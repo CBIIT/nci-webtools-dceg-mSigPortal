@@ -1,10 +1,119 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Card from 'react-bootstrap/Card';
 import { CardDeck, Button } from 'react-bootstrap';
 import './home.scss';
 
+
+
 export default function Home({ links }) {
+
+  const [cats,setCats] = useState([])
+
+  const cat = async () => {
+    const response = await fetch('http://aws.random.cat/meow')
+    const obj = await response.json()
+    return obj.file
+  }
+
+  useEffect(() => {
+    for(let i in links.slice(1,5)){
+      cat().then((url) => setCats((cats) => [...cats,url]))
+    }
+  },[])
+
+  const Rows = (props) =>{
+    
+    var start = Number(props.start)
+    var end = Number(props.end)
+    var index = start-2
+    console.log(start)
+    
+    return(
+      <CardDeck>
+          {links
+            .slice(start, end)
+            .map(
+              (
+                { exact, route, action, title, cardTitle, cardText, image }
+              ) => {
+                index = index+1
+                return (
+                <>
+                  
+                  <Card
+                    key={title}
+                    className="mb-5 align-self-center"
+                    style={{
+                      width: '18rem',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      border: '1px solid #DADBE6',
+                      // minHeight: '280px'
+                      // borderRadius: '10px'
+                    }}
+                  >
+                    <Link
+                      className="stretched-link"
+                      exact={exact}
+                      key={index}
+                      to={route}
+                    >
+                      <span className="ssr-only">{title + ' link'}</span>
+                      <div
+                        className="bg-primary rounded-circle"
+                        style={{ marginTop: '-40px', padding: '10px' }}
+                      >
+                        <img alt="icon" src={cats[index]} height="55" width="55" />
+ 
+                      </div>
+                    </Link>
+                    <Card.Body>
+                      <Card.Title
+                        style={{ color: '#545871', wordSpacing: '100vw' }}
+                      >
+                        <h2 style={{ fontSize: '1.75rem' }}>
+                          <b>{cardTitle}</b>
+                        </h2>
+                      </Card.Title>
+                      <Card.Text className="text-secondary">
+                        <small>{cardText}</small>
+                      </Card.Text>
+                    </Card.Body>
+                    <Card.Footer
+                      className="bg-white border-top-0"
+                      style={{ width: '100%' }}
+                    >
+                      <Button
+                        className="my-2 border border-0 font-weight-bold"
+                        style={{
+                          backgroundColor: '#2CC799',
+                          // borderRadius: '10px',
+                          width: '90%',
+                        }}
+                      >
+                        <Link
+                          className="stretched-link text-dark"
+                          style={{ textDecoration: 'none' }}
+                          exact={exact}
+                          key={index}
+                          to={route}
+                        >
+                          {action}
+                        </Link>
+                      </Button>
+                    </Card.Footer>
+                  </Card>
+                  <div className="d-lg-none w-100"></div>
+                </>
+              )
+              
+              })}
+                      
+        </CardDeck>
+    )
+  }
+  
   return (
     <>
       <div className="banner-container text-center d-none d-md-block">
@@ -62,82 +171,10 @@ export default function Home({ links }) {
         className="container align-middle text-center"
         style={{ marginTop: '70px' }}
       >
-        <CardDeck>
-          {links
-            .slice(1, 5)
-            .map(
-              (
-                { exact, route, action, title, cardTitle, cardText, image },
-                index
-              ) => (
-                <>
-                  <Card
-                    key={title}
-                    className="mb-5 align-self-center"
-                    style={{
-                      width: '18rem',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      border: '1px solid #DADBE6',
-                      // minHeight: '280px'
-                      // borderRadius: '10px'
-                    }}
-                  >
-                    <Link
-                      className="stretched-link"
-                      exact={exact}
-                      key={index}
-                      to={route}
-                    >
-                      <span className="sr-only">{title + ' link'}</span>
-                      <div
-                        className="bg-primary rounded-circle"
-                        style={{ marginTop: '-40px', padding: '10px' }}
-                      >
-                        <img alt="icon" src={image} height="55" width="55" />
-                      </div>
-                    </Link>
-                    <Card.Body>
-                      <Card.Title
-                        style={{ color: '#545871', wordSpacing: '100vw' }}
-                      >
-                        <h2 style={{ fontSize: '1.75rem' }}>
-                          <b>{cardTitle}</b>
-                        </h2>
-                      </Card.Title>
-                      <Card.Text className="text-secondary">
-                        <small>{cardText}</small>
-                      </Card.Text>
-                    </Card.Body>
-                    <Card.Footer
-                      className="bg-white border-top-0"
-                      style={{ width: '100%' }}
-                    >
-                      <Button
-                        className="my-2 border border-0 font-weight-bold"
-                        style={{
-                          backgroundColor: '#2CC799',
-                          // borderRadius: '10px',
-                          width: '90%',
-                        }}
-                      >
-                        <Link
-                          className="stretched-link text-dark"
-                          style={{ textDecoration: 'none' }}
-                          exact={exact}
-                          key={index}
-                          to={route}
-                        >
-                          {action}
-                        </Link>
-                      </Button>
-                    </Card.Footer>
-                  </Card>
-                  <div className="d-lg-none w-100"></div>
-                </>
-              )
-            )}
-        </CardDeck>
+      {/*Cards go here*/}
+      {<Rows start={1} end={3}></Rows>}
+      {<Rows start={3} end={5}></Rows>}
+        
       </div>
       <div className="bg-white text-center">
         <div
