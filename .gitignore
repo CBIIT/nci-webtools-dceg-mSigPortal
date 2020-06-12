@@ -1,0 +1,11 @@
+/node_modules/
+/server/logs/
+/server/data/
+/www/
+config*.json
+*.meta
+*.vs
+*.Rhistory
+*.log
+*-audit.json
+.DS_Store
