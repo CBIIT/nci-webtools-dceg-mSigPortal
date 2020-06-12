@@ -59,15 +59,16 @@ export default function Home({ links }) {
                       key={index}
                       to={route}
                     >
-                      <span className="ssr-only">{title + ' link'}</span>
+                    
+                    <span className="ssr-only" display>{title + ' link'}</span> {/*Causes style issues if image is too small*/}
                       <div
                         className="bg-primary rounded-circle"
                         style={{ marginTop: '-40px', padding: '10px' }}
                       >
-                        <img alt="icon" src={cats[index]} height="55" width="55" />
+                       <img alt="icon" src={cats[index]} height="100" width="100" /> {/*Doesn't fit in circle properly*/}
  
                       </div>
-                    </Link>
+                    </Link> 
                     <Card.Body>
                       <Card.Title
                         style={{ color: '#545871', wordSpacing: '100vw' }}
@@ -171,7 +172,7 @@ export default function Home({ links }) {
         className="container align-middle text-center"
         style={{ marginTop: '70px' }}
       >
-      {/*Cards go here*/}
+      {/*Cards go here, could change to not hardcode numbers*/}
       {<Rows start={1} end={3}></Rows>}
       {<Rows start={3} end={5}></Rows>}
         
