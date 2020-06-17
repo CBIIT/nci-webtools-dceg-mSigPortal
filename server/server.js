@@ -13,17 +13,32 @@ app.use(express.static('www'));
 app.get('/ping', (req, res) => res.send(true));
 
 app.get('/api/python', (req, res) => {
+
   const wrapper = spawn('python3', [
     'api/python/wrapper.py',
     req.query.fn,
-    req.query.arg,
+    req.query.arg
   ]);
 
   wrapper.stdout.on('data', (data) => res.send(data.toString()));
   wrapper.stderr.on('data', (data) => console.log(`error: ${data}`));
 });
 
-app.get('/api/r', (req, res) => res.send(true));
+app.get('/api/r', (req, res) => {
+  
+   //Validate args and check for optional/missing args here. Assign default for optional args
+
+  const wrapper= spawn('python3', [
+    "api/python/r-wrapper.py",
+    req.query.fn,
+    req.query.first,
+    req.query.second 
+  ]);
+ 
+  wrapper.stdout.on('data', (data) => res.send(data.toString()));
+  wrapper.stderr.on('data', (data) => console.log(`error: ${data}`));
+});
+
 
 app.listen(port, () => {
   logger.log('info', `Application running on port: ${port}`);
