@@ -5,6 +5,8 @@ var path = require('path');
 const logger = require('./logger');
 const { port } = require('./config.json');
 const { spawn } = require('child_process');
+const r = require('r-wrapper')
+
 
 app.use(cors());
 app.use(express.json());
@@ -28,15 +30,8 @@ app.get('/api/r', (req, res) => {
   
    //Validate args and check for optional/missing args here. Assign default for optional args
 
-  const wrapper= spawn('python3', [
-    "api/python/r-wrapper.py",
-    req.query.fn,
-    req.query.first,
-    req.query.second 
-  ]);
- 
-  wrapper.stdout.on('data', (data) => res.send(data.toString()));
-  wrapper.stderr.on('data', (data) => console.log(`error: ${data}`));
+  const data = r(path.resolve(__dirname, 'test.R'),'hello',{name: "world"})
+  res.send(data.toString())
 });
 
 
