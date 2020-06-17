@@ -1,6 +1,13 @@
-def test(args):
-    print(args.param)
-    return {True, args.param}
+import os
+import rpy2
+
+
+def testPython(args):
+    print(args.params)
+    return {True, args.params}
+
+
+def testR(args):
 
 
 if __name__ == '__main__':
@@ -8,9 +15,9 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     subparsers = parser.add_subparsers()
 
-    testParser = subparsers.add_parser('test')
-    testParser.add_argument('param')
-    testParser.set_defaults(func=test)
+    testPythonParser = subparsers.add_parser('testPython')
+    testPythonParser.add_argument('params')
+    testPythonParser.set_defaults(func=testPython)
 
     args = parser.parse_args()
     args.func(args)
