@@ -5,7 +5,9 @@ import { CardDeck, Button } from 'react-bootstrap';
 import './home.scss';
 
 export default function Home({ links }) {
-  function cardRow(links) {
+  const colors = ['#fc8701', '#2c71dd', '#689f39', '#018f83'];
+
+  function cardRow(links, colors) {
     return (
       <CardDeck>
         {links.map(
@@ -23,6 +25,7 @@ export default function Home({ links }) {
                   justifyContent: 'center',
                   alignItems: 'center',
                   border: '1px solid #DADBE6',
+                  backgroundColor: 'white',
                   // minHeight: '280px'
                   // borderRadius: '10px'
                 }}
@@ -35,8 +38,12 @@ export default function Home({ links }) {
                 >
                   <span className="sr-only">{title + ' link'}</span>
                   <div
-                    className="bg-primary rounded-circle"
-                    style={{ marginTop: '-40px', padding: '10px' }}
+                    className="rounded-circle"
+                    style={{
+                      marginTop: '-40px',
+                      padding: '10px',
+                      backgroundColor: colors[index],
+                    }}
                   >
                     <img alt="icon" src={image} height="55" width="55" />
                   </div>
@@ -86,8 +93,8 @@ export default function Home({ links }) {
         className="container align-middle text-center"
         style={{ marginTop: '70px' }}
       >
-        {cardRow(links.slice(0, 2))}
-        {cardRow(links.slice(2, 4))}
+        {cardRow(links.slice(0, 2), colors.slice(0, 2))}
+        {cardRow(links.slice(2, 4), colors.slice(2, 4))}
       </div>
     </>
   );
