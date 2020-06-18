@@ -1,6 +1,7 @@
 import os
-import rpy2
 import json
+from rpy2.robjects import r
+
 from python import test
 
 
@@ -8,11 +9,17 @@ def pythonHandler(args):
     req = json.loads(args.params)
     fn = getattr(test, req['fn'])
     args = req['args']
-    print(json.dumps({'return': fn(args)}), end='')
+    result = fn(args)
+    print(json.dumps({'return': result}), end='')
 
 
 def rHandler(args):
-    print('rHander: ', args.params)
+    req = json.loads(args.params)
+    fn = req['fn']
+    args = req['args']
+    r.source('api/R/test.R')
+    result = str(r[fn](args))
+    print(json.dumps({'return': result}), end='')
 
 
 if __name__ == '__main__':

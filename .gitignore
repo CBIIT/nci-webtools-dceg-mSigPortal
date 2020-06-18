@@ -9,3 +9,4 @@ config*.json
 *.log
 *-audit.json
 .DS_Store
+api/python/__pycache__
