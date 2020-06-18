@@ -5,11 +5,13 @@
 }
 
 .navlinks:hover {
-  color: #ddd !important;
+  opacity: 0.75;
+  background-color: #1976d2 !important;
+  color: white;
 }
 
 .active-navlinks {
-  background-color: #8e0000 !important;
+  background-color: #1976d2 !important;
   color: #fafafa !important;
 
   // button {
