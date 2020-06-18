@@ -1,13 +1,18 @@
 import os
 import rpy2
+import json
+from python import test
 
 
-def testPython(args):
-    print(args.params)
-    return {True, args.params}
+def pythonHandler(args):
+    req = json.loads(args.params)
+    fn = getattr(test, req['fn'])
+    args = req['args']
+    print(json.dumps({'return': fn(args)}), end='')
 
 
-def testR(args):
+def rHandler(args):
+    print('rHander: ', args.params)
 
 
 if __name__ == '__main__':
@@ -15,15 +20,13 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     subparsers = parser.add_subparsers()
 
-    testPythonParser = subparsers.add_parser('testPython')
-    testPythonParser.add_argument('params')
-    testPythonParser.set_defaults(func=testPython)
+    pythonParser = subparsers.add_parser('pythonHandler')
+    pythonParser.add_argument('params')
+    pythonParser.set_defaults(func=pythonHandler)
+
+    rParser = subparsers.add_parser('rHandler')
+    rParser.add_argument('params')
+    rParser.set_defaults(func=rHandler)
 
     args = parser.parse_args()
     args.func(args)
-
-# parser.add_argument('-f', '--function', help='specify function to call')
-# args = parser.parse_args()
-# if (args.debug):
-#     config = Util('config.dev.ini')
-# else:

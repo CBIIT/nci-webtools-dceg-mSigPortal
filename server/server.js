@@ -22,16 +22,16 @@ app.get('/ping', (req, res) => res.send(true));
  * Calls wrapper function for Python and R
  *
  * @param {string} req.body.fn Wrapper function name
- * @param {string} req.body.args JSON string of function params
- * @return {string} JSON string of function output
+ * @param {string} req.body.args Name of function handler (python or R)
+ * @return {string} JSON string of function name and arguments
  */
 app.post('/api', (req, res) => {
   let stdout = '';
   let stderr = '';
   const wrapper = spawn('python3', [
     'api/wrapper.py',
-    req.body.fn,
-    req.body.args,
+    req.body.handler,
+    JSON.stringify(req.body.params),
   ]);
 
   wrapper.stdout.on('data', (data) => (stdout += data.toString()));
