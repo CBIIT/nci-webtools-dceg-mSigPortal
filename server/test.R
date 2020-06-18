@@ -1,8 +1,7 @@
 #! /usr/bin/Rscript
 
-hello <- function(name){
-
-    return(paste("Hello ",name))
+hello <- function(first,last){
+    return(paste("Hello ",first,last))
 }
 
 add <- function(a,b){

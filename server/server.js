@@ -26,11 +26,12 @@ app.get('/api/python', (req, res) => {
   wrapper.stderr.on('data', (data) => console.log(`error: ${data}`));
 });
 
-app.get('/api/r', (req, res) => {
-  
-   //Validate args and check for optional/missing args here. Assign default for optional args
+app.post('/r', (req, res) => {
 
-  const data = r(path.resolve(__dirname, 'test.R'),'hello',{name: "world"})
+  const data = r(path.resolve(__dirname, 'test.R'),req.body.script,{
+    first: req.body.first !== undefined ? req.body.first : 'John',
+    last: req.body.last !== undefined ? req.body.last : 'Smith'
+  })
   res.send(data.toString())
 });
 
