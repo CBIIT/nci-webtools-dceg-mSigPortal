@@ -1,24 +1,20 @@
 .navlinks {
   text-decoration: none !important;
   font-weight: 700;
-  color: white;
+  color: #fafafa;
 }
 
 .navlinks:hover {
   color: #ddd !important;
 }
 
-.navlinks.active-navlinks:hover {
-  color: #444 !important;
-}
-
 .active-navlinks {
-  background-color: #2cc799 !important;
-  color: #333c4e !important;
+  background-color: #8e0000 !important;
+  color: #fafafa !important;
 
-  button {
-    background-color: white !important;
-    color: black !important;
-    font-weight: 700 !important;
-  }
+  // button {
+  //   background-color: white !important;
+  //   color: black !important;
+  //   font-weight: 700 !important;
+  // }
 }

@@ -5,7 +5,7 @@ import './navbar.scss';
 export default function Navbar({ links }) {
   return (
     <div className="bg-primary text-white shadow-sm">
-      <div className="container">
+      <div className="container d-flex">
         {[{ route: '/', title: 'Home', exact: true }]
           .concat(links)
           .filter((link) => link.title)

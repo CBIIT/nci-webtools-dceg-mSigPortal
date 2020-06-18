@@ -2,13 +2,19 @@
   z-index: 0;
   overflow: hidden;
   display: block;
-  height: 233px;
+  height: 260px;
   position: relative;
 
-  .banner-overlay-text {
+  img {
     position: absolute;
-    top: 60%;
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    max-width: 100%;
+    height: auto;
   }
+}
+
+.card {
+  background-color: #f5f5f6 !important;
 }
