@@ -9,6 +9,8 @@ const r = require('r-wrapper')
 
 const app = express();
 
+const app = express();
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static('www'));
@@ -43,16 +45,6 @@ app.post('/api', (req, res) => {
     res.send({ return: stdout, err: stderr });
   });
 });
-
-app.post('/r', (req, res) => {
-
-  const data = r(path.resolve(__dirname, 'test.R'),req.body.script,{
-    first: req.body.first !== undefined ? req.body.first : 'John',
-    last: req.body.last !== undefined ? req.body.last : 'Smith'
-  })
-  res.send(data.toString())
-});
-
 
 app.listen(port, () => {
   logger.log('info', `Application running on port: ${port}`);
