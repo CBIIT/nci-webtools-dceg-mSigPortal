@@ -12,13 +12,6 @@ import Association from './pages/association/association';
 export default function App() {
   const links = [
     {
-      route: '/about',
-      title: 'About',
-      // cardTitle: 'About',
-      image: 'assets/images/about.svg',
-      navIndex: 4,
-    },
-    {
       route: '/visualize',
       action: 'Visualize',
       title: 'Visualize',
@@ -32,7 +25,7 @@ export default function App() {
       action: 'Explore',
       title: 'Explore',
       cardTitle: 'Signature Exploring',
-      cardText: 'Placeholder',
+      cardText: 'Signature Exploring',
       image: 'assets/images/phenotypes.svg',
       navIndex: 1,
     },
@@ -53,6 +46,13 @@ export default function App() {
       cardText: 'Signature Association',
       image: 'assets/images/downloads.svg',
       navIndex: 3,
+    },
+    {
+      route: '/about',
+      title: 'About',
+      // cardTitle: 'About',
+      image: 'assets/images/about.svg',
+      navIndex: 4,
     },
   ];
 

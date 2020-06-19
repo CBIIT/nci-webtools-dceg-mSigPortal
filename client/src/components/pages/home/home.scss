@@ -1,14 +1,28 @@
+
 .banner-container {
   z-index: 0;
   overflow: hidden;
   display: block;
-  height: 233px;
+  height: 260px;
   position: relative;
 
-  .banner-overlay-text {
+  img {
     position: absolute;
-    top: 60%;
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .card {
+    text-decoration: none;
+    transform: scale(1.04);
+    transition: all 200ms;
+    box-shadow: 0px 12px 20px 10px rgba(0,0,0,0.2);
+  }
+  
+  .card:hover {
+    transform: scale(1.5); /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
   }
 }
