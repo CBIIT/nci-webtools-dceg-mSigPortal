@@ -14,3 +14,10 @@
     height: auto;
   }
 }
+
+.card:hover {
+  text-decoration: none;
+  background-color: #2a71a5 !important;
+  transition: all 200ms;
+  box-shadow: 0px 12px 20px 10px rgba(0,0,0,0.2);
+}

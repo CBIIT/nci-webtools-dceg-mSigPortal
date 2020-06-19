@@ -19,6 +19,7 @@ export default function Home({ links }) {
               <Card
                 key={title}
                 className="mb-5 align-self-center"
+
                 style={{
                   width: '18rem',
                   height: '18rem',
@@ -28,7 +29,8 @@ export default function Home({ links }) {
                   backgroundColor: 'white',
                   // minHeight: '280px'
                   // borderRadius: '10px'
-                }}
+                }
+              }
               >
                 <Link
                   className="stretched-link"
@@ -43,6 +45,7 @@ export default function Home({ links }) {
                       marginTop: '-40px',
                       padding: '10px',
                       backgroundColor: colors[index],
+                      border: "4px solid white"
                     }}
                   >
                     <img alt="icon" src={image} height="55" width="55" />

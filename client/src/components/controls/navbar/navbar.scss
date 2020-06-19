@@ -5,14 +5,17 @@
 }
 
 .navlinks:hover {
-  opacity: 0.75;
-  background-color: #1976d2 !important;
-  color: white;
+  background-color: #fafafa;
+  color: #2f2f2f;
+  border-bottom: 7px solid #fafafa; 
 }
 
 .active-navlinks {
-  background-color: #1976d2 !important;
-  color: #fafafa !important;
+  background-color: #fafafa !important;
+  color: #2f2f2f !important;
+  border-bottom: 7px solid #14819b !important;
+
+
 
   // button {
   //   background-color: white !important;
