@@ -232,18 +232,16 @@ export default function UploadForm() {
           </Text>
         </div>
       </Group>
-      <div className="container">
-        <div className="row">
-          <div className="col-sm-6">
-            <Button className="w-100" variant="secondary">
-              Reset
-            </Button>
-          </div>
-          <div className="col-sm-6">
-            <Button className="w-100" variant="primary" type="submit">
-              Submit
-            </Button>
-          </div>
+      <div className="row">
+        <div className="col-sm-6">
+          <Button className="w-100" variant="secondary">
+            Reset
+          </Button>
+        </div>
+        <div className="col-sm-6">
+          <Button className="w-100" variant="primary" type="submit">
+            Submit
+          </Button>
         </div>
       </div>
     </Form>
