@@ -1,0 +1,18 @@
+.dropzone {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  border-radius: 2px;
+  border: 2px dashed #14819b;
+  background-color: #fafafa;
+  color: #646C7F;
+  outline: none;
+  transition: border 0.24s ease-in-out;
+}
+
+aside > ul {
+  list-style: none;
+  padding: 0;
+}
