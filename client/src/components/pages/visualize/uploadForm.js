@@ -9,7 +9,6 @@ const { Group, Label, Control, Check, Text } = Form;
 
 export default function UploadForm() {
   const [inputFormat, setInputFormat] = useState('vcf');
-  const [selectedFileType, setSelectedFile] = useState('vcf');
   const [projectID, setProjectID] = useState('');
   const [selectedGenome, setSelectedGenome] = useState('GRCh37');
   const [experimentalStrategy, setStrategy] = useState('WGS');
@@ -33,27 +32,21 @@ export default function UploadForm() {
     switch (type) {
       case 'vcf':
         setInputFormat('vcf');
-        setSelectedFile('vcf');
         break;
       case 'csv':
         setInputFormat('csv');
-        setSelectedFile('csv');
         break;
       case 'tsv':
         setInputFormat('tsv');
-        setSelectedFile('tsv');
         break;
-      case 'cat_tsv':
+      case 'catalog_tsv':
         setInputFormat('catalog_tsv');
-        setSelectedFile('catalog_tsv');
         break;
-      case 'cat_csv':
+      case 'catalog_csv':
         setInputFormat('catalog_csv');
-        setSelectedFile('catalog_csv');
         break;
       default:
         setInputFormat('vcf');
-        setSelectedFile('vcf');
     }
   }
 
@@ -91,14 +84,14 @@ export default function UploadForm() {
         <Label className="required">Choose File Type</Label>
         <Control
           as="select"
-          value={selectedFileType}
+          value={inputFormat}
           onChange={(e) => handleInputSelect(e.target.value)}
         >
           <option value="vcf">VCF</option>
           <option value="csv">CSV</option>
           <option value="tsv">TSV</option>
-          <option value="cat_tsv">CATALOG TSV</option>
-          <option value="cat_csv">CATALOG CSV</option>
+          <option value="catalog_tsv">CATALOG TSV</option>
+          <option value="catalog_csv">CATALOG CSV</option>
         </Control>
       </Group>
       <Group controlId="fileUpload">
@@ -227,6 +220,8 @@ export default function UploadForm() {
           <Control
             placeholder="Enter Email"
             size="sm"
+            value={email}
+            onChange={(e) => handleEmailInput(e.target.value)}
             disabled={!queueMode}
           ></Control>
           <Text className="text-muted">
