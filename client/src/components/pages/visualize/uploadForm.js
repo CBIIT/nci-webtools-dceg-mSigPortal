@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileUpload } from '@fortawesome/free-solid-svg-icons';
 import './visualize.scss';
 
-const { Group, Label, Control, Check, Text, FormCheck } = Form;
+const { Group, Label, Control, Check, Text } = Form;
 
 export default function UploadForm() {
   const [inputFormat, setInputFormat] = useState('vcf');
@@ -16,6 +16,8 @@ export default function UploadForm() {
   const [collapseSample, setCollapse] = useState('False');
   const [mutationFilter, setFilter] = useState('text');
   const [mutationSplit, setSplit] = useState('False');
+  const [queueMode, setQueueMode] = useState(false);
+  const [email, setEmail] = useState('');
 
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
     accept: '.csv,.tsv.,.vcf,.gz,.zip,.tar,.tar.gz',
@@ -77,6 +79,10 @@ export default function UploadForm() {
 
   function handleMutationRadio(bool) {
     setSplit(bool);
+  }
+
+  function handleEmailInput(string) {
+    setEmail(string.trim());
   }
 
   return (
@@ -203,6 +209,33 @@ export default function UploadForm() {
           />
           <Check.Label className="font-weight-normal">True</Check.Label>
         </Check>
+      </Group>
+      <Group controlId="email">
+        <div>
+          <Check
+            inline
+            id="toggleQueue"
+            type="checkbox"
+            label="Submit this job to a Queue"
+            checked={queueMode == true}
+            onChange={(_) => {
+              setQueueMode(!queueMode);
+            }}
+          />
+        </div>
+        <div>
+          <Control
+            placeholder="Enter Email"
+            size="sm"
+            disabled={!queueMode}
+          ></Control>
+          <Text className="text-muted">
+            <i>
+              Note: if sending to queue, when computation is completed, a
+              notification will be sent to the e-mail entered above.
+            </i>
+          </Text>
+        </div>
       </Group>
       <div className="d-flex">
         <Button className="ml-auto" variant="primary" type="submit">
