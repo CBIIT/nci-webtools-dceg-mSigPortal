@@ -19,7 +19,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "npm run format && react-scripts build",
+    "build": "npm run format && react-scripts build && rm -rf ../www && mv build ../www",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "format": "prettier --single-quote --write \"src/**/*.{js,json,css,scss}\""
