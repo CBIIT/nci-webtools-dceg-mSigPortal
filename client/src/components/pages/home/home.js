@@ -23,7 +23,7 @@ export default function Home({ links }) {
 
                 style={{
                   width: '18rem',
-                  height: '18rem',
+                  // height: '18rem',
                   justifyContent: 'center',
                   alignItems: 'center',
                   border: '1px solid #DADBE6',
