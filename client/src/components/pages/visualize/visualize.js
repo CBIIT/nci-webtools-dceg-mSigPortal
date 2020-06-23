@@ -1,15 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
+import {
+  SidebarContainer,
+  SidebarPanel,
+  MainPanel,
+} from '../../controls/sidebar-container/sidebar-container';
+import UploadForm from './uploadForm';
+import './visualize.scss';
 
 export default function Visualize() {
-  return (
-    <div className="mt-3 container bg-white tab-pane-bordered rounded-0 p-4"
-      style={{
-        minHeight: '420px'
-      }}>
-      <h1 className="font-weight-light">Visualize</h1>
-      <hr />
+  const [openSidebar, setOpenSidebar] = useState(true);
 
-      <p>TBA</p>
+  return (
+    <div className="container">
+      <SidebarContainer
+        className="my-3"
+        collapsed={!openSidebar}
+        onCollapsed={(collapsed) => setOpenSidebar(!collapsed)}
+      >
+        <SidebarPanel className="col-lg-4">
+          <div className="p-3 shadow-sm bg-white">
+            <div className="row">
+              <div className="col-sm-auto">
+                <h3 className="mb-2">Parameters</h3>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-sm-auto w-100">
+                <UploadForm />
+              </div>
+            </div>
+          </div>
+        </SidebarPanel>
+        <MainPanel className="col-lg-8">
+          <div
+            className="p-3 shadow-sm bg-white"
+            style={{ minHeight: '420px' }}
+          ></div>
+        </MainPanel>
+      </SidebarContainer>
     </div>
   );
 }

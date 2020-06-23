@@ -4,8 +4,8 @@ import './navbar.scss';
 
 export default function Navbar({ links }) {
   return (
-    <div className="bg-primary-dark text-white shadow-sm">
-      <div className="container d-flex">
+    <div className="bg-dark text-white gradient shadow-sm">
+      <div className="container d-flex justify-content-center">
         {[{ route: '/', title: 'Home', exact: true }]
           .concat(links)
           .filter((link) => link.title)
@@ -14,6 +14,7 @@ export default function Navbar({ links }) {
             <div data-testid="Navbar" className="d-inline-block" key={title}>
               <NavLink
                 data-testid={`Navbar-NavLink-${index}`}
+                id={title}
                 // key={title}
                 className="navlinks py-2 px-4 d-inline-block"
                 activeClassName="active-navlinks"

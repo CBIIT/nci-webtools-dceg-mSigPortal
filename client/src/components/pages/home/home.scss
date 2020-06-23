@@ -16,9 +16,38 @@
   }
 }
 
-.card:hover {
+.card#Visualize:hover {
   text-decoration: none;
   transform: scale(1.04);
+  background-color: #ffb844 !important;
+  border-color: #ffb844 !important;
+  transition: all 200ms;
+  box-shadow: 0px 12px 20px 10px rgba(0,0,0,0.2);
+}
+
+.card#Explore:hover {
+  text-decoration: none;
+  transform: scale(1.04);
+  background-color: #6f9fff !important;
+  border-color: #6f9fff !important;
+  transition: all 200ms;
+  box-shadow: 0px 12px 20px 10px rgba(0,0,0,0.2);
+}
+
+.card#Refitting:hover {
+  text-decoration: none;
+  transform: scale(1.04);
+  background-color: #99d067 !important;
+  border-color: #99d067 !important;
+  transition: all 200ms;
+  box-shadow: 0px 12px 20px 10px rgba(0,0,0,0.2);
+}
+
+.card#Association:hover {
+  text-decoration: none;
+  transform: scale(1.04);
+  background-color: #b664be !important;
+  border-color: #b664be !important;
   transition: all 200ms;
   box-shadow: 0px 12px 20px 10px rgba(0,0,0,0.2);
 }

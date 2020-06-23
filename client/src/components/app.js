@@ -19,6 +19,7 @@ export default function App() {
       cardText: 'Visualize mutational profiles',
       image: 'assets/images/gwas.svg',
       navIndex: 0,
+      
     },
     {
       route: '/explore',
@@ -26,7 +27,7 @@ export default function App() {
       title: 'Explore',
       cardTitle: 'Signature Exploring',
       cardText: 'Signature Exploring',
-      image: 'assets/images/phenotypes.svg',
+      image: 'assets/images/gwas.svg',
       navIndex: 1,
     },
     {
@@ -35,7 +36,7 @@ export default function App() {
       title: 'Refitting',
       cardTitle: 'Signature Refitting',
       cardText: 'Signature Refitting',
-      image: 'assets/images/downloads.svg',
+      image: 'assets/images/gwas.svg',
       navIndex: 2,
     },
     {
@@ -44,14 +45,14 @@ export default function App() {
       title: 'Association',
       cardTitle: 'Signature Association',
       cardText: 'Signature Association',
-      image: 'assets/images/downloads.svg',
+      image: 'assets/images/gwas.svg',
       navIndex: 3,
     },
     {
       route: '/about',
       title: 'About',
       // cardTitle: 'About',
-      image: 'assets/images/about.svg',
+      image: 'assets/images/gwas.svg',
       navIndex: 4,
     },
   ];
