@@ -7,7 +7,7 @@ const { spawn } = require('child_process');
 
 const app = express();
 
-// app.use(cors());
+app.use(cors());
 app.use(express.static(path.resolve('www')));
 app.use(express.json());
 
