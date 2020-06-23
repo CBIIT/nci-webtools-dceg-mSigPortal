@@ -12,7 +12,7 @@ export const CollapseButton = ({ collapsed, toggleCollapse }) => (
       border: 'none',
       outline: 'none',
       color: 'white',
-      height: '100%',
+      height: '15%',
     }}
   >
     <span className="sr-only">Show or hide input sidebar</span>
