@@ -10,10 +10,42 @@
   border-bottom: 7px solid #fafafa; 
 }
 
-.active-navlinks {
+.active-navlinks#Home{
   background-color: #fafafa !important;
   color: #2f2f2f !important;
-  border-bottom: 7px solid #14819b !important;
+  border-bottom: 7px solid #BB0E3D !important;
+}
+
+.active-navlinks#Visualize{
+  background-color: #fafafa !important;
+  color: #2f2f2f !important;
+  border-bottom: 7px solid #fc8701 !important;
+}
+
+.active-navlinks#Explore{
+  background-color: #fafafa !important;
+  color: #2f2f2f !important;
+  border-bottom: 7px solid #2c71dd !important;
+}
+
+.active-navlinks#Refitting{
+  background-color: #fafafa !important;
+  color: #2f2f2f !important;
+  border-bottom: 7px solid #689f39 !important;
+}
+
+.active-navlinks#Association{
+  background-color: #fafafa !important;
+  color: #2f2f2f !important;
+  border-bottom: 7px solid #84368d !important;
+}
+
+.active-navlinks#About{
+  background-color: #fafafa !important;
+  color: #2f2f2f !important;
+  border-bottom: 7px solid #606060 !important;
+}
+
 
 
 
@@ -22,4 +54,4 @@
   //   color: black !important;
   //   font-weight: 700 !important;
   // }
-}
+

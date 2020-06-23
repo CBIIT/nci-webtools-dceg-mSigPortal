@@ -14,6 +14,7 @@ export default function Navbar({ links }) {
             <div data-testid="Navbar" className="d-inline-block" key={title}>
               <NavLink
                 data-testid={`Navbar-NavLink-${index}`}
+                id={title}
                 // key={title}
                 className="navlinks py-2 px-4 d-inline-block"
                 activeClassName="active-navlinks"

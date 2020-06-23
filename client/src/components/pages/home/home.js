@@ -5,7 +5,7 @@ import { CardDeck, Button } from 'react-bootstrap';
 import './home.scss';
 
 export default function Home({ links }) {
-  const colors = ['#fc8701', '#2c71dd', '#689f39', '#018f83'];
+  const colors = ['#fc8701', '#2c71dd', '#689f39', '#84368d'];
 
   function cardRow(links, colors) {
     return (
