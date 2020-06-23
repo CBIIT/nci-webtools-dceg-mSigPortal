@@ -19,7 +19,7 @@ export default function UploadForm() {
   const [email, setEmail] = useState('');
 
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
-    accept: '.csv,.tsv.,.vcf,.gz,.zip,.tar,.tar.gz',
+    accept: '.csv,.tsv,.vcf,.gz,.zip,.tar,.tar.gz',
   });
 
   const files = acceptedFiles.map((file) => (

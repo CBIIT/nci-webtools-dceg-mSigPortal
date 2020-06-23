@@ -7,11 +7,12 @@ export const CollapseButton = ({ collapsed, toggleCollapse }) => (
     onClick={toggleCollapse}
     style={{
       position: 'absolute',
-      left: '-10px',
-      background: 'transparent',
+      left: '-14px',
+      background: '#63a4ff',
       border: 'none',
       outline: 'none',
-      color: 'rgb(0, 126, 167)',
+      color: 'white',
+      height: '100%',
     }}
   >
     <span className="sr-only">Show or hide input sidebar</span>
