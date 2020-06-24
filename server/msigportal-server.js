@@ -2,10 +2,13 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const logger = require('./logger');
-const { port } = require('./config.json');
+const { port, tmppath } = require('./config.json');
 const { spawn } = require('child_process');
-const r = require('r-wrapper')
 const cron = require("node-cron");
+const formidable = require('formidable');
+const fs = require('fs');
+const rimraf = require('rimraf');
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 
@@ -44,6 +47,48 @@ app.post('/api', (req, res) => {
   });
 });
 
+app.post('/upload', (req, res, next) => {
+  const projectID = uuidv4();
+  const form = formidable({ uploadDir: path.resolve(tmppath, projectID) });
+
+  logger.info(`/UPLOAD: Request UUID:${projectID}`);
+
+  if (!fs.existsSync(form.uploadDir)) {
+    fs.mkdirSync(form.uploadDir);
+  } else {
+    rimraf(form.uploadDir, () => {
+      fs.mkdirSync(form.uploadDir);
+    });
+  }
+
+  form.parse(req);
+  form.on('file', (field, file) => {
+    fs.rename(file.path, path.join(form.uploadDir, file.name), (err) => {
+      if (err) {
+        logger.warn(
+          `/UPLOAD: Failed to upload file: ${file.name}` + '\n' + err
+        );
+        res.status(404).json({
+          msg: `/UPLOAD: Failed to upload file: ${file.name}`,
+          error: err,
+        });
+      } else {
+        logger.info(`/UPLOAD: Successfully uploaded file: ${file.name}`);
+        res.json({
+          projectID: projectID,
+        });
+      }
+    });
+  });
+  form.on('error', function (err) {
+    logger.warn('/UPLOAD: An error occured\n' + err);
+    res.status(500).json({
+      msg: '/UPLOAD: An error has occured',
+      err: err,
+    });
+  });
+});
+
 cron.schedule("50 7 * * *", function() {
   const process = spawn('find local/content/analysistools/public_html/apps/msigportal/tmp -mindepth 1 -mtime +14 -exec rm {} \; >>var/log/msigportal-cron.log 2>&1', [],{shell:true})
   process.stderr.on('data',(data) => console.log(data.toString()))
@@ -55,6 +100,6 @@ cron.schedule("45 7 * * *", function() {
 });
 
 app.listen(port, () => {
-  logger.log('info', `Application running on port: ${port}`);
+  logger.info(`msigportal server running on port: ${port}`);
   console.log(`Listening on port ${port}`);
 });
