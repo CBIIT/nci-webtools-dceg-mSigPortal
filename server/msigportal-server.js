@@ -90,14 +90,22 @@ app.post('/upload', (req, res, next) => {
   });
 });
 
-cron.schedule("50 7 * * *", function() {
-  const process = spawn('find local/content/analysistools/public_html/apps/msigportal/tmp -mindepth 1 -mtime +14 -exec rm {} \; >>var/log/msigportal-cron.log 2>&1', [],{shell:true})
-  process.stderr.on('data',(data) => console.log(data.toString()))
+cron.schedule('50 7 * * *', function () {
+  const process = spawn(
+    'find local/content/analysistools/public_html/apps/msigportal/tmp -mindepth 1 -mtime +14 -exec rm {} ; >>var/log/msigportal-cron.log 2>&1',
+    [],
+    { shell: true }
+  );
+  process.stderr.on('data', (data) => console.log(data.toString()));
 });
 
-cron.schedule("45 7 * * *", function() {
-  const process = spawn('find  local/content/analysistools/public_html/apps/msigportal/logs -mindepth 1 -mtime +60 -exec rm {} \; >>var/log/msigportal-cron.log 2>&1', [],{shell:true})
-  process.stderr.on('data',(data) => console.log(data.toString()))
+cron.schedule('45 7 * * *', function () {
+  const process = spawn(
+    'find  local/content/analysistools/public_html/apps/msigportal/logs -mindepth 1 -mtime +60 -exec rm {} ; >>var/log/msigportal-cron.log 2>&1',
+    [],
+    { shell: true }
+  );
+  process.stderr.on('data', (data) => console.log(data.toString()));
 });
 
 app.listen(port, () => {
