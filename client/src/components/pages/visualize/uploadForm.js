@@ -9,7 +9,7 @@ const { Group, Label, Control, Check, Text } = Form;
 
 export default function UploadForm() {
   const [inputFormat, setInputFormat] = useState('vcf');
-  const [inputFile, setInput] = useState(new File([], 'default'));
+  const [inputFile, setInput] = useState(new File([], ''));
   const [selectedGenome, setSelectedGenome] = useState('GRCh37');
   const [experimentalStrategy, setStrategy] = useState('WGS');
   const [collapseSample, setCollapse] = useState('False');
@@ -75,17 +75,21 @@ export default function UploadForm() {
   function submitHandler() {
     const upload = uploadFile();
     upload.then((data) => {
-      let req = {
-        projectID: data.projectID,
-        inputFile: inputFile,
-        inputFormat: inputFormat,
-        genomeAssemblyVersion: selectedGenome,
-        experimentalStrategy: experimentalStrategy,
-        collapseSample: collapseSample,
-        mutationFilter: mutationFilter,
-        mutationSplit: mutationSplit,
-      };
-      console.log('fn args', req);
+      if (data && data.projectID) {
+        let req = {
+          projectID: data.projectID,
+          inputFile: inputFile,
+          inputFormat: inputFormat,
+          genomeAssemblyVersion: selectedGenome,
+          experimentalStrategy: experimentalStrategy,
+          collapseSample: collapseSample,
+          mutationFilter: mutationFilter,
+          mutationSplit: mutationSplit,
+        };
+        console.log('fn args', req);
+      } else {
+        //   add error handling
+      }
     });
   }
 
@@ -112,7 +116,7 @@ export default function UploadForm() {
   }
 
   function removeFile() {
-    setInput(new File([], 'default'));
+    setInput(new File([], ''));
   }
 
   return (
@@ -279,6 +283,7 @@ export default function UploadForm() {
         </div>
         <div className="col-sm-6">
           <Button
+            disabled={!inputFile.size}
             className="w-100"
             variant="primary"
             type="submit"
