@@ -19,7 +19,6 @@ export default function App() {
       cardText: 'Visualize mutational profiles',
       image: 'assets/images/gwas.svg',
       navIndex: 0,
-      
     },
     {
       route: '/explore',

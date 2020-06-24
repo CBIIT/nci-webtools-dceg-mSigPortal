@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node server/server.js",
+    "start": "node server/msigportal-server.js",
     "build": "npm run format && cd client && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --single-quote --write \"server/**/*.{js,json}\""

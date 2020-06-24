@@ -10,8 +10,9 @@ const cron = require("node-cron");
 const app = express();
 
 app.use(cors());
+app.use(express.static(path.resolve('www')));
 app.use(express.json());
-app.use(express.static('www'));
+
 app.use((err, req, res, next) => {
   console.error(err.message);
   if (!err.statusCode) err.statusCode = 500;
