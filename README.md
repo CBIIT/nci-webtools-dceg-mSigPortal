@@ -20,7 +20,7 @@ cp config.example.json config.json
 #### Start Server
 ```bash
 npm start
-# Server runs on port 9000 by default
+# Server runs on port 8330 by default
 ```
 
 #### Start Client

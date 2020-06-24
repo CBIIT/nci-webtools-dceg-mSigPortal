@@ -5,6 +5,7 @@ import {
   MainPanel,
 } from '../../controls/sidebar-container/sidebar-container';
 import UploadForm from './uploadForm';
+import Results from './results';
 import './visualize.scss';
 
 export default function Visualize() {
@@ -35,7 +36,9 @@ export default function Visualize() {
           <div
             className="p-3 shadow-sm bg-white"
             style={{ minHeight: '420px' }}
-          ></div>
+          >
+            <Results />
+          </div>
         </MainPanel>
       </SidebarContainer>
     </div>
