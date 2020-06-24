@@ -5,9 +5,7 @@ const logger = require('./logger');
 const { port } = require('./config.json');
 const { spawn } = require('child_process');
 const r = require('r-wrapper')
-
-
-const app = express();
+const cron = require("node-cron");
 
 const app = express();
 
@@ -38,12 +36,21 @@ app.post('/api', (req, res) => {
     JSON.stringify(req.body.params),
   ]);
 
-  wrapper.stdout.on('data', (data) => (stdout += data.toString()));
   wrapper.stderr.on('data', (data) => (stderr += data.toString()));
   wrapper.stderr.on('close', () => {
     console.log('return', { stdout, stderr });
     res.send({ return: stdout, err: stderr });
   });
+});
+
+cron.schedule("50 7 * * *", function() {
+  const process = spawn('find local/content/analysistools/public_html/apps/msigportal/tmp -mindepth 1 -mtime +14 -exec rm {} \; >>var/log/msigportal-cron.log 2>&1', [],{shell:true})
+  process.stderr.on('data',(data) => console.log(data.toString()))
+});
+
+cron.schedule("45 7 * * *", function() {
+  const process = spawn('find  local/content/analysistools/public_html/apps/msigportal/logs -mindepth 1 -mtime +60 -exec rm {} \; >>var/log/msigportal-cron.log 2>&1', [],{shell:true})
+  process.stderr.on('data',(data) => console.log(data.toString()))
 });
 
 app.listen(port, () => {
