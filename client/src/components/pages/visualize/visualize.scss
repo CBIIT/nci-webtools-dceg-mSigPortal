@@ -10,9 +10,19 @@
   color: #646c7f;
   outline: none;
   transition: border 0.24s ease-in-out;
+  cursor: pointer;
 }
 
-aside > ul {
-  list-style: none;
-  padding: 0;
+.dropzone:disabled {
+  cursor: default;
+}
+
+#removeFile {
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+#removeFile:hover {
+  background: #cfd8dc;
 }

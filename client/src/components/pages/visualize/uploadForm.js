@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { useDropzone } from 'react-dropzone';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileUpload } from '@fortawesome/free-solid-svg-icons';
+import { faCloudUploadAlt, faMinus } from '@fortawesome/free-solid-svg-icons';
 import './visualize.scss';
 
 const { Group, Label, Control, Check, Text } = Form;
 
 export default function UploadForm() {
   const [inputFormat, setInputFormat] = useState('vcf');
-  const [projectID, setProjectID] = useState('');
+  const [inputFile, setInput] = useState(new File([], 'default'));
   const [selectedGenome, setSelectedGenome] = useState('GRCh37');
   const [experimentalStrategy, setStrategy] = useState('WGS');
   const [collapseSample, setCollapse] = useState('False');
@@ -18,15 +18,13 @@ export default function UploadForm() {
   const [queueMode, setQueueMode] = useState(false);
   const [email, setEmail] = useState('');
 
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
-    accept: '.csv,.tsv,.vcf,.gz,.zip,.tar,.tar.gz',
+  const onDrop = useCallback((acceptedFiles) => {
+    setInput(acceptedFiles[0]);
+  }, []);
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: '.csv, .tsv, .vcf, .gz, .zip, .tar, .tar.gz',
   });
-
-  const files = acceptedFiles.map((file) => (
-    <li key={file.path}>
-      {file.path} - {file.size} bytes
-    </li>
-  ));
 
   function handleInputSelect(type) {
     switch (type) {
@@ -48,10 +46,6 @@ export default function UploadForm() {
       default:
         setInputFormat('vcf');
     }
-  }
-
-  function handleProjectInput(id) {
-    setProjectID(id.trim());
   }
 
   function handleGenomeSelect(genome) {
@@ -78,10 +72,53 @@ export default function UploadForm() {
     setEmail(string.trim());
   }
 
+  function submitHandler() {
+    const upload = uploadFile();
+    upload.then((data) => {
+      let req = {
+        projectID: data.projectID,
+        inputFile: inputFile,
+        inputFormat: inputFormat,
+        genomeAssemblyVersion: selectedGenome,
+        experimentalStrategy: experimentalStrategy,
+        collapseSample: collapseSample,
+        mutationFilter: mutationFilter,
+        mutationSplit: mutationSplit,
+      };
+      console.log('fn args', req);
+    });
+  }
+
+  //   Uploads inputFile and returns a projectID
+  async function uploadFile() {
+    const root =
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:8330/'
+        : window.location.pathname;
+    const data = new FormData();
+    data.append('file', inputFile);
+
+    let response = await fetch(`${root}upload`, {
+      method: 'POST',
+      body: data,
+    });
+
+    if (!response.ok) {
+      // add error handling
+      console.log(`HTTP error! status: ${response.status}`);
+    } else {
+      return await response.json();
+    }
+  }
+
+  function removeFile() {
+    setInput(new File([], 'default'));
+  }
+
   return (
     <Form className="mb-2">
       <Group controlId="fileType">
-        <Label className="required">Choose File Type</Label>
+        <Label>Choose File Type</Label>
         <Control
           as="select"
           value={inputFormat}
@@ -97,25 +134,26 @@ export default function UploadForm() {
       <Group controlId="fileUpload">
         <section>
           <div {...getRootProps({ className: 'dropzone' })}>
-            <input {...getInputProps()} />
-            <p>Drop files here or click to upload.</p>
-            <FontAwesomeIcon icon={faFileUpload} size="4x" />
+            <input {...getInputProps()} disabled={inputFile.size} />
+            {inputFile.size ? (
+              <button
+                id="removeFile"
+                className="d-flex w-100"
+                onClick={() => removeFile()}
+              >
+                <span id="uploadedFile">{inputFile.name}</span>
+                <span className="text-danger ml-auto">
+                  <FontAwesomeIcon icon={faMinus} />
+                </span>
+              </button>
+            ) : (
+              <>
+                <p>Drop files here or click to upload.</p>
+                <FontAwesomeIcon icon={faCloudUploadAlt} size="4x" />
+              </>
+            )}
           </div>
-          <aside>
-            <ul>{files}</ul>
-          </aside>
         </section>
-      </Group>
-      <Group controlId="projectID">
-        <Label className="required">Project ID</Label>
-        <Control
-          type="text"
-          size="sm"
-          placeholder="Enter a Project ID"
-          value={projectID}
-          onChange={(e) => handleProjectInput(e.target.value)}
-        ></Control>
-        <Text className="text-muted">Input Rules: No Whitespace, ... TBA</Text>
       </Group>
       <Group controlId="genomeAssembly">
         <Label>Genome Assembly Version</Label>
@@ -171,7 +209,7 @@ export default function UploadForm() {
           <Check.Label className="font-weight-normal">True</Check.Label>
         </Check>
       </Group>
-      <Group controlId="projectID">
+      <Group controlId="filter">
         <Label>Mutation Filter</Label>
         <Control
           type="text"
@@ -206,6 +244,7 @@ export default function UploadForm() {
       <Group controlId="email">
         <div>
           <Check
+            disabled
             inline
             id="toggleQueue"
             type="checkbox"
@@ -239,7 +278,12 @@ export default function UploadForm() {
           </Button>
         </div>
         <div className="col-sm-6">
-          <Button className="w-100" variant="primary" type="submit">
+          <Button
+            className="w-100"
+            variant="primary"
+            type="submit"
+            onClick={() => submitHandler()}
+          >
             Submit
           </Button>
         </div>
