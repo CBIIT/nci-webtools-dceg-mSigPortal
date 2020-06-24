@@ -1,6 +1,6 @@
 /node_modules/
 /server/logs/
-/server/data/
+/server/tmp/*
 /www/
 config*.json
 *.meta
