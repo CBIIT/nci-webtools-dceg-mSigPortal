@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Card from 'react-bootstrap/Card';
 import { CardDeck, Button } from 'react-bootstrap';
@@ -92,10 +92,15 @@ export default function Home({ links }) {
         <div className="px-3 text-center">App Description</div>
       </div>
 
+      
+      <img src="assets/images/Banner.png" class="center"></img>
+      
+   
       <div
         className="container align-middle text-center"
         style={{ marginTop: '70px' }}
       >
+        
         {cardRow(links.slice(0, 2), colors.slice(0, 2))}
         {cardRow(links.slice(2, 4), colors.slice(2, 4))}
       </div>

@@ -1,18 +1,28 @@
-.banner-container {
+/*.banner-container {
   z-index: 0;
   overflow: hidden;
   display: block;
   height: 260px;
   position: relative;
-
   img {
     position: absolute;
-    top: 50%;
+    top: 65%;
     left: 50%;
     transform: translate(-50%, -50%);
-    max-width: 100%;
+    max-width: 200%;
     height: auto;
+    background-image: -moz-linear-gradient(left, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 49%, rgba(255, 255, 255, 1) 100%);
   }
+}
+*/
+.center{
+  text-align: center;
+  display: block;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+  width: 100%;
+  height: 300px;
 }
 
 .card#Visualize:hover {
