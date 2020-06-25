@@ -4,8 +4,6 @@ import Card from 'react-bootstrap/Card';
 import { CardDeck, Button } from 'react-bootstrap';
 import './home.scss';
 
-
-
 export default function Home({ links }) {
   const colors = ['#fc8701', '#2c71dd', '#689f39', '#84368d'];
 
@@ -93,6 +91,12 @@ export default function Home({ links }) {
         <hr className="w-75"></hr>
         <div className="px-3 text-center">App Description</div>
       </div>
+
+      <div className="banner-container">
+        <img src="assets/images/Banner.png"></img>
+      </div>
+   
+    
 
       <div
         className="container align-middle text-center"
