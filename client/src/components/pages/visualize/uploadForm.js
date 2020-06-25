@@ -3,6 +3,7 @@ import { Form, Button } from 'react-bootstrap';
 import { useDropzone } from 'react-dropzone';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCloudUploadAlt, faMinus } from '@fortawesome/free-solid-svg-icons';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import './visualize.scss';
 
 const { Group, Label, Control, Check, Text } = Form;
@@ -298,6 +299,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
       </Group>
       <hr />
       <Group controlId="email">
+        <LoadingOverlay active={true} content={"Work in progress..."}/>
         <div>
           <Check
             disabled
