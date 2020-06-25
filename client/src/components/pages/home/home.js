@@ -92,9 +92,9 @@ export default function Home({ links }) {
         <div className="px-3 text-center">App Description</div>
       </div>
 
-      <div className="banner-container">
-        <img src="assets/images/Banner.png"></img>
-      </div>
+      
+      <img src="assets/images/Banner.png" class="center"></img>
+      
    
       <div
         className="container align-middle text-center"
