@@ -42,7 +42,44 @@ app.post('/api', (req, res) => {
   wrapper.stderr.on('data', (data) => (stderr += data.toString()));
   wrapper.stderr.on('close', () => {
     console.log('return', { stdout, stderr });
-    res.send({ return: stdout, err: stderr });
+    res.json({ return: stdout, err: stderr });
+  });
+});
+
+app.post('/api/visualize', (req, res) => {
+  logger.info('/API/VISUALIZE: Spawning Python Process');
+  let reqBody = { ...req.body };
+  // resolve paths
+  const root = 'server/tmp';
+  const resultsDir = path.join(reqBody.outputDir[1], 'results');
+  reqBody.inputFile[1] = path.resolve(root, reqBody.inputFile[1]);
+  reqBody.outputDir[1] = path.resolve(root, resultsDir);
+  const args = Object.values(reqBody);
+  const cli = args.reduce((params, arg) => [...params, ...arg]);
+  logger.debug('/API/VISUALIZE: CLI args\n' + cli);
+  let stdout = '';
+  let stderr = '';
+  const wrapper = spawn('python3', [
+    'api/python/mSigPortal_Profiler_Extraction.py',
+    ...cli,
+  ]);
+
+  wrapper.stdout.on('data', (data) => (stdout += data.toString()));
+  wrapper.stderr.on('data', (data) => (stderr += data.toString()));
+  wrapper.stderr.on('close', () => {
+    console.log('return', { stdout, stderr });
+    if (stderr.length) {
+      res.json({ return: stdout, err: stderr });
+    } else {
+      let plotDir = '';
+      if (reqBody.inputFormat[1].includes('catalog'))
+        plotDir = path.join(resultsDir, 'svg');
+      else plotDir = path.join(resultsDir, 'output', 'plots', 'svg');
+      const plots = fs.readdirSync(path.resolve(root, plotDir));
+      console.log(plots);
+
+      res.json({ plotDir: plotDir, plots: plots, return: stdout, err: stderr });
+    }
   });
 });
 
@@ -60,11 +97,29 @@ app.post('/upload', (req, res, next) => {
     });
   }
 
+  app.post('/svg', (req, res) => {
+    const root = 'server/tmp';
+    const svgPath = path.resolve(root, req.body.path);
+    console.log(svgPath);
+    var s = fs.createReadStream(svgPath);
+    s.on('open', () => {
+      res.set('Content-Type', 'image/svg+xml');
+      console.log('open');
+      s.pipe(res);
+    });
+    s.on('error', () => {
+      res.set('Content-Type', 'text/plain');
+      console.log('error');
+      res.status(404).end('Not found');
+    });
+  });
+
   form.parse(req);
   form.on('file', (field, file) => {
-    fs.rename(file.path, path.join(form.uploadDir, file.name), (err) => {
+    const uploadPath = path.join(form.uploadDir, file.name);
+    fs.rename(file.path, uploadPath, (err) => {
       if (err) {
-        logger.warn(
+        logger.error(
           `/UPLOAD: Failed to upload file: ${file.name}` + '\n' + err
         );
         res.status(404).json({
@@ -75,12 +130,15 @@ app.post('/upload', (req, res, next) => {
         logger.info(`/UPLOAD: Successfully uploaded file: ${file.name}`);
         res.json({
           projectID: projectID,
+          filePath: path.join(projectID, file.name),
+          // filePath: uploadPath,
+          // outputDir: form.uploadDir,
         });
       }
     });
   });
   form.on('error', function (err) {
-    logger.warn('/UPLOAD: An error occured\n' + err);
+    logger.error('/UPLOAD: An error occured\n' + err);
     res.status(500).json({
       msg: '/UPLOAD: An error has occured',
       err: err,

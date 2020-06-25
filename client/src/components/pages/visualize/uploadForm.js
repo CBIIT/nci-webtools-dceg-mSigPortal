@@ -7,14 +7,22 @@ import './visualize.scss';
 
 const { Group, Label, Control, Check, Text } = Form;
 
-export default function UploadForm() {
+const root =
+  process.env.NODE_ENV === 'development'
+    ? 'http://localhost:8330/'
+    : window.location.pathname;
+
+export default function UploadForm({ setPlots, setOpenSidebar }) {
   const [inputFormat, setInputFormat] = useState('vcf');
   const [inputFile, setInput] = useState(new File([], ''));
   const [selectedGenome, setSelectedGenome] = useState('GRCh37');
   const [experimentalStrategy, setStrategy] = useState('WGS');
-  const [collapseSample, setCollapse] = useState('False');
-  const [mutationFilter, setFilter] = useState('text');
   const [mutationSplit, setSplit] = useState('False');
+
+  const [isMultiple, setMultiple] = useState(false);
+  const [collapseSample, setCollapse] = useState('False');
+  const [mutationFilter, setFilter] = useState('');
+
   const [queueMode, setQueueMode] = useState(false);
   const [email, setEmail] = useState('');
 
@@ -56,6 +64,14 @@ export default function UploadForm() {
     setStrategy(experimentalStrategy);
   }
 
+  function handleMutationRadio(bool) {
+    setSplit(bool);
+  }
+
+  function handleMultiple(bool) {
+    setMultiple(bool);
+  }
+
   function handleCollapseRadio(bool) {
     setCollapse(bool);
   }
@@ -64,41 +80,47 @@ export default function UploadForm() {
     setFilter(string.trim());
   }
 
-  function handleMutationRadio(bool) {
-    setSplit(bool);
-  }
-
   function handleEmailInput(string) {
     setEmail(string.trim());
   }
 
-  function submitHandler() {
-    const upload = uploadFile();
-    upload.then((data) => {
-      if (data && data.projectID) {
-        let req = {
-          projectID: data.projectID,
-          inputFile: inputFile,
-          inputFormat: inputFormat,
-          genomeAssemblyVersion: selectedGenome,
-          experimentalStrategy: experimentalStrategy,
-          collapseSample: collapseSample,
-          mutationFilter: mutationFilter,
-          mutationSplit: mutationSplit,
-        };
-        console.log('fn args', req);
-      } else {
-        //   add error handling
+  async function handleSubmit(e) {
+    const data = await uploadFile();
+    if (data && data.projectID) {
+      const args = {
+        inputFormat: ['-f', inputFormat],
+        inputFile: ['-i', data.filePath],
+        projectID: ['-p', data.projectID],
+        genomeAssemblyVersion: ['-g', selectedGenome],
+        experimentalStrategy: ['-t', experimentalStrategy],
+        outputDir: ['-o', data.projectID],
+        // outputDir: ['-o', `${data.projectID}/results`],
+      };
+      if (inputFormat == 'vcf') args['mutationSplit'] = ['-s', mutationSplit];
+      if (isMultiple) {
+        args['collapseSample'] = ['-c', collapseSample];
+        args['mutationFilter'] = ['-F', mutationFilter];
       }
-    });
+      const response = await fetch(`${root}api/visualize`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(args),
+      });
+      const result = await response.json();
+      console.log(result);
+      setPlots(result);
+      setOpenSidebar(false);
+    } else {
+      //   add error handling
+    }
+    e.preventDefault();
   }
 
   //   Uploads inputFile and returns a projectID
   async function uploadFile() {
-    const root =
-      process.env.NODE_ENV === 'development'
-        ? 'http://localhost:8330/'
-        : window.location.pathname;
     const data = new FormData();
     data.append('file', inputFile);
 
@@ -193,41 +215,10 @@ export default function UploadForm() {
         </Check>
       </Group>
       <Group className="d-flex">
-        <Label className="mr-auto">Collapse Sample</Label>
-        <Check inline id="radioFalse">
-          <Check.Input
-            type="radio"
-            value="False"
-            checked={collapseSample == 'False'}
-            onChange={(e) => handleCollapseRadio(e.target.value)}
-          />
-          <Check.Label className="font-weight-normal">False</Check.Label>
-        </Check>
-        <Check inline id="radioTrue">
-          <Check.Input
-            type="radio"
-            value="True"
-            checked={collapseSample == 'True'}
-            onChange={(e) => handleCollapseRadio(e.target.value)}
-          />
-          <Check.Label className="font-weight-normal">True</Check.Label>
-        </Check>
-      </Group>
-      <Group controlId="filter">
-        <Label>Mutation Filter</Label>
-        <Control
-          type="text"
-          size="sm"
-          placeholder="Enter a filter"
-          value={mutationFilter}
-          onChange={(e) => handleFilterInput(e.target.value)}
-        ></Control>
-        <Text className="text-muted">Default: text</Text>
-      </Group>
-      <Group className="d-flex">
         <Label className="mr-auto">Mutation Split</Label>
         <Check inline id="radioMutationSplitFalse">
           <Check.Input
+            disabled={inputFormat != 'vcf'}
             type="radio"
             value="False"
             checked={mutationSplit == 'False'}
@@ -237,6 +228,7 @@ export default function UploadForm() {
         </Check>
         <Check inline id="radioMutationSplitTrue">
           <Check.Input
+            disabled={inputFormat != 'vcf'}
             type="radio"
             value="True"
             checked={mutationSplit == 'True'}
@@ -245,6 +237,66 @@ export default function UploadForm() {
           <Check.Label className="font-weight-normal">True</Check.Label>
         </Check>
       </Group>
+      <Group className="d-flex">
+        <Label className="mr-auto">Multiple Samples</Label>
+        <Check inline id="multipleFalse">
+          <Check.Input
+            type="radio"
+            // value={false}
+            checked={!isMultiple}
+            onChange={() => handleMultiple(!isMultiple)}
+          />
+          <Check.Label htmlFor="multipleFalse" className="font-weight-normal">
+            False
+          </Check.Label>
+        </Check>
+        <Check inline id="multipleTrue">
+          <Check.Input
+            type="radio"
+            // value={true}
+            checked={isMultiple}
+            onChange={() => handleMultiple(!isMultiple)}
+          />
+          <Check.Label htmlFor="multipleTrue" className="font-weight-normal">
+            True
+          </Check.Label>
+        </Check>
+      </Group>
+      <Group className="d-flex">
+        <Label className="mr-auto">Collapse Sample</Label>
+        <Check inline id="radioFalse">
+          <Check.Input
+            disabled={!isMultiple}
+            type="radio"
+            value="False"
+            checked={collapseSample == 'False'}
+            onChange={(e) => handleCollapseRadio(e.target.value)}
+          />
+          <Check.Label className="font-weight-normal">False</Check.Label>
+        </Check>
+        <Check inline id="radioTrue">
+          <Check.Input
+            disabled={!isMultiple}
+            type="radio"
+            value="True"
+            checked={collapseSample == 'True'}
+            onChange={(e) => handleCollapseRadio(e.target.value)}
+          />
+          <Check.Label className="font-weight-normal">True</Check.Label>
+        </Check>
+      </Group>
+      <Group controlId="filter">
+        <Label className="required">Mutation Filter</Label>
+        <Control
+          disabled={!isMultiple}
+          type="text"
+          size="sm"
+          placeholder="Enter a filter"
+          value={mutationFilter}
+          onChange={(e) => handleFilterInput(e.target.value)}
+        ></Control>
+      </Group>
+      <hr />
       <Group controlId="email">
         <div>
           <Check
@@ -287,7 +339,7 @@ export default function UploadForm() {
             className="w-100"
             variant="primary"
             type="submit"
-            onClick={() => submitHandler()}
+            onClick={(e) => handleSubmit(e)}
           >
             Submit
           </Button>
