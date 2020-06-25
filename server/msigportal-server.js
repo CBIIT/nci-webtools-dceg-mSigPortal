@@ -8,7 +8,6 @@ const formidable = require('formidable');
 const fs = require('fs');
 const rimraf = require('rimraf');
 const { v4: uuidv4 } = require('uuid');
-var cron = require('node-cron');
 
 const app = express();
 
