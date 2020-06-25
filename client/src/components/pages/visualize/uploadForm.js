@@ -19,11 +19,9 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
   const [selectedGenome, setSelectedGenome] = useState('GRCh37');
   const [experimentalStrategy, setStrategy] = useState('WGS');
   const [mutationSplit, setSplit] = useState('False');
-
   const [isMultiple, setMultiple] = useState(false);
   const [collapseSample, setCollapse] = useState('False');
   const [mutationFilter, setFilter] = useState('');
-
   const [queueMode, setQueueMode] = useState(false);
   const [email, setEmail] = useState('');
 
@@ -95,13 +93,12 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
         genomeAssemblyVersion: ['-g', selectedGenome],
         experimentalStrategy: ['-t', experimentalStrategy],
         outputDir: ['-o', data.projectID],
-        // outputDir: ['-o', `${data.projectID}/results`],
       };
-      if (inputFormat == 'vcf') args['mutationSplit'] = ['-s', mutationSplit];
-      if (isMultiple) {
-        args['collapseSample'] = ['-c', collapseSample];
+      if (mutationFilter.length)
         args['mutationFilter'] = ['-F', mutationFilter];
-      }
+      if (inputFormat == 'vcf') args['mutationSplit'] = ['-s', mutationSplit];
+      if (isMultiple) args['collapseSample'] = ['-c', collapseSample];
+
       const response = await fetch(`${root}api/visualize`, {
         method: 'POST',
         headers: {
@@ -287,9 +284,8 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
         </Check>
       </Group>
       <Group controlId="filter">
-        <Label className="required">Mutation Filter</Label>
+        <Label>Mutation Filter</Label>
         <Control
-          disabled={!isMultiple}
           type="text"
           size="sm"
           placeholder="Enter a filter"
@@ -299,7 +295,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
       </Group>
       <hr />
       <Group controlId="email">
-        <LoadingOverlay active={true} content={"Work in progress..."}/>
+        <LoadingOverlay active={true} content={'Work in progress...'} />
         <div>
           <Check
             disabled
