@@ -94,9 +94,9 @@ app.post('/api/visualize', (req, res) => {
 
 app.post('/upload', (req, res, next) => {
   const projectID = uuidv4();
-  const form = formidable({ uploadDir: path.resolve(tmppath, projectID) });
+  const form = formidable({ uploadDir: path.join(tmppath, projectID) });
 
-  logger.info(`/UPLOAD: Request UUID:${projectID}`);
+  logger.info(`/UPLOAD: Request Project ID:${projectID}`);
 
   if (!fs.existsSync(form.uploadDir)) {
     fs.mkdirSync(form.uploadDir);
@@ -112,13 +112,13 @@ app.post('/upload', (req, res, next) => {
     var s = fs.createReadStream(svgPath);
     s.on('open', () => {
       res.set('Content-Type', 'image/svg+xml');
-      console.log('open');
       s.pipe(res);
+      logger.debug(`/SVG: Serving ${req.body.path}`);
     });
     s.on('error', () => {
       res.set('Content-Type', 'text/plain');
-      console.log('error');
       res.status(500).end('Not found');
+      logger.error(`/SVG: Error retrieving ${req.body.path}`);
     });
   });
 
@@ -139,8 +139,6 @@ app.post('/upload', (req, res, next) => {
         res.json({
           projectID: projectID,
           filePath: path.join(projectID, file.name),
-          // filePath: uploadPath,
-          // outputDir: form.uploadDir,
         });
       }
     });
