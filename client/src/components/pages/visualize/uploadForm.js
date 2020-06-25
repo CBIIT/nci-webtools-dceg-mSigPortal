@@ -4,6 +4,8 @@ import { useDropzone } from 'react-dropzone';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCloudUploadAlt, faMinus } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateVisualize } from '../../../services/actions';
 import './visualize.scss';
 
 const { Group, Label, Control, Check, Text } = Form;
@@ -14,18 +16,72 @@ const root =
     : window.location.pathname;
 
 export default function UploadForm({ setPlots, setOpenSidebar }) {
-  const [inputFormat, setInputFormat] = useState('vcf');
-  const [inputFile, setInput] = useState(new File([], ''));
-  const [selectedGenome, setSelectedGenome] = useState('GRCh37');
-  const [experimentalStrategy, setStrategy] = useState('WGS');
-  const [mutationSplit, setSplit] = useState('False');
+  const dispatch = useDispatch();
+  const {
+    inputFormat,
+    inputFile,
+    selectedGenome,
+    experimentalStrategy,
+    mutationSplit,
+    isMultiple,
+    collapseSample,
+    mutationFilter,
+    queueMode,
+    email
+  } = useSelector(state => state.visualize);
 
-  const [isMultiple, setMultiple] = useState(false);
-  const [collapseSample, setCollapse] = useState('False');
-  const [mutationFilter, setFilter] = useState('');
+  const setInputFormat = inputFormat => {
+    dispatch(updateVisualize({ inputFormat }));
+  };
 
-  const [queueMode, setQueueMode] = useState(false);
-  const [email, setEmail] = useState('');
+  const setInput = inputFile => {
+    dispatch(updateVisualize({ inputFile }));
+  };
+
+  const setSelectedGenome = selectedGenome => {
+    dispatch(updateVisualize({ selectedGenome }));
+  };
+
+  const setStrategy = experimentalStrategy => {
+    dispatch(updateVisualize({ experimentalStrategy }));
+  };
+
+  const setSplit = mutationSplit => {
+    dispatch(updateVisualize({ mutationSplit }));
+  };
+
+  const setMultiple = isMultiple => {
+    dispatch(updateVisualize({ isMultiple }));
+  };
+
+  const setCollapse = collapseSample => {
+    dispatch(updateVisualize({ collapseSample }));
+  };
+
+  const setFilter = mutationFilter => {
+    dispatch(updateVisualize({ mutationFilter }));
+  };
+
+  const setQueueMode = queueMode => {
+    dispatch(updateVisualize({ queueMode }));
+  };
+
+  const setEmail = email => {
+    dispatch(updateVisualize({ email }));
+  };
+
+  // const [inputFormat, setInputFormat] = useState('vcf');
+  // const [inputFile, setInput] = useState(new File([], ''));
+  // const [selectedGenome, setSelectedGenome] = useState('GRCh37');
+  // const [experimentalStrategy, setStrategy] = useState('WGS');
+  // const [mutationSplit, setSplit] = useState('False');
+
+  // const [isMultiple, setMultiple] = useState(false);
+  // const [collapseSample, setCollapse] = useState('False');
+  // const [mutationFilter, setFilter] = useState('');
+
+  // const [queueMode, setQueueMode] = useState(false);
+  // const [email, setEmail] = useState('');
 
   const onDrop = useCallback((acceptedFiles) => {
     setInput(acceptedFiles[0]);
@@ -161,14 +217,14 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
       <Group controlId="fileUpload">
         <section>
           <div {...getRootProps({ className: 'dropzone' })}>
-            <input {...getInputProps()} disabled={inputFile.size} />
-            {inputFile.size ? (
+            <input {...getInputProps()} disabled={inputFile} />
+            {inputFile ? (
               <button
                 id="removeFile"
                 className="d-flex w-100"
                 onClick={() => removeFile()}
               >
-                <span id="uploadedFile">{inputFile.name}</span>
+                <span id="uploadedFile">{inputFile ? inputFile.name : ''}</span>
                 <span className="text-danger ml-auto">
                   <FontAwesomeIcon icon={faMinus} />
                 </span>
@@ -337,7 +393,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
         </div>
         <div className="col-sm-6">
           <Button
-            disabled={!inputFile.size}
+            disabled={!inputFile}
             className="w-100"
             variant="primary"
             type="submit"
