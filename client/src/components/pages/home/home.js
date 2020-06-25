@@ -96,8 +96,6 @@ export default function Home({ links }) {
         <img src="assets/images/Banner.png"></img>
       </div>
    
-    
-
       <div
         className="container align-middle text-center"
         style={{ marginTop: '70px' }}
