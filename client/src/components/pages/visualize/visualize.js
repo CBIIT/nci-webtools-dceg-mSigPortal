@@ -10,6 +10,7 @@ import './visualize.scss';
 
 export default function Visualize() {
   const [openSidebar, setOpenSidebar] = useState(true);
+  const [plots, setPlots] = useState({});
 
   return (
     <div className="container">
@@ -27,7 +28,10 @@ export default function Visualize() {
             </div>
             <div className="row">
               <div className="col-sm-auto w-100">
-                <UploadForm />
+                <UploadForm
+                  setPlots={(e) => setPlots(e)}
+                  setOpenSidebar={(e) => setOpenSidebar(e)}
+                />
               </div>
             </div>
           </div>
@@ -37,7 +41,7 @@ export default function Visualize() {
             className="p-3 shadow-sm bg-white"
             style={{ minHeight: '420px' }}
           >
-            <Results />
+            <Results plots={plots} />
           </div>
         </MainPanel>
       </SidebarContainer>
