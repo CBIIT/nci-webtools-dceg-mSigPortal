@@ -19,6 +19,11 @@ export const getInitialState = () => ({
     queueMode: false,
     email: ''
   },
+  visualizeResults: {
+    uid: null,
+    mapping: null,
+    displayedPlot: null
+  }
 });
 
 export const store = configureStore({

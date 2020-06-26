@@ -1,11 +1,11 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { updateVisualize } from '../../../services/actions';
+// import { useDispatch, useSelector } from 'react-redux';
+// import { updateVisualize } from '../../../services/actions';
 export default function About() {
-  const dispatch = useDispatch();
-  const {
-    count
-  } = useSelector(state => state.visualize);
+  // const dispatch = useDispatch();
+  // const {
+  //   count
+  // } = useSelector(state => state.visualize);
   
   return (
     <div
@@ -19,7 +19,8 @@ export default function About() {
 
       <p>TBA</p>
 
-      <button
+      {/* TEST REDUX */}
+      {/* <button
         onClick={e => {
           dispatch(updateVisualize({ count: count + 1 }));
         }}>
@@ -33,7 +34,7 @@ export default function About() {
       </button>
       <pre>
         { count }
-      </pre>
+      </pre> */}
 
     </div>
   );

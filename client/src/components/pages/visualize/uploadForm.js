@@ -5,7 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCloudUploadAlt, faMinus } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateVisualize } from '../../../services/actions';
+import { updateVisualize, updateVisualizeResults } from '../../../services/actions';
+import { getInitialState } from '../../../services/store'
 import './visualize.scss';
 
 const { Group, Label, Control, Check, Text } = Form;
@@ -84,7 +85,8 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
   // const [email, setEmail] = useState('');
 
   const onDrop = useCallback((acceptedFiles) => {
-    setInput(acceptedFiles[0]);
+    console.log("acceptedFiles[0]", acceptedFiles[0].name);
+    setInput(acceptedFiles[0].name);
   }, []);
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
@@ -176,6 +178,16 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
     e.preventDefault();
   }
 
+  function handleReset() {
+    const initialState = getInitialState();
+    dispatch(
+      updateVisualize(initialState.visualize)
+    );
+    // dispatch(
+    //   updateVisualizeResults(initialState.visualizeResults)
+    // );
+  }
+
   //   Uploads inputFile and returns a projectID
   async function uploadFile() {
     const data = new FormData();
@@ -195,7 +207,8 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
   }
 
   function removeFile() {
-    setInput(new File([], ''));
+    // setInput(new File([], ''));
+    setInput(null);
   }
 
   return (
@@ -224,7 +237,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
                 className="d-flex w-100"
                 onClick={() => removeFile()}
               >
-                <span id="uploadedFile">{inputFile ? inputFile.name : ''}</span>
+                <span id="uploadedFile">{inputFile ? inputFile : ""}</span>
                 <span className="text-danger ml-auto">
                   <FontAwesomeIcon icon={faMinus} />
                 </span>
@@ -387,7 +400,10 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
       </Group>
       <div className="row">
         <div className="col-sm-6">
-          <Button className="w-100" variant="secondary">
+          <Button 
+            className="w-100" 
+            variant="secondary"
+            onClick={(e) => handleReset()}>
             Reset
           </Button>
         </div>
