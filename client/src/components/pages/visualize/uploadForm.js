@@ -76,11 +76,9 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
   // const [selectedGenome, setSelectedGenome] = useState('GRCh37');
   // const [experimentalStrategy, setStrategy] = useState('WGS');
   // const [mutationSplit, setSplit] = useState('False');
-
   // const [isMultiple, setMultiple] = useState(false);
   // const [collapseSample, setCollapse] = useState('False');
   // const [mutationFilter, setFilter] = useState('');
-
   // const [queueMode, setQueueMode] = useState(false);
   // const [email, setEmail] = useState('');
 
@@ -153,13 +151,14 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
         genomeAssemblyVersion: ['-g', selectedGenome],
         experimentalStrategy: ['-t', experimentalStrategy],
         outputDir: ['-o', data.projectID],
-        // outputDir: ['-o', `${data.projectID}/results`],
       };
-      if (inputFormat == 'vcf') args['mutationSplit'] = ['-s', mutationSplit];
-      if (isMultiple) {
-        args['collapseSample'] = ['-c', collapseSample];
+      // conditionally include params
+      if (mutationFilter.length)
         args['mutationFilter'] = ['-F', mutationFilter];
-      }
+      if (['vcf', 'csv', 'tsv'].includes(inputFormat))
+        args['mutationSplit'] = ['-s', mutationSplit];
+      if (isMultiple) args['collapseSample'] = ['-c', collapseSample];
+
       const response = await fetch(`${root}api/visualize`, {
         method: 'POST',
         headers: {
@@ -288,7 +287,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
         <Label className="mr-auto">Mutation Split</Label>
         <Check inline id="radioMutationSplitFalse">
           <Check.Input
-            disabled={inputFormat != 'vcf'}
+            disabled={!['vcf', 'csv', 'tsv'].includes(inputFormat)}
             type="radio"
             value="False"
             checked={mutationSplit == 'False'}
@@ -298,7 +297,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
         </Check>
         <Check inline id="radioMutationSplitTrue">
           <Check.Input
-            disabled={inputFormat != 'vcf'}
+            disabled={!['vcf', 'csv', 'tsv'].includes(inputFormat)}
             type="radio"
             value="True"
             checked={mutationSplit == 'True'}
@@ -356,9 +355,8 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
         </Check>
       </Group>
       <Group controlId="filter">
-        <Label className="required">Mutation Filter</Label>
+        <Label>Mutation Filter</Label>
         <Control
-          disabled={!isMultiple}
           type="text"
           size="sm"
           placeholder="Enter a filter"
@@ -368,7 +366,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
       </Group>
       <hr />
       <Group controlId="email">
-        <LoadingOverlay active={true} content={"Work in progress..."}/>
+        <LoadingOverlay active={true} content={'Work in progress...'} />
         <div>
           <Check
             disabled

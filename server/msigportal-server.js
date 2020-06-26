@@ -49,11 +49,10 @@ app.post('/api', (req, res) => {
 app.post('/api/visualize', (req, res) => {
   logger.info('/API/VISUALIZE: Spawning Python Process');
   let reqBody = { ...req.body };
-  // resolve paths
-  const root = 'server/tmp';
+  // update paths
   const resultsDir = path.join(reqBody.outputDir[1], 'results');
-  reqBody.inputFile[1] = path.resolve(root, reqBody.inputFile[1]);
-  reqBody.outputDir[1] = path.resolve(root, resultsDir);
+  reqBody.inputFile[1] = path.join(tmppath, reqBody.inputFile[1]);
+  reqBody.outputDir[1] = path.join(tmppath, resultsDir);
   const args = Object.values(reqBody);
   const cli = args.reduce((params, arg) => [...params, ...arg]);
   logger.debug('/API/VISUALIZE: CLI args\n' + cli);
@@ -67,27 +66,37 @@ app.post('/api/visualize', (req, res) => {
   wrapper.stdout.on('data', (data) => (stdout += data.toString()));
   wrapper.stderr.on('data', (data) => (stderr += data.toString()));
   wrapper.stderr.on('close', () => {
-    console.log('return', { stdout, stderr });
+    const scriptOut = { stdout: stdout, stderr: stderr };
+    console.log('python out', scriptOut);
     if (stderr.length) {
-      res.json({ return: stdout, err: stderr });
+      logger.error('/API/VISUALIZE: Python Error Occured');
+      res.status(500).json(scriptOut);
     } else {
-      let plotDir = '';
-      if (reqBody.inputFormat[1].includes('catalog'))
-        plotDir = path.join(resultsDir, 'svg');
-      else plotDir = path.join(resultsDir, 'output', 'plots', 'svg');
-      const plots = fs.readdirSync(path.resolve(root, plotDir));
-      console.log(plots);
-
-      res.json({ plotDir: plotDir, plots: plots, return: stdout, err: stderr });
+      try {
+        let plotDir = '';
+        reqBody.inputFormat[1].includes('catalog')
+          ? (plotDir = path.join(resultsDir, 'svg'))
+          : (plotDir = path.join(resultsDir, 'output', 'plots', 'svg'));
+        const plots = fs.readdirSync(path.join(tmppath, plotDir));
+        console.log(plots);
+        logger.info('/API/VISUALIZE: Profile Extraction Succeeded');
+        res.json({ plotDir: plotDir, plots: plots, ...scriptOut });
+      } catch (err) {
+        logger.error(
+          '/API/VISUALIZE: An Error Occured While Extracting Profiles'
+        );
+        logger.error(err);
+        res.status(500).json({ server: err, ...scriptOut });
+      }
     }
   });
 });
 
 app.post('/upload', (req, res, next) => {
   const projectID = uuidv4();
-  const form = formidable({ uploadDir: path.resolve(tmppath, projectID) });
+  const form = formidable({ uploadDir: path.join(tmppath, projectID) });
 
-  logger.info(`/UPLOAD: Request UUID:${projectID}`);
+  logger.info(`/UPLOAD: Request Project ID:${projectID}`);
 
   if (!fs.existsSync(form.uploadDir)) {
     fs.mkdirSync(form.uploadDir);
@@ -98,19 +107,18 @@ app.post('/upload', (req, res, next) => {
   }
 
   app.post('/svg', (req, res) => {
-    const root = 'server/tmp';
-    const svgPath = path.resolve(root, req.body.path);
+    const svgPath = path.join(tmppath, req.body.path);
     console.log(svgPath);
     var s = fs.createReadStream(svgPath);
     s.on('open', () => {
       res.set('Content-Type', 'image/svg+xml');
-      console.log('open');
       s.pipe(res);
+      logger.debug(`/SVG: Serving ${req.body.path}`);
     });
     s.on('error', () => {
       res.set('Content-Type', 'text/plain');
-      console.log('error');
-      res.status(404).end('Not found');
+      res.status(500).end('Not found');
+      logger.error(`/SVG: Error retrieving ${req.body.path}`);
     });
   });
 
@@ -131,8 +139,6 @@ app.post('/upload', (req, res, next) => {
         res.json({
           projectID: projectID,
           filePath: path.join(projectID, file.name),
-          // filePath: uploadPath,
-          // outputDir: form.uploadDir,
         });
       }
     });
