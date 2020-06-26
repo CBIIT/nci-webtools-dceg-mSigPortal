@@ -94,9 +94,11 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
         experimentalStrategy: ['-t', experimentalStrategy],
         outputDir: ['-o', data.projectID],
       };
+      // conditionally include params
       if (mutationFilter.length)
         args['mutationFilter'] = ['-F', mutationFilter];
-      if (inputFormat == 'vcf') args['mutationSplit'] = ['-s', mutationSplit];
+      if (['vcf', 'csv', 'tsv'].includes(inputFormat))
+        args['mutationSplit'] = ['-s', mutationSplit];
       if (isMultiple) args['collapseSample'] = ['-c', collapseSample];
 
       const response = await fetch(`${root}api/visualize`, {
@@ -216,7 +218,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
         <Label className="mr-auto">Mutation Split</Label>
         <Check inline id="radioMutationSplitFalse">
           <Check.Input
-            disabled={inputFormat != 'vcf'}
+            disabled={!['vcf', 'csv', 'tsv'].includes(inputFormat)}
             type="radio"
             value="False"
             checked={mutationSplit == 'False'}
@@ -226,7 +228,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
         </Check>
         <Check inline id="radioMutationSplitTrue">
           <Check.Input
-            disabled={inputFormat != 'vcf'}
+            disabled={!['vcf', 'csv', 'tsv'].includes(inputFormat)}
             type="radio"
             value="True"
             checked={mutationSplit == 'True'}
