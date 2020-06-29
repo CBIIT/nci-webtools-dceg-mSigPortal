@@ -8,7 +8,6 @@ const formidable = require('formidable');
 const fs = require('fs');
 const rimraf = require('rimraf');
 const { v4: uuidv4 } = require('uuid');
-var cron = require('node-cron');
 
 const app = express();
 
@@ -43,15 +42,61 @@ app.post('/api', (req, res) => {
   wrapper.stderr.on('data', (data) => (stderr += data.toString()));
   wrapper.stderr.on('close', () => {
     console.log('return', { stdout, stderr });
-    res.send({ return: stdout, err: stderr });
+    res.json({ return: stdout, err: stderr });
+  });
+});
+
+app.post('/api/visualize', (req, res) => {
+  logger.info('/API/VISUALIZE: Spawning Python Process');
+  let reqBody = { ...req.body };
+  // update paths
+  const resultsDir = path.join(reqBody.outputDir[1], 'results');
+  reqBody.inputFile[1] = path.join(tmppath, reqBody.inputFile[1]);
+  reqBody.outputDir[1] = path.join(tmppath, resultsDir);
+  const args = Object.values(reqBody);
+  const cli = args.reduce((params, arg) => [...params, ...arg]);
+  logger.debug('/API/VISUALIZE: CLI args\n' + cli);
+  let stdout = '';
+  let stderr = '';
+  const wrapper = spawn('python3', [
+    'api/python/mSigPortal_Profiler_Extraction.py',
+    ...cli,
+  ]);
+
+  wrapper.stdout.on('data', (data) => (stdout += data.toString()));
+  wrapper.stderr.on('data', (data) => (stderr += data.toString()));
+  wrapper.stderr.on('close', () => {
+    const scriptOut = { stdout: stdout, stderr: stderr };
+    console.log('python out', scriptOut);
+    if (stderr.length) {
+      logger.error('/API/VISUALIZE: Python Error Occured');
+      res.status(500).json(scriptOut);
+    } else {
+      try {
+        let plotDir = '';
+        reqBody.inputFormat[1].includes('catalog')
+          ? (plotDir = path.join(resultsDir, 'svg'))
+          : (plotDir = path.join(resultsDir, 'output', 'plots', 'svg'));
+        const plots = fs.readdirSync(path.join(tmppath, plotDir));
+        console.log(plots);
+        logger.info('/API/VISUALIZE: Profile Extraction Succeeded');
+        res.json({ plotDir: plotDir, plots: plots, ...scriptOut });
+      } catch (err) {
+        logger.error(
+          '/API/VISUALIZE: An Error Occured While Extracting Profiles'
+        );
+        logger.error(err);
+        res.status(500).json({ server: err, ...scriptOut });
+      }
+    }
   });
 });
 
 app.post('/upload', (req, res, next) => {
   const projectID = uuidv4();
-  const form = formidable({ uploadDir: path.resolve(tmppath, projectID) });
+  const form = formidable({ uploadDir: path.join(tmppath, projectID) });
 
-  logger.info(`/UPLOAD: Request UUID:${projectID}`);
+  logger.info(`/UPLOAD: Request Project ID:${projectID}`);
 
   if (!fs.existsSync(form.uploadDir)) {
     fs.mkdirSync(form.uploadDir);
@@ -61,11 +106,28 @@ app.post('/upload', (req, res, next) => {
     });
   }
 
+  app.post('/svg', (req, res) => {
+    const svgPath = path.join(tmppath, req.body.path);
+    console.log(svgPath);
+    var s = fs.createReadStream(svgPath);
+    s.on('open', () => {
+      res.set('Content-Type', 'image/svg+xml');
+      s.pipe(res);
+      logger.debug(`/SVG: Serving ${req.body.path}`);
+    });
+    s.on('error', () => {
+      res.set('Content-Type', 'text/plain');
+      res.status(500).end('Not found');
+      logger.error(`/SVG: Error retrieving ${req.body.path}`);
+    });
+  });
+
   form.parse(req);
   form.on('file', (field, file) => {
-    fs.rename(file.path, path.join(form.uploadDir, file.name), (err) => {
+    const uploadPath = path.join(form.uploadDir, file.name);
+    fs.rename(file.path, uploadPath, (err) => {
       if (err) {
-        logger.warn(
+        logger.error(
           `/UPLOAD: Failed to upload file: ${file.name}` + '\n' + err
         );
         res.status(404).json({
@@ -76,27 +138,18 @@ app.post('/upload', (req, res, next) => {
         logger.info(`/UPLOAD: Successfully uploaded file: ${file.name}`);
         res.json({
           projectID: projectID,
+          filePath: path.join(projectID, file.name),
         });
       }
     });
   });
   form.on('error', function (err) {
-    logger.warn('/UPLOAD: An error occured\n' + err);
+    logger.error('/UPLOAD: An error occured\n' + err);
     res.status(500).json({
       msg: '/UPLOAD: An error has occured',
       err: err,
     });
   });
-});
-
-cron.schedule("50 7 * * *", function() {
-  const process = spawn('find local/content/analysistools/public_html/apps/msigportal/tmp -mindepth 1 -mtime +14 -exec rm {} \; >>var/log/msigportal-cron.log 2>&1', [],{shell:true})
-  process.stderr.on('data',(data) => console.log(data.toString()))
-});
-
-cron.schedule("45 7 * * *", function() {
-  const process = spawn('find  local/content/analysistools/public_html/apps/msigportal/logs -mindepth 1 -mtime +60 -exec rm {} \; >>var/log/msigportal-cron.log 2>&1', [],{shell:true})
-  process.stderr.on('data',(data) => console.log(data.toString()))
 });
 
 app.listen(port, () => {

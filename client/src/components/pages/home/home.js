@@ -72,37 +72,52 @@ export default function Home({ links }) {
 
   return (
     <>
-      {/* <div className="banner-container text-center d-none d-md-block">
-        <img src="assets/images/banner.png" alt="mSigPortal banner"></img>
-        <div className="row justify-content-center text-center text-dark w-75">
+      <div className="banner-container text-center d-none d-md-block">
+        <div className="image-blurred-edge">
+          <img
+            src="assets/images/Banner.jpeg"
+            alt="mSigPortal banner"
+            style={{ 
+              width: '100%',
+              height: '250px'
+            }}></img>
+        </div>
+        <div className="banner-overlay-text row justify-content-center text-center text-light w-75">
           <div className="col-12">
             <h1 className="text-light">
               <b>mSigPortal</b>
             </h1>
           </div>
+          <div
+            className="col-6 w-50 my-3 align-self-center"
+            style={{ borderTop: '3px solid white' }}></div>
+          <div
+            className="col-12 text-center mt-2 font-weight-bold"
+            style={{ width: '100%', fontSize: '18pt' }}>
+            App Description
+          </div>
+          <div
+            className="col-12 text-center mt-5"
+            style={{ width: '100%', fontSize: '14pt' }}>
+          </div>
         </div>
-      </div> */}
+      </div>
 
       {/* mobile */}
       <div className="text-center mt-2 d-md-none">
-        <h1 className="text-light">
+        <h1 className="text-dark">
           <b>mSigPortal</b>
         </h1>
         <hr className="w-75"></hr>
-        <div className="px-3 text-center">App Description</div>
-      </div>
-
-      <div className="banner-container">
-        <img src="assets/images/Banner.png"></img>
+        <div className="px-3 text-center">
+          App Description
+        </div>
       </div>
    
-    
-
       <div
         className="container align-middle text-center"
         style={{ marginTop: '70px' }}
       >
-        
         {cardRow(links.slice(0, 2), colors.slice(0, 2))}
         {cardRow(links.slice(2, 4), colors.slice(2, 4))}
       </div>
