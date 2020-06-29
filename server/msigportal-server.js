@@ -106,22 +106,6 @@ app.post('/upload', (req, res, next) => {
     });
   }
 
-  app.post('/svg', (req, res) => {
-    const svgPath = path.join(tmppath, req.body.path);
-    console.log(svgPath);
-    var s = fs.createReadStream(svgPath);
-    s.on('open', () => {
-      res.set('Content-Type', 'image/svg+xml');
-      s.pipe(res);
-      logger.debug(`/SVG: Serving ${req.body.path}`);
-    });
-    s.on('error', () => {
-      res.set('Content-Type', 'text/plain');
-      res.status(500).end('Not found');
-      logger.error(`/SVG: Error retrieving ${req.body.path}`);
-    });
-  });
-
   form.parse(req);
   form.on('file', (field, file) => {
     const uploadPath = path.join(form.uploadDir, file.name);
@@ -149,6 +133,22 @@ app.post('/upload', (req, res, next) => {
       msg: '/UPLOAD: An error has occured',
       err: err,
     });
+  });
+});
+
+app.post('/svg', (req, res) => {
+  const svgPath = path.join(tmppath, req.body.path);
+  console.log(svgPath);
+  var s = fs.createReadStream(svgPath);
+  s.on('open', () => {
+    res.set('Content-Type', 'image/svg+xml');
+    s.pipe(res);
+    logger.debug(`/SVG: Serving ${req.body.path}`);
+  });
+  s.on('error', () => {
+    res.set('Content-Type', 'text/plain');
+    res.status(500).end('Not found');
+    logger.error(`/SVG: Error retrieving ${req.body.path}`);
   });
 });
 
