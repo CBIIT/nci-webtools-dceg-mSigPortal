@@ -15,6 +15,6 @@ const visualSlice = createSlice({
   })
 
 const {actions,reducer} = visualSlice
-const store = configureStore({reducer: reducer})
+export const store = configureStore({reducer: reducer})
 export const {setInputFormat} = actions
-export default store
+// export default store

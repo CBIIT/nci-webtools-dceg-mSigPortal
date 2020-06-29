@@ -9,7 +9,7 @@ import { updateVisualize, updateVisualizeResults } from '../../../services/actio
 import { getInitialState } from '../../../services/store'
 import './visualize.scss';
 import { createSlice, configureStore, combineReducers } from '@reduxjs/toolkit';
-import store,{setInputFormat} from '../../../services/visualSlice'
+import { store, setInputFormat} from '../../../services/visualSlice'
 
 const { Group, Label, Control, Check, Text } = Form;
 
@@ -224,7 +224,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
         <Label>Choose File Type</Label>
         <Control
           as="select"
-          value={store.inputFormat}
+          value={inputFormat}
           onChange={(e) => {
             handleInputSelect(e.target.value)
           }}
