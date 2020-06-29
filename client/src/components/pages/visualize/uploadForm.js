@@ -7,7 +7,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useDispatch, useSelector } from 'react-redux';
 import './visualize.scss';
 import { createSlice, configureStore, combineReducers } from '@reduxjs/toolkit';
-import { store, updateVisualize} from '../../../services/visualSlice'
+import { store, updateVisualize,resetVisualize} from '../../../services/visualSlice'
 const { Group, Label, Control, Check, Text } = Form;
 
 const root =
@@ -135,8 +135,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
   }
 
   function handleReset() {
-    // const initialState = getInitialState();
-    
+    store.dispatch(resetVisualize())    
   }
 
   //   Uploads inputFile and returns a projectID

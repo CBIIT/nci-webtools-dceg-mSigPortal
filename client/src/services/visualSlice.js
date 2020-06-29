@@ -33,7 +33,24 @@ const visualSlice = createSlice({
                     [action.payload.param]: action.payload.data
                 }
             }
-        } 
+        },
+        resetVisualize: (state) => {
+            return{
+                ...state,
+                visualize: {
+                    inputFormat: 'vcf',
+                    inputFile: null,
+                    selectedGenome: 'GRCh37',
+                    experimentalStrategy: 'WGS',
+                    mutationSplit: 'False',
+                    isMultiple: false,
+                    collapseSample: 'False',
+                    mutationFilter: '',
+                    queueMode: false,
+                    email: ''
+                }
+            }
+        }
     }
   })
 
@@ -42,5 +59,5 @@ export const store = configureStore({
     reducer: reducer,
     preloadedState: getInitialState()
 })
-export const {updateVisualize} = actions
+export const {updateVisualize,resetVisualize} = actions
 // export default store
