@@ -1,15 +1,14 @@
 import { rootReducer } from './reducers';
 // import { initialize } from './actions';
-import { 
+import {
   // createAction,
-  configureStore
+  configureStore,
 } from '@reduxjs/toolkit';
 
 export const getInitialState = () => ({
   visualize: {
     count: 0,
     inputFormat: 'vcf',
-    inputFile: null,
     selectedGenome: 'GRCh37',
     experimentalStrategy: 'WGS',
     mutationSplit: 'False',
@@ -17,18 +16,18 @@ export const getInitialState = () => ({
     collapseSample: 'False',
     mutationFilter: '',
     queueMode: false,
-    email: ''
+    email: '',
   },
   visualizeResults: {
     uid: null,
     mapping: null,
-    displayedPlot: null
-  }
+    displayedPlot: null,
+  },
 });
 
 export const store = configureStore({
   reducer: rootReducer,
-  preloadedState: getInitialState()
+  preloadedState: getInitialState(),
 });
 
 // store.dispatch(initialize());

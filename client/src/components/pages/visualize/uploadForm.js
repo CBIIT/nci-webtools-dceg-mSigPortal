@@ -5,8 +5,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCloudUploadAlt, faMinus } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateVisualize, updateVisualizeResults } from '../../../services/actions';
-import { getInitialState } from '../../../services/store'
+import {
+  updateVisualize,
+  updateVisualizeResults,
+} from '../../../services/actions';
+import { getInitialState } from '../../../services/store';
 import './visualize.scss';
 
 const { Group, Label, Control, Check, Text } = Form;
@@ -20,7 +23,6 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
   const dispatch = useDispatch();
   const {
     inputFormat,
-    inputFile,
     selectedGenome,
     experimentalStrategy,
     mutationSplit,
@@ -28,63 +30,49 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
     collapseSample,
     mutationFilter,
     queueMode,
-    email
-  } = useSelector(state => state.visualize);
+    email,
+  } = useSelector((state) => state.visualize);
 
-  const setInputFormat = inputFormat => {
+  const setInputFormat = (inputFormat) => {
     dispatch(updateVisualize({ inputFormat }));
   };
 
-  const setInput = inputFile => {
-    dispatch(updateVisualize({ inputFile }));
-  };
-
-  const setSelectedGenome = selectedGenome => {
+  const setSelectedGenome = (selectedGenome) => {
     dispatch(updateVisualize({ selectedGenome }));
   };
 
-  const setStrategy = experimentalStrategy => {
+  const setStrategy = (experimentalStrategy) => {
     dispatch(updateVisualize({ experimentalStrategy }));
   };
 
-  const setSplit = mutationSplit => {
+  const setSplit = (mutationSplit) => {
     dispatch(updateVisualize({ mutationSplit }));
   };
 
-  const setMultiple = isMultiple => {
+  const setMultiple = (isMultiple) => {
     dispatch(updateVisualize({ isMultiple }));
   };
 
-  const setCollapse = collapseSample => {
+  const setCollapse = (collapseSample) => {
     dispatch(updateVisualize({ collapseSample }));
   };
 
-  const setFilter = mutationFilter => {
+  const setFilter = (mutationFilter) => {
     dispatch(updateVisualize({ mutationFilter }));
   };
 
-  const setQueueMode = queueMode => {
+  const setQueueMode = (queueMode) => {
     dispatch(updateVisualize({ queueMode }));
   };
 
-  const setEmail = email => {
+  const setEmail = (email) => {
     dispatch(updateVisualize({ email }));
   };
 
-  // const [inputFormat, setInputFormat] = useState('vcf');
-  // const [inputFile, setInput] = useState(new File([], ''));
-  // const [selectedGenome, setSelectedGenome] = useState('GRCh37');
-  // const [experimentalStrategy, setStrategy] = useState('WGS');
-  // const [mutationSplit, setSplit] = useState('False');
-  // const [isMultiple, setMultiple] = useState(false);
-  // const [collapseSample, setCollapse] = useState('False');
-  // const [mutationFilter, setFilter] = useState('');
-  // const [queueMode, setQueueMode] = useState(false);
-  // const [email, setEmail] = useState('');
+  const [inputFile, setInput] = useState(new File([], ''));
 
   const onDrop = useCallback((acceptedFiles) => {
-    console.log("acceptedFiles[0]", acceptedFiles[0].name);
-    setInput(acceptedFiles[0].name);
+    setInput(acceptedFiles[0]);
   }, []);
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
@@ -179,9 +167,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
 
   function handleReset() {
     const initialState = getInitialState();
-    dispatch(
-      updateVisualize(initialState.visualize)
-    );
+    dispatch(updateVisualize(initialState.visualize));
     // dispatch(
     //   updateVisualizeResults(initialState.visualizeResults)
     // );
@@ -206,8 +192,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
   }
 
   function removeFile() {
-    // setInput(new File([], ''));
-    setInput(null);
+    setInput(new File([], ''));
   }
 
   return (
@@ -229,14 +214,14 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
       <Group controlId="fileUpload">
         <section>
           <div {...getRootProps({ className: 'dropzone' })}>
-            <input {...getInputProps()} disabled={inputFile} />
-            {inputFile ? (
+            <input {...getInputProps()} disabled={inputFile.size} />
+            {inputFile.size ? (
               <button
                 id="removeFile"
                 className="d-flex w-100"
                 onClick={() => removeFile()}
               >
-                <span id="uploadedFile">{inputFile ? inputFile : ""}</span>
+                <span id="uploadedFile">{inputFile.name}</span>
                 <span className="text-danger ml-auto">
                   <FontAwesomeIcon icon={faMinus} />
                 </span>
@@ -398,16 +383,17 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
       </Group>
       <div className="row">
         <div className="col-sm-6">
-          <Button 
-            className="w-100" 
+          <Button
+            className="w-100"
             variant="secondary"
-            onClick={(e) => handleReset()}>
+            onClick={(e) => handleReset()}
+          >
             Reset
           </Button>
         </div>
         <div className="col-sm-6">
           <Button
-            disabled={!inputFile}
+            disabled={!inputFile.size}
             className="w-100"
             variant="primary"
             type="submit"
