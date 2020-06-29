@@ -6,7 +6,7 @@ import { faCloudUploadAlt, faMinus } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateVisualize, updateVisualizeResults } from '../../../services/actions';
-import { getInitialState } from '../../../services/store'
+// import { getInitialState } from '../../../services/store-old'
 import './visualize.scss';
 import { createSlice, configureStore, combineReducers } from '@reduxjs/toolkit';
 import { store, setInputFormat} from '../../../services/visualSlice'
@@ -190,7 +190,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
   }
 
   function handleReset() {
-    const initialState = getInitialState();
+    // const initialState = getInitialState();
     
   }
 
