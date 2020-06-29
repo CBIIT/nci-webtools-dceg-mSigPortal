@@ -28,8 +28,13 @@ const visualSlice = createSlice({
     reducers: {
         setInputFormat: (state,action) => {
             return{
+                // ...state,
+                // inputFormat: action.payload
                 ...state,
+                visualize: {
+                ...state.visualize,
                 inputFormat: action.payload
+                }
             }
         } 
     }
