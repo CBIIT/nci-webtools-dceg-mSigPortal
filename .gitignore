@@ -1,6 +1,7 @@
 /node_modules/
 /server/logs/
 /server/tmp/*
+!/server/tmp/.gitkeep
 /www/
 config*.json
 *.meta
