@@ -190,9 +190,6 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
 
   function handleReset() {
     const initialState = getInitialState();
-    dispatch(
-      updateVisualize(initialState.visualize)
-    );
     
   }
 
