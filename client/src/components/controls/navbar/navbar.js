@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import './navbar.scss';
 
-export default function Navbar({ links }) {
+export function Navbar({ links }) {
   return (
     <div className="bg-dark text-white gradient shadow-sm">
       <div className="container d-flex justify-content-center">

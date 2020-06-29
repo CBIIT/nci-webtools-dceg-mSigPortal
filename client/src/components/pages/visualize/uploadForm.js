@@ -175,6 +175,9 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
       //   add error handling
     }
     e.preventDefault();
+    // dispatch(
+    //   updateVisualizeResults(initialState.visualizeResults)
+    // );
   }
 
   function handleReset() {
@@ -182,9 +185,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
     dispatch(
       updateVisualize(initialState.visualize)
     );
-    // dispatch(
-    //   updateVisualizeResults(initialState.visualizeResults)
-    // );
+    
   }
 
   //   Uploads inputFile and returns a projectID
