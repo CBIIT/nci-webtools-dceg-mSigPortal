@@ -31,7 +31,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
     mutationFilter,
     queueMode,
     email
-  } = useSelector(state => state);
+  } = useSelector(state => state.visualize);
 /*
   const setInputFormat = inputFormat => {
     dispatch(updateVisualize({ inputFormat }));
