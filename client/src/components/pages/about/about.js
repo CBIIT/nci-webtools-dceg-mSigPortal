@@ -1,11 +1,6 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { updateVisualize } from '../../../services/actions';
+
 export default function About() {
-  const dispatch = useDispatch();
-  const {
-    count
-  } = useSelector(state => state.visualize);
   
   return (
     <div
@@ -18,24 +13,6 @@ export default function About() {
       <hr />
 
       <p>TBA</p>
-
-      {/* TEST REDUX */}
-      <button
-        onClick={e => {
-          dispatch(updateVisualize({ count: count + 1 }));
-        }}>
-        INCREMENT
-      </button>
-      <button 
-        onClick={e => {
-          dispatch(updateVisualize({ count: count - 1}));
-        }}>
-        DECREMENT
-      </button>
-      <pre>
-        { count }
-      </pre>
-
     </div>
   );
 }

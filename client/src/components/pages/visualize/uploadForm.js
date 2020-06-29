@@ -5,12 +5,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCloudUploadAlt, faMinus } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateVisualize, updateVisualizeResults } from '../../../services/actions';
-// import { getInitialState } from '../../../services/store-old'
 import './visualize.scss';
 import { createSlice, configureStore, combineReducers } from '@reduxjs/toolkit';
-import { store, setInputFormat} from '../../../services/visualSlice'
-
+import { store, updateVisualize} from '../../../services/visualSlice'
 const { Group, Label, Control, Check, Text } = Form;
 
 const root =
@@ -31,7 +28,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
     mutationFilter,
     queueMode,
     email
-  } = useSelector(state => state);
+  } = useSelector(state => state.visualize);
 /*
   const setInputFormat = inputFormat => {
     dispatch(updateVisualize({ inputFormat }));
@@ -95,31 +92,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
   });
 
   function handleInputSelect(type) {
-    switch (type) {
-      case 'vcf':
-        store.dispatch(setInputFormat('vcf'))
-        console.log(store.getState())
-        break;
-      case 'csv':
-       
-        store.dispatch(setInputFormat('csv'))
-        console.log(store.getState())
-        //setInputFormat('csv');
-        break;
-      case 'tsv':
-        store.dispatch(setInputFormat('tsv'))
-        console.log(store.getState())
-        break;
-      case 'catalog_tsv':
-        store.dispatch(setInputFormat('catalog_tsv'))
-        break;
-      case 'catalog_csv':
-        store.dispatch(setInputFormat('catalog_csv'))
-        //setInputFormat('catalog_csv');
-        break;
-      default:
-        store.dispatch(setInputFormat('vcf'))
-    }
+    store.dispatch(updateVisualize({param: 'inputFormat',data: type}))
   }
 
   function handleGenomeSelect(genome) {
@@ -164,7 +137,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
       // conditionally include params
       if (mutationFilter.length)
         args['mutationFilter'] = ['-F', mutationFilter];
-      if (['vcf', 'csv', 'tsv'].includes(store.getState().inputFormat))
+      if (['vcf', 'csv', 'tsv'].includes(inputFormat))
         args['mutationSplit'] = ['-s', mutationSplit];
       if (isMultiple) args['collapseSample'] = ['-c', collapseSample];
 
@@ -220,7 +193,6 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
   return (
     
     <Form className="mb-2">
-      {console.log(store.getState().inputFormat)}
       <Group controlId="fileType">
         <Label>Choose File Type</Label>
         <Control

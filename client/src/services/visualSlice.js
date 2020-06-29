@@ -24,16 +24,14 @@ export const getInitialState = () => ({
 
 const visualSlice = createSlice({
     name: 'visualize',
-    initialState: getInitialState().visualize,
+    initialState: getInitialState(),
     reducers: {
-        setInputFormat: (state,action) => {
+        updateVisualize: (state,action) => {
             return{
-                // ...state,
-                // inputFormat: action.payload
                 ...state,
                 visualize: {
-                ...state.visualize,
-                inputFormat: action.payload
+                    ...state.visualize,
+                    [action.payload.param]: action.payload.data
                 }
             }
         } 
@@ -45,5 +43,5 @@ export const store = configureStore({
     reducer: reducer,
     preloadedState: getInitialState()
 })
-export const {setInputFormat} = actions
+export const {updateVisualize} = actions
 // export default store
