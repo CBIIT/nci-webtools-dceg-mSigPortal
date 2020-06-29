@@ -29,6 +29,15 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
     queueMode,
     email
   } = useSelector(state => state.visualize);
+/*
+  const setInputFormat = inputFormat => {
+    dispatch(updateVisualize({ inputFormat }));
+  };
+*/
+  const setInput = inputFile => {
+ //   dispatch(updateVisualize({ inputFile }));
+  };
+
 
   // const [inputFormat, setInputFormat] = useState('vcf');
   // const [inputFile, setInput] = useState(new File([], ''));
