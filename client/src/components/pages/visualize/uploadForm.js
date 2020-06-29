@@ -3,23 +3,91 @@ import { Form, Button } from 'react-bootstrap';
 import { useDropzone } from 'react-dropzone';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCloudUploadAlt, faMinus } from '@fortawesome/free-solid-svg-icons';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateVisualize, updateVisualizeResults } from '../../../services/actions';
+import { getInitialState } from '../../../services/store'
 import './visualize.scss';
+import { createSlice, configureStore, combineReducers } from '@reduxjs/toolkit';
+import store,{setInputFormat} from '../../../services/visualSlice'
 
 const { Group, Label, Control, Check, Text } = Form;
 
-export default function UploadForm() {
-  const [inputFormat, setInputFormat] = useState('vcf');
-  const [inputFile, setInput] = useState(new File([], ''));
-  const [selectedGenome, setSelectedGenome] = useState('GRCh37');
-  const [experimentalStrategy, setStrategy] = useState('WGS');
-  const [collapseSample, setCollapse] = useState('False');
-  const [mutationFilter, setFilter] = useState('text');
-  const [mutationSplit, setSplit] = useState('False');
-  const [queueMode, setQueueMode] = useState(false);
-  const [email, setEmail] = useState('');
+const root =
+  process.env.NODE_ENV === 'development'
+    ? 'http://localhost:8330/'
+    : window.location.pathname;
+
+export default function UploadForm({ setPlots, setOpenSidebar }) {
+  //const dispatch = useDispatch();
+  const {
+    inputFormat,
+    inputFile,
+    selectedGenome,
+    experimentalStrategy,
+    mutationSplit,
+    isMultiple,
+    collapseSample,
+    mutationFilter,
+    queueMode,
+    email
+  } = useSelector(state => state);
+/*
+  const setInputFormat = inputFormat => {
+    dispatch(updateVisualize({ inputFormat }));
+  };
+*/
+  const setInput = inputFile => {
+ //   dispatch(updateVisualize({ inputFile }));
+  };
+
+  const setSelectedGenome = selectedGenome => {
+  //  dispatch(updateVisualize({ selectedGenome }));
+  };
+
+  const setStrategy = experimentalStrategy => {
+  //  dispatch(updateVisualize({ experimentalStrategy }));
+  };
+
+  const setSplit = mutationSplit => {
+  //  dispatch(updateVisualize({ mutationSplit }));
+  };
+
+  const setMultiple = isMultiple => {
+ //   dispatch(updateVisualize({ isMultiple }));
+  };
+
+  const setCollapse = collapseSample => {
+  //  dispatch(updateVisualize({ collapseSample }));
+  };
+
+  const setFilter = mutationFilter => {
+  //  dispatch(updateVisualize({ mutationFilter }));
+  };
+
+  const setQueueMode = queueMode => {
+  //  dispatch(updateVisualize({ queueMode }));
+  };
+
+  const setEmail = email => {
+  //  dispatch(updateVisualize({ email }));
+  };
+
+
+  // const [inputFormat, setInputFormat] = useState('vcf');
+  // const [inputFile, setInput] = useState(new File([], ''));
+  // const [selectedGenome, setSelectedGenome] = useState('GRCh37');
+  // const [experimentalStrategy, setStrategy] = useState('WGS');
+  // const [mutationSplit, setSplit] = useState('False');
+  // const [isMultiple, setMultiple] = useState(false);
+  // const [collapseSample, setCollapse] = useState('False');
+  // const [mutationFilter, setFilter] = useState('');
+  // const [queueMode, setQueueMode] = useState(false);
+  // const [email, setEmail] = useState('');
 
   const onDrop = useCallback((acceptedFiles) => {
-    setInput(acceptedFiles[0]);
+    console.log("acceptedFiles[0]", acceptedFiles[0].name);
+    setInput(acceptedFiles[0].name);
   }, []);
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
@@ -29,19 +97,24 @@ export default function UploadForm() {
   function handleInputSelect(type) {
     switch (type) {
       case 'vcf':
-        setInputFormat('vcf');
+        store.dispatch(setInputFormat('vcf'))
+        console.log(store.getState())
         break;
       case 'csv':
-        setInputFormat('csv');
+       
+        store.dispatch(setInputFormat('csv'))
+        console.log(store.getState())
+        //setInputFormat('csv');
         break;
       case 'tsv':
-        setInputFormat('tsv');
+        store.dispatch(setInputFormat('tsv'))
+        console.log(store.getState())
         break;
       case 'catalog_tsv':
-        setInputFormat('catalog_tsv');
+        //setInputFormat('catalog_tsv');
         break;
       case 'catalog_csv':
-        setInputFormat('catalog_csv');
+        //setInputFormat('catalog_csv');
         break;
       default:
         setInputFormat('vcf');
@@ -56,6 +129,14 @@ export default function UploadForm() {
     setStrategy(experimentalStrategy);
   }
 
+  function handleMutationRadio(bool) {
+    setSplit(bool);
+  }
+
+  function handleMultiple(bool) {
+    setMultiple(bool);
+  }
+
   function handleCollapseRadio(bool) {
     setCollapse(bool);
   }
@@ -64,41 +145,56 @@ export default function UploadForm() {
     setFilter(string.trim());
   }
 
-  function handleMutationRadio(bool) {
-    setSplit(bool);
-  }
-
   function handleEmailInput(string) {
     setEmail(string.trim());
   }
 
-  function submitHandler() {
-    const upload = uploadFile();
-    upload.then((data) => {
-      if (data && data.projectID) {
-        let req = {
-          projectID: data.projectID,
-          inputFile: inputFile,
-          inputFormat: inputFormat,
-          genomeAssemblyVersion: selectedGenome,
-          experimentalStrategy: experimentalStrategy,
-          collapseSample: collapseSample,
-          mutationFilter: mutationFilter,
-          mutationSplit: mutationSplit,
-        };
-        console.log('fn args', req);
-      } else {
-        //   add error handling
-      }
-    });
+  async function handleSubmit(e) {
+    const data = await uploadFile();
+    if (data && data.projectID) {
+      const args = {
+        inputFormat: ['-f', inputFormat],
+        inputFile: ['-i', data.filePath],
+        projectID: ['-p', data.projectID],
+        genomeAssemblyVersion: ['-g', selectedGenome],
+        experimentalStrategy: ['-t', experimentalStrategy],
+        outputDir: ['-o', data.projectID],
+      };
+      // conditionally include params
+      if (mutationFilter.length)
+        args['mutationFilter'] = ['-F', mutationFilter];
+      if (['vcf', 'csv', 'tsv'].includes(store.getState().inputFormat))
+        args['mutationSplit'] = ['-s', mutationSplit];
+      if (isMultiple) args['collapseSample'] = ['-c', collapseSample];
+
+      const response = await fetch(`${root}api/visualize`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(args),
+      });
+      const result = await response.json();
+      console.log(result);
+      setPlots(result);
+      setOpenSidebar(false);
+    } else {
+      //   add error handling
+    }
+    e.preventDefault();
+  }
+
+  function handleReset() {
+    const initialState = getInitialState();
+    
+    // dispatch(
+    //   updateVisualizeResults(initialState.visualizeResults)
+    // );
   }
 
   //   Uploads inputFile and returns a projectID
   async function uploadFile() {
-    const root =
-      process.env.NODE_ENV === 'development'
-        ? 'http://localhost:8330/'
-        : window.location.pathname;
     const data = new FormData();
     data.append('file', inputFile);
 
@@ -116,17 +212,22 @@ export default function UploadForm() {
   }
 
   function removeFile() {
-    setInput(new File([], ''));
+    // setInput(new File([], ''));
+    setInput(null);
   }
 
   return (
+    
     <Form className="mb-2">
+      {console.log(store.getState().inputFormat)}
       <Group controlId="fileType">
         <Label>Choose File Type</Label>
         <Control
           as="select"
-          value={inputFormat}
-          onChange={(e) => handleInputSelect(e.target.value)}
+          value={store.inputFormat}
+          onChange={(e) => {
+            handleInputSelect(e.target.value)
+          }}
         >
           <option value="vcf">VCF</option>
           <option value="csv">CSV</option>
@@ -138,14 +239,14 @@ export default function UploadForm() {
       <Group controlId="fileUpload">
         <section>
           <div {...getRootProps({ className: 'dropzone' })}>
-            <input {...getInputProps()} disabled={inputFile.size} />
-            {inputFile.size ? (
+            <input {...getInputProps()} disabled={inputFile} />
+            {inputFile ? (
               <button
                 id="removeFile"
                 className="d-flex w-100"
                 onClick={() => removeFile()}
               >
-                <span id="uploadedFile">{inputFile.name}</span>
+                <span id="uploadedFile">{inputFile ? inputFile : ""}</span>
                 <span className="text-danger ml-auto">
                   <FontAwesomeIcon icon={faMinus} />
                 </span>
@@ -193,9 +294,58 @@ export default function UploadForm() {
         </Check>
       </Group>
       <Group className="d-flex">
+        <Label className="mr-auto">Mutation Split</Label>
+        <Check inline id="radioMutationSplitFalse">
+          <Check.Input
+            disabled={!['vcf', 'csv', 'tsv'].includes(inputFormat)}
+            type="radio"
+            value="False"
+            checked={mutationSplit == 'False'}
+            onChange={(e) => handleMutationRadio(e.target.value)}
+          />
+          <Check.Label className="font-weight-normal">False</Check.Label>
+        </Check>
+        <Check inline id="radioMutationSplitTrue">
+          <Check.Input
+            disabled={!['vcf', 'csv', 'tsv'].includes(inputFormat)}
+            type="radio"
+            value="True"
+            checked={mutationSplit == 'True'}
+            onChange={(e) => handleMutationRadio(e.target.value)}
+          />
+          <Check.Label className="font-weight-normal">True</Check.Label>
+        </Check>
+      </Group>
+      <Group className="d-flex">
+        <Label className="mr-auto">Multiple Samples</Label>
+        <Check inline id="multipleFalse">
+          <Check.Input
+            type="radio"
+            // value={false}
+            checked={!isMultiple}
+            onChange={() => handleMultiple(!isMultiple)}
+          />
+          <Check.Label htmlFor="multipleFalse" className="font-weight-normal">
+            False
+          </Check.Label>
+        </Check>
+        <Check inline id="multipleTrue">
+          <Check.Input
+            type="radio"
+            // value={true}
+            checked={isMultiple}
+            onChange={() => handleMultiple(!isMultiple)}
+          />
+          <Check.Label htmlFor="multipleTrue" className="font-weight-normal">
+            True
+          </Check.Label>
+        </Check>
+      </Group>
+      <Group className="d-flex">
         <Label className="mr-auto">Collapse Sample</Label>
         <Check inline id="radioFalse">
           <Check.Input
+            disabled={!isMultiple}
             type="radio"
             value="False"
             checked={collapseSample == 'False'}
@@ -205,6 +355,7 @@ export default function UploadForm() {
         </Check>
         <Check inline id="radioTrue">
           <Check.Input
+            disabled={!isMultiple}
             type="radio"
             value="True"
             checked={collapseSample == 'True'}
@@ -222,30 +373,10 @@ export default function UploadForm() {
           value={mutationFilter}
           onChange={(e) => handleFilterInput(e.target.value)}
         ></Control>
-        <Text className="text-muted">Default: text</Text>
       </Group>
-      <Group className="d-flex">
-        <Label className="mr-auto">Mutation Split</Label>
-        <Check inline id="radioMutationSplitFalse">
-          <Check.Input
-            type="radio"
-            value="False"
-            checked={mutationSplit == 'False'}
-            onChange={(e) => handleMutationRadio(e.target.value)}
-          />
-          <Check.Label className="font-weight-normal">False</Check.Label>
-        </Check>
-        <Check inline id="radioMutationSplitTrue">
-          <Check.Input
-            type="radio"
-            value="True"
-            checked={mutationSplit == 'True'}
-            onChange={(e) => handleMutationRadio(e.target.value)}
-          />
-          <Check.Label className="font-weight-normal">True</Check.Label>
-        </Check>
-      </Group>
+      <hr />
       <Group controlId="email">
+        <LoadingOverlay active={true} content={'Work in progress...'} />
         <div>
           <Check
             disabled
@@ -277,17 +408,20 @@ export default function UploadForm() {
       </Group>
       <div className="row">
         <div className="col-sm-6">
-          <Button className="w-100" variant="secondary">
+          <Button 
+            className="w-100" 
+            variant="secondary"
+            onClick={(e) => handleReset()}>
             Reset
           </Button>
         </div>
         <div className="col-sm-6">
           <Button
-            disabled={!inputFile.size}
+            disabled={!inputFile}
             className="w-100"
             variant="primary"
             type="submit"
-            onClick={() => submitHandler()}
+            onClick={(e) => handleSubmit(e)}
           >
             Submit
           </Button>
