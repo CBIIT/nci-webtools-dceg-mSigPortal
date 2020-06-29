@@ -16,7 +16,7 @@ const root =
     : window.location.pathname;
 
 export default function UploadForm({ setPlots, setOpenSidebar }) {
-  //const dispatch = useDispatch();
+
   const {
     inputFormat,
     inputFile,
@@ -29,47 +29,6 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
     queueMode,
     email
   } = useSelector(state => state.visualize);
-/*
-  const setInputFormat = inputFormat => {
-    dispatch(updateVisualize({ inputFormat }));
-  };
-*/
-  const setInput = inputFile => {
- //   dispatch(updateVisualize({ inputFile }));
-  };
-
-  const setSelectedGenome = selectedGenome => {
-  //  dispatch(updateVisualize({ selectedGenome }));
-  };
-
-  const setStrategy = experimentalStrategy => {
-  //  dispatch(updateVisualize({ experimentalStrategy }));
-  };
-
-  const setSplit = mutationSplit => {
-  //  dispatch(updateVisualize({ mutationSplit }));
-  };
-
-  const setMultiple = isMultiple => {
- //   dispatch(updateVisualize({ isMultiple }));
-  };
-
-  const setCollapse = collapseSample => {
-  //  dispatch(updateVisualize({ collapseSample }));
-  };
-
-  const setFilter = mutationFilter => {
-  //  dispatch(updateVisualize({ mutationFilter }));
-  };
-
-  const setQueueMode = queueMode => {
-  //  dispatch(updateVisualize({ queueMode }));
-  };
-
-  const setEmail = email => {
-  //  dispatch(updateVisualize({ email }));
-  };
-
 
   // const [inputFormat, setInputFormat] = useState('vcf');
   // const [inputFile, setInput] = useState(new File([], ''));
@@ -92,35 +51,39 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
   });
 
   function handleInputSelect(type) {
-    store.dispatch(updateVisualize({param: 'inputFormat',data: type}))
+    store.dispatch(updateVisualize({param: 'inputFormat', data: type}))
   }
 
   function handleGenomeSelect(genome) {
-    setSelectedGenome(genome);
+    store.dispatch(updateVisualize({param: 'selectedGenome', data: genome}))
   }
 
   function handleStrategyRadio(experimentalStrategy) {
-    setStrategy(experimentalStrategy);
+    store.dispatch(updateVisualize({param: 'experimentalStrategy', data: experimentalStrategy}))
   }
 
   function handleMutationRadio(bool) {
-    setSplit(bool);
+    store.dispatch(updateVisualize({param: 'mutationSplit', data: bool}))
   }
 
   function handleMultiple(bool) {
-    setMultiple(bool);
+    store.dispatch(updateVisualize({param: 'isMultiple', data: bool}))
   }
 
   function handleCollapseRadio(bool) {
-    setCollapse(bool);
+    store.dispatch(updateVisualize({param: 'collapseSample', data: bool}))
   }
 
   function handleFilterInput(string) {
-    setFilter(string.trim());
+    store.dispatch(updateVisualize({param: 'mutationFilter', data: string}))
   }
 
-  function handleEmailInput(string) {
-    setEmail(string.trim());
+  function setQueueMode(bool) {
+    store.dispatch(updateVisualize({param: 'queueMode', data: bool}))
+  }
+
+  function handleEmailInput(email) {
+    store.dispatch(updateVisualize({param: 'email', data: email}))
   }
 
   async function handleSubmit(e) {

@@ -3,7 +3,6 @@ import { createSlice,configureStore} from '@reduxjs/toolkit';
 
 export const getInitialState = () => ({
     visualize: {
-      count: 0,
       inputFormat: 'vcf',
       inputFile: null,
       selectedGenome: 'GRCh37',
