@@ -73,10 +73,15 @@ export default function Home({ links }) {
   return (
     <>
       <div className="banner-container text-center d-none d-md-block">
-        <img
-          src="assets/images/Banner.jpeg"
-          alt="mSigPortal banner"
-          style={{ width: '100%' }}></img>
+        <div className="image-blurred-edge">
+          <img
+            src="assets/images/Banner.jpeg"
+            alt="mSigPortal banner"
+            style={{ 
+              width: '100%',
+              height: '250px'
+            }}></img>
+        </div>
         <div className="banner-overlay-text row justify-content-center text-center text-light w-75">
           <div className="col-12">
             <h1 className="text-light">
