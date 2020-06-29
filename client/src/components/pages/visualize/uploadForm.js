@@ -111,13 +111,14 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
         console.log(store.getState())
         break;
       case 'catalog_tsv':
-        //setInputFormat('catalog_tsv');
+        store.dispatch(setInputFormat('catalog_tsv'))
         break;
       case 'catalog_csv':
+        store.dispatch(setInputFormat('catalog_csv'))
         //setInputFormat('catalog_csv');
         break;
       default:
-        setInputFormat('vcf');
+        store.dispatch(setInputFormat('vcf'))
     }
   }
 
