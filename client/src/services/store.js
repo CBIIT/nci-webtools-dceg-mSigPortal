@@ -17,66 +17,85 @@ export const getInitialState = () => ({
       uid: null,
       mapping: null,
       displayedPlot: null
+    },
+    error: {
+        visible: false,
+        message: `An error occured when requesting data. If this problem persists, please contact the administrator at <a href="mailto:mSigPortalWebAdmin@cancer.gov">mSigPortalWebAdmin@cancer.gov</a>.`
     }
-  });
+});
 
-const visualSlice = createSlice({
+const visualizeSlice = createSlice({
     name: 'visualize',
-    initialState: getInitialState(),
+    initialState: getInitialState().visualize,
     reducers: {
         replaceVisualize: (state, action) => {
             return {
                 ...state,
-                [action.payload.param]: action.payload.data
+                ...action.payload.data
             }
         },
         updateVisualize: (state, action) => {
             return {
                 ...state,
-                visualize: {
-                    ...state.visualize,
-                    [action.payload.param]: action.payload.data
-                }
+                [action.payload.param]: action.payload.data
+            }
+        },
+    }
+});
+
+const visualizeResultsSlice = createSlice({
+    name: 'visualizeResults',
+    initialState: getInitialState().visualizeResults,
+    reducers: {
+        replaceVisualizeResults: (state, action) => {
+            return {
+                ...state,
+                ...action.payload.data
             }
         },
         updateVisualizeResults: (state, action) => {
             return {
                 ...state,
-                visualizeResults: {
-                    ...state.visualizeResults,
-                    [action.payload.param]: action.payload.data
-                }
+                [action.payload.param]: action.payload.data
             }
         }
-        // resetVisualize: (state) => {
-        //     return{
-        //         ...state,
-        //         visualize: {
-        //             inputFormat: 'vcf',
-        //             inputFile: null,
-        //             selectedGenome: 'GRCh37',
-        //             experimentalStrategy: 'WGS',
-        //             mutationSplit: 'False',
-        //             isMultiple: false,
-        //             collapseSample: 'False',
-        //             mutationFilter: '',
-        //             queueMode: false,
-        //             email: ''
-        //         }
-        //     }
-        // }
     }
-  })
+});
 
-const {actions, reducer} = visualSlice;
+const errorSlice = createSlice({
+    name: 'error',
+    initialState: getInitialState().error,
+    reducers: {
+        updateError: (state, action) => {
+            return {
+                ...state,
+                [action.payload.param]: action.payload.data
+            }
+        }
+    }
+});
+
+const rootReducer = combineReducers({
+    visualize: visualizeSlice.reducer,
+    visualizeResults: visualizeResultsSlice.reducer,
+    error: errorSlice.reducer
+})
+
 export const store = configureStore({
-    reducer: reducer,
+    reducer: rootReducer,
     preloadedState: getInitialState()
 });
 
 export const {
     replaceVisualize,
     updateVisualize, 
-    updateVisualizeResults,
-    // resetVisualize
-} = actions;
+} = visualizeSlice.actions;
+
+export const {
+    replaceVisualizeResults,
+    updateVisualizeResults
+} = visualizeResultsSlice.actions;
+
+export const {
+    updateError
+} = errorSlice.actions;

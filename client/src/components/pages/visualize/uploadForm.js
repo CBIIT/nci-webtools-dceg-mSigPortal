@@ -124,7 +124,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
 
   function handleReset() {
     const initialState = getInitialState();
-    console.log(initialState.visualize);
+    // console.log(initialState.visualize);
     store.dispatch(replaceVisualize({param: 'visualize', data: initialState.visualize}));
   }
 
