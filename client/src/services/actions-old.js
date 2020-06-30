@@ -1,4 +1,4 @@
-// import { 
+// import {
 //   createAction,
 // } from '@reduxjs/toolkit';
 // import { getInitialState } from './store';
@@ -25,9 +25,7 @@ export function updateVisualizeResults(data) {
 //     try {
 //       console.log("Do something...");
 //     } catch (e) {
-// 
+//
 //     }
 //   }
 // }
-
-

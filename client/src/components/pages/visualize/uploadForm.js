@@ -4,14 +4,14 @@ import { useDropzone } from 'react-dropzone';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCloudUploadAlt, faMinus } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  updateVisualize,
-  updateVisualizeResults,
-} from '../../../services/actions';
-import { getInitialState } from '../../../services/store';
+import { useSelector } from 'react-redux';
 import './visualize.scss';
-
+import {
+  store,
+  replaceVisualize,
+  updateVisualize,
+  getInitialState,
+} from '../../../services/store';
 const { Group, Label, Control, Check, Text } = Form;
 
 const root =
@@ -20,7 +20,6 @@ const root =
     : window.location.pathname;
 
 export default function UploadForm({ setOpenSidebar }) {
-  const dispatch = useDispatch();
   const {
     inputFormat,
     selectedGenome,
@@ -33,42 +32,6 @@ export default function UploadForm({ setOpenSidebar }) {
     email,
   } = useSelector((state) => state.visualize);
 
-  const setInputFormat = (inputFormat) => {
-    dispatch(updateVisualize({ inputFormat }));
-  };
-
-  const setSelectedGenome = (selectedGenome) => {
-    dispatch(updateVisualize({ selectedGenome }));
-  };
-
-  const setStrategy = (experimentalStrategy) => {
-    dispatch(updateVisualize({ experimentalStrategy }));
-  };
-
-  const setSplit = (mutationSplit) => {
-    dispatch(updateVisualize({ mutationSplit }));
-  };
-
-  const setMultiple = (isMultiple) => {
-    dispatch(updateVisualize({ isMultiple }));
-  };
-
-  const setCollapse = (collapseSample) => {
-    dispatch(updateVisualize({ collapseSample }));
-  };
-
-  const setFilter = (mutationFilter) => {
-    dispatch(updateVisualize({ mutationFilter }));
-  };
-
-  const setQueueMode = (queueMode) => {
-    dispatch(updateVisualize({ queueMode }));
-  };
-
-  const setEmail = (email) => {
-    dispatch(updateVisualize({ email }));
-  };
-
   const [inputFile, setInput] = useState(new File([], ''));
 
   const onDrop = useCallback((acceptedFiles) => {
@@ -80,53 +43,48 @@ export default function UploadForm({ setOpenSidebar }) {
   });
 
   function handleInputSelect(type) {
-    switch (type) {
-      case 'vcf':
-        setInputFormat('vcf');
-        break;
-      case 'csv':
-        setInputFormat('csv');
-        break;
-      case 'tsv':
-        setInputFormat('tsv');
-        break;
-      case 'catalog_tsv':
-        setInputFormat('catalog_tsv');
-        break;
-      case 'catalog_csv':
-        setInputFormat('catalog_csv');
-        break;
-      default:
-        setInputFormat('vcf');
-    }
+    store.dispatch(updateVisualize({ param: 'inputFormat', data: type }));
   }
 
+  // function handleInputFile(inputFile) {
+  //   store.dispatch(updateVisualize({ param: 'inputFile', data: inputFile }));
+  // }
+
   function handleGenomeSelect(genome) {
-    setSelectedGenome(genome);
+    store.dispatch(updateVisualize({ param: 'selectedGenome', data: genome }));
   }
 
   function handleStrategyRadio(experimentalStrategy) {
-    setStrategy(experimentalStrategy);
+    store.dispatch(
+      updateVisualize({
+        param: 'experimentalStrategy',
+        data: experimentalStrategy,
+      })
+    );
   }
 
   function handleMutationRadio(bool) {
-    setSplit(bool);
+    store.dispatch(updateVisualize({ param: 'mutationSplit', data: bool }));
   }
 
   function handleMultiple(bool) {
-    setMultiple(bool);
+    store.dispatch(updateVisualize({ param: 'isMultiple', data: bool }));
   }
 
   function handleCollapseRadio(bool) {
-    setCollapse(bool);
+    store.dispatch(updateVisualize({ param: 'collapseSample', data: bool }));
   }
 
   function handleFilterInput(string) {
-    setFilter(string.trim());
+    store.dispatch(updateVisualize({ param: 'mutationFilter', data: string }));
   }
 
-  function handleEmailInput(string) {
-    setEmail(string.trim());
+  function setQueueMode(bool) {
+    store.dispatch(updateVisualize({ param: 'queueMode', data: bool }));
+  }
+
+  function handleEmailInput(email) {
+    store.dispatch(updateVisualize({ param: 'email', data: email }));
   }
 
   async function handleSubmit(e) {
@@ -173,10 +131,10 @@ export default function UploadForm({ setOpenSidebar }) {
 
   function handleReset() {
     const initialState = getInitialState();
-    dispatch(updateVisualize(initialState.visualize));
-    // dispatch(
-    //   updateVisualizeResults(initialState.visualizeResults)
-    // );
+    console.log(initialState.visualize);
+    store.dispatch(
+      replaceVisualize({ param: 'visualize', data: initialState.visualize })
+    );
   }
 
   //   Uploads inputFile and returns a projectID
@@ -208,7 +166,9 @@ export default function UploadForm({ setOpenSidebar }) {
         <Control
           as="select"
           value={inputFormat}
-          onChange={(e) => handleInputSelect(e.target.value)}
+          onChange={(e) => {
+            handleInputSelect(e.target.value);
+          }}
         >
           <option value="vcf">VCF</option>
           <option value="csv">CSV</option>

@@ -73,10 +73,16 @@ export default function Home({ links }) {
   return (
     <>
       <div className="banner-container text-center d-none d-md-block">
-        <img
-          src="assets/images/Banner.jpeg"
-          alt="mSigPortal banner"
-          style={{ width: '100%' }}></img>
+        <div className="image-blurred-edge">
+          <img
+            src="assets/images/Banner.jpeg"
+            alt="mSigPortal banner"
+            style={{
+              width: '100%',
+              height: '250px',
+            }}
+          ></img>
+        </div>
         <div className="banner-overlay-text row justify-content-center text-center text-light w-75">
           <div className="col-12">
             <h1 className="text-light">
@@ -85,16 +91,18 @@ export default function Home({ links }) {
           </div>
           <div
             className="col-6 w-50 my-3 align-self-center"
-            style={{ borderTop: '3px solid white' }}></div>
+            style={{ borderTop: '3px solid white' }}
+          ></div>
           <div
             className="col-12 text-center mt-2 font-weight-bold"
-            style={{ width: '100%', fontSize: '18pt' }}>
+            style={{ width: '100%', fontSize: '18pt' }}
+          >
             App Description
           </div>
           <div
             className="col-12 text-center mt-5"
-            style={{ width: '100%', fontSize: '14pt' }}>
-          </div>
+            style={{ width: '100%', fontSize: '14pt' }}
+          ></div>
         </div>
       </div>
 
@@ -104,11 +112,9 @@ export default function Home({ links }) {
           <b>mSigPortal</b>
         </h1>
         <hr className="w-75"></hr>
-        <div className="px-3 text-center">
-          App Description
-        </div>
+        <div className="px-3 text-center">App Description</div>
       </div>
-   
+
       <div
         className="container align-middle text-center"
         style={{ marginTop: '70px' }}
