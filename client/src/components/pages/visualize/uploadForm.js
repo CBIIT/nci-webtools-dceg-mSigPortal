@@ -104,6 +104,7 @@ export default function UploadForm({ setOpenSidebar }) {
     const initialState = getInitialState();
     // console.log(initialState.visualize);
     store.dispatch(updateVisualize(initialState.visualize));
+    store.dispatch(updateVisualizeResults(initialState.visualizeResults));
   }
 
   //   Uploads inputFile and returns a projectID
