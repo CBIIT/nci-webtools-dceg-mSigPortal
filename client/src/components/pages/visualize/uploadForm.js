@@ -4,10 +4,15 @@ import { useDropzone } from 'react-dropzone';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCloudUploadAlt, faMinus } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import './visualize.scss';
 import { createSlice, configureStore, combineReducers } from '@reduxjs/toolkit';
-import { store, updateVisualize,resetVisualize} from '../../../services/visualSlice'
+import { 
+  store, 
+  replaceVisualize,
+  updateVisualize, 
+  getInitialState
+} from '../../../services/store'
 const { Group, Label, Control, Check, Text } = Form;
 
 const root =
@@ -29,15 +34,6 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
     queueMode,
     email
   } = useSelector(state => state.visualize);
-/*
-  const setInputFormat = inputFormat => {
-    dispatch(updateVisualize({ inputFormat }));
-  };
-*/
-  const setInput = inputFile => {
- //   dispatch(updateVisualize({ inputFile }));
-  };
-
 
   // const [inputFormat, setInputFormat] = useState('vcf');
   // const [inputFile, setInput] = useState(new File([], ''));
@@ -52,7 +48,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
 
   const onDrop = useCallback((acceptedFiles) => {
     console.log("acceptedFiles[0]", acceptedFiles[0].name);
-    setInput(acceptedFiles[0].name);
+    handleInputFile(acceptedFiles[0].name);
   }, []);
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
@@ -60,39 +56,43 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
   });
 
   function handleInputSelect(type) {
-    store.dispatch(updateVisualize({param: 'inputFormat', data: type}))
+    store.dispatch(updateVisualize({param: 'inputFormat', data: type}));
+  }
+
+  function handleInputFile(inputFile) {
+    store.dispatch(updateVisualize({param: 'inputFile', data: inputFile}));
   }
 
   function handleGenomeSelect(genome) {
-    store.dispatch(updateVisualize({param: 'selectedGenome', data: genome}))
+    store.dispatch(updateVisualize({param: 'selectedGenome', data: genome}));
   }
 
   function handleStrategyRadio(experimentalStrategy) {
-    store.dispatch(updateVisualize({param: 'experimentalStrategy', data: experimentalStrategy}))
+    store.dispatch(updateVisualize({param: 'experimentalStrategy', data: experimentalStrategy}));
   }
 
   function handleMutationRadio(bool) {
-    store.dispatch(updateVisualize({param: 'mutationSplit', data: bool}))
+    store.dispatch(updateVisualize({param: 'mutationSplit', data: bool}));
   }
 
   function handleMultiple(bool) {
-    store.dispatch(updateVisualize({param: 'isMultiple', data: bool}))
+    store.dispatch(updateVisualize({param: 'isMultiple', data: bool}));
   }
 
   function handleCollapseRadio(bool) {
-    store.dispatch(updateVisualize({param: 'collapseSample', data: bool}))
+    store.dispatch(updateVisualize({param: 'collapseSample', data: bool}));
   }
 
   function handleFilterInput(string) {
-    store.dispatch(updateVisualize({param: 'mutationFilter', data: string}))
+    store.dispatch(updateVisualize({param: 'mutationFilter', data: string}));
   }
 
   function setQueueMode(bool) {
-    store.dispatch(updateVisualize({param: 'queueMode', data: bool}))
+    store.dispatch(updateVisualize({param: 'queueMode', data: bool}));
   }
 
   function handleEmailInput(email) {
-    store.dispatch(updateVisualize({param: 'email', data: email}))
+    store.dispatch(updateVisualize({param: 'email', data: email}));
   }
 
   async function handleSubmit(e) {
@@ -135,7 +135,9 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
   }
 
   function handleReset() {
-    store.dispatch(resetVisualize())    
+    const initialState = getInitialState();
+    console.log(initialState.visualize);
+    store.dispatch(replaceVisualize({param: 'visualize', data: initialState.visualize}));
   }
 
   //   Uploads inputFile and returns a projectID
@@ -158,7 +160,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
 
   function removeFile() {
     // setInput(new File([], ''));
-    setInput(null);
+    handleInputFile(null);
   }
 
   return (

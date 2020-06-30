@@ -1,0 +1,72 @@
+import { createSlice,configureStore} from '@reduxjs/toolkit';
+
+export const getInitialState = () => ({
+    visualize: {
+      inputFormat: 'vcf',
+      inputFile: null,
+      selectedGenome: 'GRCh37',
+      experimentalStrategy: 'WGS',
+      mutationSplit: 'False',
+      isMultiple: false,
+      collapseSample: 'False',
+      mutationFilter: '',
+      queueMode: false,
+      email: ''
+    },
+    visualizeResults: {
+      uid: null,
+      mapping: null,
+      displayedPlot: null
+    }
+  });
+
+const visualSlice = createSlice({
+    name: 'visualize',
+    initialState: getInitialState(),
+    reducers: {
+        replaceVisualize: (state, action) => {
+            return {
+                ...state,
+                [action.payload.param]: action.payload.data
+            }
+        },
+        updateVisualize: (state, action) => {
+            return {
+                ...state,
+                visualize: {
+                    ...state.visualize,
+                    [action.payload.param]: action.payload.data
+                }
+            }
+        },
+        // resetVisualize: (state) => {
+        //     return{
+        //         ...state,
+        //         visualize: {
+        //             inputFormat: 'vcf',
+        //             inputFile: null,
+        //             selectedGenome: 'GRCh37',
+        //             experimentalStrategy: 'WGS',
+        //             mutationSplit: 'False',
+        //             isMultiple: false,
+        //             collapseSample: 'False',
+        //             mutationFilter: '',
+        //             queueMode: false,
+        //             email: ''
+        //         }
+        //     }
+        // }
+    }
+  })
+
+const {actions, reducer} = visualSlice;
+export const store = configureStore({
+    reducer: reducer,
+    preloadedState: getInitialState()
+});
+
+export const {
+    replaceVisualize,
+    updateVisualize, 
+    // resetVisualize
+} = actions;
