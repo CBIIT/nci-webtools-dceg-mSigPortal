@@ -1,7 +1,6 @@
 import React from 'react';
 
 export default function About() {
-  
   return (
     <div
       className="mt-3 container bg-white tab-pane-bordered rounded-0 p-4"
