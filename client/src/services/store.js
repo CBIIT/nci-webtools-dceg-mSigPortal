@@ -1,4 +1,4 @@
-import { createSlice, configureStore } from '@reduxjs/toolkit';
+import { createSlice, configureStore, combineReducers } from '@reduxjs/toolkit';
 
 export const getInitialState = () => ({
     visualize: {

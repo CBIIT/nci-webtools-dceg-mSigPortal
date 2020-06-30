@@ -6,7 +6,6 @@ import { faCloudUploadAlt, faMinus } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useSelector } from 'react-redux';
 import './visualize.scss';
-import { createSlice, configureStore, combineReducers } from '@reduxjs/toolkit';
 import { 
   store, 
   replaceVisualize,
@@ -34,17 +33,6 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
     queueMode,
     email
   } = useSelector(state => state.visualize);
-
-  // const [inputFormat, setInputFormat] = useState('vcf');
-  // const [inputFile, setInput] = useState(new File([], ''));
-  // const [selectedGenome, setSelectedGenome] = useState('GRCh37');
-  // const [experimentalStrategy, setStrategy] = useState('WGS');
-  // const [mutationSplit, setSplit] = useState('False');
-  // const [isMultiple, setMultiple] = useState(false);
-  // const [collapseSample, setCollapse] = useState('False');
-  // const [mutationFilter, setFilter] = useState('');
-  // const [queueMode, setQueueMode] = useState(false);
-  // const [email, setEmail] = useState('');
 
   const onDrop = useCallback((acceptedFiles) => {
     console.log("acceptedFiles[0]", acceptedFiles[0].name);
