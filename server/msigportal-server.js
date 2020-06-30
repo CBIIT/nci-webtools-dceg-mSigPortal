@@ -176,10 +176,11 @@ app.post('/visualizeSummary', (req, res) => {
       logger.error(err);
       res.status(500).json(err);
     }
-    Papa.parse(data, {
+    Papa.parse(data.trim(), {
       header: true,
-      complete: (parsed) =>
-        res.json(parsed.data.slice(0, parsed.data.length - 1)),
+      complete: (parsed) => {
+        res.json(parsed.data);
+      },
     });
   });
 });
