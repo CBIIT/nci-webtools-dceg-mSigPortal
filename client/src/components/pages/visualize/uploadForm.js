@@ -9,6 +9,7 @@ import './visualize.scss';
 import {
   store,
   updateVisualize,
+  updateVisualizeResults,
   getInitialState,
 } from '../../../services/store';
 const { Group, Label, Control, Check, Text } = Form;
@@ -76,7 +77,7 @@ export default function UploadForm({ setOpenSidebar }) {
             projectID: data.projectID,
           })
         );
-        setOpenSidebar(false);
+        // setOpenSidebar(false);
       } else {
         // add error handling
       }

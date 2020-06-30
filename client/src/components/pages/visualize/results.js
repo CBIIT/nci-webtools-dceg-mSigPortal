@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import { updateVisualizeResults } from '../../../services/actions';
-import { getInitialState } from '../../../services/store';
+import { useSelector } from 'react-redux';
+import { store, updateVisualizeResults } from '../../../services/store';
 
 const { Group, Label, Control } = Form;
 
@@ -12,7 +11,6 @@ const root =
     : window.location.pathname;
 
 export default function Results() {
-  const dispatch = useDispatch();
   const { projectID, mapping, plots, displayedPlot, plotURL } = useSelector(
     (state) => state.visualizeResults
   );
@@ -25,7 +23,7 @@ export default function Results() {
   }, [projectID]);
 
   useEffect(() => {
-    if (plots.length && displayedPlot.length == 0) {
+    if (plots.length) {
       setPlot(mapping[0].Sample_Name);
       console.log('useEffect mapping');
     }
@@ -41,8 +39,8 @@ export default function Results() {
       body: JSON.stringify({ projectID: projectID }),
     });
     const mapping = await response.json();
-
-    dispatch(
+    console.log(mapping);
+    store.dispatch(
       updateVisualizeResults({
         mapping: mapping,
         plots: mapping.map((plot) => plot.Sample_Name).sort(),
@@ -65,7 +63,7 @@ export default function Results() {
     const pic = await response.blob();
     let objectURL = URL.createObjectURL(pic);
     console.log(pic, objectURL);
-    dispatch(
+    store.dispatch(
       updateVisualizeResults({
         displayedPlot: plotName,
         plotURL: objectURL,
