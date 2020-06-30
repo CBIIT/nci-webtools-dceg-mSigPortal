@@ -42,7 +42,7 @@ export default function UploadForm({ setOpenSidebar }) {
     accept: '.csv, .tsv, .vcf, .gz, .zip, .tar, .tar.gz',
   });
 
-  async function handleSubmit(e) {
+  async function handleSubmit() {
     const data = await uploadFile();
     if (data && data.projectID) {
       const args = {
@@ -70,14 +70,13 @@ export default function UploadForm({ setOpenSidebar }) {
       });
 
       const result = await response.json();
-      console.log(result);
       if (response.ok) {
         store.dispatch(
           updateVisualizeResults({
             projectID: data.projectID,
           })
         );
-        // setOpenSidebar(false);
+        setOpenSidebar(false);
       } else {
         // add error handling
       }

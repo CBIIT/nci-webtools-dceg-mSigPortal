@@ -11,6 +11,7 @@ export const getInitialState = () => ({
     mutationFilter: '',
     queueMode: false,
     email: '',
+    openSidebar: true,
   },
   visualizeResults: {
     projectID: '',

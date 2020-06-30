@@ -6,17 +6,23 @@ import {
 } from '../../controls/sidebar-container/sidebar-container';
 import UploadForm from './uploadForm';
 import Results from './results';
+import { useSelector } from 'react-redux';
+import { store, updateVisualize } from '../../../services/store';
 import './visualize.scss';
 
 export default function Visualize() {
-  const [openSidebar, setOpenSidebar] = useState(true);
+  const { openSidebar } = useSelector((state) => state.visualize);
+
+  function setOpenSidebar(bool) {
+    store.dispatch(updateVisualize({ openSidebar: bool }));
+  }
 
   return (
     <div className="container">
       <SidebarContainer
         className="my-3"
         collapsed={!openSidebar}
-        onCollapsed={(collapsed) => setOpenSidebar(!collapsed)}
+        onCollapsed={(e) => setOpenSidebar(!e)}
       >
         <SidebarPanel className="col-lg-4">
           <div className="p-3 shadow-sm bg-white">
