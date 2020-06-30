@@ -12,8 +12,10 @@ export const getInitialState = () => ({
     queueMode: false,
     email: '',
     openSidebar: true,
+    disableParameters: false,
   },
   visualizeResults: {
+    error: '',
     projectID: '',
     mapping: [],
     plots: [],

@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Form } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { store, updateVisualizeResults } from '../../../services/store';
+import {
+  store,
+  updateVisualizeResults,
+  updateError,
+} from '../../../services/store';
 
 const { Group, Label, Control } = Form;
 
@@ -11,9 +15,14 @@ const root =
     : window.location.pathname;
 
 export default function Results() {
-  const { projectID, mapping, plots, displayedPlot, plotURL } = useSelector(
-    (state) => state.visualizeResults
-  );
+  const {
+    projectID,
+    mapping,
+    plots,
+    displayedPlot,
+    plotURL,
+    error,
+  } = useSelector((state) => state.visualizeResults);
 
   useEffect(() => {
     if (projectID.length) {
@@ -24,7 +33,6 @@ export default function Results() {
   useEffect(() => {
     if (plots.length && !displayedPlot.length) {
       setPlot(mapping[0].Sample_Name);
-      console.log('useEffect mapping');
     }
   }, [mapping]);
 
@@ -38,7 +46,6 @@ export default function Results() {
       body: JSON.stringify({ projectID: projectID }),
     });
     const mapping = await response.json();
-    console.log(mapping);
     store.dispatch(
       updateVisualizeResults({
         mapping: mapping,
@@ -59,18 +66,24 @@ export default function Results() {
       },
       body: JSON.stringify({ path: plotPath[0].Location }),
     });
-    const pic = await response.blob();
-    let objectURL = URL.createObjectURL(pic);
-    console.log(pic, objectURL);
-    store.dispatch(
-      updateVisualizeResults({
-        displayedPlot: plotName,
-        plotURL: objectURL,
-      })
-    );
+    if (!response.ok) {
+      const { msg } = await response.json();
+      store.dispatch(updateError({ visible: true, message: msg }));
+    } else {
+      const pic = await response.blob();
+      let objectURL = URL.createObjectURL(pic);
+      store.dispatch(
+        updateVisualizeResults({
+          displayedPlot: plotName,
+          plotURL: objectURL,
+        })
+      );
+    }
   }
 
-  return plots.length ? (
+  return error.length ? (
+    <h4 className="text-danger">{error}</h4>
+  ) : plots.length ? (
     <div>
       <Form>
         <Group>
