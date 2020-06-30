@@ -1,12 +1,11 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Modal, Button } from 'react-bootstrap';
-import { updateError } from '../../../services/actions';
+import { store, updateError } from '../../../services/store';
 
 export function ErrorModal(props) {
   const error = useSelector((store) => store.error);
-  const dispatch = useDispatch();
-  const closeErrorModal = () => dispatch(updateError({ visible: false }));
+  const closeErrorModal = () => store.dispatch(updateError({ visible: false }));
 
   return (
     <Modal

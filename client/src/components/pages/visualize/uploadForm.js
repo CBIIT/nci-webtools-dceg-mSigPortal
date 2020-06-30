@@ -8,7 +8,6 @@ import { useSelector } from 'react-redux';
 import './visualize.scss';
 import {
   store,
-  replaceVisualize,
   updateVisualize,
   getInitialState,
 } from '../../../services/store';
@@ -42,51 +41,6 @@ export default function UploadForm({ setOpenSidebar }) {
     accept: '.csv, .tsv, .vcf, .gz, .zip, .tar, .tar.gz',
   });
 
-  function handleInputSelect(type) {
-    store.dispatch(updateVisualize({ param: 'inputFormat', data: type }));
-  }
-
-  // function handleInputFile(inputFile) {
-  //   store.dispatch(updateVisualize({ param: 'inputFile', data: inputFile }));
-  // }
-
-  function handleGenomeSelect(genome) {
-    store.dispatch(updateVisualize({ param: 'selectedGenome', data: genome }));
-  }
-
-  function handleStrategyRadio(experimentalStrategy) {
-    store.dispatch(
-      updateVisualize({
-        param: 'experimentalStrategy',
-        data: experimentalStrategy,
-      })
-    );
-  }
-
-  function handleMutationRadio(bool) {
-    store.dispatch(updateVisualize({ param: 'mutationSplit', data: bool }));
-  }
-
-  function handleMultiple(bool) {
-    store.dispatch(updateVisualize({ param: 'isMultiple', data: bool }));
-  }
-
-  function handleCollapseRadio(bool) {
-    store.dispatch(updateVisualize({ param: 'collapseSample', data: bool }));
-  }
-
-  function handleFilterInput(string) {
-    store.dispatch(updateVisualize({ param: 'mutationFilter', data: string }));
-  }
-
-  function setQueueMode(bool) {
-    store.dispatch(updateVisualize({ param: 'queueMode', data: bool }));
-  }
-
-  function handleEmailInput(email) {
-    store.dispatch(updateVisualize({ param: 'email', data: email }));
-  }
-
   async function handleSubmit(e) {
     const data = await uploadFile();
     if (data && data.projectID) {
@@ -117,7 +71,7 @@ export default function UploadForm({ setOpenSidebar }) {
       const result = await response.json();
       console.log(result);
       if (response.ok) {
-        dispatch(
+        store.dispatch(
           updateVisualizeResults({
             projectID: data.projectID,
           })
@@ -131,10 +85,8 @@ export default function UploadForm({ setOpenSidebar }) {
 
   function handleReset() {
     const initialState = getInitialState();
-    console.log(initialState.visualize);
-    store.dispatch(
-      replaceVisualize({ param: 'visualize', data: initialState.visualize })
-    );
+    // console.log(initialState.visualize);
+    store.dispatch(updateVisualize(initialState.visualize));
   }
 
   //   Uploads inputFile and returns a projectID
@@ -167,7 +119,7 @@ export default function UploadForm({ setOpenSidebar }) {
           as="select"
           value={inputFormat}
           onChange={(e) => {
-            handleInputSelect(e.target.value);
+            store.dispatch(updateVisualize({ inputFormat: e.target.value }));
           }}
         >
           <option value="vcf">VCF</option>
@@ -206,7 +158,9 @@ export default function UploadForm({ setOpenSidebar }) {
         <Control
           as="select"
           value={selectedGenome}
-          onChange={(e) => handleGenomeSelect(e.target.value)}
+          onChange={(e) =>
+            store.dispatch(updateVisualize({ selectedGenome: e.target.value }))
+          }
         >
           <option value="GRCh37">GRCh37</option>
           <option value="GRCh38">GRCh38</option>
@@ -220,7 +174,11 @@ export default function UploadForm({ setOpenSidebar }) {
             type="radio"
             value="WGS"
             checked={experimentalStrategy == 'WGS'}
-            onChange={(e) => handleStrategyRadio(e.target.value)}
+            onChange={(e) =>
+              store.dispatch(
+                updateVisualize({ experimentalStrategy: e.target.value })
+              )
+            }
           />
           <Check.Label className="font-weight-normal">WGS</Check.Label>
         </Check>
@@ -229,7 +187,11 @@ export default function UploadForm({ setOpenSidebar }) {
             type="radio"
             value="WES"
             checked={experimentalStrategy == 'WES'}
-            onChange={(e) => handleStrategyRadio(e.target.value)}
+            onChange={(e) =>
+              store.dispatch(
+                updateVisualize({ experimentalStrategy: e.target.value })
+              )
+            }
           />
           <Check.Label className="font-weight-normal">WES</Check.Label>
         </Check>
@@ -242,7 +204,9 @@ export default function UploadForm({ setOpenSidebar }) {
             type="radio"
             value="False"
             checked={mutationSplit == 'False'}
-            onChange={(e) => handleMutationRadio(e.target.value)}
+            onChange={(e) =>
+              store.dispatch(updateVisualize({ mutationSplit: e.target.value }))
+            }
           />
           <Check.Label className="font-weight-normal">False</Check.Label>
         </Check>
@@ -252,7 +216,9 @@ export default function UploadForm({ setOpenSidebar }) {
             type="radio"
             value="True"
             checked={mutationSplit == 'True'}
-            onChange={(e) => handleMutationRadio(e.target.value)}
+            onChange={(e) =>
+              store.dispatch(updateVisualize({ mutationSplit: e.target.value }))
+            }
           />
           <Check.Label className="font-weight-normal">True</Check.Label>
         </Check>
@@ -264,7 +230,9 @@ export default function UploadForm({ setOpenSidebar }) {
             type="radio"
             // value={false}
             checked={!isMultiple}
-            onChange={() => handleMultiple(!isMultiple)}
+            onChange={() =>
+              store.dispatch(updateVisualize({ isMultiple: !isMultiple }))
+            }
           />
           <Check.Label htmlFor="multipleFalse" className="font-weight-normal">
             False
@@ -275,7 +243,9 @@ export default function UploadForm({ setOpenSidebar }) {
             type="radio"
             // value={true}
             checked={isMultiple}
-            onChange={() => handleMultiple(!isMultiple)}
+            onChange={() =>
+              store.dispatch(updateVisualize({ isMultiple: !isMultiple }))
+            }
           />
           <Check.Label htmlFor="multipleTrue" className="font-weight-normal">
             True
@@ -290,7 +260,11 @@ export default function UploadForm({ setOpenSidebar }) {
             type="radio"
             value="False"
             checked={collapseSample == 'False'}
-            onChange={(e) => handleCollapseRadio(e.target.value)}
+            onChange={(e) =>
+              store.dispatch(
+                updateVisualize({ collapseSample: e.target.value })
+              )
+            }
           />
           <Check.Label className="font-weight-normal">False</Check.Label>
         </Check>
@@ -300,7 +274,11 @@ export default function UploadForm({ setOpenSidebar }) {
             type="radio"
             value="True"
             checked={collapseSample == 'True'}
-            onChange={(e) => handleCollapseRadio(e.target.value)}
+            onChange={(e) =>
+              store.dispatch(
+                updateVisualize({ collapseSample: e.target.value })
+              )
+            }
           />
           <Check.Label className="font-weight-normal">True</Check.Label>
         </Check>
@@ -312,7 +290,9 @@ export default function UploadForm({ setOpenSidebar }) {
           size="sm"
           placeholder="Enter a filter"
           value={mutationFilter}
-          onChange={(e) => handleFilterInput(e.target.value)}
+          onChange={(e) =>
+            store.dispatch(updateVisualize({ mutationFilter: e.target.value }))
+          }
         ></Control>
       </Group>
       <hr />
@@ -327,7 +307,7 @@ export default function UploadForm({ setOpenSidebar }) {
             label="Submit this job to a Queue"
             checked={queueMode == true}
             onChange={(_) => {
-              setQueueMode(!queueMode);
+              store.dispatch(updateVisualize({ queueMode: !queueMode }));
             }}
           />
         </div>
@@ -336,7 +316,9 @@ export default function UploadForm({ setOpenSidebar }) {
             placeholder="Enter Email"
             size="sm"
             value={email}
-            onChange={(e) => handleEmailInput(e.target.value)}
+            onChange={(e) =>
+              store.dispatch(updateVisualize({ email: e.target.value }))
+            }
             disabled={!queueMode}
           ></Control>
           <Text className="text-muted">

@@ -19,65 +19,64 @@ export const getInitialState = () => ({
     displayedPlot: '',
     plotURL: '',
   },
-});
-
-const visualSlice = createSlice({
-  name: 'visualize',
-  initialState: getInitialState(),
-  reducers: {
-    replaceVisualize: (state, action) => {
-      return {
-        ...state,
-        [action.payload.param]: action.payload.data,
-      };
-    },
-    updateVisualize: (state, action) => {
-      return {
-        ...state,
-        visualize: {
-          ...state.visualize,
-          [action.payload.param]: action.payload.data,
-        },
-      };
-    },
-    updateVisualizeResults: (state, action) => {
-      return {
-        ...state,
-        visualizeResults: {
-          ...state.visualizeResults,
-          [action.payload.param]: action.payload.data,
-        },
-      };
-    },
-    // resetVisualize: (state) => {
-    //     return{
-    //         ...state,
-    //         visualize: {
-    //             inputFormat: 'vcf',
-    //             inputFile: null,
-    //             selectedGenome: 'GRCh37',
-    //             experimentalStrategy: 'WGS',
-    //             mutationSplit: 'False',
-    //             isMultiple: false,
-    //             collapseSample: 'False',
-    //             mutationFilter: '',
-    //             queueMode: false,
-    //             email: ''
-    //         }
-    //     }
-    // }
+  error: {
+    visible: false,
+    message: `An error occured when requesting data. If this problem persists, please contact the administrator at <a href="mailto:mSigPortalWebAdmin@cancer.gov">mSigPortalWebAdmin@cancer.gov</a>.`,
   },
 });
 
-const { actions, reducer } = visualSlice;
+const visualizeSlice = createSlice({
+  name: 'visualize',
+  initialState: getInitialState().visualize,
+  reducers: {
+    updateVisualize: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
+
+const visualizeResultsSlice = createSlice({
+  name: 'visualizeResults',
+  initialState: getInitialState().visualizeResults,
+  reducers: {
+    updateVisualizeResults: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
+
+const errorSlice = createSlice({
+  name: 'error',
+  initialState: getInitialState().error,
+  reducers: {
+    updateError: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
+
+const rootReducer = combineReducers({
+  visualize: visualizeSlice.reducer,
+  visualizeResults: visualizeResultsSlice.reducer,
+  error: errorSlice.reducer,
+});
+
 export const store = configureStore({
-  reducer: reducer,
+  reducer: rootReducer,
   preloadedState: getInitialState(),
 });
 
-export const {
-  replaceVisualize,
-  updateVisualize,
-  updateVisualizeResults,
-  // resetVisualize
-} = actions;
+export const { updateVisualize } = visualizeSlice.actions;
+
+export const { updateVisualizeResults } = visualizeResultsSlice.actions;
+
+export const { updateError } = errorSlice.actions;
