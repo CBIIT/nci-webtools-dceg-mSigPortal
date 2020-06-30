@@ -10,6 +10,7 @@ import {
   store,
   updateVisualize,
   updateVisualizeResults,
+  updateError,
   getInitialState,
 } from '../../../services/store';
 const { Group, Label, Control, Check, Text } = Form;
@@ -30,6 +31,7 @@ export default function UploadForm({ setOpenSidebar }) {
     mutationFilter,
     queueMode,
     email,
+    disableParameters,
   } = useSelector((state) => state.visualize);
 
   const [inputFile, setInput] = useState(new File([], ''));
@@ -43,6 +45,9 @@ export default function UploadForm({ setOpenSidebar }) {
   });
 
   async function handleSubmit() {
+    // disable parameters after submit
+    store.dispatch(updateVisualize({ disableParameters: true }));
+
     const data = await uploadFile();
     if (data && data.projectID) {
       const args = {
@@ -78,7 +83,19 @@ export default function UploadForm({ setOpenSidebar }) {
         );
         setOpenSidebar(false);
       } else {
-        // add error handling
+        store.dispatch(
+          updateVisualizeResults({
+            error: 'Please Reset Your Parameters and Try again.',
+          })
+        );
+        const { msg, stdout, stderr } = result;
+        const message = `<div>
+            <p>${msg}</p>
+            <p><b>Python:</b></p>
+            <pre>${stdout}</pre>
+            <pre>${stderr}</pre>
+          </div>`;
+        store.dispatch(updateError({ visible: true, message: message }));
       }
     }
   }
@@ -101,7 +118,12 @@ export default function UploadForm({ setOpenSidebar }) {
 
     if (!response.ok) {
       // add error handling
-      console.log(`HTTP error! status: ${response.status}`);
+      const { msg, error } = await response.json();
+      const message = `<div>
+          <p>${msg}</p>
+         ${error ? `<p>${error}</p>` : ''} 
+        </div>`;
+      store.dispatch(updateError({ visible: true, message: message }));
     } else {
       return await response.json();
     }
@@ -121,6 +143,7 @@ export default function UploadForm({ setOpenSidebar }) {
           onChange={(e) => {
             store.dispatch(updateVisualize({ inputFormat: e.target.value }));
           }}
+          disabled={disableParameters}
         >
           <option value="vcf">VCF</option>
           <option value="csv">CSV</option>
@@ -132,12 +155,16 @@ export default function UploadForm({ setOpenSidebar }) {
       <Group controlId="fileUpload">
         <section>
           <div {...getRootProps({ className: 'dropzone' })}>
-            <input {...getInputProps()} disabled={inputFile.size} />
+            <input
+              {...getInputProps()}
+              disabled={inputFile.size || disableParameters}
+            />
             {inputFile.size ? (
               <button
                 id="removeFile"
                 className="d-flex w-100"
                 onClick={() => removeFile()}
+                disabled={disableParameters}
               >
                 <span id="uploadedFile">{inputFile.name}</span>
                 <span className="text-danger ml-auto">
@@ -161,6 +188,7 @@ export default function UploadForm({ setOpenSidebar }) {
           onChange={(e) =>
             store.dispatch(updateVisualize({ selectedGenome: e.target.value }))
           }
+          disabled={disableParameters}
         >
           <option value="GRCh37">GRCh37</option>
           <option value="GRCh38">GRCh38</option>
@@ -179,6 +207,7 @@ export default function UploadForm({ setOpenSidebar }) {
                 updateVisualize({ experimentalStrategy: e.target.value })
               )
             }
+            disabled={disableParameters}
           />
           <Check.Label className="font-weight-normal">WGS</Check.Label>
         </Check>
@@ -192,6 +221,7 @@ export default function UploadForm({ setOpenSidebar }) {
                 updateVisualize({ experimentalStrategy: e.target.value })
               )
             }
+            disabled={disableParameters}
           />
           <Check.Label className="font-weight-normal">WES</Check.Label>
         </Check>
@@ -207,6 +237,7 @@ export default function UploadForm({ setOpenSidebar }) {
             onChange={(e) =>
               store.dispatch(updateVisualize({ mutationSplit: e.target.value }))
             }
+            disabled={disableParameters}
           />
           <Check.Label className="font-weight-normal">False</Check.Label>
         </Check>
@@ -219,6 +250,7 @@ export default function UploadForm({ setOpenSidebar }) {
             onChange={(e) =>
               store.dispatch(updateVisualize({ mutationSplit: e.target.value }))
             }
+            disabled={disableParameters}
           />
           <Check.Label className="font-weight-normal">True</Check.Label>
         </Check>
@@ -233,6 +265,7 @@ export default function UploadForm({ setOpenSidebar }) {
             onChange={() =>
               store.dispatch(updateVisualize({ isMultiple: !isMultiple }))
             }
+            disabled={disableParameters}
           />
           <Check.Label htmlFor="multipleFalse" className="font-weight-normal">
             False
@@ -246,6 +279,7 @@ export default function UploadForm({ setOpenSidebar }) {
             onChange={() =>
               store.dispatch(updateVisualize({ isMultiple: !isMultiple }))
             }
+            disabled={disableParameters}
           />
           <Check.Label htmlFor="multipleTrue" className="font-weight-normal">
             True
@@ -265,6 +299,7 @@ export default function UploadForm({ setOpenSidebar }) {
                 updateVisualize({ collapseSample: e.target.value })
               )
             }
+            disabled={disableParameters}
           />
           <Check.Label className="font-weight-normal">False</Check.Label>
         </Check>
@@ -279,6 +314,7 @@ export default function UploadForm({ setOpenSidebar }) {
                 updateVisualize({ collapseSample: e.target.value })
               )
             }
+            disabled={disableParameters}
           />
           <Check.Label className="font-weight-normal">True</Check.Label>
         </Check>
@@ -293,6 +329,7 @@ export default function UploadForm({ setOpenSidebar }) {
           onChange={(e) =>
             store.dispatch(updateVisualize({ mutationFilter: e.target.value }))
           }
+          disabled={disableParameters}
         ></Control>
       </Group>
       <hr />
@@ -341,7 +378,7 @@ export default function UploadForm({ setOpenSidebar }) {
         </div>
         <div className="col-sm-6">
           <Button
-            disabled={!inputFile.size}
+            disabled={!inputFile.size || disableParameters}
             className="w-100"
             variant="primary"
             type="button"

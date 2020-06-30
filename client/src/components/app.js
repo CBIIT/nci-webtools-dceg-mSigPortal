@@ -7,7 +7,7 @@ import Visualize from './pages/visualize/visualize';
 import Explore from './pages/explore/explore';
 import Refitting from './pages/refitting/refitting';
 import Association from './pages/association/association';
-// import { ErrorModal } from './controls/error-modal/error-modal';
+import { ErrorModal } from './controls/error-modal/error-modal';
 
 export default function App() {
   const links = [
@@ -58,7 +58,7 @@ export default function App() {
 
   return (
     <Router>
-      {/* <ErrorModal /> */}
+      <ErrorModal />
       <Navbar links={links} />
       <Route path="/" exact={true} render={(_) => <Home links={links} />} />
       <Route path="/about" component={About} />

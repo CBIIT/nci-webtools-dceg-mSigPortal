@@ -54,9 +54,9 @@ app.post('/api/visualize', (req, res) => {
   const resultsDir = path.join(reqBody.outputDir[1], 'results');
   reqBody.inputFile[1] = path.join(tmppath, reqBody.inputFile[1]);
   reqBody.outputDir[1] = path.join(tmppath, resultsDir);
-  // reqBody.outputDir[1] = 'results';
   const args = Object.values(reqBody);
   const cli = args.reduce((params, arg) => [...params, ...arg]);
+
   logger.debug('/API/VISUALIZE: CLI args\n' + cli);
   let stdout = '';
   let stderr = '';
@@ -70,17 +70,6 @@ app.post('/api/visualize', (req, res) => {
   wrapper.stderr.on('close', () => {
     const scriptOut = { stdout: stdout, stderr: stderr };
     console.log('python out', scriptOut);
-    // if (stderr.length) {
-    //   logger.error('/API/VISUALIZE: Python Error Occured');
-    //   res.status(500).json(scriptOut);
-    // } else {
-    // try {
-    //   let plotsDir = '';
-    //   reqBody.inputFormat[1].includes('catalog')
-    //     ? (plotsDir = path.join(resultsDir, 'svg'))
-    //     : (plotsDir = path.join(resultsDir, 'output', 'plots', 'svg'));
-    //   const plots = fs.readdirSync(path.join(tmppath, plotsDir));
-    //   console.log(plots);
     if (
       fs.existsSync(
         path.join(tmppath, reqBody.projectID[1], 'results', 'Summary.txt')
@@ -92,16 +81,12 @@ app.post('/api/visualize', (req, res) => {
       logger.error(
         '/API/VISUALIZE: An Error Occured While Extracting Profiles'
       );
-      res.status(500).json({ ...scriptOut });
+      res.status(500).json({
+        msg:
+          'An error occured durring profile extraction. Please review your input parameters and try again.',
+        ...scriptOut,
+      });
     }
-    // } catch (err) {
-    //   logger.error(
-    //     '/API/VISUALIZE: An Error Occured While Extracting Profiles'
-    //   );
-    //   logger.error(err);
-    //   res.status(500).json({ server: err, ...scriptOut });
-    //   // }
-    // }
   });
 });
 
@@ -128,7 +113,8 @@ app.post('/upload', (req, res, next) => {
           `/UPLOAD: Failed to upload file: ${file.name}` + '\n' + err
         );
         res.status(404).json({
-          msg: `/UPLOAD: Failed to upload file: ${file.name}`,
+          msg: `Failed to upload file: ${file.name}<br><br>
+        Review your selected File Type and try again.`,
           error: err,
         });
       } else {
@@ -143,7 +129,7 @@ app.post('/upload', (req, res, next) => {
   form.on('error', function (err) {
     logger.error('/UPLOAD: An error occured\n' + err);
     res.status(500).json({
-      msg: '/UPLOAD: An error has occured',
+      msg: 'An error occured while trying to upload',
       err: err,
     });
   });
@@ -151,17 +137,22 @@ app.post('/upload', (req, res, next) => {
 
 app.post('/svg', (req, res) => {
   const path = req.body.path;
-  var s = fs.createReadStream(path);
-  s.on('open', () => {
-    res.set('Content-Type', 'image/svg+xml');
-    s.pipe(res);
-    logger.debug(`/SVG: Serving ${req.body.path}`);
-  });
-  s.on('error', () => {
-    res.set('Content-Type', 'text/plain');
-    res.status(500).end('Not found');
-    logger.error(`/SVG: Error retrieving ${req.body.path}`);
-  });
+  if (path.includes(tmppath)) {
+    var s = fs.createReadStream(path);
+    s.on('open', () => {
+      res.set('Content-Type', 'image/svg+xml');
+      s.pipe(res);
+      logger.debug(`/SVG: Serving ${path}`);
+    });
+    s.on('error', () => {
+      res.set('Content-Type', 'text/plain');
+      res.status(500).end('Not found');
+      logger.error(`/SVG: Error retrieving ${path}`);
+    });
+  } else {
+    logger.error(`/SVG: Invalid Path Traversal ${path}`);
+    res.status(500).json({ msg: 'Invalid Image Path' });
+  }
 });
 
 // read summary file and return plot mapping
