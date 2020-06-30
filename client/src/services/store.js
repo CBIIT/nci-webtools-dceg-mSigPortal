@@ -1,4 +1,4 @@
-import { createSlice,configureStore} from '@reduxjs/toolkit';
+import { createSlice, configureStore } from '@reduxjs/toolkit';
 
 export const getInitialState = () => ({
     visualize: {
@@ -39,6 +39,15 @@ const visualSlice = createSlice({
                 }
             }
         },
+        updateVisualizeResults: (state, action) => {
+            return {
+                ...state,
+                visualizeResults: {
+                    ...state.visualizeResults,
+                    [action.payload.param]: action.payload.data
+                }
+            }
+        }
         // resetVisualize: (state) => {
         //     return{
         //         ...state,
@@ -68,5 +77,6 @@ export const store = configureStore({
 export const {
     replaceVisualize,
     updateVisualize, 
+    updateVisualizeResults,
     // resetVisualize
 } = actions;
