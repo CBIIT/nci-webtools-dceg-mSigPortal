@@ -8,6 +8,7 @@ const formidable = require('formidable');
 const fs = require('fs');
 const rimraf = require('rimraf');
 const { v4: uuidv4 } = require('uuid');
+const Papa = require('papaparse');
 
 const app = express();
 
@@ -53,6 +54,7 @@ app.post('/api/visualize', (req, res) => {
   const resultsDir = path.join(reqBody.outputDir[1], 'results');
   reqBody.inputFile[1] = path.join(tmppath, reqBody.inputFile[1]);
   reqBody.outputDir[1] = path.join(tmppath, resultsDir);
+  // reqBody.outputDir[1] = 'results';
   const args = Object.values(reqBody);
   const cli = args.reduce((params, arg) => [...params, ...arg]);
   logger.debug('/API/VISUALIZE: CLI args\n' + cli);
@@ -68,27 +70,38 @@ app.post('/api/visualize', (req, res) => {
   wrapper.stderr.on('close', () => {
     const scriptOut = { stdout: stdout, stderr: stderr };
     console.log('python out', scriptOut);
-    if (stderr.length) {
-      logger.error('/API/VISUALIZE: Python Error Occured');
-      res.status(500).json(scriptOut);
+    // if (stderr.length) {
+    //   logger.error('/API/VISUALIZE: Python Error Occured');
+    //   res.status(500).json(scriptOut);
+    // } else {
+    // try {
+    //   let plotsDir = '';
+    //   reqBody.inputFormat[1].includes('catalog')
+    //     ? (plotsDir = path.join(resultsDir, 'svg'))
+    //     : (plotsDir = path.join(resultsDir, 'output', 'plots', 'svg'));
+    //   const plots = fs.readdirSync(path.join(tmppath, plotsDir));
+    //   console.log(plots);
+    if (
+      fs.existsSync(
+        path.join(tmppath, reqBody.projectID[1], 'results', 'Summary.txt')
+      )
+    ) {
+      logger.info('/API/VISUALIZE: Profile Extraction Succeeded');
+      res.json({ ...scriptOut });
     } else {
-      try {
-        let plotDir = '';
-        reqBody.inputFormat[1].includes('catalog')
-          ? (plotDir = path.join(resultsDir, 'svg'))
-          : (plotDir = path.join(resultsDir, 'output', 'plots', 'svg'));
-        const plots = fs.readdirSync(path.join(tmppath, plotDir));
-        console.log(plots);
-        logger.info('/API/VISUALIZE: Profile Extraction Succeeded');
-        res.json({ plotDir: plotDir, plots: plots, ...scriptOut });
-      } catch (err) {
-        logger.error(
-          '/API/VISUALIZE: An Error Occured While Extracting Profiles'
-        );
-        logger.error(err);
-        res.status(500).json({ server: err, ...scriptOut });
-      }
+      logger.error(
+        '/API/VISUALIZE: An Error Occured While Extracting Profiles'
+      );
+      res.status(500).json({ ...scriptOut });
     }
+    // } catch (err) {
+    //   logger.error(
+    //     '/API/VISUALIZE: An Error Occured While Extracting Profiles'
+    //   );
+    //   logger.error(err);
+    //   res.status(500).json({ server: err, ...scriptOut });
+    //   // }
+    // }
   });
 });
 
@@ -137,9 +150,8 @@ app.post('/upload', (req, res, next) => {
 });
 
 app.post('/svg', (req, res) => {
-  const svgPath = path.join(tmppath, req.body.path);
-  console.log(svgPath);
-  var s = fs.createReadStream(svgPath);
+  const path = req.body.path;
+  var s = fs.createReadStream(path);
   s.on('open', () => {
     res.set('Content-Type', 'image/svg+xml');
     s.pipe(res);
@@ -149,6 +161,26 @@ app.post('/svg', (req, res) => {
     res.set('Content-Type', 'text/plain');
     res.status(500).end('Not found');
     logger.error(`/SVG: Error retrieving ${req.body.path}`);
+  });
+});
+
+// read summary file and return plot mapping
+app.post('/visualizeSummary', (req, res) => {
+  logger.info('/VISUALIZESUMMARY: Reading Results Summary');
+  const projectID = req.body.projectID;
+  const summaryPath = path.join(tmppath, projectID, 'results', 'Summary.txt');
+
+  fs.readFile(summaryPath, 'utf8', (err, data) => {
+    if (err) {
+      logger.error('/VISUALIZESUMMARY: Error Reading Results Summary');
+      logger.error(err);
+      res.status(500).json(err);
+    }
+    Papa.parse(data, {
+      header: true,
+      complete: (parsed) =>
+        res.json(parsed.data.slice(0, parsed.data.length - 1)),
+    });
   });
 });
 
