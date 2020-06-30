@@ -19,7 +19,7 @@ const root =
     ? 'http://localhost:8330/'
     : window.location.pathname;
 
-export default function UploadForm({ setPlots, setOpenSidebar }) {
+export default function UploadForm({ setOpenSidebar }) {
   const dispatch = useDispatch();
   const {
     inputFormat,
@@ -155,14 +155,20 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
         },
         body: JSON.stringify(args),
       });
+
       const result = await response.json();
       console.log(result);
-      setPlots(result);
-      setOpenSidebar(false);
-    } else {
-      //   add error handling
+      if (response.ok) {
+        dispatch(
+          updateVisualizeResults({
+            projectID: data.projectID,
+          })
+        );
+        setOpenSidebar(false);
+      } else {
+        // add error handling
+      }
     }
-    e.preventDefault();
   }
 
   function handleReset() {
@@ -396,7 +402,7 @@ export default function UploadForm({ setPlots, setOpenSidebar }) {
             disabled={!inputFile.size}
             className="w-100"
             variant="primary"
-            type="submit"
+            type="button"
             onClick={(e) => handleSubmit(e)}
           >
             Submit

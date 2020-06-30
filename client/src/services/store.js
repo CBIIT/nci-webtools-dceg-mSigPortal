@@ -6,7 +6,7 @@ import {
 } from '@reduxjs/toolkit';
 
 export const getInitialState = () => ({
-  visualize: {
+  visualizeForm: {
     count: 0,
     inputFormat: 'vcf',
     selectedGenome: 'GRCh37',
@@ -19,9 +19,11 @@ export const getInitialState = () => ({
     email: '',
   },
   visualizeResults: {
-    uid: null,
-    mapping: null,
-    displayedPlot: null,
+    projectID: '',
+    mapping: [],
+    plots: [],
+    displayedPlot: '',
+    plotURL: '',
   },
 });
 
