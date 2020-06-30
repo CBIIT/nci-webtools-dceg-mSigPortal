@@ -28,16 +28,10 @@ const visualizeSlice = createSlice({
     name: 'visualize',
     initialState: getInitialState().visualize,
     reducers: {
-        replaceVisualize: (state, action) => {
-            return {
-                ...state,
-                ...action.payload.data
-            }
-        },
         updateVisualize: (state, action) => {
             return {
                 ...state,
-                [action.payload.param]: action.payload.data
+                ...action.payload
             }
         },
     }
@@ -47,16 +41,10 @@ const visualizeResultsSlice = createSlice({
     name: 'visualizeResults',
     initialState: getInitialState().visualizeResults,
     reducers: {
-        replaceVisualizeResults: (state, action) => {
-            return {
-                ...state,
-                ...action.payload.data
-            }
-        },
         updateVisualizeResults: (state, action) => {
             return {
                 ...state,
-                [action.payload.param]: action.payload.data
+                ...action.payload
             }
         }
     }
@@ -69,7 +57,7 @@ const errorSlice = createSlice({
         updateError: (state, action) => {
             return {
                 ...state,
-                [action.payload.param]: action.payload.data
+                ...action.payload
             }
         }
     }
@@ -87,12 +75,10 @@ export const store = configureStore({
 });
 
 export const {
-    replaceVisualize,
     updateVisualize, 
 } = visualizeSlice.actions;
 
 export const {
-    replaceVisualizeResults,
     updateVisualizeResults
 } = visualizeResultsSlice.actions;
 

@@ -5,8 +5,7 @@ import { store, updateError } from '../../../services/store';
 
 export function ErrorModal(props) {
   const error = useSelector((store) => store.error);
-  // const dispatch = useDispatch();
-  const closeErrorModal = () => store.dispatch(updateError({param: 'visible', data: false}));
+  const closeErrorModal = () => store.dispatch(updateError({ visible: false }));
 
   return (
     <Modal
