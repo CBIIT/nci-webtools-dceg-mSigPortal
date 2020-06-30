@@ -18,12 +18,11 @@ export default function Results() {
   useEffect(() => {
     if (projectID.length) {
       getPlotMapping(projectID);
-      console.log('useEffect projectID', projectID);
     }
   }, [projectID]);
 
   useEffect(() => {
-    if (plots.length) {
+    if (plots.length && !displayedPlot.length) {
       setPlot(mapping[0].Sample_Name);
       console.log('useEffect mapping');
     }
