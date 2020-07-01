@@ -311,7 +311,7 @@ export default function UploadForm({ setOpenSidebar }) {
             // value={false}
             checked={!isMultiple}
             onChange={() =>
-              store.dispatch(updateVisualize({ isMultiple: !isMultiple }))
+              store.dispatch(updateVisualize({ isMultiple: false }))
             }
             disabled={disableParameters}
           />
@@ -325,7 +325,7 @@ export default function UploadForm({ setOpenSidebar }) {
             // value={true}
             checked={isMultiple}
             onChange={() =>
-              store.dispatch(updateVisualize({ isMultiple: !isMultiple }))
+              store.dispatch(updateVisualize({ isMultiple: true }))
             }
             disabled={disableParameters}
           />
@@ -338,7 +338,7 @@ export default function UploadForm({ setOpenSidebar }) {
         <Label className="mr-auto">Collapse Sample</Label>
         <Check inline id="radioFalse">
           <Check.Input
-            disabled={!isMultiple}
+            disabled={!isMultiple || disableParameters}
             type="radio"
             value="False"
             checked={collapseSample == 'False'}
@@ -347,13 +347,12 @@ export default function UploadForm({ setOpenSidebar }) {
                 updateVisualize({ collapseSample: e.target.value })
               )
             }
-            disabled={disableParameters}
           />
           <Check.Label className="font-weight-normal">False</Check.Label>
         </Check>
         <Check inline id="radioTrue">
           <Check.Input
-            disabled={!isMultiple}
+            disabled={!isMultiple || disableParameters}
             type="radio"
             value="True"
             checked={collapseSample == 'True'}
@@ -362,7 +361,6 @@ export default function UploadForm({ setOpenSidebar }) {
                 updateVisualize({ collapseSample: e.target.value })
               )
             }
-            disabled={disableParameters}
           />
           <Check.Label className="font-weight-normal">True</Check.Label>
         </Check>
