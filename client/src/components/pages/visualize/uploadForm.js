@@ -417,6 +417,7 @@ export default function UploadForm({ setOpenSidebar }) {
       <div className="row">
         <div className="col-sm-6">
           <Button
+            disabled={loading.active}
             className="w-100"
             variant="secondary"
             onClick={(e) => handleReset()}
