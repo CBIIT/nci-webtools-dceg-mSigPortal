@@ -65,7 +65,15 @@ export default function UploadForm({ setOpenSidebar }) {
         args['mutationSplit'] = ['-s', mutationSplit];
       if (isMultiple) args['collapseSample'] = ['-c', collapseSample];
 
-      store.dispatch(updateVisualize({ loading: { active: true, content: 'Calculating...', showIndicator: true } }));
+      store.dispatch(
+        updateVisualize({
+          loading: {
+            active: true,
+            content: 'Calculating...',
+            showIndicator: true,
+          },
+        })
+      );
       const response = await fetch(`${root}api/visualize`, {
         method: 'POST',
         headers: {
@@ -75,22 +83,32 @@ export default function UploadForm({ setOpenSidebar }) {
         body: JSON.stringify(args),
       });
 
-      const result = await response.json();
       if (response.ok) {
-        store.dispatch(updateVisualize({ loading: { active: false, content: null, showIndicator: false } }));
         store.dispatch(
           updateVisualizeResults({
             projectID: data.projectID,
           })
         );
         setOpenSidebar(false);
+      } else if (response.status == 502) {
+        store.dispatch(
+          updateVisualizeResults({
+            error: 'Please Reset Your Parameters and Try again.',
+          })
+        );
+        store.dispatch(
+          updateError({
+            visible: true,
+            message: 'Your submission has timed out. Please Try Again.',
+          })
+        );
       } else {
         store.dispatch(
           updateVisualizeResults({
             error: 'Please Reset Your Parameters and Try again.',
           })
         );
-        const { msg, stdout, stderr } = result;
+        const { msg, stdout, stderr } = response.json();
         const message = `<div>
             <p>${msg}</p>
             <p><b>Python:</b></p>
@@ -112,7 +130,15 @@ export default function UploadForm({ setOpenSidebar }) {
 
   //   Uploads inputFile and returns a projectID
   async function uploadFile() {
-    store.dispatch(updateVisualize({ loading: { active: true, content: 'Uploading file...', showIndicator: true } }));
+    store.dispatch(
+      updateVisualize({
+        loading: {
+          active: true,
+          content: 'Uploading file...',
+          showIndicator: true,
+        },
+      })
+    );
     const data = new FormData();
     data.append('file', inputFile);
 
