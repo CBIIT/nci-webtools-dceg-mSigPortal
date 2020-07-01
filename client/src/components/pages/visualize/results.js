@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Form } from 'react-bootstrap';
+import { Form, Row, Col } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faChevronRight,
+  faChevronLeft,
+} from '@fortawesome/free-solid-svg-icons';
 import { useSelector } from 'react-redux';
 import {
   store,
@@ -81,26 +86,56 @@ export default function Results() {
     }
   }
 
+  function nextPlot() {
+    const currIndex = plots.indexOf(displayedPlot);
+    console.log(currIndex + 1);
+    currIndex < plots.length - 1
+      ? setPlot(plots[currIndex + 1])
+      : setPlot(plots[0]);
+  }
+
+  function prevPlot() {
+    const currIndex = plots.indexOf(displayedPlot);
+    console.log(currIndex - 1);
+    currIndex > 0
+      ? setPlot(plots[currIndex - 1])
+      : setPlot(plots[plots.length - 1]);
+  }
+
   return error.length ? (
     <h4 className="text-danger">{error}</h4>
   ) : plots.length ? (
     <div>
       <Form>
         <Group>
-          <Label>Choose SVG</Label>
-          <Control
-            as="select"
-            value={displayedPlot}
-            onChange={(e) => setPlot(e.target.value)}
-          >
-            {plots.map((plot) => {
-              return (
-                <option key={plot} value={plot}>
-                  {plot}
-                </option>
-              );
-            })}
-          </Control>
+          <Label>View Plots</Label>
+          <Row className="justify-content-center">
+            <Col sm="auto">
+              <button className="faButton" onClick={() => prevPlot()}>
+                <FontAwesomeIcon icon={faChevronLeft} size="2x" />
+              </button>
+            </Col>
+            <Col sm="auto">
+              <Control
+                as="select"
+                value={displayedPlot}
+                onChange={(e) => setPlot(e.target.value)}
+              >
+                {plots.map((plot) => {
+                  return (
+                    <option key={plot} value={plot}>
+                      {plot}
+                    </option>
+                  );
+                })}
+              </Control>
+            </Col>
+            <Col sm="auto">
+              <button className="faButton" onClick={() => nextPlot()}>
+                <FontAwesomeIcon icon={faChevronRight} size="2x" />
+              </button>
+            </Col>
+          </Row>
         </Group>
       </Form>
       <img className="w-100" src={plotURL}></img>

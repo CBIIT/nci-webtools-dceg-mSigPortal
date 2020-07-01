@@ -163,7 +163,7 @@ export default function UploadForm({ setOpenSidebar }) {
             {inputFile.size ? (
               <button
                 id="removeFile"
-                className="d-flex w-100"
+                className="d-flex w-100 faButton"
                 onClick={() => removeFile()}
                 disabled={disableParameters}
               >
