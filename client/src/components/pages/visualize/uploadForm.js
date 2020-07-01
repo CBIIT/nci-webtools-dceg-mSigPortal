@@ -118,6 +118,14 @@ export default function UploadForm({ setOpenSidebar }) {
           </div>`;
         store.dispatch(updateError({ visible: true, message: message }));
       }
+      store.dispatch(
+        updateVisualize({
+          loading: {
+            active: false,
+            showIndicator: false,
+          },
+        })
+      );
     }
   }
 
@@ -159,6 +167,14 @@ export default function UploadForm({ setOpenSidebar }) {
     } else {
       return await response.json();
     }
+    store.dispatch(
+      updateVisualize({
+        loading: {
+          active: false,
+          showIndicator: false,
+        },
+      })
+    );
   }
 
   function removeFile() {
