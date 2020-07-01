@@ -23,8 +23,7 @@ export const getInitialState = () => ({
     error: '',
     projectID: '',
     mapping: [],
-    plots: [],
-    displayedPlot: '',
+    displayedPlotIndex: '',
     plotURL: '',
   },
   error: {

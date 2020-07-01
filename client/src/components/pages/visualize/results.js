@@ -23,8 +23,7 @@ export default function Results() {
   const {
     projectID,
     mapping,
-    plots,
-    displayedPlot,
+    displayedPlotIndex,
     plotURL,
     error,
   } = useSelector((state) => state.visualizeResults);
@@ -36,8 +35,8 @@ export default function Results() {
   }, [projectID]);
 
   useEffect(() => {
-    if (plots.length && !displayedPlot.length) {
-      setPlot(mapping[0].Sample_Name);
+    if (mapping.length && !displayedPlotIndex.length) {
+      setPlot(0);
     }
   }, [mapping]);
 
@@ -54,58 +53,57 @@ export default function Results() {
     store.dispatch(
       updateVisualizeResults({
         mapping: mapping,
-        plots: mapping.map((plot) => plot.Sample_Name).sort(),
       })
     );
   }
 
-  async function setPlot(plotName) {
-    const plotPath = mapping.filter((plot) => {
-      return plot.Sample_Name == plotName;
-    });
-    const response = await fetch(`${root}svg`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ path: plotPath[0].Location }),
-    });
-    if (!response.ok) {
-      const { msg } = await response.json();
-      store.dispatch(updateError({ visible: true, message: msg }));
+  async function setPlot(index) {
+    const plot = mapping[index];
+    if (plot) {
+      const response = await fetch(`${root}svg`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ path: plot.Location }),
+      });
+      if (!response.ok) {
+        const { msg } = await response.json();
+        store.dispatch(updateError({ visible: true, message: msg }));
+      } else {
+        const pic = await response.blob();
+        let objectURL = URL.createObjectURL(pic);
+        store.dispatch(
+          updateVisualizeResults({
+            displayedPlotIndex: index,
+            plotURL: objectURL,
+          })
+        );
+      }
     } else {
-      const pic = await response.blob();
-      let objectURL = URL.createObjectURL(pic);
-      store.dispatch(
-        updateVisualizeResults({
-          displayedPlot: plotName,
-          plotURL: objectURL,
-        })
-      );
+      console.log('invalid index', index);
     }
   }
 
   function nextPlot() {
-    const currIndex = plots.indexOf(displayedPlot);
-    currIndex < plots.length - 1
-      ? setPlot(plots[currIndex + 1])
-      : setPlot(plots[0]);
+    displayedPlotIndex < mapping.length - 1
+      ? setPlot(parseInt(displayedPlotIndex + 1))
+      : setPlot(0);
   }
 
   function prevPlot() {
-    const currIndex = plots.indexOf(displayedPlot);
-    currIndex > 0
-      ? setPlot(plots[currIndex - 1])
-      : setPlot(plots[plots.length - 1]);
+    displayedPlotIndex > 0
+      ? setPlot(parseInt(displayedPlotIndex - 1))
+      : setPlot(mapping.length - 1);
   }
 
   return error.length ? (
     <h4 className="text-danger">{error}</h4>
-  ) : plots.length ? (
+  ) : mapping.length ? (
     <div>
       <Form>
-        <Group>
+        <Group controlId="selectPlot">
           <Label>View Plots</Label>
           <Row className="justify-content-center">
             <Col sm="auto">
@@ -116,13 +114,13 @@ export default function Results() {
             <Col sm="auto">
               <Control
                 as="select"
-                value={displayedPlot}
+                value={displayedPlotIndex}
                 onChange={(e) => setPlot(e.target.value)}
               >
-                {plots.map((plot) => {
+                {mapping.map((plot, index) => {
                   return (
-                    <option key={plot} value={plot}>
-                      {plot}
+                    <option key={index} value={index}>
+                      {`${plot.Sample_Name} | ${plot.Profile_Type} | ${plot.Matrix}`}
                     </option>
                   );
                 })}
