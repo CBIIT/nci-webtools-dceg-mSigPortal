@@ -16,8 +16,8 @@ export const getInitialState = () => ({
     loading: {
       active: false,
       content: null,
-      showIndicator: false
-    }
+      showIndicator: false,
+    },
   },
   visualizeResults: {
     error: '',

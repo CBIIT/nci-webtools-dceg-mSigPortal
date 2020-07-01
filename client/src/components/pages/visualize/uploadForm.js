@@ -32,6 +32,7 @@ export default function UploadForm({ setOpenSidebar }) {
     queueMode,
     email,
     disableParameters,
+    loading,
   } = useSelector((state) => state.visualize);
 
   const [inputFile, setInput] = useState(new File([], ''));
@@ -409,7 +410,7 @@ export default function UploadForm({ setOpenSidebar }) {
         </div>
         <div className="col-sm-6">
           <Button
-            disabled={!inputFile.size || disableParameters}
+            disabled={!inputFile.size || disableParameters || loading.active}
             className="w-100"
             variant="primary"
             type="button"
