@@ -13,6 +13,11 @@ export const getInitialState = () => ({
     email: '',
     openSidebar: true,
     disableParameters: false,
+    loading: {
+      active: false,
+      content: null,
+      showIndicator: false
+    }
   },
   visualizeResults: {
     error: '',

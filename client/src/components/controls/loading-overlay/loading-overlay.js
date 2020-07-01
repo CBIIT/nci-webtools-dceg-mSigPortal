@@ -32,6 +32,23 @@ const DefaultLoader = (props) => (
   </div>
 );
 
+const IndicatorLoader = (props) => (
+  <div
+    style={{ ...loaderStyle, ...props.loaderStyle }}
+    {...props.loaderProps}
+    data-testid="IndicatorLoader"
+  >
+    {props.content && (
+      <>
+        <Spinner animation="border" variant="primary" role="status"></Spinner>
+        <div className="sr-only">Loading...</div>
+        <br></br>
+        {props.content}
+      </>
+    )}
+  </div>
+);
+
 /**
  * Example Usage: <LoadingOverlay active={loading}>Loading</LoadingOverlay>
  * @param {*} props
@@ -49,9 +66,17 @@ export const LoadingOverlay = (props) => {
         style={{ ...overlayStyle, ...props.overlayStyle }}
         {...props.overlayProps}
       >
-        <div style={{ visibility: 'hidden' }} ref={loaderNode}>
-          {(props.loader || DefaultLoader)(props)}
-        </div>
+        {!props.showIndicator && (
+          <div style={{ visibility: 'hidden' }} ref={loaderNode}>
+            {(props.loader || DefaultLoader)(props)}
+          </div>
+        )}
+        {props.showIndicator && (
+          <div style={{ visibility: 'hidden' }} ref={loaderNode}>
+            {IndicatorLoader(props)}
+          </div>
+        )}
+        
       </div>
     )
   );

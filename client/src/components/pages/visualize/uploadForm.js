@@ -65,6 +65,7 @@ export default function UploadForm({ setOpenSidebar }) {
         args['mutationSplit'] = ['-s', mutationSplit];
       if (isMultiple) args['collapseSample'] = ['-c', collapseSample];
 
+      store.dispatch(updateVisualize({ loading: { active: true, content: 'Calculating...', showIndicator: true } }));
       const response = await fetch(`${root}api/visualize`, {
         method: 'POST',
         headers: {
@@ -76,6 +77,7 @@ export default function UploadForm({ setOpenSidebar }) {
 
       const result = await response.json();
       if (response.ok) {
+        store.dispatch(updateVisualize({ loading: { active: false, content: null, showIndicator: false } }));
         store.dispatch(
           updateVisualizeResults({
             projectID: data.projectID,
@@ -103,12 +105,14 @@ export default function UploadForm({ setOpenSidebar }) {
   function handleReset() {
     const initialState = getInitialState();
     // console.log(initialState.visualize);
+    removeFile();
     store.dispatch(updateVisualize(initialState.visualize));
     store.dispatch(updateVisualizeResults(initialState.visualizeResults));
   }
 
   //   Uploads inputFile and returns a projectID
   async function uploadFile() {
+    store.dispatch(updateVisualize({ loading: { active: true, content: 'Uploading file...', showIndicator: true } }));
     const data = new FormData();
     data.append('file', inputFile);
 
