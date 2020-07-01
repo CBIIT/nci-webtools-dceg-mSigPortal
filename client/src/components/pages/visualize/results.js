@@ -88,7 +88,6 @@ export default function Results() {
 
   function nextPlot() {
     const currIndex = plots.indexOf(displayedPlot);
-    console.log(currIndex + 1);
     currIndex < plots.length - 1
       ? setPlot(plots[currIndex + 1])
       : setPlot(plots[0]);
@@ -96,7 +95,6 @@ export default function Results() {
 
   function prevPlot() {
     const currIndex = plots.indexOf(displayedPlot);
-    console.log(currIndex - 1);
     currIndex > 0
       ? setPlot(plots[currIndex - 1])
       : setPlot(plots[plots.length - 1]);
