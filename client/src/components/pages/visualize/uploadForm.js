@@ -109,7 +109,7 @@ export default function UploadForm({ setOpenSidebar }) {
             error: 'Please Reset Your Parameters and Try again.',
           })
         );
-        const { msg, stdout, stderr } = response.json();
+        const { msg, stdout, stderr } = await response.json();
         const message = `<div>
             <p>${msg}</p>
             <p><b>Python:</b></p>
