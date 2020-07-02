@@ -34,6 +34,7 @@ export default function Results() {
     }
   }, [projectID]);
 
+  // load first plot after results are recieved
   useEffect(() => {
     if (mapping.length && !displayedPlotIndex.length) {
       setPlot(0);
@@ -73,7 +74,9 @@ export default function Results() {
         store.dispatch(updateError({ visible: true, message: msg }));
       } else {
         const pic = await response.blob();
-        let objectURL = URL.createObjectURL(pic);
+        const objectURL = URL.createObjectURL(pic);
+
+        if (plotURL.length) URL.revokeObjectURL(plotURL);
         store.dispatch(
           updateVisualizeResults({
             displayedPlotIndex: index,
