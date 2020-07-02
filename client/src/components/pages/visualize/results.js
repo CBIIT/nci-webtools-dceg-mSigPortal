@@ -110,7 +110,12 @@ export default function Results() {
           <Label>View Plots</Label>
           <Row className="justify-content-center">
             <Col sm="auto">
-              <button className="faButton navButton" onClick={() => prevPlot()}>
+              <button 
+                className="faButton navButton" 
+                  onClick={e => {
+                    e.preventDefault();
+                    prevPlot();
+                }}>
                 <FontAwesomeIcon icon={faChevronLeft} size="2x" />
               </button>
             </Col>
@@ -130,7 +135,12 @@ export default function Results() {
               </Control>
             </Col>
             <Col sm="auto">
-              <button className="faButton navButton" onClick={() => nextPlot()}>
+              <button 
+                className="faButton navButton" 
+                onClick={e => {
+                  e.preventDefault();
+                  nextPlot();
+                }}>
                 <FontAwesomeIcon icon={faChevronRight} size="2x" />
               </button>
             </Col>
