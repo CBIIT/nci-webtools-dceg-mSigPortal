@@ -75,7 +75,7 @@ export default function Home({ links }) {
       <div className="banner-container text-center d-none d-md-block">
         <div className="image-blurred-edge">
           <img
-            src="assets/images/Banner.jpeg"
+            src="assets/images/banner1.jpg"
             alt="mSigPortal banner"
             style={{
               width: '100%',
@@ -85,16 +85,16 @@ export default function Home({ links }) {
         </div>
         <div className="banner-overlay-text row justify-content-center text-center text-light w-75">
           <div className="col-12">
-            <h1 className="text-light">
+            <h1 className="text-dark">
               <b>mSigPortal</b>
             </h1>
           </div>
           <div
             className="col-6 w-50 my-3 align-self-center"
-            style={{ borderTop: '3px solid white' }}
+            style={{ borderTop: '3px solid black' }}
           ></div>
           <div
-            className="col-12 text-center mt-2 font-weight-bold"
+            className="col-12 text-center mt-2 font-weight-bold text-dark"
             style={{ width: '100%', fontSize: '18pt' }}
           >
             App Description
