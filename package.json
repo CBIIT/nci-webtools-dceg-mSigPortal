@@ -17,6 +17,7 @@
     "formidable": "^1.2.2",
     "papaparse": "^5.2.0",
     "rimraf": "^3.0.2",
+    "tar": "^6.0.2",
     "uuid": "^8.2.0",
     "winston": "^3.2.1",
     "winston-daily-rotate-file": "^4.4.2"

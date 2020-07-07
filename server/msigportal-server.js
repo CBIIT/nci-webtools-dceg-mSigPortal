@@ -9,6 +9,7 @@ const fs = require('fs');
 const rimraf = require('rimraf');
 const { v4: uuidv4 } = require('uuid');
 const Papa = require('papaparse');
+const tar = require('tar');
 
 const app = express();
 
@@ -137,23 +138,21 @@ app.post('/visualize/upload', (req, res, next) => {
 });
 
 app.post('/visualize/svg', (req, res) => {
-  const path = req.body.path;
-  if (path.includes(tmppath)) {
-    var s = fs.createReadStream(path);
-    s.on('open', () => {
-      res.set('Content-Type', 'image/svg+xml');
-      s.pipe(res);
-      logger.debug(`/VISUALIZE/SVG: Serving ${path}`);
-    });
-    s.on('error', () => {
-      res.set('Content-Type', 'text/plain');
-      res.status(500).end('Not found');
-      logger.error(`/VISUALIZE/SVG: Error retrieving ${path}`);
-    });
-  } else {
-    logger.error(`/VISUALIZE/SVG: Invalid Path Traversal ${path}`);
-    res.status(500).json({ msg: 'Invalid Image Path' });
-  }
+  const svgPath = path
+    .normalize(req.body.path)
+    .replace(/^(\.\.(\/|\\|$))+/, '');
+  const s = fs.createReadStream(svgPath);
+
+  s.on('open', () => {
+    res.set('Content-Type', 'image/svg+xml');
+    s.pipe(res);
+    logger.debug(`/VISUALIZE/SVG: Serving ${svgPath}`);
+  });
+  s.on('error', () => {
+    res.set('Content-Type', 'text/plain');
+    res.status(500).end('Not found');
+    logger.error(`/VISUALIZE/SVG: Error retrieving ${svgPath}`);
+  });
 });
 
 // read summary file and return plot mapping
@@ -175,6 +174,27 @@ app.post('/visualize/summary', (req, res) => {
       },
     });
   });
+});
+
+app.post('/visualize/results', (req, res) => {
+  // add error and path traversal checks
+  logger.info('/VISUALIZE/RESULTS: Creating Results Archive');
+  const projectID = req.body.projectID;
+  const archivePath = path.join(tmppath, projectID, 'results.tgz');
+
+  tar
+    .create({ sync: true, gzip: true, cwd: path.join(tmppath, projectID) }, [
+      'results',
+    ])
+    .pipe(fs.createWriteStream(archivePath));
+
+  res.json({ projectID: projectID });
+});
+
+app.get('/visualize/download', (req, res) => {
+  // add logging and checks for path traversal
+  const archivePath = path.join(tmppath, req.query.id, 'results.tgz');
+  res.download(archivePath, 'results.tgz');
 });
 
 app.post('/visualize/queue', (req, res) => {

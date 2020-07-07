@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Form, Row, Col } from 'react-bootstrap';
+import { Form, Row, Col, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faChevronRight,
@@ -100,7 +100,7 @@ export default function Results() {
       : setPlot(mapping.length - 1);
   }
 
-  function getDownloadName() {
+  function getPlotName() {
     if (displayedPlotIndex) {
       const plot = mapping[displayedPlotIndex];
       return `${plot.Sample_Name}-${plot.Profile_Type}-${plot.Matrix}.svg`;
@@ -111,13 +111,46 @@ export default function Results() {
     }
   }
 
+  async function downloadResults() {
+    const response = await fetch(`${root}visualize/results`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ projectID: projectID }),
+    });
+    if (!response.ok) {
+      const { msg } = await response.json();
+      store.dispatch(updateError({ visible: true, message: msg }));
+    } else {
+      const req = await response.json();
+      const id = req.projectID;
+      const tempLink = document.createElement('a');
+
+      tempLink.href = `${root}visualize/download?id=${id}`;
+      document.body.appendChild(tempLink);
+      tempLink.click();
+      document.body.removeChild(tempLink);
+    }
+  }
+
   return error.length ? (
     <h4 className="text-danger">{error}</h4>
   ) : mapping.length ? (
     <div>
       <Form>
         <Group controlId="selectPlot">
-          <Label>View Plots</Label>
+          <span className="d-flex">
+            <Label className="px-2 py-1">Results</Label>
+            <Button
+              className="px-2 py-1 ml-auto"
+              variant="link"
+              onClick={() => downloadResults()}
+            >
+              Download Results
+            </Button>
+          </span>
           <Row className="justify-content-center">
             <Col sm="auto">
               <button
@@ -159,10 +192,18 @@ export default function Results() {
           </Row>
         </Group>
       </Form>
-      <a href={plotURL} download={getDownloadName()}>
-        Download Plot
-      </a>
-      <img className="w-100" src={plotURL}></img>
+      <Row>
+        <Col>
+          <img className="w-100 my-4" src={plotURL}></img>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <a className="ml-2" href={plotURL} download={getPlotName()}>
+            Download Plot
+          </a>
+        </Col>
+      </Row>
     </div>
   ) : (
     <div>
