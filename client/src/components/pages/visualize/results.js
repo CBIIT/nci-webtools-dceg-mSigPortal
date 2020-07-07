@@ -41,7 +41,7 @@ export default function Results() {
   }, [mapping]);
 
   async function getPlotMapping() {
-    const response = await fetch(`${root}visualizeSummary`, {
+    const response = await fetch(`${root}visualize/summary`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -60,7 +60,7 @@ export default function Results() {
   async function setPlot(index) {
     const plot = mapping[index];
     if (plot) {
-      const response = await fetch(`${root}svg`, {
+      const response = await fetch(`${root}visualize/svg`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',

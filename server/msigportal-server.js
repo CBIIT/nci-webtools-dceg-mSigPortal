@@ -91,11 +91,11 @@ app.post('/api/visualize', (req, res) => {
   });
 });
 
-app.post('/upload', (req, res, next) => {
+app.post('/visualize/upload', (req, res, next) => {
   const projectID = uuidv4();
   const form = formidable({ uploadDir: path.join(tmppath, projectID) });
 
-  logger.info(`/UPLOAD: Request Project ID:${projectID}`);
+  logger.info(`/VISUALIZE/UPLOAD: Request Project ID:${projectID}`);
 
   if (!fs.existsSync(form.uploadDir)) {
     fs.mkdirSync(form.uploadDir);
@@ -136,35 +136,35 @@ app.post('/upload', (req, res, next) => {
   });
 });
 
-app.post('/svg', (req, res) => {
+app.post('/visualize/svg', (req, res) => {
   const path = req.body.path;
   if (path.includes(tmppath)) {
     var s = fs.createReadStream(path);
     s.on('open', () => {
       res.set('Content-Type', 'image/svg+xml');
       s.pipe(res);
-      logger.debug(`/SVG: Serving ${path}`);
+      logger.debug(`/VISUALIZE/SVG: Serving ${path}`);
     });
     s.on('error', () => {
       res.set('Content-Type', 'text/plain');
       res.status(500).end('Not found');
-      logger.error(`/SVG: Error retrieving ${path}`);
+      logger.error(`/VISUALIZE/SVG: Error retrieving ${path}`);
     });
   } else {
-    logger.error(`/SVG: Invalid Path Traversal ${path}`);
+    logger.error(`/VISUALIZE/SVG: Invalid Path Traversal ${path}`);
     res.status(500).json({ msg: 'Invalid Image Path' });
   }
 });
 
 // read summary file and return plot mapping
-app.post('/visualizeSummary', (req, res) => {
-  logger.info('/VISUALIZESUMMARY: Reading Results Summary');
+app.post('/visualize/summary', (req, res) => {
+  logger.info('/VISUALIZE/SUMMARY: Reading Results Summary');
   const projectID = req.body.projectID;
   const summaryPath = path.join(tmppath, projectID, 'results', 'Summary.txt');
 
   fs.readFile(summaryPath, 'utf8', (err, data) => {
     if (err) {
-      logger.error('/VISUALIZESUMMARY: Error Reading Results Summary');
+      logger.error('/VISUALIZE/SUMMARY: Error Reading Results Summary');
       logger.error(err);
       res.status(500).json(err);
     }
@@ -177,7 +177,7 @@ app.post('/visualizeSummary', (req, res) => {
   });
 });
 
-app.post('queue', (req, res) => {
+app.post('/visualize/queue', (req, res) => {
   res.json(req);
 });
 

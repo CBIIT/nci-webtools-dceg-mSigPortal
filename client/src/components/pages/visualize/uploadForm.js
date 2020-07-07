@@ -163,7 +163,7 @@ export default function UploadForm({ setOpenSidebar }) {
     const data = new FormData();
     data.append('file', inputFile);
 
-    let response = await fetch(`${root}upload`, {
+    let response = await fetch(`${root}visualize/upload`, {
       method: 'POST',
       body: data,
     });
