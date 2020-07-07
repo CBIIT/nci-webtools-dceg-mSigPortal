@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -13,7 +13,6 @@ import {
 } from '../../../services/store';
 
 const { Group, Label, Control } = Form;
-
 const root =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:8330/'
@@ -101,6 +100,17 @@ export default function Results() {
       : setPlot(mapping.length - 1);
   }
 
+  function getDownloadName() {
+    if (displayedPlotIndex) {
+      const plot = mapping[displayedPlotIndex];
+      return `${plot.Sample_Name}-${plot.Profile_Type}-${plot.Matrix}.svg`;
+    } else {
+      // assume index is 0 upon loading a projectID
+      const plot = mapping[0];
+      return `${plot.Sample_Name}-${plot.Profile_Type}-${plot.Matrix}.svg`;
+    }
+  }
+
   return error.length ? (
     <h4 className="text-danger">{error}</h4>
   ) : mapping.length ? (
@@ -110,12 +120,13 @@ export default function Results() {
           <Label>View Plots</Label>
           <Row className="justify-content-center">
             <Col sm="auto">
-              <button 
-                className="faButton navButton" 
-                  onClick={e => {
-                    e.preventDefault();
-                    prevPlot();
-                }}>
+              <button
+                className="faButton navButton"
+                onClick={(e) => {
+                  e.preventDefault();
+                  prevPlot();
+                }}
+              >
                 <FontAwesomeIcon icon={faChevronLeft} size="2x" />
               </button>
             </Col>
@@ -135,18 +146,22 @@ export default function Results() {
               </Control>
             </Col>
             <Col sm="auto">
-              <button 
-                className="faButton navButton" 
-                onClick={e => {
+              <button
+                className="faButton navButton"
+                onClick={(e) => {
                   e.preventDefault();
                   nextPlot();
-                }}>
+                }}
+              >
                 <FontAwesomeIcon icon={faChevronRight} size="2x" />
               </button>
             </Col>
           </Row>
         </Group>
       </Form>
+      <a href={plotURL} download={getDownloadName()}>
+        Download Plot
+      </a>
       <img className="w-100" src={plotURL}></img>
     </div>
   ) : (
