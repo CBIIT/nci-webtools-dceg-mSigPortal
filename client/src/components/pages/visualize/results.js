@@ -23,7 +23,8 @@ export default function Results() {
   const {
     projectID,
     mapping,
-    displayedPlotIndex,
+    plots,
+    displayedPlot,
     plotURL,
     error,
   } = useSelector((state) => state.visualizeResults);
@@ -34,10 +35,9 @@ export default function Results() {
     }
   }, [projectID]);
 
-  // load first plot after results are recieved
   useEffect(() => {
-    if (mapping.length && !displayedPlotIndex.length) {
-      setPlot(0);
+    if (plots.length && !displayedPlot.length) {
+      setPlot(mapping[0].Sample_Name);
     }
   }, [mapping]);
 
@@ -54,59 +54,60 @@ export default function Results() {
     store.dispatch(
       updateVisualizeResults({
         mapping: mapping,
+        plots: mapping.map((plot) => plot.Sample_Name).sort(),
       })
     );
   }
 
-  async function setPlot(index) {
-    const plot = mapping[index];
-    if (plot) {
-      const response = await fetch(`${root}svg`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ path: plot.Location }),
-      });
-      if (!response.ok) {
-        const { msg } = await response.json();
-        store.dispatch(updateError({ visible: true, message: msg }));
-      } else {
-        const pic = await response.blob();
-        const objectURL = URL.createObjectURL(pic);
-
-        if (plotURL.length) URL.revokeObjectURL(plotURL);
-        store.dispatch(
-          updateVisualizeResults({
-            displayedPlotIndex: index,
-            plotURL: objectURL,
-          })
-        );
-      }
+  async function setPlot(plotName) {
+    const plotPath = mapping.filter((plot) => {
+      return plot.Sample_Name == plotName;
+    });
+    const response = await fetch(`${root}svg`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ path: plotPath[0].Location }),
+    });
+    if (!response.ok) {
+      const { msg } = await response.json();
+      store.dispatch(updateError({ visible: true, message: msg }));
     } else {
-      console.log('invalid index', index);
+      const pic = await response.blob();
+      let objectURL = URL.createObjectURL(pic);
+      store.dispatch(
+        updateVisualizeResults({
+          displayedPlot: plotName,
+          plotURL: objectURL,
+        })
+      );
     }
   }
 
   function nextPlot() {
-    displayedPlotIndex < mapping.length - 1
-      ? setPlot(parseInt(displayedPlotIndex + 1))
-      : setPlot(0);
+    const currIndex = plots.indexOf(displayedPlot);
+    console.log(currIndex + 1);
+    currIndex < plots.length - 1
+      ? setPlot(plots[currIndex + 1])
+      : setPlot(plots[0]);
   }
 
   function prevPlot() {
-    displayedPlotIndex > 0
-      ? setPlot(parseInt(displayedPlotIndex - 1))
-      : setPlot(mapping.length - 1);
+    const currIndex = plots.indexOf(displayedPlot);
+    console.log(currIndex - 1);
+    currIndex > 0
+      ? setPlot(plots[currIndex - 1])
+      : setPlot(plots[plots.length - 1]);
   }
 
   return error.length ? (
     <h4 className="text-danger">{error}</h4>
-  ) : mapping.length ? (
+  ) : plots.length ? (
     <div>
       <Form>
-        <Group controlId="selectPlot">
+        <Group>
           <Label>View Plots</Label>
           <Row className="justify-content-center">
             <Col sm="auto">
@@ -122,13 +123,13 @@ export default function Results() {
             <Col sm="auto">
               <Control
                 as="select"
-                value={displayedPlotIndex}
+                value={displayedPlot}
                 onChange={(e) => setPlot(e.target.value)}
               >
-                {mapping.map((plot, index) => {
+                {plots.map((plot) => {
                   return (
-                    <option key={index} value={index}>
-                      {`${plot.Sample_Name} | ${plot.Profile_Type} | ${plot.Matrix}`}
+                    <option key={plot} value={plot}>
+                      {plot}
                     </option>
                   );
                 })}
