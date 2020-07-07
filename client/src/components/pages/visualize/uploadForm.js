@@ -32,12 +32,17 @@ export default function UploadForm({ setOpenSidebar }) {
     queueMode,
     email,
     disableParameters,
+    storeFile,
+    loading,
   } = useSelector((state) => state.visualize);
 
   const [inputFile, setInput] = useState(new File([], ''));
+  const [fileText, setText] = useState('');
 
   const onDrop = useCallback((acceptedFiles) => {
     setInput(acceptedFiles[0]);
+    store.dispatch(updateVisualize({storeFile: acceptedFiles[0].name}))
+    setText(acceptedFiles[0].name)
   }, []);
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
@@ -65,7 +70,18 @@ export default function UploadForm({ setOpenSidebar }) {
         args['mutationSplit'] = ['-s', mutationSplit];
       if (isMultiple) args['collapseSample'] = ['-c', collapseSample];
 
-      store.dispatch(updateVisualize({ loading: { active: true, content: 'Calculating...', showIndicator: true } }));
+      store.dispatch(
+        updateVisualize({
+          loading: {
+            active: true,
+            content: 'Calculating...',
+            showIndicator: true,
+          },
+        })
+      );
+
+      setText(storeFile)
+      console.log(storeFile)
       const response = await fetch(`${root}api/visualize`, {
         method: 'POST',
         headers: {
@@ -171,7 +187,7 @@ export default function UploadForm({ setOpenSidebar }) {
                 onClick={() => removeFile()}
                 disabled={disableParameters}
               >
-                <span id="uploadedFile">{inputFile.name}</span>
+                <span id="uploadedFile">{fileText}</span>
                 <span className="text-danger ml-auto">
                   <FontAwesomeIcon icon={faMinus} />
                 </span>

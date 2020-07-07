@@ -13,6 +13,7 @@ export const getInitialState = () => ({
     email: '',
     openSidebar: true,
     disableParameters: false,
+    storeFile: '',
     loading: {
       active: false,
       content: null,
