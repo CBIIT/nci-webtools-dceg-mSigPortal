@@ -177,6 +177,10 @@ app.post('/visualizeSummary', (req, res) => {
   });
 });
 
+app.post('queue', (req, res) => {
+  res.json(req);
+});
+
 app.listen(port, () => {
   logger.info(`msigportal server running on port: ${port}`);
   console.log(`Listening on port ${port}`);

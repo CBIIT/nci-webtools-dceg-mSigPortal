@@ -66,66 +66,78 @@ export default function UploadForm({ setOpenSidebar }) {
         args['mutationSplit'] = ['-s', mutationSplit];
       if (isMultiple) args['collapseSample'] = ['-c', collapseSample];
 
-      store.dispatch(
-        updateVisualize({
-          loading: {
-            active: true,
-            content: 'Calculating...',
-            showIndicator: true,
-          },
-        })
-      );
-      const response = await fetch(`${root}api/visualize`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(args),
-      });
-
-      if (response.ok) {
+      if (queueMode) {
         store.dispatch(
-          updateVisualizeResults({
-            projectID: data.projectID,
-          })
-        );
-        setOpenSidebar(false);
-      } else if (response.status == 502) {
-        store.dispatch(
-          updateVisualizeResults({
-            error: 'Please Reset Your Parameters and Try again.',
-          })
-        );
-        store.dispatch(
-          updateError({
-            visible: true,
-            message: 'Your submission has timed out. Please Try Again.',
+          updateVisualize({
+            loading: {
+              active: true,
+              content: 'Sending to Queue...',
+              showIndicator: true,
+            },
           })
         );
       } else {
         store.dispatch(
-          updateVisualizeResults({
-            error: 'Please Reset Your Parameters and Try again.',
+          updateVisualize({
+            loading: {
+              active: true,
+              content: 'Calculating...',
+              showIndicator: true,
+            },
           })
         );
-        const { msg, stdout, stderr } = await response.json();
-        const message = `<div>
+        const response = await fetch(`${root}api/visualize`, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(args),
+        });
+
+        if (response.ok) {
+          store.dispatch(
+            updateVisualizeResults({
+              projectID: data.projectID,
+            })
+          );
+          setOpenSidebar(false);
+        } else if (response.status == 502) {
+          store.dispatch(
+            updateVisualizeResults({
+              error: 'Please Reset Your Parameters and Try again.',
+            })
+          );
+          store.dispatch(
+            updateError({
+              visible: true,
+              message: 'Your submission has timed out. Please Try Again.',
+            })
+          );
+        } else {
+          store.dispatch(
+            updateVisualizeResults({
+              error: 'Please Reset Your Parameters and Try again.',
+            })
+          );
+          const { msg, stdout, stderr } = await response.json();
+          const message = `<div>
             <p>${msg}</p>
             <p><b>Python:</b></p>
             <pre>${stdout}</pre>
             <pre>${stderr}</pre>
           </div>`;
-        store.dispatch(updateError({ visible: true, message: message }));
+          store.dispatch(updateError({ visible: true, message: message }));
+        }
+        store.dispatch(
+          updateVisualize({
+            loading: {
+              active: false,
+              showIndicator: false,
+            },
+          })
+        );
       }
-      store.dispatch(
-        updateVisualize({
-          loading: {
-            active: false,
-            showIndicator: false,
-          },
-        })
-      );
     }
   }
 
