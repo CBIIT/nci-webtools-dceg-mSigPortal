@@ -81,7 +81,7 @@ export default function UploadForm({ setOpenSidebar }) {
       );
 
       setText(storeFile)
-      console.log(storeFile)
+      
       const response = await fetch(`${root}api/visualize`, {
         method: 'POST',
         headers: {
@@ -106,7 +106,7 @@ export default function UploadForm({ setOpenSidebar }) {
             error: 'Please Reset Your Parameters and Try again.',
           })
         );
-        const { msg, stdout, stderr } = result;
+        const { msg, stdout, stderr } = await response.json();
         const message = `<div>
             <p>${msg}</p>
             <p><b>Python:</b></p>
@@ -115,6 +115,14 @@ export default function UploadForm({ setOpenSidebar }) {
           </div>`;
         store.dispatch(updateError({ visible: true, message: message }));
       }
+      store.dispatch(
+        updateVisualize({
+          loading: {
+            active: false,
+            showIndicator: false,
+          },
+        })
+      );
     }
   }
 
@@ -128,7 +136,15 @@ export default function UploadForm({ setOpenSidebar }) {
 
   //   Uploads inputFile and returns a projectID
   async function uploadFile() {
-    store.dispatch(updateVisualize({ loading: { active: true, content: 'Uploading file...', showIndicator: true } }));
+    store.dispatch(
+      updateVisualize({
+        loading: {
+          active: true,
+          content: 'Uploading file...',
+          showIndicator: true,
+        },
+      })
+    );
     const data = new FormData();
     data.append('file', inputFile);
 
@@ -148,6 +164,14 @@ export default function UploadForm({ setOpenSidebar }) {
     } else {
       return await response.json();
     }
+    store.dispatch(
+      updateVisualize({
+        loading: {
+          active: false,
+          showIndicator: false,
+        },
+      })
+    );
   }
 
   function removeFile() {
@@ -284,7 +308,7 @@ export default function UploadForm({ setOpenSidebar }) {
             // value={false}
             checked={!isMultiple}
             onChange={() =>
-              store.dispatch(updateVisualize({ isMultiple: !isMultiple }))
+              store.dispatch(updateVisualize({ isMultiple: false }))
             }
             disabled={disableParameters}
           />
@@ -298,7 +322,7 @@ export default function UploadForm({ setOpenSidebar }) {
             // value={true}
             checked={isMultiple}
             onChange={() =>
-              store.dispatch(updateVisualize({ isMultiple: !isMultiple }))
+              store.dispatch(updateVisualize({ isMultiple: true }))
             }
             disabled={disableParameters}
           />
@@ -311,7 +335,7 @@ export default function UploadForm({ setOpenSidebar }) {
         <Label className="mr-auto">Collapse Sample</Label>
         <Check inline id="radioFalse">
           <Check.Input
-            disabled={!isMultiple}
+            disabled={!isMultiple || disableParameters}
             type="radio"
             value="False"
             checked={collapseSample == 'False'}
@@ -326,7 +350,7 @@ export default function UploadForm({ setOpenSidebar }) {
         </Check>
         <Check inline id="radioTrue">
           <Check.Input
-            disabled={!isMultiple}
+            disabled={!isMultiple || disableParameters}
             type="radio"
             value="True"
             checked={collapseSample == 'True'}
@@ -335,7 +359,6 @@ export default function UploadForm({ setOpenSidebar }) {
                 updateVisualize({ collapseSample: e.target.value })
               )
             }
-            disabled={disableParameters}
           />
           <Check.Label className="font-weight-normal">True</Check.Label>
         </Check>
@@ -390,6 +413,7 @@ export default function UploadForm({ setOpenSidebar }) {
       <div className="row">
         <div className="col-sm-6">
           <Button
+            disabled={loading.active}
             className="w-100"
             variant="secondary"
             onClick={(e) => handleReset()}
@@ -399,7 +423,7 @@ export default function UploadForm({ setOpenSidebar }) {
         </div>
         <div className="col-sm-6">
           <Button
-            disabled={!inputFile.size || disableParameters}
+            disabled={!inputFile.size || disableParameters || loading.active}
             className="w-100"
             variant="primary"
             type="button"
