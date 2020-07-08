@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Row, Col } from 'react-bootstrap';
+import React, { useEffect } from 'react';
+import { Form, Row, Col, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faChevronRight,
@@ -13,7 +13,6 @@ import {
 } from '../../../services/store';
 
 const { Group, Label, Control } = Form;
-
 const root =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:8330/'
@@ -23,8 +22,7 @@ export default function Results() {
   const {
     projectID,
     mapping,
-    plots,
-    displayedPlot,
+    displayedPlotIndex,
     plotURL,
     error,
   } = useSelector((state) => state.visualizeResults);
@@ -35,14 +33,15 @@ export default function Results() {
     }
   }, [projectID]);
 
+  // load first plot after results are recieved
   useEffect(() => {
-    if (plots.length && !displayedPlot.length) {
-      setPlot(mapping[0].Sample_Name);
+    if (mapping.length && !displayedPlotIndex.length) {
+      setPlot(0);
     }
   }, [mapping]);
 
   async function getPlotMapping() {
-    const response = await fetch(`${root}visualizeSummary`, {
+    const response = await fetch(`${root}visualize/summary`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -54,101 +53,157 @@ export default function Results() {
     store.dispatch(
       updateVisualizeResults({
         mapping: mapping,
-        plots: mapping.map((plot) => plot.Sample_Name).sort(),
       })
     );
   }
 
-  async function setPlot(plotName) {
-    const plotPath = mapping.filter((plot) => {
-      return plot.Sample_Name == plotName;
-    });
-    const response = await fetch(`${root}svg`, {
+  async function setPlot(index) {
+    const plot = mapping[index];
+    if (plot) {
+      const response = await fetch(`${root}visualize/svg`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ path: plot.Location }),
+      });
+      if (!response.ok) {
+        const { msg } = await response.json();
+        store.dispatch(updateError({ visible: true, message: msg }));
+      } else {
+        const pic = await response.blob();
+        const objectURL = URL.createObjectURL(pic);
+
+        if (plotURL.length) URL.revokeObjectURL(plotURL);
+        store.dispatch(
+          updateVisualizeResults({
+            displayedPlotIndex: index,
+            plotURL: objectURL,
+          })
+        );
+      }
+    } else {
+      console.log('invalid index', index);
+    }
+  }
+
+  function nextPlot() {
+    displayedPlotIndex < mapping.length - 1
+      ? setPlot(parseInt(displayedPlotIndex + 1))
+      : setPlot(0);
+  }
+
+  function prevPlot() {
+    displayedPlotIndex > 0
+      ? setPlot(parseInt(displayedPlotIndex - 1))
+      : setPlot(mapping.length - 1);
+  }
+
+  function getPlotName() {
+    if (displayedPlotIndex) {
+      const plot = mapping[displayedPlotIndex];
+      return `${plot.Sample_Name}-${plot.Profile_Type}-${plot.Matrix}.svg`;
+    } else {
+      // assume index is 0 upon loading a projectID
+      const plot = mapping[0];
+      return `${plot.Sample_Name}-${plot.Profile_Type}-${plot.Matrix}.svg`;
+    }
+  }
+
+  async function downloadResults() {
+    const response = await fetch(`${root}visualize/results`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ path: plotPath[0].Location }),
+      body: JSON.stringify({ projectID: projectID }),
     });
     if (!response.ok) {
       const { msg } = await response.json();
       store.dispatch(updateError({ visible: true, message: msg }));
     } else {
-      const pic = await response.blob();
-      let objectURL = URL.createObjectURL(pic);
-      store.dispatch(
-        updateVisualizeResults({
-          displayedPlot: plotName,
-          plotURL: objectURL,
-        })
-      );
+      const req = await response.json();
+      const id = req.projectID;
+      const tempLink = document.createElement('a');
+
+      tempLink.href = `${root}visualize/download?id=${id}`;
+      document.body.appendChild(tempLink);
+      tempLink.click();
+      document.body.removeChild(tempLink);
     }
-  }
-
-  function nextPlot() {
-    const currIndex = plots.indexOf(displayedPlot);
-    console.log(currIndex + 1);
-    currIndex < plots.length - 1
-      ? setPlot(plots[currIndex + 1])
-      : setPlot(plots[0]);
-  }
-
-  function prevPlot() {
-    const currIndex = plots.indexOf(displayedPlot);
-    console.log(currIndex - 1);
-    currIndex > 0
-      ? setPlot(plots[currIndex - 1])
-      : setPlot(plots[plots.length - 1]);
   }
 
   return error.length ? (
     <h4 className="text-danger">{error}</h4>
-  ) : plots.length ? (
+  ) : mapping.length ? (
     <div>
       <Form>
-        <Group>
-          <Label>View Plots</Label>
+        <Group controlId="selectPlot">
+          <span className="d-flex">
+            <Label className="px-2 py-1">Results</Label>
+            <Button
+              className="px-2 py-1 ml-auto"
+              variant="link"
+              onClick={() => downloadResults()}
+            >
+              Download Results
+            </Button>
+          </span>
           <Row className="justify-content-center">
             <Col sm="auto">
-              <button 
-                className="faButton navButton" 
-                  onClick={e => {
-                    e.preventDefault();
-                    prevPlot();
-                }}>
+              <button
+                className="faButton navButton"
+                onClick={(e) => {
+                  e.preventDefault();
+                  prevPlot();
+                }}
+              >
                 <FontAwesomeIcon icon={faChevronLeft} size="2x" />
               </button>
             </Col>
             <Col sm="auto">
               <Control
                 as="select"
-                value={displayedPlot}
+                value={displayedPlotIndex}
                 onChange={(e) => setPlot(e.target.value)}
               >
-                {plots.map((plot) => {
+                {mapping.map((plot, index) => {
                   return (
-                    <option key={plot} value={plot}>
-                      {plot}
+                    <option key={index} value={index}>
+                      {`${plot.Sample_Name} | ${plot.Profile_Type} | ${plot.Matrix}`}
                     </option>
                   );
                 })}
               </Control>
             </Col>
             <Col sm="auto">
-              <button 
-                className="faButton navButton" 
-                onClick={e => {
+              <button
+                className="faButton navButton"
+                onClick={(e) => {
                   e.preventDefault();
                   nextPlot();
-                }}>
+                }}
+              >
                 <FontAwesomeIcon icon={faChevronRight} size="2x" />
               </button>
             </Col>
           </Row>
         </Group>
       </Form>
-      <img className="w-100" src={plotURL}></img>
+      <Row>
+        <Col>
+          <img className="w-100 my-4" src={plotURL}></img>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <a className="ml-2" href={plotURL} download={getPlotName()}>
+            Download Plot
+          </a>
+        </Col>
+      </Row>
     </div>
   ) : (
     <div>

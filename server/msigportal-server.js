@@ -9,6 +9,7 @@ const fs = require('fs');
 const rimraf = require('rimraf');
 const { v4: uuidv4 } = require('uuid');
 const Papa = require('papaparse');
+const tar = require('tar');
 
 const app = express();
 
@@ -90,11 +91,11 @@ app.post('/api/visualize', (req, res) => {
   });
 });
 
-app.post('/upload', (req, res, next) => {
+app.post('/visualize/upload', (req, res, next) => {
   const projectID = uuidv4();
   const form = formidable({ uploadDir: path.join(tmppath, projectID) });
 
-  logger.info(`/UPLOAD: Request Project ID:${projectID}`);
+  logger.info(`/VISUALIZE/UPLOAD: Request Project ID:${projectID}`);
 
   if (!fs.existsSync(form.uploadDir)) {
     fs.mkdirSync(form.uploadDir);
@@ -135,35 +136,33 @@ app.post('/upload', (req, res, next) => {
   });
 });
 
-app.post('/svg', (req, res) => {
-  const path = req.body.path;
-  if (path.includes(tmppath)) {
-    var s = fs.createReadStream(path);
-    s.on('open', () => {
-      res.set('Content-Type', 'image/svg+xml');
-      s.pipe(res);
-      logger.debug(`/SVG: Serving ${path}`);
-    });
-    s.on('error', () => {
-      res.set('Content-Type', 'text/plain');
-      res.status(500).end('Not found');
-      logger.error(`/SVG: Error retrieving ${path}`);
-    });
-  } else {
-    logger.error(`/SVG: Invalid Path Traversal ${path}`);
-    res.status(500).json({ msg: 'Invalid Image Path' });
-  }
+app.post('/visualize/svg', (req, res) => {
+  const svgPath = path
+    .normalize(req.body.path)
+    .replace(/^(\.\.(\/|\\|$))+/, '');
+  const s = fs.createReadStream(svgPath);
+
+  s.on('open', () => {
+    res.set('Content-Type', 'image/svg+xml');
+    s.pipe(res);
+    logger.debug(`/VISUALIZE/SVG: Serving ${svgPath}`);
+  });
+  s.on('error', () => {
+    res.set('Content-Type', 'text/plain');
+    res.status(500).end('Not found');
+    logger.error(`/VISUALIZE/SVG: Error retrieving ${svgPath}`);
+  });
 });
 
 // read summary file and return plot mapping
-app.post('/visualizeSummary', (req, res) => {
-  logger.info('/VISUALIZESUMMARY: Reading Results Summary');
+app.post('/visualize/summary', (req, res) => {
+  logger.info('/VISUALIZE/SUMMARY: Reading Results Summary');
   const projectID = req.body.projectID;
   const summaryPath = path.join(tmppath, projectID, 'results', 'Summary.txt');
 
   fs.readFile(summaryPath, 'utf8', (err, data) => {
     if (err) {
-      logger.error('/VISUALIZESUMMARY: Error Reading Results Summary');
+      logger.error('/VISUALIZE/SUMMARY: Error Reading Results Summary');
       logger.error(err);
       res.status(500).json(err);
     }
@@ -174,6 +173,31 @@ app.post('/visualizeSummary', (req, res) => {
       },
     });
   });
+});
+
+app.post('/visualize/results', (req, res) => {
+  // add error and path traversal checks
+  logger.info('/VISUALIZE/RESULTS: Creating Results Archive');
+  const projectID = req.body.projectID;
+  const archivePath = path.join(tmppath, projectID, 'results.tgz');
+
+  tar
+    .create({ sync: true, gzip: true, cwd: path.join(tmppath, projectID) }, [
+      'results',
+    ])
+    .pipe(fs.createWriteStream(archivePath));
+
+  res.json({ projectID: projectID });
+});
+
+app.get('/visualize/download', (req, res) => {
+  // add logging and checks for path traversal
+  const archivePath = path.join(tmppath, req.query.id, 'results.tgz');
+  res.download(archivePath, 'results.tgz');
+});
+
+app.post('/visualize/queue', (req, res) => {
+  res.json(req);
 });
 
 app.listen(port, () => {

@@ -17,15 +17,14 @@ export const getInitialState = () => ({
     loading: {
       active: false,
       content: null,
-      showIndicator: false
-    }
+      showIndicator: false,
+    },
   },
   visualizeResults: {
     error: '',
     projectID: '',
     mapping: [],
-    plots: [],
-    displayedPlot: '',
+    displayedPlotIndex: '',
     plotURL: '',
   },
   error: {
