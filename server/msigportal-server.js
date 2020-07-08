@@ -50,6 +50,7 @@ app.post('/api', (req, res) => {
 });
 
 app.post('/api/visualize', (req, res) => {
+  req.setTimeout(600000);
   logger.info('/API/VISUALIZE: Spawning Python Process');
   let reqBody = { ...req.body };
   // update paths
