@@ -10,6 +10,7 @@ const rimraf = require('rimraf');
 const { v4: uuidv4 } = require('uuid');
 const Papa = require('papaparse');
 const tar = require('tar');
+const AWS = require('aws-sdk');
 
 const app = express();
 
