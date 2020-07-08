@@ -137,9 +137,7 @@ app.post('/visualize/upload', (req, res, next) => {
 });
 
 app.post('/visualize/svg', (req, res) => {
-  const svgPath = path
-    .normalize(req.body.path)
-    .replace(/^(\.\.(\/|\\|$))+/, '');
+  const svgPath = req.body.path;
   const s = fs.createReadStream(svgPath);
 
   s.on('open', () => {
