@@ -10,6 +10,7 @@ const rimraf = require('rimraf');
 const { v4: uuidv4 } = require('uuid');
 const Papa = require('papaparse');
 const tar = require('tar');
+const AWS = require('aws-sdk');
 
 const app = express();
 
@@ -49,6 +50,7 @@ app.post('/api', (req, res) => {
 });
 
 app.post('/api/visualize', (req, res) => {
+  req.setTimeout(600000);
   logger.info('/API/VISUALIZE: Spawning Python Process');
   let reqBody = { ...req.body };
   // update paths
