@@ -387,6 +387,7 @@ export default function UploadForm({ setOpenSidebar }) {
           }
           disabled={disableParameters}
         ></Control>
+        <Text className="text-muted">Use @ to separate multiple filters</Text>
       </Group>
       <hr />
       <Group controlId="email">
