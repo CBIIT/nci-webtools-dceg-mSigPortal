@@ -76,7 +76,6 @@ export const LoadingOverlay = (props) => {
             {IndicatorLoader(props)}
           </div>
         )}
-        
       </div>
     )
   );

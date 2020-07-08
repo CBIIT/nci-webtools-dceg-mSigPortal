@@ -12,10 +12,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import './visualize.scss';
 
 export default function Visualize() {
-  const { 
-    openSidebar, 
-    loading
-  } = useSelector((state) => state.visualize);
+  const { openSidebar, loading } = useSelector((state) => state.visualize);
 
   function setOpenSidebar(bool) {
     store.dispatch(updateVisualize({ openSidebar: bool }));
@@ -47,7 +44,11 @@ export default function Visualize() {
             className="p-3 shadow-sm bg-white"
             style={{ minHeight: '420px' }}
           >
-            <LoadingOverlay active={loading.active} content={loading.content} showIndicator={loading.showIndicator} />
+            <LoadingOverlay
+              active={loading.active}
+              content={loading.content}
+              showIndicator={loading.showIndicator}
+            />
             <Results />
           </div>
         </MainPanel>
