@@ -75,7 +75,7 @@ export default function Home({ links }) {
       <div className="banner-container text-center d-none d-md-block">
         <div className="image-blurred-edge">
           <img
-            src="assets/images/Banner.jpeg"
+            src="assets/images/banner-sample.jpeg"
             alt="mSigPortal banner"
             style={{
               width: '100%',
