@@ -37,12 +37,10 @@ export default function UploadForm({ setOpenSidebar }) {
   } = useSelector((state) => state.visualize);
 
   const [inputFile, setInput] = useState(new File([], ''));
-  const [fileText, setText] = useState('');
 
   const onDrop = useCallback((acceptedFiles) => {
     setInput(acceptedFiles[0]);
     store.dispatch(updateVisualize({ storeFile: acceptedFiles[0].name }));
-    setText(acceptedFiles[0].name);
   }, []);
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
@@ -90,7 +88,6 @@ export default function UploadForm({ setOpenSidebar }) {
             },
           })
         );
-        setText(storeFile);
 
         const response = await fetch(`${root}api/visualize`, {
           method: 'POST',
@@ -192,7 +189,9 @@ export default function UploadForm({ setOpenSidebar }) {
   }
 
   return (
+    
     <Form className="mb-2">
+    
       <Group controlId="fileType">
         <Label>Choose File Type</Label>
         <Control
@@ -217,14 +216,15 @@ export default function UploadForm({ setOpenSidebar }) {
               {...getInputProps()}
               disabled={inputFile.size || disableParameters}
             />
-            {inputFile.size ? (
+            {inputFile.size || loading.active ? (
               <button
                 id="removeFile"
                 className="d-flex w-100 faButton"
                 onClick={() => removeFile()}
                 disabled={disableParameters}
               >
-                <span id="uploadedFile">{fileText}</span>
+               
+                <span id="uploadedFile">{loading.active ? storeFile : inputFile.name}</span>
                 <span className="text-danger ml-auto">
                   <FontAwesomeIcon icon={faMinus} />
                 </span>
