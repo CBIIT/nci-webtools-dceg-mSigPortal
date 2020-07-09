@@ -202,7 +202,7 @@ export default function Results() {
         <span className="ml-auto">
           <LoadingOverlay
             active={downloadOverlay}
-            showIndicator={true}
+            // showIndicator={true}
           />
           <Button
             className="px-2 py-1"
