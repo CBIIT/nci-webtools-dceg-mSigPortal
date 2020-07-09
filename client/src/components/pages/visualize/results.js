@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -11,6 +11,7 @@ import {
   updateVisualizeResults,
   updateError,
 } from '../../../services/store';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const { Group, Label, Control } = Form;
 const root =
@@ -19,6 +20,7 @@ const root =
     : window.location.pathname;
 
 export default function Results() {
+  const [downloadOverlay, setOverlay] = useState(false);
   const {
     projectID,
     mapping,
@@ -112,6 +114,7 @@ export default function Results() {
   }
 
   async function downloadResults() {
+    setOverlay(true);
     const response = await fetch(`${root}visualize/results`, {
       method: 'POST',
       headers: {
@@ -121,9 +124,11 @@ export default function Results() {
       body: JSON.stringify({ projectID: projectID }),
     });
     if (!response.ok) {
+      setOverlay(false);
       const { msg } = await response.json();
       store.dispatch(updateError({ visible: true, message: msg }));
     } else {
+      setOverlay(false);
       const req = await response.json();
       const id = req.projectID;
       const tempLink = document.createElement('a');
@@ -143,13 +148,6 @@ export default function Results() {
         <Group controlId="selectPlot">
           <span className="d-flex">
             <Label className="px-2 py-1">Results</Label>
-            <Button
-              className="px-2 py-1 ml-auto"
-              variant="link"
-              onClick={() => downloadResults()}
-            >
-              Download Results
-            </Button>
           </span>
           <Row className="justify-content-center">
             <Col sm="auto">
@@ -197,13 +195,21 @@ export default function Results() {
           <img className="w-100 my-4" src={plotURL}></img>
         </Col>
       </Row>
-      <Row>
-        <Col>
-          <a className="ml-2" href={plotURL} download={getPlotName()}>
-            Download Plot
-          </a>
-        </Col>
-      </Row>
+      <span className="d-flex">
+        <a className="ml-2 px-2 py-1" href={plotURL} download={getPlotName()}>
+          Download Plot
+        </a>
+        <span className="ml-auto px-2 py-1">
+          <LoadingOverlay
+            active={downloadOverlay}
+            content={'Loading'}
+            showIndicator={true}
+          />
+          <Button variant="link" onClick={() => downloadResults()}>
+            Download Results
+          </Button>
+        </span>
+      </span>
     </div>
   ) : (
     <div>

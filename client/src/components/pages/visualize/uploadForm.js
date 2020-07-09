@@ -40,16 +40,33 @@ export default function UploadForm({ setOpenSidebar }) {
 
   const onDrop = useCallback((acceptedFiles) => {
     setInput(acceptedFiles[0]);
-    store.dispatch(updateVisualize({ storeFile: acceptedFiles[0].name }));
+    dispatchVisualize({ storeFile: acceptedFiles[0].name });
   }, []);
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     accept: '.csv, .tsv, .vcf, .gz, .zip, .tar, .tar.gz',
   });
 
+  function dispatchError(msg) {
+    store.dispatch(
+      updateError({
+        visible: true,
+        message: msg,
+      })
+    );
+  }
+
+  function dispatchVisualize(obj) {
+    store.dispatch(updateVisualize(obj));
+  }
+
+  function dispatchVisualizeResults(obj) {
+    store.dispatch(updateVisualizeResults(obj));
+  }
+
   async function handleSubmit() {
     // disable parameters after submit
-    store.dispatch(updateVisualize({ disableParameters: true }));
+    dispatchVisualize({ disableParameters: true });
 
     const data = await uploadFile();
     if (data && data.projectID) {
@@ -69,25 +86,41 @@ export default function UploadForm({ setOpenSidebar }) {
       if (isMultiple) args['collapseSample'] = ['-c', collapseSample];
 
       if (queueMode) {
-        store.dispatch(
-          updateVisualize({
-            loading: {
-              active: true,
-              content: 'Sending to Queue...',
-              showIndicator: true,
-            },
-          })
-        );
+        dispatchVisualize({
+          loading: {
+            active: true,
+            content: 'Sending to Queue...',
+            showIndicator: true,
+          },
+        });
+        const response = await fetch(`${root}visualize/queue`, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+          // placeholder alert with error modal
+          dispatchError('Successfully submitted to queue.');
+          dispatchVisualize({ loading: { active: false } });
+        } else {
+          dispatchVisualizeResults({
+            error: 'Please Reset Your Parameters and Try again.',
+          });
+          dispatchError('Failed to submit to queue. Please Try Again.');
+          dispatchVisualize({ loading: { active: false } });
+        }
       } else {
-        store.dispatch(
-          updateVisualize({
-            loading: {
-              active: true,
-              content: 'Calculating...',
-              showIndicator: true,
-            },
-          })
-        );
+        dispatchVisualize({
+          loading: {
+            active: true,
+            content: 'Calculating...',
+            showIndicator: true,
+          },
+        });
 
         const response = await fetch(`${root}api/visualize`, {
           method: 'POST',
@@ -99,30 +132,19 @@ export default function UploadForm({ setOpenSidebar }) {
         });
 
         if (response.ok) {
-          store.dispatch(
-            updateVisualizeResults({
-              projectID: data.projectID,
-            })
-          );
+          dispatchVisualizeResults({
+            projectID: data.projectID,
+          });
           setOpenSidebar(false);
         } else if (response.status == 502) {
-          store.dispatch(
-            updateVisualizeResults({
-              error: 'Please Reset Your Parameters and Try again.',
-            })
-          );
-          store.dispatch(
-            updateError({
-              visible: true,
-              message: 'Your submission has timed out. Please Try Again.',
-            })
-          );
+          dispatchVisualizeResults({
+            error: 'Please Reset Your Parameters and Try again.',
+          });
+          dispatchError('Your submission has timed out. Please Try Again.');
         } else {
-          store.dispatch(
-            updateVisualizeResults({
-              error: 'Please Reset Your Parameters and Try again.',
-            })
-          );
+          dispatchVisualizeResults({
+            error: 'Please Reset Your Parameters and Try again.',
+          });
           const { msg, stdout, stderr } = await response.json();
           const message = `<div>
             <p>${msg}</p>
@@ -130,16 +152,14 @@ export default function UploadForm({ setOpenSidebar }) {
             <pre>${stdout}</pre>
             <pre>${stderr}</pre>
           </div>`;
-          store.dispatch(updateError({ visible: true, message: message }));
+          dispatchError(message);
         }
-        store.dispatch(
-          updateVisualize({
-            loading: {
-              active: false,
-              showIndicator: false,
-            },
-          })
-        );
+        dispatchVisualize({
+          loading: {
+            active: false,
+            showIndicator: false,
+          },
+        });
       }
     }
   }
@@ -148,21 +168,19 @@ export default function UploadForm({ setOpenSidebar }) {
     const initialState = getInitialState();
     // console.log(initialState.visualize);
     removeFile();
-    store.dispatch(updateVisualize(initialState.visualize));
-    store.dispatch(updateVisualizeResults(initialState.visualizeResults));
+    dispatchVisualize(initialState.visualize);
+    dispatchVisualizeResults(initialState.visualizeResults);
   }
 
   //   Uploads inputFile and returns a projectID
   async function uploadFile() {
-    store.dispatch(
-      updateVisualize({
-        loading: {
-          active: true,
-          content: 'Uploading file...',
-          showIndicator: true,
-        },
-      })
-    );
+    dispatchVisualize({
+      loading: {
+        active: true,
+        content: 'Uploading file...',
+        showIndicator: true,
+      },
+    });
     const data = new FormData();
     data.append('file', inputFile);
 
@@ -178,7 +196,7 @@ export default function UploadForm({ setOpenSidebar }) {
           <p>${msg}</p>
          ${error ? `<p>${error}</p>` : ''} 
         </div>`;
-      store.dispatch(updateError({ visible: true, message: message }));
+      dispatchError(message);
     } else {
       return await response.json();
     }
@@ -189,16 +207,14 @@ export default function UploadForm({ setOpenSidebar }) {
   }
 
   return (
-    
     <Form className="mb-2">
-    
       <Group controlId="fileType">
         <Label>Choose File Type</Label>
         <Control
           as="select"
           value={inputFormat}
           onChange={(e) => {
-            store.dispatch(updateVisualize({ inputFormat: e.target.value }));
+            dispatchVisualize({ inputFormat: e.target.value });
           }}
           disabled={disableParameters}
         >
@@ -223,8 +239,9 @@ export default function UploadForm({ setOpenSidebar }) {
                 onClick={() => removeFile()}
                 disabled={disableParameters}
               >
-               
-                <span id="uploadedFile">{loading.active ? storeFile : inputFile.name}</span>
+                <span id="uploadedFile">
+                  {loading.active ? storeFile : inputFile.name}
+                </span>
                 <span className="text-danger ml-auto">
                   <FontAwesomeIcon icon={faMinus} />
                 </span>
@@ -244,7 +261,7 @@ export default function UploadForm({ setOpenSidebar }) {
           as="select"
           value={selectedGenome}
           onChange={(e) =>
-            store.dispatch(updateVisualize({ selectedGenome: e.target.value }))
+            dispatchVisualize({ selectedGenome: e.target.value })
           }
           disabled={disableParameters}
         >
@@ -261,9 +278,7 @@ export default function UploadForm({ setOpenSidebar }) {
             value="WGS"
             checked={experimentalStrategy == 'WGS'}
             onChange={(e) =>
-              store.dispatch(
-                updateVisualize({ experimentalStrategy: e.target.value })
-              )
+              dispatchVisualize({ experimentalStrategy: e.target.value })
             }
             disabled={disableParameters}
           />
@@ -275,9 +290,7 @@ export default function UploadForm({ setOpenSidebar }) {
             value="WES"
             checked={experimentalStrategy == 'WES'}
             onChange={(e) =>
-              store.dispatch(
-                updateVisualize({ experimentalStrategy: e.target.value })
-              )
+              dispatchVisualize({ experimentalStrategy: e.target.value })
             }
             disabled={disableParameters}
           />
@@ -293,7 +306,7 @@ export default function UploadForm({ setOpenSidebar }) {
             value="False"
             checked={mutationSplit == 'False'}
             onChange={(e) =>
-              store.dispatch(updateVisualize({ mutationSplit: e.target.value }))
+              dispatchVisualize({ mutationSplit: e.target.value })
             }
             disabled={disableParameters}
           />
@@ -306,7 +319,7 @@ export default function UploadForm({ setOpenSidebar }) {
             value="True"
             checked={mutationSplit == 'True'}
             onChange={(e) =>
-              store.dispatch(updateVisualize({ mutationSplit: e.target.value }))
+              dispatchVisualize({ mutationSplit: e.target.value })
             }
             disabled={disableParameters}
           />
@@ -320,9 +333,7 @@ export default function UploadForm({ setOpenSidebar }) {
             type="radio"
             // value={false}
             checked={!isMultiple}
-            onChange={() =>
-              store.dispatch(updateVisualize({ isMultiple: false }))
-            }
+            onChange={() => dispatchVisualize({ isMultiple: false })}
             disabled={disableParameters}
           />
           <Check.Label htmlFor="multipleFalse" className="font-weight-normal">
@@ -334,9 +345,7 @@ export default function UploadForm({ setOpenSidebar }) {
             type="radio"
             // value={true}
             checked={isMultiple}
-            onChange={() =>
-              store.dispatch(updateVisualize({ isMultiple: true }))
-            }
+            onChange={() => dispatchVisualize({ isMultiple: true })}
             disabled={disableParameters}
           />
           <Check.Label htmlFor="multipleTrue" className="font-weight-normal">
@@ -353,9 +362,7 @@ export default function UploadForm({ setOpenSidebar }) {
             value="False"
             checked={collapseSample == 'False'}
             onChange={(e) =>
-              store.dispatch(
-                updateVisualize({ collapseSample: e.target.value })
-              )
+              dispatchVisualize({ collapseSample: e.target.value })
             }
           />
           <Check.Label className="font-weight-normal">False</Check.Label>
@@ -367,9 +374,7 @@ export default function UploadForm({ setOpenSidebar }) {
             value="True"
             checked={collapseSample == 'True'}
             onChange={(e) =>
-              store.dispatch(
-                updateVisualize({ collapseSample: e.target.value })
-              )
+              dispatchVisualize({ collapseSample: e.target.value })
             }
           />
           <Check.Label className="font-weight-normal">True</Check.Label>
@@ -383,24 +388,24 @@ export default function UploadForm({ setOpenSidebar }) {
           placeholder="Enter a filter"
           value={mutationFilter}
           onChange={(e) =>
-            store.dispatch(updateVisualize({ mutationFilter: e.target.value }))
+            dispatchVisualize({ mutationFilter: e.target.value })
           }
           disabled={disableParameters}
         ></Control>
+        <Text className="text-muted">Use @ to separate multiple filters</Text>
       </Group>
       <hr />
       <Group controlId="email">
         <LoadingOverlay active={true} content={'Work in progress...'} />
         <div>
           <Check
-            disabled
             inline
             id="toggleQueue"
             type="checkbox"
             label="Submit this job to a Queue"
             checked={queueMode == true}
             onChange={(_) => {
-              store.dispatch(updateVisualize({ queueMode: !queueMode }));
+              dispatchVisualize({ queueMode: !queueMode });
             }}
           />
         </div>
@@ -409,9 +414,7 @@ export default function UploadForm({ setOpenSidebar }) {
             placeholder="Enter Email"
             size="sm"
             value={email}
-            onChange={(e) =>
-              store.dispatch(updateVisualize({ email: e.target.value }))
-            }
+            onChange={(e) => dispatchVisualize({ email: e.target.value })}
             disabled={!queueMode}
           ></Control>
           <Text className="text-muted">
