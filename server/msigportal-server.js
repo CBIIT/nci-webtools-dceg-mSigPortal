@@ -73,8 +73,8 @@ app.post('/api/visualize', (req, res) => {
   wrapper.stderr.on('close', () => {
     const scriptOut = { stdout: stdout, stderr: stderr };
 
-    logger.debug(`STDOUT ${scriptOut.stdout}`);
-    logger.debug(`STDERR: ${scriptOut.stderr}`);
+    logger.debug('STDOUT\n' + scriptOut.stdout);
+    logger.debug('STDERR\n' + scriptOut.stderr);
 
     if (
       fs.existsSync(
