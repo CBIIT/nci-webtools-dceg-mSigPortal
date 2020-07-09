@@ -33,6 +33,7 @@ export default function UploadForm({ setOpenSidebar }) {
     email,
     disableParameters,
     storeFile,
+    submitted,
     loading,
   } = useSelector((state) => state.visualize);
 
@@ -50,6 +51,7 @@ export default function UploadForm({ setOpenSidebar }) {
   async function handleSubmit() {
     // disable parameters after submit
     store.dispatch(updateVisualize({ disableParameters: true }));
+    store.dispatch(updateVisualize({ submitted: true}))
 
     const data = await uploadFile();
     if (data && data.projectID) {
@@ -216,7 +218,7 @@ export default function UploadForm({ setOpenSidebar }) {
               {...getInputProps()}
               disabled={inputFile.size || disableParameters}
             />
-            {inputFile.size || loading.active ? (
+            {inputFile.size || submitted ? (
               <button
                 id="removeFile"
                 className="d-flex w-100 faButton"
@@ -224,7 +226,7 @@ export default function UploadForm({ setOpenSidebar }) {
                 disabled={disableParameters}
               >
                
-                <span id="uploadedFile">{loading.active ? storeFile : inputFile.name}</span>
+                <span id="uploadedFile">{submitted ? storeFile : inputFile.name}</span>
                 <span className="text-danger ml-auto">
                   <FontAwesomeIcon icon={faMinus} />
                 </span>

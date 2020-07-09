@@ -14,6 +14,7 @@ export const getInitialState = () => ({
     openSidebar: true,
     disableParameters: false,
     storeFile: '',
+    submitted: false,
     loading: {
       active: false,
       content: null,
