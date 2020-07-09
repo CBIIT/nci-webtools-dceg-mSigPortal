@@ -199,13 +199,17 @@ export default function Results() {
         <a className="ml-2 px-2 py-1" href={plotURL} download={getPlotName()}>
           Download Plot
         </a>
-        <span className="ml-auto px-2 py-1">
+        <span className="ml-auto">
           <LoadingOverlay
             active={downloadOverlay}
             content={'Loading'}
             showIndicator={true}
           />
-          <Button variant="link" onClick={() => downloadResults()}>
+          <Button
+            className="px-2 py-1"
+            variant="link"
+            onClick={() => downloadResults()}
+          >
             Download Results
           </Button>
         </span>
