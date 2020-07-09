@@ -72,7 +72,10 @@ app.post('/api/visualize', (req, res) => {
   wrapper.stderr.on('data', (data) => (stderr += data.toString()));
   wrapper.stderr.on('close', () => {
     const scriptOut = { stdout: stdout, stderr: stderr };
-    console.log('python out', scriptOut);
+
+    logger.debug('STDOUT\n' + scriptOut.stdout);
+    logger.debug('STDERR\n' + scriptOut.stderr);
+
     if (
       fs.existsSync(
         path.join(tmppath, reqBody.projectID[1], 'results', 'Summary.txt')
@@ -197,7 +200,7 @@ app.get('/visualize/download', (req, res) => {
 });
 
 app.post('/visualize/queue', (req, res) => {
-  res.json(req);
+  res.json(req.body);
 });
 
 app.listen(port, () => {
