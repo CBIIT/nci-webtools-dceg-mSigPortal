@@ -216,9 +216,9 @@ export default function Results() {
       </div>
       <div>
         <div>stdout</div>
-        <pre>{debug.stdout}</pre>
+        <pre className="border">{debug.stdout}</pre>
         <div>stderr</div>
-        <pre>{debug.stderr}</pre>
+        <pre className="border">{debug.stderr}</pre>
       </div>
     </div>
   ) : (
