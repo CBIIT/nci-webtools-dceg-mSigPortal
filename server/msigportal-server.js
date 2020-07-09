@@ -72,7 +72,10 @@ app.post('/api/visualize', (req, res) => {
   wrapper.stderr.on('data', (data) => (stderr += data.toString()));
   wrapper.stderr.on('close', () => {
     const scriptOut = { stdout: stdout, stderr: stderr };
-    console.log('python out', scriptOut);
+
+    logger.debug(`STDOUT ${scriptOut.stdout}`);
+    logger.debug(`STDERR: ${scriptOut.stderr}`);
+
     if (
       fs.existsSync(
         path.join(tmppath, reqBody.projectID[1], 'results', 'Summary.txt')
