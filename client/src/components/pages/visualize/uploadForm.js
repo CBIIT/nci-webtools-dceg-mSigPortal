@@ -67,8 +67,8 @@ export default function UploadForm({ setOpenSidebar }) {
 
   async function handleSubmit() {
     // disable parameters after submit
-    store.dispatch(updateVisualize({ disableParameters: true }));
-    store.dispatch(updateVisualize({ submitted: true}))
+    dispatchVisualize({ disableParameters: true });
+    dispatchVisualize({ submitted: true });
 
     const data = await uploadFile();
     if (data && data.projectID) {
@@ -241,7 +241,6 @@ export default function UploadForm({ setOpenSidebar }) {
                 onClick={() => removeFile()}
                 disabled={disableParameters}
               >
-               
                 <span id="uploadedFile">{submitted ? storeFile : inputFile.name}</span>
                 <span className="text-danger ml-auto">
                   <FontAwesomeIcon icon={faMinus} />
