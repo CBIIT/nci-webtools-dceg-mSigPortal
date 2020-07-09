@@ -197,7 +197,7 @@ app.get('/visualize/download', (req, res) => {
 });
 
 app.post('/visualize/queue', (req, res) => {
-  res.json(req);
+  res.json(req.body);
 });
 
 app.listen(port, () => {
