@@ -202,7 +202,6 @@ export default function Results() {
         <span className="ml-auto">
           <LoadingOverlay
             active={downloadOverlay}
-            content={'Loading'}
             showIndicator={true}
           />
           <Button
