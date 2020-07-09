@@ -27,6 +27,7 @@ export default function Results() {
     displayedPlotIndex,
     plotURL,
     error,
+    debug,
   } = useSelector((state) => state.visualizeResults);
 
   useEffect(() => {
@@ -195,7 +196,7 @@ export default function Results() {
           <img className="w-100 my-4" src={plotURL}></img>
         </Col>
       </Row>
-      <span className="d-flex">
+      <div className="d-flex">
         <a className="ml-2 px-2 py-1" href={plotURL} download={getPlotName()}>
           Download Plot
         </a>
@@ -212,7 +213,13 @@ export default function Results() {
             Download Results
           </Button>
         </span>
-      </span>
+      </div>
+      <div>
+        <div>stdout</div>
+        <pre>{debug.stdout}</pre>
+        <div>stderr</div>
+        <pre>{debug.stderr}</pre>
+      </div>
     </div>
   ) : (
     <div>

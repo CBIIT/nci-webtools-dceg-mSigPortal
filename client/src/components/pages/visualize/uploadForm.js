@@ -134,8 +134,11 @@ export default function UploadForm({ setOpenSidebar }) {
         });
 
         if (response.ok) {
+          const pythonOut = await response.json();
+
           dispatchVisualizeResults({
             projectID: data.projectID,
+            debug: pythonOut,
           });
           setOpenSidebar(false);
         } else if (response.status == 502) {
@@ -241,7 +244,9 @@ export default function UploadForm({ setOpenSidebar }) {
                 onClick={() => removeFile()}
                 disabled={disableParameters}
               >
-                <span id="uploadedFile">{submitted ? storeFile : inputFile.name}</span>
+                <span id="uploadedFile">
+                  {submitted ? storeFile : inputFile.name}
+                </span>
                 <span className="text-danger ml-auto">
                   <FontAwesomeIcon icon={faMinus} />
                 </span>
