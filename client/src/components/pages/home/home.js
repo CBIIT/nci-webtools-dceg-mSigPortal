@@ -7,26 +7,28 @@ import './home.scss';
 export default function Home({ links }) {
   const colors = ['#fc8701', '#2c71dd', '#689f39', '#84368d'];
 
-  function cardRow(links, colors) {
+  function cardRow(links, color) {
     return (
       <CardDeck>
         {links.map(
           (
-            { exact, route, action, title, cardTitle, cardText, image },
+            { exact, route, action, title, cardTitle, cardText, description, image },
             index
           ) => (
-            <>
+            <div class="d-flex bd-highlight w-100">
+            
               <Card
                 key={title}
                 id={title}
-                className="mb-5 align-self-center"
+                className="mb-5 align-self-center flex-fill  p-2 bd-highlight"
                 style={{
-                  width: '18rem',
+                  width: '70rem',
                   // height: '18rem',
                   justifyContent: 'center',
                   alignItems: 'center',
+                  position: 'relative',
                   border: '1px solid #DADBE6',
-                  backgroundColor: 'white',
+                  backgroundColor: 'white'
                   // minHeight: '280px'
                   // borderRadius: '10px'
                 }}
@@ -43,14 +45,15 @@ export default function Home({ links }) {
                     style={{
                       marginTop: '-40px',
                       padding: '10px',
-                      backgroundColor: colors[index],
+                      backgroundColor: color,
                       border: '4px solid white',
-                      fillOpacity: '0.5',
+                      fillOpacity: '0.5'
                     }}
                   >
                     <img alt="icon" src={image} height="55" width="55" />
                   </div>
                 </Link>
+                
                 <Card.Body>
                   <Card.Title className="text-dark">
                     <h2 style={{ fontSize: '1.75rem' }}>
@@ -62,8 +65,9 @@ export default function Home({ links }) {
                   </Card.Text>
                 </Card.Body>
               </Card>
+              <div class="description flex-fill bd-highlight">{description}</div>
               <div className="d-lg-none w-100"></div>
-            </>
+            </div>
           )
         )}
       </CardDeck>
@@ -119,8 +123,10 @@ export default function Home({ links }) {
         className="container align-middle text-center"
         style={{ marginTop: '70px' }}
       >
-        {cardRow(links.slice(0, 2), colors.slice(0, 2))}
-        {cardRow(links.slice(2, 4), colors.slice(2, 4))}
+        {cardRow(links.slice(0, 1), colors[0])}
+        {cardRow(links.slice(1, 2), colors[1])}
+        {cardRow(links.slice(2, 3), colors[2])}
+        {cardRow(links.slice(3, 4), colors[3])}
       </div>
     </>
   );
