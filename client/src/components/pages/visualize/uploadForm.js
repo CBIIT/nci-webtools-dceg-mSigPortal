@@ -222,6 +222,7 @@ export default function UploadForm({ setOpenSidebar }) {
             dispatchVisualize({ inputFormat: e.target.value });
           }}
           disabled={disableParameters}
+          custom
         >
           <option value="vcf">VCF</option>
           <option value="csv">CSV</option>
@@ -269,6 +270,7 @@ export default function UploadForm({ setOpenSidebar }) {
             dispatchVisualize({ selectedGenome: e.target.value })
           }
           disabled={disableParameters}
+          custom
         >
           <option value="GRCh37">GRCh37</option>
           <option value="GRCh38">GRCh38</option>
