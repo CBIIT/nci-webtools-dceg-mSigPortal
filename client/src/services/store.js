@@ -15,6 +15,7 @@ export const getInitialState = () => ({
     disableParameters: false,
     storeFile: '',
     submitted: false,
+    exampleData: 'assets/exampleInput/demo_input_single.vcf.gz',
     loading: {
       active: false,
       content: null,
