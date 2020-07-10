@@ -24,6 +24,15 @@ export default function Results() {
   const {
     projectID,
     mapping,
+    filtered,
+    selectName,
+    selectProfile,
+    selectMatrix,
+    selectTag,
+    nameOptions,
+    profileOptions,
+    matrixOptions,
+    tagOptions,
     displayedPlotIndex,
     plotURL,
     error,
@@ -38,10 +47,14 @@ export default function Results() {
 
   // load first plot after results are recieved
   useEffect(() => {
-    if (mapping.length && !displayedPlotIndex.length) {
+    if (filtered.length && !displayedPlotIndex.length) {
       setPlot(0);
     }
   }, [mapping]);
+
+  useEffect(() => {
+    setPlot(0);
+  }, [filtered]);
 
   async function getPlotMapping() {
     const response = await fetch(`${root}visualize/summary`, {
@@ -56,13 +69,19 @@ export default function Results() {
     store.dispatch(
       updateVisualizeResults({
         mapping: mapping,
+        filtered: mapping,
+        nameOptions: [...new Set(mapping.map((plot) => plot.Sample_Name))],
+        profileOptions: [...new Set(mapping.map((plot) => plot.Profile_Type))],
+        matrixOptions: [...new Set(mapping.map((plot) => plot.Matrix))],
+        tagOptions: [...new Set(mapping.map((plot) => plot.Tag))],
       })
     );
   }
 
   async function setPlot(index) {
-    const plot = mapping[index];
+    const plot = filtered[index];
     if (plot) {
+      console.log(plot.Location);
       const response = await fetch(`${root}visualize/svg`, {
         method: 'POST',
         headers: {
@@ -141,6 +160,77 @@ export default function Results() {
     }
   }
 
+  function filterSampleName(e) {
+    const filteredPlots = mapping.filter((plot) => plot.Sample_Name == e);
+    store.dispatch(
+      updateVisualizeResults({
+        selectName: e,
+        selectProfile: '0',
+        selectMatrix: '0',
+        selectTag: '0',
+        profileOptions: [
+          ...new Set(filteredPlots.map((plot) => plot.Profile_Type)),
+        ],
+        matrixOptions: [...new Set(filteredPlots.map((plot) => plot.Matrix))],
+        tagOptions: [...new Set(filteredPlots.map((plot) => plot.Tag))],
+        filtered: filteredPlots,
+      })
+    );
+  }
+
+  function filterProfileType(e) {
+    const filteredPlots = mapping.filter((plot) => plot.Profile_Type == e);
+    store.dispatch(
+      updateVisualizeResults({
+        selectProfile: e,
+        selectMatrix: '0',
+        selectTag: '0',
+        matrixOptions: [...new Set(filteredPlots.map((plot) => plot.Matrix))],
+        tagOptions: [...new Set(filteredPlots.map((plot) => plot.Tag))],
+        filtered: filteredPlots,
+      })
+    );
+  }
+
+  function filterMatrix(e) {
+    const filteredPlots = mapping.filter((plot) => plot.Matrix == e);
+    store.dispatch(
+      updateVisualizeResults({
+        selectMatrix: e,
+        selectTag: '0',
+        tagOptions: [...new Set(filteredPlots.map((plot) => plot.Tag))],
+        filtered: filteredPlots,
+      })
+    );
+  }
+
+  function filterTag(e) {
+    const filteredPlots = mapping.filter((plot) => plot.Tag == e);
+    store.dispatch(
+      updateVisualizeResults({
+        selectTag: e,
+        filtered: filteredPlots,
+      })
+    );
+  }
+
+  function resetSelect() {
+    store.dispatch(
+      updateVisualizeResults({
+        filtered: mapping,
+        selectName: '0',
+        selectProfile: '0',
+        selectMatrix: '0',
+        selectTag: '0',
+        nameOptions: [...new Set(mapping.map((plot) => plot.Sample_Name))],
+        profileOptions: [...new Set(mapping.map((plot) => plot.Profile_Type))],
+        matrixOptions: [...new Set(mapping.map((plot) => plot.Matrix))],
+        tagOptions: [...new Set(mapping.map((plot) => plot.Tag))],
+      })
+    );
+    setPlot(0);
+  }
+
   return error.length ? (
     <h4 className="text-danger">{error}</h4>
   ) : mapping.length ? (
@@ -151,6 +241,89 @@ export default function Results() {
             <Label className="px-2 py-1">Results</Label>
           </span>
           <Row className="justify-content-center">
+            <Col sm="3">
+              <Label>Sample Name</Label>
+              <Control
+                as="select"
+                value={selectName}
+                onChange={(e) => filterSampleName(e.target.value)}
+                // defaultValue="unselected"
+                custom
+              >
+                <option value="0" disabled>
+                  Select
+                </option>
+                {nameOptions.map((sampleName, index) => {
+                  return (
+                    <option key={index} value={sampleName}>
+                      {sampleName}
+                    </option>
+                  );
+                })}
+              </Control>
+            </Col>
+            <Col sm="3">
+              <Label>Profile Type</Label>
+              <Control
+                as="select"
+                value={selectProfile}
+                onChange={(e) => filterProfileType(e.target.value)}
+                custom
+              >
+                <option value="0" disabled>
+                  Select
+                </option>
+                {profileOptions.map((profile, index) => {
+                  return (
+                    <option key={index} value={profile}>
+                      {profile}
+                    </option>
+                  );
+                })}
+              </Control>
+            </Col>
+            <Col sm="3">
+              <Label>Matrix</Label>
+              <Control
+                as="select"
+                value={selectMatrix}
+                onChange={(e) => filterMatrix(e.target.value)}
+                custom
+              >
+                <option value="0" disabled>
+                  Select
+                </option>
+                {matrixOptions.map((matrix, index) => {
+                  return (
+                    <option key={index} value={matrix}>
+                      {matrix}
+                    </option>
+                  );
+                })}
+              </Control>
+            </Col>
+            <Col sm="3">
+              <Label>Tag</Label>
+              <Control
+                as="select"
+                value={selectTag}
+                onChange={(e) => filterTag(e.target.value)}
+                custom
+              >
+                <option value="0" disabled>
+                  Select
+                </option>
+                {tagOptions.map((tag, index) => {
+                  return (
+                    <option key={index} value={tag}>
+                      {tag}
+                    </option>
+                  );
+                })}
+              </Control>
+            </Col>
+          </Row>
+          <Row className="justify-content-center mt-4">
             <Col sm="auto">
               <button
                 className="faButton navButton"
@@ -167,11 +340,12 @@ export default function Results() {
                 as="select"
                 value={displayedPlotIndex}
                 onChange={(e) => setPlot(e.target.value)}
+                custom
               >
-                {mapping.map((plot, index) => {
+                {filtered.map((plot, index) => {
                   return (
                     <option key={index} value={index}>
-                      {`${plot.Sample_Name} | ${plot.Profile_Type} | ${plot.Matrix}`}
+                      {`${plot.Sample_Name} | ${plot.Profile_Type} | ${plot.Matrix} | ${plot.Tag}`}
                     </option>
                   );
                 })}
@@ -187,6 +361,15 @@ export default function Results() {
               >
                 <FontAwesomeIcon icon={faChevronRight} size="2x" />
               </button>
+            </Col>
+            <Col sm="auto">
+              <Button
+                variant="secondary"
+                type="reset"
+                onClick={() => resetSelect()}
+              >
+                Reset
+              </Button>
             </Col>
           </Row>
         </Group>
