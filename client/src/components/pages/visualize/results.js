@@ -160,11 +160,11 @@ export default function Results() {
     }
   }
 
-  function filterSampleName(e) {
-    const filteredPlots = mapping.filter((plot) => plot.Sample_Name == e);
+  function filterSampleName(name) {
+    const filteredPlots = mapping.filter((plot) => plot.Sample_Name == name);
     store.dispatch(
       updateVisualizeResults({
-        selectName: e,
+        selectName: name,
         selectProfile: '0',
         selectMatrix: '0',
         selectTag: '0',
@@ -178,11 +178,13 @@ export default function Results() {
     );
   }
 
-  function filterProfileType(e) {
-    const filteredPlots = mapping.filter((plot) => plot.Profile_Type == e);
+  function filterProfileType(profile) {
+    const filteredPlots = mapping.filter(
+      (plot) => plot.Sample_Name == selectName && plot.Profile_Type == profile
+    );
     store.dispatch(
       updateVisualizeResults({
-        selectProfile: e,
+        selectProfile: profile,
         selectMatrix: '0',
         selectTag: '0',
         matrixOptions: [...new Set(filteredPlots.map((plot) => plot.Matrix))],
@@ -192,11 +194,16 @@ export default function Results() {
     );
   }
 
-  function filterMatrix(e) {
-    const filteredPlots = mapping.filter((plot) => plot.Matrix == e);
+  function filterMatrix(matrix) {
+    const filteredPlots = mapping.filter(
+      (plot) =>
+        plot.Sample_Name == selectName &&
+        plot.Profile_Type == selectProfile &&
+        plot.Matrix == matrix
+    );
     store.dispatch(
       updateVisualizeResults({
-        selectMatrix: e,
+        selectMatrix: matrix,
         selectTag: '0',
         tagOptions: [...new Set(filteredPlots.map((plot) => plot.Tag))],
         filtered: filteredPlots,
@@ -204,11 +211,17 @@ export default function Results() {
     );
   }
 
-  function filterTag(e) {
-    const filteredPlots = mapping.filter((plot) => plot.Tag == e);
+  function filterTag(tag) {
+    const filteredPlots = mapping.filter(
+      (plot) =>
+        plot.Sample_Name == selectName &&
+        plot.Profile_Type == selectProfile &&
+        plot.Matrix == selectMatrix &&
+        plot.Tag == tag
+    );
     store.dispatch(
       updateVisualizeResults({
-        selectTag: e,
+        selectTag: tag,
         filtered: filteredPlots,
       })
     );
@@ -238,7 +251,7 @@ export default function Results() {
       <Form>
         <Group controlId="selectPlot">
           <span className="d-flex">
-            <Label className="px-2 py-1">Results</Label>
+            <Label className="py-1">Results</Label>
           </span>
           <Row className="justify-content-center">
             <Col sm="3">
