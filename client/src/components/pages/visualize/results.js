@@ -111,7 +111,7 @@ export default function Results() {
   }
 
   function nextPlot() {
-    displayedPlotIndex < mapping.length - 1
+    displayedPlotIndex < filtered.length - 1
       ? setPlot(parseInt(displayedPlotIndex + 1))
       : setPlot(0);
   }
