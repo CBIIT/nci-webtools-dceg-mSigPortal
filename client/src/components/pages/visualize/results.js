@@ -278,6 +278,7 @@ export default function Results() {
             <Col sm="3">
               <Label>Profile Type</Label>
               <Control
+                disabled={selectName == '0'}
                 as="select"
                 value={selectProfile}
                 onChange={(e) => filterProfileType(e.target.value)}
@@ -298,6 +299,7 @@ export default function Results() {
             <Col sm="3">
               <Label>Matrix</Label>
               <Control
+                disabled={selectProfile == '0'}
                 as="select"
                 value={selectMatrix}
                 onChange={(e) => filterMatrix(e.target.value)}
@@ -318,6 +320,7 @@ export default function Results() {
             <Col sm="3">
               <Label>Tag</Label>
               <Control
+                disabled={selectMatrix == '0'}
                 as="select"
                 value={selectTag}
                 onChange={(e) => filterTag(e.target.value)}
