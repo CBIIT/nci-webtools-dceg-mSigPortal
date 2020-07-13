@@ -24,18 +24,14 @@
 }
 
 .description{
-  visibility: hidden;
-  opacity: 0;
-  transition: visibility 0s 2s, opacity 0.5s linear;
+  display: none;
 }
 
-.card:hover ~ .description{
-  visibility: visible;
-  opacity:1;
-  transition: opacity 0.5s linear; 
+.cardrow:hover .description{
+  display: block;
 }
 
-.card#Visualize:hover {
+.card#Visualize:hover{
   text-decoration: none;
   transform: scale(1.04);
   background-color: #ffb844 !important;

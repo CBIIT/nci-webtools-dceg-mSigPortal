@@ -15,15 +15,14 @@ export default function Home({ links }) {
             { exact, route, action, title, cardTitle, cardText, description, image },
             index
           ) => (
-            <div class="d-flex bd-highlight w-100">
+            <div class="cardrow d-flex bd-highlight w-100" key={title}>
             
               <Card
                 key={title}
                 id={title}
-                className="mb-5 align-self-center flex-fill p-2 bd-highlight"
+                className="mb-5 align-self-center p-2 bd-highlight w-100"
                 style={{
-                  minWidth: '30rem',
-                  // height: '18rem',
+                  minWidth: '45%',
                   justifyContent: 'center',
                   alignItems: 'center',
                   position: 'relative',
@@ -65,7 +64,7 @@ export default function Home({ links }) {
                   </Card.Text>
                 </Card.Body>
               </Card>
-              <div class="description flex-fill bd-highlight">{description}</div>
+              <div class="description bd-highlight">{description}</div>
               <div className="d-lg-none w-100"></div>
             </div>
           )
