@@ -20,9 +20,9 @@ export default function Home({ links }) {
               <Card
                 key={title}
                 id={title}
-                className="mb-5 align-self-center flex-fill  p-2 bd-highlight"
+                className="mb-5 align-self-center flex-fill p-2 bd-highlight"
                 style={{
-                  width: '70rem',
+                  minWidth: '30rem',
                   // height: '18rem',
                   justifyContent: 'center',
                   alignItems: 'center',
