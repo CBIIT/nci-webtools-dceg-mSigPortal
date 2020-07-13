@@ -11,4 +11,3 @@ config*.json
 *-audit.json
 .DS_Store
 api/python/__pycache__
-api/python/mSigPortal_Profiler_Extraction.py

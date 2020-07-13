@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Form, Button } from 'react-bootstrap';
+import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useDropzone } from 'react-dropzone';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCloudUploadAlt, faMinus } from '@fortawesome/free-solid-svg-icons';
@@ -34,6 +34,7 @@ export default function UploadForm({ setOpenSidebar }) {
     disableParameters,
     storeFile,
     submitted,
+    exampleData,
     loading,
   } = useSelector((state) => state.visualize);
 
@@ -134,8 +135,11 @@ export default function UploadForm({ setOpenSidebar }) {
         });
 
         if (response.ok) {
+          const pythonOut = await response.json();
+
           dispatchVisualizeResults({
             projectID: data.projectID,
+            debug: pythonOut,
           });
           setOpenSidebar(false);
         } else if (response.status == 502) {
@@ -208,6 +212,25 @@ export default function UploadForm({ setOpenSidebar }) {
     setInput(new File([], ''));
   }
 
+  function selectFormat(format) {
+    let path = '';
+    if (format == 'vcf') path = 'assets/exampleInput/demo_input_single.vcf.gz';
+    if (format == 'csv') path = 'assets/exampleInput/demo_input_multi.csv.zip';
+    if (format == 'tsv') path = 'assets/exampleInput/demo_input_multi.tsv.zip';
+    if (format == 'catalog_tsv')
+      path = 'assets/exampleInput/demo_input_catalog.tsv.zip';
+    if (format == 'catalog_csv')
+      path = 'assets/exampleInput/demo_input_catalog.csv.zip';
+
+    dispatchVisualize({ inputFormat: format, exampleData: path });
+  }
+
+  async function loadExample() {
+    const filename = exampleData.split('/').slice(-1)[0];
+    setInput(new File([await (await fetch(exampleData)).blob()], filename));
+    dispatchVisualize({ storeFile: filename });
+  }
+
   return (
     <Form className="mb-2">
       <Group controlId="fileType">
@@ -215,10 +238,9 @@ export default function UploadForm({ setOpenSidebar }) {
         <Control
           as="select"
           value={inputFormat}
-          onChange={(e) => {
-            dispatchVisualize({ inputFormat: e.target.value });
-          }}
+          onChange={(e) => selectFormat(e.target.value)}
           disabled={disableParameters}
+          custom
         >
           <option value="vcf">VCF</option>
           <option value="csv">CSV</option>
@@ -226,6 +248,31 @@ export default function UploadForm({ setOpenSidebar }) {
           <option value="catalog_tsv">CATALOG TSV</option>
           <option value="catalog_csv">CATALOG CSV</option>
         </Control>
+      </Group>
+      <Group id="exampleData">
+        <Label>Example Data</Label>
+        <Row>
+          <Col>
+            <Button
+              disabled={disableParameters}
+              variant="link"
+              href={exampleData}
+              download
+            >
+              Download
+            </Button>
+          </Col>
+          <Col>
+            <Button
+              disabled={disableParameters}
+              variant="link"
+              type="button"
+              onClick={() => loadExample()}
+            >
+              Load
+            </Button>
+          </Col>
+        </Row>
       </Group>
       <Group controlId="fileUpload">
         <section>
@@ -241,7 +288,9 @@ export default function UploadForm({ setOpenSidebar }) {
                 onClick={() => removeFile()}
                 disabled={disableParameters}
               >
-                <span id="uploadedFile">{submitted ? storeFile : inputFile.name}</span>
+                <span id="uploadedFile">
+                  {submitted ? storeFile : inputFile.name}
+                </span>
                 <span className="text-danger ml-auto">
                   <FontAwesomeIcon icon={faMinus} />
                 </span>
@@ -264,6 +313,7 @@ export default function UploadForm({ setOpenSidebar }) {
             dispatchVisualize({ selectedGenome: e.target.value })
           }
           disabled={disableParameters}
+          custom
         >
           <option value="GRCh37">GRCh37</option>
           <option value="GRCh38">GRCh38</option>
@@ -425,8 +475,8 @@ export default function UploadForm({ setOpenSidebar }) {
           </Text>
         </div>
       </Group>
-      <div className="row">
-        <div className="col-sm-6">
+      <Row>
+        <Col sm="6">
           <Button
             disabled={loading.active}
             className="w-100"
@@ -435,8 +485,8 @@ export default function UploadForm({ setOpenSidebar }) {
           >
             Reset
           </Button>
-        </div>
-        <div className="col-sm-6">
+        </Col>
+        <Col sm="6">
           <Button
             disabled={!inputFile.size || disableParameters || loading.active}
             className="w-100"
@@ -446,8 +496,8 @@ export default function UploadForm({ setOpenSidebar }) {
           >
             Submit
           </Button>
-        </div>
-      </div>
+        </Col>
+      </Row>
     </Form>
   );
 }
