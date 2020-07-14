@@ -28,7 +28,8 @@ export function Navbar({ links }) {
           ))}
         {/* <pre>{JSON.stringify(links)}</pre> */}
       </div>
-
+      
+      {/*Mobile View*/}
       <div className="container d-flex flex-column d-md-none" align="center">
         {[{ route: '/', title: 'Home', exact: true }]
             .concat(links)
