@@ -16,7 +16,7 @@ export default function Home({ links }) {
             index
           ) => (
 
-                <div class="cardrow d-flex bd-highlight w-100" key={title}>
+            <div class="d-flex bd-highlight w-100" key={title}>
 
               <Card
                 key={title}
@@ -65,10 +65,8 @@ export default function Home({ links }) {
                   </div>
                 </Card.Body>
               </Card>
-              <div class="d-none d-md-block">
-                <div class="description">
-                  {description}
-                </div>
+              <div class="description d-none d-md-block">
+                {description}
               </div>
 
             </div>

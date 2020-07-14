@@ -22,13 +22,14 @@
   width: 100%;
   height: 300px;
 }
-
 .description{
-  display: none;
+  text-align: left;
+  margin-top: 20px;
+  margin-left: 10px;
 }
 
-.cardrow:hover .description{
-  display: block;
+.card:hover ~ .description{
+  text-shadow: 1px 0 0 currentColor;
 }
 
 .card#Visualize:hover{
