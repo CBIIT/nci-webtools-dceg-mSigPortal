@@ -38,7 +38,7 @@ export default function Visualize() {
               </div>
             </div>
           </div>
-          <hr class="d-lg-none" style={{opacity:0}}></hr>
+          <hr className="d-lg-none" style={{opacity:0}}></hr>
         </SidebarPanel>
         <MainPanel className="col-lg-8">
           <div
