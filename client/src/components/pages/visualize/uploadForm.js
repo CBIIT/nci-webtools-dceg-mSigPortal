@@ -232,7 +232,7 @@ export default function UploadForm({ setOpenSidebar }) {
   }
 
   return (
-    <Form className="mb-2">
+    <Form className="p-1">
       <Group controlId="fileType">
         <Label>Choose File Type</Label>
         <Control
@@ -249,32 +249,31 @@ export default function UploadForm({ setOpenSidebar }) {
           <option value="catalog_csv">CATALOG CSV</option>
         </Control>
       </Group>
-      <Group id="exampleData">
-        <Label>Example Data</Label>
-        <Row>
-          <Col>
+      <Group controlId="fileUpload">
+        <Row className="m-0">
+          <Col sm="6" className="p-0">
             <Button
+              className="p-0"
               disabled={disableParameters}
               variant="link"
               href={exampleData}
               download
             >
-              Download
+              Download Sample
             </Button>
           </Col>
-          <Col>
+          <Col sm="6" className="p-0 d-flex">
             <Button
+              className="p-0 ml-auto"
               disabled={disableParameters}
               variant="link"
               type="button"
               onClick={() => loadExample()}
             >
-              Load
+              Load Sample
             </Button>
           </Col>
         </Row>
-      </Group>
-      <Group controlId="fileUpload">
         <section>
           <div {...getRootProps({ className: 'dropzone' })}>
             <input
