@@ -15,12 +15,13 @@ export default function Home({ links }) {
             { exact, route, action, title, cardTitle, cardText, description, image },
             index
           ) => (
-            <div class="cardrow d-flex bd-highlight w-100" key={title}>
-            
+
+                <div class="cardrow d-flex bd-highlight w-100" key={title}>
+
               <Card
                 key={title}
                 id={title}
-                className="mb-5 align-self-center p-2 bd-highlight w-100"
+                className="mb-5 align-self-center p-2 bd-highlight"
                 style={{
                   minWidth: '45%',
                   justifyContent: 'center',
@@ -52,22 +53,26 @@ export default function Home({ links }) {
                     <img alt="icon" src={image} height="55" width="55" />
                   </div>
                 </Link>
-                
+
                 <Card.Body>
                   <Card.Title className="text-dark">
                     <h2 style={{ fontSize: '1.75rem' }}>
                       <b>{cardTitle}</b>
                     </h2>
-                  </Card.Title>
-                  <Card.Text className="text-dark">
-                    <small>{cardText}</small>
-                  </Card.Text>
+                   </Card.Title>
+                  <div className="text-center mt-2 d-md-none">
+                    {description}
+                  </div>
                 </Card.Body>
               </Card>
-              <div class="description bd-highlight">{description}</div>
-              <div className="d-lg-none w-100"></div>
+              <div class="d-none d-md-block">
+                <div class="description">
+                  {description}
+                </div>
+              </div>
+
             </div>
-          )
+            )
         )}
       </CardDeck>
     );
