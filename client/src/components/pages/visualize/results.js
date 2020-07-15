@@ -41,6 +41,9 @@ export default function Results() {
     selectName2,
     selectSigFormula,
     sigFormula,
+    rPlots,
+    rPlotIndex,
+    rPlotURL,
     submitOverlay,
     debug,
     debugR,
@@ -58,6 +61,12 @@ export default function Results() {
       setPlot(0);
     }
   }, [mapping]);
+
+  useEffect(() => {
+    if (rPlots.length && !rPlotIndex.length) {
+      setRPlot(0);
+    }
+  }, [rPlots]);
 
   useEffect(() => {
     setPlot(0);
@@ -272,11 +281,46 @@ export default function Results() {
       },
       body: JSON.stringify(args),
     });
-    const stdout = await response.text();
-    console.log(stdout);
+    const data = await response.json();
+    console.log(data);
     store.dispatch(
-      updateVisualizeResults({ debugR: stdout, submitOverlay: false })
+      updateVisualizeResults({
+        debugR: data.debugR,
+        rPlots: data.plots,
+        submitOverlay: false,
+      })
     );
+  }
+
+  async function setRPlot(index) {
+    const plot = rPlots[index];
+    if (plot) {
+      const response = await fetch(`${root}visualize/svg`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ path: plot }),
+      });
+      if (!response.ok) {
+        const { msg } = await response.json();
+        store.dispatch(updateError({ visible: true, message: msg }));
+      } else {
+        const pic = await response.blob();
+        const objectURL = URL.createObjectURL(pic);
+
+        if (plotURL.length) URL.revokeObjectURL(plotURL);
+        store.dispatch(
+          updateVisualizeResults({
+            rPlotIndex: index,
+            rPlotURL: objectURL,
+          })
+        );
+      }
+    } else {
+      console.log('invalid index', index);
+    }
   }
 
   return error.length ? (
@@ -560,16 +604,43 @@ export default function Results() {
             ></Control>
           </Col>
         </Row>
-        {/* <Col sm="2" className="align-bottom"> */}
+
         <Button variant="primary" onClick={() => submitR()}>
           Calculate
         </Button>
-
-        {/* </Col> */}
       </div>
+      <Col sm="auto">
+        <Control
+          as="select"
+          value={rPlotIndex}
+          onChange={(e) => setRPlot(e.target.value)}
+          custom
+        >
+          {rPlots.map((plot, index) => {
+            return (
+              <option key={index} value={index}>
+                {plot}
+              </option>
+            );
+          })}
+        </Control>
+      </Col>
+      <Row>
+        <Col>
+          <img className="w-100 my-4" src={rPlotURL}></img>
+        </Col>
+      </Row>
       <div>
         <div>R output</div>
-        <pre className="border">{debugR}</pre>
+        <div className="border">
+          {debugR.map((line, index) => {
+            return (
+              <p className="m-0">
+                {index}| {line}
+              </p>
+            );
+          })}
+        </div>
       </div>
     </div>
   ) : (

@@ -42,9 +42,12 @@ export const getInitialState = () => ({
     selectName2: '0',
     selectSigFormula: 'signature',
     sigFormula: 'SBS5',
+    rPlots: [],
+    rPlotIndex: '',
+    rPlotURL: '',
     submitOverlay: false,
     debug: { stdout: '', stderr: '' },
-    debugR: '',
+    debugR: [],
   },
   error: {
     visible: false,

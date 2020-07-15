@@ -98,18 +98,36 @@ app.post('/api/visualize', (req, res) => {
 
 app.post('/api/visualizeR', (req, res) => {
   logger.info('/API/VISUALIZER: Calling R Wrapper');
-  console.log(req.body);
-  const plots = r('api/R/visualizeWrapper.R', 'generatePlots', {
+  console.log('args', req.body);
+  const plotSavePath = path.join(
+    tmppath,
+    req.body.projectID,
+    'results/rPlots/'
+  );
+
+  if (!fs.existsSync(plotSavePath)) {
+    fs.mkdirSync(plotSavePath);
+  }
+  const rOut = r('api/R/visualizeWrapper.R', 'generatePlots', {
     profileName: req.body.profileName,
     signatureSetName: req.body.signatureSetName,
     sampleName: req.body.sampleName,
     signatureName: req.body.signatureName,
     formula: req.body.formula,
     projectID: req.body.projectID,
-    savePath: path.join(tmppath, req.body.projectID, 'results/output'),
+    pythonOutput: path.join(tmppath, req.body.projectID, 'results/output'),
+    savePath: plotSavePath,
   });
-  console.log(plots);
-  res.send(plots);
+  const plots = fs
+    .readdirSync(plotSavePath)
+    .map((plot) => path.join(plotSavePath, plot));
+
+  console.log('rOut', rOut);
+
+  res.json({
+    debugR: rOut,
+    plots: plots,
+  });
 });
 
 app.post('/visualize/upload', (req, res, next) => {
