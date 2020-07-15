@@ -5,9 +5,9 @@ import { CardDeck, Button } from 'react-bootstrap';
 import './home.scss';
 
 export default function Home({ links }) {
-  const colors = ['#fc8701', '#2c71dd', '#689f39', '#84368d'];
+  const colors = ['#ffbe63', '#799eff', '#a4ce76', '#ab68b9'];
 
-  function cardRow(links, color) {
+  function cardRow(links) {
     return (
       <CardDeck>
         {links.map(
@@ -39,6 +39,12 @@ export default function Home({ links }) {
                   key={index}
                   to={route}
                 >
+                  <img alt="icon" src={image} height="80" width="80" 
+                    style={{
+                      marginTop: '-40px',
+                      borderRadius: '80'
+                    }} />
+                  {/*
                   <span className="sr-only">{title + ' link'}</span>
                   <div
                     className="rounded-circle"
@@ -50,8 +56,8 @@ export default function Home({ links }) {
                       fillOpacity: '0.5'
                     }}
                   >
-                    <img alt="icon" src={image} height="55" width="55" />
-                  </div>
+                    
+                  </div>*/}
                 </Link>
 
                 <Card.Body>
@@ -91,7 +97,9 @@ export default function Home({ links }) {
         </div>
         <div className="banner-overlay-text row justify-content-center text-center text-light w-75">
           <div className="col-12">
-            <h1 className="text-light">
+            <h1 
+              style={{color:'rgb(200,37,6)', font: '40px Phosphate Inline, sans-serif', fontWeight:'300'}}
+            >
               <b>mSigPortal</b>
             </h1>
           </div>
@@ -101,9 +109,9 @@ export default function Home({ links }) {
           ></div>
           <div
             className="col-12 text-center mt-2 font-weight-bold"
-            style={{ width: '100%', fontSize: '18pt' }}
+            style={{ width: '100%', fontSize: '18pt', color: 'black', fontStyle: 'italic' }}
           >
-            App Description
+            Integrative mutational signature portal for cancer genomic study
           </div>
           <div
             className="col-12 text-center mt-5"
@@ -111,24 +119,37 @@ export default function Home({ links }) {
           ></div>
         </div>
       </div>
-
+      
       {/* mobile */}
       <div className="text-center mt-2 d-md-none">
         <h1 className="text-dark">
           <b>mSigPortal</b>
         </h1>
         <hr className="w-75"></hr>
-        <div className="px-3 text-center">App Description</div>
+        <div className="px-3 text-center">
+          <b>Integrative mutational signature portal for cancer genomic study</b>
+        </div>
       </div>
-
+      
+      <div 
+        className="container align-middle "
+        style={{ 
+          marginTop: '50px', 
+          textAlign: 'left'
+        }}
+      >
+        Mutational signatures are characteristic combination of mutation types arising from specific mutagenesis processes such as DNA replication infidelity, exogenous or endogenous exposures, defective DNA repair and DNA enzymatic editing. Analysis of mutational signatures is becoming routine in cancer genomics and provide a novel opportunity for biomarker discovery, tumor diagnostics and treatment guidance. mSigPortal will provide the state-of-the art methods and platform to explore, visualize and analyze mutational signatures, which will greatly facilitate broad investigation of mutational signatures to elucidate different mutagenesis processes involved in tumorigenesis.  Currently, mSigPortal includes the following modules:
+      </div>
+        
       <div
         className="container align-middle text-center"
         style={{ marginTop: '70px' }}
       >
-        {cardRow(links.slice(0, 1), colors[0])}
-        {cardRow(links.slice(1, 2), colors[1])}
-        {cardRow(links.slice(2, 3), colors[2])}
-        {cardRow(links.slice(3, 4), colors[3])}
+        
+        {cardRow(links.slice(0, 1))}
+        {cardRow(links.slice(1, 2))}
+        {cardRow(links.slice(2, 3))}
+        {cardRow(links.slice(3, 4))}
       </div>
     </>
   );
