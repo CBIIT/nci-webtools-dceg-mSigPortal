@@ -16,7 +16,7 @@ export default function Home({ links }) {
             index
           ) => (
 
-            <div class="d-flex bd-highlight w-100" key={title}>
+            <div className="d-flex bd-highlight w-100" key={title}>
 
               <Card
                 key={title}
@@ -71,7 +71,7 @@ export default function Home({ links }) {
                   </div>
                 </Card.Body>
               </Card>
-              <div class="description d-none d-md-block">
+              <div className="description d-none d-md-block">
                 {description}
               </div>
 

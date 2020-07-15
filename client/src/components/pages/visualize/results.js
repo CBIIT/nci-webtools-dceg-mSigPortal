@@ -36,7 +36,17 @@ export default function Results() {
     displayedPlotIndex,
     plotURL,
     error,
+    sigProfileType,
+    signatureSet,
+    selectName2,
+    selectSigFormula,
+    sigFormula,
+    rPlots,
+    rPlotIndex,
+    rPlotURL,
+    submitOverlay,
     debug,
+    debugR,
   } = useSelector((state) => state.visualizeResults);
 
   useEffect(() => {
@@ -51,6 +61,12 @@ export default function Results() {
       setPlot(0);
     }
   }, [mapping]);
+
+  useEffect(() => {
+    if (rPlots.length && !rPlotIndex.length) {
+      setPlot(0, 'r');
+    }
+  }, [rPlots]);
 
   useEffect(() => {
     setPlot(0);
@@ -78,17 +94,17 @@ export default function Results() {
     );
   }
 
-  async function setPlot(index) {
-    const plot = filtered[index];
+  async function setPlot(index, type = 'python') {
+    let plot = filtered[index];
+    if (type == 'r') plot = rPlots[index];
     if (plot) {
-      console.log(plot.Location);
       const response = await fetch(`${root}visualize/svg`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ path: plot.Location }),
+        body: JSON.stringify({ path: plot.Location || plot }),
       });
       if (!response.ok) {
         const { msg } = await response.json();
@@ -98,12 +114,21 @@ export default function Results() {
         const objectURL = URL.createObjectURL(pic);
 
         if (plotURL.length) URL.revokeObjectURL(plotURL);
-        store.dispatch(
-          updateVisualizeResults({
-            displayedPlotIndex: index,
-            plotURL: objectURL,
-          })
-        );
+        if (type == 'python') {
+          store.dispatch(
+            updateVisualizeResults({
+              displayedPlotIndex: index,
+              plotURL: objectURL,
+            })
+          );
+        } else {
+          store.dispatch(
+            updateVisualizeResults({
+              rPlotIndex: index,
+              rPlotURL: objectURL,
+            })
+          );
+        }
       }
     } else {
       console.log('invalid index', index);
@@ -242,6 +267,46 @@ export default function Results() {
       })
     );
     setPlot(0);
+  }
+
+  async function submitR() {
+    store.dispatch(updateVisualizeResults({ submitOverlay: true }));
+    let args = {
+      profileName: sigProfileType,
+      signatureSetName: signatureSet,
+      sampleName: selectName2,
+      signatureName: null,
+      formula: null,
+      projectID: projectID,
+    };
+    selectSigFormula == 'signature'
+      ? (args.signatureName = sigFormula)
+      : (args.formula = sigFormula);
+
+    const response = await fetch(`${root}api/visualizeR`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(args),
+    });
+    if (!response.ok) {
+      const { msg } = await response.json();
+      store.dispatch(
+        updateError({ visible: true, message: msg, submitOverlay: false })
+      );
+    } else {
+      const data = await response.json();
+      console.log(data);
+      store.dispatch(
+        updateVisualizeResults({
+          debugR: data.debugR,
+          rPlots: data.plots,
+          submitOverlay: false,
+        })
+      );
+    }
   }
 
   return error.length ? (
@@ -418,6 +483,155 @@ export default function Results() {
         <pre className="border">{debug.stdout}</pre>
         <div>stderr</div>
         <pre className="border">{debug.stderr}</pre>
+      </div>
+      <Label>Additional Plots</Label>
+      <div className="border rounded p-2">
+        <LoadingOverlay active={submitOverlay} />
+        <Row className="justify-content-center">
+          <Col sm="4">
+            <Group controlId="sigProfileType">
+              <Label>Signature Profile Type</Label>
+              <Control
+                as="select"
+                value={sigProfileType}
+                onChange={(e) =>
+                  store.dispatch(
+                    updateVisualizeResults({ sigProfileType: e.target.value })
+                  )
+                }
+                custom
+              >
+                <option value="SBS">SBS</option>
+                <option value="DBS">DBS</option>
+                <option value="ID">ID</option>
+              </Control>
+            </Group>
+          </Col>
+          <Col sm="4">
+            <Group controlId="signatureSet">
+              <Label>Reference Set</Label>
+              <Control
+                as="select"
+                value={signatureSet}
+                onChange={(e) =>
+                  store.dispatch(
+                    updateVisualizeResults({ signatureSet: e.target.value })
+                  )
+                }
+                custom
+              >
+                <option value="COSMIC v3 Signatures (SBS)">
+                  COSMIC v3 Signatures (SBS)
+                </option>
+              </Control>
+            </Group>
+          </Col>
+          <Col sm="4">
+            <Group controlId="selectName2">
+              <Label>Sample Name</Label>
+              <Control
+                as="select"
+                value={selectName2}
+                onChange={(e) =>
+                  store.dispatch(
+                    updateVisualizeResults({ selectName2: e.target.value })
+                  )
+                }
+                custom
+              >
+                <option value="0" disabled>
+                  Select
+                </option>
+                {nameOptions.map((sampleName, index) => {
+                  return (
+                    <option key={index} value={sampleName}>
+                      {sampleName}
+                    </option>
+                  );
+                })}
+              </Control>
+            </Group>
+          </Col>
+        </Row>
+        <Row className="justify-content-center">
+          <Col sm="6">
+            <Group
+              controlId="selectSigFormula"
+              className="d-flex align-items-center"
+            >
+              <Label className="mr-auto">Signature/Formula</Label>
+              <Control
+                as="select"
+                value={selectSigFormula}
+                onChange={(e) =>
+                  store.dispatch(
+                    updateVisualizeResults({ selectSigFormula: e.target.value })
+                  )
+                }
+                custom
+                style={{ width: '150px' }}
+              >
+                <option value="signature">Signature</option>
+                <option value="formula">Formula</option>
+              </Control>
+            </Group>
+          </Col>
+          <Col sm="6">
+            <Control
+              type="text"
+              // size="sm"
+              placeholder={selectSigFormula}
+              value={sigFormula}
+              onChange={(e) =>
+                store.dispatch(
+                  updateVisualizeResults({ sigFormula: e.target.value })
+                )
+              }
+            ></Control>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Button variant="primary" onClick={() => submitR()}>
+              Calculate
+            </Button>
+          </Col>
+        </Row>
+      </div>
+      <div className="mt-2 p-2 border rounded">
+        <Col sm="auto">
+          <Control
+            as="select"
+            value={rPlotIndex}
+            onChange={(e) => setPlot(e.target.value, 'r')}
+            custom
+          >
+            {rPlots.map((plot, index) => {
+              return (
+                <option key={index} value={index}>
+                  {plot}
+                </option>
+              );
+            })}
+          </Control>
+        </Col>
+        <Row>
+          <Col>
+            <img className="w-100 my-4" src={rPlotURL}></img>
+          </Col>
+        </Row>
+        <div>
+          <div>R output</div>
+          <div className="border">
+            {debugR.map((line, index) => {
+              return (
+                <p className="m-0">
+                  {index}| {line}
+                </p>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   ) : (
