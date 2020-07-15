@@ -291,15 +291,22 @@ export default function Results() {
       },
       body: JSON.stringify(args),
     });
-    const data = await response.json();
-    console.log(data);
-    store.dispatch(
-      updateVisualizeResults({
-        debugR: data.debugR,
-        rPlots: data.plots,
-        submitOverlay: false,
-      })
-    );
+    if (!response.ok) {
+      const { msg } = await response.json();
+      store.dispatch(
+        updateError({ visible: true, message: msg, submitOverlay: false })
+      );
+    } else {
+      const data = await response.json();
+      console.log(data);
+      store.dispatch(
+        updateVisualizeResults({
+          debugR: data.debugR,
+          rPlots: data.plots,
+          submitOverlay: false,
+        })
+      );
+    }
   }
 
   return error.length ? (
