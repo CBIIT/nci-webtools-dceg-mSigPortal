@@ -292,9 +292,13 @@ export default function Results() {
       body: JSON.stringify(args),
     });
     if (!response.ok) {
-      const { msg } = await response.json();
+      const err = await response.text();
+      console.log(err);
+      // store.dispatch(updateError({ visible: true, message: err }));
       store.dispatch(
-        updateError({ visible: true, message: msg, submitOverlay: false })
+        updateVisualizeResults({
+          submitOverlay: false,
+        })
       );
     } else {
       const data = await response.json();
@@ -623,13 +627,17 @@ export default function Results() {
         <div>
           <div>R output</div>
           <div className="border">
-            {debugR.map((line, index) => {
-              return (
-                <p className="m-0">
-                  {index}| {line}
-                </p>
-              );
-            })}
+            {Array.isArray(debugR) ? (
+              debugR.map((line, index) => {
+                return (
+                  <p className="m-0">
+                    {index}| {line}
+                  </p>
+                );
+              })
+            ) : (
+              <p>{debugR}</p>
+            )}
           </div>
         </div>
       </div>

@@ -108,26 +108,30 @@ app.post('/api/visualizeR', (req, res) => {
   if (!fs.existsSync(plotSavePath)) {
     fs.mkdirSync(plotSavePath);
   }
-  const rOut = r('api/R/visualizeWrapper.R', 'generatePlots', {
-    profileName: req.body.profileName,
-    signatureSetName: req.body.signatureSetName,
-    sampleName: req.body.sampleName,
-    signatureName: req.body.signatureName,
-    formula: req.body.formula,
-    projectID: req.body.projectID,
-    pythonOutput: path.join(tmppath, req.body.projectID, 'results/output'),
-    savePath: plotSavePath,
-  });
-  const plots = fs
-    .readdirSync(plotSavePath)
-    .map((plot) => path.join(plotSavePath, plot));
+  try {
+    const rOut = r('api/R/visualizeWrapper.R', 'generatePlots', {
+      profileName: req.body.profileName,
+      signatureSetName: req.body.signatureSetName,
+      sampleName: req.body.sampleName,
+      signatureName: req.body.signatureName,
+      formula: req.body.formula,
+      projectID: req.body.projectID,
+      pythonOutput: path.join(tmppath, req.body.projectID, 'results/output'),
+      savePath: plotSavePath,
+    });
+    const plots = fs
+      .readdirSync(plotSavePath)
+      .map((plot) => path.join(plotSavePath, plot));
 
-  console.log('rOut', rOut);
+    console.log('rOut', rOut);
 
-  res.json({
-    debugR: rOut,
-    plots: plots,
-  });
+    res.json({
+      debugR: rOut,
+      plots: plots,
+    });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
 });
 
 app.post('/visualize/upload', (req, res, next) => {
