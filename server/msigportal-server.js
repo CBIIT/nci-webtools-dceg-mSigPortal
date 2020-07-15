@@ -10,6 +10,7 @@ const rimraf = require('rimraf');
 const { v4: uuidv4 } = require('uuid');
 const Papa = require('papaparse');
 const tar = require('tar');
+const r = require('r-wrapper');
 const AWS = require('aws-sdk');
 
 const app = express();
@@ -54,9 +55,8 @@ app.post('/api/visualize', (req, res) => {
   logger.info('/API/VISUALIZE: Spawning Python Process');
   let reqBody = { ...req.body };
   // update paths
-  const resultsDir = path.join(reqBody.outputDir[1], 'results');
   reqBody.inputFile[1] = path.join(tmppath, reqBody.inputFile[1]);
-  reqBody.outputDir[1] = path.join(tmppath, resultsDir);
+  reqBody.outputDir[1] = path.join(tmppath, reqBody.outputDir[1], 'results');
   const args = Object.values(reqBody);
   const cli = args.reduce((params, arg) => [...params, ...arg]);
 
@@ -94,6 +94,22 @@ app.post('/api/visualize', (req, res) => {
       });
     }
   });
+});
+
+app.post('/api/visualizeR', (req, res) => {
+  logger.info('/API/VISUALIZER: Calling R Wrapper');
+  console.log(req.body);
+  const plots = r('api/R/visualizeWrapper.R', 'generatePlots', {
+    profileName: req.body.profileName,
+    signatureSetName: req.body.signatureSetName,
+    sampleName: req.body.sampleName,
+    signatureName: req.body.signatureName,
+    formula: req.body.formula,
+    projectID: req.body.projectID,
+    savePath: path.join(tmppath, req.body.projectID, 'results/output'),
+  });
+  console.log(plots);
+  res.send(plots);
 });
 
 app.post('/visualize/upload', (req, res, next) => {
