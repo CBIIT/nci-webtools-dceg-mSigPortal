@@ -97,11 +97,12 @@ export default function Home({ links }) {
         </div>
         <div className="banner-overlay-text row justify-content-center text-center text-light w-75">
           <div className="col-12">
-            <h1 
-              style={{color:'rgb(200,37,6)', font: '40px Phosphate Inline, sans-serif', fontWeight:'300'}}
-            >
-              <b>mSigPortal</b>
-            </h1>
+            <img src="assets/images/msigportal.svg"
+              style={{
+                width: '50%',
+                marginTop: '30px'
+              }}
+            ></img>
           </div>
           <div
             className="col-6 w-50 my-3 align-self-center"
