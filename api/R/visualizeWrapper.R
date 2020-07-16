@@ -1,8 +1,10 @@
 library(tidyverse)
 library(cowplot)
-library(hrbrthemes)
 library(ggsci)
 library(ggrepel)
+library(hrbrthemes)
+
+import_roboto_condensed()
 library(factoextra)
 
 
@@ -18,8 +20,6 @@ generatePlots <- function(profileName, signatureSetName, sampleName, signatureNa
     con <- textConnection('stdout', 'wr', local = TRUE)
     sink(con, type = "message")
     sink(con, type = "output")
-    print(getwd())
-    print(savePath)
     # on the web, we need the dropdown list for signature Profile Type and reference set name --------
     matrix <- if_else(profileName == "SBS", "SBS96", if_else(profileName == "DBS", "DBS78", if_else(profileName == "ID", "ID83", NA_character_)))
 
