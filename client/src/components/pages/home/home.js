@@ -99,8 +99,8 @@ export default function Home({ links }) {
           <div className="col-12">
             <img src="assets/images/msigportal.svg"
               style={{
-                width: '50%',
-                marginTop: '30px'
+                width: '550px',
+                height: '50px'
               }}
             ></img>
           </div>
