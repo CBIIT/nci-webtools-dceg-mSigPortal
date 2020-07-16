@@ -105,7 +105,7 @@ export default function Home({ links }) {
           </div>
           <div
             className="col-6 w-50 my-3 align-self-center"
-            style={{ borderTop: '3px solid white' }}
+            style={{ borderTop: '3px solid', color:'rgb(200,37,6)' }}
           ></div>
           <div
             className="col-12 text-center mt-2 font-weight-bold"
