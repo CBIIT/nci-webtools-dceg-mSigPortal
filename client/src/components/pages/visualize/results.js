@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faChevronRight,
-  faChevronLeft,
-} from '@fortawesome/free-solid-svg-icons';
 import { useSelector } from 'react-redux';
 import {
   store,
@@ -252,23 +247,6 @@ export default function Results() {
     );
   }
 
-  function resetSelect() {
-    store.dispatch(
-      updateVisualizeResults({
-        filtered: mapping,
-        selectName: '0',
-        selectProfile: '0',
-        selectMatrix: '0',
-        selectTag: '0',
-        nameOptions: [...new Set(mapping.map((plot) => plot.Sample_Name))],
-        profileOptions: [...new Set(mapping.map((plot) => plot.Profile_Type))],
-        matrixOptions: [...new Set(mapping.map((plot) => plot.Matrix))],
-        tagOptions: [...new Set(mapping.map((plot) => plot.Tag))],
-      })
-    );
-    setPlot(0);
-  }
-
   async function submitR() {
     store.dispatch(updateVisualizeResults({ submitOverlay: true }));
     let args = {
@@ -292,9 +270,15 @@ export default function Results() {
       body: JSON.stringify(args),
     });
     if (!response.ok) {
-      const { msg } = await response.json();
+      const err = await response.text();
+      console.log(err);
+      // store.dispatch(updateError({ visible: true, message: err }));
       store.dispatch(
-        updateError({ visible: true, message: msg, submitOverlay: false })
+        updateVisualizeResults({
+          debugR: err,
+          rPlots: [],
+          submitOverlay: false,
+        })
       );
     } else {
       const data = await response.json();
@@ -318,148 +302,96 @@ export default function Results() {
           <span className="d-flex">
             <Label className="py-1">Results</Label>
           </span>
-          <Row className="justify-content-center">
-            <Col sm="3">
-              <Label>Sample Name</Label>
-              <Control
-                as="select"
-                value={selectName}
-                onChange={(e) => filterSampleName(e.target.value)}
-                // defaultValue="unselected"
-                custom
-              >
-                <option value="0" disabled>
-                  Select
-                </option>
-                {nameOptions.map((sampleName, index) => {
-                  return (
-                    <option key={index} value={sampleName}>
-                      {sampleName}
-                    </option>
-                  );
-                })}
-              </Control>
-            </Col>
-            <Col sm="3">
-              <Label>Profile Type</Label>
-              <Control
-                disabled={selectName == '0'}
-                as="select"
-                value={selectProfile}
-                onChange={(e) => filterProfileType(e.target.value)}
-                custom
-              >
-                <option value="0" disabled>
-                  Select
-                </option>
-                {profileOptions.map((profile, index) => {
-                  return (
-                    <option key={index} value={profile}>
-                      {profile}
-                    </option>
-                  );
-                })}
-              </Control>
-            </Col>
-            <Col sm="3">
-              <Label>Matrix</Label>
-              <Control
-                disabled={selectProfile == '0'}
-                as="select"
-                value={selectMatrix}
-                onChange={(e) => filterMatrix(e.target.value)}
-                custom
-              >
-                <option value="0" disabled>
-                  Select
-                </option>
-                {matrixOptions.map((matrix, index) => {
-                  return (
-                    <option key={index} value={matrix}>
-                      {matrix}
-                    </option>
-                  );
-                })}
-              </Control>
-            </Col>
-            <Col sm="3">
-              <Label>Tag</Label>
-              <Control
-                disabled={selectMatrix == '0'}
-                as="select"
-                value={selectTag}
-                onChange={(e) => filterTag(e.target.value)}
-                custom
-              >
-                <option value="0" disabled>
-                  Select
-                </option>
-                {tagOptions.map((tag, index) => {
-                  return (
-                    <option key={index} value={tag}>
-                      {tag}
-                    </option>
-                  );
-                })}
-              </Control>
-            </Col>
-          </Row>
-          <Row className="justify-content-center mt-4">
-            <Col sm="auto">
-              <button
-                className="faButton navButton"
-                onClick={(e) => {
-                  e.preventDefault();
-                  prevPlot();
-                }}
-              >
-                <FontAwesomeIcon icon={faChevronLeft} size="2x" />
-              </button>
-            </Col>
-            <Col sm="auto">
-              <Control
-                as="select"
-                value={displayedPlotIndex}
-                onChange={(e) => setPlot(e.target.value)}
-                custom
-              >
-                {filtered.map((plot, index) => {
-                  return (
-                    <option key={index} value={index}>
-                      {`${plot.Sample_Name} | ${plot.Profile_Type} | ${plot.Matrix} | ${plot.Tag}`}
-                    </option>
-                  );
-                })}
-              </Control>
-            </Col>
-            <Col sm="auto">
-              <button
-                className="faButton navButton"
-                onClick={(e) => {
-                  e.preventDefault();
-                  nextPlot();
-                }}
-              >
-                <FontAwesomeIcon icon={faChevronRight} size="2x" />
-              </button>
-            </Col>
-            <Col sm="auto">
-              <Button
-                variant="secondary"
-                type="reset"
-                onClick={() => resetSelect()}
-              >
-                Reset
-              </Button>
-            </Col>
-          </Row>
+          <div className="border rounded p-2">
+            <Row className="justify-content-center">
+              <Col sm="3">
+                <Label>Sample Name</Label>
+                <Control
+                  as="select"
+                  value={selectName}
+                  onChange={(e) => filterSampleName(e.target.value)}
+                  // defaultValue="unselected"
+                  custom
+                >
+                  <option value="0" disabled>
+                    Select
+                  </option>
+                  {nameOptions.map((sampleName, index) => {
+                    return (
+                      <option key={index} value={sampleName}>
+                        {sampleName}
+                      </option>
+                    );
+                  })}
+                </Control>
+              </Col>
+              <Col sm="3">
+                <Label>Profile Type</Label>
+                <Control
+                  disabled={selectName == '0'}
+                  as="select"
+                  value={selectProfile}
+                  onChange={(e) => filterProfileType(e.target.value)}
+                  custom
+                >
+                  <option value="0" disabled>
+                    Select
+                  </option>
+                  {profileOptions.map((profile, index) => {
+                    return (
+                      <option key={index} value={profile}>
+                        {profile}
+                      </option>
+                    );
+                  })}
+                </Control>
+              </Col>
+              <Col sm="3">
+                <Label>Matrix</Label>
+                <Control
+                  disabled={selectProfile == '0'}
+                  as="select"
+                  value={selectMatrix}
+                  onChange={(e) => filterMatrix(e.target.value)}
+                  custom
+                >
+                  <option value="0" disabled>
+                    Select
+                  </option>
+                  {matrixOptions.map((matrix, index) => {
+                    return (
+                      <option key={index} value={matrix}>
+                        {matrix}
+                      </option>
+                    );
+                  })}
+                </Control>
+              </Col>
+              <Col sm="3">
+                <Label>Tag</Label>
+                <Control
+                  disabled={selectMatrix == '0'}
+                  as="select"
+                  value={selectTag}
+                  onChange={(e) => filterTag(e.target.value)}
+                  custom
+                >
+                  <option value="0" disabled>
+                    Select
+                  </option>
+                  {tagOptions.map((tag, index) => {
+                    return (
+                      <option key={index} value={tag}>
+                        {tag}
+                      </option>
+                    );
+                  })}
+                </Control>
+              </Col>
+            </Row>
+          </div>
         </Group>
       </Form>
-      <Row>
-        <Col>
-          <img className="w-100 my-4" src={plotURL}></img>
-        </Col>
-      </Row>
       <div className="d-flex">
         <a className="ml-2 px-2 py-1" href={plotURL} download={getPlotName()}>
           Download Plot
@@ -478,128 +410,137 @@ export default function Results() {
           </Button>
         </span>
       </div>
-      <div>
-        <div>stdout</div>
-        <pre className="border">{debug.stdout}</pre>
-        <div>stderr</div>
-        <pre className="border">{debug.stderr}</pre>
-      </div>
-      <Label>Additional Plots</Label>
-      <div className="border rounded p-2">
-        <LoadingOverlay active={submitOverlay} />
-        <Row className="justify-content-center">
-          <Col sm="4">
-            <Group controlId="sigProfileType">
-              <Label>Signature Profile Type</Label>
-              <Control
-                as="select"
-                value={sigProfileType}
-                onChange={(e) =>
-                  store.dispatch(
-                    updateVisualizeResults({ sigProfileType: e.target.value })
-                  )
-                }
-                custom
-              >
-                <option value="SBS">SBS</option>
-                <option value="DBS">DBS</option>
-                <option value="ID">ID</option>
-              </Control>
-            </Group>
-          </Col>
-          <Col sm="4">
-            <Group controlId="signatureSet">
-              <Label>Reference Set</Label>
-              <Control
-                as="select"
-                value={signatureSet}
-                onChange={(e) =>
-                  store.dispatch(
-                    updateVisualizeResults({ signatureSet: e.target.value })
-                  )
-                }
-                custom
-              >
-                <option value="COSMIC v3 Signatures (SBS)">
-                  COSMIC v3 Signatures (SBS)
-                </option>
-              </Control>
-            </Group>
-          </Col>
-          <Col sm="4">
-            <Group controlId="selectName2">
-              <Label>Sample Name</Label>
-              <Control
-                as="select"
-                value={selectName2}
-                onChange={(e) =>
-                  store.dispatch(
-                    updateVisualizeResults({ selectName2: e.target.value })
-                  )
-                }
-                custom
-              >
-                <option value="0" disabled>
-                  Select
-                </option>
-                {nameOptions.map((sampleName, index) => {
-                  return (
-                    <option key={index} value={sampleName}>
-                      {sampleName}
-                    </option>
-                  );
-                })}
-              </Control>
-            </Group>
-          </Col>
-        </Row>
-        <Row className="justify-content-center">
-          <Col sm="6">
-            <Group
-              controlId="selectSigFormula"
-              className="d-flex align-items-center"
-            >
-              <Label className="mr-auto">Signature/Formula</Label>
-              <Control
-                as="select"
-                value={selectSigFormula}
-                onChange={(e) =>
-                  store.dispatch(
-                    updateVisualizeResults({ selectSigFormula: e.target.value })
-                  )
-                }
-                custom
-                style={{ width: '150px' }}
-              >
-                <option value="signature">Signature</option>
-                <option value="formula">Formula</option>
-              </Control>
-            </Group>
-          </Col>
-          <Col sm="6">
-            <Control
-              type="text"
-              // size="sm"
-              placeholder={selectSigFormula}
-              value={sigFormula}
-              onChange={(e) =>
-                store.dispatch(
-                  updateVisualizeResults({ sigFormula: e.target.value })
-                )
-              }
-            ></Control>
-          </Col>
-        </Row>
+      <div className="border rounded p-2 mb-2">
         <Row>
           <Col>
-            <Button variant="primary" onClick={() => submitR()}>
-              Calculate
-            </Button>
+            <img className="w-100 my-4" src={plotURL}></img>
           </Col>
         </Row>
       </div>
-      <div className="mt-2 p-2 border rounded">
-        <Col sm="auto">
+
+      <Form>
+        <Label>Additional Plots</Label>
+        <div className="border rounded p-2">
+          <LoadingOverlay active={submitOverlay} />
+          <Row className="justify-content-center">
+            <Col sm="4">
+              <Group controlId="sigProfileType">
+                <Label>Signature Profile Type</Label>
+                <Control
+                  as="select"
+                  value={sigProfileType}
+                  onChange={(e) =>
+                    store.dispatch(
+                      updateVisualizeResults({ sigProfileType: e.target.value })
+                    )
+                  }
+                  custom
+                >
+                  <option value="SBS">SBS</option>
+                  <option value="DBS">DBS</option>
+                  <option value="ID">ID</option>
+                </Control>
+              </Group>
+            </Col>
+            <Col sm="4">
+              <Group controlId="signatureSet">
+                <Label>Reference Set</Label>
+                <Control
+                  as="select"
+                  value={signatureSet}
+                  onChange={(e) =>
+                    store.dispatch(
+                      updateVisualizeResults({ signatureSet: e.target.value })
+                    )
+                  }
+                  custom
+                >
+                  <option value="COSMIC v3 Signatures (SBS)">
+                    COSMIC v3 Signatures (SBS)
+                  </option>
+                </Control>
+              </Group>
+            </Col>
+            <Col sm="4">
+              <Group controlId="selectName2">
+                <Label>Sample Name</Label>
+                <Control
+                  as="select"
+                  value={selectName2}
+                  onChange={(e) =>
+                    store.dispatch(
+                      updateVisualizeResults({ selectName2: e.target.value })
+                    )
+                  }
+                  custom
+                >
+                  <option value="0" disabled>
+                    Select
+                  </option>
+                  {nameOptions.map((sampleName, index) => {
+                    return (
+                      <option key={index} value={sampleName}>
+                        {sampleName}
+                      </option>
+                    );
+                  })}
+                </Control>
+              </Group>
+            </Col>
+          </Row>
+          <Row className="justify-content-center">
+            <Col sm="6">
+              <Group
+                controlId="selectSigFormula"
+                className="d-flex align-items-center"
+              >
+                <Label className="mr-auto">Signature/Formula</Label>
+                <Control
+                  as="select"
+                  value={selectSigFormula}
+                  onChange={(e) =>
+                    store.dispatch(
+                      updateVisualizeResults({
+                        selectSigFormula: e.target.value,
+                      })
+                    )
+                  }
+                  custom
+                  style={{ width: '150px' }}
+                >
+                  <option value="signature">Signature</option>
+                  <option value="formula">Formula</option>
+                </Control>
+              </Group>
+            </Col>
+            <Col sm="6">
+              <Control
+                type="text"
+                // size="sm"
+                placeholder={selectSigFormula}
+                value={sigFormula}
+                onChange={(e) =>
+                  store.dispatch(
+                    updateVisualizeResults({ sigFormula: e.target.value })
+                  )
+                }
+              ></Control>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <Button variant="primary" onClick={() => submitR()}>
+                Calculate
+              </Button>
+            </Col>
+          </Row>
+        </div>
+      </Form>
+      <div
+        className="mt-2 p-2 border rounded"
+        style={{ display: rPlots.length ? 'block' : 'none' }}
+      >
+        <Col sm="auto" className="p-0">
           <Control
             as="select"
             value={rPlotIndex}
@@ -620,17 +561,28 @@ export default function Results() {
             <img className="w-100 my-4" src={rPlotURL}></img>
           </Col>
         </Row>
-        <div>
-          <div>R output</div>
-          <div className="border">
-            {debugR.map((line, index) => {
+      </div>
+      <div className="border rounded p-1 my-2">
+        <div>python</div>
+        <div>stdout</div>
+        <pre className="border">{debug.stdout}</pre>
+        <div>stderr</div>
+        <pre className="border">{debug.stderr}</pre>
+      </div>
+      <div className="border rounded p-1">
+        <div>R output</div>
+        <div className="border">
+          {Array.isArray(debugR) ? (
+            debugR.map((line, index) => {
               return (
                 <p className="m-0">
                   {index}| {line}
                 </p>
               );
-            })}
-          </div>
+            })
+          ) : (
+            <p>{debugR}</p>
+          )}
         </div>
       </div>
     </div>
