@@ -133,9 +133,11 @@ export default function Home({ links }) {
       </div>
       
       <div 
-        className="container align-middle "
+        className="align-middle"
         style={{ 
           marginTop: '50px', 
+          marginLeft: '80px',
+          marginRight: '50px',
           textAlign: 'left'
         }}
       >

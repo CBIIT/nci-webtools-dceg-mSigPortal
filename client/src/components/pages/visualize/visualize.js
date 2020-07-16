@@ -19,7 +19,7 @@ export default function Visualize() {
   }
 
   return (
-    <div className="container">
+    <div className>
       <SidebarContainer
         className="my-3"
         collapsed={!openSidebar}
