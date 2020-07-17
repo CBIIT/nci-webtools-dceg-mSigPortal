@@ -25,6 +25,7 @@ export const getInitialState = () => ({
   visualizeResults: {
     error: '',
     projectID: '',
+    displayTab: 'python',
     mapping: [],
     filtered: [],
     selectName: '0',
