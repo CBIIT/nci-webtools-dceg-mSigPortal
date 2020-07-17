@@ -19,9 +19,9 @@ export default function Visualize() {
   }
 
   return (
-    <div className>
+    <div className="position-relative">
       <SidebarContainer
-        className="my-3"
+        className="m-3"
         collapsed={!openSidebar}
         onCollapsed={(e) => setOpenSidebar(!e)}
       >
@@ -38,7 +38,7 @@ export default function Visualize() {
               </div>
             </div>
           </div>
-          <hr className="d-lg-none" style={{opacity:0}}></hr>
+          <hr className="d-lg-none" style={{ opacity: 0 }}></hr>
         </SidebarPanel>
         <MainPanel className="col-lg-8">
           <div
