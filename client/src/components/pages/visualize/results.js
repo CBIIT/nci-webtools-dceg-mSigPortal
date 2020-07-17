@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Form, Row, Col, Button, Card, Nav } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
-  store,
-  updateVisualizeResults,
-  updateError,
+  dispatchError,
+  dispatchVisualizeResults,
 } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
@@ -81,16 +80,15 @@ export default function Results() {
       body: JSON.stringify({ projectID: projectID }),
     });
     const mapping = await response.json();
-    store.dispatch(
-      updateVisualizeResults({
-        mapping: mapping,
-        filtered: mapping,
-        nameOptions: [...new Set(mapping.map((plot) => plot.Sample_Name))],
-        profileOptions: [...new Set(mapping.map((plot) => plot.Profile_Type))],
-        matrixOptions: [...new Set(mapping.map((plot) => plot.Matrix))],
-        tagOptions: [...new Set(mapping.map((plot) => plot.Tag))],
-      })
-    );
+
+    dispatchVisualizeResults({
+      mapping: mapping,
+      filtered: mapping,
+      nameOptions: [...new Set(mapping.map((plot) => plot.Sample_Name))],
+      profileOptions: [...new Set(mapping.map((plot) => plot.Profile_Type))],
+      matrixOptions: [...new Set(mapping.map((plot) => plot.Matrix))],
+      tagOptions: [...new Set(mapping.map((plot) => plot.Tag))],
+    });
   }
 
   async function setPlot(index, type = 'python') {
@@ -107,26 +105,22 @@ export default function Results() {
       });
       if (!response.ok) {
         const { msg } = await response.json();
-        store.dispatch(updateError({ visible: true, message: msg }));
+        dispatchError({ visible: true, message: msg });
       } else {
         const pic = await response.blob();
         const objectURL = URL.createObjectURL(pic);
 
         if (plotURL.length) URL.revokeObjectURL(plotURL);
         if (type == 'python') {
-          store.dispatch(
-            updateVisualizeResults({
-              displayedPlotIndex: index,
-              plotURL: objectURL,
-            })
-          );
+          dispatchVisualizeResults({
+            displayedPlotIndex: index,
+            plotURL: objectURL,
+          });
         } else {
-          store.dispatch(
-            updateVisualizeResults({
-              rPlotIndex: index,
-              rPlotURL: objectURL,
-            })
-          );
+          dispatchVisualizeResults({
+            rPlotIndex: index,
+            rPlotURL: objectURL,
+          });
         }
       }
     } else {
@@ -158,7 +152,7 @@ export default function Results() {
     if (!response.ok) {
       setOverlay(false);
       const { msg } = await response.json();
-      store.dispatch(updateError({ visible: true, message: msg }));
+      dispatchError({ visible: true, message: msg });
     } else {
       setOverlay(false);
       const req = await response.json();
@@ -174,36 +168,32 @@ export default function Results() {
 
   function filterSampleName(name) {
     const filteredPlots = mapping.filter((plot) => plot.Sample_Name == name);
-    store.dispatch(
-      updateVisualizeResults({
-        selectName: name,
-        selectProfile: '0',
-        selectMatrix: '0',
-        selectTag: '0',
-        profileOptions: [
-          ...new Set(filteredPlots.map((plot) => plot.Profile_Type)),
-        ],
-        matrixOptions: [...new Set(filteredPlots.map((plot) => plot.Matrix))],
-        tagOptions: [...new Set(filteredPlots.map((plot) => plot.Tag))],
-        filtered: filteredPlots,
-      })
-    );
+    dispatchVisualizeResults({
+      selectName: name,
+      selectProfile: '0',
+      selectMatrix: '0',
+      selectTag: '0',
+      profileOptions: [
+        ...new Set(filteredPlots.map((plot) => plot.Profile_Type)),
+      ],
+      matrixOptions: [...new Set(filteredPlots.map((plot) => plot.Matrix))],
+      tagOptions: [...new Set(filteredPlots.map((plot) => plot.Tag))],
+      filtered: filteredPlots,
+    });
   }
 
   function filterProfileType(profile) {
     const filteredPlots = mapping.filter(
       (plot) => plot.Sample_Name == selectName && plot.Profile_Type == profile
     );
-    store.dispatch(
-      updateVisualizeResults({
-        selectProfile: profile,
-        selectMatrix: '0',
-        selectTag: '0',
-        matrixOptions: [...new Set(filteredPlots.map((plot) => plot.Matrix))],
-        tagOptions: [...new Set(filteredPlots.map((plot) => plot.Tag))],
-        filtered: filteredPlots,
-      })
-    );
+    dispatchVisualizeResults({
+      selectProfile: profile,
+      selectMatrix: '0',
+      selectTag: '0',
+      matrixOptions: [...new Set(filteredPlots.map((plot) => plot.Matrix))],
+      tagOptions: [...new Set(filteredPlots.map((plot) => plot.Tag))],
+      filtered: filteredPlots,
+    });
   }
 
   function filterMatrix(matrix) {
@@ -213,14 +203,12 @@ export default function Results() {
         plot.Profile_Type == selectProfile &&
         plot.Matrix == matrix
     );
-    store.dispatch(
-      updateVisualizeResults({
-        selectMatrix: matrix,
-        selectTag: '0',
-        tagOptions: [...new Set(filteredPlots.map((plot) => plot.Tag))],
-        filtered: filteredPlots,
-      })
-    );
+    dispatchVisualizeResults({
+      selectMatrix: matrix,
+      selectTag: '0',
+      tagOptions: [...new Set(filteredPlots.map((plot) => plot.Tag))],
+      filtered: filteredPlots,
+    });
   }
 
   function filterTag(tag) {
@@ -231,16 +219,14 @@ export default function Results() {
         plot.Matrix == selectMatrix &&
         plot.Tag == tag
     );
-    store.dispatch(
-      updateVisualizeResults({
-        selectTag: tag,
-        filtered: filteredPlots,
-      })
-    );
+    dispatchVisualizeResults({
+      selectTag: tag,
+      filtered: filteredPlots,
+    });
   }
 
   async function submitR() {
-    store.dispatch(updateVisualizeResults({ submitOverlay: true }));
+    dispatchVisualizeResults({ submitOverlay: true });
     let args = {
       profileName: sigProfileType,
       signatureSetName: signatureSet,
@@ -264,24 +250,19 @@ export default function Results() {
     if (!response.ok) {
       const err = await response.text();
       console.log(err);
-      // store.dispatch(updateError({ visible: true, message: err }));
-      store.dispatch(
-        updateVisualizeResults({
-          debugR: err,
-          rPlots: [],
-          submitOverlay: false,
-        })
-      );
+      dispatchVisualizeResults({
+        debugR: err,
+        rPlots: [],
+        submitOverlay: false,
+      });
     } else {
       const data = await response.json();
       console.log(data);
-      store.dispatch(
-        updateVisualizeResults({
-          debugR: data.debugR,
-          rPlots: data.plots,
-          submitOverlay: false,
-        })
-      );
+      dispatchVisualizeResults({
+        debugR: data.debugR,
+        rPlots: data.plots,
+        submitOverlay: false,
+      });
     }
   }
 
@@ -294,9 +275,7 @@ export default function Results() {
           <Item>
             <Link
               active={displayTab == 'python'}
-              onClick={() =>
-                store.dispatch(updateVisualizeResults({ displayTab: 'python' }))
-              }
+              onClick={() => dispatchVisualizeResults({ displayTab: 'python' })}
             >
               Python
             </Link>
@@ -304,9 +283,7 @@ export default function Results() {
           <Item>
             <Link
               active={displayTab == 'r'}
-              onClick={() =>
-                store.dispatch(updateVisualizeResults({ displayTab: 'r' }))
-              }
+              onClick={() => dispatchVisualizeResults({ displayTab: 'r' })}
             >
               R
             </Link>
@@ -450,11 +427,9 @@ export default function Results() {
                     as="select"
                     value={sigProfileType}
                     onChange={(e) =>
-                      store.dispatch(
-                        updateVisualizeResults({
-                          sigProfileType: e.target.value,
-                        })
-                      )
+                      dispatchVisualizeResults({
+                        sigProfileType: e.target.value,
+                      })
                     }
                     custom
                   >
@@ -471,9 +446,7 @@ export default function Results() {
                     as="select"
                     value={signatureSet}
                     onChange={(e) =>
-                      store.dispatch(
-                        updateVisualizeResults({ signatureSet: e.target.value })
-                      )
+                      dispatchVisualizeResults({ signatureSet: e.target.value })
                     }
                     custom
                   >
@@ -490,9 +463,7 @@ export default function Results() {
                     as="select"
                     value={selectName2}
                     onChange={(e) =>
-                      store.dispatch(
-                        updateVisualizeResults({ selectName2: e.target.value })
-                      )
+                      dispatchVisualizeResults({ selectName2: e.target.value })
                     }
                     custom
                   >
@@ -521,11 +492,9 @@ export default function Results() {
                     as="select"
                     value={selectSigFormula}
                     onChange={(e) =>
-                      store.dispatch(
-                        updateVisualizeResults({
-                          selectSigFormula: e.target.value,
-                        })
-                      )
+                      dispatchVisualizeResults({
+                        selectSigFormula: e.target.value,
+                      })
                     }
                     custom
                     style={{ width: '150px' }}
@@ -541,9 +510,7 @@ export default function Results() {
                   placeholder={selectSigFormula}
                   value={sigFormula}
                   onChange={(e) =>
-                    store.dispatch(
-                      updateVisualizeResults({ sigFormula: e.target.value })
-                    )
+                    dispatchVisualizeResults({ sigFormula: e.target.value })
                   }
                 ></Control>
               </Col>

@@ -7,10 +7,9 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useSelector } from 'react-redux';
 import './visualize.scss';
 import {
-  store,
-  updateVisualize,
-  updateVisualizeResults,
-  updateError,
+  dispatchVisualize,
+  dispatchVisualizeResults,
+  dispatchError,
   getInitialState,
 } from '../../../services/store';
 const { Group, Label, Control, Check, Text } = Form;
@@ -48,23 +47,6 @@ export default function UploadForm({ setOpenSidebar }) {
     onDrop,
     accept: '.csv, .tsv, .vcf, .gz, .zip, .tar, .tar.gz',
   });
-
-  function dispatchError(msg) {
-    store.dispatch(
-      updateError({
-        visible: true,
-        message: msg,
-      })
-    );
-  }
-
-  function dispatchVisualize(obj) {
-    store.dispatch(updateVisualize(obj));
-  }
-
-  function dispatchVisualizeResults(obj) {
-    store.dispatch(updateVisualizeResults(obj));
-  }
 
   async function handleSubmit() {
     // disable parameters after submit
