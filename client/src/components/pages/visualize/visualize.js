@@ -19,7 +19,7 @@ export default function Visualize() {
   }
 
   return (
-    <div className="container">
+    <div className style={{marginLeft:'5%',marginRight:'5%'}}>
       <SidebarContainer
         className="my-3"
         collapsed={!openSidebar}

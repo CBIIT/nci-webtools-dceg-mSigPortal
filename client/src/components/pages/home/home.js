@@ -16,7 +16,7 @@ export default function Home({ links }) {
             index
           ) => (
 
-            <div className="d-flex bd-highlight w-100" key={title}>
+            <div className="d-flex bd-highlight w-100" key={title} style={{marginRight:'1%'}}>
 
               <Card
                 key={title}
@@ -136,6 +136,8 @@ export default function Home({ links }) {
         className="container align-middle "
         style={{ 
           marginTop: '50px', 
+          marginLeft: '6%',
+          marginRight: '6%',
           textAlign: 'left'
         }}
       >
