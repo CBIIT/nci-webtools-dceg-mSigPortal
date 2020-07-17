@@ -134,18 +134,6 @@ export default function Results() {
     }
   }
 
-  function nextPlot() {
-    displayedPlotIndex < filtered.length - 1
-      ? setPlot(parseInt(displayedPlotIndex + 1))
-      : setPlot(0);
-  }
-
-  function prevPlot() {
-    displayedPlotIndex > 0
-      ? setPlot(parseInt(displayedPlotIndex - 1))
-      : setPlot(mapping.length - 1);
-  }
-
   function getPlotName() {
     if (displayedPlotIndex) {
       const plot = mapping[displayedPlotIndex];
@@ -424,9 +412,7 @@ export default function Results() {
             Download Plot
           </a>
           <span className="ml-auto">
-            <LoadingOverlay
-              active={downloadOverlay}
-            />
+            <LoadingOverlay active={downloadOverlay} />
             <Button
               className="px-2 py-1"
               variant="link"
