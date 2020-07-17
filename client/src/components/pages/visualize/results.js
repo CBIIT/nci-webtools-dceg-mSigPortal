@@ -95,33 +95,37 @@ export default function Results() {
     let plot = filtered[index];
     if (type == 'r') plot = rPlots[index];
     if (plot) {
-      const response = await fetch(`${root}visualize/svg`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ path: plot.Location || plot }),
-      });
-      if (!response.ok) {
-        const { msg } = await response.json();
-        dispatchError({ visible: true, message: msg });
-      } else {
-        const pic = await response.blob();
-        const objectURL = URL.createObjectURL(pic);
-
-        if (plotURL.length) URL.revokeObjectURL(plotURL);
-        if (type == 'python') {
-          dispatchVisualizeResults({
-            displayedPlotIndex: index,
-            plotURL: objectURL,
-          });
+      try {
+        const response = await fetch(`${root}visualize/svg`, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ path: plot.Location || plot }),
+        });
+        if (!response.ok) {
+          const { msg } = await response.json();
+          dispatchError(msg);
         } else {
-          dispatchVisualizeResults({
-            rPlotIndex: index,
-            rPlotURL: objectURL,
-          });
+          const pic = await response.blob();
+          const objectURL = URL.createObjectURL(pic);
+
+          if (plotURL.length) URL.revokeObjectURL(plotURL);
+          if (type == 'python') {
+            dispatchVisualizeResults({
+              displayedPlotIndex: index,
+              plotURL: objectURL,
+            });
+          } else if (type == 'r') {
+            dispatchVisualizeResults({
+              rPlotIndex: index,
+              rPlotURL: objectURL,
+            });
+          }
         }
+      } catch (err) {
+        dispatchError(err);
       }
     } else {
       console.log('invalid index', index);
@@ -141,28 +145,32 @@ export default function Results() {
 
   async function downloadResults() {
     setOverlay(true);
-    const response = await fetch(`${root}visualize/results`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ projectID: projectID }),
-    });
-    if (!response.ok) {
-      setOverlay(false);
-      const { msg } = await response.json();
-      dispatchError({ visible: true, message: msg });
-    } else {
-      setOverlay(false);
-      const req = await response.json();
-      const id = req.projectID;
-      const tempLink = document.createElement('a');
+    try {
+      const response = await fetch(`${root}visualize/results`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ projectID: projectID }),
+      });
+      if (!response.ok) {
+        setOverlay(false);
+        const { msg } = await response.json();
+        dispatchError(msg);
+      } else {
+        setOverlay(false);
+        const req = await response.json();
+        const id = req.projectID;
+        const tempLink = document.createElement('a');
 
-      tempLink.href = `${root}visualize/download?id=${id}`;
-      document.body.appendChild(tempLink);
-      tempLink.click();
-      document.body.removeChild(tempLink);
+        tempLink.href = `${root}visualize/download?id=${id}`;
+        document.body.appendChild(tempLink);
+        tempLink.click();
+        document.body.removeChild(tempLink);
+      }
+    } catch (err) {
+      dispatchError(err);
     }
   }
 
@@ -239,30 +247,34 @@ export default function Results() {
       ? (args.signatureName = sigFormula)
       : (args.formula = sigFormula);
 
-    const response = await fetch(`${root}api/visualizeR`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(args),
-    });
-    if (!response.ok) {
-      const err = await response.text();
-      console.log(err);
-      dispatchVisualizeResults({
-        debugR: err,
-        rPlots: [],
-        submitOverlay: false,
+    try {
+      const response = await fetch(`${root}api/visualizeR`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(args),
       });
-    } else {
-      const data = await response.json();
-      console.log(data);
-      dispatchVisualizeResults({
-        debugR: data.debugR,
-        rPlots: data.plots,
-        submitOverlay: false,
-      });
+      if (!response.ok) {
+        const err = await response.text();
+        console.log(err);
+        dispatchVisualizeResults({
+          debugR: err,
+          rPlots: [],
+        });
+      } else {
+        const data = await response.json();
+        console.log(data);
+        dispatchVisualizeResults({
+          debugR: data.debugR,
+          rPlots: data.plots,
+        });
+      }
+    } catch (err) {
+      dispatchError(err);
+    } finally {
+      dispatchVisualizeResults({ submitOverlay: false });
     }
   }
 
