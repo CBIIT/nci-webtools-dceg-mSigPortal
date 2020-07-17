@@ -47,30 +47,35 @@ export default function Results() {
     debugR,
   } = useSelector((state) => state.visualizeResults);
 
+  // get mapping after retrieving projectID
   useEffect(() => {
     if (projectID.length) {
-      getPlotMapping(projectID);
+      getSummary(projectID);
     }
   }, [projectID]);
 
-  // load first plot after results are recieved
+  // load first plots after mapping is loaded
   useEffect(() => {
     if (filtered.length) {
       setPlot(0);
+      submitR();
     }
   }, [mapping]);
 
+  // load first r plot after they are recieved
   useEffect(() => {
     if (rPlots.length && !rPlotIndex.length) {
       setPlot(0, 'r');
     }
   }, [rPlots]);
 
+  // set first plot after dropdown filters are changed
   useEffect(() => {
     setPlot(0);
   }, [filtered]);
 
-  async function getPlotMapping() {
+  // retrieve mapping of samples to plots from summary file
+  async function getSummary() {
     const response = await fetch(`${root}visualize/summary`, {
       method: 'POST',
       headers: {
@@ -80,14 +85,25 @@ export default function Results() {
       body: JSON.stringify({ projectID: projectID }),
     });
     const mapping = await response.json();
+    const nameOptions = [...new Set(mapping.map((plot) => plot.Sample_Name))];
+    const profileOptions = [
+      ...new Set(mapping.map((plot) => plot.Profile_Type)),
+    ];
+    const matrixOptions = [...new Set(mapping.map((plot) => plot.Matrix))];
+    const tagOptions = [...new Set(mapping.map((plot) => plot.Tag))];
 
     dispatchVisualizeResults({
       mapping: mapping,
       filtered: mapping,
-      nameOptions: [...new Set(mapping.map((plot) => plot.Sample_Name))],
-      profileOptions: [...new Set(mapping.map((plot) => plot.Profile_Type))],
-      matrixOptions: [...new Set(mapping.map((plot) => plot.Matrix))],
-      tagOptions: [...new Set(mapping.map((plot) => plot.Tag))],
+      nameOptions: nameOptions,
+      profileOptions: profileOptions,
+      matrixOptions: matrixOptions,
+      tagOptions: tagOptions,
+      selectName: nameOptions[0],
+      selectProfile: profileOptions[0],
+      selectMatrix: matrixOptions[0],
+      selectTag: tagOptions[0],
+      selectName2: nameOptions[0],
     });
   }
 
@@ -176,14 +192,16 @@ export default function Results() {
 
   function filterSampleName(name) {
     const filteredPlots = mapping.filter((plot) => plot.Sample_Name == name);
+    const profileOptions = [
+      ...new Set(filteredPlots.map((plot) => plot.Profile_Type)),
+    ];
+
     dispatchVisualizeResults({
       selectName: name,
-      selectProfile: '0',
+      selectProfile: profileOptions[0],
       selectMatrix: '0',
       selectTag: '0',
-      profileOptions: [
-        ...new Set(filteredPlots.map((plot) => plot.Profile_Type)),
-      ],
+      profileOptions: profileOptions,
       matrixOptions: [...new Set(filteredPlots.map((plot) => plot.Matrix))],
       tagOptions: [...new Set(filteredPlots.map((plot) => plot.Tag))],
       filtered: filteredPlots,
@@ -194,11 +212,15 @@ export default function Results() {
     const filteredPlots = mapping.filter(
       (plot) => plot.Sample_Name == selectName && plot.Profile_Type == profile
     );
+    const matrixOptions = [
+      ...new Set(filteredPlots.map((plot) => plot.Matrix)),
+    ];
+
     dispatchVisualizeResults({
       selectProfile: profile,
-      selectMatrix: '0',
+      selectMatrix: matrixOptions[0],
       selectTag: '0',
-      matrixOptions: [...new Set(filteredPlots.map((plot) => plot.Matrix))],
+      matrixOptions: matrixOptions,
       tagOptions: [...new Set(filteredPlots.map((plot) => plot.Tag))],
       filtered: filteredPlots,
     });
@@ -211,10 +233,11 @@ export default function Results() {
         plot.Profile_Type == selectProfile &&
         plot.Matrix == matrix
     );
+    const tagOptions = [...new Set(filteredPlots.map((plot) => plot.Tag))];
     dispatchVisualizeResults({
       selectMatrix: matrix,
-      selectTag: '0',
-      tagOptions: [...new Set(filteredPlots.map((plot) => plot.Tag))],
+      selectTag: tagOptions[0],
+      tagOptions: tagOptions,
       filtered: filteredPlots,
     });
   }
