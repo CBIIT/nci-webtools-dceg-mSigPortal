@@ -25,7 +25,7 @@ export default function Visualize() {
         collapsed={!openSidebar}
         onCollapsed={(e) => setOpenSidebar(!e)}
       >
-        <SidebarPanel className="col-lg-4">
+        <SidebarPanel>
           <div className="p-3 shadow-sm bg-white">
             <div className="row">
               <div className="col-sm-auto">
@@ -40,7 +40,7 @@ export default function Visualize() {
           </div>
           <hr className="d-lg-none" style={{ opacity: 0 }}></hr>
         </SidebarPanel>
-        <MainPanel className="col-lg-8">
+        <MainPanel>
           <div
             className="p-3 shadow-sm bg-white"
             style={{ minHeight: '420px' }}
