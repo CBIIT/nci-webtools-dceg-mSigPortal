@@ -7,10 +7,9 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useSelector } from 'react-redux';
 import './visualize.scss';
 import {
-  store,
-  updateVisualize,
-  updateVisualizeResults,
-  updateError,
+  dispatchVisualize,
+  dispatchVisualizeResults,
+  dispatchError,
   getInitialState,
 } from '../../../services/store';
 const { Group, Label, Control, Check, Text } = Form;
@@ -49,23 +48,6 @@ export default function UploadForm({ setOpenSidebar }) {
     accept: '.csv, .tsv, .vcf, .gz, .zip, .tar, .tar.gz',
   });
 
-  function dispatchError(msg) {
-    store.dispatch(
-      updateError({
-        visible: true,
-        message: msg,
-      })
-    );
-  }
-
-  function dispatchVisualize(obj) {
-    store.dispatch(updateVisualize(obj));
-  }
-
-  function dispatchVisualizeResults(obj) {
-    store.dispatch(updateVisualizeResults(obj));
-  }
-
   async function handleSubmit() {
     // disable parameters after submit
     dispatchVisualize({ disableParameters: true });
@@ -96,24 +78,28 @@ export default function UploadForm({ setOpenSidebar }) {
             showIndicator: true,
           },
         });
-        const response = await fetch(`${root}visualize/queue`, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data),
-        });
-
-        if (response.ok) {
-          // placeholder alert with error modal
-          dispatchError('Successfully submitted to queue.');
-          dispatchVisualize({ loading: { active: false } });
-        } else {
-          dispatchVisualizeResults({
-            error: 'Please Reset Your Parameters and Try again.',
+        try {
+          const response = await fetch(`${root}visualize/queue`, {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
           });
-          dispatchError('Failed to submit to queue. Please Try Again.');
+
+          if (response.ok) {
+            // placeholder alert with error modal
+            dispatchError('Successfully submitted to queue.');
+          } else {
+            dispatchVisualizeResults({
+              error: 'Please Reset Your Parameters and Try again.',
+            });
+            dispatchError('Failed to submit to queue. Please Try Again.');
+          }
+        } catch (err) {
+          dispatchError(err);
+        } finally {
           dispatchVisualize({ loading: { active: false } });
         }
       } else {
@@ -124,48 +110,52 @@ export default function UploadForm({ setOpenSidebar }) {
             showIndicator: true,
           },
         });
-
-        const response = await fetch(`${root}api/visualize`, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(args),
-        });
-
-        if (response.ok) {
-          const pythonOut = await response.json();
-
-          dispatchVisualizeResults({
-            projectID: data.projectID,
-            debug: pythonOut,
+        try {
+          const response = await fetch(`${root}api/visualize`, {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(args),
           });
-          setOpenSidebar(false);
-        } else if (response.status == 502) {
-          dispatchVisualizeResults({
-            error: 'Please Reset Your Parameters and Try again.',
-          });
-          dispatchError('Your submission has timed out. Please Try Again.');
-        } else {
-          dispatchVisualizeResults({
-            error: 'Please Reset Your Parameters and Try again.',
-          });
-          const { msg, stdout, stderr } = await response.json();
-          const message = `<div>
+
+          if (response.ok) {
+            dispatchVisualizeResults({
+              projectID: data.projectID,
+              debug: await response.json(),
+            });
+            setOpenSidebar(false);
+          } else if (response.status == 502) {
+            dispatchVisualizeResults({
+              error: 'Please Reset Your Parameters and Try again.',
+            });
+            dispatchError('Your submission has timed out. Please Try Again.');
+          } else {
+            dispatchVisualizeResults({
+              error: 'Please Reset Your Parameters and Try again.',
+            });
+            const { msg, stdout, stderr } = await response.json();
+            const message = `<div>
             <p>${msg}</p>
             <p><b>Python:</b></p>
             <pre>${stdout}</pre>
             <pre>${stderr}</pre>
           </div>`;
-          dispatchError(message);
+            dispatchError(message);
+          }
+        } catch (err) {
+          dispatchError(err);
+          dispatchVisualizeResults({
+            error: 'Please Reset Your Parameters and Try again.',
+          });
+        } finally {
+          dispatchVisualize({
+            loading: {
+              active: false,
+            },
+          });
         }
-        dispatchVisualize({
-          loading: {
-            active: false,
-            showIndicator: false,
-          },
-        });
       }
     }
   }
@@ -187,24 +177,32 @@ export default function UploadForm({ setOpenSidebar }) {
         showIndicator: true,
       },
     });
-    const data = new FormData();
-    data.append('file', inputFile);
+    try {
+      const data = new FormData();
+      data.append('file', inputFile);
+      let response = await fetch(`${root}visualize/upload`, {
+        method: 'POST',
+        body: data,
+      });
 
-    let response = await fetch(`${root}visualize/upload`, {
-      method: 'POST',
-      body: data,
-    });
-
-    if (!response.ok) {
-      // add error handling
-      const { msg, error } = await response.json();
-      const message = `<div>
+      if (!response.ok) {
+        const { msg, error } = await response.json();
+        const message = `<div>
           <p>${msg}</p>
          ${error ? `<p>${error}</p>` : ''} 
         </div>`;
-      dispatchError(message);
-    } else {
-      return await response.json();
+        dispatchError(message);
+      } else {
+        return await response.json();
+      }
+    } catch (err) {
+      dispatchError(err);
+    } finally {
+      dispatchVisualize({
+        loading: {
+          active: false,
+        },
+      });
     }
   }
 

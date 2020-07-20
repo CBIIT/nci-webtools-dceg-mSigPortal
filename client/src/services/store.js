@@ -25,6 +25,7 @@ export const getInitialState = () => ({
   visualizeResults: {
     error: '',
     projectID: '',
+    displayTab: 'python',
     mapping: [],
     filtered: [],
     selectName: '0',
@@ -110,3 +111,20 @@ export const { updateVisualize } = visualizeSlice.actions;
 export const { updateVisualizeResults } = visualizeResultsSlice.actions;
 
 export const { updateError } = errorSlice.actions;
+
+export function dispatchVisualize(obj) {
+  store.dispatch(updateVisualize(obj));
+}
+
+export function dispatchVisualizeResults(obj) {
+  store.dispatch(updateVisualizeResults(obj));
+}
+
+export function dispatchError(msg) {
+  store.dispatch(
+    updateError({
+      visible: true,
+      message: msg,
+    })
+  );
+}
