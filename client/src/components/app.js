@@ -7,6 +7,8 @@ import Visualize from './pages/visualize/visualize';
 import Explore from './pages/explore/explore';
 import Refitting from './pages/refitting/refitting';
 import Association from './pages/association/association';
+import Publications from './pages/publications/publications';
+import Faq from './pages/faq/faq';
 import { ErrorModal } from './controls/error-modal/error-modal';
 
 export default function App() {
@@ -52,11 +54,21 @@ export default function App() {
       navIndex: 3,
     },
     {
+      route: '/publications',
+      title: 'Publications',
+      navIndex: 4
+    },
+    {
+      route: '/faq',
+      title: 'FAQ',
+      navIndex: 5
+    },
+    {
       route: '/about',
       title: 'About',
       // cardTitle: 'About',
       image: 'assets/images/gwas.svg',
-      navIndex: 4,
+      navIndex: 6,
     },
   ];
 
@@ -70,6 +82,8 @@ export default function App() {
       <Route path="/explore" component={Explore} />
       <Route path="/refitting" component={Refitting} />
       <Route path="/association" component={Association} />
+      <Route path="/publications" component={Publications} />
+      <Route path="/faq" component={Faq} />
     </Router>
   );
 }
