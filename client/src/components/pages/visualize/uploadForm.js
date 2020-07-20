@@ -212,13 +212,13 @@ export default function UploadForm({ setOpenSidebar }) {
 
   function selectFormat(format) {
     let path = '';
-    if (format == 'vcf') path = 'assets/exampleInput/demo_input_single.vcf.gz';
-    if (format == 'csv') path = 'assets/exampleInput/demo_input_multi.csv.zip';
-    if (format == 'tsv') path = 'assets/exampleInput/demo_input_multi.tsv.zip';
+    if (format == 'vcf') path = 'assets/exampleInput/demo_input_multi.vcf.gz';
+    if (format == 'csv') path = 'assets/exampleInput/demo_input_multi.csv';
+    if (format == 'tsv') path = 'assets/exampleInput/demo_input_multi.tsv';
     if (format == 'catalog_tsv')
-      path = 'assets/exampleInput/demo_input_catalog.tsv.zip';
+      path = 'assets/exampleInput/demo_input_catalog.tsv';
     if (format == 'catalog_csv')
-      path = 'assets/exampleInput/demo_input_catalog.csv.zip';
+      path = 'assets/exampleInput/demo_input_catalog.csv';
 
     dispatchVisualize({ inputFormat: format, exampleData: path });
   }
