@@ -13,8 +13,8 @@ export default function App() {
   const links = [
     {
       route: '/visualize',
-      action: 'Visualize',
-      title: 'Visualize',
+      action: 'Visualization',
+      title: 'Visualization',
       cardTitle: 'Signature Visualization',
       cardText: 'Visualize mutational profiles',
       description: 'Interactively and comprehensively visualize mutation signature in both sample and study level, including different type and level of mutational profiles (SBS/INDEL/DBS/SV/CNV), PCA components and different mutational feature (kataegis mutation, mutation quality, drive gene mutation etc).',
@@ -23,8 +23,8 @@ export default function App() {
     },
     {
       route: '/explore',
-      action: 'Explore',
-      title: 'Explore',
+      action: 'Exploring',
+      title: 'Exploring',
       cardTitle: 'Signature Exploring',
       cardText: 'Signature Exploring',
       description: 'Systematically explore any reference or update to date published signatures with different profiles, version and etiology (endogenous vs Exogenous). Intergratively explore the landscape of signature exposure in different genomic studies, including TCGA, PCAWG, and our Sherlock-Lung study.',
