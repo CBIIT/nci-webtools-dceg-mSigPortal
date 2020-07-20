@@ -4,10 +4,10 @@ import Card from 'react-bootstrap/Card';
 import { CardDeck, Button } from 'react-bootstrap';
 import './home.scss';
 
-export default function Home({ links }) {
-  const colors = ['#ffbe63', '#799eff', '#a4ce76', '#ab68b9'];
+export default function Home({ links}) {
+  const colors = ['#fc8701', '#2c71dd', '#689f39', '#84368d'];
 
-  function cardRow(links) {
+  function cardRow(links,color) {
     return (
       <CardDeck>
         {links.map(
@@ -39,25 +39,27 @@ export default function Home({ links }) {
                   key={index}
                   to={route}
                 >
-                  <img alt="icon" src={image} height="80" width="80" 
-                    style={{
-                      marginTop: '-40px',
-                      borderRadius: '80'
-                    }} />
-                  {/*
                   <span className="sr-only">{title + ' link'}</span>
                   <div
                     className="rounded-circle"
                     style={{
                       marginTop: '-40px',
+                      width: '90px',
+                      height: '90px',
                       padding: '10px',
                       backgroundColor: color,
                       border: '4px solid white',
                       fillOpacity: '0.5'
                     }}
                   >
+                  <img alt="icon" src={image} height="80" width="80" 
+                    style={{
+                      marginTop: '-15px',
+                      marginLeft: '-9px'
+                    }} 
+                  />
                     
-                  </div>*/}
+                  </div>
                 </Link>
 
                 <Card.Body>
@@ -97,9 +99,9 @@ export default function Home({ links }) {
         </div>
         <div className="banner-overlay-text row justify-content-center text-center text-light w-75">
           <div className="col-12">
-            <img src="assets/images/msigportal.svg"
+            <img src="assets/images/logo-horizontal.png"
               style={{
-                width: '550px',
+                width: '325px',
                 height: '50px'
               }}
             ></img>
@@ -149,10 +151,10 @@ export default function Home({ links }) {
         style={{ marginTop: '70px' }}
       >
         
-        {cardRow(links.slice(0, 1))}
-        {cardRow(links.slice(1, 2))}
-        {cardRow(links.slice(2, 3))}
-        {cardRow(links.slice(3, 4))}
+        {cardRow(links.slice(0, 1), colors[0])}
+        {cardRow(links.slice(1, 2), colors[1])}
+        {cardRow(links.slice(2, 3), colors[2])}
+        {cardRow(links.slice(3, 4), colors[3])}
       </div>
     </>
   );
