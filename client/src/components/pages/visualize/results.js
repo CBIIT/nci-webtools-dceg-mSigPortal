@@ -28,7 +28,6 @@ export default function Results() {
     selectMatrix,
     selectTag,
     nameOptions,
-    profileOptions,
     matrixOptions,
     tagOptions,
     displayedPlotIndex,
@@ -57,6 +56,10 @@ export default function Results() {
   // load first plots after mapping is loaded
   useEffect(() => {
     if (filtered.length) {
+      filterSampleName(selectName);
+      filterProfileType(selectProfile);
+      filterMatrix(selectMatrix);
+      filterTag(selectTag);
       setPlot(0);
       submitR();
     }
@@ -86,9 +89,6 @@ export default function Results() {
     });
     const mapping = await response.json();
     const nameOptions = [...new Set(mapping.map((plot) => plot.Sample_Name))];
-    const profileOptions = [
-      ...new Set(mapping.map((plot) => plot.Profile_Type)),
-    ];
     const matrixOptions = [...new Set(mapping.map((plot) => plot.Matrix))];
     const tagOptions = [...new Set(mapping.map((plot) => plot.Tag))];
 
@@ -96,11 +96,10 @@ export default function Results() {
       mapping: mapping,
       filtered: mapping,
       nameOptions: nameOptions,
-      profileOptions: profileOptions,
       matrixOptions: matrixOptions,
       tagOptions: tagOptions,
       selectName: nameOptions[0],
-      selectProfile: profileOptions[0],
+      selectProfile: 'SBS',
       selectMatrix: matrixOptions[0],
       selectTag: tagOptions[0],
       selectName2: nameOptions[0],
@@ -191,17 +190,15 @@ export default function Results() {
   }
 
   function filterSampleName(name) {
-    const filteredPlots = mapping.filter((plot) => plot.Sample_Name == name);
-    const profileOptions = [
-      ...new Set(filteredPlots.map((plot) => plot.Profile_Type)),
-    ];
+    const filteredPlots = mapping.filter(
+      (plot) => plot.Sample_Name == name && plot.Profile_Type == 'SBS'
+    );
 
     dispatchVisualizeResults({
       selectName: name,
-      selectProfile: profileOptions[0],
+      selectProfile: 'SBS',
       selectMatrix: '0',
       selectTag: '0',
-      profileOptions: profileOptions,
       matrixOptions: [...new Set(filteredPlots.map((plot) => plot.Matrix))],
       tagOptions: [...new Set(filteredPlots.map((plot) => plot.Tag))],
       filtered: filteredPlots,
@@ -234,6 +231,7 @@ export default function Results() {
         plot.Matrix == matrix
     );
     const tagOptions = [...new Set(filteredPlots.map((plot) => plot.Tag))];
+
     dispatchVisualizeResults({
       selectMatrix: matrix,
       selectTag: tagOptions[0],
@@ -250,6 +248,7 @@ export default function Results() {
         plot.Matrix == selectMatrix &&
         plot.Tag == tag
     );
+
     dispatchVisualizeResults({
       selectTag: tag,
       filtered: filteredPlots,
@@ -364,13 +363,9 @@ export default function Results() {
                     <option value="0" disabled>
                       Select
                     </option>
-                    {profileOptions.map((profile, index) => {
-                      return (
-                        <option key={index} value={profile}>
-                          {profile}
-                        </option>
-                      );
-                    })}
+                    <option value="SBS">SBS</option>
+                    <option value="DBS">DBS</option>
+                    <option value="ID">ID</option>
                   </Control>
                 </Col>
                 <Col sm="3">
@@ -591,8 +586,8 @@ export default function Results() {
             {Array.isArray(debugR) ? (
               debugR.map((line, index) => {
                 return (
-                  <p className="m-0">
-                    {index}| {line}
+                  <p key={index} className="m-0">
+                    [{index}] {line}
                   </p>
                 );
               })

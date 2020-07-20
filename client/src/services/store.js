@@ -33,7 +33,6 @@ export const getInitialState = () => ({
     selectMatrix: '0',
     selectTag: '0',
     nameOptions: [],
-    profileOptions: [],
     matrixOptions: [],
     tagOptions: [],
     displayedPlotIndex: '',
