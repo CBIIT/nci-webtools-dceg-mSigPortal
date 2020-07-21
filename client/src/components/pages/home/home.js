@@ -5,10 +5,10 @@ import { CardDeck, Button } from 'react-bootstrap';
 import './home.scss';
 import { ConsoleTransportOptions } from 'winston/lib/winston/transports';
 
-export default function Home({ links}) {
+export default function Home({ links }) {
   const colors = ['#fc8701', '#2c71dd', '#689f39', '#84368d'];
 
-  function cardRow(links,color) {
+  function cardRow(links, color) {
     return (
       <CardDeck>
         {links.map(
@@ -17,68 +17,72 @@ export default function Home({ links}) {
             index
           ) => (
 
-            <div className="d-flex bd-highlight w-100" key={title} style={{marginRight:'1%'}}>
+              <div className="d-flex bd-highlight w-100" key={title} style={{ marginRight: '1%' }}>
 
-              <Card
-                key={title}
-                id={title}
-                className="mb-5 align-self-center p-2 bd-highlight"
-                style={{
-                  minWidth: '45%',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  position: 'relative',
-                  border: '1px solid #DADBE6',
-                  backgroundColor: 'white'
-                  // minHeight: '280px'
-                  // borderRadius: '10px'
-                }}
-              >
-                <Link
-                  className="stretched-link"
-                  exact={exact}
-                  key={index}
-                  to={route}
+                <Card
+                  key={title}
+                  id={title}
+                  className="mb-5 align-self-center p-2 bd-highlight"
+                  style={{
+                    minWidth: '45%',
+                    justifyContent: 'center',
+                    position: 'relative',
+                    border: '1px solid #DADBE6',
+                    backgroundColor: 'white'
+                    // minHeight: '280px'
+                    // borderRadius: '10px'
+                  }}
                 >
-                  <span className="sr-only">{title + ' link'}</span>
-                  <div
-                    className="rounded-circle"
-                    style={{
-                      marginTop: '-40px',
-                      width: '90px',
-                      height: '90px',
-                      padding: '10px',
-                      backgroundColor: color,
-                      border: '4px solid white',
-                      fillOpacity: '0.5'
-                    }}
+                  <Link
+                    className="stretched-link"
+                    exact={exact}
+                    key={index}
+                    to={route}
                   >
-                  <img alt="icon" src={image} height="80" width="80" 
-                    style={{
-                      marginTop: '-15px',
-                      marginLeft: '-9px'
-                    }} 
-                  />
-                    
-                  </div>
-                </Link>
+                    <span className="sr-only">{title + ' link'}</span>
 
-                <Card.Body>
-                  <Card.Title className="text-dark">
-                    <h2 style={{ fontSize: '1.75rem' }}>
-                      <b>{cardTitle}</b>
-                    </h2>
-                   </Card.Title>
-                  <div className="text-center mt-2 d-md-none">
-                    {description}
-                  </div>
-                </Card.Body>
-              </Card>
-              <div className="description d-none d-md-block">
-                {description}
+                  </Link>
+
+                  <Card.Body>
+                    <div className="d-flex flex-row align-items-center justify-content-left">
+                      <div
+                        className="rounded-circle"
+                        style={{
+                          //marginTop: '-15px',
+                          marginLeft: '-10px',
+                          marginRight: '10px',
+                          width: '120px',
+                          height: '120px',
+                          padding: '10px',
+                          backgroundColor: color,
+                          border: '4px solid white',
+                          fillOpacity: '0.5'
+                        }}
+                      >
+                        <img alt="icon" src={image} height="105" width="105"
+                          style={{
+                            marginTop: '-13px',
+                            marginLeft: '-7px'
+                          }}
+                        />
+
+                      </div>
+                      <Card.Title className="text-dark">
+                        <h2 style={{ fontSize: '1.75rem', marginBottom:'-5px' }}>
+                          <b>{cardTitle}</b>
+                        </h2>
+                      </Card.Title>
+                    </div>
+                    <div className="text-center mt-2 d-md-none">
+                      {description}
+                    </div>
+                  </Card.Body>
+                </Card>
+                <div className="description d-none d-md-block">
+                  {description}
+                </div>
+
               </div>
-
-            </div>
             )
         )}
       </CardDeck>
@@ -110,7 +114,7 @@ export default function Home({ links}) {
           </div>
           <div
             className="col-6 w-50 my-3 align-self-center"
-            style={{ borderTop: '3px solid', color:'rgb(200,37,6)' }}
+            style={{ borderTop: '3px solid', color: 'rgb(200,37,6)' }}
           ></div>
           <div
             className="col-12 text-center mt-2 font-weight-bold"
@@ -124,7 +128,7 @@ export default function Home({ links}) {
           ></div>
         </div>
       </div>
-      
+
       {/* mobile */}
       <div className="text-center mt-2 d-md-none">
         <h1 className="text-dark">
@@ -135,11 +139,10 @@ export default function Home({ links}) {
           <b>Integrative mutational signature portal for cancer genomic study</b>
         </div>
       </div>
-      
-      <div 
+
+      <div
         className="align-middle"
-        style={{ 
-          marginTop: '50px', 
+        style={{
           marginLeft: '6%',
           marginRight: '6%',
           textAlign: 'left'
@@ -147,12 +150,12 @@ export default function Home({ links}) {
       >
         Mutational signatures are characteristic combination of mutation types arising from specific mutagenesis processes such as DNA replication infidelity, exogenous or endogenous exposures, defective DNA repair and DNA enzymatic editing. Analysis of mutational signatures is becoming routine in cancer genomics and provide a novel opportunity for biomarker discovery, tumor diagnostics and treatment guidance. mSigPortal will provide the state-of-the art methods and platform to explore, visualize and analyze mutational signatures, which will greatly facilitate broad investigation of mutational signatures to elucidate different mutagenesis processes involved in tumorigenesis.  Currently, mSigPortal includes the following modules:
       </div>
-        
+
       <div
         className="container align-middle text-center"
         style={{ marginTop: '70px' }}
       >
-        
+
         {cardRow(links.slice(0, 1), colors[0])}
         {cardRow(links.slice(1, 2), colors[1])}
         {cardRow(links.slice(2, 3), colors[2])}
