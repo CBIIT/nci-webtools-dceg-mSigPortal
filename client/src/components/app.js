@@ -7,14 +7,16 @@ import Visualize from './pages/visualize/visualize';
 import Explore from './pages/explore/explore';
 import Refitting from './pages/refitting/refitting';
 import Association from './pages/association/association';
+import Publications from './pages/publications/publications';
+import Faq from './pages/faq/faq';
 import { ErrorModal } from './controls/error-modal/error-modal';
 
 export default function App() {
   const links = [
     {
       route: '/visualize',
-      action: 'Visualize',
-      title: 'Visualize',
+      action: 'Visualization',
+      title: 'Visualization',
       cardTitle: 'Signature Visualization',
       cardText: 'Visualize mutational profiles',
       description: 'Interactively and comprehensively visualize mutation signature in both sample and study level, including different type and level of mutational profiles (SBS/INDEL/DBS/SV/CNV), PCA components and different mutational feature (kataegis mutation, mutation quality, drive gene mutation etc).',
@@ -23,8 +25,8 @@ export default function App() {
     },
     {
       route: '/explore',
-      action: 'Explore',
-      title: 'Explore',
+      action: 'Exploring',
+      title: 'Exploring',
       cardTitle: 'Signature Exploring',
       cardText: 'Signature Exploring',
       description: 'Systematically explore any reference or update to date published signatures with different profiles, version and etiology (endogenous vs Exogenous). Intergratively explore the landscape of signature exposure in different genomic studies, including TCGA, PCAWG, and our Sherlock-Lung study.',
@@ -52,11 +54,21 @@ export default function App() {
       navIndex: 3,
     },
     {
+      route: '/publications',
+      title: 'Publications',
+      navIndex: 4
+    },
+    {
+      route: '/faq',
+      title: 'FAQ',
+      navIndex: 5
+    },
+    {
       route: '/about',
       title: 'About',
       // cardTitle: 'About',
       image: 'assets/images/gwas.svg',
-      navIndex: 4,
+      navIndex: 6,
     },
   ];
 
@@ -70,6 +82,8 @@ export default function App() {
       <Route path="/explore" component={Explore} />
       <Route path="/refitting" component={Refitting} />
       <Route path="/association" component={Association} />
+      <Route path="/publications" component={Publications} />
+      <Route path="/faq" component={Faq} />
     </Router>
   );
 }

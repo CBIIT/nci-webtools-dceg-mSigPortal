@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Card from 'react-bootstrap/Card';
 import { CardDeck, Button } from 'react-bootstrap';
 import './home.scss';
+import { ConsoleTransportOptions } from 'winston/lib/winston/transports';
 
 export default function Home({ links}) {
   const colors = ['#fc8701', '#2c71dd', '#689f39', '#84368d'];
@@ -89,11 +90,12 @@ export default function Home({ links}) {
       <div className="banner-container text-center d-none d-md-block">
         <div className="image-blurred-edge">
           <img
-            src="assets/images/banner-sample.jpg"
+            src="assets/images/msigportal-banner.png"
             alt="mSigPortal banner"
             style={{
               width: '100%',
               height: '250px',
+              filter: 'contrast(2)'
             }}
           ></img>
         </div>
