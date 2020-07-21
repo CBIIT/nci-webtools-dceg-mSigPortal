@@ -6,7 +6,6 @@ export const getInitialState = () => ({
     selectedGenome: 'GRCh37',
     experimentalStrategy: 'WGS',
     mutationSplit: 'False',
-    isMultiple: false,
     collapseSample: 'False',
     mutationFilter: '',
     queueMode: false,

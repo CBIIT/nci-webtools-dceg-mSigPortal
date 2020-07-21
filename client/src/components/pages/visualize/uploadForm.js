@@ -25,7 +25,6 @@ export default function UploadForm({ setOpenSidebar }) {
     selectedGenome,
     experimentalStrategy,
     mutationSplit,
-    isMultiple,
     collapseSample,
     mutationFilter,
     queueMode,
@@ -61,6 +60,7 @@ export default function UploadForm({ setOpenSidebar }) {
         projectID: ['-p', data.projectID],
         genomeAssemblyVersion: ['-g', selectedGenome],
         experimentalStrategy: ['-t', experimentalStrategy],
+        collapseSample: ['-c', collapseSample],
         outputDir: ['-o', data.projectID],
       };
       // conditionally include params
@@ -68,7 +68,6 @@ export default function UploadForm({ setOpenSidebar }) {
         args['mutationFilter'] = ['-F', mutationFilter];
       if (['vcf', 'csv', 'tsv'].includes(inputFormat))
         args['mutationSplit'] = ['-s', mutationSplit];
-      if (isMultiple) args['collapseSample'] = ['-c', collapseSample];
 
       if (queueMode) {
         dispatchVisualize({
@@ -374,37 +373,10 @@ export default function UploadForm({ setOpenSidebar }) {
         </Check>
       </Group>
       <Group className="d-flex">
-        <Label className="mr-auto">Multiple Samples</Label>
-        <Check inline id="multipleFalse">
-          <Check.Input
-            type="radio"
-            // value={false}
-            checked={!isMultiple}
-            onChange={() => dispatchVisualize({ isMultiple: false })}
-            disabled={disableParameters}
-          />
-          <Check.Label htmlFor="multipleFalse" className="font-weight-normal">
-            False
-          </Check.Label>
-        </Check>
-        <Check inline id="multipleTrue">
-          <Check.Input
-            type="radio"
-            // value={true}
-            checked={isMultiple}
-            onChange={() => dispatchVisualize({ isMultiple: true })}
-            disabled={disableParameters}
-          />
-          <Check.Label htmlFor="multipleTrue" className="font-weight-normal">
-            True
-          </Check.Label>
-        </Check>
-      </Group>
-      <Group className="d-flex">
         <Label className="mr-auto">Collapse Sample</Label>
         <Check inline id="radioFalse">
           <Check.Input
-            disabled={!isMultiple || disableParameters}
+            disabled={disableParameters}
             type="radio"
             value="False"
             checked={collapseSample == 'False'}
@@ -416,7 +388,7 @@ export default function UploadForm({ setOpenSidebar }) {
         </Check>
         <Check inline id="radioTrue">
           <Check.Input
-            disabled={!isMultiple || disableParameters}
+            disabled={disableParameters}
             type="radio"
             value="True"
             checked={collapseSample == 'True'}
@@ -437,7 +409,7 @@ export default function UploadForm({ setOpenSidebar }) {
           onChange={(e) =>
             dispatchVisualize({ mutationFilter: e.target.value })
           }
-          disabled={disableParameters}
+          disabled={disableParameters || mutationSplit == 'True'}
         ></Control>
         <Text className="text-muted">Use @ to separate multiple filters</Text>
       </Group>
