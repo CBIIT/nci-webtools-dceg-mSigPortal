@@ -64,7 +64,7 @@ export default function UploadForm({ setOpenSidebar }) {
         outputDir: ['-o', data.projectID],
       };
       // conditionally include params
-      if (mutationFilter.length)
+      if (mutationFilter.length && mutationSplit == 'False')
         args['mutationFilter'] = ['-F', mutationFilter];
       if (['vcf', 'csv', 'tsv'].includes(inputFormat))
         args['mutationSplit'] = ['-s', mutationSplit];
