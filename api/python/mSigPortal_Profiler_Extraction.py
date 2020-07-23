@@ -8,25 +8,19 @@ from zipfile import ZipFile
 '''
 Name:		mSigPortal_Profiler_Extraction
 Function:	Generate Input File for mSigPortal
-Version:	1.18
-Date:		July-18-2020
-Update:		(1) Add Collapse function for Catalog_CSV format
-		(2) Add Collapse function for Catalog_TSV format
-		(3) When Splitting (-s) option is given, Each sample 
-		    without splitting will be also printed
-		(4) When input file with Single sample is collapsed, 
-		    no error will be reported
-		(5) Solve the problem in collapsed samples with duplicated line
-		(6) -s and -F should not be used together
-		(7) -s option only supports csv, tsv and vcf format
-		(8) If input file is in compressed format, a "tmp" dir will be created 
-		in the input Dir, where the compressed file will be decompressed 
+Version:	1.20
+Date:		July-22-2020
+Update:		Fix the input header:
+			(1) TSV header:			SAMPLE	CHROM	START	END	REF	ALT	FILTER
+			(2) CSV header:			SAMPLE,CHROM,START,END,REF,ALT,FILTER
+			(3) VCF header:			#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT
+			(4) catalog_tsv header:		MutationType	Sample1	Sample2	Sample3...
+			(5) catalog_csv header:		MutationType,Sample1,Sample2,Sample3...
 '''
 
 ########################################################################
 ###################### 0 Define Basic Function #########################
 ########################################################################
-
 
 ####### 01-1 Get Options
 def Parser():
@@ -281,7 +275,7 @@ def csv_Convert(Input_Path,Project_ID,Output_Dir,Genome_Building,Data_Type,Colla
 
 	####### 01-3-1 Parse File 
 	Input_File = open(Input_Path)
-	Header = "Sample_ID,Chrom,Start,End,REF,ALT,Filter"
+	Header = "SAMPLE,CHROM,START,END,REF,ALT,FILTER"
 	String_File = ""
 	Count = 1
 	for line in Input_File:
@@ -289,11 +283,11 @@ def csv_Convert(Input_Path,Project_ID,Output_Dir,Genome_Building,Data_Type,Colla
 		if len(ss) == 7:
 			String_File += line
 		else:
-			print("Error 233: The CSV option requires each line in input file should include 7 Item: Sample,Chrom,Start,End,Ref,Alt,Filter.\nHowever, the %d line contains %d items!" % (Count,len(ss)))
+			print("Error 233: The CSV option requires each line in input file should include 7 Item: SAMPLE,CHROM,START,END,REF,ALT,FILTER.\nHowever, the %d line contains %d items!" % (Count,len(ss)))
 			sys.exit()
 			Count += 1
 	if Header not in String_File:
-		print("Error 233: A header line: \"Sample_ID,Chrom,Start,End,REF,ALT,Filter\" is required!")
+		print("Error 233: A header line: \"SAMPLE,CHROM,START,END,REF,ALT,FILTER\" is required!")
 		sys.exit()
 		
 	####### 01-3-2 Generate Result
@@ -333,7 +327,7 @@ def csv_Convert_Filter(Input_Path,Project_ID,Output_Dir,Genome_Building,Data_Typ
 
 	####### 01-6-1 Parse File 
 	Input_File = open(Input_Path)
-	Header = "Sample_ID,Chrom,Start,End,REF,ALT,Filter"
+	Header = "SAMPLE,CHROM,START,END,REF,ALT,FILTER"
 	String_File = ""
 	Count = 1
 	for line in Input_File:
@@ -345,7 +339,7 @@ def csv_Convert_Filter(Input_Path,Project_ID,Output_Dir,Genome_Building,Data_Typ
 			sys.exit()
 			Count += 1
 	if Header not in String_File:
-		print("Error 233: A header line: \"Sample_ID,Chrom,Start,End,REF,ALT,Filter\" is required!")
+		print("Error 233: A header line: \"SAMPLE,CHROM,START,END,REF,ALT,FILTER\" is required!")
 		sys.exit()
 
 	####### 01-6-2 Parse Filter:
@@ -403,7 +397,7 @@ def csv_Convert_Split(Input_Path,Project_ID,Output_Dir,Genome_Building,Data_Type
 
 	####### 01-6-1 Parse File 
 	Input_File = open(Input_Path)
-	Header = "Sample_ID,Chrom,Start,End,REF,ALT,Filter"
+	Header = "SAMPLE,CHROM,START,END,REF,ALT,FILTER"
 	String_File = ""
 	Count = 1
 	for line in Input_File:
@@ -415,7 +409,7 @@ def csv_Convert_Split(Input_Path,Project_ID,Output_Dir,Genome_Building,Data_Type
 			sys.exit()
 			Count += 1
 	if Header not in String_File:
-		print("Error 233: A header line: \"Sample_ID,Chrom,Start,End,REF,ALT,Filter\" is required!")
+		print("Error 233: A header line: \"SAMPLE,CHROM,START,END,REF,ALT,FILTER\" is required!")
 		sys.exit()
 
 	####### 01-6-2 Parse Filter:
@@ -474,7 +468,7 @@ def tsv_Convert(Input_Path,Project_ID,Output_Dir,Genome_Building,Data_Type,Colla
 
 	####### 01-3-1 Parse File 
 	Input_File = open(Input_Path)
-	Header = "Sample_ID	Chrom	Start	End	Ref	Alt	Filter"
+	Header = "SAMPLE	CHROM	START	END	REF	ALT	FILTER"
 	#Header = ""
 	String_File = ""
 	Count = 1
@@ -487,7 +481,7 @@ def tsv_Convert(Input_Path,Project_ID,Output_Dir,Genome_Building,Data_Type,Colla
 			sys.exit()
 			Count += 1
 	if Header not in String_File:
-		print("Error 233: A header line: \"Sample_ID	Chrom	Start	End	Ref	Alt	Filter\" is required!")
+		print("Error 233: A header line: \"SAMPLE	CHROM	START	END	REF	ALT	FILTER\" is required!")
 		sys.exit()
 	#print(String_File)
 	####### 01-3-2 Generate Result
@@ -529,7 +523,7 @@ def tsv_Convert_Filter(Input_Path,Project_ID,Output_Dir,Genome_Building,Data_Typ
 
 	####### 01-6-1 Parse File 
 	Input_File = open(Input_Path)
-	Header = "Sample_ID	Chrom	Start	End	Ref	Alt	Filter"
+	Header = "SAMPLE	CHROM	START	END	REF	ALT	FILTER"
 	String_File = ""
 	Count = 1
 	for line in Input_File:
@@ -541,7 +535,7 @@ def tsv_Convert_Filter(Input_Path,Project_ID,Output_Dir,Genome_Building,Data_Typ
 			sys.exit()
 			Count += 1
 	if Header not in String_File:
-		print("Error 233: A header line: \"Sample_ID	Chrom	Start	End	Ref	Alt	Filter\" is required!")
+		print("Error 233: A header line: \"SAMPLE	CHROM	START	END	REF	ALT	FILTER\" is required!")
 		sys.exit()
 
 	####### 01-6-2 Parse Filter:
@@ -600,7 +594,7 @@ def tsv_Convert_Split(Input_Path,Project_ID,Output_Dir,Genome_Building,Data_Type
 
 	####### 01-6-1 Parse File 
 	Input_File = open(Input_Path)
-	Header = "Sample_ID	Chrom	Start	End	Ref	Alt	Filter"
+	Header = "SAMPLE	CHROM	START	END	REF	ALT	FILTER"
 	String_File = ""
 	Count = 1
 	for line in Input_File:
@@ -612,7 +606,7 @@ def tsv_Convert_Split(Input_Path,Project_ID,Output_Dir,Genome_Building,Data_Type
 			sys.exit()
 			Count += 1
 	if Header not in String_File:
-		print("Error 233: A header line: \"Sample_ID	Chrom	Start	End	Ref	Alt	Filter\" is required!")
+		print("Error 233: A header line: \"SAMPLE	CHROM	START	END	REF	ALT	FILTER\" is required!")
 		sys.exit()
 
 	####### 01-6-3 Generate Result
