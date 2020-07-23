@@ -19,7 +19,7 @@ export default function Visualize() {
   }
 
   return (
-    <div className="position-relative">
+    <div className="position-relative mx-4">
       <SidebarContainer
         className="m-3"
         collapsed={!openSidebar}

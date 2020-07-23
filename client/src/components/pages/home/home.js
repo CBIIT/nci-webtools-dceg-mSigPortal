@@ -139,12 +139,10 @@ export default function Home({ links }) {
           <b>Integrative mutational signature portal for cancer genomic study</b>
         </div>
       </div>
-
-      <div
-        className="align-middle"
-        style={{
-          marginLeft: '6%',
-          marginRight: '6%',
+      
+      <div 
+        className="container align-middle"
+        style={{ 
           textAlign: 'left'
         }}
       >
