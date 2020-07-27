@@ -32,8 +32,7 @@ export default function Results() {
   const { mapping, filtered } = pyTab;
 
   const {
-    sigProfileType,
-    matrixSize,
+    profileType,
     signatureSet,
     selectName2,
     selectSigFormula,
@@ -135,7 +134,7 @@ export default function Results() {
   async function submitR() {
     dispatchVisualizeResults({ rTab: { ...rTab, submitOverlay: true } });
     let args = {
-      profileName: sigProfileType,
+      profileName: profileType,
       signatureSetName: signatureSet,
       sampleName: selectName2,
       signatureName: null,

@@ -19,18 +19,21 @@ export default function RTab({ setPlot, submitR }) {
     (state) => state.visualizeResults
   );
 
-  const { nameOptions, profileOptions } = pyTab;
+  const { nameOptions, profileOptions, matrixOptions } = pyTab;
 
   const {
-    sigProfileType,
+    profileType1,
     matrixSize,
+    profileType2,
     signatureSet,
+    signatureSetOptions,
     selectName2,
     selectSigFormula,
     sigFormula,
     rPlots,
     rPlotIndex,
     submitOverlay,
+    refSigOverlay,
     debugR,
   } = rTab;
 
@@ -41,22 +44,57 @@ export default function RTab({ setPlot, submitR }) {
     }
   }, [rPlots]);
 
+  // get Signature Reference Sets
+  async function getSignatureSet(profileType) {
+    dispatchVisualizeResults({
+      rTab: { ...rTab, refSigOverlay: true },
+    });
+    try {
+      const response = await fetch(
+        `${root}api/visualizeR/getSignatureReferenceSets`,
+        {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ profileType: profileType }),
+        }
+      );
+      const signatureSetOptions = await response.json();
+      console.log(signatureSetOptions);
+      dispatchVisualizeResults({
+        rTab: {
+          ...rTab,
+          profileType2: profileType,
+          signatureSetOptions: signatureSetOptions,
+          refSigOverlay: false,
+        },
+      });
+    } catch (err) {
+      dispatchError(err);
+    } finally {
+      //   dispatchVisualizeResults({ rTab: { ...rTab, refSigOverlay: false } });
+    }
+  }
+
+  useEffect(() => {}, [profileType2]);
+
   return (
     <div>
       <Form>
-        <Label>Additional Plots</Label>
+        <Label>Cosine Similarity Within Samples</Label>
         <div className="border rounded p-2">
-          <LoadingOverlay active={submitOverlay} />
           <Row className="justify-content-center">
-            <Col sm="4">
-              <Group controlId="sigProfileType">
-                <Label>Signature Profile Type</Label>
+            <Col sm="6">
+              <Group controlId="profileType1">
+                <Label>Profile Type</Label>
                 <Control
                   as="select"
-                  value={sigProfileType}
+                  value={profileType1}
                   onChange={(e) =>
                     dispatchVisualizeResults({
-                      sigProfileType: e.target.value,
+                      rTab: { ...rTab, profileType1: e.target.value },
                     })
                   }
                   custom
@@ -71,23 +109,98 @@ export default function RTab({ setPlot, submitR }) {
                 </Control>
               </Group>
             </Col>
-            <Col sm="4">
-              <Group controlId="signatureSet">
-                <Label>Reference Set</Label>
+            <Col sm="6">
+              <Label>Matrix Size</Label>
+              <Control
+                as="select"
+                value={matrixSize}
+                onChange={(e) =>
+                  dispatchVisualizeResults({
+                    rTab: {
+                      ...rTab,
+                      matrixSize: e.target.value.replace('-', ''),
+                    },
+                  })
+                }
+                custom
+              >
+                <option value="0" disabled>
+                  Select
+                </option>
+                {matrixOptions.map((matrix, index) => {
+                  return (
+                    <option key={index} value={matrix}>
+                      {matrix}
+                    </option>
+                  );
+                })}
+              </Control>
+            </Col>
+          </Row>
+        </div>
+      </Form>
+
+      <Form>
+        <Label>Cosine Similarity to Reference Signatures</Label>
+        <LoadingOverlay active={refSigOverlay} />
+        <div className="border rounded p-2">
+          <Row className="justify-content-center">
+            <Col sm="6">
+              <Group controlId="profileType2">
+                <Label>Profile Type</Label>
                 <Control
                   as="select"
-                  value={signatureSet}
-                  onChange={(e) =>
-                    dispatchVisualizeResults({ signatureSet: e.target.value })
-                  }
+                  value={profileType2}
+                  onChange={(e) => {
+                    getSignatureSet(e.target.value);
+                  }}
                   custom
                 >
-                  <option value="COSMIC v3 Signatures (SBS)">
-                    COSMIC v3 Signatures (SBS)
-                  </option>
+                  {profileOptions.map((profile, index) => {
+                    return (
+                      <option key={index} value={profile}>
+                        {profile}
+                      </option>
+                    );
+                  })}
                 </Control>
               </Group>
             </Col>
+            <Col sm="6">
+              <Group controlId="signatureSet">
+                <Label>Reference Signature Set</Label>
+                <Control
+                  disabled={!signatureSetOptions.length}
+                  as="select"
+                  value={signatureSet}
+                  onChange={(e) =>
+                    dispatchVisualizeResults({
+                      ...rTab,
+                      signatureSet: e.target.value,
+                    })
+                  }
+                  custom
+                >
+                  <option value="0">Select</option>
+                  {signatureSetOptions.map((signatureSet, index) => {
+                    return (
+                      <option key={index} value={signatureSet}>
+                        {signatureSet}
+                      </option>
+                    );
+                  })}
+                </Control>
+              </Group>
+            </Col>
+          </Row>
+        </div>
+      </Form>
+
+      <Form>
+        <Label>Additional Plots</Label>
+        <div className="border rounded p-2">
+          <LoadingOverlay active={submitOverlay} />
+          <Row className="justify-content-center">
             <Col sm="4">
               <Group controlId="selectName2">
                 <Label>Sample Name</Label>
@@ -95,7 +208,10 @@ export default function RTab({ setPlot, submitR }) {
                   as="select"
                   value={selectName2}
                   onChange={(e) =>
-                    dispatchVisualizeResults({ selectName2: e.target.value })
+                    dispatchVisualizeResults({
+                      ...rTab,
+                      selectName2: e.target.value,
+                    })
                   }
                   custom
                 >
@@ -125,7 +241,7 @@ export default function RTab({ setPlot, submitR }) {
                   value={selectSigFormula}
                   onChange={(e) =>
                     dispatchVisualizeResults({
-                      selectSigFormula: e.target.value,
+                      rTab: { ...rTab, selectSigFormula: e.target.value },
                     })
                   }
                   custom
@@ -142,7 +258,9 @@ export default function RTab({ setPlot, submitR }) {
                 placeholder={selectSigFormula}
                 value={sigFormula}
                 onChange={(e) =>
-                  dispatchVisualizeResults({ sigFormula: e.target.value })
+                  dispatchVisualizeResults({
+                    rTab: { ...rTab, sigFormula: e.target.value },
+                  })
                 }
               ></Control>
             </Col>
@@ -156,6 +274,7 @@ export default function RTab({ setPlot, submitR }) {
           </Row>
         </div>
       </Form>
+
       <div
         className="mt-2 p-2 border rounded"
         style={{ display: rPlots.length ? 'block' : 'none' }}

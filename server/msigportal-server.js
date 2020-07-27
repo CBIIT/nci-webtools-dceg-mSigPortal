@@ -126,9 +126,27 @@ app.post('/api/visualizeR', (req, res) => {
     console.log('rOut', rOut);
 
     res.json({
+      list: list,
       debugR: rOut,
       plots: plots,
     });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.post('/api/visualizeR/getSignatureReferenceSets', (req, res) => {
+  logger.info('/api/visualizeR/getSignatureReferenceSets: Calling R Wrapper');
+  console.log('args', req.body);
+
+  try {
+    const list = r('api/R/visualizeWrapper.R', 'getSignatureReferenceSets', [
+      req.body.profileType,
+    ]);
+
+    console.log('SignatureReferenceSets', list);
+
+    res.json(list);
   } catch (err) {
     res.status(500).send(err.message);
   }

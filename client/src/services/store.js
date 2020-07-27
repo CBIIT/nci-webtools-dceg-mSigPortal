@@ -23,8 +23,9 @@ export const getInitialState = () => ({
   },
   visualizeResults: {
     error: '',
+    // projectID: 'b8776700-da44-4073-aa72-0c3b422b0fa2',
     projectID: '',
-    displayTab: 'python',
+    displayTab: 'r',
     pyPlotURL: '',
     rPlotURL: '',
     pyTab: {
@@ -41,9 +42,11 @@ export const getInitialState = () => ({
       debugPy: { stdout: '', stderr: '' },
     },
     rTab: {
-      sigProfileType: 'SBS',
+      profileType1: '',
       matrixSize: '',
-      signatureSet: 'COSMIC v3 Signatures (SBS)',
+      profileType2: '',
+      signatureSet: '',
+      signatureSetOptions: [],
       selectProfile: '',
       selectSigFormula: 'signature',
       sigFormula: 'SBS5',
@@ -51,6 +54,7 @@ export const getInitialState = () => ({
       rPlotIndex: '',
       debugR: [],
       submitOverlay: false,
+      refSigOverlay: false,
     },
   },
   error: {

@@ -10,47 +10,50 @@ library(factoextra)
 
 # source msigportal function ----------------------------------------------
 source('api/R/Sigvisualfunc.R')
-
 # load reference signatures files -----------------------------------------
 load('api/R/signature_refsets.RData')
 
-generatePlots <- function(profileName, signatureSetName, sampleName, signatureName, formula, projectID, pythonOutput, savePath) {
+# get all Reference Signature Set options using profileName (matrix)
+getSignatureReferenceSets <- function(profileType) {
+  profileName <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
+  return(signature_refsets %>% filter(Profile == profileName) %>% pull(Signature_set_name) %>% unique())
+}
+
+### Cosine Similarity tab ###
+generatePlots <- function(profileType, matrixSize, signatureSetName, sampleName, signatureName, formula, projectID, pythonOutput, savePath) {
   tryCatch({
     stdout <- vector('character')
     con <- textConnection('stdout', 'wr', local = TRUE)
     sink(con, type = "message")
     sink(con, type = "output")
-    # on the web, we need the dropdown list for signature Profile Type and reference set name --------
-    matrix <- if_else(profileName == "SBS", "SBS96", if_else(profileName == "DBS", "DBS78", if_else(profileName == "ID", "ID83", NA_character_)))
-
-    signature_refsets_input <- signature_refsets %>% filter(Profile == matrix, Signature_set_name == signatureSetName)
 
 
-    # load SBS-96/DBS-78/ID-83 catalog file generated from previous result according to the profileName -----------
-    if (profileName == "SBS") {
-      data_input <- read_delim(paste0(pythonOutput, '/SBS/', projectID, '.', matrix, '.all'), delim = '\t')
+    # section 1: Cosine similarity within samples #
+    # two parameters need: Profile Type and Matrix Size #
+    if (profileType == "SBS") {
+      data_input <- read_delim(paste0(pythonOutput, '/SBS/', projectID, '.', matrixSize, '.all'), delim = '\t')
     }
-    else if (profileName == "DBS") {
-      data_input <- read_delim(paste0(pythonOutput, '/DBS/', projectID, '.', matrix, '.all'), delim = '\t')
+    else if (profileType == "DBS") {
+      data_input <- read_delim(paste0(pythonOutput, '/DBS/', projectID, '.', matrixSize, '.all'), delim = '\t')
     }
-    else if (profileName == "ID") {
-      data_input <- read_delim(paste0(pythonOutput, '/ID/', projectID, '.', matrix, '.all'), delim = '\t')
+    else if (profileType == "ID") {
+      data_input <- read_delim(paste0(pythonOutput, '/ID/', projectID, '.', matrixSize, '.all'), delim = '\t')
     }
 
     ## remove the false data from the result. Don't know why the web generated two additonal columns: False and seen, i think you trying to find the bug and remove.
-    # data_input <- data_input %>% select(-seen)
+    data_input <- data_input %>% select(-False, - seen)
+    # Heatmap of cosine similarity within samples  and put on the web---------------------------
+    cos_sim_res1 = cos_sim_df(data_input, data_input)
+    plot_cosine_heatmap_df(cos_sim_res1, cluster_rows = TRUE, plot_values = FALSE)
+    ggsave(paste0(savePath, 'cosineSimilarityBetweenSamples.svg'))
+    # a link to download the cosine similarity bellow the plot
+    # you could rename the file name if you need
+    cos_sim_res1 %>% write_delim('cos_sim_res1.txt', delim = '\t', col_names = T)
 
-    # Heatmap of cosine similarity to reference set ---------------------------
 
-    sigref <- signature_refsets_input %>%
-  select(Signature_name, MutationType, Contribution) %>%
-  pivot_wider(names_from = Signature_name, values_from = Contribution)
-
-    cos_sim_res = cos_sim_df(data_input, sigref)
-    # return(cos_sim_res)
-    # put this heatmap on the web
-    plot_cosine_heatmap_df(cos_sim_res, cluster_rows = TRUE, plot_values = FALSE)
-    ggsave(paste0(savePath, 'heatmap1.svg'))
+    # section 2: Cosine similarity  to reference signatures #
+    # Two parameters need: Profile Type, Reference Signature Set
+    # Profile Type only support SBS, DBS, ID
 
 
     # on the web, dropdown list for the input sample and (specific signature or a formula), put the barplot on the web
@@ -118,9 +121,4 @@ generatePlots <- function(profileName, signatureSetName, sampleName, signatureNa
   })
   # t-SNE plots, coming soon ###
 }
-
-
-
-
-
 
