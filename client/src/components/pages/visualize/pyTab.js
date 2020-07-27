@@ -50,7 +50,7 @@ export default function PyTab({ setPlot }) {
 
   function getPlotName() {
     const plot = filtered[0];
-    return `${plot.Sample_Name}-${plot.Profile_Type}-${plot.Matrix}.svg`;
+    return `${plot.Sample_Name}-${plot.Profile_Type}-${plot.Matrix}-${plot.Tag}.svg`;
   }
 
   async function downloadResults() {
