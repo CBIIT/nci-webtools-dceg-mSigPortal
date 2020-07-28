@@ -7,7 +7,7 @@ import {
 } from '../../../services/store';
 
 import PyTab from './pyTab';
-import RTab from './rTab';
+import { CosineSimilarity } from './rTab';
 
 const { Group, Label, Control } = Form;
 const { Header, Body } = Card;
@@ -24,21 +24,20 @@ export default function Results() {
     projectID,
     displayTab,
     pyPlotURL,
-    rPlotURL,
+    csPlotURL,
     pyTab,
-    rTab,
+    cosineSimilarity,
   } = useSelector((state) => state.visualizeResults);
 
   const { mapping, filtered } = pyTab;
 
   const {
-    profileType,
+    profileType1,
+    matrixSize,
+    profileType2,
     signatureSet,
-    selectName2,
-    selectSigFormula,
-    sigFormula,
     rPlots,
-  } = rTab;
+  } = cosineSimilarity;
 
   // get mapping after retrieving projectID
   useEffect(() => {
@@ -72,10 +71,10 @@ export default function Results() {
             dispatchVisualizeResults({
               pyPlotURL: objectURL,
             });
-          } else if (type == 'r') {
+          } else if (type == 'cosineSimilarity') {
             dispatchVisualizeResults({
               rPlotIndex: index,
-              rPlotURL: objectURL,
+              csPlotURL: objectURL,
             });
           }
         }
@@ -155,23 +154,30 @@ export default function Results() {
         selectMatrix: selectMatrix,
         selectTag: selectTag,
       },
-      rTab: { ...rTab, selectName2: nameOptions[0] },
+      cosineSimilarity: {
+        ...cosineSimilarity,
+        profileType1: profileOptions[0],
+        profileType2: profileOptions[0],
+        matrixSize: matrixOptions[0],
+      },
     });
   }
 
-  async function submitR() {
-    dispatchVisualizeResults({ rTab: { ...rTab, submitOverlay: true } });
+  async function submitR(fn = '') {
+    dispatchVisualizeResults({
+      cosineSimilarity: { ...cosineSimilarity, submitOverlay: true },
+    });
     let args = {
-      profileName: profileType,
-      signatureSetName: signatureSet,
-      sampleName: selectName2,
-      signatureName: null,
-      formula: null,
+      fn: fn,
+      profileType1: profileType1,
+      matrixSize: matrixSize.replace('-', ''),
+      profileType2: profileType2,
+      signatureSet: signatureSet,
       projectID: projectID,
     };
-    selectSigFormula == 'signature'
-      ? (args.signatureName = sigFormula)
-      : (args.formula = sigFormula);
+    // selectSigFormula == 'signature'
+    //   ? (args.signatureName = sigFormula)
+    //   : (args.formula = sigFormula);
 
     try {
       const response = await fetch(`${root}api/visualizeR`, {
@@ -186,19 +192,25 @@ export default function Results() {
         const err = await response.text();
         console.log(err);
         dispatchVisualizeResults({
-          rTab: { ...rTab, debugR: err, rPlots: [] },
+          cosineSimilarity: { ...cosineSimilarity, debugR: err, rPlots: [] },
         });
       } else {
         const data = await response.json();
         console.log(data);
         dispatchVisualizeResults({
-          rTab: { ...rTab, debugR: data.debugR, rPlots: data.plots },
+          cosineSimilarity: {
+            ...cosineSimilarity,
+            debugR: data.debugR,
+            rPlots: data.plots,
+            submitOverlay: false,
+          },
         });
       }
     } catch (err) {
       dispatchError(err);
-    } finally {
-      dispatchVisualizeResults({ rTab: { ...rTab, submitOverlay: false } });
+      dispatchVisualizeResults({
+        cosineSimilarity: { ...cosineSimilarity, submitOverlay: false },
+      });
     }
   }
 
@@ -218,10 +230,12 @@ export default function Results() {
           </Item>
           <Item>
             <Link
-              active={displayTab == 'r'}
-              onClick={() => dispatchVisualizeResults({ displayTab: 'r' })}
+              active={displayTab == 'cosineSimilarity'}
+              onClick={() =>
+                dispatchVisualizeResults({ displayTab: 'cosineSimilarity' })
+              }
             >
-              R
+              Cosine Similarity
             </Link>
           </Item>
         </Nav>
@@ -229,8 +243,10 @@ export default function Results() {
       <Body style={{ display: displayTab == 'python' ? 'block' : 'none' }}>
         <PyTab setPlot={(e) => setPlot(e)} />
       </Body>
-      <Body style={{ display: displayTab == 'r' ? 'block' : 'none' }}>
-        <RTab
+      <Body
+        style={{ display: displayTab == 'cosineSimilarity' ? 'block' : 'none' }}
+      >
+        <CosineSimilarity
           setPlot={(e, type) => setPlot(e, type)}
           submitR={() => submitR()}
         />

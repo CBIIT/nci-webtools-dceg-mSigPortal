@@ -14,8 +14,8 @@ const root =
     ? 'http://localhost:8330/'
     : window.location.pathname;
 
-export default function RTab({ setPlot, submitR }) {
-  const { pyTab, rPlotURL, rTab } = useSelector(
+export function CosineSimilarity({ setPlot, submitR }) {
+  const { pyTab, csPlotURL, cosineSimilarity } = useSelector(
     (state) => state.visualizeResults
   );
 
@@ -35,19 +35,23 @@ export default function RTab({ setPlot, submitR }) {
     submitOverlay,
     refSigOverlay,
     debugR,
-  } = rTab;
+  } = cosineSimilarity;
 
   // load first r plot after they are recieved
   useEffect(() => {
     if (rPlots.length && !rPlotIndex.length) {
-      setPlot(0, 'r');
+      setPlot(0, 'cosineSimilarity');
     }
   }, [rPlots]);
+
+  useEffect(() => {
+    getSignatureSet(profileType2);
+  }, [profileType2]);
 
   // get Signature Reference Sets
   async function getSignatureSet(profileType) {
     dispatchVisualizeResults({
-      rTab: { ...rTab, refSigOverlay: true },
+      cosineSimilarity: { ...cosineSimilarity, refSigOverlay: true },
     });
     try {
       const response = await fetch(
@@ -62,23 +66,21 @@ export default function RTab({ setPlot, submitR }) {
         }
       );
       const signatureSetOptions = await response.json();
-      console.log(signatureSetOptions);
+
       dispatchVisualizeResults({
-        rTab: {
-          ...rTab,
-          profileType2: profileType,
+        cosineSimilarity: {
+          ...cosineSimilarity,
           signatureSetOptions: signatureSetOptions,
+          signatureSet: signatureSetOptions[0],
           refSigOverlay: false,
         },
       });
     } catch (err) {
       dispatchError(err);
     } finally {
-      //   dispatchVisualizeResults({ rTab: { ...rTab, refSigOverlay: false } });
+      //   dispatchVisualizeResults({ cosineSimilarity: { ...cosineSimilarity, refSigOverlay: false } });
     }
   }
-
-  useEffect(() => {}, [profileType2]);
 
   return (
     <div>
@@ -94,7 +96,10 @@ export default function RTab({ setPlot, submitR }) {
                   value={profileType1}
                   onChange={(e) =>
                     dispatchVisualizeResults({
-                      rTab: { ...rTab, profileType1: e.target.value },
+                      cosineSimilarity: {
+                        ...cosineSimilarity,
+                        profileType1: e.target.value,
+                      },
                     })
                   }
                   custom
@@ -116,9 +121,9 @@ export default function RTab({ setPlot, submitR }) {
                 value={matrixSize}
                 onChange={(e) =>
                   dispatchVisualizeResults({
-                    rTab: {
-                      ...rTab,
-                      matrixSize: e.target.value.replace('-', ''),
+                    cosineSimilarity: {
+                      ...cosineSimilarity,
+                      matrixSize: e.target.value,
                     },
                   })
                 }
@@ -152,7 +157,12 @@ export default function RTab({ setPlot, submitR }) {
                   as="select"
                   value={profileType2}
                   onChange={(e) => {
-                    getSignatureSet(e.target.value);
+                    dispatchVisualizeResults({
+                      cosineSimilarity: {
+                        ...cosineSimilarity,
+                        profileType2: e.target.value,
+                      },
+                    });
                   }}
                   custom
                 >
@@ -175,8 +185,10 @@ export default function RTab({ setPlot, submitR }) {
                   value={signatureSet}
                   onChange={(e) =>
                     dispatchVisualizeResults({
-                      ...rTab,
-                      signatureSet: e.target.value,
+                      cosineSimilarity: {
+                        ...cosineSimilarity,
+                        signatureSet: e.target.value,
+                      },
                     })
                   }
                   custom
@@ -193,10 +205,17 @@ export default function RTab({ setPlot, submitR }) {
               </Group>
             </Col>
           </Row>
+          <Row>
+            <Col>
+              <Button variant="primary" onClick={() => submitR()}>
+                Calculate
+              </Button>
+            </Col>
+          </Row>
         </div>
       </Form>
 
-      <Form>
+      {/* <Form>
         <Label>Additional Plots</Label>
         <div className="border rounded p-2">
           <LoadingOverlay active={submitOverlay} />
@@ -209,8 +228,10 @@ export default function RTab({ setPlot, submitR }) {
                   value={selectName2}
                   onChange={(e) =>
                     dispatchVisualizeResults({
-                      ...rTab,
-                      selectName2: e.target.value,
+                      cosineSimilarity: {
+                        ...cosineSimilarity,
+                        selectName2: e.target.value,
+                      },
                     })
                   }
                   custom
@@ -241,7 +262,10 @@ export default function RTab({ setPlot, submitR }) {
                   value={selectSigFormula}
                   onChange={(e) =>
                     dispatchVisualizeResults({
-                      rTab: { ...rTab, selectSigFormula: e.target.value },
+                      cosineSimilarity: {
+                        ...cosineSimilarity,
+                        selectSigFormula: e.target.value,
+                      },
                     })
                   }
                   custom
@@ -259,7 +283,10 @@ export default function RTab({ setPlot, submitR }) {
                 value={sigFormula}
                 onChange={(e) =>
                   dispatchVisualizeResults({
-                    rTab: { ...rTab, sigFormula: e.target.value },
+                    cosineSimilarity: {
+                      ...cosineSimilarity,
+                      sigFormula: e.target.value,
+                    },
                   })
                 }
               ></Control>
@@ -273,7 +300,7 @@ export default function RTab({ setPlot, submitR }) {
             </Col>
           </Row>
         </div>
-      </Form>
+      </Form> */}
 
       <div
         className="mt-2 p-2 border rounded"
@@ -283,7 +310,7 @@ export default function RTab({ setPlot, submitR }) {
           <Control
             as="select"
             value={rPlotIndex}
-            onChange={(e) => setPlot(e.target.value, 'r')}
+            onChange={(e) => setPlot(e.target.value, 'cosineSimilarity')}
             custom
           >
             {rPlots.map((plot, index) => {
@@ -297,7 +324,7 @@ export default function RTab({ setPlot, submitR }) {
         </Col>
         <Row>
           <Col>
-            <img className="w-100 my-4" src={rPlotURL}></img>
+            <img className="w-100 my-4" src={csPlotURL}></img>
           </Col>
         </Row>
       </div>

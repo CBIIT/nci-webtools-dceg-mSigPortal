@@ -109,12 +109,11 @@ app.post('/api/visualizeR', (req, res) => {
     fs.mkdirSync(plotSavePath);
   }
   try {
-    const rOut = r('api/R/visualizeWrapper.R', 'generatePlots', {
-      profileName: req.body.profileName,
-      signatureSetName: req.body.signatureSetName,
-      sampleName: req.body.sampleName,
-      signatureName: req.body.signatureName,
-      formula: req.body.formula,
+    const rOut = r('api/R/visualizeWrapper.R', 'cosineSimilarity', {
+      profileType1: req.body.profileType1,
+      matrixSize: req.body.matrixSize,
+      profileType2: req.body.profileType2,
+      signatureSetName: req.body.signatureSet,
       projectID: req.body.projectID,
       pythonOutput: path.join(tmppath, req.body.projectID, 'results/output'),
       savePath: plotSavePath,
@@ -126,7 +125,6 @@ app.post('/api/visualizeR', (req, res) => {
     console.log('rOut', rOut);
 
     res.json({
-      list: list,
       debugR: rOut,
       plots: plots,
     });
