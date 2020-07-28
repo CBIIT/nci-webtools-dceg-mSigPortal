@@ -98,6 +98,7 @@ export default function Results() {
       body: JSON.stringify({ projectID: projectID }),
     });
     const mapping = await response.json();
+
     const nameOptions = [...new Set(mapping.map((plot) => plot.Sample_Name))];
     const profileOptions = [
       ...new Set(mapping.map((plot) => plot.Profile_Type)),
@@ -105,13 +106,40 @@ export default function Results() {
     const matrixOptions = [...new Set(mapping.map((plot) => plot.Matrix))];
     const tagOptions = [...new Set(mapping.map((plot) => plot.Tag))];
 
+    const selectName = pyTab.selectName || nameOptions[0];
+    const selectProfile = pyTab.selectProfile || profileOptions[0];
+    const selectMatrix = pyTab.selectMatrix || matrixOptions[0];
+    const selectTag = pyTab.selectTag || tagOptions[0];
+
     const filteredPlots = mapping.filter(
       (plot) =>
-        plot.Sample_Name == (pyTab.selectName || nameOptions[0]) &&
-        plot.Profile_Type == (pyTab.selectProfile || profileOptions[0]) &&
-        plot.Matrix == (pyTab.selectMatrix || matrixOptions[0]) &&
-        plot.Tag == (pyTab.selectTag || tagOptions[0])
+        plot.Sample_Name == selectName &&
+        plot.Profile_Type == selectProfile &&
+        plot.Matrix == selectMatrix &&
+        plot.Tag == selectTag
     );
+
+    const filteredProfileOptions = [
+      ...new Set(
+        mapping
+          .filter((plot) => plot.Sample_Name == selectName)
+          .map((plot) => plot.Profile_Type)
+      ),
+    ];
+    const filteredMatrixOptions = [
+      ...new Set(
+        mapping
+          .filter((plot) => plot.Profile_Type == selectProfile)
+          .map((plot) => plot.Matrix)
+      ),
+    ];
+    const filteredTagOptions = [
+      ...new Set(
+        mapping
+          .filter((plot) => plot.Matrix == selectMatrix)
+          .map((plot) => plot.Tag)
+      ),
+    ];
 
     dispatchVisualizeResults({
       pyTab: {
@@ -119,13 +147,13 @@ export default function Results() {
         mapping: mapping,
         filtered: filteredPlots,
         nameOptions: nameOptions,
-        profileOptions: profileOptions,
-        matrixOptions: matrixOptions,
-        tagOptions: tagOptions,
-        selectName: pyTab.selectName || nameOptions[0],
-        selectProfile: pyTab.selectProfile || profileOptions[0],
-        selectMatrix: pyTab.selectMatrix || matrixOptions[0],
-        selectTag: pyTab.selectTag || tagOptions[0],
+        profileOptions: filteredProfileOptions,
+        matrixOptions: filteredMatrixOptions,
+        tagOptions: filteredTagOptions,
+        selectName: selectName,
+        selectProfile: selectProfile,
+        selectMatrix: selectMatrix,
+        selectTag: selectTag,
       },
       rTab: { ...rTab, selectName2: nameOptions[0] },
     });

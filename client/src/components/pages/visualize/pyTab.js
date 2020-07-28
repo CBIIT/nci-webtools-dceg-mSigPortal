@@ -85,11 +85,23 @@ export default function PyTab({ setPlot }) {
   }
 
   function filterSampleName(name) {
-    const filteredPlots = mapping.filter(
-      (plot) => plot.Sample_Name == name && plot.Profile_Type == 'SBS'
-    );
+    const filteredPlots = mapping.filter((plot) => plot.Sample_Name == name);
     const profileOptions = [
       ...new Set(filteredPlots.map((plot) => plot.Profile_Type)),
+    ];
+    const matrixOptions = [
+      ...new Set(
+        filteredPlots
+          .filter((plot) => plot.Profile_Type == profileOptions[0])
+          .map((plot) => plot.Matrix)
+      ),
+    ];
+    const tagOptions = [
+      ...new Set(
+        filteredPlots
+          .filter((plot) => plot.Matrix == matrixOptions[0])
+          .map((plot) => plot.Tag)
+      ),
     ];
 
     dispatchVisualizeResults({
@@ -97,11 +109,11 @@ export default function PyTab({ setPlot }) {
         ...pyTab,
         selectName: name,
         selectProfile: profileOptions[0],
-        selectMatrix: '',
-        selectTag: '',
+        selectMatrix: matrixOptions[0],
+        selectTag: tagOptions[0],
         profileOptions: profileOptions,
-        matrixOptions: [...new Set(filteredPlots.map((plot) => plot.Matrix))],
-        tagOptions: [...new Set(filteredPlots.map((plot) => plot.Tag))],
+        matrixOptions: matrixOptions,
+        tagOptions: tagOptions,
         filtered: filteredPlots,
       },
     });
@@ -109,10 +121,17 @@ export default function PyTab({ setPlot }) {
 
   function filterProfileType(profile) {
     const filteredPlots = mapping.filter(
-      (plot) => plot.Sample_Name == selectName && plot.Profile_Type == profile
+      (plot) => plot.Profile_Type == profile
     );
     const matrixOptions = [
       ...new Set(filteredPlots.map((plot) => plot.Matrix)),
+    ];
+    const tagOptions = [
+      ...new Set(
+        filteredPlots
+          .filter((plot) => plot.Matrix == matrixOptions[0])
+          .map((plot) => plot.Tag)
+      ),
     ];
 
     dispatchVisualizeResults({
@@ -120,21 +139,16 @@ export default function PyTab({ setPlot }) {
         ...pyTab,
         selectProfile: profile,
         selectMatrix: matrixOptions[0],
-        selectTag: '',
+        selectTag: tagOptions[0],
         matrixOptions: matrixOptions,
-        tagOptions: [...new Set(filteredPlots.map((plot) => plot.Tag))],
+        tagOptions: tagOptions,
         filtered: filteredPlots,
       },
     });
   }
 
   function filterMatrix(matrix) {
-    const filteredPlots = mapping.filter(
-      (plot) =>
-        plot.Sample_Name == selectName &&
-        plot.Profile_Type == selectProfile &&
-        plot.Matrix == matrix
-    );
+    const filteredPlots = mapping.filter((plot) => plot.Matrix == matrix);
     const tagOptions = [...new Set(filteredPlots.map((plot) => plot.Tag))];
 
     dispatchVisualizeResults({
@@ -149,13 +163,7 @@ export default function PyTab({ setPlot }) {
   }
 
   function filterTag(tag) {
-    const filteredPlots = mapping.filter(
-      (plot) =>
-        plot.Sample_Name == selectName &&
-        plot.Profile_Type == selectProfile &&
-        plot.Matrix == selectMatrix &&
-        plot.Tag == tag
-    );
+    const filteredPlots = mapping.filter((plot) => plot.Tag == tag);
 
     dispatchVisualizeResults({
       pyTab: {
@@ -179,7 +187,6 @@ export default function PyTab({ setPlot }) {
                   as="select"
                   value={selectName}
                   onChange={(e) => filterSampleName(e.target.value)}
-                  // defaultValue="unselected"
                   custom
                 >
                   <option value="0" disabled>
@@ -197,7 +204,6 @@ export default function PyTab({ setPlot }) {
               <Col sm="3">
                 <Label>Profile Type</Label>
                 <Control
-                  disabled={selectName == ''}
                   as="select"
                   value={selectProfile}
                   onChange={(e) => filterProfileType(e.target.value)}
@@ -218,7 +224,6 @@ export default function PyTab({ setPlot }) {
               <Col sm="3">
                 <Label>Matrix</Label>
                 <Control
-                  disabled={selectProfile == ''}
                   as="select"
                   value={selectMatrix}
                   onChange={(e) => filterMatrix(e.target.value)}
@@ -239,7 +244,6 @@ export default function PyTab({ setPlot }) {
               <Col sm="3">
                 <Label>Tag</Label>
                 <Control
-                  disabled={selectMatrix == ''}
                   as="select"
                   value={selectTag}
                   onChange={(e) => filterTag(e.target.value)}
