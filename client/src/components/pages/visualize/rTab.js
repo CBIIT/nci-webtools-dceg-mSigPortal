@@ -84,8 +84,9 @@ export function CosineSimilarity({ setPlot, submitR }) {
       });
     } catch (err) {
       dispatchError(err);
-    } finally {
-      //   dispatchVisualizeResults({ cosineSimilarity: { ...cosineSimilarity, refSigOverlay: false } });
+      dispatchVisualizeResults({
+        cosineSimilarity: { ...cosineSimilarity, refSigOverlay: false },
+      });
     }
   }
 
