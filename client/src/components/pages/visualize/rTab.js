@@ -32,6 +32,7 @@ export function CosineSimilarity({ setPlot, submitR }) {
     sigFormula,
     rPlots,
     rPlotIndex,
+    results,
     submitOverlay,
     refSigOverlay,
     debugR,
@@ -43,6 +44,12 @@ export function CosineSimilarity({ setPlot, submitR }) {
       setPlot(0, 'cosineSimilarity');
     }
   }, [rPlots]);
+
+  useEffect(() => {
+    if (!rPlots.length && signatureSet.length) {
+      submitR();
+    }
+  }, [signatureSet]);
 
   useEffect(() => {
     getSignatureSet(profileType2);
@@ -82,8 +89,40 @@ export function CosineSimilarity({ setPlot, submitR }) {
     }
   }
 
+  //   download text results files
+  async function downloadResults() {
+    try {
+      const response = await fetch(`${root}visualize/txt`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ path: results[rPlotIndex] }),
+      });
+      if (!response.ok) {
+        const { msg } = await response.json();
+        dispatchError(msg);
+      } else {
+        const file = await response.blob();
+        const objectURL = URL.createObjectURL(file);
+        const tempLink = document.createElement('a');
+
+        tempLink.href = objectURL;
+        tempLink.download = results[rPlotIndex].split('/').slice(-1)[0];
+        document.body.appendChild(tempLink);
+        tempLink.click();
+        document.body.removeChild(tempLink);
+        URL.revokeObjectURL(objectURL);
+      }
+    } catch (err) {
+      dispatchError(err);
+    }
+  }
+
   return (
     <div>
+      <LoadingOverlay active={submitOverlay} />
       <Form>
         <Label>Cosine Similarity Within Samples</Label>
         <div className="border rounded p-2">
@@ -145,7 +184,7 @@ export function CosineSimilarity({ setPlot, submitR }) {
         </div>
       </Form>
 
-      <Form>
+      <Form className="my-2">
         <Label>Cosine Similarity to Reference Signatures</Label>
         <LoadingOverlay active={refSigOverlay} />
         <div className="border rounded p-2">
@@ -301,7 +340,24 @@ export function CosineSimilarity({ setPlot, submitR }) {
           </Row>
         </div>
       </Form> */}
-
+      <div className="d-flex">
+        <a
+          className="px-2 py-1"
+          href={csPlotURL}
+          download={csPlotURL.split('/').slice(-1)[0]}
+        >
+          Download Plot
+        </a>
+        <span className="ml-auto">
+          <Button
+            className="px-2 py-1"
+            variant="link"
+            onClick={() => downloadResults()}
+          >
+            Download Results
+          </Button>
+        </span>
+      </div>
       <div
         className="mt-2 p-2 border rounded"
         style={{ display: rPlots.length ? 'block' : 'none' }}

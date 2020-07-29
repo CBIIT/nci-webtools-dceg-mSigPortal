@@ -34,10 +34,8 @@ cosineSimilarity <- function(profileType1, matrixSize, profileType2, signatureSe
     # Heatmap of cosine similarity within samples  and put on the web---------------------------
     cos_sim_res1 = cos_sim_df(data_input, data_input)
     plot_cosine_heatmap_df(cos_sim_res1, cluster_rows = TRUE, plot_values = FALSE)
-    ggsave(paste0(savePath, 'cosineSimilarityBetweenSamples.svg'))
-    # a link to download the cosine similarity bellow the plot
-    # you could rename the file name if you need
-    cos_sim_res1 %>% write_delim(paste0(savePath, 'cos_sim_res1.txt'), delim = '\t', col_names = T)
+    ggsave(paste0(savePath, 'cos_sim_within.svg'))
+    cos_sim_res1 %>% write_delim(paste0(savePath, 'cos_sim_within.txt'), delim = '\t', col_names = T)
 
 
     # section 2: Cosine similarity  to reference signatures #
@@ -48,19 +46,15 @@ cosineSimilarity <- function(profileType1, matrixSize, profileType2, signatureSe
     sigref <- signature_refsets_input %>%
       select(Signature_name, MutationType, Contribution) %>%
       pivot_wider(names_from = Signature_name, values_from = Contribution)
-    data_input <- read_delim(paste0(pythonOutput, '/', profileType2, '/', projectID, '.', matrixSize, '.all'), delim = '\t')
 
+    data_input <- read_delim(paste0(pythonOutput, '/', profileType2, '/', projectID, '.', matrixSize2, '.all'), delim = '\t')
     # data_input <- data_input %>% select(-False, - seen)
 
     # Heatmap of cosine similarity to reference set signature and put on the web---------------------------
     cos_sim_res2 = cos_sim_df(data_input, sigref)
-    print(1)
     plot_cosine_heatmap_df(cos_sim_res2, cluster_rows = TRUE, plot_values = FALSE)
-    print(2)
-    ggsave(paste0(savePath, 'cosineSimilarityToRefSetSignature.svg'))
-    # a link to download the cosine similarity bellow the plot 
-    # you could rename the file name if you need
-    cos_sim_res2 %>% write_delim(paste0(savePath, 'cos_sim_res2.txt', delim = '\t', col_names = T))
+    ggsave(paste0(savePath, 'cos_sim_sigref.svg'))
+    cos_sim_res2 %>% write_delim(paste0(savePath, 'cos_sim_sigref.txt', delim = '\t', col_names = T))
 
   }, error = function(e) {
     print(e)

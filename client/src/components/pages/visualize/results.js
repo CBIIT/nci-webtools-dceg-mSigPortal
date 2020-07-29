@@ -48,7 +48,7 @@ export default function Results() {
 
   async function setPlot(index, type = 'python') {
     let plot = filtered[index];
-    if (type == 'r') plot = rPlots[index];
+    if (type == 'cosineSimilarity') plot = rPlots[index];
     if (plot) {
       try {
         const response = await fetch(`${root}visualize/svg`, {
@@ -73,8 +73,11 @@ export default function Results() {
             });
           } else if (type == 'cosineSimilarity') {
             dispatchVisualizeResults({
-              rPlotIndex: index,
               csPlotURL: objectURL,
+              cosineSimilarity: {
+                ...cosineSimilarity,
+                rPlotIndex: index,
+              },
             });
           }
         }
@@ -202,6 +205,7 @@ export default function Results() {
             ...cosineSimilarity,
             debugR: data.debugR,
             rPlots: data.plots,
+            results: data.results,
             submitOverlay: false,
           },
         });

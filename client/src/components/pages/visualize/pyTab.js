@@ -266,7 +266,7 @@ export default function PyTab({ setPlot }) {
         </Group>
       </Form>
       <div className="d-flex">
-        <a className="ml-2 px-2 py-1" href={pyPlotURL} download={getPlotName()}>
+        <a className="px-2 py-1" href={pyPlotURL} download={getPlotName()}>
           Download Plot
         </a>
         <span className="ml-auto">

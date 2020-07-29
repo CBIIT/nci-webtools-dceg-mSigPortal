@@ -120,13 +120,19 @@ app.post('/api/visualizeR', (req, res) => {
     });
     const plots = fs
       .readdirSync(plotSavePath)
+      .filter((file) => file.endsWith('.svg'))
       .map((plot) => path.join(plotSavePath, plot));
+    const cosSim = fs
+      .readdirSync(plotSavePath)
+      .filter((file) => file.endsWith('.txt'))
+      .map((cosSim) => path.join(plotSavePath, cosSim));
 
     console.log('rOut', rOut);
 
     res.json({
       debugR: rOut,
       plots: plots,
+      results: cosSim,
     });
   } catch (err) {
     res.status(500).send(err.message);
@@ -192,6 +198,22 @@ app.post('/visualize/upload', (req, res, next) => {
       msg: 'An error occured while trying to upload',
       err: err,
     });
+  });
+});
+
+app.post('/visualize/txt', (req, res) => {
+  const txtPath = req.body.path;
+  const s = fs.createReadStream(txtPath);
+
+  s.on('open', () => {
+    res.set('Content-Type', 'text/plain');
+    s.pipe(res);
+    logger.debug(`/visualize/txt: Serving ${txtPath}`);
+  });
+  s.on('error', () => {
+    res.set('Content-Type', 'text/plain');
+    res.status(500).end('Not found');
+    logger.error(`/visualize/txt: Error retrieving ${txtPath}`);
   });
 });
 

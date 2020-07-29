@@ -52,6 +52,7 @@ export const getInitialState = () => ({
       // sigFormula: 'SBS5',
       rPlots: [],
       rPlotIndex: '',
+      results: [],
       debugR: [],
       submitOverlay: false,
       refSigOverlay: false,
