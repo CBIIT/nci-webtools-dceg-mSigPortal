@@ -48,6 +48,7 @@ var logger = new createLogger({
       timestamp: true,
       maxFiles: '1d',
       prepend: true,
+      colorize: true,
     }),
     new transports.Console(),
   ],

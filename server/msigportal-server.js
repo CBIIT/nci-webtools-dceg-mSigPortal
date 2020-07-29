@@ -20,7 +20,8 @@ app.use(express.static(path.resolve('www')));
 app.use(express.json());
 
 app.use((err, req, res, next) => {
-  logger.error('Caught Error:\n' + err.message);
+  logger.info('Caught Error:\n' + err.message);
+  logger.error(err);
   if (!err.statusCode) err.statusCode = 500;
   res.status(err.statusCode).send(err.message);
 });
@@ -84,9 +85,7 @@ app.post('/api/visualize', (req, res) => {
       logger.info('/API/VISUALIZE: Profile Extraction Succeeded');
       res.json({ ...scriptOut });
     } else {
-      logger.error(
-        '/API/VISUALIZE: An Error Occured While Extracting Profiles'
-      );
+      logger.info('/API/VISUALIZE: An Error Occured While Extracting Profiles');
       res.status(500).json({
         msg:
           'An error occured durring profile extraction. Please review your input parameters and try again.',
@@ -135,8 +134,8 @@ app.post('/api/visualizeR', (req, res) => {
       results: cosSim,
     });
   } catch (err) {
-    logger.error('/api/visualizeR: An error occured');
-    logger.error(err.message);
+    logger.info('/api/visualizeR: An error occured');
+    logger.error(err);
     res.status(500).send(err.message);
   }
 });
@@ -154,8 +153,8 @@ app.post('/api/visualizeR/getSignatureReferenceSets', (req, res) => {
 
     res.json(list);
   } catch (err) {
-    logger.error('/api/visualizeR/getSignatureReferenceSets: An error occured');
-    logger.error(err.message);
+    logger.info('/api/visualizeR/getSignatureReferenceSets: An error occured');
+    logger.error(err);
     res.status(500).send(err.message);
   }
 });
@@ -179,9 +178,8 @@ app.post('/visualize/upload', (req, res, next) => {
     const uploadPath = path.join(form.uploadDir, file.name);
     fs.rename(file.path, uploadPath, (err) => {
       if (err) {
-        logger.error(
-          `/UPLOAD: Failed to upload file: ${file.name}` + '\n' + err
-        );
+        logger.info(`/UPLOAD: Failed to upload file: ${file.name}`);
+        logger.error(err);
         res.status(404).json({
           msg: `Failed to upload file: ${file.name}<br><br>
         Review your selected File Type and try again.`,
@@ -197,7 +195,8 @@ app.post('/visualize/upload', (req, res, next) => {
     });
   });
   form.on('error', function (err) {
-    logger.error('/UPLOAD: An error occured\n' + err);
+    logger.info('/UPLOAD: An error occured\n' + err);
+    logger.error(err);
     res.status(500).json({
       msg: 'An error occured while trying to upload',
       err: err,
@@ -217,7 +216,7 @@ app.post('/visualize/txt', (req, res) => {
   s.on('error', () => {
     res.set('Content-Type', 'text/plain');
     res.status(500).end('Not found');
-    logger.error(`/visualize/txt: Error retrieving ${txtPath}`);
+    logger.info(`/visualize/txt: Error retrieving ${txtPath}`);
   });
 });
 
@@ -233,7 +232,7 @@ app.post('/visualize/svg', (req, res) => {
   s.on('error', () => {
     res.set('Content-Type', 'text/plain');
     res.status(500).end('Not found');
-    logger.error(`/VISUALIZE/SVG: Error retrieving ${svgPath}`);
+    logger.info(`/VISUALIZE/SVG: Error retrieving ${svgPath}`);
   });
 });
 
@@ -245,7 +244,7 @@ app.post('/visualize/summary', (req, res) => {
 
   fs.readFile(summaryPath, 'utf8', (err, data) => {
     if (err) {
-      logger.error('/VISUALIZE/SUMMARY: Error Reading Results Summary');
+      logger.info('/VISUALIZE/SUMMARY: Error Reading Results Summary');
       logger.error(err);
       res.status(500).json(err);
     }
