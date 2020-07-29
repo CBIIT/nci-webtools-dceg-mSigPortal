@@ -135,6 +135,8 @@ app.post('/api/visualizeR', (req, res) => {
       results: cosSim,
     });
   } catch (err) {
+    logger.error('/api/visualizeR: An error occured');
+    logger.error(err.message);
     res.status(500).send(err.message);
   }
 });
@@ -152,6 +154,8 @@ app.post('/api/visualizeR/getSignatureReferenceSets', (req, res) => {
 
     res.json(list);
   } catch (err) {
+    logger.error('/api/visualizeR/getSignatureReferenceSets: An error occured');
+    logger.error(err.message);
     res.status(500).send(err.message);
   }
 });
