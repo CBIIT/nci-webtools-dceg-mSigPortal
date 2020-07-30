@@ -72,16 +72,23 @@ export function CosineSimilarity({ setPlot, submitR }) {
           body: JSON.stringify({ profileType: profileType }),
         }
       );
-      const signatureSetOptions = await response.json();
+      if (response.ok) {
+        const signatureSetOptions = await response.json();
 
-      dispatchVisualizeResults({
-        cosineSimilarity: {
-          ...cosineSimilarity,
-          signatureSetOptions: signatureSetOptions,
-          signatureSet: signatureSetOptions[0],
-          refSigOverlay: false,
-        },
-      });
+        dispatchVisualizeResults({
+          cosineSimilarity: {
+            ...cosineSimilarity,
+            signatureSetOptions: signatureSetOptions,
+            signatureSet: signatureSetOptions[0],
+            refSigOverlay: false,
+          },
+        });
+      } else {
+        dispatchError(await response.json());
+        dispatchVisualizeResults({
+          cosineSimilarity: { ...cosineSimilarity, refSigOverlay: false },
+        });
+      }
     } catch (err) {
       dispatchError(err);
       dispatchVisualizeResults({

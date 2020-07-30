@@ -23,7 +23,7 @@ app.use((err, req, res, next) => {
   logger.info('Caught Error:\n' + err.message);
   logger.error(err);
   if (!err.statusCode) err.statusCode = 500;
-  res.status(err.statusCode).send(err.message);
+  res.status(err.statusCode).json(err.message);
 });
 
 app.get('/ping', (req, res) => res.send(true));
@@ -136,7 +136,7 @@ app.post('/api/visualizeR', (req, res) => {
   } catch (err) {
     logger.info('/api/visualizeR: An error occured');
     logger.error(err);
-    res.status(500).send(err.message);
+    res.status(500).json(err.message);
   }
 });
 
@@ -155,7 +155,7 @@ app.post('/api/visualizeR/getSignatureReferenceSets', (req, res) => {
   } catch (err) {
     logger.info('/api/visualizeR/getSignatureReferenceSets: An error occured');
     logger.error(err);
-    res.status(500).send(err.message);
+    res.status(500).json(err.message);
   }
 });
 
