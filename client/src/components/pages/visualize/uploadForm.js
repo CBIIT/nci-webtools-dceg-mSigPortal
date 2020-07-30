@@ -14,11 +14,6 @@ import {
 } from '../../../services/store';
 const { Group, Label, Control, Check, Text } = Form;
 
-const root =
-  process.env.NODE_ENV === 'development'
-    ? 'http://localhost:8330/'
-    : window.location.pathname;
-
 export default function UploadForm({ setOpenSidebar }) {
   const {
     inputFormat,
@@ -78,7 +73,7 @@ export default function UploadForm({ setOpenSidebar }) {
           },
         });
         try {
-          const response = await fetch(`${root}visualize/queue`, {
+          const response = await fetch(`/visualize/queue`, {
             method: 'POST',
             headers: {
               Accept: 'application/json',
@@ -110,7 +105,7 @@ export default function UploadForm({ setOpenSidebar }) {
           },
         });
         try {
-          const response = await fetch(`${root}api/visualize`, {
+          const response = await fetch(`/api/visualize`, {
             method: 'POST',
             headers: {
               Accept: 'application/json',
@@ -179,7 +174,7 @@ export default function UploadForm({ setOpenSidebar }) {
     try {
       const data = new FormData();
       data.append('file', inputFile);
-      let response = await fetch(`${root}visualize/upload`, {
+      let response = await fetch(`/visualize/upload`, {
         method: 'POST',
         body: data,
       });

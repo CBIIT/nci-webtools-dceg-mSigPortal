@@ -9,11 +9,6 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const { Group, Label, Control } = Form;
 
-const root =
-  process.env.NODE_ENV === 'development'
-    ? 'http://localhost:8330/'
-    : window.location.pathname;
-
 export default function PyTab({ setPlot }) {
   const [downloadOverlay, setOverlay] = useState(false);
   const { projectID, pyPlotURL, pyTab } = useSelector(
@@ -56,7 +51,7 @@ export default function PyTab({ setPlot }) {
   async function downloadResults() {
     setOverlay(true);
     try {
-      const response = await fetch(`${root}visualize/results`, {
+      const response = await fetch(`/visualize/results`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -74,7 +69,7 @@ export default function PyTab({ setPlot }) {
         const id = req.projectID;
         const tempLink = document.createElement('a');
 
-        tempLink.href = `${root}visualize/download?id=${id}`;
+        tempLink.href = `/visualize/download?id=${id}`;
         document.body.appendChild(tempLink);
         tempLink.click();
         document.body.removeChild(tempLink);

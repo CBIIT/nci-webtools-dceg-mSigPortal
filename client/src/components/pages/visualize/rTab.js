@@ -9,11 +9,6 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const { Group, Label, Control } = Form;
 
-const root =
-  process.env.NODE_ENV === 'development'
-    ? 'http://localhost:8330/'
-    : window.location.pathname;
-
 export function CosineSimilarity({ setPlot, submitR }) {
   const { pyTab, csPlotURL, cosineSimilarity } = useSelector(
     (state) => state.visualizeResults
@@ -63,7 +58,7 @@ export function CosineSimilarity({ setPlot, submitR }) {
     });
     try {
       const response = await fetch(
-        `${root}api/visualizeR/getSignatureReferenceSets`,
+        `/api/visualizeR/getSignatureReferenceSets`,
         {
           method: 'POST',
           headers: {
@@ -101,7 +96,7 @@ export function CosineSimilarity({ setPlot, submitR }) {
   //   download text results files
   async function downloadResults() {
     try {
-      const response = await fetch(`${root}visualize/txt`, {
+      const response = await fetch(`/visualize/txt`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',

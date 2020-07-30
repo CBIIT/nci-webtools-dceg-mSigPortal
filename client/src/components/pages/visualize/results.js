@@ -9,14 +9,8 @@ import {
 import PyTab from './pyTab';
 import { CosineSimilarity } from './rTab';
 
-const { Group, Label, Control } = Form;
 const { Header, Body } = Card;
 const { Item, Link } = Nav;
-
-const root =
-  process.env.NODE_ENV === 'development'
-    ? 'http://localhost:8330/'
-    : window.location.pathname;
 
 export default function Results() {
   const {
@@ -51,7 +45,7 @@ export default function Results() {
     if (type == 'cosineSimilarity') plot = rPlots[index];
     if (plot) {
       try {
-        const response = await fetch(`${root}visualize/svg`, {
+        const response = await fetch(`/visualize/svg`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -91,7 +85,7 @@ export default function Results() {
 
   // retrieve mapping of samples to plots from summary file
   async function getSummary() {
-    const response = await fetch(`${root}visualize/summary`, {
+    const response = await fetch(`/visualize/summary`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -162,7 +156,7 @@ export default function Results() {
         profileType1: profileOptions[0],
         profileType2: profileOptions[0],
         matrixSize: matrixOptions[0],
-        matrixOptions: matrixOptions
+        matrixOptions: matrixOptions,
       },
     });
   }
@@ -184,7 +178,7 @@ export default function Results() {
     //   : (args.formula = sigFormula);
 
     try {
-      const response = await fetch(`${root}api/visualizeR`, {
+      const response = await fetch(`/api/visualizeR`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',

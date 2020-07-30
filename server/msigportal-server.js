@@ -1,5 +1,4 @@
 const express = require('express');
-const cors = require('cors');
 const path = require('path');
 const logger = require('./logger');
 const { port, tmppath } = require('./config.json');
@@ -15,7 +14,6 @@ const AWS = require('aws-sdk');
 
 const app = express();
 
-app.use(cors());
 app.use(express.static(path.resolve('www')));
 app.use(express.json());
 
