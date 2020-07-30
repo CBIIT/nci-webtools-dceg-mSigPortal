@@ -162,6 +162,7 @@ export default function Results() {
         profileType1: profileOptions[0],
         profileType2: profileOptions[0],
         matrixSize: matrixOptions[0],
+        matrixOptions: matrixOptions
       },
     });
   }

@@ -19,11 +19,12 @@ export function CosineSimilarity({ setPlot, submitR }) {
     (state) => state.visualizeResults
   );
 
-  const { nameOptions, profileOptions, matrixOptions } = pyTab;
+  const { mapping, profileOptions } = pyTab;
 
   const {
     profileType1,
     matrixSize,
+    matrixOptions,
     profileType2,
     signatureSet,
     signatureSetOptions,
@@ -128,6 +129,25 @@ export function CosineSimilarity({ setPlot, submitR }) {
     }
   }
 
+  function handleProfileType1(profileType) {
+    const matrixOptions = [
+      ...new Set(
+        mapping
+          .filter((plot) => plot.Profile_Type == profileType)
+          .map((plot) => plot.Matrix)
+      ),
+    ];
+
+    dispatchVisualizeResults({
+      cosineSimilarity: {
+        ...cosineSimilarity,
+        profileType1: profileType,
+        matrixSize: matrixOptions[0],
+        matrixOptions: matrixOptions,
+      },
+    });
+  }
+
   return (
     <div>
       <LoadingOverlay active={submitOverlay} />
@@ -141,14 +161,7 @@ export function CosineSimilarity({ setPlot, submitR }) {
                 <Control
                   as="select"
                   value={profileType1}
-                  onChange={(e) =>
-                    dispatchVisualizeResults({
-                      cosineSimilarity: {
-                        ...cosineSimilarity,
-                        profileType1: e.target.value,
-                      },
-                    })
-                  }
+                  onChange={(e) => handleProfileType1(e.target.value)}
                   custom
                 >
                   {profileOptions.map((profile, index) => {

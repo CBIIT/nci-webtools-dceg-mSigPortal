@@ -23,7 +23,6 @@ export const getInitialState = () => ({
   },
   visualizeResults: {
     error: '',
-    // projectID: 'b8776700-da44-4073-aa72-0c3b422b0fa2',
     projectID: '',
     displayTab: 'python',
     pyPlotURL: '',
@@ -44,6 +43,7 @@ export const getInitialState = () => ({
     cosineSimilarity: {
       profileType1: '',
       matrixSize: '',
+      matrixOptions: [],
       profileType2: '',
       signatureSet: '',
       signatureSetOptions: [],
