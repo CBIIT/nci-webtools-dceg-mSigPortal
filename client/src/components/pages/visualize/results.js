@@ -13,25 +13,11 @@ const { Header, Body } = Card;
 const { Item, Link } = Nav;
 
 export default function Results() {
-  const {
-    error,
-    projectID,
-    displayTab,
-    pyPlotURL,
-    csPlotURL,
-    pyTab,
-    cosineSimilarity,
-  } = useSelector((state) => state.visualizeResults);
+  const { error, projectID, displayTab, pyTab, cosineSimilarity } = useSelector(
+    (state) => state.visualizeResults
+  );
 
-  const { mapping, filtered } = pyTab;
-
-  const {
-    profileType1,
-    matrixSize,
-    profileType2,
-    signatureSet,
-    rPlots,
-  } = cosineSimilarity;
+  const { mapping } = pyTab;
 
   // get mapping after retrieving projectID
   useEffect(() => {
@@ -39,49 +25,6 @@ export default function Results() {
       getSummary(projectID);
     }
   }, [projectID]);
-
-  async function setPlot(index, type = 'python') {
-    let plot = filtered[index];
-    if (type == 'cosineSimilarity') plot = rPlots[index];
-    if (plot) {
-      try {
-        const response = await fetch(`/visualize/svg`, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ path: plot.Location || plot }),
-        });
-        if (!response.ok) {
-          const { msg } = await response.json();
-          dispatchError(msg);
-        } else {
-          const pic = await response.blob();
-          const objectURL = URL.createObjectURL(pic);
-
-          if (pyPlotURL.length) URL.revokeObjectURL(pyPlotURL);
-          if (type == 'python') {
-            dispatchVisualizeResults({
-              pyPlotURL: objectURL,
-            });
-          } else if (type == 'cosineSimilarity') {
-            dispatchVisualizeResults({
-              csPlotURL: objectURL,
-              cosineSimilarity: {
-                ...cosineSimilarity,
-                rPlotIndex: index,
-              },
-            });
-          }
-        }
-      } catch (err) {
-        dispatchError(err);
-      }
-    } else {
-      console.log('invalid index', index);
-    }
-  }
 
   // retrieve mapping of samples to plots from summary file
   async function getSummary() {
@@ -161,56 +104,15 @@ export default function Results() {
     });
   }
 
-  async function submitR(fn = '') {
-    dispatchVisualizeResults({
-      cosineSimilarity: { ...cosineSimilarity, submitOverlay: true },
+  function submitR(fn, args) {
+    return fetch(`/api/visualizeR`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ fn: fn, args: args, projectID: projectID }),
     });
-    let args = {
-      fn: fn,
-      profileType1: profileType1,
-      matrixSize: matrixSize.replace('-', ''),
-      profileType2: profileType2,
-      signatureSet: signatureSet,
-      projectID: projectID,
-    };
-    // selectSigFormula == 'signature'
-    //   ? (args.signatureName = sigFormula)
-    //   : (args.formula = sigFormula);
-
-    try {
-      const response = await fetch(`/api/visualizeR`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(args),
-      });
-      if (!response.ok) {
-        const err = await response.text();
-        console.log(err);
-        dispatchVisualizeResults({
-          cosineSimilarity: { ...cosineSimilarity, debugR: err, rPlots: [] },
-        });
-      } else {
-        const data = await response.json();
-        console.log(data);
-        dispatchVisualizeResults({
-          cosineSimilarity: {
-            ...cosineSimilarity,
-            debugR: data.debugR,
-            rPlots: data.plots,
-            results: data.results,
-            submitOverlay: false,
-          },
-        });
-      }
-    } catch (err) {
-      dispatchError(err);
-      dispatchVisualizeResults({
-        cosineSimilarity: { ...cosineSimilarity, submitOverlay: false },
-      });
-    }
   }
 
   return error.length ? (
@@ -240,15 +142,12 @@ export default function Results() {
         </Nav>
       </Header>
       <Body style={{ display: displayTab == 'python' ? 'block' : 'none' }}>
-        <PyTab setPlot={(e) => setPlot(e)} />
+        <PyTab />
       </Body>
       <Body
         style={{ display: displayTab == 'cosineSimilarity' ? 'block' : 'none' }}
       >
-        <CosineSimilarity
-          setPlot={(e, type) => setPlot(e, type)}
-          submitR={() => submitR()}
-        />
+        <CosineSimilarity submitR={(fn, args) => submitR(fn, args)} />
       </Body>
     </Card>
   ) : (

@@ -9,8 +9,8 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const { Group, Label, Control } = Form;
 
-export function CosineSimilarity({ setPlot, submitR }) {
-  const { pyTab, csPlotURL, cosineSimilarity } = useSelector(
+export function CosineSimilarity({ submitR }) {
+  const { pyTab, csWithinURL, csRefSigURL, cosineSimilarity } = useSelector(
     (state) => state.visualizeResults
   );
 
@@ -23,38 +23,89 @@ export function CosineSimilarity({ setPlot, submitR }) {
     profileType2,
     signatureSet,
     signatureSetOptions,
-    selectName2,
-    selectSigFormula,
-    sigFormula,
-    rPlots,
-    rPlotIndex,
-    results,
+    // selectName2,
+    // selectSigFormula,
+    // sigFormula,
+    csWithinPlot,
+    csWithinTxt,
+    csRefSigPlot,
+    csRefSigTxt,
     submitOverlay,
-    refSigOverlay,
+    displayWithin,
+    displayRefSig,
     debugR,
   } = cosineSimilarity;
 
-  // load first r plot after they are recieved
+  // load r plots after they are recieved
   useEffect(() => {
-    if (rPlots.length && !rPlotIndex.length) {
-      setPlot(0, 'cosineSimilarity');
+    if (csWithinPlot.length) {
+      setRPlot(csWithinPlot, 'within');
     }
-  }, [rPlots]);
+  }, [csWithinPlot]);
 
   useEffect(() => {
-    if (!rPlots.length && signatureSet.length) {
-      submitR();
+    if (csRefSigPlot.length) {
+      setRPlot(csRefSigPlot, 'refsig');
     }
-  }, [signatureSet]);
+  }, [csRefSigPlot]);
 
+  // call r wrapper on load
+  // useEffect(() => {
+  //   if (!csWithinURL.length && !csRefSigURL.length) {
+  //     calculateR('cosineSimilarityWithin', {
+  //       profileType: profileType1,
+  //       matrixSize: matrixSize.replace('-', ''),
+  //     });
+  //     calculateR('cosineSimilarityRefSig', {
+  //       profileType: profileType2,
+  //       signatureSet: signatureSet,
+  //     });
+  //   }
+  // }, [csWithinPlot, csRefSigPlot]);
+
+  // retrieve signature set options on change
   useEffect(() => {
     getSignatureSet(profileType2);
   }, [profileType2]);
 
-  // get Signature Reference Sets
+  async function setRPlot(plotPath, type) {
+    try {
+      const response = await fetch(`/visualize/svg`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ path: plotPath }),
+      });
+      if (!response.ok) {
+        const { msg } = await response.json();
+        dispatchError(msg);
+      } else {
+        const pic = await response.blob();
+        const objectURL = URL.createObjectURL(pic);
+
+        if (type == 'within') {
+          if (csWithinURL.length) URL.revokeObjectURL(csWithinURL);
+          dispatchVisualizeResults({
+            csWithinURL: objectURL,
+          });
+        } else {
+          if (csRefSigURL.length) URL.revokeObjectURL(csRefSigURL);
+          dispatchVisualizeResults({
+            csRefSigURL: objectURL,
+          });
+        }
+      }
+    } catch (err) {
+      dispatchError(err);
+    }
+  }
+
+  // get Signature Reference Sets for dropdown options
   async function getSignatureSet(profileType) {
     dispatchVisualizeResults({
-      cosineSimilarity: { ...cosineSimilarity, refSigOverlay: true },
+      cosineSimilarity: { ...cosineSimilarity, submitOverlay: true },
     });
     try {
       const response = await fetch(
@@ -76,25 +127,73 @@ export function CosineSimilarity({ setPlot, submitR }) {
             ...cosineSimilarity,
             signatureSetOptions: signatureSetOptions,
             signatureSet: signatureSetOptions[0],
-            refSigOverlay: false,
+            submitOverlay: false,
           },
         });
       } else {
         dispatchError(await response.json());
         dispatchVisualizeResults({
-          cosineSimilarity: { ...cosineSimilarity, refSigOverlay: false },
+          cosineSimilarity: { ...cosineSimilarity, submitOverlay: false },
         });
       }
     } catch (err) {
       dispatchError(err);
       dispatchVisualizeResults({
-        cosineSimilarity: { ...cosineSimilarity, refSigOverlay: false },
+        cosineSimilarity: { ...cosineSimilarity, submitOverlay: false },
+      });
+    }
+  }
+
+  async function calculateR(fn, args) {
+    dispatchVisualizeResults({
+      cosineSimilarity: { ...cosineSimilarity, submitOverlay: true },
+    });
+
+    try {
+      const response = await submitR(fn, args);
+      if (!response.ok) {
+        const err = await response.json();
+        dispatchVisualizeResults({
+          cosineSimilarity: {
+            ...cosineSimilarity,
+            debugR: err,
+            submitOverlay: false,
+          },
+        });
+      } else {
+        const data = await response.json();
+        let update = {
+          cosineSimilarity: {
+            ...cosineSimilarity,
+            debugR: data.debugR,
+            submitOverlay: false,
+          },
+        };
+        if (fn == 'cosineSimilarityWithin')
+          update.cosineSimilarity = {
+            ...update.cosineSimilarity,
+            csWithinPlot: data.plot,
+            csWithinTxt: data.txt,
+          };
+        else {
+          update.cosineSimilarity = {
+            ...update.cosineSimilarity,
+            csRefSigPlot: data.plot,
+            csRefSigTxt: data.txt,
+          };
+        }
+        dispatchVisualizeResults(update);
+      }
+    } catch (err) {
+      dispatchError(err);
+      dispatchVisualizeResults({
+        cosineSimilarity: { ...cosineSimilarity, submitOverlay: false },
       });
     }
   }
 
   //   download text results files
-  async function downloadResults() {
+  async function downloadResults(txtPath) {
     try {
       const response = await fetch(`/visualize/txt`, {
         method: 'POST',
@@ -102,7 +201,7 @@ export function CosineSimilarity({ setPlot, submitR }) {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ path: results[rPlotIndex] }),
+        body: JSON.stringify({ path: txtPath }),
       });
       if (!response.ok) {
         const { msg } = await response.json();
@@ -113,7 +212,7 @@ export function CosineSimilarity({ setPlot, submitR }) {
         const tempLink = document.createElement('a');
 
         tempLink.href = objectURL;
-        tempLink.download = results[rPlotIndex].split('/').slice(-1)[0];
+        tempLink.download = txtPath.split('/').slice(-1)[0];
         document.body.appendChild(tempLink);
         tempLink.click();
         document.body.removeChild(tempLink);
@@ -147,10 +246,28 @@ export function CosineSimilarity({ setPlot, submitR }) {
     <div>
       <LoadingOverlay active={submitOverlay} />
       <Form>
-        <Label>Cosine Similarity Within Samples</Label>
-        <div className="border rounded p-2">
+        <Label>
+          <Button
+            variant="link"
+            className="p-0 font-weight-bold"
+            onClick={() =>
+              dispatchVisualizeResults({
+                cosineSimilarity: {
+                  ...cosineSimilarity,
+                  displayWithin: !displayWithin,
+                },
+              })
+            }
+          >
+            Cosine Similarity Within Samples
+          </Button>
+        </Label>
+        <div
+          className="border rounded p-2"
+          style={{ display: displayWithin ? 'block' : 'none' }}
+        >
           <Row className="justify-content-center">
-            <Col sm="6">
+            <Col sm="5">
               <Group controlId="profileType1">
                 <Label>Profile Type</Label>
                 <Control
@@ -169,7 +286,7 @@ export function CosineSimilarity({ setPlot, submitR }) {
                 </Control>
               </Group>
             </Col>
-            <Col sm="6">
+            <Col sm="5">
               <Label>Matrix Size</Label>
               <Control
                 as="select"
@@ -196,16 +313,76 @@ export function CosineSimilarity({ setPlot, submitR }) {
                 })}
               </Control>
             </Col>
+            <Col sm="2" className="m-auto">
+              <Button
+                variant="primary"
+                onClick={() =>
+                  calculateR('cosineSimilarityWithin', {
+                    profileType: profileType1,
+                    matrixSize: matrixSize.replace('-', ''),
+                  })
+                }
+              >
+                Calculate
+              </Button>
+            </Col>
           </Row>
+        </div>
+        <div
+          id="csWithinPlot"
+          style={{ display: csWithinURL.length ? 'block' : 'none' }}
+        >
+          <div className="d-flex">
+            <a
+              className="px-2 py-1"
+              href={csWithinURL}
+              download={csWithinURL.split('/').slice(-1)[0]}
+            >
+              Download Plot
+            </a>
+            <span className="ml-auto">
+              <Button
+                className="px-2 py-1"
+                variant="link"
+                onClick={() => downloadResults(csWithinTxt)}
+              >
+                Download Results
+              </Button>
+            </span>
+          </div>
+          <div className="mt-2 p-2 border rounded">
+            <Row>
+              <Col>
+                <img className="w-100 my-4" src={csWithinURL}></img>
+              </Col>
+            </Row>
+          </div>
         </div>
       </Form>
 
       <Form className="my-2">
-        <Label>Cosine Similarity to Reference Signatures</Label>
-        <LoadingOverlay active={refSigOverlay} />
-        <div className="border rounded p-2">
+        <Label>
+          <Button
+            variant="link"
+            className="p-0 font-weight-bold"
+            onClick={() =>
+              dispatchVisualizeResults({
+                cosineSimilarity: {
+                  ...cosineSimilarity,
+                  displayRefSig: !displayRefSig,
+                },
+              })
+            }
+          >
+            Cosine Similarity to Reference Signatures
+          </Button>
+        </Label>
+        <div
+          className="border rounded p-2"
+          style={{ display: displayRefSig ? 'block' : 'none' }}
+        >
           <Row className="justify-content-center">
-            <Col sm="6">
+            <Col sm="5">
               <Group controlId="profileType2">
                 <Label>Profile Type</Label>
                 <Control
@@ -231,7 +408,7 @@ export function CosineSimilarity({ setPlot, submitR }) {
                 </Control>
               </Group>
             </Col>
-            <Col sm="6">
+            <Col sm="5">
               <Group controlId="signatureSet">
                 <Label>Reference Signature Set</Label>
                 <Control
@@ -259,14 +436,51 @@ export function CosineSimilarity({ setPlot, submitR }) {
                 </Control>
               </Group>
             </Col>
-          </Row>
-          <Row>
-            <Col>
-              <Button variant="primary" onClick={() => submitR()}>
+            <Col sm="2" className="m-auto">
+              <Button
+                variant="primary"
+                onClick={() =>
+                  calculateR('cosineSimilarityRefSig', {
+                    profileType: profileType2,
+                    signatureSet: signatureSet,
+                  })
+                }
+              >
                 Calculate
               </Button>
             </Col>
           </Row>
+
+          <div
+            id="csRefSigPlot"
+            style={{ display: csRefSigURL.length ? 'block' : 'none' }}
+          >
+            <div className="d-flex">
+              <a
+                className="px-2 py-1"
+                href={csRefSigURL}
+                download={csRefSigURL.split('/').slice(-1)[0]}
+              >
+                Download Plot
+              </a>
+              <span className="ml-auto">
+                <Button
+                  className="px-2 py-1"
+                  variant="link"
+                  onClick={() => downloadResults(csRefSigTxt)}
+                >
+                  Download Results
+                </Button>
+              </span>
+            </div>
+            <div className="mt-2 p-2 border rounded">
+              <Row>
+                <Col>
+                  <img className="w-100 my-4" src={csRefSigURL}></img>
+                </Col>
+              </Row>
+            </div>
+          </div>
         </div>
       </Form>
 
@@ -356,51 +570,8 @@ export function CosineSimilarity({ setPlot, submitR }) {
           </Row>
         </div>
       </Form> */}
-      <div className="d-flex">
-        <a
-          className="px-2 py-1"
-          href={csPlotURL}
-          download={csPlotURL.split('/').slice(-1)[0]}
-        >
-          Download Plot
-        </a>
-        <span className="ml-auto">
-          <Button
-            className="px-2 py-1"
-            variant="link"
-            onClick={() => downloadResults()}
-          >
-            Download Results
-          </Button>
-        </span>
-      </div>
-      <div
-        className="mt-2 p-2 border rounded"
-        style={{ display: rPlots.length ? 'block' : 'none' }}
-      >
-        <Col sm="auto" className="p-0">
-          <Control
-            as="select"
-            value={rPlotIndex}
-            onChange={(e) => setPlot(e.target.value, 'cosineSimilarity')}
-            custom
-          >
-            {rPlots.map((plot, index) => {
-              return (
-                <option key={index} value={index}>
-                  {plot}
-                </option>
-              );
-            })}
-          </Control>
-        </Col>
-        <Row>
-          <Col>
-            <img className="w-100 my-4" src={csPlotURL}></img>
-          </Col>
-        </Row>
-      </div>
-      <div className="border rounded p-1 my-2">
+
+      <pre className="border rounded p-1 mt-5">
         <div>R output</div>
         <div className="border">
           {Array.isArray(debugR) ? (
@@ -415,7 +586,7 @@ export function CosineSimilarity({ setPlot, submitR }) {
             <p>{debugR}</p>
           )}
         </div>
-      </div>
+      </pre>
     </div>
   );
 }

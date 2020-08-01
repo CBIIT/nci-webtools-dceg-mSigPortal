@@ -94,42 +94,33 @@ app.post('/api/visualize', (req, res) => {
 });
 
 app.post('/api/visualizeR', (req, res) => {
-  logger.info('/API/VISUALIZER: Calling R Wrapper');
+  logger.info('/api/visualizeR: function ' + req.body.fn);
   console.log('args', req.body);
-  const plotSavePath = path.join(
+  const savePath = path.join(
     tmppath,
     req.body.projectID,
-    'results/rPlots/'
+    'results',
+    req.body.fn
   );
 
-  if (!fs.existsSync(plotSavePath)) {
-    fs.mkdirSync(plotSavePath);
+  if (!fs.existsSync(savePath)) {
+    fs.mkdirSync(savePath);
   }
   try {
-    const rOut = r('api/R/visualizeWrapper.R', 'cosineSimilarity', {
-      profileType1: req.body.profileType1,
-      matrixSize: req.body.matrixSize,
-      profileType2: req.body.profileType2,
-      signatureSetName: req.body.signatureSet,
+    const wrapper = r('api/R/visualizeWrapper.R', req.body.fn, {
+      ...req.body.args,
       projectID: req.body.projectID,
       pythonOutput: path.join(tmppath, req.body.projectID, 'results/output'),
-      savePath: plotSavePath,
+      savePath: savePath,
     });
-    const plots = fs
-      .readdirSync(plotSavePath)
-      .filter((file) => file.endsWith('.svg'))
-      .map((plot) => path.join(plotSavePath, plot));
-    const cosSim = fs
-      .readdirSync(plotSavePath)
-      .filter((file) => file.endsWith('.txt'))
-      .map((cosSim) => path.join(plotSavePath, cosSim));
 
-    console.log('rOut', rOut);
+    const { stdout, paths } = JSON.parse(wrapper);
+    console.log('wrapper return', JSON.parse(wrapper));
 
     res.json({
-      debugR: rOut,
-      plots: plots,
-      results: cosSim,
+      debugR: stdout,
+      plot: paths.plotPath,
+      txt: paths.txtPath,
     });
   } catch (err) {
     logger.info('/api/visualizeR: An error occured');

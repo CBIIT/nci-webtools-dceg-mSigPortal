@@ -9,7 +9,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const { Group, Label, Control } = Form;
 
-export default function PyTab({ setPlot }) {
+export default function PyTab() {
   const [downloadOverlay, setOverlay] = useState(false);
   const { projectID, pyPlotURL, pyTab } = useSelector(
     (state) => state.visualizeResults
@@ -32,20 +32,53 @@ export default function PyTab({ setPlot }) {
   // set inital plot
   useEffect(() => {
     if (!pyPlotURL.length) {
-      setPlot(0);
+      setPyPlot();
     }
   }, [filtered]);
 
   // change plot
   useEffect(() => {
     if (filtered.length && pyPlotURL.length) {
-      setPlot(0);
+      setPyPlot();
     }
   }, [selectName, selectProfile, selectMatrix, selectTag]);
 
   function getPlotName() {
     const plot = filtered[0];
     return `${plot.Sample_Name}-${plot.Profile_Type}-${plot.Matrix}-${plot.Tag}.svg`;
+  }
+
+  async function setPyPlot() {
+    if (filtered.length) {
+      const plot = filtered[0];
+      try {
+        const response = await fetch(`/visualize/svg`, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ path: plot.Location || plot }),
+        });
+        if (!response.ok) {
+          const { msg } = await response.json();
+          dispatchError(msg);
+        } else {
+          const pic = await response.blob();
+          const objectURL = URL.createObjectURL(pic);
+
+          if (pyPlotURL.length) URL.revokeObjectURL(pyPlotURL);
+
+          dispatchVisualizeResults({
+            pyPlotURL: objectURL,
+          });
+        }
+      } catch (err) {
+        dispatchError(err);
+      }
+    } else {
+      console.log('filtered summary empty');
+    }
   }
 
   async function downloadResults() {
@@ -282,13 +315,13 @@ export default function PyTab({ setPlot }) {
           </Col>
         </Row>
       </div>
-      <div className="border rounded p-1 my-2">
+      <pre className="border rounded p-1 mt-5">
         <div>python</div>
         <div>stdout</div>
         <pre className="border">{debugPy.stdout}</pre>
         <div>stderr</div>
         <pre className="border">{debugPy.stderr}</pre>
-      </div>
+      </pre>
     </div>
   );
 }
