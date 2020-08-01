@@ -13,7 +13,6 @@
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.711.0",
-    "cors": "^2.8.5",
     "express": "^4.17.1",
     "formidable": "^1.2.2",
     "papaparse": "^5.2.0",
