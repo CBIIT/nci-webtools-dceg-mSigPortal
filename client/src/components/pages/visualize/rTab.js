@@ -38,13 +38,13 @@ export function CosineSimilarity({ submitR }) {
 
   // load r plots after they are recieved
   useEffect(() => {
-    if (csWithinPlot.length) {
+    if (csWithinPlot && csWithinPlot.length) {
       setRPlot(csWithinPlot, 'within');
     }
   }, [csWithinPlot]);
 
   useEffect(() => {
-    if (csRefSigPlot.length) {
+    if (csRefSigPlot && csRefSigPlot.length) {
       setRPlot(csRefSigPlot, 'refsig');
     }
   }, [csRefSigPlot]);
