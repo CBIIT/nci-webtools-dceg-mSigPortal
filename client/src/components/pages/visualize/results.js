@@ -5,10 +5,12 @@ import {
   dispatchVisualizeResults,
   dispatchPyTab,
   dispatchCosineSimilarity,
+  dispatchProfileComparison,
 } from '../../../services/store';
 
 import PyTab from './pyTab';
 import CosineSimilarity from './cosineSimilarity';
+import ProfileComparison from './profileComparison';
 
 const { Header, Body } = Card;
 const { Item, Link } = Nav;
@@ -19,6 +21,7 @@ export default function Results() {
   );
   const pyTab = useSelector((state) => state.pyTab);
   const { mapping } = pyTab;
+  const { within, refSig } = useSelector((state) => state.profileComparison);
   const rootURL = window.location.pathname;
 
   // get mapping after retrieving projectID
@@ -101,6 +104,16 @@ export default function Results() {
       matrixSize: matrixOptions[0],
       matrixOptions: matrixOptions,
     });
+
+    dispatchProfileComparison({
+      within: {
+        ...within,
+        profileType: profileOptions[0],
+        sampleName1: nameOptions[0],
+        sampleName2: nameOptions[1],
+      },
+      refSig: { ...refSig, profileType: profileOptions[0] },
+    });
   }
 
   function submitR(fn, args) {
@@ -138,6 +151,16 @@ export default function Results() {
               Cosine Similarity
             </Link>
           </Item>
+          <Item>
+            <Link
+              active={displayTab == 'profileComparison'}
+              onClick={() =>
+                dispatchVisualizeResults({ displayTab: 'profileComparison' })
+              }
+            >
+              Profile Comparison
+            </Link>
+          </Item>
         </Nav>
       </Header>
       <Body style={{ display: displayTab == 'python' ? 'block' : 'none' }}>
@@ -147,6 +170,13 @@ export default function Results() {
         style={{ display: displayTab == 'cosineSimilarity' ? 'block' : 'none' }}
       >
         <CosineSimilarity submitR={(fn, args) => submitR(fn, args)} />
+      </Body>
+      <Body
+        style={{
+          display: displayTab == 'profileComparison' ? 'block' : 'none',
+        }}
+      >
+        <ProfileComparison submitR={(fn, args) => submitR(fn, args)} />
       </Body>
     </Card>
   ) : (

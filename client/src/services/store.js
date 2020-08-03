@@ -28,6 +28,8 @@ export const getInitialState = () => ({
     pyPlotURL: '',
     csWithinURL: '',
     csRefSigURL: '',
+    pcWithinURL: '',
+    pcRefSigURL: '',
   },
   pyTab: {
     mapping: [],
@@ -53,6 +55,26 @@ export const getInitialState = () => ({
     csWithinTxt: '',
     csRefSigPlot: '',
     csRefSigTxt: '',
+    displayWithin: true,
+    displayRefSig: true,
+    debugR: [],
+    submitOverlay: false,
+  },
+  profileComparison: {
+    within: {
+      profileType: '',
+      sampleName1: '',
+      sampleName2: '',
+    },
+    refSig: {
+      profileType: '',
+      sampleName: '',
+      signatureSet: '',
+      signatureSetOptions: [],
+      compare: 'SBS5',
+    },
+    withinPlotPath: '',
+    refSigPlotPath: '',
     displayWithin: true,
     displayRefSig: true,
     debugR: [],
@@ -116,6 +138,19 @@ const cosineSimilaritySlice = createSlice({
   },
 });
 
+const profileComparisonSlice = createSlice({
+  name: 'profileComparison',
+  initialState: getInitialState().profileComparison,
+  reducers: {
+    updateProfileComparison: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
+
 const errorSlice = createSlice({
   name: 'error',
   initialState: getInitialState().error,
@@ -134,6 +169,7 @@ const rootReducer = combineReducers({
   visualizeResults: visualizeResultsSlice.reducer,
   pyTab: pyTabSlice.reducer,
   cosineSimilarity: cosineSimilaritySlice.reducer,
+  profileComparison: profileComparisonSlice.reducer,
   error: errorSlice.reducer,
 });
 
@@ -146,6 +182,7 @@ export const { updateVisualize } = visualizeSlice.actions;
 export const { updateVisualizeResults } = visualizeResultsSlice.actions;
 export const { updatePyTab } = pyTabSlice.actions;
 export const { updateCosineSimilarity } = cosineSimilaritySlice.actions;
+export const { updateProfileComparison } = profileComparisonSlice.actions;
 export const { updateError } = errorSlice.actions;
 
 export function dispatchVisualize(obj) {
@@ -162,6 +199,10 @@ export function dispatchPyTab(obj) {
 
 export function dispatchCosineSimilarity(obj) {
   store.dispatch(updateCosineSimilarity(obj));
+}
+
+export function dispatchProfileComparison(obj) {
+  store.dispatch(updateProfileComparison(obj));
 }
 
 export function dispatchError(msg) {
