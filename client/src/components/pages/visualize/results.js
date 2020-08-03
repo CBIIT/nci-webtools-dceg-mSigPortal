@@ -7,7 +7,7 @@ import {
 } from '../../../services/store';
 
 import PyTab from './pyTab';
-import { CosineSimilarity } from './rTab';
+import CosineSimilarity  from './cosineSimilarity';
 
 const { Header, Body } = Card;
 const { Item, Link } = Nav;

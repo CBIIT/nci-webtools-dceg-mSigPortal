@@ -9,7 +9,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const { Group, Label, Control } = Form;
 
-export function CosineSimilarity({ submitR }) {
+export default function CosineSimilarity({ submitR }) {
   const { pyTab, csWithinURL, csRefSigURL, cosineSimilarity } = useSelector(
     (state) => state.visualizeResults
   );
