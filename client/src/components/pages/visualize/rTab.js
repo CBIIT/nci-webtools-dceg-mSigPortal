@@ -326,35 +326,36 @@ export function CosineSimilarity({ submitR }) {
               </Button>
             </Col>
           </Row>
-        </div>
-        <div
-          id="csWithinPlot"
-          style={{ display: csWithinURL.length ? 'block' : 'none' }}
-        >
-          <div className="d-flex">
-            <a
-              className="px-2 py-1"
-              href={csWithinURL}
-              download={csWithinURL.split('/').slice(-1)[0]}
-            >
-              Download Plot
-            </a>
-            <span className="ml-auto">
-              <Button
+
+          <div
+            id="csWithinPlot"
+            style={{ display: csWithinURL.length ? 'block' : 'none' }}
+          >
+            <div className="d-flex">
+              <a
                 className="px-2 py-1"
-                variant="link"
-                onClick={() => downloadResults(csWithinTxt)}
+                href={csWithinURL}
+                download={csWithinURL.split('/').slice(-1)[0]}
               >
-                Download Results
-              </Button>
-            </span>
-          </div>
-          <div className="mt-2 p-2 border rounded">
-            <Row>
-              <Col>
-                <img className="w-100 my-4" src={csWithinURL}></img>
-              </Col>
-            </Row>
+                Download Plot
+              </a>
+              <span className="ml-auto">
+                <Button
+                  className="px-2 py-1"
+                  variant="link"
+                  onClick={() => downloadResults(csWithinTxt)}
+                >
+                  Download Results
+                </Button>
+              </span>
+            </div>
+            <div className="mt-2 p-2 border rounded">
+              <Row>
+                <Col>
+                  <img className="w-100 my-4" src={csWithinURL}></img>
+                </Col>
+              </Row>
+            </div>
           </div>
         </div>
       </Form>
