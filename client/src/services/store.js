@@ -28,38 +28,35 @@ export const getInitialState = () => ({
     pyPlotURL: '',
     csWithinURL: '',
     csRefSigURL: '',
-    pyTab: {
-      mapping: [],
-      filtered: [],
-      selectName: '',
-      selectProfile: '',
-      selectMatrix: '',
-      selectTag: '',
-      nameOptions: [],
-      profileOptions: [],
-      matrixOptions: [],
-      tagOptions: [],
-      debugPy: { stdout: '', stderr: '' },
-    },
-    cosineSimilarity: {
-      profileType1: '',
-      matrixSize: '',
-      matrixOptions: [],
-      profileType2: '',
-      signatureSet: '',
-      signatureSetOptions: [],
-      csWithinPlot: '',
-      csWithinTxt: '',
-      csRefSigPlot: '',
-      csRefSigTxt: '',
-      // selectProfile: '',
-      // selectSigFormula: 'signature',
-      // sigFormula: 'SBS5',
-      displayWithin: true,
-      displayRefSig: true,
-      debugR: [],
-      submitOverlay: false,
-    },
+  },
+  pyTab: {
+    mapping: [],
+    filtered: [],
+    selectName: '',
+    selectProfile: '',
+    selectMatrix: '',
+    selectTag: '',
+    nameOptions: [],
+    profileOptions: [],
+    matrixOptions: [],
+    tagOptions: [],
+    debugPy: { stdout: '', stderr: '' },
+  },
+  cosineSimilarity: {
+    profileType1: '',
+    matrixSize: '',
+    matrixOptions: [],
+    profileType2: '',
+    signatureSet: '',
+    signatureSetOptions: [],
+    csWithinPlot: '',
+    csWithinTxt: '',
+    csRefSigPlot: '',
+    csRefSigTxt: '',
+    displayWithin: true,
+    displayRefSig: true,
+    debugR: [],
+    submitOverlay: false,
   },
   error: {
     visible: false,
@@ -93,6 +90,32 @@ const visualizeResultsSlice = createSlice({
   },
 });
 
+const pyTabSlice = createSlice({
+  name: 'pyTab',
+  initialState: getInitialState().pyTab,
+  reducers: {
+    updatePyTab: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
+
+const cosineSimilaritySlice = createSlice({
+  name: 'cosineSimilarity',
+  initialState: getInitialState().cosineSimilarity,
+  reducers: {
+    updateCosineSimilarity: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
+
 const errorSlice = createSlice({
   name: 'error',
   initialState: getInitialState().error,
@@ -109,6 +132,8 @@ const errorSlice = createSlice({
 const rootReducer = combineReducers({
   visualize: visualizeSlice.reducer,
   visualizeResults: visualizeResultsSlice.reducer,
+  pyTab: pyTabSlice.reducer,
+  cosineSimilarity: cosineSimilaritySlice.reducer,
   error: errorSlice.reducer,
 });
 
@@ -118,9 +143,9 @@ export const store = configureStore({
 });
 
 export const { updateVisualize } = visualizeSlice.actions;
-
 export const { updateVisualizeResults } = visualizeResultsSlice.actions;
-
+export const { updatePyTab } = pyTabSlice.actions;
+export const { updateCosineSimilarity } = cosineSimilaritySlice.actions;
 export const { updateError } = errorSlice.actions;
 
 export function dispatchVisualize(obj) {
@@ -129,6 +154,14 @@ export function dispatchVisualize(obj) {
 
 export function dispatchVisualizeResults(obj) {
   store.dispatch(updateVisualizeResults(obj));
+}
+
+export function dispatchPyTab(obj) {
+  store.dispatch(updatePyTab(obj));
+}
+
+export function dispatchCosineSimilarity(obj) {
+  store.dispatch(updateCosineSimilarity(obj));
 }
 
 export function dispatchError(msg) {

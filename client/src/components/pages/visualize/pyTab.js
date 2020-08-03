@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Row, Col, Button, Card, Nav } from 'react-bootstrap';
+import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
   dispatchVisualizeResults,
+  dispatchPyTab,
 } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
@@ -11,7 +12,7 @@ const { Group, Label, Control } = Form;
 
 export default function PyTab() {
   const [downloadOverlay, setOverlay] = useState(false);
-  const { projectID, pyPlotURL, pyTab } = useSelector(
+  const { projectID, pyPlotURL } = useSelector(
     (state) => state.visualizeResults
   );
   const rootURL = window.location.pathname;
@@ -27,7 +28,7 @@ export default function PyTab() {
     matrixOptions,
     tagOptions,
     debugPy,
-  } = pyTab;
+  } = useSelector((state) => state.pyTab);
 
   // set inital plot
   useEffect(() => {
@@ -132,18 +133,15 @@ export default function PyTab() {
       ),
     ];
 
-    dispatchVisualizeResults({
-      pyTab: {
-        ...pyTab,
-        selectName: name,
-        selectProfile: profileOptions[0],
-        selectMatrix: matrixOptions[0],
-        selectTag: tagOptions[0],
-        profileOptions: profileOptions,
-        matrixOptions: matrixOptions,
-        tagOptions: tagOptions,
-        filtered: filteredPlots,
-      },
+    dispatchPyTab({
+      selectName: name,
+      selectProfile: profileOptions[0],
+      selectMatrix: matrixOptions[0],
+      selectTag: tagOptions[0],
+      profileOptions: profileOptions,
+      matrixOptions: matrixOptions,
+      tagOptions: tagOptions,
+      filtered: filteredPlots,
     });
   }
 
@@ -162,16 +160,13 @@ export default function PyTab() {
       ),
     ];
 
-    dispatchVisualizeResults({
-      pyTab: {
-        ...pyTab,
-        selectProfile: profile,
-        selectMatrix: matrixOptions[0],
-        selectTag: tagOptions[0],
-        matrixOptions: matrixOptions,
-        tagOptions: tagOptions,
-        filtered: filteredPlots,
-      },
+    dispatchPyTab({
+      selectProfile: profile,
+      selectMatrix: matrixOptions[0],
+      selectTag: tagOptions[0],
+      matrixOptions: matrixOptions,
+      tagOptions: tagOptions,
+      filtered: filteredPlots,
     });
   }
 
@@ -179,26 +174,20 @@ export default function PyTab() {
     const filteredPlots = mapping.filter((plot) => plot.Matrix == matrix);
     const tagOptions = [...new Set(filteredPlots.map((plot) => plot.Tag))];
 
-    dispatchVisualizeResults({
-      pyTab: {
-        ...pyTab,
-        selectMatrix: matrix,
-        selectTag: tagOptions[0],
-        tagOptions: tagOptions,
-        filtered: filteredPlots,
-      },
+    dispatchPyTab({
+      selectMatrix: matrix,
+      selectTag: tagOptions[0],
+      tagOptions: tagOptions,
+      filtered: filteredPlots,
     });
   }
 
   function filterTag(tag) {
     const filteredPlots = mapping.filter((plot) => plot.Tag == tag);
 
-    dispatchVisualizeResults({
-      pyTab: {
-        ...pyTab,
-        selectTag: tag,
-        filtered: filteredPlots,
-      },
+    dispatchPyTab({
+      selectTag: tag,
+      filtered: filteredPlots,
     });
   }
 

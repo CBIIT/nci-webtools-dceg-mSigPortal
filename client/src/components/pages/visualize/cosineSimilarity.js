@@ -1,19 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { Form, Row, Col, Button, Card, Nav } from 'react-bootstrap';
+import React, { useEffect } from 'react';
+import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
   dispatchVisualizeResults,
+  dispatchCosineSimilarity,
 } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const { Group, Label, Control } = Form;
 
 export default function CosineSimilarity({ submitR }) {
-  const { pyTab, csWithinURL, csRefSigURL, cosineSimilarity } = useSelector(
+  const { csWithinURL, csRefSigURL } = useSelector(
     (state) => state.visualizeResults
   );
-  const { mapping, profileOptions } = pyTab;
+  const { mapping, profileOptions } = useSelector((state) => state.pyTab);
   const rootURL = window.location.pathname;
   const {
     profileType1,
@@ -22,9 +23,6 @@ export default function CosineSimilarity({ submitR }) {
     profileType2,
     signatureSet,
     signatureSetOptions,
-    // selectName2,
-    // selectSigFormula,
-    // sigFormula,
     csWithinPlot,
     csWithinTxt,
     csRefSigPlot,
@@ -33,7 +31,7 @@ export default function CosineSimilarity({ submitR }) {
     displayWithin,
     displayRefSig,
     debugR,
-  } = cosineSimilarity;
+  } = useSelector((state) => state.cosineSimilarity);
 
   // load r plots after they are recieved
   useEffect(() => {
@@ -103,12 +101,10 @@ export default function CosineSimilarity({ submitR }) {
 
   // get Signature Reference Sets for dropdown options
   async function getSignatureSet(profileType) {
-    dispatchVisualizeResults({
-      cosineSimilarity: { ...cosineSimilarity, submitOverlay: true },
-    });
+    dispatchCosineSimilarity({ submitOverlay: true });
     try {
       const response = await fetch(
-        `${rootURL}/api/visualizeR/getSignatureReferenceSets`,
+        `${rootURL}api/visualizeR/getSignatureReferenceSets`,
         {
           method: 'POST',
           headers: {
@@ -121,73 +117,56 @@ export default function CosineSimilarity({ submitR }) {
       if (response.ok) {
         const signatureSetOptions = await response.json();
 
-        dispatchVisualizeResults({
-          cosineSimilarity: {
-            ...cosineSimilarity,
-            signatureSetOptions: signatureSetOptions,
-            signatureSet: signatureSetOptions[0],
-            submitOverlay: false,
-          },
+        dispatchCosineSimilarity({
+          signatureSetOptions: signatureSetOptions,
+          signatureSet: signatureSetOptions[0],
+          submitOverlay: false,
         });
       } else {
         dispatchError(await response.json());
-        dispatchVisualizeResults({
-          cosineSimilarity: { ...cosineSimilarity, submitOverlay: false },
-        });
+        dispatchCosineSimilarity({ submitOverlay: false });
       }
     } catch (err) {
       dispatchError(err);
-      dispatchVisualizeResults({
-        cosineSimilarity: { ...cosineSimilarity, submitOverlay: false },
-      });
+      dispatchCosineSimilarity({ submitOverlay: false });
     }
   }
 
   async function calculateR(fn, args) {
-    dispatchVisualizeResults({
-      cosineSimilarity: { ...cosineSimilarity, submitOverlay: true },
-    });
+    dispatchCosineSimilarity({ submitOverlay: true });
 
     try {
       const response = await submitR(fn, args);
       if (!response.ok) {
         const err = await response.json();
-        dispatchVisualizeResults({
-          cosineSimilarity: {
-            ...cosineSimilarity,
-            debugR: err,
-            submitOverlay: false,
-          },
+        dispatchCosineSimilarity({
+          debugR: err,
+          submitOverlay: false,
         });
       } else {
         const data = await response.json();
         let update = {
-          cosineSimilarity: {
-            ...cosineSimilarity,
-            debugR: data.debugR,
-            submitOverlay: false,
-          },
+          debugR: data.debugR,
+          submitOverlay: false,
         };
         if (fn == 'cosineSimilarityWithin')
-          update.cosineSimilarity = {
-            ...update.cosineSimilarity,
+          update = {
+            ...update,
             csWithinPlot: data.plot,
             csWithinTxt: data.txt,
           };
         else {
-          update.cosineSimilarity = {
-            ...update.cosineSimilarity,
+          update = {
+            ...update,
             csRefSigPlot: data.plot,
             csRefSigTxt: data.txt,
           };
         }
-        dispatchVisualizeResults(update);
+        dispatchCosineSimilarity(update);
       }
     } catch (err) {
       dispatchError(err);
-      dispatchVisualizeResults({
-        cosineSimilarity: { ...cosineSimilarity, submitOverlay: false },
-      });
+      dispatchCosineSimilarity({ submitOverlay: false });
     }
   }
 
@@ -231,13 +210,10 @@ export default function CosineSimilarity({ submitR }) {
       ),
     ];
 
-    dispatchVisualizeResults({
-      cosineSimilarity: {
-        ...cosineSimilarity,
-        profileType1: profileType,
-        matrixSize: matrixOptions[0],
-        matrixOptions: matrixOptions,
-      },
+    dispatchCosineSimilarity({
+      profileType1: profileType,
+      matrixSize: matrixOptions[0],
+      matrixOptions: matrixOptions,
     });
   }
 
@@ -250,11 +226,8 @@ export default function CosineSimilarity({ submitR }) {
             variant="link"
             className="p-0 font-weight-bold"
             onClick={() =>
-              dispatchVisualizeResults({
-                cosineSimilarity: {
-                  ...cosineSimilarity,
-                  displayWithin: !displayWithin,
-                },
+              dispatchCosineSimilarity({
+                displayWithin: !displayWithin,
               })
             }
           >
@@ -291,11 +264,8 @@ export default function CosineSimilarity({ submitR }) {
                 as="select"
                 value={matrixSize}
                 onChange={(e) =>
-                  dispatchVisualizeResults({
-                    cosineSimilarity: {
-                      ...cosineSimilarity,
-                      matrixSize: e.target.value,
-                    },
+                  dispatchCosineSimilarity({
+                    matrixSize: e.target.value,
                   })
                 }
                 custom
@@ -366,11 +336,8 @@ export default function CosineSimilarity({ submitR }) {
             variant="link"
             className="p-0 font-weight-bold"
             onClick={() =>
-              dispatchVisualizeResults({
-                cosineSimilarity: {
-                  ...cosineSimilarity,
-                  displayRefSig: !displayRefSig,
-                },
+              dispatchCosineSimilarity({
+                displayRefSig: !displayRefSig,
               })
             }
           >
@@ -389,11 +356,8 @@ export default function CosineSimilarity({ submitR }) {
                   as="select"
                   value={profileType2}
                   onChange={(e) => {
-                    dispatchVisualizeResults({
-                      cosineSimilarity: {
-                        ...cosineSimilarity,
-                        profileType2: e.target.value,
-                      },
+                    dispatchCosineSimilarity({
+                      profileType2: e.target.value,
                     });
                   }}
                   custom
@@ -416,11 +380,8 @@ export default function CosineSimilarity({ submitR }) {
                   as="select"
                   value={signatureSet}
                   onChange={(e) =>
-                    dispatchVisualizeResults({
-                      cosineSimilarity: {
-                        ...cosineSimilarity,
-                        signatureSet: e.target.value,
-                      },
+                    dispatchCosineSimilarity({
+                      signatureSet: e.target.value,
                     })
                   }
                   custom
@@ -483,93 +444,6 @@ export default function CosineSimilarity({ submitR }) {
           </div>
         </div>
       </Form>
-
-      {/* <Form>
-        <Label>Additional Plots</Label>
-        <div className="border rounded p-2">
-          <LoadingOverlay active={submitOverlay} />
-          <Row className="justify-content-center">
-            <Col sm="4">
-              <Group controlId="selectName2">
-                <Label>Sample Name</Label>
-                <Control
-                  as="select"
-                  value={selectName2}
-                  onChange={(e) =>
-                    dispatchVisualizeResults({
-                      cosineSimilarity: {
-                        ...cosineSimilarity,
-                        selectName2: e.target.value,
-                      },
-                    })
-                  }
-                  custom
-                >
-                  <option value="0" disabled>
-                    Select
-                  </option>
-                  {nameOptions.map((sampleName, index) => {
-                    return (
-                      <option key={index} value={sampleName}>
-                        {sampleName}
-                      </option>
-                    );
-                  })}
-                </Control>
-              </Group>
-            </Col>
-          </Row>
-          <Row className="justify-content-center">
-            <Col sm="6">
-              <Group
-                controlId="selectSigFormula"
-                className="d-flex align-items-center"
-              >
-                <Label className="mr-auto">Signature/Formula</Label>
-                <Control
-                  as="select"
-                  value={selectSigFormula}
-                  onChange={(e) =>
-                    dispatchVisualizeResults({
-                      cosineSimilarity: {
-                        ...cosineSimilarity,
-                        selectSigFormula: e.target.value,
-                      },
-                    })
-                  }
-                  custom
-                  style={{ width: '150px' }}
-                >
-                  <option value="signature">Signature</option>
-                  <option value="formula">Formula</option>
-                </Control>
-              </Group>
-            </Col>
-            <Col sm="6">
-              <Control
-                type="text"
-                placeholder={selectSigFormula}
-                value={sigFormula}
-                onChange={(e) =>
-                  dispatchVisualizeResults({
-                    cosineSimilarity: {
-                      ...cosineSimilarity,
-                      sigFormula: e.target.value,
-                    },
-                  })
-                }
-              ></Control>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <Button variant="primary" onClick={() => submitR()}>
-                Calculate
-              </Button>
-            </Col>
-          </Row>
-        </div>
-      </Form> */}
 
       <pre className="border rounded p-1 mt-5">
         <div>R output</div>

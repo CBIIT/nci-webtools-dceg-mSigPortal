@@ -1,21 +1,23 @@
 import React, { useEffect } from 'react';
-import { Form, Card, Nav } from 'react-bootstrap';
+import { Card, Nav } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
-  dispatchError,
   dispatchVisualizeResults,
+  dispatchPyTab,
+  dispatchCosineSimilarity,
 } from '../../../services/store';
 
 import PyTab from './pyTab';
-import CosineSimilarity  from './cosineSimilarity';
+import CosineSimilarity from './cosineSimilarity';
 
 const { Header, Body } = Card;
 const { Item, Link } = Nav;
 
 export default function Results() {
-  const { error, projectID, displayTab, pyTab, cosineSimilarity } = useSelector(
+  const { error, projectID, displayTab } = useSelector(
     (state) => state.visualizeResults
   );
+  const pyTab = useSelector((state) => state.pyTab);
   const { mapping } = pyTab;
   const rootURL = window.location.pathname;
 
@@ -80,27 +82,24 @@ export default function Results() {
       ),
     ];
 
-    dispatchVisualizeResults({
-      pyTab: {
-        ...pyTab,
-        mapping: mapping,
-        filtered: filteredPlots,
-        nameOptions: nameOptions,
-        profileOptions: filteredProfileOptions,
-        matrixOptions: filteredMatrixOptions,
-        tagOptions: filteredTagOptions,
-        selectName: selectName,
-        selectProfile: selectProfile,
-        selectMatrix: selectMatrix,
-        selectTag: selectTag,
-      },
-      cosineSimilarity: {
-        ...cosineSimilarity,
-        profileType1: profileOptions[0],
-        profileType2: profileOptions[0],
-        matrixSize: matrixOptions[0],
-        matrixOptions: matrixOptions,
-      },
+    dispatchPyTab({
+      mapping: mapping,
+      filtered: filteredPlots,
+      nameOptions: nameOptions,
+      profileOptions: filteredProfileOptions,
+      matrixOptions: filteredMatrixOptions,
+      tagOptions: filteredTagOptions,
+      selectName: selectName,
+      selectProfile: selectProfile,
+      selectMatrix: selectMatrix,
+      selectTag: selectTag,
+    });
+
+    dispatchCosineSimilarity({
+      profileType1: profileOptions[0],
+      profileType2: profileOptions[0],
+      matrixSize: matrixOptions[0],
+      matrixOptions: matrixOptions,
     });
   }
 
