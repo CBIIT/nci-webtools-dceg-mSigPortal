@@ -30,9 +30,8 @@ export default function UploadForm({ setOpenSidebar }) {
     exampleData,
     loading,
   } = useSelector((state) => state.visualize);
-
+  const rootURL = window.location.pathname;
   const [inputFile, setInput] = useState(new File([], ''));
-
   const onDrop = useCallback((acceptedFiles) => {
     setInput(acceptedFiles[0]);
     dispatchVisualize({ storeFile: acceptedFiles[0].name });
@@ -73,7 +72,7 @@ export default function UploadForm({ setOpenSidebar }) {
           },
         });
         try {
-          const response = await fetch(`/visualize/queue`, {
+          const response = await fetch(`${rootURL}visualize/queue`, {
             method: 'POST',
             headers: {
               Accept: 'application/json',
@@ -105,7 +104,7 @@ export default function UploadForm({ setOpenSidebar }) {
           },
         });
         try {
-          const response = await fetch(`/api/visualize`, {
+          const response = await fetch(`${rootURL}api/visualize`, {
             method: 'POST',
             headers: {
               Accept: 'application/json',
@@ -174,7 +173,7 @@ export default function UploadForm({ setOpenSidebar }) {
     try {
       const data = new FormData();
       data.append('file', inputFile);
-      let response = await fetch(`/visualize/upload`, {
+      let response = await fetch(`${rootURL}visualize/upload`, {
         method: 'POST',
         body: data,
       });

@@ -14,7 +14,7 @@ export default function PyTab() {
   const { projectID, pyPlotURL, pyTab } = useSelector(
     (state) => state.visualizeResults
   );
-
+  const rootURL = window.location.pathname;
   const {
     mapping,
     filtered,
@@ -52,7 +52,7 @@ export default function PyTab() {
     if (filtered.length) {
       const plot = filtered[0];
       try {
-        const response = await fetch(`/visualize/svg`, {
+        const response = await fetch(`${rootURL}visualize/svg`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -84,7 +84,7 @@ export default function PyTab() {
   async function downloadResults() {
     setOverlay(true);
     try {
-      const response = await fetch(`/visualize/results`, {
+      const response = await fetch(`${rootURL}visualize/results`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',

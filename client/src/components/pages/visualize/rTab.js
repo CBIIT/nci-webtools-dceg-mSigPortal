@@ -13,9 +13,8 @@ export function CosineSimilarity({ submitR }) {
   const { pyTab, csWithinURL, csRefSigURL, cosineSimilarity } = useSelector(
     (state) => state.visualizeResults
   );
-
   const { mapping, profileOptions } = pyTab;
-
+  const rootURL = window.location.pathname;
   const {
     profileType1,
     matrixSize,
@@ -70,7 +69,7 @@ export function CosineSimilarity({ submitR }) {
 
   async function setRPlot(plotPath, type) {
     try {
-      const response = await fetch(`/visualize/svg`, {
+      const response = await fetch(`${rootURL}visualize/svg`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -109,7 +108,7 @@ export function CosineSimilarity({ submitR }) {
     });
     try {
       const response = await fetch(
-        `/api/visualizeR/getSignatureReferenceSets`,
+        `${rootURL}/api/visualizeR/getSignatureReferenceSets`,
         {
           method: 'POST',
           headers: {
@@ -195,7 +194,7 @@ export function CosineSimilarity({ submitR }) {
   //   download text results files
   async function downloadResults(txtPath) {
     try {
-      const response = await fetch(`/visualize/txt`, {
+      const response = await fetch(`${rootURL}visualize/txt`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',

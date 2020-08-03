@@ -16,8 +16,8 @@ export default function Results() {
   const { error, projectID, displayTab, pyTab, cosineSimilarity } = useSelector(
     (state) => state.visualizeResults
   );
-
   const { mapping } = pyTab;
+  const rootURL = window.location.pathname;
 
   // get mapping after retrieving projectID
   useEffect(() => {
@@ -28,7 +28,7 @@ export default function Results() {
 
   // retrieve mapping of samples to plots from summary file
   async function getSummary() {
-    const response = await fetch(`/visualize/summary`, {
+    const response = await fetch(`${rootURL}visualize/summary`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -105,7 +105,7 @@ export default function Results() {
   }
 
   function submitR(fn, args) {
-    return fetch(`/api/visualizeR`, {
+    return fetch(`${rootURL}api/visualizeR`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
