@@ -11,6 +11,9 @@ import {
   dispatchVisualizeResults,
   dispatchError,
   getInitialState,
+  dispatchPyTab,
+  dispatchCosineSimilarity,
+  dispatchProfileComparison,
 } from '../../../services/store';
 const { Group, Label, Control, Check, Text } = Form;
 
@@ -159,6 +162,9 @@ export default function UploadForm({ setOpenSidebar }) {
     removeFile();
     dispatchVisualize(initialState.visualize);
     dispatchVisualizeResults(initialState.visualizeResults);
+    dispatchPyTab(initialState.pyTab)
+    dispatchCosineSimilarity(initialState.cosineSimilarity)
+    dispatchProfileComparison(initialState.profileComparison)
   }
 
   //   Uploads inputFile and returns a projectID
