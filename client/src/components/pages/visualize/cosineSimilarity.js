@@ -17,16 +17,16 @@ export default function CosineSimilarity({ submitR }) {
   const { mapping, profileOptions } = useSelector((state) => state.pyTab);
   const rootURL = window.location.pathname;
   const {
-    profileType1,
-    matrixSize,
-    matrixOptions,
-    profileType2,
-    signatureSet,
-    signatureSetOptions,
-    csWithinPlot,
-    csWithinTxt,
-    csRefSigPlot,
-    csRefSigTxt,
+    withinProfileType,
+    withinMatrixSize,
+    withinMatrixOptions,
+    refProfileType,
+    refSignatureSet,
+    refSignatureSetOptions,
+    withinPlotPath,
+    withinTxtPath,
+    refPlotPath,
+    refTxtPath,
     submitOverlay,
     displayWithin,
     displayRefSig,
@@ -35,35 +35,35 @@ export default function CosineSimilarity({ submitR }) {
 
   // load r plots after they are recieved
   useEffect(() => {
-    if (csWithinPlot && csWithinPlot.length) {
-      setRPlot(csWithinPlot, 'within');
+    if (withinPlotPath && withinPlotPath.length) {
+      setRPlot(withinPlotPath, 'within');
     }
-  }, [csWithinPlot]);
+  }, [withinPlotPath]);
 
   useEffect(() => {
-    if (csRefSigPlot && csRefSigPlot.length) {
-      setRPlot(csRefSigPlot, 'refsig');
+    if (refPlotPath && refPlotPath.length) {
+      setRPlot(refPlotPath, 'refsig');
     }
-  }, [csRefSigPlot]);
+  }, [refPlotPath]);
 
   // call r wrapper on load
   // useEffect(() => {
   //   if (!csWithinURL.length && !csRefSigURL.length) {
   //     calculateR('cosineSimilarityWithin', {
-  //       profileType: profileType1,
-  //       matrixSize: matrixSize.replace('-', ''),
+  //       profileType: withinProfileType,
+  //       matrixSize: withinMatrixSize.replace('-', ''),
   //     });
   //     calculateR('cosineSimilarityRefSig', {
-  //       profileType: profileType2,
-  //       signatureSet: signatureSet,
+  //       profileType: refProfileType,
+  //       signatureSet: refSignatureSet,
   //     });
   //   }
-  // }, [csWithinPlot, csRefSigPlot]);
+  // }, [withinPlotPath, refPlotPath]);
 
   // retrieve signature set options on change
   useEffect(() => {
-    getSignatureSet(profileType2);
-  }, [profileType2]);
+    getrefSignatureSet(refProfileType);
+  }, [refProfileType]);
 
   async function setRPlot(plotPath, type) {
     try {
@@ -100,8 +100,8 @@ export default function CosineSimilarity({ submitR }) {
   }
 
   // get Signature Reference Sets for dropdown options
-  async function getSignatureSet(profileType) {
-    if (profileType.length) {
+  async function getrefSignatureSet(profileType) {
+    if (profileType && profileType.length) {
       dispatchCosineSimilarity({ submitOverlay: true });
       try {
         const response = await fetch(
@@ -116,11 +116,11 @@ export default function CosineSimilarity({ submitR }) {
           }
         );
         if (response.ok) {
-          const signatureSetOptions = await response.json();
+          const refSignatureSetOptions = await response.json();
 
           dispatchCosineSimilarity({
-            signatureSetOptions: signatureSetOptions,
-            signatureSet: signatureSetOptions[0],
+            refSignatureSetOptions: refSignatureSetOptions,
+            refSignatureSet: refSignatureSetOptions[0],
             submitOverlay: false,
           });
         } else {
@@ -154,14 +154,14 @@ export default function CosineSimilarity({ submitR }) {
         if (fn == 'cosineSimilarityWithin')
           update = {
             ...update,
-            csWithinPlot: data.plot,
-            csWithinTxt: data.txt,
+            withinPlotPath: data.plot,
+            withinTxtPath: data.txt,
           };
         else {
           update = {
             ...update,
-            csRefSigPlot: data.plot,
-            csRefSigTxt: data.txt,
+            refPlotPath: data.plot,
+            refTxtPath: data.txt,
           };
         }
         dispatchCosineSimilarity(update);
@@ -203,8 +203,8 @@ export default function CosineSimilarity({ submitR }) {
     }
   }
 
-  function handleProfileType1(profileType) {
-    const matrixOptions = [
+  function handlewithinProfileType(profileType) {
+    const withinMatrixOptions = [
       ...new Set(
         mapping
           .filter((plot) => plot.Profile_Type == profileType)
@@ -213,9 +213,9 @@ export default function CosineSimilarity({ submitR }) {
     ];
 
     dispatchCosineSimilarity({
-      profileType1: profileType,
-      matrixSize: matrixOptions[0],
-      matrixOptions: matrixOptions,
+      withinProfileType: profileType,
+      withinMatrixSize: withinMatrixOptions[0],
+      withinMatrixOptions: withinMatrixOptions,
     });
   }
 
@@ -242,12 +242,12 @@ export default function CosineSimilarity({ submitR }) {
         >
           <Row className="justify-content-center">
             <Col sm="5">
-              <Group controlId="profileType1">
+              <Group controlId="withinProfileType">
                 <Label>Profile Type</Label>
                 <Control
                   as="select"
-                  value={profileType1}
-                  onChange={(e) => handleProfileType1(e.target.value)}
+                  value={withinProfileType}
+                  onChange={(e) => handlewithinProfileType(e.target.value)}
                   custom
                 >
                   {profileOptions.map((profile, index) => {
@@ -264,10 +264,10 @@ export default function CosineSimilarity({ submitR }) {
               <Label>Matrix Size</Label>
               <Control
                 as="select"
-                value={matrixSize}
+                value={withinMatrixSize}
                 onChange={(e) =>
                   dispatchCosineSimilarity({
-                    matrixSize: e.target.value,
+                    withinMatrixSize: e.target.value,
                   })
                 }
                 custom
@@ -275,7 +275,7 @@ export default function CosineSimilarity({ submitR }) {
                 <option value="0" disabled>
                   Select
                 </option>
-                {matrixOptions.map((matrix, index) => {
+                {withinMatrixOptions.map((matrix, index) => {
                   return (
                     <option key={index} value={matrix}>
                       {matrix}
@@ -289,8 +289,8 @@ export default function CosineSimilarity({ submitR }) {
                 variant="primary"
                 onClick={() =>
                   calculateR('cosineSimilarityWithin', {
-                    profileType: profileType1,
-                    matrixSize: matrixSize.replace('-', ''),
+                    profileType: withinProfileType,
+                    matrixSize: withinMatrixSize.replace('-', ''),
                   })
                 }
               >
@@ -300,7 +300,7 @@ export default function CosineSimilarity({ submitR }) {
           </Row>
 
           <div
-            id="csWithinPlot"
+            id="withinPlotPath"
             style={{ display: csWithinURL.length ? 'block' : 'none' }}
           >
             <div className="d-flex">
@@ -315,7 +315,7 @@ export default function CosineSimilarity({ submitR }) {
                 <Button
                   className="px-2 py-1"
                   variant="link"
-                  onClick={() => downloadResults(csWithinTxt)}
+                  onClick={() => downloadResults(withinTxtPath)}
                 >
                   Download Results
                 </Button>
@@ -352,14 +352,14 @@ export default function CosineSimilarity({ submitR }) {
         >
           <Row className="justify-content-center">
             <Col sm="5">
-              <Group controlId="profileType2">
+              <Group controlId="refProfileType">
                 <Label>Profile Type</Label>
                 <Control
                   as="select"
-                  value={profileType2}
+                  value={refProfileType}
                   onChange={(e) => {
                     dispatchCosineSimilarity({
-                      profileType2: e.target.value,
+                      refProfileType: e.target.value,
                     });
                   }}
                   custom
@@ -375,24 +375,24 @@ export default function CosineSimilarity({ submitR }) {
               </Group>
             </Col>
             <Col sm="5">
-              <Group controlId="signatureSet">
+              <Group controlId="refSignatureSet">
                 <Label>Reference Signature Set</Label>
                 <Control
-                  disabled={!signatureSetOptions.length}
+                  disabled={!refSignatureSetOptions.length}
                   as="select"
-                  value={signatureSet}
+                  value={refSignatureSet}
                   onChange={(e) =>
                     dispatchCosineSimilarity({
-                      signatureSet: e.target.value,
+                      refSignatureSet: e.target.value,
                     })
                   }
                   custom
                 >
                   <option value="0">Select</option>
-                  {signatureSetOptions.map((signatureSet, index) => {
+                  {refSignatureSetOptions.map((refSignatureSet, index) => {
                     return (
-                      <option key={index} value={signatureSet}>
-                        {signatureSet}
+                      <option key={index} value={refSignatureSet}>
+                        {refSignatureSet}
                       </option>
                     );
                   })}
@@ -404,8 +404,8 @@ export default function CosineSimilarity({ submitR }) {
                 variant="primary"
                 onClick={() =>
                   calculateR('cosineSimilarityRefSig', {
-                    profileType: profileType2,
-                    signatureSet: signatureSet,
+                    profileType: refProfileType,
+                    signatureSet: refSignatureSet,
                   })
                 }
               >
@@ -415,7 +415,7 @@ export default function CosineSimilarity({ submitR }) {
           </Row>
 
           <div
-            id="csRefSigPlot"
+            id="refPlotPath"
             style={{ display: csRefSigURL.length ? 'block' : 'none' }}
           >
             <div className="d-flex">
@@ -430,7 +430,7 @@ export default function CosineSimilarity({ submitR }) {
                 <Button
                   className="px-2 py-1"
                   variant="link"
-                  onClick={() => downloadResults(csRefSigTxt)}
+                  onClick={() => downloadResults(refTxtPath)}
                 >
                   Download Results
                 </Button>

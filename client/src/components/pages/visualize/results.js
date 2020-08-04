@@ -99,10 +99,10 @@ export default function Results() {
     });
 
     dispatchCosineSimilarity({
-      profileType1: profileOptions[0],
-      profileType2: profileOptions[0],
-      matrixSize: matrixOptions[0],
-      matrixOptions: matrixOptions,
+      withinProfileType: profileOptions[0],
+      refProfileType: profileOptions[0],
+      withinMatrixSize: matrixOptions[0],
+      withinMatrixOptions: matrixOptions,
     });
 
     dispatchProfileComparison({
