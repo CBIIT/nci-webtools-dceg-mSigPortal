@@ -152,17 +152,10 @@ export default function ProfileComparison({ submitR }) {
           submitOverlay: false,
         };
         if (fn == 'profileComparisonWithin')
-          update = {
-            ...update,
-            withinPlotPath: data.plot,
-          };
+          dispatchProfileComparison({ ...update, withinPlotPath: data.plot });
         else {
-          update = {
-            ...update,
-            refPlotPath: data.plot,
-          };
+          dispatchProfileComparison({ ...update, refPlotPath: data.plot });
         }
-        dispatchProfileComparison(update);
       }
     } catch (err) {
       dispatchError(err);
