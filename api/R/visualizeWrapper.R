@@ -31,6 +31,7 @@ cosineSimilarityWithin <- function(profileType, matrixSize, projectID, pythonOut
     paths = list()
     plotPath = paste0(savePath, '/cos_sim_within.svg')
     txtPath = paste0(savePath, '/cos_sim_within.txt')
+
     data_input <- read_delim(paste0(pythonOutput, '/', profileType, '/', projectID, '.', matrixSize, '.all'), delim = '\t')
     if ("False" %in% colnames(data_input)) {
       data_input <- data_input %>% select(-False)
@@ -64,6 +65,7 @@ cosineSimilarityRefSig <- function(profileType, signatureSetName, projectID, pyt
     paths = list()
     plotPath = paste0(savePath, 'cos_sim_refsig.svg')
     txtPath = paste0(savePath, 'cos_sim_refsig.txt')
+
     matrix <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
     signature_refsets_input <- signature_refsets %>% filter(Profile == matrix, Signature_set_name == signatureSetName)
     refsig <- signature_refsets_input %>%
@@ -102,9 +104,9 @@ profileComparisonWithin <- function(profileType, sampleName1, sampleName2, proje
   tryCatch({
     paths = list()
     plotPath = paste0(savePath, '/cos_sim_within.svg')
+
     matrixsize <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
     data_input <- read_delim(paste0(pythonOutput, '/', profileType, '/', projectID, '.', matrixsize, '.all'), delim = '\t')
-    # data_input <- data_input %>% select(-False,-seen)
     profile1 <- data_input %>% select(MutationType, contains(sampleName1))
     profile2 <- data_input %>% select(MutationType, contains(sampleName2))
     plot_compare_profiles_diff(profile1, profile2, condensed = FALSE)
@@ -131,10 +133,11 @@ profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, c
   tryCatch({
     paths = list()
     plotPath = paste0(savePath, 'cos_sim_refsig.svg')
+
     profilename <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
     matrixsize <- profilename
     data_input <- read_delim(paste0(pythonOutput, '/', profileType, '/', projectID, '.', matrixsize, '.all'), delim = '\t')
-    profile1 <- data_input %>% select(MutationType, one_of(profileType))
+    profile1 <- data_input %>% select(MutationType, one_of(sampleName))
     signature_refsets_input <- signature_refsets %>% filter(Profile == profilename, Signature_set_name == signatureSetName)
     refsig <- signature_refsets_input %>%
       select(Signature_name, MutationType, Contribution) %>%
