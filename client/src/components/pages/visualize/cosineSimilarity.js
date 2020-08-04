@@ -101,34 +101,36 @@ export default function CosineSimilarity({ submitR }) {
 
   // get Signature Reference Sets for dropdown options
   async function getSignatureSet(profileType) {
-    dispatchCosineSimilarity({ submitOverlay: true });
-    try {
-      const response = await fetch(
-        `${rootURL}api/visualizeR/getSignatureReferenceSets`,
-        {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ profileType: profileType }),
-        }
-      );
-      if (response.ok) {
-        const signatureSetOptions = await response.json();
+    if (profileType.length) {
+      dispatchCosineSimilarity({ submitOverlay: true });
+      try {
+        const response = await fetch(
+          `${rootURL}api/visualizeR/getSignatureReferenceSets`,
+          {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ profileType: profileType }),
+          }
+        );
+        if (response.ok) {
+          const signatureSetOptions = await response.json();
 
-        dispatchCosineSimilarity({
-          signatureSetOptions: signatureSetOptions,
-          signatureSet: signatureSetOptions[0],
-          submitOverlay: false,
-        });
-      } else {
-        dispatchError(await response.json());
+          dispatchCosineSimilarity({
+            signatureSetOptions: signatureSetOptions,
+            signatureSet: signatureSetOptions[0],
+            submitOverlay: false,
+          });
+        } else {
+          dispatchError(await response.json());
+          dispatchCosineSimilarity({ submitOverlay: false });
+        }
+      } catch (err) {
+        dispatchError(err);
         dispatchCosineSimilarity({ submitOverlay: false });
       }
-    } catch (err) {
-      dispatchError(err);
-      dispatchCosineSimilarity({ submitOverlay: false });
     }
   }
 

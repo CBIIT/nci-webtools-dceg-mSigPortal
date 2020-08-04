@@ -17,10 +17,16 @@ export default function ProfileComparison({ submitR }) {
   const { nameOptions, profileOptions } = useSelector((state) => state.pyTab);
   const rootURL = window.location.pathname;
   const {
-    within,
-    refSig,
+    withinProfileType,
+    withinSampleName1,
+    withinSampleName2,
+    refProfileType,
+    refSampleName,
+    refSignatureSet,
+    refSignatureSetOptions,
+    refCompare,
     withinPlotPath,
-    refSigPlotPath,
+    refPlotPath,
     displayWithin,
     displayRefSig,
     debugR,
@@ -35,10 +41,10 @@ export default function ProfileComparison({ submitR }) {
   }, [withinPlotPath]);
 
   useEffect(() => {
-    if (refSigPlotPath && refSigPlotPath.length) {
-      setRPlot(refSigPlotPath, 'refsig');
+    if (refPlotPath && refPlotPath.length) {
+      setRPlot(refPlotPath, 'refsig');
     }
-  }, [refSigPlotPath]);
+  }, [refPlotPath]);
 
   // call r wrapper on load
   // useEffect(() => {
@@ -52,12 +58,12 @@ export default function ProfileComparison({ submitR }) {
   //       signatureSet: signatureSet,
   //     });
   //   }
-  // }, [withinPlotPath, refSigPlotPath]);
+  // }, [withinPlotPath, refPlotPath]);
 
   // retrieve signature set options on change
   useEffect(() => {
-    // getSignatureSet(refSig.profileType);
-  }, [refSig.profileType]);
+    getSignatureSet(refProfileType);
+  }, [refProfileType]);
 
   async function setRPlot(plotPath, type) {
     try {
@@ -95,38 +101,36 @@ export default function ProfileComparison({ submitR }) {
 
   // get Signature Reference Sets for dropdown options
   async function getSignatureSet(profileType) {
-    dispatchProfileComparison({ submitOverlay: true });
-    try {
-      const response = await fetch(
-        `${rootURL}api/visualizeR/getSignatureReferenceSets`,
-        {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ profileType: profileType }),
-        }
-      );
-      if (response.ok) {
-        const signatureSetOptions = await response.json();
+    if (profileType.length) {
+      dispatchProfileComparison({ submitOverlay: true });
+      try {
+        const response = await fetch(
+          `${rootURL}api/visualizeR/getSignatureReferenceSets`,
+          {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ profileType: profileType }),
+          }
+        );
+        if (response.ok) {
+          const signatureSetOptions = await response.json();
 
-        dispatchProfileComparison({
-          refSig: {
-            ...refSig,
-            signatureSetOptions: signatureSetOptions,
-            signatureSet: signatureSetOptions[0],
-          },
-          submitOverlay: false,
-        });
-        console.log('done');
-      } else {
-        dispatchError(await response.json());
+          dispatchProfileComparison({
+            refSignatureSetOptions: signatureSetOptions,
+            refSignatureSet: signatureSetOptions[0],
+            submitOverlay: false,
+          });
+        } else {
+          dispatchError(await response.json());
+          dispatchProfileComparison({ submitOverlay: false });
+        }
+      } catch (err) {
+        dispatchError(err);
         dispatchProfileComparison({ submitOverlay: false });
       }
-    } catch (err) {
-      dispatchError(err);
-      dispatchProfileComparison({ submitOverlay: false });
     }
   }
 
@@ -155,7 +159,7 @@ export default function ProfileComparison({ submitR }) {
         else {
           update = {
             ...update,
-            refSigPlotPath: data.plot,
+            refPlotPath: data.plot,
           };
         }
         dispatchProfileComparison(update);
@@ -193,10 +197,10 @@ export default function ProfileComparison({ submitR }) {
                 <Label>Profile Type</Label>
                 <Control
                   as="select"
-                  value={within.profileType}
+                  value={withinProfileType}
                   onChange={(e) =>
                     dispatchProfileComparison({
-                      within: { ...within, profileType: e.target.value },
+                      withinProfileType: e.target.value,
                     })
                   }
                   custom
@@ -215,10 +219,10 @@ export default function ProfileComparison({ submitR }) {
               <Label>Sample Name 1</Label>
               <Control
                 as="select"
-                value={within.sampleName1}
+                value={withinSampleName1}
                 onChange={(e) =>
                   dispatchProfileComparison({
-                    within: { ...within, sampleName1: e.target.value },
+                    withinSampleName1: e.target.value,
                   })
                 }
                 custom
@@ -239,10 +243,10 @@ export default function ProfileComparison({ submitR }) {
               <Label>Sample Name 2</Label>
               <Control
                 as="select"
-                value={within.sampleName2}
+                value={withinSampleName2}
                 onChange={(e) =>
                   dispatchProfileComparison({
-                    within: { ...within, sampleName2: e.target.value },
+                    withinSampleName2: e.target.value,
                   })
                 }
                 custom
@@ -264,9 +268,9 @@ export default function ProfileComparison({ submitR }) {
                 variant="primary"
                 onClick={() =>
                   calculateR('profileComparisonWithin', {
-                    profileType: within.profileType,
-                    sampleName1: within.sampleName1,
-                    sampleName2: within.sampleName2,
+                    profileType: withinProfileType,
+                    sampleName1: withinSampleName1,
+                    sampleName2: withinSampleName2,
                   })
                 }
               >
@@ -323,10 +327,10 @@ export default function ProfileComparison({ submitR }) {
                 <Label>Profile Type</Label>
                 <Control
                   as="select"
-                  value={refSig.profileType}
+                  value={refProfileType}
                   onChange={(e) => {
                     dispatchProfileComparison({
-                      refSig: { ...refSig, profileType: e.target.value },
+                      refProfileType: e.target.value,
                     });
                   }}
                   custom
@@ -346,10 +350,10 @@ export default function ProfileComparison({ submitR }) {
                 <Label>Sample Name</Label>
                 <Control
                   as="select"
-                  value={refSig.sampleName}
+                  value={refSampleName}
                   onChange={(e) => {
                     dispatchProfileComparison({
-                      refSig: { ...refSig, sampleName: e.target.value },
+                      refSampleName: e.target.value,
                     });
                   }}
                   custom
@@ -368,18 +372,18 @@ export default function ProfileComparison({ submitR }) {
               <Group controlId="signatureSet">
                 <Label>Reference Signature Set</Label>
                 <Control
-                  disabled={!refSig.signatureSetOptions.length}
+                  disabled={!refSignatureSetOptions.length}
                   as="select"
-                  value={refSig.signatureSet}
+                  value={refSignatureSet}
                   onChange={(e) => {
                     dispatchProfileComparison({
-                      refSig: { ...refSig, signatureSet: e.target.value },
+                      refSignatureSet: e.target.value,
                     });
                   }}
                   custom
                 >
                   <option value="0">Select</option>
-                  {refSig.signatureSetOptions.map((signatureSet, index) => {
+                  {refSignatureSetOptions.map((signatureSet, index) => {
                     return (
                       <option key={index} value={signatureSet}>
                         {signatureSet}
@@ -393,10 +397,10 @@ export default function ProfileComparison({ submitR }) {
               <Group controlId="signatureSet">
                 <Label>Compare</Label>
                 <Control
-                  value={refSig.compare}
+                  value={refCompare}
                   onChange={(e) => {
                     dispatchProfileComparison({
-                      refSig: { ...refSig, compare: e.target.value },
+                      refCompare: e.target.value,
                     });
                   }}
                 ></Control>
@@ -407,10 +411,10 @@ export default function ProfileComparison({ submitR }) {
                 variant="primary"
                 onClick={() =>
                   calculateR('profileComparisonRefSig', {
-                    profileType: refSig.profileType,
-                    sampleName: refSig.sampleName,
-                    signatureSet: refSig.signatureSet,
-                    compare: refSig.compare,
+                    profileType: refProfileType,
+                    sampleName: refSampleName,
+                    signatureSet: refSignatureSet,
+                    compare: refCompare,
                   })
                 }
               >
@@ -420,7 +424,7 @@ export default function ProfileComparison({ submitR }) {
           </Row>
 
           <div
-            id="refSigPlotPath"
+            id="refPlotPath"
             style={{ display: pcRefSigURL.length ? 'block' : 'none' }}
           >
             <div className="d-flex">

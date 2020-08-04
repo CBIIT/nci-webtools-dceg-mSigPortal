@@ -106,13 +106,11 @@ export default function Results() {
     });
 
     dispatchProfileComparison({
-      within: {
-        ...within,
-        profileType: profileOptions[0],
-        sampleName1: nameOptions[0],
-        sampleName2: nameOptions[1],
-      },
-      refSig: { ...refSig, profileType: profileOptions[0] },
+      withinProfileType: profileOptions[0],
+      withinSampleName1: nameOptions[0],
+      withinSampleName2: nameOptions[1],
+      refProfileType: profileOptions[0],
+      refSampleName: nameOptions[0],
     });
   }
 
