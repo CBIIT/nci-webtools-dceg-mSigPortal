@@ -2,15 +2,18 @@ import React, { useEffect } from 'react';
 import { Card, Nav } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
+  dispatchError,
   dispatchVisualizeResults,
   dispatchPyTab,
   dispatchCosineSimilarity,
   dispatchProfileComparison,
+  dispatchPCA,
 } from '../../../services/store';
 
 import PyTab from './pyTab';
 import CosineSimilarity from './cosineSimilarity';
 import ProfileComparison from './profileComparison';
+import PCA from './pca';
 
 const { Header, Body } = Card;
 const { Item, Link } = Nav;
@@ -112,6 +115,8 @@ export default function Results() {
       refProfileType: profileOptions[0],
       refSampleName: nameOptions[0],
     });
+
+    dispatchPCA({ profileType: profileOptions[0] });
   }
 
   function submitR(fn, args) {
@@ -123,6 +128,37 @@ export default function Results() {
       },
       body: JSON.stringify({ fn: fn, args: args, projectID: projectID }),
     });
+  }
+
+  //   download text results files
+  async function downloadResults(txtPath) {
+    try {
+      const response = await fetch(`${rootURL}visualize/txt`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ path: txtPath }),
+      });
+      if (!response.ok) {
+        const { msg } = await response.json();
+        dispatchError(msg);
+      } else {
+        const file = await response.blob();
+        const objectURL = URL.createObjectURL(file);
+        const tempLink = document.createElement('a');
+
+        tempLink.href = objectURL;
+        tempLink.download = txtPath.split('/').slice(-1)[0];
+        document.body.appendChild(tempLink);
+        tempLink.click();
+        document.body.removeChild(tempLink);
+        URL.revokeObjectURL(objectURL);
+      }
+    } catch (err) {
+      dispatchError(err);
+    }
   }
 
   return error.length ? (
@@ -159,6 +195,14 @@ export default function Results() {
               Profile Comparison
             </Link>
           </Item>
+          <Item>
+            <Link
+              active={displayTab == 'pca'}
+              onClick={() => dispatchVisualizeResults({ displayTab: 'pca' })}
+            >
+              PCA
+            </Link>
+          </Item>
         </Nav>
       </Header>
       <Body style={{ display: displayTab == 'python' ? 'block' : 'none' }}>
@@ -167,7 +211,10 @@ export default function Results() {
       <Body
         style={{ display: displayTab == 'cosineSimilarity' ? 'block' : 'none' }}
       >
-        <CosineSimilarity submitR={(fn, args) => submitR(fn, args)} />
+        <CosineSimilarity
+          downloadResults={(path) => downloadResults(path)}
+          submitR={(fn, args) => submitR(fn, args)}
+        />
       </Body>
       <Body
         style={{
@@ -175,6 +222,12 @@ export default function Results() {
         }}
       >
         <ProfileComparison submitR={(fn, args) => submitR(fn, args)} />
+      </Body>
+      <Body style={{ display: displayTab == 'pca' ? 'block' : 'none' }}>
+        <PCA
+          downloadResults={(path) => downloadResults(path)}
+          submitR={(fn, args) => submitR(fn, args)}
+        />
       </Body>
     </Card>
   ) : (

@@ -146,15 +146,15 @@ export default function ProfileComparison({ submitR }) {
           submitOverlay: false,
         });
       } else {
-        const data = await response.json();
+        const { debugR, output } = await response.json();
         let update = {
-          debugR: data.debugR,
+          debugR: debugR,
           submitOverlay: false,
         };
         if (fn == 'profileComparisonWithin')
-          dispatchProfileComparison({ ...update, withinPlotPath: data.plot });
+          dispatchProfileComparison({ ...update, withinPlotPath: output.plotPath });
         else {
-          dispatchProfileComparison({ ...update, refPlotPath: data.plot });
+          dispatchProfileComparison({ ...update, refPlotPath: output.plotPath });
         }
       }
     } catch (err) {

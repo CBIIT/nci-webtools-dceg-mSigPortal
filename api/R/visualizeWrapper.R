@@ -28,7 +28,7 @@ cosineSimilarityWithin <- function(profileType, matrixSize, projectID, pythonOut
   sink(con, type = "output")
 
   tryCatch({
-    paths = list()
+    output = list()
     plotPath = paste0(savePath, '/cos_sim_within.svg')
     txtPath = paste0(savePath, '/cos_sim_within.txt')
 
@@ -42,13 +42,13 @@ cosineSimilarityWithin <- function(profileType, matrixSize, projectID, pythonOut
     ggsave(plotPath)
     cos_sim_res1 %>% write_delim(txtPath, delim = '\t', col_names = T)
 
-    paths = list('plotPath' = plotPath[1], 'txtPath' = txtPath[1])
+    output = list('plotPath' = plotPath, 'txtPath' = txtPath)
   }, error = function(e) {
     print(e)
   }, finally = {
     sink(con)
     sink(con)
-    return(toJSON(list('stdout' = stdout, 'paths' = paths), pretty = TRUE, auto_unbox = TRUE))
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
   })
 }
 
@@ -62,7 +62,7 @@ cosineSimilarityRefSig <- function(profileType, signatureSetName, projectID, pyt
   sink(con, type = "output")
 
   tryCatch({
-    paths = list()
+    output = list()
     plotPath = paste0(savePath, 'cos_sim_refsig.svg')
     txtPath = paste0(savePath, 'cos_sim_refsig.txt')
 
@@ -82,13 +82,13 @@ cosineSimilarityRefSig <- function(profileType, signatureSetName, projectID, pyt
     ggsave(plotPath)
     cos_sim_res2 %>% write_delim(txtPath, delim = '\t', col_names = T)
 
-    paths = list('plotPath' = plotPath, 'txtPath' = txtPath)
+    output = list('plotPath' = plotPath, 'txtPath' = txtPath)
   }, error = function(e) {
     print(e)
   }, finally = {
     sink(con)
     sink(con)
-    return(toJSON(list('stdout' = stdout, 'paths' = paths), pretty = TRUE, auto_unbox = TRUE))
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
   })
 }
 
@@ -102,7 +102,7 @@ profileComparisonWithin <- function(profileType, sampleName1, sampleName2, proje
   sink(con, type = "output")
 
   tryCatch({
-    paths = list()
+    output = list()
     plotPath = paste0(savePath, '/cos_sim_within.svg')
 
     matrixsize <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
@@ -112,13 +112,13 @@ profileComparisonWithin <- function(profileType, sampleName1, sampleName2, proje
     plot_compare_profiles_diff(profile1, profile2, condensed = FALSE)
     ggsave(plotPath)
 
-    paths = list('plotPath' = plotPath)
+    output = list('plotPath' = plotPath)
   }, error = function(e) {
     print(e)
   }, finally = {
     sink(con)
     sink(con)
-    return(toJSON(list('stdout' = stdout, 'paths' = paths), pretty = TRUE, auto_unbox = TRUE))
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
   })
 }
 
@@ -131,7 +131,7 @@ profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, c
   sink(con, type = "output")
 
   tryCatch({
-    paths = list()
+    output = list()
     plotPath = paste0(savePath, 'cos_sim_refsig.svg')
 
     profilename <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
@@ -156,13 +156,105 @@ profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, c
     plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, profile_names = profile_names)
     ggsave(plotPath)
 
-    paths = list('plotPath' = plotPath)
+    output = list('plotPath' = plotPath)
   }, error = function(e) {
     print(e)
   }, finally = {
     sink(con)
     sink(con)
-    return(toJSON(list('stdout' = stdout, 'paths' = paths), pretty = TRUE, auto_unbox = TRUE))
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
   })
+}
 
+### “Principal Component Analysis” ###
+# Two parameters need: Profile Type, Reference Signature Set
+# Profile Type only support SBS, DBS, ID
+pca <- function(profileType, signatureSetName, projectID, pythonOutput, savePath) {
+  stdout <- vector('character')
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+    eig = paste0(savePath, '/eig.svg')
+    pca1 = paste0(savePath, '/pca1.svg')
+    pca2 = paste0(savePath, '/pca2.svg')
+    heatmap = paste0(savePath, '/heatmap.svg')
+    pca1Data = paste0(savePath, '/pca1_data.txt')
+    pca2Data = paste0(savePath, '/pca2_data.txt')
+    heatmapData = paste0(savePath, '/heatmap_data.txt')
+
+
+
+    profilename <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
+    matrixsize <- profilename
+
+    signature_refsets_input <- signature_refsets %>% filter(Profile == profilename, Signature_set_name == signatureSetName)
+    refsig <- signature_refsets_input %>%
+      select(Signature_name, MutationType, Contribution) %>%
+      pivot_wider(names_from = Signature_name, values_from = Contribution)
+
+    data_input <- read_delim(paste0(pythonOutput, '/', profileType, '/', projectID, '.', matrixsize, '.all'), delim = '\t')
+    if ("False" %in% colnames(data_input)) {
+      data_input <- data_input %>% select(-False)
+    }
+
+    # PCA plot ----------------------------------------------------------------
+    mdata_input <- as.matrix(data_input[, -1])
+    rownames(mdata_input) <- data_input$MutationType
+
+    res.pca <- prcomp(t(mdata_input), scale = FALSE, center = FALSE)
+    fviz_eig(res.pca, ncp = 10)
+    ggsave(eig)
+
+    if ((dim(data_input)[2] - 1) > 20) {
+      fviz_pca_ind(res.pca, axes = c(1, 2), geom = "point", col.ind = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE)
+      ggsave(pca1)
+    } else {
+      fviz_pca_ind(res.pca, axes = c(1, 2), col.ind = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE)
+      ggsave(pca1)
+    }
+
+    ## a link to download pca data1
+    res.pca$x %>% as.data.frame() %>% rownames_to_column(var = 'Sample') %>% write_delim(pca1Data, delim = '\t', col_names = T)
+
+    fviz_pca_var(res.pca, axes = c(1, 2),
+             col.var = "contrib", # Color by contributions to the PC
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = FALSE # Avoid text overlapping
+    )
+    ggsave(pca2)
+
+
+    # a link to download pca data2
+    res.pca$rotation %>% as.data.frame() %>% rownames_to_column(var = 'Sample') %>% write_delim(pca2Data, delim = '\t', col_names = T)
+
+    ## heatmap between PCs and signatures
+    sigpca <- res.pca$rotation %>% as.data.frame() %>% rownames_to_column(var = "MutationType")
+    cos_sim_res3 = cos_sim_df(sigpca, refsig)
+    # put this heatmap on the web
+    plot_cosine_heatmap_df(cos_sim_res3, cluster_rows = TRUE, plot_values = FALSE)
+    ggsave(heatmap)
+
+    # a link to download the cosine similarity bellow the plot 
+    # you could rename the file name if you need
+    cos_sim_res3 %>% write_delim(heatmapData, delim = '\t', col_names = T)
+
+    output = list(
+      'eig' = eig,
+      'pca1' = pca1,
+      'pca2' = pca2,
+      'heatmap' = heatmap,
+      'pca1Data' = pca1Data,
+      'pca2Data' = pca2Data,
+      'heatmapData' = heatmapData
+     )
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+  })
 }

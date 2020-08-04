@@ -114,13 +114,12 @@ app.post('/api/visualizeR', (req, res) => {
       savePath: savePath,
     });
 
-    const { stdout, paths } = JSON.parse(wrapper);
+    const { stdout, output } = JSON.parse(wrapper);
     console.log('wrapper return', JSON.parse(wrapper));
 
     res.json({
       debugR: stdout,
-      plot: paths.plotPath,
-      txt: paths.txtPath,
+      output: output,
     });
   } catch (err) {
     logger.info('/api/visualizeR: An error occured');

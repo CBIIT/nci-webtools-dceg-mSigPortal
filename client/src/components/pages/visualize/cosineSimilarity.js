@@ -10,7 +10,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const { Group, Label, Control } = Form;
 
-export default function CosineSimilarity({ submitR }) {
+export default function CosineSimilarity({ downloadResults, submitR }) {
   const { csWithinURL, csRefSigURL } = useSelector(
     (state) => state.visualizeResults
   );
@@ -146,25 +146,24 @@ export default function CosineSimilarity({ submitR }) {
           submitOverlay: false,
         });
       } else {
-        const data = await response.json();
+        const { debugR, output } = await response.json();
         let update = {
-          debugR: data.debugR,
+          debugR: debugR,
           submitOverlay: false,
         };
         if (fn == 'cosineSimilarityWithin')
-          update = {
+          dispatchCosineSimilarity({
             ...update,
-            withinPlotPath: data.plot,
-            withinTxtPath: data.txt,
-          };
+            withinPlotPath: output.plotPath,
+            withinTxtPath: output.txtPath,
+          });
         else {
-          update = {
+          dispatchCosineSimilarity({
             ...update,
-            refPlotPath: data.plot,
-            refTxtPath: data.txt,
-          };
+            refPlotPath: output.plotPath,
+            refTxtPath: output.txtPath,
+          });
         }
-        dispatchCosineSimilarity(update);
       }
     } catch (err) {
       dispatchError(err);
@@ -172,36 +171,7 @@ export default function CosineSimilarity({ submitR }) {
     }
   }
 
-  //   download text results files
-  async function downloadResults(txtPath) {
-    try {
-      const response = await fetch(`${rootURL}visualize/txt`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ path: txtPath }),
-      });
-      if (!response.ok) {
-        const { msg } = await response.json();
-        dispatchError(msg);
-      } else {
-        const file = await response.blob();
-        const objectURL = URL.createObjectURL(file);
-        const tempLink = document.createElement('a');
-
-        tempLink.href = objectURL;
-        tempLink.download = txtPath.split('/').slice(-1)[0];
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        document.body.removeChild(tempLink);
-        URL.revokeObjectURL(objectURL);
-      }
-    } catch (err) {
-      dispatchError(err);
-    }
-  }
+ 
 
   function handlewithinProfileType(profileType) {
     const withinMatrixOptions = [

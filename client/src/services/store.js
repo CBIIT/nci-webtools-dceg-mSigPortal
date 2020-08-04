@@ -76,6 +76,25 @@ export const getInitialState = () => ({
     debugR: [],
     submitOverlay: false,
   },
+  pca: {
+    profileType: '',
+    signatureSet: '',
+    signatureSetOptions: [],
+    eig: '',
+    pca1: '',
+    pca2: '',
+    heatmap: '',
+    pca1Data: '',
+    pca2Data: '',
+    heatmapData: '',
+    eigURL: '',
+    pca1URL: '',
+    pca2URL: '',
+    heatmapURL: '',
+    displayPCA: true,
+    debugR: [],
+    submitOverlay: false,
+  },
   error: {
     visible: false,
     message: `An error occured when requesting data. If this problem persists, please contact the administrator at <a href="mailto:mSigPortalWebAdmin@cancer.gov">mSigPortalWebAdmin@cancer.gov</a>.`,
@@ -147,6 +166,19 @@ const profileComparisonSlice = createSlice({
   },
 });
 
+const pcaSlice = createSlice({
+  name: 'pca',
+  initialState: getInitialState().pca,
+  reducers: {
+    updatePCA: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
+
 const errorSlice = createSlice({
   name: 'error',
   initialState: getInitialState().error,
@@ -166,6 +198,7 @@ const rootReducer = combineReducers({
   pyTab: pyTabSlice.reducer,
   cosineSimilarity: cosineSimilaritySlice.reducer,
   profileComparison: profileComparisonSlice.reducer,
+  pca: pcaSlice.reducer,
   error: errorSlice.reducer,
 });
 
@@ -179,6 +212,7 @@ export const { updateVisualizeResults } = visualizeResultsSlice.actions;
 export const { updatePyTab } = pyTabSlice.actions;
 export const { updateCosineSimilarity } = cosineSimilaritySlice.actions;
 export const { updateProfileComparison } = profileComparisonSlice.actions;
+export const { updatePCA } = pcaSlice.actions;
 export const { updateError } = errorSlice.actions;
 
 export function dispatchVisualize(obj) {
@@ -199,6 +233,10 @@ export function dispatchCosineSimilarity(obj) {
 
 export function dispatchProfileComparison(obj) {
   store.dispatch(updateProfileComparison(obj));
+}
+
+export function dispatchPCA(obj) {
+  store.dispatch(updatePCA(obj));
 }
 
 export function dispatchError(msg) {
