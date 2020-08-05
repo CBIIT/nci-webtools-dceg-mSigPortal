@@ -11,9 +11,6 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 const { Group, Label, Control } = Form;
 
 export default function CosineSimilarity({ downloadResults, submitR }) {
-  const { csWithinURL, csRefSigURL } = useSelector(
-    (state) => state.visualizeResults
-  );
   const { mapping, profileOptions } = useSelector((state) => state.pyTab);
   const rootURL = window.location.pathname;
   const {
@@ -28,6 +25,8 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
     refPlotPath,
     refTxtPath,
     submitOverlay,
+    withinPlotURL,
+    refPlotURL,
     displayWithin,
     displayRefSig,
     debugR,
@@ -48,7 +47,7 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
 
   // call r wrapper on load
   // useEffect(() => {
-  //   if (!csWithinURL.length && !csRefSigURL.length) {
+  //   if (!withinPlotURL.length && !refPlotURL.length) {
   //     calculateR('cosineSimilarityWithin', {
   //       profileType: withinProfileType,
   //       matrixSize: withinMatrixSize.replace('-', ''),
@@ -83,14 +82,14 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
         const objectURL = URL.createObjectURL(pic);
 
         if (type == 'within') {
-          if (csWithinURL.length) URL.revokeObjectURL(csWithinURL);
-          dispatchVisualizeResults({
-            csWithinURL: objectURL,
+          if (withinPlotURL.length) URL.revokeObjectURL(withinPlotURL);
+          dispatchCosineSimilarity({
+            withinPlotURL: objectURL,
           });
         } else {
-          if (csRefSigURL.length) URL.revokeObjectURL(csRefSigURL);
-          dispatchVisualizeResults({
-            csRefSigURL: objectURL,
+          if (refPlotURL.length) URL.revokeObjectURL(refPlotURL);
+          dispatchCosineSimilarity({
+            refPlotURL: objectURL,
           });
         }
       }
@@ -274,13 +273,13 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
 
           <div
             id="withinPlotPath"
-            style={{ display: csWithinURL.length ? 'block' : 'none' }}
+            style={{ display: withinPlotURL.length ? 'block' : 'none' }}
           >
             <div className="d-flex">
               <a
                 className="px-2 py-1"
-                href={csWithinURL}
-                download={csWithinURL.split('/').slice(-1)[0]}
+                href={withinPlotURL}
+                download={withinPlotURL.split('/').slice(-1)[0]}
               >
                 Download Plot
               </a>
@@ -297,7 +296,7 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
             <div className="p-2 border rounded">
               <Row>
                 <Col>
-                  <img className="w-100 my-4" src={csWithinURL}></img>
+                  <img className="w-100 my-4" src={withinPlotURL}></img>
                 </Col>
               </Row>
             </div>
@@ -389,13 +388,13 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
 
           <div
             id="refPlotPath"
-            style={{ display: csRefSigURL.length ? 'block' : 'none' }}
+            style={{ display: refPlotURL.length ? 'block' : 'none' }}
           >
             <div className="d-flex">
               <a
                 className="px-2 py-1"
-                href={csRefSigURL}
-                download={csRefSigURL.split('/').slice(-1)[0]}
+                href={refPlotURL}
+                download={refPlotURL.split('/').slice(-1)[0]}
               >
                 Download Plot
               </a>
@@ -412,7 +411,7 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
             <div className="p-2 border rounded">
               <Row>
                 <Col>
-                  <img className="w-100 my-4" src={csRefSigURL}></img>
+                  <img className="w-100 my-4" src={refPlotURL}></img>
                 </Col>
               </Row>
             </div>

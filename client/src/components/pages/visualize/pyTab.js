@@ -12,7 +12,7 @@ const { Group, Label, Control } = Form;
 
 export default function PyTab() {
   const [downloadOverlay, setOverlay] = useState(false);
-  const { projectID, pyPlotURL } = useSelector(
+  const { projectID } = useSelector(
     (state) => state.visualizeResults
   );
   const rootURL = window.location.pathname;
@@ -27,19 +27,20 @@ export default function PyTab() {
     profileOptions,
     matrixOptions,
     tagOptions,
+    plotURL,
     debugPy,
   } = useSelector((state) => state.pyTab);
 
   // set inital plot
   useEffect(() => {
-    if (!pyPlotURL.length) {
+    if (!plotURL.length) {
       setPyPlot();
     }
   }, [filtered]);
 
   // change plot
   useEffect(() => {
-    if (filtered.length && pyPlotURL.length) {
+    if (filtered.length && plotURL.length) {
       setPyPlot();
     }
   }, [selectName, selectProfile, selectMatrix, selectTag]);
@@ -68,10 +69,10 @@ export default function PyTab() {
           const pic = await response.blob();
           const objectURL = URL.createObjectURL(pic);
 
-          if (pyPlotURL.length) URL.revokeObjectURL(pyPlotURL);
+          if (plotURL.length) URL.revokeObjectURL(plotURL);
 
-          dispatchVisualizeResults({
-            pyPlotURL: objectURL,
+          dispatchPyTab({
+            plotURL: objectURL,
           });
         }
       } catch (err) {
@@ -283,7 +284,7 @@ export default function PyTab() {
         </Group>
       </Form>
       <div className="d-flex">
-        <a className="px-2 py-1" href={pyPlotURL} download={getPlotName()}>
+        <a className="px-2 py-1" href={plotURL} download={getPlotName()}>
           Download Plot
         </a>
         <span className="ml-auto">
@@ -300,7 +301,7 @@ export default function PyTab() {
       <div className="border rounded p-2 mb-2">
         <Row>
           <Col>
-            <img className="w-100 my-4" src={pyPlotURL}></img>
+            <img className="w-100 my-4" src={plotURL}></img>
           </Col>
         </Row>
       </div>

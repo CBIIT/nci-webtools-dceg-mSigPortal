@@ -11,9 +11,6 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 const { Group, Label, Control } = Form;
 
 export default function ProfileComparison({ submitR }) {
-  const { pcWithinURL, pcRefSigURL } = useSelector(
-    (state) => state.visualizeResults
-  );
   const { nameOptions, profileOptions } = useSelector((state) => state.pyTab);
   const rootURL = window.location.pathname;
   const {
@@ -27,6 +24,8 @@ export default function ProfileComparison({ submitR }) {
     refCompare,
     withinPlotPath,
     refPlotPath,
+    withinPlotURL,
+    refPlotURL,
     displayWithin,
     displayRefSig,
     debugR,
@@ -48,7 +47,7 @@ export default function ProfileComparison({ submitR }) {
 
   // call r wrapper on load
   // useEffect(() => {
-  //   if (!pcWithinURL.length && !pcRefSigURL.length) {
+  //   if (!withinPlotURL.length && !refPlotURL.length) {
   //     calculateR('cosineSimilarityWithin', {
   //       profileType: profileType1,
   //       matrixSize: matrixSize.replace('-', ''),
@@ -83,14 +82,14 @@ export default function ProfileComparison({ submitR }) {
         const objectURL = URL.createObjectURL(pic);
 
         if (type == 'within') {
-          if (pcWithinURL.length) URL.revokeObjectURL(pcWithinURL);
-          dispatchVisualizeResults({
-            pcWithinURL: objectURL,
+          if (withinPlotURL.length) URL.revokeObjectURL(withinPlotURL);
+          dispatchProfileComparison({
+            withinPlotURL: objectURL,
           });
         } else {
-          if (pcRefSigURL.length) URL.revokeObjectURL(pcRefSigURL);
-          dispatchVisualizeResults({
-            pcRefSigURL: objectURL,
+          if (refPlotURL.length) URL.revokeObjectURL(refPlotURL);
+          dispatchProfileComparison({
+            refPlotURL: objectURL,
           });
         }
       }
@@ -283,13 +282,13 @@ export default function ProfileComparison({ submitR }) {
 
           <div
             id="pcWithinPlot"
-            style={{ display: pcWithinURL.length ? 'block' : 'none' }}
+            style={{ display: withinPlotURL.length ? 'block' : 'none' }}
           >
             <div className="d-flex">
               <a
                 className="px-2 py-1"
-                href={pcWithinURL}
-                download={pcWithinURL.split('/').slice(-1)[0]}
+                href={withinPlotURL}
+                download={withinPlotURL.split('/').slice(-1)[0]}
               >
                 Download Plot
               </a>
@@ -297,7 +296,7 @@ export default function ProfileComparison({ submitR }) {
             <div className="p-2 border rounded">
               <Row>
                 <Col>
-                  <img className="w-100 my-4" src={pcWithinURL}></img>
+                  <img className="w-100 my-4" src={withinPlotURL}></img>
                 </Col>
               </Row>
             </div>
@@ -427,13 +426,13 @@ export default function ProfileComparison({ submitR }) {
 
           <div
             id="refPlotPath"
-            style={{ display: pcRefSigURL.length ? 'block' : 'none' }}
+            style={{ display: refPlotURL.length ? 'block' : 'none' }}
           >
             <div className="d-flex">
               <a
                 className="px-2 py-1"
-                href={pcRefSigURL}
-                download={pcRefSigURL.split('/').slice(-1)[0]}
+                href={refPlotURL}
+                download={refPlotURL.split('/').slice(-1)[0]}
               >
                 Download Plot
               </a>
@@ -441,7 +440,7 @@ export default function ProfileComparison({ submitR }) {
             <div className="p-2 border rounded">
               <Row>
                 <Col>
-                  <img className="w-100 my-4" src={pcRefSigURL}></img>
+                  <img className="w-100 my-4" src={refPlotURL}></img>
                 </Col>
               </Row>
             </div>
