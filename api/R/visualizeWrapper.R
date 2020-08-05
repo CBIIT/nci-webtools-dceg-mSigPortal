@@ -33,9 +33,7 @@ cosineSimilarityWithin <- function(profileType, matrixSize, projectID, pythonOut
     txtPath = paste0(savePath, '/cos_sim_within.txt')
 
     data_input <- read_delim(paste0(pythonOutput, '/', profileType, '/', projectID, '.', matrixSize, '.all'), delim = '\t')
-    if ("False" %in% colnames(data_input)) {
-      data_input <- data_input %>% select(-False)
-    }
+
     # Heatmap of cosine similarity within samples  and put on the web---------------------------
     cos_sim_res1 = cos_sim_df(data_input, data_input)
     plot_cosine_heatmap_df(cos_sim_res1, cluster_rows = TRUE, plot_values = FALSE)
@@ -73,9 +71,7 @@ cosineSimilarityRefSig <- function(profileType, signatureSetName, projectID, pyt
       pivot_wider(names_from = Signature_name, values_from = Contribution)
 
     data_input <- read_delim(paste0(pythonOutput, '/', profileType, '/', projectID, '.', matrix, '.all'), delim = '\t')
-    if ("False" %in% colnames(data_input)) {
-      data_input <- data_input %>% select(-False)
-    }
+
     # Heatmap of cosine similarity to reference set signature and put on the web---------------------------
     cos_sim_res2 = cos_sim_df(data_input, refsig)
     plot_cosine_heatmap_df(cos_sim_res2, cluster_rows = TRUE, plot_values = FALSE)
@@ -196,9 +192,6 @@ pca <- function(profileType, signatureSetName, projectID, pythonOutput, savePath
       pivot_wider(names_from = Signature_name, values_from = Contribution)
 
     data_input <- read_delim(paste0(pythonOutput, '/', profileType, '/', projectID, '.', matrixsize, '.all'), delim = '\t')
-    if ("False" %in% colnames(data_input)) {
-      data_input <- data_input %>% select(-False)
-    }
 
     # PCA plot ----------------------------------------------------------------
     mdata_input <- as.matrix(data_input[, -1])
