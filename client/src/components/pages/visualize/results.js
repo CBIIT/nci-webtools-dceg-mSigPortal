@@ -104,8 +104,8 @@ export default function Results() {
     dispatchCosineSimilarity({
       withinProfileType: profileOptions[0],
       refProfileType: profileOptions[0],
-      withinMatrixSize: matrixOptions[0],
-      withinMatrixOptions: matrixOptions,
+      withinMatrixSize: filteredMatrixOptions[0],
+      withinMatrixOptions: filteredMatrixOptions,
     });
 
     dispatchProfileComparison({

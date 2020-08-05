@@ -38,7 +38,6 @@ export default function PCA({ downloadResults, submitR }) {
 
   // load r plots after they are recieved
   useEffect(() => {
-    console.log('change');
     if (eig && eig.length) {
       setRPlot(eig, 'eig');
     }
@@ -161,7 +160,7 @@ export default function PCA({ downloadResults, submitR }) {
   }
 
   async function calculateR(fn, args) {
-    dispatchPCA({ submitOverlay: true });
+    dispatchPCA({ submitOverlay: true, debugR: '' });
 
     try {
       const response = await submitR(fn, args);
@@ -174,6 +173,15 @@ export default function PCA({ downloadResults, submitR }) {
       } else {
         const { debugR, output } = await response.json();
 
+        dispatchPCA({
+          eig: '',
+          pca1: '',
+          pca2: '',
+          heatmap: '',
+          pca1Data: '',
+          pca2Data: '',
+          heatmapData: '',
+        });
         dispatchPCA({
           debugR: debugR,
           submitOverlay: false,

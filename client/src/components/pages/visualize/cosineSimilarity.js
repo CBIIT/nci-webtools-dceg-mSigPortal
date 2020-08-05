@@ -135,7 +135,10 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
   }
 
   async function calculateR(fn, args) {
-    dispatchCosineSimilarity({ submitOverlay: true });
+    dispatchCosineSimilarity({
+      submitOverlay: true,
+      debugR: '',
+    });
 
     try {
       const response = await submitR(fn, args);
@@ -147,19 +150,21 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
         });
       } else {
         const { debugR, output } = await response.json();
-        let update = {
-          debugR: debugR,
-          submitOverlay: false,
-        };
-        if (fn == 'cosineSimilarityWithin')
+
+        if (fn == 'cosineSimilarityWithin') {
+          dispatchCosineSimilarity({ withinPlotPath: '', withinTxtPath: '' });
           dispatchCosineSimilarity({
-            ...update,
+            debugR: debugR,
+            submitOverlay: false,
+
             withinPlotPath: output.plotPath,
             withinTxtPath: output.txtPath,
           });
-        else {
+        } else {
+          dispatchCosineSimilarity({ refPlotPath: '', refTxtPath: '' });
           dispatchCosineSimilarity({
-            ...update,
+            debugR: debugR,
+            submitOverlay: false,
             refPlotPath: output.plotPath,
             refTxtPath: output.txtPath,
           });
@@ -170,8 +175,6 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
       dispatchCosineSimilarity({ submitOverlay: false });
     }
   }
-
- 
 
   function handlewithinProfileType(profileType) {
     const withinMatrixOptions = [

@@ -135,7 +135,7 @@ export default function ProfileComparison({ submitR }) {
   }
 
   async function calculateR(fn, args) {
-    dispatchProfileComparison({ submitOverlay: true });
+    dispatchProfileComparison({ submitOverlay: true, debugR: '' });
 
     try {
       const response = await submitR(fn, args);
@@ -147,14 +147,23 @@ export default function ProfileComparison({ submitR }) {
         });
       } else {
         const { debugR, output } = await response.json();
-        let update = {
-          debugR: debugR,
-          submitOverlay: false,
-        };
-        if (fn == 'profileComparisonWithin')
-          dispatchProfileComparison({ ...update, withinPlotPath: output.plotPath });
-        else {
-          dispatchProfileComparison({ ...update, refPlotPath: output.plotPath });
+
+        if (fn == 'profileComparisonWithin') {
+          dispatchProfileComparison({ withinPlotPath: '' });
+          dispatchProfileComparison({
+            debugR: debugR,
+            submitOverlay: false,
+            withinPlotPath: output.plotPath,
+          });
+        } else {
+          {
+            dispatchProfileComparison({ refPlotPath: '' });
+            dispatchProfileComparison({
+              debugR: debugR,
+              submitOverlay: false,
+              refPlotPath: output.plotPath,
+            });
+          }
         }
       }
     } catch (err) {
