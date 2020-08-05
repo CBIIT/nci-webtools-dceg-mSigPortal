@@ -294,7 +294,7 @@ export default function ProfileComparison({ submitR }) {
                 Download Plot
               </a>
             </div>
-            <div className="mt-2 p-2 border rounded">
+            <div className="p-2 border rounded">
               <Row>
                 <Col>
                   <img className="w-100 my-4" src={pcWithinURL}></img>
@@ -438,7 +438,7 @@ export default function ProfileComparison({ submitR }) {
                 Download Plot
               </a>
             </div>
-            <div className="mt-2 p-2 border rounded">
+            <div className="p-2 border rounded">
               <Row>
                 <Col>
                   <img className="w-100 my-4" src={pcRefSigURL}></img>

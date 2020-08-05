@@ -294,7 +294,7 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
                 </Button>
               </span>
             </div>
-            <div className="mt-2 p-2 border rounded">
+            <div className="p-2 border rounded">
               <Row>
                 <Col>
                   <img className="w-100 my-4" src={csWithinURL}></img>
@@ -409,7 +409,7 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
                 </Button>
               </span>
             </div>
-            <div className="mt-2 p-2 border rounded">
+            <div className="p-2 border rounded">
               <Row>
                 <Col>
                   <img className="w-100 my-4" src={csRefSigURL}></img>

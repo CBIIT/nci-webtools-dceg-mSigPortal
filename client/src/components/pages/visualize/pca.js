@@ -288,6 +288,7 @@ export default function PCA({ downloadResults, submitR }) {
 
           <div
             id="eigPlot"
+            className="my-4"
             style={{ display: eigURL.length ? 'block' : 'none' }}
           >
             <div className="d-flex">
@@ -299,7 +300,7 @@ export default function PCA({ downloadResults, submitR }) {
                 Download Plot
               </a>
             </div>
-            <div className="mt-2 p-2 border rounded">
+            <div className="p-2 border rounded">
               <Row>
                 <Col>
                   <img className="w-100 my-4" src={eigURL}></img>
@@ -310,6 +311,7 @@ export default function PCA({ downloadResults, submitR }) {
 
           <div
             id="pca1Plot"
+            className="my-4"
             style={{ display: pca1URL.length ? 'block' : 'none' }}
           >
             <div className="d-flex">
@@ -330,7 +332,7 @@ export default function PCA({ downloadResults, submitR }) {
                 </Button>
               </span>
             </div>
-            <div className="mt-2 p-2 border rounded">
+            <div className="p-2 border rounded">
               <Row>
                 <Col>
                   <img className="w-100 my-4" src={pca1URL}></img>
@@ -341,6 +343,7 @@ export default function PCA({ downloadResults, submitR }) {
 
           <div
             id="withinPlotPath"
+            className="my-4"
             style={{ display: pca2URL.length ? 'block' : 'none' }}
           >
             <div className="d-flex">
@@ -361,7 +364,7 @@ export default function PCA({ downloadResults, submitR }) {
                 </Button>
               </span>
             </div>
-            <div className="mt-2 p-2 border rounded">
+            <div className="p-2 border rounded">
               <Row>
                 <Col>
                   <img className="w-100 my-4" src={pca2URL}></img>
@@ -372,6 +375,7 @@ export default function PCA({ downloadResults, submitR }) {
 
           <div
             id="withinPlotPath"
+            className="my-4"
             style={{ display: heatmapURL.length ? 'block' : 'none' }}
           >
             <div className="d-flex">
@@ -392,7 +396,7 @@ export default function PCA({ downloadResults, submitR }) {
                 </Button>
               </span>
             </div>
-            <div className="mt-2 p-2 border rounded">
+            <div className="p-2 border rounded">
               <Row>
                 <Col>
                   <img className="w-100 my-4" src={heatmapURL}></img>
