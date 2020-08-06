@@ -13,7 +13,6 @@
   }
 }
 
-
 .center {
   text-align: center;
   display: block;
@@ -23,17 +22,17 @@
   width: 100%;
   height: 300px;
 }
-.description{
+.description {
   text-align: left;
   margin-top: 20px;
   margin-left: 10px;
 }
 
-.card:hover ~ .description{
+.card:hover ~ .description {
   text-shadow: 1px 0 0 currentColor;
 }
 
-.card#Visualization:hover{
+.card#Visualization:hover {
   text-decoration: none;
   transform: scale(1.04);
   background-color: #ffb844 !important;

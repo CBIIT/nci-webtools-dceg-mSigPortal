@@ -28,28 +28,27 @@ export function Navbar({ links }) {
           ))}
         {/* <pre>{JSON.stringify(links)}</pre> */}
       </div>
-      
+
       {/*Mobile View*/}
       <div className="container d-flex flex-column d-md-none" align="center">
         {[{ route: '/', title: 'Home', exact: true }]
-            .concat(links)
-            .filter((link) => link.title)
-            .sort((a, b) => a.navIndex - b.navIndex)
-            .map(({ route, action, title, exact }, index) => (
-              <div data-testid="Navbar" className="d-block" key={title}>
-                <NavLink
-                  data-testid={`Navbar-NavLink-${index}`}
-                  id={title}
-                  // key={title}
-                  className="navlinks py-2 px-4 d-inline-block"
-                  activeClassName="active-navlinks"
-                  exact={exact}
-                  to={route}
-                >
-                  {title}
-                </NavLink>
-               
-              </div>
+          .concat(links)
+          .filter((link) => link.title)
+          .sort((a, b) => a.navIndex - b.navIndex)
+          .map(({ route, action, title, exact }, index) => (
+            <div data-testid="Navbar" className="d-block" key={title}>
+              <NavLink
+                data-testid={`Navbar-NavLink-${index}`}
+                id={title}
+                // key={title}
+                className="navlinks py-2 px-4 d-inline-block"
+                activeClassName="active-navlinks"
+                exact={exact}
+                to={route}
+              >
+                {title}
+              </NavLink>
+            </div>
           ))}
       </div>
     </div>
