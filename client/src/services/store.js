@@ -25,9 +25,12 @@ export const getInitialState = () => ({
     error: '',
     projectID: '',
     displayTab: 'python',
+    downloads: [],
+    summary: [],
+    matrixList: [],
+    statistics: '',
   },
   pyTab: {
-    mapping: [],
     filtered: [],
     selectName: '',
     selectProfile: '',
@@ -38,7 +41,7 @@ export const getInitialState = () => ({
     matrixOptions: [],
     tagOptions: [],
     plotURL: '',
-    debugPy: { stdout: '', stderr: '' },
+    debug: { stdout: '', stderr: '' },
   },
   cosineSimilarity: {
     withinProfileType: '',

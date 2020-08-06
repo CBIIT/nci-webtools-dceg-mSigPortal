@@ -14,51 +14,40 @@ import PyTab from './pyTab';
 import CosineSimilarity from './cosineSimilarity';
 import ProfileComparison from './profileComparison';
 import PCA from './pca';
+import Download from './download';
 
 const { Header, Body } = Card;
 const { Item, Link } = Nav;
 
 export default function Results() {
-  const { error, projectID, displayTab } = useSelector(
+  const { error, projectID, displayTab, downloads, summary } = useSelector(
     (state) => state.visualizeResults
   );
   const pyTab = useSelector((state) => state.pyTab);
-  const { mapping } = pyTab;
-  const { within, refSig } = useSelector((state) => state.profileComparison);
   const rootURL = window.location.pathname;
 
-  // get mapping after retrieving projectID
+  // get mapping of plots after retrieving projectID
   useEffect(() => {
-    if (projectID.length) {
-      getSummary(projectID);
+    if (summary.length) {
+      mapSummary();
     }
-  }, [projectID]);
+  }, [summary]);
 
   // retrieve mapping of samples to plots from summary file
-  async function getSummary() {
-    const response = await fetch(`${rootURL}visualize/summary`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ projectID: projectID }),
-    });
-    const mapping = await response.json();
-
-    const nameOptions = [...new Set(mapping.map((plot) => plot.Sample_Name))];
+  async function mapSummary() {
+    const nameOptions = [...new Set(summary.map((plot) => plot.Sample_Name))];
     const profileOptions = [
-      ...new Set(mapping.map((plot) => plot.Profile_Type)),
+      ...new Set(summary.map((plot) => plot.Profile_Type)),
     ];
-    const matrixOptions = [...new Set(mapping.map((plot) => plot.Matrix))];
-    const tagOptions = [...new Set(mapping.map((plot) => plot.Tag))];
+    const matrixOptions = [...new Set(summary.map((plot) => plot.Matrix))];
+    const tagOptions = [...new Set(summary.map((plot) => plot.Tag))];
 
     const selectName = pyTab.selectName || nameOptions[0];
     const selectProfile = pyTab.selectProfile || profileOptions[0];
     const selectMatrix = pyTab.selectMatrix || matrixOptions[0];
     const selectTag = pyTab.selectTag || tagOptions[0];
 
-    const filteredPlots = mapping.filter(
+    const filteredPlots = summary.filter(
       (plot) =>
         plot.Sample_Name == selectName &&
         plot.Profile_Type == selectProfile &&
@@ -68,28 +57,27 @@ export default function Results() {
 
     const filteredProfileOptions = [
       ...new Set(
-        mapping
+        summary
           .filter((plot) => plot.Sample_Name == selectName)
           .map((plot) => plot.Profile_Type)
       ),
     ];
     const filteredMatrixOptions = [
       ...new Set(
-        mapping
+        summary
           .filter((plot) => plot.Profile_Type == selectProfile)
           .map((plot) => plot.Matrix)
       ),
     ];
     const filteredTagOptions = [
       ...new Set(
-        mapping
+        summary
           .filter((plot) => plot.Matrix == selectMatrix)
           .map((plot) => plot.Tag)
       ),
     ];
 
     dispatchPyTab({
-      mapping: mapping,
       filtered: filteredPlots,
       nameOptions: nameOptions,
       profileOptions: filteredProfileOptions,
@@ -163,7 +151,7 @@ export default function Results() {
 
   return error.length ? (
     <h4 className="text-danger">{error}</h4>
-  ) : mapping.length ? (
+  ) : summary.length ? (
     <Card>
       <Header>
         <Nav variant="pills" defaultActiveKey="#python">
@@ -203,6 +191,16 @@ export default function Results() {
               PCA
             </Link>
           </Item>
+          <Item>
+            <Link
+              active={displayTab == 'download'}
+              onClick={() =>
+                dispatchVisualizeResults({ displayTab: 'download' })
+              }
+            >
+              Download
+            </Link>
+          </Item>
         </Nav>
       </Header>
       <Body style={{ display: displayTab == 'python' ? 'block' : 'none' }}>
@@ -228,6 +226,9 @@ export default function Results() {
           downloadResults={(path) => downloadResults(path)}
           submitR={(fn, args) => submitR(fn, args)}
         />
+      </Body>
+      <Body style={{ display: displayTab == 'download' ? 'block' : 'none' }}>
+        <Download />
       </Body>
     </Card>
   ) : (

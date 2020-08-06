@@ -117,9 +117,15 @@ export default function UploadForm({ setOpenSidebar }) {
           });
 
           if (response.ok) {
+            const results = await response.json();
             dispatchVisualizeResults({
               projectID: data.projectID,
-              debug: await response.json(),
+              summary: results.summary,
+              statistics: results.statistics,
+              matrixList: results.matrixList,
+            });
+            dispatchPyTab({
+              debug: { stdout: results.stdout, stderr: results.stderr },
             });
             setOpenSidebar(false);
           } else if (response.status == 502) {
@@ -162,9 +168,9 @@ export default function UploadForm({ setOpenSidebar }) {
     removeFile();
     dispatchVisualize(initialState.visualize);
     dispatchVisualizeResults(initialState.visualizeResults);
-    dispatchPyTab(initialState.pyTab)
-    dispatchCosineSimilarity(initialState.cosineSimilarity)
-    dispatchProfileComparison(initialState.profileComparison)
+    dispatchPyTab(initialState.pyTab);
+    dispatchCosineSimilarity(initialState.cosineSimilarity);
+    dispatchProfileComparison(initialState.profileComparison);
   }
 
   //   Uploads inputFile and returns a projectID

@@ -49,9 +49,26 @@ app.post('/api', (req, res) => {
   });
 });
 
-app.post('/api/visualize', (req, res) => {
+function parseCSV(filepath) {
+  const file = fs.createReadStream(filepath);
+  return new Promise((resolve, reject) => {
+    Papa.parse(file, {
+      header: true,
+      complete(results, file) {
+        resolve(results.data);
+      },
+      error(err, file) {
+        logger.info('Error parsing ' + filepath);
+        logger.error(err);
+        reject(err);
+      },
+    });
+  });
+}
+
+app.post('/api/visualize', async (req, res) => {
   req.setTimeout(600000);
-  logger.info('/API/VISUALIZE: Spawning Python Process');
+  logger.info('/api/visualize: Spawning Python Process');
   let reqBody = { ...req.body };
   // update paths
   reqBody.inputFile[1] = path.join(tmppath, reqBody.inputFile[1]);
@@ -59,7 +76,7 @@ app.post('/api/visualize', (req, res) => {
   const args = Object.values(reqBody);
   const cli = args.reduce((params, arg) => [...params, ...arg]);
 
-  logger.debug('/API/VISUALIZE: CLI args\n' + cli);
+  logger.debug('/api/visualize: CLI args\n' + cli);
   let stdout = '';
   let stderr = '';
   const wrapper = spawn('python3', [
@@ -72,18 +89,33 @@ app.post('/api/visualize', (req, res) => {
   wrapper.stderr.on('close', () => {
     const scriptOut = { stdout: stdout, stderr: stderr };
 
-    logger.debug('STDOUT\n' + scriptOut.stdout);
-    logger.debug('STDERR\n' + scriptOut.stderr);
+    // logger.debug('STDOUT\n' + scriptOut.stdout);
+    // logger.debug('STDERR\n' + scriptOut.stderr);
 
-    if (
-      fs.existsSync(
-        path.join(tmppath, reqBody.projectID[1], 'results', 'Summary.txt')
-      )
-    ) {
-      logger.info('/API/VISUALIZE: Profile Extraction Succeeded');
-      res.json({ ...scriptOut });
+    const resultsPath = path.join(tmppath, reqBody.projectID[1], 'results');
+    const summaryPath = path.join(resultsPath, 'Summary.txt');
+    const statisticsPath = path.join(resultsPath, 'Statistics.txt');
+    const matrixPath = path.join(resultsPath, 'Matrix_List.txt');
+
+    if (fs.existsSync(summaryPath)) {
+      (async () => {
+        let matrixList = [];
+        let statistics = '';
+        const summary = await parseCSV(summaryPath);
+
+        if (fs.existsSync(matrixPath)) matrixList = await parseCSV(matrixPath);
+        if (fs.existsSync(statisticsPath))
+          statistics = fs.readFileSync(statisticsPath, 'utf8');
+
+        res.json({
+          ...scriptOut,
+          summary: summary,
+          statistics: statistics,
+          matrixList: matrixList,
+        });
+      })();
     } else {
-      logger.info('/API/VISUALIZE: An Error Occured While Extracting Profiles');
+      logger.info('/api/visualize: An Error Occured While Extracting Profiles');
       res.status(500).json({
         msg:
           'An error occured durring profile extraction. Please review your input parameters and try again.',
@@ -222,48 +254,6 @@ app.post('/visualize/svg', (req, res) => {
     res.status(500).end('Not found');
     logger.info(`/VISUALIZE/SVG: Error retrieving ${svgPath}`);
   });
-});
-
-// read summary file and return plot mapping
-app.post('/visualize/summary', (req, res) => {
-  logger.info('/VISUALIZE/SUMMARY: Reading Results Summary');
-  const projectID = req.body.projectID;
-  const summaryPath = path.join(tmppath, projectID, 'results', 'Summary.txt');
-
-  fs.readFile(summaryPath, 'utf8', (err, data) => {
-    if (err) {
-      logger.info('/VISUALIZE/SUMMARY: Error Reading Results Summary');
-      logger.error(err);
-      res.status(500).json(err);
-    }
-    Papa.parse(data.trim(), {
-      header: true,
-      complete: (parsed) => {
-        res.json(parsed.data);
-      },
-    });
-  });
-});
-
-app.post('/visualize/results', (req, res) => {
-  // add error and path traversal checks
-  logger.info('/VISUALIZE/RESULTS: Creating Results Archive');
-  const projectID = req.body.projectID;
-  const archivePath = path.join(tmppath, projectID, 'results.tgz');
-
-  tar
-    .create({ sync: true, gzip: true, cwd: path.join(tmppath, projectID) }, [
-      'results',
-    ])
-    .pipe(fs.createWriteStream(archivePath));
-
-  res.json({ projectID: projectID });
-});
-
-app.get('/visualize/download', (req, res) => {
-  // add logging and checks for path traversal
-  const archivePath = path.join(tmppath, req.query.id, 'results.tgz');
-  res.download(archivePath, 'results.tgz');
 });
 
 app.post('/visualize/queue', (req, res) => {

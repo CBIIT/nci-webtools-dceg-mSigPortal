@@ -12,12 +12,9 @@ const { Group, Label, Control } = Form;
 
 export default function PyTab() {
   const [downloadOverlay, setOverlay] = useState(false);
-  const { projectID } = useSelector(
-    (state) => state.visualizeResults
-  );
+  const { summary } = useSelector((state) => state.visualizeResults);
   const rootURL = window.location.pathname;
   const {
-    mapping,
     filtered,
     selectName,
     selectProfile,
@@ -28,7 +25,7 @@ export default function PyTab() {
     matrixOptions,
     tagOptions,
     plotURL,
-    debugPy,
+    debug,
   } = useSelector((state) => state.pyTab);
 
   // set inital plot
@@ -46,8 +43,11 @@ export default function PyTab() {
   }, [selectName, selectProfile, selectMatrix, selectTag]);
 
   function getPlotName() {
-    const plot = filtered[0];
-    return `${plot.Sample_Name}-${plot.Profile_Type}-${plot.Matrix}-${plot.Tag}.svg`;
+    if (filtered.length) {
+      const plot = filtered[0];
+
+      return `${plot.Sample_Name}-${plot.Profile_Type}-${plot.Matrix}-${plot.Tag}.svg`;
+    } else return '';
   }
 
   async function setPyPlot() {
@@ -83,39 +83,39 @@ export default function PyTab() {
     }
   }
 
-  async function downloadResults() {
-    setOverlay(true);
-    try {
-      const response = await fetch(`${rootURL}visualize/results`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ projectID: projectID }),
-      });
-      if (!response.ok) {
-        setOverlay(false);
-        const { msg } = await response.json();
-        dispatchError(msg);
-      } else {
-        setOverlay(false);
-        const req = await response.json();
-        const id = req.projectID;
-        const tempLink = document.createElement('a');
+  // async function downloadResults() {
+  //   setOverlay(true);
+  //   try {
+  //     const response = await fetch(`${rootURL}visualize/results`, {
+  //       method: 'POST',
+  //       headers: {
+  //         Accept: 'application/json',
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ projectID: projectID }),
+  //     });
+  //     if (!response.ok) {
+  //       setOverlay(false);
+  //       const { msg } = await response.json();
+  //       dispatchError(msg);
+  //     } else {
+  //       setOverlay(false);
+  //       const req = await response.json();
+  //       const id = req.projectID;
+  //       const tempLink = document.createElement('a');
 
-        tempLink.href = `/visualize/download?id=${id}`;
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        document.body.removeChild(tempLink);
-      }
-    } catch (err) {
-      dispatchError(err);
-    }
-  }
+  //       tempLink.href = `/visualize/download?id=${id}`;
+  //       document.body.appendChild(tempLink);
+  //       tempLink.click();
+  //       document.body.removeChild(tempLink);
+  //     }
+  //   } catch (err) {
+  //     dispatchError(err);
+  //   }
+  // }
 
   function filterSampleName(name) {
-    const filteredPlots = mapping.filter((plot) => plot.Sample_Name == name);
+    const filteredPlots = summary.filter((plot) => plot.Sample_Name == name);
     const profileOptions = [
       ...new Set(filteredPlots.map((plot) => plot.Profile_Type)),
     ];
@@ -147,7 +147,7 @@ export default function PyTab() {
   }
 
   function filterProfileType(profile) {
-    const filteredPlots = mapping.filter(
+    const filteredPlots = summary.filter(
       (plot) => plot.Profile_Type == profile
     );
     const matrixOptions = [
@@ -172,7 +172,7 @@ export default function PyTab() {
   }
 
   function filterMatrix(matrix) {
-    const filteredPlots = mapping.filter((plot) => plot.Matrix == matrix);
+    const filteredPlots = summary.filter((plot) => plot.Matrix == matrix);
     const tagOptions = [...new Set(filteredPlots.map((plot) => plot.Tag))];
 
     dispatchPyTab({
@@ -184,7 +184,7 @@ export default function PyTab() {
   }
 
   function filterTag(tag) {
-    const filteredPlots = mapping.filter((plot) => plot.Tag == tag);
+    const filteredPlots = summary.filter((plot) => plot.Tag == tag);
 
     dispatchPyTab({
       selectTag: tag,
@@ -289,13 +289,6 @@ export default function PyTab() {
         </a>
         <span className="ml-auto">
           <LoadingOverlay active={downloadOverlay} />
-          <Button
-            className="px-2 py-1"
-            variant="link"
-            onClick={() => downloadResults()}
-          >
-            Download Results
-          </Button>
         </span>
       </div>
       <div className="border rounded p-2 mb-2">
@@ -308,9 +301,9 @@ export default function PyTab() {
       <pre className="border rounded p-1 mt-5">
         <div>python</div>
         <div>stdout</div>
-        <pre className="border">{debugPy.stdout}</pre>
+        <pre className="border">{debug.stdout}</pre>
         <div>stderr</div>
-        <pre className="border">{debugPy.stderr}</pre>
+        <pre className="border">{debug.stderr}</pre>
       </pre>
     </div>
   );

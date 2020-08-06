@@ -11,7 +11,8 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 const { Group, Label, Control } = Form;
 
 export default function CosineSimilarity({ downloadResults, submitR }) {
-  const { mapping, profileOptions } = useSelector((state) => state.pyTab);
+  const { profileOptions } = useSelector((state) => state.pyTab);
+  const { summary } = useSelector((state) => state.visualizeResults);
   const rootURL = window.location.pathname;
   const {
     withinProfileType,
@@ -178,7 +179,7 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
   function handlewithinProfileType(profileType) {
     const withinMatrixOptions = [
       ...new Set(
-        mapping
+        summary
           .filter((plot) => plot.Profile_Type == profileType)
           .map((plot) => plot.Matrix)
       ),
