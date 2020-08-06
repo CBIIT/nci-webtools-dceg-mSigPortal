@@ -125,6 +125,39 @@ app.post('/api/visualize', async (req, res) => {
   });
 });
 
+// read summary file and return plot mapping
+app.post('/visualize/summary', (req, res) => {
+  logger.info('/visualize/summary: Retrieving Summary');
+  const projectID = req.body.projectID;
+  const resultsPath = path.join(tmppath, projectID, 'results');
+  const summaryPath = path.join(resultsPath, 'Summary.txt');
+  const statisticsPath = path.join(resultsPath, 'Statistics.txt');
+  const matrixPath = path.join(resultsPath, 'Matrix_List.txt');
+
+  if (fs.existsSync(summaryPath)) {
+    (async () => {
+      let matrixList = [];
+      let statistics = '';
+      const summary = await parseCSV(summaryPath);
+
+      if (fs.existsSync(matrixPath)) matrixList = await parseCSV(matrixPath);
+      if (fs.existsSync(statisticsPath))
+        statistics = fs.readFileSync(statisticsPath, 'utf8');
+
+      res.json({
+        summary: summary,
+        statistics: statistics,
+        matrixList: matrixList,
+      });
+    })();
+  } else {
+    logger.info('/visualize/summary: Summary file not found');
+    res.status(500).json({
+      msg: 'Summary file not found',
+    });
+  }
+});
+
 app.post('/api/visualizeR', (req, res) => {
   logger.info('/api/visualizeR: function ' + req.body.fn);
   console.log('args', req.body);

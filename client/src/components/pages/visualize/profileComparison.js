@@ -100,7 +100,7 @@ export default function ProfileComparison({ submitR }) {
 
   // get Signature Reference Sets for dropdown options
   async function getSignatureSet(profileType) {
-    if (profileType.length) {
+    if (profileType && profileType.length) {
       dispatchProfileComparison({ submitOverlay: true });
       try {
         const response = await fetch(

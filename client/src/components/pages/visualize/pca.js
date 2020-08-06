@@ -126,7 +126,7 @@ export default function PCA({ downloadResults, submitR }) {
 
   // get Signature Reference Sets for dropdown options
   async function getSignatureSet(profileType) {
-    if (profileType.length) {
+    if (profileType && profileType.length) {
       dispatchPCA({ submitOverlay: true });
       try {
         const response = await fetch(
@@ -203,7 +203,7 @@ export default function PCA({ downloadResults, submitR }) {
   return (
     <div>
       <LoadingOverlay active={submitOverlay} />
-      <Form className="my-2">
+      <Form>
         <Label>
           <Button
             variant="link"

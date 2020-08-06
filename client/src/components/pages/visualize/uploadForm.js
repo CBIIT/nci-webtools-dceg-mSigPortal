@@ -14,6 +14,7 @@ import {
   dispatchPyTab,
   dispatchCosineSimilarity,
   dispatchProfileComparison,
+  dispatchPCA,
 } from '../../../services/store';
 const { Group, Label, Control, Check, Text } = Form;
 
@@ -171,6 +172,7 @@ export default function UploadForm({ setOpenSidebar }) {
     dispatchPyTab(initialState.pyTab);
     dispatchCosineSimilarity(initialState.cosineSimilarity);
     dispatchProfileComparison(initialState.profileComparison);
+    dispatchPCA(initialState.pca);
   }
 
   //   Uploads inputFile and returns a projectID

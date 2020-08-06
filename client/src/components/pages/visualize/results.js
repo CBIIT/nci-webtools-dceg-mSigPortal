@@ -30,8 +30,29 @@ export default function Results() {
   useEffect(() => {
     if (summary.length) {
       mapSummary();
+    } else {
+      if (projectID.length) getSummary();
     }
   }, [summary]);
+
+  // reload summary information
+  async function getSummary() {
+    console.log(projectID);
+    const response = await fetch(`${rootURL}visualize/summary`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ projectID: projectID }),
+    });
+    const { summary, statistics, matrixList } = await response.json();
+    dispatchVisualizeResults({
+      summary: summary,
+      statistics: statistics,
+      matrixList: matrixList,
+    });
+  }
 
   // retrieve mapping of samples to plots from summary file
   async function mapSummary() {
