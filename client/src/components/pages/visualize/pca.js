@@ -33,6 +33,7 @@ export default function PCA({ downloadResults, submitR }) {
     heatmapURL,
     displayPCA,
     debugR,
+    displayDebug,
     submitOverlay,
   } = useSelector((state) => state.pca);
 
@@ -407,8 +408,21 @@ export default function PCA({ downloadResults, submitR }) {
         </div>
       </Form>
 
-      <pre className="border rounded p-1 mt-5">
-        <div>R output</div>
+      <Button
+        variant="link"
+        className="p-0 mt-5"
+        onClick={() =>
+          dispatchPCA({
+            displayDebug: !displayDebug,
+          })
+        }
+      >
+        R Debug
+      </Button>
+      <pre
+        className="border rounded p-1 "
+        style={{ display: displayDebug ? 'block' : 'none' }}
+      >
         <div className="border">
           {Array.isArray(debugR) ? (
             debugR.map((line, index) => {

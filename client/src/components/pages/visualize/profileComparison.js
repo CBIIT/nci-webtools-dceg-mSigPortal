@@ -29,6 +29,7 @@ export default function ProfileComparison({ submitR }) {
     displayWithin,
     displayRefSig,
     debugR,
+    displayDebug,
     withinSubmitOverlay,
     refSubmitOverlay,
   } = useSelector((state) => state.profileComparison);
@@ -470,8 +471,21 @@ export default function ProfileComparison({ submitR }) {
         </div>
       </Form>
 
-      <pre className="border rounded p-1 mt-5">
-        <div>R output</div>
+      <Button
+        variant="link"
+        className="p-0 mt-5"
+        onClick={() =>
+          dispatchProfileComparison({
+            displayDebug: !displayDebug,
+          })
+        }
+      >
+        R Debug
+      </Button>
+      <pre
+        className="border rounded p-1 "
+        style={{ display: displayDebug ? 'block' : 'none' }}
+      >
         <div className="border">
           {Array.isArray(debugR) ? (
             debugR.map((line, index) => {

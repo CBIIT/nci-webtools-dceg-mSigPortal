@@ -32,6 +32,7 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
     withinSubmitOverlay,
     refSubmitOverlay,
     debugR,
+    displayDebug,
   } = useSelector((state) => state.cosineSimilarity);
 
   // load r plots after they are recieved
@@ -437,9 +438,22 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
           </div>
         </div>
       </Form>
-
-      <pre className="border rounded p-1 mt-5">
-        <div>R output</div>
+      
+      <Button
+        variant="link"
+        className="p-0 mt-5"
+        onClick={() =>
+          dispatchCosineSimilarity({
+            displayDebug: !displayDebug,
+          })
+        }
+      >
+        R Debug
+      </Button>
+      <pre
+        className="border rounded p-1 "
+        style={{ display: displayDebug ? 'block' : 'none' }}
+      >
         <div className="border">
           {Array.isArray(debugR) ? (
             debugR.map((line, index) => {

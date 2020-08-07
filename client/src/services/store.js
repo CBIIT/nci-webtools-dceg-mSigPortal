@@ -42,6 +42,7 @@ export const getInitialState = () => ({
     tagOptions: [],
     plotURL: '',
     debug: { stdout: '', stderr: '' },
+    displayDebug: false,
   },
   cosineSimilarity: {
     withinProfileType: '',
@@ -59,6 +60,7 @@ export const getInitialState = () => ({
     displayWithin: true,
     displayRefSig: true,
     debugR: [],
+    displayDebug: false,
     withinSubmitOverlay: false,
     refSubmitOverlay: false,
   },
@@ -78,6 +80,7 @@ export const getInitialState = () => ({
     displayWithin: true,
     displayRefSig: true,
     debugR: [],
+    displayDebug: false,
     withinSubmitOverlay: false,
     refSubmitOverlay: false,
   },
@@ -98,6 +101,7 @@ export const getInitialState = () => ({
     heatmapURL: '',
     displayPCA: true,
     debugR: [],
+    displayDebug: false,
     submitOverlay: false,
   },
   error: {

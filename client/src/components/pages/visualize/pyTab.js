@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Row, Col } from 'react-bootstrap';
+import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { dispatchError, dispatchPyTab } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
@@ -22,6 +22,7 @@ export default function PyTab() {
     tagOptions,
     plotURL,
     debug,
+    displayDebug,
   } = useSelector((state) => state.pyTab);
 
   // set inital plot
@@ -294,8 +295,21 @@ export default function PyTab() {
           </Col>
         </Row>
       </div>
-      <pre className="border rounded p-1 mt-5">
-        <div>python</div>
+      <Button
+        variant="link"
+        className="p-0 mt-5"
+        onClick={() =>
+          dispatchPyTab({
+            displayDebug: !displayDebug,
+          })
+        }
+      >
+        Python Debug
+      </Button>
+      <pre
+        className="border rounded p-1 "
+        style={{ display: displayDebug ? 'block' : 'none' }}
+      >
         <div>stdout</div>
         <pre className="border">{debug.stdout}</pre>
         <div>stderr</div>
