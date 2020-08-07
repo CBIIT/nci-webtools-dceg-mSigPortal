@@ -25,11 +25,12 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
     withinTxtPath,
     refPlotPath,
     refTxtPath,
-    submitOverlay,
     withinPlotURL,
     refPlotURL,
     displayWithin,
     displayRefSig,
+    withinSubmitOverlay,
+    refSubmitOverlay,
     debugR,
   } = useSelector((state) => state.cosineSimilarity);
 
@@ -102,7 +103,7 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
   // get Signature Reference Sets for dropdown options
   async function getrefSignatureSet(profileType) {
     if (profileType && profileType.length) {
-      dispatchCosineSimilarity({ submitOverlay: true });
+      dispatchCosineSimilarity({ refSubmitOverlay: true });
       try {
         const response = await fetch(
           `${rootURL}api/visualizeR/getSignatureReferenceSets`,
@@ -121,33 +122,46 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
           dispatchCosineSimilarity({
             refSignatureSetOptions: refSignatureSetOptions,
             refSignatureSet: refSignatureSetOptions[0],
-            submitOverlay: false,
+            refSubmitOverlay: false,
           });
         } else {
           dispatchError(await response.json());
-          dispatchCosineSimilarity({ submitOverlay: false });
+          dispatchCosineSimilarity({ refSubmitOverlay: false });
         }
       } catch (err) {
         dispatchError(err);
-        dispatchCosineSimilarity({ submitOverlay: false });
+        dispatchCosineSimilarity({ refSubmitOverlay: false });
       }
     }
   }
 
   async function calculateR(fn, args) {
-    dispatchCosineSimilarity({
-      submitOverlay: true,
-      debugR: '',
-    });
-
+    if (fn == 'cosineSimilarityWithin') {
+      dispatchCosineSimilarity({
+        withinSubmitOverlay: true,
+        debugR: '',
+      });
+    } else {
+      dispatchCosineSimilarity({
+        refSubmitOverlay: true,
+        debugR: '',
+      });
+    }
     try {
       const response = await submitR(fn, args);
       if (!response.ok) {
         const err = await response.json();
-        dispatchCosineSimilarity({
-          debugR: err,
-          submitOverlay: false,
-        });
+        if (fn == 'cosineSimilarityWithin') {
+          dispatchCosineSimilarity({
+            withinSubmitOverlay: false,
+            debugR: err,
+          });
+        } else {
+          dispatchCosineSimilarity({
+            refSubmitOverlay: false,
+            debugR: err,
+          });
+        }
       } else {
         const { debugR, output } = await response.json();
 
@@ -155,8 +169,7 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
           dispatchCosineSimilarity({ withinPlotPath: '', withinTxtPath: '' });
           dispatchCosineSimilarity({
             debugR: debugR,
-            submitOverlay: false,
-
+            withinSubmitOverlay: false,
             withinPlotPath: output.plotPath,
             withinTxtPath: output.txtPath,
           });
@@ -164,7 +177,7 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
           dispatchCosineSimilarity({ refPlotPath: '', refTxtPath: '' });
           dispatchCosineSimilarity({
             debugR: debugR,
-            submitOverlay: false,
+            refSubmitOverlay: false,
             refPlotPath: output.plotPath,
             refTxtPath: output.txtPath,
           });
@@ -172,7 +185,11 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
       }
     } catch (err) {
       dispatchError(err);
-      dispatchCosineSimilarity({ submitOverlay: false });
+      if (fn == 'cosineSimilarityWithin') {
+        dispatchCosineSimilarity({ withinSubmitOverlay: false });
+      } else {
+        dispatchCosineSimilarity({ refSubmitOverlay: false });
+      }
     }
   }
 
@@ -194,8 +211,8 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
 
   return (
     <div>
-      <LoadingOverlay active={submitOverlay} />
       <Form>
+        <LoadingOverlay active={withinSubmitOverlay} />
         <Label>
           <Button
             variant="link"
@@ -306,6 +323,7 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
       </Form>
 
       <Form className="my-2">
+        <LoadingOverlay active={refSubmitOverlay} />
         <Label>
           <Button
             variant="link"

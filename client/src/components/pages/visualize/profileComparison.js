@@ -29,7 +29,8 @@ export default function ProfileComparison({ submitR }) {
     displayWithin,
     displayRefSig,
     debugR,
-    submitOverlay,
+    withinSubmitOverlay,
+    refSubmitOverlay,
   } = useSelector((state) => state.profileComparison);
 
   // load r plots after they are recieved
@@ -101,7 +102,7 @@ export default function ProfileComparison({ submitR }) {
   // get Signature Reference Sets for dropdown options
   async function getSignatureSet(profileType) {
     if (profileType && profileType.length) {
-      dispatchProfileComparison({ submitOverlay: true });
+      dispatchProfileComparison({ refSubmitOverlay: true });
       try {
         const response = await fetch(
           `${rootURL}api/visualizeR/getSignatureReferenceSets`,
@@ -120,30 +121,46 @@ export default function ProfileComparison({ submitR }) {
           dispatchProfileComparison({
             refSignatureSetOptions: signatureSetOptions,
             refSignatureSet: signatureSetOptions[0],
-            submitOverlay: false,
+            refSubmitOverlay: false,
           });
         } else {
           dispatchError(await response.json());
-          dispatchProfileComparison({ submitOverlay: false });
+          dispatchProfileComparison({ refSubmitOverlay: false });
         }
       } catch (err) {
         dispatchError(err);
-        dispatchProfileComparison({ submitOverlay: false });
+        dispatchProfileComparison({ refSubmitOverlay: false });
       }
     }
   }
 
   async function calculateR(fn, args) {
-    dispatchProfileComparison({ submitOverlay: true, debugR: '' });
-
+    if (fn == 'profileComparisonWithin') {
+      dispatchProfileComparison({
+        withinSubmitOverlay: true,
+        debugR: '',
+      });
+    } else {
+      dispatchProfileComparison({
+        refSubmitOverlay: true,
+        debugR: '',
+      });
+    }
     try {
       const response = await submitR(fn, args);
       if (!response.ok) {
         const err = await response.json();
-        dispatchProfileComparison({
-          debugR: err,
-          submitOverlay: false,
-        });
+        if (fn == 'profileComparisonWithin') {
+          dispatchProfileComparison({
+            withinSubmitOverlay: false,
+            debugR: err,
+          });
+        } else {
+          dispatchProfileComparison({
+            refSubmitOverlay: false,
+            debugR: err,
+          });
+        }
       } else {
         const { debugR, output } = await response.json();
 
@@ -151,7 +168,7 @@ export default function ProfileComparison({ submitR }) {
           dispatchProfileComparison({ withinPlotPath: '' });
           dispatchProfileComparison({
             debugR: debugR,
-            submitOverlay: false,
+            withinSubmitOverlay: false,
             withinPlotPath: output.plotPath,
           });
         } else {
@@ -159,7 +176,7 @@ export default function ProfileComparison({ submitR }) {
             dispatchProfileComparison({ refPlotPath: '' });
             dispatchProfileComparison({
               debugR: debugR,
-              submitOverlay: false,
+              refSubmitOverlay: false,
               refPlotPath: output.plotPath,
             });
           }
@@ -167,14 +184,18 @@ export default function ProfileComparison({ submitR }) {
       }
     } catch (err) {
       dispatchError(err);
-      dispatchProfileComparison({ submitOverlay: false });
+      if (fn == 'profileComparisonWithin') {
+        dispatchProfileComparison({ withinSubmitOverlay: true });
+      } else {
+        dispatchProfileComparison({ refSubmitOverlay: true });
+      }
     }
   }
 
   return (
     <div>
-      <LoadingOverlay active={submitOverlay} />
       <Form>
+        <LoadingOverlay active={withinSubmitOverlay} />
         <Label>
           <Button
             variant="link"
@@ -305,6 +326,7 @@ export default function ProfileComparison({ submitR }) {
       </Form>
 
       <Form className="my-2">
+        <LoadingOverlay active={refSubmitOverlay} />
         <Label>
           <Button
             variant="link"

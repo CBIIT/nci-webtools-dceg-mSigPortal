@@ -59,7 +59,8 @@ export const getInitialState = () => ({
     displayWithin: true,
     displayRefSig: true,
     debugR: [],
-    submitOverlay: false,
+    withinSubmitOverlay: false,
+    refSubmitOverlay: false,
   },
   profileComparison: {
     withinProfileType: '',
@@ -77,7 +78,8 @@ export const getInitialState = () => ({
     displayWithin: true,
     displayRefSig: true,
     debugR: [],
-    submitOverlay: false,
+    withinSubmitOverlay: false,
+    refSubmitOverlay: false,
   },
   pca: {
     profileType: '',
