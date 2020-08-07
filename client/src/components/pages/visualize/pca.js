@@ -75,7 +75,14 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
 
   async function setRPlot(plotPath, type) {
     try {
-      const response = await getRefSigOptions(profileType);
+      const response = await fetch(`${rootURL}visualize/svg`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ path: plotPath }),
+      });
 
       if (!response.ok) {
         const { msg } = await response.json();
@@ -116,17 +123,8 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
     if (profileType && profileType.length) {
       dispatchPCA({ submitOverlay: true });
       try {
-        const response = await fetch(
-          `${rootURL}api/visualizeR/getSignatureReferenceSets`,
-          {
-            method: 'POST',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ profileType: profileType }),
-          }
-        );
+        const response = await getRefSigOptions(profileType);
+
         if (response.ok) {
           const signatureSetOptions = await response.json();
 
