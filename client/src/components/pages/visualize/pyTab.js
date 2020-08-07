@@ -236,7 +236,7 @@ export default function PyTab() {
                 </Control>
               </Col>
               <Col sm="3">
-                <Label>Matrix</Label>
+                <Label>Matrix Size</Label>
                 <Control
                   as="select"
                   value={selectMatrix}
