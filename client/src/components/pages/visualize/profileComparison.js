@@ -186,9 +186,9 @@ export default function ProfileComparison({ submitR }) {
     } catch (err) {
       dispatchError(err);
       if (fn == 'profileComparisonWithin') {
-        dispatchProfileComparison({ withinSubmitOverlay: true });
+        dispatchProfileComparison({ withinSubmitOverlay: false });
       } else {
-        dispatchProfileComparison({ refSubmitOverlay: true });
+        dispatchProfileComparison({ refSubmitOverlay: false });
       }
     }
   }
