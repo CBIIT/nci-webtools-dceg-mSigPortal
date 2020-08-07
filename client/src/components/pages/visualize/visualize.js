@@ -34,7 +34,7 @@ export default function Visualize() {
             </div>
             <div className="row">
               <div className="col-sm-auto w-100">
-                <UploadForm setOpenSidebar={(e) => setOpenSidebar(e)} />
+                <UploadForm />
               </div>
             </div>
           </div>
@@ -50,7 +50,7 @@ export default function Visualize() {
               content={loading.content}
               showIndicator={loading.showIndicator}
             />
-            <Results />
+            <Results setOpenSidebar={(e) => setOpenSidebar(e)} />
           </div>
         </MainPanel>
       </SidebarContainer>

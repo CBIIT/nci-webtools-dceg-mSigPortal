@@ -11,7 +11,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 const { Group, Label, Control } = Form;
 
 export default function ProfileComparison({ submitR, getRefSigOptions }) {
-  const { nameOptions, profileOptions } = useSelector((state) => state.pyTab);
+  const { nameOptions, profileOptions } = useSelector((state) => state.mutationalProfiles);
   const rootURL = window.location.pathname;
   const {
     withinProfileType,

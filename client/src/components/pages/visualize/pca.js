@@ -11,10 +11,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 const { Group, Label, Control } = Form;
 
 export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
-  const { pcWithinURL, pcRefSigURL } = useSelector(
-    (state) => state.visualizeResults
-  );
-  const { profileOptions } = useSelector((state) => state.pyTab);
+  const { profileOptions } = useSelector((state) => state.mutationalProfiles);
   const rootURL = window.location.pathname;
   const {
     profileType,

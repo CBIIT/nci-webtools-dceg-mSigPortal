@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { dispatchError, dispatchPyTab } from '../../../services/store';
+import { dispatchError, dispatchMutationalProfiles } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const { Group, Label, Control } = Form;
 
-export default function PyTab() {
+export default function MutationalProfiles() {
   const [downloadOverlay, setOverlay] = useState(false);
   const { summary } = useSelector((state) => state.visualizeResults);
   const rootURL = window.location.pathname;
@@ -23,7 +23,7 @@ export default function PyTab() {
     plotURL,
     debug,
     displayDebug,
-  } = useSelector((state) => state.pyTab);
+  } = useSelector((state) => state.mutationalProfiles);
 
   // set inital plot
   useEffect(() => {
@@ -68,7 +68,7 @@ export default function PyTab() {
 
           if (plotURL.length) URL.revokeObjectURL(plotURL);
 
-          dispatchPyTab({
+          dispatchMutationalProfiles({
             plotURL: objectURL,
           });
         }
@@ -131,7 +131,7 @@ export default function PyTab() {
       ),
     ];
 
-    dispatchPyTab({
+    dispatchMutationalProfiles({
       selectName: name,
       selectProfile: profileOptions[0],
       selectMatrix: matrixOptions[0],
@@ -158,7 +158,7 @@ export default function PyTab() {
       ),
     ];
 
-    dispatchPyTab({
+    dispatchMutationalProfiles({
       selectProfile: profile,
       selectMatrix: matrixOptions[0],
       selectTag: tagOptions[0],
@@ -172,7 +172,7 @@ export default function PyTab() {
     const filteredPlots = summary.filter((plot) => plot.Matrix == matrix);
     const tagOptions = [...new Set(filteredPlots.map((plot) => plot.Tag))];
 
-    dispatchPyTab({
+    dispatchMutationalProfiles({
       selectMatrix: matrix,
       selectTag: tagOptions[0],
       tagOptions: tagOptions,
@@ -183,7 +183,7 @@ export default function PyTab() {
   function filterTag(tag) {
     const filteredPlots = summary.filter((plot) => plot.Tag == tag);
 
-    dispatchPyTab({
+    dispatchMutationalProfiles({
       selectTag: tag,
       filtered: filteredPlots,
     });
@@ -299,7 +299,7 @@ export default function PyTab() {
         variant="link"
         className="p-0 mt-5"
         onClick={() =>
-          dispatchPyTab({
+          dispatchMutationalProfiles({
             displayDebug: !displayDebug,
           })
         }

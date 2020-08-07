@@ -11,14 +11,14 @@ import {
   dispatchVisualizeResults,
   dispatchError,
   getInitialState,
-  dispatchPyTab,
+  dispatchMutationalProfiles,
   dispatchCosineSimilarity,
   dispatchProfileComparison,
   dispatchPCA,
 } from '../../../services/store';
 const { Group, Label, Control, Check, Text } = Form;
 
-export default function UploadForm({ setOpenSidebar }) {
+export default function UploadForm() {
   const {
     inputFormat,
     selectedGenome,
@@ -127,10 +127,9 @@ export default function UploadForm({ setOpenSidebar }) {
               matrixList: results.matrixList,
               downloads: results.downloads,
             });
-            dispatchPyTab({
+            dispatchMutationalProfiles({
               debug: { stdout: results.stdout, stderr: results.stderr },
             });
-            setOpenSidebar(false);
           } else if (response.status == 502) {
             dispatchVisualizeResults({
               error: 'Please Reset Your Parameters and Try again.',
@@ -151,14 +150,13 @@ export default function UploadForm({ setOpenSidebar }) {
           }
         } catch (err) {
           dispatchError(err);
-          dispatchVisualizeResults({
-            error: 'Please Reset Your Parameters and Try again.',
-          });
-        } finally {
           dispatchVisualize({
             loading: {
               active: false,
             },
+          });
+          dispatchVisualizeResults({
+            error: 'Please Reset Your Parameters and Try again.',
           });
         }
       }
@@ -171,7 +169,7 @@ export default function UploadForm({ setOpenSidebar }) {
     removeFile();
     dispatchVisualize(initialState.visualize);
     dispatchVisualizeResults(initialState.visualizeResults);
-    dispatchPyTab(initialState.pyTab);
+    dispatchMutationalProfiles(initialState.mutationalProfiles);
     dispatchCosineSimilarity(initialState.cosineSimilarity);
     dispatchProfileComparison(initialState.profileComparison);
     dispatchPCA(initialState.pca);

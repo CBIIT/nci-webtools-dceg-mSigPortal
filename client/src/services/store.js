@@ -24,13 +24,13 @@ export const getInitialState = () => ({
   visualizeResults: {
     error: '',
     projectID: '',
-    displayTab: 'python',
+    displayTab: 'mutationalProfiles',
     downloads: [],
     summary: [],
     matrixList: [],
     statistics: '',
   },
-  pyTab: {
+  mutationalProfiles: {
     filtered: [],
     selectName: '',
     selectProfile: '',
@@ -136,11 +136,11 @@ const visualizeResultsSlice = createSlice({
   },
 });
 
-const pyTabSlice = createSlice({
-  name: 'pyTab',
-  initialState: getInitialState().pyTab,
+const mutationalProfilesSlice = createSlice({
+  name: 'mutationalProfiles',
+  initialState: getInitialState().mutationalProfiles,
   reducers: {
-    updatePyTab: (state, action) => {
+    updateMutationalProfiles: (state, action) => {
       return {
         ...state,
         ...action.payload,
@@ -204,7 +204,7 @@ const errorSlice = createSlice({
 const rootReducer = combineReducers({
   visualize: visualizeSlice.reducer,
   visualizeResults: visualizeResultsSlice.reducer,
-  pyTab: pyTabSlice.reducer,
+  mutationalProfiles: mutationalProfilesSlice.reducer,
   cosineSimilarity: cosineSimilaritySlice.reducer,
   profileComparison: profileComparisonSlice.reducer,
   pca: pcaSlice.reducer,
@@ -218,7 +218,7 @@ export const store = configureStore({
 
 export const { updateVisualize } = visualizeSlice.actions;
 export const { updateVisualizeResults } = visualizeResultsSlice.actions;
-export const { updatePyTab } = pyTabSlice.actions;
+export const { updateMutationalProfiles } = mutationalProfilesSlice.actions;
 export const { updateCosineSimilarity } = cosineSimilaritySlice.actions;
 export const { updateProfileComparison } = profileComparisonSlice.actions;
 export const { updatePCA } = pcaSlice.actions;
@@ -232,8 +232,8 @@ export function dispatchVisualizeResults(obj) {
   store.dispatch(updateVisualizeResults(obj));
 }
 
-export function dispatchPyTab(obj) {
-  store.dispatch(updatePyTab(obj));
+export function dispatchMutationalProfiles(obj) {
+  store.dispatch(updateMutationalProfiles(obj));
 }
 
 export function dispatchCosineSimilarity(obj) {

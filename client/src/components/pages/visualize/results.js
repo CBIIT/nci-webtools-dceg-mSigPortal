@@ -3,14 +3,15 @@ import { Card, Nav } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
+  dispatchVisualize,
   dispatchVisualizeResults,
-  dispatchPyTab,
+  dispatchMutationalProfiles,
   dispatchCosineSimilarity,
   dispatchProfileComparison,
   dispatchPCA,
 } from '../../../services/store';
 
-import PyTab from './pyTab';
+import MutationalProfiles from './mutationalProfiles';
 import CosineSimilarity from './cosineSimilarity';
 import ProfileComparison from './profileComparison';
 import PCA from './pca';
@@ -19,11 +20,11 @@ import Download from './download';
 const { Header, Body } = Card;
 const { Item, Link } = Nav;
 
-export default function Results() {
+export default function Results({ setOpenSidebar }) {
   const { error, projectID, displayTab, summary } = useSelector(
     (state) => state.visualizeResults
   );
-  const pyTab = useSelector((state) => state.pyTab);
+  const mutationalProfiles = useSelector((state) => state.mutationalProfiles);
   const rootURL = window.location.pathname;
 
   // get mapping of plots after retrieving projectID
@@ -69,10 +70,10 @@ export default function Results() {
     const matrixOptions = [...new Set(summary.map((plot) => plot.Matrix))];
     const tagOptions = [...new Set(summary.map((plot) => plot.Tag))];
 
-    const selectName = pyTab.selectName || nameOptions[0];
-    const selectProfile = pyTab.selectProfile || profileOptions[0];
-    const selectMatrix = pyTab.selectMatrix || matrixOptions[0];
-    const selectTag = pyTab.selectTag || tagOptions[0];
+    const selectName = mutationalProfiles.selectName || nameOptions[0];
+    const selectProfile = mutationalProfiles.selectProfile || profileOptions[0];
+    const selectMatrix = mutationalProfiles.selectMatrix || matrixOptions[0];
+    const selectTag = mutationalProfiles.selectTag || tagOptions[0];
 
     const filteredPlots = summary.filter(
       (plot) =>
@@ -108,7 +109,7 @@ export default function Results() {
       await getRefSigOptions(profileOptions[0])
     ).json();
 
-    dispatchPyTab({
+    dispatchMutationalProfiles({
       filtered: filteredPlots,
       nameOptions: nameOptions,
       profileOptions: filteredProfileOptions,
@@ -144,6 +145,13 @@ export default function Results() {
       signatureSet: refSignatureSetOptions[0],
       signatureSetOptions: refSignatureSetOptions,
     });
+
+    dispatchVisualize({
+      loading: {
+        active: false,
+      },
+    });
+    setOpenSidebar(false);
   }
 
   function submitR(fn, args) {
@@ -201,14 +209,14 @@ export default function Results() {
 
   return error.length ? (
     <h4 className="text-danger">{error}</h4>
-  ) : summary.length ? (
+  ) : mutationalProfiles.filtered.length ? (
     <Card>
       <Header>
-        <Nav variant="pills" defaultActiveKey="#python">
+        <Nav variant="pills" defaultActiveKey="#mutationalProfiles">
           <Item>
             <Link
-              active={displayTab == 'python'}
-              onClick={() => dispatchVisualizeResults({ displayTab: 'python' })}
+              active={displayTab == 'mutationalProfiles'}
+              onClick={() => dispatchVisualizeResults({ displayTab: 'mutationalProfiles' })}
             >
               Mutational Profiles
             </Link>
@@ -253,8 +261,8 @@ export default function Results() {
           </Item>
         </Nav>
       </Header>
-      <Body style={{ display: displayTab == 'python' ? 'block' : 'none' }}>
-        <PyTab />
+      <Body style={{ display: displayTab == 'mutationalProfiles' ? 'block' : 'none' }}>
+        <MutationalProfiles />
       </Body>
       <Body
         style={{ display: displayTab == 'cosineSimilarity' ? 'block' : 'none' }}

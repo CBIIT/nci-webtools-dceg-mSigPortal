@@ -15,7 +15,7 @@ export default function CosineSimilarity({
   submitR,
   getRefSigOptions,
 }) {
-  const { profileOptions } = useSelector((state) => state.pyTab);
+  const { profileOptions } = useSelector((state) => state.mutationalProfiles);
   const { summary } = useSelector((state) => state.visualizeResults);
   const rootURL = window.location.pathname;
   const {
