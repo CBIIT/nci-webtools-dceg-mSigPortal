@@ -61,11 +61,12 @@ export default function UploadForm({ setOpenSidebar }) {
         collapseSample: ['-c', collapseSample],
         outputDir: ['-o', data.projectID],
       };
-      // conditionally include params
-      if (mutationFilter.length)
-        args['mutationFilter'] = ['-F', mutationFilter];
-      if (['vcf', 'csv', 'tsv'].includes(inputFormat))
+      // conditionally include mutation split and mutation filter params
+      if (['vcf', 'csv', 'tsv'].includes(inputFormat)) {
         args['mutationSplit'] = ['-s', mutationSplit];
+        if (mutationFilter.length)
+          args['mutationFilter'] = ['-F', mutationFilter];
+      }
 
       if (queueMode) {
         dispatchVisualize({
@@ -419,7 +420,10 @@ export default function UploadForm({ setOpenSidebar }) {
           onChange={(e) =>
             dispatchVisualize({ mutationFilter: e.target.value })
           }
-          disabled={disableParameters}
+          disabled={
+            disableParameters ||
+            ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
+          }
         ></Control>
         <Text className="text-muted">Use @ to separate multiple filters</Text>
       </Group>
