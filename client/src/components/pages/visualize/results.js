@@ -104,6 +104,10 @@ export default function Results() {
       ),
     ];
 
+    const refSignatureSetOptions = await (
+      await getRefSigOptions(profileOptions[0])
+    ).json();
+
     dispatchPyTab({
       filtered: filteredPlots,
       nameOptions: nameOptions,
@@ -119,6 +123,8 @@ export default function Results() {
     dispatchCosineSimilarity({
       withinProfileType: profileOptions[0],
       refProfileType: profileOptions[0],
+      refSignatureSet: refSignatureSetOptions[0],
+      refSignatureSetOptions: refSignatureSetOptions,
       withinMatrixSize: filteredMatrixOptions[0],
       withinMatrixOptions: filteredMatrixOptions,
     });
@@ -129,9 +135,15 @@ export default function Results() {
       withinSampleName2: nameOptions[1],
       refProfileType: profileOptions[0],
       refSampleName: nameOptions[0],
+      refSignatureSet: refSignatureSetOptions[0],
+      refSignatureSetOptions: refSignatureSetOptions,
     });
 
-    dispatchPCA({ profileType: profileOptions[0] });
+    dispatchPCA({
+      profileType: profileOptions[0],
+      signatureSet: refSignatureSetOptions[0],
+      signatureSetOptions: refSignatureSetOptions,
+    });
   }
 
   function submitR(fn, args) {
@@ -142,6 +154,17 @@ export default function Results() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ fn: fn, args: args, projectID: projectID }),
+    });
+  }
+
+  function getRefSigOptions(profileType) {
+    return fetch(`${rootURL}api/visualizeR/getSignatureReferenceSets`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ profileType: profileType }),
     });
   }
 
@@ -237,6 +260,7 @@ export default function Results() {
         style={{ display: displayTab == 'cosineSimilarity' ? 'block' : 'none' }}
       >
         <CosineSimilarity
+          getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
           downloadResults={(path) => downloadResults(path)}
           submitR={(fn, args) => submitR(fn, args)}
         />
@@ -246,10 +270,14 @@ export default function Results() {
           display: displayTab == 'profileComparison' ? 'block' : 'none',
         }}
       >
-        <ProfileComparison submitR={(fn, args) => submitR(fn, args)} />
+        <ProfileComparison
+          getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
+          submitR={(fn, args) => submitR(fn, args)}
+        />
       </Body>
       <Body style={{ display: displayTab == 'pca' ? 'block' : 'none' }}>
         <PCA
+          getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
           downloadResults={(path) => downloadResults(path)}
           submitR={(fn, args) => submitR(fn, args)}
         />

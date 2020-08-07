@@ -10,7 +10,11 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const { Group, Label, Control } = Form;
 
-export default function CosineSimilarity({ downloadResults, submitR }) {
+export default function CosineSimilarity({
+  downloadResults,
+  submitR,
+  getRefSigOptions,
+}) {
   const { profileOptions } = useSelector((state) => state.pyTab);
   const { summary } = useSelector((state) => state.visualizeResults);
   const rootURL = window.location.pathname;
@@ -62,11 +66,6 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
   //   }
   // }, [withinPlotPath, refPlotPath]);
 
-  // retrieve signature set options on change
-  useEffect(() => {
-    getrefSignatureSet(refProfileType);
-  }, [refProfileType]);
-
   async function setRPlot(plotPath, type) {
     try {
       const response = await fetch(`${rootURL}visualize/svg`, {
@@ -102,25 +101,17 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
   }
 
   // get Signature Reference Sets for dropdown options
-  async function getrefSignatureSet(profileType) {
+  async function getSignatureSet(profileType) {
     if (profileType && profileType.length) {
       dispatchCosineSimilarity({ refSubmitOverlay: true });
       try {
-        const response = await fetch(
-          `${rootURL}api/visualizeR/getSignatureReferenceSets`,
-          {
-            method: 'POST',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ profileType: profileType }),
-          }
-        );
+        const response = await getRefSigOptions(profileType);
+
         if (response.ok) {
           const refSignatureSetOptions = await response.json();
 
           dispatchCosineSimilarity({
+            refProfileType: profileType,
             refSignatureSetOptions: refSignatureSetOptions,
             refSignatureSet: refSignatureSetOptions[0],
             refSubmitOverlay: false,
@@ -349,11 +340,7 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
                 <Control
                   as="select"
                   value={refProfileType}
-                  onChange={(e) => {
-                    dispatchCosineSimilarity({
-                      refProfileType: e.target.value,
-                    });
-                  }}
+                  onChange={(e) => getSignatureSet(e.target.value)}
                   custom
                 >
                   {profileOptions.map((profile, index) => {
@@ -438,7 +425,7 @@ export default function CosineSimilarity({ downloadResults, submitR }) {
           </div>
         </div>
       </Form>
-      
+
       <Button
         variant="link"
         className="p-0 mt-5"

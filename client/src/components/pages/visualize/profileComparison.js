@@ -10,7 +10,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const { Group, Label, Control } = Form;
 
-export default function ProfileComparison({ submitR }) {
+export default function ProfileComparison({ submitR, getRefSigOptions }) {
   const { nameOptions, profileOptions } = useSelector((state) => state.pyTab);
   const rootURL = window.location.pathname;
   const {
@@ -61,11 +61,6 @@ export default function ProfileComparison({ submitR }) {
   //   }
   // }, [withinPlotPath, refPlotPath]);
 
-  // retrieve signature set options on change
-  useEffect(() => {
-    getSignatureSet(refProfileType);
-  }, [refProfileType]);
-
   async function setRPlot(plotPath, type) {
     try {
       const response = await fetch(`${rootURL}visualize/svg`, {
@@ -105,21 +100,13 @@ export default function ProfileComparison({ submitR }) {
     if (profileType && profileType.length) {
       dispatchProfileComparison({ refSubmitOverlay: true });
       try {
-        const response = await fetch(
-          `${rootURL}api/visualizeR/getSignatureReferenceSets`,
-          {
-            method: 'POST',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ profileType: profileType }),
-          }
-        );
+        const response = await getRefSigOptions(profileType);
+
         if (response.ok) {
           const signatureSetOptions = await response.json();
 
           dispatchProfileComparison({
+            refProfileType: profileType,
             refSignatureSetOptions: signatureSetOptions,
             refSignatureSet: signatureSetOptions[0],
             refSubmitOverlay: false,
@@ -352,11 +339,7 @@ export default function ProfileComparison({ submitR }) {
                 <Control
                   as="select"
                   value={refProfileType}
-                  onChange={(e) => {
-                    dispatchProfileComparison({
-                      refProfileType: e.target.value,
-                    });
-                  }}
+                  onChange={(e) => getSignatureSet(e.target.value)}
                   custom
                 >
                   {profileOptions.map((profile, index) => {

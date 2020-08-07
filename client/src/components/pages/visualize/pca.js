@@ -10,7 +10,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const { Group, Label, Control } = Form;
 
-export default function PCA({ downloadResults, submitR }) {
+export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
   const { pcWithinURL, pcRefSigURL } = useSelector(
     (state) => state.visualizeResults
   );
@@ -76,21 +76,10 @@ export default function PCA({ downloadResults, submitR }) {
   //   }
   // }, [withinPlotPath, refPlotPath]);
 
-  // retrieve signature set options on change
-  useEffect(() => {
-    getSignatureSet(profileType);
-  }, [profileType]);
-
   async function setRPlot(plotPath, type) {
     try {
-      const response = await fetch(`${rootURL}visualize/svg`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ path: plotPath }),
-      });
+      const response = await getRefSigOptions(profileType);
+
       if (!response.ok) {
         const { msg } = await response.json();
         dispatchError(msg);
@@ -145,6 +134,7 @@ export default function PCA({ downloadResults, submitR }) {
           const signatureSetOptions = await response.json();
 
           dispatchPCA({
+            profileType: profileType,
             signatureSetOptions: signatureSetOptions,
             signatureSet: signatureSetOptions[0],
             submitOverlay: false,
@@ -229,11 +219,7 @@ export default function PCA({ downloadResults, submitR }) {
                 <Control
                   as="select"
                   value={profileType}
-                  onChange={(e) => {
-                    dispatchPCA({
-                      profileType: e.target.value,
-                    });
-                  }}
+                  onChange={(e) => getSignatureSet(e.target.value)}
                   custom
                 >
                   {profileOptions.map((profile, index) => {
