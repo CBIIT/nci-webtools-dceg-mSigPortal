@@ -66,7 +66,36 @@ function parseCSV(filepath) {
   });
 }
 
-app.post('/api/visualize', async (req, res) => {
+async function getSummary(resultsPath) {
+  const summaryPath = path.join(resultsPath, 'Summary.txt');
+  const statisticsPath = path.join(resultsPath, 'Statistics.txt');
+  const matrixPath = path.join(resultsPath, 'Matrix_List.txt');
+  const downloadsPath = path.join(resultsPath, 'output');
+  let matrixList = [];
+  let statistics = '';
+  let downloads = [];
+  const summary = await parseCSV(summaryPath);
+
+  if (fs.existsSync(matrixPath)) matrixList = await parseCSV(matrixPath);
+  if (fs.existsSync(statisticsPath))
+    statistics = fs.readFileSync(statisticsPath, 'utf8');
+
+  if (fs.existsSync(downloadsPath)) {
+    downloads = fs
+      .readdirSync(downloadsPath)
+      .filter((file) => file.endsWith('.tar.gz'))
+      .map((file) => file);
+  }
+
+  return {
+    summary: summary,
+    statistics: statistics,
+    matrixList: matrixList,
+    downloads: downloads,
+  };
+}
+
+app.post('/api/visualize', (req, res) => {
   req.setTimeout(600000);
   logger.info('/api/visualize: Spawning Python Process');
   let reqBody = { ...req.body };
@@ -86,34 +115,14 @@ app.post('/api/visualize', async (req, res) => {
 
   wrapper.stdout.on('data', (data) => (stdout += data.toString()));
   wrapper.stderr.on('data', (data) => (stderr += data.toString()));
-  wrapper.stderr.on('close', () => {
+  wrapper.stderr.on('close', async () => {
     const scriptOut = { stdout: stdout, stderr: stderr };
-
+    const resultsPath = path.join(tmppath, reqBody.projectID[1], 'results');
     // logger.debug('STDOUT\n' + scriptOut.stdout);
     // logger.debug('STDERR\n' + scriptOut.stderr);
 
-    const resultsPath = path.join(tmppath, reqBody.projectID[1], 'results');
-    const summaryPath = path.join(resultsPath, 'Summary.txt');
-    const statisticsPath = path.join(resultsPath, 'Statistics.txt');
-    const matrixPath = path.join(resultsPath, 'Matrix_List.txt');
-
-    if (fs.existsSync(summaryPath)) {
-      (async () => {
-        let matrixList = [];
-        let statistics = '';
-        const summary = await parseCSV(summaryPath);
-
-        if (fs.existsSync(matrixPath)) matrixList = await parseCSV(matrixPath);
-        if (fs.existsSync(statisticsPath))
-          statistics = fs.readFileSync(statisticsPath, 'utf8');
-
-        res.json({
-          ...scriptOut,
-          summary: summary,
-          statistics: statistics,
-          matrixList: matrixList,
-        });
-      })();
+    if (fs.existsSync(path.join(resultsPath, 'Summary.txt'))) {
+      res.json({ ...scriptOut, ...(await getSummary(resultsPath)) });
     } else {
       logger.info('/api/visualize: An Error Occured While Extracting Profiles');
       res.status(500).json({
@@ -126,30 +135,12 @@ app.post('/api/visualize', async (req, res) => {
 });
 
 // read summary file and return plot mapping
-app.post('/visualize/summary', (req, res) => {
+app.post('/visualize/summary', async (req, res) => {
   logger.info('/visualize/summary: Retrieving Summary');
-  const projectID = req.body.projectID;
-  const resultsPath = path.join(tmppath, projectID, 'results');
-  const summaryPath = path.join(resultsPath, 'Summary.txt');
-  const statisticsPath = path.join(resultsPath, 'Statistics.txt');
-  const matrixPath = path.join(resultsPath, 'Matrix_List.txt');
+  const resultsPath = path.join(tmppath, req.body.projectID, 'results');
 
-  if (fs.existsSync(summaryPath)) {
-    (async () => {
-      let matrixList = [];
-      let statistics = '';
-      const summary = await parseCSV(summaryPath);
-
-      if (fs.existsSync(matrixPath)) matrixList = await parseCSV(matrixPath);
-      if (fs.existsSync(statisticsPath))
-        statistics = fs.readFileSync(statisticsPath, 'utf8');
-
-      res.json({
-        summary: summary,
-        statistics: statistics,
-        matrixList: matrixList,
-      });
-    })();
+  if (fs.existsSync(path.join(resultsPath, 'Summary.txt'))) {
+    res.json(await getSummary(resultsPath));
   } else {
     logger.info('/visualize/summary: Summary file not found');
     res.status(500).json({
@@ -259,34 +250,61 @@ app.post('/visualize/upload', (req, res, next) => {
 
 app.post('/visualize/txt', (req, res) => {
   const txtPath = req.body.path;
-  const s = fs.createReadStream(txtPath);
+  if (txtPath.indexOf(tmppath) == 0) {
+    const s = fs.createReadStream(txtPath);
 
-  s.on('open', () => {
-    res.set('Content-Type', 'text/plain');
-    s.pipe(res);
-    logger.debug(`/visualize/txt: Serving ${txtPath}`);
-  });
-  s.on('error', () => {
-    res.set('Content-Type', 'text/plain');
+    s.on('open', () => {
+      res.set('Content-Type', 'text/plain');
+      s.pipe(res);
+      logger.debug(`/visualize/txt: Serving ${txtPath}`);
+    });
+    s.on('error', () => {
+      res.set('Content-Type', 'text/plain');
+      res.status(500).end('Not found');
+      logger.info(`/visualize/txt: Error retrieving ${txtPath}`);
+    });
+  } else {
+    logger.info('traversal error');
     res.status(500).end('Not found');
-    logger.info(`/visualize/txt: Error retrieving ${txtPath}`);
-  });
+  }
 });
 
 app.post('/visualize/svg', (req, res) => {
   const svgPath = req.body.path;
-  const s = fs.createReadStream(svgPath);
+  if (svgPath.indexOf(tmppath) == 0) {
+    const s = fs.createReadStream(svgPath);
 
-  s.on('open', () => {
-    res.set('Content-Type', 'image/svg+xml');
-    s.pipe(res);
-    logger.debug(`/VISUALIZE/SVG: Serving ${svgPath}`);
-  });
-  s.on('error', () => {
-    res.set('Content-Type', 'text/plain');
+    s.on('open', () => {
+      res.set('Content-Type', 'image/svg+xml');
+      s.pipe(res);
+      logger.debug(`/VISUALIZE/SVG: Serving ${svgPath}`);
+    });
+    s.on('error', () => {
+      res.set('Content-Type', 'text/plain');
+      res.status(500).end('Not found');
+      logger.info(`/VISUALIZE/SVG: Error retrieving ${svgPath}`);
+    });
+  } else {
+    logger.info('traversal error');
     res.status(500).end('Not found');
-    logger.info(`/VISUALIZE/SVG: Error retrieving ${svgPath}`);
-  });
+  }
+});
+
+// download generated result outputs
+app.get('/visualize/download', (req, res) => {
+  logger.info(`/visualize/download: id:${req.query.id} file:${req.query.file}`);
+  const file = path.join(
+    tmppath,
+    req.query.id,
+    'results/output',
+    req.query.file
+  );
+  if (file.indexOf(tmppath) == 0) {
+    res.download(file);
+  } else {
+    logger.info('traversal error');
+    res.status(500).end('Not found');
+  }
 });
 
 app.post('/visualize/queue', (req, res) => {

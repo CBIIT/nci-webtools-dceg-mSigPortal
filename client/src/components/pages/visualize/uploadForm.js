@@ -124,6 +124,7 @@ export default function UploadForm({ setOpenSidebar }) {
               summary: results.summary,
               statistics: results.statistics,
               matrixList: results.matrixList,
+              downloads: results.downloads,
             });
             dispatchPyTab({
               debug: { stdout: results.stdout, stderr: results.stderr },

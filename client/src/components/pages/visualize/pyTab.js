@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Row, Col, Button } from 'react-bootstrap';
+import { Form, Row, Col } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { dispatchError, dispatchPyTab } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
@@ -8,9 +8,7 @@ const { Group, Label, Control } = Form;
 
 export default function PyTab() {
   const [downloadOverlay, setOverlay] = useState(false);
-  const { summary, statistics } = useSelector(
-    (state) => state.visualizeResults
-  );
+  const { summary } = useSelector((state) => state.visualizeResults);
   const rootURL = window.location.pathname;
   const {
     filtered,
@@ -280,13 +278,6 @@ export default function PyTab() {
           </div>
         </Group>
       </Form>
-      {statistics.length > 0 && (
-        <Row>
-          <Col>
-            <p>{statistics}</p>
-          </Col>
-        </Row>
-      )}
 
       <div className="d-flex">
         <a className="px-2 py-1" href={plotURL} download={getPlotName()}>

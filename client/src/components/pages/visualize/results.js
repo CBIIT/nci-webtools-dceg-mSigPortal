@@ -20,9 +20,12 @@ const { Header, Body } = Card;
 const { Item, Link } = Nav;
 
 export default function Results() {
-  const { error, projectID, displayTab, downloads, summary } = useSelector(
-    (state) => state.visualizeResults
-  );
+  const {
+    error,
+    projectID,
+    displayTab,
+    summary,
+  } = useSelector((state) => state.visualizeResults);
   const pyTab = useSelector((state) => state.pyTab);
   const rootURL = window.location.pathname;
 
@@ -46,11 +49,12 @@ export default function Results() {
       },
       body: JSON.stringify({ projectID: projectID }),
     });
-    const { summary, statistics, matrixList } = await response.json();
+    const { summary, statistics, matrixList, downloads } = await response.json();
     dispatchVisualizeResults({
       summary: summary,
       statistics: statistics,
       matrixList: matrixList,
+      downloads: downloads,
     });
   }
 

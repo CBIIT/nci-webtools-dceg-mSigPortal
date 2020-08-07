@@ -1,13 +1,50 @@
-import React, { useEffect } from 'react';
-import { Form, Row, Col, Button } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import {
-  dispatchError,
-  dispatchVisualizeResults,
-} from '../../../services/store';
+import { dispatchError } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 export default function Download() {
-  const { downloads } = useSelector((state) => state.visualizeResults);
-  return <div></div>;
+  const { projectID, downloads, statistics } = useSelector(
+    (state) => state.visualizeResults
+  );
+  const rootURL = window.location.pathname;
+  const [downloading, setDownload] = useState([]);
+
+  async function downloadOutput(file) {
+    setDownload((downloading) => [...downloading, file]);
+    const response = await fetch(
+      `${rootURL}visualize/download?id=${projectID}&file=${file}`
+    );
+    if (response.ok) {
+      const objectURL = URL.createObjectURL(await response.blob());
+      const tempLink = document.createElement('a');
+
+      tempLink.href = `${objectURL}`;
+      tempLink.setAttribute('download', `${file}`);
+      document.body.appendChild(tempLink);
+      tempLink.click();
+      document.body.removeChild(tempLink);
+    } else {
+      dispatchError(`${file} is not available`);
+    }
+    setDownload((downloading) => downloading.filter((item) => item != file));
+  }
+  return (
+    <div>
+      {statistics.length > 0 && <p>{statistics}</p>}
+      {downloads.length > 0 && (
+        <div>
+          {downloads.map((file) => (
+            <div>
+              <Button variant="link" onClick={() => downloadOutput(file)}>
+                <LoadingOverlay active={downloading.indexOf(file) != -1} />
+                {file}
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
