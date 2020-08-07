@@ -32,8 +32,12 @@ export default function Download() {
   }
   return (
     <div>
-      {statistics.length > 0 && <p>{statistics}</p>}
-      {downloads.length > 0 && (
+      {statistics.length > 0 ? (
+        <p>{statistics}</p>
+      ) : (
+        <p>No statistics available</p>
+      )}
+      {downloads.length > 0 ? (
         <div>
           {downloads.map((file) => (
             <div>
@@ -44,6 +48,8 @@ export default function Download() {
             </div>
           ))}
         </div>
+      ) : (
+        <p>No files available</p>
       )}
     </div>
   );
