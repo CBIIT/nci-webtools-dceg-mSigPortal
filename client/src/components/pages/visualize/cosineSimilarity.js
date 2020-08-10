@@ -56,7 +56,8 @@ export default function CosineSimilarity({
     if (
       withinProfileType.length &&
       withinMatrixSize.length &&
-      !withinPlotPath.length 
+      !withinPlotPath.length &&
+      !withinSubmitOverlay
     ) {
       calculateR('cosineSimilarityWithin', {
         profileType: withinProfileType,
@@ -69,7 +70,8 @@ export default function CosineSimilarity({
     if (
       refProfileType.length &&
       refSignatureSet.length &&
-      !refPlotPath.length 
+      !refPlotPath.length &&
+      !refSubmitOverlay
     ) {
       calculateR('cosineSimilarityRefSig', {
         profileType: refProfileType,

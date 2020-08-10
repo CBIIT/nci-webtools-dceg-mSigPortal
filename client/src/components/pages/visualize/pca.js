@@ -1,10 +1,7 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import {
-  dispatchError,
-  dispatchPCA,
-} from '../../../services/store';
+import { dispatchError, dispatchPCA } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const { Group, Label, Control } = Form;
@@ -65,7 +62,8 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
       !eig.length &&
       !pca1.length &&
       !pca2.length &&
-      !heatmap.length
+      !heatmap.length &&
+      !submitOverlay
     ) {
       calculateR('pca', {
         profileType: profileType,
