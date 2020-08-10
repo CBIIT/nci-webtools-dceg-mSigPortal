@@ -37,13 +37,13 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
 
   // load r plots after they are recieved
   useEffect(() => {
-    if (withinPlotPath && withinPlotPath.length) {
+    if (withinPlotPath) {
       setRPlot(withinPlotPath, 'within');
     }
   }, [withinPlotPath]);
 
   useEffect(() => {
-    if (refPlotPath && refPlotPath.length) {
+    if (refPlotPath) {
       setRPlot(refPlotPath, 'refsig');
     }
   }, [refPlotPath]);
@@ -54,7 +54,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       withinProfileType.length &&
       withinSampleName1.length &&
       withinSampleName2.length &&
-      !withinPlotURL.length &&
+      !withinPlotPath &&
+      // !withinPlotPath.length &&
       !withinSubmitOverlay
     ) {
       calculateR('profileComparisonWithin', {
@@ -71,7 +72,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       refSampleName.length &&
       refSignatureSet.length &&
       refCompare.length &&
-      !refPlotURL.length &&
+      !refPlotPath &&
+      // !refPlotPath.length &&
       !refSubmitOverlay
     ) {
       calculateR('profileComparisonRefSig', {
@@ -94,8 +96,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         body: JSON.stringify({ path: plotPath }),
       });
       if (!response.ok) {
-        const { msg } = await response.json();
-        dispatchError(msg);
+        // console.log(await response.json());
       } else {
         const pic = await response.blob();
         const objectURL = URL.createObjectURL(pic);

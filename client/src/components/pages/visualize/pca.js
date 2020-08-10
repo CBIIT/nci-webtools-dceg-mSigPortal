@@ -32,25 +32,25 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
 
   // load r plots after they are recieved
   useEffect(() => {
-    if (eig && eig.length) {
+    if (eig) {
       setRPlot(eig, 'eig');
     }
   }, [eig]);
 
   useEffect(() => {
-    if (pca1 && pca1.length) {
+    if (pca1) {
       setRPlot(pca1, 'pca1');
     }
   }, [pca1]);
 
   useEffect(() => {
-    if (pca2 && pca2.length) {
+    if (pca2) {
       setRPlot(pca2, 'pca2');
     }
   }, [pca2]);
 
   useEffect(() => {
-    if (heatmap && heatmap.length) {
+    if (heatmap) {
       setRPlot(heatmap, 'heatmap');
     }
   }, [heatmap]);
@@ -59,10 +59,14 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
     if (
       profileType.length &&
       signatureSet.length &&
-      !eigURL.length &&
-      !pca1URL.length &&
-      !pca2URL.length &&
-      !heatmapURL.length &&
+      !eig &&
+      !pca1 &&
+      !pca2 &&
+      !heatmap &&
+      // !eig.length &&
+      // !pca1.length &&
+      // !pca2.length &&
+      // !heatmap.length &&
       !submitOverlay
     ) {
       calculateR('pca', {
@@ -84,8 +88,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
       });
 
       if (!response.ok) {
-        const { msg } = await response.json();
-        dispatchError(msg);
+        // console.log(await response.json());
       } else {
         const pic = await response.blob();
         const objectURL = URL.createObjectURL(pic);

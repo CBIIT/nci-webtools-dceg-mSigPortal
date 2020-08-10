@@ -40,13 +40,13 @@ export default function CosineSimilarity({
 
   // load r plots after they are recieved
   useEffect(() => {
-    if (withinPlotPath && withinPlotPath.length) {
+    if (withinPlotPath) {
       setRPlot(withinPlotPath, 'within');
     }
   }, [withinPlotPath]);
 
   useEffect(() => {
-    if (refPlotPath && refPlotPath.length) {
+    if (refPlotPath) {
       setRPlot(refPlotPath, 'refsig');
     }
   }, [refPlotPath]);
@@ -56,7 +56,8 @@ export default function CosineSimilarity({
     if (
       withinProfileType.length &&
       withinMatrixSize.length &&
-      !withinPlotURL.length &&
+      !withinPlotPath &&
+      // !withinPlotPath.length &&
       !withinSubmitOverlay
     ) {
       calculateR('cosineSimilarityWithin', {
@@ -70,7 +71,8 @@ export default function CosineSimilarity({
     if (
       refProfileType.length &&
       refSignatureSet.length &&
-      !refPlotURL.length &&
+      !refPlotPath &&
+      // !refPlotPath.length &&
       !refSubmitOverlay
     ) {
       calculateR('cosineSimilarityRefSig', {
@@ -91,8 +93,7 @@ export default function CosineSimilarity({
         body: JSON.stringify({ path: plotPath }),
       });
       if (!response.ok) {
-        const { msg } = await response.json();
-        dispatchError(msg);
+        // console.log(await response.json());
       } else {
         const pic = await response.blob();
         const objectURL = URL.createObjectURL(pic);
