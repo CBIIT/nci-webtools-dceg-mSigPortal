@@ -3,7 +3,6 @@ import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
-  dispatchVisualizeResults,
   dispatchPCA,
 } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
@@ -59,19 +58,21 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
     }
   }, [heatmap]);
 
-  // call r wrapper on load
-  // useEffect(() => {
-  //   if (!pcWithinURL.length && !pcRefSigURL.length) {
-  //     calculateR('cosineSimilarityWithin', {
-  //       profileType: profileType1,
-  //       matrixSize: matrixSize.replace('-', ''),
-  //     });
-  //     calculateR('cosineSimilarityRefSig', {
-  //       profileType: profileType2,
-  //       signatureSet: signatureSet,
-  //     });
-  //   }
-  // }, [withinPlotPath, refPlotPath]);
+  useEffect(() => {
+    if (
+      profileType.length &&
+      signatureSet.length &&
+      !eig.length &&
+      !pca1.length &&
+      !pca2.length &&
+      !heatmap.length
+    ) {
+      calculateR('pca', {
+        profileType: profileType,
+        signatureSet: signatureSet,
+      });
+    }
+  }, [profileType, signatureSet]);
 
   async function setRPlot(plotPath, type) {
     try {

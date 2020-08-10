@@ -3,7 +3,6 @@ import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
-  dispatchVisualizeResults,
   dispatchProfileComparison,
 } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
@@ -11,7 +10,9 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 const { Group, Label, Control } = Form;
 
 export default function ProfileComparison({ submitR, getRefSigOptions }) {
-  const { nameOptions, profileOptions } = useSelector((state) => state.mutationalProfiles);
+  const { nameOptions, profileOptions } = useSelector(
+    (state) => state.mutationalProfiles
+  );
   const rootURL = window.location.pathname;
   const {
     withinProfileType,
@@ -47,19 +48,39 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     }
   }, [refPlotPath]);
 
-  // call r wrapper on load
-  // useEffect(() => {
-  //   if (!withinPlotURL.length && !refPlotURL.length) {
-  //     calculateR('cosineSimilarityWithin', {
-  //       profileType: profileType1,
-  //       matrixSize: matrixSize.replace('-', ''),
-  //     });
-  //     calculateR('cosineSimilarityRefSig', {
-  //       profileType: profileType2,
-  //       signatureSet: signatureSet,
-  //     });
-  //   }
-  // }, [withinPlotPath, refPlotPath]);
+  // calculate r on load
+  useEffect(() => {
+    if (
+      withinProfileType.length &&
+      withinSampleName1.length &&
+      withinSampleName2.length &&
+      !withinPlotPath.length
+    ) {
+      calculateR('profileComparisonWithin', {
+        profileType: withinProfileType,
+        sampleName1: withinSampleName1,
+        sampleName2: withinSampleName2,
+      });
+    }
+  }, [withinProfileType, withinSampleName1, withinSampleName2]);
+
+  useEffect(() => {
+    if (
+      refProfileType.length &&
+      refSampleName.length &&
+      refSignatureSet.length &&
+      refCompare.length &&
+      refPlotPath &&
+      !refPlotPath.length
+    ) {
+      calculateR('profileComparisonRefSig', {
+        profileType: refProfileType,
+        sampleName: refSampleName,
+        signatureSet: refSignatureSet,
+        compare: refCompare,
+      });
+    }
+  }, [refProfileType, refSampleName, refSignatureSet, refCompare]);
 
   async function setRPlot(plotPath, type) {
     try {
@@ -431,7 +452,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
           </Row>
 
           <div
-            id="refPlotPath"
+            id="refPlotDownload"
             style={{ display: refPlotURL.length ? 'block' : 'none' }}
           >
             <div className="d-flex">

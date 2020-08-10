@@ -3,7 +3,6 @@ import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
-  dispatchVisualizeResults,
   dispatchCosineSimilarity,
 } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
@@ -52,19 +51,32 @@ export default function CosineSimilarity({
     }
   }, [refPlotPath]);
 
-  // call r wrapper on load
-  // useEffect(() => {
-  //   if (!withinPlotURL.length && !refPlotURL.length) {
-  //     calculateR('cosineSimilarityWithin', {
-  //       profileType: withinProfileType,
-  //       matrixSize: withinMatrixSize.replace('-', ''),
-  //     });
-  //     calculateR('cosineSimilarityRefSig', {
-  //       profileType: refProfileType,
-  //       signatureSet: refSignatureSet,
-  //     });
-  //   }
-  // }, [withinPlotPath, refPlotPath]);
+  // calculate r on load
+  useEffect(() => {
+    if (
+      withinProfileType.length &&
+      withinMatrixSize.length &&
+      !withinPlotPath.length 
+    ) {
+      calculateR('cosineSimilarityWithin', {
+        profileType: withinProfileType,
+        matrixSize: withinMatrixSize.replace('-', ''),
+      });
+    }
+  }, [withinProfileType, withinMatrixSize]);
+
+  useEffect(() => {
+    if (
+      refProfileType.length &&
+      refSignatureSet.length &&
+      !refPlotPath.length 
+    ) {
+      calculateR('cosineSimilarityRefSig', {
+        profileType: refProfileType,
+        signatureSet: refSignatureSet,
+      });
+    }
+  }, [refProfileType, refSignatureSet]);
 
   async function setRPlot(plotPath, type) {
     try {
@@ -282,7 +294,7 @@ export default function CosineSimilarity({
           </Row>
 
           <div
-            id="withinPlotPath"
+            id="withinPlot"
             style={{ display: withinPlotURL.length ? 'block' : 'none' }}
           >
             <div className="d-flex">
@@ -394,7 +406,7 @@ export default function CosineSimilarity({
           </Row>
 
           <div
-            id="refPlotPath"
+            id="refPlot"
             style={{ display: refPlotURL.length ? 'block' : 'none' }}
           >
             <div className="d-flex">

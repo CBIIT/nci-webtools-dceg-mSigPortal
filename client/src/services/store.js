@@ -23,6 +23,7 @@ export const getInitialState = () => ({
   },
   visualizeResults: {
     error: '',
+    // projectID: '97037720-cdf8-4137-9de8-fd60027482fa',
     projectID: '',
     displayTab: 'mutationalProfiles',
     downloads: [],
@@ -48,7 +49,7 @@ export const getInitialState = () => ({
     withinProfileType: '',
     withinMatrixSize: '',
     withinMatrixOptions: [],
-    refProfileType2: '',
+    refProfileType: '',
     refSignatureSet: '',
     refSignatureSetOptions: [],
     withinPlotPath: '',
