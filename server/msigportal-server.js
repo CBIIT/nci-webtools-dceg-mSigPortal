@@ -184,12 +184,12 @@ app.post('/api/visualizeR', (req, res) => {
   }
 });
 
-app.post('/api/visualizeR/getSignatureReferenceSets', (req, res) => {
-  logger.info('/api/visualizeR/getSignatureReferenceSets: Calling R Wrapper');
+app.post('/api/visualizeR/getReferenceSignatureSets', (req, res) => {
+  logger.info('/api/visualizeR/getReferenceSignatureSets: Calling R Wrapper');
   console.log('args', req.body);
 
   try {
-    const list = r('api/R/visualizeWrapper.R', 'getSignatureReferenceSets', [
+    const list = r('api/R/visualizeWrapper.R', 'getReferenceSignatureSets', [
       req.body.profileType,
     ]);
 
@@ -197,7 +197,7 @@ app.post('/api/visualizeR/getSignatureReferenceSets', (req, res) => {
 
     res.json(list);
   } catch (err) {
-    logger.info('/api/visualizeR/getSignatureReferenceSets: An error occured');
+    logger.info('/api/visualizeR/getReferenceSignatureSets: An error occured');
     logger.error(err);
     res.status(500).json(err.message);
   }
