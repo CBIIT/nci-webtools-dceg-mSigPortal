@@ -54,7 +54,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       withinProfileType.length &&
       withinSampleName1.length &&
       withinSampleName2.length &&
-      !withinPlotPath.length &&
+      !withinPlotURL.length &&
       !withinSubmitOverlay
     ) {
       calculateR('profileComparisonWithin', {
@@ -71,8 +71,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       refSampleName.length &&
       refSignatureSet.length &&
       refCompare.length &&
-      refPlotPath &&
-      !refPlotPath.length &&
+      !refPlotURL.length &&
       !refSubmitOverlay
     ) {
       calculateR('profileComparisonRefSig', {

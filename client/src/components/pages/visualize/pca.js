@@ -59,10 +59,10 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
     if (
       profileType.length &&
       signatureSet.length &&
-      !eig.length &&
-      !pca1.length &&
-      !pca2.length &&
-      !heatmap.length &&
+      !eigURL.length &&
+      !pca1URL.length &&
+      !pca2URL.length &&
+      !heatmapURL.length &&
       !submitOverlay
     ) {
       calculateR('pca', {

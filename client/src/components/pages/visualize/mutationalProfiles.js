@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { dispatchError, dispatchMutationalProfiles } from '../../../services/store';
+import {
+  dispatchError,
+  dispatchMutationalProfiles,
+} from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const { Group, Label, Control } = Form;
