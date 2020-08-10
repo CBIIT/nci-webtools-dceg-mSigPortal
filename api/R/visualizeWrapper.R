@@ -13,7 +13,7 @@ source('api/R/Sigvisualfunc.R')
 load('api/R/signature_refsets.RData')
 
 # get all Reference Signature Set options using profileName (matrix)
-getSignatureReferenceSets <- function(profileType) {
+getReferenceSignatureSets <- function(profileType) {
   profileName <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
   return(signature_refsets %>% filter(Profile == profileName) %>% pull(Signature_set_name) %>% unique())
 }
