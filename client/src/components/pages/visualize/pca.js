@@ -32,28 +32,11 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
 
   // load r plots after they are recieved
   useEffect(() => {
-    if (eig) {
-      setRPlot(eig, 'eig');
-    }
-  }, [eig]);
-
-  useEffect(() => {
-    if (pca1) {
-      setRPlot(pca1, 'pca1');
-    }
-  }, [pca1]);
-
-  useEffect(() => {
-    if (pca2) {
-      setRPlot(pca2, 'pca2');
-    }
-  }, [pca2]);
-
-  useEffect(() => {
-    if (heatmap) {
-      setRPlot(heatmap, 'heatmap');
-    }
-  }, [heatmap]);
+    if (eig) setRPlot(eig, 'eig');
+    if (pca1) setRPlot(pca1, 'pca1');
+    if (pca2) setRPlot(pca2, 'pca2');
+    if (heatmap) setRPlot(heatmap, 'heatmap');
+  }, [eig, pca1, pca2, heatmap]);
 
   useEffect(() => {
     if (

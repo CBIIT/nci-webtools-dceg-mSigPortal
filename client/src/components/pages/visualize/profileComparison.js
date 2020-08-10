@@ -37,16 +37,10 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
 
   // load r plots after they are recieved
   useEffect(() => {
-    if (withinPlotPath) {
+    if (withinPlotPath && !withinSubmitOverlay)
       setRPlot(withinPlotPath, 'within');
-    }
-  }, [withinPlotPath]);
-
-  useEffect(() => {
-    if (refPlotPath) {
-      setRPlot(refPlotPath, 'refsig');
-    }
-  }, [refPlotPath]);
+    if (refPlotPath && !refSubmitOverlay) setRPlot(refPlotPath, 'refsig');
+  }, [withinPlotPath, refPlotPath]);
 
   // calculate r on load
   useEffect(() => {
@@ -85,7 +79,17 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     }
   }, [refProfileType, refSampleName, refSignatureSet, refCompare]);
 
+  function setOverlay(type, display) {
+    if (type == 'within') {
+      dispatchProfileComparison({ withinSubmitOverlay: display });
+    } else {
+      dispatchProfileComparison({ refSubmitOverlay: display });
+    }
+  }
+
   async function setRPlot(plotPath, type) {
+    console.log('pc', type, plotPath);
+    setOverlay(type, true);
     try {
       const response = await fetch(`${rootURL}visualize/svg`, {
         method: 'POST',
@@ -97,6 +101,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       });
       if (!response.ok) {
         // console.log(await response.json());
+        setOverlay(type, false);
       } else {
         const pic = await response.blob();
         const objectURL = URL.createObjectURL(pic);
@@ -112,9 +117,11 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
             refPlotURL: objectURL,
           });
         }
+        setOverlay(type, false);
       }
     } catch (err) {
       dispatchError(err);
+      setOverlay(type, false);
     }
   }
 

@@ -40,16 +40,10 @@ export default function CosineSimilarity({
 
   // load r plots after they are recieved
   useEffect(() => {
-    if (withinPlotPath) {
+    if (withinPlotPath && !withinSubmitOverlay)
       setRPlot(withinPlotPath, 'within');
-    }
-  }, [withinPlotPath]);
-
-  useEffect(() => {
-    if (refPlotPath) {
-      setRPlot(refPlotPath, 'refsig');
-    }
-  }, [refPlotPath]);
+    if (refPlotPath && !refSubmitOverlay) setRPlot(refPlotPath, 'refsig');
+  }, [withinPlotPath, refPlotPath]);
 
   // calculate r on load
   useEffect(() => {
@@ -82,7 +76,17 @@ export default function CosineSimilarity({
     }
   }, [refProfileType, refSignatureSet]);
 
+  function setOverlay(type, display) {
+    if (type == 'within') {
+      dispatchCosineSimilarity({ withinSubmitOverlay: display });
+    } else {
+      dispatchCosineSimilarity({ refSubmitOverlay: display });
+    }
+  }
+
   async function setRPlot(plotPath, type) {
+    console.log('cs', type, plotPath);
+    setOverlay(type, true);
     try {
       const response = await fetch(`${rootURL}visualize/svg`, {
         method: 'POST',
@@ -94,6 +98,7 @@ export default function CosineSimilarity({
       });
       if (!response.ok) {
         // console.log(await response.json());
+        setOverlay(type, false);
       } else {
         const pic = await response.blob();
         const objectURL = URL.createObjectURL(pic);
@@ -109,9 +114,11 @@ export default function CosineSimilarity({
             refPlotURL: objectURL,
           });
         }
+        setOverlay(type, false);
       }
     } catch (err) {
       dispatchError(err);
+      setOverlay(type, false);
     }
   }
 
