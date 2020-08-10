@@ -25,12 +25,14 @@ export default function Results({ setOpenSidebar }) {
     (state) => state.visualizeResults
   );
   const mutationalProfiles = useSelector((state) => state.mutationalProfiles);
+  const { signatureSetOptions } = useSelector((state) => state.pca);
   const rootURL = window.location.pathname;
 
   // get mapping of plots after retrieving projectID
   useEffect(() => {
     if (summary.length) {
-      mapSummary();
+      // only set summary if signature set was not set
+      if (!signatureSetOptions.length) mapSummary();
     } else {
       if (projectID.length) getSummary();
     }
@@ -63,6 +65,12 @@ export default function Results({ setOpenSidebar }) {
 
   // retrieve mapping of samples to plots from summary file
   async function mapSummary() {
+    dispatchVisualize({
+      loading: {
+        active: true,
+      },
+    });
+
     const nameOptions = [...new Set(summary.map((plot) => plot.Sample_Name))];
     const profileOptions = [
       ...new Set(summary.map((plot) => plot.Profile_Type)),
@@ -216,7 +224,9 @@ export default function Results({ setOpenSidebar }) {
           <Item>
             <Link
               active={displayTab == 'mutationalProfiles'}
-              onClick={() => dispatchVisualizeResults({ displayTab: 'mutationalProfiles' })}
+              onClick={() =>
+                dispatchVisualizeResults({ displayTab: 'mutationalProfiles' })
+              }
             >
               Mutational Profiles
             </Link>
@@ -261,7 +271,11 @@ export default function Results({ setOpenSidebar }) {
           </Item>
         </Nav>
       </Header>
-      <Body style={{ display: displayTab == 'mutationalProfiles' ? 'block' : 'none' }}>
+      <Body
+        style={{
+          display: displayTab == 'mutationalProfiles' ? 'block' : 'none',
+        }}
+      >
         <MutationalProfiles />
       </Body>
       <Body
