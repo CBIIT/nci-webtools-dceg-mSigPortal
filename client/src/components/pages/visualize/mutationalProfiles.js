@@ -148,7 +148,7 @@ export default function MutationalProfiles() {
 
   function filterProfileType(profile) {
     const filteredPlots = summary.filter(
-      (plot) => plot.Profile_Type == profile
+      (plot) => plot.Sample_Name == selectName && plot.Profile_Type == profile
     );
     const matrixOptions = [
       ...new Set(filteredPlots.map((plot) => plot.Matrix)),
@@ -172,7 +172,12 @@ export default function MutationalProfiles() {
   }
 
   function filterMatrix(matrix) {
-    const filteredPlots = summary.filter((plot) => plot.Matrix == matrix);
+    const filteredPlots = summary.filter(
+      (plot) =>
+        plot.Sample_Name == selectName &&
+        plot.Profile_Type == selectProfile &&
+        plot.Matrix == matrix
+    );
     const tagOptions = [...new Set(filteredPlots.map((plot) => plot.Tag))];
 
     dispatchMutationalProfiles({
@@ -184,7 +189,13 @@ export default function MutationalProfiles() {
   }
 
   function filterTag(tag) {
-    const filteredPlots = summary.filter((plot) => plot.Tag == tag);
+    const filteredPlots = summary.filter(
+      (plot) =>
+        plot.Sample_Name == selectName &&
+        plot.Profile_Type == selectProfile &&
+        plot.Matrix == selectMatrix &&
+        plot.Tag == tag
+    );
 
     dispatchMutationalProfiles({
       selectTag: tag,
