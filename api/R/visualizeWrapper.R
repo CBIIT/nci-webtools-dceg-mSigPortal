@@ -61,8 +61,8 @@ cosineSimilarityRefSig <- function(profileType, signatureSetName, projectID, pyt
 
   tryCatch({
     output = list()
-    plotPath = paste0(savePath, 'cos_sim_refsig.svg')
-    txtPath = paste0(savePath, 'cos_sim_refsig.txt')
+    plotPath = paste0(savePath, '/cos_sim_refsig.svg')
+    txtPath = paste0(savePath, '/cos_sim_refsig.txt')
 
     matrix <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
     signature_refsets_input <- signature_refsets %>% filter(Profile == matrix, Signature_set_name == signatureSetName)
@@ -99,7 +99,7 @@ profileComparisonWithin <- function(profileType, sampleName1, sampleName2, proje
 
   tryCatch({
     output = list()
-    plotPath = paste0(savePath, '/cos_sim_within.svg')
+    plotPath = paste0(savePath, '/pro_com_within.svg')
 
     matrixsize <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
     data_input <- read_delim(paste0(pythonOutput, '/', profileType, '/', projectID, '.', matrixsize, '.all'), delim = '\t')
@@ -128,7 +128,7 @@ profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, c
 
   tryCatch({
     output = list()
-    plotPath = paste0(savePath, 'cos_sim_refsig.svg')
+    plotPath = paste0(savePath, '/pro_com_refsig.svg')
 
     profilename <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
     matrixsize <- profilename
