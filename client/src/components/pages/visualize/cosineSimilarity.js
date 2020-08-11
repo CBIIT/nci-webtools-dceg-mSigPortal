@@ -91,7 +91,7 @@ export default function CosineSimilarity({
       const response = await fetch(`${rootURL}visualize/svg`, {
         method: 'POST',
         headers: {
-          Accept: 'application/json',
+          Accept: 'image/svg',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ path: plotPath }),
