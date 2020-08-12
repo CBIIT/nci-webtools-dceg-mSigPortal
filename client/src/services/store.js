@@ -12,9 +12,11 @@ export const getInitialState = () => ({
     email: '',
     openSidebar: true,
     disableParameters: false,
-    storeFile: '',
+    storeFilename: '',
+    bedFilename: '',
     submitted: false,
     exampleData: 'assets/exampleInput/demo_input_multi.vcf.gz',
+    bedData: 'assets/exampleInput/demo_input_bed.bed',
     loading: {
       active: false,
       content: null,

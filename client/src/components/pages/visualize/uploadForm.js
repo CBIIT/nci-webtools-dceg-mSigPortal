@@ -29,20 +29,37 @@ export default function UploadForm() {
     queueMode,
     email,
     disableParameters,
-    storeFile,
+    storeFilename,
+    bedFilename,
+    bedData,
     submitted,
     exampleData,
     loading,
   } = useSelector((state) => state.visualize);
   const rootURL = window.location.pathname;
   const [inputFile, setInput] = useState(new File([], ''));
-  const onDrop = useCallback((acceptedFiles) => {
+  const [bedFile, setBed] = useState(new File([], ''));
+  const onDropMain = useCallback((acceptedFiles) => {
     setInput(acceptedFiles[0]);
-    dispatchVisualize({ storeFile: acceptedFiles[0].name });
+    dispatchVisualize({ storeFilename: acceptedFiles[0].name });
   }, []);
-  const { getRootProps, getInputProps } = useDropzone({
-    onDrop,
+  const {
+    getRootProps: mainRootProps,
+    getInputProps: mainInputProps,
+  } = useDropzone({
+    onDrop: onDropMain,
     accept: '.csv, .tsv, .vcf, .gz, .zip, .tar, .tar.gz',
+  });
+  const onDropBed = useCallback((acceptedFiles) => {
+    setBed(acceptedFiles[0]);
+    dispatchVisualize({ bedFilename: acceptedFiles[0].name });
+  }, []);
+  const {
+    getRootProps: bedRootProps,
+    getInputProps: bedInputProps,
+  } = useDropzone({
+    onDrop: onDropBed,
+    accept: '.bed',
   });
 
   async function handleSubmit() {
@@ -50,16 +67,16 @@ export default function UploadForm() {
     dispatchVisualize({ disableParameters: true });
     dispatchVisualize({ submitted: true });
 
-    const data = await uploadFile();
-    if (data && data.projectID) {
+    const { projectID, filePath, bedPath } = await uploadFile();
+    if (projectID) {
       const args = {
         inputFormat: ['-f', inputFormat],
-        inputFile: ['-i', data.filePath],
-        projectID: ['-p', data.projectID],
+        inputFile: ['-i', filePath],
+        projectID: ['-p', projectID],
         genomeAssemblyVersion: ['-g', selectedGenome],
         experimentalStrategy: ['-t', experimentalStrategy],
         collapseSample: ['-c', collapseSample],
-        outputDir: ['-o', data.projectID],
+        outputDir: ['-o', projectID],
       };
       // conditionally include mutation split and mutation filter params
       if (['vcf', 'csv', 'tsv'].includes(inputFormat)) {
@@ -67,39 +84,38 @@ export default function UploadForm() {
         if (mutationFilter.length)
           args['mutationFilter'] = ['-F', mutationFilter];
       }
+      if (bedFile.size) args['bedFile'] = ['-b', bedPath];
 
       if (queueMode) {
-        dispatchVisualize({
-          loading: {
-            active: true,
-            content: 'Sending to Queue...',
-            showIndicator: true,
-          },
-        });
-        try {
-          const response = await fetch(`${rootURL}visualize/queue`, {
-            method: 'POST',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-          });
-
-          if (response.ok) {
-            // placeholder alert with error modal
-            dispatchError('Successfully submitted to queue.');
-          } else {
-            dispatchVisualizeResults({
-              error: 'Please Reset Your Parameters and Try again.',
-            });
-            dispatchError('Failed to submit to queue. Please Try Again.');
-          }
-        } catch (err) {
-          dispatchError(err);
-        } finally {
-          dispatchVisualize({ loading: { active: false } });
-        }
+        // wip
+        // dispatchVisualize({
+        //   loading: {
+        //     active: true,
+        //     content: 'Sending to Queue...',
+        //     showIndicator: true,
+        //   },
+        // });
+        // try {
+        //   const response = await fetch(`${rootURL}visualize/queue`, {
+        //     method: 'POST',
+        //     headers: {
+        //       Accept: 'application/json',
+        //       'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify(data),
+        //   });
+        //   if (response.ok) {
+        //     // placeholder alert with error modal
+        //     dispatchError('Successfully submitted to queue.');
+        //   } else {
+        //     dispatchVisualizeResults({
+        //       error: 'Please Reset Your Parameters and Try again.',
+        //     });
+        //     dispatchError('Failed to submit to queue. Please Try Again.');
+        //   }
+        // } catch (err) {
+        //   dispatchError(err);
+        // }
       } else {
         dispatchVisualize({
           loading: {
@@ -121,7 +137,7 @@ export default function UploadForm() {
           if (response.ok) {
             const results = await response.json();
             dispatchVisualizeResults({
-              projectID: data.projectID,
+              projectID: projectID,
               summary: results.summary,
               statistics: results.statistics,
               matrixList: results.matrixList,
@@ -150,23 +166,19 @@ export default function UploadForm() {
           }
         } catch (err) {
           dispatchError(err);
-          dispatchVisualize({
-            loading: {
-              active: false,
-            },
-          });
           dispatchVisualizeResults({
             error: 'Please Reset Your Parameters and Try again.',
           });
         }
+        dispatchVisualize({ loading: { active: false } });
       }
     }
   }
 
   function handleReset() {
     const initialState = getInitialState();
-    // console.log(initialState.visualize);
     removeFile();
+    removeBedFile();
     dispatchVisualize(initialState.visualize);
     dispatchVisualizeResults(initialState.visualizeResults);
     dispatchMutationalProfiles(initialState.mutationalProfiles);
@@ -186,7 +198,8 @@ export default function UploadForm() {
     });
     try {
       const data = new FormData();
-      data.append('file', inputFile);
+      data.append('inputFile', inputFile);
+      if (bedFile.size) data.append('bedFile', bedFile);
       let response = await fetch(`${rootURL}visualize/upload`, {
         method: 'POST',
         body: data,
@@ -217,6 +230,10 @@ export default function UploadForm() {
     setInput(new File([], ''));
   }
 
+  function removeBedFile() {
+    setBed(new File([], ''));
+  }
+
   function selectFormat(format) {
     let path = '';
     if (format == 'vcf') path = 'assets/exampleInput/demo_input_multi.vcf.gz';
@@ -233,7 +250,13 @@ export default function UploadForm() {
   async function loadExample() {
     const filename = exampleData.split('/').slice(-1)[0];
     setInput(new File([await (await fetch(exampleData)).blob()], filename));
-    dispatchVisualize({ storeFile: filename });
+    dispatchVisualize({ storeFilename: filename });
+  }
+
+  async function loadBed() {
+    const filename = bedData.split('/').slice(-1)[0];
+    setBed(new File([await (await fetch(bedData)).blob()], filename));
+    dispatchVisualize({ bedFilename: filename });
   }
 
   return (
@@ -280,9 +303,9 @@ export default function UploadForm() {
           </Col>
         </Row>
         <section>
-          <div {...getRootProps({ className: 'dropzone' })}>
+          <div {...mainRootProps({ className: 'dropzone' })}>
             <input
-              {...getInputProps()}
+              {...mainInputProps()}
               disabled={inputFile.size || disableParameters}
             />
             {inputFile.size || submitted ? (
@@ -293,7 +316,7 @@ export default function UploadForm() {
                 disabled={disableParameters}
               >
                 <span id="uploadedFile">
-                  {submitted ? storeFile : inputFile.name}
+                  {submitted ? storeFilename : inputFile.name}
                 </span>
                 <span className="text-danger ml-auto">
                   <FontAwesomeIcon icon={faMinus} />
@@ -424,6 +447,62 @@ export default function UploadForm() {
           }
         ></Control>
         <Text className="text-muted">Use @ to separate multiple filters</Text>
+      </Group>
+      <Group controlId="fileUpload">
+        <Row className="m-0">
+          <Col sm="6" className="p-0">
+            <Button
+              className="p-0"
+              disabled={disableParameters}
+              variant="link"
+              href={bedData}
+              download
+            >
+              Download Sample
+            </Button>
+          </Col>
+          <Col sm="6" className="p-0 d-flex">
+            <Button
+              className="p-0 ml-auto"
+              disabled={disableParameters}
+              variant="link"
+              type="button"
+              onClick={() => loadBed()}
+            >
+              Load Sample
+            </Button>
+          </Col>
+        </Row>
+        <section>
+          <div {...bedRootProps({ className: 'dropzone' })}>
+            <input
+              {...bedInputProps()}
+              disabled={bedFile.size || disableParameters}
+            />
+            {bedFile.size || submitted ? (
+              bedFilename.length > 0 && (
+                <button
+                  id="removeFile"
+                  className="d-flex w-100 faButton"
+                  onClick={() => removeBedFile()}
+                  disabled={disableParameters}
+                >
+                  <span id="uploadedFile">
+                    {submitted ? bedFilename : bedFile.name}
+                  </span>
+                  <span className="text-danger ml-auto">
+                    <FontAwesomeIcon icon={faMinus} />
+                  </span>
+                </button>
+              )
+            ) : (
+              <>
+                <p>Upload Bed File.</p>
+                <FontAwesomeIcon icon={faCloudUploadAlt} size="4x" />
+              </>
+            )}
+          </div>
+        </section>
       </Group>
       <hr />
       <Group controlId="email">

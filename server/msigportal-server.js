@@ -205,7 +205,10 @@ app.post('/api/visualizeR/getReferenceSignatureSets', (req, res) => {
 
 app.post('/visualize/upload', (req, res, next) => {
   const projectID = uuidv4();
-  const form = formidable({ uploadDir: path.join(tmppath, projectID) });
+  const form = formidable({
+    uploadDir: path.join(tmppath, projectID),
+    multiples: true,
+  });
 
   logger.info(`/VISUALIZE/UPLOAD: Request Project ID:${projectID}`);
 
@@ -220,6 +223,8 @@ app.post('/visualize/upload', (req, res, next) => {
   form.parse(req);
   form.on('file', (field, file) => {
     const uploadPath = path.join(form.uploadDir, file.name);
+    if (field == 'inputFile') form.inputFilename = file.name;
+    if (field == 'bedFile') form.bedFilename = file.name;
     fs.rename(file.path, uploadPath, (err) => {
       if (err) {
         logger.info(`/UPLOAD: Failed to upload file: ${file.name}`);
@@ -231,19 +236,22 @@ app.post('/visualize/upload', (req, res, next) => {
         });
       } else {
         logger.info(`/UPLOAD: Successfully uploaded file: ${file.name}`);
-        res.json({
-          projectID: projectID,
-          filePath: path.join(projectID, file.name),
-        });
       }
     });
   });
-  form.on('error', function (err) {
+  form.on('error', (err) => {
     logger.info('/UPLOAD: An error occured\n' + err);
     logger.error(err);
     res.status(500).json({
       msg: 'An error occured while trying to upload',
       err: err,
+    });
+  });
+  form.on('end', () => {
+    res.json({
+      projectID: projectID,
+      filePath: path.join(projectID, form.inputFilename),
+      bedPath: path.join(projectID, form.bedFilename || ''),
     });
   });
 });
