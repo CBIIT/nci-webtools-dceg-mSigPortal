@@ -7,6 +7,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 const { Group, Label, Control } = Form;
 
 export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
+  const { displayTab } = useSelector((state) => state.visualizeResults);
   const { profileOptions } = useSelector((state) => state.mutationalProfiles);
   const rootURL = window.location.pathname;
   const {
@@ -46,18 +47,15 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
       !pca1 &&
       !pca2 &&
       !heatmap &&
-      // !eig.length &&
-      // !pca1.length &&
-      // !pca2.length &&
-      // !heatmap.length &&
-      !submitOverlay
+      !submitOverlay &&
+      displayTab == 'pca'
     ) {
       calculateR('pca', {
         profileType: profileType,
         signatureSet: signatureSet,
       });
     }
-  }, [profileType, signatureSet]);
+  }, [profileType, signatureSet, displayTab]);
 
   async function setRPlot(plotPath, type) {
     try {

@@ -10,6 +10,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 const { Group, Label, Control } = Form;
 
 export default function ProfileComparison({ submitR, getRefSigOptions }) {
+  const { displayTab } = useSelector((state) => state.visualizeResults);
   const { nameOptions, profileOptions } = useSelector(
     (state) => state.mutationalProfiles
   );
@@ -49,8 +50,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       withinSampleName1.length &&
       withinSampleName2.length &&
       !withinPlotPath &&
-      // !withinPlotPath.length &&
-      !withinSubmitOverlay
+      !withinSubmitOverlay &&
+      displayTab == 'profileComparison'
     ) {
       calculateR('profileComparisonWithin', {
         profileType: withinProfileType,
@@ -58,7 +59,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         sampleName2: withinSampleName2,
       });
     }
-  }, [withinProfileType, withinSampleName1, withinSampleName2]);
+  }, [withinProfileType, withinSampleName1, withinSampleName2, displayTab]);
 
   useEffect(() => {
     if (
@@ -67,8 +68,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       refSignatureSet.length &&
       refCompare.length &&
       !refPlotPath &&
-      // !refPlotPath.length &&
-      !refSubmitOverlay
+      !refSubmitOverlay &&
+      displayTab == 'profileComparison'
     ) {
       calculateR('profileComparisonRefSig', {
         profileType: refProfileType,
@@ -77,7 +78,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         compare: refCompare,
       });
     }
-  }, [refProfileType, refSampleName, refSignatureSet, refCompare]);
+  }, [refProfileType, refSampleName, refSignatureSet, refCompare, displayTab]);
 
   function setOverlay(type, display) {
     if (type == 'within') {
@@ -88,7 +89,6 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
   }
 
   async function setRPlot(plotPath, type) {
-    console.log('pc', type, plotPath);
     setOverlay(type, true);
     try {
       const response = await fetch(`${rootURL}visualize/svg`, {

@@ -15,7 +15,9 @@ export default function CosineSimilarity({
   getRefSigOptions,
 }) {
   const { profileOptions } = useSelector((state) => state.mutationalProfiles);
-  const { summary } = useSelector((state) => state.visualizeResults);
+  const { summary, displayTab } = useSelector(
+    (state) => state.visualizeResults
+  );
   const rootURL = window.location.pathname;
   const {
     withinProfileType,
@@ -51,30 +53,30 @@ export default function CosineSimilarity({
       withinProfileType.length &&
       withinMatrixSize.length &&
       !withinPlotPath &&
-      // !withinPlotPath.length &&
-      !withinSubmitOverlay
+      !withinSubmitOverlay &&
+      displayTab == 'cosineSimilarity'
     ) {
       calculateR('cosineSimilarityWithin', {
         profileType: withinProfileType,
         matrixSize: withinMatrixSize.replace('-', ''),
       });
     }
-  }, [withinProfileType, withinMatrixSize]);
+  }, [withinProfileType, withinMatrixSize, displayTab, displayTab]);
 
   useEffect(() => {
     if (
       refProfileType.length &&
       refSignatureSet.length &&
       !refPlotPath &&
-      // !refPlotPath.length &&
-      !refSubmitOverlay
+      !refSubmitOverlay &&
+      displayTab == 'cosineSimilarity'
     ) {
       calculateR('cosineSimilarityRefSig', {
         profileType: refProfileType,
         signatureSet: refSignatureSet,
       });
     }
-  }, [refProfileType, refSignatureSet]);
+  }, [refProfileType, refSignatureSet, displayTab]);
 
   function setOverlay(type, display) {
     if (type == 'within') {
@@ -85,7 +87,6 @@ export default function CosineSimilarity({
   }
 
   async function setRPlot(plotPath, type) {
-    console.log('cs', type, plotPath);
     setOverlay(type, true);
     try {
       const response = await fetch(`${rootURL}visualize/svg`, {
