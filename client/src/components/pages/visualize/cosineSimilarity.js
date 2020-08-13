@@ -61,7 +61,7 @@ export default function CosineSimilarity({
         matrixSize: withinMatrixSize.replace('-', ''),
       });
     }
-  }, [withinProfileType, withinMatrixSize, displayTab, displayTab]);
+  }, [displayTab]);
 
   useEffect(() => {
     if (
@@ -76,7 +76,7 @@ export default function CosineSimilarity({
         signatureSet: refSignatureSet,
       });
     }
-  }, [refProfileType, refSignatureSet, displayTab]);
+  }, [displayTab]);
 
   function setOverlay(type, display) {
     if (type == 'within') {

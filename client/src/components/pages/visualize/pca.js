@@ -55,7 +55,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
         signatureSet: signatureSet,
       });
     }
-  }, [profileType, signatureSet, displayTab]);
+  }, [displayTab]);
 
   async function setRPlot(plotPath, type) {
     try {

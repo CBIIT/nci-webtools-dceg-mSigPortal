@@ -59,7 +59,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         sampleName2: withinSampleName2,
       });
     }
-  }, [withinProfileType, withinSampleName1, withinSampleName2, displayTab]);
+  }, [displayTab]);
 
   useEffect(() => {
     if (
@@ -78,7 +78,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         compare: refCompare,
       });
     }
-  }, [refProfileType, refSampleName, refSignatureSet, refCompare, displayTab]);
+  }, [displayTab]);
 
   function setOverlay(type, display) {
     if (type == 'within') {
