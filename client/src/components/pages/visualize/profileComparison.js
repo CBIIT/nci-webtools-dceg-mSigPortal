@@ -224,7 +224,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
               })
             }
           >
-            Cosine Similarity Within Samples
+            Profile Comparison Within Samples
           </Button>
         </Label>
         <div
