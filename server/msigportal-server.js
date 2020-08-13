@@ -100,7 +100,6 @@ app.post('/api/visualize', (req, res) => {
   logger.info('/api/visualize: Spawning Python Process');
   let reqBody = { ...req.body };
   // update paths
-  reqBody.inputFile[1] = path.join(tmppath, reqBody.inputFile[1]);
   reqBody.outputDir[1] = path.join(tmppath, reqBody.outputDir[1], 'results');
   const args = Object.values(reqBody);
   const cli = args.reduce((params, arg) => [...params, ...arg]);
@@ -223,8 +222,8 @@ app.post('/visualize/upload', (req, res, next) => {
   form.parse(req);
   form.on('file', (field, file) => {
     const uploadPath = path.join(form.uploadDir, file.name);
-    if (field == 'inputFile') form.inputFilename = file.name;
-    if (field == 'bedFile') form.bedFilename = file.name;
+    if (field == 'inputFile') form.filePath = uploadPath;
+    if (field == 'bedFile') form.bedPath = uploadPath;
     fs.rename(file.path, uploadPath, (err) => {
       if (err) {
         logger.info(`/UPLOAD: Failed to upload file: ${file.name}`);
@@ -250,8 +249,8 @@ app.post('/visualize/upload', (req, res, next) => {
   form.on('end', () => {
     res.json({
       projectID: projectID,
-      filePath: path.join(projectID, form.inputFilename),
-      bedPath: path.join(projectID, form.bedFilename || ''),
+      filePath: form.filePath,
+      bedPath: form.bedPath || '',
     });
   });
 });
