@@ -39,23 +39,23 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
     if (heatmap) setRPlot(heatmap, 'heatmap');
   }, [eig, pca1, pca2, heatmap]);
 
-  useEffect(() => {
-    if (
-      profileType.length &&
-      signatureSet.length &&
-      !eig &&
-      !pca1 &&
-      !pca2 &&
-      !heatmap &&
-      !submitOverlay &&
-      displayTab == 'pca'
-    ) {
-      calculateR('pca', {
-        profileType: profileType,
-        signatureSet: signatureSet,
-      });
-    }
-  }, [displayTab]);
+  // useEffect(() => {
+  //   if (
+  //     profileType.length &&
+  //     signatureSet.length &&
+  //     !eig &&
+  //     !pca1 &&
+  //     !pca2 &&
+  //     !heatmap &&
+  //     !submitOverlay &&
+  //     displayTab == 'pca'
+  //   ) {
+  //     calculateR('pca', {
+  //       profileType: profileType,
+  //       signatureSet: signatureSet,
+  //     });
+  //   }
+  // }, [displayTab]);
 
   async function setRPlot(plotPath, type) {
     try {

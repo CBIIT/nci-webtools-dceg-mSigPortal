@@ -48,35 +48,35 @@ export default function CosineSimilarity({
   }, [withinPlotPath, refPlotPath]);
 
   // calculate r on load
-  useEffect(() => {
-    if (
-      withinProfileType.length &&
-      withinMatrixSize.length &&
-      !withinPlotPath &&
-      !withinSubmitOverlay &&
-      displayTab == 'cosineSimilarity'
-    ) {
-      calculateR('cosineSimilarityWithin', {
-        profileType: withinProfileType,
-        matrixSize: withinMatrixSize.replace('-', ''),
-      });
-    }
-  }, [displayTab]);
+  // useEffect(() => {
+  //   if (
+  //     withinProfileType.length &&
+  //     withinMatrixSize.length &&
+  //     !withinPlotPath &&
+  //     !withinSubmitOverlay &&
+  //     displayTab == 'cosineSimilarity'
+  //   ) {
+  //     calculateR('cosineSimilarityWithin', {
+  //       profileType: withinProfileType,
+  //       matrixSize: withinMatrixSize.replace('-', ''),
+  //     });
+  //   }
+  // }, [displayTab]);
 
-  useEffect(() => {
-    if (
-      refProfileType.length &&
-      refSignatureSet.length &&
-      !refPlotPath &&
-      !refSubmitOverlay &&
-      displayTab == 'cosineSimilarity'
-    ) {
-      calculateR('cosineSimilarityRefSig', {
-        profileType: refProfileType,
-        signatureSet: refSignatureSet,
-      });
-    }
-  }, [displayTab]);
+  // useEffect(() => {
+  //   if (
+  //     refProfileType.length &&
+  //     refSignatureSet.length &&
+  //     !refPlotPath &&
+  //     !refSubmitOverlay &&
+  //     displayTab == 'cosineSimilarity'
+  //   ) {
+  //     calculateR('cosineSimilarityRefSig', {
+  //       profileType: refProfileType,
+  //       signatureSet: refSignatureSet,
+  //     });
+  //   }
+  // }, [displayTab]);
 
   function setOverlay(type, display) {
     if (type == 'within') {

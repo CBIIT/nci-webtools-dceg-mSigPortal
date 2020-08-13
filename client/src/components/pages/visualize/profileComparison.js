@@ -44,41 +44,41 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
   }, [withinPlotPath, refPlotPath]);
 
   // calculate r on load
-  useEffect(() => {
-    if (
-      withinProfileType.length &&
-      withinSampleName1.length &&
-      withinSampleName2.length &&
-      !withinPlotPath &&
-      !withinSubmitOverlay &&
-      displayTab == 'profileComparison'
-    ) {
-      calculateR('profileComparisonWithin', {
-        profileType: withinProfileType,
-        sampleName1: withinSampleName1,
-        sampleName2: withinSampleName2,
-      });
-    }
-  }, [displayTab]);
+  // useEffect(() => {
+  //   if (
+  //     withinProfileType.length &&
+  //     withinSampleName1.length &&
+  //     withinSampleName2.length &&
+  //     !withinPlotPath &&
+  //     !withinSubmitOverlay &&
+  //     displayTab == 'profileComparison'
+  //   ) {
+  //     calculateR('profileComparisonWithin', {
+  //       profileType: withinProfileType,
+  //       sampleName1: withinSampleName1,
+  //       sampleName2: withinSampleName2,
+  //     });
+  //   }
+  // }, [displayTab]);
 
-  useEffect(() => {
-    if (
-      refProfileType.length &&
-      refSampleName.length &&
-      refSignatureSet.length &&
-      refCompare.length &&
-      !refPlotPath &&
-      !refSubmitOverlay &&
-      displayTab == 'profileComparison'
-    ) {
-      calculateR('profileComparisonRefSig', {
-        profileType: refProfileType,
-        sampleName: refSampleName,
-        signatureSet: refSignatureSet,
-        compare: refCompare,
-      });
-    }
-  }, [displayTab]);
+  // useEffect(() => {
+  //   if (
+  //     refProfileType.length &&
+  //     refSampleName.length &&
+  //     refSignatureSet.length &&
+  //     refCompare.length &&
+  //     !refPlotPath &&
+  //     !refSubmitOverlay &&
+  //     displayTab == 'profileComparison'
+  //   ) {
+  //     calculateR('profileComparisonRefSig', {
+  //       profileType: refProfileType,
+  //       sampleName: refSampleName,
+  //       signatureSet: refSignatureSet,
+  //       compare: refCompare,
+  //     });
+  //   }
+  // }, [displayTab]);
 
   function setOverlay(type, display) {
     if (type == 'within') {
