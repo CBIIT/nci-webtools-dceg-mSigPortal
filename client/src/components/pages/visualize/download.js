@@ -40,7 +40,7 @@ export default function Download() {
       {downloads.length > 0 ? (
         <div>
           {downloads.map((file) => (
-            <div>
+            <div key={file}>
               <Button variant="link" onClick={() => downloadOutput(file)}>
                 <LoadingOverlay active={downloading.indexOf(file) != -1} />
                 Download {file.split('.')[0]}
