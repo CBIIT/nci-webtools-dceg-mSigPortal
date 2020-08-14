@@ -332,7 +332,7 @@ export default function CosineSimilarity({
             <div className="p-2 border rounded">
               <Row>
                 <Col>
-                  <img className="w-100 my-4" src={withinPlotURL}></img>
+                  <img className="w-100 my-4 h-500" src={withinPlotURL}></img>
                 </Col>
               </Row>
             </div>
@@ -444,7 +444,7 @@ export default function CosineSimilarity({
             <div className="p-2 border rounded">
               <Row>
                 <Col>
-                  <img className="w-100 my-4" src={refPlotURL}></img>
+                  <img className="w-100 my-4 h-500" src={refPlotURL}></img>
                 </Col>
               </Row>
             </div>

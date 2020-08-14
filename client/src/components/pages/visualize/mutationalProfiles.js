@@ -305,7 +305,7 @@ export default function MutationalProfiles() {
       <div className="border rounded p-2 mb-2">
         <Row>
           <Col>
-            <img className="w-100 my-4" src={plotURL}></img>
+            <img className="w-100 my-4 h-500" src={plotURL}></img>
           </Col>
         </Row>
       </div>

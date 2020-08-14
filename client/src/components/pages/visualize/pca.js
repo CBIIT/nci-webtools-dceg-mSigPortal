@@ -270,7 +270,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
             <div className="p-2 border rounded">
               <Row>
                 <Col>
-                  <img className="w-100 my-4" src={pca1URL}></img>
+                  <img className="w-100 my-4 h-500" src={pca1URL}></img>
                 </Col>
               </Row>
             </div>
@@ -302,7 +302,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
             <div className="p-2 border rounded">
               <Row>
                 <Col>
-                  <img className="w-100 my-4" src={pca2URL}></img>
+                  <img className="w-100 my-4 h-600" src={pca2URL}></img>
                 </Col>
               </Row>
             </div>
@@ -334,7 +334,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
             <div className="p-2 border rounded">
               <Row>
                 <Col>
-                  <img className="w-100 my-4" src={pca3URL}></img>
+                  <img className="w-100 my-4 h-600" src={pca3URL}></img>
                 </Col>
               </Row>
             </div>
@@ -366,7 +366,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
             <div className="p-2 border rounded">
               <Row>
                 <Col>
-                  <img className="w-100 my-4" src={heatmapURL}></img>
+                  <img className="w-100 my-4 h-600" src={heatmapURL}></img>
                 </Col>
               </Row>
             </div>
