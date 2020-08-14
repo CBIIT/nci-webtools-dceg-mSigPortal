@@ -38,10 +38,13 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
 
   // load r plots after they are recieved
   useEffect(() => {
-    if (withinPlotPath && !withinSubmitOverlay)
-      setRPlot(withinPlotPath, 'within');
-    if (refPlotPath && !refSubmitOverlay) setRPlot(refPlotPath, 'refsig');
-  }, [withinPlotPath, refPlotPath]);
+    if (displayTab == 'profileComparison') {
+      if (withinPlotPath && !withinPlotURL && !withinSubmitOverlay)
+        setRPlot(withinPlotPath, 'within');
+      if (refPlotPath && !refPlotURL && !refSubmitOverlay)
+        setRPlot(refPlotPath, 'refsig');
+    }
+  }, [withinPlotPath, refPlotPath, displayTab]);
 
   // calculate r on load
   // useEffect(() => {

@@ -33,11 +33,13 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
 
   // load r plots after they are recieved
   useEffect(() => {
-    if (pca1) setRPlot(pca1, 'pca1');
-    if (pca2) setRPlot(pca2, 'pca2');
-    if (pca3) setRPlot(pca3, 'pca3');
-    if (heatmap) setRPlot(heatmap, 'heatmap');
-  }, [pca1, pca2, pca3, heatmap]);
+    if (displayTab == 'pca') {
+      if (pca1 && !pca1URL) setRPlot(pca1, 'pca1');
+      if (pca2 && !pca2URL) setRPlot(pca2, 'pca2');
+      if (pca3 && !pca3URL) setRPlot(pca3, 'pca3');
+      if (heatmap && !heatmapURL) setRPlot(heatmap, 'heatmap');
+    }
+  }, [pca1, pca2, pca3, heatmap, displayTab]);
 
   // useEffect(() => {
   //   if (

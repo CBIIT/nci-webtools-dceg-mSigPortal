@@ -42,10 +42,13 @@ export default function CosineSimilarity({
 
   // load r plots after they are recieved
   useEffect(() => {
-    if (withinPlotPath && !withinSubmitOverlay)
-      setRPlot(withinPlotPath, 'within');
-    if (refPlotPath && !refSubmitOverlay) setRPlot(refPlotPath, 'refsig');
-  }, [withinPlotPath, refPlotPath]);
+    if (displayTab == 'cosineSimilarity') {
+      if (withinPlotPath && !withinPlotURL && !withinSubmitOverlay)
+        setRPlot(withinPlotPath, 'within');
+      if (refPlotPath && !refPlotURL && !refSubmitOverlay)
+        setRPlot(refPlotPath, 'refsig');
+    }
+  }, [withinPlotPath, refPlotPath, displayTab]);
 
   // calculate r on load
   // useEffect(() => {
