@@ -15,7 +15,7 @@ export default function CosineSimilarity({
   getRefSigOptions,
 }) {
   const { profileOptions } = useSelector((state) => state.mutationalProfiles);
-  const { summary, displayTab } = useSelector(
+  const { displayTab, matrixList } = useSelector(
     (state) => state.visualizeResults
   );
   const rootURL = window.location.pathname;
@@ -211,9 +211,9 @@ export default function CosineSimilarity({
   function handlewithinProfileType(profileType) {
     const withinMatrixOptions = [
       ...new Set(
-        summary
-          .filter((plot) => plot.Profile_Type == profileType)
-          .map((plot) => plot.Matrix)
+        matrixList
+          .filter((matrix) => matrix.Catalog == profileType)
+          .map((matrix) => matrix.Type)
       ),
     ];
 
@@ -295,7 +295,7 @@ export default function CosineSimilarity({
                 onClick={() =>
                   calculateR('cosineSimilarityWithin', {
                     profileType: withinProfileType,
-                    matrixSize: withinMatrixSize.replace('-', ''),
+                    matrixSize: withinMatrixSize,
                   })
                 }
               >

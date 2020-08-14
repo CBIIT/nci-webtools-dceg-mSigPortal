@@ -21,7 +21,7 @@ const { Header, Body } = Card;
 const { Item, Link } = Nav;
 
 export default function Results({ setOpenSidebar }) {
-  const { error, projectID, displayTab, summary } = useSelector(
+  const { error, projectID, displayTab, summary, matrixList } = useSelector(
     (state) => state.visualizeResults
   );
   const mutationalProfiles = useSelector((state) => state.mutationalProfiles);
@@ -112,6 +112,13 @@ export default function Results({ setOpenSidebar }) {
           .map((plot) => plot.Tag)
       ),
     ];
+    const filteredMatrixList = [
+      ...new Set(
+        matrixList
+          .filter((matrix) => matrix.Catalog == selectProfile)
+          .map((matrix) => matrix.Type)
+      ),
+    ];
 
     const refSignatureSetOptions = await (
       await getRefSigOptions(profileOptions[0])
@@ -134,8 +141,8 @@ export default function Results({ setOpenSidebar }) {
       refProfileType: profileOptions[0],
       refSignatureSet: refSignatureSetOptions[0],
       refSignatureSetOptions: refSignatureSetOptions,
-      withinMatrixSize: filteredMatrixOptions[0],
-      withinMatrixOptions: filteredMatrixOptions,
+      withinMatrixSize: filteredMatrixList[0],
+      withinMatrixOptions: filteredMatrixList,
     });
 
     dispatchProfileComparison({
