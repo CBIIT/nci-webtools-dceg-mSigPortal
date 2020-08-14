@@ -14,16 +14,16 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
     profileType,
     signatureSet,
     signatureSetOptions,
-    eig,
     pca1,
     pca2,
+    pca3,
     heatmap,
-    pca1Data,
     pca2Data,
+    pca3Data,
     heatmapData,
-    eigURL,
     pca1URL,
     pca2URL,
+    pca3URL,
     heatmapURL,
     displayPCA,
     debugR,
@@ -33,19 +33,19 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
 
   // load r plots after they are recieved
   useEffect(() => {
-    if (eig) setRPlot(eig, 'eig');
     if (pca1) setRPlot(pca1, 'pca1');
     if (pca2) setRPlot(pca2, 'pca2');
+    if (pca3) setRPlot(pca3, 'pca3');
     if (heatmap) setRPlot(heatmap, 'heatmap');
-  }, [eig, pca1, pca2, heatmap]);
+  }, [pca1, pca2, pca3, heatmap]);
 
   // useEffect(() => {
   //   if (
   //     profileType.length &&
   //     signatureSet.length &&
-  //     !eig &&
   //     !pca1 &&
   //     !pca2 &&
+  //     !pca3 &&
   //     !heatmap &&
   //     !submitOverlay &&
   //     displayTab == 'pca'
@@ -74,12 +74,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
         const pic = await response.blob();
         const objectURL = URL.createObjectURL(pic);
 
-        if (type == 'eig') {
-          if (eigURL.length) URL.revokeObjectURL(eigURL);
-          dispatchPCA({
-            eigURL: objectURL,
-          });
-        } else if (type == 'pca1') {
+        if (type == 'pca1') {
           if (pca1URL.length) URL.revokeObjectURL(pca1URL);
           dispatchPCA({
             pca1URL: objectURL,
@@ -88,6 +83,11 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
           if (pca2URL.length) URL.revokeObjectURL(pca2URL);
           dispatchPCA({
             pca2URL: objectURL,
+          });
+        } else if (type == 'pca3') {
+          if (pca3URL.length) URL.revokeObjectURL(pca3URL);
+          dispatchPCA({
+            pca3URL: objectURL,
           });
         } else if (type == 'heatmap') {
           if (heatmapURL.length) URL.revokeObjectURL(heatmapURL);
@@ -143,23 +143,23 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
         const { debugR, output } = await response.json();
 
         dispatchPCA({
-          eig: '',
           pca1: '',
           pca2: '',
+          pca3: '',
           heatmap: '',
-          pca1Data: '',
           pca2Data: '',
+          pca3Data: '',
           heatmapData: '',
         });
         dispatchPCA({
           debugR: debugR,
           submitOverlay: false,
-          eig: output.eig,
           pca1: output.pca1,
           pca2: output.pca2,
+          pca3: output.pca3,
           heatmap: output.heatmap,
-          pca1Data: output.pca1Data,
           pca2Data: output.pca2Data,
+          pca3Data: output.pca3Data,
           heatmapData: output.heatmapData,
         });
       }
@@ -176,7 +176,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
         <Label>
           <Button
             variant="link"
-            className="p-0 font-weight-bold"
+            className="p-0 font-wpca1ht-bold"
             onClick={() =>
               dispatchPCA({
                 displayPCA: !displayPCA,
@@ -252,29 +252,6 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
           </Row>
 
           <div
-            id="eigPlot"
-            className="my-4"
-            style={{ display: eigURL.length ? 'block' : 'none' }}
-          >
-            <div className="d-flex">
-              <a
-                className="px-2 py-1"
-                href={eigURL}
-                download={eigURL.split('/').slice(-1)[0]}
-              >
-                Download Plot
-              </a>
-            </div>
-            <div className="p-2 border rounded">
-              <Row>
-                <Col>
-                  <img className="w-100 my-4" src={eigURL}></img>
-                </Col>
-              </Row>
-            </div>
-          </div>
-
-          <div
             id="pca1Plot"
             className="my-4"
             style={{ display: pca1URL.length ? 'block' : 'none' }}
@@ -287,15 +264,6 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
               >
                 Download Plot
               </a>
-              <span className="ml-auto">
-                <Button
-                  className="px-2 py-1"
-                  variant="link"
-                  onClick={() => downloadResults(pca1Data)}
-                >
-                  Download Results
-                </Button>
-              </span>
             </div>
             <div className="p-2 border rounded">
               <Row>
@@ -307,7 +275,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
           </div>
 
           <div
-            id="withinPlotPath"
+            id="pca2Plot"
             className="my-4"
             style={{ display: pca2URL.length ? 'block' : 'none' }}
           >
@@ -333,6 +301,38 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
               <Row>
                 <Col>
                   <img className="w-100 my-4" src={pca2URL}></img>
+                </Col>
+              </Row>
+            </div>
+          </div>
+
+          <div
+            id="withinPlotPath"
+            className="my-4"
+            style={{ display: pca3URL.length ? 'block' : 'none' }}
+          >
+            <div className="d-flex">
+              <a
+                className="px-2 py-1"
+                href={pca3URL}
+                download={pca3URL.split('/').slice(-1)[0]}
+              >
+                Download Plot
+              </a>
+              <span className="ml-auto">
+                <Button
+                  className="px-2 py-1"
+                  variant="link"
+                  onClick={() => downloadResults(pca3Data)}
+                >
+                  Download Results
+                </Button>
+              </span>
+            </div>
+            <div className="p-2 border rounded">
+              <Row>
+                <Col>
+                  <img className="w-100 my-4" src={pca3URL}></img>
                 </Col>
               </Row>
             </div>

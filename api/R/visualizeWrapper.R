@@ -33,11 +33,9 @@ cosineSimilarityWithin <- function(profileType, matrixSize, projectID, pythonOut
     txtPath = paste0(savePath, '/cos_sim_within.txt')
 
     data_input <- read_delim(paste0(pythonOutput, '/', profileType, '/', projectID, '.', matrixSize, '.all'), delim = '\t')
-
     # Heatmap of cosine similarity within samples  and put on the web---------------------------
     cos_sim_res1 = cos_sim_df(data_input, data_input)
-    plot_cosine_heatmap_df(cos_sim_res1, cluster_rows = TRUE, plot_values = FALSE)
-    ggsave(plotPath)
+    plot_cosine_heatmap_df(cos_sim_res1, cluster_rows = TRUE, plot_values = FALSE, output_plot = plotPath)
     cos_sim_res1 %>% write_delim(txtPath, delim = '\t', col_names = T)
 
     output = list('plotPath' = plotPath, 'txtPath' = txtPath)
@@ -74,8 +72,7 @@ cosineSimilarityRefSig <- function(profileType, signatureSetName, projectID, pyt
 
     # Heatmap of cosine similarity to reference set signature and put on the web---------------------------
     cos_sim_res2 = cos_sim_df(data_input, refsig)
-    plot_cosine_heatmap_df(cos_sim_res2, cluster_rows = TRUE, plot_values = FALSE)
-    ggsave(plotPath)
+    plot_cosine_heatmap_df(cos_sim_res2, cluster_rows = TRUE, plot_values = FALSE, output_plot = plotPath)
     cos_sim_res2 %>% write_delim(txtPath, delim = '\t', col_names = T)
 
     output = list('plotPath' = plotPath, 'txtPath' = txtPath)
@@ -105,8 +102,7 @@ profileComparisonWithin <- function(profileType, sampleName1, sampleName2, proje
     data_input <- read_delim(paste0(pythonOutput, '/', profileType, '/', projectID, '.', matrixsize, '.all'), delim = '\t')
     profile1 <- data_input %>% select(MutationType, contains(sampleName1))
     profile2 <- data_input %>% select(MutationType, contains(sampleName2))
-    plot_compare_profiles_diff(profile1, profile2, condensed = FALSE)
-    ggsave(plotPath)
+    plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, output_plot = plotPath)
 
     output = list('plotPath' = plotPath)
   }, error = function(e) {
@@ -149,8 +145,7 @@ profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, c
       profile_names = c(colnames(profile1)[2], colnames(profile2)[2])
     }
 
-    plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, profile_names = profile_names)
-    ggsave(plotPath)
+    plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, profile_names = profile_names, output_plot = plotPath)
 
     output = list('plotPath' = plotPath)
   }, error = function(e) {
@@ -173,12 +168,12 @@ pca <- function(profileType, signatureSetName, projectID, pythonOutput, savePath
 
   tryCatch({
     output = list()
-    eig = paste0(savePath, '/eig.svg')
     pca1 = paste0(savePath, '/pca1.svg')
     pca2 = paste0(savePath, '/pca2.svg')
+    pca3 = paste0(savePath, '/pca3.svg')
     heatmap = paste0(savePath, '/heatmap.svg')
-    pca1Data = paste0(savePath, '/pca1_data.txt')
     pca2Data = paste0(savePath, '/pca2_data.txt')
+    pca3Data = paste0(savePath, '/pca3_data.txt')
     heatmapData = paste0(savePath, '/heatmap_data.txt')
 
 
@@ -198,49 +193,50 @@ pca <- function(profileType, signatureSetName, projectID, pythonOutput, savePath
     rownames(mdata_input) <- data_input$MutationType
 
     res.pca <- prcomp(t(mdata_input), scale = FALSE, center = FALSE)
-    fviz_eig(res.pca, ncp = 10)
-    ggsave(eig)
+
+    xleng <- dim(res.pca$x)[2] * 0.5 + 1
+    yleng <- 4
+    pcap1 <- fviz_eig(res.pca, ncp = 10, main = "")
+    ggsave(filename = pca1, plot = pcap1, width = xleng, height = yleng)
 
     if ((dim(data_input)[2] - 1) > 20) {
-      fviz_pca_ind(res.pca, axes = c(1, 2), geom = "point", col.ind = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE)
-      ggsave(pca1)
+      pcap2 <- fviz_pca_ind(res.pca, axes = c(1, 2), geom = "point", col.ind = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE)
     } else {
-      fviz_pca_ind(res.pca, axes = c(1, 2), col.ind = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE)
-      ggsave(pca1)
+      pcap2 <- fviz_pca_ind(res.pca, axes = c(1, 2), col.ind = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE)
     }
+    ggsave(filename = pca2, plot = pcap2, width = 10, height = 7)
 
     ## a link to download pca data1
-    res.pca$x %>% as.data.frame() %>% rownames_to_column(var = 'Sample') %>% write_delim(pca1Data, delim = '\t', col_names = T)
+    res.pca$x %>% as.data.frame() %>% rownames_to_column(var = 'Sample') %>% write_delim(pca2Data, delim = '\t', col_names = T)
 
-    fviz_pca_var(res.pca, axes = c(1, 2),
+    pcap3 <- fviz_pca_var(res.pca, axes = c(1, 2),
              col.var = "contrib", # Color by contributions to the PC
              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
              repel = FALSE # Avoid text overlapping
     )
-    ggsave(pca2)
+    ggsave(filename = pca3, plot = pcap3, width = 10, height = 7)
 
 
     # a link to download pca data2
-    res.pca$rotation %>% as.data.frame() %>% rownames_to_column(var = 'Sample') %>% write_delim(pca2Data, delim = '\t', col_names = T)
+    res.pca$rotation %>% as.data.frame() %>% rownames_to_column(var = 'Sample') %>% write_delim(pca3Data, delim = '\t', col_names = T)
 
     ## heatmap between PCs and signatures
     sigpca <- res.pca$rotation %>% as.data.frame() %>% rownames_to_column(var = "MutationType")
     cos_sim_res3 = cos_sim_df(sigpca, refsig)
     # put this heatmap on the web
-    plot_cosine_heatmap_df(cos_sim_res3, cluster_rows = TRUE, plot_values = FALSE)
-    ggsave(heatmap)
+    plot_cosine_heatmap_df(cos_sim_res3, cluster_rows = TRUE, plot_values = FALSE, output_plot = heatmap)
 
     # a link to download the cosine similarity bellow the plot 
     # you could rename the file name if you need
     cos_sim_res3 %>% write_delim(heatmapData, delim = '\t', col_names = T)
 
     output = list(
-      'eig' = eig,
       'pca1' = pca1,
       'pca2' = pca2,
+      'pca3' = pca3,
       'heatmap' = heatmap,
-      'pca1Data' = pca1Data,
       'pca2Data' = pca2Data,
+      'pca3Data' = pca3Data,
       'heatmapData' = heatmapData
      )
   }, error = function(e) {
