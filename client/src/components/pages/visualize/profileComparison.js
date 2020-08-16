@@ -9,14 +9,14 @@ import {
 } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import {
   dispatchError,
   dispatchProfileComparison,
 } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
-const { Group, Label, Control } = Form;
+const { Group, Label, Control, Text } = Form;
 const { Title, Content } = Popover;
 
 export default function ProfileComparison({ submitR, getRefSigOptions }) {
@@ -299,7 +299,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
               })
             }
           >
-            Profile Comparison Within Samples
+            Comparison Within Samples
           </Button>
         </Label>
         <div
@@ -438,7 +438,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
           style={{ display: displayRefSig ? 'block' : 'none' }}
         >
           <Row className="justify-content-center">
-            <Col sm="2">
+            <Col sm="1">
               <Group controlId="profileTypeRefSig">
                 <Label>Profile Type</Label>
                 <Control
@@ -506,7 +506,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 </Control>
               </Group>
             </Col>
-            <Col sm="2">
+            <Col sm="3">
               <Group controlId="signatureSet">
                 <Label>
                   Compare Signatures{' '}
@@ -517,7 +517,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   >
                     <Button variant="link" className="p-0 font-weight-bold">
                       <FontAwesomeIcon
-                        icon={faQuestionCircle}
+                        icon={faInfoCircle}
                         style={{ verticalAlign: 'baseline' }}
                       />
                     </Button>
@@ -531,6 +531,9 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                     });
                   }}
                 ></Control>
+                <Text className="text-muted">
+                  Delimit signatures with semicolons (0.8*SBS5;0.1*SBS1)
+                </Text>
               </Group>
             </Col>
             <Col sm="2" className="m-auto">
