@@ -25,7 +25,7 @@ export const getInitialState = () => ({
   },
   visualizeResults: {
     error: '',
-    // projectID: 'd2b4a45c-3e79-4bef-86d8-71bbce3f0a17',
+    // projectID: 'b7ee6020-d4fc-4751-ba2e-5a9047977767',
     projectID: '',
     displayTab: 'mutationalProfiles',
     downloads: [],
@@ -75,7 +75,8 @@ export const getInitialState = () => ({
     refSampleName: '',
     refSignatureSet: '',
     refSignatureSetOptions: [],
-    refCompare: 'SBS5',
+    refSignatures: [],
+    refCompare: '',
     withinPlotPath: '',
     refPlotPath: '',
     withinPlotURL: '',

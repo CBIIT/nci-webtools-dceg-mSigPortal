@@ -1,6 +1,15 @@
 import React, { useEffect } from 'react';
-import { Form, Row, Col, Button } from 'react-bootstrap';
+import {
+  Form,
+  Row,
+  Col,
+  Button,
+  Popover,
+  OverlayTrigger,
+} from 'react-bootstrap';
 import { useSelector } from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import {
   dispatchError,
   dispatchProfileComparison,
@@ -8,6 +17,7 @@ import {
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const { Group, Label, Control } = Form;
+const { Title, Content } = Popover;
 
 export default function ProfileComparison({ submitR, getRefSigOptions }) {
   const { displayTab } = useSelector((state) => state.visualizeResults);
@@ -23,6 +33,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     refSampleName,
     refSignatureSet,
     refSignatureSetOptions,
+    refSignatures,
     refCompare,
     withinPlotPath,
     refPlotPath,
@@ -45,6 +56,13 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         setRPlot(refPlotPath, 'refsig');
     }
   }, [withinPlotPath, refPlotPath, displayTab]);
+
+  // get inital signatures from initially selected signature set
+  useEffect(() => {
+    if (refProfileType && refSignatureSet && !refSignatures.length) {
+      getSignatures(refProfileType, refSignatureSet);
+    }
+  }, [refProfileType, refSignatureSet]);
 
   // calculate r on load
   // useEffect(() => {
@@ -144,6 +162,43 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
             refSignatureSet: signatureSetOptions[0],
             refSubmitOverlay: false,
           });
+          getSignatures(profileType, signatureSetOptions[0]);
+        } else {
+          dispatchError(await response.json());
+          dispatchProfileComparison({ refSubmitOverlay: false });
+        }
+      } catch (err) {
+        dispatchError(err);
+        dispatchProfileComparison({ refSubmitOverlay: false });
+      }
+    }
+  }
+
+  // get signature options for compare
+  async function getSignatures(profileType, signatureSetName) {
+    if (signatureSetName && signatureSetName.length) {
+      dispatchProfileComparison({ refSubmitOverlay: true });
+      try {
+        const response = await fetch(`${rootURL}api/visualizeR/getSignatures`, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            profileType: profileType,
+            signatureSetName: signatureSetName,
+          }),
+        });
+
+        if (response.ok) {
+          const signatures = await response.json();
+
+          dispatchProfileComparison({
+            refSignatures: signatures,
+            refCompare: signatures[0],
+            refSubmitOverlay: false,
+          });
         } else {
           dispatchError(await response.json());
           dispatchProfileComparison({ refSubmitOverlay: false });
@@ -212,6 +267,23 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       }
     }
   }
+
+  const popover = (
+    <Popover id="popover-basic">
+      <Title as="h3">{refSignatureSet}</Title>
+      <Content>
+        {refSignatures.length > 0 ? (
+          <ul>
+            {refSignatures.map((signature) => (
+              <li key={signature}>{signature}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>No Signature Available</p>
+        )}
+      </Content>
+    </Popover>
+  );
 
   return (
     <div>
@@ -419,6 +491,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                     dispatchProfileComparison({
                       refSignatureSet: e.target.value,
                     });
+                    getSignatures(refProfileType, e.target.value);
                   }}
                   custom
                 >
@@ -435,7 +508,21 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
             </Col>
             <Col sm="2">
               <Group controlId="signatureSet">
-                <Label>Compare</Label>
+                <Label>
+                  Compare Signatures{' '}
+                  <OverlayTrigger
+                    trigger="click"
+                    placement="left"
+                    overlay={popover}
+                  >
+                    <Button variant="link" className="p-0 font-weight-bold">
+                      <FontAwesomeIcon
+                        icon={faQuestionCircle}
+                        style={{ verticalAlign: 'baseline' }}
+                      />
+                    </Button>
+                  </OverlayTrigger>
+                </Label>
                 <Control
                   value={refCompare}
                   onChange={(e) => {

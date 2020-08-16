@@ -202,6 +202,25 @@ app.post('/api/visualizeR/getReferenceSignatureSets', (req, res) => {
   }
 });
 
+app.post('/api/visualizeR/getSignatures', (req, res) => {
+  logger.info('/api/visualizeR/getSignatures: Calling R Wrapper');
+
+  try {
+    const list = r('api/R/visualizeWrapper.R', 'getSignatures', [
+      req.body.profileType,
+      req.body.signatureSetName,
+    ]);
+
+    console.log('signatures', list);
+
+    res.json(list);
+  } catch (err) {
+    logger.info('/api/visualizeR/getSignatures: An error occured');
+    logger.error(err);
+    res.status(500).json(err.message);
+  }
+});
+
 app.post('/visualize/upload', (req, res, next) => {
   const projectID = uuidv4();
   const form = formidable({

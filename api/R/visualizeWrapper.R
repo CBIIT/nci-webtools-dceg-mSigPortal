@@ -15,7 +15,21 @@ load('api/R/signature_refsets.RData')
 # get all Reference Signature Set options using profileName (matrix)
 getReferenceSignatureSets <- function(profileType) {
   profileName <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
-  return(signature_refsets %>% filter(Profile == profileName) %>% pull(Signature_set_name) %>% unique())
+  signatureSets <- signature_refsets %>% filter(Profile == profileName) %>% pull(Signature_set_name) %>% unique()
+
+  return(signatureSets)
+}
+
+# get list of signatures in the selected signature set
+getSignatures <- function(profileType, signatureSetName) {
+  profileName <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
+  signature_refsets_input <- signature_refsets %>% filter(Profile == profileName, Signature_set_name == signatureSetName)
+  refsig <- signature_refsets_input %>%
+      select(Signature_name, MutationType, Contribution) %>%
+      pivot_wider(names_from = Signature_name, values_from = Contribution)
+  signatures <- colnames(refsig[1, -1])
+
+  return(signatures)
 }
 
 ### Cosine Similarity tab ###
