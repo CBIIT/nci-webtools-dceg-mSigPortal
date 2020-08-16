@@ -178,7 +178,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
         <Label>
           <Button
             variant="link"
-            className="p-0 font-wpca1ht-bold"
+            className="p-0 font-weight-bold"
             onClick={() =>
               dispatchPCA({
                 displayPCA: !displayPCA,
