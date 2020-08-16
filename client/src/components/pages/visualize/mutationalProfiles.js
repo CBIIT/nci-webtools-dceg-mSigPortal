@@ -11,7 +11,9 @@ const { Group, Label, Control } = Form;
 
 export default function MutationalProfiles() {
   const [downloadOverlay, setOverlay] = useState(false);
-  const { summary } = useSelector((state) => state.visualizeResults);
+  const { summary, displayTab } = useSelector(
+    (state) => state.visualizeResults
+  );
   const rootURL = window.location.pathname;
   const {
     filtered,
@@ -30,17 +32,10 @@ export default function MutationalProfiles() {
 
   // set inital plot
   useEffect(() => {
-    if (!plotURL.length) {
+    if (!plotURL && displayTab == 'mutationalProfiles') {
       setPyPlot();
     }
   }, [filtered]);
-
-  // change plot
-  useEffect(() => {
-    if (filtered.length && plotURL.length) {
-      setPyPlot();
-    }
-  }, [selectName, selectProfile, selectMatrix, selectTag]);
 
   function getPlotName() {
     if (filtered.length) {
@@ -144,6 +139,7 @@ export default function MutationalProfiles() {
       tagOptions: tagOptions,
       filtered: filteredPlots,
     });
+    setPyPlot();
   }
 
   function filterProfileType(profile) {
@@ -169,6 +165,7 @@ export default function MutationalProfiles() {
       tagOptions: tagOptions,
       filtered: filteredPlots,
     });
+    setPyPlot();
   }
 
   function filterMatrix(matrix) {
@@ -186,6 +183,7 @@ export default function MutationalProfiles() {
       tagOptions: tagOptions,
       filtered: filteredPlots,
     });
+    setPyPlot();
   }
 
   function filterTag(tag) {
@@ -201,6 +199,7 @@ export default function MutationalProfiles() {
       selectTag: tag,
       filtered: filteredPlots,
     });
+    setPyPlot();
   }
 
   return (
