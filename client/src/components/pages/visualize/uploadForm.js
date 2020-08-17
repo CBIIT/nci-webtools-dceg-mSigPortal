@@ -83,8 +83,8 @@ export default function UploadForm() {
         args['mutationSplit'] = ['-s', mutationSplit];
         if (mutationFilter.length)
           args['mutationFilter'] = ['-F', mutationFilter];
+        if (bedFile.size) args['bedFile'] = ['-b', bedPath];
       }
-      if (bedFile.size) args['bedFile'] = ['-b', bedPath];
 
       if (queueMode) {
         // wip
@@ -278,6 +278,9 @@ export default function UploadForm() {
         </Control>
       </Group>
       <Group controlId="fileUpload">
+        <Label>
+          Upload Samples <span style={{ color: 'red' }}>*</span>
+        </Label>
         <Row className="m-0">
           <Col sm="6" className="p-0">
             <Button
@@ -324,8 +327,8 @@ export default function UploadForm() {
               </button>
             ) : (
               <>
-                <p>Drop files here or click to upload.</p>
-                <FontAwesomeIcon icon={faCloudUploadAlt} size="4x" />
+                <span>Drop files here or click to upload</span>
+                {/* <FontAwesomeIcon icon={faCloudUploadAlt} size="4x" /> */}
               </>
             )}
           </div>
@@ -432,7 +435,12 @@ export default function UploadForm() {
         </Check>
       </Group>
       <Group controlId="filter">
-        <Label>Mutation Filter</Label>
+        <Label>
+          Mutation Filter{' '}
+          <span className="text-muted font-italic font-weight-normal">
+            (optional)
+          </span>
+        </Label>
         <Control
           type="text"
           size="sm"
@@ -448,12 +456,21 @@ export default function UploadForm() {
         ></Control>
         <Text className="text-muted">Use @ to separate multiple filters</Text>
       </Group>
-      <Group controlId="fileUpload">
+      <Group controlId="bedUpload">
+        <Label>
+          Upload Mutations{' '}
+          <span className="text-muted font-italic font-weight-normal">
+            (optional)
+          </span>
+        </Label>
         <Row className="m-0">
           <Col sm="6" className="p-0">
             <Button
               className="p-0"
-              disabled={disableParameters}
+              disabled={
+                disableParameters ||
+                ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
+              }
               variant="link"
               href={bedData}
               download
@@ -464,7 +481,10 @@ export default function UploadForm() {
           <Col sm="6" className="p-0 d-flex">
             <Button
               className="p-0 ml-auto"
-              disabled={disableParameters}
+              disabled={
+                disableParameters ||
+                ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
+              }
               variant="link"
               type="button"
               onClick={() => loadBed()}
@@ -477,7 +497,11 @@ export default function UploadForm() {
           <div {...bedRootProps({ className: 'dropzone' })}>
             <input
               {...bedInputProps()}
-              disabled={bedFile.size || disableParameters}
+              disabled={
+                bedFile.size ||
+                disableParameters ||
+                ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
+              }
             />
             {bedFile.size || submitted ? (
               bedFilename.length > 0 && (
@@ -497,8 +521,8 @@ export default function UploadForm() {
               )
             ) : (
               <>
-                <p>Upload Bed File.</p>
-                <FontAwesomeIcon icon={faCloudUploadAlt} size="4x" />
+                <span>Drop files here or click to upload</span>
+                {/* <FontAwesomeIcon icon={faCloudUploadAlt} size="4x" /> */}
               </>
             )}
           </div>
