@@ -228,10 +228,12 @@ export default function UploadForm() {
 
   function removeFile() {
     setInput(new File([], ''));
+    dispatchVisualize({ storeFilename: '' });
   }
 
   function removeBedFile() {
     setBed(new File([], ''));
+    dispatchVisualize({ bedFilename: '' });
   }
 
   function selectFormat(format) {
