@@ -438,7 +438,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
           style={{ display: displayRefSig ? 'block' : 'none' }}
         >
           <Row className="justify-content-center">
-            <Col sm="1">
+            <Col sm="2">
               <Group controlId="profileTypeRefSig">
                 <Label>Profile Type</Label>
                 <Control
@@ -506,14 +506,15 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 </Control>
               </Group>
             </Col>
-            <Col sm="3">
+            <Col sm="2">
               <Group controlId="signatureSet">
                 <Label>
                   Compare Signatures{' '}
                   <OverlayTrigger
                     trigger="click"
-                    placement="left"
+                    placement="top"
                     overlay={popover}
+                    rootClose
                   >
                     <Button variant="link" className="p-0 font-weight-bold">
                       <FontAwesomeIcon
@@ -531,9 +532,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                     });
                   }}
                 ></Control>
-                <Text className="text-muted">
-                  Delimit signatures with semicolons (0.8*SBS5;0.1*SBS1)
-                </Text>
+                <Text className="text-muted">(Ex. 0.8*SBS5;0.1*SBS1)</Text>
               </Group>
             </Col>
             <Col sm="2" className="m-auto">

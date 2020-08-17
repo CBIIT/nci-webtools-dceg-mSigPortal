@@ -36,10 +36,16 @@
 }
 
 .popover {
-  min-width: 700px;
+  min-width: 500px;
+}
+
+.popover-body {
+  overflow-y: auto;
+  max-height: 350px;
+  white-space: pre-wrap;
 }
 
 ul {
-  columns: 6;
+  columns: 3;
   column-width: auto;
 }
