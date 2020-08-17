@@ -96,7 +96,7 @@ async function getSummary(resultsPath) {
 }
 
 app.post('/api/visualize', (req, res) => {
-  req.setTimeout(600000);
+  req.setTimeout(900000);
   logger.info('/api/visualize: Spawning Python Process');
   let reqBody = { ...req.body };
   // update paths
