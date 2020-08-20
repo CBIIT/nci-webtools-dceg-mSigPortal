@@ -271,7 +271,7 @@ export default function MutationalProfiles() {
                 </Control>
               </Col>
               <Col sm="3">
-                <Label>Tag</Label>
+                <Label>Filter</Label>
                 <Control
                   as="select"
                   value={selectTag}
