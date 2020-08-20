@@ -95,7 +95,7 @@ async function getSummary(resultsPath) {
 
 app.post('/api/visualize', (req, res) => {
   req.setTimeout(15 * 60 * 1000);
-  res.setTimeout(15 * 60 * 100, () => {
+  res.setTimeout(15 * 60 * 1000, () => {
     res.status(504).send('request timed out');
   });
 
