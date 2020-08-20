@@ -36,6 +36,12 @@ export default function MutationalProfiles() {
       setPyPlot();
     }
   }, [filtered]);
+  // set new plots on dropdown change
+  useEffect(() => {
+    if (plotURL && displayTab == 'mutationalProfiles') {
+      setPyPlot();
+    }
+  }, [selectName, selectProfile, selectMatrix, selectTag]);
 
   function getPlotName() {
     if (filtered.length) {
@@ -139,7 +145,6 @@ export default function MutationalProfiles() {
       tagOptions: tagOptions,
       filtered: filteredPlots,
     });
-    setPyPlot();
   }
 
   function filterProfileType(profile) {
@@ -165,7 +170,6 @@ export default function MutationalProfiles() {
       tagOptions: tagOptions,
       filtered: filteredPlots,
     });
-    setPyPlot();
   }
 
   function filterMatrix(matrix) {
@@ -183,7 +187,6 @@ export default function MutationalProfiles() {
       tagOptions: tagOptions,
       filtered: filteredPlots,
     });
-    setPyPlot();
   }
 
   function filterTag(tag) {
@@ -199,7 +202,6 @@ export default function MutationalProfiles() {
       selectTag: tag,
       filtered: filteredPlots,
     });
-    setPyPlot();
   }
 
   return (
