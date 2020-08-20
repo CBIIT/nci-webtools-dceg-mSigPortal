@@ -146,11 +146,13 @@ export default function UploadForm() {
             dispatchMutationalProfiles({
               debug: { stdout: results.stdout, stderr: results.stderr },
             });
-          } else if (response.status == 502) {
+          } else if (response.status == 504) {
             dispatchVisualizeResults({
               error: 'Please Reset Your Parameters and Try again.',
             });
-            dispatchError('Your submission has timed out. Please Try Again.');
+            dispatchError(
+              'Your submission has timed out. Please try again by submitting this job to a queue instead.'
+            );
           } else {
             dispatchVisualizeResults({
               error: 'Please Reset Your Parameters and Try again.',

@@ -8,20 +8,18 @@ const fs = require('fs');
 const rimraf = require('rimraf');
 const { v4: uuidv4 } = require('uuid');
 const Papa = require('papaparse');
-const tar = require('tar');
 const r = require('r-wrapper');
 const AWS = require('aws-sdk');
-
 const app = express();
 
 app.use(express.static(path.resolve('www')));
 app.use(express.json());
 
 app.use((err, req, res, next) => {
-  logger.info('Caught Error:\n' + err.message);
+  logger.info('Unhandled Error:\n' + err.message);
   logger.error(err);
   if (!err.statusCode) err.statusCode = 500;
-  res.status(err.statusCode).json(err.message);
+  res.status(err.statusCode).send(err.message);
 });
 
 app.get('/ping', (req, res) => res.send(true));
@@ -96,7 +94,11 @@ async function getSummary(resultsPath) {
 }
 
 app.post('/api/visualize', (req, res) => {
-  req.setTimeout(900000);
+  req.setTimeout(15 * 60 * 1000);
+  res.setTimeout(15 * 60 * 100, () => {
+    res.status(504).send('request timed out');
+  });
+
   logger.info('/api/visualize: Spawning Python Process');
   let reqBody = { ...req.body };
   // update paths
