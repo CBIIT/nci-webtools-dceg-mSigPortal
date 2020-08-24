@@ -41,14 +41,14 @@ export default function CosineSimilarity({
   } = useSelector((state) => state.cosineSimilarity);
 
   // load r plots after they are recieved
-  useEffect(() => {
-    if (displayTab == 'cosineSimilarity') {
-      if (withinPlotPath && !withinPlotURL && !withinSubmitOverlay)
-        setRPlot(withinPlotPath, 'within');
-      if (refPlotPath && !refPlotURL && !refSubmitOverlay)
-        setRPlot(refPlotPath, 'refsig');
-    }
-  }, [withinPlotPath, refPlotPath, displayTab]);
+  // useEffect(() => {
+  //   if (displayTab == 'cosineSimilarity') {
+  //     if (withinPlotPath  && !withinSubmitOverlay)
+  //       setRPlot(withinPlotPath, 'within');
+  //     if (refPlotPath && !refPlotURL && !refSubmitOverlay)
+  //       setRPlot(refPlotPath, 'refsig');
+  //   }
+  // }, [withinPlotPath, refPlotPath]);
 
   // calculate r on load
   // useEffect(() => {
@@ -184,21 +184,21 @@ export default function CosineSimilarity({
         const { debugR, output } = await response.json();
 
         if (fn == 'cosineSimilarityWithin') {
-          dispatchCosineSimilarity({ withinPlotPath: '', withinTxtPath: '' });
           dispatchCosineSimilarity({
             debugR: debugR,
             withinSubmitOverlay: false,
             withinPlotPath: output.plotPath,
             withinTxtPath: output.txtPath,
           });
+          setRPlot(output.plotPath, 'within');
         } else {
-          dispatchCosineSimilarity({ refPlotPath: '', refTxtPath: '' });
           dispatchCosineSimilarity({
             debugR: debugR,
             refSubmitOverlay: false,
             refPlotPath: output.plotPath,
             refTxtPath: output.txtPath,
           });
+          setRPlot(output.plotPath, 'refsig');
         }
       }
     } catch (err) {

@@ -48,14 +48,14 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
   } = useSelector((state) => state.profileComparison);
 
   // load r plots after they are recieved
-  useEffect(() => {
-    if (displayTab == 'profileComparison') {
-      if (withinPlotPath && !withinPlotURL && !withinSubmitOverlay)
-        setRPlot(withinPlotPath, 'within');
-      if (refPlotPath && !refPlotURL && !refSubmitOverlay)
-        setRPlot(refPlotPath, 'refsig');
-    }
-  }, [withinPlotPath, refPlotPath, displayTab]);
+  // useEffect(() => {
+  //   if (displayTab == 'profileComparison') {
+  //     if (withinPlotPath && !withinPlotURL && !withinSubmitOverlay)
+  //       setRPlot(withinPlotPath, 'within');
+  //     if (refPlotPath && !refPlotURL && !refSubmitOverlay)
+  //       setRPlot(refPlotPath, 'refsig');
+  //   }
+  // }, [withinPlotPath, refPlotPath, displayTab]);
 
   // get inital signatures from initially selected signature set
   useEffect(() => {
@@ -241,20 +241,20 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         const { debugR, output } = await response.json();
 
         if (fn == 'profileComparisonWithin') {
-          dispatchProfileComparison({ withinPlotPath: '' });
           dispatchProfileComparison({
             debugR: debugR,
             withinSubmitOverlay: false,
             withinPlotPath: output.plotPath,
           });
+          setRPlot(output.plotPath, 'within');
         } else {
           {
-            dispatchProfileComparison({ refPlotPath: '' });
             dispatchProfileComparison({
               debugR: debugR,
               refSubmitOverlay: false,
               refPlotPath: output.plotPath,
             });
+            setRPlot(output.plotPath, 'refsig');
           }
         }
       }

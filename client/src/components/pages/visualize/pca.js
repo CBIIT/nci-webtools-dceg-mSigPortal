@@ -32,14 +32,14 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
   } = useSelector((state) => state.pca);
 
   // load r plots after they are recieved
-  useEffect(() => {
-    if (displayTab == 'pca') {
-      if (pca1 && !pca1URL) setRPlot(pca1, 'pca1');
-      if (pca2 && !pca2URL) setRPlot(pca2, 'pca2');
-      if (pca3 && !pca3URL) setRPlot(pca3, 'pca3');
-      if (heatmap && !heatmapURL) setRPlot(heatmap, 'heatmap');
-    }
-  }, [pca1, pca2, pca3, heatmap, displayTab]);
+  // useEffect(() => {
+  //   if (displayTab == 'pca') {
+  //     if (pca1 && !pca1URL) setRPlot(pca1, 'pca1');
+  //     if (pca2 && !pca2URL) setRPlot(pca2, 'pca2');
+  //     if (pca3 && !pca3URL) setRPlot(pca3, 'pca3');
+  //     if (heatmap && !heatmapURL) setRPlot(heatmap, 'heatmap');
+  //   }
+  // }, [pca1, pca2, pca3, heatmap, displayTab]);
 
   // useEffect(() => {
   //   if (
@@ -145,15 +145,6 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
         const { debugR, output } = await response.json();
 
         dispatchPCA({
-          pca1: '',
-          pca2: '',
-          pca3: '',
-          heatmap: '',
-          pca2Data: '',
-          pca3Data: '',
-          heatmapData: '',
-        });
-        dispatchPCA({
           debugR: debugR,
           submitOverlay: false,
           pca1: output.pca1,
@@ -164,6 +155,10 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
           pca3Data: output.pca3Data,
           heatmapData: output.heatmapData,
         });
+        setRPlot(output.pca1, 'pca1');
+        setRPlot(output.pca2, 'pca2');
+        setRPlot(output.pca3, 'pca3');
+        setRPlot(output.heatmap, 'heatmap');
       }
     } catch (err) {
       dispatchError(err);
