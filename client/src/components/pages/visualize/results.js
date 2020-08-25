@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Nav } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
@@ -27,14 +27,17 @@ export default function Results({ setOpenSidebar }) {
   const mutationalProfiles = useSelector((state) => state.mutationalProfiles);
   const { signatureSetOptions } = useSelector((state) => state.pca);
   const rootURL = window.location.pathname;
-
+  const [retrieveSummary, setAttempt] = useState(false);
   // get mapping of plots after retrieving projectID
   useEffect(() => {
     if (summary.length) {
       // only set summary if signature set was not set
       if (!signatureSetOptions.length) mapSummary();
     } else {
-      if (projectID.length) getSummary();
+      if (projectID.length && !retrieveSummary) {
+        setAttempt(true);
+        getSummary();
+      }
     }
   }, [summary]);
 

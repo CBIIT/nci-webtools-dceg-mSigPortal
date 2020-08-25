@@ -2,6 +2,7 @@ import { createSlice, configureStore, combineReducers } from '@reduxjs/toolkit';
 
 export const getInitialState = () => ({
   visualize: {
+    source: 'user',
     inputFormat: 'vcf',
     selectedGenome: 'GRCh37',
     experimentalStrategy: 'WGS',
@@ -25,8 +26,8 @@ export const getInitialState = () => ({
   },
   visualizeResults: {
     error: '',
-    // projectID: 'b7ee6020-d4fc-4751-ba2e-5a9047977767',
     projectID: '',
+    // projectID: 'a4af4a40-8004-4c6a-a27b-2e1641b5f3dd',
     displayTab: 'mutationalProfiles',
     downloads: [],
     summary: [],

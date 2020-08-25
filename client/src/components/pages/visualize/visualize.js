@@ -1,4 +1,5 @@
 import React from 'react';
+import { Form, Row, Col } from 'react-bootstrap';
 import {
   SidebarContainer,
   SidebarPanel,
@@ -11,15 +12,19 @@ import { store, updateVisualize } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import './visualize.scss';
 
+const { Group, Label, Check } = Form;
+
 export default function Visualize() {
-  const { openSidebar, loading } = useSelector((state) => state.visualize);
+  const { openSidebar, loading, source } = useSelector(
+    (state) => state.visualize
+  );
 
   function setOpenSidebar(bool) {
     store.dispatch(updateVisualize({ openSidebar: bool }));
   }
 
   return (
-    <div className="position-relative mx-4">
+    <div className="position-relative">
       <SidebarContainer
         className="m-3"
         collapsed={!openSidebar}
@@ -27,16 +32,46 @@ export default function Visualize() {
       >
         <SidebarPanel>
           <div className="p-3 shadow-sm bg-white">
-            <div className="row">
-              <div className="col-sm-auto">
-                <h3 className="mb-2">Parameters</h3>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-sm-auto w-100">
+            <Row>
+              <Col sm="auto">
+                <Group className="d-flex">
+                  <Label className="mr-auto">
+                    <h3 className="mb-2">Data Source</h3>
+                  </Label>
+                  <Check inline id="radioWGS" className="ml-4">
+                    <Check.Input
+                      type="radio"
+                      value="WGS"
+                      checked={source == 'user'}
+                      onChange={(e) =>
+                        store.dispatch(updateVisualize({ source: 'user' }))
+                      }
+                    />
+                    <Check.Label className="font-weight-normal">
+                      User
+                    </Check.Label>
+                  </Check>
+                  <Check inline id="radioWES">
+                    <Check.Input
+                      type="radio"
+                      value="WES"
+                      checked={source == 'public'}
+                      onChange={(e) =>
+                        store.dispatch(updateVisualize({ source: 'public' }))
+                      }
+                    />
+                    <Check.Label className="font-weight-normal">
+                      Public
+                    </Check.Label>
+                  </Check>
+                </Group>
+              </Col>
+            </Row>
+            <Row style={{ display: source == 'user' ? 'block' : 'none' }}>
+              <Col sm="auto" className="w-100">
                 <UploadForm />
-              </div>
-            </div>
+              </Col>
+            </Row>
           </div>
           <hr className="d-lg-none" style={{ opacity: 0 }}></hr>
         </SidebarPanel>

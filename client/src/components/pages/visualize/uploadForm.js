@@ -1,8 +1,19 @@
 import React, { useState, useCallback } from 'react';
-import { Form, Button, Row, Col } from 'react-bootstrap';
+import {
+  Form,
+  Button,
+  Row,
+  Col,
+  Popover,
+  OverlayTrigger,
+} from 'react-bootstrap';
 import { useDropzone } from 'react-dropzone';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCloudUploadAlt, faMinus } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCloudUploadAlt,
+  faMinus,
+  faInfoCircle,
+} from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useSelector } from 'react-redux';
 import './visualize.scss';
@@ -17,6 +28,7 @@ import {
   dispatchPCA,
 } from '../../../services/store';
 const { Group, Label, Control, Check, Text } = Form;
+const { Title, Content } = Popover;
 
 export default function UploadForm() {
   const {
@@ -75,15 +87,20 @@ export default function UploadForm() {
         projectID: ['-p', projectID],
         genomeAssemblyVersion: ['-g', selectedGenome],
         experimentalStrategy: ['-t', experimentalStrategy],
-        collapseSample: ['-c', collapseSample],
+
         outputDir: ['-o', projectID],
       };
       // conditionally include mutation split and mutation filter params
       if (['vcf', 'csv', 'tsv'].includes(inputFormat)) {
-        args['mutationSplit'] = ['-s', mutationSplit];
-        if (mutationFilter.length)
-          args['mutationFilter'] = ['-F', mutationFilter];
+        args['collapseSample'] = ['-c', collapseSample];
+
         if (bedFile.size) args['bedFile'] = ['-b', bedPath];
+
+        if (mutationFilter.length) {
+          args['mutationFilter'] = ['-F', mutationFilter];
+        } else {
+          args['mutationSplit'] = ['-s', mutationSplit];
+        }
       }
 
       if (queueMode) {
@@ -263,10 +280,35 @@ export default function UploadForm() {
     dispatchVisualize({ bedFilename: filename });
   }
 
+  const msPopover = (
+    <Popover id="popover-basic">
+      <Title as="h3">Mutation Split</Title>
+      <Content>
+        <p>
+          For each sample, split mutations in to different groups according the
+          “Filter” column in VCF/CSV/TSV file. Splitting operation use the “;”
+          as separator.
+        </p>
+      </Content>
+    </Popover>
+  );
+
+  const csPopover = (
+    <Popover id="popover-basic">
+      <Title as="h3">Mutation Split</Title>
+      <Content>
+        <p>
+          A new sample called “All_Sample” will add to the result, which
+          combines the mutations from all samples.
+        </p>
+      </Content>
+    </Popover>
+  );
+
   return (
     <Form className="">
       <Group controlId="fileType">
-        <Label>Choose File Type</Label>
+        <Label>Choose File Format</Label>
         <Control
           as="select"
           value={inputFormat}
@@ -283,29 +325,29 @@ export default function UploadForm() {
       </Group>
       <Group controlId="fileUpload">
         <Label>
-          Upload Samples <span style={{ color: 'red' }}>*</span>
+          Upload File <span style={{ color: 'red' }}>*</span>
         </Label>
         <Row className="m-0">
           <Col sm="6" className="p-0">
             <Button
-              className="p-0"
+              className="p-0 font-14"
               disabled={disableParameters}
               variant="link"
               href={exampleData}
               download
             >
-              Download Sample
+              Download Example Data
             </Button>
           </Col>
           <Col sm="6" className="p-0 d-flex">
             <Button
-              className="p-0 ml-auto"
+              className="p-0 ml-auto font-14"
               disabled={disableParameters}
               variant="link"
               type="button"
               onClick={() => loadExample()}
             >
-              Load Sample
+              Load Example Data
             </Button>
           </Col>
         </Row>
@@ -339,14 +381,17 @@ export default function UploadForm() {
         </section>
       </Group>
       <Group controlId="genomeAssembly">
-        <Label>Genome Assembly Version</Label>
+        <Label>Choose Reference Genome Build</Label>
         <Control
           as="select"
           value={selectedGenome}
           onChange={(e) =>
             dispatchVisualize({ selectedGenome: e.target.value })
           }
-          disabled={disableParameters}
+          disabled={
+            disableParameters ||
+            ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
+          }
           custom
         >
           <option value="GRCh37">GRCh37</option>
@@ -355,7 +400,7 @@ export default function UploadForm() {
         </Control>
       </Group>
       <Group className="d-flex">
-        <Label className="mr-auto">Experiment Strategy</Label>
+        <Label className="mr-auto">Experimental Strategy</Label>
         <Check inline id="radioWGS">
           <Check.Input
             type="radio"
@@ -364,7 +409,10 @@ export default function UploadForm() {
             onChange={(e) =>
               dispatchVisualize({ experimentalStrategy: e.target.value })
             }
-            disabled={disableParameters}
+            disabled={
+              disableParameters ||
+              ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
+            }
           />
           <Check.Label className="font-weight-normal">WGS</Check.Label>
         </Check>
@@ -376,71 +424,52 @@ export default function UploadForm() {
             onChange={(e) =>
               dispatchVisualize({ experimentalStrategy: e.target.value })
             }
-            disabled={disableParameters}
+            disabled={
+              disableParameters ||
+              ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
+            }
           />
           <Check.Label className="font-weight-normal">WES</Check.Label>
         </Check>
       </Group>
       <Group className="d-flex">
-        <Label className="mr-auto">Mutation Split</Label>
+        <Label className="mr-auto">
+          Split Mutations According to Filter{' '}
+          <OverlayTrigger
+            trigger="click"
+            placement="top"
+            overlay={msPopover}
+            rootClose
+          >
+            <Button variant="link" className="p-0 font-weight-bold">
+              <FontAwesomeIcon
+                icon={faInfoCircle}
+                style={{ verticalAlign: 'baseline' }}
+              />
+            </Button>
+          </OverlayTrigger>
+        </Label>
         <Check inline id="radioMutationSplitFalse">
           <Check.Input
-            disabled={!['vcf', 'csv', 'tsv'].includes(inputFormat)}
-            type="radio"
-            value="False"
-            checked={mutationSplit == 'False'}
-            onChange={(e) =>
-              dispatchVisualize({ mutationSplit: e.target.value })
+            disabled={
+              disableParameters ||
+              mutationFilter.length ||
+              ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
             }
-            disabled={disableParameters}
-          />
-          <Check.Label className="font-weight-normal">False</Check.Label>
-        </Check>
-        <Check inline id="radioMutationSplitTrue">
-          <Check.Input
-            disabled={!['vcf', 'csv', 'tsv'].includes(inputFormat)}
-            type="radio"
-            value="True"
+            type="checkbox"
+            value={mutationSplit}
             checked={mutationSplit == 'True'}
             onChange={(e) =>
-              dispatchVisualize({ mutationSplit: e.target.value })
-            }
-            disabled={disableParameters}
-          />
-          <Check.Label className="font-weight-normal">True</Check.Label>
-        </Check>
-      </Group>
-
-      <Group className="d-flex">
-        <Label className="mr-auto">Collapse Sample</Label>
-        <Check inline id="radioFalse">
-          <Check.Input
-            disabled={disableParameters}
-            type="radio"
-            value="False"
-            checked={collapseSample == 'False'}
-            onChange={(e) =>
-              dispatchVisualize({ collapseSample: e.target.value })
+              dispatchVisualize({
+                mutationSplit: e.target.value == 'True' ? 'False' : 'True',
+              })
             }
           />
-          <Check.Label className="font-weight-normal">False</Check.Label>
-        </Check>
-        <Check inline id="radioTrue">
-          <Check.Input
-            disabled={disableParameters}
-            type="radio"
-            value="True"
-            checked={collapseSample == 'True'}
-            onChange={(e) =>
-              dispatchVisualize({ collapseSample: e.target.value })
-            }
-          />
-          <Check.Label className="font-weight-normal">True</Check.Label>
         </Check>
       </Group>
       <Group controlId="filter">
         <Label>
-          Mutation Filter{' '}
+          Select Filter{' '}
           <span className="text-muted font-italic font-weight-normal">
             (optional)
           </span>
@@ -455,6 +484,7 @@ export default function UploadForm() {
           }
           disabled={
             disableParameters ||
+            mutationSplit == 'True' ||
             ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
           }
         ></Control>
@@ -462,7 +492,7 @@ export default function UploadForm() {
       </Group>
       <Group controlId="bedUpload">
         <Label>
-          Upload Mutations{' '}
+          Filter Mutations using Bed File{' '}
           <span className="text-muted font-italic font-weight-normal">
             (optional)
           </span>
@@ -470,7 +500,7 @@ export default function UploadForm() {
         <Row className="m-0">
           <Col sm="6" className="p-0">
             <Button
-              className="p-0"
+              className="p-0 font-14"
               disabled={
                 disableParameters ||
                 ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
@@ -479,12 +509,12 @@ export default function UploadForm() {
               href={bedData}
               download
             >
-              Download Sample
+              Download Example Bed Data
             </Button>
           </Col>
           <Col sm="6" className="p-0 d-flex">
             <Button
-              className="p-0 ml-auto"
+              className="p-0 ml-auto font-14"
               disabled={
                 disableParameters ||
                 ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
@@ -493,7 +523,7 @@ export default function UploadForm() {
               type="button"
               onClick={() => loadBed()}
             >
-              Load Sample
+              Load Example Bed Data
             </Button>
           </Col>
         </Row>
@@ -531,6 +561,40 @@ export default function UploadForm() {
             )}
           </div>
         </section>
+      </Group>
+      <Group className="d-flex">
+        <Label className="mr-auto">
+          Add Collapsing Data{' '}
+          <OverlayTrigger
+            trigger="click"
+            placement="top"
+            overlay={csPopover}
+            rootClose
+          >
+            <Button variant="link" className="p-0 font-weight-bold">
+              <FontAwesomeIcon
+                icon={faInfoCircle}
+                style={{ verticalAlign: 'baseline' }}
+              />
+            </Button>
+          </OverlayTrigger>
+        </Label>
+        <Check inline id="radioFalse">
+          <Check.Input
+            disabled={
+              disableParameters ||
+              ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
+            }
+            type="checkbox"
+            value={collapseSample}
+            checked={collapseSample == 'True'}
+            onChange={(e) =>
+              dispatchVisualize({
+                collapseSample: e.target.value == 'True' ? 'False' : 'True',
+              })
+            }
+          />
+        </Check>
       </Group>
       <hr />
       <Group controlId="email">
