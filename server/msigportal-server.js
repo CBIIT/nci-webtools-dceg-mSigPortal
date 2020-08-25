@@ -339,7 +339,10 @@ app.post('/visualize/queue', (req, res) => {
   res.json(req.body);
 });
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   logger.info(`msigportal server running on port: ${port}`);
   console.log(`Listening on port ${port}`);
 });
+
+server.keepAliveTimeout = 61 * 1000;
+server.headersTimeout = 62 * 1000;
