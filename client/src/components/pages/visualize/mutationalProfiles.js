@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
+import { Typeahead } from 'react-bootstrap-typeahead';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
   dispatchMutationalProfiles,
 } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import 'react-bootstrap-typeahead/css/Typeahead.css';
 
 const { Group, Label, Control } = Form;
 
@@ -212,7 +214,19 @@ export default function MutationalProfiles() {
             <Row className="justify-content-center">
               <Col sm="3">
                 <Label>Sample Name</Label>
-                <Control
+                <Typeahead
+                  clearButton
+                  id="selectSampleName"
+                  placeholder="Select Sample Name"
+                  selected={[selectName]}
+                  options={nameOptions}
+                  onChange={(name) => {
+                    dispatchMutationalProfiles({ selectName: name[0] || '' });
+                    if (nameOptions.indexOf(name[0]) > -1) filterSampleName(name[0]);
+                  }}
+                />
+
+                {/* <Control
                   as="select"
                   value={selectName}
                   onChange={(e) => filterSampleName(e.target.value)}
@@ -228,7 +242,7 @@ export default function MutationalProfiles() {
                       </option>
                     );
                   })}
-                </Control>
+                </Control> */}
               </Col>
               <Col sm="3">
                 <Label>Profile Type</Label>
@@ -237,6 +251,7 @@ export default function MutationalProfiles() {
                   value={selectProfile}
                   onChange={(e) => filterProfileType(e.target.value)}
                   custom
+                  disabled={!selectName}
                 >
                   <option value="0" disabled>
                     Select
@@ -257,6 +272,7 @@ export default function MutationalProfiles() {
                   value={selectMatrix}
                   onChange={(e) => filterMatrix(e.target.value)}
                   custom
+                  disabled={!selectName || !selectProfile}
                 >
                   <option value="0" disabled>
                     Select
@@ -277,6 +293,7 @@ export default function MutationalProfiles() {
                   value={selectFilter}
                   onChange={(e) => filterTag(e.target.value)}
                   custom
+                  disabled={!selectName || !selectProfile || !selectMatrix}
                 >
                   <option value="0" disabled>
                     Select

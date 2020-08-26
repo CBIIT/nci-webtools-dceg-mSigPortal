@@ -7,6 +7,7 @@ import {
   Popover,
   OverlayTrigger,
 } from 'react-bootstrap';
+import { Typeahead } from 'react-bootstrap-typeahead';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
@@ -15,6 +16,7 @@ import {
   dispatchProfileComparison,
 } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import 'react-bootstrap-typeahead/css/Typeahead.css';
 
 const { Group, Label, Control, Text } = Form;
 const { Title, Content } = Popover;
@@ -332,7 +334,19 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
             </Col>
             <Col sm="4">
               <Label>Sample Name 1</Label>
-              <Control
+              <Typeahead
+                clearButton
+                id="selectSampleName1"
+                placeholder="Select Sample Name 1"
+                selected={[withinSampleName1]}
+                options={nameOptions}
+                onChange={(name) =>
+                  dispatchProfileComparison({
+                    withinSampleName1: name[0] || '',
+                  })
+                }
+              />
+              {/* <Control
                 as="select"
                 value={withinSampleName1}
                 onChange={(e) =>
@@ -352,11 +366,23 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                     </option>
                   );
                 })}
-              </Control>
+              </Control> */}
             </Col>
             <Col sm="4">
               <Label>Sample Name 2</Label>
-              <Control
+              <Typeahead
+                clearButton
+                id="selectSampleName2"
+                placeholder="Select Sample Name 2"
+                selected={[withinSampleName2]}
+                options={nameOptions}
+                onChange={(name) =>
+                  dispatchProfileComparison({
+                    withinSampleName2: name[0] || '',
+                  })
+                }
+              />
+              {/* <Control
                 as="select"
                 value={withinSampleName2}
                 onChange={(e) =>
@@ -376,7 +402,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                     </option>
                   );
                 })}
-              </Control>
+              </Control> */}
             </Col>
             <Col sm="2" className="m-auto">
               <Button
@@ -460,7 +486,19 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
             <Col sm="2">
               <Group controlId="sampleNameRefSig">
                 <Label>Sample Name</Label>
-                <Control
+                <Typeahead
+                  clearButton
+                  id="selectSampleNameRef"
+                  placeholder="Select Sample Name"
+                  selected={[refSampleName]}
+                  options={nameOptions}
+                  onChange={(name) =>
+                    dispatchProfileComparison({
+                      refSampleName: name[0] || '',
+                    })
+                  }
+                />
+                {/* <Control
                   as="select"
                   value={refSampleName}
                   onChange={(e) => {
@@ -469,7 +507,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                     });
                   }}
                   custom
-                >
+                > 
                   {nameOptions.map((name, index) => {
                     return (
                       <option key={index} value={name}>
@@ -477,7 +515,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                       </option>
                     );
                   })}
-                </Control>
+                </Control>*/}
               </Group>
             </Col>
             <Col sm="4">
