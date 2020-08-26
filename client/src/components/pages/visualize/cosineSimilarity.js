@@ -215,8 +215,8 @@ export default function CosineSimilarity({
     const withinMatrixOptions = [
       ...new Set(
         matrixList
-          .filter((matrix) => matrix.Catalog == profileType)
-          .map((matrix) => matrix.Type)
+          .filter((matrix) => matrix.Profile_Type == profileType)
+          .map((matrix) => matrix.Matrix_Size)
       ),
     ];
 

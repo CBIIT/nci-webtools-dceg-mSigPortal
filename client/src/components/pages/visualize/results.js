@@ -21,25 +21,25 @@ const { Header, Body } = Card;
 const { Item, Link } = Nav;
 
 export default function Results({ setOpenSidebar }) {
-  const { error, projectID, displayTab, summary, matrixList } = useSelector(
+  const { error, projectID, displayTab, svgList, matrixList } = useSelector(
     (state) => state.visualizeResults
   );
   const mutationalProfiles = useSelector((state) => state.mutationalProfiles);
   const { signatureSetOptions } = useSelector((state) => state.pca);
   const rootURL = window.location.pathname;
-  const [retrieveSummary, setAttempt] = useState(false);
+  const [retrieveSvgList, setAttempt] = useState(false);
   // get mapping of plots after retrieving projectID
   useEffect(() => {
-    if (summary.length) {
-      // only set summary if signature set was not set
-      if (!signatureSetOptions.length) mapSummary();
+    if (svgList.length) {
+      // only set svgList if signature set was not set
+      if (!signatureSetOptions.length) mapSvgList();
     } else {
-      if (projectID.length && !retrieveSummary) {
+      if (projectID.length && !retrieveSvgList) {
         setAttempt(true);
         getSummary();
       }
     }
-  }, [summary]);
+  }, [svgList]);
 
   // reload summary information
   async function getSummary() {
@@ -53,73 +53,73 @@ export default function Results({ setOpenSidebar }) {
       body: JSON.stringify({ projectID: projectID }),
     });
     const {
-      summary,
+      svgList,
       statistics,
       matrixList,
       downloads,
     } = await response.json();
     dispatchVisualizeResults({
-      summary: summary,
+      svgList: svgList,
       statistics: statistics,
       matrixList: matrixList,
       downloads: downloads,
     });
   }
 
-  // retrieve mapping of samples to plots from summary file
-  async function mapSummary() {
+  // retrieve mapping of samples to plots from svgList file
+  async function mapSvgList() {
     dispatchVisualize({
       loading: {
         active: true,
       },
     });
 
-    const nameOptions = [...new Set(summary.map((plot) => plot.Sample_Name))];
+    const nameOptions = [...new Set(svgList.map((plot) => plot.Sample_Name))];
     const profileOptions = [
-      ...new Set(summary.map((plot) => plot.Profile_Type)),
+      ...new Set(svgList.map((plot) => plot.Profile_Type)),
     ];
-    const matrixOptions = [...new Set(summary.map((plot) => plot.Matrix))];
-    const tagOptions = [...new Set(summary.map((plot) => plot.Tag))];
+    const matrixOptions = [...new Set(svgList.map((plot) => plot.Matrix_Size))];
+    const filterOptions = [...new Set(svgList.map((plot) => plot.Filter))];
 
     const selectName = mutationalProfiles.selectName || nameOptions[0];
     const selectProfile = mutationalProfiles.selectProfile || profileOptions[0];
     const selectMatrix = mutationalProfiles.selectMatrix || matrixOptions[0];
-    const selectTag = mutationalProfiles.selectTag || tagOptions[0];
+    const selectFilter = mutationalProfiles.selectFilter || filterOptions[0];
 
-    const filteredPlots = summary.filter(
+    const filteredPlots = svgList.filter(
       (plot) =>
         plot.Sample_Name == selectName &&
         plot.Profile_Type == selectProfile &&
-        plot.Matrix == selectMatrix &&
-        plot.Tag == selectTag
+        plot.Matrix_Size == selectMatrix &&
+        plot.Filter == selectFilter
     );
 
     const filteredProfileOptions = [
       ...new Set(
-        summary
+        svgList
           .filter((plot) => plot.Sample_Name == selectName)
           .map((plot) => plot.Profile_Type)
       ),
     ];
     const filteredMatrixOptions = [
       ...new Set(
-        summary
+        svgList
           .filter((plot) => plot.Profile_Type == selectProfile)
-          .map((plot) => plot.Matrix)
+          .map((plot) => plot.Matrix_Size)
       ),
     ];
-    const filteredTagOptions = [
+    const filteredFilterOptions = [
       ...new Set(
-        summary
-          .filter((plot) => plot.Matrix == selectMatrix)
-          .map((plot) => plot.Tag)
+        svgList
+          .filter((plot) => plot.Matrix_Size == selectMatrix)
+          .map((plot) => plot.Filter)
       ),
     ];
     const filteredMatrixList = [
       ...new Set(
         matrixList
-          .filter((matrix) => matrix.Catalog == selectProfile)
-          .map((matrix) => matrix.Type)
+          .filter((matrix) => matrix.Profile_Type == selectProfile)
+          .map((matrix) => matrix.Matrix_Size)
       ),
     ];
 
@@ -132,11 +132,11 @@ export default function Results({ setOpenSidebar }) {
       nameOptions: nameOptions,
       profileOptions: filteredProfileOptions,
       matrixOptions: filteredMatrixOptions,
-      tagOptions: filteredTagOptions,
+      filterOptions: filteredFilterOptions,
       selectName: selectName,
       selectProfile: selectProfile,
       selectMatrix: selectMatrix,
-      selectTag: selectTag,
+      selectFilter: selectFilter,
     });
 
     dispatchCosineSimilarity({

@@ -155,7 +155,7 @@ export default function UploadForm() {
             const results = await response.json();
             dispatchVisualizeResults({
               projectID: projectID,
-              summary: results.summary,
+              svgList: results.svgList,
               statistics: results.statistics,
               matrixList: results.matrixList,
               downloads: results.downloads,

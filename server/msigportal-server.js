@@ -65,14 +65,14 @@ function parseCSV(filepath) {
 }
 
 async function getSummary(resultsPath) {
-  const summaryPath = path.join(resultsPath, 'Summary.txt');
+  const svgListPath = path.join(resultsPath, 'svg_files_list.txt');
   const statisticsPath = path.join(resultsPath, 'Statistics.txt');
-  const matrixPath = path.join(resultsPath, 'Matrix_List.txt');
+  const matrixPath = path.join(resultsPath, 'matrix_files_list.txt');
   const downloadsPath = path.join(resultsPath, 'output');
   let matrixList = [];
   let statistics = '';
   let downloads = [];
-  const summary = await parseCSV(summaryPath);
+  const svgList = await parseCSV(svgListPath);
 
   if (fs.existsSync(matrixPath)) matrixList = await parseCSV(matrixPath);
   if (fs.existsSync(statisticsPath))
@@ -86,7 +86,7 @@ async function getSummary(resultsPath) {
   }
 
   return {
-    summary: summary,
+    svgList: svgList,
     statistics: statistics,
     matrixList: matrixList,
     downloads: downloads,
@@ -122,7 +122,7 @@ app.post('/api/visualize', (req, res) => {
     // logger.debug('STDOUT\n' + scriptOut.stdout);
     // logger.debug('STDERR\n' + scriptOut.stderr);
 
-    if (fs.existsSync(path.join(resultsPath, 'Summary.txt'))) {
+    if (fs.existsSync(path.join(resultsPath, 'svg_files_list.txt'))) {
       res.json({ ...scriptOut, ...(await getSummary(resultsPath)) });
     } else {
       logger.info('/api/visualize: An Error Occured While Extracting Profiles');
@@ -135,12 +135,12 @@ app.post('/api/visualize', (req, res) => {
   });
 });
 
-// read summary file and return plot mapping
+// read summary files and return plot mapping
 app.post('/visualize/summary', async (req, res) => {
   logger.info('/visualize/summary: Retrieving Summary');
   const resultsPath = path.join(tmppath, req.body.projectID, 'results');
 
-  if (fs.existsSync(path.join(resultsPath, 'Summary.txt'))) {
+  if (fs.existsSync(path.join(resultsPath, 'svg_files_list.txt'))) {
     res.json(await getSummary(resultsPath));
   } else {
     logger.info('/visualize/summary: Summary file not found');
@@ -194,7 +194,7 @@ app.post('/api/visualizeR/getReferenceSignatureSets', (req, res) => {
       req.body.profileType,
     ]);
 
-    console.log('SignatureReferenceSets', list);
+    // console.log('SignatureReferenceSets', list);
 
     res.json(list);
   } catch (err) {
@@ -277,8 +277,8 @@ app.post('/visualize/upload', (req, res, next) => {
 });
 
 app.post('/visualize/txt', (req, res) => {
-  const txtPath = req.body.path;
-  if (txtPath.indexOf(tmppath) == 0) {
+  const txtPath = path.resolve(req.body.path);
+  if (txtPath.indexOf(path.resolve(tmppath)) == 0) {
     const s = fs.createReadStream(txtPath);
 
     s.on('open', () => {
@@ -298,8 +298,8 @@ app.post('/visualize/txt', (req, res) => {
 });
 
 app.post('/visualize/svg', (req, res) => {
-  const svgPath = req.body.path;
-  if (svgPath.indexOf(tmppath) == 0) {
+  const svgPath = path.resolve(req.body.path);
+  if (svgPath.indexOf(path.resolve(tmppath)) == 0) {
     const s = fs.createReadStream(svgPath);
 
     s.on('open', () => {
@@ -321,13 +321,10 @@ app.post('/visualize/svg', (req, res) => {
 // download generated result outputs
 app.get('/visualize/download', (req, res) => {
   logger.info(`/visualize/download: id:${req.query.id} file:${req.query.file}`);
-  const file = path.join(
-    tmppath,
-    req.query.id,
-    'results/output',
-    req.query.file
+  const file = path.resolve(
+    path.join(tmppath, req.query.id, 'results/output', req.query.file)
   );
-  if (file.indexOf(tmppath) == 0) {
+  if (file.indexOf(path.resolve(tmppath)) == 0) {
     res.download(file);
   } else {
     logger.info('traversal error');

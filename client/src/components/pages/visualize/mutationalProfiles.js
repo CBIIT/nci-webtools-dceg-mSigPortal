@@ -11,7 +11,7 @@ const { Group, Label, Control } = Form;
 
 export default function MutationalProfiles() {
   const [downloadOverlay, setOverlay] = useState(false);
-  const { summary, displayTab } = useSelector(
+  const { svgList, displayTab } = useSelector(
     (state) => state.visualizeResults
   );
   const rootURL = window.location.pathname;
@@ -20,11 +20,11 @@ export default function MutationalProfiles() {
     selectName,
     selectProfile,
     selectMatrix,
-    selectTag,
+    selectFilter,
     nameOptions,
     profileOptions,
     matrixOptions,
-    tagOptions,
+    filterOptions,
     plotURL,
     debug,
     displayDebug,
@@ -41,13 +41,13 @@ export default function MutationalProfiles() {
     if (plotURL && displayTab == 'mutationalProfiles') {
       setPyPlot();
     }
-  }, [selectName, selectProfile, selectMatrix, selectTag]);
+  }, [selectName, selectProfile, selectMatrix, selectFilter]);
 
   function getPlotName() {
     if (filtered.length) {
       const plot = filtered[0];
 
-      return `${plot.Sample_Name}-${plot.Profile_Type}-${plot.Matrix}-${plot.Tag}.svg`;
+      return `${plot.Sample_Name}-${plot.Profile_Type}-${plot.Matrix_Size}-${plot.Filter}.svg`;
     } else return '';
   }
 
@@ -61,10 +61,10 @@ export default function MutationalProfiles() {
             Accept: 'image/svg',
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ path: plot.Location || plot }),
+          body: JSON.stringify({ path: plot.Path }),
         });
         if (!response.ok) {
-          const { msg } = await response.json();
+          const msg = await response.text();
           dispatchError(msg);
         } else {
           const pic = await response.blob();
@@ -79,8 +79,6 @@ export default function MutationalProfiles() {
       } catch (err) {
         dispatchError(err);
       }
-    } else {
-      console.log('filtered summary empty');
     }
   }
 
@@ -116,7 +114,7 @@ export default function MutationalProfiles() {
   // }
 
   function filterSampleName(name) {
-    const filteredPlots = summary.filter((plot) => plot.Sample_Name == name);
+    const filteredPlots = svgList.filter((plot) => plot.Sample_Name == name);
     const profileOptions = [
       ...new Set(filteredPlots.map((plot) => plot.Profile_Type)),
     ];
@@ -124,14 +122,14 @@ export default function MutationalProfiles() {
       ...new Set(
         filteredPlots
           .filter((plot) => plot.Profile_Type == profileOptions[0])
-          .map((plot) => plot.Matrix)
+          .map((plot) => plot.Matrix_Size)
       ),
     ];
-    const tagOptions = [
+    const filterOptions = [
       ...new Set(
         filteredPlots
-          .filter((plot) => plot.Matrix == matrixOptions[0])
-          .map((plot) => plot.Tag)
+          .filter((plot) => plot.Matrix_Size == matrixOptions[0])
+          .map((plot) => plot.Filter)
       ),
     ];
 
@@ -139,67 +137,69 @@ export default function MutationalProfiles() {
       selectName: name,
       selectProfile: profileOptions[0],
       selectMatrix: matrixOptions[0],
-      selectTag: tagOptions[0],
+      selectFilter: filterOptions[0],
       profileOptions: profileOptions,
       matrixOptions: matrixOptions,
-      tagOptions: tagOptions,
+      filterOptions: filterOptions,
       filtered: filteredPlots,
     });
   }
 
   function filterProfileType(profile) {
-    const filteredPlots = summary.filter(
+    const filteredPlots = svgList.filter(
       (plot) => plot.Sample_Name == selectName && plot.Profile_Type == profile
     );
     const matrixOptions = [
-      ...new Set(filteredPlots.map((plot) => plot.Matrix)),
+      ...new Set(filteredPlots.map((plot) => plot.Matrix_Size)),
     ];
-    const tagOptions = [
+    const filterOptions = [
       ...new Set(
         filteredPlots
-          .filter((plot) => plot.Matrix == matrixOptions[0])
-          .map((plot) => plot.Tag)
+          .filter((plot) => plot.Matrix_Size == matrixOptions[0])
+          .map((plot) => plot.Filter)
       ),
     ];
 
     dispatchMutationalProfiles({
       selectProfile: profile,
       selectMatrix: matrixOptions[0],
-      selectTag: tagOptions[0],
+      selectFilter: filterOptions[0],
       matrixOptions: matrixOptions,
-      tagOptions: tagOptions,
+      filterOptions: filterOptions,
       filtered: filteredPlots,
     });
   }
 
   function filterMatrix(matrix) {
-    const filteredPlots = summary.filter(
+    const filteredPlots = svgList.filter(
       (plot) =>
         plot.Sample_Name == selectName &&
         plot.Profile_Type == selectProfile &&
-        plot.Matrix == matrix
+        plot.Matrix_Size == matrix
     );
-    const tagOptions = [...new Set(filteredPlots.map((plot) => plot.Tag))];
+    const filterOptions = [
+      ...new Set(filteredPlots.map((plot) => plot.Filter)),
+    ];
 
     dispatchMutationalProfiles({
       selectMatrix: matrix,
-      selectTag: tagOptions[0],
-      tagOptions: tagOptions,
+      selectFilter: filterOptions[0],
+      filterOptions: filterOptions,
       filtered: filteredPlots,
     });
   }
 
   function filterTag(tag) {
-    const filteredPlots = summary.filter(
+    const filteredPlots = svgList.filter(
       (plot) =>
         plot.Sample_Name == selectName &&
         plot.Profile_Type == selectProfile &&
-        plot.Matrix == selectMatrix &&
-        plot.Tag == tag
+        plot.Matrix_Size == selectMatrix &&
+        plot.Filter == tag
     );
 
     dispatchMutationalProfiles({
-      selectTag: tag,
+      selectFilter: tag,
       filtered: filteredPlots,
     });
   }
@@ -274,14 +274,14 @@ export default function MutationalProfiles() {
                 <Label>Filter</Label>
                 <Control
                   as="select"
-                  value={selectTag}
+                  value={selectFilter}
                   onChange={(e) => filterTag(e.target.value)}
                   custom
                 >
                   <option value="0" disabled>
                     Select
                   </option>
-                  {tagOptions.map((tag, index) => {
+                  {filterOptions.map((tag, index) => {
                     return (
                       <option key={index} value={tag}>
                         {tag}
