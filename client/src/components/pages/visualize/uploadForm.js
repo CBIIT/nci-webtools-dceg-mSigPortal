@@ -333,7 +333,7 @@ export default function UploadForm() {
               className="p-0 font-14"
               disabled={disableParameters}
               variant="link"
-              href={exampleData}
+              href={'assets/exampleInput/all_demo_inputs.zip'}
               download
             >
               Download Example Data
