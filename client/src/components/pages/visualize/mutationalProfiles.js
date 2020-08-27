@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import { Typeahead } from 'react-bootstrap-typeahead';
+import Select from 'react-select';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
   dispatchMutationalProfiles,
 } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import 'react-bootstrap-typeahead/css/Typeahead.css';
 
 const { Group, Label, Control } = Form;
 
@@ -214,35 +213,16 @@ export default function MutationalProfiles() {
             <Row className="justify-content-center">
               <Col sm="3">
                 <Label>Sample Name</Label>
-                <Typeahead
-                  clearButton
-                  id="selectSampleName"
-                  placeholder="Select Sample Name"
-                  selected={[selectName]}
+                <Select
                   options={nameOptions}
+                  value={[selectName]}
                   onChange={(name) => {
-                    dispatchMutationalProfiles({ selectName: name[0] || '' });
-                    if (nameOptions.indexOf(name[0]) > -1) filterSampleName(name[0]);
+                    dispatchMutationalProfiles({ selectName: name || '' });
+                    if (nameOptions.indexOf(name) > -1) filterSampleName(name);
                   }}
+                  getOptionLabel={(option) => option}
+                  getOptionValue={(option) => option}
                 />
-
-                {/* <Control
-                  as="select"
-                  value={selectName}
-                  onChange={(e) => filterSampleName(e.target.value)}
-                  custom
-                >
-                  <option value="0" disabled>
-                    Select
-                  </option>
-                  {nameOptions.map((sampleName, index) => {
-                    return (
-                      <option key={index} value={sampleName}>
-                        {sampleName}
-                      </option>
-                    );
-                  })}
-                </Control> */}
               </Col>
               <Col sm="3">
                 <Label>Profile Type</Label>

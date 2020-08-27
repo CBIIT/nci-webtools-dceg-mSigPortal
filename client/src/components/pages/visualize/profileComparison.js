@@ -7,7 +7,7 @@ import {
   Popover,
   OverlayTrigger,
 } from 'react-bootstrap';
-import { Typeahead } from 'react-bootstrap-typeahead';
+import Select from 'react-select';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
@@ -16,7 +16,6 @@ import {
   dispatchProfileComparison,
 } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import 'react-bootstrap-typeahead/css/Typeahead.css';
 
 const { Group, Label, Control, Text } = Form;
 const { Title, Content } = Popover;
@@ -334,75 +333,27 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
             </Col>
             <Col sm="4">
               <Label>Sample Name 1</Label>
-              <Typeahead
-                clearButton
-                id="selectSampleName1"
-                placeholder="Select Sample Name 1"
-                selected={[withinSampleName1]}
+              <Select
                 options={nameOptions}
-                onChange={(name) =>
-                  dispatchProfileComparison({
-                    withinSampleName1: name[0] || '',
-                  })
-                }
+                value={[withinSampleName1]}
+                onChange={(name) => {
+                  dispatchProfileComparison({ withinSampleName1: name || '' });
+                }}
+                getOptionLabel={(option) => option}
+                getOptionValue={(option) => option}
               />
-              {/* <Control
-                as="select"
-                value={withinSampleName1}
-                onChange={(e) =>
-                  dispatchProfileComparison({
-                    withinSampleName1: e.target.value,
-                  })
-                }
-                custom
-              >
-                <option value="0" disabled>
-                  Select
-                </option>
-                {nameOptions.map((name, index) => {
-                  return (
-                    <option key={index} value={name}>
-                      {name}
-                    </option>
-                  );
-                })}
-              </Control> */}
             </Col>
             <Col sm="4">
               <Label>Sample Name 2</Label>
-              <Typeahead
-                clearButton
-                id="selectSampleName2"
-                placeholder="Select Sample Name 2"
-                selected={[withinSampleName2]}
+              <Select
                 options={nameOptions}
-                onChange={(name) =>
-                  dispatchProfileComparison({
-                    withinSampleName2: name[0] || '',
-                  })
-                }
+                value={[withinSampleName2]}
+                onChange={(name) => {
+                  dispatchProfileComparison({ withinSampleName2: name || '' });
+                }}
+                getOptionLabel={(option) => option}
+                getOptionValue={(option) => option}
               />
-              {/* <Control
-                as="select"
-                value={withinSampleName2}
-                onChange={(e) =>
-                  dispatchProfileComparison({
-                    withinSampleName2: e.target.value,
-                  })
-                }
-                custom
-              >
-                <option value="0" disabled>
-                  Select
-                </option>
-                {nameOptions.map((name, index) => {
-                  return (
-                    <option key={index} value={name}>
-                      {name}
-                    </option>
-                  );
-                })}
-              </Control> */}
             </Col>
             <Col sm="2" className="m-auto">
               <Button
@@ -486,36 +437,15 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
             <Col sm="2">
               <Group controlId="sampleNameRefSig">
                 <Label>Sample Name</Label>
-                <Typeahead
-                  clearButton
-                  id="selectSampleNameRef"
-                  placeholder="Select Sample Name"
-                  selected={[refSampleName]}
+                <Select
                   options={nameOptions}
-                  onChange={(name) =>
-                    dispatchProfileComparison({
-                      refSampleName: name[0] || '',
-                    })
-                  }
-                />
-                {/* <Control
-                  as="select"
-                  value={refSampleName}
-                  onChange={(e) => {
-                    dispatchProfileComparison({
-                      refSampleName: e.target.value,
-                    });
+                  value={[refSampleName]}
+                  onChange={(name) => {
+                    dispatchProfileComparison({ refSampleName: name || '' });
                   }}
-                  custom
-                > 
-                  {nameOptions.map((name, index) => {
-                    return (
-                      <option key={index} value={name}>
-                        {name}
-                      </option>
-                    );
-                  })}
-                </Control>*/}
+                  getOptionLabel={(option) => option}
+                  getOptionValue={(option) => option}
+                />
               </Group>
             </Col>
             <Col sm="4">
