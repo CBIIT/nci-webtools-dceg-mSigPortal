@@ -1060,7 +1060,7 @@ plot_compare_profiles_diff_strand <- function (profile1, profile2, profile_names
       theme_ipsum_rc(axis_title_just = "m",grid = "Y",axis = TRUE) + 
       ggtitle(paste("RSS = ", RSS, "; Cosine similarity = ", cosine_sim, sep = ""))+
       theme(axis.title.y = element_text(size = 14, vjust = 1), axis.text.y = element_text(size = 12), axis.title.x = element_text(size = 12), axis.text.x = element_text(size = 6, angle = 90, vjust = 0.5), strip.text.x = element_text(size = 14,hjust = 0.5), strip.text.y = element_text(size = 14,hjust = 0.5),strip.background = element_rect(fill = "#f0f0f0"), panel.grid.major.x = element_blank(), panel.spacing.x = unit(0, "lines"),panel.spacing.y = unit(0.2, "lines"),plot.title = element_text(hjust = 0.5))+
-      panel_border(color = gray(0.5),size = 0.3)
+      panel_border(size = 0.3)
   }
   else {
     plot = ggplot(data = df, aes(x = SubType, y = value, fill=Strand,group=Strand, width = 0.7)) + 
@@ -1076,7 +1076,7 @@ plot_compare_profiles_diff_strand <- function (profile1, profile2, profile_names
       theme_ipsum_rc(axis_title_just = "m",grid = "Y",axis = TRUE) + 
       ggtitle(paste("RSS = ", RSS, "; Cosine similarity = ", cosine_sim, sep = ""))+
       theme(axis.title.y = element_text(size = 14, vjust = 1), axis.text.y = element_text(size = 10), axis.title.x = element_text(size = 12), axis.text.x = element_text(size = 6, angle = 90, vjust = 0.5), strip.text.x = element_text(size = 14,hjust = 0.5), strip.text.y = element_text(size = 14,hjust = 0.5),strip.background = element_rect(fill = "#f0f0f0"), panel.grid.major.x = element_blank(), panel.spacing.x = unit(0, "lines"),panel.spacing.y = unit(0.2, "lines"),plot.title = element_text(hjust = 0.5))+
-      panel_border(color = gray(0.5),size = 0.3)
+      panel_border(size = 0.3)
   }
   return(plot)
 }

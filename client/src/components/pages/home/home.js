@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import Card from 'react-bootstrap/Card';
 import { CardDeck, Button } from 'react-bootstrap';
 import './home.scss';
-import { ConsoleTransportOptions } from 'winston/lib/winston/transports';
 
 export default function Home({ links }) {
   const colors = ['#fc8701', '#2c71dd', '#689f39', '#84368d'];

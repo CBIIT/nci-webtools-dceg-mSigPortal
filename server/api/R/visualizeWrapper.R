@@ -6,14 +6,9 @@ library(ggrepel)
 library(factoextra)
 library(jsonlite)
 
-
-# source msigportal function ----------------------------------------------
-source('api/R/Sigvisualfunc.R')
-# load reference signatures files -----------------------------------------
-
 # get all Reference Signature Set options using profileName (matrix)
-getReferenceSignatureSets <- function(profileType) {
-  load('api/R/signature_refsets.RData')
+getReferenceSignatureSets <- function(profileType, dataPath) {
+  load(paste0(dataPath, 'signature_refsets.RData'))
 
   profileName <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
   signatureSets <- signature_refsets %>% filter(Profile == profileName) %>% pull(Signature_set_name) %>% unique()
@@ -22,9 +17,8 @@ getReferenceSignatureSets <- function(profileType) {
 }
 
 # get list of signatures in the selected signature set
-getSignatures <- function(profileType, signatureSetName) {
-  load('api/R/signature_refsets.RData')
-
+getSignatures <- function(profileType, signatureSetName, dataPath) {
+  load(paste0(dataPath, 'signature_refsets.RData'))
   profileName <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
   signature_refsets_input <- signature_refsets %>% filter(Profile == profileName, Signature_set_name == signatureSetName)
   refsig <- signature_refsets_input %>%
@@ -36,8 +30,9 @@ getSignatures <- function(profileType, signatureSetName) {
 }
 
 # get svg list for public data
-mutationProfilesPublic <- function() {
-  load('Data/seqmatrix_refdata_info.RData')
+mutationProfilesPublic <- function(dataPath) {
+  load(paste0(dataPath, 'signature_refsets.RData'))
+  load(paste0(dataPath, 'seqmatrix_refdata_info.RData'))
 
 
 
@@ -46,7 +41,8 @@ mutationProfilesPublic <- function() {
 ### Cosine Similarity tab ###
 # section 1: Cosine similarity within samples #
 # two parameters need: Profile Type and Matrix Size #
-cosineSimilarityWithin <- function(profileType, matrixSize, projectID, pythonOutput, savePath) {
+cosineSimilarityWithin <- function(profileType, matrixSize, projectID, pythonOutput, savePath, dataPath) {
+  source('api/R/Sigvisualfunc.R')
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
@@ -57,7 +53,7 @@ cosineSimilarityWithin <- function(profileType, matrixSize, projectID, pythonOut
     plotPath = paste0(savePath, '/cos_sim_within.svg')
     txtPath = paste0(savePath, '/cos_sim_within.txt')
 
-    data_input <- read_delim(paste0(pythonOutput, '/', profileType, '/', projectID, '.', profileType, matrixSize, '.all'), delim = '\t')
+    data_input <- read_delim(file.path(pythonOutput, profileType, paste0(projectID, '.', profileType, matrixSize, '.all')), delim = '\t')
     # Heatmap of cosine similarity within samples  and put on the web---------------------------
     cos_sim_res1 = cos_sim_df(data_input, data_input)
     plot_cosine_heatmap_df(cos_sim_res1, cluster_rows = TRUE, plot_values = FALSE, output_plot = plotPath)
@@ -76,8 +72,9 @@ cosineSimilarityWithin <- function(profileType, matrixSize, projectID, pythonOut
 # section 2: Cosine similarity  to reference signatures 
 # Two parameters need: Profile Type, Reference Signature Set
 # Profile Type only support SBS, DBS, ID
-cosineSimilarityRefSig <- function(profileType, signatureSetName, projectID, pythonOutput, savePath) {
-  load('api/R/signature_refsets.RData')
+cosineSimilarityRefSig <- function(profileType, signatureSetName, projectID, pythonOutput, savePath, dataPath) {
+  source('api/R/Sigvisualfunc.R')
+  load(paste0(dataPath, 'signature_refsets.RData'))
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
@@ -114,7 +111,8 @@ cosineSimilarityRefSig <- function(profileType, signatureSetName, projectID, pyt
 ### Profile Comparison tab ###
 # section 1: Cosine similarity within samples 
 # three parameters need: Profile Type, Sample Name1 and Sample Name2
-profileComparisonWithin <- function(profileType, sampleName1, sampleName2, projectID, pythonOutput, savePath) {
+profileComparisonWithin <- function(profileType, sampleName1, sampleName2, projectID, pythonOutput, savePath, dataPath) {
+  source('api/R/Sigvisualfunc.R')
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
@@ -142,8 +140,9 @@ profileComparisonWithin <- function(profileType, sampleName1, sampleName2, proje
 
 # section 2: Comparison to reference signatures # 
 # four parameters need: “Profile Type”, “Sample Name”, “Reference Signature Set” and “Compare Single Signature or Combined Signatures” # 
-profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, compare, projectID, pythonOutput, savePath) {
-  load('api/R/signature_refsets.RData')
+profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, compare, projectID, pythonOutput, savePath, dataPath) {
+  source('api/R/Sigvisualfunc.R')
+  load(paste0(dataPath, 'signature_refsets.RData'))
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
@@ -187,8 +186,9 @@ profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, c
 ### “Principal Component Analysis” ###
 # Two parameters need: Profile Type, Reference Signature Set
 # Profile Type only support SBS, DBS, ID
-pca <- function(profileType, signatureSetName, projectID, pythonOutput, savePath) {
-  load('api/R/signature_refsets.RData')
+pca <- function(profileType, signatureSetName, projectID, pythonOutput, savePath, dataPath) {
+  source('api/R/Sigvisualfunc.R')
+  load(paste0(dataPath, 'signature_refsets.RData'))
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")

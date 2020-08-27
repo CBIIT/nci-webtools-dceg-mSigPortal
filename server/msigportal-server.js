@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const logger = require('./logger');
-const { port, tmppath } = require('./config.json');
+const { port, tmppath, datapath } = require('./config.json');
 const { spawn } = require('child_process');
 const formidable = require('formidable');
 const fs = require('fs');
@@ -31,21 +31,21 @@ app.get('/ping', (req, res) => res.send(true));
  * @param {string} req.body.args Name of function handler (python or R)
  * @return {string} JSON string of function name and arguments
  */
-app.post('/api', (req, res) => {
-  let stdout = '';
-  let stderr = '';
-  const wrapper = spawn('python3', [
-    'api/wrapper.py',
-    req.body.handler,
-    JSON.stringify(req.body.params),
-  ]);
+// app.post('/api', (req, res) => {
+//   let stdout = '';
+//   let stderr = '';
+//   const wrapper = spawn('python3', [
+//     'api/wrapper.py',
+//     req.body.handler,
+//     JSON.stringify(req.body.params),
+//   ]);
 
-  wrapper.stderr.on('data', (data) => (stderr += data.toString()));
-  wrapper.stderr.on('close', () => {
-    console.log('return', { stdout, stderr });
-    res.json({ return: stdout, err: stderr });
-  });
-});
+//   wrapper.stderr.on('data', (data) => (stderr += data.toString()));
+//   wrapper.stderr.on('close', () => {
+//     console.log('return', { stdout, stderr });
+//     res.json({ return: stdout, err: stderr });
+//   });
+// });
 
 function parseCSV(filepath) {
   const file = fs.createReadStream(filepath);
@@ -169,6 +169,7 @@ app.post('/api/visualizeR', (req, res) => {
       projectID: req.body.projectID,
       pythonOutput: path.join(tmppath, req.body.projectID, 'results/output'),
       savePath: savePath,
+      dataPath: datapath,
     });
 
     const { stdout, output } = JSON.parse(wrapper);
@@ -192,6 +193,7 @@ app.post('/api/visualizeR/getReferenceSignatureSets', (req, res) => {
   try {
     const list = r('api/R/visualizeWrapper.R', 'getReferenceSignatureSets', [
       req.body.profileType,
+      datapath,
     ]);
 
     // console.log('SignatureReferenceSets', list);
@@ -211,6 +213,7 @@ app.post('/api/visualizeR/getSignatures', (req, res) => {
     const list = r('api/R/visualizeWrapper.R', 'getSignatures', [
       req.body.profileType,
       req.body.signatureSetName,
+      datapath,
     ]);
 
     console.log('signatures', list);
