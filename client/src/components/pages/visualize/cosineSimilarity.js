@@ -34,21 +34,13 @@ export default function CosineSimilarity({
     refPlotURL,
     displayWithin,
     displayRefSig,
+    withinErr,
+    refErr,
     withinSubmitOverlay,
     refSubmitOverlay,
     debugR,
     displayDebug,
   } = useSelector((state) => state.cosineSimilarity);
-
-  // load r plots after they are recieved
-  // useEffect(() => {
-  //   if (displayTab == 'cosineSimilarity') {
-  //     if (withinPlotPath  && !withinSubmitOverlay)
-  //       setRPlot(withinPlotPath, 'within');
-  //     if (refPlotPath && !refPlotURL && !refSubmitOverlay)
-  //       setRPlot(refPlotPath, 'refsig');
-  //   }
-  // }, [withinPlotPath, refPlotPath]);
 
   // calculate r on load
   // useEffect(() => {
@@ -91,44 +83,53 @@ export default function CosineSimilarity({
 
   async function setRPlot(plotPath, type) {
     setOverlay(type, true);
-    try {
-      const response = await fetch(`${rootURL}visualize/svg`, {
-        method: 'POST',
-        headers: {
-          Accept: 'image/svg',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ path: plotPath }),
-      });
-      if (!response.ok) {
-        // console.log(await response.json());
-        setOverlay(type, false);
-      } else {
-        const pic = await response.blob();
-        const objectURL = URL.createObjectURL(pic);
-
-        if (type == 'within') {
-          if (withinPlotURL.length) URL.revokeObjectURL(withinPlotURL);
-          dispatchCosineSimilarity({
-            withinPlotURL: objectURL,
-          });
+    if (plotPath) {
+      try {
+        const response = await fetch(`${rootURL}visualize/svg`, {
+          method: 'POST',
+          headers: {
+            Accept: 'image/svg',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ path: plotPath }),
+        });
+        if (!response.ok) {
+          // console.log(await response.json());
         } else {
-          if (refPlotURL.length) URL.revokeObjectURL(refPlotURL);
-          dispatchCosineSimilarity({
-            refPlotURL: objectURL,
-          });
+          const pic = await response.blob();
+          const objectURL = URL.createObjectURL(pic);
+
+          if (type == 'within') {
+            if (withinPlotURL) URL.revokeObjectURL(withinPlotURL);
+            dispatchCosineSimilarity({
+              withinPlotURL: objectURL,
+            });
+          } else {
+            if (refPlotURL) URL.revokeObjectURL(refPlotURL);
+            dispatchCosineSimilarity({
+              refPlotURL: objectURL,
+            });
+          }
+          setOverlay(type, false);
         }
-        setOverlay(type, false);
+      } catch (err) {
+        dispatchError(err);
       }
-    } catch (err) {
-      dispatchError(err);
-      setOverlay(type, false);
+    } else {
+      if (type == 'within') {
+        if (withinPlotURL) URL.revokeObjectURL(withinPlotURL);
+        dispatchCosineSimilarity({ withinErr: true, withinPlotURL: '' });
+      } else {
+        if (refPlotURL) URL.revokeObjectURL(refPlotURL);
+        dispatchCosineSimilarity({ refErr: true, refPlotURL: '' });
+      }
     }
+    setOverlay(type, false);
   }
 
   // get Signature Reference Sets for dropdown options
   async function getSignatureSet(profileType) {
-    if (profileType && profileType.length) {
+    if (profileType) {
       dispatchCosineSimilarity({ refSubmitOverlay: true });
       try {
         const response = await getRefSigOptions(profileType);
@@ -157,11 +158,13 @@ export default function CosineSimilarity({
     if (fn == 'cosineSimilarityWithin') {
       dispatchCosineSimilarity({
         withinSubmitOverlay: true,
+        withinErr: '',
         debugR: '',
       });
     } else {
       dispatchCosineSimilarity({
         refSubmitOverlay: true,
+        refErr: '',
         debugR: '',
       });
     }
@@ -307,34 +310,38 @@ export default function CosineSimilarity({
             </Col>
           </Row>
 
-          <div
-            id="withinPlot"
-            style={{ display: withinPlotURL.length ? 'block' : 'none' }}
-          >
-            <div className="d-flex">
-              <a
-                className="px-2 py-1"
-                href={withinPlotURL}
-                download={withinPlotURL.split('/').slice(-1)[0]}
-              >
-                Download Plot
-              </a>
-              <span className="ml-auto">
-                <Button
-                  className="px-2 py-1"
-                  variant="link"
-                  onClick={() => downloadResults(withinTxtPath)}
-                >
-                  Download Results
-                </Button>
-              </span>
+          <div id="withinPlot">
+            <div style={{ display: withinErr ? 'block' : 'none' }}>
+              <p>
+                An error has occured. Check the debug section for more info.
+              </p>
             </div>
-            <div className="p-2 border rounded">
-              <Row>
-                <Col>
-                  <img className="w-100 my-4 h-500" src={withinPlotURL}></img>
-                </Col>
-              </Row>
+            <div style={{ display: withinPlotURL ? 'block' : 'none' }}>
+              <div className="d-flex">
+                <a
+                  className="px-2 py-1"
+                  href={withinPlotURL}
+                  download={withinPlotURL.split('/').slice(-1)[0]}
+                >
+                  Download Plot
+                </a>
+                <span className="ml-auto">
+                  <Button
+                    className="px-2 py-1"
+                    variant="link"
+                    onClick={() => downloadResults(withinTxtPath)}
+                  >
+                    Download Results
+                  </Button>
+                </span>
+              </div>
+              <div className="p-2 border rounded">
+                <Row>
+                  <Col>
+                    <img className="w-100 my-4 h-500" src={withinPlotURL}></img>
+                  </Col>
+                </Row>
+              </div>
             </div>
           </div>
         </div>
@@ -419,34 +426,44 @@ export default function CosineSimilarity({
             </Col>
           </Row>
 
-          <div
-            id="refPlot"
-            style={{ display: refPlotURL.length ? 'block' : 'none' }}
-          >
-            <div className="d-flex">
-              <a
-                className="px-2 py-1"
-                href={refPlotURL}
-                download={refPlotURL.split('/').slice(-1)[0]}
-              >
-                Download Plot
-              </a>
-              <span className="ml-auto">
-                <Button
-                  className="px-2 py-1"
-                  variant="link"
-                  onClick={() => downloadResults(refTxtPath)}
-                >
-                  Download Results
-                </Button>
-              </span>
+          <div id="refPlot">
+            <div style={{ display: refErr ? 'block' : 'none' }}>
+              <p>
+                An error has occured. Check the debug section for more info.
+              </p>
             </div>
-            <div className="p-2 border rounded">
-              <Row>
-                <Col>
-                  <img className="w-100 my-4 h-500" src={refPlotURL}></img>
-                </Col>
-              </Row>
+            <div style={{ display: refPlotURL ? 'block' : 'none' }}>
+              <div className="d-flex">
+                <a
+                  className="px-2 py-1"
+                  href={refPlotURL}
+                  download={refPlotURL.split('/').slice(-1)[0]}
+                >
+                  Download Plot
+                </a>
+                <span className="ml-auto">
+                  <Button
+                    className="px-2 py-1"
+                    variant="link"
+                    onClick={() => downloadResults(refTxtPath)}
+                  >
+                    Download Results
+                  </Button>
+                </span>
+              </div>
+              <div className="p-2 border rounded">
+                <Row>
+                  <Col>
+                    {refErr == true && (
+                      <p>
+                        An error has occured. Check the debug section for more
+                        info.
+                      </p>
+                    )}
+                    <img className="w-100 my-4 h-500" src={refPlotURL}></img>
+                  </Col>
+                </Row>
+              </div>
             </div>
           </div>
         </div>

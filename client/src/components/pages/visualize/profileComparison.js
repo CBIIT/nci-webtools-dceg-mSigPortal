@@ -42,21 +42,13 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     refPlotURL,
     displayWithin,
     displayRefSig,
+    withinErr,
+    refErr,
     debugR,
     displayDebug,
     withinSubmitOverlay,
     refSubmitOverlay,
   } = useSelector((state) => state.profileComparison);
-
-  // load r plots after they are recieved
-  // useEffect(() => {
-  //   if (displayTab == 'profileComparison') {
-  //     if (withinPlotPath && !withinPlotURL && !withinSubmitOverlay)
-  //       setRPlot(withinPlotPath, 'within');
-  //     if (refPlotPath && !refPlotURL && !refSubmitOverlay)
-  //       setRPlot(refPlotPath, 'refsig');
-  //   }
-  // }, [withinPlotPath, refPlotPath, displayTab]);
 
   // get inital signatures from initially selected signature set
   useEffect(() => {
@@ -112,44 +104,52 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
 
   async function setRPlot(plotPath, type) {
     setOverlay(type, true);
-    try {
-      const response = await fetch(`${rootURL}visualize/svg`, {
-        method: 'POST',
-        headers: {
-          Accept: 'image/svg',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ path: plotPath }),
-      });
-      if (!response.ok) {
-        // console.log(await response.json());
-        setOverlay(type, false);
-      } else {
-        const pic = await response.blob();
-        const objectURL = URL.createObjectURL(pic);
-
-        if (type == 'within') {
-          if (withinPlotURL.length) URL.revokeObjectURL(withinPlotURL);
-          dispatchProfileComparison({
-            withinPlotURL: objectURL,
-          });
+    if (plotPath) {
+      try {
+        const response = await fetch(`${rootURL}visualize/svg`, {
+          method: 'POST',
+          headers: {
+            Accept: 'image/svg',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ path: plotPath }),
+        });
+        if (!response.ok) {
+          // console.log(await response.json());
         } else {
-          if (refPlotURL.length) URL.revokeObjectURL(refPlotURL);
-          dispatchProfileComparison({
-            refPlotURL: objectURL,
-          });
+          const pic = await response.blob();
+          const objectURL = URL.createObjectURL(pic);
+
+          if (type == 'within') {
+            if (withinPlotURL) URL.revokeObjectURL(withinPlotURL);
+            dispatchProfileComparison({
+              withinPlotURL: objectURL,
+            });
+          } else {
+            if (refPlotURL) URL.revokeObjectURL(refPlotURL);
+            dispatchProfileComparison({
+              refPlotURL: objectURL,
+            });
+          }
         }
-        setOverlay(type, false);
+      } catch (err) {
+        dispatchError(err);
       }
-    } catch (err) {
-      dispatchError(err);
-      setOverlay(type, false);
+    } else {
+      if (type == 'within') {
+        if (withinPlotURL) URL.revokeObjectURL(withinPlotURL);
+        dispatchProfileComparison({ withinErr: true, withinPlotURL: '' });
+      } else {
+        if (refPlotURL) URL.revokeObjectURL(refPlotURL);
+        dispatchProfileComparison({ refErr: true, refPlotURL: '' });
+      }
     }
+    setOverlay(type, false);
   }
 
   // get Signature Reference Sets for dropdown options
   async function getSignatureSet(profileType) {
-    if (profileType && profileType.length) {
+    if (profileType) {
       dispatchProfileComparison({ refSubmitOverlay: true });
       try {
         const response = await getRefSigOptions(profileType);
@@ -177,7 +177,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
 
   // get signature options for compare
   async function getSignatures(profileType, signatureSetName) {
-    if (signatureSetName && signatureSetName.length) {
+    if (signatureSetName) {
       dispatchProfileComparison({ refSubmitOverlay: true });
       try {
         const response = await fetch(`${rootURL}api/visualizeR/getSignatures`, {
@@ -215,11 +215,13 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     if (fn == 'profileComparisonWithin') {
       dispatchProfileComparison({
         withinSubmitOverlay: true,
+        withinErr: '',
         debugR: '',
       });
     } else {
       dispatchProfileComparison({
         refSubmitOverlay: true,
+        refErr: '',
         debugR: '',
       });
     }
@@ -371,25 +373,29 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
             </Col>
           </Row>
 
-          <div
-            id="pcWithinPlot"
-            style={{ display: withinPlotURL.length ? 'block' : 'none' }}
-          >
-            <div className="d-flex">
-              <a
-                className="px-2 py-1"
-                href={withinPlotURL}
-                download={withinPlotURL.split('/').slice(-1)[0]}
-              >
-                Download Plot
-              </a>
+          <div id="pcWithinPlot">
+            <div style={{ display: withinErr ? 'block' : 'none' }}>
+              <p>
+                An error has occured. Check the debug section for more info.
+              </p>
             </div>
-            <div className="p-2 border rounded">
-              <Row>
-                <Col>
-                  <img className="w-100 my-4" src={withinPlotURL}></img>
-                </Col>
-              </Row>
+            <div style={{ display: withinPlotURL ? 'block' : 'none' }}>
+              <div className="d-flex">
+                <a
+                  className="px-2 py-1"
+                  href={withinPlotURL}
+                  download={withinPlotURL.split('/').slice(-1)[0]}
+                >
+                  Download Plot
+                </a>
+              </div>
+              <div className="p-2 border rounded">
+                <Row>
+                  <Col>
+                    <img className="w-100 my-4" src={withinPlotURL}></img>
+                  </Col>
+                </Row>
+              </div>
             </div>
           </div>
         </div>
@@ -520,10 +526,13 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
             </Col>
           </Row>
 
-          <div
-            id="refPlotDownload"
-            style={{ display: refPlotURL.length ? 'block' : 'none' }}
-          >
+          <div id="refPlotDownload">
+            <div style={{ display: refErr ? 'block' : 'none' }}>
+              <p>
+                An error has occured. Check the debug section for more info.
+              </p>
+            </div>
+            <div style={{ display: refPlotURL ? 'block' : 'none' }}></div>
             <div className="d-flex">
               <a
                 className="px-2 py-1"
