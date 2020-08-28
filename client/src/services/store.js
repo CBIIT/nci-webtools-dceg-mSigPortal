@@ -12,7 +12,6 @@ export const getInitialState = () => ({
     queueMode: false,
     email: '',
     openSidebar: true,
-    disableParameters: false,
     storeFilename: '',
     bedFilename: '',
     submitted: false,
@@ -27,7 +26,7 @@ export const getInitialState = () => ({
   visualizeResults: {
     error: '',
     projectID: '',
-    // projectID: '467dce61-87a8-4d4b-a0d2-0f75bedf073f',
+    // projectID: '04640afa-5530-4790-91db-6ff695a51478',
     displayTab: 'mutationalProfiles',
     downloads: [],
     svgList: [],

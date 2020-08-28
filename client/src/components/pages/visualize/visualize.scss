@@ -54,3 +54,12 @@ ul {
   columns: 3;
   column-width: auto;
 }
+
+a.disabled,
+input:disabled,
+select:disabled,
+button:disabled,
+div[disabled] {
+  cursor: not-allowed;
+  pointer-events: all !important;
+}

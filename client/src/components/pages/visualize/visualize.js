@@ -38,10 +38,10 @@ export default function Visualize() {
                   <Label className="mr-auto">
                     <h3 className="mb-2">Data Source</h3>
                   </Label>
-                  <Check inline id="radioWGS" className="ml-4">
+                  <Check inline id="radioUser" className="ml-4">
                     <Check.Input
                       type="radio"
-                      value="WGS"
+                      value="user"
                       checked={source == 'user'}
                       onChange={(e) =>
                         store.dispatch(updateVisualize({ source: 'user' }))
@@ -51,10 +51,10 @@ export default function Visualize() {
                       User
                     </Check.Label>
                   </Check>
-                  <Check inline id="radioWES">
+                  <Check inline id="radioPublic">
                     <Check.Input
                       type="radio"
-                      value="WES"
+                      value="public"
                       checked={source == 'public'}
                       onChange={(e) =>
                         store.dispatch(updateVisualize({ source: 'public' }))

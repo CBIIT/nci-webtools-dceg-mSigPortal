@@ -11,7 +11,7 @@ import { useDropzone } from 'react-dropzone';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCloudUploadAlt,
-  faMinus,
+  faTimes,
   faInfoCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
@@ -40,7 +40,6 @@ export default function UploadForm() {
     mutationFilter,
     queueMode,
     email,
-    disableParameters,
     storeFilename,
     bedFilename,
     bedData,
@@ -76,7 +75,6 @@ export default function UploadForm() {
 
   async function handleSubmit() {
     // disable parameters after submit
-    dispatchVisualize({ disableParameters: true });
     dispatchVisualize({ submitted: true });
 
     const { projectID, filePath, bedPath } = await uploadFile();
@@ -256,6 +254,7 @@ export default function UploadForm() {
   }
 
   function selectFormat(format) {
+    handleReset();
     let path = '';
     if (format == 'vcf') path = 'assets/exampleInput/demo_input_multi.vcf.gz';
     if (format == 'csv') path = 'assets/exampleInput/demo_input_multi.csv';
@@ -313,7 +312,7 @@ export default function UploadForm() {
           as="select"
           value={inputFormat}
           onChange={(e) => selectFormat(e.target.value)}
-          disabled={disableParameters}
+          disabled={submitted}
           custom
         >
           <option value="vcf">VCF</option>
@@ -331,7 +330,7 @@ export default function UploadForm() {
           <Col sm="6" className="p-0">
             <Button
               className="p-0 font-14"
-              disabled={disableParameters}
+              disabled={submitted}
               variant="link"
               href={'assets/exampleInput/all_demo_inputs.zip'}
               download
@@ -342,7 +341,7 @@ export default function UploadForm() {
           <Col sm="6" className="p-0 d-flex">
             <Button
               className="p-0 ml-auto font-14"
-              disabled={disableParameters}
+              disabled={submitted}
               variant="link"
               type="button"
               onClick={() => loadExample()}
@@ -352,23 +351,26 @@ export default function UploadForm() {
           </Col>
         </Row>
         <section>
-          <div {...mainRootProps({ className: 'dropzone' })}>
+          <div
+            {...mainRootProps({ className: 'dropzone' })}
+            disabled={submitted}
+          >
             <input
               {...mainInputProps()}
-              disabled={inputFile.size || disableParameters}
+              disabled={inputFile.size || submitted}
             />
-            {inputFile.size || submitted ? (
+            {inputFile.size ? (
               <button
                 id="removeFile"
                 className="d-flex w-100 faButton"
                 onClick={() => removeFile()}
-                disabled={disableParameters}
+                disabled={submitted}
               >
                 <span id="uploadedFile">
                   {submitted ? storeFilename : inputFile.name}
                 </span>
                 <span className="text-danger ml-auto">
-                  <FontAwesomeIcon icon={faMinus} />
+                  <FontAwesomeIcon icon={faTimes} />
                 </span>
               </button>
             ) : (
@@ -389,8 +391,7 @@ export default function UploadForm() {
             dispatchVisualize({ selectedGenome: e.target.value })
           }
           disabled={
-            disableParameters ||
-            ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
+            submitted || ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
           }
           custom
         >
@@ -410,8 +411,7 @@ export default function UploadForm() {
               dispatchVisualize({ experimentalStrategy: e.target.value })
             }
             disabled={
-              disableParameters ||
-              ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
+              submitted || ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
             }
           />
           <Check.Label className="font-weight-normal">WGS</Check.Label>
@@ -425,13 +425,13 @@ export default function UploadForm() {
               dispatchVisualize({ experimentalStrategy: e.target.value })
             }
             disabled={
-              disableParameters ||
-              ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
+              submitted || ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
             }
           />
           <Check.Label className="font-weight-normal">WES</Check.Label>
         </Check>
       </Group>
+      <hr />
       <Group className="d-flex">
         <Label className="mr-auto">
           Split Mutations According to Filter{' '}
@@ -452,8 +452,9 @@ export default function UploadForm() {
         <Check inline id="radioMutationSplitFalse">
           <Check.Input
             disabled={
-              disableParameters ||
+              submitted ||
               mutationFilter.length ||
+              bedFile.size ||
               ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
             }
             type="checkbox"
@@ -483,13 +484,14 @@ export default function UploadForm() {
             dispatchVisualize({ mutationFilter: e.target.value })
           }
           disabled={
-            disableParameters ||
+            submitted ||
             mutationSplit == 'True' ||
             ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
           }
         ></Control>
         <Text className="text-muted">Use @ to separate multiple filters</Text>
       </Group>
+      <hr />
       <Group controlId="bedUpload">
         <Label>
           Filter Mutations using Bed File{' '}
@@ -502,7 +504,8 @@ export default function UploadForm() {
             <Button
               className="p-0 font-14"
               disabled={
-                disableParameters ||
+                submitted ||
+                mutationSplit == 'True' ||
                 ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
               }
               variant="link"
@@ -516,7 +519,8 @@ export default function UploadForm() {
             <Button
               className="p-0 ml-auto font-14"
               disabled={
-                disableParameters ||
+                submitted ||
+                mutationSplit == 'True' ||
                 ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
               }
               variant="link"
@@ -528,28 +532,35 @@ export default function UploadForm() {
           </Col>
         </Row>
         <section>
-          <div {...bedRootProps({ className: 'dropzone' })}>
+          <div
+            disabled={
+              submitted ||
+              mutationSplit == 'True' ||
+              ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
+            }
+            {...bedRootProps({ className: 'dropzone' })}
+          >
             <input
               {...bedInputProps()}
               disabled={
                 bedFile.size ||
-                disableParameters ||
+                submitted ||
                 ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
               }
             />
-            {bedFile.size || submitted ? (
+            {bedFile.size ? (
               bedFilename.length > 0 && (
                 <button
                   id="removeFile"
                   className="d-flex w-100 faButton"
                   onClick={() => removeBedFile()}
-                  disabled={disableParameters}
+                  disabled={submitted}
                 >
                   <span id="uploadedFile">
                     {submitted ? bedFilename : bedFile.name}
                   </span>
                   <span className="text-danger ml-auto">
-                    <FontAwesomeIcon icon={faMinus} />
+                    <FontAwesomeIcon icon={faTimes} />
                   </span>
                 </button>
               )
@@ -562,6 +573,7 @@ export default function UploadForm() {
           </div>
         </section>
       </Group>
+      <hr />
       <Group className="d-flex">
         <Label className="mr-auto">
           Add Collapsing Data{' '}
@@ -582,8 +594,7 @@ export default function UploadForm() {
         <Check inline id="radioFalse">
           <Check.Input
             disabled={
-              disableParameters ||
-              ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
+              submitted || ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
             }
             type="checkbox"
             value={collapseSample}
@@ -640,7 +651,7 @@ export default function UploadForm() {
         </Col>
         <Col sm="6">
           <Button
-            disabled={!inputFile.size || disableParameters || loading.active}
+            disabled={!inputFile.size || submitted || loading.active}
             className="w-100"
             variant="primary"
             type="button"
