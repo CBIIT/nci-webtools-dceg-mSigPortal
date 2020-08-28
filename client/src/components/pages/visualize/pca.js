@@ -1,10 +1,14 @@
 import React, { useEffect } from 'react';
-import { Form, Row, Col, Button } from 'react-bootstrap';
+import { Form, Row, Col, Button, Accordion, Card } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { dispatchError, dispatchPCA } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const { Group, Label, Control } = Form;
+const { Header, Body } = Card;
+const { Toggle, Collapse } = Accordion;
 
 export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
   const { displayTab } = useSelector((state) => state.visualizeResults);
@@ -179,234 +183,259 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
 
   return (
     <div>
-      <LoadingOverlay active={submitOverlay} />
-      <Form>
-        <Label>
-          <Button
-            variant="link"
-            className="p-0 font-weight-bold"
+      <Accordion defaultActiveKey="0">
+        <Card>
+          <Toggle
+            className="font-weight-bold"
+            as={Header}
+            eventKey="0"
             onClick={() =>
               dispatchPCA({
                 displayPCA: !displayPCA,
               })
             }
           >
+            {displayPCA == true ? (
+              <FontAwesomeIcon icon={faPlus} />
+            ) : (
+              <FontAwesomeIcon icon={faMinus} />
+            )}{' '}
             Principal Component Analysis
-          </Button>
-        </Label>
-        <div
-          className="border rounded p-2"
-          style={{ display: displayPCA ? 'block' : 'none' }}
-        >
-          <Row className="justify-content-center">
-            <Col sm="5">
-              <Group controlId="profileType">
-                <Label>Profile Type</Label>
-                <Control
-                  as="select"
-                  value={profileType}
-                  onChange={(e) => getSignatureSet(e.target.value)}
-                  custom
-                >
-                  {profileOptions.map((profile, index) => {
-                    return (
-                      <option key={index} value={profile}>
-                        {profile}
-                      </option>
-                    );
-                  })}
-                </Control>
-              </Group>
-            </Col>
+          </Toggle>
+          <Collapse eventKey="0">
+            <Body>
+              <Form>
+                <LoadingOverlay active={submitOverlay} />
+                <div>
+                  <Row className="justify-content-center">
+                    <Col sm="5">
+                      <Group controlId="profileType">
+                        <Label>Profile Type</Label>
+                        <Control
+                          as="select"
+                          value={profileType}
+                          onChange={(e) => getSignatureSet(e.target.value)}
+                          custom
+                        >
+                          {profileOptions.map((profile, index) => {
+                            return (
+                              <option key={index} value={profile}>
+                                {profile}
+                              </option>
+                            );
+                          })}
+                        </Control>
+                      </Group>
+                    </Col>
 
-            <Col sm="5">
-              <Group controlId="signatureSet">
-                <Label>Reference Signature Set</Label>
-                <Control
-                  disabled={!signatureSetOptions.length}
-                  as="select"
-                  value={signatureSet}
-                  onChange={(e) => {
-                    dispatchPCA({
-                      signatureSet: e.target.value,
-                    });
-                  }}
-                  custom
-                >
-                  <option value="0">Select</option>
-                  {signatureSetOptions.map((signatureSet, index) => {
-                    return (
-                      <option key={index} value={signatureSet}>
-                        {signatureSet}
-                      </option>
-                    );
-                  })}
-                </Control>
-              </Group>
-            </Col>
-            <Col sm="2" className="m-auto">
-              <Button
-                variant="primary"
-                onClick={() =>
-                  calculateR('pca', {
-                    profileType: profileType,
-                    signatureSet: signatureSet,
-                  })
-                }
-              >
-                Calculate
-              </Button>
-            </Col>
-          </Row>
+                    <Col sm="5">
+                      <Group controlId="signatureSet">
+                        <Label>Reference Signature Set</Label>
+                        <Control
+                          disabled={!signatureSetOptions.length}
+                          as="select"
+                          value={signatureSet}
+                          onChange={(e) => {
+                            dispatchPCA({
+                              signatureSet: e.target.value,
+                            });
+                          }}
+                          custom
+                        >
+                          <option value="0">Select</option>
+                          {signatureSetOptions.map((signatureSet, index) => {
+                            return (
+                              <option key={index} value={signatureSet}>
+                                {signatureSet}
+                              </option>
+                            );
+                          })}
+                        </Control>
+                      </Group>
+                    </Col>
+                    <Col sm="2" className="m-auto">
+                      <Button
+                        variant="primary"
+                        onClick={() =>
+                          calculateR('pca', {
+                            profileType: profileType,
+                            signatureSet: signatureSet,
+                          })
+                        }
+                      >
+                        Calculate
+                      </Button>
+                    </Col>
+                  </Row>
 
-          <div id="pca1Plot">
-            <div style={{ display: pca1Err ? 'block' : 'none' }}>
-              <h4>PCA 1</h4>
-              <p>
-                An error has occured. Check the debug section for more info.
-              </p>
-            </div>
-            <div
-              className="my-4"
-              style={{ display: pca1URL ? 'block' : 'none' }}
-            >
-              <div className="d-flex">
-                <a
-                  className="px-2 py-1"
-                  href={pca1URL}
-                  download={pca1URL.split('/').slice(-1)[0]}
-                >
-                  Download Plot
-                </a>
-              </div>
-              <div className="p-2 border rounded">
-                <Row>
-                  <Col>
-                    <img className="w-100 my-4 h-500" src={pca1URL}></img>
-                  </Col>
-                </Row>
-              </div>
-            </div>
-          </div>
+                  <div id="pca1Plot">
+                    <div style={{ display: pca1Err ? 'block' : 'none' }}>
+                      <h4>PCA 1</h4>
+                      <p>
+                        An error has occured. Check the debug section for more
+                        info.
+                      </p>
+                    </div>
+                    <div
+                      className="my-4"
+                      style={{ display: pca1URL ? 'block' : 'none' }}
+                    >
+                      <div className="d-flex">
+                        <a
+                          className="px-2 py-1"
+                          href={pca1URL}
+                          download={pca1URL.split('/').slice(-1)[0]}
+                        >
+                          Download Plot
+                        </a>
+                      </div>
+                      <div className="p-2 border rounded">
+                        <Row>
+                          <Col>
+                            <img
+                              className="w-100 my-4 h-500"
+                              src={pca1URL}
+                            ></img>
+                          </Col>
+                        </Row>
+                      </div>
+                    </div>
+                  </div>
 
-          <div id="pca2Plot">
-            <div style={{ display: pca2Err ? 'block' : 'none' }}>
-              <h4>PCA 2</h4>
-              <p>
-                An error has occured. Check the debug section for more info.
-              </p>
-            </div>
-            <div
-              className="my-4"
-              style={{ display: pca2URL ? 'block' : 'none' }}
-            >
-              <div className="d-flex">
-                <a
-                  className="px-2 py-1"
-                  href={pca2URL}
-                  download={pca2URL.split('/').slice(-1)[0]}
-                >
-                  Download Plot
-                </a>
-                <span className="ml-auto">
-                  <Button
-                    className="px-2 py-1"
-                    variant="link"
-                    onClick={() => downloadResults(pca2Data)}
-                  >
-                    Download Results
-                  </Button>
-                </span>
-              </div>
-              <div className="p-2 border rounded">
-                <Row>
-                  <Col>
-                    <img className="w-100 my-4 h-600" src={pca2URL}></img>
-                  </Col>
-                </Row>
-              </div>
-            </div>
-          </div>
+                  <div id="pca2Plot">
+                    <div style={{ display: pca2Err ? 'block' : 'none' }}>
+                      <h4>PCA 2</h4>
+                      <p>
+                        An error has occured. Check the debug section for more
+                        info.
+                      </p>
+                    </div>
+                    <div
+                      className="my-4"
+                      style={{ display: pca2URL ? 'block' : 'none' }}
+                    >
+                      <div className="d-flex">
+                        <a
+                          className="px-2 py-1"
+                          href={pca2URL}
+                          download={pca2URL.split('/').slice(-1)[0]}
+                        >
+                          Download Plot
+                        </a>
+                        <span className="ml-auto">
+                          <Button
+                            className="px-2 py-1"
+                            variant="link"
+                            onClick={() => downloadResults(pca2Data)}
+                          >
+                            Download Results
+                          </Button>
+                        </span>
+                      </div>
+                      <div className="p-2 border rounded">
+                        <Row>
+                          <Col>
+                            <img
+                              className="w-100 my-4 h-600"
+                              src={pca2URL}
+                            ></img>
+                          </Col>
+                        </Row>
+                      </div>
+                    </div>
+                  </div>
 
-          <div id="pca3Plot">
-            <div style={{ display: pca3Err ? 'block' : 'none' }}>
-              <h4>PCA 3</h4>
-              <p>
-                An error has occured. Check the debug section for more info.
-              </p>
-            </div>
-            <div
-              className="my-4"
-              style={{ display: pca3URL ? 'block' : 'none' }}
-            >
-              <div className="d-flex">
-                <a
-                  className="px-2 py-1"
-                  href={pca3URL}
-                  download={pca3URL.split('/').slice(-1)[0]}
-                >
-                  Download Plot
-                </a>
-                <span className="ml-auto">
-                  <Button
-                    className="px-2 py-1"
-                    variant="link"
-                    onClick={() => downloadResults(pca3Data)}
-                  >
-                    Download Results
-                  </Button>
-                </span>
-              </div>
-              <div className="p-2 border rounded">
-                <Row>
-                  <Col>
-                    <img className="w-100 my-4 h-600" src={pca3URL}></img>
-                  </Col>
-                </Row>
-              </div>
-            </div>
-          </div>
+                  <div id="pca3Plot">
+                    <div style={{ display: pca3Err ? 'block' : 'none' }}>
+                      <h4>PCA 3</h4>
+                      <p>
+                        An error has occured. Check the debug section for more
+                        info.
+                      </p>
+                    </div>
+                    <div
+                      className="my-4"
+                      style={{ display: pca3URL ? 'block' : 'none' }}
+                    >
+                      <div className="d-flex">
+                        <a
+                          className="px-2 py-1"
+                          href={pca3URL}
+                          download={pca3URL.split('/').slice(-1)[0]}
+                        >
+                          Download Plot
+                        </a>
+                        <span className="ml-auto">
+                          <Button
+                            className="px-2 py-1"
+                            variant="link"
+                            onClick={() => downloadResults(pca3Data)}
+                          >
+                            Download Results
+                          </Button>
+                        </span>
+                      </div>
+                      <div className="p-2 border rounded">
+                        <Row>
+                          <Col>
+                            <img
+                              className="w-100 my-4 h-600"
+                              src={pca3URL}
+                            ></img>
+                          </Col>
+                        </Row>
+                      </div>
+                    </div>
+                  </div>
 
-          <div id="heatmapPlot">
-            <div style={{ display: heatmapErr ? 'block' : 'none' }}>
-              <h4>Heatmap</h4>
-              <p>
-                An error has occured. Check the debug section for more info.
-              </p>
-            </div>
-            <div
-              className="my-4"
-              style={{ display: heatmapURL ? 'block' : 'none' }}
-            >
-              <div className="d-flex">
-                <a
-                  className="px-2 py-1"
-                  href={heatmapURL}
-                  download={heatmapURL.split('/').slice(-1)[0]}
-                >
-                  Download Plot
-                </a>
-                <span className="ml-auto">
-                  <Button
-                    className="px-2 py-1"
-                    variant="link"
-                    onClick={() => downloadResults(heatmapData)}
-                  >
-                    Download Results
-                  </Button>
-                </span>
-              </div>
-              <div className="p-2 border rounded">
-                <Row>
-                  <Col>
-                    <img className="w-100 my-4 h-600" src={heatmapURL}></img>
-                  </Col>
-                </Row>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Form>
+                  <div id="heatmapPlot">
+                    <div style={{ display: heatmapErr ? 'block' : 'none' }}>
+                      <h4>Heatmap</h4>
+                      <p>
+                        An error has occured. Check the debug section for more
+                        info.
+                      </p>
+                    </div>
+                    <div
+                      className="my-4"
+                      style={{ display: heatmapURL ? 'block' : 'none' }}
+                    >
+                      <div className="d-flex">
+                        <a
+                          className="px-2 py-1"
+                          href={heatmapURL}
+                          download={heatmapURL.split('/').slice(-1)[0]}
+                        >
+                          Download Plot
+                        </a>
+                        <span className="ml-auto">
+                          <Button
+                            className="px-2 py-1"
+                            variant="link"
+                            onClick={() => downloadResults(heatmapData)}
+                          >
+                            Download Results
+                          </Button>
+                        </span>
+                      </div>
+                      <div className="p-2 border rounded">
+                        <Row>
+                          <Col>
+                            <img
+                              className="w-100 my-4 h-600"
+                              src={heatmapURL}
+                            ></img>
+                          </Col>
+                        </Row>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Form>
+            </Body>
+          </Collapse>
+        </Card>
+      </Accordion>
 
       <Button
         variant="link"

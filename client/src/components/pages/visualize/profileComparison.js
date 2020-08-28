@@ -6,11 +6,17 @@ import {
   Button,
   Popover,
   OverlayTrigger,
+  Accordion,
+  Card,
 } from 'react-bootstrap';
 import Select from 'react-select';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import {
+  faInfoCircle,
+  faPlus,
+  faMinus,
+} from '@fortawesome/free-solid-svg-icons';
 import {
   dispatchError,
   dispatchProfileComparison,
@@ -19,6 +25,8 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const { Group, Label, Control, Text } = Form;
 const { Title, Content } = Popover;
+const { Header, Body } = Card;
+const { Toggle, Collapse } = Accordion;
 
 export default function ProfileComparison({ submitR, getRefSigOptions }) {
   const { displayTab } = useSelector((state) => state.visualizeResults);
@@ -290,268 +298,303 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
 
   return (
     <div>
-      <Form>
-        <LoadingOverlay active={withinSubmitOverlay} />
-        <Label>
-          <Button
-            variant="link"
-            className="p-0 font-weight-bold"
+      <Accordion defaultActiveKey="0">
+        <Card>
+          <Toggle
+            className="font-weight-bold"
+            as={Header}
+            eventKey="0"
             onClick={() =>
               dispatchProfileComparison({
                 displayWithin: !displayWithin,
               })
             }
           >
+            {displayWithin == true ? (
+              <FontAwesomeIcon icon={faPlus} />
+            ) : (
+              <FontAwesomeIcon icon={faMinus} />
+            )}{' '}
             Comparison Within Samples
-          </Button>
-        </Label>
-        <div
-          className="border rounded p-2"
-          style={{ display: displayWithin ? 'block' : 'none' }}
-        >
-          <Row className="justify-content-center">
-            <Col sm="2">
-              <Group controlId="profileTypeWithin">
-                <Label>Profile Type</Label>
-                <Control
-                  as="select"
-                  value={withinProfileType}
-                  onChange={(e) =>
-                    dispatchProfileComparison({
-                      withinProfileType: e.target.value,
-                    })
-                  }
-                  custom
-                >
-                  {profileOptions.map((profile, index) => {
-                    return (
-                      <option key={index} value={profile}>
-                        {profile}
-                      </option>
-                    );
-                  })}
-                </Control>
-              </Group>
-            </Col>
-            <Col sm="4">
-              <Label>Sample Name 1</Label>
-              <Select
-                options={nameOptions}
-                value={[withinSampleName1]}
-                onChange={(name) => {
-                  dispatchProfileComparison({ withinSampleName1: name || '' });
-                }}
-                getOptionLabel={(option) => option}
-                getOptionValue={(option) => option}
-              />
-            </Col>
-            <Col sm="4">
-              <Label>Sample Name 2</Label>
-              <Select
-                options={nameOptions}
-                value={[withinSampleName2]}
-                onChange={(name) => {
-                  dispatchProfileComparison({ withinSampleName2: name || '' });
-                }}
-                getOptionLabel={(option) => option}
-                getOptionValue={(option) => option}
-              />
-            </Col>
-            <Col sm="2" className="m-auto">
-              <Button
-                variant="primary"
-                onClick={() =>
-                  calculateR('profileComparisonWithin', {
-                    profileType: withinProfileType,
-                    sampleName1: withinSampleName1,
-                    sampleName2: withinSampleName2,
-                  })
-                }
-              >
-                Calculate
-              </Button>
-            </Col>
-          </Row>
+          </Toggle>
+          <Collapse eventKey="0">
+            <Body>
+              <Form>
+                <LoadingOverlay active={withinSubmitOverlay} />
+                <div>
+                  <Row className="justify-content-center">
+                    <Col sm="2">
+                      <Group controlId="profileTypeWithin">
+                        <Label>Profile Type</Label>
+                        <Control
+                          as="select"
+                          value={withinProfileType}
+                          onChange={(e) =>
+                            dispatchProfileComparison({
+                              withinProfileType: e.target.value,
+                            })
+                          }
+                          custom
+                        >
+                          {profileOptions.map((profile, index) => {
+                            return (
+                              <option key={index} value={profile}>
+                                {profile}
+                              </option>
+                            );
+                          })}
+                        </Control>
+                      </Group>
+                    </Col>
+                    <Col sm="4">
+                      <Label>Sample Name 1</Label>
+                      <Select
+                        options={nameOptions}
+                        value={[withinSampleName1]}
+                        onChange={(name) => {
+                          dispatchProfileComparison({
+                            withinSampleName1: name || '',
+                          });
+                        }}
+                        getOptionLabel={(option) => option}
+                        getOptionValue={(option) => option}
+                      />
+                    </Col>
+                    <Col sm="4">
+                      <Label>Sample Name 2</Label>
+                      <Select
+                        options={nameOptions}
+                        value={[withinSampleName2]}
+                        onChange={(name) => {
+                          dispatchProfileComparison({
+                            withinSampleName2: name || '',
+                          });
+                        }}
+                        getOptionLabel={(option) => option}
+                        getOptionValue={(option) => option}
+                      />
+                    </Col>
+                    <Col sm="2" className="m-auto">
+                      <Button
+                        variant="primary"
+                        onClick={() =>
+                          calculateR('profileComparisonWithin', {
+                            profileType: withinProfileType,
+                            sampleName1: withinSampleName1,
+                            sampleName2: withinSampleName2,
+                          })
+                        }
+                      >
+                        Calculate
+                      </Button>
+                    </Col>
+                  </Row>
 
-          <div id="pcWithinPlot">
-            <div style={{ display: withinErr ? 'block' : 'none' }}>
-              <p>
-                An error has occured. Check the debug section for more info.
-              </p>
-            </div>
-            <div style={{ display: withinPlotURL ? 'block' : 'none' }}>
-              <div className="d-flex">
-                <a
-                  className="px-2 py-1"
-                  href={withinPlotURL}
-                  download={withinPlotURL.split('/').slice(-1)[0]}
-                >
-                  Download Plot
-                </a>
-              </div>
-              <div className="p-2 border rounded">
-                <Row>
-                  <Col>
-                    <img className="w-100 my-4" src={withinPlotURL}></img>
-                  </Col>
-                </Row>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Form>
+                  <div id="pcWithinPlot">
+                    <div style={{ display: withinErr ? 'block' : 'none' }}>
+                      <p>
+                        An error has occured. Check the debug section for more
+                        info.
+                      </p>
+                    </div>
+                    <div style={{ display: withinPlotURL ? 'block' : 'none' }}>
+                      <div className="d-flex">
+                        <a
+                          className="px-2 py-1"
+                          href={withinPlotURL}
+                          download={withinPlotURL.split('/').slice(-1)[0]}
+                        >
+                          Download Plot
+                        </a>
+                      </div>
+                      <div className="p-2 border rounded">
+                        <Row>
+                          <Col>
+                            <img
+                              className="w-100 my-4"
+                              src={withinPlotURL}
+                            ></img>
+                          </Col>
+                        </Row>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Form>
+            </Body>
+          </Collapse>
+        </Card>
+      </Accordion>
 
-      <Form className="my-2">
-        <LoadingOverlay active={refSubmitOverlay} />
-        <Label>
-          <Button
-            variant="link"
-            className="p-0 font-weight-bold"
+      <Accordion defaultActiveKey="1">
+        <Card>
+          <Toggle
+            className="font-weight-bold"
+            as={Header}
+            eventKey="1"
             onClick={() =>
               dispatchProfileComparison({
                 displayRefSig: !displayRefSig,
               })
             }
           >
+            {displayRefSig == true ? (
+              <FontAwesomeIcon icon={faPlus} />
+            ) : (
+              <FontAwesomeIcon icon={faMinus} />
+            )}{' '}
             Comparison to Reference Signatures
-          </Button>
-        </Label>
-        <div
-          className="border rounded p-2"
-          style={{ display: displayRefSig ? 'block' : 'none' }}
-        >
-          <Row className="justify-content-center">
-            <Col sm="2">
-              <Group controlId="profileTypeRefSig">
-                <Label>Profile Type</Label>
-                <Control
-                  as="select"
-                  value={refProfileType}
-                  onChange={(e) => getSignatureSet(e.target.value)}
-                  custom
-                >
-                  {profileOptions.map((profile, index) => {
-                    return (
-                      <option key={index} value={profile}>
-                        {profile}
-                      </option>
-                    );
-                  })}
-                </Control>
-              </Group>
-            </Col>
-            <Col sm="2">
-              <Group controlId="sampleNameRefSig">
-                <Label>Sample Name</Label>
-                <Select
-                  options={nameOptions}
-                  value={[refSampleName]}
-                  onChange={(name) => {
-                    dispatchProfileComparison({ refSampleName: name || '' });
-                  }}
-                  getOptionLabel={(option) => option}
-                  getOptionValue={(option) => option}
-                />
-              </Group>
-            </Col>
-            <Col sm="4">
-              <Group controlId="signatureSet">
-                <Label>Reference Signature Set</Label>
-                <Control
-                  disabled={!refSignatureSetOptions.length}
-                  as="select"
-                  value={refSignatureSet}
-                  onChange={(e) => {
-                    dispatchProfileComparison({
-                      refSignatureSet: e.target.value,
-                    });
-                    getSignatures(refProfileType, e.target.value);
-                  }}
-                  custom
-                >
-                  <option value="0">Select</option>
-                  {refSignatureSetOptions.map((signatureSet, index) => {
-                    return (
-                      <option key={index} value={signatureSet}>
-                        {signatureSet}
-                      </option>
-                    );
-                  })}
-                </Control>
-              </Group>
-            </Col>
-            <Col sm="2">
-              <Group controlId="signatureSet">
-                <Label>
-                  Compare Signatures{' '}
-                  <OverlayTrigger
-                    trigger="click"
-                    placement="top"
-                    overlay={popover}
-                    rootClose
-                  >
-                    <Button variant="link" className="p-0 font-weight-bold">
-                      <FontAwesomeIcon
-                        icon={faInfoCircle}
-                        style={{ verticalAlign: 'baseline' }}
-                      />
-                    </Button>
-                  </OverlayTrigger>
-                </Label>
-                <Control
-                  value={refCompare}
-                  onChange={(e) => {
-                    dispatchProfileComparison({
-                      refCompare: e.target.value,
-                    });
-                  }}
-                ></Control>
-                <Text className="text-muted">(Ex. 0.8*SBS5;0.1*SBS1)</Text>
-              </Group>
-            </Col>
-            <Col sm="2" className="m-auto">
-              <Button
-                variant="primary"
-                onClick={() =>
-                  calculateR('profileComparisonRefSig', {
-                    profileType: refProfileType,
-                    sampleName: refSampleName,
-                    signatureSet: refSignatureSet,
-                    compare: refCompare,
-                  })
-                }
-              >
-                Calculate
-              </Button>
-            </Col>
-          </Row>
+          </Toggle>
+          <Collapse eventKey="1">
+            <Body>
+              <Form className="my-2">
+                <LoadingOverlay active={refSubmitOverlay} />
+                <div>
+                  <Row className="justify-content-center">
+                    <Col sm="2">
+                      <Group controlId="profileTypeRefSig">
+                        <Label>Profile Type</Label>
+                        <Control
+                          as="select"
+                          value={refProfileType}
+                          onChange={(e) => getSignatureSet(e.target.value)}
+                          custom
+                        >
+                          {profileOptions.map((profile, index) => {
+                            return (
+                              <option key={index} value={profile}>
+                                {profile}
+                              </option>
+                            );
+                          })}
+                        </Control>
+                      </Group>
+                    </Col>
+                    <Col sm="2">
+                      <Group controlId="sampleNameRefSig">
+                        <Label>Sample Name</Label>
+                        <Select
+                          options={nameOptions}
+                          value={[refSampleName]}
+                          onChange={(name) => {
+                            dispatchProfileComparison({
+                              refSampleName: name || '',
+                            });
+                          }}
+                          getOptionLabel={(option) => option}
+                          getOptionValue={(option) => option}
+                        />
+                      </Group>
+                    </Col>
+                    <Col sm="4">
+                      <Group controlId="signatureSet">
+                        <Label>Reference Signature Set</Label>
+                        <Control
+                          disabled={!refSignatureSetOptions.length}
+                          as="select"
+                          value={refSignatureSet}
+                          onChange={(e) => {
+                            dispatchProfileComparison({
+                              refSignatureSet: e.target.value,
+                            });
+                            getSignatures(refProfileType, e.target.value);
+                          }}
+                          custom
+                        >
+                          <option value="0">Select</option>
+                          {refSignatureSetOptions.map((signatureSet, index) => {
+                            return (
+                              <option key={index} value={signatureSet}>
+                                {signatureSet}
+                              </option>
+                            );
+                          })}
+                        </Control>
+                      </Group>
+                    </Col>
+                    <Col sm="2">
+                      <Group controlId="signatureSet">
+                        <Label>
+                          Compare Signatures{' '}
+                          <OverlayTrigger
+                            trigger="click"
+                            placement="top"
+                            overlay={popover}
+                            rootClose
+                          >
+                            <Button
+                              variant="link"
+                              className="p-0 font-weight-bold"
+                            >
+                              <FontAwesomeIcon
+                                icon={faInfoCircle}
+                                style={{ verticalAlign: 'baseline' }}
+                              />
+                            </Button>
+                          </OverlayTrigger>
+                        </Label>
+                        <Control
+                          value={refCompare}
+                          onChange={(e) => {
+                            dispatchProfileComparison({
+                              refCompare: e.target.value,
+                            });
+                          }}
+                        ></Control>
+                        <Text className="text-muted">
+                          (Ex. 0.8*SBS5;0.1*SBS1)
+                        </Text>
+                      </Group>
+                    </Col>
+                    <Col sm="2" className="m-auto">
+                      <Button
+                        variant="primary"
+                        onClick={() =>
+                          calculateR('profileComparisonRefSig', {
+                            profileType: refProfileType,
+                            sampleName: refSampleName,
+                            signatureSet: refSignatureSet,
+                            compare: refCompare,
+                          })
+                        }
+                      >
+                        Calculate
+                      </Button>
+                    </Col>
+                  </Row>
 
-          <div id="refPlotDownload">
-            <div style={{ display: refErr ? 'block' : 'none' }}>
-              <p>
-                An error has occured. Check the debug section for more info.
-              </p>
-            </div>
-            <div style={{ display: refPlotURL ? 'block' : 'none' }}></div>
-            <div className="d-flex">
-              <a
-                className="px-2 py-1"
-                href={refPlotURL}
-                download={refPlotURL.split('/').slice(-1)[0]}
-              >
-                Download Plot
-              </a>
-            </div>
-            <div className="p-2 border rounded">
-              <Row>
-                <Col>
-                  <img className="w-100 my-4" src={refPlotURL}></img>
-                </Col>
-              </Row>
-            </div>
-          </div>
-        </div>
-      </Form>
+                  <div id="refPlotDownload">
+                    <div style={{ display: refErr ? 'block' : 'none' }}>
+                      <p>
+                        An error has occured. Check the debug section for more
+                        info.
+                      </p>
+                    </div>
+                    <div style={{ display: refPlotURL ? 'block' : 'none' }}>
+                      <div className="d-flex">
+                        <a
+                          className="px-2 py-1"
+                          href={refPlotURL}
+                          download={refPlotURL.split('/').slice(-1)[0]}
+                        >
+                          Download Plot
+                        </a>
+                      </div>
+                      <div className="p-2 border rounded">
+                        <Row>
+                          <Col>
+                            <img className="w-100 my-4" src={refPlotURL}></img>
+                          </Col>
+                        </Row>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Form>
+            </Body>
+          </Collapse>
+        </Card>
+      </Accordion>
 
       <Button
         variant="link"

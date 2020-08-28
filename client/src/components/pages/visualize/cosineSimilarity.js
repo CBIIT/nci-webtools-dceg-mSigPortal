@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
-import { Form, Row, Col, Button } from 'react-bootstrap';
+import { Form, Row, Col, Button, Accordion, Card } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import {
   dispatchError,
   dispatchCosineSimilarity,
@@ -8,6 +10,8 @@ import {
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const { Group, Label, Control } = Form;
+const { Header, Body } = Card;
+const { Toggle, Collapse } = Accordion;
 
 export default function CosineSimilarity({
   downloadResults,
@@ -232,242 +236,272 @@ export default function CosineSimilarity({
 
   return (
     <div>
-      <Form>
-        <LoadingOverlay active={withinSubmitOverlay} />
-        <Label>
-          <Button
-            variant="link"
-            className="p-0 font-weight-bold"
+      <Accordion defaultActiveKey="0">
+        <Card>
+          <Toggle
+            className="font-weight-bold"
+            as={Header}
+            eventKey="0"
             onClick={() =>
               dispatchCosineSimilarity({
                 displayWithin: !displayWithin,
               })
             }
           >
+            {displayWithin == true ? (
+              <FontAwesomeIcon icon={faMinus} />
+            ) : (
+              <FontAwesomeIcon icon={faPlus} />
+            )}{' '}
             Cosine Similarity Within Samples
-          </Button>
-        </Label>
-        <div
-          className="border rounded p-2"
-          style={{ display: displayWithin ? 'block' : 'none' }}
-        >
-          <Row className="justify-content-center">
-            <Col sm="5">
-              <Group controlId="withinProfileType">
-                <Label>Profile Type</Label>
-                <Control
-                  as="select"
-                  value={withinProfileType}
-                  onChange={(e) => handlewithinProfileType(e.target.value)}
-                  custom
-                >
-                  {profileOptions.map((profile, index) => {
-                    return (
-                      <option key={index} value={profile}>
-                        {profile}
-                      </option>
-                    );
-                  })}
-                </Control>
-              </Group>
-            </Col>
-            <Col sm="5">
-              <Label>Matrix Size</Label>
-              <Control
-                as="select"
-                value={withinMatrixSize}
-                onChange={(e) =>
-                  dispatchCosineSimilarity({
-                    withinMatrixSize: e.target.value,
-                  })
-                }
-                custom
-              >
-                <option value="0" disabled>
-                  Select
-                </option>
-                {withinMatrixOptions.map((matrix, index) => {
-                  return (
-                    <option key={index} value={matrix}>
-                      {matrix}
-                    </option>
-                  );
-                })}
-              </Control>
-            </Col>
-            <Col sm="2" className="m-auto">
-              <Button
-                variant="primary"
-                onClick={() =>
-                  calculateR('cosineSimilarityWithin', {
-                    profileType: withinProfileType,
-                    matrixSize: withinMatrixSize,
-                  })
-                }
-              >
-                Calculate
-              </Button>
-            </Col>
-          </Row>
+          </Toggle>
+          <Collapse eventKey="0">
+            <Body>
+              <Form>
+                <LoadingOverlay active={withinSubmitOverlay} />
+                <div>
+                  <Row className="justify-content-center">
+                    <Col sm="5">
+                      <Group controlId="withinProfileType">
+                        <Label>Profile Type</Label>
+                        <Control
+                          as="select"
+                          value={withinProfileType}
+                          onChange={(e) =>
+                            handlewithinProfileType(e.target.value)
+                          }
+                          custom
+                        >
+                          {profileOptions.map((profile, index) => {
+                            return (
+                              <option key={index} value={profile}>
+                                {profile}
+                              </option>
+                            );
+                          })}
+                        </Control>
+                      </Group>
+                    </Col>
+                    <Col sm="5">
+                      <Label>Matrix Size</Label>
+                      <Control
+                        as="select"
+                        value={withinMatrixSize}
+                        onChange={(e) =>
+                          dispatchCosineSimilarity({
+                            withinMatrixSize: e.target.value,
+                          })
+                        }
+                        custom
+                      >
+                        <option value="0" disabled>
+                          Select
+                        </option>
+                        {withinMatrixOptions.map((matrix, index) => {
+                          return (
+                            <option key={index} value={matrix}>
+                              {matrix}
+                            </option>
+                          );
+                        })}
+                      </Control>
+                    </Col>
+                    <Col sm="2" className="m-auto">
+                      <Button
+                        variant="primary"
+                        onClick={() =>
+                          calculateR('cosineSimilarityWithin', {
+                            profileType: withinProfileType,
+                            matrixSize: withinMatrixSize,
+                          })
+                        }
+                      >
+                        Calculate
+                      </Button>
+                    </Col>
+                  </Row>
 
-          <div id="withinPlot">
-            <div style={{ display: withinErr ? 'block' : 'none' }}>
-              <p>
-                An error has occured. Check the debug section for more info.
-              </p>
-            </div>
-            <div style={{ display: withinPlotURL ? 'block' : 'none' }}>
-              <div className="d-flex">
-                <a
-                  className="px-2 py-1"
-                  href={withinPlotURL}
-                  download={withinPlotURL.split('/').slice(-1)[0]}
-                >
-                  Download Plot
-                </a>
-                <span className="ml-auto">
-                  <Button
-                    className="px-2 py-1"
-                    variant="link"
-                    onClick={() => downloadResults(withinTxtPath)}
-                  >
-                    Download Results
-                  </Button>
-                </span>
-              </div>
-              <div className="p-2 border rounded">
-                <Row>
-                  <Col>
-                    <img className="w-100 my-4 h-500" src={withinPlotURL}></img>
-                  </Col>
-                </Row>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Form>
+                  <div id="withinPlot">
+                    <div style={{ display: withinErr ? 'block' : 'none' }}>
+                      <p>
+                        An error has occured. Check the debug section for more
+                        info.
+                      </p>
+                    </div>
+                    <div style={{ display: withinPlotURL ? 'block' : 'none' }}>
+                      <div className="d-flex">
+                        <a
+                          className="px-2 py-1"
+                          href={withinPlotURL}
+                          download={withinPlotURL.split('/').slice(-1)[0]}
+                        >
+                          Download Plot
+                        </a>
+                        <span className="ml-auto">
+                          <Button
+                            className="px-2 py-1"
+                            variant="link"
+                            onClick={() => downloadResults(withinTxtPath)}
+                          >
+                            Download Results
+                          </Button>
+                        </span>
+                      </div>
+                      <div className="p-2 border rounded">
+                        <Row>
+                          <Col>
+                            <img
+                              className="w-100 my-4 h-500"
+                              src={withinPlotURL}
+                            ></img>
+                          </Col>
+                        </Row>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Form>
+            </Body>
+          </Collapse>
+        </Card>
+      </Accordion>
 
-      <Form className="my-2">
-        <LoadingOverlay active={refSubmitOverlay} />
-        <Label>
-          <Button
-            variant="link"
-            className="p-0 font-weight-bold"
+      <Accordion defaultActiveKey="1">
+        <Card>
+          <Toggle
+            className="font-weight-bold"
+            as={Header}
+            eventKey="1"
             onClick={() =>
               dispatchCosineSimilarity({
                 displayRefSig: !displayRefSig,
               })
             }
           >
+            {displayRefSig == true ? (
+              <FontAwesomeIcon icon={faMinus} />
+            ) : (
+              <FontAwesomeIcon icon={faPlus} />
+            )}{' '}
             Cosine Similarity to Reference Signatures
-          </Button>
-        </Label>
-        <div
-          className="border rounded p-2"
-          style={{ display: displayRefSig ? 'block' : 'none' }}
-        >
-          <Row className="justify-content-center">
-            <Col sm="5">
-              <Group controlId="refProfileType">
-                <Label>Profile Type</Label>
-                <Control
-                  as="select"
-                  value={refProfileType}
-                  onChange={(e) => getSignatureSet(e.target.value)}
-                  custom
-                >
-                  {profileOptions.map((profile, index) => {
-                    return (
-                      <option key={index} value={profile}>
-                        {profile}
-                      </option>
-                    );
-                  })}
-                </Control>
-              </Group>
-            </Col>
-            <Col sm="5">
-              <Group controlId="refSignatureSet">
-                <Label>Reference Signature Set</Label>
-                <Control
-                  disabled={!refSignatureSetOptions.length}
-                  as="select"
-                  value={refSignatureSet}
-                  onChange={(e) =>
-                    dispatchCosineSimilarity({
-                      refSignatureSet: e.target.value,
-                    })
-                  }
-                  custom
-                >
-                  <option value="0">Select</option>
-                  {refSignatureSetOptions.map((refSignatureSet, index) => {
-                    return (
-                      <option key={index} value={refSignatureSet}>
-                        {refSignatureSet}
-                      </option>
-                    );
-                  })}
-                </Control>
-              </Group>
-            </Col>
-            <Col sm="2" className="m-auto">
-              <Button
-                variant="primary"
-                onClick={() =>
-                  calculateR('cosineSimilarityRefSig', {
-                    profileType: refProfileType,
-                    signatureSet: refSignatureSet,
-                  })
-                }
-              >
-                Calculate
-              </Button>
-            </Col>
-          </Row>
+          </Toggle>
+          <Collapse eventKey="1">
+            <Body>
+              <Form className="my-2">
+                <LoadingOverlay active={refSubmitOverlay} />
+                <div>
+                  <Row className="justify-content-center">
+                    <Col sm="5">
+                      <Group controlId="refProfileType">
+                        <Label>Profile Type</Label>
+                        <Control
+                          as="select"
+                          value={refProfileType}
+                          onChange={(e) => getSignatureSet(e.target.value)}
+                          custom
+                        >
+                          {profileOptions.map((profile, index) => {
+                            return (
+                              <option key={index} value={profile}>
+                                {profile}
+                              </option>
+                            );
+                          })}
+                        </Control>
+                      </Group>
+                    </Col>
+                    <Col sm="5">
+                      <Group controlId="refSignatureSet">
+                        <Label>Reference Signature Set</Label>
+                        <Control
+                          disabled={!refSignatureSetOptions.length}
+                          as="select"
+                          value={refSignatureSet}
+                          onChange={(e) =>
+                            dispatchCosineSimilarity({
+                              refSignatureSet: e.target.value,
+                            })
+                          }
+                          custom
+                        >
+                          <option value="0">Select</option>
+                          {refSignatureSetOptions.map(
+                            (refSignatureSet, index) => {
+                              return (
+                                <option key={index} value={refSignatureSet}>
+                                  {refSignatureSet}
+                                </option>
+                              );
+                            }
+                          )}
+                        </Control>
+                      </Group>
+                    </Col>
+                    <Col sm="2" className="m-auto">
+                      <Button
+                        variant="primary"
+                        onClick={() =>
+                          calculateR('cosineSimilarityRefSig', {
+                            profileType: refProfileType,
+                            signatureSet: refSignatureSet,
+                          })
+                        }
+                      >
+                        Calculate
+                      </Button>
+                    </Col>
+                  </Row>
 
-          <div id="refPlot">
-            <div style={{ display: refErr ? 'block' : 'none' }}>
-              <p>
-                An error has occured. Check the debug section for more info.
-              </p>
-            </div>
-            <div style={{ display: refPlotURL ? 'block' : 'none' }}>
-              <div className="d-flex">
-                <a
-                  className="px-2 py-1"
-                  href={refPlotURL}
-                  download={refPlotURL.split('/').slice(-1)[0]}
-                >
-                  Download Plot
-                </a>
-                <span className="ml-auto">
-                  <Button
-                    className="px-2 py-1"
-                    variant="link"
-                    onClick={() => downloadResults(refTxtPath)}
-                  >
-                    Download Results
-                  </Button>
-                </span>
-              </div>
-              <div className="p-2 border rounded">
-                <Row>
-                  <Col>
-                    {refErr == true && (
+                  <div id="refPlot">
+                    <div style={{ display: refErr ? 'block' : 'none' }}>
                       <p>
                         An error has occured. Check the debug section for more
                         info.
                       </p>
-                    )}
-                    <img className="w-100 my-4 h-500" src={refPlotURL}></img>
-                  </Col>
-                </Row>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Form>
+                    </div>
+                    <div style={{ display: refPlotURL ? 'block' : 'none' }}>
+                      <div className="d-flex">
+                        <a
+                          className="px-2 py-1"
+                          href={refPlotURL}
+                          download={refPlotURL.split('/').slice(-1)[0]}
+                        >
+                          Download Plot
+                        </a>
+                        <span className="ml-auto">
+                          <Button
+                            className="px-2 py-1"
+                            variant="link"
+                            onClick={() => downloadResults(refTxtPath)}
+                          >
+                            Download Results
+                          </Button>
+                        </span>
+                      </div>
+                      <div className="p-2 border rounded">
+                        <Row>
+                          <Col>
+                            {refErr == true && (
+                              <p>
+                                An error has occured. Check the debug section
+                                for more info.
+                              </p>
+                            )}
+                            <img
+                              className="w-100 my-4 h-500"
+                              src={refPlotURL}
+                            ></img>
+                          </Col>
+                        </Row>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Form>
+            </Body>
+          </Collapse>
+        </Card>
+      </Accordion>
 
       <Button
         variant="link"
