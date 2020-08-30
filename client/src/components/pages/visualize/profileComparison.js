@@ -58,6 +58,13 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     refSubmitOverlay,
   } = useSelector((state) => state.profileComparison);
 
+  const selectFix = {
+    styles: {
+      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+    },
+    menuPortalTarget: document.body,
+  };
+
   // get inital signatures from initially selected signature set
   useEffect(() => {
     if (refProfileType && refSignatureSet && !refSignatures.length) {
@@ -166,7 +173,6 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
           const signatureSetOptions = await response.json();
 
           dispatchProfileComparison({
-            refProfileType: profileType,
             refSignatureSetOptions: signatureSetOptions,
             refSignatureSet: signatureSetOptions[0],
             refSubmitOverlay: false,
@@ -326,24 +332,18 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                     <Col sm="2">
                       <Group controlId="profileTypeWithin">
                         <Label>Profile Type</Label>
-                        <Control
-                          as="select"
-                          value={withinProfileType}
-                          onChange={(e) =>
+                        <Select
+                          options={profileOptions}
+                          value={[withinProfileType]}
+                          onChange={(profile) =>
                             dispatchProfileComparison({
-                              withinProfileType: e.target.value,
+                              withinProfileType: profile,
                             })
                           }
-                          custom
-                        >
-                          {profileOptions.map((profile, index) => {
-                            return (
-                              <option key={index} value={profile}>
-                                {profile}
-                              </option>
-                            );
-                          })}
-                        </Control>
+                          getOptionLabel={(option) => option}
+                          getOptionValue={(option) => option}
+                          {...selectFix}
+                        />
                       </Group>
                     </Col>
                     <Col sm="4">
@@ -353,11 +353,12 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                         value={[withinSampleName1]}
                         onChange={(name) => {
                           dispatchProfileComparison({
-                            withinSampleName1: name || '',
+                            withinSampleName1: name,
                           });
                         }}
                         getOptionLabel={(option) => option}
                         getOptionValue={(option) => option}
+                        {...selectFix}
                       />
                     </Col>
                     <Col sm="4">
@@ -367,11 +368,12 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                         value={[withinSampleName2]}
                         onChange={(name) => {
                           dispatchProfileComparison({
-                            withinSampleName2: name || '',
+                            withinSampleName2: name,
                           });
                         }}
                         getOptionLabel={(option) => option}
                         getOptionValue={(option) => option}
+                        {...selectFix}
                       />
                     </Col>
                     <Col sm="2" className="m-auto">
@@ -454,20 +456,19 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                     <Col sm="2">
                       <Group controlId="profileTypeRefSig">
                         <Label>Profile Type</Label>
-                        <Control
-                          as="select"
-                          value={refProfileType}
-                          onChange={(e) => getSignatureSet(e.target.value)}
-                          custom
-                        >
-                          {profileOptions.map((profile, index) => {
-                            return (
-                              <option key={index} value={profile}>
-                                {profile}
-                              </option>
-                            );
-                          })}
-                        </Control>
+                        <Select
+                          options={profileOptions}
+                          value={[refProfileType]}
+                          onChange={(refProfileType) => {
+                            dispatchProfileComparison({
+                              refProfileType: refProfileType,
+                            });
+                            getSignatureSet(refProfileType);
+                          }}
+                          getOptionLabel={(option) => option}
+                          getOptionValue={(option) => option}
+                          {...selectFix}
+                        />
                       </Group>
                     </Col>
                     <Col sm="2">
@@ -478,38 +479,31 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                           value={[refSampleName]}
                           onChange={(name) => {
                             dispatchProfileComparison({
-                              refSampleName: name || '',
+                              refSampleName: name,
                             });
                           }}
                           getOptionLabel={(option) => option}
                           getOptionValue={(option) => option}
+                          {...selectFix}
                         />
                       </Group>
                     </Col>
                     <Col sm="4">
                       <Group controlId="signatureSet">
                         <Label>Reference Signature Set</Label>
-                        <Control
-                          disabled={!refSignatureSetOptions.length}
-                          as="select"
-                          value={refSignatureSet}
-                          onChange={(e) => {
+                        <Select
+                          options={refSignatureSetOptions}
+                          value={[refSignatureSet]}
+                          onChange={(refSignatureSet) => {
                             dispatchProfileComparison({
-                              refSignatureSet: e.target.value,
+                              refSignatureSet: refSignatureSet,
                             });
-                            getSignatures(refProfileType, e.target.value);
+                            getSignatures(refProfileType, refSignatureSet);
                           }}
-                          custom
-                        >
-                          <option value="0">Select</option>
-                          {refSignatureSetOptions.map((signatureSet, index) => {
-                            return (
-                              <option key={index} value={signatureSet}>
-                                {signatureSet}
-                              </option>
-                            );
-                          })}
-                        </Control>
+                          getOptionLabel={(option) => option}
+                          getOptionValue={(option) => option}
+                          {...selectFix}
+                        />
                       </Group>
                     </Col>
                     <Col sm="2">

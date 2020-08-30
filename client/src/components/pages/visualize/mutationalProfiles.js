@@ -217,8 +217,8 @@ export default function MutationalProfiles() {
                   options={nameOptions}
                   value={[selectName]}
                   onChange={(name) => {
-                    dispatchMutationalProfiles({ selectName: name || '' });
-                    if (nameOptions.indexOf(name) > -1) filterSampleName(name);
+                    dispatchMutationalProfiles({ selectName: name });
+                    filterSampleName(name);
                   }}
                   getOptionLabel={(option) => option}
                   getOptionValue={(option) => option}
@@ -226,66 +226,48 @@ export default function MutationalProfiles() {
               </Col>
               <Col sm="3">
                 <Label>Profile Type</Label>
-                <Control
-                  as="select"
-                  value={selectProfile}
-                  onChange={(e) => filterProfileType(e.target.value)}
-                  custom
-                  disabled={!selectName}
-                >
-                  <option value="0" disabled>
-                    Select
-                  </option>
-                  {profileOptions.map((profile, index) => {
-                    return (
-                      <option key={index} value={profile}>
-                        {profile}
-                      </option>
-                    );
-                  })}
-                </Control>
+                <Select
+                  options={profileOptions}
+                  value={[selectProfile]}
+                  onChange={(profile) => {
+                    dispatchMutationalProfiles({
+                      selectProfile: profile,
+                    });
+                    filterProfileType(profile);
+                  }}
+                  getOptionLabel={(option) => option}
+                  getOptionValue={(option) => option}
+                />
               </Col>
               <Col sm="3">
                 <Label>Matrix Size</Label>
-                <Control
-                  as="select"
-                  value={selectMatrix}
-                  onChange={(e) => filterMatrix(e.target.value)}
-                  custom
-                  disabled={!selectName || !selectProfile}
-                >
-                  <option value="0" disabled>
-                    Select
-                  </option>
-                  {matrixOptions.map((matrix, index) => {
-                    return (
-                      <option key={index} value={matrix}>
-                        {matrix}
-                      </option>
-                    );
-                  })}
-                </Control>
+                <Select
+                  options={matrixOptions}
+                  value={[selectMatrix]}
+                  onChange={(matrix) => {
+                    dispatchMutationalProfiles({
+                      selectMatrix: matrix,
+                    });
+                    filterMatrix(matrix);
+                  }}
+                  getOptionLabel={(option) => option}
+                  getOptionValue={(option) => option}
+                />
               </Col>
               <Col sm="3">
                 <Label>Filter</Label>
-                <Control
-                  as="select"
-                  value={selectFilter}
-                  onChange={(e) => filterTag(e.target.value)}
-                  custom
-                  disabled={!selectName || !selectProfile || !selectMatrix}
-                >
-                  <option value="0" disabled>
-                    Select
-                  </option>
-                  {filterOptions.map((tag, index) => {
-                    return (
-                      <option key={index} value={tag}>
-                        {tag}
-                      </option>
-                    );
-                  })}
-                </Control>
+                <Select
+                  options={filterOptions}
+                  value={[selectFilter]}
+                  onChange={(filter) => {
+                    dispatchMutationalProfiles({
+                      selectFilter: filter,
+                    });
+                    filterTag(filter);
+                  }}
+                  getOptionLabel={(option) => option}
+                  getOptionValue={(option) => option}
+                />
               </Col>
             </Row>
           </div>

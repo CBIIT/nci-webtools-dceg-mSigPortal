@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button, Accordion, Card } from 'react-bootstrap';
+import Select from 'react-select';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -45,6 +46,13 @@ export default function CosineSimilarity({
     debugR,
     displayDebug,
   } = useSelector((state) => state.cosineSimilarity);
+
+  const selectFix = {
+    styles: {
+      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+    },
+    menuPortalTarget: document.body,
+  };
 
   // calculate r on load
   // useEffect(() => {
@@ -142,7 +150,6 @@ export default function CosineSimilarity({
           const refSignatureSetOptions = await response.json();
 
           dispatchCosineSimilarity({
-            refProfileType: profileType,
             refSignatureSetOptions: refSignatureSetOptions,
             refSignatureSet: refSignatureSetOptions[0],
             refSubmitOverlay: false,
@@ -264,47 +271,32 @@ export default function CosineSimilarity({
                     <Col sm="5">
                       <Group controlId="withinProfileType">
                         <Label>Profile Type</Label>
-                        <Control
-                          as="select"
-                          value={withinProfileType}
-                          onChange={(e) =>
-                            handlewithinProfileType(e.target.value)
-                          }
-                          custom
-                        >
-                          {profileOptions.map((profile, index) => {
-                            return (
-                              <option key={index} value={profile}>
-                                {profile}
-                              </option>
-                            );
-                          })}
-                        </Control>
+                        <Select
+                          options={profileOptions}
+                          value={[withinProfileType]}
+                          onChange={(profile) => {
+                            handlewithinProfileType(profile);
+                          }}
+                          getOptionLabel={(option) => option}
+                          getOptionValue={(option) => option}
+                          {...selectFix}
+                        />
                       </Group>
                     </Col>
                     <Col sm="5">
                       <Label>Matrix Size</Label>
-                      <Control
-                        as="select"
-                        value={withinMatrixSize}
-                        onChange={(e) =>
+                      <Select
+                        options={withinMatrixOptions}
+                        value={[withinMatrixSize]}
+                        onChange={(matrix) => {
                           dispatchCosineSimilarity({
-                            withinMatrixSize: e.target.value,
-                          })
-                        }
-                        custom
-                      >
-                        <option value="0" disabled>
-                          Select
-                        </option>
-                        {withinMatrixOptions.map((matrix, index) => {
-                          return (
-                            <option key={index} value={matrix}>
-                              {matrix}
-                            </option>
-                          );
-                        })}
-                      </Control>
+                            withinMatrixSize: matrix,
+                          });
+                        }}
+                        getOptionLabel={(option) => option}
+                        getOptionValue={(option) => option}
+                        {...selectFix}
+                      />
                     </Col>
                     <Col sm="2" className="m-auto">
                       <Button
@@ -394,47 +386,36 @@ export default function CosineSimilarity({
                     <Col sm="5">
                       <Group controlId="refProfileType">
                         <Label>Profile Type</Label>
-                        <Control
-                          as="select"
-                          value={refProfileType}
-                          onChange={(e) => getSignatureSet(e.target.value)}
-                          custom
-                        >
-                          {profileOptions.map((profile, index) => {
-                            return (
-                              <option key={index} value={profile}>
-                                {profile}
-                              </option>
-                            );
-                          })}
-                        </Control>
+                        <Select
+                          options={profileOptions}
+                          value={[refProfileType]}
+                          onChange={(refProfileType) => {
+                            dispatchCosineSimilarity({
+                              refProfileType: refProfileType,
+                            });
+                            getSignatureSet(refProfileType);
+                          }}
+                          getOptionLabel={(option) => option}
+                          getOptionValue={(option) => option}
+                          {...selectFix}
+                        />
                       </Group>
                     </Col>
                     <Col sm="5">
                       <Group controlId="refSignatureSet">
                         <Label>Reference Signature Set</Label>
-                        <Control
-                          disabled={!refSignatureSetOptions.length}
-                          as="select"
-                          value={refSignatureSet}
-                          onChange={(e) =>
+                        <Select
+                          options={refSignatureSetOptions}
+                          value={[refSignatureSet]}
+                          onChange={(refSignatureSet) => {
                             dispatchCosineSimilarity({
-                              refSignatureSet: e.target.value,
-                            })
-                          }
-                          custom
-                        >
-                          <option value="0">Select</option>
-                          {refSignatureSetOptions.map(
-                            (refSignatureSet, index) => {
-                              return (
-                                <option key={index} value={refSignatureSet}>
-                                  {refSignatureSet}
-                                </option>
-                              );
-                            }
-                          )}
-                        </Control>
+                              refSignatureSet: refSignatureSet,
+                            });
+                          }}
+                          getOptionLabel={(option) => option}
+                          getOptionValue={(option) => option}
+                          {...selectFix}
+                        />
                       </Group>
                     </Col>
                     <Col sm="2" className="m-auto">

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button, Accordion, Card } from 'react-bootstrap';
+import Select from 'react-select';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -39,23 +40,12 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
     submitOverlay,
   } = useSelector((state) => state.pca);
 
-  // useEffect(() => {
-  //   if (
-  //     profileType.length &&
-  //     signatureSet.length &&
-  //     !pca1 &&
-  //     !pca2 &&
-  //     !pca3 &&
-  //     !heatmap &&
-  //     !submitOverlay &&
-  //     displayTab == 'pca'
-  //   ) {
-  //     calculateR('pca', {
-  //       profileType: profileType,
-  //       signatureSet: signatureSet,
-  //     });
-  //   }
-  // }, [displayTab]);
+  const selectFix = {
+    styles: {
+      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+    },
+    menuPortalTarget: document.body,
+  };
 
   async function setRPlot(plotPath, type) {
     dispatchPCA({ submitOverlay: true });
@@ -122,7 +112,6 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
           const signatureSetOptions = await response.json();
 
           dispatchPCA({
-            profileType: profileType,
             signatureSetOptions: signatureSetOptions,
             signatureSet: signatureSetOptions[0],
             submitOverlay: false,
@@ -211,46 +200,38 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
                     <Col sm="5">
                       <Group controlId="profileType">
                         <Label>Profile Type</Label>
-                        <Control
-                          as="select"
-                          value={profileType}
-                          onChange={(e) => getSignatureSet(e.target.value)}
-                          custom
-                        >
-                          {profileOptions.map((profile, index) => {
-                            return (
-                              <option key={index} value={profile}>
-                                {profile}
-                              </option>
-                            );
-                          })}
-                        </Control>
+                        <Select
+                          options={profileOptions}
+                          value={[profileType]}
+                          onChange={(profileType) => {
+                            dispatchPCA({
+                              profileType: profileType,
+                            });
+                            getSignatureSet(profileType);
+                          }}
+                          getOptionLabel={(option) => option}
+                          getOptionValue={(option) => option}
+                          {...selectFix}
+                        />
                       </Group>
                     </Col>
 
                     <Col sm="5">
                       <Group controlId="signatureSet">
                         <Label>Reference Signature Set</Label>
-                        <Control
-                          disabled={!signatureSetOptions.length}
-                          as="select"
-                          value={signatureSet}
-                          onChange={(e) => {
+
+                        <Select
+                          options={signatureSetOptions}
+                          value={[signatureSet]}
+                          onChange={(signatureSet) => {
                             dispatchPCA({
-                              signatureSet: e.target.value,
+                              signatureSet: signatureSet,
                             });
                           }}
-                          custom
-                        >
-                          <option value="0">Select</option>
-                          {signatureSetOptions.map((signatureSet, index) => {
-                            return (
-                              <option key={index} value={signatureSet}>
-                                {signatureSet}
-                              </option>
-                            );
-                          })}
-                        </Control>
+                          getOptionLabel={(option) => option}
+                          getOptionValue={(option) => option}
+                          {...selectFix}
+                        />
                       </Group>
                     </Col>
                     <Col sm="2" className="m-auto">
