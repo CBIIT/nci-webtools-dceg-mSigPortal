@@ -24,6 +24,7 @@ export default function Results({ setOpenSidebar }) {
   const { error, projectID, displayTab, svgList, matrixList } = useSelector(
     (state) => state.visualizeResults
   );
+  const { source } = useSelector((state) => state.visualize);
   const mutationalProfiles = useSelector((state) => state.mutationalProfiles);
   const { signatureSetOptions } = useSelector((state) => state.pca);
   const rootURL = window.location.pathname;
@@ -31,12 +32,17 @@ export default function Results({ setOpenSidebar }) {
   // get mapping of plots after retrieving projectID
   useEffect(() => {
     if (svgList.length) {
-      // only set svgList if signature set was not set
-      if (!signatureSetOptions.length) mapSvgList();
-    } else {
-      if (projectID.length && !retrieveSvgList) {
-        setAttempt(true);
-        getSummary();
+      if (source == 'user') {
+        // only set svgList if signature set was not set
+        if (!signatureSetOptions.length) mapSvgList();
+        else {
+          if (projectID.length && !retrieveSvgList) {
+            setAttempt(true);
+            getSummary();
+          }
+        }
+      } else {
+        mapPublicData();
       }
     }
   }, [svgList]);
@@ -146,6 +152,104 @@ export default function Results({ setOpenSidebar }) {
       refSignatureSetOptions: refSignatureSetOptions,
       withinMatrixSize: filteredMatrixList[0],
       withinMatrixOptions: filteredMatrixList,
+    });
+
+    dispatchProfileComparison({
+      withinProfileType: profileOptions[0],
+      withinSampleName1: nameOptions[0],
+      withinSampleName2: nameOptions[1],
+      refProfileType: profileOptions[0],
+      refSampleName: nameOptions[0],
+      refSignatureSet: refSignatureSetOptions[0],
+      refSignatureSetOptions: refSignatureSetOptions,
+    });
+
+    dispatchPCA({
+      profileType: profileOptions[0],
+      signatureSet: refSignatureSetOptions[0],
+      signatureSetOptions: refSignatureSetOptions,
+    });
+
+    dispatchVisualize({
+      loading: {
+        active: false,
+      },
+    });
+    setOpenSidebar(false);
+  }
+
+  // retrieve mapping of samples to plots from svgList file
+  async function mapPublicData() {
+    dispatchVisualize({
+      loading: {
+        active: true,
+      },
+    });
+
+    const nameOptions = [...new Set(svgList.map((plot) => plot.Sample))];
+    const profileOptions = [
+      ...new Set(svgList.map((plot) => plot.Profile.match(/[a-z]+/gi)[0])),
+    ];
+    const matrixOptions = [
+      ...new Set(svgList.map((plot) => plot.Profile.match(/\d+/gi)[0])),
+    ];
+    const filterOptions = ['NA'];
+
+    const selectName = mutationalProfiles.selectName || nameOptions[0];
+    const selectProfile = mutationalProfiles.selectProfile || profileOptions[0];
+    const selectMatrix = mutationalProfiles.selectMatrix || matrixOptions[0];
+    const selectFilter = filterOptions[0];
+
+    const filteredPlots = svgList.filter(
+      (plot) =>
+        plot.Sample == selectName &&
+        plot.Profile.indexOf(selectProfile) > -1 &&
+        plot.Profile.indexOf(selectMatrix) > -1
+    );
+
+    const filteredProfileOptions = [
+      ...new Set(
+        svgList
+          .filter((plot) => plot.Sample == selectName)
+          .map((plot) => plot.Profile.match(/[a-z]+/gi)[0])
+      ),
+    ];
+
+    const filteredMatrixOptions = [
+      ...new Set(
+        svgList
+          .filter(
+            (plot) =>
+              plot.Sample == selectName &&
+              plot.Profile.indexOf(filteredProfileOptions[0]) > -1
+          )
+          .map((plot) => plot.Profile.match(/\d+/gi)[0])
+      ),
+    ];
+
+    const refSignatureSetOptions = await (
+      await getRefSigOptions(profileOptions[0])
+    ).json();
+
+    dispatchMutationalProfiles({
+      filtered: filteredPlots,
+      nameOptions: nameOptions,
+      profileOptions: filteredProfileOptions,
+      matrixOptions: filteredMatrixOptions,
+      filterOptions: filterOptions,
+      selectName: selectName,
+      selectProfile: selectProfile,
+      selectMatrix: selectMatrix,
+      selectFilter: selectFilter,
+    });
+
+    dispatchCosineSimilarity({
+      withinProfileType: profileOptions[0],
+      refProfileType: profileOptions[0],
+      refSignatureSet: refSignatureSetOptions[0],
+      refSignatureSetOptions: refSignatureSetOptions,
+      withinMatrixSize: matrixOptions[0],
+      withinMatrixOptions: matrixOptions,
     });
 
     dispatchProfileComparison({

@@ -226,6 +226,39 @@ app.post('/api/visualizeR/getSignatures', (req, res) => {
   }
 });
 
+app.post('/visualize/getPublicDataOptions', (req, res) => {
+  logger.info('/visualize/getPublicOptions: Calling R Wrapper');
+  try {
+    const list = r('api/R/visualizeWrapper.R', 'getPublicDataOptions', [
+      datapath,
+    ]);
+
+    res.json(JSON.parse(list));
+  } catch (err) {
+    logger.info('/visualize/getPublicOptions: An error occured');
+    logger.error(err);
+    res.status(500).json(err.message);
+  }
+});
+
+app.post('/visualize/getPublicData', (req, res) => {
+  logger.info('/visualize/getPublicOptions: Calling R Wrapper');
+  try {
+    const list = r('api/R/visualizeWrapper.R', 'getPublicData', [
+      req.body.study,
+      req.body.cancerType,
+      req.body.experimentalStrategy,
+      datapath,
+    ]);
+    logger.info('/visualize/getPublicOptions: Complete');
+    res.json(JSON.parse(list));
+  } catch (err) {
+    logger.info('/visualize/getPublicOptions: An error occured');
+    logger.error(err);
+    res.status(500).json(err.message);
+  }
+});
+
 app.post('/visualize/upload', (req, res, next) => {
   const projectID = uuidv4();
   const form = formidable({
@@ -314,6 +347,27 @@ app.post('/visualize/svg', (req, res) => {
       res.set('Content-Type', 'text/plain');
       res.status(500).end('Not found');
       logger.info(`/VISUALIZE/SVG: Error retrieving ${svgPath}`);
+    });
+  } else {
+    logger.info('traversal error');
+    res.status(500).end('Not found');
+  }
+});
+
+app.post('/visualize/svgPublic', (req, res) => {
+  const svgPath = path.resolve(req.body.path);
+  if (svgPath.indexOf(path.resolve(datapath)) == 0) {
+    const s = fs.createReadStream(svgPath);
+
+    s.on('open', () => {
+      res.set('Content-Type', 'image/svg+xml');
+      s.pipe(res);
+      logger.debug(`/visualize/svgPublic: Serving ${svgPath}`);
+    });
+    s.on('error', () => {
+      res.set('Content-Type', 'text/plain');
+      res.status(500).end('Not found');
+      logger.debug(`/visualize/svgPublic: Serving Error retrieving ${svgPath}`);
     });
   } else {
     logger.info('traversal error');

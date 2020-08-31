@@ -29,13 +29,22 @@ getSignatures <- function(profileType, signatureSetName, dataPath) {
   return(signatures)
 }
 
-# get svg list for public data
-mutationProfilesPublic <- function(dataPath) {
-  load(paste0(dataPath, 'signature_refsets.RData'))
+# get list of options for study, cancer type, and experimental strategy
+getPublicDataOptions <- function(dataPath) {
   load(paste0(dataPath, 'seqmatrix_refdata_info.RData'))
+  return(toJSON(seqmatrix_refdata_info2, pretty = TRUE, auto_unbox = TRUE))
+}
 
+# get public svgFiles and load into session
+getPublicData <- function(study, cancerType, experimentalStrategy, dataPath) {
+  load(paste0(dataPath, 'seqmatrix_refdata_info.RData'))
+  load(paste0(dataPath, 'seqmatrix_refdata.RData'))
 
+  svgfiles <- seqmatrix_refdata_info %>% mutate(Path = paste0(dataPath, Path))
+  svgfiles_public <- svgfiles %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy)
+  # seqmatrix_refdata_public <- seqmatrix_refdata %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy)
 
+  return(toJSON(svgfiles_public, pretty = TRUE, auto_unbox = TRUE))
 }
 
 ### Cosine Similarity tab ###

@@ -6,6 +6,7 @@ import {
   MainPanel,
 } from '../../controls/sidebar-container/sidebar-container';
 import UploadForm from './uploadForm';
+import PublicForm from './publicForm';
 import Results from './results';
 import { useSelector } from 'react-redux';
 import { store, updateVisualize } from '../../../services/store';
@@ -70,6 +71,11 @@ export default function Visualize() {
             <Row style={{ display: source == 'user' ? 'block' : 'none' }}>
               <Col sm="auto" className="w-100">
                 <UploadForm />
+              </Col>
+            </Row>
+            <Row style={{ display: source == 'public' ? 'block' : 'none' }}>
+              <Col sm="auto" className="w-100">
+                <PublicForm />
               </Col>
             </Row>
           </div>
