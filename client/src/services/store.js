@@ -24,6 +24,7 @@ export const getInitialState = () => ({
     submitted: false,
     exampleData: 'assets/exampleInput/demo_input_multi.vcf.gz',
     bedData: 'assets/exampleInput/demo_input_bed.bed',
+    loadingPublic: false,
     loading: {
       active: false,
       content: null,

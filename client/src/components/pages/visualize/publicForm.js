@@ -29,6 +29,7 @@ export default function PublicForm() {
     pExperimentOptions,
     pDataOptions,
     loading,
+    loadingPublic,
   } = useSelector((state) => state.visualize);
   const rootURL = window.location.pathname;
 
@@ -101,6 +102,7 @@ export default function PublicForm() {
   }
 
   async function getPublicDataOptions() {
+    dispatchVisualize({ loadingPublic: true });
     try {
       const response = await fetch(`${rootURL}visualize/getPublicDataOptions`, {
         method: 'POST',
@@ -149,6 +151,7 @@ export default function PublicForm() {
     } catch (err) {
       dispatchError(err);
     }
+    dispatchVisualize({ loadingPublic: false });
   }
 
   function handleStudyChange(study) {
@@ -198,6 +201,7 @@ export default function PublicForm() {
 
   return (
     <Form>
+      <LoadingOverlay active={loadingPublic} />
       <Group controlId="Study">
         <Label>Study</Label>
         <Select
