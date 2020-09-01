@@ -28,14 +28,15 @@ export default function PublicForm() {
     pExperimentalStrategy,
     pExperimentOptions,
     pDataOptions,
+    submitted,
     loading,
     loadingPublic,
   } = useSelector((state) => state.visualize);
   const rootURL = window.location.pathname;
 
   useEffect(() => {
-    getPublicDataOptions();
-  }, []);
+    if (!pDataOptions.length) getPublicDataOptions();
+  }, [pDataOptions]);
 
   async function handleSubmit() {
     // disable parameters after submit
@@ -65,10 +66,11 @@ export default function PublicForm() {
       });
 
       if (response.ok) {
-        const svgFiles = await response.json();
+        const { svgList, projectID } = await response.json();
 
         dispatchVisualizeResults({
-          svgList: svgFiles,
+          svgList: svgList,
+          projectID: projectID,
         });
       } else if (response.status == 504) {
         dispatchVisualizeResults({
@@ -205,6 +207,7 @@ export default function PublicForm() {
       <Group controlId="Study">
         <Label>Study</Label>
         <Select
+          disabled={submitted}
           options={studyOptions}
           value={[study]}
           onChange={(study) => handleStudyChange(study)}
@@ -215,6 +218,7 @@ export default function PublicForm() {
       <Group controlId="cancerType">
         <Label>Cancer Type</Label>
         <Select
+          disabled={submitted}
           options={cancerTypeOptions}
           value={[cancerType]}
           onChange={(cancerType) => handleCancerChange(cancerType)}
@@ -226,6 +230,7 @@ export default function PublicForm() {
       <Group>
         <Label>Experimental Strategy</Label>
         <Select
+          disabled={submitted}
           options={pExperimentOptions}
           value={[pExperimentalStrategy]}
           onChange={(pExperimentalStrategy) =>

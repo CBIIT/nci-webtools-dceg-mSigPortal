@@ -19,8 +19,11 @@ export default function CosineSimilarity({
   submitR,
   getRefSigOptions,
 }) {
+  const { source, study, cancerType, pExperimentalStrategy } = useSelector(
+    (state) => state.visualize
+  );
   const { profileOptions } = useSelector((state) => state.mutationalProfiles);
-  const { displayTab, matrixList } = useSelector(
+  const { displayTab, matrixList, svgList } = useSelector(
     (state) => state.visualizeResults
   );
   const rootURL = window.location.pathname;
@@ -166,7 +169,11 @@ export default function CosineSimilarity({
   }
 
   async function calculateR(fn, args) {
-    if (fn == 'cosineSimilarityWithin') {
+    if (
+      fn == 'cosineSimilarityWithin' ||
+      fn == 'cosineSimilarityWithinPublic'
+    ) {
+      console.log(fn);
       dispatchCosineSimilarity({
         withinSubmitOverlay: true,
         withinErr: '',
@@ -183,7 +190,10 @@ export default function CosineSimilarity({
       const response = await submitR(fn, args);
       if (!response.ok) {
         const err = await response.json();
-        if (fn == 'cosineSimilarityWithin') {
+        if (
+          fn == 'cosineSimilarityWithin' ||
+          fn == 'cosineSimilarityWithinPublic'
+        ) {
           dispatchCosineSimilarity({
             withinSubmitOverlay: false,
             debugR: err,
@@ -197,7 +207,10 @@ export default function CosineSimilarity({
       } else {
         const { debugR, output } = await response.json();
 
-        if (fn == 'cosineSimilarityWithin') {
+        if (
+          fn == 'cosineSimilarityWithin' ||
+          fn == 'cosineSimilarityWithinPublic'
+        ) {
           dispatchCosineSimilarity({
             debugR: debugR,
             withinSubmitOverlay: false,
@@ -217,7 +230,10 @@ export default function CosineSimilarity({
       }
     } catch (err) {
       dispatchError(err);
-      if (fn == 'cosineSimilarityWithin') {
+      if (
+        fn == 'cosineSimilarityWithin' ||
+        fn == 'cosineSimilarityWithinPublic'
+      ) {
         dispatchCosineSimilarity({ withinSubmitOverlay: false });
       } else {
         dispatchCosineSimilarity({ refSubmitOverlay: false });
@@ -225,20 +241,36 @@ export default function CosineSimilarity({
     }
   }
 
-  function handlewithinProfileType(profileType) {
-    const withinMatrixOptions = [
-      ...new Set(
-        matrixList
-          .filter((matrix) => matrix.Profile_Type == profileType)
-          .map((matrix) => matrix.Matrix_Size)
-      ),
-    ];
+  function handleWithinProfileType(profileType) {
+    if (source == 'user') {
+      const withinMatrixOptions = [
+        ...new Set(
+          matrixList
+            .filter((matrix) => matrix.Profile_Type == profileType)
+            .map((matrix) => matrix.Matrix_Size)
+        ),
+      ];
 
-    dispatchCosineSimilarity({
-      withinProfileType: profileType,
-      withinMatrixSize: withinMatrixOptions[0],
-      withinMatrixOptions: withinMatrixOptions,
-    });
+      dispatchCosineSimilarity({
+        withinProfileType: profileType,
+        withinMatrixSize: withinMatrixOptions[0],
+        withinMatrixOptions: withinMatrixOptions,
+      });
+    } else {
+      const withinMatrixOptions = [
+        ...new Set(
+          svgList
+            .filter((plot) => plot.Profile.indexOf(profileType) > -1)
+            .map((plot) => plot.Profile.match(/\d+/gi)[0])
+        ),
+      ];
+
+      dispatchCosineSimilarity({
+        withinProfileType: profileType,
+        withinMatrixSize: withinMatrixOptions[0],
+        withinMatrixOptions: withinMatrixOptions,
+      });
+    }
   }
 
   return (
@@ -274,9 +306,9 @@ export default function CosineSimilarity({
                         <Select
                           options={profileOptions}
                           value={[withinProfileType]}
-                          onChange={(profile) => {
-                            handlewithinProfileType(profile);
-                          }}
+                          onChange={(profile) =>
+                            handleWithinProfileType(profile)
+                          }
                           getOptionLabel={(option) => option}
                           getOptionValue={(option) => option}
                           {...selectFix}
@@ -288,11 +320,11 @@ export default function CosineSimilarity({
                       <Select
                         options={withinMatrixOptions}
                         value={[withinMatrixSize]}
-                        onChange={(matrix) => {
+                        onChange={(matrix) =>
                           dispatchCosineSimilarity({
                             withinMatrixSize: matrix,
-                          });
-                        }}
+                          })
+                        }
                         getOptionLabel={(option) => option}
                         getOptionValue={(option) => option}
                         {...selectFix}
@@ -301,12 +333,25 @@ export default function CosineSimilarity({
                     <Col sm="2" className="m-auto">
                       <Button
                         variant="primary"
-                        onClick={() =>
-                          calculateR('cosineSimilarityWithin', {
-                            profileType: withinProfileType,
-                            matrixSize: withinMatrixSize,
-                          })
-                        }
+                        onClick={() => {
+                          if (source == 'user') {
+                            calculateR('cosineSimilarityWithin', {
+                              matrixFile: matrixList.filter(
+                                (path) =>
+                                  path.Profile_Type == withinProfileType &&
+                                  path.Matrix_Size == withinMatrixSize
+                              )[0].Path,
+                            });
+                          } else {
+                            calculateR('cosineSimilarityWithinPublic', {
+                              profileType: withinProfileType,
+                              matrixSize: withinMatrixSize,
+                              study: study,
+                              cancerType: cancerType,
+                              experimentalStrategy: pExperimentalStrategy,
+                            });
+                          }
+                        }}
                       >
                         Calculate
                       </Button>
@@ -421,12 +466,28 @@ export default function CosineSimilarity({
                     <Col sm="2" className="m-auto">
                       <Button
                         variant="primary"
-                        onClick={() =>
-                          calculateR('cosineSimilarityRefSig', {
-                            profileType: refProfileType,
-                            signatureSet: refSignatureSet,
-                          })
-                        }
+                        onClick={() => {
+                          if (source == 'user') {
+                            calculateR('cosineSimilarityRefSig', {
+                              profileType: refProfileType,
+                              signatureSet: refSignatureSet,
+                              matrixList: JSON.stringify(
+                                matrixList.filter(
+                                  (matrix) =>
+                                    matrix.Profile_Type == refProfileType
+                                )
+                              ),
+                            });
+                          } else {
+                            calculateR('cosineSimilarityRefSigPublic', {
+                              profileType: refProfileType,
+                              signatureSet: refSignatureSet,
+                              study: study,
+                              cancerType: cancerType,
+                              experimentalStrategy: pExperimentalStrategy,
+                            });
+                          }
+                        }}
                       >
                         Calculate
                       </Button>

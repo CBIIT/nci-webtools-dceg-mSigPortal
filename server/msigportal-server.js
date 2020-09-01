@@ -161,7 +161,7 @@ app.post('/api/visualizeR', (req, res) => {
   );
 
   if (!fs.existsSync(savePath)) {
-    fs.mkdirSync(savePath);
+    fs.mkdirSync(savePath, { recursive: true });
   }
   try {
     const wrapper = r('api/R/visualizeWrapper.R', req.body.fn, {
@@ -216,7 +216,7 @@ app.post('/api/visualizeR/getSignatures', (req, res) => {
       path.join(datapath, 'signature_visualization/'),
     ]);
 
-    console.log('signatures', list);
+    // console.log('signatures', list);
 
     res.json(list);
   } catch (err) {
@@ -251,7 +251,19 @@ app.post('/visualize/getPublicData', (req, res) => {
       path.join(datapath, 'signature_visualization/'),
     ]);
     logger.info('/visualize/getPublicOptions: Complete');
-    res.json(JSON.parse(list));
+
+    const projectID = uuidv4();
+    const saveDir = path.join(tmppath, projectID);
+
+    if (!fs.existsSync(saveDir)) {
+      fs.mkdirSync(saveDir);
+    } else {
+      rimraf(saveDir, () => {
+        fs.mkdirSync(saveDir);
+      });
+    }
+
+    res.json({ svgList: JSON.parse(list), projectID: projectID });
   } catch (err) {
     logger.info('/visualize/getPublicOptions: An error occured');
     logger.error(err);

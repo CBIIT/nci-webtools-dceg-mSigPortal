@@ -38,19 +38,16 @@ getPublicDataOptions <- function(dataPath) {
 # get public svgFiles and load into session
 getPublicData <- function(study, cancerType, experimentalStrategy, dataPath) {
   load(paste0(dataPath, 'seqmatrix_refdata_info.RData'))
-  load(paste0(dataPath, 'seqmatrix_refdata.RData'))
 
   svgfiles <- seqmatrix_refdata_info %>% mutate(Path = paste0(dataPath, Path))
   svgfiles_public <- svgfiles %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy)
-  # seqmatrix_refdata_public <- seqmatrix_refdata %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy)
 
   return(toJSON(svgfiles_public, pretty = TRUE, auto_unbox = TRUE))
 }
 
 ### Cosine Similarity tab ###
 # section 1: Cosine similarity within samples #
-# two parameters need: Profile Type and Matrix Size #
-cosineSimilarityWithin <- function(profileType, matrixSize, projectID, pythonOutput, savePath, dataPath) {
+cosineSimilarityWithin <- function(matrixFile, projectID, pythonOutput, savePath, dataPath) {
   source('api/R/Sigvisualfunc.R')
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
@@ -62,7 +59,42 @@ cosineSimilarityWithin <- function(profileType, matrixSize, projectID, pythonOut
     plotPath = paste0(savePath, '/cos_sim_within.svg')
     txtPath = paste0(savePath, '/cos_sim_within.txt')
 
-    data_input <- read_delim(file.path(pythonOutput, profileType, paste0(projectID, '.', profileType, matrixSize, '.all')), delim = '\t')
+    data_input <- read_delim(matrixFile, delim = '\t')
+    data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
+    # Heatmap of cosine similarity within samples  and put on the web---------------------------
+    cos_sim_res1 = cos_sim_df(data_input, data_input)
+    plot_cosine_heatmap_df(cos_sim_res1, cluster_rows = TRUE, plot_values = FALSE, output_plot = plotPath)
+    cos_sim_res1 %>% write_delim(txtPath, delim = '\t', col_names = T)
+
+    output = list('plotPath' = plotPath, 'txtPath' = txtPath)
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+  })
+}
+
+cosineSimilarityWithinPublic <- function(profileType, matrixSize, study, cancerType, experimentalStrategy, projectID, pythonOutput, savePath, dataPath) {
+  source('api/R/Sigvisualfunc.R')
+  load(paste0(dataPath, 'seqmatrix_refdata.RData'))
+  stdout <- vector('character')
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+    plotPath = paste0(savePath, '/cos_sim_within.svg')
+    txtPath = paste0(savePath, '/cos_sim_within.txt')
+
+    seqmatrix_refdata_public <- seqmatrix_refdata %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy)
+    data_input <- seqmatrix_refdata_public %>% filter(Profile == paste0(profileType, matrixSize)) %>%
+      select(MutationType, Sample, Mutations) %>%
+      pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations)
+
+    data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
     # Heatmap of cosine similarity within samples  and put on the web---------------------------
     cos_sim_res1 = cos_sim_df(data_input, data_input)
     plot_cosine_heatmap_df(cos_sim_res1, cluster_rows = TRUE, plot_values = FALSE, output_plot = plotPath)
@@ -81,7 +113,7 @@ cosineSimilarityWithin <- function(profileType, matrixSize, projectID, pythonOut
 # section 2: Cosine similarity  to reference signatures 
 # Two parameters need: Profile Type, Reference Signature Set
 # Profile Type only support SBS, DBS, ID
-cosineSimilarityRefSig <- function(profileType, signatureSetName, projectID, pythonOutput, savePath, dataPath) {
+cosineSimilarityRefSig <- function(profileType, signatureSetName, matrixList, projectID, pythonOutput, savePath, dataPath) {
   source('api/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'signature_refsets.RData'))
   stdout <- vector('character')
@@ -94,13 +126,58 @@ cosineSimilarityRefSig <- function(profileType, signatureSetName, projectID, pyt
     plotPath = paste0(savePath, '/cos_sim_refsig.svg')
     txtPath = paste0(savePath, '/cos_sim_refsig.txt')
 
-    matrix <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
-    signature_refsets_input <- signature_refsets %>% filter(Profile == matrix, Signature_set_name == signatureSetName)
-    refsig <- signature_refsets_input %>%
+    profile_name <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
+    signature_refsets_data <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == signatureSetName)
+    refsig <- signature_refsets_data %>%
       select(Signature_name, MutationType, Contribution) %>%
       pivot_wider(names_from = Signature_name, values_from = Contribution)
 
-    data_input <- read_delim(paste0(pythonOutput, '/', profileType, '/', projectID, '.', matrix, '.all'), delim = '\t')
+    matrix_size <- str_remove(str_remove(str_remove(profile_name, "SBS"), "ID"), "DBS")
+    matrixfiles = fromJSON(matrixList)
+    matrixfile_selected <- matrixfiles %>% filter(Profile_Type == profileType, Matrix_Size == matrix_size) %>% pull(Path)
+    data_input <- read_delim(matrixfile_selected, delim = '\t')
+    data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
+
+    # Heatmap of cosine similarity to reference set signature and put on the web---------------------------
+    cos_sim_res2 = cos_sim_df(data_input, refsig)
+    plot_cosine_heatmap_df(cos_sim_res2, cluster_rows = TRUE, plot_values = FALSE, output_plot = plotPath)
+    cos_sim_res2 %>% write_delim(txtPath, delim = '\t', col_names = T)
+
+    output = list('plotPath' = plotPath, 'txtPath' = txtPath)
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+  })
+}
+
+cosineSimilarityRefSigPublic <- function(profileType, signatureSetName, study, cancerType, experimentalStrategy, projectID, pythonOutput, savePath, dataPath) {
+  source('api/R/Sigvisualfunc.R')
+  load(paste0(dataPath, 'seqmatrix_refdata.RData'))
+  load(paste0(dataPath, 'signature_refsets.RData'))
+  stdout <- vector('character')
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+    plotPath = paste0(savePath, '/cos_sim_refsig.svg')
+    txtPath = paste0(savePath, '/cos_sim_refsig.txt')
+
+    profile_name <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
+    signature_refsets_data <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == signatureSetName)
+    refsig <- signature_refsets_data %>%
+      select(Signature_name, MutationType, Contribution) %>%
+      pivot_wider(names_from = Signature_name, values_from = Contribution)
+
+    seqmatrix_refdata_public <- seqmatrix_refdata %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy)
+    data_input <- seqmatrix_refdata_public %>% filter(Profile == profile_name) %>%
+      select(MutationType, Sample, Mutations) %>%
+      pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations)
+    data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
     # Heatmap of cosine similarity to reference set signature and put on the web---------------------------
     cos_sim_res2 = cos_sim_df(data_input, refsig)

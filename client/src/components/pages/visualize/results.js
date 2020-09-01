@@ -31,21 +31,15 @@ export default function Results({ setOpenSidebar }) {
   const [retrieveSvgList, setAttempt] = useState(false);
   // get mapping of plots after retrieving projectID
   useEffect(() => {
-    if (svgList.length) {
-      if (source == 'user') {
-        // only set svgList if signature set was not set
-        if (!signatureSetOptions.length) mapSvgList();
-        else {
-          if (projectID.length && !retrieveSvgList) {
-            setAttempt(true);
-            getSummary();
-          }
-        }
-      } else {
-        mapPublicData();
-      }
+    if (source == 'user') {
+      if (projectID && !retrieveSvgList) {
+        setAttempt(true);
+        getSummary();
+      } else if (projectID && !signatureSetOptions.length) mapSvgList();
+    } else {
+      if (svgList.length > 0) mapPublicData();
     }
-  }, [svgList]);
+  }, [svgList, projectID, source]);
 
   // reload summary information
   async function getSummary() {
@@ -248,8 +242,8 @@ export default function Results({ setOpenSidebar }) {
       refProfileType: profileOptions[0],
       refSignatureSet: refSignatureSetOptions[0],
       refSignatureSetOptions: refSignatureSetOptions,
-      withinMatrixSize: matrixOptions[0],
-      withinMatrixOptions: matrixOptions,
+      withinMatrixSize: filteredMatrixOptions[0],
+      withinMatrixOptions: filteredMatrixOptions,
     });
 
     dispatchProfileComparison({
