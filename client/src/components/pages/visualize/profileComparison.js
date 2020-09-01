@@ -317,9 +317,9 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
             }
           >
             {displayWithin == true ? (
-              <FontAwesomeIcon icon={faPlus} />
-            ) : (
               <FontAwesomeIcon icon={faMinus} />
+            ) : (
+              <FontAwesomeIcon icon={faPlus} />
             )}{' '}
             Comparison Within Samples
           </Toggle>
@@ -441,9 +441,9 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
             }
           >
             {displayRefSig == true ? (
-              <FontAwesomeIcon icon={faPlus} />
-            ) : (
               <FontAwesomeIcon icon={faMinus} />
+            ) : (
+              <FontAwesomeIcon icon={faPlus} />
             )}{' '}
             Comparison to Reference Signatures
           </Toggle>

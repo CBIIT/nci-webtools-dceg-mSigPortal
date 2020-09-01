@@ -185,9 +185,9 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
             }
           >
             {displayPCA == true ? (
-              <FontAwesomeIcon icon={faPlus} />
-            ) : (
               <FontAwesomeIcon icon={faMinus} />
+            ) : (
+              <FontAwesomeIcon icon={faPlus} />
             )}{' '}
             Principal Component Analysis
           </Toggle>
