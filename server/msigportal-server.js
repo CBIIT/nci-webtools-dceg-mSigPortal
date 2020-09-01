@@ -169,7 +169,7 @@ app.post('/api/visualizeR', (req, res) => {
       projectID: req.body.projectID,
       pythonOutput: path.join(tmppath, req.body.projectID, 'results/output'),
       savePath: savePath,
-      dataPath: datapath,
+      dataPath: path.join(datapath, 'signature_visualization/'),
     });
 
     const { stdout, output } = JSON.parse(wrapper);
@@ -193,7 +193,7 @@ app.post('/api/visualizeR/getReferenceSignatureSets', (req, res) => {
   try {
     const list = r('api/R/visualizeWrapper.R', 'getReferenceSignatureSets', [
       req.body.profileType,
-      datapath,
+      path.join(datapath, 'signature_visualization/'),
     ]);
 
     // console.log('SignatureReferenceSets', list);
@@ -213,7 +213,7 @@ app.post('/api/visualizeR/getSignatures', (req, res) => {
     const list = r('api/R/visualizeWrapper.R', 'getSignatures', [
       req.body.profileType,
       req.body.signatureSetName,
-      datapath,
+      path.join(datapath, 'signature_visualization/'),
     ]);
 
     console.log('signatures', list);
@@ -230,7 +230,7 @@ app.post('/visualize/getPublicDataOptions', (req, res) => {
   logger.info('/visualize/getPublicOptions: Calling R Wrapper');
   try {
     const list = r('api/R/visualizeWrapper.R', 'getPublicDataOptions', [
-      datapath,
+      path.join(datapath, 'signature_visualization/'),
     ]);
 
     res.json(JSON.parse(list));
@@ -248,7 +248,7 @@ app.post('/visualize/getPublicData', (req, res) => {
       req.body.study,
       req.body.cancerType,
       req.body.experimentalStrategy,
-      datapath,
+      path.join(datapath, 'signature_visualization/'),
     ]);
     logger.info('/visualize/getPublicOptions: Complete');
     res.json(JSON.parse(list));
