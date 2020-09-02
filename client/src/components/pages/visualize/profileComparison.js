@@ -29,7 +29,10 @@ const { Header, Body } = Card;
 const { Toggle, Collapse } = Accordion;
 
 export default function ProfileComparison({ submitR, getRefSigOptions }) {
-  const { displayTab } = useSelector((state) => state.visualizeResults);
+  const { source, study, cancerType, pExperimentalStrategy } = useSelector(
+    (state) => state.visualize
+  );
+  const { matrixList } = useSelector((state) => state.visualizeResults);
   const { nameOptions, profileOptions } = useSelector(
     (state) => state.mutationalProfiles
   );
@@ -226,7 +229,10 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
   }
 
   async function calculateR(fn, args) {
-    if (fn == 'profileComparisonWithin') {
+    if (
+      fn == 'profileComparisonWithin' ||
+      fn == 'profileComparisonWithinPublic'
+    ) {
       dispatchProfileComparison({
         withinSubmitOverlay: true,
         withinErr: '',
@@ -243,7 +249,10 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       const response = await submitR(fn, args);
       if (!response.ok) {
         const err = await response.json();
-        if (fn == 'profileComparisonWithin') {
+        if (
+          fn == 'profileComparisonWithin' ||
+          fn == 'profileComparisonWithinPublic'
+        ) {
           dispatchProfileComparison({
             withinSubmitOverlay: false,
             debugR: err,
@@ -257,7 +266,10 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       } else {
         const { debugR, output } = await response.json();
 
-        if (fn == 'profileComparisonWithin') {
+        if (
+          fn == 'profileComparisonWithin' ||
+          fn == 'profileComparisonWithinPublic'
+        ) {
           dispatchProfileComparison({
             debugR: debugR,
             withinSubmitOverlay: false,
@@ -277,7 +289,10 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       }
     } catch (err) {
       dispatchError(err);
-      if (fn == 'profileComparisonWithin') {
+      if (
+        fn == 'profileComparisonWithin' ||
+        fn == 'profileComparisonWithinPublic'
+      ) {
         dispatchProfileComparison({ withinSubmitOverlay: false });
       } else {
         dispatchProfileComparison({ refSubmitOverlay: false });
@@ -379,13 +394,30 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                     <Col sm="2" className="m-auto">
                       <Button
                         variant="primary"
-                        onClick={() =>
-                          calculateR('profileComparisonWithin', {
-                            profileType: withinProfileType,
-                            sampleName1: withinSampleName1,
-                            sampleName2: withinSampleName2,
-                          })
-                        }
+                        onClick={() => {
+                          if (source == 'user') {
+                            calculateR('profileComparisonWithin', {
+                              profileType: withinProfileType,
+                              sampleName1: withinSampleName1,
+                              sampleName2: withinSampleName2,
+                              matrixList: JSON.stringify(
+                                matrixList.filter(
+                                  (matrix) =>
+                                    matrix.Profile_Type == withinProfileType
+                                )
+                              ),
+                            });
+                          } else {
+                            calculateR('profileComparisonWithinPublic', {
+                              profileType: withinProfileType,
+                              sampleName1: withinSampleName1,
+                              sampleName2: withinSampleName2,
+                              study: study,
+                              cancerType: cancerType,
+                              experimentalStrategy: pExperimentalStrategy,
+                            });
+                          }
+                        }}
                       >
                         Calculate
                       </Button>
@@ -543,14 +575,32 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                     <Col sm="2" className="m-auto">
                       <Button
                         variant="primary"
-                        onClick={() =>
-                          calculateR('profileComparisonRefSig', {
-                            profileType: refProfileType,
-                            sampleName: refSampleName,
-                            signatureSet: refSignatureSet,
-                            compare: refCompare,
-                          })
-                        }
+                        onClick={() => {
+                          if (source == 'user') {
+                            calculateR('profileComparisonRefSig', {
+                              profileType: refProfileType,
+                              sampleName: refSampleName,
+                              signatureSet: refSignatureSet,
+                              compare: refCompare,
+                              matrixList: JSON.stringify(
+                                matrixList.filter(
+                                  (matrix) =>
+                                    matrix.Profile_Type == withinProfileType
+                                )
+                              ),
+                            });
+                          } else {
+                            calculateR('profileComparisonRefSigPublic', {
+                              profileType: refProfileType,
+                              sampleName: refSampleName,
+                              signatureSet: refSignatureSet,
+                              compare: refCompare,
+                              study: study,
+                              cancerType: cancerType,
+                              experimentalStrategy: pExperimentalStrategy,
+                            });
+                          }
+                        }}
                       >
                         Calculate
                       </Button>

@@ -197,7 +197,7 @@ cosineSimilarityRefSigPublic <- function(profileType, signatureSetName, study, c
 ### Profile Comparison tab ###
 # section 1: Cosine similarity within samples 
 # three parameters need: Profile Type, Sample Name1 and Sample Name2
-profileComparisonWithin <- function(profileType, sampleName1, sampleName2, projectID, pythonOutput, savePath, dataPath) {
+profileComparisonWithin <- function(profileType, sampleName1, sampleName2, matrixList, projectID, pythonOutput, savePath, dataPath) {
   source('api/R/Sigvisualfunc.R')
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
@@ -208,10 +208,50 @@ profileComparisonWithin <- function(profileType, sampleName1, sampleName2, proje
     output = list()
     plotPath = paste0(savePath, '/pro_com_within.svg')
 
-    matrixsize <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
-    data_input <- read_delim(paste0(pythonOutput, '/', profileType, '/', projectID, '.', matrixsize, '.all'), delim = '\t')
-    profile1 <- data_input %>% select(MutationType, contains(sampleName1))
-    profile2 <- data_input %>% select(MutationType, contains(sampleName2))
+    matrix_size <- if_else(profileType == "SBS", "96", if_else(profileType == "DBS", "78", if_else(profileType == "ID", "83", NA_character_)))
+
+    matrixfiles = fromJSON(matrixList)
+    matrixfile_selected <- matrixfiles %>% filter(Profile_Type == profileType, Matrix_Size == matrix_size) %>% pull(Path)
+    data_input <- read_delim(matrixfile_selected, delim = '\t')
+    data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
+
+    profile1 <- data_input %>% select(MutationType, one_of(sampleName1))
+    profile2 <- data_input %>% select(MutationType, one_of(sampleName2))
+    plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, output_plot = plotPath)
+
+    output = list('plotPath' = plotPath)
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+  })
+}
+
+profileComparisonWithinPublic <- function(profileType, sampleName1, sampleName2, study, cancerType, experimentalStrategy, projectID, pythonOutput, savePath, dataPath) {
+  source('api/R/Sigvisualfunc.R')
+  load(paste0(dataPath, 'seqmatrix_refdata.RData'))
+  stdout <- vector('character')
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+    plotPath = paste0(savePath, '/pro_com_within.svg')
+
+    matrix_size <- if_else(profileType == "SBS", "96", if_else(profileType == "DBS", "78", if_else(profileType == "ID", "83", NA_character_)))
+    profile_name <- paste0(profileType, matrix_size)
+
+    seqmatrix_refdata_public <- seqmatrix_refdata %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy)
+    data_input <- seqmatrix_refdata_public %>% filter(Profile == profile_name) %>%
+      select(MutationType, Sample, Mutations) %>%
+      filter(Sample %in% c(sampleName1, sampleName2)) %>%
+      pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations)
+
+    profile1 <- data_input %>% select(MutationType, one_of(sampleName1))
+    profile2 <- data_input %>% select(MutationType, one_of(sampleName2))
     plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, output_plot = plotPath)
 
     output = list('plotPath' = plotPath)
@@ -226,7 +266,7 @@ profileComparisonWithin <- function(profileType, sampleName1, sampleName2, proje
 
 # section 2: Comparison to reference signatures # 
 # four parameters need: “Profile Type”, “Sample Name”, “Reference Signature Set” and “Compare Single Signature or Combined Signatures” # 
-profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, compare, projectID, pythonOutput, savePath, dataPath) {
+profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, compare, matrixList, projectID, pythonOutput, savePath, dataPath) {
   source('api/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'signature_refsets.RData'))
   stdout <- vector('character')
@@ -239,24 +279,72 @@ profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, c
     plotPath = paste0(savePath, '/pro_com_refsig.svg')
 
     profilename <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
-    matrixsize <- profilename
-    data_input <- read_delim(paste0(pythonOutput, '/', profileType, '/', projectID, '.', matrixsize, '.all'), delim = '\t')
-    profile1 <- data_input %>% select(MutationType, one_of(sampleName))
+    matrix_size <- if_else(profileType == "SBS", "96", if_else(profileType == "DBS", "78", if_else(profileType == "ID", "83", NA_character_)))
+
     signature_refsets_input <- signature_refsets %>% filter(Profile == profilename, Signature_set_name == signatureSetName)
     refsig <- signature_refsets_input %>%
       select(Signature_name, MutationType, Contribution) %>%
       pivot_wider(names_from = Signature_name, values_from = Contribution)
 
-    user_input = compare # user_input <- "SBS5" #user_input <- "0.8*SBS5;0.1*SBS1;0.1*SBS3"
-
-    if (str_detect(user_input, ";")) {
-      profile2 <- signature_sum_operation(sigdatabase = signature_refsets_input, sigsetname = signatureSetName, formulax = user_input, outsigname = "Reconstructed")
+    if (str_detect(compare, ";")) {
+      profile2 <- signature_sum_operation(sigdatabase = signature_refsets_input, sigsetname = signatureSetName, formulax = compare, outsigname = "Reconstructed")
       profile_names = c("Original", "Reconstructed")
     } else {
-      profile2 <- refsig %>% select(MutationType, one_of(user_input))
-      profile_names = c(colnames(profile1)[2], colnames(profile2)[2])
+      profile2 <- refsig %>% select(MutationType, one_of(compare))
     }
 
+    matrixfiles = fromJSON(matrixList)
+    matrixfile_selected <- matrixfiles %>% filter(Profile_Type == profileType, Matrix_Size == matrix_size) %>% pull(Path)
+    data_input <- read_delim(matrixfile_selected, delim = '\t')
+    data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
+
+    profile1 <- data_input %>% select(MutationType, one_of(sampleName))
+    profile_names = c(colnames(profile1)[2], colnames(profile2)[2])
+    plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, profile_names = profile_names, output_plot = plotPath)
+
+    output = list('plotPath' = plotPath)
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+  })
+}
+
+profileComparisonRefSigPublic <- function(profileType, sampleName, signatureSetName, compare, study, cancerType, experimentalStrategy, projectID, pythonOutput, savePath, dataPath) {
+  source('api/R/Sigvisualfunc.R')
+  load(paste0(dataPath, 'signature_refsets.RData'))
+  load(paste0(dataPath, 'seqmatrix_refdata.RData'))
+  stdout <- vector('character')
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+    plotPath = paste0(savePath, '/pro_com_refsig.svg')
+
+    profilename <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
+
+    signature_refsets_input <- signature_refsets %>% filter(Profile == profilename, Signature_set_name == signatureSetName)
+    refsig <- signature_refsets_input %>%
+      select(Signature_name, MutationType, Contribution) %>%
+      pivot_wider(names_from = Signature_name, values_from = Contribution)
+
+    if (str_detect(compare, ";")) {
+      profile2 <- signature_sum_operation(sigdatabase = signature_refsets_input, sigsetname = signatureSetName, formulax = compare, outsigname = "Reconstructed")
+      profile_names = c("Original", "Reconstructed")
+    } else {
+      profile2 <- refsig %>% select(MutationType, one_of(compare))
+    }
+
+    seqmatrix_refdata_public <- seqmatrix_refdata %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy)
+    profile1 <- seqmatrix_refdata_public %>% filter(Profile == profilename) %>%
+      select(MutationType, Sample, Mutations) %>%
+      filter(Sample %in% c(sampleName)) %>%
+      pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations)
+    profile_names = c(colnames(profile1)[2], colnames(profile2)[2])
     plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, profile_names = profile_names, output_plot = plotPath)
 
     output = list('plotPath' = plotPath)
