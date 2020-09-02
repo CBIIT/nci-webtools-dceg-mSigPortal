@@ -6,12 +6,12 @@ library(ggrepel)
 library(factoextra)
 library(jsonlite)
 
-# get all Reference Signature Set options using profileName (matrix)
+# get all Reference Signature Set options using profile_name (profile type and matrix size)
 getReferenceSignatureSets <- function(profileType, dataPath) {
   load(paste0(dataPath, 'signature_refsets.RData'))
 
-  profileName <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
-  signatureSets <- signature_refsets %>% filter(Profile == profileName) %>% pull(Signature_set_name) %>% unique()
+  profile_name <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
+  signatureSets <- signature_refsets %>% filter(Profile == profile_name) %>% pull(Signature_set_name) %>% unique()
 
   return(signatureSets)
 }
@@ -19,8 +19,8 @@ getReferenceSignatureSets <- function(profileType, dataPath) {
 # get list of signatures in the selected signature set
 getSignatures <- function(profileType, signatureSetName, dataPath) {
   load(paste0(dataPath, 'signature_refsets.RData'))
-  profileName <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
-  signature_refsets_input <- signature_refsets %>% filter(Profile == profileName, Signature_set_name == signatureSetName)
+  profile_name <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
+  signature_refsets_input <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == signatureSetName)
   refsig <- signature_refsets_input %>%
       select(Signature_name, MutationType, Contribution) %>%
       pivot_wider(names_from = Signature_name, values_from = Contribution)
@@ -278,10 +278,10 @@ profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, c
     output = list()
     plotPath = paste0(savePath, '/pro_com_refsig.svg')
 
-    profilename <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
+    profile_name <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
     matrix_size <- if_else(profileType == "SBS", "96", if_else(profileType == "DBS", "78", if_else(profileType == "ID", "83", NA_character_)))
 
-    signature_refsets_input <- signature_refsets %>% filter(Profile == profilename, Signature_set_name == signatureSetName)
+    signature_refsets_input <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == signatureSetName)
     refsig <- signature_refsets_input %>%
       select(Signature_name, MutationType, Contribution) %>%
       pivot_wider(names_from = Signature_name, values_from = Contribution)
@@ -325,9 +325,9 @@ profileComparisonRefSigPublic <- function(profileType, sampleName, signatureSetN
     output = list()
     plotPath = paste0(savePath, '/pro_com_refsig.svg')
 
-    profilename <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
+    profile_name <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
 
-    signature_refsets_input <- signature_refsets %>% filter(Profile == profilename, Signature_set_name == signatureSetName)
+    signature_refsets_input <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == signatureSetName)
     refsig <- signature_refsets_input %>%
       select(Signature_name, MutationType, Contribution) %>%
       pivot_wider(names_from = Signature_name, values_from = Contribution)
@@ -340,7 +340,7 @@ profileComparisonRefSigPublic <- function(profileType, sampleName, signatureSetN
     }
 
     seqmatrix_refdata_public <- seqmatrix_refdata %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy)
-    profile1 <- seqmatrix_refdata_public %>% filter(Profile == profilename) %>%
+    profile1 <- seqmatrix_refdata_public %>% filter(Profile == profile_name) %>%
       select(MutationType, Sample, Mutations) %>%
       filter(Sample %in% c(sampleName)) %>%
       pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations)
@@ -360,7 +360,7 @@ profileComparisonRefSigPublic <- function(profileType, sampleName, signatureSetN
 ### “Principal Component Analysis” ###
 # Two parameters need: Profile Type, Reference Signature Set
 # Profile Type only support SBS, DBS, ID
-pca <- function(profileType, signatureSetName, projectID, pythonOutput, savePath, dataPath) {
+pca <- function(profileType, signatureSetName, matrixList, projectID, pythonOutput, savePath, dataPath) {
   source('api/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'signature_refsets.RData'))
   stdout <- vector('character')
@@ -380,15 +380,13 @@ pca <- function(profileType, signatureSetName, projectID, pythonOutput, savePath
 
 
 
-    profilename <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
-    matrixsize <- profilename
+    profile_name <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
+    matrix_size <- if_else(profileType == "SBS", "96", if_else(profileType == "DBS", "78", if_else(profileType == "ID", "83", NA_character_)))
 
-    signature_refsets_input <- signature_refsets %>% filter(Profile == profilename, Signature_set_name == signatureSetName)
-    refsig <- signature_refsets_input %>%
-      select(Signature_name, MutationType, Contribution) %>%
-      pivot_wider(names_from = Signature_name, values_from = Contribution)
-
-    data_input <- read_delim(paste0(pythonOutput, '/', profileType, '/', projectID, '.', matrixsize, '.all'), delim = '\t')
+    matrixfiles = fromJSON(matrixList)
+    matrixfile_selected <- matrixfiles %>% filter(Profile_Type == profileType, Matrix_Size == matrix_size) %>% pull(Path)
+    data_input <- read_delim(matrixfile_selected, delim = '\t')
+    data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
     # PCA plot ----------------------------------------------------------------
     mdata_input <- as.matrix(data_input[, -1])
@@ -396,12 +394,13 @@ pca <- function(profileType, signatureSetName, projectID, pythonOutput, savePath
 
     res.pca <- prcomp(t(mdata_input), scale = FALSE, center = FALSE)
 
-    xleng <- dim(res.pca$x)[2] * 0.5 + 1
+    xleng <- dim(res.pca$x)[2] * 0.25 + 1
+    xleng <- if_else(xleng > 4, 4, xleng)
     yleng <- 4
-    pcap1 <- fviz_eig(res.pca, ncp = 10, main = "")
+    pcap1 <- fviz_eig(res.pca, ncp = 10, main = "", addlabels = T)
     ggsave(filename = pca1, plot = pcap1, width = xleng, height = yleng)
 
-    if ((dim(data_input)[2] - 1) > 20) {
+    if ((dim(data_input)[2] - 1) > 35) {
       pcap2 <- fviz_pca_ind(res.pca, axes = c(1, 2), geom = "point", col.ind = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE)
     } else {
       pcap2 <- fviz_pca_ind(res.pca, axes = c(1, 2), col.ind = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE)
@@ -422,15 +421,124 @@ pca <- function(profileType, signatureSetName, projectID, pythonOutput, savePath
     # a link to download pca data2
     res.pca$rotation %>% as.data.frame() %>% rownames_to_column(var = 'Sample') %>% write_delim(pca3Data, delim = '\t', col_names = T)
 
-    ## heatmap between PCs and signatures
-    sigpca <- res.pca$rotation %>% as.data.frame() %>% rownames_to_column(var = "MutationType")
-    cos_sim_res3 = cos_sim_df(sigpca, refsig)
-    # put this heatmap on the web
-    plot_cosine_heatmap_df(cos_sim_res3, cluster_rows = TRUE, plot_values = FALSE, output_plot = heatmap)
+    # parameters:  Reference Signature Set
+    #all the option of Reference Signature Set
+    ## only work if the profile included in singatures dataset
+    if (profile_name %in% unique(signature_refsets$Profile)) {
+      signature_refsets_input <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == signatureSetName)
+      sigref_data <- signature_refsets_input %>%
+        select(Signature_name, MutationType, Contribution) %>%
+        pivot_wider(names_from = Signature_name, values_from = Contribution)
 
-    # a link to download the cosine similarity bellow the plot 
-    # you could rename the file name if you need
-    cos_sim_res3 %>% write_delim(heatmapData, delim = '\t', col_names = T)
+      ## heatmap between PCs and signatures
+      sigpca_data <- res.pca$rotation %>% as.data.frame() %>% rownames_to_column(var = "MutationType")
+      cos_sim_res4 = cos_sim_df(sigpca_data, sigref_data)
+      # put this heatmap on the web
+      plot_cosine_heatmap_df(cos_sim_res4, cluster_rows = TRUE, plot_values = FALSE, output_plot = heatmap)
+      # a link to download the cosine similarity bellow the plot
+      # you could rename the file name if you need
+      cos_sim_res4 %>% write_delim(heatmapData, delim = '\t', col_names = T)
+    }
+
+    output = list(
+      'pca1' = pca1,
+      'pca2' = pca2,
+      'pca3' = pca3,
+      'heatmap' = heatmap,
+      'pca2Data' = pca2Data,
+      'pca3Data' = pca3Data,
+      'heatmapData' = heatmapData
+     )
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+  })
+}
+
+pcaPublic <- function(profileType, signatureSetName, study, cancerType, experimentalStrategy, projectID, pythonOutput, savePath, dataPath) {
+  source('api/R/Sigvisualfunc.R')
+  load(paste0(dataPath, 'signature_refsets.RData'))
+  load(paste0(dataPath, 'seqmatrix_refdata.RData'))
+  stdout <- vector('character')
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+    pca1 = paste0(savePath, '/pca1.svg')
+    pca2 = paste0(savePath, '/pca2.svg')
+    pca3 = paste0(savePath, '/pca3.svg')
+    heatmap = paste0(savePath, '/heatmap.svg')
+    pca2Data = paste0(savePath, '/pca2_data.txt')
+    pca3Data = paste0(savePath, '/pca3_data.txt')
+    heatmapData = paste0(savePath, '/heatmap_data.txt')
+
+
+
+    profile_name <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
+    matrix_size <- if_else(profileType == "SBS", "96", if_else(profileType == "DBS", "78", if_else(profileType == "ID", "83", NA_character_)))
+
+    seqmatrix_refdata_public <- seqmatrix_refdata %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy)
+    data_input <- seqmatrix_refdata_public %>% filter(Profile == profile_name) %>%
+      select(MutationType, Sample, Mutations) %>%
+      pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations)
+    data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
+
+    # PCA plot ----------------------------------------------------------------
+    mdata_input <- as.matrix(data_input[, -1])
+    rownames(mdata_input) <- data_input$MutationType
+
+    res.pca <- prcomp(t(mdata_input), scale = FALSE, center = FALSE)
+
+    xleng <- dim(res.pca$x)[2] * 0.25 + 1
+    xleng <- if_else(xleng > 4, 4, xleng)
+    yleng <- 4
+    pcap1 <- fviz_eig(res.pca, ncp = 10, main = "", addlabels = T)
+    ggsave(filename = pca1, plot = pcap1, width = xleng, height = yleng)
+
+    if ((dim(data_input)[2] - 1) > 35) {
+      pcap2 <- fviz_pca_ind(res.pca, axes = c(1, 2), geom = "point", col.ind = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE)
+    } else {
+      pcap2 <- fviz_pca_ind(res.pca, axes = c(1, 2), col.ind = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE)
+    }
+    ggsave(filename = pca2, plot = pcap2, width = 10, height = 7)
+
+    ## a link to download pca data1
+    res.pca$x %>% as.data.frame() %>% rownames_to_column(var = 'Sample') %>% write_delim(pca2Data, delim = '\t', col_names = T)
+
+    pcap3 <- fviz_pca_var(res.pca, axes = c(1, 2),
+             col.var = "contrib", # Color by contributions to the PC
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = FALSE # Avoid text overlapping
+    )
+    ggsave(filename = pca3, plot = pcap3, width = 10, height = 7)
+
+
+    # a link to download pca data2
+    res.pca$rotation %>% as.data.frame() %>% rownames_to_column(var = 'Sample') %>% write_delim(pca3Data, delim = '\t', col_names = T)
+
+    # parameters:  Reference Signature Set
+    #all the option of Reference Signature Set
+    ## only work if the profile included in singatures dataset
+    if (profile_name %in% unique(signature_refsets$Profile)) {
+      signature_refsets_input <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == signatureSetName)
+      sigref_data <- signature_refsets_input %>%
+        select(Signature_name, MutationType, Contribution) %>%
+        pivot_wider(names_from = Signature_name, values_from = Contribution)
+
+      ## heatmap between PCs and signatures
+      sigpca_data <- res.pca$rotation %>% as.data.frame() %>% rownames_to_column(var = "MutationType")
+      cos_sim_res4 = cos_sim_df(sigpca_data, sigref_data)
+      # put this heatmap on the web
+      plot_cosine_heatmap_df(cos_sim_res4, cluster_rows = TRUE, plot_values = FALSE, output_plot = heatmap)
+      # a link to download the cosine similarity bellow the plot
+      # you could rename the file name if you need
+      cos_sim_res4 %>% write_delim(heatmapData, delim = '\t', col_names = T)
+    }
 
     output = list(
       'pca1' = pca1,

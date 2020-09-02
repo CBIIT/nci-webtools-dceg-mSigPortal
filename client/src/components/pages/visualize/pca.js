@@ -7,12 +7,15 @@ import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { dispatchError, dispatchPCA } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
-const { Group, Label, Control } = Form;
+const { Group, Label } = Form;
 const { Header, Body } = Card;
 const { Toggle, Collapse } = Accordion;
 
 export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
-  const { displayTab } = useSelector((state) => state.visualizeResults);
+  const { matrixList } = useSelector((state) => state.visualizeResults);
+  const { source, study, cancerType, pExperimentalStrategy } = useSelector(
+    (state) => state.visualize
+  );
   const { profileOptions } = useSelector((state) => state.mutationalProfiles);
   const rootURL = window.location.pathname;
   const {
@@ -237,12 +240,27 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
                     <Col sm="2" className="m-auto">
                       <Button
                         variant="primary"
-                        onClick={() =>
-                          calculateR('pca', {
-                            profileType: profileType,
-                            signatureSet: signatureSet,
-                          })
-                        }
+                        onClick={() => {
+                          if (source == 'user') {
+                            calculateR('pca', {
+                              profileType: profileType,
+                              signatureSet: signatureSet,
+                              matrixList: JSON.stringify(
+                                matrixList.filter(
+                                  (matrix) => matrix.Profile_Type == profileType
+                                )
+                              ),
+                            });
+                          } else {
+                            calculateR('pcaPublic', {
+                              profileType: profileType,
+                              signatureSet: signatureSet,
+                              study: study,
+                              cancerType: cancerType,
+                              experimentalStrategy: pExperimentalStrategy,
+                            });
+                          }
+                        }}
                       >
                         Calculate
                       </Button>
