@@ -146,6 +146,9 @@ export default function Results({ setOpenSidebar }) {
       refSignatureSetOptions: refSignatureSetOptions,
       withinMatrixSize: filteredMatrixList[0],
       withinMatrixOptions: filteredMatrixList,
+      pubProfileType: profileOptions[0],
+      pubMatrixSize: filteredMatrixOptions[0],
+      pubMatrixOptions: filteredMatrixOptions,
     });
 
     dispatchProfileComparison({
@@ -156,12 +159,17 @@ export default function Results({ setOpenSidebar }) {
       refSampleName: nameOptions[0],
       refSignatureSet: refSignatureSetOptions[0],
       refSignatureSetOptions: refSignatureSetOptions,
+      pubProfileType: profileOptions[0],
+      pubSampleName1: nameOptions[0],
     });
 
     dispatchPCA({
       profileType: profileOptions[0],
       signatureSet: refSignatureSetOptions[0],
       signatureSetOptions: refSignatureSetOptions,
+      userProfileType: profileOptions[0],
+      userMatrixSize: filteredMatrixList[0],
+      userMatrixOptions: filteredMatrixOptions,
     });
 
     dispatchVisualize({

@@ -19,11 +19,16 @@ export default function CosineSimilarity({
   submitR,
   getRefSigOptions,
 }) {
-  const { source, study, cancerType, pExperimentalStrategy } = useSelector(
-    (state) => state.visualize
-  );
+  const {
+    source,
+    study,
+    studyOptions,
+    cancerType,
+    pExperimentalStrategy,
+    pDataOptions,
+  } = useSelector((state) => state.visualize);
   const { profileOptions } = useSelector((state) => state.mutationalProfiles);
-  const { displayTab, matrixList, svgList } = useSelector(
+  const { matrixList, svgList } = useSelector(
     (state) => state.visualizeResults
   );
   const rootURL = window.location.pathname;
@@ -34,18 +39,32 @@ export default function CosineSimilarity({
     refProfileType,
     refSignatureSet,
     refSignatureSetOptions,
+    pubProfileType,
+    pubMatrixSize,
+    pubMatrixOptions,
+    pubStudy,
+    pubCancerType,
+    pubCancerTypeOptions,
+    pubProfileName,
+    pubProfileNameOptions,
     withinPlotPath,
     withinTxtPath,
     refPlotPath,
     refTxtPath,
+    pubPlotPath,
+    pubTxtPath,
     withinPlotURL,
     refPlotURL,
+    pubPlotURL,
     displayWithin,
     displayRefSig,
+    displayPublic,
     withinErr,
     refErr,
+    pubErr,
     withinSubmitOverlay,
     refSubmitOverlay,
+    pubSubmitOverlay,
     debugR,
     displayDebug,
   } = useSelector((state) => state.cosineSimilarity);
@@ -57,11 +76,69 @@ export default function CosineSimilarity({
     menuPortalTarget: document.body,
   };
 
+  // get public data profile names
+  useEffect(() => {
+    if (
+      source == 'user' &&
+      pubStudy &&
+      !pubProfileNameOptions.length
+    ) {
+      getPublicProfiles(pubStudy, pubCancerType);
+    }
+  }, [pDataOptions, pubStudy]);
+
+  async function getPublicProfiles(study, cancerType) {
+    dispatchCosineSimilarity({ pubSubmitOverlay: true });
+    const args = {
+      study: study,
+      cancerType: cancerType,
+      experimentalStrategy: [
+        ...new Set(
+          pDataOptions
+            .filter(
+              (data) => data.Study == study && data.Cancer_Type == cancerType
+            )
+            .map((data) => data.Dataset)
+        ),
+      ][0],
+    };
+
+    try {
+      const response = await fetch(`${rootURL}visualize/getPublicData`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(args),
+      });
+
+      if (response.ok) {
+        const { svgList } = await response.json();
+        const pubProfiles = [
+          ...new Set(svgList.map((plot) => plot.Profile)),
+        ];
+
+        dispatchCosineSimilarity({
+          pubProfileNameOptions: pubProfiles,
+          pubProfileName: pubProfiles[0],
+        });
+      } else {
+        dispatchCosineSimilarity({ pubProfileNameOptions: ['NA'] });
+      }
+    } catch (err) {
+      dispatchError(err);
+    }
+    dispatchCosineSimilarity({ pubSubmitOverlay: false });
+  }
+
   function setOverlay(type, display) {
     if (type == 'within') {
       dispatchCosineSimilarity({ withinSubmitOverlay: display });
-    } else {
+    } else if (type == 'refsig') {
       dispatchCosineSimilarity({ refSubmitOverlay: display });
+    } else {
+      dispatchCosineSimilarity({ pubSubmitOverlay: display });
     }
   }
 
@@ -88,10 +165,15 @@ export default function CosineSimilarity({
             dispatchCosineSimilarity({
               withinPlotURL: objectURL,
             });
-          } else {
+          } else if (type == 'refsig') {
             if (refPlotURL) URL.revokeObjectURL(refPlotURL);
             dispatchCosineSimilarity({
               refPlotURL: objectURL,
+            });
+          } else {
+            if (pubPlotURL) URL.revokeObjectURL(pubPlotURL);
+            dispatchCosineSimilarity({
+              pubPlotURL: objectURL,
             });
           }
           setOverlay(type, false);
@@ -103,9 +185,12 @@ export default function CosineSimilarity({
       if (type == 'within') {
         if (withinPlotURL) URL.revokeObjectURL(withinPlotURL);
         dispatchCosineSimilarity({ withinErr: true, withinPlotURL: '' });
-      } else {
+      } else if (type == 'refsig') {
         if (refPlotURL) URL.revokeObjectURL(refPlotURL);
         dispatchCosineSimilarity({ refErr: true, refPlotURL: '' });
+      } else {
+        if (pubPlotURL) URL.revokeObjectURL(pubPlotURL);
+        dispatchCosineSimilarity({ pubErr: true, pubPlotURL: '' });
       }
     }
     setOverlay(type, false);
@@ -138,20 +223,23 @@ export default function CosineSimilarity({
   }
 
   async function calculateR(fn, args) {
-    if (
-      fn == 'cosineSimilarityWithin' ||
-      fn == 'cosineSimilarityWithinPublic'
-    ) {
+    if (fn.includes('cosineSimilarityWithin')) {
       console.log(fn);
       dispatchCosineSimilarity({
         withinSubmitOverlay: true,
-        withinErr: '',
+        withinErr: false,
+        debugR: '',
+      });
+    } else if (fn.includes('cosineSimilarityRefSig')) {
+      dispatchCosineSimilarity({
+        refSubmitOverlay: true,
+        refErr: false,
         debugR: '',
       });
     } else {
       dispatchCosineSimilarity({
-        refSubmitOverlay: true,
-        refErr: '',
+        pubSubmitOverlay: true,
+        refErr: false,
         debugR: '',
       });
     }
@@ -159,27 +247,26 @@ export default function CosineSimilarity({
       const response = await submitR(fn, args);
       if (!response.ok) {
         const err = await response.json();
-        if (
-          fn == 'cosineSimilarityWithin' ||
-          fn == 'cosineSimilarityWithinPublic'
-        ) {
+        if (fn.includes('cosineSimilarityWithin')) {
           dispatchCosineSimilarity({
             withinSubmitOverlay: false,
             debugR: err,
           });
-        } else {
+        } else if (fn.includes('cosineSimilarityRefSig')) {
           dispatchCosineSimilarity({
             refSubmitOverlay: false,
             debugR: err,
+          });
+        } else {
+          dispatchCosineSimilarity({
+            pubSubmitOverlay: false,
+            debugR: '',
           });
         }
       } else {
         const { debugR, output } = await response.json();
 
-        if (
-          fn == 'cosineSimilarityWithin' ||
-          fn == 'cosineSimilarityWithinPublic'
-        ) {
+        if (fn.includes('cosineSimilarityWithin')) {
           dispatchCosineSimilarity({
             debugR: debugR,
             withinSubmitOverlay: false,
@@ -187,7 +274,7 @@ export default function CosineSimilarity({
             withinTxtPath: output.txtPath,
           });
           setRPlot(output.plotPath, 'within');
-        } else {
+        } else if (fn.includes('cosineSimilarityRefSig')) {
           dispatchCosineSimilarity({
             debugR: debugR,
             refSubmitOverlay: false,
@@ -195,17 +282,24 @@ export default function CosineSimilarity({
             refTxtPath: output.txtPath,
           });
           setRPlot(output.plotPath, 'refsig');
+        } else {
+          dispatchCosineSimilarity({
+            debugR: debugR,
+            pubSubmitOverlay: false,
+            pubPlotPath: output.plotPath,
+            pubTxtPath: output.txtPath,
+          });
+          setRPlot(output.plotPath, 'pub');
         }
       }
     } catch (err) {
       dispatchError(err);
-      if (
-        fn == 'cosineSimilarityWithin' ||
-        fn == 'cosineSimilarityWithinPublic'
-      ) {
+      if (fn.includes('cosineSimilarityWithin')) {
         dispatchCosineSimilarity({ withinSubmitOverlay: false });
-      } else {
+      } else if (fn.includes('cosineSimilarityRefSig')) {
         dispatchCosineSimilarity({ refSubmitOverlay: false });
+      } else {
+        dispatchCosineSimilarity({ pubSubmitOverlay: false });
       }
     }
   }
@@ -240,6 +334,46 @@ export default function CosineSimilarity({
         withinMatrixOptions: withinMatrixOptions,
       });
     }
+  }
+
+  function handlePublicProfileType(profileType) {
+    const pubMatrixOptions = [
+      ...new Set(
+        matrixList
+          .filter((matrix) => matrix.Profile_Type == profileType)
+          .map((matrix) => matrix.Matrix_Size)
+      ),
+    ];
+
+    dispatchCosineSimilarity({
+      pubProfileType: profileType,
+      pubMatrixSize: pubMatrixOptions[0],
+      pubMatrixOptions: pubMatrixOptions,
+    });
+  }
+
+  function handleStudyChange(study) {
+    const cancerTypeOptions = [
+      ...new Set(
+        pDataOptions
+          .filter((data) => data.Study == study)
+          .map((data) => data.Cancer_Type)
+      ),
+    ];
+
+    dispatchCosineSimilarity({
+      pubStudy: study,
+      pubCancerType: cancerTypeOptions[0],
+      pubCancerTypeOptions: cancerTypeOptions,
+    });
+    getPublicProfiles(study, cancerTypeOptions[0]);
+  }
+
+  function handleCancerChange(cancer) {
+    dispatchCosineSimilarity({
+      pubCancerType: cancer,
+    });
+    getPublicProfiles(pubStudy, cancer);
   }
 
   return (
@@ -513,7 +647,171 @@ export default function CosineSimilarity({
           </Collapse>
         </Card>
       </Accordion>
+      {source == 'user' && (
+        <Accordion defaultActiveKey="2">
+          <Card>
+            <Toggle
+              className="font-weight-bold"
+              as={Header}
+              eventKey="2"
+              onClick={() =>
+                dispatchCosineSimilarity({
+                  displayPublic: !displayPublic,
+                })
+              }
+            >
+              {displayPublic == true ? (
+                <FontAwesomeIcon icon={faMinus} />
+              ) : (
+                <FontAwesomeIcon icon={faPlus} />
+              )}{' '}
+              Cosine Similarity to Public Data
+            </Toggle>
+            <Collapse eventKey="2">
+              <Body>
+                <Form>
+                  <LoadingOverlay active={pubSubmitOverlay} />
+                  <div>
+                    <Row className="justify-content-center">
+                      <Col sm="2">
+                        <Group controlId="pubProfileType">
+                          <Label>Profile Type</Label>
+                          <Select
+                            options={profileOptions}
+                            value={[pubProfileType]}
+                            onChange={(profile) =>
+                              handlePublicProfileType(profile)
+                            }
+                            getOptionLabel={(option) => option}
+                            getOptionValue={(option) => option}
+                            {...selectFix}
+                          />
+                        </Group>
+                      </Col>
+                      <Col sm="2">
+                        <Label>Matrix Size</Label>
+                        <Select
+                          options={pubMatrixOptions}
+                          value={[pubMatrixSize]}
+                          onChange={(matrix) =>
+                            dispatchCosineSimilarity({
+                              pubMatrixSize: matrix,
+                            })
+                          }
+                          getOptionLabel={(option) => option}
+                          getOptionValue={(option) => option}
+                          {...selectFix}
+                        />
+                      </Col>
+                      <Col sm="2">
+                        <Group controlId="pubStudy">
+                          <Label>Study</Label>
+                          <Select
+                            options={studyOptions}
+                            value={[pubStudy]}
+                            onChange={(study) => handleStudyChange(study)}
+                            getOptionLabel={(option) => option}
+                            getOptionValue={(option) => option}
+                            {...selectFix}
+                          />
+                        </Group>
+                      </Col>
+                      <Col sm="2">
+                        <Group controlId="pubCancerType">
+                          <Label>Cancer Type</Label>
+                          <Select
+                            options={pubCancerTypeOptions}
+                            value={[pubCancerType]}
+                            onChange={(cancer) => handleCancerChange(cancer)}
+                            getOptionLabel={(option) => option}
+                            getOptionValue={(option) => option}
+                            {...selectFix}
+                          />
+                        </Group>
+                      </Col>
 
+                      <Col sm="2">
+                        <Label>Profile Name</Label>
+                        <Select
+                          options={pubProfileNameOptions}
+                          value={[pubProfileName]}
+                          onChange={(name) => {
+                            dispatchCosineSimilarity({
+                              pubProfileName: name,
+                            });
+                          }}
+                          getOptionLabel={(option) => option}
+                          getOptionValue={(option) => option}
+                          {...selectFix}
+                        />
+                      </Col>
+                      <Col sm="2" className="m-auto">
+                        <Button
+                          variant="primary"
+                          onClick={() =>
+                            calculateR('cosineSimilarityPublic', {
+                              matrixFile: matrixList.filter(
+                                (path) =>
+                                  path.Profile_Type == pubProfileType &&
+                                  path.Matrix_Size == pubMatrixSize
+                              )[0].Path,
+                              study: pubStudy,
+                              cancerType: pubCancerType,
+                              profileName: pubProfileName,
+                            })
+                          }
+                        >
+                          Calculate
+                        </Button>
+                      </Col>
+                    </Row>
+                    <div id="pubPlot">
+                      <div style={{ display: pubErr ? 'block' : 'none' }}>
+                        <p>
+                          An error has occured. Check the debug section for more
+                          info.
+                        </p>
+                      </div>
+                      <div
+                        style={{ display: pubPlotURL ? 'block' : 'none' }}
+                      >
+                        <div className="d-flex">
+                          <a
+                            className="px-2 py-1"
+                            href={pubPlotURL}
+                            download={pubPlotURL.split('/').slice(-1)[0]}
+                          >
+                            Download Plot
+                          </a>
+                          <span className="ml-auto">
+                            <Button
+                              className="px-2 py-1"
+                              variant="link"
+                              onClick={() => downloadResults(pubTxtPath)}
+                            >
+                              Download Results
+                            </Button>
+                          </span>
+                        </div>
+                        <div className="p-2 border rounded">
+                          <Row>
+                            <Col>
+                              <img
+                                className="w-100 my-4 h-500"
+                                src={pubPlotURL}
+                              ></img>
+                            </Col>
+                          </Row>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Form>
+              </Body>
+            </Collapse>
+          </Card>
+        </Accordion>
+      )}
       <Button
         variant="link"
         className="p-0 mt-5"

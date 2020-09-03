@@ -194,6 +194,48 @@ cosineSimilarityRefSigPublic <- function(profileType, signatureSetName, study, c
   })
 }
 
+# section 3: Cosine similarity to Public data -----------------------------
+# find the common profile between data and seqmatrix
+cosineSimilarityPublic <- function(matrixFile, study, cancerType, profileName, projectID, pythonOutput, savePath, dataPath) {
+  source('api/R/Sigvisualfunc.R')
+  load(paste0(dataPath, 'seqmatrix_refdata.RData'))
+  stdout <- vector('character')
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+    plotPath = paste0(savePath, '/cos_sim_within.svg')
+    txtPath = paste0(savePath, '/cos_sim_within.txt')
+
+
+    ## input data
+    data_input <- read_delim(matrixFile, delim = '\t')
+    data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
+
+    ## seqmatrix data from public data
+    sigmatrix_data <- seqmatrix_refdata %>%
+    filter(Profile == profileName, Study == study, Cancer_Type == cancerType) %>%
+    select(Sample, MutationType, Mutations) %>%
+    pivot_wider(names_from = Sample, values_from = Mutations)
+
+    # Heatmap of cosine similarity to public seqmatrix data and put on the web---------------------------
+    cos_sim_res3 = cos_sim_df(data_input, sigmatrix_data)
+    plot_cosine_heatmap_df(cos_sim_res3, cluster_rows = TRUE, plot_values = FALSE, output_plot = plotPath)
+    cos_sim_res3 %>% write_delim(txtPath, delim = '\t', col_names = T)
+
+    output = list('plotPath' = plotPath, 'txtPath' = txtPath)
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+  })
+}
+
+
 ### Profile Comparison tab ###
 # section 1: Cosine similarity within samples 
 # three parameters need: Profile Type, Sample Name1 and Sample Name2
@@ -346,6 +388,49 @@ profileComparisonRefSigPublic <- function(profileType, sampleName, signatureSetN
       pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations)
     profile_names = c(colnames(profile1)[2], colnames(profile2)[2])
     plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, profile_names = profile_names, output_plot = plotPath)
+
+    output = list('plotPath' = plotPath)
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+  })
+}
+
+# section 3: Profile Comparison to Public data ----------------------------
+profileComparisonPublic <- function(profileType, matrixSize, matrixList, study, cancerType, projectID, pythonOutput, savePath, dataPath) {
+  source('api/R/Sigvisualfunc.R')
+  load(paste0(dataPath, 'seqmatrix_refdata.RData'))
+  stdout <- vector('character')
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+    plotPath = paste0(savePath, '/pro_com_within.svg')
+
+    matrix_size <- if_else(profileType == "SBS", "96", if_else(profileType == "DBS", "78", if_else(profileType == "ID", "83", NA_character_)))
+    profile_name <- paste0(profileType, matrix_size)
+
+    ## input data
+    matrixfiles = fromJSON(matrixList)
+    matrixfile_selected <- matrixfiles %>% filter(Profile_Type == profileType, Matrix_Size == matrix_size) %>% pull(Path)
+    data_input <- read_delim(matrixfile_selected, delim = '\t')
+    data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
+    profile1 <- data_input %>% select(MutationType, one_of(sampleName1))
+
+    ## seqmatrix data from public data
+    profile2 <- seqmatrix_refdata %>%
+      filter(Profile == profile_name, Study == study, Cancer_Type == cancerType) %>%
+      select(Sample, MutationType, Mutations) %>%
+      filter(Sample == sampleName2) %>%
+      pivot_wider(names_from = Sample, values_from = Mutations)
+
+
+    plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, output_plot = plotPath)
 
     output = list('plotPath' = plotPath)
   }, error = function(e) {
@@ -548,6 +633,88 @@ pcaPublic <- function(profileType, signatureSetName, study, cancerType, experime
       'pca2Data' = pca2Data,
       'pca3Data' = pca3Data,
       'heatmapData' = heatmapData
+     )
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+  })
+}
+
+#  section 2 PCA together with public data --------------------------------
+pcaWithPublic <- function(matrixFile, study, cancerType, profileName, projectID, pythonOutput, savePath, dataPath) {
+  source('api/R/Sigvisualfunc.R')
+  load(paste0(dataPath, 'signature_refsets.RData'))
+  load(paste0(dataPath, 'seqmatrix_refdata.RData'))
+  stdout <- vector('character')
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+    pca1 = paste0(savePath, '/pca1.svg')
+    pca2 = paste0(savePath, '/pca2.svg')
+    pca3 = paste0(savePath, '/pca3.svg')
+    pca2Data = paste0(savePath, '/pca2_data.txt')
+    pca3Data = paste0(savePath, '/pca3_data.txt')
+
+
+    data_input1 <- read_delim(matrixFile, delim = '\t')
+    data_input1 <- data_input1 %>% select_if(~!is.numeric(.) || sum(.) > 0)
+
+    ## seqmatrix data from public data
+    data_input2 <- seqmatrix_refdata %>%
+      filter(Profile == profileName, Study == study, Cancer_Type == cancerType) %>%
+      select(Sample, MutationType, Mutations) %>%
+      pivot_wider(names_from = Sample, values_from = Mutations)
+
+    data_input <- data_input1 %>% left_join(data_input2)
+
+    indcolors <- c(rep("Input", length(colnames(data_input1)[-1])), rep(cancerType, length(colnames(data_input2)[-1])))
+    names(indcolors) <- c(colnames(data_input1)[-1], colnames(data_input2)[-1])
+
+    # PCA plot ----------------------------------------------------------------
+    mdata_input <- as.matrix(data_input[, -1])
+    rownames(mdata_input) <- data_input$MutationType
+
+    res.pca <- prcomp(t(mdata_input), scale = FALSE, center = FALSE)
+    xleng <- dim(res.pca$x)[2] * 0.25 + 1
+    xleng <- if_else(xleng > 4, 4, xleng)
+    yleng <- 4
+    pcap1 <- fviz_eig(res.pca, ncp = 10, main = "", addlabels = T)
+    ggsave(filename = pca1, plot = pcap1, width = xleng, height = yleng)
+
+
+    if ((dim(data_input)[2] - 1) > 35) {
+      pcap2 <- fviz_pca_ind(res.pca, axes = c(1, 2), geom = "point", col.ind = indcolors, repel = TRUE) + scale_color_brewer(palette = "Set1")
+    } else {
+      pcap2 <- fviz_pca_ind(res.pca, axes = c(1, 2), col.ind = indcolors, repel = TRUE) + scale_color_brewer(palette = "Set1")
+    }
+    ggsave(filename = pca2, plot = pcap2, width = 10, height = 7)
+
+    ## a link to download pca data1
+    res.pca$x %>% as.data.frame() %>% rownames_to_column(var = 'Sample') %>% write_delim(pca2Data, delim = '\t', col_names = T)
+
+    pcap3 <- fviz_pca_var(res.pca, axes = c(1, 2),
+                        col.var = "contrib", # Color by contributions to the PC
+                        gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+                        repel = FALSE # Avoid text overlapping
+  )
+    ggsave(filename = pca3, plot = pcap3, width = 10, height = 7)
+
+    # a link to download pca data2
+    res.pca$rotation %>% as.data.frame() %>% rownames_to_column(var = 'Sample') %>% write_delim(pca3Data, delim = '\t', col_names = T)
+
+
+    output = list(
+      'pca1' = pca1,
+      'pca2' = pca2,
+      'pca3' = pca3,
+      'pca2Data' = pca2Data,
+      'pca3Data' = pca3Data
      )
   }, error = function(e) {
     print(e)

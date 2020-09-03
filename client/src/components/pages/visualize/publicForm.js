@@ -149,6 +149,24 @@ export default function PublicForm() {
           pExperimentalStrategy: pExperimentOptions[0],
           pExperimentOptions: pExperimentOptions,
         });
+
+        dispatchCosineSimilarity({
+          pubStudy: studyOptions[0],
+          pubCancerType: cancerTypeOptions[0],
+          pubCancerTypeOptions: cancerTypeOptions,
+        });
+
+        dispatchProfileComparison({
+          pubStudy: studyOptions[0],
+          pubCancerType: cancerTypeOptions[0],
+          pubCancerTypeOptions: cancerTypeOptions,
+        });
+
+        dispatchPCA({
+          pubStudy: studyOptions[0],
+          pubCancerType: cancerTypeOptions[0],
+          pubCancerTypeOptions: cancerTypeOptions,
+        });
       }
     } catch (err) {
       dispatchError(err);
@@ -165,10 +183,23 @@ export default function PublicForm() {
       ),
     ];
 
+    const esOptions = [
+      ...new Set(
+        pDataOptions
+          .filter(
+            (data) =>
+              data.Study == study && data.Cancer_Type == cancerTypeOptions[0]
+          )
+          .map((data) => data.Dataset)
+      ),
+    ];
+
     dispatchVisualize({
       study: study,
       cancerType: cancerTypeOptions[0],
       cancerTypeOptions: cancerTypeOptions,
+      pExperimentalStrategy: esOptions[0],
+      pExperimentOptions: esOptions,
     });
   }
 

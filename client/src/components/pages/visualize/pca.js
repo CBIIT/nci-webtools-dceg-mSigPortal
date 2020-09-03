@@ -13,9 +13,14 @@ const { Toggle, Collapse } = Accordion;
 
 export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
   const { matrixList } = useSelector((state) => state.visualizeResults);
-  const { source, study, cancerType, pExperimentalStrategy } = useSelector(
-    (state) => state.visualize
-  );
+  const {
+    source,
+    study,
+    studyOptions,
+    cancerType,
+    pExperimentalStrategy,
+    pDataOptions,
+  } = useSelector((state) => state.visualize);
   const { profileOptions } = useSelector((state) => state.mutationalProfiles);
   const rootURL = window.location.pathname;
   const {
@@ -41,6 +46,29 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
     debugR,
     displayDebug,
     submitOverlay,
+    pubPCA,
+
+    userProfileType,
+    userMatrixSize,
+    userMatrixOptions,
+    pubStudy,
+    pubCancerType,
+    pubCancerTypeOptions,
+    pubProfileName,
+    pubProfileNameOptions,
+    pubPca1,
+    pubPca2,
+    pubPca3,
+    pubPca2Data,
+    pubPca3Data,
+    pubPca1URL,
+    pubPca2URL,
+    pubPca3URL,
+    displayPub,
+    pubPca1Err,
+    pubPca2Err,
+    pubPca3Err,
+    pubSubmitOverlay,
   } = useSelector((state) => state.pca);
 
   const selectFix = {
@@ -50,9 +78,66 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
     menuPortalTarget: document.body,
   };
 
+  // get public data profile names
+  useEffect(() => {
+    if (
+      source == 'user' &&
+      pubStudy &&
+      !pubProfileNameOptions.length
+    ) {
+      getPublicProfiles(pubStudy, pubCancerType);
+    }
+  }, [pDataOptions, pubStudy]);
+
+  async function getPublicProfiles(study, cancerType) {
+    dispatchPCA({ pubSubmitOverlay: true });
+    const args = {
+      study: study,
+      cancerType: cancerType,
+      experimentalStrategy: [
+        ...new Set(
+          pDataOptions
+            .filter(
+              (data) => data.Study == study && data.Cancer_Type == cancerType
+            )
+            .map((data) => data.Dataset)
+        ),
+      ][0],
+    };
+
+    try {
+      const response = await fetch(`${rootURL}visualize/getPublicData`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(args),
+      });
+
+      if (response.ok) {
+        const { svgList } = await response.json();
+        const pubProfiles = [
+          ...new Set(svgList.map((plot) => plot.Profile)),
+        ];
+
+        dispatchPCA({
+          pubProfileNameOptions: pubProfiles,
+          pubProfileName: pubProfiles[0],
+        });
+      } else {
+        dispatchPCA({ pubProfileNameOptions: ['NA'] });
+      }
+    } catch (err) {
+      dispatchError(err);
+    }
+    dispatchPCA({ pubSubmitOverlay: false });
+  }
+
   async function setRPlot(plotPath, type) {
-    dispatchPCA({ submitOverlay: true });
     if (plotPath) {
+      dispatchPCA({ submitOverlay: true });
+
       try {
         const response = await fetch(`${rootURL}visualize/svg`, {
           method: 'POST',
@@ -81,11 +166,21 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
           } else if (type == 'heatmap') {
             if (heatmapURL) URL.revokeObjectURL(heatmapURL);
             dispatchPCA({ heatmapURL: objectURL });
+          } else if (type == 'pubPca1') {
+            if (pubPca1URL) URL.revokeObjectURL(pubPca1);
+            dispatchPCA({ pubPca1URL: objectURL });
+          } else if (type == 'pubPca2') {
+            if (pubPca2URL) URL.revokeObjectURL(pubPca2URL);
+            dispatchPCA({ pubPca2URL: objectURL });
+          } else if (type == 'pubPca3') {
+            if (pubPca3URL) URL.revokeObjectURL(pubPca3URL);
+            dispatchPCA({ pubPca3URL: objectURL });
           }
         }
       } catch (err) {
         dispatchError(err);
       }
+      dispatchPCA({ submitOverlay: false });
     } else {
       if (type == 'pca1') {
         if (pca1URL) URL.revokeObjectURL(pca1URL);
@@ -99,9 +194,17 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
       } else if (type == 'heatmap') {
         if (heatmapURL) URL.revokeObjectURL(heatmapURL);
         dispatchPCA({ heatmapErr: true, heatmapURL: '' });
+      } else if (type == 'pubPca1') {
+        if (pubPca1URL) URL.revokeObjectURL(pubPca1URL);
+        dispatchPCA({ pubPca1Err: true, pubPca1URL: '' });
+      } else if (type == 'pubPca2') {
+        if (pubPca2URL) URL.revokeObjectURL(pubPca2URL);
+        dispatchPCA({ pubPca2Err: true, pubPca2URL: '' });
+      } else if (type == 'pubPca3') {
+        if (pubPca3URL) URL.revokeObjectURL(pubPca3URL);
+        dispatchPCA({ pubPca3Err: true, pubPca3URL: '' });
       }
     }
-    dispatchPCA({ submitOverlay: false });
   }
 
   // get Signature Reference Sets for dropdown options
@@ -131,46 +234,123 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
   }
 
   async function calculateR(fn, args) {
-    dispatchPCA({
-      submitOverlay: true,
-      debugR: '',
-      pca1Err: '',
-      pca2Err: '',
-      pca3Err: '',
-      heatmapErr: '',
-    });
+    if (!fn.includes('With')) {
+      dispatchPCA({
+        submitOverlay: true,
+        debugR: '',
+        pca1Err: false,
+        pca2Err: false,
+        pca3Err: false,
+        heatmapErr: false,
+      });
+    } else {
+      dispatchPCA({
+        pubSubmitOverlay: true,
+        debugR: '',
+        pubPca1Err: false,
+        pubPca2Err: false,
+        pubPca3Err: false,
+      });
+    }
 
     try {
       const response = await submitR(fn, args);
       if (!response.ok) {
         const err = await response.json();
-        dispatchPCA({
-          debugR: err,
-          submitOverlay: false,
-        });
+
+        dispatchPCA({ debugR: err });
+        if (!fn.includes('With')) {
+          dispatchPCA({ submitOverlay: false });
+        } else {
+          dispatchPCA({
+            pubSubmitOverlay: false,
+          });
+        }
       } else {
         const { debugR, output } = await response.json();
 
-        dispatchPCA({
-          debugR: debugR,
-          submitOverlay: false,
-          pca1: output.pca1,
-          pca2: output.pca2,
-          pca3: output.pca3,
-          heatmap: output.heatmap,
-          pca2Data: output.pca2Data,
-          pca3Data: output.pca3Data,
-          heatmapData: output.heatmapData,
-        });
-        setRPlot(output.pca1, 'pca1');
-        setRPlot(output.pca2, 'pca2');
-        setRPlot(output.pca3, 'pca3');
-        setRPlot(output.heatmap, 'heatmap');
+        if (!fn.includes('With')) {
+          dispatchPCA({
+            debugR: debugR,
+            submitOverlay: false,
+            pca1: output.pca1,
+            pca2: output.pca2,
+            pca3: output.pca3,
+            heatmap: output.heatmap,
+            pca2Data: output.pca2Data,
+            pca3Data: output.pca3Data,
+            heatmapData: output.heatmapData,
+          });
+          setRPlot(output.pca1, 'pca1');
+          setRPlot(output.pca2, 'pca2');
+          setRPlot(output.pca3, 'pca3');
+          setRPlot(output.heatmap, 'heatmap');
+        } else {
+          dispatchPCA({
+            debugR: debugR,
+            pubSubmitOverlay: false,
+            pubPca1: output.pca1,
+            pubPca2: output.pca2,
+            pubPca3: output.pca3,
+
+            pubPca2Data: output.pca2Data,
+            pubPca3Data: output.pca3Data,
+          });
+          setRPlot(output.pca1, 'pubPca1');
+          setRPlot(output.pca2, 'pubPca2');
+          setRPlot(output.pca3, 'pubPca3');
+        }
       }
     } catch (err) {
       dispatchError(err);
-      dispatchPCA({ submitOverlay: false });
+      if (!fn.includes('With')) {
+        dispatchPCA({ submitOverlay: false });
+      } else {
+        dispatchPCA({
+          pubSubmitOverlay: false,
+        });
+      }
     }
+  }
+
+  function handleProfileType(profileType) {
+    const pubMatrixOptions = [
+      ...new Set(
+        matrixList
+          .filter((matrix) => matrix.Profile_Type == profileType)
+          .map((matrix) => matrix.Matrix_Size)
+      ),
+    ];
+
+    dispatchPCA({
+      userProfileType: profileType,
+      userMatrixSize: pubMatrixOptions[0],
+      userMatrixOptions: pubMatrixOptions,
+    });
+  }
+
+  function handleStudyChange(study) {
+    const cancerTypeOptions = [
+      ...new Set(
+        pDataOptions
+          .filter((data) => data.Study == study)
+          .map((data) => data.Cancer_Type)
+      ),
+    ];
+
+    dispatchPCA({
+      pubStudy: study,
+      pubCancerType: cancerTypeOptions[0],
+      pubCancerTypeOptions: cancerTypeOptions,
+    });
+    getPublicProfiles(study, cancerTypeOptions[0]);
+  }
+
+  function handleCancerChange(cancer) {
+    dispatchPCA({
+      pubCancerType: cancer,
+    });
+    getPublicProfiles(pubStudy, cancer);
   }
 
   return (
@@ -435,6 +615,250 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
           </Collapse>
         </Card>
       </Accordion>
+
+      {source == 'user' && (
+        <Accordion defaultActiveKey="1">
+          <Card>
+            <Toggle
+              className="font-weight-bold"
+              as={Header}
+              eventKey="1"
+              onClick={() => dispatchPCA({ displayPub: !displayPub })}
+            >
+              {displayPub == true ? (
+                <FontAwesomeIcon icon={faMinus} />
+              ) : (
+                <FontAwesomeIcon icon={faPlus} />
+              )}{' '}
+              Principal Component Analysis with Public Data
+            </Toggle>
+            <Collapse eventKey="1">
+              <Body>
+                <Form>
+                  <LoadingOverlay active={pubSubmitOverlay} />
+                  <div>
+                    <Row className="justify-content-center">
+                      <Col sm="2">
+                        <Group controlId="profileType">
+                          <Label>Profile Type</Label>
+                          <Select
+                            options={profileOptions}
+                            value={[userProfileType]}
+                            onChange={(profile) => handleProfileType(profile)}
+                            getOptionLabel={(option) => option}
+                            getOptionValue={(option) => option}
+                            {...selectFix}
+                          />
+                        </Group>
+                      </Col>
+
+                      <Col sm="2">
+                        <Group controlId="signatureSet">
+                          <Label>Matrix Size</Label>
+                          <Select
+                            options={userMatrixOptions}
+                            value={[userMatrixSize]}
+                            onChange={(matrix) => {
+                              dispatchPCA({ userMatrixSize: matrix });
+                            }}
+                            getOptionLabel={(option) => option}
+                            getOptionValue={(option) => option}
+                            {...selectFix}
+                          />
+                        </Group>
+                      </Col>
+
+                      <Col sm="2">
+                        <Group controlId="pubStudy">
+                          <Label>Study</Label>
+                          <Select
+                            options={studyOptions}
+                            value={[pubStudy]}
+                            onChange={(study) => handleStudyChange(study)}
+                            getOptionLabel={(option) => option}
+                            getOptionValue={(option) => option}
+                            {...selectFix}
+                          />
+                        </Group>
+                      </Col>
+                      <Col sm="2">
+                        <Group controlId="pubCancerType">
+                          <Label>Cancer Type</Label>
+                          <Select
+                            options={pubCancerTypeOptions}
+                            value={[pubCancerType]}
+                            onChange={(cancerType) =>
+                              handleCancerChange(cancerType)
+                            }
+                            getOptionLabel={(option) => option}
+                            getOptionValue={(option) => option}
+                            {...selectFix}
+                          />
+                        </Group>
+                      </Col>
+                      <Col sm="2">
+                        <Label>Profile Name</Label>
+                        <Select
+                          options={pubProfileNameOptions}
+                          value={[pubProfileName]}
+                          onChange={(name) => {
+                            dispatchPCA({
+                              pubProfileName: name,
+                            });
+                          }}
+                          getOptionLabel={(option) => option}
+                          getOptionValue={(option) => option}
+                          {...selectFix}
+                        />
+                      </Col>
+
+                      <Col sm="2" className="m-auto">
+                        <Button
+                          variant="primary"
+                          onClick={() =>
+                            calculateR('pcaWithPublic', {
+                              matrixFile: matrixList.filter(
+                                (path) =>
+                                  path.Profile_Type == userProfileType &&
+                                  path.Matrix_Size == userMatrixSize
+                              )[0].Path,
+                              study: pubStudy,
+                              cancerType: pubCancerType,
+                              profileName: pubProfileName,
+                            })
+                          }
+                        >
+                          Calculate
+                        </Button>
+                      </Col>
+                    </Row>
+
+                    <div id="pubPca1Plot">
+                      <div style={{ display: pubPca1Err ? 'block' : 'none' }}>
+                        <h4>PCA 1</h4>
+                        <p>
+                          An error has occured. Check the debug section for more
+                          info.
+                        </p>
+                      </div>
+                      <div
+                        className="my-4"
+                        style={{ display: pubPca1URL ? 'block' : 'none' }}
+                      >
+                        <div className="d-flex">
+                          <a
+                            className="px-2 py-1"
+                            href={pubPca1URL}
+                            download={pubPca1URL.split('/').slice(-1)[0]}
+                          >
+                            Download Plot
+                          </a>
+                        </div>
+                        <div className="p-2 border rounded">
+                          <Row>
+                            <Col>
+                              <img
+                                className="w-100 my-4 h-500"
+                                src={pubPca1URL}
+                              ></img>
+                            </Col>
+                          </Row>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div id="pubPca2Plot">
+                      <div style={{ display: pubPca2Err ? 'block' : 'none' }}>
+                        <h4>PCA 2</h4>
+                        <p>
+                          An error has occured. Check the debug section for more
+                          info.
+                        </p>
+                      </div>
+                      <div
+                        className="my-4"
+                        style={{ display: pubPca2URL ? 'block' : 'none' }}
+                      >
+                        <div className="d-flex">
+                          <a
+                            className="px-2 py-1"
+                            href={pubPca2URL}
+                            download={pubPca2URL.split('/').slice(-1)[0]}
+                          >
+                            Download Plot
+                          </a>
+                          <span className="ml-auto">
+                            <Button
+                              className="px-2 py-1"
+                              variant="link"
+                              onClick={() => downloadResults(pubPca2Data)}
+                            >
+                              Download Results
+                            </Button>
+                          </span>
+                        </div>
+                        <div className="p-2 border rounded">
+                          <Row>
+                            <Col>
+                              <img
+                                className="w-100 my-4 h-600"
+                                src={pubPca2URL}
+                              ></img>
+                            </Col>
+                          </Row>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div id="pubPca3Plot">
+                      <div style={{ display: pubPca3Err ? 'block' : 'none' }}>
+                        <h4>PCA 3</h4>
+                        <p>
+                          An error has occured. Check the debug section for more
+                          info.
+                        </p>
+                      </div>
+                      <div
+                        className="my-4"
+                        style={{ display: pubPca3URL ? 'block' : 'none' }}
+                      >
+                        <div className="d-flex">
+                          <a
+                            className="px-2 py-1"
+                            href={pubPca3URL}
+                            download={pubPca3URL.split('/').slice(-1)[0]}
+                          >
+                            Download Plot
+                          </a>
+                          <span className="ml-auto">
+                            <Button
+                              className="px-2 py-1"
+                              variant="link"
+                              onClick={() => downloadResults(pubPca3Data)}
+                            >
+                              Download Results
+                            </Button>
+                          </span>
+                        </div>
+                        <div className="p-2 border rounded">
+                          <Row>
+                            <Col>
+                              <img
+                                className="w-100 my-4 h-600"
+                                src={pubPca3URL}
+                              ></img>
+                            </Col>
+                          </Row>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Form>
+              </Body>
+            </Collapse>
+          </Card>
+        </Accordion>
+      )}
 
       <Button
         variant="link"
