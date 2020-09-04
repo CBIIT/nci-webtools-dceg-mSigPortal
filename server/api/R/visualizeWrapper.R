@@ -206,8 +206,8 @@ cosineSimilarityPublic <- function(matrixFile, study, cancerType, profileName, p
 
   tryCatch({
     output = list()
-    plotPath = paste0(savePath, '/cos_sim_within.svg')
-    txtPath = paste0(savePath, '/cos_sim_within.txt')
+    plotPath = paste0(savePath, '/cos_sim_public.svg')
+    txtPath = paste0(savePath, '/cos_sim_public.txt')
 
 
     ## input data
@@ -400,7 +400,7 @@ profileComparisonRefSigPublic <- function(profileType, sampleName, signatureSetN
 }
 
 # section 3: Profile Comparison to Public data ----------------------------
-profileComparisonPublic <- function(profileType, matrixSize, matrixList, study, cancerType, projectID, pythonOutput, savePath, dataPath) {
+profileComparisonPublic <- function(profileName, matrixFile, userSample, study, cancerType, publicSample, projectID, pythonOutput, savePath, dataPath) {
   source('api/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'seqmatrix_refdata.RData'))
   stdout <- vector('character')
@@ -410,25 +410,19 @@ profileComparisonPublic <- function(profileType, matrixSize, matrixList, study, 
 
   tryCatch({
     output = list()
-    plotPath = paste0(savePath, '/pro_com_within.svg')
-
-    matrix_size <- if_else(profileType == "SBS", "96", if_else(profileType == "DBS", "78", if_else(profileType == "ID", "83", NA_character_)))
-    profile_name <- paste0(profileType, matrix_size)
+    plotPath = paste0(savePath, '/pro_com_public.svg')
 
     ## input data
-    matrixfiles = fromJSON(matrixList)
-    matrixfile_selected <- matrixfiles %>% filter(Profile_Type == profileType, Matrix_Size == matrix_size) %>% pull(Path)
-    data_input <- read_delim(matrixfile_selected, delim = '\t')
+    data_input <- read_delim(matrixFile, delim = '\t')
     data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
-    profile1 <- data_input %>% select(MutationType, one_of(sampleName1))
+    profile1 <- data_input %>% select(MutationType, one_of(userSample))
 
     ## seqmatrix data from public data
     profile2 <- seqmatrix_refdata %>%
-      filter(Profile == profile_name, Study == study, Cancer_Type == cancerType) %>%
+      filter(Profile == profileName, Study == study, Cancer_Type == cancerType) %>%
       select(Sample, MutationType, Mutations) %>%
-      filter(Sample == sampleName2) %>%
+      filter(Sample == publicSample) %>%
       pivot_wider(names_from = Sample, values_from = Mutations)
-
 
     plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, output_plot = plotPath)
 
@@ -655,11 +649,11 @@ pcaWithPublic <- function(matrixFile, study, cancerType, profileName, projectID,
 
   tryCatch({
     output = list()
-    pca1 = paste0(savePath, '/pca1.svg')
-    pca2 = paste0(savePath, '/pca2.svg')
-    pca3 = paste0(savePath, '/pca3.svg')
-    pca2Data = paste0(savePath, '/pca2_data.txt')
-    pca3Data = paste0(savePath, '/pca3_data.txt')
+    pca1 = paste0(savePath, '/pca1_with_public_.svg')
+    pca2 = paste0(savePath, '/pca2_with_public_.svg')
+    pca3 = paste0(savePath, '/pca3_with_public_.svg')
+    pca2Data = paste0(savePath, '/pca2_data_with_public_.txt')
+    pca3Data = paste0(savePath, '/pca3_data_with_public_.txt')
 
 
     data_input1 <- read_delim(matrixFile, delim = '\t')

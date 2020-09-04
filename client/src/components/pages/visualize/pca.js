@@ -54,8 +54,6 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
     pubStudy,
     pubCancerType,
     pubCancerTypeOptions,
-    pubProfileName,
-    pubProfileNameOptions,
     pubPca1,
     pubPca2,
     pubPca3,
@@ -77,62 +75,6 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
     },
     menuPortalTarget: document.body,
   };
-
-  // get public data profile names
-  useEffect(() => {
-    if (
-      source == 'user' &&
-      pubStudy &&
-      !pubProfileNameOptions.length
-    ) {
-      getPublicProfiles(pubStudy, pubCancerType);
-    }
-  }, [pDataOptions, pubStudy]);
-
-  async function getPublicProfiles(study, cancerType) {
-    dispatchPCA({ pubSubmitOverlay: true });
-    const args = {
-      study: study,
-      cancerType: cancerType,
-      experimentalStrategy: [
-        ...new Set(
-          pDataOptions
-            .filter(
-              (data) => data.Study == study && data.Cancer_Type == cancerType
-            )
-            .map((data) => data.Dataset)
-        ),
-      ][0],
-    };
-
-    try {
-      const response = await fetch(`${rootURL}visualize/getPublicData`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(args),
-      });
-
-      if (response.ok) {
-        const { svgList } = await response.json();
-        const pubProfiles = [
-          ...new Set(svgList.map((plot) => plot.Profile)),
-        ];
-
-        dispatchPCA({
-          pubProfileNameOptions: pubProfiles,
-          pubProfileName: pubProfiles[0],
-        });
-      } else {
-        dispatchPCA({ pubProfileNameOptions: ['NA'] });
-      }
-    } catch (err) {
-      dispatchError(err);
-    }
-    dispatchPCA({ pubSubmitOverlay: false });
-  }
 
   async function setRPlot(plotPath, type) {
     if (plotPath) {
@@ -314,7 +256,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
   }
 
   function handleProfileType(profileType) {
-    const pubMatrixOptions = [
+    const userMatrixOptions = [
       ...new Set(
         matrixList
           .filter((matrix) => matrix.Profile_Type == profileType)
@@ -324,8 +266,8 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
 
     dispatchPCA({
       userProfileType: profileType,
-      userMatrixSize: pubMatrixOptions[0],
-      userMatrixOptions: pubMatrixOptions,
+      userMatrixSize: userMatrixOptions[0],
+      userMatrixOptions: userMatrixOptions,
     });
   }
 
@@ -343,14 +285,12 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
       pubCancerType: cancerTypeOptions[0],
       pubCancerTypeOptions: cancerTypeOptions,
     });
-    getPublicProfiles(study, cancerTypeOptions[0]);
   }
 
   function handleCancerChange(cancer) {
     dispatchPCA({
       pubCancerType: cancer,
     });
-    getPublicProfiles(pubStudy, cancer);
   }
 
   return (
@@ -417,7 +357,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
                         />
                       </Group>
                     </Col>
-                    <Col sm="2" className="m-auto">
+                    <Col sm="1" className="m-auto">
                       <Button
                         variant="primary"
                         onClick={() => {
@@ -681,7 +621,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
                           />
                         </Group>
                       </Col>
-                      <Col sm="2">
+                      <Col sm="4">
                         <Group controlId="pubCancerType">
                           <Label>Cancer Type</Label>
                           <Select
@@ -696,23 +636,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
                           />
                         </Group>
                       </Col>
-                      <Col sm="2">
-                        <Label>Profile Name</Label>
-                        <Select
-                          options={pubProfileNameOptions}
-                          value={[pubProfileName]}
-                          onChange={(name) => {
-                            dispatchPCA({
-                              pubProfileName: name,
-                            });
-                          }}
-                          getOptionLabel={(option) => option}
-                          getOptionValue={(option) => option}
-                          {...selectFix}
-                        />
-                      </Col>
-
-                      <Col sm="2" className="m-auto">
+                      <Col sm="1" className="m-auto">
                         <Button
                           variant="primary"
                           onClick={() =>
@@ -724,7 +648,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
                               )[0].Path,
                               study: pubStudy,
                               cancerType: pubCancerType,
-                              profileName: pubProfileName,
+                              profileName: userProfileType + userMatrixSize,
                             })
                           }
                         >

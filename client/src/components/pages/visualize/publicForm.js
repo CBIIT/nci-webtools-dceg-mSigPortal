@@ -95,7 +95,6 @@ export default function PublicForm() {
 
   function handleReset() {
     const initialState = getInitialState();
-    dispatchVisualize(initialState.visualize);
     dispatchVisualizeResults(initialState.visualizeResults);
     dispatchMutationalProfiles(initialState.mutationalProfiles);
     dispatchCosineSimilarity(initialState.cosineSimilarity);

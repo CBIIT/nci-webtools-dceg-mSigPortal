@@ -52,9 +52,11 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     refSignatureSetOptions,
     refSignatures,
     refCompare,
-    pubProfileType,
-    pubSampleName1,
-    pubSampleName2,
+    userProfileType,
+    userSampleName,
+    userMatrixSize,
+    userMatrixOptions,
+    pubSampleName,
     pubSampleOptions,
     pubStudy,
     pubCancerType,
@@ -169,9 +171,12 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       if (type == 'within') {
         if (withinPlotURL) URL.revokeObjectURL(withinPlotURL);
         dispatchProfileComparison({ withinErr: true, withinPlotURL: '' });
-      } else {
+      } else if (type == 'refsig') {
         if (refPlotURL) URL.revokeObjectURL(refPlotURL);
         dispatchProfileComparison({ refErr: true, refPlotURL: '' });
+      } else {
+        if (pubPlotURL) URL.revokeObjectURL(pubPlotURL);
+        dispatchProfileComparison({ pubErr: true, pubPlotURL: '' });
       }
     }
     setOverlay(type, false);
@@ -256,7 +261,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     } else {
       dispatchProfileComparison({
         pubSubmitOverlay: true,
-        refErr: false,
+        pubErr: false,
         debugR: '',
       });
     }
@@ -334,7 +339,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
 
         dispatchProfileComparison({
           pubSampleOptions: pubSamples,
-          pubSampleName2: pubSamples[0],
+          pubSampleName: pubSamples[0],
         });
       } else {
         dispatchProfileComparison({
@@ -375,6 +380,22 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     getPublicSamples(pubStudy, cancer);
   }
 
+  function handlePublicProfileType(profileType) {
+    const userMatrixOptions = [
+      ...new Set(
+        matrixList
+          .filter((matrix) => matrix.Profile_Type == profileType)
+          .map((matrix) => matrix.Matrix_Size)
+      ),
+    ];
+
+    dispatchProfileComparison({
+      userProfileType: profileType,
+      userMatrixSize: userMatrixOptions[0],
+      userMatrixOptions: userMatrixOptions,
+    });
+  }
+
   return (
     <div>
       <Accordion defaultActiveKey="0">
@@ -402,7 +423,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 <LoadingOverlay active={withinSubmitOverlay} />
                 <div>
                   <Row className="justify-content-center">
-                    <Col sm="2">
+                    <Col sm="1">
                       <Group controlId="profileTypeWithin">
                         <Label>Profile Type</Label>
                         <Select
@@ -419,7 +440,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                         />
                       </Group>
                     </Col>
-                    <Col sm="4">
+                    <Col sm="5">
                       <Label>Sample Name 1</Label>
                       <Select
                         options={nameOptions}
@@ -434,7 +455,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                         {...selectFix}
                       />
                     </Col>
-                    <Col sm="4">
+                    <Col sm="5">
                       <Label>Sample Name 2</Label>
                       <Select
                         options={nameOptions}
@@ -449,7 +470,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                         {...selectFix}
                       />
                     </Col>
-                    <Col sm="2" className="m-auto">
+                    <Col sm="1" className="m-auto">
                       <Button
                         variant="primary"
                         onClick={() => {
@@ -543,7 +564,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 <LoadingOverlay active={refSubmitOverlay} />
                 <div>
                   <Row className="justify-content-center">
-                    <Col sm="2">
+                    <Col sm="1">
                       <Group controlId="profileTypeRefSig">
                         <Label>Profile Type</Label>
                         <Select
@@ -561,7 +582,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                         />
                       </Group>
                     </Col>
-                    <Col sm="2">
+                    <Col sm="3">
                       <Group controlId="sampleNameRefSig">
                         <Label>Sample Name</Label>
                         <Select
@@ -596,7 +617,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                         />
                       </Group>
                     </Col>
-                    <Col sm="2">
+                    <Col sm="3">
                       <Group controlId="signatureSet">
                         <Label>
                           Compare Signatures{' '}
@@ -608,7 +629,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                           >
                             <Button
                               variant="link"
-                              className="p-0 font-weight-bold"
+                              className="p-0 font-weight-bold "
                             >
                               <FontAwesomeIcon
                                 icon={faInfoCircle}
@@ -630,7 +651,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                         </Text>
                       </Group>
                     </Col>
-                    <Col sm="2" className="m-auto">
+                    <Col sm="1" className="m-auto">
                       <Button
                         variant="primary"
                         onClick={() => {
@@ -724,15 +745,15 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   <LoadingOverlay active={pubSubmitOverlay} />
                   <div>
                     <Row className="justify-content-center">
-                      <Col sm="2">
-                        <Group controlId="pubProfileType">
+                      <Col sm="1">
+                        <Group controlId="userProfileType">
                           <Label>Profile Type</Label>
                           <Select
                             options={profileOptions}
-                            value={[pubProfileType]}
+                            value={[userProfileType]}
                             onChange={(profile) =>
                               dispatchProfileComparison({
-                                pubProfileType: profile,
+                                userProfileType: profile,
                               })
                             }
                             getOptionLabel={(option) => option}
@@ -741,14 +762,29 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                           />
                         </Group>
                       </Col>
+                      <Col sm="1">
+                        <Label>Matrix Size</Label>
+                        <Select
+                          options={userMatrixOptions}
+                          value={[userMatrixSize]}
+                          onChange={(matrix) =>
+                            dispatchProfileComparison({
+                              userMatrixSize: matrix,
+                            })
+                          }
+                          getOptionLabel={(option) => option}
+                          getOptionValue={(option) => option}
+                          {...selectFix}
+                        />
+                      </Col>
                       <Col sm="2">
-                        <Label>Sample Name 1</Label>
+                        <Label>Sample Name</Label>
                         <Select
                           options={nameOptions}
-                          value={[pubSampleName1]}
+                          value={[userSampleName]}
                           onChange={(name) => {
                             dispatchProfileComparison({
-                              pubSampleName1: name,
+                              userSampleName: name,
                             });
                           }}
                           getOptionLabel={(option) => option}
@@ -785,14 +821,14 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                           />
                         </Group>
                       </Col>
-                      <Col sm="2">
-                        <Label>Sample Name 2</Label>
+                      <Col sm="3">
+                        <Label>Public Sample Name</Label>
                         <Select
                           options={pubSampleOptions}
-                          value={[pubSampleName2]}
+                          value={[pubSampleName]}
                           onChange={(name) => {
                             dispatchProfileComparison({
-                              pubSampleName2: name,
+                              pubSampleName: name,
                             });
                           }}
                           getOptionLabel={(option) => option}
@@ -800,22 +836,21 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                           {...selectFix}
                         />
                       </Col>
-                      <Col sm="2" className="m-auto">
+                      <Col sm="1" className="m-auto">
                         <Button
                           variant="primary"
                           onClick={() =>
                             calculateR('profileComparisonPublic', {
-                              profileType: pubProfileType,
-                              sampleName1: pubSampleName1,
-                              sampleName2: pubSampleName2,
-                              matrixList: JSON.stringify(
-                                matrixList.filter(
-                                  (matrix) =>
-                                    matrix.Profile_Type == pubProfileType
-                                )
-                              ),
+                              profileName: userProfileType + userMatrixSize,
+                              matrixFile: matrixList.filter(
+                                (path) =>
+                                  path.Profile_Type == userProfileType &&
+                                  path.Matrix_Size == userMatrixSize
+                              )[0].Path,
+                              userSample: userSampleName,
                               study: pubStudy,
                               cancerType: pubCancerType,
+                              publicSample: pubSampleName,
                             })
                           }
                         >

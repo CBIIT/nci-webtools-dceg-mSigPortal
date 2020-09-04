@@ -39,14 +39,12 @@ export default function CosineSimilarity({
     refProfileType,
     refSignatureSet,
     refSignatureSetOptions,
-    pubProfileType,
-    pubMatrixSize,
-    pubMatrixOptions,
+    userProfileType,
+    userMatrixSize,
+    userMatrixOptions,
     pubStudy,
     pubCancerType,
     pubCancerTypeOptions,
-    pubProfileName,
-    pubProfileNameOptions,
     withinPlotPath,
     withinTxtPath,
     refPlotPath,
@@ -75,62 +73,6 @@ export default function CosineSimilarity({
     },
     menuPortalTarget: document.body,
   };
-
-  // get public data profile names
-  useEffect(() => {
-    if (
-      source == 'user' &&
-      pubStudy &&
-      !pubProfileNameOptions.length
-    ) {
-      getPublicProfiles(pubStudy, pubCancerType);
-    }
-  }, [pDataOptions, pubStudy]);
-
-  async function getPublicProfiles(study, cancerType) {
-    dispatchCosineSimilarity({ pubSubmitOverlay: true });
-    const args = {
-      study: study,
-      cancerType: cancerType,
-      experimentalStrategy: [
-        ...new Set(
-          pDataOptions
-            .filter(
-              (data) => data.Study == study && data.Cancer_Type == cancerType
-            )
-            .map((data) => data.Dataset)
-        ),
-      ][0],
-    };
-
-    try {
-      const response = await fetch(`${rootURL}visualize/getPublicData`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(args),
-      });
-
-      if (response.ok) {
-        const { svgList } = await response.json();
-        const pubProfiles = [
-          ...new Set(svgList.map((plot) => plot.Profile)),
-        ];
-
-        dispatchCosineSimilarity({
-          pubProfileNameOptions: pubProfiles,
-          pubProfileName: pubProfiles[0],
-        });
-      } else {
-        dispatchCosineSimilarity({ pubProfileNameOptions: ['NA'] });
-      }
-    } catch (err) {
-      dispatchError(err);
-    }
-    dispatchCosineSimilarity({ pubSubmitOverlay: false });
-  }
 
   function setOverlay(type, display) {
     if (type == 'within') {
@@ -239,7 +181,7 @@ export default function CosineSimilarity({
     } else {
       dispatchCosineSimilarity({
         pubSubmitOverlay: true,
-        refErr: false,
+        pubErr: false,
         debugR: '',
       });
     }
@@ -337,7 +279,7 @@ export default function CosineSimilarity({
   }
 
   function handlePublicProfileType(profileType) {
-    const pubMatrixOptions = [
+    const userMatrixOptions = [
       ...new Set(
         matrixList
           .filter((matrix) => matrix.Profile_Type == profileType)
@@ -346,9 +288,9 @@ export default function CosineSimilarity({
     ];
 
     dispatchCosineSimilarity({
-      pubProfileType: profileType,
-      pubMatrixSize: pubMatrixOptions[0],
-      pubMatrixOptions: pubMatrixOptions,
+      userProfileType: profileType,
+      userMatrixSize: userMatrixOptions[0],
+      userMatrixOptions: userMatrixOptions,
     });
   }
 
@@ -366,14 +308,12 @@ export default function CosineSimilarity({
       pubCancerType: cancerTypeOptions[0],
       pubCancerTypeOptions: cancerTypeOptions,
     });
-    getPublicProfiles(study, cancerTypeOptions[0]);
   }
 
   function handleCancerChange(cancer) {
     dispatchCosineSimilarity({
       pubCancerType: cancer,
     });
-    getPublicProfiles(pubStudy, cancer);
   }
 
   return (
@@ -433,7 +373,7 @@ export default function CosineSimilarity({
                         {...selectFix}
                       />
                     </Col>
-                    <Col sm="2" className="m-auto">
+                    <Col sm="1" className="m-auto">
                       <Button
                         variant="primary"
                         onClick={() => {
@@ -566,7 +506,7 @@ export default function CosineSimilarity({
                         />
                       </Group>
                     </Col>
-                    <Col sm="2" className="m-auto">
+                    <Col sm="1" className="m-auto">
                       <Button
                         variant="primary"
                         onClick={() => {
@@ -674,11 +614,11 @@ export default function CosineSimilarity({
                   <div>
                     <Row className="justify-content-center">
                       <Col sm="2">
-                        <Group controlId="pubProfileType">
+                        <Group controlId="userProfileType">
                           <Label>Profile Type</Label>
                           <Select
                             options={profileOptions}
-                            value={[pubProfileType]}
+                            value={[userProfileType]}
                             onChange={(profile) =>
                               handlePublicProfileType(profile)
                             }
@@ -691,11 +631,11 @@ export default function CosineSimilarity({
                       <Col sm="2">
                         <Label>Matrix Size</Label>
                         <Select
-                          options={pubMatrixOptions}
-                          value={[pubMatrixSize]}
+                          options={userMatrixOptions}
+                          value={[userMatrixSize]}
                           onChange={(matrix) =>
                             dispatchCosineSimilarity({
-                              pubMatrixSize: matrix,
+                              userMatrixSize: matrix,
                             })
                           }
                           getOptionLabel={(option) => option}
@@ -716,7 +656,7 @@ export default function CosineSimilarity({
                           />
                         </Group>
                       </Col>
-                      <Col sm="2">
+                      <Col sm="4">
                         <Group controlId="pubCancerType">
                           <Label>Cancer Type</Label>
                           <Select
@@ -729,35 +669,19 @@ export default function CosineSimilarity({
                           />
                         </Group>
                       </Col>
-
-                      <Col sm="2">
-                        <Label>Profile Name</Label>
-                        <Select
-                          options={pubProfileNameOptions}
-                          value={[pubProfileName]}
-                          onChange={(name) => {
-                            dispatchCosineSimilarity({
-                              pubProfileName: name,
-                            });
-                          }}
-                          getOptionLabel={(option) => option}
-                          getOptionValue={(option) => option}
-                          {...selectFix}
-                        />
-                      </Col>
-                      <Col sm="2" className="m-auto">
+                      <Col sm="1" className="m-auto">
                         <Button
                           variant="primary"
                           onClick={() =>
                             calculateR('cosineSimilarityPublic', {
                               matrixFile: matrixList.filter(
                                 (path) =>
-                                  path.Profile_Type == pubProfileType &&
-                                  path.Matrix_Size == pubMatrixSize
+                                  path.Profile_Type == userProfileType &&
+                                  path.Matrix_Size == userMatrixSize
                               )[0].Path,
                               study: pubStudy,
                               cancerType: pubCancerType,
-                              profileName: pubProfileName,
+                              profileName: userProfileType + userMatrixSize,
                             })
                           }
                         >
@@ -772,9 +696,7 @@ export default function CosineSimilarity({
                           info.
                         </p>
                       </div>
-                      <div
-                        style={{ display: pubPlotURL ? 'block' : 'none' }}
-                      >
+                      <div style={{ display: pubPlotURL ? 'block' : 'none' }}>
                         <div className="d-flex">
                           <a
                             className="px-2 py-1"
