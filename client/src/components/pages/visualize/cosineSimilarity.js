@@ -202,7 +202,7 @@ export default function CosineSimilarity({
         } else {
           dispatchCosineSimilarity({
             pubSubmitOverlay: false,
-            debugR: '',
+            debugR: err,
           });
         }
       } else {
