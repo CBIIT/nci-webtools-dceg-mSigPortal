@@ -18,7 +18,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
     study,
     studyOptions,
     cancerType,
-    pExperimentalStrategy,
+    pubExperimentalStrategy,
     pDataOptions,
   } = useSelector((state) => state.visualize);
   const { profileOptions } = useSelector((state) => state.mutationalProfiles);
@@ -384,7 +384,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
                               signatureSet: signatureSet,
                               study: study,
                               cancerType: cancerType,
-                              experimentalStrategy: pExperimentalStrategy,
+                              experimentalStrategy: pubExperimentalStrategy,
                             });
                           }
                         }}

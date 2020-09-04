@@ -34,7 +34,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     study,
     studyOptions,
     cancerType,
-    pExperimentalStrategy,
+    pubExperimentalStrategy,
     pDataOptions,
   } = useSelector((state) => state.visualize);
   const { matrixList } = useSelector((state) => state.visualizeResults);
@@ -493,7 +493,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                               sampleName2: withinSampleName2,
                               study: study,
                               cancerType: cancerType,
-                              experimentalStrategy: pExperimentalStrategy,
+                              experimentalStrategy: pubExperimentalStrategy,
                             });
                           }
                         }}
@@ -676,7 +676,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                               compare: refCompare,
                               study: study,
                               cancerType: cancerType,
-                              experimentalStrategy: pExperimentalStrategy,
+                              experimentalStrategy: pubExperimentalStrategy,
                             });
                           }
                         }}

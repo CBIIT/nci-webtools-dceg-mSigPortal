@@ -25,18 +25,19 @@ export default function PublicForm() {
     studyOptions,
     cancerType,
     cancerTypeOptions,
-    pExperimentalStrategy,
-    pExperimentOptions,
+    pubExperimentalStrategy,
+    pubExperimentOptions,
     pDataOptions,
     submitted,
     loading,
     loadingPublic,
+    source,
   } = useSelector((state) => state.visualize);
   const rootURL = window.location.pathname;
 
   useEffect(() => {
     if (!pDataOptions.length) getPublicDataOptions();
-  }, [pDataOptions]);
+  }, [pDataOptions, source]);
 
   async function handleSubmit() {
     // disable parameters after submit
@@ -45,7 +46,7 @@ export default function PublicForm() {
     const args = {
       study: study,
       cancerType: cancerType,
-      experimentalStrategy: pExperimentalStrategy,
+      experimentalStrategy: pubExperimentalStrategy,
     };
 
     dispatchVisualize({
@@ -128,7 +129,7 @@ export default function PublicForm() {
               .map((data) => data.Cancer_Type)
           ),
         ];
-        const pExperimentOptions = [
+        const pubExperimentOptions = [
           ...new Set(
             pDataOptions
               .filter(
@@ -146,8 +147,8 @@ export default function PublicForm() {
           studyOptions: studyOptions,
           cancerType: cancerTypeOptions[0],
           cancerTypeOptions: cancerTypeOptions,
-          pExperimentalStrategy: pExperimentOptions[0],
-          pExperimentOptions: pExperimentOptions,
+          pubExperimentalStrategy: pubExperimentOptions[0],
+          pubExperimentOptions: pubExperimentOptions,
         });
 
         dispatchCosineSimilarity({
@@ -198,13 +199,13 @@ export default function PublicForm() {
       study: study,
       cancerType: cancerTypeOptions[0],
       cancerTypeOptions: cancerTypeOptions,
-      pExperimentalStrategy: esOptions[0],
-      pExperimentOptions: esOptions,
+      pubExperimentalStrategy: esOptions[0],
+      pubExperimentOptions: esOptions,
     });
   }
 
   function handleCancerChange(cancer) {
-    const pExperimentOptions = [
+    const pubExperimentOptions = [
       ...new Set(
         pDataOptions
           .filter((data) => data.Study == study && data.Cancer_Type == cancer)
@@ -214,8 +215,8 @@ export default function PublicForm() {
 
     dispatchVisualize({
       cancerType: cancer,
-      pExperimentalStrategy: pExperimentOptions[0],
-      pExperimentOptions: pExperimentOptions,
+      pubExperimentalStrategy: pubExperimentOptions[0],
+      pubExperimentOptions: pubExperimentOptions,
     });
   }
 
@@ -262,11 +263,11 @@ export default function PublicForm() {
         <Label>Experimental Strategy</Label>
         <Select
           isDisabled={submitted}
-          options={pExperimentOptions}
-          value={[pExperimentalStrategy]}
-          onChange={(pExperimentalStrategy) =>
+          options={pubExperimentOptions}
+          value={[pubExperimentalStrategy]}
+          onChange={(pubExperimentalStrategy) =>
             dispatchVisualize({
-              pExperimentalStrategy: pExperimentalStrategy,
+              pubExperimentalStrategy: pubExperimentalStrategy,
             })
           }
           getOptionLabel={(option) => option}

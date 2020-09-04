@@ -24,7 +24,7 @@ export default function CosineSimilarity({
     study,
     studyOptions,
     cancerType,
-    pExperimentalStrategy,
+    pubExperimentalStrategy,
     pDataOptions,
   } = useSelector((state) => state.visualize);
   const { profileOptions } = useSelector((state) => state.mutationalProfiles);
@@ -391,7 +391,7 @@ export default function CosineSimilarity({
                               matrixSize: withinMatrixSize,
                               study: study,
                               cancerType: cancerType,
-                              experimentalStrategy: pExperimentalStrategy,
+                              experimentalStrategy: pubExperimentalStrategy,
                             });
                           }
                         }}
@@ -527,7 +527,7 @@ export default function CosineSimilarity({
                               signatureSet: refSignatureSet,
                               study: study,
                               cancerType: cancerType,
-                              experimentalStrategy: pExperimentalStrategy,
+                              experimentalStrategy: pubExperimentalStrategy,
                             });
                           }
                         }}
