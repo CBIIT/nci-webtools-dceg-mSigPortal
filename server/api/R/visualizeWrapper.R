@@ -377,9 +377,7 @@ profileComparisonRefSigPublic <- function(profileType, sampleName, signatureSetN
 
     profile_name <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
 
-    publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
-    seqmatrix_refdata_public <- get(load(paste0(dataPath, publicDataFile)))
-
+    signature_refsets_input <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == signatureSetName)
     refsig <- signature_refsets_input %>%
       select(Signature_name, MutationType, Contribution) %>%
       pivot_wider(names_from = Signature_name, values_from = Contribution)
@@ -390,8 +388,9 @@ profileComparisonRefSigPublic <- function(profileType, sampleName, signatureSetN
     } else {
       profile2 <- refsig %>% select(MutationType, one_of(compare))
     }
+    publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
+    seqmatrix_refdata_public <- get(load(paste0(dataPath, publicDataFile)))
 
-    seqmatrix_refdata_public <- seqmatrix_refdata %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy)
     profile1 <- seqmatrix_refdata_public %>% filter(Profile == profile_name) %>%
       select(MutationType, Sample, Mutations) %>%
       filter(Sample %in% c(sampleName)) %>%
