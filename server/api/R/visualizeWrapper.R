@@ -78,7 +78,7 @@ cosineSimilarityWithin <- function(matrixFile, projectID, pythonOutput, savePath
 
 cosineSimilarityWithinPublic <- function(profileType, matrixSize, study, cancerType, experimentalStrategy, projectID, pythonOutput, savePath, dataPath) {
   source('api/R/Sigvisualfunc.R')
-  load(paste0(dataPath, 'seqmatrix_refdata.RData'))
+  load(paste0(dataPath, 'seqmatrix_refdata_subset_files.RData'))
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
@@ -89,7 +89,9 @@ cosineSimilarityWithinPublic <- function(profileType, matrixSize, study, cancerT
     plotPath = paste0(savePath, '/cos_sim_within.svg')
     txtPath = paste0(savePath, '/cos_sim_within.txt')
 
-    seqmatrix_refdata_public <- seqmatrix_refdata %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy)
+    publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
+    seqmatrix_refdata_public <- get(load(paste0(dataPath, publicDataFile)))
+
     data_input <- seqmatrix_refdata_public %>% filter(Profile == paste0(profileType, matrixSize)) %>%
       select(MutationType, Sample, Mutations) %>%
       pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations)
@@ -155,7 +157,7 @@ cosineSimilarityRefSig <- function(profileType, signatureSetName, matrixList, pr
 
 cosineSimilarityRefSigPublic <- function(profileType, signatureSetName, study, cancerType, experimentalStrategy, projectID, pythonOutput, savePath, dataPath) {
   source('api/R/Sigvisualfunc.R')
-  load(paste0(dataPath, 'seqmatrix_refdata.RData'))
+  load(paste0(dataPath, 'seqmatrix_refdata_subset_files.RData'))
   load(paste0(dataPath, 'signature_refsets.RData'))
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
@@ -173,7 +175,9 @@ cosineSimilarityRefSigPublic <- function(profileType, signatureSetName, study, c
       select(Signature_name, MutationType, Contribution) %>%
       pivot_wider(names_from = Signature_name, values_from = Contribution)
 
-    seqmatrix_refdata_public <- seqmatrix_refdata %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy)
+    publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
+    seqmatrix_refdata_public <- get(load(paste0(dataPath, publicDataFile)))
+
     data_input <- seqmatrix_refdata_public %>% filter(Profile == profile_name) %>%
       select(MutationType, Sample, Mutations) %>%
       pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations)
@@ -198,7 +202,7 @@ cosineSimilarityRefSigPublic <- function(profileType, signatureSetName, study, c
 # find the common profile between data and seqmatrix
 cosineSimilarityPublic <- function(matrixFile, study, cancerType, profileName, projectID, pythonOutput, savePath, dataPath) {
   source('api/R/Sigvisualfunc.R')
-  load(paste0(dataPath, 'seqmatrix_refdata.RData'))
+  load(paste0(dataPath, 'seqmatrix_refdata_subset_files.RData'))
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
@@ -215,8 +219,10 @@ cosineSimilarityPublic <- function(matrixFile, study, cancerType, profileName, p
     data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
     ## seqmatrix data from public data
-    sigmatrix_data <- seqmatrix_refdata %>%
-    filter(Profile == profileName, Study == study, Cancer_Type == cancerType) %>%
+    publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType) %>% pull(file)
+    publicData <- get(load(paste0(dataPath, publicDataFile)))
+
+    sigmatrix_data <- publicData %>% filter(Profile == profileName) %>%
     select(Sample, MutationType, Mutations) %>%
     pivot_wider(names_from = Sample, values_from = Mutations)
 
@@ -273,7 +279,7 @@ profileComparisonWithin <- function(profileType, sampleName1, sampleName2, matri
 
 profileComparisonWithinPublic <- function(profileType, sampleName1, sampleName2, study, cancerType, experimentalStrategy, projectID, pythonOutput, savePath, dataPath) {
   source('api/R/Sigvisualfunc.R')
-  load(paste0(dataPath, 'seqmatrix_refdata.RData'))
+  load(paste0(dataPath, 'seqmatrix_refdata_subset_files.RData'))
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
@@ -286,7 +292,9 @@ profileComparisonWithinPublic <- function(profileType, sampleName1, sampleName2,
     matrix_size <- if_else(profileType == "SBS", "96", if_else(profileType == "DBS", "78", if_else(profileType == "ID", "83", NA_character_)))
     profile_name <- paste0(profileType, matrix_size)
 
-    seqmatrix_refdata_public <- seqmatrix_refdata %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy)
+    publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
+    seqmatrix_refdata_public <- get(load(paste0(dataPath, publicDataFile)))
+
     data_input <- seqmatrix_refdata_public %>% filter(Profile == profile_name) %>%
       select(MutationType, Sample, Mutations) %>%
       filter(Sample %in% c(sampleName1, sampleName2)) %>%
@@ -357,7 +365,7 @@ profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, c
 profileComparisonRefSigPublic <- function(profileType, sampleName, signatureSetName, compare, study, cancerType, experimentalStrategy, projectID, pythonOutput, savePath, dataPath) {
   source('api/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'signature_refsets.RData'))
-  load(paste0(dataPath, 'seqmatrix_refdata.RData'))
+  load(paste0(dataPath, 'seqmatrix_refdata_subset_files.RData'))
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
@@ -369,7 +377,9 @@ profileComparisonRefSigPublic <- function(profileType, sampleName, signatureSetN
 
     profile_name <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
 
-    signature_refsets_input <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == signatureSetName)
+    publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
+    seqmatrix_refdata_public <- get(load(paste0(dataPath, publicDataFile)))
+
     refsig <- signature_refsets_input %>%
       select(Signature_name, MutationType, Contribution) %>%
       pivot_wider(names_from = Signature_name, values_from = Contribution)
@@ -402,7 +412,7 @@ profileComparisonRefSigPublic <- function(profileType, sampleName, signatureSetN
 # section 3: Profile Comparison to Public data ----------------------------
 profileComparisonPublic <- function(profileName, matrixFile, userSample, study, cancerType, publicSample, projectID, pythonOutput, savePath, dataPath) {
   source('api/R/Sigvisualfunc.R')
-  load(paste0(dataPath, 'seqmatrix_refdata.RData'))
+  load(paste0(dataPath, 'seqmatrix_refdata_subset_files.RData'))
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
@@ -418,8 +428,10 @@ profileComparisonPublic <- function(profileName, matrixFile, userSample, study, 
     profile1 <- data_input %>% select(MutationType, one_of(userSample))
 
     ## seqmatrix data from public data
-    profile2 <- seqmatrix_refdata %>%
-      filter(Profile == profileName, Study == study, Cancer_Type == cancerType) %>%
+    publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType) %>% pull(file)
+    publicData <- get(load(paste0(dataPath, publicDataFile)))
+
+    profile2 <- publicData %>% filter(Profile == profileName) %>%
       select(Sample, MutationType, Mutations) %>%
       filter(Sample == publicSample) %>%
       pivot_wider(names_from = Sample, values_from = Mutations)
@@ -540,7 +552,7 @@ pca <- function(profileType, signatureSetName, matrixList, projectID, pythonOutp
 pcaPublic <- function(profileType, signatureSetName, study, cancerType, experimentalStrategy, projectID, pythonOutput, savePath, dataPath) {
   source('api/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'signature_refsets.RData'))
-  load(paste0(dataPath, 'seqmatrix_refdata.RData'))
+  load(paste0(dataPath, 'seqmatrix_refdata_subset_files.RData'))
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
@@ -561,7 +573,9 @@ pcaPublic <- function(profileType, signatureSetName, study, cancerType, experime
     profile_name <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
     matrix_size <- if_else(profileType == "SBS", "96", if_else(profileType == "DBS", "78", if_else(profileType == "ID", "83", NA_character_)))
 
-    seqmatrix_refdata_public <- seqmatrix_refdata %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy)
+    publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
+    seqmatrix_refdata_public <- get(load(paste0(dataPath, publicDataFile)))
+
     data_input <- seqmatrix_refdata_public %>% filter(Profile == profile_name) %>%
       select(MutationType, Sample, Mutations) %>%
       pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations)
@@ -641,7 +655,7 @@ pcaPublic <- function(profileType, signatureSetName, study, cancerType, experime
 pcaWithPublic <- function(matrixFile, study, cancerType, profileName, projectID, pythonOutput, savePath, dataPath) {
   source('api/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'signature_refsets.RData'))
-  load(paste0(dataPath, 'seqmatrix_refdata.RData'))
+  load(paste0(dataPath, 'seqmatrix_refdata_subset_files.RData'))
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
@@ -660,8 +674,10 @@ pcaWithPublic <- function(matrixFile, study, cancerType, profileName, projectID,
     data_input1 <- data_input1 %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
     ## seqmatrix data from public data
-    data_input2 <- seqmatrix_refdata %>%
-      filter(Profile == profileName, Study == study, Cancer_Type == cancerType) %>%
+    publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType) %>% pull(file)
+    publicData <- get(load(paste0(dataPath, publicDataFile)))
+
+    data_input2 <- publicData %>% filter(Profile == profileName) %>%
       select(Sample, MutationType, Mutations) %>%
       pivot_wider(names_from = Sample, values_from = Mutations)
 
