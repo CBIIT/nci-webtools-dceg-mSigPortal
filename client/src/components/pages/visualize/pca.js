@@ -78,8 +78,11 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
 
   async function setRPlot(plotPath, type) {
     if (plotPath) {
-      dispatchPCA({ submitOverlay: true });
-
+      if (!type.includes('With')) {
+        dispatchPCA({ submitOverlay: true });
+      } else {
+        dispatchPCA({ pubSubmitOverlay: true });
+      }
       try {
         const response = await fetch(`${rootURL}visualize/svg`, {
           method: 'POST',
@@ -122,7 +125,11 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
       } catch (err) {
         dispatchError(err);
       }
-      dispatchPCA({ submitOverlay: false });
+      if (!type.includes('With')) {
+        dispatchPCA({ submitOverlay: false });
+      } else {
+        dispatchPCA({ pubSubmitOverlay: false });
+      }
     } else {
       if (type == 'pca1') {
         if (pca1URL) URL.revokeObjectURL(pca1URL);
