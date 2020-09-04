@@ -312,7 +312,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
             ) : (
               <FontAwesomeIcon icon={faPlus} />
             )}{' '}
-            Principal Component Analysis
+            PCA Within Samples
           </Toggle>
           <Collapse eventKey="0">
             <Body>
@@ -570,7 +570,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
               ) : (
                 <FontAwesomeIcon icon={faPlus} />
               )}{' '}
-              Principal Component Analysis with Public Data
+              PCA with Public Data
             </Toggle>
             <Collapse eventKey="1">
               <Body>
