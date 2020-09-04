@@ -95,6 +95,7 @@ export default function PublicForm() {
 
   function handleReset() {
     const initialState = getInitialState();
+    dispatchVisualize({ submitted: false });
     dispatchVisualizeResults(initialState.visualizeResults);
     dispatchMutationalProfiles(initialState.mutationalProfiles);
     dispatchCosineSimilarity(initialState.cosineSimilarity);
@@ -237,7 +238,7 @@ export default function PublicForm() {
       <Group controlId="Study">
         <Label>Study</Label>
         <Select
-          disabled={submitted}
+          isDisabled={submitted}
           options={studyOptions}
           value={[study]}
           onChange={(study) => handleStudyChange(study)}
@@ -248,7 +249,7 @@ export default function PublicForm() {
       <Group controlId="cancerType">
         <Label>Cancer Type</Label>
         <Select
-          disabled={submitted}
+          isDisabled={submitted}
           options={cancerTypeOptions}
           value={[cancerType]}
           onChange={(cancerType) => handleCancerChange(cancerType)}
@@ -260,7 +261,7 @@ export default function PublicForm() {
       <Group>
         <Label>Experimental Strategy</Label>
         <Select
-          disabled={submitted}
+          isDisabled={submitted}
           options={pExperimentOptions}
           value={[pExperimentalStrategy]}
           onChange={(pExperimentalStrategy) =>
@@ -286,7 +287,7 @@ export default function PublicForm() {
         </Col>
         <Col sm="6">
           <Button
-            disabled={loading.active}
+            disabled={loading.active || submitted}
             className="w-100"
             variant="primary"
             type="button"
