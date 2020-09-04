@@ -32,12 +32,17 @@ export default function Results({ setOpenSidebar }) {
   // get mapping of plots after retrieving projectID
   useEffect(() => {
     if (source == 'user') {
-      if (projectID && !retrieveSvgList) {
+      if (
+        projectID &&
+        !retrieveSvgList &&
+        !mutationalProfiles.filtered.length
+      ) {
         setAttempt(true);
         getSummary();
       } else if (projectID && !signatureSetOptions.length) mapSvgList();
     } else {
-      if (svgList.length > 0) mapPublicData();
+      if (svgList.length > 0 && !mutationalProfiles.filtered.length)
+        mapPublicData();
     }
   }, [svgList, projectID, source]);
 
