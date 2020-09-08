@@ -286,10 +286,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
           dispatchProfileComparison({ withinPlotPath: output.plotPath });
           setRPlot(output.plotPath, 'within');
         } else if (fn.includes('profileComparisonRefSig')) {
-          {
-            dispatchProfileComparison({ refPlotPath: output.plotPath });
-            setRPlot(output.plotPath, 'refsig');
-          }
+          dispatchProfileComparison({ refPlotPath: output.plotPath });
+          setRPlot(output.plotPath, 'refsig');
         } else {
           dispatchProfileComparison({ pubPlotPath: output.plotPath });
           setRPlot(output.plotPath, 'pub');
