@@ -7,12 +7,14 @@ import {
   dispatchVisualizeResults,
   dispatchMutationalProfiles,
   dispatchCosineSimilarity,
+  dispatchMutationalPattern,
   dispatchProfileComparison,
   dispatchPCA,
 } from '../../../services/store';
 
 import MutationalProfiles from './mutationalProfiles';
 import CosineSimilarity from './cosineSimilarity';
+import MutationalPattern from './mutationalPattern';
 import ProfileComparison from './profileComparison';
 import PCA from './pca';
 import Download from './download';
@@ -154,6 +156,12 @@ export default function Results({ setOpenSidebar }) {
       userProfileType: profileOptions[0],
       userMatrixSize: filteredMatrixOptions[0],
       userMatrixOptions: filteredMatrixOptions,
+    });
+
+    dispatchMutationalPattern({
+      profileType: profileOptions[0],
+      matrixSize: filteredMatrixList[0],
+      matrixOptions: filteredMatrixList,
     });
 
     dispatchProfileComparison({
@@ -344,54 +352,28 @@ export default function Results({ setOpenSidebar }) {
     <Card>
       <Header>
         <Nav variant="pills" defaultActiveKey="#mutationalProfiles">
-          <Item>
-            <Link
-              active={displayTab == 'mutationalProfiles'}
-              onClick={() =>
-                dispatchVisualizeResults({ displayTab: 'mutationalProfiles' })
-              }
-            >
-              Mutational Profiles
-            </Link>
-          </Item>
-          <Item>
-            <Link
-              active={displayTab == 'cosineSimilarity'}
-              onClick={() =>
-                dispatchVisualizeResults({ displayTab: 'cosineSimilarity' })
-              }
-            >
-              Cosine Similarity
-            </Link>
-          </Item>
-          <Item>
-            <Link
-              active={displayTab == 'profileComparison'}
-              onClick={() =>
-                dispatchVisualizeResults({ displayTab: 'profileComparison' })
-              }
-            >
-              Profile Comparison
-            </Link>
-          </Item>
-          <Item>
-            <Link
-              active={displayTab == 'pca'}
-              onClick={() => dispatchVisualizeResults({ displayTab: 'pca' })}
-            >
-              PCA
-            </Link>
-          </Item>
-          <Item>
-            <Link
-              active={displayTab == 'download'}
-              onClick={() =>
-                dispatchVisualizeResults({ displayTab: 'download' })
-              }
-            >
-              Download
-            </Link>
-          </Item>
+          {[
+            { title: 'Mutational Profiles', id: 'mutationalProfiles' },
+            { title: 'Cosine Similarity', id: 'cosineSimilarity' },
+            {
+              title: 'Mutational Pattern Enrichment Analysis',
+              id: 'mutationalPattern',
+            },
+            { title: 'Profile Comparison', id: 'profileComparison' },
+            { title: 'PCA', id: 'pca' },
+            { title: 'Download', id: 'download' },
+          ].map(({ title, id }) => {
+            return (
+              <Item>
+                <Link
+                  active={displayTab == id}
+                  onClick={() => dispatchVisualizeResults({ displayTab: id })}
+                >
+                  {title}
+                </Link>
+              </Item>
+            );
+          })}
         </Nav>
       </Header>
       <Body
@@ -410,6 +392,18 @@ export default function Results({ setOpenSidebar }) {
           submitR={(fn, args) => submitR(fn, args)}
         />
       </Body>
+      <Body
+        style={{
+          display: displayTab == 'mutationalPattern' ? 'block' : 'none',
+        }}
+      >
+        <MutationalPattern
+          getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
+          downloadResults={(path) => downloadResults(path)}
+          submitR={(fn, args) => submitR(fn, args)}
+        />
+      </Body>
+
       <Body
         style={{
           display: displayTab == 'profileComparison' ? 'block' : 'none',

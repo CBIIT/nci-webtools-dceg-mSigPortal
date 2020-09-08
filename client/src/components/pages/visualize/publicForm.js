@@ -15,6 +15,7 @@ import {
   dispatchCosineSimilarity,
   dispatchProfileComparison,
   dispatchPCA,
+  dispatchMutationalPattern,
 } from '../../../services/store';
 const { Group, Label } = Form;
 const { Title, Content } = Popover;
@@ -152,6 +153,12 @@ export default function PublicForm() {
         });
 
         dispatchCosineSimilarity({
+          pubStudy: studyOptions[0],
+          pubCancerType: cancerTypeOptions[0],
+          pubCancerTypeOptions: cancerTypeOptions,
+        });
+
+        dispatchMutationalPattern({
           pubStudy: studyOptions[0],
           pubCancerType: cancerTypeOptions[0],
           pubCancerTypeOptions: cancerTypeOptions,

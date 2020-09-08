@@ -447,6 +447,102 @@ profileComparisonPublic <- function(profileName, matrixFile, userSample, study, 
   })
 }
 
+# Motif analysis ----------------------------------------------------------
+###parameters:
+mutationalPattern <- function(matrixFile, study, proportion, pattern, projectID, pythonOutput, savePath, dataPath) {
+  source('services/R/Sigvisualfunc.R')
+  stdout <- vector('character')
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+    plotPath = paste0(savePath, '/mpea.svg')
+    txtPath = paste0(savePath, '/mpea.txt')
+
+    data_input <- read_delim(matrixFile, delim = '\t')
+    data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0) %>%
+      pivot_longer(cols = -MutationType) %>%
+      mutate(Study = "Input") %>%
+      select(Study, Sample = name, MutationType, Mutations = value) %>%
+      mutate(Type = str_sub(MutationType, 3, 5), SubType1 = str_sub(MutationType, 1, 1), SubType2 = str_sub(str_sub(MutationType, 7, 7))) %>%
+      select(Study, Sample, MutationType, Type, SubType1, SubType2, Mutations)
+
+    content_all_tmp <- content_extraction(data_input)
+    data_tmp <- content_all_tmp %>%
+    filter(N1 > proportion, str_detect(Study, paste0("^", study, "@"))) %>%
+    count(Pattern, sort = T) %>%
+    mutate(Type = "Frequency of Mutational Pattern") %>% select(Type, Pattern, n)
+
+    if (dim(data_tmp) > 0) {
+      barchart_plot2(data = data_tmp, plot_width = 16, plot_height = 5, output_plot = 'tmp.svg')
+    } else {
+      print(paste0('No mutational pattern with proportion of mutations large than', proportion))
+    }
+
+    context_plot(data = data_input, pattern = pattern, output_plot = plotPath)
+    context_plot(data = data_input, pattern = pattern, data_return = TRUE) %>%
+    arrange(desc(N1)) %>% write_delim(txtPath, delim = '\t', col_names = T)
+
+    output = list('plotPath' = plotPath, 'txtPath' = txtPath)
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+  })
+}
+
+# Motif analysis ----------------------------------------------------------
+###parameters:
+mutationalPatternPublic <- function(study, cancerType, proportion, pattern, projectID, pythonOutput, savePath, dataPath) {
+  source('services/R/Sigvisualfunc.R')
+  stdout <- vector('character')
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+    plotPath = paste0(savePath, '/mpea.svg')
+    txtPath = paste0(savePath, '/mpea.txt')
+
+    data_input <- read_delim(matrixFile, delim = '\t')
+    data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0) %>%
+      pivot_longer(cols = -MutationType) %>%
+      mutate(Study = "Input") %>%
+      select(Study, Sample = name, MutationType, Mutations = value) %>%
+      mutate(Type = str_sub(MutationType, 3, 5), SubType1 = str_sub(MutationType, 1, 1), SubType2 = str_sub(str_sub(MutationType, 7, 7))) %>%
+      select(Study, Sample, MutationType, Type, SubType1, SubType2, Mutations)
+
+    content_all_tmp <- content_extraction(data_input)
+    data_tmp <- content_all_tmp %>%
+    filter(N1 > proportion, str_detect(Study, paste0("^", study, "@"))) %>%
+    count(Pattern, sort = T) %>%
+    mutate(Type = "Frequency of Mutational Pattern") %>% select(Type, Pattern, n)
+
+    if (dim(data_tmp) > 0) {
+      barchart_plot2(data = data_tmp, plot_width = 16, plot_height = 5, output_plot = 'tmp.svg')
+    } else {
+      print(paste0('No mutational pattern with proportion of mutations large than', proportion))
+    }
+
+    context_plot(data = data_input, pattern = pattern, output_plot = plotPath)
+    context_plot(data = data_input, pattern = pattern, data_return = TRUE) %>%
+    arrange(desc(N1)) %>% write_delim(txtPath, delim = '\t', col_names = T)
+
+    output = list('plotPath' = plotPath, 'txtPath' = txtPath)
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+  })
+}
+
 ### “Principal Component Analysis” ###
 # Two parameters need: Profile Type, Reference Signature Set
 # Profile Type only support SBS, DBS, ID
