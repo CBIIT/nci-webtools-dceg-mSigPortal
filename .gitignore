@@ -1,7 +1,6 @@
 /server/logs/
-/server/tmp/*
+/server/tmp/
 /server/data/
-!/server/tmp/.gitkeep
 
 config*.json
 *.meta

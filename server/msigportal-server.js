@@ -139,7 +139,7 @@ app.post('/api/visualize', (req, res) => {
   let stdout = '';
   let stderr = '';
   const wrapper = spawn('python3', [
-    'api/python/mSigPortal_Profiler_Extraction.py',
+    'services/python/mSigPortal_Profiler_Extraction.py',
     ...cli,
   ]);
 
@@ -193,7 +193,7 @@ app.post('/api/visualizeR', (req, res) => {
     fs.mkdirSync(savePath, { recursive: true });
   }
   try {
-    const wrapper = r('api/R/visualizeWrapper.R', req.body.fn, {
+    const wrapper = r('services/R/visualizeWrapper.R', req.body.fn, {
       ...req.body.args,
       projectID: req.body.projectID,
       pythonOutput: path.join(tmppath, req.body.projectID, 'results/output'),
@@ -220,7 +220,7 @@ app.post('/api/visualizeR/getReferenceSignatureSets', (req, res) => {
   console.log('args', req.body);
 
   try {
-    const list = r('api/R/visualizeWrapper.R', 'getReferenceSignatureSets', [
+    const list = r('services/R/visualizeWrapper.R', 'getReferenceSignatureSets', [
       req.body.profileType,
       path.join(datapath, 'signature_visualization/'),
     ]);
@@ -239,7 +239,7 @@ app.post('/api/visualizeR/getSignatures', (req, res) => {
   logger.info('/api/visualizeR/getSignatures: Calling R Wrapper');
 
   try {
-    const list = r('api/R/visualizeWrapper.R', 'getSignatures', [
+    const list = r('services/R/visualizeWrapper.R', 'getSignatures', [
       req.body.profileType,
       req.body.signatureSetName,
       path.join(datapath, 'signature_visualization/'),
@@ -258,7 +258,7 @@ app.post('/api/visualizeR/getSignatures', (req, res) => {
 app.post('/visualize/getPublicDataOptions', (req, res) => {
   logger.info('/visualize/getPublicOptions: Calling R Wrapper');
   try {
-    const list = r('api/R/visualizeWrapper.R', 'getPublicDataOptions', [
+    const list = r('services/R/visualizeWrapper.R', 'getPublicDataOptions', [
       path.join(datapath, 'signature_visualization/'),
     ]);
 
@@ -273,7 +273,7 @@ app.post('/visualize/getPublicDataOptions', (req, res) => {
 app.post('/visualize/getPublicData', (req, res) => {
   logger.info('/visualize/getPublicOptions: Calling R Wrapper');
   try {
-    const list = r('api/R/visualizeWrapper.R', 'getPublicData', [
+    const list = r('services/R/visualizeWrapper.R', 'getPublicData', [
       req.body.study,
       req.body.cancerType,
       req.body.experimentalStrategy,

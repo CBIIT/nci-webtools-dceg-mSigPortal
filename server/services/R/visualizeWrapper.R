@@ -48,7 +48,7 @@ getPublicData <- function(study, cancerType, experimentalStrategy, dataPath) {
 ### Cosine Similarity tab ###
 # section 1: Cosine similarity within samples #
 cosineSimilarityWithin <- function(matrixFile, projectID, pythonOutput, savePath, dataPath) {
-  source('api/R/Sigvisualfunc.R')
+  source('services/R/Sigvisualfunc.R')
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
@@ -77,7 +77,7 @@ cosineSimilarityWithin <- function(matrixFile, projectID, pythonOutput, savePath
 }
 
 cosineSimilarityWithinPublic <- function(profileType, matrixSize, study, cancerType, experimentalStrategy, projectID, pythonOutput, savePath, dataPath) {
-  source('api/R/Sigvisualfunc.R')
+  source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'seqmatrix_refdata_subset_files.RData'))
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
@@ -116,7 +116,7 @@ cosineSimilarityWithinPublic <- function(profileType, matrixSize, study, cancerT
 # Two parameters need: Profile Type, Reference Signature Set
 # Profile Type only support SBS, DBS, ID
 cosineSimilarityRefSig <- function(profileType, signatureSetName, matrixList, projectID, pythonOutput, savePath, dataPath) {
-  source('api/R/Sigvisualfunc.R')
+  source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'signature_refsets.RData'))
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
@@ -156,7 +156,7 @@ cosineSimilarityRefSig <- function(profileType, signatureSetName, matrixList, pr
 }
 
 cosineSimilarityRefSigPublic <- function(profileType, signatureSetName, study, cancerType, experimentalStrategy, projectID, pythonOutput, savePath, dataPath) {
-  source('api/R/Sigvisualfunc.R')
+  source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'seqmatrix_refdata_subset_files.RData'))
   load(paste0(dataPath, 'signature_refsets.RData'))
   stdout <- vector('character')
@@ -201,7 +201,7 @@ cosineSimilarityRefSigPublic <- function(profileType, signatureSetName, study, c
 # section 3: Cosine similarity to Public data -----------------------------
 # find the common profile between data and seqmatrix
 cosineSimilarityPublic <- function(matrixFile, study, cancerType, profileName, projectID, pythonOutput, savePath, dataPath) {
-  source('api/R/Sigvisualfunc.R')
+  source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'seqmatrix_refdata_subset_files.RData'))
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
@@ -246,7 +246,7 @@ cosineSimilarityPublic <- function(matrixFile, study, cancerType, profileName, p
 # section 1: Cosine similarity within samples 
 # three parameters need: Profile Type, Sample Name1 and Sample Name2
 profileComparisonWithin <- function(profileType, sampleName1, sampleName2, matrixList, projectID, pythonOutput, savePath, dataPath) {
-  source('api/R/Sigvisualfunc.R')
+  source('services/R/Sigvisualfunc.R')
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
@@ -278,7 +278,7 @@ profileComparisonWithin <- function(profileType, sampleName1, sampleName2, matri
 }
 
 profileComparisonWithinPublic <- function(profileType, sampleName1, sampleName2, study, cancerType, experimentalStrategy, projectID, pythonOutput, savePath, dataPath) {
-  source('api/R/Sigvisualfunc.R')
+  source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'seqmatrix_refdata_subset_files.RData'))
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
@@ -317,7 +317,7 @@ profileComparisonWithinPublic <- function(profileType, sampleName1, sampleName2,
 # section 2: Comparison to reference signatures # 
 # four parameters need: “Profile Type”, “Sample Name”, “Reference Signature Set” and “Compare Single Signature or Combined Signatures” # 
 profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, compare, matrixList, projectID, pythonOutput, savePath, dataPath) {
-  source('api/R/Sigvisualfunc.R')
+  source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'signature_refsets.RData'))
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
@@ -363,7 +363,7 @@ profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, c
 }
 
 profileComparisonRefSigPublic <- function(profileType, sampleName, signatureSetName, compare, study, cancerType, experimentalStrategy, projectID, pythonOutput, savePath, dataPath) {
-  source('api/R/Sigvisualfunc.R')
+  source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'signature_refsets.RData'))
   load(paste0(dataPath, 'seqmatrix_refdata_subset_files.RData'))
   stdout <- vector('character')
@@ -410,7 +410,7 @@ profileComparisonRefSigPublic <- function(profileType, sampleName, signatureSetN
 
 # section 3: Profile Comparison to Public data ----------------------------
 profileComparisonPublic <- function(profileName, matrixFile, userSample, study, cancerType, publicSample, projectID, pythonOutput, savePath, dataPath) {
-  source('api/R/Sigvisualfunc.R')
+  source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'seqmatrix_refdata_subset_files.RData'))
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
@@ -451,7 +451,7 @@ profileComparisonPublic <- function(profileName, matrixFile, userSample, study, 
 # Two parameters need: Profile Type, Reference Signature Set
 # Profile Type only support SBS, DBS, ID
 pca <- function(profileType, signatureSetName, matrixList, projectID, pythonOutput, savePath, dataPath) {
-  source('api/R/Sigvisualfunc.R')
+  source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'signature_refsets.RData'))
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
@@ -549,7 +549,7 @@ pca <- function(profileType, signatureSetName, matrixList, projectID, pythonOutp
 }
 
 pcaPublic <- function(profileType, signatureSetName, study, cancerType, experimentalStrategy, projectID, pythonOutput, savePath, dataPath) {
-  source('api/R/Sigvisualfunc.R')
+  source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'signature_refsets.RData'))
   load(paste0(dataPath, 'seqmatrix_refdata_subset_files.RData'))
   stdout <- vector('character')
@@ -652,7 +652,7 @@ pcaPublic <- function(profileType, signatureSetName, study, cancerType, experime
 
 #  section 2 PCA together with public data --------------------------------
 pcaWithPublic <- function(matrixFile, study, cancerType, profileName, projectID, pythonOutput, savePath, dataPath) {
-  source('api/R/Sigvisualfunc.R')
+  source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'signature_refsets.RData'))
   load(paste0(dataPath, 'seqmatrix_refdata_subset_files.RData'))
   stdout <- vector('character')
