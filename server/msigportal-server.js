@@ -1,3 +1,5 @@
+const cluster = require('cluster');
+const numCPUs = require('os').cpus().length;
 const express = require('express');
 const path = require('path');
 const logger = require('./logger');
@@ -11,6 +13,33 @@ const Papa = require('papaparse');
 const r = require('r-wrapper');
 const AWS = require('aws-sdk');
 const app = express();
+
+if (cluster.isMaster) {
+  masterProcess();
+} else {
+  childProcess();
+}
+
+function masterProcess() {
+  console.log(`Master ${process.pid} is running`);
+
+  for (let i = 0; i < numCPUs; i++) {
+    console.log(`Forking process number ${i}...`);
+    cluster.fork();
+  }
+}
+
+function childProcess() {
+  console.log(`Worker ${process.pid} started and finished`);
+
+  const server = app.listen(port, () => {
+    logger.info(`msigportal server running on port: ${port}`);
+    console.log(`Listening on port ${port}`);
+  });
+
+  server.keepAliveTimeout = 61 * 1000;
+  server.headersTimeout = 62 * 1000;
+}
 
 app.use(express.static(path.resolve('www')));
 app.use(express.json());
@@ -404,11 +433,3 @@ app.get('/visualize/download', (req, res) => {
 app.post('/visualize/queue', (req, res) => {
   res.json(req.body);
 });
-
-const server = app.listen(port, () => {
-  logger.info(`msigportal server running on port: ${port}`);
-  console.log(`Listening on port ${port}`);
-});
-
-server.keepAliveTimeout = 61 * 1000;
-server.headersTimeout = 62 * 1000;
