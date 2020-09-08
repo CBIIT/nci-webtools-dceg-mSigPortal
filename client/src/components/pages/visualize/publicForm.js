@@ -36,7 +36,7 @@ export default function PublicForm() {
   const rootURL = window.location.pathname;
 
   useEffect(() => {
-    if (!pDataOptions.length) getPublicDataOptions();
+    if (!pDataOptions.length && !loadingPublic) getPublicDataOptions();
   }, [pDataOptions, source]);
 
   async function handleSubmit() {
