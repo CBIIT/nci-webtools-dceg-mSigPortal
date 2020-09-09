@@ -100,6 +100,7 @@ export default function PublicForm() {
     dispatchVisualize({ submitted: false });
     dispatchVisualizeResults(initialState.visualizeResults);
     dispatchMutationalProfiles(initialState.mutationalProfiles);
+    dispatchMutationalPattern(initialState.mutationalPattern);
     dispatchCosineSimilarity(initialState.cosineSimilarity);
     dispatchProfileComparison(initialState.profileComparison);
     dispatchPCA(initialState.pca);

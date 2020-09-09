@@ -77,7 +77,6 @@ export const getInitialState = () => ({
     withinPlotURL: '',
     refPlotURL: '',
     pubPlotURL: '',
-    pubTxtURL: '',
     displayWithin: true,
     displayRefSig: true,
     displayPublic: true,
@@ -89,6 +88,30 @@ export const getInitialState = () => ({
     withinSubmitOverlay: false,
     refSubmitOverlay: false,
     pubSubmitOverlay: false,
+  },
+  mutationalPattern: {
+    profileType: '',
+    profileType: '',
+    matrixSize: '',
+    matrixOptions: '',
+    proportion: '',
+    pattern: '',
+
+    pubStudy: '',
+    pubCancerType: '',
+    pubCancerTypeOptions: [],
+    
+    txtPath: '',
+    plotPath: '',
+    plotURL: '',
+    barPath: '',
+    barURL: '',
+
+    display: true,
+    err: false,
+    debugR: [],
+    displayDebug: false,
+    submitOverlay: false,
   },
   profileComparison: {
     withinProfileType: '',
@@ -102,7 +125,7 @@ export const getInitialState = () => ({
     refCompare: '',
     userProfileType: '',
     userMatrixSize: '',
-    userMatrixOptions:'',
+    userMatrixOptions: '',
     userSampleName: '',
     pubSampleName: '',
     pubSampleOptions: [],
@@ -229,6 +252,19 @@ const cosineSimilaritySlice = createSlice({
   },
 });
 
+const mutationalPatternSlice = createSlice({
+  name: 'mutationalPattern',
+  initialState: getInitialState().mutationalPattern,
+  reducers: {
+    updateMutationalPattern: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
+
 const profileComparisonSlice = createSlice({
   name: 'profileComparison',
   initialState: getInitialState().profileComparison,
@@ -273,6 +309,7 @@ const rootReducer = combineReducers({
   visualizeResults: visualizeResultsSlice.reducer,
   mutationalProfiles: mutationalProfilesSlice.reducer,
   cosineSimilarity: cosineSimilaritySlice.reducer,
+  mutationalPattern: mutationalPatternSlice.reducer,
   profileComparison: profileComparisonSlice.reducer,
   pca: pcaSlice.reducer,
   error: errorSlice.reducer,
@@ -287,6 +324,7 @@ export const { updateVisualize } = visualizeSlice.actions;
 export const { updateVisualizeResults } = visualizeResultsSlice.actions;
 export const { updateMutationalProfiles } = mutationalProfilesSlice.actions;
 export const { updateCosineSimilarity } = cosineSimilaritySlice.actions;
+export const { updateMutationalPattern } = mutationalPatternSlice.actions;
 export const { updateProfileComparison } = profileComparisonSlice.actions;
 export const { updatePCA } = pcaSlice.actions;
 export const { updateError } = errorSlice.actions;
@@ -305,6 +343,10 @@ export function dispatchMutationalProfiles(obj) {
 
 export function dispatchCosineSimilarity(obj) {
   store.dispatch(updateCosineSimilarity(obj));
+}
+
+export function dispatchMutationalPattern(obj) {
+  store.dispatch(updateMutationalPattern(obj));
 }
 
 export function dispatchProfileComparison(obj) {

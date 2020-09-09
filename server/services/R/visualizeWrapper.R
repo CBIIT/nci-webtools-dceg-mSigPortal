@@ -4,6 +4,7 @@ library(cowplot)
 library(ggsci)
 library(ggrepel)
 library(factoextra)
+library(scales)
 library(jsonlite)
 
 # get all Reference Signature Set options using profile_name (profile type and matrix size)
@@ -475,17 +476,19 @@ mutationalPattern <- function(matrixFile, study, proportion, pattern, projectID,
     count(Pattern, sort = T) %>%
     mutate(Type = "Frequency of Mutational Pattern") %>% select(Type, Pattern, n)
 
-    if (dim(data_tmp) > 0) {
-      barchart_plot2(data = data_tmp, plot_width = 16, plot_height = 5, output_plot = 'tmp.svg')
-    } else {
-      print(paste0('No mutational pattern with proportion of mutations large than', proportion))
-    }
 
     context_plot(data = data_input, pattern = pattern, output_plot = plotPath)
     context_plot(data = data_input, pattern = pattern, data_return = TRUE) %>%
     arrange(desc(N1)) %>% write_delim(txtPath, delim = '\t', col_names = T)
+    if (dim(data_tmp) > 0) {
+      barPath = paste0(savePath, '/barchart.svg')
+      barchart_plot2(data = data_tmp, plot_width = 16, plot_height = 5, output_plot = barPath)
+      output = list('barPath' = barPath, 'plotPath' = plotPath, 'txtPath' = txtPath)
+    } else {
+      print(paste0('No mutational pattern with proportion of mutations large than', proportion))
+      output = list('plotPath' = plotPath, 'txtPath' = txtPath)
+    }
 
-    output = list('plotPath' = plotPath, 'txtPath' = txtPath)
   }, error = function(e) {
     print(e)
   }, finally = {
@@ -499,6 +502,7 @@ mutationalPattern <- function(matrixFile, study, proportion, pattern, projectID,
 ###parameters:
 mutationalPatternPublic <- function(study, cancerType, proportion, pattern, projectID, pythonOutput, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
+  load(paste0(dataPath, 'content_data_all.RData'))
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
@@ -506,34 +510,29 @@ mutationalPatternPublic <- function(study, cancerType, proportion, pattern, proj
 
   tryCatch({
     output = list()
+    barPath = paste0(savePath, '/barchart.svg')
     plotPath = paste0(savePath, '/mpea.svg')
     txtPath = paste0(savePath, '/mpea.txt')
 
-    data_input <- read_delim(matrixFile, delim = '\t')
-    data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0) %>%
-      pivot_longer(cols = -MutationType) %>%
-      mutate(Study = "Input") %>%
-      select(Study, Sample = name, MutationType, Mutations = value) %>%
-      mutate(Type = str_sub(MutationType, 3, 5), SubType1 = str_sub(MutationType, 1, 1), SubType2 = str_sub(str_sub(MutationType, 7, 7))) %>%
-      select(Study, Sample, MutationType, Type, SubType1, SubType2, Mutations)
-
-    content_all_tmp <- content_extraction(data_input)
-    data_tmp <- content_all_tmp %>%
+    data_tmp <- content_data_all %>%
     filter(N1 > proportion, str_detect(Study, paste0("^", study, "@"))) %>%
     count(Pattern, sort = T) %>%
     mutate(Type = "Frequency of Mutational Pattern") %>% select(Type, Pattern, n)
 
-    if (dim(data_tmp) > 0) {
-      barchart_plot2(data = data_tmp, plot_width = 16, plot_height = 5, output_plot = 'tmp.svg')
-    } else {
-      print(paste0('No mutational pattern with proportion of mutations large than', proportion))
-    }
+    barchart_plot2(data = data_tmp, plot_width = 16, plot_height = 5, output_plot = barPath)
+
+    data_input <- seqmatrix_refdata %>% filter(Study == study) %>%
+    filter(Profile == "SBS96") %>%
+    mutate(Study = paste0(Study, "@", cancerType)) %>%
+    select(Study, Sample, MutationType, Mutations) %>%
+    mutate(Type = str_sub(MutationType, 3, 5), SubType1 = str_sub(MutationType, 1, 1), SubType2 = str_sub(str_sub(MutationType, 7, 7))) %>%
+    select(Study, Sample, MutationType, Type, SubType1, SubType2, Mutations)
 
     context_plot(data = data_input, pattern = pattern, output_plot = plotPath)
     context_plot(data = data_input, pattern = pattern, data_return = TRUE) %>%
     arrange(desc(N1)) %>% write_delim(txtPath, delim = '\t', col_names = T)
 
-    output = list('plotPath' = plotPath, 'txtPath' = txtPath)
+    output = list('barPath' = barPath, 'plotPath' = plotPath, 'txtPath' = txtPath)
   }, error = function(e) {
     print(e)
   }, finally = {

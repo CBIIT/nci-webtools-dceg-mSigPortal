@@ -54,9 +54,11 @@ export default function MutationalPattern({
     pubStudy,
     pubCancerType,
     pubCancerTypeOptions,
+    txtPath,
     plotPath,
-
     plotURL,
+    barPath,
+    barURL,
     display,
     err,
     debugR,
@@ -71,18 +73,9 @@ export default function MutationalPattern({
     menuPortalTarget: document.body,
   };
 
-  function setOverlay(type, display) {
-    if (type == 'within') {
-      dispatchMutationalPattern({ submitOverlay: display });
-    } else if (type == 'refsig') {
-      dispatchMutationalPattern({ refSubmitOverlay: display });
-    } else {
-      dispatchMutationalPattern({ pubSubmitOverlay: display });
-    }
-  }
-
   async function setRPlot(plotPath, type) {
-    setOverlay(type, true);
+    dispatchMutationalPattern({ submitOverlay: true });
+
     if (plotPath) {
       try {
         const response = await fetch(`${rootURL}visualize/svg`, {
@@ -99,10 +92,17 @@ export default function MutationalPattern({
           const pic = await response.blob();
           const objectURL = URL.createObjectURL(pic);
 
-          if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchMutationalPattern({
-            plotURL: objectURL,
-          });
+          if (type == 'context') {
+            if (plotURL) URL.revokeObjectURL(plotURL);
+            dispatchMutationalPattern({
+              plotURL: objectURL,
+            });
+          } else {
+            if (barURL) URL.revokeObjectURL(barURL);
+            dispatchMutationalPattern({
+              barURL: objectURL,
+            });
+          }
         }
       } catch (err) {
         dispatchError(err);
@@ -111,7 +111,7 @@ export default function MutationalPattern({
       if (plotURL) URL.revokeObjectURL(plotURL);
       dispatchMutationalPattern({ err: true, plotURL: '' });
     }
-    setOverlay(type, false);
+    dispatchMutationalPattern({ submitOverlay: false });
   }
 
   // get Signature Reference Sets for dropdown options
@@ -194,89 +194,19 @@ export default function MutationalPattern({
       } else {
         const { debugR, output } = await response.json();
 
-        dispatchMutationalPattern({ debugR: debugR });
-
-        dispatchMutationalPattern({ plotPath: output.plotPath });
-        setRPlot(output.plotPath, 'within');
+        dispatchMutationalPattern({
+          debugR: debugR,
+          plotPath: output.plotPath,
+          barPath: output.barPath,
+          txtPath: output.txtPath,
+        });
+        setRPlot(output.plotPath, 'context');
+        if (output.barPath) setRPlot(output.barPath, 'barchart');
       }
     } catch (err) {
       dispatchError(err);
-
       dispatchMutationalPattern({ submitOverlay: false });
     }
-  }
-
-  async function getPublicSamples(study, cancerType) {
-    const args = {
-      study: study,
-      cancerType: cancerType,
-      experimentalStrategy: [
-        ...new Set(
-          pDataOptions
-            .filter(
-              (data) => data.Study == study && data.Cancer_Type == cancerType
-            )
-            .map((data) => data.Dataset)
-        ),
-      ][0],
-    };
-
-    setOverlay('pub', true);
-    try {
-      const response = await fetch(`${rootURL}visualize/getPublicData`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(args),
-      });
-
-      if (response.ok) {
-        const { svgList } = await response.json();
-        const pubSamples = [...new Set(svgList.map((plot) => plot.Sample))];
-
-        dispatchMutationalPattern({
-          pubSampleOptions: pubSamples,
-          pubSampleName: pubSamples[0],
-        });
-      } else {
-        dispatchMutationalPattern({
-          pubSampleOptions: ['NA'],
-          pubErr: 'Error retrieving pub data samples',
-        });
-      }
-    } catch (err) {
-      dispatchError(err);
-      dispatchMutationalPattern({
-        pubErr: 'Error retrieving pub data samples',
-      });
-    }
-    setOverlay('pub', false);
-  }
-
-  function handleStudyChange(study) {
-    const cancerTypeOptions = [
-      ...new Set(
-        pDataOptions
-          .filter((data) => data.Study == study)
-          .map((data) => data.Cancer_Type)
-      ),
-    ];
-
-    dispatchMutationalPattern({
-      pubStudy: study,
-      pubCancerType: cancerTypeOptions[0],
-      pubCancerTypeOptions: cancerTypeOptions,
-    });
-    getPublicSamples(study, cancerTypeOptions[0]);
-  }
-
-  function handleCancerChange(cancer) {
-    dispatchMutationalPattern({
-      pubCancerType: cancer,
-    });
-    getPublicSamples(pubStudy, cancer);
   }
 
   function handleProfileType(profileType) {
@@ -357,7 +287,9 @@ export default function MutationalPattern({
                           <Select
                             options={studyOptions}
                             value={[pubStudy]}
-                            onChange={(study) => handleStudyChange(study)}
+                            onChange={(study) =>
+                              dispatchMutationalPattern({ pubStudy: study })
+                            }
                             getOptionLabel={(option) => option}
                             getOptionValue={(option) => option}
                             {...selectFix}
@@ -392,29 +324,20 @@ export default function MutationalPattern({
                         <Text className="text-muted">(Ex. NCG>NTG)</Text>
                       </Col>
 
-                      <Col sm="2" className="m-auto">
+                      <Col sm="1" className="m-auto">
                         <Button
                           variant="primary"
                           onClick={() => {
-                            if (source == 'user') {
-                              calculateR('mutationalPattern', {
-                                matrixFile: matrixList.filter(
-                                  (path) =>
-                                    path.Profile_Type == profileType &&
-                                    path.Matrix_Size == matrixSize
-                                )[0].Path,
-                                study: pubStudy,
-                                proportion: proportion,
-                                pattern: pattern,
-                              });
-                            } else {
-                              calculateR('profileComparisonWithinPublic', {
-                                profileType: profileType,
-                                study: study,
-                                cancerType: cancerType,
-                                experimentalStrategy: pubExperimentalStrategy,
-                              });
-                            }
+                            calculateR('mutationalPattern', {
+                              matrixFile: matrixList.filter(
+                                (path) =>
+                                  path.Profile_Type == profileType &&
+                                  path.Matrix_Size == matrixSize
+                              )[0].Path,
+                              study: pubStudy,
+                              proportion: proportion,
+                              pattern: pattern,
+                            });
                           }}
                         >
                           Calculate
@@ -442,7 +365,10 @@ export default function MutationalPattern({
                         <div className="p-2 border rounded">
                           <Row>
                             <Col>
-                              <img className="w-100 my-4" src={plotURL}></img>
+                              <img
+                                className="w-100 my-4 h-600"
+                                src={plotURL}
+                              ></img>
                             </Col>
                           </Row>
                         </div>
@@ -482,48 +408,7 @@ export default function MutationalPattern({
                   <LoadingOverlay active={submitOverlay} />
                   <div>
                     <Row className="justify-content-center">
-                      <Col sm="2">
-                        <Group controlId="profileType">
-                          <Label>Profile Type</Label>
-                          <Select
-                            options={profileOptions}
-                            value={[profileType]}
-                            onChange={(profile) => handleProfileType(profile)}
-                            getOptionLabel={(option) => option}
-                            getOptionValue={(option) => option}
-                            {...selectFix}
-                          />
-                        </Group>
-                      </Col>
-                      <Col sm="2">
-                        <Label>Matrix Size</Label>
-                        <Select
-                          options={matrixOptions}
-                          value={[matrixSize]}
-                          onChange={(matrix) =>
-                            dispatchMutationalPattern({
-                              matrixSize: matrix,
-                            })
-                          }
-                          getOptionLabel={(option) => option}
-                          getOptionValue={(option) => option}
-                          {...selectFix}
-                        />
-                      </Col>
-                      <Col sm="2">
-                        <Group controlId="pubStudy">
-                          <Label>Study</Label>
-                          <Select
-                            options={studyOptions}
-                            value={[pubStudy]}
-                            onChange={(study) => handleStudyChange(study)}
-                            getOptionLabel={(option) => option}
-                            getOptionValue={(option) => option}
-                            {...selectFix}
-                          />
-                        </Group>
-                      </Col>
-                      <Col sm="2">
+                      <Col sm="5">
                         <Label>
                           Minimal Proportion mutations within Each Mutational
                           Pattern
@@ -538,7 +423,7 @@ export default function MutationalPattern({
                         ></Control>{' '}
                         <Text className="text-muted">(Ex. 0.8)</Text>
                       </Col>
-                      <Col sm="2">
+                      <Col sm="5">
                         <Label>Mutational Pattern</Label>
                         <Control
                           value={pattern}
@@ -551,29 +436,16 @@ export default function MutationalPattern({
                         <Text className="text-muted">(Ex. NCG>NTG)</Text>
                       </Col>
 
-                      <Col sm="2" className="m-auto">
+                      <Col sm="1" className="m-auto">
                         <Button
                           variant="primary"
                           onClick={() => {
-                            if (source == 'user') {
-                              calculateR('mutationalPattern', {
-                                matrixFile: matrixList.filter(
-                                  (path) =>
-                                    path.Profile_Type == profileType &&
-                                    path.Matrix_Size == matrixSize
-                                )[0].Path,
-                                study: pubStudy,
-                                proportion: proportion,
-                                pattern: pattern,
-                              });
-                            } else {
-                              calculateR('profileComparisonWithinPublic', {
-                                profileType: profileType,
-                                study: study,
-                                cancerType: cancerType,
-                                experimentalStrategy: pubExperimentalStrategy,
-                              });
-                            }
+                            calculateR('mutationalPatternPublic', {
+                              study: study,
+                              cancerType: cancerType,
+                              proportion: proportion,
+                              pattern: pattern,
+                            });
                           }}
                         >
                           Calculate
@@ -601,7 +473,10 @@ export default function MutationalPattern({
                         <div className="p-2 border rounded">
                           <Row>
                             <Col>
-                              <img className="w-100 my-4" src={plotURL}></img>
+                              <img
+                                className="w-100 my-4 h-600"
+                                src={plotURL}
+                              ></img>
                             </Col>
                           </Row>
                         </div>
