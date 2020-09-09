@@ -97,10 +97,6 @@ export const getInitialState = () => ({
     proportion: '',
     pattern: '',
 
-    pubStudy: '',
-    pubCancerType: '',
-    pubCancerTypeOptions: [],
-    
     txtPath: '',
     plotPath: '',
     plotURL: '',

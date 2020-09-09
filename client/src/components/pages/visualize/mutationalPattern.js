@@ -32,18 +32,11 @@ export default function MutationalPattern({
   submitR,
   getRefSigOptions,
 }) {
-  const {
-    source,
-    study,
-    studyOptions,
-    cancerType,
-    pubExperimentalStrategy,
-    pDataOptions,
-  } = useSelector((state) => state.visualize);
-  const { matrixList } = useSelector((state) => state.visualizeResults);
-  const { nameOptions, profileOptions } = useSelector(
-    (state) => state.mutationalProfiles
+  const { source, study, cancerType, pubExperimentalStrategy } = useSelector(
+    (state) => state.visualize
   );
+  const { matrixList } = useSelector((state) => state.visualizeResults);
+  const { profileOptions } = useSelector((state) => state.mutationalProfiles);
   const rootURL = window.location.pathname;
   const {
     profileType,
@@ -51,9 +44,7 @@ export default function MutationalPattern({
     matrixOptions,
     proportion,
     pattern,
-    pubStudy,
-    pubCancerType,
-    pubCancerTypeOptions,
+
     txtPath,
     plotPath,
     plotURL,
@@ -281,22 +272,7 @@ export default function MutationalPattern({
                           {...selectFix}
                         />
                       </Col>
-                      <Col sm="2">
-                        <Group controlId="pubStudy">
-                          <Label>Study</Label>
-                          <Select
-                            options={studyOptions}
-                            value={[pubStudy]}
-                            onChange={(study) =>
-                              dispatchMutationalPattern({ pubStudy: study })
-                            }
-                            getOptionLabel={(option) => option}
-                            getOptionValue={(option) => option}
-                            {...selectFix}
-                          />
-                        </Group>
-                      </Col>
-                      <Col sm="2">
+                      <Col sm="3">
                         <Label>
                           Minimal Proportion mutations within Each Mutational
                           Pattern
@@ -311,7 +287,7 @@ export default function MutationalPattern({
                         ></Control>{' '}
                         <Text className="text-muted">(Ex. 0.8)</Text>
                       </Col>
-                      <Col sm="2">
+                      <Col sm="3">
                         <Label>Mutational Pattern</Label>
                         <Control
                           value={pattern}
@@ -334,7 +310,6 @@ export default function MutationalPattern({
                                   path.Profile_Type == profileType &&
                                   path.Matrix_Size == matrixSize
                               )[0].Path,
-                              study: pubStudy,
                               proportion: proportion,
                               pattern: pattern,
                             });
@@ -361,6 +336,15 @@ export default function MutationalPattern({
                           >
                             Download Plot
                           </a>
+                          <span className="ml-auto">
+                            <Button
+                              className="px-2 py-1"
+                              variant="link"
+                              onClick={() => downloadResults(txtPath)}
+                            >
+                              Download Results
+                            </Button>
+                          </span>
                         </div>
                         <div className="p-2 border rounded">
                           <Row>
@@ -443,6 +427,7 @@ export default function MutationalPattern({
                             calculateR('mutationalPatternPublic', {
                               study: study,
                               cancerType: cancerType,
+                              experimentalStrategy: pubExperimentalStrategy,
                               proportion: proportion,
                               pattern: pattern,
                             });

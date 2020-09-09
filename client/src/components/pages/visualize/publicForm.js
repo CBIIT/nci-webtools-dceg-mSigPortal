@@ -159,12 +159,6 @@ export default function PublicForm() {
           pubCancerTypeOptions: cancerTypeOptions,
         });
 
-        dispatchMutationalPattern({
-          pubStudy: studyOptions[0],
-          pubCancerType: cancerTypeOptions[0],
-          pubCancerTypeOptions: cancerTypeOptions,
-        });
-
         dispatchProfileComparison({
           pubStudy: studyOptions[0],
           pubCancerType: cancerTypeOptions[0],

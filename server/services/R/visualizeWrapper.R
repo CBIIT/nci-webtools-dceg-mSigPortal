@@ -46,6 +46,24 @@ getPublicData <- function(study, cancerType, experimentalStrategy, dataPath) {
   return(toJSON(svgfiles_public, pretty = TRUE, auto_unbox = TRUE))
 }
 
+# Tumor Mutation Burden ---------------------------------------------------
+profilerSummary <- function(matrixFile, projectID, pythonOutput, savePath, dataPath) {
+  data_input <- tibble()
+  for (i in 1:dim(matrixfiles)[1]) {
+    matrixfile_selected <- matrixfiles$Path[i]
+    if (dim(data_input_tmp)[1] > 0) {
+      data_input_tmp <- read_delim(matrixfile_selected, delim = '\t')
+      #data_input_tmp <- data_input_tmp %>% select_if(~ !is.numeric(.)|| sum(.)>0)
+      data_input_tmp <- data_input_tmp %>% pivot_longer(cols = -MutationType) %>%
+        group_by(name) %>%
+        summarise(Mutations = sum(value, na.rm = TRUE)) %>%
+        mutate(Profile = paste0(matrixfiles$Profile_Type[i], matrixfiles$Matrix_Size[i])) %>%
+        select(Sample = name, Profile, Mutations)
+      data_input <- bind_rows(data_input, data_input_tmp)
+    }
+  }
+}
+
 ### Cosine Similarity tab ###
 # section 1: Cosine similarity within samples #
 cosineSimilarityWithin <- function(matrixFile, projectID, pythonOutput, savePath, dataPath) {
@@ -450,7 +468,7 @@ profileComparisonPublic <- function(profileName, matrixFile, userSample, study, 
 
 # Motif analysis ----------------------------------------------------------
 ###parameters:
-mutationalPattern <- function(matrixFile, study, proportion, pattern, projectID, pythonOutput, savePath, dataPath) {
+mutationalPattern <- function(matrixFile, proportion, pattern, projectID, pythonOutput, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
@@ -472,7 +490,7 @@ mutationalPattern <- function(matrixFile, study, proportion, pattern, projectID,
 
     content_all_tmp <- content_extraction(data_input)
     data_tmp <- content_all_tmp %>%
-    filter(N1 > proportion, str_detect(Study, paste0("^", study, "@"))) %>%
+    filter(N1 > proportion) %>%
     count(Pattern, sort = T) %>%
     mutate(Type = "Frequency of Mutational Pattern") %>% select(Type, Pattern, n)
 
@@ -500,9 +518,10 @@ mutationalPattern <- function(matrixFile, study, proportion, pattern, projectID,
 
 # Motif analysis ----------------------------------------------------------
 ###parameters:
-mutationalPatternPublic <- function(study, cancerType, proportion, pattern, projectID, pythonOutput, savePath, dataPath) {
+mutationalPatternPublic <- function(study, cancerType, experimentalStrategy, proportion, pattern, projectID, pythonOutput, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'content_data_all.RData'))
+  load(paste0(dataPath, 'seqmatrix_refdata_subset_files.RData'))
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
@@ -520,6 +539,9 @@ mutationalPatternPublic <- function(study, cancerType, proportion, pattern, proj
     mutate(Type = "Frequency of Mutational Pattern") %>% select(Type, Pattern, n)
 
     barchart_plot2(data = data_tmp, plot_width = 16, plot_height = 5, output_plot = barPath)
+
+    publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
+    seqmatrix_refdata <- get(load(paste0(dataPath, publicDataFile)))
 
     data_input <- seqmatrix_refdata %>% filter(Study == study) %>%
     filter(Profile == "SBS96") %>%
