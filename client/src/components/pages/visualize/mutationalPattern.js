@@ -216,6 +216,57 @@ export default function MutationalPattern({
     });
   }
 
+  const plots = (
+    <>
+      <div id="barchart">
+        <div style={{ display: err ? 'block' : 'none' }}>
+          <p>An error has occured. Check the debug section for more info.</p>
+        </div>
+        <div style={{ display: barURL ? 'block' : 'none' }}>
+          <div className="d-flex">
+            <a
+              className="px-2 py-1"
+              href={barURL}
+              download={barURL.split('/').slice(-1)[0]}
+            >
+              Download Plot
+            </a>
+          </div>
+          <div className="p-2 border rounded">
+            <Row>
+              <Col>
+                <img className="w-100 my-4 h-600" src={barURL}></img>
+              </Col>
+            </Row>
+          </div>
+        </div>
+      </div>
+      <div id="context">
+        <div style={{ display: err ? 'block' : 'none' }}>
+          <p>An error has occured. Check the debug section for more info.</p>
+        </div>
+        <div style={{ display: plotURL ? 'block' : 'none' }}>
+          <div className="d-flex">
+            <a
+              className="px-2 py-1"
+              href={plotURL}
+              download={plotURL.split('/').slice(-1)[0]}
+            >
+              Download Plot
+            </a>
+          </div>
+          <div className="p-2 border rounded">
+            <Row>
+              <Col>
+                <img className="w-100 my-4 h-600" src={plotURL}></img>
+              </Col>
+            </Row>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+
   return (
     <div>
       {source == 'user' && (
@@ -318,46 +369,8 @@ export default function MutationalPattern({
                           Calculate
                         </Button>
                       </Col>
-                    </Row>
-
-                    <div id="plot">
-                      <div style={{ display: err ? 'block' : 'none' }}>
-                        <p>
-                          An error has occured. Check the debug section for more
-                          info.
-                        </p>
-                      </div>
-                      <div style={{ display: plotURL ? 'block' : 'none' }}>
-                        <div className="d-flex">
-                          <a
-                            className="px-2 py-1"
-                            href={plotURL}
-                            download={plotURL.split('/').slice(-1)[0]}
-                          >
-                            Download Plot
-                          </a>
-                          <span className="ml-auto">
-                            <Button
-                              className="px-2 py-1"
-                              variant="link"
-                              onClick={() => downloadResults(txtPath)}
-                            >
-                              Download Results
-                            </Button>
-                          </span>
-                        </div>
-                        <div className="p-2 border rounded">
-                          <Row>
-                            <Col>
-                              <img
-                                className="w-100 my-4 h-600"
-                                src={plotURL}
-                              ></img>
-                            </Col>
-                          </Row>
-                        </div>
-                      </div>
-                    </div>
+                    </Row>{' '}
+                    {plots}
                   </div>
                 </Form>
               </Body>
@@ -437,36 +450,7 @@ export default function MutationalPattern({
                         </Button>
                       </Col>
                     </Row>
-
-                    <div id="plot">
-                      <div style={{ display: err ? 'block' : 'none' }}>
-                        <p>
-                          An error has occured. Check the debug section for more
-                          info.
-                        </p>
-                      </div>
-                      <div style={{ display: plotURL ? 'block' : 'none' }}>
-                        <div className="d-flex">
-                          <a
-                            className="px-2 py-1"
-                            href={plotURL}
-                            download={plotURL.split('/').slice(-1)[0]}
-                          >
-                            Download Plot
-                          </a>
-                        </div>
-                        <div className="p-2 border rounded">
-                          <Row>
-                            <Col>
-                              <img
-                                className="w-100 my-4 h-600"
-                                src={plotURL}
-                              ></img>
-                            </Col>
-                          </Row>
-                        </div>
-                      </div>
-                    </div>
+                    {plots}
                   </div>
                 </Form>
               </Body>
