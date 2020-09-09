@@ -10,7 +10,7 @@ const fs = require('fs');
 const rimraf = require('rimraf');
 const { v4: uuidv4 } = require('uuid');
 const Papa = require('papaparse');
-const r = require('r-wrapper');
+const r = require('r-wrapper').async;
 const AWS = require('aws-sdk');
 const app = express();
 
@@ -179,7 +179,7 @@ app.post('/visualize/summary', async (req, res) => {
   }
 });
 
-app.post('/api/visualizeR', (req, res) => {
+app.post('/api/visualizeR', async (req, res) => {
   logger.info('/api/visualizeR: function ' + req.body.fn);
   console.log('args', req.body);
   const savePath = path.join(
@@ -193,7 +193,7 @@ app.post('/api/visualizeR', (req, res) => {
     fs.mkdirSync(savePath, { recursive: true });
   }
   try {
-    const wrapper = r('services/R/visualizeWrapper.R', req.body.fn, {
+    const wrapper = await r('services/R/visualizeWrapper.R', req.body.fn, {
       ...req.body.args,
       projectID: req.body.projectID,
       pythonOutput: path.join(tmppath, req.body.projectID, 'results/output'),
@@ -215,15 +215,16 @@ app.post('/api/visualizeR', (req, res) => {
   }
 });
 
-app.post('/api/visualizeR/getReferenceSignatureSets', (req, res) => {
+app.post('/api/visualizeR/getReferenceSignatureSets', async (req, res) => {
   logger.info('/api/visualizeR/getReferenceSignatureSets: Calling R Wrapper');
   console.log('args', req.body);
 
   try {
-    const list = r('services/R/visualizeWrapper.R', 'getReferenceSignatureSets', [
-      req.body.profileType,
-      path.join(datapath, 'signature_visualization/'),
-    ]);
+    const list = await r(
+      'services/R/visualizeWrapper.R',
+      'getReferenceSignatureSets',
+      [req.body.profileType, path.join(datapath, 'signature_visualization/')]
+    );
 
     // console.log('SignatureReferenceSets', list);
 
@@ -235,11 +236,11 @@ app.post('/api/visualizeR/getReferenceSignatureSets', (req, res) => {
   }
 });
 
-app.post('/api/visualizeR/getSignatures', (req, res) => {
+app.post('/api/visualizeR/getSignatures', async (req, res) => {
   logger.info('/api/visualizeR/getSignatures: Calling R Wrapper');
 
   try {
-    const list = r('services/R/visualizeWrapper.R', 'getSignatures', [
+    const list = await r('services/R/visualizeWrapper.R', 'getSignatures', [
       req.body.profileType,
       req.body.signatureSetName,
       path.join(datapath, 'signature_visualization/'),
@@ -255,14 +256,17 @@ app.post('/api/visualizeR/getSignatures', (req, res) => {
   }
 });
 
-app.post('/visualize/getPublicDataOptions', (req, res) => {
-  logger.info('/visualize/getPublicOptions: Calling R Wrapper');
+app.post('/visualize/getPublicDataOptions', async (req, res) => {
+  logger.info('/visualize/getPublicOptions: Request');
   try {
-    const list = r('services/R/visualizeWrapper.R', 'getPublicDataOptions', [
-      path.join(datapath, 'signature_visualization/'),
-    ]);
+    const list = await r(
+      'services/R/visualizeWrapper.R',
+      'getPublicDataOptions',
+      [path.join(datapath, 'signature_visualization/')]
+    );
 
     res.json(JSON.parse(list));
+    logger.info('/visualize/getPublicOptions: Sucess');
   } catch (err) {
     logger.info('/visualize/getPublicOptions: An error occured');
     logger.error(err);
@@ -270,10 +274,10 @@ app.post('/visualize/getPublicDataOptions', (req, res) => {
   }
 });
 
-app.post('/visualize/getPublicData', (req, res) => {
+app.post('/visualize/getPublicData', async (req, res) => {
   logger.info('/visualize/getPublicOptions: Calling R Wrapper');
   try {
-    const list = r('services/R/visualizeWrapper.R', 'getPublicData', [
+    const list = await r('services/R/visualizeWrapper.R', 'getPublicData', [
       req.body.study,
       req.body.cancerType,
       req.body.experimentalStrategy,
