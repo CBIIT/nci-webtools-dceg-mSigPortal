@@ -16,7 +16,7 @@ import './visualize.scss';
 const { Group, Label, Check } = Form;
 
 export default function Visualize() {
-  const { openSidebar, loading, source } = useSelector(
+  const { openSidebar, loading, source, submitted } = useSelector(
     (state) => state.visualize
   );
 
@@ -41,6 +41,7 @@ export default function Visualize() {
                   </Label>
                   <Check inline id="radioUser" className="ml-4">
                     <Check.Input
+                      disabled={submitted}
                       type="radio"
                       value="user"
                       checked={source == 'user'}
@@ -54,6 +55,7 @@ export default function Visualize() {
                   </Check>
                   <Check inline id="radioPublic">
                     <Check.Input
+                      disabled={submitted}
                       type="radio"
                       value="public"
                       checked={source == 'public'}
