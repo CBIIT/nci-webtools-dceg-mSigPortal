@@ -35,11 +35,19 @@ export const getInitialState = () => ({
     error: '',
     projectID: '',
     // projectID: '04640afa-5530-4790-91db-6ff695a51478',
-    displayTab: 'mutationalProfiles',
+    displayTab: 'profilerSummary',
     downloads: [],
     svgList: [],
     matrixList: [],
     statistics: '',
+  },
+  profilerSummary: {
+    plotPath: '',
+    plotURL: '',
+    err: '',
+    debugR: '',
+    displayDebug: false,
+    loading: false,
   },
   mutationalProfiles: {
     filtered: [],
@@ -222,6 +230,19 @@ const visualizeResultsSlice = createSlice({
   },
 });
 
+const profilerSummarySlice = createSlice({
+  name: 'profilerSummary',
+  initialState: getInitialState().profilerSummary,
+  reducers: {
+    updateProfilerSummary: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
+
 const mutationalProfilesSlice = createSlice({
   name: 'mutationalProfiles',
   initialState: getInitialState().mutationalProfiles,
@@ -303,6 +324,7 @@ const errorSlice = createSlice({
 const rootReducer = combineReducers({
   visualize: visualizeSlice.reducer,
   visualizeResults: visualizeResultsSlice.reducer,
+  profilerSummary: profilerSummarySlice.reducer,
   mutationalProfiles: mutationalProfilesSlice.reducer,
   cosineSimilarity: cosineSimilaritySlice.reducer,
   mutationalPattern: mutationalPatternSlice.reducer,
@@ -318,6 +340,7 @@ export const store = configureStore({
 
 export const { updateVisualize } = visualizeSlice.actions;
 export const { updateVisualizeResults } = visualizeResultsSlice.actions;
+export const { updateProfilerSummary } = profilerSummarySlice.actions;
 export const { updateMutationalProfiles } = mutationalProfilesSlice.actions;
 export const { updateCosineSimilarity } = cosineSimilaritySlice.actions;
 export const { updateMutationalPattern } = mutationalPatternSlice.actions;
@@ -331,6 +354,10 @@ export function dispatchVisualize(obj) {
 
 export function dispatchVisualizeResults(obj) {
   store.dispatch(updateVisualizeResults(obj));
+}
+
+export function dispatchProfilerSummary(obj) {
+  store.dispatch(updateProfilerSummary(obj));
 }
 
 export function dispatchMutationalProfiles(obj) {

@@ -10,8 +10,10 @@ import {
   dispatchMutationalPattern,
   dispatchProfileComparison,
   dispatchPCA,
+  dispatchProfilerSummary,
 } from '../../../services/store';
 
+import ProfilerSummary from './profilerSummary';
 import MutationalProfiles from './mutationalProfiles';
 import CosineSimilarity from './cosineSimilarity';
 import MutationalPattern from './mutationalPattern';
@@ -353,6 +355,7 @@ export default function Results({ setOpenSidebar }) {
       <Header>
         <Nav variant="pills" defaultActiveKey="#mutationalProfiles">
           {[
+            { title: 'Profiler Summary', id: 'profilerSummary' },
             { title: 'Mutational Profiles', id: 'mutationalProfiles' },
             { title: 'Cosine Similarity', id: 'cosineSimilarity' },
             {
@@ -364,7 +367,7 @@ export default function Results({ setOpenSidebar }) {
             { title: 'Download', id: 'download' },
           ].map(({ title, id }) => {
             return (
-              <Item>
+              <Item key={id}>
                 <Link
                   active={displayTab == id}
                   onClick={() => dispatchVisualizeResults({ displayTab: id })}
@@ -376,6 +379,13 @@ export default function Results({ setOpenSidebar }) {
           })}
         </Nav>
       </Header>
+      <Body
+        style={{
+          display: displayTab == 'profilerSummary' ? 'block' : 'none',
+        }}
+      >
+        <ProfilerSummary submitR={(fn, args) => submitR(fn, args)} />
+      </Body>
       <Body
         style={{
           display: displayTab == 'mutationalProfiles' ? 'block' : 'none',

@@ -47,21 +47,70 @@ getPublicData <- function(study, cancerType, experimentalStrategy, dataPath) {
 }
 
 # Tumor Mutation Burden ---------------------------------------------------
-profilerSummary <- function(matrixFile, projectID, pythonOutput, savePath, dataPath) {
-  data_input <- tibble()
-  for (i in 1:dim(matrixfiles)[1]) {
-    matrixfile_selected <- matrixfiles$Path[i]
-    if (dim(data_input_tmp)[1] > 0) {
+profilerSummary <- function(matrixList, projectID, pythonOutput, savePath, dataPath) {
+  source('services/R/Sigvisualfunc.R')
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+    plotPath = paste0(savePath, '/cos_sim_within.svg')
+
+    matrixList = fromJSON(matrixList)
+    data_input <- tibble()
+
+    for (i in 1:dim(matrixList)[1]) {
+      matrixfile_selected <- matrixList$Path[i]
       data_input_tmp <- read_delim(matrixfile_selected, delim = '\t')
-      #data_input_tmp <- data_input_tmp %>% select_if(~ !is.numeric(.)|| sum(.)>0)
       data_input_tmp <- data_input_tmp %>% pivot_longer(cols = -MutationType) %>%
         group_by(name) %>%
         summarise(Mutations = sum(value, na.rm = TRUE)) %>%
-        mutate(Profile = paste0(matrixfiles$Profile_Type[i], matrixfiles$Matrix_Size[i])) %>%
+        mutate(Profile = paste0(matrixList$Profile_Type[i], matrixList$Matrix_Size[i])) %>%
         select(Sample = name, Profile, Mutations)
       data_input <- bind_rows(data_input, data_input_tmp)
     }
-  }
+    profile_heatmap_plot(data = data_input, output_plot = plotPath)
+
+    output = list('plotPath' = plotPath)
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+  })
+}
+
+profilerSummaryPublic <- function(study, cancerType, experimentalStrategy, projectID, pythonOutput, savePath, dataPath) {
+  source('services/R/Sigvisualfunc.R')
+  load(paste0(dataPath, 'seqmatrix_refdata_subset_files.RData'))
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+    plotPath = paste0(savePath, '/cos_sim_within.svg')
+
+    publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
+    seqmatrix_refdata_public <- get(load(paste0(dataPath, publicDataFile)))
+
+    data_input <- seqmatrix_refdata_public %>%
+      group_by(Sample, Profile) %>%
+      summarise(Mutations = sum(Mutations, na.rm = TRUE)) %>%
+      ungroup()
+
+    profile_heatmap_plot(data = data_input, output_plot = plotPath)
+
+    output = list('plotPath' = plotPath)
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+  })
 }
 
 ### Cosine Similarity tab ###
