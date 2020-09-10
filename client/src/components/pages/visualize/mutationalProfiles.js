@@ -37,7 +37,7 @@ export default function MutationalProfiles() {
     if (!plotURL && displayTab == 'mutationalProfiles') {
       setPlot();
     }
-  }, [filtered]);
+  }, [filtered, displayTab]);
   // set new plots on dropdown change
   useEffect(() => {
     if (plotURL && displayTab == 'mutationalProfiles') {
