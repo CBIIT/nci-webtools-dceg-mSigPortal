@@ -63,12 +63,14 @@ profilerSummary <- function(matrixList, projectID, pythonOutput, savePath, dataP
     for (i in 1:dim(matrixList)[1]) {
       matrixfile_selected <- matrixList$Path[i]
       data_input_tmp <- read_delim(matrixfile_selected, delim = '\t')
-      data_input_tmp <- data_input_tmp %>% pivot_longer(cols = -MutationType) %>%
+      if (dim(data_input_tmp)[1] > 0) {
+        data_input_tmp <- data_input_tmp %>% pivot_longer(cols = -MutationType) %>%
         group_by(name) %>%
         summarise(Mutations = sum(value, na.rm = TRUE)) %>%
         mutate(Profile = paste0(matrixList$Profile_Type[i], matrixList$Matrix_Size[i])) %>%
         select(Sample = name, Profile, Mutations)
-      data_input <- bind_rows(data_input, data_input_tmp)
+        data_input <- bind_rows(data_input, data_input_tmp)
+      }
     }
     profile_heatmap_plot(data = data_input, output_plot = plotPath)
 
@@ -583,9 +585,9 @@ mutationalPatternPublic <- function(study, cancerType, experimentalStrategy, pro
     txtPath = paste0(savePath, '/mpea.txt')
 
     data_tmp <- content_data_all %>%
-    filter(N1 > proportion, str_detect(Study, paste0("^", study, "@"))) %>%
-    count(Pattern, sort = T) %>%
-    mutate(Type = "Frequency of Mutational Pattern") %>% select(Type, Pattern, n)
+      filter(N1 > proportion, str_detect(Study, paste0("^", study, "@"))) %>%
+      count(Pattern, sort = T) %>%
+      mutate(Type = "Frequency of Mutational Pattern") %>% select(Type, Pattern, n)
 
     barchart_plot2(data = data_tmp, plot_width = 16, plot_height = 5, output_plot = barPath)
 

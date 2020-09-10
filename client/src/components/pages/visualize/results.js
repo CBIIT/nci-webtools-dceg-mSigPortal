@@ -160,12 +160,6 @@ export default function Results({ setOpenSidebar }) {
       userMatrixOptions: filteredMatrixOptions,
     });
 
-    dispatchMutationalPattern({
-      profileType: profileOptions[0],
-      matrixSize: filteredMatrixList[0],
-      matrixOptions: filteredMatrixList,
-    });
-
     dispatchProfileComparison({
       withinProfileType: profileOptions[0],
       withinSampleName1: nameOptions[0],
@@ -408,7 +402,6 @@ export default function Results({ setOpenSidebar }) {
         }}
       >
         <MutationalPattern
-          getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
           downloadResults={(path) => downloadResults(path)}
           submitR={(fn, args) => submitR(fn, args)}
         />

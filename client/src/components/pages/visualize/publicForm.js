@@ -16,6 +16,7 @@ import {
   dispatchProfileComparison,
   dispatchPCA,
   dispatchMutationalPattern,
+  dispatchProfilerSummary,
 } from '../../../services/store';
 const { Group, Label } = Form;
 const { Title, Content } = Popover;
@@ -98,6 +99,7 @@ export default function PublicForm() {
   function handleReset() {
     const initialState = getInitialState();
     dispatchVisualize({ submitted: false });
+    dispatchProfilerSummary(initialState.profilerSummary);
     dispatchVisualizeResults(initialState.visualizeResults);
     dispatchMutationalProfiles(initialState.mutationalProfiles);
     dispatchMutationalPattern(initialState.mutationalPattern);

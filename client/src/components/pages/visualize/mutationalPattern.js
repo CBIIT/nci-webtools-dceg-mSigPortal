@@ -1,47 +1,25 @@
-import React, { useEffect } from 'react';
-import {
-  Form,
-  Row,
-  Col,
-  Button,
-  Popover,
-  OverlayTrigger,
-  Accordion,
-  Card,
-} from 'react-bootstrap';
-import Select from 'react-select';
+import React from 'react';
+import { Form, Row, Col, Button, Accordion, Card } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faInfoCircle,
-  faPlus,
-  faMinus,
-} from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 import {
   dispatchError,
   dispatchMutationalPattern,
 } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
-const { Group, Label, Control, Text } = Form;
+const { Label, Control, Text } = Form;
 const { Header, Body } = Card;
 const { Toggle, Collapse } = Accordion;
 
-export default function MutationalPattern({
-  downloadResults,
-  submitR,
-  getRefSigOptions,
-}) {
+export default function MutationalPattern({ downloadResults, submitR }) {
   const { source, study, cancerType, pubExperimentalStrategy } = useSelector(
     (state) => state.visualize
   );
   const { matrixList } = useSelector((state) => state.visualizeResults);
-  const { profileOptions } = useSelector((state) => state.mutationalProfiles);
   const rootURL = window.location.pathname;
   const {
-    profileType,
-    matrixSize,
-    matrixOptions,
     proportion,
     pattern,
 
@@ -105,69 +83,6 @@ export default function MutationalPattern({
     dispatchMutationalPattern({ submitOverlay: false });
   }
 
-  // get Signature Reference Sets for dropdown options
-  async function getSignatureSet(profileType) {
-    if (profileType) {
-      dispatchMutationalPattern({ refSubmitOverlay: true });
-      try {
-        const response = await getRefSigOptions(profileType);
-
-        if (response.ok) {
-          const signatureSetOptions = await response.json();
-
-          dispatchMutationalPattern({
-            refSignatureSetOptions: signatureSetOptions,
-            refSignatureSet: signatureSetOptions[0],
-            refSubmitOverlay: false,
-          });
-          getSignatures(profileType, signatureSetOptions[0]);
-        } else {
-          dispatchError(await response.json());
-          dispatchMutationalPattern({ refSubmitOverlay: false });
-        }
-      } catch (err) {
-        dispatchError(err);
-        dispatchMutationalPattern({ refSubmitOverlay: false });
-      }
-    }
-  }
-
-  // get signature options for compare
-  async function getSignatures(profileType, signatureSetName) {
-    if (signatureSetName) {
-      dispatchMutationalPattern({ refSubmitOverlay: true });
-      try {
-        const response = await fetch(`${rootURL}api/visualizeR/getSignatures`, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            profileType: profileType,
-            signatureSetName: signatureSetName,
-          }),
-        });
-
-        if (response.ok) {
-          const signatures = await response.json();
-
-          dispatchMutationalPattern({
-            refSignatures: signatures,
-            refCompare: signatures[0],
-            refSubmitOverlay: false,
-          });
-        } else {
-          dispatchError(await response.json());
-          dispatchMutationalPattern({ refSubmitOverlay: false });
-        }
-      } catch (err) {
-        dispatchError(err);
-        dispatchMutationalPattern({ refSubmitOverlay: false });
-      }
-    }
-  }
-
   async function calculateR(fn, args) {
     dispatchMutationalPattern({
       submitOverlay: true,
@@ -200,46 +115,40 @@ export default function MutationalPattern({
     }
   }
 
-  function handleProfileType(profileType) {
-    const matrixOptions = [
-      ...new Set(
-        matrixList
-          .filter((matrix) => matrix.Profile_Type == profileType)
-          .map((matrix) => matrix.Matrix_Size)
-      ),
-    ];
-
-    dispatchMutationalPattern({
-      profileType: profileType,
-      matrixSize: matrixOptions[0],
-      matrixOptions: matrixOptions,
-    });
-  }
-
   const plots = (
     <>
       <div id="barchart">
         <div style={{ display: err ? 'block' : 'none' }}>
           <p>An error has occured. Check the debug section for more info.</p>
         </div>
-        <div style={{ display: barURL ? 'block' : 'none' }}>
-          <div className="d-flex">
-            <a
-              className="px-2 py-1"
-              href={barURL}
-              download={barURL.split('/').slice(-1)[0]}
-            >
-              Download Plot
-            </a>
+        {barURL.length > 0 ? (
+          <div>
+            <div className="d-flex">
+              <a
+                className="px-2 py-1"
+                href={barURL}
+                download={barURL.split('/').slice(-1)[0]}
+              >
+                Download Plot
+              </a>
+            </div>
+            <div className="p-2 border rounded">
+              <Row>
+                <Col>
+                  <img className="w-100 my-4 h-600" src={barURL}></img>
+                </Col>
+              </Row>
+            </div>
           </div>
-          <div className="p-2 border rounded">
-            <Row>
-              <Col>
-                <img className="w-100 my-4 h-600" src={barURL}></img>
-              </Col>
-            </Row>
+        ) : (
+          <div>
+            <h4>Proportion</h4>
+            <p>
+              No mutational pattern with proportion of mutations large than{' '}
+              {proportion}
+            </p>
           </div>
-        </div>
+        )}
       </div>
       <div id="context">
         <div style={{ display: err ? 'block' : 'none' }}>
@@ -254,6 +163,15 @@ export default function MutationalPattern({
             >
               Download Plot
             </a>
+            <span className="ml-auto">
+              <Button
+                className="px-2 py-1"
+                variant="link"
+                onClick={() => downloadResults(txtPath)}
+              >
+                Download Results
+              </Button>
+            </span>
           </div>
           <div className="p-2 border rounded">
             <Row>
@@ -295,35 +213,7 @@ export default function MutationalPattern({
                   <LoadingOverlay active={submitOverlay} />
                   <div>
                     <Row className="justify-content-center">
-                      <Col sm="2">
-                        <Group controlId="profileType">
-                          <Label>Profile Type</Label>
-                          <Select
-                            options={profileOptions}
-                            value={[profileType]}
-                            onChange={(profile) => handleProfileType(profile)}
-                            getOptionLabel={(option) => option}
-                            getOptionValue={(option) => option}
-                            {...selectFix}
-                          />
-                        </Group>
-                      </Col>
-                      <Col sm="2">
-                        <Label>Matrix Size</Label>
-                        <Select
-                          options={matrixOptions}
-                          value={[matrixSize]}
-                          onChange={(matrix) =>
-                            dispatchMutationalPattern({
-                              matrixSize: matrix,
-                            })
-                          }
-                          getOptionLabel={(option) => option}
-                          getOptionValue={(option) => option}
-                          {...selectFix}
-                        />
-                      </Col>
-                      <Col sm="3">
+                      <Col sm="5">
                         <Label>
                           Minimal Proportion mutations within Each Mutational
                           Pattern
@@ -338,7 +228,7 @@ export default function MutationalPattern({
                         ></Control>{' '}
                         <Text className="text-muted">(Ex. 0.8)</Text>
                       </Col>
-                      <Col sm="3">
+                      <Col sm="5">
                         <Label>Mutational Pattern</Label>
                         <Control
                           value={pattern}
@@ -358,10 +248,10 @@ export default function MutationalPattern({
                             calculateR('mutationalPattern', {
                               matrixFile: matrixList.filter(
                                 (path) =>
-                                  path.Profile_Type == profileType &&
-                                  path.Matrix_Size == matrixSize
+                                  path.Profile_Type == 'SBS' &&
+                                  path.Matrix_Size == '96'
                               )[0].Path,
-                              proportion: proportion,
+                              proportion: parseFloat(proportion),
                               pattern: pattern,
                             });
                           }}
@@ -441,7 +331,7 @@ export default function MutationalPattern({
                               study: study,
                               cancerType: cancerType,
                               experimentalStrategy: pubExperimentalStrategy,
-                              proportion: proportion,
+                              proportion: parseFloat(proportion),
                               pattern: pattern,
                             });
                           }}

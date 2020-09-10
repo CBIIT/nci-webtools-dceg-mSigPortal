@@ -16,24 +16,29 @@ export default function ProfilerSummary({ submitR }) {
     pubExperimentalStrategy,
     pDataOptions,
   } = useSelector((state) => state.visualize);
-  const { matrixList } = useSelector((state) => state.visualizeResults);
+  const { matrixList, svgList } = useSelector(
+    (state) => state.visualizeResults
+  );
   const { plotPath, plotURL, err, debugR, displayDebug, loading } = useSelector(
     (state) => state.profilerSummary
   );
   const rootURL = window.location.pathname;
 
   useEffect(() => {
-    if (!plotPath && matrixList.length && source == 'user') {
-      calculateR('profilerSummary', {
-        matrixList: JSON.stringify(matrixList),
-      });
-    } else
-      calculateR('profilerSummaryPublic', {
-        study: study,
-        cancerType: cancerType,
-        experimentalStrategy: pubExperimentalStrategy,
-      });
-  }, [plotPath, matrixList]);
+    if (!loading && !plotPath) {
+      if (source == 'user' && matrixList.length) {
+        calculateR('profilerSummary', {
+          matrixList: JSON.stringify(matrixList),
+        });
+      } else if (source == 'public' && svgList.length) {
+        calculateR('profilerSummaryPublic', {
+          study: study,
+          cancerType: cancerType,
+          experimentalStrategy: pubExperimentalStrategy,
+        });
+      }
+    }
+  }, [matrixList, svgList]);
 
   async function setRPlot(plotPath) {
     if (plotPath) {
@@ -119,7 +124,7 @@ export default function ProfilerSummary({ submitR }) {
           <div className="p-2 border rounded">
             <Row>
               <Col>
-                <img className="w-100 my-4" src={plotURL}></img>
+                <img className="w-100 my-4 h-1000" src={plotURL}></img>
               </Col>
             </Row>
           </div>

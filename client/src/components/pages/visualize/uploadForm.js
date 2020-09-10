@@ -27,6 +27,7 @@ import {
   dispatchProfileComparison,
   dispatchPCA,
   dispatchMutationalPattern,
+  dispatchProfilerSummary,
 } from '../../../services/store';
 const { Group, Label, Control, Check, Text } = Form;
 const { Title, Content } = Popover;
@@ -199,6 +200,7 @@ export default function UploadForm() {
     removeBedFile();
     dispatchVisualize(initialState.visualize);
     dispatchVisualizeResults(initialState.visualizeResults);
+    dispatchProfilerSummary(initialState.profilerSummary);
     dispatchMutationalProfiles(initialState.mutationalProfiles);
     dispatchMutationalPattern(initialState.mutationalPattern);
     dispatchCosineSimilarity(initialState.cosineSimilarity);

@@ -98,10 +98,6 @@ export const getInitialState = () => ({
     pubSubmitOverlay: false,
   },
   mutationalPattern: {
-    profileType: '',
-    profileType: '',
-    matrixSize: '',
-    matrixOptions: '',
     proportion: '',
     pattern: '',
 
