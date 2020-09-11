@@ -196,7 +196,15 @@ export const getInitialState = () => ({
     displayTab: 'referenceSignatures',
     projectID: '',
   },
-  exploringRefSigs: {
+  exploringRefSig: {
+    plotPath: '',
+    plotURL: '',
+    debugR: '',
+    err: '',
+    displayDebug: false,
+    loading: false,
+  },
+  mutationalSigPro: {
     plotPath: '',
     plotURL: '',
     debugR: '',
@@ -329,7 +337,7 @@ const errorSlice = createSlice({
 });
 
 const exploringSlice = createSlice({
-  name: 'visualize',
+  name: 'exploring',
   initialState: getInitialState().exploring,
   reducers: {
     updateExploring: (state, action) => {
@@ -341,11 +349,24 @@ const exploringSlice = createSlice({
   },
 });
 
-const exploringRefSigsSlice = createSlice({
-  name: 'visualize',
-  initialState: getInitialState().exploringRefSigs,
+const exploringRefSigSlice = createSlice({
+  name: 'exploringRefSig',
+  initialState: getInitialState().exploringRefSig,
   reducers: {
-    updateExploringRefSigs: (state, action) => {
+    updateExploringRefSig: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
+
+const mutationalSigProSlice = createSlice({
+  name: 'mutationalSigPro',
+  initialState: getInitialState().mutationalSigPro,
+  reducers: {
+    updateMutationalSigPro: (state, action) => {
       return {
         ...state,
         ...action.payload,
@@ -365,7 +386,8 @@ const rootReducer = combineReducers({
   pca: pcaSlice.reducer,
   error: errorSlice.reducer,
   exploring: exploringSlice.reducer,
-  exploringRefSigs: exploringRefSigsSlice.reducer,
+  exploringRefSig: exploringRefSigSlice.reducer,
+  mutationalSigPro: mutationalSigProSlice.reducer,
 });
 
 export const store = configureStore({
@@ -383,7 +405,8 @@ export const { updateProfileComparison } = profileComparisonSlice.actions;
 export const { updatePCA } = pcaSlice.actions;
 export const { updateError } = errorSlice.actions;
 export const { updateExploring } = exploringSlice.actions;
-export const { updateExploringRefSigs } = exploringRefSigsSlice.actions;
+export const { updateExploringRefSig } = exploringRefSigSlice.actions;
+export const { updateMutationalSigPro } = mutationalSigProSlice.actions;
 
 export function dispatchVisualize(obj) {
   store.dispatch(updateVisualize(obj));
@@ -430,6 +453,10 @@ export function dispatchExploring(obj) {
   store.dispatch(updateExploring(obj));
 }
 
-export function dispatchExploringRefSigs(obj) {
-  store.dispatch(updateExploringRefSigs(obj));
+export function dispatchExploringRefSig(obj) {
+  store.dispatch(updateExploringRefSig(obj));
+}
+
+export function dispatchMutationalSigPro(obj) {
+  store.dispatch(updateMutationalSigPro(obj));
 }

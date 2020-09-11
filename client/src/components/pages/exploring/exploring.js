@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, Nav } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import ReferenceSignatures from './referenceSignatures';
+import MutationalSigPro from './mutationalSignatureProfile';
 import { dispatchError, dispatchExploring } from '../../../services/store';
 
 const { Header, Body } = Card;
@@ -30,7 +31,7 @@ export default function Explore() {
           <Nav variant="pills" defaultActiveKey="#mutationalProfiles">
             {[
               { title: 'Reference Signatures', id: 'referenceSignatures' },
-              // { title: 'Mutational Profiles', id: 'mutationalProfiles' },
+              { title: 'Mutational Signature Profile', id: 'mutationalSigPro' },
               // { title: 'Cosine Similarity', id: 'cosineSimilarity' },
               // {
               //   title: 'Mutational Pattern Enrichment Analysis',
@@ -60,14 +61,14 @@ export default function Explore() {
         >
           <ReferenceSignatures submitR={(fn, args) => submitR(fn, args)} />
         </Body>
-        {/*  <Body
+        <Body
           style={{
-            display: displayTab == 'mutationalProfiles' ? 'block' : 'none',
+            display: displayTab == 'mutationalSigPro' ? 'block' : 'none',
           }}
         >
-          <MutationalProfiles />
+          <MutationalSigPro submitR={(fn, args) => submitR(fn, args)} />
         </Body>
-        <Body
+        {/*  <Body
           style={{
             display: displayTab == 'cosineSimilarity' ? 'block' : 'none',
           }}

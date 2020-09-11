@@ -3,26 +3,26 @@ import { Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
-  dispatchExploringRefSig,
+  dispatchMutationalSigPro,
 } from '../../../services/store';
 
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
-export default function ReferenceSignatures({ submitR }) {
+export default function MutationalSignatureProfile({ submitR }) {
   const rootURL = window.location.pathname;
   const { plotPath, plotURL, debugR, err, displayDebug, loading } = useSelector(
-    (state) => state.exploringRefSig
+    (state) => state.mutationalSigPro
   );
   const { displayTab } = useSelector((state) => state.exploring);
-
   useEffect(() => {
-    if (!loading && !plotPath && displayTab == 'referenceSignatures') {
-      calculateR('referenceSignatures', {});
+    if (!loading && !plotPath && displayTab == 'mutationalSigPro') {
+      calculateR('mutationalSigPro', {});
     }
   }, [plotPath, displayTab]);
 
   async function calculateR(fn, args) {
-    dispatchExploringRefSig({
+    console.log(fn);
+    dispatchMutationalSigPro({
       loading: true,
       err: false,
       debugR: '',
@@ -33,14 +33,14 @@ export default function ReferenceSignatures({ submitR }) {
       if (!response.ok) {
         const err = await response.json();
 
-        dispatchExploringRefSig({
+        dispatchMutationalSigPro({
           loading: false,
           debugR: err,
         });
       } else {
         const { debugR, output } = await response.json();
 
-        dispatchExploringRefSig({
+        dispatchMutationalSigPro({
           debugR: debugR,
           loading: false,
           plotPath: output.plotPath,
@@ -49,14 +49,14 @@ export default function ReferenceSignatures({ submitR }) {
       }
     } catch (err) {
       dispatchError(err);
-      dispatchExploringRefSig({ loading: false });
+      dispatchMutationalSigPro({ loading: false });
     }
   }
 
   async function setRPlot(plotPath) {
     if (plotPath) {
       try {
-        const response = await fetch(`${rootURL}getSVG`, {
+        const response = await fetch(`${rootURL}getPublicSVG`, {
           method: 'POST',
           headers: {
             Accept: 'image/svg',
@@ -71,7 +71,7 @@ export default function ReferenceSignatures({ submitR }) {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchExploringRefSig({
+          dispatchMutationalSigPro({
             plotURL: objectURL,
           });
         }
@@ -80,7 +80,7 @@ export default function ReferenceSignatures({ submitR }) {
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchExploringRefSig({ err: true, plotURL: '' });
+      dispatchMutationalSigPro({ err: true, plotURL: '' });
     }
   }
 
@@ -115,7 +115,7 @@ export default function ReferenceSignatures({ submitR }) {
         variant="link"
         className="p-0 mt-5"
         onClick={() =>
-          dispatchExploringRefSig({
+          dispatchMutationalSigPro({
             displayDebug: !displayDebug,
           })
         }

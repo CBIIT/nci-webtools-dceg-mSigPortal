@@ -49,4 +49,36 @@ referenceSignatures <- function(projectID, pythonOutput, savePath, dataPath) {
   })
 }
 
+# section 2: Mutational signature profile  --------------------------------------------------------------
+mutationalSigPro <- function(projectID, pythonOutput, savePath, dataPath) {
+  source('services/R/Sigvisualfunc.R')
+  load(paste0(dataPath, 'signature_refsets.RData'))
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+
+    path_profile <- paste0(dataPath, 'Reference_Signature_Profiles_SVG/')
+    signature_profile_files <- signature_refsets %>% select(Source, Profile, Signature_set_name, Dataset, Signature_name) %>% unique() %>% mutate(Path = str_replace_all(Signature_set_name, " ", "_"), Path = str_remove_all(Path, "[()]"), Path = paste0(path_profile, Path, "/", Signature_name, ".svg"))
+    # print(signature_profile_files$Path)
+    ## multiple selected profiles
+    signature_source_input <- "Reference_signatures"
+    profile_name_input <- "SBS96"
+    signatureset_name_input <- "COSMIC v3 Signatures (SBS)"
+    dataset_input <- "WGS"
+    signature_name_input <- "SBS1"
+    svgfile_selected <- signature_profile_files %>% filter(Source == signature_source_input, Profile == profile_name_input, Signature_set_name == signatureset_name_input, Dataset == dataset_input, Signature_name == signature_name_input) %>% pull(Path)
+    # print(svgfile_selected)
+
+    output = list('plotPath' = svgfile_selected)
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+  })
+}
 
