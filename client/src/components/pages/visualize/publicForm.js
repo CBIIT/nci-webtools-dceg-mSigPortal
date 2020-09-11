@@ -59,7 +59,7 @@ export default function PublicForm() {
       },
     });
     try {
-      const response = await fetch(`${rootURL}visualize/getPublicData`, {
+      const response = await fetch(`${rootURL}getPublicData`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -111,7 +111,7 @@ export default function PublicForm() {
   async function getPublicDataOptions() {
     dispatchVisualize({ loadingPublic: true });
     try {
-      const response = await fetch(`${rootURL}visualize/getPublicDataOptions`, {
+      const response = await fetch(`${rootURL}getPublicDataOptions`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',

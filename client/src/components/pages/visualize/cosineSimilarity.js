@@ -88,7 +88,7 @@ export default function CosineSimilarity({
     setOverlay(type, true);
     if (plotPath) {
       try {
-        const response = await fetch(`${rootURL}visualize/svg`, {
+        const response = await fetch(`${rootURL}getSVG`, {
           method: 'POST',
           headers: {
             Accept: 'image/svg',

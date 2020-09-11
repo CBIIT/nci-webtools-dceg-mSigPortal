@@ -43,7 +43,7 @@ export default function ProfilerSummary({ submitR }) {
   async function setRPlot(plotPath) {
     if (plotPath) {
       try {
-        const response = await fetch(`${rootURL}visualize/svg`, {
+        const response = await fetch(`${rootURL}getSVG`, {
           method: 'POST',
           headers: {
             Accept: 'image/svg',

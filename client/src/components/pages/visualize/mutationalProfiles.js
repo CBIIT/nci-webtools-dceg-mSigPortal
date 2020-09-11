@@ -60,7 +60,7 @@ export default function MutationalProfiles() {
       try {
         const response =
           source == 'user'
-            ? await fetch(`${rootURL}visualize/svg`, {
+            ? await fetch(`${rootURL}getSVG`, {
                 method: 'POST',
                 headers: {
                   Accept: 'image/svg',
@@ -68,7 +68,7 @@ export default function MutationalProfiles() {
                 },
                 body: JSON.stringify({ path: plot.Path }),
               })
-            : await fetch(`${rootURL}visualize/svgPublic`, {
+            : await fetch(`${rootURL}getPublicSVG`, {
                 method: 'POST',
                 headers: {
                   Accept: 'image/svg',

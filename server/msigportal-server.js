@@ -122,20 +122,20 @@ async function getSummary(resultsPath) {
   };
 }
 
-app.post('/api/visualize', (req, res) => {
+app.post('/profilerExtraction', (req, res) => {
   req.setTimeout(15 * 60 * 1000);
   res.setTimeout(15 * 60 * 1000, () => {
     res.status(504).send('request timed out');
   });
 
-  logger.info('/api/visualize: Spawning Python Process');
+  logger.info('/profilerExtraction: Spawning Python Process');
   let reqBody = { ...req.body };
   // update paths
   reqBody.outputDir[1] = path.join(tmppath, reqBody.outputDir[1], 'results');
   const args = Object.values(reqBody);
   const cli = args.reduce((params, arg) => [...params, ...arg]);
 
-  logger.debug('/api/visualize: CLI args\n' + cli);
+  logger.debug('/profilerExtraction: CLI args\n' + cli);
   let stdout = '';
   let stderr = '';
   const wrapper = spawn('python3', [
@@ -154,7 +154,7 @@ app.post('/api/visualize', (req, res) => {
     if (fs.existsSync(path.join(resultsPath, 'svg_files_list.txt'))) {
       res.json({ ...scriptOut, ...(await getSummary(resultsPath)) });
     } else {
-      logger.info('/api/visualize: An Error Occured While Extracting Profiles');
+      logger.info('/profilerExtraction: An Error Occured While Extracting Profiles');
       res.status(500).json({
         msg:
           'An error occured durring profile extraction. Please review your input parameters and try again.',
@@ -165,22 +165,22 @@ app.post('/api/visualize', (req, res) => {
 });
 
 // read summary files and return plot mapping
-app.post('/visualize/summary', async (req, res) => {
-  logger.info('/visualize/summary: Retrieving Summary');
+app.post('/getSummary', async (req, res) => {
+  logger.info('/getSummary: Retrieving Summary');
   const resultsPath = path.join(tmppath, req.body.projectID, 'results');
 
   if (fs.existsSync(path.join(resultsPath, 'svg_files_list.txt'))) {
     res.json(await getSummary(resultsPath));
   } else {
-    logger.info('/visualize/summary: Summary file not found');
+    logger.info('/getSummary: Summary file not found');
     res.status(500).json({
       msg: 'Summary file not found',
     });
   }
 });
 
-app.post('/api/visualizeR', async (req, res) => {
-  logger.info('/api/visualizeR: function ' + req.body.fn);
+app.post('/visualizeR', async (req, res) => {
+  logger.info('/visualizeR: function ' + req.body.fn);
   console.log('args', req.body);
   const savePath = path.join(
     tmppath,
@@ -209,14 +209,14 @@ app.post('/api/visualizeR', async (req, res) => {
       output: output,
     });
   } catch (err) {
-    logger.info('/api/visualizeR: An error occured');
+    logger.info('/visualizeR: An error occured');
     logger.error(err);
     res.status(500).json(err.message);
   }
 });
 
-app.post('/api/visualizeR/getReferenceSignatureSets', async (req, res) => {
-  logger.info('/api/visualizeR/getReferenceSignatureSets: Calling R Wrapper');
+app.post('/visualizeR/getReferenceSignatureSets', async (req, res) => {
+  logger.info('/visualizeR/getReferenceSignatureSets: Calling R Wrapper');
   console.log('args', req.body);
 
   try {
@@ -230,14 +230,14 @@ app.post('/api/visualizeR/getReferenceSignatureSets', async (req, res) => {
 
     res.json(list);
   } catch (err) {
-    logger.info('/api/visualizeR/getReferenceSignatureSets: An error occured');
+    logger.info('/visualizeR/getReferenceSignatureSets: An error occured');
     logger.error(err);
     res.status(500).json(err.message);
   }
 });
 
-app.post('/api/visualizeR/getSignatures', async (req, res) => {
-  logger.info('/api/visualizeR/getSignatures: Calling R Wrapper');
+app.post('/visualizeR/getSignatures', async (req, res) => {
+  logger.info('/visualizeR/getSignatures: Calling R Wrapper');
 
   try {
     const list = await r('services/R/visualizeWrapper.R', 'getSignatures', [
@@ -250,13 +250,13 @@ app.post('/api/visualizeR/getSignatures', async (req, res) => {
 
     res.json(list);
   } catch (err) {
-    logger.info('/api/visualizeR/getSignatures: An error occured');
+    logger.info('/visualizeR/getSignatures: An error occured');
     logger.error(err);
     res.status(500).json(err.message);
   }
 });
 
-app.post('/visualize/getPublicDataOptions', async (req, res) => {
+app.post('/getPublicDataOptions', async (req, res) => {
   logger.info('/visualize/getPublicOptions: Request');
   try {
     const list = await r(
@@ -274,7 +274,7 @@ app.post('/visualize/getPublicDataOptions', async (req, res) => {
   }
 });
 
-app.post('/visualize/getPublicData', async (req, res) => {
+app.post('/getPublicData', async (req, res) => {
   logger.info('/visualize/getPublicOptions: Calling R Wrapper');
   try {
     const list = await r('services/R/visualizeWrapper.R', 'getPublicData', [
@@ -304,14 +304,14 @@ app.post('/visualize/getPublicData', async (req, res) => {
   }
 });
 
-app.post('/visualize/upload', (req, res, next) => {
+app.post('/upload', (req, res, next) => {
   const projectID = uuidv4();
   const form = formidable({
     uploadDir: path.join(tmppath, projectID),
     multiples: true,
   });
 
-  logger.info(`/VISUALIZE/UPLOAD: Request Project ID:${projectID}`);
+  logger.info(`/upload: Request Project ID:${projectID}`);
 
   if (!fs.existsSync(form.uploadDir)) {
     fs.mkdirSync(form.uploadDir);
@@ -357,7 +357,7 @@ app.post('/visualize/upload', (req, res, next) => {
   });
 });
 
-app.post('/visualize/txt', (req, res) => {
+app.post('/downloadPlotData', (req, res) => {
   const txtPath = path.resolve(req.body.path);
   if (txtPath.indexOf(path.resolve(tmppath)) == 0) {
     const s = fs.createReadStream(txtPath);
@@ -365,12 +365,12 @@ app.post('/visualize/txt', (req, res) => {
     s.on('open', () => {
       res.set('Content-Type', 'text/plain');
       s.pipe(res);
-      logger.debug(`/visualize/txt: Serving ${txtPath}`);
+      logger.debug(`/downloadPlotData: Serving ${txtPath}`);
     });
     s.on('error', () => {
       res.set('Content-Type', 'text/plain');
       res.status(500).end('Not found');
-      logger.info(`/visualize/txt: Error retrieving ${txtPath}`);
+      logger.info(`/downloadPlotData: Error retrieving ${txtPath}`);
     });
   } else {
     logger.info('traversal error');
@@ -378,7 +378,7 @@ app.post('/visualize/txt', (req, res) => {
   }
 });
 
-app.post('/visualize/svg', (req, res) => {
+app.post('/getSVG', (req, res) => {
   const svgPath = path.resolve(req.body.path);
   if (svgPath.indexOf(path.resolve(tmppath)) == 0) {
     const s = fs.createReadStream(svgPath);
@@ -386,12 +386,12 @@ app.post('/visualize/svg', (req, res) => {
     s.on('open', () => {
       res.set('Content-Type', 'image/svg+xml');
       s.pipe(res);
-      logger.debug(`/VISUALIZE/SVG: Serving ${svgPath}`);
+      logger.debug(`/getSVG: Serving ${svgPath}`);
     });
     s.on('error', () => {
       res.set('Content-Type', 'text/plain');
       res.status(500).end('Not found');
-      logger.info(`/VISUALIZE/SVG: Error retrieving ${svgPath}`);
+      logger.info(`/getSVG: Error retrieving ${svgPath}`);
     });
   } else {
     logger.info('traversal error');
@@ -399,7 +399,7 @@ app.post('/visualize/svg', (req, res) => {
   }
 });
 
-app.post('/visualize/svgPublic', (req, res) => {
+app.post('/getPublicSVG', (req, res) => {
   const svgPath = path.resolve(req.body.path);
   if (svgPath.indexOf(path.resolve(datapath)) == 0) {
     const s = fs.createReadStream(svgPath);
@@ -407,12 +407,12 @@ app.post('/visualize/svgPublic', (req, res) => {
     s.on('open', () => {
       res.set('Content-Type', 'image/svg+xml');
       s.pipe(res);
-      logger.debug(`/visualize/svgPublic: Serving ${svgPath}`);
+      logger.debug(`/getPublicSVG: Serving ${svgPath}`);
     });
     s.on('error', () => {
       res.set('Content-Type', 'text/plain');
       res.status(500).end('Not found');
-      logger.debug(`/visualize/svgPublic: Serving Error retrieving ${svgPath}`);
+      logger.debug(`/getPublicSVG: Serving Error retrieving ${svgPath}`);
     });
   } else {
     logger.info('traversal error');

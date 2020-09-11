@@ -82,7 +82,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
         ? dispatchPCA({ submitOverlay: true })
         : dispatchPCA({ pubSubmitOverlay: true });
       try {
-        const response = await fetch(`${rootURL}visualize/svg`, {
+        const response = await fetch(`${rootURL}getSVG`, {
           method: 'POST',
           headers: {
             Accept: 'image/svg',

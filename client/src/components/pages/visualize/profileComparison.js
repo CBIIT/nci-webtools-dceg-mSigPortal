@@ -133,7 +133,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     setOverlay(type, true);
     if (plotPath) {
       try {
-        const response = await fetch(`${rootURL}visualize/svg`, {
+        const response = await fetch(`${rootURL}getSVG`, {
           method: 'POST',
           headers: {
             Accept: 'image/svg',
@@ -214,7 +214,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     if (signatureSetName) {
       dispatchProfileComparison({ refSubmitOverlay: true });
       try {
-        const response = await fetch(`${rootURL}api/visualizeR/getSignatures`, {
+        const response = await fetch(`${rootURL}visualizeR/getSignatures`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -322,7 +322,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
 
     setOverlay('pub', true);
     try {
-      const response = await fetch(`${rootURL}visualize/getPublicData`, {
+      const response = await fetch(`${rootURL}getPublicData`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',

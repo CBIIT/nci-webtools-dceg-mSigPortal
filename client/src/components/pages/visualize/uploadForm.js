@@ -142,7 +142,7 @@ export default function UploadForm() {
           },
         });
         try {
-          const response = await fetch(`${rootURL}api/visualize`, {
+          const response = await fetch(`${rootURL}profilerExtraction`, {
             method: 'POST',
             headers: {
               Accept: 'application/json',
@@ -221,7 +221,7 @@ export default function UploadForm() {
       const data = new FormData();
       data.append('inputFile', inputFile);
       if (bedFile.size) data.append('bedFile', bedFile);
-      let response = await fetch(`${rootURL}visualize/upload`, {
+      let response = await fetch(`${rootURL}upload`, {
         method: 'POST',
         body: data,
       });

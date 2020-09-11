@@ -53,7 +53,7 @@ export default function Results({ setOpenSidebar }) {
   // reload summary information
   async function getSummary() {
     console.log(projectID);
-    const response = await fetch(`${rootURL}visualize/summary`, {
+    const response = await fetch(`${rootURL}getSummary`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -290,7 +290,7 @@ export default function Results({ setOpenSidebar }) {
   }
 
   function submitR(fn, args) {
-    return fetch(`${rootURL}api/visualizeR`, {
+    return fetch(`${rootURL}visualizeR`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -301,7 +301,7 @@ export default function Results({ setOpenSidebar }) {
   }
 
   function getRefSigOptions(profileType) {
-    return fetch(`${rootURL}api/visualizeR/getReferenceSignatureSets`, {
+    return fetch(`${rootURL}visualizeR/getReferenceSignatureSets`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -314,7 +314,7 @@ export default function Results({ setOpenSidebar }) {
   //   download text results files
   async function downloadResults(txtPath) {
     try {
-      const response = await fetch(`${rootURL}visualize/txt`, {
+      const response = await fetch(`${rootURL}downloadPlotData`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',

@@ -47,7 +47,7 @@ export default function MutationalPattern({ downloadResults, submitR }) {
 
     if (plotPath) {
       try {
-        const response = await fetch(`${rootURL}visualize/svg`, {
+        const response = await fetch(`${rootURL}getSVG`, {
           method: 'POST',
           headers: {
             Accept: 'image/svg',
