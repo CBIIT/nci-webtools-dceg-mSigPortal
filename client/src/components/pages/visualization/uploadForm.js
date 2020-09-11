@@ -16,7 +16,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useSelector } from 'react-redux';
-import './visualize.scss';
+import './visualization.scss';
 import {
   dispatchVisualize,
   dispatchVisualizeResults,

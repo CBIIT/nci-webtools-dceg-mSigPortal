@@ -11,7 +11,7 @@ import Results from './results';
 import { useSelector } from 'react-redux';
 import { store, updateVisualize } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import './visualize.scss';
+import './visualization.scss';
 
 const { Group, Label, Check } = Form;
 

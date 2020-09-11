@@ -3,8 +3,8 @@ import { HashRouter as Router, Route } from 'react-router-dom';
 import { Navbar } from './controls/navbar/navbar';
 import Home from './pages/home/home';
 import About from './pages/about/about';
-import Visualize from './pages/visualize/visualize';
-import Explore from './pages/explore/explore';
+import Visualization from './pages/visualization/visualization';
+import Exploring from './pages/exploring/exploring';
 import Refitting from './pages/refitting/refitting';
 import Association from './pages/association/association';
 import Publications from './pages/publications/publications';
@@ -14,7 +14,7 @@ import { ErrorModal } from './controls/error-modal/error-modal';
 export default function App() {
   const links = [
     {
-      route: '/visualize',
+      route: '/visualization',
       action: 'Visualization',
       title: 'Visualization',
       cardTitle: 'Signature Visualization',
@@ -25,7 +25,7 @@ export default function App() {
       navIndex: 0,
     },
     {
-      route: '/explore',
+      route: '/exploring',
       action: 'Exploring',
       title: 'Exploring',
       cardTitle: 'Signature Exploring',
@@ -82,8 +82,8 @@ export default function App() {
       <Navbar links={links} />
       <Route path="/" exact={true} render={(_) => <Home links={links} />} />
       <Route path="/about" component={About} />
-      <Route path="/visualize" component={Visualize} />
-      <Route path="/explore" component={Explore} />
+      <Route path="/visualization" component={Visualization} />
+      <Route path="/exploring" component={Exploring} />
       <Route path="/refitting" component={Refitting} />
       <Route path="/association" component={Association} />
       <Route path="/publications" component={Publications} />

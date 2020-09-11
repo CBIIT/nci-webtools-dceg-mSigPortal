@@ -1,11 +1,9 @@
 import React, { useEffect } from 'react';
 import { Form, Button, Row, Col, Popover } from 'react-bootstrap';
 import Select from 'react-select';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useSelector } from 'react-redux';
-import './visualize.scss';
+import './visualization.scss';
 import {
   dispatchVisualize,
   dispatchVisualizeResults,
@@ -98,7 +96,7 @@ export default function PublicForm() {
 
   function handleReset() {
     const initialState = getInitialState();
-    dispatchVisualize({ submitted: false });
+    dispatchVisualize(initialState.visualize);
     dispatchProfilerSummary(initialState.profilerSummary);
     dispatchVisualizeResults(initialState.visualizeResults);
     dispatchMutationalProfiles(initialState.mutationalProfiles);
@@ -282,7 +280,7 @@ export default function PublicForm() {
       <Row>
         <Col sm="6">
           <Button
-            disabled={loading.active}
+            disabled={loading.active || loadingPublic}
             className="w-100"
             variant="secondary"
             onClick={(e) => handleReset()}
@@ -292,7 +290,7 @@ export default function PublicForm() {
         </Col>
         <Col sm="6">
           <Button
-            disabled={loading.active || submitted}
+            disabled={loading.active || loadingPublic || submitted}
             className="w-100"
             variant="primary"
             type="button"
