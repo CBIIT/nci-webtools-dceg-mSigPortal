@@ -121,34 +121,35 @@ export default function MutationalPattern({ downloadResults, submitR }) {
         <div style={{ display: err ? 'block' : 'none' }}>
           <p>An error has occured. Check the debug section for more info.</p>
         </div>
-        {barURL.length > 0 ? (
-          <div>
-            <div className="d-flex">
-              <a
-                className="px-2 py-1"
-                href={barURL}
-                download={barURL.split('/').slice(-1)[0]}
-              >
-                Download Plot
-              </a>
+        {plotURL.length > 0 &&
+          (barURL.length > 0 ? (
+            <div>
+              <div className="d-flex">
+                <a
+                  className="px-2 py-1"
+                  href={barURL}
+                  download={barURL.split('/').slice(-1)[0]}
+                >
+                  Download Plot
+                </a>
+              </div>
+              <div className="p-2 border rounded">
+                <Row>
+                  <Col>
+                    <img className="w-100 my-4 h-600" src={barURL}></img>
+                  </Col>
+                </Row>
+              </div>
             </div>
-            <div className="p-2 border rounded">
-              <Row>
-                <Col>
-                  <img className="w-100 my-4 h-600" src={barURL}></img>
-                </Col>
-              </Row>
+          ) : (
+            <div>
+              <h4>Proportion</h4>
+              <p>
+                No mutational pattern with proportion of mutations large than{' '}
+                {proportion}
+              </p>
             </div>
-          </div>
-        ) : (
-          <div>
-            <h4>Proportion</h4>
-            <p>
-              No mutational pattern with proportion of mutations large than{' '}
-              {proportion}
-            </p>
-          </div>
-        )}
+          ))}
       </div>
       <div id="context">
         <div style={{ display: err ? 'block' : 'none' }}>
