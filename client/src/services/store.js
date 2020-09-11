@@ -100,13 +100,11 @@ export const getInitialState = () => ({
   mutationalPattern: {
     proportion: '',
     pattern: '',
-
     txtPath: '',
     plotPath: '',
     plotURL: '',
     barPath: '',
     barURL: '',
-
     display: true,
     err: false,
     debugR: [],
@@ -173,7 +171,6 @@ export const getInitialState = () => ({
     debugR: [],
     displayDebug: false,
     submitOverlay: false,
-
     userProfileType: '',
     userMatrixSize: '',
     userMatrixOptions: [],
@@ -194,6 +191,20 @@ export const getInitialState = () => ({
     pubPca3Err: false,
     pubSubmitOverlay: false,
   },
+
+  exploring: {
+    displayTab: 'referenceSignatures',
+    projectID: '',
+  },
+  exploringRefSigs: {
+    plotPath: '',
+    plotURL: '',
+    debugR: '',
+    err: '',
+    displayDebug: false,
+    loading: false,
+  },
+
   error: {
     visible: false,
     message: `An error occured when requesting data. If this problem persists, please contact the administrator at <a href="mailto:mSigPortalWebAdmin@cancer.gov">mSigPortalWebAdmin@cancer.gov</a>.`,
@@ -317,6 +328,32 @@ const errorSlice = createSlice({
   },
 });
 
+const exploringSlice = createSlice({
+  name: 'visualize',
+  initialState: getInitialState().exploring,
+  reducers: {
+    updateExploring: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
+
+const exploringRefSigsSlice = createSlice({
+  name: 'visualize',
+  initialState: getInitialState().exploringRefSigs,
+  reducers: {
+    updateExploringRefSigs: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
+
 const rootReducer = combineReducers({
   visualize: visualizeSlice.reducer,
   visualizeResults: visualizeResultsSlice.reducer,
@@ -327,6 +364,8 @@ const rootReducer = combineReducers({
   profileComparison: profileComparisonSlice.reducer,
   pca: pcaSlice.reducer,
   error: errorSlice.reducer,
+  exploring: exploringSlice.reducer,
+  exploringRefSigs: exploringRefSigsSlice.reducer,
 });
 
 export const store = configureStore({
@@ -343,6 +382,8 @@ export const { updateMutationalPattern } = mutationalPatternSlice.actions;
 export const { updateProfileComparison } = profileComparisonSlice.actions;
 export const { updatePCA } = pcaSlice.actions;
 export const { updateError } = errorSlice.actions;
+export const { updateExploring } = exploringSlice.actions;
+export const { updateExploringRefSigs } = exploringRefSigsSlice.actions;
 
 export function dispatchVisualize(obj) {
   store.dispatch(updateVisualize(obj));
@@ -383,4 +424,12 @@ export function dispatchError(msg) {
       message: msg,
     })
   );
+}
+
+export function dispatchExploring(obj) {
+  store.dispatch(updateExploring(obj));
+}
+
+export function dispatchExploringRefSigs(obj) {
+  store.dispatch(updateExploringRefSigs(obj));
 }

@@ -1,17 +1,29 @@
 import React, { useEffect } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { dispatchError } from '../../../services/store';
+import {
+  dispatchError,
+  dispatchExploringRefSigs,
+} from '../../../services/store';
+
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
-export default function referenceSignatures({ submitR }) {
+export default function ReferenceSignatures({ submitR }) {
   const rootURL = window.location.pathname;
+  const { plotPath, plotURL, debugR, err, displayDebug, loading } = useSelector(
+    (state) => state.exploringRefSigs
+  );
+  const { displayTab } = useSelector((state) => state.exploring);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    if (!loading && !plotPath && displayTab == 'referenceSignatures') {
+      calculateR('referenceSignatures', {});
+    }
+  }, [plotPath, displayTab]);
 
   async function calculateR(fn, args) {
     console.log(fn);
-    dispatchProfilerSummary({
+    dispatchExploringRefSigs({
       loading: true,
       err: false,
       debugR: '',
@@ -22,14 +34,14 @@ export default function referenceSignatures({ submitR }) {
       if (!response.ok) {
         const err = await response.json();
 
-        dispatchProfilerSummary({
+        dispatchExploringRefSigs({
           loading: false,
           debugR: err,
         });
       } else {
         const { debugR, output } = await response.json();
 
-        dispatchProfilerSummary({
+        dispatchExploringRefSigs({
           debugR: debugR,
           loading: false,
           plotPath: output.plotPath,
@@ -38,7 +50,38 @@ export default function referenceSignatures({ submitR }) {
       }
     } catch (err) {
       dispatchError(err);
-      dispatchProfilerSummary({ loading: false });
+      dispatchExploringRefSigs({ loading: false });
+    }
+  }
+
+  async function setRPlot(plotPath) {
+    if (plotPath) {
+      try {
+        const response = await fetch(`${rootURL}getSVG`, {
+          method: 'POST',
+          headers: {
+            Accept: 'image/svg',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ path: plotPath }),
+        });
+        if (!response.ok) {
+          // console.log(await response.json());
+        } else {
+          const pic = await response.blob();
+          const objectURL = URL.createObjectURL(pic);
+
+          if (plotURL) URL.revokeObjectURL(plotURL);
+          dispatchExploringRefSigs({
+            plotURL: objectURL,
+          });
+        }
+      } catch (err) {
+        dispatchError(err);
+      }
+    } else {
+      if (plotURL) URL.revokeObjectURL(plotURL);
+      dispatchExploringRefSigs({ err: true, plotURL: '' });
     }
   }
 
@@ -73,7 +116,7 @@ export default function referenceSignatures({ submitR }) {
         variant="link"
         className="p-0 mt-5"
         onClick={() =>
-          dispatchProfilerSummary({
+          dispatchExploringRefSigs({
             displayDebug: !displayDebug,
           })
         }

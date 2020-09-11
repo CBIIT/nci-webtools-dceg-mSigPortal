@@ -1,33 +1,50 @@
 import React from 'react';
 import { Card, Nav } from 'react-bootstrap';
-// import ReferenceSignatures from './referenceSignatures';
+import { useSelector } from 'react-redux';
+import ReferenceSignatures from './referenceSignatures';
+import { dispatchError, dispatchExploring } from '../../../services/store';
 
 const { Header, Body } = Card;
 const { Item, Link } = Nav;
 
 export default function Explore() {
+  const rootURL = window.location.pathname;
+
+  const { displayTab, projectID } = useSelector((state) => state.exploring);
+
+  function submitR(fn, args) {
+    return fetch(`${rootURL}exploringR`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ fn: fn, args: args, projectID: projectID }),
+    });
+  }
+
   return (
-    <div className="position-relative">
-      {/* <Card>
+    <div className="position-relative m-3">
+      <Card>
         <Header>
           <Nav variant="pills" defaultActiveKey="#mutationalProfiles">
             {[
-              { title: 'Profiler Summary', id: 'profilerSummary' },
-              { title: 'Mutational Profiles', id: 'mutationalProfiles' },
-              { title: 'Cosine Similarity', id: 'cosineSimilarity' },
-              {
-                title: 'Mutational Pattern Enrichment Analysis',
-                id: 'mutationalPattern',
-              },
-              { title: 'Profile Comparison', id: 'profileComparison' },
-              { title: 'PCA', id: 'pca' },
-              { title: 'Download', id: 'download' },
+              { title: 'Reference Signatures', id: 'referenceSignatures' },
+              // { title: 'Mutational Profiles', id: 'mutationalProfiles' },
+              // { title: 'Cosine Similarity', id: 'cosineSimilarity' },
+              // {
+              //   title: 'Mutational Pattern Enrichment Analysis',
+              //   id: 'mutationalPattern',
+              // },
+              // { title: 'Profile Comparison', id: 'profileComparison' },
+              // { title: 'PCA', id: 'pca' },
+              // { title: 'Download', id: 'download' },
             ].map(({ title, id }) => {
               return (
                 <Item key={id}>
                   <Link
                     active={displayTab == id}
-                    onClick={() => dispatchVisualizeResults({ displayTab: id })}
+                    onClick={() => dispatchExploring({ displayTab: id })}
                   >
                     {title}
                   </Link>
@@ -38,12 +55,12 @@ export default function Explore() {
         </Header>
         <Body
           style={{
-            display: displayTab == 'profilerSummary' ? 'block' : 'none',
+            display: displayTab == 'referenceSignatures' ? 'block' : 'none',
           }}
         >
-          <ProfilerSummary submitR={(fn, args) => submitR(fn, args)} />
+          <ReferenceSignatures submitR={(fn, args) => submitR(fn, args)} />
         </Body>
-        <Body
+        {/*  <Body
           style={{
             display: displayTab == 'mutationalProfiles' ? 'block' : 'none',
           }}
@@ -91,8 +108,8 @@ export default function Explore() {
         </Body>
         <Body style={{ display: displayTab == 'download' ? 'block' : 'none' }}>
           <Download />
-        </Body>
-      </Card> */}
+        </Body> */}
+      </Card>
     </div>
   );
 }

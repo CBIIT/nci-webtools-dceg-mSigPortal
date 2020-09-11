@@ -7,10 +7,8 @@ import {
   dispatchVisualizeResults,
   dispatchMutationalProfiles,
   dispatchCosineSimilarity,
-  dispatchMutationalPattern,
   dispatchProfileComparison,
   dispatchPCA,
-  dispatchProfilerSummary,
 } from '../../../services/store';
 
 import ProfilerSummary from './profilerSummary';

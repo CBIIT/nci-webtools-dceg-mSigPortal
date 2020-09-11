@@ -154,7 +154,9 @@ app.post('/profilerExtraction', (req, res) => {
     if (fs.existsSync(path.join(resultsPath, 'svg_files_list.txt'))) {
       res.json({ ...scriptOut, ...(await getSummary(resultsPath)) });
     } else {
-      logger.info('/profilerExtraction: An Error Occured While Extracting Profiles');
+      logger.info(
+        '/profilerExtraction: An Error Occured While Extracting Profiles'
+      );
       res.status(500).json({
         msg:
           'An error occured durring profile extraction. Please review your input parameters and try again.',
@@ -266,7 +268,7 @@ app.post('/getPublicDataOptions', async (req, res) => {
     );
 
     res.json(JSON.parse(list));
-    logger.info('/visualize/getPublicOptions: Sucess');
+    logger.info('/visualize/getPublicOptions: Success');
   } catch (err) {
     logger.info('/visualize/getPublicOptions: An error occured');
     logger.error(err);
@@ -436,4 +438,37 @@ app.get('/visualize/download', (req, res) => {
 
 app.post('/visualize/queue', (req, res) => {
   res.json(req.body);
+});
+
+app.post('/exploringR', async (req, res) => {
+  logger.info('/exploringR: function ' + req.body.fn);
+  console.log('args', req.body);
+  const projectID = req.body.projectID || uuidv4();
+  const savePath = path.join(tmppath, projectID, 'results', req.body.fn);
+
+  if (!fs.existsSync(savePath)) {
+    fs.mkdirSync(savePath, { recursive: true });
+  }
+  try {
+    const wrapper = await r('services/R/exploringWrapper.R', req.body.fn, {
+      ...req.body.args,
+      projectID: projectID,
+      pythonOutput: path.join(tmppath, req.body.projectID, 'results/output'),
+      savePath: savePath,
+      dataPath: path.join(datapath, 'signature_visualization/'),
+    });
+
+    const { stdout, output } = JSON.parse(wrapper);
+    console.log('wrapper return', JSON.parse(wrapper));
+
+    res.json({
+      debugR: stdout,
+      output: output,
+      projectID: projectID,
+    });
+  } catch (err) {
+    logger.info('/exploringR: An error occured');
+    logger.error(err);
+    res.status(500).json(err.message);
+  }
 });
