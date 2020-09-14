@@ -1,28 +1,25 @@
 import React, { useEffect } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import {
-  dispatchError,
-  dispatchExploringRefSig,
-} from '../../../services/store';
+import { dispatchError, dispatchExpRefSig } from '../../../services/store';
 
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 export default function ReferenceSignatures({ submitR }) {
   const rootURL = window.location.pathname;
   const { plotPath, plotURL, debugR, err, displayDebug, loading } = useSelector(
-    (state) => state.exploringRefSig
+    (state) => state.expRefSig
   );
   const { displayTab } = useSelector((state) => state.exploring);
 
   useEffect(() => {
-    if (!loading && !plotPath && displayTab == 'referenceSignatures') {
+    if (!loading && !plotPath && displayTab == 'signatureExploring') {
       calculateR('referenceSignatures', {});
     }
   }, [plotPath, displayTab]);
 
   async function calculateR(fn, args) {
-    dispatchExploringRefSig({
+    dispatchExpRefSig({
       loading: true,
       err: false,
       debugR: '',
@@ -33,14 +30,14 @@ export default function ReferenceSignatures({ submitR }) {
       if (!response.ok) {
         const err = await response.json();
 
-        dispatchExploringRefSig({
+        dispatchExpRefSig({
           loading: false,
           debugR: err,
         });
       } else {
         const { debugR, output } = await response.json();
 
-        dispatchExploringRefSig({
+        dispatchExpRefSig({
           debugR: debugR,
           loading: false,
           plotPath: output.plotPath,
@@ -49,7 +46,7 @@ export default function ReferenceSignatures({ submitR }) {
       }
     } catch (err) {
       dispatchError(err);
-      dispatchExploringRefSig({ loading: false });
+      dispatchExpRefSig({ loading: false });
     }
   }
 
@@ -71,7 +68,7 @@ export default function ReferenceSignatures({ submitR }) {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchExploringRefSig({
+          dispatchExpRefSig({
             plotURL: objectURL,
           });
         }
@@ -80,14 +77,14 @@ export default function ReferenceSignatures({ submitR }) {
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchExploringRefSig({ err: true, plotURL: '' });
+      dispatchExpRefSig({ err: true, plotURL: '' });
     }
   }
 
   return (
     <div>
       <LoadingOverlay active={loading} />
-      <div id="withinPlot">
+      <div id="plot">
         <div style={{ display: err ? 'block' : 'none' }}>
           <p>An error has occured. Check the debug section for more info.</p>
         </div>
@@ -115,7 +112,7 @@ export default function ReferenceSignatures({ submitR }) {
         variant="link"
         className="p-0 mt-5"
         onClick={() =>
-          dispatchExploringRefSig({
+          dispatchExpRefSig({
             displayDebug: !displayDebug,
           })
         }

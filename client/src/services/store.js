@@ -193,10 +193,17 @@ export const getInitialState = () => ({
   },
 
   exploring: {
-    displayTab: 'referenceSignatures',
+    displayTab: 'signatureExploring',
+    signatureTab: {
+      referenceSignatures: true,
+      mutationalSignatureProfile: true,
+      cosineSimilarity: true,
+    },
+    referenceSignatureData: {},
+    exposureTab: {},
     projectID: '',
   },
-  exploringRefSig: {
+  expRefSig: {
     plotPath: '',
     plotURL: '',
     debugR: '',
@@ -204,15 +211,42 @@ export const getInitialState = () => ({
     displayDebug: false,
     loading: false,
   },
-  mutationalSigPro: {
-    plotPath: '',
-    plotURL: '',
-    debugR: '',
-    err: '',
-    displayDebug: false,
-    loading: false,
-  },
+  expMutationalProfiles: {
+    signatureSource: '',
+    signatureSourceOptions: [],
+    profileName: '',
+    profileNameOptions: [],
+    refSignatureSet: '',
+    refSignatureSetOptions: [],
+    strategy: '',
+    strategyOptions: [],
+    signatureName: '',
+    signatureNameOptions: [],
 
+    plotPath: '',
+    plotURL: '',
+    debugR: '',
+    err: '',
+    displayDebug: false,
+    loading: false,
+  },
+  expCosineSimilarity: {
+    profile: '',
+    profileOptions: [],
+    matrix: '',
+    matrixOptions: [],
+    refSignatureSet1: '',
+    refSignatureSetOptions1: [],
+    refSignatureSet2: '',
+    refSignatureSetOptions2: [],
+    plotPath: '',
+    plotURL: '',
+    txtPath: '',
+    debugR: '',
+    err: '',
+    displayDebug: false,
+    loading: false,
+  },
   error: {
     visible: false,
     message: `An error occured when requesting data. If this problem persists, please contact the administrator at <a href="mailto:mSigPortalWebAdmin@cancer.gov">mSigPortalWebAdmin@cancer.gov</a>.`,
@@ -349,11 +383,11 @@ const exploringSlice = createSlice({
   },
 });
 
-const exploringRefSigSlice = createSlice({
-  name: 'exploringRefSig',
-  initialState: getInitialState().exploringRefSig,
+const expRefSigSlice = createSlice({
+  name: 'expRefSig',
+  initialState: getInitialState().expRefSig,
   reducers: {
-    updateExploringRefSig: (state, action) => {
+    updateExpRefSig: (state, action) => {
       return {
         ...state,
         ...action.payload,
@@ -362,11 +396,24 @@ const exploringRefSigSlice = createSlice({
   },
 });
 
-const mutationalSigProSlice = createSlice({
-  name: 'mutationalSigPro',
-  initialState: getInitialState().mutationalSigPro,
+const expMutationalProfilesSlice = createSlice({
+  name: 'expMutationalProfiles',
+  initialState: getInitialState().expMutationalProfiles,
   reducers: {
-    updateMutationalSigPro: (state, action) => {
+    updateExpMutationalProfiles: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
+
+const expCosineSimilaritySlice = createSlice({
+  name: 'expCosineSimilarity',
+  initialState: getInitialState().expCosineSimilarity,
+  reducers: {
+    updateExpCosineSimilarity: (state, action) => {
       return {
         ...state,
         ...action.payload,
@@ -386,8 +433,9 @@ const rootReducer = combineReducers({
   pca: pcaSlice.reducer,
   error: errorSlice.reducer,
   exploring: exploringSlice.reducer,
-  exploringRefSig: exploringRefSigSlice.reducer,
-  mutationalSigPro: mutationalSigProSlice.reducer,
+  expRefSig: expRefSigSlice.reducer,
+  expMutationalProfiles: expMutationalProfilesSlice.reducer,
+  expCosineSimilarity: expCosineSimilaritySlice.reducer,
 });
 
 export const store = configureStore({
@@ -405,8 +453,11 @@ export const { updateProfileComparison } = profileComparisonSlice.actions;
 export const { updatePCA } = pcaSlice.actions;
 export const { updateError } = errorSlice.actions;
 export const { updateExploring } = exploringSlice.actions;
-export const { updateExploringRefSig } = exploringRefSigSlice.actions;
-export const { updateMutationalSigPro } = mutationalSigProSlice.actions;
+export const { updateExpRefSig } = expRefSigSlice.actions;
+export const {
+  updateExpMutationalProfiles,
+} = expMutationalProfilesSlice.actions;
+export const { updateExpCosineSimilarity } = expCosineSimilaritySlice.actions;
 
 export function dispatchVisualize(obj) {
   store.dispatch(updateVisualize(obj));
@@ -453,10 +504,14 @@ export function dispatchExploring(obj) {
   store.dispatch(updateExploring(obj));
 }
 
-export function dispatchExploringRefSig(obj) {
-  store.dispatch(updateExploringRefSig(obj));
+export function dispatchExpRefSig(obj) {
+  store.dispatch(updateExpRefSig(obj));
 }
 
-export function dispatchMutationalSigPro(obj) {
-  store.dispatch(updateMutationalSigPro(obj));
+export function dispatchExpMutationalProfiles(obj) {
+  store.dispatch(updateExpMutationalProfiles(obj));
+}
+
+export function dispatchExpCosineSimilarity(obj) {
+  store.dispatch(updateExpCosineSimilarity(obj));
 }

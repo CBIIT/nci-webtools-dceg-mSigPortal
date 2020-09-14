@@ -10,8 +10,14 @@ library(jsonlite)
 
 
 
-# Signature Explore -------------------------------------------------------
+# Util Functions
+# get dataframe with study, cancer type, sample, dataset, profile, and path
+getReferenceSignatures <- function(dataPath) {
+  load(paste0(dataPath, 'signature_refsets.RData'))
+  return(toJSON(signature_refsets, pretty = TRUE, auto_unbox = TRUE))
+}
 
+# Signature Explore -------------------------------------------------------
 # section 1: Current reference signatures in mSigPortal -------------------
 referenceSignatures <- function(projectID, pythonOutput, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
@@ -50,7 +56,7 @@ referenceSignatures <- function(projectID, pythonOutput, savePath, dataPath) {
 }
 
 # section 2: Mutational signature profile  --------------------------------------------------------------
-mutationalSigPro <- function(projectID, pythonOutput, savePath, dataPath) {
+mutationalProfiles <- function(projectID, pythonOutput, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'signature_refsets.RData'))
   con <- textConnection('stdout', 'wr', local = TRUE)
@@ -82,3 +88,51 @@ mutationalSigPro <- function(projectID, pythonOutput, savePath, dataPath) {
   })
 }
 
+# section3: Cosine similarities among mutational signatures -------------------------
+cosineSimilarity <- function(profileType, matrixSize, refSignatureSet1, refSignatureSet2, projectID, pythonOutput, savePath, dataPath) {
+  # The parameters will be “Matrix Size”, “Reference Signature Set1” and “Reference Signature Set2”. 
+  source('services/R/Sigvisualfunc.R')
+  load(paste0(dataPath, 'signature_refsets.RData'))
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+    plotPath = paste0(savePath, 'signature_cos_sim_res.svg')
+    txtPath = paste0(savePath, 'signature_cos_sim_res.txt')
+
+    profile_name_input <- "SBS96" # profile type
+    # the availabe options for signaturesetname1 and signaturesetname2 will be:
+    signature_refsets %>% filter(Profile == profile_name_input) %>% pull(Signature_set_name) %>% unique()
+
+    signatureset_name1 <- "Environmental Mutagen Signatures (SBS)"
+    signatureset_name2 <- "COSMIC v3 Signatures (SBS)"
+
+
+    sigrefset1_data <- signature_refsets %>%
+      filter(Profile == profile_name_input, Signature_set_name == signatureset_name1) %>%
+      select(Signature_name, MutationType, Contribution) %>%
+      pivot_wider(names_from = Signature_name, values_from = Contribution)
+
+    sigrefset2_data <- signature_refsets %>%
+      filter(Profile == profile_name_input, Signature_set_name == signatureset_name2) %>%
+      select(Signature_name, MutationType, Contribution) %>%
+      pivot_wider(names_from = Signature_name, values_from = Contribution)
+
+    cos_sim_res = cos_sim_df(sigrefset1_data, sigrefset2_data)
+
+    # put this heatmap on the web
+    plot_cosine_heatmap_df(cos_sim_res, cluster_rows = TRUE, plot_values = FALSE, output_plot = plotPath)
+    # add a link bellow the heatmap
+    cos_sim_res %>% write_delim(txtPath, delim = '\t', col_names = T)
+
+    output = list('plotPath' = plotPath, 'txtPath' = txtPath)
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+  })
+}

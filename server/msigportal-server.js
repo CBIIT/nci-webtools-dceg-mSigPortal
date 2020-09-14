@@ -472,3 +472,21 @@ app.post('/exploringR', async (req, res) => {
     res.status(500).json(err.message);
   }
 });
+
+app.post('/getReferenceSignatures', async (req, res) => {
+  logger.info('/getReferenceSignatures: Request');
+  try {
+    const data = await r(
+      'services/R/exploringWrapper.R',
+      'getReferenceSignatures',
+      [path.join(datapath, 'signature_visualization/')]
+    );
+
+    res.json(JSON.parse(data));
+    logger.info('/getReferenceSignatures: Success');
+  } catch (err) {
+    logger.info('/getReferenceSignatures: An error occured');
+    logger.error(err);
+    res.status(500).json(err.message);
+  }
+});

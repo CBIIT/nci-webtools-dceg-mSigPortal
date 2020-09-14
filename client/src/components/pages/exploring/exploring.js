@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, Nav } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import ReferenceSignatures from './referenceSignatures';
-import MutationalSigPro from './mutationalSignatureProfile';
-import { dispatchError, dispatchExploring } from '../../../services/store';
+import SignatureExploring from './signatureExploring';
+import {
+  dispatchError,
+  dispatchExploring,
+  dispatchExpMutationalProfiles,
+} from '../../../services/store';
 
 const { Header, Body } = Card;
 const { Item, Link } = Nav;
@@ -11,7 +14,76 @@ const { Item, Link } = Nav;
 export default function Explore() {
   const rootURL = window.location.pathname;
 
-  const { displayTab, projectID } = useSelector((state) => state.exploring);
+  const { displayTab, projectID, referenceSignatureData } = useSelector(
+    (state) => state.exploring
+  );
+
+  useEffect(async () => {
+    // if (!referenceSignatureData.size) getReferenceSignatures();
+  }, []);
+
+  async function getReferenceSignatures() {
+    const data = await (
+      await fetch(`${rootURL}getReferenceSignatures`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      })
+    ).json();
+
+    const signatureSourceOptions = [...new Set(data.map((row) => row.Source))];
+    const signatureSource = signatureSourceOptions[0];
+    let filteredData = data.filter((row) => row.Source == signatureSource);
+    const profileNameOptions = [
+      ...new Set(filteredData.map((row) => row.Profile)),
+    ];
+    const profileName = profileNameOptions[0];
+    filteredData.filter(
+      (row) => row.Source == signatureSource && row.Profile == profileName
+    );
+    const refSignatureSetOptions = [
+      ...new Set(filteredData.map((row) => row.Signature_set_name)),
+    ];
+    const refSignatureSet = refSignatureSetOptions[0];
+    filteredData.filter(
+      (row) =>
+        row.Source == signatureSource &&
+        row.Profile == profileName &&
+        row.Signature_set_name == refSignatureSet
+    );
+    const strategyOptions = [
+      ...new Set(filteredData.map((row) => row.Dataset)),
+    ];
+    const strategy = strategyOptions[0];
+    filteredData.filter(
+      (row) =>
+        row.Source == signatureSource &&
+        row.Profile == profileName &&
+        row.Signature_set_name == refSignatureSet &&
+        row.Dataset == strategy
+    );
+    const signatureNameOptions = [
+      ...new Set(filteredData.map((row) => row.Signature_name)),
+    ];
+
+    dispatchExploring({
+      referenceSignatureData: data,
+    });
+    dispatchExpMutationalProfiles({
+      signatureSource: signatureSource,
+      signatureSourceOptions: signatureSourceOptions,
+      profileName: profileName,
+      profileNameOptions: profileNameOptions,
+      refSignatureSet: refSignatureSet,
+      refSignatureSetOptions: refSignatureSetOptions,
+      strategy: strategy,
+      strategyOptions: strategyOptions,
+      signatureName: signatureNameOptions[0],
+      signatureNameOptions: signatureNameOptions,
+    });
+  }
 
   function submitR(fn, args) {
     return fetch(`${rootURL}exploringR`, {
@@ -30,16 +102,8 @@ export default function Explore() {
         <Header>
           <Nav variant="pills" defaultActiveKey="#mutationalProfiles">
             {[
-              { title: 'Reference Signatures', id: 'referenceSignatures' },
-              { title: 'Mutational Signature Profile', id: 'mutationalSigPro' },
-              // { title: 'Cosine Similarity', id: 'cosineSimilarity' },
-              // {
-              //   title: 'Mutational Pattern Enrichment Analysis',
-              //   id: 'mutationalPattern',
-              // },
-              // { title: 'Profile Comparison', id: 'profileComparison' },
-              // { title: 'PCA', id: 'pca' },
-              // { title: 'Download', id: 'download' },
+              { title: 'Signature Exploring', id: 'signatureExploring' },
+              { title: 'Exposure Exploring', id: 'exposureExploring' },
             ].map(({ title, id }) => {
               return (
                 <Item key={id}>
@@ -56,59 +120,17 @@ export default function Explore() {
         </Header>
         <Body
           style={{
-            display: displayTab == 'referenceSignatures' ? 'block' : 'none',
+            display: displayTab == 'signatureExploring' ? 'block' : 'none',
           }}
         >
-          <ReferenceSignatures submitR={(fn, args) => submitR(fn, args)} />
+          <SignatureExploring />
         </Body>
-        <Body
+        {/* <Body
           style={{
-            display: displayTab == 'mutationalSigPro' ? 'block' : 'none',
+            display: displayTab == 'exposureExploring' ? 'block' : 'none',
           }}
         >
-          <MutationalSigPro submitR={(fn, args) => submitR(fn, args)} />
-        </Body>
-        {/*  <Body
-          style={{
-            display: displayTab == 'cosineSimilarity' ? 'block' : 'none',
-          }}
-        >
-          <CosineSimilarity
-            getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
-            downloadResults={(path) => downloadResults(path)}
-            submitR={(fn, args) => submitR(fn, args)}
-          />
-        </Body>
-        <Body
-          style={{
-            display: displayTab == 'mutationalPattern' ? 'block' : 'none',
-          }}
-        >
-          <MutationalPattern
-            downloadResults={(path) => downloadResults(path)}
-            submitR={(fn, args) => submitR(fn, args)}
-          />
-        </Body>
-
-        <Body
-          style={{
-            display: displayTab == 'profileComparison' ? 'block' : 'none',
-          }}
-        >
-          <ProfileComparison
-            getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
-            submitR={(fn, args) => submitR(fn, args)}
-          />
-        </Body>
-        <Body style={{ display: displayTab == 'pca' ? 'block' : 'none' }}>
-          <PCA
-            getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
-            downloadResults={(path) => downloadResults(path)}
-            submitR={(fn, args) => submitR(fn, args)}
-          />
-        </Body>
-        <Body style={{ display: displayTab == 'download' ? 'block' : 'none' }}>
-          <Download />
+          <MutationalProfiles />
         </Body> */}
       </Card>
     </div>

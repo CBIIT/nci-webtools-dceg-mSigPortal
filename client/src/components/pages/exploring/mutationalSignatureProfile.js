@@ -1,28 +1,56 @@
 import React, { useEffect } from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Form, Row, Col, Button } from 'react-bootstrap';
+import Select from 'react-select';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
-  dispatchMutationalSigPro,
+  dispatchExpMutationalProfiles,
 } from '../../../services/store';
 
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
+const { Group, Label } = Form;
+
 export default function MutationalSignatureProfile({ submitR }) {
   const rootURL = window.location.pathname;
-  const { plotPath, plotURL, debugR, err, displayDebug, loading } = useSelector(
-    (state) => state.mutationalSigPro
-  );
+  const {
+    signatureSource,
+    signatureSourceOptions,
+    profileName,
+    profileNameOptions,
+    refSignatureSet,
+    refSignatureSetOptions,
+    strategy,
+    strategyOptions,
+    signatureName,
+    signatureNameOptions,
+
+    plotPath,
+    plotURL,
+    debugR,
+    err,
+    displayDebug,
+    loading,
+  } = useSelector((state) => state.expMutationalProfiles);
+
   const { displayTab } = useSelector((state) => state.exploring);
-  useEffect(() => {
-    if (!loading && !plotPath && displayTab == 'mutationalSigPro') {
-      calculateR('mutationalSigPro', {});
-    }
-  }, [plotPath, displayTab]);
+  // useEffect(() => {
+  //   if (!loading && !plotPath && displayTab == 'signatureExploring') {
+  //     calculateR('mutationalProfiles', {});
+  //   }
+  // }, [plotPath, displayTab]);
+
+  const selectFix = {
+    styles: {
+      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+    },
+    menuPortalTarget: document.body,
+    getOptionLabel: (option) => option,
+    getOptionValue: (option) => option,
+  };
 
   async function calculateR(fn, args) {
-    console.log(fn);
-    dispatchMutationalSigPro({
+    dispatchExpMutationalProfiles({
       loading: true,
       err: false,
       debugR: '',
@@ -33,14 +61,14 @@ export default function MutationalSignatureProfile({ submitR }) {
       if (!response.ok) {
         const err = await response.json();
 
-        dispatchMutationalSigPro({
+        dispatchExpMutationalProfiles({
           loading: false,
           debugR: err,
         });
       } else {
         const { debugR, output } = await response.json();
 
-        dispatchMutationalSigPro({
+        dispatchExpMutationalProfiles({
           debugR: debugR,
           loading: false,
           plotPath: output.plotPath,
@@ -49,7 +77,7 @@ export default function MutationalSignatureProfile({ submitR }) {
       }
     } catch (err) {
       dispatchError(err);
-      dispatchMutationalSigPro({ loading: false });
+      dispatchExpMutationalProfiles({ loading: false });
     }
   }
 
@@ -71,7 +99,7 @@ export default function MutationalSignatureProfile({ submitR }) {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchMutationalSigPro({
+          dispatchExpMutationalProfiles({
             plotURL: objectURL,
           });
         }
@@ -80,13 +108,94 @@ export default function MutationalSignatureProfile({ submitR }) {
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchMutationalSigPro({ err: true, plotURL: '' });
+      dispatchExpMutationalProfiles({ err: true, plotURL: '' });
     }
   }
 
   return (
     <div>
       <LoadingOverlay active={loading} />
+      <Row className="justify-content-center">
+        <Col sm="2">
+          <Group controlId="withinProfileType">
+            <Label>Signature Source</Label>
+            <Select
+              options={signatureSourceOptions}
+              value={[signatureSource]}
+              // onChange={(profile) => handleProfileType(profile)}
+              {...selectFix}
+            />
+          </Group>
+        </Col>
+        <Col sm="2">
+          <Group controlId="withinProfileType">
+            <Label>Profile Name</Label>
+            <Select
+              options={profileNameOptions}
+              value={[profileName]}
+              // onChange={(profile) => handleProfileType(profile)}
+              {...selectFix}
+            />
+          </Group>
+        </Col>
+        <Col sm="3">
+          <Label>Reference Signature Set</Label>
+          <Select
+            options={refSignatureSetOptions}
+            value={[refSignatureSet]}
+            // onChange={(set) =>
+            // dispatchExpMutationalProfiles({
+            //   refSignatureSet: set,
+            // })
+            // }
+            {...selectFix}
+          />
+        </Col>
+        <Col sm="2">
+          <Label>Experimental Strategy</Label>
+          <Select
+            options={strategyOptions}
+            value={[strategy]}
+            // onChange={(strategy) =>
+            // dispatchExpMutationalProfiles({
+            //   strategy: strategy,
+            // })
+            // }
+            {...selectFix}
+          />
+        </Col>
+        <Col sm="3">
+          <Label>Signature Name</Label>
+          <Select
+            options={signatureNameOptions}
+            value={[signatureName]}
+            // onChange={(name) =>
+            // dispatchExpMutationalProfiles({
+            //   signatureName: name,
+            // })
+            // }
+            {...selectFix}
+          />
+        </Col>
+      </Row>
+      <Row>
+        <Col sm="1" className="m-auto">
+          <Button
+            variant="primary"
+            onClick={() => {
+              calculateR('mutationalProfiles', {
+                signatureSource: signatureSource,
+                profileName: profileName,
+                refSignatureSet: refSignatureSet,
+                experimentalStrategy: strategy,
+                signatureName: signatureName,
+              });
+            }}
+          >
+            Calculate
+          </Button>
+        </Col>
+      </Row>
       <div id="withinPlot">
         <div style={{ display: err ? 'block' : 'none' }}>
           <p>An error has occured. Check the debug section for more info.</p>
@@ -115,7 +224,7 @@ export default function MutationalSignatureProfile({ submitR }) {
         variant="link"
         className="p-0 mt-5"
         onClick={() =>
-          dispatchMutationalSigPro({
+          dispatchExpMutationalProfiles({
             displayDebug: !displayDebug,
           })
         }
