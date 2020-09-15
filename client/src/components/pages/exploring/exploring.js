@@ -6,6 +6,7 @@ import {
   dispatchError,
   dispatchExploring,
   dispatchExpMutationalProfiles,
+  dispatchExpCosineSimilarity,
 } from '../../../services/store';
 
 const { Header, Body } = Card;
@@ -18,7 +19,7 @@ export default function Explore() {
     (state) => state.exploring
   );
 
-  useEffect(async () => {
+  useEffect(() => {
     // if (!referenceSignatureData.size) getReferenceSignatures();
   }, []);
 
@@ -71,6 +72,7 @@ export default function Explore() {
     dispatchExploring({
       referenceSignatureData: data,
     });
+
     dispatchExpMutationalProfiles({
       signatureSource: signatureSource,
       signatureSourceOptions: signatureSourceOptions,
@@ -82,6 +84,19 @@ export default function Explore() {
       strategyOptions: strategyOptions,
       signatureName: signatureNameOptions[0],
       signatureNameOptions: signatureNameOptions,
+    });
+
+    dispatchExpCosineSimilarity({
+      profileName: profileName,
+      profileNameOptions: profileNameOptions,
+      refSignatureSet1: refSignatureSetOptions[0],
+      refSignatureSetOptions1: refSignatureSetOptions,
+      refSignatureSet2: refSignatureSetOptions[1],
+      refSignatureSetOptions2: refSignatureSetOptions,
+      signatureName1: signatureNameOptions[0],
+      signatureNameOptions1: signatureNameOptions,
+      signatureName2: signatureNameOptions[1],
+      signatureNameOptions2: signatureNameOptions,
     });
   }
 

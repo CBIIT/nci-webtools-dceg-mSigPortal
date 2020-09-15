@@ -17,10 +17,12 @@ export default function MutationalSignatureProfile({
 }) {
   const rootURL = window.location.pathname;
   const {
-    profile,
-    profileOptions,
-    matrix,
-    matrixOptions,
+    profileName,
+    profileNameOptions,
+    signatureName1,
+    signatureNameOptions1,
+    signatureName2,
+    signatureNameOptions2,
     refSignatureSet1,
     refSignatureSetOptions1,
     refSignatureSet2,
@@ -165,43 +167,47 @@ export default function MutationalSignatureProfile({
         <LoadingOverlay active={loading} />
         <div>
           <Row className="justify-content-center">
-            <Col sm="1">
+            <Col sm="3">
               <Group controlId="withinProfileType">
-                <Label>Profile Type</Label>
+                <Label>Profile Name</Label>
                 <Select
-                  options={profileOptions}
-                  value={[profile]}
-                  onChange={(profile) => handleProfileType(profile)}
+                  options={profileNameOptions}
+                  value={[profileName]}
+                  // onChange={(profile) => handleProfileName(profile)}
                   {...selectFix}
                 />
               </Group>
             </Col>
-            <Col sm="1">
-              <Label>Matrix Size</Label>
+            <Col sm="4">
+              <Label>Reference Signature Set 1</Label>
               <Select
-                options={matrixOptions}
-                value={[matrix]}
-                onChange={(matrix) =>
-                  dispatchExpCosineSimilarity({
-                    matrix: matrix,
-                  })
-                }
+                options={refSignatureSetOptions1}
+                value={[refSignatureSet1]}
+                // onChange={(set) =>
+                //   dispatchExpCosineSimilarity({
+                //     refSignatureSet1: set,
+                //   })
+                // }
                 {...selectFix}
               />
             </Col>
             <Col sm="4">
-              <Label>Signature Set 1</Label>
+              <Label>Signature Name 1</Label>
               <Select
-                options={refSignatureSetOptions1}
-                value={[refSignatureSet1]}
-                onChange={(set) =>
-                  dispatchExpCosineSimilarity({
-                    refSignatureSet1: set,
-                  })
-                }
+                options={signatureNameOptions1}
+                value={[signatureName1]}
+                // onChange={(name) =>
+                //   dispatchExpCosineSimilarity({
+                //     signatureName1: name,
+                //   })
+                // }
                 {...selectFix}
               />
             </Col>
+            <Col sm="1" />
+          </Row>
+          <Row>
+            <Col sm="3" />
             <Col sm="4">
               <Label>Signature Set 2</Label>
               <Select
@@ -215,15 +221,29 @@ export default function MutationalSignatureProfile({
                 {...selectFix}
               />
             </Col>
+            <Col sm="4">
+              <Label>Signature Name 2</Label>
+              <Select
+                options={signatureNameOptions2}
+                value={[signatureName2]}
+                // onChange={(name) =>
+                //   dispatchExpCosineSimilarity({
+                //     signatureName1: name,
+                //   })
+                // }
+                {...selectFix}
+              />
+            </Col>
             <Col sm="1" className="m-auto">
               <Button
                 variant="primary"
                 onClick={() => {
                   calculateR('cosineSimilarity', {
-                    profileType: profile,
-                    matrixSize: matrix,
+                    profileName: profileName,
                     refSignatureSet1: refSignatureSet1,
+                    signatureName1: signatureNameOptions1,
                     refSignatureSet2: refSignatureSet2,
+                    signatureName2: signatureName2,
                   });
                 }}
               >
