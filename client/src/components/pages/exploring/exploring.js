@@ -20,23 +20,50 @@ export default function Explore() {
   );
 
   useEffect(() => {
-    // if (!referenceSignatureData.size) getReferenceSignatures();
+    if (!referenceSignatureData.size) getInitalRefSigData();
   }, []);
 
-  async function getReferenceSignatures() {
-    const data = await (
-      await fetch(`${rootURL}getReferenceSignatures`, {
+  async function getReferenceSignatureData(
+    columns = [
+      'Source',
+      'Profile',
+      'Signature_set_name',
+      'Dataset',
+      'Signature_name',
+    ],
+    filters = {
+      Source: 'Reference_signatures',
+      Profile: 'SBS96',
+      Signature_set_name: 'COSMIC v3 Signatures (SBS)',
+      Dataset: 'WGS',
+    }
+  ) {
+    return await (
+      await fetch(`${rootURL}getReferenceSignatureData`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          args: {
+            columns: columns,
+            filters: filters,
+          },
+        }),
       })
     ).json();
+  }
+  async function getInitalRefSigData() {
+    const refSigData = (await getReferenceSignatureData()).output.data;
 
-    const signatureSourceOptions = [...new Set(data.map((row) => row.Source))];
+    const signatureSourceOptions = [
+      ...new Set(refSigData.map((row) => row.Source)),
+    ];
     const signatureSource = signatureSourceOptions[0];
-    let filteredData = data.filter((row) => row.Source == signatureSource);
+    let filteredData = refSigData.filter(
+      (row) => row.Source == signatureSource
+    );
     const profileNameOptions = [
       ...new Set(filteredData.map((row) => row.Profile)),
     ];
@@ -70,7 +97,7 @@ export default function Explore() {
     ];
 
     dispatchExploring({
-      referenceSignatureData: data,
+      referenceSignatureData: refSigData,
     });
 
     dispatchExpMutationalProfiles({
@@ -97,17 +124,6 @@ export default function Explore() {
       signatureNameOptions1: signatureNameOptions,
       signatureName2: signatureNameOptions[1],
       signatureNameOptions2: signatureNameOptions,
-    });
-  }
-
-  function submitR(fn, args) {
-    return fetch(`${rootURL}exploringR`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ fn: fn, args: args, projectID: projectID }),
     });
   }
 
@@ -138,7 +154,11 @@ export default function Explore() {
             display: displayTab == 'signatureExploring' ? 'block' : 'none',
           }}
         >
-          <SignatureExploring />
+          <SignatureExploring
+            getReferenceSignatureData={(columns, filters) =>
+              getReferenceSignatureData(columns, filters)
+            }
+          />
         </Body>
         {/* <Body
           style={{

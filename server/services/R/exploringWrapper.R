@@ -11,10 +11,35 @@ library(jsonlite)
 
 
 # Util Functions
-# get dataframe with study, cancer type, sample, dataset, profile, and path
-getReferenceSignatures <- function(dataPath) {
+# get dataframe with column and filter arguments
+getReferenceSignatureData <- function(args, dataPath) {
   load(paste0(dataPath, 'signature_refsets.RData'))
-  return(toJSON(signature_refsets, pretty = TRUE, auto_unbox = TRUE))
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+
+    columns = unlist(args$columns, use.names = FALSE)
+    filters = args$filters
+    # get selected columns
+    data = signature_refsets %>% select(columns)
+    # apply filters
+    if (length(filters) > 0) {
+      for (i in 1:length(names(filters))) {
+        data = data %>% filter(get(names(filters)[[i]]) == filters[[i]])
+      }
+    }
+
+    output = list('data' = data)
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+  })
 }
 
 # Signature Explore -------------------------------------------------------
@@ -56,7 +81,7 @@ referenceSignatures <- function(projectID, pythonOutput, savePath, dataPath) {
 }
 
 # section 2: Mutational signature profile  --------------------------------------------------------------
-mutationalProfiles <- function(projectID, pythonOutput, savePath, dataPath) {
+mutationalProfiles <- function(signatureSource, profileName, refSignatureSet, experimentalStrategy, signatureName, projectID, pythonOutput, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'signature_refsets.RData'))
   con <- textConnection('stdout', 'wr', local = TRUE)
@@ -68,16 +93,14 @@ mutationalProfiles <- function(projectID, pythonOutput, savePath, dataPath) {
 
     path_profile <- paste0(dataPath, 'Reference_Signature_Profiles_SVG/')
     signature_profile_files <- signature_refsets %>% select(Source, Profile, Signature_set_name, Dataset, Signature_name) %>% unique() %>% mutate(Path = str_replace_all(Signature_set_name, " ", "_"), Path = str_remove_all(Path, "[()]"), Path = paste0(path_profile, Path, "/", Signature_name, ".svg"))
-    # print(signature_profile_files$Path)
-    ## multiple selected profiles
+
     signature_source_input <- "Reference_signatures"
     profile_name_input <- "SBS96"
     signatureset_name_input <- "COSMIC v3 Signatures (SBS)"
     dataset_input <- "WGS"
     signature_name_input <- "SBS1"
-    svgfile_selected <- signature_profile_files %>% filter(Source == signature_source_input, Profile == profile_name_input, Signature_set_name == signatureset_name_input, Dataset == dataset_input, Signature_name == signature_name_input) %>% pull(Path)
-    # print(svgfile_selected)
-
+    svgfile_selected <- signature_profile_files %>% filter(Source == signatureSource, Profile == profileName, Signature_set_name == refSignatureSet, Dataset == experimentalStrategy, Signature_name == signatureName) %>% pull(Path)
+    print(svgfile_selected)
     output = list('plotPath' = svgfile_selected)
   }, error = function(e) {
     print(e)
@@ -89,7 +112,7 @@ mutationalProfiles <- function(projectID, pythonOutput, savePath, dataPath) {
 }
 
 # section3: Cosine similarities among mutational signatures -------------------------
-cosineSimilarity <- function(profileType, matrixSize, refSignatureSet1, refSignatureSet2, projectID, pythonOutput, savePath, dataPath) {
+cosineSimilarity <- function(profileName, refSignatureSet1, refSignatureSet2, projectID, pythonOutput, savePath, dataPath) {
   # The parameters will be “Matrix Size”, “Reference Signature Set1” and “Reference Signature Set2”. 
   source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'signature_refsets.RData'))
@@ -104,7 +127,7 @@ cosineSimilarity <- function(profileType, matrixSize, refSignatureSet1, refSigna
 
     profile_name_input <- "SBS96" # profile type
     # the availabe options for signaturesetname1 and signaturesetname2 will be:
-    signature_refsets %>% filter(Profile == profile_name_input) %>% pull(Signature_set_name) %>% unique()
+    signature_refsets %>% filter(Profile == profileName) %>% pull(Signature_set_name) %>% unique()
 
     signatureset_name1 <- "Environmental Mutagen Signatures (SBS)"
     signatureset_name2 <- "COSMIC v3 Signatures (SBS)"

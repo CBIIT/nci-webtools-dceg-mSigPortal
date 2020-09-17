@@ -11,7 +11,7 @@ import { dispatchError, dispatchExploring } from '../../../services/store';
 const { Header, Body } = Card;
 const { Toggle, Collapse } = Accordion;
 
-export default function SignatureExploring() {
+export default function SignatureExploring({ getReferenceSignatureData }) {
   const rootURL = window.location.pathname;
 
   const { displayTab, signatureTab, exposureTab, projectID } = useSelector(
@@ -25,7 +25,11 @@ export default function SignatureExploring() {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ fn: fn, args: args, projectID: projectID }),
+      body: JSON.stringify({
+        fn: fn,
+        args: args,
+        projectID: projectID,
+      }),
     });
   }
 
@@ -81,7 +85,10 @@ export default function SignatureExploring() {
     },
     {
       component: (
-        <MutationalSignatureProfile submitR={(fn, args) => submitR(fn, args)} />
+        <MutationalSignatureProfile
+          submitR={(fn, args) => submitR(fn, args)}
+          getReferenceSignatureData={(c, f) => getReferenceSignatureData(c, f)}
+        />
       ),
       id: 'mutationalSignatureProfile',
       title: 'Mutational Signature Profile',
@@ -92,6 +99,7 @@ export default function SignatureExploring() {
           getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
           downloadResults={(path) => downloadResults(path)}
           submitR={(fn, args) => submitR(fn, args)}
+          getReferenceSignatureData={(c, f) => getReferenceSignatureData(c, f)}
         />
       ),
       id: 'cosineSimilarity',

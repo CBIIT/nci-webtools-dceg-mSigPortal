@@ -11,7 +11,10 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const { Group, Label } = Form;
 
-export default function MutationalSignatureProfile({ submitR }) {
+export default function MutationalSignatureProfile({
+  submitR,
+  getReferenceSignatureData,
+}) {
   const rootURL = window.location.pathname;
   const {
     signatureSource,
@@ -122,7 +125,9 @@ export default function MutationalSignatureProfile({ submitR }) {
             <Select
               options={signatureSourceOptions}
               value={[signatureSource]}
-              // onChange={(profile) => handleProfileType(profile)}
+              onChange={(source) =>
+                dispatchExpMutationalProfiles({ signatureSource: source })
+              }
               {...selectFix}
             />
           </Group>
@@ -133,7 +138,7 @@ export default function MutationalSignatureProfile({ submitR }) {
             <Select
               options={profileNameOptions}
               value={[profileName]}
-              // onChange={(profile) => handleProfileType(profile)}
+              onChange={(profile) => dispatchExpMutationalProfiles(profile)}
               {...selectFix}
             />
           </Group>
@@ -143,11 +148,11 @@ export default function MutationalSignatureProfile({ submitR }) {
           <Select
             options={refSignatureSetOptions}
             value={[refSignatureSet]}
-            // onChange={(set) =>
-            // dispatchExpMutationalProfiles({
-            //   refSignatureSet: set,
-            // })
-            // }
+            onChange={(set) =>
+              dispatchExpMutationalProfiles({
+                refSignatureSet: set,
+              })
+            }
             {...selectFix}
           />
         </Col>
@@ -156,29 +161,27 @@ export default function MutationalSignatureProfile({ submitR }) {
           <Select
             options={strategyOptions}
             value={[strategy]}
-            // onChange={(strategy) =>
-            // dispatchExpMutationalProfiles({
-            //   strategy: strategy,
-            // })
-            // }
+            onChange={(strategy) =>
+              dispatchExpMutationalProfiles({
+                strategy: strategy,
+              })
+            }
             {...selectFix}
           />
         </Col>
-        <Col sm="3">
+        <Col sm="2">
           <Label>Signature Name</Label>
           <Select
             options={signatureNameOptions}
             value={[signatureName]}
-            // onChange={(name) =>
-            // dispatchExpMutationalProfiles({
-            //   signatureName: name,
-            // })
-            // }
+            onChange={(name) =>
+              dispatchExpMutationalProfiles({
+                signatureName: name,
+              })
+            }
             {...selectFix}
           />
         </Col>
-      </Row>
-      <Row>
         <Col sm="1" className="m-auto">
           <Button
             variant="primary"
@@ -196,6 +199,7 @@ export default function MutationalSignatureProfile({ submitR }) {
           </Button>
         </Col>
       </Row>
+
       <div id="withinPlot">
         <div style={{ display: err ? 'block' : 'none' }}>
           <p>An error has occured. Check the debug section for more info.</p>

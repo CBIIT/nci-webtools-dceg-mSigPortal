@@ -473,15 +473,17 @@ app.post('/exploringR', async (req, res) => {
   }
 });
 
-app.post('/getReferenceSignatures', async (req, res) => {
+app.post('/getReferenceSignatureData', async (req, res) => {
   logger.info('/getReferenceSignatures: Request');
   try {
     const data = await r(
       'services/R/exploringWrapper.R',
-      'getReferenceSignatures',
-      [path.join(datapath, 'signature_visualization/')]
+      'getReferenceSignatureData',
+      {
+        ...req.body,
+        dataPath: path.join(datapath, 'signature_visualization/'),
+      }
     );
-
     res.json(JSON.parse(data));
     logger.info('/getReferenceSignatures: Success');
   } catch (err) {

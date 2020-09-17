@@ -14,6 +14,7 @@ export default function MutationalSignatureProfile({
   submitR,
   downloadResults,
   getRefSigOptions,
+  getReferenceSignatureData,
 }) {
   const rootURL = window.location.pathname;
   const {
