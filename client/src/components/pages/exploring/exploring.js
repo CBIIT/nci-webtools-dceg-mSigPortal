@@ -31,12 +31,7 @@ export default function Explore() {
       'Dataset',
       'Signature_name',
     ],
-    filters = {
-      Source: 'Reference_signatures',
-      Profile: 'SBS96',
-      Signature_set_name: 'COSMIC v3 Signatures (SBS)',
-      Dataset: 'WGS',
-    }
+    filters = {}
   ) {
     return await (
       await fetch(`${rootURL}getReferenceSignatureData`, {

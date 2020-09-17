@@ -24,7 +24,7 @@ getReferenceSignatureData <- function(args, dataPath) {
     columns = unlist(args$columns, use.names = FALSE)
     filters = args$filters
     # get selected columns
-    data = signature_refsets %>% select(columns)
+    data = signature_refsets %>% select(columns) %>% unique()
     # apply filters
     if (length(filters) > 0) {
       for (i in 1:length(names(filters))) {
