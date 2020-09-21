@@ -199,7 +199,7 @@ export const getInitialState = () => ({
       mutationalSignatureProfile: true,
       cosineSimilarity: true,
     },
-    referenceSignatureData: {},
+    refSigData: {},
     exposureTab: {},
     projectID: '',
   },

@@ -15,24 +15,22 @@ const { Item, Link } = Nav;
 export default function Explore() {
   const rootURL = window.location.pathname;
 
-  const { displayTab, projectID, referenceSignatureData } = useSelector(
+  const { displayTab, projectID, refSigData } = useSelector(
     (state) => state.exploring
   );
 
   useEffect(() => {
-    if (!referenceSignatureData.size) getInitalRefSigData();
+    if (!refSigData.size) getInitalRefSigData();
   }, []);
 
-  async function getReferenceSignatureData(
-    columns = [
+  async function getReferenceSignatureData(filters = {}) {
+    const columns = [
       'Source',
       'Profile',
       'Signature_set_name',
       'Dataset',
       'Signature_name',
-    ],
-    filters = {}
-  ) {
+    ];
     return await (
       await fetch(`${rootURL}getReferenceSignatureData`, {
         method: 'POST',
@@ -50,27 +48,29 @@ export default function Explore() {
     ).json();
   }
   async function getInitalRefSigData() {
-    const refSigData = (await getReferenceSignatureData()).output.data;
+    // set loading indicators
+    dispatchExpMutationalProfiles({ loading: true });
+    dispatchExpCosineSimilarity({
+      loading: true,
+    });
 
-    const signatureSourceOptions = [
-      ...new Set(refSigData.map((row) => row.Source)),
-    ];
+    const data = (await getReferenceSignatureData()).output.data;
+
+    const signatureSourceOptions = [...new Set(data.map((row) => row.Source))];
     const signatureSource = signatureSourceOptions[0];
-    let filteredData = refSigData.filter(
-      (row) => row.Source == signatureSource
-    );
+    let filteredData = data.filter((row) => row.Source == signatureSource);
     const profileNameOptions = [
       ...new Set(filteredData.map((row) => row.Profile)),
     ];
     const profileName = profileNameOptions[0];
-    filteredData.filter(
+    filteredData = filteredData.filter(
       (row) => row.Source == signatureSource && row.Profile == profileName
     );
     const refSignatureSetOptions = [
       ...new Set(filteredData.map((row) => row.Signature_set_name)),
     ];
     const refSignatureSet = refSignatureSetOptions[0];
-    filteredData.filter(
+    filteredData = filteredData.filter(
       (row) =>
         row.Source == signatureSource &&
         row.Profile == profileName &&
@@ -80,7 +80,7 @@ export default function Explore() {
       ...new Set(filteredData.map((row) => row.Dataset)),
     ];
     const strategy = strategyOptions[0];
-    filteredData.filter(
+    filteredData = filteredData.filter(
       (row) =>
         row.Source == signatureSource &&
         row.Profile == profileName &&
@@ -92,7 +92,7 @@ export default function Explore() {
     ];
 
     dispatchExploring({
-      referenceSignatureData: refSigData,
+      refSigData: data,
     });
 
     dispatchExpMutationalProfiles({
@@ -106,6 +106,7 @@ export default function Explore() {
       strategyOptions: strategyOptions,
       signatureName: signatureNameOptions[0],
       signatureNameOptions: signatureNameOptions,
+      loading: false,
     });
 
     dispatchExpCosineSimilarity({
@@ -119,6 +120,7 @@ export default function Explore() {
       signatureNameOptions1: signatureNameOptions,
       signatureName2: signatureNameOptions[1],
       signatureNameOptions2: signatureNameOptions,
+      loading: false,
     });
   }
 

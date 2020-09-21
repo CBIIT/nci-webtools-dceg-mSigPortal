@@ -27,7 +27,6 @@ export default function MutationalSignatureProfile({
     strategyOptions,
     signatureName,
     signatureNameOptions,
-
     plotPath,
     plotURL,
     debugR,
@@ -35,8 +34,8 @@ export default function MutationalSignatureProfile({
     displayDebug,
     loading,
   } = useSelector((state) => state.expMutationalProfiles);
+  const { displayTab, refSigData } = useSelector((state) => state.exploring);
 
-  const { displayTab } = useSelector((state) => state.exploring);
   // useEffect(() => {
   //   if (!loading && !plotPath && displayTab == 'signatureExploring') {
   //     calculateR('mutationalProfiles', {});
@@ -115,6 +114,144 @@ export default function MutationalSignatureProfile({
     }
   }
 
+  function handleSource(source) {
+    let filteredData = refSigData.filter((row) => row.Source == source);
+    const profileNameOptions = [
+      ...new Set(filteredData.map((row) => row.Profile)),
+    ];
+    const profileName = profileNameOptions[0];
+    filteredData = filteredData.filter(
+      (row) => row.Source == source && row.Profile == profileName
+    );
+    const refSignatureSetOptions = [
+      ...new Set(filteredData.map((row) => row.Signature_set_name)),
+    ];
+    const refSignatureSet = refSignatureSetOptions[0];
+    filteredData = filteredData.filter(
+      (row) =>
+        row.Source == source &&
+        row.Profile == profileName &&
+        row.Signature_set_name == refSignatureSet
+    );
+    const strategyOptions = [
+      ...new Set(filteredData.map((row) => row.Dataset)),
+    ];
+    const strategy = strategyOptions[0];
+    filteredData = filteredData.filter(
+      (row) =>
+        row.Source == source &&
+        row.Profile == profileName &&
+        row.Signature_set_name == refSignatureSet &&
+        row.Dataset == strategy
+    );
+    const signatureNameOptions = [
+      ...new Set(filteredData.map((row) => row.Signature_name)),
+    ];
+
+    dispatchExpMutationalProfiles({
+      signatureSource: source,
+      profileName: profileName,
+      profileNameOptions: profileNameOptions,
+      refSignatureSet: refSignatureSet,
+      refSignatureSetOptions: refSignatureSetOptions,
+      strategy: strategy,
+      strategyOptions: strategyOptions,
+      signatureName: signatureNameOptions[0],
+      signatureNameOptions: signatureNameOptions,
+    });
+  }
+
+  function handleProfile(profile) {
+    let filteredData = refSigData.filter(
+      (row) => row.Source == signatureSource && row.Profile == profile
+    );
+    const refSignatureSetOptions = [
+      ...new Set(filteredData.map((row) => row.Signature_set_name)),
+    ];
+    const refSignatureSet = refSignatureSetOptions[0];
+    filteredData = filteredData.filter(
+      (row) =>
+        row.Source == signatureSource &&
+        row.Profile == profile &&
+        row.Signature_set_name == refSignatureSet
+    );
+    const strategyOptions = [
+      ...new Set(filteredData.map((row) => row.Dataset)),
+    ];
+    const strategy = strategyOptions[0];
+    filteredData = filteredData.filter(
+      (row) =>
+        row.Source == signatureSource &&
+        row.Profile == profile &&
+        row.Signature_set_name == refSignatureSet &&
+        row.Dataset == strategy
+    );
+    const signatureNameOptions = [
+      ...new Set(filteredData.map((row) => row.Signature_name)),
+    ];
+
+    dispatchExpMutationalProfiles({
+      profileName: profile,
+      refSignatureSet: refSignatureSet,
+      refSignatureSetOptions: refSignatureSetOptions,
+      strategy: strategy,
+      strategyOptions: strategyOptions,
+      signatureName: signatureNameOptions[0],
+      signatureNameOptions: signatureNameOptions,
+    });
+  }
+
+  function handleSet(set) {
+    let filteredData = refSigData.filter(
+      (row) =>
+        row.Source == signatureSource &&
+        row.Profile == profileName &&
+        row.Signature_set_name == set
+    );
+    const strategyOptions = [
+      ...new Set(filteredData.map((row) => row.Dataset)),
+    ];
+    const strategy = strategyOptions[0];
+    filteredData = filteredData.filter(
+      (row) =>
+        row.Source == signatureSource &&
+        row.Profile == profileName &&
+        row.Signature_set_name == set &&
+        row.Dataset == strategy
+    );
+    const signatureNameOptions = [
+      ...new Set(filteredData.map((row) => row.Signature_name)),
+    ];
+
+    dispatchExpMutationalProfiles({
+      refSignatureSet: set,
+      strategy: strategy,
+      strategyOptions: strategyOptions,
+      signatureName: signatureNameOptions[0],
+      signatureNameOptions: signatureNameOptions,
+    });
+  }
+
+  function handleStrategy(strategy) {
+    let filteredData = refSigData.filter(
+      (row) =>
+        row.Source == signatureSource &&
+        row.Profile == profileName &&
+        row.Signature_set_name == refSignatureSet &&
+        row.Dataset == strategy
+    );
+
+    const signatureNameOptions = [
+      ...new Set(filteredData.map((row) => row.Signature_name)),
+    ];
+
+    dispatchExpMutationalProfiles({
+      strategy: strategy,
+      signatureName: signatureNameOptions[0],
+      signatureNameOptions: signatureNameOptions,
+    });
+  }
+
   return (
     <div>
       <LoadingOverlay active={loading} />
@@ -125,9 +262,7 @@ export default function MutationalSignatureProfile({
             <Select
               options={signatureSourceOptions}
               value={[signatureSource]}
-              onChange={(source) =>
-                dispatchExpMutationalProfiles({ signatureSource: source })
-              }
+              onChange={(source) => handleSource(source)}
               {...selectFix}
             />
           </Group>
@@ -138,7 +273,7 @@ export default function MutationalSignatureProfile({
             <Select
               options={profileNameOptions}
               value={[profileName]}
-              onChange={(profile) => dispatchExpMutationalProfiles(profile)}
+              onChange={(profile) => handleProfile(profile)}
               {...selectFix}
             />
           </Group>
@@ -148,11 +283,7 @@ export default function MutationalSignatureProfile({
           <Select
             options={refSignatureSetOptions}
             value={[refSignatureSet]}
-            onChange={(set) =>
-              dispatchExpMutationalProfiles({
-                refSignatureSet: set,
-              })
-            }
+            onChange={(set) => handleSet(set)}
             {...selectFix}
           />
         </Col>
@@ -161,11 +292,7 @@ export default function MutationalSignatureProfile({
           <Select
             options={strategyOptions}
             value={[strategy]}
-            onChange={(strategy) =>
-              dispatchExpMutationalProfiles({
-                strategy: strategy,
-              })
-            }
+            onChange={(strategy) => handleStrategy(strategy)}
             {...selectFix}
           />
         </Col>
