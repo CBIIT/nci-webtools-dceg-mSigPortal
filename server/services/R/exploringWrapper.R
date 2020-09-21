@@ -6,6 +6,7 @@ library(ggrepel)
 library(ggforce)
 # library(ggtext) requires R 3.5
 library(jsonlite)
+library(stringr)
 
 
 
@@ -93,15 +94,18 @@ mutationalProfiles <- function(signatureSource, profileName, refSignatureSet, ex
 
     path_profile <- paste0(dataPath, 'Reference_Signature_Profiles_SVG/')
     signature_profile_files <- signature_refsets %>% select(Source, Profile, Signature_set_name, Dataset, Signature_name) %>% unique() %>% mutate(Path = str_replace_all(Signature_set_name, " ", "_"), Path = str_remove_all(Path, "[()]"), Path = paste0(path_profile, Path, "/", Signature_name, ".svg"))
+    svgfile_selected <- signature_profile_files %>%
+      filter(Source == signatureSource, Profile == profileName, Signature_set_name == refSignatureSet, Dataset == experimentalStrategy, Signature_name == signatureName) %>% pull(Path)
 
-    signature_source_input <- "Reference_signatures"
-    profile_name_input <- "SBS96"
-    signatureset_name_input <- "COSMIC v3 Signatures (SBS)"
-    dataset_input <- "WGS"
-    signature_name_input <- "SBS1"
-    svgfile_selected <- signature_profile_files %>% filter(Source == signatureSource, Profile == profileName, Signature_set_name == refSignatureSet, Dataset == experimentalStrategy, Signature_name == signatureName) %>% pull(Path)
-    print(svgfile_selected)
-    output = list('plotPath' = svgfile_selected)
+    # fix filename 
+    splitPath = strsplit(svgfile_selected, '/')[[1]]
+    profileType = str_extract_all(profileName, "[aA-zZ]+")
+    matrixSize = str_extract_all(profileName, "[0-9]+")
+    filenamePrefix = paste0(profileType, '_', matrixSize, '_plots_mSigPortal_')
+    splitPath[length(splitPath)] = paste0(filenamePrefix, splitPath[length(splitPath)])
+    newPath = paste0(splitPath, collapse = "/")
+
+    output = list('plotPath' = newPath)
   }, error = function(e) {
     print(e)
   }, finally = {
