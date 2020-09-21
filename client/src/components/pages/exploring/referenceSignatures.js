@@ -10,80 +10,80 @@ export default function ReferenceSignatures({ submitR }) {
   const { plotPath, plotURL, debugR, err, displayDebug, loading } = useSelector(
     (state) => state.expRefSig
   );
-  const { displayTab } = useSelector((state) => state.exploring);
+  // const { displayTab } = useSelector((state) => state.exploring);
 
-  useEffect(() => {
-    if (!loading && !plotPath && displayTab == 'signatureExploring') {
-      calculateR('referenceSignatures', {});
-    }
-  }, [plotPath, displayTab]);
+  // useEffect(() => {
+  //   if (!loading && !plotPath && displayTab == 'signatureExploring') {
+  //     calculateR('referenceSignatures', {});
+  //   }
+  // }, [plotPath, displayTab]);
 
-  async function calculateR(fn, args) {
-    dispatchExpRefSig({
-      loading: true,
-      err: false,
-      debugR: '',
-    });
+  // async function calculateR(fn, args) {
+  //   dispatchExpRefSig({
+  //     loading: true,
+  //     err: false,
+  //     debugR: '',
+  //   });
 
-    try {
-      const response = await submitR(fn, args);
-      if (!response.ok) {
-        const err = await response.json();
+  //   try {
+  //     const response = await submitR(fn, args);
+  //     if (!response.ok) {
+  //       const err = await response.json();
 
-        dispatchExpRefSig({
-          loading: false,
-          debugR: err,
-        });
-      } else {
-        const { debugR, output } = await response.json();
+  //       dispatchExpRefSig({
+  //         loading: false,
+  //         debugR: err,
+  //       });
+  //     } else {
+  //       const { debugR, output } = await response.json();
 
-        dispatchExpRefSig({
-          debugR: debugR,
-          loading: false,
-          plotPath: output.plotPath,
-        });
-        setRPlot(output.plotPath, 'within');
-      }
-    } catch (err) {
-      dispatchError(err);
-      dispatchExpRefSig({ loading: false });
-    }
-  }
+  //       dispatchExpRefSig({
+  //         debugR: debugR,
+  //         loading: false,
+  //         plotPath: output.plotPath,
+  //       });
+  //       setRPlot(output.plotPath, 'within');
+  //     }
+  //   } catch (err) {
+  //     dispatchError(err);
+  //     dispatchExpRefSig({ loading: false });
+  //   }
+  // }
 
-  async function setRPlot(plotPath) {
-    if (plotPath) {
-      try {
-        const response = await fetch(`${rootURL}getSVG`, {
-          method: 'POST',
-          headers: {
-            Accept: 'image/svg',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ path: plotPath }),
-        });
-        if (!response.ok) {
-          // console.log(await response.json());
-        } else {
-          const pic = await response.blob();
-          const objectURL = URL.createObjectURL(pic);
+  // async function setRPlot(plotPath) {
+  //   if (plotPath) {
+  //     try {
+  //       const response = await fetch(`${rootURL}getSVG`, {
+  //         method: 'POST',
+  //         headers: {
+  //           Accept: 'image/svg',
+  //           'Content-Type': 'application/json',
+  //         },
+  //         body: JSON.stringify({ path: plotPath }),
+  //       });
+  //       if (!response.ok) {
+  //         // console.log(await response.json());
+  //       } else {
+  //         const pic = await response.blob();
+  //         const objectURL = URL.createObjectURL(pic);
 
-          if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchExpRefSig({
-            plotURL: objectURL,
-          });
-        }
-      } catch (err) {
-        dispatchError(err);
-      }
-    } else {
-      if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchExpRefSig({ err: true, plotURL: '' });
-    }
-  }
+  //         if (plotURL) URL.revokeObjectURL(plotURL);
+  //         dispatchExpRefSig({
+  //           plotURL: objectURL,
+  //         });
+  //       }
+  //     } catch (err) {
+  //       dispatchError(err);
+  //     }
+  //   } else {
+  //     if (plotURL) URL.revokeObjectURL(plotURL);
+  //     dispatchExpRefSig({ err: true, plotURL: '' });
+  //   }
+  // }
 
   return (
     <div>
-      <LoadingOverlay active={loading} />
+      {/* <LoadingOverlay active={loading} /> */}
       <div id="plot">
         <div style={{ display: err ? 'block' : 'none' }}>
           <p>An error has occured. Check the debug section for more info.</p>
@@ -108,7 +108,7 @@ export default function ReferenceSignatures({ submitR }) {
         </div>
       </div>
 
-      <Button
+      {/* <Button
         variant="link"
         className="p-0 mt-5"
         onClick={() =>
@@ -136,7 +136,7 @@ export default function ReferenceSignatures({ submitR }) {
             <p>{debugR}</p>
           )}
         </div>
-      </pre>
+      </pre> */}
     </div>
   );
 }

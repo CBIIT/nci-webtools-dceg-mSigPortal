@@ -205,7 +205,7 @@ export const getInitialState = () => ({
   },
   expRefSig: {
     plotPath: '',
-    plotURL: '',
+    plotURL: 'assets/images/mSigPortalReferenceSignatures.svg',
     debugR: '',
     err: '',
     displayDebug: false,
