@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import Select from 'react-select';
 import { useSelector } from 'react-redux';
@@ -11,10 +11,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const { Group, Label } = Form;
 
-export default function MutationalSignatureProfile({
-  submitR,
-  getReferenceSignatureData,
-}) {
+export default function MutationalSignatureProfile({ submitR }) {
   const rootURL = window.location.pathname;
   const {
     signatureSource,
@@ -35,12 +32,6 @@ export default function MutationalSignatureProfile({
     loading,
   } = useSelector((state) => state.expMutationalProfiles);
   const { displayTab, refSigData } = useSelector((state) => state.exploring);
-
-  // useEffect(() => {
-  //   if (!loading && !plotPath && displayTab == 'signatureExploring') {
-  //     calculateR('mutationalProfiles', {});
-  //   }
-  // }, [plotPath, displayTab]);
 
   const selectFix = {
     styles: {
@@ -115,37 +106,44 @@ export default function MutationalSignatureProfile({
   }
 
   function handleSource(source) {
-    let filteredData = refSigData.filter((row) => row.Source == source);
+    const filteredData = refSigData.filter((row) => row.Source == source);
     const profileNameOptions = [
       ...new Set(filteredData.map((row) => row.Profile)),
     ];
     const profileName = profileNameOptions[0];
-    filteredData = filteredData.filter(
-      (row) => row.Source == source && row.Profile == profileName
-    );
     const refSignatureSetOptions = [
-      ...new Set(filteredData.map((row) => row.Signature_set_name)),
+      ...new Set(
+        filteredData
+          .filter((row) => row.Source == source && row.Profile == profileName)
+          .map((row) => row.Signature_set_name)
+      ),
     ];
     const refSignatureSet = refSignatureSetOptions[0];
-    filteredData = filteredData.filter(
-      (row) =>
-        row.Source == source &&
-        row.Profile == profileName &&
-        row.Signature_set_name == refSignatureSet
-    );
     const strategyOptions = [
-      ...new Set(filteredData.map((row) => row.Dataset)),
+      ...new Set(
+        filteredData
+          .filter(
+            (row) =>
+              row.Source == source &&
+              row.Profile == profileName &&
+              row.Signature_set_name == refSignatureSet
+          )
+          .map((row) => row.Dataset)
+      ),
     ];
     const strategy = strategyOptions[0];
-    filteredData = filteredData.filter(
-      (row) =>
-        row.Source == source &&
-        row.Profile == profileName &&
-        row.Signature_set_name == refSignatureSet &&
-        row.Dataset == strategy
-    );
     const signatureNameOptions = [
-      ...new Set(filteredData.map((row) => row.Signature_name)),
+      ...new Set(
+        filteredData
+          .filter(
+            (row) =>
+              row.Source == source &&
+              row.Profile == profileName &&
+              row.Signature_set_name == refSignatureSet &&
+              row.Dataset == strategy
+          )
+          .map((row) => row.Signature_name)
+      ),
     ];
 
     dispatchExpMutationalProfiles({
@@ -162,32 +160,38 @@ export default function MutationalSignatureProfile({
   }
 
   function handleProfile(profile) {
-    let filteredData = refSigData.filter(
+    const filteredData = refSigData.filter(
       (row) => row.Source == signatureSource && row.Profile == profile
     );
     const refSignatureSetOptions = [
       ...new Set(filteredData.map((row) => row.Signature_set_name)),
     ];
     const refSignatureSet = refSignatureSetOptions[0];
-    filteredData = filteredData.filter(
-      (row) =>
-        row.Source == signatureSource &&
-        row.Profile == profile &&
-        row.Signature_set_name == refSignatureSet
-    );
     const strategyOptions = [
-      ...new Set(filteredData.map((row) => row.Dataset)),
+      ...new Set(
+        filteredData
+          .filter(
+            (row) =>
+              row.Source == signatureSource &&
+              row.Profile == profile &&
+              row.Signature_set_name == refSignatureSet
+          )
+          .map((row) => row.Dataset)
+      ),
     ];
     const strategy = strategyOptions[0];
-    filteredData = filteredData.filter(
-      (row) =>
-        row.Source == signatureSource &&
-        row.Profile == profile &&
-        row.Signature_set_name == refSignatureSet &&
-        row.Dataset == strategy
-    );
     const signatureNameOptions = [
-      ...new Set(filteredData.map((row) => row.Signature_name)),
+      ...new Set(
+        filteredData
+          .filter(
+            (row) =>
+              row.Source == signatureSource &&
+              row.Profile == profile &&
+              row.Signature_set_name == refSignatureSet &&
+              row.Dataset == strategy
+          )
+          .map((row) => row.Signature_name)
+      ),
     ];
 
     dispatchExpMutationalProfiles({
@@ -212,15 +216,18 @@ export default function MutationalSignatureProfile({
       ...new Set(filteredData.map((row) => row.Dataset)),
     ];
     const strategy = strategyOptions[0];
-    filteredData = filteredData.filter(
-      (row) =>
-        row.Source == signatureSource &&
-        row.Profile == profileName &&
-        row.Signature_set_name == set &&
-        row.Dataset == strategy
-    );
     const signatureNameOptions = [
-      ...new Set(filteredData.map((row) => row.Signature_name)),
+      ...new Set(
+        filteredData
+          .filter(
+            (row) =>
+              row.Source == signatureSource &&
+              row.Profile == profileName &&
+              row.Signature_set_name == set &&
+              row.Dataset == strategy
+          )
+          .map((row) => row.Signature_name)
+      ),
     ];
 
     dispatchExpMutationalProfiles({
@@ -336,7 +343,7 @@ export default function MutationalSignatureProfile({
             <a
               className="px-2 py-1"
               href={plotURL}
-              download={plotURL.split('/').slice(-1)[0]}
+              download={plotPath.split('/').slice(-1)[0]}
             >
               Download Plot
             </a>
