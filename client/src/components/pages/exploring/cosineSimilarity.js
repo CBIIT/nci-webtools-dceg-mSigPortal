@@ -111,18 +111,11 @@ export default function MutationalSignatureProfile({
     const refSignatureSetOptions = [
       ...new Set(filteredData.map((row) => row.Signature_set_name)),
     ];
-    const signatureNameOptions = [
-      ...new Set(
-        filteredData
-          .filter((row) => row.Signature_set_name == refSignatureSetOptions[0])
-          .map((row) => row.Signature_name)
-      ),
-    ];
 
     dispatchExpCosineSimilarity({
       profileName: profile,
       refSignatureSet1: refSignatureSetOptions[0],
-      refSignatureSet2: refSignatureSetOptions[0],
+      refSignatureSet2: refSignatureSetOptions[1] || refSignatureSetOptions[0],
       refSignatureSetOptions1: refSignatureSetOptions,
       refSignatureSetOptions2: refSignatureSetOptions,
     });
