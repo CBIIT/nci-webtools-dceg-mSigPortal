@@ -194,14 +194,18 @@ export const getInitialState = () => ({
 
   exploring: {
     displayTab: 'signatureExploring',
-    signatureTab: {
+    signatureAccordion: {
       referenceSignatures: true,
       mutationalSignatureProfile: true,
       cosineSimilarity: true,
+      mutationalSignatureComparison: true,
     },
+    exposureAccordion: {},
     refSigData: {},
-    exposureTab: {},
     projectID: '',
+    source: 'public',
+    openSidebar: false,
+    submitted: false,
   },
   expRefSig: {
     plotPath: '',

@@ -15,9 +15,12 @@ const { Toggle, Collapse } = Accordion;
 export default function SignatureExploring({ getReferenceSignatureData }) {
   const rootURL = window.location.pathname;
 
-  const { displayTab, signatureTab, exposureTab, projectID } = useSelector(
-    (state) => state.exploring
-  );
+  const {
+    displayTab,
+    projectID,
+    signatureAccordion,
+    exposureAccordion,
+  } = useSelector((state) => state.exploring);
 
   function submitR(fn, args) {
     return fetch(`${rootURL}exploringR`, {
@@ -115,29 +118,29 @@ export default function SignatureExploring({ getReferenceSignatureData }) {
     <div className="position-relative">
       {sections.map(({ component, id, title }) => {
         return (
-          <Accordion defaultActiveKey={id} key={id}>
+          <Accordion activeKey={signatureAccordion[id]} key={id}>
             <Card>
               <Toggle
                 className="font-weight-bold"
                 as={Header}
-                eventKey={id}
+                eventKey={signatureAccordion[id]}
                 onClick={() =>
                   dispatchExploring({
-                    signatureTab: {
-                      ...signatureTab,
-                      [id]: !signatureTab[id],
+                    signatureAccordion: {
+                      ...signatureAccordion,
+                      [id]: !signatureAccordion[id],
                     },
                   })
                 }
               >
-                {signatureTab[id] == true ? (
+                {signatureAccordion[id] == true ? (
                   <FontAwesomeIcon icon={faMinus} />
                 ) : (
                   <FontAwesomeIcon icon={faPlus} />
                 )}{' '}
                 {title}
               </Toggle>
-              <Collapse eventKey={id}>
+              <Collapse eventKey={signatureAccordion[id]}>
                 <Body>{component}</Body>
               </Collapse>
             </Card>
