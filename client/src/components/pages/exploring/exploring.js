@@ -58,37 +58,49 @@ export default function Explore() {
 
     const signatureSourceOptions = [...new Set(data.map((row) => row.Source))];
     const signatureSource = signatureSourceOptions[0];
-    let filteredData = data.filter((row) => row.Source == signatureSource);
     const profileNameOptions = [
-      ...new Set(filteredData.map((row) => row.Profile)),
+      ...new Set(
+        data
+          .filter((row) => row.Source == signatureSource)
+          .map((row) => row.Profile)
+      ),
     ];
     const profileName = profileNameOptions[0];
-    filteredData = filteredData.filter(
-      (row) => row.Source == signatureSource && row.Profile == profileName
-    );
     const refSignatureSetOptions = [
-      ...new Set(filteredData.map((row) => row.Signature_set_name)),
+      ...new Set(
+        data
+          .filter(
+            (row) => row.Source == signatureSource && row.Profile == profileName
+          )
+          .map((row) => row.Signature_set_name)
+      ),
     ];
     const refSignatureSet = refSignatureSetOptions[0];
-    filteredData = filteredData.filter(
-      (row) =>
-        row.Source == signatureSource &&
-        row.Profile == profileName &&
-        row.Signature_set_name == refSignatureSet
-    );
     const strategyOptions = [
-      ...new Set(filteredData.map((row) => row.Dataset)),
+      ...new Set(
+        data
+          .filter(
+            (row) =>
+              row.Source == signatureSource &&
+              row.Profile == profileName &&
+              row.Signature_set_name == refSignatureSet
+          )
+          .map((row) => row.Dataset)
+      ),
     ];
     const strategy = strategyOptions[0];
-    filteredData = filteredData.filter(
-      (row) =>
-        row.Source == signatureSource &&
-        row.Profile == profileName &&
-        row.Signature_set_name == refSignatureSet &&
-        row.Dataset == strategy
-    );
     const signatureNameOptions = [
-      ...new Set(filteredData.map((row) => row.Signature_name)),
+      ...new Set(
+        data
+          .filter(
+            (row) =>
+              row.Source == signatureSource &&
+              row.Profile == profileName &&
+              row.Signature_set_name == refSignatureSet &&
+              row.Dataset == strategy
+          )
+          .map((row) => row.Signature_name)
+      ),
     ];
 
     dispatchExploring({
@@ -113,13 +125,9 @@ export default function Explore() {
       profileName: profileName,
       profileNameOptions: profileNameOptions,
       refSignatureSet1: refSignatureSetOptions[0],
-      refSignatureSetOptions1: refSignatureSetOptions,
       refSignatureSet2: refSignatureSetOptions[1],
+      refSignatureSetOptions1: refSignatureSetOptions,
       refSignatureSetOptions2: refSignatureSetOptions,
-      signatureName1: signatureNameOptions[0],
-      signatureNameOptions1: signatureNameOptions,
-      signatureName2: signatureNameOptions[1],
-      signatureNameOptions2: signatureNameOptions,
       loading: false,
     });
   }

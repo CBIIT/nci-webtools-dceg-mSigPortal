@@ -129,21 +129,14 @@ cosineSimilarity <- function(profileName, refSignatureSet1, refSignatureSet2, pr
     plotPath = paste0(savePath, 'signature_cos_sim_res.svg')
     txtPath = paste0(savePath, 'signature_cos_sim_res.txt')
 
-    profile_name_input <- "SBS96" # profile type
-    # the availabe options for signaturesetname1 and signaturesetname2 will be:
     signature_refsets %>% filter(Profile == profileName) %>% pull(Signature_set_name) %>% unique()
-
-    signatureset_name1 <- "Environmental Mutagen Signatures (SBS)"
-    signatureset_name2 <- "COSMIC v3 Signatures (SBS)"
-
-
     sigrefset1_data <- signature_refsets %>%
-      filter(Profile == profile_name_input, Signature_set_name == signatureset_name1) %>%
+      filter(Profile == profileName, Signature_set_name == refSignatureSet1) %>%
       select(Signature_name, MutationType, Contribution) %>%
       pivot_wider(names_from = Signature_name, values_from = Contribution)
 
     sigrefset2_data <- signature_refsets %>%
-      filter(Profile == profile_name_input, Signature_set_name == signatureset_name2) %>%
+      filter(Profile == profileName, Signature_set_name == refSignatureSet2) %>%
       select(Signature_name, MutationType, Contribution) %>%
       pivot_wider(names_from = Signature_name, values_from = Contribution)
 

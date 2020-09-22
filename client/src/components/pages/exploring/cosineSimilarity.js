@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import Select from 'react-select';
 import { useSelector } from 'react-redux';
@@ -13,20 +13,14 @@ const { Group, Label } = Form;
 export default function MutationalSignatureProfile({
   submitR,
   downloadResults,
-  getRefSigOptions,
-  getReferenceSignatureData,
 }) {
   const rootURL = window.location.pathname;
   const {
     profileName,
     profileNameOptions,
-    signatureName1,
-    signatureNameOptions1,
-    signatureName2,
-    signatureNameOptions2,
     refSignatureSet1,
-    refSignatureSetOptions1,
     refSignatureSet2,
+    refSignatureSetOptions1,
     refSignatureSetOptions2,
     plotPath,
     plotURL,
@@ -36,6 +30,7 @@ export default function MutationalSignatureProfile({
     displayDebug,
     loading,
   } = useSelector((state) => state.expCosineSimilarity);
+  const { displayTab, refSigData } = useSelector((state) => state.exploring);
 
   const selectFix = {
     styles: {
@@ -45,14 +40,6 @@ export default function MutationalSignatureProfile({
     getOptionLabel: (option) => option,
     getOptionValue: (option) => option,
   };
-
-  const { displayTab } = useSelector((state) => state.exploring);
-
-  useEffect(() => {
-    if (!loading && !plotPath && displayTab == 'cosineSimilarity') {
-      calculateR('cosineSimilarity', {});
-    }
-  }, [plotPath, displayTab]);
 
   async function calculateR(fn, args) {
     console.log(fn);
@@ -78,7 +65,7 @@ export default function MutationalSignatureProfile({
           debugR: debugR,
           loading: false,
           plotPath: output.plotPath,
-          txtPath: output.textPath,
+          txtPath: output.txtPath,
         });
         setRPlot(output.plotPath);
       }
@@ -119,46 +106,25 @@ export default function MutationalSignatureProfile({
     }
   }
 
-  // get Signature Reference Sets for dropdown options
-  async function getSignatureSet(profileType) {
-    if (profileType) {
-      dispatchExpCosineSimilarity({ loading: true });
-      try {
-        const response = await getRefSigOptions(profileType);
-
-        if (response.ok) {
-          const refSignatureSetOptions = await response.json();
-
-          dispatchExpCosineSimilarity({
-            refSignatureSetOptions: refSignatureSetOptions,
-            refSignatureSet: refSignatureSetOptions[0],
-            loading: false,
-          });
-        } else {
-          dispatchError(await response.json());
-          dispatchExpCosineSimilarity({ loading: false });
-        }
-      } catch (err) {
-        dispatchError(err);
-        dispatchExpCosineSimilarity({ loading: false });
-      }
-    }
-  }
-
-  function handleProfileType(profileType) {
-    const matrixList = [];
-    const matrixOptions = [
+  function handleProfile(profile) {
+    let filteredData = refSigData.filter((row) => row.Profile == profile);
+    const refSignatureSetOptions = [
+      ...new Set(filteredData.map((row) => row.Signature_set_name)),
+    ];
+    const signatureNameOptions = [
       ...new Set(
-        matrixList
-          .filter((matrix) => matrix.Profile_Type == profileType)
-          .map((matrix) => matrix.Matrix_Size)
+        filteredData
+          .filter((row) => row.Signature_set_name == refSignatureSetOptions[0])
+          .map((row) => row.Signature_name)
       ),
     ];
 
     dispatchExpCosineSimilarity({
-      profile: profileType,
-      matrix: matrixOptions[0],
-      matrixOptions: matrixOptions,
+      profileName: profile,
+      refSignatureSet1: refSignatureSetOptions[0],
+      refSignatureSet2: refSignatureSetOptions[0],
+      refSignatureSetOptions1: refSignatureSetOptions,
+      refSignatureSetOptions2: refSignatureSetOptions,
     });
   }
 
@@ -174,7 +140,7 @@ export default function MutationalSignatureProfile({
                 <Select
                   options={profileNameOptions}
                   value={[profileName]}
-                  // onChange={(profile) => handleProfileName(profile)}
+                  onChange={(profile) => handleProfile(profile)}
                   {...selectFix}
                 />
               </Group>
@@ -184,54 +150,20 @@ export default function MutationalSignatureProfile({
               <Select
                 options={refSignatureSetOptions1}
                 value={[refSignatureSet1]}
-                // onChange={(set) =>
-                //   dispatchExpCosineSimilarity({
-                //     refSignatureSet1: set,
-                //   })
-                // }
-                {...selectFix}
-              />
-            </Col>
-            <Col sm="4">
-              <Label>Signature Name 1</Label>
-              <Select
-                options={signatureNameOptions1}
-                value={[signatureName1]}
-                // onChange={(name) =>
-                //   dispatchExpCosineSimilarity({
-                //     signatureName1: name,
-                //   })
-                // }
-                {...selectFix}
-              />
-            </Col>
-            <Col sm="1" />
-          </Row>
-          <Row>
-            <Col sm="3" />
-            <Col sm="4">
-              <Label>Signature Set 2</Label>
-              <Select
-                options={refSignatureSet2}
-                value={[refSignatureSetOptions2]}
                 onChange={(set) =>
-                  dispatchExpCosineSimilarity({
-                    refSignatureSet2: set,
-                  })
+                  dispatchExpCosineSimilarity({ refSignatureSet1: set })
                 }
                 {...selectFix}
               />
             </Col>
             <Col sm="4">
-              <Label>Signature Name 2</Label>
+              <Label>Signature Set 2</Label>
               <Select
-                options={signatureNameOptions2}
-                value={[signatureName2]}
-                // onChange={(name) =>
-                //   dispatchExpCosineSimilarity({
-                //     signatureName1: name,
-                //   })
-                // }
+                options={refSignatureSetOptions2}
+                value={[refSignatureSet2]}
+                onChange={(set) =>
+                  dispatchExpCosineSimilarity({ refSignatureSet2: set })
+                }
                 {...selectFix}
               />
             </Col>
@@ -242,9 +174,7 @@ export default function MutationalSignatureProfile({
                   calculateR('cosineSimilarity', {
                     profileName: profileName,
                     refSignatureSet1: refSignatureSet1,
-                    signatureName1: signatureNameOptions1,
                     refSignatureSet2: refSignatureSet2,
-                    signatureName2: signatureName2,
                   });
                 }}
               >
@@ -263,7 +193,7 @@ export default function MutationalSignatureProfile({
                 <a
                   className="px-2 py-1"
                   href={plotURL}
-                  download={plotURL.split('/').slice(-1)[0]}
+                  download={plotPath.split('/').slice(-1)[0]}
                 >
                   Download Plot
                 </a>

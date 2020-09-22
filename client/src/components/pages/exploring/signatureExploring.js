@@ -85,10 +85,7 @@ export default function SignatureExploring({ getReferenceSignatureData }) {
     },
     {
       component: (
-        <MutationalSignatureProfile
-          submitR={(fn, args) => submitR(fn, args)}
-          getReferenceSignatureData={(c, f) => getReferenceSignatureData(c, f)}
-        />
+        <MutationalSignatureProfile submitR={(fn, args) => submitR(fn, args)} />
       ),
       id: 'mutationalSignatureProfile',
       title: 'Mutational Signature Profile',
@@ -96,10 +93,8 @@ export default function SignatureExploring({ getReferenceSignatureData }) {
     {
       component: (
         <CosineSimilarity
-          getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
           downloadResults={(path) => downloadResults(path)}
           submitR={(fn, args) => submitR(fn, args)}
-          getReferenceSignatureData={(c, f) => getReferenceSignatureData(c, f)}
         />
       ),
       id: 'cosineSimilarity',
