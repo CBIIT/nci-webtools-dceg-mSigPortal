@@ -12,7 +12,7 @@ import { dispatchError, dispatchExploring } from '../../../services/store';
 const { Header, Body } = Card;
 const { Toggle, Collapse } = Accordion;
 
-export default function SignatureExploring({ getReferenceSignatureData }) {
+export default function SignatureExploring() {
   const rootURL = window.location.pathname;
 
   const {
@@ -66,17 +66,6 @@ export default function SignatureExploring({ getReferenceSignatureData }) {
     } catch (err) {
       dispatchError(err);
     }
-  }
-
-  function getRefSigOptions(profileType) {
-    return fetch(`${rootURL}visualizeR/getReferenceSignatureSets`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ profileType: profileType }),
-    });
   }
 
   const sections = [
