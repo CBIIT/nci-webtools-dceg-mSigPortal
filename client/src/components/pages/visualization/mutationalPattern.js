@@ -160,7 +160,7 @@ export default function MutationalPattern({ downloadResults, submitR }) {
             <a
               className="px-2 py-1"
               href={plotURL}
-              download={plotURL.split('/').slice(-1)[0]}
+              download={plotPath.split('/').slice(-1)[0]}
             >
               Download Plot
             </a>
