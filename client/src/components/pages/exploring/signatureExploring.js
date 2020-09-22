@@ -6,6 +6,7 @@ import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import ReferenceSignatures from './referenceSignatures';
 import MutationalSignatureProfile from './mutationalSignatureProfile';
 import CosineSimilarity from './cosineSimilarity';
+import MutationalSignatureComparison from './mutationalSignatureComparison';
 import { dispatchError, dispatchExploring } from '../../../services/store';
 
 const { Header, Body } = Card;
@@ -99,6 +100,15 @@ export default function SignatureExploring({ getReferenceSignatureData }) {
       ),
       id: 'cosineSimilarity',
       title: 'Cosine Similarity Among Mutational Signatures',
+    },
+    {
+      component: (
+        <MutationalSignatureComparison
+          submitR={(fn, args) => submitR(fn, args)}
+        />
+      ),
+      id: 'mutationalSignatureComparison',
+      title: 'Mutational Signatures Comparisons',
     },
   ];
   return (

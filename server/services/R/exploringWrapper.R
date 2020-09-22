@@ -156,3 +156,49 @@ cosineSimilarity <- function(profileName, refSignatureSet1, refSignatureSet2, pr
     return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
   })
 }
+
+# section4: Mutational signatures comparisons
+## A comparison of two reference signatures
+# There will be five parameters: “Profile Type”,  “Reference Signature Set1”, “Signature Name1”, “Reference Signature Set2”, “Signature Name2”;
+mutationalSignatureComparison <- function(profileName, refSignatureSet1, signatureName1, refSignatureSet2, signatureName2, projectID, pythonOutput, savePath, dataPath) {
+  # The parameters will be “Matrix Size”, “Reference Signature Set1” and “Reference Signature Set2”. 
+  source('services/R/Sigvisualfunc.R')
+  load(paste0(dataPath, 'signature_refsets.RData'))
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+    plotPath = paste0(savePath, 'mutationalSignatureComparison.svg')
+
+    profile_name_input <- "SBS96" # profile type
+    signatureset_name1 <- "COSMIC v3 Signatures (SBS)"
+    signatureset_name2 <- "COSMIC v3 Signatures (SBS)"
+    signature_name1 <- "SBS1"
+    signature_name2 <- "SBS5"
+
+    signature_refsets %>% filter(Profile == profileName) %>% pull(Signature_set_name) %>% unique()
+    profile1 <- signature_refsets %>%
+      filter(Profile == profileName, Signature_set_name == refSignatureSet1) %>%
+      select(Signature_name, MutationType, Contribution) %>%
+      pivot_wider(names_from = Signature_name, values_from = Contribution) %>%
+      select(MutationType, one_of(signatureName1))
+
+    profile2 <- signature_refsets %>%
+      filter(Profile == profileName, Signature_set_name == refSignatureSet2) %>%
+      select(Signature_name, MutationType, Contribution) %>%
+      pivot_wider(names_from = Signature_name, values_from = Contribution) %>%
+      select(MutationType, one_of(signatureName2))
+
+    plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, output_plot = plotPath)
+
+    output = list('plotPath' = plotPath)
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+  })
+}

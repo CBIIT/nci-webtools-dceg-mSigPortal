@@ -7,6 +7,7 @@ import {
   dispatchExploring,
   dispatchExpMutationalProfiles,
   dispatchExpCosineSimilarity,
+  dispatchExpMutationalSigComparison,
 } from '../../../services/store';
 
 const { Header, Body } = Card;
@@ -53,6 +54,7 @@ export default function Explore() {
     dispatchExpCosineSimilarity({
       loading: true,
     });
+    dispatchExpMutationalSigComparison({ loading: true });
 
     const data = (await getReferenceSignatureData()).output.data;
 
@@ -76,6 +78,9 @@ export default function Explore() {
       ),
     ];
     const refSignatureSet = refSignatureSetOptions[0];
+    const refSignatureSet2 =
+      refSignatureSetOptions[1] || refSignatureSetOptions[0];
+
     const strategyOptions = [
       ...new Set(
         data
@@ -97,6 +102,19 @@ export default function Explore() {
               row.Source == signatureSource &&
               row.Profile == profileName &&
               row.Signature_set_name == refSignatureSet &&
+              row.Dataset == strategy
+          )
+          .map((row) => row.Signature_name)
+      ),
+    ];
+    const signatureNameOptions2 = [
+      ...new Set(
+        data
+          .filter(
+            (row) =>
+              row.Source == signatureSource &&
+              row.Profile == profileName &&
+              row.Signature_set_name == refSignatureSet2 &&
               row.Dataset == strategy
           )
           .map((row) => row.Signature_name)
@@ -125,9 +143,23 @@ export default function Explore() {
       profileName: profileName,
       profileNameOptions: profileNameOptions,
       refSignatureSet1: refSignatureSetOptions[0],
-      refSignatureSet2: refSignatureSetOptions[1],
+      refSignatureSet2: refSignatureSetOptions[1] || refSignatureSetOptions[0],
       refSignatureSetOptions1: refSignatureSetOptions,
       refSignatureSetOptions2: refSignatureSetOptions,
+      loading: false,
+    });
+
+    dispatchExpMutationalSigComparison({
+      profileName: profileName,
+      profileNameOptions: profileNameOptions,
+      refSignatureSet1: refSignatureSet,
+      refSignatureSet2: refSignatureSet2,
+      refSignatureSetOptions1: refSignatureSetOptions,
+      refSignatureSetOptions2: refSignatureSetOptions,
+      signatureName1: signatureNameOptions[0],
+      signatureNameOptions1: signatureNameOptions,
+      signatureName2: signatureNameOptions2[0],
+      signatureNameOptions2: signatureNameOptions2,
       loading: false,
     });
   }

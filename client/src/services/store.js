@@ -245,6 +245,24 @@ export const getInitialState = () => ({
     displayDebug: false,
     loading: false,
   },
+  expMutationalSigComparison: {
+    profileName: '',
+    profileNameOptions: [],
+    refSignatureSet1: '',
+    refSignatureSetOptions1: [],
+    refSignatureSet2: '',
+    refSignatureSetOptions2: [],
+    signatureName1: '',
+    signatureNameOptions1: [],
+    signatureName2: '',
+    signatureNameOptions2: [],
+    plotPath: '',
+    plotURL: '',
+    debugR: '',
+    err: '',
+    displayDebug: false,
+    loading: false,
+  },
   error: {
     visible: false,
     message: `An error occured when requesting data. If this problem persists, please contact the administrator at <a href="mailto:mSigPortalWebAdmin@cancer.gov">mSigPortalWebAdmin@cancer.gov</a>.`,
@@ -420,6 +438,19 @@ const expCosineSimilaritySlice = createSlice({
   },
 });
 
+const expMutationalSigComparisonSlice = createSlice({
+  name: 'expMutationalSigComparison',
+  initialState: getInitialState().expMutationalSigComparison,
+  reducers: {
+    updateExpMutationalSigComparison: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
+
 const rootReducer = combineReducers({
   visualize: visualizeSlice.reducer,
   visualizeResults: visualizeResultsSlice.reducer,
@@ -434,6 +465,7 @@ const rootReducer = combineReducers({
   expRefSig: expRefSigSlice.reducer,
   expMutationalProfiles: expMutationalProfilesSlice.reducer,
   expCosineSimilarity: expCosineSimilaritySlice.reducer,
+  expMutationalSigComparison: expMutationalSigComparisonSlice.reducer,
 });
 
 export const store = configureStore({
@@ -456,6 +488,9 @@ export const {
   updateExpMutationalProfiles,
 } = expMutationalProfilesSlice.actions;
 export const { updateExpCosineSimilarity } = expCosineSimilaritySlice.actions;
+export const {
+  updateExpMutationalSigComparison,
+} = expMutationalSigComparisonSlice.actions;
 
 export function dispatchVisualize(obj) {
   store.dispatch(updateVisualize(obj));
@@ -512,4 +547,8 @@ export function dispatchExpMutationalProfiles(obj) {
 
 export function dispatchExpCosineSimilarity(obj) {
   store.dispatch(updateExpCosineSimilarity(obj));
+}
+
+export function dispatchExpMutationalSigComparison(obj) {
+  store.dispatch(updateExpMutationalSigComparison(obj));
 }
