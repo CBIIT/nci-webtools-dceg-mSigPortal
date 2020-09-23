@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { dispatchError, dispatchExpRefSig } from '../../../services/store';
-
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { dispatchError, dispatchExpRefSig } from '../../../../services/store';
+import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
 export default function ReferenceSignatures({ submitR }) {
   const rootURL = window.location.pathname;

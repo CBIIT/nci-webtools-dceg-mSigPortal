@@ -6,7 +6,8 @@ import {
   SidebarPanel,
   MainPanel,
 } from '../../controls/sidebar-container/sidebar-container';
-import SignatureExploring from './signatureExploring';
+import SignatureExploring from './signature/signatureExploring';
+import ExposureExploring from './exposure/exposureExploring';
 import {
   dispatchExploring,
   dispatchExpMutationalProfiles,
@@ -259,19 +260,15 @@ export default function Explore() {
                     displayTab == 'signatureExploring' ? 'block' : 'none',
                 }}
               >
-                <SignatureExploring
-                  getReferenceSignatureData={(columns, filters) =>
-                    getReferenceSignatureData(columns, filters)
-                  }
-                />
+                <SignatureExploring />
               </Body>
-              {/* <Body
-          style={{
-            display: displayTab == 'exposureExploring' ? 'block' : 'none',
-          }}
-        >
-          <MutationalProfiles />
-        </Body> */}
+              <Body
+                style={{
+                  display: displayTab == 'exposureExploring' ? 'block' : 'none',
+                }}
+              >
+                <ExposureExploring />
+              </Body>
             </Card>
           </div>
         </MainPanel>

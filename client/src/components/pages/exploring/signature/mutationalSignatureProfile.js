@@ -5,9 +5,8 @@ import { useSelector } from 'react-redux';
 import {
   dispatchError,
   dispatchExpMutationalProfiles,
-} from '../../../services/store';
-
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+} from '../../../../services/store';
+import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
 const { Group, Label } = Form;
 
