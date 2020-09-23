@@ -3,7 +3,11 @@ import { Row, Col, Accordion, Card } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
-
+import Tumor from './tumor';
+import Activity from './activity';
+import Decomposition from './decomposition';
+import Landscape from './landscape';
+import Prevalence from './prevalence';
 import { dispatchError, dispatchExploring } from '../../../../services/store';
 
 const { Header, Body } = Card;
@@ -11,12 +15,9 @@ const { Toggle, Collapse } = Accordion;
 
 export default function ExposureExploring() {
   const rootURL = window.location.pathname;
-  const {
-    displayTab,
-    projectID,
-    signatureAccordion,
-    exposureAccordion,
-  } = useSelector((state) => state.exploring);
+  const { displayTab, projectID, exposureAccordion } = useSelector(
+    (state) => state.exploring
+  );
 
   function submitR(fn, args) {
     return fetch(`${rootURL}exploringR`, {
@@ -65,67 +66,64 @@ export default function ExposureExploring() {
   }
 
   const sections = [
-    // {
-    //   component: (
-    //     <ReferenceSignatures submitR={(fn, args) => submitR(fn, args)} />
-    //   ),
-    //   id: 'referenceSignatures',
-    //   title: 'Current Reference Signatures in mSigPortal',
-    // },
-    // {
-    //   component: (
-    //     <MutationalSignatureProfile submitR={(fn, args) => submitR(fn, args)} />
-    //   ),
-    //   id: 'mutationalSignatureProfile',
-    //   title: 'Mutational Signature Profile',
-    // },
-    // {
-    //   component: (
-    //     <CosineSimilarity
-    //       downloadResults={(path) => downloadResults(path)}
-    //       submitR={(fn, args) => submitR(fn, args)}
-    //     />
-    //   ),
-    //   id: 'cosineSimilarity',
-    //   title: 'Cosine Similarity Among Mutational Signatures',
-    // },
-    // {
-    //   component: (
-    //     <MutationalSignatureComparison
-    //       submitR={(fn, args) => submitR(fn, args)}
-    //     />
-    //   ),
-    //   id: 'mutationalSignatureComparison',
-    //   title: 'Mutational Signatures Comparisons',
-    // },
+    {
+      component: <Tumor submitR={(fn, args) => submitR(fn, args)} />,
+      id: 'tumor',
+      title: 'Tumor Mutational Burden',
+    },
+    {
+      component: <Activity submitR={(fn, args) => submitR(fn, args)} />,
+      id: 'activity',
+      title: 'Mutational Signature Activity',
+    },
+    {
+      component: (
+        <Decomposition
+          downloadResults={(path) => downloadResults(path)}
+          submitR={(fn, args) => submitR(fn, args)}
+        />
+      ),
+      id: 'decomposition',
+      title: 'Evaluating the Performance of Mutational Signature Decomposition',
+    },
+    {
+      component: <Landscape submitR={(fn, args) => submitR(fn, args)} />,
+      id: 'landscape',
+      title: 'Landscape of Mutational Signature Activity',
+    },
+    {
+      component: <Prevalence submitR={(fn, args) => submitR(fn, args)} />,
+      id: 'prevalence',
+      title: 'Prevalence of Mutational Signature',
+    },
   ];
   return (
     <div className="position-relative">
       {sections.map(({ component, id, title }) => {
         return (
-          <Accordion activeKey={signatureAccordion[id]} key={id}>
+          <Accordion activeKey={exposureAccordion[id]} key={id}>
             <Card>
               <Toggle
                 className="font-weight-bold"
                 as={Header}
-                eventKey={signatureAccordion[id]}
+                eventKey={exposureAccordion[id]}
                 onClick={() =>
                   dispatchExploring({
-                    signatureAccordion: {
-                      ...signatureAccordion,
-                      [id]: !signatureAccordion[id],
+                    exposureAccordion: {
+                      ...exposureAccordion,
+                      [id]: !exposureAccordion[id],
                     },
                   })
                 }
               >
-                {signatureAccordion[id] == true ? (
+                {exposureAccordion[id] == true ? (
                   <FontAwesomeIcon icon={faMinus} />
                 ) : (
                   <FontAwesomeIcon icon={faPlus} />
                 )}{' '}
                 {title}
               </Toggle>
-              <Collapse eventKey={signatureAccordion[id]}>
+              <Collapse eventKey={exposureAccordion[id]}>
                 <Body>{component}</Body>
               </Collapse>
             </Card>

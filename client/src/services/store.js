@@ -200,7 +200,13 @@ export const getInitialState = () => ({
       cosineSimilarity: true,
       mutationalSignatureComparison: true,
     },
-    exposureAccordion: {},
+    exposureAccordion: {
+      tumor: true,
+      activity: true,
+      decomposition: true,
+      landscape: true,
+      prevalence: true,
+    },
     refSigData: {},
     projectID: '',
     source: 'public',
@@ -262,6 +268,86 @@ export const getInitialState = () => ({
     signatureNameOptions2: [],
     plotPath: '',
     plotURL: '',
+    debugR: '',
+    err: '',
+    displayDebug: false,
+    loading: false,
+  },
+  expTumor: {
+    study: '',
+    studyOptions: [],
+    strategy: '',
+    strategyOptions: [],
+    refSignatureSet: '',
+    refSignatureSetOptions: [],
+    genomeSize: '3102',
+    plotPath: '',
+    plotURL: '',
+    txtPath: '',
+    debugR: '',
+    err: '',
+    displayDebug: false,
+    loading: false,
+  },
+  expActivity: {
+    study: '',
+    studyOptions: [],
+    strategy: '',
+    strategyOptions: [],
+    refSignatureSet: '',
+    refSignatureSetOptions: [],
+    genomeSize: '3102',
+    plotPath: '',
+    plotURL: '',
+    txtPath: '',
+    debugR: '',
+    err: '',
+    displayDebug: false,
+    loading: false,
+  },
+  expDecomposition: {
+    study: '',
+    studyOptions: [],
+    strategy: '',
+    strategyOptions: [],
+    refSignatureSet: '',
+    refSignatureSetOptions: [],
+    genomeSize: '3102',
+    plotPath: '',
+    plotURL: '',
+    txtPath: '',
+    debugR: '',
+    err: '',
+    displayDebug: false,
+    loading: false,
+  },
+  expLandscape: {
+    study: '',
+    studyOptions: [],
+    strategy: '',
+    strategyOptions: [],
+    refSignatureSet: '',
+    refSignatureSetOptions: [],
+    genomeSize: '3102',
+    plotPath: '',
+    plotURL: '',
+    txtPath: '',
+    debugR: '',
+    err: '',
+    displayDebug: false,
+    loading: false,
+  },
+  expPrevalence: {
+    study: '',
+    studyOptions: [],
+    strategy: '',
+    strategyOptions: [],
+    refSignatureSet: '',
+    refSignatureSetOptions: [],
+    genomeSize: '3102',
+    plotPath: '',
+    plotURL: '',
+    txtPath: '',
     debugR: '',
     err: '',
     displayDebug: false,
@@ -454,6 +540,66 @@ const expMutationalSigComparisonSlice = createSlice({
     },
   },
 });
+const expTumorSlice = createSlice({
+  name: 'expTumor',
+  initialState: getInitialState().expTumor,
+  reducers: {
+    updateExpTumor: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
+const expActivitySlice = createSlice({
+  name: 'expActivity',
+  initialState: getInitialState().expActivity,
+  reducers: {
+    updateExpActivity: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
+const expDecompositionSlice = createSlice({
+  name: 'expDecomposition',
+  initialState: getInitialState().expDecomposition,
+  reducers: {
+    updateExpDecomposition: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
+const expLandscapeSlice = createSlice({
+  name: 'expLandscape',
+  initialState: getInitialState().expLandscape,
+  reducers: {
+    updateExpLandscape: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
+const expPrevalenceSlice = createSlice({
+  name: 'expPrevalence',
+  initialState: getInitialState().expPrevalence,
+  reducers: {
+    updateExpPrevalence: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
 
 const rootReducer = combineReducers({
   visualize: visualizeSlice.reducer,
@@ -470,6 +616,11 @@ const rootReducer = combineReducers({
   expMutationalProfiles: expMutationalProfilesSlice.reducer,
   expCosineSimilarity: expCosineSimilaritySlice.reducer,
   expMutationalSigComparison: expMutationalSigComparisonSlice.reducer,
+  expTumor: expTumorSlice.reducer,
+  expActivity: expActivitySlice.reducer,
+  expDecomposition: expDecompositionSlice.reducer,
+  expLandscape: expLandscapeSlice.reducer,
+  expPrevalence: expPrevalenceSlice.reducer,
 });
 
 export const store = configureStore({
@@ -495,6 +646,11 @@ export const { updateExpCosineSimilarity } = expCosineSimilaritySlice.actions;
 export const {
   updateExpMutationalSigComparison,
 } = expMutationalSigComparisonSlice.actions;
+export const { updateExpTumor } = expTumorSlice.actions;
+export const { updateExpActivity } = expActivitySlice.actions;
+export const { updateExpDecomposition } = expDecompositionSlice.actions;
+export const { updateExpLandscape } = expLandscapeSlice.actions;
+export const { updateExpPrevalence } = expPrevalenceSlice.actions;
 
 export function dispatchVisualize(obj) {
   store.dispatch(updateVisualize(obj));
@@ -555,4 +711,20 @@ export function dispatchExpCosineSimilarity(obj) {
 
 export function dispatchExpMutationalSigComparison(obj) {
   store.dispatch(updateExpMutationalSigComparison(obj));
+}
+
+export function dispatchExpTumor(obj) {
+  store.dispatch(updateExpTumor(obj));
+}
+export function dispatchExpActivity(obj) {
+  store.dispatch(updateExpActivity(obj));
+}
+export function dispatchExpDecomposition(obj) {
+  store.dispatch(updateExpDecomposition(obj));
+}
+export function dispatchExpLandscape(obj) {
+  store.dispatch(updateExpLandscape(obj));
+}
+export function dispatchExpPrevalence(obj) {
+  store.dispatch(updateExpPrevalence(obj));
 }
