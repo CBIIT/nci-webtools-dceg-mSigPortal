@@ -208,6 +208,7 @@ export const getInitialState = () => ({
       prevalence: true,
     },
     refSigData: {},
+    publicDataOptions: {},
     projectID: '',
     source: 'public',
     openSidebar: false,

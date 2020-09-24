@@ -9,10 +9,16 @@ import {
 import SignatureExploring from './signature/signatureExploring';
 import ExposureExploring from './exposure/exposureExploring';
 import {
+  dispatchError,
   dispatchExploring,
   dispatchExpMutationalProfiles,
   dispatchExpCosineSimilarity,
   dispatchExpMutationalSigComparison,
+  dispatchExpTumor,
+  dispatchExpActivity,
+  dispatchExpDecomposition,
+  dispatchExpLandscape,
+  dispatchExpPrevalence,
 } from '../../../services/store';
 
 const { Header, Body } = Card;
@@ -25,6 +31,7 @@ export default function Explore() {
     displayTab,
     projectID,
     refSigData,
+    publicDataOptions,
     source,
     openSidebar,
     submitted,
@@ -32,18 +39,21 @@ export default function Explore() {
 
   useEffect(() => {
     if (!Object.keys(refSigData).length) getInitalRefSigData();
+    if (!Object.keys(publicDataOptions).length) getPublicDataOptions();
   }, []);
 
-  async function getReferenceSignatureData(filters = {}) {
-    const columns = [
+  async function getReferenceSignatureData(
+    columns = [
       'Source',
       'Profile',
       'Signature_set_name',
       'Dataset',
       'Signature_name',
-    ];
-    return await (
-      await fetch(`${rootURL}getReferenceSignatureData`, {
+    ],
+    filters = {}
+  ) {
+    try {
+      const res = await fetch(`${rootURL}getReferenceSignatureData`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -55,9 +65,77 @@ export default function Explore() {
             filters: filters,
           },
         }),
-      })
-    ).json();
+      });
+      if (!res.ok) {
+        // log error
+      } else {
+        return await res.json();
+      }
+    } catch (err) {}
   }
+
+  async function getPublicDataOptions() {
+    dispatchExpTumor({ loading: true });
+    dispatchExpActivity({ loading: true });
+    dispatchExpDecomposition({ loading: true });
+    dispatchExpLandscape({ loading: true });
+    dispatchExpPrevalence({ loading: true });
+
+    try {
+      let [publicData, referenceSignatures] = await Promise.all([
+        fetch(`${rootURL}getPublicDataOptions`, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        }),
+        getReferenceSignatureData(['Signature_set_name']),
+      ]);
+
+      if (!publicData.ok) {
+        // console.log(await response.json());
+      } else {
+        const data = await publicData.json();
+        const studyOptions = [...new Set(data.map((data) => data.Study))];
+        const strategyOptions = [
+          ...new Set(
+            data
+              .filter((data) => data.Study == studyOptions[0])
+              .map((data) => data.Dataset)
+          ),
+        ];
+        const refSignatureSetOptions = [
+          ...new Set(
+            referenceSignatures.output.data.map((row) => row.Signature_set_name)
+          ),
+        ];
+
+        const params = {
+          study: studyOptions[0],
+          studyOptions: studyOptions,
+          strategy: strategyOptions[0],
+          strategyOptions: strategyOptions,
+          refSignatureSet: refSignatureSetOptions[0],
+          refSignatureSetOptions: refSignatureSetOptions,
+        };
+        dispatchExploring({ publicDataOptions: data });
+        dispatchExpTumor({ ...params });
+        dispatchExpActivity({ ...params });
+        dispatchExpDecomposition({ ...params });
+        dispatchExpLandscape({ ...params });
+        dispatchExpPrevalence({ ...params });
+      }
+    } catch (err) {
+      dispatchError(err);
+    }
+    dispatchExpTumor({ loading: false });
+    dispatchExpActivity({ loading: false });
+    dispatchExpDecomposition({ loading: false });
+    dispatchExpLandscape({ loading: false });
+    dispatchExpPrevalence({ loading: false });
+  }
+
   async function getInitalRefSigData() {
     // set loading indicators
     dispatchExpMutationalProfiles({ loading: true });
@@ -66,8 +144,7 @@ export default function Explore() {
     });
     dispatchExpMutationalSigComparison({ loading: true });
 
-    const data = (await getReferenceSignatureData()).output.data;
-
+    let data = (await getReferenceSignatureData()).output.data;
     const signatureSourceOptions = [...new Set(data.map((row) => row.Source))];
     const signatureSource = signatureSourceOptions[0];
     const profileNameOptions = [
