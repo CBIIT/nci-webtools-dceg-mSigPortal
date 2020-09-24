@@ -16,6 +16,21 @@
     <!-- <link rel="manifest" href="%PUBLIC_URL%/manifest.json" /> -->
     <link rel="stylesheet" href="index.css" />
     <title>mSigPortal</title>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-62346354-26"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+
+      gtag('config', 'UA-62346354-26');
+    </script>
   </head>
 
   <body class="d-flex flex-column bg-egg" style="min-height: 100vh;">
@@ -27,7 +42,7 @@
           >Skip to Main Content</a
         >
         <div class="ml-4 mr-5">
-          <div class=" p-2 d-none d-sm-block">
+          <div class="p-2 d-none d-sm-block">
             <a href="https://dceg.cancer.gov/" target="_blank">
               <img
                 src="https://analysistools.cancer.gov/common/images/DCEG-logo.svg"
@@ -35,7 +50,12 @@
                 alt="National Cancer Institute Logo"
               />
             </a>
-            <img class="d-none d-md-block" src="assets/images/msigportal-logo.png" height="80" style="float:right; margin-top: 15px;">
+            <img
+              class="d-none d-md-block"
+              src="assets/images/msigportal-logo.png"
+              height="80"
+              style="float: right; margin-top: 15px;"
+            />
           </div>
           <div class="p-1 d-sm-none">
             <a href="https://dceg.cancer.gov/">
