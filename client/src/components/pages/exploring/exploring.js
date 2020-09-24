@@ -110,7 +110,24 @@ export default function Explore() {
             referenceSignatures.output.data.map((row) => row.Signature_set_name)
           ),
         ];
-
+        const cancerOptions = [
+          ...new Set(
+            data
+              .filter((data) => data.Study == studyOptions[0])
+              .map((data) => data.Cancer_Type)
+          ),
+        ];
+        const signatureSetOptions2 = [
+          ...new Set(
+            data
+              .filter(
+                (data) =>
+                  data.Study == studyOptions[0] &&
+                  data.Cancer_Type == cancerOptions[0]
+              )
+              .map((data) => data.Dataset)
+          ),
+        ];
         const params = {
           study: studyOptions[0],
           studyOptions: studyOptions,
@@ -119,11 +136,18 @@ export default function Explore() {
           refSignatureSet: refSignatureSetOptions[0],
           refSignatureSetOptions: refSignatureSetOptions,
         };
+        const landscapeParams = {
+          cancer: cancerOptions[0],
+          cancerOptions: cancerOptions,
+          refSignatureSet: signatureSetOptions2[0],
+          refSignatureSetOptions: signatureSetOptions2,
+        };
+
         dispatchExploring({ publicDataOptions: data });
         dispatchExpTumor({ ...params });
         dispatchExpActivity({ ...params });
         dispatchExpDecomposition({ ...params });
-        dispatchExpLandscape({ ...params });
+        dispatchExpLandscape({ ...params, ...landscapeParams });
         dispatchExpPrevalence({ ...params });
       }
     } catch (err) {

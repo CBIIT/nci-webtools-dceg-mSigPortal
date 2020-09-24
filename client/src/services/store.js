@@ -325,6 +325,8 @@ export const getInitialState = () => ({
   expLandscape: {
     study: '',
     studyOptions: [],
+    cancer: '',
+    cancerOptions: [],
     strategy: '',
     strategyOptions: [],
     refSignatureSet: '',
