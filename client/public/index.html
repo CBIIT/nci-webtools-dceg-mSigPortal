@@ -30,6 +30,17 @@
       gtag('js', new Date());
 
       gtag('config', 'UA-62346354-26');
+      window.addEventListener('hashchange', (e) => {
+        if (window.location.hash === '#!' || window.location.hash === '#') {
+          gtag('config', 'UA-62346354-26', {
+            page_path: location.pathname + location.search,
+          });
+        } else {
+          gtag('config', 'UA-62346354-26', {
+            page_path: location.pathname + location.search + location.hash,
+          });
+        }
+      });
     </script>
   </head>
 
