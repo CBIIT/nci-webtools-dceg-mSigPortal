@@ -167,7 +167,7 @@ export default function Tumor({ submitR, downloadResults }) {
               <Button
                 variant="primary"
                 onClick={() => {
-                  calculateR('cosineSimilarity', {
+                  calculateR('tumorBurden', {
                     study: study,
                     strategy: strategy,
                     refSignatureSet: refSignatureSet,

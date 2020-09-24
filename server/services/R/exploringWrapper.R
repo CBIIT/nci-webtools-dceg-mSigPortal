@@ -202,3 +202,28 @@ mutationalSignatureComparison <- function(profileName, refSignatureSet1, signatu
     return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
   })
 }
+
+# Exposure Explore -------------------------------------------------------
+# section 1: Tumor Mutational Burden -------------------
+tumorBurden <- function(study, strategy, set, size, projectID, pythonOutput, savePath, dataPath) {
+  source('services/R/Sigvisualfunc.R')
+  load(paste0(dataPath, 'signature_refsets.RData'))
+  load(paste0(dataPath, 'seqmatrix_refdata_subset_files.RData'))
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+    plotPath = paste0(savePath, 'tumorMutationalBurden.svg')
+
+
+    output = list('plotPath' = plotPath)
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+  })
+}
