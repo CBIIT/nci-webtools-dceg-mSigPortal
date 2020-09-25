@@ -15,6 +15,8 @@ export default function Tumor({ submitR, downloadResults }) {
   const {
     study,
     studyOptions,
+    cancer,
+    cancerOptions,
     strategy,
     strategyOptions,
     refSignatureSet,
@@ -28,7 +30,9 @@ export default function Tumor({ submitR, downloadResults }) {
     displayDebug,
     loading,
   } = useSelector((state) => state.expLandscape);
-  const { displayTab, refSigData } = useSelector((state) => state.exploring);
+  const { displayTab, publicDataOptions } = useSelector(
+    (state) => state.exploring
+  );
 
   const selectFix = {
     styles: {
@@ -104,18 +108,47 @@ export default function Tumor({ submitR, downloadResults }) {
     }
   }
 
-  function handleProfile(profile) {
-    let filteredData = refSigData.filter((row) => row.Profile == profile);
-    const refSignatureSetOptions = [
-      ...new Set(filteredData.map((row) => row.Signature_set_name)),
+  function handleStudy(study) {
+    const cancerOptions = [
+      ...new Set(
+        publicDataOptions
+          .filter((data) => data.Study == study)
+          .map((data) => data.Cancer_Type)
+      ),
+    ];
+    const strategyOptions = [
+      ...new Set(
+        publicDataOptions
+          .filter(
+            (data) =>
+              data.Study == study && data.Cancer_Type == cancerOptions[0]
+          )
+          .map((data) => data.Dataset)
+      ),
     ];
 
     dispatchExpLandscape({
-      profileName: profile,
-      refSignatureSet1: refSignatureSetOptions[0],
-      refSignatureSet2: refSignatureSetOptions[1] || refSignatureSetOptions[0],
-      refSignatureSetOptions1: refSignatureSetOptions,
-      refSignatureSetOptions2: refSignatureSetOptions,
+      study: study,
+      cancer: cancerOptions[0],
+      cancerOptions: cancerOptions,
+      strategy: strategyOptions[0],
+      strategyOptions: strategyOptions,
+    });
+  }
+
+  function handleCancer(cancer) {
+    const strategyOptions = [
+      ...new Set(
+        publicDataOptions
+          .filter((data) => data.Study == study && data.Cancer_Type == cancer)
+          .map((data) => data.Dataset)
+      ),
+    ];
+
+    dispatchExpLandscape({
+      cancer: cancer,
+      strategy: strategyOptions[0],
+      strategyOptions: strategyOptions,
     });
   }
 
@@ -126,15 +159,22 @@ export default function Tumor({ submitR, downloadResults }) {
         <div>
           <Row className="justify-content-center">
             <Col sm="2">
-              <Group controlId="withinProfileType">
-                <Label>Study</Label>
-                <Select
-                  options={studyOptions}
-                  value={[study]}
-                  onChange={(profile) => handleProfile(profile)}
-                  {...selectFix}
-                />
-              </Group>
+              <Label>Study</Label>
+              <Select
+                options={studyOptions}
+                value={[study]}
+                onChange={(study) => handleStudy(study)}
+                {...selectFix}
+              />
+            </Col>
+            <Col sm="2">
+              <Label>Cancer Type</Label>
+              <Select
+                options={cancerOptions}
+                value={[cancer]}
+                onChange={(cancer) => handleCancer(cancer)}
+                {...selectFix}
+              />
             </Col>
             <Col sm="2">
               <Label>Experimental Strategy</Label>
@@ -147,18 +187,18 @@ export default function Tumor({ submitR, downloadResults }) {
                 {...selectFix}
               />
             </Col>
-            <Col sm="4">
+            <Col sm="3">
               <Label>Reference Signature Set</Label>
               <Select
                 options={refSignatureSetOptions}
                 value={[refSignatureSet]}
                 onChange={(set) =>
-                  dispatchExpLandscape({ refSignatureSet2: set })
+                  dispatchExpLandscape({ refSignatureSet: set })
                 }
                 {...selectFix}
               />
             </Col>
-            <Col sm="3">
+            <Col sm="2">
               <Label>Genome Size</Label>
               <Control
                 value={genomeSize}
@@ -167,8 +207,8 @@ export default function Tumor({ submitR, downloadResults }) {
                     genomeSize: e.target.value,
                   });
                 }}
-              ></Control>
-              <Text className="text-muted">(Ex. NCG>NTG)</Text>
+              />
+              {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
             </Col>
             <Col sm="1" className="m-auto">
               <Button
@@ -176,9 +216,10 @@ export default function Tumor({ submitR, downloadResults }) {
                 onClick={() => {
                   calculateR('cosineSimilarity', {
                     study: study,
+                    cancer: cancer,
                     strategy: strategy,
                     refSignatureSet: refSignatureSet,
-                    genomeSize: genomeSize,
+                    genomeSize: parseFloat(genomeSize),
                   });
                 }}
               >
@@ -186,6 +227,7 @@ export default function Tumor({ submitR, downloadResults }) {
               </Button>
             </Col>
           </Row>
+
           <div id="withinPlot">
             <div style={{ display: err ? 'block' : 'none' }}>
               <p>

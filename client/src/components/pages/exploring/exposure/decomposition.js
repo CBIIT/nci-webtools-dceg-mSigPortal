@@ -28,7 +28,9 @@ export default function Tumor({ submitR, downloadResults }) {
     displayDebug,
     loading,
   } = useSelector((state) => state.expDecomposition);
-  const { displayTab, refSigData } = useSelector((state) => state.exploring);
+  const { displayTab, publicDataOptions } = useSelector(
+    (state) => state.exploring
+  );
 
   const selectFix = {
     styles: {
@@ -104,18 +106,19 @@ export default function Tumor({ submitR, downloadResults }) {
     }
   }
 
-  function handleProfile(profile) {
-    let filteredData = refSigData.filter((row) => row.Profile == profile);
-    const refSignatureSetOptions = [
-      ...new Set(filteredData.map((row) => row.Signature_set_name)),
+  function handleStudy(study) {
+    const strategyOptions = [
+      ...new Set(
+        publicDataOptions
+          .filter((data) => data.Study == study)
+          .map((data) => data.Dataset)
+      ),
     ];
 
     dispatchExpDecomposition({
-      profileName: profile,
-      refSignatureSet1: refSignatureSetOptions[0],
-      refSignatureSet2: refSignatureSetOptions[1] || refSignatureSetOptions[0],
-      refSignatureSetOptions1: refSignatureSetOptions,
-      refSignatureSetOptions2: refSignatureSetOptions,
+      study: study,
+      strategy: strategyOptions[0],
+      strategyOptions: strategyOptions,
     });
   }
 
@@ -131,7 +134,7 @@ export default function Tumor({ submitR, downloadResults }) {
                 <Select
                   options={studyOptions}
                   value={[study]}
-                  onChange={(profile) => handleProfile(profile)}
+                  onChange={(study) => handleStudy(study)}
                   {...selectFix}
                 />
               </Group>
@@ -141,8 +144,8 @@ export default function Tumor({ submitR, downloadResults }) {
               <Select
                 options={strategyOptions}
                 value={[strategy]}
-                onChange={(set) =>
-                  dispatchExpDecomposition({ refSignatureSet1: set })
+                onChange={(strategy) =>
+                  dispatchExpDecomposition({ strategy: strategy })
                 }
                 {...selectFix}
               />
@@ -153,7 +156,7 @@ export default function Tumor({ submitR, downloadResults }) {
                 options={refSignatureSetOptions}
                 value={[refSignatureSet]}
                 onChange={(set) =>
-                  dispatchExpDecomposition({ refSignatureSet2: set })
+                  dispatchExpDecomposition({ refSignatureSet: set })
                 }
                 {...selectFix}
               />
@@ -167,8 +170,8 @@ export default function Tumor({ submitR, downloadResults }) {
                     genomeSize: e.target.value,
                   });
                 }}
-              ></Control>
-              <Text className="text-muted">(Ex. NCG>NTG)</Text>
+              />
+              {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
             </Col>
             <Col sm="1" className="m-auto">
               <Button
@@ -178,7 +181,7 @@ export default function Tumor({ submitR, downloadResults }) {
                     study: study,
                     strategy: strategy,
                     refSignatureSet: refSignatureSet,
-                    genomeSize: genomeSize,
+                    genomeSize: parseFloat(genomeSize),
                   });
                 }}
               >

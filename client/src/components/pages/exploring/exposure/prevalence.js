@@ -20,6 +20,7 @@ export default function Tumor({ submitR, downloadResults }) {
     refSignatureSet,
     refSignatureSetOptions,
     genomeSize,
+    mutation,
     plotPath,
     plotURL,
     txtPath,
@@ -28,7 +29,9 @@ export default function Tumor({ submitR, downloadResults }) {
     displayDebug,
     loading,
   } = useSelector((state) => state.expPrevalence);
-  const { displayTab, refSigData } = useSelector((state) => state.exploring);
+  const { displayTab, publicDataOptions } = useSelector(
+    (state) => state.exploring
+  );
 
   const selectFix = {
     styles: {
@@ -104,18 +107,19 @@ export default function Tumor({ submitR, downloadResults }) {
     }
   }
 
-  function handleProfile(profile) {
-    let filteredData = refSigData.filter((row) => row.Profile == profile);
-    const refSignatureSetOptions = [
-      ...new Set(filteredData.map((row) => row.Signature_set_name)),
+  function handleStudy(study) {
+    const strategyOptions = [
+      ...new Set(
+        publicDataOptions
+          .filter((data) => data.Study == study)
+          .map((data) => data.Dataset)
+      ),
     ];
 
     dispatchExpPrevalence({
-      profileName: profile,
-      refSignatureSet1: refSignatureSetOptions[0],
-      refSignatureSet2: refSignatureSetOptions[1] || refSignatureSetOptions[0],
-      refSignatureSetOptions1: refSignatureSetOptions,
-      refSignatureSetOptions2: refSignatureSetOptions,
+      study: study,
+      strategy: strategyOptions[0],
+      strategyOptions: strategyOptions,
     });
   }
 
@@ -131,7 +135,7 @@ export default function Tumor({ submitR, downloadResults }) {
                 <Select
                   options={studyOptions}
                   value={[study]}
-                  onChange={(profile) => handleProfile(profile)}
+                  onChange={(study) => handleStudy(study)}
                   {...selectFix}
                 />
               </Group>
@@ -141,24 +145,24 @@ export default function Tumor({ submitR, downloadResults }) {
               <Select
                 options={strategyOptions}
                 value={[strategy]}
-                onChange={(set) =>
-                  dispatchExpPrevalence({ refSignatureSet1: set })
-                }
-                {...selectFix}
-              />
-            </Col>
-            <Col sm="4">
-              <Label>Reference Signature Set</Label>
-              <Select
-                options={refSignatureSetOptions}
-                value={[refSignatureSet]}
-                onChange={(set) =>
-                  dispatchExpPrevalence({ refSignatureSet2: set })
+                onChange={(strategy) =>
+                  dispatchExpPrevalence({ strategy: strategy })
                 }
                 {...selectFix}
               />
             </Col>
             <Col sm="3">
+              <Label>Reference Signature Set</Label>
+              <Select
+                options={refSignatureSetOptions}
+                value={[refSignatureSet]}
+                onChange={(set) =>
+                  dispatchExpPrevalence({ refSignatureSet: set })
+                }
+                {...selectFix}
+              />
+            </Col>
+            <Col sm="2">
               <Label>Genome Size</Label>
               <Control
                 value={genomeSize}
@@ -168,7 +172,19 @@ export default function Tumor({ submitR, downloadResults }) {
                   });
                 }}
               ></Control>
-              <Text className="text-muted">(Ex. NCG>NTG)</Text>
+              {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
+            </Col>
+            <Col sm="2">
+              <Label>Minimal Number Mutations within in Each Signature</Label>
+              <Control
+                value={mutation}
+                onChange={(e) => {
+                  dispatchExpPrevalence({
+                    mutation: e.target.value,
+                  });
+                }}
+              />
+              {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
             </Col>
             <Col sm="1" className="m-auto">
               <Button
@@ -178,7 +194,8 @@ export default function Tumor({ submitR, downloadResults }) {
                     study: study,
                     strategy: strategy,
                     refSignatureSet: refSignatureSet,
-                    genomeSize: genomeSize,
+                    genomeSize: parseFloat(genomeSize),
+                    mutation: parseFloat(mutation),
                   });
                 }}
               >

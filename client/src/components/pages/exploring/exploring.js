@@ -117,7 +117,7 @@ export default function Explore() {
               .map((data) => data.Cancer_Type)
           ),
         ];
-        const signatureSetOptions2 = [
+        const strategyOptions2 = [
           ...new Set(
             data
               .filter(
@@ -139,8 +139,8 @@ export default function Explore() {
         const landscapeParams = {
           cancer: cancerOptions[0],
           cancerOptions: cancerOptions,
-          refSignatureSet: signatureSetOptions2[0],
-          refSignatureSetOptions: signatureSetOptions2,
+          strategy: strategyOptions2[0],
+          strategyOptions: strategyOptions2,
         };
 
         dispatchExploring({ publicDataOptions: data });
