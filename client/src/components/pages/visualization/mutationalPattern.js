@@ -99,15 +99,22 @@ export default function MutationalPattern({ downloadResults, submitR }) {
         dispatchMutationalPattern({ submitOverlay: false });
       } else {
         const { debugR, output } = await response.json();
-
-        dispatchMutationalPattern({
-          debugR: debugR,
-          plotPath: output.plotPath,
-          barPath: output.barPath,
-          txtPath: output.txtPath,
-        });
-        setRPlot(output.plotPath, 'context');
-        if (output.barPath) setRPlot(output.barPath, 'barchart');
+        if (output.plotPath) {
+          dispatchMutationalPattern({
+            debugR: debugR,
+            plotPath: output.plotPath,
+            barPath: output.barPath,
+            txtPath: output.txtPath,
+          });
+          setRPlot(output.plotPath, 'context');
+          if (output.barPath) setRPlot(output.barPath, 'barchart');
+        } else {
+          dispatchMutationalPattern({
+            debugR: debugR,
+            err: true,
+            submitOverlay: false,
+          });
+        }
       }
     } catch (err) {
       dispatchError(err);
@@ -119,6 +126,7 @@ export default function MutationalPattern({ downloadResults, submitR }) {
     <>
       <div id="barchart">
         <div style={{ display: err ? 'block' : 'none' }}>
+          <h4>Bar Chart</h4>
           <p>An error has occured. Check the debug section for more info.</p>
         </div>
         {plotURL.length > 0 &&
@@ -153,6 +161,7 @@ export default function MutationalPattern({ downloadResults, submitR }) {
       </div>
       <div id="context">
         <div style={{ display: err ? 'block' : 'none' }}>
+          <h4>Context Plot</h4>
           <p>An error has occured. Check the debug section for more info.</p>
         </div>
         <div style={{ display: plotURL ? 'block' : 'none' }}>
