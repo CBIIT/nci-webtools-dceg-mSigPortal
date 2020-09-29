@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import Select from 'react-select';
 import { useSelector } from 'react-redux';
@@ -8,7 +8,7 @@ import {
 } from '../../../../services/store';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
-const { Group, Label, Control, Text } = Form;
+const { Group, Label, Control } = Form;
 
 export default function Tumor({ submitR, downloadResults }) {
   const rootURL = window.location.pathname;
@@ -42,6 +42,8 @@ export default function Tumor({ submitR, downloadResults }) {
     getOptionLabel: (option) => option,
     getOptionValue: (option) => option,
   };
+
+  const [vdFile, setFile] = useState(new File([], ''));
 
   async function calculateR(fn, args) {
     console.log(fn);
@@ -152,6 +154,47 @@ export default function Tumor({ submitR, downloadResults }) {
     });
   }
 
+  async function handleSubmit() {
+    dispatchExpLandscape({ loading: true });
+
+    const { projectID } = await upload();
+    if (projectID) {
+      calculateR('cosineSimilarity', {
+        projectID: projectID,
+        study: study,
+        cancer: cancer,
+        strategy: strategy,
+        refSignatureSet: refSignatureSet,
+        genomeSize: parseFloat(genomeSize),
+      });
+    }
+    dispatchExpLandscape({ loading: false });
+  }
+
+  async function upload() {
+    try {
+      const data = new FormData();
+      data.append('inputFile', vdFile);
+      let response = await fetch(`${rootURL}upload`, {
+        method: 'POST',
+        body: data,
+      });
+
+      if (!response.ok) {
+        const { msg, error } = await response.json();
+        const message = `<div>
+          <p>${msg}</p>
+         ${error ? `<p>${error}</p>` : ''} 
+        </div>`;
+        dispatchError(message);
+      } else {
+        return await response.json();
+      }
+    } catch (err) {
+      dispatchError(err);
+    }
+  }
+
   return (
     <div>
       <Form>
@@ -159,13 +202,15 @@ export default function Tumor({ submitR, downloadResults }) {
         <div>
           <Row className="justify-content-center">
             <Col sm="2">
-              <Label>Study</Label>
-              <Select
-                options={studyOptions}
-                value={[study]}
-                onChange={(study) => handleStudy(study)}
-                {...selectFix}
-              />
+              <Group controlId="study">
+                <Label>Study</Label>
+                <Select
+                  options={studyOptions}
+                  value={[study]}
+                  onChange={(study) => handleStudy(study)}
+                  {...selectFix}
+                />
+              </Group>
             </Col>
             <Col sm="2">
               <Label>Cancer Type</Label>
@@ -211,23 +256,22 @@ export default function Tumor({ submitR, downloadResults }) {
               {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
             </Col>
             <Col sm="1" className="m-auto">
-              <Button
-                variant="primary"
-                onClick={() => {
-                  calculateR('cosineSimilarity', {
-                    study: study,
-                    cancer: cancer,
-                    strategy: strategy,
-                    refSignatureSet: refSignatureSet,
-                    genomeSize: parseFloat(genomeSize),
-                  });
-                }}
-              >
+              <Button variant="primary" onClick={() => handleSubmit()}>
                 Calculate
               </Button>
             </Col>
           </Row>
-
+          <Row>
+            <Col sm="4">
+              <Label>Upload Variable Data</Label>
+              <Form.File
+                id="variableData"
+                label={vdFile.name || 'Upload here'}
+                onChange={(e) => setFile(e.target.files[0])}
+                custom
+              />
+            </Col>
+          </Row>
           <div id="withinPlot">
             <div style={{ display: err ? 'block' : 'none' }}>
               <p>
