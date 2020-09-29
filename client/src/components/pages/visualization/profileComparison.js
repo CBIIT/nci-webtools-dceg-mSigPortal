@@ -22,6 +22,7 @@ import {
   dispatchProfileComparison,
 } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import Plot from '../../controls/plot/plot';
 
 const { Group, Label, Control, Text } = Form;
 const { Title, Content } = Popover;
@@ -378,22 +379,6 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     getPublicSamples(pubStudy, cancer);
   }
 
-  function handlePublicProfileType(profileType) {
-    const userMatrixOptions = [
-      ...new Set(
-        matrixList
-          .filter((matrix) => matrix.Profile_Type == profileType)
-          .map((matrix) => matrix.Matrix_Size)
-      ),
-    ];
-
-    dispatchProfileComparison({
-      userProfileType: profileType,
-      userMatrixSize: userMatrixOptions[0],
-      userMatrixOptions: userMatrixOptions,
-    });
-  }
-
   return (
     <div>
       <Accordion defaultActiveKey="0">
@@ -509,25 +494,10 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                       </p>
                     </div>
                     <div style={{ display: withinPlotURL ? 'block' : 'none' }}>
-                      <div className="d-flex">
-                        <a
-                          className="px-2 py-1"
-                          href={withinPlotURL}
-                          download={withinPlotURL.split('/').slice(-1)[0]}
-                        >
-                          Download Plot
-                        </a>
-                      </div>
-                      <div className="p-2 border rounded">
-                        <Row>
-                          <Col>
-                            <img
-                              className="w-100 my-4"
-                              src={withinPlotURL}
-                            ></img>
-                          </Col>
-                        </Row>
-                      </div>
+                      <Plot
+                        plotName={withinPlotPath.split('/').slice(-1)[0]}
+                        plotURL={withinPlotURL}
+                      />
                     </div>
                   </div>
                 </div>
@@ -692,22 +662,10 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                       </p>
                     </div>
                     <div style={{ display: refPlotURL ? 'block' : 'none' }}>
-                      <div className="d-flex">
-                        <a
-                          className="px-2 py-1"
-                          href={refPlotURL}
-                          download={refPlotURL.split('/').slice(-1)[0]}
-                        >
-                          Download Plot
-                        </a>
-                      </div>
-                      <div className="p-2 border rounded">
-                        <Row>
-                          <Col>
-                            <img className="w-100 my-4" src={refPlotURL}></img>
-                          </Col>
-                        </Row>
-                      </div>
+                      <Plot
+                        plotName={refPlotPath.split('/').slice(-1)[0]}
+                        plotURL={refPlotURL}
+                      />
                     </div>
                   </div>
                 </div>
@@ -865,25 +823,10 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                         </p>
                       </div>
                       <div style={{ display: pubPlotURL ? 'block' : 'none' }}>
-                        <div className="d-flex">
-                          <a
-                            className="px-2 py-1"
-                            href={pubPlotURL}
-                            download={pubPlotURL.split('/').slice(-1)[0]}
-                          >
-                            Download Plot
-                          </a>
-                        </div>
-                        <div className="p-2 border rounded">
-                          <Row>
-                            <Col>
-                              <img
-                                className="w-100 my-4"
-                                src={pubPlotURL}
-                              ></img>
-                            </Col>
-                          </Row>
-                        </div>
+                        <Plot
+                          plotName={pubPlotPath.split('/').slice(-1)[0]}
+                          plotURL={pubPlotURL}
+                        />
                       </div>
                     </div>
                   </div>

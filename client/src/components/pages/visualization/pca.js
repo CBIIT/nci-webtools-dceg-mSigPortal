@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { dispatchError, dispatchPCA } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import Plot from '../../controls/plot/plot';
 
 const { Group, Label } = Form;
 const { Header, Body } = Card;
@@ -39,10 +40,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
     pca3URL,
     heatmapURL,
     displayPCA,
-    pca1Err,
-    pca2Err,
-    pca3Err,
-    heatmapErr,
+    pcaErr,
     debugR,
     displayDebug,
     submitOverlay,
@@ -63,9 +61,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
     pubPca2URL,
     pubPca3URL,
     displayPub,
-    pubPca1Err,
-    pubPca2Err,
-    pubPca3Err,
+    pubPcaErr,
     pubSubmitOverlay,
   } = useSelector((state) => state.pca);
 
@@ -126,29 +122,6 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
       !type.includes('pub')
         ? dispatchPCA({ submitOverlay: false })
         : dispatchPCA({ pubSubmitOverlay: false });
-    } else {
-      if (type == 'pca1') {
-        if (pca1URL) URL.revokeObjectURL(pca1URL);
-        dispatchPCA({ pca1Err: true, pca1URL: '' });
-      } else if (type == 'pca2') {
-        if (pca2URL) URL.revokeObjectURL(pca2URL);
-        dispatchPCA({ pca2Err: true, pca2URL: '' });
-      } else if (type == 'pca3') {
-        if (pca3URL) URL.revokeObjectURL(pca3URL);
-        dispatchPCA({ pca3Err: true, pca3URL: '' });
-      } else if (type == 'heatmap') {
-        if (heatmapURL) URL.revokeObjectURL(heatmapURL);
-        dispatchPCA({ heatmapErr: true, heatmapURL: '' });
-      } else if (type == 'pubPca1') {
-        if (pubPca1URL) URL.revokeObjectURL(pubPca1URL);
-        dispatchPCA({ pubPca1Err: true, pubPca1URL: '' });
-      } else if (type == 'pubPca2') {
-        if (pubPca2URL) URL.revokeObjectURL(pubPca2URL);
-        dispatchPCA({ pubPca2Err: true, pubPca2URL: '' });
-      } else if (type == 'pubPca3') {
-        if (pubPca3URL) URL.revokeObjectURL(pubPca3URL);
-        dispatchPCA({ pubPca3Err: true, pubPca3URL: '' });
-      }
     }
   }
 
@@ -183,18 +156,13 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
       dispatchPCA({
         submitOverlay: true,
         debugR: '',
-        pca1Err: false,
-        pca2Err: false,
-        pca3Err: false,
-        heatmapErr: false,
+        pcaErr: false,
       });
     } else {
       dispatchPCA({
         pubSubmitOverlay: true,
         debugR: '',
-        pubPca1Err: false,
-        pubPca2Err: false,
-        pubPca3Err: false,
+        pubPcaErr: false,
       });
     }
 
@@ -215,35 +183,64 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
         const { debugR, output } = await response.json();
 
         if (!fn.includes('With')) {
-          dispatchPCA({
-            debugR: debugR,
-            submitOverlay: false,
-            pca1: output.pca1,
-            pca2: output.pca2,
-            pca3: output.pca3,
-            heatmap: output.heatmap,
-            pca2Data: output.pca2Data,
-            pca3Data: output.pca3Data,
-            heatmapData: output.heatmapData,
-          });
-          setRPlot(output.pca1, 'pca1');
-          setRPlot(output.pca2, 'pca2');
-          setRPlot(output.pca3, 'pca3');
-          setRPlot(output.heatmap, 'heatmap');
+          if (output.pca1) {
+            dispatchPCA({
+              debugR: debugR,
+              submitOverlay: false,
+              pca1: output.pca1,
+              pca2: output.pca2,
+              pca3: output.pca3,
+              heatmap: output.heatmap,
+              pca2Data: output.pca2Data,
+              pca3Data: output.pca3Data,
+              heatmapData: output.heatmapData,
+            });
+            setRPlot(output.pca1, 'pca1');
+            setRPlot(output.pca2, 'pca2');
+            setRPlot(output.pca3, 'pca3');
+            setRPlot(output.heatmap, 'heatmap');
+          } else {
+            if (pca1URL) URL.revokeObjectURL(pca1URL);
+            if (pca2URL) URL.revokeObjectURL(pca2URL);
+            if (pca3URL) URL.revokeObjectURL(pca3URL);
+            if (heatmapURL) URL.revokeObjectURL(heatmapURL);
+            dispatchPCA({
+              debugR: debugR,
+              submitOverlay: false,
+              pcaErr: true,
+              pca1URL: '',
+              pca2URL: '',
+              pca3URL: '',
+              heatmapURL: '',
+            });
+          }
         } else {
-          dispatchPCA({
-            debugR: debugR,
-            pubSubmitOverlay: false,
-            pubPca1: output.pca1,
-            pubPca2: output.pca2,
-            pubPca3: output.pca3,
-
-            pubPca2Data: output.pca2Data,
-            pubPca3Data: output.pca3Data,
-          });
-          setRPlot(output.pca1, 'pubPca1');
-          setRPlot(output.pca2, 'pubPca2');
-          setRPlot(output.pca3, 'pubPca3');
+          if (output.pubPca1) {
+            dispatchPCA({
+              debugR: debugR,
+              pubSubmitOverlay: false,
+              pubPca1: output.pca1,
+              pubPca2: output.pca2,
+              pubPca3: output.pca3,
+              pubPca2Data: output.pca2Data,
+              pubPca3Data: output.pca3Data,
+            });
+            setRPlot(output.pca1, 'pubPca1');
+            setRPlot(output.pca2, 'pubPca2');
+            setRPlot(output.pca3, 'pubPca3');
+          } else {
+            if (pubPca1URL) URL.revokeObjectURL(pubPca1URL);
+            if (pubPca2URL) URL.revokeObjectURL(pubPca2URL);
+            if (pubPca3URL) URL.revokeObjectURL(pubPca3URL);
+            dispatchPCA({
+              debugR: debugR,
+              pubPcaErr: true,
+              pubSubmitOverlay: false,
+              pubPca1URL: '',
+              pubPca2URL: '',
+              pubPca3URL: '',
+            });
+          }
         }
       }
     } catch (err) {
@@ -391,8 +388,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
                   </Row>
 
                   <div id="pca1Plot">
-                    <div style={{ display: pca1Err ? 'block' : 'none' }}>
-                      <h4>PCA 1</h4>
+                    <div style={{ display: pcaErr ? 'block' : 'none' }}>
                       <p>
                         An error has occured. Check the debug section for more
                         info.
@@ -402,154 +398,49 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
                       className="my-4"
                       style={{ display: pca1URL ? 'block' : 'none' }}
                     >
-                      <div className="d-flex">
-                        <a
-                          className="px-2 py-1"
-                          href={pca1URL}
-                          download={pca1URL.split('/').slice(-1)[0]}
-                        >
-                          Download Plot
-                        </a>
-                      </div>
-                      <div className="p-2 border rounded">
-                        <Row>
-                          <Col>
-                            <img
-                              className="w-100 my-4 h-500"
-                              src={pca1URL}
-                            ></img>
-                          </Col>
-                        </Row>
-                      </div>
+                      <Plot
+                        plotName={pca1.split('/').slice(-1)[0]}
+                        plotURL={pca1URL}
+                      />
                     </div>
                   </div>
 
                   <div id="pca2Plot">
-                    <div style={{ display: pca2Err ? 'block' : 'none' }}>
-                      <h4>PCA 2</h4>
-                      <p>
-                        An error has occured. Check the debug section for more
-                        info.
-                      </p>
-                    </div>
                     <div
                       className="my-4"
                       style={{ display: pca2URL ? 'block' : 'none' }}
                     >
-                      <div className="d-flex">
-                        <a
-                          className="px-2 py-1"
-                          href={pca2URL}
-                          download={pca2URL.split('/').slice(-1)[0]}
-                        >
-                          Download Plot
-                        </a>
-                        <span className="ml-auto">
-                          <Button
-                            className="px-2 py-1"
-                            variant="link"
-                            onClick={() => downloadResults(pca2Data)}
-                          >
-                            Download Results
-                          </Button>
-                        </span>
-                      </div>
-                      <div className="p-2 border rounded">
-                        <Row>
-                          <Col>
-                            <img
-                              className="w-100 my-4 h-600"
-                              src={pca2URL}
-                            ></img>
-                          </Col>
-                        </Row>
-                      </div>
+                      <Plot
+                        plotName={pca2.split('/').slice(-1)[0]}
+                        plotURL={pca2URL}
+                        txtPath={pca2Data}
+                      />
                     </div>
                   </div>
 
                   <div id="pca3Plot">
-                    <div style={{ display: pca3Err ? 'block' : 'none' }}>
-                      <h4>PCA 3</h4>
-                      <p>
-                        An error has occured. Check the debug section for more
-                        info.
-                      </p>
-                    </div>
                     <div
                       className="my-4"
                       style={{ display: pca3URL ? 'block' : 'none' }}
                     >
-                      <div className="d-flex">
-                        <a
-                          className="px-2 py-1"
-                          href={pca3URL}
-                          download={pca3URL.split('/').slice(-1)[0]}
-                        >
-                          Download Plot
-                        </a>
-                        <span className="ml-auto">
-                          <Button
-                            className="px-2 py-1"
-                            variant="link"
-                            onClick={() => downloadResults(pca3Data)}
-                          >
-                            Download Results
-                          </Button>
-                        </span>
-                      </div>
-                      <div className="p-2 border rounded">
-                        <Row>
-                          <Col>
-                            <img
-                              className="w-100 my-4 h-600"
-                              src={pca3URL}
-                            ></img>
-                          </Col>
-                        </Row>
-                      </div>
+                      <Plot
+                        plotName={pca3.split('/').slice(-1)[0]}
+                        plotURL={pca3URL}
+                        txtPath={pca3Data}
+                      />
                     </div>
                   </div>
 
                   <div id="heatmapPlot">
-                    <div style={{ display: heatmapErr ? 'block' : 'none' }}>
-                      <h4>Heatmap</h4>
-                      <p>
-                        An error has occured. Check the debug section for more
-                        info.
-                      </p>
-                    </div>
                     <div
                       className="my-4"
                       style={{ display: heatmapURL ? 'block' : 'none' }}
                     >
-                      <div className="d-flex">
-                        <a
-                          className="px-2 py-1"
-                          href={heatmapURL}
-                          download={heatmapURL.split('/').slice(-1)[0]}
-                        >
-                          Download Plot
-                        </a>
-                        <span className="ml-auto">
-                          <Button
-                            className="px-2 py-1"
-                            variant="link"
-                            onClick={() => downloadResults(heatmapData)}
-                          >
-                            Download Results
-                          </Button>
-                        </span>
-                      </div>
-                      <div className="p-2 border rounded">
-                        <Row>
-                          <Col>
-                            <img
-                              className="w-100 my-4 h-600"
-                              src={heatmapURL}
-                            ></img>
-                          </Col>
-                        </Row>
-                      </div>
+                      <Plot
+                        plotName={heatmap.split('/').slice(-1)[0]}
+                        plotURL={heatmapURL}
+                        txtPath={heatmapData}
+                      />
                     </div>
                   </div>
                 </div>
@@ -661,8 +552,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
                     </Row>
 
                     <div id="pubPca1Plot">
-                      <div style={{ display: pubPca1Err ? 'block' : 'none' }}>
-                        <h4>PCA 1</h4>
+                      <div style={{ display: pubPcaErr ? 'block' : 'none' }}>
                         <p>
                           An error has occured. Check the debug section for more
                           info.
@@ -672,111 +562,36 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
                         className="my-4"
                         style={{ display: pubPca1URL ? 'block' : 'none' }}
                       >
-                        <div className="d-flex">
-                          <a
-                            className="px-2 py-1"
-                            href={pubPca1URL}
-                            download={pubPca1URL.split('/').slice(-1)[0]}
-                          >
-                            Download Plot
-                          </a>
-                        </div>
-                        <div className="p-2 border rounded">
-                          <Row>
-                            <Col>
-                              <img
-                                className="w-100 my-4 h-500"
-                                src={pubPca1URL}
-                              ></img>
-                            </Col>
-                          </Row>
-                        </div>
+                        <Plot
+                          plotName={pubPca1.split('/').slice(-1)[0]}
+                          plotURL={pubPca1URL}
+                        />
                       </div>
                     </div>
 
                     <div id="pubPca2Plot">
-                      <div style={{ display: pubPca2Err ? 'block' : 'none' }}>
-                        <h4>PCA 2</h4>
-                        <p>
-                          An error has occured. Check the debug section for more
-                          info.
-                        </p>
-                      </div>
                       <div
                         className="my-4"
                         style={{ display: pubPca2URL ? 'block' : 'none' }}
                       >
-                        <div className="d-flex">
-                          <a
-                            className="px-2 py-1"
-                            href={pubPca2URL}
-                            download={pubPca2URL.split('/').slice(-1)[0]}
-                          >
-                            Download Plot
-                          </a>
-                          <span className="ml-auto">
-                            <Button
-                              className="px-2 py-1"
-                              variant="link"
-                              onClick={() => downloadResults(pubPca2Data)}
-                            >
-                              Download Results
-                            </Button>
-                          </span>
-                        </div>
-                        <div className="p-2 border rounded">
-                          <Row>
-                            <Col>
-                              <img
-                                className="w-100 my-4 h-600"
-                                src={pubPca2URL}
-                              ></img>
-                            </Col>
-                          </Row>
-                        </div>
+                        <Plot
+                          plotName={pubPca2.split('/').slice(-1)[0]}
+                          plotURL={pubPca2URL}
+                          txtPath={pubPca2Data}
+                        />
                       </div>
                     </div>
 
                     <div id="pubPca3Plot">
-                      <div style={{ display: pubPca3Err ? 'block' : 'none' }}>
-                        <h4>PCA 3</h4>
-                        <p>
-                          An error has occured. Check the debug section for more
-                          info.
-                        </p>
-                      </div>
                       <div
                         className="my-4"
                         style={{ display: pubPca3URL ? 'block' : 'none' }}
                       >
-                        <div className="d-flex">
-                          <a
-                            className="px-2 py-1"
-                            href={pubPca3URL}
-                            download={pubPca3URL.split('/').slice(-1)[0]}
-                          >
-                            Download Plot
-                          </a>
-                          <span className="ml-auto">
-                            <Button
-                              className="px-2 py-1"
-                              variant="link"
-                              onClick={() => downloadResults(pubPca3Data)}
-                            >
-                              Download Results
-                            </Button>
-                          </span>
-                        </div>
-                        <div className="p-2 border rounded">
-                          <Row>
-                            <Col>
-                              <img
-                                className="w-100 my-4 h-600"
-                                src={pubPca3URL}
-                              ></img>
-                            </Col>
-                          </Row>
-                        </div>
+                        <Plot
+                          plotName={pubPca3.split('/').slice(-1)[0]}
+                          plotURL={pubPca3URL}
+                          txtPath={pubPca3Data}
+                        />
                       </div>
                     </div>
                   </div>

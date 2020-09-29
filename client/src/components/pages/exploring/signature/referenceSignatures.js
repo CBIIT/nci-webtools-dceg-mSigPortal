@@ -3,6 +3,7 @@ import { Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { dispatchError, dispatchExpRefSig } from '../../../../services/store';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import Plot from '../../../controls/plot/plot';
 
 export default function ReferenceSignatures({ submitR }) {
   const rootURL = window.location.pathname;
@@ -82,60 +83,18 @@ export default function ReferenceSignatures({ submitR }) {
 
   return (
     <div>
-      {/* <LoadingOverlay active={loading} /> */}
       <div id="plot">
         <div style={{ display: err ? 'block' : 'none' }}>
           <p>An error has occured. Check the debug section for more info.</p>
         </div>
         <div style={{ display: plotURL ? 'block' : 'none' }}>
-          <div className="d-flex">
-            <a
-              className="px-2 py-1"
-              href={plotURL}
-              download={plotPath.split('/').slice(-1)[0]}
-            >
-              Download Plot
-            </a>
-          </div>
-          <div className="p-2 border rounded">
-            <Row>
-              <Col>
-                <img className="w-100 my-4 h-1000" src={plotURL}></img>
-              </Col>
-            </Row>
-          </div>
+          <Plot
+            plotName={plotPath.split('/').slice(-1)[0]}
+            plotURL={plotURL}
+            maxHeight="1000px"
+          />
         </div>
       </div>
-
-      {/* <Button
-        variant="link"
-        className="p-0 mt-5"
-        onClick={() =>
-          dispatchExpRefSig({
-            displayDebug: !displayDebug,
-          })
-        }
-      >
-        R Debug
-      </Button>
-      <pre
-        className="border rounded p-1 "
-        style={{ display: displayDebug ? 'block' : 'none' }}
-      >
-        <div className="border">
-          {Array.isArray(debugR) ? (
-            debugR.map((line, index) => {
-              return (
-                <p key={index} className="m-0">
-                  [{index}] {line}
-                </p>
-              );
-            })
-          ) : (
-            <p>{debugR}</p>
-          )}
-        </div>
-      </pre> */}
     </div>
   );
 }

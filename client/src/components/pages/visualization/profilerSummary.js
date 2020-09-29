@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
   dispatchProfilerSummary,
 } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import Plot from '../../controls/plot/plot';
 
 export default function ProfilerSummary({ submitR }) {
   const {
@@ -107,30 +108,11 @@ export default function ProfilerSummary({ submitR }) {
   return (
     <div>
       <LoadingOverlay active={loading} />
-      <div id="withinPlot">
-        <div style={{ display: err ? 'block' : 'none' }}>
-          <p>An error has occured. Check the debug section for more info.</p>
-        </div>
-        <div style={{ display: plotURL ? 'block' : 'none' }}>
-          <div className="d-flex">
-            <a
-              className="px-2 py-1"
-              href={plotURL}
-              download={plotPath.split('/').slice(-1)[0]}
-            >
-              Download Plot
-            </a>
-          </div>
-          <div className="p-2 border rounded">
-            <Row>
-              <Col>
-                <img className="w-100 my-4 h-1000" src={plotURL}></img>
-              </Col>
-            </Row>
-          </div>
-        </div>
-      </div>
-
+      <Plot
+        plotName={plotPath.split('/').slice(-1)[0]}
+        plotURL={plotURL}
+        maxHeight="600px"
+      />
       <Button
         variant="link"
         className="p-0 mt-5"

@@ -6,12 +6,11 @@ import {
   dispatchError,
   dispatchMutationalProfiles,
 } from '../../../services/store';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import Plot from '../../controls/plot/plot';
 
-const { Group, Label, Control } = Form;
+const { Group, Label } = Form;
 
 export default function MutationalProfiles() {
-  const [downloadOverlay, setOverlay] = useState(false);
   const { source } = useSelector((state) => state.visualize);
   const { svgList, displayTab } = useSelector(
     (state) => state.visualizeResults
@@ -95,37 +94,6 @@ export default function MutationalProfiles() {
       }
     }
   }
-
-  // async function downloadResults() {
-  //   setOverlay(true);
-  //   try {
-  //     const response = await fetch(`${rootURL}visualize/results`, {
-  //       method: 'POST',
-  //       headers: {
-  //         Accept: 'application/json',
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ projectID: projectID }),
-  //     });
-  //     if (!response.ok) {
-  //       setOverlay(false);
-  //       const { msg } = await response.json();
-  //       dispatchError(msg);
-  //     } else {
-  //       setOverlay(false);
-  //       const req = await response.json();
-  //       const id = req.projectID;
-  //       const tempLink = document.createElement('a');
-
-  //       tempLink.href = `/visualize/download?id=${id}`;
-  //       document.body.appendChild(tempLink);
-  //       tempLink.click();
-  //       document.body.removeChild(tempLink);
-  //     }
-  //   } catch (err) {
-  //     dispatchError(err);
-  //   }
-  // }
 
   function filterSampleName(name) {
     if (source == 'user') {
@@ -327,21 +295,7 @@ export default function MutationalProfiles() {
         </Group>
       </Form>
 
-      <div className="d-flex">
-        <a className="px-2 py-1" href={plotURL} download={getPlotName()}>
-          Download Plot
-        </a>
-        <span className="ml-auto">
-          <LoadingOverlay active={downloadOverlay} />
-        </span>
-      </div>
-      <div className="border rounded p-2 mb-2">
-        <Row>
-          <Col>
-            <img className="w-100 my-4 h-500" src={plotURL}></img>
-          </Col>
-        </Row>
-      </div>
+      <Plot plotName={getPlotName()} plotURL={plotURL} />
       <Button
         variant="link"
         className="p-0 mt-5"

@@ -7,6 +7,7 @@ import {
   dispatchExpMutationalSigComparison,
 } from '../../../../services/store';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import Plot from '../../../controls/plot/plot';
 
 const { Group, Label } = Form;
 
@@ -263,22 +264,11 @@ export default function MutationalSignatureProfile({ submitR }) {
               </p>
             </div>
             <div style={{ display: plotURL ? 'block' : 'none' }}>
-              <div className="d-flex">
-                <a
-                  className="px-2 py-1"
-                  href={plotURL}
-                  download={plotPath.split('/').slice(-1)[0]}
-                >
-                  Download Plot
-                </a>
-              </div>
-              <div className="p-2 border rounded">
-                <Row>
-                  <Col>
-                    <img className="w-100 my-4 h-1000" src={plotURL}></img>
-                  </Col>
-                </Row>
-              </div>
+              <Plot
+                plotName={plotPath.split('/').slice(-1)[0]}
+                plotURL={plotURL}
+                maxHeight="1000px"
+              />
             </div>
           </div>
         </div>

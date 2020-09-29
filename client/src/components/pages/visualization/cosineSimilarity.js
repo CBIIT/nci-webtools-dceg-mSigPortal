@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Form, Row, Col, Button, Accordion, Card } from 'react-bootstrap';
 import Select from 'react-select';
 import { useSelector } from 'react-redux';
@@ -9,16 +9,13 @@ import {
   dispatchCosineSimilarity,
 } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import Plot from '../../controls/plot/plot';
 
-const { Group, Label, Control } = Form;
+const { Group, Label } = Form;
 const { Header, Body } = Card;
 const { Toggle, Collapse } = Accordion;
 
-export default function CosineSimilarity({
-  downloadResults,
-  submitR,
-  getRefSigOptions,
-}) {
+export default function CosineSimilarity({ submitR, getRefSigOptions }) {
   const {
     source,
     study,
@@ -409,34 +406,11 @@ export default function CosineSimilarity({
                       </p>
                     </div>
                     <div style={{ display: withinPlotURL ? 'block' : 'none' }}>
-                      <div className="d-flex">
-                        <a
-                          className="px-2 py-1"
-                          href={withinPlotURL}
-                          download={withinPlotURL.split('/').slice(-1)[0]}
-                        >
-                          Download Plot
-                        </a>
-                        <span className="ml-auto">
-                          <Button
-                            className="px-2 py-1"
-                            variant="link"
-                            onClick={() => downloadResults(withinTxtPath)}
-                          >
-                            Download Results
-                          </Button>
-                        </span>
-                      </div>
-                      <div className="p-2 border rounded">
-                        <Row>
-                          <Col>
-                            <img
-                              className="w-100 my-4 h-500"
-                              src={withinPlotURL}
-                            ></img>
-                          </Col>
-                        </Row>
-                      </div>
+                      <Plot
+                        plotName={withinPlotPath.split('/').slice(-1)[0]}
+                        plotURL={withinPlotURL}
+                        txtPath={withinTxtPath}
+                      />
                     </div>
                   </div>
                 </div>
@@ -545,40 +519,11 @@ export default function CosineSimilarity({
                       </p>
                     </div>
                     <div style={{ display: refPlotURL ? 'block' : 'none' }}>
-                      <div className="d-flex">
-                        <a
-                          className="px-2 py-1"
-                          href={refPlotURL}
-                          download={refPlotURL.split('/').slice(-1)[0]}
-                        >
-                          Download Plot
-                        </a>
-                        <span className="ml-auto">
-                          <Button
-                            className="px-2 py-1"
-                            variant="link"
-                            onClick={() => downloadResults(refTxtPath)}
-                          >
-                            Download Results
-                          </Button>
-                        </span>
-                      </div>
-                      <div className="p-2 border rounded">
-                        <Row>
-                          <Col>
-                            {refErr == true && (
-                              <p>
-                                An error has occured. Check the debug section
-                                for more info.
-                              </p>
-                            )}
-                            <img
-                              className="w-100 my-4 h-500"
-                              src={refPlotURL}
-                            ></img>
-                          </Col>
-                        </Row>
-                      </div>
+                      <Plot
+                        plotName={refPlotPath.split('/').slice(-1)[0]}
+                        plotURL={refPlotURL}
+                        txtPath={refTxtPath}
+                      />
                     </div>
                   </div>
                 </div>
@@ -697,34 +642,11 @@ export default function CosineSimilarity({
                         </p>
                       </div>
                       <div style={{ display: pubPlotURL ? 'block' : 'none' }}>
-                        <div className="d-flex">
-                          <a
-                            className="px-2 py-1"
-                            href={pubPlotURL}
-                            download={pubPlotURL.split('/').slice(-1)[0]}
-                          >
-                            Download Plot
-                          </a>
-                          <span className="ml-auto">
-                            <Button
-                              className="px-2 py-1"
-                              variant="link"
-                              onClick={() => downloadResults(pubTxtPath)}
-                            >
-                              Download Results
-                            </Button>
-                          </span>
-                        </div>
-                        <div className="p-2 border rounded">
-                          <Row>
-                            <Col>
-                              <img
-                                className="w-100 my-4 h-500"
-                                src={pubPlotURL}
-                              ></img>
-                            </Col>
-                          </Row>
-                        </div>
+                        <Plot
+                          plotName={pubPlotURL.split('/').slice(-1)[0]}
+                          plotURL={pubPlotURL}
+                          txtPath={pubTxtPath}
+                        />
                       </div>
                     </div>
                   </div>

@@ -8,6 +8,7 @@ import {
   dispatchMutationalPattern,
 } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import Plot from '../../controls/plot/plot';
 
 const { Label, Control, Text } = Form;
 const { Header, Body } = Card;
@@ -22,7 +23,6 @@ export default function MutationalPattern({ downloadResults, submitR }) {
   const {
     proportion,
     pattern,
-
     txtPath,
     plotPath,
     plotURL,
@@ -34,13 +34,6 @@ export default function MutationalPattern({ downloadResults, submitR }) {
     displayDebug,
     submitOverlay,
   } = useSelector((state) => state.mutationalPattern);
-
-  const selectFix = {
-    styles: {
-      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-    },
-    menuPortalTarget: document.body,
-  };
 
   async function setRPlot(plotPath, type) {
     dispatchMutationalPattern({ submitOverlay: true });
@@ -131,24 +124,7 @@ export default function MutationalPattern({ downloadResults, submitR }) {
         </div>
         {plotURL.length > 0 &&
           (barURL.length > 0 ? (
-            <div>
-              <div className="d-flex">
-                <a
-                  className="px-2 py-1"
-                  href={barURL}
-                  download={barURL.split('/').slice(-1)[0]}
-                >
-                  Download Plot
-                </a>
-              </div>
-              <div className="p-2 border rounded">
-                <Row>
-                  <Col>
-                    <img className="w-100 my-4 h-600" src={barURL}></img>
-                  </Col>
-                </Row>
-              </div>
-            </div>
+            <Plot plotName={barPath.split('/').slice(-1)[0]} plotURL={barURL} />
           ) : (
             <div>
               <h4>Proportion</h4>
@@ -165,31 +141,11 @@ export default function MutationalPattern({ downloadResults, submitR }) {
           <p>An error has occured. Check the debug section for more info.</p>
         </div>
         <div style={{ display: plotURL ? 'block' : 'none' }}>
-          <div className="d-flex">
-            <a
-              className="px-2 py-1"
-              href={plotURL}
-              download={plotPath.split('/').slice(-1)[0]}
-            >
-              Download Plot
-            </a>
-            <span className="ml-auto">
-              <Button
-                className="px-2 py-1"
-                variant="link"
-                onClick={() => downloadResults(txtPath)}
-              >
-                Download Results
-              </Button>
-            </span>
-          </div>
-          <div className="p-2 border rounded">
-            <Row>
-              <Col>
-                <img className="w-100 my-4 h-600" src={plotURL}></img>
-              </Col>
-            </Row>
-          </div>
+          <Plot
+            plotName={plotPath.split('/').slice(-1)[0]}
+            plotURL={plotURL}
+            txtPath={txtPath}
+          />
         </div>
       </div>
     </>
