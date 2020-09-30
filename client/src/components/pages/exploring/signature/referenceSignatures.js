@@ -91,7 +91,7 @@ export default function ReferenceSignatures({ submitR }) {
           <Plot
             plotName={plotPath.split('/').slice(-1)[0]}
             plotURL={plotURL}
-            maxHeight="1000px"
+            maxHeight="600px"
           />
         </div>
       </div>

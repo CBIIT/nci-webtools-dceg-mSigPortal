@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { dispatchError } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import Zoom from 'react-medium-image-zoom';
-import 'react-medium-image-zoom/dist/styles.css';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 
 export default function ({ plotName, plotURL, txtPath, maxHeight }) {
   const rootURL = window.location.pathname;
@@ -63,15 +62,30 @@ export default function ({ plotName, plotURL, txtPath, maxHeight }) {
         )}
       </div>
       <div className="p-2 border rounded">
-        <div>
-          <Zoom wrapStyle={{ width: '100%' }}>
-            <img
-              className="w-100 my-4"
-              src={plotURL}
-              style={{ maxHeight: maxHeight || '500px' }}
-            />
-          </Zoom>
-        </div>
+        <TransformWrapper defaultScale={1}>
+          {({ zoomIn, zoomOut, resetTransform }) => (
+            <React.Fragment>
+              <div className="tools">
+                <Button variant="secondary" onClick={zoomIn}>
+                  +
+                </Button>{' '}
+                <Button variant="secondary" onClick={zoomOut}>
+                  -
+                </Button>{' '}
+                <Button variant="secondary" onClick={resetTransform}>
+                  Reset
+                </Button>
+              </div>
+              <TransformComponent>
+                <img
+                  className="w-100"
+                  src={plotURL}
+                  style={{ maxHeight: maxHeight || '500px' }}
+                />
+              </TransformComponent>
+            </React.Fragment>
+          )}
+        </TransformWrapper>
       </div>
     </div>
   );
