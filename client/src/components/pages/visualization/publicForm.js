@@ -17,7 +17,6 @@ import {
   dispatchProfilerSummary,
 } from '../../../services/store';
 const { Group, Label } = Form;
-const { Title, Content } = Popover;
 
 export default function PublicForm() {
   const {
@@ -222,25 +221,13 @@ export default function PublicForm() {
     });
   }
 
-  const msPopover = (
-    <Popover id="popover-basic">
-      <Title as="h3">Mutation Split</Title>
-      <Content>
-        <p>
-          For each sample, split mutations in to different groups according the
-          “Filter” column in VCF/CSV/TSV file. Splitting operation use the “;”
-          as separator.
-        </p>
-      </Content>
-    </Popover>
-  );
-
   return (
     <Form>
       <LoadingOverlay active={loadingPublic} />
-      <Group controlId="Study">
+      <Group controlId="study">
         <Label>Study</Label>
         <Select
+          inputId="study"
           isDisabled={submitted}
           options={studyOptions}
           value={[study]}
@@ -252,6 +239,7 @@ export default function PublicForm() {
       <Group controlId="cancerType">
         <Label>Cancer Type</Label>
         <Select
+          inputId="cancerType"
           isDisabled={submitted}
           options={cancerTypeOptions}
           value={[cancerType]}
@@ -261,9 +249,10 @@ export default function PublicForm() {
         />
       </Group>
 
-      <Group>
+      <Group controlId="strategy">
         <Label>Experimental Strategy</Label>
         <Select
+          inputId="strategy"
           isDisabled={submitted}
           options={pubExperimentOptions}
           value={[pubExperimentalStrategy]}

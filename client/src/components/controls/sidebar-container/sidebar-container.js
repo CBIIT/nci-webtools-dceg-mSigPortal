@@ -14,7 +14,7 @@ export const CollapseButton = ({ collapsed, toggleCollapse }) => (
       color: 'rgb(0, 126, 167)',
     }}
   >
-    <span className="sr-only">Show or hide input sidebar</span>
+    <span className="sr-only text-dark">Show or hide input sidebar</span>
     <i
       className={`
             fa fa-lg

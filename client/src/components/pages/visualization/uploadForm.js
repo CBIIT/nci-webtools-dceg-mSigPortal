@@ -328,7 +328,7 @@ export default function UploadForm() {
       </Group>
       <Group controlId="fileUpload">
         <Label>
-          Upload File <span style={{ color: 'red' }}>*</span>
+          Upload File <span style={{ color: 'crimson' }}>*</span>
         </Label>
         <Row className="m-0">
           <Col sm="6" className="p-0">
@@ -360,6 +360,7 @@ export default function UploadForm() {
             disabled={submitted}
           >
             <input
+              id="fileUpload"
               {...mainInputProps()}
               disabled={inputFile.size || submitted}
             />
@@ -379,7 +380,7 @@ export default function UploadForm() {
               </button>
             ) : (
               <>
-                <span>Drop files here or click to upload</span>
+                <label>Drop files here or click to upload</label>
                 {/* <FontAwesomeIcon icon={faCloudUploadAlt} size="4x" /> */}
               </>
             )}
@@ -436,7 +437,7 @@ export default function UploadForm() {
         </Check>
       </Group>
       <hr />
-      <Group className="d-flex">
+      <Group controlId="split" className="d-flex">
         <Label className="mr-auto">
           Split Mutations According to Filter{' '}
           <OverlayTrigger
@@ -445,7 +446,11 @@ export default function UploadForm() {
             overlay={msPopover}
             rootClose
           >
-            <Button variant="link" className="p-0 font-weight-bold">
+            <Button
+              variant="link"
+              className="p-0 font-weight-bold"
+              aria-label="mutation split info"
+            >
               <FontAwesomeIcon
                 icon={faInfoCircle}
                 style={{ verticalAlign: 'baseline' }}
@@ -453,7 +458,7 @@ export default function UploadForm() {
             </Button>
           </OverlayTrigger>
         </Label>
-        <Check inline id="radioMutationSplitFalse">
+        <Check inline id="split">
           <Check.Input
             disabled={
               submitted ||
@@ -545,6 +550,7 @@ export default function UploadForm() {
             {...bedRootProps({ className: 'dropzone' })}
           >
             <input
+              id="bedUpload"
               {...bedInputProps()}
               disabled={
                 bedFile.size ||
@@ -570,7 +576,7 @@ export default function UploadForm() {
               )
             ) : (
               <>
-                <span>Drop files here or click to upload</span>
+                <Label>Drop files here or click to upload</Label>
                 {/* <FontAwesomeIcon icon={faCloudUploadAlt} size="4x" /> */}
               </>
             )}
@@ -578,7 +584,7 @@ export default function UploadForm() {
         </section>
       </Group>
       <hr />
-      <Group className="d-flex">
+      <Group controlId="collapse" className="d-flex">
         <Label className="mr-auto">
           Add Collapsing Data{' '}
           <OverlayTrigger
@@ -587,7 +593,11 @@ export default function UploadForm() {
             overlay={csPopover}
             rootClose
           >
-            <Button variant="link" className="p-0 font-weight-bold">
+            <Button
+              variant="link"
+              className="p-0 font-weight-bold"
+              aria-label="collapse data info"
+            >
               <FontAwesomeIcon
                 icon={faInfoCircle}
                 style={{ verticalAlign: 'baseline' }}
@@ -595,7 +605,7 @@ export default function UploadForm() {
             </Button>
           </OverlayTrigger>
         </Label>
-        <Check inline id="radioFalse">
+        <Check inline id="collapse">
           <Check.Input
             disabled={
               submitted || ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
@@ -613,34 +623,34 @@ export default function UploadForm() {
       </Group>
       <hr />
       <Group controlId="email">
-        <LoadingOverlay active={true} content={'Work in progress...'} />
-        <div>
-          <Check
-            inline
-            id="toggleQueue"
-            type="checkbox"
-            label="Submit this job to a Queue"
-            checked={queueMode == true}
-            onChange={(_) => {
-              dispatchVisualize({ queueMode: !queueMode });
-            }}
-          />
+        <LoadingOverlay active={false} content={'Work in progress...'} />
+        <div className="d-flex">
+          <Label className="mr-auto">Submit this job to a Queue</Label>{' '}
+          <Check inline id="email">
+            <Check.Input
+              type="checkbox"
+              checked={queueMode == true}
+              onChange={(_) => {
+                dispatchVisualize({ queueMode: !queueMode });
+              }}
+            />
+          </Check>
         </div>
-        <div>
-          <Control
-            placeholder="Enter Email"
-            size="sm"
-            value={email}
-            onChange={(e) => dispatchVisualize({ email: e.target.value })}
-            disabled={!queueMode}
-          ></Control>
-          <Text className="text-muted">
-            <i>
-              Note: if sending to queue, when computation is completed, a
-              notification will be sent to the e-mail entered above.
-            </i>
-          </Text>
-        </div>
+
+        <Control
+          id="email"
+          placeholder="Enter Email"
+          size="sm"
+          value={email}
+          onChange={(e) => dispatchVisualize({ email: e.target.value })}
+          disabled={!queueMode}
+        />
+        <Text className="text-muted">
+          <i>
+            Note: if sending to queue, when computation is completed, a
+            notification will be sent to the e-mail entered above.
+          </i>
+        </Text>
       </Group>
       <Row>
         <Col sm="6">
