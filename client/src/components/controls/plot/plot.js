@@ -3,6 +3,7 @@ import { Button } from 'react-bootstrap';
 import { dispatchError } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import './plot.scss';
 
 export default function ({ plotName, plotURL, txtPath, maxHeight }) {
   const rootURL = window.location.pathname;
@@ -10,7 +11,7 @@ export default function ({ plotName, plotURL, txtPath, maxHeight }) {
   const [loading, setLoading] = useState(false);
 
   //   download text results files
-  async function downloadResults(txtPath) {
+  async function downloadData(txtPath) {
     setLoading(true);
     try {
       const response = await fetch(`${rootURL}downloadPlotData`, {
@@ -54,15 +55,15 @@ export default function ({ plotName, plotURL, txtPath, maxHeight }) {
             <Button
               className="px-2 py-1"
               variant="link"
-              onClick={() => downloadResults(txtPath)}
+              onClick={() => downloadData(txtPath)}
             >
-              Download Results
+              Download Data
             </Button>
           </span>
         )}
       </div>
       <div className="p-2 border rounded">
-        <TransformWrapper defaultScale={1}>
+        <TransformWrapper className="w-100">
           {({ zoomIn, zoomOut, resetTransform }) => (
             <React.Fragment>
               <div className="tools">
