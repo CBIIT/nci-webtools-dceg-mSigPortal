@@ -7,6 +7,7 @@ import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { dispatchError, dispatchPCA } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
+import Debug from '../../controls/debug/debug';
 
 const { Group, Label } = Form;
 const { Header, Body } = Card;
@@ -602,35 +603,7 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
         </Accordion>
       )}
 
-      <Button
-        variant="link"
-        className="p-0 mt-5"
-        onClick={() =>
-          dispatchPCA({
-            displayDebug: !displayDebug,
-          })
-        }
-      >
-        R Debug
-      </Button>
-      <pre
-        className="border rounded p-1 "
-        style={{ display: displayDebug ? 'block' : 'none' }}
-      >
-        <div className="border">
-          {Array.isArray(debugR) ? (
-            debugR.map((line, index) => {
-              return (
-                <p key={index} className="m-0">
-                  [{index}] {line}
-                </p>
-              );
-            })
-          ) : (
-            <p>{debugR}</p>
-          )}
-        </div>
-      </pre>
+      <Debug msg={debugR} />
     </div>
   );
 }
