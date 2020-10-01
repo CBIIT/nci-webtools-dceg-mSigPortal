@@ -238,7 +238,6 @@ export default function Tumor({ submitR, downloadResults }) {
               <Group controlId="landscapeGenomeSize">
                 <Label>Genome Size</Label>
                 <Control
-                  id="landscapeGenomeSize"
                   value={genomeSize}
                   onChange={(e) => {
                     dispatchExpLandscape({

@@ -638,7 +638,6 @@ export default function UploadForm() {
         </div>
 
         <Control
-          id="email"
           placeholder="Enter Email"
           size="sm"
           value={email}

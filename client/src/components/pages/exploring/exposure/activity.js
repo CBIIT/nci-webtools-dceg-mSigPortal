@@ -153,7 +153,6 @@ export default function Activity({ submitR, downloadResults }) {
               <Group controlId="activityGenomeSize">
                 <Label>Genome Size</Label>
                 <Control
-                  id="activityGenomeSize"
                   value={genomeSize}
                   onChange={(e) => {
                     dispatchExpActivity({

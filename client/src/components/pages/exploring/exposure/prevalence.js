@@ -157,7 +157,6 @@ export default function Tumor({ submitR, downloadResults }) {
               <Group controlId="prevalenceGenomeSize">
                 <Label>Genome Size</Label>
                 <Control
-                  id="prevalenceGenomeSize"
                   value={genomeSize}
                   onChange={(e) => {
                     dispatchExpPrevalence({
@@ -172,7 +171,6 @@ export default function Tumor({ submitR, downloadResults }) {
               <Group controlId="prevalenceMutations">
                 <Label>Minimal Number Mutations within in Each Signature</Label>
                 <Control
-                  id="prevalenceMutations"
                   value={mutation}
                   onChange={(e) => {
                     dispatchExpPrevalence({

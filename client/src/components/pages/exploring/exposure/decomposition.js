@@ -156,7 +156,6 @@ export default function Tumor({ submitR, downloadResults }) {
               <Group controlId="decompGenomeSize">
                 <Label>Genome Size</Label>
                 <Control
-                  id="decompGenomeSize"
                   value={genomeSize}
                   onChange={(e) => {
                     dispatchExpDecomposition({
