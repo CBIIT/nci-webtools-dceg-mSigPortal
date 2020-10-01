@@ -1,6 +1,5 @@
 import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import Select from 'react-select';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
@@ -9,8 +8,7 @@ import {
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
-
-const { Group, Label } = Form;
+import Select from '../../../controls/select/select';
 
 export default function MutationalSignatureProfile({ submitR }) {
   const rootURL = window.location.pathname;
@@ -34,15 +32,6 @@ export default function MutationalSignatureProfile({ submitR }) {
   } = useSelector((state) => state.expMutationalSigComparison);
   const { displayTab, refSigData } = useSelector((state) => state.exploring);
 
-  const selectFix = {
-    styles: {
-      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-    },
-    menuPortalTarget: document.body,
-    getOptionLabel: (option) => option,
-    getOptionValue: (option) => option,
-  };
-
   async function calculateR(fn, args) {
     console.log(fn);
     dispatchExpMutationalSigComparison({
@@ -62,14 +51,25 @@ export default function MutationalSignatureProfile({ submitR }) {
         });
       } else {
         const { debugR, output } = await response.json();
-
-        dispatchExpMutationalSigComparison({
-          debugR: debugR,
-          loading: false,
-          plotPath: output.plotPath,
-          txtPath: output.textPath,
-        });
-        setRPlot(output.plotPath);
+        if (output.plotPath) {
+          dispatchExpMutationalSigComparison({
+            debugR: debugR,
+            loading: false,
+            plotPath: output.plotPath,
+            txtPath: output.textPath,
+          });
+          setRPlot(output.plotPath);
+        } else {
+          if (plotURL) URL.revokeObjectURL(plotURL);
+          dispatchExpMutationalSigComparison({
+            debugR: debugR,
+            loading: false,
+            plotPath: '',
+            plotURL: '',
+            txtPath: '',
+            err: true,
+          });
+        }
       }
     } catch (err) {
       dispatchError(err);
@@ -183,36 +183,34 @@ export default function MutationalSignatureProfile({ submitR }) {
         <div>
           <Row className="justify-content-center">
             <Col sm="3">
-              <Group controlId="withinProfileType">
-                <Label>Profile Name</Label>
-                <Select
-                  options={profileNameOptions}
-                  value={[profileName]}
-                  onChange={(profile) => handleProfile(profile)}
-                  {...selectFix}
-                />
-              </Group>
-            </Col>
-            <Col sm="4">
-              <Label>Reference Signature Set 1</Label>
               <Select
-                options={refSignatureSetOptions1}
-                value={[refSignatureSet1]}
-                onChange={(set) => handleSet1(set)}
-                {...selectFix}
+                id="mscProfileName"
+                label="Profile Name"
+                value={profileName}
+                options={profileNameOptions}
+                onChange={handleProfile}
               />
             </Col>
             <Col sm="4">
-              <Label>Signature Name 1</Label>
               <Select
+                id="mscRefSet1"
+                label="Reference Signature Set 1"
+                value={refSignatureSet1}
+                options={refSignatureSetOptions1}
+                onChange={handleSet1}
+              />
+            </Col>
+            <Col sm="4">
+              <Select
+                id="mscSigName1"
+                label="Signature Name 1"
+                value={signatureName1}
                 options={signatureNameOptions1}
-                value={[signatureName1]}
                 onChange={(name) =>
                   dispatchExpMutationalSigComparison({
                     signatureName1: name,
                   })
                 }
-                {...selectFix}
               />
             </Col>
             <Col sm="1" />
@@ -220,25 +218,25 @@ export default function MutationalSignatureProfile({ submitR }) {
           <Row>
             <Col sm="3" />
             <Col sm="4">
-              <Label>Signature Set 2</Label>
               <Select
+                id="mscSigSet2"
+                label="Signature Set 2"
+                value={refSignatureSet2}
                 options={refSignatureSetOptions2}
-                value={[refSignatureSet2]}
-                onChange={(set) => handleSet2(set)}
-                {...selectFix}
+                onChange={handleSet2}
               />
             </Col>
             <Col sm="4">
-              <Label>Signature Name 2</Label>
               <Select
+                id="mscSetName2"
+                label="Signature Name 2"
+                value={signatureName2}
                 options={signatureNameOptions2}
-                value={[signatureName2]}
                 onChange={(name) =>
                   dispatchExpMutationalSigComparison({
                     signatureName2: name,
                   })
                 }
-                {...selectFix}
               />
             </Col>
             <Col sm="1" className="m-auto">

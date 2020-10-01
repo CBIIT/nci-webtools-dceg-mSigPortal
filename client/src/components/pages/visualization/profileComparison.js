@@ -9,7 +9,6 @@ import {
   Accordion,
   Card,
 } from 'react-bootstrap';
-import Select from 'react-select';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -24,6 +23,7 @@ import {
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
+import Select from '../../controls/select/select';
 
 const { Group, Label, Control, Text } = Form;
 const { Title, Content } = Popover;
@@ -82,13 +82,6 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     refSubmitOverlay,
     pubSubmitOverlay,
   } = useSelector((state) => state.profileComparison);
-
-  const selectFix = {
-    styles: {
-      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-    },
-    menuPortalTarget: document.body,
-  };
 
   const popover = (
     <Popover id="popover-basic">
@@ -408,50 +401,42 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 <div>
                   <Row className="justify-content-center">
                     <Col sm="1">
-                      <Group controlId="profileTypeWithin">
-                        <Label>Profile Type</Label>
-                        <Select
-                          options={profileOptions}
-                          value={[withinProfileType]}
-                          onChange={(profile) =>
-                            dispatchProfileComparison({
-                              withinProfileType: profile,
-                            })
-                          }
-                          getOptionLabel={(option) => option}
-                          getOptionValue={(option) => option}
-                          {...selectFix}
-                        />
-                      </Group>
+                      <Select
+                        id="pcProfileTypeWithin"
+                        label="Profile Type"
+                        value={withinProfileType}
+                        options={profileOptions}
+                        onChange={(profile) =>
+                          dispatchProfileComparison({
+                            withinProfileType: profile,
+                          })
+                        }
+                      />
                     </Col>
                     <Col sm="5">
-                      <Label>Sample Name 1</Label>
                       <Select
+                        id="pcSample1"
+                        label="Sample Name 1"
+                        value={withinSampleName1}
                         options={nameOptions}
-                        value={[withinSampleName1]}
                         onChange={(name) => {
                           dispatchProfileComparison({
                             withinSampleName1: name,
                           });
                         }}
-                        getOptionLabel={(option) => option}
-                        getOptionValue={(option) => option}
-                        {...selectFix}
                       />
                     </Col>
                     <Col sm="5">
-                      <Label>Sample Name 2</Label>
                       <Select
+                        id="pcSample2"
+                        label="Sample Name 2"
+                        value={withinSampleName2}
                         options={nameOptions}
-                        value={[withinSampleName2]}
                         onChange={(name) => {
                           dispatchProfileComparison({
                             withinSampleName2: name,
                           });
                         }}
-                        getOptionLabel={(option) => option}
-                        getOptionValue={(option) => option}
-                        {...selectFix}
                       />
                     </Col>
                     <Col sm="1" className="m-auto">
@@ -534,57 +519,45 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 <div>
                   <Row className="justify-content-center">
                     <Col sm="1">
-                      <Group controlId="profileTypeRefSig">
-                        <Label>Profile Type</Label>
-                        <Select
-                          options={profileOptions}
-                          value={[refProfileType]}
-                          onChange={(refProfileType) => {
-                            dispatchProfileComparison({
-                              refProfileType: refProfileType,
-                            });
-                            getSignatureSet(refProfileType);
-                          }}
-                          getOptionLabel={(option) => option}
-                          getOptionValue={(option) => option}
-                          {...selectFix}
-                        />
-                      </Group>
+                      <Select
+                        id="pcProfileTypeRef"
+                        label="Profile Type"
+                        value={refProfileType}
+                        options={profileOptions}
+                        onChange={(refProfileType) => {
+                          dispatchProfileComparison({
+                            refProfileType: refProfileType,
+                          });
+                          getSignatureSet(refProfileType);
+                        }}
+                      />
                     </Col>
                     <Col sm="3">
-                      <Group controlId="sampleNameRefSig">
-                        <Label>Sample Name</Label>
-                        <Select
-                          options={nameOptions}
-                          value={[refSampleName]}
-                          onChange={(name) => {
-                            dispatchProfileComparison({
-                              refSampleName: name,
-                            });
-                          }}
-                          getOptionLabel={(option) => option}
-                          getOptionValue={(option) => option}
-                          {...selectFix}
-                        />
-                      </Group>
+                      <Select
+                        id="sampleNameRefSig"
+                        label="Sample Name"
+                        value={refSampleName}
+                        options={nameOptions}
+                        onChange={(name) => {
+                          dispatchProfileComparison({
+                            refSampleName: name,
+                          });
+                        }}
+                      />
                     </Col>
                     <Col sm="4">
-                      <Group controlId="signatureSet">
-                        <Label>Reference Signature Set</Label>
-                        <Select
-                          options={refSignatureSetOptions}
-                          value={[refSignatureSet]}
-                          onChange={(refSignatureSet) => {
-                            dispatchProfileComparison({
-                              refSignatureSet: refSignatureSet,
-                            });
-                            getSignatures(refProfileType, refSignatureSet);
-                          }}
-                          getOptionLabel={(option) => option}
-                          getOptionValue={(option) => option}
-                          {...selectFix}
-                        />
-                      </Group>
+                      <Select
+                        id="pcRefSet"
+                        label="Reference Signature Set"
+                        value={refSignatureSet}
+                        options={refSignatureSetOptions}
+                        onChange={(refSignatureSet) => {
+                          dispatchProfileComparison({
+                            refSignatureSet: refSignatureSet,
+                          });
+                          getSignatures(refProfileType, refSignatureSet);
+                        }}
+                      />
                     </Col>
                     <Col sm="3">
                       <Group controlId="signatureSet">
@@ -597,6 +570,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                             rootClose
                           >
                             <Button
+                              aria-label="compare signatures info"
                               variant="link"
                               className="p-0 font-weight-bold "
                             >
@@ -703,94 +677,73 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   <div>
                     <Row className="justify-content-center">
                       <Col sm="1">
-                        <Group controlId="userProfileType">
-                          <Label>Profile Type</Label>
-                          <Select
-                            options={profileOptions}
-                            value={[userProfileType]}
-                            onChange={(profile) =>
-                              dispatchProfileComparison({
-                                userProfileType: profile,
-                              })
-                            }
-                            getOptionLabel={(option) => option}
-                            getOptionValue={(option) => option}
-                            {...selectFix}
-                          />
-                        </Group>
+                        <Select
+                          id="pcUserProfileType"
+                          label="Profile Type"
+                          value={userProfileType}
+                          options={profileOptions}
+                          onChange={(profile) =>
+                            dispatchProfileComparison({
+                              userProfileType: profile,
+                            })
+                          }
+                        />
                       </Col>
                       <Col sm="1">
-                        <Label>Matrix Size</Label>
                         <Select
+                          id="pcUserMatrixSize"
+                          label="Matrix Size"
+                          value={userMatrixSize}
                           options={userMatrixOptions}
-                          value={[userMatrixSize]}
                           onChange={(matrix) =>
                             dispatchProfileComparison({
                               userMatrixSize: matrix,
                             })
                           }
-                          getOptionLabel={(option) => option}
-                          getOptionValue={(option) => option}
-                          {...selectFix}
                         />
                       </Col>
                       <Col sm="2">
-                        <Label>Sample Name</Label>
                         <Select
+                          id="pcUserSampleName"
+                          label="Sample Name"
+                          value={userSampleName}
                           options={nameOptions}
-                          value={[userSampleName]}
                           onChange={(name) => {
                             dispatchProfileComparison({
                               userSampleName: name,
                             });
                           }}
-                          getOptionLabel={(option) => option}
-                          getOptionValue={(option) => option}
-                          {...selectFix}
                         />
                       </Col>
-
                       <Col sm="2">
-                        <Group controlId="pubStudy">
-                          <Label>Study</Label>
-                          <Select
-                            options={studyOptions}
-                            value={[pubStudy]}
-                            onChange={(study) => handleStudyChange(study)}
-                            getOptionLabel={(option) => option}
-                            getOptionValue={(option) => option}
-                            {...selectFix}
-                          />
-                        </Group>
+                        <Select
+                          id="pcPubStudy"
+                          label="Study"
+                          value={pubStudy}
+                          options={studyOptions}
+                          onChange={handleStudyChange}
+                        />
                       </Col>
                       <Col sm="2">
-                        <Group controlId="pubCancerType">
-                          <Label>Cancer Type</Label>
-                          <Select
-                            options={pubCancerTypeOptions}
-                            value={[pubCancerType]}
-                            onChange={(cancerType) =>
-                              handleCancerChange(cancerType)
-                            }
-                            getOptionLabel={(option) => option}
-                            getOptionValue={(option) => option}
-                            {...selectFix}
-                          />
-                        </Group>
+                        <Select
+                          id="pcPubCancerType"
+                          label="Cancer Type"
+                          value={pubCancerType}
+                          options={pubCancerTypeOptions}
+                          onChange={handleCancerChange}
+                        />
                       </Col>
                       <Col sm="3">
-                        <Label>Public Sample Name</Label>
                         <Select
+                          id="pcPubSampleName"
+                          label="Public Sample Name"
+                          value={pubSampleName}
                           options={pubSampleOptions}
-                          value={[pubSampleName]}
                           onChange={(name) => {
                             dispatchProfileComparison({
                               pubSampleName: name,
                             });
                           }}
-                          getOptionLabel={(option) => option}
-                          getOptionValue={(option) => option}
-                          {...selectFix}
                         />
                       </Col>
                       <Col sm="1" className="m-auto">

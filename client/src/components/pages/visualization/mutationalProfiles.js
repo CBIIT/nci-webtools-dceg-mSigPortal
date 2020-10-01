@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import Select from 'react-select';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
   dispatchMutationalProfiles,
 } from '../../../services/store';
 import Plot from '../../controls/plot/plot';
+import Select from '../../controls/select/select';
 
 const { Group, Label } = Form;
 
@@ -248,46 +248,40 @@ export default function MutationalProfiles() {
           <div className="border rounded p-2">
             <Row className="justify-content-center">
               <Col sm="3">
-                <Label>Sample Name</Label>
                 <Select
+                  id="mpSampleName"
+                  label="Sample Name"
+                  value={selectName}
                   options={nameOptions}
-                  value={[selectName]}
-                  onChange={(name) => filterSampleName(name)}
-                  getOptionLabel={(option) => option}
-                  getOptionValue={(option) => option}
+                  onChange={filterSampleName}
                 />
               </Col>
               <Col sm="3">
-                <Label>Profile Type</Label>
                 <Select
+                  id="mpProfileType"
+                  label="Profile Type"
+                  value={selectProfile}
                   options={profileOptions}
-                  value={[selectProfile]}
-                  onChange={(profile) => {
-                    filterProfileType(profile);
-                  }}
-                  getOptionLabel={(option) => option}
-                  getOptionValue={(option) => option}
+                  onChange={filterProfileType}
                 />
               </Col>
               <Col sm="3">
-                <Label>Matrix Size</Label>
                 <Select
+                  id="mpMatrixSize"
+                  label="Matrix Size"
+                  value={selectMatrix}
                   options={matrixOptions}
-                  value={[selectMatrix]}
-                  onChange={(matrix) => filterMatrix(matrix)}
-                  getOptionLabel={(option) => option}
-                  getOptionValue={(option) => option}
+                  onChange={filterMatrix}
                 />
               </Col>
               <Col sm="3">
-                <Label>Filter</Label>
                 <Select
-                  disabled={source == 'public'}
+                  id="mpFilter"
+                  label="Filter"
+                  value={selectFilter}
                   options={filterOptions}
-                  value={[selectFilter]}
-                  onChange={(filter) => filterTag(filter)}
-                  getOptionLabel={(option) => option}
-                  getOptionValue={(option) => option}
+                  onChange={filterTag}
+                  disabled={source == 'public'}
                 />
               </Col>
             </Row>

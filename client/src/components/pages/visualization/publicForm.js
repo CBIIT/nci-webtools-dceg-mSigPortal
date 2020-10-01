@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { Form, Button, Row, Col, Popover } from 'react-bootstrap';
-import Select from 'react-select';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useSelector } from 'react-redux';
 import './visualization.scss';
@@ -16,7 +15,7 @@ import {
   dispatchMutationalPattern,
   dispatchProfilerSummary,
 } from '../../../services/store';
-const { Group, Label } = Form;
+import Select from '../../controls/select/select';
 
 export default function PublicForm() {
   const {
@@ -224,47 +223,34 @@ export default function PublicForm() {
   return (
     <Form>
       <LoadingOverlay active={loadingPublic} />
-      <Group controlId="study">
-        <Label>Study</Label>
-        <Select
-          inputId="study"
-          isDisabled={submitted}
-          options={studyOptions}
-          value={[study]}
-          onChange={(study) => handleStudyChange(study)}
-          getOptionLabel={(option) => option}
-          getOptionValue={(option) => option}
-        />
-      </Group>
-      <Group controlId="cancerType">
-        <Label>Cancer Type</Label>
-        <Select
-          inputId="cancerType"
-          isDisabled={submitted}
-          options={cancerTypeOptions}
-          value={[cancerType]}
-          onChange={(cancerType) => handleCancerChange(cancerType)}
-          getOptionLabel={(option) => option}
-          getOptionValue={(option) => option}
-        />
-      </Group>
-
-      <Group controlId="strategy">
-        <Label>Experimental Strategy</Label>
-        <Select
-          inputId="strategy"
-          isDisabled={submitted}
-          options={pubExperimentOptions}
-          value={[pubExperimentalStrategy]}
-          onChange={(pubExperimentalStrategy) =>
-            dispatchVisualize({
-              pubExperimentalStrategy: pubExperimentalStrategy,
-            })
-          }
-          getOptionLabel={(option) => option}
-          getOptionValue={(option) => option}
-        />
-      </Group>
+      <Select
+        id="publicFormStudy"
+        label="Study"
+        disabled={submitted}
+        value={study}
+        options={studyOptions}
+        onChange={handleStudyChange}
+      />
+      <Select
+        id="publicFromCancerType"
+        label="Cancer Type"
+        disabled={submitted}
+        value={cancerType}
+        options={cancerTypeOptions}
+        onChange={handleCancerChange}
+      />
+      <Select
+        id="publicFormStrategy"
+        label="Experimental Strategy"
+        disabled={submitted}
+        value={pubExperimentalStrategy}
+        options={pubExperimentOptions}
+        onChange={(pubExperimentalStrategy) =>
+          dispatchVisualize({
+            pubExperimentalStrategy: pubExperimentalStrategy,
+          })
+        }
+      />
 
       <Row>
         <Col sm="6">

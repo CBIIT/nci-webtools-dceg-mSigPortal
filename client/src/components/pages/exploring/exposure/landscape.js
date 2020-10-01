@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import Select from 'react-select';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
@@ -9,6 +8,7 @@ import {
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
+import Select from '../../../controls/select/select';
 
 const { Group, Label, Control } = Form;
 
@@ -35,15 +35,6 @@ export default function Tumor({ submitR, downloadResults }) {
   const { displayTab, publicDataOptions } = useSelector(
     (state) => state.exploring
   );
-
-  const selectFix = {
-    styles: {
-      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-    },
-    menuPortalTarget: document.body,
-    getOptionLabel: (option) => option,
-    getOptionValue: (option) => option,
-  };
 
   const [vdFile, setFile] = useState(new File([], ''));
 
@@ -204,58 +195,59 @@ export default function Tumor({ submitR, downloadResults }) {
         <div>
           <Row className="justify-content-center">
             <Col sm="2">
-              <Group controlId="study">
-                <Label>Study</Label>
-                <Select
-                  options={studyOptions}
-                  value={[study]}
-                  onChange={(study) => handleStudy(study)}
-                  {...selectFix}
-                />
-              </Group>
-            </Col>
-            <Col sm="2">
-              <Label>Cancer Type</Label>
               <Select
-                options={cancerOptions}
-                value={[cancer]}
-                onChange={(cancer) => handleCancer(cancer)}
-                {...selectFix}
+                id="landscapeStudy"
+                label="Study"
+                value={study}
+                options={studyOptions}
+                onChange={(study) => handleStudy(study)}
               />
             </Col>
             <Col sm="2">
-              <Label>Experimental Strategy</Label>
               <Select
+                id="landscapeType"
+                label="Cancer Type"
+                value={cancer}
+                options={cancerOptions}
+                onChange={(cancer) => handleCancer(cancer)}
+              />
+            </Col>
+            <Col sm="2">
+              <Select
+                id="landscapeStrategy"
+                label="Experimental Strategy"
+                value={strategy}
                 options={strategyOptions}
-                value={[strategy]}
-                onChange={(set) =>
-                  dispatchExpLandscape({ refSignatureSet1: set })
+                onChange={(strategy) =>
+                  dispatchExpLandscape({ strategy: strategy })
                 }
-                {...selectFix}
               />
             </Col>
             <Col sm="3">
-              <Label>Reference Signature Set</Label>
               <Select
+                id="landscapeRefSet"
+                label="Reference Signature Set"
+                value={refSignatureSet}
                 options={refSignatureSetOptions}
-                value={[refSignatureSet]}
                 onChange={(set) =>
                   dispatchExpLandscape({ refSignatureSet: set })
                 }
-                {...selectFix}
               />
             </Col>
             <Col sm="2">
-              <Label>Genome Size</Label>
-              <Control
-                value={genomeSize}
-                onChange={(e) => {
-                  dispatchExpLandscape({
-                    genomeSize: e.target.value,
-                  });
-                }}
-              />
-              {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
+              <Group controlId="landscapeGenomeSize">
+                <Label>Genome Size</Label>
+                <Control
+                  id="landscapeGenomeSize"
+                  value={genomeSize}
+                  onChange={(e) => {
+                    dispatchExpLandscape({
+                      genomeSize: e.target.value,
+                    });
+                  }}
+                />
+                {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
+              </Group>
             </Col>
             <Col sm="1" className="m-auto">
               <Button variant="primary" onClick={() => handleSubmit()}>

@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button, Accordion, Card } from 'react-bootstrap';
-import Select from 'react-select';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -8,8 +7,8 @@ import { dispatchError, dispatchPCA } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
+import Select from '../../controls/select/select';
 
-const { Group, Label } = Form;
 const { Header, Body } = Card;
 const { Toggle, Collapse } = Accordion;
 
@@ -65,13 +64,6 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
     pubPcaErr,
     pubSubmitOverlay,
   } = useSelector((state) => state.pca);
-
-  const selectFix = {
-    styles: {
-      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-    },
-    menuPortalTarget: document.body,
-  };
 
   async function setRPlot(plotPath, type) {
     if (plotPath) {
@@ -322,41 +314,32 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
                 <div>
                   <Row className="justify-content-center">
                     <Col sm="5">
-                      <Group controlId="profileType">
-                        <Label>Profile Type</Label>
-                        <Select
-                          options={profileOptions}
-                          value={[profileType]}
-                          onChange={(profileType) => {
-                            dispatchPCA({
-                              profileType: profileType,
-                            });
-                            getSignatureSet(profileType);
-                          }}
-                          getOptionLabel={(option) => option}
-                          getOptionValue={(option) => option}
-                          {...selectFix}
-                        />
-                      </Group>
+                      <Select
+                        id="pcaProfileType"
+                        label="Profile Type"
+                        value={profileType}
+                        options={profileOptions}
+                        onChange={(profileType) => {
+                          dispatchPCA({
+                            profileType: profileType,
+                          });
+                          getSignatureSet(profileType);
+                        }}
+                      />
                     </Col>
 
                     <Col sm="5">
-                      <Group controlId="signatureSet">
-                        <Label>Reference Signature Set</Label>
-
-                        <Select
-                          options={signatureSetOptions}
-                          value={[signatureSet]}
-                          onChange={(signatureSet) => {
-                            dispatchPCA({
-                              signatureSet: signatureSet,
-                            });
-                          }}
-                          getOptionLabel={(option) => option}
-                          getOptionValue={(option) => option}
-                          {...selectFix}
-                        />
-                      </Group>
+                      <Select
+                        id="pcaRefSet"
+                        label="Reference Signature Set"
+                        value={signatureSet}
+                        options={signatureSetOptions}
+                        onChange={(signatureSet) => {
+                          dispatchPCA({
+                            signatureSet: signatureSet,
+                          });
+                        }}
+                      />
                     </Col>
                     <Col sm="1" className="m-auto">
                       <Button
@@ -474,62 +457,42 @@ export default function PCA({ downloadResults, submitR, getRefSigOptions }) {
                   <div>
                     <Row className="justify-content-center">
                       <Col sm="2">
-                        <Group controlId="profileType">
-                          <Label>Profile Type</Label>
-                          <Select
-                            options={profileOptions}
-                            value={[userProfileType]}
-                            onChange={(profile) => handleProfileType(profile)}
-                            getOptionLabel={(option) => option}
-                            getOptionValue={(option) => option}
-                            {...selectFix}
-                          />
-                        </Group>
+                        <Select
+                          id="pcaPubProfile"
+                          label="Profile Type"
+                          value={userProfileType}
+                          options={profileOptions}
+                          onChange={handleProfileType}
+                        />
                       </Col>
-
                       <Col sm="2">
-                        <Group controlId="signatureSet">
-                          <Label>Matrix Size</Label>
-                          <Select
-                            options={userMatrixOptions}
-                            value={[userMatrixSize]}
-                            onChange={(matrix) => {
-                              dispatchPCA({ userMatrixSize: matrix });
-                            }}
-                            getOptionLabel={(option) => option}
-                            getOptionValue={(option) => option}
-                            {...selectFix}
-                          />
-                        </Group>
+                        <Select
+                          id="pcaPubMatrixSize"
+                          label="Matrix Size"
+                          value={userMatrixSize}
+                          options={userMatrixOptions}
+                          onChange={(matrix) => {
+                            dispatchPCA({ userMatrixSize: matrix });
+                          }}
+                        />
                       </Col>
-
                       <Col sm="2">
-                        <Group controlId="pubStudy">
-                          <Label>Study</Label>
-                          <Select
-                            options={studyOptions}
-                            value={[pubStudy]}
-                            onChange={(study) => handleStudyChange(study)}
-                            getOptionLabel={(option) => option}
-                            getOptionValue={(option) => option}
-                            {...selectFix}
-                          />
-                        </Group>
+                        <Select
+                          id="pcaPubStudy"
+                          label="Study"
+                          value={pubStudy}
+                          options={studyOptions}
+                          onChange={(study) => handleStudyChange(study)}
+                        />
                       </Col>
                       <Col sm="4">
-                        <Group controlId="pubCancerType">
-                          <Label>Cancer Type</Label>
-                          <Select
-                            options={pubCancerTypeOptions}
-                            value={[pubCancerType]}
-                            onChange={(cancerType) =>
-                              handleCancerChange(cancerType)
-                            }
-                            getOptionLabel={(option) => option}
-                            getOptionValue={(option) => option}
-                            {...selectFix}
-                          />
-                        </Group>
+                        <Select
+                          id="pcaPubCancerType"
+                          label="Cancer Type"
+                          value={pubCancerType}
+                          options={pubCancerTypeOptions}
+                          onChange={handleCancerChange}
+                        />
                       </Col>
                       <Col sm="1" className="m-auto">
                         <Button

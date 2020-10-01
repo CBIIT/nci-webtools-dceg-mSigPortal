@@ -1,6 +1,5 @@
 import React from 'react';
-import { Form, Row, Col, Button } from 'react-bootstrap';
-import Select from 'react-select';
+import { Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
@@ -9,8 +8,7 @@ import {
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
-
-const { Group, Label } = Form;
+import Select from '../../../controls/select/select';
 
 export default function MutationalSignatureProfile({ submitR }) {
   const rootURL = window.location.pathname;
@@ -33,15 +31,6 @@ export default function MutationalSignatureProfile({ submitR }) {
     loading,
   } = useSelector((state) => state.expMutationalProfiles);
   const { displayTab, refSigData } = useSelector((state) => state.exploring);
-
-  const selectFix = {
-    styles: {
-      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-    },
-    menuPortalTarget: document.body,
-    getOptionLabel: (option) => option,
-    getOptionValue: (option) => option,
-  };
 
   async function calculateR(fn, args) {
     dispatchExpMutationalProfiles({
@@ -265,56 +254,52 @@ export default function MutationalSignatureProfile({ submitR }) {
       <LoadingOverlay active={loading} />
       <Row className="justify-content-center">
         <Col sm="2">
-          <Group controlId="withinProfileType">
-            <Label>Signature Source</Label>
-            <Select
-              options={signatureSourceOptions}
-              value={[signatureSource]}
-              onChange={(source) => handleSource(source)}
-              {...selectFix}
-            />
-          </Group>
+          <Select
+            id="mspSource"
+            label="Signature Source"
+            value={signatureSource}
+            options={signatureSourceOptions}
+            onChange={handleSource}
+          />
         </Col>
         <Col sm="2">
-          <Group controlId="withinProfileType">
-            <Label>Profile Name</Label>
-            <Select
-              options={profileNameOptions}
-              value={[profileName]}
-              onChange={(profile) => handleProfile(profile)}
-              {...selectFix}
-            />
-          </Group>
+          <Select
+            id="mspProfileName"
+            label="Profile Name"
+            value={profileName}
+            options={profileNameOptions}
+            onChange={handleProfile}
+          />
         </Col>
         <Col sm="3">
-          <Label>Reference Signature Set</Label>
           <Select
+            id="mspSet"
+            label="Reference Signature Set"
+            value={refSignatureSet}
             options={refSignatureSetOptions}
-            value={[refSignatureSet]}
-            onChange={(set) => handleSet(set)}
-            {...selectFix}
+            onChange={handleSet}
           />
         </Col>
         <Col sm="2">
-          <Label>Experimental Strategy</Label>
           <Select
+            id="mspStrategy"
+            label="Experimental Strategy"
+            value={strategy}
             options={strategyOptions}
-            value={[strategy]}
-            onChange={(strategy) => handleStrategy(strategy)}
-            {...selectFix}
+            onChange={handleStrategy}
           />
         </Col>
         <Col sm="2">
-          <Label>Signature Name</Label>
           <Select
+            id="mspSigName"
+            label="Signature Name"
+            value={signatureName}
             options={signatureNameOptions}
-            value={[signatureName]}
             onChange={(name) =>
               dispatchExpMutationalProfiles({
                 signatureName: name,
               })
             }
-            {...selectFix}
           />
         </Col>
         <Col sm="1" className="m-auto">

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import Select from 'react-select';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
@@ -9,8 +8,7 @@ import {
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
-
-const { Group, Label } = Form;
+import Select from '../../../controls/select/select';
 
 export default function MutationalSignatureProfile({
   submitR,
@@ -33,15 +31,6 @@ export default function MutationalSignatureProfile({
     loading,
   } = useSelector((state) => state.expCosineSimilarity);
   const { displayTab, refSigData } = useSelector((state) => state.exploring);
-
-  const selectFix = {
-    styles: {
-      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-    },
-    menuPortalTarget: document.body,
-    getOptionLabel: (option) => option,
-    getOptionValue: (option) => option,
-  };
 
   async function calculateR(fn, args) {
     console.log(fn);
@@ -130,36 +119,34 @@ export default function MutationalSignatureProfile({
         <div>
           <Row className="justify-content-center">
             <Col sm="3">
-              <Group controlId="withinProfileType">
-                <Label>Profile Name</Label>
-                <Select
-                  options={profileNameOptions}
-                  value={[profileName]}
-                  onChange={(profile) => handleProfile(profile)}
-                  {...selectFix}
-                />
-              </Group>
-            </Col>
-            <Col sm="4">
-              <Label>Reference Signature Set 1</Label>
               <Select
-                options={refSignatureSetOptions1}
-                value={[refSignatureSet1]}
-                onChange={(set) =>
-                  dispatchExpCosineSimilarity({ refSignatureSet1: set })
-                }
-                {...selectFix}
+                id="csProfileName"
+                label="Profile Name"
+                value={profileName}
+                options={profileNameOptions}
+                onChange={handleProfile}
               />
             </Col>
             <Col sm="4">
-              <Label>Signature Set 2</Label>
               <Select
+                id="csRefSet1"
+                label="Reference Signature Set 1"
+                value={refSignatureSet1}
+                options={refSignatureSetOptions1}
+                onChange={(set) =>
+                  dispatchExpCosineSimilarity({ refSignatureSet1: set })
+                }
+              />
+            </Col>
+            <Col sm="4">
+              <Select
+                id="rcsRefSet2"
+                label="Signature Set 2"
+                value={refSignatureSet2}
                 options={refSignatureSetOptions2}
-                value={[refSignatureSet2]}
                 onChange={(set) =>
                   dispatchExpCosineSimilarity({ refSignatureSet2: set })
                 }
-                {...selectFix}
               />
             </Col>
             <Col sm="1" className="m-auto">

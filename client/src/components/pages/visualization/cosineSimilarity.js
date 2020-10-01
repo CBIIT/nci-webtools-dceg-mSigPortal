@@ -1,6 +1,5 @@
 import React from 'react';
 import { Form, Row, Col, Button, Accordion, Card } from 'react-bootstrap';
-import Select from 'react-select';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -11,6 +10,7 @@ import {
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
+import Select from '../../controls/select/select';
 
 const { Group, Label } = Form;
 const { Header, Body } = Card;
@@ -64,13 +64,6 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
     debugR,
     displayDebug,
   } = useSelector((state) => state.cosineSimilarity);
-
-  const selectFix = {
-    styles: {
-      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-    },
-    menuPortalTarget: document.body,
-  };
 
   function setOverlay(type, display) {
     if (type == 'within') {
@@ -342,33 +335,25 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 <div>
                   <Row className="justify-content-center">
                     <Col sm="5">
-                      <Group controlId="withinProfileType">
-                        <Label>Profile Type</Label>
-                        <Select
-                          options={profileOptions}
-                          value={[withinProfileType]}
-                          onChange={(profile) =>
-                            handleWithinProfileType(profile)
-                          }
-                          getOptionLabel={(option) => option}
-                          getOptionValue={(option) => option}
-                          {...selectFix}
-                        />
-                      </Group>
+                      <Select
+                        id="csProfileType"
+                        label="Profile Type"
+                        value={withinProfileType}
+                        options={profileOptions}
+                        onChange={handleWithinProfileType}
+                      />
                     </Col>
                     <Col sm="5">
-                      <Label>Matrix Size</Label>
                       <Select
+                        id="csMatrixSize"
+                        label="Matrix Size"
+                        value={withinMatrixSize}
                         options={withinMatrixOptions}
-                        value={[withinMatrixSize]}
                         onChange={(matrix) =>
                           dispatchCosineSimilarity({
                             withinMatrixSize: matrix,
                           })
                         }
-                        getOptionLabel={(option) => option}
-                        getOptionValue={(option) => option}
-                        {...selectFix}
                       />
                     </Col>
                     <Col sm="1" className="m-auto">
@@ -447,39 +432,31 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 <div>
                   <Row className="justify-content-center">
                     <Col sm="5">
-                      <Group controlId="refProfileType">
-                        <Label>Profile Type</Label>
-                        <Select
-                          options={profileOptions}
-                          value={[refProfileType]}
-                          onChange={(refProfileType) => {
-                            dispatchCosineSimilarity({
-                              refProfileType: refProfileType,
-                            });
-                            getSignatureSet(refProfileType);
-                          }}
-                          getOptionLabel={(option) => option}
-                          getOptionValue={(option) => option}
-                          {...selectFix}
-                        />
-                      </Group>
+                      <Select
+                        id="csRefProfileType"
+                        label="Profile Type"
+                        value={refProfileType}
+                        options={profileOptions}
+                        onChange={(refProfileType) => {
+                          dispatchCosineSimilarity({
+                            refProfileType: refProfileType,
+                          });
+                          getSignatureSet(refProfileType);
+                        }}
+                      />
                     </Col>
                     <Col sm="5">
-                      <Group controlId="refSignatureSet">
-                        <Label>Reference Signature Set</Label>
-                        <Select
-                          options={refSignatureSetOptions}
-                          value={[refSignatureSet]}
-                          onChange={(refSignatureSet) => {
-                            dispatchCosineSimilarity({
-                              refSignatureSet: refSignatureSet,
-                            });
-                          }}
-                          getOptionLabel={(option) => option}
-                          getOptionValue={(option) => option}
-                          {...selectFix}
-                        />
-                      </Group>
+                      <Select
+                        id="csRefSignatureSet"
+                        label="Reference Signature Set"
+                        value={refSignatureSet}
+                        options={refSignatureSetOptions}
+                        onChange={(refSignatureSet) => {
+                          dispatchCosineSimilarity({
+                            refSignatureSet: refSignatureSet,
+                          });
+                        }}
+                      />
                     </Col>
                     <Col sm="1" className="m-auto">
                       <Button
@@ -560,60 +537,44 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   <div>
                     <Row className="justify-content-center">
                       <Col sm="2">
-                        <Group controlId="userProfileType">
-                          <Label>Profile Type</Label>
-                          <Select
-                            options={profileOptions}
-                            value={[userProfileType]}
-                            onChange={(profile) =>
-                              handlePublicProfileType(profile)
-                            }
-                            getOptionLabel={(option) => option}
-                            getOptionValue={(option) => option}
-                            {...selectFix}
-                          />
-                        </Group>
+                        <Select
+                          id="csUserProfileType"
+                          label="Profile Type"
+                          value={userProfileType}
+                          options={profileOptions}
+                          onChange={handlePublicProfileType}
+                        />
                       </Col>
                       <Col sm="2">
-                        <Label>Matrix Size</Label>
                         <Select
+                          id="csUserMatrixSize"
+                          label="Matrix Size"
+                          value={userMatrixSize}
                           options={userMatrixOptions}
-                          value={[userMatrixSize]}
                           onChange={(matrix) =>
                             dispatchCosineSimilarity({
                               userMatrixSize: matrix,
                             })
                           }
-                          getOptionLabel={(option) => option}
-                          getOptionValue={(option) => option}
-                          {...selectFix}
                         />
                       </Col>
                       <Col sm="2">
-                        <Group controlId="pubStudy">
-                          <Label>Study</Label>
-                          <Select
-                            options={studyOptions}
-                            value={[pubStudy]}
-                            onChange={(study) => handleStudyChange(study)}
-                            getOptionLabel={(option) => option}
-                            getOptionValue={(option) => option}
-                            {...selectFix}
-                          />
-                        </Group>
+                        <Select
+                          id="csPubStudy"
+                          label="Study"
+                          value={pubStudy}
+                          options={studyOptions}
+                          onChange={handleStudyChange}
+                        />
                       </Col>
                       <Col sm="4">
-                        <Group controlId="pubCancerType">
-                          <Label>Cancer Type</Label>
-                          <Select
-                            options={pubCancerTypeOptions}
-                            value={[pubCancerType]}
-                            onChange={(cancer) => handleCancerChange(cancer)}
-                            getOptionLabel={(option) => option}
-                            getOptionValue={(option) => option}
-                            {...selectFix}
-                          />
-                        </Group>
+                        <Select
+                          id="csPubCancerType"
+                          label="Cancer Type"
+                          value={pubCancerType}
+                          options={pubCancerTypeOptions}
+                          onChange={handleCancerChange}
+                        />
                       </Col>
                       <Col sm="1" className="m-auto">
                         <Button
