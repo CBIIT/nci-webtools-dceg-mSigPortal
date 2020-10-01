@@ -10,7 +10,6 @@ import {
   dispatchProfileComparison,
   dispatchPCA,
 } from '../../../services/store';
-
 import ProfilerSummary from './profilerSummary';
 import MutationalProfiles from './mutationalProfiles';
 import CosineSimilarity from './cosineSimilarity';
@@ -340,24 +339,26 @@ export default function Results({ setOpenSidebar }) {
     }
   }
 
+  const links = [
+    { title: 'Profiler Summary', id: 'profilerSummary' },
+    { title: 'Mutational Profiles', id: 'mutationalProfiles' },
+    { title: 'Cosine Similarity', id: 'cosineSimilarity' },
+    {
+      title: 'Mutational Pattern Enrichment Analysis',
+      id: 'mutationalPattern',
+    },
+    { title: 'Profile Comparison', id: 'profileComparison' },
+    { title: 'PCA', id: 'pca' },
+    { title: 'Download', id: 'download' },
+  ];
+
   return error.length ? (
     <h4 className="text-danger">{error}</h4>
   ) : mutationalProfiles.filtered.length ? (
     <Card>
       <Header>
         <Nav variant="pills" defaultActiveKey="#mutationalProfiles">
-          {[
-            { title: 'Profiler Summary', id: 'profilerSummary' },
-            { title: 'Mutational Profiles', id: 'mutationalProfiles' },
-            { title: 'Cosine Similarity', id: 'cosineSimilarity' },
-            {
-              title: 'Mutational Pattern Enrichment Analysis',
-              id: 'mutationalPattern',
-            },
-            { title: 'Profile Comparison', id: 'profileComparison' },
-            { title: 'PCA', id: 'pca' },
-            { title: 'Download', id: 'download' },
-          ].map(({ title, id }) => {
+          {links.map(({ title, id }) => {
             return (
               <Item key={id}>
                 <Link
