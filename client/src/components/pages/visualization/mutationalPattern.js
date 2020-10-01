@@ -11,7 +11,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
 
-const { Label, Control, Text } = Form;
+const { Group, Label, Control, Text } = Form;
 const { Header, Body } = Card;
 const { Toggle, Collapse } = Accordion;
 
@@ -181,31 +181,35 @@ export default function MutationalPattern({ downloadResults, submitR }) {
                   <div>
                     <Row className="justify-content-center">
                       <Col sm="5">
-                        <Label>
-                          Minimal Proportion mutations within Each Mutational
-                          Pattern
-                        </Label>
-                        <Control
-                          value={proportion}
-                          onChange={(e) => {
-                            dispatchMutationalPattern({
-                              proportion: e.target.value,
-                            });
-                          }}
-                        ></Control>{' '}
-                        <Text className="text-muted">(Ex. 0.8)</Text>
+                        <Group controlId="minimum">
+                          <Label>
+                            Minimal Proportion mutations within Each Mutational
+                            Pattern
+                          </Label>
+                          <Control
+                            value={proportion}
+                            onChange={(e) => {
+                              dispatchMutationalPattern({
+                                proportion: e.target.value,
+                              });
+                            }}
+                          ></Control>{' '}
+                          <Text className="text-muted">(Ex. 0.8)</Text>
+                        </Group>
                       </Col>
                       <Col sm="5">
-                        <Label>Mutational Pattern</Label>
-                        <Control
-                          value={pattern}
-                          onChange={(e) => {
-                            dispatchMutationalPattern({
-                              pattern: e.target.value,
-                            });
-                          }}
-                        ></Control>
-                        <Text className="text-muted">(Ex. NCG>NTG)</Text>
+                        <Group controlId="pattern">
+                          <Label>Mutational Pattern</Label>
+                          <Control
+                            value={pattern}
+                            onChange={(e) => {
+                              dispatchMutationalPattern({
+                                pattern: e.target.value,
+                              });
+                            }}
+                          ></Control>
+                          <Text className="text-muted">(Ex. NCG>NTG)</Text>
+                        </Group>
                       </Col>
 
                       <Col sm="1" className="m-auto">
