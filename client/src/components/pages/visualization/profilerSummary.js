@@ -74,7 +74,6 @@ export default function ProfilerSummary({ submitR }) {
   }
 
   async function calculateR(fn, args) {
-    console.log(fn);
     dispatchProfilerSummary({
       loading: true,
       err: false,
