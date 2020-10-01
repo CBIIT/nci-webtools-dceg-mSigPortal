@@ -5,7 +5,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import './plot.scss';
 
-export default function ({ plotName, plotURL, txtPath, maxHeight }) {
+export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
   const rootURL = window.location.pathname;
 
   const [loading, setLoading] = useState(false);
@@ -82,6 +82,7 @@ export default function ({ plotName, plotURL, txtPath, maxHeight }) {
                   className="w-100"
                   src={plotURL}
                   style={{ maxHeight: maxHeight || '500px' }}
+                  alt={alt || plotName}
                 />
               </TransformComponent>
             </React.Fragment>
