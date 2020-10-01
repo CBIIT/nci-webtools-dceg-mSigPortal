@@ -576,7 +576,7 @@ export default function UploadForm() {
               )
             ) : (
               <>
-                <Label>Drop files here or click to upload</Label>
+                <label>Drop files here or click to upload</label>
                 {/* <FontAwesomeIcon icon={faCloudUploadAlt} size="4x" /> */}
               </>
             )}
