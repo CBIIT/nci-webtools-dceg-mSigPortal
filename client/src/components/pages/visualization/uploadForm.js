@@ -623,7 +623,7 @@ export default function UploadForm() {
       </Group>
       <hr />
       <Group controlId="email">
-        <LoadingOverlay active={false} content={'Work in progress...'} />
+        <LoadingOverlay active={true} content={'Work in progress...'} />
         <div className="d-flex">
           <Label className="mr-auto">Submit this job to a Queue</Label>{' '}
           <Check inline id="email">
@@ -636,7 +636,6 @@ export default function UploadForm() {
             />
           </Check>
         </div>
-
         <Control
           placeholder="Enter Email"
           size="sm"
