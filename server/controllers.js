@@ -4,7 +4,6 @@ const { tmppath, datapath } = require('./config.json');
 const { spawn } = require('child_process');
 const formidable = require('formidable');
 const fs = require('fs');
-const rimraf = require('rimraf');
 const { v4: uuidv4 } = require('uuid');
 const Papa = require('papaparse');
 const r = require('r-wrapper').async;
@@ -125,9 +124,8 @@ async function visualizeR(req, res, next) {
     req.body.fn
   );
 
-  if (!fs.existsSync(savePath)) {
-    fs.mkdirSync(savePath, { recursive: true });
-  }
+  fs.mkdirSync(savePath, { recursive: true });
+
   try {
     const wrapper = await r('services/R/visualizeWrapper.R', req.body.fn, {
       ...req.body.args,
@@ -224,13 +222,7 @@ async function getPublicData(req, res, next) {
     const projectID = uuidv4();
     const saveDir = path.join(tmppath, projectID);
 
-    if (!fs.existsSync(saveDir)) {
-      fs.mkdirSync(saveDir);
-    } else {
-      rimraf(saveDir, () => {
-        fs.mkdirSync(saveDir);
-      });
-    }
+    fs.mkdirSync(saveDir);
 
     res.json({ svgList: JSON.parse(list), projectID: projectID });
   } catch (err) {
@@ -249,13 +241,7 @@ function upload(req, res, next) {
 
   logger.info(`/upload: Request Project ID:${projectID}`);
 
-  if (!fs.existsSync(form.uploadDir)) {
-    fs.mkdirSync(form.uploadDir);
-  } else {
-    rimraf(form.uploadDir, () => {
-      fs.mkdirSync(form.uploadDir);
-    });
-  }
+  fs.mkdirSync(form.uploadDir);
 
   form.parse(req);
   form.on('file', (field, file) => {
@@ -375,9 +361,8 @@ async function exploringR(req, res, next) {
   const projectID = req.body.projectID || uuidv4();
   const savePath = path.join(tmppath, projectID, 'results', req.body.fn);
 
-  if (!fs.existsSync(savePath)) {
-    fs.mkdirSync(savePath, { recursive: true });
-  }
+  fs.mkdirSync(savePath, { recursive: true });
+
   try {
     const wrapper = await r('services/R/exploringWrapper.R', req.body.fn, {
       ...req.body.args,
