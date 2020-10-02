@@ -39,7 +39,7 @@ export function Navbar({ links }) {
             <div data-testid="Navbar" className="d-block" key={title}>
               <NavLink
                 data-testid={`Navbar-NavLink-${index}`}
-                id={title}
+                id={'nav' + title}
                 // key={title}
                 className="navlinks py-2 px-4 d-inline-block"
                 activeClassName="active-navlinks"

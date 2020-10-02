@@ -380,7 +380,7 @@ export default function UploadForm() {
               </button>
             ) : (
               <>
-                <label>Drop files here or click to upload</label>
+                <span>Drop files here or click to upload</span>
                 {/* <FontAwesomeIcon icon={faCloudUploadAlt} size="4x" /> */}
               </>
             )}
@@ -576,7 +576,7 @@ export default function UploadForm() {
               )
             ) : (
               <>
-                <label>Drop files here or click to upload</label>
+                <span>Drop files here or click to upload</span>
                 {/* <FontAwesomeIcon icon={faCloudUploadAlt} size="4x" /> */}
               </>
             )}
@@ -622,11 +622,11 @@ export default function UploadForm() {
         </Check>
       </Group>
       <hr />
-      <Group controlId="email">
+      <div>
         <LoadingOverlay active={true} content={'Work in progress...'} />
-        <div className="d-flex">
+        <Group controlId="toggleQueue">
           <Label className="mr-auto">Submit this job to a Queue</Label>{' '}
-          <Check inline id="email">
+          <Check inline>
             <Check.Input
               type="checkbox"
               checked={queueMode == true}
@@ -635,21 +635,23 @@ export default function UploadForm() {
               }}
             />
           </Check>
-        </div>
-        <Control
-          placeholder="Enter Email"
-          size="sm"
-          value={email}
-          onChange={(e) => dispatchVisualize({ email: e.target.value })}
-          disabled={!queueMode}
-        />
-        <Text className="text-muted">
-          <i>
-            Note: if sending to queue, when computation is completed, a
-            notification will be sent to the e-mail entered above.
-          </i>
-        </Text>
-      </Group>
+        </Group>
+        <Group controlId="email">
+          <Control
+            placeholder="Enter Email"
+            size="sm"
+            value={email}
+            onChange={(e) => dispatchVisualize({ email: e.target.value })}
+            disabled={!queueMode}
+          />
+          <Text className="text-muted">
+            <i>
+              Note: if sending to queue, when computation is completed, a
+              notification will be sent to the e-mail entered above.
+            </i>
+          </Text>
+        </Group>
+      </div>
       <Row>
         <Col sm="6">
           <Button

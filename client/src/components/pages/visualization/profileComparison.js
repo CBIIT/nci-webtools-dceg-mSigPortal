@@ -769,7 +769,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                       </Col>
                     </Row>
 
-                    <div id="pcWithinPlot">
+                    <div id="pcPubPlot">
                       <div style={{ display: pubErr ? 'block' : 'none' }}>
                         <p>
                           An error has occured. Check the debug section for more
