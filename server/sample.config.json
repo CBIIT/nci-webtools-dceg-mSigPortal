@@ -1,13 +1,26 @@
 {
   "port": 8330,
-  "logpath": "server/logs/",
-  "tmppath": "server/tmp",
+  "logpath": "./logs/",
+  "tmppath": "./tmp/",
+  "datapath": "./data/",
   "loglevel": "debug",
-  "database": {
-    "name": "example-database",
+  "aws": {
+    "bucket": "bucket",
+    "key": "key",
+    "queue": "queue",
+    "region": "region",
+    "queue_request_interval": 3,
+    "queue_msg_fitting_timeout": 43200,
+    "visibility_timeout": 90,
+    "queue_long_pull_time": 45
+  },
+  "mail": {
     "host": "host",
     "port": "port",
-    "user": "username",
-    "password": "password"
+    "web_admin_email": "admin",
+    "support_email": "support",
+    "tls": {
+      "rejectUnauthorized": false
+    }
   }
 }
