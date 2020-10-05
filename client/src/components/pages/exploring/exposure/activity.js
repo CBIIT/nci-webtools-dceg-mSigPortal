@@ -9,7 +9,7 @@ import Select from '../../../controls/select/select';
 
 const { Group, Label, Control, Text } = Form;
 
-export default function Activity({ submitR, downloadResults }) {
+export default function Activity({ submitR }) {
   const rootURL = window.location.pathname;
   const {
     study,
@@ -68,14 +68,7 @@ export default function Activity({ submitR, downloadResults }) {
   async function setRPlot(plotPath) {
     if (plotPath) {
       try {
-        const response = await fetch(`${rootURL}getSVG`, {
-          method: 'POST',
-          headers: {
-            Accept: 'image/svg',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ path: plotPath }),
-        });
+        const response = await fetch(`${rootURL}results/${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {

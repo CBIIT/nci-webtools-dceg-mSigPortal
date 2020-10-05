@@ -12,7 +12,7 @@ import Select from '../../../controls/select/select';
 
 const { Group, Label, Control } = Form;
 
-export default function Tumor({ submitR, downloadResults }) {
+export default function Tumor({ submitR }) {
   const rootURL = window.location.pathname;
   const {
     study,
@@ -75,14 +75,7 @@ export default function Tumor({ submitR, downloadResults }) {
   async function setRPlot(plotPath) {
     if (plotPath) {
       try {
-        const response = await fetch(`${rootURL}getSVG`, {
-          method: 'POST',
-          headers: {
-            Accept: 'image/svg',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ path: plotPath }),
-        });
+        const response = await fetch(`${rootURL}results/${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {

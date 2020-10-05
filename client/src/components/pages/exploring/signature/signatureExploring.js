@@ -37,37 +37,6 @@ export default function SignatureExploring() {
     });
   }
 
-  //   download text results files
-  async function downloadResults(txtPath) {
-    try {
-      const response = await fetch(`${rootURL}downloadPlotData`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ path: txtPath }),
-      });
-      if (!response.ok) {
-        const { msg } = await response.json();
-        dispatchError(msg);
-      } else {
-        const file = await response.blob();
-        const objectURL = URL.createObjectURL(file);
-        const tempLink = document.createElement('a');
-
-        tempLink.href = objectURL;
-        tempLink.download = txtPath.split('/').slice(-1)[0];
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        document.body.removeChild(tempLink);
-        URL.revokeObjectURL(objectURL);
-      }
-    } catch (err) {
-      dispatchError(err);
-    }
-  }
-
   const sections = [
     {
       component: (
@@ -84,12 +53,7 @@ export default function SignatureExploring() {
       title: 'Mutational Signature Profile',
     },
     {
-      component: (
-        <CosineSimilarity
-          downloadResults={(path) => downloadResults(path)}
-          submitR={(fn, args) => submitR(fn, args)}
-        />
-      ),
+      component: <CosineSimilarity submitR={(fn, args) => submitR(fn, args)} />,
       id: 'cosineSimilarity',
       title: 'Cosine Similarity Among Mutational Signatures',
     },

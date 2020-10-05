@@ -14,14 +14,8 @@ export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
   async function downloadData(txtPath) {
     setLoading(true);
     try {
-      const response = await fetch(`${rootURL}downloadPlotData`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ path: txtPath }),
-      });
+      const response = await fetch(`${rootURL}results/${txtPath}`);
+
       if (!response.ok) {
         const { msg } = await response.json();
         dispatchError(msg);

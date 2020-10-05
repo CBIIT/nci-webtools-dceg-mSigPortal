@@ -59,14 +59,7 @@ export default function MutationalProfiles() {
       try {
         const response =
           source == 'user'
-            ? await fetch(`${rootURL}getSVG`, {
-                method: 'POST',
-                headers: {
-                  Accept: 'image/svg',
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ path: plot.Path }),
-              })
+            ? await fetch(`${rootURL}results/${plot.Path}`)
             : await fetch(`${rootURL}getPublicSVG`, {
                 method: 'POST',
                 headers: {

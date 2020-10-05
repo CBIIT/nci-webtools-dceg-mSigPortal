@@ -34,7 +34,7 @@ async function getSummaryFiles(resultsPath) {
   let matrixList = [];
   let statistics = '';
   let downloads = [];
-  const svgList = await parseCSV(svgListPath);
+  let svgList = await parseCSV(svgListPath);
 
   if (fs.existsSync(matrixPath)) matrixList = await parseCSV(matrixPath);
   if (fs.existsSync(statisticsPath))
@@ -47,12 +47,27 @@ async function getSummaryFiles(resultsPath) {
       .map((file) => file);
   }
 
+  svgList.forEach(
+    (plot) => (plot.Path = getRelativePath({ Path: plot.Path }).Path)
+  );
+  console.log(svgList);
+
   return {
     svgList: svgList,
     statistics: statistics,
     matrixList: matrixList,
     downloads: downloads,
   };
+}
+
+function getRelativePath(paths) {
+  console.log('paths', paths);
+  let newPaths = {};
+  Object.keys(paths).map((key) => {
+    const fullPath = path.resolve(paths[key]);
+    newPaths[key] = fullPath.replace(path.resolve(tmppath) + '/', '');
+  });
+  return newPaths;
 }
 
 async function profilerExtraction(req, res, next) {
@@ -136,11 +151,11 @@ async function visualizeR(req, res, next) {
     });
 
     const { stdout, output } = JSON.parse(wrapper);
-    console.log('wrapper return', JSON.parse(wrapper));
-
+    // console.log('wrapper return', JSON.parse(wrapper));
+    console.log('output', output);
     res.json({
       debugR: stdout,
-      output: output,
+      output: getRelativePath(output),
     });
   } catch (err) {
     logger.info('/visualizeR: An error occured');
@@ -279,27 +294,6 @@ function upload(req, res, next) {
   });
 }
 
-function downloadPlotData(req, res, next) {
-  const txtPath = path.resolve(req.body.path);
-  if (txtPath.indexOf(path.resolve(tmppath)) == 0) {
-    const s = fs.createReadStream(txtPath);
-
-    s.on('open', () => {
-      res.set('Content-Type', 'text/plain');
-      s.pipe(res);
-      logger.debug(`/downloadPlotData: Serving ${txtPath}`);
-    });
-    s.on('error', () => {
-      res.set('Content-Type', 'text/plain');
-      res.status(500).end('Not found');
-      logger.info(`/downloadPlotData: Error retrieving ${txtPath}`);
-    });
-  } else {
-    logger.info('traversal error');
-    res.status(500).end('Not found');
-  }
-}
-
 function getSVG(req, res, next) {
   const svgPath = path.resolve(req.body.path);
   if (svgPath.indexOf(path.resolve(tmppath)) == 0) {
@@ -363,49 +357,40 @@ async function exploringR(req, res, next) {
 
   fs.mkdirSync(savePath, { recursive: true });
 
-  try {
-    const wrapper = await r('services/R/exploringWrapper.R', req.body.fn, {
-      ...req.body.args,
-      projectID: projectID,
-      pythonOutput: path.join(tmppath, req.body.projectID, 'results/output'),
-      savePath: savePath,
-      dataPath: path.join(datapath, 'signature_visualization/'),
-    });
+  const wrapper = await r('services/R/exploringWrapper.R', req.body.fn, {
+    ...req.body.args,
+    projectID: projectID,
+    pythonOutput: path.join(tmppath, req.body.projectID, 'results/output'),
+    savePath: savePath,
+    dataPath: path.join(datapath, 'signature_visualization/'),
+  }).catch(next);
 
-    const { stdout, output } = JSON.parse(wrapper);
-    console.log('wrapper return', JSON.parse(wrapper));
+  const { stdout, output } = JSON.parse(wrapper);
 
-    res.json({
-      debugR: stdout,
-      output: output,
-      projectID: projectID,
-    });
-  } catch (err) {
-    logger.info('/exploringR: An error occured');
-    logger.error(err);
-    res.status(500).json(err.message);
-  }
+  return res.json({
+    debugR: stdout,
+    output: getRelativePath(output),
+    projectID: projectID,
+  });
 }
 
 async function getReferenceSignatureData(req, res, next) {
   logger.info('/getReferenceSignatures: Request');
-  try {
-    const data = await r(
-      'services/R/exploringWrapper.R',
-      'getReferenceSignatureData',
-      {
-        ...req.body,
-        dataPath: path.join(datapath, 'signature_visualization/'),
-      }
-    );
-    res.json(JSON.parse(data));
-    logger.info('/getReferenceSignatures: Success');
-  } catch (err) {
-    logger.info('/getReferenceSignatures: An error occured');
-    logger.error(err);
-    res.status(500).json(err.message);
-  }
+
+  const data = await r(
+    'services/R/exploringWrapper.R',
+    'getReferenceSignatureData',
+    {
+      ...req.body,
+      dataPath: path.join(datapath, 'signature_visualization/'),
+    }
+  ).catch(next);
+
+  logger.info('/getReferenceSignatures: Success');
+  return res.json(JSON.parse(data));
 }
+
+async function submitQueue(res, req, next) {}
 
 module.exports = {
   profilerExtraction,
@@ -416,10 +401,10 @@ module.exports = {
   getPublicDataOptions,
   getPublicData,
   upload,
-  downloadPlotData,
   getSVG,
   getPublicSVG,
   download,
   exploringR,
   getReferenceSignatureData,
+  submitQueue,
 };

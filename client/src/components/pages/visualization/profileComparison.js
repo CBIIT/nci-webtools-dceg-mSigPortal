@@ -128,14 +128,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     setOverlay(type, true);
     if (plotPath) {
       try {
-        const response = await fetch(`${rootURL}getSVG`, {
-          method: 'POST',
-          headers: {
-            Accept: 'image/svg',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ path: plotPath }),
-        });
+        const response = await fetch(`${rootURL}results/${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {

@@ -308,37 +308,6 @@ export default function Results({ setOpenSidebar }) {
     });
   }
 
-  //   download text results files
-  async function downloadResults(txtPath) {
-    try {
-      const response = await fetch(`${rootURL}downloadPlotData`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ path: txtPath }),
-      });
-      if (!response.ok) {
-        const { msg } = await response.json();
-        dispatchError(msg);
-      } else {
-        const file = await response.blob();
-        const objectURL = URL.createObjectURL(file);
-        const tempLink = document.createElement('a');
-
-        tempLink.href = objectURL;
-        tempLink.download = txtPath.split('/').slice(-1)[0];
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        document.body.removeChild(tempLink);
-        URL.revokeObjectURL(objectURL);
-      }
-    } catch (err) {
-      dispatchError(err);
-    }
-  }
-
   const links = [
     { title: 'Profiler Summary', id: 'profilerSummary' },
     { title: 'Mutational Profiles', id: 'mutationalProfiles' },
@@ -391,7 +360,6 @@ export default function Results({ setOpenSidebar }) {
       >
         <CosineSimilarity
           getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
-          downloadResults={(path) => downloadResults(path)}
           submitR={(fn, args) => submitR(fn, args)}
         />
       </Body>
@@ -400,10 +368,7 @@ export default function Results({ setOpenSidebar }) {
           display: displayTab == 'mutationalPattern' ? 'block' : 'none',
         }}
       >
-        <MutationalPattern
-          downloadResults={(path) => downloadResults(path)}
-          submitR={(fn, args) => submitR(fn, args)}
-        />
+        <MutationalPattern submitR={(fn, args) => submitR(fn, args)} />
       </Body>
 
       <Body
@@ -419,7 +384,6 @@ export default function Results({ setOpenSidebar }) {
       <Body style={{ display: displayTab == 'pca' ? 'block' : 'none' }}>
         <PCA
           getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
-          downloadResults={(path) => downloadResults(path)}
           submitR={(fn, args) => submitR(fn, args)}
         />
       </Body>

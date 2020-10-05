@@ -34,37 +34,6 @@ export default function ExposureExploring() {
     });
   }
 
-  //   download text results files
-  async function downloadResults(txtPath) {
-    try {
-      const response = await fetch(`${rootURL}downloadPlotData`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ path: txtPath }),
-      });
-      if (!response.ok) {
-        const { msg } = await response.json();
-        dispatchError(msg);
-      } else {
-        const file = await response.blob();
-        const objectURL = URL.createObjectURL(file);
-        const tempLink = document.createElement('a');
-
-        tempLink.href = objectURL;
-        tempLink.download = txtPath.split('/').slice(-1)[0];
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        document.body.removeChild(tempLink);
-        URL.revokeObjectURL(objectURL);
-      }
-    } catch (err) {
-      dispatchError(err);
-    }
-  }
-
   const sections = [
     {
       component: <Tumor submitR={(fn, args) => submitR(fn, args)} />,
@@ -79,7 +48,6 @@ export default function ExposureExploring() {
     {
       component: (
         <Decomposition
-          downloadResults={(path) => downloadResults(path)}
           submitR={(fn, args) => submitR(fn, args)}
         />
       ),

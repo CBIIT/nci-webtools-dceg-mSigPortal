@@ -15,7 +15,7 @@ const { Group, Label, Control, Text } = Form;
 const { Header, Body } = Card;
 const { Toggle, Collapse } = Accordion;
 
-export default function MutationalPattern({ downloadResults, submitR }) {
+export default function MutationalPattern({ submitR }) {
   const { source, study, cancerType, pubExperimentalStrategy } = useSelector(
     (state) => state.visualize
   );
@@ -41,14 +41,7 @@ export default function MutationalPattern({ downloadResults, submitR }) {
 
     if (plotPath) {
       try {
-        const response = await fetch(`${rootURL}getSVG`, {
-          method: 'POST',
-          headers: {
-            Accept: 'image/svg',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ path: plotPath }),
-        });
+        const response = await fetch(`${rootURL}results/${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {

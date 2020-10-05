@@ -10,10 +10,7 @@ import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
 
-export default function MutationalSignatureProfile({
-  submitR,
-  downloadResults,
-}) {
+export default function MutationalSignatureProfile({ submitR }) {
   const rootURL = window.location.pathname;
   const {
     profileName,
@@ -69,14 +66,7 @@ export default function MutationalSignatureProfile({
   async function setRPlot(plotPath) {
     if (plotPath) {
       try {
-        const response = await fetch(`${rootURL}getSVG`, {
-          method: 'POST',
-          headers: {
-            Accept: 'image/svg',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ path: plotPath }),
-        });
+        const response = await fetch(`${rootURL}results/${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {

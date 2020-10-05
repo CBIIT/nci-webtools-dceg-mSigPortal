@@ -104,35 +104,35 @@ export default function UploadForm() {
       }
 
       if (queueMode) {
-        // wip
-        // dispatchVisualize({
-        //   loading: {
-        //     active: true,
-        //     content: 'Sending to Queue...',
-        //     showIndicator: true,
-        //   },
-        // });
-        // try {
-        //   const response = await fetch(`${rootURL}visualize/queue`, {
-        //     method: 'POST',
-        //     headers: {
-        //       Accept: 'application/json',
-        //       'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify(data),
-        //   });
-        //   if (response.ok) {
-        //     // placeholder alert with error modal
-        //     dispatchError('Successfully submitted to queue.');
-        //   } else {
-        //     dispatchVisualizeResults({
-        //       error: 'Please Reset Your Parameters and Try again.',
-        //     });
-        //     dispatchError('Failed to submit to queue. Please Try Again.');
-        //   }
-        // } catch (err) {
-        //   dispatchError(err);
-        // }
+        dispatchVisualize({
+          loading: {
+            active: true,
+            content: 'Sending to Queue...',
+            showIndicator: true,
+          },
+        });
+
+        try {
+          const response = await fetch(`${rootURL}visualize/queue`, {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({}),
+          });
+          if (response.ok) {
+            // placeholder alert with error modal
+            dispatchError('Successfully submitted to queue.');
+          } else {
+            dispatchVisualizeResults({
+              error: 'Please Reset Your Parameters and Try again.',
+            });
+            dispatchError('Failed to submit to queue. Please Try Again.');
+          }
+        } catch (err) {
+          dispatchError(err);
+        }
       } else {
         dispatchVisualize({
           loading: {
@@ -623,7 +623,7 @@ export default function UploadForm() {
       </Group>
       <hr />
       <div>
-        <LoadingOverlay active={true} content={'Work in progress...'} />
+        <LoadingOverlay active={false} content={'Work in progress...'} />
         <Group controlId="toggleQueue">
           <Label className="mr-auto">Submit this job to a Queue</Label>{' '}
           <Check inline>

@@ -2,7 +2,7 @@ const cluster = require('cluster');
 const numCPUs = require('os').cpus().length;
 const path = require('path');
 const express = require('express');
-const { port } = require('./config.json');
+const { port, tmppath } = require('./config.json');
 const logger = require('./logger');
 const app = express();
 const {
@@ -14,12 +14,11 @@ const {
   getPublicDataOptions,
   getPublicData,
   upload,
-  downloadPlotData,
-  getSVG,
   getPublicSVG,
   download,
   exploringR,
   getReferenceSignatureData,
+  submitQueue,
 } = require('./controllers');
 
 if (cluster.isMaster) {
@@ -50,13 +49,13 @@ function childProcess() {
 }
 
 app.use(express.static(path.resolve('www')));
+app.use('/results', express.static(tmppath));
 app.use(express.json());
 
-app.use((err, req, res, next) => {
-  logger.info('Unhandled Error:\n' + err.message);
+app.use((error, req, res, next) => {
   logger.error(err);
-  if (!err.statusCode) err.statusCode = 500;
-  res.status(err.statusCode).send(err.message);
+  if (!error.statusCode) error.statusCode = 500;
+  return res.status(error.statusCode).json({ error: error.toString() });
 });
 
 app.get('/ping', (req, res) => res.send(true));
@@ -77,10 +76,6 @@ app.post('/getPublicData', getPublicData);
 
 app.post('/upload', upload);
 
-app.post('/downloadPlotData', downloadPlotData);
-
-app.post('/getSVG', getSVG);
-
 app.post('/getPublicSVG', getPublicSVG);
 
 app.get('/visualize/download', download);
@@ -89,6 +84,4 @@ app.post('/exploringR', exploringR);
 
 app.post('/getReferenceSignatureData', getReferenceSignatureData);
 
-app.post('/visualize/queue', (req, res) => {
-  res.json(req.body);
-});
+app.post('/submitQueue', submitQueue);
