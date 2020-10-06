@@ -1,13 +1,14 @@
 const path = require('path');
 const logger = require('./logger');
 const { tmppath, datapath } = require('./config.json');
-const { spawn } = require('child_process');
+const { spawn } = require('promisify-child-process');
 const formidable = require('formidable');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const Papa = require('papaparse');
 const r = require('r-wrapper').async;
 const AWS = require('aws-sdk');
+const config = require('./config.json');
 
 function parseCSV(filepath) {
   const file = fs.createReadStream(filepath);
@@ -70,48 +71,51 @@ function getRelativePath(paths) {
   return newPaths;
 }
 
-async function profilerExtraction(req, res, next) {
+async function profilerExtraction(params) {
+  logger.info('/profilerExtraction: Spawning Python Process');
+  // update path
+  params.outputDir[1] = path.join(tmppath, params.outputDir[1], 'results');
+
+  const args = Object.values(params);
+  const cli = args.reduce((params, arg) => [...params, ...arg]);
+
+  logger.debug('/profilerExtraction: CLI args\n' + cli);
+
+  const { stdout, stderr } = await spawn(
+    'python3',
+    ['services/python/mSigPortal_Profiler_Extraction.py', ...cli],
+    { encoding: 'utf8' }
+  );
+
+  return {
+    stdout: stdout,
+    stderr: stderr,
+    projectPath: path.join(tmppath, params.projectID[1]),
+  };
+}
+
+async function visualizationProfilerExtraction(req, res, next) {
   req.setTimeout(15 * 60 * 1000);
   res.setTimeout(15 * 60 * 1000, () => {
     res.status(504).send('request timed out');
   });
 
-  logger.info('/profilerExtraction: Spawning Python Process');
-  let reqBody = { ...req.body };
-  // update paths
-  reqBody.outputDir[1] = path.join(tmppath, reqBody.outputDir[1], 'results');
-  const args = Object.values(reqBody);
-  const cli = args.reduce((params, arg) => [...params, ...arg]);
+  const { stdout, stderr, projectPath } = await profilerExtraction(req.body);
+  const resultsPath = path.join(projectPath, 'results');
 
-  logger.debug('/profilerExtraction: CLI args\n' + cli);
-  let stdout = '';
-  let stderr = '';
-  const wrapper = spawn('python3', [
-    'services/python/mSigPortal_Profiler_Extraction.py',
-    ...cli,
-  ]);
-
-  wrapper.stdout.on('data', (data) => (stdout += data.toString()));
-  wrapper.stderr.on('data', (data) => (stderr += data.toString()));
-  wrapper.stderr.on('close', async () => {
-    const scriptOut = { stdout: stdout, stderr: stderr };
-    const resultsPath = path.join(tmppath, reqBody.projectID[1], 'results');
-    // logger.debug('STDOUT\n' + scriptOut.stdout);
-    // logger.debug('STDERR\n' + scriptOut.stderr);
-
-    if (fs.existsSync(path.join(resultsPath, 'svg_files_list.txt'))) {
-      res.json({ ...scriptOut, ...(await getSummaryFiles(resultsPath)) });
-    } else {
-      logger.info(
-        '/profilerExtraction: An Error Occured While Extracting Profiles'
-      );
-      res.status(500).json({
-        msg:
-          'An error occured durring profile extraction. Please review your input parameters and try again.',
-        ...scriptOut,
-      });
-    }
-  });
+  if (fs.existsSync(path.join(resultsPath, 'svg_files_list.txt'))) {
+    res.json({ stdout, stderr, ...(await getSummaryFiles(resultsPath)) });
+  } else {
+    logger.info(
+      '/profilerExtraction: An Error Occured While Extracting Profiles'
+    );
+    res.status(500).json({
+      msg:
+        'An error occured durring profile extraction. Please review your input parameters and try again.',
+      stdout,
+      stderr,
+    });
+  }
 }
 
 async function getSummary(req, res, next) {
@@ -165,7 +169,7 @@ async function visualizeR(req, res, next) {
 }
 
 async function getReferenceSignatureSets(req, res, next) {
-  logger.info('/visualizeR/getReferenceSignatureSets: Calling R Wrapper');
+  logger.info('/getReferenceSignatureSets: Calling R Wrapper');
   console.log('args', req.body);
 
   try {
@@ -179,14 +183,14 @@ async function getReferenceSignatureSets(req, res, next) {
 
     res.json(list);
   } catch (err) {
-    logger.info('/visualizeR/getReferenceSignatureSets: An error occured');
+    logger.info('/getReferenceSignatureSets: An error occured');
     logger.error(err);
     res.status(500).json(err.message);
   }
 }
 
 async function getSignatures(req, res, next) {
-  logger.info('/visualizeR/getSignatures: Calling R Wrapper');
+  logger.info('/getSignatures: Calling R Wrapper');
 
   try {
     const list = await r('services/R/visualizeWrapper.R', 'getSignatures', [
@@ -199,14 +203,14 @@ async function getSignatures(req, res, next) {
 
     res.json(list);
   } catch (err) {
-    logger.info('/visualizeR/getSignatures: An error occured');
+    logger.info('/getSignatures: An error occured');
     logger.error(err);
     res.status(500).json(err.message);
   }
 }
 
 async function getPublicDataOptions(req, res, next) {
-  logger.info('/visualize/getPublicOptions: Request');
+  logger.info('/getPublicOptions: Request');
   try {
     const list = await r(
       'services/R/visualizeWrapper.R',
@@ -215,16 +219,16 @@ async function getPublicDataOptions(req, res, next) {
     );
 
     res.json(JSON.parse(list));
-    logger.info('/visualize/getPublicOptions: Success');
+    logger.info('/getPublicOptions: Success');
   } catch (err) {
-    logger.info('/visualize/getPublicOptions: An error occured');
+    logger.info('/getPublicOptions: An error occured');
     logger.error(err);
     res.status(500).json(err.message);
   }
 }
 
 async function getPublicData(req, res, next) {
-  logger.info('/visualize/getPublicOptions: Calling R Wrapper');
+  logger.info('/getPublicOptions: Calling R Wrapper');
   try {
     const list = await r('services/R/visualizeWrapper.R', 'getPublicData', [
       req.body.study,
@@ -232,16 +236,13 @@ async function getPublicData(req, res, next) {
       req.body.experimentalStrategy,
       path.join(datapath, 'signature_visualization/'),
     ]);
-    logger.info('/visualize/getPublicOptions: Complete');
+    logger.info('/getPublicOptions: Complete');
 
     const projectID = uuidv4();
-    const saveDir = path.join(tmppath, projectID);
-
-    fs.mkdirSync(saveDir);
 
     res.json({ svgList: JSON.parse(list), projectID: projectID });
   } catch (err) {
-    logger.info('/visualize/getPublicOptions: An error occured');
+    logger.info('/getPublicOptions: An error occured');
     logger.error(err);
     res.status(500).json(err.message);
   }
@@ -292,27 +293,6 @@ function upload(req, res, next) {
       bedPath: form.bedPath || '',
     });
   });
-}
-
-function getSVG(req, res, next) {
-  const svgPath = path.resolve(req.body.path);
-  if (svgPath.indexOf(path.resolve(tmppath)) == 0) {
-    const s = fs.createReadStream(svgPath);
-
-    s.on('open', () => {
-      res.set('Content-Type', 'image/svg+xml');
-      s.pipe(res);
-      logger.debug(`/getSVG: Serving ${svgPath}`);
-    });
-    s.on('error', () => {
-      res.set('Content-Type', 'text/plain');
-      res.status(500).end('Not found');
-      logger.info(`/getSVG: Error retrieving ${svgPath}`);
-    });
-  } else {
-    logger.info('traversal error');
-    res.status(500).end('Not found');
-  }
 }
 
 function getPublicSVG(req, res, next) {
@@ -390,10 +370,37 @@ async function getReferenceSignatureData(req, res, next) {
   return res.json(JSON.parse(data));
 }
 
-async function submitQueue(res, req, next) {}
+async function submitQueue(req, res, next) {
+  const projectID = req.body.args.projectID[1];
+
+  AWS.config.update({ region: 'us-east-1' });
+  const sqs = new AWS.SQS();
+
+  try {
+    const { QueueUrl } = await sqs
+      .getQueueUrl({ QueueName: config.aws.queue })
+      .promise();
+
+    await sqs
+      .sendMessage({
+        QueueUrl: QueueUrl,
+        MessageDeduplicationId: projectID,
+        MessageGroupId: projectID,
+        MessageBody: JSON.stringify(req.body),
+      })
+      .promise();
+
+    logger.info('Queue submitted ID: ' + projectID);
+    res.json({ projectID });
+  } catch (err) {
+    logger.info('Queue failed to submit ID: ' + projectID);
+    next(err);
+  }
+}
 
 module.exports = {
   profilerExtraction,
+  visualizationProfilerExtraction,
   getSummary,
   visualizeR,
   getReferenceSignatureSets,
@@ -401,7 +408,6 @@ module.exports = {
   getPublicDataOptions,
   getPublicData,
   upload,
-  getSVG,
   getPublicSVG,
   download,
   exploringR,

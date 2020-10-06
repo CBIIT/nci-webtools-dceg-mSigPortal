@@ -52,6 +52,7 @@ export default function UploadForm() {
   const rootURL = window.location.pathname;
   const [inputFile, setInput] = useState(new File([], ''));
   const [bedFile, setBed] = useState(new File([], ''));
+  const [validEmail, setValid] = useState(false);
   const onDropMain = useCallback((acceptedFiles) => {
     setInput(acceptedFiles[0]);
     dispatchVisualize({ storeFilename: acceptedFiles[0].name });
@@ -76,121 +77,119 @@ export default function UploadForm() {
   });
 
   async function handleSubmit() {
-    // disable parameters after submit
-    dispatchVisualize({ submitted: true });
-
     const { projectID, filePath, bedPath } = await uploadFile();
-    if (projectID) {
-      const args = {
-        inputFormat: ['-f', inputFormat],
-        inputFile: ['-i', filePath],
-        projectID: ['-p', projectID],
-        genomeAssemblyVersion: ['-g', selectedGenome],
-        experimentalStrategy: ['-t', experimentalStrategy],
 
-        outputDir: ['-o', projectID],
-      };
-      // conditionally include mutation split and mutation filter params
-      if (['vcf', 'csv', 'tsv'].includes(inputFormat)) {
-        args['collapseSample'] = ['-c', collapseSample];
+    const args = {
+      inputFormat: ['-f', inputFormat],
+      inputFile: ['-i', filePath],
+      projectID: ['-p', projectID],
+      genomeAssemblyVersion: ['-g', selectedGenome],
+      experimentalStrategy: ['-t', experimentalStrategy],
+      outputDir: ['-o', projectID],
+    };
 
-        if (bedFile.size) args['bedFile'] = ['-b', bedPath];
+    // conditionally include mutation split and mutation filter params
+    if (['vcf', 'csv', 'tsv'].includes(inputFormat)) {
+      args['collapseSample'] = ['-c', collapseSample];
 
-        if (mutationFilter.length) {
-          args['mutationFilter'] = ['-F', mutationFilter];
-        } else {
-          args['mutationSplit'] = ['-s', mutationSplit];
-        }
-      }
+      if (bedFile.size) args['bedFile'] = ['-b', bedPath];
 
-      if (queueMode) {
-        dispatchVisualize({
-          loading: {
-            active: true,
-            content: 'Sending to Queue...',
-            showIndicator: true,
-          },
-        });
-
-        try {
-          const response = await fetch(`${rootURL}visualize/queue`, {
-            method: 'POST',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({}),
-          });
-          if (response.ok) {
-            // placeholder alert with error modal
-            dispatchError('Successfully submitted to queue.');
-          } else {
-            dispatchVisualizeResults({
-              error: 'Please Reset Your Parameters and Try again.',
-            });
-            dispatchError('Failed to submit to queue. Please Try Again.');
-          }
-        } catch (err) {
-          dispatchError(err);
-        }
+      if (mutationFilter.length) {
+        args['mutationFilter'] = ['-F', mutationFilter];
       } else {
-        dispatchVisualize({
-          loading: {
-            active: true,
-            content: 'Calculating...',
-            showIndicator: true,
-          },
-        });
-        try {
-          const response = await fetch(`${rootURL}profilerExtraction`, {
-            method: 'POST',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(args),
-          });
+        args['mutationSplit'] = ['-s', mutationSplit];
+      }
+    }
 
-          if (response.ok) {
-            const results = await response.json();
-            dispatchVisualizeResults({
-              projectID: projectID,
-              svgList: results.svgList,
-              statistics: results.statistics,
-              matrixList: results.matrixList,
-              downloads: results.downloads,
-            });
-            dispatchMutationalProfiles({
-              debug: { stdout: results.stdout, stderr: results.stderr },
-            });
-          } else if (response.status == 504) {
-            dispatchVisualizeResults({
-              error: 'Please Reset Your Parameters and Try again.',
-            });
-            dispatchError(
-              'Your submission has timed out. Please try again by submitting this job to a queue instead.'
-            );
-          } else {
-            dispatchVisualizeResults({
-              error: 'Please Reset Your Parameters and Try again.',
-            });
-            const { msg, stdout, stderr } = await response.json();
-            const message = `<div>
+    if (queueMode) {
+      dispatchVisualize({
+        loading: {
+          active: true,
+          content: 'Sending to Queue...',
+          showIndicator: true,
+        },
+      });
+
+      try {
+        const response = await fetch(`${rootURL}queue`, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ args: args, email: email }),
+        });
+        if (response.ok) {
+          // placeholder alert with error modal
+          dispatchError('Successfully submitted to queue.');
+        } else {
+          dispatchVisualizeResults({
+            error: 'Please Reset Your Parameters and Try again.',
+            submitted: false,
+          });
+          dispatchError('Failed to submit to queue. Please Try Again.');
+        }
+      } catch (err) {
+        dispatchError(err);
+      }
+      dispatchVisualize({ loading: { active: false } });
+    } else {
+      dispatchVisualize({
+        loading: {
+          active: true,
+          content: 'Calculating...',
+          showIndicator: true,
+        },
+      });
+      try {
+        const response = await fetch(`${rootURL}profilerExtraction`, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(args),
+        });
+
+        if (response.ok) {
+          const results = await response.json();
+          dispatchVisualizeResults({
+            projectID: projectID,
+            svgList: results.svgList,
+            statistics: results.statistics,
+            matrixList: results.matrixList,
+            downloads: results.downloads,
+          });
+          dispatchMutationalProfiles({
+            debug: { stdout: results.stdout, stderr: results.stderr },
+          });
+        } else if (response.status == 504) {
+          dispatchVisualizeResults({
+            error: 'Please Reset Your Parameters and Try again.',
+          });
+          dispatchError(
+            'Your submission has timed out. Please try again by submitting this job to a queue instead.'
+          );
+        } else {
+          dispatchVisualizeResults({
+            error: 'Please Reset Your Parameters and Try again.',
+          });
+          const { msg, stdout, stderr } = await response.json();
+          const message = `<div>
             <p>${msg}</p>
             <p><b>Python:</b></p>
             <pre>${stdout}</pre>
             <pre>${stderr}</pre>
           </div>`;
-            dispatchError(message);
-          }
-        } catch (err) {
-          dispatchError(err);
-          dispatchVisualizeResults({
-            error: 'Please Reset Your Parameters and Try again.',
-          });
+          dispatchError(message);
         }
-        dispatchVisualize({ loading: { active: false } });
+      } catch (err) {
+        dispatchError(err);
+        dispatchVisualizeResults({
+          error: 'Please Reset Your Parameters and Try again.',
+        });
       }
+      dispatchVisualize({ loading: { active: false } });
     }
   }
 
@@ -211,6 +210,7 @@ export default function UploadForm() {
   //   Uploads inputFile and returns a projectID
   async function uploadFile() {
     dispatchVisualize({
+      submitted: true,
       loading: {
         active: true,
         content: 'Uploading file...',
@@ -283,6 +283,14 @@ export default function UploadForm() {
     dispatchVisualize({ bedFilename: filename });
   }
 
+  function handleEmail(email) {
+    dispatchVisualize({ email: email });
+    const re = new RegExp(
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+    );
+    setValid(re.test(email));
+  }
+
   const msPopover = (
     <Popover id="popover-basic">
       <Title as="h3">Mutation Split</Title>
@@ -309,7 +317,7 @@ export default function UploadForm() {
   );
 
   return (
-    <Form className="">
+    <Form>
       <Group controlId="fileType">
         <Label>Choose File Format</Label>
         <Control
@@ -629,7 +637,7 @@ export default function UploadForm() {
           <Check inline>
             <Check.Input
               type="checkbox"
-              checked={queueMode == true}
+              checked={queueMode}
               onChange={(_) => {
                 dispatchVisualize({ queueMode: !queueMode });
               }}
@@ -641,9 +649,14 @@ export default function UploadForm() {
             placeholder="Enter Email"
             size="sm"
             value={email}
-            onChange={(e) => dispatchVisualize({ email: e.target.value })}
+            type="email"
+            onChange={(e) => handleEmail(e.target.value)}
             disabled={!queueMode}
+            isInvalid={queueMode ? !validEmail : false}
           />
+          <Control.Feedback type="invalid">
+            Please provide a valid email
+          </Control.Feedback>
           <Text className="text-muted">
             <i>
               Note: if sending to queue, when computation is completed, a
@@ -665,7 +678,12 @@ export default function UploadForm() {
         </Col>
         <Col sm="6">
           <Button
-            disabled={!inputFile.size || submitted || loading.active}
+            disabled={
+              !inputFile.size ||
+              submitted ||
+              loading.active ||
+              (queueMode ? !validEmail : false)
+            }
             className="w-100"
             variant="primary"
             type="button"

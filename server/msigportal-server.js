@@ -2,11 +2,11 @@ const cluster = require('cluster');
 const numCPUs = require('os').cpus().length;
 const path = require('path');
 const express = require('express');
-const { port, tmppath } = require('./config.json');
+const config = require('./config.json');
 const logger = require('./logger');
 const app = express();
 const {
-  profilerExtraction,
+  visualizationProfilerExtraction,
   getSummary,
   visualizeR,
   getReferenceSignatureSets,
@@ -39,9 +39,10 @@ function masterProcess() {
 function childProcess() {
   console.log(`Worker ${process.pid} started and finished`);
 
-  const server = app.listen(port, () => {
-    logger.info(`msigportal server running on port: ${port}`);
-    console.log(`Listening on port ${port}`);
+  const server = app.listen(config.port, () => {
+    logger.info(
+      `msigconfig.portal server running on config.port: ${config.port}`
+    );
   });
 
   server.keepAliveTimeout = 61 * 1000;
@@ -49,7 +50,7 @@ function childProcess() {
 }
 
 app.use(express.static(path.resolve('www')));
-app.use('/results', express.static(tmppath));
+app.use('/results', express.static(config.tmppath));
 app.use(express.json());
 
 app.use((error, req, res, next) => {
@@ -60,7 +61,7 @@ app.use((error, req, res, next) => {
 
 app.get('/ping', (req, res) => res.send(true));
 
-app.post('/profilerExtraction', profilerExtraction);
+app.post('/profilerExtraction', visualizationProfilerExtraction);
 
 app.post('/getSummary', getSummary);
 
@@ -84,4 +85,4 @@ app.post('/exploringR', exploringR);
 
 app.post('/getReferenceSignatureData', getReferenceSignatureData);
 
-app.post('/submitQueue', submitQueue);
+app.post('/queue', submitQueue);
