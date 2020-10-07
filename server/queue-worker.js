@@ -5,22 +5,23 @@ const nodemailer = require('nodemailer');
 const r = require('r-wrapper').async;
 const tar = require('tar');
 const config = require('./config.json');
-const logger = require('./utils/logger');
+const logger = require('./logger');
 const { profilerExtraction } = require('./controllers');
-// (async function main() {
-//   // update aws configuration if all keys are supplied, otherwise
-//   // fall back to default credentials/IAM role
-//   if (config.aws) {
-//     AWS.config.update(config.aws);
-//   }
 
-//   // create required folders
-//   for (let folder of [config.logs.folder, config.results.folder]) {
-//     fs.mkdirSync(folder, { recursive: true });
-//   }
+(async function main() {
+  // update aws configuration if all keys are supplied, otherwise
+  // fall back to default credentials/IAM role
+  if (config.aws) {
+    AWS.config.update(config.aws);
+  }
 
-//   receiveMessage();
-// })();
+  // create required folders
+  for (let folder of [config.logs.folder, config.results.folder]) {
+    fs.mkdirSync(folder, { recursive: true });
+  }
+
+  receiveMessage();
+})();
 
 /**
  * Reads a template, substituting {tokens} with data values
@@ -55,14 +56,14 @@ function streamToFile(readStream, filePath) {
  * Processes a message and sends emails when finished
  * @param {object} params
  */
-async function processMessage({ args, email }) {
-  const projectID = args.projectID[1];
+async function processMessage({ args, email, timestamp }) {
+  const id = args.projectID[1];
   const s3 = new AWS.S3();
-  const email = nodemailer.createTransport(config.email.smtp);
+  const mailer = nodemailer.createTransport(config.email.smtp);
 
   try {
     // get calculation results
-    const directory = path.resolve(config.tmpdata, projectID);
+    const directory = path.resolve(config.results.folder, id);
     await fs.promises.mkdir(directory, { recursive: true });
 
     const start = new Date().getTime();
@@ -78,27 +79,26 @@ async function processMessage({ args, email }) {
     // upload archived project directory
     await s3
       .upload({
-        Body: tar.c({ gzip: true, C: config.tmppath }, [projectID]),
-        Bucket: config.aws.bucket,
-        Key: `${config.aws.key}${projectID}.tgz`,
+        Body: tar.c({ gzip: true, C: config.results.folder }, [id]),
+        Bucket: config.s3.bucket,
+        Key: `${config.aws.key}${id}.tgz`,
       })
       .promise();
 
     // specify email template variables
     const templateData = {
       jobName: 'mSigPortal',
-      numSims: '',
-      originalTimestamp: '',
+      originalTimestamp: timestamp,
       runTime: runtime,
-      resultsUrl: `${config.email.baseUrl}/#/sparrpowR/${params.id}`,
+      resultsUrl: `${config.email.baseUrl}/mutational-signatures/${id}`,
     };
 
     // send user success email
     logger.info(`Sending user success email`);
-    const userEmailResults = await email.sendMail({
+    const userEmailResults = await mailer.sendMail({
       from: config.email.sender,
-      to: params.email,
-      subject: 'SparrpowR Results: ' + params.job_name,
+      to: email,
+      subject: 'mSigPortal Results - ' + timestamp,
       html: await readTemplate(
         __dirname + '/templates/user-success-email.html',
         templateData
@@ -111,9 +111,9 @@ async function processMessage({ args, email }) {
 
     // template variables
     const templateData = {
-      id: params.id,
-      parameters: JSON.stringify(params, null, 4),
-      originalTimestamp: params.timestamp,
+      id: id,
+      parameters: JSON.stringify(args, null, 4),
+      originalTimestamp: timestamp,
       exception: e.toString(),
       processOutput: e.stdout ? e.stdout.toString() : null,
       supportEmail: config.email.admin,
@@ -121,10 +121,10 @@ async function processMessage({ args, email }) {
 
     // send admin error email
     logger.info(`Sending admin error email`);
-    const adminEmailResults = await email.sendMail({
+    const adminEmailResults = await mailer.sendMail({
       from: config.email.sender,
       to: config.email.admin,
-      subject: `SparrpowR Error: ${params.id}`, // searchable calculation error subject
+      subject: `mSigPortal Error: ${id}`, // searchable calculation error subject
       html: await readTemplate(
         __dirname + '/templates/admin-failure-email.html',
         templateData
@@ -132,12 +132,12 @@ async function processMessage({ args, email }) {
     });
 
     // send user error email
-    if (params.email) {
+    if (email) {
       logger.info(`Sending user error email`);
-      const userEmailResults = await email.sendMail({
+      const userEmailResults = await mailer.sendMail({
         from: config.email.sender,
-        to: params.email,
-        subject: 'SparrpowR Error',
+        to: email,
+        subject: 'mSigPortal Error',
         html: await readTemplate(
           __dirname + '/templates/user-failure-email.html',
           templateData
@@ -160,7 +160,7 @@ async function receiveMessage() {
     // to simplify running multiple workers in parallel,
     // fetch one message at a time
     const { QueueUrl } = await sqs
-      .getQueueUrl({ QueueName: config.aws.queue })
+      .getQueueUrl({ QueueName: config.queue.url })
       .promise();
 
     const data = await sqs
@@ -197,23 +197,23 @@ async function receiveMessage() {
 
       // if message was not processed successfully, send it to the
       // error queue (add metadata in future if needed)
-      if (!status && config.queue.errorUrl) {
-        // generate new unique id for error message
-        const id = crypto.randomBytes(16).toString('hex');
-        await sqs
-          .sendMessage({
-            QueueUrl: config.queue.errorUrl,
-            MessageDeduplicationId: id,
-            MessageGroupId: id,
-            MessageBody: JSON.stringify(params),
-          })
-          .promise();
-      }
+      //   if (!status && config.queue.errorUrl) {
+      //     // generate new unique id for error message
+      //     const id = crypto.randomBytes(16).toString('hex');
+      //     await sqs
+      //       .sendMessage({
+      //         QueueUrl: config.queue.errorUrl,
+      //         MessageDeduplicationId: id,
+      //         MessageGroupId: id,
+      //         MessageBody: JSON.stringify(params),
+      //       })
+      //       .promise();
+      //   }
 
       // remove original message from queue once processed
       await sqs
         .deleteMessage({
-          QueueUrl: config.queue.url,
+          QueueUrl: QueueUrl,
           ReceiptHandle: message.ReceiptHandle,
         })
         .promise();

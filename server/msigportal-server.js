@@ -2,6 +2,8 @@ const cluster = require('cluster');
 const numCPUs = require('os').cpus().length;
 const path = require('path');
 const express = require('express');
+const AWS = require('aws-sdk');
+const fs = require('fs');
 const config = require('./config.json');
 const logger = require('./logger');
 const app = express();
@@ -39,9 +41,19 @@ function masterProcess() {
 function childProcess() {
   console.log(`Worker ${process.pid} started and finished`);
 
-  const server = app.listen(config.port, () => {
+  const server = app.listen(config.server.port, () => {
+    // update aws configuration if supplied
+    if (config.aws) {
+      AWS.config.update(config.aws);
+    }
+
+    // create required folders
+    for (let folder of [config.logs.folder, config.results.folder]) {
+      fs.mkdirSync(folder, { recursive: true });
+    }
+
     logger.info(
-      `msigconfig.portal server running on config.port: ${config.port}`
+      `msigconfig.portal server running on config.port: ${config.server.port}`
     );
   });
 
@@ -50,7 +62,7 @@ function childProcess() {
 }
 
 app.use(express.static(path.resolve('www')));
-app.use('/results', express.static(config.tmppath));
+app.use('/results', express.static(config.results.folder));
 app.use(express.json());
 
 app.use((error, req, res, next) => {

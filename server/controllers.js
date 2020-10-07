@@ -1,6 +1,5 @@
 const path = require('path');
 const logger = require('./logger');
-const { tmppath, datapath } = require('./config.json');
 const { spawn } = require('promisify-child-process');
 const formidable = require('formidable');
 const fs = require('fs');
@@ -66,7 +65,10 @@ function getRelativePath(paths) {
   let newPaths = {};
   Object.keys(paths).map((key) => {
     const fullPath = path.resolve(paths[key]);
-    newPaths[key] = fullPath.replace(path.resolve(tmppath) + '/', '');
+    newPaths[key] = fullPath.replace(
+      path.resolve(config.results.folder) + '/',
+      ''
+    );
   });
   return newPaths;
 }
@@ -74,7 +76,11 @@ function getRelativePath(paths) {
 async function profilerExtraction(params) {
   logger.info('/profilerExtraction: Spawning Python Process');
   // update path
-  params.outputDir[1] = path.join(tmppath, params.outputDir[1], 'results');
+  params.outputDir[1] = path.join(
+    config.results.folder,
+    params.outputDir[1],
+    'results'
+  );
 
   const args = Object.values(params);
   const cli = args.reduce((params, arg) => [...params, ...arg]);
@@ -90,7 +96,7 @@ async function profilerExtraction(params) {
   return {
     stdout: stdout,
     stderr: stderr,
-    projectPath: path.join(tmppath, params.projectID[1]),
+    projectPath: path.join(config.results.folder, params.projectID[1]),
   };
 }
 
@@ -121,7 +127,11 @@ async function visualizationProfilerExtraction(req, res, next) {
 async function getSummary(req, res, next) {
   logger.info('/getSummary: Retrieving Summary');
   console.log('summary', req.body);
-  const resultsPath = path.join(tmppath, req.body.projectID, 'results');
+  const resultsPath = path.join(
+    config.results.folder,
+    req.body.projectID,
+    'results'
+  );
 
   if (fs.existsSync(path.join(resultsPath, 'svg_files_list.txt'))) {
     res.json(await getSummaryFiles(resultsPath));
@@ -137,7 +147,7 @@ async function visualizeR(req, res, next) {
   logger.info('/visualizeR: function ' + req.body.fn);
   console.log('args', req.body);
   const savePath = path.join(
-    tmppath,
+    config.results.folder,
     req.body.projectID,
     'results',
     req.body.fn
@@ -149,9 +159,13 @@ async function visualizeR(req, res, next) {
     const wrapper = await r('services/R/visualizeWrapper.R', req.body.fn, {
       ...req.body.args,
       projectID: req.body.projectID,
-      pythonOutput: path.join(tmppath, req.body.projectID, 'results/output'),
+      pythonOutput: path.join(
+        config.results.folder,
+        req.body.projectID,
+        'results/output'
+      ),
       savePath: savePath,
-      dataPath: path.join(datapath, 'signature_visualization/'),
+      dataPath:  path.join(config.data.folder, 'signature_visualization/'),
     });
 
     const { stdout, output } = JSON.parse(wrapper);
@@ -176,7 +190,7 @@ async function getReferenceSignatureSets(req, res, next) {
     const list = await r(
       'services/R/visualizeWrapper.R',
       'getReferenceSignatureSets',
-      [req.body.profileType, path.join(datapath, 'signature_visualization/')]
+      [req.body.profileType, path.join(config.data.folder, 'signature_visualization/')]
     );
 
     // console.log('SignatureReferenceSets', list);
@@ -196,7 +210,7 @@ async function getSignatures(req, res, next) {
     const list = await r('services/R/visualizeWrapper.R', 'getSignatures', [
       req.body.profileType,
       req.body.signatureSetName,
-      path.join(datapath, 'signature_visualization/'),
+      path.join(config.data.folder, 'signature_visualization/'),
     ]);
 
     // console.log('signatures', list);
@@ -215,7 +229,7 @@ async function getPublicDataOptions(req, res, next) {
     const list = await r(
       'services/R/visualizeWrapper.R',
       'getPublicDataOptions',
-      [path.join(datapath, 'signature_visualization/')]
+      [path.join(config.data.folder, 'signature_visualization/')]
     );
 
     res.json(JSON.parse(list));
@@ -234,7 +248,7 @@ async function getPublicData(req, res, next) {
       req.body.study,
       req.body.cancerType,
       req.body.experimentalStrategy,
-      path.join(datapath, 'signature_visualization/'),
+      path.join(config.data.folder, 'signature_visualization/'),
     ]);
     logger.info('/getPublicOptions: Complete');
 
@@ -251,7 +265,7 @@ async function getPublicData(req, res, next) {
 function upload(req, res, next) {
   const projectID = uuidv4();
   const form = formidable({
-    uploadDir: path.join(tmppath, projectID),
+    uploadDir: path.join(config.results.folder, projectID),
     multiples: true,
   });
 
@@ -297,7 +311,7 @@ function upload(req, res, next) {
 
 function getPublicSVG(req, res, next) {
   const svgPath = path.resolve(req.body.path);
-  if (svgPath.indexOf(path.resolve(datapath)) == 0) {
+  if (svgPath.indexOf(path.resolve(config.data.folder)) == 0) {
     const s = fs.createReadStream(svgPath);
 
     s.on('open', () => {
@@ -319,9 +333,14 @@ function getPublicSVG(req, res, next) {
 function download(req, res, next) {
   logger.info(`/visualize/download: id:${req.query.id} file:${req.query.file}`);
   const file = path.resolve(
-    path.join(tmppath, req.query.id, 'results/output', req.query.file)
+    path.join(
+      config.results.folder,
+      req.query.id,
+      'results/output',
+      req.query.file
+    )
   );
-  if (file.indexOf(path.resolve(tmppath)) == 0) {
+  if (file.indexOf(path.resolve(config.results.folder)) == 0) {
     res.download(file);
   } else {
     logger.info('traversal error');
@@ -333,16 +352,25 @@ async function exploringR(req, res, next) {
   logger.info('/exploringR: function ' + req.body.fn);
   console.log('args', req.body);
   const projectID = req.body.projectID || uuidv4();
-  const savePath = path.join(tmppath, projectID, 'results', req.body.fn);
+  const savePath = path.join(
+    config.results.folder,
+    projectID,
+    'results',
+    req.body.fn
+  );
 
   fs.mkdirSync(savePath, { recursive: true });
 
   const wrapper = await r('services/R/exploringWrapper.R', req.body.fn, {
     ...req.body.args,
     projectID: projectID,
-    pythonOutput: path.join(tmppath, req.body.projectID, 'results/output'),
+    pythonOutput: path.join(
+      config.results.folder,
+      req.body.projectID,
+      'results/output'
+    ),
     savePath: savePath,
-    dataPath: path.join(datapath, 'signature_visualization/'),
+    dataPath: path.join(config.data.folder, 'signature_visualization/'),
   }).catch(next);
 
   const { stdout, output } = JSON.parse(wrapper);
@@ -362,7 +390,7 @@ async function getReferenceSignatureData(req, res, next) {
     'getReferenceSignatureData',
     {
       ...req.body,
-      dataPath: path.join(datapath, 'signature_visualization/'),
+      dataPath: path.join(config.data.folder, 'signature_visualization/'),
     }
   ).catch(next);
 
@@ -372,13 +400,17 @@ async function getReferenceSignatureData(req, res, next) {
 
 async function submitQueue(req, res, next) {
   const projectID = req.body.args.projectID[1];
-
-  AWS.config.update({ region: 'us-east-1' });
+  const date = new Date();
+  const isoDate = new Date(
+    date.getTime() - date.getTimezoneOffset() * 60000
+  ).toISOString();
+  const day = isoDate.split('T')[0];
+  const time = isoDate.split('T')[1].split('Z')[0].substring(0, 5);
   const sqs = new AWS.SQS();
 
   try {
     const { QueueUrl } = await sqs
-      .getQueueUrl({ QueueName: config.aws.queue })
+      .getQueueUrl({ QueueName: config.queue.url })
       .promise();
 
     await sqs
@@ -386,7 +418,10 @@ async function submitQueue(req, res, next) {
         QueueUrl: QueueUrl,
         MessageDeduplicationId: projectID,
         MessageGroupId: projectID,
-        MessageBody: JSON.stringify(req.body),
+        MessageBody: JSON.stringify({
+          ...req.body,
+          timestamp: `${day} ${time} UTC`,
+        }),
       })
       .promise();
 

@@ -15,6 +15,7 @@
     "aws-sdk": "^2.767.0",
     "express": "^4.17.1",
     "formidable": "^1.2.2",
+    "nodemailer": "^6.4.13",
     "papaparse": "^5.2.0",
     "promisify-child-process": "^4.1.1",
     "r-wrapper": "^1.1.0",
