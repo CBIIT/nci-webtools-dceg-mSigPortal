@@ -98,10 +98,23 @@ export default function Explore() {
       } else {
         const data = await publicData.json();
         const studyOptions = [...new Set(data.map((data) => data.Study))];
+        // default study
+        const study = 'PCAWG';
+
+        const cancerOptions = [
+          ...new Set(
+            data
+              .filter((data) => data.Study == study)
+              .map((data) => data.Cancer_Type)
+          ),
+        ];
+        // default cancer type
+        const cancer = 'Lung-AdenoCA';
+
         const strategyOptions = [
           ...new Set(
             data
-              .filter((data) => data.Study == studyOptions[0])
+              .filter((data) => data.Study == study)
               .map((data) => data.Dataset)
           ),
         ];
@@ -110,26 +123,18 @@ export default function Explore() {
             referenceSignatures.output.data.map((row) => row.Signature_set_name)
           ),
         ];
-        const cancerOptions = [
-          ...new Set(
-            data
-              .filter((data) => data.Study == studyOptions[0])
-              .map((data) => data.Cancer_Type)
-          ),
-        ];
+
         const strategyOptions2 = [
           ...new Set(
             data
               .filter(
-                (data) =>
-                  data.Study == studyOptions[0] &&
-                  data.Cancer_Type == cancerOptions[0]
+                (data) => data.Study == study && data.Cancer_Type == cancer
               )
               .map((data) => data.Dataset)
           ),
         ];
         const params = {
-          study: studyOptions[0],
+          study: study,
           studyOptions: studyOptions,
           strategy: strategyOptions[0],
           strategyOptions: strategyOptions,
@@ -137,7 +142,7 @@ export default function Explore() {
           refSignatureSetOptions: refSignatureSetOptions,
         };
         const landscapeParams = {
-          cancer: cancerOptions[0],
+          cancer: cancer,
           cancerOptions: cancerOptions,
           strategy: strategyOptions2[0],
           strategyOptions: strategyOptions2,

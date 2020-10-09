@@ -121,21 +121,24 @@ export default function PublicForm() {
         const studyOptions = [
           ...new Set(pDataOptions.map((data) => data.Study)),
         ];
+        // default study
+        const study = 'PCAWG';
 
         const cancerTypeOptions = [
           ...new Set(
             pDataOptions
-              .filter((data) => data.Study == studyOptions[0])
+              .filter((data) => data.Study == study)
               .map((data) => data.Cancer_Type)
           ),
         ];
+        //  default cancer type
+        const cancer = 'Lung-AdenoCA';
+
         const pubExperimentOptions = [
           ...new Set(
             pDataOptions
               .filter(
-                (data) =>
-                  data.Study == studyOptions[0] &&
-                  data.Cancer_Type == cancerTypeOptions[0]
+                (data) => data.Study == study && data.Cancer_Type == cancer
               )
               .map((data) => data.Dataset)
           ),
@@ -143,29 +146,29 @@ export default function PublicForm() {
 
         dispatchVisualize({
           pDataOptions: pDataOptions,
-          study: studyOptions[0],
+          study: study,
           studyOptions: studyOptions,
-          cancerType: cancerTypeOptions[0],
+          cancerType: cancer,
           cancerTypeOptions: cancerTypeOptions,
           pubExperimentalStrategy: pubExperimentOptions[0],
           pubExperimentOptions: pubExperimentOptions,
         });
 
         dispatchCosineSimilarity({
-          pubStudy: studyOptions[0],
-          pubCancerType: cancerTypeOptions[0],
+          pubStudy: study,
+          pubCancerType: cancer,
           pubCancerTypeOptions: cancerTypeOptions,
         });
 
         dispatchProfileComparison({
-          pubStudy: studyOptions[0],
-          pubCancerType: cancerTypeOptions[0],
+          pubStudy: study,
+          pubCancerType: cancer,
           pubCancerTypeOptions: cancerTypeOptions,
         });
 
         dispatchPCA({
-          pubStudy: studyOptions[0],
-          pubCancerType: cancerTypeOptions[0],
+          pubStudy: study,
+          pubCancerType: cancer,
           pubCancerTypeOptions: cancerTypeOptions,
         });
       }
