@@ -295,19 +295,7 @@ export default function Explore() {
                   <Label className="mr-auto">
                     <h3 className="mb-2">Data Source</h3>
                   </Label>
-                  <Check inline id="radioUser" className="ml-4">
-                    <Check.Input
-                      disabled={submitted}
-                      type="radio"
-                      value="user"
-                      checked={source == 'user'}
-                      onChange={(e) => dispatchExploring({ source: 'user' })}
-                    />
-                    <Check.Label className="font-weight-normal">
-                      User
-                    </Check.Label>
-                  </Check>
-                  <Check inline id="radioPublic">
+                  <Check inline id="radioPublic" className="ml-4">
                     <Check.Input
                       disabled={submitted}
                       type="radio"
@@ -317,6 +305,18 @@ export default function Explore() {
                     />
                     <Check.Label className="font-weight-normal">
                       Public
+                    </Check.Label>
+                  </Check>
+                  <Check inline id="radioUser">
+                    <Check.Input
+                      disabled={submitted}
+                      type="radio"
+                      value="user"
+                      checked={source == 'user'}
+                      onChange={(e) => dispatchExploring({ source: 'user' })}
+                    />
+                    <Check.Label className="font-weight-normal">
+                      User
                     </Check.Label>
                   </Check>
                 </Group>

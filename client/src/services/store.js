@@ -2,7 +2,7 @@ import { createSlice, configureStore, combineReducers } from '@reduxjs/toolkit';
 
 export const getInitialState = () => ({
   visualize: {
-    source: 'user',
+    source: 'public',
     inputFormat: 'vcf',
     selectedGenome: 'GRCh37',
     experimentalStrategy: 'WGS',
