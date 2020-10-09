@@ -56,7 +56,8 @@ function streamToFile(readStream, filePath) {
  * Processes a message and sends emails when finished
  * @param {object} params
  */
-async function processMessage({ args, email, timestamp }) {
+async function processMessage(params) {
+  const { args, state, timestamp } = params;
   const id = args.projectID[1];
   const s3 = new AWS.S3();
   const mailer = nodemailer.createTransport(config.email.smtp);
@@ -76,12 +77,21 @@ async function processMessage({ args, email, timestamp }) {
 
     const runtime = (minutes > 0 ? minutes + ' min ' : '') + seconds + ' secs';
 
+    // upload parameters
+    await s3
+      .upload({
+        Body: JSON.stringify(params),
+        Bucket: config.s3.bucket,
+        Key: `${config.s3.outputKeyPrefix}${id}/params.json`,
+      })
+      .promise();
+
     // upload archived project directory
     await s3
       .upload({
         Body: tar.c({ gzip: true, C: config.results.folder }, [id]),
         Bucket: config.s3.bucket,
-        Key: `${config.aws.key}${id}.tgz`,
+        Key: `${config.s3.outputKeyPrefix}${id}/${id}.tgz`,
       })
       .promise();
 
@@ -97,7 +107,7 @@ async function processMessage({ args, email, timestamp }) {
     logger.info(`Sending user success email`);
     const userEmailResults = await mailer.sendMail({
       from: config.email.sender,
-      to: email,
+      to: state.email,
       subject: 'mSigPortal Results - ' + timestamp,
       html: await readTemplate(
         __dirname + '/templates/user-success-email.html',
@@ -132,11 +142,11 @@ async function processMessage({ args, email, timestamp }) {
     });
 
     // send user error email
-    if (email) {
+    if (state.email) {
       logger.info(`Sending user error email`);
       const userEmailResults = await mailer.sendMail({
         from: config.email.sender,
-        to: email,
+        to: state.email,
         subject: 'mSigPortal Error',
         html: await readTemplate(
           __dirname + '/templates/user-failure-email.html',

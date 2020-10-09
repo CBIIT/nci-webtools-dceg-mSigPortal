@@ -26,7 +26,6 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "start-queue-worker": "node queue-worker.js",
     "build": "npm run format && react-scripts build && rm -rf ../server/www && mv build ../server/www",
     "test": "react-scripts test --ci --reporters=default --reporters=jest-junit --watchAll=false",
     "eject": "react-scripts eject",

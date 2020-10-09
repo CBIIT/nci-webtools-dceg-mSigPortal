@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 import {
   SidebarContainer,
@@ -9,19 +9,50 @@ import UploadForm from './uploadForm';
 import PublicForm from './publicForm';
 import Results from './results';
 import { useSelector } from 'react-redux';
-import { store, updateVisualize } from '../../../services/store';
+import {
+  dispatchVisualize,
+  dispatchVisualizeResults,
+  dispatchError,
+  store,
+  updateVisualize,
+} from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import './visualization.scss';
 
 const { Group, Label, Check } = Form;
 
-export default function Visualize() {
+export default function Visualize({ match }) {
   const { openSidebar, loading, source, submitted } = useSelector(
     (state) => state.visualize
   );
+  const { id, module } = match.params;
+  const rootURL = window.location.pathname;
+
+  // when retrieving queued result, update id in store
+  useEffect(() => {
+    if (id) loadResults(id);
+  }, [id]);
 
   function setOpenSidebar(bool) {
-    store.dispatch(updateVisualize({ openSidebar: bool }));
+    dispatchVisualize({ openSidebar: bool });
+  }
+
+  async function loadResults(id) {
+    dispatchVisualize({
+      loading: { active: true, content: 'Loading...', showIndicator: true },
+    });
+    try {
+      const { args, state, timestamp } = await (
+        await fetch(`${rootURL}fetchResults/${id}`)
+      ).json();
+      dispatchVisualize(state);
+      dispatchVisualizeResults({ projectID: id });
+    } catch (error) {
+      dispatchError(error.toString());
+    }
+    dispatchVisualize({
+      loading: { active: false, content: '', showIndicator: false },
+    });
   }
 
   return (

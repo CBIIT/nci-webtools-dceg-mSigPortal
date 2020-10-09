@@ -21,6 +21,7 @@ const {
   exploringR,
   getReferenceSignatureData,
   submitQueue,
+  fetchResults,
 } = require('./controllers');
 
 if (cluster.isMaster) {
@@ -68,7 +69,7 @@ app.use(express.json());
 app.use((error, req, res, next) => {
   logger.error(err);
   if (!error.statusCode) error.statusCode = 500;
-  return res.status(error.statusCode).json({ error: error.toString() });
+  return res.status(error.statusCode).json(error.toString());
 });
 
 app.get('/ping', (req, res) => res.send(true));
@@ -98,3 +99,5 @@ app.post('/exploringR', exploringR);
 app.post('/getReferenceSignatureData', getReferenceSignatureData);
 
 app.post('/queue', submitQueue);
+
+app.get('/fetchResults/:id', fetchResults);

@@ -33,6 +33,7 @@ const { Group, Label, Control, Check, Text } = Form;
 const { Title, Content } = Popover;
 
 export default function UploadForm() {
+  const state = useSelector((state) => state.visualize);
   const {
     inputFormat,
     selectedGenome,
@@ -48,7 +49,7 @@ export default function UploadForm() {
     submitted,
     exampleData,
     loading,
-  } = useSelector((state) => state.visualize);
+  } = state;
   const rootURL = window.location.pathname;
   const [inputFile, setInput] = useState(new File([], ''));
   const [bedFile, setBed] = useState(new File([], ''));
@@ -117,7 +118,10 @@ export default function UploadForm() {
             Accept: 'application/json',
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ args: args, email: email }),
+          body: JSON.stringify({
+            args: args,
+            state: state,
+          }),
         });
         if (response.ok) {
           // placeholder alert with error modal

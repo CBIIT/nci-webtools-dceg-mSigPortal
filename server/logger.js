@@ -6,12 +6,12 @@
 
 const winston = require('winston');
 const { createLogger, format, transports } = winston;
-const { logpath, loglevel } = require('./config.json');
+const { logs } = require('./config.json');
 require('winston-daily-rotate-file');
 // winston.emitErrs = true;
 
 var logger = new createLogger({
-  level: loglevel || 'info',
+  level: logs.level || 'info',
   format: format.combine(
     format.errors({ stack: true }), // <-- use errors format
     // format.colorize(),
@@ -41,7 +41,7 @@ var logger = new createLogger({
   ),
   transports: [
     new transports.DailyRotateFile({
-      filename: logpath + 'application-%DATE%.log',
+      filename: logs.folder + '/application-%DATE%.log',
       datePattern: 'YYYY-MM-DD-HH',
       zippedArchive: false,
       maxSize: '1024m',

@@ -82,7 +82,7 @@ export default function App() {
       <Navbar links={links} />
       <Route path="/" exact={true} render={(_) => <Home links={links} />} />
       <Route path="/about" component={About} />
-      <Route path="/visualization" component={Visualization} />
+      <Route path="/visualization/:id?/:module?" component={Visualization} />
       <Route path="/exploring" component={Exploring} />
       <Route path="/refitting" component={Refitting} />
       <Route path="/association" component={Association} />

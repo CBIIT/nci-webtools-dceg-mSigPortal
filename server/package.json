@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node msigportal-server.js",
+    "start-queue-worker": "node queue-worker.js",
     "build": "npm run format",
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --single-quote --write \"**/*.{js,json}\""

@@ -3,8 +3,9 @@ const logger = require('./logger');
 const { spawn } = require('promisify-child-process');
 const formidable = require('formidable');
 const fs = require('fs');
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4, validate } = require('uuid');
 const Papa = require('papaparse');
+const tar = require('tar');
 const r = require('r-wrapper').async;
 const AWS = require('aws-sdk');
 const config = require('./config.json');
@@ -165,7 +166,7 @@ async function visualizeR(req, res, next) {
         'results/output'
       ),
       savePath: savePath,
-      dataPath:  path.join(config.data.folder, 'signature_visualization/'),
+      dataPath: path.join(config.data.folder, 'signature_visualization/'),
     });
 
     const { stdout, output } = JSON.parse(wrapper);
@@ -190,7 +191,10 @@ async function getReferenceSignatureSets(req, res, next) {
     const list = await r(
       'services/R/visualizeWrapper.R',
       'getReferenceSignatureSets',
-      [req.body.profileType, path.join(config.data.folder, 'signature_visualization/')]
+      [
+        req.body.profileType,
+        path.join(config.data.folder, 'signature_visualization/'),
+      ]
     );
 
     // console.log('SignatureReferenceSets', list);
@@ -433,6 +437,70 @@ async function submitQueue(req, res, next) {
   }
 }
 
+async function fetchResults(req, res, next) {
+  try {
+    const s3 = new AWS.S3();
+    const { id } = req.params;
+
+    // validate id format
+    if (!validate(id)) {
+      throw `Invalid id`;
+    }
+
+    // ensure output directory exists
+    const resultsFolder = path.resolve(config.results.folder, id);
+    await fs.promises.mkdir(resultsFolder, { recursive: true });
+
+    // find objects which use the specified id as the prefix
+    const objects = await s3
+      .listObjectsV2({
+        Bucket: config.s3.bucket,
+        Prefix: `${config.s3.outputKeyPrefix}${id}/`,
+      })
+      .promise();
+
+    // download results
+    for (let { Key } of objects.Contents) {
+      const filename = path.basename(Key);
+      const filepath = path.resolve(resultsFolder, filename);
+
+      // download results if they do not exist
+      if (!fs.existsSync(filepath)) {
+        logger.info(`Downloading result: ${Key}`);
+        const object = await s3
+          .getObject({
+            Bucket: config.s3.bucket,
+            Key,
+          })
+          .promise();
+
+        await fs.promises.writeFile(filepath, object.Body);
+        // extract and delete archive
+        if (path.extname(filename) == '.tgz') {
+          fs.createReadStream(filepath)
+            .pipe(tar.x({ strip: 1, C: resultsFolder }))
+            .once('finish', () => fs.unlink(filepath, next));
+        }
+      }
+    }
+
+    let paramsFilePath = path.resolve(resultsFolder, `params.json`);
+
+    if (fs.existsSync(paramsFilePath)) {
+      const params = JSON.parse(
+        String(await fs.promises.readFile(paramsFilePath))
+      );
+
+      logger.info('/fetchResults: Found Params')
+      res.json(params);
+    } else {
+      throw `Invalid id`;
+    }
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   profilerExtraction,
   visualizationProfilerExtraction,
@@ -448,4 +516,5 @@ module.exports = {
   exploringR,
   getReferenceSignatureData,
   submitQueue,
+  fetchResults,
 };
