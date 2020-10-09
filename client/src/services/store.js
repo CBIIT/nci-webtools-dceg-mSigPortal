@@ -98,8 +98,8 @@ export const getInitialState = () => ({
     pubSubmitOverlay: false,
   },
   mutationalPattern: {
-    proportion: '',
-    pattern: '',
+    proportion: '0.8',
+    pattern: 'NCG>NTG',
     txtPath: '',
     plotPath: '',
     plotURL: '',

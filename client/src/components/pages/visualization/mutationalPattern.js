@@ -11,7 +11,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
 
-const { Group, Label, Control, Text } = Form;
+const { Group, Label, Control } = Form;
 const { Header, Body } = Card;
 const { Toggle, Collapse } = Accordion;
 
@@ -181,13 +181,13 @@ export default function MutationalPattern({ submitR }) {
                           </Label>
                           <Control
                             value={proportion}
+                            placeholder="Ex. 0.8"
                             onChange={(e) => {
                               dispatchMutationalPattern({
                                 proportion: e.target.value,
                               });
                             }}
-                          ></Control>{' '}
-                          <Text className="text-muted">(Ex. 0.8)</Text>
+                          ></Control>
                         </Group>
                       </Col>
                       <Col sm="5">
@@ -195,13 +195,13 @@ export default function MutationalPattern({ submitR }) {
                           <Label>Mutational Pattern</Label>
                           <Control
                             value={pattern}
+                            placeholder="Ex. NCG>NTG"
                             onChange={(e) => {
                               dispatchMutationalPattern({
                                 pattern: e.target.value,
                               });
                             }}
                           ></Control>
-                          <Text className="text-muted">(Ex. NCG>NTG)</Text>
                         </Group>
                       </Col>
 
@@ -271,8 +271,7 @@ export default function MutationalPattern({ submitR }) {
                               proportion: e.target.value,
                             });
                           }}
-                        ></Control>{' '}
-                        <Text className="text-muted">(Ex. 0.8)</Text>
+                        ></Control>
                       </Col>
                       <Col sm="5">
                         <Label>Mutational Pattern</Label>
@@ -284,7 +283,6 @@ export default function MutationalPattern({ submitR }) {
                             });
                           }}
                         ></Control>
-                        <Text className="text-muted">(Ex. NCG>NTG)</Text>
                       </Col>
 
                       <Col sm="1" className="m-auto">
