@@ -197,11 +197,26 @@ export default function UploadForm() {
     }
   }
 
-  function handleReset() {
+  function resetForm() {
     const initialState = getInitialState();
     removeFile();
     removeBedFile();
-    dispatchVisualize(initialState.visualize);
+    dispatchVisualize({
+      ...initialState.visualize,
+      source: 'user',
+      pDataOptions: state.pDataOptions,
+      studyOptions: state.studyOptions,
+      study: state.studyOptions[0],
+      cancerTypeOptions: state.cancerTypeOptions,
+      cancerType: state.cancerTypeOptions[0],
+      pubExperimentOptions: state.pubExperimentOptions,
+      pubExperimentalStrategy: state.pubExperimentOptions[0],
+    });
+  }
+
+  function handleReset() {
+    const initialState = getInitialState();
+    resetForm();
     dispatchVisualizeResults(initialState.visualizeResults);
     dispatchProfilerSummary(initialState.profilerSummary);
     dispatchMutationalProfiles(initialState.mutationalProfiles);
@@ -262,7 +277,7 @@ export default function UploadForm() {
   }
 
   function selectFormat(format) {
-    handleReset();
+    resetForm();
     let path = '';
     if (format == 'vcf') path = 'assets/exampleInput/demo_input_multi.vcf.gz';
     if (format == 'csv') path = 'assets/exampleInput/demo_input_multi.csv';
@@ -565,6 +580,7 @@ export default function UploadForm() {
               id="bedUpload"
               {...bedInputProps()}
               disabled={
+                mutationSplit == 'True' ||
                 bedFile.size ||
                 submitted ||
                 ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
