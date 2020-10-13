@@ -94,7 +94,16 @@ export default function PublicForm() {
 
   function handleReset() {
     const initialState = getInitialState();
-    dispatchVisualize(initialState.visualize);
+    dispatchVisualize({
+      ...initialState.visualize,
+      pDataOptions: pDataOptions,
+      studyOptions: studyOptions,
+      study: studyOptions[0],
+      cancerTypeOptions: cancerTypeOptions,
+      cancerType: cancerTypeOptions[0],
+      pubExperimentOptions: pubExperimentOptions,
+      pubExperimentalStrategy: pubExperimentOptions[0],
+    });
     dispatchProfilerSummary(initialState.profilerSummary);
     dispatchVisualizeResults(initialState.visualizeResults);
     dispatchMutationalProfiles(initialState.mutationalProfiles);
