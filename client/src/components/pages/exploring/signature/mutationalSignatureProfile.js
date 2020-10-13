@@ -426,11 +426,13 @@ export default function MutationalSignatureProfile({ submitR }) {
               label="Signature Name"
               value={plots[index].signatureName}
               options={plots[index].signatureNameOptions}
-              onChange={(name) =>
+              onChange={(name) => {
+                let newPlots = plots.slice();
+                newPlots[index] = { ...newPlots[index], signatureName: name };
                 dispatchExpMutationalProfiles({
-                  signatureName: name,
-                })
-              }
+                  plots: newPlots,
+                });
+              }}
             />
           </Col>
           <Col sm="1" className="m-auto">
@@ -513,11 +515,13 @@ export default function MutationalSignatureProfile({ submitR }) {
             label="Signature Name"
             value={plots[0].signatureName}
             options={plots[0].signatureNameOptions}
-            onChange={(name) =>
+            onChange={(name) => {
+              let newPlots = plots.slice();
+              newPlots[0] = { ...newPlots[0], signatureName: name };
               dispatchExpMutationalProfiles({
-                signatureName: name,
-              })
-            }
+                plots: newPlots,
+              });
+            }}
           />
         </Col>
         <Col sm="1" className="m-auto">
