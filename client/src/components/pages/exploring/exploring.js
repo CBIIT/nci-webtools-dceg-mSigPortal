@@ -242,16 +242,22 @@ export default function Explore() {
     });
 
     dispatchExpMutationalProfiles({
-      signatureSource: signatureSource,
-      signatureSourceOptions: signatureSourceOptions,
-      profileName: profileName,
-      profileNameOptions: profileNameOptions,
-      refSignatureSet: refSignatureSet,
-      refSignatureSetOptions: refSignatureSetOptions,
-      strategy: strategy,
-      strategyOptions: strategyOptions,
-      signatureName: signatureNameOptions[0],
-      signatureNameOptions: signatureNameOptions,
+      plots: [
+        {
+          signatureSource: signatureSource,
+          signatureSourceOptions: signatureSourceOptions,
+          profileName: profileName,
+          profileNameOptions: profileNameOptions,
+          refSignatureSet: refSignatureSet,
+          refSignatureSetOptions: refSignatureSetOptions,
+          strategy: strategy,
+          strategyOptions: strategyOptions,
+          signatureName: signatureNameOptions[0],
+          signatureNameOptions: signatureNameOptions,
+          plotPath: '',
+          plotURL: '',
+        },
+      ],
       loading: false,
     });
 
