@@ -100,7 +100,7 @@ async function processMessage(params) {
       jobName: 'mSigPortal',
       originalTimestamp: timestamp,
       runTime: runtime,
-      resultsUrl: `${config.email.baseUrl}/mutational-signatures/${id}`,
+      resultsUrl: `${config.email.baseUrl}/#/visualization/${id}`,
     };
 
     // send user success email
