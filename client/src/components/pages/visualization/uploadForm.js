@@ -651,7 +651,7 @@ export default function UploadForm() {
       </Group>
       <hr />
       <div>
-        <LoadingOverlay active={true} content={'Work in progress...'} />
+        <LoadingOverlay active={false} content={'Work in progress...'} />
         <Group controlId="toggleQueue">
           <Label className="mr-auto">Submit this job to a Queue</Label>{' '}
           <Check inline>
