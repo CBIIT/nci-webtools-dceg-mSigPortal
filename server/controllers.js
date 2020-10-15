@@ -88,17 +88,21 @@ async function profilerExtraction(params) {
 
   logger.debug('/profilerExtraction: CLI args\n' + cli);
 
-  const { stdout, stderr } = await spawn(
-    'python3',
-    ['services/python/mSigPortal_Profiler_Extraction.py', ...cli],
-    { encoding: 'utf8' }
-  );
+  try {
+    const { stdout, stderr } = await spawn(
+      'python3',
+      ['services/python/mSigPortal_Profiler_Extraction.py', ...cli],
+      { encoding: 'utf8' }
+    );
 
-  return {
-    stdout: stdout,
-    stderr: stderr,
-    projectPath: path.join(config.results.folder, params.projectID[1]),
-  };
+    return {
+      stdout: stdout,
+      stderr: stderr,
+      projectPath: path.join(config.results.folder, params.projectID[1]),
+    };
+  } catch (e) {
+    throw e;
+  }
 }
 
 async function visualizationProfilerExtraction(req, res, next) {

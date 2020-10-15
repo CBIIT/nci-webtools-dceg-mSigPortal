@@ -84,7 +84,11 @@ async function downloadS3(id, savePath) {
     if (path.extname(filename) == '.tgz') {
       fs.createReadStream(filepath)
         .pipe(tar.x({ strip: 1, C: savePath }))
-        .once('finish', () => fs.unlink(filepath, logger.err));
+        .once('finish', () =>
+          fs.unlink(filepath, (e) => {
+            if (e) logger.error(e);
+          })
+        );
     }
   }
 }
@@ -107,8 +111,8 @@ async function processMessage(params) {
     const start = new Date().getTime();
     await downloadS3(id, directory);
     const { stdout, stderr, projectPath } = await profilerExtraction(args);
-    logger.debug('stdout:' + stdout);
-    logger.debug('stderr:' + stderr);
+    // logger.debug('stdout:' + stdout);
+    // logger.debug('stderr:' + stderr);
     const end = new Date().getTime();
 
     const time = end - start;
@@ -226,7 +230,8 @@ async function receiveMessage() {
       const message = data.Messages[0];
       const params = JSON.parse(message.Body);
 
-      logger.info(`Received Message : ${message.Body}`);
+      logger.info(`Received Message ${params.args.projectID[1]}`);
+      // logger.debug(message.Body);
 
       // while processing is not complete, update the message's visibilityTimeout
       const intervalId = setInterval(
