@@ -19,51 +19,14 @@ export default function Tumor({ submitR }) {
     refSignatureSet,
     refSignatureSetOptions,
     genomeSize,
-    plotPath,
-    plotURL,
-    txtPath,
-    debugR,
-    err,
-    displayDebug,
     loading,
-  } = useSelector((state) => state.expTumor);
+  } = useSelector((state) => state.expExposure);
+  const { plotPath, plotURL, txtPath, debugR, err, displayDebug } = useSelector(
+    (state) => state.expTumor
+  );
   const { displayTab, publicDataOptions } = useSelector(
     (state) => state.exploring
   );
-
-  async function calculateR(fn, args) {
-    console.log(fn);
-    dispatchExpTumor({
-      loading: true,
-      err: false,
-      debugR: '',
-    });
-
-    try {
-      const response = await submitR(fn, args);
-      if (!response.ok) {
-        const err = await response.json();
-
-        dispatchExpTumor({
-          loading: false,
-          debugR: err,
-        });
-      } else {
-        const { debugR, output } = await response.json();
-
-        dispatchExpTumor({
-          debugR: debugR,
-          loading: false,
-          plotPath: output.plotPath,
-          txtPath: output.txtPath,
-        });
-        setRPlot(output.plotPath);
-      }
-    } catch (err) {
-      dispatchError(err);
-      dispatchExpTumor({ loading: false });
-    }
-  }
 
   async function setRPlot(plotPath) {
     if (plotPath) {
@@ -89,103 +52,19 @@ export default function Tumor({ submitR }) {
     }
   }
 
-  function handleStudy(study) {
-    const strategyOptions = [
-      ...new Set(
-        publicDataOptions
-          .filter((data) => data.Study == study)
-          .map((data) => data.Dataset)
-      ),
-    ];
-
-    dispatchExpTumor({
-      study: study,
-      strategy: strategyOptions[0],
-      strategyOptions: strategyOptions,
-    });
-  }
-
   return (
     <div>
-      <Form>
-        <LoadingOverlay active={loading} />
-        <div>
-          <Row className="justify-content-center">
-            <Col sm="2">
-              <Select
-                id="tumorStudy"
-                label="Study"
-                value={study}
-                options={studyOptions}
-                onChange={handleStudy}
-              />
-            </Col>
-            <Col sm="2">
-              <Select
-                id="tumorStrategy"
-                label="Experimental Strategy"
-                value={strategy}
-                options={strategyOptions}
-                onChange={(strategy) =>
-                  dispatchExpTumor({ strategy: strategy })
-                }
-              />
-            </Col>
-            <Col sm="4">
-              <Select
-                id="tumorSet"
-                label="Reference Signature Set"
-                value={refSignatureSet}
-                options={refSignatureSetOptions}
-                onChange={(set) => dispatchExpTumor({ refSignatureSet: set })}
-              />
-            </Col>
-            <Col sm="3">
-              <Group controlId="tumorGenomeSize">
-                <Label>Genome Size</Label>
-                <Control
-                  value={genomeSize}
-                  onChange={(e) => {
-                    dispatchExpTumor({
-                      genomeSize: e.target.value,
-                    });
-                  }}
-                />
-                {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
-              </Group>
-            </Col>
-            <Col sm="1" className="m-auto">
-              <Button
-                variant="primary"
-                onClick={() => {
-                  calculateR('tumorBurden', {
-                    study: study,
-                    strategy: strategy,
-                    refSignatureSet: refSignatureSet,
-                    genomeSize: parseFloat(genomeSize),
-                  });
-                }}
-              >
-                Calculate
-              </Button>
-            </Col>
-          </Row>
-          <div id="withinPlot">
-            <div style={{ display: err ? 'block' : 'none' }}>
-              <p>
-                An error has occured. Check the debug section for more info.
-              </p>
-            </div>
-            <div style={{ display: plotURL ? 'block' : 'none' }}>
-              <Plot
-                plotName={plotPath.split('/').slice(-1)[0]}
-                plotURL={plotURL}
-                txtPath={txtPath}
-              />
-            </div>
-          </div>
-        </div>
-      </Form>
+      <LoadingOverlay active={loading} />
+      {err && (
+        <p>An error has occured. Check the debug section for more info.</p>
+      )}
+      {plotURL && (
+        <Plot
+          plotName={plotPath.split('/').slice(-1)[0]}
+          plotURL={plotURL}
+          txtPath={txtPath}
+        />
+      )}
       <Debug msg={debugR} />
     </div>
   );

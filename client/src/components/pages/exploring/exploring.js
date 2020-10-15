@@ -19,6 +19,7 @@ import {
   dispatchExpDecomposition,
   dispatchExpLandscape,
   dispatchExpPrevalence,
+  dispatchExpExposure,
 } from '../../../services/store';
 
 const { Header, Body } = Card;
@@ -75,11 +76,7 @@ export default function Explore() {
   }
 
   async function getPublicDataOptions() {
-    dispatchExpTumor({ loading: true });
-    dispatchExpActivity({ loading: true });
-    dispatchExpDecomposition({ loading: true });
-    dispatchExpLandscape({ loading: true });
-    dispatchExpPrevalence({ loading: true });
+    dispatchExpExposure({ loading: true });
 
     try {
       let [publicData, referenceSignatures] = await Promise.all([
@@ -149,20 +146,13 @@ export default function Explore() {
         };
 
         dispatchExploring({ publicDataOptions: data });
-        dispatchExpTumor({ ...params });
-        dispatchExpActivity({ ...params });
-        dispatchExpDecomposition({ ...params });
-        dispatchExpLandscape({ ...params, ...landscapeParams });
-        dispatchExpPrevalence({ ...params });
+        dispatchExpExposure({ ...params });
+        dispatchExpLandscape({ ...landscapeParams });
       }
     } catch (err) {
       dispatchError(err);
     }
-    dispatchExpTumor({ loading: false });
-    dispatchExpActivity({ loading: false });
-    dispatchExpDecomposition({ loading: false });
-    dispatchExpLandscape({ loading: false });
-    dispatchExpPrevalence({ loading: false });
+    dispatchExpExposure({ loading: false });
   }
 
   async function getInitalRefSigData() {

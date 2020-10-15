@@ -113,7 +113,7 @@ export default function Tumor({ submitR }) {
       <Form>
         <LoadingOverlay active={loading} />
         <div>
-          <Row className="justify-content-center">
+          {/* <Row className="justify-content-center">
             <Col sm="2">
               <Select
                 id="decompStudy"
@@ -122,42 +122,6 @@ export default function Tumor({ submitR }) {
                 options={studyOptions}
                 onChange={(study) => handleStudy(study)}
               />
-            </Col>
-            <Col sm="2">
-              <Select
-                id="decompStrategy"
-                label="Experimental Strategy"
-                value={strategy}
-                options={strategyOptions}
-                onChange={(strategy) =>
-                  dispatchExpDecomposition({ strategy: strategy })
-                }
-              />
-            </Col>
-            <Col sm="4">
-              <Select
-                id="decompRefSet"
-                label="Reference Signature Set"
-                value={refSignatureSet}
-                options={refSignatureSetOptions}
-                onChange={(set) =>
-                  dispatchExpDecomposition({ refSignatureSet: set })
-                }
-              />
-            </Col>
-            <Col sm="3">
-              <Group controlId="decompGenomeSize">
-                <Label>Genome Size</Label>
-                <Control
-                  value={genomeSize}
-                  onChange={(e) => {
-                    dispatchExpDecomposition({
-                      genomeSize: e.target.value,
-                    });
-                  }}
-                />
-                {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
-              </Group>
             </Col>
             <Col sm="1" className="m-auto">
               <Button
@@ -174,7 +138,7 @@ export default function Tumor({ submitR }) {
                 Calculate
               </Button>
             </Col>
-          </Row>
+          </Row> */}
           <div id="withinPlot">
             <div style={{ display: err ? 'block' : 'none' }}>
               <p>

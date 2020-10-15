@@ -17,13 +17,15 @@ export default function Tumor({ submitR }) {
   const {
     study,
     studyOptions,
-    cancer,
-    cancerOptions,
     strategy,
     strategyOptions,
     refSignatureSet,
     refSignatureSetOptions,
     genomeSize,
+  } = useSelector((state) => state.expExposure);
+  const {
+    cancer,
+    cancerOptions,
     plotPath,
     plotURL,
     txtPath,
@@ -189,15 +191,6 @@ export default function Tumor({ submitR }) {
           <Row className="justify-content-center">
             <Col sm="2">
               <Select
-                id="landscapeStudy"
-                label="Study"
-                value={study}
-                options={studyOptions}
-                onChange={(study) => handleStudy(study)}
-              />
-            </Col>
-            <Col sm="2">
-              <Select
                 id="landscapeType"
                 label="Cancer Type"
                 value={cancer}
@@ -205,49 +198,6 @@ export default function Tumor({ submitR }) {
                 onChange={(cancer) => handleCancer(cancer)}
               />
             </Col>
-            <Col sm="2">
-              <Select
-                id="landscapeStrategy"
-                label="Experimental Strategy"
-                value={strategy}
-                options={strategyOptions}
-                onChange={(strategy) =>
-                  dispatchExpLandscape({ strategy: strategy })
-                }
-              />
-            </Col>
-            <Col sm="3">
-              <Select
-                id="landscapeRefSet"
-                label="Reference Signature Set"
-                value={refSignatureSet}
-                options={refSignatureSetOptions}
-                onChange={(set) =>
-                  dispatchExpLandscape({ refSignatureSet: set })
-                }
-              />
-            </Col>
-            <Col sm="2">
-              <Group controlId="landscapeGenomeSize">
-                <Label>Genome Size</Label>
-                <Control
-                  value={genomeSize}
-                  onChange={(e) => {
-                    dispatchExpLandscape({
-                      genomeSize: e.target.value,
-                    });
-                  }}
-                />
-                {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
-              </Group>
-            </Col>
-            <Col sm="1" className="m-auto">
-              <Button variant="primary" onClick={() => handleSubmit()}>
-                Calculate
-              </Button>
-            </Col>
-          </Row>
-          <Row>
             <Col sm="4">
               <Label>Upload Variable Data</Label>
               <Form.File
@@ -256,6 +206,12 @@ export default function Tumor({ submitR }) {
                 onChange={(e) => setFile(e.target.files[0])}
                 custom
               />
+            </Col>
+            <Col sm="5" />
+            <Col sm="1" className="m-auto">
+              <Button variant="primary" onClick={() => handleSubmit()}>
+                Calculate
+              </Button>
             </Col>
           </Row>
           <div id="withinPlot">

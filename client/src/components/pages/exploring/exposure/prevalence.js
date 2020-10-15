@@ -22,6 +22,8 @@ export default function Tumor({ submitR }) {
     refSignatureSet,
     refSignatureSetOptions,
     genomeSize,
+  } = useSelector((state) => state.expExposure);
+  const {
     mutation,
     plotPath,
     plotURL,
@@ -115,52 +117,7 @@ export default function Tumor({ submitR }) {
         <LoadingOverlay active={loading} />
         <div>
           <Row className="justify-content-center">
-            <Col sm="2">
-              <Select
-                id="prevalenceStudy"
-                label="Study"
-                value={study}
-                options={studyOptions}
-                onChange={handleStudy}
-              />
-            </Col>
-            <Col sm="2">
-              <Select
-                id="prevalenceStrategy"
-                label="Experimental Strategy"
-                value={strategy}
-                options={strategyOptions}
-                onChange={(strategy) =>
-                  dispatchExpPrevalence({ strategy: strategy })
-                }
-              />
-            </Col>
-            <Col sm="3">
-              <Select
-                id="prevalenceRefSet"
-                label="Reference Signature Set"
-                value={refSignatureSet}
-                options={refSignatureSetOptions}
-                onChange={(set) =>
-                  dispatchExpPrevalence({ refSignatureSet: set })
-                }
-              />
-            </Col>
-            <Col sm="2">
-              <Group controlId="prevalenceGenomeSize">
-                <Label>Genome Size</Label>
-                <Control
-                  value={genomeSize}
-                  onChange={(e) => {
-                    dispatchExpPrevalence({
-                      genomeSize: e.target.value,
-                    });
-                  }}
-                ></Control>
-                {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
-              </Group>
-            </Col>
-            <Col sm="2">
+            <Col sm="4">
               <Group controlId="prevalenceMutations">
                 <Label>Minimal Number Mutations within in Each Signature</Label>
                 <Control
@@ -174,6 +131,7 @@ export default function Tumor({ submitR }) {
                 {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
               </Group>
             </Col>
+            <Col sm="7" />
             <Col sm="1" className="m-auto">
               <Button
                 variant="primary"

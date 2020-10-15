@@ -19,6 +19,8 @@ export default function Activity({ submitR }) {
     refSignatureSet,
     refSignatureSetOptions,
     genomeSize,
+  } = useSelector((state) => state.expExposure);
+  const {
     plotPath,
     plotURL,
     txtPath,
@@ -89,28 +91,28 @@ export default function Activity({ submitR }) {
     }
   }
 
-  function handleStudy(study) {
-    const strategyOptions = [
-      ...new Set(
-        publicDataOptions
-          .filter((data) => data.Study == study)
-          .map((data) => data.Dataset)
-      ),
-    ];
+  // function handleStudy(study) {
+  //   const strategyOptions = [
+  //     ...new Set(
+  //       publicDataOptions
+  //         .filter((data) => data.Study == study)
+  //         .map((data) => data.Dataset)
+  //     ),
+  //   ];
 
-    dispatchExpActivity({
-      study: study,
-      strategy: strategyOptions[0],
-      strategyOptions: strategyOptions,
-    });
-  }
+  //   dispatchExpActivity({
+  //     study: study,
+  //     strategy: strategyOptions[0],
+  //     strategyOptions: strategyOptions,
+  //   });
+  // }
 
   return (
     <div>
       <Form>
         <LoadingOverlay active={loading} />
         <div>
-          <Row className="justify-content-center">
+          {/* <Row className="justify-content-center">
             <Col sm="2">
               <Select
                 id="activityStudy"
@@ -119,42 +121,6 @@ export default function Activity({ submitR }) {
                 options={studyOptions}
                 onChange={handleStudy}
               />
-            </Col>
-            <Col sm="2">
-              <Select
-                id="activityStrategy"
-                label="Experimental Strategy"
-                value={strategy}
-                options={strategyOptions}
-                onChange={(strategy) =>
-                  dispatchExpActivity({ strategy: strategy })
-                }
-              />
-            </Col>
-            <Col sm="4">
-              <Select
-                id="activitySet"
-                label="Reference Signature Set"
-                value={refSignatureSet}
-                options={refSignatureSetOptions}
-                onChange={(set) =>
-                  dispatchExpActivity({ refSignatureSet: set })
-                }
-              />
-            </Col>
-            <Col sm="3">
-              <Group controlId="activityGenomeSize">
-                <Label>Genome Size</Label>
-                <Control
-                  value={genomeSize}
-                  onChange={(e) => {
-                    dispatchExpActivity({
-                      genomeSize: e.target.value,
-                    });
-                  }}
-                />
-                {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
-              </Group>
             </Col>
             <Col sm="1" className="m-auto">
               <Button
@@ -171,7 +137,7 @@ export default function Activity({ submitR }) {
                 Calculate
               </Button>
             </Col>
-          </Row>
+          </Row> */}
           <div id="withinPlot">
             <div style={{ display: err ? 'block' : 'none' }}>
               <p>
