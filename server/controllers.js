@@ -413,6 +413,15 @@ async function submitQueue(req, res, next) {
   const sqs = new AWS.SQS();
 
   try {
+    // upload archived project directory
+    await new AWS.S3()
+      .upload({
+        Body: tar.c({ gzip: true, C: config.results.folder }, [projectID]),
+        Bucket: config.s3.bucket,
+        Key: `${config.s3.outputKeyPrefix}${projectID}/${projectID}.tgz`,
+      })
+      .promise();
+
     const { QueueUrl } = await sqs
       .getQueueUrl({ QueueName: config.queue.url })
       .promise();
@@ -491,7 +500,7 @@ async function fetchResults(req, res, next) {
         String(await fs.promises.readFile(paramsFilePath))
       );
 
-      logger.info('/fetchResults: Found Params')
+      logger.info('/fetchResults: Found Params');
       res.json(params);
     } else {
       throw `Invalid id`;
