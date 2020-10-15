@@ -53,6 +53,37 @@ function streamToFile(readStream, filePath) {
 }
 
 /**
+ * Downloads work files from s3 for calculation
+ * @param {string} id
+ * @param {string} savePath
+ */
+async function downloadS3(id, savePath) {
+  const s3 = new AWS.S3();
+  const objects = await s3
+    .listObjectsV2({
+      Bucket: config.s3.bucket,
+      Prefix: `${config.s3.outputKeyPrefix}${id}/`,
+    })
+    .promise();
+
+  // download work files
+  for (let { Key } of objects.Contents) {
+    const filename = path.basename(Key);
+    const filepath = path.resolve(savePath, filename);
+
+    logger.info(`Downloading: ${Key}`);
+    const object = await s3
+      .getObject({
+        Bucket: config.s3.bucket,
+        Key,
+      })
+      .promise();
+
+    await fs.promises.writeFile(filepath, object.Body);
+  }
+}
+
+/**
  * Processes a message and sends emails when finished
  * @param {object} params
  */
@@ -68,7 +99,9 @@ async function processMessage(params) {
     await fs.promises.mkdir(directory, { recursive: true });
 
     const start = new Date().getTime();
+    await downloadS3(id, directory);
     const { stdout, stderr, projectPath } = await profilerExtraction(args);
+    logger.debug(stdout, stderr);
     const end = new Date().getTime();
 
     const time = end - start;
