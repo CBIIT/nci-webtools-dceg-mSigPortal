@@ -80,6 +80,12 @@ async function downloadS3(id, savePath) {
       .promise();
 
     await fs.promises.writeFile(filepath, object.Body);
+    // extract and delete archive
+    if (path.extname(filename) == '.tgz') {
+      fs.createReadStream(filepath)
+        .pipe(tar.x({ strip: 1, C: savePath }))
+        .once('finish', () => fs.unlink(filepath, logger.err));
+    }
   }
 }
 
@@ -101,7 +107,8 @@ async function processMessage(params) {
     const start = new Date().getTime();
     await downloadS3(id, directory);
     const { stdout, stderr, projectPath } = await profilerExtraction(args);
-    logger.debug(stdout, stderr);
+    logger.debug('stdout:' + stdout);
+    logger.debug('stderr:' + stderr);
     const end = new Date().getTime();
 
     const time = end - start;
