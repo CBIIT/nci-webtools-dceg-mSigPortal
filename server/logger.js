@@ -17,7 +17,7 @@ var logger = new createLogger({
     // format.colorize(),
     format.timestamp(),
     format.prettyPrint(),
-    format.label({ label: '[PLCO-SERVER]' }),
+    format.label({ label: '[mSigPortal]' }),
     format.timestamp({
       format: 'YYYY-MM-DD HH:mm:ss',
     }),
