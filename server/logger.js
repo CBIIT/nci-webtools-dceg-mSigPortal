@@ -14,7 +14,7 @@ var logger = new createLogger({
   level: logs.level || 'info',
   format: format.combine(
     format.errors({ stack: true }), // <-- use errors format
-    // format.colorize(),
+    format.colorize(),
     format.timestamp(),
     format.prettyPrint(),
     format.label({ label: '[mSigPortal]' }),
