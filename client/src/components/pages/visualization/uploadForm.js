@@ -21,6 +21,7 @@ import {
   dispatchVisualize,
   dispatchVisualizeResults,
   dispatchError,
+  dispatchSuccess,
   getInitialState,
   dispatchMutationalProfiles,
   dispatchCosineSimilarity,
@@ -125,7 +126,7 @@ export default function UploadForm() {
         });
         if (response.ok) {
           // placeholder alert with error modal
-          dispatchError('Successfully submitted to queue.');
+          dispatchSuccess('Your job was successfully submitted to the queue.');
         } else {
           dispatchVisualizeResults({
             error: 'Please Reset Your Parameters and Try again.',

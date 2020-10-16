@@ -2,23 +2,23 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { Modal, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
-import { store, updateError } from '../../../services/store';
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { store, updateSuccess } from '../../../services/store';
 
-export function ErrorModal(props) {
-  const error = useSelector((store) => store.error);
-  const closeErrorModal = () => store.dispatch(updateError({ visible: false }));
+export function SuccessModal(props) {
+  const success = useSelector((store) => store.success);
+  const closeModal = () => store.dispatch(updateSuccess({ visible: false }));
 
   return (
     <Modal
-      data-testid="ErrorModal"
-      show={error.visible}
-      onHide={closeErrorModal}
+      data-testid="SuccessModal"
+      show={success.visible}
+      onHide={closeModal}
     >
-      <Modal.Header style={{ backgroundColor: '#d32f2f' }}>
+      <Modal.Header style={{ backgroundColor: '#04c585 ' }}>
         <Modal.Title className="d-flex justify-content-center w-100">
           <FontAwesomeIcon
-            icon={faTimesCircle}
+            icon={faCheckCircle}
             size="3x"
             style={{ color: '#fafafa' }}
           />
@@ -31,8 +31,8 @@ export function ErrorModal(props) {
       >
         <p
           className="m-0"
-          data-testid="ErrorModalMessage"
-          dangerouslySetInnerHTML={{ __html: error.message }}
+          data-testid="ModalMessage"
+          dangerouslySetInnerHTML={{ __html: success.message }}
         />
       </Modal.Body>
 
@@ -40,7 +40,7 @@ export function ErrorModal(props) {
         className="d-flex justify-content-center border-0"
         style={{ backgroundColor: '#fafafa' }}
       >
-        <Button variant="outline-secondary" onClick={closeErrorModal}>
+        <Button variant="outline-secondary" onClick={closeModal}>
           Close
         </Button>
       </Modal.Footer>

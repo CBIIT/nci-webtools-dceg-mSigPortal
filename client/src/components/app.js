@@ -10,6 +10,7 @@ import Association from './pages/association/association';
 import Publications from './pages/publications/publications';
 import Faq from './pages/faq/faq';
 import { ErrorModal } from './controls/error-modal/error-modal';
+import { SuccessModal } from './controls/success-modal/success-modal';
 
 export default function App() {
   const links = [
@@ -79,6 +80,7 @@ export default function App() {
   return (
     <Router>
       <ErrorModal />
+      <SuccessModal />
       <Navbar links={links} />
       <Route path="/" exact={true} render={(_) => <Home links={links} />} />
       <Route path="/about" component={About} />

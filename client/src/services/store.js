@@ -333,6 +333,10 @@ export const getInitialState = () => ({
     visible: false,
     message: `An error occured when requesting data. If this problem persists, please contact the administrator at <a href="mailto:mSigPortalWebAdmin@cancer.gov">mSigPortalWebAdmin@cancer.gov</a>.`,
   },
+  success: {
+    visible: false,
+    message: 'Your job was successfuly submitted to the queue.',
+  },
 });
 
 const visualizeSlice = createSlice({
@@ -444,6 +448,19 @@ const errorSlice = createSlice({
   initialState: getInitialState().error,
   reducers: {
     updateError: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
+
+const successSlice = createSlice({
+  name: 'success',
+  initialState: getInitialState().success,
+  reducers: {
+    updateSuccess: (state, action) => {
       return {
         ...state,
         ...action.payload,
@@ -599,6 +616,7 @@ const rootReducer = combineReducers({
   profileComparison: profileComparisonSlice.reducer,
   pca: pcaSlice.reducer,
   error: errorSlice.reducer,
+  success: successSlice.reducer,
   exploring: exploringSlice.reducer,
   expRefSig: expRefSigSlice.reducer,
   expMutationalProfiles: expMutationalProfilesSlice.reducer,
@@ -626,6 +644,7 @@ export const { updateMutationalPattern } = mutationalPatternSlice.actions;
 export const { updateProfileComparison } = profileComparisonSlice.actions;
 export const { updatePCA } = pcaSlice.actions;
 export const { updateError } = errorSlice.actions;
+export const { updateSuccess } = successSlice.actions;
 export const { updateExploring } = exploringSlice.actions;
 export const { updateExpRefSig } = expRefSigSlice.actions;
 export const {
@@ -677,6 +696,15 @@ export function dispatchPCA(obj) {
 export function dispatchError(msg) {
   store.dispatch(
     updateError({
+      visible: true,
+      message: msg,
+    })
+  );
+}
+
+export function dispatchSuccess(msg) {
+  store.dispatch(
+    updateSuccess({
       visible: true,
       message: msg,
     })
