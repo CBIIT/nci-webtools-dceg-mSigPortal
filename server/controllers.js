@@ -62,14 +62,16 @@ async function getSummaryFiles(resultsPath) {
 }
 
 function getRelativePath(paths) {
-  console.log('paths', paths);
   let newPaths = {};
+  const resultsPath = path.resolve(config.results.folder);
+  const dataPath = path.resolve(config.data.folder);
+
   Object.keys(paths).map((key) => {
     const fullPath = path.resolve(paths[key]);
-    newPaths[key] = fullPath.replace(
-      path.resolve(config.results.folder) + '/',
-      ''
-    );
+    if (fullPath.includes(resultsPath))
+      newPaths[key] = fullPath.replace(resultsPath + '/', '');
+    if (fullPath.includes(dataPath))
+      newPaths[key] = fullPath.replace(dataPath + '/', '');
   });
   return newPaths;
 }
@@ -317,27 +319,6 @@ function upload(req, res, next) {
   });
 }
 
-function getPublicSVG(req, res, next) {
-  const svgPath = path.resolve(req.body.path);
-  if (svgPath.indexOf(path.resolve(config.data.folder)) == 0) {
-    const s = fs.createReadStream(svgPath);
-
-    s.on('open', () => {
-      res.set('Content-Type', 'image/svg+xml');
-      s.pipe(res);
-      logger.debug(`/getPublicSVG: Serving ${svgPath}`);
-    });
-    s.on('error', () => {
-      res.set('Content-Type', 'text/plain');
-      res.status(500).end('Not found');
-      logger.debug(`/getPublicSVG: Serving Error retrieving ${svgPath}`);
-    });
-  } else {
-    logger.info('traversal error');
-    res.status(500).end('Not found');
-  }
-}
-
 function download(req, res, next) {
   logger.info(`/visualize/download: id:${req.query.id} file:${req.query.file}`);
   const file = path.resolve(
@@ -524,7 +505,6 @@ module.exports = {
   getPublicDataOptions,
   getPublicData,
   upload,
-  getPublicSVG,
   download,
   exploringR,
   getReferenceSignatureData,

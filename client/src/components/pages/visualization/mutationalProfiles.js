@@ -60,14 +60,10 @@ export default function MutationalProfiles() {
         const response =
           source == 'user'
             ? await fetch(`${rootURL}results/${plot.Path}`)
-            : await fetch(`${rootURL}getPublicSVG`, {
-                method: 'POST',
-                headers: {
-                  Accept: 'image/svg',
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ path: plot.Path }),
-              });
+            : await fetch(
+                `${rootURL}public/${plot.Path.split('/').slice(1).join('/')}`
+                // remove data/ from path
+              );
 
         if (!response.ok) {
           const msg = await response.text();

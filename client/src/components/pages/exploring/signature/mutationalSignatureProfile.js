@@ -94,14 +94,7 @@ export default function MutationalSignatureProfile({ submitR }) {
     try {
       const svgs = await Promise.all(
         plots.map((plot) =>
-          fetch(`${rootURL}getPublicSVG`, {
-            method: 'POST',
-            headers: {
-              Accept: 'image/svg',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ path: plot.plotPath }),
-          }).then((res) => res.blob())
+          fetch(`${rootURL}public/${plot.plotPath}`).then((res) => res.blob())
         )
       );
       let newPlots = plots.slice();

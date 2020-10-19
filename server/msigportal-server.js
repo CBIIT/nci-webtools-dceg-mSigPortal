@@ -16,7 +16,6 @@ const {
   getPublicDataOptions,
   getPublicData,
   upload,
-  getPublicSVG,
   download,
   exploringR,
   getReferenceSignatureData,
@@ -64,6 +63,7 @@ function childProcess() {
 
 app.use(express.static(path.resolve('www')));
 app.use('/results', express.static(config.results.folder));
+app.use('/public', express.static(config.data.folder));
 app.use(express.json());
 
 app.use((error, req, res, next) => {
@@ -89,8 +89,6 @@ app.post('/getPublicDataOptions', getPublicDataOptions);
 app.post('/getPublicData', getPublicData);
 
 app.post('/upload', upload);
-
-app.post('/getPublicSVG', getPublicSVG);
 
 app.get('/visualize/download', download);
 
