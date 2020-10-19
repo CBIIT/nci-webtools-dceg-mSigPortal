@@ -17,77 +17,69 @@ export default function MutationalSignatureProfile({ submitR }) {
   );
   const { displayTab, refSigData } = useSelector((state) => state.exploring);
 
-  async function calculateR(fn, args, index) {
-    dispatchExpMutationalProfiles({
-      loading: true,
-      err: false,
-      debugR: '',
-    });
+  // dataFolder/Reference_Signature_Profiles_SVG/refSignatureSet/profileName+signatureName
+  function buildPlotPath(profileName, refSignatureSet, signatureName) {
+    const profile = profileName.match(/[a-z]+|\d+/gi).join('_');
+    const set = refSignatureSet
+      .replace(/\s/g, '_')
+      .replace(/[^a-zA-Z0-9-_]/gi, '');
 
-    try {
-      const response = await submitR(fn, args);
-      if (!response.ok) {
-        const err = await response.json();
-
-        dispatchExpMutationalProfiles({
-          loading: false,
-          debugR: err,
-        });
-      } else {
-        const { debugR, output } = await response.json();
-
-        dispatchExpMutationalProfiles({
-          debugR: debugR,
-          loading: false,
-          plotPath: output.plotPath,
-        });
-        setRPlot(output.plotPath, plots[index].plotURL, index);
-      }
-    } catch (err) {
-      dispatchError(err);
-      dispatchExpMutationalProfiles({ loading: false });
-    }
+    return `signature_visualization/Reference_Signature_Profiles_SVG/${set}/${profile}_plots_mSigPortal_${signatureName}.svg`;
   }
 
   async function handleCalculate() {
-    dispatchExpMutationalProfiles({
-      loading: true,
-      err: false,
-      debugR: '',
+    const plotPaths = plots.map((plot, index) =>
+      buildPlotPath(plot.profileName, plot.refSignatureSet, plot.signatureName)
+    );
+
+    let newPlots = plots.slice();
+    plotPaths.forEach((path, index) => {
+      newPlots[index] = {
+        ...newPlots[index],
+        plotPath: path,
+      };
     });
+    dispatchExpMutationalProfiles({
+      loading: false,
+    });
+    console.log(newPlots);
+    setRPlot(newPlots);
 
-    try {
-      const reqR = await Promise.all(
-        plots.map((plot, index) =>
-          submitR('mutationalProfiles', {
-            signatureSource: plot.signatureSource,
-            profileName: plot.profileName,
-            refSignatureSet: plot.refSignatureSet,
-            experimentalStrategy: plot.strategy,
-            signatureName: plot.signatureName,
-          }).then((res) => res.json())
-        )
-      );
-
-      let newPlots = plots.slice();
-      reqR.forEach((data, index) => {
-        newPlots[index] = {
-          ...newPlots[index],
-          plotPath: data.output.plotPath,
-        };
-        dispatchExpMutationalProfiles({
-          debugR: debugR + data.debugR,
-        });
-      });
-
-      dispatchExpMutationalProfiles({
-        loading: false,
-      });
-      setRPlot(newPlots);
-    } catch (err) {
-      dispatchError(err);
-      dispatchExpMutationalProfiles({ loading: false });
-    }
+    // dispatchExpMutationalProfiles({
+    //   loading: true,
+    //   err: false,
+    //   debugR: '',
+    // });
+    // try {
+    //   const reqR = await Promise.all(
+    //     plots.map((plot, index) =>
+    //       submitR('mutationalProfiles', {
+    //         signatureSource: plot.signatureSource,
+    //         profileName: plot.profileName,
+    //         refSignatureSet: plot.refSignatureSet,
+    //         experimentalStrategy: plot.strategy,
+    //         signatureName: plot.signatureName,
+    //       }).then((res) => res.json())
+    //     )
+    //   );
+    //   let newPlots = plots.slice();
+    //   reqR.forEach((data, index) => {
+    //     newPlots[index] = {
+    //       ...newPlots[index],
+    //       plotPath: data.output.plotPath,
+    //     };
+    //     dispatchExpMutationalProfiles({
+    //       debugR: debugR + data.debugR,
+    //     });
+    //   });
+    //   dispatchExpMutationalProfiles({
+    //     loading: false,
+    //   });
+    //   setRPlot(newPlots);
+    // } catch (err) {
+    //   dispatchError(err);
+    //   dispatchExpMutationalProfiles({ loading: false });
+    // }
   }
 
   async function setRPlot(plots) {
