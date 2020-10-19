@@ -42,7 +42,6 @@ export default function MutationalSignatureProfile({ submitR }) {
     dispatchExpMutationalProfiles({
       loading: false,
     });
-    console.log(newPlots);
     setRPlot(newPlots);
 
     // dispatchExpMutationalProfiles({
