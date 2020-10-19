@@ -41,7 +41,11 @@ getPublicData <- function(study, cancerType, experimentalStrategy, dataPath) {
   load(paste0(dataPath, 'seqmatrix_refdata_info.RData'))
 
   svgfiles <- seqmatrix_refdata_info %>% mutate(Path = paste0(dataPath, Path))
-  svgfiles_public <- svgfiles %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy)
+  if (cancerType == 'PanCancer') {
+    svgfiles_public <- svgfiles %>% filter(Study == study, Dataset == experimentalStrategy)
+  } else {
+    svgfiles_public <- svgfiles %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy)
+  }
 
   return(toJSON(svgfiles_public, pretty = TRUE, auto_unbox = TRUE))
 }
@@ -55,7 +59,7 @@ profilerSummary <- function(matrixList, projectID, pythonOutput, savePath, dataP
 
   tryCatch({
     output = list()
-    plotPath = paste0(savePath, '/cos_sim_within.svg')
+    plotPath = paste0(savePath, '/profilerSummary.svg')
 
     matrixList = fromJSON(matrixList)
     data_input <- tibble()
@@ -93,7 +97,7 @@ profilerSummaryPublic <- function(study, cancerType, experimentalStrategy, proje
 
   tryCatch({
     output = list()
-    plotPath = paste0(savePath, '/cos_sim_within.svg')
+    plotPath = paste0(savePath, '/profilerSummaryPublic.svg')
 
     publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
     seqmatrix_refdata_public <- get(load(paste0(dataPath, publicDataFile)))
