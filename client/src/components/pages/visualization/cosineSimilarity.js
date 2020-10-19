@@ -148,85 +148,78 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
     }
   }
 
-  async function calculateR(fn, args) {
+  function dispatchRError(fn, status, err = '') {
     if (fn.includes('cosineSimilarityWithin')) {
-      console.log(fn);
       dispatchCosineSimilarity({
-        withinSubmitOverlay: true,
-        withinErr: false,
-        debugR: '',
+        withinErr: status,
+        debugR: err,
       });
     } else if (fn.includes('cosineSimilarityRefSig')) {
       dispatchCosineSimilarity({
-        refSubmitOverlay: true,
-        refErr: false,
-        debugR: '',
+        refErr: status,
+        debugR: err,
       });
     } else {
       dispatchCosineSimilarity({
-        pubSubmitOverlay: true,
-        pubErr: false,
-        debugR: '',
+        pubErr: status,
+        debugR: err,
       });
     }
+  }
+
+  function dispatchOverlay(fn, status) {
+    if (fn.includes('cosineSimilarityWithin')) {
+      dispatchCosineSimilarity({ withinSubmitOverlay: status });
+    } else if (fn.includes('cosineSimilarityRefSig')) {
+      dispatchCosineSimilarity({ refSubmitOverlay: status });
+    } else {
+      dispatchCosineSimilarity({ pubSubmitOverlay: status });
+    }
+  }
+
+  async function calculateR(fn, args) {
+    dispatchOverlay(fn, true);
+    dispatchRError(fn, false);
+
     try {
       const response = await submitR(fn, args);
       if (!response.ok) {
         const err = await response.json();
-        if (fn.includes('cosineSimilarityWithin')) {
-          dispatchCosineSimilarity({
-            withinSubmitOverlay: false,
-            debugR: err,
-          });
-        } else if (fn.includes('cosineSimilarityRefSig')) {
-          dispatchCosineSimilarity({
-            refSubmitOverlay: false,
-            debugR: err,
-          });
-        } else {
-          dispatchCosineSimilarity({
-            pubSubmitOverlay: false,
-            debugR: err,
-          });
-        }
+        dispatchOverlay(fn, false);
+        dispatchRError(fn, true, err);
       } else {
         const { debugR, output } = await response.json();
 
-        if (fn.includes('cosineSimilarityWithin')) {
-          dispatchCosineSimilarity({
-            debugR: debugR,
-            withinSubmitOverlay: false,
-            withinPlotPath: output.plotPath,
-            withinTxtPath: output.txtPath,
-          });
-          setRPlot(output.plotPath, 'within');
-        } else if (fn.includes('cosineSimilarityRefSig')) {
-          dispatchCosineSimilarity({
-            debugR: debugR,
-            refSubmitOverlay: false,
-            refPlotPath: output.plotPath,
-            refTxtPath: output.txtPath,
-          });
-          setRPlot(output.plotPath, 'refsig');
+        if (Object.keys(output).length) {
+          dispatchOverlay(fn, false);
+          dispatchRError(fn, false, debugR);
+          if (fn.includes('cosineSimilarityWithin')) {
+            dispatchCosineSimilarity({
+              withinPlotPath: output.plotPath,
+              withinTxtPath: output.txtPath,
+            });
+            setRPlot(output.plotPath, 'within');
+          } else if (fn.includes('cosineSimilarityRefSig')) {
+            dispatchCosineSimilarity({
+              refPlotPath: output.plotPath,
+              refTxtPath: output.txtPath,
+            });
+            setRPlot(output.plotPath, 'refsig');
+          } else {
+            dispatchCosineSimilarity({
+              pubPlotPath: output.plotPath,
+              pubTxtPath: output.txtPath,
+            });
+            setRPlot(output.plotPath, 'pub');
+          }
         } else {
-          dispatchCosineSimilarity({
-            debugR: debugR,
-            pubSubmitOverlay: false,
-            pubPlotPath: output.plotPath,
-            pubTxtPath: output.txtPath,
-          });
-          setRPlot(output.plotPath, 'pub');
+          dispatchRError(fn, true, debugR);
+          dispatchOverlay(fn, false);
         }
       }
     } catch (err) {
       dispatchError(err);
-      if (fn.includes('cosineSimilarityWithin')) {
-        dispatchCosineSimilarity({ withinSubmitOverlay: false });
-      } else if (fn.includes('cosineSimilarityRefSig')) {
-        dispatchCosineSimilarity({ refSubmitOverlay: false });
-      } else {
-        dispatchCosineSimilarity({ pubSubmitOverlay: false });
-      }
+      dispatchOverlay(fn, false);
     }
   }
 
