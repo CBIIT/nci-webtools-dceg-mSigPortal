@@ -48,14 +48,23 @@ export default function MutationalSignatureProfile({ submitR }) {
         });
       } else {
         const { debugR, output } = await response.json();
-
-        dispatchExpCosineSimilarity({
-          debugR: debugR,
-          loading: false,
-          plotPath: output.plotPath,
-          txtPath: output.txtPath,
-        });
-        setRPlot(output.plotPath);
+        if (Object.keys(output).length) {
+          dispatchExpCosineSimilarity({
+            debugR: debugR,
+            loading: false,
+            plotPath: output.plotPath,
+            txtPath: output.txtPath,
+          });
+          setRPlot(output.plotPath);
+        } else {
+          dispatchExpCosineSimilarity({
+            debugR: debugR,
+            loading: false,
+            err: true,
+            plotPath: '',
+            txtPath: '',
+          });
+        }
       }
     } catch (err) {
       dispatchError(err);

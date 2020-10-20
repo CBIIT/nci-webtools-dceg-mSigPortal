@@ -86,7 +86,7 @@ export default function MutationalPattern({ submitR }) {
         dispatchMutationalPattern({ submitOverlay: false });
       } else {
         const { debugR, output } = await response.json();
-        if (output.plotPath) {
+        if (Object.keys(output).length) {
           dispatchMutationalPattern({
             debugR: debugR,
             plotPath: output.plotPath,

@@ -169,7 +169,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
         const { debugR, output } = await response.json();
 
         if (!fn.includes('With')) {
-          if (output.pca1) {
+          if (Object.keys(output).length) {
             dispatchPCA({
               debugR: debugR,
               submitOverlay: false,
@@ -201,7 +201,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
             });
           }
         } else {
-          if (output.pubPca1) {
+          if (Object.keys(output).length) {
             dispatchPCA({
               debugR: debugR,
               pubSubmitOverlay: false,

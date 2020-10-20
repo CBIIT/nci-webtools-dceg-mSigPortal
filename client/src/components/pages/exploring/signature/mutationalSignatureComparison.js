@@ -51,7 +51,7 @@ export default function MutationalSignatureProfile({ submitR }) {
         });
       } else {
         const { debugR, output } = await response.json();
-        if (output.plotPath) {
+        if (Object.keys(output).length) {
           dispatchExpMutationalSigComparison({
             debugR: debugR,
             loading: false,

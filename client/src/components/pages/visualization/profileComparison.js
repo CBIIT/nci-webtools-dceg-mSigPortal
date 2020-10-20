@@ -269,16 +269,25 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         const { debugR, output } = await response.json();
 
         dispatchProfileComparison({ debugR: debugR });
-
-        if (fn.includes('profileComparisonWithin')) {
-          dispatchProfileComparison({ withinPlotPath: output.plotPath });
-          setRPlot(output.plotPath, 'within');
-        } else if (fn.includes('profileComparisonRefSig')) {
-          dispatchProfileComparison({ refPlotPath: output.plotPath });
-          setRPlot(output.plotPath, 'refsig');
+        if (Object.keys(output).length) {
+          if (fn.includes('profileComparisonWithin')) {
+            dispatchProfileComparison({ withinPlotPath: output.plotPath });
+            setRPlot(output.plotPath, 'within');
+          } else if (fn.includes('profileComparisonRefSig')) {
+            dispatchProfileComparison({ refPlotPath: output.plotPath });
+            setRPlot(output.plotPath, 'refsig');
+          } else {
+            dispatchProfileComparison({ pubPlotPath: output.plotPath });
+            setRPlot(output.plotPath, 'pub');
+          }
         } else {
-          dispatchProfileComparison({ pubPlotPath: output.plotPath });
-          setRPlot(output.plotPath, 'pub');
+          if (fn.includes('profileComparisonWithin')) {
+            dispatchProfileComparison({ withinPlotPath: '', withinErr: true });
+          } else if (fn.includes('profileComparisonRefSig')) {
+            dispatchProfileComparison({ refPlotPath: '', refErr: true });
+          } else {
+            dispatchProfileComparison({ pubPlotPath: '', pubErr: true });
+          }
         }
       }
     } catch (err) {
