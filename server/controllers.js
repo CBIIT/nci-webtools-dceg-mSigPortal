@@ -51,7 +51,6 @@ async function getSummaryFiles(resultsPath) {
   svgList.forEach(
     (plot) => (plot.Path = getRelativePath({ Path: plot.Path }).Path)
   );
-  console.log(svgList);
 
   return {
     svgList: svgList,
@@ -254,6 +253,7 @@ async function getPublicDataOptions(req, res, next) {
 async function getPublicData(req, res, next) {
   logger.info('/getPublicOptions: Calling R Wrapper');
   try {
+    const projectID = uuidv4();
     const list = await r('services/R/visualizeWrapper.R', 'getPublicData', [
       req.body.study,
       req.body.cancerType,
@@ -262,9 +262,15 @@ async function getPublicData(req, res, next) {
     ]);
     logger.info('/getPublicOptions: Complete');
 
-    const projectID = uuidv4();
+    let svgList = JSON.parse(list);
+    svgList.forEach(
+      (plot) => (plot.Path = getRelativePath({ Path: plot.Path }).Path)
+    );
 
-    res.json({ svgList: JSON.parse(list), projectID: projectID });
+    res.json({
+      svgList: svgList,
+      projectID: projectID,
+    });
   } catch (err) {
     logger.info('/getPublicOptions: An error occured');
     logger.error(err);
