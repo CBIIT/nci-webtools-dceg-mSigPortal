@@ -63,7 +63,7 @@ function childProcess() {
 
 app.use(express.static(path.resolve('www')));
 app.use('/results', express.static(config.results.folder));
-app.use('/public', express.static(config.data.folder));
+app.use('/public', express.static(config.data.database));
 app.use(express.json());
 
 app.use((error, req, res, next) => {

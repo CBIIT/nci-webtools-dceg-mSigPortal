@@ -14,7 +14,7 @@ library(stringr)
 # Util Functions
 # get dataframe with column and filter arguments
 getReferenceSignatureData <- function(args, dataPath) {
-  load(paste0(dataPath, 'signature_refsets.RData'))
+  load(paste0(dataPath, 'Signature/signature_refsets.RData'))
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
   sink(con, type = "output")
@@ -47,7 +47,7 @@ getReferenceSignatureData <- function(args, dataPath) {
 # section 1: Current reference signatures in mSigPortal -------------------
 referenceSignatures <- function(projectID, pythonOutput, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
-  load(paste0(dataPath, 'signature_refsets.RData'))
+  load(paste0(dataPath, 'Signature/signature_refsets.RData'))
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
   sink(con, type = "output")
@@ -84,7 +84,7 @@ referenceSignatures <- function(projectID, pythonOutput, savePath, dataPath) {
 # section 2: Mutational signature profile  --------------------------------------------------------------
 mutationalProfiles <- function(signatureSource, profileName, refSignatureSet, experimentalStrategy, signatureName, projectID, pythonOutput, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
-  load(paste0(dataPath, 'signature_refsets.RData'))
+  load(paste0(dataPath, 'Signature/signature_refsets.RData'))
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
   sink(con, type = "output")
@@ -92,7 +92,7 @@ mutationalProfiles <- function(signatureSource, profileName, refSignatureSet, ex
   tryCatch({
     output = list()
 
-    path_profile <- paste0(dataPath, 'Reference_Signature_Profiles_SVG/')
+    path_profile <- paste0(dataPath, 'Signature/Reference_Signature_Profiles_SVG/')
     signature_profile_files <- signature_refsets %>% select(Source, Profile, Signature_set_name, Dataset, Signature_name) %>% unique() %>% mutate(Path = str_replace_all(Signature_set_name, " ", "_"), Path = str_remove_all(Path, "[()]"), Path = paste0(path_profile, Path, "/", Signature_name, ".svg"))
     svgfile_selected <- signature_profile_files %>%
       filter(Source == signatureSource, Profile == profileName, Signature_set_name == refSignatureSet, Dataset == experimentalStrategy, Signature_name == signatureName) %>% pull(Path)
@@ -119,7 +119,7 @@ mutationalProfiles <- function(signatureSource, profileName, refSignatureSet, ex
 cosineSimilarity <- function(profileName, refSignatureSet1, refSignatureSet2, projectID, pythonOutput, savePath, dataPath) {
   # The parameters will be “Matrix Size”, “Reference Signature Set1” and “Reference Signature Set2”. 
   source('services/R/Sigvisualfunc.R')
-  load(paste0(dataPath, 'signature_refsets.RData'))
+  load(paste0(dataPath, 'Signature/signature_refsets.RData'))
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
   sink(con, type = "output")
@@ -163,7 +163,7 @@ cosineSimilarity <- function(profileName, refSignatureSet1, refSignatureSet2, pr
 mutationalSignatureComparison <- function(profileName, refSignatureSet1, signatureName1, refSignatureSet2, signatureName2, projectID, pythonOutput, savePath, dataPath) {
   # The parameters will be “Matrix Size”, “Reference Signature Set1” and “Reference Signature Set2”. 
   source('services/R/Sigvisualfunc.R')
-  load(paste0(dataPath, 'signature_refsets.RData'))
+  load(paste0(dataPath, 'Signature/signature_refsets.RData'))
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
   sink(con, type = "output")
@@ -207,8 +207,8 @@ mutationalSignatureComparison <- function(profileName, refSignatureSet1, signatu
 # section 1: Tumor Mutational Burden -------------------
 tumorBurden <- function(study, strategy, set, size, projectID, pythonOutput, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
-  load(paste0(dataPath, 'signature_refsets.RData'))
-  load(paste0(dataPath, 'seqmatrix_refdata_subset_files.RData'))
+  load(paste0(dataPath, 'Signature/signature_refsets.RData'))
+  load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'))
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
   sink(con, type = "output")

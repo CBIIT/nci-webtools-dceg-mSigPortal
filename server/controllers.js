@@ -63,7 +63,7 @@ async function getSummaryFiles(resultsPath) {
 function getRelativePath(paths) {
   let newPaths = {};
   const resultsPath = path.resolve(config.results.folder);
-  const dataPath = path.resolve(config.data.folder);
+  const dataPath = path.resolve(config.data.database);
 
   Object.keys(paths).map((key) => {
     const fullPath = path.resolve(paths[key]);
@@ -171,12 +171,13 @@ async function visualizeR(req, res, next) {
         'results/output'
       ),
       savePath: savePath,
-      dataPath: path.join(config.data.folder, 'signature_visualization/'),
+      dataPath: path.join(config.data.database),
     });
 
     const { stdout, output } = JSON.parse(wrapper);
     // console.log('wrapper return', JSON.parse(wrapper));
-    console.log('output', output);
+    logger.debug(stdout);
+
     res.json({
       debugR: stdout,
       output: getRelativePath(output),
@@ -196,10 +197,7 @@ async function getReferenceSignatureSets(req, res, next) {
     const list = await r(
       'services/R/visualizeWrapper.R',
       'getReferenceSignatureSets',
-      [
-        req.body.profileType,
-        path.join(config.data.folder, 'signature_visualization/'),
-      ]
+      [req.body.profileType, path.join(config.data.database)]
     );
 
     // console.log('SignatureReferenceSets', list);
@@ -219,7 +217,7 @@ async function getSignatures(req, res, next) {
     const list = await r('services/R/visualizeWrapper.R', 'getSignatures', [
       req.body.profileType,
       req.body.signatureSetName,
-      path.join(config.data.folder, 'signature_visualization/'),
+      path.join(config.data.database),
     ]);
 
     // console.log('signatures', list);
@@ -238,7 +236,7 @@ async function getPublicDataOptions(req, res, next) {
     const list = await r(
       'services/R/visualizeWrapper.R',
       'getPublicDataOptions',
-      [path.join(config.data.folder, 'signature_visualization/')]
+      [path.join(config.data.database)]
     );
 
     res.json(JSON.parse(list));
@@ -258,7 +256,7 @@ async function getPublicData(req, res, next) {
       req.body.study,
       req.body.cancerType,
       req.body.experimentalStrategy,
-      path.join(config.data.folder, 'signature_visualization/'),
+      path.join(config.data.database),
     ]);
     logger.info('/getPublicOptions: Complete');
 
@@ -365,7 +363,7 @@ async function exploringR(req, res, next) {
       'results/output'
     ),
     savePath: savePath,
-    dataPath: path.join(config.data.folder, 'signature_visualization/'),
+    dataPath: path.join(config.data.database),
   }).catch(next);
 
   const { stdout, output } = JSON.parse(wrapper);
@@ -385,7 +383,7 @@ async function getReferenceSignatureData(req, res, next) {
     'getReferenceSignatureData',
     {
       ...req.body,
-      dataPath: path.join(config.data.folder, 'signature_visualization/'),
+      dataPath: path.join(config.data.database),
     }
   ).catch(next);
 

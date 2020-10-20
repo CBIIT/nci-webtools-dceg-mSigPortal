@@ -24,7 +24,7 @@ export default function MutationalSignatureProfile({ submitR }) {
       .replace(/\s/g, '_')
       .replace(/[^a-zA-Z0-9-_]/gi, '');
 
-    return `signature_visualization/Reference_Signature_Profiles_SVG/${set}/${profile}_plots_mSigPortal_${signatureName}.svg`;
+    return `Signature/Reference_Signature_Profiles_SVG/${set}/${profile}_plots_mSigPortal_${signatureName}.svg`;
   }
 
   async function handleCalculate() {
