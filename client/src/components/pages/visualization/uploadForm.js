@@ -121,7 +121,7 @@ export default function UploadForm() {
           },
           body: JSON.stringify({
             args: args,
-            state: state,
+            state: { ...state, submitted: true },
           }),
         });
         if (response.ok) {
@@ -394,7 +394,7 @@ export default function UploadForm() {
               {...mainInputProps()}
               disabled={inputFile.size || submitted}
             />
-            {inputFile.size ? (
+            {inputFile.size || storeFilename ? (
               <button
                 id="removeFile"
                 className="d-flex w-100 faButton"
@@ -402,7 +402,7 @@ export default function UploadForm() {
                 disabled={submitted}
               >
                 <span id="uploadedFile">
-                  {submitted ? storeFilename : inputFile.name}
+                  {inputFile.size ? inputFile.name : storeFilename}
                 </span>
                 <span className="text-danger ml-auto">
                   <FontAwesomeIcon icon={faTimes} />
@@ -589,7 +589,7 @@ export default function UploadForm() {
                 ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
               }
             />
-            {bedFile.size ? (
+            {bedFile.size || bedFilename ? (
               bedFilename.length > 0 && (
                 <button
                   id="removeFile"
@@ -598,7 +598,7 @@ export default function UploadForm() {
                   disabled={submitted}
                 >
                   <span id="uploadedFile">
-                    {submitted ? bedFilename : bedFile.name}
+                    {bedFile.size ? bedFile.name : bedFilename}
                   </span>
                   <span className="text-danger ml-auto">
                     <FontAwesomeIcon icon={faTimes} />
@@ -660,6 +660,7 @@ export default function UploadForm() {
           <Check inline>
             <Check.Input
               type="checkbox"
+              disabled={submitted}
               checked={queueMode}
               onChange={(_) => {
                 dispatchVisualize({ queueMode: !queueMode });
