@@ -30,7 +30,7 @@ export function ErrorModal(props) {
         style={{ backgroundColor: '#fafafa' }}
       >
         <p
-          className="m-0"
+          className="m-0 w-100"
           data-testid="ErrorModalMessage"
           dangerouslySetInnerHTML={{ __html: error.message }}
         />
