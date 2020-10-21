@@ -9,11 +9,7 @@ import {
 } from 'react-bootstrap';
 import { useDropzone } from 'react-dropzone';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faCloudUploadAlt,
-  faTimes,
-  faInfoCircle,
-} from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useSelector } from 'react-redux';
 import './visualization.scss';
@@ -54,7 +50,9 @@ export default function UploadForm() {
   const rootURL = window.location.pathname;
   const [inputFile, setInput] = useState(new File([], ''));
   const [bedFile, setBed] = useState(new File([], ''));
-  const [validEmail, setValid] = useState(false);
+  const [validFile, setValidFile] = useState(false);
+  const [validEmail, setValidEmail] = useState(false);
+  const [checkValid, setCheckValid] = useState(false);
   const onDropMain = useCallback((acceptedFiles) => {
     setInput(acceptedFiles[0]);
     dispatchVisualize({ storeFilename: acceptedFiles[0].name });
@@ -221,7 +219,9 @@ export default function UploadForm() {
     const initialState = getInitialState();
     // clear id from url
     window.location.hash = '#/visualization';
-
+    setCheckValid(false);
+    setValidFile(false);
+    setValidEmail(false);
     resetForm();
     dispatchVisualizeResults(initialState.visualizeResults);
     dispatchProfilerSummary(initialState.profilerSummary);
@@ -308,12 +308,18 @@ export default function UploadForm() {
     dispatchVisualize({ bedFilename: filename });
   }
 
-  function handleEmail(email) {
-    dispatchVisualize({ email: email });
+  function validateForm() {
+    setCheckValid(true);
     const re = new RegExp(
       /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
     );
-    setValid(re.test(email));
+    setValidFile(inputFile.size > 0);
+    if (queueMode) {
+      setValidEmail(re.test(email));
+      return inputFile.size > 0 && re.test(email);
+    } else {
+      return inputFile.size > 0;
+    }
   }
 
   const msPopover = (
@@ -392,10 +398,11 @@ export default function UploadForm() {
             {...mainRootProps({ className: 'dropzone' })}
             disabled={submitted}
           >
-            <input
-              id="fileUpload"
+            <Control
+              as="input"
               {...mainInputProps()}
               disabled={inputFile.size || submitted}
+              isInvalid={checkValid ? !validFile : false}
             />
             {inputFile.size || storeFilename ? (
               <button
@@ -414,7 +421,9 @@ export default function UploadForm() {
             ) : (
               <>
                 <span>Drop files here or click to upload</span>
-                {/* <FontAwesomeIcon icon={faCloudUploadAlt} size="4x" /> */}
+                {!validFile && checkValid && (
+                  <span className="text-danger">Please upload a data file</span>
+                )}
               </>
             )}
           </div>
@@ -611,7 +620,6 @@ export default function UploadForm() {
             ) : (
               <>
                 <span>Drop files here or click to upload</span>
-                {/* <FontAwesomeIcon icon={faCloudUploadAlt} size="4x" /> */}
               </>
             )}
           </div>
@@ -677,9 +685,9 @@ export default function UploadForm() {
             size="sm"
             value={email}
             type="email"
-            onChange={(e) => handleEmail(e.target.value)}
+            onChange={(e) => dispatchVisualize({ email: e.target.value })}
             disabled={!queueMode}
-            isInvalid={queueMode ? !validEmail : false}
+            isInvalid={queueMode && checkValid ? !validEmail : false}
           />
           <Control.Feedback type="invalid">
             Please provide a valid email
@@ -705,16 +713,13 @@ export default function UploadForm() {
         </Col>
         <Col sm="6">
           <Button
-            disabled={
-              !inputFile.size ||
-              submitted ||
-              loading.active ||
-              (queueMode ? !validEmail : false)
-            }
+            disabled={submitted || loading.active}
             className="w-100"
             variant="primary"
             type="button"
-            onClick={(e) => handleSubmit(e)}
+            onClick={() => {
+              if (validateForm()) handleSubmit();
+            }}
           >
             Submit
           </Button>
