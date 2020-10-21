@@ -114,18 +114,18 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     }
   }, [pDataOptions, pubStudy]);
 
-  function setOverlay(type, display) {
-    if (type == 'within') {
-      dispatchProfileComparison({ withinSubmitOverlay: display });
-    } else if (type == 'refsig') {
-      dispatchProfileComparison({ refSubmitOverlay: display });
+  function handleOverlay(fn, status) {
+    if (fn.includes('profileComparisonWithin')) {
+      dispatchProfileComparison({ withinSubmitOverlay: status });
+    } else if (fn.includes('profileComparisonRefSig')) {
+      dispatchProfileComparison({ refSubmitOverlay: status });
     } else {
-      dispatchProfileComparison({ pubSubmitOverlay: display });
+      dispatchProfileComparison({ pubSubmitOverlay: status });
     }
   }
 
-  async function setRPlot(plotPath, type) {
-    setOverlay(type, true);
+  async function setRPlot(plotPath, fn) {
+    handleOverlay(fn, true);
     if (plotPath) {
       try {
         const response = await fetch(`${rootURL}results/${plotPath}`);
@@ -135,12 +135,12 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
           const pic = await response.blob();
           const objectURL = URL.createObjectURL(pic);
 
-          if (type == 'within') {
+          if (fn == 'profileComparisonWithin') {
             if (withinPlotURL) URL.revokeObjectURL(withinPlotURL);
             dispatchProfileComparison({
               withinPlotURL: objectURL,
             });
-          } else if (type == 'refsig') {
+          } else if (fn == 'profileComparisonRefSig') {
             if (refPlotURL) URL.revokeObjectURL(refPlotURL);
             dispatchProfileComparison({
               refPlotURL: objectURL,
@@ -156,10 +156,10 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         dispatchError(err);
       }
     } else {
-      if (type == 'within') {
+      if (fn == 'profileComparisonWithin') {
         if (withinPlotURL) URL.revokeObjectURL(withinPlotURL);
         dispatchProfileComparison({ withinErr: true, withinPlotURL: '' });
-      } else if (type == 'refsig') {
+      } else if (fn == 'profileComparisonRefSig') {
         if (refPlotURL) URL.revokeObjectURL(refPlotURL);
         dispatchProfileComparison({ refErr: true, refPlotURL: '' });
       } else {
@@ -167,7 +167,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         dispatchProfileComparison({ pubErr: true, pubPlotURL: '' });
       }
     }
-    setOverlay(type, false);
+    handleOverlay(fn, false);
   }
 
   // get Signature Reference Sets for dropdown options
@@ -234,21 +234,19 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
   }
 
   async function calculateR(fn, args) {
+    handleOverlay(fn, true);
     if (fn.includes('profileComparisonWithin')) {
       dispatchProfileComparison({
-        withinSubmitOverlay: true,
         withinErr: false,
         debugR: '',
       });
     } else if (fn.includes('profileComparisonRefSig')) {
       dispatchProfileComparison({
-        refSubmitOverlay: true,
         refErr: false,
         debugR: '',
       });
     } else {
       dispatchProfileComparison({
-        pubSubmitOverlay: true,
         pubErr: false,
         debugR: '',
       });
@@ -258,13 +256,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       if (!response.ok) {
         const err = await response.json();
         dispatchProfileComparison({ debugR: err });
-        if (fn.includes('profileComparisonWithin')) {
-          dispatchProfileComparison({ withinSubmitOverlay: false });
-        } else if (fn.includes('profileComparisonRefSig')) {
-          dispatchProfileComparison({ refSubmitOverlay: false });
-        } else {
-          dispatchProfileComparison({ pubSubmitOverlay: false });
-        }
+        handleOverlay(fn, false);
       } else {
         const { debugR, output } = await response.json();
 
@@ -272,15 +264,16 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         if (Object.keys(output).length) {
           if (fn.includes('profileComparisonWithin')) {
             dispatchProfileComparison({ withinPlotPath: output.plotPath });
-            setRPlot(output.plotPath, 'within');
+            setRPlot(output.plotPath, fn);
           } else if (fn.includes('profileComparisonRefSig')) {
             dispatchProfileComparison({ refPlotPath: output.plotPath });
-            setRPlot(output.plotPath, 'refsig');
+            setRPlot(output.plotPath, fn);
           } else {
             dispatchProfileComparison({ pubPlotPath: output.plotPath });
-            setRPlot(output.plotPath, 'pub');
+            setRPlot(output.plotPath, fn);
           }
         } else {
+          handleOverlay(fn, false);
           if (fn.includes('profileComparisonWithin')) {
             dispatchProfileComparison({ withinPlotPath: '', withinErr: true });
           } else if (fn.includes('profileComparisonRefSig')) {
@@ -292,13 +285,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       }
     } catch (err) {
       dispatchError(err);
-      if (fn.includes('profileComparisonWithin')) {
-        dispatchProfileComparison({ withinSubmitOverlay: false });
-      } else if (fn.includes('profileComparisonRefSig')) {
-        dispatchProfileComparison({ refSubmitOverlay: false });
-      } else {
-        dispatchProfileComparison({ pubSubmitOverlay: false });
-      }
+      handleOverlay(fn, false);
     }
   }
 
@@ -317,7 +304,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       ][0],
     };
 
-    setOverlay('pub', true);
+    handleOverlay('pub', true);
     try {
       const response = await fetch(`${rootURL}getPublicData`, {
         method: 'POST',
@@ -348,7 +335,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         pubErr: 'Error retrieving pub data samples',
       });
     }
-    setOverlay('pub', false);
+    handleOverlay('pub', false);
   }
 
   function handleStudyChange(study) {
