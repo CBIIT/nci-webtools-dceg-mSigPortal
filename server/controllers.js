@@ -175,8 +175,7 @@ async function visualizeR(req, res, next) {
     });
 
     const { stdout, output } = JSON.parse(wrapper);
-    // console.log('wrapper return', JSON.parse(wrapper));
-    logger.debug(stdout);
+    // logger.debug(stdout);
 
     res.json({
       debugR: stdout,
