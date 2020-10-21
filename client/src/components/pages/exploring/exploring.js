@@ -6,8 +6,8 @@ import {
   SidebarPanel,
   MainPanel,
 } from '../../controls/sidebar-container/sidebar-container';
-import SignatureExploring from './signature/signatureExploring';
-import ExposureExploring from './exposure/exposureExploring';
+import SignatureExploring from './signature/main';
+import ExposureExploring from './exposure/main';
 import {
   dispatchError,
   dispatchExploring,
