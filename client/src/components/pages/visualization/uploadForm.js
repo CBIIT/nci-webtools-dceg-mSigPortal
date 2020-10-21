@@ -219,10 +219,8 @@ export default function UploadForm() {
 
   function handleReset() {
     const initialState = getInitialState();
-
     // clear id from url
-    let hash = window.location.hash.split('/');
-    window.location.hash = hash.slice(0, hash.length - 1).join('');
+    window.location.hash = '#/visualization';
 
     resetForm();
     dispatchVisualizeResults(initialState.visualizeResults);
