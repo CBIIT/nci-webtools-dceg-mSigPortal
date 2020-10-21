@@ -126,7 +126,9 @@ export default function UploadForm() {
         });
         if (response.ok) {
           // placeholder alert with error modal
-          dispatchSuccess('Your job was successfully submitted to the queue.');
+          dispatchSuccess(
+            `Your job was successfully submitted to the queue. You will recieve an email at ${email} with your results.`
+          );
         } else {
           dispatchVisualizeResults({
             error: 'Please Reset Your Parameters and Try again.',
