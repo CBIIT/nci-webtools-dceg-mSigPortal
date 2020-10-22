@@ -350,7 +350,7 @@ export default function UploadForm() {
   return (
     <Form>
       <Group controlId="fileType">
-        <Label>Choose File Format</Label>
+        <Label>Select File Format</Label>
         <Control
           as="select"
           value={inputFormat}
@@ -430,7 +430,7 @@ export default function UploadForm() {
         </section>
       </Group>
       <Group controlId="genomeAssembly">
-        <Label>Choose Reference Genome Build</Label>
+        <Label>Select Reference Genome Build</Label>
         <Control
           as="select"
           value={selectedGenome}
