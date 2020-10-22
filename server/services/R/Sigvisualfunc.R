@@ -769,7 +769,11 @@ profile_heatmap_plot <- function(data,output_plot = NULL,plot_width=NULL, plot_h
   # max_tmp <- data2 %>% group_by(Profile) %>% summarise(max=max(Ratio))
   # 
   # data2 <- data2 %>% left_join(max_tmp) %>% mutate(value=Ratio/max+Seq)
-  
+  name_max <- max(str_length(unique(data$Sample)))
+  name_len <- length(unique(data$Sample))
+  angle_max <- if_else(name_max < 15, 90, 30)
+  vjust_max <- if_else(name_max < 15, 0.5, 1)
+
   plot_final <- data %>% left_join(profile_tmp) %>% 
     mutate(Sample=factor(Sample,levels = samleve_tmp),Profile=factor(Profile,levels = profile_tmp$Profile)) %>% 
     ggplot(aes(Sample,Profile,fill=(Mutations)))+
@@ -777,16 +781,22 @@ profile_heatmap_plot <- function(data,output_plot = NULL,plot_width=NULL, plot_h
     scale_fill_viridis_c(trans = "log10",label=comma_format(),na.value = 'black')+
     labs(x="",y="",fill="Number of mutations\n")+
     theme_ipsum_rc(grid = FALSE,ticks = FALSE,axis = FALSE)+
-    theme(axis.text.x = element_text(angle = 90,hjust = 1,vjust = 0.5,size = 10),legend.key.width =unit(2, "cm"),legend.position = "top")
+    theme(legend.key.width =unit(2, "cm"),legend.position = "top")
   
+  if(name_len<=80){
+    plot_final <- plot_final + theme(axis.text.x = element_text(angle = angle_max,hjust = 1,vjust = vjust_max,size = 10))
+  } else{
+    plot_final <- plot_final + theme(axis.text.x = element_blank())
+  }
   
   ## define the length of x and y
   leng0 <- 2.5
   leng_ratio <-  0.2
-  xleng <- leng_ratio*(length(unique(data$Sample)))+leng0+2.5
+  
+  xleng <- leng_ratio*(name_len)+leng0+2.5
   
   xleng <- if_else(xleng>15,15,xleng)
-  yleng <- leng_ratio*max(str_length(unique(data$Sample)))+2.5+leng0
+  yleng <- leng_ratio*name_max+2.5+leng0
   
   if(is.null(output_plot)){
     return(plot_final)
@@ -947,23 +957,48 @@ plot_cosine_heatmap_df <- function (cos_sim_df, col_order, cluster_rows = TRUE, 
   
   
   ## define the length of x and y
+  name_max_x <- max(str_length(unique(cos_sim_matrix.m$Signature)))
+  name_max_y <- max(str_length(unique(cos_sim_matrix.m$Sample)))
+  name_len_x <- length(unique(cos_sim_matrix.m$Signature))
+  name_len_y <- length(unique(cos_sim_matrix.m$Sample))
+  
+  angle_max_x <- if_else(name_max_x < 15, 90, 30)
+  vjust_max_x <- if_else(name_max_x < 15, 0.5, 1)
+  
   leng0 <- 2.5
   leng_ratio <-  0.2
-  lenx <- str_length(unique(cos_sim_matrix.m$Signature))*0.5
-  leny <- str_length(unique(cos_sim_matrix.m$Sample))*0.5
-  xleng <- leng_ratio*length(unique(cos_sim_matrix.m$Signature))+leng0+2.5+leny
-  yleng <- leng_ratio*length(unique(cos_sim_matrix.m$Sample))+leng0+4+lenx
+  lenx <- name_max_x*0.4
+  leny <- name_max_y*0.4
+  xleng <- leng_ratio*name_len_x+leng0+3+leny
+  yleng <- leng_ratio*name_len_y+leng0+4+lenx
+  
+  xleng <- if_else(xleng>30,30,xleng)
+  yleng <- if_else(yleng>25,25,yleng)
   
   heatmap = ggplot(cos_sim_matrix.m, aes(x = Signature, y = Sample,  fill = Cosine.sim, order = Sample)) + 
     geom_tile(color = "white") + 
     scale_fill_viridis_c(name = "Cosine similarity\n", limits = c(mincosine, maxcosine),breaks=scales::pretty_breaks())+
     # scale_fill_distiller(palette = "YlGnBu", direction = 1,name = "Cosine similarity", limits = c(0, 1)) + 
     theme_ipsum_rc(grid = FALSE,ticks = T)+
-    theme(axis.text.x = element_text(angle = 90,hjust = 1,vjust = 0.5)) +
+    #theme(axis.text.x = element_text(angle = 90,hjust = 1,vjust = 0.5)) +
     labs(x = NULL, y = NULL)+
     scale_y_discrete(expand = c(0,0))+
     scale_x_discrete(expand = c(0,0))+
-    theme(legend.position = "top",legend.key.width = unit(1.5,"cm"),legend.key.height = unit(0.3,"cm"))
+    theme(legend.position = "top",legend.key.width = unit(2,"cm"))
+  #legend.key.width = unit(1.5,"cm"),legend.key.height = unit(0.3,"cm")
+  
+  
+  if(name_len_x<=80){
+    heatmap <- heatmap + theme(axis.text.x = element_text(angle = angle_max_x,hjust = 1,vjust = vjust_max_x,size = 10))
+  } else{
+    heatmap <- heatmap + theme(axis.text.x = element_blank())
+  }
+  
+  if(name_len_y>80){
+    heatmap <- heatmap + theme(axis.text.y = element_blank())
+  }
+  
+  
   if (plot_values) {
     heatmap = heatmap + geom_text(aes(label = coslab), size = 3,col="red")
   }
@@ -1050,7 +1085,7 @@ plot_compare_profiles_diff <- function (profile1, profile2, profile_names = NULL
       #scale_y_continuous(expand = c(0,0))+
       theme_ipsum_rc(axis_title_just = "m",grid = "Y",axis = TRUE) + 
       ggtitle(paste("RSS = ", RSS, "; Cosine similarity = ", cosine_sim, sep = ""))+
-      theme(axis.title.y = element_text(size = 14, vjust = 1), axis.text.y = element_text(size = 12), axis.title.x = element_text(size = 12), axis.text.x = element_text(size = 6, angle = 90, vjust = 0.5), strip.text.x = element_text(size = 14,hjust = 0.5), strip.text.y = element_text(size = 14,hjust = 0.5),strip.background = element_rect(fill = "#f0f0f0"), panel.grid.major.x = element_blank(), panel.spacing.x = unit(0, "lines"),panel.spacing.y = unit(0.2, "lines"),plot.title = element_text(hjust = 0.5),axis.line.y = element_line(colour = 'black',size = 0.25))+annotate("segment", x=-Inf, xend=Inf, y=-Inf, yend=-Inf,colour = 'black',size = 0.5)#axis.line.x = element_line(colour = 'black',size = 0.25),
+      theme(axis.title.y = element_text(size = 14, vjust = 1), axis.text.y = element_text(size = 12), axis.title.x = element_text(size = 12), axis.text.x = element_text(size = 6, angle = 90, vjust = 0.5), strip.text.x = element_text(size = 14,hjust = 0.5), strip.text.y = element_text(size = 14,hjust = 0.5),strip.background = element_rect(fill = "#f0f0f0"), panel.grid.major.x = element_blank(), panel.spacing.x = unit(0, "lines"),panel.spacing.y = unit(0.2, "lines"),plot.title = element_text(hjust = 0.5),axis.line.y = element_line(colour = 'black',size = 0.25))+annotate("segment", x=-Inf, xend=Inf, y=-Inf, yend=-Inf,colour = 'black',size = 0.5)+geom_vline(xintercept = Inf,colour = 'black',size = 0.5)#axis.line.x = element_line(colour = 'black',size = 0.25),
     #panel_border(color = gray(0.5),size = 0.3)
   }
   else {
@@ -1065,7 +1100,7 @@ plot_compare_profiles_diff <- function (profile1, profile2, profile_names = NULL
       #scale_y_continuous(expand = c(0,0))+
       theme_ipsum_rc(axis_title_just = "m",grid = "Y",axis = TRUE) + 
       ggtitle(paste("RSS = ", RSS, "; Cosine similarity = ", cosine_sim, sep = ""))+
-      theme(axis.title.y = element_text(size = 14, vjust = 1), axis.text.y = element_text(size = 10), axis.title.x = element_text(size = 12), axis.text.x = element_text(size = 6, angle = 90, vjust = 0.5), strip.text.x = element_text(size = 14,hjust = 0.5), strip.text.y = element_text(size = 14,hjust = 0.5),strip.background = element_rect(fill = "#f0f0f0"), panel.grid.major.x = element_blank(), panel.spacing.x = unit(0, "lines"),panel.spacing.y = unit(0.2, "lines"),plot.title = element_text(hjust = 0.5),axis.line.y = element_line(colour = 'black',size = 0.25))+annotate("segment", x=-Inf, xend=Inf, y=-Inf, yend=-Inf,colour = 'black',size = 0.5) #,axis.line.x = element_line(colour = 'black',size = 0.25)
+      theme(axis.title.y = element_text(size = 14, vjust = 1), axis.text.y = element_text(size = 10), axis.title.x = element_text(size = 12), axis.text.x = element_text(size = 6, angle = 90, vjust = 0.5), strip.text.x = element_text(size = 14,hjust = 0.5), strip.text.y = element_text(size = 14,hjust = 0.5),strip.background = element_rect(fill = "#f0f0f0"), panel.grid.major.x = element_blank(), panel.spacing.x = unit(0, "lines"),panel.spacing.y = unit(0.2, "lines"),plot.title = element_text(hjust = 0.5),axis.line.y = element_line(colour = 'black',size = 0.25))+annotate("segment", x=-Inf, xend=Inf, y=-Inf, yend=-Inf,colour = 'black',size = 0.5) +geom_vline(xintercept = Inf,colour = 'black',size = 0.5) #,axis.line.x = element_line(colour = 'black',size = 0.25)
     #     panel_border(color = gray(0.5),size = 0.3)
   }
   if(is.null(output_plot)){
@@ -1128,7 +1163,7 @@ plot_compare_profiles_diff_strand <- function (profile1, profile2, profile_names
       #scale_y_continuous(expand = c(0,0))+
       theme_ipsum_rc(axis_title_just = "m",grid = "Y",axis = TRUE) + 
       ggtitle(paste("RSS = ", RSS, "; Cosine similarity = ", cosine_sim, sep = ""))+
-      theme(axis.title.y = element_text(size = 14, vjust = 1), axis.text.y = element_text(size = 12), axis.title.x = element_text(size = 12), axis.text.x = element_text(size = 6, angle = 90, vjust = 0.5), strip.text.x = element_text(size = 14,hjust = 0.5), strip.text.y = element_text(size = 14,hjust = 0.5),strip.background = element_rect(fill = "#f0f0f0"), panel.grid.major.x = element_blank(), panel.spacing.x = unit(0, "lines"),panel.spacing.y = unit(0.2, "lines"),plot.title = element_text(hjust = 0.5),axis.line.x = element_line(colour = 'black',size = 0.25),axis.line.y = element_line(colour = 'black',size = 0.25))
+      theme(axis.title.y = element_text(size = 14, vjust = 1), axis.text.y = element_text(size = 12), axis.title.x = element_text(size = 12), axis.text.x = element_text(size = 6, angle = 90, vjust = 0.5), strip.text.x = element_text(size = 14,hjust = 0.5), strip.text.y = element_text(size = 14,hjust = 0.5),strip.background = element_rect(fill = "#f0f0f0"), panel.grid.major.x = element_blank(), panel.spacing.x = unit(0, "lines"),panel.spacing.y = unit(0.2, "lines"),plot.title = element_text(hjust = 0.5),axis.line.x = element_line(colour = 'black',size = 0.25),axis.line.y = element_line(colour = 'black',size = 0.25))+geom_vline(xintercept = Inf,colour = 'black',size = 0.5)
     #      panel_border(color = gray(0.5),size = 0.3)
   }
   else {
@@ -1144,7 +1179,7 @@ plot_compare_profiles_diff_strand <- function (profile1, profile2, profile_names
       #scale_y_continuous(expand = c(0,0))+
       theme_ipsum_rc(axis_title_just = "m",grid = "Y",axis = TRUE) + 
       ggtitle(paste("RSS = ", RSS, "; Cosine similarity = ", cosine_sim, sep = ""))+
-      theme(axis.title.y = element_text(size = 14, vjust = 1), axis.text.y = element_text(size = 10), axis.title.x = element_text(size = 12), axis.text.x = element_text(size = 6, angle = 90, vjust = 0.5), strip.text.x = element_text(size = 14,hjust = 0.5), strip.text.y = element_text(size = 14,hjust = 0.5),strip.background = element_rect(fill = "#f0f0f0"), panel.grid.major.x = element_blank(), panel.spacing.x = unit(0, "lines"),panel.spacing.y = unit(0.2, "lines"),plot.title = element_text(hjust = 0.5),axis.line.x = element_line(colour = 'black',size = 0.25),axis.line.y = element_line(colour = 'black',size = 0.25))
+      theme(axis.title.y = element_text(size = 14, vjust = 1), axis.text.y = element_text(size = 10), axis.title.x = element_text(size = 12), axis.text.x = element_text(size = 6, angle = 90, vjust = 0.5), strip.text.x = element_text(size = 14,hjust = 0.5), strip.text.y = element_text(size = 14,hjust = 0.5),strip.background = element_rect(fill = "#f0f0f0"), panel.grid.major.x = element_blank(), panel.spacing.x = unit(0, "lines"),panel.spacing.y = unit(0.2, "lines"),plot.title = element_text(hjust = 0.5),axis.line.x = element_line(colour = 'black',size = 0.25),axis.line.y = element_line(colour = 'black',size = 0.25))+geom_vline(xintercept = Inf,colour = 'black',size = 0.5)
     # panel_border(color = gray(0.5),size = 0.3)
   }
   return(plot)
@@ -1856,8 +1891,18 @@ signature_association <- function(data,cancer_type_input=NULL,signature_both=FAL
 
 
 
-
-
+# Genome2Size  ------------------------------------------------------------
+genome2size <- function(genome){
+  genomesize <- case_when(
+    genome == "hg18" ~ 3080436051/10^6, 
+    genome == "GRCh38" ~ 3217346917/10^6, 
+    genome == "GRch37" ~ 3101976562/10^6, 
+    genome == "mmc10" ~ 2725537669/10^6,
+    genome == "mmc9" ~ 2654911517/10^6,
+    TRUE ~ NA_real_
+  )
+  return(genomesize)
+}
 
 
 
