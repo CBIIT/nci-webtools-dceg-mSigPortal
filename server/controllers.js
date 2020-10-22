@@ -353,25 +353,30 @@ async function exploringR(req, res, next) {
 
   fs.mkdirSync(savePath, { recursive: true });
 
-  const wrapper = await r('services/R/exploringWrapper.R', req.body.fn, {
-    ...req.body.args,
-    projectID: projectID,
-    pythonOutput: path.join(
-      config.results.folder,
-      req.body.projectID,
-      'results/output'
-    ),
-    savePath: savePath,
-    dataPath: path.join(config.data.database),
-  }).catch(next);
+  try {
+    const wrapper = await r('services/R/exploringWrapper.R', req.body.fn, {
+      ...req.body.args,
+      projectID: projectID,
+      pythonOutput: path.join(
+        config.results.folder,
+        req.body.projectID,
+        'results/output'
+      ),
+      savePath: savePath,
+      dataPath: path.join(config.data.database),
+    });
 
-  const { stdout, output } = JSON.parse(wrapper);
+    const { stdout, output } = JSON.parse(wrapper);
 
-  return res.json({
-    debugR: stdout,
-    output: getRelativePath(output),
-    projectID: projectID,
-  });
+    return res.json({
+      debugR: stdout,
+      output: getRelativePath(output),
+      projectID: projectID,
+    });
+  } catch (err) {
+    logger.info(req.body.fn + ' failed');
+    res.json({ debugR: err.stderr });
+  }
 }
 
 async function getReferenceSignatureData(req, res, next) {

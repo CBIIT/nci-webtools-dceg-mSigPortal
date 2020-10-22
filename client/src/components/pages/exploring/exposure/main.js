@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import Tumor from './tumor';
 import Activity from './activity';
+import Association from './association';
 import Decomposition from './decomposition';
 import Landscape from './landscape';
 import Prevalence from './prevalence';
@@ -12,6 +13,9 @@ import {
   dispatchError,
   dispatchExploring,
   dispatchExpExposure,
+  dispatchExpTumor,
+  dispatchExpActivity,
+  dispatchExpAssociation,
 } from '../../../../services/store';
 import Select from '../../../controls/select/select';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -31,11 +35,17 @@ export default function ExposureExploring() {
     studyOptions,
     strategy,
     strategyOptions,
+    refSigData,
     refSignatureSet,
     refSignatureSetOptions,
     genomeSize,
     loading,
   } = useSelector((state) => state.expExposure);
+  const activityArgs = useSelector((state) => state.expActivity);
+  const associationArgs = useSelector((state) => state.expAssociation);
+  const decompositionArgs = useSelector((state) => state.expDecomposition);
+  const landscapeArgs = useSelector((state) => state.expLandscape);
+  const prevalenceArgs = useSelector((state) => state.expPrevalence);
 
   function submitR(fn, args) {
     return fetch(`${rootURL}exploringR`, {
@@ -49,44 +59,80 @@ export default function ExposureExploring() {
         args: args,
         projectID: projectID,
       }),
+    }).then((res) => res.json());
+  }
+
+  // async function calculateTumor(fn, args) {
+  //   console.log(fn);
+  //   // dispatchExpTumor({
+  //   //   loading: true,
+  //   //   err: false,
+  //   //   debugR: '',
+  //   // });
+
+  //   try {
+  //     const response = await submitR(fn, args);
+  //     if (!response.ok) {
+  //       const err = await response.json();
+
+  //       // dispatchExpTumor({
+  //       //   loading: false,
+  //       //   debugR: err,
+  //       // });
+  //     } else {
+  //       const { debugR, output } = await response.json();
+
+  //       // dispatchExpTumor({
+  //       //   debugR: debugR,
+  //       //   loading: false,
+  //       //   plotPath: output.plotPath,
+  //       //   txtPath: output.txtPath,
+  //       // });
+  //       // setRPlot(output.plotPath);
+  //     }
+  //   } catch (err) {
+  //     dispatchError(err);
+  //     // dispatchExpTumor({ loading: false });
+  //   }
+  // }
+
+  async function handleCalculate() {
+    dispatchExpExposure({ loading: true });
+
+    const { debugR, output } = await submitR('exposurePublic', {
+      common: JSON.stringify({
+        study: study,
+        strategy: strategy,
+        refSignatureSet: refSignatureSet,
+        genomeSize: parseFloat(genomeSize),
+      }),
+      activity: JSON.stringify({ signatureName: activityArgs.signatureName }),
+      association: JSON.stringify({
+        signatureName1: associationArgs.signatureName1,
+        signatureName2: associationArgs.signatureName2,
+      }),
+      decomposition: JSON.stringify({}),
     });
-  }
 
-  async function calculateTumor(fn, args) {
-    console.log(fn);
-    // dispatchExpTumor({
-    //   loading: true,
-    //   err: false,
-    //   debugR: '',
-    // });
-
-    try {
-      const response = await submitR(fn, args);
-      if (!response.ok) {
-        const err = await response.json();
-
-        // dispatchExpTumor({
-        //   loading: false,
-        //   debugR: err,
-        // });
-      } else {
-        const { debugR, output } = await response.json();
-
-        // dispatchExpTumor({
-        //   debugR: debugR,
-        //   loading: false,
-        //   plotPath: output.plotPath,
-        //   txtPath: output.txtPath,
-        // });
-        // setRPlot(output.plotPath);
-      }
-    } catch (err) {
-      dispatchError(err);
-      // dispatchExpTumor({ loading: false });
+    if (output) {
+      if (output.tumorPath)
+        dispatchExpTumor({
+          plotPath: output.tumorPath,
+          debugR: debugR,
+          err: false,
+        });
+      else dispatchExpTumor({ err: true, debugR: debugR });
+      if (output.activityPath)
+        dispatchExpActivity({
+          plotPath: output.activityPath,
+          debugR: debugR,
+          err: false,
+        });
+      else dispatchExpActivity({ err: true, debugR: debugR });
     }
-  }
 
-  async function handleCalculate() {}
+    dispatchExpExposure({ loading: false });
+  }
 
   function handleStudy(study) {
     const strategyOptions = [
@@ -104,9 +150,23 @@ export default function ExposureExploring() {
     });
   }
 
+  function handleSet(set) {
+    const signatureNameOptions = [
+      ...new Set(
+        refSigData
+          .filter((row) => row.Signature_set_name == set)
+          .map((row) => row.Signature_name)
+      ),
+    ];
+    dispatchExpExposure({
+      refSignatureSet: set,
+      signatureNameOptions: signatureNameOptions,
+    });
+  }
+
   const sections = [
     {
-      component: <Tumor submitR={(fn, args) => submitR(fn, args)} />,
+      component: <Tumor />,
       id: 'tumor',
       title: 'Tumor Mutational Burden',
     },
@@ -114,6 +174,11 @@ export default function ExposureExploring() {
       component: <Activity submitR={(fn, args) => submitR(fn, args)} />,
       id: 'activity',
       title: 'Mutational Signature Activity',
+    },
+    {
+      component: <Association submitR={(fn, args) => submitR(fn, args)} />,
+      id: 'association',
+      title: 'Mutational Signature Association',
     },
     {
       component: <Decomposition submitR={(fn, args) => submitR(fn, args)} />,
@@ -163,9 +228,7 @@ export default function ExposureExploring() {
                 label="Reference Signature Set"
                 value={refSignatureSet}
                 options={refSignatureSetOptions}
-                onChange={(set) =>
-                  dispatchExpExposure({ refSignatureSet: set })
-                }
+                onChange={handleSet}
               />
             </Col>
             <Col sm="3">
@@ -183,17 +246,7 @@ export default function ExposureExploring() {
               </Group>
             </Col>
             <Col sm="1" className="m-auto">
-              <Button
-                variant="primary"
-                onClick={() => {
-                  handleCalculate('tumorBurden', {
-                    study: study,
-                    strategy: strategy,
-                    refSignatureSet: refSignatureSet,
-                    genomeSize: parseFloat(genomeSize),
-                  });
-                }}
-              >
+              <Button variant="primary" onClick={() => handleCalculate()}>
                 Calculate
               </Button>
             </Col>

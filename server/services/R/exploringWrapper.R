@@ -204,21 +204,111 @@ mutationalSignatureComparison <- function(profileName, refSignatureSet1, signatu
 }
 
 # Exposure Explore -------------------------------------------------------
-# section 1: Tumor Mutational Burden -------------------
-tumorBurden <- function(study, strategy, set, size, projectID, pythonOutput, savePath, dataPath) {
+exposurePublic <- function(common, activity, association, decomposition, projectID, pythonOutput, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'Signature/signature_refsets.RData'))
-  load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'))
+  load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata.RData'))
+  # load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'))
+  load(paste0(dataPath, 'Exposure/exposure_refdata.RData'))
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
   sink(con, type = "output")
 
   tryCatch({
     output = list()
-    plotPath = paste0(savePath, 'tumorMutationalBurden.svg')
+    tumorPath = paste0(savePath, 'tumorMutationalBurden.svg')
+    activityPath = paste0(savePath, 'mutationalSignatureActivity.svg')
+    associationPath = paste0(savePath, 'mutationalSignatureAssociation.svg')
+    decompositionPath = paste0(savePath, 'mutationalSignatureDecomposition.svg')
+
+    # parse arguments
+    common = fromJSON(common)
+    activity = fromJSON(activity)
+    association = fromJSON(association)
+    decomposition = fromJSON(decomposition)
+
+    exposure_refdata_selected <- exposure_refdata %>% filter(Study == common$study, Dataset == common$strategy, Signature_set_name == common$refSignatureSet)
+
+    ## reduce the data for signature and profile
+    signature_refsets %>% select(Profile, Signature_set_name) %>% unique()
+    signature_refsets_selected <- signature_refsets %>%
+      filter(Signature_set_name == common$refSignatureSet)
+
+    # files <- seqmatrix_refdata_subset_files %>% filter(Study == common$study, Dataset == common$strategy) %>% pull(file)
+    # for (seqmatrix in files) {
+    #   seqmatrix_refdata <- get(load(paste0(dataPath, 'Seqmatrix/', seqmatrix)))
+    # }
+
+    seqmatrix_refdata_selected <- seqmatrix_refdata %>% filter(Study == common$study, Dataset == common$strategy, Profile == signature_refsets_selected$Profile[1])
+
+    ## Tumor Overall Mutational Burden
+    data_input <- exposure_refdata_selected %>%
+      group_by(Cancer_Type, Sample) %>%
+      summarise(Burden = log10(sum(Exposure) / common$genomeSize)) %>%
+      ungroup()
+    # put this barplot on the web
+    TMBplot(data_input, output_plot = tumorPath)
+
+    # # Mutational Signature Activity
+
+    data_input <- exposure_refdata_selected %>%
+      filter(Signature_name == activity$signatureName) %>%
+      group_by(Cancer_Type, Sample) %>%
+      summarise(Burden = log10(sum(Exposure) / common$genomeSize)) %>%
+      ungroup()
+    # put this barplot on the web
+    TMBplot(data_input, output_plot = activityPath, addnote = activity$signatureName)
+
+    # Mutational Signature Assocaition
+    # cancer_type_input <- NULL ## toggle to select specific cancer type or combine all cancer type data (default)
+    # signature_both <- FALSE ## toggle to choose samples with both signature detected
 
 
-    output = list('plotPath' = plotPath)
+    # data_input <- left_join(
+    #   exposure_refdata_selected %>%
+    #     filter(Signature_name == association$signatureName1) %>%
+    #     rename(Exposure1 = Exposure) %>%
+    #     select(-Signature_name),
+
+    #   exposure_refdata_selected %>%
+    #     filter(Signature_name == association$signatureName2) %>%
+    #     rename(Exposure2 = Exposure) %>%
+    #     select(-Signature_name)
+    # )
+
+    # signature_association(data = data_input, cancer_type_input = cancer_type_input, signature_both = signature_both, output_plot = associationPath)
+
+    # Evaluating the Performance of Mutational Signature Decomposition --------
+
+    # exposure_refdata_input <- exposure_refdata_selected %>% mutate(Sample = paste0(Cancer_Type, "@", Sample)) %>%
+    #   select(Sample, Signature_name, Exposure) %>%
+    #   pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure)
+
+    # signature_refsets_input <- signature_refsets_selected %>%
+    #   select(MutationType, Signature_name, Contribution) %>%
+    #   pivot_wider(id_cols = MutationType, names_from = Signature_name, values_from = Contribution) %>%
+    #   arrange(MutationType) # have to sort the mutationtype
+
+    # seqmatrix_refdata_input <- seqmatrix_refdata_selected %>% mutate(Sample = paste0(Cancer_Type, "@", Sample)) %>%
+    #   select(MutationType, Sample, Mutations) %>%
+    #   pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
+    #   arrange(MutationType) ## have to sort the mutation type
+
+
+    # decompsite_input <- calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
+    # decompsite_input <- decompsite_input %>% separate(col = Sample_Names, into = c('Cancer_Type', 'Sample'), sep = '@')
+    # decompsite_input %>% write_delim('tmp.txt', delim = '\t', col_names = T) ## put the link to download this table
+
+    # decompsite_distribution(decompsite = decompsite_input, output_plot = decompositionPath) # put the distribution plot online.
+
+
+    output = list(
+      'tumorPath' = tumorPath,
+      'activityPath' = activityPath,
+      'associationPath' = associationPath,
+      'decompositionPath' = decompositionPath
+      )
+
   }, error = function(e) {
     print(e)
   }, finally = {

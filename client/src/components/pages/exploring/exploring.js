@@ -16,6 +16,7 @@ import {
   dispatchExpMutationalSigComparison,
   dispatchExpTumor,
   dispatchExpActivity,
+  dispatchExpAssociation,
   dispatchExpDecomposition,
   dispatchExpLandscape,
   dispatchExpPrevalence,
@@ -79,7 +80,7 @@ export default function Explore() {
     dispatchExpExposure({ loading: true });
 
     try {
-      let [publicData, referenceSignatures] = await Promise.all([
+      let [publicData, refSigData] = await Promise.all([
         fetch(`${rootURL}getPublicDataOptions`, {
           method: 'POST',
           headers: {
@@ -87,7 +88,7 @@ export default function Explore() {
             'Content-Type': 'application/json',
           },
         }),
-        getReferenceSignatureData(['Signature_set_name']),
+        getReferenceSignatureData(['Signature_set_name', 'Signature_name']),
       ]);
 
       if (!publicData.ok) {
@@ -117,7 +118,15 @@ export default function Explore() {
         ];
         const refSignatureSetOptions = [
           ...new Set(
-            referenceSignatures.output.data.map((row) => row.Signature_set_name)
+            refSigData.output.data.map((row) => row.Signature_set_name)
+          ),
+        ];
+        const refSignatureSet = refSignatureSetOptions[0];
+        const signatureNameOptions = [
+          ...new Set(
+            refSigData.output.data
+              .filter((row) => row.Signature_set_name == refSignatureSet)
+              .map((row) => row.Signature_name)
           ),
         ];
 
@@ -135,8 +144,10 @@ export default function Explore() {
           studyOptions: studyOptions,
           strategy: strategyOptions[0],
           strategyOptions: strategyOptions,
-          refSignatureSet: refSignatureSetOptions[0],
+          refSigData: refSigData.output.data,
+          refSignatureSet: refSignatureSet,
           refSignatureSetOptions: refSignatureSetOptions,
+          signatureNameOptions: signatureNameOptions,
         };
         const landscapeParams = {
           cancer: cancer,

@@ -198,6 +198,7 @@ export const getInitialState = () => ({
     exposureAccordion: {
       tumor: true,
       activity: true,
+      association: true,
       decomposition: true,
       landscape: true,
       prevalence: true,
@@ -277,27 +278,35 @@ export const getInitialState = () => ({
     studyOptions: [],
     strategy: '',
     strategyOptions: [],
+    refSigData: [],
     refSignatureSet: '',
     refSignatureSetOptions: [],
+    signatureNameOptions: [],
     genomeSize: '3102',
     loading: false,
   },
   expTumor: {
     plotPath: '',
     plotURL: '',
-    txtPath: '',
     debugR: '',
     err: '',
-    displayDebug: false,
-    loading: false,
   },
   expActivity: {
+    signatureName: '',
+    plotPath: '',
+    plotURL: '',
+    debugR: '',
+    err: '',
+    loading: false,
+  },
+  expAssociation: {
+    signatureName1: '',
+    signatureName2: '',
     plotPath: '',
     plotURL: '',
     txtPath: '',
     debugR: '',
     err: '',
-    displayDebug: false,
     loading: false,
   },
   expDecomposition: {
@@ -306,7 +315,6 @@ export const getInitialState = () => ({
     txtPath: '',
     debugR: '',
     err: '',
-    displayDebug: false,
     loading: false,
   },
   expLandscape: {
@@ -317,7 +325,6 @@ export const getInitialState = () => ({
     txtPath: '',
     debugR: '',
     err: '',
-    displayDebug: false,
     loading: false,
   },
   expPrevalence: {
@@ -326,7 +333,6 @@ export const getInitialState = () => ({
     txtPath: '',
     debugR: '',
     err: '',
-    displayDebug: false,
     loading: false,
   },
   error: {
@@ -569,6 +575,18 @@ const expActivitySlice = createSlice({
     },
   },
 });
+const expAssocationSlice = createSlice({
+  name: 'expAssocation',
+  initialState: getInitialState().expAssociation,
+  reducers: {
+    updateExpAssociation: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
 const expDecompositionSlice = createSlice({
   name: 'expDecomposition',
   initialState: getInitialState().expDecomposition,
@@ -625,6 +643,7 @@ const rootReducer = combineReducers({
   expExposure: expExposureSlice.reducer,
   expTumor: expTumorSlice.reducer,
   expActivity: expActivitySlice.reducer,
+  expAssociation: expAssocationSlice.reducer,
   expDecomposition: expDecompositionSlice.reducer,
   expLandscape: expLandscapeSlice.reducer,
   expPrevalence: expPrevalenceSlice.reducer,
@@ -657,6 +676,7 @@ export const {
 export const { updateExpExposure } = expExposureSlice.actions;
 export const { updateExpTumor } = expTumorSlice.actions;
 export const { updateExpActivity } = expActivitySlice.actions;
+export const { updateExpAssociation } = expAssocationSlice.actions;
 export const { updateExpDecomposition } = expDecompositionSlice.actions;
 export const { updateExpLandscape } = expLandscapeSlice.actions;
 export const { updateExpPrevalence } = expPrevalenceSlice.actions;
@@ -738,6 +758,9 @@ export function dispatchExpTumor(obj) {
 }
 export function dispatchExpActivity(obj) {
   store.dispatch(updateExpActivity(obj));
+}
+export function dispatchExpAssociation(obj) {
+  store.dispatch(updateExpAssociation(obj));
 }
 export function dispatchExpDecomposition(obj) {
   store.dispatch(updateExpDecomposition(obj));

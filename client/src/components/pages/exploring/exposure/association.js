@@ -1,25 +1,29 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { dispatchError, dispatchExpActivity } from '../../../../services/store';
+import {
+  dispatchError,
+  dispatchExpAssociation,
+} from '../../../../services/store';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
 
-export default function Activity({ submitR }) {
+export default function Association({ submitR }) {
   const rootURL = window.location.pathname;
   const { signatureNameOptions, loading: mainLoading } = useSelector(
     (state) => state.expExposure
   );
   const {
-    signatureName,
+    signatureName1,
+    signatureName2,
     plotPath,
     plotURL,
     debugR,
     err,
     loading,
-  } = useSelector((state) => state.expActivity);
+  } = useSelector((state) => state.expAssociation);
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
@@ -27,12 +31,15 @@ export default function Activity({ submitR }) {
 
   useEffect(() => {
     if (signatureNameOptions.length)
-      dispatchExpActivity({ signatureName: signatureNameOptions[0] });
+      dispatchExpAssociation({
+        signatureName1: signatureNameOptions[0],
+        signatureName2: signatureNameOptions[1] || signatureNameOptions[0],
+      });
   }, [signatureNameOptions]);
 
   // async function calculateR(fn, args) {
   //   console.log(fn);
-  //   dispatchExpActivity({
+  //   dispatchExpAssociation({
   //     loading: true,
   //     err: false,
   //     debugR: '',
@@ -43,14 +50,14 @@ export default function Activity({ submitR }) {
   //     if (!response.ok) {
   //       const err = await response.json();
 
-  //       dispatchExpActivity({
+  //       dispatchExpAssociation({
   //         loading: false,
   //         debugR: err,
   //       });
   //     } else {
   //       const { debugR, output } = await response.json();
 
-  //       dispatchExpActivity({
+  //       dispatchExpAssociation({
   //         debugR: debugR,
   //         loading: false,
   //         plotPath: output.plotPath,
@@ -60,7 +67,7 @@ export default function Activity({ submitR }) {
   //     }
   //   } catch (err) {
   //     dispatchError(err);
-  //     dispatchExpActivity({ loading: false });
+  //     dispatchExpAssociation({ loading: false });
   //   }
   // }
 
@@ -75,7 +82,7 @@ export default function Activity({ submitR }) {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchExpActivity({
+          dispatchExpAssociation({
             plotURL: objectURL,
           });
         }
@@ -84,7 +91,7 @@ export default function Activity({ submitR }) {
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchExpActivity({ err: true, plotURL: '' });
+      dispatchExpAssociation({ err: true, plotURL: '' });
     }
   }
 
@@ -96,12 +103,23 @@ export default function Activity({ submitR }) {
           <Row className="justify-content-center">
             <Col sm="2">
               <Select
-                id="activitySignatureName"
-                label="Signature Name"
-                value={signatureName}
+                id="associationSignatureName1"
+                label="Signature Name 1"
+                value={signatureName1}
                 options={signatureNameOptions}
                 onChange={(name) =>
-                  dispatchExpActivity({ signatureName: name })
+                  dispatchExpAssociation({ signatureName1: name })
+                }
+              />
+            </Col>
+            <Col sm="2">
+              <Select
+                id="associationSignatureName2"
+                label="Signature Name 2"
+                value={signatureName2}
+                options={signatureNameOptions}
+                onChange={(name) =>
+                  dispatchExpAssociation({ signatureName2: name })
                 }
               />
             </Col>
@@ -121,7 +139,7 @@ export default function Activity({ submitR }) {
               </Button>
             </Col>
           </Row>
-          <div id="activityPlot">
+          <div id="associationPlot">
             {err && (
               <p>
                 An error has occured. Check the debug section for more info.
