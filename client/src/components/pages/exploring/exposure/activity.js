@@ -105,7 +105,8 @@ export default function Activity({ submitR }) {
                 }
               />
             </Col>
-            <Col sm="1" className="my-auto ml-auto">
+            <Col sm="9" />
+            <Col sm="1" className="my-auto">
               <Button
                 variant="primary"
                 onClick={() => {

@@ -123,7 +123,8 @@ export default function Association({ submitR }) {
                 }
               />
             </Col>
-            <Col sm="1" className="my-auto ml-auto">
+            <Col sm="7" />
+            <Col sm="1" className="my-auto">
               <Button
                 variant="primary"
                 onClick={() => {
