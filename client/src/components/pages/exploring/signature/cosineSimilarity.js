@@ -30,7 +30,6 @@ export default function MutationalSignatureProfile({ submitR }) {
   const { displayTab, refSigData } = useSelector((state) => state.exploring);
 
   async function calculateR(fn, args) {
-    console.log(fn);
     dispatchExpCosineSimilarity({
       loading: true,
       err: false,
