@@ -204,7 +204,7 @@ mutationalSignatureComparison <- function(profileName, refSignatureSet1, signatu
 }
 
 # Exposure Explore -------------------------------------------------------
-exposurePublic <- function(common, activity, association, decomposition, projectID, pythonOutput, savePath, dataPath) {
+exposurePublic <- function(common, activity, association, projectID, pythonOutput, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'Signature/signature_refsets.RData'))
   load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata.RData'))
@@ -220,17 +220,24 @@ exposurePublic <- function(common, activity, association, decomposition, project
     activityPath = paste0(savePath, 'mutationalSignatureActivity.svg')
     associationPath = paste0(savePath, 'mutationalSignatureAssociation.svg')
     decompositionPath = paste0(savePath, 'mutationalSignatureDecomposition.svg')
+    decompositionData = paste0(savePath, 'mutationalSignatureDecomposition.txt')
 
     # parse arguments
     common = fromJSON(common)
     activity = fromJSON(activity)
     association = fromJSON(association)
-    decomposition = fromJSON(decomposition)
 
     exposure_refdata_selected <- exposure_refdata %>% filter(Study == common$study, Dataset == common$strategy, Signature_set_name == common$refSignatureSet)
 
+    genome <- case_when(
+    common$study == "PCAWG" ~ "GRCh37",
+    common$study == "TCGA" ~ "GRCh37",
+    TRUE ~ NA_character_
+  )
+    genomesize = genome2size(genome)
+
     ## reduce the data for signature and profile
-    signature_refsets %>% select(Profile, Signature_set_name) %>% unique()
+    # signature_refsets %>% select(Profile, Signature_set_name) %>% unique()
     signature_refsets_selected <- signature_refsets %>%
       filter(Signature_set_name == common$refSignatureSet)
 
@@ -244,7 +251,7 @@ exposurePublic <- function(common, activity, association, decomposition, project
     ## Tumor Overall Mutational Burden
     data_input <- exposure_refdata_selected %>%
       group_by(Cancer_Type, Sample) %>%
-      summarise(Burden = log10(sum(Exposure) / common$genomeSize)) %>%
+      summarise(Burden = log10(sum(Exposure) / genomesize)) %>%
       ungroup()
     # put this barplot on the web
     TMBplot(data_input, output_plot = tumorPath)
@@ -254,7 +261,7 @@ exposurePublic <- function(common, activity, association, decomposition, project
     data_input <- exposure_refdata_selected %>%
       filter(Signature_name == activity$signatureName) %>%
       group_by(Cancer_Type, Sample) %>%
-      summarise(Burden = log10(sum(Exposure) / common$genomeSize)) %>%
+      summarise(Burden = log10(sum(Exposure) / genomesize)) %>%
       ungroup()
     # put this barplot on the web
     TMBplot(data_input, output_plot = activityPath, addnote = activity$signatureName)
@@ -280,33 +287,34 @@ exposurePublic <- function(common, activity, association, decomposition, project
 
     # Evaluating the Performance of Mutational Signature Decomposition --------
 
-    # exposure_refdata_input <- exposure_refdata_selected %>% mutate(Sample = paste0(Cancer_Type, "@", Sample)) %>%
-    #   select(Sample, Signature_name, Exposure) %>%
-    #   pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure)
+    exposure_refdata_input <- exposure_refdata_selected %>% mutate(Sample = paste0(Cancer_Type, "@", Sample)) %>%
+      select(Sample, Signature_name, Exposure) %>%
+      pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure)
 
-    # signature_refsets_input <- signature_refsets_selected %>%
-    #   select(MutationType, Signature_name, Contribution) %>%
-    #   pivot_wider(id_cols = MutationType, names_from = Signature_name, values_from = Contribution) %>%
-    #   arrange(MutationType) # have to sort the mutationtype
+    signature_refsets_input <- signature_refsets_selected %>%
+      select(MutationType, Signature_name, Contribution) %>%
+      pivot_wider(id_cols = MutationType, names_from = Signature_name, values_from = Contribution) %>%
+      arrange(MutationType) # have to sort the mutationtype
 
-    # seqmatrix_refdata_input <- seqmatrix_refdata_selected %>% mutate(Sample = paste0(Cancer_Type, "@", Sample)) %>%
-    #   select(MutationType, Sample, Mutations) %>%
-    #   pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
-    #   arrange(MutationType) ## have to sort the mutation type
+    seqmatrix_refdata_input <- seqmatrix_refdata_selected %>% mutate(Sample = paste0(Cancer_Type, "@", Sample)) %>%
+      select(MutationType, Sample, Mutations) %>%
+      pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
+      arrange(MutationType) ## have to sort the mutation type
 
 
-    # decompsite_input <- calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
-    # decompsite_input <- decompsite_input %>% separate(col = Sample_Names, into = c('Cancer_Type', 'Sample'), sep = '@')
-    # decompsite_input %>% write_delim('tmp.txt', delim = '\t', col_names = T) ## put the link to download this table
+    decompsite_input <- calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
+    decompsite_input <- decompsite_input %>% separate(col = Sample_Names, into = c('Cancer_Type', 'Sample'), sep = '@')
+    decompsite_input %>% write_delim(decompositionData, delim = '\t', col_names = T) ## put the link to download this table
 
-    # decompsite_distribution(decompsite = decompsite_input, output_plot = decompositionPath) # put the distribution plot online.
+    decompsite_distribution(decompsite = decompsite_input, output_plot = decompositionPath) # put the distribution plot online.
 
 
     output = list(
       'tumorPath' = tumorPath,
       'activityPath' = activityPath,
       'associationPath' = associationPath,
-      'decompositionPath' = decompositionPath
+      'decompositionPath' = decompositionPath,
+      'decompositionData' = decompositionData
       )
 
   }, error = function(e) {

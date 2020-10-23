@@ -39,12 +39,11 @@ export default function ExposureExploring() {
     refSigData,
     refSignatureSet,
     refSignatureSetOptions,
-    genomeSize,
+    datasource,
     loading,
   } = useSelector((state) => state.expExposure);
   const activityArgs = useSelector((state) => state.expActivity);
   const associationArgs = useSelector((state) => state.expAssociation);
-  const decompositionArgs = useSelector((state) => state.expDecomposition);
   const landscapeArgs = useSelector((state) => state.expLandscape);
   const prevalenceArgs = useSelector((state) => state.expPrevalence);
 
@@ -105,14 +104,12 @@ export default function ExposureExploring() {
         study: study,
         strategy: strategy,
         refSignatureSet: refSignatureSet,
-        genomeSize: parseFloat(genomeSize),
       }),
       activity: JSON.stringify({ signatureName: activityArgs.signatureName }),
       association: JSON.stringify({
         signatureName1: associationArgs.signatureName1,
         signatureName2: associationArgs.signatureName2,
       }),
-      decomposition: JSON.stringify({}),
     });
 
     if (output) {
@@ -129,6 +126,7 @@ export default function ExposureExploring() {
           debugR: debugR,
           err: false,
         });
+      else dispatchExpActivity({ err: true, debugR: debugR });
       if (output.associationPath)
         dispatchExpAssociation({
           plotPath: output.associationPath,
@@ -139,6 +137,7 @@ export default function ExposureExploring() {
       if (output.decompositionPath)
         dispatchExpDecomposition({
           plotPath: output.decompositionPath,
+          txtPath: output.decompositionData,
           debugR: debugR,
           err: false,
         });
@@ -195,7 +194,7 @@ export default function ExposureExploring() {
       title: 'Mutational Signature Association',
     },
     {
-      component: <Decomposition submitR={(fn, args) => submitR(fn, args)} />,
+      component: <Decomposition />,
       id: 'decomposition',
       title: 'Evaluating the Performance of Mutational Signature Decomposition',
     },
@@ -245,20 +244,7 @@ export default function ExposureExploring() {
                 onChange={handleSet}
               />
             </Col>
-            <Col sm="3">
-              <Group controlId="tumorGenomeSize">
-                <Label>Genome Size</Label>
-                <Control
-                  value={genomeSize}
-                  onChange={(e) => {
-                    dispatchExpExposure({
-                      genomeSize: e.target.value,
-                    });
-                  }}
-                />
-                {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
-              </Group>
-            </Col>
+            <Col sm="3"></Col>
             <Col sm="1" className="m-auto">
               <Button variant="primary" onClick={() => handleCalculate()}>
                 Calculate
