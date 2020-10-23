@@ -156,7 +156,8 @@ async function visualizeR(req, res, next) {
     config.results.folder,
     req.body.projectID,
     'results',
-    req.body.fn
+    req.body.fn,
+    '/'
   );
 
   fs.mkdirSync(savePath, { recursive: true });
@@ -348,7 +349,8 @@ async function exploringR(req, res, next) {
     config.results.folder,
     projectID,
     'results',
-    req.body.fn
+    req.body.fn,
+    '/'
   );
 
   fs.mkdirSync(savePath, { recursive: true });
