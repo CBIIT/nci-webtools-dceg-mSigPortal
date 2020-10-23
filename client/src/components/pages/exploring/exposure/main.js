@@ -113,6 +113,10 @@ export default function ExposureExploring() {
         signatureName1: associationArgs.signatureName1,
         signatureName2: associationArgs.signatureName2,
       }),
+      landscape: JSON.stringify({
+        cancerType: landscapeArgs.cancer,
+        varDataPath: landscapeArgs.varDataPath,
+      }),
     });
 
     if (output) {
@@ -145,6 +149,13 @@ export default function ExposureExploring() {
           err: false,
         });
       else dispatchExpDecomposition({ err: true, debugR: debugR });
+      if (output.landscapePath)
+        dispatchExpLandscape({
+          plotPath: output.landscapePath,
+          debugR: debugR,
+          err: false,
+        });
+      else dispatchExpLandscape({ err: true, debugR: debugR });
     }
 
     dispatchExpExposure({ loading: false });

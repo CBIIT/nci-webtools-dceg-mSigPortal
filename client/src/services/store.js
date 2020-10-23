@@ -318,6 +318,7 @@ export const getInitialState = () => ({
   expLandscape: {
     cancer: '',
     cancerOptions: [],
+    varDataPath: '',
     plotPath: '',
     plotURL: '',
     txtPath: '',

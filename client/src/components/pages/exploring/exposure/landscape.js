@@ -23,6 +23,7 @@ export default function Tumor({ submitR }) {
   const {
     cancer,
     cancerOptions,
+    varDataPath,
     plotPath,
     plotURL,
     txtPath,
@@ -32,6 +33,10 @@ export default function Tumor({ submitR }) {
   } = useSelector((state) => state.expLandscape);
 
   const [vdFile, setFile] = useState(new File([], ''));
+
+  useEffect(() => {
+    if (plotPath) setRPlot(plotPath);
+  }, [plotPath]);
 
   async function calculateR(fn, args) {
     console.log(fn);
@@ -152,6 +157,7 @@ export default function Tumor({ submitR }) {
               <Form.File
                 id="variableData"
                 label={vdFile.name || 'Upload here'}
+                // accept=''
                 onChange={(e) => setFile(e.target.files[0])}
                 custom
               />
