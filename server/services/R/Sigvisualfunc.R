@@ -1873,8 +1873,8 @@ signature_association <- function(data,cancer_type_input=NULL,signature_both=FAL
     data=data %>% mutate(Exposure1=log10(Exposure1+1),Exposure2=log10(Exposure2+1)),
     x=Exposure1,
     y=Exposure2,
-    xlab=paste0('Nubmer of mutations in ',signature_name_input1, ' (log10)'),
-    ylab=paste0('Nubmer of mutations in ',signature_name_input2,' (log10)'),
+    xlab=paste0('Nubmer of mutations in ','signature_name_input1', ' (log10)'),
+    ylab=paste0('Nubmer of mutations in ','signature_name_input2',' (log10)'),
     marginal.type = "density",
     messages=FALSE,
   )

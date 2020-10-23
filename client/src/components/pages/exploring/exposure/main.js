@@ -16,6 +16,7 @@ import {
   dispatchExpTumor,
   dispatchExpActivity,
   dispatchExpAssociation,
+  dispatchExpDecomposition,
 } from '../../../../services/store';
 import Select from '../../../controls/select/select';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -128,7 +129,20 @@ export default function ExposureExploring() {
           debugR: debugR,
           err: false,
         });
-      else dispatchExpActivity({ err: true, debugR: debugR });
+      if (output.associationPath)
+        dispatchExpAssociation({
+          plotPath: output.associationPath,
+          debugR: debugR,
+          err: false,
+        });
+      else dispatchExpAssociation({ err: true, debugR: debugR });
+      if (output.decompositionPath)
+        dispatchExpDecomposition({
+          plotPath: output.decompositionPath,
+          debugR: debugR,
+          err: false,
+        });
+      else dispatchExpDecomposition({ err: true, debugR: debugR });
     }
 
     dispatchExpExposure({ loading: false });

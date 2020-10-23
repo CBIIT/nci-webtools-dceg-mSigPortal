@@ -260,23 +260,23 @@ exposurePublic <- function(common, activity, association, decomposition, project
     TMBplot(data_input, output_plot = activityPath, addnote = activity$signatureName)
 
     # Mutational Signature Assocaition
-    # cancer_type_input <- NULL ## toggle to select specific cancer type or combine all cancer type data (default)
-    # signature_both <- FALSE ## toggle to choose samples with both signature detected
+    cancer_type_input <- NULL ## toggle to select specific cancer type or combine all cancer type data (default)
+    signature_both <- FALSE ## toggle to choose samples with both signature detected
 
 
-    # data_input <- left_join(
-    #   exposure_refdata_selected %>%
-    #     filter(Signature_name == association$signatureName1) %>%
-    #     rename(Exposure1 = Exposure) %>%
-    #     select(-Signature_name),
+    data_input <- left_join(
+      exposure_refdata_selected %>%
+        filter(Signature_name == association$signatureName1) %>%
+        rename(Exposure1 = Exposure) %>%
+        select(-Signature_name),
 
-    #   exposure_refdata_selected %>%
-    #     filter(Signature_name == association$signatureName2) %>%
-    #     rename(Exposure2 = Exposure) %>%
-    #     select(-Signature_name)
-    # )
+      exposure_refdata_selected %>%
+        filter(Signature_name == association$signatureName2) %>%
+        rename(Exposure2 = Exposure) %>%
+        select(-Signature_name)
+    )
 
-    # signature_association(data = data_input, cancer_type_input = cancer_type_input, signature_both = signature_both, output_plot = associationPath)
+    signature_association(data = data_input, cancer_type_input = cancer_type_input, signature_both = signature_both, output_plot = associationPath)
 
     # Evaluating the Performance of Mutational Signature Decomposition --------
 
