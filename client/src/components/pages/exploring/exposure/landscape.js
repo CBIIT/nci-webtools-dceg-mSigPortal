@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
@@ -16,12 +16,9 @@ export default function Tumor({ submitR }) {
   const rootURL = window.location.pathname;
   const {
     study,
-    studyOptions,
     strategy,
-    strategyOptions,
     refSignatureSet,
-    refSignatureSetOptions,
-    genomeSize,
+    loading: mainLoading,
   } = useSelector((state) => state.expExposure);
   const {
     cancer,
@@ -31,12 +28,8 @@ export default function Tumor({ submitR }) {
     txtPath,
     debugR,
     err,
-    displayDebug,
     loading,
   } = useSelector((state) => state.expLandscape);
-  const { displayTab, publicDataOptions } = useSelector(
-    (state) => state.exploring
-  );
 
   const [vdFile, setFile] = useState(new File([], ''));
 
@@ -98,95 +91,47 @@ export default function Tumor({ submitR }) {
     }
   }
 
-  function handleStudy(study) {
-    const cancerOptions = [
-      ...new Set(
-        publicDataOptions
-          .filter((data) => data.Study == study)
-          .map((data) => data.Cancer_Type)
-      ),
-    ];
-    const strategyOptions = [
-      ...new Set(
-        publicDataOptions
-          .filter(
-            (data) =>
-              data.Study == study && data.Cancer_Type == cancerOptions[0]
-          )
-          .map((data) => data.Dataset)
-      ),
-    ];
-
-    dispatchExpLandscape({
-      study: study,
-      cancer: cancerOptions[0],
-      cancerOptions: cancerOptions,
-      strategy: strategyOptions[0],
-      strategyOptions: strategyOptions,
-    });
-  }
-
-  function handleCancer(cancer) {
-    const strategyOptions = [
-      ...new Set(
-        publicDataOptions
-          .filter((data) => data.Study == study && data.Cancer_Type == cancer)
-          .map((data) => data.Dataset)
-      ),
-    ];
-
-    dispatchExpLandscape({
-      cancer: cancer,
-      strategy: strategyOptions[0],
-      strategyOptions: strategyOptions,
-    });
-  }
-
   async function handleSubmit() {
-    dispatchExpLandscape({ loading: true });
-
-    const { projectID } = await upload();
-    if (projectID) {
-      calculateR('cosineSimilarity', {
-        projectID: projectID,
-        study: study,
-        cancer: cancer,
-        strategy: strategy,
-        refSignatureSet: refSignatureSet,
-        genomeSize: parseFloat(genomeSize),
-      });
-    }
-    dispatchExpLandscape({ loading: false });
-  }
-
-  async function upload() {
-    try {
-      const data = new FormData();
-      data.append('inputFile', vdFile);
-      let response = await fetch(`${rootURL}upload`, {
-        method: 'POST',
-        body: data,
-      });
-
-      if (!response.ok) {
-        const { msg, error } = await response.json();
-        const message = `<div>
-          <p>${msg}</p>
-         ${error ? `<p>${error}</p>` : ''} 
-        </div>`;
-        dispatchError(message);
-      } else {
-        return await response.json();
-      }
-    } catch (err) {
-      dispatchError(err);
-    }
+    //   dispatchExpLandscape({ loading: true });
+    //   const { projectID } = await upload();
+    //   if (projectID) {
+    //     calculateR('cosineSimilarity', {
+    //       projectID: projectID,
+    //       study: study,
+    //       cancer: cancer,
+    //       strategy: strategy,
+    //       refSignatureSet: refSignatureSet,
+    //     });
+    //   }
+    //   dispatchExpLandscape({ loading: false });
+    // }
+    // async function upload() {
+    //   try {
+    //     const data = new FormData();
+    //     data.append('inputFile', vdFile);
+    //     let response = await fetch(`${rootURL}upload`, {
+    //       method: 'POST',
+    //       body: data,
+    //     });
+    //     if (!response.ok) {
+    //       const { msg, error } = await response.json();
+    //       const message = `<div>
+    //         <p>${msg}</p>
+    //        ${error ? `<p>${error}</p>` : ''}
+    //       </div>`;
+    //       dispatchError(message);
+    //     } else {
+    //       return await response.json();
+    //     }
+    //   } catch (err) {
+    //     dispatchError(err);
+    //   }
   }
 
   return (
     <div>
       <Form>
-        <LoadingOverlay active={loading} />
+        <LoadingOverlay active={loading || mainLoading} />
         <div>
           <Row className="justify-content-center">
             <Col sm="2">
@@ -195,7 +140,11 @@ export default function Tumor({ submitR }) {
                 label="Cancer Type"
                 value={cancer}
                 options={cancerOptions}
-                onChange={(cancer) => handleCancer(cancer)}
+                onChange={(cancer) =>
+                  dispatchExpLandscape({
+                    cancer: cancer,
+                  })
+                }
               />
             </Col>
             <Col sm="4">

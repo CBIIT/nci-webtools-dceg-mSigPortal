@@ -17,6 +17,7 @@ import {
   dispatchExpActivity,
   dispatchExpAssociation,
   dispatchExpDecomposition,
+  dispatchExpLandscape,
 } from '../../../../services/store';
 import Select from '../../../controls/select/select';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -27,11 +28,13 @@ const { Group, Label, Control, Text } = Form;
 
 export default function ExposureExploring() {
   const rootURL = window.location.pathname;
-  const { displayTab, projectID, exposureAccordion } = useSelector(
-    (state) => state.exploring
-  );
   const {
+    displayTab,
+    projectID,
+    exposureAccordion,
     publicDataOptions,
+  } = useSelector((state) => state.exploring);
+  const {
     study,
     studyOptions,
     strategy,
@@ -156,10 +159,23 @@ export default function ExposureExploring() {
       ),
     ];
 
+    const cancerOptions = [
+      ...new Set(
+        publicDataOptions
+          .filter((data) => data.Study == study)
+          .map((data) => data.Cancer_Type)
+      ),
+    ];
+
     dispatchExpExposure({
       study: study,
       strategy: strategyOptions[0],
       strategyOptions: strategyOptions,
+    });
+
+    dispatchExpLandscape({
+      cancer: cancerOptions[0],
+      cancerOptions: cancerOptions,
     });
   }
 

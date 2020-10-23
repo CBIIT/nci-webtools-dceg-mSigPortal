@@ -128,15 +128,6 @@ export default function Explore() {
           ),
         ];
 
-        const strategyOptions2 = [
-          ...new Set(
-            data
-              .filter(
-                (data) => data.Study == study && data.Cancer_Type == cancer
-              )
-              .map((data) => data.Dataset)
-          ),
-        ];
         const params = {
           study: study,
           studyOptions: studyOptions,
@@ -150,8 +141,6 @@ export default function Explore() {
         const landscapeParams = {
           cancer: cancer,
           cancerOptions: cancerOptions,
-          strategy: strategyOptions2[0],
-          strategyOptions: strategyOptions2,
         };
 
         dispatchExploring({ publicDataOptions: data });

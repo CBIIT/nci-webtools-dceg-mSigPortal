@@ -272,7 +272,6 @@ export const getInitialState = () => ({
     loading: false,
   },
   expExposure: {
-    publicDataOptions: [],
     study: '',
     studyOptions: [],
     strategy: '',
