@@ -59,7 +59,7 @@ profilerSummary <- function(matrixList, projectID, pythonOutput, savePath, dataP
 
   tryCatch({
     output = list()
-    plotPath = paste0(savepath, 'profilerSummary.svg')
+    plotPath = paste0(savePath, 'profilerSummary.svg')
 
     matrixList = fromJSON(matrixList)
     data_input <- tibble()
@@ -97,7 +97,7 @@ profilerSummaryPublic <- function(study, cancerType, experimentalStrategy, proje
 
   tryCatch({
     output = list()
-    plotPath = paste0(savepath, 'profilerSummaryPublic.svg')
+    plotPath = paste0(savePath, 'profilerSummaryPublic.svg')
 
     publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
     seqmatrix_refdata_public <- get(load(paste0(dataPath, 'Seqmatrix/', publicDataFile)))
@@ -130,8 +130,8 @@ cosineSimilarityWithin <- function(matrixFile, projectID, pythonOutput, savePath
 
   tryCatch({
     output = list()
-    plotPath = paste0(savepath, 'cos_sim_within.svg')
-    txtPath = paste0(savepath, 'cos_sim_within.txt')
+    plotPath = paste0(savePath, 'cos_sim_within.svg')
+    txtPath = paste0(savePath, 'cos_sim_within.txt')
 
     data_input <- read_delim(matrixFile, delim = '\t')
     data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
@@ -160,8 +160,8 @@ cosineSimilarityWithinPublic <- function(profileType, matrixSize, study, cancerT
 
   tryCatch({
     output = list()
-    plotPath = paste0(savepath, 'cos_sim_within.svg')
-    txtPath = paste0(savepath, 'cos_sim_within.txt')
+    plotPath = paste0(savePath, 'cos_sim_within.svg')
+    txtPath = paste0(savePath, 'cos_sim_within.txt')
 
     publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
     seqmatrix_refdata_public <- get(load(paste0(dataPath, 'Seqmatrix/', publicDataFile)))
@@ -199,8 +199,8 @@ cosineSimilarityRefSig <- function(profileType, signatureSetName, matrixList, pr
 
   tryCatch({
     output = list()
-    plotPath = paste0(savepath, 'cos_sim_refsig.svg')
-    txtPath = paste0(savepath, 'cos_sim_refsig.txt')
+    plotPath = paste0(savePath, 'cos_sim_refsig.svg')
+    txtPath = paste0(savePath, 'cos_sim_refsig.txt')
 
     profile_name <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
     signature_refsets_data <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == signatureSetName)
@@ -240,8 +240,8 @@ cosineSimilarityRefSigPublic <- function(profileType, signatureSetName, study, c
 
   tryCatch({
     output = list()
-    plotPath = paste0(savepath, 'cos_sim_refsig.svg')
-    txtPath = paste0(savepath, 'cos_sim_refsig.txt')
+    plotPath = paste0(savePath, 'cos_sim_refsig.svg')
+    txtPath = paste0(savePath, 'cos_sim_refsig.txt')
 
     profile_name <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
     signature_refsets_data <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == signatureSetName)
@@ -284,8 +284,8 @@ cosineSimilarityPublic <- function(matrixFile, study, cancerType, profileName, p
 
   tryCatch({
     output = list()
-    plotPath = paste0(savepath, 'cos_sim_public.svg')
-    txtPath = paste0(savepath, 'cos_sim_public.txt')
+    plotPath = paste0(savePath, 'cos_sim_public.svg')
+    txtPath = paste0(savePath, 'cos_sim_public.txt')
 
 
     ## input data
@@ -328,7 +328,7 @@ profileComparisonWithin <- function(profileType, sampleName1, sampleName2, matri
 
   tryCatch({
     output = list()
-    plotPath = paste0(savepath, 'pro_com_within.svg')
+    plotPath = paste0(savePath, 'pro_com_within.svg')
 
     matrix_size <- if_else(profileType == "SBS", "96", if_else(profileType == "DBS", "78", if_else(profileType == "ID", "83", NA_character_)))
 
@@ -361,7 +361,7 @@ profileComparisonWithinPublic <- function(profileType, sampleName1, sampleName2,
 
   tryCatch({
     output = list()
-    plotPath = paste0(savepath, 'pro_com_within.svg')
+    plotPath = paste0(savePath, 'pro_com_within.svg')
 
     matrix_size <- if_else(profileType == "SBS", "96", if_else(profileType == "DBS", "78", if_else(profileType == "ID", "83", NA_character_)))
     profile_name <- paste0(profileType, matrix_size)
@@ -400,7 +400,7 @@ profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, c
 
   tryCatch({
     output = list()
-    plotPath = paste0(savepath, 'pro_com_refsig.svg')
+    plotPath = paste0(savePath, 'pro_com_refsig.svg')
 
     profile_name <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
     matrix_size <- if_else(profileType == "SBS", "96", if_else(profileType == "DBS", "78", if_else(profileType == "ID", "83", NA_character_)))
@@ -447,7 +447,7 @@ profileComparisonRefSigPublic <- function(profileType, sampleName, signatureSetN
 
   tryCatch({
     output = list()
-    plotPath = paste0(savepath, 'pro_com_refsig.svg')
+    plotPath = paste0(savePath, 'pro_com_refsig.svg')
 
     profile_name <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
 
@@ -493,7 +493,7 @@ profileComparisonPublic <- function(profileName, matrixFile, userSample, study, 
 
   tryCatch({
     output = list()
-    plotPath = paste0(savepath, 'pro_com_public.svg')
+    plotPath = paste0(savePath, 'pro_com_public.svg')
 
     ## input data
     data_input <- read_delim(matrixFile, delim = '\t')
@@ -532,8 +532,8 @@ mutationalPattern <- function(matrixFile, proportion, pattern, projectID, python
 
   tryCatch({
     output = list()
-    plotPath = paste0(savepath, 'mpea.svg')
-    txtPath = paste0(savepath, 'mpea.txt')
+    plotPath = paste0(savePath, 'mpea.svg')
+    txtPath = paste0(savePath, 'mpea.txt')
 
     data_input <- read_delim(matrixFile, delim = '\t')
     data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0) %>%
@@ -554,7 +554,7 @@ mutationalPattern <- function(matrixFile, proportion, pattern, projectID, python
     context_plot(data = data_input, pattern = pattern, data_return = TRUE) %>%
     arrange(desc(N1)) %>% write_delim(txtPath, delim = '\t', col_names = T)
     if (dim(data_tmp) > 0) {
-      barPath = paste0(savepath, 'barchart.svg')
+      barPath = paste0(savePath, 'barchart.svg')
       barchart_plot2(data = data_tmp, plot_width = 16, plot_height = 5, output_plot = barPath)
       output = list('barPath' = barPath, 'plotPath' = plotPath, 'txtPath' = txtPath)
     } else {
@@ -584,9 +584,9 @@ mutationalPatternPublic <- function(study, cancerType, experimentalStrategy, pro
 
   tryCatch({
     output = list()
-    barPath = paste0(savepath, 'barchart.svg')
-    plotPath = paste0(savepath, 'mpea.svg')
-    txtPath = paste0(savepath, 'mpea.txt')
+    barPath = paste0(savePath, 'barchart.svg')
+    plotPath = paste0(savePath, 'mpea.svg')
+    txtPath = paste0(savePath, 'mpea.txt')
 
     data_tmp <- content_data_all %>%
       filter(N1 > proportion, str_detect(Study, paste0("^", study, "@"))) %>%
@@ -632,13 +632,13 @@ pca <- function(profileType, signatureSetName, matrixList, projectID, pythonOutp
 
   tryCatch({
     output = list()
-    pca1 = paste0(savepath, 'pca1.svg')
-    pca2 = paste0(savepath, 'pca2.svg')
-    pca3 = paste0(savepath, 'pca3.svg')
-    heatmap = paste0(savepath, 'heatmap.svg')
-    pca2Data = paste0(savepath, 'pca2_data.txt')
-    pca3Data = paste0(savepath, 'pca3_data.txt')
-    heatmapData = paste0(savepath, 'heatmap_data.txt')
+    pca1 = paste0(savePath, 'pca1.svg')
+    pca2 = paste0(savePath, 'pca2.svg')
+    pca3 = paste0(savePath, 'pca3.svg')
+    heatmap = paste0(savePath, 'heatmap.svg')
+    pca2Data = paste0(savePath, 'pca2_data.txt')
+    pca3Data = paste0(savePath, 'pca3_data.txt')
+    heatmapData = paste0(savePath, 'heatmap_data.txt')
 
 
 
@@ -731,13 +731,13 @@ pcaPublic <- function(profileType, signatureSetName, study, cancerType, experime
 
   tryCatch({
     output = list()
-    pca1 = paste0(savepath, 'pca1.svg')
-    pca2 = paste0(savepath, 'pca2.svg')
-    pca3 = paste0(savepath, 'pca3.svg')
-    heatmap = paste0(savepath, 'heatmap.svg')
-    pca2Data = paste0(savepath, 'pca2_data.txt')
-    pca3Data = paste0(savepath, 'pca3_data.txt')
-    heatmapData = paste0(savepath, 'heatmap_data.txt')
+    pca1 = paste0(savePath, 'pca1.svg')
+    pca2 = paste0(savePath, 'pca2.svg')
+    pca3 = paste0(savePath, 'pca3.svg')
+    heatmap = paste0(savePath, 'heatmap.svg')
+    pca2Data = paste0(savePath, 'pca2_data.txt')
+    pca3Data = paste0(savePath, 'pca3_data.txt')
+    heatmapData = paste0(savePath, 'heatmap_data.txt')
 
 
 
@@ -834,11 +834,11 @@ pcaWithPublic <- function(matrixFile, study, cancerType, profileName, projectID,
 
   tryCatch({
     output = list()
-    pca1 = paste0(savepath, 'pca1_with_public_.svg')
-    pca2 = paste0(savepath, 'pca2_with_public_.svg')
-    pca3 = paste0(savepath, 'pca3_with_public_.svg')
-    pca2Data = paste0(savepath, 'pca2_data_with_public_.txt')
-    pca3Data = paste0(savepath, 'pca3_data_with_public_.txt')
+    pca1 = paste0(savePath, 'pca1_with_public_.svg')
+    pca2 = paste0(savePath, 'pca2_with_public_.svg')
+    pca3 = paste0(savePath, 'pca3_with_public_.svg')
+    pca2Data = paste0(savePath, 'pca2_data_with_public_.txt')
+    pca3Data = paste0(savePath, 'pca3_data_with_public_.txt')
 
 
     data_input1 <- read_delim(matrixFile, delim = '\t')
