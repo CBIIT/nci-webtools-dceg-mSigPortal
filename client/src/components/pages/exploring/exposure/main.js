@@ -25,7 +25,6 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 
 const { Header, Body } = Card;
 const { Toggle, Collapse } = Accordion;
-const { Group, Label, Control, Text } = Form;
 
 export default function ExposureExploring() {
   const rootURL = window.location.pathname;

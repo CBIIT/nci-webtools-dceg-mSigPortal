@@ -10,20 +10,14 @@ import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
 
-const { Group, Label, Control } = Form;
+const { Label } = Form;
 
-export default function Tumor({ submitR }) {
+export default function Tumor() {
   const rootURL = window.location.pathname;
-  const {
-    study,
-    strategy,
-    refSignatureSet,
-    loading: mainLoading,
-  } = useSelector((state) => state.expExposure);
+  const { loading: mainLoading } = useSelector((state) => state.expExposure);
   const {
     cancer,
     cancerOptions,
-    varDataPath,
     plotPath,
     plotURL,
     txtPath,
@@ -37,40 +31,6 @@ export default function Tumor({ submitR }) {
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
   }, [plotPath]);
-
-  async function calculateR(fn, args) {
-    console.log(fn);
-    dispatchExpLandscape({
-      loading: true,
-      err: false,
-      debugR: '',
-    });
-
-    try {
-      const response = await submitR(fn, args);
-      if (!response.ok) {
-        const err = await response.json();
-
-        dispatchExpLandscape({
-          loading: false,
-          debugR: err,
-        });
-      } else {
-        const { debugR, output } = await response.json();
-
-        dispatchExpLandscape({
-          debugR: debugR,
-          loading: false,
-          plotPath: output.plotPath,
-          txtPath: output.txtPath,
-        });
-        setRPlot(output.plotPath);
-      }
-    } catch (err) {
-      dispatchError(err);
-      dispatchExpLandscape({ loading: false });
-    }
-  }
 
   async function setRPlot(plotPath) {
     if (plotPath) {
@@ -96,41 +56,37 @@ export default function Tumor({ submitR }) {
     }
   }
 
-  async function handleSubmit() {
-    //   dispatchExpLandscape({ loading: true });
-    //   const { projectID } = await upload();
-    //   if (projectID) {
-    //     calculateR('cosineSimilarity', {
-    //       projectID: projectID,
-    //       study: study,
-    //       cancer: cancer,
-    //       strategy: strategy,
-    //       refSignatureSet: refSignatureSet,
-    //     });
-    //   }
-    //   dispatchExpLandscape({ loading: false });
-    // }
-    // async function upload() {
-    //   try {
-    //     const data = new FormData();
-    //     data.append('inputFile', vdFile);
-    //     let response = await fetch(`${rootURL}upload`, {
-    //       method: 'POST',
-    //       body: data,
-    //     });
-    //     if (!response.ok) {
-    //       const { msg, error } = await response.json();
-    //       const message = `<div>
-    //         <p>${msg}</p>
-    //        ${error ? `<p>${error}</p>` : ''}
-    //       </div>`;
-    //       dispatchError(message);
-    //     } else {
-    //       return await response.json();
-    //     }
-    //   } catch (err) {
-    //     dispatchError(err);
-    //   }
+  async function handleSubmit() {}
+
+  async function handleUpload() {
+    if (vdFile.size) {
+      dispatchExpLandscape({ loading: true });
+
+      try {
+        const data = new FormData();
+        data.append('inputFile', vdFile);
+        let response = await fetch(`${rootURL}upload`, {
+          method: 'POST',
+          body: data,
+        });
+
+        if (!response.ok) {
+          const { msg, error } = await response.json();
+          const message = `<div>
+          <p>${msg}</p>
+         ${error ? `<p>${error}</p>` : ''} 
+        </div>`;
+          dispatchError(message);
+        } else {
+          const { filePath } = await response.json();
+          dispatchExpLandscape({ varDataPath: filePath });
+        }
+      } catch (err) {
+        dispatchError(err);
+      }
+
+      dispatchExpLandscape({ loading: false });
+    }
   }
 
   return (
@@ -162,7 +118,16 @@ export default function Tumor({ submitR }) {
                 custom
               />
             </Col>
-            <Col sm="5" />
+            <Col sm="1" className="my-auto">
+              <Button
+                variant="secondary"
+                onClick={handleUpload}
+                disabled={!vdFile.size}
+              >
+                Upload
+              </Button>
+            </Col>
+            <Col sm="4" />
             <Col sm="1" className="m-auto">
               <Button variant="primary" onClick={() => handleSubmit()}>
                 Calculate
