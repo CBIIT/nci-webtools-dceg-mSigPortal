@@ -206,8 +206,6 @@ export const getInitialState = () => ({
     refSigData: {},
     publicDataOptions: {},
     projectID: '',
-    source: 'public',
-    openSidebar: false,
     submitted: false,
   },
   expRefSig: {
@@ -274,6 +272,7 @@ export const getInitialState = () => ({
     loading: false,
   },
   expExposure: {
+    publicDataOptions: [],
     study: '',
     studyOptions: [],
     strategy: '',
@@ -282,7 +281,7 @@ export const getInitialState = () => ({
     refSignatureSet: '',
     refSignatureSetOptions: [],
     signatureNameOptions: [],
-    genomeSize: '3102',
+    datasource: 'public',
     loading: false,
   },
   expTumor: {

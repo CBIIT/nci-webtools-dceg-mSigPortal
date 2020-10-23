@@ -34,8 +34,6 @@ export default function Explore() {
     projectID,
     refSigData,
     publicDataOptions,
-    source,
-    openSidebar,
     submitted,
   } = useSelector((state) => state.exploring);
 
@@ -289,103 +287,43 @@ export default function Explore() {
 
   return (
     <div className="position-relative">
-      <SidebarContainer
-        className="m-3"
-        collapsed={!openSidebar}
-        onCollapsed={(e) => dispatchExploring({ openSidebar: !e })}
-      >
-        <SidebarPanel>
-          <div className="p-3 shadow-sm bg-white">
-            <Row>
-              <Col sm="auto">
-                <Group className="d-flex">
-                  <Label className="mr-auto">
-                    <h3 className="mb-2">Data Source</h3>
-                  </Label>
-                  <Check inline id="radioPublic" className="ml-4">
-                    <Check.Input
-                      disabled={submitted}
-                      type="radio"
-                      value="public"
-                      checked={source == 'public'}
-                      onChange={(e) => dispatchExploring({ source: 'public' })}
-                    />
-                    <Check.Label className="font-weight-normal">
-                      Public
-                    </Check.Label>
-                  </Check>
-                  <Check inline id="radioUser">
-                    <Check.Input
-                      disabled={submitted}
-                      type="radio"
-                      value="user"
-                      checked={source == 'user'}
-                      onChange={(e) => dispatchExploring({ source: 'user' })}
-                    />
-                    <Check.Label className="font-weight-normal">
-                      User
-                    </Check.Label>
-                  </Check>
-                </Group>
-              </Col>
-            </Row>
-            <Row style={{ display: source == 'user' ? 'block' : 'none' }}>
-              <Col sm="auto" className="w-100">
-                {/* <UploadForm /> */}
-              </Col>
-            </Row>
-            <Row style={{ display: source == 'public' ? 'block' : 'none' }}>
-              <Col sm="auto" className="w-100">
-                {/* <PublicForm /> */}
-              </Col>
-            </Row>
-          </div>
-          <hr className="d-lg-none" style={{ opacity: 0 }}></hr>
-        </SidebarPanel>
-        <MainPanel>
-          <div
-            className="p-3 shadow-sm bg-white"
-            style={{ minHeight: '420px' }}
+      <div className="p-3 shadow-sm bg-white">
+        <Card>
+          <Header>
+            <Nav variant="pills" defaultActiveKey="#mutationalProfiles">
+              {[
+                { title: 'Signature Exploring', id: 'signatureExploring' },
+                { title: 'Exposure Exploring', id: 'exposureExploring' },
+              ].map(({ title, id }) => {
+                return (
+                  <Item key={id}>
+                    <Link
+                      active={displayTab == id}
+                      onClick={() => dispatchExploring({ displayTab: id })}
+                    >
+                      {title}
+                    </Link>
+                  </Item>
+                );
+              })}
+            </Nav>
+          </Header>
+          <Body
+            style={{
+              display: displayTab == 'signatureExploring' ? 'block' : 'none',
+            }}
           >
-            <Card>
-              <Header>
-                <Nav variant="pills" defaultActiveKey="#mutationalProfiles">
-                  {[
-                    { title: 'Signature Exploring', id: 'signatureExploring' },
-                    { title: 'Exposure Exploring', id: 'exposureExploring' },
-                  ].map(({ title, id }) => {
-                    return (
-                      <Item key={id}>
-                        <Link
-                          active={displayTab == id}
-                          onClick={() => dispatchExploring({ displayTab: id })}
-                        >
-                          {title}
-                        </Link>
-                      </Item>
-                    );
-                  })}
-                </Nav>
-              </Header>
-              <Body
-                style={{
-                  display:
-                    displayTab == 'signatureExploring' ? 'block' : 'none',
-                }}
-              >
-                <SignatureExploring />
-              </Body>
-              <Body
-                style={{
-                  display: displayTab == 'exposureExploring' ? 'block' : 'none',
-                }}
-              >
-                <ExposureExploring />
-              </Body>
-            </Card>
-          </div>
-        </MainPanel>
-      </SidebarContainer>
+            <SignatureExploring />
+          </Body>
+          <Body
+            style={{
+              display: displayTab == 'exposureExploring' ? 'block' : 'none',
+            }}
+          >
+            <ExposureExploring />
+          </Body>
+        </Card>
+      </div>
     </div>
   );
 }
