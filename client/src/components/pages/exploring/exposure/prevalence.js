@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
@@ -8,34 +8,19 @@ import {
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
-import Select from '../../../controls/select/select';
 
 const { Group, Label, Control, Text } = Form;
 
 export default function Tumor({ submitR }) {
   const rootURL = window.location.pathname;
-  const {
-    study,
-    studyOptions,
-    strategy,
-    strategyOptions,
-    refSignatureSet,
-    refSignatureSetOptions,
-    genomeSize,
-  } = useSelector((state) => state.expExposure);
-  const {
-    mutation,
-    plotPath,
-    plotURL,
-    txtPath,
-    debugR,
-    err,
-    displayDebug,
-    loading,
-  } = useSelector((state) => state.expPrevalence);
-  const { displayTab, publicDataOptions } = useSelector(
-    (state) => state.exploring
+  const { loading: mainLoading } = useSelector((state) => state.expExposure);
+  const { mutation, plotPath, plotURL, debugR, err, loading } = useSelector(
+    (state) => state.expPrevalence
   );
+
+  useEffect(() => {
+    if (plotPath) setRPlot(plotPath);
+  }, [plotPath]);
 
   async function calculateR(fn, args) {
     console.log(fn);
@@ -95,26 +80,10 @@ export default function Tumor({ submitR }) {
     }
   }
 
-  function handleStudy(study) {
-    const strategyOptions = [
-      ...new Set(
-        publicDataOptions
-          .filter((data) => data.Study == study)
-          .map((data) => data.Dataset)
-      ),
-    ];
-
-    dispatchExpPrevalence({
-      study: study,
-      strategy: strategyOptions[0],
-      strategyOptions: strategyOptions,
-    });
-  }
-
   return (
     <div>
       <Form>
-        <LoadingOverlay active={loading} />
+        <LoadingOverlay active={loading || mainLoading} />
         <div>
           <Row className="justify-content-center">
             <Col sm="4">
@@ -122,6 +91,7 @@ export default function Tumor({ submitR }) {
                 <Label>Minimal Number Mutations within in Each Signature</Label>
                 <Control
                   value={mutation}
+                  placeholder="e.g. 100"
                   onChange={(e) => {
                     dispatchExpPrevalence({
                       mutation: e.target.value,
@@ -133,18 +103,7 @@ export default function Tumor({ submitR }) {
             </Col>
             <Col sm="7" />
             <Col sm="1" className="m-auto">
-              <Button
-                variant="primary"
-                onClick={() => {
-                  calculateR('cosineSimilarity', {
-                    study: study,
-                    strategy: strategy,
-                    refSignatureSet: refSignatureSet,
-                    genomeSize: parseFloat(genomeSize),
-                    mutation: parseFloat(mutation),
-                  });
-                }}
-              >
+              <Button variant="primary" onClick={() => {}}>
                 Calculate
               </Button>
             </Col>
@@ -159,7 +118,6 @@ export default function Tumor({ submitR }) {
               <Plot
                 plotName={plotPath.split('/').slice(-1)[0]}
                 plotURL={plotURL}
-                txtPath={txtPath}
               />
             </div>
           </div>

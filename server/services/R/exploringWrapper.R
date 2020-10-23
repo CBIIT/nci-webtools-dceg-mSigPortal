@@ -204,7 +204,7 @@ mutationalSignatureComparison <- function(profileName, refSignatureSet1, signatu
 }
 
 # Exposure Explore -------------------------------------------------------
-exposurePublic <- function(common, activity, association, landscape, projectID, pythonOutput, savePath, dataPath) {
+exposurePublic <- function(common, activity, association, landscape, prevalence, projectID, pythonOutput, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'Signature/signature_refsets.RData'))
   load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata.RData'))
@@ -222,13 +222,14 @@ exposurePublic <- function(common, activity, association, landscape, projectID, 
     decompositionPath = paste0(savePath, 'mutationalSignatureDecomposition.svg')
     decompositionData = paste0(savePath, 'mutationalSignatureDecomposition.txt')
     landscapePath = paste0(savePath, 'landscapeMutationalSignature.svg')
-
+    prevalencePath = paste0(savePath, 'prevalenceMutationalSignature.svg')
 
     # parse arguments
     common = fromJSON(common)
     activity = fromJSON(activity)
     association = fromJSON(association)
     landscape = fromJSON(landscape)
+    prevalence = fromJSON(prevalence)
 
     exposure_refdata_selected <- exposure_refdata %>% filter(Study == common$study, Dataset == common$strategy, Signature_set_name == common$refSignatureSet)
 
@@ -376,6 +377,8 @@ exposurePublic <- function(common, activity, association, landscape, projectID, 
 
     Exposure_Clustering(sigdata = sigdata, studydata = vardata1_input, studydata_cat = vardata1_cat_input, puritydata = vardata2_input, puritydata_cat = vardata2_cat_input, cosinedata = cosinedata, clustern = 5, output_plot = landscapePath)
 
+    ### prevalence plot
+    prevalence_plot(sigdata = sigdata, nmutation = prevalence$mutation, output_plot = prevalencePath)
 
     output = list(
       'tumorPath' = tumorPath,
@@ -383,7 +386,8 @@ exposurePublic <- function(common, activity, association, landscape, projectID, 
       'associationPath' = associationPath,
       'decompositionPath' = decompositionPath,
       'decompositionData' = decompositionData,
-      'landscapePath' = landscapePath
+      'landscapePath' = landscapePath,
+      'prevalencePath' = prevalencePath
       )
 
   }, error = function(e) {

@@ -327,9 +327,9 @@ export const getInitialState = () => ({
     loading: false,
   },
   expPrevalence: {
+    mutation: '100',
     plotPath: '',
     plotURL: '',
-    txtPath: '',
     debugR: '',
     err: '',
     loading: false,

@@ -18,6 +18,7 @@ import {
   dispatchExpAssociation,
   dispatchExpDecomposition,
   dispatchExpLandscape,
+  dispatchExpPrevalence,
 } from '../../../../services/store';
 import Select from '../../../controls/select/select';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -117,6 +118,9 @@ export default function ExposureExploring() {
         cancerType: landscapeArgs.cancer,
         varDataPath: landscapeArgs.varDataPath,
       }),
+      prevalence: JSON.stringify({
+        mutation: parseFloat(prevalenceArgs.mutation) || 100,
+      }),
     });
 
     if (output) {
@@ -156,6 +160,13 @@ export default function ExposureExploring() {
           err: false,
         });
       else dispatchExpLandscape({ err: true, debugR: debugR });
+      if (output.prevalencePath)
+        dispatchExpPrevalence({
+          plotPath: output.prevalencePath,
+          debugR: debugR,
+          err: false,
+        });
+      else dispatchExpPrevalence({ err: true, debugR: debugR });
     }
 
     dispatchExpExposure({ loading: false });
