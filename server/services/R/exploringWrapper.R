@@ -256,7 +256,7 @@ exposurePublic <- function(common, activity, association, projectID, pythonOutpu
     # put this barplot on the web
     TMBplot(data_input, output_plot = tumorPath)
 
-    # # Mutational Signature Activity
+    # Mutational Signature Activity
 
     data_input <- exposure_refdata_selected %>%
       filter(Signature_name == activity$signatureName) %>%
@@ -283,7 +283,7 @@ exposurePublic <- function(common, activity, association, projectID, pythonOutpu
         select(-Signature_name)
     )
 
-    signature_association(data = data_input, cancer_type_input = cancer_type_input, signature_both = signature_both, output_plot = associationPath)
+    signature_association(data = data_input, cancer_type_input = cancer_type_input, signature_name_input1 = association$signatureName1, signature_name_input2 = association$signatureName2, signature_both = signature_both, output_plot = associationPath)
 
     # Evaluating the Performance of Mutational Signature Decomposition --------
 
