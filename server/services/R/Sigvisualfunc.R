@@ -1896,7 +1896,7 @@ genome2size <- function(genome){
   genomesize <- case_when(
     genome == "hg18" ~ 3080436051/10^6, 
     genome == "GRCh38" ~ 3217346917/10^6, 
-    genome == "GRch37" ~ 3101976562/10^6, 
+    genome == "GRCh37" ~ 3101976562/10^6, 
     genome == "mmc10" ~ 2725537669/10^6,
     genome == "mmc9" ~ 2654911517/10^6,
     TRUE ~ NA_real_
