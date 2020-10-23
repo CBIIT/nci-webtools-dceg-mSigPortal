@@ -62,7 +62,7 @@ export default function UploadForm() {
     getInputProps: mainInputProps,
   } = useDropzone({
     onDrop: onDropMain,
-    accept: '.csv, .tsv, .vcf, .gz, .zip, .tar, .tar.gz',
+    accept: '.csv, .tsv, .vcf, .gz, .tar, .tar.gz',
   });
   const onDropBed = useCallback((acceptedFiles) => {
     setBed(acceptedFiles[0]);
