@@ -7,7 +7,7 @@ import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
 
-export default function Activity({ submitR }) {
+export default function Activity({ calculateActivity }) {
   const rootURL = window.location.pathname;
   const { signatureNameOptions, loading: mainLoading } = useSelector(
     (state) => state.expExposure
@@ -29,40 +29,6 @@ export default function Activity({ submitR }) {
     if (signatureNameOptions.length)
       dispatchExpActivity({ signatureName: signatureNameOptions[0] });
   }, [signatureNameOptions]);
-
-  // async function calculateR(fn, args) {
-  //   console.log(fn);
-  //   dispatchExpActivity({
-  //     loading: true,
-  //     err: false,
-  //     debugR: '',
-  //   });
-
-  //   try {
-  //     const response = await submitR(fn, args);
-  //     if (!response.ok) {
-  //       const err = await response.json();
-
-  //       dispatchExpActivity({
-  //         loading: false,
-  //         debugR: err,
-  //       });
-  //     } else {
-  //       const { debugR, output } = await response.json();
-
-  //       dispatchExpActivity({
-  //         debugR: debugR,
-  //         loading: false,
-  //         plotPath: output.plotPath,
-  //         txtPath: output.txtPath,
-  //       });
-  //       setRPlot(output.plotPath);
-  //     }
-  //   } catch (err) {
-  //     dispatchError(err);
-  //     dispatchExpActivity({ loading: false });
-  //   }
-  // }
 
   async function setRPlot(plotPath) {
     if (plotPath) {
@@ -107,17 +73,7 @@ export default function Activity({ submitR }) {
             </Col>
             <Col sm="9" />
             <Col sm="1" className="my-auto">
-              <Button
-                variant="primary"
-                onClick={() => {
-                  // calculateR('cosineSimilarity', {
-                  //   study: study,
-                  //   strategy: strategy,
-                  //   refSignatureSet: refSignatureSet,
-                  //   genomeSize: parseFloat(genomeSize),
-                  // });
-                }}
-              >
+              <Button variant="primary" onClick={calculateActivity}>
                 Calculate
               </Button>
             </Col>

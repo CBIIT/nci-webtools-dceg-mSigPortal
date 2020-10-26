@@ -329,17 +329,16 @@ mutationalSignatureLandscape <- function(cancerType, varDataPath, plotPath, expo
 
 mutationalSignaturePrevalence <- function(mutation, cancerType, plotPath, exposure_refdata) {
   sigdata <- exposure_refdata %>%
-      filter(Cancer_Type == cancerType) %>%
-      select(Sample, Signature_name, Exposure) %>%
-      pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure) %>%
-      rename(Samples = Sample)
-
+    filter(Cancer_Type == cancerType) %>%
+    select(Sample, Signature_name, Exposure) %>%
+    pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure) %>%
+    rename(Samples = Sample)
   sigdata <- sigdata %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
   prevalence_plot(sigdata = sigdata, nmutation = mutation, output_plot = plotPath)
 }
 
-exposurePublic <- function(fn, common, activity, association, landscape, prevalence, projectID, pythonOutput, savePath, dataPath) {
+exposurePublic <- function(fn, common, activity = '{}', association = '{}', landscape = '{}', prevalence = '{}', projectID, pythonOutput, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'Signature/signature_refsets.RData'))
   load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata.RData'))
@@ -401,8 +400,8 @@ exposurePublic <- function(fn, common, activity, association, landscape, prevale
       mutationalSignatureLandscape(landscape$cancerType, landscape$varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
 
     # Prevalence plot
-    if ('all' %in% fn | 'landscape' %in% fn)
-      mutationalSignaturePrevalence(prevalence$mutation, prevalence$cancer, prevalencePath, exposure_refdata_selected)
+    if ('all' %in% fn | 'prevalence' %in% fn)
+      mutationalSignaturePrevalence(prevalence$mutation, prevalence$cancerType, prevalencePath, exposure_refdata_selected)
 
     output = list(
       'tumorPath' = tumorPath,

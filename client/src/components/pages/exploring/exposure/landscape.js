@@ -12,7 +12,7 @@ import Select from '../../../controls/select/select';
 
 const { Label } = Form;
 
-export default function Tumor() {
+export default function Landscape({ calculateLandscape }) {
   const rootURL = window.location.pathname;
   const { loading: mainLoading } = useSelector((state) => state.expExposure);
   const {
@@ -55,8 +55,6 @@ export default function Tumor() {
       dispatchExpLandscape({ err: true, plotURL: '' });
     }
   }
-
-  async function handleSubmit() {}
 
   async function handleUpload() {
     if (vdFile.size) {
@@ -129,7 +127,7 @@ export default function Tumor() {
             </Col>
             <Col sm="4" />
             <Col sm="1" className="m-auto">
-              <Button variant="primary" onClick={() => handleSubmit()}>
+              <Button variant="primary" onClick={calculateLandscape}>
                 Calculate
               </Button>
             </Col>

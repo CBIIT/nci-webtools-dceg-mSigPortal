@@ -12,7 +12,7 @@ import Select from '../../../controls/select/select';
 
 const { Group, Label, Control, Check, Text } = Form;
 
-export default function Association({ submitR }) {
+export default function Association({ calculateAssociation }) {
   const rootURL = window.location.pathname;
   const { signatureNameOptions, loading: mainLoading } = useSelector(
     (state) => state.expExposure
@@ -41,39 +41,6 @@ export default function Association({ submitR }) {
         signatureName2: signatureNameOptions[1] || signatureNameOptions[0],
       });
   }, [signatureNameOptions]);
-
-  // async function calculateR(fn, args) {
-  //   dispatchExpAssociation({
-  //     loading: true,
-  //     err: false,
-  //     debugR: '',
-  //   });
-
-  //   try {
-  //     const response = await submitR(fn, args);
-  //     if (!response.ok) {
-  //       const err = await response.json();
-
-  //       dispatchExpAssociation({
-  //         loading: false,
-  //         debugR: err,
-  //       });
-  //     } else {
-  //       const { debugR, output } = await response.json();
-
-  //       dispatchExpAssociation({
-  //         debugR: debugR,
-  //         loading: false,
-  //         plotPath: output.plotPath,
-  //         txtPath: output.txtPath,
-  //       });
-  //       setRPlot(output.plotPath);
-  //     }
-  //   } catch (err) {
-  //     dispatchError(err);
-  //     dispatchExpAssociation({ loading: false });
-  //   }
-  // }
 
   async function setRPlot(plotPath) {
     if (plotPath) {
@@ -151,17 +118,7 @@ export default function Association({ submitR }) {
             </Col>
             <Col sm="3" />
             <Col sm="1" className="my-auto">
-              <Button
-                variant="primary"
-                onClick={() => {
-                  // calculateR('cosineSimilarity', {
-                  //   study: study,
-                  //   strategy: strategy,
-                  //   refSignatureSet: refSignatureSet,
-                  //   genomeSize: parseFloat(genomeSize),
-                  // });
-                }}
-              >
+              <Button variant="primary" onClick={calculateAssociation}>
                 Calculate
               </Button>
             </Col>

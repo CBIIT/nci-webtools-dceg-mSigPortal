@@ -12,7 +12,7 @@ import Select from '../../../controls/select/select';
 
 const { Group, Label, Control, Text } = Form;
 
-export default function Tumor({ submitR }) {
+export default function Tumor({ calculatePrevalence }) {
   const rootURL = window.location.pathname;
   const { loading: mainLoading } = useSelector((state) => state.expExposure);
   const {
@@ -29,39 +29,6 @@ export default function Tumor({ submitR }) {
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
   }, [plotPath]);
-
-  async function calculateR(fn, args) {
-    dispatchExpPrevalence({
-      loading: true,
-      err: false,
-      debugR: '',
-    });
-
-    try {
-      const response = await submitR(fn, args);
-      if (!response.ok) {
-        const err = await response.json();
-
-        dispatchExpPrevalence({
-          loading: false,
-          debugR: err,
-        });
-      } else {
-        const { debugR, output } = await response.json();
-
-        dispatchExpPrevalence({
-          debugR: debugR,
-          loading: false,
-          plotPath: output.plotPath,
-          txtPath: output.txtPath,
-        });
-        setRPlot(output.plotPath);
-      }
-    } catch (err) {
-      dispatchError(err);
-      dispatchExpPrevalence({ loading: false });
-    }
-  }
 
   async function setRPlot(plotPath) {
     if (plotPath) {
@@ -123,7 +90,7 @@ export default function Tumor({ submitR }) {
             </Col>
             <Col sm="5" />
             <Col sm="1" className="m-auto">
-              <Button variant="primary" onClick={() => {}}>
+              <Button variant="primary" onClick={calculatePrevalence}>
                 Calculate
               </Button>
             </Col>

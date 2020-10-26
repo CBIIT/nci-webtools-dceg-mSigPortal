@@ -73,7 +73,8 @@ export default function ExposureExploring() {
     });
 
     try {
-      const { debugR, output } = await submitR('', {
+      const { debugR, output } = await submitR('exposurePublic', {
+        fn: 'activity',
         common: JSON.stringify({
           study: study,
           strategy: strategy,
@@ -96,6 +97,120 @@ export default function ExposureExploring() {
     }
 
     dispatchExpActivity({ loading: false });
+  }
+
+  async function calculateAssociation() {
+    dispatchExpAssociation({
+      loading: true,
+      err: false,
+      debugR: '',
+    });
+
+    try {
+      const { debugR, output } = await submitR('exposurePublic', {
+        fn: 'association',
+        common: JSON.stringify({
+          study: study,
+          strategy: strategy,
+          refSignatureSet: refSignatureSet,
+        }),
+        association: JSON.stringify({
+          cancerType:
+            associationArgs.cancer == 'None' ? null : associationArgs.cancer,
+          both: associationArgs.both,
+          signatureName1: associationArgs.signatureName1,
+          signatureName2: associationArgs.signatureName2,
+        }),
+      });
+
+      if (output) {
+        if (output.associationPath)
+          dispatchExpAssociation({
+            plotPath: output.associationPath,
+            debugR: debugR,
+            err: false,
+          });
+        else dispatchExpAssociation({ err: true, debugR: debugR });
+      }
+    } catch (err) {
+      dispatchError(err);
+    }
+
+    dispatchExpAssociation({ loading: false });
+  }
+
+  async function calculateLandscape() {
+    dispatchExpLandscape({
+      loading: true,
+      err: false,
+      debugR: '',
+    });
+
+    try {
+      const { debugR, output } = await submitR('exposurePublic', {
+        fn: 'landscape',
+        common: JSON.stringify({
+          study: study,
+          strategy: strategy,
+          refSignatureSet: refSignatureSet,
+        }),
+        landscape: JSON.stringify({
+          cancerType: landscapeArgs.cancer,
+          varDataPath: landscapeArgs.varDataPath,
+        }),
+      });
+
+      if (output) {
+        if (output.landscapePath)
+          dispatchExpLandscape({
+            plotPath: output.landscapePath,
+            debugR: debugR,
+            err: false,
+          });
+        else dispatchExpLandscape({ err: true, debugR: debugR });
+      }
+    } catch (err) {
+      dispatchError(err);
+    }
+
+    dispatchExpLandscape({ loading: false });
+  }
+
+  async function calculatePrevalence() {
+    dispatchExpPrevalence({
+      loading: true,
+      err: false,
+      debugR: '',
+    });
+
+    try {
+      const { debugR, output } = await submitR('exposurePublic', {
+        fn: 'prevalence',
+        common: JSON.stringify({
+          study: study,
+          strategy: strategy,
+          refSignatureSet: refSignatureSet,
+        }),
+        prevalence: JSON.stringify({
+          cancerType: prevalenceArgs.cancer,
+          mutation: parseFloat(prevalenceArgs.mutation) || 100,
+        }),
+      });
+
+      if (output) {
+        if (output.prevalencePath)
+          dispatchExpPrevalence({
+            plotPath: output.prevalencePath,
+            debugR: debugR,
+            err: false,
+          });
+        else dispatchExpPrevalence({ err: true, debugR: debugR });
+      }
+    } catch (err) {
+      dispatchError(err);
+    }
+
+    dispatchExpPrevalence({ loading: false });
   }
 
   async function handleCalculate(fn) {
@@ -225,12 +340,12 @@ export default function ExposureExploring() {
       title: 'Tumor Mutational Burden',
     },
     {
-      component: <Activity submitR={(fn, args) => submitR(fn, args)} />,
+      component: <Activity calculateActivity={calculateActivity} />,
       id: 'activity',
       title: 'Mutational Signature Activity',
     },
     {
-      component: <Association submitR={(fn, args) => submitR(fn, args)} />,
+      component: <Association calculateAssociation={calculateAssociation} />,
       id: 'association',
       title: 'Mutational Signature Association',
     },
@@ -240,12 +355,12 @@ export default function ExposureExploring() {
       title: 'Evaluating the Performance of Mutational Signature Decomposition',
     },
     {
-      component: <Landscape submitR={(fn, args) => submitR(fn, args)} />,
+      component: <Landscape calculateLandscape={calculateLandscape} />,
       id: 'landscape',
       title: 'Landscape of Mutational Signature Activity',
     },
     {
-      component: <Prevalence submitR={(fn, args) => submitR(fn, args)} />,
+      component: <Prevalence calculatePrevalence={calculatePrevalence} />,
       id: 'prevalence',
       title: 'Prevalence of Mutational Signature',
     },

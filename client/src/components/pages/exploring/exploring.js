@@ -1,11 +1,6 @@
 import React, { useEffect } from 'react';
-import { Card, Nav, Row, Col, Form } from 'react-bootstrap';
+import { Card, Nav, Form } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import {
-  SidebarContainer,
-  SidebarPanel,
-  MainPanel,
-} from '../../controls/sidebar-container/sidebar-container';
 import SignatureExploring from './signature/main';
 import ExposureExploring from './exposure/main';
 import {
@@ -151,6 +146,7 @@ export default function Explore() {
         dispatchExpExposure(params);
         dispatchExpAssociation(associationParams);
         dispatchExpLandscape(landscapeParams);
+        dispatchExpPrevalence(landscapeParams);
       }
     } catch (err) {
       dispatchError(err);
