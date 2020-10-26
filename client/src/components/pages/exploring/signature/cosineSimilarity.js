@@ -24,7 +24,6 @@ export default function MutationalSignatureProfile({ submitR }) {
     txtPath,
     debugR,
     err,
-    displayDebug,
     loading,
   } = useSelector((state) => state.expCosineSimilarity);
   const { displayTab, refSigData } = useSelector((state) => state.exploring);

@@ -7,7 +7,7 @@ import Plot from '../../../controls/plot/plot';
 
 export default function ReferenceSignatures({ submitR }) {
   const rootURL = window.location.pathname;
-  const { plotPath, plotURL, debugR, err, displayDebug, loading } = useSelector(
+  const { plotPath, plotURL, debugR, err,  loading } = useSelector(
     (state) => state.expRefSig
   );
   // const { displayTab } = useSelector((state) => state.exploring);

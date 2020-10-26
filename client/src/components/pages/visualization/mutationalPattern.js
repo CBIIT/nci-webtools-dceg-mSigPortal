@@ -32,7 +32,6 @@ export default function MutationalPattern({ submitR }) {
     display,
     err,
     debugR,
-    displayDebug,
     submitOverlay,
   } = useSelector((state) => state.mutationalPattern);
 

@@ -27,7 +27,6 @@ export default function MutationalSignatureProfile({ submitR }) {
     plotURL,
     debugR,
     err,
-    displayDebug,
     loading,
   } = useSelector((state) => state.expMutationalSigComparison);
   const { displayTab, refSigData } = useSelector((state) => state.exploring);

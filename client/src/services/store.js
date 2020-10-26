@@ -46,7 +46,6 @@ export const getInitialState = () => ({
     plotURL: '',
     err: '',
     debugR: '',
-    displayDebug: false,
     loading: false,
   },
   mutationalProfiles: {
@@ -92,7 +91,6 @@ export const getInitialState = () => ({
     refErr: false,
     pubErr: false,
     debugR: [],
-    displayDebug: false,
     withinSubmitOverlay: false,
     refSubmitOverlay: false,
     pubSubmitOverlay: false,
@@ -108,7 +106,6 @@ export const getInitialState = () => ({
     display: true,
     err: false,
     debugR: [],
-    displayDebug: false,
     submitOverlay: false,
   },
   profileComparison: {
@@ -142,7 +139,6 @@ export const getInitialState = () => ({
     refErr: false,
     pubErr: false,
     debugR: [],
-    displayDebug: false,
     withinSubmitOverlay: false,
     refSubmitOverlay: false,
     pubSubmitOverlay: false,
@@ -166,7 +162,6 @@ export const getInitialState = () => ({
     pcaErr: false,
     displayPCA: true,
     debugR: [],
-    displayDebug: false,
     submitOverlay: false,
     userProfileType: '',
     userMatrixSize: '',
@@ -213,7 +208,6 @@ export const getInitialState = () => ({
     plotURL: 'assets/images/mSigPortalReferenceSignatures.svg',
     debugR: '',
     err: '',
-    displayDebug: false,
     loading: false,
   },
   expMutationalProfiles: {
@@ -235,7 +229,6 @@ export const getInitialState = () => ({
     ],
     debugR: '',
     err: '',
-    displayDebug: false,
     loading: false,
   },
   expCosineSimilarity: {
@@ -250,7 +243,6 @@ export const getInitialState = () => ({
     txtPath: '',
     debugR: '',
     err: '',
-    displayDebug: false,
     loading: false,
   },
   expMutationalSigComparison: {
@@ -268,7 +260,6 @@ export const getInitialState = () => ({
     plotURL: '',
     debugR: '',
     err: '',
-    displayDebug: false,
     loading: false,
   },
   expExposure: {

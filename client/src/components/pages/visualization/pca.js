@@ -42,7 +42,6 @@ export default function PCA({ submitR, getRefSigOptions }) {
     displayPCA,
     pcaErr,
     debugR,
-    displayDebug,
     submitOverlay,
     pubPCA,
 

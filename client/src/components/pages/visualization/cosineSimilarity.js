@@ -62,7 +62,6 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
     refSubmitOverlay,
     pubSubmitOverlay,
     debugR,
-    displayDebug,
   } = useSelector((state) => state.cosineSimilarity);
 
   function setOverlay(type, display) {

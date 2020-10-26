@@ -77,7 +77,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     refErr,
     pubErr,
     debugR,
-    displayDebug,
+    
     withinSubmitOverlay,
     refSubmitOverlay,
     pubSubmitOverlay,

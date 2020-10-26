@@ -12,7 +12,7 @@ import Select from '../../../controls/select/select';
 
 export default function MutationalSignatureProfile({ submitR }) {
   const rootURL = window.location.pathname;
-  const { plots, debugR, err, displayDebug, loading } = useSelector(
+  const { plots, debugR, err, loading } = useSelector(
     (state) => state.expMutationalProfiles
   );
   const { displayTab, refSigData } = useSelector((state) => state.exploring);

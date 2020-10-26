@@ -21,7 +21,7 @@ export default function ProfilerSummary({ submitR }) {
   const { matrixList, svgList } = useSelector(
     (state) => state.visualizeResults
   );
-  const { plotPath, plotURL, err, debugR, displayDebug, loading } = useSelector(
+  const { plotPath, plotURL, err, debugR,  loading } = useSelector(
     (state) => state.profilerSummary
   );
   const rootURL = window.location.pathname;
