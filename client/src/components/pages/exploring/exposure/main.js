@@ -98,10 +98,11 @@ export default function ExposureExploring() {
     dispatchExpActivity({ loading: false });
   }
 
-  async function handleCalculate() {
+  async function handleCalculate(fn) {
     dispatchExpExposure({ loading: true });
 
     const { debugR, output } = await submitR('exposurePublic', {
+      fn: fn,
       common: JSON.stringify({
         study: study,
         strategy: strategy,
@@ -120,6 +121,7 @@ export default function ExposureExploring() {
         varDataPath: landscapeArgs.varDataPath,
       }),
       prevalence: JSON.stringify({
+        cancerType: prevalenceArgs.cancer,
         mutation: parseFloat(prevalenceArgs.mutation) || 100,
       }),
     });
@@ -285,7 +287,7 @@ export default function ExposureExploring() {
             </Col>
             <Col sm="3"></Col>
             <Col sm="1" className="m-auto">
-              <Button variant="primary" onClick={() => handleCalculate()}>
+              <Button variant="primary" onClick={() => handleCalculate('all')}>
                 Calculate
               </Button>
             </Col>

@@ -325,14 +325,24 @@ mutationalSignatureLandscape <- function(cancerType, varDataPath, plotPath, expo
   }
 
   Exposure_Clustering(sigdata = sigdata, studydata = vardata1_input, studydata_cat = vardata1_cat_input, puritydata = vardata2_input, puritydata_cat = vardata2_cat_input, cosinedata = cosinedata, clustern = 5, output_plot = plotPath)
-  return(sigdata)
 }
 
-exposurePublic <- function(common, activity, association, landscape, prevalence, projectID, pythonOutput, savePath, dataPath) {
+mutationalSignaturePrevalence <- function(mutation, cancerType, plotPath, exposure_refdata) {
+  sigdata <- exposure_refdata %>%
+      filter(Cancer_Type == cancerType) %>%
+      select(Sample, Signature_name, Exposure) %>%
+      pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure) %>%
+      rename(Samples = Sample)
+
+  sigdata <- sigdata %>% select_if(~!is.numeric(.) || sum(.) > 0)
+
+  prevalence_plot(sigdata = sigdata, nmutation = mutation, output_plot = plotPath)
+}
+
+exposurePublic <- function(fn, common, activity, association, landscape, prevalence, projectID, pythonOutput, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'Signature/signature_refsets.RData'))
   load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata.RData'))
-  # load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'))
   load(paste0(dataPath, 'Exposure/exposure_refdata.RData'))
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
@@ -371,26 +381,28 @@ exposurePublic <- function(common, activity, association, landscape, prevalence,
 
 
     ## Tumor Overall Mutational Burden
-    print(1)
-    tumorMutationalBurden(genomesize, tumorPath, exposure_refdata_selected)
+    if ('all' %in% fn)
+      tumorMutationalBurden(genomesize, tumorPath, exposure_refdata_selected)
 
     # Mutational Signature Activity
-    print(2)
-    mutationalSignatureActivity(activity$signatureName, genomesize, activityPath, exposure_refdata_selected)
+    if ('all' %in% fn || 'activity' %in% fn)
+      mutationalSignatureActivity(activity$signatureName, genomesize, activityPath, exposure_refdata_selected)
 
     # Mutational Signature Association
-    print(3)
-    mutationalSignatureAssociation(association$cancerType, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
+    if ('all' %in% fn | 'association' %in% fn)
+      mutationalSignatureAssociation(association$cancerType, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
 
     # Evaluating the Performance of Mutational Signature Decomposition --------
-    mutationalSignatureDecomposition(decompositionPath, decompositionData, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
-    print(4)
+    if ('all' %in% fn)
+      mutationalSignatureDecomposition(decompositionPath, decompositionData, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
 
     # Landscape of Mutational Signature Activity
-    sigdata = mutationalSignatureLandscape(landscape$cancerType, landscape$varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+    if ('all' %in% fn | 'landscape' %in% fn)
+      mutationalSignatureLandscape(landscape$cancerType, landscape$varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
 
-    ### prevalence plot
-    prevalence_plot(sigdata = sigdata, nmutation = prevalence$mutation, output_plot = prevalencePath)
+    # Prevalence plot
+    if ('all' %in% fn | 'landscape' %in% fn)
+      mutationalSignaturePrevalence(prevalence$mutation, prevalence$cancer, prevalencePath, exposure_refdata_selected)
 
     output = list(
       'tumorPath' = tumorPath,

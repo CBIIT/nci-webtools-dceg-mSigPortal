@@ -321,6 +321,8 @@ export const getInitialState = () => ({
     loading: false,
   },
   expPrevalence: {
+    cancer: '',
+    cancerOptions: [],
     mutation: '100',
     plotPath: '',
     plotURL: '',
