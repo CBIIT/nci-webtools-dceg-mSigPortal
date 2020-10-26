@@ -273,7 +273,8 @@ export const getInitialState = () => ({
     refSignatureSet: '',
     refSignatureSetOptions: [],
     signatureNameOptions: [],
-    datasource: 'public',
+    genomeSize: '',
+    source: 'public',
     loading: false,
   },
   expTumor: {

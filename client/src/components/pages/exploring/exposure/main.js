@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, Row, Col, Accordion, Card, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -25,6 +25,7 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 
 const { Header, Body } = Card;
 const { Toggle, Collapse } = Accordion;
+const { Group, Label, Check, Control } = Form;
 
 export default function ExposureExploring() {
   const rootURL = window.location.pathname;
@@ -44,13 +45,18 @@ export default function ExposureExploring() {
     refSigData,
     refSignatureSet,
     refSignatureSetOptions,
-    datasource,
+    genomeSize,
+    source,
     loading,
   } = useSelector((state) => state.expExposure);
   const activityArgs = useSelector((state) => state.expActivity);
   const associationArgs = useSelector((state) => state.expAssociation);
   const landscapeArgs = useSelector((state) => state.expLandscape);
   const prevalenceArgs = useSelector((state) => state.expPrevalence);
+
+  const [exposureFile, setExposure] = useState(new File([], ''));
+  const [matrixFile, setMatrix] = useState(new File([], ''));
+  const [signatureFile, setSignature] = useState(new File([], ''));
 
   function submitR(fn, args) {
     return fetch(`${rootURL}exploringR`, {
@@ -312,9 +318,6 @@ export default function ExposureExploring() {
       study: study,
       strategy: strategyOptions[0],
       strategyOptions: strategyOptions,
-    });
-
-    dispatchExpLandscape({
       cancer: cancerOptions[0],
       cancerOptions: cancerOptions,
     });
@@ -332,6 +335,37 @@ export default function ExposureExploring() {
       refSignatureSet: set,
       signatureNameOptions: signatureNameOptions,
     });
+  }
+
+  async function handleUpload() {
+    if ('vdFile.size') {
+      dispatchExpLandscape({ loading: true });
+
+      try {
+        const data = new FormData();
+        data.append('inputFile', 'vdFile');
+        let response = await fetch(`${rootURL}upload`, {
+          method: 'POST',
+          body: data,
+        });
+
+        if (!response.ok) {
+          const { msg, error } = await response.json();
+          const message = `<div>
+          <p>${msg}</p>
+         ${error ? `<p>${error}</p>` : ''} 
+        </div>`;
+          dispatchError(message);
+        } else {
+          const { filePath } = await response.json();
+          dispatchExpLandscape({ varDataPath: filePath });
+        }
+      } catch (err) {
+        dispatchError(err);
+      }
+
+      dispatchExpLandscape({ loading: false });
+    }
   }
 
   const sections = [
@@ -366,61 +400,153 @@ export default function ExposureExploring() {
       title: 'Prevalence of Mutational Signature',
     },
   ];
+
   return (
     <div className="position-relative">
       <Form>
         <LoadingOverlay active={loading} />
         <div>
           <Row className="justify-content-center">
-            <Col sm="2">
-              <Select
-                id="tumorStudy"
-                label="Study"
-                value={study}
-                options={studyOptions}
-                onChange={handleStudy}
-              />
-            </Col>
-            <Col sm="2">
-              <Select
-                id="tumorStrategy"
-                label="Experimental Strategy"
-                value={strategy}
-                options={strategyOptions}
-                onChange={(strategy) =>
-                  dispatchExpExposure({ strategy: strategy })
-                }
-              />
-            </Col>
-            <Col sm="2">
-              <Select
-                id="prevalenceCancerType"
-                label="Cancer Type"
-                value={cancer}
-                options={cancerOptions}
-                onChange={(cancer) =>
-                  dispatchExpPrevalence({
-                    cancer: cancer,
-                  })
-                }
-              />
-            </Col>
-            <Col sm="2">
-              <Select
-                id="tumorSet"
-                label="Reference Signature Set"
-                value={refSignatureSet}
-                options={refSignatureSetOptions}
-                onChange={handleSet}
-              />
-            </Col>
-            <Col sm="2"></Col>
-            <Col sm="1" className="m-auto">
-              <Button variant="primary" onClick={() => handleCalculate('all')}>
-                Calculate
-              </Button>
+            <Col sm="auto">
+              <Group className="d-flex">
+                <Label className="mr-auto">
+                  <h5 className="mb-2">Data Source</h5>
+                </Label>
+                <Check inline id="radioPublic" className="ml-4">
+                  <Check.Input
+                    type="radio"
+                    value="public"
+                    checked={source == 'public'}
+                    onChange={(e) => dispatchExpExposure({ source: 'public' })}
+                  />
+                  <Check.Label className="font-weight-normal">
+                    Public
+                  </Check.Label>
+                </Check>
+                <Check inline id="radioUser">
+                  <Check.Input
+                    type="radio"
+                    value="user"
+                    checked={source == 'user'}
+                    onChange={(e) => dispatchExpExposure({ source: 'user' })}
+                  />
+                  <Check.Label className="font-weight-normal">User</Check.Label>
+                </Check>
+              </Group>
             </Col>
           </Row>
+          {source == 'public' ? (
+            <Row className="justify-content-center">
+              <Col sm="2">
+                <Select
+                  id="tumorStudy"
+                  label="Study"
+                  value={study}
+                  options={studyOptions}
+                  onChange={handleStudy}
+                />
+              </Col>
+              <Col sm="2">
+                <Select
+                  id="tumorStrategy"
+                  label="Experimental Strategy"
+                  value={strategy}
+                  options={strategyOptions}
+                  onChange={(strategy) =>
+                    dispatchExpExposure({ strategy: strategy })
+                  }
+                />
+              </Col>
+              <Col sm="2">
+                <Select
+                  id="prevalenceCancerType"
+                  label="Cancer Type"
+                  value={cancer}
+                  options={cancerOptions}
+                  onChange={(cancer) =>
+                    dispatchExpPrevalence({
+                      cancer: cancer,
+                    })
+                  }
+                />
+              </Col>
+              <Col sm="2">
+                <Select
+                  id="tumorSet"
+                  label="Reference Signature Set"
+                  value={refSignatureSet}
+                  options={refSignatureSetOptions}
+                  onChange={handleSet}
+                />
+              </Col>
+              <Col sm="3"></Col>
+              <Col sm="1" className="m-auto">
+                <Button
+                  variant="primary"
+                  onClick={() => handleCalculate('all')}
+                >
+                  Calculate
+                </Button>
+              </Col>
+            </Row>
+          ) : (
+            <Row className="justify-content-center">
+              <Col sm="2">
+                <Label>Upload Exposure File</Label>
+                <Form.File
+                  id="variableData"
+                  label={exposureFile.name || 'Exposure File'}
+                  // accept=''
+                  onChange={(e) => setExposure(e.target.files[0])}
+                  custom
+                />
+              </Col>{' '}
+              <Col sm="2">
+                <Label>Upload Matrix File</Label>
+                <Form.File
+                  id="variableData"
+                  label={matrixFile.name || 'Matrix File'}
+                  // accept=''
+                  onChange={(e) => setMatrix(e.target.files[0])}
+                  custom
+                />
+              </Col>{' '}
+              <Col sm="2">
+                <Label>Upload Signature Data</Label>
+                <Form.File
+                  id="variableData"
+                  label={signatureFile.name || 'Signature File'}
+                  // accept=''
+                  onChange={(e) => setSignature(e.target.files[0])}
+                  custom
+                />
+              </Col>
+              <Col sm="2">
+                <Group controlId="exposureGenomesize">
+                  <Label>Genome Size</Label>
+                  <Control
+                    value={genomeSize}
+                    placeholder="e.g. 100"
+                    onChange={(e) => {
+                      dispatchExpExposure({
+                        genomeSize: e.target.value,
+                      });
+                    }}
+                  />
+                  {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
+                </Group>
+              </Col>
+              <Col sm="3"></Col>
+              <Col sm="1" className="m-auto">
+                <Button
+                  variant="primary"
+                  onClick={() => handleCalculate('all')}
+                >
+                  Calculate
+                </Button>
+              </Col>
+            </Row>
+          )}
         </div>
       </Form>
       {sections.map(({ component, id, title }) => {
