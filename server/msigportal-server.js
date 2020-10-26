@@ -69,7 +69,7 @@ app.use(express.json());
 app.use((error, req, res, next) => {
   logger.error(err);
   if (!error.statusCode) error.statusCode = 500;
-  return res.status(error.statusCode).json(error.toString());
+  res.status(error.statusCode).json(error.message);
 });
 
 app.get('/ping', (req, res) => res.send(true));

@@ -112,21 +112,25 @@ async function visualizationProfilerExtraction(req, res, next) {
     res.status(504).send('request timed out');
   });
 
-  const { stdout, stderr, projectPath } = await profilerExtraction(req.body);
-  const resultsPath = path.join(projectPath, 'results');
+  try {
+    const { stdout, stderr, projectPath } = await profilerExtraction(req.body);
+    const resultsPath = path.join(projectPath, 'results');
 
-  if (fs.existsSync(path.join(resultsPath, 'svg_files_list.txt'))) {
-    res.json({ stdout, stderr, ...(await getSummaryFiles(resultsPath)) });
-  } else {
-    logger.info(
-      '/profilerExtraction: An Error Occured While Extracting Profiles'
-    );
-    res.status(500).json({
-      msg:
-        'An error occured durring profile extraction. Please review your input parameters and try again.',
-      stdout,
-      stderr,
-    });
+    if (fs.existsSync(path.join(resultsPath, 'svg_files_list.txt'))) {
+      res.json({ stdout, stderr, ...(await getSummaryFiles(resultsPath)) });
+    } else {
+      logger.info(
+        '/profilerExtraction: An Error Occured While Extracting Profiles'
+      );
+      res.status(500).json({
+        msg:
+          'An error occured durring profile extraction. Please review your input parameters and try again.',
+        stdout,
+        stderr,
+      });
+    }
+  } catch (err) {
+    next(err);
   }
 }
 
@@ -370,7 +374,7 @@ async function exploringR(req, res, next) {
 
     const { stdout, output } = JSON.parse(wrapper);
 
-    return res.json({
+    res.json({
       debugR: stdout,
       output: getRelativePath(output),
       projectID: projectID,
@@ -394,7 +398,7 @@ async function getReferenceSignatureData(req, res, next) {
   ).catch(next);
 
   logger.info('/getReferenceSignatures: Success');
-  return res.json(JSON.parse(data));
+  res.json(JSON.parse(data));
 }
 
 async function submitQueue(req, res, next) {
