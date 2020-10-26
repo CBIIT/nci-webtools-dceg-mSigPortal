@@ -65,39 +65,38 @@ export default function ExposureExploring() {
     }).then((res) => res.json());
   }
 
-  // async function calculateTumor(fn, args) {
-  //   console.log(fn);
-  //   // dispatchExpTumor({
-  //   //   loading: true,
-  //   //   err: false,
-  //   //   debugR: '',
-  //   // });
+  async function calculateActivity() {
+    dispatchExpActivity({
+      loading: true,
+      err: false,
+      debugR: '',
+    });
 
-  //   try {
-  //     const response = await submitR(fn, args);
-  //     if (!response.ok) {
-  //       const err = await response.json();
+    try {
+      const { debugR, output } = await submitR('', {
+        common: JSON.stringify({
+          study: study,
+          strategy: strategy,
+          refSignatureSet: refSignatureSet,
+        }),
+        activity: JSON.stringify({ signatureName: activityArgs.signatureName }),
+      });
 
-  //       // dispatchExpTumor({
-  //       //   loading: false,
-  //       //   debugR: err,
-  //       // });
-  //     } else {
-  //       const { debugR, output } = await response.json();
+      if (output) {
+        if (output.activityPath)
+          dispatchExpActivity({
+            plotPath: output.activityPath,
+            debugR: debugR,
+            err: false,
+          });
+        else dispatchExpActivity({ err: true, debugR: debugR });
+      }
+    } catch (err) {
+      dispatchError(err);
+    }
 
-  //       // dispatchExpTumor({
-  //       //   debugR: debugR,
-  //       //   loading: false,
-  //       //   plotPath: output.plotPath,
-  //       //   txtPath: output.txtPath,
-  //       // });
-  //       // setRPlot(output.plotPath);
-  //     }
-  //   } catch (err) {
-  //     dispatchError(err);
-  //     // dispatchExpTumor({ loading: false });
-  //   }
-  // }
+    dispatchExpActivity({ loading: false });
+  }
 
   async function handleCalculate() {
     dispatchExpExposure({ loading: true });
@@ -110,6 +109,9 @@ export default function ExposureExploring() {
       }),
       activity: JSON.stringify({ signatureName: activityArgs.signatureName }),
       association: JSON.stringify({
+        cancerType:
+          associationArgs.cancer == 'None' ? null : associationArgs.cancer,
+        both: associationArgs.both,
         signatureName1: associationArgs.signatureName1,
         signatureName2: associationArgs.signatureName2,
       }),

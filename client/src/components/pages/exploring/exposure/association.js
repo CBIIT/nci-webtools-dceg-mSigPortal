@@ -10,12 +10,17 @@ import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
 
+const { Group, Label, Control, Check, Text } = Form;
+
 export default function Association({ submitR }) {
   const rootURL = window.location.pathname;
   const { signatureNameOptions, loading: mainLoading } = useSelector(
     (state) => state.expExposure
   );
   const {
+    cancer,
+    cancerOptions,
+    both,
     signatureName1,
     signatureName2,
     plotPath,
@@ -38,7 +43,6 @@ export default function Association({ submitR }) {
   }, [signatureNameOptions]);
 
   // async function calculateR(fn, args) {
-  //   console.log(fn);
   //   dispatchExpAssociation({
   //     loading: true,
   //     err: false,
@@ -103,6 +107,28 @@ export default function Association({ submitR }) {
           <Row className="justify-content-center">
             <Col sm="2">
               <Select
+                id="associationCancerType"
+                label="Cancer Type"
+                value={cancer}
+                options={cancerOptions}
+                onChange={(name) => dispatchExpAssociation({ cancer: name })}
+              />
+            </Col>
+            <Col sm="2" className="my-auto">
+              <Group controlId="split" className="d-flex">
+                <Label className="mr-auto">Both Signatures</Label>
+                <Check inline id="split">
+                  <Check.Input
+                    type="checkbox"
+                    value={both}
+                    checked={both}
+                    onChange={(e) => dispatchExpAssociation({ both: !both })}
+                  />
+                </Check>
+              </Group>
+            </Col>
+            <Col sm="2">
+              <Select
                 id="associationSignatureName1"
                 label="Signature Name 1"
                 value={signatureName1}
@@ -123,7 +149,7 @@ export default function Association({ submitR }) {
                 }
               />
             </Col>
-            <Col sm="7" />
+            <Col sm="3" />
             <Col sm="1" className="my-auto">
               <Button
                 variant="primary"

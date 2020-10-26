@@ -298,6 +298,9 @@ export const getInitialState = () => ({
     loading: false,
   },
   expAssociation: {
+    cancer: '',
+    cancerOptions: [],
+    both: false,
     signatureName1: '',
     signatureName2: '',
     plotPath: '',

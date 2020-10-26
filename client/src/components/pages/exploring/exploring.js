@@ -138,14 +138,19 @@ export default function Explore() {
           refSignatureSetOptions: refSignatureSetOptions,
           signatureNameOptions: signatureNameOptions,
         };
+        const associationParams = {
+          cancer: 'None',
+          cancerOptions: ['None', ...cancerOptions],
+        };
         const landscapeParams = {
           cancer: cancer,
           cancerOptions: cancerOptions,
         };
 
         dispatchExploring({ publicDataOptions: data });
-        dispatchExpExposure({ ...params });
-        dispatchExpLandscape({ ...landscapeParams });
+        dispatchExpExposure(params);
+        dispatchExpAssociation(associationParams);
+        dispatchExpLandscape(landscapeParams);
       }
     } catch (err) {
       dispatchError(err);
