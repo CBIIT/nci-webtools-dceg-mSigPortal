@@ -128,25 +128,16 @@ export default function Explore() {
           studyOptions: studyOptions,
           strategy: strategyOptions[0],
           strategyOptions: strategyOptions,
+          cancer: cancerOptions[0],
+          cancerOptions: cancerOptions,
           refSigData: refSigData.output.data,
           refSignatureSet: refSignatureSet,
           refSignatureSetOptions: refSignatureSetOptions,
           signatureNameOptions: signatureNameOptions,
         };
-        const associationParams = {
-          cancer: 'None',
-          cancerOptions: ['None', ...cancerOptions],
-        };
-        const landscapeParams = {
-          cancer: cancer,
-          cancerOptions: cancerOptions,
-        };
 
         dispatchExploring({ publicDataOptions: data });
         dispatchExpExposure(params);
-        dispatchExpAssociation(associationParams);
-        dispatchExpLandscape(landscapeParams);
-        dispatchExpPrevalence(landscapeParams);
       }
     } catch (err) {
       dispatchError(err);

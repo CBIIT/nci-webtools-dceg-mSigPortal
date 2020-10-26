@@ -8,23 +8,15 @@ import {
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
-import Select from '../../../controls/select/select';
 
 const { Label } = Form;
 
 export default function Landscape({ calculateLandscape }) {
   const rootURL = window.location.pathname;
   const { loading: mainLoading } = useSelector((state) => state.expExposure);
-  const {
-    cancer,
-    cancerOptions,
-    plotPath,
-    plotURL,
-    txtPath,
-    debugR,
-    err,
-    loading,
-  } = useSelector((state) => state.expLandscape);
+  const { plotPath, plotURL, txtPath, debugR, err, loading } = useSelector(
+    (state) => state.expLandscape
+  );
 
   const [vdFile, setFile] = useState(new File([], ''));
 
@@ -93,19 +85,6 @@ export default function Landscape({ calculateLandscape }) {
         <LoadingOverlay active={loading || mainLoading} />
         <div>
           <Row className="justify-content-center">
-            <Col sm="2">
-              <Select
-                id="landscapeType"
-                label="Cancer Type"
-                value={cancer}
-                options={cancerOptions}
-                onChange={(cancer) =>
-                  dispatchExpLandscape({
-                    cancer: cancer,
-                  })
-                }
-              />
-            </Col>
             <Col sm="4">
               <Label>Upload Variable Data</Label>
               <Form.File
@@ -125,7 +104,7 @@ export default function Landscape({ calculateLandscape }) {
                 Upload
               </Button>
             </Col>
-            <Col sm="4" />
+            <Col sm="6" />
             <Col sm="1" className="m-auto">
               <Button variant="primary" onClick={calculateLandscape}>
                 Calculate

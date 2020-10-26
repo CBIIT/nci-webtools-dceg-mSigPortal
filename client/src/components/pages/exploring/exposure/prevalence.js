@@ -15,16 +15,9 @@ const { Group, Label, Control, Text } = Form;
 export default function Tumor({ calculatePrevalence }) {
   const rootURL = window.location.pathname;
   const { loading: mainLoading } = useSelector((state) => state.expExposure);
-  const {
-    cancer,
-    cancerOptions,
-    mutation,
-    plotPath,
-    plotURL,
-    debugR,
-    err,
-    loading,
-  } = useSelector((state) => state.expPrevalence);
+  const { mutation, plotPath, plotURL, debugR, err, loading } = useSelector(
+    (state) => state.expPrevalence
+  );
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
@@ -60,19 +53,6 @@ export default function Tumor({ calculatePrevalence }) {
         <LoadingOverlay active={loading || mainLoading} />
         <div>
           <Row className="justify-content-center">
-            <Col sm="2">
-              <Select
-                id="prevalenceCancerType"
-                label="Cancer Type"
-                value={cancer}
-                options={cancerOptions}
-                onChange={(cancer) =>
-                  dispatchExpPrevalence({
-                    cancer: cancer,
-                  })
-                }
-              />
-            </Col>
             <Col sm="4">
               <Group controlId="prevalenceMutations">
                 <Label>Minimal Number Mutations within in Each Signature</Label>
@@ -88,7 +68,7 @@ export default function Tumor({ calculatePrevalence }) {
                 {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
               </Group>
             </Col>
-            <Col sm="5" />
+            <Col sm="7" />
             <Col sm="1" className="m-auto">
               <Button variant="primary" onClick={calculatePrevalence}>
                 Calculate

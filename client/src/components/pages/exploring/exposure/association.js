@@ -18,8 +18,7 @@ export default function Association({ calculateAssociation }) {
     (state) => state.expExposure
   );
   const {
-    cancer,
-    cancerOptions,
+    toggleCancer,
     both,
     signatureName1,
     signatureName2,
@@ -72,19 +71,25 @@ export default function Association({ calculateAssociation }) {
         <LoadingOverlay active={loading || mainLoading} />
         <div>
           <Row className="justify-content-center">
-            <Col sm="2">
-              <Select
-                id="associationCancerType"
-                label="Cancer Type"
-                value={cancer}
-                options={cancerOptions}
-                onChange={(name) => dispatchExpAssociation({ cancer: name })}
-              />
+            <Col sm="2" className="my-auto">
+              <Group controlId="toggleCancerType" className="d-flex">
+                <Label className="mr-4">Use Cancer Type</Label>
+                <Check inline id="toggleCancerType">
+                  <Check.Input
+                    type="checkbox"
+                    value={toggleCancer}
+                    checked={toggleCancer}
+                    onChange={() =>
+                      dispatchExpAssociation({ toggleCancer: !toggleCancer })
+                    }
+                  />
+                </Check>
+              </Group>
             </Col>
             <Col sm="2" className="my-auto">
-              <Group controlId="split" className="d-flex">
-                <Label className="mr-auto">Both Signatures</Label>
-                <Check inline id="split">
+              <Group controlId="toggleBothSamples" className="d-flex">
+                <Label className="mr-4">Both Signatures</Label>
+                <Check inline id="toggleBothSamples">
                   <Check.Input
                     type="checkbox"
                     value={both}

@@ -223,7 +223,7 @@ mutationalSignatureActivity <- function(signatureName, genomesize, plotPath, exp
   TMBplot(data_input, output_plot = plotPath, addnote = signatureName)
 }
 
-mutationalSignatureAssociation <- function(cancerType, both, signatureName1, signatureName2, plotPath, exposure_refdata) {
+mutationalSignatureAssociation <- function(useCancer, cancerType, both, signatureName1, signatureName2, plotPath, exposure_refdata) {
   ## cancerType: toggle to select specific cancer type or combine all cancer type data (default)
   ## both: toggle to choose samples with both signature detected
   data_input <- left_join(
@@ -237,7 +237,10 @@ mutationalSignatureAssociation <- function(cancerType, both, signatureName1, sig
       rename(Exposure2 = Exposure) %>%
       select(-Signature_name)
   )
-  signature_association(data = data_input, cancer_type_input = cancerType, signature_name_input1 = signatureName1, signature_name_input2 = signatureName2, signature_both = both, output_plot = plotPath)
+  if (useCancer == TRUE)
+    signature_association(data = data_input, cancer_type_input = cancerType, signature_name_input1 = signatureName1, signature_name_input2 = signatureName2, signature_both = both, output_plot = plotPath)
+  else
+    signature_association(data = data_input, cancer_type_input = NULL, signature_name_input1 = signatureName1, signature_name_input2 = signatureName2, signature_both = both, output_plot = plotPath)
 }
 
 mutationalSignatureDecomposition <- function(plotPath, dataPath, exposure_refdata, signature_refsets, seqmatrix_refdata) {
@@ -389,7 +392,7 @@ exposurePublic <- function(fn, common, activity = '{}', association = '{}', land
 
     # Mutational Signature Association
     if ('all' %in% fn | 'association' %in% fn)
-      mutationalSignatureAssociation(association$cancerType, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
+      mutationalSignatureAssociation(association$useCancer, common$cancerType, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
 
     # Evaluating the Performance of Mutational Signature Decomposition --------
     if ('all' %in% fn)
@@ -397,11 +400,11 @@ exposurePublic <- function(fn, common, activity = '{}', association = '{}', land
 
     # Landscape of Mutational Signature Activity
     if ('all' %in% fn | 'landscape' %in% fn)
-      mutationalSignatureLandscape(landscape$cancerType, landscape$varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+      mutationalSignatureLandscape(common$cancerType, landscape$varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
 
     # Prevalence plot
     if ('all' %in% fn | 'prevalence' %in% fn)
-      mutationalSignaturePrevalence(prevalence$mutation, prevalence$cancerType, prevalencePath, exposure_refdata_selected)
+      mutationalSignaturePrevalence(prevalence$mutation, common$cancerType, prevalencePath, exposure_refdata_selected)
 
     output = list(
       'tumorPath' = tumorPath,

@@ -267,6 +267,8 @@ export const getInitialState = () => ({
     studyOptions: [],
     strategy: '',
     strategyOptions: [],
+    cancer: '',
+    cancerOptions: [],
     refSigData: [],
     refSignatureSet: '',
     refSignatureSetOptions: [],
@@ -289,8 +291,7 @@ export const getInitialState = () => ({
     loading: false,
   },
   expAssociation: {
-    cancer: '',
-    cancerOptions: [],
+    toggleCancer: false,
     both: false,
     signatureName1: '',
     signatureName2: '',
@@ -310,8 +311,6 @@ export const getInitialState = () => ({
     loading: false,
   },
   expLandscape: {
-    cancer: '',
-    cancerOptions: [],
     varDataPath: '',
     plotPath: '',
     plotURL: '',
@@ -321,8 +320,6 @@ export const getInitialState = () => ({
     loading: false,
   },
   expPrevalence: {
-    cancer: '',
-    cancerOptions: [],
     mutation: '100',
     plotPath: '',
     plotURL: '',

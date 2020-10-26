@@ -39,6 +39,8 @@ export default function ExposureExploring() {
     studyOptions,
     strategy,
     strategyOptions,
+    cancer,
+    cancerOptions,
     refSigData,
     refSignatureSet,
     refSignatureSetOptions,
@@ -79,6 +81,7 @@ export default function ExposureExploring() {
           study: study,
           strategy: strategy,
           refSignatureSet: refSignatureSet,
+          cancerType: cancer,
         }),
         activity: JSON.stringify({ signatureName: activityArgs.signatureName }),
       });
@@ -113,10 +116,10 @@ export default function ExposureExploring() {
           study: study,
           strategy: strategy,
           refSignatureSet: refSignatureSet,
+          cancerType: cancer,
         }),
         association: JSON.stringify({
-          cancerType:
-            associationArgs.cancer == 'None' ? null : associationArgs.cancer,
+          useCancerType: associationArgs.toggleCancer,
           both: associationArgs.both,
           signatureName1: associationArgs.signatureName1,
           signatureName2: associationArgs.signatureName2,
@@ -153,9 +156,9 @@ export default function ExposureExploring() {
           study: study,
           strategy: strategy,
           refSignatureSet: refSignatureSet,
+          cancerType: cancer,
         }),
         landscape: JSON.stringify({
-          cancerType: landscapeArgs.cancer,
           varDataPath: landscapeArgs.varDataPath,
         }),
       });
@@ -190,9 +193,9 @@ export default function ExposureExploring() {
           study: study,
           strategy: strategy,
           refSignatureSet: refSignatureSet,
+          cancerType: cancer,
         }),
         prevalence: JSON.stringify({
-          cancerType: prevalenceArgs.cancer,
           mutation: parseFloat(prevalenceArgs.mutation) || 100,
         }),
       });
@@ -222,21 +225,19 @@ export default function ExposureExploring() {
         study: study,
         strategy: strategy,
         refSignatureSet: refSignatureSet,
+        cancerType: cancer,
       }),
       activity: JSON.stringify({ signatureName: activityArgs.signatureName }),
       association: JSON.stringify({
-        cancerType:
-          associationArgs.cancer == 'None' ? null : associationArgs.cancer,
+        useCancerType: associationArgs.toggleCancer,
         both: associationArgs.both,
         signatureName1: associationArgs.signatureName1,
         signatureName2: associationArgs.signatureName2,
       }),
       landscape: JSON.stringify({
-        cancerType: landscapeArgs.cancer,
         varDataPath: landscapeArgs.varDataPath,
       }),
       prevalence: JSON.stringify({
-        cancerType: prevalenceArgs.cancer,
         mutation: parseFloat(prevalenceArgs.mutation) || 100,
       }),
     });
@@ -345,14 +346,14 @@ export default function ExposureExploring() {
       title: 'Mutational Signature Activity',
     },
     {
-      component: <Association calculateAssociation={calculateAssociation} />,
-      id: 'association',
-      title: 'Mutational Signature Association',
-    },
-    {
       component: <Decomposition />,
       id: 'decomposition',
       title: 'Evaluating the Performance of Mutational Signature Decomposition',
+    },
+    {
+      component: <Association calculateAssociation={calculateAssociation} />,
+      id: 'association',
+      title: 'Mutational Signature Association',
     },
     {
       component: <Landscape calculateLandscape={calculateLandscape} />,
@@ -391,7 +392,20 @@ export default function ExposureExploring() {
                 }
               />
             </Col>
-            <Col sm="4">
+            <Col sm="2">
+              <Select
+                id="prevalenceCancerType"
+                label="Cancer Type"
+                value={cancer}
+                options={cancerOptions}
+                onChange={(cancer) =>
+                  dispatchExpPrevalence({
+                    cancer: cancer,
+                  })
+                }
+              />
+            </Col>
+            <Col sm="2">
               <Select
                 id="tumorSet"
                 label="Reference Signature Set"
@@ -400,7 +414,7 @@ export default function ExposureExploring() {
                 onChange={handleSet}
               />
             </Col>
-            <Col sm="3"></Col>
+            <Col sm="2"></Col>
             <Col sm="1" className="m-auto">
               <Button variant="primary" onClick={() => handleCalculate('all')}>
                 Calculate
