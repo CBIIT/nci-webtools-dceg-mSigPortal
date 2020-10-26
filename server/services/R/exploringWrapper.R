@@ -204,6 +204,130 @@ mutationalSignatureComparison <- function(profileName, refSignatureSet1, signatu
 }
 
 # Exposure Explore -------------------------------------------------------
+tumorMutationalBurden <- function(genomesize, plotPath, exposure_refdata) {
+  data_input <- exposure_refdata %>%
+    group_by(Cancer_Type, Sample) %>%
+    summarise(Burden = log10(sum(Exposure) / genomesize)) %>%
+    ungroup()
+  # put this barplot on the web
+  TMBplot(data_input, output_plot = plotPath)
+}
+
+mutationalSignatureActivity <- function(signatureName, genomesize, plotPath, exposure_refdata) {
+  data_input <- exposure_refdata %>%
+      filter(Signature_name == signatureName) %>%
+      group_by(Cancer_Type, Sample) %>%
+      summarise(Burden = log10(sum(Exposure) / genomesize)) %>%
+      ungroup()
+  # put this barplot on the web
+  TMBplot(data_input, output_plot = plotPath, addnote = signatureName)
+}
+
+mutationalSignatureAssociation <- function(cancerType, both, signatureName1, signatureName2, plotPath, exposure_refdata) {
+  ## cancerType: toggle to select specific cancer type or combine all cancer type data (default)
+  ## both: toggle to choose samples with both signature detected
+  data_input <- left_join(
+    exposure_refdata %>%
+      filter(Signature_name == signatureName1) %>%
+      rename(Exposure1 = Exposure) %>%
+      select(-Signature_name),
+
+    exposure_refdata %>%
+      filter(Signature_name == signatureName2) %>%
+      rename(Exposure2 = Exposure) %>%
+      select(-Signature_name)
+  )
+  signature_association(data = data_input, cancer_type_input = cancerType, signature_name_input1 = signatureName1, signature_name_input2 = signatureName2, signature_both = both, output_plot = plotPath)
+}
+
+mutationalSignatureDecomposition <- function(plotPath, dataPath, exposure_refdata, signature_refsets, seqmatrix_refdata) {
+  exposure_refdata_input <- exposure_refdata %>% mutate(Sample = paste0(Cancer_Type, "@", Sample)) %>%
+      select(Sample, Signature_name, Exposure) %>%
+      pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure)
+
+  signature_refsets_input <- signature_refsets %>%
+      select(MutationType, Signature_name, Contribution) %>%
+      pivot_wider(id_cols = MutationType, names_from = Signature_name, values_from = Contribution) %>%
+      arrange(MutationType) # have to sort the mutationtype
+
+  seqmatrix_refdata_input <- seqmatrix_refdata %>% mutate(Sample = paste0(Cancer_Type, "@", Sample)) %>%
+      select(MutationType, Sample, Mutations) %>%
+      pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
+      arrange(MutationType) ## have to sort the mutation type
+
+
+  decompsite_input <- calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
+  decompsite_input <- decompsite_input %>% separate(col = Sample_Names, into = c('Cancer_Type', 'Sample'), sep = '@')
+  decompsite_input %>% write_delim(dataPath, delim = '\t', col_names = T) ## put the link to download this table
+
+  decompsite_distribution(decompsite = decompsite_input, output_plot = plotPath) # put the distribution plot online.
+}
+
+mutationalSignatureLandscape <- function(cancerType, varDataPath, plotPath, exposure_refdata, signature_refsets, seqmatrix_refdata) {
+  exposure_refdata_input <- exposure_refdata %>% filter(Cancer_Type == cancerType) %>%
+      select(Sample, Signature_name, Exposure) %>%
+      pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure)
+
+  signature_refsets_input <- signature_refsets %>%
+      select(MutationType, Signature_name, Contribution) %>%
+      pivot_wider(id_cols = MutationType, names_from = Signature_name, values_from = Contribution) %>%
+      arrange(MutationType) # have to sort the mutationtype
+
+  seqmatrix_refdata_input <- seqmatrix_refdata %>% filter(Cancer_Type == cancerType) %>%
+      select(MutationType, Sample, Mutations) %>%
+      pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
+      arrange(MutationType) ## have to sort the mutationtype
+  decompsite_input <- calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
+
+  cosinedata <- decompsite_input %>% select(Samples = Sample_Names, Similarity = Cosine_similarity)
+
+  data_input <- exposure_refdata %>%
+      filter(Cancer_Type == cancerType) %>%
+      select(Sample, Signature_name, Exposure) %>%
+      pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure) %>%
+      rename(Samples = Sample)
+
+  data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
+
+  sigdata <- data_input
+  ## two parameters to add the two bars: vardata1, vardata1_cat, vardata2, vardata2_cat
+  # studydata <- data_input %>% select(Samples) %>% mutate(Study=if_else((seq_along(Samples) %% 2 ==0), "A","B"))
+  # puritydata <-  data_input %>% select(Samples) %>% mutate(Purity=0)
+  # puritydata$Purity <- runif(n=length(puritydata$Purity), min=1e-12, max=.9999999999)
+  # highlight <-  c('SP124389','SP124273')
+  # Exposure_Clustering(sigdata = sigdata,studydata = studydata,studyname = "VAR1",puritydata = puritydata,purityname = 'VAR2',cosinedata = cosinedata,clustern=5,output_plot = 'tmp.svg' )
+  # Exposure_Clustering(sigdata = sigdata,cosinedata = cosinedata,clustern=5,output_plot = 'tmp.svg' )
+
+  # parameter: Cancer Type, Vardata_input_file
+  if (stringi::stri_length(varDataPath) > 0) {
+    print(varDataPath)
+    vardata_input <- read_delim(vardata_input_file, delim = '\t', col_names = T)
+
+    vardata1_input <- vardata_input %>% select(1:2)
+    colnames(vardata1_input) <- c('Samples', 'Study')
+    vardata1_cat_input <- if_else(is.character(vardata1_input$Study), TRUE, FALSE)
+
+    if (dim(vardata_input)[2] > 2) {
+      vardata2_input <- vardata_input %>% select(1, 3)
+      colnames(vardata2_input) <- c('Samples', 'Purity')
+      vardata2_cat_input <- if_else(is.character(vardata2_input$Purity), TRUE, FALSE)
+    } else {
+      vardata2_input <- NULL
+      vardata2_cat_input <- FALSE
+    }
+
+  } else {
+    vardata_input <- NULL
+    vardata1_input <- NULL
+    vardata1_cat_input <- NULL
+    vardata2_input <- NULL
+    vardata2_cat_input <- NULL
+  }
+
+  Exposure_Clustering(sigdata = sigdata, studydata = vardata1_input, studydata_cat = vardata1_cat_input, puritydata = vardata2_input, puritydata_cat = vardata2_cat_input, cosinedata = cosinedata, clustern = 5, output_plot = plotPath)
+  return(sigdata)
+}
+
 exposurePublic <- function(common, activity, association, landscape, prevalence, projectID, pythonOutput, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'Signature/signature_refsets.RData'))
@@ -240,142 +364,30 @@ exposurePublic <- function(common, activity, association, landscape, prevalence,
   )
     genomesize = genome2size(genome)
 
-    ## reduce the data for signature and profile
-    # signature_refsets %>% select(Profile, Signature_set_name) %>% unique()
     signature_refsets_selected <- signature_refsets %>%
       filter(Signature_set_name == common$refSignatureSet)
 
-    # files <- seqmatrix_refdata_subset_files %>% filter(Study == common$study, Dataset == common$strategy) %>% pull(file)
-    # for (seqmatrix in files) {
-    #   seqmatrix_refdata <- get(load(paste0(dataPath, 'Seqmatrix/', seqmatrix)))
-    # }
-
     seqmatrix_refdata_selected <- seqmatrix_refdata %>% filter(Study == common$study, Dataset == common$strategy, Profile == signature_refsets_selected$Profile[1])
 
+
     ## Tumor Overall Mutational Burden
-    data_input <- exposure_refdata_selected %>%
-      group_by(Cancer_Type, Sample) %>%
-      summarise(Burden = log10(sum(Exposure) / genomesize)) %>%
-      ungroup()
-    # put this barplot on the web
-    TMBplot(data_input, output_plot = tumorPath)
+    print(1)
+    tumorMutationalBurden(genomesize, tumorPath, exposure_refdata_selected)
 
     # Mutational Signature Activity
+    print(2)
+    mutationalSignatureActivity(activity$signatureName, genomesize, activityPath, exposure_refdata_selected)
 
-    data_input <- exposure_refdata_selected %>%
-      filter(Signature_name == activity$signatureName) %>%
-      group_by(Cancer_Type, Sample) %>%
-      summarise(Burden = log10(sum(Exposure) / genomesize)) %>%
-      ungroup()
-    # put this barplot on the web
-    TMBplot(data_input, output_plot = activityPath, addnote = activity$signatureName)
-
-    # Mutational Signature Assocaition
-    cancer_type_input <- NULL ## toggle to select specific cancer type or combine all cancer type data (default)
-    signature_both <- FALSE ## toggle to choose samples with both signature detected
-
-
-    data_input <- left_join(
-      exposure_refdata_selected %>%
-        filter(Signature_name == association$signatureName1) %>%
-        rename(Exposure1 = Exposure) %>%
-        select(-Signature_name),
-
-      exposure_refdata_selected %>%
-        filter(Signature_name == association$signatureName2) %>%
-        rename(Exposure2 = Exposure) %>%
-        select(-Signature_name)
-    )
-
-    signature_association(data = data_input, cancer_type_input = cancer_type_input, signature_name_input1 = association$signatureName1, signature_name_input2 = association$signatureName2, signature_both = signature_both, output_plot = associationPath)
+    # Mutational Signature Association
+    print(3)
+    mutationalSignatureAssociation(association$cancerType, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
 
     # Evaluating the Performance of Mutational Signature Decomposition --------
-
-    exposure_refdata_input <- exposure_refdata_selected %>% mutate(Sample = paste0(Cancer_Type, "@", Sample)) %>%
-      select(Sample, Signature_name, Exposure) %>%
-      pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure)
-
-    signature_refsets_input <- signature_refsets_selected %>%
-      select(MutationType, Signature_name, Contribution) %>%
-      pivot_wider(id_cols = MutationType, names_from = Signature_name, values_from = Contribution) %>%
-      arrange(MutationType) # have to sort the mutationtype
-
-    seqmatrix_refdata_input <- seqmatrix_refdata_selected %>% mutate(Sample = paste0(Cancer_Type, "@", Sample)) %>%
-      select(MutationType, Sample, Mutations) %>%
-      pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
-      arrange(MutationType) ## have to sort the mutation type
-
-
-    decompsite_input <- calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
-    decompsite_input <- decompsite_input %>% separate(col = Sample_Names, into = c('Cancer_Type', 'Sample'), sep = '@')
-    decompsite_input %>% write_delim(decompositionData, delim = '\t', col_names = T) ## put the link to download this table
-
-    decompsite_distribution(decompsite = decompsite_input, output_plot = decompositionPath) # put the distribution plot online.
+    mutationalSignatureDecomposition(decompositionPath, decompositionData, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+    print(4)
 
     # Landscape of Mutational Signature Activity
-    cancer_type_input <- 'Skin-Melanoma'
-
-    exposure_refdata_input <- exposure_refdata_selected %>% filter(Cancer_Type == cancer_type_input) %>%
-      select(Sample, Signature_name, Exposure) %>%
-      pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure)
-
-    signature_refsets_input <- signature_refsets_selected %>%
-      select(MutationType, Signature_name, Contribution) %>%
-      pivot_wider(id_cols = MutationType, names_from = Signature_name, values_from = Contribution) %>%
-      arrange(MutationType) # have to sort the mutationtype
-
-    seqmatrix_refdata_input <- seqmatrix_refdata_selected %>% filter(Cancer_Type == cancer_type_input) %>%
-      select(MutationType, Sample, Mutations) %>%
-      pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
-      arrange(MutationType) ## have to sort the mutationtype
-    decompsite_input <- calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
-
-    cosinedata <- decompsite_input %>% select(Samples = Sample_Names, Similarity = Cosine_similarity)
-
-    data_input <- exposure_refdata_selected %>%
-      filter(Cancer_Type == cancer_type_input) %>%
-      select(Sample, Signature_name, Exposure) %>%
-      pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure) %>%
-      rename(Samples = Sample)
-
-    data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
-
-    sigdata <- data_input
-    ## two parameters to add the two bars: vardata1, vardata1_cat, vardata2, vardata2_cat 
-    # studydata <- data_input %>% select(Samples) %>% mutate(Study=if_else((seq_along(Samples) %% 2 ==0), "A","B"))
-    # puritydata <-  data_input %>% select(Samples) %>% mutate(Purity=0)
-    # puritydata$Purity <- runif(n=length(puritydata$Purity), min=1e-12, max=.9999999999)
-    # highlight <-  c('SP124389','SP124273')
-    # Exposure_Clustering(sigdata = sigdata,studydata = studydata,studyname = "VAR1",puritydata = puritydata,purityname = 'VAR2',cosinedata = cosinedata,clustern=5,output_plot = 'tmp.svg' )
-    # Exposure_Clustering(sigdata = sigdata,cosinedata = cosinedata,clustern=5,output_plot = 'tmp.svg' )
-
-    # parameter: Cancer Type, Vardata_input_file
-    if (stringi::stri_length(landscape$varDataPath) > 0) {
-      print(landscape$varDataPath)
-      vardata_input <- read_delim(vardata_input_file, delim = '\t', col_names = T)
-
-      vardata1_input <- vardata_input %>% select(1:2)
-      colnames(vardata1_input) <- c('Samples', 'Study')
-      vardata1_cat_input <- if_else(is.character(vardata1_input$Study), TRUE, FALSE)
-
-      if (dim(vardata_input)[2] > 2) {
-        vardata2_input <- vardata_input %>% select(1, 3)
-        colnames(vardata2_input) <- c('Samples', 'Purity')
-        vardata2_cat_input <- if_else(is.character(vardata2_input$Purity), TRUE, FALSE)
-      } else {
-        vardata2_input <- NULL
-        vardata2_cat_input <- FALSE
-      }
-
-    } else {
-      vardata_input <- NULL
-      vardata1_input <- NULL
-      vardata1_cat_input <- NULL
-      vardata2_input <- NULL
-      vardata2_cat_input <- NULL
-    }
-
-    Exposure_Clustering(sigdata = sigdata, studydata = vardata1_input, studydata_cat = vardata1_cat_input, puritydata = vardata2_input, puritydata_cat = vardata2_cat_input, cosinedata = cosinedata, clustern = 5, output_plot = landscapePath)
+    sigdata = mutationalSignatureLandscape(landscape$cancerType, landscape$varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
 
     ### prevalence plot
     prevalence_plot(sigdata = sigdata, nmutation = prevalence$mutation, output_plot = prevalencePath)
@@ -398,3 +410,4 @@ exposurePublic <- function(common, activity, association, landscape, prevalence,
     return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
   })
 }
+
