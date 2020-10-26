@@ -8,8 +8,9 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 
-export default function Tumor() {
+export default function Decomposition() {
   const rootURL = window.location.pathname;
+  const { loading: mainLoading } = useSelector((state) => state.expExposure);
   const { plotPath, plotURL, txtPath, debugR, err, loading } = useSelector(
     (state) => state.expDecomposition
   );
@@ -44,7 +45,7 @@ export default function Tumor() {
 
   return (
     <div>
-      <LoadingOverlay active={loading} />
+      <LoadingOverlay active={loading || mainLoading} />
       {err && (
         <p>An error has occured. Check the debug section for more info.</p>
       )}
