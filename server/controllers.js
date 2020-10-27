@@ -292,12 +292,16 @@ function upload(req, res, next) {
   fs.mkdirSync(form.uploadDir);
 
   form.parse(req);
-  form.on('file', (field, file) => {
+  form.on('file', async (field, file) => {
     const uploadPath = path.join(form.uploadDir, file.name);
     if (field == 'inputFile') form.filePath = uploadPath;
     if (field == 'bedFile') form.bedPath = uploadPath;
-    fs.rename(file.path, uploadPath, (err) => {
-      if (err) {
+
+    let data = await fs.promises.readFile(file.path);
+    await fs.promises
+      .writeFile(uploadPath, data)
+      .then(logger.info(`/UPLOAD: Successfully uploaded file: ${file.name}`))
+      .catch((err) => {
         logger.info(`/UPLOAD: Failed to upload file: ${file.name}`);
         logger.error(err);
         res.status(404).json({
@@ -305,10 +309,7 @@ function upload(req, res, next) {
         Review your selected File Type and try again.`,
           error: err,
         });
-      } else {
-        logger.info(`/UPLOAD: Successfully uploaded file: ${file.name}`);
-      }
-    });
+      });
   });
   form.on('error', (err) => {
     logger.info('/UPLOAD: An error occured\n' + err);
@@ -319,6 +320,7 @@ function upload(req, res, next) {
     });
   });
   form.on('end', () => {
+    logger.info('Upload Complete');
     res.json({
       projectID: projectID,
       filePath: form.filePath,
