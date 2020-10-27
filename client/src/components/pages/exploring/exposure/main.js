@@ -344,8 +344,6 @@ export default function ExposureExploring() {
         ((!usePublicSignature && signatureFileObj) ||
           (usePublicSignature && refSignatureSet))
       ) {
-        dispatchExpExposure({ loading: true });
-
         try {
           const data = new FormData();
           data.append('inputFile', exposureFileObj);
@@ -366,12 +364,10 @@ export default function ExposureExploring() {
             reject(error);
           } else {
             const { projectID } = await response.json();
-            dispatchExpExposure({ projectID: projectID, loading: false });
             resolve(projectID);
           }
         } catch (err) {
           dispatchError(err);
-          dispatchExpExposure({ loading: false });
           reject(err);
         }
       } else {
