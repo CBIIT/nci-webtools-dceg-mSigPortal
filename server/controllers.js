@@ -350,8 +350,8 @@ function download(req, res, next) {
 async function exploringR(req, res, next) {
   logger.info('/exploringR: function ' + req.body.fn);
   console.log('args', req.body);
-  const projectID = req.body.projectID ? req.body.projectID : uuidv4();
-  const rootDir = path.join(config.results.folder, req.body.projectID);
+  const projectID = req.body.projectID ? req.body.projectID : uuidv4()
+  const rootDir = path.join(config.results.folder, projectID);
   const savePath = path.join(rootDir, 'results', req.body.fn, '/');
 
   fs.mkdirSync(savePath, { recursive: true });
