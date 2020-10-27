@@ -127,6 +127,7 @@ export default function UploadForm() {
           dispatchSuccess(
             `Your job was successfully submitted to the queue. You will recieve an email at ${email} with your results.`
           );
+          handleReset();
         } else {
           dispatchVisualizeResults({
             error: 'Please Reset Your Parameters and Try again.',
@@ -686,7 +687,7 @@ export default function UploadForm() {
             value={email}
             type="email"
             onChange={(e) => dispatchVisualize({ email: e.target.value })}
-            disabled={!queueMode}
+            disabled={!queueMode || submitted}
             isInvalid={queueMode && checkValid ? !validEmail : false}
           />
           <Control.Feedback type="invalid">
