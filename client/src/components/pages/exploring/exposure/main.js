@@ -29,12 +29,9 @@ const { Group, Label, Check, Control } = Form;
 
 export default function ExposureExploring() {
   const rootURL = window.location.pathname;
-  const {
-    displayTab,
-    projectID,
-    exposureAccordion,
-    publicDataOptions,
-  } = useSelector((state) => state.exploring);
+  const { displayTab, exposureAccordion, publicDataOptions } = useSelector(
+    (state) => state.exploring
+  );
   const {
     study,
     studyOptions,
@@ -45,18 +42,27 @@ export default function ExposureExploring() {
     refSigData,
     refSignatureSet,
     refSignatureSetOptions,
-    genomeSize,
+    genome,
+    genomeOptions,
+    exposureFile,
+    matrixFile,
+    signatureFile,
+    usePublicSignature,
     source,
     loading,
+    projectID,
   } = useSelector((state) => state.expExposure);
   const activityArgs = useSelector((state) => state.expActivity);
   const associationArgs = useSelector((state) => state.expAssociation);
   const landscapeArgs = useSelector((state) => state.expLandscape);
   const prevalenceArgs = useSelector((state) => state.expPrevalence);
 
-  const [exposureFile, setExposure] = useState(new File([], ''));
-  const [matrixFile, setMatrix] = useState(new File([], ''));
-  const [signatureFile, setSignature] = useState(new File([], ''));
+  const [exposureFileObj, setExposure] = useState(new File([], ''));
+  const [matrixFileObj, setMatrix] = useState(new File([], ''));
+  const [signatureFileObj, setSignature] = useState(new File([], ''));
+  const [exposureValidity, setExposureValidity] = useState(false);
+  const [matrixValidity, setMatrixValidity] = useState(false);
+  const [signatureValidity, setSignatureValidity] = useState(false);
 
   function submitR(fn, args) {
     return fetch(`${rootURL}exploringR`, {
@@ -224,14 +230,15 @@ export default function ExposureExploring() {
 
   async function handleCalculate(fn) {
     dispatchExpExposure({ loading: true });
-
-    const { debugR, output } = await submitR('exposurePublic', {
+    let rFn = 'exposurePublic';
+    let args = {
       fn: fn,
       common: JSON.stringify({
         study: study,
         strategy: strategy,
         refSignatureSet: refSignatureSet,
         cancerType: cancer,
+        genome: genome,
       }),
       activity: JSON.stringify({ signatureName: activityArgs.signatureName }),
       association: JSON.stringify({
@@ -246,7 +253,16 @@ export default function ExposureExploring() {
       prevalence: JSON.stringify({
         mutation: parseFloat(prevalenceArgs.mutation) || 100,
       }),
-    });
+    };
+    if (source == 'user') {
+      rFn = 'exposureUser';
+      args.files = JSON.stringify({
+        exposureFile: exposureFile,
+        matrixFile: matrixFile,
+        signatureFile: signatureFile,
+      });
+    }
+    const { debugR, output } = await submitR(rFn, args);
 
     if (output) {
       if (output.tumorPath)
@@ -292,6 +308,8 @@ export default function ExposureExploring() {
           err: false,
         });
       else dispatchExpPrevalence({ err: true, debugR: debugR });
+    } else {
+      dispatchError(debugR);
     }
 
     dispatchExpExposure({ loading: false });
@@ -337,35 +355,48 @@ export default function ExposureExploring() {
     });
   }
 
-  async function handleUpload() {
-    if ('vdFile.size') {
-      dispatchExpLandscape({ loading: true });
+  function handleUpload() {
+    return new Promise(async (resolve, reject) => {
+      if (
+        exposureFileObj.size &&
+        matrixFileObj.size &&
+        ((!usePublicSignature && signatureFileObj) ||
+          (usePublicSignature && refSignatureSet))
+      ) {
+        dispatchExpExposure({ loading: true });
 
-      try {
-        const data = new FormData();
-        data.append('inputFile', 'vdFile');
-        let response = await fetch(`${rootURL}upload`, {
-          method: 'POST',
-          body: data,
-        });
+        try {
+          const data = new FormData();
+          data.append('inputFile', exposureFileObj);
+          data.append('inputFile', matrixFileObj);
+          if (!usePublicSignature) data.append('inputFile', signatureFileObj);
+          let response = await fetch(`${rootURL}upload`, {
+            method: 'POST',
+            body: data,
+          });
 
-        if (!response.ok) {
-          const { msg, error } = await response.json();
-          const message = `<div>
-          <p>${msg}</p>
-         ${error ? `<p>${error}</p>` : ''} 
-        </div>`;
-          dispatchError(message);
-        } else {
-          const { filePath } = await response.json();
-          dispatchExpLandscape({ varDataPath: filePath });
+          if (!response.ok) {
+            const { msg, error } = await response.json();
+            const message = `<div>
+            <p>${msg}</p>
+          ${error ? `<p>${error}</p>` : ''} 
+          </div>`;
+            dispatchError(message);
+            reject(error);
+          } else {
+            const { projectID } = await response.json();
+            dispatchExpExposure({ projectID: projectID, loading: false });
+            resolve(projectID);
+          }
+        } catch (err) {
+          dispatchError(err);
+          dispatchExpExposure({ loading: false });
+          reject(err);
         }
-      } catch (err) {
-        dispatchError(err);
+      } else {
+        reject('Missing required files');
       }
-
-      dispatchExpLandscape({ loading: false });
-    }
+    });
   }
 
   const sections = [
@@ -495,52 +526,103 @@ export default function ExposureExploring() {
                 <Label>Upload Exposure File</Label>
                 <Form.File
                   id="variableData"
-                  label={exposureFile.name || 'Exposure File'}
-                  // accept=''
-                  onChange={(e) => setExposure(e.target.files[0])}
+                  label={exposureFileObj.name || 'Exposure File'}
+                  accept=".txt"
+                  onChange={(e) => {
+                    setExposure(e.target.files[0]);
+                    dispatchExpExposure({
+                      exposureFile: e.target.files[0].name,
+                    });
+                  }}
                   custom
                 />
-              </Col>{' '}
+                {exposureValidity && (
+                  <span className="text-danger">Exposure File Required</span>
+                )}
+              </Col>
               <Col sm="2">
                 <Label>Upload Matrix File</Label>
                 <Form.File
                   id="variableData"
-                  label={matrixFile.name || 'Matrix File'}
-                  // accept=''
-                  onChange={(e) => setMatrix(e.target.files[0])}
+                  label={matrixFileObj.name || 'Matrix File'}
+                  accept=".txt"
+                  onChange={(e) => {
+                    setMatrix(e.target.files[0]);
+                    dispatchExpExposure({
+                      matrixFile: e.target.files[0].name,
+                    });
+                  }}
                   custom
                 />
-              </Col>{' '}
-              <Col sm="2">
-                <Label>Upload Signature Data</Label>
-                <Form.File
-                  id="variableData"
-                  label={signatureFile.name || 'Signature File'}
-                  // accept=''
-                  onChange={(e) => setSignature(e.target.files[0])}
-                  custom
-                />
+                {matrixValidity && (
+                  <span className="text-danger">Matrix File Required</span>
+                )}
               </Col>
-              <Col sm="2">
-                <Group controlId="exposureGenomesize">
-                  <Label>Genome Size</Label>
-                  <Control
-                    value={genomeSize}
-                    placeholder="e.g. 100"
-                    onChange={(e) => {
-                      dispatchExpExposure({
-                        genomeSize: e.target.value,
-                      });
-                    }}
-                  />
-                  {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
+              <Col sm="2" className="my-auto">
+                <Group controlId="toggleSignatureSource" className="d-flex">
+                  <Label className="mr-4">Use Public Signature Data</Label>
+                  <Check inline id="toggleSignatureSource">
+                    <Check.Input
+                      type="checkbox"
+                      value={usePublicSignature}
+                      checked={usePublicSignature}
+                      onChange={() =>
+                        dispatchExpExposure({
+                          usePublicSignature: !usePublicSignature,
+                        })
+                      }
+                    />
+                  </Check>
                 </Group>
               </Col>
-              <Col sm="3"></Col>
+              {usePublicSignature ? (
+                <Col sm="2">
+                  <Select
+                    id="exposureSignatureSet"
+                    label="Reference Signature Set"
+                    value={refSignatureSet}
+                    options={refSignatureSetOptions}
+                    onChange={handleSet}
+                  />
+                </Col>
+              ) : (
+                <Col sm="2">
+                  <Label>Upload Signature Data</Label>
+                  <Form.File
+                    id="variableData"
+                    label={signatureFileObj.name || 'Signature File'}
+                    accept=".txt"
+                    onChange={(e) => {
+                      setSignature(e.target.files[0]);
+                      dispatchExpExposure({
+                        signatureFile: e.target.files[0].name,
+                      });
+                    }}
+                    custom
+                  />
+                  {signatureValidity && (
+                    <span className="text-danger">Signature File Required</span>
+                  )}
+                </Col>
+              )}
+              <Col sm="2">
+                <Select
+                  id="exposureGenome"
+                  label="Genome"
+                  value={genome}
+                  options={genomeOptions}
+                  onChange={(genome) => dispatchExpExposure({ genome: genome })}
+                />
+              </Col>
+              <Col sm="1"></Col>
               <Col sm="1" className="m-auto">
                 <Button
                   variant="primary"
-                  onClick={() => handleCalculate('all')}
+                  onClick={() => {
+                    handleUpload()
+                      .then(() => handleCalculate('all'))
+                      .catch(dispatchError);
+                  }}
                 >
                   Calculate
                 </Button>

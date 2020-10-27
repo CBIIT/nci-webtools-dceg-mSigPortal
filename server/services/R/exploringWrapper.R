@@ -45,7 +45,7 @@ getReferenceSignatureData <- function(args, dataPath) {
 
 # Signature Explore -------------------------------------------------------
 # section 1: Current reference signatures in mSigPortal -------------------
-referenceSignatures <- function(projectID, pythonOutput, savePath, dataPath) {
+referenceSignatures <- function(projectID, pythonOutput, rootDir, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'Signature/signature_refsets.RData'))
   con <- textConnection('stdout', 'wr', local = TRUE)
@@ -82,7 +82,7 @@ referenceSignatures <- function(projectID, pythonOutput, savePath, dataPath) {
 }
 
 # section 2: Mutational signature profile  --------------------------------------------------------------
-mutationalProfiles <- function(signatureSource, profileName, refSignatureSet, experimentalStrategy, signatureName, projectID, pythonOutput, savePath, dataPath) {
+mutationalProfiles <- function(signatureSource, profileName, refSignatureSet, experimentalStrategy, signatureName, projectID, pythonOutput, rootDir, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'Signature/signature_refsets.RData'))
   con <- textConnection('stdout', 'wr', local = TRUE)
@@ -116,7 +116,7 @@ mutationalProfiles <- function(signatureSource, profileName, refSignatureSet, ex
 }
 
 # section3: Cosine similarities among mutational signatures -------------------------
-cosineSimilarity <- function(profileName, refSignatureSet1, refSignatureSet2, projectID, pythonOutput, savePath, dataPath) {
+cosineSimilarity <- function(profileName, refSignatureSet1, refSignatureSet2, projectID, pythonOutput, rootDir, savePath, dataPath) {
   # The parameters will be “Matrix Size”, “Reference Signature Set1” and “Reference Signature Set2”. 
   source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'Signature/signature_refsets.RData'))
@@ -160,7 +160,7 @@ cosineSimilarity <- function(profileName, refSignatureSet1, refSignatureSet2, pr
 # section4: Mutational signatures comparisons
 ## A comparison of two reference signatures
 # There will be five parameters: “Profile Type”,  “Reference Signature Set1”, “Signature Name1”, “Reference Signature Set2”, “Signature Name2”;
-mutationalSignatureComparison <- function(profileName, refSignatureSet1, signatureName1, refSignatureSet2, signatureName2, projectID, pythonOutput, savePath, dataPath) {
+mutationalSignatureComparison <- function(profileName, refSignatureSet1, signatureName1, refSignatureSet2, signatureName2, projectID, pythonOutput, rootDir, savePath, dataPath) {
   # The parameters will be “Matrix Size”, “Reference Signature Set1” and “Reference Signature Set2”. 
   source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'Signature/signature_refsets.RData'))
@@ -341,7 +341,7 @@ mutationalSignaturePrevalence <- function(mutation, cancerType, plotPath, exposu
   prevalence_plot(sigdata = sigdata, nmutation = mutation, output_plot = plotPath)
 }
 
-exposurePublic <- function(fn, common, activity = '{}', association = '{}', landscape = '{}', prevalence = '{}', projectID, pythonOutput, savePath, dataPath) {
+exposurePublic <- function(fn, common, activity = '{}', association = '{}', landscape = '{}', prevalence = '{}', projectID, pythonOutput, rootDir, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'Signature/signature_refsets.RData'))
   load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata.RData'))
@@ -425,3 +425,100 @@ exposurePublic <- function(fn, common, activity = '{}', association = '{}', land
   })
 }
 
+exposureUser <- function(fn, files, common, activity = '{}', association = '{}', landscape = '{}', prevalence = '{}', projectID, pythonOutput, rootDir, savePath, dataPath) {
+  source('services/R/Sigvisualfunc.R')
+
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+    tumorPath = paste0(savePath, 'tumorMutationalBurden.svg')
+    activityPath = paste0(savePath, 'mutationalSignatureActivity.svg')
+    associationPath = paste0(savePath, 'mutationalSignatureAssociation.svg')
+    decompositionPath = paste0(savePath, 'mutationalSignatureDecomposition.svg')
+    decompositionData = paste0(savePath, 'mutationalSignatureDecomposition.txt')
+    landscapePath = paste0(savePath, 'landscapeMutationalSignature.svg')
+    prevalencePath = paste0(savePath, 'prevalenceMutationalSignature.svg')
+
+    # parse arguments
+    common = fromJSON(common)
+    activity = fromJSON(activity)
+    association = fromJSON(association)
+    landscape = fromJSON(landscape)
+    prevalence = fromJSON(prevalence)
+    files = fromJSON(files)
+
+    exposure_refdata_selected <- read_delim(file.path(rootDir, files$exposureFile), delim = '\t', col_names = T)
+    seqmatrix_refdata_selected <- read_delim(file.path(rootDir, files$matrixFile), delim = '\t', col_names = T)
+
+    if (stringi::stri_length(files$signatureFile) > 0) {
+      # if using user uploaded signature file
+      signature_refsets_selected <- read_delim(file.path(rootDir, files$signatureFile), delim = '\t', col_names = T)
+    } else {
+      # else use public signature data
+      load(paste0(dataPath, 'Signature/signature_refsets.RData'))
+      signature_refsets_selected <- signature_refsets %>%
+        filter(Signature_set_name == common$refSignatureSet) %>%
+        select(MutationType, Signature_name, Contribution) %>%
+        pivot_wider(names_from = Signature_name, values_from = Contribution)
+    }
+
+    genomesize <- genome2size(common$genome)
+    cancer_type_user <- "Input"
+
+    ## format the input as suggest by the public dataset ##
+    colnames(exposure_refdata_selected)[1] <- "Sample"
+    colnames(seqmatrix_refdata_selected)[1] <- "MutationType"
+    colnames(signature_refsets_selected)[1] <- "MutationType"
+    seqmatrix_refdata_selected <- seqmatrix_refdata_selected %>% select(1, any_of(exposure_refdata_selected$Sample)) %>% profile_format_df()
+    signature_refsets_selected <- signature_refsets_selected %>% select(MutationType, any_of(colnames(exposure_refdata_selected))) %>% profile_format_df()
+
+    exposure_refdata_selected <- exposure_refdata_selected %>% pivot_longer(cols = -Sample, names_to = "Signature_name", values_to = "Exposure") %>% mutate(Cancer_Type = cancer_type_user)
+    signature_refsets_selected <- signature_refsets_selected %>% select(-Type, - SubType) %>% pivot_longer(cols = -MutationType, names_to = "Signature_name", values_to = "Contribution")
+    seqmatrix_refdata_selected <- seqmatrix_refdata_selected %>% select(-Type, - SubType) %>% pivot_longer(cols = -MutationType, names_to = "Sample", values_to = "Mutations") %>% mutate(Cancer_Type = cancer_type_user)
+
+
+    ## Tumor Overall Mutational Burden
+    if ('all' %in% fn)
+      tumorMutationalBurden(genomesize, tumorPath, exposure_refdata_selected)
+
+    # Mutational Signature Activity
+    if ('all' %in% fn || 'activity' %in% fn)
+      mutationalSignatureActivity(activity$signatureName, genomesize, activityPath, exposure_refdata_selected)
+
+    # Mutational Signature Association
+    if ('all' %in% fn | 'association' %in% fn)
+      mutationalSignatureAssociation(association$useCancer, cancer_type_user, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
+
+    # Evaluating the Performance of Mutational Signature Decomposition --------
+    if ('all' %in% fn)
+      mutationalSignatureDecomposition(decompositionPath, decompositionData, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+
+    # Landscape of Mutational Signature Activity
+    if ('all' %in% fn | 'landscape' %in% fn)
+      mutationalSignatureLandscape(cancer_type_user, landscape$varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+
+    # Prevalence plot
+    if ('all' %in% fn | 'prevalence' %in% fn)
+      mutationalSignaturePrevalence(prevalence$mutation, cancer_type_user, prevalencePath, exposure_refdata_selected)
+
+    output = list(
+      'tumorPath' = tumorPath,
+      'activityPath' = activityPath,
+      'associationPath' = associationPath,
+      'decompositionPath' = decompositionPath,
+      'decompositionData' = decompositionData,
+      'landscapePath' = landscapePath,
+      'prevalencePath' = prevalencePath
+      )
+
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+  })
+}

@@ -348,14 +348,9 @@ function download(req, res, next) {
 async function exploringR(req, res, next) {
   logger.info('/exploringR: function ' + req.body.fn);
   console.log('args', req.body);
-  const projectID = req.body.projectID || uuidv4();
-  const savePath = path.join(
-    config.results.folder,
-    projectID,
-    'results',
-    req.body.fn,
-    '/'
-  );
+  const projectID = req.body.projectID ? req.body.projectID : uuidv4();
+  const rootDir = path.join(config.results.folder, req.body.projectID);
+  const savePath = path.join(rootDir, 'results', req.body.fn, '/');
 
   fs.mkdirSync(savePath, { recursive: true });
 
@@ -368,6 +363,7 @@ async function exploringR(req, res, next) {
         req.body.projectID,
         'results/output'
       ),
+      rootDir: rootDir,
       savePath: savePath,
       dataPath: path.join(config.data.database),
     });
