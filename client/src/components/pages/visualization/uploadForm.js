@@ -127,7 +127,6 @@ export default function UploadForm() {
           dispatchSuccess(
             `Your job was successfully submitted to the queue. You will recieve an email at ${email} with your results.`
           );
-          handleReset();
         } else {
           dispatchVisualizeResults({
             error: 'Please Reset Your Parameters and Try again.',
