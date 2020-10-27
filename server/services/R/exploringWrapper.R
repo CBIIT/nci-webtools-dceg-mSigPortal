@@ -383,38 +383,36 @@ exposurePublic <- function(fn, common, activity = '{}', association = '{}', land
 
 
     ## Tumor Overall Mutational Burden
-    if ('all' %in% fn)
+    if ('all' %in% fn) {
       tumorMutationalBurden(genomesize, tumorPath, exposure_refdata_selected)
+      output[['tumorPath']] = tumorPath
+    }
 
     # Mutational Signature Activity
-    if ('all' %in% fn || 'activity' %in% fn)
+    if ('all' %in% fn || 'activity' %in% fn) {
       mutationalSignatureActivity(activity$signatureName, genomesize, activityPath, exposure_refdata_selected)
-
+      output[['activityPath']] = activityPath
+    }
     # Mutational Signature Association
-    if ('all' %in% fn | 'association' %in% fn)
+    if ('all' %in% fn | 'association' %in% fn) {
       mutationalSignatureAssociation(association$useCancer, common$cancerType, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
-
+      output[['associationPath']] = associationPath
+    }
     # Evaluating the Performance of Mutational Signature Decomposition --------
-    if ('all' %in% fn)
+    if ('all' %in% fn) {
       mutationalSignatureDecomposition(decompositionPath, decompositionData, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
-
+      output[['decompositionPath']] = decompositionPath
+    }
     # Landscape of Mutational Signature Activity
-    if ('all' %in% fn | 'landscape' %in% fn)
+    if ('all' %in% fn | 'landscape' %in% fn) {
       mutationalSignatureLandscape(common$cancerType, landscape$varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
-
+      output[['landscapePath']] = landscapePath
+    }
     # Prevalence plot
-    if ('all' %in% fn | 'prevalence' %in% fn)
+    if ('all' %in% fn | 'prevalence' %in% fn) {
       mutationalSignaturePrevalence(prevalence$mutation, common$cancerType, prevalencePath, exposure_refdata_selected)
-
-    output = list(
-      'tumorPath' = tumorPath,
-      'activityPath' = activityPath,
-      'associationPath' = associationPath,
-      'decompositionPath' = decompositionPath,
-      'decompositionData' = decompositionData,
-      'landscapePath' = landscapePath,
-      'prevalencePath' = prevalencePath
-      )
+      output[['prevalencePath']] = prevalencePath
+    }
 
   }, error = function(e) {
     print(e)
@@ -481,38 +479,36 @@ exposureUser <- function(fn, files, common, activity = '{}', association = '{}',
 
 
     ## Tumor Overall Mutational Burden
-    if ('all' %in% fn)
+    if ('all' %in% fn) {
       tumorMutationalBurden(genomesize, tumorPath, exposure_refdata_selected)
+      output[['tumorPath']] = tumorPath
+    }
 
     # Mutational Signature Activity
-    if ('all' %in% fn || 'activity' %in% fn)
+    if ('all' %in% fn || 'activity' %in% fn) {
       mutationalSignatureActivity(activity$signatureName, genomesize, activityPath, exposure_refdata_selected)
-
+      output[['activityPath']] = activityPath
+    }
     # Mutational Signature Association
-    if ('all' %in% fn | 'association' %in% fn)
+    if ('all' %in% fn | 'association' %in% fn) {
       mutationalSignatureAssociation(association$useCancer, cancer_type_user, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
-
+      output[['associationPath']] = associationPath
+    }
     # Evaluating the Performance of Mutational Signature Decomposition --------
-    if ('all' %in% fn)
+    if ('all' %in% fn) {
       mutationalSignatureDecomposition(decompositionPath, decompositionData, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
-
+      output[['decompositionPath']] = decompositionPath
+    }
     # Landscape of Mutational Signature Activity
-    if ('all' %in% fn | 'landscape' %in% fn)
+    if ('all' %in% fn | 'landscape' %in% fn) {
       mutationalSignatureLandscape(cancer_type_user, landscape$varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
-
+      output[['landscapePath']] = landscapePath
+    }
     # Prevalence plot
-    if ('all' %in% fn | 'prevalence' %in% fn)
+    if ('all' %in% fn | 'prevalence' %in% fn) {
       mutationalSignaturePrevalence(prevalence$mutation, cancer_type_user, prevalencePath, exposure_refdata_selected)
-
-    output = list(
-      'tumorPath' = tumorPath,
-      'activityPath' = activityPath,
-      'associationPath' = associationPath,
-      'decompositionPath' = decompositionPath,
-      'decompositionData' = decompositionData,
-      'landscapePath' = landscapePath,
-      'prevalencePath' = prevalencePath
-      )
+      output[['prevalencePath']] = prevalencePath
+    }
 
   }, error = function(e) {
     print(e)

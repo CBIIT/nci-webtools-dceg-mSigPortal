@@ -64,7 +64,7 @@ export default function ExposureExploring() {
   const [matrixValidity, setMatrixValidity] = useState(false);
   const [signatureValidity, setSignatureValidity] = useState(false);
 
-  function submitR(fn, args) {
+  function submitR(fn, args, id = projectID) {
     return fetch(`${rootURL}exploringR`, {
       method: 'POST',
       headers: {
@@ -74,7 +74,7 @@ export default function ExposureExploring() {
       body: JSON.stringify({
         fn: fn,
         args: args,
-        projectID: projectID,
+        projectID: id,
       }),
     }).then((res) => res.json());
   }
@@ -86,29 +86,15 @@ export default function ExposureExploring() {
       debugR: '',
     });
 
-    try {
-      const { debugR, output } = await submitR('exposurePublic', {
-        fn: 'activity',
-        common: JSON.stringify({
-          study: study,
-          strategy: strategy,
-          refSignatureSet: refSignatureSet,
-          cancerType: cancer,
-        }),
-        activity: JSON.stringify({ signatureName: activityArgs.signatureName }),
-      });
-
-      if (output) {
-        if (output.activityPath)
-          dispatchExpActivity({
-            plotPath: output.activityPath,
-            debugR: debugR,
-            err: false,
-          });
-        else dispatchExpActivity({ err: true, debugR: debugR });
+    if (source == 'user') {
+      if (!projectID) {
+        const id = await handleUpload().catch(dispatchError);
+        await handleCalculate('activity', id);
+      } else {
+        await handleCalculate('activity', projectID);
       }
-    } catch (err) {
-      dispatchError(err);
+    } else {
+      await handleCalculate('activity');
     }
 
     dispatchExpActivity({ loading: false });
@@ -121,34 +107,15 @@ export default function ExposureExploring() {
       debugR: '',
     });
 
-    try {
-      const { debugR, output } = await submitR('exposurePublic', {
-        fn: 'association',
-        common: JSON.stringify({
-          study: study,
-          strategy: strategy,
-          refSignatureSet: refSignatureSet,
-          cancerType: cancer,
-        }),
-        association: JSON.stringify({
-          useCancerType: associationArgs.toggleCancer,
-          both: associationArgs.both,
-          signatureName1: associationArgs.signatureName1,
-          signatureName2: associationArgs.signatureName2,
-        }),
-      });
-
-      if (output) {
-        if (output.associationPath)
-          dispatchExpAssociation({
-            plotPath: output.associationPath,
-            debugR: debugR,
-            err: false,
-          });
-        else dispatchExpAssociation({ err: true, debugR: debugR });
+    if (source == 'user') {
+      if (!projectID) {
+        const id = await handleUpload().catch(dispatchError);
+        await handleCalculate('association', id);
+      } else {
+        await handleCalculate('association', projectID);
       }
-    } catch (err) {
-      dispatchError(err);
+    } else {
+      await handleCalculate('association');
     }
 
     dispatchExpAssociation({ loading: false });
@@ -161,31 +128,15 @@ export default function ExposureExploring() {
       debugR: '',
     });
 
-    try {
-      const { debugR, output } = await submitR('exposurePublic', {
-        fn: 'landscape',
-        common: JSON.stringify({
-          study: study,
-          strategy: strategy,
-          refSignatureSet: refSignatureSet,
-          cancerType: cancer,
-        }),
-        landscape: JSON.stringify({
-          varDataPath: landscapeArgs.varDataPath,
-        }),
-      });
-
-      if (output) {
-        if (output.landscapePath)
-          dispatchExpLandscape({
-            plotPath: output.landscapePath,
-            debugR: debugR,
-            err: false,
-          });
-        else dispatchExpLandscape({ err: true, debugR: debugR });
+    if (source == 'user') {
+      if (!projectID) {
+        const id = await handleUpload().catch(dispatchError);
+        await handleCalculate('landscape', id);
+      } else {
+        await handleCalculate('landscape', projectID);
       }
-    } catch (err) {
-      dispatchError(err);
+    } else {
+      await handleCalculate('landscape');
     }
 
     dispatchExpLandscape({ loading: false });
@@ -198,38 +149,38 @@ export default function ExposureExploring() {
       debugR: '',
     });
 
-    try {
-      const { debugR, output } = await submitR('exposurePublic', {
-        fn: 'prevalence',
-        common: JSON.stringify({
-          study: study,
-          strategy: strategy,
-          refSignatureSet: refSignatureSet,
-          cancerType: cancer,
-        }),
-        prevalence: JSON.stringify({
-          mutation: parseFloat(prevalenceArgs.mutation) || 100,
-        }),
-      });
-
-      if (output) {
-        if (output.prevalencePath)
-          dispatchExpPrevalence({
-            plotPath: output.prevalencePath,
-            debugR: debugR,
-            err: false,
-          });
-        else dispatchExpPrevalence({ err: true, debugR: debugR });
+    if (source == 'user') {
+      if (!projectID) {
+        const id = await handleUpload().catch(dispatchError);
+        await handleCalculate('prevalence', id);
+      } else {
+        await handleCalculate('prevalence', projectID);
       }
-    } catch (err) {
-      dispatchError(err);
+    } else {
+      await handleCalculate('prevalence');
     }
 
     dispatchExpPrevalence({ loading: false });
   }
 
-  async function handleCalculate(fn) {
+  async function calculateAll() {
     dispatchExpExposure({ loading: true });
+
+    if (source == 'user') {
+      if (!projectID) {
+        const id = await handleUpload().catch(dispatchError);
+        await handleCalculate('all', id);
+      } else {
+        await handleCalculate('all', projectID);
+      }
+    } else {
+      await handleCalculate('all');
+    }
+
+    dispatchExpExposure({ loading: false });
+  }
+
+  async function handleCalculate(fn = 'all', id = projectID) {
     let rFn = 'exposurePublic';
     let args = {
       fn: fn,
@@ -240,20 +191,30 @@ export default function ExposureExploring() {
         cancerType: cancer,
         genome: genome,
       }),
-      activity: JSON.stringify({ signatureName: activityArgs.signatureName }),
-      association: JSON.stringify({
+    };
+    if (fn == 'all' || fn == 'activity') {
+      args.activity = JSON.stringify({
+        signatureName: activityArgs.signatureName,
+      });
+    }
+    if (fn == 'all' || fn == 'association') {
+      args.association = JSON.stringify({
         useCancerType: associationArgs.toggleCancer,
         both: associationArgs.both,
         signatureName1: associationArgs.signatureName1,
         signatureName2: associationArgs.signatureName2,
-      }),
-      landscape: JSON.stringify({
+      });
+    }
+    if (fn == 'all' || fn == 'landscape') {
+      args.landscape = JSON.stringify({
         varDataPath: landscapeArgs.varDataPath,
-      }),
-      prevalence: JSON.stringify({
+      });
+    }
+    if (fn == 'all' || fn == 'prevalence') {
+      args.prevalence = JSON.stringify({
         mutation: parseFloat(prevalenceArgs.mutation) || 100,
-      }),
-    };
+      });
+    }
     if (source == 'user') {
       rFn = 'exposureUser';
       args.files = JSON.stringify({
@@ -262,7 +223,7 @@ export default function ExposureExploring() {
         signatureFile: signatureFile,
       });
     }
-    const { debugR, output } = await submitR(rFn, args);
+    const { debugR, output } = await submitR(rFn, args, id);
 
     if (output) {
       if (output.tumorPath)
@@ -271,21 +232,26 @@ export default function ExposureExploring() {
           debugR: debugR,
           err: false,
         });
-      else dispatchExpTumor({ err: true, debugR: debugR });
+      else if (fn == 'all') dispatchExpTumor({ err: true, debugR: debugR });
+
       if (output.activityPath)
         dispatchExpActivity({
           plotPath: output.activityPath,
           debugR: debugR,
           err: false,
         });
-      else dispatchExpActivity({ err: true, debugR: debugR });
+      else if (fn == 'all' || fn == 'activity')
+        dispatchExpActivity({ err: true, debugR: debugR });
+
       if (output.associationPath)
         dispatchExpAssociation({
           plotPath: output.associationPath,
           debugR: debugR,
           err: false,
         });
-      else dispatchExpAssociation({ err: true, debugR: debugR });
+      else if (fn == 'all' || fn == 'association')
+        dispatchExpAssociation({ err: true, debugR: debugR });
+
       if (output.decompositionPath)
         dispatchExpDecomposition({
           plotPath: output.decompositionPath,
@@ -293,26 +259,29 @@ export default function ExposureExploring() {
           debugR: debugR,
           err: false,
         });
-      else dispatchExpDecomposition({ err: true, debugR: debugR });
+      else if (fn == 'all')
+        dispatchExpDecomposition({ err: true, debugR: debugR });
+
       if (output.landscapePath)
         dispatchExpLandscape({
           plotPath: output.landscapePath,
           debugR: debugR,
           err: false,
         });
-      else dispatchExpLandscape({ err: true, debugR: debugR });
+      else if (fn == 'all' || fn == 'landscape')
+        dispatchExpLandscape({ err: true, debugR: debugR });
+
       if (output.prevalencePath)
         dispatchExpPrevalence({
           plotPath: output.prevalencePath,
           debugR: debugR,
           err: false,
         });
-      else dispatchExpPrevalence({ err: true, debugR: debugR });
+      else if (fn == 'all' || fn == 'prevalence')
+        dispatchExpPrevalence({ err: true, debugR: debugR });
     } else {
       dispatchError(debugR);
     }
-
-    dispatchExpExposure({ loading: false });
   }
 
   function handleStudy(study) {
@@ -512,10 +481,7 @@ export default function ExposureExploring() {
               </Col>
               <Col sm="3"></Col>
               <Col sm="1" className="m-auto">
-                <Button
-                  variant="primary"
-                  onClick={() => handleCalculate('all')}
-                >
+                <Button variant="primary" onClick={() => calculateAll()}>
                   Calculate
                 </Button>
               </Col>
@@ -616,14 +582,7 @@ export default function ExposureExploring() {
               </Col>
               <Col sm="1"></Col>
               <Col sm="1" className="m-auto">
-                <Button
-                  variant="primary"
-                  onClick={() => {
-                    handleUpload()
-                      .then(() => handleCalculate('all'))
-                      .catch(dispatchError);
-                  }}
-                >
+                <Button variant="primary" onClick={() => calculateAll()}>
                   Calculate
                 </Button>
               </Col>
