@@ -50,7 +50,7 @@ export default function PublicForm() {
     dispatchVisualize({
       loading: {
         active: true,
-        content: 'Loading...',
+        content: 'Loading Public Data',
         showIndicator: true,
       },
     });

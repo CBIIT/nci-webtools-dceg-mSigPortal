@@ -39,7 +39,11 @@ export default function Visualize({ match }) {
 
   async function loadResults(id) {
     dispatchVisualize({
-      loading: { active: true, content: 'Loading...', showIndicator: true },
+      loading: {
+        active: true,
+        content: 'Loading Queued Result',
+        showIndicator: true,
+      },
     });
     try {
       const { args, state, timestamp } = await (
@@ -51,7 +55,7 @@ export default function Visualize({ match }) {
       dispatchError(error.toString());
     }
     dispatchVisualize({
-      loading: { active: false, content: '', showIndicator: false },
+      loading: { active: false },
     });
   }
 

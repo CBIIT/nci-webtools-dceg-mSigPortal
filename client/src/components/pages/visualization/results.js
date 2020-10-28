@@ -49,7 +49,6 @@ export default function Results({ setOpenSidebar }) {
 
   // reload summary information
   async function getSummary() {
-    console.log(projectID);
     const response = await fetch(`${rootURL}getSummary`, {
       method: 'POST',
       headers: {
@@ -77,6 +76,8 @@ export default function Results({ setOpenSidebar }) {
     dispatchVisualize({
       loading: {
         active: true,
+        content: 'Putting Data Into Session',
+        showIndicator: true,
       },
     });
 
@@ -193,6 +194,8 @@ export default function Results({ setOpenSidebar }) {
     dispatchVisualize({
       loading: {
         active: true,
+        content: 'Putting Public Data Into Session',
+        showIndicator: true,
       },
     });
 
