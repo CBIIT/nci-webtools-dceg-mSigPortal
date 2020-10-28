@@ -6,7 +6,7 @@ const r = require('r-wrapper').async;
 const tar = require('tar');
 const config = require('./config.json');
 const logger = require('./logger');
-const { profilerExtraction } = require('./controllers');
+const { profilerExtraction, parseCSV } = require('./controllers');
 
 (async function main() {
   // update aws configuration if all keys are supplied, otherwise
@@ -104,15 +104,36 @@ async function processMessage(params) {
   const mailer = nodemailer.createTransport(config.email.smtp);
 
   try {
-    // get calculation results
+    // Setup folders
     const directory = path.resolve(config.results.folder, id);
     await fs.promises.mkdir(directory, { recursive: true });
 
+    // python extraction
     const start = new Date().getTime();
     await downloadS3(id, directory);
     const { stdout, stderr, projectPath } = await profilerExtraction(args);
     // logger.debug('stdout:' + stdout);
     // logger.debug('stderr:' + stderr);
+
+    // R profiler summary
+    const matrixPath = path.join(directory, 'results/matrix_files_list.txt');
+    const matrixList = await parseCSV(matrixPath);
+    const savePath = path.join(directory, 'results/profilerSummary/');
+    await fs.promises.mkdir(savePath, { recursive: true });
+    const wrapper = await r(
+      'services/R/visualizeWrapper.R',
+      'profilerSummary',
+      {
+        matrixList: JSON.stringify(matrixList),
+        projectID: id,
+        pythonOutput: path.join(directory, 'results/output'),
+        savePath: savePath,
+        dataPath: path.join(config.data.database),
+      }
+    );
+    // const { stdout: rStdout } = JSON.parse(wrapper);
+    // logger.debug(rStdout);
+
     const end = new Date().getTime();
 
     const time = end - start;
