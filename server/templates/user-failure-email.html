@@ -10,11 +10,20 @@
   <body>
     Dear mSigPortal User, <br />
     <p>
-      The job you submitted on {originalTimestamp} could not be processed due to
-      an internal error. Please contact
-      <a href="mailto:{supportEmail}">{supportEmail}</a> if this issue continues
-      to occur. Include the following job id in your email: {id}
+      The job you submitted to the mSigPortal queue failed to be processed.
+      Please correct your settings and resubmit or contact us at
+      <a href="mailto:{supportEmail}">{supportEmail}</a> for more information or
+      if you have any questions.
     </p>
+
+    <b>Job Information</b>
+    <ul style="list-style-type: none">
+      <li href="{id}">ID: {id}</li>
+      <li href="{originalTimestamp}">
+        Submitted Time: {originalTimestamp} EST
+      </li>
+      <li href="{runTime}">Execution Time: {runTime}</li>
+    </ul>
 
     <p>
       Respectfully, <br />

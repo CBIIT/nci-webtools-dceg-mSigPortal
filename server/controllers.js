@@ -401,12 +401,6 @@ async function getReferenceSignatureData(req, res, next) {
 
 async function submitQueue(req, res, next) {
   const projectID = req.body.args.projectID[1];
-  const date = new Date();
-  const isoDate = new Date(
-    date.getTime() - date.getTimezoneOffset() * 60000
-  ).toISOString();
-  const day = isoDate.split('T')[0];
-  const time = isoDate.split('T')[1].split('Z')[0].substring(0, 5);
   const sqs = new AWS.SQS();
 
   try {
@@ -430,7 +424,9 @@ async function submitQueue(req, res, next) {
         MessageGroupId: projectID,
         MessageBody: JSON.stringify({
           ...req.body,
-          timestamp: `${day} ${time} UTC`,
+          timestamp: new Date().toLocaleString('en-US', {
+            timeZone: 'America/New_York',
+          }),
         }),
       })
       .promise();
