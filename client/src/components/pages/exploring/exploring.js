@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react';
-import { Card, Nav, Form } from 'react-bootstrap';
+import { Nav } from 'react-bootstrap';
+import { Route, NavLink, Redirect } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import SignatureExploring from './signature/main';
 import ExposureExploring from './exposure/main';
+import EtiologyExploring from './etiology/main';
 import {
   dispatchError,
   dispatchExploring,
@@ -17,10 +19,7 @@ import {
   dispatchExpPrevalence,
   dispatchExpExposure,
 } from '../../../services/store';
-
-const { Header, Body } = Card;
-const { Item, Link } = Nav;
-const { Group, Label, Check } = Form;
+import './exploring.scss';
 
 export default function Explore() {
   const rootURL = window.location.pathname;
@@ -128,7 +127,7 @@ export default function Explore() {
           studyOptions: studyOptions,
           strategy: strategyOptions[0],
           strategyOptions: strategyOptions,
-          cancer: cancerOptions[0],
+          cancer: cancer,
           cancerOptions: cancerOptions,
           refSigData: refSigData.output.data,
           refSignatureSet: refSignatureSet,
@@ -266,44 +265,52 @@ export default function Explore() {
     });
   }
 
+  const links = [
+    { name: 'Etiology Exploring', pathId: 'etiology' },
+    { name: 'Signature Exploring', pathId: 'signature' },
+    { name: 'Exposure Exploring', pathId: 'exposure' },
+  ];
+
   return (
-    <div className="position-relative">
-      <div className="p-3 shadow-sm bg-white">
-        <Card>
-          <Header>
-            <Nav variant="pills" defaultActiveKey="#mutationalProfiles">
-              {[
-                { title: 'Signature Exploring', id: 'signatureExploring' },
-                { title: 'Exposure Exploring', id: 'exposureExploring' },
-              ].map(({ title, id }) => {
-                return (
-                  <Item key={id}>
-                    <Link
-                      active={displayTab == id}
-                      onClick={() => dispatchExploring({ displayTab: id })}
-                    >
-                      {title}
-                    </Link>
-                  </Item>
-                );
-              })}
-            </Nav>
-          </Header>
-          <Body
-            style={{
-              display: displayTab == 'signatureExploring' ? 'block' : 'none',
-            }}
-          >
-            <SignatureExploring />
-          </Body>
-          <Body
-            style={{
-              display: displayTab == 'exposureExploring' ? 'block' : 'none',
-            }}
-          >
-            <ExposureExploring />
-          </Body>
-        </Card>
+    <div className="px-0">
+      <div className="mx-3">
+        <div className="mx-3 bg-white border border-top-0">
+          <Nav defaultActiveKey="summary">
+            {links.map(({ name, pathId }) => (
+              <div key={pathId} className="d-inline-block">
+                <NavLink
+                  className="secondary-navlinks px-3 py-1 d-inline-block"
+                  activeClassName="active-secondary-navlinks"
+                  style={{
+                    textDecoration: 'none',
+                    fontSize: '11pt',
+                    color: 'black',
+                    fontWeight: '500',
+                  }}
+                  exact={true}
+                  to={`/exploring/${pathId}`}
+                >
+                  {name}
+                </NavLink>
+                <div className="d-md-none w-100"></div>
+              </div>
+            ))}
+          </Nav>
+        </div>
+      </div>
+      <div className="mx-3">
+        <div className="mx-3 my-3 bg-white border">
+          <div className="p-3">
+            <Route
+              exact
+              path={`/exploring`}
+              render={() => <Redirect to="/exploring/signature" />}
+            />
+            <Route path="/exploring/etiology" component={EtiologyExploring} />
+            <Route path="/exploring/signature" component={SignatureExploring} />
+            <Route path="/exploring/exposure" component={ExposureExploring} />
+          </div>
+        </div>
       </div>
     </div>
   );
