@@ -36,6 +36,12 @@ export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
     }
     setLoading(false);
   }
+  const zoomProps = {
+    wheel: { wheelEnabled: false },
+    zoomIn: { step: 5 },
+    zoomOut: { step: 5 },
+    doubleClick: { step: 5 },
+  };
 
   return (
     <div>
@@ -57,7 +63,7 @@ export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
         )}
       </div>
       <div className="p-2 border rounded">
-        <TransformWrapper className="w-100">
+        <TransformWrapper className="w-100" {...zoomProps}>
           {({ zoomIn, zoomOut, resetTransform }) => (
             <React.Fragment>
               <div className="tools">
