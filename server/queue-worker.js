@@ -118,6 +118,8 @@ async function processMessage(params) {
 
     // R profiler summary
     const matrixPath = path.join(directory, 'results/matrix_files_list.txt');
+    if (!fs.existsSync(matrixPath))
+      throw `matrix file does not exist at ${matrixPath}`;
     const matrixList = await parseCSV(matrixPath);
     const savePath = path.join(directory, 'results/profilerSummary/');
     await fs.promises.mkdir(savePath, { recursive: true });
