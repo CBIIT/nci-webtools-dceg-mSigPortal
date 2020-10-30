@@ -13,7 +13,9 @@
     "folder": "./data"
   },
   "aws": {
-    "region": "region"
+    "region": "region",
+    "aws_access_key_id": "",
+    "aws_secret_access_key": ""
   },
   "queue": {
     "url": "url",
