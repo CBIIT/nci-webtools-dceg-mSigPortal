@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import SignatureExploring from './signature/main';
 import ExposureExploring from './exposure/main';
 import EtiologyExploring from './etiology/main';
+import Download from './download/download';
 import {
   dispatchError,
   dispatchExploring,
@@ -269,6 +270,7 @@ export default function Explore() {
     { name: 'Etiology Exploring', pathId: 'etiology' },
     { name: 'Signature Exploring', pathId: 'signature' },
     { name: 'Exposure Exploring', pathId: 'exposure' },
+    { name: 'Download', pathId: 'download' },
   ];
 
   return (
@@ -309,6 +311,7 @@ export default function Explore() {
             <Route path="/exploring/etiology" component={EtiologyExploring} />
             <Route path="/exploring/signature" component={SignatureExploring} />
             <Route path="/exploring/exposure" component={ExposureExploring} />
+            <Route path="/exploring/download" component={Download} />
           </div>
         </div>
       </div>
