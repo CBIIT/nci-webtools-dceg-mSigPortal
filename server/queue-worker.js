@@ -112,6 +112,7 @@ async function processMessage(params) {
     const start = new Date().getTime();
     await downloadS3(id, directory);
     const { stdout, stderr, projectPath } = await profilerExtraction(args);
+    logger.info('profiler extraction done');
     // logger.debug('stdout:' + stdout);
     // logger.debug('stderr:' + stderr);
 
@@ -131,6 +132,7 @@ async function processMessage(params) {
         dataPath: path.join(config.data.database),
       }
     );
+    logger.info('profiler summary done');
     // const { stdout: rStdout } = JSON.parse(wrapper);
     // logger.debug(rStdout);
 
