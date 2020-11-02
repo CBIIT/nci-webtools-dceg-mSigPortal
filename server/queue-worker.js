@@ -112,7 +112,6 @@ async function processMessage(params) {
     const start = new Date().getTime();
     await downloadS3(id, directory);
     const { stdout, stderr, projectPath } = await profilerExtraction(args);
-    logger.info('profiler extraction done');
     // logger.debug('stdout:' + stdout);
     // logger.debug('stderr:' + stderr);
 
@@ -123,21 +122,25 @@ async function processMessage(params) {
     const matrixList = await parseCSV(matrixPath);
     const savePath = path.join(directory, 'results/profilerSummary/');
     await fs.promises.mkdir(savePath, { recursive: true });
-    const wrapper = await r(
-      'services/R/visualizeWrapper.R',
-      'profilerSummary',
-      {
-        matrixList: JSON.stringify(matrixList),
-        projectID: id,
-        pythonOutput: path.join(directory, 'results/output'),
-        savePath: savePath,
-        dataPath: path.join(config.data.database),
-      }
-    );
-    logger.info('profiler summary done');
-    // const { stdout: rStdout } = JSON.parse(wrapper);
-    // logger.debug(rStdout);
-
+    try {
+      const wrapper = await r(
+        'services/R/visualizeWrapper.R',
+        'profilerSummary',
+        {
+          matrixList: JSON.stringify(matrixList),
+          projectID: id,
+          pythonOutput: path.join(directory, 'results/output'),
+          savePath: savePath,
+          dataPath: path.join(config.data.database),
+        }
+      );
+      // const { stdout: rStdout } = JSON.parse(wrapper);
+      // logger.debug(rStdout);
+    } catch (err) {
+      logger.error(error);
+      logger.info(err.message);
+      throw err;
+    }
     const end = new Date().getTime();
 
     const time = end - start;
@@ -186,8 +189,8 @@ async function processMessage(params) {
     });
 
     return true;
-  } catch (e) {
-    logger.error(e);
+  } catch (err) {
+    logger.error(err);
 
     // template variables
     const templateData = {
@@ -195,8 +198,8 @@ async function processMessage(params) {
       parameters: JSON.stringify(args, null, 4),
       originalTimestamp: timestamp,
       runTime: runtime,
-      exception: e.toString(),
-      processOutput: e.stdout ? e.stdout.toString() : null,
+      exception: err.toString(),
+      processOutput: err.stdout ? err.stdout.toString() : null,
       supportEmail: config.email.admin,
     };
 
