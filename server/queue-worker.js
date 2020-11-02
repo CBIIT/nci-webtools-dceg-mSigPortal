@@ -197,7 +197,6 @@ async function processMessage(params) {
       id: id,
       parameters: JSON.stringify(args, null, 4),
       originalTimestamp: timestamp,
-      runTime: runtime,
       exception: err.toString(),
       processOutput: err.stdout ? err.stdout.toString() : null,
       supportEmail: config.email.admin,
