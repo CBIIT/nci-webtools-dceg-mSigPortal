@@ -122,25 +122,20 @@ async function processMessage(params) {
     const matrixList = await parseCSV(matrixPath);
     const savePath = path.join(directory, 'results/profilerSummary/');
     await fs.promises.mkdir(savePath, { recursive: true });
-    try {
-      const wrapper = await r(
-        'services/R/visualizeWrapper.R',
-        'profilerSummary',
-        {
-          matrixList: JSON.stringify(matrixList),
-          projectID: id,
-          pythonOutput: path.join(directory, 'results/output'),
-          savePath: savePath,
-          dataPath: path.join(config.data.database),
-        }
-      );
-      // const { stdout: rStdout } = JSON.parse(wrapper);
-      // logger.debug(rStdout);
-    } catch (err) {
-      logger.error(error);
-      logger.info(err.message);
-      throw err;
-    }
+    const wrapper = await r(
+      'services/R/visualizeWrapper.R',
+      'profilerSummary',
+      {
+        matrixList: JSON.stringify(matrixList),
+        projectID: id,
+        pythonOutput: path.join(directory, 'results/output'),
+        savePath: savePath,
+        dataPath: path.join(config.data.database),
+      }
+    );
+    // const { stdout: rStdout } = JSON.parse(wrapper);
+    // logger.debug(rStdout);
+
     const end = new Date().getTime();
 
     const time = end - start;
@@ -192,13 +187,16 @@ async function processMessage(params) {
   } catch (err) {
     logger.error(err);
 
+    const stdout = err.stdout ? err.stdout.toString() : '';
+    const stderr = err.stderr ? err.stderr.toString() : '';
+
     // template variables
     const templateData = {
       id: id,
       parameters: JSON.stringify(args, null, 4),
       originalTimestamp: timestamp,
       exception: err.toString(),
-      processOutput: err.stdout ? err.stdout.toString() : null,
+      processOutput: !stdout && !stderr ? null : stdout + stderr,
       supportEmail: config.email.admin,
     };
 

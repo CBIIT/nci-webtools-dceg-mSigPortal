@@ -101,8 +101,10 @@ async function profilerExtraction(params) {
       stderr: stderr,
       projectPath: path.join(config.results.folder, params.projectID[1]),
     };
-  } catch (e) {
-    throw e;
+  } catch (error) {
+    // const error = { code, signal, stdout, stderr };
+    logger.info('Profiler Extraction Error');
+    throw error;
   }
 }
 
