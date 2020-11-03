@@ -16,7 +16,7 @@ export default function Select({
       menuPortal: (base) => ({ ...base, zIndex: 9999 }),
     },
     menuPortalTarget: document.body,
-    getOptionLabel: (option) => option,
+    getOptionLabel: (option) => (option == 'NA' ? 'N/A' : option),
     getOptionValue: (option) => option,
   };
 
