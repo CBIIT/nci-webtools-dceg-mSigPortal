@@ -26,7 +26,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "npm run format && react-scripts build && rm -rf ../server/www && mv build ../server/www",
+    "build": "npm run format && react-scripts build",
     "test": "react-scripts test --ci --reporters=default --reporters=jest-junit --watchAll=false",
     "eject": "react-scripts eject",
     "format": "prettier --single-quote --write \"src/**/*.{js,json,css,scss}\""
