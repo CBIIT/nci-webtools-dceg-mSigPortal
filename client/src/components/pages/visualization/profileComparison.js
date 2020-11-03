@@ -39,7 +39,9 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     pubExperimentalStrategy,
     pDataOptions,
   } = useSelector((state) => state.visualize);
-  const { matrixList } = useSelector((state) => state.visualizeResults);
+  const { matrixList, svgList } = useSelector(
+    (state) => state.visualizeResults
+  );
   const { nameOptions, profileOptions } = useSelector(
     (state) => state.mutationalProfiles
   );
@@ -77,7 +79,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     refErr,
     pubErr,
     debugR,
-    
+
     withinSubmitOverlay,
     refSubmitOverlay,
     pubSubmitOverlay,
@@ -135,12 +137,12 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
           const pic = await response.blob();
           const objectURL = URL.createObjectURL(pic);
 
-          if (fn == 'profileComparisonWithin') {
+          if (fn.includes('profileComparisonWithin')) {
             if (withinPlotURL) URL.revokeObjectURL(withinPlotURL);
             dispatchProfileComparison({
               withinPlotURL: objectURL,
             });
-          } else if (fn == 'profileComparisonRefSig') {
+          } else if (fn.includes('profileComparisonRefSig')) {
             if (refPlotURL) URL.revokeObjectURL(refPlotURL);
             dispatchProfileComparison({
               refPlotURL: objectURL,
@@ -156,10 +158,10 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         dispatchError(err);
       }
     } else {
-      if (fn == 'profileComparisonWithin') {
+      if (fn.includes('profileComparisonWithin')) {
         if (withinPlotURL) URL.revokeObjectURL(withinPlotURL);
         dispatchProfileComparison({ withinErr: true, withinPlotURL: '' });
-      } else if (fn == 'profileComparisonRefSig') {
+      } else if (fn.includes('profileComparisonRefSig')) {
         if (refPlotURL) URL.revokeObjectURL(refPlotURL);
         dispatchProfileComparison({ refErr: true, refPlotURL: '' });
       } else {
@@ -360,6 +362,22 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       pubCancerType: cancer,
     });
     getPublicSamples(pubStudy, cancer);
+  }
+
+  function handleProfile(profile) {
+    const matrixOptions = [
+      ...new Set(
+        svgList
+          .filter((plot) => plot.Profile_Type == profile)
+          .map((plot) => plot.Matrix_Size)
+      ),
+    ];
+
+    dispatchProfileComparison({
+      userProfileType: profile,
+      userMatrixOptions: matrixOptions,
+      userMatrixSize: matrixOptions[0],
+    });
   }
 
   return (
@@ -671,11 +689,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                           label="Profile Type"
                           value={userProfileType}
                           options={profileOptions}
-                          onChange={(profile) =>
-                            dispatchProfileComparison({
-                              userProfileType: profile,
-                            })
-                          }
+                          onChange={handleProfile}
                         />
                       </Col>
                       <Col sm="1">

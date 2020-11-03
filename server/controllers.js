@@ -27,7 +27,7 @@ function parseCSV(filepath) {
   });
 }
 
-async function getSummaryFiles(resultsPath) {
+async function getResultDataFiles(resultsPath) {
   const svgListPath = path.join(resultsPath, 'svg_files_list.txt');
   const statisticsPath = path.join(resultsPath, 'Statistics.txt');
   const matrixPath = path.join(resultsPath, 'matrix_files_list.txt');
@@ -101,8 +101,10 @@ async function profilerExtraction(params) {
       stderr: stderr,
       projectPath: path.join(config.results.folder, params.projectID[1]),
     };
-  } catch (e) {
-    throw e;
+  } catch (error) {
+    // const error = { code, signal, stdout, stderr };
+    logger.info('Profiler Extraction Error');
+    throw error;
   }
 }
 
@@ -117,7 +119,7 @@ async function visualizationProfilerExtraction(req, res, next) {
     const resultsPath = path.join(projectPath, 'results');
 
     if (fs.existsSync(path.join(resultsPath, 'svg_files_list.txt'))) {
-      res.json({ stdout, stderr, ...(await getSummaryFiles(resultsPath)) });
+      res.json({ stdout, stderr, ...(await getResultDataFiles(resultsPath)) });
     } else {
       logger.info(
         '/profilerExtraction: An Error Occured While Extracting Profiles'
@@ -134,8 +136,8 @@ async function visualizationProfilerExtraction(req, res, next) {
   }
 }
 
-async function getSummary(req, res, next) {
-  logger.info('/getSummary: Retrieving Summary');
+async function getResultData(req, res, next) {
+  logger.info(`/getResultData: Retrieving Results for ${req.body.projectID}`);
   console.log('summary', req.body);
   const resultsPath = path.join(
     config.results.folder,
@@ -144,12 +146,10 @@ async function getSummary(req, res, next) {
   );
 
   if (fs.existsSync(path.join(resultsPath, 'svg_files_list.txt'))) {
-    res.json(await getSummaryFiles(resultsPath));
+    res.json(await getResultDataFiles(resultsPath));
   } else {
-    logger.info('/getSummary: Summary file not found');
-    res.status(500).json({
-      msg: 'Summary file not found',
-    });
+    logger.info('/getResultData: Results not found');
+    res.status(500).json('Results not found');
   }
 }
 
@@ -350,7 +350,7 @@ function download(req, res, next) {
 async function exploringR(req, res, next) {
   logger.info('/exploringR: function ' + req.body.fn);
   console.log('args', req.body);
-  const projectID = req.body.projectID ? req.body.projectID : uuidv4()
+  const projectID = req.body.projectID ? req.body.projectID : uuidv4();
   const rootDir = path.join(config.results.folder, projectID);
   const savePath = path.join(rootDir, 'results', req.body.fn, '/');
 
@@ -401,12 +401,6 @@ async function getReferenceSignatureData(req, res, next) {
 
 async function submitQueue(req, res, next) {
   const projectID = req.body.args.projectID[1];
-  const date = new Date();
-  const isoDate = new Date(
-    date.getTime() - date.getTimezoneOffset() * 60000
-  ).toISOString();
-  const day = isoDate.split('T')[0];
-  const time = isoDate.split('T')[1].split('Z')[0].substring(0, 5);
   const sqs = new AWS.SQS();
 
   try {
@@ -430,7 +424,9 @@ async function submitQueue(req, res, next) {
         MessageGroupId: projectID,
         MessageBody: JSON.stringify({
           ...req.body,
-          timestamp: `${day} ${time} UTC`,
+          timestamp: new Date().toLocaleString('en-US', {
+            timeZone: 'America/New_York',
+          }),
         }),
       })
       .promise();
@@ -483,9 +479,19 @@ async function fetchResults(req, res, next) {
         await fs.promises.writeFile(filepath, object.Body);
         // extract and delete archive
         if (path.extname(filename) == '.tgz') {
-          fs.createReadStream(filepath)
-            .pipe(tar.x({ strip: 1, C: resultsFolder }))
-            .once('finish', () => fs.unlink(filepath, next));
+          await new Promise((resolve, reject) => {
+            fs.createReadStream(filepath)
+              .on('end', () =>
+                fs.unlink(filepath, (err) => {
+                  if (err) {
+                    reject(err);
+                  } else {
+                    resolve();
+                  }
+                })
+              )
+              .pipe(tar.x({ strip: 1, C: resultsFolder }));
+          });
         }
       }
     }
@@ -510,7 +516,7 @@ async function fetchResults(req, res, next) {
 module.exports = {
   profilerExtraction,
   visualizationProfilerExtraction,
-  getSummary,
+  getResultData,
   visualizeR,
   getReferenceSignatureSets,
   getSignatures,
@@ -522,4 +528,5 @@ module.exports = {
   getReferenceSignatureData,
   submitQueue,
   fetchResults,
+  parseCSV,
 };

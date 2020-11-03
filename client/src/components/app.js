@@ -24,6 +24,7 @@ export default function App() {
         'Interactively and comprehensively visualize mutation signature in both sample and study level, including different type and level of mutational profiles (SBS/INDEL/DBS/SV/CNV), PCA components and different mutational feature (kataegis mutation, mutation quality, drive gene mutation etc).',
       image: 'assets/images/visualize.png',
       navIndex: 0,
+      color: '#fc8701', // orange
     },
     {
       route: '/exploring',
@@ -35,6 +36,7 @@ export default function App() {
         'Systematically explore any reference or update to date published signatures with different profiles, version and etiology (endogenous vs Exogenous). Intergratively explore the landscape of signature exposure in different genomic studies, including TCGA, PCAWG, and our Sherlock-Lung study.',
       image: 'assets/images/explore.png',
       navIndex: 1,
+      color: '#2c71dd', // blue
     },
     {
       route: '/refitting',
@@ -46,6 +48,7 @@ export default function App() {
         'Comprehensively evaluate the accuracy of mutational signature based on different statistical variables (Cosine similarity, BIC, L2 norms etc) and re-decompsite signatures using different algorithms (SigProfiler, deconstructsig, bootstrapping method).',
       image: 'assets/images/refitting.png',
       navIndex: 2,
+      color: '#689f39', // green
     },
     {
       route: '/association',
@@ -57,6 +60,7 @@ export default function App() {
         'Systematically analyze and visualize the association between mutational signature exposure and genomic or epigenomic features or other sample based variables (such as clinical data) in different genomic studies.',
       image: 'assets/images/association.png',
       navIndex: 3,
+      color: '#84368d', // purple
     },
     {
       route: '/publications',

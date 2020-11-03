@@ -88,10 +88,12 @@ export default function ExposureExploring() {
 
     if (source == 'user') {
       if (!projectID) {
-        const id = await handleUpload().catch(dispatchError);
-        await handleCalculate('activity', id);
-      } else {
-        await handleCalculate('activity', projectID);
+        try {
+          const id = await handleUpload();
+          await handleCalculate('activity', id);
+        } catch (error) {
+          dispatchError(error);
+        }
       }
     } else {
       await handleCalculate('activity');
@@ -109,10 +111,12 @@ export default function ExposureExploring() {
 
     if (source == 'user') {
       if (!projectID) {
-        const id = await handleUpload().catch(dispatchError);
-        await handleCalculate('association', id);
-      } else {
-        await handleCalculate('association', projectID);
+        try {
+          const id = await handleUpload();
+          await handleCalculate('association', id);
+        } catch (error) {
+          dispatchError(error);
+        }
       }
     } else {
       await handleCalculate('association');
@@ -130,10 +134,12 @@ export default function ExposureExploring() {
 
     if (source == 'user') {
       if (!projectID) {
-        const id = await handleUpload().catch(dispatchError);
-        await handleCalculate('landscape', id);
-      } else {
-        await handleCalculate('landscape', projectID);
+        try {
+          const id = await handleUpload();
+          await handleCalculate('landscape', id);
+        } catch (error) {
+          dispatchError(error);
+        }
       }
     } else {
       await handleCalculate('landscape');
@@ -151,8 +157,12 @@ export default function ExposureExploring() {
 
     if (source == 'user') {
       if (!projectID) {
-        const id = await handleUpload().catch(dispatchError);
-        await handleCalculate('prevalence', id);
+        try {
+          const id = await handleUpload();
+          await handleCalculate('prevalence', id);
+        } catch (error) {
+          dispatchError(error);
+        }
       } else {
         await handleCalculate('prevalence', projectID);
       }
@@ -168,10 +178,12 @@ export default function ExposureExploring() {
 
     if (source == 'user') {
       if (!projectID) {
-        const id = await handleUpload().catch(dispatchError);
-        await handleCalculate('all', id);
-      } else {
-        await handleCalculate('all', projectID);
+        try {
+          const id = await handleUpload();
+          await handleCalculate('all', id);
+        } catch (error) {
+          dispatchError(error);
+        }
       }
     } else {
       await handleCalculate('all');
@@ -332,8 +344,6 @@ export default function ExposureExploring() {
         ((!usePublicSignature && signatureFileObj) ||
           (usePublicSignature && refSignatureSet))
       ) {
-        dispatchExpExposure({ loading: true });
-
         try {
           const data = new FormData();
           data.append('inputFile', exposureFileObj);
@@ -354,12 +364,10 @@ export default function ExposureExploring() {
             reject(error);
           } else {
             const { projectID } = await response.json();
-            dispatchExpExposure({ projectID: projectID, loading: false });
             resolve(projectID);
           }
         } catch (err) {
           dispatchError(err);
-          dispatchExpExposure({ loading: false });
           reject(err);
         }
       } else {

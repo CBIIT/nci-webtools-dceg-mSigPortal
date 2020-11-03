@@ -6,7 +6,7 @@ const r = require('r-wrapper').async;
 const tar = require('tar');
 const config = require('./config.json');
 const logger = require('./logger');
-const { profilerExtraction } = require('./controllers');
+const { profilerExtraction, parseCSV } = require('./controllers');
 
 (async function main() {
   // update aws configuration if all keys are supplied, otherwise
@@ -104,15 +104,38 @@ async function processMessage(params) {
   const mailer = nodemailer.createTransport(config.email.smtp);
 
   try {
-    // get calculation results
+    // Setup folders
     const directory = path.resolve(config.results.folder, id);
     await fs.promises.mkdir(directory, { recursive: true });
 
+    // python extraction
     const start = new Date().getTime();
     await downloadS3(id, directory);
     const { stdout, stderr, projectPath } = await profilerExtraction(args);
     // logger.debug('stdout:' + stdout);
     // logger.debug('stderr:' + stderr);
+
+    // R profiler summary
+    const matrixPath = path.join(directory, 'results/matrix_files_list.txt');
+    if (!fs.existsSync(matrixPath))
+      throw `matrix file does not exist at ${matrixPath}`;
+    const matrixList = await parseCSV(matrixPath);
+    const savePath = path.join(directory, 'results/profilerSummary/');
+    await fs.promises.mkdir(savePath, { recursive: true });
+    const wrapper = await r(
+      'services/R/visualizeWrapper.R',
+      'profilerSummary',
+      {
+        matrixList: JSON.stringify(matrixList),
+        projectID: id,
+        pythonOutput: path.join(directory, 'results/output'),
+        savePath: savePath,
+        dataPath: path.join(config.data.database),
+      }
+    );
+    // const { stdout: rStdout } = JSON.parse(wrapper);
+    // logger.debug(rStdout);
+
     const end = new Date().getTime();
 
     const time = end - start;
@@ -145,6 +168,7 @@ async function processMessage(params) {
       originalTimestamp: timestamp,
       runTime: runtime,
       resultsUrl: `${config.email.baseUrl}/#/visualization/${id}`,
+      supportEmail: config.email.admin,
     };
 
     // send user success email
@@ -152,7 +176,7 @@ async function processMessage(params) {
     const userEmailResults = await mailer.sendMail({
       from: config.email.sender,
       to: state.email,
-      subject: 'mSigPortal Results - ' + timestamp,
+      subject: `mSigPortal Results - ${timestamp} EST`,
       html: await readTemplate(
         __dirname + '/templates/user-success-email.html',
         templateData
@@ -160,16 +184,19 @@ async function processMessage(params) {
     });
 
     return true;
-  } catch (e) {
-    logger.error(e);
+  } catch (err) {
+    logger.error(err);
+
+    const stdout = err.stdout ? err.stdout.toString() : '';
+    const stderr = err.stderr ? err.stderr.toString() : '';
 
     // template variables
     const templateData = {
       id: id,
       parameters: JSON.stringify(args, null, 4),
       originalTimestamp: timestamp,
-      exception: e.toString(),
-      processOutput: e.stdout ? e.stdout.toString() : null,
+      exception: err.toString(),
+      processOutput: !stdout && !stderr ? null : stdout + stderr,
       supportEmail: config.email.admin,
     };
 
@@ -178,7 +205,7 @@ async function processMessage(params) {
     const adminEmailResults = await mailer.sendMail({
       from: config.email.sender,
       to: config.email.admin,
-      subject: `mSigPortal Error: ${id}`, // searchable calculation error subject
+      subject: `mSigPortal Error: ${id} - ${timestamp} EST`, // searchable calculation error subject
       html: await readTemplate(
         __dirname + '/templates/admin-failure-email.html',
         templateData

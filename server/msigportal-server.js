@@ -13,7 +13,7 @@ app.use('/api', apiRouter);
 
 const {
   visualizationProfilerExtraction,
-  getSummary,
+  getResultData,
   visualizeR,
   getReferenceSignatureSets,
   getSignatures,
@@ -85,7 +85,7 @@ apiRouter.get('/ping', (req, res) => res.send(true));
 
 apiRouter.post('/profilerExtraction', visualizationProfilerExtraction);
 
-apiRouter.post('/getSummary', getSummary);
+apiRouter.post('/getResultData', getResultData);
 
 apiRouter.post('/visualizeR', visualizeR);
 

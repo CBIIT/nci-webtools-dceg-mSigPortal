@@ -18,27 +18,42 @@ export default function ProfilerSummary({ submitR }) {
     pubExperimentalStrategy,
     pDataOptions,
   } = useSelector((state) => state.visualize);
-  const { matrixList, svgList } = useSelector(
+  const { matrixList, svgList, projectID } = useSelector(
     (state) => state.visualizeResults
   );
-  const { plotPath, plotURL, err, debugR,  loading } = useSelector(
+  const { plotPath, plotURL, err, debugR, loading } = useSelector(
     (state) => state.profilerSummary
   );
   const rootURL = window.location.pathname;
 
   useEffect(() => {
-    if (!loading && !plotPath) {
-      if (source == 'user' && matrixList.length) {
-        calculateR('profilerSummary', {
-          matrixList: JSON.stringify(matrixList),
-        });
-      } else if (source == 'public' && svgList.length) {
-        calculateR('profilerSummaryPublic', {
-          study: study,
-          cancerType: cancerType,
-          experimentalStrategy: pubExperimentalStrategy,
-        });
+    // check if profiler summary already exists, else lazy-load calculate
+    const checkSummary = async () => {
+      const path = `${projectID}/results/profilerSummary/profilerSummary.svg`;
+      const check = await fetch(`${rootURL}results/${path}`, {
+        method: 'HEAD',
+        cache: 'no-cache',
+      });
+
+      if (check.status === 200) {
+        setRPlot(path);
+      } else {
+        if (source == 'user' && matrixList.length) {
+          calculateR('profilerSummary', {
+            matrixList: JSON.stringify(matrixList),
+          });
+        } else if (source == 'public' && svgList.length) {
+          calculateR('profilerSummaryPublic', {
+            study: study,
+            cancerType: cancerType,
+            experimentalStrategy: pubExperimentalStrategy,
+          });
+        }
       }
+    };
+
+    if (!loading && !plotPath) {
+      checkSummary();
     }
   }, [matrixList, svgList]);
 
