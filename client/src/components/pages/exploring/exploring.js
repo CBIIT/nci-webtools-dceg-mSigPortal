@@ -48,7 +48,7 @@ export default function Explore() {
     filters = {}
   ) {
     try {
-      const res = await fetch(`${rootURL}getReferenceSignatureData`, {
+      const res = await fetch(`api/getReferenceSignatureData`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -74,7 +74,7 @@ export default function Explore() {
 
     try {
       let [publicData, refSigData] = await Promise.all([
-        fetch(`${rootURL}getPublicDataOptions`, {
+        fetch(`api/getPublicDataOptions`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',

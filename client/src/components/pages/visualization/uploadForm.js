@@ -111,7 +111,7 @@ export default function UploadForm() {
       });
 
       try {
-        const response = await fetch(`${rootURL}queue`, {
+        const response = await fetch(`api/queue`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -147,7 +147,7 @@ export default function UploadForm() {
         },
       });
       try {
-        const response = await fetch(`${rootURL}profilerExtraction`, {
+        const response = await fetch(`api/profilerExtraction`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -246,7 +246,7 @@ export default function UploadForm() {
       const data = new FormData();
       data.append('inputFile', inputFile);
       if (bedFile.size) data.append('bedFile', bedFile);
-      let response = await fetch(`${rootURL}upload`, {
+      let response = await fetch(`api/upload`, {
         method: 'POST',
         body: data,
       });

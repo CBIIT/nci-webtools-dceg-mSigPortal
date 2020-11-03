@@ -59,7 +59,7 @@ export default function MutationalProfiles() {
       try {
         const response =
           source == 'user'
-            ? await fetch(`${rootURL}results/${plot.Path}`)
+            ? await fetch(`api/results/${plot.Path}`)
             : await fetch(
                 `${rootURL}public/${plot.Path}`
                 // remove data/ from path

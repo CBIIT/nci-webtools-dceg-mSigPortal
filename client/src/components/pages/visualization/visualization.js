@@ -47,7 +47,7 @@ export default function Visualize({ match }) {
     });
     try {
       const { args, state, timestamp } = await (
-        await fetch(`${rootURL}fetchResults/${id}`)
+        await fetch(`api/fetchResults/${id}`)
       ).json();
       dispatchVisualize(state);
       dispatchVisualizeResults({ projectID: id });

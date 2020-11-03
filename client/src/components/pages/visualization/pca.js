@@ -70,7 +70,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
         ? dispatchPCA({ submitOverlay: true })
         : dispatchPCA({ pubSubmitOverlay: true });
       try {
-        const response = await fetch(`${rootURL}results/${plotPath}`);
+        const response = await fetch(`api/results/${plotPath}`);
 
         if (!response.ok) {
           // console.log(await response.json());

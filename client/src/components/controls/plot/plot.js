@@ -14,7 +14,7 @@ export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
   async function downloadData(txtPath) {
     setLoading(true);
     try {
-      const response = await fetch(`${rootURL}results/${txtPath}`);
+      const response = await fetch(`api/results/${txtPath}`);
 
       if (!response.ok) {
         const { msg } = await response.json();

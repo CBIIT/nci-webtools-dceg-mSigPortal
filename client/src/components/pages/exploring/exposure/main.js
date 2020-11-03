@@ -65,7 +65,7 @@ export default function ExposureExploring() {
   const [signatureValidity, setSignatureValidity] = useState(false);
 
   function submitR(fn, args, id = projectID) {
-    return fetch(`${rootURL}exploringR`, {
+    return fetch(`api/exploringR`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -349,7 +349,7 @@ export default function ExposureExploring() {
           data.append('inputFile', exposureFileObj);
           data.append('inputFile', matrixFileObj);
           if (!usePublicSignature) data.append('inputFile', signatureFileObj);
-          let response = await fetch(`${rootURL}upload`, {
+          let response = await fetch(`api/upload`, {
             method: 'POST',
             body: data,
           });
