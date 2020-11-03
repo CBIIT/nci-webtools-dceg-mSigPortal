@@ -9,7 +9,7 @@ const logger = require('./logger');
 const app = express();
 const {
   visualizationProfilerExtraction,
-  getSummary,
+  getResultData,
   visualizeR,
   getReferenceSignatureSets,
   getSignatures,
@@ -76,7 +76,7 @@ app.get('/ping', (req, res) => res.send(true));
 
 app.post('/profilerExtraction', visualizationProfilerExtraction);
 
-app.post('/getSummary', getSummary);
+app.post('/getResultData', getResultData);
 
 app.post('/visualizeR', visualizeR);
 

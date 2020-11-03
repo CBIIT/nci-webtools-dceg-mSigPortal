@@ -29,18 +29,13 @@ export default function Results({ setOpenSidebar }) {
   const mutationalProfiles = useSelector((state) => state.mutationalProfiles);
   const { signatureSetOptions } = useSelector((state) => state.pca);
   const rootURL = window.location.pathname;
-  const [retrieveSvgList, setAttempt] = useState(false);
+
   // get mapping of plots after retrieving projectID
   useEffect(() => {
     if (source == 'user') {
-      if (
-        projectID &&
-        !retrieveSvgList &&
-        !mutationalProfiles.filtered.length
-      ) {
-        setAttempt(true);
-        getSummary();
-      } else if (projectID && !signatureSetOptions.length) mapSvgList();
+      if (projectID && !svgList.length) {
+        getResultData();
+      } else if (svgList.length && !signatureSetOptions.length) loadData();
     } else {
       if (svgList.length > 0 && !mutationalProfiles.filtered.length)
         mapPublicData();
@@ -48,8 +43,8 @@ export default function Results({ setOpenSidebar }) {
   }, [svgList, projectID, source]);
 
   // reload summary information
-  async function getSummary() {
-    const response = await fetch(`${rootURL}getSummary`, {
+  async function getResultData() {
+    const response = await fetch(`${rootURL}getResultData`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -57,22 +52,27 @@ export default function Results({ setOpenSidebar }) {
       },
       body: JSON.stringify({ projectID: projectID }),
     });
-    const {
-      svgList,
-      statistics,
-      matrixList,
-      downloads,
-    } = await response.json();
-    dispatchVisualizeResults({
-      svgList: svgList,
-      statistics: statistics,
-      matrixList: matrixList,
-      downloads: downloads,
-    });
+
+    if (response.ok) {
+      const {
+        svgList,
+        statistics,
+        matrixList,
+        downloads,
+      } = await response.json();
+      dispatchVisualizeResults({
+        svgList: svgList,
+        statistics: statistics,
+        matrixList: matrixList,
+        downloads: downloads,
+      });
+    } else {
+      dispatchError(await response.json());
+    }
   }
 
   // retrieve mapping of samples to plots from svgList file
-  async function mapSvgList() {
+  async function loadData() {
     dispatchVisualize({
       loading: {
         active: true,
