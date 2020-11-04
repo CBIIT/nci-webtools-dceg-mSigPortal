@@ -301,18 +301,16 @@ export default function Explore() {
         </Nav>
       </div>
       <div className="mx-3">
-        <div className="mx-3 my-3 bg-white border">
-          <div className="p-3">
-            <Route
-              exact
-              path={`/exploring`}
-              render={() => <Redirect to="/exploring/signature" />}
-            />
-            <Route path="/exploring/etiology" component={EtiologyExploring} />
-            <Route path="/exploring/signature" component={SignatureExploring} />
-            <Route path="/exploring/exposure" component={ExposureExploring} />
-            <Route path="/exploring/download" component={Download} />
-          </div>
+        <div className="mx-3 my-3">
+          <Route
+            exact
+            path={`/exploring`}
+            render={() => <Redirect to="/exploring/signature" />}
+          />
+          <Route path="/exploring/etiology" component={EtiologyExploring} />
+          <Route path="/exploring/signature" component={SignatureExploring} />
+          <Route path="/exploring/exposure" component={ExposureExploring} />
+          <Route path="/exploring/download" component={Download} />
         </div>
       </div>
     </div>

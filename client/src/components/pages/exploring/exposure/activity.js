@@ -58,7 +58,7 @@ export default function Activity({ calculateActivity }) {
     <div>
       <Form>
         <LoadingOverlay active={loading || mainLoading} />
-        <div>
+        <div className="px-4">
           <Row className="justify-content-center">
             <Col sm="2">
               <Select
@@ -78,20 +78,18 @@ export default function Activity({ calculateActivity }) {
               </Button>
             </Col>
           </Row>
-          <div id="activityPlot">
-            {err && (
-              <p>
-                An error has occured. Check the debug section for more info.
-              </p>
-            )}
-            {plotURL && (
-              <Plot
-                plotName={plotPath.split('/').slice(-1)[0]}
-                plotURL={plotURL}
-              />
-            )}
-            <Debug msg={debugR} />
-          </div>
+        </div>
+        <div id="activityPlot">
+          {err && (
+            <p>An error has occured. Check the debug section for more info.</p>
+          )}
+          {plotURL && (
+            <Plot
+              plotName={plotPath.split('/').slice(-1)[0]}
+              plotURL={plotURL}
+            />
+          )}
+          <Debug msg={debugR} />
         </div>
       </Form>
     </div>

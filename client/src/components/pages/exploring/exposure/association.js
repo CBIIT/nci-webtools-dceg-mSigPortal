@@ -69,7 +69,7 @@ export default function Association({ calculateAssociation }) {
     <div>
       <Form>
         <LoadingOverlay active={loading || mainLoading} />
-        <div>
+        <div className="px-4">
           <Row className="justify-content-center">
             <Col sm="2" className="my-auto">
               <Group controlId="toggleCancerType" className="d-flex">
