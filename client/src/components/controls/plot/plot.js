@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from 'react-bootstrap';
 import { dispatchError } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
@@ -9,6 +9,43 @@ export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
   const rootURL = window.location.pathname;
 
   const [loading, setLoading] = useState(false);
+
+  // Key listener hook usehooks.com/useKeyPress/
+  const useKeyPress = (targetKey) => {
+    // State for keeping track of whether key is pressed
+    const [keyPressed, setKeyPressed] = useState(false);
+    // If pressed key is our target key then set to true
+    const downHandler = ({ key }) => {
+      if (key === targetKey) {
+        console.log(key + 'DOWN');
+        setKeyPressed(true);
+      }
+    };
+
+    // If released key is our target key then set to false
+    const upHandler = ({ key }) => {
+      if (key === targetKey) {
+        console.log(key + 'UP');
+
+        setKeyPressed(false);
+      }
+    };
+
+    // Add event listeners
+    useEffect(() => {
+      window.addEventListener('keydown', downHandler);
+      window.addEventListener('keyup', upHandler);
+      // Remove event listeners on cleanup
+      return () => {
+        window.removeEventListener('keydown', downHandler);
+        window.removeEventListener('keyup', upHandler);
+      };
+    }, []); // Empty array ensures that effect is only run on mount and unmount
+
+    return keyPressed;
+  };
+
+  const zoomKeyDown = useKeyPress('z');
 
   //   download text results files
   async function downloadData(txtPath) {
@@ -37,10 +74,9 @@ export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
     setLoading(false);
   }
   const zoomProps = {
-    wheel: { wheelEnabled: false },
-    zoomIn: { step: 5 },
-    zoomOut: { step: 5 },
-    doubleClick: { step: 5 },
+    wheel: { wheelEnabled: zoomKeyDown, step: 3 },
+    zoomIn: { step: 3 },
+    zoomOut: { step: 3 },
   };
 
   return (
