@@ -119,10 +119,7 @@ export default function Visualize({ match }) {
           <hr className="d-lg-none" style={{ opacity: 0 }}></hr>
         </SidebarPanel>
         <MainPanel>
-          <div
-            className="p-3 shadow-sm bg-white"
-            style={{ minHeight: '420px' }}
-          >
+          <div className="shadow-sm bg-white" style={{ minHeight: '420px' }}>
             <LoadingOverlay
               active={loading.active}
               content={loading.content}
