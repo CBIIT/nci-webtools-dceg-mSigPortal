@@ -17,7 +17,6 @@ export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
     // If pressed key is our target key then set to true
     const downHandler = ({ key }) => {
       if (key === targetKey) {
-        console.log(key + 'DOWN');
         setKeyPressed(true);
       }
     };
@@ -25,8 +24,6 @@ export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
     // If released key is our target key then set to false
     const upHandler = ({ key }) => {
       if (key === targetKey) {
-        console.log(key + 'UP');
-
         setKeyPressed(false);
       }
     };
