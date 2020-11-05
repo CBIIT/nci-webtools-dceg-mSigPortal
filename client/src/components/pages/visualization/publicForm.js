@@ -100,7 +100,7 @@ export default function PublicForm() {
       studyOptions: studyOptions,
       study: studyOptions[0],
       cancerTypeOptions: cancerTypeOptions,
-      cancerType: cancerTypeOptions[0],
+      cancerType: 'Lung-AdenoCA',
       pubExperimentOptions: pubExperimentOptions,
       pubExperimentalStrategy: pubExperimentOptions[0],
     });
