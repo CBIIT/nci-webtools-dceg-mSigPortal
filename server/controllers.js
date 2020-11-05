@@ -125,14 +125,15 @@ async function visualizationProfilerExtraction(req, res, next) {
         '/profilerExtraction: An Error Occured While Extracting Profiles'
       );
       res.status(500).json({
-        msg:
-          'An error occured durring profile extraction. Please review your input parameters and try again.',
         stdout,
         stderr,
       });
     }
-  } catch (err) {
-    next(err);
+  } catch ({ stdout, stderr }) {
+    res.status(500).json({
+      stdout,
+      stderr,
+    });
   }
 }
 

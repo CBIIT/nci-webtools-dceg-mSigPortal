@@ -67,7 +67,7 @@ app.use('/public', express.static(config.data.database));
 app.use(express.json());
 
 app.use((error, req, res, next) => {
-  logger.error(err);
+  logger.error(error);
   if (!error.statusCode) error.statusCode = 500;
   res.status(error.statusCode).json(error.message);
 });
