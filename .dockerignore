@@ -2,5 +2,5 @@
 **/node_modules
 
 server/logs/
-server/data/
+server/data/Database.zip
 server/tmp/

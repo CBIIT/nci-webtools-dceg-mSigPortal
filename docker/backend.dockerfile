@@ -14,6 +14,8 @@ COPY . /deploy
 
 WORKDIR /deploy/server
 
+# RUN unzip data/Database.zip 
+
 RUN npm install
 
 CMD npm start
