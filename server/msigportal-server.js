@@ -21,6 +21,7 @@ const {
   getReferenceSignatureData,
   submitQueue,
   fetchResults,
+  fetchExample,
 } = require('./controllers');
 
 if (cluster.isMaster) {
@@ -99,3 +100,5 @@ app.post('/getReferenceSignatureData', getReferenceSignatureData);
 app.post('/queue', submitQueue);
 
 app.get('/fetchResults/:id', fetchResults);
+
+app.get('/fetchExample/:folder', fetchExample);

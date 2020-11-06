@@ -139,15 +139,23 @@ async function visualizationProfilerExtraction(req, res, next) {
 
 async function getResultData(req, res, next) {
   logger.info(`/getResultData: Retrieving Results for ${req.body.projectID}`);
-  console.log('summary', req.body);
-  const resultsPath = path.join(
+
+  const userResults = path.resolve(
     config.results.folder,
     req.body.projectID,
     'results'
   );
+  const exampleResults = path.resolve(
+    config.data.folder,
+    'Examples',
+    req.body.projectID,
+    'results'
+  );
 
-  if (fs.existsSync(path.join(resultsPath, 'svg_files_list.txt'))) {
-    res.json(await getResultDataFiles(resultsPath));
+  if (fs.existsSync(path.join(userResults, 'svg_files_list.txt'))) {
+    res.json(await getResultDataFiles(userResults));
+  } else if (fs.existsSync(path.join(exampleResults, 'svg_files_list.txt'))) {
+    res.json(await getResultDataFiles(exampleResults));
   } else {
     logger.info('/getResultData: Results not found');
     res.status(500).json('Results not found');
@@ -445,10 +453,10 @@ async function fetchResults(req, res, next) {
     const s3 = new AWS.S3();
     const { id } = req.params;
 
+    logger.info(`Fetch Queue Result: ${id}`);
+
     // validate id format
-    if (!validate(id)) {
-      throw `Invalid id`;
-    }
+    if (!validate(id)) throw `Invalid id`;
 
     // ensure output directory exists
     const resultsFolder = path.resolve(config.results.folder, id);
@@ -504,7 +512,6 @@ async function fetchResults(req, res, next) {
         String(await fs.promises.readFile(paramsFilePath))
       );
 
-      logger.info('/fetchResults: Found Params');
       res.json(params);
     } else {
       throw `Invalid id`;
@@ -514,7 +521,34 @@ async function fetchResults(req, res, next) {
   }
 }
 
+async function fetchExample(req, res, next) {
+  try {
+    const { folder } = req.params;
+    const examplePath = path.resolve(config.data.folder, 'Examples', folder);
+
+    logger.info(`Fetch Example: ${folder}`);
+
+    // validate example
+    if (!fs.existsSync(examplePath)) throw `Example does not exist`;
+
+    let paramsFilePath = path.resolve(examplePath, `params.json`);
+
+    if (fs.existsSync(paramsFilePath)) {
+      const params = JSON.parse(
+        String(await fs.promises.readFile(paramsFilePath))
+      );
+
+      res.json(params);
+    } else {
+      throw `Invalid id`;
+    }
+  } catch (error) {
+    res.status(500).json(error);
+  }
+}
+
 module.exports = {
+  parseCSV,
   profilerExtraction,
   visualizationProfilerExtraction,
   getResultData,
@@ -529,5 +563,5 @@ module.exports = {
   getReferenceSignatureData,
   submitQueue,
   fetchResults,
-  parseCSV,
+  fetchExample,
 };

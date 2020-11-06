@@ -167,7 +167,7 @@ async function processMessage(params) {
       jobName: 'mSigPortal',
       originalTimestamp: timestamp,
       runTime: runtime,
-      resultsUrl: `${config.email.baseUrl}/#/visualization/${id}`,
+      resultsUrl: `${config.email.baseUrl}/#/visualization/queue/${id}`,
       supportEmail: config.email.admin,
     };
 
