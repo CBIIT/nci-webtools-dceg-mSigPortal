@@ -25,7 +25,9 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
     pubExperimentalStrategy,
     pDataOptions,
   } = useSelector((state) => state.visualize);
-  const { profileOptions } = useSelector((state) => state.mutationalProfiles);
+  const { profileOptions, nameOptions } = useSelector(
+    (state) => state.mutationalProfiles
+  );
   const { matrixList, svgList } = useSelector(
     (state) => state.visualizeResults
   );
@@ -317,72 +319,78 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
             <Body>
               <Form>
                 <LoadingOverlay active={withinSubmitOverlay} />
-                <div>
-                  <Row className="justify-content-center">
-                    <Col sm="5">
-                      <Select
-                        id="csProfileType"
-                        label="Profile Type"
-                        value={withinProfileType}
-                        options={profileOptions}
-                        onChange={handleWithinProfileType}
-                      />
-                    </Col>
-                    <Col sm="5">
-                      <Select
-                        id="csMatrixSize"
-                        label="Matrix Size"
-                        value={withinMatrixSize}
-                        options={withinMatrixOptions}
-                        onChange={(matrix) =>
-                          dispatchCosineSimilarity({
-                            withinMatrixSize: matrix,
-                          })
+                <Row className="justify-content-center">
+                  <Col sm="5">
+                    <Select
+                      disabled={nameOptions.length < 2}
+                      id="csProfileType"
+                      label="Profile Type"
+                      value={withinProfileType}
+                      options={profileOptions}
+                      onChange={handleWithinProfileType}
+                    />
+                  </Col>
+                  <Col sm="5">
+                    <Select
+                      disabled={nameOptions.length < 2}
+                      id="csMatrixSize"
+                      label="Matrix Size"
+                      value={withinMatrixSize}
+                      options={withinMatrixOptions}
+                      onChange={(matrix) =>
+                        dispatchCosineSimilarity({
+                          withinMatrixSize: matrix,
+                        })
+                      }
+                    />
+                  </Col>
+                  <Col sm="1" className="m-auto">
+                    <Button
+                      disabled={nameOptions.length < 2}
+                      variant="primary"
+                      onClick={() => {
+                        if (source == 'user') {
+                          calculateR('cosineSimilarityWithin', {
+                            matrixFile: matrixList.filter(
+                              (path) =>
+                                path.Profile_Type == withinProfileType &&
+                                path.Matrix_Size == withinMatrixSize
+                            )[0].Path,
+                          });
+                        } else {
+                          calculateR('cosineSimilarityWithinPublic', {
+                            profileType: withinProfileType,
+                            matrixSize: withinMatrixSize,
+                            study: study,
+                            cancerType: cancerType,
+                            experimentalStrategy: pubExperimentalStrategy,
+                          });
                         }
-                      />
-                    </Col>
-                    <Col sm="1" className="m-auto">
-                      <Button
-                        variant="primary"
-                        onClick={() => {
-                          if (source == 'user') {
-                            calculateR('cosineSimilarityWithin', {
-                              matrixFile: matrixList.filter(
-                                (path) =>
-                                  path.Profile_Type == withinProfileType &&
-                                  path.Matrix_Size == withinMatrixSize
-                              )[0].Path,
-                            });
-                          } else {
-                            calculateR('cosineSimilarityWithinPublic', {
-                              profileType: withinProfileType,
-                              matrixSize: withinMatrixSize,
-                              study: study,
-                              cancerType: cancerType,
-                              experimentalStrategy: pubExperimentalStrategy,
-                            });
-                          }
-                        }}
-                      >
-                        Calculate
-                      </Button>
-                    </Col>
+                      }}
+                    >
+                      Calculate
+                    </Button>
+                  </Col>
+                </Row>
+                {nameOptions.length < 2 && (
+                  <Row>
+                    <Col>Unavailable - More than one Sample Required</Col>
                   </Row>
+                )}
 
-                  <div id="withinPlot">
-                    <div style={{ display: withinErr ? 'block' : 'none' }}>
-                      <p>
-                        An error has occured. Check the debug section for more
-                        info.
-                      </p>
-                    </div>
-                    <div style={{ display: withinPlotURL ? 'block' : 'none' }}>
-                      <Plot
-                        plotName={withinPlotPath.split('/').slice(-1)[0]}
-                        plotURL={withinPlotURL}
-                        txtPath={withinTxtPath}
-                      />
-                    </div>
+                <div id="withinPlot">
+                  <div style={{ display: withinErr ? 'block' : 'none' }}>
+                    <p>
+                      An error has occured. Check the debug section for more
+                      info.
+                    </p>
+                  </div>
+                  <div style={{ display: withinPlotURL ? 'block' : 'none' }}>
+                    <Plot
+                      plotName={withinPlotPath.split('/').slice(-1)[0]}
+                      plotURL={withinPlotURL}
+                      txtPath={withinTxtPath}
+                    />
                   </div>
                 </div>
               </Form>

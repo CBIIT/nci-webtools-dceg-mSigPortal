@@ -405,93 +405,100 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
             <Body>
               <Form>
                 <LoadingOverlay active={withinSubmitOverlay} />
-                <div>
-                  <Row className="justify-content-center">
-                    <Col sm="1">
-                      <Select
-                        id="pcProfileTypeWithin"
-                        label="Profile Type"
-                        value={withinProfileType}
-                        options={profileOptions}
-                        onChange={(profile) =>
-                          dispatchProfileComparison({
-                            withinProfileType: profile,
-                          })
+                <Row className="justify-content-center">
+                  <Col sm="1">
+                    <Select
+                      disabled={nameOptions.length < 2}
+                      id="pcProfileTypeWithin"
+                      label="Profile Type"
+                      value={withinProfileType}
+                      options={profileOptions}
+                      onChange={(profile) =>
+                        dispatchProfileComparison({
+                          withinProfileType: profile,
+                        })
+                      }
+                    />
+                  </Col>
+                  <Col sm="5">
+                    <Select
+                      disabled={nameOptions.length < 2}
+                      id="pcSample1"
+                      label="Sample Name 1"
+                      value={withinSampleName1}
+                      options={nameOptions}
+                      onChange={(name) => {
+                        dispatchProfileComparison({
+                          withinSampleName1: name,
+                        });
+                      }}
+                    />
+                  </Col>
+                  <Col sm="5">
+                    <Select
+                      disabled={nameOptions.length < 2}
+                      id="pcSample2"
+                      label="Sample Name 2"
+                      value={withinSampleName2}
+                      options={nameOptions}
+                      onChange={(name) => {
+                        dispatchProfileComparison({
+                          withinSampleName2: name,
+                        });
+                      }}
+                    />
+                  </Col>
+                  <Col sm="1" className="m-auto">
+                    <Button
+                      disabled={nameOptions.length < 2}
+                      variant="primary"
+                      onClick={() => {
+                        if (source == 'user') {
+                          calculateR('profileComparisonWithin', {
+                            profileType: withinProfileType,
+                            sampleName1: withinSampleName1,
+                            sampleName2: withinSampleName2,
+                            matrixList: JSON.stringify(
+                              matrixList.filter(
+                                (matrix) =>
+                                  matrix.Profile_Type == withinProfileType
+                              )
+                            ),
+                          });
+                        } else {
+                          calculateR('profileComparisonWithinPublic', {
+                            profileType: withinProfileType,
+                            sampleName1: withinSampleName1,
+                            sampleName2: withinSampleName2,
+                            study: study,
+                            cancerType: cancerType,
+                            experimentalStrategy: pubExperimentalStrategy,
+                          });
                         }
-                      />
-                    </Col>
-                    <Col sm="5">
-                      <Select
-                        id="pcSample1"
-                        label="Sample Name 1"
-                        value={withinSampleName1}
-                        options={nameOptions}
-                        onChange={(name) => {
-                          dispatchProfileComparison({
-                            withinSampleName1: name,
-                          });
-                        }}
-                      />
-                    </Col>
-                    <Col sm="5">
-                      <Select
-                        id="pcSample2"
-                        label="Sample Name 2"
-                        value={withinSampleName2}
-                        options={nameOptions}
-                        onChange={(name) => {
-                          dispatchProfileComparison({
-                            withinSampleName2: name,
-                          });
-                        }}
-                      />
-                    </Col>
-                    <Col sm="1" className="m-auto">
-                      <Button
-                        variant="primary"
-                        onClick={() => {
-                          if (source == 'user') {
-                            calculateR('profileComparisonWithin', {
-                              profileType: withinProfileType,
-                              sampleName1: withinSampleName1,
-                              sampleName2: withinSampleName2,
-                              matrixList: JSON.stringify(
-                                matrixList.filter(
-                                  (matrix) =>
-                                    matrix.Profile_Type == withinProfileType
-                                )
-                              ),
-                            });
-                          } else {
-                            calculateR('profileComparisonWithinPublic', {
-                              profileType: withinProfileType,
-                              sampleName1: withinSampleName1,
-                              sampleName2: withinSampleName2,
-                              study: study,
-                              cancerType: cancerType,
-                              experimentalStrategy: pubExperimentalStrategy,
-                            });
-                          }
-                        }}
-                      >
-                        Calculate
-                      </Button>
-                    </Col>
+                      }}
+                    >
+                      Calculate
+                    </Button>
+                  </Col>
+                </Row>
+                {nameOptions.length < 2 && (
+                  <Row>
+                    <Col>Unavailable - More than one Sample Required</Col>
                   </Row>
+                )}
 
-                  <div id="pcWithinPlot">
-                    <div style={{ display: withinErr ? 'block' : 'none' }}>
-                      <p>
-                        An error has occured. Check the debug section for more
-                        info.
-                      </p>
-                    </div>
-                    <div style={{ display: withinPlotURL ? 'block' : 'none' }}>
-                      <Plot
-                        plotName={withinPlotPath.split('/').slice(-1)[0]}
-                        plotURL={withinPlotURL}
-                      />
-                    </div>
+                <div id="pcWithinPlot">
+                  <div style={{ display: withinErr ? 'block' : 'none' }}>
+                    <p>
+                      An error has occured. Check the debug section for more
+                      info.
+                    </p>
+                  </div>
+                  <div style={{ display: withinPlotURL ? 'block' : 'none' }}>
+                    <Plot
+                      plotName={withinPlotPath.split('/').slice(-1)[0]}
+                      plotURL={withinPlotURL}
+                    />
                   </div>
                 </div>
               </Form>

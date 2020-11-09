@@ -22,7 +22,9 @@ export default function PCA({ submitR, getRefSigOptions }) {
     pubExperimentalStrategy,
     pDataOptions,
   } = useSelector((state) => state.visualize);
-  const { profileOptions } = useSelector((state) => state.mutationalProfiles);
+  const { profileOptions, nameOptions } = useSelector(
+    (state) => state.mutationalProfiles
+  );
   const rootURL = window.location.pathname;
   const {
     profileType,
@@ -303,121 +305,127 @@ export default function PCA({ submitR, getRefSigOptions }) {
             <Body>
               <Form>
                 <LoadingOverlay active={submitOverlay} />
-                <div>
-                  <Row className="justify-content-center">
-                    <Col sm="5">
-                      <Select
-                        id="pcaProfileType"
-                        label="Profile Type"
-                        value={profileType}
-                        options={profileOptions}
-                        onChange={(profileType) => {
-                          dispatchPCA({
+                <Row className="justify-content-center">
+                  <Col sm="5">
+                    <Select
+                      disabled={nameOptions.length < 2}
+                      id="pcaProfileType"
+                      label="Profile Type"
+                      value={profileType}
+                      options={profileOptions}
+                      onChange={(profileType) => {
+                        dispatchPCA({
+                          profileType: profileType,
+                        });
+                        getSignatureSet(profileType);
+                      }}
+                    />
+                  </Col>
+
+                  <Col sm="5">
+                    <Select
+                      disabled={nameOptions.length < 2}
+                      id="pcaRefSet"
+                      label="Reference Signature Set"
+                      value={signatureSet}
+                      options={signatureSetOptions}
+                      onChange={(signatureSet) => {
+                        dispatchPCA({
+                          signatureSet: signatureSet,
+                        });
+                      }}
+                    />
+                  </Col>
+                  <Col sm="1" className="m-auto">
+                    <Button
+                      disabled={nameOptions.length < 2}
+                      variant="primary"
+                      onClick={() => {
+                        if (source == 'user') {
+                          calculateR('pca', {
                             profileType: profileType,
-                          });
-                          getSignatureSet(profileType);
-                        }}
-                      />
-                    </Col>
-
-                    <Col sm="5">
-                      <Select
-                        id="pcaRefSet"
-                        label="Reference Signature Set"
-                        value={signatureSet}
-                        options={signatureSetOptions}
-                        onChange={(signatureSet) => {
-                          dispatchPCA({
                             signatureSet: signatureSet,
+                            matrixList: JSON.stringify(
+                              matrixList.filter(
+                                (matrix) => matrix.Profile_Type == profileType
+                              )
+                            ),
                           });
-                        }}
-                      />
-                    </Col>
-                    <Col sm="1" className="m-auto">
-                      <Button
-                        variant="primary"
-                        onClick={() => {
-                          if (source == 'user') {
-                            calculateR('pca', {
-                              profileType: profileType,
-                              signatureSet: signatureSet,
-                              matrixList: JSON.stringify(
-                                matrixList.filter(
-                                  (matrix) => matrix.Profile_Type == profileType
-                                )
-                              ),
-                            });
-                          } else {
-                            calculateR('pcaPublic', {
-                              profileType: profileType,
-                              signatureSet: signatureSet,
-                              study: study,
-                              cancerType: cancerType,
-                              experimentalStrategy: pubExperimentalStrategy,
-                            });
-                          }
-                        }}
-                      >
-                        Calculate
-                      </Button>
-                    </Col>
+                        } else {
+                          calculateR('pcaPublic', {
+                            profileType: profileType,
+                            signatureSet: signatureSet,
+                            study: study,
+                            cancerType: cancerType,
+                            experimentalStrategy: pubExperimentalStrategy,
+                          });
+                        }
+                      }}
+                    >
+                      Calculate
+                    </Button>
+                  </Col>
+                </Row>
+                {nameOptions.length < 2 && (
+                  <Row>
+                    <Col>Unavailable - More than one Sample Required</Col>
                   </Row>
+                )}
 
-                  <div id="pca1Plot">
-                    <div style={{ display: pcaErr ? 'block' : 'none' }}>
-                      <p>
-                        An error has occured. Check the debug section for more
-                        info.
-                      </p>
-                    </div>
-                    <div
-                      className="my-4"
-                      style={{ display: pca1URL ? 'block' : 'none' }}
-                    >
-                      <Plot
-                        plotName={pca1.split('/').slice(-1)[0]}
-                        plotURL={pca1URL}
-                      />
-                    </div>
+                <div id="pca1Plot">
+                  <div style={{ display: pcaErr ? 'block' : 'none' }}>
+                    <p>
+                      An error has occured. Check the debug section for more
+                      info.
+                    </p>
                   </div>
-
-                  <div id="pca2Plot">
-                    <div
-                      className="my-4"
-                      style={{ display: pca2URL ? 'block' : 'none' }}
-                    >
-                      <Plot
-                        plotName={pca2.split('/').slice(-1)[0]}
-                        plotURL={pca2URL}
-                        txtPath={pca2Data}
-                      />
-                    </div>
+                  <div
+                    className="my-4"
+                    style={{ display: pca1URL ? 'block' : 'none' }}
+                  >
+                    <Plot
+                      plotName={pca1.split('/').slice(-1)[0]}
+                      plotURL={pca1URL}
+                    />
                   </div>
+                </div>
 
-                  <div id="pca3Plot">
-                    <div
-                      className="my-4"
-                      style={{ display: pca3URL ? 'block' : 'none' }}
-                    >
-                      <Plot
-                        plotName={pca3.split('/').slice(-1)[0]}
-                        plotURL={pca3URL}
-                        txtPath={pca3Data}
-                      />
-                    </div>
+                <div id="pca2Plot">
+                  <div
+                    className="my-4"
+                    style={{ display: pca2URL ? 'block' : 'none' }}
+                  >
+                    <Plot
+                      plotName={pca2.split('/').slice(-1)[0]}
+                      plotURL={pca2URL}
+                      txtPath={pca2Data}
+                    />
                   </div>
+                </div>
 
-                  <div id="heatmapPlot">
-                    <div
-                      className="my-4"
-                      style={{ display: heatmapURL ? 'block' : 'none' }}
-                    >
-                      <Plot
-                        plotName={heatmap.split('/').slice(-1)[0]}
-                        plotURL={heatmapURL}
-                        txtPath={heatmapData}
-                      />
-                    </div>
+                <div id="pca3Plot">
+                  <div
+                    className="my-4"
+                    style={{ display: pca3URL ? 'block' : 'none' }}
+                  >
+                    <Plot
+                      plotName={pca3.split('/').slice(-1)[0]}
+                      plotURL={pca3URL}
+                      txtPath={pca3Data}
+                    />
+                  </div>
+                </div>
+
+                <div id="heatmapPlot">
+                  <div
+                    className="my-4"
+                    style={{ display: heatmapURL ? 'block' : 'none' }}
+                  >
+                    <Plot
+                      plotName={heatmap.split('/').slice(-1)[0]}
+                      plotURL={heatmapURL}
+                      txtPath={heatmapData}
+                    />
                   </div>
                 </div>
               </Form>
