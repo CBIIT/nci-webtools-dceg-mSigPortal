@@ -145,17 +145,9 @@ async function getResultData(req, res, next) {
     req.body.projectID,
     'results'
   );
-  const exampleResults = path.resolve(
-    config.data.folder,
-    'Examples',
-    req.body.projectID,
-    'results'
-  );
 
   if (fs.existsSync(path.join(userResults, 'svg_files_list.txt'))) {
     res.json(await getResultDataFiles(userResults));
-  } else if (fs.existsSync(path.join(exampleResults, 'svg_files_list.txt'))) {
-    res.json(await getResultDataFiles(exampleResults));
   } else {
     logger.info('/getResultData: Results not found');
     res.status(500).json('Results not found');
