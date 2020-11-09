@@ -8,21 +8,22 @@ RUN dnf -y update \
    && dnf config-manager --enable PowerTools \
    && dnf -y module enable nodejs:13 \
    && dnf -y install \
-      nodejs \
-      R \
-      python3-pip \
       # gdal-devel \
-      libcurl-devel \
-      libxml2-devel \
-      git \
-      rsync \
-      wget \
       # proj-devel \
       # protobuf-devel \
       # udunits2-devel \
       # v8-devel \
       # https://download.fedoraproject.org/pub/epel/7/x86_64/Packages/j/jq-1.6-2.el7.x86_64.rpm \
       # https://download.fedoraproject.org/pub/epel/7/x86_64/Packages/j/jq-devel-1.6-2.el7.x86_64.rpm \
+      openssl-devel \
+      nodejs \
+      R \
+      python3-pip \
+      libcurl-devel \
+      libxml2-devel \
+      git \
+      rsync \
+      wget \
    && dnf -y install \
       cairo \
       cairo-devel \
