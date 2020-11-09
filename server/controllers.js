@@ -2,7 +2,7 @@ const path = require('path');
 const logger = require('./logger');
 const { spawn } = require('promisify-child-process');
 const formidable = require('formidable');
-const fs = require('fs');
+const fs = require('fs-extra');
 const { v4: uuidv4, validate } = require('uuid');
 const Papa = require('papaparse');
 const tar = require('tar');
@@ -534,11 +534,16 @@ async function fetchExample(req, res, next) {
     let paramsFilePath = path.resolve(examplePath, `params.json`);
 
     if (fs.existsSync(paramsFilePath)) {
-      const params = JSON.parse(
-        String(await fs.promises.readFile(paramsFilePath))
-      );
+      const projectID = uuidv4();
+      const destinationPath = path.resolve(config.results.folder, projectID);
 
-      res.json(params);
+      fs.copy(examplePath, destinationPath, (err) => {
+        if (err) throw err;
+      });
+
+      const params = JSON.parse(await fs.promises.readFile(paramsFilePath));
+
+      res.json({ ...params, projectID: projectID });
     } else {
       throw `Invalid id`;
     }
