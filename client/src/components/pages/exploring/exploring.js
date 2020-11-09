@@ -267,9 +267,9 @@ export default function Explore() {
   }
 
   const links = [
-    { name: 'Etiology Exploring', pathId: 'etiology' },
-    { name: 'Signature Exploring', pathId: 'signature' },
-    { name: 'Exposure Exploring', pathId: 'exposure' },
+    { name: 'Etiology', pathId: 'etiology' },
+    { name: 'Signature', pathId: 'signature' },
+    { name: 'Exposure', pathId: 'exposure' },
     { name: 'Download', pathId: 'download' },
   ];
 
