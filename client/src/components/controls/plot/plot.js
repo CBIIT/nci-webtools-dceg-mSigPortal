@@ -37,10 +37,9 @@ export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
     setLoading(false);
   }
   const zoomProps = {
-    wheel: { wheelEnabled: false },
-    zoomIn: { step: 5 },
-    zoomOut: { step: 5 },
-    doubleClick: { step: 5 },
+    wheel: { wheelEnabled: false, step: 3 },
+    zoomIn: { step: 3 },
+    zoomOut: { step: 3 },
   };
 
   return (

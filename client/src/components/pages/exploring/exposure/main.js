@@ -22,6 +22,11 @@ import {
 } from '../../../../services/store';
 import Select from '../../../controls/select/select';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import {
+  SidebarContainer,
+  SidebarPanel,
+  MainPanel,
+} from '../../../controls/sidebar-container/sidebar-container';
 
 const { Header, Body } = Card;
 const { Toggle, Collapse } = Accordion;
@@ -51,6 +56,7 @@ export default function ExposureExploring() {
     source,
     loading,
     projectID,
+    openSidebar,
   } = useSelector((state) => state.expExposure);
   const activityArgs = useSelector((state) => state.expActivity);
   const associationArgs = useSelector((state) => state.expAssociation);
@@ -411,224 +417,284 @@ export default function ExposureExploring() {
 
   return (
     <div className="position-relative">
-      <Form>
-        <LoadingOverlay active={loading} />
-        <div>
-          <Row className="justify-content-center">
-            <Col sm="auto">
-              <Group className="d-flex">
-                <Label className="mr-auto">
-                  <h5 className="mb-2">Data Source</h5>
-                </Label>
-                <Check inline id="radioPublic" className="ml-4">
-                  <Check.Input
-                    type="radio"
-                    value="public"
-                    checked={source == 'public'}
-                    onChange={(e) => dispatchExpExposure({ source: 'public' })}
-                  />
-                  <Check.Label className="font-weight-normal">
-                    Public
-                  </Check.Label>
-                </Check>
-                <Check inline id="radioUser">
-                  <Check.Input
-                    type="radio"
-                    value="user"
-                    checked={source == 'user'}
-                    onChange={(e) => dispatchExpExposure({ source: 'user' })}
-                  />
-                  <Check.Label className="font-weight-normal">User</Check.Label>
-                </Check>
-              </Group>
-            </Col>
-          </Row>
-          {source == 'public' ? (
-            <Row className="justify-content-center">
-              <Col sm="2">
-                <Select
-                  id="tumorStudy"
-                  label="Study"
-                  value={study}
-                  options={studyOptions}
-                  onChange={handleStudy}
-                />
-              </Col>
-              <Col sm="2">
-                <Select
-                  id="tumorStrategy"
-                  label="Experimental Strategy"
-                  value={strategy}
-                  options={strategyOptions}
-                  onChange={(strategy) =>
-                    dispatchExpExposure({ strategy: strategy })
-                  }
-                />
-              </Col>
-              <Col sm="2">
-                <Select
-                  id="prevalenceCancerType"
-                  label="Cancer Type"
-                  value={cancer}
-                  options={cancerOptions}
-                  onChange={(cancer) =>
-                    dispatchExpPrevalence({
-                      cancer: cancer,
-                    })
-                  }
-                />
-              </Col>
-              <Col sm="2">
-                <Select
-                  id="tumorSet"
-                  label="Reference Signature Set"
-                  value={refSignatureSet}
-                  options={refSignatureSetOptions}
-                  onChange={handleSet}
-                />
-              </Col>
-              <Col sm="3"></Col>
-              <Col sm="1" className="m-auto">
-                <Button variant="primary" onClick={() => calculateAll()}>
-                  Calculate
-                </Button>
-              </Col>
-            </Row>
-          ) : (
-            <Row className="justify-content-center">
-              <Col sm="2">
-                <Label>Upload Exposure File</Label>
-                <Form.File
-                  id="variableData"
-                  label={exposureFileObj.name || 'Exposure File'}
-                  accept=".txt"
-                  onChange={(e) => {
-                    setExposure(e.target.files[0]);
-                    dispatchExpExposure({
-                      exposureFile: e.target.files[0].name,
-                    });
-                  }}
-                  custom
-                />
-                {exposureValidity && (
-                  <span className="text-danger">Exposure File Required</span>
-                )}
-              </Col>
-              <Col sm="2">
-                <Label>Upload Matrix File</Label>
-                <Form.File
-                  id="variableData"
-                  label={matrixFileObj.name || 'Matrix File'}
-                  accept=".txt"
-                  onChange={(e) => {
-                    setMatrix(e.target.files[0]);
-                    dispatchExpExposure({
-                      matrixFile: e.target.files[0].name,
-                    });
-                  }}
-                  custom
-                />
-                {matrixValidity && (
-                  <span className="text-danger">Matrix File Required</span>
-                )}
-              </Col>
-              <Col sm="2" className="my-auto">
-                <Group controlId="toggleSignatureSource" className="d-flex">
-                  <Label className="mr-4">Use Public Signature Data</Label>
-                  <Check inline id="toggleSignatureSource">
+      <SidebarContainer
+        collapsed={!openSidebar}
+        onCollapsed={(e) => dispatchExpExposure({ openSidebar: !e })}
+      >
+        <SidebarPanel>
+          <div className="p-3 shadow-sm bg-white">
+            <LoadingOverlay active={loading} />
+            <Row>
+              <Col sm="auto">
+                <Group>
+                  <Label className="mr-auto">
+                    <h3 className="mb-2">Data Source</h3>
+                  </Label>
+                  <Check inline id="radioPublic" className="ml-4">
                     <Check.Input
-                      type="checkbox"
-                      value={usePublicSignature}
-                      checked={usePublicSignature}
-                      onChange={() =>
-                        dispatchExpExposure({
-                          usePublicSignature: !usePublicSignature,
-                        })
+                      type="radio"
+                      value="public"
+                      checked={source == 'public'}
+                      onChange={(e) =>
+                        dispatchExpExposure({ source: 'public' })
                       }
                     />
+                    <Check.Label className="font-weight-normal">
+                      Public
+                    </Check.Label>
+                  </Check>
+                  <Check inline id="radioUser">
+                    <Check.Input
+                      type="radio"
+                      value="user"
+                      checked={source == 'user'}
+                      onChange={(e) => dispatchExpExposure({ source: 'user' })}
+                    />
+                    <Check.Label className="font-weight-normal">
+                      User
+                    </Check.Label>
                   </Check>
                 </Group>
               </Col>
-              {usePublicSignature ? (
-                <Col sm="2">
-                  <Select
-                    id="exposureSignatureSet"
-                    label="Reference Signature Set"
-                    value={refSignatureSet}
-                    options={refSignatureSetOptions}
-                    onChange={handleSet}
-                  />
-                </Col>
-              ) : (
-                <Col sm="2">
-                  <Label>Upload Signature Data</Label>
-                  <Form.File
-                    id="variableData"
-                    label={signatureFileObj.name || 'Signature File'}
-                    accept=".txt"
-                    onChange={(e) => {
-                      setSignature(e.target.files[0]);
-                      dispatchExpExposure({
-                        signatureFile: e.target.files[0].name,
-                      });
-                    }}
-                    custom
-                  />
-                  {signatureValidity && (
-                    <span className="text-danger">Signature File Required</span>
-                  )}
-                </Col>
-              )}
-              <Col sm="2">
-                <Select
-                  id="exposureGenome"
-                  label="Genome"
-                  value={genome}
-                  options={genomeOptions}
-                  onChange={(genome) => dispatchExpExposure({ genome: genome })}
-                />
-              </Col>
-              <Col sm="1"></Col>
-              <Col sm="1" className="m-auto">
-                <Button variant="primary" onClick={() => calculateAll()}>
-                  Calculate
-                </Button>
-              </Col>
             </Row>
-          )}
-        </div>
-      </Form>
-      {sections.map(({ component, id, title }) => {
-        return (
-          <Accordion activeKey={exposureAccordion[id]} key={id}>
-            <Card>
-              <Toggle
-                className="font-weight-bold"
-                as={Header}
-                eventKey={exposureAccordion[id]}
-                onClick={() =>
-                  dispatchExploring({
-                    exposureAccordion: {
-                      ...exposureAccordion,
-                      [id]: !exposureAccordion[id],
-                    },
-                  })
-                }
-              >
-                {exposureAccordion[id] == true ? (
-                  <FontAwesomeIcon icon={faMinus} />
-                ) : (
-                  <FontAwesomeIcon icon={faPlus} />
-                )}{' '}
-                {title}
-              </Toggle>
-              <Collapse eventKey={exposureAccordion[id]}>
-                <Body>{component}</Body>
-              </Collapse>
-            </Card>
-          </Accordion>
-        );
-      })}
+            {source == 'public' ? (
+              <div>
+                <Row>
+                  <Col>
+                    <Group>
+                      <Select
+                        id="tumorStudy"
+                        label="Study"
+                        value={study}
+                        options={studyOptions}
+                        onChange={handleStudy}
+                      />
+                    </Group>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <Group>
+                      <Select
+                        id="tumorStrategy"
+                        label="Experimental Strategy"
+                        value={strategy}
+                        options={strategyOptions}
+                        onChange={(strategy) =>
+                          dispatchExpExposure({ strategy: strategy })
+                        }
+                      />
+                    </Group>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <Group>
+                      <Select
+                        id="prevalenceCancerType"
+                        label="Cancer Type"
+                        value={cancer}
+                        options={cancerOptions}
+                        onChange={(cancer) =>
+                          dispatchExpPrevalence({
+                            cancer: cancer,
+                          })
+                        }
+                      />
+                    </Group>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <Group>
+                      <Select
+                        id="tumorSet"
+                        label="Reference Signature Set"
+                        value={refSignatureSet}
+                        options={refSignatureSetOptions}
+                        onChange={handleSet}
+                      />
+                    </Group>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <Group>
+                      <Button variant="primary" onClick={() => calculateAll()}>
+                        Calculate
+                      </Button>
+                    </Group>
+                  </Col>
+                </Row>
+              </div>
+            ) : (
+              <div>
+                <Row>
+                  <Col>
+                    <Group>
+                      <Label>Upload Exposure File</Label>
+                      <Form.File
+                        id="variableData"
+                        label={exposureFileObj.name || 'Exposure File'}
+                        accept=".txt"
+                        onChange={(e) => {
+                          setExposure(e.target.files[0]);
+                          dispatchExpExposure({
+                            exposureFile: e.target.files[0].name,
+                          });
+                        }}
+                        custom
+                      />
+                      {exposureValidity && (
+                        <span className="text-danger">
+                          Exposure File Required
+                        </span>
+                      )}
+                    </Group>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <Group>
+                      <Label>Upload Matrix File</Label>
+                      <Form.File
+                        id="variableData"
+                        label={matrixFileObj.name || 'Matrix File'}
+                        accept=".txt"
+                        onChange={(e) => {
+                          setMatrix(e.target.files[0]);
+                          dispatchExpExposure({
+                            matrixFile: e.target.files[0].name,
+                          });
+                        }}
+                        custom
+                      />
+                      {matrixValidity && (
+                        <span className="text-danger">
+                          Matrix File Required
+                        </span>
+                      )}
+                    </Group>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <Group controlId="toggleSignatureSource" className="d-flex">
+                      <Label className="mr-4">Use Public Signature Data</Label>
+                      <Check inline id="toggleSignatureSource">
+                        <Check.Input
+                          type="checkbox"
+                          value={usePublicSignature}
+                          checked={usePublicSignature}
+                          onChange={() =>
+                            dispatchExpExposure({
+                              usePublicSignature: !usePublicSignature,
+                            })
+                          }
+                        />
+                      </Check>
+                    </Group>
+                  </Col>
+                </Row>
+
+                <Row>
+                  <Col>
+                    <Group>
+                      {usePublicSignature ? (
+                        <Select
+                          id="exposureSignatureSet"
+                          label="Reference Signature Set"
+                          value={refSignatureSet}
+                          options={refSignatureSetOptions}
+                          onChange={handleSet}
+                        />
+                      ) : (
+                        <div>
+                          <Label>Upload Signature Data</Label>
+                          <Form.File
+                            id="variableData"
+                            label={signatureFileObj.name || 'Signature File'}
+                            accept=".txt"
+                            onChange={(e) => {
+                              setSignature(e.target.files[0]);
+                              dispatchExpExposure({
+                                signatureFile: e.target.files[0].name,
+                              });
+                            }}
+                            custom
+                          />
+                          {signatureValidity && (
+                            <span className="text-danger">
+                              Signature File Required
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </Group>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <Group>
+                      <Select
+                        id="exposureGenome"
+                        label="Genome"
+                        value={genome}
+                        options={genomeOptions}
+                        onChange={(genome) =>
+                          dispatchExpExposure({ genome: genome })
+                        }
+                      />
+                    </Group>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <Group>
+                      <Button variant="primary" onClick={() => calculateAll()}>
+                        Calculate
+                      </Button>
+                    </Group>
+                  </Col>
+                </Row>
+              </div>
+            )}
+          </div>
+        </SidebarPanel>
+        <MainPanel>
+          {sections.map(({ component, id, title }) => {
+            return (
+              <Accordion activeKey={exposureAccordion[id]} key={id}>
+                <Card>
+                  <Toggle
+                    className="font-weight-bold"
+                    as={Header}
+                    eventKey={exposureAccordion[id]}
+                    onClick={() =>
+                      dispatchExploring({
+                        exposureAccordion: {
+                          ...exposureAccordion,
+                          [id]: !exposureAccordion[id],
+                        },
+                      })
+                    }
+                  >
+                    {exposureAccordion[id] == true ? (
+                      <FontAwesomeIcon icon={faMinus} />
+                    ) : (
+                      <FontAwesomeIcon icon={faPlus} />
+                    )}{' '}
+                    {title}
+                  </Toggle>
+                  <Collapse eventKey={exposureAccordion[id]}>
+                    <Body>{component}</Body>
+                  </Collapse>
+                </Card>
+              </Accordion>
+            );
+          })}
+        </MainPanel>
+      </SidebarContainer>
     </div>
   );
 }

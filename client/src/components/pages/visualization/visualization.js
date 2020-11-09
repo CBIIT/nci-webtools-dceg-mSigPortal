@@ -25,19 +25,23 @@ export default function Visualize({ match }) {
   const { openSidebar, loading, source, submitted } = useSelector(
     (state) => state.visualize
   );
-  const { id, module } = match.params;
+  const { type, id } = match.params;
   const rootURL = window.location.pathname;
 
   // when retrieving queued result, update id in store
   useEffect(() => {
-    if (id) loadResults(id);
+    if (type == 'queue') {
+      if (id) loadQueueResult(id);
+    } else if (type == 'example') {
+      if (id) loadExample(id);
+    }
   }, [id]);
 
   function setOpenSidebar(bool) {
     dispatchVisualize({ openSidebar: bool });
   }
 
-  async function loadResults(id) {
+  async function loadQueueResult(id) {
     dispatchVisualize({
       loading: {
         active: true,
@@ -51,6 +55,28 @@ export default function Visualize({ match }) {
       ).json();
       dispatchVisualize(state);
       dispatchVisualizeResults({ projectID: id });
+    } catch (error) {
+      dispatchError(error.toString());
+    }
+    dispatchVisualize({
+      loading: { active: false },
+    });
+  }
+
+  async function loadExample(id) {
+    dispatchVisualize({
+      loading: {
+        active: true,
+        content: 'Loading Example',
+        showIndicator: true,
+      },
+    });
+    try {
+      const { args, state, timestamp, projectID } = await (
+        await fetch(`${rootURL}fetchExample/${id}`)
+      ).json();
+      dispatchVisualize(state);
+      dispatchVisualizeResults({ projectID: projectID });
     } catch (error) {
       dispatchError(error.toString());
     }
@@ -119,10 +145,7 @@ export default function Visualize({ match }) {
           <hr className="d-lg-none" style={{ opacity: 0 }}></hr>
         </SidebarPanel>
         <MainPanel>
-          <div
-            className="p-3 shadow-sm bg-white"
-            style={{ minHeight: '420px' }}
-          >
+          <div className="shadow-sm bg-white" style={{ minHeight: '420px' }}>
             <LoadingOverlay
               active={loading.active}
               content={loading.content}

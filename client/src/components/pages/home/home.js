@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import Card from 'react-bootstrap/Card';
-import { CardDeck, Button } from 'react-bootstrap';
+import { CardDeck } from 'react-bootstrap';
+import { NavLink } from 'react-router-dom';
 import './home.scss';
 
 export default function Home({ links }) {
@@ -20,6 +21,7 @@ export default function Home({ links }) {
               description,
               image,
               color,
+              examples,
             },
             index
           ) => (
@@ -85,11 +87,27 @@ export default function Home({ links }) {
                     </Card.Title>
                   </div>
                   <div className="text-center mt-2 d-md-none">
-                    {description}
+                    <div>{description}</div>
+                    <div className="mt-3">
+                      {examples.map(({ title, folder }) => (
+                        <NavLink exact={true} to={`${route}/example/${folder}`}>
+                          {title}
+                        </NavLink>
+                      ))}
+                    </div>
                   </div>
                 </Card.Body>
               </Card>
-              <div className="description d-none d-md-block">{description}</div>
+              <div className="description d-none d-md-block">
+                <div>{description}</div>
+                <div className="mt-3">
+                  {examples.map(({ title, folder }) => (
+                    <NavLink exact={true} to={`${route}/example/${folder}`}>
+                      {title}
+                    </NavLink>
+                  ))}
+                </div>
+              </div>
             </div>
           )
         )}

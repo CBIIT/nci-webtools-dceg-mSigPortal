@@ -179,10 +179,9 @@ export default function UploadForm() {
           dispatchVisualizeResults({
             error: 'Please Reset Your Parameters and Try again.',
           });
-          const { msg, stdout, stderr } = await response.json();
+          const { stdout, stderr } = await response.json();
+
           const message = `<div>
-            <p>${msg}</p>
-            <p><b>Python:</b></p>
             <pre>${stdout}</pre>
             <pre>${stderr}</pre>
           </div>`;

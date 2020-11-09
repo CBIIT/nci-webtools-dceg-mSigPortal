@@ -25,6 +25,8 @@ export default function App() {
       image: 'assets/images/visualize.png',
       navIndex: 0,
       color: '#fc8701', // orange
+      examples: [],
+      // examples: [{ title: 'VCF Example', folder: 'vis1' }],
     },
     {
       route: '/exploring',
@@ -37,6 +39,7 @@ export default function App() {
       image: 'assets/images/explore.png',
       navIndex: 1,
       color: '#2c71dd', // blue
+      examples: [],
     },
     {
       route: '/refitting',
@@ -49,6 +52,7 @@ export default function App() {
       image: 'assets/images/refitting.png',
       navIndex: 2,
       color: '#689f39', // green
+      examples: [],
     },
     {
       route: '/association',
@@ -61,6 +65,7 @@ export default function App() {
       image: 'assets/images/association.png',
       navIndex: 3,
       color: '#84368d', // purple
+      examples: [],
     },
     {
       route: '/publications',
@@ -88,7 +93,7 @@ export default function App() {
       <Navbar links={links} />
       <Route path="/" exact={true} render={(_) => <Home links={links} />} />
       <Route path="/about" component={About} />
-      <Route path="/visualization/:id?/:module?" component={Visualization} />
+      <Route path="/visualization/:type?/:id?" component={Visualization} />
       <Route path="/exploring" component={Exploring} />
       <Route path="/refitting" component={Refitting} />
       <Route path="/association" component={Association} />

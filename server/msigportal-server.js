@@ -25,6 +25,7 @@ const {
   getReferenceSignatureData,
   submitQueue,
   fetchResults,
+  fetchExample,
 } = require('./controllers');
 
 if (cluster.isMaster) {
@@ -76,7 +77,7 @@ apiRouter.use('/public', express.static(config.data.database));
 apiRouter.use(express.json());
 
 apiRouter.use((error, req, res, next) => {
-  logger.error(err);
+  logger.error(error);
   if (!error.statusCode) error.statusCode = 500;
   res.status(error.statusCode).json(error.message);
 });
@@ -108,3 +109,5 @@ apiRouter.post('/getReferenceSignatureData', getReferenceSignatureData);
 apiRouter.post('/queue', submitQueue);
 
 apiRouter.get('/fetchResults/:id', fetchResults);
+
+apiRouter.get('/fetchExample/:folder', fetchExample);

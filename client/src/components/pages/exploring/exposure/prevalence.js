@@ -51,7 +51,7 @@ export default function Tumor({ calculatePrevalence }) {
     <div>
       <Form>
         <LoadingOverlay active={loading || mainLoading} />
-        <div>
+        <div className="px-4">
           <Row className="justify-content-center">
             <Col sm="4">
               <Group controlId="prevalenceMutations">

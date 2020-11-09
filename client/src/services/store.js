@@ -282,6 +282,7 @@ export const getInitialState = () => ({
     source: 'public',
     loading: false,
     projectID: '',
+    openSidebar: true,
   },
   expTumor: {
     plotPath: '',

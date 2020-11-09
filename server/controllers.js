@@ -2,7 +2,7 @@ const path = require('path');
 const logger = require('./logger');
 const { spawn } = require('promisify-child-process');
 const formidable = require('formidable');
-const fs = require('fs');
+const fs = require('fs-extra');
 const { v4: uuidv4, validate } = require('uuid');
 const Papa = require('papaparse');
 const tar = require('tar');
@@ -125,28 +125,29 @@ async function visualizationProfilerExtraction(req, res, next) {
         '/profilerExtraction: An Error Occured While Extracting Profiles'
       );
       res.status(500).json({
-        msg:
-          'An error occured durring profile extraction. Please review your input parameters and try again.',
         stdout,
         stderr,
       });
     }
-  } catch (err) {
-    next(err);
+  } catch ({ stdout, stderr }) {
+    res.status(500).json({
+      stdout,
+      stderr,
+    });
   }
 }
 
 async function getResultData(req, res, next) {
   logger.info(`/getResultData: Retrieving Results for ${req.body.projectID}`);
-  console.log('summary', req.body);
-  const resultsPath = path.join(
+
+  const userResults = path.resolve(
     config.results.folder,
     req.body.projectID,
     'results'
   );
 
-  if (fs.existsSync(path.join(resultsPath, 'svg_files_list.txt'))) {
-    res.json(await getResultDataFiles(resultsPath));
+  if (fs.existsSync(path.join(userResults, 'svg_files_list.txt'))) {
+    res.json(await getResultDataFiles(userResults));
   } else {
     logger.info('/getResultData: Results not found');
     res.status(500).json('Results not found');
@@ -444,10 +445,10 @@ async function fetchResults(req, res, next) {
     const s3 = new AWS.S3();
     const { id } = req.params;
 
+    logger.info(`Fetch Queue Result: ${id}`);
+
     // validate id format
-    if (!validate(id)) {
-      throw `Invalid id`;
-    }
+    if (!validate(id)) throw `Invalid id`;
 
     // ensure output directory exists
     const resultsFolder = path.resolve(config.results.folder, id);
@@ -503,7 +504,6 @@ async function fetchResults(req, res, next) {
         String(await fs.promises.readFile(paramsFilePath))
       );
 
-      logger.info('/fetchResults: Found Params');
       res.json(params);
     } else {
       throw `Invalid id`;
@@ -513,7 +513,39 @@ async function fetchResults(req, res, next) {
   }
 }
 
+async function fetchExample(req, res, next) {
+  try {
+    const { folder } = req.params;
+    const examplePath = path.resolve(config.data.folder, 'Examples', folder);
+
+    logger.info(`Fetch Example: ${folder}`);
+
+    // validate example
+    if (!fs.existsSync(examplePath)) throw `Example does not exist`;
+
+    let paramsFilePath = path.resolve(examplePath, `params.json`);
+
+    if (fs.existsSync(paramsFilePath)) {
+      const projectID = uuidv4();
+      const destinationPath = path.resolve(config.results.folder, projectID);
+
+      fs.copy(examplePath, destinationPath, (err) => {
+        if (err) throw err;
+      });
+
+      const params = JSON.parse(await fs.promises.readFile(paramsFilePath));
+
+      res.json({ ...params, projectID: projectID });
+    } else {
+      throw `Invalid id`;
+    }
+  } catch (error) {
+    res.status(500).json(error);
+  }
+}
+
 module.exports = {
+  parseCSV,
   profilerExtraction,
   visualizationProfilerExtraction,
   getResultData,
@@ -528,5 +560,5 @@ module.exports = {
   getReferenceSignatureData,
   submitQueue,
   fetchResults,
-  parseCSV,
+  fetchExample,
 };

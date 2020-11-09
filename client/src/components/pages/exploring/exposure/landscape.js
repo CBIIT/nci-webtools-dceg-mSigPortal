@@ -83,7 +83,7 @@ export default function Landscape({ calculateLandscape }) {
     <div>
       <Form>
         <LoadingOverlay active={loading || mainLoading} />
-        <div>
+        <div className="px-4">
           <Row className="justify-content-center">
             <Col sm="4">
               <Label>Upload Variable Data</Label>
