@@ -14,7 +14,7 @@ export default function Download() {
   async function downloadOutput(file) {
     setDownload((downloading) => [...downloading, file]);
     const response = await fetch(
-      `${rootURL}visualize/download?id=${projectID}&file=${file}`
+      `api/visualize/download?id=${projectID}&file=${file}`
     );
     if (response.ok) {
       const objectURL = URL.createObjectURL(await response.blob());
