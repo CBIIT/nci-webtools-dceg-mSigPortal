@@ -64,13 +64,16 @@ function getRelativePath(paths) {
   let newPaths = {};
   const resultsPath = path.resolve(config.results.folder);
   const dataPath = path.resolve(config.data.database);
+  const examplePath = path.resolve(config.data.folder, 'Examples');
 
   Object.keys(paths).map((key) => {
     const fullPath = path.resolve(paths[key]);
     if (fullPath.includes(resultsPath))
       newPaths[key] = fullPath.replace(resultsPath + '/', '');
-    if (fullPath.includes(dataPath))
+    else if (fullPath.includes(dataPath))
       newPaths[key] = fullPath.replace(dataPath + '/', '');
+    else if (fullPath.includes(examplePath))
+      newPaths[key] = fullPath.replace(examplePath + '/', '');
   });
   return newPaths;
 }

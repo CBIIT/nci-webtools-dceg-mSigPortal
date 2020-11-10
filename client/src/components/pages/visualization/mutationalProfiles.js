@@ -60,10 +60,9 @@ export default function MutationalProfiles() {
         const response =
           source == 'user'
             ? await fetch(`${rootURL}results/${plot.Path}`)
-            : await fetch(
-                `${rootURL}public/${plot.Path}`
-                // remove data/ from path
-              );
+            : source == 'public'
+            ? await fetch(`${rootURL}public/${plot.Path}`)
+            : await fetch(`${rootURL}examples/${plot.Path}`);
 
         if (!response.ok) {
           const msg = await response.text();

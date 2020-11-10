@@ -25,7 +25,7 @@ export default function App() {
       image: 'assets/images/visualize.png',
       navIndex: 0,
       color: '#fc8701', // orange
-      examples: [{ title: 'VCF Example', folder: 'vis1' }],
+      examples: [{ title: 'VCF Example', folder: 'vcfExample' }],
     },
     {
       route: '/exploring',
