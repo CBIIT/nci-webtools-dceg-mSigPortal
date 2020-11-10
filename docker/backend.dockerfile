@@ -4,6 +4,8 @@ FROM ${BASE_IMAGE}
 
 COPY . /deploy
 
+RUN unzip /deploy/data/Database.zip
+
 WORKDIR /deploy/server
 
 RUN npm install
