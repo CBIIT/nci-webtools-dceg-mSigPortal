@@ -1,6 +1,6 @@
-/server/logs/
-/server/tmp/
-/server/data/
+**/logs/
+**/tmp/
+**/data/
 
 config*.json
 *.meta

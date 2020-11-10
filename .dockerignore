@@ -1,6 +1,6 @@
 .git
 **/node_modules
 
-server/logs/
-server/data/Database
-server/tmp/
+**/logs/
+**/data/Database
+**/tmp/
