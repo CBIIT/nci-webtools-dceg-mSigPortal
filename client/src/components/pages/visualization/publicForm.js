@@ -116,71 +116,59 @@ export default function PublicForm() {
   async function getPublicDataOptions() {
     dispatchVisualize({ loadingPublic: true });
     try {
-      const response = await fetch(`${rootURL}getPublicDataOptions`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
+      const pDataOptions = await (
+        await fetch(`public/Others/json/Visualization-Public.json`)
+      ).json();
+
+      const studyOptions = [...new Set(pDataOptions.map((data) => data.Study))];
+      // default study
+      const study = 'PCAWG';
+
+      const cancerTypeOptions = [
+        ...new Set(
+          pDataOptions
+            .filter((data) => data.Study == study)
+            .map((data) => data.Cancer_Type)
+        ),
+      ];
+      //  default cancer type
+      const cancer = 'Lung-AdenoCA';
+
+      const pubExperimentOptions = [
+        ...new Set(
+          pDataOptions
+            .filter((data) => data.Study == study && data.Cancer_Type == cancer)
+            .map((data) => data.Dataset)
+        ),
+      ];
+
+      dispatchVisualize({
+        pDataOptions: pDataOptions,
+        study: study,
+        studyOptions: studyOptions,
+        cancerType: cancer,
+        cancerTypeOptions: cancerTypeOptions,
+        pubExperimentalStrategy: pubExperimentOptions[0],
+        pubExperimentOptions: pubExperimentOptions,
       });
-      if (!response.ok) {
-        // console.log(await response.json());
-      } else {
-        const pDataOptions = await response.json();
-        const studyOptions = [
-          ...new Set(pDataOptions.map((data) => data.Study)),
-        ];
-        // default study
-        const study = 'PCAWG';
 
-        const cancerTypeOptions = [
-          ...new Set(
-            pDataOptions
-              .filter((data) => data.Study == study)
-              .map((data) => data.Cancer_Type)
-          ),
-        ];
-        //  default cancer type
-        const cancer = 'Lung-AdenoCA';
+      dispatchCosineSimilarity({
+        pubStudy: study,
+        pubCancerType: cancer,
+        pubCancerTypeOptions: cancerTypeOptions,
+      });
 
-        const pubExperimentOptions = [
-          ...new Set(
-            pDataOptions
-              .filter(
-                (data) => data.Study == study && data.Cancer_Type == cancer
-              )
-              .map((data) => data.Dataset)
-          ),
-        ];
+      dispatchProfileComparison({
+        pubStudy: study,
+        pubCancerType: cancer,
+        pubCancerTypeOptions: cancerTypeOptions,
+      });
 
-        dispatchVisualize({
-          pDataOptions: pDataOptions,
-          study: study,
-          studyOptions: studyOptions,
-          cancerType: cancer,
-          cancerTypeOptions: cancerTypeOptions,
-          pubExperimentalStrategy: pubExperimentOptions[0],
-          pubExperimentOptions: pubExperimentOptions,
-        });
-
-        dispatchCosineSimilarity({
-          pubStudy: study,
-          pubCancerType: cancer,
-          pubCancerTypeOptions: cancerTypeOptions,
-        });
-
-        dispatchProfileComparison({
-          pubStudy: study,
-          pubCancerType: cancer,
-          pubCancerTypeOptions: cancerTypeOptions,
-        });
-
-        dispatchPCA({
-          pubStudy: study,
-          pubCancerType: cancer,
-          pubCancerTypeOptions: cancerTypeOptions,
-        });
-      }
+      dispatchPCA({
+        pubStudy: study,
+        pubCancerType: cancer,
+        pubCancerTypeOptions: cancerTypeOptions,
+      });
     } catch (err) {
       dispatchError(err);
     }
