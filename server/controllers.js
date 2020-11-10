@@ -2,7 +2,7 @@ const path = require('path');
 const logger = require('./logger');
 const { spawn } = require('promisify-child-process');
 const formidable = require('formidable');
-const fs = require('fs-extra');
+const fs = require('fs');
 const { v4: uuidv4, validate } = require('uuid');
 const Papa = require('papaparse');
 const tar = require('tar');
@@ -145,9 +145,17 @@ async function getResultData(req, res, next) {
     req.body.projectID,
     'results'
   );
+  const examplePath = path.resolve(
+    config.data.folder,
+    'Examples',
+    req.body.projectID,
+    'results'
+  );
 
   if (fs.existsSync(path.join(userResults, 'svg_files_list.txt'))) {
     res.json(await getResultDataFiles(userResults));
+  } else if (fs.existsSync(path.join(examplePath, 'svg_files_list.txt'))) {
+    res.json(await getResultDataFiles(examplePath));
   } else {
     logger.info('/getResultData: Results not found');
     res.status(500).json('Results not found');
@@ -526,16 +534,9 @@ async function fetchExample(req, res, next) {
     let paramsFilePath = path.resolve(examplePath, `params.json`);
 
     if (fs.existsSync(paramsFilePath)) {
-      const projectID = uuidv4();
-      const destinationPath = path.resolve(config.results.folder, projectID);
-
-      fs.copy(examplePath, destinationPath, (err) => {
-        if (err) throw err;
-      });
-
       const params = JSON.parse(await fs.promises.readFile(paramsFilePath));
 
-      res.json({ ...params, projectID: projectID });
+      res.json(params);
     } else {
       throw `Invalid id`;
     }
