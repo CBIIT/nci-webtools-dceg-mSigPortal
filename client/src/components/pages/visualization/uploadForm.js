@@ -158,6 +158,7 @@ export default function UploadForm() {
 
         if (response.ok) {
           const results = await response.json();
+          dispatchVisualize({ loading: { active: false } });
           dispatchVisualizeResults({
             projectID: projectID,
             svgList: results.svgList,
@@ -192,8 +193,8 @@ export default function UploadForm() {
         dispatchVisualizeResults({
           error: 'Please Reset Your Parameters and Try again.',
         });
+        dispatchVisualize({ loading: { active: false } });
       }
-      dispatchVisualize({ loading: { active: false } });
     }
   }
 
