@@ -422,7 +422,7 @@ export default function ExposureExploring() {
         onCollapsed={(e) => dispatchExpExposure({ openSidebar: !e })}
       >
         <SidebarPanel>
-          <div className="p-3 shadow-sm bg-white">
+          <div className="p-3 bg-white border rounded">
             <LoadingOverlay active={loading} />
             <Row>
               <Col sm="auto">

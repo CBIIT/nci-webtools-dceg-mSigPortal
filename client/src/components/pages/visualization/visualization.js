@@ -93,7 +93,7 @@ export default function Visualize({ match }) {
         onCollapsed={(e) => setOpenSidebar(!e)}
       >
         <SidebarPanel>
-          <div className="p-3 shadow-sm bg-white">
+          <div className="p-3 bg-white border rounded">
             <Row>
               <Col sm="auto">
                 <Group className="d-flex">
@@ -145,14 +145,12 @@ export default function Visualize({ match }) {
           <hr className="d-lg-none" style={{ opacity: 0 }}></hr>
         </SidebarPanel>
         <MainPanel>
-          <div className="shadow-sm bg-white" style={{ minHeight: '420px' }}>
-            <LoadingOverlay
-              active={loading.active}
-              content={loading.content}
-              showIndicator={loading.showIndicator}
-            />
-            <Results setOpenSidebar={(e) => setOpenSidebar(e)} />
-          </div>
+          <LoadingOverlay
+            active={loading.active}
+            content={loading.content}
+            showIndicator={loading.showIndicator}
+          />
+          <Results setOpenSidebar={(e) => setOpenSidebar(e)} />
         </MainPanel>
       </SidebarContainer>
     </div>

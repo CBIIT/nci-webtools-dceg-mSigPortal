@@ -347,6 +347,7 @@ export default function Results({ setOpenSidebar }) {
       <Body
         style={{
           display: displayTab == 'profilerSummary' ? 'block' : 'none',
+          minHeight: '420px',
         }}
       >
         <ProfilerSummary submitR={(fn, args) => submitR(fn, args)} />
@@ -354,12 +355,16 @@ export default function Results({ setOpenSidebar }) {
       <Body
         style={{
           display: displayTab == 'mutationalProfiles' ? 'block' : 'none',
+          minHeight: '420px',
         }}
       >
         <MutationalProfiles />
       </Body>
       <Body
-        style={{ display: displayTab == 'cosineSimilarity' ? 'block' : 'none' }}
+        style={{
+          display: displayTab == 'cosineSimilarity' ? 'block' : 'none',
+          minHeight: '420px',
+        }}
       >
         <CosineSimilarity
           getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
@@ -369,6 +374,7 @@ export default function Results({ setOpenSidebar }) {
       <Body
         style={{
           display: displayTab == 'mutationalPattern' ? 'block' : 'none',
+          minHeight: '420px',
         }}
       >
         <MutationalPattern submitR={(fn, args) => submitR(fn, args)} />
@@ -377,6 +383,7 @@ export default function Results({ setOpenSidebar }) {
       <Body
         style={{
           display: displayTab == 'profileComparison' ? 'block' : 'none',
+          minHeight: '420px',
         }}
       >
         <ProfileComparison
@@ -384,20 +391,32 @@ export default function Results({ setOpenSidebar }) {
           submitR={(fn, args) => submitR(fn, args)}
         />
       </Body>
-      <Body style={{ display: displayTab == 'pca' ? 'block' : 'none' }}>
+      <Body
+        style={{
+          display: displayTab == 'pca' ? 'block' : 'none',
+          minHeight: '420px',
+        }}
+      >
         <PCA
           getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
           submitR={(fn, args) => submitR(fn, args)}
         />
       </Body>
-      <Body style={{ display: displayTab == 'download' ? 'block' : 'none' }}>
+      <Body
+        style={{
+          display: displayTab == 'download' ? 'block' : 'none',
+          minHeight: '420px',
+        }}
+      >
         <Download />
       </Body>
     </Card>
   ) : (
-    <div className="p-3">
-      <h2>Instructions</h2>
-      <p>Upload Sample Variants and specify parameters</p>
+    <div className="border rounded bg-white" style={{ minHeight: '420px' }}>
+      <div className="p-3 ">
+        <h2>Instructions</h2>
+        <p>Upload Sample Variants and specify parameters</p>
+      </div>
     </div>
   );
 }
