@@ -61,10 +61,7 @@ export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
           </span>
         )}
       </div>
-      <div
-        className="p-2 border rounded"
-        title="Ctrl + Mouse Wheel to zoom"
-      >
+      <div className="p-2 border rounded" title="Ctrl + Mouse Wheel to zoom">
         <TransformWrapper className="w-100" {...zoomProps}>
           {({ zoomIn, zoomOut, resetTransform }) => (
             <React.Fragment>

@@ -47,7 +47,7 @@ export default function MutationalProfiles() {
   function getPlotName() {
     if (filtered.length) {
       const plot = filtered[0];
-      if (source == 'user')
+      if (source == 'user' || source == 'example')
         return `${plot.Sample_Name}-${plot.Profile_Type}-${plot.Matrix_Size}-${plot.Filter}.svg`;
       else return plot.Path.split('/').slice(-1)[0];
     } else return '';
@@ -84,7 +84,7 @@ export default function MutationalProfiles() {
   }
 
   function filterSampleName(name) {
-    if (source == 'user') {
+    if (source == 'user' || source == 'example') {
       const filteredPlots = svgList.filter((plot) => plot.Sample_Name == name);
       const profileOptions = [
         ...new Set(filteredPlots.map((plot) => plot.Profile_Type)),
@@ -142,7 +142,7 @@ export default function MutationalProfiles() {
   }
 
   function filterProfileType(profile) {
-    if (source == 'user') {
+    if (source == 'user' || source == 'example') {
       const filteredPlots = svgList.filter(
         (plot) => plot.Sample_Name == selectName && plot.Profile_Type == profile
       );
@@ -182,7 +182,7 @@ export default function MutationalProfiles() {
   }
 
   function filterMatrix(matrix) {
-    if (source == 'user') {
+    if (source == 'user' || source == 'example') {
       const filteredPlots = svgList.filter(
         (plot) =>
           plot.Sample_Name == selectName &&
