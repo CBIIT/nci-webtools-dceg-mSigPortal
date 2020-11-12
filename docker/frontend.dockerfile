@@ -1,7 +1,7 @@
 # Stage 0 - Build Client
 FROM node:latest
 
-COPY . /client
+COPY client/ /client
 
 WORKDIR /client
 
