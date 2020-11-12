@@ -32,6 +32,10 @@ RUN dnf -y update \
       google-roboto-condensed-fonts \
    && dnf clean all
 
+COPY . /deploy/data
+
+RUN unzip /deploy/data/Database.zip -d /deploy/data/
+
 RUN pip3 install scipy statsmodels
 
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'

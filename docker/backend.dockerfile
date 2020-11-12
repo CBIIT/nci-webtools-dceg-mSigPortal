@@ -2,9 +2,9 @@ ARG BASE_IMAGE=msigportal:base
 
 FROM ${BASE_IMAGE}
 
-COPY . /deploy
+COPY . /deploy/server
 
-RUN unzip /deploy/data/Database.zip -d /deploy/data/
+# RUN unzip /deploy/data/Database.zip -d /deploy/data/
 
 WORKDIR /deploy/server
 
