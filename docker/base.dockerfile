@@ -32,9 +32,9 @@ RUN dnf -y update \
       google-roboto-condensed-fonts \
    && dnf clean all
 
-COPY . /deploy/data
+# COPY . /deploy/data
 
-RUN unzip /deploy/data/Database.zip -d /deploy/data/
+# RUN unzip /deploy/data/Database.zip -d /deploy/data/
 
 RUN pip3 install scipy statsmodels
 
