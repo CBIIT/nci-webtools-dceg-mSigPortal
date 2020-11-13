@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button, Accordion, Card } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -22,9 +22,8 @@ export default function PCA({ submitR, getRefSigOptions }) {
     pubExperimentalStrategy,
     pDataOptions,
   } = useSelector((state) => state.visualize);
-  const { profileOptions, nameOptions } = useSelector(
-    (state) => state.mutationalProfiles
-  );
+  const { profileOptions } = useSelector((state) => state.mutationalProfiles);
+  const { svgList } = useSelector((state) => state.visualizeResults);
   const rootURL = window.location.pathname;
   const {
     profileType,
@@ -65,6 +64,17 @@ export default function PCA({ submitR, getRefSigOptions }) {
     pubPcaErr,
     pubSubmitOverlay,
   } = useSelector((state) => state.pca);
+
+  const [multiSample, setMultiSample] = useState(false);
+
+  useEffect(() => {
+    if (svgList.length) {
+      const samples = [...new Set(svgList.map((plot) => plot.Filter))];
+
+      if (samples.length > 1) setMultiSample(true);
+      else setMultiSample(false);
+    }
+  }, [svgList]);
 
   async function setRPlot(plotPath, type) {
     if (plotPath) {
@@ -308,7 +318,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                 <Row className="justify-content-center">
                   <Col sm="5">
                     <Select
-                      disabled={nameOptions.length < 2}
+                      disabled={!multiSample}
                       id="pcaProfileType"
                       label="Profile Type"
                       value={profileType}
@@ -324,7 +334,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
 
                   <Col sm="5">
                     <Select
-                      disabled={nameOptions.length < 2}
+                      disabled={!multiSample}
                       id="pcaRefSet"
                       label="Reference Signature Set"
                       value={signatureSet}
@@ -338,7 +348,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                   </Col>
                   <Col sm="1" className="m-auto">
                     <Button
-                      disabled={nameOptions.length < 2}
+                      disabled={!multiSample}
                       variant="primary"
                       onClick={() => {
                         if (source == 'user') {
@@ -366,7 +376,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                     </Button>
                   </Col>
                 </Row>
-                {nameOptions.length < 2 && (
+                {!multiSample && (
                   <Row>
                     <Col>Unavailable - More than one Sample Required</Col>
                   </Row>

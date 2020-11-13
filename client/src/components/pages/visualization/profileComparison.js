@@ -42,7 +42,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
   const { matrixList, svgList } = useSelector(
     (state) => state.visualizeResults
   );
-  const { nameOptions, profileOptions } = useSelector(
+  const { profileOptions } = useSelector(
     (state) => state.mutationalProfiles
   );
   const rootURL = window.location.pathname;
@@ -50,6 +50,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     withinProfileType,
     withinSampleName1,
     withinSampleName2,
+    sampleOptions,
     refProfileType,
     refSampleName,
     refSignatureSet,
@@ -408,7 +409,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 <Row className="justify-content-center">
                   <Col sm="1">
                     <Select
-                      disabled={nameOptions.length < 2}
+                      disabled={sampleOptions.length < 2}
                       id="pcProfileTypeWithin"
                       label="Profile Type"
                       value={withinProfileType}
@@ -422,11 +423,11 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   </Col>
                   <Col sm="5">
                     <Select
-                      disabled={nameOptions.length < 2}
+                      disabled={sampleOptions.length < 2}
                       id="pcSample1"
                       label="Sample Name 1"
                       value={withinSampleName1}
-                      options={nameOptions}
+                      options={sampleOptions}
                       onChange={(name) => {
                         dispatchProfileComparison({
                           withinSampleName1: name,
@@ -436,11 +437,11 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   </Col>
                   <Col sm="5">
                     <Select
-                      disabled={nameOptions.length < 2}
+                      disabled={sampleOptions.length < 2}
                       id="pcSample2"
                       label="Sample Name 2"
                       value={withinSampleName2}
-                      options={nameOptions}
+                      options={sampleOptions}
                       onChange={(name) => {
                         dispatchProfileComparison({
                           withinSampleName2: name,
@@ -450,7 +451,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   </Col>
                   <Col sm="1" className="m-auto">
                     <Button
-                      disabled={nameOptions.length < 2}
+                      disabled={sampleOptions.length < 2}
                       variant="primary"
                       onClick={() => {
                         if (source == 'user') {
@@ -481,7 +482,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                     </Button>
                   </Col>
                 </Row>
-                {nameOptions.length < 2 && (
+                {sampleOptions.length < 2 && (
                   <Row>
                     <Col>Unavailable - More than one Sample Required</Col>
                   </Row>
@@ -551,7 +552,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                         id="sampleNameRefSig"
                         label="Sample Name"
                         value={refSampleName}
-                        options={nameOptions}
+                        options={sampleOptions}
                         onChange={(name) => {
                           dispatchProfileComparison({
                             refSampleName: name,
@@ -717,7 +718,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                           id="pcUserSampleName"
                           label="Sample Name"
                           value={userSampleName}
-                          options={nameOptions}
+                          options={sampleOptions}
                           onChange={(name) => {
                             dispatchProfileComparison({
                               userSampleName: name,

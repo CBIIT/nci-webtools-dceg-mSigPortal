@@ -17,6 +17,7 @@ import MutationalPattern from './mutationalPattern';
 import ProfileComparison from './profileComparison';
 import PCA from './pca';
 import Download from './download';
+import plot from '../../controls/plot/plot';
 
 const { Header, Body } = Card;
 const { Item, Link } = Nav;
@@ -81,7 +82,17 @@ export default function Results({ setOpenSidebar }) {
       },
     });
 
-    const nameOptions = [...new Set(svgList.map((plot) => plot.Sample_Name))];
+    const nameOptions = [
+      ...new Set(svgList.map(({ Sample_Name }) => Sample_Name)),
+    ];
+    const profileComparisonSamples = [
+      ...new Set(
+        svgList.map((plot) => {
+          if (plot.Filter != 'NA') return `${plot.Sample_Name}@${plot.Filter}`;
+          else return plot.Sample_Name;
+        })
+      ),
+    ];
     const profileOptions = [
       ...new Set(svgList.map((plot) => plot.Profile_Type)),
     ];
@@ -160,16 +171,17 @@ export default function Results({ setOpenSidebar }) {
 
     dispatchProfileComparison({
       withinProfileType: profileOptions[0],
-      withinSampleName1: nameOptions[0],
-      withinSampleName2: nameOptions[1],
+      withinSampleName1: profileComparisonSamples[0],
+      withinSampleName2: profileComparisonSamples[1],
+      sampleOptions: profileComparisonSamples,
       refProfileType: profileOptions[0],
-      refSampleName: nameOptions[0],
+      refSampleName: profileComparisonSamples[0],
       refSignatureSet: refSignatureSetOptions[0],
       refSignatureSetOptions: refSignatureSetOptions,
       userProfileType: profileOptions[0],
       userMatrixSize: filteredMatrixOptions[0],
       userMatrixOptions: filteredMatrixOptions,
-      userSampleName: nameOptions[0],
+      userSampleName: profileComparisonSamples[0],
     });
 
     dispatchPCA({
@@ -269,6 +281,7 @@ export default function Results({ setOpenSidebar }) {
       withinProfileType: profileOptions[0],
       withinSampleName1: nameOptions[0],
       withinSampleName2: nameOptions[1],
+      sampleOptions: nameOptions,
       refProfileType: profileOptions[0],
       refSampleName: nameOptions[0],
       refSignatureSet: refSignatureSetOptions[0],

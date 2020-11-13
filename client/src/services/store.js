@@ -112,6 +112,7 @@ export const getInitialState = () => ({
     withinProfileType: '',
     withinSampleName1: '',
     withinSampleName2: '',
+    sampleOptions: '',
     refProfileType: '',
     refSampleName: '',
     refSignatureSet: '',

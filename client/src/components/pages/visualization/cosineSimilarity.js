@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button, Accordion, Card } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -12,7 +12,6 @@ import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
 import Select from '../../controls/select/select';
 
-const { Group, Label } = Form;
 const { Header, Body } = Card;
 const { Toggle, Collapse } = Accordion;
 
@@ -25,9 +24,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
     pubExperimentalStrategy,
     pDataOptions,
   } = useSelector((state) => state.visualize);
-  const { profileOptions, nameOptions } = useSelector(
-    (state) => state.mutationalProfiles
-  );
+  const { profileOptions } = useSelector((state) => state.mutationalProfiles);
   const { matrixList, svgList } = useSelector(
     (state) => state.visualizeResults
   );
@@ -65,6 +62,17 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
     pubSubmitOverlay,
     debugR,
   } = useSelector((state) => state.cosineSimilarity);
+
+  const [multiSample, setMultiSample] = useState(false);
+
+  useEffect(() => {
+    if (svgList.length) {
+      const samples = [...new Set(svgList.map((plot) => plot.Filter))];
+
+      if (samples.length > 1) setMultiSample(true);
+      else setMultiSample(false);
+    }
+  }, [svgList]);
 
   function setOverlay(type, display) {
     if (type == 'within') {
@@ -322,7 +330,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 <Row className="justify-content-center">
                   <Col sm="5">
                     <Select
-                      disabled={nameOptions.length < 2}
+                      disabled={!multiSample}
                       id="csProfileType"
                       label="Profile Type"
                       value={withinProfileType}
@@ -332,7 +340,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   </Col>
                   <Col sm="5">
                     <Select
-                      disabled={nameOptions.length < 2}
+                      disabled={!multiSample}
                       id="csMatrixSize"
                       label="Matrix Size"
                       value={withinMatrixSize}
@@ -346,7 +354,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   </Col>
                   <Col sm="1" className="m-auto">
                     <Button
-                      disabled={nameOptions.length < 2}
+                      disabled={!multiSample}
                       variant="primary"
                       onClick={() => {
                         if (source == 'user') {
@@ -372,7 +380,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                     </Button>
                   </Col>
                 </Row>
-                {nameOptions.length < 2 && (
+                {!multiSample && (
                   <Row>
                     <Col>Unavailable - More than one Sample Required</Col>
                   </Row>
