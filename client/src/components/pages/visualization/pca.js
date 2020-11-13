@@ -341,7 +341,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                       disabled={nameOptions.length < 2}
                       variant="primary"
                       onClick={() => {
-                        if (source == 'user' || source == 'example') {
+                        if (source == 'user') {
                           calculateR('pca', {
                             profileType: profileType,
                             signatureSet: signatureSet,
@@ -434,7 +434,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
         </Card>
       </Accordion>
 
-      {(source == 'user' || source == 'example') && (
+      {source == 'user' && (
         <Accordion defaultActiveKey="1">
           <Card>
             <Toggle

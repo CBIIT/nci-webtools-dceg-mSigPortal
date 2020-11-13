@@ -47,7 +47,7 @@ export default function MutationalProfiles() {
   function getPlotName() {
     if (filtered.length) {
       const plot = filtered[0];
-      if (source == 'user' || source == 'example')
+      if (source == 'user')
         return `${plot.Sample_Name}-${plot.Profile_Type}-${plot.Matrix_Size}-${plot.Filter}.svg`;
       else return plot.Path.split('/').slice(-1)[0];
     } else return '';
@@ -60,9 +60,7 @@ export default function MutationalProfiles() {
         const response =
           source == 'user'
             ? await fetch(`${rootURL}results/${plot.Path}`)
-            : source == 'public'
-            ? await fetch(`${rootURL}public/${plot.Path}`)
-            : await fetch(`${rootURL}examples/${plot.Path}`);
+            : await fetch(`${rootURL}public/${plot.Path}`);
 
         if (!response.ok) {
           const msg = await response.text();
@@ -84,7 +82,7 @@ export default function MutationalProfiles() {
   }
 
   function filterSampleName(name) {
-    if (source == 'user' || source == 'example') {
+    if (source == 'user') {
       const filteredPlots = svgList.filter((plot) => plot.Sample_Name == name);
       const profileOptions = [
         ...new Set(filteredPlots.map((plot) => plot.Profile_Type)),
@@ -142,7 +140,7 @@ export default function MutationalProfiles() {
   }
 
   function filterProfileType(profile) {
-    if (source == 'user' || source == 'example') {
+    if (source == 'user') {
       const filteredPlots = svgList.filter(
         (plot) => plot.Sample_Name == selectName && plot.Profile_Type == profile
       );
@@ -182,7 +180,7 @@ export default function MutationalProfiles() {
   }
 
   function filterMatrix(matrix) {
-    if (source == 'user' || source == 'example') {
+    if (source == 'user') {
       const filteredPlots = svgList.filter(
         (plot) =>
           plot.Sample_Name == selectName &&

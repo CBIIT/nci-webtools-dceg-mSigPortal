@@ -38,7 +38,7 @@ export default function ProfilerSummary({ submitR }) {
       if (check.status === 200) {
         setRPlot(path);
       } else {
-        if ((source == 'user' || source == 'example') && matrixList.length) {
+        if (source == 'user' && matrixList.length) {
           calculateR('profilerSummary', {
             matrixList: JSON.stringify(matrixList),
           });

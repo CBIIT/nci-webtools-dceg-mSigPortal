@@ -119,7 +119,7 @@ export default function Visualize({ match }) {
                       disabled={submitted}
                       type="radio"
                       value="user"
-                      checked={source == 'user' || source == 'example'}
+                      checked={source == 'user'}
                       onChange={(e) =>
                         store.dispatch(updateVisualize({ source: 'user' }))
                       }
@@ -133,8 +133,7 @@ export default function Visualize({ match }) {
             </Row>
             <Row
               style={{
-                display:
-                  source == 'user' || source == 'example' ? 'block' : 'none',
+                display: source == 'user' ? 'block' : 'none',
               }}
             >
               <Col sm="auto" className="w-100">

@@ -225,7 +225,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
   }
 
   function handleWithinProfileType(profileType) {
-    if (source == 'user' || source == 'example') {
+    if (source == 'user') {
       const withinMatrixOptions = [
         ...new Set(
           matrixList
@@ -349,7 +349,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                       disabled={nameOptions.length < 2}
                       variant="primary"
                       onClick={() => {
-                        if (source == 'user' || source == 'example') {
+                        if (source == 'user') {
                           calculateR('cosineSimilarityWithin', {
                             matrixFile: matrixList.filter(
                               (path) =>
@@ -455,7 +455,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                       <Button
                         variant="primary"
                         onClick={() => {
-                          if (source == 'user' || source == 'example') {
+                          if (source == 'user') {
                             calculateR('cosineSimilarityRefSig', {
                               profileType: refProfileType,
                               signatureSet: refSignatureSet,
@@ -503,7 +503,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
           </Collapse>
         </Card>
       </Accordion>
-      {(source == 'user' || source == 'example') && (
+      {source == 'user' && (
         <Accordion defaultActiveKey="2">
           <Card>
             <Toggle

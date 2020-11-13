@@ -32,7 +32,7 @@ export default function Results({ setOpenSidebar }) {
 
   // get mapping of plots after retrieving projectID
   useEffect(() => {
-    if (source == 'user' || source == 'example') {
+    if (source == 'user') {
       if (projectID && !svgList.length) {
         getResultData();
       } else if (svgList.length && !signatureSetOptions.length) loadData();

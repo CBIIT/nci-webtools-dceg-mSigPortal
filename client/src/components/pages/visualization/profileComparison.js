@@ -111,11 +111,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
 
   // get public data samples
   useEffect(() => {
-    if (
-      !pubSampleOptions.length &&
-      (source == 'user' || source == 'example') &&
-      pubStudy
-    ) {
+    if (!pubSampleOptions.length && source == 'user' && pubStudy) {
       getPublicSamples(pubStudy, pubCancerType);
     }
   }, [pDataOptions, pubStudy]);
@@ -457,7 +453,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                       disabled={nameOptions.length < 2}
                       variant="primary"
                       onClick={() => {
-                        if (source == 'user' || source == 'example') {
+                        if (source == 'user') {
                           calculateR('profileComparisonWithin', {
                             profileType: withinProfileType,
                             sampleName1: withinSampleName1,
@@ -616,7 +612,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                       <Button
                         variant="primary"
                         onClick={() => {
-                          if (source == 'user' || source == 'example') {
+                          if (source == 'user') {
                             calculateR('profileComparisonRefSig', {
                               profileType: refProfileType,
                               sampleName: refSampleName,
@@ -668,7 +664,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         </Card>
       </Accordion>
 
-      {(source == 'user' || source == 'example') && (
+      {source == 'user' && (
         <Accordion defaultActiveKey="2">
           <Card>
             <Toggle

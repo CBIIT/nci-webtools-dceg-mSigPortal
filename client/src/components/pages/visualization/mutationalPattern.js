@@ -146,7 +146,7 @@ export default function MutationalPattern({ submitR }) {
 
   return (
     <div>
-      {(source == 'user' || source == 'example') && (
+      {source == 'user' && (
         <Accordion defaultActiveKey="0">
           <Card>
             <Toggle
