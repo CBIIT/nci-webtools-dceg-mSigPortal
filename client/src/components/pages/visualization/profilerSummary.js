@@ -99,13 +99,21 @@ export default function ProfilerSummary({ submitR }) {
         });
       } else {
         const { debugR, output } = await response.json();
-
-        dispatchProfilerSummary({
-          debugR: debugR,
-          loading: false,
-          plotPath: output.plotPath,
-        });
-        setRPlot(output.plotPath, 'within');
+        if (Object.keys(output).length) {
+          dispatchProfilerSummary({
+            debugR: debugR,
+            loading: false,
+            plotPath: output.plotPath,
+          });
+          setRPlot(output.plotPath, 'within');
+        } else {
+          dispatchProfilerSummary({
+            debugR: debugR,
+            loading: false,
+            err: true,
+            plotPath: '',
+          });
+        }
       }
     } catch (err) {
       dispatchError(err);
