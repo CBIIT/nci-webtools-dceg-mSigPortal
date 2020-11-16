@@ -1,6 +1,6 @@
-**/logs/
-**/tmp/
-**/data/Database*
+/logs
+/tmp
+/data
 
 *.meta
 *.vs
