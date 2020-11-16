@@ -6,15 +6,13 @@ import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import './plot.scss';
 
 export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
-  const rootURL = window.location.pathname;
-
   const [loading, setLoading] = useState(false);
 
   //   download text results files
   async function downloadData(txtPath) {
     setLoading(true);
     try {
-      const response = await fetch(`${rootURL}results/${txtPath}`);
+      const response = await fetch(`api/results/${txtPath}`);
 
       if (!response.ok) {
         const { msg } = await response.json();

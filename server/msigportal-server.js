@@ -6,7 +6,11 @@ const AWS = require('aws-sdk');
 const fs = require('fs');
 const config = require('./config.json');
 const logger = require('./logger');
+
 const app = express();
+const apiRouter = express.Router();
+app.use('/api', apiRouter);
+
 const {
   visualizationProfilerExtraction,
   getResultData,
@@ -62,44 +66,48 @@ function childProcess() {
   server.headersTimeout = 62 * 1000;
 }
 
-app.use(express.static(path.resolve('www')));
-app.use('/results', express.static(config.results.folder));
-app.use('/public', express.static(config.data.database));
-app.use('/examples', express.static(path.join(config.data.folder, 'Examples')));
-app.use(express.json());
+// serve public folder during local development
+if (process.env.NODE_ENV !== 'production')
+  // app.use(express.static(config.server.static));
+  app.use(express.static(path.resolve('www')));
 
-app.use((error, req, res, next) => {
+
+apiRouter.use('/results', express.static(config.results.folder));
+apiRouter.use('/public', express.static(config.data.database));
+apiRouter.use(express.json());
+
+apiRouter.use((error, req, res, next) => {
   logger.error(error);
   if (!error.statusCode) error.statusCode = 500;
   res.status(error.statusCode).json(error.message);
 });
 
-app.get('/ping', (req, res) => res.send(true));
+apiRouter.get('/ping', (req, res) => res.send(true));
 
-app.post('/profilerExtraction', visualizationProfilerExtraction);
+apiRouter.post('/profilerExtraction', visualizationProfilerExtraction);
 
-app.post('/getResultData', getResultData);
+apiRouter.post('/getResultData', getResultData);
 
-app.post('/visualizeR', visualizeR);
+apiRouter.post('/visualizeR', visualizeR);
 
-app.post('/visualizeR/getReferenceSignatureSets', getReferenceSignatureSets);
+apiRouter.post('/visualizeR/getReferenceSignatureSets', getReferenceSignatureSets);
 
-app.post('/visualizeR/getSignatures', getSignatures);
+apiRouter.post('/visualizeR/getSignatures', getSignatures);
 
-app.post('/getPublicDataOptions', getPublicDataOptions);
+apiRouter.post('/getPublicDataOptions', getPublicDataOptions);
 
-app.post('/getPublicData', getPublicData);
+apiRouter.post('/getPublicData', getPublicData);
 
-app.post('/upload', upload);
+apiRouter.post('/upload', upload);
 
-app.get('/visualize/download', download);
+apiRouter.get('/visualize/download', download);
 
-app.post('/exploringR', exploringR);
+apiRouter.post('/exploringR', exploringR);
 
-app.post('/getReferenceSignatureData', getReferenceSignatureData);
+apiRouter.post('/getReferenceSignatureData', getReferenceSignatureData);
 
-app.post('/queue', submitQueue);
+apiRouter.post('/queue', submitQueue);
 
-app.get('/fetchResults/:id', fetchResults);
+apiRouter.get('/fetchResults/:id', fetchResults);
 
-app.get('/fetchExample/:folder', fetchExample);
+apiRouter.get('/fetchExample/:folder', fetchExample);

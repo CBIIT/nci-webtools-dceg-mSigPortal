@@ -12,7 +12,6 @@ const { Toggle, Collapse } = Accordion;
 const { Group, Label, Check, Control } = Form;
 
 export default function EtiologyExploring() {
-  const rootURL = window.location.pathname;
   const { displayTab, exposureAccordion, publicDataOptions } = useSelector(
     (state) => state.exploring
   );

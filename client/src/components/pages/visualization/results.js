@@ -29,7 +29,6 @@ export default function Results({ setOpenSidebar }) {
   const { source } = useSelector((state) => state.visualize);
   const mutationalProfiles = useSelector((state) => state.mutationalProfiles);
   const { signatureSetOptions } = useSelector((state) => state.pca);
-  const rootURL = window.location.pathname;
 
   // get mapping of plots after retrieving projectID
   useEffect(() => {
@@ -45,7 +44,7 @@ export default function Results({ setOpenSidebar }) {
 
   // reload summary information
   async function getResultData() {
-    const response = await fetch(`${rootURL}getResultData`, {
+    const response = await fetch(`api/getResultData`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -303,7 +302,7 @@ export default function Results({ setOpenSidebar }) {
   }
 
   function submitR(fn, args) {
-    return fetch(`${rootURL}visualizeR`, {
+    return fetch(`api/visualizeR`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -314,7 +313,7 @@ export default function Results({ setOpenSidebar }) {
   }
 
   function getRefSigOptions(profileType) {
-    return fetch(`${rootURL}visualizeR/getReferenceSignatureSets`, {
+    return fetch(`api/visualizeR/getReferenceSignatureSets`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',

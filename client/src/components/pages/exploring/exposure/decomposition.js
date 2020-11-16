@@ -9,7 +9,6 @@ import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 
 export default function Decomposition() {
-  const rootURL = window.location.pathname;
   const { loading: mainLoading } = useSelector((state) => state.expExposure);
   const { plotPath, plotURL, txtPath, debugR, err, loading } = useSelector(
     (state) => state.expDecomposition
@@ -22,7 +21,7 @@ export default function Decomposition() {
   async function setRPlot(plotPath) {
     if (plotPath) {
       try {
-        const response = await fetch(`${rootURL}results/${plotPath}`);
+        const response = await fetch(`api/results/${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {

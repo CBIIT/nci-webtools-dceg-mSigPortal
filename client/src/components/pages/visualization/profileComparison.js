@@ -42,10 +42,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
   const { matrixList, svgList } = useSelector(
     (state) => state.visualizeResults
   );
-  const { profileOptions } = useSelector(
-    (state) => state.mutationalProfiles
-  );
-  const rootURL = window.location.pathname;
+  const { profileOptions } = useSelector((state) => state.mutationalProfiles);
+
   const {
     withinProfileType,
     withinSampleName1,
@@ -131,7 +129,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     handleOverlay(fn, true);
     if (plotPath) {
       try {
-        const response = await fetch(`${rootURL}results/${plotPath}`);
+        const response = await fetch(`api/results/${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {
@@ -205,7 +203,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     if (signatureSetName) {
       dispatchProfileComparison({ refSubmitOverlay: true });
       try {
-        const response = await fetch(`${rootURL}visualizeR/getSignatures`, {
+        const response = await fetch(`api/visualizeR/getSignatures`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -309,7 +307,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
 
     handleOverlay('pub', true);
     try {
-      const response = await fetch(`${rootURL}getPublicData`, {
+      const response = await fetch(`api/getPublicData`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',

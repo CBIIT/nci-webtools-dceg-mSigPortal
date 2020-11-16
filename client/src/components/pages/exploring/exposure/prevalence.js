@@ -13,7 +13,6 @@ import Select from '../../../controls/select/select';
 const { Group, Label, Control, Text } = Form;
 
 export default function Tumor({ calculatePrevalence }) {
-  const rootURL = window.location.pathname;
   const { loading: mainLoading } = useSelector((state) => state.expExposure);
   const { mutation, plotPath, plotURL, debugR, err, loading } = useSelector(
     (state) => state.expPrevalence
@@ -26,7 +25,7 @@ export default function Tumor({ calculatePrevalence }) {
   async function setRPlot(plotPath) {
     if (plotPath) {
       try {
-        const response = await fetch(`${rootURL}results/${plotPath}`);
+        const response = await fetch(`api/results/${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {

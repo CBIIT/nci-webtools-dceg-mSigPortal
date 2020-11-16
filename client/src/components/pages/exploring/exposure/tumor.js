@@ -6,7 +6,6 @@ import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 
 export default function Tumor() {
-  const rootURL = window.location.pathname;
   const { loading } = useSelector((state) => state.expExposure);
   const { plotPath, plotURL, debugR, err } = useSelector(
     (state) => state.expTumor
@@ -19,7 +18,7 @@ export default function Tumor() {
   async function setRPlot(plotPath) {
     if (plotPath) {
       try {
-        const response = await fetch(`${rootURL}results/${plotPath}`);
+        const response = await fetch(`api/results/${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {

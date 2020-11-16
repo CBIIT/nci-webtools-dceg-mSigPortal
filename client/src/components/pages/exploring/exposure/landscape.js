@@ -12,7 +12,6 @@ import Debug from '../../../controls/debug/debug';
 const { Label } = Form;
 
 export default function Landscape({ calculateLandscape }) {
-  const rootURL = window.location.pathname;
   const { loading: mainLoading } = useSelector((state) => state.expExposure);
   const { plotPath, plotURL, txtPath, debugR, err, loading } = useSelector(
     (state) => state.expLandscape
@@ -27,7 +26,7 @@ export default function Landscape({ calculateLandscape }) {
   async function setRPlot(plotPath) {
     if (plotPath) {
       try {
-        const response = await fetch(`${rootURL}results/${plotPath}`);
+        const response = await fetch(`api/results/${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {
@@ -55,7 +54,7 @@ export default function Landscape({ calculateLandscape }) {
       try {
         const data = new FormData();
         data.append('inputFile', vdFile);
-        let response = await fetch(`${rootURL}upload`, {
+        let response = await fetch(`api/upload`, {
           method: 'POST',
           body: data,
         });

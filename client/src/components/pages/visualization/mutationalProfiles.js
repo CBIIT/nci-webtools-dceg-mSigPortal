@@ -15,7 +15,7 @@ export default function MutationalProfiles() {
   const { svgList, displayTab } = useSelector(
     (state) => state.visualizeResults
   );
-  const rootURL = window.location.pathname;
+
   const {
     filtered,
     selectName,
@@ -59,8 +59,8 @@ export default function MutationalProfiles() {
       try {
         const response =
           source == 'user'
-            ? await fetch(`${rootURL}results/${plot.Path}`)
-            : await fetch(`${rootURL}public/${plot.Path}`);
+            ? await fetch(`api/results/${plot.Path}`)
+            : await fetch(`api/public/${plot.Path}`);
 
         if (!response.ok) {
           const msg = await response.text();

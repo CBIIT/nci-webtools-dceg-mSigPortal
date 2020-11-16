@@ -26,7 +26,6 @@ export default function Visualize({ match }) {
     (state) => state.visualize
   );
   const { type, id } = match.params;
-  const rootURL = window.location.pathname;
 
   // when retrieving queued result, update id in store
   useEffect(() => {
@@ -51,7 +50,7 @@ export default function Visualize({ match }) {
     });
     try {
       const { args, state, timestamp } = await (
-        await fetch(`${rootURL}fetchResults/${id}`)
+        await fetch(`api/fetchResults/${id}`)
       ).json();
       dispatchVisualize(state);
       dispatchVisualizeResults({ projectID: id });
@@ -73,7 +72,7 @@ export default function Visualize({ match }) {
     });
     try {
       const { args, state, timestamp } = await (
-        await fetch(`${rootURL}fetchExample/${id}`)
+        await fetch(`fetchExample/${id}`)
       ).json();
       dispatchVisualize(state);
       dispatchVisualizeResults({ projectID: id });

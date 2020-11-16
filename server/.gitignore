@@ -1,0 +1,16 @@
+**/logs/
+**/tmp/
+**/data/
+
+config*.json
+*.meta
+*.vs
+*.Rhistory
+*.log
+*-audit.json
+.DS_Store
+
+**/node_modules/
+www/
+
+*Rplots.pdf

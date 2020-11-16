@@ -1,15 +1,10 @@
-/server/logs/
-/server/tmp/
-/server/data/
+**/logs/
+**/tmp/
+**/data/Database*
 
-config*.json
 *.meta
 *.vs
 *.Rhistory
 *.log
 *-audit.json
 .DS_Store
-
-package-lock.json
-node_modules/
-www/

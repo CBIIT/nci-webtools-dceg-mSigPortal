@@ -28,8 +28,8 @@ export default function Explore() {
 
     try {
       let [signatureData, exposureData] = await Promise.all([
-        (await fetch(`public/Others/json/Exploring-Signature.json`)).json(),
-        (await fetch('public/Others/json/Exploring-Exposure.json')).json(),
+        (await fetch(`api/public/Others/json/Exploring-Signature.json`)).json(),
+        (await fetch('api/public/Others/json/Exploring-Exposure.json')).json(),
       ]);
 
       setInitalRefSigData(signatureData);

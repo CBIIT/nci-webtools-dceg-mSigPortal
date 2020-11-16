@@ -28,7 +28,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
   const { matrixList, svgList } = useSelector(
     (state) => state.visualizeResults
   );
-  const rootURL = window.location.pathname;
+
   const {
     withinProfileType,
     withinMatrixSize,
@@ -88,7 +88,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
     setOverlay(type, true);
     if (plotPath) {
       try {
-        const response = await fetch(`${rootURL}results/${plotPath}`);
+        const response = await fetch(`api/results/${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {

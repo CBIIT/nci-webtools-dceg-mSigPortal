@@ -12,8 +12,6 @@ const { Toggle, Collapse } = Accordion;
 const { Group, Label, Check, Control } = Form;
 
 export default function Download() {
-  const rootURL = window.location.pathname;
-
   return (
     <div className="position-relative">
       <h4>TBA</h4>

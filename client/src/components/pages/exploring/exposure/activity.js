@@ -8,7 +8,6 @@ import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
 
 export default function Activity({ calculateActivity }) {
-  const rootURL = window.location.pathname;
   const { signatureNameOptions, loading: mainLoading } = useSelector(
     (state) => state.expExposure
   );
@@ -33,7 +32,7 @@ export default function Activity({ calculateActivity }) {
   async function setRPlot(plotPath) {
     if (plotPath) {
       try {
-        const response = await fetch(`${rootURL}results/${plotPath}`);
+        const response = await fetch(`api/results/${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {

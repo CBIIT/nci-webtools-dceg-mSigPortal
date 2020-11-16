@@ -20,7 +20,7 @@ export default function MutationalPattern({ submitR }) {
     (state) => state.visualize
   );
   const { matrixList } = useSelector((state) => state.visualizeResults);
-  const rootURL = window.location.pathname;
+
   const {
     proportion,
     pattern,
@@ -40,7 +40,7 @@ export default function MutationalPattern({ submitR }) {
 
     if (plotPath) {
       try {
-        const response = await fetch(`${rootURL}results/${plotPath}`);
+        const response = await fetch(`api/results/${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {

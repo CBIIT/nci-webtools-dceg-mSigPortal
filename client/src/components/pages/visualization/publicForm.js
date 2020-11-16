@@ -31,7 +31,6 @@ export default function PublicForm() {
     loadingPublic,
     source,
   } = useSelector((state) => state.visualize);
-  const rootURL = window.location.pathname;
 
   useEffect(() => {
     if (!pDataOptions.length && !loadingPublic) getPublicDataOptions();
@@ -55,7 +54,7 @@ export default function PublicForm() {
       },
     });
     try {
-      const response = await fetch(`${rootURL}getPublicData`, {
+      const response = await fetch(`api/getPublicData`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -117,7 +116,7 @@ export default function PublicForm() {
     dispatchVisualize({ loadingPublic: true });
     try {
       const pDataOptions = await (
-        await fetch(`public/Others/json/Visualization-Public.json`)
+        await fetch(`api/public/Others/json/Visualization-Public.json`)
       ).json();
 
       const studyOptions = [...new Set(pDataOptions.map((data) => data.Study))];

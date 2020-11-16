@@ -24,7 +24,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
   } = useSelector((state) => state.visualize);
   const { profileOptions } = useSelector((state) => state.mutationalProfiles);
   const { svgList } = useSelector((state) => state.visualizeResults);
-  const rootURL = window.location.pathname;
+
   const {
     profileType,
     signatureSet,
@@ -82,7 +82,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
         ? dispatchPCA({ submitOverlay: true })
         : dispatchPCA({ pubSubmitOverlay: true });
       try {
-        const response = await fetch(`${rootURL}results/${plotPath}`);
+        const response = await fetch(`api/results/${plotPath}`);
 
         if (!response.ok) {
           // console.log(await response.json());

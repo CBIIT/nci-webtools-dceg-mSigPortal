@@ -8,13 +8,13 @@ export default function Download() {
   const { projectID, downloads, statistics } = useSelector(
     (state) => state.visualizeResults
   );
-  const rootURL = window.location.pathname;
+
   const [downloading, setDownload] = useState([]);
 
   async function downloadOutput(file) {
     setDownload((downloading) => [...downloading, file]);
     const response = await fetch(
-      `${rootURL}visualize/download?id=${projectID}&file=${file}`
+      `api/visualize/download?id=${projectID}&file=${file}`
     );
     if (response.ok) {
       const objectURL = URL.createObjectURL(await response.blob());

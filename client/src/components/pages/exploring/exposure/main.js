@@ -33,7 +33,6 @@ const { Toggle, Collapse } = Accordion;
 const { Group, Label, Check, Control } = Form;
 
 export default function ExposureExploring() {
-  const rootURL = window.location.pathname;
   const { displayTab, exposureAccordion, publicDataOptions } = useSelector(
     (state) => state.exploring
   );
@@ -71,7 +70,7 @@ export default function ExposureExploring() {
   const [signatureValidity, setSignatureValidity] = useState(false);
 
   function submitR(fn, args, id = projectID) {
-    return fetch(`${rootURL}exploringR`, {
+    return fetch(`api/exploringR`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -355,7 +354,7 @@ export default function ExposureExploring() {
           data.append('inputFile', exposureFileObj);
           data.append('inputFile', matrixFileObj);
           if (!usePublicSignature) data.append('inputFile', signatureFileObj);
-          let response = await fetch(`${rootURL}upload`, {
+          let response = await fetch(`api/upload`, {
             method: 'POST',
             body: data,
           });

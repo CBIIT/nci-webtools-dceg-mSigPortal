@@ -11,7 +11,6 @@ import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
 
 export default function MutationalSignatureProfile({ submitR }) {
-  const rootURL = window.location.pathname;
   const {
     profileName,
     profileNameOptions,
@@ -73,7 +72,7 @@ export default function MutationalSignatureProfile({ submitR }) {
   async function setRPlot(plotPath) {
     if (plotPath) {
       try {
-        const response = await fetch(`${rootURL}results/${plotPath}`);
+        const response = await fetch(`api/results/${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {

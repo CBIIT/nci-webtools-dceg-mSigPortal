@@ -11,7 +11,6 @@ import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
 
 export default function MutationalSignatureProfile({ submitR }) {
-  const rootURL = window.location.pathname;
   const { plots, debugR, err, loading } = useSelector(
     (state) => state.expMutationalProfiles
   );
@@ -85,7 +84,7 @@ export default function MutationalSignatureProfile({ submitR }) {
     try {
       const svgs = await Promise.all(
         plots.map((plot) =>
-          fetch(`${rootURL}public/${plot.plotPath}`).then((res) => res.blob())
+          fetch(`api/public/${plot.plotPath}`).then((res) => res.blob())
         )
       );
       let newPlots = plots.slice();

@@ -13,8 +13,6 @@ const { Header, Body } = Card;
 const { Toggle, Collapse } = Accordion;
 
 export default function SignatureExploring() {
-  const rootURL = window.location.pathname;
-
   const {
     displayTab,
     projectID,
@@ -23,7 +21,7 @@ export default function SignatureExploring() {
   } = useSelector((state) => state.exploring);
 
   function submitR(fn, args) {
-    return fetch(`${rootURL}exploringR`, {
+    return fetch(`api/exploringR`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',

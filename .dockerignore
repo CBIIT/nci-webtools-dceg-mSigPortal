@@ -1,0 +1,7 @@
+.git
+.git
+**/node_modules/
+**/data/
+**/logs/
+**/tmp/
+
