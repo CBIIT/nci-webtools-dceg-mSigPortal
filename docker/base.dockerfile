@@ -15,6 +15,7 @@ RUN dnf -y update \
       # v8-devel \
       # https://download.fedoraproject.org/pub/epel/7/x86_64/Packages/j/jq-1.6-2.el7.x86_64.rpm \
       # https://download.fedoraproject.org/pub/epel/7/x86_64/Packages/j/jq-devel-1.6-2.el7.x86_64.rpm \
+      libjpeg-turbo-devel \
       openssl-devel \
       nodejs \
       R \
@@ -44,4 +45,4 @@ RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerPlotting#egg=SigPr
 
 RUN python3.6 -c "from SigProfilerMatrixGenerator import install as genInstall; genInstall.install('GRCh37', rsync=False, bash=True); genInstall.install('GRCh38', rsync=False, bash=True); genInstall.install('mm10', rsync=False, bash=True)"
 
-RUN Rscript -e "install.packages(c('tidyverse', 'hrbrthemes', 'ggsci', 'ggrepel', 'ggdendro', 'ggscales', 'ggforce', 'svglite', 'cowplot', 'car', 'FactoMineR', 'factoextra', 'coop', 'ggridges', 'ggstatsplot', 'ggtext'), repos='https://cloud.r-project.org/')"
+RUN Rscript -e "install.packages(c('tidyverse', 'hrbrthemes', 'ggsci', 'ggrepel', 'ggdendro', 'ggscales', 'ggforce', 'svglite', 'cowplot', 'car', 'FactoMineR', 'factoextra', 'coop', 'ggridges', 'ggstatsplot', 'ggtext', 'ggpubr'), repos='https://cloud.r-project.org/')"
