@@ -17,7 +17,9 @@ import {
 import './exploring.scss';
 
 export default function Explore() {
-  const { publicDataOptions } = useSelector((state) => state.exploring);
+  const { publicDataOptions, displayTab } = useSelector(
+    (state) => state.exploring
+  );
 
   useEffect(() => {
     if (!Object.keys(publicDataOptions).length) populateControls();
@@ -246,7 +248,7 @@ export default function Explore() {
           <Route
             exact
             path={`/exploring`}
-            render={() => <Redirect to="/exploring/signature" />}
+            render={() => <Redirect to={`/exploring/${displayTab}`} />}
           />
           <Route path="/exploring/etiology" component={EtiologyExploring} />
           <Route path="/exploring/signature" component={SignatureExploring} />

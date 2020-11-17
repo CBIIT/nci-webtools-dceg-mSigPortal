@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Accordion, Card, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -30,10 +30,10 @@ import {
 
 const { Header, Body } = Card;
 const { Toggle, Collapse } = Accordion;
-const { Group, Label, Check, Control } = Form;
+const { Group, Label, Check } = Form;
 
 export default function ExposureExploring() {
-  const { displayTab, exposureAccordion, publicDataOptions } = useSelector(
+  const { exposureAccordion, publicDataOptions } = useSelector(
     (state) => state.exploring
   );
   const {
@@ -68,6 +68,10 @@ export default function ExposureExploring() {
   const [exposureValidity, setExposureValidity] = useState(false);
   const [matrixValidity, setMatrixValidity] = useState(false);
   const [signatureValidity, setSignatureValidity] = useState(false);
+
+  useEffect(() => {
+    dispatchExploring({ displayTab: 'exposure' });
+  }, []);
 
   function submitR(fn, args, id = projectID) {
     return fetch(`api/exploringR`, {

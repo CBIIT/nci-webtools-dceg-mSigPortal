@@ -1,5 +1,5 @@
-import React from 'react';
-import { Row, Col, Accordion, Card } from 'react-bootstrap';
+import React, { useEffect } from 'react';
+import { Accordion, Card } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -7,18 +7,19 @@ import ReferenceSignatures from './referenceSignatures';
 import MutationalSignatureProfile from './mutationalSignatureProfile';
 import CosineSimilarity from './cosineSimilarity';
 import MutationalSignatureComparison from './mutationalSignatureComparison';
-import { dispatchError, dispatchExploring } from '../../../../services/store';
+import { dispatchExploring } from '../../../../services/store';
 
 const { Header, Body } = Card;
 const { Toggle, Collapse } = Accordion;
 
 export default function SignatureExploring() {
-  const {
-    displayTab,
-    projectID,
-    signatureAccordion,
-    exposureAccordion,
-  } = useSelector((state) => state.exploring);
+  const { projectID, signatureAccordion } = useSelector(
+    (state) => state.exploring
+  );
+
+  useEffect(() => {
+    dispatchExploring({ displayTab: 'signature' });
+  }, []);
 
   function submitR(fn, args) {
     return fetch(`api/exploringR`, {

@@ -184,7 +184,7 @@ export const getInitialState = () => ({
   },
 
   exploring: {
-    displayTab: 'signatureExploring',
+    displayTab: 'signature',
     signatureAccordion: {
       referenceSignatures: true,
       mutationalSignatureProfile: true,

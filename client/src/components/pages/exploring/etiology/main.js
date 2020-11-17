@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Accordion, Card, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -12,7 +12,7 @@ const { Toggle, Collapse } = Accordion;
 const { Group, Label, Check, Control } = Form;
 
 export default function EtiologyExploring() {
-  const { displayTab, exposureAccordion, publicDataOptions } = useSelector(
+  const { exposureAccordion, publicDataOptions } = useSelector(
     (state) => state.exploring
   );
   const {
@@ -35,6 +35,10 @@ export default function EtiologyExploring() {
     loading,
     projectID,
   } = useSelector((state) => state.expExposure);
+
+  useEffect(() => {
+    dispatchExploring({ displayTab: 'etiology' });
+  }, []);
 
   const sections = [
     // {
