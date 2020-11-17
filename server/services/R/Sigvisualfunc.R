@@ -1101,6 +1101,7 @@ plot_cosine_heatmap_df <- function (cos_sim_df, col_order, cluster_rows = TRUE, 
 # Plot two profile difference for SBS96, ID83 and DBS78 ---------------------------------------------
 plot_compare_profiles_diff <- function (profile1, profile2, profile_names = NULL, profile_ymax = NULL, diff_ylim = NULL, colors = NULL, condensed = FALSE,output_plot = NULL,plot_width=NULL, plot_height=NULL) 
 {
+  require(ggpubr)
   ## profile 1 and profile 2 will be the dataframe with two columns: MutationType and value
   
   COLORS6 = c("#03BCEE", "#010101", "#E32926", "#CAC9C9", "#A1CE63", "#EBC6C4")
