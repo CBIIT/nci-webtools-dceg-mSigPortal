@@ -283,7 +283,7 @@ export default function MutationalProfiles() {
           })
         }
       >
-        Python Debug
+        Debug
       </Button>
       <pre
         className="border rounded p-1 "
