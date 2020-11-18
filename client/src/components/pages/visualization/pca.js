@@ -69,18 +69,22 @@ export default function PCA({ submitR, getRefSigOptions }) {
 
   useEffect(() => {
     if (svgList.length) {
-      const samples = [
-        ...new Set(
-          svgList.map((plot) => {
-            if (plot.Filter != 'NA')
-              return `${plot.Sample_Name}@${plot.Filter}`;
-            else return plot.Sample_Name;
-          })
-        ),
-      ];
+      if (source == 'user') {
+        const samples = [
+          ...new Set(
+            svgList.map((plot) => {
+              if (plot.Filter != 'NA')
+                return `${plot.Sample_Name}@${plot.Filter}`;
+              else return plot.Sample_Name;
+            })
+          ),
+        ];
 
-      if (samples.length > 1) setMultiSample(true);
-      else setMultiSample(false);
+        if (samples.length > 1) setMultiSample(true);
+        else setMultiSample(false);
+      } else {
+        setMultiSample(true);
+      }
     }
   }, [svgList]);
 
