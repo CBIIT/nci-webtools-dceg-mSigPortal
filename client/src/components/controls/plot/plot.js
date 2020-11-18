@@ -44,7 +44,8 @@ export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
     <div>
       <LoadingOverlay active={loading} />
       <div className="d-flex">
-        <a className="px-2 py-1" href={plotURL} download={plotName}>
+        <span>{plotName.slice(0, -4)}</span>
+        <a className="ml-auto" href={plotURL} download={plotName}>
           Download Plot
         </a>
         {txtPath && (
