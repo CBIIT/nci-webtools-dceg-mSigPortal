@@ -41,7 +41,7 @@ getPublicData <- function(study, cancerType, experimentalStrategy, dataPath) {
   load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata_info.RData'))
 
   svgfiles <- seqmatrix_refdata_info %>% mutate(Path = paste0(dataPath, 'Seqmatrix/', Path))
-  if (cancerType != 'PanCancer') {
+  if (cancerType == 'PanCancer') {
     svgfiles_public <- svgfiles %>% filter(Study == study, Dataset == experimentalStrategy)
   } else {
     svgfiles_public <- svgfiles %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy)
