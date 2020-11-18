@@ -4,7 +4,8 @@ import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import Tumor from './tumor';
-import Activity from './activity';
+import Separated from './separated';
+import Across from './across';
 import Association from './association';
 import Decomposition from './decomposition';
 import Landscape from './landscape';
@@ -14,11 +15,12 @@ import {
   dispatchExploring,
   dispatchExpExposure,
   dispatchExpTumor,
-  dispatchExpActivity,
+  dispatchExpAcross,
   dispatchExpAssociation,
   dispatchExpDecomposition,
   dispatchExpLandscape,
   dispatchExpPrevalence,
+  dispatchExpSeparated,
 } from '../../../../services/store';
 import Select from '../../../controls/select/select';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -57,7 +59,7 @@ export default function ExposureExploring() {
     projectID,
     openSidebar,
   } = useSelector((state) => state.expExposure);
-  const activityArgs = useSelector((state) => state.expActivity);
+  const acrossArgs = useSelector((state) => state.expAcross);
   const associationArgs = useSelector((state) => state.expAssociation);
   const landscapeArgs = useSelector((state) => state.expLandscape);
   const prevalenceArgs = useSelector((state) => state.expPrevalence);
@@ -88,8 +90,8 @@ export default function ExposureExploring() {
     }).then((res) => res.json());
   }
 
-  async function calculateActivity() {
-    dispatchExpActivity({
+  async function calculateAcross() {
+    dispatchExpAcross({
       loading: true,
       err: false,
       debugR: '',
@@ -99,16 +101,16 @@ export default function ExposureExploring() {
       if (!projectID) {
         try {
           const id = await handleUpload();
-          await handleCalculate('activity', id);
+          await handleCalculate('across', id);
         } catch (error) {
           dispatchError(error);
         }
       }
     } else {
-      await handleCalculate('activity');
+      await handleCalculate('across');
     }
 
-    dispatchExpActivity({ loading: false });
+    dispatchExpAcross({ loading: false });
   }
 
   async function calculateAssociation() {
@@ -213,9 +215,9 @@ export default function ExposureExploring() {
         genome: genome,
       }),
     };
-    if (fn == 'all' || fn == 'activity') {
-      args.activity = JSON.stringify({
-        signatureName: activityArgs.signatureName,
+    if (fn == 'all' || fn == 'across') {
+      args.across = JSON.stringify({
+        signatureName: acrossArgs.signatureName,
       });
     }
     if (fn == 'all' || fn == 'association') {
@@ -255,14 +257,23 @@ export default function ExposureExploring() {
         });
       else if (fn == 'all') dispatchExpTumor({ err: true, debugR: debugR });
 
-      if (output.activityPath)
-        dispatchExpActivity({
-          plotPath: output.activityPath,
+      if (output.burdenSeparatedPath)
+        dispatchExpSeparated({
+          plotPath: output.burdenSeparatedPath,
           debugR: debugR,
           err: false,
         });
-      else if (fn == 'all' || fn == 'activity')
-        dispatchExpActivity({ err: true, debugR: debugR });
+      else if (fn == 'all' || fn == 'across')
+        dispatchExpSeparated({ err: true, debugR: debugR });
+
+      if (output.burdenAcrossPath)
+        dispatchExpAcross({
+          plotPath: output.burdenAcrossPath,
+          debugR: debugR,
+          err: false,
+        });
+      else if (fn == 'all' || fn == 'across')
+        dispatchExpAcross({ err: true, debugR: debugR });
 
       if (output.associationPath)
         dispatchExpAssociation({
@@ -392,9 +403,14 @@ export default function ExposureExploring() {
       title: 'Tumor Mutational Burden',
     },
     {
-      component: <Activity calculateActivity={calculateActivity} />,
-      id: 'activity',
-      title: 'Mutational Signature Activity',
+      component: <Separated />,
+      id: 'separated',
+      title: 'Tumor Mutational Burden Separated by Signatures',
+    },
+    {
+      component: <Across calculateAcross={calculateAcross} />,
+      id: 'across',
+      title: 'Mutational Signature Across Cancer Types',
     },
     {
       component: <Decomposition />,

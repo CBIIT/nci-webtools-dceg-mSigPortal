@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { dispatchError, dispatchExpActivity } from '../../../../services/store';
+import { dispatchError, dispatchExpAcross } from '../../../../services/store';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
 
-export default function Activity({ calculateActivity }) {
+export default function Across({ calculateAcross }) {
   const { signatureNameOptions, loading: mainLoading } = useSelector(
     (state) => state.expExposure
   );
@@ -18,7 +18,7 @@ export default function Activity({ calculateActivity }) {
     debugR,
     err,
     loading,
-  } = useSelector((state) => state.expActivity);
+  } = useSelector((state) => state.expAcross);
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
@@ -26,7 +26,7 @@ export default function Activity({ calculateActivity }) {
 
   useEffect(() => {
     if (signatureNameOptions.length)
-      dispatchExpActivity({ signatureName: signatureNameOptions[0] });
+      dispatchExpAcross({ signatureName: signatureNameOptions[0] });
   }, [signatureNameOptions]);
 
   async function setRPlot(plotPath) {
@@ -40,7 +40,7 @@ export default function Activity({ calculateActivity }) {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchExpActivity({
+          dispatchExpAcross({
             plotURL: objectURL,
           });
         }
@@ -49,7 +49,7 @@ export default function Activity({ calculateActivity }) {
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchExpActivity({ err: true, plotURL: '' });
+      dispatchExpAcross({ err: true, plotURL: '' });
     }
   }
 
@@ -61,24 +61,24 @@ export default function Activity({ calculateActivity }) {
           <Row className="justify-content-center">
             <Col sm="2">
               <Select
-                id="activitySignatureName"
+                id="acrossSignatureName"
                 label="Signature Name"
                 value={signatureName}
                 options={signatureNameOptions}
                 onChange={(name) =>
-                  dispatchExpActivity({ signatureName: name })
+                  dispatchExpAcross({ signatureName: name })
                 }
               />
             </Col>
             <Col sm="9" />
             <Col sm="1" className="my-auto">
-              <Button variant="primary" onClick={calculateActivity}>
+              <Button variant="primary" onClick={calculateAcross}>
                 Calculate
               </Button>
             </Col>
           </Row>
         </div>
-        <div id="activityPlot">
+        <div id="acrossPlot">
           {err && (
             <p>An error has occured. Check the debug section for more info.</p>
           )}

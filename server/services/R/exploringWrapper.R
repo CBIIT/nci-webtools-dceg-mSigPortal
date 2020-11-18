@@ -213,7 +213,18 @@ tumorMutationalBurden <- function(genomesize, plotPath, exposure_refdata) {
   TMBplot(data_input, output_plot = plotPath)
 }
 
-mutationalSignatureActivity <- function(signatureName, genomesize, plotPath, exposure_refdata) {
+mutationalSignatureBurdenSeparated <- function(genomesize, cancerType, plotPath, exposure_refdata) {
+  data_input <- exposure_refdata %>%
+  filter(Cancer_Type == cancerType) %>%
+  mutate(Burden = log10((Exposure) / genomesize)) %>%
+  select(-Cancer_Type) %>%
+  rename(Cancer_Type = Signature_name)
+  # put this barplot on the web
+
+  TMBplot(data_input, output_plot = plotPath)
+}
+
+mutationalSignatureBurdenAcrossCancer <- function(signatureName, genomesize, plotPath, exposure_refdata) {
   data_input <- exposure_refdata %>%
       filter(Signature_name == signatureName) %>%
       group_by(Cancer_Type, Sample) %>%
@@ -303,7 +314,6 @@ mutationalSignatureLandscape <- function(cancerType, varDataPath, plotPath, expo
 
   # parameter: Cancer Type, Vardata_input_file
   if (stringi::stri_length(varDataPath) > 0) {
-    print(varDataPath)
     vardata_input <- read_delim(vardata_input_file, delim = '\t', col_names = T)
 
     vardata1_input <- vardata_input %>% select(1:2)
@@ -341,7 +351,7 @@ mutationalSignaturePrevalence <- function(mutation, cancerType, plotPath, exposu
   prevalence_plot(sigdata = sigdata, nmutation = mutation, output_plot = plotPath)
 }
 
-exposurePublic <- function(fn, common, activity = '{}', association = '{}', landscape = '{}', prevalence = '{}', projectID, pythonOutput, rootDir, savePath, dataPath) {
+exposurePublic <- function(fn, common, across = '{}', association = '{}', landscape = '{}', prevalence = '{}', projectID, pythonOutput, rootDir, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'Signature/signature_refsets.RData'))
   load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata.RData'))
@@ -353,7 +363,8 @@ exposurePublic <- function(fn, common, activity = '{}', association = '{}', land
   tryCatch({
     output = list()
     tumorPath = paste0(savePath, 'tumorMutationalBurden.svg')
-    activityPath = paste0(savePath, 'mutationalSignatureActivity.svg')
+    burdenSeparatedPath = paste0(savePath, 'burdenSeparatedPath.svg')
+    burdenAcrossPath = paste0(savePath, 'burdenAcrossCancer.svg')
     associationPath = paste0(savePath, 'mutationalSignatureAssociation.svg')
     decompositionPath = paste0(savePath, 'mutationalSignatureDecomposition.svg')
     decompositionData = paste0(savePath, 'mutationalSignatureDecomposition.txt')
@@ -362,7 +373,7 @@ exposurePublic <- function(fn, common, activity = '{}', association = '{}', land
 
     # parse arguments
     common = fromJSON(common)
-    activity = fromJSON(activity)
+    across = fromJSON(across)
     association = fromJSON(association)
     landscape = fromJSON(landscape)
     prevalence = fromJSON(prevalence)
@@ -388,10 +399,16 @@ exposurePublic <- function(fn, common, activity = '{}', association = '{}', land
       output[['tumorPath']] = tumorPath
     }
 
-    # Mutational Signature Activity
-    if ('all' %in% fn || 'activity' %in% fn) {
-      mutationalSignatureActivity(activity$signatureName, genomesize, activityPath, exposure_refdata_selected)
-      output[['activityPath']] = activityPath
+    # Tumor Mutational Burden separated by signatures
+    if ('all' %in% fn || 'separated' %in% fn) {
+      mutationalSignatureBurdenSeparated(genomesize, common$cancerType, burdenSeparatedPath, exposure_refdata_selected)
+      output[['burdenSeparatedPath']] = burdenSeparatedPath
+    }
+
+    # Mutational signature burden across cancer types
+    if ('all' %in% fn || 'across' %in% fn) {
+      mutationalSignatureBurdenAcrossCancer(across$signatureName, genomesize, burdenAcrossPath, exposure_refdata_selected)
+      output[['burdenAcrossPath']] = burdenAcrossPath
     }
     # Mutational Signature Association
     if ('all' %in% fn | 'association' %in% fn) {
@@ -423,7 +440,7 @@ exposurePublic <- function(fn, common, activity = '{}', association = '{}', land
   })
 }
 
-exposureUser <- function(fn, files, common, activity = '{}', association = '{}', landscape = '{}', prevalence = '{}', projectID, pythonOutput, rootDir, savePath, dataPath) {
+exposureUser <- function(fn, files, common, across = '{}', association = '{}', landscape = '{}', prevalence = '{}', projectID, pythonOutput, rootDir, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
 
   con <- textConnection('stdout', 'wr', local = TRUE)
@@ -433,7 +450,8 @@ exposureUser <- function(fn, files, common, activity = '{}', association = '{}',
   tryCatch({
     output = list()
     tumorPath = paste0(savePath, 'tumorMutationalBurden.svg')
-    activityPath = paste0(savePath, 'mutationalSignatureActivity.svg')
+    burdenSeparatedPath = paste0(savePath, 'burdenSeparatedPath.svg')
+    burdenAcrossPath = paste0(savePath, 'burdenAcrossCancer.svg')
     associationPath = paste0(savePath, 'mutationalSignatureAssociation.svg')
     decompositionPath = paste0(savePath, 'mutationalSignatureDecomposition.svg')
     decompositionData = paste0(savePath, 'mutationalSignatureDecomposition.txt')
@@ -442,7 +460,7 @@ exposureUser <- function(fn, files, common, activity = '{}', association = '{}',
 
     # parse arguments
     common = fromJSON(common)
-    activity = fromJSON(activity)
+    across = fromJSON(across)
     association = fromJSON(association)
     landscape = fromJSON(landscape)
     prevalence = fromJSON(prevalence)
@@ -484,10 +502,15 @@ exposureUser <- function(fn, files, common, activity = '{}', association = '{}',
       output[['tumorPath']] = tumorPath
     }
 
-    # Mutational Signature Activity
-    if ('all' %in% fn || 'activity' %in% fn) {
-      mutationalSignatureActivity(activity$signatureName, genomesize, activityPath, exposure_refdata_selected)
-      output[['activityPath']] = activityPath
+    # Tumor Mutational Burden separated by signatures
+    if ('all' %in% fn || 'separated' %in% fn) {
+      mutationalSignatureBurdenSeparated(genomesize, cancer_type_user, burdenSeparatedPath, exposure_refdata_selected)
+      output[['burdenSeparatedPath']] = burdenSeparatedPath
+    }
+    # Mutational signature burden across cancer types
+    if ('all' %in% fn || 'across' %in% fn) {
+      mutationalSignatureBurdenAcrossCancer(burden$signatureName, genomesize, burdenAcrossPath, exposure_refdata_selected)
+      output[['burdenAcrossPath']] = burdenAcrossPath
     }
     # Mutational Signature Association
     if ('all' %in% fn | 'association' %in% fn) {

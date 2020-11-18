@@ -193,7 +193,8 @@ export const getInitialState = () => ({
     },
     exposureAccordion: {
       tumor: true,
-      activity: true,
+      separated: true,
+      across: true,
       association: true,
       decomposition: true,
       landscape: true,
@@ -291,7 +292,13 @@ export const getInitialState = () => ({
     debugR: '',
     err: '',
   },
-  expActivity: {
+  expSeparated: {
+    plotPath: '',
+    plotURL: '',
+    debugR: '',
+    err: '',
+  },
+  expAcross: {
     signatureName: '',
     plotPath: '',
     plotURL: '',
@@ -564,11 +571,23 @@ const expTumorSlice = createSlice({
     },
   },
 });
-const expActivitySlice = createSlice({
-  name: 'expActivity',
-  initialState: getInitialState().expActivity,
+const expSeparatedSlice = createSlice({
+  name: 'expSeparated',
+  initialState: getInitialState().expSeparated,
   reducers: {
-    updateExpActivity: (state, action) => {
+    updateExpSeparated: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
+const expAcrossSlice = createSlice({
+  name: 'expAcross',
+  initialState: getInitialState().expAcross,
+  reducers: {
+    updateExpAcross: (state, action) => {
       return {
         ...state,
         ...action.payload,
@@ -643,7 +662,8 @@ const rootReducer = combineReducers({
   expMutationalSigComparison: expMutationalSigComparisonSlice.reducer,
   expExposure: expExposureSlice.reducer,
   expTumor: expTumorSlice.reducer,
-  expActivity: expActivitySlice.reducer,
+  expSeparated: expSeparatedSlice.reducer,
+  expAcross: expAcrossSlice.reducer,
   expAssociation: expAssocationSlice.reducer,
   expDecomposition: expDecompositionSlice.reducer,
   expLandscape: expLandscapeSlice.reducer,
@@ -676,7 +696,8 @@ export const {
 } = expMutationalSigComparisonSlice.actions;
 export const { updateExpExposure } = expExposureSlice.actions;
 export const { updateExpTumor } = expTumorSlice.actions;
-export const { updateExpActivity } = expActivitySlice.actions;
+export const { updateExpSeparated } = expSeparatedSlice.actions;
+export const { updateExpAcross } = expAcrossSlice.actions;
 export const { updateExpAssociation } = expAssocationSlice.actions;
 export const { updateExpDecomposition } = expDecompositionSlice.actions;
 export const { updateExpLandscape } = expLandscapeSlice.actions;
@@ -757,8 +778,11 @@ export function dispatchExpExposure(obj) {
 export function dispatchExpTumor(obj) {
   store.dispatch(updateExpTumor(obj));
 }
-export function dispatchExpActivity(obj) {
-  store.dispatch(updateExpActivity(obj));
+export function dispatchExpSeparated(obj) {
+  store.dispatch(updateExpSeparated(obj));
+}
+export function dispatchExpAcross(obj) {
+  store.dispatch(updateExpAcross(obj));
 }
 export function dispatchExpAssociation(obj) {
   store.dispatch(updateExpAssociation(obj));
