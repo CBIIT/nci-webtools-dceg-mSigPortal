@@ -2,10 +2,10 @@ import React, { useEffect } from 'react';
 import { Nav } from 'react-bootstrap';
 import { Route, NavLink, Redirect } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import SignatureExploring from './signature/main';
-import ExposureExploring from './exposure/main';
-import EtiologyExploring from './etiology/main';
-import Download from './download/download';
+import SignatureExploring from './signature';
+import ExposureExploring from './exposure';
+import EtiologyExploring from './etiology';
+import Download from './download';
 import {
   dispatchError,
   dispatchExploring,
