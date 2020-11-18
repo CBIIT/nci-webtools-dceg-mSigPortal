@@ -26,6 +26,8 @@ RUN dnf -y update \
    rsync \
    wget \
    && dnf -y install \
+   gmp-devel \
+   mpfr-devel \
    cairo \
    cairo-devel \
    # NLopt \
@@ -45,4 +47,4 @@ RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerPlotting#egg=SigPr
 
 RUN python3.6 -c "from SigProfilerMatrixGenerator import install as genInstall; genInstall.install('GRCh37', rsync=False, bash=True); genInstall.install('GRCh38', rsync=False, bash=True); genInstall.install('mm10', rsync=False, bash=True)"
 
-RUN Rscript -e "install.packages(c('tidyverse', 'hrbrthemes', 'ggsci', 'ggrepel', 'ggdendro', 'ggscales', 'ggforce', 'svglite', 'cowplot', 'car', 'FactoMineR', 'factoextra', 'coop', 'ggridges', 'ggstatsplot', 'ggtext', 'ggpubr'), repos='https://cloud.r-project.org/')"
+RUN Rscript -e "install.packages(c('tidyverse', 'hrbrthemes', 'ggsci', 'ggrepel', 'ggdendro', 'scales', 'ggforce', 'svglite', 'cowplot', 'car', 'FactoMineR', 'factoextra', 'coop', 'ggridges', 'ggstatsplot', 'ggtext', 'ggpubr', 'entropy', 'janitor'), repos='https://cloud.r-project.org/')"
