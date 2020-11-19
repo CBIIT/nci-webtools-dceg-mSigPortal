@@ -22,9 +22,9 @@ RUN chmod +x /run-httpd.sh
 # Add custom httpd configuration
 ADD docker/frontend.conf /etc/httpd/conf.d/frontend.conf
 
-COPY --from=0 /client/build /var/www/html/msigportal
+COPY --from=0 /client/build /var/www/html/mutational-signatures
 
-RUN chmod 755 -R /var/www/html/msigportal
+RUN chmod 755 -R /var/www/html/mutational-signatures
 
 EXPOSE 80
 EXPOSE 443
