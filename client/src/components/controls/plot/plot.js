@@ -43,21 +43,19 @@ export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
   return (
     <div>
       <LoadingOverlay active={loading} />
-      <div className="d-flex">
+      <div className="d-flex align-items-end">
         <span>{plotName.slice(0, -4)}</span>
         <a className="ml-auto" href={plotURL} download={plotName}>
           Download Plot
         </a>
         {txtPath && (
-          <span className="ml-auto">
-            <Button
-              className="px-2 py-1"
-              variant="link"
-              onClick={() => downloadData(txtPath)}
-            >
-              Download Data
-            </Button>
-          </span>
+          <Button
+            className="p-0 border-0 ml-3"
+            variant="link"
+            onClick={() => downloadData(txtPath)}
+          >
+            Download Data
+          </Button>
         )}
       </div>
       <div className="p-2 border rounded" title="Ctrl + Mouse Wheel to zoom">
