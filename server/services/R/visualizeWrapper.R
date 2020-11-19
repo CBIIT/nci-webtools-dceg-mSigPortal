@@ -595,10 +595,14 @@ mutationalPatternPublic <- function(study, cancerType, experimentalStrategy, pro
 
     barchart_plot2(data = data_tmp, plot_width = 16, plot_height = 5, output_plot = barPath)
 
-    publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
-    seqmatrix_refdata <- get(load(paste0(dataPath, 'Seqmatrix/', publicDataFile)))
+    if (cancerType != "PanCancer") {
+      publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
+      seqmatrix_refdata <- get(load(paste0(dataPath, 'Seqmatrix/', publicDataFile))) %>% filter(Study == study)
+    } else {
+      seqmatrix_refdata <- get(load(paste0(dataPath, 'Seqmatrix/', 'seqmatrix_refdata.Rdata')))
+    }
 
-    data_input <- seqmatrix_refdata %>% filter(Study == study) %>%
+    data_input <- seqmatrix_refdata %>%
     filter(Profile == "SBS96") %>%
     mutate(Study = paste0(Study, "@", cancerType)) %>%
     select(Study, Sample, MutationType, Mutations) %>%
