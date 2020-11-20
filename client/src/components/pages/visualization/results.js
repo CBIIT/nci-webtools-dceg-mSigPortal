@@ -313,7 +313,7 @@ export default function Results({ setOpenSidebar }) {
   }
 
   function getRefSigOptions(profileType) {
-    return fetch(`api/visualizeR/getReferenceSignatureSets`, {
+    return fetch(`api/getReferenceSignatureSets`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',

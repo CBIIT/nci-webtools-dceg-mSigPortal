@@ -16,7 +16,8 @@ const {
   getResultData,
   visualizeR,
   getReferenceSignatureSets,
-  getSignatures,
+  getSignaturesR,
+  getSignaturesUser,
   getPublicDataOptions,
   getPublicData,
   upload,
@@ -71,7 +72,6 @@ if (process.env.NODE_ENV !== 'production')
   // app.use(express.static(config.server.static));
   app.use(express.static(path.resolve('www')));
 
-
 apiRouter.use('/results', express.static(config.results.folder));
 apiRouter.use('/public', express.static(config.data.database));
 apiRouter.use(express.json());
@@ -90,9 +90,11 @@ apiRouter.post('/getResultData', getResultData);
 
 apiRouter.post('/visualizeR', visualizeR);
 
-apiRouter.post('/visualizeR/getReferenceSignatureSets', getReferenceSignatureSets);
+apiRouter.post('/getReferenceSignatureSets', getReferenceSignatureSets);
 
-apiRouter.post('/visualizeR/getSignatures', getSignatures);
+apiRouter.post('/getSignaturesR', getSignaturesR);
+
+apiRouter.post('/getSignaturesUser', getSignaturesUser);
 
 apiRouter.post('/getPublicDataOptions', getPublicDataOptions);
 

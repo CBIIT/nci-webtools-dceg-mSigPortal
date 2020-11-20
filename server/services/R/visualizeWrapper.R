@@ -18,7 +18,7 @@ getReferenceSignatureSets <- function(profileType, dataPath) {
 }
 
 # get list of signatures in the selected signature set
-getSignatures <- function(profileType, signatureSetName, dataPath) {
+getSignaturesR <- function(profileType, signatureSetName, dataPath) {
   load(paste0(dataPath, 'Signature/signature_refsets.RData'))
   profile_name <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
   signature_refsets_input <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == signatureSetName)

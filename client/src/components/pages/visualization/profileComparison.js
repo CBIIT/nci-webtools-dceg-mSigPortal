@@ -203,7 +203,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     if (signatureSetName) {
       dispatchProfileComparison({ refSubmitOverlay: true });
       try {
-        const response = await fetch(`api/visualizeR/getSignatures`, {
+        const response = await fetch(`api/getSignaturesR`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',

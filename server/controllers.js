@@ -226,11 +226,11 @@ async function getReferenceSignatureSets(req, res, next) {
   }
 }
 
-async function getSignatures(req, res, next) {
-  logger.info('/getSignatures: Calling R Wrapper');
+async function getSignaturesR(req, res, next) {
+  logger.info('/getSignaturesR: Calling R Wrapper');
 
   try {
-    const list = await r('services/R/visualizeWrapper.R', 'getSignatures', [
+    const list = await r('services/R/visualizeWrapper.R', 'getSignaturesR', [
       req.body.profileType,
       req.body.signatureSetName,
       path.join(config.data.database),
@@ -240,7 +240,26 @@ async function getSignatures(req, res, next) {
 
     res.json(list);
   } catch (err) {
-    logger.info('/getSignatures: An error occured');
+    logger.info('/getSignaturesR: An error occured');
+    logger.error(err);
+    res.status(500).json(err.message);
+  }
+}
+
+async function getSignaturesUser(req, res, next) {
+  logger.info('/getSignaturesUser: Parsing File');
+  try {
+    const signaturePath = path.resolve(req.body.path);
+    logger.debug(signaturePath);
+    if (signaturePath.indexOf(path.resolve(config.results.folder)) == 0) {
+      const data = await parseCSV(signaturePath);
+      res.json(data);
+    } else {
+      logger.info('traversal error');
+      res.status(500).end('Not found');
+    }
+  } catch (err) {
+    logger.info('/getSignaturesUser: An error occured');
     logger.error(err);
     res.status(500).json(err.message);
   }
@@ -303,42 +322,33 @@ function upload(req, res, next) {
 
   fs.mkdirSync(form.uploadDir);
 
-  form.parse(req);
-  form.on('file', async (field, file) => {
-    const uploadPath = path.join(form.uploadDir, file.name);
-    if (field == 'inputFile') form.filePath = uploadPath;
-    if (field == 'bedFile') form.bedPath = uploadPath;
+  form
+    .on('fileBegin', (field, file) => {
+      uploadPath = path.join(form.uploadDir, file.name);
+      if (field == 'inputFile') form.filePath = uploadPath;
+      if (field == 'bedFile') form.bedPath = uploadPath;
+      if (field == 'signatureFile') form.signaturePath = uploadPath;
 
-    let data = await fs.promises.readFile(file.path);
-    await fs.promises
-      .writeFile(uploadPath, data)
-      .then(logger.info(`/UPLOAD: Successfully uploaded file: ${file.name}`))
-      .catch((err) => {
-        logger.info(`/UPLOAD: Failed to upload file: ${file.name}`);
-        logger.error(err);
-        res.status(404).json({
-          msg: `Failed to upload file: ${file.name}<br><br>
-        Review your selected File Type and try again.`,
-          error: err,
-        });
+      file.path = uploadPath;
+    })
+    .on('error', (err) => {
+      logger.info('/UPLOAD: An error occured\n' + err);
+      logger.error(err);
+      res.status(500).json({
+        msg: 'An error occured while trying to upload',
+        err: err,
       });
-  });
-  form.on('error', (err) => {
-    logger.info('/UPLOAD: An error occured\n' + err);
-    logger.error(err);
-    res.status(500).json({
-      msg: 'An error occured while trying to upload',
-      err: err,
+    })
+    .on('end', () => {
+      res.json({
+        projectID: projectID,
+        filePath: form.filePath,
+        bedPath: form.bedPath,
+        signaturePath: form.signaturePath,
+      });
     });
-  });
-  form.on('end', () => {
-    logger.info('Upload Complete');
-    res.json({
-      projectID: projectID,
-      filePath: form.filePath,
-      bedPath: form.bedPath || '',
-    });
-  });
+
+  form.parse(req);
 }
 
 function download(req, res, next) {
@@ -555,7 +565,8 @@ module.exports = {
   getResultData,
   visualizeR,
   getReferenceSignatureSets,
-  getSignatures,
+  getSignaturesR,
+  getSignaturesUser,
   getPublicDataOptions,
   getPublicData,
   upload,
