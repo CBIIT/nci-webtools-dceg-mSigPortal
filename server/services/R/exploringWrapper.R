@@ -341,6 +341,8 @@ mutationalSignatureLandscape <- function(cancerType, varDataPath, plotPath, expo
 }
 
 mutationalSignaturePrevalence <- function(mutation, cancerType, plotPath, exposure_refdata) {
+  require(janitor)
+  require(scales)
   sigdata <- exposure_refdata %>%
     filter(Cancer_Type == cancerType) %>%
     select(Sample, Signature_name, Exposure) %>%
