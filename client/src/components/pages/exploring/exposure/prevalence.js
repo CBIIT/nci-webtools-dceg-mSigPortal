@@ -13,7 +13,6 @@ import Select from '../../../controls/select/select';
 const { Group, Label, Control, Text } = Form;
 
 export default function Tumor({ calculatePrevalence }) {
-  const { loading: mainLoading } = useSelector((state) => state.expExposure);
   const { mutation, plotPath, plotURL, debugR, err, loading } = useSelector(
     (state) => state.expPrevalence
   );
@@ -49,7 +48,7 @@ export default function Tumor({ calculatePrevalence }) {
   return (
     <div>
       <Form>
-        <LoadingOverlay active={loading || mainLoading} />
+        <LoadingOverlay active={loading} />
         <div className="px-4">
           <Row className="justify-content-center">
             <Col sm="4">

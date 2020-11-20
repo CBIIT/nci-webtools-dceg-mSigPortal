@@ -12,7 +12,6 @@ import Debug from '../../../controls/debug/debug';
 const { Label } = Form;
 
 export default function Landscape({ calculateLandscape }) {
-  const { loading: mainLoading } = useSelector((state) => state.expExposure);
   const { plotPath, plotURL, txtPath, debugR, err, loading } = useSelector(
     (state) => state.expLandscape
   );
@@ -81,7 +80,7 @@ export default function Landscape({ calculateLandscape }) {
   return (
     <div>
       <Form>
-        <LoadingOverlay active={loading || mainLoading} />
+        <LoadingOverlay active={loading} />
         <div className="px-4">
           <Row className="justify-content-center">
             <Col sm="4">

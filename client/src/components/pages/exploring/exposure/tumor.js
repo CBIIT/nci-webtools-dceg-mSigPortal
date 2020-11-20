@@ -1,12 +1,10 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { dispatchError, dispatchExpTumor } from '../../../../services/store';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 
 export default function Tumor() {
-  const { loading } = useSelector((state) => state.expExposure);
   const { plotPath, plotURL, debugR, err } = useSelector(
     (state) => state.expTumor
   );
@@ -41,7 +39,6 @@ export default function Tumor() {
 
   return (
     <div>
-      <LoadingOverlay active={loading} />
       {err && (
         <p>An error has occured. Check the debug section for more info.</p>
       )}

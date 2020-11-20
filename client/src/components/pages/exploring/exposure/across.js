@@ -8,9 +8,7 @@ import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
 
 export default function Across({ calculateAcross }) {
-  const { signatureNameOptions, loading: mainLoading } = useSelector(
-    (state) => state.expExposure
-  );
+  const { signatureNameOptions } = useSelector((state) => state.expExposure);
   const {
     signatureName,
     plotPath,
@@ -56,7 +54,7 @@ export default function Across({ calculateAcross }) {
   return (
     <div>
       <Form>
-        <LoadingOverlay active={loading || mainLoading} />
+        <LoadingOverlay active={loading} />
         <div className="px-4">
           <Row className="justify-content-center">
             <Col sm="2">
@@ -65,9 +63,7 @@ export default function Across({ calculateAcross }) {
                 label="Signature Name"
                 value={signatureName}
                 options={signatureNameOptions}
-                onChange={(name) =>
-                  dispatchExpAcross({ signatureName: name })
-                }
+                onChange={(name) => dispatchExpAcross({ signatureName: name })}
               />
             </Col>
             <Col sm="9" />

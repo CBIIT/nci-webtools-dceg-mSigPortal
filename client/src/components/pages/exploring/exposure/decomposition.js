@@ -9,7 +9,6 @@ import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 
 export default function Decomposition() {
-  const { loading: mainLoading } = useSelector((state) => state.expExposure);
   const { plotPath, plotURL, txtPath, debugR, err, loading } = useSelector(
     (state) => state.expDecomposition
   );
@@ -44,7 +43,7 @@ export default function Decomposition() {
 
   return (
     <div>
-      <LoadingOverlay active={loading || mainLoading} />
+      <LoadingOverlay active={loading} />
       {err && (
         <p>An error has occured. Check the debug section for more info.</p>
       )}

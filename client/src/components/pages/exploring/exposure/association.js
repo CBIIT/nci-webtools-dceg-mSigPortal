@@ -13,9 +13,7 @@ import Select from '../../../controls/select/select';
 const { Group, Label, Control, Check, Text } = Form;
 
 export default function Association({ calculateAssociation }) {
-  const { signatureNameOptions, loading: mainLoading } = useSelector(
-    (state) => state.expExposure
-  );
+  const { signatureNameOptions } = useSelector((state) => state.expExposure);
   const {
     toggleCancer,
     both,
@@ -67,7 +65,7 @@ export default function Association({ calculateAssociation }) {
   return (
     <div>
       <Form>
-        <LoadingOverlay active={loading || mainLoading} />
+        <LoadingOverlay active={loading} />
         <div className="px-4">
           <Row className="justify-content-center">
             <Col sm="2" className="my-auto">
