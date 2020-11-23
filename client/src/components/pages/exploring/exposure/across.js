@@ -8,7 +8,9 @@ import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
 
 export default function Across({ calculateAcross }) {
-  const { signatureNameOptions } = useSelector((state) => state.expExposure);
+  const { signatureNameOptions, userNameOptions, source } = useSelector(
+    (state) => state.expExposure
+  );
   const {
     signatureName,
     plotPath,
@@ -23,9 +25,12 @@ export default function Across({ calculateAcross }) {
   }, [plotPath]);
 
   useEffect(() => {
-    if (signatureNameOptions.length)
+    if (source == 'public') {
       dispatchExpAcross({ signatureName: signatureNameOptions[0] });
-  }, [signatureNameOptions]);
+    } else {
+      dispatchExpAcross({ signatureName: userNameOptions[0] });
+    }
+  }, [signatureNameOptions, userNameOptions, source]);
 
   async function setRPlot(plotPath) {
     if (plotPath) {
@@ -62,7 +67,9 @@ export default function Across({ calculateAcross }) {
                 id="acrossSignatureName"
                 label="Signature Name"
                 value={signatureName}
-                options={signatureNameOptions}
+                options={
+                  source == 'public' ? signatureNameOptions : userNameOptions
+                }
                 onChange={(name) => dispatchExpAcross({ signatureName: name })}
               />
             </Col>

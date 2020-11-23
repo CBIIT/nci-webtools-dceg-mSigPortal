@@ -252,7 +252,12 @@ export default function Explore() {
           />
           <Route path="/exploring/etiology" component={EtiologyExploring} />
           <Route path="/exploring/signature" component={SignatureExploring} />
-          <Route path="/exploring/exposure" component={ExposureExploring} />
+          <Route
+            path="/exploring/exposure"
+            render={() => (
+              <ExposureExploring populateControls={populateControls} />
+            )}
+          />
           <Route path="/exploring/download" component={Download} />
         </div>
       </div>

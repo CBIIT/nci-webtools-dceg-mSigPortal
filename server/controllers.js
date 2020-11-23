@@ -249,10 +249,10 @@ async function getSignaturesR(req, res, next) {
 async function getSignaturesUser(req, res, next) {
   logger.info('/getSignaturesUser: Parsing File');
   try {
-    const signaturePath = path.resolve(req.body.path);
-    logger.debug(signaturePath);
-    if (signaturePath.indexOf(path.resolve(config.results.folder)) == 0) {
-      const data = await parseCSV(signaturePath);
+    const file = path.resolve(req.body.path);
+    logger.debug(file);
+    if (file.indexOf(path.resolve(config.results.folder)) == 0) {
+      const data = await parseCSV(file);
       res.json(data);
     } else {
       logger.info('traversal error');
@@ -327,7 +327,7 @@ function upload(req, res, next) {
       uploadPath = path.join(form.uploadDir, file.name);
       if (field == 'inputFile') form.filePath = uploadPath;
       if (field == 'bedFile') form.bedPath = uploadPath;
-      if (field == 'signatureFile') form.signaturePath = uploadPath;
+      if (field == 'exposureFile') form.exposurePath = uploadPath;
 
       file.path = uploadPath;
     })
@@ -344,7 +344,7 @@ function upload(req, res, next) {
         projectID: projectID,
         filePath: form.filePath,
         bedPath: form.bedPath,
-        signaturePath: form.signaturePath,
+        exposurePath: form.exposurePath,
       });
     });
 

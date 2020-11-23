@@ -13,7 +13,9 @@ import Select from '../../../controls/select/select';
 const { Group, Label, Control, Check, Text } = Form;
 
 export default function Association({ calculateAssociation }) {
-  const { signatureNameOptions } = useSelector((state) => state.expExposure);
+  const { signatureNameOptions, userNameOptions, source } = useSelector(
+    (state) => state.expExposure
+  );
   const {
     toggleCancer,
     both,
@@ -31,12 +33,18 @@ export default function Association({ calculateAssociation }) {
   }, [plotPath]);
 
   useEffect(() => {
-    if (signatureNameOptions.length)
+    if (source == 'public') {
       dispatchExpAssociation({
         signatureName1: signatureNameOptions[0],
-        signatureName2: signatureNameOptions[1] || signatureNameOptions[0],
+        signatureName2: signatureNameOptions[1],
       });
-  }, [signatureNameOptions]);
+    } else {
+      dispatchExpAssociation({
+        signatureName1: userNameOptions[0],
+        signatureName2: userNameOptions[1],
+      });
+    }
+  }, [signatureNameOptions, userNameOptions, source]);
 
   async function setRPlot(plotPath) {
     if (plotPath) {
@@ -101,7 +109,9 @@ export default function Association({ calculateAssociation }) {
                 id="associationSignatureName1"
                 label="Signature Name 1"
                 value={signatureName1}
-                options={signatureNameOptions}
+                options={
+                  source == 'public' ? signatureNameOptions : userNameOptions
+                }
                 onChange={(name) =>
                   dispatchExpAssociation({ signatureName1: name })
                 }
@@ -112,7 +122,9 @@ export default function Association({ calculateAssociation }) {
                 id="associationSignatureName2"
                 label="Signature Name 2"
                 value={signatureName2}
-                options={signatureNameOptions}
+                options={
+                  source == 'public' ? signatureNameOptions : userNameOptions
+                }
                 onChange={(name) =>
                   dispatchExpAssociation({ signatureName2: name })
                 }

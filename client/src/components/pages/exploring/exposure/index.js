@@ -11,6 +11,7 @@ import Decomposition from './decomposition';
 import Landscape from './landscape';
 import Prevalence from './prevalence';
 import {
+  getInitialState,
   dispatchError,
   dispatchExploring,
   dispatchExpExposure,
@@ -34,7 +35,7 @@ const { Header, Body } = Card;
 const { Toggle, Collapse } = Accordion;
 const { Group, Label, Check } = Form;
 
-export default function ExposureExploring() {
+export default function ExposureExploring({ populateControls }) {
   const { exposureAccordion, publicDataOptions } = useSelector(
     (state) => state.exploring
   );
@@ -48,6 +49,8 @@ export default function ExposureExploring() {
     refSigData,
     refSignatureSet,
     refSignatureSetOptions,
+    signatureNameOptions,
+    userNameOptions,
     genome,
     genomeOptions,
     exposureFile,
@@ -91,116 +94,148 @@ export default function ExposureExploring() {
   }
 
   async function calculateAcross() {
-    dispatchExpAcross({
-      loading: true,
-      err: false,
-      debugR: '',
-    });
-
-    if (source == 'user') {
-      if (!projectID) {
-        try {
-          const id = await handleUpload();
-          await handleCalculate('across', id);
-        } catch (error) {
-          dispatchError(error);
-        }
-      }
+    if (source == 'user' && !projectID) {
+      dispatchError('Missing Required Files');
     } else {
-      await handleCalculate('across');
-    }
+      dispatchExpAcross({
+        loading: true,
+        err: false,
+        debugR: '',
+      });
 
-    dispatchExpAcross({ loading: false });
+      if (source == 'user') {
+        if (!projectID) {
+          try {
+            const id = handleUpload();
+            await handleCalculate('across', id);
+          } catch (error) {
+            dispatchError(error);
+          }
+        }
+      } else {
+        await handleCalculate('across');
+      }
+
+      dispatchExpAcross({ loading: false });
+    }
   }
 
   async function calculateAssociation() {
-    dispatchExpAssociation({
-      loading: true,
-      err: false,
-      debugR: '',
-    });
-
-    if (source == 'user') {
-      if (!projectID) {
-        try {
-          const id = await handleUpload();
-          await handleCalculate('association', id);
-        } catch (error) {
-          dispatchError(error);
-        }
-      }
+    if (source == 'user' && !projectID) {
+      dispatchError('Missing Required Files');
     } else {
-      await handleCalculate('association');
-    }
+      dispatchExpAssociation({
+        loading: true,
+        err: false,
+        debugR: '',
+      });
 
-    dispatchExpAssociation({ loading: false });
+      if (source == 'user') {
+        if (!projectID) {
+          try {
+            const id = await handleUpload();
+            await handleCalculate('association', id);
+          } catch (error) {
+            dispatchError(error);
+          }
+        }
+      } else {
+        await handleCalculate('association');
+      }
+
+      dispatchExpAssociation({ loading: false });
+    }
   }
 
   async function calculateLandscape() {
-    dispatchExpLandscape({
-      loading: true,
-      err: false,
-      debugR: '',
-    });
-
-    if (source == 'user') {
-      if (!projectID) {
-        try {
-          const id = await handleUpload();
-          await handleCalculate('landscape', id);
-        } catch (error) {
-          dispatchError(error);
-        }
-      }
+    if (source == 'user' && !projectID) {
+      dispatchError('Missing Required Files');
     } else {
-      await handleCalculate('landscape');
-    }
+      dispatchExpLandscape({
+        loading: true,
+        err: false,
+        debugR: '',
+      });
 
-    dispatchExpLandscape({ loading: false });
+      if (source == 'user') {
+        if (!projectID) {
+          try {
+            const id = await handleUpload();
+            await handleCalculate('landscape', id);
+          } catch (error) {
+            dispatchError(error);
+          }
+        }
+      } else {
+        await handleCalculate('landscape');
+      }
+
+      dispatchExpLandscape({ loading: false });
+    }
   }
 
   async function calculatePrevalence() {
-    dispatchExpPrevalence({
-      loading: true,
-      err: false,
-      debugR: '',
-    });
+    if (source == 'user' && !projectID) {
+      dispatchError('Missing Required Files');
+    } else {
+      dispatchExpPrevalence({
+        loading: true,
+        err: false,
+        debugR: '',
+      });
 
-    if (source == 'user') {
-      if (!projectID) {
+      if (source == 'user') {
+        if (!projectID) {
+          try {
+            const id = await handleUpload();
+            await handleCalculate('prevalence', id);
+          } catch (error) {
+            dispatchError(error);
+          }
+        } else {
+          await handleCalculate('prevalence', projectID);
+        }
+      } else {
+        await handleCalculate('prevalence');
+      }
+
+      dispatchExpPrevalence({ loading: false });
+    }
+  }
+
+  async function calculateAll() {
+    try {
+      dispatchExpExposure({ loading: true });
+      if (source == 'user') {
+        const { projectID, exposureData } = await handleUpload();
+
+        // get signature name options, ignore sample key
+        const nameOptions = Object.keys(exposureData[0]).filter(
+          (key) => key != 'Samples'
+        );
+
+        dispatchExpAcross({ signatureName: nameOptions[0] });
+        dispatchExpAssociation({
+          signatureName1: nameOptions[0],
+          signatureName2: nameOptions[1],
+        });
+        dispatchExpExposure({
+          projectID: projectID,
+          userNameOptions: nameOptions,
+        });
         try {
-          const id = await handleUpload();
-          await handleCalculate('prevalence', id);
+          await handleCalculate('all', projectID);
         } catch (error) {
           dispatchError(error);
         }
       } else {
-        await handleCalculate('prevalence', projectID);
+        await handleCalculate('all');
       }
-    } else {
-      await handleCalculate('prevalence');
+    } catch (err) {
+      dispatchError(err);
+    } finally {
+      dispatchExpExposure({ loading: false });
     }
-
-    dispatchExpPrevalence({ loading: false });
-  }
-
-  async function calculateAll() {
-    dispatchExpExposure({ loading: true });
-
-    if (source == 'user') {
-      if (!projectID) {
-        try {
-          const id = await handleUpload();
-          await handleCalculate('all', id);
-        } catch (error) {
-          dispatchError(error);
-        }
-      }
-    } else {
-      await handleCalculate('all');
-    }
-
-    dispatchExpExposure({ loading: false });
   }
 
   async function handleCalculate(fn = 'all', id = projectID) {
@@ -356,7 +391,7 @@ export default function ExposureExploring() {
     });
   }
 
-  function handleUpload() {
+  async function handleUpload() {
     return new Promise(async (resolve, reject) => {
       if (
         exposureFileObj.size &&
@@ -366,9 +401,10 @@ export default function ExposureExploring() {
       ) {
         try {
           const data = new FormData();
-          data.append('inputFile', exposureFileObj);
-          data.append('inputFile', matrixFileObj);
-          if (!usePublicSignature) data.append('inputFile', signatureFileObj);
+          data.append('exposureFile', exposureFileObj);
+          data.append('matrixFile', matrixFileObj);
+          if (!usePublicSignature)
+            data.append('signatureFile', signatureFileObj);
           let response = await fetch(`api/upload`, {
             method: 'POST',
             body: data,
@@ -381,10 +417,22 @@ export default function ExposureExploring() {
           ${error ? `<p>${error}</p>` : ''} 
           </div>`;
             dispatchError(message);
-            reject(error);
           } else {
-            const { projectID } = await response.json();
-            resolve(projectID);
+            const { projectID, exposurePath } = await response.json();
+
+            const exposureData = await (
+              await fetch('api/getSignaturesUser', {
+                method: 'POST',
+                headers: {
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  path: exposurePath,
+                }),
+              })
+            ).json();
+            resolve({ projectID, exposureData });
           }
         } catch (err) {
           dispatchError(err);
@@ -394,6 +442,22 @@ export default function ExposureExploring() {
         reject('Missing required files');
       }
     });
+  }
+
+  function handleReset() {
+    const initialState = getInitialState();
+
+    source == 'public'
+      ? dispatchExpExposure(initialState.expExposure)
+      : dispatchExpExposure({ ...initialState.expExposure, source: 'user' });
+    dispatchExpTumor(initialState.expTumor);
+    dispatchExpSeparated(initialState.expSeparated);
+    dispatchExpAcross(initialState.expAcross);
+    dispatchExpDecomposition(initialState.expDecomposition);
+    dispatchExpAssociation(initialState.expAssociation);
+    dispatchExpLandscape(initialState.expLandscape);
+    dispatchExpPrevalence(initialState.expPrevalence);
+    populateControls();
   }
 
   const sections = [
@@ -410,7 +474,7 @@ export default function ExposureExploring() {
     {
       component: <Across calculateAcross={calculateAcross} />,
       id: 'across',
-      title: 'Mutational Signature Across Cancer Types',
+      title: 'Mutational Signature Burden Across Cancer Types',
     },
     {
       component: <Decomposition />,
@@ -442,7 +506,6 @@ export default function ExposureExploring() {
       >
         <SidebarPanel>
           <div className="p-3 bg-white border rounded">
-            <LoadingOverlay active={loading} />
             <Row>
               <Col sm="auto">
                 <Group>
@@ -451,6 +514,7 @@ export default function ExposureExploring() {
                   </Label>
                   <Check inline id="radioPublic" className="ml-4">
                     <Check.Input
+                      disabled={loading}
                       type="radio"
                       value="public"
                       checked={source == 'public'}
@@ -464,6 +528,7 @@ export default function ExposureExploring() {
                   </Check>
                   <Check inline id="radioUser">
                     <Check.Input
+                      disabled={loading}
                       type="radio"
                       value="user"
                       checked={source == 'user'}
@@ -482,6 +547,7 @@ export default function ExposureExploring() {
                   <Col>
                     <Group>
                       <Select
+                        disabled={loading}
                         id="tumorStudy"
                         label="Study"
                         value={study}
@@ -495,6 +561,7 @@ export default function ExposureExploring() {
                   <Col>
                     <Group>
                       <Select
+                        disabled={loading}
                         id="tumorStrategy"
                         label="Experimental Strategy"
                         value={strategy}
@@ -510,6 +577,7 @@ export default function ExposureExploring() {
                   <Col>
                     <Group>
                       <Select
+                        disabled={loading}
                         id="prevalenceCancerType"
                         label="Cancer Type"
                         value={cancer}
@@ -527,6 +595,7 @@ export default function ExposureExploring() {
                   <Col>
                     <Group>
                       <Select
+                        disabled={loading}
                         id="tumorSet"
                         label="Reference Signature Set"
                         value={refSignatureSet}
@@ -538,8 +607,15 @@ export default function ExposureExploring() {
                 </Row>
                 <Row>
                   <Col>
-                    <Group>
-                      <Button variant="primary" onClick={() => calculateAll()}>
+                    <Group className="d-flex">
+                      <Button variant="secondary" onClick={() => handleReset()}>
+                        Reset
+                      </Button>
+                      <Button
+                        className="ml-auto"
+                        variant="primary"
+                        onClick={() => calculateAll()}
+                      >
                         Calculate
                       </Button>
                     </Group>
@@ -553,6 +629,7 @@ export default function ExposureExploring() {
                     <Group>
                       <Label>Upload Exposure File</Label>
                       <Form.File
+                        disabled={loading}
                         id="variableData"
                         label={exposureFileObj.name || 'Exposure File'}
                         accept=".txt"
@@ -577,6 +654,7 @@ export default function ExposureExploring() {
                     <Group>
                       <Label>Upload Matrix File</Label>
                       <Form.File
+                        disabled={loading}
                         id="variableData"
                         label={matrixFileObj.name || 'Matrix File'}
                         accept=".txt"
@@ -602,6 +680,7 @@ export default function ExposureExploring() {
                       <Label className="mr-4">Use Public Signature Data</Label>
                       <Check inline id="toggleSignatureSource">
                         <Check.Input
+                          disabled={loading}
                           type="checkbox"
                           value={usePublicSignature}
                           checked={usePublicSignature}
@@ -621,6 +700,7 @@ export default function ExposureExploring() {
                     <Group>
                       {usePublicSignature ? (
                         <Select
+                          disabled={loading}
                           id="exposureSignatureSet"
                           label="Reference Signature Set"
                           value={refSignatureSet}
@@ -631,6 +711,7 @@ export default function ExposureExploring() {
                         <div>
                           <Label>Upload Signature Data</Label>
                           <Form.File
+                            disabled={loading}
                             id="variableData"
                             label={signatureFileObj.name || 'Signature File'}
                             accept=".txt"
@@ -656,6 +737,7 @@ export default function ExposureExploring() {
                   <Col>
                     <Group>
                       <Select
+                        disabled={loading}
                         id="exposureGenome"
                         label="Genome"
                         value={genome}
@@ -669,8 +751,16 @@ export default function ExposureExploring() {
                 </Row>
                 <Row>
                   <Col>
-                    <Group>
-                      <Button variant="primary" onClick={() => calculateAll()}>
+                    <Group className="d-flex">
+                      <Button variant="secondary" onClick={() => handleReset()}>
+                        Reset
+                      </Button>
+                      <Button
+                        disabled={loading}
+                        className="ml-auto"
+                        variant="primary"
+                        onClick={() => calculateAll()}
+                      >
                         Calculate
                       </Button>
                     </Group>
@@ -681,6 +771,7 @@ export default function ExposureExploring() {
           </div>
         </SidebarPanel>
         <MainPanel>
+          <LoadingOverlay active={loading} />
           {sections.map(({ component, id, title }) => {
             return (
               <Accordion activeKey={exposureAccordion[id]} key={id}>

@@ -275,6 +275,7 @@ export const getInitialState = () => ({
     refSignatureSet: '',
     refSignatureSetOptions: [],
     signatureNameOptions: [],
+    userNameOptions: [],
     genome: 'GRCh37',
     genomeOptions: ['GRCh37', 'GRCh38', 'mm10'],
     exposureFile: '',
