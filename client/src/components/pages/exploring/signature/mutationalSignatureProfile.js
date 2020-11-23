@@ -419,7 +419,7 @@ export default function MutationalSignatureProfile({ submitR }) {
             />
           </Col>
           <Col sm="1" className="m-auto">
-            <Button variant="secondary" onClick={() => removePlots(index)}>
+            <Button variant="secondary" onClick={() => removePlots(index)} title="Remove Plot">
               -
             </Button>
           </Col>
@@ -516,7 +516,7 @@ export default function MutationalSignatureProfile({ submitR }) {
       {additionalControls()}
       <Row>
         <Col sm="1">
-          <Button variant="secondary" onClick={() => addPlots()}>
+          <Button variant="secondary" onClick={() => addPlots()} title="Add Plot">
             +
           </Button>
         </Col>
