@@ -41,7 +41,7 @@ export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
   };
 
   return (
-    <div>
+    <div className="my-3">
       <LoadingOverlay active={loading} />
       <div className="d-flex align-items-end">
         <span>{plotName.slice(0, -4)}</span>
