@@ -368,12 +368,25 @@ export default function ExposureExploring({ populateControls }) {
       ),
     ];
 
+    const refSignatureSetOptions = [
+      ...new Set(
+        publicDataOptions
+          .filter((row) => row.Study == study)
+          .map((row) => row.Signature_set_name)
+      ),
+    ];
+    const refSignatureSet = refSignatureSetOptions[0];
+
+    handleSet(refSignatureSet);
+
     dispatchExpExposure({
       study: study,
       strategy: strategyOptions[0],
       strategyOptions: strategyOptions,
       cancer: cancerOptions[0],
       cancerOptions: cancerOptions,
+      refSignatureSetOptions: refSignatureSetOptions,
+      refSignatureSet: refSignatureSet,
     });
   }
 
@@ -548,7 +561,7 @@ export default function ExposureExploring({ populateControls }) {
                     <Group>
                       <Select
                         disabled={loading}
-                        id="tumorStudy"
+                        id="expStudyPublic"
                         label="Study"
                         value={study}
                         options={studyOptions}
@@ -596,7 +609,7 @@ export default function ExposureExploring({ populateControls }) {
                     <Group>
                       <Select
                         disabled={loading}
-                        id="tumorSet"
+                        id="expSetPublic"
                         label="Reference Signature Set"
                         value={refSignatureSet}
                         options={refSignatureSetOptions}
@@ -695,19 +708,41 @@ export default function ExposureExploring({ populateControls }) {
                   </Col>
                 </Row>
 
-                <Row>
-                  <Col>
-                    <Group>
-                      {usePublicSignature ? (
-                        <Select
-                          disabled={loading}
-                          id="exposureSignatureSet"
-                          label="Reference Signature Set"
-                          value={refSignatureSet}
-                          options={refSignatureSetOptions}
-                          onChange={handleSet}
-                        />
-                      ) : (
+                {usePublicSignature ? (
+                  <div>
+                    <Row>
+                      <Col>
+                        <Group>
+                          <Select
+                            disabled={loading}
+                            id="expStudyUser"
+                            label="Study"
+                            value={study}
+                            options={studyOptions}
+                            onChange={handleStudy}
+                          />
+                        </Group>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col>
+                        <Group>
+                          <Select
+                            disabled={loading}
+                            id="exposureSignatureSet"
+                            label="Reference Signature Set"
+                            value={refSignatureSet}
+                            options={refSignatureSetOptions}
+                            onChange={handleSet}
+                          />{' '}
+                        </Group>
+                      </Col>
+                    </Row>
+                  </div>
+                ) : (
+                  <Row>
+                    <Col>
+                      <Group>
                         <div>
                           <Label>Upload Signature Data</Label>
                           <Form.File
@@ -729,10 +764,10 @@ export default function ExposureExploring({ populateControls }) {
                             </span>
                           )}
                         </div>
-                      )}
-                    </Group>
-                  </Col>
-                </Row>
+                      </Group>
+                    </Col>
+                  </Row>
+                )}
                 <Row>
                   <Col>
                     <Group>

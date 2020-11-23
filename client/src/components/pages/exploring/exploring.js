@@ -57,7 +57,11 @@ export default function Explore() {
         ),
       ];
       const refSignatureSetOptions = [
-        ...new Set(signatureData.map((row) => row.Signature_set_name)),
+        ...new Set(
+          exposureData
+            .filter((row) => row.Study == study)
+            .map((row) => row.Signature_set_name)
+        ),
       ];
       const refSignatureSet = refSignatureSetOptions[0];
       const signatureNameOptions = [
