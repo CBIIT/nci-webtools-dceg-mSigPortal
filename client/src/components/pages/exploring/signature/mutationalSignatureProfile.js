@@ -418,10 +418,18 @@ export default function MutationalSignatureProfile({ submitR }) {
               }}
             />
           </Col>
-          <Col sm="1" className="m-auto">
-            <Button variant="secondary" onClick={() => removePlots(index)} title="Remove Plot">
+          <Col sm="1" className="m-auto d-flex">
+            <Button
+              variant="secondary"
+              onClick={() => removePlots(index)}
+              title="Remove Plot"
+              style={{ width: '2.25rem' }}
+            >
               -
             </Button>
+            <span className="mx-auto align-botto">
+              Plot {parseInt(index) + 1}
+            </span>
           </Col>
         </Row>
       );
@@ -439,6 +447,9 @@ export default function MutationalSignatureProfile({ submitR }) {
           </div>
           {plots[index].plotURL && (
             <div style={{ display: plots[index].plotURL ? 'block' : 'none' }}>
+              <span className="font-weight-bold">
+                Plot {parseInt(index) + 1}
+              </span>
               <Plot
                 plotName={plots[index].plotPath.split('/').slice(-1)[0]}
                 plotURL={plots[index].plotURL}
@@ -515,8 +526,13 @@ export default function MutationalSignatureProfile({ submitR }) {
       </Row>
       {additionalControls()}
       <Row>
-        <Col sm="1">
-          <Button variant="secondary" onClick={() => addPlots()} title="Add Plot">
+        <Col sm="1" className="ml-auto">
+          <Button
+            variant="secondary"
+            onClick={() => addPlots()}
+            title="Add Plot"
+            style={{ width: '2.25rem' }}
+          >
             +
           </Button>
         </Col>
