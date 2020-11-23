@@ -511,7 +511,7 @@ exposureUser <- function(fn, files, common, across = '{}', association = '{}', l
     }
     # Mutational signature burden across cancer types
     if ('all' %in% fn || 'across' %in% fn) {
-      mutationalSignatureBurdenAcrossCancer(burden$signatureName, genomesize, burdenAcrossPath, exposure_refdata_selected)
+      mutationalSignatureBurdenAcrossCancer(across$signatureName, genomesize, burdenAcrossPath, exposure_refdata_selected)
       output[['burdenAcrossPath']] = burdenAcrossPath
     }
     # Mutational Signature Association
