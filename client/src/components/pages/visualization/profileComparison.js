@@ -54,7 +54,9 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     refSignatureSet,
     refSignatureSetOptions,
     refSignatures,
+    filterSignatures,
     refCompare,
+    searchFilter,
     userProfileType,
     userSampleName,
     userMatrixSize,
@@ -88,14 +90,49 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     <Popover id="popover-basic">
       <Title as="h3">{refSignatureSet}</Title>
       <Content>
+        <Control
+          value={searchFilter}
+          placeholder="Search Signatures"
+          onChange={(e) => {
+            const search = e.target.value;
+            const signatures = refSignatures.filter(
+              (sig) => sig.toLowerCase().indexOf(search.toLowerCase()) > -1
+            );
+            console.log(signatures);
+            dispatchProfileComparison({
+              searchFilter: search,
+              filterSignatures: signatures,
+            });
+          }}
+        />
         {refSignatures.length > 0 ? (
-          <ul>
-            {refSignatures.map((signature) => (
-              <li key={signature}>{signature}</li>
+          <div>
+            {filterSignatures.map((signature) => (
+              <Button
+                key={signature}
+                variant="link"
+                onClick={() => {
+                  console.log('click');
+                  let ref = refCompare;
+                  if (ref.length) {
+                    console.log('if');
+                    dispatchProfileComparison({
+                      refCompare: (ref += `;1*${signature}`),
+                    });
+                  } else {
+                    console.log('else');
+                    dispatchProfileComparison({
+                      refCompare: signature,
+                    });
+                  }
+                }}
+              >
+                {signature}
+              </Button>
             ))}
-          </ul>
+          </div>
         ) : (
-          <p>No Signature Available</p>
+          <p>No Signatures Available</p>
         )}
       </Content>
     </Popover>
@@ -220,6 +257,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
 
           dispatchProfileComparison({
             refSignatures: signatures,
+            filterSignatures: signatures,
             refCompare: signatures[0],
             refSubmitOverlay: false,
           });
@@ -601,7 +639,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                               refCompare: e.target.value,
                             });
                           }}
-                        ></Control>
+                        />
                         <Text className="text-muted">
                           (Ex. 0.8*SBS5;0.1*SBS1)
                         </Text>
