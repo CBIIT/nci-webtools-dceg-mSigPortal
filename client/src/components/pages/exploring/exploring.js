@@ -222,31 +222,6 @@ export default function Explore() {
 
   return (
     <div className="px-0">
-      <div
-        className="bg-white border border-top-0 mx-auto"
-        style={{ width: 'max-content' }}
-      >
-        <Nav defaultActiveKey="summary">
-          {links.map(({ name, pathId }) => (
-            <div key={pathId} className="d-inline-block">
-              <NavLink
-                className="secondary-navlinks px-3 py-1 d-inline-block"
-                activeClassName="active-secondary-navlinks"
-                style={{
-                  textDecoration: 'none',
-                  fontSize: '11pt',
-                  color: 'black',
-                  fontWeight: '500',
-                }}
-                exact={true}
-                to={`/exploring/${pathId}`}
-              >
-                {name}
-              </NavLink>
-            </div>
-          ))}
-        </Nav>
-      </div>
       <div className="mx-3">
         <div className="mx-3 my-3">
           <Route

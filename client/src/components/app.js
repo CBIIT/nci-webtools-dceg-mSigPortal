@@ -40,6 +40,12 @@ export default function App() {
       navIndex: 1,
       color: '#2c71dd', // blue
       examples: [],
+      dropdown: [
+        { name: 'Etiology', path: 'etiology' },
+        { name: 'Signature', path: 'signature' },
+        { name: 'Exposure', path: 'exposure' },
+        { name: 'Download', path: 'download' },
+      ],
     },
     {
       route: '/refitting',

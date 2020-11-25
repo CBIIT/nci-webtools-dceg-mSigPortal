@@ -47,8 +47,6 @@ RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerPlotting#egg=SigPr
 
 RUN python3.6 -c "from SigProfilerMatrixGenerator import install as genInstall; genInstall.install('GRCh37', rsync=False, bash=True); genInstall.install('GRCh38', rsync=False, bash=True); genInstall.install('mm10', rsync=False, bash=True)"
 
-# RUN Rscript -e 'dotR <- file.path(Sys.getenv("HOME"), ".R"); if (!file.exists(dotR)) dir.create(dotR); M <- file.path(dotR, "Makevars"); if (!file.exists(M)) file.create(M); cat("\nCXX14FLAGS += -O3 -mtune=native -march x86_64 -ftemplate-depth-256in",file = M, sep = "\n", append = FALSE)'
+RUN R -e "Sys.setenv(MAKEFLAGS = '-j2'); install.packages('ggstatsplot', repos='https://cloud.r-project.org/')"
 
-RUN Rscript -e "Sys.setenv(MAKEFLAGS = '-j2'); install.packages(c('tidyverse', 'hrbrthemes', 'ggsci', 'ggrepel', 'ggdendro', 'scales', 'ggforce', 'svglite', 'cowplot', 'car', 'FactoMineR', 'factoextra', 'coop', 'ggridges', 'ggtext', 'ggpubr', 'entropy', 'janitor'), repos='https://cloud.r-project.org/')"
-
-RUN Rscript -e "Sys.setenv(MAKEFLAGS = '-j2'); install.packages('ggstatsplot', repos='https://cloud.r-project.org/')"
+RUN R -e "Sys.setenv(MAKEFLAGS = '-j2'); install.packages(c('tidyverse', 'hrbrthemes', 'ggsci', 'ggrepel', 'ggdendro', 'scales', 'ggforce', 'svglite', 'cowplot', 'car', 'FactoMineR', 'factoextra', 'coop', 'ggridges', 'ggtext', 'ggpubr', 'entropy', 'janitor'), repos='https://cloud.r-project.org/')"
