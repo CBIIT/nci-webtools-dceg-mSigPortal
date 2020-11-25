@@ -191,10 +191,11 @@ async function visualizeR(req, res, next) {
       dataPath: path.join(config.data.database),
     });
 
-    const { stdout, output } = JSON.parse(wrapper);
+    const { stdout, output, ...rest } = JSON.parse(wrapper);
     // logger.debug(stdout);
 
     res.json({
+      ...rest,
       debugR: stdout,
       output: getRelativePath(output),
     });
@@ -392,9 +393,10 @@ async function exploringR(req, res, next) {
       dataPath: path.join(config.data.database),
     });
 
-    const { stdout, output } = JSON.parse(wrapper);
+    const { stdout, output, ...rest } = JSON.parse(wrapper);
 
     res.json({
+      ...rest,
       debugR: stdout,
       output: getRelativePath(output),
       projectID: projectID,

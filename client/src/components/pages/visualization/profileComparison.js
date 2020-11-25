@@ -297,7 +297,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         dispatchProfileComparison({ debugR: err });
         handleOverlay(fn, false);
       } else {
-        const { debugR, output } = await response.json();
+        const { debugR, output, error } = await response.json();
 
         dispatchProfileComparison({ debugR: debugR });
         if (Object.keys(output).length) {
@@ -314,9 +314,9 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         } else {
           handleOverlay(fn, false);
           if (fn.includes('profileComparisonWithin')) {
-            dispatchProfileComparison({ withinPlotPath: '', withinErr: true });
+            dispatchProfileComparison({ withinPlotPath: '', withinErr: error });
           } else if (fn.includes('profileComparisonRefSig')) {
-            dispatchProfileComparison({ refPlotPath: '', refErr: true });
+            dispatchProfileComparison({ refPlotPath: '', refErr: error });
           } else {
             dispatchProfileComparison({ pubPlotPath: '', pubErr: true });
           }
@@ -526,10 +526,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
 
                 <div id="pcWithinPlot">
                   <div style={{ display: withinErr ? 'block' : 'none' }}>
-                    <p>
-                      An error has occured. Check the debug section for more
-                      info.
-                    </p>
+                    <p>{withinErr}</p>
                   </div>
                   <div style={{ display: withinPlotURL ? 'block' : 'none' }}>
                     <Plot
@@ -682,10 +679,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
 
                   <div id="refPlotDownload">
                     <div style={{ display: refErr ? 'block' : 'none' }}>
-                      <p>
-                        An error has occured. Check the debug section for more
-                        info.
-                      </p>
+                      <p>{refErr}</p>
                     </div>
                     <div style={{ display: refPlotURL ? 'block' : 'none' }}>
                       <Plot

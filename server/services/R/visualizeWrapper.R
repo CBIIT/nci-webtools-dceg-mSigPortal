@@ -329,6 +329,7 @@ profileComparisonWithin <- function(profileType, sampleName1, sampleName2, matri
   tryCatch({
     output = list()
     plotPath = paste0(savePath, 'pro_com_within.svg')
+    error = ''
 
     matrix_size <- if_else(profileType == "SBS", "96", if_else(profileType == "DBS", "78", if_else(profileType == "ID", "83", NA_character_)))
 
@@ -339,6 +340,16 @@ profileComparisonWithin <- function(profileType, sampleName1, sampleName2, matri
 
     profile1 <- data_input %>% select(MutationType, one_of(sampleName1))
     profile2 <- data_input %>% select(MutationType, one_of(sampleName2))
+
+    if (dim(profile1)[1] != 2) {
+      error = paste0('Sample: ', sampleName1, ' has no Data. Try a different sample.')
+      stop(error)
+    }
+    if (dim(profil2)[1] != 2) {
+      error = paste0('Sample: ', sampleName2, ' has no Data. Try a different sample.')
+      stop(error)
+    }
+
     plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, output_plot = plotPath)
 
     output = list('plotPath' = plotPath)
@@ -347,7 +358,7 @@ profileComparisonWithin <- function(profileType, sampleName1, sampleName2, matri
   }, finally = {
     sink(con)
     sink(con)
-    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+    return(toJSON(list('stdout' = stdout, 'output' = output, 'error' = error), pretty = TRUE, auto_unbox = TRUE))
   })
 }
 
@@ -401,6 +412,7 @@ profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, c
   tryCatch({
     output = list()
     plotPath = paste0(savePath, 'pro_com_refsig.svg')
+    error = ''
 
     profile_name <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
     matrix_size <- if_else(profileType == "SBS", "96", if_else(profileType == "DBS", "78", if_else(profileType == "ID", "83", NA_character_)))
@@ -423,6 +435,12 @@ profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, c
     data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
     profile1 <- data_input %>% select(MutationType, one_of(sampleName))
+
+    if (dim(profile1)[1] != 2) {
+      error = paste0('Sample: ', sampleName, ' has no Data. Try a different sample.')
+      stop(error)
+    }
+
     profile_names = c(colnames(profile1)[2], colnames(profile2)[2])
     plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, profile_names = profile_names, output_plot = plotPath)
 
@@ -432,7 +450,7 @@ profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, c
   }, finally = {
     sink(con)
     sink(con)
-    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+    return(toJSON(list('stdout' = stdout, 'output' = output, 'error' = error), pretty = TRUE, auto_unbox = TRUE))
   })
 }
 
