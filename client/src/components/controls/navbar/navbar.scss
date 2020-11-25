@@ -4,6 +4,12 @@
   color: white;
 }
 
+a.nav-link.dropdown-toggle {
+  text-decoration: none !important;
+  font-weight: 700;
+  color: white;
+}
+
 .navlinks:hover {
   background-color: #fafafa;
   color: #2f2f2f;
@@ -22,7 +28,7 @@
   border-bottom: 7px solid #fc8701 !important;
 }
 
-.active-navlinks#Exploring {
+.active.nav-link#Exploring {
   background-color: #fafafa !important;
   color: #2f2f2f !important;
   border-bottom: 7px solid #2c71dd !important;
