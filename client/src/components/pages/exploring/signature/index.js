@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Accordion, Card } from 'react-bootstrap';
+import { Accordion, Card, Nav } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -66,39 +66,49 @@ export default function SignatureExploring() {
       title: 'Mutational Signatures Comparisons',
     },
   ];
+
   return (
-    <div className="position-relative">
-      {sections.map(({ component, id, title }) => {
-        return (
-          <Accordion activeKey={signatureAccordion[id]} key={id}>
-            <Card>
-              <Toggle
-                className="font-weight-bold"
-                as={Header}
-                eventKey={signatureAccordion[id]}
-                onClick={() =>
-                  dispatchExploring({
-                    signatureAccordion: {
-                      ...signatureAccordion,
-                      [id]: !signatureAccordion[id],
-                    },
-                  })
-                }
-              >
-                {signatureAccordion[id] == true ? (
-                  <FontAwesomeIcon icon={faMinus} />
-                ) : (
-                  <FontAwesomeIcon icon={faPlus} />
-                )}{' '}
-                {title}
-              </Toggle>
-              <Collapse eventKey={signatureAccordion[id]}>
-                <Body>{component}</Body>
-              </Collapse>
-            </Card>
-          </Accordion>
-        );
-      })}
-    </div>
+    <Card>
+      <Header>
+        <Nav variant="pills" defaultActiveKey="#exploring/signature">
+          <Nav.Item>
+            <Nav.Link href="#exploring/signature">Signature Exploring</Nav.Link>
+          </Nav.Item>
+        </Nav>
+      </Header>
+      <Body>
+        {sections.map(({ component, id, title }) => {
+          return (
+            <Accordion activeKey={signatureAccordion[id]} key={id}>
+              <Card>
+                <Toggle
+                  className="font-weight-bold"
+                  as={Header}
+                  eventKey={signatureAccordion[id]}
+                  onClick={() =>
+                    dispatchExploring({
+                      signatureAccordion: {
+                        ...signatureAccordion,
+                        [id]: !signatureAccordion[id],
+                      },
+                    })
+                  }
+                >
+                  {signatureAccordion[id] == true ? (
+                    <FontAwesomeIcon icon={faMinus} />
+                  ) : (
+                    <FontAwesomeIcon icon={faPlus} />
+                  )}{' '}
+                  {title}
+                </Toggle>
+                <Collapse eventKey={signatureAccordion[id]}>
+                  <Body>{component}</Body>
+                </Collapse>
+              </Card>
+            </Accordion>
+          );
+        })}
+      </Body>
+    </Card>
   );
 }

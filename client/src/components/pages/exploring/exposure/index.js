@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Row, Col, Accordion, Card, Button } from 'react-bootstrap';
+import { Form, Row, Col, Accordion, Card, Button, Nav } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -806,38 +806,51 @@ export default function ExposureExploring({ populateControls }) {
           </div>
         </SidebarPanel>
         <MainPanel>
-          <LoadingOverlay active={loading} />
-          {sections.map(({ component, id, title }) => {
-            return (
-              <Accordion activeKey={exposureAccordion[id]} key={id}>
-                <Card>
-                  <Toggle
-                    className="font-weight-bold"
-                    as={Header}
-                    eventKey={exposureAccordion[id]}
-                    onClick={() =>
-                      dispatchExploring({
-                        exposureAccordion: {
-                          ...exposureAccordion,
-                          [id]: !exposureAccordion[id],
-                        },
-                      })
-                    }
-                  >
-                    {exposureAccordion[id] == true ? (
-                      <FontAwesomeIcon icon={faMinus} />
-                    ) : (
-                      <FontAwesomeIcon icon={faPlus} />
-                    )}{' '}
-                    {title}
-                  </Toggle>
-                  <Collapse eventKey={exposureAccordion[id]}>
-                    <Body>{component}</Body>
-                  </Collapse>
-                </Card>
-              </Accordion>
-            );
-          })}
+          <Card>
+            <Header>
+              <Nav variant="pills" defaultActiveKey="#exploring/exposure">
+                <Nav.Item>
+                  <Nav.Link href="#exploring/exposure">
+                    Exposure Exploring
+                  </Nav.Link>
+                </Nav.Item>
+              </Nav>
+            </Header>
+            <Body>
+              <LoadingOverlay active={loading} />
+              {sections.map(({ component, id, title }) => {
+                return (
+                  <Accordion activeKey={exposureAccordion[id]} key={id}>
+                    <Card>
+                      <Toggle
+                        className="font-weight-bold"
+                        as={Header}
+                        eventKey={exposureAccordion[id]}
+                        onClick={() =>
+                          dispatchExploring({
+                            exposureAccordion: {
+                              ...exposureAccordion,
+                              [id]: !exposureAccordion[id],
+                            },
+                          })
+                        }
+                      >
+                        {exposureAccordion[id] == true ? (
+                          <FontAwesomeIcon icon={faMinus} />
+                        ) : (
+                          <FontAwesomeIcon icon={faPlus} />
+                        )}{' '}
+                        {title}
+                      </Toggle>
+                      <Collapse eventKey={exposureAccordion[id]}>
+                        <Body>{component}</Body>
+                      </Collapse>
+                    </Card>
+                  </Accordion>
+                );
+              })}
+            </Body>
+          </Card>
         </MainPanel>
       </SidebarContainer>
     </div>

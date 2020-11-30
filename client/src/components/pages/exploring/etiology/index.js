@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Row, Col, Accordion, Card, Button } from 'react-bootstrap';
+import { Form, Row, Col, Accordion, Card, Button, Nav } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -74,8 +74,17 @@ export default function EtiologyExploring() {
   ];
 
   return (
-    <div className="position-relative">
-      <h4>TBA</h4>
-    </div>
+    <Card>
+      <Header>
+        <Nav variant="pills" defaultActiveKey="#exploring/etiology">
+          <Nav.Item>
+            <Nav.Link href="#exploring/etiology">Etiology Exploring</Nav.Link>
+          </Nav.Item>
+        </Nav>
+      </Header>
+      <Body>
+        <h4>TBA</h4>
+      </Body>
+    </Card>
   );
 }

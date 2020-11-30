@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
-import { Nav } from 'react-bootstrap';
-import { Route, NavLink, Redirect } from 'react-router-dom';
+import { Route, Redirect } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import SignatureExploring from './signature';
 import ExposureExploring from './exposure';
@@ -213,12 +212,12 @@ export default function Explore() {
     });
   }
 
-  const links = [
-    { name: 'Etiology', pathId: 'etiology' },
-    { name: 'Signature', pathId: 'signature' },
-    { name: 'Exposure', pathId: 'exposure' },
-    { name: 'Download', pathId: 'download' },
-  ];
+  // const links = [
+  //   { name: 'Etiology', pathId: 'etiology' },
+  //   { name: 'Signature', pathId: 'signature' },
+  //   { name: 'Exposure', pathId: 'exposure' },
+  //   { name: 'Download', pathId: 'download' },
+  // ];
 
   return (
     <div className="px-0">
