@@ -621,7 +621,11 @@ export default function ExposureExploring({ populateControls }) {
                 <Row>
                   <Col>
                     <Group className="d-flex">
-                      <Button variant="secondary" onClick={() => handleReset()}>
+                      <Button
+                        disabled={loading}
+                        variant="secondary"
+                        onClick={() => handleReset()}
+                      >
                         Reset
                       </Button>
                       <Button
