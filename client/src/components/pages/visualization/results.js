@@ -17,7 +17,7 @@ import MutationalPattern from './mutationalPattern';
 import ProfileComparison from './profileComparison';
 import PCA from './pca';
 import Download from './download';
-import plot from '../../controls/plot/plot';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const { Header, Body } = Card;
 const { Item, Link } = Nav;
@@ -26,7 +26,7 @@ export default function Results({ setOpenSidebar }) {
   const { error, projectID, displayTab, svgList, matrixList } = useSelector(
     (state) => state.visualizeResults
   );
-  const { source } = useSelector((state) => state.visualize);
+  const { source, loading } = useSelector((state) => state.visualize);
   const mutationalProfiles = useSelector((state) => state.mutationalProfiles);
   const { signatureSetOptions } = useSelector((state) => state.pca);
 
@@ -336,99 +336,111 @@ export default function Results({ setOpenSidebar }) {
     { title: 'Download', id: 'download' },
   ];
 
-  return error.length ? (
-    <h4 className="text-danger">{error}</h4>
-  ) : mutationalProfiles.filtered.length ? (
-    <Card>
-      <Header>
-        <Nav variant="pills" defaultActiveKey="#mutationalProfiles">
-          {links.map(({ title, id }) => {
-            return (
-              <Item key={id}>
-                <Link
-                  active={displayTab == id}
-                  onClick={() => dispatchVisualizeResults({ displayTab: id })}
-                >
-                  {title}
-                </Link>
-              </Item>
-            );
-          })}
-        </Nav>
-      </Header>
-      <Body
-        style={{
-          display: displayTab == 'profilerSummary' ? 'block' : 'none',
-          minHeight: '420px',
-        }}
-      >
-        <ProfilerSummary submitR={(fn, args) => submitR(fn, args)} />
-      </Body>
-      <Body
-        style={{
-          display: displayTab == 'mutationalProfiles' ? 'block' : 'none',
-          minHeight: '420px',
-        }}
-      >
-        <MutationalProfiles />
-      </Body>
-      <Body
-        style={{
-          display: displayTab == 'cosineSimilarity' ? 'block' : 'none',
-          minHeight: '420px',
-        }}
-      >
-        <CosineSimilarity
-          getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
-          submitR={(fn, args) => submitR(fn, args)}
-        />
-      </Body>
-      <Body
-        style={{
-          display: displayTab == 'mutationalPattern' ? 'block' : 'none',
-          minHeight: '420px',
-        }}
-      >
-        <MutationalPattern submitR={(fn, args) => submitR(fn, args)} />
-      </Body>
+  return (
+    <div>
+      <LoadingOverlay
+        active={loading.active}
+        content={loading.content}
+        showIndicator={loading.showIndicator}
+      />
+      {error.length ? (
+        <h4 className="text-danger">{error}</h4>
+      ) : mutationalProfiles.filtered.length ? (
+        <Card>
+          <Header>
+            <Nav variant="pills" defaultActiveKey="#mutationalProfiles">
+              {links.map(({ title, id }) => {
+                return (
+                  <Item key={id}>
+                    <Link
+                      active={displayTab == id}
+                      onClick={() =>
+                        dispatchVisualizeResults({ displayTab: id })
+                      }
+                    >
+                      {title}
+                    </Link>
+                  </Item>
+                );
+              })}
+            </Nav>
+          </Header>
+          <Body
+            style={{
+              display: displayTab == 'profilerSummary' ? 'block' : 'none',
+              minHeight: '420px',
+            }}
+          >
+            <ProfilerSummary submitR={(fn, args) => submitR(fn, args)} />
+          </Body>
+          <Body
+            style={{
+              display: displayTab == 'mutationalProfiles' ? 'block' : 'none',
+              minHeight: '420px',
+            }}
+          >
+            <MutationalProfiles />
+          </Body>
+          <Body
+            style={{
+              display: displayTab == 'cosineSimilarity' ? 'block' : 'none',
+              minHeight: '420px',
+            }}
+          >
+            <CosineSimilarity
+              getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
+              submitR={(fn, args) => submitR(fn, args)}
+            />
+          </Body>
+          <Body
+            style={{
+              display: displayTab == 'mutationalPattern' ? 'block' : 'none',
+              minHeight: '420px',
+            }}
+          >
+            <MutationalPattern submitR={(fn, args) => submitR(fn, args)} />
+          </Body>
 
-      <Body
-        style={{
-          display: displayTab == 'profileComparison' ? 'block' : 'none',
-          minHeight: '420px',
-        }}
-      >
-        <ProfileComparison
-          getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
-          submitR={(fn, args) => submitR(fn, args)}
-        />
-      </Body>
-      <Body
-        style={{
-          display: displayTab == 'pca' ? 'block' : 'none',
-          minHeight: '420px',
-        }}
-      >
-        <PCA
-          getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
-          submitR={(fn, args) => submitR(fn, args)}
-        />
-      </Body>
-      <Body
-        style={{
-          display: displayTab == 'download' ? 'block' : 'none',
-          minHeight: '420px',
-        }}
-      >
-        <Download />
-      </Body>
-    </Card>
-  ) : (
-    <div className="border rounded bg-white" style={{ minHeight: '420px' }}>
-      <div className="p-3 ">
-        <h2>Instructions</h2>
-        <p>Upload Sample Variants and specify parameters</p>
-      </div>
+          <Body
+            style={{
+              display: displayTab == 'profileComparison' ? 'block' : 'none',
+              minHeight: '420px',
+            }}
+          >
+            <ProfileComparison
+              getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
+              submitR={(fn, args) => submitR(fn, args)}
+            />
+          </Body>
+          <Body
+            style={{
+              display: displayTab == 'pca' ? 'block' : 'none',
+              minHeight: '420px',
+            }}
+          >
+            <PCA
+              getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
+              submitR={(fn, args) => submitR(fn, args)}
+            />
+          </Body>
+          <Body
+            style={{
+              display: displayTab == 'download' ? 'block' : 'none',
+              minHeight: '420px',
+            }}
+          >
+            <Download />
+          </Body>
+        </Card>
+      ) : (
+        <div
+          className="border rounded bg-white p-3"
+          style={{ minHeight: '420px' }}
+        >
+          <h2>Instructions</h2>
+          <p>Upload Sample Variants and specify parameters</p>
+        </div>
+      )}
     </div>
   );
 }

@@ -148,11 +148,6 @@ export default function Visualize({ match }) {
           <hr className="d-lg-none" style={{ opacity: 0 }}></hr>
         </SidebarPanel>
         <MainPanel>
-          <LoadingOverlay
-            active={loading.active}
-            content={loading.content}
-            showIndicator={loading.showIndicator}
-          />
           <Results setOpenSidebar={(e) => setOpenSidebar(e)} />
         </MainPanel>
       </SidebarContainer>
