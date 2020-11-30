@@ -34,6 +34,11 @@ a.nav-link.dropdown-toggle {
   border-bottom: 7px solid #2c71dd !important;
 }
 
+div.dropdown-menu > a.dropdown-item.active-navlinks {
+  background-color: #2c71dd !important;
+  color: #fafafa !important;
+}
+
 .active-navlinks#Refitting {
   background-color: #fafafa !important;
   color: #2f2f2f !important;
