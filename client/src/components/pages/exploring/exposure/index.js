@@ -625,6 +625,7 @@ export default function ExposureExploring({ populateControls }) {
                         Reset
                       </Button>
                       <Button
+                        disabled={loading}
                         className="ml-auto"
                         variant="primary"
                         onClick={() => calculateAll()}
