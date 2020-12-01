@@ -122,6 +122,9 @@ export default function UploadForm() {
             state: { ...state, submitted: true },
           }),
         });
+
+        dispatchVisualize({ loading: { active: false } });
+
         if (response.ok) {
           // placeholder alert with error modal
           dispatchSuccess(
@@ -136,8 +139,8 @@ export default function UploadForm() {
         }
       } catch (err) {
         dispatchError(err);
+        dispatchVisualize({ loading: { active: false } });
       }
-      dispatchVisualize({ loading: { active: false } });
     } else {
       dispatchVisualize({
         loading: {
@@ -156,9 +159,11 @@ export default function UploadForm() {
           body: JSON.stringify(args),
         });
 
+        dispatchVisualize({ loading: { active: false } });
+
         if (response.ok) {
           const results = await response.json();
-          dispatchVisualize({ loading: { active: false } });
+
           dispatchVisualizeResults({
             projectID: projectID,
             svgList: results.svgList,
