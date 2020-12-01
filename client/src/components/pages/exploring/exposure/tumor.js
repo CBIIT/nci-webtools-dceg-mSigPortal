@@ -39,6 +39,7 @@ export default function Tumor() {
 
   return (
     <div>
+      {!err && !plotURL && <p>Please calculate using the left side panel.</p>}
       {err && (
         <p>An error has occured. Check the debug section for more info.</p>
       )}
