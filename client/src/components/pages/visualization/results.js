@@ -344,7 +344,12 @@ export default function Results({ setOpenSidebar }) {
         showIndicator={loading.showIndicator}
       />
       {error.length ? (
-        <h4 className="text-danger">{error}</h4>
+        <div
+          className="border rounded bg-white p-3"
+          style={{ minHeight: '420px' }}
+        >
+          <h4 className="text-danger">{error}</h4>
+        </div>
       ) : mutationalProfiles.filtered.length ? (
         <Card>
           <Header>
