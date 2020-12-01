@@ -91,6 +91,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       <Title as="h3">{refSignatureSet}</Title>
       <Content>
         <Control
+          id="searchSignatures"
           value={searchFilter}
           placeholder="Search Signatures"
           onChange={(e) => {
@@ -115,12 +116,10 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   console.log('click');
                   let ref = refCompare;
                   if (ref.length) {
-                    console.log('if');
                     dispatchProfileComparison({
                       refCompare: (ref += `;1*${signature}`),
                     });
                   } else {
-                    console.log('else');
                     dispatchProfileComparison({
                       refCompare: signature,
                     });
