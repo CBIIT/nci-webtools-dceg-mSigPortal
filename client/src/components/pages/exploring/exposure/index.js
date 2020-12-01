@@ -298,8 +298,7 @@ export default function ExposureExploring({ populateControls }) {
           debugR: debugR,
           err: false,
         });
-      else if (fn == 'all' || fn == 'across')
-        dispatchExpSeparated({ err: true, debugR: debugR });
+      else if (fn == 'all') dispatchExpSeparated({ err: true, debugR: debugR });
 
       if (output.burdenAcrossPath)
         dispatchExpAcross({
