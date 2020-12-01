@@ -618,24 +618,25 @@ export default function ExposureExploring({ populateControls }) {
                   </Col>
                 </Row>
                 <Row>
-                  <Col>
-                    <Group className="d-flex">
-                      <Button
-                        disabled={loading}
-                        variant="secondary"
-                        onClick={() => handleReset()}
-                      >
-                        Reset
-                      </Button>
-                      <Button
-                        disabled={loading}
-                        className="ml-auto"
-                        variant="primary"
-                        onClick={() => calculateAll()}
-                      >
-                        Calculate
-                      </Button>
-                    </Group>
+                  <Col sm="6">
+                    <Button
+                      disabled={loading}
+                      className="w-100"
+                      variant="secondary"
+                      onClick={() => handleReset()}
+                    >
+                      Reset
+                    </Button>
+                  </Col>
+                  <Col sm="6">
+                    <Button
+                      disabled={loading}
+                      className="w-100"
+                      variant="primary"
+                      onClick={() => calculateAll()}
+                    >
+                      Calculate
+                    </Button>
                   </Col>
                 </Row>
               </div>
@@ -789,20 +790,25 @@ export default function ExposureExploring({ populateControls }) {
                   </Col>
                 </Row>
                 <Row>
-                  <Col>
-                    <Group className="d-flex">
-                      <Button variant="secondary" onClick={() => handleReset()}>
-                        Reset
-                      </Button>
-                      <Button
-                        disabled={loading}
-                        className="ml-auto"
-                        variant="primary"
-                        onClick={() => calculateAll()}
-                      >
-                        Calculate
-                      </Button>
-                    </Group>
+                  <Col sm="6">
+                    <Button
+                      disabled={loading}
+                      className="w-100"
+                      variant="secondary"
+                      onClick={() => handleReset()}
+                    >
+                      Reset
+                    </Button>
+                  </Col>
+                  <Col sm="6">
+                    <Button
+                      disabled={loading}
+                      className="w-100"
+                      variant="primary"
+                      onClick={() => calculateAll()}
+                    >
+                      Calculate
+                    </Button>
                   </Col>
                 </Row>
               </div>
