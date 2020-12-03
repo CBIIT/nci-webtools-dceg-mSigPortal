@@ -622,7 +622,7 @@ export default function ExposureExploring({ populateControls }) {
                         value={cancer}
                         options={cancerOptions}
                         onChange={(cancer) =>
-                          dispatchExpPrevalence({
+                          dispatchExpExposure({
                             cancer: cancer,
                           })
                         }
