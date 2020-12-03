@@ -44,6 +44,7 @@ export default function Decomposition() {
   return (
     <div>
       <LoadingOverlay active={loading} />
+      {!err && !plotURL && <p>Please calculate using the left side panel.</p>}
       {err && (
         <p>An error has occured. Check the debug section for more info.</p>
       )}
