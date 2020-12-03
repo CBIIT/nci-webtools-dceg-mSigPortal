@@ -617,7 +617,7 @@ mutationalPatternPublic <- function(study, cancerType, experimentalStrategy, pro
       publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
       seqmatrix_refdata <- get(load(paste0(dataPath, 'Seqmatrix/', publicDataFile))) %>% filter(Study == study)
     } else {
-      seqmatrix_refdata <- get(load(paste0(dataPath, 'Seqmatrix/', 'seqmatrix_refdata.Rdata'))) %>% filter(Study == study)
+      seqmatrix_refdata <- get(load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata.RData'))) %>% filter(Study == study)
     }
     data_input <- seqmatrix_refdata %>%
       filter(Profile == "SBS96") %>%
