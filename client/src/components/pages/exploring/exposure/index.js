@@ -389,6 +389,35 @@ export default function ExposureExploring({ populateControls }) {
     });
   }
 
+  function handleStrategy(strategy) {
+    const cancerOptions = [
+      ...new Set(
+        publicDataOptions
+          .filter((data) => data.Study == study && data.Dataset == strategy)
+          .map((data) => data.Cancer_Type)
+      ),
+    ];
+
+    const refSignatureSetOptions = [
+      ...new Set(
+        publicDataOptions
+          .filter((row) => row.Study == study && row.Dataset == strategy)
+          .map((row) => row.Signature_set_name)
+      ),
+    ];
+    const refSignatureSet = refSignatureSetOptions[0];
+
+    handleSet(refSignatureSet);
+
+    dispatchExpExposure({
+      strategy: strategy,
+      cancer: cancerOptions[0],
+      cancerOptions: cancerOptions,
+      refSignatureSetOptions: refSignatureSetOptions,
+      refSignatureSet: refSignatureSet,
+    });
+  }
+
   function handleSet(set) {
     const signatureNameOptions = [
       ...new Set(
@@ -578,9 +607,7 @@ export default function ExposureExploring({ populateControls }) {
                         label="Experimental Strategy"
                         value={strategy}
                         options={strategyOptions}
-                        onChange={(strategy) =>
-                          dispatchExpExposure({ strategy: strategy })
-                        }
+                        onChange={handleStrategy}
                       />
                     </Group>
                   </Col>
