@@ -730,6 +730,7 @@ export default function ExposureExploring({ populateControls }) {
                   <Col>
                     <Group>
                       <Select
+                        className="mb-4"
                         disabled={loading}
                         id="prevalenceCancerType"
                         label="Cancer Type"
