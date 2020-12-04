@@ -34,19 +34,9 @@ export default function Explore() {
       ]);
 
       setInitalRefSigData(signatureData);
-      const studyOptions = [...new Set(exposureData.map((data) => data.Study))];
-      // default study
-      const study = 'PCAWG';
 
-      const cancerOptions = [
-        ...new Set(
-          exposureData
-            .filter((data) => data.Study == study)
-            .map((data) => data.Cancer_Type)
-        ),
-      ];
-      // default cancer type
-      const cancer = 'Lung-AdenoCA';
+      const studyOptions = [...new Set(exposureData.map((data) => data.Study))];
+      const study = 'PCAWG'; // default
 
       const strategyOptions = [
         ...new Set(
@@ -55,14 +45,31 @@ export default function Explore() {
             .map((data) => data.Dataset)
         ),
       ];
+      const strategy = strategyOptions[0];
+
       const refSignatureSetOptions = [
         ...new Set(
           exposureData
-            .filter((row) => row.Study == study)
+            .filter((row) => row.Study == study && row.Dataset == strategy)
             .map((row) => row.Signature_set_name)
         ),
       ];
-      const refSignatureSet = 'COSMIC v3 Signatures (SBS)';
+      const refSignatureSet = 'COSMIC v3 Signatures (SBS)'; // default
+
+      const cancerOptions = [
+        ...new Set(
+          exposureData
+            .filter(
+              (data) =>
+                data.Study == study &&
+                data.Dataset == strategy &&
+                data.Signature_set_name == refSignatureSet
+            )
+            .map((data) => data.Cancer_Type)
+        ),
+      ];
+      const cancer = 'Lung-AdenoCA'; // default
+
       const signatureNameOptions = [
         ...new Set(
           signatureData
@@ -74,7 +81,7 @@ export default function Explore() {
       const params = {
         study: study,
         studyOptions: studyOptions,
-        strategy: strategyOptions[0],
+        strategy: strategy,
         strategyOptions: strategyOptions,
         cancer: cancer,
         cancerOptions: cancerOptions,

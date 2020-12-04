@@ -387,45 +387,7 @@ export default function ExposureExploring({ populateControls }) {
           .map((data) => data.Dataset)
       ),
     ];
-
-    const cancerOptions = [
-      ...new Set(
-        publicDataOptions
-          .filter((data) => data.Study == study)
-          .map((data) => data.Cancer_Type)
-      ),
-    ];
-
-    const refSignatureSetOptions = [
-      ...new Set(
-        publicDataOptions
-          .filter((row) => row.Study == study)
-          .map((row) => row.Signature_set_name)
-      ),
-    ];
-    const refSignatureSet = refSignatureSetOptions[0];
-
-    handleSet(refSignatureSet);
-
-    dispatchExpExposure({
-      study: study,
-      strategy: strategyOptions[0],
-      strategyOptions: strategyOptions,
-      cancer: cancerOptions[0],
-      cancerOptions: cancerOptions,
-      refSignatureSetOptions: refSignatureSetOptions,
-      refSignatureSet: refSignatureSet,
-    });
-  }
-
-  function handleStrategy(strategy) {
-    const cancerOptions = [
-      ...new Set(
-        publicDataOptions
-          .filter((data) => data.Study == study && data.Dataset == strategy)
-          .map((data) => data.Cancer_Type)
-      ),
-    ];
+    const strategy = strategyOptions[0];
 
     const refSignatureSetOptions = [
       ...new Set(
@@ -435,6 +397,55 @@ export default function ExposureExploring({ populateControls }) {
       ),
     ];
     const refSignatureSet = refSignatureSetOptions[0];
+
+    const cancerOptions = [
+      ...new Set(
+        publicDataOptions
+          .filter(
+            (data) =>
+              data.Study == study &&
+              data.Dataset == strategy &&
+              data.Signature_set_name == refSignatureSet
+          )
+          .map((data) => data.Cancer_Type)
+      ),
+    ];
+
+    handleSet(refSignatureSet);
+
+    dispatchExpExposure({
+      study: study,
+      strategy: strategy,
+      strategyOptions: strategyOptions,
+      cancer: cancerOptions[0],
+      cancerOptions: cancerOptions,
+      refSignatureSetOptions: refSignatureSetOptions,
+      refSignatureSet: refSignatureSet,
+    });
+  }
+
+  function handleStrategy(strategy) {
+    const refSignatureSetOptions = [
+      ...new Set(
+        publicDataOptions
+          .filter((row) => row.Study == study && row.Dataset == strategy)
+          .map((row) => row.Signature_set_name)
+      ),
+    ];
+    const refSignatureSet = refSignatureSetOptions[0];
+
+    const cancerOptions = [
+      ...new Set(
+        publicDataOptions
+          .filter(
+            (data) =>
+              data.Study == study &&
+              data.Dataset == strategy &&
+              data.Signature_set_name == refSignatureSet
+          )
+          .map((data) => data.Cancer_Type)
+      ),
+    ];
 
     handleSet(refSignatureSet);
 
@@ -455,9 +466,25 @@ export default function ExposureExploring({ populateControls }) {
           .map((row) => row.Signature_name)
       ),
     ];
+
+    const cancerOptions = [
+      ...new Set(
+        publicDataOptions
+          .filter(
+            (data) =>
+              data.Study == study &&
+              data.Dataset == strategy &&
+              data.Signature_set_name == set
+          )
+          .map((data) => data.Cancer_Type)
+      ),
+    ];
+
     dispatchExpExposure({
       refSignatureSet: set,
       signatureNameOptions: signatureNameOptions,
+      cancer: cancerOptions[0],
+      cancerOptions: cancerOptions,
     });
   }
 
@@ -690,15 +717,11 @@ export default function ExposureExploring({ populateControls }) {
                     <Group>
                       <Select
                         disabled={loading}
-                        id="prevalenceCancerType"
-                        label="Cancer Type"
-                        value={cancer}
-                        options={cancerOptions}
-                        onChange={(cancer) =>
-                          dispatchExpExposure({
-                            cancer: cancer,
-                          })
-                        }
+                        id="expSetPublic"
+                        label="Reference Signature Set"
+                        value={refSignatureSet}
+                        options={refSignatureSetOptions}
+                        onChange={handleSet}
                       />
                     </Group>
                   </Col>
@@ -708,11 +731,15 @@ export default function ExposureExploring({ populateControls }) {
                     <Group>
                       <Select
                         disabled={loading}
-                        id="expSetPublic"
-                        label="Reference Signature Set"
-                        value={refSignatureSet}
-                        options={refSignatureSetOptions}
-                        onChange={handleSet}
+                        id="prevalenceCancerType"
+                        label="Cancer Type"
+                        value={cancer}
+                        options={cancerOptions}
+                        onChange={(cancer) =>
+                          dispatchExpExposure({
+                            cancer: cancer,
+                          })
+                        }
                       />
                     </Group>
                   </Col>
