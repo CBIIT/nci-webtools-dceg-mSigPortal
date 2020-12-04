@@ -39,6 +39,11 @@ export default function ExposureExploring({ populateControls }) {
   const { exposureAccordion, publicDataOptions } = useSelector(
     (state) => state.exploring
   );
+  const { loading: loadingAcross } = useSelector((state) => state.expAcross);
+  const { loading: loadingAssociation } = useSelector((state) => state.expAssociation);
+  const { loading: loadingLandscape } = useSelector((state) => state.expLandscape);
+  const { loading: loadingPrevalence } = useSelector((state) => state.expPrevalence);
+
   const {
     study,
     studyOptions,
@@ -70,6 +75,8 @@ export default function ExposureExploring({ populateControls }) {
   const [exposureFileObj, setExposure] = useState(new File([], ''));
   const [matrixFileObj, setMatrix] = useState(new File([], ''));
   const [signatureFileObj, setSignature] = useState(new File([], ''));
+  const [variableFileObj, setVariable] = useState(new File([], ''));
+
   const [exposureValidity, setExposureValidity] = useState(false);
   const [matrixValidity, setMatrixValidity] = useState(false);
   const [signatureValidity, setSignatureValidity] = useState(false);
@@ -166,6 +173,13 @@ export default function ExposureExploring({ populateControls }) {
             dispatchError(error);
           }
         }
+      } else if (variableFileObj.size) {
+        try {
+          const id = await uploadVariable();
+          await handleCalculate('landscape', id);
+        } catch (error) {
+          dispatchError(error);
+        }
       } else {
         await handleCalculate('landscape');
       }
@@ -228,6 +242,13 @@ export default function ExposureExploring({ populateControls }) {
         } catch (error) {
           dispatchError(error);
         }
+      } else if (variableFileObj.size) {
+        try {
+          const id = await uploadVariable();
+          await handleCalculate('all', id);
+        } catch (error) {
+          dispatchError(error);
+        }
       } else {
         await handleCalculate('all');
       }
@@ -265,7 +286,7 @@ export default function ExposureExploring({ populateControls }) {
     }
     if (fn == 'all' || fn == 'landscape') {
       args.landscape = JSON.stringify({
-        varDataPath: landscapeArgs.varDataPath,
+        variableFile: landscapeArgs.variableFile,
       });
     }
     if (fn == 'all' || fn == 'prevalence') {
@@ -446,6 +467,8 @@ export default function ExposureExploring({ populateControls }) {
           data.append('matrixFile', matrixFileObj);
           if (!usePublicSignature)
             data.append('signatureFile', signatureFileObj);
+          if (variableFileObj.size)
+            data.append('variableFile', variableFileObj);
           let response = await fetch(`api/upload`, {
             method: 'POST',
             body: data,
@@ -458,6 +481,7 @@ export default function ExposureExploring({ populateControls }) {
           ${error ? `<p>${error}</p>` : ''} 
           </div>`;
             dispatchError(message);
+            reject(error);
           } else {
             const { projectID, exposurePath } = await response.json();
 
@@ -501,6 +525,42 @@ export default function ExposureExploring({ populateControls }) {
     populateControls();
   }
 
+  // when using public data and only need to upload a variable data file
+  async function uploadVariable() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const data = new FormData();
+        data.append('variableFile', variableFileObj);
+
+        let response = await fetch(`api/upload`, {
+          method: 'POST',
+          body: data,
+        });
+
+        if (!response.ok) {
+          const { msg, error } = await response.json();
+          const message = `<div>
+                            <p>${msg}</p>
+                            ${error ? `<p>${error}</p>` : ''} 
+                          </div>`;
+          dispatchError(message);
+          reject(error);
+        } else {
+          const { projectID } = await response.json();
+          resolve(projectID);
+        }
+      } catch (err) {
+        dispatchError(err);
+        reject(err);
+      }
+    });
+  }
+
+  function handleVariable(file) {
+    setVariable(file);
+    dispatchExpLandscape({ variableFile: file.name });
+  }
+
   const sections = [
     {
       component: <Tumor />,
@@ -528,7 +588,12 @@ export default function ExposureExploring({ populateControls }) {
       title: 'Mutational Signature Association',
     },
     {
-      component: <Landscape calculateLandscape={calculateLandscape} />,
+      component: (
+        <Landscape
+          calculateLandscape={calculateLandscape}
+          handleVariable={handleVariable}
+        />
+      ),
       id: 'landscape',
       title: 'Landscape of Mutational Signature Activity',
     },

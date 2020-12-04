@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
@@ -11,12 +11,16 @@ import Debug from '../../../controls/debug/debug';
 
 const { Label } = Form;
 
-export default function Landscape({ calculateLandscape }) {
-  const { plotPath, plotURL, txtPath, debugR, err, loading } = useSelector(
-    (state) => state.expLandscape
-  );
-
-  const [vdFile, setFile] = useState(new File([], ''));
+export default function Landscape({ calculateLandscape, handleVariable }) {
+  const {
+    variableFile,
+    plotPath,
+    plotURL,
+    txtPath,
+    debugR,
+    err,
+    loading,
+  } = useSelector((state) => state.expLandscape);
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
@@ -46,37 +50,6 @@ export default function Landscape({ calculateLandscape }) {
     }
   }
 
-  async function handleUpload() {
-    if (vdFile.size) {
-      dispatchExpLandscape({ loading: true });
-
-      try {
-        const data = new FormData();
-        data.append('inputFile', vdFile);
-        let response = await fetch(`api/upload`, {
-          method: 'POST',
-          body: data,
-        });
-
-        if (!response.ok) {
-          const { msg, error } = await response.json();
-          const message = `<div>
-          <p>${msg}</p>
-         ${error ? `<p>${error}</p>` : ''} 
-        </div>`;
-          dispatchError(message);
-        } else {
-          const { filePath } = await response.json();
-          dispatchExpLandscape({ varDataPath: filePath });
-        }
-      } catch (err) {
-        dispatchError(err);
-      }
-
-      dispatchExpLandscape({ loading: false });
-    }
-  }
-
   return (
     <div>
       <Form>
@@ -87,23 +60,25 @@ export default function Landscape({ calculateLandscape }) {
               <Label>Upload Variable Data</Label>
               <Form.File
                 id="variableData"
-                label={vdFile.name || 'Upload here'}
+                label={variableFile || 'Upload here (optional)'}
                 // accept=''
-                onChange={(e) => setFile(e.target.files[0])}
+                onChange={(e) => handleVariable(e.target.files[0])}
                 custom
               />
             </Col>
-            <Col sm="1" className="my-auto">
+            <Col sm="1" className="mt-auto">
               <Button
                 variant="secondary"
-                onClick={handleUpload}
-                disabled={!vdFile.size}
+                onClick={() => {
+                  handleVariable(new File([], ''));
+                }}
+                disabled={!variableFile}
               >
-                Upload
+                Remove
               </Button>
             </Col>
-            <Col sm="6" />
-            <Col sm="1" className="m-auto">
+            <Col sm="5" />
+            <Col sm="2" className="d-flex justify-content-end mt-auto">
               <Button variant="primary" onClick={calculateLandscape}>
                 Calculate
               </Button>

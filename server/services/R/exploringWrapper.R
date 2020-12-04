@@ -314,7 +314,7 @@ mutationalSignatureLandscape <- function(cancerType, varDataPath, plotPath, expo
 
   # parameter: Cancer Type, Vardata_input_file
   if (stringi::stri_length(varDataPath) > 0) {
-    vardata_input <- read_delim(vardata_input_file, delim = '\t', col_names = T)
+    vardata_input <- read_delim(varDataPath, delim = '\t', col_names = T)
 
     vardata1_input <- vardata_input %>% select(1:2)
     colnames(vardata1_input) <- c('Samples', 'Study')
@@ -430,7 +430,11 @@ exposurePublic <- function(fn, common, across = '{}', association = '{}', landsc
     # Landscape of Mutational Signature Activity
     if ('all' %in% fn | 'landscape' %in% fn) {
       print('Landscape of Mutational Signature Activity')
-      mutationalSignatureLandscape(common$cancerType, landscape$varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+      varDataPath = ''
+      if (stringi::stri_length(landscape$variableFile) > 0) {
+        varDataPath = file.path(rootDir, landscape$variableFile)
+      }
+      mutationalSignatureLandscape(common$cancerType, varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
       output[['landscapePath']] = landscapePath
     }
     # Prevalence plot
@@ -539,7 +543,11 @@ exposureUser <- function(fn, files, common, across = '{}', association = '{}', l
     # Landscape of Mutational Signature Activity
     if ('all' %in% fn | 'landscape' %in% fn) {
       print('Landscape of Mutational Signature Activity')
-      mutationalSignatureLandscape(cancer_type_user, landscape$varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+      varDataPath = ''
+      if (stringi::stri_length(landscape$variableFile) > 0) {
+        varDataPath = file.path(rootDir, landscape$variableFile$signatureFile)
+      }
+      mutationalSignatureLandscape(cancer_type_user, varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
       output[['landscapePath']] = landscapePath
     }
     # Prevalence plot

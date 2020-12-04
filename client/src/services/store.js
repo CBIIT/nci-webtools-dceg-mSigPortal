@@ -330,7 +330,7 @@ export const getInitialState = () => ({
     loading: false,
   },
   expLandscape: {
-    varDataPath: '',
+    variableFile: '',
     plotPath: '',
     plotURL: '',
     txtPath: '',
