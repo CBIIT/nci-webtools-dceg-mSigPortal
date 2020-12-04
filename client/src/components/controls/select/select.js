@@ -1,9 +1,11 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
 import ReactSelect from 'react-select';
+
 const { Group, Label } = Form;
 
 export default function Select({
+  className,
   id,
   label,
   value,
@@ -21,7 +23,7 @@ export default function Select({
   };
 
   return (
-    <Group controlId={id}>
+    <Group controlId={id} className={className}>
       <Label>{label}</Label>
       <ReactSelect
         inputId={id}

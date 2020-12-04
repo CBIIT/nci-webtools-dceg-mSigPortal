@@ -330,6 +330,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                 <Row className="justify-content-center">
                   <Col sm="5">
                     <Select
+                      className="mb-0"
                       disabled={!multiSample}
                       id="pcaProfileType"
                       label="Profile Type"
@@ -346,6 +347,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
 
                   <Col sm="5">
                     <Select
+                      className="mb-0"
                       disabled={!multiSample}
                       id="pcaRefSet"
                       label="Reference Signature Set"
@@ -358,7 +360,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                       }}
                     />
                   </Col>
-                  <Col sm="1" className="m-auto">
+                  <Col sm="2" className="d-flex justify-content-end mt-auto">
                     <Button
                       disabled={!multiSample}
                       variant="primary"
@@ -480,6 +482,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                     <Row className="justify-content-center">
                       <Col sm="2">
                         <Select
+                          className="mb-0"
                           id="pcaPubProfile"
                           label="Profile Type"
                           value={userProfileType}
@@ -489,6 +492,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                       </Col>
                       <Col sm="2">
                         <Select
+                          className="mb-0"
                           id="pcaPubMatrixSize"
                           label="Matrix Size"
                           value={userMatrixSize}
@@ -500,6 +504,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                       </Col>
                       <Col sm="2">
                         <Select
+                          className="mb-0"
                           id="pcaPubStudy"
                           label="Study"
                           value={pubStudy}
@@ -509,6 +514,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                       </Col>
                       <Col sm="4">
                         <Select
+                          className="mb-0"
                           id="pcaPubCancerType"
                           label="Cancer Type"
                           value={pubCancerType}
@@ -516,7 +522,10 @@ export default function PCA({ submitR, getRefSigOptions }) {
                           onChange={handleCancerChange}
                         />
                       </Col>
-                      <Col sm="1" className="m-auto">
+                      <Col
+                        sm="2"
+                        className="d-flex justify-content-end mt-auto"
+                      >
                         <Button
                           variant="primary"
                           onClick={() =>

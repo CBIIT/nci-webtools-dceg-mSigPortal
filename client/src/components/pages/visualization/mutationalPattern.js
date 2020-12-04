@@ -171,9 +171,9 @@ export default function MutationalPattern({ submitR }) {
                 <Form>
                   <LoadingOverlay active={submitOverlay} />
                   <div>
-                    <Row className="justify-content-center">
+                    <Row className="">
                       <Col sm="5">
-                        <Group controlId="minimum">
+                        <Group controlId="minimum" className="mb-0">
                           <Label>
                             Minimal Proportion mutations within Each Mutational
                             Pattern
@@ -190,7 +190,7 @@ export default function MutationalPattern({ submitR }) {
                         </Group>
                       </Col>
                       <Col sm="5">
-                        <Group controlId="pattern">
+                        <Group controlId="pattern" className="mb-0">
                           <Label>Mutational Pattern</Label>
                           <Control
                             value={pattern}
@@ -203,8 +203,10 @@ export default function MutationalPattern({ submitR }) {
                           ></Control>
                         </Group>
                       </Col>
-
-                      <Col sm="1" className="m-auto">
+                      <Col
+                        sm="2"
+                        className="d-flex justify-content-end mt-auto"
+                      >
                         <Button
                           variant="primary"
                           onClick={() => {

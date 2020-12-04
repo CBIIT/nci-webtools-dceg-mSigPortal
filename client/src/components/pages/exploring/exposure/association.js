@@ -106,6 +106,7 @@ export default function Association({ calculateAssociation }) {
             </Col>
             <Col sm="2">
               <Select
+                className="mb-0"
                 id="associationSignatureName1"
                 label="Signature Name 1"
                 value={signatureName1}
@@ -119,6 +120,7 @@ export default function Association({ calculateAssociation }) {
             </Col>
             <Col sm="2">
               <Select
+                className="mb-0"
                 id="associationSignatureName2"
                 label="Signature Name 2"
                 value={signatureName2}
@@ -130,8 +132,8 @@ export default function Association({ calculateAssociation }) {
                 }
               />
             </Col>
-            <Col sm="3" />
-            <Col sm="1" className="my-auto">
+            <Col sm="2" />
+            <Col sm="2" className="d-flex justify-content-end mt-auto">
               <Button variant="primary" onClick={calculateAssociation}>
                 Calculate
               </Button>

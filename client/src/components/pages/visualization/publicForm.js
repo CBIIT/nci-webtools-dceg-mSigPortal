@@ -223,6 +223,7 @@ export default function PublicForm() {
     <Form>
       <LoadingOverlay active={loadingPublic} />
       <Select
+        className="mb-2"
         id="publicFormStudy"
         label="Study"
         disabled={submitted}
@@ -231,6 +232,7 @@ export default function PublicForm() {
         onChange={handleStudyChange}
       />
       <Select
+        className="mb-2"
         id="publicFromCancerType"
         label="Cancer Type"
         disabled={submitted}
@@ -239,6 +241,7 @@ export default function PublicForm() {
         onChange={handleCancerChange}
       />
       <Select
+        className="mb-4"
         id="publicFormStrategy"
         label="Experimental Strategy"
         disabled={submitted}

@@ -64,6 +64,7 @@ export default function Across({ calculateAcross }) {
           <Row className="justify-content-center">
             <Col sm="2">
               <Select
+                className="mb-0"
                 id="acrossSignatureName"
                 label="Signature Name"
                 value={signatureName}
@@ -73,8 +74,8 @@ export default function Across({ calculateAcross }) {
                 onChange={(name) => dispatchExpAcross({ signatureName: name })}
               />
             </Col>
-            <Col sm="9" />
-            <Col sm="1" className="my-auto">
+            <Col sm="8" />
+            <Col sm="2" className="d-flex justify-content-end mt-auto">
               <Button variant="primary" onClick={calculateAcross}>
                 Calculate
               </Button>

@@ -234,6 +234,7 @@ export default function MutationalProfiles() {
           <Row className="justify-content-center">
             <Col sm="3">
               <Select
+                className="mb-0"
                 id="mpSampleName"
                 label="Sample Name"
                 value={selectName}
@@ -243,6 +244,7 @@ export default function MutationalProfiles() {
             </Col>
             <Col sm="3">
               <Select
+                className="mb-0"
                 id="mpProfileType"
                 label="Profile Type"
                 value={selectProfile}
@@ -252,6 +254,7 @@ export default function MutationalProfiles() {
             </Col>
             <Col sm="3">
               <Select
+                className="mb-0"
                 id="mpMatrixSize"
                 label="Matrix Size"
                 value={selectMatrix}
@@ -261,6 +264,7 @@ export default function MutationalProfiles() {
             </Col>
             <Col sm="3">
               <Select
+                className="mb-0"
                 id="mpFilter"
                 label="Filter"
                 value={selectFilter}

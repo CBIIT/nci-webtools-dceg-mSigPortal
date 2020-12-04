@@ -66,8 +66,8 @@ export default function Tumor({ calculatePrevalence }) {
                 {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
               </Group>
             </Col>
-            <Col sm="7" />
-            <Col sm="1" className="m-auto">
+            <Col sm="6" />
+            <Col sm="2" className="d-flex justify-content-end mt-auto">
               <Button variant="primary" onClick={calculatePrevalence}>
                 Calculate
               </Button>

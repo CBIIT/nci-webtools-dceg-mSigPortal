@@ -40,9 +40,15 @@ export default function ExposureExploring({ populateControls }) {
     (state) => state.exploring
   );
   const { loading: loadingAcross } = useSelector((state) => state.expAcross);
-  const { loading: loadingAssociation } = useSelector((state) => state.expAssociation);
-  const { loading: loadingLandscape } = useSelector((state) => state.expLandscape);
-  const { loading: loadingPrevalence } = useSelector((state) => state.expPrevalence);
+  const { loading: loadingAssociation } = useSelector(
+    (state) => state.expAssociation
+  );
+  const { loading: loadingLandscape } = useSelector(
+    (state) => state.expLandscape
+  );
+  const { loading: loadingPrevalence } = useSelector(
+    (state) => state.expPrevalence
+  );
 
   const {
     study,

@@ -62,7 +62,7 @@ export default function Explore() {
             .map((row) => row.Signature_set_name)
         ),
       ];
-      const refSignatureSet = 'COSMIC v3 Signatures (SBS)'
+      const refSignatureSet = 'COSMIC v3 Signatures (SBS)';
       const signatureNameOptions = [
         ...new Set(
           signatureData

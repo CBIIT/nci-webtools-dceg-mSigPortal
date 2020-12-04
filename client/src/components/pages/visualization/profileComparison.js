@@ -444,6 +444,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 <Row className="justify-content-center">
                   <Col sm="1">
                     <Select
+                      className="mb-0"
                       disabled={sampleOptions.length < 2}
                       id="pcProfileTypeWithin"
                       label="Profile Type"
@@ -458,6 +459,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   </Col>
                   <Col sm="5">
                     <Select
+                      className="mb-0"
                       disabled={sampleOptions.length < 2}
                       id="pcSample1"
                       label="Sample Name 1"
@@ -472,6 +474,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   </Col>
                   <Col sm="5">
                     <Select
+                      className="mb-0"
                       disabled={sampleOptions.length < 2}
                       id="pcSample2"
                       label="Sample Name 2"
@@ -484,7 +487,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                       }}
                     />
                   </Col>
-                  <Col sm="1" className="m-auto">
+                  <Col sm="1" className="d-flex justify-content-end mt-auto">
                     <Button
                       disabled={sampleOptions.length < 2}
                       variant="primary"
@@ -567,6 +570,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   <Row className="justify-content-center">
                     <Col sm="1">
                       <Select
+                        className="mb-0"
                         id="pcProfileTypeRef"
                         label="Profile Type"
                         value={refProfileType}
@@ -581,6 +585,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                     </Col>
                     <Col sm="3">
                       <Select
+                        className="mb-0"
                         id="sampleNameRefSig"
                         label="Sample Name"
                         value={refSampleName}
@@ -594,6 +599,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                     </Col>
                     <Col sm="4">
                       <Select
+                        className="mb-0"
                         id="pcRefSet"
                         label="Reference Signature Set"
                         value={refSignatureSet}
@@ -607,7 +613,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                       />
                     </Col>
                     <Col sm="3">
-                      <Group controlId="signatureSet">
+                      <Group controlId="signatureSet" className="mb-0">
                         <Label>
                           Compare Signatures{' '}
                           <OverlayTrigger
@@ -641,7 +647,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                         </Text>
                       </Group>
                     </Col>
-                    <Col sm="1" className="m-auto">
+                    <Col sm="1" className="d-flex justify-content-end my-auto">
                       <Button
                         variant="primary"
                         onClick={() => {
@@ -722,6 +728,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                     <Row className="justify-content-center">
                       <Col sm="1">
                         <Select
+                          className="mb-0"
                           id="pcUserProfileType"
                           label="Profile Type"
                           value={userProfileType}
@@ -731,6 +738,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                       </Col>
                       <Col sm="1">
                         <Select
+                          className="mb-0"
                           id="pcUserMatrixSize"
                           label="Matrix Size"
                           value={userMatrixSize}
@@ -744,6 +752,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                       </Col>
                       <Col sm="2">
                         <Select
+                          className="mb-0"
                           id="pcUserSampleName"
                           label="Sample Name"
                           value={userSampleName}
@@ -757,6 +766,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                       </Col>
                       <Col sm="2">
                         <Select
+                          className="mb-0"
                           id="pcPubStudy"
                           label="Study"
                           value={pubStudy}
@@ -766,6 +776,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                       </Col>
                       <Col sm="2">
                         <Select
+                          className="mb-0"
                           id="pcPubCancerType"
                           label="Cancer Type"
                           value={pubCancerType}
@@ -775,6 +786,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                       </Col>
                       <Col sm="3">
                         <Select
+                          className="mb-0"
                           id="pcPubSampleName"
                           label="Public Sample Name"
                           value={pubSampleName}
@@ -786,7 +798,10 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                           }}
                         />
                       </Col>
-                      <Col sm="1" className="m-auto">
+                      <Col
+                        sm="1"
+                        className="d-flex justify-content-end mt-auto"
+                      >
                         <Button
                           variant="primary"
                           onClick={() =>

@@ -366,9 +366,10 @@ export default function MutationalSignatureProfile({ submitR }) {
     let controls = [];
     for (let index in plots) {
       controls.push(
-        <Row className="justify-content-center" key={'control' + index}>
+        <Row className="mt-3" key={'control' + index}>
           <Col sm="2">
             <Select
+              className="mb-0"
               id={`mspSource${index}`}
               label="Signature Source"
               value={plots[index].signatureSource}
@@ -378,6 +379,7 @@ export default function MutationalSignatureProfile({ submitR }) {
           </Col>
           <Col sm="2">
             <Select
+              className="mb-0"
               id={'mspProfileName' + index}
               label="Profile Name"
               value={plots[index].profileName}
@@ -387,6 +389,7 @@ export default function MutationalSignatureProfile({ submitR }) {
           </Col>
           <Col sm="3">
             <Select
+              className="mb-0"
               id={'mspSet' + index}
               label="Reference Signature Set"
               value={plots[index].refSignatureSet}
@@ -396,6 +399,7 @@ export default function MutationalSignatureProfile({ submitR }) {
           </Col>
           <Col sm="2">
             <Select
+              className="mb-0"
               id={'mspStrategy' + index}
               label="Experimental Strategy"
               value={plots[index].strategy}
@@ -405,6 +409,7 @@ export default function MutationalSignatureProfile({ submitR }) {
           </Col>
           <Col sm="2">
             <Select
+              className="mb-0"
               id={'mspSigName' + index}
               label="Signature Name"
               value={plots[index].signatureName}
@@ -418,7 +423,7 @@ export default function MutationalSignatureProfile({ submitR }) {
               }}
             />
           </Col>
-          <Col sm="1" className="m-auto d-flex">
+          <Col sm="1" className="d-flex justify-content-end mt-auto">
             <Button
               variant="secondary"
               onClick={() => removePlots(index)}
@@ -427,7 +432,7 @@ export default function MutationalSignatureProfile({ submitR }) {
             >
               -
             </Button>
-            <span className="mx-auto align-botto">
+            <span className="mx-auto align-bottom">
               Plot {parseInt(index) + 1}
             </span>
           </Col>
@@ -466,9 +471,10 @@ export default function MutationalSignatureProfile({ submitR }) {
   return (
     <div>
       <LoadingOverlay active={loading} />
-      <Row className="justify-content-center">
+      <Row className="">
         <Col sm="2">
           <Select
+            className="mb-0"
             id="mspSource"
             label="Signature Source"
             value={plots[0].signatureSource}
@@ -478,6 +484,7 @@ export default function MutationalSignatureProfile({ submitR }) {
         </Col>
         <Col sm="2">
           <Select
+            className="mb-0"
             id="mspProfileName"
             label="Profile Name"
             value={plots[0].profileName}
@@ -487,6 +494,7 @@ export default function MutationalSignatureProfile({ submitR }) {
         </Col>
         <Col sm="3">
           <Select
+            className="mb-0"
             id="mspSet"
             label="Reference Signature Set"
             value={plots[0].refSignatureSet}
@@ -496,6 +504,7 @@ export default function MutationalSignatureProfile({ submitR }) {
         </Col>
         <Col sm="2">
           <Select
+            className="mb-0"
             id="mspStrategy"
             label="Experimental Strategy"
             value={plots[0].strategy}
@@ -505,6 +514,7 @@ export default function MutationalSignatureProfile({ submitR }) {
         </Col>
         <Col sm="2">
           <Select
+            className="mb-0"
             id="mspSigName"
             label="Signature Name"
             value={plots[0].signatureName}
@@ -518,15 +528,16 @@ export default function MutationalSignatureProfile({ submitR }) {
             }}
           />
         </Col>
-        <Col sm="1" className="m-auto">
+        <Col sm="1" className="d-flex justify-content-end mt-auto">
           <Button variant="primary" onClick={handleCalculate}>
             Calculate
           </Button>
         </Col>
       </Row>
       {additionalControls()}
-      <Row>
-        <Col sm="1" className="ml-auto">
+      <Row className="mt-3">
+        <Col sm="11" />
+        <Col sm="1" className="d-flex justify-content-end mt-auto">
           <Button
             variant="secondary"
             onClick={() => addPlots()}

@@ -116,6 +116,7 @@ export default function MutationalSignatureProfile({ submitR }) {
           <Row className="justify-content-center">
             <Col sm="3">
               <Select
+                className="mb-0"
                 id="csProfileName"
                 label="Profile Name"
                 value={profileName}
@@ -125,6 +126,7 @@ export default function MutationalSignatureProfile({ submitR }) {
             </Col>
             <Col sm="4">
               <Select
+                className="mb-0"
                 id="csRefSet1"
                 label="Reference Signature Set 1"
                 value={refSignatureSet1}
@@ -136,6 +138,7 @@ export default function MutationalSignatureProfile({ submitR }) {
             </Col>
             <Col sm="4">
               <Select
+                className="mb-0"
                 id="rcsRefSet2"
                 label="Signature Set 2"
                 value={refSignatureSet2}
@@ -145,7 +148,7 @@ export default function MutationalSignatureProfile({ submitR }) {
                 }
               />
             </Col>
-            <Col sm="1" className="m-auto">
+            <Col sm="1" className="d-flex justify-content-end mt-auto">
               <Button
                 variant="primary"
                 onClick={() => {
