@@ -24,6 +24,7 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
+    else clearPlot();
   }, [plotPath]);
 
   async function setRPlot(plotPath) {
@@ -50,53 +51,54 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
     }
   }
 
+  function clearPlot() {
+    if (plotURL) URL.revokeObjectURL(plotURL);
+    dispatchExpLandscape({ plotPath: '', plotURL: '' });
+  }
+
   return (
     <div>
       <Form>
         <LoadingOverlay active={loading} />
-        <div className="px-4">
-          <Row className="justify-content-center">
-            <Col sm="4">
-              <Label>Upload Variable Data</Label>
-              <Form.File
-                id="variableData"
-                label={variableFile || 'Upload here (optional)'}
-                // accept=''
-                onChange={(e) => handleVariable(e.target.files[0])}
-                custom
-              />
-            </Col>
-            <Col sm="1" className="mt-auto">
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  handleVariable(new File([], ''));
-                }}
-                disabled={!variableFile}
-              >
-                Remove
-              </Button>
-            </Col>
-            <Col sm="5" />
-            <Col sm="2" className="d-flex justify-content-end mt-auto">
-              <Button variant="primary" onClick={calculateLandscape}>
-                Calculate
-              </Button>
-            </Col>
-          </Row>
-          <div id="withinPlot">
-            <div style={{ display: err ? 'block' : 'none' }}>
-              <p>
-                An error has occured. Check the debug section for more info.
-              </p>
-            </div>
-            <div style={{ display: plotURL ? 'block' : 'none' }}>
-              <Plot
-                plotName={plotPath.split('/').slice(-1)[0]}
-                plotURL={plotURL}
-                txtPath={txtPath}
-              />
-            </div>
+        <Row className="">
+          <Col sm="4">
+            <Label>Upload Variable Data</Label>
+            <Form.File
+              id="variableData"
+              label={variableFile || 'Upload here (optional)'}
+              // accept=''
+              onChange={(e) => handleVariable(e.target.files[0])}
+              custom
+            />
+          </Col>
+          <Col sm="1" className="mt-auto">
+            <Button
+              variant="secondary"
+              onClick={() => {
+                handleVariable(new File([], ''));
+              }}
+              disabled={!variableFile}
+            >
+              Remove
+            </Button>
+          </Col>
+          <Col sm="5" />
+          <Col sm="2" className="d-flex justify-content-end mt-auto">
+            <Button variant="primary" onClick={calculateLandscape}>
+              Calculate
+            </Button>
+          </Col>
+        </Row>
+        <div id="withinPlot">
+          <div style={{ display: err ? 'block' : 'none' }}>
+            <p>An error has occured. Check the debug section for more info.</p>
+          </div>
+          <div style={{ display: plotURL ? 'block' : 'none' }}>
+            <Plot
+              plotName={plotPath.split('/').slice(-1)[0]}
+              plotURL={plotURL}
+              txtPath={txtPath}
+            />
           </div>
         </div>
       </Form>

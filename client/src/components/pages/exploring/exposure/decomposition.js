@@ -15,6 +15,7 @@ export default function Decomposition() {
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
+    else clearPlot();
   }, [plotPath]);
 
   async function setRPlot(plotPath) {
@@ -39,6 +40,11 @@ export default function Decomposition() {
       if (plotURL) URL.revokeObjectURL(plotURL);
       dispatchExpDecomposition({ err: true, plotURL: '' });
     }
+  }
+
+  function clearPlot() {
+    if (plotURL) URL.revokeObjectURL(plotURL);
+    dispatchExpDecomposition({ plotPath: '', plotURL: '' });
   }
 
   return (

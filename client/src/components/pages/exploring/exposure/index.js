@@ -317,7 +317,8 @@ export default function ExposureExploring({ populateControls }) {
           debugR: debugR,
           err: false,
         });
-      else if (fn == 'all') dispatchExpTumor({ err: true, debugR: debugR });
+      else if (fn == 'all')
+        dispatchExpTumor({ err: true, debugR: debugR, plotPath: '' });
 
       if (output.burdenSeparatedPath)
         dispatchExpSeparated({
@@ -325,7 +326,8 @@ export default function ExposureExploring({ populateControls }) {
           debugR: debugR,
           err: false,
         });
-      else if (fn == 'all') dispatchExpSeparated({ err: true, debugR: debugR });
+      else if (fn == 'all')
+        dispatchExpSeparated({ err: true, debugR: debugR, plotPath: '' });
 
       if (output.burdenAcrossPath)
         dispatchExpAcross({
@@ -334,7 +336,7 @@ export default function ExposureExploring({ populateControls }) {
           err: false,
         });
       else if (fn == 'all' || fn == 'across')
-        dispatchExpAcross({ err: true, debugR: debugR });
+        dispatchExpAcross({ err: true, debugR: debugR, plotPath: '' });
 
       if (output.associationPath)
         dispatchExpAssociation({
@@ -343,7 +345,7 @@ export default function ExposureExploring({ populateControls }) {
           err: false,
         });
       else if (fn == 'all' || fn == 'association')
-        dispatchExpAssociation({ err: true, debugR: debugR });
+        dispatchExpAssociation({ err: true, debugR: debugR, plotPath: '' });
 
       if (output.decompositionPath)
         dispatchExpDecomposition({
@@ -353,7 +355,7 @@ export default function ExposureExploring({ populateControls }) {
           err: false,
         });
       else if (fn == 'all')
-        dispatchExpDecomposition({ err: true, debugR: debugR });
+        dispatchExpDecomposition({ err: true, debugR: debugR, plotPath: '' });
 
       if (output.landscapePath)
         dispatchExpLandscape({
@@ -362,7 +364,7 @@ export default function ExposureExploring({ populateControls }) {
           err: false,
         });
       else if (fn == 'all' || fn == 'landscape')
-        dispatchExpLandscape({ err: true, debugR: debugR });
+        dispatchExpLandscape({ err: true, debugR: debugR, plotPath: '' });
 
       if (output.prevalencePath)
         dispatchExpPrevalence({
@@ -371,7 +373,7 @@ export default function ExposureExploring({ populateControls }) {
           err: false,
         });
       else if (fn == 'all' || fn == 'prevalence')
-        dispatchExpPrevalence({ err: true, debugR: debugR });
+        dispatchExpPrevalence({ err: true, debugR: debugR, plotPath: '' });
     } else {
       dispatchError(debugR);
     }
@@ -846,27 +848,25 @@ export default function ExposureExploring({ populateControls }) {
                   <Row>
                     <Col>
                       <Group>
-                        <div>
-                          <Label>Upload Signature Data</Label>
-                          <Form.File
-                            disabled={loading}
-                            id="variableData"
-                            label={signatureFileObj.name || 'Signature File'}
-                            accept=".txt"
-                            onChange={(e) => {
-                              setSignature(e.target.files[0]);
-                              dispatchExpExposure({
-                                signatureFile: e.target.files[0].name,
-                              });
-                            }}
-                            custom
-                          />
-                          {signatureValidity && (
-                            <span className="text-danger">
-                              Signature File Required
-                            </span>
-                          )}
-                        </div>
+                        <Label>Upload Signature Data</Label>
+                        <Form.File
+                          disabled={loading}
+                          id="variableData"
+                          label={signatureFileObj.name || 'Signature File'}
+                          accept=".txt"
+                          onChange={(e) => {
+                            setSignature(e.target.files[0]);
+                            dispatchExpExposure({
+                              signatureFile: e.target.files[0].name,
+                            });
+                          }}
+                          custom
+                        />
+                        {signatureValidity && (
+                          <span className="text-danger">
+                            Signature File Required
+                          </span>
+                        )}
                       </Group>
                     </Col>
                   </Row>

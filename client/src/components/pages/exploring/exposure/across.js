@@ -22,6 +22,7 @@ export default function Across({ calculateAcross }) {
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
+    else clearPlot();
   }, [plotPath]);
 
   useEffect(() => {
@@ -56,32 +57,36 @@ export default function Across({ calculateAcross }) {
     }
   }
 
+  function clearPlot() {
+    if (plotURL) URL.revokeObjectURL(plotURL);
+    dispatchExpAcross({ plotPath: '', plotURL: '' });
+  }
+
   return (
     <div>
       <Form>
         <LoadingOverlay active={loading} />
-        <div className="px-4">
-          <Row className="justify-content-center">
-            <Col sm="2">
-              <Select
-                className="mb-0"
-                id="acrossSignatureName"
-                label="Signature Name"
-                value={signatureName}
-                options={
-                  source == 'public' ? signatureNameOptions : userNameOptions
-                }
-                onChange={(name) => dispatchExpAcross({ signatureName: name })}
-              />
-            </Col>
-            <Col sm="8" />
-            <Col sm="2" className="d-flex justify-content-end mt-auto">
-              <Button variant="primary" onClick={calculateAcross}>
-                Calculate
-              </Button>
-            </Col>
-          </Row>
-        </div>
+
+        <Row className="">
+          <Col sm="3">
+            <Select
+              className="mb-0"
+              id="acrossSignatureName"
+              label="Signature Name"
+              value={signatureName}
+              options={
+                source == 'public' ? signatureNameOptions : userNameOptions
+              }
+              onChange={(name) => dispatchExpAcross({ signatureName: name })}
+            />
+          </Col>
+          <Col sm="7" />
+          <Col sm="2" className="d-flex justify-content-end mt-auto">
+            <Button variant="primary" onClick={calculateAcross}>
+              Calculate
+            </Button>
+          </Col>
+        </Row>
         <div id="acrossPlot">
           {err && (
             <p>An error has occured. Check the debug section for more info.</p>

@@ -14,6 +14,7 @@ export default function Separated() {
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
+    else clearPlot();
   }, [plotPath]);
 
   async function setRPlot(plotPath) {
@@ -38,6 +39,11 @@ export default function Separated() {
       if (plotURL) URL.revokeObjectURL(plotURL);
       dispatchExpSeparated({ err: true, plotURL: '' });
     }
+  }
+
+  function clearPlot() {
+    if (plotURL) URL.revokeObjectURL(plotURL);
+    dispatchExpSeparated({ plotPath: '', plotURL: '' });
   }
 
   return (

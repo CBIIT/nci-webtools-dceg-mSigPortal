@@ -19,6 +19,7 @@ export default function Tumor({ calculatePrevalence }) {
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
+    else clearPlot();
   }, [plotPath]);
 
   async function setRPlot(plotPath) {
@@ -45,46 +46,47 @@ export default function Tumor({ calculatePrevalence }) {
     }
   }
 
+  function clearPlot() {
+    if (plotURL) URL.revokeObjectURL(plotURL);
+    dispatchExpPrevalence({ plotPath: '', plotURL: '' });
+  }
+
   return (
     <div>
       <Form>
         <LoadingOverlay active={loading} />
-        <div className="px-4">
-          <Row className="justify-content-center">
-            <Col sm="4">
-              <Group controlId="prevalenceMutations">
-                <Label>Minimal Number Mutations within in Each Signature</Label>
-                <Control
-                  value={mutation}
-                  placeholder="e.g. 100"
-                  onChange={(e) => {
-                    dispatchExpPrevalence({
-                      mutation: e.target.value,
-                    });
-                  }}
-                />
-                {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
-              </Group>
-            </Col>
-            <Col sm="6" />
-            <Col sm="2" className="d-flex justify-content-end mt-auto">
-              <Button variant="primary" onClick={calculatePrevalence}>
-                Calculate
-              </Button>
-            </Col>
-          </Row>
-          <div id="withinPlot">
-            <div style={{ display: err ? 'block' : 'none' }}>
-              <p>
-                An error has occured. Check the debug section for more info.
-              </p>
-            </div>
-            <div style={{ display: plotURL ? 'block' : 'none' }}>
-              <Plot
-                plotName={plotPath.split('/').slice(-1)[0]}
-                plotURL={plotURL}
+        <Row className="">
+          <Col sm="4">
+            <Group controlId="prevalenceMutations">
+              <Label>Minimal Number Mutations within in Each Signature</Label>
+              <Control
+                value={mutation}
+                placeholder="e.g. 100"
+                onChange={(e) => {
+                  dispatchExpPrevalence({
+                    mutation: e.target.value,
+                  });
+                }}
               />
-            </div>
+              {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
+            </Group>
+          </Col>
+          <Col sm="6" />
+          <Col sm="2" className="d-flex justify-content-end mt-auto">
+            <Button variant="primary" onClick={calculatePrevalence}>
+              Calculate
+            </Button>
+          </Col>
+        </Row>
+        <div id="withinPlot">
+          <div style={{ display: err ? 'block' : 'none' }}>
+            <p>An error has occured. Check the debug section for more info.</p>
+          </div>
+          <div style={{ display: plotURL ? 'block' : 'none' }}>
+            <Plot
+              plotName={plotPath.split('/').slice(-1)[0]}
+              plotURL={plotURL}
+            />
           </div>
         </div>
       </Form>

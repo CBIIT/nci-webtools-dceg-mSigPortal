@@ -11,6 +11,7 @@ export default function Tumor() {
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
+    else clearPlot();
   }, [plotPath]);
 
   async function setRPlot(plotPath) {
@@ -35,6 +36,11 @@ export default function Tumor() {
       if (plotURL) URL.revokeObjectURL(plotURL);
       dispatchExpTumor({ err: true, plotURL: '' });
     }
+  }
+
+  function clearPlot() {
+    if (plotURL) URL.revokeObjectURL(plotURL);
+    dispatchExpTumor({ plotPath: '', plotURL: '' });
   }
 
   return (

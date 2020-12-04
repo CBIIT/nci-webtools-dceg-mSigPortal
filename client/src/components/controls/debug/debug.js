@@ -8,7 +8,7 @@ export default function Debug({ msg }) {
     <div style={{ display: msg.length ? 'block' : 'none' }}>
       <Button
         variant="link"
-        className="p-0 mt-5"
+        className="p-0 mt-3"
         onClick={() => setDisplay(!display)}
       >
         Debug
