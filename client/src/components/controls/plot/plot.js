@@ -3,6 +3,8 @@ import { Button } from 'react-bootstrap';
 import { dispatchError } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faMinus, faHome } from '@fortawesome/free-solid-svg-icons';
 import './plot.scss';
 
 export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
@@ -64,13 +66,16 @@ export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
             <React.Fragment>
               <div className="tools">
                 <Button variant="secondary" onClick={zoomIn}>
-                  +
+                  <FontAwesomeIcon icon={faPlus} style={{ color: '#fafafa' }} />
                 </Button>{' '}
                 <Button variant="secondary" onClick={zoomOut}>
-                  -
+                  <FontAwesomeIcon
+                    icon={faMinus}
+                    style={{ color: '#fafafa' }}
+                  />
                 </Button>{' '}
                 <Button variant="secondary" onClick={resetTransform}>
-                  Reset
+                  <FontAwesomeIcon icon={faHome} style={{ color: '#fafafa' }} />
                 </Button>
               </div>
               <TransformComponent>
