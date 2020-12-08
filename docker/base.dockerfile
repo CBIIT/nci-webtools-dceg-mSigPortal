@@ -5,7 +5,7 @@ RUN dnf -y update \
    dnf-plugins-core \
    epel-release \
    glibc-langpack-en \
-   && dnf config-manager --enable PowerTools \
+   && dnf config-manager --enable powertools \
    && dnf -y module enable nodejs:13 \
    && dnf -y install \
    # gdal-devel \
