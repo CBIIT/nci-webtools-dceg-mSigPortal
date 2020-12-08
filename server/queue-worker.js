@@ -156,7 +156,9 @@ async function processMessage(params) {
     // upload archived project directory
     await s3
       .upload({
-        Body: tar.c({ gzip: true, C: config.results.folder }, [id]),
+        Body: tar
+          .c({ sync: true, gzip: true, C: config.results.folder }, [id])
+          .read(),
         Bucket: config.s3.bucket,
         Key: `${config.s3.outputKeyPrefix}${id}/${id}.tgz`,
       })
