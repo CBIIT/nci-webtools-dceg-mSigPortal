@@ -75,21 +75,41 @@ export function Navbar({ links }) {
           .concat(links)
           .filter((link) => link.title)
           .sort((a, b) => a.navIndex - b.navIndex)
-          .map(({ route, action, title, exact }, index) => (
-            <div data-testid="Navbar" className="d-block" key={title}>
-              <NavLink
-                data-testid={`Navbar-NavLink-${index}`}
-                id={'nav' + title}
-                // key={title}
-                className="navlinks py-2 px-4 d-inline-block"
-                activeClassName="active-navlinks"
-                exact={exact}
-                to={route}
-              >
-                {title}
-              </NavLink>
-            </div>
-          ))}
+          .map(({ route, action, title, exact, dropdown }, index) => {
+            if (dropdown) {
+              return dropdown.map(({ name, path }) => (
+                <div data-testid="Navbar" className="d-block" key={name}>
+                  <NavLink
+                    data-testid={`Navbar-NavLink-${index}`}
+                    id={'nav' + name}
+                    // key={title}
+                    className="navlinks py-2 px-4 d-inline-block"
+                    activeClassName="active-navlinks"
+                    exact={exact}
+                    to={`/exploring/${path}`}
+                  >
+                    {name}
+                  </NavLink>
+                </div>
+              ));
+            } else {
+              return (
+                <div data-testid="Navbar" className="d-block" key={title}>
+                  <NavLink
+                    data-testid={`Navbar-NavLink-${index}`}
+                    id={'nav' + title}
+                    // key={title}
+                    className="navlinks py-2 px-4 d-inline-block"
+                    activeClassName="active-navlinks"
+                    exact={exact}
+                    to={route}
+                  >
+                    {title}
+                  </NavLink>
+                </div>
+              );
+            }
+          })}
       </div>
     </div>
   );
