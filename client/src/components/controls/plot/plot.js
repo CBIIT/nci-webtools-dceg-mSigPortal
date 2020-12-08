@@ -43,24 +43,24 @@ export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
   };
 
   return (
-    <div className="mb-4">
+    <div className="my-2">
       <LoadingOverlay active={loading} />
-      <div className="d-flex align-items-end">
-        <span>{plotName.slice(0, -4)}</span>
-        <a className="ml-auto" href={plotURL} download={plotName}>
-          Download Plot
-        </a>
-        {txtPath && (
-          <Button
-            className="p-0 border-0 ml-3"
-            variant="link"
-            onClick={() => downloadData(txtPath)}
-          >
-            Download Data
-          </Button>
-        )}
-      </div>
       <div className="p-2 border rounded" title="Ctrl + Mouse Wheel to zoom">
+        <div className="d-flex align-items-end mb-2">
+          <span>{plotName.slice(0, -4)}</span>
+          <a className="ml-auto" href={plotURL} download={plotName}>
+            Download Plot
+          </a>
+          {txtPath && (
+            <Button
+              className="p-0 border-0 ml-3"
+              variant="link"
+              onClick={() => downloadData(txtPath)}
+            >
+              Download Data
+            </Button>
+          )}
+        </div>
         <TransformWrapper className="w-100" {...zoomProps}>
           {({ zoomIn, zoomOut, resetTransform }) => (
             <React.Fragment>
