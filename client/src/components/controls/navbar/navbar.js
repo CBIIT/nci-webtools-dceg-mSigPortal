@@ -25,6 +25,10 @@ export function Navbar({ links }) {
                   onMouseEnter={() => setDropdown(true)}
                   onMouseLeave={() => setDropdown(false)}
                   show={dropdownStatus}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.hash = '/exploring/';
+                  }}
                 >
                   {dropdown.map(({ name, path }) => (
                     <NavLink
