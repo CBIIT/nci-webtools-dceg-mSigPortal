@@ -308,7 +308,7 @@ export default function ExposureExploring({ populateControls }) {
         signatureFile: signatureFile,
       });
     }
-    const { debugR, output } = await submitR(rFn, args, id);
+    const { debugR, output, errors } = await submitR(rFn, args, id);
 
     if (output) {
       if (output.tumorPath)
@@ -373,7 +373,11 @@ export default function ExposureExploring({ populateControls }) {
           err: false,
         });
       else if (fn == 'all' || fn == 'prevalence')
-        dispatchExpPrevalence({ err: true, debugR: debugR, plotPath: '' });
+        dispatchExpPrevalence({
+          err: errors.prevalenceError,
+          debugR: debugR,
+          plotPath: '',
+        });
     } else {
       dispatchError(debugR);
     }

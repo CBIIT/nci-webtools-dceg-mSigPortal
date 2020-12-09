@@ -269,6 +269,8 @@ mutationalSignatureDecomposition <- function(plotPath, dataPath, exposure_refdat
       pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
       arrange(MutationType) ## have to sort the mutation type
 
+  ## filter out the samples without exposure data
+  seqmatrix_refdata_input <- seqmatrix_refdata_input %>% select(MutationType, one_of(exposure_refdata_input$Sample))
 
   decompsite_input <- calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
   decompsite_input <- decompsite_input %>% separate(col = Sample_Names, into = c('Cancer_Type', 'Sample'), sep = '@')
@@ -291,6 +293,10 @@ mutationalSignatureLandscape <- function(cancerType, varDataPath, plotPath, expo
       select(MutationType, Sample, Mutations) %>%
       pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
       arrange(MutationType) ## have to sort the mutationtype
+
+  ## filter out the samples without exposure data
+  seqmatrix_refdata_input <- seqmatrix_refdata_input %>% select(MutationType, one_of(exposure_refdata_input$Sample))
+
   decompsite_input <- calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
 
   cosinedata <- decompsite_input %>% select(Samples = Sample_Names, Similarity = Cosine_similarity)
@@ -350,7 +356,13 @@ mutationalSignaturePrevalence <- function(mutation, cancerType, plotPath, exposu
     rename(Samples = Sample)
   sigdata <- sigdata %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
-  prevalence_plot(sigdata = sigdata, nmutation = mutation, output_plot = plotPath)
+  nsams <- sigdata %>% pivot_longer(cols = -Samples) %>% filter(value > 100) %>% dim()
+
+  if (nsams[1] > 0) {
+    prevalence_plot(sigdata = sigdata, nmutation = mutation, output_plot = plotPath)
+  } else {
+    stop(paste0('No signature in any sample with number of mutation larger than ', mutation))
+  }
 }
 
 exposurePublic <- function(fn, common, across = '{}', association = '{}', landscape = '{}', prevalence = '{}', projectID, pythonOutput, rootDir, savePath, dataPath) {
@@ -364,6 +376,7 @@ exposurePublic <- function(fn, common, across = '{}', association = '{}', landsc
 
   tryCatch({
     output = list()
+    errors = list()
     tumorPath = paste0(savePath, 'tumorMutationalBurden.svg')
     burdenSeparatedPath = paste0(savePath, 'burdenSeparatedPath.svg')
     burdenAcrossPath = paste0(savePath, 'burdenAcrossCancer.svg')
@@ -385,7 +398,7 @@ exposurePublic <- function(fn, common, across = '{}', association = '{}', landsc
     genome <- case_when(
     common$study == "PCAWG" ~ "GRCh37",
     common$study == "TCGA" ~ "GRCh37",
-    TRUE ~ NA_character_
+    TRUE ~ "GRCh37"
   )
     genomesize = genome2size(genome)
 
@@ -472,6 +485,7 @@ exposurePublic <- function(fn, common, across = '{}', association = '{}', landsc
         mutationalSignaturePrevalence(prevalence$mutation, common$cancerType, prevalencePath, exposure_refdata_selected)
         output[['prevalencePath']] = prevalencePath
       }, error = function(e) {
+        errors[['prevalenceError']] <<- e$message
         print(e)
       })
     }
@@ -481,7 +495,7 @@ exposurePublic <- function(fn, common, across = '{}', association = '{}', landsc
   }, finally = {
     sink(con)
     sink(con)
-    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+    return(toJSON(list('stdout' = stdout, 'output' = output, 'errors' = errors), pretty = TRUE, auto_unbox = TRUE))
   })
 }
 
@@ -494,6 +508,7 @@ exposureUser <- function(fn, files, common, across = '{}', association = '{}', l
 
   tryCatch({
     output = list()
+    errors = list()
     tumorPath = paste0(savePath, 'tumorMutationalBurden.svg')
     burdenSeparatedPath = paste0(savePath, 'burdenSeparatedPath.svg')
     burdenAcrossPath = paste0(savePath, 'burdenAcrossCancer.svg')
@@ -614,6 +629,7 @@ exposureUser <- function(fn, files, common, across = '{}', association = '{}', l
         output[['prevalencePath']] = prevalencePath
       }, error = function(e) {
         print(e)
+        errors[['prevalenceError']] = e$message
       })
     }
 
@@ -622,6 +638,6 @@ exposureUser <- function(fn, files, common, across = '{}', association = '{}', l
   }, finally = {
     sink(con)
     sink(con)
-    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+    return(toJSON(list('stdout' = stdout, 'output' = output, 'errors' = errors), pretty = TRUE, auto_unbox = TRUE))
   })
 }
