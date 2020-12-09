@@ -145,9 +145,7 @@ export default function Association({ calculateAssociation }) {
           </Col>
         </Row>
         <div id="associationPlot">
-          {err && (
-            <p>An error has occured. Check the debug section for more info.</p>
-          )}
+          {err && <p>{err}</p>}
           {plotURL && (
             <Plot
               plotName={plotPath.split('/').slice(-1)[0]}

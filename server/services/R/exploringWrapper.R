@@ -415,6 +415,7 @@ exposurePublic <- function(fn, common, across = '{}', association = '{}', landsc
         tumorMutationalBurden(genomesize, tumorPath, exposure_refdata_selected)
         output[['tumorPath']] = tumorPath
       }, error = function(e) {
+        errors[['tumorError']] <<- e$message
         print(e)
       })
     }
@@ -426,6 +427,7 @@ exposurePublic <- function(fn, common, across = '{}', association = '{}', landsc
         mutationalSignatureBurdenSeparated(genomesize, common$cancerType, burdenSeparatedPath, exposure_refdata_selected)
         output[['burdenSeparatedPath']] = burdenSeparatedPath
       }, error = function(e) {
+        errors[['burdenSeparatedError']] <<- e$message
         print(e)
       })
     }
@@ -437,6 +439,7 @@ exposurePublic <- function(fn, common, across = '{}', association = '{}', landsc
         mutationalSignatureBurdenAcrossCancer(across$signatureName, genomesize, burdenAcrossPath, exposure_refdata_selected)
         output[['burdenAcrossPath']] = burdenAcrossPath
       }, error = function(e) {
+        errors[['burdenAcrossError']] <<- e$message
         print(e)
       })
     }
@@ -448,6 +451,7 @@ exposurePublic <- function(fn, common, across = '{}', association = '{}', landsc
         mutationalSignatureAssociation(association$useCancer, common$cancerType, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
         output[['associationPath']] = associationPath
       }, error = function(e) {
+        errors[['associationError']] <<- e$message
         print(e)
       })
     }
@@ -459,6 +463,7 @@ exposurePublic <- function(fn, common, across = '{}', association = '{}', landsc
         mutationalSignatureDecomposition(decompositionPath, decompositionData, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
         output[['decompositionPath']] = decompositionPath
       }, error = function(e) {
+        errors[['decompositionError']] <<- e$message
         print(e)
       })
     }
@@ -474,6 +479,7 @@ exposurePublic <- function(fn, common, across = '{}', association = '{}', landsc
         mutationalSignatureLandscape(common$cancerType, varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
         output[['landscapePath']] = landscapePath
       }, error = function(e) {
+        errors[['landscapeError']] <<- e$message
         print(e)
       })
     }
@@ -563,6 +569,7 @@ exposureUser <- function(fn, files, common, across = '{}', association = '{}', l
         tumorMutationalBurden(genomesize, tumorPath, exposure_refdata_selected)
         output[['tumorPath']] = tumorPath
       }, error = function(e) {
+        errors[['tumorError']] <<- e$message
         print(e)
       })
     }
@@ -574,6 +581,7 @@ exposureUser <- function(fn, files, common, across = '{}', association = '{}', l
         mutationalSignatureBurdenSeparated(genomesize, cancer_type_user, burdenSeparatedPath, exposure_refdata_selected)
         output[['burdenSeparatedPath']] = burdenSeparatedPath
       }, error = function(e) {
+        errors[['burdenSeparatedError']] <<- e$message
         print(e)
       })
     }
@@ -584,6 +592,7 @@ exposureUser <- function(fn, files, common, across = '{}', association = '{}', l
         mutationalSignatureBurdenAcrossCancer(across$signatureName, genomesize, burdenAcrossPath, exposure_refdata_selected)
         output[['burdenAcrossPath']] = burdenAcrossPath
       }, error = function(e) {
+        errors[['burdenAcrossError']] <<- e$message
         print(e)
       })
     }
@@ -594,6 +603,7 @@ exposureUser <- function(fn, files, common, across = '{}', association = '{}', l
         mutationalSignatureAssociation(association$useCancer, cancer_type_user, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
         output[['associationPath']] = associationPath
       }, error = function(e) {
+        errors[['associationError']] <<- e$message
         print(e)
       })
     }
@@ -604,6 +614,7 @@ exposureUser <- function(fn, files, common, across = '{}', association = '{}', l
         mutationalSignatureDecomposition(decompositionPath, decompositionData, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
         output[['decompositionPath']] = decompositionPath
       }, error = function(e) {
+        errors[['decompositionError']] <<- e$message
         print(e)
       })
     }
@@ -618,6 +629,7 @@ exposureUser <- function(fn, files, common, across = '{}', association = '{}', l
         mutationalSignatureLandscape(cancer_type_user, varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
         output[['landscapePath']] = landscapePath
       }, error = function(e) {
+        errors[['landscapeError']] <<- e$message
         print(e)
       })
     }
@@ -628,8 +640,8 @@ exposureUser <- function(fn, files, common, across = '{}', association = '{}', l
         mutationalSignaturePrevalence(prevalence$mutation, cancer_type_user, prevalencePath, exposure_refdata_selected)
         output[['prevalencePath']] = prevalencePath
       }, error = function(e) {
+        errors[['prevalenceError']] <<- e$message
         print(e)
-        errors[['prevalenceError']] = e$message
       })
     }
 

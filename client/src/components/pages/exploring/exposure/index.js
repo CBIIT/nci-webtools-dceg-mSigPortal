@@ -318,7 +318,11 @@ export default function ExposureExploring({ populateControls }) {
           err: false,
         });
       else if (fn == 'all')
-        dispatchExpTumor({ err: true, debugR: debugR, plotPath: '' });
+        dispatchExpTumor({
+          err: errors.tumorError,
+          debugR: debugR,
+          plotPath: '',
+        });
 
       if (output.burdenSeparatedPath)
         dispatchExpSeparated({
@@ -327,7 +331,11 @@ export default function ExposureExploring({ populateControls }) {
           err: false,
         });
       else if (fn == 'all')
-        dispatchExpSeparated({ err: true, debugR: debugR, plotPath: '' });
+        dispatchExpSeparated({
+          err: errors.burdenSeparatedError,
+          debugR: debugR,
+          plotPath: '',
+        });
 
       if (output.burdenAcrossPath)
         dispatchExpAcross({
@@ -336,7 +344,11 @@ export default function ExposureExploring({ populateControls }) {
           err: false,
         });
       else if (fn == 'all' || fn == 'across')
-        dispatchExpAcross({ err: true, debugR: debugR, plotPath: '' });
+        dispatchExpAcross({
+          err: errors.burdenAcrossError,
+          debugR: debugR,
+          plotPath: '',
+        });
 
       if (output.associationPath)
         dispatchExpAssociation({
@@ -345,7 +357,11 @@ export default function ExposureExploring({ populateControls }) {
           err: false,
         });
       else if (fn == 'all' || fn == 'association')
-        dispatchExpAssociation({ err: true, debugR: debugR, plotPath: '' });
+        dispatchExpAssociation({
+          err: errors.associationError,
+          debugR: debugR,
+          plotPath: '',
+        });
 
       if (output.decompositionPath)
         dispatchExpDecomposition({
@@ -355,7 +371,11 @@ export default function ExposureExploring({ populateControls }) {
           err: false,
         });
       else if (fn == 'all')
-        dispatchExpDecomposition({ err: true, debugR: debugR, plotPath: '' });
+        dispatchExpDecomposition({
+          err: errors.decompositionError,
+          debugR: debugR,
+          plotPath: '',
+        });
 
       if (output.landscapePath)
         dispatchExpLandscape({
@@ -364,7 +384,11 @@ export default function ExposureExploring({ populateControls }) {
           err: false,
         });
       else if (fn == 'all' || fn == 'landscape')
-        dispatchExpLandscape({ err: true, debugR: debugR, plotPath: '' });
+        dispatchExpLandscape({
+          err: errors.landscapeError,
+          debugR: debugR,
+          plotPath: '',
+        });
 
       if (output.prevalencePath)
         dispatchExpPrevalence({

@@ -66,7 +66,6 @@ export default function Across({ calculateAcross }) {
     <div>
       <Form>
         <LoadingOverlay active={loading} />
-
         <Row className="">
           <Col sm="3">
             <Select
@@ -89,7 +88,7 @@ export default function Across({ calculateAcross }) {
         </Row>
         <div id="acrossPlot">
           {err && (
-            <p>An error has occured. Check the debug section for more info.</p>
+            <p>{err}</p>
           )}
           {plotURL && (
             <Plot

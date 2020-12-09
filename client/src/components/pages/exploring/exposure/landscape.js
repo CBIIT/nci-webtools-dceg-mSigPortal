@@ -91,7 +91,7 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
         </Row>
         <div id="withinPlot">
           <div style={{ display: err ? 'block' : 'none' }}>
-            <p>An error has occured. Check the debug section for more info.</p>
+            <p>{err}</p>
           </div>
           <div style={{ display: plotURL ? 'block' : 'none' }}>
             <Plot

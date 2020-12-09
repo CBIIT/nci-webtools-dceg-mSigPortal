@@ -49,9 +49,7 @@ export default function Separated() {
   return (
     <div>
       {!err && !plotURL && <p>Please calculate using the left side panel.</p>}
-      {err && (
-        <p>An error has occured. Check the debug section for more info.</p>
-      )}
+      {err && <p>{err}</p>}
       {plotURL && (
         <Plot plotName={plotPath.split('/').slice(-1)[0]} plotURL={plotURL} />
       )}
