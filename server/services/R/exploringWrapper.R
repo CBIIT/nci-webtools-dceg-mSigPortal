@@ -444,7 +444,7 @@ exposurePublic <- function(fn, common, across = '{}', association = '{}', landsc
     # Mutational Signature Association
     if ('all' %in% fn | 'association' %in% fn) {
       tryCatch({
-        print('Evaluating the Performance of Mutational Signature Decomposition')
+        print('Mutational Signature Association')
         mutationalSignatureAssociation(association$useCancer, common$cancerType, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
         output[['associationPath']] = associationPath
       }, error = function(e) {
@@ -455,7 +455,7 @@ exposurePublic <- function(fn, common, across = '{}', association = '{}', landsc
     # Evaluating the Performance of Mutational Signature Decomposition --------
     if ('all' %in% fn) {
       tryCatch({
-        print('Mutational Signature Association')
+        print('Evaluating the Performance of Mutational Signature Decomposition')
         mutationalSignatureDecomposition(decompositionPath, decompositionData, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
         output[['decompositionPath']] = decompositionPath
       }, error = function(e) {
@@ -590,7 +590,7 @@ exposureUser <- function(fn, files, common, across = '{}', association = '{}', l
     # Mutational Signature Association
     if ('all' %in% fn | 'association' %in% fn) {
       tryCatch({
-        print('Evaluating the Performance of Mutational Signature Decomposition')
+        print('Mutational Signature Association')
         mutationalSignatureAssociation(association$useCancer, cancer_type_user, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
         output[['associationPath']] = associationPath
       }, error = function(e) {
@@ -600,7 +600,7 @@ exposureUser <- function(fn, files, common, across = '{}', association = '{}', l
     # Evaluating the Performance of Mutational Signature Decomposition --------
     if ('all' %in% fn) {
       tryCatch({
-        print('Mutational Signature Association')
+        print('Evaluating the Performance of Mutational Signature Decomposition')
         mutationalSignatureDecomposition(decompositionPath, decompositionData, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
         output[['decompositionPath']] = decompositionPath
       }, error = function(e) {
