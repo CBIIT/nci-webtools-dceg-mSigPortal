@@ -257,7 +257,7 @@ mutationalSignatureAssociation <- function(useCancer, cancerType, both, signatur
 mutationalSignatureDecomposition <- function(plotPath, dataPath, exposure_refdata, signature_refsets, seqmatrix_refdata) {
   exposure_refdata_input <- exposure_refdata %>% mutate(Sample = paste0(Cancer_Type, "@", Sample)) %>%
       select(Sample, Signature_name, Exposure) %>%
-      pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure)
+      pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure, values_fill = 0)
 
   signature_refsets_input <- signature_refsets %>%
       select(MutationType, Signature_name, Contribution) %>%
@@ -268,9 +268,6 @@ mutationalSignatureDecomposition <- function(plotPath, dataPath, exposure_refdat
       select(MutationType, Sample, Mutations) %>%
       pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
       arrange(MutationType) ## have to sort the mutation type
-
-  ## filter out the samples without exposure data
-  seqmatrix_refdata_input <- seqmatrix_refdata_input %>% select(MutationType, one_of(exposure_refdata_input$Sample))
 
   decompsite_input <- calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
   decompsite_input <- decompsite_input %>% separate(col = Sample_Names, into = c('Cancer_Type', 'Sample'), sep = '@')
@@ -293,10 +290,6 @@ mutationalSignatureLandscape <- function(cancerType, varDataPath, plotPath, expo
       select(MutationType, Sample, Mutations) %>%
       pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
       arrange(MutationType) ## have to sort the mutationtype
-
-  ## filter out the samples without exposure data
-  seqmatrix_refdata_input <- seqmatrix_refdata_input %>% select(MutationType, one_of(exposure_refdata_input$Sample))
-
   decompsite_input <- calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
 
   cosinedata <- decompsite_input %>% select(Samples = Sample_Names, Similarity = Cosine_similarity)

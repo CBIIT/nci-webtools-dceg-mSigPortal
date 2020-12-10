@@ -36,9 +36,12 @@ const { Toggle, Collapse } = Accordion;
 const { Group, Label, Check } = Form;
 
 export default function ExposureExploring({ populateControls }) {
-  const { exposureAccordion, publicDataOptions } = useSelector(
-    (state) => state.exploring
-  );
+  const {
+    exposureAccordion,
+    exposureSignature,
+    exposureCancer,
+    signatureNames,
+  } = useSelector((state) => state.exploring);
   const { loading: loadingAcross } = useSelector((state) => state.expAcross);
   const { loading: loadingAssociation } = useSelector(
     (state) => state.expAssociation
@@ -410,7 +413,7 @@ export default function ExposureExploring({ populateControls }) {
   function handleStudy(study) {
     const strategyOptions = [
       ...new Set(
-        publicDataOptions
+        exposureSignature
           .filter((data) => data.Study == study)
           .map((data) => data.Dataset)
       ),
@@ -419,7 +422,7 @@ export default function ExposureExploring({ populateControls }) {
 
     const refSignatureSetOptions = [
       ...new Set(
-        publicDataOptions
+        exposureSignature
           .filter((row) => row.Study == study && row.Dataset == strategy)
           .map((row) => row.Signature_set_name)
       ),
@@ -428,13 +431,8 @@ export default function ExposureExploring({ populateControls }) {
 
     const cancerOptions = [
       ...new Set(
-        publicDataOptions
-          .filter(
-            (data) =>
-              data.Study == study &&
-              data.Dataset == strategy &&
-              data.Signature_set_name == refSignatureSet
-          )
+        exposureCancer
+          .filter((data) => data.Study == study && data.Dataset == strategy)
           .map((data) => data.Cancer_Type)
       ),
     ];
@@ -455,7 +453,7 @@ export default function ExposureExploring({ populateControls }) {
   function handleStrategy(strategy) {
     const refSignatureSetOptions = [
       ...new Set(
-        publicDataOptions
+        exposureSignature
           .filter((row) => row.Study == study && row.Dataset == strategy)
           .map((row) => row.Signature_set_name)
       ),
@@ -464,13 +462,8 @@ export default function ExposureExploring({ populateControls }) {
 
     const cancerOptions = [
       ...new Set(
-        publicDataOptions
-          .filter(
-            (data) =>
-              data.Study == study &&
-              data.Dataset == strategy &&
-              data.Signature_set_name == refSignatureSet
-          )
+        exposureCancer
+          .filter((data) => data.Study == study && data.Dataset == strategy)
           .map((data) => data.Cancer_Type)
       ),
     ];
@@ -489,30 +482,15 @@ export default function ExposureExploring({ populateControls }) {
   function handleSet(set) {
     const signatureNameOptions = [
       ...new Set(
-        refSigData
+        signatureNames
           .filter((row) => row.Signature_set_name == set)
           .map((row) => row.Signature_name)
-      ),
-    ];
-
-    const cancerOptions = [
-      ...new Set(
-        publicDataOptions
-          .filter(
-            (data) =>
-              data.Study == study &&
-              data.Dataset == strategy &&
-              data.Signature_set_name == set
-          )
-          .map((data) => data.Cancer_Type)
       ),
     ];
 
     dispatchExpExposure({
       refSignatureSet: set,
       signatureNameOptions: signatureNameOptions,
-      cancer: cancerOptions[0],
-      cancerOptions: cancerOptions,
     });
   }
 

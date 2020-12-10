@@ -16,90 +16,114 @@ import {
 import './exploring.scss';
 
 export default function Explore() {
-  const { publicDataOptions, displayTab } = useSelector(
+  const { exposureSignature, displayTab } = useSelector(
     (state) => state.exploring
   );
 
   useEffect(() => {
-    if (!Object.keys(publicDataOptions).length) populateControls();
+    if (!Object.keys(exposureSignature).length) populateControls();
   }, []);
 
   async function populateControls() {
-    dispatchExpExposure({ loading: true });
-
     try {
-      let [signatureData, exposureData] = await Promise.all([
+      let [
+        signatureData,
+        exposureCancer,
+        exposureSignature,
+        signatureNames,
+      ] = await Promise.all([
         (await fetch(`api/public/Others/json/Exploring-Signature.json`)).json(),
-        (await fetch('api/public/Others/json/Exploring-Exposure.json')).json(),
+        (
+          await fetch(
+            'api/public/Others/json/Exploring-Exposure-cancertype.json'
+          )
+        ).json(),
+        (
+          await fetch(
+            'api/public/Others/json/Exploring-Exposure-Signature-set-name.json'
+          )
+        ).json(),
+        (await fetch('api/public/Others/json/Signature_name.json')).json(),
       ]);
 
-      setInitalRefSigData(signatureData);
-
-      const studyOptions = [...new Set(exposureData.map((data) => data.Study))];
-      const study = 'PCAWG'; // default
-
-      const strategyOptions = [
-        ...new Set(
-          exposureData
-            .filter((data) => data.Study == study)
-            .map((data) => data.Dataset)
-        ),
-      ];
-      const strategy = strategyOptions[0];
-
-      const refSignatureSetOptions = [
-        ...new Set(
-          exposureData
-            .filter((row) => row.Study == study && row.Dataset == strategy)
-            .map((row) => row.Signature_set_name)
-        ),
-      ];
-      const refSignatureSet = 'COSMIC v3 Signatures (SBS)'; // default
-
-      const cancerOptions = [
-        ...new Set(
-          exposureData
-            .filter(
-              (data) =>
-                data.Study == study &&
-                data.Dataset == strategy &&
-                data.Signature_set_name == refSignatureSet
-            )
-            .map((data) => data.Cancer_Type)
-        ),
-      ];
-      const cancer = 'Lung-AdenoCA'; // default
-
-      const signatureNameOptions = [
-        ...new Set(
-          signatureData
-            .filter((row) => row.Signature_set_name == refSignatureSet)
-            .map((row) => row.Signature_name)
-        ),
-      ];
-
-      const params = {
-        study: study,
-        studyOptions: studyOptions,
-        strategy: strategy,
-        strategyOptions: strategyOptions,
-        cancer: cancer,
-        cancerOptions: cancerOptions,
-        refSigData: signatureData,
-        refSignatureSet: refSignatureSet,
-        refSignatureSetOptions: refSignatureSetOptions,
-        signatureNameOptions: signatureNameOptions,
-      };
-
-      dispatchExploring({ publicDataOptions: exposureData });
-      dispatchExpExposure(params);
+      populateSignatureExp(signatureData);
+      populateExposureExp(exposureCancer, exposureSignature, signatureNames);
     } catch (err) {
       dispatchError(err);
     }
-    dispatchExpExposure({ loading: false });
   }
 
-  async function setInitalRefSigData(data) {
+  async function populateExposureExp(
+    exposureCancer,
+    exposureSignature,
+    signatureNames
+  ) {
+    dispatchExpExposure({ loading: true });
+
+    const studyOptions = [
+      ...new Set(exposureSignature.map((data) => data.Study)),
+    ];
+    const study = 'PCAWG'; // default
+
+    const strategyOptions = [
+      ...new Set(
+        exposureSignature
+          .filter((data) => data.Study == study)
+          .map((data) => data.Dataset)
+      ),
+    ];
+    const strategy = strategyOptions[0];
+
+    const refSignatureSetOptions = [
+      ...new Set(
+        exposureSignature
+          .filter((row) => row.Study == study && row.Dataset == strategy)
+          .map((row) => row.Signature_set_name)
+      ),
+    ];
+    const refSignatureSet = 'COSMIC v3 Signatures (SBS)'; // default
+
+    const cancerOptions = [
+      ...new Set(
+        exposureCancer
+          .filter((data) => data.Study == study && data.Dataset == strategy)
+          .map((data) => data.Cancer_Type)
+      ),
+    ];
+    const cancer = 'Lung-AdenoCA'; // default
+
+    const signatureNameOptions = [
+      ...new Set(
+        signatureNames
+          .filter((row) => row.Signature_set_name == refSignatureSet)
+          .map((row) => row.Signature_name)
+      ),
+    ];
+
+    const params = {
+      study: study,
+      studyOptions: studyOptions,
+      strategy: strategy,
+      strategyOptions: strategyOptions,
+      cancer: cancer,
+      cancerOptions: cancerOptions,
+      signatureNames: signatureNames,
+      refSignatureSet: refSignatureSet,
+      refSignatureSetOptions: refSignatureSetOptions,
+      signatureNameOptions: signatureNameOptions,
+      loading: false,
+    };
+
+    dispatchExpExposure(params);
+
+    dispatchExploring({
+      exposureCancer: exposureCancer,
+      exposureSignature: exposureSignature,
+      signatureNames: signatureNames,
+    });
+  }
+
+  async function populateSignatureExp(data) {
     // set loading indicators
     dispatchExpMutationalProfiles({ loading: true });
     dispatchExpCosineSimilarity({
