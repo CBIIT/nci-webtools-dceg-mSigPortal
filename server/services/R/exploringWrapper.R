@@ -273,7 +273,11 @@ mutationalSignatureDecomposition <- function(plotPath, dataPath, exposure_refdat
   decompsite_input <- decompsite_input %>% separate(col = Sample_Names, into = c('Cancer_Type', 'Sample'), sep = '@')
   decompsite_input %>% write_delim(dataPath, delim = '\t', col_names = T) ## put the link to download this table
 
-  decompsite_distribution(decompsite = decompsite_input, output_plot = plotPath) # put the distribution plot online.
+  if (!is.data.frame(decompsite_input)) {
+    stop('Evaluating step failed due to missing the data')
+  } else {
+    decompsite_distribution(decompsite = decompsite_input, output_plot = plotPath) # put the distribution plot online.
+  }
 }
 
 mutationalSignatureLandscape <- function(cancerType, varDataPath, plotPath, exposure_refdata, signature_refsets, seqmatrix_refdata) {
@@ -290,9 +294,9 @@ mutationalSignatureLandscape <- function(cancerType, varDataPath, plotPath, expo
       select(MutationType, Sample, Mutations) %>%
       pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
       arrange(MutationType) ## have to sort the mutationtype
+
   decompsite_input <- calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
 
-  cosinedata <- decompsite_input %>% select(Samples = Sample_Names, Similarity = Cosine_similarity)
 
   data_input <- exposure_refdata %>%
       filter(Cancer_Type == cancerType) %>%
@@ -301,8 +305,16 @@ mutationalSignatureLandscape <- function(cancerType, varDataPath, plotPath, expo
       rename(Samples = Sample)
 
   data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
+  data_input <- data_input %>% filter(rowAny(across(where(is.numeric), ~ .x > 0)))
 
   sigdata <- data_input
+
+  if (!is.data.frame(decompsite_input)) {
+    cosinedata <- sigdata %>% select(Samples) %>% mutate(Similarity = NA_real_)
+  } else {
+    cosinedata <- decompsite_input %>% select(Samples = Sample_Names, Similarity = Cosine_similarity)
+  }
+
   ## two parameters to add the two bars: vardata1, vardata1_cat, vardata2, vardata2_cat
   # studydata <- data_input %>% select(Samples) %>% mutate(Study=if_else((seq_along(Samples) %% 2 ==0), "A","B"))
   # puritydata <-  data_input %>% select(Samples) %>% mutate(Purity=0)
