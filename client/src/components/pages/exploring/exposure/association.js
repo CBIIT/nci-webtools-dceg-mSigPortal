@@ -81,35 +81,31 @@ export default function Association({ calculateAssociation }) {
       <Form>
         <LoadingOverlay active={loading} />
         <Row className="">
-          <Col sm="2" className="my-auto">
+          <Col sm="6" md="3" className="my-auto">
             <Group controlId="toggleCancerType" className="d-flex">
-              <Label className="mr-4">Use Cancer Type</Label>
-              <Check inline id="toggleCancerType">
-                <Check.Input
-                  type="checkbox"
-                  value={toggleCancer}
-                  checked={toggleCancer}
-                  onChange={() =>
-                    dispatchExpAssociation({ toggleCancer: !toggleCancer })
-                  }
-                />
-              </Check>
+              <Check
+                type="checkbox"
+                label="Selected Cancer Type Only"
+                value={toggleCancer}
+                checked={toggleCancer}
+                onChange={() =>
+                  dispatchExpAssociation({ toggleCancer: !toggleCancer })
+                }
+              />
             </Group>
           </Col>
-          <Col sm="2" className="my-auto">
+          <Col sm="6" md="4" className="my-auto">
             <Group controlId="toggleBothSamples" className="d-flex">
-              <Label className="mr-4">Both Signatures</Label>
-              <Check inline id="toggleBothSamples">
-                <Check.Input
-                  type="checkbox"
-                  value={both}
-                  checked={both}
-                  onChange={(e) => dispatchExpAssociation({ both: !both })}
-                />
-              </Check>
+              <Check
+                type="checkbox"
+                label="Number of Mutations assigned to both signature > 0"
+                value={both}
+                checked={both}
+                onChange={(e) => dispatchExpAssociation({ both: !both })}
+              />
             </Group>
           </Col>
-          <Col sm="2">
+          <Col sm="4" md="2">
             <Select
               className="mb-0"
               id="associationSignatureName1"
@@ -123,7 +119,7 @@ export default function Association({ calculateAssociation }) {
               }
             />
           </Col>
-          <Col sm="2">
+          <Col sm="4" md="2">
             <Select
               className="mb-0"
               id="associationSignatureName2"
@@ -137,8 +133,7 @@ export default function Association({ calculateAssociation }) {
               }
             />
           </Col>
-          <Col sm="2" />
-          <Col sm="2" className="d-flex justify-content-end mt-auto">
+          <Col sm="4" md="1" className="d-flex justify-content-end mt-auto">
             <Button variant="primary" onClick={calculateAssociation}>
               Calculate
             </Button>

@@ -312,8 +312,8 @@ export const getInitialState = () => ({
     loading: false,
   },
   expAssociation: {
-    toggleCancer: false,
-    both: false,
+    toggleCancer: true,
+    both: true,
     signatureName1: '',
     signatureName2: '',
     plotPath: '',
