@@ -280,12 +280,12 @@ export default function ExposureExploring({ populateControls }) {
         genome: genome,
       }),
     };
-    if (fn == 'all' || fn == 'across') {
+    if (!loadingAcross && (fn == 'all' || fn == 'across')) {
       args.across = JSON.stringify({
         signatureName: acrossArgs.signatureName,
       });
     }
-    if (fn == 'all' || fn == 'association') {
+    if (!loadingAssociation && (fn == 'all' || fn == 'association')) {
       args.association = JSON.stringify({
         useCancerType: associationArgs.toggleCancer,
         both: associationArgs.both,
@@ -293,12 +293,12 @@ export default function ExposureExploring({ populateControls }) {
         signatureName2: associationArgs.signatureName2,
       });
     }
-    if (fn == 'all' || fn == 'landscape') {
+    if (!loadingLandscape && (fn == 'all' || fn == 'landscape')) {
       args.landscape = JSON.stringify({
         variableFile: landscapeArgs.variableFile,
       });
     }
-    if (fn == 'all' || fn == 'prevalence') {
+    if (!loadingPrevalence && (fn == 'all' || fn == 'prevalence')) {
       args.prevalence = JSON.stringify({
         mutation: parseFloat(prevalenceArgs.mutation) || 100,
       });
@@ -752,7 +752,7 @@ export default function ExposureExploring({ populateControls }) {
                   </Col>
                 </Row>
                 <Row>
-                  <Col sm="6">
+                  <Col sm="12" md="6">
                     <Button
                       disabled={loading}
                       className="w-100"
@@ -762,7 +762,7 @@ export default function ExposureExploring({ populateControls }) {
                       Reset
                     </Button>
                   </Col>
-                  <Col sm="6">
+                  <Col sm="12" md="6">
                     <Button
                       disabled={loading}
                       className="w-100"
