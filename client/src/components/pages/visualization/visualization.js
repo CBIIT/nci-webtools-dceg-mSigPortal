@@ -71,11 +71,11 @@ export default function Visualize({ match }) {
       },
     });
     try {
-      const { args, state, timestamp } = await (
-        await fetch(`fetchExample/${id}`)
+      const { projectID, state } = await (
+        await fetch(`api/fetchExample/${id}`)
       ).json();
       dispatchVisualize(state);
-      dispatchVisualizeResults({ projectID: id });
+      dispatchVisualizeResults({ projectID: projectID });
     } catch (error) {
       dispatchError(error.toString());
     }

@@ -112,4 +112,4 @@ apiRouter.post('/queue', submitQueue);
 
 apiRouter.get('/fetchResults/:id', fetchResults);
 
-apiRouter.get('/fetchExample/:folder', fetchExample);
+apiRouter.get('/fetchExample/:example', fetchExample);

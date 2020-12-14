@@ -26,7 +26,7 @@ export default function App() {
       navIndex: 0,
       color: '#fc8701', // orange
       examples: [],
-      // examples: [{ title: 'VCF Example', folder: 'vcfExample' }],
+      examples: [{ title: 'VCF Example', folder: 'vcfExample' }],
     },
     {
       route: '/exploring',

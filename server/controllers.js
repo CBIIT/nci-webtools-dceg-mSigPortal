@@ -2,12 +2,13 @@ const path = require('path');
 const logger = require('./logger');
 const { spawn } = require('promisify-child-process');
 const formidable = require('formidable');
-const fs = require('fs');
+const fs = require('fs-extra');
 const { v4: uuidv4, validate } = require('uuid');
 const Papa = require('papaparse');
 const tar = require('tar');
 const r = require('r-wrapper').async;
 const AWS = require('aws-sdk');
+const replace = require('replace-in-file');
 const config = require('./config.json');
 
 function parseCSV(filepath) {
@@ -538,25 +539,43 @@ async function fetchResults(req, res, next) {
 
 async function fetchExample(req, res, next) {
   try {
-    const { folder } = req.params;
-    const examplePath = path.resolve(config.data.folder, 'Examples', folder);
+    const { example } = req.params;
+    logger.info(`Fetching example: ${example}`);
 
-    logger.info(`Fetch Example: ${folder}`);
+    // check exists
+    const examplePath = path.resolve(config.data.examples, example);
+    const paramsPath = path.join(examplePath, `params.json`);
 
-    // validate example
-    if (!fs.existsSync(examplePath)) throw `Example does not exist`;
+    if (fs.existsSync(paramsPath)) {
+      const params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
+      const oldID = params.args.projectID[1];
 
-    let paramsFilePath = path.resolve(examplePath, `params.json`);
+      // copy example to results with unique id
+      const id = uuidv4();
+      const resultsPath = path.resolve(config.results.folder, id);
+      await fs.promises.mkdir(resultsPath, { recursive: true });
+      await fs.copy(examplePath, resultsPath);
 
-    if (fs.existsSync(paramsFilePath)) {
-      const params = JSON.parse(await fs.promises.readFile(paramsFilePath));
+      // rename file paths with new ID
+      const svgPath = path.join(resultsPath, 'results', 'svg_files_list.txt');
+      const matrixPath = path.join(
+        resultsPath,
+        'results',
+        'matrix_files_list.txt'
+      );
 
-      res.json(params);
+      await replace({
+        files: [svgPath, matrixPath],
+        from: new RegExp(`/${oldID}/`, 'g'),
+        to: `/${id}/`,
+      });
+
+      res.json({ projectID: id, state: params.state });
     } else {
-      throw `Invalid id`;
+      throw `Invalid example`;
     }
   } catch (error) {
-    res.status(500).json(error);
+    next(error);
   }
 }
 
