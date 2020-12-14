@@ -86,9 +86,14 @@ export default function Across({ calculateAcross }) {
             </Button>
           </Col>
         </Row>
-        <div id="acrossPlot">
+        <div id="exposureAcrossPlot">
           {err && (
-            <p>{err}</p>
+            <div>
+              <p>
+                An error has occured. Check the debug section for more info.
+              </p>
+              <p>Error: {err}</p>
+            </div>
           )}
           {plotURL && (
             <Plot

@@ -89,10 +89,15 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
             </Button>
           </Col>
         </Row>
-        <div id="withinPlot">
-          <div style={{ display: err ? 'block' : 'none' }}>
-            <p>{err}</p>
-          </div>
+        <div id="exposureLandscapePlot">
+          {err && (
+            <div>
+              <p>
+                An error has occured. Check the debug section for more info.
+              </p>
+              <p>Error: {err}</p>
+            </div>
+          )}
           <div style={{ display: plotURL ? 'block' : 'none' }}>
             <Plot
               plotName={plotPath.split('/').slice(-1)[0]}

@@ -139,8 +139,15 @@ export default function Association({ calculateAssociation }) {
             </Button>
           </Col>
         </Row>
-        <div id="associationPlot">
-          {err && <p>{err}</p>}
+        <div id="exposureAssociationPlot">
+          {err && (
+            <div>
+              <p>
+                An error has occured. Check the debug section for more info.
+              </p>
+              <p>Error: {err}</p>
+            </div>
+          )}
           {plotURL && (
             <Plot
               plotName={plotPath.split('/').slice(-1)[0]}
