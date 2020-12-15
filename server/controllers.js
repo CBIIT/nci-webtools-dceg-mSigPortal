@@ -28,6 +28,7 @@ function parseCSV(filepath) {
   });
 }
 
+// retrieves parsed data files - modify paths if needed
 async function getResultDataFiles(resultsPath) {
   const svgListPath = path.join(resultsPath, 'svg_files_list.txt');
   const statisticsPath = path.join(resultsPath, 'Statistics.txt');
@@ -65,16 +66,14 @@ function getRelativePath(paths) {
   let newPaths = {};
   const resultsPath = path.resolve(config.results.folder);
   const dataPath = path.resolve(config.data.database);
-  const examplePath = path.resolve(config.data.folder, 'Examples');
 
   Object.keys(paths).map((key) => {
     const fullPath = path.resolve(paths[key]);
+
     if (fullPath.includes(resultsPath))
       newPaths[key] = fullPath.replace(resultsPath + '/', '');
     else if (fullPath.includes(dataPath))
       newPaths[key] = fullPath.replace(dataPath + '/', '');
-    else if (fullPath.includes(examplePath))
-      newPaths[key] = fullPath.replace(examplePath + '/', '');
   });
   return newPaths;
 }
@@ -149,17 +148,9 @@ async function getResultData(req, res, next) {
     req.body.projectID,
     'results'
   );
-  const examplePath = path.resolve(
-    config.data.folder,
-    'Examples',
-    req.body.projectID,
-    'results'
-  );
 
   if (fs.existsSync(path.join(userResults, 'svg_files_list.txt'))) {
     res.json(await getResultDataFiles(userResults));
-  } else if (fs.existsSync(path.join(examplePath, 'svg_files_list.txt'))) {
-    res.json(await getResultDataFiles(examplePath));
   } else {
     logger.info('/getResultData: Results not found');
     res.status(500).json('Results not found');
