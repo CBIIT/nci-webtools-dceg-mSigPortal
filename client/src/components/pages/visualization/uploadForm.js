@@ -288,7 +288,7 @@ export default function UploadForm() {
   }
 
   function selectFormat(format) {
-    resetForm();
+    removeFile();
     let path = '';
     if (format == 'vcf') path = 'assets/exampleInput/demo_input_multi.vcf.gz';
     if (format == 'csv') path = 'assets/exampleInput/demo_input_multi.csv';
