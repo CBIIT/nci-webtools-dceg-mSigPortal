@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, Row, Col, Button, Accordion, Card } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -35,6 +35,42 @@ export default function MutationalPattern({ submitR }) {
     debugR,
     submitOverlay,
   } = useSelector((state) => state.mutationalPattern);
+
+  useEffect(() => {
+    // load plots if they exist - used for precalculated examples
+    const checkPlot = async () => {
+      const barchart =
+        source == 'user'
+          ? `/results/mutationalPattern/barchart.svg`
+          : `/results/mutationalPatternPublic/barchart.svg`;
+      let check = await fetch(`api/results/${projectID}${barchart}`, {
+        method: 'HEAD',
+        cache: 'no-cache',
+      });
+      if (check.status === 200) {
+        dispatchMutationalPattern({ barPath: barchart });
+        setRPlot(barchart, 'barchart');
+      }
+
+      const mpea =
+        source == 'user'
+          ? `/results/mutationalPattern/mpea.svg`
+          : `/results/mutationalPatternPublic/mpea.svg`;
+      check = await fetch(`api/results/${projectID}${mpea}`, {
+        method: 'HEAD',
+        cache: 'no-cache',
+      });
+      if (check.status === 200) {
+        dispatchMutationalPattern({
+          plotPath: mpea,
+          txtPath: `/results/mutationalPatternPublic/mpea.txt`,
+        });
+        setRPlot(mpea, 'context');
+      }
+    };
+
+    if (projectID) checkPlot();
+  }, [projectID]);
 
   async function setRPlot(plotPath, type) {
     dispatchMutationalPattern({ submitOverlay: true });

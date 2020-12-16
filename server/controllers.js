@@ -541,7 +541,6 @@ async function fetchExample(req, res, next) {
 
     if (fs.existsSync(paramsPath)) {
       const params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
-      const oldID = params.args.projectID[1];
 
       // copy example to results with unique id
       const id = uuidv4();
@@ -549,19 +548,22 @@ async function fetchExample(req, res, next) {
       await fs.promises.mkdir(resultsPath, { recursive: true });
       await fs.copy(examplePath, resultsPath);
 
-      // rename file paths with new ID
+      // rename file paths with new ID if needed
       const svgPath = path.join(resultsPath, 'results', 'svg_files_list.txt');
-      const matrixPath = path.join(
-        resultsPath,
-        'results',
-        'matrix_files_list.txt'
-      );
+      if (fs.existsSync(svgPath)) {
+        const oldID = params.args.projectID[1];
+        const matrixPath = path.join(
+          resultsPath,
+          'results',
+          'matrix_files_list.txt'
+        );
 
-      await replace({
-        files: [svgPath, matrixPath],
-        from: new RegExp(`/${oldID}/`, 'g'),
-        to: `/${id}/`,
-      });
+        await replace({
+          files: [svgPath, matrixPath],
+          from: new RegExp(`/${oldID}/`, 'g'),
+          to: `/${id}/`,
+        });
+      }
 
       res.json({ projectID: id, state: params.state });
     } else {

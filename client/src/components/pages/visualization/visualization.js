@@ -89,8 +89,12 @@ export default function Visualize({ match }) {
       if (state.profileComparison)
         dispatchProfileComparison(state.profileComparison);
       if (state.pca) dispatchPCA(state.pca);
-
-      dispatchVisualizeResults({ projectID: projectID });
+      if (state.visualizeResults) {
+        dispatchVisualizeResults({
+          ...state.visualizeResults,
+          projectID: projectID,
+        });
+      } else dispatchVisualizeResults({ projectID: projectID });
     } catch (error) {
       dispatchError(error.toString());
     }

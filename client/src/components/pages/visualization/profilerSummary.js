@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
@@ -28,7 +27,10 @@ export default function ProfilerSummary({ submitR }) {
   useEffect(() => {
     // check if profiler summary already exists, else lazy-load calculate
     const checkSummary = async () => {
-      const path = `${projectID}/results/profilerSummary/profilerSummary.svg`;
+      const path =
+        source == 'user'
+          ? `/results/profilerSummary/profilerSummary.svg`
+          : `/results/profilerSummaryPublic/profilerSummaryPublic.svg`;
       const check = await fetch(`api/results/${projectID}${path}`, {
         method: 'HEAD',
         cache: 'no-cache',

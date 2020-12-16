@@ -86,25 +86,26 @@ export default function Home({ links }) {
                       </h2>
                     </Card.Title>
                   </div>
-                  <div className="text-center mt-2 d-md-none">
-                    <div>{description}</div>
-                    <div className="mt-3">
-                      {examples.map(({ title, folder }) => (
-                        <NavLink exact={true} to={`${route}/example/${folder}`}>
-                          {title}
-                        </NavLink>
-                      ))}
-                    </div>
-                  </div>
                 </Card.Body>
               </Card>
               <div className="description d-none d-md-block">
                 <div>{description}</div>
                 <div className="mt-3">
-                  {examples.map(({ title, folder }) => (
-                    <NavLink exact={true} to={`${route}/example/${folder}`}>
-                      {title}
-                    </NavLink>
+                  {examples.map(({ title, external, folder }, index) => (
+                    <div key={index}>
+                      <Link to={`${route}/example/${folder}`}>
+                        <span className="sr-only">{title + ' link'}</span>
+                        {title}
+                      </Link>
+                      {external && (
+                        <span>
+                          {'; '}
+                          <a href={external.href} target="_blank">
+                            {external.name}
+                          </a>
+                        </span>
+                      )}
+                    </div>
                   ))}
                 </div>
               </div>
