@@ -12,6 +12,11 @@ import { useSelector } from 'react-redux';
 import {
   dispatchVisualize,
   dispatchVisualizeResults,
+  dispatchProfilerSummary,
+  dispatchMutationalPattern,
+  dispatchCosineSimilarity,
+  dispatchProfileComparison,
+  dispatchPCA,
   dispatchError,
   store,
   updateVisualize,
@@ -52,7 +57,7 @@ export default function Visualize({ match }) {
       const { args, state, timestamp } = await (
         await fetch(`api/fetchResults/${id}`)
       ).json();
-      dispatchVisualize(state);
+      dispatchVisualize(state.visualize);
       dispatchVisualizeResults({ projectID: id });
     } catch (error) {
       dispatchError(error.toString());
@@ -74,7 +79,17 @@ export default function Visualize({ match }) {
       const { projectID, state } = await (
         await fetch(`api/fetchExample/${id}`)
       ).json();
-      dispatchVisualize(state);
+      dispatchVisualize(state.visualize);
+      // rehydrate state if available
+      if (state.profilerSummary) dispatchProfilerSummary(state.profilerSummary);
+      if (state.mutationalPattern)
+        dispatchMutationalPattern(state.mutationalPattern);
+      if (state.cosineSimilarity)
+        dispatchCosineSimilarity(state.cosineSimilarity);
+      if (state.profileComparison)
+        dispatchProfileComparison(state.profileComparison);
+      if (state.pca) dispatchPCA(state.pca);
+
       dispatchVisualizeResults({ projectID: projectID });
     } catch (error) {
       dispatchError(error.toString());

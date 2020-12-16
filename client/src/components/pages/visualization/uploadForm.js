@@ -30,7 +30,7 @@ const { Group, Label, Control, Check, Text } = Form;
 const { Title, Content } = Popover;
 
 export default function UploadForm() {
-  const state = useSelector((state) => state.visualize);
+  const visualizeState = useSelector((state) => state.visualize);
   const {
     inputFormat,
     selectedGenome,
@@ -46,7 +46,14 @@ export default function UploadForm() {
     submitted,
     exampleData,
     loading,
-  } = state;
+    pDataOptions,
+    studyOptions,
+    study,
+    cancerTypeOptions,
+    cancerType,
+    pubExperimentOptions,
+    pubExperimentalStrategy,
+  } = visualizeState;
 
   const [inputFile, setInput] = useState(new File([], ''));
   const [bedFile, setBed] = useState(new File([], ''));
@@ -119,7 +126,7 @@ export default function UploadForm() {
           },
           body: JSON.stringify({
             args: args,
-            state: { ...state, submitted: true },
+            state: { visualize: { ...visualizeState, submitted: true } },
           }),
         });
 
@@ -203,6 +210,7 @@ export default function UploadForm() {
     }
   }
 
+  // reset form while preserving selected data source and public parameters
   function resetForm() {
     const initialState = getInitialState();
     removeFile();
@@ -210,13 +218,13 @@ export default function UploadForm() {
     dispatchVisualize({
       ...initialState.visualize,
       source: 'user',
-      pDataOptions: state.pDataOptions,
-      studyOptions: state.studyOptions,
-      study: state.studyOptions[0],
-      cancerTypeOptions: state.cancerTypeOptions,
-      cancerType: state.cancerTypeOptions[0],
-      pubExperimentOptions: state.pubExperimentOptions,
-      pubExperimentalStrategy: state.pubExperimentOptions[0],
+      pDataOptions: pDataOptions,
+      studyOptions: studyOptions,
+      study: study,
+      cancerTypeOptions: cancerTypeOptions,
+      cancerType: cancerType,
+      pubExperimentOptions: pubExperimentOptions,
+      pubExperimentalStrategy: pubExperimentalStrategy,
     });
   }
 

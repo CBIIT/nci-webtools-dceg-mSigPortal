@@ -23,7 +23,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
     pDataOptions,
   } = useSelector((state) => state.visualize);
   const { profileOptions } = useSelector((state) => state.mutationalProfiles);
-  const { svgList } = useSelector((state) => state.visualizeResults);
+  const { projectID, svgList } = useSelector((state) => state.visualizeResults);
 
   const {
     profileType,
@@ -94,7 +94,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
         ? dispatchPCA({ submitOverlay: true })
         : dispatchPCA({ pubSubmitOverlay: true });
       try {
-        const response = await fetch(`api/results/${plotPath}`);
+        const response = await fetch(`api/results/${projectID}${plotPath}`);
 
         if (!response.ok) {
           // console.log(await response.json());
@@ -422,7 +422,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                     <Plot
                       plotName={pca2.split('/').slice(-1)[0]}
                       plotURL={pca2URL}
-                      txtPath={pca2Data}
+                      txtPath={projectID + pca2Data}
                     />
                   </div>
                 </div>
@@ -435,7 +435,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                     <Plot
                       plotName={pca3.split('/').slice(-1)[0]}
                       plotURL={pca3URL}
-                      txtPath={pca3Data}
+                      txtPath={projectID + pca3Data}
                     />
                   </div>
                 </div>
@@ -448,7 +448,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                     <Plot
                       plotName={heatmap.split('/').slice(-1)[0]}
                       plotURL={heatmapURL}
-                      txtPath={heatmapData}
+                      txtPath={projectID + heatmapData}
                     />
                   </div>
                 </div>
@@ -572,7 +572,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                         <Plot
                           plotName={pubPca2.split('/').slice(-1)[0]}
                           plotURL={pubPca2URL}
-                          txtPath={pubPca2Data}
+                          txtPath={projectID + pubPca2Data}
                         />
                       </div>
                     </div>
@@ -585,7 +585,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                         <Plot
                           plotName={pubPca3.split('/').slice(-1)[0]}
                           plotURL={pubPca3URL}
-                          txtPath={pubPca3Data}
+                          txtPath={projectID + pubPca3Data}
                         />
                       </div>
                     </div>

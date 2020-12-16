@@ -26,6 +26,7 @@ export default function MutationalSignatureProfile({ submitR }) {
     loading,
   } = useSelector((state) => state.expCosineSimilarity);
   const { displayTab, refSigData } = useSelector((state) => state.exploring);
+  const { projectID } = useSelector((state) => state.visualizeResults);
 
   async function calculateR(fn, args) {
     dispatchExpCosineSimilarity({
@@ -72,7 +73,7 @@ export default function MutationalSignatureProfile({ submitR }) {
   async function setRPlot(plotPath) {
     if (plotPath) {
       try {
-        const response = await fetch(`api/results/${plotPath}`);
+        const response = await fetch(`api/results/${projectID}${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {
@@ -173,7 +174,7 @@ export default function MutationalSignatureProfile({ submitR }) {
               <Plot
                 plotName={plotPath.split('/').slice(-1)[0]}
                 plotURL={plotURL}
-                txtPath={txtPath}
+                txtPath={projectID + txtPath}
                 maxHeight="1000px"
               />
             </div>

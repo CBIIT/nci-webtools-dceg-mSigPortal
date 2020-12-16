@@ -177,7 +177,7 @@ async function processMessage(params) {
     logger.info(`Sending user success email`);
     const userEmailResults = await mailer.sendMail({
       from: config.email.sender,
-      to: state.email,
+      to: state.visualize.email,
       subject: `mSigPortal Results - ${timestamp} EST`,
       html: await readTemplate(
         __dirname + '/templates/user-success-email.html',
@@ -215,11 +215,11 @@ async function processMessage(params) {
     });
 
     // send user error email
-    if (state.email) {
+    if (state.visualize.email) {
       logger.info(`Sending user error email`);
       const userEmailResults = await mailer.sendMail({
         from: config.email.sender,
-        to: state.email,
+        to: state.visualize.email,
         subject: 'mSigPortal Error',
         html: await readTemplate(
           __dirname + '/templates/user-failure-email.html',

@@ -8,6 +8,7 @@ export default function Tumor() {
   const { plotPath, plotURL, debugR, err } = useSelector(
     (state) => state.expTumor
   );
+  const { projectID } = useSelector((state) => state.visualizeResults);
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
@@ -17,7 +18,7 @@ export default function Tumor() {
   async function setRPlot(plotPath) {
     if (plotPath) {
       try {
-        const response = await fetch(`api/results/${plotPath}`);
+        const response = await fetch(`api/results/${projectID}${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {

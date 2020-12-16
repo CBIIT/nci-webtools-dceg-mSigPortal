@@ -12,6 +12,7 @@ export default function Decomposition() {
   const { plotPath, plotURL, txtPath, debugR, err, loading } = useSelector(
     (state) => state.expDecomposition
   );
+  const { projectID } = useSelector((state) => state.visualizeResults);
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
@@ -21,7 +22,7 @@ export default function Decomposition() {
   async function setRPlot(plotPath) {
     if (plotPath) {
       try {
-        const response = await fetch(`api/results/${plotPath}`);
+        const response = await fetch(`api/results/${projectID}${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {
@@ -61,7 +62,7 @@ export default function Decomposition() {
         <Plot
           plotName={plotPath.split('/').slice(-1)[0]}
           plotURL={plotURL}
-          txtPath={txtPath}
+          txtPath={projectID + txtPath}
         />
       )}
       <Debug msg={debugR} />

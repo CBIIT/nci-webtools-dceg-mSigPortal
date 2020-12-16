@@ -25,7 +25,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
     pDataOptions,
   } = useSelector((state) => state.visualize);
   const { profileOptions } = useSelector((state) => state.mutationalProfiles);
-  const { matrixList, svgList } = useSelector(
+  const { projectID, matrixList, svgList } = useSelector(
     (state) => state.visualizeResults
   );
 
@@ -100,7 +100,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
     setOverlay(type, true);
     if (plotPath) {
       try {
-        const response = await fetch(`api/results/${plotPath}`);
+        const response = await fetch(`api/results/${projectID}${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {
@@ -411,7 +411,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                     <Plot
                       plotName={withinPlotPath.split('/').slice(-1)[0]}
                       plotURL={withinPlotURL}
-                      txtPath={withinTxtPath}
+                      txtPath={projectID + withinTxtPath}
                     />
                   </div>
                 </div>
@@ -517,7 +517,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                       <Plot
                         plotName={refPlotPath.split('/').slice(-1)[0]}
                         plotURL={refPlotURL}
-                        txtPath={refTxtPath}
+                        txtPath={projectID + refTxtPath}
                       />
                     </div>
                   </div>
@@ -631,7 +631,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                         <Plot
                           plotName={pubPlotURL.split('/').slice(-1)[0]}
                           plotURL={pubPlotURL}
-                          txtPath={pubTxtPath}
+                          txtPath={projectID + pubTxtPath}
                         />
                       </div>
                     </div>

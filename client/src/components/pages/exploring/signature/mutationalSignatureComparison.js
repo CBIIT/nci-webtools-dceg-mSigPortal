@@ -29,6 +29,7 @@ export default function MutationalSignatureProfile({ submitR }) {
     loading,
   } = useSelector((state) => state.expMutationalSigComparison);
   const { displayTab, refSigData } = useSelector((state) => state.exploring);
+  const { projectID } = useSelector((state) => state.visualizeResults);
 
   async function calculateR(fn, args) {
     dispatchExpMutationalSigComparison({
@@ -77,7 +78,7 @@ export default function MutationalSignatureProfile({ submitR }) {
   async function setRPlot(plotPath) {
     if (plotPath) {
       try {
-        const response = await fetch(`api/results/${plotPath}`);
+        const response = await fetch(`api/results/${projectID}${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {

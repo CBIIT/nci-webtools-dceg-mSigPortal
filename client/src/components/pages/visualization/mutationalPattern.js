@@ -19,8 +19,9 @@ export default function MutationalPattern({ submitR }) {
   const { source, study, cancerType, pubExperimentalStrategy } = useSelector(
     (state) => state.visualize
   );
-  const { matrixList } = useSelector((state) => state.visualizeResults);
-
+  const { projectID, matrixList } = useSelector(
+    (state) => state.visualizeResults
+  );
   const {
     proportion,
     pattern,
@@ -40,7 +41,7 @@ export default function MutationalPattern({ submitR }) {
 
     if (plotPath) {
       try {
-        const response = await fetch(`api/results/${plotPath}`);
+        const response = await fetch(`api/results/${projectID}${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {
@@ -137,7 +138,7 @@ export default function MutationalPattern({ submitR }) {
           <Plot
             plotName={plotPath.split('/').slice(-1)[0]}
             plotURL={plotURL}
-            txtPath={txtPath}
+            txtPath={projectID + txtPath}
           />
         </div>
       </div>

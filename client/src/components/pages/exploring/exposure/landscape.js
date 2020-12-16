@@ -21,6 +21,7 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
     err,
     loading,
   } = useSelector((state) => state.expLandscape);
+  const { projectID } = useSelector((state) => state.visualizeResults);
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
@@ -30,7 +31,7 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
   async function setRPlot(plotPath) {
     if (plotPath) {
       try {
-        const response = await fetch(`api/results/${plotPath}`);
+        const response = await fetch(`api/results/${projectID}${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {
@@ -102,7 +103,7 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
             <Plot
               plotName={plotPath.split('/').slice(-1)[0]}
               plotURL={plotURL}
-              txtPath={txtPath}
+              txtPath={projectID + txtPath}
             />
           </div>
         </div>

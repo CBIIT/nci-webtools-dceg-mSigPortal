@@ -62,16 +62,16 @@ async function getResultDataFiles(resultsPath) {
   };
 }
 
-function getRelativePath(paths) {
+function getRelativePath(paths, id = '') {
   let newPaths = {};
-  const resultsPath = path.resolve(config.results.folder);
+  const resultsPath = path.resolve(config.results.folder, id);
   const dataPath = path.resolve(config.data.database);
 
   Object.keys(paths).map((key) => {
     const fullPath = path.resolve(paths[key]);
 
     if (fullPath.includes(resultsPath))
-      newPaths[key] = fullPath.replace(resultsPath + '/', '');
+      newPaths[key] = fullPath.replace(resultsPath, '');
     else if (fullPath.includes(dataPath))
       newPaths[key] = fullPath.replace(dataPath + '/', '');
   });
@@ -189,7 +189,7 @@ async function visualizeR(req, res, next) {
     res.json({
       ...rest,
       debugR: stdout,
-      output: getRelativePath(output),
+      output: getRelativePath(output, req.body.projectID),
     });
   } catch (err) {
     logger.info('/visualizeR: An error occured');
@@ -390,7 +390,7 @@ async function exploringR(req, res, next) {
     res.json({
       ...rest,
       debugR: stdout,
-      output: getRelativePath(output),
+      output: getRelativePath(output, req.body.projectID),
       projectID: projectID,
     });
   } catch (err) {

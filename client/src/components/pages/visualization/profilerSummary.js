@@ -29,7 +29,7 @@ export default function ProfilerSummary({ submitR }) {
     // check if profiler summary already exists, else lazy-load calculate
     const checkSummary = async () => {
       const path = `${projectID}/results/profilerSummary/profilerSummary.svg`;
-      const check = await fetch(`api/results/${path}`, {
+      const check = await fetch(`api/results/${projectID}${path}`, {
         method: 'HEAD',
         cache: 'no-cache',
       });
@@ -59,7 +59,7 @@ export default function ProfilerSummary({ submitR }) {
   async function setRPlot(plotPath) {
     if (plotPath) {
       try {
-        const response = await fetch(`api/results/${plotPath}`);
+        const response = await fetch(`api/results/${projectID}${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {

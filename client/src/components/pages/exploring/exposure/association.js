@@ -27,6 +27,7 @@ export default function Association({ calculateAssociation }) {
     err,
     loading,
   } = useSelector((state) => state.expAssociation);
+  const { projectID } = useSelector((state) => state.visualizeResults);
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
@@ -50,7 +51,7 @@ export default function Association({ calculateAssociation }) {
   async function setRPlot(plotPath) {
     if (plotPath) {
       try {
-        const response = await fetch(`api/results/${plotPath}`);
+        const response = await fetch(`api/results/${projectID}${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {

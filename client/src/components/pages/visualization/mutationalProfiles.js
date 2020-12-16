@@ -12,7 +12,7 @@ const { Group, Label } = Form;
 
 export default function MutationalProfiles() {
   const { source } = useSelector((state) => state.visualize);
-  const { svgList, displayTab } = useSelector(
+  const { projectID, svgList, displayTab } = useSelector(
     (state) => state.visualizeResults
   );
 
@@ -59,7 +59,7 @@ export default function MutationalProfiles() {
       try {
         const response =
           source == 'user'
-            ? await fetch(`api/results/${plot.Path}`)
+            ? await fetch(`api/results/${projectID}${plot.Path}`)
             : await fetch(`api/public/${plot.Path}`);
 
         if (!response.ok) {

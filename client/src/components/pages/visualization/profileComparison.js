@@ -39,7 +39,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     pubExperimentalStrategy,
     pDataOptions,
   } = useSelector((state) => state.visualize);
-  const { matrixList, svgList } = useSelector(
+  const { projectID, matrixList, svgList } = useSelector(
     (state) => state.visualizeResults
   );
   const { profileOptions } = useSelector((state) => state.mutationalProfiles);
@@ -165,7 +165,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     handleOverlay(fn, true);
     if (plotPath) {
       try {
-        const response = await fetch(`api/results/${plotPath}`);
+        const response = await fetch(`api/results/${projectID}${plotPath}`);
         if (!response.ok) {
           // console.log(await response.json());
         } else {
@@ -313,9 +313,15 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         } else {
           handleOverlay(fn, false);
           if (fn.includes('profileComparisonWithin')) {
-            dispatchProfileComparison({ withinPlotPath: '', withinErr: error });
+            dispatchProfileComparison({
+              withinPlotPath: '',
+              withinErr: error || debugR,
+            });
           } else if (fn.includes('profileComparisonRefSig')) {
-            dispatchProfileComparison({ refPlotPath: '', refErr: error });
+            dispatchProfileComparison({
+              refPlotPath: '',
+              refErr: error || debugR,
+            });
           } else {
             dispatchProfileComparison({ pubPlotPath: '', pubErr: true });
           }
@@ -527,9 +533,15 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 )}
 
                 <div id="pcWithinPlot">
-                  <div style={{ display: withinErr ? 'block' : 'none' }}>
-                    <p>{withinErr}</p>
-                  </div>
+                  {withinErr && (
+                    <div>
+                      <p>
+                        An error has occured. Check the debug section for more
+                        info.
+                      </p>
+                      <p>Error: {withinErr}</p>
+                    </div>
+                  )}
                   <div style={{ display: withinPlotURL ? 'block' : 'none' }}>
                     <Plot
                       plotName={withinPlotPath.split('/').slice(-1)[0]}
@@ -683,9 +695,15 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   </Row>
 
                   <div id="refPlotDownload">
-                    <div style={{ display: refErr ? 'block' : 'none' }}>
-                      <p>{refErr}</p>
-                    </div>
+                    {refErr && (
+                      <div>
+                        <p>
+                          An error has occured. Check the debug section for more
+                          info.
+                        </p>
+                        <p>Error: {refErr}</p>
+                      </div>
+                    )}
                     <div style={{ display: refPlotURL ? 'block' : 'none' }}>
                       <Plot
                         plotName={refPlotPath.split('/').slice(-1)[0]}
@@ -825,12 +843,14 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                     </Row>
 
                     <div id="pcPubPlot">
-                      <div style={{ display: pubErr ? 'block' : 'none' }}>
-                        <p>
-                          An error has occured. Check the debug section for more
-                          info.
-                        </p>
-                      </div>
+                      {pubErr && (
+                        <div>
+                          <p>
+                            An error has occured. Check the debug section for
+                            more info.
+                          </p>
+                        </div>
+                      )}
                       <div style={{ display: pubPlotURL ? 'block' : 'none' }}>
                         <Plot
                           plotName={pubPlotPath.split('/').slice(-1)[0]}
