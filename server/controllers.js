@@ -423,7 +423,9 @@ async function submitQueue(req, res, next) {
     // upload archived project directory
     await new AWS.S3()
       .upload({
-        Body: tar.c({ gzip: true, C: config.results.folder }, [projectID]),
+        Body: tar
+          .c({ sync: true, gzip: true, C: config.results.folder }, [projectID])
+          .read(),
         Bucket: config.s3.bucket,
         Key: `${config.s3.outputKeyPrefix}${projectID}/${projectID}.tgz`,
       })
