@@ -5,6 +5,7 @@ library(ggsci)
 library(ggrepel)
 library(factoextra)
 library(scales)
+library(ggpubr)
 library(jsonlite)
 
 # get all Reference Signature Set options using profile_name (profile type and matrix size)
