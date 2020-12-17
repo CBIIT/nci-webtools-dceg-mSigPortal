@@ -25,17 +25,6 @@ export default function App() {
       image: 'assets/images/visualize.png',
       navIndex: 0,
       color: '#fc8701', // orange
-      examples: [
-        { title: 'VCF Example', folder: 'vcfExample' },
-        {
-          title: 'MBD4 defect is associated with hypermutated CpG>TpG pattern',
-          external: {
-            name: 'PMID: 29760383',
-            href: 'https://pubmed.ncbi.nlm.nih.gov/29760383/',
-          },
-          folder: 'tcgaPanCancer',
-        },
-      ],
     },
     {
       route: '/exploring',
@@ -48,7 +37,6 @@ export default function App() {
       image: 'assets/images/explore.png',
       navIndex: 1,
       color: '#2c71dd', // blue
-      examples: [],
       dropdown: [
         { name: 'Etiology', path: 'etiology' },
         { name: 'Signature', path: 'signature' },
@@ -67,7 +55,6 @@ export default function App() {
       image: 'assets/images/refitting.png',
       navIndex: 2,
       color: '#689f39', // green
-      examples: [],
     },
     {
       route: '/association',
@@ -80,7 +67,6 @@ export default function App() {
       image: 'assets/images/association.png',
       navIndex: 3,
       color: '#84368d', // purple
-      examples: [],
     },
     {
       route: '/publications',

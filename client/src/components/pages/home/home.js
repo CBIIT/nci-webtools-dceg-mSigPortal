@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Card from 'react-bootstrap/Card';
 import { CardDeck } from 'react-bootstrap';
-import { NavLink } from 'react-router-dom';
 import './home.scss';
 
 export default function Home({ links }) {
@@ -90,24 +89,6 @@ export default function Home({ links }) {
               </Card>
               <div className="description d-none d-md-block">
                 <div>{description}</div>
-                <div className="mt-3">
-                  {examples.map(({ title, external, folder }, index) => (
-                    <div key={index}>
-                      <Link to={`${route}/example/${folder}`}>
-                        <span className="sr-only">{title + ' link'}</span>
-                        {title}
-                      </Link>
-                      {external && (
-                        <span>
-                          {'; '}
-                          <a href={external.href} target="_blank">
-                            {external.name}
-                          </a>
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                </div>
               </div>
             </div>
           )

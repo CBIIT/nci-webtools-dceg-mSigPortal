@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, Nav } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
@@ -20,7 +21,7 @@ import Download from './download';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const { Header, Body } = Card;
-const { Item, Link } = Nav;
+const { Item, Link: CardLink } = Nav;
 
 export default function Results({ setOpenSidebar }) {
   const { error, projectID, displayTab, svgList, matrixList } = useSelector(
@@ -336,6 +337,18 @@ export default function Results({ setOpenSidebar }) {
     { title: 'Download', id: 'download' },
   ];
 
+  const examples = [
+    { title: 'VCF Example', path: 'vcfExample' },
+    {
+      title: 'MBD4 defect is associated with hypermutated CpG>TpG pattern',
+      external: {
+        name: 'PMID: 29760383',
+        href: 'https://pubmed.ncbi.nlm.nih.gov/29760383/',
+      },
+      path: 'tcgaPanCancer',
+    },
+  ];
+
   return (
     <div>
       <LoadingOverlay
@@ -357,14 +370,14 @@ export default function Results({ setOpenSidebar }) {
               {links.map(({ title, id }) => {
                 return (
                   <Item key={id}>
-                    <Link
+                    <CardLink
                       active={displayTab == id}
                       onClick={() =>
                         dispatchVisualizeResults({ displayTab: id })
                       }
                     >
                       {title}
-                    </Link>
+                    </CardLink>
                   </Item>
                 );
               })}
@@ -443,7 +456,28 @@ export default function Results({ setOpenSidebar }) {
           style={{ minHeight: '420px' }}
         >
           <h2>Instructions</h2>
-          <p>Upload Sample Variants and specify parameters</p>
+          <hr />
+          <h4>Data Souce</h4>
+          <p>Public: Perform analysis using data available on the website</p>
+          <p>User: Upload Sample Variants and specify parameters </p>
+          <hr />
+          <h4>Examples Queries</h4>
+          {examples.map(({ title, external, path }, index) => (
+            <div key={index}>
+              <Link to={`visualization/example/${path}`}>
+                <span className="sr-only">{title + ' link'}</span>
+                {title}
+              </Link>
+              {external && (
+                <span>
+                  {'; '}
+                  <a href={external.href} target="_blank">
+                    {external.name}
+                  </a>
+                </span>
+              )}
+            </div>
+          ))}
         </div>
       )}
     </div>
