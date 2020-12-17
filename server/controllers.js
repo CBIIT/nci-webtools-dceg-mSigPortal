@@ -29,7 +29,7 @@ function parseCSV(filepath) {
 }
 
 // retrieves parsed data files - modify paths if needed
-async function getResultDataFiles(resultsPath) {
+async function getResultDataFiles(resultsPath, id = '') {
   const svgListPath = path.join(resultsPath, 'svg_files_list.txt');
   const statisticsPath = path.join(resultsPath, 'Statistics.txt');
   const matrixPath = path.join(resultsPath, 'matrix_files_list.txt');
@@ -51,7 +51,7 @@ async function getResultDataFiles(resultsPath) {
   }
 
   svgList.forEach(
-    (plot) => (plot.Path = getRelativePath({ Path: plot.Path }).Path)
+    (plot) => (plot.Path = getRelativePath({ Path: plot.Path }, id).Path)
   );
 
   return {
@@ -122,7 +122,11 @@ async function visualizationProfilerExtraction(req, res, next) {
     const resultsPath = path.join(projectPath, 'results');
 
     if (fs.existsSync(path.join(resultsPath, 'svg_files_list.txt'))) {
-      res.json({ stdout, stderr, ...(await getResultDataFiles(resultsPath)) });
+      res.json({
+        stdout,
+        stderr,
+        ...(await getResultDataFiles(resultsPath, req.body.projectID[1])),
+      });
     } else {
       logger.info(
         '/profilerExtraction: An Error Occured While Extracting Profiles'
@@ -150,7 +154,7 @@ async function getResultData(req, res, next) {
   );
 
   if (fs.existsSync(path.join(userResults, 'svg_files_list.txt'))) {
-    res.json(await getResultDataFiles(userResults));
+    res.json(await getResultDataFiles(userResults, req.body.projectID));
   } else {
     logger.info('/getResultData: Results not found');
     res.status(500).json('Results not found');
