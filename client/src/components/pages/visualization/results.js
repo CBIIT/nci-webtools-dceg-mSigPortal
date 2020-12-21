@@ -96,43 +96,37 @@ export default function Results({ setOpenSidebar }) {
     const profileOptions = [
       ...new Set(svgList.map((plot) => plot.Profile_Type)),
     ];
-    const matrixOptions = [...new Set(svgList.map((plot) => plot.Matrix_Size))];
-    const filterOptions = [...new Set(svgList.map((plot) => plot.Filter))];
+    // const matrixOptions = [...new Set(svgList.map((plot) => plot.Matrix_Size))];
+    // const filterOptions = [...new Set(svgList.map((plot) => plot.Filter))];
 
-    const selectName = mutationalProfiles.selectName || nameOptions[0];
-    const selectProfile = mutationalProfiles.selectProfile || profileOptions[0];
-    const selectMatrix = mutationalProfiles.selectMatrix || matrixOptions[0];
-    const selectFilter = mutationalProfiles.selectFilter || filterOptions[0];
+    const selectName = nameOptions[0];
 
     const filteredPlots = svgList.filter(
-      (plot) =>
-        plot.Sample_Name == selectName &&
-        plot.Profile_Type == selectProfile &&
-        plot.Matrix_Size == selectMatrix &&
-        plot.Filter == selectFilter
+      (plot) => plot.Sample_Name == selectName
     );
 
     const filteredProfileOptions = [
-      ...new Set(
-        svgList
-          .filter((plot) => plot.Sample_Name == selectName)
-          .map((plot) => plot.Profile_Type)
-      ),
+      ...new Set(filteredPlots.map((plot) => plot.Profile_Type)),
     ];
     const filteredMatrixOptions = [
       ...new Set(
-        svgList
-          .filter((plot) => plot.Profile_Type == selectProfile)
+        filteredPlots
+          .filter((plot) => plot.Profile_Type == filteredProfileOptions[0])
           .map((plot) => plot.Matrix_Size)
       ),
     ];
     const filteredFilterOptions = [
       ...new Set(
-        svgList
-          .filter((plot) => plot.Matrix_Size == selectMatrix)
+        filteredPlots
+          .filter((plot) => plot.Matrix_Size == filteredMatrixOptions[0])
           .map((plot) => plot.Filter)
       ),
     ];
+
+    const selectProfile = filteredProfileOptions[0];
+    const selectMatrix = filteredMatrixOptions[0];
+    const selectFilter = filteredFilterOptions[0];
+
     const filteredMatrixList = [
       ...new Set(
         matrixList
