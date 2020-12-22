@@ -1,21 +1,17 @@
 import React, { useEffect } from 'react';
-import { Accordion, Card, Nav } from 'react-bootstrap';
+import { Card, Nav } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import ReferenceSignatures from './referenceSignatures';
 import MutationalSignatureProfile from './mutationalSignatureProfile';
 import CosineSimilarity from './cosineSimilarity';
 import MutationalSignatureComparison from './mutationalSignatureComparison';
 import { dispatchExploring } from '../../../../services/store';
+import Accordions from '../../../controls/accordions/accordions';
 
 const { Header, Body } = Card;
-const { Toggle, Collapse } = Accordion;
 
 export default function SignatureExploring() {
-  const { projectID, signatureAccordion } = useSelector(
-    (state) => state.exploring
-  );
+  const { projectID } = useSelector((state) => state.exploring);
 
   useEffect(() => {
     dispatchExploring({ displayTab: 'signature' });
@@ -77,37 +73,7 @@ export default function SignatureExploring() {
         </Nav>
       </Header>
       <Body>
-        {sections.map(({ component, id, title }) => {
-          return (
-            <Accordion activeKey={signatureAccordion[id]} key={id}>
-              <Card>
-                <Toggle
-                  className="font-weight-bold"
-                  as={Header}
-                  eventKey={signatureAccordion[id]}
-                  onClick={() =>
-                    dispatchExploring({
-                      signatureAccordion: {
-                        ...signatureAccordion,
-                        [id]: !signatureAccordion[id],
-                      },
-                    })
-                  }
-                >
-                  {signatureAccordion[id] == true ? (
-                    <FontAwesomeIcon icon={faMinus} />
-                  ) : (
-                    <FontAwesomeIcon icon={faPlus} />
-                  )}{' '}
-                  {title}
-                </Toggle>
-                <Collapse eventKey={signatureAccordion[id]}>
-                  <Body>{component}</Body>
-                </Collapse>
-              </Card>
-            </Accordion>
-          );
-        })}
+        <Accordions components={sections} />
       </Body>
     </Card>
   );

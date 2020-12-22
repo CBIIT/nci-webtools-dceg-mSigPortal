@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
-import { Form, Row, Col, Button, Accordion, Card } from 'react-bootstrap';
+import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 import {
   dispatchError,
   dispatchMutationalPattern,
@@ -10,10 +8,9 @@ import {
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
+import Accordions from '../../controls/accordions/accordions';
 
 const { Group, Label, Control } = Form;
-const { Header, Body } = Card;
-const { Toggle, Collapse } = Accordion;
 
 export default function MutationalPattern({ submitR }) {
   const { source, study, cancerType, pubExperimentalStrategy } = useSelector(
@@ -181,173 +178,120 @@ export default function MutationalPattern({ submitR }) {
     </>
   );
 
+  const component =
+    source == 'user' ? (
+      <Form>
+        <LoadingOverlay active={submitOverlay} />
+        <div>
+          <Row className="">
+            <Col sm="5">
+              <Group controlId="minimum" className="mb-0">
+                <Label>
+                  Minimal Proportion mutations within Each Mutational Pattern
+                </Label>
+                <Control
+                  value={proportion}
+                  placeholder="Ex. 0.8"
+                  onChange={(e) => {
+                    dispatchMutationalPattern({
+                      proportion: e.target.value,
+                    });
+                  }}
+                ></Control>
+              </Group>
+            </Col>
+            <Col sm="5">
+              <Group controlId="pattern" className="mb-0">
+                <Label>Mutational Pattern</Label>
+                <Control
+                  value={pattern}
+                  placeholder="Ex. NCG>NTG"
+                  onChange={(e) => {
+                    dispatchMutationalPattern({
+                      pattern: e.target.value,
+                    });
+                  }}
+                ></Control>
+              </Group>
+            </Col>
+            <Col sm="2" className="d-flex justify-content-end mt-auto">
+              <Button
+                variant="primary"
+                onClick={() => {
+                  calculateR('mutationalPattern', {
+                    matrixFile: matrixList.filter(
+                      (path) =>
+                        path.Profile_Type == 'SBS' && path.Matrix_Size == '96'
+                    )[0].Path,
+                    proportion: parseFloat(proportion),
+                    pattern: pattern,
+                  });
+                }}
+              >
+                Calculate
+              </Button>
+            </Col>
+          </Row>{' '}
+          {plots}
+        </div>
+      </Form>
+    ) : (
+      <Form>
+        <LoadingOverlay active={submitOverlay} />
+        <div>
+          <Row className="justify-content-center">
+            <Col sm="5">
+              <Label>
+                Minimal Proportion mutations within Each Mutational Pattern
+              </Label>
+              <Control
+                value={proportion}
+                onChange={(e) => {
+                  dispatchMutationalPattern({
+                    proportion: e.target.value,
+                  });
+                }}
+              ></Control>
+            </Col>
+            <Col sm="5">
+              <Label>Mutational Pattern</Label>
+              <Control
+                value={pattern}
+                onChange={(e) => {
+                  dispatchMutationalPattern({
+                    pattern: e.target.value,
+                  });
+                }}
+              ></Control>
+            </Col>
+
+            <Col sm="1" className="m-auto">
+              <Button
+                variant="primary"
+                onClick={() => {
+                  calculateR('mutationalPatternPublic', {
+                    study: study,
+                    cancerType: cancerType,
+                    experimentalStrategy: pubExperimentalStrategy,
+                    proportion: parseFloat(proportion),
+                    pattern: pattern,
+                  });
+                }}
+              >
+                Calculate
+              </Button>
+            </Col>
+          </Row>
+          {plots}
+        </div>
+      </Form>
+    );
+
+  const accordions = [{ title: 'Motif Analysis', component: component }];
+
   return (
     <div>
-      {source == 'user' && (
-        <Accordion defaultActiveKey="0">
-          <Card>
-            <Toggle
-              className="font-weight-bold"
-              as={Header}
-              eventKey="0"
-              onClick={() =>
-                dispatchMutationalPattern({
-                  display: !display,
-                })
-              }
-            >
-              {display == true ? (
-                <FontAwesomeIcon icon={faMinus} />
-              ) : (
-                <FontAwesomeIcon icon={faPlus} />
-              )}{' '}
-              Motif Analysis
-            </Toggle>
-            <Collapse eventKey="0">
-              <Body>
-                <Form>
-                  <LoadingOverlay active={submitOverlay} />
-                  <div>
-                    <Row className="">
-                      <Col sm="5">
-                        <Group controlId="minimum" className="mb-0">
-                          <Label>
-                            Minimal Proportion mutations within Each Mutational
-                            Pattern
-                          </Label>
-                          <Control
-                            value={proportion}
-                            placeholder="Ex. 0.8"
-                            onChange={(e) => {
-                              dispatchMutationalPattern({
-                                proportion: e.target.value,
-                              });
-                            }}
-                          ></Control>
-                        </Group>
-                      </Col>
-                      <Col sm="5">
-                        <Group controlId="pattern" className="mb-0">
-                          <Label>Mutational Pattern</Label>
-                          <Control
-                            value={pattern}
-                            placeholder="Ex. NCG>NTG"
-                            onChange={(e) => {
-                              dispatchMutationalPattern({
-                                pattern: e.target.value,
-                              });
-                            }}
-                          ></Control>
-                        </Group>
-                      </Col>
-                      <Col
-                        sm="2"
-                        className="d-flex justify-content-end mt-auto"
-                      >
-                        <Button
-                          variant="primary"
-                          onClick={() => {
-                            calculateR('mutationalPattern', {
-                              matrixFile: matrixList.filter(
-                                (path) =>
-                                  path.Profile_Type == 'SBS' &&
-                                  path.Matrix_Size == '96'
-                              )[0].Path,
-                              proportion: parseFloat(proportion),
-                              pattern: pattern,
-                            });
-                          }}
-                        >
-                          Calculate
-                        </Button>
-                      </Col>
-                    </Row>{' '}
-                    {plots}
-                  </div>
-                </Form>
-              </Body>
-            </Collapse>
-          </Card>
-        </Accordion>
-      )}
-
-      {source == 'public' && (
-        <Accordion defaultActiveKey="1">
-          <Card>
-            <Toggle
-              className="font-weight-bold"
-              as={Header}
-              eventKey="1"
-              onClick={() =>
-                dispatchMutationalPattern({
-                  display: !display,
-                })
-              }
-            >
-              {display == true ? (
-                <FontAwesomeIcon icon={faMinus} />
-              ) : (
-                <FontAwesomeIcon icon={faPlus} />
-              )}{' '}
-              Motif Analysis
-            </Toggle>
-            <Collapse eventKey="1">
-              <Body>
-                <Form>
-                  <LoadingOverlay active={submitOverlay} />
-                  <div>
-                    <Row className="justify-content-center">
-                      <Col sm="5">
-                        <Label>
-                          Minimal Proportion mutations within Each Mutational
-                          Pattern
-                        </Label>
-                        <Control
-                          value={proportion}
-                          onChange={(e) => {
-                            dispatchMutationalPattern({
-                              proportion: e.target.value,
-                            });
-                          }}
-                        ></Control>
-                      </Col>
-                      <Col sm="5">
-                        <Label>Mutational Pattern</Label>
-                        <Control
-                          value={pattern}
-                          onChange={(e) => {
-                            dispatchMutationalPattern({
-                              pattern: e.target.value,
-                            });
-                          }}
-                        ></Control>
-                      </Col>
-
-                      <Col sm="1" className="m-auto">
-                        <Button
-                          variant="primary"
-                          onClick={() => {
-                            calculateR('mutationalPatternPublic', {
-                              study: study,
-                              cancerType: cancerType,
-                              experimentalStrategy: pubExperimentalStrategy,
-                              proportion: parseFloat(proportion),
-                              pattern: pattern,
-                            });
-                          }}
-                        >
-                          Calculate
-                        </Button>
-                      </Col>
-                    </Row>
-                    {plots}
-                  </div>
-                </Form>
-              </Body>
-            </Collapse>
-          </Card>
-        </Accordion>
-      )}
+      <Accordions components={accordions} />
       <Debug msg={debugR} />
     </div>
   );

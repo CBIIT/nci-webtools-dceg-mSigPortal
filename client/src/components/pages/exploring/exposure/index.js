@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Row, Col, Accordion, Card, Button, Nav } from 'react-bootstrap';
+import { Form, Row, Col, Card, Button, Nav } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import Tumor from './tumor';
 import Separated from './separated';
 import Across from './across';
@@ -30,18 +28,15 @@ import {
   SidebarPanel,
   MainPanel,
 } from '../../../controls/sidebar-container/sidebar-container';
+import Accordions from '../../../controls/accordions/accordions';
 
 const { Header, Body } = Card;
-const { Toggle, Collapse } = Accordion;
 const { Group, Label, Check } = Form;
 
 export default function ExposureExploring({ populateControls }) {
-  const {
-    exposureAccordion,
-    exposureSignature,
-    exposureCancer,
-    signatureNames,
-  } = useSelector((state) => state.exploring);
+  const { exposureSignature, exposureCancer, signatureNames } = useSelector(
+    (state) => state.exploring
+  );
   const { loading: loadingAcross } = useSelector((state) => state.expAcross);
   const { loading: loadingAssociation } = useSelector(
     (state) => state.expAssociation
@@ -960,37 +955,7 @@ export default function ExposureExploring({ populateControls }) {
             </Header>
             <Body>
               <LoadingOverlay active={loading} />
-              {sections.map(({ component, id, title }) => {
-                return (
-                  <Accordion activeKey={exposureAccordion[id]} key={id}>
-                    <Card>
-                      <Toggle
-                        className="font-weight-bold"
-                        as={Header}
-                        eventKey={exposureAccordion[id]}
-                        onClick={() =>
-                          dispatchExploring({
-                            exposureAccordion: {
-                              ...exposureAccordion,
-                              [id]: !exposureAccordion[id],
-                            },
-                          })
-                        }
-                      >
-                        {exposureAccordion[id] == true ? (
-                          <FontAwesomeIcon icon={faMinus} />
-                        ) : (
-                          <FontAwesomeIcon icon={faPlus} />
-                        )}{' '}
-                        {title}
-                      </Toggle>
-                      <Collapse eventKey={exposureAccordion[id]}>
-                        <Body>{component}</Body>
-                      </Collapse>
-                    </Card>
-                  </Accordion>
-                );
-              })}
+              <Accordions components={sections} />
             </Body>
           </Card>
         </MainPanel>

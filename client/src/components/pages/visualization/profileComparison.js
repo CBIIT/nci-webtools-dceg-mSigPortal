@@ -6,16 +6,10 @@ import {
   Button,
   Popover,
   OverlayTrigger,
-  Accordion,
-  Card,
 } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faInfoCircle,
-  faPlus,
-  faMinus,
-} from '@fortawesome/free-solid-svg-icons';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import {
   dispatchError,
   dispatchProfileComparison,
@@ -24,11 +18,10 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
 import Select from '../../controls/select/select';
+import Accordions from '../../controls/accordions/accordions';
 
 const { Group, Label, Control, Text } = Form;
 const { Title, Content } = Popover;
-const { Header, Body } = Card;
-const { Toggle, Collapse } = Accordion;
 
 export default function ProfileComparison({ submitR, getRefSigOptions }) {
   const {
@@ -422,449 +415,380 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     });
   }
 
+  let accordions = [
+    {
+      title: 'Comparison Within Samples',
+      component: (
+        <Form>
+          <LoadingOverlay active={withinSubmitOverlay} />
+          <Row className="justify-content-center">
+            <Col sm="1">
+              <Select
+                className="mb-0"
+                disabled={sampleOptions.length < 2}
+                id="pcProfileTypeWithin"
+                label="Profile Type"
+                value={withinProfileType}
+                options={profileOptions}
+                onChange={(profile) =>
+                  dispatchProfileComparison({
+                    withinProfileType: profile,
+                  })
+                }
+              />
+            </Col>
+            <Col sm="5">
+              <Select
+                className="mb-0"
+                disabled={sampleOptions.length < 2}
+                id="pcSample1"
+                label="Sample Name 1"
+                value={withinSampleName1}
+                options={sampleOptions}
+                onChange={(name) => {
+                  dispatchProfileComparison({
+                    withinSampleName1: name,
+                  });
+                }}
+              />
+            </Col>
+            <Col sm="5">
+              <Select
+                className="mb-0"
+                disabled={sampleOptions.length < 2}
+                id="pcSample2"
+                label="Sample Name 2"
+                value={withinSampleName2}
+                options={sampleOptions}
+                onChange={(name) => {
+                  dispatchProfileComparison({
+                    withinSampleName2: name,
+                  });
+                }}
+              />
+            </Col>
+            <Col sm="1" className="d-flex justify-content-end mt-auto">
+              <Button
+                disabled={sampleOptions.length < 2}
+                variant="primary"
+                onClick={() => {
+                  if (source == 'user') {
+                    calculateR('profileComparisonWithin', {
+                      profileType: withinProfileType,
+                      sampleName1: withinSampleName1,
+                      sampleName2: withinSampleName2,
+                      matrixList: JSON.stringify(
+                        matrixList.filter(
+                          (matrix) => matrix.Profile_Type == withinProfileType
+                        )
+                      ),
+                    });
+                  } else {
+                    calculateR('profileComparisonWithinPublic', {
+                      profileType: withinProfileType,
+                      sampleName1: withinSampleName1,
+                      sampleName2: withinSampleName2,
+                      study: study,
+                      cancerType: cancerType,
+                      experimentalStrategy: pubExperimentalStrategy,
+                    });
+                  }
+                }}
+              >
+                Calculate
+              </Button>
+            </Col>
+          </Row>
+          {sampleOptions.length < 2 && (
+            <Row>
+              <Col>Unavailable - More than one Sample Required</Col>
+            </Row>
+          )}
+
+          <div id="pcWithinPlot">
+            {withinErr && (
+              <div>
+                <p>
+                  An error has occured. Check the debug section for more info.
+                </p>
+                <p>Error: {withinErr}</p>
+              </div>
+            )}
+            <div style={{ display: withinPlotURL ? 'block' : 'none' }}>
+              <Plot
+                plotName={withinPlotPath.split('/').slice(-1)[0]}
+                plotURL={withinPlotURL}
+              />
+            </div>
+          </div>
+        </Form>
+      ),
+    },
+    {
+      title: 'Comparison to Reference Signatures',
+      component: (
+        <Form className="my-2">
+          <LoadingOverlay active={refSubmitOverlay} />
+          <div>
+            <Row className="justify-content-center">
+              <Col sm="1">
+                <Select
+                  className="mb-0"
+                  id="pcProfileTypeRef"
+                  label="Profile Type"
+                  value={refProfileType}
+                  options={profileOptions}
+                  onChange={(refProfileType) => {
+                    dispatchProfileComparison({
+                      refProfileType: refProfileType,
+                    });
+                    getSignatureSet(refProfileType);
+                  }}
+                />
+              </Col>
+              <Col sm="3">
+                <Select
+                  className="mb-0"
+                  id="sampleNameRefSig"
+                  label="Sample Name"
+                  value={refSampleName}
+                  options={sampleOptions}
+                  onChange={(name) => {
+                    dispatchProfileComparison({
+                      refSampleName: name,
+                    });
+                  }}
+                />
+              </Col>
+              <Col sm="4">
+                <Select
+                  className="mb-0"
+                  id="pcRefSet"
+                  label="Reference Signature Set"
+                  value={refSignatureSet}
+                  options={refSignatureSetOptions}
+                  onChange={(refSignatureSet) => {
+                    dispatchProfileComparison({
+                      refSignatureSet: refSignatureSet,
+                    });
+                    getSignatures(refProfileType, refSignatureSet);
+                  }}
+                />
+              </Col>
+              <Col sm="3">
+                <Group controlId="signatureSet" className="mb-0">
+                  <Label>
+                    Compare Signatures{' '}
+                    <OverlayTrigger
+                      trigger="click"
+                      placement="top"
+                      overlay={popover}
+                      rootClose
+                    >
+                      <Button
+                        aria-label="compare signatures info"
+                        variant="link"
+                        className="p-0 font-weight-bold "
+                      >
+                        <FontAwesomeIcon
+                          icon={faInfoCircle}
+                          style={{ verticalAlign: 'baseline' }}
+                        />
+                      </Button>
+                    </OverlayTrigger>
+                  </Label>
+                  <Control
+                    value={refCompare}
+                    onChange={(e) => {
+                      dispatchProfileComparison({
+                        refCompare: e.target.value,
+                      });
+                    }}
+                  />
+                  <Text className="text-muted">(Ex. 0.8*SBS5;0.1*SBS1)</Text>
+                </Group>
+              </Col>
+              <Col sm="1" className="d-flex justify-content-end my-auto">
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    if (source == 'user') {
+                      calculateR('profileComparisonRefSig', {
+                        profileType: refProfileType,
+                        sampleName: refSampleName,
+                        signatureSet: refSignatureSet,
+                        compare: refCompare,
+                        matrixList: JSON.stringify(
+                          matrixList.filter(
+                            (matrix) => matrix.Profile_Type == withinProfileType
+                          )
+                        ),
+                      });
+                    } else {
+                      calculateR('profileComparisonRefSigPublic', {
+                        profileType: refProfileType,
+                        sampleName: refSampleName,
+                        signatureSet: refSignatureSet,
+                        compare: refCompare,
+                        study: study,
+                        cancerType: cancerType,
+                        experimentalStrategy: pubExperimentalStrategy,
+                      });
+                    }
+                  }}
+                >
+                  Calculate
+                </Button>
+              </Col>
+            </Row>
+
+            <div id="refPlotDownload">
+              {refErr && (
+                <div>
+                  <p>
+                    An error has occured. Check the debug section for more info.
+                  </p>
+                  <p>Error: {refErr}</p>
+                </div>
+              )}
+              <div style={{ display: refPlotURL ? 'block' : 'none' }}>
+                <Plot
+                  plotName={refPlotPath.split('/').slice(-1)[0]}
+                  plotURL={refPlotURL}
+                />
+              </div>
+            </div>
+          </div>
+        </Form>
+      ),
+    },
+  ];
+
+  if (source == 'user')
+    accordions.push({
+      title: 'Comparison to Public Data',
+      component: (
+        <Form>
+          <LoadingOverlay active={pubSubmitOverlay} />
+          <div>
+            <Row className="justify-content-center">
+              <Col sm="1">
+                <Select
+                  className="mb-0"
+                  id="pcUserProfileType"
+                  label="Profile Type"
+                  value={userProfileType}
+                  options={profileOptions}
+                  onChange={handleProfile}
+                />
+              </Col>
+              <Col sm="1">
+                <Select
+                  className="mb-0"
+                  id="pcUserMatrixSize"
+                  label="Matrix Size"
+                  value={userMatrixSize}
+                  options={userMatrixOptions}
+                  onChange={(matrix) =>
+                    dispatchProfileComparison({
+                      userMatrixSize: matrix,
+                    })
+                  }
+                />
+              </Col>
+              <Col sm="2">
+                <Select
+                  className="mb-0"
+                  id="pcUserSampleName"
+                  label="Sample Name"
+                  value={userSampleName}
+                  options={sampleOptions}
+                  onChange={(name) => {
+                    dispatchProfileComparison({
+                      userSampleName: name,
+                    });
+                  }}
+                />
+              </Col>
+              <Col sm="2">
+                <Select
+                  className="mb-0"
+                  id="pcPubStudy"
+                  label="Study"
+                  value={pubStudy}
+                  options={studyOptions}
+                  onChange={handleStudyChange}
+                />
+              </Col>
+              <Col sm="2">
+                <Select
+                  className="mb-0"
+                  id="pcPubCancerType"
+                  label="Cancer Type"
+                  value={pubCancerType}
+                  options={pubCancerTypeOptions}
+                  onChange={handleCancerChange}
+                />
+              </Col>
+              <Col sm="3">
+                <Select
+                  className="mb-0"
+                  id="pcPubSampleName"
+                  label="Public Sample Name"
+                  value={pubSampleName}
+                  options={pubSampleOptions}
+                  onChange={(name) => {
+                    dispatchProfileComparison({
+                      pubSampleName: name,
+                    });
+                  }}
+                />
+              </Col>
+              <Col sm="1" className="d-flex justify-content-end mt-auto">
+                <Button
+                  variant="primary"
+                  onClick={() =>
+                    calculateR('profileComparisonPublic', {
+                      profileName: userProfileType + userMatrixSize,
+                      matrixFile: matrixList.filter(
+                        (path) =>
+                          path.Profile_Type == userProfileType &&
+                          path.Matrix_Size == userMatrixSize
+                      )[0].Path,
+                      userSample: userSampleName,
+                      study: pubStudy,
+                      cancerType: pubCancerType,
+                      publicSample: pubSampleName,
+                    })
+                  }
+                >
+                  Calculate
+                </Button>
+              </Col>
+            </Row>
+
+            <div id="pcPubPlot">
+              {pubErr && (
+                <div>
+                  <p>
+                    An error has occured. Check the debug section for more info.
+                  </p>
+                </div>
+              )}
+              <div style={{ display: pubPlotURL ? 'block' : 'none' }}>
+                <Plot
+                  plotName={pubPlotPath.split('/').slice(-1)[0]}
+                  plotURL={pubPlotURL}
+                />
+              </div>
+            </div>
+          </div>
+        </Form>
+      ),
+    });
   return (
     <div>
-      <Accordion defaultActiveKey="0">
-        <Card>
-          <Toggle
-            className="font-weight-bold"
-            as={Header}
-            eventKey="0"
-            onClick={() =>
-              dispatchProfileComparison({
-                displayWithin: !displayWithin,
-              })
-            }
-          >
-            {displayWithin == true ? (
-              <FontAwesomeIcon icon={faMinus} />
-            ) : (
-              <FontAwesomeIcon icon={faPlus} />
-            )}{' '}
-            Comparison Within Samples
-          </Toggle>
-          <Collapse eventKey="0">
-            <Body>
-              <Form>
-                <LoadingOverlay active={withinSubmitOverlay} />
-                <Row className="justify-content-center">
-                  <Col sm="1">
-                    <Select
-                      className="mb-0"
-                      disabled={sampleOptions.length < 2}
-                      id="pcProfileTypeWithin"
-                      label="Profile Type"
-                      value={withinProfileType}
-                      options={profileOptions}
-                      onChange={(profile) =>
-                        dispatchProfileComparison({
-                          withinProfileType: profile,
-                        })
-                      }
-                    />
-                  </Col>
-                  <Col sm="5">
-                    <Select
-                      className="mb-0"
-                      disabled={sampleOptions.length < 2}
-                      id="pcSample1"
-                      label="Sample Name 1"
-                      value={withinSampleName1}
-                      options={sampleOptions}
-                      onChange={(name) => {
-                        dispatchProfileComparison({
-                          withinSampleName1: name,
-                        });
-                      }}
-                    />
-                  </Col>
-                  <Col sm="5">
-                    <Select
-                      className="mb-0"
-                      disabled={sampleOptions.length < 2}
-                      id="pcSample2"
-                      label="Sample Name 2"
-                      value={withinSampleName2}
-                      options={sampleOptions}
-                      onChange={(name) => {
-                        dispatchProfileComparison({
-                          withinSampleName2: name,
-                        });
-                      }}
-                    />
-                  </Col>
-                  <Col sm="1" className="d-flex justify-content-end mt-auto">
-                    <Button
-                      disabled={sampleOptions.length < 2}
-                      variant="primary"
-                      onClick={() => {
-                        if (source == 'user') {
-                          calculateR('profileComparisonWithin', {
-                            profileType: withinProfileType,
-                            sampleName1: withinSampleName1,
-                            sampleName2: withinSampleName2,
-                            matrixList: JSON.stringify(
-                              matrixList.filter(
-                                (matrix) =>
-                                  matrix.Profile_Type == withinProfileType
-                              )
-                            ),
-                          });
-                        } else {
-                          calculateR('profileComparisonWithinPublic', {
-                            profileType: withinProfileType,
-                            sampleName1: withinSampleName1,
-                            sampleName2: withinSampleName2,
-                            study: study,
-                            cancerType: cancerType,
-                            experimentalStrategy: pubExperimentalStrategy,
-                          });
-                        }
-                      }}
-                    >
-                      Calculate
-                    </Button>
-                  </Col>
-                </Row>
-                {sampleOptions.length < 2 && (
-                  <Row>
-                    <Col>Unavailable - More than one Sample Required</Col>
-                  </Row>
-                )}
-
-                <div id="pcWithinPlot">
-                  {withinErr && (
-                    <div>
-                      <p>
-                        An error has occured. Check the debug section for more
-                        info.
-                      </p>
-                      <p>Error: {withinErr}</p>
-                    </div>
-                  )}
-                  <div style={{ display: withinPlotURL ? 'block' : 'none' }}>
-                    <Plot
-                      plotName={withinPlotPath.split('/').slice(-1)[0]}
-                      plotURL={withinPlotURL}
-                    />
-                  </div>
-                </div>
-              </Form>
-            </Body>
-          </Collapse>
-        </Card>
-      </Accordion>
-
-      <Accordion defaultActiveKey="1">
-        <Card>
-          <Toggle
-            className="font-weight-bold"
-            as={Header}
-            eventKey="1"
-            onClick={() =>
-              dispatchProfileComparison({
-                displayRefSig: !displayRefSig,
-              })
-            }
-          >
-            {displayRefSig == true ? (
-              <FontAwesomeIcon icon={faMinus} />
-            ) : (
-              <FontAwesomeIcon icon={faPlus} />
-            )}{' '}
-            Comparison to Reference Signatures
-          </Toggle>
-          <Collapse eventKey="1">
-            <Body>
-              <Form className="my-2">
-                <LoadingOverlay active={refSubmitOverlay} />
-                <div>
-                  <Row className="justify-content-center">
-                    <Col sm="1">
-                      <Select
-                        className="mb-0"
-                        id="pcProfileTypeRef"
-                        label="Profile Type"
-                        value={refProfileType}
-                        options={profileOptions}
-                        onChange={(refProfileType) => {
-                          dispatchProfileComparison({
-                            refProfileType: refProfileType,
-                          });
-                          getSignatureSet(refProfileType);
-                        }}
-                      />
-                    </Col>
-                    <Col sm="3">
-                      <Select
-                        className="mb-0"
-                        id="sampleNameRefSig"
-                        label="Sample Name"
-                        value={refSampleName}
-                        options={sampleOptions}
-                        onChange={(name) => {
-                          dispatchProfileComparison({
-                            refSampleName: name,
-                          });
-                        }}
-                      />
-                    </Col>
-                    <Col sm="4">
-                      <Select
-                        className="mb-0"
-                        id="pcRefSet"
-                        label="Reference Signature Set"
-                        value={refSignatureSet}
-                        options={refSignatureSetOptions}
-                        onChange={(refSignatureSet) => {
-                          dispatchProfileComparison({
-                            refSignatureSet: refSignatureSet,
-                          });
-                          getSignatures(refProfileType, refSignatureSet);
-                        }}
-                      />
-                    </Col>
-                    <Col sm="3">
-                      <Group controlId="signatureSet" className="mb-0">
-                        <Label>
-                          Compare Signatures{' '}
-                          <OverlayTrigger
-                            trigger="click"
-                            placement="top"
-                            overlay={popover}
-                            rootClose
-                          >
-                            <Button
-                              aria-label="compare signatures info"
-                              variant="link"
-                              className="p-0 font-weight-bold "
-                            >
-                              <FontAwesomeIcon
-                                icon={faInfoCircle}
-                                style={{ verticalAlign: 'baseline' }}
-                              />
-                            </Button>
-                          </OverlayTrigger>
-                        </Label>
-                        <Control
-                          value={refCompare}
-                          onChange={(e) => {
-                            dispatchProfileComparison({
-                              refCompare: e.target.value,
-                            });
-                          }}
-                        />
-                        <Text className="text-muted">
-                          (Ex. 0.8*SBS5;0.1*SBS1)
-                        </Text>
-                      </Group>
-                    </Col>
-                    <Col sm="1" className="d-flex justify-content-end my-auto">
-                      <Button
-                        variant="primary"
-                        onClick={() => {
-                          if (source == 'user') {
-                            calculateR('profileComparisonRefSig', {
-                              profileType: refProfileType,
-                              sampleName: refSampleName,
-                              signatureSet: refSignatureSet,
-                              compare: refCompare,
-                              matrixList: JSON.stringify(
-                                matrixList.filter(
-                                  (matrix) =>
-                                    matrix.Profile_Type == withinProfileType
-                                )
-                              ),
-                            });
-                          } else {
-                            calculateR('profileComparisonRefSigPublic', {
-                              profileType: refProfileType,
-                              sampleName: refSampleName,
-                              signatureSet: refSignatureSet,
-                              compare: refCompare,
-                              study: study,
-                              cancerType: cancerType,
-                              experimentalStrategy: pubExperimentalStrategy,
-                            });
-                          }
-                        }}
-                      >
-                        Calculate
-                      </Button>
-                    </Col>
-                  </Row>
-
-                  <div id="refPlotDownload">
-                    {refErr && (
-                      <div>
-                        <p>
-                          An error has occured. Check the debug section for more
-                          info.
-                        </p>
-                        <p>Error: {refErr}</p>
-                      </div>
-                    )}
-                    <div style={{ display: refPlotURL ? 'block' : 'none' }}>
-                      <Plot
-                        plotName={refPlotPath.split('/').slice(-1)[0]}
-                        plotURL={refPlotURL}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </Form>
-            </Body>
-          </Collapse>
-        </Card>
-      </Accordion>
-
-      {source == 'user' && (
-        <Accordion defaultActiveKey="2">
-          <Card>
-            <Toggle
-              className="font-weight-bold"
-              as={Header}
-              eventKey="2"
-              onClick={() =>
-                dispatchProfileComparison({
-                  displayPublic: !displayPublic,
-                })
-              }
-            >
-              {displayPublic == true ? (
-                <FontAwesomeIcon icon={faMinus} />
-              ) : (
-                <FontAwesomeIcon icon={faPlus} />
-              )}{' '}
-              Comparison to Public Data
-            </Toggle>
-            <Collapse eventKey="2">
-              <Body>
-                <Form>
-                  <LoadingOverlay active={pubSubmitOverlay} />
-                  <div>
-                    <Row className="justify-content-center">
-                      <Col sm="1">
-                        <Select
-                          className="mb-0"
-                          id="pcUserProfileType"
-                          label="Profile Type"
-                          value={userProfileType}
-                          options={profileOptions}
-                          onChange={handleProfile}
-                        />
-                      </Col>
-                      <Col sm="1">
-                        <Select
-                          className="mb-0"
-                          id="pcUserMatrixSize"
-                          label="Matrix Size"
-                          value={userMatrixSize}
-                          options={userMatrixOptions}
-                          onChange={(matrix) =>
-                            dispatchProfileComparison({
-                              userMatrixSize: matrix,
-                            })
-                          }
-                        />
-                      </Col>
-                      <Col sm="2">
-                        <Select
-                          className="mb-0"
-                          id="pcUserSampleName"
-                          label="Sample Name"
-                          value={userSampleName}
-                          options={sampleOptions}
-                          onChange={(name) => {
-                            dispatchProfileComparison({
-                              userSampleName: name,
-                            });
-                          }}
-                        />
-                      </Col>
-                      <Col sm="2">
-                        <Select
-                          className="mb-0"
-                          id="pcPubStudy"
-                          label="Study"
-                          value={pubStudy}
-                          options={studyOptions}
-                          onChange={handleStudyChange}
-                        />
-                      </Col>
-                      <Col sm="2">
-                        <Select
-                          className="mb-0"
-                          id="pcPubCancerType"
-                          label="Cancer Type"
-                          value={pubCancerType}
-                          options={pubCancerTypeOptions}
-                          onChange={handleCancerChange}
-                        />
-                      </Col>
-                      <Col sm="3">
-                        <Select
-                          className="mb-0"
-                          id="pcPubSampleName"
-                          label="Public Sample Name"
-                          value={pubSampleName}
-                          options={pubSampleOptions}
-                          onChange={(name) => {
-                            dispatchProfileComparison({
-                              pubSampleName: name,
-                            });
-                          }}
-                        />
-                      </Col>
-                      <Col
-                        sm="1"
-                        className="d-flex justify-content-end mt-auto"
-                      >
-                        <Button
-                          variant="primary"
-                          onClick={() =>
-                            calculateR('profileComparisonPublic', {
-                              profileName: userProfileType + userMatrixSize,
-                              matrixFile: matrixList.filter(
-                                (path) =>
-                                  path.Profile_Type == userProfileType &&
-                                  path.Matrix_Size == userMatrixSize
-                              )[0].Path,
-                              userSample: userSampleName,
-                              study: pubStudy,
-                              cancerType: pubCancerType,
-                              publicSample: pubSampleName,
-                            })
-                          }
-                        >
-                          Calculate
-                        </Button>
-                      </Col>
-                    </Row>
-
-                    <div id="pcPubPlot">
-                      {pubErr && (
-                        <div>
-                          <p>
-                            An error has occured. Check the debug section for
-                            more info.
-                          </p>
-                        </div>
-                      )}
-                      <div style={{ display: pubPlotURL ? 'block' : 'none' }}>
-                        <Plot
-                          plotName={pubPlotPath.split('/').slice(-1)[0]}
-                          plotURL={pubPlotURL}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </Form>
-              </Body>
-            </Collapse>
-          </Card>
-        </Accordion>
-      )}
+      <Accordions components={accordions} />
       <Debug msg={debugR} />
     </div>
   );

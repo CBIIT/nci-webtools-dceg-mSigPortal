@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Row, Col, Button, Accordion, Card } from 'react-bootstrap';
+import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { dispatchError, dispatchPCA } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
 import Select from '../../controls/select/select';
-
-const { Header, Body } = Card;
-const { Toggle, Collapse } = Accordion;
+import Accordions from '../../controls/accordions/accordions';
 
 export default function PCA({ submitR, getRefSigOptions }) {
   const { matrixList } = useSelector((state) => state.visualizeResults);
@@ -301,302 +297,259 @@ export default function PCA({ submitR, getRefSigOptions }) {
       pubCancerType: cancer,
     });
   }
+  let accordions = [
+    {
+      title: 'PCA Within Samples',
+      component: (
+        <Form>
+          <LoadingOverlay active={submitOverlay} />
+          <Row className="justify-content-center">
+            <Col sm="5">
+              <Select
+                className="mb-0"
+                disabled={!multiSample}
+                id="pcaProfileType"
+                label="Profile Type"
+                value={profileType}
+                options={profileOptions}
+                onChange={(profileType) => {
+                  dispatchPCA({
+                    profileType: profileType,
+                  });
+                  getSignatureSet(profileType);
+                }}
+              />
+            </Col>
+
+            <Col sm="5">
+              <Select
+                className="mb-0"
+                disabled={!multiSample}
+                id="pcaRefSet"
+                label="Reference Signature Set"
+                value={signatureSet}
+                options={signatureSetOptions}
+                onChange={(signatureSet) => {
+                  dispatchPCA({
+                    signatureSet: signatureSet,
+                  });
+                }}
+              />
+            </Col>
+            <Col sm="2" className="d-flex justify-content-end mt-auto">
+              <Button
+                disabled={!multiSample}
+                variant="primary"
+                onClick={() => {
+                  if (source == 'user') {
+                    calculateR('pca', {
+                      profileType: profileType,
+                      signatureSet: signatureSet,
+                      matrixList: JSON.stringify(
+                        matrixList.filter(
+                          (matrix) => matrix.Profile_Type == profileType
+                        )
+                      ),
+                    });
+                  } else {
+                    calculateR('pcaPublic', {
+                      profileType: profileType,
+                      signatureSet: signatureSet,
+                      study: study,
+                      cancerType: cancerType,
+                      experimentalStrategy: pubExperimentalStrategy,
+                    });
+                  }
+                }}
+              >
+                Calculate
+              </Button>
+            </Col>
+          </Row>
+          {!multiSample && (
+            <Row>
+              <Col>Unavailable - More than one Sample Required</Col>
+            </Row>
+          )}
+
+          <div id="pca1Plot">
+            <div style={{ display: pcaErr ? 'block' : 'none' }}>
+              <p>
+                An error has occured. Check the debug section for more info.
+              </p>
+            </div>
+            <div
+              className="my-4"
+              style={{ display: pca1URL ? 'block' : 'none' }}
+            >
+              <Plot plotName={pca1.split('/').slice(-1)[0]} plotURL={pca1URL} />
+            </div>
+          </div>
+
+          <div id="pca2Plot">
+            <div
+              className="my-4"
+              style={{ display: pca2URL ? 'block' : 'none' }}
+            >
+              <Plot
+                plotName={pca2.split('/').slice(-1)[0]}
+                plotURL={pca2URL}
+                txtPath={projectID + pca2Data}
+              />
+            </div>
+          </div>
+
+          <div id="pca3Plot">
+            <div
+              className="my-4"
+              style={{ display: pca3URL ? 'block' : 'none' }}
+            >
+              <Plot
+                plotName={pca3.split('/').slice(-1)[0]}
+                plotURL={pca3URL}
+                txtPath={projectID + pca3Data}
+              />
+            </div>
+          </div>
+
+          <div id="heatmapPlot">
+            <div
+              className="my-4"
+              style={{ display: heatmapURL ? 'block' : 'none' }}
+            >
+              <Plot
+                plotName={heatmap.split('/').slice(-1)[0]}
+                plotURL={heatmapURL}
+                txtPath={projectID + heatmapData}
+              />
+            </div>
+          </div>
+        </Form>
+      ),
+    },
+  ];
+
+  if (source == 'user')
+    accordions.push({
+      title: 'PCA with Public Data',
+      component: (
+        <Form>
+          <LoadingOverlay active={pubSubmitOverlay} />
+          <div>
+            <Row className="justify-content-center">
+              <Col sm="2">
+                <Select
+                  className="mb-0"
+                  id="pcaPubProfile"
+                  label="Profile Type"
+                  value={userProfileType}
+                  options={profileOptions}
+                  onChange={handleProfileType}
+                />
+              </Col>
+              <Col sm="2">
+                <Select
+                  className="mb-0"
+                  id="pcaPubMatrixSize"
+                  label="Matrix Size"
+                  value={userMatrixSize}
+                  options={userMatrixOptions}
+                  onChange={(matrix) => {
+                    dispatchPCA({ userMatrixSize: matrix });
+                  }}
+                />
+              </Col>
+              <Col sm="2">
+                <Select
+                  className="mb-0"
+                  id="pcaPubStudy"
+                  label="Study"
+                  value={pubStudy}
+                  options={studyOptions}
+                  onChange={(study) => handleStudyChange(study)}
+                />
+              </Col>
+              <Col sm="4">
+                <Select
+                  className="mb-0"
+                  id="pcaPubCancerType"
+                  label="Cancer Type"
+                  value={pubCancerType}
+                  options={pubCancerTypeOptions}
+                  onChange={handleCancerChange}
+                />
+              </Col>
+              <Col sm="2" className="d-flex justify-content-end mt-auto">
+                <Button
+                  variant="primary"
+                  onClick={() =>
+                    calculateR('pcaWithPublic', {
+                      matrixFile: matrixList.filter(
+                        (path) =>
+                          path.Profile_Type == userProfileType &&
+                          path.Matrix_Size == userMatrixSize
+                      )[0].Path,
+                      study: pubStudy,
+                      cancerType: pubCancerType,
+                      profileName: userProfileType + userMatrixSize,
+                    })
+                  }
+                >
+                  Calculate
+                </Button>
+              </Col>
+            </Row>
+
+            <div id="pubPca1Plot">
+              <div style={{ display: pubPcaErr ? 'block' : 'none' }}>
+                <p>
+                  An error has occured. Check the debug section for more info.
+                </p>
+              </div>
+              <div
+                className="my-4"
+                style={{ display: pubPca1URL ? 'block' : 'none' }}
+              >
+                <Plot
+                  plotName={pubPca1.split('/').slice(-1)[0]}
+                  plotURL={pubPca1URL}
+                />
+              </div>
+            </div>
+
+            <div id="pubPca2Plot">
+              <div
+                className="my-4"
+                style={{ display: pubPca2URL ? 'block' : 'none' }}
+              >
+                <Plot
+                  plotName={pubPca2.split('/').slice(-1)[0]}
+                  plotURL={pubPca2URL}
+                  txtPath={projectID + pubPca2Data}
+                />
+              </div>
+            </div>
+
+            <div id="pubPca3Plot">
+              <div
+                className="my-4"
+                style={{ display: pubPca3URL ? 'block' : 'none' }}
+              >
+                <Plot
+                  plotName={pubPca3.split('/').slice(-1)[0]}
+                  plotURL={pubPca3URL}
+                  txtPath={projectID + pubPca3Data}
+                />
+              </div>
+            </div>
+          </div>
+        </Form>
+      ),
+    });
 
   return (
     <div>
-      <Accordion defaultActiveKey="0">
-        <Card>
-          <Toggle
-            className="font-weight-bold"
-            as={Header}
-            eventKey="0"
-            onClick={() =>
-              dispatchPCA({
-                displayPCA: !displayPCA,
-              })
-            }
-          >
-            {displayPCA == true ? (
-              <FontAwesomeIcon icon={faMinus} />
-            ) : (
-              <FontAwesomeIcon icon={faPlus} />
-            )}{' '}
-            PCA Within Samples
-          </Toggle>
-          <Collapse eventKey="0">
-            <Body>
-              <Form>
-                <LoadingOverlay active={submitOverlay} />
-                <Row className="justify-content-center">
-                  <Col sm="5">
-                    <Select
-                      className="mb-0"
-                      disabled={!multiSample}
-                      id="pcaProfileType"
-                      label="Profile Type"
-                      value={profileType}
-                      options={profileOptions}
-                      onChange={(profileType) => {
-                        dispatchPCA({
-                          profileType: profileType,
-                        });
-                        getSignatureSet(profileType);
-                      }}
-                    />
-                  </Col>
-
-                  <Col sm="5">
-                    <Select
-                      className="mb-0"
-                      disabled={!multiSample}
-                      id="pcaRefSet"
-                      label="Reference Signature Set"
-                      value={signatureSet}
-                      options={signatureSetOptions}
-                      onChange={(signatureSet) => {
-                        dispatchPCA({
-                          signatureSet: signatureSet,
-                        });
-                      }}
-                    />
-                  </Col>
-                  <Col sm="2" className="d-flex justify-content-end mt-auto">
-                    <Button
-                      disabled={!multiSample}
-                      variant="primary"
-                      onClick={() => {
-                        if (source == 'user') {
-                          calculateR('pca', {
-                            profileType: profileType,
-                            signatureSet: signatureSet,
-                            matrixList: JSON.stringify(
-                              matrixList.filter(
-                                (matrix) => matrix.Profile_Type == profileType
-                              )
-                            ),
-                          });
-                        } else {
-                          calculateR('pcaPublic', {
-                            profileType: profileType,
-                            signatureSet: signatureSet,
-                            study: study,
-                            cancerType: cancerType,
-                            experimentalStrategy: pubExperimentalStrategy,
-                          });
-                        }
-                      }}
-                    >
-                      Calculate
-                    </Button>
-                  </Col>
-                </Row>
-                {!multiSample && (
-                  <Row>
-                    <Col>Unavailable - More than one Sample Required</Col>
-                  </Row>
-                )}
-
-                <div id="pca1Plot">
-                  <div style={{ display: pcaErr ? 'block' : 'none' }}>
-                    <p>
-                      An error has occured. Check the debug section for more
-                      info.
-                    </p>
-                  </div>
-                  <div
-                    className="my-4"
-                    style={{ display: pca1URL ? 'block' : 'none' }}
-                  >
-                    <Plot
-                      plotName={pca1.split('/').slice(-1)[0]}
-                      plotURL={pca1URL}
-                    />
-                  </div>
-                </div>
-
-                <div id="pca2Plot">
-                  <div
-                    className="my-4"
-                    style={{ display: pca2URL ? 'block' : 'none' }}
-                  >
-                    <Plot
-                      plotName={pca2.split('/').slice(-1)[0]}
-                      plotURL={pca2URL}
-                      txtPath={projectID + pca2Data}
-                    />
-                  </div>
-                </div>
-
-                <div id="pca3Plot">
-                  <div
-                    className="my-4"
-                    style={{ display: pca3URL ? 'block' : 'none' }}
-                  >
-                    <Plot
-                      plotName={pca3.split('/').slice(-1)[0]}
-                      plotURL={pca3URL}
-                      txtPath={projectID + pca3Data}
-                    />
-                  </div>
-                </div>
-
-                <div id="heatmapPlot">
-                  <div
-                    className="my-4"
-                    style={{ display: heatmapURL ? 'block' : 'none' }}
-                  >
-                    <Plot
-                      plotName={heatmap.split('/').slice(-1)[0]}
-                      plotURL={heatmapURL}
-                      txtPath={projectID + heatmapData}
-                    />
-                  </div>
-                </div>
-              </Form>
-            </Body>
-          </Collapse>
-        </Card>
-      </Accordion>
-
-      {source == 'user' && (
-        <Accordion defaultActiveKey="1">
-          <Card>
-            <Toggle
-              className="font-weight-bold"
-              as={Header}
-              eventKey="1"
-              onClick={() => dispatchPCA({ displayPub: !displayPub })}
-            >
-              {displayPub == true ? (
-                <FontAwesomeIcon icon={faMinus} />
-              ) : (
-                <FontAwesomeIcon icon={faPlus} />
-              )}{' '}
-              PCA with Public Data
-            </Toggle>
-            <Collapse eventKey="1">
-              <Body>
-                <Form>
-                  <LoadingOverlay active={pubSubmitOverlay} />
-                  <div>
-                    <Row className="justify-content-center">
-                      <Col sm="2">
-                        <Select
-                          className="mb-0"
-                          id="pcaPubProfile"
-                          label="Profile Type"
-                          value={userProfileType}
-                          options={profileOptions}
-                          onChange={handleProfileType}
-                        />
-                      </Col>
-                      <Col sm="2">
-                        <Select
-                          className="mb-0"
-                          id="pcaPubMatrixSize"
-                          label="Matrix Size"
-                          value={userMatrixSize}
-                          options={userMatrixOptions}
-                          onChange={(matrix) => {
-                            dispatchPCA({ userMatrixSize: matrix });
-                          }}
-                        />
-                      </Col>
-                      <Col sm="2">
-                        <Select
-                          className="mb-0"
-                          id="pcaPubStudy"
-                          label="Study"
-                          value={pubStudy}
-                          options={studyOptions}
-                          onChange={(study) => handleStudyChange(study)}
-                        />
-                      </Col>
-                      <Col sm="4">
-                        <Select
-                          className="mb-0"
-                          id="pcaPubCancerType"
-                          label="Cancer Type"
-                          value={pubCancerType}
-                          options={pubCancerTypeOptions}
-                          onChange={handleCancerChange}
-                        />
-                      </Col>
-                      <Col
-                        sm="2"
-                        className="d-flex justify-content-end mt-auto"
-                      >
-                        <Button
-                          variant="primary"
-                          onClick={() =>
-                            calculateR('pcaWithPublic', {
-                              matrixFile: matrixList.filter(
-                                (path) =>
-                                  path.Profile_Type == userProfileType &&
-                                  path.Matrix_Size == userMatrixSize
-                              )[0].Path,
-                              study: pubStudy,
-                              cancerType: pubCancerType,
-                              profileName: userProfileType + userMatrixSize,
-                            })
-                          }
-                        >
-                          Calculate
-                        </Button>
-                      </Col>
-                    </Row>
-
-                    <div id="pubPca1Plot">
-                      <div style={{ display: pubPcaErr ? 'block' : 'none' }}>
-                        <p>
-                          An error has occured. Check the debug section for more
-                          info.
-                        </p>
-                      </div>
-                      <div
-                        className="my-4"
-                        style={{ display: pubPca1URL ? 'block' : 'none' }}
-                      >
-                        <Plot
-                          plotName={pubPca1.split('/').slice(-1)[0]}
-                          plotURL={pubPca1URL}
-                        />
-                      </div>
-                    </div>
-
-                    <div id="pubPca2Plot">
-                      <div
-                        className="my-4"
-                        style={{ display: pubPca2URL ? 'block' : 'none' }}
-                      >
-                        <Plot
-                          plotName={pubPca2.split('/').slice(-1)[0]}
-                          plotURL={pubPca2URL}
-                          txtPath={projectID + pubPca2Data}
-                        />
-                      </div>
-                    </div>
-
-                    <div id="pubPca3Plot">
-                      <div
-                        className="my-4"
-                        style={{ display: pubPca3URL ? 'block' : 'none' }}
-                      >
-                        <Plot
-                          plotName={pubPca3.split('/').slice(-1)[0]}
-                          plotURL={pubPca3URL}
-                          txtPath={projectID + pubPca3Data}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </Form>
-              </Body>
-            </Collapse>
-          </Card>
-        </Accordion>
-      )}
-
+      <Accordions components={accordions} />
       <Debug msg={debugR} />
     </div>
   );

@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Row, Col, Button, Accordion, Card } from 'react-bootstrap';
+import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import {
   dispatchError,
   dispatchCosineSimilarity,
@@ -11,9 +9,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
 import Select from '../../controls/select/select';
-
-const { Header, Body } = Card;
-const { Toggle, Collapse } = Accordion;
+import Accordions from '../../controls/accordions/accordions';
 
 export default function CosineSimilarity({ submitR, getRefSigOptions }) {
   const {
@@ -314,334 +310,270 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
     });
   }
 
+  let accordions = [
+    {
+      title: 'Cosine Similarity Within Samples',
+      component: (
+        <Form>
+          <LoadingOverlay active={withinSubmitOverlay} />
+          <Row className="justify-content-center">
+            <Col sm="5">
+              <Select
+                className="mb-0"
+                disabled={!multiSample}
+                id="csProfileType"
+                label="Profile Type"
+                value={withinProfileType}
+                options={profileOptions}
+                onChange={handleWithinProfileType}
+              />
+            </Col>
+            <Col sm="5">
+              <Select
+                className="mb-0"
+                disabled={!multiSample}
+                id="csMatrixSize"
+                label="Matrix Size"
+                value={withinMatrixSize}
+                options={withinMatrixOptions}
+                onChange={(matrix) =>
+                  dispatchCosineSimilarity({
+                    withinMatrixSize: matrix,
+                  })
+                }
+              />
+            </Col>
+            <Col sm="2" className="d-flex justify-content-end mt-auto">
+              <Button
+                disabled={!multiSample}
+                variant="primary"
+                onClick={() => {
+                  if (source == 'user') {
+                    calculateR('cosineSimilarityWithin', {
+                      matrixFile: matrixList.filter(
+                        (path) =>
+                          path.Profile_Type == withinProfileType &&
+                          path.Matrix_Size == withinMatrixSize
+                      )[0].Path,
+                    });
+                  } else {
+                    calculateR('cosineSimilarityWithinPublic', {
+                      profileType: withinProfileType,
+                      matrixSize: withinMatrixSize,
+                      study: study,
+                      cancerType: cancerType,
+                      experimentalStrategy: pubExperimentalStrategy,
+                    });
+                  }
+                }}
+              >
+                Calculate
+              </Button>
+            </Col>
+          </Row>
+          {!multiSample && (
+            <Row>
+              <Col>Unavailable - More than one Sample Required</Col>
+            </Row>
+          )}
+
+          <div id="withinPlot">
+            <div style={{ display: withinErr ? 'block' : 'none' }}>
+              <p>
+                An error has occured. Check the debug section for more info.
+              </p>
+            </div>
+            <div style={{ display: withinPlotURL ? 'block' : 'none' }}>
+              <Plot
+                plotName={withinPlotPath.split('/').slice(-1)[0]}
+                plotURL={withinPlotURL}
+                txtPath={projectID + withinTxtPath}
+              />
+            </div>
+          </div>
+        </Form>
+      ),
+    },
+    {
+      title: 'Cosine Similarity to Reference Signatures',
+      component: (
+        <Form className="my-2">
+          <LoadingOverlay active={refSubmitOverlay} />
+          <div>
+            <Row className="justify-content-center">
+              <Col sm="5">
+                <Select
+                  className="mb-0"
+                  id="csRefProfileType"
+                  label="Profile Type"
+                  value={refProfileType}
+                  options={profileOptions}
+                  onChange={(refProfileType) => {
+                    dispatchCosineSimilarity({
+                      refProfileType: refProfileType,
+                    });
+                    getSignatureSet(refProfileType);
+                  }}
+                />
+              </Col>
+              <Col sm="5">
+                <Select
+                  className="mb-0"
+                  id="csRefSignatureSet"
+                  label="Reference Signature Set"
+                  value={refSignatureSet}
+                  options={refSignatureSetOptions}
+                  onChange={(refSignatureSet) => {
+                    dispatchCosineSimilarity({
+                      refSignatureSet: refSignatureSet,
+                    });
+                  }}
+                />
+              </Col>
+              <Col sm="2" className="d-flex justify-content-end mt-auto">
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    if (source == 'user') {
+                      calculateR('cosineSimilarityRefSig', {
+                        profileType: refProfileType,
+                        signatureSet: refSignatureSet,
+                        matrixList: JSON.stringify(
+                          matrixList.filter(
+                            (matrix) => matrix.Profile_Type == refProfileType
+                          )
+                        ),
+                      });
+                    } else {
+                      calculateR('cosineSimilarityRefSigPublic', {
+                        profileType: refProfileType,
+                        signatureSet: refSignatureSet,
+                        study: study,
+                        cancerType: cancerType,
+                        experimentalStrategy: pubExperimentalStrategy,
+                      });
+                    }
+                  }}
+                >
+                  Calculate
+                </Button>
+              </Col>
+            </Row>
+
+            <div id="refPlot">
+              <div style={{ display: refErr ? 'block' : 'none' }}>
+                <p>
+                  An error has occured. Check the debug section for more info.
+                </p>
+              </div>
+              <div style={{ display: refPlotURL ? 'block' : 'none' }}>
+                <Plot
+                  plotName={refPlotPath.split('/').slice(-1)[0]}
+                  plotURL={refPlotURL}
+                  txtPath={projectID + refTxtPath}
+                />
+              </div>
+            </div>
+          </div>
+        </Form>
+      ),
+    },
+  ];
+
+  if (source == 'user')
+    accordions.push({
+      title: 'Cosine Similarity to Public Data',
+      component: (
+        <Form>
+          <LoadingOverlay active={pubSubmitOverlay} />
+          <div>
+            <Row className="justify-content-center">
+              <Col sm="2">
+                <Select
+                  className="mb-0"
+                  id="csUserProfileType"
+                  label="Profile Type"
+                  value={userProfileType}
+                  options={profileOptions}
+                  onChange={handlePublicProfileType}
+                />
+              </Col>
+              <Col sm="2">
+                <Select
+                  className="mb-0"
+                  id="csUserMatrixSize"
+                  label="Matrix Size"
+                  value={userMatrixSize}
+                  options={userMatrixOptions}
+                  onChange={(matrix) =>
+                    dispatchCosineSimilarity({
+                      userMatrixSize: matrix,
+                    })
+                  }
+                />
+              </Col>
+              <Col sm="2">
+                <Select
+                  className="mb-0"
+                  id="csPubStudy"
+                  label="Study"
+                  value={pubStudy}
+                  options={studyOptions}
+                  onChange={handleStudyChange}
+                />
+              </Col>
+              <Col sm="4">
+                <Select
+                  className="mb-0"
+                  id="csPubCancerType"
+                  label="Cancer Type"
+                  value={pubCancerType}
+                  options={pubCancerTypeOptions}
+                  onChange={handleCancerChange}
+                />
+              </Col>
+              <Col sm="2" className="d-flex justify-content-end mt-auto">
+                <Button
+                  variant="primary"
+                  onClick={() =>
+                    calculateR('cosineSimilarityPublic', {
+                      matrixFile: matrixList.filter(
+                        (path) =>
+                          path.Profile_Type == userProfileType &&
+                          path.Matrix_Size == userMatrixSize
+                      )[0].Path,
+                      study: pubStudy,
+                      cancerType: pubCancerType,
+                      profileName: userProfileType + userMatrixSize,
+                    })
+                  }
+                >
+                  Calculate
+                </Button>
+              </Col>
+            </Row>
+            <div id="pubPlot">
+              <div style={{ display: pubErr ? 'block' : 'none' }}>
+                <p>
+                  An error has occured. Check the debug section for more info.
+                </p>
+              </div>
+              <div style={{ display: pubPlotURL ? 'block' : 'none' }}>
+                <Plot
+                  plotName={pubPlotURL.split('/').slice(-1)[0]}
+                  plotURL={pubPlotURL}
+                  txtPath={projectID + pubTxtPath}
+                />
+              </div>
+            </div>
+          </div>
+        </Form>
+      ),
+    });
+
   return (
     <div>
-      <Accordion defaultActiveKey="0">
-        <Card>
-          <Toggle
-            className="font-weight-bold"
-            as={Header}
-            eventKey="0"
-            onClick={() =>
-              dispatchCosineSimilarity({
-                displayWithin: !displayWithin,
-              })
-            }
-          >
-            {displayWithin == true ? (
-              <FontAwesomeIcon icon={faMinus} />
-            ) : (
-              <FontAwesomeIcon icon={faPlus} />
-            )}{' '}
-            Cosine Similarity Within Samples
-          </Toggle>
-          <Collapse eventKey="0">
-            <Body>
-              <Form>
-                <LoadingOverlay active={withinSubmitOverlay} />
-                <Row className="justify-content-center">
-                  <Col sm="5">
-                    <Select
-                      className="mb-0"
-                      disabled={!multiSample}
-                      id="csProfileType"
-                      label="Profile Type"
-                      value={withinProfileType}
-                      options={profileOptions}
-                      onChange={handleWithinProfileType}
-                    />
-                  </Col>
-                  <Col sm="5">
-                    <Select
-                      className="mb-0"
-                      disabled={!multiSample}
-                      id="csMatrixSize"
-                      label="Matrix Size"
-                      value={withinMatrixSize}
-                      options={withinMatrixOptions}
-                      onChange={(matrix) =>
-                        dispatchCosineSimilarity({
-                          withinMatrixSize: matrix,
-                        })
-                      }
-                    />
-                  </Col>
-                  <Col sm="2" className="d-flex justify-content-end mt-auto">
-                    <Button
-                      disabled={!multiSample}
-                      variant="primary"
-                      onClick={() => {
-                        if (source == 'user') {
-                          calculateR('cosineSimilarityWithin', {
-                            matrixFile: matrixList.filter(
-                              (path) =>
-                                path.Profile_Type == withinProfileType &&
-                                path.Matrix_Size == withinMatrixSize
-                            )[0].Path,
-                          });
-                        } else {
-                          calculateR('cosineSimilarityWithinPublic', {
-                            profileType: withinProfileType,
-                            matrixSize: withinMatrixSize,
-                            study: study,
-                            cancerType: cancerType,
-                            experimentalStrategy: pubExperimentalStrategy,
-                          });
-                        }
-                      }}
-                    >
-                      Calculate
-                    </Button>
-                  </Col>
-                </Row>
-                {!multiSample && (
-                  <Row>
-                    <Col>Unavailable - More than one Sample Required</Col>
-                  </Row>
-                )}
-
-                <div id="withinPlot">
-                  <div style={{ display: withinErr ? 'block' : 'none' }}>
-                    <p>
-                      An error has occured. Check the debug section for more
-                      info.
-                    </p>
-                  </div>
-                  <div style={{ display: withinPlotURL ? 'block' : 'none' }}>
-                    <Plot
-                      plotName={withinPlotPath.split('/').slice(-1)[0]}
-                      plotURL={withinPlotURL}
-                      txtPath={projectID + withinTxtPath}
-                    />
-                  </div>
-                </div>
-              </Form>
-            </Body>
-          </Collapse>
-        </Card>
-      </Accordion>
-
-      <Accordion defaultActiveKey="1">
-        <Card>
-          <Toggle
-            className="font-weight-bold"
-            as={Header}
-            eventKey="1"
-            onClick={() =>
-              dispatchCosineSimilarity({
-                displayRefSig: !displayRefSig,
-              })
-            }
-          >
-            {displayRefSig == true ? (
-              <FontAwesomeIcon icon={faMinus} />
-            ) : (
-              <FontAwesomeIcon icon={faPlus} />
-            )}{' '}
-            Cosine Similarity to Reference Signatures
-          </Toggle>
-          <Collapse eventKey="1">
-            <Body>
-              <Form className="my-2">
-                <LoadingOverlay active={refSubmitOverlay} />
-                <div>
-                  <Row className="justify-content-center">
-                    <Col sm="5">
-                      <Select
-                        className="mb-0"
-                        id="csRefProfileType"
-                        label="Profile Type"
-                        value={refProfileType}
-                        options={profileOptions}
-                        onChange={(refProfileType) => {
-                          dispatchCosineSimilarity({
-                            refProfileType: refProfileType,
-                          });
-                          getSignatureSet(refProfileType);
-                        }}
-                      />
-                    </Col>
-                    <Col sm="5">
-                      <Select
-                        className="mb-0"
-                        id="csRefSignatureSet"
-                        label="Reference Signature Set"
-                        value={refSignatureSet}
-                        options={refSignatureSetOptions}
-                        onChange={(refSignatureSet) => {
-                          dispatchCosineSimilarity({
-                            refSignatureSet: refSignatureSet,
-                          });
-                        }}
-                      />
-                    </Col>
-                    <Col sm="2" className="d-flex justify-content-end mt-auto">
-                      <Button
-                        variant="primary"
-                        onClick={() => {
-                          if (source == 'user') {
-                            calculateR('cosineSimilarityRefSig', {
-                              profileType: refProfileType,
-                              signatureSet: refSignatureSet,
-                              matrixList: JSON.stringify(
-                                matrixList.filter(
-                                  (matrix) =>
-                                    matrix.Profile_Type == refProfileType
-                                )
-                              ),
-                            });
-                          } else {
-                            calculateR('cosineSimilarityRefSigPublic', {
-                              profileType: refProfileType,
-                              signatureSet: refSignatureSet,
-                              study: study,
-                              cancerType: cancerType,
-                              experimentalStrategy: pubExperimentalStrategy,
-                            });
-                          }
-                        }}
-                      >
-                        Calculate
-                      </Button>
-                    </Col>
-                  </Row>
-
-                  <div id="refPlot">
-                    <div style={{ display: refErr ? 'block' : 'none' }}>
-                      <p>
-                        An error has occured. Check the debug section for more
-                        info.
-                      </p>
-                    </div>
-                    <div style={{ display: refPlotURL ? 'block' : 'none' }}>
-                      <Plot
-                        plotName={refPlotPath.split('/').slice(-1)[0]}
-                        plotURL={refPlotURL}
-                        txtPath={projectID + refTxtPath}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </Form>
-            </Body>
-          </Collapse>
-        </Card>
-      </Accordion>
-      {source == 'user' && (
-        <Accordion defaultActiveKey="2">
-          <Card>
-            <Toggle
-              className="font-weight-bold"
-              as={Header}
-              eventKey="2"
-              onClick={() =>
-                dispatchCosineSimilarity({
-                  displayPublic: !displayPublic,
-                })
-              }
-            >
-              {displayPublic == true ? (
-                <FontAwesomeIcon icon={faMinus} />
-              ) : (
-                <FontAwesomeIcon icon={faPlus} />
-              )}{' '}
-              Cosine Similarity to Public Data
-            </Toggle>
-            <Collapse eventKey="2">
-              <Body>
-                <Form>
-                  <LoadingOverlay active={pubSubmitOverlay} />
-                  <div>
-                    <Row className="justify-content-center">
-                      <Col sm="2">
-                        <Select
-                          className="mb-0"
-                          id="csUserProfileType"
-                          label="Profile Type"
-                          value={userProfileType}
-                          options={profileOptions}
-                          onChange={handlePublicProfileType}
-                        />
-                      </Col>
-                      <Col sm="2">
-                        <Select
-                          className="mb-0"
-                          id="csUserMatrixSize"
-                          label="Matrix Size"
-                          value={userMatrixSize}
-                          options={userMatrixOptions}
-                          onChange={(matrix) =>
-                            dispatchCosineSimilarity({
-                              userMatrixSize: matrix,
-                            })
-                          }
-                        />
-                      </Col>
-                      <Col sm="2">
-                        <Select
-                          className="mb-0"
-                          id="csPubStudy"
-                          label="Study"
-                          value={pubStudy}
-                          options={studyOptions}
-                          onChange={handleStudyChange}
-                        />
-                      </Col>
-                      <Col sm="4">
-                        <Select
-                          className="mb-0"
-                          id="csPubCancerType"
-                          label="Cancer Type"
-                          value={pubCancerType}
-                          options={pubCancerTypeOptions}
-                          onChange={handleCancerChange}
-                        />
-                      </Col>
-                      <Col
-                        sm="2"
-                        className="d-flex justify-content-end mt-auto"
-                      >
-                        <Button
-                          variant="primary"
-                          onClick={() =>
-                            calculateR('cosineSimilarityPublic', {
-                              matrixFile: matrixList.filter(
-                                (path) =>
-                                  path.Profile_Type == userProfileType &&
-                                  path.Matrix_Size == userMatrixSize
-                              )[0].Path,
-                              study: pubStudy,
-                              cancerType: pubCancerType,
-                              profileName: userProfileType + userMatrixSize,
-                            })
-                          }
-                        >
-                          Calculate
-                        </Button>
-                      </Col>
-                    </Row>
-                    <div id="pubPlot">
-                      <div style={{ display: pubErr ? 'block' : 'none' }}>
-                        <p>
-                          An error has occured. Check the debug section for more
-                          info.
-                        </p>
-                      </div>
-                      <div style={{ display: pubPlotURL ? 'block' : 'none' }}>
-                        <Plot
-                          plotName={pubPlotURL.split('/').slice(-1)[0]}
-                          plotURL={pubPlotURL}
-                          txtPath={projectID + pubTxtPath}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </Form>
-              </Body>
-            </Collapse>
-          </Card>
-        </Accordion>
-      )}
+      <Accordions components={accordions} />
       <Debug msg={debugR} />
     </div>
   );
