@@ -70,6 +70,7 @@ export default function ProfilerSummary({ submitR }) {
 
           if (plotURL) URL.revokeObjectURL(plotURL);
           dispatchProfilerSummary({
+            plotPath: plotPath,
             plotURL: objectURL,
           });
         }
@@ -104,7 +105,6 @@ export default function ProfilerSummary({ submitR }) {
           dispatchProfilerSummary({
             debugR: debugR,
             loading: false,
-            plotPath: output.plotPath,
           });
           setRPlot(output.plotPath, 'within');
         } else {
