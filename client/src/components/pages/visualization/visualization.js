@@ -21,7 +21,6 @@ import {
   store,
   updateVisualize,
 } from '../../../services/store';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import './visualization.scss';
 
 const { Group, Label, Check } = Form;
@@ -113,12 +112,12 @@ export default function Visualize({ match }) {
         <SidebarPanel>
           <div className="p-3 bg-white border rounded">
             <Row>
-              <Col sm="auto">
-                <Group className="d-flex">
-                  <Label className="mr-auto">
-                    <h3 className="mb-2">Data Source</h3>
+              <Col lg="auto">
+                <Group>
+                  <Label className="mr-4">
+                    <h4 className="mb-2">Data Source</h4>
                   </Label>
-                  <Check inline id="radioPublic" className="ml-4">
+                  <Check inline id="radioPublic">
                     <Check.Input
                       disabled={submitted}
                       type="radio"
@@ -154,12 +153,12 @@ export default function Visualize({ match }) {
                 display: source == 'user' ? 'block' : 'none',
               }}
             >
-              <Col sm="auto" className="w-100">
+              <Col lg="auto" className="w-100">
                 <UploadForm />
               </Col>
             </Row>
             <Row style={{ display: source == 'public' ? 'block' : 'none' }}>
-              <Col sm="auto" className="w-100">
+              <Col lg="auto" className="w-100">
                 <PublicForm />
               </Col>
             </Row>

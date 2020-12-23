@@ -367,9 +367,8 @@ export default function MutationalSignatureProfile({ submitR }) {
     for (let index in plots) {
       controls.push(
         <Row className="mt-3" key={'control' + index}>
-          <Col sm="2">
+          <Col lg="2">
             <Select
-              className="mb-0"
               id={`mspSource${index}`}
               label="Signature Source"
               value={plots[index].signatureSource}
@@ -377,9 +376,8 @@ export default function MutationalSignatureProfile({ submitR }) {
               onChange={(source) => handleSource(source, index)}
             />
           </Col>
-          <Col sm="2">
+          <Col lg="2">
             <Select
-              className="mb-0"
               id={'mspProfileName' + index}
               label="Profile Name"
               value={plots[index].profileName}
@@ -387,9 +385,8 @@ export default function MutationalSignatureProfile({ submitR }) {
               onChange={(profile) => handleProfile(profile, index)}
             />
           </Col>
-          <Col sm="3">
+          <Col lg="3">
             <Select
-              className="mb-0"
               id={'mspSet' + index}
               label="Reference Signature Set"
               value={plots[index].refSignatureSet}
@@ -397,9 +394,8 @@ export default function MutationalSignatureProfile({ submitR }) {
               onChange={(profile) => handleSet(profile, index)}
             />
           </Col>
-          <Col sm="2">
+          <Col lg="2">
             <Select
-              className="mb-0"
               id={'mspStrategy' + index}
               label="Experimental Strategy"
               value={plots[index].strategy}
@@ -407,9 +403,8 @@ export default function MutationalSignatureProfile({ submitR }) {
               onChange={(strategy) => handleStrategy(strategy, index)}
             />
           </Col>
-          <Col sm="2">
+          <Col lg="2">
             <Select
-              className="mb-0"
               id={'mspSigName' + index}
               label="Signature Name"
               value={plots[index].signatureName}
@@ -423,18 +418,18 @@ export default function MutationalSignatureProfile({ submitR }) {
               }}
             />
           </Col>
-          <Col sm="1" className="d-flex justify-content-end mt-auto">
+          <Col lg="1" className="d-flex justify-content-end">
+            {/* <span className="mx-auto mt-auto mb-3">
+              Plot {parseInt(index) + 1}
+            </span> */}
             <Button
-              variant="secondary"
+              className="mt-auto mb-3 text-nowrap"
+              variant="danger"
               onClick={() => removePlots(index)}
               title="Remove Plot"
-              style={{ width: '2.25rem' }}
             >
-              -
+              Remove ({parseInt(index) + 1})
             </Button>
-            <span className="mx-auto align-bottom">
-              Plot {parseInt(index) + 1}
-            </span>
           </Col>
         </Row>
       );
@@ -472,9 +467,8 @@ export default function MutationalSignatureProfile({ submitR }) {
     <div>
       <LoadingOverlay active={loading} />
       <Row className="">
-        <Col sm="2">
+        <Col lg="2">
           <Select
-            className="mb-0"
             id="mspSource"
             label="Signature Source"
             value={plots[0].signatureSource}
@@ -482,9 +476,8 @@ export default function MutationalSignatureProfile({ submitR }) {
             onChange={(source) => handleSource(source, 0)}
           />
         </Col>
-        <Col sm="2">
+        <Col lg="2">
           <Select
-            className="mb-0"
             id="mspProfileName"
             label="Profile Name"
             value={plots[0].profileName}
@@ -492,9 +485,8 @@ export default function MutationalSignatureProfile({ submitR }) {
             onChange={(profile) => handleProfile(profile, 0)}
           />
         </Col>
-        <Col sm="3">
+        <Col lg="3">
           <Select
-            className="mb-0"
             id="mspSet"
             label="Reference Signature Set"
             value={plots[0].refSignatureSet}
@@ -502,9 +494,8 @@ export default function MutationalSignatureProfile({ submitR }) {
             onChange={(set) => handleSet(set, 0)}
           />
         </Col>
-        <Col sm="2">
+        <Col lg="2">
           <Select
-            className="mb-0"
             id="mspStrategy"
             label="Experimental Strategy"
             value={plots[0].strategy}
@@ -512,9 +503,8 @@ export default function MutationalSignatureProfile({ submitR }) {
             onChange={(strategy) => handleStrategy(strategy, 0)}
           />
         </Col>
-        <Col sm="2">
+        <Col lg="2">
           <Select
-            className="mb-0"
             id="mspSigName"
             label="Signature Name"
             value={plots[0].signatureName}
@@ -528,16 +518,20 @@ export default function MutationalSignatureProfile({ submitR }) {
             }}
           />
         </Col>
-        <Col sm="1" className="d-flex justify-content-end mt-auto">
-          <Button variant="primary" onClick={handleCalculate}>
+        <Col lg="1" className="d-flex justify-content-end">
+          <Button
+            className="mt-auto mb-3"
+            variant="primary"
+            onClick={handleCalculate}
+          >
             Calculate
           </Button>
         </Col>
       </Row>
       {additionalControls()}
       <Row className="mt-3">
-        <Col sm="11" />
-        <Col sm="1" className="d-flex justify-content-end mt-auto">
+        <Col lg="11" />
+        <Col lg="1" className="d-flex justify-content-end mt-auto">
           <Button
             variant="secondary"
             onClick={() => addPlots()}

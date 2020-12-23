@@ -232,9 +232,8 @@ export default function MutationalProfiles() {
       <Form>
         <div className="border rounded p-2">
           <Row className="justify-content-center">
-            <Col sm="3">
+            <Col lg="3">
               <Select
-                className="mb-0"
                 id="mpSampleName"
                 label="Sample Name"
                 value={selectName}
@@ -242,9 +241,8 @@ export default function MutationalProfiles() {
                 onChange={filterSampleName}
               />
             </Col>
-            <Col sm="3">
+            <Col lg="3">
               <Select
-                className="mb-0"
                 id="mpProfileType"
                 label="Profile Type"
                 value={selectProfile}
@@ -252,9 +250,8 @@ export default function MutationalProfiles() {
                 onChange={filterProfileType}
               />
             </Col>
-            <Col sm="3">
+            <Col lg="3">
               <Select
-                className="mb-0"
                 id="mpMatrixSize"
                 label="Matrix Size"
                 value={selectMatrix}
@@ -262,9 +259,8 @@ export default function MutationalProfiles() {
                 onChange={filterMatrix}
               />
             </Col>
-            <Col sm="3">
+            <Col lg="3">
               <Select
-                className="mb-0"
                 id="mpFilter"
                 label="Filter"
                 value={selectFilter}

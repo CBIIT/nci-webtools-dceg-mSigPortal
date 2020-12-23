@@ -184,8 +184,8 @@ export default function MutationalPattern({ submitR }) {
         <LoadingOverlay active={submitOverlay} />
         <div>
           <Row className="">
-            <Col sm="5">
-              <Group controlId="minimum" className="mb-0">
+            <Col lg="4">
+              <Group controlId="minimum">
                 <Label>
                   Minimal Proportion mutations within Each Mutational Pattern
                 </Label>
@@ -200,8 +200,8 @@ export default function MutationalPattern({ submitR }) {
                 ></Control>
               </Group>
             </Col>
-            <Col sm="5">
-              <Group controlId="pattern" className="mb-0">
+            <Col lg="3">
+              <Group controlId="pattern">
                 <Label>Mutational Pattern</Label>
                 <Control
                   value={pattern}
@@ -214,8 +214,10 @@ export default function MutationalPattern({ submitR }) {
                 ></Control>
               </Group>
             </Col>
-            <Col sm="2" className="d-flex justify-content-end mt-auto">
+            <Col lg="3" />
+            <Col lg="2" className="d-flex justify-content-end">
               <Button
+                className="mt-auto mb-3"
                 variant="primary"
                 onClick={() => {
                   calculateR('mutationalPattern', {
@@ -240,7 +242,7 @@ export default function MutationalPattern({ submitR }) {
         <LoadingOverlay active={submitOverlay} />
         <div>
           <Row className="justify-content-center">
-            <Col sm="5">
+            <Col lg="5">
               <Label>
                 Minimal Proportion mutations within Each Mutational Pattern
               </Label>
@@ -253,7 +255,7 @@ export default function MutationalPattern({ submitR }) {
                 }}
               ></Control>
             </Col>
-            <Col sm="5">
+            <Col lg="5">
               <Label>Mutational Pattern</Label>
               <Control
                 value={pattern}
@@ -265,7 +267,7 @@ export default function MutationalPattern({ submitR }) {
               ></Control>
             </Col>
 
-            <Col sm="1" className="m-auto">
+            <Col lg="1" className="m-auto">
               <Button
                 variant="primary"
                 onClick={() => {

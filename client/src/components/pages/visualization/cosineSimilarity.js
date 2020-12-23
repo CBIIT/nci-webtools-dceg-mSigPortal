@@ -317,9 +317,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
         <Form>
           <LoadingOverlay active={withinSubmitOverlay} />
           <Row className="justify-content-center">
-            <Col sm="5">
+            <Col lg="2">
               <Select
-                className="mb-0"
                 disabled={!multiSample}
                 id="csProfileType"
                 label="Profile Type"
@@ -328,9 +327,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 onChange={handleWithinProfileType}
               />
             </Col>
-            <Col sm="5">
+            <Col lg="2">
               <Select
-                className="mb-0"
                 disabled={!multiSample}
                 id="csMatrixSize"
                 label="Matrix Size"
@@ -343,8 +341,10 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 }
               />
             </Col>
-            <Col sm="2" className="d-flex justify-content-end mt-auto">
+            <Col lg="6" />
+            <Col lg="2" className="d-flex justify-content-end">
               <Button
+                className="mt-auto mb-3"
                 disabled={!multiSample}
                 variant="primary"
                 onClick={() => {
@@ -401,9 +401,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
           <LoadingOverlay active={refSubmitOverlay} />
           <div>
             <Row className="justify-content-center">
-              <Col sm="5">
+              <Col lg="2">
                 <Select
-                  className="mb-0"
                   id="csRefProfileType"
                   label="Profile Type"
                   value={refProfileType}
@@ -416,9 +415,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   }}
                 />
               </Col>
-              <Col sm="5">
+              <Col lg="3">
                 <Select
-                  className="mb-0"
                   id="csRefSignatureSet"
                   label="Reference Signature Set"
                   value={refSignatureSet}
@@ -430,8 +428,10 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   }}
                 />
               </Col>
-              <Col sm="2" className="d-flex justify-content-end mt-auto">
+              <Col lg="5" />
+              <Col lg="2" className="d-flex justify-content-end">
                 <Button
+                  className="mt-auto mb-3"
                   variant="primary"
                   onClick={() => {
                     if (source == 'user') {
@@ -488,9 +488,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
           <LoadingOverlay active={pubSubmitOverlay} />
           <div>
             <Row className="justify-content-center">
-              <Col sm="2">
+              <Col lg="2">
                 <Select
-                  className="mb-0"
                   id="csUserProfileType"
                   label="Profile Type"
                   value={userProfileType}
@@ -498,9 +497,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   onChange={handlePublicProfileType}
                 />
               </Col>
-              <Col sm="2">
+              <Col lg="2">
                 <Select
-                  className="mb-0"
                   id="csUserMatrixSize"
                   label="Matrix Size"
                   value={userMatrixSize}
@@ -512,9 +510,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   }
                 />
               </Col>
-              <Col sm="2">
+              <Col lg="2">
                 <Select
-                  className="mb-0"
                   id="csPubStudy"
                   label="Study"
                   value={pubStudy}
@@ -522,9 +519,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   onChange={handleStudyChange}
                 />
               </Col>
-              <Col sm="4">
+              <Col lg="2">
                 <Select
-                  className="mb-0"
                   id="csPubCancerType"
                   label="Cancer Type"
                   value={pubCancerType}
@@ -532,8 +528,10 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   onChange={handleCancerChange}
                 />
               </Col>
-              <Col sm="2" className="d-flex justify-content-end mt-auto">
+              <Col lg="2" />
+              <Col lg="2" className="d-flex justify-content-end">
                 <Button
+                  className="mt-auto mb-3"
                   variant="primary"
                   onClick={() =>
                     calculateR('cosineSimilarityPublic', {

@@ -383,7 +383,7 @@ export default function UploadForm() {
           Upload File <span style={{ color: 'crimson' }}>*</span>
         </Label>
         <Row className="m-0">
-          <Col sm="6" className="p-0">
+          <Col lg="6" className="p-0">
             <Button
               className="p-0 font-14"
               disabled={submitted}
@@ -394,7 +394,7 @@ export default function UploadForm() {
               Download Example Data
             </Button>
           </Col>
-          <Col sm="6" className="p-0 d-flex">
+          <Col lg="6" className="p-0 d-flex">
             <Button
               className="p-0 ml-auto font-14"
               disabled={submitted}
@@ -564,7 +564,7 @@ export default function UploadForm() {
           </span>
         </Label>
         <Row className="m-0">
-          <Col sm="6" className="p-0">
+          <Col lg="6" className="p-0">
             <Button
               className="p-0 font-14"
               disabled={
@@ -579,7 +579,7 @@ export default function UploadForm() {
               Download Example Bed Data
             </Button>
           </Col>
-          <Col sm="6" className="p-0 d-flex">
+          <Col lg="6" className="p-0 d-flex">
             <Button
               className="p-0 ml-auto font-14"
               disabled={
@@ -714,7 +714,7 @@ export default function UploadForm() {
         </Group>
       </div>
       <Row>
-        <Col sm="6">
+        <Col lg="6">
           <Button
             disabled={loading.active}
             className="w-100"
@@ -724,7 +724,7 @@ export default function UploadForm() {
             Reset
           </Button>
         </Col>
-        <Col sm="6">
+        <Col lg="6">
           <Button
             disabled={submitted || loading.active}
             className="w-100"
