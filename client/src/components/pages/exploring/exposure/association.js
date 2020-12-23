@@ -10,7 +10,7 @@ import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
 
-const { Group, Label, Control, Check, Text } = Form;
+const { Group, Check } = Form;
 
 export default function Association({ calculateAssociation }) {
   const { signatureNameOptions, userNameOptions, source } = useSelector(
@@ -27,7 +27,7 @@ export default function Association({ calculateAssociation }) {
     err,
     loading,
   } = useSelector((state) => state.expAssociation);
-  const { projectID } = useSelector((state) => state.visualizeResults);
+  const { projectID } = useSelector((state) => state.expExposure);
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
@@ -82,8 +82,8 @@ export default function Association({ calculateAssociation }) {
       <Form>
         <LoadingOverlay active={loading} />
         <Row className="">
-          <Col sm="6" md="3" className="my-auto">
-            <Group controlId="toggleCancerType" className="d-flex">
+          <Col lg="3">
+            <Group controlId="toggleCancerType">
               <Check
                 type="checkbox"
                 label="Selected Cancer Type Only"
@@ -95,8 +95,8 @@ export default function Association({ calculateAssociation }) {
               />
             </Group>
           </Col>
-          <Col sm="6" md="4" className="my-auto">
-            <Group controlId="toggleBothSamples" className="d-flex">
+          <Col lg="3">
+            <Group controlId="toggleBothSamples">
               <Check
                 type="checkbox"
                 label="Number of Mutations assigned to both signature > 0"
@@ -106,9 +106,8 @@ export default function Association({ calculateAssociation }) {
               />
             </Group>
           </Col>
-          <Col sm="4" md="2">
+          <Col lg="2">
             <Select
-              className="mb-0"
               id="associationSignatureName1"
               label="Signature Name 1"
               value={signatureName1}
@@ -120,9 +119,8 @@ export default function Association({ calculateAssociation }) {
               }
             />
           </Col>
-          <Col sm="4" md="2">
+          <Col lg="2">
             <Select
-              className="mb-0"
               id="associationSignatureName2"
               label="Signature Name 2"
               value={signatureName2}
@@ -134,8 +132,12 @@ export default function Association({ calculateAssociation }) {
               }
             />
           </Col>
-          <Col sm="4" md="1" className="d-flex justify-content-end mt-auto">
-            <Button variant="primary" onClick={calculateAssociation}>
+          <Col lg="2" className="d-flex justify-content-end">
+            <Button
+              className="mt-auto mb-3"
+              variant="primary"
+              onClick={calculateAssociation}
+            >
               Calculate
             </Button>
           </Col>

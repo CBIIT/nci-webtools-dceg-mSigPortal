@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Form, Row, Col, Button } from 'react-bootstrap';
+import { Form, Row, Col, Button, Group } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { dispatchError, dispatchExpAcross } from '../../../../services/store';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -19,7 +19,7 @@ export default function Across({ calculateAcross }) {
     err,
     loading,
   } = useSelector((state) => state.expAcross);
-  const { projectID } = useSelector((state) => state.visualizeResults);
+  const { projectID } = useSelector((state) => state.expExposure);
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
@@ -68,9 +68,8 @@ export default function Across({ calculateAcross }) {
       <Form>
         <LoadingOverlay active={loading} />
         <Row className="">
-          <Col sm="3">
+          <Col lg="3">
             <Select
-              className="mb-0"
               id="acrossSignatureName"
               label="Signature Name"
               value={signatureName}
@@ -80,9 +79,13 @@ export default function Across({ calculateAcross }) {
               onChange={(name) => dispatchExpAcross({ signatureName: name })}
             />
           </Col>
-          <Col sm="7" />
-          <Col sm="2" className="d-flex justify-content-end mt-auto">
-            <Button variant="primary" onClick={calculateAcross}>
+          <Col lg="7" />
+          <Col lg="2" className="d-flex justify-content-end">
+            <Button
+              className="mt-auto mb-3"
+              variant="primary"
+              onClick={calculateAcross}
+            >
               Calculate
             </Button>
           </Col>

@@ -25,8 +25,9 @@ export default function MutationalSignatureProfile({ submitR }) {
     err,
     loading,
   } = useSelector((state) => state.expCosineSimilarity);
-  const { displayTab, refSigData } = useSelector((state) => state.exploring);
-  const { projectID } = useSelector((state) => state.visualizeResults);
+  const { displayTab, refSigData, projectID } = useSelector(
+    (state) => state.exploring
+  );
 
   async function calculateR(fn, args) {
     dispatchExpCosineSimilarity({
@@ -115,9 +116,8 @@ export default function MutationalSignatureProfile({ submitR }) {
         <LoadingOverlay active={loading} />
         <div>
           <Row className="justify-content-center">
-            <Col sm="3">
+            <Col lg="3">
               <Select
-                className="mb-0"
                 id="csProfileName"
                 label="Profile Name"
                 value={profileName}
@@ -125,9 +125,8 @@ export default function MutationalSignatureProfile({ submitR }) {
                 onChange={handleProfile}
               />
             </Col>
-            <Col sm="4">
+            <Col lg="4">
               <Select
-                className="mb-0"
                 id="csRefSet1"
                 label="Reference Signature Set 1"
                 value={refSignatureSet1}
@@ -137,9 +136,8 @@ export default function MutationalSignatureProfile({ submitR }) {
                 }
               />
             </Col>
-            <Col sm="4">
+            <Col lg="4">
               <Select
-                className="mb-0"
                 id="rcsRefSet2"
                 label="Signature Set 2"
                 value={refSignatureSet2}
@@ -149,8 +147,9 @@ export default function MutationalSignatureProfile({ submitR }) {
                 }
               />
             </Col>
-            <Col sm="1" className="d-flex justify-content-end mt-auto">
+            <Col lg="1" className="d-flex justify-content-end">
               <Button
+                className="mt-auto mb-3"
                 variant="primary"
                 onClick={() => {
                   calculateR('cosineSimilarity', {

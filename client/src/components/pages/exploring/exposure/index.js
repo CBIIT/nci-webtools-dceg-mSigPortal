@@ -309,6 +309,8 @@ export default function ExposureExploring({ populateControls }) {
     const { debugR, output, errors } = await submitR(rFn, args, id);
 
     if (output) {
+      dispatchExpExposure({ projectID: id });
+
       if (output.tumorPath)
         dispatchExpTumor({
           plotPath: output.tumorPath,
@@ -649,12 +651,12 @@ export default function ExposureExploring({ populateControls }) {
         <SidebarPanel>
           <div className="p-3 bg-white border rounded">
             <Row>
-              <Col sm="auto">
+              <Col lg="auto">
                 <Group>
-                  <Label className="mr-auto">
-                    <h3 className="mb-2">Data Source</h3>
+                  <Label className="mr-4">
+                    <h4 className="mb-2">Data Source</h4>
                   </Label>
-                  <Check inline id="radioPublic" className="ml-4">
+                  <Check inline id="radioPublic">
                     <Check.Input
                       disabled={loading}
                       type="radio"
@@ -747,17 +749,17 @@ export default function ExposureExploring({ populateControls }) {
                   </Col>
                 </Row>
                 <Row>
-                  <Col sm="12" md="6">
+                  <Col lg="6">
                     <Button
                       disabled={loading}
-                      className="w-100"
+                      className="w-100 mb-3"
                       variant="secondary"
                       onClick={() => handleReset()}
                     >
                       Reset
                     </Button>
                   </Col>
-                  <Col sm="12" md="6">
+                  <Col lg="6">
                     <Button
                       disabled={loading}
                       className="w-100"
@@ -917,17 +919,17 @@ export default function ExposureExploring({ populateControls }) {
                   </Col>
                 </Row>
                 <Row>
-                  <Col sm="6">
+                  <Col lg="6">
                     <Button
                       disabled={loading}
-                      className="w-100"
+                      className="w-100 mb-3"
                       variant="secondary"
                       onClick={() => handleReset()}
                     >
                       Reset
                     </Button>
                   </Col>
-                  <Col sm="6">
+                  <Col lg="6">
                     <Button
                       disabled={loading}
                       className="w-100"

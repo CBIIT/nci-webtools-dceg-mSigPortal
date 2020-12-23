@@ -8,7 +8,7 @@ export default function Tumor() {
   const { plotPath, plotURL, debugR, err } = useSelector(
     (state) => state.expTumor
   );
-  const { projectID } = useSelector((state) => state.visualizeResults);
+  const { projectID } = useSelector((state) => state.expExposure);
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);

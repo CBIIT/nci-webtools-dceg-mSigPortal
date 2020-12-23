@@ -9,7 +9,7 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 
-const { Label } = Form;
+const { Label, Group } = Form;
 
 export default function Landscape({ calculateLandscape, handleVariable }) {
   const {
@@ -21,7 +21,7 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
     err,
     loading,
   } = useSelector((state) => state.expLandscape);
-  const { projectID } = useSelector((state) => state.visualizeResults);
+  const { projectID } = useSelector((state) => state.expExposure);
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
@@ -62,18 +62,21 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
       <Form>
         <LoadingOverlay active={loading} />
         <Row className="">
-          <Col sm="4">
-            <Label>Upload Variable Data</Label>
-            <Form.File
-              id="variableData"
-              label={variableFile || 'Upload here (optional)'}
-              // accept=''
-              onChange={(e) => handleVariable(e.target.files[0])}
-              custom
-            />
+          <Col lg="4">
+            <Group controlId="landscape">
+              <Label>Upload Variable Data</Label>
+              <Form.File
+                id="variableData"
+                label={variableFile || 'Upload here (optional)'}
+                // accept=''
+                onChange={(e) => handleVariable(e.target.files[0])}
+                custom
+              />
+            </Group>
           </Col>
-          <Col sm="1" className="mt-auto">
+          <Col lg="1" className="d-flex justify-content-end">
             <Button
+              className="mt-auto mb-3"
               variant="secondary"
               onClick={() => {
                 handleVariable(new File([], ''));
@@ -83,9 +86,13 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
               Remove
             </Button>
           </Col>
-          <Col sm="5" />
-          <Col sm="2" className="d-flex justify-content-end mt-auto">
-            <Button variant="primary" onClick={calculateLandscape}>
+          <Col lg="5" />
+          <Col lg="2" className="d-flex justify-content-end">
+            <Button
+              className="mt-auto mb-3"
+              variant="primary"
+              onClick={calculateLandscape}
+            >
               Calculate
             </Button>
           </Col>

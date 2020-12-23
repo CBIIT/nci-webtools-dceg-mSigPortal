@@ -12,7 +12,7 @@ export default function Decomposition() {
   const { plotPath, plotURL, txtPath, debugR, err, loading } = useSelector(
     (state) => state.expDecomposition
   );
-  const { projectID } = useSelector((state) => state.visualizeResults);
+  const { projectID } = useSelector((state) => state.expExposure);
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);

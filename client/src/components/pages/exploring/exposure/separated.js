@@ -11,7 +11,7 @@ export default function Separated() {
   const { plotPath, plotURL, debugR, err } = useSelector(
     (state) => state.expSeparated
   );
-  const { projectID } = useSelector((state) => state.visualizeResults);
+  const { projectID } = useSelector((state) => state.expExposure);
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);

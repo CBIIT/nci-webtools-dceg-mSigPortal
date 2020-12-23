@@ -8,15 +8,14 @@ import {
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
-import Select from '../../../controls/select/select';
 
-const { Group, Label, Control, Text } = Form;
+const { Group, Label, Control } = Form;
 
 export default function Tumor({ calculatePrevalence }) {
   const { mutation, plotPath, plotURL, debugR, err, loading } = useSelector(
     (state) => state.expPrevalence
   );
-  const { projectID } = useSelector((state) => state.visualizeResults);
+  const { projectID } = useSelector((state) => state.expExposure);
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
@@ -57,7 +56,7 @@ export default function Tumor({ calculatePrevalence }) {
       <Form>
         <LoadingOverlay active={loading} />
         <Row className="">
-          <Col sm="4">
+          <Col lg="5">
             <Group controlId="prevalenceMutations">
               <Label>Minimal Number Mutations within in Each Signature</Label>
               <Control
@@ -72,9 +71,13 @@ export default function Tumor({ calculatePrevalence }) {
               {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
             </Group>
           </Col>
-          <Col sm="6" />
-          <Col sm="2" className="d-flex justify-content-end mt-auto">
-            <Button variant="primary" onClick={calculatePrevalence}>
+          <Col lg="5" />
+          <Col lg="2" className="d-flex justify-content-end">
+            <Button
+              className="mt-auto mb-3"
+              variant="primary"
+              onClick={calculatePrevalence}
+            >
               Calculate
             </Button>
           </Col>
