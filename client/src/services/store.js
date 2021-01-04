@@ -34,7 +34,6 @@ export const getInitialState = () => ({
   visualizeResults: {
     error: '',
     projectID: '',
-    // projectID: 'b22d73fd-55c6-414c-9bd0-213c95db1092',
     displayTab: 'profilerSummary',
     downloads: [],
     svgList: [],
@@ -288,6 +287,7 @@ export const getInitialState = () => ({
     usePublicSignature: true,
     source: 'public',
     loading: false,
+    loadingMsg: null,
     projectID: '',
     openSidebar: true,
   },

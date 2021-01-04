@@ -12,10 +12,21 @@ import Select from '../../../controls/select/select';
 
 const { Group, Check } = Form;
 
-export default function Association({ calculateAssociation }) {
-  const { signatureNameOptions, userNameOptions, source } = useSelector(
-    (state) => state.expExposure
-  );
+export default function Association({
+  calculateAssociation,
+  handleSet,
+  getSignatureNames,
+}) {
+  const { exposureSignature } = useSelector((state) => state.exploring);
+  const {
+    signatureNameOptions,
+    userNameOptions,
+    source,
+    study,
+    strategy,
+    refSignatureSet,
+    cancer,
+  } = useSelector((state) => state.expExposure);
   const {
     toggleCancer,
     both,
@@ -34,6 +45,7 @@ export default function Association({ calculateAssociation }) {
     else clearPlot();
   }, [plotPath]);
 
+  // apply default signature names
   useEffect(() => {
     if (source == 'public') {
       dispatchExpAssociation({
@@ -47,6 +59,19 @@ export default function Association({ calculateAssociation }) {
       });
     }
   }, [signatureNameOptions, userNameOptions, source]);
+
+  // get new signature name options filtered by cancer type
+  useEffect(() => {
+    if (source == 'public' && refSignatureSet && exposureSignature.length)
+      toggleCancer ? getSignatureNames() : handleSet(refSignatureSet);
+  }, [
+    toggleCancer,
+    exposureSignature,
+    refSignatureSet,
+    cancer,
+    study,
+    strategy,
+  ]);
 
   async function setRPlot(plotPath) {
     if (plotPath) {

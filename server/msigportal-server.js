@@ -27,6 +27,7 @@ const {
   submitQueue,
   fetchResults,
   fetchExample,
+  getSignatureNames,
 } = require('./controllers');
 
 if (cluster.isMaster) {
@@ -113,3 +114,5 @@ apiRouter.post('/queue', submitQueue);
 apiRouter.get('/fetchResults/:id', fetchResults);
 
 apiRouter.get('/fetchExample/:example', fetchExample);
+
+apiRouter.post('/getSignatureNames', getSignatureNames);

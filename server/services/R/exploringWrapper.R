@@ -12,7 +12,7 @@ library(stringr)
 
 
 
-# Util Functions
+# Util Functions for retrieving data
 # get dataframe with column and filter arguments
 getReferenceSignatureData <- function(args, dataPath) {
   load(paste0(dataPath, 'Signature/signature_refsets.RData'))
@@ -35,6 +35,30 @@ getReferenceSignatureData <- function(args, dataPath) {
     }
 
     output = list('data' = data)
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+  })
+}
+
+# retrieve signature names filtered by cancer type
+getSignatureNames <- function(args, dataPath) {
+  load(paste0(dataPath, 'Exposure/exposure_refdata.RData'))
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+    exposure_refdata_selected <- exposure_refdata %>% filter(Study == args$study, Dataset == args$strategy, Signature_set_name == args$refSignatureSet)
+
+    # available siganture name, Dropdown list for all the signature name
+    signature_name_avail <- exposure_refdata_selected %>% filter(Cancer_Type == args$cancerType, Exposure > 0) %>% pull(Signature_name) %>% unique()
+
+    output = list(data = signature_name_avail)
   }, error = function(e) {
     print(e)
   }, finally = {
@@ -249,35 +273,35 @@ mutationalSignatureAssociation <- function(useCancer, cancerType, both, signatur
       rename(Exposure2 = Exposure) %>%
       select(-Signature_name)
   )
-  if (useCancer == TRUE)
-    signature_association(data = data_input, cancer_type_input = cancerType, signature_name_input1 = signatureName1, signature_name_input2 = signatureName2, signature_both = both, output_plot = plotPath)
-  else
-    signature_association(data = data_input, cancer_type_input = NULL, signature_name_input1 = signatureName1, signature_name_input2 = signatureName2, signature_both = both, output_plot = plotPath)
+
+  error = signature_association(data = data_input, signature_name_input1 = signatureName1, signature_name_input2 = signatureName2, signature_both = both, output_plot = plotPath)
+  if (!is.null(error)) stop(error)
+
 }
 
-mutationalSignatureDecomposition <- function(plotPath, dataPath, exposure_refdata, signature_refsets, seqmatrix_refdata) {
-  exposure_refdata_input <- exposure_refdata %>% mutate(Sample = paste0(Cancer_Type, "@", Sample)) %>%
-      select(Sample, Signature_name, Exposure) %>%
-      pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure, values_fill = 0)
+mutationalSignatureDecomposition <- function(plotPath, dataPath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected) {
+  exposure_refdata_input <- exposure_refdata_selected %>% mutate(Sample = paste0(Cancer_Type, "@", Sample)) %>%
+    select(Sample, Signature_name, Exposure) %>%
+    pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure, values_fill = 0)
 
-  signature_refsets_input <- signature_refsets %>%
-      select(MutationType, Signature_name, Contribution) %>%
-      pivot_wider(id_cols = MutationType, names_from = Signature_name, values_from = Contribution) %>%
-      arrange(MutationType) # have to sort the mutationtype
+  signature_refsets_input <- signature_refsets_selected %>%
+    select(MutationType, Signature_name, Contribution) %>%
+    pivot_wider(id_cols = MutationType, names_from = Signature_name, values_from = Contribution) %>%
+    arrange(MutationType) # have to sort the mutationtype
 
-  seqmatrix_refdata_input <- seqmatrix_refdata %>% mutate(Sample = paste0(Cancer_Type, "@", Sample)) %>%
-      select(MutationType, Sample, Mutations) %>%
-      pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
-      arrange(MutationType) ## have to sort the mutation type
+  seqmatrix_refdata_input <- seqmatrix_refdata_selected %>% mutate(Sample = paste0(Cancer_Type, "@", Sample)) %>%
+    select(MutationType, Sample, Mutations) %>%
+    pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
+    arrange(MutationType) ## have to sort the mutation type
 
   decompsite_input <- calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
-  decompsite_input <- decompsite_input %>% separate(col = Sample_Names, into = c('Cancer_Type', 'Sample'), sep = '@')
-  decompsite_input %>% write_delim(dataPath, delim = '\t', col_names = T) ## put the link to download this table
 
   if (!is.data.frame(decompsite_input)) {
     stop('Evaluating step failed due to missing the data')
   } else {
+    decompsite_input <- decompsite_input %>% separate(col = Sample_Names, into = c('Cancer_Type', 'Sample'), sep = '@')
     decompsite_distribution(decompsite = decompsite_input, output_plot = plotPath) # put the distribution plot online.
+    decompsite_input %>% write_delim(dataPath, delim = '\t', col_names = T) ## put the link to download this table
   }
 }
 
@@ -416,7 +440,7 @@ exposurePublic <- function(fn, common, across = '{}', association = '{}', landsc
     seqmatrix_refdata_selected <- seqmatrix_refdata %>% filter(Study == common$study, Dataset == common$strategy, Profile == signature_refsets_selected$Profile[1])
 
 
-    ## Tumor Overall Mutational Burden
+    # Tumor Overall Mutational Burden
     if ('all' %in% fn) {
       fnTime = proc.time()
       tryCatch({

@@ -68,6 +68,7 @@ export default function ExposureExploring({ populateControls }) {
     usePublicSignature,
     source,
     loading,
+    loadingMsg,
     projectID,
     openSidebar,
   } = useSelector((state) => state.expExposure);
@@ -89,19 +90,58 @@ export default function ExposureExploring({ populateControls }) {
     dispatchExploring({ displayTab: 'exposure' });
   }, []);
 
-  function submitR(fn, args, id = projectID) {
-    return fetch(`api/exploringR`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        fn: fn,
-        args: args,
-        projectID: id,
-      }),
-    }).then((res) => res.json());
+  // get signature name options filtered by cancer type
+  async function getSignatureNames() {
+    dispatchExpExposure({
+      loading: true,
+      loadingMsg: 'Filtering Signature Names',
+    });
+    try {
+      const { stdout, output } = await (
+        await fetch(`api/getSignatureNames`, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            args: {
+              study: study,
+              strategy: strategy,
+              refSignatureSet: refSignatureSet,
+              cancerType: cancer,
+            },
+          }),
+        })
+      ).json();
+
+      if (output.data.length)
+        dispatchExpExposure({
+          signatureNameOptions: output.data,
+        });
+      else dispatchError(stdout);
+    } catch (err) {
+      console.log(err);
+      dispatchError(err);
+    }
+    dispatchExpExposure({ loading: false, loadingMsg: null });
+  }
+
+  async function submitR(fn, args, id = projectID) {
+    return await (
+      await fetch(`api/exploringR`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fn: fn,
+          args: args,
+          projectID: id,
+        }),
+      })
+    ).json();
   }
 
   async function calculateAcross() {
@@ -621,7 +661,13 @@ export default function ExposureExploring({ populateControls }) {
       title: 'Evaluating the Performance of Mutational Signature Decomposition',
     },
     {
-      component: <Association calculateAssociation={calculateAssociation} />,
+      component: (
+        <Association
+          calculateAssociation={calculateAssociation}
+          handleSet={handleSet}
+          getSignatureNames={getSignatureNames}
+        />
+      ),
       id: 'association',
       title: 'Mutational Signature Association',
     },
@@ -956,7 +1002,11 @@ export default function ExposureExploring({ populateControls }) {
               </Nav>
             </Header>
             <Body>
-              <LoadingOverlay active={loading} />
+              <LoadingOverlay
+                active={loading}
+                content={loadingMsg}
+                showIndicator={loadingMsg}
+              />
               <Accordions components={sections} />
             </Body>
           </Card>

@@ -578,6 +578,23 @@ async function fetchExample(req, res, next) {
   }
 }
 
+async function getSignatureNames(req, res, next) {
+  try {
+    const wrapper = await r(
+      'services/R/exploringWrapper.R',
+      'getSignatureNames',
+      {
+        args: req.body.args,
+        dataPath: path.join(config.data.database),
+      }
+    );
+
+    res.json(JSON.parse(wrapper));
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   parseCSV,
   profilerExtraction,
@@ -596,4 +613,5 @@ module.exports = {
   submitQueue,
   fetchResults,
   fetchExample,
+  getSignatureNames,
 };
