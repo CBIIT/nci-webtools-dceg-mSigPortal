@@ -53,8 +53,10 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
   }
 
   function clearPlot() {
-    if (plotURL) URL.revokeObjectURL(plotURL);
-    dispatchExpLandscape({ plotPath: '', plotURL: '' });
+    if (plotURL) {
+      URL.revokeObjectURL(plotURL);
+      dispatchExpLandscape({ plotPath: '', plotURL: '' });
+    }
   }
 
   return (

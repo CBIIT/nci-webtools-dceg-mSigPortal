@@ -59,8 +59,10 @@ export default function Across({ calculateAcross }) {
   }
 
   function clearPlot() {
-    if (plotURL) URL.revokeObjectURL(plotURL);
-    dispatchExpAcross({ plotPath: '', plotURL: '' });
+    if (plotURL) {
+      URL.revokeObjectURL(plotURL);
+      dispatchExpAcross({ plotPath: '', plotURL: '' });
+    }
   }
 
   return (

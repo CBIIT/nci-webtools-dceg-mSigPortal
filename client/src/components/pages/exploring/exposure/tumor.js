@@ -40,8 +40,10 @@ export default function Tumor() {
   }
 
   function clearPlot() {
-    if (plotURL) URL.revokeObjectURL(plotURL);
-    dispatchExpTumor({ plotPath: '', plotURL: '' });
+    if (plotURL) {
+      URL.revokeObjectURL(plotURL);
+      dispatchExpTumor({ plotPath: '', plotURL: '' });
+    }
   }
 
   return (

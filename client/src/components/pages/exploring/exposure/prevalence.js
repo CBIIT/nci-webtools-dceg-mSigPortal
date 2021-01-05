@@ -47,8 +47,10 @@ export default function Tumor({ calculatePrevalence }) {
   }
 
   function clearPlot() {
-    if (plotURL) URL.revokeObjectURL(plotURL);
-    dispatchExpPrevalence({ plotPath: '', plotURL: '' });
+    if (plotURL) {
+      URL.revokeObjectURL(plotURL);
+      dispatchExpPrevalence({ plotPath: '', plotURL: '' });
+    }
   }
 
   return (

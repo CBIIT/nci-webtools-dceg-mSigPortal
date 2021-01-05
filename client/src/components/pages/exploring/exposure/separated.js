@@ -43,8 +43,10 @@ export default function Separated() {
   }
 
   function clearPlot() {
-    if (plotURL) URL.revokeObjectURL(plotURL);
-    dispatchExpSeparated({ plotPath: '', plotURL: '' });
+    if (plotURL) {
+      URL.revokeObjectURL(plotURL);
+      dispatchExpSeparated({ plotPath: '', plotURL: '' });
+    }
   }
 
   return (

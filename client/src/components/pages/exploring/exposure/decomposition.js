@@ -44,8 +44,10 @@ export default function Decomposition() {
   }
 
   function clearPlot() {
-    if (plotURL) URL.revokeObjectURL(plotURL);
-    dispatchExpDecomposition({ plotPath: '', plotURL: '' });
+    if (plotURL) {
+      URL.revokeObjectURL(plotURL);
+      dispatchExpDecomposition({ plotPath: '', plotURL: '' });
+    }
   }
 
   return (
