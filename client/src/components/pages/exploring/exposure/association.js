@@ -17,7 +17,6 @@ export default function Association({
   handleSet,
   getSignatureNames,
 }) {
-  const { exposureSignature } = useSelector((state) => state.exploring);
   const {
     signatureNameOptions,
     userNameOptions,
@@ -25,7 +24,6 @@ export default function Association({
     study,
     strategy,
     refSignatureSet,
-    cancer,
   } = useSelector((state) => state.expExposure);
   const {
     toggleCancer,
@@ -58,20 +56,19 @@ export default function Association({
         signatureName2: userNameOptions[1],
       });
     }
-  }, [signatureNameOptions, userNameOptions, source]);
+  }, [signatureNameOptions, userNameOptions]);
 
   // get new signature name options filtered by cancer type
   useEffect(() => {
-    if (source == 'public' && refSignatureSet && exposureSignature.length)
-      toggleCancer ? getSignatureNames() : handleSet(refSignatureSet);
-  }, [
-    toggleCancer,
-    exposureSignature,
-    refSignatureSet,
-    cancer,
-    study,
-    strategy,
-  ]);
+    if (
+      study &&
+      strategy &&
+      refSignatureSet &&
+      toggleCancer &&
+      source == 'public'
+    )
+      getSignatureNames();
+  }, [study, strategy, refSignatureSet]);
 
   async function setRPlot(plotPath) {
     if (plotPath) {
@@ -98,8 +95,10 @@ export default function Association({
   }
 
   function clearPlot() {
-    if (plotURL) URL.revokeObjectURL(plotURL);
-    dispatchExpAssociation({ plotPath: '', plotURL: '' });
+    if (plotURL) {
+      URL.revokeObjectURL(plotURL);
+      dispatchExpAssociation({ plotPath: '', plotURL: '' });
+    }
   }
 
   return (
@@ -114,9 +113,13 @@ export default function Association({
                 label="Selected Cancer Type Only"
                 value={toggleCancer}
                 checked={toggleCancer}
-                onChange={() =>
-                  dispatchExpAssociation({ toggleCancer: !toggleCancer })
-                }
+                onChange={() => {
+                  {
+                    if (!toggleCancer) getSignatureNames();
+                    else handleSet(refSignatureSet);
+                    dispatchExpAssociation({ toggleCancer: !toggleCancer });
+                  }
+                }}
               />
             </Group>
           </Col>
