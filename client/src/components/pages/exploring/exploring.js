@@ -21,7 +21,7 @@ export default function Explore() {
   );
 
   useEffect(() => {
-    if (!Object.keys(exposureSignature).length) populateControls();
+    if (!exposureSignature.length) populateControls();
   }, []);
 
   async function populateControls() {
