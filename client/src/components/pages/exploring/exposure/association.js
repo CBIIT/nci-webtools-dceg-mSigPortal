@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
@@ -58,6 +58,25 @@ export default function Association({
     }
   }, [signatureNameOptions, userNameOptions]);
 
+  function usePrevious(value) {
+    const ref = useRef();
+    useEffect(() => {
+      ref.current = value;
+    }, [value]);
+
+    return ref.current;
+  }
+
+  function arrayEquals(arr1, arr2) {
+    if (arr1.length != arr2.length) return false;
+    arr1.forEach((v, i) => {
+      if (v != arr2[i]) return false;
+    });
+
+    return true;
+  }
+
+  const prevSigNameOptions = usePrevious(userNameOptions);
   // get new signature name options filtered by cancer type
   useEffect(() => {
     if (
@@ -65,7 +84,9 @@ export default function Association({
       strategy &&
       refSignatureSet &&
       toggleCancer &&
-      source == 'public'
+      source == 'public' &&
+      prevSigNameOptions &&
+      !arrayEquals(prevSigNameOptions, signatureNameOptions)
     )
       getSignatureNames();
   }, [study, strategy, refSignatureSet]);
