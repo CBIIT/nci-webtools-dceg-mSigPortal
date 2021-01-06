@@ -72,6 +72,27 @@ export default function Results({ setOpenSidebar }) {
     }
   }
 
+  function defaultProfile(profileOptions) {
+    if (profileOptions.includes('SBS')) return 'SBS';
+    if (profileOptions.includes('DBS')) return 'DBS';
+    if (profileOptions.includes('ID')) return 'ID';
+  }
+
+  function defaultMatrix(profile, matrixOptions) {
+    if (profile == 'SBS')
+      return matrixOptions.includes('96') ? '96' : matrixOptions[0];
+
+    if (profile == 'DBS')
+      return matrixOptions.includes('78') ? '78' : matrixOptions[0];
+
+    if (profile == 'ID')
+      return matrixOptions.includes('83') ? '83' : matrixOptions[0];
+  }
+
+  function defaultFilter(filterOptions) {
+    return filterOptions.includes('NA') ? 'NA' : filterOptions[0];
+  }
+
   // retrieve mapping of samples to plots from svgList file
   async function loadData() {
     dispatchVisualize({
@@ -82,9 +103,60 @@ export default function Results({ setOpenSidebar }) {
       },
     });
 
+    // Mutational Profiles
     const nameOptions = [
       ...new Set(svgList.map(({ Sample_Name }) => Sample_Name)),
     ];
+    const selectName = nameOptions[0];
+
+    const filteredPlots = svgList.filter(
+      (plot) => plot.Sample_Name == selectName
+    );
+
+    const filteredProfileOptions = [
+      ...new Set(filteredPlots.map((plot) => plot.Profile_Type)),
+    ].sort();
+    const mpProfile = defaultProfile(filteredProfileOptions);
+
+    const filteredMatrixOptions = [
+      ...new Set(
+        filteredPlots
+          .filter((plot) => plot.Profile_Type == mpProfile)
+          .map((plot) => plot.Matrix_Size)
+      ),
+    ].sort((a, b) => a - b);
+    const mpMatrix = defaultMatrix(mpProfile, filteredMatrixOptions);
+
+    const filteredFilterOptions = [
+      ...new Set(
+        filteredPlots
+          .filter((plot) => plot.Matrix_Size == mpMatrix)
+          .map((plot) => plot.Filter)
+      ),
+    ];
+    const mpFilter = defaultFilter(filteredFilterOptions);
+
+    const filteredMatrixList = [
+      ...new Set(
+        matrixList
+          .filter((matrix) => matrix.Profile_Type == mpProfile)
+          .map((matrix) => matrix.Matrix_Size)
+      ),
+    ].sort((a, b) => a - b);
+
+    dispatchMutationalProfiles({
+      filtered: filteredPlots,
+      nameOptions: nameOptions,
+      profileOptions: filteredProfileOptions,
+      matrixOptions: filteredMatrixOptions,
+      filterOptions: filteredFilterOptions,
+      selectName: selectName,
+      selectProfile: mpProfile,
+      selectMatrix: mpMatrix,
+      selectFilter: mpFilter,
+    });
+
+    // Cosine Similarity - Profile Comparison - PCA
     const profileComparisonSamples = [
       ...new Set(
         svgList.map((plot) => {
@@ -95,95 +167,48 @@ export default function Results({ setOpenSidebar }) {
     ];
     const profileOptions = [
       ...new Set(svgList.map((plot) => plot.Profile_Type)),
-    ];
-    // const matrixOptions = [...new Set(svgList.map((plot) => plot.Matrix_Size))];
-    // const filterOptions = [...new Set(svgList.map((plot) => plot.Filter))];
+    ].sort();
 
-    const selectName = nameOptions[0];
-
-    const filteredPlots = svgList.filter(
-      (plot) => plot.Sample_Name == selectName
-    );
-
-    const filteredProfileOptions = [
-      ...new Set(filteredPlots.map((plot) => plot.Profile_Type)),
-    ];
-    const filteredMatrixOptions = [
-      ...new Set(
-        filteredPlots
-          .filter((plot) => plot.Profile_Type == filteredProfileOptions[0])
-          .map((plot) => plot.Matrix_Size)
-      ),
-    ];
-    const filteredFilterOptions = [
-      ...new Set(
-        filteredPlots
-          .filter((plot) => plot.Matrix_Size == filteredMatrixOptions[0])
-          .map((plot) => plot.Filter)
-      ),
-    ];
-
-    const selectProfile = filteredProfileOptions[0];
-    const selectMatrix = filteredMatrixOptions[0];
-    const selectFilter = filteredFilterOptions[0];
-
-    const filteredMatrixList = [
-      ...new Set(
-        matrixList
-          .filter((matrix) => matrix.Profile_Type == selectProfile)
-          .map((matrix) => matrix.Matrix_Size)
-      ),
-    ];
+    const selectProfile = defaultProfile(profileOptions);
+    const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);
 
     const refSignatureSetOptions = await (
-      await getRefSigOptions(profileOptions[0])
+      await getRefSigOptions(selectProfile)
     ).json();
 
-    dispatchMutationalProfiles({
-      filtered: filteredPlots,
-      nameOptions: nameOptions,
-      profileOptions: filteredProfileOptions,
-      matrixOptions: filteredMatrixOptions,
-      filterOptions: filteredFilterOptions,
-      selectName: selectName,
-      selectProfile: selectProfile,
-      selectMatrix: selectMatrix,
-      selectFilter: selectFilter,
-    });
-
     dispatchCosineSimilarity({
-      withinProfileType: profileOptions[0],
-      refProfileType: profileOptions[0],
+      withinProfileType: selectProfile,
+      refProfileType: selectProfile,
       refSignatureSet: refSignatureSetOptions[0],
       refSignatureSetOptions: refSignatureSetOptions,
-      withinMatrixSize: filteredMatrixList[0],
+      withinMatrixSize: selectMatrix,
       withinMatrixOptions: filteredMatrixList,
-      userProfileType: profileOptions[0],
-      userMatrixSize: filteredMatrixOptions[0],
+      userProfileType: selectProfile,
+      userMatrixSize: selectMatrix,
       userMatrixOptions: filteredMatrixOptions,
     });
 
     dispatchProfileComparison({
-      withinProfileType: profileOptions[0],
+      withinProfileType: selectProfile,
       withinSampleName1: profileComparisonSamples[0],
       withinSampleName2: profileComparisonSamples[1],
       sampleOptions: profileComparisonSamples,
-      refProfileType: profileOptions[0],
+      refProfileType: selectProfile,
       refSampleName: profileComparisonSamples[0],
       refSignatureSet: refSignatureSetOptions[0],
       refSignatureSetOptions: refSignatureSetOptions,
-      userProfileType: profileOptions[0],
-      userMatrixSize: filteredMatrixOptions[0],
+      userProfileType: selectProfile,
+      userMatrixSize: selectMatrix,
       userMatrixOptions: filteredMatrixOptions,
       userSampleName: profileComparisonSamples[0],
     });
 
     dispatchPCA({
-      profileType: profileOptions[0],
+      profileType: selectProfile,
       signatureSet: refSignatureSetOptions[0],
       signatureSetOptions: refSignatureSetOptions,
-      userProfileType: profileOptions[0],
-      userMatrixSize: filteredMatrixList[0],
+      userProfileType: selectProfile,
+      userMatrixSize: selectMatrix,
       userMatrixOptions: filteredMatrixOptions,
     });
 
@@ -205,25 +230,28 @@ export default function Results({ setOpenSidebar }) {
       },
     });
 
+    // Mutational Profiles
     const nameOptions = [...new Set(svgList.map((plot) => plot.Sample))];
+    const selectName = mutationalProfiles.selectName || nameOptions[0];
+
     const profileOptions = [
       ...new Set(svgList.map((plot) => plot.Profile.match(/[a-z]+/gi)[0])),
     ];
+
     const matrixOptions = [
       ...new Set(svgList.map((plot) => plot.Profile.match(/\d+/gi)[0])),
     ];
-    const filterOptions = ['NA'];
 
-    const selectName = mutationalProfiles.selectName || nameOptions[0];
-    const selectProfile = mutationalProfiles.selectProfile || profileOptions[0];
-    const selectMatrix = mutationalProfiles.selectMatrix || matrixOptions[0];
+    const filterOptions = ['NA'];
     const selectFilter = filterOptions[0];
 
     const filteredPlots = svgList.filter(
       (plot) =>
         plot.Sample == selectName &&
-        plot.Profile.indexOf(selectProfile) > -1 &&
-        plot.Profile.indexOf(selectMatrix) > -1
+        plot.Profile.indexOf(defaultProfile(profileOptions)) > -1 &&
+        plot.Profile.indexOf(
+          defaultMatrix(defaultProfile(profileOptions), matrixOptions)
+        ) > -1
     );
 
     const filteredProfileOptions = [
@@ -232,23 +260,24 @@ export default function Results({ setOpenSidebar }) {
           .filter((plot) => plot.Sample == selectName)
           .map((plot) => plot.Profile.match(/[a-z]+/gi)[0])
       ),
-    ];
+    ].sort();
+    const mpProfile =
+      mutationalProfiles.selectProfile ||
+      defaultProfile(filteredProfileOptions);
 
     const filteredMatrixOptions = [
       ...new Set(
         svgList
           .filter(
             (plot) =>
-              plot.Sample == selectName &&
-              plot.Profile.indexOf(filteredProfileOptions[0]) > -1
+              plot.Sample == selectName && plot.Profile.indexOf(mpProfile) > -1
           )
           .map((plot) => plot.Profile.match(/\d+/gi)[0])
       ),
-    ];
-
-    const refSignatureSetOptions = await (
-      await getRefSigOptions(profileOptions[0])
-    ).json();
+    ].sort((a, b) => a - b);
+    const mpMatrix =
+      mutationalProfiles.selectMatrix ||
+      defaultMatrix(mpProfile, filteredMatrixOptions);
 
     dispatchMutationalProfiles({
       filtered: filteredPlots,
@@ -257,33 +286,41 @@ export default function Results({ setOpenSidebar }) {
       matrixOptions: filteredMatrixOptions,
       filterOptions: filterOptions,
       selectName: selectName,
-      selectProfile: selectProfile,
-      selectMatrix: selectMatrix,
+      selectProfile: mpProfile,
+      selectMatrix: mpMatrix,
       selectFilter: selectFilter,
     });
 
+    // Cosine Similarity - Profile Comparison - PCA
+    const selectProfile = defaultProfile(profileOptions);
+    const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);
+
+    const refSignatureSetOptions = await (
+      await getRefSigOptions(selectProfile)
+    ).json();
+
     dispatchCosineSimilarity({
-      withinProfileType: profileOptions[0],
-      refProfileType: profileOptions[0],
+      withinProfileType: selectProfile,
+      refProfileType: selectProfile,
       refSignatureSet: refSignatureSetOptions[0],
       refSignatureSetOptions: refSignatureSetOptions,
-      withinMatrixSize: filteredMatrixOptions[0],
+      withinMatrixSize: selectMatrix,
       withinMatrixOptions: filteredMatrixOptions,
     });
 
     dispatchProfileComparison({
-      withinProfileType: profileOptions[0],
+      withinProfileType: selectProfile,
       withinSampleName1: nameOptions[0],
       withinSampleName2: nameOptions[1],
       sampleOptions: nameOptions,
-      refProfileType: profileOptions[0],
+      refProfileType: selectProfile,
       refSampleName: nameOptions[0],
       refSignatureSet: refSignatureSetOptions[0],
       refSignatureSetOptions: refSignatureSetOptions,
     });
 
     dispatchPCA({
-      profileType: profileOptions[0],
+      profileType: selectProfile,
       signatureSet: refSignatureSetOptions[0],
       signatureSetOptions: refSignatureSetOptions,
     });
@@ -391,7 +428,11 @@ export default function Results({ setOpenSidebar }) {
               minHeight: '420px',
             }}
           >
-            <MutationalProfiles />
+            <MutationalProfiles
+              defaultMatrix={(profile, matrixOptions) =>
+                defaultMatrix(profile, matrixOptions)
+              }
+            />
           </Body>
           <Body
             style={{
@@ -402,6 +443,9 @@ export default function Results({ setOpenSidebar }) {
             <CosineSimilarity
               getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
               submitR={(fn, args) => submitR(fn, args)}
+              defaultMatrix={(profile, matrixOptions) =>
+                defaultMatrix(profile, matrixOptions)
+              }
             />
           </Body>
           <Body
@@ -422,6 +466,9 @@ export default function Results({ setOpenSidebar }) {
             <ProfileComparison
               getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
               submitR={(fn, args) => submitR(fn, args)}
+              defaultMatrix={(profile, matrixOptions) =>
+                defaultMatrix(profile, matrixOptions)
+              }
             />
           </Body>
           <Body
@@ -433,6 +480,9 @@ export default function Results({ setOpenSidebar }) {
             <PCA
               getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
               submitR={(fn, args) => submitR(fn, args)}
+              defaultMatrix={(profile, matrixOptions) =>
+                defaultMatrix(profile, matrixOptions)
+              }
             />
           </Body>
           <Body

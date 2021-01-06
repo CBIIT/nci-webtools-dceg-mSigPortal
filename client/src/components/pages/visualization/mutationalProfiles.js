@@ -10,7 +10,7 @@ import Select from '../../controls/select/select';
 
 const { Group, Label } = Form;
 
-export default function MutationalProfiles() {
+export default function MutationalProfiles({ defaultMatrix }) {
   const { source } = useSelector((state) => state.visualize);
   const { projectID, svgList, displayTab } = useSelector(
     (state) => state.visualizeResults
@@ -146,7 +146,7 @@ export default function MutationalProfiles() {
       );
       const matrixOptions = [
         ...new Set(filteredPlots.map((plot) => plot.Matrix_Size)),
-      ];
+      ].sort((a, b) => a - b);
       const filterOptions = [
         ...new Set(
           filteredPlots
@@ -156,7 +156,7 @@ export default function MutationalProfiles() {
       ];
       dispatchMutationalProfiles({
         selectProfile: profile,
-        selectMatrix: matrixOptions[0],
+        selectMatrix: defaultMatrix(profile, matrixOptions),
         selectFilter: filterOptions[0],
         matrixOptions: matrixOptions,
         filterOptions: filterOptions,

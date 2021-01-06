@@ -11,7 +11,11 @@ import Debug from '../../controls/debug/debug';
 import Select from '../../controls/select/select';
 import Accordions from '../../controls/accordions/accordions';
 
-export default function CosineSimilarity({ submitR, getRefSigOptions }) {
+export default function CosineSimilarity({
+  submitR,
+  getRefSigOptions,
+  defaultMatrix,
+}) {
   const {
     source,
     study,
@@ -248,11 +252,11 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
             .filter((matrix) => matrix.Profile_Type == profileType)
             .map((matrix) => matrix.Matrix_Size)
         ),
-      ];
+      ].sort((a, b) => a - b);
 
       dispatchCosineSimilarity({
         withinProfileType: profileType,
-        withinMatrixSize: withinMatrixOptions[0],
+        withinMatrixSize: defaultMatrix(profileType, withinMatrixOptions),
         withinMatrixOptions: withinMatrixOptions,
       });
     } else {
@@ -262,11 +266,10 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
             .filter((plot) => plot.Profile.indexOf(profileType) > -1)
             .map((plot) => plot.Profile.match(/\d+/gi)[0])
         ),
-      ];
-
+      ].sort((a, b) => a - b);
       dispatchCosineSimilarity({
         withinProfileType: profileType,
-        withinMatrixSize: withinMatrixOptions[0],
+        withinMatrixSize: defaultMatrix(profileType, withinMatrixOptions),
         withinMatrixOptions: withinMatrixOptions,
       });
     }
@@ -279,11 +282,11 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
           .filter((matrix) => matrix.Profile_Type == profileType)
           .map((matrix) => matrix.Matrix_Size)
       ),
-    ];
+    ].sort((a, b) => a - b);
 
     dispatchCosineSimilarity({
       userProfileType: profileType,
-      userMatrixSize: userMatrixOptions[0],
+      userMatrixSize: defaultMatrix(profileType, userMatrixOptions),
       userMatrixOptions: userMatrixOptions,
     });
   }

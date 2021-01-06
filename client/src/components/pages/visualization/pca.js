@@ -8,7 +8,7 @@ import Debug from '../../controls/debug/debug';
 import Select from '../../controls/select/select';
 import Accordions from '../../controls/accordions/accordions';
 
-export default function PCA({ submitR, getRefSigOptions }) {
+export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
   const { matrixList } = useSelector((state) => state.visualizeResults);
   const {
     source,
@@ -267,11 +267,11 @@ export default function PCA({ submitR, getRefSigOptions }) {
           .filter((matrix) => matrix.Profile_Type == profileType)
           .map((matrix) => matrix.Matrix_Size)
       ),
-    ];
+    ].sort((a, b) => a - b);
 
     dispatchPCA({
       userProfileType: profileType,
-      userMatrixSize: userMatrixOptions[0],
+      userMatrixSize: defaultMatrix(profileType, userMatrixOptions),
       userMatrixOptions: userMatrixOptions,
     });
   }

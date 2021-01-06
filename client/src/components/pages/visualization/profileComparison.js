@@ -23,7 +23,11 @@ import Accordions from '../../controls/accordions/accordions';
 const { Group, Label, Control, Text } = Form;
 const { Title, Content } = Popover;
 
-export default function ProfileComparison({ submitR, getRefSigOptions }) {
+export default function ProfileComparison({
+  submitR,
+  getRefSigOptions,
+  defaultMatrix,
+}) {
   const {
     source,
     study,
@@ -406,12 +410,12 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
           .filter((plot) => plot.Profile_Type == profile)
           .map((plot) => plot.Matrix_Size)
       ),
-    ];
+    ].sort((a, b) => a - b);
 
     dispatchProfileComparison({
       userProfileType: profile,
       userMatrixOptions: matrixOptions,
-      userMatrixSize: matrixOptions[0],
+      userMatrixSize: defaultMatrix(profile, matrixOptions),
     });
   }
 
