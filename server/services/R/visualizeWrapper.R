@@ -342,11 +342,11 @@ profileComparisonWithin <- function(profileType, sampleName1, sampleName2, matri
     profile1 <- data_input %>% select(MutationType, one_of(sampleName1))
     profile2 <- data_input %>% select(MutationType, one_of(sampleName2))
 
-    if (dim(profile1)[1] != 2) {
+    if (dim(profile1)[2] != 2) {
       error = paste0('Sample: ', sampleName1, ' has no Data. Try a different sample.')
       stop(error)
     }
-    if (dim(profil2)[1] != 2) {
+    if (dim(profile2)[2] != 2) {
       error = paste0('Sample: ', sampleName2, ' has no Data. Try a different sample.')
       stop(error)
     }
@@ -437,7 +437,7 @@ profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, c
 
     profile1 <- data_input %>% select(MutationType, one_of(sampleName))
 
-    if (dim(profile1)[1] != 2) {
+    if (dim(profile1)[2] != 2) {
       error = paste0('Sample: ', sampleName, ' has no Data. Try a different sample.')
       stop(error)
     }
