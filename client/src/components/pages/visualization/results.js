@@ -9,6 +9,7 @@ import {
   dispatchMutationalProfiles,
   dispatchCosineSimilarity,
   dispatchProfileComparison,
+  dispatchRainfall,
   dispatchPCA,
 } from '../../../services/store';
 import ProfilerSummary from './profilerSummary';
@@ -17,6 +18,7 @@ import CosineSimilarity from './cosineSimilarity';
 import MutationalPattern from './mutationalPattern';
 import ProfileComparison from './profileComparison';
 import PCA from './pca';
+import Rainfall from './rainfall';
 import Download from './download';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
@@ -156,8 +158,8 @@ export default function Results({ setOpenSidebar }) {
       selectFilter: mpFilter,
     });
 
-    // Cosine Similarity - Profile Comparison - PCA
-    const profileComparisonSamples = [
+    // Cosine Similarity - Profile Comparison - PCA - Rainfall
+    const sampleNameOptions = [
       ...new Set(
         svgList.map((plot) => {
           if (plot.Filter != 'NA') return `${plot.Sample_Name}@${plot.Filter}`;
@@ -190,17 +192,17 @@ export default function Results({ setOpenSidebar }) {
 
     dispatchProfileComparison({
       withinProfileType: selectProfile,
-      withinSampleName1: profileComparisonSamples[0],
-      withinSampleName2: profileComparisonSamples[1],
-      sampleOptions: profileComparisonSamples,
+      withinSampleName1: sampleNameOptions[0],
+      withinSampleName2: sampleNameOptions[1],
+      sampleOptions: sampleNameOptions,
       refProfileType: selectProfile,
-      refSampleName: profileComparisonSamples[0],
+      refSampleName: sampleNameOptions[0],
       refSignatureSet: refSignatureSetOptions[0],
       refSignatureSetOptions: refSignatureSetOptions,
       userProfileType: selectProfile,
       userMatrixSize: selectMatrix,
       userMatrixOptions: filteredMatrixOptions,
-      userSampleName: profileComparisonSamples[0],
+      userSampleName: sampleNameOptions[0],
     });
 
     dispatchPCA({
@@ -210,6 +212,11 @@ export default function Results({ setOpenSidebar }) {
       userProfileType: selectProfile,
       userMatrixSize: selectMatrix,
       userMatrixOptions: filteredMatrixOptions,
+    });
+
+    dispatchRainfall({
+      sample: sampleNameOptions[0],
+      sampleOptions: sampleNameOptions,
     });
 
     dispatchVisualize({
@@ -365,6 +372,7 @@ export default function Results({ setOpenSidebar }) {
     },
     { title: 'Profile Comparison', id: 'profileComparison' },
     { title: 'PCA', id: 'pca' },
+    { title: 'Rainfall', id: 'rainfall' },
     { title: 'Download', id: 'download' },
   ];
 
@@ -484,6 +492,14 @@ export default function Results({ setOpenSidebar }) {
                 defaultMatrix(profile, matrixOptions)
               }
             />
+          </Body>
+          <Body
+            style={{
+              display: displayTab == 'rainfall' ? 'block' : 'none',
+              minHeight: '420px',
+            }}
+          >
+            <Rainfall submitR={(fn, args) => submitR(fn, args)} />
           </Body>
           <Body
             style={{

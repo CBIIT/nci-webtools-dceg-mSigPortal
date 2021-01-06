@@ -183,6 +183,23 @@ export const getInitialState = () => ({
     pubPcaErr: false,
     pubSubmitOverlay: false,
   },
+  rainfall: {
+    sample: '',
+    sampleOptions: '',
+    highlight: false,
+    min: '1',
+    max: '100',
+    chromosome: 'None',
+    txtPath: '',
+    plotPath: '',
+    plotURL: '',
+    barPath: '',
+    barURL: '',
+    display: true,
+    err: false,
+    debugR: [],
+    submitOverlay: false,
+  },
 
   exploring: {
     displayTab: 'signature',
@@ -357,6 +374,7 @@ export const getInitialState = () => ({
   },
 });
 
+// visualization modules
 const visualizeSlice = createSlice({
   name: 'visualize',
   initialState: getInitialState().visualize,
@@ -461,6 +479,20 @@ const pcaSlice = createSlice({
   },
 });
 
+const rainfallSlice = createSlice({
+  name: 'rainfall',
+  initialState: getInitialState().rainfall,
+  reducers: {
+    updateRainfall: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
+
+// util
 const errorSlice = createSlice({
   name: 'error',
   initialState: getInitialState().error,
@@ -487,6 +519,7 @@ const successSlice = createSlice({
   },
 });
 
+// exploring modules
 const exploringSlice = createSlice({
   name: 'exploring',
   initialState: getInitialState().exploring,
@@ -657,8 +690,11 @@ const rootReducer = combineReducers({
   mutationalPattern: mutationalPatternSlice.reducer,
   profileComparison: profileComparisonSlice.reducer,
   pca: pcaSlice.reducer,
+  rainfall: rainfallSlice.reducer,
+
   error: errorSlice.reducer,
   success: successSlice.reducer,
+
   exploring: exploringSlice.reducer,
   expRefSig: expRefSigSlice.reducer,
   expMutationalProfiles: expMutationalProfilesSlice.reducer,
@@ -687,8 +723,11 @@ export const { updateCosineSimilarity } = cosineSimilaritySlice.actions;
 export const { updateMutationalPattern } = mutationalPatternSlice.actions;
 export const { updateProfileComparison } = profileComparisonSlice.actions;
 export const { updatePCA } = pcaSlice.actions;
+export const { updateRainfall } = rainfallSlice.actions;
+
 export const { updateError } = errorSlice.actions;
 export const { updateSuccess } = successSlice.actions;
+
 export const { updateExploring } = exploringSlice.actions;
 export const { updateExpRefSig } = expRefSigSlice.actions;
 export const {
@@ -737,6 +776,10 @@ export function dispatchProfileComparison(obj) {
 
 export function dispatchPCA(obj) {
   store.dispatch(updatePCA(obj));
+}
+
+export function dispatchRainfall(obj) {
+  store.dispatch(updateRainfall(obj));
 }
 
 export function dispatchError(msg) {

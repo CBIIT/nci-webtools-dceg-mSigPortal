@@ -927,3 +927,52 @@ pcaWithPublic <- function(matrixFile, study, cancerType, profileName, projectID,
     return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
   })
 }
+
+# Kataegis Identificaiton -----------------------------------------------------------
+#parameters for this function: Sample Name, Highlight Kataegis Mutations, Minimum Number of Mutations, Maximum Distance, Chromosome
+# Sample Name: same as other module
+# Highlight Kataegis Mutations: logical, default FALSE
+# Minimum Number of Mutations: default 5
+# Maximum Distance: 1000
+# Chromosome: default null; can choose from chr1:chr22, chrX and chrY
+rainfall <- function(sample, highlight, min, max, chromosome, projectID, pythonOutput, savePath, dataPath) {
+  source('services/R/Sigvisualfunc.R')
+  stdout <- vector('character')
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+    rainfall = paste0(savePath, 'rainfall.svg')
+
+    mutationPath = paste0(savePath, '../')
+    mutationFile = list.files(mutationPath, pattern = "_mSigPortal_SNV_Collapse.txt")
+    mutation_file = paste0(mutationPath, mutationFile)
+
+    if (file.exists(mutation_file)) {
+      mutation_data <- read_delim(file = mutation_file, delim = '\t', col_names = FALSE)
+      colnames(mutation_data) <- c('project', 'sample', 'type', 'genome_build', 'mutation_type', 'chr', 'pos', 'end', 'ref', 'alt', 'source')
+
+      genome_build <- mutation_data$genome_build[1]
+      mutdata <- mutation_data %>% filter(sample == sample) %>% dplyr::select(chr, pos, ref, alt)
+
+      kataegis_result <- kataegis_rainfall_plot(mutdata, sample_name = sample_name_input, genome_build = genome_build, reference_data_folder = '../Database/Others', chromsome = chromosome, kataegis_highligh = highlight, min.mut = min, max.dis = max, filename = rainfall) ## put tmp.svg on the webpage
+      #resolve_conflicts()
+      # kataegis_result # make a table using kataegis_result bellow the plot
+    }
+    else {
+      print("Kataegis Identification only works for the VCF input files!")
+    }
+
+    output = list(
+      'rainfall' = rainfall,
+     )
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+  })
+}
