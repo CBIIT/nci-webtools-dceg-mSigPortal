@@ -47,7 +47,7 @@ export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
       <LoadingOverlay active={loading} />
       <div className="p-2 border rounded" title="Ctrl + Mouse Wheel to zoom">
         <div className="d-flex align-items-end mb-2">
-          <span>{plotName.slice(0, -4)}</span>
+          {/* <span>{plotName.slice(0, -4)}</span> */}
           <a className="ml-auto" href={plotURL} download={plotName}>
             Download Plot
           </a>
@@ -64,17 +64,25 @@ export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
         <TransformWrapper className="w-100" {...zoomProps}>
           {({ zoomIn, zoomOut, resetTransform }) => (
             <React.Fragment>
-              <div className="tools">
-                <Button variant="secondary" onClick={zoomIn}>
+              <div className="tools d-flex">
+                <Button
+                  className="ml-auto"
+                  variant="secondary"
+                  onClick={zoomIn}
+                >
                   <FontAwesomeIcon icon={faPlus} style={{ color: '#fafafa' }} />
-                </Button>{' '}
-                <Button variant="secondary" onClick={zoomOut}>
+                </Button>
+                <Button className="ml-1" variant="secondary" onClick={zoomOut}>
                   <FontAwesomeIcon
                     icon={faMinus}
                     style={{ color: '#fafafa' }}
                   />
-                </Button>{' '}
-                <Button variant="secondary" onClick={resetTransform}>
+                </Button>
+                <Button
+                  className="ml-1"
+                  variant="secondary"
+                  onClick={resetTransform}
+                >
                   <FontAwesomeIcon icon={faHome} style={{ color: '#fafafa' }} />
                 </Button>
               </div>
