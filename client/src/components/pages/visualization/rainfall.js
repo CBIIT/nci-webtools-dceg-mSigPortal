@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { dispatchError, dispatchRainfall } from '../../../services/store';
@@ -11,15 +11,8 @@ import Accordions from '../../controls/accordions/accordions';
 const { Group, Check, Label, Control } = Form;
 
 export default function PCA({ submitR }) {
-  const { inputFormat } = useSelector((state) => state.visualize);
-  // const {
-  //   source,
-  //   study,
-  //   studyOptions,
-  //   cancerType,
-  //   pubExperimentalStrategy,
-  //   pDataOptions,
-  // } = useSelector((state) => state.visualize);
+  const { source, inputFormat } = useSelector((state) => state.visualize);
+
   const { projectID } = useSelector((state) => state.visualizeResults);
 
   const {
@@ -34,10 +27,13 @@ export default function PCA({ submitR }) {
     plotURL,
     err,
     debugR,
-    submitOverlay,
+    loading,
   } = useSelector((state) => state.rainfall);
 
-  // useEffect(() => {}, [svgList]);
+  useEffect(() => {
+    if (plotPath) setRPlot(plotPath);
+    else clearPlot();
+  }, [plotPath]);
 
   async function setRPlot(plotPath) {
     if (plotPath) {
@@ -63,9 +59,16 @@ export default function PCA({ submitR }) {
     }
   }
 
+  function clearPlot() {
+    if (plotURL) {
+      URL.revokeObjectURL(plotURL);
+      dispatchRainfall({ plotPath: '', plotURL: '' });
+    }
+  }
+
   async function calculateR() {
     dispatchRainfall({
-      submitOverlay: true,
+      loading: true,
       err: false,
       debugR: '',
     });
@@ -74,36 +77,37 @@ export default function PCA({ submitR }) {
       const response = await submitR('rainfall', {
         sample: sample,
         highlight: highlight,
-        min: min,
-        max: max,
+        min: parseInt(min),
+        max: parseInt(max),
         chromosome: chromosome,
       });
       if (!response.ok) {
         const err = await response.json();
         dispatchRainfall({ debugR: err });
 
-        dispatchRainfall({ submitOverlay: false });
+        dispatchRainfall({ loading: false });
       } else {
-        const { debugR, output } = await response.json();
+        const { debugR, output, errors } = await response.json();
         if (Object.keys(output).length) {
           dispatchRainfall({
             debugR: debugR,
             plotPath: output.plotPath,
-            barPath: output.barPath,
-            txtPath: output.txtPath,
+            // txtPath: output.txtPath,
+            loading: false,
           });
-          setRPlot(output.plotPath);
         } else {
           dispatchRainfall({
             debugR: debugR,
-            err: true,
-            submitOverlay: false,
+            plotPath: '',
+            // txtPath: '',
+            err: errors,
+            loading: false,
           });
         }
       }
     } catch (err) {
       dispatchError(err);
-      dispatchRainfall({ submitOverlay: false });
+      dispatchRainfall({ loading: false });
     }
   }
 
@@ -125,9 +129,9 @@ export default function PCA({ submitR }) {
   );
 
   const component =
-    inputFormat == 'vcf' ? (
+    source == 'user' && inputFormat == 'vcf' ? (
       <Form>
-        <LoadingOverlay active={submitOverlay} />
+        <LoadingOverlay active={loading} />
         <div>
           <Row className="">
             <Col lg="3">
@@ -213,10 +217,15 @@ export default function PCA({ submitR }) {
         </div>
       </Form>
     ) : (
-      <p>Kataegis Identification only works for the VCF input files!</p>
+      <p>
+        Kataegis Identification is only available for Data Source: User and
+        requires VCF input files
+      </p>
     );
 
-  const accordions = [{ title: 'Motif Analysis', component: component }];
+  const accordions = [
+    { title: 'Kataegis Identification', component: component },
+  ];
 
   return (
     <div>

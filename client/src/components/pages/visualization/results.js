@@ -372,7 +372,7 @@ export default function Results({ setOpenSidebar }) {
     },
     { title: 'Profile Comparison', id: 'profileComparison' },
     { title: 'PCA', id: 'pca' },
-    { title: 'Rainfall', id: 'rainfall' },
+    { title: 'Kataegis Identification', id: 'rainfall' },
     { title: 'Download', id: 'download' },
   ];
 

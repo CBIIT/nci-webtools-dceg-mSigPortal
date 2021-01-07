@@ -49,5 +49,6 @@ RUN python3.6 -c "from SigProfilerMatrixGenerator import install as genInstall; 
 
 RUN Rscript -e 'dotR <- file.path(Sys.getenv("HOME"), ".R"); dir.create(dotR); M <- file.path(dotR, "Makevars"); file.create(M); cat("\nCXX14FLAGS=-O3 -march=native -mtune=native -fPIC","CXX14=g++", file = M, sep = "\n", append = TRUE);'
 
-RUN Rscript -e "Sys.setenv(MAKEFLAGS = '-j2'); install.packages(c('tidyverse', 'hrbrthemes', 'ggsci', 'ggrepel', 'ggdendro', 'scales', 'ggforce', 'svglite', 'cowplot', 'car', 'FactoMineR', 'factoextra', 'coop', 'ggridges', 'ggtext', 'ggpubr', 'entropy', 'janitor', 'ggstatsplot'), repos='https://cloud.r-project.org/')"
+RUN Rscript -e "Sys.setenv(MAKEFLAGS = '-j2'); install.packages(c('tidyverse', 'hrbrthemes', 'ggsci', 'ggrepel', 'ggdendro', 'scales', 'ggforce', 'svglite', 'cowplot', 'car', 'FactoMineR', 'factoextra', 'coop', 'ggridges', 'ggtext', 'ggpubr', 'entropy', 'janitor', 'ggstatsplot', 'BiocManager'), repos='https://cloud.r-project.org/')"
 
+RUN Rscript -e 'BiocManager::install("BSgenome.Hsapiens.UCSC.hg19", "TxDb.Hsapiens.UCSC.hg19.knownGene", "BSgenome.Hsapiens.UCSC.hg38")'

@@ -193,12 +193,10 @@ export const getInitialState = () => ({
     txtPath: '',
     plotPath: '',
     plotURL: '',
-    barPath: '',
-    barURL: '',
     display: true,
     err: false,
     debugR: [],
-    submitOverlay: false,
+    loading: false,
   },
 
   exploring: {

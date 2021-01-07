@@ -944,11 +944,15 @@ rainfall <- function(sample, highlight, min, max, chromosome, projectID, pythonO
 
   tryCatch({
     output = list()
+    errors = list()
     rainfall = paste0(savePath, 'rainfall.svg')
+    rainfallData = paste0(savePath, 'rainfallData.txt')
 
     mutationPath = paste0(savePath, '../')
-    mutationFile = list.files(mutationPath, pattern = "_mSigPortal_SNV_Collapse.txt")
+    mutationFile = list.files(mutationPath, pattern = "_mSigPortal_SNV")
     mutation_file = paste0(mutationPath, mutationFile)
+
+    if (chromosome == 'None') chromosome = NULL
 
     if (file.exists(mutation_file)) {
       mutation_data <- read_delim(file = mutation_file, delim = '\t', col_names = FALSE)
@@ -957,22 +961,29 @@ rainfall <- function(sample, highlight, min, max, chromosome, projectID, pythonO
       genome_build <- mutation_data$genome_build[1]
       mutdata <- mutation_data %>% filter(sample == sample) %>% dplyr::select(chr, pos, ref, alt)
 
-      kataegis_result <- kataegis_rainfall_plot(mutdata, sample_name = sample_name_input, genome_build = genome_build, reference_data_folder = '../Database/Others', chromsome = chromosome, kataegis_highligh = highlight, min.mut = min, max.dis = max, filename = rainfall) ## put tmp.svg on the webpage
+      tryCatch({
+        kataegis_result <- kataegis_rainfall_plot(mutdata, sample_name = sample_name_input, genome_build = genome_build, reference_data_folder = paste0(dataPath, 'Others'), chromsome = chromosome, kataegis_highligh = highlight, min.mut = min, max.dis = max, filename = rainfall)
+      }, catch = function(e) {
+        errors[['rainfallError']] <- e$message
+        print(e)
+      })
+
       #resolve_conflicts()
-      # kataegis_result # make a table using kataegis_result bellow the plot
+      # kataegis_result %>% write_delim(rainfallData, delim = '\t', col_names = T)
     }
     else {
       print("Kataegis Identification only works for the VCF input files!")
     }
 
     output = list(
-      'rainfall' = rainfall,
+      'plotPath' = rainfall
+    # 'txtPath' = rainfallData
      )
   }, error = function(e) {
     print(e)
   }, finally = {
     sink(con)
     sink(con)
-    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+    return(toJSON(list('stdout' = stdout, 'output' = output, 'errors' = errors), pretty = TRUE, auto_unbox = TRUE))
   })
 }
