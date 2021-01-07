@@ -699,9 +699,7 @@ export default function ExposureExploring({ populateControls }) {
             <Row>
               <Col lg="auto">
                 <Group>
-                  <Label className="mr-4">
-                    <h4 className="mb-2">Data Source</h4>
-                  </Label>
+                  <Label className="mr-4">Data Source</Label>
                   <Check inline id="radioPublic">
                     <Check.Input
                       disabled={loading}
