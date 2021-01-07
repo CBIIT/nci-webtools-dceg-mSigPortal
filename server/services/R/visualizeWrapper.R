@@ -944,7 +944,7 @@ rainfall <- function(sample, highlight, min, max, chromosome, projectID, pythonO
 
   tryCatch({
     output = list()
-    errors = list()
+    errors = ''
     rainfall = paste0(savePath, 'rainfall.svg')
     rainfallData = paste0(savePath, 'rainfallData.txt')
 
@@ -961,12 +961,7 @@ rainfall <- function(sample, highlight, min, max, chromosome, projectID, pythonO
       genome_build <- mutation_data$genome_build[1]
       mutdata <- mutation_data %>% filter(sample == sample) %>% dplyr::select(chr, pos, ref, alt)
 
-      tryCatch({
-        kataegis_result <- kataegis_rainfall_plot(mutdata, sample_name = sample_name_input, genome_build = genome_build, reference_data_folder = paste0(dataPath, 'Others'), chromsome = chromosome, kataegis_highligh = highlight, min.mut = min, max.dis = max, filename = rainfall)
-      }, catch = function(e) {
-        errors[['rainfallError']] <- e$message
-        print(e)
-      })
+      kataegis_result <- kataegis_rainfall_plot(mutdata, sample_name = sample_name_input, genome_build = genome_build, reference_data_folder = paste0(dataPath, 'Others'), chromsome = chromosome, kataegis_highligh = highlight, min.mut = min, max.dis = max, filename = rainfall)
 
       #resolve_conflicts()
       # kataegis_result %>% write_delim(rainfallData, delim = '\t', col_names = T)
@@ -980,6 +975,7 @@ rainfall <- function(sample, highlight, min, max, chromosome, projectID, pythonO
     # 'txtPath' = rainfallData
      )
   }, error = function(e) {
+    errors <<- e$message
     print(e)
   }, finally = {
     sink(con)

@@ -2268,7 +2268,7 @@ kataegis_rainfall_plot <- function(mutdata,sample_name="sample",genome_build = "
   
   if(genome_build %in% c('hg38','grch38')){
     require(BSgenome.Hsapiens.UCSC.hg38)
-    require(TxDb.Hsapiens.UCSC.hg19.knownGene)
+    require(TxDb.Hsapiens.UCSC.hg38.knownGene)
     genome_build <- 'hg38'
     ref_file <- paste0(reference_data_folder,"/hg38_ref.RData")
     load(ref_file)
