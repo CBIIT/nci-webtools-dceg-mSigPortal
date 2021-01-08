@@ -188,7 +188,7 @@ export const getInitialState = () => ({
     sampleOptions: '',
     highlight: false,
     min: '5',
-    max: '1000',
+    max: '100',
     chromosome: 'None',
     txtPath: '',
     plotPath: '',

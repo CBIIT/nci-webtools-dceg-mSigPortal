@@ -122,7 +122,7 @@ export default function PCA({ submitR }) {
         <Plot
           plotName={plotPath.split('/').slice(-1)[0]}
           plotURL={plotURL}
-          txtPath={projectID + txtPath}
+          txtPath={txtPath ? projectID + txtPath : null}
         />
       </div>
     </div>

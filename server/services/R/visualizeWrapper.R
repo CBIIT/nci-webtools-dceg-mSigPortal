@@ -946,7 +946,7 @@ rainfall <- function(sample, highlight, min, max, chromosome, projectID, pythonO
     output = list()
     errors = ''
     rainfall = paste0(savePath, 'rainfall.svg')
-    rainfallData = paste0(savePath, 'rainfallData.txt')
+    rainfallData = ''
 
     mutationPath = paste0(savePath, '../')
     mutationFile = list.files(mutationPath, pattern = "_mSigPortal_SNV")
@@ -961,18 +961,20 @@ rainfall <- function(sample, highlight, min, max, chromosome, projectID, pythonO
       genome_build <- mutation_data$genome_build[1]
       mutdata <- mutation_data %>% filter(sample == sample) %>% dplyr::select(chr, pos, ref, alt)
 
-      kataegis_result <- kataegis_rainfall_plot(mutdata, sample_name = sample_name_input, genome_build = genome_build, reference_data_folder = paste0(dataPath, 'Others'), chromsome = chromosome, kataegis_highligh = highlight, min.mut = min, max.dis = max, filename = rainfall)
+      kataegis_result <- kataegis_rainfall_plot(mutdata, sample_name = sample, genome_build = genome_build, reference_data_folder = paste0(dataPath, 'Others'), chromsome = chromosome, kataegis_highligh = highlight, min.mut = min, max.dis = max, filename = rainfall)
 
-      #resolve_conflicts()
-      # kataegis_result %>% write_delim(rainfallData, delim = '\t', col_names = T)
+      if (!is.na(kataegis_result)) {
+        kataegis_result %>% write_delim(rainfallData, delim = '\t', col_names = T)
+        rainfallData = paste0(savePath, 'rainfallData.txt')
+      }
     }
     else {
-      print("Kataegis Identification only works for the VCF input files!")
+      stop("Mutation File Unavailable")
     }
 
     output = list(
-      'plotPath' = rainfall
-    # 'txtPath' = rainfallData
+      'plotPath' = rainfall,
+      'txtPath' = rainfallData
      )
   }, error = function(e) {
     errors <<- e$message

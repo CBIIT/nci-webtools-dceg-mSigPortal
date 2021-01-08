@@ -51,4 +51,4 @@ RUN Rscript -e 'dotR <- file.path(Sys.getenv("HOME"), ".R"); dir.create(dotR); M
 
 RUN Rscript -e "Sys.setenv(MAKEFLAGS = '-j2'); install.packages(c('tidyverse', 'hrbrthemes', 'ggsci', 'ggrepel', 'ggdendro', 'scales', 'ggforce', 'svglite', 'cowplot', 'car', 'FactoMineR', 'factoextra', 'coop', 'ggridges', 'ggtext', 'ggpubr', 'entropy', 'janitor', 'ggstatsplot', 'BiocManager'), repos='https://cloud.r-project.org/')"
 
-RUN Rscript -e 'BiocManager::install(c("BSgenome.Hsapiens.UCSC.hg19", "TxDb.Hsapiens.UCSC.hg19.knownGene", "BSgenome.Hsapiens.UCSC.hg38"))'
+RUN Rscript -e 'BiocManager::install(c("BSgenome.Hsapiens.UCSC.hg19", "TxDb.Hsapiens.UCSC.hg19.knownGene", "BSgenome.Hsapiens.UCSC.hg38", "TxDb.Hsapiens.UCSC.hg38.knownGene", "ChIPseeker", "org.Hs.eg.db"))'
