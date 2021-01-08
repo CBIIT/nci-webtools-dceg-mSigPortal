@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Form, Row, Col } from 'react-bootstrap';
+import { Form, Row, Col, Nav, Button } from 'react-bootstrap';
 import {
   SidebarContainer,
   SidebarPanel,
@@ -28,6 +28,9 @@ const { Group, Label, Check } = Form;
 export default function Visualize({ match }) {
   const { openSidebar, loading, source, submitted } = useSelector(
     (state) => state.visualize
+  );
+  const { displayTab, svgList } = useSelector(
+    (state) => state.visualizeResults
   );
   const { type, id } = match.params;
 
@@ -102,8 +105,82 @@ export default function Visualize({ match }) {
     });
   }
 
+  const subModules = [
+    { name: 'Profiler Summary', id: 'profilerSummary' },
+    { name: 'Mutational Profiles', id: 'mutationalProfiles' },
+    { name: 'Cosine Similarity', id: 'cosineSimilarity' },
+    {
+      name: 'Mutational Pattern Enrichment Analysis',
+      id: 'mutationalPattern',
+    },
+    { name: 'Profile Comparison', id: 'profileComparison' },
+    { name: 'PCA', id: 'pca' },
+    { name: 'Kataegis Identification', id: 'rainfall' },
+    { name: 'Download', id: 'download' },
+  ];
+
   return (
     <div className="position-relative">
+      <div className="mx-3">
+        <div className="mx-3 bg-white border border-top-0">
+          {/* for desktops and tablets */}
+          <div className="d-none d-md-block">
+            <Nav defaultActiveKey="profilerSummary">
+              {subModules.map(({ name, id }) => (
+                <div key={id} className="d-inline-block">
+                  <Button
+                    variant="link"
+                    className={
+                      id == displayTab && svgList.length
+                        ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 active-secondary-navlinks'
+                        : 'secondary-navlinks px-3 py-1 d-inline-block border-0'
+                    }
+                    active={id == displayTab && svgList.length}
+                    disabled={!svgList.length}
+                    style={{
+                      textDecoration: 'none',
+                      fontSize: '11pt',
+                      color: 'black',
+                      fontWeight: '500',
+                    }}
+                    onClick={() => dispatchVisualizeResults({ displayTab: id })}
+                  >
+                    {name}
+                  </Button>
+                  <div className="d-md-none w-100"></div>
+                </div>
+              ))}
+            </Nav>
+          </div>
+          {/* for mobile devices */}
+          <div className="row d-md-none">
+            <Nav defaultActiveKey="summary">
+              {subModules.map(({ name, id }) => (
+                <div key={id} className="col-12 text-center">
+                  <Button
+                    variant="link"
+                    className={
+                      id == displayTab && svgList.length
+                        ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 active-secondary-navlinks'
+                        : 'secondary-navlinks px-3 py-1 d-inline-block border-0'
+                    }
+                    style={{
+                      textDecoration: 'none',
+                      fontSize: '11pt',
+                      color: 'black',
+                      fontWeight: '500',
+                    }}
+                    onClick={() => dispatchVisualizeResults({ displayTab: id })}
+                  >
+                    {name}
+                  </Button>
+                  <div className="d-md-none w-100"></div>
+                </div>
+              ))}
+            </Nav>
+          </div>
+        </div>
+      </div>
       <SidebarContainer
         className="m-3"
         collapsed={!openSidebar}

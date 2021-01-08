@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, Nav } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
@@ -22,8 +21,6 @@ import Rainfall from './rainfall';
 import Download from './download';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
-const { Header, Body } = Card;
-const { Item, Link: CardLink } = Nav;
 
 export default function Results({ setOpenSidebar }) {
   const { error, projectID, displayTab, svgList, matrixList } = useSelector(
@@ -362,20 +359,6 @@ export default function Results({ setOpenSidebar }) {
     });
   }
 
-  const links = [
-    { title: 'Profiler Summary', id: 'profilerSummary' },
-    { title: 'Mutational Profiles', id: 'mutationalProfiles' },
-    { title: 'Cosine Similarity', id: 'cosineSimilarity' },
-    {
-      title: 'Mutational Pattern Enrichment Analysis',
-      id: 'mutationalPattern',
-    },
-    { title: 'Profile Comparison', id: 'profileComparison' },
-    { title: 'PCA', id: 'pca' },
-    { title: 'Kataegis Identification', id: 'rainfall' },
-    { title: 'Download', id: 'download' },
-  ];
-
   const examples = [
     { title: 'VCF Example', path: 'vcfExample' },
     {
@@ -403,34 +386,18 @@ export default function Results({ setOpenSidebar }) {
           <h4 className="text-danger">{error}</h4>
         </div>
       ) : mutationalProfiles.filtered.length ? (
-        <Card>
-          <Header>
-            <Nav variant="pills" defaultActiveKey="#mutationalProfiles">
-              {links.map(({ title, id }) => {
-                return (
-                  <Item key={id}>
-                    <CardLink
-                      active={displayTab == id}
-                      onClick={() =>
-                        dispatchVisualizeResults({ displayTab: id })
-                      }
-                    >
-                      {title}
-                    </CardLink>
-                  </Item>
-                );
-              })}
-            </Nav>
-          </Header>
-          <Body
+        <div>
+          <div
+            className="bg-white"
             style={{
               display: displayTab == 'profilerSummary' ? 'block' : 'none',
               minHeight: '420px',
             }}
           >
             <ProfilerSummary submitR={(fn, args) => submitR(fn, args)} />
-          </Body>
-          <Body
+          </div>
+          <div
+            className="bg-white"
             style={{
               display: displayTab == 'mutationalProfiles' ? 'block' : 'none',
               minHeight: '420px',
@@ -441,8 +408,9 @@ export default function Results({ setOpenSidebar }) {
                 defaultMatrix(profile, matrixOptions)
               }
             />
-          </Body>
-          <Body
+          </div>
+          <div
+            className="bg-white"
             style={{
               display: displayTab == 'cosineSimilarity' ? 'block' : 'none',
               minHeight: '420px',
@@ -455,17 +423,19 @@ export default function Results({ setOpenSidebar }) {
                 defaultMatrix(profile, matrixOptions)
               }
             />
-          </Body>
-          <Body
+          </div>
+          <div
+            className="bg-white"
             style={{
               display: displayTab == 'mutationalPattern' ? 'block' : 'none',
               minHeight: '420px',
             }}
           >
             <MutationalPattern submitR={(fn, args) => submitR(fn, args)} />
-          </Body>
+          </div>
 
-          <Body
+          <div
+            className="bg-white"
             style={{
               display: displayTab == 'profileComparison' ? 'block' : 'none',
               minHeight: '420px',
@@ -478,8 +448,9 @@ export default function Results({ setOpenSidebar }) {
                 defaultMatrix(profile, matrixOptions)
               }
             />
-          </Body>
-          <Body
+          </div>
+          <div
+            className="bg-white"
             style={{
               display: displayTab == 'pca' ? 'block' : 'none',
               minHeight: '420px',
@@ -492,24 +463,26 @@ export default function Results({ setOpenSidebar }) {
                 defaultMatrix(profile, matrixOptions)
               }
             />
-          </Body>
-          <Body
+          </div>
+          <div
+            className="bg-white"
             style={{
               display: displayTab == 'rainfall' ? 'block' : 'none',
               minHeight: '420px',
             }}
           >
             <Rainfall submitR={(fn, args) => submitR(fn, args)} />
-          </Body>
-          <Body
+          </div>
+          <div
+            className="bg-white"
             style={{
               display: displayTab == 'download' ? 'block' : 'none',
               minHeight: '420px',
             }}
           >
             <Download />
-          </Body>
-        </Card>
+          </div>
+        </div>
       ) : (
         <div
           className="border rounded bg-white p-3"

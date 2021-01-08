@@ -130,7 +130,7 @@ export default function ProfilerSummary({ submitR }) {
         plotURL={plotURL}
         maxHeight="600px"
       />
-      <Debug msg={debugR} />
+      {/* <Debug msg={debugR} /> */}
     </div>
   );
 }

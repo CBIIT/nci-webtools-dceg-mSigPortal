@@ -55,3 +55,18 @@ div[disabled] {
   cursor: not-allowed;
   pointer-events: all !important;
 }
+
+.active-secondary-navlinks {
+  box-shadow: none !important;
+  color: 'black';
+}
+
+.active-secondary-navlinks:after {
+  content: '';
+  display: block;
+  padding-top: 4px;
+  width: 100%;
+  margin: 0 auto;
+  border-bottom: 3px solid #fc8701 !important;
+  margin-bottom: -5px;
+}
