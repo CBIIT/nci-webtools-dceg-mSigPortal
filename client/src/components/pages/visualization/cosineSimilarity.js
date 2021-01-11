@@ -586,18 +586,18 @@ export default function CosineSimilarity({
         <Nav variant="tabs">
           <Item>
             <Link eventKey="within" as="button" className="outline-none">
-              <strong>Within</strong>
+              <strong>CS Within Samples</strong>
             </Link>
           </Item>
           <Item>
             <Link eventKey="reference" as="button" className="outline-none">
-              <strong>Reference Signatures</strong>
+              <strong>CS to Reference Signatures</strong>
             </Link>
           </Item>
           {source == 'user' && (
             <Item>
               <Link eventKey="public" as="button" className="outline-none">
-                <strong>Public Data</strong>
+                <strong>CS to Public Data</strong>
               </Link>
             </Item>
           )}

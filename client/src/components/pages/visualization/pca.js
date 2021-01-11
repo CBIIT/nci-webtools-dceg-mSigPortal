@@ -557,13 +557,13 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
         <Nav variant="tabs">
           <Item>
             <Link eventKey="within" as="button" className="outline-none">
-              <strong>Within</strong>
+              <strong>PCA Within Samples</strong>
             </Link>
           </Item>
           {source == 'user' && (
             <Item>
               <Link eventKey="public" as="button" className="outline-none">
-                <strong>Public Data</strong>
+                <strong>PCA with Public Data</strong>
               </Link>
             </Item>
           )}
