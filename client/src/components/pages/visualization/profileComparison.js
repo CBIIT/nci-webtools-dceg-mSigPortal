@@ -6,6 +6,8 @@ import {
   Button,
   Popover,
   OverlayTrigger,
+  Tab,
+  Nav,
 } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -18,10 +20,11 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
 import Select from '../../controls/select/select';
-import Accordions from '../../controls/accordions/accordions';
 
 const { Group, Label, Control, Text } = Form;
 const { Title, Content } = Popover;
+const { Container, Content: TabContent, Pane } = Tab;
+const { Item, Link } = Nav;
 
 export default function ProfileComparison({
   submitR,
@@ -70,9 +73,7 @@ export default function ProfileComparison({
     refPlotURL,
     pubPlotURL,
     pubTxtURL,
-    displayWithin,
-    displayRefSig,
-    displayPublic,
+    display,
     withinErr,
     refErr,
     pubErr,
@@ -419,94 +420,95 @@ export default function ProfileComparison({
     });
   }
 
-  let accordions = [
+  let tabs = [
     {
-      title: 'Comparison Within Samples',
+      key: 'within',
       component: (
-        <Form>
-          <LoadingOverlay active={withinSubmitOverlay} />
-          <Row className="justify-content-center">
-            <Col lg="2">
-              <Select
-                disabled={sampleOptions.length < 2}
-                id="pcProfileTypeWithin"
-                label="Profile Type"
-                value={withinProfileType}
-                options={profileOptions}
-                onChange={(profile) =>
-                  dispatchProfileComparison({
-                    withinProfileType: profile,
-                  })
-                }
-              />
-            </Col>
-            <Col lg="4">
-              <Select
-                disabled={sampleOptions.length < 2}
-                id="pcSample1"
-                label="Sample Name 1"
-                value={withinSampleName1}
-                options={sampleOptions}
-                onChange={(name) => {
-                  dispatchProfileComparison({
-                    withinSampleName1: name,
-                  });
-                }}
-              />
-            </Col>
-            <Col lg="4">
-              <Select
-                disabled={sampleOptions.length < 2}
-                id="pcSample2"
-                label="Sample Name 2"
-                value={withinSampleName2}
-                options={sampleOptions}
-                onChange={(name) => {
-                  dispatchProfileComparison({
-                    withinSampleName2: name,
-                  });
-                }}
-              />
-            </Col>
-            <Col lg="2" className="d-flex justify-content-end">
-              <Button
-                className="mt-auto mb-3"
-                disabled={sampleOptions.length < 2}
-                variant="primary"
-                onClick={() => {
-                  if (source == 'user') {
-                    calculateR('profileComparisonWithin', {
-                      profileType: withinProfileType,
-                      sampleName1: withinSampleName1,
-                      sampleName2: withinSampleName2,
-                      matrixList: JSON.stringify(
-                        matrixList.filter(
-                          (matrix) => matrix.Profile_Type == withinProfileType
-                        )
-                      ),
-                    });
-                  } else {
-                    calculateR('profileComparisonWithinPublic', {
-                      profileType: withinProfileType,
-                      sampleName1: withinSampleName1,
-                      sampleName2: withinSampleName2,
-                      study: study,
-                      cancerType: cancerType,
-                      experimentalStrategy: pubExperimentalStrategy,
-                    });
+        <div>
+          <Form className="border rounded p-2 mb-3">
+            <LoadingOverlay active={withinSubmitOverlay} />
+            <Row className="justify-content-center">
+              <Col lg="2">
+                <Select
+                  disabled={sampleOptions.length < 2}
+                  id="pcProfileTypeWithin"
+                  label="Profile Type"
+                  value={withinProfileType}
+                  options={profileOptions}
+                  onChange={(profile) =>
+                    dispatchProfileComparison({
+                      withinProfileType: profile,
+                    })
                   }
-                }}
-              >
-                Calculate
-              </Button>
-            </Col>
-          </Row>
-          {sampleOptions.length < 2 && (
-            <Row>
-              <Col>Unavailable - More than one Sample Required</Col>
+                />
+              </Col>
+              <Col lg="4">
+                <Select
+                  disabled={sampleOptions.length < 2}
+                  id="pcSample1"
+                  label="Sample Name 1"
+                  value={withinSampleName1}
+                  options={sampleOptions}
+                  onChange={(name) => {
+                    dispatchProfileComparison({
+                      withinSampleName1: name,
+                    });
+                  }}
+                />
+              </Col>
+              <Col lg="4">
+                <Select
+                  disabled={sampleOptions.length < 2}
+                  id="pcSample2"
+                  label="Sample Name 2"
+                  value={withinSampleName2}
+                  options={sampleOptions}
+                  onChange={(name) => {
+                    dispatchProfileComparison({
+                      withinSampleName2: name,
+                    });
+                  }}
+                />
+              </Col>
+              <Col lg="2" className="d-flex justify-content-end">
+                <Button
+                  className="mt-auto mb-3"
+                  disabled={sampleOptions.length < 2}
+                  variant="primary"
+                  onClick={() => {
+                    if (source == 'user') {
+                      calculateR('profileComparisonWithin', {
+                        profileType: withinProfileType,
+                        sampleName1: withinSampleName1,
+                        sampleName2: withinSampleName2,
+                        matrixList: JSON.stringify(
+                          matrixList.filter(
+                            (matrix) => matrix.Profile_Type == withinProfileType
+                          )
+                        ),
+                      });
+                    } else {
+                      calculateR('profileComparisonWithinPublic', {
+                        profileType: withinProfileType,
+                        sampleName1: withinSampleName1,
+                        sampleName2: withinSampleName2,
+                        study: study,
+                        cancerType: cancerType,
+                        experimentalStrategy: pubExperimentalStrategy,
+                      });
+                    }
+                  }}
+                >
+                  Calculate
+                </Button>
+              </Col>
             </Row>
-          )}
-
+            {sampleOptions.length < 2 && (
+              <Row>
+                <Col>Unavailable - More than one Sample Required</Col>
+              </Row>
+            )}
+          </Form>
           <div id="pcWithinPlot">
             {withinErr && (
               <div>
@@ -523,15 +525,15 @@ export default function ProfileComparison({
               />
             </div>
           </div>
-        </Form>
+        </div>
       ),
     },
     {
-      title: 'Comparison to Reference Signatures',
+      key: 'reference',
       component: (
-        <Form className="my-2">
-          <LoadingOverlay active={refSubmitOverlay} />
-          <div>
+        <div>
+          <Form className="border rounded p-2 mb-3">
+            <LoadingOverlay active={refSubmitOverlay} />
             <Row className="justify-content-center">
               <Col lg="2">
                 <Select
@@ -642,36 +644,36 @@ export default function ProfileComparison({
                 </Button>
               </Col>
             </Row>
-
-            <div id="refPlotDownload">
-              {refErr && (
-                <div>
-                  <p>
-                    An error has occured. Check the debug section for more info.
-                  </p>
-                  <p>Error: {refErr}</p>
-                </div>
-              )}
-              <div style={{ display: refPlotURL ? 'block' : 'none' }}>
-                <Plot
-                  plotName={refPlotPath.split('/').slice(-1)[0]}
-                  plotURL={refPlotURL}
-                />
+          </Form>
+          <div id="refPlotDownload">
+            {refErr && (
+              <div>
+                <p>
+                  An error has occured. Check the debug section for more info.
+                </p>
+                <p>Error: {refErr}</p>
               </div>
+            )}
+            <div style={{ display: refPlotURL ? 'block' : 'none' }}>
+              <Plot
+                plotName={refPlotPath.split('/').slice(-1)[0]}
+                plotURL={refPlotURL}
+              />
             </div>
           </div>
-        </Form>
+        </div>
       ),
     },
   ];
 
   if (source == 'user')
-    accordions.push({
-      title: 'Comparison to Public Data',
+    tabs.push({
+      key: 'public',
       component: (
-        <Form>
-          <LoadingOverlay active={pubSubmitOverlay} />
-          <div>
+        <div>
+          <Form className="border rounded p-2 mb-3">
+            <LoadingOverlay active={pubSubmitOverlay} />
+
             <Row className="justify-content-center">
               <Col lg="2">
                 <Select
@@ -765,29 +767,63 @@ export default function ProfileComparison({
                 </Button>
               </Col>
             </Row>
-            <div id="pcPubPlot">
-              {pubErr && (
-                <div>
-                  <p>
-                    An error has occured. Check the debug section for more info.
-                  </p>
-                </div>
-              )}
-              <div style={{ display: pubPlotURL ? 'block' : 'none' }}>
-                <Plot
-                  plotName={pubPlotPath.split('/').slice(-1)[0]}
-                  plotURL={pubPlotURL}
-                />
+          </Form>
+          <div id="pcPubPlot">
+            {pubErr && (
+              <div>
+                <p>
+                  An error has occured. Check the debug section for more info.
+                </p>
               </div>
+            )}
+            <div style={{ display: pubPlotURL ? 'block' : 'none' }}>
+              <Plot
+                plotName={pubPlotPath.split('/').slice(-1)[0]}
+                plotURL={pubPlotURL}
+              />
             </div>
           </div>
-        </Form>
+        </div>
       ),
     });
   return (
     <div>
-      <Accordions components={accordions} />
-      <Debug msg={debugR} />
+      <Container
+        transition={false}
+        className="mt-2"
+        defaultActiveKey={display}
+        activeKey={display}
+        onSelect={(tab) => dispatchProfileComparison({ display: tab })}
+      >
+        <Nav variant="tabs">
+          <Item>
+            <Link eventKey="within" as="button" className="outline-none">
+              <strong>Within</strong>
+            </Link>
+          </Item>
+          <Item>
+            <Link eventKey="reference" as="button" className="outline-none">
+              <strong>Reference Signatures</strong>
+            </Link>
+          </Item>
+          <Item>
+            <Link eventKey="public" as="button" className="outline-none">
+              <strong>Public Data</strong>
+            </Link>
+          </Item>
+        </Nav>
+        <TabContent
+          className={`p-2 bg-white tab-pane-bordered rounded-0 d-block`}
+          style={{ overflowX: 'auto' }}
+        >
+          {tabs.map(({ key, component }) => (
+            <Pane eventKey={key} className="border-0 py-2">
+              {component}
+            </Pane>
+          ))}
+        </TabContent>
+      </Container>
+      {/* <Debug msg={debugR} /> */}
     </div>
   );
 }
