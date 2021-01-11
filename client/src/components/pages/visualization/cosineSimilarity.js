@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Row, Col, Button } from 'react-bootstrap';
+import { Form, Row, Col, Button, Tab, Nav } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
@@ -9,7 +9,9 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
 import Select from '../../controls/select/select';
-import Accordions from '../../controls/accordions/accordions';
+
+const { Container, Content, Pane } = Tab;
+const { Item, Link } = Nav;
 
 export default function CosineSimilarity({
   submitR,
@@ -51,9 +53,7 @@ export default function CosineSimilarity({
     withinPlotURL,
     refPlotURL,
     pubPlotURL,
-    displayWithin,
-    displayRefSig,
-    displayPublic,
+    display,
     withinErr,
     refErr,
     pubErr,
@@ -313,72 +313,74 @@ export default function CosineSimilarity({
     });
   }
 
-  let accordions = [
+  let tabs = [
     {
-      title: 'Cosine Similarity Within Samples',
+      key: 'within',
       component: (
-        <Form>
-          <LoadingOverlay active={withinSubmitOverlay} />
-          <Row className="justify-content-center">
-            <Col lg="2">
-              <Select
-                disabled={!multiSample}
-                id="csProfileType"
-                label="Profile Type"
-                value={withinProfileType}
-                options={profileOptions}
-                onChange={handleWithinProfileType}
-              />
-            </Col>
-            <Col lg="2">
-              <Select
-                disabled={!multiSample}
-                id="csMatrixSize"
-                label="Matrix Size"
-                value={withinMatrixSize}
-                options={withinMatrixOptions}
-                onChange={(matrix) =>
-                  dispatchCosineSimilarity({
-                    withinMatrixSize: matrix,
-                  })
-                }
-              />
-            </Col>
-            <Col lg="6" />
-            <Col lg="2" className="d-flex justify-content-end">
-              <Button
-                className="mt-auto mb-3"
-                disabled={!multiSample}
-                variant="primary"
-                onClick={() => {
-                  if (source == 'user') {
-                    calculateR('cosineSimilarityWithin', {
-                      matrixFile: matrixList.filter(
-                        (path) =>
-                          path.Profile_Type == withinProfileType &&
-                          path.Matrix_Size == withinMatrixSize
-                      )[0].Path,
-                    });
-                  } else {
-                    calculateR('cosineSimilarityWithinPublic', {
-                      profileType: withinProfileType,
-                      matrixSize: withinMatrixSize,
-                      study: study,
-                      cancerType: cancerType,
-                      experimentalStrategy: pubExperimentalStrategy,
-                    });
-                  }
-                }}
-              >
-                Calculate
-              </Button>
-            </Col>
-          </Row>
-          {!multiSample && (
+        <div>
+          <Form className="border rounded p-2 mb-3">
+            <LoadingOverlay active={withinSubmitOverlay} />
             <Row>
-              <Col>Unavailable - More than one Sample Required</Col>
+              <Col lg="2">
+                <Select
+                  disabled={!multiSample}
+                  id="csProfileType"
+                  label="Profile Type"
+                  value={withinProfileType}
+                  options={profileOptions}
+                  onChange={handleWithinProfileType}
+                />
+              </Col>
+              <Col lg="2">
+                <Select
+                  disabled={!multiSample}
+                  id="csMatrixSize"
+                  label="Matrix Size"
+                  value={withinMatrixSize}
+                  options={withinMatrixOptions}
+                  onChange={(matrix) =>
+                    dispatchCosineSimilarity({
+                      withinMatrixSize: matrix,
+                    })
+                  }
+                />
+              </Col>
+              <Col lg="6" />
+              <Col lg="2" className="d-flex justify-content-end">
+                <Button
+                  className="mt-auto mb-3"
+                  disabled={!multiSample}
+                  variant="primary"
+                  onClick={() => {
+                    if (source == 'user') {
+                      calculateR('cosineSimilarityWithin', {
+                        matrixFile: matrixList.filter(
+                          (path) =>
+                            path.Profile_Type == withinProfileType &&
+                            path.Matrix_Size == withinMatrixSize
+                        )[0].Path,
+                      });
+                    } else {
+                      calculateR('cosineSimilarityWithinPublic', {
+                        profileType: withinProfileType,
+                        matrixSize: withinMatrixSize,
+                        study: study,
+                        cancerType: cancerType,
+                        experimentalStrategy: pubExperimentalStrategy,
+                      });
+                    }
+                  }}
+                >
+                  Calculate
+                </Button>
+              </Col>
             </Row>
-          )}
+            {!multiSample && (
+              <Row>
+                <Col>Unavailable - More than one Sample Required</Col>
+              </Row>
+            )}
+          </Form>
 
           <div id="withinPlot">
             <div style={{ display: withinErr ? 'block' : 'none' }}>
@@ -394,15 +396,15 @@ export default function CosineSimilarity({
               />
             </div>
           </div>
-        </Form>
+        </div>
       ),
     },
     {
-      title: 'Cosine Similarity to Reference Signatures',
+      key: 'reference',
       component: (
-        <Form className="my-2">
-          <LoadingOverlay active={refSubmitOverlay} />
-          <div>
+        <div>
+          <Form className="border rounded p-2 mb-3">
+            <LoadingOverlay active={refSubmitOverlay} />
             <Row className="justify-content-center">
               <Col lg="2">
                 <Select
@@ -462,34 +464,33 @@ export default function CosineSimilarity({
                 </Button>
               </Col>
             </Row>
-
-            <div id="refPlot">
-              <div style={{ display: refErr ? 'block' : 'none' }}>
-                <p>
-                  An error has occured. Check the debug section for more info.
-                </p>
-              </div>
-              <div style={{ display: refPlotURL ? 'block' : 'none' }}>
-                <Plot
-                  plotName={refPlotPath.split('/').slice(-1)[0]}
-                  plotURL={refPlotURL}
-                  txtPath={projectID + refTxtPath}
-                />
-              </div>
+          </Form>
+          <div id="refPlot">
+            <div style={{ display: refErr ? 'block' : 'none' }}>
+              <p>
+                An error has occured. Check the debug section for more info.
+              </p>
+            </div>
+            <div style={{ display: refPlotURL ? 'block' : 'none' }}>
+              <Plot
+                plotName={refPlotPath.split('/').slice(-1)[0]}
+                plotURL={refPlotURL}
+                txtPath={projectID + refTxtPath}
+              />
             </div>
           </div>
-        </Form>
+        </div>
       ),
     },
   ];
 
   if (source == 'user')
-    accordions.push({
-      title: 'Cosine Similarity to Public Data',
+    tabs.push({
+      key: 'public',
       component: (
-        <Form>
-          <LoadingOverlay active={pubSubmitOverlay} />
-          <div>
+        <div>
+          <Form className="border rounded p-2 mb-3">
+            <LoadingOverlay active={pubSubmitOverlay} />
             <Row className="justify-content-center">
               <Col lg="2">
                 <Select
@@ -553,29 +554,64 @@ export default function CosineSimilarity({
                 </Button>
               </Col>
             </Row>
-            <div id="pubPlot">
-              <div style={{ display: pubErr ? 'block' : 'none' }}>
-                <p>
-                  An error has occured. Check the debug section for more info.
-                </p>
-              </div>
-              <div style={{ display: pubPlotURL ? 'block' : 'none' }}>
-                <Plot
-                  plotName={pubPlotURL.split('/').slice(-1)[0]}
-                  plotURL={pubPlotURL}
-                  txtPath={projectID + pubTxtPath}
-                />
-              </div>
+          </Form>
+
+          <div id="pubPlot">
+            <div style={{ display: pubErr ? 'block' : 'none' }}>
+              <p>
+                An error has occured. Check the debug section for more info.
+              </p>
+            </div>
+            <div style={{ display: pubPlotURL ? 'block' : 'none' }}>
+              <Plot
+                plotName={pubPlotURL.split('/').slice(-1)[0]}
+                plotURL={pubPlotURL}
+                txtPath={projectID + pubTxtPath}
+              />
             </div>
           </div>
-        </Form>
+        </div>
       ),
     });
 
   return (
     <div>
-      <Accordions components={accordions} />
-      <Debug msg={debugR} />
+      <Container
+        transition={false}
+        className="mt-2"
+        defaultActiveKey={display}
+        activeKey={display}
+        onSelect={(tab) => dispatchCosineSimilarity({ display: tab })}
+      >
+        <Nav variant="tabs">
+          <Item>
+            <Link eventKey="within" as="button" className="outline-none">
+              <strong>Within</strong>
+            </Link>
+          </Item>
+          <Item>
+            <Link eventKey="reference" as="button" className="outline-none">
+              <strong>Reference Signatures</strong>
+            </Link>
+          </Item>
+          <Item>
+            <Link eventKey="public" as="button" className="outline-none">
+              <strong>Public Data</strong>
+            </Link>
+          </Item>
+        </Nav>
+        <Content
+          className={`p-2 bg-white tab-pane-bordered rounded-0 d-block`}
+          style={{ overflowX: 'auto' }}
+        >
+          {tabs.map(({ key, component }) => (
+            <Pane eventKey={key} className="border-0 py-2">
+              {component}
+            </Pane>
+          ))}
+        </Content>
+      </Container>
+      {/* <Debug msg={debugR} /> */}
     </div>
   );
 }

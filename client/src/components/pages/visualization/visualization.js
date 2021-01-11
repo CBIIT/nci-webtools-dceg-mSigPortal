@@ -130,11 +130,11 @@ export default function Visualize({ match }) {
                 <div key={id} className="d-inline-block">
                   <Button
                     variant="link"
-                    className={
+                    className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
                       id == displayTab && svgList.length
-                        ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 active-secondary-navlinks'
-                        : 'secondary-navlinks px-3 py-1 d-inline-block border-0'
-                    }
+                        ? 'active-secondary-navlinks'
+                        : ''
+                    }`}
                     active={id == displayTab && svgList.length}
                     disabled={!svgList.length}
                     style={{

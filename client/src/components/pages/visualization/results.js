@@ -407,7 +407,6 @@ export default function Results({ setOpenSidebar }) {
             />
           </div>
           <div
-            className="bg-white"
             style={{
               display: displayTab == 'cosineSimilarity' ? 'block' : 'none',
               minHeight: '420px',
@@ -422,7 +421,6 @@ export default function Results({ setOpenSidebar }) {
             />
           </div>
           <div
-            className="bg-white"
             style={{
               display: displayTab == 'mutationalPattern' ? 'block' : 'none',
               minHeight: '420px',
@@ -432,7 +430,6 @@ export default function Results({ setOpenSidebar }) {
           </div>
 
           <div
-            className="bg-white"
             style={{
               display: displayTab == 'profileComparison' ? 'block' : 'none',
               minHeight: '420px',
@@ -447,7 +444,6 @@ export default function Results({ setOpenSidebar }) {
             />
           </div>
           <div
-            className="bg-white"
             style={{
               display: displayTab == 'pca' ? 'block' : 'none',
               minHeight: '420px',
@@ -462,7 +458,6 @@ export default function Results({ setOpenSidebar }) {
             />
           </div>
           <div
-            className="bg-white"
             style={{
               display: displayTab == 'rainfall' ? 'block' : 'none',
               minHeight: '420px',
@@ -471,7 +466,6 @@ export default function Results({ setOpenSidebar }) {
             <Rainfall submitR={(fn, args) => submitR(fn, args)} />
           </div>
           <div
-            className="bg-white"
             style={{
               display: displayTab == 'download' ? 'block' : 'none',
               minHeight: '420px',
