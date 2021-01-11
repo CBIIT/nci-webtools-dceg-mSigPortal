@@ -225,7 +225,7 @@ export default function PCA({ submitR }) {
           {plots}
         </div>
       ) : (
-        <div className="bg-white border rounded">
+        <div className="bg-white border rounded p-2">
           <p>
             Kataegis Identification is only available for Data Source: User and
             requires VCF input files
