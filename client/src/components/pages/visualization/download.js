@@ -31,7 +31,7 @@ export default function Download() {
     setDownload((downloading) => downloading.filter((item) => item != file));
   }
   return (
-    <div>
+    <div className="bg-white border rounded p-2">
       {statistics.length > 0 ? (
         <p>{statistics}</p>
       ) : (

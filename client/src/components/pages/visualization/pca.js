@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Row, Col, Button } from 'react-bootstrap';
+import { Form, Row, Col, Button, Tab, Nav } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { dispatchError, dispatchPCA } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
 import Select from '../../controls/select/select';
-import Accordions from '../../controls/accordions/accordions';
+
+const { Container, Content, Pane } = Tab;
+const { Item, Link } = Nav;
 
 export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
   const { matrixList } = useSelector((state) => state.visualizeResults);
@@ -36,12 +38,9 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
     pca2URL,
     pca3URL,
     heatmapURL,
-    displayPCA,
     pcaErr,
     debugR,
     submitOverlay,
-    pubPCA,
-
     userProfileType,
     userMatrixSize,
     userMatrixOptions,
@@ -56,7 +55,7 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
     pubPca1URL,
     pubPca2URL,
     pubPca3URL,
-    displayPub,
+    display,
     pubPcaErr,
     pubSubmitOverlay,
   } = useSelector((state) => state.pca);
@@ -297,79 +296,82 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
       pubCancerType: cancer,
     });
   }
-  let accordions = [
+  let tabs = [
     {
-      title: 'PCA Within Samples',
+      key: 'within',
       component: (
-        <Form>
-          <LoadingOverlay active={submitOverlay} />
-          <Row className="justify-content-center">
-            <Col lg="2">
-              <Select
-                disabled={!multiSample}
-                id="pcaProfileType"
-                label="Profile Type"
-                value={profileType}
-                options={profileOptions}
-                onChange={(profileType) => {
-                  dispatchPCA({
-                    profileType: profileType,
-                  });
-                  getSignatureSet(profileType);
-                }}
-              />
-            </Col>
+        <div>
+          <Form className="border rounded p-2 mb-3">
+            {' '}
+            <LoadingOverlay active={submitOverlay} />
+            <Row className="justify-content-center">
+              <Col lg="2">
+                <Select
+                  disabled={!multiSample}
+                  id="pcaProfileType"
+                  label="Profile Type"
+                  value={profileType}
+                  options={profileOptions}
+                  onChange={(profileType) => {
+                    dispatchPCA({
+                      profileType: profileType,
+                    });
+                    getSignatureSet(profileType);
+                  }}
+                />
+              </Col>
 
-            <Col lg="3">
-              <Select
-                disabled={!multiSample}
-                id="pcaRefSet"
-                label="Reference Signature Set"
-                value={signatureSet}
-                options={signatureSetOptions}
-                onChange={(signatureSet) => {
-                  dispatchPCA({
-                    signatureSet: signatureSet,
-                  });
-                }}
-              />
-            </Col>
-            <Col lg="7" className="d-flex justify-content-end">
-              <Button
-                className="mt-auto mb-3"
-                disabled={!multiSample}
-                variant="primary"
-                onClick={() => {
-                  if (source == 'user') {
-                    calculateR('pca', {
-                      profileType: profileType,
+              <Col lg="3">
+                <Select
+                  disabled={!multiSample}
+                  id="pcaRefSet"
+                  label="Reference Signature Set"
+                  value={signatureSet}
+                  options={signatureSetOptions}
+                  onChange={(signatureSet) => {
+                    dispatchPCA({
                       signatureSet: signatureSet,
-                      matrixList: JSON.stringify(
-                        matrixList.filter(
-                          (matrix) => matrix.Profile_Type == profileType
-                        )
-                      ),
                     });
-                  } else {
-                    calculateR('pcaPublic', {
-                      profileType: profileType,
-                      signatureSet: signatureSet,
-                      study: study,
-                      cancerType: cancerType,
-                      experimentalStrategy: pubExperimentalStrategy,
-                    });
-                  }
-                }}
-              >
-                Calculate
-              </Button>
-            </Col>
-          </Row>
-          {!multiSample && (
-            <Row>
-              <Col>Unavailable - More than one Sample Required</Col>
+                  }}
+                />
+              </Col>
+              <Col lg="7" className="d-flex justify-content-end">
+                <Button
+                  className="mt-auto mb-3"
+                  disabled={!multiSample}
+                  variant="primary"
+                  onClick={() => {
+                    if (source == 'user') {
+                      calculateR('pca', {
+                        profileType: profileType,
+                        signatureSet: signatureSet,
+                        matrixList: JSON.stringify(
+                          matrixList.filter(
+                            (matrix) => matrix.Profile_Type == profileType
+                          )
+                        ),
+                      });
+                    } else {
+                      calculateR('pcaPublic', {
+                        profileType: profileType,
+                        signatureSet: signatureSet,
+                        study: study,
+                        cancerType: cancerType,
+                        experimentalStrategy: pubExperimentalStrategy,
+                      });
+                    }
+                  }}
+                >
+                  Calculate
+                </Button>
+              </Col>
             </Row>
-          )}
+            {!multiSample && (
+              <Row>
+                <Col>Unavailable - More than one Sample Required</Col>
+              </Row>
+            )}
+          </Form>
 
           <div id="pca1Plot">
             <div style={{ display: pcaErr ? 'block' : 'none' }}>
@@ -423,18 +425,18 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
               />
             </div>
           </div>
-        </Form>
+        </div>
       ),
     },
   ];
 
   if (source == 'user')
-    accordions.push({
-      title: 'PCA with Public Data',
+    tabs.push({
+      key: 'public',
       component: (
-        <Form>
-          <LoadingOverlay active={pubSubmitOverlay} />
-          <div>
+        <div>
+          <Form className="border rounded p-2 mb-3">
+            <LoadingOverlay active={pubSubmitOverlay} />
             <Row className="justify-content-center">
               <Col lg="2">
                 <Select
@@ -495,58 +497,89 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
                 </Button>
               </Col>
             </Row>
+          </Form>
 
-            <div id="pubPca1Plot">
-              <div style={{ display: pubPcaErr ? 'block' : 'none' }}>
-                <p>
-                  An error has occured. Check the debug section for more info.
-                </p>
-              </div>
-              <div
-                className="my-4"
-                style={{ display: pubPca1URL ? 'block' : 'none' }}
-              >
-                <Plot
-                  plotName={pubPca1.split('/').slice(-1)[0]}
-                  plotURL={pubPca1URL}
-                />
-              </div>
+          <div id="pubPca1Plot">
+            <div style={{ display: pubPcaErr ? 'block' : 'none' }}>
+              <p>
+                An error has occured. Check the debug section for more info.
+              </p>
             </div>
-
-            <div id="pubPca2Plot">
-              <div
-                className="my-4"
-                style={{ display: pubPca2URL ? 'block' : 'none' }}
-              >
-                <Plot
-                  plotName={pubPca2.split('/').slice(-1)[0]}
-                  plotURL={pubPca2URL}
-                  txtPath={projectID + pubPca2Data}
-                />
-              </div>
-            </div>
-
-            <div id="pubPca3Plot">
-              <div
-                className="my-4"
-                style={{ display: pubPca3URL ? 'block' : 'none' }}
-              >
-                <Plot
-                  plotName={pubPca3.split('/').slice(-1)[0]}
-                  plotURL={pubPca3URL}
-                  txtPath={projectID + pubPca3Data}
-                />
-              </div>
+            <div
+              className="my-4"
+              style={{ display: pubPca1URL ? 'block' : 'none' }}
+            >
+              <Plot
+                plotName={pubPca1.split('/').slice(-1)[0]}
+                plotURL={pubPca1URL}
+              />
             </div>
           </div>
-        </Form>
+
+          <div id="pubPca2Plot">
+            <div
+              className="my-4"
+              style={{ display: pubPca2URL ? 'block' : 'none' }}
+            >
+              <Plot
+                plotName={pubPca2.split('/').slice(-1)[0]}
+                plotURL={pubPca2URL}
+                txtPath={projectID + pubPca2Data}
+              />
+            </div>
+          </div>
+
+          <div id="pubPca3Plot">
+            <div
+              className="my-4"
+              style={{ display: pubPca3URL ? 'block' : 'none' }}
+            >
+              <Plot
+                plotName={pubPca3.split('/').slice(-1)[0]}
+                plotURL={pubPca3URL}
+                txtPath={projectID + pubPca3Data}
+              />
+            </div>
+          </div>
+        </div>
       ),
     });
 
   return (
     <div>
-      <Accordions components={accordions} />
-      <Debug msg={debugR} />
+      <Container
+        transition={false}
+        className="mt-2"
+        defaultActiveKey={display}
+        activeKey={display}
+        onSelect={(tab) => dispatchPCA({ display: tab })}
+      >
+        <Nav variant="tabs">
+          <Item>
+            <Link eventKey="within" as="button" className="outline-none">
+              <strong>Within</strong>
+            </Link>
+          </Item>
+          {source == 'user' && (
+            <Item>
+              <Link eventKey="public" as="button" className="outline-none">
+                <strong>Public Data</strong>
+              </Link>
+            </Item>
+          )}
+        </Nav>
+        <Content
+          className={`p-2 bg-white tab-pane-bordered rounded-0 d-block`}
+          style={{ overflowX: 'auto' }}
+        >
+          {tabs.map(({ key, component }) => (
+            <Pane eventKey={key} className="border-0 py-2">
+              {component}
+            </Pane>
+          ))}
+        </Content>
+      </Container>
+      {/* <Debug msg={debugR} /> */}
     </div>
   );
 }

@@ -806,11 +806,13 @@ export default function ProfileComparison({
               <strong>Reference Signatures</strong>
             </Link>
           </Item>
-          <Item>
-            <Link eventKey="public" as="button" className="outline-none">
-              <strong>Public Data</strong>
-            </Link>
-          </Item>
+          {source == 'user' && (
+            <Item>
+              <Link eventKey="public" as="button" className="outline-none">
+                <strong>Public Data</strong>
+              </Link>
+            </Item>
+          )}
         </Nav>
         <TabContent
           className={`p-2 bg-white tab-pane-bordered rounded-0 d-block`}
