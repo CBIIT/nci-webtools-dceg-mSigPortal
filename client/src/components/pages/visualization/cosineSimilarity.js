@@ -607,7 +607,7 @@ export default function CosineSimilarity({
           style={{ overflowX: 'auto' }}
         >
           {tabs.map(({ key, component }) => (
-            <Pane eventKey={key} className="border-0 py-2">
+            <Pane key={key} eventKey={key} className="border-0 py-2">
               {component}
             </Pane>
           ))}
