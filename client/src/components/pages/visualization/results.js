@@ -21,7 +21,6 @@ import Rainfall from './rainfall';
 import Download from './download';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
-
 export default function Results({ setOpenSidebar }) {
   const { error, projectID, displayTab, svgList, matrixList } = useSelector(
     (state) => state.visualizeResults
@@ -388,7 +387,6 @@ export default function Results({ setOpenSidebar }) {
       ) : mutationalProfiles.filtered.length ? (
         <div>
           <div
-            className="bg-white"
             style={{
               display: displayTab == 'profilerSummary' ? 'block' : 'none',
               minHeight: '420px',
@@ -397,7 +395,6 @@ export default function Results({ setOpenSidebar }) {
             <ProfilerSummary submitR={(fn, args) => submitR(fn, args)} />
           </div>
           <div
-            className="bg-white"
             style={{
               display: displayTab == 'mutationalProfiles' ? 'block' : 'none',
               minHeight: '420px',

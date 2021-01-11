@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Form, Row, Col, Button } from 'react-bootstrap';
+import React, { useEffect } from 'react';
+import { Form, Row, Col } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
@@ -7,8 +7,6 @@ import {
 } from '../../../services/store';
 import Plot from '../../controls/plot/plot';
 import Select from '../../controls/select/select';
-
-const { Group, Label } = Form;
 
 export default function MutationalProfiles({ defaultMatrix }) {
   const { source } = useSelector((state) => state.visualize);
@@ -229,7 +227,7 @@ export default function MutationalProfiles({ defaultMatrix }) {
 
   return (
     <div>
-      <Form>
+      <Form className="bg-white mb-3">
         <div className="border rounded p-2">
           <Row className="justify-content-center">
             <Col lg="3">
@@ -274,7 +272,7 @@ export default function MutationalProfiles({ defaultMatrix }) {
       </Form>
 
       <Plot plotName={getPlotName()} plotURL={plotURL} />
-      <Button
+      {/* <Button
         variant="link"
         className="p-0 mt-5"
         onClick={() =>
@@ -293,7 +291,7 @@ export default function MutationalProfiles({ defaultMatrix }) {
         <pre className="border">{debug.stdout}</pre>
         <div>stderr</div>
         <pre className="border">{debug.stderr}</pre>
-      </pre>
+      </pre> */}
     </div>
   );
 }

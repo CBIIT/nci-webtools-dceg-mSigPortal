@@ -43,7 +43,7 @@ export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
   };
 
   return (
-    <div>
+    <div className="bg-white">
       <LoadingOverlay active={loading} />
       <div className="p-2 border rounded" title="Ctrl + Mouse Wheel to zoom">
         <div className="d-flex align-items-end mb-2">
