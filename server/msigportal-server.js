@@ -13,7 +13,7 @@ app.use('/api', apiRouter);
 
 const {
   visualizationProfilerExtraction,
-  getResultData,
+  getResults,
   visualizeR,
   getReferenceSignatureSets,
   getSignaturesR,
@@ -25,8 +25,8 @@ const {
   exploringR,
   getReferenceSignatureData,
   submitQueue,
-  fetchResults,
-  fetchExample,
+  getQueueResults,
+  getVisExample,
   getSignatureNames,
 } = require('./controllers');
 
@@ -87,7 +87,7 @@ apiRouter.get('/ping', (req, res) => res.send(true));
 
 apiRouter.post('/profilerExtraction', visualizationProfilerExtraction);
 
-apiRouter.post('/getResultData', getResultData);
+apiRouter.post('/getResults', getResults);
 
 apiRouter.post('/visualizeR', visualizeR);
 
@@ -111,8 +111,8 @@ apiRouter.post('/getReferenceSignatureData', getReferenceSignatureData);
 
 apiRouter.post('/queue', submitQueue);
 
-apiRouter.get('/fetchResults/:id', fetchResults);
+apiRouter.get('/getQueueResults/:id', getQueueResults);
 
-apiRouter.get('/fetchExample/:example', fetchExample);
+apiRouter.get('/getVisExample/:example', getVisExample);
 
 apiRouter.post('/getSignatureNames', getSignatureNames);

@@ -33,7 +33,7 @@ export default function Results({ setOpenSidebar }) {
   useEffect(() => {
     if (source == 'user') {
       if (projectID && !svgList.length) {
-        getResultData();
+        getResults();
       } else if (svgList.length && !signatureSetOptions.length) loadData();
     } else {
       if (svgList.length > 0 && !mutationalProfiles.filtered.length)
@@ -42,8 +42,8 @@ export default function Results({ setOpenSidebar }) {
   }, [svgList, projectID, source]);
 
   // reload summary information
-  async function getResultData() {
-    const response = await fetch(`api/getResultData`, {
+  async function getResults() {
+    const response = await fetch(`api/getResults`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',

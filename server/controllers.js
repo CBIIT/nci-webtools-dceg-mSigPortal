@@ -29,7 +29,7 @@ function parseCSV(filepath) {
 }
 
 // retrieves parsed data files - modify paths if needed
-async function getResultDataFiles(resultsPath, id = '') {
+async function getResultsFiles(resultsPath, id = '') {
   const svgListPath = path.join(resultsPath, 'svg_files_list.txt');
   const statisticsPath = path.join(resultsPath, 'Statistics.txt');
   const matrixPath = path.join(resultsPath, 'matrix_files_list.txt');
@@ -125,7 +125,7 @@ async function visualizationProfilerExtraction(req, res, next) {
       res.json({
         stdout,
         stderr,
-        ...(await getResultDataFiles(resultsPath, req.body.projectID[1])),
+        ...(await getResultsFiles(resultsPath, req.body.projectID[1])),
       });
     } else {
       logger.info(
@@ -144,8 +144,8 @@ async function visualizationProfilerExtraction(req, res, next) {
   }
 }
 
-async function getResultData(req, res, next) {
-  logger.info(`/getResultData: Retrieving Results for ${req.body.projectID}`);
+async function getResults(req, res, next) {
+  logger.info(`/getResults: Retrieving Results for ${req.body.projectID}`);
 
   const userResults = path.resolve(
     config.results.folder,
@@ -154,9 +154,9 @@ async function getResultData(req, res, next) {
   );
 
   if (fs.existsSync(path.join(userResults, 'svg_files_list.txt'))) {
-    res.json(await getResultDataFiles(userResults, req.body.projectID));
+    res.json(await getResultsFiles(userResults, req.body.projectID));
   } else {
-    logger.info('/getResultData: Results not found');
+    logger.info('/getResults: Results not found');
     res.status(500).json('Results not found');
   }
 }
@@ -461,7 +461,7 @@ async function submitQueue(req, res, next) {
   }
 }
 
-async function fetchResults(req, res, next) {
+async function getQueueResults(req, res, next) {
   try {
     const s3 = new AWS.S3();
     const { id } = req.params;
@@ -534,7 +534,7 @@ async function fetchResults(req, res, next) {
   }
 }
 
-async function fetchExample(req, res, next) {
+async function getVisExample(req, res, next) {
   try {
     const { example } = req.params;
     logger.info(`Fetching example: ${example}`);
@@ -599,7 +599,7 @@ module.exports = {
   parseCSV,
   profilerExtraction,
   visualizationProfilerExtraction,
-  getResultData,
+  getResults,
   visualizeR,
   getReferenceSignatureSets,
   getSignaturesR,
@@ -611,7 +611,7 @@ module.exports = {
   exploringR,
   getReferenceSignatureData,
   submitQueue,
-  fetchResults,
-  fetchExample,
+  getQueueResults,
+  getVisExample,
   getSignatureNames,
 };

@@ -57,7 +57,7 @@ export default function Visualize({ match }) {
     });
     try {
       const { args, state, timestamp } = await (
-        await fetch(`api/fetchResults/${id}`)
+        await fetch(`api/getQueueResults/${id}`)
       ).json();
       dispatchVisualize(state.visualize);
       dispatchVisualizeResults({ projectID: id });
@@ -79,7 +79,7 @@ export default function Visualize({ match }) {
     });
     try {
       const { projectID, state } = await (
-        await fetch(`api/fetchExample/${id}`)
+        await fetch(`api/getVisExample/${id}`)
       ).json();
       dispatchVisualize(state.visualize);
       // rehydrate state if available
