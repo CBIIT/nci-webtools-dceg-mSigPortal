@@ -346,10 +346,14 @@ export default function ExposureExploring({ populateControls }) {
         signatureFile: signatureFile,
       });
     }
-    const { debugR, output, errors } = await submitR(rFn, args, id);
+    const { debugR, output, errors, projectID: pID } = await submitR(
+      rFn,
+      args,
+      id
+    );
 
     if (output) {
-      dispatchExpExposure({ projectID: id });
+      if (!projectID) dispatchExpExposure({ projectID: pID });
 
       if (output.tumorPath)
         dispatchExpTumor({

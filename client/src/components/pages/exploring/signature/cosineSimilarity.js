@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
   dispatchExpCosineSimilarity,
+  dispatchExploring,
 } from '../../../../services/store';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
@@ -29,6 +30,18 @@ export default function MutationalSignatureProfile({ submitR }) {
     (state) => state.exploring
   );
 
+  useEffect(() => {
+    if (plotPath) setRPlot(plotPath);
+    else clearPlot();
+  }, [plotPath]);
+
+  function clearPlot() {
+    if (plotURL) {
+      URL.revokeObjectURL(plotURL);
+      dispatchExpCosineSimilarity({ plotPath: '', plotURL: '' });
+    }
+  }
+
   async function calculateR(fn, args) {
     dispatchExpCosineSimilarity({
       loading: true,
@@ -46,15 +59,15 @@ export default function MutationalSignatureProfile({ submitR }) {
           debugR: err,
         });
       } else {
-        const { debugR, output } = await response.json();
+        const { debugR, output, projectID: id } = await response.json();
         if (Object.keys(output).length) {
+          if (!projectID) dispatchExploring({ projectID: id });
           dispatchExpCosineSimilarity({
             debugR: debugR,
             loading: false,
             plotPath: output.plotPath,
             txtPath: output.txtPath,
           });
-          setRPlot(output.plotPath);
         } else {
           dispatchExpCosineSimilarity({
             debugR: debugR,

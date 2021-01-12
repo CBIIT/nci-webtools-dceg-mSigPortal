@@ -394,7 +394,7 @@ async function exploringR(req, res, next) {
     res.json({
       ...rest,
       debugR: stdout,
-      output: getRelativePath(output, req.body.projectID),
+      output: getRelativePath(output, projectID),
       projectID: projectID,
     });
   } catch (err) {

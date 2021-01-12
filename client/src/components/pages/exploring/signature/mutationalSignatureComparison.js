@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
+  dispatchExploring,
   dispatchExpMutationalSigComparison,
 } from '../../../../services/store';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -32,6 +33,18 @@ export default function MutationalSignatureProfile({ submitR }) {
     (state) => state.exploring
   );
 
+  useEffect(() => {
+    if (plotPath) setRPlot(plotPath);
+    else clearPlot();
+  }, [plotPath]);
+
+  function clearPlot() {
+    if (plotURL) {
+      URL.revokeObjectURL(plotURL);
+      dispatchExpMutationalSigComparison({ plotPath: '', plotURL: '' });
+    }
+  }
+
   async function calculateR(fn, args) {
     dispatchExpMutationalSigComparison({
       loading: true,
@@ -49,15 +62,16 @@ export default function MutationalSignatureProfile({ submitR }) {
           debugR: err,
         });
       } else {
-        const { debugR, output } = await response.json();
+        const { debugR, output, projectID: id } = await response.json();
         if (Object.keys(output).length) {
+          if (!projectID) dispatchExploring({ projectID: id });
+
           dispatchExpMutationalSigComparison({
             debugR: debugR,
             loading: false,
             plotPath: output.plotPath,
             txtPath: output.textPath,
           });
-          setRPlot(output.plotPath);
         } else {
           if (plotURL) URL.revokeObjectURL(plotURL);
           dispatchExpMutationalSigComparison({
