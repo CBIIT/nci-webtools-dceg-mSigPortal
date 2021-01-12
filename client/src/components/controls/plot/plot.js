@@ -66,19 +66,26 @@ export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
             <React.Fragment>
               <div className="tools d-flex">
                 <Button
+                  size="sm"
                   className="ml-auto"
                   variant="secondary"
                   onClick={zoomIn}
                 >
                   <FontAwesomeIcon icon={faPlus} style={{ color: '#fafafa' }} />
                 </Button>
-                <Button className="ml-1" variant="secondary" onClick={zoomOut}>
+                <Button
+                  size="sm"
+                  className="ml-1"
+                  variant="secondary"
+                  onClick={zoomOut}
+                >
                   <FontAwesomeIcon
                     icon={faMinus}
                     style={{ color: '#fafafa' }}
                   />
                 </Button>
                 <Button
+                  size="sm"
                   className="ml-1"
                   variant="secondary"
                   onClick={resetTransform}
