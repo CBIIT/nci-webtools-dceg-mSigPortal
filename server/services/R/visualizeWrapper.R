@@ -963,9 +963,9 @@ rainfall <- function(sample, highlight, min, max, chromosome, projectID, pythonO
 
       kataegis_result <- kataegis_rainfall_plot(mutdata, sample_name = sample, genome_build = genome_build, reference_data_folder = paste0(dataPath, 'Others'), chromsome = chromosome, kataegis_highligh = highlight, min.mut = min, max.dis = max, filename = rainfall)
 
-      if (!is.na(kataegis_result)) {
-        kataegis_result %>% write_delim(rainfallData, delim = '\t', col_names = T)
+      if (is.data.frame(kataegis_result)) {
         rainfallData = paste0(savePath, 'rainfallData.txt')
+        kataegis_result %>% write_delim(rainfallData, delim = '\t', col_names = T)
       }
     }
     else {

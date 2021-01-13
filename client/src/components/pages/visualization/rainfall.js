@@ -91,14 +91,14 @@ export default function PCA({ submitR }) {
           dispatchRainfall({
             debugR: debugR,
             plotPath: output.plotPath,
-            // txtPath: output.txtPath,
+            txtPath: output.txtPath,
             loading: false,
           });
         } else {
           dispatchRainfall({
             debugR: debugR,
             plotPath: '',
-            // txtPath: '',
+            txtPath: '',
             err: errors,
             loading: false,
           });
@@ -178,9 +178,9 @@ export default function PCA({ submitR }) {
                   value={chromosome}
                   options={[
                     'None',
-                    ...[...Array(23).keys()].slice(1),
-                    'X',
-                    'Y',
+                    ...[...Array(23).keys()].slice(1).map((chr) => 'chr' + chr),
+                    'chrX',
+                    'chrY',
                   ]}
                   onChange={(chromosome) =>
                     dispatchRainfall({
@@ -226,7 +226,7 @@ export default function PCA({ submitR }) {
           </p>
         </div>
       )}
-      {/* <Debug msg={debugR} /> */}
+      <Debug msg={debugR} />
     </div>
   );
 }
