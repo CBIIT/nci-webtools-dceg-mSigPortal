@@ -226,52 +226,51 @@ export default function MutationalProfiles({ defaultMatrix }) {
   }
 
   return (
-    <div>
-      <Form className="bg-white mb-3">
-        <div className="border rounded p-2">
-          <Row className="justify-content-center">
-            <Col lg="3">
-              <Select
-                id="mpSampleName"
-                label="Sample Name"
-                value={selectName}
-                options={nameOptions}
-                onChange={filterSampleName}
-              />
-            </Col>
-            <Col lg="3">
-              <Select
-                id="mpProfileType"
-                label="Profile Type"
-                value={selectProfile}
-                options={profileOptions}
-                onChange={filterProfileType}
-              />
-            </Col>
-            <Col lg="3">
-              <Select
-                id="mpMatrixSize"
-                label="Matrix Size"
-                value={selectMatrix}
-                options={matrixOptions}
-                onChange={filterMatrix}
-              />
-            </Col>
-            <Col lg="3">
-              <Select
-                id="mpFilter"
-                label="Filter"
-                value={selectFilter}
-                options={filterOptions}
-                onChange={filterTag}
-                disabled={source == 'public'}
-              />
-            </Col>
-          </Row>
-        </div>
+    <div className="bg-white border rounded">
+      <Form className="p-3">
+        <Row>
+          <Col lg="3">
+            <Select
+              id="mpSampleName"
+              label="Sample Name"
+              value={selectName}
+              options={nameOptions}
+              onChange={filterSampleName}
+            />
+          </Col>
+          <Col lg="3">
+            <Select
+              id="mpProfileType"
+              label="Profile Type"
+              value={selectProfile}
+              options={profileOptions}
+              onChange={filterProfileType}
+            />
+          </Col>
+          <Col lg="3">
+            <Select
+              id="mpMatrixSize"
+              label="Matrix Size"
+              value={selectMatrix}
+              options={matrixOptions}
+              onChange={filterMatrix}
+            />
+          </Col>
+          <Col lg="3">
+            <Select
+              id="mpFilter"
+              label="Filter"
+              value={selectFilter}
+              options={filterOptions}
+              onChange={filterTag}
+              disabled={source == 'public'}
+            />
+          </Col>
+        </Row>
       </Form>
 
-      <Plot plotName={getPlotName()} plotURL={plotURL} />
+      <hr />
+      <Plot className="p-3" plotName={getPlotName()} plotURL={plotURL} />
       {/* <Button
         variant="link"
         className="p-0 mt-5"

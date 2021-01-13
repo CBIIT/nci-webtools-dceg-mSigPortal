@@ -301,10 +301,9 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
       key: 'within',
       component: (
         <div>
-          <Form className="border rounded p-2 mb-3">
-            {' '}
+          <Form className="p-3">
             <LoadingOverlay active={submitOverlay} />
-            <Row className="justify-content-center">
+            <Row>
               <Col lg="2">
                 <Select
                   disabled={!multiSample}
@@ -375,24 +374,29 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
 
           <div id="pca1Plot">
             <div style={{ display: pcaErr ? 'block' : 'none' }}>
-              <p>
-                An error has occured. Check the debug section for more info.
-              </p>
+              <p>An error has occured. Please verify your input.</p>
             </div>
             <div
-              className="my-4"
+             
               style={{ display: pca1URL ? 'block' : 'none' }}
             >
-              <Plot plotName={pca1.split('/').slice(-1)[0]} plotURL={pca1URL} />
+              <hr />
+              <Plot
+                className="p-3"
+                plotName={pca1.split('/').slice(-1)[0]}
+                plotURL={pca1URL}
+              />
             </div>
           </div>
 
           <div id="pca2Plot">
             <div
-              className="my-4"
+             
               style={{ display: pca2URL ? 'block' : 'none' }}
             >
+              <hr />
               <Plot
+                className="p-3"
                 plotName={pca2.split('/').slice(-1)[0]}
                 plotURL={pca2URL}
                 txtPath={projectID + pca2Data}
@@ -402,10 +406,12 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
 
           <div id="pca3Plot">
             <div
-              className="my-4"
+             
               style={{ display: pca3URL ? 'block' : 'none' }}
             >
+              <hr />
               <Plot
+                className="p-3"
                 plotName={pca3.split('/').slice(-1)[0]}
                 plotURL={pca3URL}
                 txtPath={projectID + pca3Data}
@@ -415,10 +421,12 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
 
           <div id="heatmapPlot">
             <div
-              className="my-4"
+             
               style={{ display: heatmapURL ? 'block' : 'none' }}
             >
+              <hr />
               <Plot
+                className="p-3"
                 plotName={heatmap.split('/').slice(-1)[0]}
                 plotURL={heatmapURL}
                 txtPath={projectID + heatmapData}
@@ -435,9 +443,9 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
       key: 'public',
       component: (
         <div>
-          <Form className="border rounded p-2 mb-3">
+          <Form className="p-3">
             <LoadingOverlay active={pubSubmitOverlay} />
-            <Row className="justify-content-center">
+            <Row>
               <Col lg="2">
                 <Select
                   id="pcaPubProfile"
@@ -501,15 +509,15 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
 
           <div id="pubPca1Plot">
             <div style={{ display: pubPcaErr ? 'block' : 'none' }}>
-              <p>
-                An error has occured. Check the debug section for more info.
-              </p>
+              <p>An error has occured. Please verify your input.</p>
             </div>
             <div
-              className="my-4"
+             
               style={{ display: pubPca1URL ? 'block' : 'none' }}
             >
+              <hr />
               <Plot
+                className="p-3"
                 plotName={pubPca1.split('/').slice(-1)[0]}
                 plotURL={pubPca1URL}
               />
@@ -518,10 +526,12 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
 
           <div id="pubPca2Plot">
             <div
-              className="my-4"
+             
               style={{ display: pubPca2URL ? 'block' : 'none' }}
             >
+              <hr />
               <Plot
+                className="p-3"
                 plotName={pubPca2.split('/').slice(-1)[0]}
                 plotURL={pubPca2URL}
                 txtPath={projectID + pubPca2Data}
@@ -531,10 +541,12 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
 
           <div id="pubPca3Plot">
             <div
-              className="my-4"
+             
               style={{ display: pubPca3URL ? 'block' : 'none' }}
             >
+              <hr />
               <Plot
+                className="p-3"
                 plotName={pubPca3.split('/').slice(-1)[0]}
                 plotURL={pubPca3URL}
                 txtPath={projectID + pubPca3Data}
@@ -569,11 +581,11 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
           )}
         </Nav>
         <Content
-          className={`p-2 bg-white tab-pane-bordered rounded-0 d-block`}
+          className={`bg-white tab-pane-bordered rounded-0 d-block`}
           style={{ overflowX: 'auto' }}
         >
           {tabs.map(({ key, component }) => (
-            <Pane key={key} eventKey={key} className="border-0 py-2">
+            <Pane key={key} eventKey={key} className="border-0">
               {component}
             </Pane>
           ))}

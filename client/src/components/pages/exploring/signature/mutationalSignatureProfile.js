@@ -443,7 +443,7 @@ export default function MutationalSignatureProfile({ submitR }) {
       display.push(
         <div id={'plot' + index} key={'plot' + index}>
           <div style={{ display: err ? 'block' : 'none' }}>
-            <p>An error has occured. Check the debug section for more info.</p>
+            <p>An error has occured. Please verify your input.</p>
           </div>
           {plots[index].plotURL && (
             <div style={{ display: plots[index].plotURL ? 'block' : 'none' }}>
@@ -544,7 +544,7 @@ export default function MutationalSignatureProfile({ submitR }) {
       </Row>
       <div id="plot0">
         <div style={{ display: err ? 'block' : 'none' }}>
-          <p>An error has occured. Check the debug section for more info.</p>
+          <p>An error has occured. Please verify your input.</p>
         </div>
         <div style={{ display: plots[0].plotURL ? 'block' : 'none' }}>
           <Plot

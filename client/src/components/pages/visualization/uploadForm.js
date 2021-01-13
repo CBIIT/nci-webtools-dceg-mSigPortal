@@ -493,7 +493,7 @@ export default function UploadForm() {
           <Check.Label className="font-weight-normal">WES</Check.Label>
         </Check>
       </Group>
-      <hr />
+      <hr className="mb-3" />
       <Group controlId="split" className="d-flex">
         <Label className="mr-auto">
           Split Mutations According to Filter{' '}
@@ -557,7 +557,7 @@ export default function UploadForm() {
         ></Control>
         <Text className="text-muted">Use @ to separate multiple filters</Text>
       </Group>
-      <hr />
+      <hr className="mb-3" />
       <Group controlId="bedUpload">
         <Label>
           Filter Mutations using Bed File{' '}
@@ -640,7 +640,7 @@ export default function UploadForm() {
           </div>
         </section>
       </Group>
-      <hr />
+      <hr className="mb-3" />
       <Group controlId="collapse" className="d-flex">
         <Label className="mr-auto">
           Add Collapsing Data{' '}
@@ -678,7 +678,7 @@ export default function UploadForm() {
           />
         </Check>
       </Group>
-      <hr />
+      <hr className="mb-3" />
       <div>
         <LoadingOverlay active={false} content={'Work in progress...'} />
         <Group controlId="toggleQueue">

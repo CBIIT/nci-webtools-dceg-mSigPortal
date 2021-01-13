@@ -39,11 +39,11 @@ export default function ProfilerSummary({ submitR }) {
       if (check.status === 200) {
         setRPlot(path);
       } else {
-        if (source == 'user' && matrixList.length) {
+        if (source == 'user') {
           calculateR('profilerSummary', {
             matrixList: JSON.stringify(matrixList),
           });
-        } else if (source == 'public' && svgList.length) {
+        } else if (source == 'public') {
           calculateR('profilerSummaryPublic', {
             study: study,
             cancerType: cancerType,
@@ -53,7 +53,7 @@ export default function ProfilerSummary({ submitR }) {
       }
     };
 
-    if (!loading && !plotPath) {
+    if (svgList.length || matrixList.length) {
       checkSummary();
     }
   }, [matrixList, svgList]);
@@ -126,6 +126,7 @@ export default function ProfilerSummary({ submitR }) {
     <div>
       <LoadingOverlay active={loading} />
       <Plot
+        className="bg-white p-3 border border-rounded"
         plotName={plotPath.split('/').slice(-1)[0]}
         plotURL={plotURL}
         maxHeight="600px"

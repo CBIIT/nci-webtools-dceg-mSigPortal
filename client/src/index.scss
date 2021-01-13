@@ -18,6 +18,10 @@ $font-size-base: 0.9rem;
 
 /** Default Overrides **/
 
+hr {
+  margin: 0;
+}
+
 a {
   //color: rgb(0, 140, 186);
   color: rgb(0, 126, 167);
@@ -174,6 +178,10 @@ a.nav-link.active {
 
 .nav-tabs .nav-link.active {
   color: black !important;
+}
+
+.nav-tabs .nav-link {
+  border-bottom: 0;
 }
 
 .nav-tabs {

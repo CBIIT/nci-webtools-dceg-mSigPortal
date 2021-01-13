@@ -110,122 +110,116 @@ export default function PCA({ submitR }) {
     }
   }
 
-  const plots = (
-    <div id="rainfallPlot">
-      {err && (
-        <div>
-          <p>Error: {err}</p>
-        </div>
-      )}
-      <div style={{ display: plotURL ? 'block' : 'none' }}>
-        <Plot
-          plotName={plotPath.split('/').slice(-1)[0]}
-          plotURL={plotURL}
-          txtPath={txtPath ? projectID + txtPath : null}
-        />
-      </div>
-    </div>
-  );
-
   return (
     <div>
       {source == 'user' && inputFormat == 'vcf' ? (
-        <div>
-          <Form className="bg-white mb-3">
-            <div className="border rounded p-2">
-              <LoadingOverlay active={loading} />
-              <Row className="">
-                <Col lg="3">
-                  <Select
-                    id="rainfallSamples"
-                    label="Sample Name"
-                    value={sample}
-                    options={sampleOptions}
-                    onChange={(sample) =>
-                      dispatchRainfall({
-                        sample: sample,
-                      })
-                    }
+        <div className="bg-white border rounded">
+          <Form className="p-3">
+            <LoadingOverlay active={loading} />
+            <Row>
+              <Col lg="3">
+                <Select
+                  id="rainfallSamples"
+                  label="Sample Name"
+                  value={sample}
+                  options={sampleOptions}
+                  onChange={(sample) =>
+                    dispatchRainfall({
+                      sample: sample,
+                    })
+                  }
+                />
+              </Col>
+              <Col lg="1">
+                <Group controlId="toggleHighlight">
+                  <Check
+                    type="checkbox"
+                    label="Highlight"
+                    value={highlight}
+                    checked={highlight}
+                    onChange={() => {
+                      dispatchRainfall({ highlight: !highlight });
+                    }}
                   />
-                </Col>
-                <Col lg="1">
-                  <Group controlId="toggleHighlight">
-                    <Check
-                      type="checkbox"
-                      label="Highlight"
-                      value={highlight}
-                      checked={highlight}
-                      onChange={() => {
-                        dispatchRainfall({ highlight: !highlight });
-                      }}
-                    />
-                  </Group>
-                </Col>
-                <Col lg="2">
-                  <Group controlId="rainfallMin">
-                    <Label>Minimum Number of Mutations</Label>
-                    <Control
-                      value={min}
-                      placeholder=""
-                      onChange={(e) => {
-                        dispatchRainfall({
-                          min: e.target.value,
-                        });
-                      }}
-                    />
-                    {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
-                  </Group>
-                </Col>
-                <Col lg="2">
-                  <Group controlId="rainfallMax">
-                    <Label>Maximum Distance</Label>
-                    <Control
-                      value={max}
-                      placeholder=""
-                      onChange={(e) => {
-                        dispatchRainfall({
-                          max: e.target.value,
-                        });
-                      }}
-                    />
-                    {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
-                  </Group>
-                </Col>
-                <Col lg="2">
-                  <Select
-                    id="rainfallChromosome"
-                    label="Chromosome"
-                    value={chromosome}
-                    options={[
-                      'None',
-                      ...[...Array(23).keys()].slice(1),
-                      'X',
-                      'Y',
-                    ]}
-                    onChange={(chromosome) =>
+                </Group>
+              </Col>
+              <Col lg="2">
+                <Group controlId="rainfallMin">
+                  <Label>Minimum Number of Mutations</Label>
+                  <Control
+                    value={min}
+                    placeholder=""
+                    onChange={(e) => {
                       dispatchRainfall({
-                        chromosome: chromosome,
-                      })
-                    }
+                        min: e.target.value,
+                      });
+                    }}
                   />
-                </Col>
-                <Col lg="2" className="d-flex justify-content-end">
-                  <Button
-                    className="mt-auto mb-3"
-                    variant="primary"
-                    onClick={calculateR}
-                  >
-                    Calculate
-                  </Button>
-                </Col>
-              </Row>
-            </div>
+                </Group>
+              </Col>
+              <Col lg="2">
+                <Group controlId="rainfallMax">
+                  <Label>Maximum Distance</Label>
+                  <Control
+                    value={max}
+                    placeholder=""
+                    onChange={(e) => {
+                      dispatchRainfall({
+                        max: e.target.value,
+                      });
+                    }}
+                  />
+                </Group>
+              </Col>
+              <Col lg="2">
+                <Select
+                  id="rainfallChromosome"
+                  label="Chromosome"
+                  value={chromosome}
+                  options={[
+                    'None',
+                    ...[...Array(23).keys()].slice(1),
+                    'X',
+                    'Y',
+                  ]}
+                  onChange={(chromosome) =>
+                    dispatchRainfall({
+                      chromosome: chromosome,
+                    })
+                  }
+                />
+              </Col>
+              <Col lg="2" className="d-flex justify-content-end">
+                <Button
+                  className="mt-auto"
+                  variant="primary"
+                  onClick={calculateR}
+                >
+                  Calculate
+                </Button>
+              </Col>
+            </Row>
           </Form>
 
-          {plots}
+          <div id="rainfallPlot">
+            {err && (
+              <div>
+                <p>Error: {err}</p>
+              </div>
+            )}
+            <div style={{ display: plotURL ? 'block' : 'none' }}>
+              <hr />
+              <Plot
+                className="p-3"
+                plotName={plotPath.split('/').slice(-1)[0]}
+                plotURL={plotURL}
+                txtPath={txtPath ? projectID + txtPath : null}
+              />
+            </div>
+          </div>
         </div>
       ) : (
-        <div className="bg-white border rounded p-2">
+        <div className="bg-white border rounded p-4">
           <p>
             Kataegis Identification is only available for Data Source: User and
             requires VCF input files

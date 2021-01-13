@@ -425,9 +425,9 @@ export default function ProfileComparison({
       key: 'within',
       component: (
         <div>
-          <Form className="border rounded p-2 mb-3">
+          <Form className="p-3">
             <LoadingOverlay active={withinSubmitOverlay} />
-            <Row className="justify-content-center">
+            <Row>
               <Col lg="2">
                 <Select
                   disabled={sampleOptions.length < 2}
@@ -512,14 +512,14 @@ export default function ProfileComparison({
           <div id="pcWithinPlot">
             {withinErr && (
               <div>
-                <p>
-                  An error has occured. Check the debug section for more info.
-                </p>
+                <p>An error has occured. Please verify your input.</p>
                 <p>Error: {withinErr}</p>
               </div>
             )}
             <div style={{ display: withinPlotURL ? 'block' : 'none' }}>
+              <hr />
               <Plot
+                className="p-3"
                 plotName={withinPlotPath.split('/').slice(-1)[0]}
                 plotURL={withinPlotURL}
               />
@@ -532,9 +532,9 @@ export default function ProfileComparison({
       key: 'reference',
       component: (
         <div>
-          <Form className="border rounded p-2 mb-3">
+          <Form className="p-3">
             <LoadingOverlay active={refSubmitOverlay} />
-            <Row className="justify-content-center">
+            <Row>
               <Col lg="2">
                 <Select
                   id="pcProfileTypeRef"
@@ -648,14 +648,14 @@ export default function ProfileComparison({
           <div id="refPlotDownload">
             {refErr && (
               <div>
-                <p>
-                  An error has occured. Check the debug section for more info.
-                </p>
+                <p>An error has occured. Please verify your input.</p>
                 <p>Error: {refErr}</p>
               </div>
             )}
             <div style={{ display: refPlotURL ? 'block' : 'none' }}>
+              <hr />
               <Plot
+                className="p-3"
                 plotName={refPlotPath.split('/').slice(-1)[0]}
                 plotURL={refPlotURL}
               />
@@ -671,10 +671,9 @@ export default function ProfileComparison({
       key: 'public',
       component: (
         <div>
-          <Form className="border rounded p-2 mb-3">
+          <Form className="p-3">
             <LoadingOverlay active={pubSubmitOverlay} />
-
-            <Row className="justify-content-center">
+            <Row>
               <Col lg="2">
                 <Select
                   id="pcUserProfileType"
@@ -771,13 +770,13 @@ export default function ProfileComparison({
           <div id="pcPubPlot">
             {pubErr && (
               <div>
-                <p>
-                  An error has occured. Check the debug section for more info.
-                </p>
+                <p>An error has occured. Please verify your input.</p>
               </div>
             )}
             <div style={{ display: pubPlotURL ? 'block' : 'none' }}>
+              <hr />
               <Plot
+                className="p-3"
                 plotName={pubPlotPath.split('/').slice(-1)[0]}
                 plotURL={pubPlotURL}
               />
@@ -815,11 +814,11 @@ export default function ProfileComparison({
           )}
         </Nav>
         <TabContent
-          className={`p-2 bg-white tab-pane-bordered rounded-0 d-block`}
+          className={`bg-white tab-pane-bordered rounded-0 d-block`}
           style={{ overflowX: 'auto' }}
         >
           {tabs.map(({ key, component }) => (
-            <Pane key={key} eventKey={key} className="border-0 py-2">
+            <Pane key={key} eventKey={key} className="border-0">
               {component}
             </Pane>
           ))}

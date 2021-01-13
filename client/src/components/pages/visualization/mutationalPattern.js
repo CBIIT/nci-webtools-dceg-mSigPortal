@@ -142,17 +142,18 @@ export default function MutationalPattern({ submitR }) {
   }
 
   const plots = (
-    <div className="bg-white border rounded p-2">
+    <div>
       <div id="barchart">
+        <hr />
         <div style={{ display: err ? 'block' : 'none' }}>
           <h5>Bar Chart</h5>
-          <p>An error has occured. Check the debug section for more info.</p>
+          <p>An error has occured. Please verify your input.</p>
         </div>
         {plotURL.length > 0 &&
           (barURL.length > 0 ? (
             <div>
-              <h5>Bar Chart</h5>
               <Plot
+                className="p-3"
                 plotName={barPath.split('/').slice(-1)[0]}
                 plotURL={barURL}
               />
@@ -169,12 +170,12 @@ export default function MutationalPattern({ submitR }) {
       </div>
       <div id="context">
         <div style={{ display: err ? 'block' : 'none' }}>
-          <h5>Context Plot</h5>
-          <p>An error has occured. Check the debug section for more info.</p>
+          <p>An error has occured. Please verify your input.</p>
         </div>
         <div style={{ display: plotURL ? 'block' : 'none' }}>
-          <h5>Context Plot</h5>
+          <hr />
           <Plot
+            className="p-3"
             plotName={plotPath.split('/').slice(-1)[0]}
             plotURL={plotURL}
             txtPath={projectID + txtPath}
@@ -187,118 +188,113 @@ export default function MutationalPattern({ submitR }) {
   return (
     <div>
       {source == 'user' ? (
-        <div>
-          <Form className="bg-white mb-3">
-            <div className="border rounded p-2">
-              <LoadingOverlay active={submitOverlay} />
-              <Row className="">
-                <Col lg="4">
-                  <Group controlId="minimum">
-                    <Label>
-                      Minimal Proportion mutations within Each Mutational
-                      Pattern
-                    </Label>
-                    <Control
-                      value={proportion}
-                      placeholder="Ex. 0.8"
-                      onChange={(e) => {
-                        dispatchMutationalPattern({
-                          proportion: e.target.value,
-                        });
-                      }}
-                    ></Control>
-                  </Group>
-                </Col>
-                <Col lg="3">
-                  <Group controlId="pattern">
-                    <Label>Mutational Pattern</Label>
-                    <Control
-                      value={pattern}
-                      placeholder="Ex. NCG>NTG"
-                      onChange={(e) => {
-                        dispatchMutationalPattern({
-                          pattern: e.target.value,
-                        });
-                      }}
-                    ></Control>
-                  </Group>
-                </Col>
-                <Col lg="3" />
-                <Col lg="2" className="d-flex justify-content-end">
-                  <Button
-                    className="mt-auto mb-3"
-                    variant="primary"
-                    onClick={() => {
-                      calculateR('mutationalPattern', {
-                        matrixFile: matrixList.filter(
-                          (path) =>
-                            path.Profile_Type == 'SBS' &&
-                            path.Matrix_Size == '96'
-                        )[0].Path,
-                        proportion: parseFloat(proportion),
-                        pattern: pattern,
-                      });
-                    }}
-                  >
-                    Calculate
-                  </Button>
-                </Col>
-              </Row>
-            </div>
-          </Form>
-          {plotPath.length > 0 && plots}
-        </div>
-      ) : (
-        <div>
-          <Form className="bg-white mb-3">
-            <div className="border rounded p-2">
-              <LoadingOverlay active={submitOverlay} />
-              <Row className="justify-content-center">
-                <Col lg="5">
+        <div className="bg-white border rounded">
+          <Form className="p-3">
+            <LoadingOverlay active={submitOverlay} />
+            <Row>
+              <Col lg="4">
+                <Group controlId="minimum">
                   <Label>
                     Minimal Proportion mutations within Each Mutational Pattern
                   </Label>
                   <Control
                     value={proportion}
+                    placeholder="Ex. 0.8"
                     onChange={(e) => {
                       dispatchMutationalPattern({
                         proportion: e.target.value,
                       });
                     }}
                   ></Control>
-                </Col>
-                <Col lg="5">
+                </Group>
+              </Col>
+              <Col lg="3">
+                <Group controlId="pattern">
                   <Label>Mutational Pattern</Label>
                   <Control
                     value={pattern}
+                    placeholder="Ex. NCG>NTG"
                     onChange={(e) => {
                       dispatchMutationalPattern({
                         pattern: e.target.value,
                       });
                     }}
                   ></Control>
-                </Col>
-
-                <Col lg="1" className="m-auto">
-                  <Button
-                    variant="primary"
-                    onClick={() => {
-                      calculateR('mutationalPatternPublic', {
-                        study: study,
-                        cancerType: cancerType,
-                        experimentalStrategy: pubExperimentalStrategy,
-                        proportion: parseFloat(proportion),
-                        pattern: pattern,
-                      });
-                    }}
-                  >
-                    Calculate
-                  </Button>
-                </Col>
-              </Row>
-            </div>
+                </Group>
+              </Col>
+              <Col lg="3" />
+              <Col lg="2" className="d-flex justify-content-end">
+                <Button
+                  className="mt-auto"
+                  variant="primary"
+                  onClick={() => {
+                    calculateR('mutationalPattern', {
+                      matrixFile: matrixList.filter(
+                        (path) =>
+                          path.Profile_Type == 'SBS' && path.Matrix_Size == '96'
+                      )[0].Path,
+                      proportion: parseFloat(proportion),
+                      pattern: pattern,
+                    });
+                  }}
+                >
+                  Calculate
+                </Button>
+              </Col>
+            </Row>
           </Form>
           {plotPath.length > 0 && plots}
+        </div>
+      ) : (
+        <div className="bg-white border rounded">
+          <Form className="p-3">
+            <LoadingOverlay active={submitOverlay} />
+            <Row className="justify-content-center">
+              <Col lg="4">
+                <Label>
+                  Minimal Proportion mutations within Each Mutational Pattern
+                </Label>
+                <Control
+                  value={proportion}
+                  onChange={(e) => {
+                    dispatchMutationalPattern({
+                      proportion: e.target.value,
+                    });
+                  }}
+                ></Control>
+              </Col>
+              <Col lg="3">
+                <Label>Mutational Pattern</Label>
+                <Control
+                  value={pattern}
+                  onChange={(e) => {
+                    dispatchMutationalPattern({
+                      pattern: e.target.value,
+                    });
+                  }}
+                ></Control>
+              </Col>
+              <Col lg="3" />
+              <Col lg="2" className="d-flex justify-content-end">
+                <Button
+                  className="mt-auto"
+                  variant="primary"
+                  onClick={() => {
+                    calculateR('mutationalPatternPublic', {
+                      study: study,
+                      cancerType: cancerType,
+                      experimentalStrategy: pubExperimentalStrategy,
+                      proportion: parseFloat(proportion),
+                      pattern: pattern,
+                    });
+                  }}
+                >
+                  Calculate
+                </Button>
+              </Col>
+            </Row>
+          </Form>
+          {plots}
         </div>
       )}
       {/* <Debug msg={debugR} /> */}

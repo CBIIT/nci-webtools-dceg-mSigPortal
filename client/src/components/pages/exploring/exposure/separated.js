@@ -54,7 +54,7 @@ export default function Separated() {
       {!err && !plotURL && <p>Please calculate using the left side panel.</p>}
       {err && (
         <div>
-          <p>An error has occured. Check the debug section for more info.</p>
+          <p>An error has occured. Please verify your input.</p>
           <p>Error: {err}</p>
         </div>
       )}

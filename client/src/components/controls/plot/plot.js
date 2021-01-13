@@ -7,7 +7,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faMinus, faHome } from '@fortawesome/free-solid-svg-icons';
 import './plot.scss';
 
-export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
+export default function ({
+  plotName,
+  plotURL,
+  txtPath,
+  alt,
+  maxHeight,
+  className,
+  ...rest
+}) {
   const [loading, setLoading] = useState(false);
 
   //   download text results files
@@ -43,31 +51,31 @@ export default function ({ plotName, plotURL, txtPath, alt, maxHeight }) {
   };
 
   return (
-    <div className="bg-white">
+    <div>
       <LoadingOverlay active={loading} />
-      <div className="p-2 border rounded" title="Ctrl + Mouse Wheel to zoom">
-        <div className="d-flex align-items-end mb-2">
-          {/* <span>{plotName.slice(0, -4)}</span> */}
-          <a className="ml-auto" href={plotURL} download={plotName}>
-            Download Plot
-          </a>
-          {txtPath && (
-            <Button
-              className="p-0 border-0 ml-3"
-              variant="link"
-              onClick={() => downloadData(txtPath)}
-            >
-              Download Data
-            </Button>
-          )}
-        </div>
+      <div className={className} title="Ctrl + Mouse Wheel to zoom">
         <TransformWrapper className="w-100" {...zoomProps}>
           {({ zoomIn, zoomOut, resetTransform }) => (
             <React.Fragment>
               <div className="tools d-flex">
+                <div className="d-flex align-items-end ml-auto mb-auto">
+                  {/* <span>{plotName.slice(0, -4)}</span> */}
+                  <a className="ml-auto" href={plotURL} download={plotName}>
+                    Download Plot
+                  </a>
+                  {txtPath && (
+                    <Button
+                      className="p-0 border-0 ml-3"
+                      variant="link"
+                      onClick={() => downloadData(txtPath)}
+                    >
+                      Download Data
+                    </Button>
+                  )}
+                </div>
                 <Button
                   size="sm"
-                  className="ml-auto"
+                  className="ml-3"
                   variant="secondary"
                   onClick={zoomIn}
                 >

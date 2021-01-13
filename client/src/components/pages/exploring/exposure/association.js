@@ -195,7 +195,7 @@ export default function Association({
           {err && (
             <div>
               <p>
-                An error has occured. Check the debug section for more info.
+                An error has occured. Please verify your input.
               </p>
               <p>Error: {err}</p>
             </div>
