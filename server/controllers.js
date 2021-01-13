@@ -595,6 +595,34 @@ async function getSignatureNames(req, res, next) {
   }
 }
 
+async function getExposureExample(req, res, next) {
+  try {
+    const { example } = req.params;
+    logger.info(`Fetching Exposure example: ${example}`);
+
+    // check exists
+    const examplePath = path.resolve(config.data.examples, example);
+    const paramsPath = path.join(examplePath, `params.json`);
+    console.log(paramsPath);
+
+    if (fs.existsSync(paramsPath)) {
+      const params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
+
+      // copy example to results with unique id
+      const id = uuidv4();
+      const resultsPath = path.resolve(config.results.folder, id);
+      await fs.promises.mkdir(resultsPath, { recursive: true });
+      await fs.copy(examplePath, resultsPath);
+
+      res.json({ projectID: id, state: params.state });
+    } else {
+      throw `Invalid example`;
+    }
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   parseCSV,
   profilerExtraction,
@@ -614,4 +642,5 @@ module.exports = {
   getQueueResults,
   getVisExample,
   getSignatureNames,
+  getExposureExample,
 };

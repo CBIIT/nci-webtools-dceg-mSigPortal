@@ -24,7 +24,7 @@ export default function Across({ calculateAcross }) {
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
     else clearPlot();
-  }, [plotPath]);
+  }, [plotPath, projectID]);
 
   useEffect(() => {
     if (source == 'public') {
@@ -95,9 +95,7 @@ export default function Across({ calculateAcross }) {
         <div id="exposureAcrossPlot">
           {err && (
             <div>
-              <p>
-                An error has occured. Please verify your input.
-              </p>
+              <p>An error has occured. Please verify your input.</p>
               <p>Error: {err}</p>
             </div>
           )}

@@ -20,7 +20,7 @@ export default function Tumor({ calculatePrevalence }) {
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
     else clearPlot();
-  }, [plotPath]);
+  }, [plotPath, projectID]);
 
   async function setRPlot(plotPath) {
     if (plotPath) {

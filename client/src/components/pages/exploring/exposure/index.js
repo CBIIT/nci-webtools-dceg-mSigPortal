@@ -33,7 +33,8 @@ import Accordions from '../../../controls/accordions/accordions';
 const { Header, Body } = Card;
 const { Group, Label, Check } = Form;
 
-export default function ExposureExploring({ populateControls }) {
+export default function ExposureExploring({ match, populateControls }) {
+  const { exampleName } = match.params;
   const { exposureSignature, exposureCancer, signatureNames } = useSelector(
     (state) => state.exploring
   );
@@ -86,9 +87,46 @@ export default function ExposureExploring({ populateControls }) {
   const [matrixValidity, setMatrixValidity] = useState(false);
   const [signatureValidity, setSignatureValidity] = useState(false);
 
+  // load example if available
+  useEffect(() => {
+    if (exampleName) loadExample(exampleName);
+  }, [exampleName]);
+
+  // set selected tab on component render
   useEffect(() => {
     dispatchExploring({ displayTab: 'exposure' });
   }, []);
+
+  async function loadExample(id) {
+    dispatchExpExposure({
+      loading: {
+        active: true,
+        content: 'Loading Example',
+        showIndicator: true,
+      },
+    });
+    try {
+      const { projectID, state } = await (
+        await fetch(`api/getExposureExample/${id}`)
+      ).json();
+
+      dispatchExpExposure({ ...state.expExposure, projectID: projectID });
+      // rehydrate state if available
+      if (state.expTumor) dispatchExpTumor(state.expTumor);
+      if (state.expAcross) dispatchExpAcross(state.expAcross);
+      if (state.expAssociation) dispatchExpAssociation(state.expAssociation);
+      if (state.expDecomposition)
+        dispatchExpDecomposition(state.expDecomposition);
+      if (state.expLandscape) dispatchExpLandscape(state.expLandscape);
+      if (state.expPrevalence) dispatchExpPrevalence(state.expPrevalence);
+      if (state.expSeparated) dispatchExpSeparated(state.expSeparated);
+    } catch (error) {
+      dispatchError(error);
+    }
+    dispatchExpExposure({
+      loading: false,
+    });
+  }
 
   // get signature name options filtered by cancer type
   async function getSignatureNames() {
@@ -594,6 +632,7 @@ export default function ExposureExploring({ populateControls }) {
   function handleReset() {
     const initialState = getInitialState();
 
+    window.location.hash = '#/exploring/exposure';
     source == 'public'
       ? dispatchExpExposure(initialState.expExposure)
       : dispatchExpExposure({ ...initialState.expExposure, source: 'user' });
@@ -689,6 +728,24 @@ export default function ExposureExploring({ populateControls }) {
       component: <Prevalence calculatePrevalence={calculatePrevalence} />,
       id: 'prevalence',
       title: 'Prevalence of Mutational Signature',
+    },
+  ];
+
+  const examples = [
+    {
+      title:
+        'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Lung-AdenoCA; MSA SBS5 vs SBS40',
+      path: 'exposure1',
+    },
+    {
+      title:
+        'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Skin-Melnaoma; MSA SBS7a vs SBS7b',
+      path: 'exposure2',
+    },
+    {
+      title:
+        'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Breast-AdenoCA; MSA SBS3 vs SBS5',
+      path: 'exposure3',
     },
   ];
 
@@ -818,6 +875,21 @@ export default function ExposureExploring({ populateControls }) {
                     </Button>
                   </Col>
                 </Row>
+                <hr />
+                <strong>Example Queries</strong>
+                {examples.map(({ title, external, path }, index) => (
+                  <div key={index} className="mb-2">
+                    <a href={`#/exploring/exposure/${path}`}>{title}</a>
+                    {external && (
+                      <span>
+                        {'; '}
+                        <a href={external.href} target="_blank">
+                          {external.name}
+                        </a>
+                      </span>
+                    )}
+                  </div>
+                ))}
               </div>
             ) : (
               <div>

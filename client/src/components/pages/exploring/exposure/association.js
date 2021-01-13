@@ -41,7 +41,7 @@ export default function Association({
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
     else clearPlot();
-  }, [plotPath]);
+  }, [plotPath, projectID]);
 
   // apply default signature names
   useEffect(() => {

@@ -479,11 +479,12 @@ export default function Results({ setOpenSidebar }) {
           className="border rounded bg-white p-3"
           style={{ minHeight: '420px' }}
         >
-          <h2>Instructions</h2>
+          <h4>Instructions</h4>
+          <p>Choose a Data Source and it's associated options to submit a query</p>
           <hr />
           <h4>Data Souce</h4>
           <p>Public: Perform analysis using data available on the website</p>
-          <p>User: Upload Sample Variants and specify parameters </p>
+          <p>User: Upload your own data</p>
           <hr />
           <h4>Examples Queries</h4>
           {examples.map(({ title, external, path }, index) => (

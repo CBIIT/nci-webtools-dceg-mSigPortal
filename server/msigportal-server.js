@@ -28,6 +28,7 @@ const {
   getQueueResults,
   getVisExample,
   getSignatureNames,
+  getExposureExample,
 } = require('./controllers');
 
 if (cluster.isMaster) {
@@ -116,3 +117,5 @@ apiRouter.get('/getQueueResults/:id', getQueueResults);
 apiRouter.get('/getVisExample/:example', getVisExample);
 
 apiRouter.post('/getSignatureNames', getSignatureNames);
+
+apiRouter.get('/getExposureExample/:example', getExposureExample);
