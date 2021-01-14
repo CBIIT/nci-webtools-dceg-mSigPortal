@@ -115,7 +115,7 @@ export default function Visualize({ match }) {
     },
     { name: 'Profile Comparison', id: 'profileComparison' },
     { name: 'PCA', id: 'pca' },
-    { name: 'Kataegis Identification', id: 'rainfall' },
+    { name: 'Kataegis Identification', id: 'kataegis' },
     { name: 'Download', id: 'download' },
   ];
 

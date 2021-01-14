@@ -1,15 +1,22 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { dispatchError, dispatchRainfall } from '../../../services/store';
+import { dispatchError, dispatchKataegis } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
 import Select from '../../controls/select/select';
+import {
+  Table,
+  paginationText,
+  paginationSizeSelector,
+  paginationButton,
+  loadingOverlay,
+} from '../../controls/table/table';
 
 const { Group, Check, Label, Control } = Form;
 
-export default function PCA({ submitR }) {
+export default function Kataegis({ submitR }) {
   const { source, inputFormat } = useSelector((state) => state.visualize);
 
   const { projectID } = useSelector((state) => state.visualizeResults);
@@ -27,7 +34,7 @@ export default function PCA({ submitR }) {
     err,
     debugR,
     loading,
-  } = useSelector((state) => state.rainfall);
+  } = useSelector((state) => state.kataegis);
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
@@ -45,7 +52,7 @@ export default function PCA({ submitR }) {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchRainfall({
+          dispatchKataegis({
             plotURL: objectURL,
           });
         }
@@ -54,26 +61,26 @@ export default function PCA({ submitR }) {
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchRainfall({ err: true, plotURL: '' });
+      dispatchKataegis({ err: true, plotURL: '' });
     }
   }
 
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchRainfall({ plotPath: '', plotURL: '' });
+      dispatchKataegis({ plotPath: '', plotURL: '' });
     }
   }
 
   async function calculateR() {
-    dispatchRainfall({
+    dispatchKataegis({
       loading: true,
       err: false,
       debugR: '',
     });
 
     try {
-      const response = await submitR('rainfall', {
+      const response = await submitR('kataegis', {
         sample: sample,
         highlight: highlight,
         min: parseInt(min),
@@ -82,20 +89,20 @@ export default function PCA({ submitR }) {
       });
       if (!response.ok) {
         const err = await response.json();
-        dispatchRainfall({ debugR: err });
+        dispatchKataegis({ debugR: err });
 
-        dispatchRainfall({ loading: false });
+        dispatchKataegis({ loading: false });
       } else {
         const { debugR, output, errors } = await response.json();
         if (Object.keys(output).length) {
-          dispatchRainfall({
+          dispatchKataegis({
             debugR: debugR,
             plotPath: output.plotPath,
             txtPath: output.txtPath,
             loading: false,
           });
         } else {
-          dispatchRainfall({
+          dispatchKataegis({
             debugR: debugR,
             plotPath: '',
             txtPath: '',
@@ -106,7 +113,7 @@ export default function PCA({ submitR }) {
       }
     } catch (err) {
       dispatchError(err);
-      dispatchRainfall({ loading: false });
+      dispatchKataegis({ loading: false });
     }
   }
 
@@ -119,12 +126,12 @@ export default function PCA({ submitR }) {
             <Row>
               <Col lg="3">
                 <Select
-                  id="rainfallSamples"
+                  id="kataegisSamples"
                   label="Sample Name"
                   value={sample}
                   options={sampleOptions}
                   onChange={(sample) =>
-                    dispatchRainfall({
+                    dispatchKataegis({
                       sample: sample,
                     })
                   }
@@ -138,19 +145,19 @@ export default function PCA({ submitR }) {
                     value={highlight}
                     checked={highlight}
                     onChange={() => {
-                      dispatchRainfall({ highlight: !highlight });
+                      dispatchKataegis({ highlight: !highlight });
                     }}
                   />
                 </Group>
               </Col>
               <Col lg="2">
-                <Group controlId="rainfallMin">
+                <Group controlId="kataegisMin">
                   <Label>Minimum Number of Mutations</Label>
                   <Control
                     value={min}
                     placeholder=""
                     onChange={(e) => {
-                      dispatchRainfall({
+                      dispatchKataegis({
                         min: e.target.value,
                       });
                     }}
@@ -158,13 +165,13 @@ export default function PCA({ submitR }) {
                 </Group>
               </Col>
               <Col lg="2">
-                <Group controlId="rainfallMax">
+                <Group controlId="kataegisMax">
                   <Label>Maximum Distance</Label>
                   <Control
                     value={max}
                     placeholder=""
                     onChange={(e) => {
-                      dispatchRainfall({
+                      dispatchKataegis({
                         max: e.target.value,
                       });
                     }}
@@ -173,7 +180,7 @@ export default function PCA({ submitR }) {
               </Col>
               <Col lg="2">
                 <Select
-                  id="rainfallChromosome"
+                  id="kataegisChromosome"
                   label="Chromosome"
                   value={chromosome}
                   options={[
@@ -183,7 +190,7 @@ export default function PCA({ submitR }) {
                     'chrY',
                   ]}
                   onChange={(chromosome) =>
-                    dispatchRainfall({
+                    dispatchKataegis({
                       chromosome: chromosome,
                     })
                   }
@@ -201,7 +208,7 @@ export default function PCA({ submitR }) {
             </Row>
           </Form>
 
-          <div id="rainfallPlot">
+          <div id="kataegisPlot">
             {err && (
               <div>
                 <p>Error: {err}</p>

@@ -935,7 +935,7 @@ pcaWithPublic <- function(matrixFile, study, cancerType, profileName, projectID,
 # Minimum Number of Mutations: default 5
 # Maximum Distance: 1000
 # Chromosome: default null; can choose from chr1:chr22, chrX and chrY
-rainfall <- function(sample, highlight, min, max, chromosome, projectID, pythonOutput, savePath, dataPath) {
+kataegis <- function(sample, highlight, min, max, chromosome, projectID, pythonOutput, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
@@ -945,8 +945,8 @@ rainfall <- function(sample, highlight, min, max, chromosome, projectID, pythonO
   tryCatch({
     output = list()
     errors = ''
-    rainfall = paste0(savePath, 'rainfall.svg')
-    rainfallData = ''
+    kataegis = paste0(savePath, 'kataegis.svg')
+    kataegisData = ''
 
     mutationPath = paste0(savePath, '../')
     mutationFile = list.files(mutationPath, pattern = "_mSigPortal_SNV")
@@ -961,11 +961,11 @@ rainfall <- function(sample, highlight, min, max, chromosome, projectID, pythonO
       genome_build <- mutation_data$genome_build[1]
       mutdata <- mutation_data %>% filter(sample == sample) %>% dplyr::select(chr, pos, ref, alt)
 
-      kataegis_result <- kataegis_rainfall_plot(mutdata, sample_name = sample, genome_build = genome_build, reference_data_folder = paste0(dataPath, 'Others'), chromsome = chromosome, kataegis_highligh = highlight, min.mut = min, max.dis = max, filename = rainfall)
+      kataegis_result <- kataegis_rainfall_plot(mutdata, sample_name = sample, genome_build = genome_build, reference_data_folder = paste0(dataPath, 'Others'), chromsome = chromosome, kataegis_highligh = highlight, min.mut = min, max.dis = max, filename = kataegis)
 
       if (is.data.frame(kataegis_result)) {
-        rainfallData = paste0(savePath, 'rainfallData.txt')
-        kataegis_result %>% write_delim(rainfallData, delim = '\t', col_names = T)
+        kataegisData = paste0(savePath, 'kataegisData.txt')
+        kataegis_result %>% write_delim(kataegisData, delim = '\t', col_names = T)
       }
     }
     else {
@@ -973,8 +973,8 @@ rainfall <- function(sample, highlight, min, max, chromosome, projectID, pythonO
     }
 
     output = list(
-      'plotPath' = rainfall,
-      'txtPath' = rainfallData
+      'plotPath' = kataegis,
+      'txtPath' = kataegisData
      )
   }, error = function(e) {
     errors <<- e$message

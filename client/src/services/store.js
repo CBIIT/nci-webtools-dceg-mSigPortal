@@ -177,7 +177,7 @@ export const getInitialState = () => ({
     pubPcaErr: false,
     pubSubmitOverlay: false,
   },
-  rainfall: {
+  kataegis: {
     sample: '',
     sampleOptions: '',
     highlight: false,
@@ -471,11 +471,11 @@ const pcaSlice = createSlice({
   },
 });
 
-const rainfallSlice = createSlice({
-  name: 'rainfall',
-  initialState: getInitialState().rainfall,
+const kataegisSlice = createSlice({
+  name: 'kataegis',
+  initialState: getInitialState().kataegis,
   reducers: {
-    updateRainfall: (state, action) => {
+    updateKataegis: (state, action) => {
       return {
         ...state,
         ...action.payload,
@@ -682,7 +682,7 @@ const rootReducer = combineReducers({
   mutationalPattern: mutationalPatternSlice.reducer,
   profileComparison: profileComparisonSlice.reducer,
   pca: pcaSlice.reducer,
-  rainfall: rainfallSlice.reducer,
+  kataegis: kataegisSlice.reducer,
 
   error: errorSlice.reducer,
   success: successSlice.reducer,
@@ -715,7 +715,7 @@ export const { updateCosineSimilarity } = cosineSimilaritySlice.actions;
 export const { updateMutationalPattern } = mutationalPatternSlice.actions;
 export const { updateProfileComparison } = profileComparisonSlice.actions;
 export const { updatePCA } = pcaSlice.actions;
-export const { updateRainfall } = rainfallSlice.actions;
+export const { updateKataegis } = kataegisSlice.actions;
 
 export const { updateError } = errorSlice.actions;
 export const { updateSuccess } = successSlice.actions;
@@ -770,8 +770,8 @@ export function dispatchPCA(obj) {
   store.dispatch(updatePCA(obj));
 }
 
-export function dispatchRainfall(obj) {
-  store.dispatch(updateRainfall(obj));
+export function dispatchKataegis(obj) {
+  store.dispatch(updateKataegis(obj));
 }
 
 export function dispatchError(msg) {

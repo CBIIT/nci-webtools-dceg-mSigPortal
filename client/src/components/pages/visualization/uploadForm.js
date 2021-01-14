@@ -25,7 +25,7 @@ import {
   dispatchPCA,
   dispatchMutationalPattern,
   dispatchProfilerSummary,
-  dispatchRainfall,
+  dispatchKataegis,
 } from '../../../services/store';
 const { Group, Label, Control, Check, Text } = Form;
 const { Title, Content } = Popover;
@@ -244,7 +244,7 @@ export default function UploadForm() {
     dispatchCosineSimilarity(initialState.cosineSimilarity);
     dispatchProfileComparison(initialState.profileComparison);
     dispatchPCA(initialState.pca);
-    dispatchRainfall(initialState.rainfall);
+    dispatchKataegis(initialState.kataegis);
   }
 
   //   Uploads inputFile and returns a projectID

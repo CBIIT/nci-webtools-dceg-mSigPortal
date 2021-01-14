@@ -8,7 +8,7 @@ import {
   dispatchMutationalProfiles,
   dispatchCosineSimilarity,
   dispatchProfileComparison,
-  dispatchRainfall,
+  dispatchKataegis,
   dispatchPCA,
 } from '../../../services/store';
 import ProfilerSummary from './profilerSummary';
@@ -17,7 +17,7 @@ import CosineSimilarity from './cosineSimilarity';
 import MutationalPattern from './mutationalPattern';
 import ProfileComparison from './profileComparison';
 import PCA from './pca';
-import Rainfall from './rainfall';
+import Kataegis from './kataegis';
 import Download from './download';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
@@ -154,7 +154,7 @@ export default function Results({ setOpenSidebar }) {
       selectFilter: mpFilter,
     });
 
-    // Cosine Similarity - Profile Comparison - PCA - Rainfall
+    // Cosine Similarity - Profile Comparison - PCA - Kataegis
     const sampleNameOptions = [
       ...new Set(
         svgList.map((plot) => {
@@ -210,7 +210,7 @@ export default function Results({ setOpenSidebar }) {
       userMatrixOptions: filteredMatrixOptions,
     });
 
-    dispatchRainfall({
+    dispatchKataegis({
       sample: sampleNameOptions[0],
       sampleOptions: sampleNameOptions,
     });
@@ -459,11 +459,11 @@ export default function Results({ setOpenSidebar }) {
           </div>
           <div
             style={{
-              display: displayTab == 'rainfall' ? 'block' : 'none',
+              display: displayTab == 'kataegis' ? 'block' : 'none',
               minHeight: '420px',
             }}
           >
-            <Rainfall submitR={(fn, args) => submitR(fn, args)} />
+            <Kataegis submitR={(fn, args) => submitR(fn, args)} />
           </div>
           <div
             style={{
@@ -480,7 +480,9 @@ export default function Results({ setOpenSidebar }) {
           style={{ minHeight: '420px' }}
         >
           <h4>Instructions</h4>
-          <p>Choose a Data Source and it's associated options to submit a query</p>
+          <p>
+            Choose a Data Source and it's associated options to submit a query
+          </p>
           <hr />
           <h4>Data Souce</h4>
           <p>Public: Perform analysis using data available on the website</p>
