@@ -6,21 +6,13 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
 import Select from '../../controls/select/select';
-import {
-  Table,
-  paginationText,
-  paginationSizeSelector,
-  paginationButton,
-  loadingOverlay,
-} from '../../controls/table/table';
+import KataegisTable from './kataegisTable';
 
 const { Group, Check, Label, Control } = Form;
 
 export default function Kataegis({ submitR }) {
   const { source, inputFormat } = useSelector((state) => state.visualize);
-
   const { projectID } = useSelector((state) => state.visualizeResults);
-
   const {
     sample,
     sampleOptions,
@@ -93,12 +85,13 @@ export default function Kataegis({ submitR }) {
 
         dispatchKataegis({ loading: false });
       } else {
-        const { debugR, output, errors } = await response.json();
+        const { debugR, output, errors, data } = await response.json();
         if (Object.keys(output).length) {
           dispatchKataegis({
             debugR: debugR,
             plotPath: output.plotPath,
             txtPath: output.txtPath,
+            kataegisData: JSON.parse(data),
             loading: false,
           });
         } else {
@@ -107,6 +100,7 @@ export default function Kataegis({ submitR }) {
             plotPath: '',
             txtPath: '',
             err: errors,
+            kataegisData: [],
             loading: false,
           });
         }
@@ -198,7 +192,7 @@ export default function Kataegis({ submitR }) {
               </Col>
               <Col lg="2" className="d-flex justify-content-end">
                 <Button
-                  className="mt-auto"
+                  className="mt-auto mb-3"
                   variant="primary"
                   onClick={calculateR}
                 >
@@ -222,6 +216,7 @@ export default function Kataegis({ submitR }) {
                 plotURL={plotURL}
                 txtPath={txtPath ? projectID + txtPath : null}
               />
+              <KataegisTable />
             </div>
           </div>
         </div>

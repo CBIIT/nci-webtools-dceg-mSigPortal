@@ -225,7 +225,7 @@ export default function MutationalPattern({ submitR }) {
               <Col lg="3" />
               <Col lg="2" className="d-flex justify-content-end">
                 <Button
-                  className="mt-auto"
+                  className="mt-auto mb-3"
                   variant="primary"
                   onClick={() => {
                     calculateR('mutationalPattern', {
@@ -277,7 +277,7 @@ export default function MutationalPattern({ submitR }) {
               <Col lg="3" />
               <Col lg="2" className="d-flex justify-content-end">
                 <Button
-                  className="mt-auto"
+                  className="mt-auto mb-3"
                   variant="primary"
                   onClick={() => {
                     calculateR('mutationalPatternPublic', {

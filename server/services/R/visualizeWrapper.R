@@ -947,6 +947,7 @@ kataegis <- function(sample, highlight, min, max, chromosome, projectID, pythonO
     errors = ''
     kataegis = paste0(savePath, 'kataegis.svg')
     kataegisData = ''
+    kataegisJSON = ''
 
     mutationPath = paste0(savePath, '../')
     mutationFile = list.files(mutationPath, pattern = "_mSigPortal_SNV")
@@ -965,6 +966,7 @@ kataegis <- function(sample, highlight, min, max, chromosome, projectID, pythonO
 
       if (is.data.frame(kataegis_result)) {
         kataegisData = paste0(savePath, 'kataegisData.txt')
+        kataegisJSON = toJSON(kataegis_result, auto_unbox = TRUE)
         kataegis_result %>% write_delim(kataegisData, delim = '\t', col_names = T)
       }
     }
@@ -982,6 +984,6 @@ kataegis <- function(sample, highlight, min, max, chromosome, projectID, pythonO
   }, finally = {
     sink(con)
     sink(con)
-    return(toJSON(list('stdout' = stdout, 'output' = output, 'errors' = errors), pretty = TRUE, auto_unbox = TRUE))
+    return(toJSON(list('stdout' = stdout, 'output' = output, 'errors' = errors, 'data' = kataegisJSON), pretty = TRUE, auto_unbox = TRUE))
   })
 }
