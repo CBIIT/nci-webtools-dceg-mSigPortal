@@ -7,12 +7,11 @@ import {
   paginationText,
   paginationSizeSelector,
   paginationButton,
-  loadingOverlay,
 } from '../../controls/table/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 
 export default function KataegisTable() {
-  const { kataegisData, dataField, filters, order, page, size } = useSelector(
+  const { kataegisData, dataField, order, page, size } = useSelector(
     (state) => state.kataegis
   );
 

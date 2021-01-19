@@ -228,7 +228,7 @@ export default function Kataegis({ submitR }) {
           </p>
         </div>
       )}
-      <Debug msg={debugR} />
+      {/* <Debug msg={debugR} /> */}
     </div>
   );
 }
