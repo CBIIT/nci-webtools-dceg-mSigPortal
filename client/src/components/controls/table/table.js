@@ -14,10 +14,11 @@ export const defaultProps = {
   noDataIndication: () => (
     <div
       className="d-flex align-items-center justify-content-center"
-      style={{ minHeight: '60px' }}>
+      style={{ minHeight: '60px' }}
+    >
       No data
     </div>
-  )
+  ),
 };
 
 export const paginationText = (singular = 'event', plural = 'events') => (
@@ -47,7 +48,7 @@ export const paginationIcons = {
   ),
   nextPageText: (
     <Icon name="angle-right" alt="next page" width="16" height="10" />
-  )
+  ),
 };
 
 export const paginationButton = ({
@@ -55,7 +56,7 @@ export const paginationButton = ({
   active,
   disabled,
   title,
-  onPageChange
+  onPageChange,
 }) => {
   let icons = {
     'first page': (
@@ -69,7 +70,7 @@ export const paginationButton = ({
     ),
     'previous page': (
       <Icon name="angle-left" alt="previous page" width="16" height="12" />
-    )
+    ),
   };
   let content = icons[title] || <span>{title}</span>;
 
@@ -77,12 +78,14 @@ export const paginationButton = ({
     <li
       key={`pagination-list-item-${page}`}
       className={['page-item', active ? 'active' : 'text-muted'].join(' ')}
-      onClick={e => onPageChange(page)}>
+      onClick={(e) => onPageChange(page)}
+    >
       <a
         className="page-link d-flex align-items-center h-100"
         style={{ border: 'none', fontSize: '0.8rem' }}
         href="javascript:void(0)"
-        aria-label={title}>
+        aria-label={title}
+      >
         {content}
       </a>
     </li>
@@ -92,15 +95,16 @@ export const paginationButton = ({
 export const paginationSizeSelector = ({
   options,
   currSizePerPage,
-  onSizePerPageChange
+  onSizePerPageChange,
 }) => {
   return (
     <select
       className="form-control-sm"
       value={currSizePerPage}
-      onChange={e => onSizePerPageChange(e.target.value)}
-      aria-label="Select a pagination size">
-      {options.map(option => (
+      onChange={(e) => onSizePerPageChange(e.target.value)}
+      aria-label="Select a pagination size"
+    >
+      {options.map((option) => (
         <option key={option.page} value={option.page}>
           {option.text}
         </option>
@@ -112,44 +116,44 @@ export const paginationSizeSelector = ({
 export const overlayConfig = {
   spinner: true,
   styles: {
-    spinner: base => ({
+    spinner: (base) => ({
       ...base,
       marginTop: '10px',
       width: '40px',
       '& svg circle': {
-        stroke: '#888'
-      }
+        stroke: '#888',
+      },
     }),
-    wrapper: base => ({
-      ...base
+    wrapper: (base) => ({
+      ...base,
       // 'pointer-events': 'none'
     }),
-    overlay: base => ({
+    overlay: (base) => ({
       ...base,
-      background: 'rgba(255, 255, 255, 0.4)'
-    })
-  }
+      background: 'rgba(255, 255, 255, 0.4)',
+    }),
+  },
 };
 
 export const plotOverlayConfig = {
   spinner: true,
   styles: {
     ...overlayConfig.styles,
-    wrapper: base => ({
+    wrapper: (base) => ({
       ...base,
       position: 'absolute',
       width: '100%',
-      height: '100%'
-    })
-  }
+      height: '100%',
+    }),
+  },
 };
 
 export const loadingOverlay = overlayFactory(overlayConfig);
 
-export const Table = props => {
-  props.columns.forEach(c => {
+export const Table = (props) => {
+  props.columns.forEach((c) => {
     if (c.sort) {
-      let sortIcon = order => {
+      let sortIcon = (order) => {
         switch (order) {
           case 'asc':
             return 'sort-up';
@@ -160,7 +164,7 @@ export const Table = props => {
         }
       };
 
-      c.sortCaret = order => (
+      c.sortCaret = (order) => (
         <Icon
           name={sortIcon(order)}
           alt="sort icon"

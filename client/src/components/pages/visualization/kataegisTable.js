@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import { dispatchKataegis } from '../../../services/store';
 import {
   Table,
@@ -11,98 +12,98 @@ import {
 import paginationFactory from 'react-bootstrap-table2-paginator';
 
 export default function KataegisTable() {
-  const { kataegisData, dataField, order, page, size } = useSelector(
+  const { kataegisData, dataField, filters, order, page, size } = useSelector(
     (state) => state.kataegis
   );
 
-  const commonProps = {
+  const commonProps = (placeholder) => ({
     title: true,
     sort: true,
     onSort: handleSort,
-    // headerStyle: { width: '65px', minWidth: '65px' },
     headerClasses: 'overflow-ellipsis',
     classes: 'overflow-ellipsis',
-  };
+    filter: textFilter({ placeholder }),
+  });
 
   const columns = [
     {
       dataField: 'sample',
       text: 'sample',
       headerTitle: (_) => 'Sample',
-      ...commonProps,
+      ...commonProps('sample'),
       sort: false,
     },
     {
       dataField: 'chrom',
       text: 'Chr.',
       headerTitle: (_) => 'Chromosome',
-      ...commonProps,
+      ...commonProps('chrom'),
     },
     {
       dataField: 'start',
       text: 'start',
       headerTitle: (_) => 'Start',
-      ...commonProps,
+      ...commonProps('start'),
     },
     {
       dataField: 'end',
       text: 'end',
       headerTitle: (_) => 'End',
-      ...commonProps,
+      ...commonProps('end'),
     },
     {
       dataField: 'chrom.arm',
       text: 'chrom.arm',
       headerTitle: (_) => 'chrom.arm',
-      ...commonProps,
+      ...commonProps('chrom.arm'),
     },
     {
       dataField: 'length',
       text: 'length',
       headerTitle: (_) => 'Length',
-      ...commonProps,
+      ...commonProps('length'),
     },
     {
       dataField: 'number.mut',
       text: 'number.mut',
       headerTitle: (_) => 'number.mut',
-      ...commonProps,
+      ...commonProps('number.mut'),
     },
     {
       dataField: 'weight.C>X',
       text: 'weight.C>X',
       headerTitle: (_) => 'weight.C>X',
-      ...commonProps,
+      ...commonProps('weight.C>X'),
     },
     {
       dataField: 'confidence',
       text: 'confidence',
       headerTitle: (_) => 'Confidence',
-      ...commonProps,
+      ...commonProps('confidence'),
     },
     {
       dataField: 'annotation',
       text: 'annotation',
       headerTitle: (_) => 'Annotation',
-      ...commonProps,
+      ...commonProps('annotation'),
     },
     {
       dataField: 'distanceToTSS',
       text: 'distanceToTSS',
       headerTitle: (_) => 'distanceToTSS',
-      ...commonProps,
+      ...commonProps('distanceToTSS'),
     },
     {
       dataField: 'geneName',
       text: 'geneName',
       headerTitle: (_) => 'geneName',
-      ...commonProps,
+      ...commonProps('geneName'),
     },
     {
       dataField: 'geneID',
       text: 'geneID',
       headerTitle: (_) => 'geneID',
-      ...commonProps,
+      ...commonProps('geneID'),
     },
   ];
 
@@ -111,17 +112,18 @@ export default function KataegisTable() {
   }
 
   const tableProps = {
-    keyField: 'chrom',
+    keyField: 'index',
     loading: false,
-    data: kataegisData,
+    data: kataegisData.map((d, i) => ({ ...d, index: i })),
     columns: columns,
-    overlay: loadingOverlay,
     defaultSorted: [
       {
         dataField: dataField || 'chrom',
         order: order || 'asc',
       },
     ],
+    filter: filterFactory(),
+    filterPosition: 'top',
     pagination: paginationFactory({
       page: page || 1,
       sizePerPage: size || 10,
@@ -144,35 +146,6 @@ export default function KataegisTable() {
   return (
     kataegisData.length > 0 && (
       <div className="mt-3 px-5" style={{ minWidth: '800px' }}>
-        <div
-          key="controls"
-          className="d-flex align-items-center justify-content-between"
-        >
-          {/* <div key="snpSearch" className="d-flex mb-2">
-          <input
-            style={{ minWidth: '280px' }}
-            className="form-control form-control-sm"
-            placeholder="Search for a SNP or SNPs (ex/ rs3 rs4)"
-            value={summarySnpTables.snp}
-            onChange={(e) => setSnp(e.target.value)}
-            aria-label="Filter SNP"
-          />
-          <button
-            className="btn btn-sm btn-silver flex-shrink-auto d-flex"
-            onClick={handleSnpReset}
-          >
-            <Icon className="opacity-50" name="times" width="12" />
-            <span className="sr-only">Clear</span>
-          </button>
-          <button
-            className="btn btn-sm btn-silver flex-shrink-auto mx-2"
-            onClick={handleSnpLookup}
-          >
-            Search
-          </button>
-        </div>
-      </div> */}
-        </div>
         <Table wrapperClasses="table-responsive" {...tableProps} />
       </div>
     )
