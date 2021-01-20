@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Row, Col, Card, Button, Nav } from 'react-bootstrap';
+import { Form, Row, Col, Tab, Button, Nav } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import Tumor from './tumor';
 import Separated from './separated';
@@ -28,12 +28,12 @@ import {
   SidebarPanel,
   MainPanel,
 } from '../../../controls/sidebar-container/sidebar-container';
-import Accordions from '../../../controls/accordions/accordions';
 
-const { Header, Body } = Card;
 const { Group, Label, Check } = Form;
+const { Container, Content, Pane } = Tab;
+const { Item, Link } = Nav;
 
-export default function ExposureExploring({ match, populateControls }) {
+export default function Exposure({ match, populateControls }) {
   const { exampleName } = match.params;
   const { exposureSignature, exposureCancer, signatureNames } = useSelector(
     (state) => state.exploring
@@ -68,6 +68,7 @@ export default function ExposureExploring({ match, populateControls }) {
     signatureFile,
     usePublicSignature,
     source,
+    display,
     loading,
     loadingMsg,
     projectID,
@@ -682,26 +683,26 @@ export default function ExposureExploring({ match, populateControls }) {
     dispatchExpLandscape({ variableFile: file.name });
   }
 
-  const sections = [
+  const tabs = [
     {
       component: <Tumor />,
-      id: 'tumor',
-      title: 'Tumor Mutational Burden',
+      key: 'tumor',
+      title: 'TMB',
     },
     {
       component: <Separated />,
-      id: 'separated',
-      title: 'Tumor Mutational Burden Separated by Signatures',
+      key: 'separated',
+      title: 'TMB by Signatures',
     },
     {
       component: <Across calculateAcross={calculateAcross} />,
-      id: 'across',
-      title: 'Mutational Signature Burden Across Cancer Types',
+      key: 'across',
+      title: 'MS Burden Across Cancer Types',
     },
     {
       component: <Decomposition />,
-      id: 'decomposition',
-      title: 'Evaluating the Performance of Mutational Signature Decomposition',
+      key: 'decomposition',
+      title: 'MS Decomposition',
     },
     {
       component: (
@@ -711,8 +712,8 @@ export default function ExposureExploring({ match, populateControls }) {
           getSignatureNames={getSignatureNames}
         />
       ),
-      id: 'association',
-      title: 'Mutational Signature Association',
+      key: 'association',
+      title: 'MS Association',
     },
     {
       component: (
@@ -721,13 +722,13 @@ export default function ExposureExploring({ match, populateControls }) {
           handleVariable={handleVariable}
         />
       ),
-      id: 'landscape',
-      title: 'Landscape of Mutational Signature Activity',
+      key: 'landscape',
+      title: 'MS Activity Landscape',
     },
     {
       component: <Prevalence calculatePrevalence={calculatePrevalence} />,
-      id: 'prevalence',
-      title: 'Prevalence of Mutational Signature',
+      key: 'prevalence',
+      title: 'MS Prevalence',
     },
   ];
 
@@ -1065,25 +1066,38 @@ export default function ExposureExploring({ match, populateControls }) {
           </div>
         </SidebarPanel>
         <MainPanel>
-          <Card>
-            <Header>
-              <Nav variant="pills" defaultActiveKey="#exploring/exposure">
-                <Nav.Item>
-                  <Nav.Link href="#exploring/exposure">
-                    Exposure Exploring
-                  </Nav.Link>
-                </Nav.Item>
-              </Nav>
-            </Header>
-            <Body>
-              <LoadingOverlay
-                active={loading}
-                content={loadingMsg}
-                showIndicator={loadingMsg}
-              />
-              <Accordions components={sections} />
-            </Body>
-          </Card>
+          <Container
+            transition={false}
+            className="mt-2"
+            defaultActiveKey={display}
+            activeKey={display}
+            onSelect={(tab) => dispatchExpExposure({ display: tab })}
+          >
+            <Nav variant="tabs">
+              {tabs.map(({ key, title }) => (
+                <Item>
+                  <Link eventKey={key} as="button" className="outline-none">
+                    <strong>{title}</strong>
+                  </Link>
+                </Item>
+              ))}
+            </Nav>
+            <Content
+              className={`bg-white tab-pane-bordered rounded-0 d-block`}
+              style={{ overflowX: 'auto' }}
+            >
+              {tabs.map(({ key, component }) => (
+                <Pane key={key} eventKey={key} className="border-0">
+                  <LoadingOverlay
+                    active={loading}
+                    content={loadingMsg}
+                    showIndicator={loadingMsg}
+                  />
+                  {component}
+                </Pane>
+              ))}
+            </Content>
+          </Container>
         </MainPanel>
       </SidebarContainer>
     </div>

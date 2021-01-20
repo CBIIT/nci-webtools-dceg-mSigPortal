@@ -184,102 +184,101 @@ export default function MutationalSignatureProfile({ submitR }) {
 
   return (
     <div>
-      <Form>
+      <Form className="p-3">
         <LoadingOverlay active={loading} />
-        <div>
-          <Row className="justify-content-center">
-            <Col lg="3">
-              <Select
-                id="mscProfileName"
-                label="Profile Name"
-                value={profileName}
-                options={profileNameOptions}
-                onChange={handleProfile}
-              />
-            </Col>
-            <Col lg="4">
-              <Select
-                id="mscRefSet1"
-                label="Reference Signature Set 1"
-                value={refSignatureSet1}
-                options={refSignatureSetOptions1}
-                onChange={handleSet1}
-              />
-            </Col>
-            <Col lg="4">
-              <Select
-                id="mscSigName1"
-                label="Signature Name 1"
-                value={signatureName1}
-                options={signatureNameOptions1}
-                onChange={(name) =>
-                  dispatchExpMutationalSigComparison({
-                    signatureName1: name,
-                  })
-                }
-              />
-            </Col>
-            <Col lg="1" />
-          </Row>
-          <Row className="mt-3">
-            <Col lg="3" />
-            <Col lg="4">
-              <Select
-                id="mscSigSet2"
-                label="Signature Set 2"
-                value={refSignatureSet2}
-                options={refSignatureSetOptions2}
-                onChange={handleSet2}
-              />
-            </Col>
-            <Col lg="4">
-              <Select
-                id="mscSetName2"
-                label="Signature Name 2"
-                value={signatureName2}
-                options={signatureNameOptions2}
-                onChange={(name) =>
-                  dispatchExpMutationalSigComparison({
-                    signatureName2: name,
-                  })
-                }
-              />
-            </Col>
-            <Col lg="1" className="d-flex justify-content-end">
-              <Button
-                className="mt-auto mb-3"
-                variant="primary"
-                onClick={() => {
-                  calculateR('mutationalSignatureComparison', {
-                    profileName: profileName,
-                    refSignatureSet1: refSignatureSet1,
-                    signatureName1: signatureName1,
-                    refSignatureSet2: refSignatureSet2,
-                    signatureName2: signatureName2,
-                  });
-                }}
-              >
-                Calculate
-              </Button>
-            </Col>
-          </Row>
-          <div id="withinPlot">
-            <div style={{ display: err ? 'block' : 'none' }}>
-              <p>
-                An error has occured. Please verify your input.
-              </p>
-            </div>
-            <div style={{ display: plotURL ? 'block' : 'none' }}>
-              <Plot
-                plotName={plotPath.split('/').slice(-1)[0]}
-                plotURL={plotURL}
-                maxHeight="1000px"
-              />
-            </div>
-          </div>
-        </div>
+        <Row className="justify-content-center">
+          <Col lg="3">
+            <Select
+              id="mscProfileName"
+              label="Profile Name"
+              value={profileName}
+              options={profileNameOptions}
+              onChange={handleProfile}
+            />
+          </Col>
+          <Col lg="4">
+            <Select
+              id="mscRefSet1"
+              label="Reference Signature Set 1"
+              value={refSignatureSet1}
+              options={refSignatureSetOptions1}
+              onChange={handleSet1}
+            />
+          </Col>
+          <Col lg="4">
+            <Select
+              id="mscSigName1"
+              label="Signature Name 1"
+              value={signatureName1}
+              options={signatureNameOptions1}
+              onChange={(name) =>
+                dispatchExpMutationalSigComparison({
+                  signatureName1: name,
+                })
+              }
+            />
+          </Col>
+          <Col lg="1" />
+        </Row>
+        <Row>
+          <Col lg="3" />
+          <Col lg="4">
+            <Select
+              id="mscSigSet2"
+              label="Signature Set 2"
+              value={refSignatureSet2}
+              options={refSignatureSetOptions2}
+              onChange={handleSet2}
+            />
+          </Col>
+          <Col lg="4">
+            <Select
+              id="mscSetName2"
+              label="Signature Name 2"
+              value={signatureName2}
+              options={signatureNameOptions2}
+              onChange={(name) =>
+                dispatchExpMutationalSigComparison({
+                  signatureName2: name,
+                })
+              }
+            />
+          </Col>
+          <Col lg="1" className="d-flex justify-content-end">
+            <Button
+              className="mt-auto mb-3"
+              variant="primary"
+              onClick={() => {
+                calculateR('mutationalSignatureComparison', {
+                  profileName: profileName,
+                  refSignatureSet1: refSignatureSet1,
+                  signatureName1: signatureName1,
+                  refSignatureSet2: refSignatureSet2,
+                  signatureName2: signatureName2,
+                });
+              }}
+            >
+              Calculate
+            </Button>
+          </Col>
+        </Row>
       </Form>
-      <Debug msg={debugR} />
+
+      <div id="mutationalSignatureComparison">
+        <div style={{ display: err ? 'block' : 'none' }}>
+          <p>An error has occured. Please verify your input.</p>
+        </div>
+        <div style={{ display: plotURL ? 'block' : 'none' }}>
+          <hr />
+          <Plot
+            className="p-3"
+            plotName={plotPath.split('/').slice(-1)[0]}
+            plotURL={plotURL}
+            maxHeight="1000px"
+          />
+        </div>
+      </div>
+      {/* <Debug msg={debugR} /> */}
     </div>
   );
 }

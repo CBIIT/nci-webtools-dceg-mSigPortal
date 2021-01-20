@@ -61,8 +61,9 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
 
   return (
     <div>
-      <Form>
+      <Form className="p-3">
         <LoadingOverlay active={loading} />
+        <p>Landscape of Mutational Signature Activity</p>
         <Row className="">
           <Col lg="4">
             <Group controlId="landscape">
@@ -99,25 +100,25 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
             </Button>
           </Col>
         </Row>
-        <div id="exposureLandscapePlot">
-          {err && (
-            <div>
-              <p>
-                An error has occured. Please verify your input.
-              </p>
-              <p>Error: {err}</p>
-            </div>
-          )}
-          <div style={{ display: plotURL ? 'block' : 'none' }}>
-            <Plot
-              plotName={plotPath.split('/').slice(-1)[0]}
-              plotURL={plotURL}
-              txtPath={projectID + txtPath}
-            />
-          </div>
-        </div>
       </Form>
-      <Debug msg={debugR} />
+      <div id="exposureLandscapePlot">
+        {err && (
+          <div>
+            <p>An error has occured. Please verify your input.</p>
+            <p>Error: {err}</p>
+          </div>
+        )}
+        <div style={{ display: plotURL ? 'block' : 'none' }}>
+          <hr />
+          <Plot
+            className="p-3"
+            plotName={plotPath.split('/').slice(-1)[0]}
+            plotURL={plotURL}
+            txtPath={projectID + txtPath}
+          />
+        </div>
+      </div>
+      {/* <Debug msg={debugR} /> */}
     </div>
   );
 }

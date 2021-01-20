@@ -11,7 +11,7 @@ const { Header, Body } = Card;
 const { Toggle, Collapse } = Accordion;
 const { Group, Label, Check, Control } = Form;
 
-export default function EtiologyExploring() {
+export default function Etiology() {
   const { exposureAccordion, publicDataOptions } = useSelector(
     (state) => state.exploring
   );
@@ -40,51 +40,5 @@ export default function EtiologyExploring() {
     dispatchExploring({ displayTab: 'etiology' });
   }, []);
 
-  const sections = [
-    // {
-    //   component: <Tumor />,
-    //   id: 'tumor',
-    //   title: 'Tumor Mutational Burden',
-    // },
-    // {
-    //   component: <Activity calculateActivity={calculateActivity} />,
-    //   id: 'activity',
-    //   title: 'Mutational Signature Activity',
-    // },
-    // {
-    //   component: <Decomposition />,
-    //   id: 'decomposition',
-    //   title: 'Evaluating the Performance of Mutational Signature Decomposition',
-    // },
-    // {
-    //   component: <Association calculateAssociation={calculateAssociation} />,
-    //   id: 'association',
-    //   title: 'Mutational Signature Association',
-    // },
-    // {
-    //   component: <Landscape calculateLandscape={calculateLandscape} />,
-    //   id: 'landscape',
-    //   title: 'Landscape of Mutational Signature Activity',
-    // },
-    // {
-    //   component: <Prevalence calculatePrevalence={calculatePrevalence} />,
-    //   id: 'prevalence',
-    //   title: 'Prevalence of Mutational Signature',
-    // },
-  ];
-
-  return (
-    <Card>
-      <Header>
-        <Nav variant="pills" defaultActiveKey="#exploring/etiology">
-          <Nav.Item>
-            <Nav.Link href="#exploring/etiology">Etiology Exploring</Nav.Link>
-          </Nav.Item>
-        </Nav>
-      </Header>
-      <Body>
-        <h4>TBA</h4>
-      </Body>
-    </Card>
-  );
+  return <div className="bg-white border rounded p-4">TBA</div>;
 }

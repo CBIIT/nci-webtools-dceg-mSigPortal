@@ -51,8 +51,10 @@ export default function Decomposition() {
   }
 
   return (
-    <div>
+    <div className="p-3">
       <LoadingOverlay active={loading} />
+
+      <p>Evaluating the Performance of Mutational Signature Decomposition</p>
       {!err && !plotURL && <p>Please calculate using the left side panel.</p>}
       {err && (
         <div>
@@ -60,14 +62,16 @@ export default function Decomposition() {
           <p>Error: {err}</p>
         </div>
       )}
+
       {plotURL && (
         <Plot
+          className="p-3"
           plotName={plotPath.split('/').slice(-1)[0]}
           plotURL={plotURL}
           txtPath={projectID + txtPath}
         />
       )}
-      <Debug msg={debugR} />
+      {/* <Debug msg={debugR} /> */}
     </div>
   );
 }

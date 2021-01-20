@@ -50,7 +50,8 @@ export default function Separated() {
   }
 
   return (
-    <div>
+    <div className="p-3">
+      <p>Tumor Mutational Burden Separated by Signatures</p>
       {!err && !plotURL && <p>Please calculate using the left side panel.</p>}
       {err && (
         <div>
@@ -59,9 +60,12 @@ export default function Separated() {
         </div>
       )}
       {plotURL && (
-        <Plot plotName={plotPath.split('/').slice(-1)[0]} plotURL={plotURL} />
+        <Plot
+          plotName={plotPath.split('/').slice(-1)[0]}
+          plotURL={plotURL}
+        />
       )}
-      <Debug msg={debugR} />
+      {/* <Debug msg={debugR} /> */}
     </div>
   );
 }

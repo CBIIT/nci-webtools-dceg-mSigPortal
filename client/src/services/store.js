@@ -200,6 +200,7 @@ export const getInitialState = () => ({
 
   exploring: {
     displayTab: 'signature',
+    signatureDisplay: 'referenceSignatures',
     signatureAccordion: {
       referenceSignatures: true,
       mutationalSignatureProfile: true,
@@ -299,6 +300,7 @@ export const getInitialState = () => ({
     signatureFile: '',
     usePublicSignature: true,
     source: 'public',
+    display: 'tumor',
     loading: false,
     loadingMsg: null,
     projectID: '',

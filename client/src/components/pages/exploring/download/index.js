@@ -16,18 +16,5 @@ export default function Download() {
     dispatchExploring({ displayTab: 'download' });
   }, []);
 
-  return (
-    <Card>
-      <Header>
-        <Nav variant="pills" defaultActiveKey="#exploring/download">
-          <Nav.Item>
-            <Nav.Link href="#exploring/download">Download</Nav.Link>
-          </Nav.Item>
-        </Nav>
-      </Header>
-      <Body>
-        <h4>TBA</h4>
-      </Body>
-    </Card>
-  );
+  return <div className="bg-white border rounded p-4">TBA</div>;
 }

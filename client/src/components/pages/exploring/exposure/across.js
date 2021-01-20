@@ -67,8 +67,9 @@ export default function Across({ calculateAcross }) {
 
   return (
     <div>
-      <Form>
+      <Form className="p-3">
         <LoadingOverlay active={loading} />
+        <p>Mutational Signature Burden Across Cancer Types</p>
         <Row className="">
           <Col lg="3">
             <Select
@@ -92,22 +93,26 @@ export default function Across({ calculateAcross }) {
             </Button>
           </Col>
         </Row>
-        <div id="exposureAcrossPlot">
-          {err && (
-            <div>
-              <p>An error has occured. Please verify your input.</p>
-              <p>Error: {err}</p>
-            </div>
-          )}
-          {plotURL && (
+      </Form>
+      <div id="exposureAcrossPlot">
+        {err && (
+          <div>
+            <p>An error has occured. Please verify your input.</p>
+            <p>Error: {err}</p>
+          </div>
+        )}
+        {plotURL && (
+          <>
+            <hr />
             <Plot
+              className="p-3"
               plotName={plotPath.split('/').slice(-1)[0]}
               plotURL={plotURL}
             />
-          )}
-          <Debug msg={debugR} />
-        </div>
-      </Form>
+          </>
+        )}
+        {/* <Debug msg={debugR} /> */}
+      </div>
     </div>
   );
 }

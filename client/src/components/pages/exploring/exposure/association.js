@@ -124,8 +124,9 @@ export default function Association({
 
   return (
     <div>
-      <Form>
+      <Form className="p-3">
         <LoadingOverlay active={loading} />
+        <p>Mutational Signature Association</p>
         <Row className="">
           <Col lg="3">
             <Group controlId="toggleCancerType">
@@ -191,24 +192,26 @@ export default function Association({
             </Button>
           </Col>
         </Row>
-        <div id="exposureAssociationPlot">
-          {err && (
-            <div>
-              <p>
-                An error has occured. Please verify your input.
-              </p>
-              <p>Error: {err}</p>
-            </div>
-          )}
-          {plotURL && (
+      </Form>
+      <div id="exposureAssociationPlot">
+        {err && (
+          <div>
+            <p>An error has occured. Please verify your input.</p>
+            <p>Error: {err}</p>
+          </div>
+        )}
+        {plotURL && (
+          <>
+            <hr />
             <Plot
+              className="p-3"
               plotName={plotPath.split('/').slice(-1)[0]}
               plotURL={plotURL}
             />
-          )}
-          <Debug msg={debugR} />
-        </div>
-      </Form>
+          </>
+        )}
+        {/* <Debug msg={debugR} /> */}
+      </div>
     </div>
   );
 }

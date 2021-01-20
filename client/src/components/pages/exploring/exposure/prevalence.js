@@ -55,9 +55,10 @@ export default function Tumor({ calculatePrevalence }) {
 
   return (
     <div>
-      <Form>
+      <Form className="p-3">
         <LoadingOverlay active={loading} />
-        <Row className="">
+        <p>Prevalence of Mutational Signature</p>
+        <Row>
           <Col lg="5">
             <Group controlId="prevalenceMutations">
               <Label>Minimal Number Mutations within in Each Signature</Label>
@@ -84,24 +85,24 @@ export default function Tumor({ calculatePrevalence }) {
             </Button>
           </Col>
         </Row>
-        <div id="exposurePrevalencePlot">
-          {err && (
-            <div>
-              <p>
-                An error has occured. Please verify your input.
-              </p>
-              <p>Error: {err}</p>
-            </div>
-          )}
-          <div style={{ display: plotURL ? 'block' : 'none' }}>
-            <Plot
-              plotName={plotPath.split('/').slice(-1)[0]}
-              plotURL={plotURL}
-            />
-          </div>
-        </div>
       </Form>
-      <Debug msg={debugR} />
+      <div id="exposurePrevalencePlot">
+        {err && (
+          <div>
+            <p>An error has occured. Please verify your input.</p>
+            <p>Error: {err}</p>
+          </div>
+        )}
+        <div style={{ display: plotURL ? 'block' : 'none' }}>
+          <hr />
+          <Plot
+            className="p-3"
+            plotName={plotPath.split('/').slice(-1)[0]}
+            plotURL={plotURL}
+          />
+        </div>
+      </div>
+      {/* <Debug msg={debugR} /> */}
     </div>
   );
 }

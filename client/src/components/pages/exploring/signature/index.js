@@ -1,17 +1,19 @@
 import React, { useEffect } from 'react';
-import { Card, Nav } from 'react-bootstrap';
+import { Tab, Nav } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import ReferenceSignatures from './referenceSignatures';
 import MutationalSignatureProfile from './mutationalSignatureProfile';
 import CosineSimilarity from './cosineSimilarity';
 import MutationalSignatureComparison from './mutationalSignatureComparison';
 import { dispatchExploring } from '../../../../services/store';
-import Accordions from '../../../controls/accordions/accordions';
 
-const { Header, Body } = Card;
+const { Container, Content, Pane } = Tab;
+const { Item, Link } = Nav;
 
-export default function SignatureExploring() {
-  const { projectID } = useSelector((state) => state.exploring);
+export default function Signature() {
+  const { projectID, signatureDisplay } = useSelector(
+    (state) => state.exploring
+  );
 
   useEffect(() => {
     dispatchExploring({ displayTab: 'signature' });
@@ -32,24 +34,24 @@ export default function SignatureExploring() {
     });
   }
 
-  const sections = [
+  const tabs = [
     {
       component: (
         <ReferenceSignatures submitR={(fn, args) => submitR(fn, args)} />
       ),
-      id: 'referenceSignatures',
+      key: 'referenceSignatures',
       title: 'Current Reference Signatures in mSigPortal',
     },
     {
       component: (
         <MutationalSignatureProfile submitR={(fn, args) => submitR(fn, args)} />
       ),
-      id: 'mutationalSignatureProfile',
+      key: 'mutationalSignatureProfile',
       title: 'Mutational Signature Profile',
     },
     {
       component: <CosineSimilarity submitR={(fn, args) => submitR(fn, args)} />,
-      id: 'cosineSimilarity',
+      key: 'cosineSimilarity',
       title: 'Cosine Similarity Among Mutational Signatures',
     },
     {
@@ -58,23 +60,40 @@ export default function SignatureExploring() {
           submitR={(fn, args) => submitR(fn, args)}
         />
       ),
-      id: 'mutationalSignatureComparison',
+      key: 'mutationalSignatureComparison',
       title: 'Mutational Signatures Comparisons',
     },
   ];
 
   return (
-    <Card>
-      <Header>
-        <Nav variant="pills" defaultActiveKey="#exploring/signature">
-          <Nav.Item>
-            <Nav.Link href="#exploring/signature">Signature Exploring</Nav.Link>
-          </Nav.Item>
+    <div>
+      <Container
+        transition={false}
+        className="mt-2"
+        defaultActiveKey={signatureDisplay}
+        activeKey={signatureDisplay}
+        onSelect={(tab) => dispatchExploring({ signatureDisplay: tab })}
+      >
+        <Nav variant="tabs">
+          {tabs.map(({ key, title }) => (
+            <Item>
+              <Link eventKey={key} as="button" className="outline-none">
+                <strong>{title}</strong>
+              </Link>
+            </Item>
+          ))}
         </Nav>
-      </Header>
-      <Body>
-        <Accordions components={sections} />
-      </Body>
-    </Card>
+        <Content
+          className={`bg-white tab-pane-bordered rounded-0 d-block`}
+          style={{ overflowX: 'auto' }}
+        >
+          {tabs.map(({ key, component }) => (
+            <Pane key={key} eventKey={key} className="border-0">
+              {component}
+            </Pane>
+          ))}
+        </Content>
+      </Container>
+    </div>
   );
 }

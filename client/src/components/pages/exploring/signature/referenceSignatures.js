@@ -74,18 +74,17 @@ export default function ReferenceSignatures({ submitR }) {
   // }
 
   return (
-    <div>
-      <div id="plot">
-        <div style={{ display: err ? 'block' : 'none' }}>
-          <p>An error has occured. Please verify your input.</p>
-        </div>
-        <div style={{ display: plotURL ? 'block' : 'none' }}>
-          <Plot
-            plotName={plotURL.split('/').slice(-1)[0]}
-            plotURL={plotURL}
-            maxHeight="600px"
-          />
-        </div>
+    <div id="plot">
+      <div style={{ display: err ? 'block' : 'none' }}>
+        <p>An error has occured. Please verify your input.</p>
+      </div>
+      <div style={{ display: plotURL ? 'block' : 'none' }}>
+        <Plot
+          className="p-3"
+          plotName={plotURL.split('/').slice(-1)[0]}
+          plotURL={plotURL}
+          maxHeight="600px"
+        />
       </div>
     </div>
   );

@@ -125,75 +125,73 @@ export default function MutationalSignatureProfile({ submitR }) {
 
   return (
     <div>
-      <Form>
+      <Form className="p-3">
         <LoadingOverlay active={loading} />
-        <div>
-          <Row className="justify-content-center">
-            <Col lg="3">
-              <Select
-                id="csProfileName"
-                label="Profile Name"
-                value={profileName}
-                options={profileNameOptions}
-                onChange={handleProfile}
-              />
-            </Col>
-            <Col lg="4">
-              <Select
-                id="csRefSet1"
-                label="Reference Signature Set 1"
-                value={refSignatureSet1}
-                options={refSignatureSetOptions1}
-                onChange={(set) =>
-                  dispatchExpCosineSimilarity({ refSignatureSet1: set })
-                }
-              />
-            </Col>
-            <Col lg="4">
-              <Select
-                id="rcsRefSet2"
-                label="Signature Set 2"
-                value={refSignatureSet2}
-                options={refSignatureSetOptions2}
-                onChange={(set) =>
-                  dispatchExpCosineSimilarity({ refSignatureSet2: set })
-                }
-              />
-            </Col>
-            <Col lg="1" className="d-flex justify-content-end">
-              <Button
-                className="mt-auto mb-3"
-                variant="primary"
-                onClick={() => {
-                  calculateR('cosineSimilarity', {
-                    profileName: profileName,
-                    refSignatureSet1: refSignatureSet1,
-                    refSignatureSet2: refSignatureSet2,
-                  });
-                }}
-              >
-                Calculate
-              </Button>
-            </Col>
-          </Row>
-          <div id="withinPlot">
-            <div style={{ display: err ? 'block' : 'none' }}>
-              <p>
-                An error has occured. Please verify your input.
-              </p>
-            </div>
-            <div style={{ display: plotURL ? 'block' : 'none' }}>
-              <Plot
-                plotName={plotPath.split('/').slice(-1)[0]}
-                plotURL={plotURL}
-                txtPath={projectID + txtPath}
-                maxHeight="1000px"
-              />
-            </div>
-          </div>
-        </div>
+        <Row className="justify-content-center">
+          <Col lg="3">
+            <Select
+              id="csProfileName"
+              label="Profile Name"
+              value={profileName}
+              options={profileNameOptions}
+              onChange={handleProfile}
+            />
+          </Col>
+          <Col lg="4">
+            <Select
+              id="csRefSet1"
+              label="Reference Signature Set 1"
+              value={refSignatureSet1}
+              options={refSignatureSetOptions1}
+              onChange={(set) =>
+                dispatchExpCosineSimilarity({ refSignatureSet1: set })
+              }
+            />
+          </Col>
+          <Col lg="4">
+            <Select
+              id="rcsRefSet2"
+              label="Signature Set 2"
+              value={refSignatureSet2}
+              options={refSignatureSetOptions2}
+              onChange={(set) =>
+                dispatchExpCosineSimilarity({ refSignatureSet2: set })
+              }
+            />
+          </Col>
+          <Col lg="1" className="d-flex justify-content-end">
+            <Button
+              className="mt-auto mb-3"
+              variant="primary"
+              onClick={() => {
+                calculateR('cosineSimilarity', {
+                  profileName: profileName,
+                  refSignatureSet1: refSignatureSet1,
+                  refSignatureSet2: refSignatureSet2,
+                });
+              }}
+            >
+              Calculate
+            </Button>
+          </Col>
+        </Row>
       </Form>
-      <Debug msg={debugR} />
+      <div id="withinPlot">
+        <div style={{ display: err ? 'block' : 'none' }}>
+          <p>An error has occured. Please verify your input.</p>
+        </div>
+        <hr />
+        <div style={{ display: plotURL ? 'block' : 'none' }}>
+          <Plot
+            className="p-3"
+            plotName={plotPath.split('/').slice(-1)[0]}
+            plotURL={plotURL}
+            txtPath={projectID + txtPath}
+            maxHeight="1000px"
+          />
+        </div>
+      </div>
+      {/* <Debug msg={debugR} /> */}
     </div>
   );
 }

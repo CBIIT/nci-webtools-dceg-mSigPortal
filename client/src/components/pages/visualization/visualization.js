@@ -105,7 +105,7 @@ export default function Visualize({ match }) {
     });
   }
 
-  const subModules = [
+  const tabs = [
     { name: 'Profiler Summary', id: 'profilerSummary' },
     { name: 'Mutational Profiles', id: 'mutationalProfiles' },
     { name: 'Cosine Similarity', id: 'cosineSimilarity' },
@@ -126,7 +126,7 @@ export default function Visualize({ match }) {
           {/* for desktops and tablets */}
           <div className="d-none d-md-block">
             <Nav defaultActiveKey="profilerSummary">
-              {subModules.map(({ name, id }) => (
+              {tabs.map(({ name, id }) => (
                 <div key={id} className="d-inline-block">
                   <Button
                     variant="link"
@@ -155,7 +155,7 @@ export default function Visualize({ match }) {
           {/* for mobile devices */}
           <div className="row d-md-none">
             <Nav defaultActiveKey="summary">
-              {subModules.map(({ name, id }) => (
+              {tabs.map(({ name, id }) => (
                 <div key={id} className="col-12 text-center">
                   <Button
                     variant="link"

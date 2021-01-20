@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button, Form } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
@@ -447,10 +447,12 @@ export default function MutationalSignatureProfile({ submitR }) {
           </div>
           {plots[index].plotURL && (
             <div style={{ display: plots[index].plotURL ? 'block' : 'none' }}>
-              <span className="font-weight-bold">
+              <hr />
+              <span className="font-weight-bold p-3">
                 Plot {parseInt(index) + 1}
               </span>
               <Plot
+                className="p-3"
                 plotName={plots[index].plotPath.split('/').slice(-1)[0]}
                 plotURL={plots[index].plotURL}
                 maxHeight="1000px"
@@ -465,89 +467,94 @@ export default function MutationalSignatureProfile({ submitR }) {
 
   return (
     <div>
-      <LoadingOverlay active={loading} />
-      <Row className="">
-        <Col lg="2">
-          <Select
-            id="mspSource"
-            label="Signature Source"
-            value={plots[0].signatureSource}
-            options={plots[0].signatureSourceOptions}
-            onChange={(source) => handleSource(source, 0)}
-          />
-        </Col>
-        <Col lg="2">
-          <Select
-            id="mspProfileName"
-            label="Profile Name"
-            value={plots[0].profileName}
-            options={plots[0].profileNameOptions}
-            onChange={(profile) => handleProfile(profile, 0)}
-          />
-        </Col>
-        <Col lg="3">
-          <Select
-            id="mspSet"
-            label="Reference Signature Set"
-            value={plots[0].refSignatureSet}
-            options={plots[0].refSignatureSetOptions}
-            onChange={(set) => handleSet(set, 0)}
-          />
-        </Col>
-        <Col lg="2">
-          <Select
-            id="mspStrategy"
-            label="Experimental Strategy"
-            value={plots[0].strategy}
-            options={plots[0].strategyOptions}
-            onChange={(strategy) => handleStrategy(strategy, 0)}
-          />
-        </Col>
-        <Col lg="2">
-          <Select
-            id="mspSigName"
-            label="Signature Name"
-            value={plots[0].signatureName}
-            options={plots[0].signatureNameOptions}
-            onChange={(name) => {
-              let newPlots = plots.slice();
-              newPlots[0] = { ...newPlots[0], signatureName: name };
-              dispatchExpMutationalProfiles({
-                plots: newPlots,
-              });
-            }}
-          />
-        </Col>
-        <Col lg="1" className="d-flex justify-content-end">
-          <Button
-            className="mt-auto mb-3"
-            variant="primary"
-            onClick={handleCalculate}
-          >
-            Calculate
-          </Button>
-        </Col>
-      </Row>
-      {additionalControls()}
-      <Row className="mt-3">
-        <Col lg="11" />
-        <Col lg="1" className="d-flex justify-content-end mt-auto">
-          <Button
-            variant="secondary"
-            onClick={() => addPlots()}
-            title="Add Plot"
-            style={{ width: '2.25rem' }}
-          >
-            +
-          </Button>
-        </Col>
-      </Row>
+      <Form className="p-3">
+        <LoadingOverlay active={loading} />
+        <Row className="">
+          <Col lg="2">
+            <Select
+              id="mspSource"
+              label="Signature Source"
+              value={plots[0].signatureSource}
+              options={plots[0].signatureSourceOptions}
+              onChange={(source) => handleSource(source, 0)}
+            />
+          </Col>
+          <Col lg="2">
+            <Select
+              id="mspProfileName"
+              label="Profile Name"
+              value={plots[0].profileName}
+              options={plots[0].profileNameOptions}
+              onChange={(profile) => handleProfile(profile, 0)}
+            />
+          </Col>
+          <Col lg="3">
+            <Select
+              id="mspSet"
+              label="Reference Signature Set"
+              value={plots[0].refSignatureSet}
+              options={plots[0].refSignatureSetOptions}
+              onChange={(set) => handleSet(set, 0)}
+            />
+          </Col>
+          <Col lg="2">
+            <Select
+              id="mspStrategy"
+              label="Experimental Strategy"
+              value={plots[0].strategy}
+              options={plots[0].strategyOptions}
+              onChange={(strategy) => handleStrategy(strategy, 0)}
+            />
+          </Col>
+          <Col lg="2">
+            <Select
+              id="mspSigName"
+              label="Signature Name"
+              value={plots[0].signatureName}
+              options={plots[0].signatureNameOptions}
+              onChange={(name) => {
+                let newPlots = plots.slice();
+                newPlots[0] = { ...newPlots[0], signatureName: name };
+                dispatchExpMutationalProfiles({
+                  plots: newPlots,
+                });
+              }}
+            />
+          </Col>
+          <Col lg="1" className="d-flex justify-content-end">
+            <Button
+              className="mt-auto mb-3"
+              variant="primary"
+              onClick={handleCalculate}
+            >
+              Calculate
+            </Button>
+          </Col>
+        </Row>
+        {additionalControls()}
+        <Row className="mt-3">
+          <Col lg="11" />
+          <Col lg="1" className="d-flex justify-content-end mt-auto">
+            <Button
+              variant="secondary"
+              onClick={() => addPlots()}
+              title="Add Plot"
+              style={{ width: '2.25rem' }}
+            >
+              +
+            </Button>
+          </Col>
+        </Row>
+      </Form>
+
       <div id="plot0">
         <div style={{ display: err ? 'block' : 'none' }}>
           <p>An error has occured. Please verify your input.</p>
         </div>
         <div style={{ display: plots[0].plotURL ? 'block' : 'none' }}>
+          <hr />
           <Plot
+            className="p-3"
             plotName={plots[0].plotPath.split('/').slice(-1)[0]}
             plotURL={plots[0].plotURL}
             maxHeight="1000px"
@@ -555,7 +562,7 @@ export default function MutationalSignatureProfile({ submitR }) {
         </div>
       </div>
       {additionalPlots()}
-      <Debug msg={debugR} />
+      {/* <Debug msg={debugR} /> */}
     </div>
   );
 }
