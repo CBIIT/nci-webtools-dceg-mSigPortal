@@ -9,3 +9,4 @@
 *.log
 *-audit.json
 .DS_Store
+.eslintcache
