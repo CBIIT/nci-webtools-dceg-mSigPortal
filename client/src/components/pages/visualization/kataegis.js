@@ -204,8 +204,8 @@ export default function Kataegis({ submitR }) {
 
           <div id="kataegisPlot">
             {err && (
-              <div>
-                <p>Error: {err}</p>
+              <div className="p-3">
+                <p className="text-danger">{err}</p>
               </div>
             )}
             <div style={{ display: plotURL ? 'block' : 'none' }}>

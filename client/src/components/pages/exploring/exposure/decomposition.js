@@ -17,7 +17,7 @@ export default function Decomposition() {
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
     else clearPlot();
-  }, [plotPath, projectID]);
+  }, [plotPath, err, debugR, projectID]);
 
   async function setRPlot(plotPath) {
     if (plotPath) {
@@ -57,9 +57,8 @@ export default function Decomposition() {
       <p>Evaluating the Performance of Mutational Signature Decomposition</p>
       {!err && !plotURL && <p>Please calculate using the left side panel.</p>}
       {err && (
-        <div>
-          <p>An error has occured. Please verify your input.</p>
-          <p>Error: {err}</p>
+        <div className="p-3">
+          <p className="text-danger">{err}</p>
         </div>
       )}
 

@@ -41,7 +41,7 @@ export default function Association({
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
     else clearPlot();
-  }, [plotPath, projectID]);
+  }, [plotPath, err, debugR, projectID]);
 
   // apply default signature names
   useEffect(() => {
@@ -195,9 +195,8 @@ export default function Association({
       </Form>
       <div id="exposureAssociationPlot">
         {err && (
-          <div>
-            <p>An error has occured. Please verify your input.</p>
-            <p>Error: {err}</p>
+          <div className="p-3">
+            <p className="text-danger">{err}</p>
           </div>
         )}
         {plotURL && (

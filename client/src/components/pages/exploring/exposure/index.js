@@ -394,96 +394,54 @@ export default function Exposure({ match, populateControls }) {
     if (output) {
       if (!projectID) dispatchExpExposure({ projectID: pID });
 
-      if (output.tumorPath)
+      if (fn == 'all') {
         dispatchExpTumor({
           plotPath: output.tumorPath,
-          debugR: debugR,
-          err: false,
-        });
-      else if (fn == 'all')
-        dispatchExpTumor({
           err: errors.tumorError,
           debugR: debugR,
-          plotPath: '',
         });
 
-      if (output.burdenSeparatedPath)
         dispatchExpSeparated({
           plotPath: output.burdenSeparatedPath,
-          debugR: debugR,
-          err: false,
-        });
-      else if (fn == 'all')
-        dispatchExpSeparated({
           err: errors.burdenSeparatedError,
           debugR: debugR,
-          plotPath: '',
         });
 
-      if (output.burdenAcrossPath)
-        dispatchExpAcross({
-          plotPath: output.burdenAcrossPath,
-          debugR: debugR,
-          err: false,
-        });
-      else if (fn == 'all' || fn == 'across')
-        dispatchExpAcross({
-          err: errors.burdenAcrossError,
-          debugR: debugR,
-          plotPath: '',
-        });
-
-      if (output.associationPath)
-        dispatchExpAssociation({
-          plotPath: output.associationPath,
-          debugR: debugR,
-          err: false,
-        });
-      else if (fn == 'all' || fn == 'association')
-        dispatchExpAssociation({
-          err: errors.associationError,
-          debugR: debugR,
-          plotPath: '',
-        });
-
-      if (output.decompositionPath)
         dispatchExpDecomposition({
           plotPath: output.decompositionPath,
           txtPath: output.decompositionData,
-          debugR: debugR,
-          err: false,
-        });
-      else if (fn == 'all')
-        dispatchExpDecomposition({
           err: errors.decompositionError,
           debugR: debugR,
-          plotPath: '',
+        });
+      }
+
+      if (fn == 'all' || fn == 'across') {
+        dispatchExpAcross({
+          plotPath: output.burdenAcrossPath,
+          debugR: debugR,
+          err: errors.burdenAcrossError,
+        });
+      }
+
+      if (fn == 'all' || fn == 'association')
+        dispatchExpAssociation({
+          plotPath: output.associationPath,
+          err: errors.associationError,
+          debugR: debugR,
         });
 
-      if (output.landscapePath)
+      if (fn == 'all' || fn == 'landscape')
         dispatchExpLandscape({
           plotPath: output.landscapePath,
-          debugR: debugR,
-          err: false,
-        });
-      else if (fn == 'all' || fn == 'landscape')
-        dispatchExpLandscape({
           err: errors.landscapeError,
           debugR: debugR,
-          plotPath: '',
         });
 
-      if (output.prevalencePath)
+      if (fn == 'all' || fn == 'prevalence')
         dispatchExpPrevalence({
           plotPath: output.prevalencePath,
-          debugR: debugR,
-          err: false,
-        });
-      else if (fn == 'all' || fn == 'prevalence')
-        dispatchExpPrevalence({
           err: errors.prevalenceError,
           debugR: debugR,
-          plotPath: '',
         });
     } else {
       dispatchError(debugR);
@@ -1075,7 +1033,7 @@ export default function Exposure({ match, populateControls }) {
           >
             <Nav variant="tabs">
               {tabs.map(({ key, title }) => (
-                <Item>
+                <Item key={key}>
                   <Link eventKey={key} as="button" className="outline-none">
                     <strong>{title}</strong>
                   </Link>

@@ -26,7 +26,7 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
     else clearPlot();
-  }, [plotPath, projectID]);
+  }, [plotPath, err, debugR, projectID]);
 
   async function setRPlot(plotPath) {
     if (plotPath) {
@@ -103,9 +103,8 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
       </Form>
       <div id="exposureLandscapePlot">
         {err && (
-          <div>
-            <p>An error has occured. Please verify your input.</p>
-            <p>Error: {err}</p>
+          <div className="p-3">
+            <p className="text-danger">{err}</p>
           </div>
         )}
         <div style={{ display: plotURL ? 'block' : 'none' }}>
