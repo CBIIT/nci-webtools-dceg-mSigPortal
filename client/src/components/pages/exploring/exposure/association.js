@@ -199,7 +199,7 @@ export default function Association({
             <p className="text-danger">{err}</p>
           </div>
         )}
-        {plotURL && (
+        {plotPath && (
           <>
             <hr />
             <Plot

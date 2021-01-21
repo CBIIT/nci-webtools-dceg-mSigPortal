@@ -53,14 +53,12 @@ export default function Separated() {
     <div>
       <div className="p-3">
         <p>Tumor Mutational Burden Separated by Signatures</p>
-        {!err && !plotURL && <p>Please calculate using the left side panel.</p>}
-        {err && (
-          <div className="p-3">
-            <p className="text-danger">{err}</p>
-          </div>
+        {!err && !plotPath && (
+          <p>Please calculate using the left side panel.</p>
         )}
+        {err && <p className="text-danger">{err}</p>}
       </div>
-      {plotURL && (
+      {plotPath && (
         <>
           <hr />
           <Plot

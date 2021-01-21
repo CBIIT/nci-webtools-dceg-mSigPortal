@@ -52,17 +52,13 @@ export default function Decomposition() {
   return (
     <div>
       <div className="p-3">
-        <p>
-          Evaluating the Performance of Mutational Signature Decomposition
-        </p>
-        {!err && !plotURL && <p>Please calculate using the left side panel.</p>}
-        {err && (
-          <div className="p-3">
-            <p className="text-danger">{err}</p>
-          </div>
+        <p>Evaluating the Performance of Mutational Signature Decomposition</p>
+        {!err && !plotPath && (
+          <p>Please calculate using the left side panel.</p>
         )}
+        {err && <p className="text-danger">{err}</p>}
       </div>
-      {plotURL && (
+      {plotPath && (
         <>
           <hr />
           <Plot

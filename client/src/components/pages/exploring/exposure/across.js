@@ -100,7 +100,7 @@ export default function Across({ calculateAcross }) {
             <p className="text-danger">{err}</p>
           </div>
         )}
-        {plotURL && (
+        {plotPath && (
           <>
             <hr />
             <Plot
