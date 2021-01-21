@@ -199,23 +199,8 @@ export const getInitialState = () => ({
   },
 
   exploring: {
-    displayTab: 'signature',
+    displayTab: 'etiology',
     signatureDisplay: 'referenceSignatures',
-    signatureAccordion: {
-      referenceSignatures: true,
-      mutationalSignatureProfile: true,
-      cosineSimilarity: true,
-      mutationalSignatureComparison: true,
-    },
-    exposureAccordion: {
-      tumor: true,
-      separated: true,
-      across: true,
-      association: true,
-      decomposition: true,
-      landscape: true,
-      prevalence: true,
-    },
     exposureSignature: [],
     exposureCancer: [],
     refSigData: [],
