@@ -50,16 +50,25 @@ export default function Separated() {
   }
 
   return (
-    <div className="p-3">
-      <p>Tumor Mutational Burden Separated by Signatures</p>
-      {!err && !plotURL && <p>Please calculate using the left side panel.</p>}
-      {err && (
-        <div className="p-3">
-          <p className="text-danger">{err}</p>
-        </div>
-      )}
+    <div>
+      <div className="p-3">
+        <p>Tumor Mutational Burden Separated by Signatures</p>
+        {!err && !plotURL && <p>Please calculate using the left side panel.</p>}
+        {err && (
+          <div className="p-3">
+            <p className="text-danger">{err}</p>
+          </div>
+        )}
+      </div>
       {plotURL && (
-        <Plot plotName={plotPath.split('/').slice(-1)[0]} plotURL={plotURL} />
+        <>
+          <hr />
+          <Plot
+            className="p-3"
+            plotName={plotPath.split('/').slice(-1)[0]}
+            plotURL={plotURL}
+          />
+        </>
       )}
       {/* <Debug msg={debugR} /> */}
     </div>

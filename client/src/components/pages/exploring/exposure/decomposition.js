@@ -4,7 +4,6 @@ import {
   dispatchError,
   dispatchExpDecomposition,
 } from '../../../../services/store';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 
@@ -51,24 +50,28 @@ export default function Decomposition() {
   }
 
   return (
-    <div className="p-3">
-      <LoadingOverlay active={loading} />
-
-      <p>Evaluating the Performance of Mutational Signature Decomposition</p>
-      {!err && !plotURL && <p>Please calculate using the left side panel.</p>}
-      {err && (
-        <div className="p-3">
-          <p className="text-danger">{err}</p>
-        </div>
-      )}
-
+    <div>
+      <div className="p-3">
+        <p>
+          Evaluating the Performance of Mutational Signature Decomposition
+        </p>
+        {!err && !plotURL && <p>Please calculate using the left side panel.</p>}
+        {err && (
+          <div className="p-3">
+            <p className="text-danger">{err}</p>
+          </div>
+        )}
+      </div>
       {plotURL && (
-        <Plot
-          className="p-3"
-          plotName={plotPath.split('/').slice(-1)[0]}
-          plotURL={plotURL}
-          txtPath={projectID + txtPath}
-        />
+        <>
+          <hr />
+          <Plot
+            className="p-3"
+            plotName={plotPath.split('/').slice(-1)[0]}
+            plotURL={plotURL}
+            txtPath={projectID + txtPath}
+          />
+        </>
       )}
       {/* <Debug msg={debugR} /> */}
     </div>
