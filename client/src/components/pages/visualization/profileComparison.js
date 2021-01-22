@@ -43,7 +43,7 @@ export default function ProfileComparison({
     (state) => state.visualizeResults
   );
   const { profileOptions } = useSelector((state) => state.mutationalProfiles);
-
+  const state = useSelector((state) => state.profileComparison);
   const {
     withinProfileType,
     withinSampleName1,
@@ -78,11 +78,10 @@ export default function ProfileComparison({
     refErr,
     pubErr,
     debugR,
-
     withinSubmitOverlay,
     refSubmitOverlay,
     pubSubmitOverlay,
-  } = useSelector((state) => state.profileComparison);
+  } = state;
 
   const popover = (
     <Popover id="popover-basic">
@@ -149,60 +148,39 @@ export default function ProfileComparison({
     }
   }, [pDataOptions, pubStudy]);
 
-  function handleOverlay(fn, status) {
-    if (fn.includes('profileComparisonWithin')) {
-      dispatchProfileComparison({ withinSubmitOverlay: status });
-    } else if (fn.includes('profileComparisonRefSig')) {
-      dispatchProfileComparison({ refSubmitOverlay: status });
-    } else {
-      dispatchProfileComparison({ pubSubmitOverlay: status });
+  useEffect(() => {
+    withinPlotPath ? setRPlot(withinPlotPath, 'within') : clearPlot('within');
+    refPlotPath ? setRPlot(refPlotPath, 'ref') : clearPlot('ref');
+    pubPlotPath ? setRPlot(pubPlotPath, 'pub') : clearPlot('pub');
+  }, [withinPlotPath, refPlotPath, pubPlotPath]);
+
+  function setOverlay(type, status) {
+    dispatchProfileComparison({ [`${type}SubmitOverlay`]: status });
+  }
+
+  async function setRPlot(plotPath, type) {
+    try {
+      const response = await fetch(`api/results/${projectID}${plotPath}`);
+      if (!response.ok) {
+        // console.log(await response.json());
+      } else {
+        const pic = await response.blob();
+        const objectURL = URL.createObjectURL(pic);
+
+        if (state[`${type}PlotURL`])
+          URL.revokeObjectURL(state[`${type}PlotURL`]);
+        dispatchProfileComparison({
+          [`${type}PlotURL`]: objectURL,
+        });
+      }
+    } catch (err) {
+      dispatchError(err);
     }
   }
 
-  async function setRPlot(plotPath, fn) {
-    handleOverlay(fn, true);
-    if (plotPath) {
-      try {
-        const response = await fetch(`api/results/${projectID}${plotPath}`);
-        if (!response.ok) {
-          // console.log(await response.json());
-        } else {
-          const pic = await response.blob();
-          const objectURL = URL.createObjectURL(pic);
-
-          if (fn.includes('profileComparisonWithin')) {
-            if (withinPlotURL) URL.revokeObjectURL(withinPlotURL);
-            dispatchProfileComparison({
-              withinPlotURL: objectURL,
-            });
-          } else if (fn.includes('profileComparisonRefSig')) {
-            if (refPlotURL) URL.revokeObjectURL(refPlotURL);
-            dispatchProfileComparison({
-              refPlotURL: objectURL,
-            });
-          } else {
-            if (pubPlotURL) URL.revokeObjectURL(pubPlotURL);
-            dispatchProfileComparison({
-              pubPlotURL: objectURL,
-            });
-          }
-        }
-      } catch (err) {
-        dispatchError(err);
-      }
-    } else {
-      if (fn.includes('profileComparisonWithin')) {
-        if (withinPlotURL) URL.revokeObjectURL(withinPlotURL);
-        dispatchProfileComparison({ withinErr: true, withinPlotURL: '' });
-      } else if (fn.includes('profileComparisonRefSig')) {
-        if (refPlotURL) URL.revokeObjectURL(refPlotURL);
-        dispatchProfileComparison({ refErr: true, refPlotURL: '' });
-      } else {
-        if (pubPlotURL) URL.revokeObjectURL(pubPlotURL);
-        dispatchProfileComparison({ pubErr: true, pubPlotURL: '' });
-      }
-    }
-    handleOverlay(fn, false);
+  function clearPlot(type) {
+    URL.revokeObjectURL(state[`${type}PlotURL`]);
+    dispatchProfileComparison({ [`${type}PlotURL`]: '' });
   }
 
   // get Signature Reference Sets for dropdown options
@@ -269,85 +247,57 @@ export default function ProfileComparison({
     }
   }
 
-  async function calculateR(fn, args) {
-    handleOverlay(fn, true);
-    if (fn.includes('profileComparisonWithin')) {
-      dispatchProfileComparison({
-        withinErr: false,
-        debugR: '',
-      });
-    } else if (fn.includes('profileComparisonRefSig')) {
-      dispatchProfileComparison({
-        refErr: false,
-        debugR: '',
-      });
-    } else {
-      dispatchProfileComparison({
-        pubErr: false,
-        debugR: '',
-      });
-    }
+  async function calculateR(type, fn, args) {
     try {
+      setOverlay(type, true);
+
+      dispatchProfileComparison({
+        [`${type}Err`]: false,
+        [`${type}PlotPath`]: '',
+        debugR: '',
+      });
+
       const response = await submitR(fn, args);
       if (!response.ok) {
         const err = await response.json();
         dispatchProfileComparison({ debugR: err });
-        handleOverlay(fn, false);
       } else {
         const { debugR, output, error } = await response.json();
 
         dispatchProfileComparison({ debugR: debugR });
         if (Object.keys(output).length) {
-          if (fn.includes('profileComparisonWithin')) {
-            dispatchProfileComparison({ withinPlotPath: output.plotPath });
-            setRPlot(output.plotPath, fn);
-          } else if (fn.includes('profileComparisonRefSig')) {
-            dispatchProfileComparison({ refPlotPath: output.plotPath });
-            setRPlot(output.plotPath, fn);
-          } else {
-            dispatchProfileComparison({ pubPlotPath: output.plotPath });
-            setRPlot(output.plotPath, fn);
-          }
+          dispatchProfileComparison({ [`${type}PlotPath`]: output.plotPath });
         } else {
-          handleOverlay(fn, false);
-          if (fn.includes('profileComparisonWithin')) {
-            dispatchProfileComparison({
-              withinPlotPath: '',
-              withinErr: error || debugR,
-            });
-          } else if (fn.includes('profileComparisonRefSig')) {
-            dispatchProfileComparison({
-              refPlotPath: '',
-              refErr: error || debugR,
-            });
-          } else {
-            dispatchProfileComparison({ pubPlotPath: '', pubErr: true });
-          }
+          dispatchProfileComparison({
+            [`${type}Err`]: error || debugR,
+            debugR: debugR || error || true,
+          });
         }
       }
     } catch (err) {
       dispatchError(err);
-      handleOverlay(fn, false);
+    } finally {
+      setOverlay(type, false);
     }
   }
 
   async function getPublicSamples(study, cancerType) {
-    const args = {
-      study: study,
-      cancerType: cancerType,
-      experimentalStrategy: [
-        ...new Set(
-          pDataOptions
-            .filter(
-              (data) => data.Study == study && data.Cancer_Type == cancerType
-            )
-            .map((data) => data.Dataset)
-        ),
-      ][0],
-    };
-
-    handleOverlay('pub', true);
     try {
+      setOverlay('pub', true);
+      const args = {
+        study: study,
+        cancerType: cancerType,
+        experimentalStrategy: [
+          ...new Set(
+            pDataOptions
+              .filter(
+                (data) => data.Study == study && data.Cancer_Type == cancerType
+              )
+              .map((data) => data.Dataset)
+          ),
+        ][0],
+      };
+
       const response = await fetch(`api/getPublicData`, {
         method: 'POST',
         headers: {
@@ -376,8 +326,9 @@ export default function ProfileComparison({
       dispatchProfileComparison({
         pubErr: 'Error retrieving pub data samples',
       });
+    } finally {
+      setOverlay('pub', false);
     }
-    handleOverlay('pub', false);
   }
 
   function handleStudyChange(study) {
@@ -477,7 +428,7 @@ export default function ProfileComparison({
                   variant="primary"
                   onClick={() => {
                     if (source == 'user') {
-                      calculateR('profileComparisonWithin', {
+                      calculateR('within', 'profileComparisonWithin', {
                         profileType: withinProfileType,
                         sampleName1: withinSampleName1,
                         sampleName2: withinSampleName2,
@@ -488,7 +439,7 @@ export default function ProfileComparison({
                         ),
                       });
                     } else {
-                      calculateR('profileComparisonWithinPublic', {
+                      calculateR('within', 'profileComparisonWithinPublic', {
                         profileType: withinProfileType,
                         sampleName1: withinSampleName1,
                         sampleName2: withinSampleName2,
@@ -513,17 +464,19 @@ export default function ProfileComparison({
             {withinErr && (
               <div>
                 <p>An error has occured. Please verify your input.</p>
-                <p>Error: {withinErr}</p>
+                <p>{withinErr}</p>
               </div>
             )}
-            <div style={{ display: withinPlotURL ? 'block' : 'none' }}>
-              <hr />
-              <Plot
-                className="p-3"
-                plotName={withinPlotPath.split('/').slice(-1)[0]}
-                plotURL={withinPlotURL}
-              />
-            </div>
+            {withinPlotURL && (
+              <>
+                <hr />
+                <Plot
+                  className="p-3"
+                  plotName={withinPlotPath.split('/').slice(-1)[0]}
+                  plotURL={withinPlotURL}
+                />
+              </>
+            )}
           </div>
         </div>
       ),
@@ -616,7 +569,7 @@ export default function ProfileComparison({
                   variant="primary"
                   onClick={() => {
                     if (source == 'user') {
-                      calculateR('profileComparisonRefSig', {
+                      calculateR('ref', 'profileComparisonRefSig', {
                         profileType: refProfileType,
                         sampleName: refSampleName,
                         signatureSet: refSignatureSet,
@@ -628,7 +581,7 @@ export default function ProfileComparison({
                         ),
                       });
                     } else {
-                      calculateR('profileComparisonRefSigPublic', {
+                      calculateR('ref', 'profileComparisonRefSigPublic', {
                         profileType: refProfileType,
                         sampleName: refSampleName,
                         signatureSet: refSignatureSet,
@@ -649,17 +602,19 @@ export default function ProfileComparison({
             {refErr && (
               <div>
                 <p>An error has occured. Please verify your input.</p>
-                <p>Error: {refErr}</p>
+                <p className="text-danger">{refErr}</p>
               </div>
             )}
-            <div style={{ display: refPlotURL ? 'block' : 'none' }}>
-              <hr />
-              <Plot
-                className="p-3"
-                plotName={refPlotPath.split('/').slice(-1)[0]}
-                plotURL={refPlotURL}
-              />
-            </div>
+            {refPlotURL && (
+              <>
+                <hr />
+                <Plot
+                  className="p-3"
+                  plotName={refPlotPath.split('/').slice(-1)[0]}
+                  plotURL={refPlotURL}
+                />
+              </>
+            )}
           </div>
         </div>
       ),
@@ -748,7 +703,7 @@ export default function ProfileComparison({
                   className="mt-auto mb-3"
                   variant="primary"
                   onClick={() =>
-                    calculateR('profileComparisonPublic', {
+                    calculateR('pub', 'profileComparisonPublic', {
                       profileName: userProfileType + userMatrixSize,
                       matrixFile: matrixList.filter(
                         (path) =>
@@ -773,14 +728,16 @@ export default function ProfileComparison({
                 <p>An error has occured. Please verify your input.</p>
               </div>
             )}
-            <div style={{ display: pubPlotURL ? 'block' : 'none' }}>
-              <hr />
-              <Plot
-                className="p-3"
-                plotName={pubPlotPath.split('/').slice(-1)[0]}
-                plotURL={pubPlotURL}
-              />
-            </div>
+            {pubPlotURL && (
+              <>
+                <hr />
+                <Plot
+                  className="p-3"
+                  plotName={pubPlotPath.split('/').slice(-1)[0]}
+                  plotURL={pubPlotURL}
+                />
+              </>
+            )}
           </div>
         </div>
       ),

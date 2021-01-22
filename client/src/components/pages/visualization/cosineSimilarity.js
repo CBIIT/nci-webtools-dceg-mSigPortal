@@ -30,7 +30,7 @@ export default function CosineSimilarity({
   const { projectID, matrixList, svgList } = useSelector(
     (state) => state.visualizeResults
   );
-
+  const state = useSelector((state) => state.cosineSimilarity);
   const {
     withinProfileType,
     withinMatrixSize,
@@ -61,10 +61,10 @@ export default function CosineSimilarity({
     refSubmitOverlay,
     pubSubmitOverlay,
     debugR,
-  } = useSelector((state) => state.cosineSimilarity);
+  } = state;
 
+  // check for multiple sample input and disable params if true
   const [multiSample, setMultiSample] = useState(false);
-
   useEffect(() => {
     if (svgList.length) {
       if (source == 'user') {
@@ -86,61 +86,39 @@ export default function CosineSimilarity({
     }
   }, [svgList]);
 
+  useEffect(() => {
+    withinPlotPath ? setRPlot(withinPlotPath, 'within') : clearPlot('within');
+    refPlotPath ? setRPlot(refPlotPath, 'ref') : clearPlot('ref');
+    pubPlotPath ? setRPlot(pubPlotPath, 'pub') : clearPlot('pub');
+  }, [withinPlotPath, refPlotPath, pubPlotPath]);
+
   function setOverlay(type, display) {
-    if (type == 'within') {
-      dispatchCosineSimilarity({ withinSubmitOverlay: display });
-    } else if (type == 'refsig') {
-      dispatchCosineSimilarity({ refSubmitOverlay: display });
-    } else {
-      dispatchCosineSimilarity({ pubSubmitOverlay: display });
-    }
+    dispatchCosineSimilarity({ [`${type}SubmitOverlay`]: display });
   }
 
   async function setRPlot(plotPath, type) {
-    setOverlay(type, true);
-    if (plotPath) {
-      try {
-        const response = await fetch(`api/results/${projectID}${plotPath}`);
-        if (!response.ok) {
-          // console.log(await response.json());
-        } else {
-          const pic = await response.blob();
-          const objectURL = URL.createObjectURL(pic);
-
-          if (type == 'within') {
-            if (withinPlotURL) URL.revokeObjectURL(withinPlotURL);
-            dispatchCosineSimilarity({
-              withinPlotURL: objectURL,
-            });
-          } else if (type == 'refsig') {
-            if (refPlotURL) URL.revokeObjectURL(refPlotURL);
-            dispatchCosineSimilarity({
-              refPlotURL: objectURL,
-            });
-          } else {
-            if (pubPlotURL) URL.revokeObjectURL(pubPlotURL);
-            dispatchCosineSimilarity({
-              pubPlotURL: objectURL,
-            });
-          }
-          setOverlay(type, false);
-        }
-      } catch (err) {
-        dispatchError(err);
-      }
-    } else {
-      if (type == 'within') {
-        if (withinPlotURL) URL.revokeObjectURL(withinPlotURL);
-        dispatchCosineSimilarity({ withinErr: true, withinPlotURL: '' });
-      } else if (type == 'refsig') {
-        if (refPlotURL) URL.revokeObjectURL(refPlotURL);
-        dispatchCosineSimilarity({ refErr: true, refPlotURL: '' });
+    try {
+      const response = await fetch(`api/results/${projectID}${plotPath}`);
+      if (!response.ok) {
+        // console.log(await response.json());
       } else {
-        if (pubPlotURL) URL.revokeObjectURL(pubPlotURL);
-        dispatchCosineSimilarity({ pubErr: true, pubPlotURL: '' });
+        const pic = await response.blob();
+        const objectURL = URL.createObjectURL(pic);
+
+        if (state[`${type}PlotURL`])
+          URL.revokeObjectURL(state[`${type}PlotURL`]);
+        dispatchCosineSimilarity({
+          [`${type}PlotURL`]: objectURL,
+        });
       }
+    } catch (err) {
+      dispatchError(err);
     }
-    setOverlay(type, false);
+  }
+
+  function clearPlot(type) {
+    URL.revokeObjectURL(state[`${type}PlotURL`]);
+    dispatchCosineSimilarity({ [`${type}PlotURL`]: '' });
   }
 
   // get Signature Reference Sets for dropdown options
@@ -169,78 +147,44 @@ export default function CosineSimilarity({
     }
   }
 
-  function dispatchRError(fn, status, err = '') {
-    if (fn.includes('cosineSimilarityWithin')) {
-      dispatchCosineSimilarity({
-        withinErr: status,
-        debugR: err,
-      });
-    } else if (fn.includes('cosineSimilarityRefSig')) {
-      dispatchCosineSimilarity({
-        refErr: status,
-        debugR: err,
-      });
-    } else {
-      dispatchCosineSimilarity({
-        pubErr: status,
-        debugR: err,
-      });
-    }
+  function setOverlay(type, status) {
+    dispatchCosineSimilarity({ [`${type}SubmitOverlay`]: status });
   }
 
-  function dispatchOverlay(fn, status) {
-    if (fn.includes('cosineSimilarityWithin')) {
-      dispatchCosineSimilarity({ withinSubmitOverlay: status });
-    } else if (fn.includes('cosineSimilarityRefSig')) {
-      dispatchCosineSimilarity({ refSubmitOverlay: status });
-    } else {
-      dispatchCosineSimilarity({ pubSubmitOverlay: status });
-    }
-  }
-
-  async function calculateR(fn, args) {
-    dispatchOverlay(fn, true);
-    dispatchRError(fn, false);
-
+  async function calculateR(type, fn, args) {
     try {
+      setOverlay(type, true);
+
+      dispatchCosineSimilarity({
+        [`${type}Err`]: false,
+        [`${type}PlotPath`]: '',
+        [`${type}TxtPath`]: '',
+        debugR: '',
+      });
+
       const response = await submitR(fn, args);
       if (!response.ok) {
         const err = await response.json();
-        dispatchOverlay(fn, false);
-        dispatchRError(fn, true, err);
+        dispatchCosineSimilarity({ debugR: err });
       } else {
-        const { debugR, output } = await response.json();
+        const { debugR, output, error } = await response.json();
 
         if (Object.keys(output).length) {
-          dispatchOverlay(fn, false);
-          dispatchRError(fn, false, debugR);
-          if (fn.includes('cosineSimilarityWithin')) {
-            dispatchCosineSimilarity({
-              withinPlotPath: output.plotPath,
-              withinTxtPath: output.txtPath,
-            });
-            setRPlot(output.plotPath, 'within');
-          } else if (fn.includes('cosineSimilarityRefSig')) {
-            dispatchCosineSimilarity({
-              refPlotPath: output.plotPath,
-              refTxtPath: output.txtPath,
-            });
-            setRPlot(output.plotPath, 'refsig');
-          } else {
-            dispatchCosineSimilarity({
-              pubPlotPath: output.plotPath,
-              pubTxtPath: output.txtPath,
-            });
-            setRPlot(output.plotPath, 'pub');
-          }
+          dispatchCosineSimilarity({
+            [`${type}PlotPath`]: output.plotPath,
+            [`${type}TxtPath`]: output.txtPath,
+          });
         } else {
-          dispatchRError(fn, true, debugR);
-          dispatchOverlay(fn, false);
+          dispatchCosineSimilarity({
+            [`${type}Err`]: error || debugR,
+            debugR: debugR || error || true,
+          });
         }
       }
     } catch (err) {
       dispatchError(err);
-      dispatchOverlay(fn, false);
+    } finally {
+      setOverlay(type, false);
     }
   }
 
@@ -353,7 +297,7 @@ export default function CosineSimilarity({
                   variant="primary"
                   onClick={() => {
                     if (source == 'user') {
-                      calculateR('cosineSimilarityWithin', {
+                      calculateR('within', 'cosineSimilarityWithin', {
                         matrixFile: matrixList.filter(
                           (path) =>
                             path.Profile_Type == withinProfileType &&
@@ -361,7 +305,7 @@ export default function CosineSimilarity({
                         )[0].Path,
                       });
                     } else {
-                      calculateR('cosineSimilarityWithinPublic', {
+                      calculateR('within', 'cosineSimilarityWithinPublic', {
                         profileType: withinProfileType,
                         matrixSize: withinMatrixSize,
                         study: study,
@@ -383,18 +327,22 @@ export default function CosineSimilarity({
           </Form>
 
           <div id="withinPlot">
-            <div style={{ display: withinErr ? 'block' : 'none' }}>
-              <p>An error has occured. Please verify your input.</p>
-            </div>
-            <div style={{ display: withinPlotURL ? 'block' : 'none' }}>
-              <hr />
-              <Plot
-                className="p-3"
-                plotName={withinPlotPath.split('/').slice(-1)[0]}
-                plotURL={withinPlotURL}
-                txtPath={projectID + withinTxtPath}
-              />
-            </div>
+            {withinErr && (
+              <div className="p-3">
+                <p>An error has occured. Please verify your input.</p>
+              </div>
+            )}
+            {withinPlotURL && (
+              <>
+                <hr />
+                <Plot
+                  className="p-3"
+                  plotName={withinPlotPath.split('/').slice(-1)[0]}
+                  plotURL={withinPlotURL}
+                  txtPath={projectID + withinTxtPath}
+                />
+              </>
+            )}
           </div>
         </div>
       ),
@@ -440,7 +388,7 @@ export default function CosineSimilarity({
                   variant="primary"
                   onClick={() => {
                     if (source == 'user') {
-                      calculateR('cosineSimilarityRefSig', {
+                      calculateR('ref', 'cosineSimilarityRefSig', {
                         profileType: refProfileType,
                         signatureSet: refSignatureSet,
                         matrixList: JSON.stringify(
@@ -450,7 +398,7 @@ export default function CosineSimilarity({
                         ),
                       });
                     } else {
-                      calculateR('cosineSimilarityRefSigPublic', {
+                      calculateR('ref', 'cosineSimilarityRefSigPublic', {
                         profileType: refProfileType,
                         signatureSet: refSignatureSet,
                         study: study,
@@ -466,18 +414,22 @@ export default function CosineSimilarity({
             </Row>
           </Form>
           <div id="refPlot">
-            <div style={{ display: refErr ? 'block' : 'none' }}>
-              <p>An error has occured. Please verify your input.</p>
-            </div>
-            <div style={{ display: refPlotURL ? 'block' : 'none' }}>
-              <hr />
-              <Plot
-                className="p-3"
-                plotName={refPlotPath.split('/').slice(-1)[0]}
-                plotURL={refPlotURL}
-                txtPath={projectID + refTxtPath}
-              />
-            </div>
+            {refErr && (
+              <div className="p-3">
+                <p>An error has occured. Please verify your input.</p>
+              </div>
+            )}
+            {refPlotURL && (
+              <>
+                <hr />
+                <Plot
+                  className="p-3"
+                  plotName={refPlotPath.split('/').slice(-1)[0]}
+                  plotURL={refPlotURL}
+                  txtPath={projectID + refTxtPath}
+                />
+              </>
+            )}
           </div>
         </div>
       ),
@@ -538,7 +490,7 @@ export default function CosineSimilarity({
                   className="mt-auto mb-3"
                   variant="primary"
                   onClick={() =>
-                    calculateR('cosineSimilarityPublic', {
+                    calculateR('pub', 'cosineSimilarityPublic', {
                       matrixFile: matrixList.filter(
                         (path) =>
                           path.Profile_Type == userProfileType &&
@@ -557,18 +509,22 @@ export default function CosineSimilarity({
           </Form>
 
           <div id="pubPlot">
-            <div style={{ display: pubErr ? 'block' : 'none' }}>
-              <p>An error has occured. Please verify your input.</p>
-            </div>
-            <div style={{ display: pubPlotURL ? 'block' : 'none' }}>
-              <hr />
-              <Plot
-                className="p-3"
-                plotName={pubPlotURL.split('/').slice(-1)[0]}
-                plotURL={pubPlotURL}
-                txtPath={projectID + pubTxtPath}
-              />
-            </div>
+            {pubErr && (
+              <div className="p-3">
+                <p>An error has occured. Please verify your input.</p>
+              </div>
+            )}
+            {pubPlotURL && (
+              <>
+                <hr />
+                <Plot
+                  className="p-3"
+                  plotName={pubPlotURL.split('/').slice(-1)[0]}
+                  plotURL={pubPlotURL}
+                  txtPath={projectID + pubTxtPath}
+                />
+              </>
+            )}
           </div>
         </div>
       ),

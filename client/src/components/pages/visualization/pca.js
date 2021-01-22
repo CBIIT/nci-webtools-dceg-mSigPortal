@@ -22,7 +22,7 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
   } = useSelector((state) => state.visualize);
   const { profileOptions } = useSelector((state) => state.mutationalProfiles);
   const { projectID, svgList } = useSelector((state) => state.visualizeResults);
-
+  const state = useSelector((state) => state.pca);
   const {
     profileType,
     signatureSet,
@@ -58,10 +58,11 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
     display,
     pubPcaErr,
     pubSubmitOverlay,
-  } = useSelector((state) => state.pca);
+  } = state;
 
   const [multiSample, setMultiSample] = useState(false);
 
+  // check for multiple sample input and disable params if true
   useEffect(() => {
     if (svgList.length) {
       if (source == 'user') {
@@ -83,57 +84,51 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
     }
   }, [svgList]);
 
+  useEffect(() => {
+    pca1 ? setRPlot(pca1, 'pca1') : clearPlot('pca1');
+    pca2 ? setRPlot(pca2, 'pca2') : clearPlot('pca2');
+    pca3 ? setRPlot(pca3, 'pca3') : clearPlot('pca3');
+    heatmap ? setRPlot(heatmap, 'heatmap') : clearPlot('heatmap');
+    pubPca1 ? setRPlot(pubPca1, 'pubPca1') : clearPlot('pubPca1');
+    pubPca2 ? setRPlot(pubPca2, 'pubPca2') : clearPlot('pubPca2');
+    pubPca3 ? setRPlot(pubPca3, 'pubPca3') : clearPlot('pubPca3');
+  }, [pca1, pca2, pca3, heatmap, pubPca1, pubPca2, pubPca3]);
+
+  function setOverlay(type, status) {
+    type == 'within'
+      ? dispatchPCA({ submitOverlay: status })
+      : dispatchPCA({ pubSubmitOverlay: status });
+  }
+
   async function setRPlot(plotPath, type) {
-    if (plotPath) {
-      !type.includes('pub')
-        ? dispatchPCA({ submitOverlay: true })
-        : dispatchPCA({ pubSubmitOverlay: true });
-      try {
-        const response = await fetch(`api/results/${projectID}${plotPath}`);
+    try {
+      const response = await fetch(`api/results/${projectID}${plotPath}`);
 
-        if (!response.ok) {
-          // console.log(await response.json());
-        } else {
-          const pic = await response.blob();
-          const objectURL = URL.createObjectURL(pic);
+      if (!response.ok) {
+        // console.log(await response.json());
+      } else {
+        const pic = await response.blob();
+        const objectURL = URL.createObjectURL(pic);
 
-          if (type == 'pca1') {
-            if (pca1URL) URL.revokeObjectURL(pca1URL);
-            dispatchPCA({ pca1URL: objectURL });
-          } else if (type == 'pca2') {
-            if (pca2URL) URL.revokeObjectURL(pca2URL);
-            dispatchPCA({ pca2URL: objectURL });
-          } else if (type == 'pca3') {
-            if (pca3URL) URL.revokeObjectURL(pca3URL);
-            dispatchPCA({ pca3URL: objectURL });
-          } else if (type == 'heatmap') {
-            if (heatmapURL) URL.revokeObjectURL(heatmapURL);
-            dispatchPCA({ heatmapURL: objectURL });
-          } else if (type == 'pubPca1') {
-            if (pubPca1URL) URL.revokeObjectURL(pubPca1);
-            dispatchPCA({ pubPca1URL: objectURL });
-          } else if (type == 'pubPca2') {
-            if (pubPca2URL) URL.revokeObjectURL(pubPca2URL);
-            dispatchPCA({ pubPca2URL: objectURL });
-          } else if (type == 'pubPca3') {
-            if (pubPca3URL) URL.revokeObjectURL(pubPca3URL);
-            dispatchPCA({ pubPca3URL: objectURL });
-          }
-        }
-      } catch (err) {
-        dispatchError(err);
+        if (state[`${type}URL`]) URL.revokeObjectURL(state[`${type}URL`]);
+        dispatchPCA({ [`${type}URL`]: objectURL });
       }
-      !type.includes('pub')
-        ? dispatchPCA({ submitOverlay: false })
-        : dispatchPCA({ pubSubmitOverlay: false });
+    } catch (err) {
+      dispatchError(err);
     }
+  }
+
+  function clearPlot(type) {
+    URL.revokeObjectURL(state[`${type}URL`]);
+    dispatchPCA({ [`${type}URL`]: '' });
   }
 
   // get Signature Reference Sets for dropdown options
   async function getSignatureSet(profileType) {
-    if (profileType) {
-      dispatchPCA({ submitOverlay: true });
-      try {
+    try {
+      if (profileType) {
+        setOverlay('within', true);
+
         const response = await getRefSigOptions(profileType);
 
         if (response.ok) {
@@ -142,55 +137,52 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
           dispatchPCA({
             signatureSetOptions: signatureSetOptions,
             signatureSet: signatureSetOptions[0],
-            submitOverlay: false,
           });
         } else {
           dispatchError(await response.json());
-          dispatchPCA({ submitOverlay: false });
         }
-      } catch (err) {
-        dispatchError(err);
-        dispatchPCA({ submitOverlay: false });
       }
+    } catch (err) {
+      dispatchError(err);
+    } finally {
+      setOverlay('within', false);
     }
   }
 
-  async function calculateR(fn, args) {
-    if (!fn.includes('With')) {
-      dispatchPCA({
-        submitOverlay: true,
-        debugR: '',
-        pcaErr: false,
-      });
-    } else {
-      dispatchPCA({
-        pubSubmitOverlay: true,
-        debugR: '',
-        pubPcaErr: false,
-      });
-    }
-
+  async function calculateR(type, fn, args) {
     try {
+      setOverlay(type, true);
+      if (type == 'within') {
+        dispatchPCA({
+          debugR: '',
+          pcaErr: false,
+          pca1: '',
+          pca2: '',
+          pca3: '',
+          heatmap: '',
+        });
+      } else {
+        dispatchPCA({
+          debugR: '',
+          pubPcaErr: false,
+          pubPca1: '',
+          pubPca2: '',
+          pubPca3: '',
+        });
+      }
+
       const response = await submitR(fn, args);
       if (!response.ok) {
         const err = await response.json();
-
         dispatchPCA({ debugR: err });
-        if (!fn.includes('With')) {
-          dispatchPCA({ submitOverlay: false });
-        } else {
-          dispatchPCA({
-            pubSubmitOverlay: false,
-          });
-        }
       } else {
         const { debugR, output } = await response.json();
 
-        if (!fn.includes('With')) {
-          if (Object.keys(output).length) {
+        dispatchPCA({ debugR: debugR });
+
+        if (Object.keys(output).length) {
+          if (type == 'within') {
             dispatchPCA({
-              debugR: debugR,
-              submitOverlay: false,
               pca1: output.pca1,
               pca2: output.pca2,
               pca3: output.pca3,
@@ -199,63 +191,33 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
               pca3Data: output.pca3Data,
               heatmapData: output.heatmapData,
             });
-            setRPlot(output.pca1, 'pca1');
-            setRPlot(output.pca2, 'pca2');
-            setRPlot(output.pca3, 'pca3');
-            setRPlot(output.heatmap, 'heatmap');
           } else {
-            if (pca1URL) URL.revokeObjectURL(pca1URL);
-            if (pca2URL) URL.revokeObjectURL(pca2URL);
-            if (pca3URL) URL.revokeObjectURL(pca3URL);
-            if (heatmapURL) URL.revokeObjectURL(heatmapURL);
             dispatchPCA({
-              debugR: debugR,
-              submitOverlay: false,
-              pcaErr: true,
-              pca1URL: '',
-              pca2URL: '',
-              pca3URL: '',
-              heatmapURL: '',
-            });
-          }
-        } else {
-          if (Object.keys(output).length) {
-            dispatchPCA({
-              debugR: debugR,
-              pubSubmitOverlay: false,
               pubPca1: output.pca1,
               pubPca2: output.pca2,
               pubPca3: output.pca3,
               pubPca2Data: output.pca2Data,
               pubPca3Data: output.pca3Data,
             });
-            setRPlot(output.pca1, 'pubPca1');
-            setRPlot(output.pca2, 'pubPca2');
-            setRPlot(output.pca3, 'pubPca3');
+          }
+        } else {
+          if (type == 'within') {
+            dispatchPCA({
+              debugR: debugR,
+              pcaErr: true,
+            });
           } else {
-            if (pubPca1URL) URL.revokeObjectURL(pubPca1URL);
-            if (pubPca2URL) URL.revokeObjectURL(pubPca2URL);
-            if (pubPca3URL) URL.revokeObjectURL(pubPca3URL);
             dispatchPCA({
               debugR: debugR,
               pubPcaErr: true,
-              pubSubmitOverlay: false,
-              pubPca1URL: '',
-              pubPca2URL: '',
-              pubPca3URL: '',
             });
           }
         }
       }
     } catch (err) {
       dispatchError(err);
-      if (!fn.includes('With')) {
-        dispatchPCA({ submitOverlay: false });
-      } else {
-        dispatchPCA({
-          pubSubmitOverlay: false,
-        });
-      }
+    } finally {
+      setOverlay(type, false);
     }
   }
 
@@ -341,7 +303,7 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
                   variant="primary"
                   onClick={() => {
                     if (source == 'user') {
-                      calculateR('pca', {
+                      calculateR('within', 'pca', {
                         profileType: profileType,
                         signatureSet: signatureSet,
                         matrixList: JSON.stringify(
@@ -351,7 +313,7 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
                         ),
                       });
                     } else {
-                      calculateR('pcaPublic', {
+                      calculateR('within', 'pcaPublic', {
                         profileType: profileType,
                         signatureSet: signatureSet,
                         study: study,
@@ -372,14 +334,14 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
             )}
           </Form>
 
-          <div id="pca1Plot">
-            <div style={{ display: pcaErr ? 'block' : 'none' }}>
+          {pcaErr && (
+            <div className="p-3">
               <p>An error has occured. Please verify your input.</p>
             </div>
-            <div
-             
-              style={{ display: pca1URL ? 'block' : 'none' }}
-            >
+          )}
+
+          {pca1URL && (
+            <div id="pca1Plot">
               <hr />
               <Plot
                 className="p-3"
@@ -387,13 +349,10 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
                 plotURL={pca1URL}
               />
             </div>
-          </div>
+          )}
 
-          <div id="pca2Plot">
-            <div
-             
-              style={{ display: pca2URL ? 'block' : 'none' }}
-            >
+          {pca2URL && (
+            <div id="pca2Plot">
               <hr />
               <Plot
                 className="p-3"
@@ -402,13 +361,10 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
                 txtPath={projectID + pca2Data}
               />
             </div>
-          </div>
+          )}
 
-          <div id="pca3Plot">
-            <div
-             
-              style={{ display: pca3URL ? 'block' : 'none' }}
-            >
+          {pca3URL && (
+            <div id="pca3Plot">
               <hr />
               <Plot
                 className="p-3"
@@ -417,13 +373,10 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
                 txtPath={projectID + pca3Data}
               />
             </div>
-          </div>
+          )}
 
-          <div id="heatmapPlot">
-            <div
-             
-              style={{ display: heatmapURL ? 'block' : 'none' }}
-            >
+          {heatmapURL && (
+            <div id="heatmapPlot">
               <hr />
               <Plot
                 className="p-3"
@@ -432,7 +385,7 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
                 txtPath={projectID + heatmapData}
               />
             </div>
-          </div>
+          )}
         </div>
       ),
     },
@@ -489,7 +442,7 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
                   className="mt-auto mb-3"
                   variant="primary"
                   onClick={() =>
-                    calculateR('pcaWithPublic', {
+                    calculateR('pub', 'pcaWithPublic', {
                       matrixFile: matrixList.filter(
                         (path) =>
                           path.Profile_Type == userProfileType &&
@@ -507,14 +460,14 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
             </Row>
           </Form>
 
-          <div id="pubPca1Plot">
-            <div style={{ display: pubPcaErr ? 'block' : 'none' }}>
+          {pubPcaErr && (
+            <div className="p-3">
               <p>An error has occured. Please verify your input.</p>
             </div>
-            <div
-             
-              style={{ display: pubPca1URL ? 'block' : 'none' }}
-            >
+          )}
+
+          {pubPca1URL && (
+            <div id="pubPca1Plot">
               <hr />
               <Plot
                 className="p-3"
@@ -522,13 +475,10 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
                 plotURL={pubPca1URL}
               />
             </div>
-          </div>
+          )}
 
-          <div id="pubPca2Plot">
-            <div
-             
-              style={{ display: pubPca2URL ? 'block' : 'none' }}
-            >
+          {pubPca2URL && (
+            <div id="pubPca2Plot">
               <hr />
               <Plot
                 className="p-3"
@@ -537,13 +487,10 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
                 txtPath={projectID + pubPca2Data}
               />
             </div>
-          </div>
+          )}
 
-          <div id="pubPca3Plot">
-            <div
-             
-              style={{ display: pubPca3URL ? 'block' : 'none' }}
-            >
+          {pubPca3URL && (
+            <div id="pubPca3Plot">
               <hr />
               <Plot
                 className="p-3"
@@ -552,7 +499,7 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
                 txtPath={projectID + pubPca3Data}
               />
             </div>
-          </div>
+          )}
         </div>
       ),
     });

@@ -103,7 +103,7 @@ export const getInitialState = () => ({
     display: true,
     err: false,
     debugR: [],
-    submitOverlay: false,
+    loading: false,
   },
   profileComparison: {
     withinProfileType: '',

@@ -26,14 +26,13 @@ export default function MutationalPattern({ submitR }) {
     plotURL,
     barPath,
     barURL,
-    display,
     err,
     debugR,
-    submitOverlay,
+    loading,
   } = useSelector((state) => state.mutationalPattern);
 
+  // load plots if they exist - used for precalculated examples
   useEffect(() => {
-    // load plots if they exist - used for precalculated examples
     const checkPlot = async () => {
       const barchart =
         source == 'user'
@@ -45,7 +44,6 @@ export default function MutationalPattern({ submitR }) {
       });
       if (check.status === 200) {
         dispatchMutationalPattern({ barPath: barchart });
-        setRPlot(barchart, 'barchart');
       }
 
       const mpea =
@@ -61,15 +59,19 @@ export default function MutationalPattern({ submitR }) {
           plotPath: mpea,
           txtPath: `/results/mutationalPatternPublic/mpea.txt`,
         });
-        setRPlot(mpea, 'context');
       }
     };
 
     if (projectID) checkPlot();
   }, [projectID]);
 
+  useEffect(() => {
+    plotPath ? setRPlot(plotPath, 'context') : clearPlot('context');
+    barPath ? setRPlot(barPath, 'barchart') : clearPlot('barchart');
+  }, [plotPath, barPath]);
+
   async function setRPlot(plotPath, type) {
-    dispatchMutationalPattern({ submitOverlay: true });
+    dispatchMutationalPattern({ loading: true });
 
     if (plotPath) {
       try {
@@ -99,23 +101,34 @@ export default function MutationalPattern({ submitR }) {
       if (plotURL) URL.revokeObjectURL(plotURL);
       dispatchMutationalPattern({ err: true, plotURL: '' });
     }
-    dispatchMutationalPattern({ submitOverlay: false });
+    dispatchMutationalPattern({ loading: false });
+  }
+
+  function clearPlot(type) {
+    if (type == 'context') {
+      URL.revokeObjectURL(plotURL);
+      dispatchMutationalPattern({ plotURL: '' });
+    } else if (type == 'barchart') {
+      URL.revokeObjectURL(barURL);
+      dispatchMutationalPattern({ barURL: '' });
+    }
   }
 
   async function calculateR(fn, args) {
     dispatchMutationalPattern({
-      submitOverlay: true,
+      loading: true,
       err: false,
       debugR: '',
+      plotPath: '',
+      txtPath: '',
+      barPath: '',
     });
 
     try {
       const response = await submitR(fn, args);
       if (!response.ok) {
         const err = await response.json();
-        dispatchMutationalPattern({ debugR: err });
-
-        dispatchMutationalPattern({ submitOverlay: false });
+        dispatchMutationalPattern({ debugR: err, loading: false });
       } else {
         const { debugR, output } = await response.json();
         if (Object.keys(output).length) {
@@ -125,62 +138,61 @@ export default function MutationalPattern({ submitR }) {
             barPath: output.barPath,
             txtPath: output.txtPath,
           });
-          setRPlot(output.plotPath, 'context');
-          if (output.barPath) setRPlot(output.barPath, 'barchart');
         } else {
           dispatchMutationalPattern({
             debugR: debugR,
             err: true,
-            submitOverlay: false,
+            loading: false,
           });
         }
       }
     } catch (err) {
       dispatchError(err);
-      dispatchMutationalPattern({ submitOverlay: false });
+      dispatchMutationalPattern({ loading: false });
     }
   }
 
   const plots = (
     <div>
-      <div id="barchart">
-        <hr />
-        <div style={{ display: err ? 'block' : 'none' }}>
-          <h5>Bar Chart</h5>
+      {err && (
+        <div className="p-3">
           <p>An error has occured. Please verify your input.</p>
         </div>
-        {plotURL.length > 0 &&
-          (barURL.length > 0 ? (
-            <div>
-              <Plot
-                className="p-3"
-                plotName={barPath.split('/').slice(-1)[0]}
-                plotURL={barURL}
-              />
-            </div>
-          ) : (
-            <div>
-              <h5>Proportion</h5>
-              <p>
-                No mutational pattern with proportion of mutations large than{' '}
-                {proportion}
-              </p>
-            </div>
-          ))}
+      )}
+
+      <div id="barchart">
+        {barPath && (
+          <>
+            <hr />
+            <Plot
+              className="p-3"
+              plotName={barPath.split('/').slice(-1)[0]}
+              plotURL={barURL}
+            />
+          </>
+        )}
+        {plotPath && !barPath && (
+          <div className="p-3">
+            <p>Frequency of Mutational Pattern</p>
+            <p>
+              No mutational pattern with proportion of mutations large than{' '}
+              {proportion}
+            </p>
+          </div>
+        )}
       </div>
       <div id="context">
-        <div style={{ display: err ? 'block' : 'none' }}>
-          <p>An error has occured. Please verify your input.</p>
-        </div>
-        <div style={{ display: plotURL ? 'block' : 'none' }}>
-          <hr />
-          <Plot
-            className="p-3"
-            plotName={plotPath.split('/').slice(-1)[0]}
-            plotURL={plotURL}
-            txtPath={projectID + txtPath}
-          />
-        </div>
+        {plotPath && (
+          <>
+            <hr />
+            <Plot
+              className="p-3"
+              plotName={plotPath.split('/').slice(-1)[0]}
+              plotURL={plotURL}
+              txtPath={projectID + txtPath}
+            />
+          </>
+        )}
       </div>
     </div>
   );
@@ -190,7 +202,7 @@ export default function MutationalPattern({ submitR }) {
       {source == 'user' ? (
         <div className="bg-white border rounded">
           <Form className="p-3">
-            <LoadingOverlay active={submitOverlay} />
+            <LoadingOverlay active={loading} />
             <Row>
               <Col lg="4">
                 <Group controlId="minimum">
@@ -243,12 +255,12 @@ export default function MutationalPattern({ submitR }) {
               </Col>
             </Row>
           </Form>
-          {plotPath.length > 0 && plots}
+          {plots}
         </div>
       ) : (
         <div className="bg-white border rounded">
           <Form className="p-3">
-            <LoadingOverlay active={submitOverlay} />
+            <LoadingOverlay active={loading} />
             <Row className="justify-content-center">
               <Col lg="4">
                 <Label>
