@@ -201,7 +201,7 @@ export default function MutationalPattern({ submitR }) {
     <div>
       {source == 'user' ? (
         <div className="bg-white border rounded">
-          <Form className="p-3">
+          <Form noValidate className="p-3">
             <LoadingOverlay active={loading} />
             <Row>
               <Col lg="4">
@@ -217,7 +217,11 @@ export default function MutationalPattern({ submitR }) {
                         proportion: e.target.value,
                       });
                     }}
-                  ></Control>
+                    isInvalid={!proportion || isNaN(proportion)}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Enter a valid proportion between 0 and 1
+                  </Form.Control.Feedback>
                 </Group>
               </Col>
               <Col lg="3">
@@ -231,7 +235,11 @@ export default function MutationalPattern({ submitR }) {
                         pattern: e.target.value,
                       });
                     }}
-                  ></Control>
+                    isInvalid={!pattern}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Enter a valid pattern
+                  </Form.Control.Feedback>
                 </Group>
               </Col>
               <Col lg="3" />
@@ -249,6 +257,7 @@ export default function MutationalPattern({ submitR }) {
                       pattern: pattern,
                     });
                   }}
+                  disabled={!pattern || isNaN(proportion) || !proportion}
                 >
                   Calculate
                 </Button>
@@ -273,7 +282,11 @@ export default function MutationalPattern({ submitR }) {
                       proportion: e.target.value,
                     });
                   }}
-                ></Control>
+                  isInvalid={!proportion || isNaN(proportion)}
+                />
+                <Form.Control.Feedback type="invalid">
+                  Enter a valid proportion between 0 and 1
+                </Form.Control.Feedback>
               </Col>
               <Col lg="3">
                 <Label>Mutational Pattern</Label>
@@ -284,7 +297,11 @@ export default function MutationalPattern({ submitR }) {
                       pattern: e.target.value,
                     });
                   }}
-                ></Control>
+                  isInvalid={!pattern}
+                />
+                <Form.Control.Feedback type="invalid">
+                  Enter a valid pattern
+                </Form.Control.Feedback>
               </Col>
               <Col lg="3" />
               <Col lg="2" className="d-flex justify-content-end">
@@ -300,6 +317,7 @@ export default function MutationalPattern({ submitR }) {
                       pattern: pattern,
                     });
                   }}
+                  disabled={!pattern || isNaN(proportion) || !proportion}
                 >
                   Calculate
                 </Button>

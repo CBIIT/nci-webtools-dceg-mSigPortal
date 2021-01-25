@@ -55,7 +55,7 @@ export default function Tumor({ calculatePrevalence }) {
 
   return (
     <div>
-      <Form className="p-3">
+      <Form noValidate className="p-3">
         <LoadingOverlay active={loading} />
         <p>Prevalence of Mutational Signature</p>
         <Row>
@@ -70,8 +70,11 @@ export default function Tumor({ calculatePrevalence }) {
                     mutation: e.target.value,
                   });
                 }}
+                isInvalid={!mutation || isNaN(mutation)}
               />
-              {/* <Text className="text-muted">(Ex. NCG>NTG)</Text> */}
+              <Form.Control.Feedback type="invalid">
+                Enter a minimum value
+              </Form.Control.Feedback>
             </Group>
           </Col>
           <Col lg="5" />
@@ -80,6 +83,7 @@ export default function Tumor({ calculatePrevalence }) {
               className="mt-auto mb-3"
               variant="primary"
               onClick={calculatePrevalence}
+              disabled={!mutation || isNaN(mutation)}
             >
               Calculate
             </Button>

@@ -115,7 +115,7 @@ export default function Kataegis({ submitR }) {
     <div>
       {source == 'user' && inputFormat == 'vcf' ? (
         <div className="bg-white border rounded">
-          <Form className="p-3">
+          <Form noValidate className="p-3">
             <LoadingOverlay active={loading} />
             <Row>
               <Col lg="3">
@@ -155,7 +155,11 @@ export default function Kataegis({ submitR }) {
                         min: e.target.value,
                       });
                     }}
+                    isInvalid={!min || isNaN(min)}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    Enter a minimum value
+                  </Form.Control.Feedback>
                 </Group>
               </Col>
               <Col lg="2">
@@ -169,7 +173,11 @@ export default function Kataegis({ submitR }) {
                         max: e.target.value,
                       });
                     }}
+                    isInvalid={!max || isNaN(max)}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    Enter a maximum value
+                  </Form.Control.Feedback>
                 </Group>
               </Col>
               <Col lg="2">
@@ -195,6 +203,7 @@ export default function Kataegis({ submitR }) {
                   className="mt-auto mb-3"
                   variant="primary"
                   onClick={calculateR}
+                  disabled={!min || !max || isNaN(min) || isNaN(max)}
                 >
                   Calculate
                 </Button>
