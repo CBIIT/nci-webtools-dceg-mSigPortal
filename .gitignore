@@ -10,3 +10,6 @@
 *-audit.json
 .DS_Store
 .eslintcache
+
+mSigPortal_Profiler_Extraction.py
+Sigvisualfunc.R
