@@ -31,25 +31,25 @@ export default function MutationalSignatureProfile({ submitR }) {
   );
 
   useEffect(() => {
-    if (plotPath) setRPlot(plotPath);
-    else clearPlot();
+    plotPath ? setRPlot(plotPath) : clearPlot();
   }, [plotPath]);
 
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchExpCosineSimilarity({ plotPath: '', plotURL: '' });
+      dispatchExpCosineSimilarity({ plotURL: '' });
     }
   }
 
   async function calculateR(fn, args) {
-    dispatchExpCosineSimilarity({
-      loading: true,
-      err: false,
-      debugR: '',
-    });
-
     try {
+      dispatchExpCosineSimilarity({
+        loading: true,
+        err: false,
+        plotPath: '',
+        txtPath: '',
+      });
+
       const response = await submitR(fn, args);
       if (!response.ok) {
         const err = await response.json();

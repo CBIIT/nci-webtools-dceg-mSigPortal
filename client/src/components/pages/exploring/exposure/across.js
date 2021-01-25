@@ -22,8 +22,7 @@ export default function Across({ calculateAcross }) {
   const { projectID } = useSelector((state) => state.expExposure);
 
   useEffect(() => {
-    if (plotPath) setRPlot(plotPath);
-    else clearPlot();
+    plotPath ? setRPlot(plotPath) : clearPlot();
   }, [plotPath, err, debugR, projectID]);
 
   useEffect(() => {
@@ -61,7 +60,7 @@ export default function Across({ calculateAcross }) {
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchExpAcross({ plotPath: '', plotURL: '' });
+      dispatchExpAcross({ plotURL: '' });
     }
   }
 

@@ -18,8 +18,7 @@ export default function Tumor({ calculatePrevalence }) {
   const { projectID } = useSelector((state) => state.expExposure);
 
   useEffect(() => {
-    if (plotPath) setRPlot(plotPath);
-    else clearPlot();
+    plotPath ? setRPlot(plotPath) : clearPlot();
   }, [plotPath, err, debugR, projectID]);
 
   async function setRPlot(plotPath) {
@@ -49,7 +48,7 @@ export default function Tumor({ calculatePrevalence }) {
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchExpPrevalence({ plotPath: '', plotURL: '' });
+      dispatchExpPrevalence({ plotURL: '' });
     }
   }
 

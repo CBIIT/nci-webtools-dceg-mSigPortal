@@ -24,8 +24,7 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
   const { projectID } = useSelector((state) => state.expExposure);
 
   useEffect(() => {
-    if (plotPath) setRPlot(plotPath);
-    else clearPlot();
+    plotPath ? setRPlot(plotPath) : clearPlot();
   }, [plotPath, err, debugR, projectID]);
 
   async function setRPlot(plotPath) {
@@ -55,7 +54,7 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchExpLandscape({ plotPath: '', plotURL: '' });
+      dispatchExpLandscape({ plotURL: '' });
     }
   }
 

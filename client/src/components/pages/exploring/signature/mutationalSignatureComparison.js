@@ -34,14 +34,13 @@ export default function MutationalSignatureProfile({ submitR }) {
   );
 
   useEffect(() => {
-    if (plotPath) setRPlot(plotPath);
-    else clearPlot();
+    plotPath ? setRPlot(plotPath) : clearPlot();
   }, [plotPath]);
 
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchExpMutationalSigComparison({ plotPath: '', plotURL: '' });
+      dispatchExpMutationalSigComparison({ plotURL: '' });
     }
   }
 
@@ -49,7 +48,8 @@ export default function MutationalSignatureProfile({ submitR }) {
     dispatchExpMutationalSigComparison({
       loading: true,
       err: false,
-      debugR: '',
+      plotPath: '',
+      txtPath: '',
     });
 
     try {

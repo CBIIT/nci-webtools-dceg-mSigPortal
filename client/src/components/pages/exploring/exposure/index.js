@@ -190,7 +190,7 @@ export default function Exposure({ match, populateControls }) {
       dispatchExpAcross({
         loading: true,
         err: false,
-        debugR: '',
+         plotPath: '',
       });
 
       if (source == 'user') {
@@ -217,7 +217,7 @@ export default function Exposure({ match, populateControls }) {
       dispatchExpAssociation({
         loading: true,
         err: false,
-        debugR: '',
+         plotPath: '',
       });
 
       if (source == 'user') {
@@ -244,7 +244,7 @@ export default function Exposure({ match, populateControls }) {
       dispatchExpLandscape({
         loading: true,
         err: false,
-        debugR: '',
+         plotPath: '',
       });
 
       if (source == 'user') {
@@ -278,7 +278,7 @@ export default function Exposure({ match, populateControls }) {
       dispatchExpPrevalence({
         loading: true,
         err: false,
-        debugR: '',
+         plotPath: '',
       });
 
       if (source == 'user') {
@@ -303,6 +303,38 @@ export default function Exposure({ match, populateControls }) {
   async function calculateAll() {
     try {
       dispatchExpExposure({ loading: true });
+
+      dispatchExpTumor({
+        plotPath: '',
+        err: '',
+      });
+      dispatchExpSeparated({
+        plotPath: '',
+        err: '',
+      });
+      dispatchExpDecomposition({
+        plotPath: '',
+        txtPath: '',
+        err: '',
+      });
+      dispatchExpAcross({
+        plotPath: '',
+        err: '',
+      });
+      dispatchExpAssociation({
+        plotPath: '',
+        err: '',
+      });
+      dispatchExpLandscape({
+        plotPath: '',
+        err: '',
+      });
+
+      dispatchExpPrevalence({
+        plotPath: '',
+        err: '',
+      });
+
       if (source == 'user') {
         const { projectID, exposureData } = await handleUpload();
 

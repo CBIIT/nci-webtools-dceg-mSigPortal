@@ -39,8 +39,7 @@ export default function Association({
   const { projectID } = useSelector((state) => state.expExposure);
 
   useEffect(() => {
-    if (plotPath) setRPlot(plotPath);
-    else clearPlot();
+    plotPath ? setRPlot(plotPath) : clearPlot();
   }, [plotPath, err, debugR, projectID]);
 
   // apply default signature names
@@ -118,7 +117,7 @@ export default function Association({
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchExpAssociation({ plotPath: '', plotURL: '' });
+      dispatchExpAssociation({ plotURL: '' });
     }
   }
 
