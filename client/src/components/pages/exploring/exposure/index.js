@@ -190,7 +190,7 @@ export default function Exposure({ match, populateControls }) {
       dispatchExpAcross({
         loading: true,
         err: false,
-         plotPath: '',
+        plotPath: '',
       });
 
       if (source == 'user') {
@@ -217,7 +217,7 @@ export default function Exposure({ match, populateControls }) {
       dispatchExpAssociation({
         loading: true,
         err: false,
-         plotPath: '',
+        plotPath: '',
       });
 
       if (source == 'user') {
@@ -244,7 +244,7 @@ export default function Exposure({ match, populateControls }) {
       dispatchExpLandscape({
         loading: true,
         err: false,
-         plotPath: '',
+        plotPath: '',
       });
 
       if (source == 'user') {
@@ -278,7 +278,7 @@ export default function Exposure({ match, populateControls }) {
       dispatchExpPrevalence({
         loading: true,
         err: false,
-         plotPath: '',
+        plotPath: '',
       });
 
       if (source == 'user') {

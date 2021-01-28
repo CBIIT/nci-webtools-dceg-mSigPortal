@@ -3,7 +3,6 @@ import { NavLink } from 'react-router-dom';
 import './navbar.scss';
 
 export function Navbar({ links }) {
-
   return (
     <div className="bg-dark text-white gradient shadow-sm">
       <div className="container d-none d-md-flex justify-content-center">

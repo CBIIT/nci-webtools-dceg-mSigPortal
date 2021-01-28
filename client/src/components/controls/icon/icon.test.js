@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import { Icon } from './icon';
 
-describe('Icon Module', function() {
+describe('Icon Module', function () {
   test('Icon renders correctly', () => {
     const props = { name: 'test', alt: 'test' };
     render(<Icon {...props} />);

@@ -112,7 +112,6 @@ export const paginationSizeSelector = ({
   );
 };
 
-
 export const Table = (props) => {
   props.columns.forEach((c) => {
     if (c.sort) {
