@@ -6,9 +6,12 @@ const AWS = require('aws-sdk');
 const fs = require('fs');
 const config = require('./config.json');
 const logger = require('./logger');
+const compression = require('compression');
 
 const app = express();
 const apiRouter = express.Router();
+
+app.use(compression())
 app.use('/api', apiRouter);
 
 const {
