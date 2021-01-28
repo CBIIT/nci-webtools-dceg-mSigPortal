@@ -6,11 +6,17 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
 import Select from '../../controls/select/select';
+import {
+  value2d,
+  filter2d,
+  unique2d,
+  defaultMatrix,
+} from '../../../services/utils';
 
 const { Container, Content, Pane } = Tab;
 const { Item, Link } = Nav;
 
-export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
+export default function PCA({ submitR, getRefSigOptions }) {
   const { matrixList } = useSelector((state) => state.visualizeResults);
   const {
     source,
@@ -64,14 +70,18 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
 
   // check for multiple sample input and disable params if true
   useEffect(() => {
-    if (svgList.length) {
+    if (Object.keys(svgList).length) {
       if (source == 'user') {
         const samples = [
           ...new Set(
-            svgList.map((plot) => {
-              if (plot.Filter != 'NA')
-                return `${plot.Sample_Name}@${plot.Filter}`;
-              else return plot.Sample_Name;
+            svgList.data.map((row) => {
+              if (value2d(row, 'Filter', svgList.columns) != 'NA')
+                return `${value2d(
+                  row,
+                  'Sample_Name',
+                  svgList.columns
+                )}@${value2d(row, 'Filter', svgList.columns)}`;
+              else return value2d(row, 'Sample_Name', svgList.columns);
             })
           ),
         ];
@@ -222,13 +232,11 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
   }
 
   function handleProfileType(profileType) {
-    const userMatrixOptions = [
-      ...new Set(
-        matrixList
-          .filter((matrix) => matrix.Profile_Type == profileType)
-          .map((matrix) => matrix.Matrix_Size)
-      ),
-    ].sort((a, b) => a - b);
+    const userMatrixOptions = unique2d(
+      'Matrix_Size',
+      matrixList.columns,
+      filter2d(profileType, matrixList.data)
+    );
 
     dispatchPCA({
       userProfileType: profileType,
@@ -306,10 +314,16 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
                       calculateR('within', 'pca', {
                         profileType: profileType,
                         signatureSet: signatureSet,
-                        matrixList: JSON.stringify(
-                          matrixList.filter(
-                            (matrix) => matrix.Profile_Type == profileType
-                          )
+                        matrixFile: value2d(
+                          filter2d(
+                            [
+                              profileType,
+                              defaultMatrix(profileType, ['96', '78', '83']),
+                            ],
+                            matrixList.data
+                          )[0],
+                          'Path',
+                          matrixList.columns
                         ),
                       });
                     } else {
@@ -443,11 +457,14 @@ export default function PCA({ submitR, getRefSigOptions, defaultMatrix }) {
                   variant="primary"
                   onClick={() =>
                     calculateR('pub', 'pcaWithPublic', {
-                      matrixFile: matrixList.filter(
-                        (path) =>
-                          path.Profile_Type == userProfileType &&
-                          path.Matrix_Size == userMatrixSize
-                      )[0].Path,
+                      matrixFile: value2d(
+                        filter2d(
+                          [userProfileType, userMatrixSize],
+                          matrixList.data
+                        )[0],
+                        'Path',
+                        matrixList.columns
+                      ),
                       study: pubStudy,
                       cancerType: pubCancerType,
                       profileName: userProfileType + userMatrixSize,

@@ -62,7 +62,10 @@ profilerSummary <- function(matrixList, projectID, pythonOutput, savePath, dataP
     output = list()
     plotPath = paste0(savePath, 'profilerSummary.svg')
 
-    matrixList = fromJSON(matrixList)
+    matrixJSON = fromJSON(matrixList)
+    matrixList = data.frame(matrixJSON$data)
+    colnames(matrixList) = matrixJSON$columns
+
     data_input <- tibble()
 
     for (i in 1:dim(matrixList)[1]) {
@@ -190,7 +193,7 @@ cosineSimilarityWithinPublic <- function(profileType, matrixSize, study, cancerT
 # section 2: Cosine similarity  to reference signatures 
 # Two parameters need: Profile Type, Reference Signature Set
 # Profile Type only support SBS, DBS, ID
-cosineSimilarityRefSig <- function(profileType, signatureSetName, matrixList, projectID, pythonOutput, savePath, dataPath) {
+cosineSimilarityRefSig <- function(profileType, signatureSetName, matrixFile, projectID, pythonOutput, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'Signature/signature_refsets.RData'))
   stdout <- vector('character')
@@ -209,10 +212,7 @@ cosineSimilarityRefSig <- function(profileType, signatureSetName, matrixList, pr
       select(Signature_name, MutationType, Contribution) %>%
       pivot_wider(names_from = Signature_name, values_from = Contribution)
 
-    matrix_size <- str_remove(str_remove(str_remove(profile_name, "SBS"), "ID"), "DBS")
-    matrixfiles = fromJSON(matrixList)
-    matrixfile_selected <- matrixfiles %>% filter(Profile_Type == profileType, Matrix_Size == matrix_size) %>% pull(Path)
-    data_input <- read_delim(matrixfile_selected, delim = '\t')
+    data_input <- read_delim(matrixFile, delim = '\t')
     data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
     # Heatmap of cosine similarity to reference set signature and put on the web---------------------------
@@ -320,7 +320,7 @@ cosineSimilarityPublic <- function(matrixFile, study, cancerType, profileName, p
 ### Profile Comparison tab ###
 # section 1: Cosine similarity within samples 
 # three parameters need: Profile Type, Sample Name1 and Sample Name2
-profileComparisonWithin <- function(profileType, sampleName1, sampleName2, matrixList, projectID, pythonOutput, savePath, dataPath) {
+profileComparisonWithin <- function(profileType, sampleName1, sampleName2, matrixFile, projectID, pythonOutput, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
@@ -332,11 +332,7 @@ profileComparisonWithin <- function(profileType, sampleName1, sampleName2, matri
     plotPath = paste0(savePath, 'pro_com_within.svg')
     error = ''
 
-    matrix_size <- if_else(profileType == "SBS", "96", if_else(profileType == "DBS", "78", if_else(profileType == "ID", "83", NA_character_)))
-
-    matrixfiles = fromJSON(matrixList)
-    matrixfile_selected <- matrixfiles %>% filter(Profile_Type == profileType, Matrix_Size == matrix_size) %>% pull(Path)
-    data_input <- read_delim(matrixfile_selected, delim = '\t')
+    data_input <- read_delim(matrixFile, delim = '\t')
     data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
     profile1 <- data_input %>% select(MutationType, one_of(sampleName1))
@@ -402,7 +398,7 @@ profileComparisonWithinPublic <- function(profileType, sampleName1, sampleName2,
 
 # section 2: Comparison to reference signatures # 
 # four parameters need: “Profile Type”, “Sample Name”, “Reference Signature Set” and “Compare Single Signature or Combined Signatures” # 
-profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, compare, matrixList, projectID, pythonOutput, savePath, dataPath) {
+profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, compare, matrixFile, projectID, pythonOutput, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'Signature/signature_refsets.RData'))
   stdout <- vector('character')
@@ -416,7 +412,6 @@ profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, c
     error = ''
 
     profile_name <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
-    matrix_size <- if_else(profileType == "SBS", "96", if_else(profileType == "DBS", "78", if_else(profileType == "ID", "83", NA_character_)))
 
     signature_refsets_input <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == signatureSetName)
     refsig <- signature_refsets_input %>%
@@ -430,9 +425,7 @@ profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, c
       profile2 <- refsig %>% select(MutationType, one_of(compare))
     }
 
-    matrixfiles = fromJSON(matrixList)
-    matrixfile_selected <- matrixfiles %>% filter(Profile_Type == profileType, Matrix_Size == matrix_size) %>% pull(Path)
-    data_input <- read_delim(matrixfile_selected, delim = '\t')
+    data_input <- read_delim(matrixFile, delim = '\t')
     data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
     profile1 <- data_input %>% select(MutationType, one_of(sampleName))
@@ -644,7 +637,7 @@ mutationalPatternPublic <- function(study, cancerType, experimentalStrategy, pro
 ### “Principal Component Analysis” ###
 # Two parameters need: Profile Type, Reference Signature Set
 # Profile Type only support SBS, DBS, ID
-pca <- function(profileType, signatureSetName, matrixList, projectID, pythonOutput, savePath, dataPath) {
+pca <- function(profileType, signatureSetName, matrixFile, projectID, pythonOutput, savePath, dataPath) {
   source('services/R/Sigvisualfunc.R')
   load(paste0(dataPath, 'Signature/signature_refsets.RData'))
   stdout <- vector('character')
@@ -665,11 +658,8 @@ pca <- function(profileType, signatureSetName, matrixList, projectID, pythonOutp
 
 
     profile_name <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
-    matrix_size <- if_else(profileType == "SBS", "96", if_else(profileType == "DBS", "78", if_else(profileType == "ID", "83", NA_character_)))
 
-    matrixfiles = fromJSON(matrixList)
-    matrixfile_selected <- matrixfiles %>% filter(Profile_Type == profileType, Matrix_Size == matrix_size) %>% pull(Path)
-    data_input <- read_delim(matrixfile_selected, delim = '\t')
+    data_input <- read_delim(matrixFile, delim = '\t')
     data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
     # PCA plot ----------------------------------------------------------------

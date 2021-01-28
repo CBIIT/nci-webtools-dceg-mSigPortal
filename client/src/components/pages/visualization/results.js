@@ -20,6 +20,14 @@ import PCA from './pca';
 import Kataegis from './kataegis';
 import Download from './download';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import {
+  value2d,
+  filter2d,
+  unique2d,
+  defaultProfile,
+  defaultMatrix,
+  defaultFilter,
+} from '../../../services/utils';
 
 export default function Results({ setOpenSidebar }) {
   const { error, projectID, displayTab, svgList, matrixList } = useSelector(
@@ -32,11 +40,15 @@ export default function Results({ setOpenSidebar }) {
   // get mapping of plots after retrieving projectID
   useEffect(() => {
     if (source == 'user') {
-      if (projectID && !svgList.length) {
+      if (projectID && !Object.keys(svgList).length) {
         getResults();
-      } else if (svgList.length && !signatureSetOptions.length) loadData();
+      } else if (Object.keys(svgList).length && !signatureSetOptions.length)
+        loadData();
     } else {
-      if (svgList.length > 0 && !mutationalProfiles.filtered.length)
+      if (
+        Object.keys(svgList).length > 0 &&
+        !mutationalProfiles.filtered.length
+      )
         mapPublicData();
     }
   }, [svgList, projectID, source]);
@@ -70,27 +82,6 @@ export default function Results({ setOpenSidebar }) {
     }
   }
 
-  function defaultProfile(profileOptions) {
-    if (profileOptions.includes('SBS')) return 'SBS';
-    if (profileOptions.includes('DBS')) return 'DBS';
-    if (profileOptions.includes('ID')) return 'ID';
-  }
-
-  function defaultMatrix(profile, matrixOptions) {
-    if (profile == 'SBS')
-      return matrixOptions.includes('96') ? '96' : matrixOptions[0];
-
-    if (profile == 'DBS')
-      return matrixOptions.includes('78') ? '78' : matrixOptions[0];
-
-    if (profile == 'ID')
-      return matrixOptions.includes('83') ? '83' : matrixOptions[0];
-  }
-
-  function defaultFilter(filterOptions) {
-    return filterOptions.includes('NA') ? 'NA' : filterOptions[0];
-  }
-
   // retrieve mapping of samples to plots from svgList file
   async function loadData() {
     dispatchVisualize({
@@ -102,45 +93,39 @@ export default function Results({ setOpenSidebar }) {
     });
 
     // Mutational Profiles
-    const nameOptions = [
-      ...new Set(svgList.map(({ Sample_Name }) => Sample_Name)),
-    ];
+    const nameOptions = unique2d('Sample_Name', svgList.columns, svgList.data);
     const selectName = nameOptions[0];
+    const filteredPlots = filter2d(selectName, svgList.data);
 
-    const filteredPlots = svgList.filter(
-      (plot) => plot.Sample_Name == selectName
+    const filteredProfileOptions = unique2d(
+      'Profile_Type',
+      svgList.columns,
+      filteredPlots
     );
 
-    const filteredProfileOptions = [
-      ...new Set(filteredPlots.map((plot) => plot.Profile_Type)),
-    ].sort();
-    const mpProfile = defaultProfile(filteredProfileOptions);
+    const profile = defaultProfile(filteredProfileOptions);
 
-    const filteredMatrixOptions = [
-      ...new Set(
-        filteredPlots
-          .filter((plot) => plot.Profile_Type == mpProfile)
-          .map((plot) => plot.Matrix_Size)
-      ),
-    ].sort((a, b) => a - b);
-    const mpMatrix = defaultMatrix(mpProfile, filteredMatrixOptions);
+    const filteredMatrixOptions = unique2d(
+      'Matrix_Size',
+      svgList.columns,
+      filter2d(profile, filteredPlots)
+    );
 
-    const filteredFilterOptions = [
-      ...new Set(
-        filteredPlots
-          .filter((plot) => plot.Matrix_Size == mpMatrix)
-          .map((plot) => plot.Filter)
-      ),
-    ];
-    const mpFilter = defaultFilter(filteredFilterOptions);
+    const matrix = defaultMatrix(profile, filteredMatrixOptions);
 
-    const filteredMatrixList = [
-      ...new Set(
-        matrixList
-          .filter((matrix) => matrix.Profile_Type == mpProfile)
-          .map((matrix) => matrix.Matrix_Size)
-      ),
-    ].sort((a, b) => a - b);
+    const filteredFilterOptions = unique2d(
+      'Filter',
+      svgList.columns,
+      filter2d(matrix, filteredPlots)
+    );
+
+    const filter = defaultFilter(filteredFilterOptions);
+
+    const filteredMatrixList = unique2d(
+      'Matrix_Size',
+      matrixList.columns,
+      filter2d(profile, matrixList.data)
+    );
 
     dispatchMutationalProfiles({
       filtered: filteredPlots,
@@ -149,23 +134,30 @@ export default function Results({ setOpenSidebar }) {
       matrixOptions: filteredMatrixOptions,
       filterOptions: filteredFilterOptions,
       selectName: selectName,
-      selectProfile: mpProfile,
-      selectMatrix: mpMatrix,
-      selectFilter: mpFilter,
+      selectProfile: profile,
+      selectMatrix: matrix,
+      selectFilter: filter,
     });
 
     // Cosine Similarity - Profile Comparison - PCA - Kataegis
     const sampleNameOptions = [
       ...new Set(
-        svgList.map((plot) => {
-          if (plot.Filter != 'NA') return `${plot.Sample_Name}@${plot.Filter}`;
-          else return plot.Sample_Name;
+        svgList.data.map((row) => {
+          if (value2d(row, 'Filter', svgList.columns) != 'NA')
+            return `${value2d(row, 'Sample_Name', svgList.columns)}@${value2d(
+              row,
+              'Filter',
+              svgList.columns
+            )}`;
+          else return value2d(row, 'Sample_Name', svgList.columns);
         })
       ),
     ];
-    const profileOptions = [
-      ...new Set(svgList.map((plot) => plot.Profile_Type)),
-    ].sort();
+    const profileOptions = unique2d(
+      'Profile_Type',
+      svgList.columns,
+      svgList.data
+    );
 
     const selectProfile = defaultProfile(profileOptions);
     const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);
@@ -234,53 +226,53 @@ export default function Results({ setOpenSidebar }) {
     });
 
     // Mutational Profiles
-    const nameOptions = [...new Set(svgList.map((plot) => plot.Sample))];
+    const nameOptions = unique2d('Sample', svgList.columns, svgList.data);
     const selectName = mutationalProfiles.selectName || nameOptions[0];
-
     const profileOptions = [
-      ...new Set(svgList.map((plot) => plot.Profile.match(/[a-z]+/gi)[0])),
+      ...new Set(
+        svgList.data.map(
+          (row) => value2d(row, 'Profile', svgList.columns).match(/[a-z]+/gi)[0]
+        )
+      ),
     ];
-
+    const profile = defaultProfile(profileOptions);
     const matrixOptions = [
-      ...new Set(svgList.map((plot) => plot.Profile.match(/\d+/gi)[0])),
+      ...new Set(
+        svgList.data.map(
+          (row) => value2d(row, 'Profile', svgList.columns).match(/\d+/gi)[0]
+        )
+      ),
     ];
-
+    const matrix = defaultMatrix(profile, matrixOptions);
     const filterOptions = ['NA'];
     const selectFilter = filterOptions[0];
 
-    const filteredPlots = svgList.filter(
-      (plot) =>
-        plot.Sample == selectName &&
-        plot.Profile.indexOf(defaultProfile(profileOptions)) > -1 &&
-        plot.Profile.indexOf(
-          defaultMatrix(defaultProfile(profileOptions), matrixOptions)
-        ) > -1
+    const filteredPlots = filter2d(
+      [selectName, `${profile + matrix}`],
+      svgList.data
     );
 
     const filteredProfileOptions = [
       ...new Set(
-        svgList
-          .filter((plot) => plot.Sample == selectName)
-          .map((plot) => plot.Profile.match(/[a-z]+/gi)[0])
+        filter2d(selectName, svgList.data).map(
+          (row) => value2d(row, 'Profile', svgList.columns).match(/[a-z]+/gi)[0]
+        )
       ),
     ].sort();
-    const mpProfile =
-      mutationalProfiles.selectProfile ||
-      defaultProfile(filteredProfileOptions);
 
     const filteredMatrixOptions = [
       ...new Set(
-        svgList
+        svgList.data
           .filter(
-            (plot) =>
-              plot.Sample == selectName && plot.Profile.indexOf(mpProfile) > -1
+            (row) =>
+              row.includes(selectName) &&
+              value2d(row, 'Profile', svgList.columns).indexOf(profile) > -1
           )
-          .map((plot) => plot.Profile.match(/\d+/gi)[0])
+          .map(
+            (row) => value2d(row, 'Profile', svgList.columns).match(/\d+/gi)[0]
+          )
       ),
     ].sort((a, b) => a - b);
-    const mpMatrix =
-      mutationalProfiles.selectMatrix ||
-      defaultMatrix(mpProfile, filteredMatrixOptions);
 
     dispatchMutationalProfiles({
       filtered: filteredPlots,
@@ -289,8 +281,8 @@ export default function Results({ setOpenSidebar }) {
       matrixOptions: filteredMatrixOptions,
       filterOptions: filterOptions,
       selectName: selectName,
-      selectProfile: mpProfile,
-      selectMatrix: mpMatrix,
+      selectProfile: profile,
+      selectMatrix: matrix,
       selectFilter: selectFilter,
     });
 
@@ -400,11 +392,7 @@ export default function Results({ setOpenSidebar }) {
               minHeight: '420px',
             }}
           >
-            <MutationalProfiles
-              defaultMatrix={(profile, matrixOptions) =>
-                defaultMatrix(profile, matrixOptions)
-              }
-            />
+            <MutationalProfiles />
           </div>
           <div
             style={{
@@ -415,9 +403,6 @@ export default function Results({ setOpenSidebar }) {
             <CosineSimilarity
               getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
               submitR={(fn, args) => submitR(fn, args)}
-              defaultMatrix={(profile, matrixOptions) =>
-                defaultMatrix(profile, matrixOptions)
-              }
             />
           </div>
           <div
@@ -438,9 +423,6 @@ export default function Results({ setOpenSidebar }) {
             <ProfileComparison
               getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
               submitR={(fn, args) => submitR(fn, args)}
-              defaultMatrix={(profile, matrixOptions) =>
-                defaultMatrix(profile, matrixOptions)
-              }
             />
           </div>
           <div
@@ -452,9 +434,6 @@ export default function Results({ setOpenSidebar }) {
             <PCA
               getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
               submitR={(fn, args) => submitR(fn, args)}
-              defaultMatrix={(profile, matrixOptions) =>
-                defaultMatrix(profile, matrixOptions)
-              }
             />
           </div>
           <div

@@ -131,12 +131,12 @@ export default function Visualize({ match }) {
                   <Button
                     variant="link"
                     className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
-                      id == displayTab && svgList.length
+                      id == displayTab && Object.keys(svgList).length
                         ? 'active-secondary-navlinks'
                         : ''
                     }`}
-                    active={id == displayTab && svgList.length}
-                    disabled={!svgList.length}
+                    active={id == displayTab && Object.keys(svgList).length}
+                    disabled={!Object.keys(svgList).length}
                     style={{
                       textDecoration: 'none',
                       fontSize: '11pt',
@@ -160,7 +160,7 @@ export default function Visualize({ match }) {
                   <Button
                     variant="link"
                     className={
-                      id == displayTab && svgList.length
+                      id == displayTab && Object.keys(svgList).length
                         ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 active-secondary-navlinks'
                         : 'secondary-navlinks px-3 py-1 d-inline-block border-0'
                     }

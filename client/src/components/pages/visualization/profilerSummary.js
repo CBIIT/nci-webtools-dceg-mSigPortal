@@ -9,17 +9,13 @@ import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
 
 export default function ProfilerSummary({ submitR }) {
-  const {
-    source,
-    study,
-    studyOptions,
-    cancerType,
-    pubExperimentalStrategy,
-    pDataOptions,
-  } = useSelector((state) => state.visualize);
-  const { matrixList, svgList, projectID } = useSelector(
+  const { source, study, cancerType, pubExperimentalStrategy } = useSelector(
+    (state) => state.visualize
+  );
+  const { matrixList, projectID } = useSelector(
     (state) => state.visualizeResults
   );
+  const { filtered } = useSelector((state) => state.mutationalProfiles);
   const { plotPath, plotURL, err, debugR, loading } = useSelector(
     (state) => state.profilerSummary
   );
@@ -53,10 +49,10 @@ export default function ProfilerSummary({ submitR }) {
       }
     };
 
-    if (svgList.length || matrixList.length) {
+    if (filtered.length) {
       checkSummary();
     }
-  }, [matrixList, svgList]);
+  }, [filtered]);
 
   async function setRPlot(plotPath) {
     if (plotPath) {

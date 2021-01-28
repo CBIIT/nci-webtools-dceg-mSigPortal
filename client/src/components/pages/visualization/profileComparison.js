@@ -20,17 +20,19 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
 import Select from '../../controls/select/select';
+import {
+  value2d,
+  filter2d,
+  unique2d,
+  defaultMatrix,
+} from '../../../services/utils';
 
 const { Group, Label, Control, Text } = Form;
 const { Title, Content } = Popover;
 const { Container, Content: TabContent, Pane } = Tab;
 const { Item, Link } = Nav;
 
-export default function ProfileComparison({
-  submitR,
-  getRefSigOptions,
-  defaultMatrix,
-}) {
+export default function ProfileComparison({ submitR, getRefSigOptions }) {
   const {
     source,
     study,
@@ -96,7 +98,7 @@ export default function ProfileComparison({
             const signatures = refSignatures.filter(
               (sig) => sig.toLowerCase().indexOf(search.toLowerCase()) > -1
             );
-            console.log(signatures);
+
             dispatchProfileComparison({
               searchFilter: search,
               filterSignatures: signatures,
@@ -110,7 +112,6 @@ export default function ProfileComparison({
                 key={signature}
                 variant="link"
                 onClick={() => {
-                  console.log('click');
                   let ref = refCompare;
                   if (ref.length) {
                     dispatchProfileComparison({
@@ -309,7 +310,7 @@ export default function ProfileComparison({
 
       if (response.ok) {
         const { svgList } = await response.json();
-        const pubSamples = [...new Set(svgList.map((plot) => plot.Sample))];
+        const pubSamples = unique2d('Sample', svgList.columns, svgList.data);
 
         dispatchProfileComparison({
           pubSampleOptions: pubSamples,
@@ -432,10 +433,20 @@ export default function ProfileComparison({
                         profileType: withinProfileType,
                         sampleName1: withinSampleName1,
                         sampleName2: withinSampleName2,
-                        matrixList: JSON.stringify(
-                          matrixList.filter(
-                            (matrix) => matrix.Profile_Type == withinProfileType
-                          )
+                        matrixFile: value2d(
+                          filter2d(
+                            [
+                              withinProfileType,
+                              defaultMatrix(withinProfileType, [
+                                '96',
+                                '78',
+                                '83',
+                              ]),
+                            ],
+                            matrixList.data
+                          )[0],
+                          'Path',
+                          matrixList.columns
                         ),
                       });
                     } else {
@@ -574,10 +585,20 @@ export default function ProfileComparison({
                         sampleName: refSampleName,
                         signatureSet: refSignatureSet,
                         compare: refCompare,
-                        matrixList: JSON.stringify(
-                          matrixList.filter(
-                            (matrix) => matrix.Profile_Type == withinProfileType
-                          )
+                        matrixFile: value2d(
+                          filter2d(
+                            [
+                              withinProfileType,
+                              defaultMatrix(withinProfileType, [
+                                '96',
+                                '78',
+                                '83',
+                              ]),
+                            ],
+                            matrixList.data
+                          )[0],
+                          'Path',
+                          matrixList.columns
                         ),
                       });
                     } else {
@@ -705,11 +726,14 @@ export default function ProfileComparison({
                   onClick={() =>
                     calculateR('pub', 'profileComparisonPublic', {
                       profileName: userProfileType + userMatrixSize,
-                      matrixFile: matrixList.filter(
-                        (path) =>
-                          path.Profile_Type == userProfileType &&
-                          path.Matrix_Size == userMatrixSize
-                      )[0].Path,
+                      matrixFile: value2d(
+                        filter2d(
+                          [userProfileType, userMatrixSize],
+                          matrixList.data
+                        )[0],
+                        'Path',
+                        matrixList.columns
+                      ),
                       userSample: userSampleName,
                       study: pubStudy,
                       cancerType: pubCancerType,

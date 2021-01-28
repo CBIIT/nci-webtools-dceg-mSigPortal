@@ -8,6 +8,7 @@ import {
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
+import { value2d, filter2d } from '../../../services/utils';
 
 const { Group, Label, Control } = Form;
 
@@ -249,10 +250,11 @@ export default function MutationalPattern({ submitR }) {
                   variant="primary"
                   onClick={() => {
                     calculateR('mutationalPattern', {
-                      matrixFile: matrixList.filter(
-                        (path) =>
-                          path.Profile_Type == 'SBS' && path.Matrix_Size == '96'
-                      )[0].Path,
+                      matrixFile: value2d(
+                        filter2d(['SBS', '96'], matrixList.data)[0],
+                        'Path',
+                        matrixList.columns
+                      ),
                       proportion: parseFloat(proportion),
                       pattern: pattern,
                     });

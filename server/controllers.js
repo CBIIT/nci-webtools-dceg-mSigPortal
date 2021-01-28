@@ -28,6 +28,15 @@ function parseCSV(filepath) {
   });
 }
 
+// convert array of objects into 2d array
+function to2dArray(list) {
+  if (list)
+    return {
+      columns: Object.keys(list[0]),
+      data: list.map((obj) => Object.values(obj)),
+    };
+}
+
 // retrieves parsed data files - modify paths if needed
 async function getResultsFiles(resultsPath, id = '') {
   const svgListPath = path.join(resultsPath, 'svg_files_list.txt');
@@ -55,9 +64,9 @@ async function getResultsFiles(resultsPath, id = '') {
   );
 
   return {
-    svgList: svgList,
+    svgList: to2dArray(svgList),
     statistics: statistics,
-    matrixList: matrixList,
+    matrixList: to2dArray(matrixList),
     downloads: downloads,
   };
 }
@@ -271,7 +280,7 @@ async function getPublicDataOptions(req, res, next) {
       [path.join(config.data.database)]
     );
 
-    res.json(JSON.parse(list));
+    res.json(JSON.to2dArray(parse(list)));
     logger.info('/getPublicOptions: Success');
   } catch (err) {
     logger.info('/getPublicOptions: An error occured');
@@ -298,7 +307,7 @@ async function getPublicData(req, res, next) {
     );
 
     res.json({
-      svgList: svgList,
+      svgList: to2dArray(svgList),
       projectID: projectID,
     });
   } catch (err) {
