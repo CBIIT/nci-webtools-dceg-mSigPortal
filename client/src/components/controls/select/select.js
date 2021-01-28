@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
-import ReactSelect from 'react-select';
+import ReactSelect, { createFilter } from 'react-select';
 
 const { Group, Label } = Form;
 
@@ -13,13 +13,14 @@ export default function Select({
   onChange,
   disabled,
 }) {
-  const selectFix = {
+  const props = {
     styles: {
       menuPortal: (base) => ({ ...base, zIndex: 9999 }),
     },
     menuPortalTarget: document.body,
     getOptionLabel: (option) => (option == 'NA' ? 'N/A' : option),
     getOptionValue: (option) => option,
+    filterOption: createFilter({ ignoreAccents: false }),
   };
 
   return (
@@ -31,7 +32,7 @@ export default function Select({
         value={[value]}
         onChange={onChange}
         isDisabled={disabled}
-        {...selectFix}
+        {...props}
       />
     </Group>
   );
