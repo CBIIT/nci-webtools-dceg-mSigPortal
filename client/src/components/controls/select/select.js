@@ -29,7 +29,7 @@ export default function Select({
       <ReactSelect
         inputId={id}
         options={options}
-        value={[value]}
+        value={[value] || [options[0]]}
         onChange={onChange}
         isDisabled={disabled}
         {...props}
