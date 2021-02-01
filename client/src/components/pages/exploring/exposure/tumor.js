@@ -48,7 +48,6 @@ export default function Tumor() {
   return (
     <div>
       <div className="p-3">
-        <p>Tumor Mutational Burden</p>
         {!err && !plotPath && (
           <p>Please calculate using the left side panel.</p>
         )}
@@ -59,7 +58,7 @@ export default function Tumor() {
           <hr />
           <Plot
             className="p-3"
-            plotName={plotPath.split('/').slice(-1)[0]}
+            plotName="Tumor Mutational Burden"
             plotURL={plotURL}
           />
         </>

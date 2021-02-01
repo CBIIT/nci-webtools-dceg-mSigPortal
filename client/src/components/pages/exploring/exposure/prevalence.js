@@ -56,7 +56,6 @@ export default function Tumor({ calculatePrevalence }) {
     <div>
       <Form noValidate className="p-3">
         <LoadingOverlay active={loading} />
-        <p>Prevalence of Mutational Signature</p>
         <Row>
           <Col lg="5">
             <Group controlId="prevalenceMutations">
@@ -99,7 +98,7 @@ export default function Tumor({ calculatePrevalence }) {
           <hr />
           <Plot
             className="p-3"
-            plotName={plotPath.split('/').slice(-1)[0]}
+            plotName="Prevalence of Mutational Signature"
             plotURL={plotURL}
           />
         </div>

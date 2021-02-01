@@ -68,7 +68,6 @@ export default function Across({ calculateAcross }) {
     <div>
       <Form className="p-3">
         <LoadingOverlay active={loading} />
-        <p>Mutational Signature Burden Across Cancer Types</p>
         <Row className="">
           <Col lg="3">
             <Select
@@ -104,7 +103,7 @@ export default function Across({ calculateAcross }) {
             <hr />
             <Plot
               className="p-3"
-              plotName={plotPath.split('/').slice(-1)[0]}
+              plotName="Mutational Signature Burden Across Cancer Types"
               plotURL={plotURL}
             />
           </>

@@ -62,7 +62,6 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
     <div>
       <Form className="p-3">
         <LoadingOverlay active={loading} />
-        <p>Landscape of Mutational Signature Activity</p>
         <Row className="">
           <Col lg="4">
             <Group controlId="landscape">
@@ -110,7 +109,7 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
           <hr />
           <Plot
             className="p-3"
-            plotName={plotPath.split('/').slice(-1)[0]}
+            plotName="Landscape of Mutational Signature Activity"
             plotURL={plotURL}
             txtPath={projectID + txtPath}
           />

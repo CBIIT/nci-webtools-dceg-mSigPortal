@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, Row, Col } from 'react-bootstrap';
 import { dispatchError } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faMinus, faHome } from '@fortawesome/free-solid-svg-icons';
 import './plot.scss';
 
-export default function ({
+export default function Plot({
   plotName,
   plotURL,
   txtPath,
@@ -57,50 +57,62 @@ export default function ({
         <TransformWrapper className="w-100" {...zoomProps}>
           {({ zoomIn, zoomOut, resetTransform }) => (
             <React.Fragment>
-              <div className="tools d-flex">
-                <div className="d-flex align-items-end ml-auto mb-auto">
-                  {/* <span>{plotName.slice(0, -4)}</span> */}
-                  <a className="ml-auto" href={plotURL} download={plotName}>
-                    Download Plot
-                  </a>
-                  {txtPath && (
-                    <Button
-                      className="p-0 border-0 ml-3"
-                      variant="link"
-                      onClick={() => downloadData(txtPath)}
-                    >
-                      Download Data
-                    </Button>
-                  )}
-                </div>
-                <Button
-                  size="sm"
-                  className="ml-3"
-                  variant="secondary"
-                  onClick={zoomIn}
-                >
-                  <FontAwesomeIcon icon={faPlus} style={{ color: '#fafafa' }} />
-                </Button>
-                <Button
-                  size="sm"
-                  className="ml-1"
-                  variant="secondary"
-                  onClick={zoomOut}
-                >
-                  <FontAwesomeIcon
-                    icon={faMinus}
-                    style={{ color: '#fafafa' }}
-                  />
-                </Button>
-                <Button
-                  size="sm"
-                  className="ml-1"
-                  variant="secondary"
-                  onClick={resetTransform}
-                >
-                  <FontAwesomeIcon icon={faHome} style={{ color: '#fafafa' }} />
-                </Button>
-              </div>
+              <Row className="tools">
+                <Col />
+                <Col className="d-flex">
+                  {plotName && <strong className="mx-auto">{plotName}</strong>}
+                </Col>
+                <Col className="d-flex">
+                  <div className="d-flex align-items-end ml-auto mb-auto">
+                    <a className="ml-auto" href={plotURL} download={plotName}>
+                      Download Plot
+                    </a>
+                    {txtPath && (
+                      <Button
+                        className="p-0 border-0 ml-3"
+                        variant="link"
+                        onClick={() => downloadData(txtPath)}
+                      >
+                        Download Data
+                      </Button>
+                    )}
+                  </div>
+                  <Button
+                    size="sm"
+                    className="ml-3"
+                    variant="secondary"
+                    onClick={zoomIn}
+                  >
+                    <FontAwesomeIcon
+                      icon={faPlus}
+                      style={{ color: '#fafafa' }}
+                    />
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="ml-1"
+                    variant="secondary"
+                    onClick={zoomOut}
+                  >
+                    <FontAwesomeIcon
+                      icon={faMinus}
+                      style={{ color: '#fafafa' }}
+                    />
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="ml-1"
+                    variant="secondary"
+                    onClick={resetTransform}
+                  >
+                    <FontAwesomeIcon
+                      icon={faHome}
+                      style={{ color: '#fafafa' }}
+                    />
+                  </Button>
+                </Col>
+              </Row>
+
               <TransformComponent>
                 <img
                   className="w-100"

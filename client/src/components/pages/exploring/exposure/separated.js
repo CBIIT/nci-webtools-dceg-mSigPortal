@@ -51,7 +51,6 @@ export default function Separated() {
   return (
     <div>
       <div className="p-3">
-        <p>Tumor Mutational Burden Separated by Signatures</p>
         {!err && !plotPath && (
           <p>Please calculate using the left side panel.</p>
         )}
@@ -62,7 +61,7 @@ export default function Separated() {
           <hr />
           <Plot
             className="p-3"
-            plotName={plotPath.split('/').slice(-1)[0]}
+            plotName="Tumor Mutational Burden Separated by Signatures"
             plotURL={plotURL}
           />
         </>
