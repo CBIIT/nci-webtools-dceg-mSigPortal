@@ -64,7 +64,11 @@ export default function Plot({
                 </Col>
                 <Col className="d-flex">
                   <div className="d-flex align-items-end ml-auto mb-auto">
-                    <a className="ml-auto" href={plotURL} download={plotName}>
+                    <a
+                      className="ml-auto"
+                      href={plotURL}
+                      download={plotName.trim()}
+                    >
                       Download Plot
                     </a>
                     {txtPath && (
