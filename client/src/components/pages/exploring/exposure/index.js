@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Form, Row, Col, Tab, Button, Nav } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import Tumor from './tumor';
@@ -98,6 +98,28 @@ export default function Exposure({ match, populateControls }) {
     dispatchExploring({ displayTab: 'exposure' });
   }, []);
 
+  // get new signature name options filtered by cancer type on first mount
+  function usePrevious(value) {
+    const ref = useRef();
+    useEffect(() => {
+      ref.current = value;
+    }, [value]);
+
+    return ref.current;
+  }
+  const prevSigNameOptions = usePrevious(signatureNameOptions);
+  useEffect(() => {
+    if (
+      associationArgs.toggleCancer &&
+      study &&
+      strategy &&
+      refSignatureSet &&
+      source == 'public' &&
+      prevSigNameOptions
+    )
+      getSignatureNames();
+  }, [study, strategy, refSignatureSet, cancer, associationArgs.toggleCancer]);
+
   async function loadExample(id) {
     dispatchExpExposure({
       loading: {
@@ -160,15 +182,14 @@ export default function Exposure({ match, populateControls }) {
         });
       else dispatchError(stdout);
     } catch (err) {
-      console.log(err);
       dispatchError(err);
     }
     dispatchExpExposure({ loading: false, loadingMsg: null });
   }
 
   async function submitR(fn, args, id = projectID) {
-    return await (
-      await fetch(`api/exploringR`, {
+    try {
+      const response = await fetch(`api/exploringR`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -179,8 +200,16 @@ export default function Exposure({ match, populateControls }) {
           args: args,
           projectID: id,
         }),
-      })
-    ).json();
+      });
+
+      if (response.ok) {
+        return await response.json();
+      } else {
+        dispatchError('R submit failed');
+      }
+    } catch (err) {
+      dispatchError(err);
+    }
   }
 
   async function calculateAcross() {
@@ -417,66 +446,70 @@ export default function Exposure({ match, populateControls }) {
         signatureFile: signatureFile,
       });
     }
-    const { debugR, output, errors, projectID: pID } = await submitR(
-      rFn,
-      args,
-      id
-    );
+    try {
+      const { debugR, output, errors, projectID: pID } = await submitR(
+        rFn,
+        args,
+        id
+      );
 
-    if (output) {
-      if (!projectID) dispatchExpExposure({ projectID: pID });
+      if (output) {
+        if (!projectID) dispatchExpExposure({ projectID: pID });
 
-      if (fn == 'all') {
-        dispatchExpTumor({
-          plotPath: output.tumorPath,
-          err: errors.tumorError,
-          debugR: debugR,
-        });
+        if (fn == 'all') {
+          dispatchExpTumor({
+            plotPath: output.tumorPath,
+            err: errors.tumorError,
+            debugR: debugR,
+          });
 
-        dispatchExpSeparated({
-          plotPath: output.burdenSeparatedPath,
-          err: errors.burdenSeparatedError,
-          debugR: debugR,
-        });
+          dispatchExpSeparated({
+            plotPath: output.burdenSeparatedPath,
+            err: errors.burdenSeparatedError,
+            debugR: debugR,
+          });
 
-        dispatchExpDecomposition({
-          plotPath: output.decompositionPath,
-          txtPath: output.decompositionData,
-          err: errors.decompositionError,
-          debugR: debugR,
-        });
+          dispatchExpDecomposition({
+            plotPath: output.decompositionPath,
+            txtPath: output.decompositionData,
+            err: errors.decompositionError,
+            debugR: debugR,
+          });
+        }
+
+        if (fn == 'all' || fn == 'across') {
+          dispatchExpAcross({
+            plotPath: output.burdenAcrossPath,
+            debugR: debugR,
+            err: errors.burdenAcrossError,
+          });
+        }
+
+        if (fn == 'all' || fn == 'association')
+          dispatchExpAssociation({
+            plotPath: output.associationPath,
+            err: errors.associationError,
+            debugR: debugR,
+          });
+
+        if (fn == 'all' || fn == 'landscape')
+          dispatchExpLandscape({
+            plotPath: output.landscapePath,
+            err: errors.landscapeError,
+            debugR: debugR,
+          });
+
+        if (fn == 'all' || fn == 'prevalence')
+          dispatchExpPrevalence({
+            plotPath: output.prevalencePath,
+            err: errors.prevalenceError,
+            debugR: debugR,
+          });
+      } else {
+        dispatchError(debugR);
       }
-
-      if (fn == 'all' || fn == 'across') {
-        dispatchExpAcross({
-          plotPath: output.burdenAcrossPath,
-          debugR: debugR,
-          err: errors.burdenAcrossError,
-        });
-      }
-
-      if (fn == 'all' || fn == 'association')
-        dispatchExpAssociation({
-          plotPath: output.associationPath,
-          err: errors.associationError,
-          debugR: debugR,
-        });
-
-      if (fn == 'all' || fn == 'landscape')
-        dispatchExpLandscape({
-          plotPath: output.landscapePath,
-          err: errors.landscapeError,
-          debugR: debugR,
-        });
-
-      if (fn == 'all' || fn == 'prevalence')
-        dispatchExpPrevalence({
-          plotPath: output.prevalencePath,
-          err: errors.prevalenceError,
-          debugR: debugR,
-        });
-    } else {
-      dispatchError(debugR);
+    } catch (err) {
+      dispatchError(err);
     }
   }
 
@@ -624,9 +657,21 @@ export default function Exposure({ match, populateControls }) {
     const initialState = getInitialState();
 
     window.location.hash = '#/exploring/exposure';
-    source == 'public'
-      ? dispatchExpExposure(initialState.expExposure)
-      : dispatchExpExposure({ ...initialState.expExposure, source: 'user' });
+
+    dispatchExpExposure({
+      ...initialState.expExposure,
+      source: source,
+      display: display,
+      study: 'PCAWG',
+      strategy: 'WGS',
+      refSignatureSet: 'COSMIC v3 Signatures (SBS)',
+      cancer: 'Lung-AdenoCA',
+      studyOptions: studyOptions,
+      strategyOptions: strategyOptions,
+      refSignatureSetOptions: refSignatureSetOptions,
+      cancerOptions: cancerOptions,
+      signatureNameOptions: signatureNameOptions,
+    });
     dispatchExpTumor(initialState.expTumor);
     dispatchExpSeparated(initialState.expSeparated);
     dispatchExpAcross(initialState.expAcross);
@@ -634,7 +679,7 @@ export default function Exposure({ match, populateControls }) {
     dispatchExpAssociation(initialState.expAssociation);
     dispatchExpLandscape(initialState.expLandscape);
     dispatchExpPrevalence(initialState.expPrevalence);
-    populateControls();
+    // populateControls();
   }
 
   // when using public data and only need to upload a variable data file
@@ -754,7 +799,7 @@ export default function Exposure({ match, populateControls }) {
                   <Label className="mr-4">Data Source</Label>
                   <Check inline id="radioPublic">
                     <Check.Input
-                      disabled={loading}
+                      disabled={loading || projectID}
                       type="radio"
                       value="public"
                       checked={source == 'public'}
@@ -768,7 +813,7 @@ export default function Exposure({ match, populateControls }) {
                   </Check>
                   <Check inline id="radioUser">
                     <Check.Input
-                      disabled={loading}
+                      disabled={loading || projectID}
                       type="radio"
                       value="user"
                       checked={source == 'user'}
@@ -787,7 +832,7 @@ export default function Exposure({ match, populateControls }) {
                   <Col>
                     <Group>
                       <Select
-                        disabled={loading}
+                        disabled={loading || projectID}
                         id="expStudyPublic"
                         label="Study"
                         value={study}
@@ -801,7 +846,7 @@ export default function Exposure({ match, populateControls }) {
                   <Col>
                     <Group>
                       <Select
-                        disabled={loading}
+                        disabled={loading || projectID}
                         id="tumorStrategy"
                         label="Experimental Strategy"
                         value={strategy}
@@ -815,7 +860,7 @@ export default function Exposure({ match, populateControls }) {
                   <Col>
                     <Group>
                       <Select
-                        disabled={loading}
+                        disabled={loading || projectID}
                         id="expSetPublic"
                         label="Reference Signature Set"
                         value={refSignatureSet}
@@ -830,7 +875,7 @@ export default function Exposure({ match, populateControls }) {
                     <Group>
                       <Select
                         className="mb-4"
-                        disabled={loading}
+                        disabled={loading || projectID}
                         id="prevalenceCancerType"
                         label="Cancer Type"
                         value={cancer}
@@ -840,6 +885,29 @@ export default function Exposure({ match, populateControls }) {
                             cancer: cancer,
                           })
                         }
+                      />
+                    </Group>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <Group controlId="toggleCancerType">
+                      <Check
+                        disabled={loading || projectID}
+                        type="checkbox"
+                        label="Cancer Type Only"
+                        value={associationArgs.toggleCancer}
+                        checked={associationArgs.toggleCancer}
+                        onChange={(e) => {
+                          if (!associationArgs.toggleCancer == false)
+                            handleSet(refSignatureSet);
+                          else {
+                            getSignatureNames();
+                          }
+                          dispatchExpAssociation({
+                            toggleCancer: !associationArgs.toggleCancer,
+                          });
+                        }}
                       />
                     </Group>
                   </Col>
@@ -857,7 +925,7 @@ export default function Exposure({ match, populateControls }) {
                   </Col>
                   <Col lg="6">
                     <Button
-                      disabled={loading}
+                      disabled={loading || projectID}
                       className="w-100"
                       variant="primary"
                       onClick={() => calculateAll()}
@@ -889,7 +957,7 @@ export default function Exposure({ match, populateControls }) {
                     <Group>
                       <Label>Upload Exposure File</Label>
                       <Form.File
-                        disabled={loading}
+                        disabled={loading || projectID}
                         id="variableData"
                         label={exposureFileObj.name || 'Exposure File'}
                         accept=".txt"
@@ -914,7 +982,7 @@ export default function Exposure({ match, populateControls }) {
                     <Group>
                       <Label>Upload Matrix File</Label>
                       <Form.File
-                        disabled={loading}
+                        disabled={loading || projectID}
                         id="variableData"
                         label={matrixFileObj.name || 'Matrix File'}
                         accept=".txt"
@@ -940,7 +1008,7 @@ export default function Exposure({ match, populateControls }) {
                       <Label className="mr-4">Use Public Signature Data</Label>
                       <Check inline id="toggleSignatureSource">
                         <Check.Input
-                          disabled={loading}
+                          disabled={loading || projectID}
                           type="checkbox"
                           value={usePublicSignature}
                           checked={usePublicSignature}
@@ -961,7 +1029,7 @@ export default function Exposure({ match, populateControls }) {
                       <Col>
                         <Group>
                           <Select
-                            disabled={loading}
+                            disabled={loading || projectID}
                             id="expStudyUser"
                             label="Study"
                             value={study}
@@ -975,7 +1043,7 @@ export default function Exposure({ match, populateControls }) {
                       <Col>
                         <Group>
                           <Select
-                            disabled={loading}
+                            disabled={loading || projectID}
                             id="exposureSignatureSet"
                             label="Reference Signature Set"
                             value={refSignatureSet}
@@ -992,7 +1060,7 @@ export default function Exposure({ match, populateControls }) {
                       <Group>
                         <Label>Upload Signature Data</Label>
                         <Form.File
-                          disabled={loading}
+                          disabled={loading || projectID}
                           id="variableData"
                           label={signatureFileObj.name || 'Signature File'}
                           accept=".txt"
@@ -1017,7 +1085,7 @@ export default function Exposure({ match, populateControls }) {
                   <Col>
                     <Group>
                       <Select
-                        disabled={loading}
+                        disabled={loading || projectID}
                         id="exposureGenome"
                         label="Genome"
                         value={genome}
@@ -1042,7 +1110,7 @@ export default function Exposure({ match, populateControls }) {
                   </Col>
                   <Col lg="6">
                     <Button
-                      disabled={loading}
+                      disabled={loading || projectID}
                       className="w-100"
                       variant="primary"
                       onClick={() => calculateAll()}

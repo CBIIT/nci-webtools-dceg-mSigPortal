@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
@@ -12,11 +12,7 @@ import Select from '../../../controls/select/select';
 
 const { Group, Check } = Form;
 
-export default function Association({
-  calculateAssociation,
-  handleSet,
-  getSignatureNames,
-}) {
+export default function Association({ calculateAssociation, handleSet }) {
   const {
     signatureNameOptions,
     userNameOptions,
@@ -26,7 +22,6 @@ export default function Association({
     refSignatureSet,
   } = useSelector((state) => state.expExposure);
   const {
-    toggleCancer,
     both,
     signatureName1,
     signatureName2,
@@ -56,39 +51,6 @@ export default function Association({
       });
     }
   }, [signatureNameOptions, userNameOptions]);
-
-  function usePrevious(value) {
-    const ref = useRef();
-    useEffect(() => {
-      ref.current = value;
-    }, [value]);
-
-    return ref.current;
-  }
-
-  function arrayEquals(arr1, arr2) {
-    if (arr1.length != arr2.length) return false;
-    arr1.forEach((v, i) => {
-      if (v != arr2[i]) return false;
-    });
-
-    return true;
-  }
-
-  const prevSigNameOptions = usePrevious(userNameOptions);
-  // get new signature name options filtered by cancer type
-  useEffect(() => {
-    if (
-      study &&
-      strategy &&
-      refSignatureSet &&
-      toggleCancer &&
-      source == 'public' &&
-      prevSigNameOptions &&
-      !arrayEquals(prevSigNameOptions, signatureNameOptions)
-    )
-      getSignatureNames();
-  }, [study, strategy, refSignatureSet]);
 
   async function setRPlot(plotPath) {
     if (plotPath) {
@@ -125,25 +87,7 @@ export default function Association({
     <div>
       <Form className="p-3">
         <LoadingOverlay active={loading} />
-        <p>Mutational Signature Association</p>
-        <Row className="">
-          <Col lg="3">
-            <Group controlId="toggleCancerType">
-              <Check
-                type="checkbox"
-                label="Selected Cancer Type Only"
-                value={toggleCancer}
-                checked={toggleCancer}
-                onChange={() => {
-                  {
-                    if (!toggleCancer) getSignatureNames();
-                    else handleSet(refSignatureSet);
-                    dispatchExpAssociation({ toggleCancer: !toggleCancer });
-                  }
-                }}
-              />
-            </Group>
-          </Col>
+        <Row>
           <Col lg="3">
             <Group controlId="toggleBothSamples">
               <Check
@@ -181,6 +125,7 @@ export default function Association({
               }
             />
           </Col>
+          <Col />
           <Col lg="2" className="d-flex justify-content-end">
             <Button
               className="mt-auto mb-3"
@@ -203,7 +148,7 @@ export default function Association({
             <hr />
             <Plot
               className="p-3"
-              plotName={plotPath.split('/').slice(-1)[0]}
+              plotName="Mutational Signature Association"
               plotURL={plotURL}
             />
           </>
