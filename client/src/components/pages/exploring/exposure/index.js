@@ -722,22 +722,26 @@ export default function Exposure({ match, populateControls }) {
     {
       component: <Tumor />,
       key: 'tumor',
-      title: 'TMB',
+      name: 'TMB',
+      title: 'Tumor Mutational Burden',
     },
     {
       component: <Separated />,
       key: 'separated',
-      title: 'TMB by Signatures',
+      name: 'TMB by Signatures',
+      title: 'Tumor Mutational Burden Separated by Signatures',
     },
     {
       component: <Across calculateAcross={calculateAcross} />,
       key: 'across',
-      title: 'MS Burden Across Cancer Types',
+      name: 'MS Burden Across Cancer Types',
+      title: 'Mutational Signature Burden Across Cancer Types',
     },
     {
       component: <Decomposition />,
       key: 'decomposition',
-      title: 'MS Decomposition',
+      name: 'MS Decomposition',
+      title: 'Evaluating the Performance of Mutational Signature Decomposition',
     },
     {
       component: (
@@ -748,7 +752,8 @@ export default function Exposure({ match, populateControls }) {
         />
       ),
       key: 'association',
-      title: 'MS Association',
+      name: 'MS Association',
+      title: 'Mutational Signature Association',
     },
     {
       component: (
@@ -758,12 +763,14 @@ export default function Exposure({ match, populateControls }) {
         />
       ),
       key: 'landscape',
-      title: 'MS Activity Landscape',
+      name: 'MS Activity Landscape',
+      title: 'Landscape of Mutational Signature Activity',
     },
     {
       component: <Prevalence calculatePrevalence={calculatePrevalence} />,
       key: 'prevalence',
-      title: 'MS Prevalence',
+      name: 'MS Prevalence',
+      title: 'Prevalence of Mutational Signature',
     },
   ];
 
@@ -1132,10 +1139,15 @@ export default function Exposure({ match, populateControls }) {
             onSelect={(tab) => dispatchExpExposure({ display: tab })}
           >
             <Nav variant="tabs">
-              {tabs.map(({ key, title }) => (
+              {tabs.map(({ key, name, title }) => (
                 <Item key={key}>
-                  <Link eventKey={key} as="button" className="outline-none">
-                    <strong>{title}</strong>
+                  <Link
+                    eventKey={key}
+                    as="button"
+                    className="outline-none"
+                    title={title}
+                  >
+                    <strong>{name}</strong>
                   </Link>
                 </Item>
               ))}
