@@ -59,10 +59,10 @@ export default function Plot({
             <React.Fragment>
               <Row className="tools">
                 <Col />
-                <Col className="d-flex">
+                <Col className="d-flex text-nowrap">
                   {plotName && <strong className="mx-auto">{plotName}</strong>}
                 </Col>
-                <Col className="d-flex">
+                <Col className="d-flex text-nowrap">
                   <div className="d-flex align-items-end ml-auto mb-auto">
                     <a
                       className="ml-auto"
