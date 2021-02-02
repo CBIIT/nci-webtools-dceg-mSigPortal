@@ -2,14 +2,14 @@ import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
-  dispatchExpDecomposition,
+  dispatchTmbSignatures,
 } from '../../../../services/store';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 
-export default function Decomposition() {
-  const { plotPath, plotURL, txtPath, debugR, err, loading } = useSelector(
-    (state) => state.expDecomposition
+export default function TmbSignatures() {
+  const { plotPath, plotURL, debugR, err } = useSelector(
+    (state) => state.tmbSignatures
   );
   const { projectID } = useSelector((state) => state.expExposure);
 
@@ -28,7 +28,7 @@ export default function Decomposition() {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchExpDecomposition({
+          dispatchTmbSignatures({
             plotURL: objectURL,
           });
         }
@@ -37,14 +37,14 @@ export default function Decomposition() {
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchExpDecomposition({ err: true, plotURL: '' });
+      dispatchTmbSignatures({ err: true, plotURL: '' });
     }
   }
 
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchExpDecomposition({ plotURL: '' });
+      dispatchTmbSignatures({ plotURL: '' });
     }
   }
 
@@ -65,13 +65,12 @@ export default function Decomposition() {
         <>
           <Plot
             className="p-3"
-            plotName="Evaluating the Performance of Mutational Signature Decomposition"
+            plotName="Tumor Mutational Burden Separated by Signatures"
             plotURL={plotURL}
-            txtPath={projectID + txtPath}
           />
         </>
       )}
-      <Debug msg={debugR} />
+      {/* <Debug msg={debugR} /> */}
     </div>
   );
 }

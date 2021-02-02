@@ -1,37 +1,56 @@
 import React, { useEffect } from 'react';
-import { Form, Row, Col, Button, Group } from 'react-bootstrap';
+import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { dispatchError, dispatchExpAcross } from '../../../../services/store';
+import {
+  dispatchError,
+  dispatchMsAssociation,
+} from '../../../../services/store';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
 
-export default function Across({ calculateAcross }) {
-  const { signatureNameOptions, userNameOptions, source } = useSelector(
-    (state) => state.expExposure
-  );
+const { Group, Check } = Form;
+
+export default function MsAssociation({ calculateAssociation, handleSet }) {
   const {
-    signatureName,
+    signatureNameOptions,
+    userNameOptions,
+    source,
+    study,
+    strategy,
+    refSignatureSet,
+  } = useSelector((state) => state.expExposure);
+  const {
+    both,
+    signatureName1,
+    signatureName2,
     plotPath,
     plotURL,
     debugR,
     err,
     loading,
-  } = useSelector((state) => state.expAcross);
+  } = useSelector((state) => state.msAssociation);
   const { projectID } = useSelector((state) => state.expExposure);
 
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
   }, [plotPath, err, debugR, projectID]);
 
+  // apply default signature names
   useEffect(() => {
     if (source == 'public') {
-      dispatchExpAcross({ signatureName: signatureNameOptions[0] });
+      dispatchMsAssociation({
+        signatureName1: signatureNameOptions[0],
+        signatureName2: signatureNameOptions[1],
+      });
     } else {
-      dispatchExpAcross({ signatureName: userNameOptions[0] });
+      dispatchMsAssociation({
+        signatureName1: userNameOptions[0],
+        signatureName2: userNameOptions[1],
+      });
     }
-  }, [signatureNameOptions, userNameOptions, source]);
+  }, [signatureNameOptions, userNameOptions]);
 
   async function setRPlot(plotPath) {
     if (plotPath) {
@@ -44,7 +63,7 @@ export default function Across({ calculateAcross }) {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchExpAcross({
+          dispatchMsAssociation({
             plotURL: objectURL,
           });
         }
@@ -53,14 +72,14 @@ export default function Across({ calculateAcross }) {
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchExpAcross({ err: true, plotURL: '' });
+      dispatchMsAssociation({ err: true, plotURL: '' });
     }
   }
 
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchExpAcross({ plotURL: '' });
+      dispatchMsAssociation({ plotURL: '' });
     }
   }
 
@@ -68,31 +87,57 @@ export default function Across({ calculateAcross }) {
     <div>
       <Form className="p-3">
         <LoadingOverlay active={loading} />
-        <Row className="">
+        <Row>
           <Col lg="3">
+            <Group controlId="toggleBothSamples">
+              <Check
+                type="checkbox"
+                label="Number of Mutations assigned to both signature > 0"
+                value={both}
+                checked={both}
+                onChange={(e) => dispatchMsAssociation({ both: !both })}
+              />
+            </Group>
+          </Col>
+          <Col lg="2">
             <Select
-              id="acrossSignatureName"
-              label="Signature Name"
-              value={signatureName}
+              id="associationSignatureName1"
+              label="Signature Name 1"
+              value={signatureName1}
               options={
                 source == 'public' ? signatureNameOptions : userNameOptions
               }
-              onChange={(name) => dispatchExpAcross({ signatureName: name })}
+              onChange={(name) =>
+                dispatchMsAssociation({ signatureName1: name })
+              }
             />
           </Col>
-          <Col lg="7" />
+          <Col lg="2">
+            <Select
+              id="associationSignatureName2"
+              label="Signature Name 2"
+              value={signatureName2}
+              options={
+                source == 'public' ? signatureNameOptions : userNameOptions
+              }
+              onChange={(name) =>
+                dispatchMsAssociation({ signatureName2: name })
+              }
+            />
+          </Col>
+          <Col />
           <Col lg="2" className="d-flex justify-content-end">
             <Button
               className="mt-auto mb-3"
               variant="primary"
-              onClick={calculateAcross}
+              onClick={calculateAssociation}
             >
               Calculate
             </Button>
           </Col>
         </Row>
       </Form>
-      <div id="exposureAcrossPlot">
+      <div id="exposureAssociationPlot">
         {err && (
           <div>
             <hr />
@@ -104,7 +149,7 @@ export default function Across({ calculateAcross }) {
             <hr />
             <Plot
               className="p-3"
-              plotName="Mutational Signature Burden Across Cancer Types"
+              plotName="Mutational Signature Association"
               plotURL={plotURL}
             />
           </>

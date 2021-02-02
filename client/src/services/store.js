@@ -285,25 +285,25 @@ export const getInitialState = () => ({
     signatureFile: '',
     usePublicSignature: true,
     source: 'public',
-    display: 'tumor',
+    display: 'tmb',
     loading: false,
     loadingMsg: null,
     projectID: '',
     openSidebar: true,
   },
-  expTumor: {
+  tmb: {
     plotPath: '',
     plotURL: '',
     debugR: '',
     err: '',
   },
-  expSeparated: {
+  tmbSignatures: {
     plotPath: '',
     plotURL: '',
     debugR: '',
     err: '',
   },
-  expAcross: {
+  msBurden: {
     signatureName: '',
     plotPath: '',
     plotURL: '',
@@ -311,7 +311,7 @@ export const getInitialState = () => ({
     err: '',
     loading: false,
   },
-  expAssociation: {
+  msAssociation: {
     toggleCancer: true,
     both: true,
     signatureName1: '',
@@ -323,7 +323,7 @@ export const getInitialState = () => ({
     err: '',
     loading: false,
   },
-  expDecomposition: {
+  msDecomposition: {
     plotPath: '',
     plotURL: '',
     txtPath: '',
@@ -331,7 +331,7 @@ export const getInitialState = () => ({
     err: '',
     loading: false,
   },
-  expLandscape: {
+  msLandscape: {
     variableFile: '',
     plotPath: '',
     plotURL: '',
@@ -340,7 +340,7 @@ export const getInitialState = () => ({
     err: '',
     loading: false,
   },
-  expPrevalence: {
+  msPrevalence: {
     mutation: '100',
     plotPath: '',
     plotURL: '',
@@ -570,7 +570,7 @@ const expMutationalSigComparisonSlice = createSlice({
 });
 const expExposureSlice = createSlice({
   name: 'expExposure',
-  initialState: getInitialState().expTumor,
+  initialState: getInitialState().tmb,
   reducers: {
     updateExpExposure: (state, action) => {
       return {
@@ -580,11 +580,11 @@ const expExposureSlice = createSlice({
     },
   },
 });
-const expTumorSlice = createSlice({
-  name: 'expTumor',
-  initialState: getInitialState().expTumor,
+const tmbSlice = createSlice({
+  name: 'tmb',
+  initialState: getInitialState().tmb,
   reducers: {
-    updateExpTumor: (state, action) => {
+    updateTMB: (state, action) => {
       return {
         ...state,
         ...action.payload,
@@ -592,11 +592,11 @@ const expTumorSlice = createSlice({
     },
   },
 });
-const expSeparatedSlice = createSlice({
-  name: 'expSeparated',
-  initialState: getInitialState().expSeparated,
+const tmbSignaturesSlice = createSlice({
+  name: 'tmbSignatures',
+  initialState: getInitialState().tmbSignatures,
   reducers: {
-    updateExpSeparated: (state, action) => {
+    updateTmbSignatures: (state, action) => {
       return {
         ...state,
         ...action.payload,
@@ -604,11 +604,11 @@ const expSeparatedSlice = createSlice({
     },
   },
 });
-const expAcrossSlice = createSlice({
-  name: 'expAcross',
-  initialState: getInitialState().expAcross,
+const msBurdenSlice = createSlice({
+  name: 'msBurden',
+  initialState: getInitialState().msBurden,
   reducers: {
-    updateExpAcross: (state, action) => {
+    updateMsBurden: (state, action) => {
       return {
         ...state,
         ...action.payload,
@@ -616,11 +616,11 @@ const expAcrossSlice = createSlice({
     },
   },
 });
-const expAssocationSlice = createSlice({
-  name: 'expAssocation',
-  initialState: getInitialState().expAssociation,
+const msAssocationSlice = createSlice({
+  name: 'msAssocation',
+  initialState: getInitialState().msAssociation,
   reducers: {
-    updateExpAssociation: (state, action) => {
+    updateMsAssociation: (state, action) => {
       return {
         ...state,
         ...action.payload,
@@ -628,11 +628,11 @@ const expAssocationSlice = createSlice({
     },
   },
 });
-const expDecompositionSlice = createSlice({
-  name: 'expDecomposition',
-  initialState: getInitialState().expDecomposition,
+const msDecompositionSlice = createSlice({
+  name: 'msDecomposition',
+  initialState: getInitialState().msDecomposition,
   reducers: {
-    updateExpDecomposition: (state, action) => {
+    updateMsDecomposition: (state, action) => {
       return {
         ...state,
         ...action.payload,
@@ -640,11 +640,11 @@ const expDecompositionSlice = createSlice({
     },
   },
 });
-const expLandscapeSlice = createSlice({
-  name: 'expLandscape',
-  initialState: getInitialState().expLandscape,
+const msLandscapeSlice = createSlice({
+  name: 'msLandscape',
+  initialState: getInitialState().msLandscape,
   reducers: {
-    updateExpLandscape: (state, action) => {
+    updateMsLandscape: (state, action) => {
       return {
         ...state,
         ...action.payload,
@@ -652,11 +652,11 @@ const expLandscapeSlice = createSlice({
     },
   },
 });
-const expPrevalenceSlice = createSlice({
-  name: 'expPrevalence',
-  initialState: getInitialState().expPrevalence,
+const msPrevalenceSlice = createSlice({
+  name: 'msPrevalence',
+  initialState: getInitialState().msPrevalence,
   reducers: {
-    updateExpPrevalence: (state, action) => {
+    updateMsPrevalence: (state, action) => {
       return {
         ...state,
         ...action.payload,
@@ -685,13 +685,13 @@ const rootReducer = combineReducers({
   expCosineSimilarity: expCosineSimilaritySlice.reducer,
   expMutationalSigComparison: expMutationalSigComparisonSlice.reducer,
   expExposure: expExposureSlice.reducer,
-  expTumor: expTumorSlice.reducer,
-  expSeparated: expSeparatedSlice.reducer,
-  expAcross: expAcrossSlice.reducer,
-  expAssociation: expAssocationSlice.reducer,
-  expDecomposition: expDecompositionSlice.reducer,
-  expLandscape: expLandscapeSlice.reducer,
-  expPrevalence: expPrevalenceSlice.reducer,
+  tmb: tmbSlice.reducer,
+  tmbSignatures: tmbSignaturesSlice.reducer,
+  msBurden: msBurdenSlice.reducer,
+  msAssociation: msAssocationSlice.reducer,
+  msDecomposition: msDecompositionSlice.reducer,
+  msLandscape: msLandscapeSlice.reducer,
+  msPrevalence: msPrevalenceSlice.reducer,
 });
 
 export const store = configureStore({
@@ -722,13 +722,13 @@ export const {
   updateExpMutationalSigComparison,
 } = expMutationalSigComparisonSlice.actions;
 export const { updateExpExposure } = expExposureSlice.actions;
-export const { updateExpTumor } = expTumorSlice.actions;
-export const { updateExpSeparated } = expSeparatedSlice.actions;
-export const { updateExpAcross } = expAcrossSlice.actions;
-export const { updateExpAssociation } = expAssocationSlice.actions;
-export const { updateExpDecomposition } = expDecompositionSlice.actions;
-export const { updateExpLandscape } = expLandscapeSlice.actions;
-export const { updateExpPrevalence } = expPrevalenceSlice.actions;
+export const { updateTMB } = tmbSlice.actions;
+export const { updateTmbSignatures } = tmbSignaturesSlice.actions;
+export const { updateMsBurden } = msBurdenSlice.actions;
+export const { updateMsAssociation } = msAssocationSlice.actions;
+export const { updateMsDecomposition } = msDecompositionSlice.actions;
+export const { updateMsLandscape } = msLandscapeSlice.actions;
+export const { updateMsPrevalence } = msPrevalenceSlice.actions;
 
 export function dispatchVisualize(obj) {
   store.dispatch(updateVisualize(obj));
@@ -806,24 +806,24 @@ export function dispatchExpMutationalSigComparison(obj) {
 export function dispatchExpExposure(obj) {
   store.dispatch(updateExpExposure(obj));
 }
-export function dispatchExpTumor(obj) {
-  store.dispatch(updateExpTumor(obj));
+export function dispatchTMB(obj) {
+  store.dispatch(updateTMB(obj));
 }
-export function dispatchExpSeparated(obj) {
-  store.dispatch(updateExpSeparated(obj));
+export function dispatchTmbSignatures(obj) {
+  store.dispatch(updateTmbSignatures(obj));
 }
-export function dispatchExpAcross(obj) {
-  store.dispatch(updateExpAcross(obj));
+export function dispatchMsBurden(obj) {
+  store.dispatch(updateMsBurden(obj));
 }
-export function dispatchExpAssociation(obj) {
-  store.dispatch(updateExpAssociation(obj));
+export function dispatchMsAssociation(obj) {
+  store.dispatch(updateMsAssociation(obj));
 }
-export function dispatchExpDecomposition(obj) {
-  store.dispatch(updateExpDecomposition(obj));
+export function dispatchMsDecomposition(obj) {
+  store.dispatch(updateMsDecomposition(obj));
 }
-export function dispatchExpLandscape(obj) {
-  store.dispatch(updateExpLandscape(obj));
+export function dispatchMsLandscape(obj) {
+  store.dispatch(updateMsLandscape(obj));
 }
-export function dispatchExpPrevalence(obj) {
-  store.dispatch(updateExpPrevalence(obj));
+export function dispatchMsPrevalence(obj) {
+  store.dispatch(updateMsPrevalence(obj));
 }

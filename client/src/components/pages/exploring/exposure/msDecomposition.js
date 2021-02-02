@@ -1,12 +1,15 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { dispatchError, dispatchExpTumor } from '../../../../services/store';
+import {
+  dispatchError,
+  dispatchMsDecomposition,
+} from '../../../../services/store';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 
-export default function Tumor() {
-  const { plotPath, plotURL, debugR, err } = useSelector(
-    (state) => state.expTumor
+export default function MsDecomposition() {
+  const { plotPath, plotURL, txtPath, debugR, err, loading } = useSelector(
+    (state) => state.msDecomposition
   );
   const { projectID } = useSelector((state) => state.expExposure);
 
@@ -25,7 +28,7 @@ export default function Tumor() {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchExpTumor({
+          dispatchMsDecomposition({
             plotURL: objectURL,
           });
         }
@@ -34,14 +37,14 @@ export default function Tumor() {
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchExpTumor({ err: true, plotURL: '' });
+      dispatchMsDecomposition({ err: true, plotURL: '' });
     }
   }
 
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchExpTumor({ plotURL: '' });
+      dispatchMsDecomposition({ plotURL: '' });
     }
   }
 
@@ -58,12 +61,13 @@ export default function Tumor() {
           </div>
         )}
       </div>
-      {plotURL && (
+      {plotPath && (
         <>
           <Plot
             className="p-3"
-            plotName="Tumor Mutational Burden"
+            plotName="Evaluating the Performance of Mutational Signature Decomposition"
             plotURL={plotURL}
+            txtPath={projectID + txtPath}
           />
         </>
       )}

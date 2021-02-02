@@ -1,15 +1,12 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import {
-  dispatchError,
-  dispatchExpSeparated,
-} from '../../../../services/store';
+import { dispatchError, dispatchTMB } from '../../../../services/store';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 
-export default function Separated() {
+export default function TMB() {
   const { plotPath, plotURL, debugR, err } = useSelector(
-    (state) => state.expSeparated
+    (state) => state.tmb
   );
   const { projectID } = useSelector((state) => state.expExposure);
 
@@ -28,7 +25,7 @@ export default function Separated() {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchExpSeparated({
+          dispatchTMB({
             plotURL: objectURL,
           });
         }
@@ -37,14 +34,14 @@ export default function Separated() {
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchExpSeparated({ err: true, plotURL: '' });
+      dispatchTMB({ err: true, plotURL: '' });
     }
   }
 
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchExpSeparated({ plotURL: '' });
+      dispatchTMB({ plotURL: '' });
     }
   }
 
@@ -61,11 +58,11 @@ export default function Separated() {
           </div>
         )}
       </div>
-      {plotPath && (
+      {plotURL && (
         <>
           <Plot
             className="p-3"
-            plotName="Tumor Mutational Burden Separated by Signatures"
+            plotName="Tumor Mutational Burden"
             plotURL={plotURL}
           />
         </>

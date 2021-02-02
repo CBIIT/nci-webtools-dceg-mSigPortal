@@ -1,25 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Form, Row, Col, Tab, Button, Nav } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import Tumor from './tumor';
-import Separated from './separated';
-import Across from './across';
-import Association from './association';
-import Decomposition from './decomposition';
-import Landscape from './landscape';
-import Prevalence from './prevalence';
+import TMB from './tmb';
+import TmbSig from './tmbSignatures';
+import MsBurden from './msBurden';
+import MsAssociation from './msAssociation';
+import MsDecomposition from './msDecomposition';
+import MsLandscape from './msLandscape';
+import MsPrevalence from './msPrevalence';
 import {
   getInitialState,
   dispatchError,
   dispatchExploring,
   dispatchExpExposure,
-  dispatchExpTumor,
-  dispatchExpAcross,
-  dispatchExpAssociation,
-  dispatchExpDecomposition,
-  dispatchExpLandscape,
-  dispatchExpPrevalence,
-  dispatchExpSeparated,
+  dispatchTMB,
+  dispatchTmbSignatures,
+  dispatchMsBurden,
+  dispatchMsAssociation,
+  dispatchMsDecomposition,
+  dispatchMsLandscape,
+  dispatchMsPrevalence,
 } from '../../../../services/store';
 import Select from '../../../controls/select/select';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -38,15 +38,15 @@ export default function Exposure({ match, populateControls }) {
   const { exposureSignature, exposureCancer, signatureNames } = useSelector(
     (state) => state.exploring
   );
-  const { loading: loadingAcross } = useSelector((state) => state.expAcross);
-  const { loading: loadingAssociation } = useSelector(
-    (state) => state.expAssociation
+  const { loading: loadingMsBurden } = useSelector((state) => state.msBurden);
+  const { loading: loadingMsAssociation } = useSelector(
+    (state) => state.msAssociation
   );
-  const { loading: loadingLandscape } = useSelector(
-    (state) => state.expLandscape
+  const { loading: loadingMsLandscape } = useSelector(
+    (state) => state.msLandscape
   );
-  const { loading: loadingPrevalence } = useSelector(
-    (state) => state.expPrevalence
+  const { loading: loadingMsPrevalence } = useSelector(
+    (state) => state.msPrevalence
   );
 
   const {
@@ -74,10 +74,10 @@ export default function Exposure({ match, populateControls }) {
     projectID,
     openSidebar,
   } = useSelector((state) => state.expExposure);
-  const acrossArgs = useSelector((state) => state.expAcross);
-  const associationArgs = useSelector((state) => state.expAssociation);
-  const landscapeArgs = useSelector((state) => state.expLandscape);
-  const prevalenceArgs = useSelector((state) => state.expPrevalence);
+  const burdenArgs = useSelector((state) => state.msBurden);
+  const associationArgs = useSelector((state) => state.msAssociation);
+  const landscapeArgs = useSelector((state) => state.msLandscape);
+  const prevalenceArgs = useSelector((state) => state.msPrevalence);
 
   const [exposureFileObj, setExposure] = useState(new File([], ''));
   const [matrixFileObj, setMatrix] = useState(new File([], ''));
@@ -135,14 +135,13 @@ export default function Exposure({ match, populateControls }) {
 
       dispatchExpExposure({ ...state.expExposure, projectID: projectID });
       // rehydrate state if available
-      if (state.expTumor) dispatchExpTumor(state.expTumor);
-      if (state.expAcross) dispatchExpAcross(state.expAcross);
-      if (state.expAssociation) dispatchExpAssociation(state.expAssociation);
-      if (state.expDecomposition)
-        dispatchExpDecomposition(state.expDecomposition);
-      if (state.expLandscape) dispatchExpLandscape(state.expLandscape);
-      if (state.expPrevalence) dispatchExpPrevalence(state.expPrevalence);
-      if (state.expSeparated) dispatchExpSeparated(state.expSeparated);
+      if (state.tmb) dispatchTMB(state.tmb);
+      if (state.msBurden) dispatchMsBurden(state.msBurden);
+      if (state.msAssociation) dispatchMsAssociation(state.msAssociation);
+      if (state.msDecomposition) dispatchMsDecomposition(state.msDecomposition);
+      if (state.msLandscape) dispatchMsLandscape(state.msLandscape);
+      if (state.msPrevalence) dispatchMsPrevalence(state.msPrevalence);
+      if (state.tmbSignatures) dispatchTmbSignatures(state.tmbSignatures);
     } catch (error) {
       dispatchError(error);
     }
@@ -212,11 +211,11 @@ export default function Exposure({ match, populateControls }) {
     }
   }
 
-  async function calculateAcross() {
+  async function calculateBurden() {
     if (source == 'user' && !projectID) {
       dispatchError('Missing Required Files');
     } else {
-      dispatchExpAcross({
+      dispatchMsBurden({
         loading: true,
         err: false,
         plotPath: '',
@@ -226,16 +225,16 @@ export default function Exposure({ match, populateControls }) {
         if (!projectID) {
           try {
             const id = handleUpload();
-            await handleCalculate('across', id);
+            await handleCalculate('burden', id);
           } catch (error) {
             dispatchError(error);
           }
         }
       } else {
-        await handleCalculate('across');
+        await handleCalculate('burden');
       }
 
-      dispatchExpAcross({ loading: false });
+      dispatchMsBurden({ loading: false });
     }
   }
 
@@ -243,7 +242,7 @@ export default function Exposure({ match, populateControls }) {
     if (source == 'user' && !projectID) {
       dispatchError('Missing Required Files');
     } else {
-      dispatchExpAssociation({
+      dispatchMsAssociation({
         loading: true,
         err: false,
         plotPath: '',
@@ -262,7 +261,7 @@ export default function Exposure({ match, populateControls }) {
         await handleCalculate('association');
       }
 
-      dispatchExpAssociation({ loading: false });
+      dispatchMsAssociation({ loading: false });
     }
   }
 
@@ -270,7 +269,7 @@ export default function Exposure({ match, populateControls }) {
     if (source == 'user' && !projectID) {
       dispatchError('Missing Required Files');
     } else {
-      dispatchExpLandscape({
+      dispatchMsLandscape({
         loading: true,
         err: false,
         plotPath: '',
@@ -296,7 +295,7 @@ export default function Exposure({ match, populateControls }) {
         await handleCalculate('landscape');
       }
 
-      dispatchExpLandscape({ loading: false });
+      dispatchMsLandscape({ loading: false });
     }
   }
 
@@ -304,7 +303,7 @@ export default function Exposure({ match, populateControls }) {
     if (source == 'user' && !projectID) {
       dispatchError('Missing Required Files');
     } else {
-      dispatchExpPrevalence({
+      dispatchMsPrevalence({
         loading: true,
         err: false,
         plotPath: '',
@@ -325,7 +324,7 @@ export default function Exposure({ match, populateControls }) {
         await handleCalculate('prevalence');
       }
 
-      dispatchExpPrevalence({ loading: false });
+      dispatchMsPrevalence({ loading: false });
     }
   }
 
@@ -333,33 +332,33 @@ export default function Exposure({ match, populateControls }) {
     try {
       dispatchExpExposure({ loading: true });
 
-      dispatchExpTumor({
+      dispatchTMB({
         plotPath: '',
         err: '',
       });
-      dispatchExpSeparated({
+      dispatchTmbSignatures({
         plotPath: '',
         err: '',
       });
-      dispatchExpDecomposition({
+      dispatchMsDecomposition({
         plotPath: '',
         txtPath: '',
         err: '',
       });
-      dispatchExpAcross({
+      dispatchMsBurden({
         plotPath: '',
         err: '',
       });
-      dispatchExpAssociation({
+      dispatchMsAssociation({
         plotPath: '',
         err: '',
       });
-      dispatchExpLandscape({
+      dispatchMsLandscape({
         plotPath: '',
         err: '',
       });
 
-      dispatchExpPrevalence({
+      dispatchMsPrevalence({
         plotPath: '',
         err: '',
       });
@@ -372,8 +371,8 @@ export default function Exposure({ match, populateControls }) {
           (key) => key != 'Samples'
         );
 
-        dispatchExpAcross({ signatureName: nameOptions[0] });
-        dispatchExpAssociation({
+        dispatchMsBurden({ signatureName: nameOptions[0] });
+        dispatchMsAssociation({
           signatureName1: nameOptions[0],
           signatureName2: nameOptions[1],
         });
@@ -415,12 +414,12 @@ export default function Exposure({ match, populateControls }) {
         genome: genome,
       }),
     };
-    if (!loadingAcross && (fn == 'all' || fn == 'across')) {
-      args.across = JSON.stringify({
-        signatureName: acrossArgs.signatureName,
+    if (!loadingMsBurden && (fn == 'all' || fn == 'burden')) {
+      args.burden = JSON.stringify({
+        signatureName: burdenArgs.signatureName,
       });
     }
-    if (!loadingAssociation && (fn == 'all' || fn == 'association')) {
+    if (!loadingMsAssociation && (fn == 'all' || fn == 'association')) {
       args.association = JSON.stringify({
         useCancerType: associationArgs.toggleCancer,
         both: associationArgs.both,
@@ -428,12 +427,12 @@ export default function Exposure({ match, populateControls }) {
         signatureName2: associationArgs.signatureName2,
       });
     }
-    if (!loadingLandscape && (fn == 'all' || fn == 'landscape')) {
+    if (!loadingMsLandscape && (fn == 'all' || fn == 'landscape')) {
       args.landscape = JSON.stringify({
         variableFile: landscapeArgs.variableFile,
       });
     }
-    if (!loadingPrevalence && (fn == 'all' || fn == 'prevalence')) {
+    if (!loadingMsPrevalence && (fn == 'all' || fn == 'prevalence')) {
       args.prevalence = JSON.stringify({
         mutation: parseFloat(prevalenceArgs.mutation) || 100,
       });
@@ -457,19 +456,19 @@ export default function Exposure({ match, populateControls }) {
         if (!projectID) dispatchExpExposure({ projectID: pID });
 
         if (fn == 'all') {
-          dispatchExpTumor({
-            plotPath: output.tumorPath,
-            err: errors.tumorError,
+          dispatchTMB({
+            plotPath: output.tmbPath,
+            err: errors.tmbError,
             debugR: debugR,
           });
 
-          dispatchExpSeparated({
-            plotPath: output.burdenSeparatedPath,
-            err: errors.burdenSeparatedError,
+          dispatchTmbSignatures({
+            plotPath: output.signaturePath,
+            err: errors.signaturesError,
             debugR: debugR,
           });
 
-          dispatchExpDecomposition({
+          dispatchMsDecomposition({
             plotPath: output.decompositionPath,
             txtPath: output.decompositionData,
             err: errors.decompositionError,
@@ -477,30 +476,30 @@ export default function Exposure({ match, populateControls }) {
           });
         }
 
-        if (fn == 'all' || fn == 'across') {
-          dispatchExpAcross({
-            plotPath: output.burdenAcrossPath,
+        if (fn == 'all' || fn == 'burden') {
+          dispatchMsBurden({
+            plotPath: output.burdenPath,
+            err: errors.burdenError,
             debugR: debugR,
-            err: errors.burdenAcrossError,
           });
         }
 
         if (fn == 'all' || fn == 'association')
-          dispatchExpAssociation({
+          dispatchMsAssociation({
             plotPath: output.associationPath,
             err: errors.associationError,
             debugR: debugR,
           });
 
         if (fn == 'all' || fn == 'landscape')
-          dispatchExpLandscape({
+          dispatchMsLandscape({
             plotPath: output.landscapePath,
             err: errors.landscapeError,
             debugR: debugR,
           });
 
         if (fn == 'all' || fn == 'prevalence')
-          dispatchExpPrevalence({
+          dispatchMsPrevalence({
             plotPath: output.prevalencePath,
             err: errors.prevalenceError,
             debugR: debugR,
@@ -672,13 +671,13 @@ export default function Exposure({ match, populateControls }) {
       cancerOptions: cancerOptions,
       signatureNameOptions: signatureNameOptions,
     });
-    dispatchExpTumor(initialState.expTumor);
-    dispatchExpSeparated(initialState.expSeparated);
-    dispatchExpAcross(initialState.expAcross);
-    dispatchExpDecomposition(initialState.expDecomposition);
-    dispatchExpAssociation(initialState.expAssociation);
-    dispatchExpLandscape(initialState.expLandscape);
-    dispatchExpPrevalence(initialState.expPrevalence);
+    dispatchTMB(initialState.tmb);
+    dispatchTmbSignatures(initialState.tmbSignatures);
+    dispatchMsBurden(initialState.msBurden);
+    dispatchMsDecomposition(initialState.msDecomposition);
+    dispatchMsAssociation(initialState.msAssociation);
+    dispatchMsLandscape(initialState.msLandscape);
+    dispatchMsPrevalence(initialState.msPrevalence);
     // populateControls();
   }
 
@@ -715,60 +714,60 @@ export default function Exposure({ match, populateControls }) {
 
   function handleVariable(file) {
     setVariable(file);
-    dispatchExpLandscape({ variableFile: file.name });
+    dispatchMsLandscape({ variableFile: file.name });
   }
 
   const tabs = [
     {
-      component: <Tumor />,
-      key: 'tumor',
+      component: <TMB />,
+      key: 'tmb',
       name: 'TMB',
       title: 'Tumor Mutational Burden',
     },
     {
-      component: <Separated />,
-      key: 'separated',
+      component: <TmbSig />,
+      key: 'tmbSig',
       name: 'TMB by Signatures',
       title: 'Tumor Mutational Burden Separated by Signatures',
     },
     {
-      component: <Across calculateAcross={calculateAcross} />,
-      key: 'across',
+      component: <MsBurden calculateBurden={calculateBurden} />,
+      key: 'msBurden',
       name: 'MS Burden Across Cancer Types',
       title: 'Mutational Signature Burden Across Cancer Types',
     },
     {
-      component: <Decomposition />,
-      key: 'decomposition',
+      component: <MsDecomposition />,
+      key: 'msDecomposition',
       name: 'MS Decomposition',
       title: 'Evaluating the Performance of Mutational Signature Decomposition',
     },
     {
       component: (
-        <Association
+        <MsAssociation
           calculateAssociation={calculateAssociation}
           handleSet={handleSet}
           getSignatureNames={getSignatureNames}
         />
       ),
-      key: 'association',
+      key: 'msAssociation',
       name: 'MS Association',
       title: 'Mutational Signature Association',
     },
     {
       component: (
-        <Landscape
+        <MsLandscape
           calculateLandscape={calculateLandscape}
           handleVariable={handleVariable}
         />
       ),
-      key: 'landscape',
+      key: 'msLandscape',
       name: 'MS Activity Landscape',
       title: 'Landscape of Mutational Signature Activity',
     },
     {
-      component: <Prevalence calculatePrevalence={calculatePrevalence} />,
-      key: 'prevalence',
+      component: <MsPrevalence calculatePrevalence={calculatePrevalence} />,
+      key: 'msPrevalence',
       name: 'MS Prevalence',
       title: 'Prevalence of Mutational Signature',
     },
@@ -911,7 +910,7 @@ export default function Exposure({ match, populateControls }) {
                           else {
                             getSignatureNames();
                           }
-                          dispatchExpAssociation({
+                          dispatchMsAssociation({
                             toggleCancer: !associationArgs.toggleCancer,
                           });
                         }}

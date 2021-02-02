@@ -395,13 +395,13 @@ mutationalSignaturePrevalence <- function(mutation, cancerType, plotPath, exposu
   }
 }
 
-exposurePublic <- function(fn, common, across = '{}', association = '{}', landscape = '{}', prevalence = '{}', projectID, pythonOutput, rootDir, savePath, dataPath) {
-  source('services/R/Sigvisualfunc.R')
-  con <- textConnection('stdout', 'wr', local = TRUE)
-  sink(con, type = "message")
-  sink(con, type = "output")
-
+exposurePublic <- function(fn, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', projectID, pythonOutput, rootDir, savePath, dataPath) {
   tryCatch({
+    source('services/R/Sigvisualfunc.R')
+    con <- textConnection('stdout', 'wr', local = TRUE)
+    sink(con, type = "message")
+    sink(con, type = "output")
+
     totalTime = proc.time()
     load(paste0(dataPath, 'Signature/signature_refsets.RData'))
     load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata.RData'))
@@ -409,22 +409,20 @@ exposurePublic <- function(fn, common, across = '{}', association = '{}', landsc
 
     output = list()
     errors = list()
-    tumorPath = paste0(savePath, 'tumorMutationalBurden.svg')
-    burdenSeparatedPath = paste0(savePath, 'burdenSeparatedPath.svg')
-    burdenAcrossPath = paste0(savePath, 'burdenAcrossCancer.svg')
+    tmbPath = paste0(savePath, 'tumorMutationalBurden.svg')
+    signaturePath = paste0(savePath, 'tmbSeparated.svg')
+    burdenPath = paste0(savePath, 'burdenAcrossCancer.svg')
     associationPath = paste0(savePath, 'mutationalSignatureAssociation.svg')
     decompositionPath = paste0(savePath, 'mutationalSignatureDecomposition.svg')
     decompositionData = paste0(savePath, 'mutationalSignatureDecomposition.txt')
     landscapePath = paste0(savePath, 'landscapeMutationalSignature.svg')
     prevalencePath = paste0(savePath, 'prevalenceMutationalSignature.svg')
-
     # parse arguments
     common = fromJSON(common)
-    across = fromJSON(across)
+    burden = fromJSON(burden)
     association = fromJSON(association)
     landscape = fromJSON(landscape)
     prevalence = fromJSON(prevalence)
-
     exposure_refdata_selected <- exposure_refdata %>% filter(Study == common$study, Dataset == common$strategy, Signature_set_name == common$refSignatureSet)
 
     genome <- case_when(
@@ -445,38 +443,38 @@ exposurePublic <- function(fn, common, across = '{}', association = '{}', landsc
       fnTime = proc.time()
       tryCatch({
         print('Tumor Mutational Burden')
-        tumorMutationalBurden(genomesize, tumorPath, exposure_refdata_selected)
-        output[['tumorPath']] = tumorPath
+        tumorMutationalBurden(genomesize, tmbPath, exposure_refdata_selected)
+        output[['tmbPath']] = tmbPath
       }, error = function(e) {
-        errors[['tumorError']] <<- e$message
+        errors[['tmbError']] <<- e$message
         print(e)
       })
       print(paste0("Tumor Mutational Burden Runtime: ", (proc.time() - fnTime)[['elapsed']]))
     }
 
     # Tumor Mutational Burden separated by signatures
-    if ('all' %in% fn || 'separated' %in% fn) {
+    if ('all' %in% fn) {
       fnTime = proc.time()
       tryCatch({
         print('Tumor Mutational Burden Separated by Signatures')
-        mutationalSignatureBurdenSeparated(genomesize, common$cancerType, burdenSeparatedPath, exposure_refdata_selected)
-        output[['burdenSeparatedPath']] = burdenSeparatedPath
+        mutationalSignatureBurdenSeparated(genomesize, common$cancerType, signaturePath, exposure_refdata_selected)
+        output[['signaturePath']] = signaturePath
       }, error = function(e) {
-        errors[['burdenSeparatedError']] <<- e$message
+        errors[['signatureError']] <<- e$message
         print(e)
       })
       print(paste0("Tumor Mutational Burden Separated by Signatures Runtime: ", (proc.time() - fnTime)[['elapsed']]))
     }
 
     # Mutational signature burden across cancer types
-    if ('all' %in% fn || 'across' %in% fn) {
+    if ('all' %in% fn || 'burden' %in% fn) {
       fnTime = proc.time()
       tryCatch({
         print('Mutational Signature Burden Across Cancer Types')
-        mutationalSignatureBurdenAcrossCancer(across$signatureName, genomesize, burdenAcrossPath, exposure_refdata_selected)
-        output[['burdenAcrossPath']] = burdenAcrossPath
+        mutationalSignatureBurdenAcrossCancer(burden$signatureName, genomesize, burdenPath, exposure_refdata_selected)
+        output[['burdenPath']] = burdenPath
       }, error = function(e) {
-        errors[['burdenAcrossError']] <<- e$message
+        errors[['burdenError']] <<- e$message
         print(e)
       })
       print(paste0("Mutational Signature Burden Across Cancer Types Runtime: ", (proc.time() - fnTime)[['elapsed']]))
@@ -552,20 +550,19 @@ exposurePublic <- function(fn, common, across = '{}', association = '{}', landsc
   })
 }
 
-exposureUser <- function(fn, files, common, across = '{}', association = '{}', landscape = '{}', prevalence = '{}', projectID, pythonOutput, rootDir, savePath, dataPath) {
-  source('services/R/Sigvisualfunc.R')
-
-  con <- textConnection('stdout', 'wr', local = TRUE)
-  sink(con, type = "message")
-  sink(con, type = "output")
-
+exposureUser <- function(fn, files, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', projectID, pythonOutput, rootDir, savePath, dataPath) {
   tryCatch({
+    source('services/R/Sigvisualfunc.R')
+    con <- textConnection('stdout', 'wr', local = TRUE)
+    sink(con, type = "message")
+    sink(con, type = "output")
+
     output = list()
     errors = list()
     totalTime = proc.time()
-    tumorPath = paste0(savePath, 'tumorMutationalBurden.svg')
-    burdenSeparatedPath = paste0(savePath, 'burdenSeparatedPath.svg')
-    burdenAcrossPath = paste0(savePath, 'burdenAcrossCancer.svg')
+    tmbPath = paste0(savePath, 'tumorMutationalBurden.svg')
+    signaturePath = paste0(savePath, 'tmbSeparated.svg')
+    burdenPath = paste0(savePath, 'burdenAcrossCancer.svg')
     associationPath = paste0(savePath, 'mutationalSignatureAssociation.svg')
     decompositionPath = paste0(savePath, 'mutationalSignatureDecomposition.svg')
     decompositionData = paste0(savePath, 'mutationalSignatureDecomposition.txt')
@@ -574,7 +571,7 @@ exposureUser <- function(fn, files, common, across = '{}', association = '{}', l
 
     # parse arguments
     common = fromJSON(common)
-    across = fromJSON(across)
+    burden = fromJSON(burden)
     association = fromJSON(association)
     landscape = fromJSON(landscape)
     prevalence = fromJSON(prevalence)
@@ -615,37 +612,37 @@ exposureUser <- function(fn, files, common, across = '{}', association = '{}', l
       fnTime = proc.time()
       tryCatch({
         print('Tumor Mutational Burden')
-        tumorMutationalBurden(genomesize, tumorPath, exposure_refdata_selected)
-        output[['tumorPath']] = tumorPath
+        tumorMutationalBurden(genomesize, tmbPath, exposure_refdata_selected)
+        output[['tmbPath']] = tmbPath
       }, error = function(e) {
-        errors[['tumorError']] <<- e$message
+        errors[['tmbError']] <<- e$message
         print(e)
       })
       print(paste0("Tumor Mutational Burden Runtime: ", (proc.time() - fnTime)[['elapsed']]))
     }
 
     # Tumor Mutational Burden separated by signatures
-    if ('all' %in% fn || 'separated' %in% fn) {
+    if ('all' %in% fn || 'signatures' %in% fn) {
       fnTime = proc.time()
       tryCatch({
         print('Tumor Mutational Burden Separated by Signatures')
-        mutationalSignatureBurdenSeparated(genomesize, cancer_type_user, burdenSeparatedPath, exposure_refdata_selected)
-        output[['burdenSeparatedPath']] = burdenSeparatedPath
+        mutationalSignatureBurdenSeparated(genomesize, cancer_type_user, signaturePath, exposure_refdata_selected)
+        output[['signaturePath']] = signaturePath
       }, error = function(e) {
-        errors[['burdenSeparatedError']] <<- e$message
+        errors[['signatureError']] <<- e$message
         print(e)
       })
       print(paste0("Tumor Mutational Burden Separated by Signatures Runtime: ", (proc.time() - fnTime)[['elapsed']]))
     }
     # Mutational signature burden across cancer types
-    if ('all' %in% fn || 'across' %in% fn) {
+    if ('all' %in% fn || 'burden' %in% fn) {
       fnTime = proc.time()
       tryCatch({
         print('Mutational Signature Burden Across Cancer Types')
-        mutationalSignatureBurdenAcrossCancer(across$signatureName, genomesize, burdenAcrossPath, exposure_refdata_selected)
-        output[['burdenAcrossPath']] = burdenAcrossPath
+        mutationalSignatureBurdenAcrossCancer(burden$signatureName, genomesize, burdenPath, exposure_refdata_selected)
+        output[['burdenPath']] = burdenPath
       }, error = function(e) {
-        errors[['burdenAcrossError']] <<- e$message
+        errors[['burdenError']] <<- e$message
         print(e)
       })
       print(paste0("Mutational Signature Burden Across Cancer Types Runtime: ", (proc.time() - fnTime)[['elapsed']]))

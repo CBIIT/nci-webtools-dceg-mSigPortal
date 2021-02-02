@@ -3,24 +3,18 @@ import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
   dispatchError,
-  dispatchExpLandscape,
+  dispatchMsPrevalence,
 } from '../../../../services/store';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 
-const { Label, Group } = Form;
+const { Group, Label, Control } = Form;
 
-export default function Landscape({ calculateLandscape, handleVariable }) {
-  const {
-    variableFile,
-    plotPath,
-    plotURL,
-    txtPath,
-    debugR,
-    err,
-    loading,
-  } = useSelector((state) => state.expLandscape);
+export default function MsPrevalence({ calculatePrevalence }) {
+  const { mutation, plotPath, plotURL, debugR, err, loading } = useSelector(
+    (state) => state.msPrevalence
+  );
   const { projectID } = useSelector((state) => state.expExposure);
 
   useEffect(() => {
@@ -38,7 +32,7 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchExpLandscape({
+          dispatchMsPrevalence({
             plotURL: objectURL,
           });
         }
@@ -47,62 +41,56 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchExpLandscape({ err: true, plotURL: '' });
+      dispatchMsPrevalence({ err: true, plotURL: '' });
     }
   }
 
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchExpLandscape({ plotURL: '' });
+      dispatchMsPrevalence({ plotURL: '' });
     }
   }
 
   return (
     <div>
-      <Form className="p-3">
+      <Form noValidate className="p-3">
         <LoadingOverlay active={loading} />
-        <Row className="">
-          <Col lg="4">
-            <Group controlId="landscape">
-              <Label>Upload Variable Data</Label>
-              <Form.File
-                id="variableData"
-                label={variableFile || 'Upload here (optional)'}
-                // accept=''
-                onChange={(e) => handleVariable(e.target.files[0])}
-                custom
+        <Row>
+          <Col lg="5">
+            <Group controlId="prevalenceMutations">
+              <Label>Minimal Number Mutations within in Each Signature</Label>
+              <Control
+                value={mutation}
+                placeholder="e.g. 100"
+                onChange={(e) => {
+                  dispatchMsPrevalence({
+                    mutation: e.target.value,
+                  });
+                }}
+                isInvalid={!mutation || isNaN(mutation)}
               />
+              <Form.Control.Feedback type="invalid">
+                Enter a minimum value
+              </Form.Control.Feedback>
             </Group>
-          </Col>
-          <Col lg="1" className="d-flex justify-content-end">
-            <Button
-              className="mt-auto mb-3"
-              variant="secondary"
-              onClick={() => {
-                handleVariable(new File([], ''));
-              }}
-              disabled={!variableFile}
-            >
-              Remove
-            </Button>
           </Col>
           <Col lg="5" />
           <Col lg="2" className="d-flex justify-content-end">
             <Button
               className="mt-auto mb-3"
               variant="primary"
-              onClick={calculateLandscape}
+              onClick={calculatePrevalence}
+              disabled={!mutation || isNaN(mutation)}
             >
               Calculate
             </Button>
           </Col>
         </Row>
       </Form>
-      <div id="exposureLandscapePlot">
+      <div id="exposurePrevalencePlot">
         {err && (
           <div>
-            <hr />
             <p className="p-3 text-danger">{err}</p>
           </div>
         )}
@@ -110,9 +98,8 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
           <hr />
           <Plot
             className="p-3"
-            plotName="Landscape of Mutational Signature Activity"
+            plotName="Prevalence of Mutational Signature"
             plotURL={plotURL}
-            txtPath={projectID + txtPath}
           />
         </div>
       </div>
