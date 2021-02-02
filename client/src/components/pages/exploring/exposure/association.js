@@ -139,8 +139,9 @@ export default function Association({ calculateAssociation, handleSet }) {
       </Form>
       <div id="exposureAssociationPlot">
         {err && (
-          <div className="p-3">
-            <p className="text-danger">{err}</p>
+          <div>
+            <hr />
+            <p className="p-3 text-danger">{err}</p>
           </div>
         )}
         {plotPath && (

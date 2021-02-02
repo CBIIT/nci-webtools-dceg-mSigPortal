@@ -47,15 +47,19 @@ export default function Tumor() {
 
   return (
     <div>
-      <div className="p-3">
+      <div>
         {!err && !plotPath && (
-          <p>Please calculate using the left side panel.</p>
+          <p className="p-3">Please calculate using the left side panel.</p>
         )}
-        {err && <p className="text-danger">{err}</p>}
+        {err && (
+          <div>
+            <hr />
+            <p className="p-3 text-danger">{err}</p>
+          </div>
+        )}
       </div>
       {plotURL && (
         <>
-          <hr />
           <Plot
             className="p-3"
             plotName="Tumor Mutational Burden"

@@ -156,8 +156,9 @@ export default function MutationalPattern({ submitR }) {
   const plots = (
     <div>
       {err && (
-        <div className="p-3">
-          <p>An error has occured. Please verify your input.</p>
+        <div>
+          <hr />
+          <p className="p-3">An error has occured. Please verify your input.</p>
         </div>
       )}
 

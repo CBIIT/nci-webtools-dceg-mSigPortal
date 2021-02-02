@@ -332,8 +332,11 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
 
           <div id="withinPlot">
             {withinErr && (
-              <div className="p-3">
-                <p>An error has occured. Please verify your input.</p>
+              <div>
+                <hr />
+                <p className="p-3">
+                  An error has occured. Please verify your input.
+                </p>
               </div>
             )}
             {withinPlotURL && (
@@ -425,8 +428,11 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
           </Form>
           <div id="refPlot">
             {refErr && (
-              <div className="p-3">
-                <p>An error has occured. Please verify your input.</p>
+              <div>
+                <hr />
+                <p className="p-3">
+                  An error has occured. Please verify your input.
+                </p>
               </div>
             )}
             {refPlotURL && (
@@ -523,8 +529,11 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
 
           <div id="pubPlot">
             {pubErr && (
-              <div className="p-3">
-                <p>An error has occured. Please verify your input.</p>
+              <div>
+                <hr />
+                <p className="p-3">
+                  An error has occured. Please verify your input.
+                </p>
               </div>
             )}
             {pubPlotURL && (

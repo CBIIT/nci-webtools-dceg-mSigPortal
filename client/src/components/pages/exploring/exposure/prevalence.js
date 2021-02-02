@@ -90,8 +90,8 @@ export default function Tumor({ calculatePrevalence }) {
       </Form>
       <div id="exposurePrevalencePlot">
         {err && (
-          <div className="p-3">
-            <p className="text-danger">{err}</p>
+          <div>
+            <p className="p-3 text-danger">{err}</p>
           </div>
         )}
         <div style={{ display: plotURL ? 'block' : 'none' }}>

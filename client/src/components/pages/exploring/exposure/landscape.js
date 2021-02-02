@@ -101,8 +101,9 @@ export default function Landscape({ calculateLandscape, handleVariable }) {
       </Form>
       <div id="exposureLandscapePlot">
         {err && (
-          <div className="p-3">
-            <p className="text-danger">{err}</p>
+          <div>
+            <hr />
+            <p className="p-3 text-danger">{err}</p>
           </div>
         )}
         <div style={{ display: plotURL ? 'block' : 'none' }}>

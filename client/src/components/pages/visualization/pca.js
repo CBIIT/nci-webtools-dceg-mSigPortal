@@ -349,8 +349,11 @@ export default function PCA({ submitR, getRefSigOptions }) {
           </Form>
 
           {pcaErr && (
-            <div className="p-3">
-              <p>An error has occured. Please verify your input.</p>
+            <div>
+              <hr />
+              <p className="p-3">
+                An error has occured. Please verify your input.
+              </p>
             </div>
           )}
 
@@ -478,8 +481,11 @@ export default function PCA({ submitR, getRefSigOptions }) {
           </Form>
 
           {pubPcaErr && (
-            <div className="p-3">
-              <p>An error has occured. Please verify your input.</p>
+            <div>
+              <hr />
+              <p className="p-3">
+                An error has occured. Please verify your input.
+              </p>
             </div>
           )}
 
