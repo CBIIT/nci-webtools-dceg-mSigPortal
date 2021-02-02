@@ -775,7 +775,7 @@ export default function Exposure({ match, populateControls }) {
     },
     {
       title:
-        'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Skin-Melnaoma; MSA SBS7a vs SBS7b',
+        'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Skin-Melanoma; MSA SBS7a vs SBS7b',
       path: 'exposure2',
     },
     {
