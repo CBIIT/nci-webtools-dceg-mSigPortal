@@ -11,7 +11,7 @@ const compression = require('compression');
 const app = express();
 const apiRouter = express.Router();
 
-app.use(compression())
+app.use(compression());
 app.use('/api', apiRouter);
 
 const {
@@ -31,6 +31,7 @@ const {
   getQueueResults,
   getVisExample,
   getSignatureNames,
+  getSampleNames,
   getExposureExample,
 } = require('./controllers');
 
@@ -120,5 +121,7 @@ apiRouter.get('/getQueueResults/:id', getQueueResults);
 apiRouter.get('/getVisExample/:example', getVisExample);
 
 apiRouter.post('/getSignatureNames', getSignatureNames);
+
+apiRouter.post('/getSampleNames', getSampleNames);
 
 apiRouter.get('/getExposureExample/:example', getExposureExample);

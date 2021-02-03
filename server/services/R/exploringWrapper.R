@@ -68,6 +68,30 @@ getSignatureNames <- function(args, dataPath) {
   })
 }
 
+# retrieve sample names filtered by cancer type
+getSampleNames <- function(args, dataPath) {
+  load(paste0(dataPath, 'Exposure/exposure_refdata.RData'))
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+    exposure_refdata_selected <- exposure_refdata %>% filter(Study == args$study, Dataset == args$strategy, Signature_set_name == args$refSignatureSet)
+
+    # available siganture name, Dropdown list for all the signature name
+    sampleNames <- exposure_refdata_selected %>% filter(Cancer_Type == args$cancerType) %>% pull(Sample) %>% unique()
+
+    output = list(data = sampleNames)
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), auto_unbox = TRUE))
+  })
+}
+
 # Signature Explore -------------------------------------------------------
 # section 1: Current reference signatures in mSigPortal -------------------
 referenceSignatures <- function(projectID, pythonOutput, rootDir, savePath, dataPath) {
@@ -395,7 +419,16 @@ mutationalSignaturePrevalence <- function(mutation, cancerType, plotPath, exposu
   }
 }
 
-exposurePublic <- function(fn, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', projectID, pythonOutput, rootDir, savePath, dataPath) {
+mutationalSignatureIndividual <- function(sample, cancerType, plotPath, exposure_refdata, signature_refsets, seqmatrix_refdata) {
+  require(scales)
+  exposure_refdata_input <- exposure_refdata %>% filter(Sample == sample) %>% select(Signature_name, Exposure)
+  signature_refsets_input <- signature_refsets %>% select(Signature_name, MutationType, Contribution)
+  seqmatrix_refdata_input <- seqmatrix_refdata %>% filter(Sample == sample) %>% select(MutationType, Mutations)
+
+  plot_individual_samples(exposure_refdata_input = exposure_refdata_input, signature_refsets_input = signature_refsets_input, seqmatrix_refdata_input = seqmatrix_refdata_input, condensed = FALSE, output_plot = plotPath)
+}
+
+exposurePublic <- function(fn, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', individual = '{}', projectID, pythonOutput, rootDir, savePath, dataPath) {
   tryCatch({
     source('services/R/Sigvisualfunc.R')
     con <- textConnection('stdout', 'wr', local = TRUE)
@@ -416,13 +449,15 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
     decompositionPath = paste0(savePath, 'mutationalSignatureDecomposition.svg')
     decompositionData = paste0(savePath, 'mutationalSignatureDecomposition.txt')
     landscapePath = paste0(savePath, 'landscapeMutationalSignature.svg')
-    prevalencePath = paste0(savePath, 'prevalenceMutationalSignature.svg')
+    individualPath = paste0(savePath, 'msIndividual.svg')
+
     # parse arguments
     common = fromJSON(common)
     burden = fromJSON(burden)
     association = fromJSON(association)
     landscape = fromJSON(landscape)
     prevalence = fromJSON(prevalence)
+    individual = fromJSON(individual)
     exposure_refdata_selected <- exposure_refdata %>% filter(Study == common$study, Dataset == common$strategy, Signature_set_name == common$refSignatureSet)
 
     genome <- case_when(
@@ -540,6 +575,20 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
       print(paste0("Prevalence of Mutational Signature Runtime: ", (proc.time() - fnTime)[['elapsed']]))
     }
 
+    # Individual plot
+    if ('all' %in% fn | 'individual' %in% fn) {
+      fnTime = proc.time()
+      tryCatch({
+        print('Mutational Signature in Individual Sample')
+        mutationalSignatureIndividual(individual$sample, common$cancerType, individualPath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+        output[['individualPath']] = individualPath
+      }, error = function(e) {
+        errors[['individualError']] <<- e$message
+        print(e)
+      })
+      print(paste0("Prevalence of Mutational Signature Runtime: ", (proc.time() - fnTime)[['elapsed']]))
+    }
+
   }, error = function(e) {
     print(e)
   }, finally = {
@@ -550,7 +599,7 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
   })
 }
 
-exposureUser <- function(fn, files, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', projectID, pythonOutput, rootDir, savePath, dataPath) {
+exposureUser <- function(fn, files, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', individual = '{}', projectID, pythonOutput, rootDir, savePath, dataPath) {
   tryCatch({
     source('services/R/Sigvisualfunc.R')
     con <- textConnection('stdout', 'wr', local = TRUE)
@@ -568,6 +617,7 @@ exposureUser <- function(fn, files, common, burden = '{}', association = '{}', l
     decompositionData = paste0(savePath, 'mutationalSignatureDecomposition.txt')
     landscapePath = paste0(savePath, 'landscapeMutationalSignature.svg')
     prevalencePath = paste0(savePath, 'prevalenceMutationalSignature.svg')
+    individualPath = paste0(savePath, 'msIndividual.svg')
 
     # parse arguments
     common = fromJSON(common)
@@ -575,6 +625,7 @@ exposureUser <- function(fn, files, common, burden = '{}', association = '{}', l
     association = fromJSON(association)
     landscape = fromJSON(landscape)
     prevalence = fromJSON(prevalence)
+    individual = fromJSON(individual)
     files = fromJSON(files)
 
     exposure_refdata_selected <- read_delim(file.path(rootDir, files$exposureFile), delim = '\t', col_names = T)
@@ -699,6 +750,20 @@ exposureUser <- function(fn, files, common, burden = '{}', association = '{}', l
         output[['prevalencePath']] = prevalencePath
       }, error = function(e) {
         errors[['prevalenceError']] <<- e$message
+        print(e)
+      })
+      print(paste0("Prevalence of Mutational Signature Runtime: ", (proc.time() - fnTime)[['elapsed']]))
+    }
+
+    # Individual plot
+    if ('all' %in% fn | 'individual' %in% fn) {
+      fnTime = proc.time()
+      tryCatch({
+        print('Mutational Signature in Individual Sample')
+        mutationalSignatureIndividual(individual$sample, common$cancerType, individualPath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+        output[['individualPath']] = individualPath
+      }, error = function(e) {
+        errors[['individualError']] <<- e$message
         print(e)
       })
       print(paste0("Prevalence of Mutational Signature Runtime: ", (proc.time() - fnTime)[['elapsed']]))

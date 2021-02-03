@@ -278,6 +278,8 @@ export const getInitialState = () => ({
     refSignatureSetOptions: [],
     signatureNameOptions: [],
     userNameOptions: [],
+    publicSampleOptions: [],
+    userSampleOptions: [],
     genome: 'GRCh37',
     genomeOptions: ['GRCh37', 'GRCh38', 'mm10'],
     exposureFile: '',
@@ -342,6 +344,14 @@ export const getInitialState = () => ({
   },
   msPrevalence: {
     mutation: '100',
+    plotPath: '',
+    plotURL: '',
+    debugR: '',
+    err: '',
+    loading: false,
+  },
+  msIndividual: {
+    sample: '',
     plotPath: '',
     plotURL: '',
     debugR: '',
@@ -664,6 +674,18 @@ const msPrevalenceSlice = createSlice({
     },
   },
 });
+const msIndividualSlice = createSlice({
+  name: 'msIndividual',
+  initialState: getInitialState().msIndividual,
+  reducers: {
+    updateMsIndividual: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+});
 
 const rootReducer = combineReducers({
   visualize: visualizeSlice.reducer,
@@ -692,6 +714,7 @@ const rootReducer = combineReducers({
   msDecomposition: msDecompositionSlice.reducer,
   msLandscape: msLandscapeSlice.reducer,
   msPrevalence: msPrevalenceSlice.reducer,
+  msIndividual: msIndividualSlice.reducer,
 });
 
 export const store = configureStore({
@@ -729,6 +752,7 @@ export const { updateMsAssociation } = msAssocationSlice.actions;
 export const { updateMsDecomposition } = msDecompositionSlice.actions;
 export const { updateMsLandscape } = msLandscapeSlice.actions;
 export const { updateMsPrevalence } = msPrevalenceSlice.actions;
+export const { updateMsIndividual } = msIndividualSlice.actions;
 
 export function dispatchVisualize(obj) {
   store.dispatch(updateVisualize(obj));
@@ -826,4 +850,7 @@ export function dispatchMsLandscape(obj) {
 }
 export function dispatchMsPrevalence(obj) {
   store.dispatch(updateMsPrevalence(obj));
+}
+export function dispatchMsIndividual(obj) {
+  store.dispatch(updateMsIndividual(obj));
 }

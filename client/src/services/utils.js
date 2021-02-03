@@ -10,7 +10,7 @@ export function filter2d(value, data) {
     : data.filter((row) => row.includes(value));
 }
 
-// get unique array of key values (column) from 2d array
+// get unique array of row entries for a given key (column) from 2d array
 export function unique2d(key, columns, data) {
   return [...new Set(data.map((row) => row[columns.indexOf(key)]))].sort(
     (a, b) => a - b

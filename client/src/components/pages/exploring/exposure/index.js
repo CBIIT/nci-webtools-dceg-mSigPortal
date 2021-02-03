@@ -8,6 +8,7 @@ import MsAssociation from './msAssociation';
 import MsDecomposition from './msDecomposition';
 import MsLandscape from './msLandscape';
 import MsPrevalence from './msPrevalence';
+import MSIndividual from './msIndividual';
 import {
   getInitialState,
   dispatchError,
@@ -20,7 +21,9 @@ import {
   dispatchMsDecomposition,
   dispatchMsLandscape,
   dispatchMsPrevalence,
+  dispatchMsIndividual,
 } from '../../../../services/store';
+import { value2d, filter2d, unique2d } from '../../../../services/utils';
 import Select from '../../../controls/select/select';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import {
@@ -48,6 +51,9 @@ export default function Exposure({ match, populateControls }) {
   const { loading: loadingMsPrevalence } = useSelector(
     (state) => state.msPrevalence
   );
+  const { loading: loadingMsIndividual } = useSelector(
+    (state) => state.msIndividual
+  );
 
   const {
     study,
@@ -61,6 +67,8 @@ export default function Exposure({ match, populateControls }) {
     refSignatureSetOptions,
     signatureNameOptions,
     userNameOptions,
+    publicSampleOptions,
+    userSampleOptions,
     genome,
     genomeOptions,
     exposureFile,
@@ -78,15 +86,24 @@ export default function Exposure({ match, populateControls }) {
   const associationArgs = useSelector((state) => state.msAssociation);
   const landscapeArgs = useSelector((state) => state.msLandscape);
   const prevalenceArgs = useSelector((state) => state.msPrevalence);
+  const individualArgs = useSelector((state) => state.msIndividual);
 
   const [exposureFileObj, setExposure] = useState(new File([], ''));
   const [matrixFileObj, setMatrix] = useState(new File([], ''));
   const [signatureFileObj, setSignature] = useState(new File([], ''));
   const [variableFileObj, setVariable] = useState(new File([], ''));
 
-  const [exposureValidity, setExposureValidity] = useState(false);
-  const [matrixValidity, setMatrixValidity] = useState(false);
-  const [signatureValidity, setSignatureValidity] = useState(false);
+  // const [exposureValidity, setExposureValidity] = useState(false);
+  // const [matrixValidity, setMatrixValidity] = useState(false);
+  // const [signatureValidity, setSignatureValidity] = useState(false);
+
+  useEffect(() => {}, [
+    burdenArgs,
+    associationArgs,
+    landscapeArgs,
+    prevalenceArgs,
+    individualArgs,
+  ]);
 
   // load example if available
   useEffect(() => {
@@ -98,7 +115,6 @@ export default function Exposure({ match, populateControls }) {
     dispatchExploring({ displayTab: 'exposure' });
   }, []);
 
-  // get new signature name options filtered by cancer type on first mount
   function usePrevious(value) {
     const ref = useRef();
     useEffect(() => {
@@ -107,18 +123,34 @@ export default function Exposure({ match, populateControls }) {
 
     return ref.current;
   }
+
+  // get new signature name options filtered by cancer type on first mount
   const prevSigNameOptions = usePrevious(signatureNameOptions);
   useEffect(() => {
     if (
+      source == 'public' &&
       associationArgs.toggleCancer &&
       study &&
       strategy &&
       refSignatureSet &&
-      source == 'public' &&
       prevSigNameOptions
     )
       getSignatureNames();
   }, [study, strategy, refSignatureSet, cancer, associationArgs.toggleCancer]);
+
+  // get sample name options
+  const prevSampleOptions = usePrevious(publicSampleOptions);
+  useEffect(() => {
+    if (
+      source == 'public' &&
+      study &&
+      strategy &&
+      refSignatureSet &&
+      cancer &&
+      prevSampleOptions
+    )
+      getSampleNames();
+  }, [study, strategy, refSignatureSet, cancer]);
 
   async function loadExample(id) {
     dispatchExpExposure({
@@ -186,6 +218,43 @@ export default function Exposure({ match, populateControls }) {
     dispatchExpExposure({ loading: false, loadingMsg: null });
   }
 
+  // get sample name options filtered by cancer type
+  async function getSampleNames() {
+    dispatchExpExposure({
+      loading: true,
+      loadingMsg: 'Filtering Sample Names',
+    });
+    try {
+      const { stdout, output } = await (
+        await fetch(`api/getSampleNames`, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            args: {
+              study: study,
+              strategy: strategy,
+              refSignatureSet: refSignatureSet,
+              cancerType: cancer,
+            },
+          }),
+        })
+      ).json();
+
+      if (output.data.length) {
+        dispatchExpExposure({
+          publicSampleOptions: output.data,
+        });
+        dispatchMsIndividual({ sample: output.data[0] });
+      } else dispatchError(stdout);
+    } catch (err) {
+      dispatchError(err);
+    }
+    dispatchExpExposure({ loading: false, loadingMsg: null });
+  }
+
   async function submitR(fn, args, id = projectID) {
     try {
       const response = await fetch(`api/exploringR`, {
@@ -212,119 +281,149 @@ export default function Exposure({ match, populateControls }) {
   }
 
   async function calculateBurden() {
-    if (source == 'user' && !projectID) {
-      dispatchError('Missing Required Files');
-    } else {
-      dispatchMsBurden({
-        loading: true,
-        err: false,
-        plotPath: '',
-      });
+    try {
+      if (source == 'user' && !projectID) {
+        dispatchError('Missing Required Files');
+      } else {
+        dispatchMsBurden({
+          loading: true,
+          err: false,
+          plotPath: '',
+        });
 
-      if (source == 'user') {
-        if (!projectID) {
-          try {
+        if (source == 'user') {
+          if (!projectID) {
             const id = handleUpload();
             await handleCalculate('burden', id);
-          } catch (error) {
-            dispatchError(error);
+          } else {
+            await handleCalculate('burden');
           }
+        } else {
+          await handleCalculate('burden');
         }
-      } else {
-        await handleCalculate('burden');
-      }
 
-      dispatchMsBurden({ loading: false });
+        dispatchMsBurden({ loading: false });
+      }
+    } catch (error) {
+      dispatchError(error);
     }
   }
 
   async function calculateAssociation() {
-    if (source == 'user' && !projectID) {
-      dispatchError('Missing Required Files');
-    } else {
-      dispatchMsAssociation({
-        loading: true,
-        err: false,
-        plotPath: '',
-      });
+    try {
+      if (source == 'user' && !projectID) {
+        dispatchError('Missing Required Files');
+      } else {
+        dispatchMsAssociation({
+          loading: true,
+          err: false,
+          plotPath: '',
+        });
 
-      if (source == 'user') {
-        if (!projectID) {
-          try {
+        if (source == 'user') {
+          if (!projectID) {
             const id = await handleUpload();
             await handleCalculate('association', id);
-          } catch (error) {
-            dispatchError(error);
+          } else {
+            await handleCalculate('association');
           }
+        } else {
+          await handleCalculate('association');
         }
-      } else {
-        await handleCalculate('association');
-      }
 
-      dispatchMsAssociation({ loading: false });
+        dispatchMsAssociation({ loading: false });
+      }
+    } catch (error) {
+      dispatchError(error);
     }
   }
 
   async function calculateLandscape() {
-    if (source == 'user' && !projectID) {
-      dispatchError('Missing Required Files');
-    } else {
-      dispatchMsLandscape({
-        loading: true,
-        err: false,
-        plotPath: '',
-      });
+    try {
+      if (source == 'user' && !projectID) {
+        dispatchError('Missing Required Files');
+      } else {
+        dispatchMsLandscape({
+          loading: true,
+          err: false,
+          plotPath: '',
+        });
 
-      if (source == 'user') {
-        if (!projectID) {
-          try {
+        if (source == 'user') {
+          if (!projectID) {
             const id = await handleUpload();
             await handleCalculate('landscape', id);
-          } catch (error) {
-            dispatchError(error);
+          } else {
+            await handleCalculate('landscape');
           }
-        }
-      } else if (variableFileObj.size) {
-        try {
+        } else if (variableFileObj.size) {
           const id = await uploadVariable();
           await handleCalculate('landscape', id);
-        } catch (error) {
-          dispatchError(error);
+        } else {
+          await handleCalculate('landscape');
         }
-      } else {
-        await handleCalculate('landscape');
-      }
 
-      dispatchMsLandscape({ loading: false });
+        dispatchMsLandscape({ loading: false });
+      }
+    } catch (error) {
+      dispatchError(error);
     }
   }
 
   async function calculatePrevalence() {
-    if (source == 'user' && !projectID) {
-      dispatchError('Missing Required Files');
-    } else {
-      dispatchMsPrevalence({
-        loading: true,
-        err: false,
-        plotPath: '',
-      });
+    try {
+      if (source == 'user' && !projectID) {
+        dispatchError('Missing Required Files');
+      } else {
+        dispatchMsPrevalence({
+          loading: true,
+          err: false,
+          plotPath: '',
+        });
 
-      if (source == 'user') {
-        if (!projectID) {
-          try {
+        if (source == 'user') {
+          if (!projectID) {
             const id = await handleUpload();
             await handleCalculate('prevalence', id);
-          } catch (error) {
-            dispatchError(error);
+          } else {
+            await handleCalculate('prevalence');
           }
         } else {
-          await handleCalculate('prevalence', projectID);
+          await handleCalculate('prevalence');
         }
-      } else {
-        await handleCalculate('prevalence');
-      }
 
-      dispatchMsPrevalence({ loading: false });
+        dispatchMsPrevalence({ loading: false });
+      }
+    } catch (error) {
+      dispatchError(error);
+    }
+  }
+  async function calculateIndividual() {
+    try {
+      if (source == 'user' && !projectID) {
+        dispatchError('Missing Required Files');
+      } else {
+        dispatchMsIndividual({
+          loading: true,
+          err: false,
+          plotPath: '',
+        });
+
+        if (source == 'user') {
+          if (!projectID) {
+            const id = await handleUpload();
+            await handleCalculate('individual', id);
+          } else {
+            await handleCalculate('individual');
+          }
+        } else {
+          await handleCalculate('individual');
+        }
+
+        dispatchMsIndividual({ loading: false });
+      }
+    } catch (error) {
+      dispatchError(error);
     }
   }
 
@@ -367,8 +466,14 @@ export default function Exposure({ match, populateControls }) {
         const { projectID, exposureData } = await handleUpload();
 
         // get signature name options, ignore sample key
-        const nameOptions = Object.keys(exposureData[0]).filter(
+        const nameOptions = exposureData.columns.filter(
           (key) => key != 'Samples'
+        );
+
+        const sampleOptions = unique2d(
+          'Samples',
+          exposureData.columns,
+          exposureData.data
         );
 
         dispatchMsBurden({ signatureName: nameOptions[0] });
@@ -376,22 +481,17 @@ export default function Exposure({ match, populateControls }) {
           signatureName1: nameOptions[0],
           signatureName2: nameOptions[1],
         });
+        dispatchMsIndividual({ sample: sampleOptions[0] });
         dispatchExpExposure({
           projectID: projectID,
           userNameOptions: nameOptions,
+          userSampleOptions: sampleOptions,
         });
-        try {
-          await handleCalculate('all', projectID);
-        } catch (error) {
-          dispatchError(error);
-        }
+
+        await handleCalculate('all', projectID);
       } else if (variableFileObj.size) {
-        try {
-          const id = await uploadVariable();
-          await handleCalculate('all', id);
-        } catch (error) {
-          dispatchError(error);
-        }
+        const id = await uploadVariable();
+        await handleCalculate('all', id);
       } else {
         await handleCalculate('all');
       }
@@ -435,6 +535,11 @@ export default function Exposure({ match, populateControls }) {
     if (!loadingMsPrevalence && (fn == 'all' || fn == 'prevalence')) {
       args.prevalence = JSON.stringify({
         mutation: parseFloat(prevalenceArgs.mutation) || 100,
+      });
+    }
+    if (!loadingMsIndividual && (fn == 'all' || fn == 'individual')) {
+      args.individual = JSON.stringify({
+        sample: individualArgs.sample,
       });
     }
     if (source == 'user') {
@@ -502,6 +607,13 @@ export default function Exposure({ match, populateControls }) {
           dispatchMsPrevalence({
             plotPath: output.prevalencePath,
             err: errors.prevalenceError,
+            debugR: debugR,
+          });
+
+        if (fn == 'all' || fn == 'individual')
+          dispatchMsIndividual({
+            plotPath: output.individualPath,
+            err: errors.individualError,
             debugR: debugR,
           });
       } else {
@@ -670,6 +782,7 @@ export default function Exposure({ match, populateControls }) {
       refSignatureSetOptions: refSignatureSetOptions,
       cancerOptions: cancerOptions,
       signatureNameOptions: signatureNameOptions,
+      publicSampleOptions: publicSampleOptions,
     });
     dispatchTMB(initialState.tmb);
     dispatchTmbSignatures(initialState.tmbSignatures);
@@ -678,6 +791,7 @@ export default function Exposure({ match, populateControls }) {
     dispatchMsAssociation(initialState.msAssociation);
     dispatchMsLandscape(initialState.msLandscape);
     dispatchMsPrevalence(initialState.msPrevalence);
+    dispatchMsIndividual(initialState.msIndividual);
     // populateControls();
   }
 
@@ -727,13 +841,13 @@ export default function Exposure({ match, populateControls }) {
     {
       component: <TmbSig />,
       key: 'tmbSig',
-      name: 'TMB by Signatures',
+      name: 'TMB Signatures',
       title: 'Tumor Mutational Burden Separated by Signatures',
     },
     {
       component: <MsBurden calculateBurden={calculateBurden} />,
       key: 'msBurden',
-      name: 'MS Burden Across Cancer Types',
+      name: 'MS Burden',
       title: 'Mutational Signature Burden Across Cancer Types',
     },
     {
@@ -762,7 +876,7 @@ export default function Exposure({ match, populateControls }) {
         />
       ),
       key: 'msLandscape',
-      name: 'MS Activity Landscape',
+      name: 'MS Landscape',
       title: 'Landscape of Mutational Signature Activity',
     },
     {
@@ -770,6 +884,12 @@ export default function Exposure({ match, populateControls }) {
       key: 'msPrevalence',
       name: 'MS Prevalence',
       title: 'Prevalence of Mutational Signature',
+    },
+    {
+      component: <MSIndividual calculateIndividual={calculateIndividual} />,
+      key: 'msIndividaul',
+      name: 'MS Individual',
+      title: 'Mutational Signature in Individual Sample',
     },
   ];
 
@@ -975,11 +1095,11 @@ export default function Exposure({ match, populateControls }) {
                         }}
                         custom
                       />
-                      {exposureValidity && (
+                      {/* {exposureValidity && (
                         <span className="text-danger">
                           Exposure File Required
                         </span>
-                      )}
+                      )} */}
                     </Group>
                   </Col>
                 </Row>
@@ -1000,11 +1120,11 @@ export default function Exposure({ match, populateControls }) {
                         }}
                         custom
                       />
-                      {matrixValidity && (
+                      {/* {matrixValidity && (
                         <span className="text-danger">
                           Matrix File Required
                         </span>
-                      )}
+                      )} */}
                     </Group>
                   </Col>
                 </Row>
@@ -1078,11 +1198,11 @@ export default function Exposure({ match, populateControls }) {
                           }}
                           custom
                         />
-                        {signatureValidity && (
+                        {/* {signatureValidity && (
                           <span className="text-danger">
                             Signature File Required
                           </span>
-                        )}
+                        )} */}
                       </Group>
                     </Col>
                   </Row>

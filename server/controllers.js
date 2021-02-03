@@ -259,7 +259,7 @@ async function getSignaturesUser(req, res, next) {
     logger.debug(file);
     if (file.indexOf(path.resolve(config.results.folder)) == 0) {
       const data = await parseCSV(file);
-      res.json(data);
+      res.json(to2dArray(data));
     } else {
       logger.info('traversal error');
       res.status(500).end('Not found');
@@ -271,6 +271,7 @@ async function getSignaturesUser(req, res, next) {
   }
 }
 
+// deprecated
 async function getPublicDataOptions(req, res, next) {
   logger.info('/getPublicOptions: Request');
   try {
@@ -280,7 +281,7 @@ async function getPublicDataOptions(req, res, next) {
       [path.join(config.data.database)]
     );
 
-    res.json(JSON.to2dArray(parse(list)));
+    res.json(to2dArray(list));
     logger.info('/getPublicOptions: Success');
   } catch (err) {
     logger.info('/getPublicOptions: An error occured');
@@ -587,6 +588,7 @@ async function getVisExample(req, res, next) {
   }
 }
 
+// get signature name options for exploring/exposure
 async function getSignatureNames(req, res, next) {
   try {
     const wrapper = await r(
@@ -597,6 +599,20 @@ async function getSignatureNames(req, res, next) {
         dataPath: path.join(config.data.database),
       }
     );
+
+    res.json(JSON.parse(wrapper));
+  } catch (err) {
+    next(err);
+  }
+}
+
+// get sample name options for exploring/exposure
+async function getSampleNames(req, res, next) {
+  try {
+    const wrapper = await r('services/R/exploringWrapper.R', 'getSampleNames', {
+      args: req.body.args,
+      dataPath: path.join(config.data.database),
+    });
 
     res.json(JSON.parse(wrapper));
   } catch (err) {
@@ -651,5 +667,6 @@ module.exports = {
   getQueueResults,
   getVisExample,
   getSignatureNames,
+  getSampleNames,
   getExposureExample,
 };
