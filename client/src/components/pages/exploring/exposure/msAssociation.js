@@ -52,11 +52,11 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
       });
     } else {
       mergeMsAssociation({
-        signatureName1: userNameOptions[0],
-        signatureName2: userNameOptions[1],
+        signatureName1: userNameOptions[0] || '',
+        signatureName2: userNameOptions[1] || '',
       });
     }
-  }, [signatureNameOptions, userNameOptions]);
+  }, [signatureNameOptions, userNameOptions, source]);
 
   async function setRPlot(plotPath) {
     if (plotPath) {
@@ -75,7 +75,6 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
         }
       } catch (err) {
         mergeError({ visible: true, message: err.message });
-;
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
@@ -108,6 +107,7 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
           </Col>
           <Col lg="2">
             <Select
+              disabled={source == 'user' && !userNameOptions.length}
               id="associationSignatureName1"
               label="Signature Name 1"
               value={signatureName1}
@@ -119,6 +119,7 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
           </Col>
           <Col lg="2">
             <Select
+              disabled={source == 'user' && !userNameOptions.length}
               id="associationSignatureName2"
               label="Signature Name 2"
               value={signatureName2}
@@ -131,6 +132,7 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
           <Col />
           <Col lg="2" className="d-flex justify-content-end">
             <Button
+              disabled={!signatureName1 || !signatureName2}
               className="mt-auto mb-3"
               variant="primary"
               onClick={calculateAssociation}

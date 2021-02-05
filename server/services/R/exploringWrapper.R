@@ -449,6 +449,7 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
     decompositionPath = paste0(savePath, 'mutationalSignatureDecomposition.svg')
     decompositionData = paste0(savePath, 'mutationalSignatureDecomposition.txt')
     landscapePath = paste0(savePath, 'landscapeMutationalSignature.svg')
+    prevalencePath = paste0(savePath, 'prevalenceMutationalSignature.svg')
     individualPath = paste0(savePath, 'msIndividual.svg')
 
     # parse arguments
@@ -536,6 +537,7 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
         print('Evaluating the Performance of Mutational Signature Decomposition')
         mutationalSignatureDecomposition(decompositionPath, decompositionData, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
         output[['decompositionPath']] = decompositionPath
+        output[['decompositionData']] = decompositionData
       }, error = function(e) {
         errors[['decompositionError']] <<- e$message
         print(e)
@@ -718,6 +720,7 @@ exposureUser <- function(fn, files, common, burden = '{}', association = '{}', l
         print('Evaluating the Performance of Mutational Signature Decomposition')
         mutationalSignatureDecomposition(decompositionPath, decompositionData, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
         output[['decompositionPath']] = decompositionPath
+        output[['decompositionData']] = decompositionData
       }, error = function(e) {
         errors[['decompositionError']] <<- e$message
         print(e)

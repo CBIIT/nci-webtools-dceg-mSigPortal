@@ -32,6 +32,7 @@ export default function Exposure({ match }) {
   const dispatch = useDispatch();
   const exploring = useSelector((state) => state.exploring);
 
+  const mergeState = (state) => dispatch(actions.mergeExploring({ state }));
   const mergeExploring = (state) =>
     dispatch(actions.mergeExploring({ exploring: state }));
   const mergeExposure = (state) =>
@@ -121,7 +122,7 @@ export default function Exposure({ match }) {
 
   // set selected tab on component render
   useEffect(() => {
-    mergeExploring({ displayTab: 'exposure' });
+    mergeState({ exploring: { displayTab: 'exposure' } });
   }, []);
 
   function usePrevious(value) {
@@ -162,11 +163,13 @@ export default function Exposure({ match }) {
   }, [study, strategy, refSignatureSet, cancer]);
 
   async function loadExample(id) {
-    mergeExposure({
-      loading: {
-        active: true,
-        content: 'Loading Example',
-        showIndicator: true,
+    mergeState({
+      exposure: {
+        loading: {
+          active: true,
+          content: 'Loading Example',
+          showIndicator: true,
+        },
       },
     });
     try {
@@ -174,7 +177,9 @@ export default function Exposure({ match }) {
         await fetch(`api/getExposureExample/${id}`)
       ).json();
 
-      mergeExposure({ ...state.expExposure, projectID: projectID });
+      mergeState({
+        exposure: { ...state.expExposure, projectID: projectID },
+      });
       // rehydrate state if available
       if (state.tmb) mergeTMB(state.tmb);
       if (state.msBurden) mergeMsBurden(state.msBurden);
@@ -186,16 +191,20 @@ export default function Exposure({ match }) {
     } catch (error) {
       mergeError({ visible: true, message: error.message });
     }
-    mergeExposure({
-      loading: false,
+    mergeState({
+      exposure: {
+        loading: false,
+      },
     });
   }
 
   // get signature name options filtered by cancer type
   async function getSignatureNames() {
-    mergeExposure({
-      loading: true,
-      loadingMsg: 'Filtering Signature Names',
+    mergeState({
+      exposure: {
+        loading: true,
+        loadingMsg: 'Filtering Signature Names',
+      },
     });
     try {
       const { stdout, output } = await (
@@ -217,21 +226,27 @@ export default function Exposure({ match }) {
       ).json();
 
       if (output.data.length)
-        mergeExposure({
-          signatureNameOptions: output.data,
+        mergeState({
+          exposure: {
+            signatureNameOptions: output.data,
+          },
         });
       else mergeError(stdout);
     } catch (err) {
       mergeError({ visible: true, message: err.message });
     }
-    mergeExposure({ loading: false, loadingMsg: null });
+    mergeState({
+      exposure: { loading: false, loadingMsg: null },
+    });
   }
 
   // get sample name options filtered by cancer type
   async function getSampleNames() {
-    mergeExposure({
-      loading: true,
-      loadingMsg: 'Filtering Sample Names',
+    mergeState({
+      exposure: {
+        loading: true,
+        loadingMsg: 'Filtering Sample Names',
+      },
     });
     try {
       const { stdout, output } = await (
@@ -485,24 +500,26 @@ export default function Exposure({ match }) {
           exposureData.data
         );
 
-        mergeMsBurden({ signatureName: nameOptions[0] });
-        mergeMsAssociation({
-          signatureName1: nameOptions[0],
-          signatureName2: nameOptions[1],
-        });
-        mergeMsIndividual({ sample: sampleOptions[0] });
-        mergeExposure({
-          projectID: projectID,
-          userNameOptions: nameOptions,
-          userSampleOptions: sampleOptions,
+        mergeState({
+          exposure: {
+            projectID: projectID,
+            userNameOptions: nameOptions,
+            userSampleOptions: sampleOptions,
+          },
+          msIndividual: { sample: sampleOptions[0] },
+          msAssociation: {
+            signatureName1: nameOptions[0],
+            signatureName2: nameOptions[1],
+          },
+          msBurden: { signatureName: nameOptions[0] },
         });
 
-        await handleCalculate('all', projectID);
+        handleCalculate('all', projectID);
       } else if (variableFileObj.size) {
         const id = await uploadVariable();
-        await handleCalculate('all', id);
+        handleCalculate('all', id);
       } else {
-        await handleCalculate('all');
+        handleCalculate('all');
       }
     } catch (err) {
       mergeError({ visible: true, message: err.message });
@@ -779,7 +796,7 @@ export default function Exposure({ match }) {
     window.location.hash = '#/exploring/exposure';
 
     mergeExposure({
-      ...initialState.expExposure,
+      ...initialState.exposure,
       source: source,
       display: display,
       study: 'PCAWG',
@@ -1057,7 +1074,7 @@ export default function Exposure({ match }) {
                   </Col>
                   <Col lg="6">
                     <Button
-                      disabled={loading || projectID}
+                      disabled={loading}
                       className="w-100"
                       variant="primary"
                       onClick={() => calculateAll()}
@@ -1240,7 +1257,7 @@ export default function Exposure({ match }) {
                   </Col>
                   <Col lg="6">
                     <Button
-                      disabled={loading || projectID}
+                      disabled={loading}
                       className="w-100"
                       variant="primary"
                       onClick={() => calculateAll()}

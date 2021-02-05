@@ -41,7 +41,7 @@ export default function MsBurden({ calculateBurden }) {
     if (source == 'public') {
       mergeMsBurden({ signatureName: signatureNameOptions[0] });
     } else {
-      mergeMsBurden({ signatureName: userNameOptions[0] });
+      mergeMsBurden({ signatureName: userNameOptions[0] || '' });
     }
   }, [signatureNameOptions, userNameOptions, source]);
 
@@ -62,7 +62,6 @@ export default function MsBurden({ calculateBurden }) {
         }
       } catch (err) {
         mergeError({ visible: true, message: err.message });
-;
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
@@ -84,6 +83,7 @@ export default function MsBurden({ calculateBurden }) {
         <Row className="">
           <Col lg="3">
             <Select
+              disabled={source == 'user' && !userNameOptions.length}
               id="acrossSignatureName"
               label="Signature Name"
               value={signatureName}
@@ -96,6 +96,7 @@ export default function MsBurden({ calculateBurden }) {
           <Col lg="7" />
           <Col lg="2" className="d-flex justify-content-end">
             <Button
+              disabled={!signatureName}
               className="mt-auto mb-3"
               variant="primary"
               onClick={calculateBurden}

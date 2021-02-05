@@ -34,7 +34,6 @@ export default function MSIndividual({ calculateIndividual }) {
     dispatch(actions.mergeExploring({ msIndividual: state }));
   const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
 
-
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
   }, [plotPath, err, debugR, projectID]);
@@ -44,7 +43,7 @@ export default function MSIndividual({ calculateIndividual }) {
     if (source == 'public') {
       mergeMsIndividual({ sample: publicSampleOptions[0] });
     } else {
-      mergeMsIndividual({ sample: userSampleOptions[0] });
+      mergeMsIndividual({ sample: userSampleOptions[0] || '' });
     }
   }, [publicSampleOptions, userSampleOptions, source]);
 
@@ -65,7 +64,6 @@ export default function MSIndividual({ calculateIndividual }) {
         }
       } catch (err) {
         mergeError({ visible: true, message: err.message });
-;
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
@@ -106,11 +104,7 @@ export default function MSIndividual({ calculateIndividual }) {
           <Col />
           <Col lg="2" className="d-flex justify-content-end">
             <Button
-              disabled={
-                source == 'public'
-                  ? !publicSampleOptions.length
-                  : !userSampleOptions.length
-              }
+              disabled={!sample}
               className="mt-auto mb-3"
               variant="primary"
               onClick={calculateIndividual}
