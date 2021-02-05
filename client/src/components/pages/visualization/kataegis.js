@@ -58,7 +58,6 @@ export default function Kataegis({ submitR }) {
         }
       } catch (err) {
         mergeError({ visible: true, message: err.message });
-;
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
@@ -116,7 +115,6 @@ export default function Kataegis({ submitR }) {
       }
     } catch (err) {
       mergeError({ visible: true, message: err.message });
-;
       mergeKataegis({ loading: false });
     }
   }

@@ -27,8 +27,7 @@ export default function ProfilerSummary({ submitR }) {
     err,
     debugR,
     loading,
-  } = visualization.profilerSummary
-  ;
+  } = visualization.profilerSummary;
   useEffect(() => {
     // check if profiler summary already exists, else lazy-load calculate
     const checkSummary = async () => {
@@ -81,7 +80,6 @@ export default function ProfilerSummary({ submitR }) {
         }
       } catch (err) {
         mergeError({ visible: true, message: err.message });
-;
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
@@ -124,7 +122,6 @@ export default function ProfilerSummary({ submitR }) {
       }
     } catch (err) {
       mergeError({ visible: true, message: err.message });
-;
       mergeProfilerSummary({ loading: false });
     }
   }

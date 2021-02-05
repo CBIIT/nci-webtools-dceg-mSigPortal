@@ -48,7 +48,6 @@ export default function ReferenceSignatures({ submitR }) {
   //     }
   //   } catch (err) {
   //     mergeError({ visible: true, message: err.message });
-;
   //     dispatchExpRefSig({ loading: false });
   //   }
   // }
@@ -70,7 +69,6 @@ export default function ReferenceSignatures({ submitR }) {
   //       }
   //     } catch (err) {
   //       mergeError({ visible: true, message: err.message });
-;
   //     }
   //   } else {
   //     if (plotURL) URL.revokeObjectURL(plotURL);

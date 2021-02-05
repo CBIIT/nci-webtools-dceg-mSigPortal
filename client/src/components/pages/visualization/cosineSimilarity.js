@@ -137,7 +137,6 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
       }
     } catch (err) {
       mergeError({ visible: true, message: err.message });
-;
     }
   }
 
@@ -167,7 +166,6 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
         }
       } catch (err) {
         mergeError({ visible: true, message: err.message });
-;
         mergeCosineSimilarity({ refSubmitOverlay: false });
       }
     }
@@ -209,7 +207,6 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
       }
     } catch (err) {
       mergeError({ visible: true, message: err.message });
-;
     } finally {
       setOverlay(type, false);
     }

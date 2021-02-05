@@ -102,7 +102,6 @@ export default function MutationalPattern({ submitR }) {
         }
       } catch (err) {
         mergeError({ visible: true, message: err.message });
-;
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
@@ -155,7 +154,6 @@ export default function MutationalPattern({ submitR }) {
       }
     } catch (err) {
       mergeError({ visible: true, message: err.message });
-;
       mergeMutationalPattern({ loading: false });
     }
   }

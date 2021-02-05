@@ -126,12 +126,12 @@ export default function PCA({ submitR, getRefSigOptions }) {
         const pic = await response.blob();
         const objectURL = URL.createObjectURL(pic);
 
-        if (visualization.pca[`${type}URL`]) URL.revokeObjectURL(visualization.pca[`${type}URL`]);
+        if (visualization.pca[`${type}URL`])
+          URL.revokeObjectURL(visualization.pca[`${type}URL`]);
         mergePCA({ [`${type}URL`]: objectURL });
       }
     } catch (err) {
       mergeError({ visible: true, message: err.message });
-;
     }
   }
 
@@ -161,7 +161,6 @@ export default function PCA({ submitR, getRefSigOptions }) {
       }
     } catch (err) {
       mergeError({ visible: true, message: err.message });
-;
     } finally {
       setOverlay('within', false);
     }
@@ -234,7 +233,6 @@ export default function PCA({ submitR, getRefSigOptions }) {
       }
     } catch (err) {
       mergeError({ visible: true, message: err.message });
-;
     } finally {
       setOverlay(type, false);
     }

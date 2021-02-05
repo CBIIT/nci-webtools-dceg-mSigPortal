@@ -15,7 +15,12 @@ export default function MsPrevalence({ calculatePrevalence }) {
   const dispatch = useDispatch();
   const exploring = useSelector((state) => state.exploring);
   const {
-    mutation, plotPath, plotURL, debugR, err, loading
+    mutation,
+    plotPath,
+    plotURL,
+    debugR,
+    err,
+    loading,
   } = exploring.msPrevalence;
   const { projectID } = exploring.exposure;
   const mergeExploring = (state) =>
@@ -23,7 +28,6 @@ export default function MsPrevalence({ calculatePrevalence }) {
   const mergeMsPrevalence = (state) =>
     dispatch(actions.mergeExploring({ msPrevalence: state }));
   const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
-
 
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
@@ -46,7 +50,6 @@ export default function MsPrevalence({ calculatePrevalence }) {
         }
       } catch (err) {
         mergeError({ visible: true, message: err.message });
-;
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);

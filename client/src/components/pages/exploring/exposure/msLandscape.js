@@ -51,7 +51,6 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
         }
       } catch (err) {
         mergeError({ visible: true, message: err.message });
-;
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);

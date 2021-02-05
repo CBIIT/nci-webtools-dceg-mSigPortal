@@ -61,7 +61,6 @@ export default function Explore() {
       populateExposureExp(exposureCancer, exposureSignature, signatureNames);
     } catch (err) {
       mergeError({ visible: true, message: err.message });
-;
     }
   }
 

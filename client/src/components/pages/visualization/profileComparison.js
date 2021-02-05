@@ -180,7 +180,6 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       }
     } catch (err) {
       mergeError({ visible: true, message: err.message });
-;
     }
   }
 
@@ -211,7 +210,6 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         }
       } catch (err) {
         mergeError({ visible: true, message: err.message });
-;
         mergeProfileComparison({ refSubmitOverlay: false });
       }
     }
@@ -249,7 +247,6 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         }
       } catch (err) {
         mergeError({ visible: true, message: err.message });
-;
         mergeProfileComparison({ refSubmitOverlay: false });
       }
     }
@@ -284,7 +281,6 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       }
     } catch (err) {
       mergeError({ visible: true, message: err.message });
-;
     } finally {
       setOverlay(type, false);
     }
@@ -332,7 +328,6 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       }
     } catch (err) {
       mergeError({ visible: true, message: err.message });
-;
       mergeProfileComparison({
         pubErr: 'Error retrieving pub data samples',
       });

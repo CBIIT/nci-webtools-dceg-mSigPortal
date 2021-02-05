@@ -83,7 +83,6 @@ export default function MutationalSignatureProfile({ submitR }) {
       }
     } catch (err) {
       mergeError({ visible: true, message: err.message });
-;
       mergeSigCosineSimilarity({ loading: false });
     }
   }
@@ -105,7 +104,6 @@ export default function MutationalSignatureProfile({ submitR }) {
         }
       } catch (err) {
         mergeError({ visible: true, message: err.message });
-;
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);

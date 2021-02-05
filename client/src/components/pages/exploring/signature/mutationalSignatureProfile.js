@@ -80,7 +80,6 @@ export default function MutationalSignatureProfile({ submitR }) {
     //   setRPlot(newPlots);
     // } catch (err) {
     //   mergeError({ visible: true, message: err.message });
-;
     //   mergeSigMutationalProfiles({ loading: false });
     // }
   }
@@ -105,7 +104,6 @@ export default function MutationalSignatureProfile({ submitR }) {
       });
     } catch (err) {
       mergeError({ visible: true, message: err.message });
-;
     }
   }
 
