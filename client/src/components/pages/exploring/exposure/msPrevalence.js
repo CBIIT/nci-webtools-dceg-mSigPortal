@@ -1,21 +1,29 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
-import {
-  dispatchError,
-  dispatchMsPrevalence,
-} from '../../../../services/store';
+import { useSelector, useDispatch } from 'react-redux';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { actions as exploringActions } from '../../../../services/store/exploring';
+import { actions as modalActions } from '../../../../services/store/modal';
 import Plot from '../../../controls/plot/plot';
+import Select from '../../../controls/select/select';
 import Debug from '../../../controls/debug/debug';
 
+const actions = { ...exploringActions, ...modalActions };
 const { Group, Label, Control } = Form;
 
 export default function MsPrevalence({ calculatePrevalence }) {
-  const { mutation, plotPath, plotURL, debugR, err, loading } = useSelector(
-    (state) => state.msPrevalence
-  );
-  const { projectID } = useSelector((state) => state.expExposure);
+  const dispatch = useDispatch();
+  const exploring = useSelector((state) => state.exploring);
+  const {
+    mutation, plotPath, plotURL, debugR, err, loading
+  } = exploring.msPrevalence;
+  const { projectID } = exploring.exposure;
+  const mergeExploring = (state) =>
+    dispatch(actions.mergeExploring({ exploring: state }));
+  const mergeMsPrevalence = (state) =>
+    dispatch(actions.mergeExploring({ msPrevalence: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+
 
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
@@ -32,23 +40,24 @@ export default function MsPrevalence({ calculatePrevalence }) {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchMsPrevalence({
+          mergeMsPrevalence({
             plotURL: objectURL,
           });
         }
       } catch (err) {
-        dispatchError(err);
+        mergeError({ visible: true, message: err.message });
+;
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchMsPrevalence({ err: true, plotURL: '' });
+      mergeMsPrevalence({ err: true, plotURL: '' });
     }
   }
 
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchMsPrevalence({ plotURL: '' });
+      mergeMsPrevalence({ plotURL: '' });
     }
   }
 
@@ -64,7 +73,7 @@ export default function MsPrevalence({ calculatePrevalence }) {
                 value={mutation}
                 placeholder="e.g. 100"
                 onChange={(e) => {
-                  dispatchMsPrevalence({
+                  mergeMsPrevalence({
                     mutation: e.target.value,
                   });
                 }}

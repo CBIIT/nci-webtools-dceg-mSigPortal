@@ -1,10 +1,5 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
-import {
-  dispatchError,
-  dispatchMutationalProfiles,
-} from '../../../services/store';
 import Plot from '../../controls/plot/plot';
 import Select from '../../controls/select/select';
 import {
@@ -15,13 +10,21 @@ import {
   defaultMatrix,
   defaultFilter,
 } from '../../../services/utils';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as visualizationActions } from '../../../services/store/visualization';
+import { actions as modalActions } from '../../../services/store/modal';
+
+const actions = { ...visualizationActions, ...modalActions };
 
 export default function MutationalProfiles() {
-  const { source } = useSelector((state) => state.visualize);
-  const { projectID, svgList, displayTab } = useSelector(
-    (state) => state.visualizeResults
-  );
+  const dispatch = useDispatch();
+  const visualization = useSelector((state) => state.visualization);
+  const mergeMutationalProfiles = (state) =>
+    dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
 
+  const { source } = visualization.visualize;
+  const { projectID, svgList, displayTab } = visualization.results;
   const {
     filtered,
     selectName,
@@ -35,7 +38,7 @@ export default function MutationalProfiles() {
     plotURL,
     debug,
     displayDebug,
-  } = useSelector((state) => state.mutationalProfiles);
+  } = visualization.mutationalProfiles;
 
   const { columns } = svgList;
 
@@ -83,19 +86,19 @@ export default function MutationalProfiles() {
 
         if (!response.ok) {
           const msg = await response.text();
-          dispatchError(msg);
+          mergeError({ visible: true, message: msg });
         } else {
           const pic = await response.blob();
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL.length) URL.revokeObjectURL(plotURL);
 
-          dispatchMutationalProfiles({
+          mergeMutationalProfiles({
             plotURL: objectURL,
           });
         }
       } catch (err) {
-        dispatchError(err);
+        mergeError({ visible: true, message: err.message });
       }
     }
   }
@@ -117,7 +120,7 @@ export default function MutationalProfiles() {
         filter2d(matrix, filteredPlots)
       );
 
-      dispatchMutationalProfiles({
+      mergeMutationalProfiles({
         selectName: name,
         selectProfile: profile,
         selectMatrix: matrix,
@@ -147,7 +150,7 @@ export default function MutationalProfiles() {
 
       const matrix = defaultMatrix(profile, matrixOptions);
 
-      dispatchMutationalProfiles({
+      mergeMutationalProfiles({
         selectName: name,
         selectProfile: profile,
         selectMatrix: matrix,
@@ -169,7 +172,7 @@ export default function MutationalProfiles() {
         filter2d(matrix, filteredPlots)
       );
 
-      dispatchMutationalProfiles({
+      mergeMutationalProfiles({
         selectProfile: profile,
         selectMatrix: matrix,
         selectFilter: defaultFilter(filterOptions),
@@ -191,7 +194,7 @@ export default function MutationalProfiles() {
         ),
       ];
 
-      dispatchMutationalProfiles({
+      mergeMutationalProfiles({
         selectProfile: profile,
         selectMatrix: defaultMatrix(profile, matrixOptions),
         matrixOptions: matrixOptions,
@@ -208,7 +211,7 @@ export default function MutationalProfiles() {
       );
       const filterOptions = unique2d('Filter', columns, filteredPlots);
 
-      dispatchMutationalProfiles({
+      mergeMutationalProfiles({
         selectMatrix: matrix,
         selectFilter: defaultFilter(filterOptions),
         filterOptions: filterOptions,
@@ -220,7 +223,7 @@ export default function MutationalProfiles() {
         svgList.data
       );
 
-      dispatchMutationalProfiles({
+      mergeMutationalProfiles({
         selectMatrix: matrix,
         filtered: filteredPlots,
       });
@@ -233,7 +236,7 @@ export default function MutationalProfiles() {
       svgList.data
     );
 
-    dispatchMutationalProfiles({
+    mergeMutationalProfiles({
       selectFilter: tag,
       filtered: filteredPlots,
     });
@@ -289,7 +292,7 @@ export default function MutationalProfiles() {
         variant="link"
         className="p-0 mt-5"
         onClick={() =>
-          dispatchMutationalProfiles({
+          mergeMutationalProfiles({
             displayDebug: !displayDebug,
           })
         }

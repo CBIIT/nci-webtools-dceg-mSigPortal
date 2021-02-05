@@ -1,22 +1,25 @@
 import React, { useEffect } from 'react';
 import { Tab, Nav } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import ReferenceSignatures from './referenceSignatures';
 import MutationalSignatureProfile from './mutationalSignatureProfile';
 import CosineSimilarity from './cosineSimilarity';
 import MutationalSignatureComparison from './mutationalSignatureComparison';
-import { dispatchExploring } from '../../../../services/store';
+import { actions, getInitialState } from '../../../../services/store/exploring';
 
 const { Container, Content, Pane } = Tab;
 const { Item, Link } = Nav;
 
 export default function Signature() {
-  const { projectID, signatureDisplay } = useSelector(
-    (state) => state.exploring
-  );
+  const dispatch = useDispatch();
+  const exploring = useSelector((state) => state.exploring);
+  const mergeExploring = (state) =>
+    dispatch(actions.mergeExploring({ exploring: state }));
+
+  const { projectID, signatureDisplay } = exploring.exploring;
 
   useEffect(() => {
-    dispatchExploring({ displayTab: 'signature' });
+    mergeExploring({ displayTab: 'signature' });
   }, []);
 
   function submitR(fn, args) {
@@ -72,11 +75,11 @@ export default function Signature() {
         className="mt-2"
         defaultActiveKey={signatureDisplay}
         activeKey={signatureDisplay}
-        onSelect={(tab) => dispatchExploring({ signatureDisplay: tab })}
+        onSelect={(tab) => mergeExploring({ signatureDisplay: tab })}
       >
         <Nav variant="tabs">
           {tabs.map(({ key, title }) => (
-            <Item>
+            <Item key={key}>
               <Link eventKey={key} as="button" className="outline-none">
                 <strong>{title}</strong>
               </Link>

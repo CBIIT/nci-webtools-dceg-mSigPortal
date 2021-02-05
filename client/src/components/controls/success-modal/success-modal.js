@@ -1,13 +1,18 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Modal, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
-import { store, updateSuccess } from '../../../services/store';
+import { actions } from '../../../services/store/modal';
 
 export function SuccessModal(props) {
-  const success = useSelector((store) => store.success);
-  const closeModal = () => store.dispatch(updateSuccess({ visible: false }));
+  const dispatch = useDispatch();
+  const mergeSuccess = (state) =>
+    dispatch(actions.mergeModal({ error: state }));
+
+  const success = useSelector((state) => state.modal['success']);
+
+  const closeModal = () => mergeSuccess({ visible: false });
 
   return (
     <Modal

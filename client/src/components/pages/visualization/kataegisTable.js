@@ -1,7 +1,5 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
-import { dispatchKataegis } from '../../../services/store';
 import {
   Table,
   paginationText,
@@ -9,12 +7,16 @@ import {
   paginationButton,
 } from '../../controls/table/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions } from '../../../services/store/visualization';
 
 export default function KataegisTable() {
-  const { kataegisData, dataField, order, page, size } = useSelector(
-    (state) => state.kataegis
-  );
+  const dispatch = useDispatch();
+  const visualization = useSelector((state) => state.visualization);
+  const mergeKataegis = (state) =>
+    dispatch(actions.mergeVisualization({ kataegis: state }));
 
+  const { kataegisData, dataField, order, page, size } = visualization.kataegis;
   const commonProps = (placeholder) => ({
     title: true,
     sort: true,
@@ -107,7 +109,7 @@ export default function KataegisTable() {
   ];
 
   function handleSort(field, order) {
-    dispatchKataegis({ dataField: field, order: order });
+    mergeKataegis({ dataField: field, order: order });
   }
 
   const tableProps = {
@@ -135,10 +137,9 @@ export default function KataegisTable() {
       ),
       sizePerPageRenderer: paginationSizeSelector,
       pageButtonRenderer: paginationButton,
-      onPageChange: (page, size) =>
-        dispatchKataegis({ page: page, size: size }),
+      onPageChange: (page, size) => mergeKataegis({ page: page, size: size }),
       onSizePerPageChange: (size, page) =>
-        dispatchKataegis({ page: page, size: size }),
+        mergeKataegis({ page: page, size: size }),
     }),
   };
 

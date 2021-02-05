@@ -1,18 +1,26 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
-import { dispatchError, dispatchKataegis } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
 import Select from '../../controls/select/select';
 import KataegisTable from './kataegisTable';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as visualizationActions } from '../../../services/store/visualization';
+import { actions as modalActions } from '../../../services/store/modal';
 
+const actions = { ...visualizationActions, ...modalActions };
 const { Group, Check, Label, Control } = Form;
 
 export default function Kataegis({ submitR }) {
-  const { source, inputFormat } = useSelector((state) => state.visualize);
-  const { projectID } = useSelector((state) => state.visualizeResults);
+  const dispatch = useDispatch();
+  const visualization = useSelector((state) => state.visualization);
+  const mergeKataegis = (state) =>
+    dispatch(actions.mergeVisualization({ kataegis: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+
+  const { source, inputFormat } = visualization.visualize;
+  const { projectID } = visualization.results;
   const {
     sample,
     sampleOptions,
@@ -26,7 +34,7 @@ export default function Kataegis({ submitR }) {
     err,
     debugR,
     loading,
-  } = useSelector((state) => state.kataegis);
+  } = visualization.kataegis;
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
@@ -44,28 +52,29 @@ export default function Kataegis({ submitR }) {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchKataegis({
+          mergeKataegis({
             plotURL: objectURL,
           });
         }
       } catch (err) {
-        dispatchError(err);
+        mergeError({ visible: true, message: err.message });
+;
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchKataegis({ err: true, plotURL: '' });
+      mergeKataegis({ err: true, plotURL: '' });
     }
   }
 
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchKataegis({ plotPath: '', plotURL: '' });
+      mergeKataegis({ plotPath: '', plotURL: '' });
     }
   }
 
   async function calculateR() {
-    dispatchKataegis({
+    mergeKataegis({
       loading: true,
       err: false,
       debugR: '',
@@ -81,13 +90,13 @@ export default function Kataegis({ submitR }) {
       });
       if (!response.ok) {
         const err = await response.json();
-        dispatchKataegis({ debugR: err });
+        mergeKataegis({ debugR: err });
 
-        dispatchKataegis({ loading: false });
+        mergeKataegis({ loading: false });
       } else {
         const { debugR, output, errors, data } = await response.json();
         if (Object.keys(output).length) {
-          dispatchKataegis({
+          mergeKataegis({
             debugR: debugR,
             plotPath: output.plotPath,
             txtPath: output.txtPath,
@@ -95,7 +104,7 @@ export default function Kataegis({ submitR }) {
             loading: false,
           });
         } else {
-          dispatchKataegis({
+          mergeKataegis({
             debugR: debugR,
             plotPath: '',
             txtPath: '',
@@ -106,8 +115,9 @@ export default function Kataegis({ submitR }) {
         }
       }
     } catch (err) {
-      dispatchError(err);
-      dispatchKataegis({ loading: false });
+      mergeError({ visible: true, message: err.message });
+;
+      mergeKataegis({ loading: false });
     }
   }
 
@@ -125,7 +135,7 @@ export default function Kataegis({ submitR }) {
                   value={sample}
                   options={sampleOptions}
                   onChange={(sample) =>
-                    dispatchKataegis({
+                    mergeKataegis({
                       sample: sample,
                     })
                   }
@@ -139,7 +149,7 @@ export default function Kataegis({ submitR }) {
                     value={highlight}
                     checked={highlight}
                     onChange={() => {
-                      dispatchKataegis({ highlight: !highlight });
+                      mergeKataegis({ highlight: !highlight });
                     }}
                   />
                 </Group>
@@ -151,7 +161,7 @@ export default function Kataegis({ submitR }) {
                     value={min}
                     placeholder=""
                     onChange={(e) => {
-                      dispatchKataegis({
+                      mergeKataegis({
                         min: e.target.value,
                       });
                     }}
@@ -169,7 +179,7 @@ export default function Kataegis({ submitR }) {
                     value={max}
                     placeholder=""
                     onChange={(e) => {
-                      dispatchKataegis({
+                      mergeKataegis({
                         max: e.target.value,
                       });
                     }}
@@ -192,7 +202,7 @@ export default function Kataegis({ submitR }) {
                     'chrY',
                   ]}
                   onChange={(chromosome) =>
-                    dispatchKataegis({
+                    mergeKataegis({
                       chromosome: chromosome,
                     })
                   }

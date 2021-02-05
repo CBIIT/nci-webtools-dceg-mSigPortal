@@ -11,27 +11,44 @@ import { useDropzone } from 'react-dropzone';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import { useSelector } from 'react-redux';
 import './visualization.scss';
+import { useSelector, useDispatch } from 'react-redux';
 import {
-  dispatchVisualize,
-  dispatchVisualizeResults,
-  dispatchError,
-  dispatchSuccess,
+  actions as visualizationActions,
   getInitialState,
-  dispatchMutationalProfiles,
-  dispatchCosineSimilarity,
-  dispatchProfileComparison,
-  dispatchPCA,
-  dispatchMutationalPattern,
-  dispatchProfilerSummary,
-  dispatchKataegis,
-} from '../../../services/store';
+} from '../../../services/store/visualization';
+import { actions as modalActions } from '../../../services/store/modal';
+
+const actions = { ...visualizationActions, ...modalActions };
 const { Group, Label, Control, Check, Text } = Form;
 const { Title, Content } = Popover;
 
-export default function UploadForm() {
-  const visualizeState = useSelector((state) => state.visualize);
+export default function UserForm() {
+  const dispatch = useDispatch();
+  const visualization = useSelector((state) => state.visualization);
+  const mergeVisualize = (state) =>
+    dispatch(actions.mergeVisualization({ visualize: state }));
+  const mergeResults = (state) =>
+    dispatch(actions.mergeVisualization({ results: state }));
+  const mergeMutationalProfiles = (state) =>
+    dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
+  const mergeProfilerSummary = (state) =>
+    dispatch(actions.mergeVisualization({ profilerSummary: state }));
+  const mergeMutationalPattern = (state) =>
+    dispatch(actions.mergeVisualization({ mutationalPattern: state }));
+  const mergeCosineSimilarity = (state) =>
+    dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
+  const mergeProfileComparison = (state) =>
+    dispatch(actions.mergeVisualization({ profileComparison: state }));
+  const mergePCA = (state) =>
+    dispatch(actions.mergeVisualization({ pca: state }));
+  const mergeKataegis = (state) =>
+    dispatch(actions.mergeVisualization({ kataegis: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const mergeSuccess = (state) =>
+    dispatch(actions.mergeModal({ success: state }));
+  const resetVisualization = (_) => dispatch(actions.resetVisualization());
+
   const {
     inputFormat,
     selectedGenome,
@@ -54,7 +71,7 @@ export default function UploadForm() {
     cancerType,
     pubExperimentOptions,
     pubExperimentalStrategy,
-  } = visualizeState;
+  } = visualization.visualize;
 
   const [inputFile, setInput] = useState(new File([], ''));
   const [bedFile, setBed] = useState(new File([], ''));
@@ -63,7 +80,7 @@ export default function UploadForm() {
   const [checkValid, setCheckValid] = useState(false);
   const onDropMain = useCallback((acceptedFiles) => {
     setInput(acceptedFiles[0]);
-    dispatchVisualize({ storeFilename: acceptedFiles[0].name });
+    mergeVisualize({ storeFilename: acceptedFiles[0].name });
   }, []);
   const {
     getRootProps: mainRootProps,
@@ -74,7 +91,7 @@ export default function UploadForm() {
   });
   const onDropBed = useCallback((acceptedFiles) => {
     setBed(acceptedFiles[0]);
-    dispatchVisualize({ bedFilename: acceptedFiles[0].name });
+    mergeVisualize({ bedFilename: acceptedFiles[0].name });
   }, []);
   const {
     getRootProps: bedRootProps,
@@ -110,7 +127,7 @@ export default function UploadForm() {
     }
 
     if (queueMode) {
-      dispatchVisualize({
+      mergeVisualize({
         loading: {
           active: true,
           content: 'Sending to Queue...',
@@ -127,30 +144,32 @@ export default function UploadForm() {
           },
           body: JSON.stringify({
             args: args,
-            state: { visualize: { ...visualizeState, submitted: true } },
+            state: {
+              visualize: { ...visualization.visualize, submitted: true },
+            },
           }),
         });
 
-        dispatchVisualize({ loading: { active: false } });
+        mergeVisualize({ loading: { active: false } });
 
         if (response.ok) {
           // placeholder alert with error modal
-          dispatchSuccess(
+          mergeSuccess(
             `Your job was successfully submitted to the queue. You will recieve an email at ${email} with your results.`
           );
         } else {
-          dispatchVisualizeResults({
+          mergeResults({
             error: 'Please Reset Your Parameters and Try again.',
             submitted: false,
           });
-          dispatchError('Failed to submit to queue. Please Try Again.');
+          mergeError('Failed to submit to queue. Please Try Again.');
         }
       } catch (err) {
-        dispatchError(err);
-        dispatchVisualize({ loading: { active: false } });
+        mergeError({ visible: true, message: err.message });
+        mergeVisualize({ loading: { active: false } });
       }
     } else {
-      dispatchVisualize({
+      mergeVisualize({
         loading: {
           active: true,
           content: 'Calculating...',
@@ -167,30 +186,30 @@ export default function UploadForm() {
           body: JSON.stringify(args),
         });
 
-        dispatchVisualize({ loading: { active: false } });
+        mergeVisualize({ loading: { active: false } });
 
         if (response.ok) {
           const results = await response.json();
 
-          dispatchVisualizeResults({
+          mergeResults({
             projectID: projectID,
             svgList: results.svgList,
             statistics: results.statistics,
             matrixList: results.matrixList,
             downloads: results.downloads,
           });
-          dispatchMutationalProfiles({
+          mergeMutationalProfiles({
             debug: { stdout: results.stdout, stderr: results.stderr },
           });
         } else if (response.status == 504) {
-          dispatchVisualizeResults({
+          mergeResults({
             error: 'Please Reset Your Parameters and Try again.',
           });
-          dispatchError(
+          mergeError(
             'Your submission has timed out. Please try again by submitting this job to a queue instead.'
           );
         } else {
-          dispatchVisualizeResults({
+          mergeResults({
             error: 'Please Reset Your Parameters and Try again.',
           });
           const { stdout, stderr } = await response.json();
@@ -199,25 +218,21 @@ export default function UploadForm() {
             <pre>${stdout}</pre>
             <pre>${stderr}</pre>
           </div>`;
-          dispatchError(message);
+          mergeError(message);
         }
       } catch (err) {
-        dispatchError(err);
-        dispatchVisualizeResults({
+        mergeError({ visible: true, message: err.message });
+        mergeResults({
           error: 'Please Reset Your Parameters and Try again.',
         });
-        dispatchVisualize({ loading: { active: false } });
+        mergeVisualize({ loading: { active: false } });
       }
     }
   }
 
   // reset form while preserving selected data source and public parameters
-  function resetForm() {
-    const initialState = getInitialState();
-    removeFile();
-    removeBedFile();
-    dispatchVisualize({
-      ...initialState.visualize,
+  function handleReset() {
+    const params = {
       source: 'user',
       pDataOptions: pDataOptions,
       studyOptions: studyOptions,
@@ -226,30 +241,19 @@ export default function UploadForm() {
       cancerType: cancerType,
       pubExperimentOptions: pubExperimentOptions,
       pubExperimentalStrategy: pubExperimentalStrategy,
-    });
-  }
-
-  function handleReset() {
-    const initialState = getInitialState();
+    };
     // clear id from url
     window.location.hash = '#/visualization';
+    resetVisualization();
     setCheckValid(false);
-    setValidFile(false);
-    setValidEmail(false);
-    resetForm();
-    dispatchVisualizeResults(initialState.visualizeResults);
-    dispatchProfilerSummary(initialState.profilerSummary);
-    dispatchMutationalProfiles(initialState.mutationalProfiles);
-    dispatchMutationalPattern(initialState.mutationalPattern);
-    dispatchCosineSimilarity(initialState.cosineSimilarity);
-    dispatchProfileComparison(initialState.profileComparison);
-    dispatchPCA(initialState.pca);
-    dispatchKataegis(initialState.kataegis);
+    removeFile();
+    removeBedFile();
+    mergeVisualize(params);
   }
 
   //   Uploads inputFile and returns a projectID
   async function uploadFile() {
-    dispatchVisualize({
+    mergeVisualize({
       submitted: true,
       loading: {
         active: true,
@@ -272,14 +276,14 @@ export default function UploadForm() {
           <p>${msg}</p>
          ${error ? `<p>${error}</p>` : ''} 
         </div>`;
-        dispatchError(message);
+        mergeError(message);
       } else {
         return await response.json();
       }
     } catch (err) {
-      dispatchError(err);
+      mergeError({ visible: true, message: err.message });
     } finally {
-      dispatchVisualize({
+      mergeVisualize({
         loading: {
           active: false,
         },
@@ -289,12 +293,12 @@ export default function UploadForm() {
 
   function removeFile() {
     setInput(new File([], ''));
-    dispatchVisualize({ storeFilename: '' });
+    mergeVisualize({ storeFilename: '' });
   }
 
   function removeBedFile() {
     setBed(new File([], ''));
-    dispatchVisualize({ bedFilename: '' });
+    mergeVisualize({ bedFilename: '' });
   }
 
   function selectFormat(format) {
@@ -308,19 +312,19 @@ export default function UploadForm() {
     if (format == 'catalog_csv')
       path = 'assets/exampleInput/demo_input_catalog.csv';
 
-    dispatchVisualize({ inputFormat: format, exampleData: path });
+    mergeVisualize({ inputFormat: format, exampleData: path });
   }
 
   async function loadExample() {
     const filename = exampleData.split('/').slice(-1)[0];
     setInput(new File([await (await fetch(exampleData)).blob()], filename));
-    dispatchVisualize({ storeFilename: filename });
+    mergeVisualize({ storeFilename: filename });
   }
 
   async function loadBed() {
     const filename = bedData.split('/').slice(-1)[0];
     setBed(new File([await (await fetch(bedData)).blob()], filename));
-    dispatchVisualize({ bedFilename: filename });
+    mergeVisualize({ bedFilename: filename });
   }
 
   function validateForm() {
@@ -449,9 +453,7 @@ export default function UploadForm() {
         <Control
           as="select"
           value={selectedGenome}
-          onChange={(e) =>
-            dispatchVisualize({ selectedGenome: e.target.value })
-          }
+          onChange={(e) => mergeVisualize({ selectedGenome: e.target.value })}
           disabled={
             submitted || ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
           }
@@ -470,7 +472,7 @@ export default function UploadForm() {
             value="WGS"
             checked={experimentalStrategy == 'WGS'}
             onChange={(e) =>
-              dispatchVisualize({ experimentalStrategy: e.target.value })
+              mergeVisualize({ experimentalStrategy: e.target.value })
             }
             disabled={
               submitted || ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
@@ -484,7 +486,7 @@ export default function UploadForm() {
             value="WES"
             checked={experimentalStrategy == 'WES'}
             onChange={(e) =>
-              dispatchVisualize({ experimentalStrategy: e.target.value })
+              mergeVisualize({ experimentalStrategy: e.target.value })
             }
             disabled={
               submitted || ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
@@ -527,7 +529,7 @@ export default function UploadForm() {
             value={mutationSplit}
             checked={mutationSplit == 'True'}
             onChange={(e) =>
-              dispatchVisualize({
+              mergeVisualize({
                 mutationSplit: e.target.value == 'True' ? 'False' : 'True',
               })
             }
@@ -546,9 +548,7 @@ export default function UploadForm() {
           size="sm"
           placeholder="Enter a filter"
           value={mutationFilter}
-          onChange={(e) =>
-            dispatchVisualize({ mutationFilter: e.target.value })
-          }
+          onChange={(e) => mergeVisualize({ mutationFilter: e.target.value })}
           disabled={
             submitted ||
             mutationSplit == 'True' ||
@@ -671,7 +671,7 @@ export default function UploadForm() {
             value={collapseSample}
             checked={collapseSample == 'True'}
             onChange={(e) =>
-              dispatchVisualize({
+              mergeVisualize({
                 collapseSample: e.target.value == 'True' ? 'False' : 'True',
               })
             }
@@ -689,7 +689,7 @@ export default function UploadForm() {
               disabled={submitted}
               checked={queueMode}
               onChange={(_) => {
-                dispatchVisualize({ queueMode: !queueMode });
+                mergeVisualize({ queueMode: !queueMode });
               }}
             />
           </Check>
@@ -700,7 +700,7 @@ export default function UploadForm() {
             size="sm"
             value={email}
             type="email"
-            onChange={(e) => dispatchVisualize({ email: e.target.value })}
+            onChange={(e) => mergeVisualize({ email: e.target.value })}
             disabled={!queueMode || submitted}
             isInvalid={queueMode && checkValid ? !validEmail : false}
           />

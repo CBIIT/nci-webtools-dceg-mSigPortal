@@ -1,17 +1,22 @@
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import {
-  dispatchError,
-  dispatchTmbSignatures,
-} from '../../../../services/store';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as exploringActions } from '../../../../services/store/exploring';
+import { actions as modalActions } from '../../../../services/store/modal';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 
+const actions = { ...exploringActions, ...modalActions };
+
 export default function TmbSignatures() {
-  const { plotPath, plotURL, debugR, err } = useSelector(
-    (state) => state.tmbSignatures
-  );
-  const { projectID } = useSelector((state) => state.expExposure);
+  const dispatch = useDispatch();
+  const exploring = useSelector((state) => state.exploring);
+  const { plotPath, plotURL, debugR, err } = exploring.tmbSignatures;
+  const { projectID } = exploring.exposure;
+  const mergeExploring = (state) =>
+    dispatch(actions.mergeExploring({ exploring: state }));
+  const mergeTmbSignatures = (state) =>
+    dispatch(actions.mergeExploring({ tmbSignatures: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
 
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
@@ -28,23 +33,24 @@ export default function TmbSignatures() {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchTmbSignatures({
+          mergeTmbSignatures({
             plotURL: objectURL,
           });
         }
       } catch (err) {
-        dispatchError(err);
+        mergeError({ visible: true, message: err.message });
+;
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchTmbSignatures({ err: true, plotURL: '' });
+      mergeTmbSignatures({ err: true, plotURL: '' });
     }
   }
 
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchTmbSignatures({ plotURL: '' });
+      mergeTmbSignatures({ plotURL: '' });
     }
   }
 

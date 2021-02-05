@@ -1,24 +1,29 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
-import {
-  dispatchError,
-  dispatchMutationalPattern,
-} from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
 import { value2d, filter2d } from '../../../services/utils';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as visualizationActions } from '../../../services/store/visualization';
+import { actions as modalActions } from '../../../services/store/modal';
 
+const actions = { ...visualizationActions, ...modalActions };
 const { Group, Label, Control } = Form;
 
 export default function MutationalPattern({ submitR }) {
-  const { source, study, cancerType, pubExperimentalStrategy } = useSelector(
-    (state) => state.visualize
-  );
-  const { projectID, matrixList } = useSelector(
-    (state) => state.visualizeResults
-  );
+  const dispatch = useDispatch();
+  const visualization = useSelector((state) => state.visualization);
+  const mergeMutationalPattern = (state) =>
+    dispatch(actions.mergeVisualization({ mutationalPattern: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const {
+    source,
+    study,
+    cancerType,
+    pubExperimentalStrategy,
+  } = visualization.visualize;
+  const { projectID, matrixList } = visualization.results;
   const {
     proportion,
     pattern,
@@ -30,7 +35,7 @@ export default function MutationalPattern({ submitR }) {
     err,
     debugR,
     loading,
-  } = useSelector((state) => state.mutationalPattern);
+  } = visualization.mutationalPattern;
 
   // load plots if they exist - used for precalculated examples
   useEffect(() => {
@@ -44,7 +49,7 @@ export default function MutationalPattern({ submitR }) {
         cache: 'no-cache',
       });
       if (check.status === 200) {
-        dispatchMutationalPattern({ barPath: barchart });
+        mergeMutationalPattern({ barPath: barchart });
       }
 
       const mpea =
@@ -56,7 +61,7 @@ export default function MutationalPattern({ submitR }) {
         cache: 'no-cache',
       });
       if (check.status === 200) {
-        dispatchMutationalPattern({
+        mergeMutationalPattern({
           plotPath: mpea,
           txtPath: `/results/mutationalPatternPublic/mpea.txt`,
         });
@@ -72,7 +77,7 @@ export default function MutationalPattern({ submitR }) {
   }, [plotPath, barPath]);
 
   async function setRPlot(plotPath, type) {
-    dispatchMutationalPattern({ loading: true });
+    mergeMutationalPattern({ loading: true });
 
     if (plotPath) {
       try {
@@ -85,38 +90,39 @@ export default function MutationalPattern({ submitR }) {
 
           if (type == 'context') {
             if (plotURL) URL.revokeObjectURL(plotURL);
-            dispatchMutationalPattern({
+            mergeMutationalPattern({
               plotURL: objectURL,
             });
           } else {
             if (barURL) URL.revokeObjectURL(barURL);
-            dispatchMutationalPattern({
+            mergeMutationalPattern({
               barURL: objectURL,
             });
           }
         }
       } catch (err) {
-        dispatchError(err);
+        mergeError({ visible: true, message: err.message });
+;
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchMutationalPattern({ err: true, plotURL: '' });
+      mergeMutationalPattern({ err: true, plotURL: '' });
     }
-    dispatchMutationalPattern({ loading: false });
+    mergeMutationalPattern({ loading: false });
   }
 
   function clearPlot(type) {
     if (type == 'context') {
       URL.revokeObjectURL(plotURL);
-      dispatchMutationalPattern({ plotURL: '' });
+      mergeMutationalPattern({ plotURL: '' });
     } else if (type == 'barchart') {
       URL.revokeObjectURL(barURL);
-      dispatchMutationalPattern({ barURL: '' });
+      mergeMutationalPattern({ barURL: '' });
     }
   }
 
   async function calculateR(fn, args) {
-    dispatchMutationalPattern({
+    mergeMutationalPattern({
       loading: true,
       err: false,
       debugR: '',
@@ -129,18 +135,18 @@ export default function MutationalPattern({ submitR }) {
       const response = await submitR(fn, args);
       if (!response.ok) {
         const err = await response.json();
-        dispatchMutationalPattern({ debugR: err, loading: false });
+        mergeMutationalPattern({ debugR: err, loading: false });
       } else {
         const { debugR, output } = await response.json();
         if (Object.keys(output).length) {
-          dispatchMutationalPattern({
+          mergeMutationalPattern({
             debugR: debugR,
             plotPath: output.plotPath,
             barPath: output.barPath,
             txtPath: output.txtPath,
           });
         } else {
-          dispatchMutationalPattern({
+          mergeMutationalPattern({
             debugR: debugR,
             err: true,
             loading: false,
@@ -148,8 +154,9 @@ export default function MutationalPattern({ submitR }) {
         }
       }
     } catch (err) {
-      dispatchError(err);
-      dispatchMutationalPattern({ loading: false });
+      mergeError({ visible: true, message: err.message });
+;
+      mergeMutationalPattern({ loading: false });
     }
   }
 
@@ -215,7 +222,7 @@ export default function MutationalPattern({ submitR }) {
                     value={proportion}
                     placeholder="Ex. 0.8"
                     onChange={(e) => {
-                      dispatchMutationalPattern({
+                      mergeMutationalPattern({
                         proportion: e.target.value,
                       });
                     }}
@@ -233,7 +240,7 @@ export default function MutationalPattern({ submitR }) {
                     value={pattern}
                     placeholder="Ex. NCG>NTG"
                     onChange={(e) => {
-                      dispatchMutationalPattern({
+                      mergeMutationalPattern({
                         pattern: e.target.value,
                       });
                     }}
@@ -281,7 +288,7 @@ export default function MutationalPattern({ submitR }) {
                 <Control
                   value={proportion}
                   onChange={(e) => {
-                    dispatchMutationalPattern({
+                    mergeMutationalPattern({
                       proportion: e.target.value,
                     });
                   }}
@@ -296,7 +303,7 @@ export default function MutationalPattern({ submitR }) {
                 <Control
                   value={pattern}
                   onChange={(e) => {
-                    dispatchMutationalPattern({
+                    mergeMutationalPattern({
                       pattern: e.target.value,
                     });
                   }}

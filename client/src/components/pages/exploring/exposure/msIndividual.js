@@ -1,27 +1,39 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
-import {
-  dispatchError,
-  dispatchMsIndividual,
-} from '../../../../services/store';
+import { useSelector, useDispatch } from 'react-redux';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { actions as exploringActions } from '../../../../services/store/exploring';
+import { actions as modalActions } from '../../../../services/store/modal';
 import Plot from '../../../controls/plot/plot';
-import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
+import Debug from '../../../controls/debug/debug';
 
+const actions = { ...exploringActions, ...modalActions };
 const { Group } = Form;
 
 export default function MSIndividual({ calculateIndividual }) {
+  const dispatch = useDispatch();
+  const exploring = useSelector((state) => state.exploring);
   const {
+    sample,
+    plotPath,
+    plotURL,
+    debugR,
+    err,
+    loading,
+  } = exploring.msIndividual;
+  const {
+    projectID,
     publicSampleOptions,
     userSampleOptions,
     source,
-    projectID,
-  } = useSelector((state) => state.expExposure);
-  const { sample, plotPath, plotURL, debugR, err, loading } = useSelector(
-    (state) => state.msIndividual
-  );
+  } = exploring.exposure;
+  const mergeExploring = (state) =>
+    dispatch(actions.mergeExploring({ exploring: state }));
+  const mergeMsIndividual = (state) =>
+    dispatch(actions.mergeExploring({ msIndividual: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+
 
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
@@ -30,9 +42,9 @@ export default function MSIndividual({ calculateIndividual }) {
   // choose inital sample
   useEffect(() => {
     if (source == 'public') {
-      dispatchMsIndividual({ sample: publicSampleOptions[0] });
+      mergeMsIndividual({ sample: publicSampleOptions[0] });
     } else {
-      dispatchMsIndividual({ sample: userSampleOptions[0] });
+      mergeMsIndividual({ sample: userSampleOptions[0] });
     }
   }, [publicSampleOptions, userSampleOptions, source]);
 
@@ -47,23 +59,24 @@ export default function MSIndividual({ calculateIndividual }) {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchMsIndividual({
+          mergeMsIndividual({
             plotURL: objectURL,
           });
         }
       } catch (err) {
-        dispatchError(err);
+        mergeError({ visible: true, message: err.message });
+;
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchMsIndividual({ err: true, plotURL: '' });
+      mergeMsIndividual({ err: true, plotURL: '' });
     }
   }
 
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchMsIndividual({ plotURL: '' });
+      mergeMsIndividual({ plotURL: '' });
     }
   }
 
@@ -86,7 +99,7 @@ export default function MSIndividual({ calculateIndividual }) {
                 options={
                   source == 'public' ? publicSampleOptions : userSampleOptions
                 }
-                onChange={(name) => dispatchMsIndividual({ sample: name })}
+                onChange={(name) => mergeMsIndividual({ sample: name })}
               />
             </Group>
           </Col>

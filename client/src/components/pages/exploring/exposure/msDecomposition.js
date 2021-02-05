@@ -1,17 +1,29 @@
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import {
-  dispatchError,
-  dispatchMsDecomposition,
-} from '../../../../services/store';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as exploringActions } from '../../../../services/store/exploring';
+import { actions as modalActions } from '../../../../services/store/modal';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 
+const actions = { ...exploringActions, ...modalActions };
+
 export default function MsDecomposition() {
-  const { plotPath, plotURL, txtPath, debugR, err, loading } = useSelector(
-    (state) => state.msDecomposition
-  );
-  const { projectID } = useSelector((state) => state.expExposure);
+  const dispatch = useDispatch();
+  const exploring = useSelector((state) => state.exploring);
+  const {
+    plotPath,
+    plotURL,
+    txtPath,
+    debugR,
+    err,
+    loading,
+  } = exploring.msDecomposition;
+  const { projectID } = exploring.exposure;
+  const mergeExploring = (state) =>
+    dispatch(actions.mergeExploring({ exploring: state }));
+  const mergeMsDecomposition = (state) =>
+    dispatch(actions.mergeExploring({ msDecomposition: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
 
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
@@ -28,23 +40,24 @@ export default function MsDecomposition() {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchMsDecomposition({
+          mergeMsDecomposition({
             plotURL: objectURL,
           });
         }
       } catch (err) {
-        dispatchError(err);
+        mergeError({ visible: true, message: err.message });
+;
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchMsDecomposition({ err: true, plotURL: '' });
+      mergeMsDecomposition({ err: true, plotURL: '' });
     }
   }
 
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchMsDecomposition({ plotURL: '' });
+      mergeMsDecomposition({ plotURL: '' });
     }
   }
 
@@ -71,7 +84,7 @@ export default function MsDecomposition() {
           />
         </>
       )}
-      {/* <Debug msg={debugR} /> */}
+      <Debug msg={debugR} />
     </div>
   );
 }

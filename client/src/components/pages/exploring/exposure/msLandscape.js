@@ -1,17 +1,19 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
-import {
-  dispatchError,
-  dispatchMsLandscape,
-} from '../../../../services/store';
+import { useSelector, useDispatch } from 'react-redux';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { actions as exploringActions } from '../../../../services/store/exploring';
+import { actions as modalActions } from '../../../../services/store/modal';
 import Plot from '../../../controls/plot/plot';
+import Select from '../../../controls/select/select';
 import Debug from '../../../controls/debug/debug';
 
+const actions = { ...exploringActions, ...modalActions };
 const { Label, Group } = Form;
 
 export default function MsLandscape({ calculateLandscape, handleVariable }) {
+  const dispatch = useDispatch();
+  const exploring = useSelector((state) => state.exploring);
   const {
     variableFile,
     plotPath,
@@ -20,8 +22,13 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
     debugR,
     err,
     loading,
-  } = useSelector((state) => state.msLandscape);
-  const { projectID } = useSelector((state) => state.expExposure);
+  } = exploring.msLandscape;
+  const { projectID } = exploring.exposure;
+  const mergeExploring = (state) =>
+    dispatch(actions.mergeExploring({ exploring: state }));
+  const mergeMsLandscape = (state) =>
+    dispatch(actions.mergeExploring({ msLandscape: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
 
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
@@ -38,23 +45,24 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchMsLandscape({
+          mergeMsLandscape({
             plotURL: objectURL,
           });
         }
       } catch (err) {
-        dispatchError(err);
+        mergeError({ visible: true, message: err.message });
+;
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchMsLandscape({ err: true, plotURL: '' });
+      mergeMsLandscape({ err: true, plotURL: '' });
     }
   }
 
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchMsLandscape({ plotURL: '' });
+      mergeMsLandscape({ plotURL: '' });
     }
   }
 

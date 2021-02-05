@@ -1,17 +1,23 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
-import {
-  dispatchError,
-  dispatchExpCosineSimilarity,
-  dispatchExploring,
-} from '../../../../services/store';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as exploringActions } from '../../../../services/store/exploring';
+import { actions as modalActions } from '../../../../services/store/modal';
+
+const actions = { ...exploringActions, ...modalActions };
 
 export default function MutationalSignatureProfile({ submitR }) {
+  const dispatch = useDispatch();
+  const exploring = useSelector((state) => state.exploring);
+  const mergeExploring = (state) =>
+    dispatch(actions.mergeExploring({ exploring: state }));
+  const mergeSigCosineSimilarity = (state) =>
+    dispatch(actions.mergeExploring({ sigCosineSimilarity: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
   const {
     profileName,
     profileNameOptions,
@@ -25,11 +31,8 @@ export default function MutationalSignatureProfile({ submitR }) {
     debugR,
     err,
     loading,
-  } = useSelector((state) => state.expCosineSimilarity);
-  const { displayTab, refSigData, projectID } = useSelector(
-    (state) => state.exploring
-  );
-
+  } = exploring.sigCosineSimilarity;
+  const { displayTab, refSigData, projectID } = exploring.exploring;
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
   }, [plotPath]);
@@ -37,13 +40,13 @@ export default function MutationalSignatureProfile({ submitR }) {
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchExpCosineSimilarity({ plotURL: '' });
+      mergeSigCosineSimilarity({ plotURL: '' });
     }
   }
 
   async function calculateR(fn, args) {
     try {
-      dispatchExpCosineSimilarity({
+      mergeSigCosineSimilarity({
         loading: true,
         err: false,
         plotPath: '',
@@ -54,22 +57,22 @@ export default function MutationalSignatureProfile({ submitR }) {
       if (!response.ok) {
         const err = await response.json();
 
-        dispatchExpCosineSimilarity({
+        mergeSigCosineSimilarity({
           loading: false,
           debugR: err,
         });
       } else {
         const { debugR, output, projectID: id } = await response.json();
         if (Object.keys(output).length) {
-          if (!projectID) dispatchExploring({ projectID: id });
-          dispatchExpCosineSimilarity({
+          if (!projectID) mergeExploring({ projectID: id });
+          mergeSigCosineSimilarity({
             debugR: debugR,
             loading: false,
             plotPath: output.plotPath,
             txtPath: output.txtPath,
           });
         } else {
-          dispatchExpCosineSimilarity({
+          mergeSigCosineSimilarity({
             debugR: debugR,
             loading: false,
             err: true,
@@ -79,8 +82,9 @@ export default function MutationalSignatureProfile({ submitR }) {
         }
       }
     } catch (err) {
-      dispatchError(err);
-      dispatchExpCosineSimilarity({ loading: false });
+      mergeError({ visible: true, message: err.message });
+;
+      mergeSigCosineSimilarity({ loading: false });
     }
   }
 
@@ -95,16 +99,17 @@ export default function MutationalSignatureProfile({ submitR }) {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchExpCosineSimilarity({
+          mergeSigCosineSimilarity({
             plotURL: objectURL,
           });
         }
       } catch (err) {
-        dispatchError(err);
+        mergeError({ visible: true, message: err.message });
+;
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchExpCosineSimilarity({ err: true, plotURL: '' });
+      mergeSigCosineSimilarity({ err: true, plotURL: '' });
     }
   }
 
@@ -114,7 +119,7 @@ export default function MutationalSignatureProfile({ submitR }) {
       ...new Set(filteredData.map((row) => row.Signature_set_name)),
     ];
 
-    dispatchExpCosineSimilarity({
+    mergeSigCosineSimilarity({
       profileName: profile,
       refSignatureSet1: refSignatureSetOptions[0],
       refSignatureSet2: refSignatureSetOptions[1] || refSignatureSetOptions[0],
@@ -144,7 +149,7 @@ export default function MutationalSignatureProfile({ submitR }) {
               value={refSignatureSet1}
               options={refSignatureSetOptions1}
               onChange={(set) =>
-                dispatchExpCosineSimilarity({ refSignatureSet1: set })
+                mergeSigCosineSimilarity({ refSignatureSet1: set })
               }
             />
           </Col>
@@ -155,7 +160,7 @@ export default function MutationalSignatureProfile({ submitR }) {
               value={refSignatureSet2}
               options={refSignatureSetOptions2}
               onChange={(set) =>
-                dispatchExpCosineSimilarity({ refSignatureSet2: set })
+                mergeSigCosineSimilarity({ refSignatureSet2: set })
               }
             />
           </Col>

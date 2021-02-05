@@ -1,16 +1,5 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import {
-  dispatchError,
-  dispatchVisualize,
-  dispatchVisualizeResults,
-  dispatchMutationalProfiles,
-  dispatchCosineSimilarity,
-  dispatchProfileComparison,
-  dispatchKataegis,
-  dispatchPCA,
-} from '../../../services/store';
 import ProfilerSummary from './profilerSummary';
 import MutationalProfiles from './mutationalProfiles';
 import CosineSimilarity from './cosineSimilarity';
@@ -28,14 +17,42 @@ import {
   defaultMatrix,
   defaultFilter,
 } from '../../../services/utils';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as visualizationActions } from '../../../services/store/visualization';
+import { actions as modalActions } from '../../../services/store/modal';
+
+const actions = { ...visualizationActions, ...modalActions };
 
 export default function Results({ setOpenSidebar }) {
-  const { error, projectID, displayTab, svgList, matrixList } = useSelector(
-    (state) => state.visualizeResults
-  );
-  const { source, loading } = useSelector((state) => state.visualize);
-  const mutationalProfiles = useSelector((state) => state.mutationalProfiles);
-  const { signatureSetOptions } = useSelector((state) => state.pca);
+  const dispatch = useDispatch();
+  const visualization = useSelector((state) => state.visualization);
+  const mergeVisualize = (state) =>
+    dispatch(actions.mergeVisualization({ visualize: state }));
+  const mergeResults = (state) =>
+    dispatch(actions.mergeVisualization({ results: state }));
+  const mergeMutationalProfiles = (state) =>
+    dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
+  const mergeKataegis = (state) =>
+    dispatch(actions.mergeVisualization({ Kataegis: state }));
+  const mergeCosineSimilarity = (state) =>
+    dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
+  const mergeProfileComparison = (state) =>
+    dispatch(actions.mergeVisualization({ profileComparison: state }));
+  const mergePCA = (state) =>
+    dispatch(actions.mergeVisualization({ pca: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+
+  const {
+    error,
+    projectID,
+    displayTab,
+    svgList,
+    matrixList,
+  } = visualization.results;
+
+  const { source, loading } = visualization.visualize;
+  const mutationalProfiles = visualization.mutationalProfiles;
+  const { signatureSetOptions } = visualization.pca;
 
   // get mapping of plots after retrieving projectID
   useEffect(() => {
@@ -71,20 +88,20 @@ export default function Results({ setOpenSidebar }) {
         matrixList,
         downloads,
       } = await response.json();
-      dispatchVisualizeResults({
+      mergeResults({
         svgList: svgList,
         statistics: statistics,
         matrixList: matrixList,
         downloads: downloads,
       });
     } else {
-      dispatchError(await response.json());
+      mergeError(await response.json());
     }
   }
 
   // retrieve mapping of samples to plots from svgList file
   async function loadData() {
-    dispatchVisualize({
+    mergeVisualize({
       loading: {
         active: true,
         content: 'Putting Data Into Session',
@@ -127,7 +144,7 @@ export default function Results({ setOpenSidebar }) {
       filter2d(profile, matrixList.data)
     );
 
-    dispatchMutationalProfiles({
+    mergeMutationalProfiles({
       filtered: filteredPlots,
       nameOptions: nameOptions,
       profileOptions: filteredProfileOptions,
@@ -166,7 +183,7 @@ export default function Results({ setOpenSidebar }) {
       await getRefSigOptions(selectProfile)
     ).json();
 
-    dispatchCosineSimilarity({
+    mergeCosineSimilarity({
       withinProfileType: selectProfile,
       refProfileType: selectProfile,
       refSignatureSet: refSignatureSetOptions[0],
@@ -178,7 +195,7 @@ export default function Results({ setOpenSidebar }) {
       userMatrixOptions: filteredMatrixOptions,
     });
 
-    dispatchProfileComparison({
+    mergeProfileComparison({
       withinProfileType: selectProfile,
       withinSampleName1: sampleNameOptions[0],
       withinSampleName2: sampleNameOptions[1],
@@ -193,7 +210,7 @@ export default function Results({ setOpenSidebar }) {
       userSampleName: sampleNameOptions[0],
     });
 
-    dispatchPCA({
+    mergePCA({
       profileType: selectProfile,
       signatureSet: refSignatureSetOptions[0],
       signatureSetOptions: refSignatureSetOptions,
@@ -202,12 +219,12 @@ export default function Results({ setOpenSidebar }) {
       userMatrixOptions: filteredMatrixOptions,
     });
 
-    dispatchKataegis({
+    mergeKataegis({
       sample: sampleNameOptions[0],
       sampleOptions: sampleNameOptions,
     });
 
-    dispatchVisualize({
+    mergeVisualize({
       loading: {
         active: false,
       },
@@ -217,7 +234,7 @@ export default function Results({ setOpenSidebar }) {
 
   // retrieve mapping of samples to plots from svgList file
   async function mapPublicData() {
-    dispatchVisualize({
+    mergeVisualize({
       loading: {
         active: true,
         content: 'Putting Public Data Into Session',
@@ -274,7 +291,7 @@ export default function Results({ setOpenSidebar }) {
       ),
     ].sort((a, b) => a - b);
 
-    dispatchMutationalProfiles({
+    mergeMutationalProfiles({
       filtered: filteredPlots,
       nameOptions: nameOptions,
       profileOptions: filteredProfileOptions,
@@ -294,7 +311,7 @@ export default function Results({ setOpenSidebar }) {
       await getRefSigOptions(selectProfile)
     ).json();
 
-    dispatchCosineSimilarity({
+    mergeCosineSimilarity({
       withinProfileType: selectProfile,
       refProfileType: selectProfile,
       refSignatureSet: refSignatureSetOptions[0],
@@ -303,7 +320,7 @@ export default function Results({ setOpenSidebar }) {
       withinMatrixOptions: filteredMatrixOptions,
     });
 
-    dispatchProfileComparison({
+    mergeProfileComparison({
       withinProfileType: selectProfile,
       withinSampleName1: nameOptions[0],
       withinSampleName2: nameOptions[1],
@@ -314,13 +331,13 @@ export default function Results({ setOpenSidebar }) {
       refSignatureSetOptions: refSignatureSetOptions,
     });
 
-    dispatchPCA({
+    mergePCA({
       profileType: selectProfile,
       signatureSet: refSignatureSetOptions[0],
       signatureSetOptions: refSignatureSetOptions,
     });
 
-    dispatchVisualize({
+    mergeVisualize({
       loading: {
         active: false,
       },

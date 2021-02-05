@@ -1,25 +1,35 @@
 import React, { useEffect } from 'react';
 import { Nav } from 'react-bootstrap';
 import { Route, Redirect, NavLink } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  actions as exploringActions,
+  getInitialState,
+} from '../../../services/store/exploring';
+import { actions as modalActions } from '../../../services/store/modal';
 import Signature from './signature/index';
 import Exposure from './exposure';
 import Etiology from './etiology';
 import Download from './download';
-import {
-  dispatchError,
-  dispatchExploring,
-  dispatchExpMutationalProfiles,
-  dispatchExpCosineSimilarity,
-  dispatchExpMutationalSigComparison,
-  dispatchExpExposure,
-} from '../../../services/store';
 import './exploring.scss';
 
+const actions = { ...exploringActions, ...modalActions };
+
 export default function Explore() {
-  const { exposureSignature, displayTab } = useSelector(
-    (state) => state.exploring
-  );
+  const dispatch = useDispatch();
+  const exploring = useSelector((state) => state.exploring);
+  const { exposureSignature, displayTab } = exploring.exploring;
+  const mergeExploring = (state) =>
+    dispatch(actions.mergeExploring({ exploring: state }));
+  const mergeExposure = (state) =>
+    dispatch(actions.mergeExploring({ exposure: state }));
+  const mergeSigMutationalProfiles = (state) =>
+    dispatch(actions.mergeExploring({ sigMutationalProfiles: state }));
+  const mergeSigMutationalSigComparison = (state) =>
+    dispatch(actions.mergeExploring({ sigMutationalSigComparison: state }));
+  const mergeSigCosineSimilarity = (state) =>
+    dispatch(actions.mergeExploring({ sigCosineSimilarity: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
 
   useEffect(() => {
     if (!exposureSignature.length) populateControls();
@@ -50,7 +60,8 @@ export default function Explore() {
       populateSignatureExp(signatureData);
       populateExposureExp(exposureCancer, exposureSignature, signatureNames);
     } catch (err) {
-      dispatchError(err);
+      mergeError({ visible: true, message: err.message });
+;
     }
   }
 
@@ -59,7 +70,7 @@ export default function Explore() {
     exposureSignature,
     signatureNames
   ) {
-    dispatchExpExposure({ loading: true });
+    mergeExposure({ loading: true });
 
     const studyOptions = [
       ...new Set(exposureSignature.map((data) => data.Study)),
@@ -115,9 +126,9 @@ export default function Explore() {
       loading: false,
     };
 
-    dispatchExpExposure(params);
+    mergeExposure(params);
 
-    dispatchExploring({
+    mergeExploring({
       exposureCancer: exposureCancer,
       exposureSignature: exposureSignature,
       signatureNames: signatureNames,
@@ -126,11 +137,11 @@ export default function Explore() {
 
   async function populateSignatureExp(data) {
     // set loading indicators
-    dispatchExpMutationalProfiles({ loading: true });
-    dispatchExpCosineSimilarity({
+    mergeSigMutationalProfiles({ loading: true });
+    mergeSigCosineSimilarity({
       loading: true,
     });
-    dispatchExpMutationalSigComparison({ loading: true });
+    mergeSigMutationalSigComparison({ loading: true });
 
     const signatureSourceOptions = [...new Set(data.map((row) => row.Source))];
     const signatureSource = signatureSourceOptions[0];
@@ -195,11 +206,11 @@ export default function Explore() {
       ),
     ];
 
-    dispatchExploring({
+    mergeExploring({
       refSigData: data,
     });
 
-    dispatchExpMutationalProfiles({
+    mergeSigMutationalProfiles({
       plots: [
         {
           signatureSource: signatureSource,
@@ -219,7 +230,7 @@ export default function Explore() {
       loading: false,
     });
 
-    dispatchExpCosineSimilarity({
+    mergeSigCosineSimilarity({
       profileName: profileName,
       profileNameOptions: profileNameOptions,
       refSignatureSet1: refSignatureSetOptions[0],
@@ -229,7 +240,7 @@ export default function Explore() {
       loading: false,
     });
 
-    dispatchExpMutationalSigComparison({
+    mergeSigMutationalSigComparison({
       profileName: profileName,
       profileNameOptions: profileNameOptions,
       refSignatureSet1: refSignatureSet,

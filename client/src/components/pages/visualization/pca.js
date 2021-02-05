@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button, Tab, Nav } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
-import { dispatchError, dispatchPCA } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
@@ -12,12 +10,22 @@ import {
   unique2d,
   defaultMatrix,
 } from '../../../services/utils';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as visualizationActions } from '../../../services/store/visualization';
+import { actions as modalActions } from '../../../services/store/modal';
 
+const actions = { ...visualizationActions, ...modalActions };
 const { Container, Content, Pane } = Tab;
 const { Item, Link } = Nav;
 
 export default function PCA({ submitR, getRefSigOptions }) {
-  const { matrixList } = useSelector((state) => state.visualizeResults);
+  const dispatch = useDispatch();
+  const visualization = useSelector((state) => state.visualization);
+  const mergePCA = (state) =>
+    dispatch(actions.mergeVisualization({ pca: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+
+  const { matrixList, projectID, svgList } = visualization.results;
   const {
     source,
     study,
@@ -25,10 +33,8 @@ export default function PCA({ submitR, getRefSigOptions }) {
     cancerType,
     pubExperimentalStrategy,
     pDataOptions,
-  } = useSelector((state) => state.visualize);
-  const { profileOptions } = useSelector((state) => state.mutationalProfiles);
-  const { projectID, svgList } = useSelector((state) => state.visualizeResults);
-  const state = useSelector((state) => state.pca);
+  } = visualization.visualize;
+  const { profileOptions } = visualization.mutationalProfiles;
   const {
     profileType,
     signatureSet,
@@ -64,7 +70,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
     display,
     pubPcaErr,
     pubSubmitOverlay,
-  } = state;
+  } = visualization.pca;
 
   const [multiSample, setMultiSample] = useState(false);
 
@@ -106,8 +112,8 @@ export default function PCA({ submitR, getRefSigOptions }) {
 
   function setOverlay(type, status) {
     type == 'within'
-      ? dispatchPCA({ submitOverlay: status })
-      : dispatchPCA({ pubSubmitOverlay: status });
+      ? mergePCA({ submitOverlay: status })
+      : mergePCA({ pubSubmitOverlay: status });
   }
 
   async function setRPlot(plotPath, type) {
@@ -120,17 +126,18 @@ export default function PCA({ submitR, getRefSigOptions }) {
         const pic = await response.blob();
         const objectURL = URL.createObjectURL(pic);
 
-        if (state[`${type}URL`]) URL.revokeObjectURL(state[`${type}URL`]);
-        dispatchPCA({ [`${type}URL`]: objectURL });
+        if (visualization.pca[`${type}URL`]) URL.revokeObjectURL(visualization.pca[`${type}URL`]);
+        mergePCA({ [`${type}URL`]: objectURL });
       }
     } catch (err) {
-      dispatchError(err);
+      mergeError({ visible: true, message: err.message });
+;
     }
   }
 
   function clearPlot(type) {
-    URL.revokeObjectURL(state[`${type}URL`]);
-    dispatchPCA({ [`${type}URL`]: '' });
+    URL.revokeObjectURL(visualization.pca[`${type}URL`]);
+    mergePCA({ [`${type}URL`]: '' });
   }
 
   // get Signature Reference Sets for dropdown options
@@ -144,16 +151,17 @@ export default function PCA({ submitR, getRefSigOptions }) {
         if (response.ok) {
           const signatureSetOptions = await response.json();
 
-          dispatchPCA({
+          mergePCA({
             signatureSetOptions: signatureSetOptions,
             signatureSet: signatureSetOptions[0],
           });
         } else {
-          dispatchError(await response.json());
+          mergeError(await response.json());
         }
       }
     } catch (err) {
-      dispatchError(err);
+      mergeError({ visible: true, message: err.message });
+;
     } finally {
       setOverlay('within', false);
     }
@@ -163,7 +171,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
     try {
       setOverlay(type, true);
       if (type == 'within') {
-        dispatchPCA({
+        mergePCA({
           debugR: '',
           pcaErr: false,
           pca1: '',
@@ -172,7 +180,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
           heatmap: '',
         });
       } else {
-        dispatchPCA({
+        mergePCA({
           debugR: '',
           pubPcaErr: false,
           pubPca1: '',
@@ -184,15 +192,15 @@ export default function PCA({ submitR, getRefSigOptions }) {
       const response = await submitR(fn, args);
       if (!response.ok) {
         const err = await response.json();
-        dispatchPCA({ debugR: err });
+        mergePCA({ debugR: err });
       } else {
         const { debugR, output } = await response.json();
 
-        dispatchPCA({ debugR: debugR });
+        mergePCA({ debugR: debugR });
 
         if (Object.keys(output).length) {
           if (type == 'within') {
-            dispatchPCA({
+            mergePCA({
               pca1: output.pca1,
               pca2: output.pca2,
               pca3: output.pca3,
@@ -202,7 +210,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
               heatmapData: output.heatmapData,
             });
           } else {
-            dispatchPCA({
+            mergePCA({
               pubPca1: output.pca1,
               pubPca2: output.pca2,
               pubPca3: output.pca3,
@@ -212,12 +220,12 @@ export default function PCA({ submitR, getRefSigOptions }) {
           }
         } else {
           if (type == 'within') {
-            dispatchPCA({
+            mergePCA({
               debugR: debugR,
               pcaErr: true,
             });
           } else {
-            dispatchPCA({
+            mergePCA({
               debugR: debugR,
               pubPcaErr: true,
             });
@@ -225,7 +233,8 @@ export default function PCA({ submitR, getRefSigOptions }) {
         }
       }
     } catch (err) {
-      dispatchError(err);
+      mergeError({ visible: true, message: err.message });
+;
     } finally {
       setOverlay(type, false);
     }
@@ -238,7 +247,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
       filter2d(profileType, matrixList.data)
     );
 
-    dispatchPCA({
+    mergePCA({
       userProfileType: profileType,
       userMatrixSize: defaultMatrix(profileType, userMatrixOptions),
       userMatrixOptions: userMatrixOptions,
@@ -254,7 +263,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
       ),
     ];
 
-    dispatchPCA({
+    mergePCA({
       pubStudy: study,
       pubCancerType: cancerTypeOptions[0],
       pubCancerTypeOptions: cancerTypeOptions,
@@ -262,7 +271,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
   }
 
   function handleCancerChange(cancer) {
-    dispatchPCA({
+    mergePCA({
       pubCancerType: cancer,
     });
   }
@@ -282,7 +291,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                   value={profileType}
                   options={profileOptions}
                   onChange={(profileType) => {
-                    dispatchPCA({
+                    mergePCA({
                       profileType: profileType,
                     });
                     getSignatureSet(profileType);
@@ -298,7 +307,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                   value={signatureSet}
                   options={signatureSetOptions}
                   onChange={(signatureSet) => {
-                    dispatchPCA({
+                    mergePCA({
                       signatureSet: signatureSet,
                     });
                   }}
@@ -432,7 +441,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                   value={userMatrixSize}
                   options={userMatrixOptions}
                   onChange={(matrix) => {
-                    dispatchPCA({ userMatrixSize: matrix });
+                    mergePCA({ userMatrixSize: matrix });
                   }}
                 />
               </Col>
@@ -534,7 +543,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
         className="mt-2"
         defaultActiveKey={display}
         activeKey={display}
-        onSelect={(tab) => dispatchPCA({ display: tab })}
+        onSelect={(tab) => mergePCA({ display: tab })}
       >
         <Nav variant="tabs">
           <Item>

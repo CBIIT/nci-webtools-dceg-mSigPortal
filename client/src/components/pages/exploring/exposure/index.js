@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Form, Row, Col, Tab, Button, Nav } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import TMB from './tmb';
 import TmbSig from './tmbSignatures';
 import MsBurden from './msBurden';
@@ -10,20 +10,11 @@ import MsLandscape from './msLandscape';
 import MsPrevalence from './msPrevalence';
 import MSIndividual from './msIndividual';
 import {
+  actions as exploringActions,
   getInitialState,
-  dispatchError,
-  dispatchExploring,
-  dispatchExpExposure,
-  dispatchTMB,
-  dispatchTmbSignatures,
-  dispatchMsBurden,
-  dispatchMsAssociation,
-  dispatchMsDecomposition,
-  dispatchMsLandscape,
-  dispatchMsPrevalence,
-  dispatchMsIndividual,
-} from '../../../../services/store';
-import { value2d, filter2d, unique2d } from '../../../../services/utils';
+} from '../../../../services/store/exploring';
+import { actions as modalActions } from '../../../../services/store/modal';
+import { unique2d } from '../../../../services/utils';
 import Select from '../../../controls/select/select';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import {
@@ -32,28 +23,37 @@ import {
   MainPanel,
 } from '../../../controls/sidebar-container/sidebar-container';
 
+const actions = { ...exploringActions, ...modalActions };
 const { Group, Label, Check } = Form;
 const { Container, Content, Pane } = Tab;
 const { Item, Link } = Nav;
 
-export default function Exposure({ match, populateControls }) {
+export default function Exposure({ match }) {
+  const dispatch = useDispatch();
+  const exploring = useSelector((state) => state.exploring);
+
+  const mergeExploring = (state) =>
+    dispatch(actions.mergeExploring({ exploring: state }));
+  const mergeExposure = (state) =>
+    dispatch(actions.mergeExploring({ exposure: state }));
+  const mergeTMB = (state) => dispatch(actions.mergeExploring({ tmb: state }));
+  const mergeTmbSignatures = (state) =>
+    dispatch(actions.mergeExploring({ tmbSignatures: state }));
+  const mergeMsBurden = (state) =>
+    dispatch(actions.mergeExploring({ msBurden: state }));
+  const mergeMsAssociation = (state) =>
+    dispatch(actions.mergeExploring({ msAssociation: state }));
+  const mergeMsDecomposition = (state) =>
+    dispatch(actions.mergeExploring({ msDecomposition: state }));
+  const mergeMsPrevalence = (state) =>
+    dispatch(actions.mergeExploring({ msPrevalence: state }));
+  const mergeMsLandscape = (state) =>
+    dispatch(actions.mergeExploring({ msLandscape: state }));
+  const mergeMsIndividual = (state) =>
+    dispatch(actions.mergeExploring({ msIndividual: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+
   const { exampleName } = match.params;
-  const { exposureSignature, exposureCancer, signatureNames } = useSelector(
-    (state) => state.exploring
-  );
-  const { loading: loadingMsBurden } = useSelector((state) => state.msBurden);
-  const { loading: loadingMsAssociation } = useSelector(
-    (state) => state.msAssociation
-  );
-  const { loading: loadingMsLandscape } = useSelector(
-    (state) => state.msLandscape
-  );
-  const { loading: loadingMsPrevalence } = useSelector(
-    (state) => state.msPrevalence
-  );
-  const { loading: loadingMsIndividual } = useSelector(
-    (state) => state.msIndividual
-  );
 
   const {
     study,
@@ -81,12 +81,29 @@ export default function Exposure({ match, populateControls }) {
     loadingMsg,
     projectID,
     openSidebar,
-  } = useSelector((state) => state.expExposure);
-  const burdenArgs = useSelector((state) => state.msBurden);
-  const associationArgs = useSelector((state) => state.msAssociation);
-  const landscapeArgs = useSelector((state) => state.msLandscape);
-  const prevalenceArgs = useSelector((state) => state.msPrevalence);
-  const individualArgs = useSelector((state) => state.msIndividual);
+  } = exploring.exposure;
+  const {
+    exposureSignature,
+    exposureCancer,
+    signatureNames,
+  } = exploring.exploring;
+  const { loading: loadingMsBurden, ...burdenArgs } = exploring.msBurden;
+  const {
+    loading: loadingMsAssociation,
+    ...associationArgs
+  } = exploring.msAssociation;
+  const {
+    loading: loadingMsLandscape,
+    ...landscapeArgs
+  } = exploring.msLandscape;
+  const {
+    loading: loadingMsPrevalence,
+    ...prevalenceArgs
+  } = exploring.msPrevalence;
+  const {
+    loading: loadingMsIndividual,
+    ...individualArgs
+  } = exploring.msIndividual;
 
   const [exposureFileObj, setExposure] = useState(new File([], ''));
   const [matrixFileObj, setMatrix] = useState(new File([], ''));
@@ -97,14 +114,6 @@ export default function Exposure({ match, populateControls }) {
   // const [matrixValidity, setMatrixValidity] = useState(false);
   // const [signatureValidity, setSignatureValidity] = useState(false);
 
-  useEffect(() => {}, [
-    burdenArgs,
-    associationArgs,
-    landscapeArgs,
-    prevalenceArgs,
-    individualArgs,
-  ]);
-
   // load example if available
   useEffect(() => {
     if (exampleName) loadExample(exampleName);
@@ -112,7 +121,7 @@ export default function Exposure({ match, populateControls }) {
 
   // set selected tab on component render
   useEffect(() => {
-    dispatchExploring({ displayTab: 'exposure' });
+    mergeExploring({ displayTab: 'exposure' });
   }, []);
 
   function usePrevious(value) {
@@ -125,7 +134,7 @@ export default function Exposure({ match, populateControls }) {
   }
 
   // get new signature name options filtered by cancer type on first mount
-  const prevSigNameOptions = usePrevious(signatureNameOptions);
+  const prevSigNameOptions = usePrevious(signatureNameOptions || []);
   useEffect(() => {
     if (
       source == 'public' &&
@@ -153,7 +162,7 @@ export default function Exposure({ match, populateControls }) {
   }, [study, strategy, refSignatureSet, cancer]);
 
   async function loadExample(id) {
-    dispatchExpExposure({
+    mergeExposure({
       loading: {
         active: true,
         content: 'Loading Example',
@@ -165,26 +174,26 @@ export default function Exposure({ match, populateControls }) {
         await fetch(`api/getExposureExample/${id}`)
       ).json();
 
-      dispatchExpExposure({ ...state.expExposure, projectID: projectID });
+      mergeExposure({ ...state.expExposure, projectID: projectID });
       // rehydrate state if available
-      if (state.tmb) dispatchTMB(state.tmb);
-      if (state.msBurden) dispatchMsBurden(state.msBurden);
-      if (state.msAssociation) dispatchMsAssociation(state.msAssociation);
-      if (state.msDecomposition) dispatchMsDecomposition(state.msDecomposition);
-      if (state.msLandscape) dispatchMsLandscape(state.msLandscape);
-      if (state.msPrevalence) dispatchMsPrevalence(state.msPrevalence);
-      if (state.tmbSignatures) dispatchTmbSignatures(state.tmbSignatures);
+      if (state.tmb) mergeTMB(state.tmb);
+      if (state.msBurden) mergeMsBurden(state.msBurden);
+      if (state.msAssociation) mergeMsAssociation(state.msAssociation);
+      if (state.msDecomposition) mergeMsDecomposition(state.msDecomposition);
+      if (state.msLandscape) mergeMsLandscape(state.msLandscape);
+      if (state.msPrevalence) mergeMsPrevalence(state.msPrevalence);
+      if (state.tmbSignatures) mergeTmbSignatures(state.tmbSignatures);
     } catch (error) {
-      dispatchError(error);
+      mergeError({ visible: true, message: error.message });
     }
-    dispatchExpExposure({
+    mergeExposure({
       loading: false,
     });
   }
 
   // get signature name options filtered by cancer type
   async function getSignatureNames() {
-    dispatchExpExposure({
+    mergeExposure({
       loading: true,
       loadingMsg: 'Filtering Signature Names',
     });
@@ -208,19 +217,19 @@ export default function Exposure({ match, populateControls }) {
       ).json();
 
       if (output.data.length)
-        dispatchExpExposure({
+        mergeExposure({
           signatureNameOptions: output.data,
         });
-      else dispatchError(stdout);
+      else mergeError(stdout);
     } catch (err) {
-      dispatchError(err);
+      mergeError({ visible: true, message: err.message });
     }
-    dispatchExpExposure({ loading: false, loadingMsg: null });
+    mergeExposure({ loading: false, loadingMsg: null });
   }
 
   // get sample name options filtered by cancer type
   async function getSampleNames() {
-    dispatchExpExposure({
+    mergeExposure({
       loading: true,
       loadingMsg: 'Filtering Sample Names',
     });
@@ -244,15 +253,15 @@ export default function Exposure({ match, populateControls }) {
       ).json();
 
       if (output.data.length) {
-        dispatchExpExposure({
+        mergeExposure({
           publicSampleOptions: output.data,
         });
-        dispatchMsIndividual({ sample: output.data[0] });
-      } else dispatchError(stdout);
+        mergeMsIndividual({ sample: output.data[0] });
+      } else mergeError(stdout);
     } catch (err) {
-      dispatchError(err);
+      mergeError({ visible: true, message: err.message });
     }
-    dispatchExpExposure({ loading: false, loadingMsg: null });
+    mergeExposure({ loading: false, loadingMsg: null });
   }
 
   async function submitR(fn, args, id = projectID) {
@@ -273,19 +282,19 @@ export default function Exposure({ match, populateControls }) {
       if (response.ok) {
         return await response.json();
       } else {
-        dispatchError('R submit failed');
+        mergeError('R submit failed');
       }
     } catch (err) {
-      dispatchError(err);
+      mergeError({ visible: true, message: err.message });
     }
   }
 
   async function calculateBurden() {
     try {
       if (source == 'user' && !projectID) {
-        dispatchError('Missing Required Files');
+        mergeError('Missing Required Files');
       } else {
-        dispatchMsBurden({
+        mergeMsBurden({
           loading: true,
           err: false,
           plotPath: '',
@@ -302,19 +311,19 @@ export default function Exposure({ match, populateControls }) {
           await handleCalculate('burden');
         }
 
-        dispatchMsBurden({ loading: false });
+        mergeMsBurden({ loading: false });
       }
     } catch (error) {
-      dispatchError(error);
+      mergeError({ visible: true, message: error.message });
     }
   }
 
   async function calculateAssociation() {
     try {
       if (source == 'user' && !projectID) {
-        dispatchError('Missing Required Files');
+        mergeError('Missing Required Files');
       } else {
-        dispatchMsAssociation({
+        mergeMsAssociation({
           loading: true,
           err: false,
           plotPath: '',
@@ -331,19 +340,19 @@ export default function Exposure({ match, populateControls }) {
           await handleCalculate('association');
         }
 
-        dispatchMsAssociation({ loading: false });
+        mergeMsAssociation({ loading: false });
       }
     } catch (error) {
-      dispatchError(error);
+      mergeError({ visible: true, message: error.message });
     }
   }
 
   async function calculateLandscape() {
     try {
       if (source == 'user' && !projectID) {
-        dispatchError('Missing Required Files');
+        mergeError('Missing Required Files');
       } else {
-        dispatchMsLandscape({
+        mergeMsLandscape({
           loading: true,
           err: false,
           plotPath: '',
@@ -363,19 +372,19 @@ export default function Exposure({ match, populateControls }) {
           await handleCalculate('landscape');
         }
 
-        dispatchMsLandscape({ loading: false });
+        mergeMsLandscape({ loading: false });
       }
     } catch (error) {
-      dispatchError(error);
+      mergeError({ visible: true, message: error.message });
     }
   }
 
   async function calculatePrevalence() {
     try {
       if (source == 'user' && !projectID) {
-        dispatchError('Missing Required Files');
+        mergeError('Missing Required Files');
       } else {
-        dispatchMsPrevalence({
+        mergeMsPrevalence({
           loading: true,
           err: false,
           plotPath: '',
@@ -392,18 +401,18 @@ export default function Exposure({ match, populateControls }) {
           await handleCalculate('prevalence');
         }
 
-        dispatchMsPrevalence({ loading: false });
+        mergeMsPrevalence({ loading: false });
       }
     } catch (error) {
-      dispatchError(error);
+      mergeError({ visible: true, message: error.message });
     }
   }
   async function calculateIndividual() {
     try {
       if (source == 'user' && !projectID) {
-        dispatchError('Missing Required Files');
+        mergeError('Missing Required Files');
       } else {
-        dispatchMsIndividual({
+        mergeMsIndividual({
           loading: true,
           err: false,
           plotPath: '',
@@ -420,44 +429,44 @@ export default function Exposure({ match, populateControls }) {
           await handleCalculate('individual');
         }
 
-        dispatchMsIndividual({ loading: false });
+        mergeMsIndividual({ loading: false });
       }
     } catch (error) {
-      dispatchError(error);
+      mergeError({ visible: true, message: error.message });
     }
   }
 
   async function calculateAll() {
     try {
-      dispatchExpExposure({ loading: true });
+      mergeExposure({ loading: true });
 
-      dispatchTMB({
+      mergeTMB({
         plotPath: '',
         err: '',
       });
-      dispatchTmbSignatures({
+      mergeTmbSignatures({
         plotPath: '',
         err: '',
       });
-      dispatchMsDecomposition({
+      mergeMsDecomposition({
         plotPath: '',
         txtPath: '',
         err: '',
       });
-      dispatchMsBurden({
+      mergeMsBurden({
         plotPath: '',
         err: '',
       });
-      dispatchMsAssociation({
+      mergeMsAssociation({
         plotPath: '',
         err: '',
       });
-      dispatchMsLandscape({
+      mergeMsLandscape({
         plotPath: '',
         err: '',
       });
 
-      dispatchMsPrevalence({
+      mergeMsPrevalence({
         plotPath: '',
         err: '',
       });
@@ -476,13 +485,13 @@ export default function Exposure({ match, populateControls }) {
           exposureData.data
         );
 
-        dispatchMsBurden({ signatureName: nameOptions[0] });
-        dispatchMsAssociation({
+        mergeMsBurden({ signatureName: nameOptions[0] });
+        mergeMsAssociation({
           signatureName1: nameOptions[0],
           signatureName2: nameOptions[1],
         });
-        dispatchMsIndividual({ sample: sampleOptions[0] });
-        dispatchExpExposure({
+        mergeMsIndividual({ sample: sampleOptions[0] });
+        mergeExposure({
           projectID: projectID,
           userNameOptions: nameOptions,
           userSampleOptions: sampleOptions,
@@ -496,9 +505,9 @@ export default function Exposure({ match, populateControls }) {
         await handleCalculate('all');
       }
     } catch (err) {
-      dispatchError(err);
+      mergeError({ visible: true, message: err.message });
     } finally {
-      dispatchExpExposure({ loading: false });
+      mergeExposure({ loading: false });
     }
   }
 
@@ -558,22 +567,22 @@ export default function Exposure({ match, populateControls }) {
       );
 
       if (output) {
-        if (!projectID) dispatchExpExposure({ projectID: pID });
+        if (!projectID) mergeExposure({ projectID: pID });
 
         if (fn == 'all') {
-          dispatchTMB({
+          mergeTMB({
             plotPath: output.tmbPath,
             err: errors.tmbError,
             debugR: debugR,
           });
 
-          dispatchTmbSignatures({
+          mergeTmbSignatures({
             plotPath: output.signaturePath,
             err: errors.signaturesError,
             debugR: debugR,
           });
 
-          dispatchMsDecomposition({
+          mergeMsDecomposition({
             plotPath: output.decompositionPath,
             txtPath: output.decompositionData,
             err: errors.decompositionError,
@@ -582,7 +591,7 @@ export default function Exposure({ match, populateControls }) {
         }
 
         if (fn == 'all' || fn == 'burden') {
-          dispatchMsBurden({
+          mergeMsBurden({
             plotPath: output.burdenPath,
             err: errors.burdenError,
             debugR: debugR,
@@ -590,37 +599,37 @@ export default function Exposure({ match, populateControls }) {
         }
 
         if (fn == 'all' || fn == 'association')
-          dispatchMsAssociation({
+          mergeMsAssociation({
             plotPath: output.associationPath,
             err: errors.associationError,
             debugR: debugR,
           });
 
         if (fn == 'all' || fn == 'landscape')
-          dispatchMsLandscape({
+          mergeMsLandscape({
             plotPath: output.landscapePath,
             err: errors.landscapeError,
             debugR: debugR,
           });
 
         if (fn == 'all' || fn == 'prevalence')
-          dispatchMsPrevalence({
+          mergeMsPrevalence({
             plotPath: output.prevalencePath,
             err: errors.prevalenceError,
             debugR: debugR,
           });
 
         if (fn == 'all' || fn == 'individual')
-          dispatchMsIndividual({
+          mergeMsIndividual({
             plotPath: output.individualPath,
             err: errors.individualError,
             debugR: debugR,
           });
       } else {
-        dispatchError(debugR);
+        mergeError(debugR);
       }
     } catch (err) {
-      dispatchError(err);
+      mergeError({ visible: true, message: err.message });
     }
   }
 
@@ -653,7 +662,7 @@ export default function Exposure({ match, populateControls }) {
 
     handleSet(refSignatureSet);
 
-    dispatchExpExposure({
+    mergeExposure({
       study: study,
       strategy: strategy,
       strategyOptions: strategyOptions,
@@ -684,7 +693,7 @@ export default function Exposure({ match, populateControls }) {
 
     handleSet(refSignatureSet);
 
-    dispatchExpExposure({
+    mergeExposure({
       strategy: strategy,
       cancer: cancerOptions[0],
       cancerOptions: cancerOptions,
@@ -702,7 +711,7 @@ export default function Exposure({ match, populateControls }) {
       ),
     ];
 
-    dispatchExpExposure({
+    mergeExposure({
       refSignatureSet: set,
       signatureNameOptions: signatureNameOptions,
     });
@@ -735,7 +744,7 @@ export default function Exposure({ match, populateControls }) {
             <p>${msg}</p>
           ${error ? `<p>${error}</p>` : ''} 
           </div>`;
-            dispatchError(message);
+            mergeError(message);
             reject(error);
           } else {
             const { projectID, exposurePath } = await response.json();
@@ -755,7 +764,7 @@ export default function Exposure({ match, populateControls }) {
             resolve({ projectID, exposureData });
           }
         } catch (err) {
-          dispatchError(err);
+          mergeError({ visible: true, message: err.message });
           reject(err);
         }
       } else {
@@ -769,7 +778,7 @@ export default function Exposure({ match, populateControls }) {
 
     window.location.hash = '#/exploring/exposure';
 
-    dispatchExpExposure({
+    mergeExposure({
       ...initialState.expExposure,
       source: source,
       display: display,
@@ -784,15 +793,14 @@ export default function Exposure({ match, populateControls }) {
       signatureNameOptions: signatureNameOptions,
       publicSampleOptions: publicSampleOptions,
     });
-    dispatchTMB(initialState.tmb);
-    dispatchTmbSignatures(initialState.tmbSignatures);
-    dispatchMsBurden(initialState.msBurden);
-    dispatchMsDecomposition(initialState.msDecomposition);
-    dispatchMsAssociation(initialState.msAssociation);
-    dispatchMsLandscape(initialState.msLandscape);
-    dispatchMsPrevalence(initialState.msPrevalence);
-    dispatchMsIndividual(initialState.msIndividual);
-    // populateControls();
+    mergeTMB(initialState.tmb);
+    mergeTmbSignatures(initialState.tmbSignatures);
+    mergeMsBurden(initialState.msBurden);
+    mergeMsDecomposition(initialState.msDecomposition);
+    mergeMsAssociation(initialState.msAssociation);
+    mergeMsLandscape(initialState.msLandscape);
+    mergeMsPrevalence(initialState.msPrevalence);
+    mergeMsIndividual(initialState.msIndividual);
   }
 
   // when using public data and only need to upload a variable data file
@@ -813,14 +821,14 @@ export default function Exposure({ match, populateControls }) {
                             <p>${msg}</p>
                             ${error ? `<p>${error}</p>` : ''} 
                           </div>`;
-          dispatchError(message);
+          mergeError(message);
           reject(error);
         } else {
           const { projectID } = await response.json();
           resolve(projectID);
         }
       } catch (err) {
-        dispatchError(err);
+        mergeError({ visible: true, message: err.message });
         reject(err);
       }
     });
@@ -828,7 +836,7 @@ export default function Exposure({ match, populateControls }) {
 
   function handleVariable(file) {
     setVariable(file);
-    dispatchMsLandscape({ variableFile: file.name });
+    mergeMsLandscape({ variableFile: file.name });
   }
 
   const tabs = [
@@ -915,7 +923,7 @@ export default function Exposure({ match, populateControls }) {
     <div className="position-relative">
       <SidebarContainer
         collapsed={!openSidebar}
-        onCollapsed={(e) => dispatchExpExposure({ openSidebar: !e })}
+        onCollapsed={(e) => mergeExposure({ openSidebar: !e })}
       >
         <SidebarPanel>
           <div className="p-3 bg-white border rounded">
@@ -929,9 +937,7 @@ export default function Exposure({ match, populateControls }) {
                       type="radio"
                       value="public"
                       checked={source == 'public'}
-                      onChange={(e) =>
-                        dispatchExpExposure({ source: 'public' })
-                      }
+                      onChange={(e) => mergeExposure({ source: 'public' })}
                     />
                     <Check.Label className="font-weight-normal">
                       Public
@@ -943,7 +949,7 @@ export default function Exposure({ match, populateControls }) {
                       type="radio"
                       value="user"
                       checked={source == 'user'}
-                      onChange={(e) => dispatchExpExposure({ source: 'user' })}
+                      onChange={(e) => mergeExposure({ source: 'user' })}
                     />
                     <Check.Label className="font-weight-normal">
                       User
@@ -1007,7 +1013,7 @@ export default function Exposure({ match, populateControls }) {
                         value={cancer}
                         options={cancerOptions}
                         onChange={(cancer) =>
-                          dispatchExpExposure({
+                          mergeExposure({
                             cancer: cancer,
                           })
                         }
@@ -1030,7 +1036,7 @@ export default function Exposure({ match, populateControls }) {
                           else {
                             getSignatureNames();
                           }
-                          dispatchMsAssociation({
+                          mergeMsAssociation({
                             toggleCancer: !associationArgs.toggleCancer,
                           });
                         }}
@@ -1089,7 +1095,7 @@ export default function Exposure({ match, populateControls }) {
                         accept=".txt"
                         onChange={(e) => {
                           setExposure(e.target.files[0]);
-                          dispatchExpExposure({
+                          mergeExposure({
                             exposureFile: e.target.files[0].name,
                           });
                         }}
@@ -1114,7 +1120,7 @@ export default function Exposure({ match, populateControls }) {
                         accept=".txt"
                         onChange={(e) => {
                           setMatrix(e.target.files[0]);
-                          dispatchExpExposure({
+                          mergeExposure({
                             matrixFile: e.target.files[0].name,
                           });
                         }}
@@ -1139,7 +1145,7 @@ export default function Exposure({ match, populateControls }) {
                           value={usePublicSignature}
                           checked={usePublicSignature}
                           onChange={() =>
-                            dispatchExpExposure({
+                            mergeExposure({
                               usePublicSignature: !usePublicSignature,
                             })
                           }
@@ -1192,7 +1198,7 @@ export default function Exposure({ match, populateControls }) {
                           accept=".txt"
                           onChange={(e) => {
                             setSignature(e.target.files[0]);
-                            dispatchExpExposure({
+                            mergeExposure({
                               signatureFile: e.target.files[0].name,
                             });
                           }}
@@ -1216,9 +1222,7 @@ export default function Exposure({ match, populateControls }) {
                         label="Genome"
                         value={genome}
                         options={genomeOptions}
-                        onChange={(genome) =>
-                          dispatchExpExposure({ genome: genome })
-                        }
+                        onChange={(genome) => mergeExposure({ genome: genome })}
                       />
                     </Group>
                   </Col>
@@ -1255,7 +1259,7 @@ export default function Exposure({ match, populateControls }) {
             className="mt-2"
             defaultActiveKey={display}
             activeKey={display}
-            onSelect={(tab) => dispatchExpExposure({ display: tab })}
+            onSelect={(tab) => mergeExposure({ display: tab })}
           >
             <Nav variant="tabs">
               {tabs.map(({ key, name, title }) => (

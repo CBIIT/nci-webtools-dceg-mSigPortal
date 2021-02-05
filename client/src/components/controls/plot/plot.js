@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Button, Row, Col } from 'react-bootstrap';
-import { dispatchError } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faMinus, faHome } from '@fortawesome/free-solid-svg-icons';
+import { useDispatch } from 'react-redux';
+import { actions } from '../../../services/store/modal';
 import './plot.scss';
 
 export default function Plot({
@@ -16,6 +17,9 @@ export default function Plot({
   className,
   ...rest
 }) {
+  const dispatch = useDispatch();
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+
   const [loading, setLoading] = useState(false);
 
   //   download text results files
@@ -26,7 +30,7 @@ export default function Plot({
 
       if (!response.ok) {
         const { msg } = await response.json();
-        dispatchError(msg);
+        mergeError({ visible: true, message: msg });
       } else {
         const file = await response.blob();
         const objectURL = URL.createObjectURL(file);
@@ -40,7 +44,7 @@ export default function Plot({
         URL.revokeObjectURL(objectURL);
       }
     } catch (err) {
-      dispatchError(err);
+      mergeError({ visible: true, message: err.message });
     }
     setLoading(false);
   }

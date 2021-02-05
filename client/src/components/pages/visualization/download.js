@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
-import { dispatchError } from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions } from '../../../services/store/modal';
 
 export default function Download() {
-  const { projectID, downloads, statistics } = useSelector(
-    (state) => state.visualizeResults
-  );
+  const dispatch = useDispatch();
+  const visualization = useSelector((state) => state.visualization);
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
 
+  const { projectID, downloads, statistics } = visualization.results;
   const [downloading, setDownload] = useState([]);
 
   async function downloadOutput(file) {
@@ -26,7 +27,7 @@ export default function Download() {
       tempLink.click();
       document.body.removeChild(tempLink);
     } else {
-      dispatchError(`${file} is not available`);
+      mergeError(`${file} is not available`);
     }
     setDownload((downloading) => downloading.filter((item) => item != file));
   }

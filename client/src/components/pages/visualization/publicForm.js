@@ -1,23 +1,39 @@
 import React, { useEffect } from 'react';
 import { Form, Button, Row, Col, Popover } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import { useSelector } from 'react-redux';
-import './visualization.scss';
-import {
-  dispatchVisualize,
-  dispatchVisualizeResults,
-  dispatchError,
-  getInitialState,
-  dispatchMutationalProfiles,
-  dispatchCosineSimilarity,
-  dispatchProfileComparison,
-  dispatchPCA,
-  dispatchMutationalPattern,
-  dispatchProfilerSummary,
-} from '../../../services/store';
 import Select from '../../controls/select/select';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  actions as visualizationActions,
+  getInitialState,
+} from '../../../services/store/visualization';
+import { actions as modalActions } from '../../../services/store/modal';
+
+const actions = { ...visualizationActions, ...modalActions };
 
 export default function PublicForm() {
+  const dispatch = useDispatch();
+  const visualization = useSelector((state) => state.visualization);
+
+  const mergeVisualize = (state) =>
+    dispatch(actions.mergeVisualization({ visualize: state }));
+  const mergeResults = (state) =>
+    dispatch(actions.mergeVisualization({ results: state }));
+  const mergeProfilerSummary = (state) =>
+    dispatch(actions.mergeVisualization({ profilerSummary: state }));
+  const mergeMutationalProfiles = (state) =>
+    dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
+  const mergeMutationalPattern = (state) =>
+    dispatch(actions.mergeVisualization({ mutationalPattern: state }));
+  const mergeCosineSimilarity = (state) =>
+    dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
+  const mergeProfileComparison = (state) =>
+    dispatch(actions.mergeVisualization({ profileComparison: state }));
+  const mergePCA = (state) =>
+    dispatch(actions.mergeVisualization({ pca: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const resetVisualization = (_) => dispatch(actions.resetVisualization());
+
   const {
     study,
     studyOptions,
@@ -30,7 +46,7 @@ export default function PublicForm() {
     loading,
     loadingPublic,
     source,
-  } = useSelector((state) => state.visualize);
+  } = visualization.visualize;
 
   useEffect(() => {
     if (!pDataOptions.length && !loadingPublic) getPublicDataOptions();
@@ -38,7 +54,7 @@ export default function PublicForm() {
 
   async function handleSubmit() {
     // disable parameters after submit
-    dispatchVisualize({ submitted: true });
+    mergeVisualize({ visualize: { submitted: true } });
 
     const args = {
       study: study,
@@ -46,7 +62,7 @@ export default function PublicForm() {
       experimentalStrategy: pubExperimentalStrategy,
     };
 
-    dispatchVisualize({
+    mergeVisualize({
       loading: {
         active: true,
         content: 'Loading Public Data',
@@ -66,35 +82,35 @@ export default function PublicForm() {
       if (response.ok) {
         const { svgList, projectID } = await response.json();
 
-        dispatchVisualizeResults({
+        mergeResults({
           svgList: svgList,
           projectID: projectID,
         });
       } else if (response.status == 504) {
-        dispatchVisualizeResults({
+        mergeResults({
           error: 'Please Reset Your Parameters and Try again.',
         });
-        dispatchError(
-          'Your submission has timed out. Please try again by submitting this job to a queue instead.'
-        );
+        mergeError({
+          visible: true,
+          message:
+            'Your submission has timed out. Please try again by submitting this job to a queue instead.',
+        });
       } else {
-        dispatchVisualizeResults({
+        mergeResults({
           error: 'Please Reset Your Parameters and Try again.',
         });
       }
     } catch (err) {
-      dispatchError(err);
-      dispatchVisualizeResults({
+      mergeError({ visible: true, message: err.message });
+      mergeResults({
         error: 'Please Reset Your Parameters and Try again.',
       });
     }
-    dispatchVisualize({ loading: { active: false } });
+    mergeVisualize({ loading: { active: false } });
   }
 
   function handleReset() {
-    const initialState = getInitialState();
-    dispatchVisualize({
-      ...initialState.visualize,
+    const params = {
       pDataOptions: pDataOptions,
       studyOptions: studyOptions,
       study: studyOptions[0],
@@ -102,18 +118,13 @@ export default function PublicForm() {
       cancerType: 'Lung-AdenoCA',
       pubExperimentOptions: pubExperimentOptions,
       pubExperimentalStrategy: pubExperimentOptions[0],
-    });
-    dispatchProfilerSummary(initialState.profilerSummary);
-    dispatchVisualizeResults(initialState.visualizeResults);
-    dispatchMutationalProfiles(initialState.mutationalProfiles);
-    dispatchMutationalPattern(initialState.mutationalPattern);
-    dispatchCosineSimilarity(initialState.cosineSimilarity);
-    dispatchProfileComparison(initialState.profileComparison);
-    dispatchPCA(initialState.pca);
+    };
+    resetVisualization();
+    mergeVisualize(params);
   }
 
   async function getPublicDataOptions() {
-    dispatchVisualize({ loadingPublic: true });
+    mergeVisualize({ loadingPublic: true });
     try {
       const pDataOptions = await (
         await fetch(`api/public/Others/json/Visualization-Public.json`)
@@ -141,7 +152,7 @@ export default function PublicForm() {
         ),
       ];
 
-      dispatchVisualize({
+      mergeVisualize({
         pDataOptions: pDataOptions,
         study: study,
         studyOptions: studyOptions,
@@ -151,27 +162,27 @@ export default function PublicForm() {
         pubExperimentOptions: pubExperimentOptions,
       });
 
-      dispatchCosineSimilarity({
+      mergeCosineSimilarity({
         pubStudy: study,
         pubCancerType: cancer,
         pubCancerTypeOptions: cancerTypeOptions,
       });
 
-      dispatchProfileComparison({
+      mergeProfileComparison({
         pubStudy: study,
         pubCancerType: cancer,
         pubCancerTypeOptions: cancerTypeOptions,
       });
 
-      dispatchPCA({
+      mergePCA({
         pubStudy: study,
         pubCancerType: cancer,
         pubCancerTypeOptions: cancerTypeOptions,
       });
     } catch (err) {
-      dispatchError(err);
+      mergeError({ visible: true, message: err.message });
     }
-    dispatchVisualize({ loadingPublic: false });
+    mergeVisualize({ loadingPublic: false });
   }
 
   function handleStudyChange(study) {
@@ -194,7 +205,7 @@ export default function PublicForm() {
       ),
     ];
 
-    dispatchVisualize({
+    mergeVisualize({
       study: study,
       cancerType: cancerTypeOptions[0],
       cancerTypeOptions: cancerTypeOptions,
@@ -212,7 +223,7 @@ export default function PublicForm() {
       ),
     ];
 
-    dispatchVisualize({
+    mergeVisualize({
       cancerType: cancer,
       pubExperimentalStrategy: pubExperimentOptions[0],
       pubExperimentOptions: pubExperimentOptions,
@@ -248,7 +259,7 @@ export default function PublicForm() {
         value={pubExperimentalStrategy}
         options={pubExperimentOptions}
         onChange={(pubExperimentalStrategy) =>
-          dispatchVisualize({
+          mergeVisualize({
             pubExperimentalStrategy: pubExperimentalStrategy,
           })
         }

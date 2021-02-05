@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button, Tab, Nav } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
-import {
-  dispatchError,
-  dispatchCosineSimilarity,
-} from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
@@ -15,11 +10,37 @@ import {
   unique2d,
   defaultMatrix,
 } from '../../../services/utils';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as visualizationActions } from '../../../services/store/visualization';
+import { actions as modalActions } from '../../../services/store/modal';
+
+const actions = { ...visualizationActions, ...modalActions };
 
 const { Container, Content, Pane } = Tab;
 const { Item, Link } = Nav;
 
 export default function CosineSimilarity({ submitR, getRefSigOptions }) {
+  const dispatch = useDispatch();
+  const visualization = useSelector((state) => state.visualization);
+
+  const mergeVisualize = (state) =>
+    dispatch(actions.mergeVisualization({ visualize: state }));
+  const mergeResults = (state) =>
+    dispatch(actions.mergeVisualization({ results: state }));
+  const mergeProfilerSummary = (state) =>
+    dispatch(actions.mergeVisualization({ profilerSummary: state }));
+  const mergeMutationalPattern = (state) =>
+    dispatch(actions.mergeVisualization({ mutationalPattern: state }));
+  const mergeCosineSimilarity = (state) =>
+    dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
+  const mergeProfileComparison = (state) =>
+    dispatch(actions.mergeVisualization({ profileComparison: state }));
+  const mergePCA = (state) =>
+    dispatch(actions.mergeVisualization({ pca: state }));
+  const mergeKataegis = (state) =>
+    dispatch(actions.mergeVisualization({ kataegis: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+
   const {
     source,
     study,
@@ -27,12 +48,9 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
     cancerType,
     pubExperimentalStrategy,
     pDataOptions,
-  } = useSelector((state) => state.visualize);
-  const { profileOptions } = useSelector((state) => state.mutationalProfiles);
-  const { projectID, matrixList, svgList } = useSelector(
-    (state) => state.visualizeResults
-  );
-  const state = useSelector((state) => state.cosineSimilarity);
+  } = visualization.visualize;
+  const { profileOptions } = visualization.mutationalProfiles;
+  const { projectID, matrixList, svgList } = visualization.results;
   const {
     withinProfileType,
     withinMatrixSize,
@@ -63,7 +81,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
     refSubmitOverlay,
     pubSubmitOverlay,
     debugR,
-  } = state;
+  } = visualization.cosineSimilarity;
 
   // check for multiple sample input and disable params if true
   const [multiSample, setMultiSample] = useState(false);
@@ -99,7 +117,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
   }, [withinPlotPath, refPlotPath, pubPlotPath]);
 
   function setOverlay(type, display) {
-    dispatchCosineSimilarity({ [`${type}SubmitOverlay`]: display });
+    mergeCosineSimilarity({ [`${type}SubmitOverlay`]: display });
   }
 
   async function setRPlot(plotPath, type) {
@@ -111,57 +129,59 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
         const pic = await response.blob();
         const objectURL = URL.createObjectURL(pic);
 
-        if (state[`${type}PlotURL`])
-          URL.revokeObjectURL(state[`${type}PlotURL`]);
-        dispatchCosineSimilarity({
+        if (visualization.cosineSimilarity[`${type}PlotURL`])
+          URL.revokeObjectURL(visualization.cosineSimilarity[`${type}PlotURL`]);
+        mergeCosineSimilarity({
           [`${type}PlotURL`]: objectURL,
         });
       }
     } catch (err) {
-      dispatchError(err);
+      mergeError({ visible: true, message: err.message });
+;
     }
   }
 
   function clearPlot(type) {
-    URL.revokeObjectURL(state[`${type}PlotURL`]);
-    dispatchCosineSimilarity({ [`${type}PlotURL`]: '' });
+    URL.revokeObjectURL(visualization.cosineSimilarity[`${type}PlotURL`]);
+    mergeCosineSimilarity({ [`${type}PlotURL`]: '' });
   }
 
   // get Signature Reference Sets for dropdown options
   async function getSignatureSet(profileType) {
     if (profileType) {
-      dispatchCosineSimilarity({ refSubmitOverlay: true });
+      mergeCosineSimilarity({ refSubmitOverlay: true });
       try {
         const response = await getRefSigOptions(profileType);
 
         if (response.ok) {
           const refSignatureSetOptions = await response.json();
 
-          dispatchCosineSimilarity({
+          mergeCosineSimilarity({
             refSignatureSetOptions: refSignatureSetOptions,
             refSignatureSet: refSignatureSetOptions[0],
             refSubmitOverlay: false,
           });
         } else {
-          dispatchError(await response.json());
-          dispatchCosineSimilarity({ refSubmitOverlay: false });
+          mergeError(await response.json());
+          mergeCosineSimilarity({ refSubmitOverlay: false });
         }
       } catch (err) {
-        dispatchError(err);
-        dispatchCosineSimilarity({ refSubmitOverlay: false });
+        mergeError({ visible: true, message: err.message });
+;
+        mergeCosineSimilarity({ refSubmitOverlay: false });
       }
     }
   }
 
   function setOverlay(type, status) {
-    dispatchCosineSimilarity({ [`${type}SubmitOverlay`]: status });
+    mergeCosineSimilarity({ [`${type}SubmitOverlay`]: status });
   }
 
   async function calculateR(type, fn, args) {
     try {
       setOverlay(type, true);
 
-      dispatchCosineSimilarity({
+      mergeCosineSimilarity({
         [`${type}Err`]: false,
         [`${type}PlotPath`]: '',
         [`${type}TxtPath`]: '',
@@ -171,24 +191,25 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
       const response = await submitR(fn, args);
       if (!response.ok) {
         const err = await response.json();
-        dispatchCosineSimilarity({ debugR: err });
+        mergeCosineSimilarity({ debugR: err });
       } else {
         const { debugR, output, error } = await response.json();
 
         if (Object.keys(output).length) {
-          dispatchCosineSimilarity({
+          mergeCosineSimilarity({
             [`${type}PlotPath`]: output.plotPath,
             [`${type}TxtPath`]: output.txtPath,
           });
         } else {
-          dispatchCosineSimilarity({
+          mergeCosineSimilarity({
             [`${type}Err`]: error || debugR,
             debugR: debugR || error || true,
           });
         }
       }
     } catch (err) {
-      dispatchError(err);
+      mergeError({ visible: true, message: err.message });
+;
     } finally {
       setOverlay(type, false);
     }
@@ -202,7 +223,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
         filter2d(profileType, matrixList.data)
       );
 
-      dispatchCosineSimilarity({
+      mergeCosineSimilarity({
         withinProfileType: profileType,
         withinMatrixSize: defaultMatrix(profileType, withinMatrixOptions),
         withinMatrixOptions: withinMatrixOptions,
@@ -216,7 +237,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
         ),
       ].sort((a, b) => a - b);
 
-      dispatchCosineSimilarity({
+      mergeCosineSimilarity({
         withinProfileType: profileType,
         withinMatrixSize: defaultMatrix(profileType, withinMatrixOptions),
         withinMatrixOptions: withinMatrixOptions,
@@ -231,7 +252,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
       filter2d(profileType, matrixList.data)
     );
 
-    dispatchCosineSimilarity({
+    mergeCosineSimilarity({
       userProfileType: profileType,
       userMatrixSize: defaultMatrix(profileType, userMatrixOptions),
       userMatrixOptions: userMatrixOptions,
@@ -245,7 +266,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
       filter2d(study, pDataOptions.data)
     );
 
-    dispatchCosineSimilarity({
+    mergeCosineSimilarity({
       pubStudy: study,
       pubCancerType: cancerTypeOptions[0],
       pubCancerTypeOptions: cancerTypeOptions,
@@ -253,7 +274,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
   }
 
   function handleCancerChange(cancer) {
-    dispatchCosineSimilarity({
+    mergeCosineSimilarity({
       pubCancerType: cancer,
     });
   }
@@ -284,7 +305,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   value={withinMatrixSize}
                   options={withinMatrixOptions}
                   onChange={(matrix) =>
-                    dispatchCosineSimilarity({
+                    mergeCosineSimilarity({
                       withinMatrixSize: matrix,
                     })
                   }
@@ -368,7 +389,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   value={refProfileType}
                   options={profileOptions}
                   onChange={(refProfileType) => {
-                    dispatchCosineSimilarity({
+                    mergeCosineSimilarity({
                       refProfileType: refProfileType,
                     });
                     getSignatureSet(refProfileType);
@@ -382,7 +403,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   value={refSignatureSet}
                   options={refSignatureSetOptions}
                   onChange={(refSignatureSet) => {
-                    dispatchCosineSimilarity({
+                    mergeCosineSimilarity({
                       refSignatureSet: refSignatureSet,
                     });
                   }}
@@ -476,7 +497,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   value={userMatrixSize}
                   options={userMatrixOptions}
                   onChange={(matrix) =>
-                    dispatchCosineSimilarity({
+                    mergeCosineSimilarity({
                       userMatrixSize: matrix,
                     })
                   }
@@ -559,7 +580,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
         className="mt-2"
         defaultActiveKey={display}
         activeKey={display}
-        onSelect={(tab) => dispatchCosineSimilarity({ display: tab })}
+        onSelect={(tab) => mergeCosineSimilarity({ display: tab })}
       >
         <Nav variant="tabs">
           <Item>

@@ -1,17 +1,24 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
-import {
-  dispatchError,
-  dispatchExploring,
-  dispatchExpMutationalSigComparison,
-} from '../../../../services/store';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as exploringActions } from '../../../../services/store/exploring';
+import { actions as modalActions } from '../../../../services/store/modal';
+
+const actions = { ...exploringActions, ...modalActions };
 
 export default function MutationalSignatureProfile({ submitR }) {
+  const dispatch = useDispatch();
+  const exploring = useSelector((state) => state.exploring);
+  const mergeExploring = (state) =>
+    dispatch(actions.mergeExploring({ exploring: state }));
+  const mergeSigMutationalSigComparison = (state) =>
+    dispatch(actions.mergeExploring({ sigMutationalSigComparison: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+
   const {
     profileName,
     profileNameOptions,
@@ -28,11 +35,8 @@ export default function MutationalSignatureProfile({ submitR }) {
     debugR,
     err,
     loading,
-  } = useSelector((state) => state.expMutationalSigComparison);
-  const { displayTab, refSigData, projectID } = useSelector(
-    (state) => state.exploring
-  );
-
+  } = exploring.sigMutationalSigComparison;
+  const { displayTab, refSigData, projectID } = exploring.exploring;
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
   }, [plotPath]);
@@ -40,12 +44,12 @@ export default function MutationalSignatureProfile({ submitR }) {
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchExpMutationalSigComparison({ plotURL: '' });
+      mergeSigMutationalSigComparison({ plotURL: '' });
     }
   }
 
   async function calculateR(fn, args) {
-    dispatchExpMutationalSigComparison({
+    mergeSigMutationalSigComparison({
       loading: true,
       err: false,
       plotPath: '',
@@ -57,16 +61,16 @@ export default function MutationalSignatureProfile({ submitR }) {
       if (!response.ok) {
         const err = await response.json();
 
-        dispatchExpMutationalSigComparison({
+        mergeSigMutationalSigComparison({
           loading: false,
           debugR: err,
         });
       } else {
         const { debugR, output, projectID: id } = await response.json();
         if (Object.keys(output).length) {
-          if (!projectID) dispatchExploring({ projectID: id });
+          if (!projectID) mergeExploring({ projectID: id });
 
-          dispatchExpMutationalSigComparison({
+          mergeSigMutationalSigComparison({
             debugR: debugR,
             loading: false,
             plotPath: output.plotPath,
@@ -74,7 +78,7 @@ export default function MutationalSignatureProfile({ submitR }) {
           });
         } else {
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchExpMutationalSigComparison({
+          mergeSigMutationalSigComparison({
             debugR: debugR,
             loading: false,
             plotPath: '',
@@ -85,8 +89,9 @@ export default function MutationalSignatureProfile({ submitR }) {
         }
       }
     } catch (err) {
-      dispatchError(err);
-      dispatchExpMutationalSigComparison({ loading: false });
+      mergeError({ visible: true, message: err.message });
+;
+      mergeSigMutationalSigComparison({ loading: false });
     }
   }
 
@@ -101,16 +106,17 @@ export default function MutationalSignatureProfile({ submitR }) {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchExpMutationalSigComparison({
+          mergeSigMutationalSigComparison({
             plotURL: objectURL,
           });
         }
       } catch (err) {
-        dispatchError(err);
+        mergeError({ visible: true, message: err.message });
+;
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchExpMutationalSigComparison({ err: true, plotURL: '' });
+      mergeSigMutationalSigComparison({ err: true, plotURL: '' });
     }
   }
 
@@ -137,7 +143,7 @@ export default function MutationalSignatureProfile({ submitR }) {
       ),
     ];
 
-    dispatchExpMutationalSigComparison({
+    mergeSigMutationalSigComparison({
       profileName: profile,
       refSignatureSet1: refSignatureSet1,
       refSignatureSet2: refSignatureSet2,
@@ -159,7 +165,7 @@ export default function MutationalSignatureProfile({ submitR }) {
       ...new Set(filteredData.map((row) => row.Signature_name)),
     ];
 
-    dispatchExpMutationalSigComparison({
+    mergeSigMutationalSigComparison({
       refSignatureSet1: set,
       signatureName1: signatureNameOptions1[0],
       signatureNameOptions1: signatureNameOptions1,
@@ -175,7 +181,7 @@ export default function MutationalSignatureProfile({ submitR }) {
       ...new Set(filteredData.map((row) => row.Signature_name)),
     ];
 
-    dispatchExpMutationalSigComparison({
+    mergeSigMutationalSigComparison({
       refSignatureSet2: set,
       signatureName2: signatureNameOptions[0],
       signatureNameOptions2: signatureNameOptions2,
@@ -212,7 +218,7 @@ export default function MutationalSignatureProfile({ submitR }) {
               value={signatureName1}
               options={signatureNameOptions1}
               onChange={(name) =>
-                dispatchExpMutationalSigComparison({
+                mergeSigMutationalSigComparison({
                   signatureName1: name,
                 })
               }
@@ -238,7 +244,7 @@ export default function MutationalSignatureProfile({ submitR }) {
               value={signatureName2}
               options={signatureNameOptions2}
               onChange={(name) =>
-                dispatchExpMutationalSigComparison({
+                mergeSigMutationalSigComparison({
                   signatureName2: name,
                 })
               }

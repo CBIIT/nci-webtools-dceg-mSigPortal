@@ -1,13 +1,16 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Modal, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
-import { store, updateError } from '../../../services/store';
+import { actions } from '../../../services/store/modal';
 
 export function ErrorModal(props) {
-  const error = useSelector((store) => store.error);
-  const closeErrorModal = () => store.dispatch(updateError({ visible: false }));
+  const dispatch = useDispatch();
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+
+  const error = useSelector((state) => state.modal['error']);
+  const closeErrorModal = () => mergeError({ visible: false });
 
   return (
     <Modal

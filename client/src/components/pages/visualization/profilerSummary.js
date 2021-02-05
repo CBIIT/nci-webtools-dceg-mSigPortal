@@ -1,25 +1,34 @@
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import {
-  dispatchError,
-  dispatchProfilerSummary,
-} from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as visualizationActions } from '../../../services/store/visualization';
+import { actions as modalActions } from '../../../services/store/modal';
 
+const actions = { ...visualizationActions, ...modalActions };
 export default function ProfilerSummary({ submitR }) {
-  const { source, study, cancerType, pubExperimentalStrategy } = useSelector(
-    (state) => state.visualize
-  );
-  const { matrixList, projectID } = useSelector(
-    (state) => state.visualizeResults
-  );
-  const { filtered } = useSelector((state) => state.mutationalProfiles);
-  const { plotPath, plotURL, err, debugR, loading } = useSelector(
-    (state) => state.profilerSummary
-  );
-
+  const dispatch = useDispatch();
+  const visualization = useSelector((state) => state.visualization);
+  const mergeProfilerSummary = (state) =>
+    dispatch(actions.mergeVisualization({ profilerSummary: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const {
+    source,
+    study,
+    cancerType,
+    pubExperimentalStrategy,
+  } = visualization.visualize;
+  const { matrixList, projectID } = visualization.results;
+  const { filtered } = visualization.mutationalProfiles;
+  const {
+    plotPath,
+    plotURL,
+    err,
+    debugR,
+    loading,
+  } = visualization.profilerSummary
+  ;
   useEffect(() => {
     // check if profiler summary already exists, else lazy-load calculate
     const checkSummary = async () => {
@@ -65,22 +74,23 @@ export default function ProfilerSummary({ submitR }) {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchProfilerSummary({
+          mergeProfilerSummary({
             plotPath: plotPath,
             plotURL: objectURL,
           });
         }
       } catch (err) {
-        dispatchError(err);
+        mergeError({ visible: true, message: err.message });
+;
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchProfilerSummary({ err: true, plotURL: '' });
+      mergeProfilerSummary({ err: true, plotURL: '' });
     }
   }
 
   async function calculateR(fn, args) {
-    dispatchProfilerSummary({
+    mergeProfilerSummary({
       loading: true,
       err: false,
       debugR: '',
@@ -91,20 +101,20 @@ export default function ProfilerSummary({ submitR }) {
       if (!response.ok) {
         const err = await response.json();
 
-        dispatchProfilerSummary({
+        mergeProfilerSummary({
           loading: false,
           debugR: err,
         });
       } else {
         const { debugR, output } = await response.json();
         if (Object.keys(output).length) {
-          dispatchProfilerSummary({
+          mergeProfilerSummary({
             debugR: debugR,
             loading: false,
           });
           setRPlot(output.plotPath, 'within');
         } else {
-          dispatchProfilerSummary({
+          mergeProfilerSummary({
             debugR: debugR,
             loading: false,
             err: true,
@@ -113,8 +123,9 @@ export default function ProfilerSummary({ submitR }) {
         }
       }
     } catch (err) {
-      dispatchError(err);
-      dispatchProfilerSummary({ loading: false });
+      mergeError({ visible: true, message: err.message });
+;
+      mergeProfilerSummary({ loading: false });
     }
   }
 

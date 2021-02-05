@@ -1,20 +1,24 @@
 import React from 'react';
 import { Row, Col, Button, Form } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
-import {
-  dispatchError,
-  dispatchExpMutationalProfiles,
-} from '../../../../services/store';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as exploringActions } from '../../../../services/store/exploring';
+import { actions as modalActions } from '../../../../services/store/modal';
+
+const actions = { ...exploringActions, ...modalActions };
 
 export default function MutationalSignatureProfile({ submitR }) {
-  const { plots, debugR, err, loading } = useSelector(
-    (state) => state.expMutationalProfiles
-  );
-  const { displayTab, refSigData } = useSelector((state) => state.exploring);
+  const dispatch = useDispatch();
+  const exploring = useSelector((state) => state.exploring);
+  const mergeSigMutationalProfiles = (state) =>
+    dispatch(actions.mergeExploring({ sigMutationalProfiles: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+
+  const { plots, debugR, err, loading } = exploring.sigMutationalProfiles;
+  const { displayTab, refSigData } = exploring.exploring;
 
   // dataFolder/Reference_Signature_Profiles_SVG/refSignatureSet/profileName+signatureName
   function buildPlotPath(profileName, refSignatureSet, signatureName) {
@@ -38,12 +42,12 @@ export default function MutationalSignatureProfile({ submitR }) {
         plotPath: path,
       };
     });
-    dispatchExpMutationalProfiles({
+    mergeSigMutationalProfiles({
       loading: false,
     });
     setRPlot(newPlots);
 
-    // dispatchExpMutationalProfiles({
+    // mergeSigMutationalProfiles({
     //   loading: true,
     //   err: false,
     //   debugR: '',
@@ -66,17 +70,18 @@ export default function MutationalSignatureProfile({ submitR }) {
     //       ...newPlots[index],
     //       plotPath: data.output.plotPath,
     //     };
-    //     dispatchExpMutationalProfiles({
+    //     mergeSigMutationalProfiles({
     //       debugR: debugR + data.debugR,
     //     });
     //   });
-    //   dispatchExpMutationalProfiles({
+    //   mergeSigMutationalProfiles({
     //     loading: false,
     //   });
     //   setRPlot(newPlots);
     // } catch (err) {
-    //   dispatchError(err);
-    //   dispatchExpMutationalProfiles({ loading: false });
+    //   mergeError({ visible: true, message: err.message });
+;
+    //   mergeSigMutationalProfiles({ loading: false });
     // }
   }
 
@@ -95,11 +100,12 @@ export default function MutationalSignatureProfile({ submitR }) {
         newPlots[index] = { ...newPlots[index], plotURL: objectURL };
       });
 
-      dispatchExpMutationalProfiles({
+      mergeSigMutationalProfiles({
         plots: newPlots,
       });
     } catch (err) {
-      dispatchError(err);
+      mergeError({ visible: true, message: err.message });
+;
     }
   }
 
@@ -158,7 +164,7 @@ export default function MutationalSignatureProfile({ submitR }) {
       signatureNameOptions: signatureNameOptions,
     };
 
-    dispatchExpMutationalProfiles({
+    mergeSigMutationalProfiles({
       plots: newPlots,
     });
   }
@@ -211,7 +217,7 @@ export default function MutationalSignatureProfile({ submitR }) {
       signatureNameOptions: signatureNameOptions,
     };
 
-    dispatchExpMutationalProfiles({
+    mergeSigMutationalProfiles({
       plots: newPlots,
     });
   }
@@ -251,7 +257,7 @@ export default function MutationalSignatureProfile({ submitR }) {
       signatureNameOptions: signatureNameOptions,
     };
 
-    dispatchExpMutationalProfiles({
+    mergeSigMutationalProfiles({
       plots: newPlots,
     });
   }
@@ -277,7 +283,7 @@ export default function MutationalSignatureProfile({ submitR }) {
       signatureNameOptions: signatureNameOptions,
     };
 
-    dispatchExpMutationalProfiles({
+    mergeSigMutationalProfiles({
       plots: newPlots,
     });
   }
@@ -333,7 +339,7 @@ export default function MutationalSignatureProfile({ submitR }) {
       ),
     ];
 
-    dispatchExpMutationalProfiles({
+    mergeSigMutationalProfiles({
       plots: [
         ...plots,
         {
@@ -359,7 +365,7 @@ export default function MutationalSignatureProfile({ submitR }) {
     let newPlots = plots.slice();
     newPlots.splice(index, 1);
 
-    dispatchExpMutationalProfiles({ plots: newPlots });
+    mergeSigMutationalProfiles({ plots: newPlots });
   }
 
   const additionalControls = () => {
@@ -412,7 +418,7 @@ export default function MutationalSignatureProfile({ submitR }) {
               onChange={(name) => {
                 let newPlots = plots.slice();
                 newPlots[index] = { ...newPlots[index], signatureName: name };
-                dispatchExpMutationalProfiles({
+                mergeSigMutationalProfiles({
                   plots: newPlots,
                 });
               }}
@@ -515,7 +521,7 @@ export default function MutationalSignatureProfile({ submitR }) {
               onChange={(name) => {
                 let newPlots = plots.slice();
                 newPlots[0] = { ...newPlots[0], signatureName: name };
-                dispatchExpMutationalProfiles({
+                mergeSigMutationalProfiles({
                   plots: newPlots,
                 });
               }}

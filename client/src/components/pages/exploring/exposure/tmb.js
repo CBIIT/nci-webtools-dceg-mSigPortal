@@ -1,14 +1,21 @@
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { dispatchError, dispatchTMB } from '../../../../services/store';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as exploringActions } from '../../../../services/store/exploring';
+import { actions as modalActions } from '../../../../services/store/modal';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 
+const actions = { ...exploringActions, ...modalActions };
+
 export default function TMB() {
-  const { plotPath, plotURL, debugR, err } = useSelector(
-    (state) => state.tmb
-  );
-  const { projectID } = useSelector((state) => state.expExposure);
+  const dispatch = useDispatch();
+  const exploring = useSelector((state) => state.exploring);
+  const { plotPath, plotURL, debugR, err } = exploring.tmb;
+  const { projectID } = exploring.exposure;
+  const mergeExploring = (state) =>
+    dispatch(actions.mergeExploring({ exploring: state }));
+  const mergeTMB = (state) => dispatch(actions.mergeExploring({ tmb: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
 
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
@@ -25,23 +32,24 @@ export default function TMB() {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchTMB({
+          mergeTMB({
             plotURL: objectURL,
           });
         }
       } catch (err) {
-        dispatchError(err);
+        mergeError({ visible: true, message: err.message });
+;
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchTMB({ err: true, plotURL: '' });
+      mergeTMB({ err: true, plotURL: '' });
     }
   }
 
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchTMB({ plotURL: '' });
+      mergeTMB({ plotURL: '' });
     }
   }
 

@@ -1,16 +1,18 @@
 import React, { useEffect } from 'react';
-import { Form, Row, Col, Button, Group } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
-import { dispatchError, dispatchMsBurden } from '../../../../services/store';
+import { Form, Row, Col, Button } from 'react-bootstrap';
+import { useSelector, useDispatch } from 'react-redux';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { actions as exploringActions } from '../../../../services/store/exploring';
+import { actions as modalActions } from '../../../../services/store/modal';
 import Plot from '../../../controls/plot/plot';
-import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
+import Debug from '../../../controls/debug/debug';
+
+const actions = { ...exploringActions, ...modalActions };
 
 export default function MsBurden({ calculateBurden }) {
-  const { signatureNameOptions, userNameOptions, source } = useSelector(
-    (state) => state.expExposure
-  );
+  const dispatch = useDispatch();
+  const exploring = useSelector((state) => state.exploring);
   const {
     signatureName,
     plotPath,
@@ -18,8 +20,18 @@ export default function MsBurden({ calculateBurden }) {
     debugR,
     err,
     loading,
-  } = useSelector((state) => state.msBurden);
-  const { projectID } = useSelector((state) => state.expExposure);
+  } = exploring.msBurden;
+  const {
+    projectID,
+    signatureNameOptions,
+    userNameOptions,
+    source,
+  } = exploring.exposure;
+  const mergeExploring = (state) =>
+    dispatch(actions.mergeExploring({ exploring: state }));
+  const mergeMsBurden = (state) =>
+    dispatch(actions.mergeExploring({ msBurden: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
 
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
@@ -27,9 +39,9 @@ export default function MsBurden({ calculateBurden }) {
 
   useEffect(() => {
     if (source == 'public') {
-      dispatchMsBurden({ signatureName: signatureNameOptions[0] });
+      mergeMsBurden({ signatureName: signatureNameOptions[0] });
     } else {
-      dispatchMsBurden({ signatureName: userNameOptions[0] });
+      mergeMsBurden({ signatureName: userNameOptions[0] });
     }
   }, [signatureNameOptions, userNameOptions, source]);
 
@@ -44,23 +56,24 @@ export default function MsBurden({ calculateBurden }) {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchMsBurden({
+          mergeMsBurden({
             plotURL: objectURL,
           });
         }
       } catch (err) {
-        dispatchError(err);
+        mergeError({ visible: true, message: err.message });
+;
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchMsBurden({ err: true, plotURL: '' });
+      mergeMsBurden({ err: true, plotURL: '' });
     }
   }
 
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchMsBurden({ plotURL: '' });
+      mergeMsBurden({ plotURL: '' });
     }
   }
 
@@ -77,7 +90,7 @@ export default function MsBurden({ calculateBurden }) {
               options={
                 source == 'public' ? signatureNameOptions : userNameOptions
               }
-              onChange={(name) => dispatchMsBurden({ signatureName: name })}
+              onChange={(name) => mergeMsBurden({ signatureName: name })}
             />
           </Col>
           <Col lg="7" />

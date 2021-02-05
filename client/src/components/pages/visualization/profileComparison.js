@@ -9,13 +9,8 @@ import {
   Tab,
   Nav,
 } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
-import {
-  dispatchError,
-  dispatchProfileComparison,
-} from '../../../services/store';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
@@ -26,13 +21,23 @@ import {
   unique2d,
   defaultMatrix,
 } from '../../../services/utils';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as visualizationActions } from '../../../services/store/visualization';
+import { actions as modalActions } from '../../../services/store/modal';
 
+const actions = { ...visualizationActions, ...modalActions };
 const { Group, Label, Control, Text } = Form;
 const { Title, Content } = Popover;
 const { Container, Content: TabContent, Pane } = Tab;
 const { Item, Link } = Nav;
 
 export default function ProfileComparison({ submitR, getRefSigOptions }) {
+  const dispatch = useDispatch();
+  const visualization = useSelector((state) => state.visualization);
+  const mergeProfileComparison = (state) =>
+    dispatch(actions.mergeVisualization({ profileComparison: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+
   const {
     source,
     study,
@@ -40,12 +45,9 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     cancerType,
     pubExperimentalStrategy,
     pDataOptions,
-  } = useSelector((state) => state.visualize);
-  const { projectID, matrixList, svgList } = useSelector(
-    (state) => state.visualizeResults
-  );
-  const { profileOptions } = useSelector((state) => state.mutationalProfiles);
-  const state = useSelector((state) => state.profileComparison);
+  } = visualization.visualize;
+  const { projectID, matrixList, svgList } = visualization.results;
+  const { profileOptions } = visualization.mutationalProfiles;
   const {
     withinProfileType,
     withinSampleName1,
@@ -83,7 +85,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     withinSubmitOverlay,
     refSubmitOverlay,
     pubSubmitOverlay,
-  } = state;
+  } = visualization.profileComparison;
 
   const popover = (
     <Popover id="popover-basic">
@@ -99,7 +101,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
               (sig) => sig.toLowerCase().indexOf(search.toLowerCase()) > -1
             );
 
-            dispatchProfileComparison({
+            mergeProfileComparison({
               searchFilter: search,
               filterSignatures: signatures,
             });
@@ -114,11 +116,11 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 onClick={() => {
                   let ref = refCompare;
                   if (ref.length) {
-                    dispatchProfileComparison({
+                    mergeProfileComparison({
                       refCompare: (ref += `;1*${signature}`),
                     });
                   } else {
-                    dispatchProfileComparison({
+                    mergeProfileComparison({
                       refCompare: signature,
                     });
                   }
@@ -156,7 +158,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
   }, [withinPlotPath, refPlotPath, pubPlotPath]);
 
   function setOverlay(type, status) {
-    dispatchProfileComparison({ [`${type}SubmitOverlay`]: status });
+    mergeProfileComparison({ [`${type}SubmitOverlay`]: status });
   }
 
   async function setRPlot(plotPath, type) {
@@ -168,45 +170,49 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         const pic = await response.blob();
         const objectURL = URL.createObjectURL(pic);
 
-        if (state[`${type}PlotURL`])
-          URL.revokeObjectURL(state[`${type}PlotURL`]);
-        dispatchProfileComparison({
+        if (visualization.profileComparison[`${type}PlotURL`])
+          URL.revokeObjectURL(
+            visualization.profileComparison[`${type}PlotURL`]
+          );
+        mergeProfileComparison({
           [`${type}PlotURL`]: objectURL,
         });
       }
     } catch (err) {
-      dispatchError(err);
+      mergeError({ visible: true, message: err.message });
+;
     }
   }
 
   function clearPlot(type) {
-    URL.revokeObjectURL(state[`${type}PlotURL`]);
-    dispatchProfileComparison({ [`${type}PlotURL`]: '' });
+    URL.revokeObjectURL(visualization.profileComparison[`${type}PlotURL`]);
+    mergeProfileComparison({ [`${type}PlotURL`]: '' });
   }
 
   // get Signature Reference Sets for dropdown options
   async function getSignatureSet(profileType) {
     if (profileType) {
-      dispatchProfileComparison({ refSubmitOverlay: true });
+      mergeProfileComparison({ refSubmitOverlay: true });
       try {
         const response = await getRefSigOptions(profileType);
 
         if (response.ok) {
           const signatureSetOptions = await response.json();
 
-          dispatchProfileComparison({
+          mergeProfileComparison({
             refSignatureSetOptions: signatureSetOptions,
             refSignatureSet: signatureSetOptions[0],
             refSubmitOverlay: false,
           });
           getSignatures(profileType, signatureSetOptions[0]);
         } else {
-          dispatchError(await response.json());
-          dispatchProfileComparison({ refSubmitOverlay: false });
+          mergeError(await response.json());
+          mergeProfileComparison({ refSubmitOverlay: false });
         }
       } catch (err) {
-        dispatchError(err);
-        dispatchProfileComparison({ refSubmitOverlay: false });
+        mergeError({ visible: true, message: err.message });
+;
+        mergeProfileComparison({ refSubmitOverlay: false });
       }
     }
   }
@@ -214,7 +220,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
   // get signature options for compare
   async function getSignatures(profileType, signatureSetName) {
     if (signatureSetName) {
-      dispatchProfileComparison({ refSubmitOverlay: true });
+      mergeProfileComparison({ refSubmitOverlay: true });
       try {
         const response = await fetch(`api/getSignaturesR`, {
           method: 'POST',
@@ -231,19 +237,20 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         if (response.ok) {
           const signatures = await response.json();
 
-          dispatchProfileComparison({
+          mergeProfileComparison({
             refSignatures: signatures,
             filterSignatures: signatures,
             refCompare: signatures[0],
             refSubmitOverlay: false,
           });
         } else {
-          dispatchError(await response.json());
-          dispatchProfileComparison({ refSubmitOverlay: false });
+          mergeError(await response.json());
+          mergeProfileComparison({ refSubmitOverlay: false });
         }
       } catch (err) {
-        dispatchError(err);
-        dispatchProfileComparison({ refSubmitOverlay: false });
+        mergeError({ visible: true, message: err.message });
+;
+        mergeProfileComparison({ refSubmitOverlay: false });
       }
     }
   }
@@ -252,7 +259,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     try {
       setOverlay(type, true);
 
-      dispatchProfileComparison({
+      mergeProfileComparison({
         [`${type}Err`]: false,
         [`${type}PlotPath`]: '',
         debugR: '',
@@ -261,22 +268,23 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       const response = await submitR(fn, args);
       if (!response.ok) {
         const err = await response.json();
-        dispatchProfileComparison({ debugR: err });
+        mergeProfileComparison({ debugR: err });
       } else {
         const { debugR, output, error } = await response.json();
 
-        dispatchProfileComparison({ debugR: debugR });
+        mergeProfileComparison({ debugR: debugR });
         if (Object.keys(output).length) {
-          dispatchProfileComparison({ [`${type}PlotPath`]: output.plotPath });
+          mergeProfileComparison({ [`${type}PlotPath`]: output.plotPath });
         } else {
-          dispatchProfileComparison({
+          mergeProfileComparison({
             [`${type}Err`]: error || debugR,
             debugR: debugR || error || true,
           });
         }
       }
     } catch (err) {
-      dispatchError(err);
+      mergeError({ visible: true, message: err.message });
+;
     } finally {
       setOverlay(type, false);
     }
@@ -312,19 +320,20 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         const { svgList } = await response.json();
         const pubSamples = unique2d('Sample', svgList.columns, svgList.data);
 
-        dispatchProfileComparison({
+        mergeProfileComparison({
           pubSampleOptions: pubSamples,
           pubSampleName: pubSamples[0],
         });
       } else {
-        dispatchProfileComparison({
+        mergeProfileComparison({
           pubSampleOptions: ['NA'],
           pubErr: 'Error retrieving pub data samples',
         });
       }
     } catch (err) {
-      dispatchError(err);
-      dispatchProfileComparison({
+      mergeError({ visible: true, message: err.message });
+;
+      mergeProfileComparison({
         pubErr: 'Error retrieving pub data samples',
       });
     } finally {
@@ -341,7 +350,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       ),
     ];
 
-    dispatchProfileComparison({
+    mergeProfileComparison({
       pubStudy: study,
       pubCancerType: cancerTypeOptions[0],
       pubCancerTypeOptions: cancerTypeOptions,
@@ -350,7 +359,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
   }
 
   function handleCancerChange(cancer) {
-    dispatchProfileComparison({
+    mergeProfileComparison({
       pubCancerType: cancer,
     });
     getPublicSamples(pubStudy, cancer);
@@ -365,7 +374,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       ),
     ].sort((a, b) => a - b);
 
-    dispatchProfileComparison({
+    mergeProfileComparison({
       userProfileType: profile,
       userMatrixOptions: matrixOptions,
       userMatrixSize: defaultMatrix(profile, matrixOptions),
@@ -388,7 +397,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   value={withinProfileType}
                   options={profileOptions}
                   onChange={(profile) =>
-                    dispatchProfileComparison({
+                    mergeProfileComparison({
                       withinProfileType: profile,
                     })
                   }
@@ -402,7 +411,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   value={withinSampleName1}
                   options={sampleOptions}
                   onChange={(name) => {
-                    dispatchProfileComparison({
+                    mergeProfileComparison({
                       withinSampleName1: name,
                     });
                   }}
@@ -416,7 +425,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   value={withinSampleName2}
                   options={sampleOptions}
                   onChange={(name) => {
-                    dispatchProfileComparison({
+                    mergeProfileComparison({
                       withinSampleName2: name,
                     });
                   }}
@@ -506,7 +515,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   value={refProfileType}
                   options={profileOptions}
                   onChange={(refProfileType) => {
-                    dispatchProfileComparison({
+                    mergeProfileComparison({
                       refProfileType: refProfileType,
                     });
                     getSignatureSet(refProfileType);
@@ -520,7 +529,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   value={refSampleName}
                   options={sampleOptions}
                   onChange={(name) => {
-                    dispatchProfileComparison({
+                    mergeProfileComparison({
                       refSampleName: name,
                     });
                   }}
@@ -533,7 +542,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   value={refSignatureSet}
                   options={refSignatureSetOptions}
                   onChange={(refSignatureSet) => {
-                    dispatchProfileComparison({
+                    mergeProfileComparison({
                       refSignatureSet: refSignatureSet,
                     });
                     getSignatures(refProfileType, refSignatureSet);
@@ -565,7 +574,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   <Control
                     value={refCompare}
                     onChange={(e) => {
-                      dispatchProfileComparison({
+                      mergeProfileComparison({
                         refCompare: e.target.value,
                       });
                     }}
@@ -666,7 +675,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   value={userMatrixSize}
                   options={userMatrixOptions}
                   onChange={(matrix) =>
-                    dispatchProfileComparison({
+                    mergeProfileComparison({
                       userMatrixSize: matrix,
                     })
                   }
@@ -679,7 +688,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   value={userSampleName}
                   options={sampleOptions}
                   onChange={(name) => {
-                    dispatchProfileComparison({
+                    mergeProfileComparison({
                       userSampleName: name,
                     });
                   }}
@@ -713,7 +722,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   value={pubSampleName}
                   options={pubSampleOptions}
                   onChange={(name) => {
-                    dispatchProfileComparison({
+                    mergeProfileComparison({
                       pubSampleName: name,
                     });
                   }}
@@ -773,7 +782,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         className="mt-2"
         defaultActiveKey={display}
         activeKey={display}
-        onSelect={(tab) => dispatchProfileComparison({ display: tab })}
+        onSelect={(tab) => mergeProfileComparison({ display: tab })}
       >
         <Nav variant="tabs">
           <Item>

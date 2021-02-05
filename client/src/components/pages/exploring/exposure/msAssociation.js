@@ -1,26 +1,19 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
-import {
-  dispatchError,
-  dispatchMsAssociation,
-} from '../../../../services/store';
+import { useSelector, useDispatch } from 'react-redux';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { actions as exploringActions } from '../../../../services/store/exploring';
+import { actions as modalActions } from '../../../../services/store/modal';
 import Plot from '../../../controls/plot/plot';
-import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
+import Debug from '../../../controls/debug/debug';
 
+const actions = { ...exploringActions, ...modalActions };
 const { Group, Check } = Form;
 
 export default function MsAssociation({ calculateAssociation, handleSet }) {
-  const {
-    signatureNameOptions,
-    userNameOptions,
-    source,
-    study,
-    strategy,
-    refSignatureSet,
-  } = useSelector((state) => state.expExposure);
+  const dispatch = useDispatch();
+  const exploring = useSelector((state) => state.exploring);
   const {
     both,
     signatureName1,
@@ -30,8 +23,21 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
     debugR,
     err,
     loading,
-  } = useSelector((state) => state.msAssociation);
-  const { projectID } = useSelector((state) => state.expExposure);
+  } = exploring.msAssociation;
+  const {
+    projectID,
+    signatureNameOptions,
+    userNameOptions,
+    source,
+    study,
+    strategy,
+    refSignatureSet,
+  } = exploring.exposure;
+  const mergeExploring = (state) =>
+    dispatch(actions.mergeExploring({ exploring: state }));
+  const mergeMsAssociation = (state) =>
+    dispatch(actions.mergeExploring({ msAssociation: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
 
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
@@ -40,12 +46,12 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
   // apply default signature names
   useEffect(() => {
     if (source == 'public') {
-      dispatchMsAssociation({
+      mergeMsAssociation({
         signatureName1: signatureNameOptions[0],
         signatureName2: signatureNameOptions[1],
       });
     } else {
-      dispatchMsAssociation({
+      mergeMsAssociation({
         signatureName1: userNameOptions[0],
         signatureName2: userNameOptions[1],
       });
@@ -63,23 +69,24 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          dispatchMsAssociation({
+          mergeMsAssociation({
             plotURL: objectURL,
           });
         }
       } catch (err) {
-        dispatchError(err);
+        mergeError({ visible: true, message: err.message });
+;
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      dispatchMsAssociation({ err: true, plotURL: '' });
+      mergeMsAssociation({ err: true, plotURL: '' });
     }
   }
 
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      dispatchMsAssociation({ plotURL: '' });
+      mergeMsAssociation({ plotURL: '' });
     }
   }
 
@@ -95,7 +102,7 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
                 label="Number of Mutations assigned to both signature > 0"
                 value={both}
                 checked={both}
-                onChange={(e) => dispatchMsAssociation({ both: !both })}
+                onChange={(e) => mergeMsAssociation({ both: !both })}
               />
             </Group>
           </Col>
@@ -107,9 +114,7 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
               options={
                 source == 'public' ? signatureNameOptions : userNameOptions
               }
-              onChange={(name) =>
-                dispatchMsAssociation({ signatureName1: name })
-              }
+              onChange={(name) => mergeMsAssociation({ signatureName1: name })}
             />
           </Col>
           <Col lg="2">
@@ -120,9 +125,7 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
               options={
                 source == 'public' ? signatureNameOptions : userNameOptions
               }
-              onChange={(name) =>
-                dispatchMsAssociation({ signatureName2: name })
-              }
+              onChange={(name) => mergeMsAssociation({ signatureName2: name })}
             />
           </Col>
           <Col />

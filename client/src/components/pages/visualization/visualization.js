@@ -5,33 +5,41 @@ import {
   SidebarPanel,
   MainPanel,
 } from '../../controls/sidebar-container/sidebar-container';
-import UploadForm from './uploadForm';
+import UserForm from './userForm';
 import PublicForm from './publicForm';
 import Results from './results';
-import { useSelector } from 'react-redux';
-import {
-  dispatchVisualize,
-  dispatchVisualizeResults,
-  dispatchProfilerSummary,
-  dispatchMutationalPattern,
-  dispatchCosineSimilarity,
-  dispatchProfileComparison,
-  dispatchPCA,
-  dispatchError,
-  store,
-  updateVisualize,
-} from '../../../services/store';
 import './visualization.scss';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as visualizationActions } from '../../../services/store/visualization';
+import { actions as modalActions } from '../../../services/store/modal';
 
+const actions = { ...visualizationActions, ...modalActions };
 const { Group, Label, Check } = Form;
 
 export default function Visualize({ match }) {
-  const { openSidebar, loading, source, submitted } = useSelector(
-    (state) => state.visualize
-  );
-  const { displayTab, svgList } = useSelector(
-    (state) => state.visualizeResults
-  );
+  const dispatch = useDispatch();
+  const visualization = useSelector((state) => state.visualization);
+
+  const mergeVisualize = (state) =>
+    dispatch(actions.mergeVisualization({ visualize: state }));
+  const mergeResults = (state) =>
+    dispatch(actions.mergeVisualization({ results: state }));
+  const mergeProfilerSummary = (state) =>
+    dispatch(actions.mergeVisualization({ profilerSummary: state }));
+  const mergeMutationalPattern = (state) =>
+    dispatch(actions.mergeVisualization({ mutationalPattern: state }));
+  const mergeCosineSimilarity = (state) =>
+    dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
+  const mergeProfileComparison = (state) =>
+    dispatch(actions.mergeVisualization({ profileComparison: state }));
+  const mergePCA = (state) =>
+    dispatch(actions.mergeVisualization({ pca: state }));
+  const mergeKataegis = (state) =>
+    dispatch(actions.mergeVisualization({ kataegis: state }));
+  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+
+  const { openSidebar, loading, source, submitted } = visualization.visualize;
+  const { displayTab, svgList } = visualization.results;
   const { type, id } = match.params;
 
   // when retrieving queued result, update id in store
@@ -44,11 +52,11 @@ export default function Visualize({ match }) {
   }, [id]);
 
   function setOpenSidebar(bool) {
-    dispatchVisualize({ openSidebar: bool });
+    mergeVisualize({ openSidebar: bool });
   }
 
   async function loadQueueResult(id) {
-    dispatchVisualize({
+    mergeVisualize({
       loading: {
         active: true,
         content: 'Loading Queued Result',
@@ -59,18 +67,18 @@ export default function Visualize({ match }) {
       const { args, state, timestamp } = await (
         await fetch(`api/getQueueResults/${id}`)
       ).json();
-      dispatchVisualize(state.visualize);
-      dispatchVisualizeResults({ projectID: id });
+      mergeVisualize(state.visualize);
+      mergeResults({ projectID: id });
     } catch (error) {
-      dispatchError(error.toString());
+      mergeError(error.toString());
     }
-    dispatchVisualize({
+    mergeVisualize({
       loading: { active: false },
     });
   }
 
   async function loadExample(id) {
-    dispatchVisualize({
+    mergeVisualize({
       loading: {
         active: true,
         content: 'Loading Example',
@@ -81,26 +89,25 @@ export default function Visualize({ match }) {
       const { projectID, state } = await (
         await fetch(`api/getVisExample/${id}`)
       ).json();
-      dispatchVisualize(state.visualize);
+      mergeVisualize(state.visualize);
       // rehydrate state if available
-      if (state.profilerSummary) dispatchProfilerSummary(state.profilerSummary);
+      if (state.profilerSummary) mergeProfilerSummary(state.profilerSummary);
       if (state.mutationalPattern)
-        dispatchMutationalPattern(state.mutationalPattern);
-      if (state.cosineSimilarity)
-        dispatchCosineSimilarity(state.cosineSimilarity);
+        mergeMutationalPattern(state.mutationalPattern);
+      if (state.cosineSimilarity) mergeCosineSimilarity(state.cosineSimilarity);
       if (state.profileComparison)
-        dispatchProfileComparison(state.profileComparison);
-      if (state.pca) dispatchPCA(state.pca);
-      if (state.visualizeResults) {
-        dispatchVisualizeResults({
-          ...state.visualizeResults,
+        mergeProfileComparison(state.profileComparison);
+      if (state.pca) mergePCA(state.pca);
+      if (state.results) {
+        mergeResults({
+          ...state.results,
           projectID: projectID,
         });
-      } else dispatchVisualizeResults({ projectID: projectID });
+      } else mergeResults({ projectID: projectID });
     } catch (error) {
-      dispatchError(error.toString());
+      mergeError(error.toString());
     }
-    dispatchVisualize({
+    mergeVisualize({
       loading: { active: false },
     });
   }
@@ -143,7 +150,7 @@ export default function Visualize({ match }) {
                       color: 'black',
                       fontWeight: '500',
                     }}
-                    onClick={() => dispatchVisualizeResults({ displayTab: id })}
+                    onClick={() => mergeResults({ displayTab: id })}
                   >
                     {name}
                   </Button>
@@ -170,7 +177,7 @@ export default function Visualize({ match }) {
                       color: 'black',
                       fontWeight: '500',
                     }}
-                    onClick={() => dispatchVisualizeResults({ displayTab: id })}
+                    onClick={() => mergeResults({ displayTab: id })}
                   >
                     {name}
                   </Button>
@@ -198,9 +205,7 @@ export default function Visualize({ match }) {
                       type="radio"
                       value="public"
                       checked={source == 'public'}
-                      onChange={(e) =>
-                        store.dispatch(updateVisualize({ source: 'public' }))
-                      }
+                      onChange={(e) => mergeVisualize({ source: 'public' })}
                     />
                     <Check.Label className="font-weight-normal">
                       Public
@@ -212,9 +217,7 @@ export default function Visualize({ match }) {
                       type="radio"
                       value="user"
                       checked={source == 'user'}
-                      onChange={(e) =>
-                        store.dispatch(updateVisualize({ source: 'user' }))
-                      }
+                      onChange={(e) => mergeVisualize({ source: 'user' })}
                     />
                     <Check.Label className="font-weight-normal">
                       User
@@ -229,7 +232,7 @@ export default function Visualize({ match }) {
               }}
             >
               <Col lg="auto" className="w-100">
-                <UploadForm />
+                <UserForm />
               </Col>
             </Row>
             <Row style={{ display: source == 'public' ? 'block' : 'none' }}>
