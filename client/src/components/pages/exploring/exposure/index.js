@@ -1303,7 +1303,7 @@ export default function Exposure({ match }) {
               style={{ overflowX: 'auto' }}
             >
               {tabs.map(({ key, component }) => (
-                <Pane key={key} eventKey={key} className="border-0">
+                <Pane key={key} eventKey={key} className="border-0" style={{minHeight: '7rem'}}>
                   <LoadingOverlay
                     active={loading}
                     content={loadingMsg}
