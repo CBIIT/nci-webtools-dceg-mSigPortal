@@ -12,7 +12,8 @@ export default function ProfilerSummary({ submitR }) {
   const visualization = useSelector((state) => state.visualization);
   const mergeProfilerSummary = (state) =>
     dispatch(actions.mergeVisualization({ profilerSummary: state }));
-  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
   const {
     source,
     study,
@@ -79,7 +80,7 @@ export default function ProfilerSummary({ submitR }) {
           });
         }
       } catch (err) {
-        mergeError({ visible: true, message: err.message });
+        mergeError(err.message);
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
@@ -121,7 +122,7 @@ export default function ProfilerSummary({ submitR }) {
         }
       }
     } catch (err) {
-      mergeError({ visible: true, message: err.message });
+      mergeError(err.message);
       mergeProfilerSummary({ loading: false });
     }
   }

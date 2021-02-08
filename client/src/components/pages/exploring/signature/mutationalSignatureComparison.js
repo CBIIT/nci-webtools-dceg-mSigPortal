@@ -17,7 +17,8 @@ export default function MutationalSignatureProfile({ submitR }) {
     dispatch(actions.mergeExploring({ exploring: state }));
   const mergeSigMutationalSigComparison = (state) =>
     dispatch(actions.mergeExploring({ sigMutationalSigComparison: state }));
-  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const {
     profileName,
@@ -89,7 +90,7 @@ export default function MutationalSignatureProfile({ submitR }) {
         }
       }
     } catch (err) {
-      mergeError({ visible: true, message: err.message });
+      mergeError(err.message);
       mergeSigMutationalSigComparison({ loading: false });
     }
   }
@@ -110,7 +111,7 @@ export default function MutationalSignatureProfile({ submitR }) {
           });
         }
       } catch (err) {
-        mergeError({ visible: true, message: err.message });
+        mergeError(err.message);
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);

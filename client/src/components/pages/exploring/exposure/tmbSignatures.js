@@ -16,7 +16,8 @@ export default function TmbSignatures() {
     dispatch(actions.mergeExploring({ exploring: state }));
   const mergeTmbSignatures = (state) =>
     dispatch(actions.mergeExploring({ tmbSignatures: state }));
-  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
@@ -38,7 +39,7 @@ export default function TmbSignatures() {
           });
         }
       } catch (err) {
-        mergeError({ visible: true, message: err.message });
+        mergeError(err.message);
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);

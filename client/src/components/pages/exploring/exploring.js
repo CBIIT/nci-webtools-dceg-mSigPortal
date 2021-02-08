@@ -29,7 +29,8 @@ export default function Explore() {
     dispatch(actions.mergeExploring({ sigMutationalSigComparison: state }));
   const mergeSigCosineSimilarity = (state) =>
     dispatch(actions.mergeExploring({ sigCosineSimilarity: state }));
-  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   useEffect(() => {
     if (!exposureSignature.length) populateControls();
@@ -60,7 +61,7 @@ export default function Explore() {
       populateSignatureExp(signatureData);
       populateExposureExp(exposureCancer, exposureSignature, signatureNames);
     } catch (err) {
-      mergeError({ visible: true, message: err.message });
+      mergeError(err.message);
     }
   }
 

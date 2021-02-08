@@ -15,7 +15,8 @@ export default function MutationalSignatureProfile({ submitR }) {
   const exploring = useSelector((state) => state.exploring);
   const mergeSigMutationalProfiles = (state) =>
     dispatch(actions.mergeExploring({ sigMutationalProfiles: state }));
-  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const { plots, debugR, err, loading } = exploring.sigMutationalProfiles;
   const { displayTab, refSigData } = exploring.exploring;
@@ -79,7 +80,7 @@ export default function MutationalSignatureProfile({ submitR }) {
     //   });
     //   setRPlot(newPlots);
     // } catch (err) {
-    //   mergeError({ visible: true, message: err.message });
+    //   mergeError(err.message );
     //   mergeSigMutationalProfiles({ loading: false });
     // }
   }
@@ -103,7 +104,7 @@ export default function MutationalSignatureProfile({ submitR }) {
         plots: newPlots,
       });
     } catch (err) {
-      mergeError({ visible: true, message: err.message });
+      mergeError(err.message);
     }
   }
 

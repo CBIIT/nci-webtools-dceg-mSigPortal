@@ -44,9 +44,10 @@ export default function UserForm() {
     dispatch(actions.mergeVisualization({ pca: state }));
   const mergeKataegis = (state) =>
     dispatch(actions.mergeVisualization({ kataegis: state }));
-  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
-  const mergeSuccess = (state) =>
-    dispatch(actions.mergeModal({ success: state }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
+  const mergeSuccess = (msg) =>
+    dispatch(actions.mergeModal({ success: { visible: true, message: msg } }));
   const resetVisualization = (_) => dispatch(actions.resetVisualization());
 
   const {
@@ -165,7 +166,7 @@ export default function UserForm() {
           mergeError('Failed to submit to queue. Please Try Again.');
         }
       } catch (err) {
-        mergeError({ visible: true, message: err.message });
+        mergeError(err.message);
         mergeVisualize({ loading: { active: false } });
       }
     } else {
@@ -221,7 +222,7 @@ export default function UserForm() {
           mergeError(message);
         }
       } catch (err) {
-        mergeError({ visible: true, message: err.message });
+        mergeError(err.message);
         mergeResults({
           error: 'Please Reset Your Parameters and Try again.',
         });
@@ -281,7 +282,7 @@ export default function UserForm() {
         return await response.json();
       }
     } catch (err) {
-      mergeError({ visible: true, message: err.message });
+      mergeError(err.message);
     } finally {
       mergeVisualize({
         loading: {

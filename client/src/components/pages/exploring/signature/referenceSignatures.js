@@ -47,7 +47,7 @@ export default function ReferenceSignatures({ submitR }) {
   //       setRPlot(output.plotPath, 'within');
   //     }
   //   } catch (err) {
-  //     mergeError({ visible: true, message: err.message });
+  //     mergeError(err.message );
   //     dispatchExpRefSig({ loading: false });
   //   }
   // }
@@ -68,7 +68,7 @@ export default function ReferenceSignatures({ submitR }) {
   //         });
   //       }
   //     } catch (err) {
-  //       mergeError({ visible: true, message: err.message });
+  //       mergeError(err.message );
   //     }
   //   } else {
   //     if (plotURL) URL.revokeObjectURL(plotURL);

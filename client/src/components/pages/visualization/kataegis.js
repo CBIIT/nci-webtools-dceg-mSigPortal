@@ -17,7 +17,8 @@ export default function Kataegis({ submitR }) {
   const visualization = useSelector((state) => state.visualization);
   const mergeKataegis = (state) =>
     dispatch(actions.mergeVisualization({ kataegis: state }));
-  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const { source, inputFormat } = visualization.visualize;
   const { projectID } = visualization.results;
@@ -57,7 +58,7 @@ export default function Kataegis({ submitR }) {
           });
         }
       } catch (err) {
-        mergeError({ visible: true, message: err.message });
+        mergeError(err.message);
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
@@ -114,7 +115,7 @@ export default function Kataegis({ submitR }) {
         }
       }
     } catch (err) {
-      mergeError({ visible: true, message: err.message });
+      mergeError(err.message);
       mergeKataegis({ loading: false });
     }
   }

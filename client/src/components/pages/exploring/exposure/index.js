@@ -52,7 +52,8 @@ export default function Exposure({ match }) {
     dispatch(actions.mergeExploring({ msLandscape: state }));
   const mergeMsIndividual = (state) =>
     dispatch(actions.mergeExploring({ msIndividual: state }));
-  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const { exampleName } = match.params;
 
@@ -189,7 +190,7 @@ export default function Exposure({ match }) {
       if (state.msPrevalence) mergeMsPrevalence(state.msPrevalence);
       if (state.tmbSignatures) mergeTmbSignatures(state.tmbSignatures);
     } catch (error) {
-      mergeError({ visible: true, message: error.message });
+      mergeError(error.message);
     }
     mergeState({
       exposure: {
@@ -233,7 +234,7 @@ export default function Exposure({ match }) {
         });
       else mergeError(stdout);
     } catch (err) {
-      mergeError({ visible: true, message: err.message });
+      mergeError(err.message);
     }
     mergeState({
       exposure: { loading: false, loadingMsg: null },
@@ -274,7 +275,7 @@ export default function Exposure({ match }) {
         mergeMsIndividual({ sample: output.data[0] });
       } else mergeError(stdout);
     } catch (err) {
-      mergeError({ visible: true, message: err.message });
+      mergeError(err.message);
     }
     mergeExposure({ loading: false, loadingMsg: null });
   }
@@ -300,7 +301,7 @@ export default function Exposure({ match }) {
         mergeError('R submit failed');
       }
     } catch (err) {
-      mergeError({ visible: true, message: err.message });
+      mergeError(err.message);
     }
   }
 
@@ -329,7 +330,7 @@ export default function Exposure({ match }) {
         mergeMsBurden({ loading: false });
       }
     } catch (error) {
-      mergeError({ visible: true, message: error.message });
+      mergeError(error.message);
     }
   }
 
@@ -358,7 +359,7 @@ export default function Exposure({ match }) {
         mergeMsAssociation({ loading: false });
       }
     } catch (error) {
-      mergeError({ visible: true, message: error.message });
+      mergeError(error.message);
     }
   }
 
@@ -390,7 +391,7 @@ export default function Exposure({ match }) {
         mergeMsLandscape({ loading: false });
       }
     } catch (error) {
-      mergeError({ visible: true, message: error.message });
+      mergeError(error.message);
     }
   }
 
@@ -419,7 +420,7 @@ export default function Exposure({ match }) {
         mergeMsPrevalence({ loading: false });
       }
     } catch (error) {
-      mergeError({ visible: true, message: error.message });
+      mergeError(error.message);
     }
   }
   async function calculateIndividual() {
@@ -447,7 +448,7 @@ export default function Exposure({ match }) {
         mergeMsIndividual({ loading: false });
       }
     } catch (error) {
-      mergeError({ visible: true, message: error.message });
+      mergeError(error.message);
     }
   }
 
@@ -522,7 +523,7 @@ export default function Exposure({ match }) {
         handleCalculate('all');
       }
     } catch (err) {
-      mergeError({ visible: true, message: err.message });
+      mergeError(err.message);
     } finally {
       mergeExposure({ loading: false });
     }
@@ -646,7 +647,7 @@ export default function Exposure({ match }) {
         mergeError(debugR);
       }
     } catch (err) {
-      mergeError({ visible: true, message: err.message });
+      mergeError(err.message);
     }
   }
 
@@ -781,7 +782,7 @@ export default function Exposure({ match }) {
             resolve({ projectID, exposureData });
           }
         } catch (err) {
-          mergeError({ visible: true, message: err.message });
+          mergeError(err.message);
           reject(err);
         }
       } else {
@@ -845,7 +846,7 @@ export default function Exposure({ match }) {
           resolve(projectID);
         }
       } catch (err) {
-        mergeError({ visible: true, message: err.message });
+        mergeError(err.message);
         reject(err);
       }
     });

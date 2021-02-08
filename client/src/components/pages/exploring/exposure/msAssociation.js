@@ -37,7 +37,8 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
     dispatch(actions.mergeExploring({ exploring: state }));
   const mergeMsAssociation = (state) =>
     dispatch(actions.mergeExploring({ msAssociation: state }));
-  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
@@ -74,7 +75,7 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
           });
         }
       } catch (err) {
-        mergeError({ visible: true, message: err.message });
+        mergeError(err.message);
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);

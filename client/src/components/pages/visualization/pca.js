@@ -23,7 +23,8 @@ export default function PCA({ submitR, getRefSigOptions }) {
   const visualization = useSelector((state) => state.visualization);
   const mergePCA = (state) =>
     dispatch(actions.mergeVisualization({ pca: state }));
-  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const { matrixList, projectID, svgList } = visualization.results;
   const {
@@ -131,7 +132,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
         mergePCA({ [`${type}URL`]: objectURL });
       }
     } catch (err) {
-      mergeError({ visible: true, message: err.message });
+      mergeError(err.message);
     }
   }
 
@@ -160,7 +161,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
         }
       }
     } catch (err) {
-      mergeError({ visible: true, message: err.message });
+      mergeError(err.message);
     } finally {
       setOverlay('within', false);
     }
@@ -232,7 +233,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
         }
       }
     } catch (err) {
-      mergeError({ visible: true, message: err.message });
+      mergeError(err.message);
     } finally {
       setOverlay(type, false);
     }

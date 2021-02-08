@@ -27,7 +27,8 @@ export default function MsPrevalence({ calculatePrevalence }) {
     dispatch(actions.mergeExploring({ exploring: state }));
   const mergeMsPrevalence = (state) =>
     dispatch(actions.mergeExploring({ msPrevalence: state }));
-  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
@@ -49,7 +50,7 @@ export default function MsPrevalence({ calculatePrevalence }) {
           });
         }
       } catch (err) {
-        mergeError({ visible: true, message: err.message });
+        mergeError(err.message);
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);

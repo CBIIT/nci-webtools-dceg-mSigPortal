@@ -18,7 +18,8 @@ export default function Etiology() {
   const exploring = useSelector((state) => state.exploring);
   const mergeExploring = (state) =>
     dispatch(actions.mergeExploring({ exploring: state }));
-  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const { exposureAccordion, publicDataOptions } = exploring.exploring;
   useEffect(() => {

@@ -36,7 +36,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
   const visualization = useSelector((state) => state.visualization);
   const mergeProfileComparison = (state) =>
     dispatch(actions.mergeVisualization({ profileComparison: state }));
-  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const {
     source,
@@ -179,7 +180,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         });
       }
     } catch (err) {
-      mergeError({ visible: true, message: err.message });
+      mergeError(err.message);
     }
   }
 
@@ -209,7 +210,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
           mergeProfileComparison({ refSubmitOverlay: false });
         }
       } catch (err) {
-        mergeError({ visible: true, message: err.message });
+        mergeError(err.message);
         mergeProfileComparison({ refSubmitOverlay: false });
       }
     }
@@ -246,7 +247,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
           mergeProfileComparison({ refSubmitOverlay: false });
         }
       } catch (err) {
-        mergeError({ visible: true, message: err.message });
+        mergeError(err.message);
         mergeProfileComparison({ refSubmitOverlay: false });
       }
     }
@@ -280,7 +281,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         }
       }
     } catch (err) {
-      mergeError({ visible: true, message: err.message });
+      mergeError(err.message);
     } finally {
       setOverlay(type, false);
     }
@@ -327,7 +328,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         });
       }
     } catch (err) {
-      mergeError({ visible: true, message: err.message });
+      mergeError(err.message);
       mergeProfileComparison({
         pubErr: 'Error retrieving pub data samples',
       });

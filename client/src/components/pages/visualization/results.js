@@ -40,7 +40,8 @@ export default function Results({ setOpenSidebar }) {
     dispatch(actions.mergeVisualization({ profileComparison: state }));
   const mergePCA = (state) =>
     dispatch(actions.mergeVisualization({ pca: state }));
-  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const {
     error,

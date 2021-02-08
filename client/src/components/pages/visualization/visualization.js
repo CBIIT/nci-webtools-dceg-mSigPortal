@@ -36,7 +36,8 @@ export default function Visualize({ match }) {
     dispatch(actions.mergeVisualization({ pca: state }));
   const mergeKataegis = (state) =>
     dispatch(actions.mergeVisualization({ kataegis: state }));
-  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const { openSidebar, loading, source, submitted } = visualization.visualize;
   const { displayTab, svgList } = visualization.results;

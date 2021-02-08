@@ -31,7 +31,8 @@ export default function PublicForm() {
     dispatch(actions.mergeVisualization({ profileComparison: state }));
   const mergePCA = (state) =>
     dispatch(actions.mergeVisualization({ pca: state }));
-  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
   const resetVisualization = (_) => dispatch(actions.resetVisualization());
 
   const {
@@ -101,7 +102,7 @@ export default function PublicForm() {
         });
       }
     } catch (err) {
-      mergeError({ visible: true, message: err.message });
+      mergeError(err.message);
       mergeResults({
         error: 'Please Reset Your Parameters and Try again.',
       });
@@ -180,7 +181,7 @@ export default function PublicForm() {
         pubCancerTypeOptions: cancerTypeOptions,
       });
     } catch (err) {
-      mergeError({ visible: true, message: err.message });
+      mergeError(err.message);
     }
     mergeVisualize({ loadingPublic: false });
   }

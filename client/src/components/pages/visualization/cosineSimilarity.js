@@ -39,7 +39,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
     dispatch(actions.mergeVisualization({ pca: state }));
   const mergeKataegis = (state) =>
     dispatch(actions.mergeVisualization({ kataegis: state }));
-  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const {
     source,
@@ -136,7 +137,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
         });
       }
     } catch (err) {
-      mergeError({ visible: true, message: err.message });
+      mergeError(err.message);
     }
   }
 
@@ -165,7 +166,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
           mergeCosineSimilarity({ refSubmitOverlay: false });
         }
       } catch (err) {
-        mergeError({ visible: true, message: err.message });
+        mergeError(err.message);
         mergeCosineSimilarity({ refSubmitOverlay: false });
       }
     }
@@ -206,7 +207,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
         }
       }
     } catch (err) {
-      mergeError({ visible: true, message: err.message });
+      mergeError(err.message);
     } finally {
       setOverlay(type, false);
     }

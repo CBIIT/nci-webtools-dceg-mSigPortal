@@ -7,7 +7,8 @@ import { actions } from '../../../services/store/modal';
 export default function Download() {
   const dispatch = useDispatch();
   const visualization = useSelector((state) => state.visualization);
-  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const { projectID, downloads, statistics } = visualization.results;
   const [downloading, setDownload] = useState([]);

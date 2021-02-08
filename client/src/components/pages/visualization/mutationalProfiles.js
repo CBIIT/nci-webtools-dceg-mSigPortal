@@ -21,7 +21,8 @@ export default function MutationalProfiles() {
   const visualization = useSelector((state) => state.visualization);
   const mergeMutationalProfiles = (state) =>
     dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
-  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const { source } = visualization.visualize;
   const { projectID, svgList, displayTab } = visualization.results;
@@ -86,7 +87,7 @@ export default function MutationalProfiles() {
 
         if (!response.ok) {
           const msg = await response.text();
-          mergeError({ visible: true, message: msg });
+          mergeError(msg);
         } else {
           const pic = await response.blob();
           const objectURL = URL.createObjectURL(pic);
@@ -98,7 +99,7 @@ export default function MutationalProfiles() {
           });
         }
       } catch (err) {
-        mergeError({ visible: true, message: err.message });
+        mergeError(err.message);
       }
     }
   }

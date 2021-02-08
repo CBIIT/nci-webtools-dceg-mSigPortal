@@ -16,7 +16,8 @@ export default function MutationalPattern({ submitR }) {
   const visualization = useSelector((state) => state.visualization);
   const mergeMutationalPattern = (state) =>
     dispatch(actions.mergeVisualization({ mutationalPattern: state }));
-  const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
   const {
     source,
     study,
@@ -101,7 +102,7 @@ export default function MutationalPattern({ submitR }) {
           }
         }
       } catch (err) {
-        mergeError({ visible: true, message: err.message });
+        mergeError(err.message);
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
@@ -153,7 +154,7 @@ export default function MutationalPattern({ submitR }) {
         }
       }
     } catch (err) {
-      mergeError({ visible: true, message: err.message });
+      mergeError(err.message);
       mergeMutationalPattern({ loading: false });
     }
   }
