@@ -12,6 +12,7 @@ import MSIndividual from './msIndividual';
 import {
   actions as exploringActions,
   getInitialState,
+  exposureUserUpload,
 } from '../../../../services/store/exploring';
 import { actions as modalActions } from '../../../../services/store/modal';
 import { unique2d } from '../../../../services/utils';
@@ -32,7 +33,8 @@ export default function Exposure({ match }) {
   const dispatch = useDispatch();
   const exploring = useSelector((state) => state.exploring);
 
-  const mergeState = (state) => dispatch(actions.mergeExploring({ state }));
+  const mergeState = async (state) =>
+    await dispatch(actions.mergeExploring({ ...state }));
   const mergeExploring = (state) =>
     dispatch(actions.mergeExploring({ exploring: state }));
   const mergeExposure = (state) =>
@@ -500,8 +502,7 @@ export default function Exposure({ match }) {
           exposureData.columns,
           exposureData.data
         );
-
-        mergeState({
+        const params = {
           exposure: {
             projectID: projectID,
             userNameOptions: nameOptions,
@@ -513,14 +514,15 @@ export default function Exposure({ match }) {
             signatureName2: nameOptions[1],
           },
           msBurden: { signatureName: nameOptions[0] },
-        });
+        };
+        mergeState(params);
 
-        handleCalculate('all', projectID);
+        await handleCalculate('all', projectID, params);
       } else if (variableFileObj.size) {
         const id = await uploadVariable();
-        handleCalculate('all', id);
+        await handleCalculate('all', id);
       } else {
-        handleCalculate('all');
+        await handleCalculate('all');
       }
     } catch (err) {
       mergeError(err.message);
@@ -529,7 +531,7 @@ export default function Exposure({ match }) {
     }
   }
 
-  async function handleCalculate(fn = 'all', id = projectID) {
+  async function handleCalculate(fn = 'all', id = projectID, params = {}) {
     let rFn = 'exposurePublic';
     let args = {
       fn: fn,
@@ -544,6 +546,7 @@ export default function Exposure({ match }) {
     if (!loadingMsBurden && (fn == 'all' || fn == 'burden')) {
       args.burden = JSON.stringify({
         signatureName: burdenArgs.signatureName,
+        ...params.msBurden,
       });
     }
     if (!loadingMsAssociation && (fn == 'all' || fn == 'association')) {
@@ -552,6 +555,7 @@ export default function Exposure({ match }) {
         both: associationArgs.both,
         signatureName1: associationArgs.signatureName1,
         signatureName2: associationArgs.signatureName2,
+        ...params.msAssociation,
       });
     }
     if (!loadingMsLandscape && (fn == 'all' || fn == 'landscape')) {
@@ -567,6 +571,7 @@ export default function Exposure({ match }) {
     if (!loadingMsIndividual && (fn == 'all' || fn == 'individual')) {
       args.individual = JSON.stringify({
         sample: individualArgs.sample,
+        ...params.msIndividual,
       });
     }
     if (source == 'user') {
