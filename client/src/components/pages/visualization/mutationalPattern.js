@@ -174,7 +174,7 @@ export default function MutationalPattern({ submitR }) {
             <hr />
             <Plot
               className="p-3"
-              plotName={barPath.split('/').slice(-1)[0]}
+              downloadName={barPath.split('/').slice(-1)[0]}
               plotURL={barURL}
             />
           </>
@@ -195,7 +195,7 @@ export default function MutationalPattern({ submitR }) {
             <hr />
             <Plot
               className="p-3"
-              plotName={plotPath.split('/').slice(-1)[0]}
+              downloadName={plotPath.split('/').slice(-1)[0]}
               plotURL={plotURL}
               txtPath={projectID + txtPath}
             />

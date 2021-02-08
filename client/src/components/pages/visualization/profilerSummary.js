@@ -132,7 +132,7 @@ export default function ProfilerSummary({ submitR }) {
       <LoadingOverlay active={loading} />
       <Plot
         className="bg-white p-3 border border-rounded"
-        plotName={plotPath.split('/').slice(-1)[0]}
+        downloadNam={plotPath.split('/').slice(-1)[0]}
         plotURL={plotURL}
         maxHeight="600px"
       />

@@ -127,7 +127,8 @@ export default function MSIndividual({ calculateIndividual }) {
             <hr />
             <Plot
               className="p-3"
-              plotName="Mutational Signature in Individual Sample"
+              title="Mutational Signature in Individual Sample"
+              downloadName={plotPath.split('/').slice(-1)[0]}
               plotURL={plotURL}
             />
           </>

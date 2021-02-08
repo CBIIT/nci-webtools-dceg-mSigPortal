@@ -155,7 +155,8 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
             <hr />
             <Plot
               className="p-3"
-              plotName="Mutational Signature Association"
+              title="Mutational Signature Association"
+              downloadName={plotPath.split('/').slice(-1)[0]}
               plotURL={plotURL}
             />
           </>

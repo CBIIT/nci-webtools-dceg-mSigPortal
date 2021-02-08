@@ -71,7 +71,8 @@ export default function TmbSignatures() {
         <>
           <Plot
             className="p-3"
-            plotName="Tumor Mutational Burden Separated by Signatures"
+            title="Tumor Mutational Burden Separated by Signatures"
+            downloadName={plotPath.split('/').slice(-1)[0]}
             plotURL={plotURL}
           />
         </>

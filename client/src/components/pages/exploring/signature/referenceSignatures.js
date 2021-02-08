@@ -84,7 +84,7 @@ export default function ReferenceSignatures({ submitR }) {
       <div style={{ display: plotURL ? 'block' : 'none' }}>
         <Plot
           className="p-3"
-          plotName={plotURL.split('/').slice(-1)[0]}
+          downloadName={plotURL.split('/').slice(-1)[0]}
           plotURL={plotURL}
           maxHeight="600px"
         />

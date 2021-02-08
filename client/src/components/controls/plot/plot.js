@@ -9,7 +9,8 @@ import { actions } from '../../../services/store/modal';
 import './plot.scss';
 
 export default function Plot({
-  plotName,
+  title,
+  downloadName,
   plotURL,
   txtPath,
   alt,
@@ -64,14 +65,14 @@ export default function Plot({
               <Row className="tools">
                 <Col />
                 <Col className="d-flex text-nowrap">
-                  {plotName && <strong className="mx-auto">{plotName}</strong>}
+                  {title && <strong className="mx-auto">{title}</strong>}
                 </Col>
                 <Col className="d-flex text-nowrap">
                   <div className="d-flex align-items-end ml-auto mb-auto">
                     <a
                       className="ml-auto"
                       href={plotURL}
-                      download={plotName.trim()}
+                      download={downloadName}
                     >
                       Download Plot
                     </a>
@@ -126,7 +127,7 @@ export default function Plot({
                   className="w-100"
                   src={plotURL}
                   style={{ maxHeight: maxHeight || '500px' }}
-                  alt={alt || plotName}
+                  alt={alt || downloadName}
                 />
               </TransformComponent>
             </React.Fragment>

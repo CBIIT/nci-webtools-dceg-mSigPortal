@@ -118,7 +118,8 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
           <hr />
           <Plot
             className="p-3"
-            plotName="Landscape of Mutational Signature Activity"
+            title="Landscape of Mutational Signature Activity"
+            downloadName={plotPath.split('/').slice(-1)[0]}
             plotURL={plotURL}
             txtPath={projectID + txtPath}
           />

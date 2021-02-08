@@ -111,7 +111,8 @@ export default function MsPrevalence({ calculatePrevalence }) {
           <hr />
           <Plot
             className="p-3"
-            plotName="Prevalence of Mutational Signature"
+            title="Prevalence of Mutational Signature"
+            downloadName={plotPath.split('/').slice(-1)[0]}
             plotURL={plotURL}
           />
         </div>

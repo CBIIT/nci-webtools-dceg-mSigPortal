@@ -78,7 +78,8 @@ export default function MsDecomposition() {
         <>
           <Plot
             className="p-3"
-            plotName="Evaluating the Performance of Mutational Signature Decomposition"
+            title="Evaluating the Performance of Mutational Signature Decomposition"
+            downloadName={plotPath.split('/').slice(-1)[0]}
             plotURL={plotURL}
             txtPath={projectID + txtPath}
           />

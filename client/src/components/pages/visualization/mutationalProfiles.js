@@ -56,7 +56,7 @@ export default function MutationalProfiles() {
     }
   }, [selectName, selectProfile, selectMatrix, selectFilter]);
 
-  function getPlotName() {
+  function getdownloadName() {
     if (filtered.length) {
       const plot = filtered[0];
       if (source == 'user')
@@ -288,7 +288,7 @@ export default function MutationalProfiles() {
       </Form>
 
       <hr />
-      <Plot className="p-3" plotName={getPlotName()} plotURL={plotURL} />
+      <Plot className="p-3" downloadName={getdownloadName()} plotURL={plotURL} />
       {/* <Button
         variant="link"
         className="p-0 mt-5"

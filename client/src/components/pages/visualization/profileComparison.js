@@ -488,7 +488,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 <hr />
                 <Plot
                   className="p-3"
-                  plotName={withinPlotPath.split('/').slice(-1)[0]}
+                  downloadName={withinPlotPath.split('/').slice(-1)[0]}
                   plotURL={withinPlotURL}
                 />
               </>
@@ -636,7 +636,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 <hr />
                 <Plot
                   className="p-3"
-                  plotName={refPlotPath.split('/').slice(-1)[0]}
+                  downloadName={refPlotPath.split('/').slice(-1)[0]}
                   plotURL={refPlotURL}
                 />
               </>
@@ -762,7 +762,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 <hr />
                 <Plot
                   className="p-3"
-                  plotName={pubPlotPath.split('/').slice(-1)[0]}
+                  downloadName={pubPlotPath.split('/').slice(-1)[0]}
                   plotURL={pubPlotURL}
                 />
               </>

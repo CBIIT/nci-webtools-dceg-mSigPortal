@@ -119,7 +119,8 @@ export default function MsBurden({ calculateBurden }) {
             <hr />
             <Plot
               className="p-3"
-              plotName="Mutational Signature Burden Across Cancer Types"
+              title="Mutational Signature Burden Across Cancer Types"
+              downloadName={plotPath.split('/').slice(-1)[0]}
               plotURL={plotURL}
             />
           </>

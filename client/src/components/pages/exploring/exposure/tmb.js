@@ -70,7 +70,8 @@ export default function TMB() {
         <>
           <Plot
             className="p-3"
-            plotName="Tumor Mutational Burden"
+            title="Tumor Mutational Burden"
+            downloadName={plotPath.split('/').slice(-1)[0]}
             plotURL={plotURL}
           />
         </>

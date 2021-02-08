@@ -231,7 +231,7 @@ export default function Kataegis({ submitR }) {
               <hr />
               <Plot
                 className="p-3"
-                plotName={plotPath.split('/').slice(-1)[0]}
+                downloadName={plotPath.split('/').slice(-1)[0]}
                 plotURL={plotURL}
                 txtPath={txtPath ? projectID + txtPath : null}
               />

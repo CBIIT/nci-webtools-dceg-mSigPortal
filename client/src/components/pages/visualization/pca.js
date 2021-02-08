@@ -370,7 +370,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
               <hr />
               <Plot
                 className="p-3"
-                plotName={pca1.split('/').slice(-1)[0]}
+                downloadName={pca1.split('/').slice(-1)[0]}
                 plotURL={pca1URL}
               />
             </div>
@@ -381,7 +381,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
               <hr />
               <Plot
                 className="p-3"
-                plotName={pca2.split('/').slice(-1)[0]}
+                downloadName={pca2.split('/').slice(-1)[0]}
                 plotURL={pca2URL}
                 txtPath={projectID + pca2Data}
               />
@@ -393,7 +393,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
               <hr />
               <Plot
                 className="p-3"
-                plotName={pca3.split('/').slice(-1)[0]}
+                downloadName={pca3.split('/').slice(-1)[0]}
                 plotURL={pca3URL}
                 txtPath={projectID + pca3Data}
               />
@@ -405,7 +405,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
               <hr />
               <Plot
                 className="p-3"
-                plotName={heatmap.split('/').slice(-1)[0]}
+                downloadName={heatmap.split('/').slice(-1)[0]}
                 plotURL={heatmapURL}
                 txtPath={projectID + heatmapData}
               />
@@ -502,7 +502,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
               <hr />
               <Plot
                 className="p-3"
-                plotName={pubPca1.split('/').slice(-1)[0]}
+                downloadName={pubPca1.split('/').slice(-1)[0]}
                 plotURL={pubPca1URL}
               />
             </div>
@@ -513,7 +513,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
               <hr />
               <Plot
                 className="p-3"
-                plotName={pubPca2.split('/').slice(-1)[0]}
+                downloadName={pubPca2.split('/').slice(-1)[0]}
                 plotURL={pubPca2URL}
                 txtPath={projectID + pubPca2Data}
               />
@@ -525,7 +525,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
               <hr />
               <Plot
                 className="p-3"
-                plotName={pubPca3.split('/').slice(-1)[0]}
+                downloadName={pubPca3.split('/').slice(-1)[0]}
                 plotURL={pubPca3URL}
                 txtPath={projectID + pubPca3Data}
               />
