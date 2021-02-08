@@ -64,20 +64,19 @@ div[disabled] {
 .active-secondary-navlinks:after {
   content: '';
   display: block;
-  padding-top: 4px;
+  padding-top: 2px;
   width: 100%;
-  margin: 0 auto;
-  border-bottom: 4px solid #fc8701 !important;
+  border-bottom: 3px solid #fc8701 !important;
   margin-bottom: -5px;
 }
 
-.active-secondary-navlinks:after {
+.nav-link.active > strong {
   content: '';
   display: block;
   padding-top: 2px;
   width: 100%;
   border-bottom: 2px solid #fc8701 !important;
-  margin-bottom: -5px;
+  margin-bottom: -4px;
 }
 
 // kataegis table
