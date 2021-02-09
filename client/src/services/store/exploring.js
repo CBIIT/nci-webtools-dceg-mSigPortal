@@ -102,12 +102,14 @@ export const getInitialState = () => ({
     plotURL: '',
     debugR: '',
     err: '',
+    loading: false,
   },
   tmbSignatures: {
     plotPath: '',
     plotURL: '',
     debugR: '',
     err: '',
+    loading: false,
   },
   msBurden: {
     signatureName: '',

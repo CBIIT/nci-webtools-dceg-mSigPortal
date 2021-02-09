@@ -103,10 +103,10 @@ export default function MSIndividual({ calculateIndividual }) {
             </Group>
           </Col>
           <Col />
-          <Col lg="2" className="d-flex justify-content-end">
+          <Col lg="2" className="d-flex">
             <Button
-              disabled={!sample}
-              className="mt-auto mb-3"
+              className="ml-auto mb-auto"
+              disabled={!sample || (source == 'user' && !projectID)}
               variant="primary"
               onClick={calculateIndividual}
             >

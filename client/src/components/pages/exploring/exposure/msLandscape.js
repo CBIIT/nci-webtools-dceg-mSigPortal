@@ -23,7 +23,7 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
     err,
     loading,
   } = exploring.msLandscape;
-  const { projectID } = exploring.exposure;
+  const { projectID, source } = exploring.exposure;
   const mergeExploring = (state) =>
     dispatch(actions.mergeExploring({ exploring: state }));
   const mergeMsLandscape = (state) =>
@@ -95,10 +95,11 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
               Remove
             </Button>
           </Col>
-          <Col lg="5" />
-          <Col lg="2" className="d-flex justify-content-end">
+          <Col />
+          <Col lg="2" className="d-flex">
             <Button
-              className="mt-auto mb-3"
+              disabled={source == 'user' && !projectID}
+              className="ml-auto mb-auto"
               variant="primary"
               onClick={calculateLandscape}
             >

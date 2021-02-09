@@ -475,7 +475,7 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
 
 
     # Tumor Overall Mutational Burden
-    if ('all' %in% fn) {
+    if ('all' %in% fn || 'tmb' %in% fn) {
       fnTime = proc.time()
       tryCatch({
         print('Tumor Mutational Burden')
@@ -489,7 +489,7 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
     }
 
     # Tumor Mutational Burden separated by signatures
-    if ('all' %in% fn) {
+    if ('all' %in% fn || 'tmbSig' %in% fn) {
       fnTime = proc.time()
       tryCatch({
         print('Tumor Mutational Burden Separated by Signatures')
@@ -531,7 +531,7 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
     }
 
     # Evaluating the Performance of Mutational Signature Decomposition --------
-    if ('all' %in% fn) {
+    if ('all' %in% fn || 'decomposition' %in% fn) {
       fnTime = proc.time()
       tryCatch({
         print('Evaluating the Performance of Mutational Signature Decomposition')
@@ -661,7 +661,7 @@ exposureUser <- function(fn, files, common, burden = '{}', association = '{}', l
 
 
     ## Tumor Overall Mutational Burden
-    if ('all' %in% fn) {
+    if ('all' %in% fn || 'tmb' %in% fn) {
       fnTime = proc.time()
       tryCatch({
         print('Tumor Mutational Burden')
@@ -675,7 +675,7 @@ exposureUser <- function(fn, files, common, burden = '{}', association = '{}', l
     }
 
     # Tumor Mutational Burden separated by signatures
-    if ('all' %in% fn || 'signatures' %in% fn) {
+    if ('all' %in% fn || 'tmbSig' %in% fn) {
       fnTime = proc.time()
       tryCatch({
         print('Tumor Mutational Burden Separated by Signatures')
@@ -714,7 +714,7 @@ exposureUser <- function(fn, files, common, burden = '{}', association = '{}', l
       print(paste0("Mutational Signature Association Runtime: ", (proc.time() - fnTime)[['elapsed']]))
     }
     # Evaluating the Performance of Mutational Signature Decomposition --------
-    if ('all' %in% fn) {
+    if ('all' %in% fn || 'decomposition' %in% fn) {
       fnTime = proc.time()
       tryCatch({
         print('Evaluating the Performance of Mutational Signature Decomposition')

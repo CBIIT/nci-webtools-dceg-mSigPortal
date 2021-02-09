@@ -288,7 +288,11 @@ export default function MutationalProfiles() {
       </Form>
 
       <hr />
-      <Plot className="p-3" downloadName={getdownloadName()} plotURL={plotURL} />
+      <Plot
+        className="p-3"
+        downloadName={getdownloadName()}
+        plotURL={plotURL}
+      />
       {/* <Button
         variant="link"
         className="p-0 mt-5"

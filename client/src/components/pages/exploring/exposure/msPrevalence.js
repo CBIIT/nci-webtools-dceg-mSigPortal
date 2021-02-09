@@ -22,7 +22,7 @@ export default function MsPrevalence({ calculatePrevalence }) {
     err,
     loading,
   } = exploring.msPrevalence;
-  const { projectID } = exploring.exposure;
+  const { projectID, source } = exploring.exposure;
   const mergeExploring = (state) =>
     dispatch(actions.mergeExploring({ exploring: state }));
   const mergeMsPrevalence = (state) =>
@@ -88,13 +88,15 @@ export default function MsPrevalence({ calculatePrevalence }) {
               </Form.Control.Feedback>
             </Group>
           </Col>
-          <Col lg="5" />
-          <Col lg="2" className="d-flex justify-content-end">
+          <Col />
+          <Col lg="2" className="d-flex">
             <Button
-              className="mt-auto mb-3"
+              className="ml-auto mb-auto"
               variant="primary"
               onClick={calculatePrevalence}
-              disabled={!mutation || isNaN(mutation)}
+              disabled={
+                !mutation || isNaN(mutation) || (source == 'user' && !projectID)
+              }
             >
               Calculate
             </Button>

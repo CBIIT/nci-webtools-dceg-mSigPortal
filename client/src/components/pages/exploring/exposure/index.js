@@ -307,6 +307,64 @@ export default function Exposure({ match }) {
     }
   }
 
+  async function calculateTMB() {
+    try {
+      if (source == 'user' && !projectID) {
+        mergeError('Missing Required Files');
+      } else {
+        mergeTMB({
+          loading: true,
+          err: false,
+          plotPath: '',
+        });
+
+        if (source == 'user') {
+          if (!projectID) {
+            const id = handleUpload();
+            await handleCalculate('tmb', id);
+          } else {
+            await handleCalculate('tmb');
+          }
+        } else {
+          await handleCalculate('tmb');
+        }
+
+        mergeTMB({ loading: false });
+      }
+    } catch (error) {
+      mergeError(error.message);
+    }
+  }
+
+  async function calculateTmbSig() {
+    try {
+      if (source == 'user' && !projectID) {
+        mergeError('Missing Required Files');
+      } else {
+        mergeTmbSignatures({
+          loading: true,
+          err: false,
+          plotPath: '',
+        });
+
+        if (source == 'user') {
+          if (!projectID) {
+            const id = handleUpload();
+            await handleCalculate('tmbSig', id);
+          } else {
+            await handleCalculate('tmbSig');
+          }
+        } else {
+          await handleCalculate('tmbSig');
+        }
+
+        mergeTmbSignatures({ loading: false });
+      }
+    } catch (error) {
+      mergeError(error.message);
+    }
+  }
+
   async function calculateBurden() {
     try {
       if (source == 'user' && !projectID) {
@@ -330,6 +388,35 @@ export default function Exposure({ match }) {
         }
 
         mergeMsBurden({ loading: false });
+      }
+    } catch (error) {
+      mergeError(error.message);
+    }
+  }
+
+  async function calculateDecomposition() {
+    try {
+      if (source == 'user' && !projectID) {
+        mergeError('Missing Required Files');
+      } else {
+        mergeMsDecomposition({
+          loading: true,
+          err: false,
+          plotPath: '',
+        });
+
+        if (source == 'user') {
+          if (!projectID) {
+            const id = handleUpload();
+            await handleCalculate('decomposition', id);
+          } else {
+            await handleCalculate('decomposition');
+          }
+        } else {
+          await handleCalculate('decomposition');
+        }
+
+        mergeMsDecomposition({ loading: false });
       }
     } catch (error) {
       mergeError(error.message);
@@ -592,19 +679,23 @@ export default function Exposure({ match }) {
       if (output) {
         if (!projectID) mergeExposure({ projectID: pID });
 
-        if (fn == 'all') {
+        if (fn == 'all' || fn == 'tmb') {
           mergeTMB({
             plotPath: output.tmbPath,
             err: errors.tmbError,
             debugR: debugR,
           });
+        }
 
+        if (fn == 'all' || fn == 'tmbSig') {
           mergeTmbSignatures({
             plotPath: output.signaturePath,
             err: errors.signaturesError,
             debugR: debugR,
           });
+        }
 
+        if (fn == 'all' || fn == 'decomposition') {
           mergeMsDecomposition({
             plotPath: output.decompositionPath,
             txtPath: output.decompositionData,
@@ -864,13 +955,13 @@ export default function Exposure({ match }) {
 
   const tabs = [
     {
-      component: <TMB />,
+      component: <TMB calculateTMB={calculateTMB} />,
       key: 'tmb',
       name: 'TMB',
       title: 'Tumor Mutational Burden',
     },
     {
-      component: <TmbSig />,
+      component: <TmbSig calculateTmbSig={calculateTmbSig} />,
       key: 'tmbSig',
       name: 'TMB Signatures',
       title: 'Tumor Mutational Burden Separated by Signatures',
@@ -882,7 +973,9 @@ export default function Exposure({ match }) {
       title: 'Mutational Signature Burden Across Cancer Types',
     },
     {
-      component: <MsDecomposition />,
+      component: (
+        <MsDecomposition calculateDecomposition={calculateDecomposition} />
+      ),
       key: 'msDecomposition',
       name: 'MS Decomposition',
       title: 'Evaluating the Performance of Mutational Signature Decomposition',
@@ -1303,7 +1396,12 @@ export default function Exposure({ match }) {
               style={{ overflowX: 'auto' }}
             >
               {tabs.map(({ key, component }) => (
-                <Pane key={key} eventKey={key} className="border-0" style={{minHeight: '7rem'}}>
+                <Pane
+                  key={key}
+                  eventKey={key}
+                  className="border-0"
+                  style={{ minHeight: '7rem' }}
+                >
                   <LoadingOverlay
                     active={loading}
                     content={loadingMsg}

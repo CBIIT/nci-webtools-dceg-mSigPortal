@@ -84,6 +84,7 @@ export default function MsBurden({ calculateBurden }) {
         <Row className="">
           <Col lg="3">
             <Select
+              className="mb-2"
               disabled={source == 'user' && !userNameOptions.length}
               id="acrossSignatureName"
               label="Signature Name"
@@ -94,11 +95,11 @@ export default function MsBurden({ calculateBurden }) {
               onChange={(name) => mergeMsBurden({ signatureName: name })}
             />
           </Col>
-          <Col lg="7" />
-          <Col lg="2" className="d-flex justify-content-end">
+          <Col />
+          <Col lg="2" className="d-flex">
             <Button
-              disabled={!signatureName}
-              className="mt-auto mb-3"
+              disabled={!signatureName || (source == 'user' && !projectID)}
+              className="ml-auto mb-auto"
               variant="primary"
               onClick={calculateBurden}
             >

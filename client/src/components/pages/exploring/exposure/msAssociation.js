@@ -131,10 +131,14 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
             />
           </Col>
           <Col />
-          <Col lg="2" className="d-flex justify-content-end">
+          <Col lg="2" className="d-flex">
             <Button
-              disabled={!signatureName1 || !signatureName2}
-              className="mt-auto mb-3"
+              className="ml-auto mb-auto"
+              disabled={
+                !signatureName1 ||
+                !signatureName2 ||
+                (source == 'user' && !projectID)
+              }
               variant="primary"
               onClick={calculateAssociation}
             >
