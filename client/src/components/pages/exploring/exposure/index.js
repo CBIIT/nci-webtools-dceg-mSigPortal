@@ -1019,16 +1019,19 @@ export default function Exposure({ match }) {
 
   const examples = [
     {
+      name: 'SBS5 vs SBS40',
       title:
         'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Lung-AdenoCA; MSA SBS5 vs SBS40',
       path: 'exposure1',
     },
     {
+      name: 'SBS7a vs SBS7b',
       title:
         'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Skin-Melanoma; MSA SBS7a vs SBS7b',
       path: 'exposure2',
     },
     {
+      name: 'SBS3 vs SBS5',
       title:
         'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Breast-AdenoCA; MSA SBS3 vs SBS5',
       path: 'exposure3',
@@ -1043,6 +1046,17 @@ export default function Exposure({ match }) {
       >
         <SidebarPanel>
           <div className="p-3 bg-white border rounded">
+            <strong>Example Queries</strong>
+            <div className="d-flex justify-content-between">
+              {examples.map(({ name, title, path }, index) => (
+                <span key={index} className="mb-2">
+                  <a href={`#/exploring/exposure/${path}`} title={title}>
+                    {name}
+                  </a>
+                </span>
+              ))}
+            </div>
+            <hr />
             <Row>
               <Col lg="auto">
                 <Group>
@@ -1182,21 +1196,6 @@ export default function Exposure({ match }) {
                     </Button>
                   </Col>
                 </Row>
-                <hr />
-                <strong>Example Queries</strong>
-                {examples.map(({ title, external, path }, index) => (
-                  <div key={index} className="mb-2">
-                    <a href={`#/exploring/exposure/${path}`}>{title}</a>
-                    {external && (
-                      <span>
-                        {'; '}
-                        <a href={external.href} target="_blank">
-                          {external.name}
-                        </a>
-                      </span>
-                    )}
-                  </div>
-                ))}
               </div>
             ) : (
               <div>
