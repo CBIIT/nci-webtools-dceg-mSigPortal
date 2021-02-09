@@ -19,6 +19,7 @@ export default function ProfilerSummary({ submitR }) {
     study,
     cancerType,
     pubExperimentalStrategy,
+    loading: mainLoading,
   } = visualization.visualize;
   const { matrixList, projectID } = visualization.results;
   const { filtered } = visualization.mutationalProfiles;
@@ -58,10 +59,10 @@ export default function ProfilerSummary({ submitR }) {
       }
     };
 
-    if (filtered.length) {
+    if (filtered.length && !mainLoading.active) {
       checkSummary();
     }
-  }, [filtered]);
+  }, [filtered, mainLoading]);
 
   async function setRPlot(plotPath) {
     if (plotPath) {
