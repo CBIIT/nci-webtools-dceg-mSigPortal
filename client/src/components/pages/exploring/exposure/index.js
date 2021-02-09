@@ -1085,7 +1085,7 @@ export default function Exposure({ match }) {
                       variant="primary"
                       onClick={() => calculateAll()}
                     >
-                      Calculate
+                      Calculate All
                     </Button>
                   </Col>
                 </Row>
@@ -1268,7 +1268,7 @@ export default function Exposure({ match }) {
                       variant="primary"
                       onClick={() => calculateAll()}
                     >
-                      Calculate
+                      Calculate All
                     </Button>
                   </Col>
                 </Row>
