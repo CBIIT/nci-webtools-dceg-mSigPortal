@@ -722,7 +722,7 @@ export default function UserForm() {
             disabled={loading.active}
             className="w-100"
             variant="secondary"
-            onClick={(e) => handleReset()}
+            onClick={() => handleReset()}
           >
             Reset
           </Button>

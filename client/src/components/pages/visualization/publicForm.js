@@ -120,6 +120,7 @@ export default function PublicForm() {
       pubExperimentOptions: pubExperimentOptions,
       pubExperimentalStrategy: pubExperimentOptions[0],
     };
+    window.location.hash = '#/visualization';
     resetVisualization();
     mergeVisualize(params);
   }
@@ -272,7 +273,7 @@ export default function PublicForm() {
             disabled={loading.active || loadingPublic}
             className="w-100"
             variant="secondary"
-            onClick={(e) => handleReset()}
+            onClick={() => handleReset()}
           >
             Reset
           </Button>
