@@ -1,5 +1,7 @@
 import React from 'react';
 import { Row, Col, Button, Form } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
@@ -367,7 +369,7 @@ export default function MutationalSignatureProfile({ submitR }) {
     mergeSigMutationalProfiles({ plots: newPlots });
   }
 
-  const additionalControls = () => {
+  const AdditionalControls = () => {
     let controls = [];
     for (let index in plots) {
       controls.push(
@@ -423,17 +425,15 @@ export default function MutationalSignatureProfile({ submitR }) {
               }}
             />
           </Col>
-          <Col lg="1" className="d-flex justify-content-end">
-            {/* <span className="mx-auto mt-auto mb-3">
-              Plot {parseInt(index) + 1}
-            </span> */}
+          <Col lg="1" className="d-flex">
             <Button
-              className="mt-auto mb-3 text-nowrap"
-              variant="danger"
+              className="my-auto text-danger"
+              variant="link"
               onClick={() => removePlots(index)}
-              title="Remove Plot"
+              title={'Remove Plot ' + (parseInt(index) + 1)}
+              style={{ width: '2.25rem' }}
             >
-              Remove ({parseInt(index) + 1})
+              <FontAwesomeIcon icon={faMinus} />
             </Button>
           </Col>
         </Row>
@@ -458,6 +458,7 @@ export default function MutationalSignatureProfile({ submitR }) {
               </span>
               <Plot
                 className="p-3"
+                title={plots[index].plotPath.split('/').slice(-1)[0]}
                 downloadName={plots[index].plotPath.split('/').slice(-1)[0]}
                 plotURL={plots[index].plotURL}
                 maxHeight="1000px"
@@ -474,7 +475,7 @@ export default function MutationalSignatureProfile({ submitR }) {
     <div>
       <Form className="p-3">
         <LoadingOverlay active={loading} />
-        <Row className="">
+        <Row>
           <Col lg="2">
             <Select
               id="mspSource"
@@ -526,27 +527,31 @@ export default function MutationalSignatureProfile({ submitR }) {
               }}
             />
           </Col>
-          <Col lg="1" className="d-flex justify-content-end">
+          <Col />
+        </Row>
+        <AdditionalControls />
+        <Row className="mt-3">
+          <Col />
+          <Col lg="1" className="d-flex">
             <Button
-              className="mt-auto mb-3"
+              className="my-auto"
+              variant="link"
+              onClick={() => addPlots()}
+              title="Add Plot"
+              style={{ width: '2.25rem', textDecoration: 'none' }}
+            >
+              <span className="text-nowrap" title="Add Plot">
+                <FontAwesomeIcon icon={faPlus} /> Add Plot
+              </span>
+            </Button>
+          </Col>
+          <Col lg="1" className="d-flex">
+            <Button
+              className="my-auto"
               variant="primary"
               onClick={handleCalculate}
             >
               Calculate
-            </Button>
-          </Col>
-        </Row>
-        {additionalControls()}
-        <Row className="mt-3">
-          <Col lg="11" />
-          <Col lg="1" className="d-flex justify-content-end mt-auto">
-            <Button
-              variant="secondary"
-              onClick={() => addPlots()}
-              title="Add Plot"
-              style={{ width: '2.25rem' }}
-            >
-              +
             </Button>
           </Col>
         </Row>
@@ -560,6 +565,7 @@ export default function MutationalSignatureProfile({ submitR }) {
           <hr />
           <Plot
             className="p-3"
+            title={plots[0].plotPath.split('/').slice(-1)[0]}
             downloadName={plots[0].plotPath.split('/').slice(-1)[0]}
             plotURL={plots[0].plotURL}
             maxHeight="1000px"
