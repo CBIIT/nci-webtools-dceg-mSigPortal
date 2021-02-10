@@ -570,8 +570,11 @@ export default function Exposure({ match }) {
         plotPath: '',
         err: '',
       });
-
       mergeMsPrevalence({
+        plotPath: '',
+        err: '',
+      });
+      mergeMsIndividual({
         plotPath: '',
         err: '',
       });
