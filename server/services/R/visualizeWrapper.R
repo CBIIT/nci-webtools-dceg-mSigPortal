@@ -1,5 +1,4 @@
 library(tidyverse)
-library(hrbrthemes)
 library(cowplot)
 library(ggsci)
 library(ggrepel)
