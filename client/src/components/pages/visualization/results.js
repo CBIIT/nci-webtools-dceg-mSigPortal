@@ -33,7 +33,7 @@ export default function Results({ setOpenSidebar }) {
   const mergeMutationalProfiles = (state) =>
     dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
   const mergeKataegis = (state) =>
-    dispatch(actions.mergeVisualization({ Kataegis: state }));
+    dispatch(actions.mergeVisualization({ kataegis: state }));
   const mergeCosineSimilarity = (state) =>
     dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
   const mergeProfileComparison = (state) =>
