@@ -8,7 +8,7 @@ import { actions } from '../../../services/store/modal';
 export function SuccessModal(props) {
   const dispatch = useDispatch();
   const mergeSuccess = (state) =>
-    dispatch(actions.mergeModal({ error: state }));
+    dispatch(actions.mergeModal({ success: state }));
 
   const success = useSelector((state) => state.modal['success']);
 
