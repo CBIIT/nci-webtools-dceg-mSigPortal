@@ -505,7 +505,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 <Select
                   id="csPubStudy"
                   label="Study"
-                  value={pubStudy}
+                  value={pubStudy || visualization.study}
                   options={studyOptions}
                   onChange={handleStudyChange}
                 />
@@ -514,7 +514,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 <Select
                   id="csPubCancerType"
                   label="Cancer Type"
-                  value={pubCancerType}
+                  value={pubCancerType || visualization.cancerType}
                   options={pubCancerTypeOptions}
                   onChange={handleCancerChange}
                 />
