@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
@@ -36,6 +36,9 @@ export default function Kataegis({ submitR }) {
     debugR,
     loading,
   } = visualization.kataegis;
+
+  const [invalidMin, setMin] = useState(false);
+  const [invalidMax, setMax] = useState(false);
 
   useEffect(() => {
     if (plotPath) setRPlot(plotPath);
@@ -164,10 +167,10 @@ export default function Kataegis({ submitR }) {
                         min: e.target.value,
                       });
                     }}
-                    isInvalid={!min || isNaN(min)}
+                    isInvalid={invalidMin}
                   />
                   <Form.Control.Feedback type="invalid">
-                    Enter a minimum value
+                    Enter a numeric minimum value
                   </Form.Control.Feedback>
                 </Group>
               </Col>
@@ -182,10 +185,10 @@ export default function Kataegis({ submitR }) {
                         max: e.target.value,
                       });
                     }}
-                    isInvalid={!max || isNaN(max)}
+                    isInvalid={invalidMax}
                   />
                   <Form.Control.Feedback type="invalid">
-                    Enter a maximum value
+                    Enter a numeric maximum value
                   </Form.Control.Feedback>
                 </Group>
               </Col>
@@ -211,8 +214,14 @@ export default function Kataegis({ submitR }) {
                 <Button
                   className="mt-auto mb-3"
                   variant="primary"
-                  onClick={calculateR}
-                  disabled={!min || !max || isNaN(min) || isNaN(max)}
+                  onClick={() => {
+                    if (!min || isNaN(min)) setMin(true);
+                    else setMin(false);
+                    if (!max || isNaN(max)) setMax(true);
+                    else setMax(false);
+
+                    if (min && max && !isNaN(min) && !isNaN(max)) calculateR();
+                  }}
                 >
                   Calculate
                 </Button>

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -29,6 +29,8 @@ export default function MsPrevalence({ calculatePrevalence }) {
     dispatch(actions.mergeExploring({ msPrevalence: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
+
+  const [invalidMin, setMin] = useState(false);
 
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
@@ -84,10 +86,10 @@ export default function MsPrevalence({ calculatePrevalence }) {
                     mutation: e.target.value,
                   });
                 }}
-                isInvalid={!mutation || isNaN(mutation)}
+                isInvalid={invalidMin}
               />
               <Form.Control.Feedback type="invalid">
-                Enter a minimum value
+                Enter a numeric minimum value
               </Form.Control.Feedback>
             </Group>
           </Col>
@@ -96,10 +98,13 @@ export default function MsPrevalence({ calculatePrevalence }) {
             <Button
               className="ml-auto mb-auto"
               variant="primary"
-              onClick={calculatePrevalence}
-              disabled={
-                !mutation || isNaN(mutation) || (source == 'user' && !projectID)
-              }
+              onClick={() => {
+                if (!mutation || isNaN(mutation)) setMin(true);
+                else setMin(false);
+
+                if (mutation && !isNaN(mutation)) calculatePrevalence();
+              }}
+              disabled={source == 'user' && !projectID}
             >
               Calculate
             </Button>

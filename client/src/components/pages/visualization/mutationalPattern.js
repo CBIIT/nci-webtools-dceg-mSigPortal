@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
@@ -14,10 +14,11 @@ const { Group, Label, Control } = Form;
 export default function MutationalPattern({ submitR }) {
   const dispatch = useDispatch();
   const visualization = useSelector((state) => state.visualization);
-  const mergeMutationalPattern = (state) =>
+  const mergeMPEA = (state) =>
     dispatch(actions.mergeVisualization({ mutationalPattern: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
+
   const {
     source,
     study,
@@ -38,6 +39,9 @@ export default function MutationalPattern({ submitR }) {
     loading,
   } = visualization.mutationalPattern;
 
+  const [invalidProportion, setProportion] = useState(false);
+  const [invalidPattern, setPattern] = useState(false);
+
   // load plots if they exist - used for precalculated examples
   useEffect(() => {
     const checkPlot = async () => {
@@ -50,7 +54,7 @@ export default function MutationalPattern({ submitR }) {
         cache: 'no-cache',
       });
       if (check.status === 200) {
-        mergeMutationalPattern({ barPath: barchart });
+        mergeMPEA({ barPath: barchart });
       }
 
       const mpea =
@@ -62,7 +66,7 @@ export default function MutationalPattern({ submitR }) {
         cache: 'no-cache',
       });
       if (check.status === 200) {
-        mergeMutationalPattern({
+        mergeMPEA({
           plotPath: mpea,
           txtPath: `/results/mutationalPatternPublic/mpea.txt`,
         });
@@ -78,7 +82,7 @@ export default function MutationalPattern({ submitR }) {
   }, [plotPath, barPath]);
 
   async function setRPlot(plotPath, type) {
-    mergeMutationalPattern({ loading: true });
+    mergeMPEA({ loading: true });
 
     if (plotPath) {
       try {
@@ -91,12 +95,12 @@ export default function MutationalPattern({ submitR }) {
 
           if (type == 'context') {
             if (plotURL) URL.revokeObjectURL(plotURL);
-            mergeMutationalPattern({
+            mergeMPEA({
               plotURL: objectURL,
             });
           } else {
             if (barURL) URL.revokeObjectURL(barURL);
-            mergeMutationalPattern({
+            mergeMPEA({
               barURL: objectURL,
             });
           }
@@ -106,23 +110,23 @@ export default function MutationalPattern({ submitR }) {
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      mergeMutationalPattern({ err: true, plotURL: '' });
+      mergeMPEA({ err: true, plotURL: '' });
     }
-    mergeMutationalPattern({ loading: false });
+    mergeMPEA({ loading: false });
   }
 
   function clearPlot(type) {
     if (type == 'context') {
       URL.revokeObjectURL(plotURL);
-      mergeMutationalPattern({ plotURL: '' });
+      mergeMPEA({ plotURL: '' });
     } else if (type == 'barchart') {
       URL.revokeObjectURL(barURL);
-      mergeMutationalPattern({ barURL: '' });
+      mergeMPEA({ barURL: '' });
     }
   }
 
   async function calculateR(fn, args) {
-    mergeMutationalPattern({
+    mergeMPEA({
       loading: true,
       err: false,
       debugR: '',
@@ -135,18 +139,18 @@ export default function MutationalPattern({ submitR }) {
       const response = await submitR(fn, args);
       if (!response.ok) {
         const err = await response.json();
-        mergeMutationalPattern({ debugR: err, loading: false });
+        mergeMPEA({ debugR: err, loading: false });
       } else {
         const { debugR, output } = await response.json();
         if (Object.keys(output).length) {
-          mergeMutationalPattern({
+          mergeMPEA({
             debugR: debugR,
             plotPath: output.plotPath,
             barPath: output.barPath,
             txtPath: output.txtPath,
           });
         } else {
-          mergeMutationalPattern({
+          mergeMPEA({
             debugR: debugR,
             err: true,
             loading: false,
@@ -155,7 +159,7 @@ export default function MutationalPattern({ submitR }) {
       }
     } catch (err) {
       mergeError(err.message);
-      mergeMutationalPattern({ loading: false });
+      mergeMPEA({ loading: false });
     }
   }
 
@@ -207,136 +211,91 @@ export default function MutationalPattern({ submitR }) {
 
   return (
     <div>
-      {source == 'user' ? (
-        <div className="bg-white border rounded">
-          <Form noValidate className="p-3">
-            <LoadingOverlay active={loading} />
-            <Row>
-              <Col lg="2">
-                <Group
-                  controlId="minimum"
-                  title="Minimal Proportion mutations within Each Mutational Pattern"
-                >
-                  <Label>Minimal Proportion</Label>
-                  <Control
-                    value={proportion}
-                    placeholder="Ex. 0.8"
-                    onChange={(e) => {
-                      mergeMutationalPattern({
-                        proportion: e.target.value,
-                      });
-                    }}
-                    isInvalid={!proportion || isNaN(proportion)}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    Enter a valid proportion between 0 and 1
-                  </Form.Control.Feedback>
-                </Group>
-              </Col>
-              <Col lg="2">
-                <Group controlId="pattern">
-                  <Label>Mutational Pattern</Label>
-                  <Control
-                    value={pattern}
-                    placeholder="Ex. NCG>NTG"
-                    onChange={(e) => {
-                      mergeMutationalPattern({
-                        pattern: e.target.value,
-                      });
-                    }}
-                    isInvalid={!pattern}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    Enter a valid pattern
-                  </Form.Control.Feedback>
-                </Group>
-              </Col>
-              <Col />
-              <Col lg="2" className="d-flex justify-content-end">
-                <Button
-                  className="mt-auto mb-3"
-                  variant="primary"
-                  onClick={() => {
-                    calculateR('mutationalPattern', {
-                      matrixFile: value2d(
-                        filter2d(['SBS', '96'], matrixList.data)[0],
-                        'Path',
-                        matrixList.columns
-                      ),
-                      proportion: parseFloat(proportion),
-                      pattern: pattern,
-                    });
-                  }}
-                  disabled={!pattern || isNaN(proportion) || !proportion}
-                >
-                  Calculate
-                </Button>
-              </Col>
-            </Row>
-          </Form>
-          {plots}
-        </div>
-      ) : (
-        <div className="bg-white border rounded">
-          <Form className="p-3">
-            <LoadingOverlay active={loading} />
-            <Row className="justify-content-center">
-              <Col lg="4">
-                <Label>
-                  Minimal Proportion mutations within Each Mutational Pattern
-                </Label>
+      <div className="bg-white border rounded">
+        <Form noValidate className="p-3">
+          <LoadingOverlay active={loading} />
+          <Row>
+            <Col lg="2">
+              <Group
+                controlId="minimum"
+                title="Minimal Proportion mutations within Each Mutational Pattern"
+              >
+                <Label>Minimal Proportion</Label>
                 <Control
                   value={proportion}
+                  placeholder="Ex. 0.8"
                   onChange={(e) => {
-                    mergeMutationalPattern({
+                    mergeMPEA({
                       proportion: e.target.value,
                     });
                   }}
-                  isInvalid={!proportion || isNaN(proportion)}
+                  isInvalid={invalidProportion}
                 />
                 <Form.Control.Feedback type="invalid">
                   Enter a valid proportion between 0 and 1
                 </Form.Control.Feedback>
-              </Col>
-              <Col lg="3">
+              </Group>
+            </Col>
+            <Col lg="2">
+              <Group controlId="pattern">
                 <Label>Mutational Pattern</Label>
                 <Control
                   value={pattern}
+                  placeholder="Ex. NCG>NTG"
                   onChange={(e) => {
-                    mergeMutationalPattern({
+                    mergeMPEA({
                       pattern: e.target.value,
                     });
                   }}
-                  isInvalid={!pattern}
+                  isInvalid={invalidPattern}
                 />
                 <Form.Control.Feedback type="invalid">
                   Enter a valid pattern
                 </Form.Control.Feedback>
-              </Col>
-              <Col lg="3" />
-              <Col lg="2" className="d-flex justify-content-end">
-                <Button
-                  className="mt-auto mb-3"
-                  variant="primary"
-                  onClick={() => {
-                    calculateR('mutationalPatternPublic', {
-                      study: study,
-                      cancerType: cancerType,
-                      experimentalStrategy: pubExperimentalStrategy,
-                      proportion: parseFloat(proportion),
-                      pattern: pattern,
-                    });
-                  }}
-                  disabled={!pattern || isNaN(proportion) || !proportion}
-                >
-                  Calculate
-                </Button>
-              </Col>
-            </Row>
-          </Form>
-          {plots}
-        </div>
-      )}
+              </Group>
+            </Col>
+            <Col />
+            <Col lg="2" className="d-flex justify-content-end">
+              <Button
+                className="mt-auto mb-3"
+                variant="primary"
+                onClick={() => {
+                  if (!pattern) setPattern(true);
+                  else setPattern(false);
+                  if (isNaN(proportion) || !proportion) setProportion(true);
+                  else setProportion(false);
+
+                  if (pattern && proportion && !isNaN(proportion)) {
+                    if (source == 'user') {
+                      calculateR('mutationalPattern', {
+                        matrixFile: value2d(
+                          filter2d(['SBS', '96'], matrixList.data)[0],
+                          'Path',
+                          matrixList.columns
+                        ),
+                        proportion: parseFloat(proportion),
+                        pattern: pattern,
+                      });
+                    } else if (source == 'public') {
+                      calculateR('mutationalPatternPublic', {
+                        study: study,
+                        cancerType: cancerType,
+                        experimentalStrategy: pubExperimentalStrategy,
+                        proportion: parseFloat(proportion),
+                        pattern: pattern,
+                      });
+                    }
+                  }
+                }}
+              >
+                Calculate
+              </Button>
+            </Col>
+          </Row>
+        </Form>
+        {plots}
+      </div>
+
       {/* <Debug msg={debugR} /> */}
     </div>
   );
