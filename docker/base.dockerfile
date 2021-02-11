@@ -43,9 +43,9 @@ RUN pip3 install scipy statsmodels
 
 RUN cd /tmp; git clone https://github.com/xtmgah/SigProfilerPlotting; cp SigProfilerPlotting/fonts/* ~/.local/share/fonts; fc-cache -fv;
 
-RUN pip3 install 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
+RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
 
-RUN pip3 install 'git+https://github.com/xtmgah/SigProfilerPlotting#egg=SigProfilerPlotting'
+RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerPlotting#egg=SigProfilerPlotting'
 
 RUN python3.6 -c "from SigProfilerMatrixGenerator import install as genInstall; genInstall.install('GRCh37', rsync=False, bash=True); genInstall.install('GRCh38', rsync=False, bash=True); genInstall.install('mm10', rsync=False, bash=True)"
 
