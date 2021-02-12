@@ -436,7 +436,8 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
 
     totalTime = proc.time()
     load(paste0(dataPath, 'Signature/signature_refsets.RData'))
-    load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata.RData'))
+    # load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata.RData'))
+    load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'))
     load(paste0(dataPath, 'Exposure/exposure_refdata.RData'))
 
     output = list()
@@ -470,8 +471,17 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
     signature_refsets_selected <- signature_refsets %>%
       filter(Signature_set_name == common$refSignatureSet)
 
-    seqmatrix_refdata_selected <- seqmatrix_refdata %>% filter(Study == common$study, Dataset == common$strategy, Profile == signature_refsets_selected$Profile[1])
-
+    # seqmatrix_refdata_selected <- seqmatrix_refdata %>% filter(Study == common$study, Dataset == common$strategy, Profile == signature_refsets_selected$Profile[1])
+    if (association$useCancer) {
+      seqmatrixFiles <- seqmatrix_refdata_subset_files %>% filter(Study == common$study, Dataset == common$strategy, Cancer_Type == common$cancerType) %>% pull(file)
+    } else {
+      seqmatrixFiles <- seqmatrix_refdata_subset_files %>% filter(Study == common$study, Dataset == common$strategy) %>% pull(file)
+    }
+    seqmatrix_refdata_selected = NULL
+    for (file in seqmatrixFiles) {
+      seqmatrix_refdata_selected <- get(load(paste0(dataPath, 'Seqmatrix/', file)))
+    }
+    seqmatrix_refdata_selected = seqmatrix_refdata_selected %>% filter(Profile == signature_refsets_selected$Profile[1])
 
     # Tumor Overall Mutational Burden
     if ('all' %in% fn || 'tmb' %in% fn) {
