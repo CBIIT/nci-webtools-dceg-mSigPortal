@@ -41,7 +41,7 @@ RUN dnf -y update \
 
 RUN pip3 install scipy statsmodels
 
-RUN cd /tmp; git clone https://github.com/xtmgah/SigProfilerPlotting; cp SigProfilerPlotting/fonts/* ~/.local/share/fonts; fc-cache -fv;
+RUN cd /tmp; git clone https://github.com/xtmgah/SigProfilerPlotting; cp /tmp/SigProfilerPlotting/fonts/* /usr/share/fonts; fc-cache -fv;
 
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
 
