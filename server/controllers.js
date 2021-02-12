@@ -8,6 +8,7 @@ const Papa = require('papaparse');
 const tar = require('tar');
 const r = require('r-wrapper').async;
 const AWS = require('aws-sdk');
+const XLSX = require('xlsx');
 const replace = require('replace-in-file');
 const config = require('./config.json');
 
@@ -648,6 +649,25 @@ async function getExposureExample(req, res, next) {
   }
 }
 
+// Publications page data
+async function getPublications(req, res, next) {
+  const pubFile = path.resolve(
+    config.data.database,
+    'Others/Publications.xlsx'
+  );
+  const workbook = XLSX.readFile(pubFile);
+  const sheetNames = workbook.SheetNames;
+  const data = sheetNames.reduce(
+    (acc, sheet) => ({
+      ...acc,
+      [sheet]: XLSX.utils.sheet_to_json(workbook.Sheets[sheet]),
+    }),
+    {}
+  );
+
+  res.json(data);
+}
+
 module.exports = {
   parseCSV,
   profilerExtraction,
@@ -669,4 +689,5 @@ module.exports = {
   getSignatureNames,
   getSampleNames,
   getExposureExample,
+  getPublications,
 };
