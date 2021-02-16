@@ -103,22 +103,33 @@ export default function App() {
         {
           Header: column,
           accessor: column,
-          Cell: (e) =>
-            column == 'DOI' ? (
-              <a href={e.value} target="_blank">
+          Cell: (e) => {
+            return column == 'Title' ? (
+              <a href={e.row.values['DOI']} target="_blank" rel="noreferrer">
                 {e.value}
               </a>
             ) : (
               e.value
-            ),
+            );
+          },
         },
       ];
+
+      // visible column order
+      const rpColumns = ['Journal', 'Year', 'Title'];
+      const oraColumns = ['Cancer Type', 'Experimental Strategy', ...rpColumns];
+      const orbColumns = ['Cancer Type', 'Experimental Strategy', ...rpColumns];
+      const cmColumns = ['Name', 'Method', 'Github', ...rpColumns];
 
       mergePublications({
         orA: {
           columns: [
             ...new Set(
-              ...data['Original Research A'].map((row) => Object.keys(row))
+              ...data['Original Research A'].map((row) =>
+                Object.keys(row).sort(
+                  (a, b) => oraColumns.indexOf(a) - oraColumns.indexOf(b)
+                )
+              )
             ),
           ].reduce(reducer, []),
           data: data['Original Research A'],
@@ -126,21 +137,35 @@ export default function App() {
         orB: {
           columns: [
             ...new Set(
-              ...data['Orignal Research B'].map((row) => Object.keys(row))
+              ...data['Orignal Research B'].map((row) =>
+                Object.keys(row).sort(
+                  (a, b) => orbColumns.indexOf(a) - orbColumns.indexOf(b)
+                )
+              )
             ),
           ].reduce(reducer, []),
           data: data['Orignal Research B'],
         },
         rp: {
           columns: [
-            ...new Set(...data['Review Paper'].map((row) => Object.keys(row))),
+            ...new Set(
+              ...data['Review Paper'].map((row) =>
+                Object.keys(row).sort(
+                  (a, b) => rpColumns.indexOf(a) - rpColumns.indexOf(b)
+                )
+              )
+            ),
           ].reduce(reducer, []),
           data: data['Review Paper'],
         },
         cm: {
           columns: [
             ...new Set(
-              ...data['Computational Methods'].map((row) => Object.keys(row))
+              ...data['Computational Methods'].map((row) =>
+                Object.keys(row).sort(
+                  (a, b) => cmColumns.indexOf(a) - cmColumns.indexOf(b)
+                )
+              )
             ),
           ].reduce(reducer, []),
           data: data['Computational Methods'],

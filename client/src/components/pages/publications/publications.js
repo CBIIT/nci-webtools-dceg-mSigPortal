@@ -3,11 +3,12 @@ import { useSelector } from 'react-redux';
 import BTable from 'react-bootstrap/Table';
 import { useTable } from 'react-table';
 
-function Table({ title, columns, data }) {
+function Table({ title, columns, data, hidden }) {
   // Use the state and functions returned from useTable to build your UI
   const { getTableProps, headerGroups, rows, prepareRow } = useTable({
     columns,
     data,
+    initialState: { hiddenColumns: hidden },
   });
 
   // Render the UI for your table
@@ -50,36 +51,62 @@ export default function Publications() {
   return (
     <div className="mx-3">
       <div className="bg-white border p-3 mx-3">
+        <div>
+          <h2 className="font-weight-light">Publications</h2>
+          <p>TBA</p>
+        </div>
+
         {tables.orA && (
           <Table
-            title="Original Research A"
+            title="Original Research Papers Including Specific Mutational Signatures in mSigPortal"
             columns={tables.orA.columns}
             data={tables.orA.data}
+            hidden={[
+              'Disease/Phenotype/Exposure',
+              'First author',
+              'Last Author',
+              'Pubmed ID/BioRxiv',
+              'DOI',
+            ]}
           />
         )}
-
         {tables.orB && (
           <Table
-            title="Original Research B"
+            title="Original Research Papers involved Mutational Signature Analyses"
             columns={tables.orB.columns}
             data={tables.orB.data}
+            hidden={[
+              'Disease/Phenotype/Exposure',
+              'First author',
+              'Last Author',
+              'Pubmed ID/BioRxiv',
+              'DOI',
+            ]}
           />
         )}
-
         {tables.rp && (
           <Table
-            title="Review Paper"
+            title="Review Papers Focued on Mutational Signatures"
             columns={tables.rp.columns}
             data={tables.rp.data}
+            hidden={['First author', 'Last Author', 'Pubmed ID/BioRxiv', 'DOI']}
           />
         )}
         {tables.cm && (
           <Table
-            title="Computational Methods"
+            title="Computational Methods, Databases or Websites for Mutational Signature Analyses"
             columns={tables.cm.columns}
             data={tables.cm.data}
+            hidden={['Programming']}
           />
         )}
+
+        <div>
+          <h2 className="font-weight-light">Citations</h2>
+          <p>TBA</p>
+        </div>
+
+        <p>Last update: 20 JAN 2021.</p>
       </div>
     </div>
   );
