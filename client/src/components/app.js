@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { HashRouter as Router, Route } from 'react-router-dom';
 import { Navbar } from './controls/navbar/navbar';
 import Home from './pages/home/home';
@@ -11,6 +11,8 @@ import Publications from './pages/publications/publications';
 import Faq from './pages/faq/faq';
 import { ErrorModal } from './controls/error-modal/error-modal';
 import { SuccessModal } from './controls/success-modal/success-modal';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions } from '../services/store/publications';
 
 export default function App() {
   const links = [
@@ -86,6 +88,68 @@ export default function App() {
       navIndex: 6,
     },
   ];
+
+  // load data for publications tab
+  const dispatch = useDispatch();
+  const publicationsState = useSelector((state) => state.publications);
+  const mergePublications = (state) => dispatch(actions.mergeState(state));
+
+  useEffect(() => {
+    const getData = async () => {
+      const data = await (await fetch(`api/getPublications`)).json();
+
+      const reducer = (acc, column) => [
+        ...acc,
+        {
+          Header: column,
+          accessor: column,
+          Cell: (e) =>
+            column == 'DOI' ? (
+              <a href={e.value} target="_blank">
+                {e.value}
+              </a>
+            ) : (
+              e.value
+            ),
+        },
+      ];
+
+      mergePublications({
+        orA: {
+          columns: [
+            ...new Set(
+              ...data['Original Research A'].map((row) => Object.keys(row))
+            ),
+          ].reduce(reducer, []),
+          data: data['Original Research A'],
+        },
+        orB: {
+          columns: [
+            ...new Set(
+              ...data['Orignal Research B'].map((row) => Object.keys(row))
+            ),
+          ].reduce(reducer, []),
+          data: data['Orignal Research B'],
+        },
+        rp: {
+          columns: [
+            ...new Set(...data['Review Paper'].map((row) => Object.keys(row))),
+          ].reduce(reducer, []),
+          data: data['Review Paper'],
+        },
+        cm: {
+          columns: [
+            ...new Set(
+              ...data['Computational Methods'].map((row) => Object.keys(row))
+            ),
+          ].reduce(reducer, []),
+          data: data['Computational Methods'],
+        },
+      });
+    };
+
+    if (Object.keys(publicationsState).length == 0) getData();
+  }, [publicationsState]);
 
   return (
     <Router>

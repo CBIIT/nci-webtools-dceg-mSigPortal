@@ -1,6 +1,7 @@
 import { reducer as exploringReducer } from './exploring';
 import { reducer as visualizationReducer } from './visualization';
 import { reducer as modalReducer } from './modal';
+import { reducer as publicationsReducer } from './publications';
 
 import { configureStore } from '@reduxjs/toolkit';
 
@@ -10,5 +11,6 @@ export const store = configureStore({
     visualization: visualizationReducer,
     exploring: exploringReducer,
     modal: modalReducer,
+    publications: publicationsReducer,
   },
 });
