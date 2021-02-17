@@ -1,11 +1,19 @@
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import BTable from 'react-bootstrap/Table';
+import { ButtonGroup, Button } from 'react-bootstrap';
 import { useTable } from 'react-table';
 
 function Table({ title, columns, data, hidden }) {
   // Use the state and functions returned from useTable to build your UI
-  const { getTableProps, headerGroups, rows, prepareRow } = useTable({
+  const {
+    getTableProps,
+    headerGroups,
+    rows,
+    prepareRow,
+    setHiddenColumns,
+    state: tableState,
+  } = useTable({
     columns,
     data,
     initialState: { hiddenColumns: hidden },
@@ -15,6 +23,27 @@ function Table({ title, columns, data, hidden }) {
   return (
     <div className="mb-3">
       <h2 className="font-weight-light">{title}</h2>
+      <ButtonGroup className="mb-1">
+        {hidden.map((col) => (
+          <Button
+            variant={
+              tableState.hiddenColumns.indexOf(col) > -1
+                ? 'outline-secondary'
+                : 'primary'
+            }
+            onClick={() =>
+              setHiddenColumns((hiddenColumns) => {
+                const index = hiddenColumns.indexOf(col);
+                return index > -1
+                  ? hiddenColumns.filter((c) => c != col)
+                  : [...hiddenColumns, col];
+              })
+            }
+          >
+            {col}
+          </Button>
+        ))}
+      </ButtonGroup>
       <BTable responsive striped bordered hover size="sm" {...getTableProps()}>
         <thead>
           {headerGroups.map((headerGroup) => (
@@ -51,9 +80,13 @@ export default function Publications() {
   return (
     <div className="mx-3">
       <div className="bg-white border p-3 mx-3">
-        <div>
-          <h2 className="font-weight-light">Publications</h2>
-          <p>TBA</p>
+        <div className="mb-4">
+          <h1 className="font-weight-light">Publications</h1>
+          <hr />
+          <p>
+            An overview of published papers, tools, websites and databases
+            related to mutational signatures analysis.
+          </p>
         </div>
 
         {tables.orA && (
