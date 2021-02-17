@@ -64,13 +64,10 @@ export default function Exposure({ match }) {
     strategyOptions,
     cancer,
     cancerOptions,
-    refSigData,
     refSignatureSet,
     refSignatureSetOptions,
     signatureNameOptions,
-    userNameOptions,
     publicSampleOptions,
-    userSampleOptions,
     genome,
     genomeOptions,
     exposureFile,
@@ -89,6 +86,10 @@ export default function Exposure({ match }) {
     exposureCancer,
     signatureNames,
   } = exploring.exploring;
+
+  const { loading: tmbLoading } = exploring.tmb;
+  const { loading: tmbSigLoading } = exploring.tmbSignatures;
+  const { loading: decompositionLoading } = exploring.msDecomposition;
   const { loading: loadingMsBurden, ...burdenArgs } = exploring.msBurden;
   const {
     loading: loadingMsAssociation,
@@ -1014,19 +1015,19 @@ export default function Exposure({ match }) {
 
   const examples = [
     {
-      name: 'SBS5 vs SBS40',
+      name: 'PCAWG/Lung-AdenoCA',
       title:
         'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Lung-AdenoCA; MSA SBS5 vs SBS40',
       path: 'exposure1',
     },
     {
-      name: 'SBS7a vs SBS7b',
+      name: 'PCAWG/Skin-Melanoma',
       title:
         'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Skin-Melanoma; MSA SBS7a vs SBS7b',
       path: 'exposure2',
     },
     {
-      name: 'SBS3 vs SBS5',
+      name: 'PCAWG/Breast-AdenoCA',
       title:
         'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Breast-AdenoCA; MSA SBS3 vs SBS5',
       path: 'exposure3',
