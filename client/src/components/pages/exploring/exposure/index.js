@@ -35,8 +35,6 @@ export default function Exposure({ match }) {
 
   const mergeState = async (state) =>
     await dispatch(actions.mergeExploring({ ...state }));
-  const mergeExploring = (state) =>
-    dispatch(actions.mergeExploring({ exploring: state }));
   const mergeExposure = (state) =>
     dispatch(actions.mergeExploring({ exposure: state }));
   const mergeTMB = (state) => dispatch(actions.mergeExploring({ tmb: state }));
@@ -204,10 +202,8 @@ export default function Exposure({ match }) {
   // get signature name options filtered by cancer type
   async function getSignatureNames() {
     mergeState({
-      exposure: {
-        loading: true,
-        loadingMsg: 'Filtering Signature Names',
-      },
+      msBurden: { loading: true },
+      msAssociation: { loading: true },
     });
     try {
       const { stdout, output } = await (
@@ -239,18 +235,14 @@ export default function Exposure({ match }) {
       mergeError(err.message);
     }
     mergeState({
-      exposure: { loading: false, loadingMsg: null },
+      msBurden: { loading: false },
+      msAssociation: { loading: false },
     });
   }
 
   // get sample name options filtered by cancer type
   async function getSampleNames() {
-    mergeState({
-      exposure: {
-        loading: true,
-        loadingMsg: 'Filtering Sample Names',
-      },
-    });
+    mergeMsIndividual({ loading: true });
     try {
       const { stdout, output } = await (
         await fetch(`api/getSampleNames`, {
@@ -279,7 +271,7 @@ export default function Exposure({ match }) {
     } catch (err) {
       mergeError(err.message);
     }
-    mergeExposure({ loading: false, loadingMsg: null });
+    mergeMsIndividual({ loading: false });
   }
 
   async function submitR(fn, args, id = projectID) {
@@ -639,15 +631,15 @@ export default function Exposure({ match }) {
         ...params.msBurden,
       });
     }
-    if (!loadingMsAssociation && (fn == 'all' || fn == 'association')) {
-      args.association = JSON.stringify({
-        useCancerType: associationArgs.toggleCancer,
-        both: associationArgs.both,
-        signatureName1: associationArgs.signatureName1,
-        signatureName2: associationArgs.signatureName2,
-        ...params.msAssociation,
-      });
-    }
+    // if (!loadingMsAssociation && (fn == 'all' || fn == 'association')) {
+    args.association = JSON.stringify({
+      useCancerType: associationArgs.toggleCancer,
+      both: associationArgs.both,
+      signatureName1: associationArgs.signatureName1,
+      signatureName2: associationArgs.signatureName2,
+      ...params.msAssociation,
+    });
+    // }
     if (!loadingMsLandscape && (fn == 'all' || fn == 'landscape')) {
       args.landscape = JSON.stringify({
         variableFile: landscapeArgs.variableFile,
