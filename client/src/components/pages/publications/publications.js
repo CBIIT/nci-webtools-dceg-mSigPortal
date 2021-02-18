@@ -1,11 +1,12 @@
 import React, { useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions } from '../../../services/store/publications';
 import BTable from 'react-bootstrap/Table';
-import { ButtonGroup, Button } from 'react-bootstrap';
+import { DropdownButton, Form, Row, Col } from 'react-bootstrap';
 import { useTable } from 'react-table';
+import './publications.scss';
 
-function Table({ title, columns, data, hidden }) {
-  // Use the state and functions returned from useTable to build your UI
+function Table({ title, columns, data, hidden, merge }) {
   const {
     getTableProps,
     headerGroups,
@@ -19,31 +20,51 @@ function Table({ title, columns, data, hidden }) {
     initialState: { hiddenColumns: hidden },
   });
 
-  // Render the UI for your table
   return (
-    <div className="mb-3">
-      <h2 className="font-weight-light">{title}</h2>
-      <ButtonGroup className="mb-1">
-        {hidden.map((col) => (
-          <Button
-            variant={
-              tableState.hiddenColumns.indexOf(col) > -1
-                ? 'outline-secondary'
-                : 'primary'
-            }
-            onClick={() =>
-              setHiddenColumns((hiddenColumns) => {
-                const index = hiddenColumns.indexOf(col);
-                return index > -1
-                  ? hiddenColumns.filter((c) => c != col)
-                  : [...hiddenColumns, col];
-              })
-            }
-          >
-            {col}
-          </Button>
-        ))}
-      </ButtonGroup>
+    <div className="mb-4">
+      <Row>
+        <Col md="8">
+          <h3>{title}</h3>
+        </Col>
+        <Col md="3"></Col>
+        <Col md="1">
+          <div id={`${title.trim()}-controls`} className="d-flex mb-2">
+            <DropdownButton title="Columns">
+              <Form>
+                {columns.map(({ Header: col }) => {
+                  // ignore DOI column
+                  if (col != 'DOI')
+                    return (
+                      <Form.Group
+                        controlId={`${col}Visibility`}
+                        className="my-1 px-2 "
+                      >
+                        <Form.Check
+                          type="checkbox"
+                          label={col}
+                          checked={tableState.hiddenColumns.indexOf(col) == -1}
+                          onClick={() =>
+                            setHiddenColumns((hiddenColumns) => {
+                              const index = hiddenColumns.indexOf(col);
+                              const newHidden =
+                                index > -1
+                                  ? hiddenColumns.filter((c) => c != col)
+                                  : [...hiddenColumns, col];
+
+                              merge({ hidden: newHidden });
+                              return newHidden;
+                            })
+                          }
+                        />
+                      </Form.Group>
+                    );
+                })}
+              </Form>
+            </DropdownButton>
+          </div>
+        </Col>
+      </Row>
+
       <BTable responsive striped bordered hover size="sm" {...getTableProps()}>
         <thead>
           {headerGroups.map((headerGroup) => (
@@ -74,14 +95,16 @@ function Table({ title, columns, data, hidden }) {
 }
 
 export default function Publications() {
+  // data is loaded in components/app.js
   const state = useSelector((state) => state.publications);
   const tables = useMemo(() => state, [state]) || {};
+  const dispatch = useDispatch();
 
   return (
     <div className="mx-3">
       <div className="bg-white border p-3 mx-3">
         <div className="mb-4">
-          <h1 className="font-weight-light">Publications</h1>
+          <h1 className="">Publications</h1>
           <hr />
           <p>
             An overview of published papers, tools, websites and databases
@@ -89,48 +112,40 @@ export default function Publications() {
           </p>
         </div>
 
-        {tables.orA && (
+        {tables.orA.data && (
           <Table
             title="Original Research Papers Including Specific Mutational Signatures in mSigPortal"
             columns={tables.orA.columns}
             data={tables.orA.data}
-            hidden={[
-              'Disease/Phenotype/Exposure',
-              'First author',
-              'Last Author',
-              'Pubmed ID/BioRxiv',
-              'DOI',
-            ]}
+            hidden={tables.orA.hidden}
+            merge={(state) => dispatch(actions.mergeState({ orA: state }))}
           />
         )}
-        {tables.orB && (
+        {tables.orB.data && (
           <Table
             title="Original Research Papers involved Mutational Signature Analyses"
             columns={tables.orB.columns}
             data={tables.orB.data}
-            hidden={[
-              'Disease/Phenotype/Exposure',
-              'First author',
-              'Last Author',
-              'Pubmed ID/BioRxiv',
-              'DOI',
-            ]}
+            hidden={tables.orB.hidden}
+            merge={(state) => dispatch(actions.mergeState({ orB: state }))}
           />
         )}
-        {tables.rp && (
+        {tables.rp.data && (
           <Table
             title="Review Papers Focued on Mutational Signatures"
             columns={tables.rp.columns}
             data={tables.rp.data}
-            hidden={['First author', 'Last Author', 'Pubmed ID/BioRxiv', 'DOI']}
+            hidden={tables.rp.hidden}
+            merge={(state) => dispatch(actions.mergeState({ rp: state }))}
           />
         )}
-        {tables.cm && (
+        {tables.cm.data && (
           <Table
             title="Computational Methods, Databases or Websites for Mutational Signature Analyses"
             columns={tables.cm.columns}
             data={tables.cm.data}
-            hidden={['Programming']}
+            hidden={tables.cm.hidden}
+            merge={(state) => dispatch(actions.mergeState({ cm: state }))}
           />
         )}
 

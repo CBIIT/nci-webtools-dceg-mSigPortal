@@ -115,21 +115,11 @@ export default function App() {
         },
       ];
 
-      // visible column order
-      const rpColumns = ['Journal', 'Year', 'Title'];
-      const oraColumns = ['Cancer Type', 'Experimental Strategy', ...rpColumns];
-      const orbColumns = ['Cancer Type', 'Experimental Strategy', ...rpColumns];
-      const cmColumns = ['Name', 'Method', 'Github', ...rpColumns];
-
       mergePublications({
         orA: {
           columns: [
             ...new Set(
-              ...data['Original Research A'].map((row) =>
-                Object.keys(row).sort(
-                  (a, b) => oraColumns.indexOf(a) - oraColumns.indexOf(b)
-                )
-              )
+              ...data['Original Research A'].map((row) => Object.keys(row))
             ),
           ].reduce(reducer, []),
           data: data['Original Research A'],
@@ -137,35 +127,21 @@ export default function App() {
         orB: {
           columns: [
             ...new Set(
-              ...data['Orignal Research B'].map((row) =>
-                Object.keys(row).sort(
-                  (a, b) => orbColumns.indexOf(a) - orbColumns.indexOf(b)
-                )
-              )
+              ...data['Orignal Research B'].map((row) => Object.keys(row))
             ),
           ].reduce(reducer, []),
           data: data['Orignal Research B'],
         },
         rp: {
           columns: [
-            ...new Set(
-              ...data['Review Paper'].map((row) =>
-                Object.keys(row).sort(
-                  (a, b) => rpColumns.indexOf(a) - rpColumns.indexOf(b)
-                )
-              )
-            ),
+            ...new Set(...data['Review Paper'].map((row) => Object.keys(row))),
           ].reduce(reducer, []),
           data: data['Review Paper'],
         },
         cm: {
           columns: [
             ...new Set(
-              ...data['Computational Methods'].map((row) =>
-                Object.keys(row).sort(
-                  (a, b) => cmColumns.indexOf(a) - cmColumns.indexOf(b)
-                )
-              )
+              ...data['Computational Methods'].map((row) => Object.keys(row))
             ),
           ].reduce(reducer, []),
           data: data['Computational Methods'],
@@ -173,7 +149,8 @@ export default function App() {
       });
     };
 
-    if (Object.keys(publicationsState).length == 0) getData();
+    // get data on inital page load
+    if (!publicationsState.orA.data) getData();
   }, [publicationsState]);
 
   return (

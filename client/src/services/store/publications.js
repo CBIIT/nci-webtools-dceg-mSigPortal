@@ -1,7 +1,29 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { mergeObject } from './utils';
 
-export const getInitialState = () => ({});
+// data is loaded in components/app.js
+export const getInitialState = () => ({
+  orA: {
+    hidden: [
+      'Disease/Phenotype/Exposure',
+      'First author',
+      'Last Author',
+      'Pubmed ID/BioRxiv',
+      'DOI',
+    ],
+  },
+  orB: {
+    hidden: [
+      'Disease/Phenotype/Exposure',
+      'First author',
+      'Last Author',
+      'Pubmed ID/BioRxiv',
+      'DOI',
+    ],
+  },
+  rp: { hidden: ['First author', 'Last Author', 'Pubmed ID/BioRxiv', 'DOI'] },
+  cm: { hidden: ['Programming'] },
+});
 
 export const { actions, reducer } = createSlice({
   name: 'publications',
