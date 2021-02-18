@@ -83,7 +83,15 @@ export default function MutationalProfiles() {
             ? await fetch(
                 `api/results/${projectID}/${value2d(plot, 'Path', columns)}`
               )
-            : await fetch(`api/public/${value2d(plot, 'Path', columns)}`);
+            : // : await fetch(`api/public/${value2d(plot, 'Path', columns)}`);
+              await fetch(`api/getPublicImage`, {
+                method: 'POST',
+                headers: {
+                  Accept: 'image/svg',
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ path: value2d(plot, 'Path', columns) }),
+              });
 
         if (!response.ok) {
           const msg = await response.text();

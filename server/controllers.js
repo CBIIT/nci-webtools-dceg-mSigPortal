@@ -668,6 +668,31 @@ async function getPublications(req, res, next) {
   res.json(data);
 }
 
+async function getPublicImage(req, res, next) {
+  const key = req.body.path;
+
+  // serve static images from s3 in production
+  // otherwise serve from local Database directory
+  if (process.env.NODE_ENV == 'production') {
+    const s3 = new AWS.S3();
+
+    res.setHeader('Content-Type', 'image/svg+xml');
+    s3.getObject({
+      Bucket: config.s3.bucket,
+      Key: `${config.s3.outputKeyPrefix}Database/${key}`,
+    })
+      .createReadStream()
+      .on('error', next)
+      .pipe(res);
+  } else {
+    console.log('local');
+    res.setHeader('Content-Type', 'image/svg+xml');
+    fs.createReadStream(path.resolve(config.data.database, key))
+      .on('error', next)
+      .pipe(res);
+  }
+}
+
 module.exports = {
   parseCSV,
   profilerExtraction,
@@ -690,4 +715,5 @@ module.exports = {
   getSampleNames,
   getExposureExample,
   getPublications,
+  getPublicImage,
 };
