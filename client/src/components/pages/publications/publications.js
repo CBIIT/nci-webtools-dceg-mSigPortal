@@ -3,65 +3,110 @@ import { useSelector, useDispatch } from 'react-redux';
 import { actions } from '../../../services/store/publications';
 import BTable from 'react-bootstrap/Table';
 import { DropdownButton, Form, Row, Col } from 'react-bootstrap';
-import { useTable } from 'react-table';
+import { useTable, useGlobalFilter, useAsyncDebounce } from 'react-table';
 import './publications.scss';
 
-function Table({ title, columns, data, hidden, merge }) {
+function GlobalFilter({ globalFilter, setGlobalFilter, handleSearch }) {
+  const [value, setValue] = React.useState(globalFilter);
+  const onChange = useAsyncDebounce((value) => {
+    setGlobalFilter(value || '');
+    handleSearch(value || '');
+  }, 200);
+
+  return (
+    <Form.Group className="m-0">
+      <Form.Control
+        type="text"
+        placeholder="Search"
+        value={value || ''}
+        onChange={(e) => {
+          setValue(e.target.value);
+          onChange(e.target.value);
+        }}
+      />
+    </Form.Group>
+  );
+}
+
+function Table({
+  title,
+  columns,
+  data,
+  hidden,
+  search,
+  handleCheck,
+  handleSearch,
+}) {
   const {
     getTableProps,
     headerGroups,
     rows,
     prepareRow,
     setHiddenColumns,
-    state: tableState,
-  } = useTable({
-    columns,
-    data,
-    initialState: { hiddenColumns: hidden },
-  });
+    state,
+    setGlobalFilter,
+  } = useTable(
+    {
+      columns,
+      data,
+      initialState: { hiddenColumns: hidden, globalFilter: search },
+    },
+    useGlobalFilter
+  );
 
   return (
     <div className="mb-4">
-      <Row>
+      <Row className="mb-2">
         <Col md="8">
-          <h3>{title}</h3>
+          <h3 className="mb-0">{title}</h3>
         </Col>
-        <Col md="3"></Col>
+        <Col md="3">
+          <GlobalFilter
+            globalFilter={state.globalFilter}
+            setGlobalFilter={setGlobalFilter}
+            handleSearch={handleSearch}
+          />
+        </Col>
         <Col md="1">
-          <div id={`${title.trim()}-controls`} className="d-flex mb-2">
-            <DropdownButton title="Columns">
-              <Form>
-                {columns.map(({ Header: col }) => {
-                  // ignore DOI column
-                  if (col != 'DOI')
-                    return (
-                      <Form.Group
-                        controlId={`${col}Visibility`}
-                        className="my-1 px-2 "
-                      >
-                        <Form.Check
-                          type="checkbox"
-                          label={col}
-                          checked={tableState.hiddenColumns.indexOf(col) == -1}
-                          onClick={() =>
-                            setHiddenColumns((hiddenColumns) => {
-                              const index = hiddenColumns.indexOf(col);
-                              const newHidden =
-                                index > -1
-                                  ? hiddenColumns.filter((c) => c != col)
-                                  : [...hiddenColumns, col];
+          <DropdownButton
+            title="Columns"
+            id={`${title.replace(/\s/g, '')}-controls`}
+          >
+            <Form>
+              {columns.map(({ Header: col }) => {
+                // ignore DOI column
+                if (col != 'DOI')
+                  return (
+                    <Form.Group
+                      key={`${title.replace(/\s/g, '')}-${col}`}
+                      controlId={`${title.replace(
+                        /\s/g,
+                        ''
+                      )}-${col}-visibility`}
+                      className="my-1 px-2"
+                    >
+                      <Form.Check
+                        type="checkbox"
+                        label={col}
+                        checked={state.hiddenColumns.indexOf(col) == -1}
+                        onChange={() =>
+                          setHiddenColumns((hiddenColumns) => {
+                            const index = hiddenColumns.indexOf(col);
+                            const newHidden =
+                              index > -1
+                                ? hiddenColumns.filter((c) => c != col)
+                                : [...hiddenColumns, col];
 
-                              merge({ hidden: newHidden });
-                              return newHidden;
-                            })
-                          }
-                        />
-                      </Form.Group>
-                    );
-                })}
-              </Form>
-            </DropdownButton>
-          </div>
+                            handleCheck({ hidden: newHidden });
+                            return newHidden;
+                          })
+                        }
+                      />
+                    </Form.Group>
+                  );
+              })}
+            </Form>
+          </DropdownButton>
         </Col>
       </Row>
 
@@ -118,7 +163,13 @@ export default function Publications() {
             columns={tables.orA.columns}
             data={tables.orA.data}
             hidden={tables.orA.hidden}
-            merge={(state) => dispatch(actions.mergeState({ orA: state }))}
+            search={tables.orA.search}
+            handleCheck={(state) =>
+              dispatch(actions.mergeState({ orA: state }))
+            }
+            handleSearch={(e) =>
+              dispatch(actions.mergeState({ orA: { search: e } }))
+            }
           />
         )}
         {tables.orB.data && (
@@ -127,7 +178,13 @@ export default function Publications() {
             columns={tables.orB.columns}
             data={tables.orB.data}
             hidden={tables.orB.hidden}
-            merge={(state) => dispatch(actions.mergeState({ orB: state }))}
+            search={tables.orB.search}
+            handleCheck={(state) =>
+              dispatch(actions.mergeState({ orB: state }))
+            }
+            handleSearch={(e) =>
+              dispatch(actions.mergeState({ orB: { search: e } }))
+            }
           />
         )}
         {tables.rp.data && (
@@ -136,7 +193,11 @@ export default function Publications() {
             columns={tables.rp.columns}
             data={tables.rp.data}
             hidden={tables.rp.hidden}
-            merge={(state) => dispatch(actions.mergeState({ rp: state }))}
+            search={tables.rp.search}
+            handleCheck={(state) => dispatch(actions.mergeState({ rp: state }))}
+            handleSearch={(e) =>
+              dispatch(actions.mergeState({ rp: { search: e } }))
+            }
           />
         )}
         {tables.cm.data && (
@@ -145,13 +206,16 @@ export default function Publications() {
             columns={tables.cm.columns}
             data={tables.cm.data}
             hidden={tables.cm.hidden}
-            merge={(state) => dispatch(actions.mergeState({ cm: state }))}
+            search={tables.cm.search}
+            handleCheck={(state) => dispatch(actions.mergeState({ cm: state }))}
+            handleSearch={(e) =>
+              dispatch(actions.mergeState({ cm: { search: e } }))
+            }
           />
         )}
 
-        <div>
-          <h2 className="font-weight-light">Citations</h2>
-          <p>TBA</p>
+        <div className="mb-4">
+          <h3>Citations</h3>
         </div>
 
         <p>Last update: 20 JAN 2021.</p>

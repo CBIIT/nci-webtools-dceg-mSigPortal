@@ -4,6 +4,7 @@ import { mergeObject } from './utils';
 // data is loaded in components/app.js
 export const getInitialState = () => ({
   orA: {
+    search: '',
     hidden: [
       'Disease/Phenotype/Exposure',
       'First author',
@@ -13,6 +14,7 @@ export const getInitialState = () => ({
     ],
   },
   orB: {
+    search: '',
     hidden: [
       'Disease/Phenotype/Exposure',
       'First author',
@@ -21,8 +23,11 @@ export const getInitialState = () => ({
       'DOI',
     ],
   },
-  rp: { hidden: ['First author', 'Last Author', 'Pubmed ID/BioRxiv', 'DOI'] },
-  cm: { hidden: ['Programming'] },
+  rp: {
+    search: '',
+    hidden: ['First author', 'Last Author', 'Pubmed ID/BioRxiv', 'DOI'],
+  },
+  cm: { search: '', hidden: ['Programming'] },
 });
 
 export const { actions, reducer } = createSlice({
