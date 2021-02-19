@@ -140,10 +140,17 @@ function Table({
 }
 
 export default function Publications() {
-  // data is loaded in components/app.js
-  const state = useSelector((state) => state.publications);
-  const tables = useMemo(() => state, [state]) || {};
+  // data is retrieved in components/app.js
   const dispatch = useDispatch();
+  const { orA, orB, rp, cm } = useSelector((state) => state.publications);
+  const { search: oraSearch, hidden: oraHidden, ...oraTable } = orA;
+  const { search: orbSearch, hidden: orbHidden, ...orbTable } = orB;
+  const { search: rpSearch, hidden: rpHidden, ...rpTable } = rp;
+  const { search: cmSearch, hidden: cmHidden, ...cmTable } = cm;
+  const oraMemo = useMemo(() => oraTable, [oraTable]) || {};
+  const orbMemo = useMemo(() => orbTable, [orbTable]) || {};
+  const rpMemo = useMemo(() => rpTable, [rpTable]) || {};
+  const cmMemo = useMemo(() => cmTable, [cmTable]) || {};
 
   return (
     <div className="mx-3">
@@ -157,13 +164,13 @@ export default function Publications() {
           </p>
         </div>
 
-        {tables.orA.data && (
+        {oraMemo.data && (
           <Table
             title="Original Research Papers Including Specific Mutational Signatures in mSigPortal"
-            columns={tables.orA.columns}
-            data={tables.orA.data}
-            hidden={tables.orA.hidden}
-            search={tables.orA.search}
+            columns={oraMemo.columns}
+            data={oraMemo.data}
+            hidden={oraHidden}
+            search={oraSearch}
             handleCheck={(state) =>
               dispatch(actions.mergeState({ orA: state }))
             }
@@ -172,13 +179,13 @@ export default function Publications() {
             }
           />
         )}
-        {tables.orB.data && (
+        {orbMemo.data && (
           <Table
             title="Original Research Papers involved Mutational Signature Analyses"
-            columns={tables.orB.columns}
-            data={tables.orB.data}
-            hidden={tables.orB.hidden}
-            search={tables.orB.search}
+            columns={orbMemo.columns}
+            data={orbMemo.data}
+            hidden={orbHidden}
+            search={orbSearch}
             handleCheck={(state) =>
               dispatch(actions.mergeState({ orB: state }))
             }
@@ -187,26 +194,26 @@ export default function Publications() {
             }
           />
         )}
-        {tables.rp.data && (
+        {rpMemo.data && (
           <Table
             title="Review Papers Focued on Mutational Signatures"
-            columns={tables.rp.columns}
-            data={tables.rp.data}
-            hidden={tables.rp.hidden}
-            search={tables.rp.search}
+            columns={rpMemo.columns}
+            data={rpMemo.data}
+            hidden={rpHidden}
+            search={rpSearch}
             handleCheck={(state) => dispatch(actions.mergeState({ rp: state }))}
             handleSearch={(e) =>
               dispatch(actions.mergeState({ rp: { search: e } }))
             }
           />
         )}
-        {tables.cm.data && (
+        {cmMemo.data && (
           <Table
             title="Computational Methods, Databases or Websites for Mutational Signature Analyses"
-            columns={tables.cm.columns}
-            data={tables.cm.data}
-            hidden={tables.cm.hidden}
-            search={tables.cm.search}
+            columns={cmMemo.columns}
+            data={cmMemo.data}
+            hidden={cmHidden}
+            search={cmSearch}
             handleCheck={(state) => dispatch(actions.mergeState({ cm: state }))}
             handleSearch={(e) =>
               dispatch(actions.mergeState({ cm: { search: e } }))
