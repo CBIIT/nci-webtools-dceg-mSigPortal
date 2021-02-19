@@ -1,12 +1,23 @@
 import React, { useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions } from '../../../services/store/publications';
 import BTable from 'react-bootstrap/Table';
 import { DropdownButton, Form, Row, Col } from 'react-bootstrap';
-import { useTable, useGlobalFilter, useAsyncDebounce } from 'react-table';
+import {
+  useTable,
+  useGlobalFilter,
+  useAsyncDebounce,
+  useSortBy,
+} from 'react-table';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faSort,
+  faSortUp,
+  faSortDown,
+} from '@fortawesome/free-solid-svg-icons';
+import { actions } from '../../../services/store/publications';
 import './publications.scss';
 
-function GlobalFilter({ globalFilter, setGlobalFilter, handleSearch }) {
+function GlobalFilter({ globalFilter, setGlobalFilter, handleSearch, title }) {
   const [value, setValue] = React.useState(globalFilter);
   const onChange = useAsyncDebounce((value) => {
     setGlobalFilter(value || '');
@@ -23,6 +34,7 @@ function GlobalFilter({ globalFilter, setGlobalFilter, handleSearch }) {
           setValue(e.target.value);
           onChange(e.target.value);
         }}
+        aria-label={`${title.replace(/\s/g, '')}-search`}
       />
     </Form.Group>
   );
@@ -51,7 +63,8 @@ function Table({
       data,
       initialState: { hiddenColumns: hidden, globalFilter: search },
     },
-    useGlobalFilter
+    useGlobalFilter,
+    useSortBy
   );
 
   return (
@@ -65,6 +78,7 @@ function Table({
             globalFilter={state.globalFilter}
             setGlobalFilter={setGlobalFilter}
             handleSearch={handleSearch}
+            title={title}
           />
         </Col>
         <Col md="1">
@@ -115,7 +129,26 @@ function Table({
           {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps()}>{column.render('Header')}</th>
+                <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                  {column.render('Header')}{' '}
+                  <span>
+                    {column.isSorted ? (
+                      column.isSortedDesc ? (
+                        <FontAwesomeIcon
+                          className="text-primary"
+                          icon={faSortDown}
+                        />
+                      ) : (
+                        <FontAwesomeIcon
+                          className="text-primary"
+                          icon={faSortUp}
+                        />
+                      )
+                    ) : (
+                      <FontAwesomeIcon className="text-primary" icon={faSort} />
+                    )}
+                  </span>
+                </th>
               ))}
             </tr>
           ))}
