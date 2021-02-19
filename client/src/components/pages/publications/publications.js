@@ -1,12 +1,13 @@
 import React, { useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import BTable from 'react-bootstrap/Table';
-import { DropdownButton, Form, Row, Col } from 'react-bootstrap';
+import { DropdownButton, Form, Row, Col, Button } from 'react-bootstrap';
 import {
   useTable,
   useGlobalFilter,
   useAsyncDebounce,
   useSortBy,
+  usePagination,
 } from 'react-table';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -40,31 +41,61 @@ function GlobalFilter({ globalFilter, setGlobalFilter, handleSearch, title }) {
   );
 }
 
+function PaginationText({
+  from,
+  to,
+  size,
+  singular = 'entry',
+  plural = 'entries',
+}) {
+  return size > 0 ? (
+    <span className="react-bootstrap-table-pagination-total ml-2 small text-muted">
+      Showing&nbsp;
+      {1 + to - from < size && `${from} to ${to} of `}
+      {size.toLocaleString()}
+      {size === 1 ? ` ${singular}` : ` ${plural || singular + 's'}`}
+    </span>
+  ) : null;
+}
+
 function Table({
   title,
   columns,
   data,
   hidden,
   search,
-  handleCheck,
-  handleSearch,
+  pagination,
+  mergeState,
 }) {
   const {
     getTableProps,
+    getTableBodyProps,
     headerGroups,
-    rows,
     prepareRow,
     setHiddenColumns,
-    state,
     setGlobalFilter,
+    page,
+    canPreviousPage,
+    canNextPage,
+    pageCount,
+    gotoPage,
+    nextPage,
+    previousPage,
+    setPageSize,
+    state: { pageIndex, pageSize, globalFilter, hiddenColumns },
   } = useTable(
     {
       columns,
       data,
-      initialState: { hiddenColumns: hidden, globalFilter: search },
+      initialState: {
+        hiddenColumns: hidden,
+        globalFilter: search,
+        ...pagination,
+      },
     },
     useGlobalFilter,
-    useSortBy
+    useSortBy,
+    usePagination
   );
 
   return (
@@ -75,9 +106,9 @@ function Table({
         </Col>
         <Col md="3">
           <GlobalFilter
-            globalFilter={state.globalFilter}
+            globalFilter={globalFilter}
             setGlobalFilter={setGlobalFilter}
-            handleSearch={handleSearch}
+            handleSearch={(query) => mergeState({ search: query })}
             title={title}
           />
         </Col>
@@ -102,7 +133,7 @@ function Table({
                       <Form.Check
                         type="checkbox"
                         label={col}
-                        checked={state.hiddenColumns.indexOf(col) == -1}
+                        checked={hiddenColumns.indexOf(col) == -1}
                         onChange={() =>
                           setHiddenColumns((hiddenColumns) => {
                             const index = hiddenColumns.indexOf(col);
@@ -111,7 +142,7 @@ function Table({
                                 ? hiddenColumns.filter((c) => c != col)
                                 : [...hiddenColumns, col];
 
-                            handleCheck({ hidden: newHidden });
+                            mergeState({ hidden: newHidden });
                             return newHidden;
                           })
                         }
@@ -153,8 +184,8 @@ function Table({
             </tr>
           ))}
         </thead>
-        <tbody>
-          {rows.map((row, i) => {
+        <tbody {...getTableBodyProps}>
+          {page.map((row, i) => {
             prepareRow(row);
             return (
               <tr {...row.getRowProps()}>
@@ -168,6 +199,82 @@ function Table({
           })}
         </tbody>
       </BTable>
+      <Row className="pagination">
+        <Col>
+          <select
+            className="form-control-sm"
+            value={pageSize}
+            onChange={(e) => {
+              setPageSize(Number(e.target.value));
+              mergeState({ pagination: { pageSize: Number(e.target.value) } });
+            }}
+            aria-label="Select a pagination size"
+          >
+            {[10, 25, 50, 100].map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+          <PaginationText
+            from={pageIndex * pageSize + 1}
+            to={pageIndex * pageSize + page.length}
+            size={data.length}
+          />
+        </Col>
+        <Col className="d-flex">
+          <div className="ml-auto">
+            {canPreviousPage && (
+              <Button
+                className="p-2"
+                variant="link"
+                onClick={() => {
+                  gotoPage(0);
+                  mergeState({ pagination: { pageIndex: 0 } });
+                }}
+              >
+                {'<<'}
+              </Button>
+            )}
+            {canPreviousPage && (
+              <Button
+                className="p-2"
+                variant="link"
+                onClick={() => {
+                  previousPage();
+                  mergeState({ pagination: { pageIndex: pageIndex - 1 } });
+                }}
+              >
+                {'<'}
+              </Button>
+            )}
+            {canNextPage && (
+              <Button
+                className="p-2"
+                variant="link"
+                onClick={() => {
+                  nextPage();
+                  mergeState({ pagination: { pageIndex: pageIndex + 1 } });
+                }}
+              >
+                {'>'}
+              </Button>
+            )}
+            {canNextPage && (
+              <Button
+                className="p-2"
+                variant="link"
+                onClick={() => {
+                  gotoPage(pageCount - 1);
+                  mergeState({ pagination: { pageIndex: pageCount - 1 } });
+                }}
+              >
+                {'>>'}
+              </Button>
+            )}
+          </div>
+        </Col>
+      </Row>
     </div>
   );
 }
@@ -176,10 +283,30 @@ export default function Publications() {
   // data is retrieved in components/app.js
   const dispatch = useDispatch();
   const { orA, orB, rp, cm } = useSelector((state) => state.publications);
-  const { search: oraSearch, hidden: oraHidden, ...oraTable } = orA;
-  const { search: orbSearch, hidden: orbHidden, ...orbTable } = orB;
-  const { search: rpSearch, hidden: rpHidden, ...rpTable } = rp;
-  const { search: cmSearch, hidden: cmHidden, ...cmTable } = cm;
+  const {
+    search: oraSearch,
+    hidden: oraHidden,
+    pagination: oraPagination,
+    ...oraTable
+  } = orA;
+  const {
+    search: orbSearch,
+    hidden: orbHidden,
+    pagination: orbPagination,
+    ...orbTable
+  } = orB;
+  const {
+    search: rpSearch,
+    hidden: rpHidden,
+    pagination: rpPagination,
+    ...rpTable
+  } = rp;
+  const {
+    search: cmSearch,
+    hidden: cmHidden,
+    pagination: cmPagination,
+    ...cmTable
+  } = cm;
   const oraMemo = useMemo(() => oraTable, [oraTable]) || {};
   const orbMemo = useMemo(() => orbTable, [orbTable]) || {};
   const rpMemo = useMemo(() => rpTable, [rpTable]) || {};
@@ -204,12 +331,8 @@ export default function Publications() {
             data={oraMemo.data}
             hidden={oraHidden}
             search={oraSearch}
-            handleCheck={(state) =>
-              dispatch(actions.mergeState({ orA: state }))
-            }
-            handleSearch={(e) =>
-              dispatch(actions.mergeState({ orA: { search: e } }))
-            }
+            pagination={oraPagination}
+            mergeState={(state) => dispatch(actions.mergeState({ orA: state }))}
           />
         )}
         {orbMemo.data && (
@@ -219,12 +342,8 @@ export default function Publications() {
             data={orbMemo.data}
             hidden={orbHidden}
             search={orbSearch}
-            handleCheck={(state) =>
-              dispatch(actions.mergeState({ orB: state }))
-            }
-            handleSearch={(e) =>
-              dispatch(actions.mergeState({ orB: { search: e } }))
-            }
+            pagination={orbPagination}
+            mergeState={(state) => dispatch(actions.mergeState({ orB: state }))}
           />
         )}
         {rpMemo.data && (
@@ -234,10 +353,8 @@ export default function Publications() {
             data={rpMemo.data}
             hidden={rpHidden}
             search={rpSearch}
-            handleCheck={(state) => dispatch(actions.mergeState({ rp: state }))}
-            handleSearch={(e) =>
-              dispatch(actions.mergeState({ rp: { search: e } }))
-            }
+            pagination={rpPagination}
+            mergeState={(state) => dispatch(actions.mergeState({ rp: state }))}
           />
         )}
         {cmMemo.data && (
@@ -247,10 +364,8 @@ export default function Publications() {
             data={cmMemo.data}
             hidden={cmHidden}
             search={cmSearch}
-            handleCheck={(state) => dispatch(actions.mergeState({ cm: state }))}
-            handleSearch={(e) =>
-              dispatch(actions.mergeState({ cm: { search: e } }))
-            }
+            pagination={cmPagination}
+            mergeState={(state) => dispatch(actions.mergeState({ cm: state }))}
           />
         )}
 

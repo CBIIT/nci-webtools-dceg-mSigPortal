@@ -12,6 +12,7 @@ export const getInitialState = () => ({
       'Pubmed ID/BioRxiv',
       'DOI',
     ],
+    pagination: { pageIndex: 0, pageSize: 10 },
   },
   orB: {
     search: '',
@@ -22,12 +23,15 @@ export const getInitialState = () => ({
       'Pubmed ID/BioRxiv',
       'DOI',
     ],
+    pagination: { pageIndex: 0, pageSize: 10 },
   },
   rp: {
     search: '',
     hidden: ['First author', 'Last Author', 'Pubmed ID/BioRxiv', 'DOI'],
+    pagination: { pageIndex: 0, pageSize: 10 },
   },
   cm: { search: '', hidden: ['Programming'] },
+  pagination: { pageIndex: 0, pageSize: 10 },
 });
 
 export const { actions, reducer } = createSlice({
