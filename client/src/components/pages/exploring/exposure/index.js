@@ -117,6 +117,8 @@ export default function Exposure({ match }) {
   // const [matrixValidity, setMatrixValidity] = useState(false);
   // const [signatureValidity, setSignatureValidity] = useState(false);
 
+  const [expand, setExpand] = useState(false);
+
   // load example if available
   useEffect(() => {
     if (exampleName) loadExample(exampleName);
@@ -1013,24 +1015,33 @@ export default function Exposure({ match }) {
     },
   ];
 
-  const examples = [
+  const queries = [
     {
-      name: 'PCAWG/Lung-AdenoCA',
-      title:
-        'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Lung-AdenoCA; MSA SBS5 vs SBS40',
-      path: 'exposure1',
+      study: 'PCAWG',
+      examples: [
+        {
+          name: 'Lung',
+          title:
+            'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Lung-AdenoCA; MSA SBS5 vs SBS40',
+          path: 'exposure1',
+        },
+        {
+          name: 'Skin',
+          title:
+            'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Skin-Melanoma; MSA SBS7a vs SBS7b',
+          path: 'exposure2',
+        },
+        {
+          name: 'Breast',
+          title:
+            'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Breast-AdenoCA; MSA SBS3 vs SBS5',
+          path: 'exposure3',
+        },
+      ],
     },
     {
-      name: 'PCAWG/Skin-Melanoma',
-      title:
-        'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Skin-Melanoma; MSA SBS7a vs SBS7b',
-      path: 'exposure2',
-    },
-    {
-      name: 'PCAWG/Breast-AdenoCA',
-      title:
-        'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Breast-AdenoCA; MSA SBS3 vs SBS5',
-      path: 'exposure3',
+      study: 'TBA',
+      examples: [],
     },
   ];
 
@@ -1043,16 +1054,70 @@ export default function Exposure({ match }) {
         <SidebarPanel>
           <div className="p-3 bg-white border rounded">
             <strong>Example Queries</strong>
-            <div className="d-flex justify-content-between">
-              {examples.map(({ name, title, path }, index) => (
-                <span key={index} className="mb-2">
-                  <a href={`#/exploring/exposure/${path}`} title={title}>
-                    {name}
-                  </a>
-                </span>
-              ))}
-            </div>
-            <hr />
+            {queries.map(({ study, examples }, index) => {
+              return index == 0 ? (
+                <Row key={`${study}-${index}`} className="mb-2">
+                  <Col md="3">{study}:</Col>
+                  {examples.map(({ name, title, path }) => (
+                    <Col md="3">
+                      <span className="mb-2">
+                        <a href={`#/exploring/exposure/${path}`} title={title}>
+                          {name}
+                        </a>
+                      </span>
+                    </Col>
+                  ))}
+                </Row>
+              ) : (
+                <>
+                  {expand ? (
+                    <>
+                      <Row key={`${study}-${index}`} className="mb-2">
+                        <Col md="3">{study}:</Col>
+                        {examples.map(({ name, title, path }) => (
+                          <Col md="3">
+                            <span className="mb-2">
+                              <a
+                                href={`#/exploring/exposure/${path}`}
+                                title={title}
+                              >
+                                {name}
+                              </a>
+                            </span>
+                          </Col>
+                        ))}
+                      </Row>
+                      <Row key={`${study}-${index}`}>
+                        <Col md="6">
+                          <Button
+                            onClick={() => setExpand(false)}
+                            variant="link"
+                            className="p-0"
+                            style={{ textDecoration: 'none' }}
+                          >
+                            Show Less
+                          </Button>
+                        </Col>
+                      </Row>
+                    </>
+                  ) : (
+                    <Row key={`${study}-${index}`}>
+                      <Col md="6">
+                        <Button
+                          onClick={() => setExpand(true)}
+                          variant="link"
+                          className="p-0"
+                          style={{ textDecoration: 'none' }}
+                        >
+                          Show More
+                        </Button>
+                      </Col>
+                    </Row>
+                  )}
+                </>
+              );
+            })}
+            <hr className="mb-2" />
             <Row>
               <Col lg="auto">
                 <Group>
