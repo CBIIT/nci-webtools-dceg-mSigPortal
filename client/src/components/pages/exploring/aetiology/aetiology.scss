@@ -1,0 +1,23 @@
+.sigIcon {
+  width: 170px;
+  position: relative;
+  cursor: pointer;
+  border-color: #343a40 !important;
+
+  &:hover {
+    border: 1px solid steelblue !important;
+  }
+  &.active {
+    border: 1px solid steelblue !important;
+  }
+  &.inactive {
+    opacity: 0.4;
+    filter: alpha(opacity=40);
+  }
+}
+
+.sigLabel {
+  position: absolute;
+  bottom: 0px;
+  left: 70px;
+}

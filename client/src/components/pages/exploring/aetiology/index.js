@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Row, Col, Accordion, Card, Button, Nav } from 'react-bootstrap';
+import { Form, Row, Col, Card, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import Select from '../../../controls/select/select';
@@ -7,6 +7,8 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as exploringActions } from '../../../../services/store/exploring';
 import { actions as modalActions } from '../../../../services/store/modal';
+import Plot from '../../../controls/plot/plot';
+import './aetiology.scss';
 
 const actions = { ...exploringActions, ...modalActions };
 
@@ -39,12 +41,29 @@ export default function Aetiology() {
       }
     };
 
-    if (!data.length) getData();
+    // if (!data.length) getData();
   }, [data]);
 
   function getAetiologies() {
     if (data.length) {
-      return [...new Set(data.map((obj) => obj.aetiology))];
+      return [
+        ...new Set(
+          data.filter((obj) => obj.Study == study).map((obj) => obj.Aetiology)
+        ),
+      ].map((Aetiology) => (
+        <Col sm="4" className="mb-3">
+          <Button
+            className="d-flex mx-auto"
+            onClick={() =>
+              mergeAetiology({ aetiology: Aetiology, signature: '' })
+            }
+            className={aetiology != Aetiology ? 'disabled' : ''}
+            block
+          >
+            {Aetiology}
+          </Button>
+        </Col>
+      ));
     } else {
       return [];
     }
@@ -52,50 +71,100 @@ export default function Aetiology() {
 
   function getSignatures() {
     if (data.length) {
-      return [...new Set(data.map((obj) => obj.signature))];
+      return data
+        .filter(({ Study }) => Study == study)
+        .map(({ Aetiology, Signature }) => (
+          <Col sm="4" className="mb-3">
+            <div
+              className={`sigIcon border rounded ${
+                aetiology != Aetiology
+                  ? 'inactive'
+                  : signature == Signature
+                  ? 'active'
+                  : ''
+              }`}
+            >
+              <img
+                src={`api/public/Aetiology/Profile_logo/${Signature}.svg`}
+                className="w-100"
+                onClick={() =>
+                  mergeAetiology({
+                    aetiology: Aetiology,
+                    signature: Signature,
+                  })
+                }
+                height="100"
+                alt={Signature}
+              />
+              <strong className="sigLabel">{Signature}</strong>
+            </div>
+          </Col>
+        ));
     } else {
       return [];
     }
   }
 
-  return (
-    <div className="bg-white border rounded p-4">
-      <div className="mx-auto" style={{ width: '300px' }}>
-        <Row className="d-flex justify-content-center">
-          {getAetiologies().map((aetiology) => (
-            <Col md="4" className="mb-3">
-              <Button
-                className="d-flex mx-auto"
-                onClick={() => mergeAetiology({ aetiology: aetiology })}
-              >
-                {aetiology}
-              </Button>
-            </Col>
+  function getStudy() {
+    if (data.length) {
+      return (
+        <select
+          className="mb-3"
+          onChange={(e) => mergeAetiology({ study: e.target.value })}
+        >
+          {[...new Set(data.map((obj) => obj.Study))].map((Study) => (
+            <option value={Study}>{Study}</option>
           ))}
-        </Row>
-        <Row className="d-flex justify-content-center">
-          {getSignatures().map((signature) => (
-            <Col md="4" className="mb-3">
-              <Button
-                className="d-flex mx-auto"
-                onClick={() => mergeAetiology({ signature: signature })}
-              >
-                {signature}
-              </Button>
-            </Col>
-          ))}
-        </Row>
-      </div>
-      {/* <pre>
-        <code>
-          {JSON.stringify(
-            (() => {
-              const { data, ...rest } = exploring.aetiology;
-              return rest;
-            })()
+        </select>
+      );
+    } else {
+      return [];
+    }
+  }
+
+  function getInfo() {
+    if (data.length && signature) {
+      const info = data.filter(
+        ({ Study, Aetiology, Signature }) =>
+          Study == study && Aetiology == aetiology && Signature == signature
+      )[0];
+
+      return (
+        <div>
+          <div>
+            <strong>Signature Name: </strong>
+            {signature}
+          </div>
+          {info.Source && (
+            <div>
+              <strong>Source: </strong>
+              <a href={info.SourceURL} target="_blank" rel="noreferrer">
+                {info.Source}
+              </a>
+            </div>
           )}
-        </code>
-      </pre> */}
+          {info.Description && info.Description.map((text) => <p>{text}</p>)}
+          <Plot
+            className="p-3 border"
+            maxHeight={'400px'}
+            plotURL={`api/public/Aetiology/Exposure/${signature}_${study}.svg`}
+          />
+        </div>
+      );
+    }
+  }
+
+  return (
+    <div className="bg-white border rounded">
+      <div className="mx-auto p-3" style={{ width: '600px' }}>
+        <Row className="justify-content-center">{getStudy()}</Row>
+        <Row className="justify-content-center">{getAetiologies()}</Row>
+        <Row className="justify-content-center">{getSignatures()}</Row>
+      </div>
+      <hr />
+      <div className="mx-auto p-3" style={{ maxWidth: '900px' }}>
+        {getInfo()}
+      </div>
     </div>
   );
 }

@@ -12,7 +12,7 @@ export const getInitialState = () => ({
     submitted: false,
   },
   aetiology: {
-    aetiology: '',
+    aetiology: 'APOBEC activity',
     signature: '',
     study: 'PCAWG',
     data: [],
