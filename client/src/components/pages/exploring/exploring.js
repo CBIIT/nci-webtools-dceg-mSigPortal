@@ -9,7 +9,7 @@ import {
 import { actions as modalActions } from '../../../services/store/modal';
 import Signature from './signature/index';
 import Exposure from './exposure';
-import Etiology from './etiology';
+import Aetiology from './aetiology';
 import Download from './download';
 import './exploring.scss';
 
@@ -256,7 +256,7 @@ export default function Explore() {
   }
 
   const tabs = [
-    { name: 'Etiology', id: 'etiology' },
+    { name: 'Aetiology', id: 'aetiology' },
     { name: 'Signature', id: 'signature' },
     { name: 'Exposure', id: 'exposure' },
     { name: 'Download', id: 'download' },
@@ -321,7 +321,7 @@ export default function Explore() {
             path={`/exploring`}
             render={() => <Redirect to={`/exploring/${displayTab}`} />}
           />
-          <Route path="/exploring/etiology" component={Etiology} />
+          <Route path="/exploring/aetiology" component={Aetiology} />
           <Route path="/exploring/signature" component={Signature} />
           <Route
             path="/exploring/exposure/:exampleName?"
