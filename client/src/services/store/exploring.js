@@ -11,6 +11,12 @@ export const getInitialState = () => ({
     projectID: '',
     submitted: false,
   },
+  aetiology: {
+    aetiology: '',
+    signature: '',
+    study: 'PCAWG',
+    data: [],
+  },
   sigRefSig: {
     plotPath: '',
     plotURL: 'assets/images/mSigPortalReferenceSignatures.svg',
