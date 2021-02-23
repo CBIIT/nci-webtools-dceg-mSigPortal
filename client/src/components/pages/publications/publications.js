@@ -114,6 +114,7 @@ function Table({
         </Col>
         <Col md="1">
           <DropdownButton
+            variant="secondary"
             title="Columns"
             id={`${title.replace(/\s/g, '')}-controls`}
           >
@@ -176,7 +177,7 @@ function Table({
                         />
                       )
                     ) : (
-                      <FontAwesomeIcon className="text-primary" icon={faSort} />
+                      <FontAwesomeIcon className="text-muted" icon={faSort} />
                     )}
                   </span>
                 </th>
@@ -316,8 +317,6 @@ export default function Publications() {
     <div className="mx-3">
       <div className="bg-white border p-3 mx-3">
         <div className="mb-4">
-          <h1 className="">Publications</h1>
-          <hr />
           <p>
             An overview of published papers, tools, websites and databases
             related to mutational signatures analysis.
