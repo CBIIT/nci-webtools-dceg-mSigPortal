@@ -97,6 +97,7 @@ export default function Table({
     prepareRow,
     setHiddenColumns,
     setGlobalFilter,
+    rows,
     page,
     canPreviousPage,
     canNextPage,
@@ -252,7 +253,7 @@ export default function Table({
           <PaginationText
             from={pageIndex * pageSize + 1}
             to={pageIndex * pageSize + page.length}
-            size={data.length}
+            size={rows.length}
           />
         </Col>
         <Col className="d-flex">
