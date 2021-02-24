@@ -4,7 +4,7 @@ import { mergeObject } from './utils';
 // data is loaded in components/app.js
 export const getInitialState = () => ({
   orA: {
-    search: '',
+    globalFilter: '',
     hidden: [
       'Disease/Phenotype/Exposure',
       'First author',
@@ -15,7 +15,7 @@ export const getInitialState = () => ({
     pagination: { pageIndex: 0, pageSize: 10 },
   },
   orB: {
-    search: '',
+    globalFilter: '',
     hidden: [
       'Disease/Phenotype/Exposure',
       'First author',
@@ -26,11 +26,11 @@ export const getInitialState = () => ({
     pagination: { pageIndex: 0, pageSize: 10 },
   },
   rp: {
-    search: '',
+    globalFilter: '',
     hidden: ['First author', 'Last Author', 'Pubmed ID/BioRxiv', 'DOI'],
     pagination: { pageIndex: 0, pageSize: 10 },
   },
-  cm: { search: '', hidden: ['Programming'] },
+  cm: { globalFilter: '', hidden: ['Programming'] },
   pagination: { pageIndex: 0, pageSize: 10 },
 });
 

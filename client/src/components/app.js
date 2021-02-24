@@ -103,6 +103,7 @@ export default function App() {
         {
           Header: column,
           accessor: column,
+          id: column,
           Cell: (e) => {
             return column == 'Title' ? (
               <a href={e.row.values['DOI']} target="_blank" rel="noreferrer">
