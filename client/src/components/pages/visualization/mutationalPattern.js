@@ -255,9 +255,9 @@ export default function MutationalPattern({ submitR }) {
               </Group>
             </Col>
             <Col />
-            <Col lg="2" className="d-flex justify-content-end">
+            <Col lg="2" className="d-flex">
               <Button
-                className="mt-auto mb-3"
+                className="ml-auto mb-auto"
                 variant="primary"
                 onClick={() => {
                   if (!pattern) setPattern(true);

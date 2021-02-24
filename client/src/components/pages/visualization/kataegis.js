@@ -213,9 +213,9 @@ export default function Kataegis({ submitR }) {
                   }
                 />
               </Col>
-              <Col lg="2" className="d-flex justify-content-end">
+              <Col lg="2" className="d-flex">
                 <Button
-                  className="mt-auto mb-3"
+                  className="ml-auto mb-auto"
                   variant="primary"
                   onClick={() => {
                     if (!min || isNaN(min)) setMin(true);

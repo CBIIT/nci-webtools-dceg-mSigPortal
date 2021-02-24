@@ -309,10 +309,10 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   }
                 />
               </Col>
-              <Col lg="6" />
-              <Col lg="2" className="d-flex justify-content-end">
+              <Col />
+              <Col lg="2" className="d-flex">
                 <Button
-                  className="mt-auto mb-3"
+                  className="ml-auto mb-auto"
                   disabled={!multiSample}
                   variant="primary"
                   onClick={() => {
@@ -407,10 +407,10 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   }}
                 />
               </Col>
-              <Col lg="5" />
-              <Col lg="2" className="d-flex justify-content-end">
+              <Col />
+              <Col lg="2" className="d-flex">
                 <Button
-                  className="mt-auto mb-3"
+                  className="ml-auto mb-auto"
                   variant="primary"
                   onClick={() => {
                     if (source == 'user') {
@@ -519,10 +519,10 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   onChange={handleCancerChange}
                 />
               </Col>
-              <Col lg="2" />
-              <Col lg="2" className="d-flex justify-content-end">
+              <Col />
+              <Col lg="2" className="d-flex">
                 <Button
-                  className="mt-auto mb-3"
+                  className="ml-auto mb-auto"
                   variant="primary"
                   onClick={() =>
                     calculateR('pub', 'cosineSimilarityPublic', {

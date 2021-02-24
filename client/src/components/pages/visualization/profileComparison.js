@@ -427,9 +427,9 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   }}
                 />
               </Col>
-              <Col lg="2" className="d-flex justify-content-end">
+              <Col lg="2" className="d-flex">
                 <Button
-                  className="mt-auto mb-3"
+                  className="ml-auto mb-auto"
                   disabled={sampleOptions.length < 2}
                   variant="primary"
                   onClick={() => {
@@ -578,9 +578,9 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   <Text className="text-muted">(Ex. 0.8*SBS5;0.1*SBS1)</Text>
                 </Group>
               </Col>
-              <Col lg="1" className="d-flex justify-content-end">
+              <Col lg="1" className="d-flex">
                 <Button
-                  className="mt-auto"
+                  className="ml-auto mb-auto"
                   style={{ marginBottom: '2.5rem' }}
                   variant="primary"
                   onClick={() => {
@@ -690,7 +690,32 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   }}
                 />
               </Col>
-              <Col lg="4" />
+              <Col />
+              <Col lg="2" className="d-flex">
+                <Button
+                  className="ml-auto mb-auto"
+                  variant="primary"
+                  onClick={() =>
+                    calculateR('pub', 'profileComparisonPublic', {
+                      profileName: userProfileType + userMatrixSize,
+                      matrixFile: value2d(
+                        filter2d(
+                          [userProfileType, userMatrixSize],
+                          matrixList.data
+                        )[0],
+                        'Path',
+                        matrixList.columns
+                      ),
+                      userSample: userSampleName,
+                      study: pubStudy,
+                      cancerType: pubCancerType,
+                      publicSample: pubSampleName,
+                    })
+                  }
+                >
+                  Calculate
+                </Button>
+              </Col>
             </Row>
             <Row>
               <Col lg="2">
@@ -723,31 +748,6 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                     });
                   }}
                 />
-              </Col>
-              <Col lg="4" className="d-flex justify-content-end">
-                <Button
-                  className="mt-auto mb-3"
-                  variant="primary"
-                  onClick={() =>
-                    calculateR('pub', 'profileComparisonPublic', {
-                      profileName: userProfileType + userMatrixSize,
-                      matrixFile: value2d(
-                        filter2d(
-                          [userProfileType, userMatrixSize],
-                          matrixList.data
-                        )[0],
-                        'Path',
-                        matrixList.columns
-                      ),
-                      userSample: userSampleName,
-                      study: pubStudy,
-                      cancerType: pubCancerType,
-                      publicSample: pubSampleName,
-                    })
-                  }
-                >
-                  Calculate
-                </Button>
               </Col>
             </Row>
           </Form>
