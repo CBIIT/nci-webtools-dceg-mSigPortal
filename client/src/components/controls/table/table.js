@@ -44,6 +44,7 @@ function DefaultColumnFilter({ column: { filterValue, setFilter, Header } }) {
     <Form.Group className="m-0">
       <Form.Control
         value={filterValue || ''}
+        onClick={(e) => e.stopPropagation()}
         onChange={(e) => {
           setFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
         }}
@@ -145,29 +146,26 @@ export default function Table({
             id={`${title.replace(/\s/g, '')}-controls`}
           >
             <Form>
-              {columns.map(({ id: col }) => {
+              {columns.map(({ id, Header }) => {
                 // ignore DOI column
-                if (col != 'DOI')
+                if (id != 'DOI')
                   return (
                     <Form.Group
-                      key={`${title.replace(/\s/g, '')}-${col}`}
-                      controlId={`${title.replace(
-                        /\s/g,
-                        ''
-                      )}-${col}-visibility`}
+                      key={`${title.replace(/\s/g, '')}-${id}`}
+                      controlId={`${title.replace(/\s/g, '')}-${id}-visibility`}
                       className="my-1 px-2"
                     >
                       <Form.Check
                         type="checkbox"
-                        label={col}
-                        checked={hiddenColumns.indexOf(col) == -1}
+                        label={Header}
+                        checked={hiddenColumns.indexOf(id) == -1}
                         onChange={() =>
                           setHiddenColumns((hiddenColumns) => {
-                            const index = hiddenColumns.indexOf(col);
+                            const index = hiddenColumns.indexOf(id);
                             const newHidden =
                               index > -1
-                                ? hiddenColumns.filter((c) => c != col)
-                                : [...hiddenColumns, col];
+                                ? hiddenColumns.filter((c) => c != id)
+                                : [...hiddenColumns, id];
 
                             console.log(newHidden);
                             mergeState({ hidden: newHidden });
@@ -190,7 +188,7 @@ export default function Table({
               {headerGroup.headers.map((column) => (
                 <th {...column.getHeaderProps(column.getSortByToggleProps())}>
                   {column.render('Header')}
-                  {(column.sort == undefined || column.sort) && (
+                  {column.canSort && (
                     <span>
                       {' '}
                       {column.isSorted ? (

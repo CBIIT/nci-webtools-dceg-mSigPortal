@@ -15,7 +15,7 @@ export default function KataegisTable() {
         id: 'sample',
         accessor: 'sample',
         Header: 'Sample',
-        sort: false,
+        disableSortBy: true,
         filterValue: 'asdf',
       },
       {
