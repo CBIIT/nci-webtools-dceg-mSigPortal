@@ -29,10 +29,7 @@ export function ErrorModal(props) {
       </Modal.Header>
 
       <Modal.Body style={{ backgroundColor: '#fafafa' }}>
-        <p>
-          An error has occured. Please contact an admin for
-          assistance.
-        </p>
+        <p>An error has occured. Please contact an admin for assistance.</p>
         <p>tba@email.com</p>
         <p
           className="m-0 w-100"
