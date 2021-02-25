@@ -146,6 +146,12 @@ export default function Aetiology() {
           )}
           <p>{info.Description}</p>
           {/* {info.Description && info.Description.map((text) => <p>{text}</p>)} */}
+
+          <Plot
+            className="p-3 border"
+            maxHeight={'500px'}
+            plotURL={`api/public/Aetiology/Profile/${signature}.svg`}
+          />
           <Plot
             className="p-3 border"
             maxHeight={'500px'}

@@ -127,7 +127,7 @@ export default function Plot({
                   className="w-100"
                   src={plotURL}
                   style={{ maxHeight: maxHeight || '500px' }}
-                  alt={alt || downloadName}
+                  alt={alt || 'Plot Unavailable'}
                 />
               </TransformComponent>
             </React.Fragment>
