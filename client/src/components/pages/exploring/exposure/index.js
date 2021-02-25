@@ -181,17 +181,12 @@ export default function Exposure({ match }) {
         await fetch(`api/getExposureExample/${id}`)
       ).json();
 
+      const { expExposure, ...rest } = state;
+
       mergeState({
-        exposure: { ...state.expExposure, projectID: projectID },
+        exposure: { expExposure, projectID: projectID },
+        ...rest,
       });
-      // rehydrate state if available
-      if (state.tmb) mergeTMB(state.tmb);
-      if (state.msBurden) mergeMsBurden(state.msBurden);
-      if (state.msAssociation) mergeMsAssociation(state.msAssociation);
-      if (state.msDecomposition) mergeMsDecomposition(state.msDecomposition);
-      if (state.msLandscape) mergeMsLandscape(state.msLandscape);
-      if (state.msPrevalence) mergeMsPrevalence(state.msPrevalence);
-      if (state.tmbSignatures) mergeTmbSignatures(state.tmbSignatures);
     } catch (error) {
       mergeError(error.message);
     }
@@ -1059,7 +1054,7 @@ export default function Exposure({ match }) {
                 <Row key={`${study}-${index}`} className="mb-2">
                   <Col md="3">{study}:</Col>
                   {examples.map(({ name, title, path }) => (
-                    <Col md="3">
+                    <Col md="3" key={name + index}>
                       <span className="mb-2">
                         <a href={`#/exploring/exposure/${path}`} title={title}>
                           {name}
@@ -1072,10 +1067,10 @@ export default function Exposure({ match }) {
                 <>
                   {expand ? (
                     <>
-                      <Row key={`${study}-${index}`} className="mb-2">
+                      <Row className="mb-2">
                         <Col md="3">{study}:</Col>
                         {examples.map(({ name, title, path }) => (
-                          <Col md="3">
+                          <Col md="3" key={`${study}-${name}`}>
                             <span className="mb-2">
                               <a
                                 href={`#/exploring/exposure/${path}`}
@@ -1087,7 +1082,7 @@ export default function Exposure({ match }) {
                           </Col>
                         ))}
                       </Row>
-                      <Row key={`${study}-${index}`}>
+                      <Row>
                         <Col md="6">
                           <Button
                             onClick={() => setExpand(false)}
@@ -1101,7 +1096,7 @@ export default function Exposure({ match }) {
                       </Row>
                     </>
                   ) : (
-                    <Row key={`${study}-${index}`}>
+                    <Row>
                       <Col md="6">
                         <Button
                           onClick={() => setExpand(true)}
