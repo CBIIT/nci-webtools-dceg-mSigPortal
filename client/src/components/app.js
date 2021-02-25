@@ -110,7 +110,7 @@ export default function App() {
                 {e.value}
               </a>
             ) : (
-              e.value
+              e.value || 'N/A'
             );
           },
         },

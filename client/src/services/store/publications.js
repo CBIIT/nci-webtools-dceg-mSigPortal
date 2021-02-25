@@ -30,8 +30,17 @@ export const getInitialState = () => ({
     hidden: ['First author', 'Last Author', 'Pubmed ID/BioRxiv', 'DOI'],
     pagination: { pageIndex: 0, pageSize: 10 },
   },
-  cm: { globalFilter: '', hidden: ['Programming'] },
-  pagination: { pageIndex: 0, pageSize: 10 },
+  cm: {
+    globalFilter: '',
+    hidden: [
+      'Programming',
+      'First author',
+      'Last Author',
+      'Pubmed ID/BioRxiv',
+      'DOI',
+    ],
+    pagination: { pageIndex: 0, pageSize: 10 },
+  },
 });
 
 export const { actions, reducer } = createSlice({
