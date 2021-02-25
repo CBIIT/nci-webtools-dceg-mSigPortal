@@ -3,7 +3,6 @@ import { Form, Row, Col, Card, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import Select from '../../../controls/select/select';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as exploringActions } from '../../../../services/store/exploring';
 import { actions as modalActions } from '../../../../services/store/modal';
@@ -51,8 +50,9 @@ export default function Aetiology() {
           data.filter((obj) => obj.Study == study).map((obj) => obj.Aetiology)
         ),
       ].map((Aetiology) => (
-        <Col lg="2" md="3" sm="4" className="mb-3">
+        <Col lg="2" md="3" sm="4" className="mb-3 d-flex">
           <Button
+            size="sm"
             variant="dark"
             className="d-flex mx-auto"
             onClick={() =>
@@ -94,7 +94,7 @@ export default function Aetiology() {
                     signature: Signature,
                   })
                 }
-                height="100"
+                height="110"
                 alt={Signature}
               />
               <strong className="sigLabel">{Signature}</strong>
