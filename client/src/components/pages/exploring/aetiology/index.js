@@ -33,7 +33,7 @@ export default function Aetiology() {
       try {
         mergeAetiology({
           data: await (
-            await fetch(`api/public/Others/json/aetiology.json`)
+            await fetch(`api/public/Aetiology/Aetiology.json`)
           ).json(),
         });
       } catch (_) {
@@ -41,7 +41,7 @@ export default function Aetiology() {
       }
     };
 
-    // if (!data.length) getData();
+    if (!data.length) getData();
   }, [data]);
 
   function getAetiologies() {
@@ -51,8 +51,9 @@ export default function Aetiology() {
           data.filter((obj) => obj.Study == study).map((obj) => obj.Aetiology)
         ),
       ].map((Aetiology) => (
-        <Col sm="4" className="mb-3">
+        <Col lg="2" md="3" sm="4" className="mb-3">
           <Button
+            variant="dark"
             className="d-flex mx-auto"
             onClick={() =>
               mergeAetiology({ aetiology: Aetiology, signature: '' })
@@ -74,7 +75,7 @@ export default function Aetiology() {
       return data
         .filter(({ Study }) => Study == study)
         .map(({ Aetiology, Signature }) => (
-          <Col sm="4" className="mb-3">
+          <Col lg="2" md="3" sm="4" className="mb-3">
             <div
               className={`sigIcon border rounded ${
                 aetiology != Aetiology
@@ -143,10 +144,11 @@ export default function Aetiology() {
               </a>
             </div>
           )}
-          {info.Description && info.Description.map((text) => <p>{text}</p>)}
+          <p>{info.Description}</p>
+          {/* {info.Description && info.Description.map((text) => <p>{text}</p>)} */}
           <Plot
             className="p-3 border"
-            maxHeight={'400px'}
+            maxHeight={'500px'}
             plotURL={`api/public/Aetiology/Exposure/${signature}_${study}.svg`}
           />
         </div>
@@ -156,15 +158,13 @@ export default function Aetiology() {
 
   return (
     <div className="bg-white border rounded">
-      <div className="mx-auto p-3" style={{ width: '600px' }}>
+      <div className="mx-auto p-3">
         <Row className="justify-content-center">{getStudy()}</Row>
         <Row className="justify-content-center">{getAetiologies()}</Row>
         <Row className="justify-content-center">{getSignatures()}</Row>
       </div>
       <hr />
-      <div className="mx-auto p-3" style={{ maxWidth: '900px' }}>
-        {getInfo()}
-      </div>
+      <div className="mx-auto px-5 py-3">{getInfo()}</div>
     </div>
   );
 }

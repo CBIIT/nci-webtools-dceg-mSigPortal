@@ -1,14 +1,15 @@
-.sigIcon {
+div.sigIcon {
   width: 170px;
   position: relative;
   cursor: pointer;
   border-color: #343a40 !important;
+  margin: auto;
 
   &:hover {
     border: 1px solid steelblue !important;
   }
   &.active {
-    border: 1px solid steelblue !important;
+    border: 2px solid steelblue !important;
   }
   &.inactive {
     opacity: 0.4;
@@ -19,5 +20,5 @@
 .sigLabel {
   position: absolute;
   bottom: 0px;
-  left: 70px;
+  left: 60px;
 }
