@@ -125,7 +125,7 @@ export default function Table({
   );
 
   return (
-    <div className="mb-4">
+    <div className="mb-5">
       <Row className="mb-2">
         <Col md="8">
           <h3 className="mb-0">{title}</h3>
@@ -256,56 +256,56 @@ export default function Table({
             size={rows.length}
           />
         </Col>
+
         <Col className="d-flex">
           <div className="ml-auto">
-            {canPreviousPage && (
-              <Button
-                className="p-2"
-                variant="link"
-                onClick={() => {
-                  gotoPage(0);
-                  mergeState({ pagination: { pageIndex: 0 } });
-                }}
-              >
-                {'<<'}
-              </Button>
-            )}
-            {canPreviousPage && (
-              <Button
-                className="p-2"
-                variant="link"
-                onClick={() => {
-                  previousPage();
-                  mergeState({ pagination: { pageIndex: pageIndex - 1 } });
-                }}
-              >
-                {'<'}
-              </Button>
-            )}
-            {canNextPage && (
-              <Button
-                className="p-2"
-                variant="link"
-                onClick={() => {
-                  nextPage();
-                  mergeState({ pagination: { pageIndex: pageIndex + 1 } });
-                }}
-              >
-                {'>'}
-              </Button>
-            )}
-            {canNextPage && (
-              <Button
-                className="p-2"
-                variant="link"
-                onClick={() => {
-                  gotoPage(pageCount - 1);
-                  mergeState({ pagination: { pageIndex: pageCount - 1 } });
-                }}
-              >
-                {'>>'}
-              </Button>
-            )}
+            <Button
+              disabled={!canPreviousPage}
+              className={`p-2 ${!canPreviousPage ? 'text-muted' : ''}`}
+              variant="link"
+              onClick={() => {
+                gotoPage(0);
+                mergeState({ pagination: { pageIndex: 0 } });
+              }}
+            >
+              {'<<'}
+            </Button>
+            <Button
+              disabled={!canPreviousPage}
+              className={`p-2 ${!canPreviousPage ? 'text-muted' : ''}`}
+              variant="link"
+              onClick={() => {
+                previousPage();
+                mergeState({ pagination: { pageIndex: pageIndex - 1 } });
+              }}
+            >
+              {'<'}
+            </Button>
+            <Button
+              disabled={!canNextPage}
+              className={`p-2 ${!canNextPage ? 'text-muted' : ''}`}
+              variant="link"
+              onClick={() => {
+                nextPage();
+                mergeState({ pagination: { pageIndex: pageIndex + 1 } });
+              }}
+            >
+              {'>'}
+            </Button>
+            <Button
+              disabled={!canNextPage}
+              className={`p-2 ${!canNextPage ? 'text-muted' : ''}`}
+              variant="link"
+              onClick={() => {
+                gotoPage(pageCount - 1);
+                mergeState({ pagination: { pageIndex: pageCount - 1 } });
+              }}
+            >
+              {'>>'}
+            </Button>{' '}
+            <span className="text-muted small align-center">
+              Page: {pageIndex + 1}
+            </span>
           </div>
         </Col>
       </Row>
