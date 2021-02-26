@@ -105,13 +105,25 @@ export default function App() {
           accessor: column,
           id: column,
           Cell: (e) => {
-            return column == 'Title' ? (
-              <a href={e.row.values['DOI']} target="_blank" rel="noreferrer">
-                {e.value}
-              </a>
-            ) : (
-              e.value || 'N/A'
-            );
+            if (column == 'Title') {
+              return (
+                <a href={e.row.values['DOI']} target="_blank" rel="noreferrer">
+                  {e.value}
+                </a>
+              );
+            } else if (column == 'Name' && e.row.values['Github']) {
+              return (
+                <a
+                  href={e.row.values['Github']}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {e.value}
+                </a>
+              );
+            } else {
+              return e.value || '';
+            }
           },
         },
       ];

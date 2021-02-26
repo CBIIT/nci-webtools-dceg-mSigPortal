@@ -36,6 +36,7 @@ export const getInitialState = () => ({
     globalFilter: '',
     hidden: [
       'Programming',
+      'Github',
       'First author',
       'Last Author',
       'Pubmed ID/BioRxiv',

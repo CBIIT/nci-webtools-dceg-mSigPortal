@@ -154,9 +154,10 @@ export default function Table({
             </Dropdown.Toggle>
             <Dropdown.Menu>
               <Form>
-                {columns.map(({ id, Header }) => {
-                  // ignore DOI column
-                  if (id != 'DOI')
+                {columns
+                  // ignore DOI and Github column
+                  .filter(({ id }) => id != 'DOI' && id != 'Github')
+                  .map(({ id, Header }) => {
                     return (
                       <Form.Group
                         key={`${title.replace(/\s/g, '')}-${id}`}
@@ -177,8 +178,6 @@ export default function Table({
                                 index > -1
                                   ? hiddenColumns.filter((c) => c != id)
                                   : [...hiddenColumns, id];
-
-                              console.log(newHidden);
                               mergeState({ hidden: newHidden });
                               return newHidden;
                             })
@@ -186,14 +185,22 @@ export default function Table({
                         />
                       </Form.Group>
                     );
-                })}
+                  })}
               </Form>
             </Dropdown.Menu>
           </Dropdown>
         </Col>
       </Row>
 
-      <BTable responsive striped bordered hover size="sm" {...getTableProps()} className="mb-2">
+      <BTable
+        responsive
+        striped
+        bordered
+        hover
+        size="sm"
+        {...getTableProps()}
+        className="mb-2"
+      >
         <thead>
           {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
