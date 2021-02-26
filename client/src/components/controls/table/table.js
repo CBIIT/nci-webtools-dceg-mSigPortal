@@ -115,6 +115,7 @@ export default function Table({
       initialState: {
         hiddenColumns: hidden,
         globalFilter: globalSearch,
+        sortBy: [{ id: 'Year', desc: true }],
         ...pagination,
       },
     },
