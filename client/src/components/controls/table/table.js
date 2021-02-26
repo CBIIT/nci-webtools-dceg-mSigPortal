@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import BTable from 'react-bootstrap/Table';
-import { DropdownButton, Form, Row, Col, Button } from 'react-bootstrap';
+import { Dropdown, Form, Row, Col, Button } from 'react-bootstrap';
 import {
   useTable,
   useGlobalFilter,
@@ -27,6 +27,7 @@ function GlobalFilter({ globalFilter, setGlobalFilter, handleSearch, title }) {
     <Form.Group className="m-0">
       <Form.Control
         type="text"
+        size="sm"
         placeholder="Search"
         value={value || ''}
         onChange={(e) => {
@@ -129,7 +130,7 @@ export default function Table({
     <div className="mb-5">
       <Row className="mb-2">
         <Col md="8">
-          <h3 className="mb-0">{title}</h3>
+          <strong>{title}</strong>
         </Col>
         <Col md="3">
           {(globalSearch || globalSearch == '') && (
@@ -142,44 +143,53 @@ export default function Table({
           )}
         </Col>
         <Col md="1">
-          <DropdownButton
-            variant="secondary"
-            title="Columns"
-            id={`${title.replace(/\s/g, '')}-controls`}
-          >
-            <Form>
-              {columns.map(({ id, Header }) => {
-                // ignore DOI column
-                if (id != 'DOI')
-                  return (
-                    <Form.Group
-                      key={`${title.replace(/\s/g, '')}-${id}`}
-                      controlId={`${title.replace(/\s/g, '')}-${id}-visibility`}
-                      className="my-1 px-2"
-                    >
-                      <Form.Check
-                        type="checkbox"
-                        label={Header}
-                        checked={hiddenColumns.indexOf(id) == -1}
-                        onChange={() =>
-                          setHiddenColumns((hiddenColumns) => {
-                            const index = hiddenColumns.indexOf(id);
-                            const newHidden =
-                              index > -1
-                                ? hiddenColumns.filter((c) => c != id)
-                                : [...hiddenColumns, id];
+          <Dropdown>
+            <Dropdown.Toggle
+              variant="secondary"
+              size="sm"
+              id={`${title.replace(/\s/g, '')}-controls`}
+              block
+            >
+              Columns
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Form>
+                {columns.map(({ id, Header }) => {
+                  // ignore DOI column
+                  if (id != 'DOI')
+                    return (
+                      <Form.Group
+                        key={`${title.replace(/\s/g, '')}-${id}`}
+                        controlId={`${title.replace(
+                          /\s/g,
+                          ''
+                        )}-${id}-visibility`}
+                        className="my-1 px-2"
+                      >
+                        <Form.Check
+                          type="checkbox"
+                          label={Header}
+                          checked={hiddenColumns.indexOf(id) == -1}
+                          onChange={() =>
+                            setHiddenColumns((hiddenColumns) => {
+                              const index = hiddenColumns.indexOf(id);
+                              const newHidden =
+                                index > -1
+                                  ? hiddenColumns.filter((c) => c != id)
+                                  : [...hiddenColumns, id];
 
-                            console.log(newHidden);
-                            mergeState({ hidden: newHidden });
-                            return newHidden;
-                          })
-                        }
-                      />
-                    </Form.Group>
-                  );
-              })}
-            </Form>
-          </DropdownButton>
+                              console.log(newHidden);
+                              mergeState({ hidden: newHidden });
+                              return newHidden;
+                            })
+                          }
+                        />
+                      </Form.Group>
+                    );
+                })}
+              </Form>
+            </Dropdown.Menu>
+          </Dropdown>
         </Col>
       </Row>
 
