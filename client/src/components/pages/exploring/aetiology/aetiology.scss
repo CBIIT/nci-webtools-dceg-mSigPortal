@@ -1,4 +1,6 @@
 div.sigIcon {
+  padding: 2px 0 1rem;
+  position: relative;
   cursor: pointer;
   border-color: #343a40 !important;
   margin: auto;
@@ -18,5 +20,5 @@ div.sigIcon {
 .sigLabel {
   position: absolute;
   bottom: 0px;
-  left: 40%;
+  left: 37%;
 }

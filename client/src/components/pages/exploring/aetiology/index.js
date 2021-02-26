@@ -45,7 +45,7 @@ export default function Aetiology() {
 
   function getAetiologies() {
     if (data.length) {
-      return [
+      const aetiologies = [
         ...new Set(
           data.filter((obj) => obj.Study == study).map((obj) => obj.Aetiology)
         ),
@@ -65,18 +65,44 @@ export default function Aetiology() {
           </Button>
         </Col>
       ));
+
+      return (
+        <>
+          {aetiologies}
+          <Col lg="2" md="3" sm="4" className="mb-3 d-flex">
+            <Button
+              size="sm"
+              variant="dark"
+              className="d-flex mx-auto"
+              onClick={() =>
+                mergeAetiology({ aetiology: 'all', signature: '' })
+              }
+              className={aetiology != 'all' ? 'disabled' : ''}
+              block
+            >
+              All Aetiologies
+            </Button>
+          </Col>
+        </>
+      );
     } else {
       return [];
     }
   }
 
-  function getSignatures() {
+  function getAllSignatures() {
     if (data.length) {
       return data
         .filter(({ Study }) => Study == study)
         .map(({ Aetiology, Signature }) => (
-          <Col lg="2" md="3" sm="4" className="mb-3">
+          <Col lg="1" md="3" sm="4" className="mb-3">
             <div
+              onClick={() =>
+                mergeAetiology({
+                  aetiology: Aetiology,
+                  signature: Signature,
+                })
+              }
               className={`sigIcon border rounded ${
                 aetiology != Aetiology
                   ? 'inactive'
@@ -84,17 +110,12 @@ export default function Aetiology() {
                   ? 'active'
                   : ''
               }`}
+              title={`${Aetiology} - ${Signature}`}
             >
               <img
                 src={`api/public/Aetiology/Profile_logo/${Signature}.svg`}
                 className="w-100"
-                onClick={() =>
-                  mergeAetiology({
-                    aetiology: Aetiology,
-                    signature: Signature,
-                  })
-                }
-                height="110"
+                // height="70"
                 alt={Signature}
               />
               <strong className="sigLabel">{Signature}</strong>
@@ -106,18 +127,64 @@ export default function Aetiology() {
     }
   }
 
+  function getSignatures() {
+    if (data.length) {
+      const signatures = data.filter(
+        ({ Study, Aetiology }) => Study == study && Aetiology == aetiology
+      );
+
+      return signatures.map(({ Aetiology, Signature }) => (
+        <Col md="2" sm="4" className="mb-3">
+          <div
+            className={`sigIcon border rounded ${
+              aetiology != Aetiology
+                ? 'inactive'
+                : signature == Signature
+                ? 'active'
+                : ''
+            }`}
+          >
+            <img
+              src={`api/public/Aetiology/Profile_logo/${Signature}.svg`}
+              className="w-100"
+              onClick={() => mergeAetiology({ signature: Signature })}
+              // height="110"
+              alt={Signature}
+            />
+            <strong className="sigLabel">{Signature}</strong>
+          </div>
+        </Col>
+      ));
+    } else {
+      return [];
+    }
+  }
+
   function getStudy() {
     if (data.length) {
-      return (
-        <select
-          className="mb-3"
-          onChange={(e) => mergeAetiology({ study: e.target.value })}
-        >
-          {[...new Set(data.map((obj) => obj.Study))].map((Study) => (
-            <option value={Study}>{Study}</option>
-          ))}
-        </select>
-      );
+      return [
+        ...new Set(
+          data
+            .filter(
+              ({ Aetiology, Signature }) =>
+                Aetiology == aetiology && Signature == signature
+            )
+            .map((obj) => obj.Study)
+        ),
+      ].map((Study) => (
+        <Col lg="2" md="3" sm="4" className="mb-3 d-flex">
+          <Button
+            size="sm"
+            variant="dark"
+            className="d-flex mx-auto"
+            onClick={() => mergeAetiology({ study: Study })}
+            className={study != Study ? 'disabled' : ''}
+            block
+          >
+            {Study}
+          </Button>
+        </Col>
+      ));
     } else {
       return [];
     }
@@ -148,13 +215,14 @@ export default function Aetiology() {
           {/* {info.Description && info.Description.map((text) => <p>{text}</p>)} */}
 
           <Plot
-            className="p-3 border"
-            maxHeight={'500px'}
+            className="p-3 border rounded mb-3"
+            maxHeight={'300px'}
             plotURL={`api/public/Aetiology/Profile/${signature}.svg`}
           />
+          <Row className="justify-content-center">{getStudy()}</Row>
           <Plot
             className="p-3 border"
-            maxHeight={'500px'}
+            maxHeight={'400px'}
             plotURL={`api/public/Aetiology/Exposure/${signature}_${study}.svg`}
           />
         </div>
@@ -165,9 +233,13 @@ export default function Aetiology() {
   return (
     <div className="bg-white border rounded">
       <div className="mx-auto p-3">
-        <Row className="justify-content-center">{getStudy()}</Row>
         <Row className="justify-content-center">{getAetiologies()}</Row>
-        <Row className="justify-content-center">{getSignatures()}</Row>
+        {aetiology != 'all' && (
+          <Row className="justify-content-center">{getSignatures()}</Row>
+        )}
+        {aetiology == 'all' && (
+          <Row className="justify-content-center">{getAllSignatures()}</Row>
+        )}
       </div>
       <hr />
       <div className="mx-auto px-5 py-3">{getInfo()}</div>
