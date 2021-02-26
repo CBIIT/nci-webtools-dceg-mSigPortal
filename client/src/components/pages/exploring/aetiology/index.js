@@ -94,10 +94,36 @@ export default function Aetiology() {
     }
   }
 
+  function profileSort(a, b) {
+    const sigOrder = ['SBS', 'DBS', 'ID'];
+    let c = 0,
+      d = 0;
+
+    sigOrder.forEach((profile, i) => {
+      if (a.Signature.includes(profile)) {
+        c = i;
+      }
+      if (b.Signature.includes(profile)) {
+        d = i;
+      }
+    });
+
+    return c - d;
+  }
+
+  function naturalSort(a, b) {
+    return a.Signature.localeCompare(b.Signature, undefined, {
+      numeric: true,
+      sensitivity: 'base',
+    });
+  }
+
   function getAllSignatures() {
     if (data.length) {
       return data
         .filter(({ Study }) => Study == study)
+        .sort(naturalSort)
+        .sort(profileSort)
         .map(({ Aetiology, Signature }) => (
           <Col lg="1" md="3" sm="4" className="mb-3">
             <div
@@ -133,9 +159,12 @@ export default function Aetiology() {
 
   function getSignatures() {
     if (data.length && aetiology != 'all') {
-      const signatures = data.filter(
-        ({ Study, Aetiology }) => Study == study && Aetiology == aetiology
-      );
+      const signatures = data
+        .filter(
+          ({ Study, Aetiology }) => Study == study && Aetiology == aetiology
+        )
+        .sort(naturalSort)
+        .sort(profileSort);
 
       return signatures.map(({ Aetiology, Signature }) => (
         <Col md="2" sm="4" className="mb-3">
