@@ -21,7 +21,7 @@ export default function Aetiology() {
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const { aetiology, signature, study, data } = exploring.aetiology;
+  const { aetiology, signature, study, all, data } = exploring.aetiology;
 
   useEffect(() => {
     mergeExploring({ displayTab: 'aetiology' });
@@ -56,7 +56,11 @@ export default function Aetiology() {
             variant="dark"
             className="d-flex mx-auto"
             onClick={() =>
-              mergeAetiology({ aetiology: Aetiology, signature: '' })
+              mergeAetiology({
+                aetiology: Aetiology,
+                signature: '',
+                all: false,
+              })
             }
             className={aetiology != Aetiology ? 'disabled' : ''}
             block
@@ -75,9 +79,9 @@ export default function Aetiology() {
               variant="dark"
               className="d-flex mx-auto"
               onClick={() =>
-                mergeAetiology({ aetiology: 'all', signature: '' })
+                mergeAetiology({ aetiology: '', signature: '', all: true })
               }
-              className={aetiology != 'all' ? 'disabled' : ''}
+              className={!all ? 'disabled' : ''}
               block
             >
               All Aetiologies
@@ -128,7 +132,7 @@ export default function Aetiology() {
   }
 
   function getSignatures() {
-    if (data.length) {
+    if (data.length && aetiology != 'all') {
       const signatures = data.filter(
         ({ Study, Aetiology }) => Study == study && Aetiology == aetiology
       );
@@ -143,11 +147,11 @@ export default function Aetiology() {
                 ? 'active'
                 : ''
             }`}
+            onClick={() => mergeAetiology({ signature: Signature })}
           >
             <img
               src={`api/public/Aetiology/Profile_logo/${Signature}.svg`}
               className="w-100"
-              onClick={() => mergeAetiology({ signature: Signature })}
               // height="110"
               alt={Signature}
             />
@@ -234,12 +238,12 @@ export default function Aetiology() {
     <div className="bg-white border rounded">
       <div className="mx-auto p-3">
         <Row className="justify-content-center">{getAetiologies()}</Row>
-        {aetiology != 'all' && (
-          <Row className="justify-content-center">{getSignatures()}</Row>
-        )}
-        {aetiology == 'all' && (
-          <Row className="justify-content-center">{getAllSignatures()}</Row>
-        )}
+        <Row className={`justify-content-center ${all ? 'd-none' : ''}`}>
+          {getSignatures()}
+        </Row>
+        <Row className={`justify-content-center ${!all ? 'd-none' : ''}`}>
+          {getAllSignatures()}
+        </Row>
       </div>
       <hr />
       <div className="mx-auto px-5 py-3">{getInfo()}</div>

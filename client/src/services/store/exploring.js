@@ -15,6 +15,7 @@ export const getInitialState = () => ({
     aetiology: 'APOBEC activity',
     signature: '',
     study: 'PCAWG',
+    all: false,
     data: [],
   },
   sigRefSig: {
