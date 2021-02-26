@@ -193,7 +193,7 @@ export default function Table({
         </Col>
       </Row>
 
-      <BTable responsive striped bordered hover size="sm" {...getTableProps()}>
+      <BTable responsive striped bordered hover size="sm" {...getTableProps()} className="mb-2">
         <thead>
           {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
