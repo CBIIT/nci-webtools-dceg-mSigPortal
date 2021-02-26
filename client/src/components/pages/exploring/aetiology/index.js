@@ -210,13 +210,16 @@ export default function Aetiology() {
           {info.Source && (
             <div>
               <strong>Source: </strong>
-              <a href={info.SourceURL} target="_blank" rel="noreferrer">
+              <a href={info.URL} target="_blank" rel="noreferrer">
                 {info.Source}
               </a>
             </div>
           )}
-          <p>{info.Description}</p>
-          {/* {info.Description && info.Description.map((text) => <p>{text}</p>)} */}
+          {typeof info.Description == 'string' ? (
+            <p>{info.Description}</p>
+          ) : (
+            info.Description.map((text) => <p>{text}</p>)
+          )}
 
           <Plot
             className="p-3 border rounded mb-3"
