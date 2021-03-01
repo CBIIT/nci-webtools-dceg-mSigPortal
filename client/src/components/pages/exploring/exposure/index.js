@@ -113,10 +113,11 @@ export default function Exposure({ match }) {
   const [signatureFileObj, setSignature] = useState(new File([], ''));
   const [variableFileObj, setVariable] = useState(new File([], ''));
 
-  // const [exposureValidity, setExposureValidity] = useState(false);
-  // const [matrixValidity, setMatrixValidity] = useState(false);
-  // const [signatureValidity, setSignatureValidity] = useState(false);
+  const [exposureValidity, setExposureValidity] = useState(false);
+  const [matrixValidity, setMatrixValidity] = useState(false);
+  const [signatureValidity, setSignatureValidity] = useState(false);
 
+  const [checkValid, setCheckValid] = useState(false);
   const [expand, setExpand] = useState(false);
 
   // load example if available
@@ -195,6 +196,19 @@ export default function Exposure({ match }) {
         loading: false,
       },
     });
+  }
+
+  function validateFiles() {
+    setCheckValid(true);
+    exposureFileObj.size
+      ? setExposureValidity(true)
+      : setExposureValidity(false);
+    matrixFileObj.size ? setMatrixValidity(true) : setMatrixValidity(false);
+    signatureFileObj.size
+      ? setSignatureValidity(true)
+      : setSignatureValidity(false);
+
+    return exposureValidity && matrixValidity && signatureValidity;
   }
 
   // get signature name options filtered by cancer type
@@ -827,8 +841,8 @@ export default function Exposure({ match }) {
   async function handleUpload() {
     return new Promise(async (resolve, reject) => {
       if (
-        exposureFileObj.size &&
-        matrixFileObj.size &&
+        exposureValidity &&
+        matrixValidity &&
         ((!usePublicSignature && signatureFileObj) ||
           (usePublicSignature && refSignatureSet))
       ) {
@@ -882,7 +896,7 @@ export default function Exposure({ match }) {
 
   function handleReset() {
     const initialState = getInitialState();
-
+    setCheckValid(false);
     window.location.hash = '#/exploring/exposure';
 
     mergeExposure({
@@ -1264,6 +1278,8 @@ export default function Exposure({ match }) {
                         id="variableData"
                         label={exposureFileObj.name || 'Exposure File'}
                         accept=".txt"
+                        isInvalid={checkValid ? !exposureValidity : false}
+                        feedback="Upload an exposure file"
                         onChange={(e) => {
                           setExposure(e.target.files[0]);
                           mergeExposure({
@@ -1272,11 +1288,6 @@ export default function Exposure({ match }) {
                         }}
                         custom
                       />
-                      {/* {exposureValidity && (
-                        <span className="text-danger">
-                          Exposure File Required
-                        </span>
-                      )} */}
                     </Group>
                   </Col>
                 </Row>
@@ -1289,6 +1300,8 @@ export default function Exposure({ match }) {
                         id="variableData"
                         label={matrixFileObj.name || 'Matrix File'}
                         accept=".txt"
+                        isInvalid={checkValid ? !matrixValidity : false}
+                        feedback="Upload a matrix file"
                         onChange={(e) => {
                           setMatrix(e.target.files[0]);
                           mergeExposure({
@@ -1297,11 +1310,6 @@ export default function Exposure({ match }) {
                         }}
                         custom
                       />
-                      {/* {matrixValidity && (
-                        <span className="text-danger">
-                          Matrix File Required
-                        </span>
-                      )} */}
                     </Group>
                   </Col>
                 </Row>
@@ -1367,6 +1375,8 @@ export default function Exposure({ match }) {
                           id="variableData"
                           label={signatureFileObj.name || 'Signature File'}
                           accept=".txt"
+                          isInvalid={checkValid ? !signatureValidity : false}
+                          feedback="Upload a signature file"
                           onChange={(e) => {
                             setSignature(e.target.files[0]);
                             mergeExposure({
@@ -1375,11 +1385,6 @@ export default function Exposure({ match }) {
                           }}
                           custom
                         />
-                        {/* {signatureValidity && (
-                          <span className="text-danger">
-                            Signature File Required
-                          </span>
-                        )} */}
                       </Group>
                     </Col>
                   </Row>
@@ -1414,7 +1419,9 @@ export default function Exposure({ match }) {
                       disabled={loading}
                       className="w-100"
                       variant="primary"
-                      onClick={() => calculateAll()}
+                      onClick={() => {
+                        if (validateFiles()) calculateAll();
+                      }}
                     >
                       Calculate All
                     </Button>
