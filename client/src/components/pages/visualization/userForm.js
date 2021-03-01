@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
   Form,
   Button,
@@ -7,9 +7,8 @@ import {
   Popover,
   OverlayTrigger,
 } from 'react-bootstrap';
-import { useDropzone } from 'react-dropzone';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import './visualization.scss';
 import { useSelector, useDispatch } from 'react-redux';
@@ -32,18 +31,6 @@ export default function UserForm() {
     dispatch(actions.mergeVisualization({ results: state }));
   const mergeMutationalProfiles = (state) =>
     dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
-  const mergeProfilerSummary = (state) =>
-    dispatch(actions.mergeVisualization({ profilerSummary: state }));
-  const mergeMutationalPattern = (state) =>
-    dispatch(actions.mergeVisualization({ mutationalPattern: state }));
-  const mergeCosineSimilarity = (state) =>
-    dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
-  const mergeProfileComparison = (state) =>
-    dispatch(actions.mergeVisualization({ profileComparison: state }));
-  const mergePCA = (state) =>
-    dispatch(actions.mergeVisualization({ pca: state }));
-  const mergeKataegis = (state) =>
-    dispatch(actions.mergeVisualization({ kataegis: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
   const mergeSuccess = (msg) =>
@@ -79,28 +66,6 @@ export default function UserForm() {
   const [validFile, setValidFile] = useState(false);
   const [validEmail, setValidEmail] = useState(false);
   const [checkValid, setCheckValid] = useState(false);
-  const onDropMain = useCallback((acceptedFiles) => {
-    setInput(acceptedFiles[0]);
-    mergeVisualize({ storeFilename: acceptedFiles[0].name });
-  }, []);
-  const {
-    getRootProps: mainRootProps,
-    getInputProps: mainInputProps,
-  } = useDropzone({
-    onDrop: onDropMain,
-    accept: '.csv, .tsv, .vcf, .gz, .tar, .tar.gz',
-  });
-  const onDropBed = useCallback((acceptedFiles) => {
-    setBed(acceptedFiles[0]);
-    mergeVisualize({ bedFilename: acceptedFiles[0].name });
-  }, []);
-  const {
-    getRootProps: bedRootProps,
-    getInputProps: bedInputProps,
-  } = useDropzone({
-    onDrop: onDropBed,
-    accept: '.bed',
-  });
 
   async function handleSubmit() {
     const { projectID, filePath, bedPath } = await uploadFile();
@@ -413,41 +378,25 @@ export default function UserForm() {
             </Button>
           </Col>
         </Row>
-        <section>
-          <div
-            {...mainRootProps({ className: 'dropzone' })}
-            disabled={submitted}
-          >
-            <Control
-              as="input"
-              {...mainInputProps()}
-              disabled={inputFile.size || submitted}
+        <Row>
+          <Col>
+            <Form.File
+              disabled={submitted}
+              id="uploadData"
+              label={inputFile.size ? inputFile.name : storeFilename}
+              accept=".csv, .tsv, .vcf, .gz, .tar, .tar.gz"
               isInvalid={checkValid ? !validFile : false}
+              feedback="Please upload a data file"
+              onChange={(e) => {
+                setInput(e.target.files[0]);
+                mergeVisualize({
+                  storeFilename: e.target.files[0].name,
+                });
+              }}
+              custom
             />
-            {inputFile.size || storeFilename ? (
-              <button
-                id="removeFile"
-                className="d-flex w-100 faButton"
-                onClick={() => removeFile()}
-                disabled={submitted}
-              >
-                <span id="uploadedFile">
-                  {inputFile.size ? inputFile.name : storeFilename}
-                </span>
-                <span className="text-danger ml-auto">
-                  <FontAwesomeIcon icon={faTimes} />
-                </span>
-              </button>
-            ) : (
-              <>
-                <span>Drop files here or click to upload</span>
-                {!validFile && checkValid && (
-                  <span className="text-danger">Please upload a data file</span>
-                )}
-              </>
-            )}
-          </div>
-        </section>
+          </Col>
+        </Row>
       </Group>
       <Group controlId="genomeAssembly">
         <Label>Select Reference Genome Build</Label>
@@ -579,7 +528,7 @@ export default function UserForm() {
               href={bedData}
               download
             >
-              Download Example Bed Data
+              Download Example Data
             </Button>
           </Col>
           <Col lg="6" className="p-0 d-flex">
@@ -594,52 +543,31 @@ export default function UserForm() {
               type="button"
               onClick={() => loadBed()}
             >
-              Load Example Bed Data
+              Load Example Data
             </Button>
           </Col>
         </Row>
-        <section>
-          <div
-            disabled={
-              submitted ||
-              mutationSplit == 'True' ||
-              ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
-            }
-            {...bedRootProps({ className: 'dropzone' })}
-          >
-            <input
-              id="bedUpload"
-              {...bedInputProps()}
+        <Row>
+          <Col>
+            <Form.File
               disabled={
-                mutationSplit == 'True' ||
-                bedFile.size ||
                 submitted ||
+                mutationSplit == 'True' ||
                 ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
               }
+              id="uploadData"
+              label={bedFile.size ? bedFile.name : bedFilename}
+              accept=".bed"
+              onChange={(e) => {
+                setBed(e.target.files[0]);
+                mergeVisualize({
+                  bedFilename: e.target.files[0].name,
+                });
+              }}
+              custom
             />
-            {bedFile.size || bedFilename ? (
-              bedFilename.length > 0 && (
-                <button
-                  id="removeFile"
-                  className="d-flex w-100 faButton"
-                  onClick={() => removeBedFile()}
-                  disabled={submitted}
-                >
-                  <span id="uploadedFile">
-                    {bedFile.size ? bedFile.name : bedFilename}
-                  </span>
-                  <span className="text-danger ml-auto">
-                    <FontAwesomeIcon icon={faTimes} />
-                  </span>
-                </button>
-              )
-            ) : (
-              <>
-                <span>Drop files here or click to upload</span>
-              </>
-            )}
-          </div>
-        </section>
+          </Col>
+        </Row>
       </Group>
       <hr className="mb-3" />
       <Group controlId="collapse" className="d-flex">
