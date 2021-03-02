@@ -2,7 +2,7 @@ div.sigIcon {
   padding: 2px 0 1rem;
   position: relative;
   cursor: pointer;
-  border-color: #343a40 !important;
+  border-color: #bb0e3d !important;
   margin: auto;
 
   &:hover {
@@ -12,6 +12,7 @@ div.sigIcon {
     border: 2px solid steelblue !important;
   }
   &.inactive {
+    border-color: #343a40 !important;
     opacity: 0.4;
     filter: alpha(opacity=40);
   }

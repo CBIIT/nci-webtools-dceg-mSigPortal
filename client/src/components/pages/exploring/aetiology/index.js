@@ -43,6 +43,21 @@ export default function Aetiology() {
     if (!data.length) getData();
   }, [data]);
 
+  // check if plot exists
+  useEffect(() => {
+    const checkPlot = async () => {
+      let check = await fetch(
+        `api/public/Aetiology/Exposure/${signature}_${study}.svg`,
+        { method: 'HEAD' }
+      );
+      check.status === 200 ? setCheck(true) : setCheck(false);
+    };
+
+    if (signature && study) checkPlot();
+  }, [signature, study]);
+
+  const [checkPlot, setCheck] = useState(false);
+
   function getAetiologies() {
     if (data.length) {
       const aetiologies = [
@@ -59,7 +74,6 @@ export default function Aetiology() {
               mergeAetiology({
                 aetiology: Aetiology,
                 signature: '',
-                all: false,
               })
             }
             className={aetiology != Aetiology ? 'disabled' : ''}
@@ -78,13 +92,11 @@ export default function Aetiology() {
               size="sm"
               variant="dark"
               className="d-flex mx-auto"
-              onClick={() =>
-                mergeAetiology({ aetiology: '', signature: '', all: true })
-              }
+              onClick={() => mergeAetiology({ all: !all })}
               className={!all ? 'disabled' : ''}
               block
             >
-              All Aetiologies
+              Toggle All Aetiologies
             </Button>
           </Col>
         </>
@@ -256,11 +268,20 @@ export default function Aetiology() {
             plotURL={`api/public/Aetiology/Profile/${signature}.svg`}
           />
           <Row className="justify-content-center">{getStudy()}</Row>
-          <Plot
-            className="p-3 border"
-            maxHeight={'400px'}
-            plotURL={`api/public/Aetiology/Exposure/${signature}_${study}.svg`}
-          />
+          {checkPlot ? (
+            <Plot
+              className="p-3 border"
+              maxHeight={'400px'}
+              plotURL={`api/public/Aetiology/Exposure/${signature}_${study}.svg`}
+            />
+          ) : (
+            <div className="p-3 border">
+              <p>
+                This signature was not detected in any sample of the selected
+                study
+              </p>
+            </div>
+          )}
         </div>
       );
     }
