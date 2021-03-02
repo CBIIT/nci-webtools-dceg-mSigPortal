@@ -113,9 +113,12 @@ export default function Exposure({ match }) {
   const [signatureFileObj, setSignature] = useState(new File([], ''));
   const [variableFileObj, setVariable] = useState(new File([], ''));
 
-  // const [exposureValidity, setExposureValidity] = useState(false);
-  // const [matrixValidity, setMatrixValidity] = useState(false);
-  // const [signatureValidity, setSignatureValidity] = useState(false);
+  const [exposureValidity, setExposureValidity] = useState(false);
+  const [matrixValidity, setMatrixValidity] = useState(false);
+  const [signatureValidity, setSignatureValidity] = useState(false);
+
+  const [checkValid, setCheckValid] = useState(false);
+  const [expand, setExpand] = useState(false);
 
   // load example if available
   useEffect(() => {
@@ -179,17 +182,12 @@ export default function Exposure({ match }) {
         await fetch(`api/getExposureExample/${id}`)
       ).json();
 
+      const { expExposure, ...rest } = state;
+
       mergeState({
-        exposure: { ...state.expExposure, projectID: projectID },
+        exposure: { expExposure, projectID: projectID },
+        ...rest,
       });
-      // rehydrate state if available
-      if (state.tmb) mergeTMB(state.tmb);
-      if (state.msBurden) mergeMsBurden(state.msBurden);
-      if (state.msAssociation) mergeMsAssociation(state.msAssociation);
-      if (state.msDecomposition) mergeMsDecomposition(state.msDecomposition);
-      if (state.msLandscape) mergeMsLandscape(state.msLandscape);
-      if (state.msPrevalence) mergeMsPrevalence(state.msPrevalence);
-      if (state.tmbSignatures) mergeTmbSignatures(state.tmbSignatures);
     } catch (error) {
       mergeError(error.message);
     }
@@ -198,6 +196,19 @@ export default function Exposure({ match }) {
         loading: false,
       },
     });
+  }
+
+  function validateFiles() {
+    setCheckValid(true);
+    exposureFileObj.size
+      ? setExposureValidity(true)
+      : setExposureValidity(false);
+    matrixFileObj.size ? setMatrixValidity(true) : setMatrixValidity(false);
+    signatureFileObj.size
+      ? setSignatureValidity(true)
+      : setSignatureValidity(false);
+
+    return exposureValidity && matrixValidity && signatureValidity;
   }
 
   // get signature name options filtered by cancer type
@@ -830,8 +841,8 @@ export default function Exposure({ match }) {
   async function handleUpload() {
     return new Promise(async (resolve, reject) => {
       if (
-        exposureFileObj.size &&
-        matrixFileObj.size &&
+        exposureValidity &&
+        matrixValidity &&
         ((!usePublicSignature && signatureFileObj) ||
           (usePublicSignature && refSignatureSet))
       ) {
@@ -885,7 +896,7 @@ export default function Exposure({ match }) {
 
   function handleReset() {
     const initialState = getInitialState();
-
+    setCheckValid(false);
     window.location.hash = '#/exploring/exposure';
 
     mergeExposure({
@@ -1013,24 +1024,33 @@ export default function Exposure({ match }) {
     },
   ];
 
-  const examples = [
+  const queries = [
     {
-      name: 'PCAWG/Lung-AdenoCA',
-      title:
-        'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Lung-AdenoCA; MSA SBS5 vs SBS40',
-      path: 'exposure1',
+      study: 'PCAWG',
+      examples: [
+        {
+          name: 'Lung',
+          title:
+            'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Lung-AdenoCA; MSA SBS5 vs SBS40',
+          path: 'exposure1',
+        },
+        {
+          name: 'Skin',
+          title:
+            'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Skin-Melanoma; MSA SBS7a vs SBS7b',
+          path: 'exposure2',
+        },
+        {
+          name: 'Breast',
+          title:
+            'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Breast-AdenoCA; MSA SBS3 vs SBS5',
+          path: 'exposure3',
+        },
+      ],
     },
     {
-      name: 'PCAWG/Skin-Melanoma',
-      title:
-        'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Skin-Melanoma; MSA SBS7a vs SBS7b',
-      path: 'exposure2',
-    },
-    {
-      name: 'PCAWG/Breast-AdenoCA',
-      title:
-        'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Breast-AdenoCA; MSA SBS3 vs SBS5',
-      path: 'exposure3',
+      study: 'TBA',
+      examples: [],
     },
   ];
 
@@ -1043,16 +1063,70 @@ export default function Exposure({ match }) {
         <SidebarPanel>
           <div className="p-3 bg-white border rounded">
             <strong>Example Queries</strong>
-            <div className="d-flex justify-content-between">
-              {examples.map(({ name, title, path }, index) => (
-                <span key={index} className="mb-2">
-                  <a href={`#/exploring/exposure/${path}`} title={title}>
-                    {name}
-                  </a>
-                </span>
-              ))}
-            </div>
-            <hr />
+            {queries.map(({ study, examples }, index) => {
+              return index == 0 ? (
+                <Row key={`${study}-${index}`} className="mb-2">
+                  <Col md="3">{study}:</Col>
+                  {examples.map(({ name, title, path }) => (
+                    <Col md="3" key={name + index}>
+                      <span className="mb-2">
+                        <a href={`#/exploring/exposure/${path}`} title={title}>
+                          {name}
+                        </a>
+                      </span>
+                    </Col>
+                  ))}
+                </Row>
+              ) : (
+                <>
+                  {expand ? (
+                    <>
+                      <Row className="mb-2">
+                        <Col md="3">{study}:</Col>
+                        {examples.map(({ name, title, path }) => (
+                          <Col md="3" key={`${study}-${name}`}>
+                            <span className="mb-2">
+                              <a
+                                href={`#/exploring/exposure/${path}`}
+                                title={title}
+                              >
+                                {name}
+                              </a>
+                            </span>
+                          </Col>
+                        ))}
+                      </Row>
+                      <Row>
+                        <Col md="6">
+                          <Button
+                            onClick={() => setExpand(false)}
+                            variant="link"
+                            className="p-0"
+                            style={{ textDecoration: 'none' }}
+                          >
+                            Show Less
+                          </Button>
+                        </Col>
+                      </Row>
+                    </>
+                  ) : (
+                    <Row>
+                      <Col md="6">
+                        <Button
+                          onClick={() => setExpand(true)}
+                          variant="link"
+                          className="p-0"
+                          style={{ textDecoration: 'none' }}
+                        >
+                          Show More
+                        </Button>
+                      </Col>
+                    </Row>
+                  )}
+                </>
+              );
+            })}
+            <hr className="mb-2" />
             <Row>
               <Col lg="auto">
                 <Group>
@@ -1204,6 +1278,8 @@ export default function Exposure({ match }) {
                         id="variableData"
                         label={exposureFileObj.name || 'Exposure File'}
                         accept=".txt"
+                        isInvalid={checkValid ? !exposureValidity : false}
+                        feedback="Upload an exposure file"
                         onChange={(e) => {
                           setExposure(e.target.files[0]);
                           mergeExposure({
@@ -1212,11 +1288,6 @@ export default function Exposure({ match }) {
                         }}
                         custom
                       />
-                      {/* {exposureValidity && (
-                        <span className="text-danger">
-                          Exposure File Required
-                        </span>
-                      )} */}
                     </Group>
                   </Col>
                 </Row>
@@ -1229,6 +1300,8 @@ export default function Exposure({ match }) {
                         id="variableData"
                         label={matrixFileObj.name || 'Matrix File'}
                         accept=".txt"
+                        isInvalid={checkValid ? !matrixValidity : false}
+                        feedback="Upload a matrix file"
                         onChange={(e) => {
                           setMatrix(e.target.files[0]);
                           mergeExposure({
@@ -1237,11 +1310,6 @@ export default function Exposure({ match }) {
                         }}
                         custom
                       />
-                      {/* {matrixValidity && (
-                        <span className="text-danger">
-                          Matrix File Required
-                        </span>
-                      )} */}
                     </Group>
                   </Col>
                 </Row>
@@ -1307,6 +1375,8 @@ export default function Exposure({ match }) {
                           id="variableData"
                           label={signatureFileObj.name || 'Signature File'}
                           accept=".txt"
+                          isInvalid={checkValid ? !signatureValidity : false}
+                          feedback="Upload a signature file"
                           onChange={(e) => {
                             setSignature(e.target.files[0]);
                             mergeExposure({
@@ -1315,11 +1385,6 @@ export default function Exposure({ match }) {
                           }}
                           custom
                         />
-                        {/* {signatureValidity && (
-                          <span className="text-danger">
-                            Signature File Required
-                          </span>
-                        )} */}
                       </Group>
                     </Col>
                   </Row>
@@ -1354,7 +1419,9 @@ export default function Exposure({ match }) {
                       disabled={loading}
                       className="w-100"
                       variant="primary"
-                      onClick={() => calculateAll()}
+                      onClick={() => {
+                        if (validateFiles()) calculateAll();
+                      }}
                     >
                       Calculate All
                     </Button>

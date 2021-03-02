@@ -35,12 +35,12 @@ export default function App() {
       cardTitle: 'Signature Exploring',
       cardText: 'Signature Exploring',
       description:
-        'Systematically explore any reference or update to date published signatures with different profiles, version and etiology (endogenous vs Exogenous). Intergratively explore the landscape of signature exposure in different genomic studies, including TCGA, PCAWG, and our Sherlock-Lung study.',
+        'Systematically explore any reference or update to date published signatures with different profiles, version and aetiology (endogenous vs Exogenous). Intergratively explore the landscape of signature exposure in different genomic studies, including TCGA, PCAWG, and our Sherlock-Lung study.',
       image: 'assets/images/explore.png',
       navIndex: 1,
       color: '#2c71dd', // blue
       dropdown: [
-        { name: 'Etiology', path: 'etiology' },
+        { name: 'Aetiology', path: 'aetiology' },
         { name: 'Signature', path: 'signature' },
         { name: 'Exposure', path: 'exposure' },
         { name: 'Download', path: 'download' },
@@ -103,33 +103,36 @@ export default function App() {
         {
           Header: column,
           accessor: column,
+          id: column,
           Cell: (e) => {
-            return column == 'Title' ? (
-              <a href={e.row.values['DOI']} target="_blank" rel="noreferrer">
-                {e.value}
-              </a>
-            ) : (
-              e.value
-            );
+            if (column == 'Title') {
+              return (
+                <a href={e.row.values['DOI']} target="_blank" rel="noreferrer">
+                  {e.value}
+                </a>
+              );
+            } else if (column == 'Name' && e.row.values['Github']) {
+              return (
+                <a
+                  href={e.row.values['Github']}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {e.value}
+                </a>
+              );
+            } else {
+              return e.value || '';
+            }
           },
         },
       ];
-
-      // visible column order
-      const rpColumns = ['Journal', 'Year', 'Title'];
-      const oraColumns = ['Cancer Type', 'Experimental Strategy', ...rpColumns];
-      const orbColumns = ['Cancer Type', 'Experimental Strategy', ...rpColumns];
-      const cmColumns = ['Name', 'Method', 'Github', ...rpColumns];
 
       mergePublications({
         orA: {
           columns: [
             ...new Set(
-              ...data['Original Research A'].map((row) =>
-                Object.keys(row).sort(
-                  (a, b) => oraColumns.indexOf(a) - oraColumns.indexOf(b)
-                )
-              )
+              ...data['Original Research A'].map((row) => Object.keys(row))
             ),
           ].reduce(reducer, []),
           data: data['Original Research A'],
@@ -137,35 +140,21 @@ export default function App() {
         orB: {
           columns: [
             ...new Set(
-              ...data['Orignal Research B'].map((row) =>
-                Object.keys(row).sort(
-                  (a, b) => orbColumns.indexOf(a) - orbColumns.indexOf(b)
-                )
-              )
+              ...data['Orignal Research B'].map((row) => Object.keys(row))
             ),
           ].reduce(reducer, []),
           data: data['Orignal Research B'],
         },
         rp: {
           columns: [
-            ...new Set(
-              ...data['Review Paper'].map((row) =>
-                Object.keys(row).sort(
-                  (a, b) => rpColumns.indexOf(a) - rpColumns.indexOf(b)
-                )
-              )
-            ),
+            ...new Set(...data['Review Paper'].map((row) => Object.keys(row))),
           ].reduce(reducer, []),
           data: data['Review Paper'],
         },
         cm: {
           columns: [
             ...new Set(
-              ...data['Computational Methods'].map((row) =>
-                Object.keys(row).sort(
-                  (a, b) => cmColumns.indexOf(a) - cmColumns.indexOf(b)
-                )
-              )
+              ...data['Computational Methods'].map((row) => Object.keys(row))
             ),
           ].reduce(reducer, []),
           data: data['Computational Methods'],
@@ -173,7 +162,8 @@ export default function App() {
       });
     };
 
-    if (Object.keys(publicationsState).length == 0) getData();
+    // get data on inital page load
+    if (!publicationsState.orA.data) getData();
   }, [publicationsState]);
 
   return (

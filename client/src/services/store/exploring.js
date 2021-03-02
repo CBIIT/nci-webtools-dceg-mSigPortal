@@ -3,13 +3,20 @@ import { mergeObject } from './utils';
 
 export const getInitialState = () => ({
   exploring: {
-    displayTab: 'etiology',
+    displayTab: 'aetiology',
     signatureDisplay: 'referenceSignatures',
     exposureSignature: [],
     exposureCancer: [],
     refSigData: [],
     projectID: '',
     submitted: false,
+  },
+  aetiology: {
+    aetiology: 'APOBEC activity',
+    signature: '',
+    study: 'PCAWG',
+    all: false,
+    data: [],
   },
   sigRefSig: {
     plotPath: '',

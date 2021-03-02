@@ -312,9 +312,9 @@ export default function PCA({ submitR, getRefSigOptions }) {
                   }}
                 />
               </Col>
-              <Col lg="7" className="d-flex justify-content-end">
+              <Col lg="7" className="d-flex">
                 <Button
-                  className="mt-auto mb-3"
+                  className="ml-auto mb-auto"
                   disabled={!multiSample}
                   variant="primary"
                   onClick={() => {
@@ -462,9 +462,9 @@ export default function PCA({ submitR, getRefSigOptions }) {
                   onChange={handleCancerChange}
                 />
               </Col>
-              <Col lg="3" className="d-flex justify-content-end">
+              <Col lg="3" className="d-flex">
                 <Button
-                  className="mt-auto mb-3"
+                  className="ml-auto mb-auto"
                   variant="primary"
                   onClick={() =>
                     calculateR('pub', 'pcaWithPublic', {

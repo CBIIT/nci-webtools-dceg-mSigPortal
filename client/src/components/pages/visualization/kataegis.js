@@ -33,6 +33,7 @@ export default function Kataegis({ submitR }) {
     plotPath,
     plotURL,
     err,
+    kataegisData,
     debugR,
     loading,
   } = visualization.kataegis;
@@ -81,6 +82,8 @@ export default function Kataegis({ submitR }) {
       loading: true,
       err: false,
       debugR: '',
+      plotPath: '',
+      kataegisData: [],
     });
 
     try {
@@ -210,9 +213,9 @@ export default function Kataegis({ submitR }) {
                   }
                 />
               </Col>
-              <Col lg="2" className="d-flex justify-content-end">
+              <Col lg="2" className="d-flex">
                 <Button
-                  className="mt-auto mb-3"
+                  className="ml-auto mb-auto"
                   variant="primary"
                   onClick={() => {
                     if (!min || isNaN(min)) setMin(true);
@@ -244,7 +247,7 @@ export default function Kataegis({ submitR }) {
                 plotURL={plotURL}
                 txtPath={txtPath ? projectID + txtPath : null}
               />
-              <KataegisTable />
+              {kataegisData.length > 0 && <KataegisTable />}
             </div>
           </div>
         </div>
