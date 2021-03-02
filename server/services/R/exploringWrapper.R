@@ -429,16 +429,21 @@ mutationalSignatureIndividual <- function(sample, cancerType, plotPath, exposure
 
 exposurePublic <- function(fn, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', individual = '{}', projectID, pythonOutput, rootDir, savePath, dataPath) {
   tryCatch({
+    library('aws.s3')
     source('services/R/Sigvisualfunc.R')
     con <- textConnection('stdout', 'wr', local = TRUE)
     sink(con, type = "message")
     sink(con, type = "output")
 
     totalTime = proc.time()
-    load(paste0(dataPath, 'Signature/signature_refsets.RData'))
-    # load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata.RData'))
-    load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'))
-    load(paste0(dataPath, 'Exposure/exposure_refdata.RData'))
+    s3load('msigportal/Database/Signature/signature_refsets.RData','nci-cbiit-ss-analysistools-sandbox')
+    s3load('msigportal/Database/Seqmatrix/seqmatrix_refdata_subset_files.RData','nci-cbiit-ss-analysistools-sandbox')
+    s3load('msigportal/Database/Exposure/exposure_refdata.RData','nci-cbiit-ss-analysistools-sandbox')
+
+    # load(paste0(dataPath, 'Signature/signature_refsets.RData'))
+    # # load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata.RData'))
+    # load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'))
+    # load(paste0(dataPath, 'Exposure/exposure_refdata.RData'))
 
     output = list()
     errors = list()
@@ -479,7 +484,9 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
     }
     seqmatrix_refdata_selected = NULL
     for (file in seqmatrixFiles) {
-      seqmatrix_refdata_selected <- get(load(paste0(dataPath, 'Seqmatrix/', file)))
+      # seqmatrix_refdata_selected <- get(load(paste0(dataPath, 'Seqmatrix/', file)))
+      seqFile <- get_object(paste0('msigportal/Database/Seqmatrix/', file),'nci-cbiit-ss-analysistools-sandbox')
+      seqmatrix_refdata_selected <- get(load(rawConnection(seqFile)))
     }
     seqmatrix_refdata_selected = seqmatrix_refdata_selected %>% filter(Profile == signature_refsets_selected$Profile[1])
 
