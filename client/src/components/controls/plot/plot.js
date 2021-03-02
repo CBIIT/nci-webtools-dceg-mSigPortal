@@ -91,6 +91,7 @@ export default function Plot({
                     className="ml-3"
                     variant="secondary"
                     onClick={zoomIn}
+                    aria-label="zoom in"
                   >
                     <FontAwesomeIcon
                       icon={faPlus}
@@ -102,6 +103,7 @@ export default function Plot({
                     className="ml-1"
                     variant="secondary"
                     onClick={zoomOut}
+                    aria-label="zoom out"
                   >
                     <FontAwesomeIcon
                       icon={faMinus}
@@ -113,6 +115,7 @@ export default function Plot({
                     className="ml-1"
                     variant="secondary"
                     onClick={resetTransform}
+                    aria-label="reset zoom"
                   >
                     <FontAwesomeIcon
                       icon={faHome}

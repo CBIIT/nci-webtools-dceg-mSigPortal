@@ -350,7 +350,7 @@ export default function UserForm() {
           <option value="catalog_csv">CATALOG CSV</option>
         </Control>
       </Group>
-      <Group controlId="fileUpload">
+      <Group>
         <Label>
           Upload File <span style={{ color: 'crimson' }}>*</span>
         </Label>
@@ -382,8 +382,14 @@ export default function UserForm() {
           <Col>
             <Form.File
               disabled={submitted}
-              id="uploadData"
-              label={inputFile.size ? inputFile.name : storeFilename}
+              id="fileUpload"
+              label={
+                inputFile.size
+                  ? inputFile.name
+                  : storeFilename
+                  ? storeFilename
+                  : 'Upload Data File...'
+              }
               accept=".csv, .tsv, .vcf, .gz, .tar, .tar.gz"
               isInvalid={checkValid ? !validFile : false}
               feedback="Please upload a data file"
@@ -508,7 +514,7 @@ export default function UserForm() {
         <Text className="text-muted">Use @ to separate multiple filters</Text>
       </Group>
       <hr className="mb-3" />
-      <Group controlId="bedUpload">
+      <Group controlId="dataFileUpload">
         <Label>
           Filter Mutations using Bed File{' '}
           <span className="text-muted font-italic font-weight-normal">
@@ -528,7 +534,7 @@ export default function UserForm() {
               href={bedData}
               download
             >
-              Download Example Data
+              Download Example Bed
             </Button>
           </Col>
           <Col lg="6" className="p-0 d-flex">
@@ -543,7 +549,7 @@ export default function UserForm() {
               type="button"
               onClick={() => loadBed()}
             >
-              Load Example Data
+              Load Example Bed
             </Button>
           </Col>
         </Row>
@@ -555,8 +561,14 @@ export default function UserForm() {
                 mutationSplit == 'True' ||
                 ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
               }
-              id="uploadData"
-              label={bedFile.size ? bedFile.name : bedFilename}
+              id="uploadDataFile"
+              label={
+                bedFile.size
+                  ? bedFile.name
+                  : bedFilename
+                  ? bedFilename
+                  : 'Upload Bed File...'
+              }
               accept=".bed"
               onChange={(e) => {
                 setBed(e.target.files[0]);

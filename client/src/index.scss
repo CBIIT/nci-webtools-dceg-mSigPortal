@@ -108,6 +108,16 @@ a:focus {
   }
 }
 
+.btn-dark {
+  &.disabled {
+    @extend .btn-outline-dark;
+    &:hover {
+      color: #6c757d;
+      background-color: transparent;
+    }
+  }
+}
+
 .btn-silver {
   // background-color:#D3D3D3;
   background-image: linear-gradient(#ffffff, #eeeeee);
