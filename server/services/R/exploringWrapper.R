@@ -7,14 +7,19 @@ library(ggtext)
 library(ggpubr)
 library(jsonlite)
 library(stringr)
+library(aws.s3)
 
 
 
 
 # Util Functions for retrieving data
 # get dataframe with column and filter arguments
-getReferenceSignatureData <- function(args, dataPath) {
-  load(paste0(dataPath, 'Signature/signature_refsets.RData'))
+getReferenceSignatureData <- function(args, dataPath, bucket) {
+  if (bucket != '') {
+    s3load(paste0(dataPath, 'Signature/signature_refsets.RData'), bucket)
+  } else {
+    load(paste0(dataPath, 'Signature/signature_refsets.RData'))
+  }
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
   sink(con, type = "output")
@@ -44,8 +49,12 @@ getReferenceSignatureData <- function(args, dataPath) {
 }
 
 # retrieve signature names filtered by cancer type
-getSignatureNames <- function(args, dataPath) {
-  load(paste0(dataPath, 'Exposure/exposure_refdata.RData'))
+getSignatureNames <- function(args, dataPath, bucket) {
+  if (bucket != '') {
+    s3load(paste0(dataPath, 'Exposure/exposure_refdata.RData'), bucket)
+  } else {
+    load(paste0(dataPath, 'Exposure/exposure_refdata.RData'))
+  }
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
   sink(con, type = "output")
@@ -68,8 +77,12 @@ getSignatureNames <- function(args, dataPath) {
 }
 
 # retrieve sample names filtered by cancer type
-getSampleNames <- function(args, dataPath) {
-  load(paste0(dataPath, 'Exposure/exposure_refdata.RData'))
+getSampleNames <- function(args, dataPath, bucket) {
+  if (bucket != '') {
+    s3load(paste0(dataPath, 'Exposure/exposure_refdata.RData'), bucket)
+  } else {
+    load(paste0(dataPath, 'Exposure/exposure_refdata.RData'))
+  }
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
   sink(con, type = "output")
@@ -93,9 +106,13 @@ getSampleNames <- function(args, dataPath) {
 
 # Signature Explore -------------------------------------------------------
 # section 1: Current reference signatures in mSigPortal -------------------
-referenceSignatures <- function(projectID, pythonOutput, rootDir, savePath, dataPath) {
+referenceSignatures <- function(projectID, pythonOutput, rootDir, savePath, dataPath, bucket) {
   source('services/R/Sigvisualfunc.R')
-  load(paste0(dataPath, 'Signature/signature_refsets.RData'))
+  if (bucket != '') {
+    s3load(paste0(dataPath, 'Signature/signature_refsets.RData'), bucket)
+  } else {
+    load(paste0(dataPath, 'Signature/signature_refsets.RData'))
+  }
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
   sink(con, type = "output")
@@ -130,9 +147,13 @@ referenceSignatures <- function(projectID, pythonOutput, rootDir, savePath, data
 }
 
 # section 2: Mutational signature profile  --------------------------------------------------------------
-mutationalProfiles <- function(signatureSource, profileName, refSignatureSet, experimentalStrategy, signatureName, projectID, pythonOutput, rootDir, savePath, dataPath) {
+mutationalProfiles <- function(signatureSource, profileName, refSignatureSet, experimentalStrategy, signatureName, projectID, pythonOutput, rootDir, savePath, dataPath, bucket) {
   source('services/R/Sigvisualfunc.R')
-  load(paste0(dataPath, 'Signature/signature_refsets.RData'))
+  if (bucket != '') {
+    s3load(paste0(dataPath, 'Signature/signature_refsets.RData'), bucket)
+  } else {
+    load(paste0(dataPath, 'Signature/signature_refsets.RData'))
+  }
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
   sink(con, type = "output")
@@ -164,10 +185,14 @@ mutationalProfiles <- function(signatureSource, profileName, refSignatureSet, ex
 }
 
 # section3: Cosine similarities among mutational signatures -------------------------
-cosineSimilarity <- function(profileName, refSignatureSet1, refSignatureSet2, projectID, pythonOutput, rootDir, savePath, dataPath) {
+cosineSimilarity <- function(profileName, refSignatureSet1, refSignatureSet2, projectID, pythonOutput, rootDir, savePath, dataPath, bucket) {
   # The parameters will be “Matrix Size”, “Reference Signature Set1” and “Reference Signature Set2”. 
   source('services/R/Sigvisualfunc.R')
-  load(paste0(dataPath, 'Signature/signature_refsets.RData'))
+  if (bucket != '') {
+    s3load(paste0(dataPath, 'Signature/signature_refsets.RData'), bucket)
+  } else {
+    load(paste0(dataPath, 'Signature/signature_refsets.RData'))
+  }
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
   sink(con, type = "output")
@@ -208,10 +233,14 @@ cosineSimilarity <- function(profileName, refSignatureSet1, refSignatureSet2, pr
 # section4: Mutational signatures comparisons
 ## A comparison of two reference signatures
 # There will be five parameters: “Profile Type”,  “Reference Signature Set1”, “Signature Name1”, “Reference Signature Set2”, “Signature Name2”;
-mutationalSignatureComparison <- function(profileName, refSignatureSet1, signatureName1, refSignatureSet2, signatureName2, projectID, pythonOutput, rootDir, savePath, dataPath) {
+mutationalSignatureComparison <- function(profileName, refSignatureSet1, signatureName1, refSignatureSet2, signatureName2, projectID, pythonOutput, rootDir, savePath, dataPath, bucket) {
   # The parameters will be “Matrix Size”, “Reference Signature Set1” and “Reference Signature Set2”. 
   source('services/R/Sigvisualfunc.R')
-  load(paste0(dataPath, 'Signature/signature_refsets.RData'))
+  if (bucket != '') {
+    s3load(paste0(dataPath, 'Signature/signature_refsets.RData'), bucket)
+  } else {
+    load(paste0(dataPath, 'Signature/signature_refsets.RData'))
+  }
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
   sink(con, type = "output")
@@ -427,24 +456,24 @@ mutationalSignatureIndividual <- function(sample, cancerType, plotPath, exposure
   plot_individual_samples(exposure_refdata_input = exposure_refdata_input, signature_refsets_input = signature_refsets_input, seqmatrix_refdata_input = seqmatrix_refdata_input, condensed = FALSE, output_plot = plotPath)
 }
 
-exposurePublic <- function(fn, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', individual = '{}', projectID, pythonOutput, rootDir, savePath, dataPath) {
+exposurePublic <- function(fn, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', individual = '{}', projectID, pythonOutput, rootDir, savePath, dataPath, bucket) {
   tryCatch({
-    library('aws.s3')
     source('services/R/Sigvisualfunc.R')
     con <- textConnection('stdout', 'wr', local = TRUE)
     sink(con, type = "message")
     sink(con, type = "output")
 
     totalTime = proc.time()
-    s3load('msigportal/Database/Signature/signature_refsets.RData','nci-cbiit-ss-analysistools-sandbox')
-    s3load('msigportal/Database/Seqmatrix/seqmatrix_refdata_subset_files.RData','nci-cbiit-ss-analysistools-sandbox')
-    s3load('msigportal/Database/Exposure/exposure_refdata.RData','nci-cbiit-ss-analysistools-sandbox')
-
-    # load(paste0(dataPath, 'Signature/signature_refsets.RData'))
-    # # load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata.RData'))
-    # load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'))
-    # load(paste0(dataPath, 'Exposure/exposure_refdata.RData'))
-
+    if (bucket != '') {
+      s3load(paste0(dataPath, 'Signature/signature_refsets.RData'), bucket)
+      s3load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), bucket)
+      s3load(paste0(dataPath, 'Exposure/exposure_refdata.RData'), bucket)
+    } else {
+      load(paste0(dataPath, 'Signature/signature_refsets.RData'))
+      # load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata.RData'))
+      load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'))
+      load(paste0(dataPath, 'Exposure/exposure_refdata.RData'))
+    }
     output = list()
     errors = list()
     tmbPath = paste0(savePath, 'tumorMutationalBurden.svg')
@@ -484,9 +513,12 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
     }
     seqmatrix_refdata_selected = NULL
     for (file in seqmatrixFiles) {
-      # seqmatrix_refdata_selected <- get(load(paste0(dataPath, 'Seqmatrix/', file)))
-      seqFile <- get_object(paste0('msigportal/Database/Seqmatrix/', file),'nci-cbiit-ss-analysistools-sandbox')
-      seqmatrix_refdata_selected <- get(load(rawConnection(seqFile)))
+      if (bucket != '') {
+        file <- get_object(paste0(dataPath, 'Seqmatrix/', file), bucket)
+        seqmatrix_refdata_selected <- get(load(rawConnection(file)))
+      } else {
+        seqmatrix_refdata_selected <- get(load(paste0(dataPath, 'Seqmatrix/', file)))
+      }
     }
     seqmatrix_refdata_selected = seqmatrix_refdata_selected %>% filter(Profile == signature_refsets_selected$Profile[1])
 
@@ -617,7 +649,7 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
   })
 }
 
-exposureUser <- function(fn, files, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', individual = '{}', projectID, pythonOutput, rootDir, savePath, dataPath) {
+exposureUser <- function(fn, files, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', individual = '{}', projectID, pythonOutput, rootDir, savePath, dataPath, bucket) {
   tryCatch({
     source('services/R/Sigvisualfunc.R')
     con <- textConnection('stdout', 'wr', local = TRUE)
@@ -654,7 +686,11 @@ exposureUser <- function(fn, files, common, burden = '{}', association = '{}', l
       signature_refsets_selected <- read_delim(file.path(rootDir, files$signatureFile), delim = '\t', col_names = T)
     } else {
       # else use public signature data
-      load(paste0(dataPath, 'Signature/signature_refsets.RData'))
+      if (bucket != '') {
+        s3load(paste0(dataPath, 'Signature/signature_refsets.RData'), bucket)
+      } else {
+        load(paste0(dataPath, 'Signature/signature_refsets.RData'))
+      }
       signature_refsets_selected <- signature_refsets %>%
         filter(Signature_set_name == common$refSignatureSet) %>%
         select(MutationType, Signature_name, Contribution) %>%

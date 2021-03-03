@@ -29,8 +29,8 @@ export default function MutationalSignatureProfile({ submitR }) {
     const set = refSignatureSet
       .replace(/\s/g, '_')
       .replace(/[^a-zA-Z0-9-_]/gi, '');
-
-    return `Signature/Reference_Signature_Profiles_SVG/${set}/${profile}_plots_mSigPortal_${signatureName}.svg`;
+    // s3 key
+    return `msigportal/Database/Signature/Reference_Signature_Profiles_SVG/${set}/${profile}_plots_mSigPortal_${signatureName}.svg`;
   }
 
   async function handleCalculate() {
@@ -91,7 +91,14 @@ export default function MutationalSignatureProfile({ submitR }) {
     try {
       const svgs = await Promise.all(
         plots.map((plot) =>
-          fetch(`api/public/${plot.plotPath}`).then((res) => res.blob())
+          fetch(`api/getPublicImage`, {
+            method: 'POST',
+            headers: {
+              Accept: 'image/svg',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ path: plot.plotPath }),
+          }).then((res) => res.blob())
         )
       );
       let newPlots = plots.slice();

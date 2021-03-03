@@ -12,6 +12,8 @@ const XLSX = require('xlsx');
 const replace = require('replace-in-file');
 const config = require('./config.json');
 
+const production = process.env.NODE_ENV === 'production';
+
 function parseCSV(filepath) {
   const file = fs.createReadStream(filepath);
   return new Promise((resolve, reject) => {
@@ -194,7 +196,10 @@ async function visualizeR(req, res, next) {
         'results/output'
       ),
       savePath: savePath,
-      dataPath: path.join(config.data.database),
+      dataPath: !production
+        ? path.join(config.data.database)
+        : config.s3.database,
+      bucket: production ? config.s3.bucket : '',
     });
 
     const { stdout, output, ...rest } = JSON.parse(wrapper);
@@ -220,7 +225,13 @@ async function getReferenceSignatureSets(req, res, next) {
     const list = await r(
       'services/R/visualizeWrapper.R',
       'getReferenceSignatureSets',
-      [req.body.profileType, path.join(config.data.database)]
+      {
+        profileType: req.body.profileType,
+        dataPath: !production
+          ? path.join(config.data.database)
+          : config.s3.database,
+        bucket: production ? config.s3.bucket : '',
+      }
     );
 
     // console.log('SignatureReferenceSets', list);
@@ -237,11 +248,14 @@ async function getSignaturesR(req, res, next) {
   logger.info('/getSignaturesR: Calling R Wrapper');
 
   try {
-    const list = await r('services/R/visualizeWrapper.R', 'getSignaturesR', [
-      req.body.profileType,
-      req.body.signatureSetName,
-      path.join(config.data.database),
-    ]);
+    const list = await r('services/R/visualizeWrapper.R', 'getSignaturesR', {
+      profileType: req.body.profileType,
+      signatureSetName: req.body.signatureSetName,
+      dataPath: !production
+        ? path.join(config.data.database)
+        : config.s3.database,
+      bucket: production ? config.s3.bucket : '',
+    });
 
     // console.log('signatures', list);
 
@@ -295,18 +309,18 @@ async function getPublicData(req, res, next) {
   logger.info('/getPublicOptions: Calling R Wrapper');
   try {
     const projectID = uuidv4();
-    const list = await r('services/R/visualizeWrapper.R', 'getPublicData', [
-      req.body.study,
-      req.body.cancerType,
-      req.body.experimentalStrategy,
-      path.join(config.data.database),
-    ]);
+    const list = await r('services/R/visualizeWrapper.R', 'getPublicData', {
+      study: req.body.study,
+      cancerType: req.body.cancerType,
+      experimentalStrategy: req.body.experimentalStrategy,
+      dataPath: !production
+        ? path.join(config.data.database)
+        : config.s3.database,
+      bucket: production ? config.s3.bucket : '',
+    });
     logger.info('/getPublicOptions: Complete');
 
     let svgList = JSON.parse(list);
-    svgList.forEach(
-      (plot) => (plot.Path = getRelativePath({ Path: plot.Path }).Path)
-    );
 
     res.json({
       svgList: to2dArray(svgList),
@@ -397,7 +411,10 @@ async function exploringR(req, res, next) {
       ),
       rootDir: rootDir,
       savePath: savePath,
-      dataPath: path.join(config.data.database),
+      dataPath: !production
+        ? path.join(config.data.database)
+        : config.s3.database,
+      bucket: production ? config.s3.bucket : '',
     });
 
     const { stdout, output, ...rest } = JSON.parse(wrapper);
@@ -422,7 +439,10 @@ async function getReferenceSignatureData(req, res, next) {
     'getReferenceSignatureData',
     {
       ...req.body,
-      dataPath: path.join(config.data.database),
+      dataPath: !production
+        ? path.join(config.data.database)
+        : config.s3.database,
+      bucket: production ? config.s3.bucket : '',
     }
   ).catch(next);
 
@@ -597,7 +617,10 @@ async function getSignatureNames(req, res, next) {
       'getSignatureNames',
       {
         args: req.body.args,
-        dataPath: path.join(config.data.database),
+        dataPath: !production
+          ? path.join(config.data.database)
+          : config.s3.database,
+        bucket: production ? config.s3.bucket : '',
       }
     );
 
@@ -612,7 +635,10 @@ async function getSampleNames(req, res, next) {
   try {
     const wrapper = await r('services/R/exploringWrapper.R', 'getSampleNames', {
       args: req.body.args,
-      dataPath: path.join(config.data.database),
+      dataPath: !production
+        ? path.join(config.data.database)
+        : config.s3.database,
+      bucket: production ? config.s3.bucket : '',
     });
 
     res.json(JSON.parse(wrapper));
@@ -673,21 +699,20 @@ async function getPublicImage(req, res, next) {
 
   // serve static images from s3 in production
   // otherwise serve from local Database directory
-  if (process.env.NODE_ENV == 'production') {
+  if (production) {
     const s3 = new AWS.S3();
 
     res.setHeader('Content-Type', 'image/svg+xml');
     s3.getObject({
       Bucket: config.s3.bucket,
-      Key: `${config.s3.outputKeyPrefix}Database/${key}`,
+      Key: `${config.s3.database}${key}`,
     })
       .createReadStream()
       .on('error', next)
       .pipe(res);
   } else {
-    console.log('local');
     res.setHeader('Content-Type', 'image/svg+xml');
-    fs.createReadStream(path.resolve(config.data.database, key))
+    fs.createReadStream(path.resolve(key.replace('msigportal', '../data')))
       .on('error', next)
       .pipe(res);
   }
