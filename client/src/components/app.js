@@ -105,13 +105,21 @@ export default function App() {
           accessor: column,
           id: column,
           Cell: (e) => {
-            if (column == 'Title') {
+            if (
+              column == 'Title' &&
+              e.row.values['DOI'] &&
+              e.row.values['DOI'] != 'NA'
+            ) {
               return (
                 <a href={e.row.values['DOI']} target="_blank" rel="noreferrer">
                   {e.value}
                 </a>
               );
-            } else if (column == 'Name' && e.row.values['Github']) {
+            } else if (
+              column == 'Name' &&
+              e.row.values['Github'] &&
+              e.row.values['Github'] != 'NA'
+            ) {
               return (
                 <a
                   href={e.row.values['Github']}
