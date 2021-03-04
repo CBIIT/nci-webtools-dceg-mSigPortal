@@ -91,7 +91,7 @@ export default function MutationalSignatureProfile({ submitR }) {
     try {
       const svgs = await Promise.all(
         plots.map((plot) =>
-          fetch(`api/getPublicImage`, {
+          fetch(`api/getImageS3`, {
             method: 'POST',
             headers: {
               Accept: 'image/svg',

@@ -34,7 +34,7 @@ const {
   getSampleNames,
   getExposureExample,
   getPublications,
-  getPublicImage,
+  getImageS3,
 } = require('./controllers');
 
 if (cluster.isMaster) {
@@ -130,4 +130,4 @@ apiRouter.get('/getExposureExample/:example', getExposureExample);
 
 apiRouter.get('/getPublications', getPublications);
 
-apiRouter.post('/getPublicImage', getPublicImage);
+apiRouter.post('/getImageS3', getImageS3);

@@ -84,7 +84,7 @@ export default function MutationalProfiles() {
                 `api/results/${projectID}/${value2d(plot, 'Path', columns)}`
               )
             : // : await fetch(`api/public/${value2d(plot, 'Path', columns)}`);
-              await fetch(`api/getPublicImage`, {
+              await fetch(`api/getImageS3`, {
                 method: 'POST',
                 headers: {
                   Accept: 'image/svg',

@@ -694,7 +694,7 @@ async function getPublications(req, res, next) {
   res.json(data);
 }
 
-async function getPublicImage(req, res, next) {
+async function getImageS3(req, res, next) {
   const key = req.body.path;
 
   // serve static images from s3 in production
@@ -740,5 +740,5 @@ module.exports = {
   getSampleNames,
   getExposureExample,
   getPublications,
-  getPublicImage,
+  getImageS3,
 };
