@@ -1,19 +1,24 @@
 div.sigIcon {
-  padding: 2px 0 1rem;
   position: relative;
+  overflow: hidden;
+  padding: 1px 1px 0.8rem;
   cursor: pointer;
-  border-color: #343a40 !important;
   margin: auto;
+  border-color: steelblue !important;
 
   &:hover {
     border: 1px solid steelblue !important;
   }
   &.active {
-    border: 2px solid steelblue !important;
+    border: 3px solid steelblue !important;
   }
   &.inactive {
+    border-color: #343a40 !important;
     opacity: 0.4;
     filter: alpha(opacity=40);
+  }
+
+  img {
   }
 }
 

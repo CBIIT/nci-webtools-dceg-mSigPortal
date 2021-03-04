@@ -1275,7 +1275,7 @@ export default function Exposure({ match }) {
                       <Label>Upload Exposure File</Label>
                       <Form.File
                         disabled={loading || projectID}
-                        id="variableData"
+                        id="uploadExposure"
                         label={exposureFileObj.name || 'Exposure File'}
                         accept=".txt"
                         isInvalid={checkValid ? !exposureValidity : false}
@@ -1297,7 +1297,7 @@ export default function Exposure({ match }) {
                       <Label>Upload Matrix File</Label>
                       <Form.File
                         disabled={loading || projectID}
-                        id="variableData"
+                        id="uploadMatrix"
                         label={matrixFileObj.name || 'Matrix File'}
                         accept=".txt"
                         isInvalid={checkValid ? !matrixValidity : false}
@@ -1372,7 +1372,7 @@ export default function Exposure({ match }) {
                         <Label>Upload Signature Data</Label>
                         <Form.File
                           disabled={loading || projectID}
-                          id="variableData"
+                          id="uploadSignature"
                           label={signatureFileObj.name || 'Signature File'}
                           accept=".txt"
                           isInvalid={checkValid ? !signatureValidity : false}

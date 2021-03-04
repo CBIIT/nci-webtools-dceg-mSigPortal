@@ -43,6 +43,21 @@ export default function Aetiology() {
     if (!data.length) getData();
   }, [data]);
 
+  // check if plot exists
+  useEffect(() => {
+    const checkPlot = async () => {
+      let check = await fetch(
+        `api/public/Aetiology/Exposure/${signature}_${study}.svg`,
+        { method: 'HEAD' }
+      );
+      check.status === 200 ? setCheck(true) : setCheck(false);
+    };
+
+    if (signature && study) checkPlot();
+  }, [signature, study]);
+
+  const [checkPlot, setCheck] = useState(false);
+
   function getAetiologies() {
     if (data.length) {
       const aetiologies = [
@@ -59,7 +74,6 @@ export default function Aetiology() {
               mergeAetiology({
                 aetiology: Aetiology,
                 signature: '',
-                all: false,
               })
             }
             className={aetiology != Aetiology ? 'disabled' : ''}
@@ -76,11 +90,21 @@ export default function Aetiology() {
           <Col lg="2" md="3" sm="4" className="mb-3 d-flex">
             <Button
               size="sm"
-              variant="dark"
+              variant="primary"
               className="d-flex mx-auto"
-              onClick={() =>
-                mergeAetiology({ aetiology: '', signature: '', all: true })
-              }
+              onClick={() => mergeAetiology({ all: false })}
+              className={all ? 'disabled' : ''}
+              block
+            >
+              Selected Aetiology
+            </Button>
+          </Col>
+          <Col lg="2" md="3" sm="4" className="mb-3 d-flex">
+            <Button
+              size="sm"
+              variant="primary"
+              className="d-flex mx-auto"
+              onClick={() => mergeAetiology({ all: true })}
               className={!all ? 'disabled' : ''}
               block
             >
@@ -125,7 +149,7 @@ export default function Aetiology() {
         .sort(naturalSort)
         .sort(profileSort)
         .map(({ Aetiology, Signature }) => (
-          <Col lg="1" md="3" sm="4" className="mb-3">
+          <Col lg="1" md="3" sm="4" className="mb-2 px-1">
             <div
               onClick={() =>
                 mergeAetiology({
@@ -167,7 +191,7 @@ export default function Aetiology() {
         .sort(profileSort);
 
       return signatures.map(({ Aetiology, Signature }) => (
-        <Col md="2" sm="4" className="mb-3">
+        <Col md="2" sm="4" className="mb-2 px-1">
           <div
             className={`sigIcon border rounded ${
               aetiology != Aetiology
@@ -208,7 +232,7 @@ export default function Aetiology() {
         <Col lg="2" md="3" sm="4" className="mb-3 d-flex">
           <Button
             size="sm"
-            variant="dark"
+            variant="primary"
             className="d-flex mx-auto"
             onClick={() => mergeAetiology({ study: Study })}
             className={study != Study ? 'disabled' : ''}
@@ -256,11 +280,30 @@ export default function Aetiology() {
             plotURL={`api/public/Aetiology/Profile/${signature}.svg`}
           />
           <Row className="justify-content-center">{getStudy()}</Row>
-          <Plot
-            className="p-3 border"
-            maxHeight={'400px'}
-            plotURL={`api/public/Aetiology/Exposure/${signature}_${study}.svg`}
-          />
+          <p>
+            Select the cancer study to review the TMB of selected signatures.
+            TMB shown as the numbers of mutations per megabase (log10)
+            attributed to each mutational signature in samples where the
+            signature is present. Only those cancer types with tumors in which
+            signature activity is attributed are shown. The numbers below the
+            dots for each cancer type indicate the number of tumors in which the
+            signatures was attributed (above the horizontal bar, in blue) and
+            the total number of tumors analyzed (below the blue bar, in green).
+          </p>
+          {checkPlot ? (
+            <Plot
+              className="p-3 border"
+              maxHeight={'400px'}
+              plotURL={`api/public/Aetiology/Exposure/${signature}_${study}.svg`}
+            />
+          ) : (
+            <div className="p-3 border">
+              <p>
+                This signature was not detected in any sample of the selected
+                study
+              </p>
+            </div>
+          )}
         </div>
       );
     }
@@ -273,7 +316,7 @@ export default function Aetiology() {
         <Row className={`justify-content-center ${all ? 'd-none' : ''}`}>
           {getSignatures()}
         </Row>
-        <Row className={`justify-content-center ${!all ? 'd-none' : ''}`}>
+        <Row className={`px-2 justify-content-center ${!all ? 'd-none' : ''}`}>
           {getAllSignatures()}
         </Row>
       </div>

@@ -115,6 +115,7 @@ export default function Home({ links }) {
           <div className="col-12">
             <img
               src="assets/images/logo-horizontal.png"
+              alt="mSigPortal title"
               style={{
                 width: '325px',
                 height: '50px',
