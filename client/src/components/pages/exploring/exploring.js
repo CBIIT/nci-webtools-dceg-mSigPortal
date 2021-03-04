@@ -36,6 +36,20 @@ export default function Explore() {
     if (!exposureSignature.length) populateControls();
   }, []);
 
+  const getFileS3 = (path) =>
+    fetch(`api/getFileS3`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        path: path,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => data);
+
   async function populateControls() {
     try {
       let [
@@ -44,18 +58,14 @@ export default function Explore() {
         exposureSignature,
         signatureNames,
       ] = await Promise.all([
-        (await fetch(`api/public/Others/json/Exploring-Signature.json`)).json(),
-        (
-          await fetch(
-            'api/public/Others/json/Exploring-Exposure-cancertype.json'
-          )
-        ).json(),
-        (
-          await fetch(
-            'api/public/Others/json/Exploring-Exposure-Signature-set-name.json'
-          )
-        ).json(),
-        (await fetch('api/public/Others/json/Signature_name.json')).json(),
+        getFileS3(`msigportal/Database/Others/json/Exploring-Signature.json`),
+        getFileS3(
+          'msigportal/Database/Others/json/Exploring-Exposure-cancertype.json'
+        ),
+        getFileS3(
+          'msigportal/Database/Others/json/Exploring-Exposure-Signature-set-name.json'
+        ),
+        getFileS3('msigportal/Database/Others/json/Signature_name.json'),
       ]);
 
       populateSignatureExp(signatureData);

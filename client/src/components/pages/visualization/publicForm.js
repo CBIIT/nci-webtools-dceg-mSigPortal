@@ -129,7 +129,16 @@ export default function PublicForm() {
     mergeVisualize({ loadingPublic: true });
     try {
       const pDataOptions = await (
-        await fetch(`api/public/Others/json/Visualization-Public.json`)
+        await fetch(`api/getFileS3`, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            path: `msigportal/Database/Others/json/Visualization-Public.json`,
+          }),
+        })
       ).json();
 
       const studyOptions = [...new Set(pDataOptions.map((data) => data.Study))];

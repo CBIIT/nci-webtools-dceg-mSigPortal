@@ -695,10 +695,10 @@ async function getPublications(req, res, next) {
 }
 
 async function getImageS3(req, res, next) {
-  const key = req.body.path;
-
   // serve static images from s3 in production
   // otherwise serve from local Database directory
+  const key = req.body.path;
+
   if (production) {
     const s3 = new AWS.S3();
 
@@ -712,6 +712,28 @@ async function getImageS3(req, res, next) {
       .pipe(res);
   } else {
     res.setHeader('Content-Type', 'image/svg+xml');
+    fs.createReadStream(path.resolve(key.replace('msigportal', '../data')))
+      .on('error', next)
+      .pipe(res);
+  }
+}
+
+async function getFileS3(req, res, next) {
+  // serve static files from s3 in production
+  // otherwise serve from local Database directory
+  const key = req.body.path;
+
+  if (production) {
+    const s3 = new AWS.S3();
+
+    s3.getObject({
+      Bucket: config.s3.bucket,
+      Key: `${config.s3.database}${key}`,
+    })
+      .createReadStream()
+      .on('error', next)
+      .pipe(res);
+  } else {
     fs.createReadStream(path.resolve(key.replace('msigportal', '../data')))
       .on('error', next)
       .pipe(res);
@@ -741,4 +763,5 @@ module.exports = {
   getExposureExample,
   getPublications,
   getImageS3,
+  getFileS3,
 };

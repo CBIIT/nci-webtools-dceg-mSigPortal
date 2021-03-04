@@ -39,7 +39,16 @@ export default function Aetiology() {
       try {
         mergeAetiology({
           data: await (
-            await fetch(`api/public/Aetiology/Aetiology.json`)
+            await fetch(`api/getFileS3`, {
+              method: 'POST',
+              headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                path: `msigportal/Database/Aetiology/Aetiology.json`,
+              }),
+            })
           ).json(),
         });
       } catch (_) {
