@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Row, Col, Card, Button } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
-import Select from '../../../controls/select/select';
+import { Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as exploringActions } from '../../../../services/store/exploring';
 import { actions as modalActions } from '../../../../services/store/modal';
 import Plot from '../../../controls/plot/plot';
+import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import './aetiology.scss';
 
 const actions = { ...exploringActions, ...modalActions };
@@ -21,7 +19,16 @@ export default function Aetiology() {
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const { aetiology, signature, study, all, data } = exploring.aetiology;
+  const {
+    aetiology,
+    signature,
+    study,
+    all,
+    data,
+    thumbnails,
+    sigURL,
+    tmbURL,
+  } = exploring.aetiology;
 
   useEffect(() => {
     mergeExploring({ displayTab: 'aetiology' });
@@ -45,18 +52,50 @@ export default function Aetiology() {
 
   // check if plot exists
   useEffect(() => {
-    const checkPlot = async () => {
-      let check = await fetch(
-        `api/public/Aetiology/Exposure/${signature}_${study}.svg`,
-        { method: 'HEAD' }
-      );
-      check.status === 200 ? setCheck(true) : setCheck(false);
+    const getImageS3 = (path) =>
+      fetch(`api/getImageS3`, {
+        method: 'POST',
+        headers: {
+          Accept: 'image/svg',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          path: path,
+        }),
+      }).then(async (res) => {
+        if (res.ok) {
+          const blob = await res.blob();
+          return URL.createObjectURL(blob);
+        } else {
+          return '';
+        }
+      });
+    const getPlots = async () => {
+      if (sigURL) URL.revokeObjectURL(sigURL);
+      if (tmbURL) URL.revokeObjectURL(tmbURL);
+      const [sig, tmb] = await Promise.all([
+        getImageS3(`msigportal/Database/Aetiology/Profile/${signature}.svg`),
+        getImageS3(
+          `msigportal/Database/Aetiology/Exposure/${signature}_${study}.svg`
+        ),
+      ]);
+      mergeAetiology({ sigURL: sig, tmbURL: tmb });
     };
 
-    if (signature && study) checkPlot();
+    if (signature && study) getPlots();
   }, [signature, study]);
 
-  const [checkPlot, setCheck] = useState(false);
+  // get thumbnails
+  useEffect(() => {
+    if (data.length) {
+      const signatures = data
+        .filter(({ Study }) => Study == study)
+        .sort(naturalSort)
+        .sort(profileSort);
+
+      getThumbnails(signatures);
+    }
+  }, [data]);
 
   function getAetiologies() {
     if (data.length) {
@@ -142,57 +181,49 @@ export default function Aetiology() {
     });
   }
 
-  function getAllSignatures() {
-    if (data.length) {
-      return data
-        .filter(({ Study }) => Study == study)
-        .sort(naturalSort)
-        .sort(profileSort)
-        .map(({ Aetiology, Signature }) => (
-          <Col lg="1" md="3" sm="4" className="mb-2 px-1">
-            <div
-              onClick={() =>
-                mergeAetiology({
-                  aetiology: Aetiology,
-                  signature: Signature,
-                })
-              }
-              className={`sigIcon border rounded ${
-                aetiology != Aetiology
-                  ? 'inactive'
-                  : signature == Signature
-                  ? 'active'
-                  : ''
-              }`}
-              title={`${Aetiology} - ${Signature}`}
-            >
-              <img
-                src={`api/public/Aetiology/Profile_logo/${Signature}.svg`}
-                className="w-100"
-                // height="70"
-                alt={Signature}
-              />
-              <strong className="sigLabel">{Signature}</strong>
-            </div>
-          </Col>
-        ));
-    } else {
-      return [];
+  async function getThumbnails(signatures) {
+    try {
+      thumbnails.forEach((t) => URL.revokeObjectURL(t));
+
+      const newThumbnails = await Promise.all(
+        signatures.map(({ Aetiology, Study, Signature }) =>
+          fetch(`api/getImageS3`, {
+            method: 'POST',
+            headers: {
+              Accept: 'image/svg',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              path: `msigportal/Database/Aetiology/Profile_logo/${Signature}.svg`,
+            }),
+          }).then(async (res) => {
+            const blob = await res.blob();
+            return {
+              Aetiology: Aetiology,
+              Study: Study,
+              Signature: Signature,
+              url: URL.createObjectURL(blob),
+            };
+          })
+        )
+      );
+      mergeAetiology({ thumbnails: newThumbnails });
+    } catch (err) {
+      mergeError(err.message);
     }
   }
 
-  function getSignatures() {
-    if (data.length && aetiology != 'all') {
-      const signatures = data
-        .filter(
-          ({ Study, Aetiology }) => Study == study && Aetiology == aetiology
-        )
-        .sort(naturalSort)
-        .sort(profileSort);
-
-      return signatures.map(({ Aetiology, Signature }) => (
-        <Col md="2" sm="4" className="mb-2 px-1">
+  function getAllSignatures() {
+    if (data.length) {
+      return thumbnails.map(({ Aetiology, Signature, url }) => (
+        <Col lg="1" md="3" sm="4" className="mb-2 px-1">
           <div
+            onClick={() =>
+              mergeAetiology({
+                aetiology: Aetiology,
+                signature: Signature,
+              })
+            }
             className={`sigIcon border rounded ${
               aetiology != Aetiology
                 ? 'inactive'
@@ -200,12 +231,12 @@ export default function Aetiology() {
                 ? 'active'
                 : ''
             }`}
-            onClick={() => mergeAetiology({ signature: Signature })}
+            title={`${Aetiology} - ${Signature}`}
           >
             <img
-              src={`api/public/Aetiology/Profile_logo/${Signature}.svg`}
+              src={url}
               className="w-100"
-              // height="110"
+              // height="70"
               alt={Signature}
             />
             <strong className="sigLabel">{Signature}</strong>
@@ -214,6 +245,40 @@ export default function Aetiology() {
       ));
     } else {
       return [];
+    }
+  }
+
+  function getSignatures() {
+    if (thumbnails.length) {
+      return thumbnails
+        .filter(({ Aetiology }) => Aetiology == aetiology)
+        .map(({ Signature, url }) => {
+          return (
+            <Col md="2" sm="4" className="mb-3">
+              <div
+                className={`sigIcon border rounded ${
+                  signature == Signature ? 'active' : ''
+                }`}
+                title={`${aetiology} - ${Signature}`}
+                onClick={() => mergeAetiology({ signature: Signature })}
+              >
+                <img
+                  src={url}
+                  className="w-100"
+                  // height="110"
+                  alt={Signature}
+                />
+                <strong className="sigLabel">{Signature}</strong>
+              </div>
+            </Col>
+          );
+        });
+    } else {
+      return (
+        <div className="my-5">
+          <LoadingOverlay active={true} />
+        </div>
+      );
     }
   }
 
@@ -243,7 +308,11 @@ export default function Aetiology() {
         </Col>
       ));
     } else {
-      return [];
+      return (
+        <div className="my-5">
+          <LoadingOverlay active={true} />
+        </div>
+      );
     }
   }
 
@@ -274,34 +343,43 @@ export default function Aetiology() {
             info.Description.map((text) => <p>{text}</p>)
           )}
 
-          <Plot
-            className="p-3 border rounded mb-3"
-            maxHeight={'300px'}
-            plotURL={`api/public/Aetiology/Profile/${signature}.svg`}
-          />
-          <Row className="justify-content-center">{getStudy()}</Row>
-          <p>
-            Select the cancer study to review the TMB of selected signatures.
-            TMB shown as the numbers of mutations per megabase (log10)
-            attributed to each mutational signature in samples where the
-            signature is present. Only those cancer types with tumors in which
-            signature activity is attributed are shown. The numbers below the
-            dots for each cancer type indicate the number of tumors in which the
-            signatures was attributed (above the horizontal bar, in blue) and
-            the total number of tumors analyzed (below the blue bar, in green).
-          </p>
-          {checkPlot ? (
-            <Plot
-              className="p-3 border"
-              maxHeight={'400px'}
-              plotURL={`api/public/Aetiology/Exposure/${signature}_${study}.svg`}
-            />
-          ) : (
-            <div className="p-3 border">
+          {sigURL ? (
+            <div>
+              <Plot
+                className="p-3 border rounded mb-3"
+                maxHeight={'300px'}
+                plotURL={sigURL}
+              />
+              <Row className="justify-content-center">{getStudy()}</Row>
               <p>
-                This signature was not detected in any sample of the selected
-                study
+                Select the cancer study to review the TMB of selected
+                signatures. TMB shown as the numbers of mutations per megabase
+                (log10) attributed to each mutational signature in samples where
+                the signature is present. Only those cancer types with tumors in
+                which signature activity is attributed are shown. The numbers
+                below the dots for each cancer type indicate the number of
+                tumors in which the signatures was attributed (above the
+                horizontal bar, in blue) and the total number of tumors analyzed
+                (below the blue bar, in green).
               </p>
+              {tmbURL ? (
+                <Plot
+                  className="p-3 border"
+                  maxHeight={'400px'}
+                  plotURL={tmbURL}
+                />
+              ) : (
+                <div className="p-3 border">
+                  <p>
+                    This signature was not detected in any sample of the
+                    selected study
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="my-5">
+              <LoadingOverlay active={true} />
             </div>
           )}
         </div>

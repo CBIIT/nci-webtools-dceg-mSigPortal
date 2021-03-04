@@ -17,6 +17,9 @@ export const getInitialState = () => ({
     study: 'PCAWG',
     all: false,
     data: [],
+    thumbnails: [],
+    sigURL: '',
+    tmbURL: '',
   },
   sigRefSig: {
     plotPath: '',
