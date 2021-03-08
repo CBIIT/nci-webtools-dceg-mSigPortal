@@ -1,7 +1,7 @@
 div.sigIcon {
   position: relative;
   overflow: hidden;
-  padding: 1px 1px 0.8rem;
+  padding: 1px 1px 1rem;
   cursor: pointer;
   margin: auto;
   border-color: steelblue !important;
@@ -19,11 +19,12 @@ div.sigIcon {
   }
 
   img {
+    margin: -0.5rem 0;
   }
-}
-
-.sigLabel {
-  position: absolute;
-  bottom: 0px;
-  left: 37%;
+  .sigLabel {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 0);
+  }
 }
