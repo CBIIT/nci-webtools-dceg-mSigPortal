@@ -286,25 +286,6 @@ async function getSignaturesUser(req, res, next) {
   }
 }
 
-// deprecated
-async function getPublicDataOptions(req, res, next) {
-  logger.info('/getPublicOptions: Request');
-  try {
-    const list = await r(
-      'services/R/visualizeWrapper.R',
-      'getPublicDataOptions',
-      [path.join(config.data.database)]
-    );
-
-    res.json(to2dArray(list));
-    logger.info('/getPublicOptions: Success');
-  } catch (err) {
-    logger.info('/getPublicOptions: An error occured');
-    logger.error(err);
-    res.status(500).json(err.message);
-  }
-}
-
 async function getPublicData(req, res, next) {
   logger.info('/getPublicOptions: Calling R Wrapper');
   try {
@@ -749,7 +730,6 @@ module.exports = {
   getReferenceSignatureSets,
   getSignaturesR,
   getSignaturesUser,
-  getPublicDataOptions,
   getPublicData,
   upload,
   download,

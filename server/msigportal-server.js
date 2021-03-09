@@ -21,7 +21,6 @@ const {
   getReferenceSignatureSets,
   getSignaturesR,
   getSignaturesUser,
-  getPublicDataOptions,
   getPublicData,
   upload,
   download,
@@ -104,8 +103,6 @@ apiRouter.post('/getReferenceSignatureSets', getReferenceSignatureSets);
 apiRouter.post('/getSignaturesR', getSignaturesR);
 
 apiRouter.post('/getSignaturesUser', getSignaturesUser);
-
-apiRouter.post('/getPublicDataOptions', getPublicDataOptions);
 
 apiRouter.post('/getPublicData', getPublicData);
 

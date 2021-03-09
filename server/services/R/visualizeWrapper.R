@@ -39,16 +39,6 @@ getSignaturesR <- function(profileType, signatureSetName, dataPath, bucket) {
   return(signatures)
 }
 
-# get list of options for study, cancer type, and experimental strategy
-getPublicDataOptions <- function(dataPath) {
-  if (bucket != '') {
-    s3load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata_info.RData'), bucket)
-  } else {
-    load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata_info.RData'))
-  }
-  return(toJSON(seqmatrix_refdata_info2, pretty = TRUE, auto_unbox = TRUE))
-}
-
 # get public svgFiles and load into session
 getPublicData <- function(study, cancerType, experimentalStrategy, dataPath, bucket) {
   if (bucket != '') {
