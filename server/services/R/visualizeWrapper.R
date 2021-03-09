@@ -41,10 +41,15 @@ getSignaturesR <- function(profileType, signatureSetName, dataPath, bucket) {
 
 # get public svgFiles and load into session
 getPublicData <- function(study, cancerType, experimentalStrategy, dataPath, bucket) {
+  infoFile = ''
+  if (study == 'PCAWG') { infoFile = 'PCAWG_WGS_seqmatrix_refdata_info.RData' }
+  else if (study == 'TCGA') { infoFile = "TCGA_WES_seqmatrix_refdata_info.RData" }
+  else if (study == 'Breast560') { infoFile = 'Breast560_WGS_seqmatrix_refdata_info.RData' }
+
   if (bucket != '') {
-    s3load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata_info.RData'), bucket)
+    s3load(paste0(dataPath, 'Seqmatrix/', infoFile), bucket)
   } else {
-    load(paste0(dataPath, 'Seqmatrix/seqmatrix_refdata_info.RData'))
+    load(paste0(dataPath, 'Seqmatrix/', infoFile))
   }
 
   svgfiles <- seqmatrix_refdata_info %>% mutate(Path = paste0(dataPath, 'Seqmatrix/', Path))
