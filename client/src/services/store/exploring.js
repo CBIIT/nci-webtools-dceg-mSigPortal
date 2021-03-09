@@ -5,13 +5,13 @@ export const getInitialState = () => ({
   exploring: {
     displayTab: 'aetiology',
     signatureDisplay: 'referenceSignatures',
-    exposureSignature: [],
-    exposureCancer: [],
+    exposureData: [],
     refSigData: [],
     projectID: '',
     submitted: false,
   },
   aetiology: {
+    source: '',
     aetiology: 'APOBEC activity',
     signature: '',
     study: 'PCAWG',

@@ -18,7 +18,7 @@ const actions = { ...exploringActions, ...modalActions };
 export default function Explore() {
   const dispatch = useDispatch();
   const exploring = useSelector((state) => state.exploring);
-  const { exposureSignature, displayTab } = exploring.exploring;
+  const { exposureData, displayTab } = exploring.exploring;
   const mergeExploring = (state) =>
     dispatch(actions.mergeExploring({ exploring: state }));
   const mergeExposure = (state) =>
@@ -33,7 +33,7 @@ export default function Explore() {
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   useEffect(() => {
-    if (!exposureSignature.length) populateControls();
+    if (!exposureData.length) populateControls();
   }, []);
 
   const getFileS3 = (path) =>
@@ -52,44 +52,29 @@ export default function Explore() {
 
   async function populateControls() {
     try {
-      let [
-        signatureData,
-        exposureCancer,
-        exposureSignature,
-        signatureNames,
-      ] = await Promise.all([
+      let [signatureData, exposureData, signatureNames] = await Promise.all([
         getFileS3(`msigportal/Database/Others/json/Exploring-Signature.json`),
-        getFileS3(
-          'msigportal/Database/Others/json/Exploring-Exposure-cancertype.json'
-        ),
-        getFileS3(
-          'msigportal/Database/Others/json/Exploring-Exposure-Signature-set-name.json'
-        ),
+        getFileS3('msigportal/Database/Others/json/Exploring-Exposure.json'),
+
         getFileS3('msigportal/Database/Others/json/Signature_name.json'),
       ]);
 
       populateSignatureExp(signatureData);
-      populateExposureExp(exposureCancer, exposureSignature, signatureNames);
+      populateExposureExp(exposureData, signatureNames);
     } catch (err) {
       mergeError(err.message);
     }
   }
 
-  async function populateExposureExp(
-    exposureCancer,
-    exposureSignature,
-    signatureNames
-  ) {
+  async function populateExposureExp(exposureData, signatureNames) {
     mergeExposure({ loading: true });
 
-    const studyOptions = [
-      ...new Set(exposureSignature.map((data) => data.Study)),
-    ];
+    const studyOptions = [...new Set(exposureData.map((data) => data.Study))];
     const study = 'PCAWG'; // default
 
     const strategyOptions = [
       ...new Set(
-        exposureSignature
+        exposureData
           .filter((data) => data.Study == study)
           .map((data) => data.Dataset)
       ),
@@ -98,7 +83,7 @@ export default function Explore() {
 
     const refSignatureSetOptions = [
       ...new Set(
-        exposureSignature
+        exposureData
           .filter((row) => row.Study == study && row.Dataset == strategy)
           .map((row) => row.Signature_set_name)
       ),
@@ -107,7 +92,7 @@ export default function Explore() {
 
     const cancerOptions = [
       ...new Set(
-        exposureCancer
+        exposureData
           .filter((data) => data.Study == study && data.Dataset == strategy)
           .map((data) => data.Cancer_Type)
       ),
@@ -139,8 +124,7 @@ export default function Explore() {
     mergeExposure(params);
 
     mergeExploring({
-      exposureCancer: exposureCancer,
-      exposureSignature: exposureSignature,
+      exposureData: exposureData,
       signatureNames: signatureNames,
     });
   }

@@ -81,11 +81,7 @@ export default function Exposure({ match }) {
     projectID,
     openSidebar,
   } = exploring.exposure;
-  const {
-    exposureSignature,
-    exposureCancer,
-    signatureNames,
-  } = exploring.exploring;
+  const { exposureData, signatureNames } = exploring.exploring;
 
   const { loading: tmbLoading } = exploring.tmb;
   const { loading: tmbSigLoading } = exploring.tmbSignatures;
@@ -757,7 +753,7 @@ export default function Exposure({ match }) {
   function handleStudy(study) {
     const strategyOptions = [
       ...new Set(
-        exposureSignature
+        exposureData
           .filter((data) => data.Study == study)
           .map((data) => data.Dataset)
       ),
@@ -766,7 +762,7 @@ export default function Exposure({ match }) {
 
     const refSignatureSetOptions = [
       ...new Set(
-        exposureSignature
+        exposureData
           .filter((row) => row.Study == study && row.Dataset == strategy)
           .map((row) => row.Signature_set_name)
       ),
@@ -775,7 +771,7 @@ export default function Exposure({ match }) {
 
     const cancerOptions = [
       ...new Set(
-        exposureCancer
+        exposureData
           .filter((data) => data.Study == study && data.Dataset == strategy)
           .map((data) => data.Cancer_Type)
       ),
@@ -797,7 +793,7 @@ export default function Exposure({ match }) {
   function handleStrategy(strategy) {
     const refSignatureSetOptions = [
       ...new Set(
-        exposureSignature
+        exposureData
           .filter((row) => row.Study == study && row.Dataset == strategy)
           .map((row) => row.Signature_set_name)
       ),
@@ -806,7 +802,7 @@ export default function Exposure({ match }) {
 
     const cancerOptions = [
       ...new Set(
-        exposureCancer
+        exposureData
           .filter((data) => data.Study == study && data.Dataset == strategy)
           .map((data) => data.Cancer_Type)
       ),
