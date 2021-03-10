@@ -39,6 +39,7 @@ export default function Aetiology() {
     },
     { name: 'Gene Edits', file: 'Aetiology_gene_edits.json' },
     { name: 'Cancer Specific Signature', file: '' },
+    // 'Aetiology_cancer_specific_signatures.json' },
     { name: 'Others', file: '' },
   ];
 
@@ -133,7 +134,7 @@ export default function Aetiology() {
       <Col key={name} lg="2" md="3" sm="4" className="mb-3 d-flex">
         <Button
           size="sm"
-          variant="dark"
+          variant="primary"
           className="d-flex mx-auto"
           onClick={
             file && name != category
@@ -300,7 +301,9 @@ export default function Aetiology() {
               alt=""
               // alt={Signature}
             />
-            <strong className="sigLabel">{Signature}</strong>
+            <div className="sigLabel">
+              <strong style={{ fontSize: '0.8rem' }}>{Signature}</strong>
+            </div>
           </div>
         </Col>
       ));
@@ -330,7 +333,9 @@ export default function Aetiology() {
                   alt=""
                   // alt={Signature}
                 />
-                <strong className="sigLabel">{Signature}</strong>
+                <div className="sigLabel">
+                  <strong className="sigLabel">{Signature}</strong>
+                </div>
               </div>
             </Col>
           );
@@ -356,7 +361,7 @@ export default function Aetiology() {
             .map((obj) => obj.Study)
         ),
       ].map((Study) => (
-        <Col lg="2" md="3" sm="4" className="mb-3 d-flex">
+        <Col key={Study} lg="2" md="3" sm="4" className="mb-3 d-flex">
           <Button
             size="sm"
             variant="primary"
