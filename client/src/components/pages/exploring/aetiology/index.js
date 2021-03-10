@@ -20,6 +20,7 @@ export default function Aetiology() {
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const {
+    category,
     aetiology,
     signature,
     study,
@@ -30,32 +31,52 @@ export default function Aetiology() {
     tmbURL,
   } = exploring.aetiology;
 
-  useEffect(() => {
-    mergeExploring({ displayTab: 'aetiology' });
-  }, []);
+  const categories = [
+    { name: 'Cosmic Mutational Signatures', file: 'Aetiology_cosmic.json' },
+    {
+      name: 'Environmental Mutagenesis',
+      file: 'Aetiology_enviromental_mutagenesis.json',
+    },
+    { name: 'Gene Edits', file: 'Aetiology_gene_edits.json' },
+    { name: 'Cancer Specific Signature', file: '' },
+    { name: 'Others', file: '' },
+  ];
+
+  // useEffect(() => {
+  //   mergeExploring({ displayTab: 'aetiology' });
+  // }, []);
 
   useEffect(() => {
     const getData = async () => {
       try {
+        const file = categories.filter(({ name }) => name == category)[0].file;
+        const data = await (
+          await fetch(`api/getFileS3`, {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              path: `msigportal/Database/Aetiology/${file}`,
+            }),
+          })
+        ).json();
+
+        const aetiologyOptions = [
+          ...new Set(data.map(({ Aetiology }) => Aetiology)),
+        ];
+        const studyOptions = [...new Set(data.map(({ Study }) => Study))];
+
         mergeAetiology({
-          data: await (
-            await fetch(`api/getFileS3`, {
-              method: 'POST',
-              headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                path: `msigportal/Database/Aetiology/Aetiology.json`,
-              }),
-            })
-          ).json(),
+          data: data,
+          aetiology: aetiologyOptions[0],
+          study: studyOptions[0],
         });
       } catch (_) {
         mergeError('Could not fetch Aetiology Info');
       }
     };
-
     if (!data.length) getData();
   }, [data]);
 
@@ -98,6 +119,7 @@ export default function Aetiology() {
   useEffect(() => {
     if (data.length) {
       const signatures = data
+        .slice()
         .filter(({ Study }) => Study == study)
         .sort(naturalSort)
         .sort(profileSort);
@@ -106,59 +128,88 @@ export default function Aetiology() {
     }
   }, [data]);
 
+  function getCategories() {
+    return categories.map(({ name, file }) => (
+      <Col key={name} lg="2" md="3" sm="4" className="mb-3 d-flex">
+        <Button
+          size="sm"
+          variant="dark"
+          className="d-flex mx-auto"
+          onClick={
+            file && name != category
+              ? async () => {
+                  mergeAetiology({
+                    category: name,
+                    aetiology: '',
+                    signature: '',
+                    study: '',
+                    data: [],
+                  });
+                }
+              : () => {}
+          }
+          className={category != name ? 'disabled' : ''}
+          block
+        >
+          {name}
+        </Button>
+      </Col>
+    ));
+  }
+
   function getAetiologies() {
     if (data.length) {
-      const aetiologies = [
-        ...new Set(
-          data.filter((obj) => obj.Study == study).map((obj) => obj.Aetiology)
-        ),
-      ].map((Aetiology) => (
-        <Col lg="2" md="3" sm="4" className="mb-3 d-flex">
-          <Button
-            size="sm"
-            variant="dark"
-            className="d-flex mx-auto"
-            onClick={() =>
-              mergeAetiology({
-                aetiology: Aetiology,
-                signature: '',
-              })
-            }
-            className={aetiology != Aetiology ? 'disabled' : ''}
-            block
-          >
-            {Aetiology}
-          </Button>
-        </Col>
-      ));
+      const aetiologies = [...new Set(data.map((obj) => obj.Aetiology))].map(
+        (Aetiology) => (
+          <Col key={Aetiology} lg="2" md="3" sm="4" className="mb-3 d-flex">
+            <Button
+              size="sm"
+              variant="dark"
+              className="d-flex mx-auto"
+              onClick={() =>
+                mergeAetiology({
+                  aetiology: Aetiology,
+                  signature: '',
+                })
+              }
+              className={aetiology != Aetiology ? 'disabled' : ''}
+              block
+            >
+              {Aetiology}
+            </Button>
+          </Col>
+        )
+      );
 
       return (
         <>
-          {aetiologies}
-          <Col lg="2" md="3" sm="4" className="mb-3 d-flex">
-            <Button
-              size="sm"
-              variant="primary"
-              className="d-flex mx-auto"
-              onClick={() => mergeAetiology({ all: false })}
-              className={all ? 'disabled' : ''}
-              block
-            >
-              Selected Aetiology
-            </Button>
-          </Col>
-          <Col lg="2" md="3" sm="4" className="mb-3 d-flex">
-            <Button
-              size="sm"
-              variant="primary"
-              className="d-flex mx-auto"
-              onClick={() => mergeAetiology({ all: true })}
-              className={!all ? 'disabled' : ''}
-              block
-            >
-              All Aetiologies
-            </Button>
-          </Col>
+          <Row className="justify-content-center">{aetiologies}</Row>
+          <Row className="justify-content-center">
+            <Col lg="2" md="3" sm="4" className="mb-3 d-flex">
+              <Button
+                size="sm"
+                variant="primary"
+                className="d-flex mx-auto"
+                onClick={() => mergeAetiology({ all: false })}
+                className={all ? 'disabled' : ''}
+                block
+              >
+                Selected Aetiology
+              </Button>
+            </Col>
+            <Col lg="2" md="3" sm="4" className="mb-3 d-flex">
+              <Button
+                size="sm"
+                variant="primary"
+                className="d-flex mx-auto"
+                onClick={() => mergeAetiology({ all: true })}
+                className={!all ? 'disabled' : ''}
+                block
+              >
+                All Aetiologies
+              </Button>
+            </Col>
+          </Row>
         </>
       );
     } else {
@@ -224,8 +275,8 @@ export default function Aetiology() {
 
   function getAllSignatures() {
     if (data.length) {
-      return thumbnails.map(({ Aetiology, Signature, url }) => (
-        <Col lg="1" md="3" sm="4" className="mb-2 px-1">
+      return thumbnails.map(({ Aetiology, Signature, url }, i) => (
+        <Col key={Signature + i} lg="1" md="3" sm="4" className="mb-2 px-1">
           <div
             onClick={() =>
               mergeAetiology({
@@ -246,7 +297,8 @@ export default function Aetiology() {
               src={url}
               className="w-100"
               // height="70"
-              alt={Signature}
+              alt=""
+              // alt={Signature}
             />
             <strong className="sigLabel">{Signature}</strong>
           </div>
@@ -263,7 +315,7 @@ export default function Aetiology() {
         .filter(({ Aetiology }) => Aetiology == aetiology)
         .map(({ Signature, url }) => {
           return (
-            <Col md="2" sm="4" className="mb-3">
+            <Col key={Signature} md="2" sm="4" className="mb-3">
               <div
                 className={`sigIcon border rounded ${
                   signature == Signature ? 'active' : ''
@@ -275,7 +327,8 @@ export default function Aetiology() {
                   src={url}
                   className="w-100"
                   // height="110"
-                  alt={Signature}
+                  alt=""
+                  // alt={Signature}
                 />
                 <strong className="sigLabel">{Signature}</strong>
               </div>
@@ -338,19 +391,50 @@ export default function Aetiology() {
             <strong>Signature Name: </strong>
             {signature}
           </div>
+          {info.Mutagen && (
+            <div>
+              <strong>Mutagen: </strong>
+              {info.Mutagen}
+            </div>
+          )}
+          {info.Treatment && (
+            <div>
+              <strong>Treatment: </strong>
+              {info.Treatment}
+            </div>
+          )}
+          {info.Study && (
+            <div>
+              <strong>Study: </strong>
+              <a href={info.Study_URL} target="_blank" rel="noreferrer">
+                {info.Study}
+              </a>
+            </div>
+          )}
+          {info['Cell Line'] && (
+            <div>
+              <strong>Cell Line: </strong>
+              {info['Cell Line']}
+            </div>
+          )}
           {info.Source && (
             <div>
               <strong>Source: </strong>
-              <a href={info.URL} target="_blank" rel="noreferrer">
+              <a
+                href={info.URL || info.Source_URL}
+                target="_blank"
+                rel="noreferrer"
+              >
                 {info.Source}
               </a>
             </div>
           )}
-          {typeof info.Description == 'string' ? (
-            <p>{info.Description}</p>
-          ) : (
-            info.Description.map((text) => <p>{text}</p>)
-          )}
+          {info.Description &&
+            (typeof info.Description == 'string' ? (
+              <p>{info.Description}</p>
+            ) : (
+              info.Description.map((text) => <p>{text}</p>)
+            ))}
 
           {sigURL ? (
             <div>
@@ -399,7 +483,8 @@ export default function Aetiology() {
   return (
     <div className="bg-white border rounded">
       <div className="mx-auto p-3">
-        <Row className="justify-content-center">{getAetiologies()}</Row>
+        <Row className="justify-content-center">{getCategories()}</Row>
+        {getAetiologies()}
         <Row className={`justify-content-center ${all ? 'd-none' : ''}`}>
           {getSignatures()}
         </Row>

@@ -11,7 +11,7 @@ export const getInitialState = () => ({
     submitted: false,
   },
   aetiology: {
-    source: '',
+    category: 'Cosmic Mutational Signatures',
     aetiology: 'APOBEC activity',
     signature: '',
     study: 'PCAWG',
