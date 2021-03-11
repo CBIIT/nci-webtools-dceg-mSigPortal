@@ -162,8 +162,9 @@ export default function Aetiology() {
 
   function getAetiologies() {
     if (data.length) {
-      const aetiologies = [...new Set(data.map((obj) => obj.Aetiology))].map(
-        (Aetiology) => (
+      const aetiologies = [...new Set(data.map((obj) => obj.Aetiology))]
+        .sort()
+        .map((Aetiology) => (
           <Col key={Aetiology} lg="2" md="3" sm="4" className="mb-3 d-flex">
             <Button
               size="sm"
@@ -182,8 +183,7 @@ export default function Aetiology() {
               {Aetiology}
             </Button>
           </Col>
-        )
-      );
+        ));
 
       return (
         <>
