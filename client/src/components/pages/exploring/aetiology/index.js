@@ -27,6 +27,7 @@ export default function Aetiology() {
     all,
     data,
     thumbnails,
+    selectedSource,
     profileURL,
     exposureURL,
   } = exploring.aetiology;
@@ -144,6 +145,7 @@ export default function Aetiology() {
                     aetiology: '',
                     signature: '',
                     study: '',
+                    selectedSource: '',
                     data: [],
                   });
                 }
@@ -171,6 +173,7 @@ export default function Aetiology() {
                 mergeAetiology({
                   aetiology: Aetiology,
                   signature: '',
+                  selectedSource: '',
                 })
               }
               className={aetiology != Aetiology ? 'disabled' : ''}
@@ -247,25 +250,28 @@ export default function Aetiology() {
       thumbnails.forEach((t) => URL.revokeObjectURL(t));
 
       const newThumbnails = await Promise.all(
-        signatures.map(({ Aetiology, Study, Signature }) =>
-          fetch(`api/getImageS3`, {
-            method: 'POST',
-            headers: {
-              Accept: 'image/svg',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              path: `msigportal/Database/Aetiology/Profile_logo/${Signature}.svg`,
-            }),
-          }).then(async (res) => {
-            const blob = await res.blob();
-            return {
-              Aetiology: Aetiology,
-              Study: Study,
-              Signature: Signature,
-              url: URL.createObjectURL(blob),
-            };
-          })
+        signatures.map(
+          ({ Aetiology, Study, Signature, Source_URL, URL: alias_URL }) =>
+            fetch(`api/getImageS3`, {
+              method: 'POST',
+              headers: {
+                Accept: 'image/svg',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                path: `msigportal/Database/Aetiology/Profile_logo/${Signature}.svg`,
+              }),
+            }).then(async (res) => {
+              const blob = await res.blob();
+              return {
+                Aetiology: Aetiology,
+                Study: Study,
+                Signature: Signature,
+                // use the Source_URL as a unique identifier
+                Source_URL: Source_URL || alias_URL,
+                url: URL.createObjectURL(blob),
+              };
+            })
         )
       );
       mergeAetiology({ thumbnails: newThumbnails });
@@ -276,37 +282,39 @@ export default function Aetiology() {
 
   function getAllSignatures() {
     if (data.length) {
-      return thumbnails.map(({ Aetiology, Signature, url }, index) => (
-        <Col key={index} lg="1" md="3" sm="4" className="mb-2 px-1">
-          <div
-            onClick={() =>
-              mergeAetiology({
-                aetiology: Aetiology,
-                signature: Signature,
-              })
-            }
-            className={`sigIcon border rounded ${
-              aetiology != Aetiology
-                ? 'inactive'
-                : signature == Signature
-                ? 'active'
-                : ''
-            }`}
-            title={`${Aetiology} - ${Signature}`}
-          >
-            <img
-              src={url}
-              className="w-100"
-              // height="70"
-              alt=""
-              // alt={Signature}
-            />
-            <div className="sigLabel">
-              <strong style={{ fontSize: '0.8rem' }}>{Signature}</strong>
+      return thumbnails.map(
+        ({ Aetiology, Signature, url, Source_URL }, index) => (
+          <Col key={index} lg="1" md="3" sm="4" className="mb-2 px-1">
+            <div
+              onClick={() =>
+                mergeAetiology({
+                  aetiology: Aetiology,
+                  signature: Signature,
+                  selectedSource: Source_URL,
+                })
+              }
+              className={`sigIcon border rounded ${
+                aetiology != Aetiology
+                  ? 'inactive'
+                  : selectedSource == Source_URL
+                  ? 'active'
+                  : ''
+              }`}
+              title={`${Aetiology} - ${Signature}`}
+            >
+              <img
+                src={url}
+                className="w-100"
+                // height="70"
+                alt={Signature}
+              />
+              <div className="sigLabel">
+                <strong style={{ fontSize: '0.8rem' }}>{Signature}</strong>
+              </div>
             </div>
-          </div>
-        </Col>
-      ));
+          </Col>
+        )
+      );
     } else {
       return [];
     }
@@ -316,22 +324,26 @@ export default function Aetiology() {
     if (thumbnails.length) {
       return thumbnails
         .filter(({ Aetiology }) => Aetiology == aetiology)
-        .map(({ Signature, url }, index) => {
+        .map(({ Signature, url, Source_URL }, index) => {
           return (
             <Col key={index} md="2" sm="4" className="mb-3">
               <div
                 className={`sigIcon border rounded ${
-                  signature == Signature ? 'active' : ''
+                  selectedSource == Source_URL ? 'active' : ''
                 }`}
                 title={`${aetiology} - ${Signature}`}
-                onClick={() => mergeAetiology({ signature: Signature })}
+                onClick={() =>
+                  mergeAetiology({
+                    signature: Signature,
+                    selectedSource: Source_URL,
+                  })
+                }
               >
                 <img
                   src={url}
                   className="w-100"
                   // height="110"
-                  alt=""
-                  // alt={Signature}
+                  alt={Signature}
                 />
                 <div className="sigLabel">
                   <strong className="sigLabel">{Signature}</strong>
@@ -378,10 +390,10 @@ export default function Aetiology() {
   }
 
   function getInfo() {
-    if (data.length && signature) {
+    if (data.length && selectedSource) {
       const info = data.filter(
-        ({ Study, Aetiology, Signature }) =>
-          Study == study && Aetiology == aetiology && Signature == signature
+        ({ Source_URL, URL: alias_URL }) =>
+          Source_URL == selectedSource || alias_URL == selectedSource
       )[0];
 
       return (

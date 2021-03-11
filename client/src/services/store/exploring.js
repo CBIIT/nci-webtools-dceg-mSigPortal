@@ -18,6 +18,7 @@ export const getInitialState = () => ({
     all: false,
     data: [],
     thumbnails: [],
+    selectedSource: '',
     profileURL: '',
     exposureURL: '',
   },
