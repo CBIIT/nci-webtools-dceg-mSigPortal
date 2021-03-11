@@ -27,8 +27,8 @@ export default function Aetiology() {
     all,
     data,
     thumbnails,
-    sigURL,
-    tmbURL,
+    profileURL,
+    exposureURL,
   } = exploring.aetiology;
 
   const categories = [
@@ -102,15 +102,15 @@ export default function Aetiology() {
         }
       });
     const getPlots = async () => {
-      if (sigURL) URL.revokeObjectURL(sigURL);
-      if (tmbURL) URL.revokeObjectURL(tmbURL);
+      if (profileURL) URL.revokeObjectURL(profileURL);
+      if (exposureURL) URL.revokeObjectURL(exposureURL);
       const [sig, tmb] = await Promise.all([
         getImageS3(`msigportal/Database/Aetiology/Profile/${signature}.svg`),
         getImageS3(
           `msigportal/Database/Aetiology/Exposure/${signature}_${study}.svg`
         ),
       ]);
-      mergeAetiology({ sigURL: sig, tmbURL: tmb });
+      mergeAetiology({ profileURL: sig, exposureURL: tmb });
     };
 
     if (signature && study) getPlots();
@@ -276,8 +276,8 @@ export default function Aetiology() {
 
   function getAllSignatures() {
     if (data.length) {
-      return thumbnails.map(({ Aetiology, Signature, url }, i) => (
-        <Col key={Signature + i} lg="1" md="3" sm="4" className="mb-2 px-1">
+      return thumbnails.map(({ Aetiology, Signature, url }, index) => (
+        <Col key={index} lg="1" md="3" sm="4" className="mb-2 px-1">
           <div
             onClick={() =>
               mergeAetiology({
@@ -316,9 +316,9 @@ export default function Aetiology() {
     if (thumbnails.length) {
       return thumbnails
         .filter(({ Aetiology }) => Aetiology == aetiology)
-        .map(({ Signature, url }) => {
+        .map(({ Signature, url }, index) => {
           return (
-            <Col key={Signature} md="2" sm="4" className="mb-3">
+            <Col key={index} md="2" sm="4" className="mb-3">
               <div
                 className={`sigIcon border rounded ${
                   signature == Signature ? 'active' : ''
@@ -374,12 +374,6 @@ export default function Aetiology() {
           </Button>
         </Col>
       ));
-    } else {
-      return (
-        <div className="my-5">
-          <LoadingOverlay active={true} />
-        </div>
-      );
     }
   }
 
@@ -441,36 +435,39 @@ export default function Aetiology() {
               info.Description.map((text) => <p>{text}</p>)
             ))}
 
-          {sigURL ? (
+          {profileURL ? (
             <div>
               <Plot
                 className="p-3 border rounded mb-3"
                 maxHeight={'300px'}
-                plotURL={sigURL}
+                plotURL={profileURL}
               />
               <Row className="justify-content-center">{getStudy()}</Row>
-              <p>
-                Select the cancer study to review the TMB of selected
-                signatures. TMB shown as the numbers of mutations per megabase
-                (log10) attributed to each mutational signature in samples where
-                the signature is present. Only those cancer types with tumors in
-                which signature activity is attributed are shown. The numbers
-                below the dots for each cancer type indicate the number of
-                tumors in which the signatures was attributed (above the
-                horizontal bar, in blue) and the total number of tumors analyzed
-                (below the blue bar, in green).
-              </p>
-              {tmbURL ? (
-                <Plot
-                  className="p-3 border"
-                  maxHeight={'400px'}
-                  plotURL={tmbURL}
-                />
+
+              {exposureURL ? (
+                <>
+                  <p>
+                    Select the cancer study to review the TMB of selected
+                    signatures. TMB shown as the numbers of mutations per
+                    megabase (log10) attributed to each mutational signature in
+                    samples where the signature is present. Only those cancer
+                    types with tumors in which signature activity is attributed
+                    are shown. The numbers below the dots for each cancer type
+                    indicate the number of tumors in which the signatures was
+                    attributed (above the horizontal bar, in blue) and the total
+                    number of tumors analyzed (below the blue bar, in green).
+                  </p>
+                  <Plot
+                    className="p-3 border"
+                    maxHeight={'400px'}
+                    plotURL={exposureURL}
+                  />
+                </>
               ) : (
                 <div className="p-3 border">
                   <p>
-                    This signature was not detected in any sample of the
-                    selected study
+                    A signature was not detected in any sample of the selected
+                    study
                   </p>
                 </div>
               )}
@@ -489,7 +486,9 @@ export default function Aetiology() {
     <div className="bg-white border rounded">
       <div className="mx-auto p-3">
         <Row className="justify-content-center">{getCategories()}</Row>
+        <hr className="mb-3" />
         {getAetiologies()}
+        <hr className="mb-3" />
         <Row className={`justify-content-center ${all ? 'd-none' : ''}`}>
           {getSignatures()}
         </Row>

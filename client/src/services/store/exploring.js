@@ -18,8 +18,8 @@ export const getInitialState = () => ({
     all: false,
     data: [],
     thumbnails: [],
-    sigURL: '',
-    tmbURL: '',
+    profileURL: '',
+    exposureURL: '',
   },
   sigRefSig: {
     plotPath: '',
