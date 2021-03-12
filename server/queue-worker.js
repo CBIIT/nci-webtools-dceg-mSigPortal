@@ -61,8 +61,8 @@ async function downloadS3(id, savePath) {
   const s3 = new AWS.S3();
   const objects = await s3
     .listObjectsV2({
-      Bucket: config.s3.bucket,
-      Prefix: `${config.s3.outputKeyPrefix}${id}/`,
+      Bucket: config.queue.bucket,
+      Prefix: `${config.queue.outputKeyPrefix}${id}/`,
     })
     .promise();
 
@@ -74,7 +74,7 @@ async function downloadS3(id, savePath) {
     logger.info(`Downloading: ${Key}`);
     const object = await s3
       .getObject({
-        Bucket: config.s3.bucket,
+        Bucket: config.queue.bucket,
         Key,
       })
       .promise();
@@ -148,8 +148,8 @@ async function processMessage(params) {
     await s3
       .upload({
         Body: JSON.stringify(params),
-        Bucket: config.s3.bucket,
-        Key: `${config.s3.outputKeyPrefix}${id}/params.json`,
+        Bucket: config.queue.bucket,
+        Key: `${config.queue.outputKeyPrefix}${id}/params.json`,
       })
       .promise();
 
@@ -159,8 +159,8 @@ async function processMessage(params) {
         Body: tar
           .c({ sync: true, gzip: true, C: config.results.folder }, [id])
           .read(),
-        Bucket: config.s3.bucket,
-        Key: `${config.s3.outputKeyPrefix}${id}/${id}.tgz`,
+        Bucket: config.queue.bucket,
+        Key: `${config.queue.outputKeyPrefix}${id}/${id}.tgz`,
       })
       .promise();
 

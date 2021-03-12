@@ -198,8 +198,8 @@ async function visualizeR(req, res, next) {
       savePath: savePath,
       dataPath: !production
         ? path.join(config.data.database)
-        : config.s3.database,
-      bucket: production ? config.s3.bucket : '',
+        : config.data.localDatabase,
+      bucket: production ? config.data.bucket : '',
     });
 
     const { stdout, output, ...rest } = JSON.parse(wrapper);
@@ -229,8 +229,8 @@ async function getReferenceSignatureSets(req, res, next) {
         profileType: req.body.profileType,
         dataPath: !production
           ? path.join(config.data.database)
-          : config.s3.database,
-        bucket: production ? config.s3.bucket : '',
+          : config.data.localDatabase,
+        bucket: production ? config.data.bucket : '',
       }
     );
 
@@ -253,8 +253,8 @@ async function getSignaturesR(req, res, next) {
       signatureSetName: req.body.signatureSetName,
       dataPath: !production
         ? path.join(config.data.database)
-        : config.s3.database,
-      bucket: production ? config.s3.bucket : '',
+        : config.data.localDatabase,
+      bucket: production ? config.data.bucket : '',
     });
 
     // console.log('signatures', list);
@@ -296,8 +296,8 @@ async function getPublicData(req, res, next) {
       experimentalStrategy: req.body.experimentalStrategy,
       dataPath: !production
         ? path.join(config.data.database)
-        : config.s3.database,
-      bucket: production ? config.s3.bucket : '',
+        : config.data.localDatabase,
+      bucket: production ? config.data.bucket : '',
     });
     logger.info('/getPublicOptions: Complete');
 
@@ -394,8 +394,8 @@ async function exploringR(req, res, next) {
       savePath: savePath,
       dataPath: !production
         ? path.join(config.data.database)
-        : config.s3.database,
-      bucket: production ? config.s3.bucket : '',
+        : config.data.localDatabase,
+      bucket: production ? config.data.bucket : '',
     });
 
     const { stdout, output, ...rest } = JSON.parse(wrapper);
@@ -422,8 +422,8 @@ async function getReferenceSignatureData(req, res, next) {
       ...req.body,
       dataPath: !production
         ? path.join(config.data.database)
-        : config.s3.database,
-      bucket: production ? config.s3.bucket : '',
+        : config.data.localDatabase,
+      bucket: production ? config.data.bucket : '',
     }
   ).catch(next);
 
@@ -442,8 +442,8 @@ async function submitQueue(req, res, next) {
         Body: tar
           .c({ sync: true, gzip: true, C: config.results.folder }, [projectID])
           .read(),
-        Bucket: config.s3.bucket,
-        Key: `${config.s3.outputKeyPrefix}${projectID}/${projectID}.tgz`,
+        Bucket: config.queue.bucket,
+        Key: `${config.queue.outputKeyPrefix}${projectID}/${projectID}.tgz`,
       })
       .promise();
 
@@ -490,8 +490,8 @@ async function getQueueResults(req, res, next) {
     // find objects which use the specified id as the prefix
     const objects = await s3
       .listObjectsV2({
-        Bucket: config.s3.bucket,
-        Prefix: `${config.s3.outputKeyPrefix}${id}/`,
+        Bucket: config.queue.bucket,
+        Prefix: `${config.queue.outputKeyPrefix}${id}/`,
       })
       .promise();
 
@@ -505,7 +505,7 @@ async function getQueueResults(req, res, next) {
         logger.info(`Downloading result: ${Key}`);
         const object = await s3
           .getObject({
-            Bucket: config.s3.bucket,
+            Bucket: config.queue.bucket,
             Key,
           })
           .promise();
@@ -600,8 +600,8 @@ async function getSignatureNames(req, res, next) {
         args: req.body.args,
         dataPath: !production
           ? path.join(config.data.database)
-          : config.s3.database,
-        bucket: production ? config.s3.bucket : '',
+          : config.data.localDatabase,
+        bucket: production ? config.data.bucket : '',
       }
     );
 
@@ -618,8 +618,8 @@ async function getSampleNames(req, res, next) {
       args: req.body.args,
       dataPath: !production
         ? path.join(config.data.database)
-        : config.s3.database,
-      bucket: production ? config.s3.bucket : '',
+        : config.data.localDatabase,
+      bucket: production ? config.data.bucket : '',
     });
 
     res.json(JSON.parse(wrapper));
@@ -685,8 +685,8 @@ async function getImageS3(req, res, next) {
 
     res.setHeader('Content-Type', 'image/svg+xml');
     s3.getObject({
-      Bucket: config.s3.bucket,
-      Key: `${config.s3.database}${key}`,
+      Bucket: config.data.bucket,
+      Key: `${config.data.database}${key}`,
     })
       .createReadStream()
       .on('error', next)
@@ -708,8 +708,8 @@ async function getFileS3(req, res, next) {
     const s3 = new AWS.S3();
 
     s3.getObject({
-      Bucket: config.s3.bucket,
-      Key: `${config.s3.database}${key}`,
+      Bucket: config.data.bucket,
+      Key: `${config.data.database}${key}`,
     })
       .createReadStream()
       .on('error', next)

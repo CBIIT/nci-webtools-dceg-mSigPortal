@@ -9,19 +9,25 @@
   "results": {
     "folder": "../tmp"
   },
-  "data": {
-    "folder": "../data",
-    "database": "../data/Database/"
-  },
   "aws": {
     "region": "region",
     "aws_access_key_id": "",
     "aws_secret_access_key": ""
   },
+  "data": {
+    "folder": "../data",
+    "examples": "../data/Examples/",
+    "localDatabase": "../data/Database/",
+    "database": "msigportal/Database/",
+    "bucket": "dataBucket"
+  },
   "queue": {
-    "url": "url",
-    "errorUrl": "url",
-    "visibilityTimeout": 60,
+    "url": "sqsName",
+    "bucket": "queueBucket",
+    "inputKeyPrefix": "msigportal/queue/",
+    "outputKeyPrefix": "msigportal/queue/",
+    "errorUrl": "sqsName",
+    "visibilityTimeout": 30,
     "pollInterval": 60
   },
   "email": {
@@ -32,10 +38,5 @@
       "host": "host",
       "port": 25
     }
-  },
-  "s3": {
-    "bucket": "bucket",
-    "inputKeyPrefix": "key/",
-    "outputKeyPrefix": "key/"
   }
 }
