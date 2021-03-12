@@ -130,7 +130,10 @@ async function processMessage(params) {
         projectID: id,
         pythonOutput: path.join(directory, 'results/output'),
         savePath: savePath,
-        dataPath: path.join(config.data.database),
+        dataPath: production
+          ? config.data.database
+          : path.join(config.data.localDatabase),
+        bucket: production ? config.data.bucket : '',
       }
     );
     // const { stdout: rStdout } = JSON.parse(wrapper);

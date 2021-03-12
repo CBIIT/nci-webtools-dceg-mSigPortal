@@ -196,9 +196,9 @@ async function visualizeR(req, res, next) {
         'results/output'
       ),
       savePath: savePath,
-      dataPath: !production
-        ? path.join(config.data.database)
-        : config.data.localDatabase,
+      dataPath: production
+        ? config.data.database
+        : path.join(config.data.localDatabase),
       bucket: production ? config.data.bucket : '',
     });
 
@@ -227,9 +227,9 @@ async function getReferenceSignatureSets(req, res, next) {
       'getReferenceSignatureSets',
       {
         profileType: req.body.profileType,
-        dataPath: !production
-          ? path.join(config.data.database)
-          : config.data.localDatabase,
+        dataPath: production
+          ? config.data.database
+          : path.join(config.data.localDatabase),
         bucket: production ? config.data.bucket : '',
       }
     );
@@ -251,9 +251,9 @@ async function getSignaturesR(req, res, next) {
     const list = await r('services/R/visualizeWrapper.R', 'getSignaturesR', {
       profileType: req.body.profileType,
       signatureSetName: req.body.signatureSetName,
-      dataPath: !production
-        ? path.join(config.data.database)
-        : config.data.localDatabase,
+      dataPath: production
+        ? config.data.database
+        : path.join(config.data.localDatabase),
       bucket: production ? config.data.bucket : '',
     });
 
@@ -294,9 +294,9 @@ async function getPublicData(req, res, next) {
       study: req.body.study,
       cancerType: req.body.cancerType,
       experimentalStrategy: req.body.experimentalStrategy,
-      dataPath: !production
-        ? path.join(config.data.database)
-        : config.data.localDatabase,
+      dataPath: production
+        ? config.data.database
+        : path.join(config.data.localDatabase),
       bucket: production ? config.data.bucket : '',
     });
     logger.info('/getPublicOptions: Complete');
@@ -392,9 +392,9 @@ async function exploringR(req, res, next) {
       ),
       rootDir: rootDir,
       savePath: savePath,
-      dataPath: !production
-        ? path.join(config.data.database)
-        : config.data.localDatabase,
+      dataPath: production
+        ? config.data.database
+        : path.join(config.data.localDatabase),
       bucket: production ? config.data.bucket : '',
     });
 
@@ -420,9 +420,9 @@ async function getReferenceSignatureData(req, res, next) {
     'getReferenceSignatureData',
     {
       ...req.body,
-      dataPath: !production
-        ? path.join(config.data.database)
-        : config.data.localDatabase,
+      dataPath: production
+        ? config.data.database
+        : path.join(config.data.localDatabase),
       bucket: production ? config.data.bucket : '',
     }
   ).catch(next);
@@ -598,9 +598,9 @@ async function getSignatureNames(req, res, next) {
       'getSignatureNames',
       {
         args: req.body.args,
-        dataPath: !production
-          ? path.join(config.data.database)
-          : config.data.localDatabase,
+        dataPath: production
+          ? config.data.database
+          : path.join(config.data.localDatabase),
         bucket: production ? config.data.bucket : '',
       }
     );
@@ -616,9 +616,9 @@ async function getSampleNames(req, res, next) {
   try {
     const wrapper = await r('services/R/exploringWrapper.R', 'getSampleNames', {
       args: req.body.args,
-      dataPath: !production
-        ? path.join(config.data.database)
-        : config.data.localDatabase,
+      dataPath: production
+        ? config.data.database
+        : path.join(config.data.localDatabase),
       bucket: production ? config.data.bucket : '',
     });
 
@@ -658,21 +658,42 @@ async function getExposureExample(req, res, next) {
 
 // Publications page data
 async function getPublications(req, res, next) {
-  const pubFile = path.resolve(
-    config.data.database,
-    'Others/Publications.xlsx'
-  );
-  const workbook = XLSX.readFile(pubFile);
-  const sheetNames = workbook.SheetNames;
-  const data = sheetNames.reduce(
-    (acc, sheet) => ({
-      ...acc,
-      [sheet]: XLSX.utils.sheet_to_json(workbook.Sheets[sheet]),
-    }),
-    {}
-  );
+  if (production) {
+    let buffers = [];
+    const filestream = new AWS.S3()
+      .getObject({
+        Bucket: config.data.bucket,
+        Key: `${config.data.database}Others/Publications.xlsx`,
+      })
+      .createReadStream();
 
-  res.json(data);
+    filestream
+      .on('data', (data) => buffers.push(data))
+      .on('end', () => {
+        const buffer = Buffer.concat(buffers);
+        const workbook = XLSX.read(buffer);
+        toExcel(workbook);
+      })
+      .on('error', next);
+  } else {
+    const workbook = XLSX.readFile(
+      path.resolve(config.data.localDatabase, 'Others/Publications.xlsx')
+    );
+    toExcel(workbook);
+  }
+
+  function toExcel(workbook) {
+    const sheetNames = workbook.SheetNames;
+    const data = sheetNames.reduce(
+      (acc, sheet) => ({
+        ...acc,
+        [sheet]: XLSX.utils.sheet_to_json(workbook.Sheets[sheet]),
+      }),
+      {}
+    );
+
+    res.json(data);
+  }
 }
 
 async function getImageS3(req, res, next) {
@@ -686,7 +707,7 @@ async function getImageS3(req, res, next) {
     res.setHeader('Content-Type', 'image/svg+xml');
     s3.getObject({
       Bucket: config.data.bucket,
-      Key: `${config.data.database}${key}`,
+      Key: key,
     })
       .createReadStream()
       .on('error', next)
@@ -709,7 +730,7 @@ async function getFileS3(req, res, next) {
 
     s3.getObject({
       Bucket: config.data.bucket,
-      Key: `${config.data.database}${key}`,
+      Key: key,
     })
       .createReadStream()
       .on('error', next)
