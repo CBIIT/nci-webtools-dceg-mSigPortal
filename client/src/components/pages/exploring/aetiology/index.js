@@ -14,6 +14,8 @@ export default function Aetiology() {
   const exploring = useSelector((state) => state.exploring);
   const mergeAetiology = (state) =>
     dispatch(actions.mergeExploring({ aetiology: state }));
+  const mergeState = async (state) =>
+    await dispatch(actions.mergeExploring({ ...state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -49,6 +51,11 @@ export default function Aetiology() {
     },
     { name: 'Others', file: '' },
   ];
+
+  // set selected tab on component render
+  useEffect(() => {
+    mergeState({ exploring: { displayTab: 'aetiology' } });
+  }, []);
 
   useEffect(() => {
     const getData = async () => {
