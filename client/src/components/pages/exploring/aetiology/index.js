@@ -296,7 +296,11 @@ export default function Aetiology() {
         </>
       );
     } else {
-      return [];
+      return (
+        <div className="my-5">
+          <LoadingOverlay active={true} />
+        </div>
+      );
     }
   }
   function getCancerAetiology() {
@@ -353,7 +357,11 @@ export default function Aetiology() {
         </>
       );
     } else {
-      return [];
+      return (
+        <div className="my-5">
+          <LoadingOverlay active={true} />
+        </div>
+      );
     }
   }
 
@@ -494,7 +502,11 @@ export default function Aetiology() {
           )
         );
       } else {
-        return [];
+        return (
+          <div className="my-5">
+            <LoadingOverlay active={true} />
+          </div>
+        );
       }
     }
 
