@@ -322,7 +322,8 @@ export default function Aetiology() {
               onClick={() =>
                 mergeAetiology({
                   aetiology: Aetiology,
-                  signature: '',
+                  tissue: '',
+                  refSig: '',
                   selectedSource: '',
                 })
               }
