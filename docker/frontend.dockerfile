@@ -1,36 +1,38 @@
-# Stage 0 - Build Client
-FROM node:latest
+FROM centos:8.3.2011
 
-COPY client/ /client
+RUN dnf -y update \
+    && dnf -y install \
+    dnf-plugins-core \
+    epel-release \
+    glibc-langpack-en \
+    && dnf -y module enable nodejs:14 \
+    && dnf -y install \
+    gcc-c++ \
+    httpd \
+    make \
+    nodejs \
+    && dnf clean all
+
+# Add custom httpd configuration
+COPY docker/msigportal.conf /etc/httpd/conf.d/msigportal.conf
+
+RUN mkdir /client
 
 WORKDIR /client
 
-RUN npm install \
- && npm run build
+COPY client/package*.json /client/
 
-# Stage 1 - Copy static assets
-FROM centos:latest
+RUN npm install
 
-RUN dnf -y --setopt=tsflags=nodocs update && \
-    dnf -y --setopt=tsflags=nodocs install httpd && \
-    dnf clean all
+COPY client /client/
 
-# Simple startup script to avoid some issues observed with container restart
-RUN echo -e '#!/bin/bash\nrm -rf /run/httpd/* /tmp/httpd* && exec /usr/sbin/apachectl -DFOREGROUND' > /run-httpd.sh
-RUN chmod +x /run-httpd.sh
-
-# Add custom httpd configuration
-ADD docker/msigportal.conf /etc/httpd/conf.d/msigportal.conf
-
-COPY --chown=apache:apache --from=0 /client/build /var/www/html/mutational-signatures
-
-RUN chmod 755 -R /var/www/html/mutational-signatures
+RUN npm run build \
+    && mv /client/build /var/www/html/msigportal
 
 WORKDIR /var/www/html
-
-RUN touch index.html && chown apache:apache index.html
 
 EXPOSE 80
 EXPOSE 443
 
-CMD ["/run-httpd.sh"]
+CMD rm -rf /run/httpd/* /tmp/httpd* \
+    && exec /usr/sbin/apachectl -DFOREGROUND
