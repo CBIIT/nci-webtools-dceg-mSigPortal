@@ -5,7 +5,8 @@ export const getInitialState = () => ({
   exploring: {
     displayTab: 'aetiology',
     signatureDisplay: 'referenceSignatures',
-    exposureData: [],
+    exposureSignature: [],
+    exposureCancer: [],
     refSigData: [],
     projectID: '',
     submitted: false,

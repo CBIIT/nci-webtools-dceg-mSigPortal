@@ -18,7 +18,7 @@ const actions = { ...exploringActions, ...modalActions };
 export default function Explore() {
   const dispatch = useDispatch();
   const exploring = useSelector((state) => state.exploring);
-  const { exposureData, displayTab } = exploring.exploring;
+  const { exposureSignature, displayTab } = exploring.exploring;
   const mergeExploring = (state) =>
     dispatch(actions.mergeExploring({ exploring: state }));
   const mergeExposure = (state) =>
@@ -33,7 +33,7 @@ export default function Explore() {
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   useEffect(() => {
-    if (!exposureData.length) populateControls();
+    if (!exposureSignature.length) populateControls();
   }, []);
 
   const getFileS3 = (path) =>
@@ -52,29 +52,44 @@ export default function Explore() {
 
   async function populateControls() {
     try {
-      let [signatureData, exposureData, signatureNames] = await Promise.all([
+      let [
+        signatureData,
+        exposureCancer,
+        exposureSignature,
+        signatureNames,
+      ] = await Promise.all([
         getFileS3(`msigportal/Database/Others/json/Exploring-Signature.json`),
-        getFileS3('msigportal/Database/Others/json/Exploring-Exposure.json'),
-
+        getFileS3(
+          'msigportal/Database/Others/json/Exploring-Exposure-cancertype.json'
+        ),
+        getFileS3(
+          'msigportal/Database/Others/json/Exploring-Exposure.json'
+        ),
         getFileS3('msigportal/Database/Others/json/Signature_name.json'),
       ]);
 
       populateSignatureExp(signatureData);
-      populateExposureExp(exposureData, signatureNames);
+      populateExposureExp(exposureCancer, exposureSignature, signatureNames);
     } catch (err) {
       mergeError(err.message);
     }
   }
 
-  async function populateExposureExp(exposureData, signatureNames) {
+  async function populateExposureExp(
+    exposureCancer,
+    exposureSignature,
+    signatureNames
+  ) {
     mergeExposure({ loading: true });
 
-    const studyOptions = [...new Set(exposureData.map((data) => data.Study))];
+    const studyOptions = [
+      ...new Set(exposureSignature.map((data) => data.Study)),
+    ];
     const study = 'PCAWG'; // default
 
     const strategyOptions = [
       ...new Set(
-        exposureData
+        exposureSignature
           .filter((data) => data.Study == study)
           .map((data) => data.Dataset)
       ),
@@ -83,7 +98,7 @@ export default function Explore() {
 
     const refSignatureSetOptions = [
       ...new Set(
-        exposureData
+        exposureSignature
           .filter((row) => row.Study == study && row.Dataset == strategy)
           .map((row) => row.Signature_set_name)
       ),
@@ -92,7 +107,7 @@ export default function Explore() {
 
     const cancerOptions = [
       ...new Set(
-        exposureData
+        exposureCancer
           .filter((data) => data.Study == study && data.Dataset == strategy)
           .map((data) => data.Cancer_Type)
       ),
@@ -124,7 +139,8 @@ export default function Explore() {
     mergeExposure(params);
 
     mergeExploring({
-      exposureData: exposureData,
+      exposureCancer: exposureCancer,
+      exposureSignature: exposureSignature,
       signatureNames: signatureNames,
     });
   }
