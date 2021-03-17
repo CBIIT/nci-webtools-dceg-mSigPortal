@@ -24,9 +24,10 @@ div.sigIcon {
   .sigLabel {
     text-align: center;
     margin-top: -0.2rem;
-    // position: absolute;
-    // bottom: 0;
-    // left: 50%;
-    // transform: translate(-50%, 0);
+    line-height: 1.5rem;
+    max-height: 3rem;
+    text-overflow: ellipsis;
+    // white-space: nowrap;
+    overflow: hidden;
   }
 }
