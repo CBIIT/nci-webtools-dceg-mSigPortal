@@ -672,17 +672,17 @@ async function getPublications(req, res, next) {
       .on('end', () => {
         const buffer = Buffer.concat(buffers);
         const workbook = XLSX.read(buffer);
-        toExcel(workbook);
+        excelToJSON(workbook);
       })
       .on('error', next);
   } else {
     const workbook = XLSX.readFile(
       path.resolve(config.data.localDatabase, 'Others/Publications.xlsx')
     );
-    toExcel(workbook);
+    excelToJSON(workbook);
   }
 
-  function toExcel(workbook) {
+  function excelToJSON(workbook) {
     const sheetNames = workbook.SheetNames;
     const data = sheetNames.reduce(
       (acc, sheet) => ({
