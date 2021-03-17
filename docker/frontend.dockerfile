@@ -27,7 +27,7 @@ RUN npm install
 COPY client /client/
 
 RUN npm run build \
-    && mv /client/build /var/www/html/msigportal
+    && mv /client/build /var/www/html/mutational-signatures
 
 WORKDIR /var/www/html
 
