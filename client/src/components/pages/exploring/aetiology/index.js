@@ -656,35 +656,41 @@ export default function Aetiology() {
                   maxHeight={'300px'}
                   plotURL={profileURL}
                 />
-                <Row className="justify-content-center">{getStudy()}</Row>
 
-                {exposureURL ? (
+                {category == 'Cosmic Mutational Signatures' && (
                   <>
-                    <p>
-                      Select the cancer study to review the TMB of selected
-                      signatures. TMB shown as the numbers of mutations per
-                      megabase (log10) attributed to each mutational signature
-                      in samples where the signature is present. Only those
-                      cancer types with tumors in which signature activity is
-                      attributed are shown. The numbers below the dots for each
-                      cancer type indicate the number of tumors in which the
-                      signatures was attributed (above the horizontal bar, in
-                      blue) and the total number of tumors analyzed (below the
-                      blue bar, in green).
-                    </p>
-                    <Plot
-                      className="p-3 border"
-                      maxHeight={'400px'}
-                      plotURL={exposureURL}
-                    />
+                    {exposureURL ? (
+                      <>
+                        <Row className="justify-content-center">
+                          {getStudy()}
+                        </Row>
+                        <p>
+                          Select the cancer study to review the TMB of selected
+                          signatures. TMB shown as the numbers of mutations per
+                          megabase (log10) attributed to each mutational
+                          signature in samples where the signature is present.
+                          Only those cancer types with tumors in which signature
+                          activity is attributed are shown. The numbers below
+                          the dots for each cancer type indicate the number of
+                          tumors in which the signatures was attributed (above
+                          the horizontal bar, in blue) and the total number of
+                          tumors analyzed (below the blue bar, in green).
+                        </p>
+                        <Plot
+                          className="p-3 border"
+                          maxHeight={'400px'}
+                          plotURL={exposureURL}
+                        />
+                      </>
+                    ) : (
+                      <div className="p-3 border">
+                        <p>
+                          A signature was not detected in any sample of the
+                          selected study
+                        </p>
+                      </div>
+                    )}
                   </>
-                ) : (
-                  <div className="p-3 border">
-                    <p>
-                      A signature was not detected in any sample of the selected
-                      study
-                    </p>
-                  </div>
                 )}
               </div>
             ) : (
@@ -696,9 +702,7 @@ export default function Aetiology() {
         );
       } else {
         return (
-          <div>
-            <p>Select a signature</p>
-          </div>
+          <p>Select a category, aeitology, and signature to view more info</p>
         );
       }
     }
@@ -706,8 +710,12 @@ export default function Aetiology() {
     return (
       <div>
         <div className="mx-auto p-3 pt-0">
+          <strong>Aetiologies</strong>
           {getAetiologies()}
-          <hr className="mb-3" />
+        </div>
+        <hr />
+        <div className="mx-auto p-3 pt-0">
+          <strong>Signatures</strong>
           <Row className={`justify-content-center ${all ? 'd-none' : ''}`}>
             {getSignatures()}
           </Row>
@@ -718,7 +726,7 @@ export default function Aetiology() {
           </Row>
         </div>
         <hr />
-        <div className="mx-auto px-5 py-3">{getInfo()}</div>
+        <div className="mx-auto p-3">{getInfo()}</div>
       </div>
     );
   }
@@ -820,44 +828,40 @@ export default function Aetiology() {
     }
 
     function getRefSig() {
-      if (refSigThumbnails.length) {
-        return tissue
-          ? refSigThumbnails
-              .filter(
-                (v) =>
-                  v.Aetiology == aetiology &&
-                  v['Tissue Specific Signature'] == tissue
-              )
-              .map((v, index) => {
-                return (
-                  <Col key={index} md="2" sm="4" className="mb-3">
-                    <div
-                      className={`sigIcon border rounded ${
-                        refSig == v['Ref Signature'] ? 'active' : ''
-                      }`}
-                      title={`${v['Tissue Specific Signature']} - ${v['Ref Signature']}`}
-                      onClick={() =>
-                        mergeAetiology({ refSig: v['Ref Signature'] })
-                      }
-                    >
-                      <img
-                        src={v.url}
-                        className="w-100"
-                        // height="110"
-                        alt={v['Ref Signature']}
-                      />
-                      <div className="sigLabel">
-                        <strong className="sigLabel">
-                          {`${v['Ref Signature']} (${v['RefSig Proportion']})`}
-                        </strong>
-                      </div>
-                    </div>
-                  </Col>
-                );
-              })
-          : <div><p>Select a Tissue</p></div>;
+      if (refSigThumbnails.length && tissue) {
+        return refSigThumbnails
+          .filter(
+            (v) =>
+              v.Aetiology == aetiology &&
+              v['Tissue Specific Signature'] == tissue
+          )
+          .map((v, index) => {
+            return (
+              <Col key={index} md="2" sm="4" className="mb-3">
+                <div
+                  className={`sigIcon border rounded ${
+                    refSig == v['Ref Signature'] ? 'active' : ''
+                  }`}
+                  title={`${v['Tissue Specific Signature']} - ${v['Ref Signature']}`}
+                  onClick={() => mergeAetiology({ refSig: v['Ref Signature'] })}
+                >
+                  <img
+                    src={v.url}
+                    className="w-100"
+                    // height="110"
+                    alt={v['Ref Signature']}
+                  />
+                  <div className="sigLabel">
+                    <strong className="sigLabel">
+                      {`${v['Ref Signature']} (${v['RefSig Proportion']})`}
+                    </strong>
+                  </div>
+                </div>
+              </Col>
+            );
+          });
       } else {
-        return [];
+        return <p>Select a signature</p>;
       }
     }
 
@@ -927,8 +931,12 @@ export default function Aetiology() {
     return (
       <div>
         <div className="mx-auto p-3">
+          <strong>Aetiologies</strong>
           {getCancerAetiology()}
-          <hr className="mb-3" />
+        </div>
+        <hr />
+        <div className="mx-auto p-3">
+          <strong>Tissue Specific Signatures</strong>
           <Row className={`justify-content-center ${all ? 'd-none' : ''}`}>
             {getTissues()}
           </Row>
@@ -937,7 +945,10 @@ export default function Aetiology() {
           >
             {getAllTissues()}
           </Row>
-          <hr className="mb-3" />
+        </div>
+        <hr />
+        <div className="mx-auto p-3">
+          <strong>Reference Signatures</strong>
           <Row className="justify-content-center">{getRefSig()}</Row>
         </div>
         <hr />
@@ -948,10 +959,11 @@ export default function Aetiology() {
 
   return (
     <div className="bg-white border rounded">
-      <div className="mx-auto pt-3">
+      <div className="mx-auto p-3">
+        <strong className="mb-3">Categories</strong>
         <Row className="justify-content-center">{getCategories()}</Row>
-        <hr />
       </div>
+      <hr />
       {category != 'Cancer Specific Signature' && standardView()}
       {category == 'Cancer Specific Signature' && cancerSpecificView()}
     </div>
