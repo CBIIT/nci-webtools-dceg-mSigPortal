@@ -81,7 +81,7 @@ if (process.env.NODE_ENV !== 'production')
   app.use(express.static(path.resolve('www')));
 
 apiRouter.use('/results', express.static(config.results.folder));
-apiRouter.use('/public', express.static(config.data.database));
+apiRouter.use('/public', express.static(config.data.localDatabase));
 apiRouter.use(express.json());
 
 apiRouter.use((error, req, res, next) => {
