@@ -55,7 +55,7 @@ export default function PublicForm() {
 
   async function handleSubmit() {
     // disable parameters after submit
-    mergeVisualize({ visualize: { submitted: true } });
+    mergeVisualize({ submitted: true });
 
     const args = {
       study: study,
