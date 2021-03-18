@@ -116,8 +116,10 @@ export default function Aetiology() {
       if (profileURL) URL.revokeObjectURL(profileURL);
       if (exposureURL) URL.revokeObjectURL(exposureURL);
       const [sig, tmb] = await Promise.all([
-        getImageS3(`Aetiology/Profile/${signature}.svg`),
-        getImageS3(`Aetiology/Exposure/${signature}_${study}.svg`),
+        getImageS3(`Aetiology/Profile/${fixFile(signature)}.svg`),
+        getImageS3(
+          `Aetiology/Exposure/${fixFile(`${signature}_${study}`)}.svg`
+        ),
       ]);
       mergeAetiology({ profileURL: sig, exposureURL: tmb });
     };
@@ -127,9 +129,9 @@ export default function Aetiology() {
       if (refSigURL) URL.revokeObjectURL(refSigURL);
       if (exposureURL) URL.revokeObjectURL(exposureURL);
       const [tissuePlot, refSigPlot, exposurePlot] = await Promise.all([
-        getImageS3(`Aetiology/Profile/${tissue}.svg`),
-        getImageS3(`Aetiology/Profile/${refSig}.svg`),
-        getImageS3(`Aetiology/Exposure/${tissue}_PCAWG.svg`),
+        getImageS3(`Aetiology/Profile/${fixFile(tissue)}.svg`),
+        getImageS3(`Aetiology/Profile/${fixFile(refSig)}.svg`),
+        getImageS3(`Aetiology/Exposure/${fixFile(tissue)}_PCAWG.svg`),
       ]);
       mergeAetiology({
         tissueURL: tissuePlot,
@@ -194,6 +196,11 @@ export default function Aetiology() {
     });
 
     return c - d;
+  }
+
+  // replace forward slash with colon for proper fs traversal
+  function fixFile(filename) {
+    return filename.replace(/\//g, ':');
   }
 
   function naturalSort(a, b) {
@@ -386,19 +393,19 @@ export default function Aetiology() {
             //     path: `Aetiology/Profile_logo/${Signature}.svg`,
             //   }),
             // })
-            fetch(`api/public/Aetiology/Profile_logo/${Signature}.svg`).then(
-              async (res) => {
-                const blob = await res.blob();
-                return {
-                  Aetiology: Aetiology,
-                  Study: Study,
-                  Signature: Signature,
-                  // use the Source_URL as a unique identifier
-                  Source_URL: Source_URL || alias_URL,
-                  url: URL.createObjectURL(blob),
-                };
-              }
-            )
+            fetch(
+              `api/public/Aetiology/Profile_logo/${fixFile(Signature)}.svg`
+            ).then(async (res) => {
+              const blob = await res.blob();
+              return {
+                Aetiology: Aetiology,
+                Study: Study,
+                Signature: Signature,
+                // use the Source_URL as a unique identifier
+                Source_URL: Source_URL || alias_URL,
+                url: URL.createObjectURL(blob),
+              };
+            })
         )
       );
       mergeAetiology({ thumbnails: newThumbnails });
@@ -424,7 +431,9 @@ export default function Aetiology() {
           //   }),
           // })
           fetch(
-            `api/public/Aetiology/Profile_logo/${tissue['Tissue Specific Signature']}.svg`
+            `api/public/Aetiology/Profile_logo/${fixFile(
+              tissue['Tissue Specific Signature']
+            )}.svg`
           ).then(async (res) => {
             const blob = await res.blob();
             return {
@@ -459,7 +468,9 @@ export default function Aetiology() {
           //   }),
           // })
           fetch(
-            `api/public/Aetiology/Profile_logo/${refSig['Ref Signature']}.svg`
+            `api/public/Aetiology/Profile_logo/${fixFile(
+              refSig['Ref Signature']
+            )}.svg`
           ).then(async (res) => {
             const blob = await res.blob();
             return {
