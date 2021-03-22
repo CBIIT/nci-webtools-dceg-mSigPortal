@@ -2,7 +2,6 @@ const cluster = require('cluster');
 const numCPUs = require('os').cpus().length;
 const path = require('path');
 const express = require('express');
-const AWS = require('aws-sdk');
 const fs = require('fs');
 const config = require('./config.json');
 const logger = require('./logger');
@@ -56,11 +55,6 @@ function childProcess() {
   console.log(`Worker ${process.pid} started and finished`);
 
   const server = app.listen(config.server.port, () => {
-    // update aws configuration if supplied
-    if (config.aws) {
-      AWS.config.update(config.aws);
-    }
-
     // create required folders
     for (let folder of [config.logs.folder, config.results.folder]) {
       fs.mkdirSync(folder, { recursive: true });

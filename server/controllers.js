@@ -14,6 +14,9 @@ const config = require('./config.json');
 
 const production = process.env.NODE_ENV === 'production';
 
+// load aws config
+if (config.aws) AWS.config.update(config.aws);
+
 function parseCSV(filepath) {
   const file = fs.createReadStream(filepath);
   return new Promise((resolve, reject) => {
@@ -724,7 +727,6 @@ async function getFileS3(req, res, next) {
   // serve static files from s3 in production
   // otherwise serve from local Database directory
   const key = req.body.path;
-
   if (production) {
     const s3 = new AWS.S3();
 
