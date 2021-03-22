@@ -59,7 +59,7 @@ export default function ProfilerSummary({ submitR }) {
       }
     };
 
-    if (filtered.length && !mainLoading.active) {
+    if (filtered.length && !mainLoading.active && !plotURL) {
       checkSummary();
     }
   }, [filtered, mainLoading]);
