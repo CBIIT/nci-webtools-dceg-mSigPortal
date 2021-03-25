@@ -98,6 +98,7 @@ export const getInitialState = () => ({
     refSigData: [],
     refSignatureSet: '',
     refSignatureSetOptions: [],
+    useCancerType: true,
     signatureNameOptions: [],
     userNameOptions: [],
     publicSampleOptions: [],
@@ -114,6 +115,7 @@ export const getInitialState = () => ({
     loadingMsg: null,
     projectID: '',
     openSidebar: true,
+    submitted: false,
   },
   tmb: {
     plotPath: '',
@@ -138,7 +140,6 @@ export const getInitialState = () => ({
     loading: false,
   },
   msAssociation: {
-    toggleCancer: true,
     both: true,
     signatureName1: '',
     signatureName2: '',

@@ -62,9 +62,7 @@ export default function Explore() {
         getFileS3(
           'msigportal/Database/Others/json/Exploring-Exposure-cancertype.json'
         ),
-        getFileS3(
-          'msigportal/Database/Others/json/Exploring-Exposure.json'
-        ),
+        getFileS3('msigportal/Database/Others/json/Exploring-Exposure.json'),
         getFileS3('msigportal/Database/Others/json/Signature_name.json'),
       ]);
 

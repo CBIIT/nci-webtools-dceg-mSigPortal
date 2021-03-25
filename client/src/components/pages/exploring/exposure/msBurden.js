@@ -36,7 +36,7 @@ export default function MsBurden({ calculateBurden }) {
 
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
-  }, [plotPath, err, debugR, projectID]);
+  }, [plotPath, err, debugR]);
 
   useEffect(() => {
     if (source == 'public') {

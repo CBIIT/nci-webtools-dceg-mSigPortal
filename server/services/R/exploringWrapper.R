@@ -506,7 +506,7 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
       filter(Signature_set_name == common$refSignatureSet)
 
     # seqmatrix_refdata_selected <- seqmatrix_refdata %>% filter(Study == common$study, Dataset == common$strategy, Profile == signature_refsets_selected$Profile[1])
-    if (association$useCancer) {
+    if (common$useCancerType) {
       seqmatrixFiles <- seqmatrix_refdata_subset_files %>% filter(Study == common$study, Dataset == common$strategy, Cancer_Type == common$cancerType) %>% pull(file)
     } else {
       seqmatrixFiles <- seqmatrix_refdata_subset_files %>% filter(Study == common$study, Dataset == common$strategy) %>% pull(file)
@@ -551,7 +551,7 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
     }
 
     # Mutational signature burden across cancer types
-    if ('all' %in% fn || 'burden' %in% fn) {
+    if (length(burden)) {
       fnTime = proc.time()
       tryCatch({
         print('Mutational Signature Burden Across Cancer Types')
@@ -565,11 +565,11 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
     }
 
     # Mutational Signature Association
-    if ('all' %in% fn | 'association' %in% fn) {
+    if (length(association)) {
       fnTime = proc.time()
       tryCatch({
         print('Mutational Signature Association')
-        mutationalSignatureAssociation(association$useCancer, common$cancerType, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
+        mutationalSignatureAssociation(common$useCancerType, common$cancerType, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
         output[['associationPath']] = associationPath
       }, error = function(e) {
         errors[['associationError']] <<- e$message
@@ -626,7 +626,7 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
     }
 
     # Individual plot
-    if ('all' %in% fn | 'individual' %in% fn) {
+    if (length(individual)) {
       fnTime = proc.time()
       tryCatch({
         print('Mutational Signature in Individual Sample')
@@ -740,7 +740,7 @@ exposureUser <- function(fn, files, common, burden = '{}', association = '{}', l
       print(paste0("Tumor Mutational Burden Separated by Signatures Runtime: ", (proc.time() - fnTime)[['elapsed']]))
     }
     # Mutational signature burden across cancer types
-    if ('all' %in% fn || 'burden' %in% fn) {
+    if (length(burden)) {
       fnTime = proc.time()
       tryCatch({
         print('Mutational Signature Burden Across Cancer Types')
@@ -753,11 +753,11 @@ exposureUser <- function(fn, files, common, burden = '{}', association = '{}', l
       print(paste0("Mutational Signature Burden Across Cancer Types Runtime: ", (proc.time() - fnTime)[['elapsed']]))
     }
     # Mutational Signature Association
-    if ('all' %in% fn | 'association' %in% fn) {
+    if (length(association)) {
       fnTime = proc.time()
       tryCatch({
         print('Mutational Signature Association')
-        mutationalSignatureAssociation(association$useCancer, cancer_type_user, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
+        mutationalSignatureAssociation(common$useCancerType, cancer_type_user, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
         output[['associationPath']] = associationPath
       }, error = function(e) {
         errors[['associationError']] <<- e$message
@@ -811,7 +811,7 @@ exposureUser <- function(fn, files, common, burden = '{}', association = '{}', l
     }
 
     # Individual plot
-    if ('all' %in% fn | 'individual' %in% fn) {
+    if (length(individual)) {
       fnTime = proc.time()
       tryCatch({
         print('Mutational Signature in Individual Sample')

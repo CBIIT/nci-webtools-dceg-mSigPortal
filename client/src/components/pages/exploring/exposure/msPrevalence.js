@@ -34,7 +34,7 @@ export default function MsPrevalence({ calculatePrevalence }) {
 
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
-  }, [plotPath, err, debugR, projectID]);
+  }, [plotPath, err, debugR]);
 
   async function setRPlot(plotPath) {
     if (plotPath) {

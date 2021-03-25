@@ -37,7 +37,7 @@ export default function MSIndividual({ calculateIndividual }) {
 
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
-  }, [plotPath, err, debugR, projectID]);
+  }, [plotPath, err, debugR]);
 
   // choose inital sample
   useEffect(() => {

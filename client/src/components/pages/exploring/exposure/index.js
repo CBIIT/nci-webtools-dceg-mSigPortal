@@ -12,7 +12,6 @@ import MSIndividual from './msIndividual';
 import {
   actions as exploringActions,
   getInitialState,
-  exposureUserUpload,
 } from '../../../../services/store/exploring';
 import { actions as modalActions } from '../../../../services/store/modal';
 import { unique2d } from '../../../../services/utils';
@@ -66,6 +65,7 @@ export default function Exposure({ match }) {
     cancerOptions,
     refSignatureSet,
     refSignatureSetOptions,
+    useCancerType,
     signatureNameOptions,
     publicSampleOptions,
     genome,
@@ -80,6 +80,7 @@ export default function Exposure({ match }) {
     loadingMsg,
     projectID,
     openSidebar,
+    submitted,
   } = exploring.exposure;
   const {
     exposureSignature,
@@ -130,6 +131,32 @@ export default function Exposure({ match }) {
     mergeState({ exploring: { displayTab: 'exposure' } });
   }, []);
 
+  // lazy load plots after loading signature names and sample names filtered by cancer type
+  useEffect(() => {
+    if (submitted) {
+      if (
+        !loadingMsBurden &&
+        !burdenArgs.plotPath &&
+        signatureNameOptions.length
+      )
+        calculateBurden();
+
+      if (
+        !loadingMsAssociation &&
+        !associationArgs.plotPath &&
+        publicSampleOptions.length
+      )
+        calculateAssociation();
+
+      if (
+        !loadingMsIndividual &&
+        !individualArgs.plotPath &&
+        publicSampleOptions.length
+      )
+        calculateIndividual();
+    }
+  }, [loadingMsBurden, loadingMsAssociation, loadingMsIndividual]);
+
   function usePrevious(value) {
     const ref = useRef();
     useEffect(() => {
@@ -144,14 +171,14 @@ export default function Exposure({ match }) {
   useEffect(() => {
     if (
       source == 'public' &&
-      associationArgs.toggleCancer &&
+      useCancerType &&
       study &&
       strategy &&
       refSignatureSet &&
       prevSigNameOptions
     )
       getSignatureNames();
-  }, [study, strategy, refSignatureSet, cancer, associationArgs.toggleCancer]);
+  }, [study, strategy, refSignatureSet, cancer, useCancerType]);
 
   // get sample name options
   const prevSampleOptions = usePrevious(publicSampleOptions);
@@ -545,44 +572,19 @@ export default function Exposure({ match }) {
     }
   }
 
+  function handleLoading(active) {
+    mergeTMB({ loading: active });
+    mergeTmbSignatures({ loading: active });
+    mergeMsDecomposition({ loading: active });
+    if (!loadingMsBurden) mergeMsBurden({ loading: active });
+    if (!loadingMsAssociation) mergeMsAssociation({ loading: active });
+    mergeMsLandscape({ loading: active });
+    mergeMsPrevalence({ loading: active });
+    if (!loadingMsIndividual) mergeMsIndividual({ loading: active });
+  }
+
   async function calculateAll() {
     try {
-      mergeExposure({ loading: true });
-
-      mergeTMB({
-        plotPath: '',
-        err: '',
-      });
-      mergeTmbSignatures({
-        plotPath: '',
-        err: '',
-      });
-      mergeMsDecomposition({
-        plotPath: '',
-        txtPath: '',
-        err: '',
-      });
-      mergeMsBurden({
-        plotPath: '',
-        err: '',
-      });
-      mergeMsAssociation({
-        plotPath: '',
-        err: '',
-      });
-      mergeMsLandscape({
-        plotPath: '',
-        err: '',
-      });
-      mergeMsPrevalence({
-        plotPath: '',
-        err: '',
-      });
-      mergeMsIndividual({
-        plotPath: '',
-        err: '',
-      });
-
       if (source == 'user') {
         const { projectID, exposureData } = await handleUpload();
 
@@ -620,8 +622,6 @@ export default function Exposure({ match }) {
       }
     } catch (err) {
       mergeError(err.message);
-    } finally {
-      mergeExposure({ loading: false });
     }
   }
 
@@ -635,6 +635,7 @@ export default function Exposure({ match }) {
         refSignatureSet: refSignatureSet,
         cancerType: cancer,
         genome: genome,
+        useCancerType: useCancerType,
       }),
     };
     if (!loadingMsBurden && (fn == 'all' || fn == 'burden')) {
@@ -643,15 +644,15 @@ export default function Exposure({ match }) {
         ...params.msBurden,
       });
     }
-    // if (!loadingMsAssociation && (fn == 'all' || fn == 'association')) {
-    args.association = JSON.stringify({
-      useCancerType: associationArgs.toggleCancer,
-      both: associationArgs.both,
-      signatureName1: associationArgs.signatureName1,
-      signatureName2: associationArgs.signatureName2,
-      ...params.msAssociation,
-    });
-    // }
+    if (!loadingMsAssociation && (fn == 'all' || fn == 'association')) {
+      args.association = JSON.stringify({
+        // useCancerType: associationArgs.toggleCancer,
+        both: associationArgs.both,
+        signatureName1: associationArgs.signatureName1,
+        signatureName2: associationArgs.signatureName2,
+        ...params.msAssociation,
+      });
+    }
     if (!loadingMsLandscape && (fn == 'all' || fn == 'landscape')) {
       args.landscape = JSON.stringify({
         variableFile: landscapeArgs.variableFile,
@@ -677,6 +678,8 @@ export default function Exposure({ match }) {
       });
     }
     try {
+      handleLoading(true);
+      mergeExposure({ submitted: true });
       const { debugR, output, errors, projectID: pID } = await submitR(
         rFn,
         args,
@@ -684,9 +687,9 @@ export default function Exposure({ match }) {
       );
 
       if (output) {
-        if (!projectID) mergeExposure({ projectID: pID });
+        mergeExposure({ projectID: pID });
 
-        if (fn == 'all' || fn == 'tmb') {
+        if (output.tmbPath) {
           mergeTMB({
             plotPath: output.tmbPath,
             err: errors.tmbError,
@@ -694,7 +697,7 @@ export default function Exposure({ match }) {
           });
         }
 
-        if (fn == 'all' || fn == 'tmbSig') {
+        if (output.signaturePath) {
           mergeTmbSignatures({
             plotPath: output.signaturePath,
             err: errors.signaturesError,
@@ -702,7 +705,7 @@ export default function Exposure({ match }) {
           });
         }
 
-        if (fn == 'all' || fn == 'decomposition') {
+        if (output.decompositionPath) {
           mergeMsDecomposition({
             plotPath: output.decompositionPath,
             txtPath: output.decompositionData,
@@ -711,7 +714,7 @@ export default function Exposure({ match }) {
           });
         }
 
-        if (fn == 'all' || fn == 'burden') {
+        if (output.burdenPath) {
           mergeMsBurden({
             plotPath: output.burdenPath,
             err: errors.burdenError,
@@ -719,28 +722,28 @@ export default function Exposure({ match }) {
           });
         }
 
-        if (fn == 'all' || fn == 'association')
+        if (output.associationPath)
           mergeMsAssociation({
             plotPath: output.associationPath,
             err: errors.associationError,
             debugR: debugR,
           });
 
-        if (fn == 'all' || fn == 'landscape')
+        if (output.landscapePath)
           mergeMsLandscape({
             plotPath: output.landscapePath,
             err: errors.landscapeError,
             debugR: debugR,
           });
 
-        if (fn == 'all' || fn == 'prevalence')
+        if (output.prevalencePath)
           mergeMsPrevalence({
             plotPath: output.prevalencePath,
             err: errors.prevalenceError,
             debugR: debugR,
           });
 
-        if (fn == 'all' || fn == 'individual')
+        if (output.individualPath)
           mergeMsIndividual({
             plotPath: output.individualPath,
             err: errors.individualError,
@@ -751,6 +754,8 @@ export default function Exposure({ match }) {
       }
     } catch (err) {
       mergeError(err.message);
+    } finally {
+      handleLoading(false);
     }
   }
 
@@ -1228,16 +1233,16 @@ export default function Exposure({ match }) {
                         disabled={loading || projectID}
                         type="checkbox"
                         label="Cancer Type Only"
-                        value={associationArgs.toggleCancer}
-                        checked={associationArgs.toggleCancer}
+                        value={useCancerType}
+                        checked={useCancerType}
                         onChange={(e) => {
-                          if (!associationArgs.toggleCancer == false)
+                          if (!useCancerType == false)
                             handleSet(refSignatureSet);
                           else {
                             getSignatureNames();
                           }
-                          mergeMsAssociation({
-                            toggleCancer: !associationArgs.toggleCancer,
+                          mergeExposure({
+                            useCancerType: !useCancerType,
                           });
                         }}
                       />
@@ -1257,7 +1262,7 @@ export default function Exposure({ match }) {
                   </Col>
                   <Col lg="6">
                     <Button
-                      disabled={loading}
+                      disabled={loading || submitted}
                       className="w-100"
                       variant="primary"
                       onClick={() => calculateAll()}

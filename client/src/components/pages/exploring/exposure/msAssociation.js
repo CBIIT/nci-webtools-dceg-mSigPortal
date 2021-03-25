@@ -42,7 +42,7 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
 
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
-  }, [plotPath, err, debugR, projectID]);
+  }, [plotPath, err, debugR]);
 
   // apply default signature names
   useEffect(() => {
