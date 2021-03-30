@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button, Form } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as exploringActions } from '../../../../services/store/exploring';
 import { actions as modalActions } from '../../../../services/store/modal';
@@ -8,6 +8,7 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 import './aetiology.scss';
 
 const actions = { ...exploringActions, ...modalActions };
+const { Group, Label, Check } = Form;
 
 export default function Aetiology() {
   const dispatch = useDispatch();
@@ -228,7 +229,7 @@ export default function Aetiology() {
       <Col key={name} lg="2" md="3" sm="4" className="mb-3 d-flex">
         <Button
           size="sm"
-          variant="primary"
+          variant="dark"
           onClick={
             file && name != category
               ? async () => {
@@ -254,56 +255,36 @@ export default function Aetiology() {
 
   function getAetiologies() {
     if (data.length) {
-      const aetiologies = [...new Set(data.map((obj) => obj.Aetiology))]
-        .sort()
-        .map((Aetiology) => (
-          <Col key={Aetiology} lg="2" md="3" sm="4" className="mb-3 d-flex">
-            <Button
-              size="sm"
-              variant="dark"
-              onClick={() =>
-                mergeAetiology({
-                  aetiology: Aetiology,
-                  signature: '',
-                  selectedSource: '',
-                })
-              }
-              className={aetiology != Aetiology ? 'disabled' : ''}
-              block
-            >
-              {Aetiology}
-            </Button>
-          </Col>
-        ));
-
       return (
-        <>
-          <Row className="justify-content-center">{aetiologies}</Row>
-          <Row className="justify-content-center">
-            <Col lg="2" md="3" sm="4" className="mb-3 d-flex">
-              <Button
-                size="sm"
-                variant="primary"
-                onClick={() => mergeAetiology({ all: false })}
-                className={all ? 'disabled' : ''}
-                block
+        <Row className="justify-content-center">
+          {[...new Set(data.map((obj) => obj.Aetiology))]
+            .sort()
+            .map((Aetiology) => (
+              <Col
+                key={Aetiology}
+                lg={category == 'Gene Edits' ? '1' : '2'}
+                md="3"
+                sm="4"
+                className="mb-3 d-flex"
               >
-                Selected Aetiology
-              </Button>
-            </Col>
-            <Col lg="2" md="3" sm="4" className="mb-3 d-flex">
-              <Button
-                size="sm"
-                variant="primary"
-                onClick={() => mergeAetiology({ all: true })}
-                className={!all ? 'disabled' : ''}
-                block
-              >
-                All Aetiologies
-              </Button>
-            </Col>
-          </Row>
-        </>
+                <Button
+                  size="sm"
+                  variant="dark"
+                  onClick={() =>
+                    mergeAetiology({
+                      aetiology: Aetiology,
+                      signature: '',
+                      selectedSource: '',
+                    })
+                  }
+                  className={aetiology != Aetiology ? 'disabled' : ''}
+                  block
+                >
+                  {Aetiology}
+                </Button>
+              </Col>
+            ))}
+        </Row>
       );
     } else {
       return (
@@ -315,57 +296,31 @@ export default function Aetiology() {
   }
   function getCancerAetiology() {
     if (data.length) {
-      const aetiologies = [...new Set(data.map((obj) => obj.Aetiology))]
-        .sort()
-        .map((Aetiology) => (
-          <Col key={Aetiology} lg="2" md="3" sm="4" className="mb-3 d-flex">
-            <Button
-              size="sm"
-              variant="dark"
-              onClick={() =>
-                mergeAetiology({
-                  aetiology: Aetiology,
-                  tissue: '',
-                  refSig: '',
-                  selectedSource: '',
-                })
-              }
-              className={aetiology != Aetiology ? 'disabled' : ''}
-              block
-            >
-              {Aetiology}
-            </Button>
-          </Col>
-        ));
-
       return (
-        <>
-          <Row className="justify-content-center">{aetiologies}</Row>
-          <Row className="justify-content-center">
-            <Col lg="2" md="3" sm="4" className="mb-3 d-flex">
-              <Button
-                size="sm"
-                variant="primary"
-                onClick={() => mergeAetiology({ all: false })}
-                className={all ? 'disabled' : ''}
-                block
-              >
-                Selected Aetiology
-              </Button>
-            </Col>
-            <Col lg="2" md="3" sm="4" className="mb-3 d-flex">
-              <Button
-                size="sm"
-                variant="primary"
-                onClick={() => mergeAetiology({ all: true })}
-                className={!all ? 'disabled' : ''}
-                block
-              >
-                All Aetiologies
-              </Button>
-            </Col>
-          </Row>
-        </>
+        <Row className="justify-content-center">
+          {[...new Set(data.map((obj) => obj.Aetiology))]
+            .sort()
+            .map((Aetiology) => (
+              <Col key={Aetiology} lg="2" md="3" sm="4" className="mb-3 d-flex">
+                <Button
+                  size="sm"
+                  variant="dark"
+                  onClick={() =>
+                    mergeAetiology({
+                      aetiology: Aetiology,
+                      tissue: '',
+                      refSig: '',
+                      selectedSource: '',
+                    })
+                  }
+                  className={aetiology != Aetiology ? 'disabled' : ''}
+                  block
+                >
+                  {Aetiology}
+                </Button>
+              </Col>
+            ))}
+        </Row>
       );
     } else {
       return (
@@ -689,7 +644,7 @@ export default function Aetiology() {
                         </p>
                         <Plot
                           className="p-3 border"
-                          maxHeight={'400px'}
+                          maxHeight={'500px'}
                           plotURL={exposureURL}
                         />
                       </>
@@ -713,7 +668,9 @@ export default function Aetiology() {
         );
       } else {
         return (
-          <p>Select a category, aeitology, and signature to view more info</p>
+          <p className="d-flex justify-content-center text-muted">
+            Select a category, aeitology, and signature to view more info
+          </p>
         );
       }
     }
@@ -721,7 +678,35 @@ export default function Aetiology() {
     return (
       <div>
         <div className="mx-auto p-3 pt-0">
-          <strong>Aetiologies</strong>
+          <Row>
+            <Col sm="4">
+              <strong>Aetiologies</strong>
+            </Col>
+            <Col sm="4">
+              <Group className="d-flex justify-content-center">
+                <Check inline id="selectedAetiology">
+                  <Check.Input
+                    type="radio"
+                    checked={all == false}
+                    onClick={(_) => mergeAetiology({ all: false })}
+                  />
+                  <Check.Label className="font-weight-normal">
+                    Selected Aetiology
+                  </Check.Label>
+                </Check>
+                <Check inline id="allAetiologies">
+                  <Check.Input
+                    type="radio"
+                    checked={all == true}
+                    onClick={(_) => mergeAetiology({ all: true })}
+                  />
+                  <Check.Label className="font-weight-normal">
+                    All Aetiologies
+                  </Check.Label>
+                </Check>
+              </Group>
+            </Col>
+          </Row>
           {getAetiologies()}
         </div>
         <hr />
@@ -872,7 +857,7 @@ export default function Aetiology() {
             );
           });
       } else {
-        return <p>Select a signature</p>;
+        return <p className="text-muted">Select a signature</p>;
       }
     }
 
@@ -930,19 +915,51 @@ export default function Aetiology() {
 
             <Plot
               className="p-3 border rounded mb-3"
-              maxHeight={'300px'}
+              maxHeight={'500px'}
               plotURL={exposureURL}
             />
           </div>
         );
       } else {
-        return [];
+        return (
+          <p className="d-flex justify-content-center text-muted">
+            Select a Reference Signature
+          </p>
+        );
       }
     }
     return (
       <div>
         <div className="mx-auto p-3">
-          <strong>Aetiologies</strong>
+          <Row>
+            <Col sm="4">
+              <strong>Aetiologies</strong>
+            </Col>
+            <Col sm="4">
+              <Group className="d-flex justify-content-center">
+                <Check inline id="selectedAetiology">
+                  <Check.Input
+                    type="radio"
+                    checked={all == false}
+                    onClick={(_) => mergeAetiology({ all: false })}
+                  />
+                  <Check.Label className="font-weight-normal">
+                    Selected Aetiology
+                  </Check.Label>
+                </Check>
+                <Check inline id="allAetiologies">
+                  <Check.Input
+                    type="radio"
+                    checked={all == true}
+                    onClick={(_) => mergeAetiology({ all: true })}
+                  />
+                  <Check.Label className="font-weight-normal">
+                    All Aetiologies
+                  </Check.Label>
+                </Check>
+              </Group>
+            </Col>
+          </Row>
           {getCancerAetiology()}
         </div>
         <hr />
