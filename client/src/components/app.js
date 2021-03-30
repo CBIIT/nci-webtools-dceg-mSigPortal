@@ -46,18 +46,18 @@ export default function App() {
         { name: 'Download', path: 'download' },
       ],
     },
-    {
-      route: '/refitting',
-      action: 'Refitting',
-      title: 'Refitting',
-      cardTitle: 'Signature Refitting',
-      cardText: 'Signature Refitting',
-      description:
-        'Comprehensively evaluate the accuracy of mutational signature based on different statistical variables (Cosine similarity, BIC, L2 norms etc) and re-decompsite signatures using different algorithms (SigProfiler, deconstructsig, bootstrapping method).',
-      image: 'assets/images/refitting.png',
-      navIndex: 2,
-      color: '#689f39', // green
-    },
+    // {
+    //   route: '/refitting',
+    //   action: 'Refitting',
+    //   title: 'Refitting',
+    //   cardTitle: 'Signature Refitting',
+    //   cardText: 'Signature Refitting',
+    //   description:
+    //     'Comprehensively evaluate the accuracy of mutational signature based on different statistical variables (Cosine similarity, BIC, L2 norms etc) and re-decompsite signatures using different algorithms (SigProfiler, deconstructsig, bootstrapping method).',
+    //   image: 'assets/images/refitting.png',
+    //   navIndex: 2,
+    //   color: '#689f39', // green
+    // },
     {
       route: '/association',
       action: 'Association',
