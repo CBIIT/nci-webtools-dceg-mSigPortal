@@ -465,7 +465,7 @@ export default function MutationalSignatureProfile({ submitR }) {
               </span>
               <Plot
                 className="p-3"
-                title={plots[index].plotPath.split('/').slice(-1)[0]}
+                title={plotTitle(plots[index])}
                 downloadName={plots[index].plotPath.split('/').slice(-1)[0]}
                 plotURL={plots[index].plotURL}
                 maxHeight="1000px"
@@ -477,6 +477,11 @@ export default function MutationalSignatureProfile({ submitR }) {
     }
     return display.slice(1);
   };
+
+  function plotTitle(plot) {
+    const { profileName, refSignatureSet, signatureName } = plot;
+    return `${profileName}/${refSignatureSet}: Mutational Signature Profile of ${signatureName}`;
+  }
 
   return (
     <div>
@@ -570,7 +575,7 @@ export default function MutationalSignatureProfile({ submitR }) {
           <hr />
           <Plot
             className="p-3"
-            title={plots[0].plotPath.split('/').slice(-1)[0]}
+            title={plotTitle(plots[0])}
             downloadName={plots[0].plotPath.split('/').slice(-1)[0]}
             plotURL={plots[0].plotURL}
             maxHeight="1000px"
