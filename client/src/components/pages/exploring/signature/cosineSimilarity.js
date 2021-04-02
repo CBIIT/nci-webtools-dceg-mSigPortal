@@ -155,7 +155,7 @@ export default function MutationalSignatureProfile({ submitR }) {
           <Col lg="4">
             <Select
               id="rcsRefSet2"
-              label="Signature Set 2"
+              label="Reference Signature Set 2"
               value={refSignatureSet2}
               options={refSignatureSetOptions2}
               onChange={(set) =>
