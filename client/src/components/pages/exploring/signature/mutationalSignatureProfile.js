@@ -539,9 +539,9 @@ export default function MutationalSignatureProfile({ submitR }) {
         <AdditionalControls />
         <Row className="mt-3">
           <Col />
-          <Col lg="1" className="d-flex">
+          <Col md="4" className="d-flex">
             <Button
-              className="my-auto"
+              className="ml-auto"
               variant="link"
               onClick={() => addPlots()}
               title="Add Plot"
@@ -551,10 +551,8 @@ export default function MutationalSignatureProfile({ submitR }) {
                 <FontAwesomeIcon icon={faPlus} /> Add Plot
               </span>
             </Button>
-          </Col>
-          <Col lg="1" className="d-flex">
             <Button
-              className="my-auto"
+              className="ml-auto"
               variant="primary"
               onClick={handleCalculate}
             >
