@@ -72,12 +72,12 @@ export default function MsPrevalence({ calculatePrevalence }) {
       <Form noValidate className="p-3">
         <LoadingOverlay active={loading} />
         <Row>
-          <Col lg="2">
+          <Col lg="5">
             <Group
               controlId="prevalenceMutations"
               title="Minimum Number of Mutations Within Each Signature"
             >
-              <Label>Minimum Mutations</Label>
+              <Label>Minimum Number of Mutations Assigned to Each Signature</Label>
               <Control
                 value={mutation}
                 placeholder="e.g. 100"
