@@ -220,7 +220,7 @@ export default function MutationalPattern({ submitR }) {
                 controlId="minimum"
                 title="Minimal Proportion mutations within Each Mutational Pattern"
               >
-                <Label>Minimal Proportion</Label>
+                <Label>Minimal Proportion (0-1)</Label>
                 <Control
                   value={proportion}
                   placeholder="Ex. 0.8"
@@ -232,7 +232,7 @@ export default function MutationalPattern({ submitR }) {
                   isInvalid={invalidProportion}
                 />
                 <Form.Control.Feedback type="invalid">
-                  Enter a valid proportion between 0 and 1
+                  Please input a value form 0 to 1 for Minimal Proportion
                 </Form.Control.Feedback>
               </Group>
             </Col>
@@ -262,10 +262,22 @@ export default function MutationalPattern({ submitR }) {
                 onClick={() => {
                   if (!pattern) setPattern(true);
                   else setPattern(false);
-                  if (isNaN(proportion) || !proportion) setProportion(true);
+                  if (
+                    isNaN(proportion) ||
+                    !proportion ||
+                    proportion < 0 ||
+                    proportion > 1
+                  )
+                    setProportion(true);
                   else setProportion(false);
 
-                  if (pattern && proportion && !isNaN(proportion)) {
+                  if (
+                    pattern &&
+                    proportion &&
+                    !isNaN(proportion) &&
+                    proportion >= 0 &&
+                    proportion <= 1
+                  ) {
                     if (source == 'user') {
                       calculateR('mutationalPattern', {
                         matrixFile: value2d(
