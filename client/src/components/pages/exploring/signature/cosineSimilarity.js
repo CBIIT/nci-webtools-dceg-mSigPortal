@@ -181,7 +181,7 @@ export default function MutationalSignatureProfile({ submitR }) {
         </Row>
       </Form>
       <div id="withinPlot">
-        <div style={{ display: err ? 'block' : 'none' }}>
+        <div style={{ display: err ? 'block' : 'none' }} className="p-3">
           <p>An error has occured. Please verify your input.</p>
         </div>
         <hr />

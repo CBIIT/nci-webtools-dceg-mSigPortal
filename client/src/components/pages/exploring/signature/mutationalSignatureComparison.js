@@ -270,7 +270,7 @@ export default function MutationalSignatureProfile({ submitR }) {
       </Form>
 
       <div id="mutationalSignatureComparison">
-        <div style={{ display: err ? 'block' : 'none' }}>
+        <div style={{ display: err ? 'block' : 'none' }} className="p-3">
           <p>An error has occured. Please verify your input.</p>
         </div>
         <div style={{ display: plotURL ? 'block' : 'none' }}>
