@@ -8,6 +8,8 @@ const config = require('./config.json');
 const logger = require('./logger');
 const { profilerExtraction, parseCSV } = require('./controllers');
 
+const production = process.env.NODE_ENV === 'production';
+
 (async function main() {
   // update aws configuration if all keys are supplied, otherwise
   // fall back to default credentials/IAM role
