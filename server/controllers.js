@@ -446,7 +446,7 @@ async function submitQueue(req, res, next) {
           .c({ sync: true, gzip: true, C: config.results.folder }, [projectID])
           .read(),
         Bucket: config.queue.bucket,
-        Key: `${config.queue.outputKeyPrefix}${projectID}/${projectID}.tgz`,
+        Key: `${config.queue.inputKeyPrefix}${projectID}/${projectID}.tgz`,
       })
       .promise();
 

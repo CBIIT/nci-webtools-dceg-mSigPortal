@@ -64,7 +64,7 @@ async function downloadS3(id, savePath) {
   const objects = await s3
     .listObjectsV2({
       Bucket: config.queue.bucket,
-      Prefix: `${config.queue.outputKeyPrefix}${id}/`,
+      Prefix: `${config.queue.inputKeyPrefix}${id}/`,
     })
     .promise();
 

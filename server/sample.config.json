@@ -24,8 +24,8 @@
   "queue": {
     "url": "sqsName",
     "bucket": "queueBucket",
-    "inputKeyPrefix": "msigportal/queue/",
-    "outputKeyPrefix": "msigportal/queue/",
+    "inputKeyPrefix": "msigportal/input/",
+    "outputKeyPrefix": "msigportal/output/",
     "errorUrl": "sqsName",
     "visibilityTimeout": 30,
     "pollInterval": 60
