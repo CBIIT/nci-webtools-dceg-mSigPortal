@@ -15,6 +15,9 @@ const config = require('./config.json');
 const production = process.env.NODE_ENV === 'production';
 
 // load aws config
+AWS.config.credentials = new AWS.EC2MetadataCredentials({
+  disableFetchToken: true,
+});
 if (config.aws) AWS.config.update(config.aws);
 
 function parseCSV(filepath) {
