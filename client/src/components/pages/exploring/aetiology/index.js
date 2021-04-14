@@ -62,17 +62,18 @@ export default function Aetiology() {
     const getData = async () => {
       try {
         const file = categories.filter(({ name }) => name == category)[0].file;
-        const data = await (await fetch(`api/public/Aetiology/${file}`)).json();
-        // await fetch(`api/getFileS3`, {
-        //   method: 'POST',
-        //   headers: {
-        //     Accept: 'application/json',
-        //     'Content-Type': 'application/json',
-        //   },
-        //   body: JSON.stringify({
-        //     path: `Aetiology/${file}`,
-        //   }),
-        // })
+        const data = await (
+          await fetch(`api/getFileS3`, {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              path: `msigportal/Database/Aetiology/${file}`,
+            }),
+          })
+        ).json();
 
         const aetiologyOptions = [
           ...new Set(data.map(({ Aetiology }) => Aetiology)),
@@ -94,17 +95,16 @@ export default function Aetiology() {
   // check if plot exists
   useEffect(() => {
     const getImageS3 = (path) =>
-      // fetch(`api/getImageS3`, {
-      //   method: 'POST',
-      //   headers: {
-      //     Accept: 'image/svg',
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({
-      //     path: path,
-      //   }),
-      // })
-      fetch('api/public/' + path).then(async (res) => {
+      fetch(`api/getImageS3`, {
+        method: 'POST',
+        headers: {
+          Accept: 'image/svg',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          path: path,
+        }),
+      }).then(async (res) => {
         if (res.ok) {
           const blob = await res.blob();
           return URL.createObjectURL(blob);
@@ -288,7 +288,7 @@ export default function Aetiology() {
       );
     } else {
       return (
-        <div className="p-5">
+        <div className="my-5">
           <LoadingOverlay active={true} />
         </div>
       );
@@ -324,7 +324,7 @@ export default function Aetiology() {
       );
     } else {
       return (
-        <div className="p-5">
+        <div className="my-5">
           <LoadingOverlay active={true} />
         </div>
       );
@@ -338,19 +338,18 @@ export default function Aetiology() {
       const newThumbnails = await Promise.all(
         signatures.map(
           ({ Aetiology, Study, Signature, Source_URL, URL: alias_URL }) =>
-            // fetch(`api/getImageS3`, {
-            //   method: 'POST',
-            //   headers: {
-            //     Accept: 'image/svg',
-            //     'Content-Type': 'application/json',
-            //   },
-            //   body: JSON.stringify({
-            //     path: `Aetiology/Profile_logo/${Signature}.svg`,
-            //   }),
-            // })
-            fetch(
-              `api/public/Aetiology/Profile_logo/${fixFile(Signature)}.svg`
-            ).then(async (res) => {
+            fetch(`api/getImageS3`, {
+              method: 'POST',
+              headers: {
+                Accept: 'image/svg',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                path: `msigportal/Database/Aetiology/Profile_logo/${fixFile(
+                  Signature
+                )}.svg`,
+              }),
+            }).then(async (res) => {
               const blob = await res.blob();
               return {
                 Aetiology: Aetiology,
@@ -375,21 +374,18 @@ export default function Aetiology() {
 
       const newThumbnails = await Promise.all(
         tissues.map((tissue) =>
-          // fetch(`api/getImageS3`, {
-          //   method: 'POST',
-          //   headers: {
-          //     Accept: 'image/svg',
-          //     'Content-Type': 'application/json',
-          //   },
-          //   body: JSON.stringify({
-          //     path: `Aetiology/Profile_logo/${tissue['Tissue Specific Signature']}.svg`,
-          //   }),
-          // })
-          fetch(
-            `api/public/Aetiology/Profile_logo/${fixFile(
-              tissue['Tissue Specific Signature']
-            )}.svg`
-          ).then(async (res) => {
+          fetch(`api/getImageS3`, {
+            method: 'POST',
+            headers: {
+              Accept: 'image/svg',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              path: `msigportal/Database/Aetiology/Profile_logo/${fixFile(
+                tissue['Tissue Specific Signature']
+              )}.svg`,
+            }),
+          }).then(async (res) => {
             const blob = await res.blob();
             return {
               Aetiology: tissue.Aetiology,
@@ -412,21 +408,18 @@ export default function Aetiology() {
 
       const newThumbnails = await Promise.all(
         refSigs.map((refSig) =>
-          // fetch(`api/getImageS3`, {
-          //   method: 'POST',
-          //   headers: {
-          //     Accept: 'image/svg',
-          //     'Content-Type': 'application/json',
-          //   },
-          //   body: JSON.stringify({
-          //     path: `Aetiology/Profile_logo/${refSig['Ref Signature']}.svg`,
-          //   }),
-          // })
-          fetch(
-            `api/public/Aetiology/Profile_logo/${fixFile(
-              refSig['Ref Signature']
-            )}.svg`
-          ).then(async (res) => {
+          fetch(`api/getImageS3`, {
+            method: 'POST',
+            headers: {
+              Accept: 'image/svg',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              path: `msigportal/Database/Aetiology/Profile_logo/${fixFile(
+                refSig['Ref Signature']
+              )}.svg`,
+            }),
+          }).then(async (res) => {
             const blob = await res.blob();
             return {
               Aetiology: refSig.Aetiology,
@@ -482,7 +475,7 @@ export default function Aetiology() {
         );
       } else {
         return (
-          <div className="p-5">
+          <div className="my-5">
             <LoadingOverlay active={true} />
           </div>
         );
@@ -523,7 +516,7 @@ export default function Aetiology() {
           });
       } else {
         return (
-          <div className="p-5">
+          <div className="my-5">
             <LoadingOverlay active={true} />
           </div>
         );
@@ -612,7 +605,7 @@ export default function Aetiology() {
               (typeof info.Description == 'string' ? (
                 <p>{info.Description}</p>
               ) : (
-                info.Description.map((text, i) => <p key={i}>{text}</p>)
+                info.Description.map((text) => <p>{text}</p>)
               ))}
 
             {profileURL ? (
@@ -660,7 +653,7 @@ export default function Aetiology() {
                 )}
               </div>
             ) : (
-              <div className="p-5">
+              <div className="my-5">
                 <LoadingOverlay active={true} />
               </div>
             )}
@@ -771,7 +764,7 @@ export default function Aetiology() {
         });
       } else {
         return (
-          <div className="p-5">
+          <div className="my-5">
             <LoadingOverlay active={true} />
           </div>
         );
@@ -782,32 +775,37 @@ export default function Aetiology() {
       if (tissueThumbnails.length) {
         return tissueThumbnails
           .filter(({ Aetiology }) => Aetiology == aetiology)
-          .map((t, index) => {
+          .map((tissue, index) => {
             return (
               <Col key={index} md="2" sm="4" className="mb-3">
                 <div
                   className={`sigIcon border rounded ${
-                    tissue == t['Tissue Specific Signature'] ? 'active' : ''
+                    selectedSource ==
+                    tissue['Tissue Specific Signature'] +
+                      tissue['Ref Signature']
+                      ? 'active'
+                      : ''
                   }`}
-                  title={`${aetiology} - ${t['Tissue Specific Signature']}`}
+                  title={`${aetiology} - ${tissue['Tissue Specific Signature']}`}
                   onClick={() =>
                     mergeAetiology({
-                      tissue: t['Tissue Specific Signature'],
+                      tissue: tissue['Tissue Specific Signature'],
                       refSig: '',
                       selectedSource:
-                        t['Tissue Specific Signature'] + t['Ref Signature'],
+                        tissue['Tissue Specific Signature'] +
+                        tissue['Ref Signature'],
                     })
                   }
                 >
                   <img
-                    src={t.url}
+                    src={tissue.url}
                     className="w-100"
                     // height="110"
-                    alt={t['Tissue Specific Signature']}
+                    alt={tissue['Tissue Specific Signature']}
                   />
                   <div className="sigLabel">
                     <strong className="sigLabel">
-                      {t['Tissue Specific Signature']}
+                      {tissue['Tissue Specific Signature']}
                     </strong>
                   </div>
                 </div>
@@ -816,7 +814,7 @@ export default function Aetiology() {
           });
       } else {
         return (
-          <div className="p-5">
+          <div className="my-5">
             <LoadingOverlay active={true} />
           </div>
         );
@@ -898,7 +896,7 @@ export default function Aetiology() {
             {typeof info.Description == 'string' ? (
               <p>{info.Description}</p>
             ) : (
-              info.Description.map((text, i) => <p key={i}>{text}</p>)
+              info.Description.map((text) => <p>{text}</p>)
             )}
 
             <Plot
