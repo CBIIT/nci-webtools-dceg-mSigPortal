@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Row, Col, Button, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -23,6 +23,26 @@ export default function MutationalSignatureProfile({ submitR }) {
   const { plots, debugR, err, loading } = exploring.sigMutationalProfiles;
   const { displayTab, refSigData } = exploring.exploring;
 
+  // get inital plot
+  useEffect(() => {
+    async function getInitalPlot() {
+      const plot = plots[0];
+      const path = buildPlotPath(
+        plot.profileName,
+        plot.refSignatureSet,
+        plot.signatureName
+      );
+      const url = await fetchPlot(path, 0);
+      mergeSigMutationalProfiles({
+        plots: [{ ...plots[0], plotPath: path, plotURL: url }],
+      });
+    }
+
+    if (plots.length == 1 && plots[0].profileName && !plots[0].plotURL) {
+      getInitalPlot();
+    }
+  }, []);
+
   // dataFolder/Reference_Signature_Profiles_SVG/refSignatureSet/profileName+signatureName
   function buildPlotPath(profileName, refSignatureSet, signatureName) {
     const profile = profileName.match(/[a-z]+|\d+/gi).join('_');
@@ -33,91 +53,28 @@ export default function MutationalSignatureProfile({ submitR }) {
     return `msigportal/Database/Signature/Reference_Signature_Profiles_SVG/${set}/${profile}_plots_mSigPortal_${signatureName}.svg`;
   }
 
-  async function handleCalculate() {
-    const plotPaths = plots.map((plot, index) =>
-      buildPlotPath(plot.profileName, plot.refSignatureSet, plot.signatureName)
-    );
-
-    let newPlots = plots.slice();
-    plotPaths.forEach((path, index) => {
-      newPlots[index] = {
-        ...newPlots[index],
-        plotPath: path,
-      };
-    });
-    mergeSigMutationalProfiles({
-      loading: false,
-    });
-    setRPlot(newPlots);
-
-    // mergeSigMutationalProfiles({
-    //   loading: true,
-    //   err: false,
-    //   debugR: '',
-    // });
-    // try {
-    //   const reqR = await Promise.all(
-    //     plots.map((plot, index) =>
-    //       submitR('mutationalProfiles', {
-    //         signatureSource: plot.signatureSource,
-    //         profileName: plot.profileName,
-    //         refSignatureSet: plot.refSignatureSet,
-    //         experimentalStrategy: plot.strategy,
-    //         signatureName: plot.signatureName,
-    //       }).then((res) => res.json())
-    //     )
-    //   );
-    //   let newPlots = plots.slice();
-    //   reqR.forEach((data, index) => {
-    //     newPlots[index] = {
-    //       ...newPlots[index],
-    //       plotPath: data.output.plotPath,
-    //     };
-    //     mergeSigMutationalProfiles({
-    //       debugR: debugR + data.debugR,
-    //     });
-    //   });
-    //   mergeSigMutationalProfiles({
-    //     loading: false,
-    //   });
-    //   setRPlot(newPlots);
-    // } catch (err) {
-    //   mergeError(err.message );
-    //   mergeSigMutationalProfiles({ loading: false });
-    // }
-  }
-
-  async function setRPlot(plots) {
+  async function fetchPlot(path, index = null) {
     try {
-      const svgs = await Promise.all(
-        plots.map((plot) =>
-          fetch(`api/getImageS3`, {
-            method: 'POST',
-            headers: {
-              Accept: 'image/svg',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ path: plot.plotPath }),
-          }).then((res) => res.blob())
-        )
-      );
-      let newPlots = plots.slice();
-      svgs.forEach((blob, index) => {
-        if (newPlots[index].plotURL)
-          URL.revokeObjectURL(newPlots[index].plotURL);
-        const objectURL = URL.createObjectURL(blob);
-        newPlots[index] = { ...newPlots[index], plotURL: objectURL };
-      });
+      const svg = await (
+        await fetch(`api/getImageS3`, {
+          method: 'POST',
+          headers: {
+            Accept: 'image/svg',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ path: path }),
+        })
+      ).blob();
 
-      mergeSigMutationalProfiles({
-        plots: newPlots,
-      });
+      if (index && plots[index].plotURL)
+        URL.revokeObjectURL(plots[index].plotURL);
+      return URL.createObjectURL(svg);
     } catch (err) {
       mergeError(err.message);
     }
   }
 
-  function handleSource(source, index) {
+  async function handleSource(source, index) {
     const filteredData = refSigData.filter((row) => row.Source == source);
     const profileNameOptions = [
       ...new Set(filteredData.map((row) => row.Profile)),
@@ -158,9 +115,18 @@ export default function MutationalSignatureProfile({ submitR }) {
       ),
     ];
 
+    const plotPath = buildPlotPath(
+      profileName,
+      refSignatureSet,
+      signatureNameOptions[0]
+    );
+    const plotURL = await fetchPlot(plotPath, index);
+
     let newPlots = plots.slice();
     newPlots[index] = {
       ...newPlots[index],
+      plotPath: plotPath,
+      plotURL: plotURL,
       signatureSource: source,
       profileName: profileName,
       profileNameOptions: profileNameOptions,
@@ -177,7 +143,7 @@ export default function MutationalSignatureProfile({ submitR }) {
     });
   }
 
-  function handleProfile(profile, index) {
+  async function handleProfile(profile, index) {
     const filteredData = refSigData.filter(
       (row) =>
         row.Source == plots[index].signatureSource && row.Profile == profile
@@ -213,9 +179,19 @@ export default function MutationalSignatureProfile({ submitR }) {
       ),
     ];
 
+    const plotPath = buildPlotPath(
+      profile,
+      refSignatureSet,
+      signatureNameOptions[0]
+    );
+
+    const plotURL = await fetchPlot(plotPath, index);
+
     let newPlots = plots.slice();
     newPlots[index] = {
       ...newPlots[index],
+      plotPath: plotPath,
+      plotURL: plotURL,
       profileName: profile,
       refSignatureSet: refSignatureSet,
       refSignatureSetOptions: refSignatureSetOptions,
@@ -230,7 +206,7 @@ export default function MutationalSignatureProfile({ submitR }) {
     });
   }
 
-  function handleSet(set, index) {
+  async function handleSet(set, index) {
     let filteredData = refSigData.filter(
       (row) =>
         row.Source == plots[index].signatureSource &&
@@ -255,9 +231,19 @@ export default function MutationalSignatureProfile({ submitR }) {
       ),
     ];
 
+    const plotPath = buildPlotPath(
+      plots[index].profileName,
+      set,
+      signatureNameOptions[0]
+    );
+
+    const plotURL = await fetchPlot(plotPath, index);
+
     let newPlots = plots.slice();
     newPlots[index] = {
       ...newPlots[index],
+      plotPath: plotPath,
+      plotURL: plotURL,
       refSignatureSet: set,
       strategy: strategy,
       strategyOptions: strategyOptions,
@@ -270,7 +256,7 @@ export default function MutationalSignatureProfile({ submitR }) {
     });
   }
 
-  function handleStrategy(strategy, index) {
+  async function handleStrategy(strategy, index) {
     let filteredData = refSigData.filter(
       (row) =>
         row.Source == plots[index].signatureSource &&
@@ -283,9 +269,19 @@ export default function MutationalSignatureProfile({ submitR }) {
       ...new Set(filteredData.map((row) => row.Signature_name)),
     ];
 
+    const plotPath = buildPlotPath(
+      plots[index].profileName,
+      plots[index].refSignatureSet,
+      signatureNameOptions[0]
+    );
+
+    const plotURL = await fetchPlot(plotPath, index);
+
     let newPlots = plots.slice();
     newPlots[index] = {
       ...newPlots[index],
+      plotPath: plotPath,
+      plotURL: plotURL,
       strategy: strategy,
       signatureName: signatureNameOptions[0],
       signatureNameOptions: signatureNameOptions,
@@ -296,7 +292,29 @@ export default function MutationalSignatureProfile({ submitR }) {
     });
   }
 
-  function addPlots() {
+  async function handleName(name, index) {
+    const plotPath = buildPlotPath(
+      plots[index].profileName,
+      plots[index].refSignatureSet,
+      name
+    );
+
+    const plotURL = await fetchPlot(plotPath, index);
+
+    let newPlots = plots.slice();
+    newPlots[index] = {
+      ...newPlots[index],
+      plotPath: plotPath,
+      plotURL: plotURL,
+      signatureName: name,
+    };
+
+    mergeSigMutationalProfiles({
+      plots: newPlots,
+    });
+  }
+
+  async function addPlots() {
     const signatureSourceOptions = [
       ...new Set(refSigData.map((row) => row.Source)),
     ];
@@ -347,10 +365,20 @@ export default function MutationalSignatureProfile({ submitR }) {
       ),
     ];
 
+    const plotPath = buildPlotPath(
+      profileName,
+      refSignatureSet,
+      signatureNameOptions[0]
+    );
+
+    const plotURL = await fetchPlot(plotPath, null);
+
     mergeSigMutationalProfiles({
       plots: [
         ...plots,
         {
+          plotPath: plotPath,
+          plotURL: plotURL,
           signatureSource: signatureSource,
           signatureSourceOptions: signatureSourceOptions,
           profileName: profileName,
@@ -361,8 +389,6 @@ export default function MutationalSignatureProfile({ submitR }) {
           strategyOptions: strategyOptions,
           signatureName: signatureNameOptions[0],
           signatureNameOptions: signatureNameOptions,
-          plotPath: '',
-          plotURL: '',
         },
       ],
     });
@@ -423,13 +449,7 @@ export default function MutationalSignatureProfile({ submitR }) {
               label="Signature Name"
               value={plots[index].signatureName}
               options={plots[index].signatureNameOptions}
-              onChange={(name) => {
-                let newPlots = plots.slice();
-                newPlots[index] = { ...newPlots[index], signatureName: name };
-                mergeSigMutationalProfiles({
-                  plots: newPlots,
-                });
-              }}
+              onChange={(name) => handleName(name, index)}
             />
           </Col>
           <Col lg="1" className="d-flex">
@@ -438,7 +458,6 @@ export default function MutationalSignatureProfile({ submitR }) {
               variant="link"
               onClick={() => removePlots(index)}
               title={'Remove Plot ' + (parseInt(index) + 1)}
-              style={{ width: '2.25rem' }}
             >
               <FontAwesomeIcon icon={faMinus} />
             </Button>
@@ -530,13 +549,7 @@ export default function MutationalSignatureProfile({ submitR }) {
               label="Signature Name"
               value={plots[0].signatureName}
               options={plots[0].signatureNameOptions}
-              onChange={(name) => {
-                let newPlots = plots.slice();
-                newPlots[0] = { ...newPlots[0], signatureName: name };
-                mergeSigMutationalProfiles({
-                  plots: newPlots,
-                });
-              }}
+              onChange={(name) => handleName(name, 0)}
             />
           </Col>
           <Col />
@@ -550,18 +563,11 @@ export default function MutationalSignatureProfile({ submitR }) {
               variant="link"
               onClick={() => addPlots()}
               title="Add Plot"
-              style={{ width: '2.25rem', textDecoration: 'none' }}
+              style={{ textDecoration: 'none' }}
             >
               <span className="text-nowrap" title="Add Plot">
                 <FontAwesomeIcon icon={faPlus} /> Add Plot
               </span>
-            </Button>
-            <Button
-              className="ml-auto"
-              variant="primary"
-              onClick={handleCalculate}
-            >
-              Calculate
             </Button>
           </Col>
         </Row>
