@@ -5,39 +5,35 @@ import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as exploringActions } from '../../../../services/store/exploring';
+import { actions as explorationActions } from '../../../../services/store/exploration';
 import { actions as modalActions } from '../../../../services/store/modal';
 
-const actions = { ...exploringActions, ...modalActions };
+const actions = { ...explorationActions, ...modalActions };
 
 export default function MutationalSignatureProfile({ submitR }) {
   const dispatch = useDispatch();
-  const exploring = useSelector((state) => state.exploring);
-  const mergeExploring = (state) =>
-    dispatch(actions.mergeExploring({ exploring: state }));
-  const mergeSigMutationalSigComparison = (state) =>
-    dispatch(actions.mergeExploring({ sigMutationalSigComparison: state }));
+  const exploration = useSelector((state) => state.exploration);
+  const mergeExploration = (state) =>
+    dispatch(actions.mergeExploration({ exploration: state }));
+  const mergeSigCosineSimilarity = (state) =>
+    dispatch(actions.mergeExploration({ sigCosineSimilarity: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
-
   const {
     profileName,
     profileNameOptions,
-    signatureName1,
-    signatureNameOptions1,
-    signatureName2,
-    signatureNameOptions2,
     refSignatureSet1,
-    refSignatureSetOptions1,
     refSignatureSet2,
+    refSignatureSetOptions1,
     refSignatureSetOptions2,
     plotPath,
     plotURL,
+    txtPath,
     debugR,
     err,
     loading,
-  } = exploring.sigMutationalSigComparison;
-  const { displayTab, refSigData, projectID } = exploring.exploring;
+  } = exploration.sigCosineSimilarity;
+  const { displayTab, refSigData, projectID } = exploration.exploration;
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
   }, [plotPath]);
@@ -45,53 +41,50 @@ export default function MutationalSignatureProfile({ submitR }) {
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      mergeSigMutationalSigComparison({ plotURL: '' });
+      mergeSigCosineSimilarity({ plotURL: '' });
     }
   }
 
   async function calculateR(fn, args) {
-    mergeSigMutationalSigComparison({
-      loading: true,
-      err: false,
-      plotPath: '',
-      txtPath: '',
-    });
-
     try {
+      mergeSigCosineSimilarity({
+        loading: true,
+        err: false,
+        plotPath: '',
+        txtPath: '',
+      });
+
       const response = await submitR(fn, args);
       if (!response.ok) {
         const err = await response.json();
 
-        mergeSigMutationalSigComparison({
+        mergeSigCosineSimilarity({
           loading: false,
           debugR: err,
         });
       } else {
         const { debugR, output, projectID: id } = await response.json();
         if (Object.keys(output).length) {
-          if (!projectID) mergeExploring({ projectID: id });
-
-          mergeSigMutationalSigComparison({
+          if (!projectID) mergeExploration({ projectID: id });
+          mergeSigCosineSimilarity({
             debugR: debugR,
             loading: false,
             plotPath: output.plotPath,
-            txtPath: output.textPath,
+            txtPath: output.txtPath,
           });
         } else {
-          if (plotURL) URL.revokeObjectURL(plotURL);
-          mergeSigMutationalSigComparison({
+          mergeSigCosineSimilarity({
             debugR: debugR,
             loading: false,
-            plotPath: '',
-            plotURL: '',
-            txtPath: '',
             err: true,
+            plotPath: '',
+            txtPath: '',
           });
         }
       }
     } catch (err) {
       mergeError(err.message);
-      mergeSigMutationalSigComparison({ loading: false });
+      mergeSigCosineSimilarity({ loading: false });
     }
   }
 
@@ -106,7 +99,7 @@ export default function MutationalSignatureProfile({ submitR }) {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          mergeSigMutationalSigComparison({
+          mergeSigCosineSimilarity({
             plotURL: objectURL,
           });
         }
@@ -115,7 +108,7 @@ export default function MutationalSignatureProfile({ submitR }) {
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      mergeSigMutationalSigComparison({ err: true, plotURL: '' });
+      mergeSigCosineSimilarity({ err: true, plotURL: '' });
     }
   }
 
@@ -124,66 +117,13 @@ export default function MutationalSignatureProfile({ submitR }) {
     const refSignatureSetOptions = [
       ...new Set(filteredData.map((row) => row.Signature_set_name)),
     ];
-    const refSignatureSet1 = refSignatureSetOptions[0];
-    const refSignatureSet2 =
-      refSignatureSetOptions[1] || refSignatureSetOptions[0];
-    const signatureNameOptions1 = [
-      ...new Set(
-        filteredData
-          .filter((row) => row.Signature_set_name == refSignatureSet1)
-          .map((row) => row.Signature_name)
-      ),
-    ];
-    const signatureNameOptions2 = [
-      ...new Set(
-        filteredData
-          .filter((row) => row.Signature_set_name == refSignatureSet2)
-          .map((row) => row.Signature_name)
-      ),
-    ];
 
-    mergeSigMutationalSigComparison({
+    mergeSigCosineSimilarity({
       profileName: profile,
-      refSignatureSet1: refSignatureSet1,
-      refSignatureSet2: refSignatureSet2,
+      refSignatureSet1: refSignatureSetOptions[0],
+      refSignatureSet2: refSignatureSetOptions[1] || refSignatureSetOptions[0],
       refSignatureSetOptions1: refSignatureSetOptions,
       refSignatureSetOptions2: refSignatureSetOptions,
-      signatureName1: signatureNameOptions1[0],
-      signatureName2: signatureNameOptions2[0],
-      signatureNameOptions1: signatureNameOptions1,
-      signatureNameOptions2: signatureNameOptions2,
-    });
-  }
-
-  function handleSet1(set) {
-    let filteredData = refSigData.filter(
-      (row) => row.Profile == profileName && row.Signature_set_name == set
-    );
-
-    const signatureNameOptions1 = [
-      ...new Set(filteredData.map((row) => row.Signature_name)),
-    ];
-
-    mergeSigMutationalSigComparison({
-      refSignatureSet1: set,
-      signatureName1: signatureNameOptions1[0],
-      signatureNameOptions1: signatureNameOptions1,
-    });
-  }
-
-  function handleSet2(set) {
-    let filteredData = refSigData.filter(
-      (row) => row.Profile == profileName && row.Signature_set_name == set
-    );
-
-    const signatureNameOptions = [
-      ...new Set(filteredData.map((row) => row.Signature_name)),
-    ];
-
-    mergeSigMutationalSigComparison({
-      refSignatureSet2: set,
-      signatureName2: signatureNameOptions[0],
-      signatureNameOptions2: signatureNameOptions2,
     });
   }
 
@@ -194,7 +134,7 @@ export default function MutationalSignatureProfile({ submitR }) {
         <Row className="justify-content-center">
           <Col lg="3">
             <Select
-              id="mscProfileName"
+              id="csProfileName"
               label="Profile Name"
               value={profileName}
               options={profileNameOptions}
@@ -203,49 +143,23 @@ export default function MutationalSignatureProfile({ submitR }) {
           </Col>
           <Col lg="4">
             <Select
-              id="mscRefSet1"
+              id="csRefSet1"
               label="Reference Signature Set 1"
               value={refSignatureSet1}
               options={refSignatureSetOptions1}
-              onChange={handleSet1}
-            />
-          </Col>
-          <Col lg="4">
-            <Select
-              id="mscSigName1"
-              label="Signature Name 1"
-              value={signatureName1}
-              options={signatureNameOptions1}
-              onChange={(name) =>
-                mergeSigMutationalSigComparison({
-                  signatureName1: name,
-                })
+              onChange={(set) =>
+                mergeSigCosineSimilarity({ refSignatureSet1: set })
               }
             />
           </Col>
-          <Col lg="1" />
-        </Row>
-        <Row>
-          <Col lg="3" />
           <Col lg="4">
             <Select
-              id="mscSigSet2"
+              id="rcsRefSet2"
               label="Reference Signature Set 2"
               value={refSignatureSet2}
               options={refSignatureSetOptions2}
-              onChange={handleSet2}
-            />
-          </Col>
-          <Col lg="4">
-            <Select
-              id="mscSetName2"
-              label="Signature Name 2"
-              value={signatureName2}
-              options={signatureNameOptions2}
-              onChange={(name) =>
-                mergeSigMutationalSigComparison({
-                  signatureName2: name,
-                })
+              onChange={(set) =>
+                mergeSigCosineSimilarity({ refSignatureSet2: set })
               }
             />
           </Col>
@@ -254,12 +168,10 @@ export default function MutationalSignatureProfile({ submitR }) {
               className="mt-auto mb-3"
               variant="primary"
               onClick={() => {
-                calculateR('mutationalSignatureComparison', {
+                calculateR('cosineSimilarity', {
                   profileName: profileName,
                   refSignatureSet1: refSignatureSet1,
-                  signatureName1: signatureName1,
                   refSignatureSet2: refSignatureSet2,
-                  signatureName2: signatureName2,
                 });
               }}
             >
@@ -268,17 +180,17 @@ export default function MutationalSignatureProfile({ submitR }) {
           </Col>
         </Row>
       </Form>
-
-      <div id="mutationalSignatureComparison">
+      <div id="withinPlot">
         <div style={{ display: err ? 'block' : 'none' }} className="p-3">
           <p>An error has occured. Please verify your input.</p>
         </div>
+        <hr />
         <div style={{ display: plotURL ? 'block' : 'none' }}>
-          <hr />
           <Plot
             className="p-3"
             downloadName={plotPath.split('/').slice(-1)[0]}
             plotURL={plotURL}
+            txtPath={projectID + txtPath}
             maxHeight="1000px"
           />
         </div>

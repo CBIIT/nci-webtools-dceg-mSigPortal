@@ -10,9 +10,9 @@ import MsLandscape from './msLandscape';
 import MsPrevalence from './msPrevalence';
 import MSIndividual from './msIndividual';
 import {
-  actions as exploringActions,
+  actions as explorationActions,
   getInitialState,
-} from '../../../../services/store/exploring';
+} from '../../../../services/store/exploration';
 import { actions as modalActions } from '../../../../services/store/modal';
 import { unique2d } from '../../../../services/utils';
 import Select from '../../../controls/select/select';
@@ -23,34 +23,34 @@ import {
   MainPanel,
 } from '../../../controls/sidebar-container/sidebar-container';
 
-const actions = { ...exploringActions, ...modalActions };
+const actions = { ...explorationActions, ...modalActions };
 const { Group, Label, Check } = Form;
 const { Container, Content, Pane } = Tab;
 const { Item, Link } = Nav;
 
 export default function Exposure({ match }) {
   const dispatch = useDispatch();
-  const exploring = useSelector((state) => state.exploring);
+  const exploration = useSelector((state) => state.exploration);
 
   const mergeState = async (state) =>
-    await dispatch(actions.mergeExploring({ ...state }));
+    await dispatch(actions.mergeExploration({ ...state }));
   const mergeExposure = (state) =>
-    dispatch(actions.mergeExploring({ exposure: state }));
-  const mergeTMB = (state) => dispatch(actions.mergeExploring({ tmb: state }));
+    dispatch(actions.mergeExploration({ exposure: state }));
+  const mergeTMB = (state) => dispatch(actions.mergeExploration({ tmb: state }));
   const mergeTmbSignatures = (state) =>
-    dispatch(actions.mergeExploring({ tmbSignatures: state }));
+    dispatch(actions.mergeExploration({ tmbSignatures: state }));
   const mergeMsBurden = (state) =>
-    dispatch(actions.mergeExploring({ msBurden: state }));
+    dispatch(actions.mergeExploration({ msBurden: state }));
   const mergeMsAssociation = (state) =>
-    dispatch(actions.mergeExploring({ msAssociation: state }));
+    dispatch(actions.mergeExploration({ msAssociation: state }));
   const mergeMsDecomposition = (state) =>
-    dispatch(actions.mergeExploring({ msDecomposition: state }));
+    dispatch(actions.mergeExploration({ msDecomposition: state }));
   const mergeMsPrevalence = (state) =>
-    dispatch(actions.mergeExploring({ msPrevalence: state }));
+    dispatch(actions.mergeExploration({ msPrevalence: state }));
   const mergeMsLandscape = (state) =>
-    dispatch(actions.mergeExploring({ msLandscape: state }));
+    dispatch(actions.mergeExploration({ msLandscape: state }));
   const mergeMsIndividual = (state) =>
-    dispatch(actions.mergeExploring({ msIndividual: state }));
+    dispatch(actions.mergeExploration({ msIndividual: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -81,33 +81,33 @@ export default function Exposure({ match }) {
     projectID,
     openSidebar,
     submitted,
-  } = exploring.exposure;
+  } = exploration.exposure;
   const {
     exposureSignature,
     exposureCancer,
     signatureNames,
-  } = exploring.exploring;
+  } = exploration.exploration;
 
-  const { loading: tmbLoading } = exploring.tmb;
-  const { loading: tmbSigLoading } = exploring.tmbSignatures;
-  const { loading: decompositionLoading } = exploring.msDecomposition;
-  const { loading: loadingMsBurden, ...burdenArgs } = exploring.msBurden;
+  const { loading: tmbLoading } = exploration.tmb;
+  const { loading: tmbSigLoading } = exploration.tmbSignatures;
+  const { loading: decompositionLoading } = exploration.msDecomposition;
+  const { loading: loadingMsBurden, ...burdenArgs } = exploration.msBurden;
   const {
     loading: loadingMsAssociation,
     ...associationArgs
-  } = exploring.msAssociation;
+  } = exploration.msAssociation;
   const {
     loading: loadingMsLandscape,
     ...landscapeArgs
-  } = exploring.msLandscape;
+  } = exploration.msLandscape;
   const {
     loading: loadingMsPrevalence,
     ...prevalenceArgs
-  } = exploring.msPrevalence;
+  } = exploration.msPrevalence;
   const {
     loading: loadingMsIndividual,
     ...individualArgs
-  } = exploring.msIndividual;
+  } = exploration.msIndividual;
 
   const [exposureFileObj, setExposure] = useState(new File([], ''));
   const [matrixFileObj, setMatrix] = useState(new File([], ''));
@@ -128,7 +128,7 @@ export default function Exposure({ match }) {
 
   // set selected tab on component render
   useEffect(() => {
-    mergeState({ exploring: { displayTab: 'exposure' } });
+    mergeState({ exploration: { displayTab: 'exposure' } });
   }, []);
 
   // lazy load plots after loading signature names and sample names filtered by cancer type
@@ -315,7 +315,7 @@ export default function Exposure({ match }) {
 
   async function submitR(fn, args, id = projectID) {
     try {
-      const response = await fetch(`api/exploringR`, {
+      const response = await fetch(`api/explorationR`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -902,7 +902,7 @@ export default function Exposure({ match }) {
   function handleReset() {
     const initialState = getInitialState();
     setCheckValid(false);
-    window.location.hash = '#/exploring/exposure';
+    window.location.hash = '#/exploration/exposure';
 
     mergeExposure({
       ...initialState.exposure,
@@ -1075,7 +1075,7 @@ export default function Exposure({ match }) {
                   {examples.map(({ name, title, path }) => (
                     <Col md="3" key={name + index}>
                       <span className="mb-2">
-                        <a href={`#/exploring/exposure/${path}`} title={title}>
+                        <a href={`#/exploration/exposure/${path}`} title={title}>
                           {name}
                         </a>
                       </span>
@@ -1092,7 +1092,7 @@ export default function Exposure({ match }) {
                           <Col md="3" key={`${study}-${name}`}>
                             <span className="mb-2">
                               <a
-                                href={`#/exploring/exposure/${path}`}
+                                href={`#/exploration/exposure/${path}`}
                                 title={title}
                               >
                                 {name}

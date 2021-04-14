@@ -3,32 +3,32 @@ import { Nav } from 'react-bootstrap';
 import { Route, Redirect, NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-  actions as exploringActions,
+  actions as explorationActions,
   getInitialState,
-} from '../../../services/store/exploring';
+} from '../../../services/store/exploration';
 import { actions as modalActions } from '../../../services/store/modal';
 import Signature from './signature/index';
 import Exposure from './exposure';
 import Aetiology from './aetiology';
 import Download from './download';
-import './exploring.scss';
+import './exploration.scss';
 
-const actions = { ...exploringActions, ...modalActions };
+const actions = { ...explorationActions, ...modalActions };
 
 export default function Explore() {
   const dispatch = useDispatch();
-  const exploring = useSelector((state) => state.exploring);
-  const { exposureSignature, displayTab } = exploring.exploring;
-  const mergeExploring = (state) =>
-    dispatch(actions.mergeExploring({ exploring: state }));
+  const exploration = useSelector((state) => state.exploration);
+  const { exposureSignature, displayTab } = exploration.exploration;
+  const mergeExploration = (state) =>
+    dispatch(actions.mergeExploration({ exploration: state }));
   const mergeExposure = (state) =>
-    dispatch(actions.mergeExploring({ exposure: state }));
+    dispatch(actions.mergeExploration({ exposure: state }));
   const mergeSigMutationalProfiles = (state) =>
-    dispatch(actions.mergeExploring({ sigMutationalProfiles: state }));
+    dispatch(actions.mergeExploration({ sigMutationalProfiles: state }));
   const mergeSigMutationalSigComparison = (state) =>
-    dispatch(actions.mergeExploring({ sigMutationalSigComparison: state }));
+    dispatch(actions.mergeExploration({ sigMutationalSigComparison: state }));
   const mergeSigCosineSimilarity = (state) =>
-    dispatch(actions.mergeExploring({ sigCosineSimilarity: state }));
+    dispatch(actions.mergeExploration({ sigCosineSimilarity: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -136,7 +136,7 @@ export default function Explore() {
 
     mergeExposure(params);
 
-    mergeExploring({
+    mergeExploration({
       exposureCancer: exposureCancer,
       exposureSignature: exposureSignature,
       signatureNames: signatureNames,
@@ -214,7 +214,7 @@ export default function Explore() {
       ),
     ];
 
-    mergeExploring({
+    mergeExploration({
       refSigData: data,
     });
 
@@ -280,7 +280,7 @@ export default function Explore() {
               {tabs.map(({ name, id }) => (
                 <div key={id} className="d-inline-block">
                   <NavLink
-                    className="secondary-navlinks px-3 py-1 d-inline-block exploringNav"
+                    className="secondary-navlinks px-3 py-1 d-inline-block explorationNav"
                     activeClassName="active-secondary-navlinks"
                     style={{
                       textDecoration: 'none',
@@ -289,7 +289,7 @@ export default function Explore() {
                       fontWeight: '500',
                     }}
                     exact={true}
-                    to={`/exploring/${id}`}
+                    to={`/exploration/${id}`}
                   >
                     {name}
                   </NavLink>
@@ -313,7 +313,7 @@ export default function Explore() {
                       fontWeight: '500',
                     }}
                     exact={true}
-                    to={`/exploring/${id}`}
+                    to={`/exploration/${id}`}
                   >
                     {name}
                   </NavLink>
@@ -326,18 +326,18 @@ export default function Explore() {
         <div className="mx-3 my-3">
           <Route
             exact
-            path={`/exploring`}
-            render={() => <Redirect to={`/exploring/${displayTab}`} />}
+            path={`/exploration`}
+            render={() => <Redirect to={`/exploration/${displayTab}`} />}
           />
-          <Route path="/exploring/aetiology" component={Aetiology} />
-          <Route path="/exploring/signature" component={Signature} />
+          <Route path="/exploration/aetiology" component={Aetiology} />
+          <Route path="/exploration/signature" component={Signature} />
           <Route
-            path="/exploring/exposure/:exampleName?"
+            path="/exploration/exposure/:exampleName?"
             render={(props) => (
               <Exposure {...props} populateControls={populateControls} />
             )}
           />
-          <Route path="/exploring/download" component={Download} />
+          <Route path="/exploration/download" component={Download} />
         </div>
       </div>
     </div>

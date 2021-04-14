@@ -2,22 +2,21 @@ import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import { actions as exploringActions } from '../../../../services/store/exploring';
+import { actions as explorationActions } from '../../../../services/store/exploration';
 import { actions as modalActions } from '../../../../services/store/modal';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 
-const actions = { ...exploringActions, ...modalActions };
+const actions = { ...explorationActions, ...modalActions };
 
-export default function TmbSignatures({ calculateTmbSig }) {
+export default function TMB({ calculateTMB }) {
   const dispatch = useDispatch();
-  const exploring = useSelector((state) => state.exploring);
-  const { plotPath, plotURL, debugR, err, loading } = exploring.tmbSignatures;
-  const { projectID, source } = exploring.exposure;
-  const mergeExploring = (state) =>
-    dispatch(actions.mergeExploring({ exploring: state }));
-  const mergeTmbSignatures = (state) =>
-    dispatch(actions.mergeExploring({ tmbSignatures: state }));
+  const exploration = useSelector((state) => state.exploration);
+  const { plotPath, plotURL, debugR, err, loading } = exploration.tmb;
+  const { projectID, source } = exploration.exposure;
+  const mergeExploration = (state) =>
+    dispatch(actions.mergeExploration({ exploration: state }));
+  const mergeTMB = (state) => dispatch(actions.mergeExploration({ tmb: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -36,7 +35,7 @@ export default function TmbSignatures({ calculateTmbSig }) {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          mergeTmbSignatures({
+          mergeTMB({
             plotURL: objectURL,
           });
         }
@@ -45,14 +44,14 @@ export default function TmbSignatures({ calculateTmbSig }) {
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      mergeTmbSignatures({ err: true, plotURL: '' });
+      mergeTMB({ err: true, plotURL: '' });
     }
   }
 
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      mergeTmbSignatures({ plotURL: '' });
+      mergeTMB({ plotURL: '' });
     }
   }
 
@@ -68,32 +67,33 @@ export default function TmbSignatures({ calculateTmbSig }) {
               disabled={source == 'user' && !projectID}
               className="ml-auto mb-auto"
               variant="primary"
-              onClick={calculateTmbSig}
+              onClick={calculateTMB}
             >
               Calculate
             </Button>
           </Col>
         </Row>
       </Form>
-      <div id="tmbSigPlot">
+      <div id="tmbPlot">
         {err && (
           <div>
             <hr />
             <p className="p-3 text-danger">{err}</p>
           </div>
         )}
-        {plotPath && (
+        {plotURL && (
           <>
             <hr />
             <Plot
               className="p-3"
-              title="Tumor Mutational Burden Separated by Signatures"
+              title="Tumor Mutational Burden"
               downloadName={plotPath.split('/').slice(-1)[0]}
               plotURL={plotURL}
             />
           </>
         )}
       </div>
+
       {/* <Debug msg={debugR} /> */}
     </div>
   );

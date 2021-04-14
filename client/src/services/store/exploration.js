@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { mergeObject } from './utils';
 
 export const getInitialState = () => ({
-  exploring: {
+  exploration: {
     displayTab: 'aetiology',
     signatureDisplay: 'referenceSignatures',
     exposureSignature: [],
@@ -186,10 +186,10 @@ export const getInitialState = () => ({
 });
 
 export const { actions, reducer } = createSlice({
-  name: 'exploring',
+  name: 'exploration',
   initialState: getInitialState(),
   reducers: {
-    mergeExploring: mergeObject,
-    resetExploring: getInitialState,
+    mergeExploration: mergeObject,
+    resetExploration: getInitialState,
   },
 });

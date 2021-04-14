@@ -7,21 +7,21 @@ import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as exploringActions } from '../../../../services/store/exploring';
+import { actions as explorationActions } from '../../../../services/store/exploration';
 import { actions as modalActions } from '../../../../services/store/modal';
 
-const actions = { ...exploringActions, ...modalActions };
+const actions = { ...explorationActions, ...modalActions };
 
 export default function MutationalSignatureProfile({ submitR }) {
   const dispatch = useDispatch();
-  const exploring = useSelector((state) => state.exploring);
+  const exploration = useSelector((state) => state.exploration);
   const mergeSigMutationalProfiles = (state) =>
-    dispatch(actions.mergeExploring({ sigMutationalProfiles: state }));
+    dispatch(actions.mergeExploration({ sigMutationalProfiles: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const { plots, debugR, err, loading } = exploring.sigMutationalProfiles;
-  const { displayTab, refSigData } = exploring.exploring;
+  const { plots, debugR, err, loading } = exploration.sigMutationalProfiles;
+  const { displayTab, refSigData } = exploration.exploration;
 
   // get inital plot
   useEffect(() => {

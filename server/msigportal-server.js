@@ -23,7 +23,7 @@ const {
   getPublicData,
   upload,
   download,
-  exploringR,
+  explorationR,
   getReferenceSignatureData,
   submitQueue,
   getQueueResults,
@@ -104,7 +104,7 @@ apiRouter.post('/upload', upload);
 
 apiRouter.get('/visualize/download', download);
 
-apiRouter.post('/exploringR', exploringR);
+apiRouter.post('/explorationR', explorationR);
 
 apiRouter.post('/getReferenceSignatureData', getReferenceSignatureData);
 

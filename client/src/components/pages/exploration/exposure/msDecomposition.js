@@ -2,21 +2,29 @@ import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import { actions as exploringActions } from '../../../../services/store/exploring';
+import { actions as explorationActions } from '../../../../services/store/exploration';
 import { actions as modalActions } from '../../../../services/store/modal';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 
-const actions = { ...exploringActions, ...modalActions };
+const actions = { ...explorationActions, ...modalActions };
 
-export default function TMB({ calculateTMB }) {
+export default function MsDecomposition({ calculateDecomposition }) {
   const dispatch = useDispatch();
-  const exploring = useSelector((state) => state.exploring);
-  const { plotPath, plotURL, debugR, err, loading } = exploring.tmb;
-  const { projectID, source } = exploring.exposure;
-  const mergeExploring = (state) =>
-    dispatch(actions.mergeExploring({ exploring: state }));
-  const mergeTMB = (state) => dispatch(actions.mergeExploring({ tmb: state }));
+  const exploration = useSelector((state) => state.exploration);
+  const {
+    plotPath,
+    plotURL,
+    txtPath,
+    debugR,
+    err,
+    loading,
+  } = exploration.msDecomposition;
+  const { projectID, source } = exploration.exposure;
+  const mergeExploration = (state) =>
+    dispatch(actions.mergeExploration({ exploration: state }));
+  const mergeMsDecomposition = (state) =>
+    dispatch(actions.mergeExploration({ msDecomposition: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -35,7 +43,7 @@ export default function TMB({ calculateTMB }) {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          mergeTMB({
+          mergeMsDecomposition({
             plotURL: objectURL,
           });
         }
@@ -44,14 +52,14 @@ export default function TMB({ calculateTMB }) {
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      mergeTMB({ err: true, plotURL: '' });
+      mergeMsDecomposition({ err: true, plotURL: '' });
     }
   }
 
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      mergeTMB({ plotURL: '' });
+      mergeMsDecomposition({ plotURL: '' });
     }
   }
 
@@ -67,33 +75,33 @@ export default function TMB({ calculateTMB }) {
               disabled={source == 'user' && !projectID}
               className="ml-auto mb-auto"
               variant="primary"
-              onClick={calculateTMB}
+              onClick={calculateDecomposition}
             >
               Calculate
             </Button>
           </Col>
         </Row>
       </Form>
-      <div id="tmbPlot">
+      <div id="decompositionPlot">
         {err && (
           <div>
             <hr />
             <p className="p-3 text-danger">{err}</p>
           </div>
         )}
-        {plotURL && (
+        {plotPath && (
           <>
             <hr />
             <Plot
               className="p-3"
-              title="Tumor Mutational Burden"
+              title="Evaluating the Performance of Mutational Signature Decomposition"
               downloadName={plotPath.split('/').slice(-1)[0]}
               plotURL={plotURL}
+              txtPath={projectID + txtPath}
             />
           </>
         )}
       </div>
-
       {/* <Debug msg={debugR} /> */}
     </div>
   );

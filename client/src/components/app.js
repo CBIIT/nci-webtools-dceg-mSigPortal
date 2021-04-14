@@ -4,7 +4,7 @@ import { Navbar } from './controls/navbar/navbar';
 import Home from './pages/home/home';
 import About from './pages/about/about';
 import Visualization from './pages/visualization/visualization';
-import Exploring from './pages/exploring/exploring';
+import Exploration from './pages/exploration/exploration';
 import Refitting from './pages/refitting/refitting';
 import Association from './pages/association/association';
 import Publications from './pages/publications/publications';
@@ -29,11 +29,11 @@ export default function App() {
       color: '#fc8701', // orange
     },
     {
-      route: '/exploring',
-      action: 'Exploring',
-      title: 'Exploring',
-      cardTitle: 'Signature Exploring',
-      cardText: 'Signature Exploring',
+      route: '/exploration',
+      action: 'Exploration',
+      title: 'Exploration',
+      cardTitle: 'Signature Exploration',
+      cardText: 'Signature Exploration',
       description:
         'Systematically explore any reference or update to date published signatures with different profiles, version and aetiology (endogenous vs Exogenous). Intergratively explore the landscape of signature exposure in different genomic studies, including TCGA, PCAWG, and our Sherlock-Lung study.',
       image: 'assets/images/explore.png',
@@ -182,7 +182,7 @@ export default function App() {
       <Route path="/" exact={true} render={(_) => <Home links={links} />} />
       <Route path="/about" component={About} />
       <Route path="/visualization/:type?/:id?" component={Visualization} />
-      <Route path="/exploring" component={Exploring} />
+      <Route path="/exploration" component={Exploration} />
       <Route path="/refitting" component={Refitting} />
       <Route path="/association" component={Association} />
       <Route path="/publications" component={Publications} />

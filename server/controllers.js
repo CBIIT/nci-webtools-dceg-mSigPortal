@@ -378,8 +378,8 @@ function download(req, res, next) {
   }
 }
 
-async function exploringR(req, res, next) {
-  logger.info('/exploringR: function ' + req.body.fn);
+async function explorationR(req, res, next) {
+  logger.info('/explorationR: function ' + req.body.fn);
   console.log('args', req.body);
   const projectID = req.body.projectID ? req.body.projectID : uuidv4();
   const rootDir = path.join(config.results.folder, projectID);
@@ -388,7 +388,7 @@ async function exploringR(req, res, next) {
   fs.mkdirSync(savePath, { recursive: true });
 
   try {
-    const wrapper = await r('services/R/exploringWrapper.R', req.body.fn, {
+    const wrapper = await r('services/R/explorationWrapper.R', req.body.fn, {
       ...req.body.args,
       projectID: projectID,
       pythonOutput: path.join(
@@ -422,7 +422,7 @@ async function getReferenceSignatureData(req, res, next) {
   logger.info('/getReferenceSignatures: Request');
 
   const data = await r(
-    'services/R/exploringWrapper.R',
+    'services/R/explorationWrapper.R',
     'getReferenceSignatureData',
     {
       ...req.body,
@@ -596,11 +596,11 @@ async function getVisExample(req, res, next) {
   }
 }
 
-// get signature name options for exploring/exposure
+// get signature name options for exploration/exposure
 async function getSignatureNames(req, res, next) {
   try {
     const wrapper = await r(
-      'services/R/exploringWrapper.R',
+      'services/R/explorationWrapper.R',
       'getSignatureNames',
       {
         args: req.body.args,
@@ -617,10 +617,10 @@ async function getSignatureNames(req, res, next) {
   }
 }
 
-// get sample name options for exploring/exposure
+// get sample name options for exploration/exposure
 async function getSampleNames(req, res, next) {
   try {
-    const wrapper = await r('services/R/exploringWrapper.R', 'getSampleNames', {
+    const wrapper = await r('services/R/explorationWrapper.R', 'getSampleNames', {
       args: req.body.args,
       dataPath: production
         ? config.data.database
@@ -759,7 +759,7 @@ module.exports = {
   getPublicData,
   upload,
   download,
-  exploringR,
+  explorationR,
   getReferenceSignatureData,
   submitQueue,
   getQueueResults,

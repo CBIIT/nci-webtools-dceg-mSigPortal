@@ -5,25 +5,25 @@ import ReferenceSignatures from './referenceSignatures';
 import MutationalSignatureProfile from './mutationalSignatureProfile';
 import CosineSimilarity from './cosineSimilarity';
 import MutationalSignatureComparison from './mutationalSignatureComparison';
-import { actions, getInitialState } from '../../../../services/store/exploring';
+import { actions, getInitialState } from '../../../../services/store/exploration';
 
 const { Container, Content, Pane } = Tab;
 const { Item, Link } = Nav;
 
 export default function Signature() {
   const dispatch = useDispatch();
-  const exploring = useSelector((state) => state.exploring);
-  const mergeExploring = (state) =>
-    dispatch(actions.mergeExploring({ exploring: state }));
+  const exploration = useSelector((state) => state.exploration);
+  const mergeExploration = (state) =>
+    dispatch(actions.mergeExploration({ exploration: state }));
 
-  const { projectID, signatureDisplay } = exploring.exploring;
+  const { projectID, signatureDisplay } = exploration.exploration;
 
   useEffect(() => {
-    mergeExploring({ displayTab: 'signature' });
+    mergeExploration({ displayTab: 'signature' });
   }, []);
 
   function submitR(fn, args) {
-    return fetch(`api/exploringR`, {
+    return fetch(`api/explorationR`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -75,7 +75,7 @@ export default function Signature() {
         className="mt-2"
         defaultActiveKey={signatureDisplay}
         activeKey={signatureDisplay}
-        onSelect={(tab) => mergeExploring({ signatureDisplay: tab })}
+        onSelect={(tab) => mergeExploration({ signatureDisplay: tab })}
       >
         <Nav variant="tabs">
           {tabs.map(({ key, title }) => (

@@ -1,36 +1,35 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import { actions as exploringActions } from '../../../../services/store/exploring';
+import { actions as explorationActions } from '../../../../services/store/exploration';
 import { actions as modalActions } from '../../../../services/store/modal';
 import Plot from '../../../controls/plot/plot';
 import Select from '../../../controls/select/select';
 import Debug from '../../../controls/debug/debug';
 
-const actions = { ...exploringActions, ...modalActions };
-const { Group, Label, Control } = Form;
+const actions = { ...explorationActions, ...modalActions };
+const { Label, Group } = Form;
 
-export default function MsPrevalence({ calculatePrevalence }) {
+export default function MsLandscape({ calculateLandscape, handleVariable }) {
   const dispatch = useDispatch();
-  const exploring = useSelector((state) => state.exploring);
+  const exploration = useSelector((state) => state.exploration);
   const {
-    mutation,
+    variableFile,
     plotPath,
     plotURL,
+    txtPath,
     debugR,
     err,
     loading,
-  } = exploring.msPrevalence;
-  const { projectID, source } = exploring.exposure;
-  const mergeExploring = (state) =>
-    dispatch(actions.mergeExploring({ exploring: state }));
-  const mergeMsPrevalence = (state) =>
-    dispatch(actions.mergeExploring({ msPrevalence: state }));
+  } = exploration.msLandscape;
+  const { projectID, source } = exploration.exposure;
+  const mergeExploration = (state) =>
+    dispatch(actions.mergeExploration({ exploration: state }));
+  const mergeMsLandscape = (state) =>
+    dispatch(actions.mergeExploration({ msLandscape: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
-
-  const [invalidMin, setMin] = useState(false);
 
   useEffect(() => {
     plotPath ? setRPlot(plotPath) : clearPlot();
@@ -47,7 +46,7 @@ export default function MsPrevalence({ calculatePrevalence }) {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          mergeMsPrevalence({
+          mergeMsLandscape({
             plotURL: objectURL,
           });
         }
@@ -56,64 +55,63 @@ export default function MsPrevalence({ calculatePrevalence }) {
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      mergeMsPrevalence({ err: true, plotURL: '' });
+      mergeMsLandscape({ err: true, plotURL: '' });
     }
   }
 
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      mergeMsPrevalence({ plotURL: '' });
+      mergeMsLandscape({ plotURL: '' });
     }
   }
 
   return (
     <div>
-      <Form noValidate className="p-3">
+      <Form className="p-3">
         <LoadingOverlay active={loading} />
-        <Row>
-          <Col lg="5">
-            <Group
-              controlId="prevalenceMutations"
-              title="Minimum Number of Mutations Within Each Signature"
-            >
-              <Label>Minimum Number of Mutations Assigned to Each Signature</Label>
-              <Control
-                value={mutation}
-                placeholder="e.g. 100"
-                onChange={(e) => {
-                  mergeMsPrevalence({
-                    mutation: e.target.value,
-                  });
-                }}
-                isInvalid={invalidMin}
+        <Row className="">
+          <Col lg="4">
+            <Group controlId="landscape">
+              <Label>Upload Variable Data</Label>
+              <Form.File
+                id="variableData"
+                label={variableFile || 'Upload here (optional)'}
+                // accept=''
+                onChange={(e) => handleVariable(e.target.files[0])}
+                custom
               />
-              <Form.Control.Feedback type="invalid">
-                Enter a numeric minimum value
-              </Form.Control.Feedback>
             </Group>
+          </Col>
+          <Col lg="1" className="d-flex justify-content-end">
+            <Button
+              className="mt-auto mb-3"
+              variant="secondary"
+              onClick={() => {
+                handleVariable(new File([], ''));
+              }}
+              disabled={!variableFile}
+            >
+              Remove
+            </Button>
           </Col>
           <Col />
           <Col lg="2" className="d-flex">
             <Button
+              disabled={source == 'user' && !projectID}
               className="ml-auto mb-auto"
               variant="primary"
-              onClick={() => {
-                if (!mutation || isNaN(mutation)) setMin(true);
-                else setMin(false);
-
-                if (mutation && !isNaN(mutation)) calculatePrevalence();
-              }}
-              disabled={source == 'user' && !projectID}
+              onClick={calculateLandscape}
             >
               Calculate
             </Button>
           </Col>
         </Row>
       </Form>
-      <div id="exposurePrevalencePlot">
+      <div id="exposureLandscapePlot">
         {err && (
           <div>
+            <hr />
             <p className="p-3 text-danger">{err}</p>
           </div>
         )}
@@ -121,9 +119,10 @@ export default function MsPrevalence({ calculatePrevalence }) {
           <hr />
           <Plot
             className="p-3"
-            title="Prevalence of Mutational Signature"
+            title="Landscape of Mutational Signature Activity"
             downloadName={plotPath.split('/').slice(-1)[0]}
             plotURL={plotURL}
+            txtPath={projectID + txtPath}
           />
         </div>
       </div>

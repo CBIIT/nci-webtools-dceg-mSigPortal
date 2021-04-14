@@ -1,22 +1,22 @@
 import React, { useEffect } from 'react';
 import { Row, Col, Button, Form } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as exploringActions } from '../../../../services/store/exploring';
+import { actions as explorationActions } from '../../../../services/store/exploration';
 import { actions as modalActions } from '../../../../services/store/modal';
 import Plot from '../../../controls/plot/plot';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import './aetiology.scss';
 
-const actions = { ...exploringActions, ...modalActions };
+const actions = { ...explorationActions, ...modalActions };
 const { Group, Label, Check } = Form;
 
 export default function Aetiology() {
   const dispatch = useDispatch();
-  const exploring = useSelector((state) => state.exploring);
+  const exploration = useSelector((state) => state.exploration);
   const mergeAetiology = (state) =>
-    dispatch(actions.mergeExploring({ aetiology: state }));
+    dispatch(actions.mergeExploration({ aetiology: state }));
   const mergeState = async (state) =>
-    await dispatch(actions.mergeExploring({ ...state }));
+    await dispatch(actions.mergeExploration({ ...state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -37,7 +37,7 @@ export default function Aetiology() {
     exposureURL,
     tissueURL,
     refSigURL,
-  } = exploring.aetiology;
+  } = exploration.aetiology;
 
   const categories = [
     { name: 'Cosmic Mutational Signatures', file: 'Aetiology_cosmic.json' },
@@ -55,7 +55,7 @@ export default function Aetiology() {
 
   // set selected tab on component render
   useEffect(() => {
-    mergeState({ exploring: { displayTab: 'aetiology' } });
+    mergeState({ exploration: { displayTab: 'aetiology' } });
   }, []);
 
   useEffect(() => {

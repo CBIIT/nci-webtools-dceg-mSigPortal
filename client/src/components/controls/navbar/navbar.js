@@ -46,7 +46,7 @@ export function Navbar({ links }) {
                     className="navlinks py-2 px-4 d-inline-block"
                     activeClassName="active-navlinks"
                     exact={exact}
-                    to={`/exploring/${path}`}
+                    to={`/exploration/${path}`}
                   >
                     {name}
                   </NavLink>

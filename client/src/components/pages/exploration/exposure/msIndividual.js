@@ -2,18 +2,18 @@ import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import { actions as exploringActions } from '../../../../services/store/exploring';
+import { actions as explorationActions } from '../../../../services/store/exploration';
 import { actions as modalActions } from '../../../../services/store/modal';
 import Plot from '../../../controls/plot/plot';
 import Select from '../../../controls/select/select';
 import Debug from '../../../controls/debug/debug';
 
-const actions = { ...exploringActions, ...modalActions };
+const actions = { ...explorationActions, ...modalActions };
 const { Group } = Form;
 
 export default function MSIndividual({ calculateIndividual }) {
   const dispatch = useDispatch();
-  const exploring = useSelector((state) => state.exploring);
+  const exploration = useSelector((state) => state.exploration);
   const {
     sample,
     plotPath,
@@ -21,17 +21,17 @@ export default function MSIndividual({ calculateIndividual }) {
     debugR,
     err,
     loading,
-  } = exploring.msIndividual;
+  } = exploration.msIndividual;
   const {
     projectID,
     publicSampleOptions,
     userSampleOptions,
     source,
-  } = exploring.exposure;
-  const mergeExploring = (state) =>
-    dispatch(actions.mergeExploring({ exploring: state }));
+  } = exploration.exposure;
+  const mergeExploration = (state) =>
+    dispatch(actions.mergeExploration({ exploration: state }));
   const mergeMsIndividual = (state) =>
-    dispatch(actions.mergeExploring({ msIndividual: state }));
+    dispatch(actions.mergeExploration({ msIndividual: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 

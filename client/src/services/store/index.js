@@ -1,4 +1,4 @@
-import { reducer as exploringReducer } from './exploring';
+import { reducer as explorationReducer } from './exploration';
 import { reducer as visualizationReducer } from './visualization';
 import { reducer as modalReducer } from './modal';
 import { reducer as publicationsReducer } from './publications';
@@ -9,7 +9,7 @@ import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
 export const store = configureStore({
   reducer: {
     visualization: visualizationReducer,
-    exploring: exploringReducer,
+    exploration: explorationReducer,
     modal: modalReducer,
     publications: publicationsReducer,
   },

@@ -2,29 +2,22 @@ import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import { actions as exploringActions } from '../../../../services/store/exploring';
+import { actions as explorationActions } from '../../../../services/store/exploration';
 import { actions as modalActions } from '../../../../services/store/modal';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 
-const actions = { ...exploringActions, ...modalActions };
+const actions = { ...explorationActions, ...modalActions };
 
-export default function MsDecomposition({ calculateDecomposition }) {
+export default function TmbSignatures({ calculateTmbSig }) {
   const dispatch = useDispatch();
-  const exploring = useSelector((state) => state.exploring);
-  const {
-    plotPath,
-    plotURL,
-    txtPath,
-    debugR,
-    err,
-    loading,
-  } = exploring.msDecomposition;
-  const { projectID, source } = exploring.exposure;
-  const mergeExploring = (state) =>
-    dispatch(actions.mergeExploring({ exploring: state }));
-  const mergeMsDecomposition = (state) =>
-    dispatch(actions.mergeExploring({ msDecomposition: state }));
+  const exploration = useSelector((state) => state.exploration);
+  const { plotPath, plotURL, debugR, err, loading } = exploration.tmbSignatures;
+  const { projectID, source } = exploration.exposure;
+  const mergeExploration = (state) =>
+    dispatch(actions.mergeExploration({ exploration: state }));
+  const mergeTmbSignatures = (state) =>
+    dispatch(actions.mergeExploration({ tmbSignatures: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -43,7 +36,7 @@ export default function MsDecomposition({ calculateDecomposition }) {
           const objectURL = URL.createObjectURL(pic);
 
           if (plotURL) URL.revokeObjectURL(plotURL);
-          mergeMsDecomposition({
+          mergeTmbSignatures({
             plotURL: objectURL,
           });
         }
@@ -52,14 +45,14 @@ export default function MsDecomposition({ calculateDecomposition }) {
       }
     } else {
       if (plotURL) URL.revokeObjectURL(plotURL);
-      mergeMsDecomposition({ err: true, plotURL: '' });
+      mergeTmbSignatures({ err: true, plotURL: '' });
     }
   }
 
   function clearPlot() {
     if (plotURL) {
       URL.revokeObjectURL(plotURL);
-      mergeMsDecomposition({ plotURL: '' });
+      mergeTmbSignatures({ plotURL: '' });
     }
   }
 
@@ -75,14 +68,14 @@ export default function MsDecomposition({ calculateDecomposition }) {
               disabled={source == 'user' && !projectID}
               className="ml-auto mb-auto"
               variant="primary"
-              onClick={calculateDecomposition}
+              onClick={calculateTmbSig}
             >
               Calculate
             </Button>
           </Col>
         </Row>
       </Form>
-      <div id="decompositionPlot">
+      <div id="tmbSigPlot">
         {err && (
           <div>
             <hr />
@@ -94,10 +87,9 @@ export default function MsDecomposition({ calculateDecomposition }) {
             <hr />
             <Plot
               className="p-3"
-              title="Evaluating the Performance of Mutational Signature Decomposition"
+              title="Tumor Mutational Burden Separated by Signatures"
               downloadName={plotPath.split('/').slice(-1)[0]}
               plotURL={plotURL}
-              txtPath={projectID + txtPath}
             />
           </>
         )}
