@@ -326,6 +326,10 @@ mutationalSignatureAssociation <- function(useCancer, cancerType, both, signatur
       select(-Signature_name)
   )
 
+  if (useCancer) {
+    data_input <- data_input %>% filter(Cancer_Type == cancerType)
+  }
+
   error = signature_association(data = data_input, signature_name_input1 = signatureName1, signature_name_input2 = signatureName2, signature_both = both, output_plot = plotPath)
   if (!is.null(error)) stop(error)
 
@@ -346,7 +350,7 @@ mutationalSignatureDecomposition <- function(plotPath, dataPath, exposure_refdat
     pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
     arrange(MutationType) ## have to sort the mutation type
 
-  decompsite_input <- calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
+  decompsite_input <- drop_na(calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input))
 
   if (!is.data.frame(decompsite_input)) {
     stop('Evaluating step failed due to missing the data')
@@ -509,7 +513,7 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
     if (common$useCancerType) {
       seqmatrixFiles <- seqmatrix_refdata_subset_files %>% filter(Study == common$study, Dataset == common$strategy, Cancer_Type == common$cancerType) %>% pull(file)
     } else {
-      seqmatrixFiles <- seqmatrix_refdata_subset_files %>% filter(Study == common$study, Dataset == common$strategy) %>% pull(file)
+      seqmatrixFiles <- seqmatrix_refdata_subset_files %>% filter(Study == common$study, Dataset == common$strategy, grepl('PanCancer', file, fixed = TRUE)) %>% pull(file)
     }
     seqmatrix_refdata_selected = NULL
     for (file in seqmatrixFiles) {
