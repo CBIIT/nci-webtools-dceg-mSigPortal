@@ -81,16 +81,30 @@ export default function Aetiology() {
         const studyOptions = [...new Set(data.map(({ Study }) => Study))];
 
         mergeAetiology({
-          data: data,
+          data: { [category]: data },
           aetiology: aetiologyOptions[0],
           study: studyOptions[0],
         });
-      } catch (_) {
-        mergeError('Could not fetch Etiology Info');
+      } catch (e) {
+        mergeError(e);
       }
     };
-    if (!data.length) getData();
-  }, [data]);
+    if (!data[category]) {
+      getData();
+    } else {
+      const aetiologyOptions = [
+        ...new Set(data[category].map(({ Aetiology }) => Aetiology)),
+      ];
+      const studyOptions = [
+        ...new Set(data[category].map(({ Study }) => Study)),
+      ];
+
+      mergeAetiology({
+        aetiology: aetiologyOptions[0],
+        study: studyOptions[0],
+      });
+    }
+  }, [category]);
 
   // check if plot exists
   useEffect(() => {
@@ -145,8 +159,13 @@ export default function Aetiology() {
 
   // get thumbnails for standard categories
   useEffect(() => {
-    if (data.length && category != 'Cancer Specific Signature') {
-      const signatures = data
+    if (
+      data[category] &&
+      data[category].length &&
+      !thumbnails[category] &&
+      category != 'Cancer Specific Signature'
+    ) {
+      const signatures = data[category]
         .slice()
         .filter(({ Study }) => Study == study)
         .sort(naturalSort)
@@ -158,9 +177,14 @@ export default function Aetiology() {
 
   // get tissue thumbnails
   useEffect(() => {
-    if (data.length && category == 'Cancer Specific Signature') {
+    if (
+      data[category] &&
+      data[category].length &&
+      !tissueThumbnails.length &&
+      category == 'Cancer Specific Signature'
+    ) {
       const uniqueTissues = Object.values(
-        data.reduce((c, e) => {
+        data[category].reduce((c, e) => {
           if (!c[e['Tissue Specific Signature']])
             c[e['Tissue Specific Signature']] = e;
           return c;
@@ -173,8 +197,13 @@ export default function Aetiology() {
 
   // get refsig thumbnails
   useEffect(() => {
-    if (data.length && category == 'Cancer Specific Signature') {
-      const refsig = data.slice().sort(naturalSort);
+    if (
+      data[category] &&
+      data[category].length &&
+      !refSigThumbnails.length &&
+      category == 'Cancer Specific Signature'
+    ) {
+      const refsig = data[category].slice().sort(naturalSort);
 
       getRefSigThumbnails(refsig);
     }
@@ -237,7 +266,6 @@ export default function Aetiology() {
                     signature: '',
                     study: '',
                     selectedSource: '',
-                    data: [],
                   });
                 }
               : () => {}
@@ -252,10 +280,10 @@ export default function Aetiology() {
   }
 
   function getAetiologies() {
-    if (data.length) {
+    if (data[category] && data[category].length) {
       return (
         <Row className="justify-content-center">
-          {[...new Set(data.map((obj) => obj.Aetiology))]
+          {[...new Set(data[category].map((obj) => obj.Aetiology))]
             .sort()
             .map((Aetiology) => (
               <Col
@@ -293,10 +321,10 @@ export default function Aetiology() {
     }
   }
   function getCancerAetiology() {
-    if (data.length) {
+    if (data[category] && data[category].length) {
       return (
         <Row className="justify-content-center">
-          {[...new Set(data.map((obj) => obj.Aetiology))]
+          {[...new Set(data[category].map((obj) => obj.Aetiology))]
             .sort()
             .map((Aetiology) => (
               <Col key={Aetiology} lg="2" md="3" sm="4" className="mb-3 d-flex">
@@ -331,8 +359,6 @@ export default function Aetiology() {
 
   async function getThumbnails(signatures) {
     try {
-      thumbnails.forEach((t) => URL.revokeObjectURL(t));
-
       const newThumbnails = await Promise.all(
         signatures.map(
           ({ Aetiology, Study, Signature, Source_URL, URL: alias_URL }) =>
@@ -360,7 +386,8 @@ export default function Aetiology() {
             })
         )
       );
-      mergeAetiology({ thumbnails: newThumbnails });
+
+      mergeAetiology({ thumbnails: { [category]: newThumbnails } });
     } catch (err) {
       mergeError(err.message);
     }
@@ -437,8 +464,8 @@ export default function Aetiology() {
 
   function standardView() {
     function getAllSignatures() {
-      if (data.length) {
-        return thumbnails.map(
+      if (thumbnails[category] && thumbnails[category].length) {
+        return thumbnails[category].map(
           ({ Aetiology, Signature, url, Source_URL }, index) => (
             <Col key={index} lg="1" md="3" sm="4" className="mb-2 px-1">
               <div
@@ -481,8 +508,8 @@ export default function Aetiology() {
     }
 
     function getSignatures() {
-      if (thumbnails.length) {
-        return thumbnails
+      if (thumbnails[category] && thumbnails[category].length) {
+        return thumbnails[category]
           .filter(({ Aetiology }) => Aetiology == aetiology)
           .map(({ Signature, url, Source_URL }, index) => {
             return (
@@ -522,10 +549,10 @@ export default function Aetiology() {
     }
 
     function getStudy() {
-      if (data.length) {
+      if (data[category] && data[category].length) {
         return [
           ...new Set(
-            data
+            data[category]
               .filter(
                 ({ Aetiology, Signature }) =>
                   Aetiology == aetiology && Signature == signature
@@ -545,78 +572,81 @@ export default function Aetiology() {
             </Button>
           </Col>
         ));
+      } else {
+        return false;
       }
     }
 
     function getInfo() {
-      if (data.length && selectedSource) {
-        const info = data.filter(
+      if (data[category] && data[category].length && selectedSource) {
+        let info = data[category].filter(
           ({ Source_URL, URL: alias_URL }) =>
             Source_URL == selectedSource || alias_URL == selectedSource
-        )[0];
+        );
+        if (info.length) {
+          info = info[0];
 
-        return (
-          <div>
+          return (
             <div>
-              <strong>Signature Name: </strong>
-              {signature}
-            </div>
-            {info.Mutagen && (
               <div>
-                <strong>Mutagen: </strong>
-                {info.Mutagen}
+                <strong>Signature Name: </strong>
+                {signature}
               </div>
-            )}
-            {info.Treatment && (
-              <div>
-                <strong>Treatment: </strong>
-                {info.Treatment}
-              </div>
-            )}
-            {info.Study && (
-              <div>
-                <strong>Study: </strong>
-                <a href={info.Study_URL} target="_blank" rel="noreferrer">
-                  {info.Study}
-                </a>
-              </div>
-            )}
-            {info['Cell Line'] && (
-              <div>
-                <strong>Cell Line: </strong>
-                {info['Cell Line']}
-              </div>
-            )}
-            {info.Source && (
-              <div>
-                <strong>Source: </strong>
-                <a
-                  href={info.URL || info.Source_URL}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {info.Source}
-                </a>
-              </div>
-            )}
-            {info.Description &&
-              (typeof info.Description == 'string' ? (
-                <p>{info.Description}</p>
-              ) : (
-                info.Description.map((text) => <p>{text}</p>)
-              ))}
+              {info.Mutagen && (
+                <div>
+                  <strong>Mutagen: </strong>
+                  {info.Mutagen}
+                </div>
+              )}
+              {info.Treatment && (
+                <div>
+                  <strong>Treatment: </strong>
+                  {info.Treatment}
+                </div>
+              )}
+              {info.Study && (
+                <div>
+                  <strong>Study: </strong>
+                  <a href={info.Study_URL} target="_blank" rel="noreferrer">
+                    {info.Study}
+                  </a>
+                </div>
+              )}
+              {info['Cell Line'] && (
+                <div>
+                  <strong>Cell Line: </strong>
+                  {info['Cell Line']}
+                </div>
+              )}
+              {info.Source && (
+                <div>
+                  <strong>Source: </strong>
+                  <a
+                    href={info.URL || info.Source_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {info.Source}
+                  </a>
+                </div>
+              )}
+              {info.Description &&
+                (typeof info.Description == 'string' ? (
+                  <p>{info.Description}</p>
+                ) : (
+                  info.Description.map((text) => <p>{text}</p>)
+                ))}
 
-            {profileURL ? (
-              <div>
-                <Plot
-                  className="p-3 border rounded mb-3"
-                  maxHeight={'300px'}
-                  plotURL={profileURL}
-                />
+              {profileURL ? (
+                <div>
+                  <Plot
+                    className="p-3 border rounded mb-3"
+                    maxHeight={'300px'}
+                    plotURL={profileURL}
+                  />
 
-                {category == 'Cosmic Mutational Signatures' && (
-                  <>
-                    {exposureURL ? (
+                  {category == 'Cosmic Mutational Signatures' && (
+                    <>
                       <>
                         <Row className="justify-content-center">
                           {getStudy()}
@@ -633,30 +663,38 @@ export default function Aetiology() {
                           the horizontal bar, in blue) and the total number of
                           tumors analyzed (below the blue bar, in green).
                         </p>
-                        <Plot
-                          className="p-3 border"
-                          maxHeight={'500px'}
-                          plotURL={exposureURL}
-                        />
+                        {exposureURL.length ? (
+                          <Plot
+                            className="p-3 border"
+                            maxHeight={'500px'}
+                            plotURL={exposureURL}
+                          />
+                        ) : (
+                          <div className="p-3 border">
+                            <p>
+                              A signature was not detected in any sample of the
+                              selected study
+                            </p>
+                          </div>
+                        )}
                       </>
-                    ) : (
-                      <div className="p-3 border">
-                        <p>
-                          A signature was not detected in any sample of the
-                          selected study
-                        </p>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            ) : (
-              <div className="my-5">
-                <LoadingOverlay active={true} />
-              </div>
-            )}
-          </div>
-        );
+                    </>
+                  )}
+                </div>
+              ) : (
+                <div className="my-5">
+                  <LoadingOverlay active={true} />
+                </div>
+              )}
+            </div>
+          );
+        } else {
+          return (
+            <p className="d-flex justify-content-center text-muted">
+              Error: No data found for {selectedSource}
+            </p>
+          );
+        }
       } else {
         return (
           <p className="d-flex justify-content-center text-muted">
@@ -858,64 +896,72 @@ export default function Aetiology() {
     }
 
     function getCancerSpecificInfo() {
-      if (data.length && tissue && refSig) {
-        let info = data.filter(
+      if (data[category] && data[category].length && tissue && refSig) {
+        let info = data[category].filter(
           (v) =>
             v['Tissue Specific Signature'] == tissue &&
             v['Ref Signature'] == refSig
-        )[0];
-
-        return (
-          <div>
-            <div>
-              <strong>Tissue Specific Signature: </strong>
-              {tissue}
-            </div>
-            <div>
-              <strong>Reference Signature: </strong>
-              {refSig}
-            </div>
-            <div>
-              <strong>RefSig Proportion: </strong>
-              {info['RefSig Proportion']}
-            </div>
-            <div>
-              <strong>Study: </strong>
-              <a href={info.Study_URL} target="_blank" rel="noreferrer">
-                {info.Study}
-              </a>
-            </div>
-            <div>
-              <strong>Source: </strong>
-              <a href={info.Source_URL} target="_blank" rel="noreferrer">
-                {info.Source}
-              </a>
-            </div>
-            {typeof info.Description == 'string' ? (
-              <p>{info.Description}</p>
-            ) : (
-              info.Description.map((text) => <p>{text}</p>)
-            )}
-
-            <Plot
-              className="p-3 border rounded mb-3"
-              maxHeight={'300px'}
-              plotURL={refSigURL}
-            />
-
-            <Plot
-              className="p-3 border rounded mb-3"
-              maxHeight={'300px'}
-              plotURL={tissueURL}
-            />
-
-            <Plot
-              className="p-3 border rounded mb-3"
-              maxHeight={'500px'}
-              plotURL={exposureURL}
-            />
-          </div>
         );
+        if (info.length) {
+          info = info[0];
+          return (
+            <div>
+              <div>
+                <strong>Tissue Specific Signature: </strong>
+                {tissue}
+              </div>
+              <div>
+                <strong>Reference Signature: </strong>
+                {refSig}
+              </div>
+              <div>
+                <strong>RefSig Proportion: </strong>
+                {info['RefSig Proportion']}
+              </div>
+              <div>
+                <strong>Study: </strong>
+                <a href={info.Study_URL} target="_blank" rel="noreferrer">
+                  {info.Study}
+                </a>
+              </div>
+              <div>
+                <strong>Source: </strong>
+                <a href={info.Source_URL} target="_blank" rel="noreferrer">
+                  {info.Source}
+                </a>
+              </div>
+              {typeof info.Description == 'string' ? (
+                <p>{info.Description}</p>
+              ) : (
+                info.Description.map((text) => <p>{text}</p>)
+              )}
+
+              <Plot
+                className="p-3 border rounded mb-3"
+                maxHeight={'300px'}
+                plotURL={refSigURL}
+              />
+
+              <Plot
+                className="p-3 border rounded mb-3"
+                maxHeight={'300px'}
+                plotURL={tissueURL}
+              />
+
+              <Plot
+                className="p-3 border rounded mb-3"
+                maxHeight={'500px'}
+                plotURL={exposureURL}
+              />
+            </div>
+          );
+        } else {
+          return (
+            <p className="d-flex justify-content-center text-muted">
+              Error: No data found for {tissue} and {refSig}
+            </p>
+          );
+        }
       } else {
         return (
           <p className="d-flex justify-content-center text-muted">
