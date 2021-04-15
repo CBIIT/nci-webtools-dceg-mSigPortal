@@ -264,7 +264,7 @@ export default function Explore() {
   }
 
   const tabs = [
-    { name: 'Aetiology', id: 'aetiology' },
+    { name: 'Etiology', id: 'etiology' },
     { name: 'Signature', id: 'signature' },
     { name: 'Exposure', id: 'exposure' },
     { name: 'Download', id: 'download' },
@@ -329,7 +329,7 @@ export default function Explore() {
             path={`/exploration`}
             render={() => <Redirect to={`/exploration/${displayTab}`} />}
           />
-          <Route path="/exploration/aetiology" component={Aetiology} />
+          <Route path="/exploration/etiology" component={Aetiology} />
           <Route path="/exploration/signature" component={Signature} />
           <Route
             path="/exploration/exposure/:exampleName?"

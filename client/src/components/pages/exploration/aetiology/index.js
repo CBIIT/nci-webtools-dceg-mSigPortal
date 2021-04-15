@@ -86,7 +86,7 @@ export default function Aetiology() {
           study: studyOptions[0],
         });
       } catch (_) {
-        mergeError('Could not fetch Aetiology Info');
+        mergeError('Could not fetch Etiology Info');
       }
     };
     if (!data.length) getData();
@@ -660,7 +660,7 @@ export default function Aetiology() {
       } else {
         return (
           <p className="d-flex justify-content-center text-muted">
-            Select a category, Aetiology, and signature to view more info
+            Select a category, etiology, and signature to view more info
           </p>
         );
       }
@@ -671,7 +671,7 @@ export default function Aetiology() {
         <div className="mx-auto p-3 pt-0">
           <Row>
             <Col sm="4">
-              <strong>Aetiologies</strong>
+              <strong>Etiologies</strong>
             </Col>
             <Col sm="4">
               <Group className="d-flex justify-content-center">
@@ -682,7 +682,7 @@ export default function Aetiology() {
                     onClick={(_) => mergeAetiology({ all: false })}
                   />
                   <Check.Label className="font-weight-normal">
-                    Selected Aetiology
+                    Selected Etiology
                   </Check.Label>
                 </Check>
                 <Check inline id="allAetiologies">
@@ -692,7 +692,7 @@ export default function Aetiology() {
                     onClick={(_) => mergeAetiology({ all: true })}
                   />
                   <Check.Label className="font-weight-normal">
-                    All Aetiologies
+                    All Etiologies
                   </Check.Label>
                 </Check>
               </Group>
@@ -929,7 +929,7 @@ export default function Aetiology() {
         <div className="mx-auto p-3">
           <Row>
             <Col sm="4">
-              <strong>Aetiologies</strong>
+              <strong>Etiologies</strong>
             </Col>
             <Col sm="4">
               <Group className="d-flex justify-content-center">
@@ -940,7 +940,7 @@ export default function Aetiology() {
                     onClick={(_) => mergeAetiology({ all: false })}
                   />
                   <Check.Label className="font-weight-normal">
-                    Selected Aetiology
+                    Selected Etiology
                   </Check.Label>
                 </Check>
                 <Check inline id="allAetiologies">
@@ -950,7 +950,7 @@ export default function Aetiology() {
                     onClick={(_) => mergeAetiology({ all: true })}
                   />
                   <Check.Label className="font-weight-normal">
-                    All Aetiologies
+                    All Etiologies
                   </Check.Label>
                 </Check>
               </Group>

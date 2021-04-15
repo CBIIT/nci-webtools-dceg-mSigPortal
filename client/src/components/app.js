@@ -35,16 +35,10 @@ export default function App() {
       cardTitle: 'Signature Exploration',
       cardText: 'Signature Exploration',
       description:
-        'Systematically explore any reference or update to date published signatures with different profiles, version and aetiology (endogenous vs Exogenous). Intergratively explore the landscape of signature exposure in different genomic studies, including TCGA, PCAWG, and our Sherlock-Lung study.',
+        'Systematically explore any reference or update to date published signatures with different profiles, version and etiology (endogenous vs Exogenous). Intergratively explore the landscape of signature exposure in different genomic studies, including TCGA, PCAWG, and our Sherlock-Lung study.',
       image: 'assets/images/explore.png',
       navIndex: 1,
       color: '#2c71dd', // blue
-      dropdown: [
-        { name: 'Aetiology', path: 'aetiology' },
-        { name: 'Signature', path: 'signature' },
-        { name: 'Exposure', path: 'exposure' },
-        { name: 'Download', path: 'download' },
-      ],
     },
     // {
     //   route: '/refitting',
