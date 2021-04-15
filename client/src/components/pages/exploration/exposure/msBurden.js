@@ -26,6 +26,7 @@ export default function MsBurden({ calculateBurden }) {
     signatureNameOptions,
     userNameOptions,
     source,
+    gettingSignatureNames,
   } = exploration.exposure;
   const mergeExploration = (state) =>
     dispatch(actions.mergeExploration({ exploration: state }));
@@ -80,7 +81,7 @@ export default function MsBurden({ calculateBurden }) {
   return (
     <div>
       <Form className="p-3">
-        <LoadingOverlay active={loading} />
+        <LoadingOverlay active={loading || gettingSignatureNames} />
         <Row className="">
           <Col lg="3">
             <Select

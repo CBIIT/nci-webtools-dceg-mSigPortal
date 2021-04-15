@@ -36,7 +36,8 @@ export default function Exposure({ match }) {
     await dispatch(actions.mergeExploration({ ...state }));
   const mergeExposure = (state) =>
     dispatch(actions.mergeExploration({ exposure: state }));
-  const mergeTMB = (state) => dispatch(actions.mergeExploration({ tmb: state }));
+  const mergeTMB = (state) =>
+    dispatch(actions.mergeExploration({ tmb: state }));
   const mergeTmbSignatures = (state) =>
     dispatch(actions.mergeExploration({ tmbSignatures: state }));
   const mergeMsBurden = (state) =>
@@ -81,6 +82,8 @@ export default function Exposure({ match }) {
     projectID,
     openSidebar,
     submitted,
+    gettingSignatureNames,
+    gettingSampleNames,
   } = exploration.exposure;
   const {
     exposureSignature,
@@ -133,29 +136,31 @@ export default function Exposure({ match }) {
 
   // lazy load plots after loading signature names and sample names filtered by cancer type
   useEffect(() => {
-    if (submitted) {
+    if (submitted == 'all') {
       if (
-        !loadingMsBurden &&
+        !gettingSignatureNames &&
         !burdenArgs.plotPath &&
-        signatureNameOptions.length
+        burdenArgs.signatureName
       )
         calculateBurden();
-
       if (
-        !loadingMsAssociation &&
+        !gettingSignatureNames &&
         !associationArgs.plotPath &&
-        publicSampleOptions.length
+        associationArgs.signatureName1
       )
         calculateAssociation();
-
+    }
+  }, [gettingSignatureNames]);
+  useEffect(() => {
+    if (submitted == 'all') {
       if (
-        !loadingMsIndividual &&
+        !gettingSampleNames &&
         !individualArgs.plotPath &&
-        publicSampleOptions.length
+        individualArgs.sample
       )
         calculateIndividual();
     }
-  }, [loadingMsBurden, loadingMsAssociation, loadingMsIndividual]);
+  }, [gettingSampleNames]);
 
   function usePrevious(value) {
     const ref = useRef();
@@ -240,10 +245,7 @@ export default function Exposure({ match }) {
 
   // get signature name options filtered by cancer type
   async function getSignatureNames() {
-    mergeState({
-      msBurden: { loading: true },
-      msAssociation: { loading: true },
-    });
+    mergeState({ exposure: { gettingSignatureNames: true } });
     try {
       const { stdout, output } = await (
         await fetch(`api/getSignatureNames`, {
@@ -269,19 +271,16 @@ export default function Exposure({ match }) {
             signatureNameOptions: output.data,
           },
         });
-      else mergeError(stdout);
+      else console.log('No Signature Names Found');
     } catch (err) {
       mergeError(err.message);
     }
-    mergeState({
-      msBurden: { loading: false },
-      msAssociation: { loading: false },
-    });
+    mergeState({ exposure: { gettingSignatureNames: false } });
   }
 
   // get sample name options filtered by cancer type
   async function getSampleNames() {
-    mergeMsIndividual({ loading: true });
+    mergeState({ exposure: { gettingSampleNames: true } });
     try {
       const { stdout, output } = await (
         await fetch(`api/getSampleNames`, {
@@ -306,11 +305,11 @@ export default function Exposure({ match }) {
           publicSampleOptions: output.data,
         });
         mergeMsIndividual({ sample: output.data[0] });
-      } else mergeError(stdout);
+      } else console.log('No Sample Names Found');
     } catch (err) {
       mergeError(err.message);
     }
-    mergeMsIndividual({ loading: false });
+    mergeState({ exposure: { gettingSampleNames: false } });
   }
 
   async function submitR(fn, args, id = projectID) {
@@ -576,11 +575,11 @@ export default function Exposure({ match }) {
     mergeTMB({ loading: active });
     mergeTmbSignatures({ loading: active });
     mergeMsDecomposition({ loading: active });
-    if (!loadingMsBurden) mergeMsBurden({ loading: active });
-    if (!loadingMsAssociation) mergeMsAssociation({ loading: active });
+    if (!gettingSignatureNames) mergeMsBurden({ loading: active });
+    if (!gettingSignatureNames) mergeMsAssociation({ loading: active });
     mergeMsLandscape({ loading: active });
     mergeMsPrevalence({ loading: active });
-    if (!loadingMsIndividual) mergeMsIndividual({ loading: active });
+    if (!gettingSampleNames) mergeMsIndividual({ loading: active });
   }
 
   async function calculateAll() {
@@ -678,8 +677,8 @@ export default function Exposure({ match }) {
       });
     }
     try {
-      handleLoading(true);
-      mergeExposure({ submitted: true });
+      if (fn == 'all') handleLoading(true);
+      mergeExposure({ submitted: fn });
       const { debugR, output, errors, projectID: pID } = await submitR(
         rFn,
         args,
@@ -755,7 +754,7 @@ export default function Exposure({ match }) {
     } catch (err) {
       mergeError(err.message);
     } finally {
-      handleLoading(false);
+      if (fn == 'all') handleLoading(false);
     }
   }
 
@@ -1074,8 +1073,11 @@ export default function Exposure({ match }) {
                   <Col md="3">{study}:</Col>
                   {examples.map(({ name, title, path }) => (
                     <Col md="3" key={name + index}>
-                      <span className="mb-2">
-                        <a href={`#/exploration/exposure/${path}`} title={title}>
+                      <span className="mb-2" disabled={loading || submitted}>
+                        <a
+                          href={`#/exploration/exposure/${path}`}
+                          title={title}
+                        >
                           {name}
                         </a>
                       </span>
@@ -1169,7 +1171,12 @@ export default function Exposure({ match }) {
                   <Col>
                     <Group>
                       <Select
-                        disabled={loading || projectID}
+                        disabled={
+                          loading ||
+                          submitted ||
+                          gettingSignatureNames ||
+                          gettingSampleNames
+                        }
                         id="expStudyPublic"
                         label="Study"
                         value={study}
@@ -1183,7 +1190,12 @@ export default function Exposure({ match }) {
                   <Col>
                     <Group>
                       <Select
-                        disabled={loading || projectID}
+                        disabled={
+                          loading ||
+                          submitted ||
+                          gettingSignatureNames ||
+                          gettingSampleNames
+                        }
                         id="tumorStrategy"
                         label="Experimental Strategy"
                         value={strategy}
@@ -1197,7 +1209,12 @@ export default function Exposure({ match }) {
                   <Col>
                     <Group>
                       <Select
-                        disabled={loading || projectID}
+                        disabled={
+                          loading ||
+                          submitted ||
+                          gettingSignatureNames ||
+                          gettingSampleNames
+                        }
                         id="expSetPublic"
                         label="Reference Signature Set"
                         value={refSignatureSet}
@@ -1212,7 +1229,12 @@ export default function Exposure({ match }) {
                     <Group>
                       <Select
                         className="mb-4"
-                        disabled={loading || projectID}
+                        disabled={
+                          loading ||
+                          submitted ||
+                          gettingSignatureNames ||
+                          gettingSampleNames
+                        }
                         id="prevalenceCancerType"
                         label="Cancer Type"
                         value={cancer}
@@ -1230,7 +1252,12 @@ export default function Exposure({ match }) {
                   <Col>
                     <Group controlId="toggleCancerType">
                       <Check
-                        disabled={loading || projectID}
+                        disabled={
+                          loading ||
+                          submitted ||
+                          gettingSampleNames ||
+                          gettingSignatureNames
+                        }
                         type="checkbox"
                         label="Cancer Type Only"
                         value={useCancerType}
@@ -1279,7 +1306,7 @@ export default function Exposure({ match }) {
                     <Group>
                       <Label>Upload Exposure File</Label>
                       <Form.File
-                        disabled={loading || projectID}
+                        disabled={loading || submitted}
                         id="uploadExposure"
                         label={exposureFileObj.name || 'Exposure File'}
                         accept=".txt"
@@ -1301,7 +1328,7 @@ export default function Exposure({ match }) {
                     <Group>
                       <Label>Upload Matrix File</Label>
                       <Form.File
-                        disabled={loading || projectID}
+                        disabled={loading || submitted}
                         id="uploadMatrix"
                         label={matrixFileObj.name || 'Matrix File'}
                         accept=".txt"
@@ -1324,7 +1351,7 @@ export default function Exposure({ match }) {
                       <Label className="mr-4">Use Public Signature Data</Label>
                       <Check inline id="toggleSignatureSource">
                         <Check.Input
-                          disabled={loading || projectID}
+                          disabled={loading || submitted}
                           type="checkbox"
                           value={usePublicSignature}
                           checked={usePublicSignature}
@@ -1345,7 +1372,7 @@ export default function Exposure({ match }) {
                       <Col>
                         <Group>
                           <Select
-                            disabled={loading || projectID}
+                            disabled={loading || submitted}
                             id="expStudyUser"
                             label="Study"
                             value={study}
@@ -1359,7 +1386,7 @@ export default function Exposure({ match }) {
                       <Col>
                         <Group>
                           <Select
-                            disabled={loading || projectID}
+                            disabled={loading || submitted}
                             id="exposureSignatureSet"
                             label="Reference Signature Set"
                             value={refSignatureSet}
@@ -1376,7 +1403,7 @@ export default function Exposure({ match }) {
                       <Group>
                         <Label>Upload Signature Data</Label>
                         <Form.File
-                          disabled={loading || projectID}
+                          disabled={loading || submitted}
                           id="uploadSignature"
                           label={signatureFileObj.name || 'Signature File'}
                           accept=".txt"
@@ -1398,7 +1425,7 @@ export default function Exposure({ match }) {
                   <Col>
                     <Group>
                       <Select
-                        disabled={loading || projectID}
+                        disabled={loading || submitted}
                         id="exposureGenome"
                         label="Genome"
                         value={genome}

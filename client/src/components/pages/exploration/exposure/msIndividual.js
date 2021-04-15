@@ -27,6 +27,7 @@ export default function MSIndividual({ calculateIndividual }) {
     publicSampleOptions,
     userSampleOptions,
     source,
+    gettingSampleNames,
   } = exploration.exposure;
   const mergeExploration = (state) =>
     dispatch(actions.mergeExploration({ exploration: state }));
@@ -82,7 +83,7 @@ export default function MSIndividual({ calculateIndividual }) {
   return (
     <div>
       <Form className="p-3">
-        <LoadingOverlay active={loading} />
+        <LoadingOverlay active={loading || gettingSampleNames} />
         <Row className="">
           <Col lg="3">
             <Group>

@@ -116,6 +116,8 @@ export const getInitialState = () => ({
     projectID: '',
     openSidebar: true,
     submitted: false,
+    gettingSignatureNames: false,
+    gettingSampleNames: false,
   },
   tmb: {
     plotPath: '',

@@ -29,9 +29,7 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
     signatureNameOptions,
     userNameOptions,
     source,
-    study,
-    strategy,
-    refSignatureSet,
+    gettingSignatureNames,
   } = exploration.exposure;
   const mergeExploration = (state) =>
     dispatch(actions.mergeExploration({ exploration: state }));
@@ -93,7 +91,7 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
   return (
     <div>
       <Form className="p-3">
-        <LoadingOverlay active={loading} />
+        <LoadingOverlay active={loading || gettingSignatureNames} />
         <Row>
           <Col lg="3">
             <Group controlId="toggleBothSamples">
