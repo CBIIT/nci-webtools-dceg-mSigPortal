@@ -130,6 +130,22 @@ export default function Kataegis({ submitR }) {
     <div>
       {source == 'user' && inputFormat == 'vcf' ? (
         <div className="bg-white border rounded">
+          <div className="p-3">
+            <p>
+              Below you can investigate instances of kataegis using a VCF file.
+              Kataegis is localized substitution hypermutation, often
+              characterized by clusters of C>T and/or C>G mutations, commonly at
+              TpCpN trinucleotides. Click <a href="#faq">here</a> for additional
+              information about kataegis. Simply input the “Minimum Number of
+              Mutations” to qualify was kataegis, the “Maximum Distance” between
+              one mutation and the next within a given cluster of mutations
+              being considered for kataegis, and a “Chromosome” to be included
+              in the Kataegis results figure. If you would like for all
+              chromosomes to be output in the results table, leave the
+              “Chromosome” input as ‘None’.
+            </p>
+          </div>
+          <hr />
           <Form noValidate className="p-3">
             <LoadingOverlay active={loading} />
             <Row>
@@ -247,7 +263,26 @@ export default function Kataegis({ submitR }) {
                 plotURL={plotURL}
                 txtPath={txtPath ? projectID + txtPath : null}
               />
-              {kataegisData.length > 0 && <KataegisTable />}
+              <p className="p-3">
+                The rainfall plot illustrates the kataegis identified given the
+                input parameters. Along the y-axis is the inter-mutation
+                distance (bp, log10) from one mutation to the next. On the
+                x-axis is the position of the mutation in the genome by
+                chromosome. The colors represent the different mutation types.
+                The arrow will highlight the kataegis region when you select the
+                “Highlight”.
+              </p>
+              {kataegisData.length > 0 && (
+                <>
+                  <p className="p-3">
+                    The table below is a summary of the kataegis identification
+                    for the input file. The table can be filtered based on any
+                    of the columns by entering an appropriate value for the
+                    given column in the box above each column.{' '}
+                  </p>
+                  <KataegisTable />
+                </>
+              )}
             </div>
           </div>
         </div>

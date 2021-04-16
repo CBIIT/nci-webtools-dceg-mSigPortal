@@ -181,6 +181,15 @@ export default function MutationalPattern({ submitR }) {
               downloadName={barPath.split('/').slice(-1)[0]}
               plotURL={barURL}
             />
+            <p className="p-3">
+              This plot illustrates the frequency by count of each mutational
+              pattern in the given study and cancer type or input dataset. The
+              y-axis is the frequency of each mutational pattern across all
+              samples, and the x-axis includes each of the mutational patterns
+              present in the study and cancer type that meet the criteria for
+              the minimal proportion of mutations within each mutational
+              pattern.
+            </p>
           </>
         )}
         {plotPath && !barPath && (
@@ -202,7 +211,16 @@ export default function MutationalPattern({ submitR }) {
               downloadName={plotPath.split('/').slice(-1)[0]}
               plotURL={plotURL}
               txtPath={projectID + txtPath}
+              title="Proportion of Mutational Pattern Context Compared to Other Contexts with the same SBS Mutation"
             />
+            <p className="p-3">
+              This plot illustrates the mutational pattern context entered
+              compared to other contexts with the same SBS mutation for each
+              sample. On the y-axis is the other contexts, and on the x-axis is
+              the specific mutational pattern context input for the enrichment
+              analysis. For some studies including multiple cancer types (such
+              as TCGA PanCancer), different colors will be used.
+            </p>
           </>
         )}
       </div>
@@ -212,6 +230,29 @@ export default function MutationalPattern({ submitR }) {
   return (
     <div>
       <div className="bg-white border rounded">
+        <div className="p-3">
+          <p>
+            This page allows you to conduct a mutational pattern enrichment
+            analysis. This type of analysis aims to determine frequency and
+            enrichment of different types of mutational patterns. For more
+            information about mutational pattern enrichment, click{' '}
+            <a href="#faq">here</a>. Below are explanations of the inputs needed
+            for the analysis.
+          </p>
+          <p>
+            Minimal Proportion: For “Frequency of Mutational Pattern” plot, set
+            the minimal proportion of mutational patterns identified in all
+            samples from selected or input study. A slightly high proportion
+            like 0.5 are suggested.{' '}
+          </p>
+          <p>
+            Mutational Pattern: For the second enrichment plot, select the
+            mutational patten to identify the enrichment of specific mutation
+            context as suggested from “Frequency of Mutational Patten”. The
+            mutational pattern supports common nucleotide symbols.{' '}
+          </p>
+        </div>
+        <hr />
         <Form noValidate className="p-3">
           <LoadingOverlay active={loading} />
           <Row>

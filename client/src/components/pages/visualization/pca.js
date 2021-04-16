@@ -373,6 +373,14 @@ export default function PCA({ submitR, getRefSigOptions }) {
                 downloadName={pca1.split('/').slice(-1)[0]}
                 plotURL={pca1URL}
               />
+              <p className="p-3">
+                The bar plot illustrates each of the principal components with
+                respect to the percentage of variation in the data that
+                component explains. On the y-axis is the dimension of the
+                component (each principal component), and on the x-axis is the
+                percentage of explained variance in the data by a particular
+                component.
+              </p>
             </div>
           )}
 
@@ -385,6 +393,13 @@ export default function PCA({ submitR, getRefSigOptions }) {
                 plotURL={pca2URL}
                 txtPath={projectID + pca2Data}
               />
+              <p className="p-3">
+                The individual PCA plot based on the top two principal
+                components helps to explain a majority of the variation in the
+                data. Each dot on the plot is a sample. The legend on the right
+                denotes the percent contribution (contrib) of each sample to the
+                principal components on the graph (Dim 1 and Dim 2).
+              </p>
             </div>
           )}
 
@@ -397,6 +412,13 @@ export default function PCA({ submitR, getRefSigOptions }) {
                 plotURL={pca3URL}
                 txtPath={projectID + pca3Data}
               />
+              <p className="p-3">
+                The variable PCA plot based on the top two principal components
+                helps to explain a majority of the variation in the data. The
+                legend on the right denotes the percent contribution (contrib)
+                of each mutation type to the principal components on the graph
+                (Dim 1 and Dim 2).
+              </p>
             </div>
           )}
 
@@ -409,6 +431,14 @@ export default function PCA({ submitR, getRefSigOptions }) {
                 plotURL={heatmapURL}
                 txtPath={projectID + heatmapData}
               />
+              <p className="p-3">
+                The heatmap shows cosine similarity between each principal
+                component and each mutational signature in the reference
+                signature set. Brighter colors denote higher levels of cosine
+                similarity between the principal component and the mutational
+                signature. Red dots in some of the boxes indicate a cosine
+                similarity of less than 0, denoting a negative correlation.
+              </p>
             </div>
           )}
         </div>
@@ -505,6 +535,14 @@ export default function PCA({ submitR, getRefSigOptions }) {
                 downloadName={pubPca1.split('/').slice(-1)[0]}
                 plotURL={pubPca1URL}
               />
+              <p className="p-3">
+                The bar plot illustrates each of the principal components with
+                respect to the percentage of variation in the data that
+                component explains. On the y-axis is the dimension of the
+                component (each principal component), and on the x-axis is the
+                percentage of explained variance in the data by a particular
+                component.
+              </p>
             </div>
           )}
 
@@ -517,6 +555,13 @@ export default function PCA({ submitR, getRefSigOptions }) {
                 plotURL={pubPca2URL}
                 txtPath={projectID + pubPca2Data}
               />
+              <p className="p-3">
+                The individual PCA plot based on the top two principal
+                components helps to explain a majority of the variation in the
+                data. Each dot on the plot is a sample. The legend on the right
+                denotes the percent contribution (contrib) of each sample to the
+                principal components on the graph (Dim 1 and Dim 2).
+              </p>
             </div>
           )}
 
@@ -529,6 +574,13 @@ export default function PCA({ submitR, getRefSigOptions }) {
                 plotURL={pubPca3URL}
                 txtPath={projectID + pubPca3Data}
               />
+              <p className="p-3">
+                The variable PCA plot based on the top two principal components
+                helps to explain a majority of the variation in the data. The
+                legend on the right denotes the percent contribution (contrib)
+                of each mutation type to the principal components on the graph
+                (Dim 1 and Dim 2).
+              </p>
             </div>
           )}
         </div>
@@ -562,6 +614,17 @@ export default function PCA({ submitR, getRefSigOptions }) {
           className={`bg-white tab-pane-bordered rounded-0 d-block`}
           style={{ overflowX: 'auto' }}
         >
+          <div className="p-3">
+            <p>
+              Below you can conduct a PCA analysis within samples, or a PCA with
+              Public Data for user input data only. PCA stands for Principal
+              Component Analysis, which helps to explain the variation found in
+              the data through the establishment of different principal
+              components. Each principal component can also be used to compare
+              with known mutational signatures.
+            </p>
+          </div>
+          <hr />
           {tabs.map(({ key, component }) => (
             <Pane key={key} eventKey={key} className="border-0">
               {component}

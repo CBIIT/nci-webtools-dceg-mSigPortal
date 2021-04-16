@@ -70,6 +70,7 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
     <div>
       <Form className="p-3">
         <LoadingOverlay active={loading} />
+        <p>MS Landscape- Landscape of Mutational Signature Activity</p>
         <Row className="">
           <Col lg="4">
             <Group controlId="landscape">
@@ -117,12 +118,32 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
         )}
         <div style={{ display: plotURL ? 'block' : 'none' }}>
           <hr />
+          <p className="p-3 m-0">
+            This page allows for you investigate the overall landscape of
+            exposure of mutational signatures across samples of a given cancer
+            type. In the combined plot below, you will find a series of bar
+            plots on top of one another to form the overall plot. The x-axis is
+            the samples for the cancer type and study selected from the left
+            panel. Starting with the bottom plot, this illustrates the
+            contribution of different signatures within a sample. The colors
+            that correspond to each mutational signature can be found at the
+            bottom in the “Mutational Signatures” legend. Just above the
+            contributions plot is a cosine similarity bar of the mutation
+            signatures deconvolution found in each sample. The plot above the
+            cosine similarity assignments is a plot that contains the number of
+            mutations in each sample assigned to each mutational signature. The
+            topmost plot is unsupervised clustering of the samples based on
+            signature contributions. Additional bars can add under the
+            clustering by uploading the variable data.
+          </p>
+          <hr />
           <Plot
             className="p-3"
             title="Landscape of Mutational Signature Activity"
             downloadName={plotPath.split('/').slice(-1)[0]}
             plotURL={plotURL}
             txtPath={projectID + txtPath}
+            maxHeight="1100px"
           />
         </div>
       </div>

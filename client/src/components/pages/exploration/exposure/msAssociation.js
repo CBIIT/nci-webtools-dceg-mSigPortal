@@ -92,6 +92,7 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
     <div>
       <Form className="p-3">
         <LoadingOverlay active={loading || gettingSignatureNames} />
+        <p>MS Association: Mutational Signature Association</p>
         <Row>
           <Col lg="3">
             <Group controlId="toggleBothSamples">
@@ -155,11 +156,24 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
         {plotPath && (
           <>
             <hr />
+            <p className="p-3 m-0">
+              The scatter plot below illustrates the associations between two
+              selected. On the x-axis is the number of mutations (log 10)
+              assigned to Signature Name 1, and on the y-axis is the number of
+              mutations (log10) assigned to Signature Name 2. Use the parameter
+              on top panel “Number of Mutations assigned to both signature >0”
+              to remove the samples without assigning any mutations to these
+              selected two signatures. Use the parameter on the left panel
+              “Cancer Type Only” to perform association analysis on selected the
+              cancer type only.
+            </p>
+            <hr />
             <Plot
               className="p-3"
               title="Mutational Signature Association"
               downloadName={plotPath.split('/').slice(-1)[0]}
               plotURL={plotURL}
+              maxHeight="900px"
             />
           </>
         )}

@@ -82,6 +82,7 @@ export default function MsBurden({ calculateBurden }) {
     <div>
       <Form className="p-3">
         <LoadingOverlay active={loading || gettingSignatureNames} />
+        <p>MS Burden: Mutational Signature Burden Across Cancer Types</p>
         <Row className="">
           <Col lg="3">
             <Select
@@ -119,6 +120,18 @@ export default function MsBurden({ calculateBurden }) {
         {plotPath && (
           <>
             <hr />
+            <p className="p-3">
+              The bar plot below illustrates the level of mutational signature
+              burden across different cancer types with regard to a specific
+              signature. The signature selected is one from the Reference
+              Signature Set selected in the left panel. Across the top of the
+              plot are the cancer types. On the y-axis is the number of
+              mutations per Megabase (log10), and the x-axis denotes sample
+              numbers. The green number is the number of samples with the cancer
+              type (across the top of the plot), and the blue number is the
+              number of samples in that cancer type that detected the signature
+              selected.
+            </p>
             <Plot
               className="p-3"
               title="Mutational Signature Burden Across Cancer Types"

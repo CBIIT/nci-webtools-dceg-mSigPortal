@@ -84,6 +84,7 @@ export default function MSIndividual({ calculateIndividual }) {
     <div>
       <Form className="p-3">
         <LoadingOverlay active={loading || gettingSampleNames} />
+        <p>MS Individual: Mutational Signature in Individual Sample</p>
         <Row className="">
           <Col lg="3">
             <Group>
@@ -126,11 +127,28 @@ export default function MSIndividual({ calculateIndividual }) {
         {plotPath && (
           <>
             <hr />
+            <p className="p-3 m-0">
+              This page allows you to visualize the signature decomposition in
+              individual samples. Selected the sample name and click “Calculate”
+              button to visualize the new sample. In this plot, it will show the
+              original mutational profile, deconstructed mutational profile and
+              the difference between these two profiles. Also at the top of the
+              plot are measurements for RSS and cosine similarity. RSS is the
+              Residual Sum of Squares. It measures the discrepancy between two
+              profiles. Cosine similarity is how similar the mutational profiles
+              are to one another. For additional information about RSS and
+              cosine similarity, click here. In addition, all relevant signature
+              profiles from signature decomposition will present on the bottom.
+              A simple formula (on the bottom) as well as a bar plot (on the
+              left) will also show the signature contribution.
+            </p>
+            <hr />
             <Plot
               className="p-3"
               title="Mutational Signature in Individual Sample"
               downloadName={plotPath.split('/').slice(-1)[0]}
               plotURL={plotURL}
+              maxHeight="700px"
             />
           </>
         )}

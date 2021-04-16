@@ -135,7 +135,7 @@ export default function Home({ links }) {
               fontStyle: 'italic',
             }}
           >
-            Integrative mutational signature portal for cancer genomic study
+            Integrative mutational signatures portal for cancer genomic studies
           </div>
           <div
             className="col-12 text-center mt-5"
@@ -152,7 +152,7 @@ export default function Home({ links }) {
         <hr className="w-75"></hr>
         <div className="px-3 text-center">
           <b>
-            Integrative mutational signature portal for cancer genomic study
+            Integrative mutational signatures portal for cancer genomic studies
           </b>
         </div>
       </div>
@@ -163,17 +163,17 @@ export default function Home({ links }) {
           textAlign: 'left',
         }}
       >
-        Mutational signatures are characteristic combination of mutation types
+        Mutational signatures are characteristic combinations of mutation types
         arising from specific mutagenesis processes such as DNA replication
-        infidelity, exogenous or endogenous exposures, defective DNA repair and
+        infidelity, exogenous or endogenous exposures, defective DNA repair, and
         DNA enzymatic editing. Analysis of mutational signatures is becoming
-        routine in cancer genomics and provide a novel opportunity for biomarker
-        discovery, tumor diagnostics and treatment guidance. mSigPortal will
-        provide the state-of-the art methods and platform to explore, visualize
-        and analyze mutational signatures, which will greatly facilitate broad
-        investigation of mutational signatures to elucidate different
-        mutagenesis processes involved in tumorigenesis. Currently, mSigPortal
-        includes the following modules:
+        routine in cancer genomics, providing a novel opportunity for biomarker
+        discovery, tumor diagnostics, and treatment guidance. mSigPortal
+        provides state-of-the art methods and platform to explore, visualize and
+        analyze mutational patterns, signatures, exposures, and associations,
+        which will greatly facilitate broad investigation of mutational
+        signatures to elucidate different mutagenesis processes involved in
+        tumorigenesis. Currently, mSigPortal includes the following modules:
       </div>
 
       <div

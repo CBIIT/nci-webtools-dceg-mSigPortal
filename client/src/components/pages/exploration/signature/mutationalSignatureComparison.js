@@ -189,6 +189,15 @@ export default function MutationalSignatureProfile({ submitR }) {
 
   return (
     <div>
+      <p className="p-3">
+        Below you can observe mutational signature comparisons signatures found
+        in two different reference signature sets. Use the dropdown menus to
+        input a “Profile Name”, two Reference Signature Sets, and two Signatures
+        within the selected Signature Sets. This will allow for a calculation as
+        to the mutational profile of each signature given the profile type, as
+        well as the difference between the two mutational profiles.
+      </p>
+      <hr />
       <Form className="p-3">
         <LoadingOverlay active={loading} />
         <Row className="justify-content-center">
@@ -281,6 +290,20 @@ export default function MutationalSignatureProfile({ submitR }) {
             plotURL={plotURL}
             maxHeight="1000px"
           />
+          <div className="p-3">
+            <p>
+              The plot generated shows the mutational profile for the “Signature
+              Name 1” selected, the mutational profile for the “Signature Name
+              2” selected, and the difference between them. Also at the top of
+              the plot are measurements for RSS and cosine similarity.
+            </p>
+            <p>
+              RSS is the Residual Sum of Squares. It measures the discrepancy
+              between two profiles. Cosine similarity is how similar the
+              mutational profiles are to one another. For additional information
+              about RSS and cosine similarity, click here.
+            </p>
+          </div>
         </div>
       </div>
       {/* <Debug msg={debugR} /> */}

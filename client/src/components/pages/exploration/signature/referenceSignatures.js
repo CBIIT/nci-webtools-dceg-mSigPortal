@@ -82,6 +82,16 @@ export default function ReferenceSignatures({ submitR }) {
         <p>An error has occured. Please verify your input.</p>
       </div>
       <div style={{ display: plotURL ? 'block' : 'none' }}>
+        <p className="p-3">
+          The pie charts below displays the reference signatures currently
+          available in mSigPortal. Each signature set included in mSigPortal is
+          denoted by a color in the legend on the right. Each pie chart
+          represents a given mutational signatures defined by specific profile
+          type (SBS, DBS, ID, RS) and its respective matrix size. The numbers
+          and coloring in each chart represent the number of signatures included
+          and the name of the signature source.{' '}
+        </p>
+        <hr />
         <Plot
           className="p-3"
           downloadName={plotURL.split('/').slice(-1)[0]}

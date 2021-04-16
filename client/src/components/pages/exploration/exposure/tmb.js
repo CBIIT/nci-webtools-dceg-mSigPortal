@@ -16,7 +16,8 @@ export default function TMB({ calculateTMB }) {
   const { projectID, source } = exploration.exposure;
   const mergeExploration = (state) =>
     dispatch(actions.mergeExploration({ exploration: state }));
-  const mergeTMB = (state) => dispatch(actions.mergeExploration({ tmb: state }));
+  const mergeTMB = (state) =>
+    dispatch(actions.mergeExploration({ tmb: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -59,9 +60,9 @@ export default function TMB({ calculateTMB }) {
     <div>
       <Form className="p-3">
         <LoadingOverlay active={loading} />
+        <p> TMB: Tumor Mutational Burden</p>
         <Row>
           <Col>Select parameters from the left side panel.</Col>
-          <Col />
           <Col lg="2" className="d-flex">
             <Button
               disabled={source == 'user' && !projectID}
@@ -83,6 +84,17 @@ export default function TMB({ calculateTMB }) {
         )}
         {plotURL && (
           <>
+            <hr />
+            <p className="p-3 m-0">
+              The bar plot below illustrates the level of tumor mutational
+              burden (number of mutations per megabase) across different cancer
+              types for selected study. Across the top of the plot are the
+              different cancer types. The y-axis is the number of mutations per
+              megabase (log10), and the x-axis denotes sample numbers. The green
+              number is the number of samples for a given cancer type, and the
+              blue number is the number of samples that had mutation data for
+              that cancer type.
+            </p>
             <hr />
             <Plot
               className="p-3"

@@ -35,7 +35,14 @@ export default function Download() {
   return (
     <div className="bg-white border rounded p-4">
       {statistics.length > 0 ? (
-        <p>{statistics}</p>
+        <div>
+          <p>{statistics}</p>
+          <p>
+            Using the following links to download different mutational profiles,
+            plots and the mapping information between mutation and each mutation
+            type.
+          </p>
+        </div>
       ) : (
         <p>No statistics available</p>
       )}

@@ -282,6 +282,25 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
       key: 'within',
       component: (
         <div>
+          <div className="p-3">
+            <p>
+              Cosine similarity is a measure of the similarity of two matrix,
+              which can be helpful to compare two mutational profiles or
+              signatures. Below you can observe cosine similarity within sample
+              profiles (CS Within Samples), cosine similarity between sample
+              profiles and reference signatures (CS to Reference Signatures), or
+              if using your own data, cosine similarity between profiles from
+              your input data and profiles from public data (CS to Public Data).
+              Simply use the dropdown menus to select a “Profile Type”, and the
+              “Matrix Size”, Reference Signature Set”, or “Study”, depending on
+              the calculation being made.
+            </p>
+            <p>
+              Click <a href="#faq">here</a> to learn more about cosine
+              similarity.
+            </p>
+          </div>
+          <hr />
           <Form className="p-3">
             <LoadingOverlay active={withinSubmitOverlay} />
             <Row>
@@ -377,6 +396,17 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
       key: 'reference',
       component: (
         <div>
+          <div className="p-3">
+            <p>
+              The CS to Reference Signatures plot Signature plot highlights
+              cosine similarity between profile in a given sample and a
+              reference signature set. Along the bottom of the heatmap are the
+              signatures within the reference signature set selected. Along the
+              side of the heatmap are the sample profiled from the input data
+              file.
+            </p>
+          </div>
+          <hr />
           <Form className="p-3">
             <LoadingOverlay active={refSubmitOverlay} />
             <Row className="justify-content-center">
@@ -476,6 +506,17 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
       key: 'public',
       component: (
         <div>
+          <div className="p-3">
+            <p>
+              The CS to Public Data plot highlights cosine similarity between
+              sample profiles from the user dataset and the public data
+              available from the given study and cancer type. Along the bottom
+              of the heatmap are the samples from the selected public data.
+              Along the side of the heatmap are the samples from the input data
+              file.
+            </p>
+          </div>
+          <hr />
           <Form className="p-3">
             <LoadingOverlay active={pubSubmitOverlay} />
             <Row className="justify-content-center">

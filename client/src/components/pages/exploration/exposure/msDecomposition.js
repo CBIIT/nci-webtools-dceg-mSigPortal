@@ -67,6 +67,10 @@ export default function MsDecomposition({ calculateDecomposition }) {
     <div>
       <Form className="p-3">
         <LoadingOverlay active={loading} />
+        <p>
+          MS Decomposition: Evaluating the Performance of Mutational Signature
+          Decomposition
+        </p>
         <Row>
           <Col>Select parameters from the left side panel.</Col>
           <Col />
@@ -91,6 +95,18 @@ export default function MsDecomposition({ calculateDecomposition }) {
         )}
         {plotPath && (
           <>
+            <hr />
+            <p className="p-3 m-0">
+              This distribution plot below illustrates mutational signature
+              decomposition distribution in selected cancer type (by selecting
+              Cancer Type Only on the left panel) or across different cancer
+              type. Five different methods are used to measure the similarities
+              of original mutational profile matrix and reconstructed mutational
+              profile matrix across all the samples, including cosine
+              similarity, 100-L1_Norm_%, 100-L2_Norm_%, KL_Divergence, and
+              Pearson Correlation. Click here for the detail of these evaluation
+              method.
+            </p>
             <hr />
             <Plot
               className="p-3"

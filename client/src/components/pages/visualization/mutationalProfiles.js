@@ -253,6 +253,19 @@ export default function MutationalProfiles() {
 
   return (
     <div className="bg-white border rounded">
+      <div className="p-3">
+        <p>
+          Below you can generate different mutational profiles for a given
+          sample. Use the dropdown arrow to select [Sample Name], [Profile Type]
+          and [Matrix Size]. The [Filter] will only available when you select
+          [Split Mutations According to Filter] for user data source.
+        </p>
+        <p>
+          For additional information on [Profile Type] and [Matrix Size], click{' '}
+          <a href="#faq">here.</a>
+        </p>
+      </div>
+      <hr />
       <Form className="p-3">
         <Row>
           <Col lg="3">

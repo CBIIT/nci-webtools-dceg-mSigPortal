@@ -209,7 +209,7 @@ export default function Table({
                   id={column.id.replace(/\s|\W/g, '')}
                   {...column.getHeaderProps(column.getSortByToggleProps())}
                 >
-                  {column.render('Header')}
+                  <span title={column.tooltip}>{column.render('Header')}</span>
                   {column.canSort && (
                     <span>
                       {' '}
