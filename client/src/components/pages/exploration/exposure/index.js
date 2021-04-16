@@ -82,6 +82,7 @@ export default function Exposure({ match }) {
     projectID,
     openSidebar,
     submitted,
+    submitAll,
     gettingSignatureNames,
     gettingSampleNames,
   } = exploration.exposure;
@@ -136,31 +137,30 @@ export default function Exposure({ match }) {
 
   // lazy load plots after loading signature names and sample names filtered by cancer type
   useEffect(() => {
-    if (submitted == 'all') {
-      if (
-        !gettingSignatureNames &&
-        !burdenArgs.plotPath &&
-        burdenArgs.signatureName
-      )
-        calculateBurden();
-      if (
-        !gettingSignatureNames &&
-        !associationArgs.plotPath &&
-        associationArgs.signatureName1
-      )
-        calculateAssociation();
-    }
-  }, [gettingSignatureNames]);
-  useEffect(() => {
-    if (submitted == 'all') {
+    if (submitAll) {
+      if (!gettingSignatureNames) {
+        if (
+          !loadingMsBurden &&
+          !burdenArgs.plotPath &&
+          burdenArgs.signatureName
+        )
+          calculateBurden();
+        if (
+          !loadingMsAssociation &&
+          !associationArgs.plotPath &&
+          associationArgs.signatureName1
+        )
+          calculateAssociation();
+      }
       if (
         !gettingSampleNames &&
+        !loadingMsIndividual &&
         !individualArgs.plotPath &&
         individualArgs.sample
       )
         calculateIndividual();
     }
-  }, [gettingSampleNames]);
+  }, [gettingSignatureNames, gettingSampleNames]);
 
   function usePrevious(value) {
     const ref = useRef();
@@ -637,13 +637,21 @@ export default function Exposure({ match }) {
         useCancerType: useCancerType,
       }),
     };
-    if (!loadingMsBurden && (fn == 'all' || fn == 'burden')) {
+    if (
+      !loadingMsBurden &&
+      !gettingSignatureNames &&
+      (fn == 'all' || fn == 'burden')
+    ) {
       args.burden = JSON.stringify({
         signatureName: burdenArgs.signatureName,
         ...params.msBurden,
       });
     }
-    if (!loadingMsAssociation && (fn == 'all' || fn == 'association')) {
+    if (
+      !loadingMsAssociation &&
+      !gettingSignatureNames &&
+      (fn == 'all' || fn == 'association')
+    ) {
       args.association = JSON.stringify({
         // useCancerType: associationArgs.toggleCancer,
         both: associationArgs.both,
@@ -662,7 +670,11 @@ export default function Exposure({ match }) {
         mutation: parseFloat(prevalenceArgs.mutation) || 100,
       });
     }
-    if (!loadingMsIndividual && (fn == 'all' || fn == 'individual')) {
+    if (
+      !loadingMsIndividual &&
+      !gettingSampleNames &&
+      (fn == 'all' || fn == 'individual')
+    ) {
       args.individual = JSON.stringify({
         sample: individualArgs.sample,
         ...params.msIndividual,
@@ -677,7 +689,10 @@ export default function Exposure({ match }) {
       });
     }
     try {
-      if (fn == 'all') handleLoading(true);
+      if (fn == 'all') {
+        handleLoading(true);
+        mergeExposure({ submitAll: true });
+      }
       mergeExposure({ submitted: fn });
       const { debugR, output, errors, projectID: pID } = await submitR(
         rFn,

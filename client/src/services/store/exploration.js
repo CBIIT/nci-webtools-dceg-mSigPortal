@@ -116,6 +116,7 @@ export const getInitialState = () => ({
     projectID: '',
     openSidebar: true,
     submitted: false,
+    submitAll: false,
     gettingSignatureNames: false,
     gettingSampleNames: false,
   },
