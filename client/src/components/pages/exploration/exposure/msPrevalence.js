@@ -69,9 +69,26 @@ export default function MsPrevalence({ calculatePrevalence }) {
 
   return (
     <div>
+      <div className="p-3">
+        <p>MS Prevalence: Prevalence of Mutational Signature </p>
+        <p>
+          This page allows you to analyze the prevalence of signatures from the
+          selected Study and Reference Signature Set by both sample and
+          mutation. For prevalence by samples, Input the “Minimal Number of
+          Mutations Assigned to Each Signature” to set the smallest number of
+          mutations assigned to each signature within sample, which can have to
+          be included in the result.
+        </p>
+        <p className="m-0">
+          The pie chart on the left illustrates the prevalence of each
+          mutational signature by mutations. The bar plot on the right
+          illustrates the prevalence of each mutational signature by samples.
+          The colors represent each of the mutational signatures in both plots.
+        </p>
+      </div>
+      <hr />
       <Form noValidate className="p-3">
         <LoadingOverlay active={loading} />
-        <p>MS Prevalence: Prevalence of Mutational Signature </p>
         <Row>
           <Col lg="5">
             <Group
@@ -123,24 +140,6 @@ export default function MsPrevalence({ calculatePrevalence }) {
         <div style={{ display: plotURL ? 'block' : 'none' }}>
           <hr />
 
-          <div className="p-3">
-            <p>
-              This page allows you to analyze the prevalence of signatures from
-              the selected Study and Reference Signature Set by both sample and
-              mutation. For prevalence by samples, Input the “Minimal Number of
-              Mutations Assigned to Each Signature” to set the smallest number
-              of mutations assigned to each signature within sample, which can
-              have to be included in the result.
-            </p>
-            <p>
-              The pie chart on the left illustrates the prevalence of each
-              mutational signature by mutations. The bar plot on the right
-              illustrates the prevalence of each mutational signature by
-              samples. The colors represent each of the mutational signatures in
-              both plots.
-            </p>
-          </div>
-          <hr />
           <Plot
             className="p-3"
             title="Prevalence of Mutational Signature"

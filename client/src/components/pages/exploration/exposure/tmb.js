@@ -58,9 +58,21 @@ export default function TMB({ calculateTMB }) {
 
   return (
     <div>
+      <div className="p-3">
+        <p> TMB: Tumor Mutational Burden</p>
+        <p className="m-0">
+          The bar plot below illustrates the level of tumor mutational burden
+          (number of mutations per megabase) across different cancer types for
+          selected study. Across the top of the plot are the different cancer
+          types. The y-axis is the number of mutations per megabase (log10), and
+          the x-axis denotes sample numbers. The green number is the number of
+          samples for a given cancer type, and the blue number is the number of
+          samples that had mutation data for that cancer type.
+        </p>
+      </div>
+      <hr />
       <Form className="p-3">
         <LoadingOverlay active={loading} />
-        <p> TMB: Tumor Mutational Burden</p>
         <Row>
           <Col>Select parameters from the left side panel.</Col>
           <Col lg="2" className="d-flex">
@@ -84,17 +96,6 @@ export default function TMB({ calculateTMB }) {
         )}
         {plotURL && (
           <>
-            <hr />
-            <p className="p-3 m-0">
-              The bar plot below illustrates the level of tumor mutational
-              burden (number of mutations per megabase) across different cancer
-              types for selected study. Across the top of the plot are the
-              different cancer types. The y-axis is the number of mutations per
-              megabase (log10), and the x-axis denotes sample numbers. The green
-              number is the number of samples for a given cancer type, and the
-              blue number is the number of samples that had mutation data for
-              that cancer type.
-            </p>
             <hr />
             <Plot
               className="p-3"

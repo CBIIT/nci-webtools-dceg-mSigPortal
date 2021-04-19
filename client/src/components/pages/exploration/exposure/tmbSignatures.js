@@ -58,9 +58,24 @@ export default function TmbSignatures({ calculateTmbSig }) {
 
   return (
     <div>
+      <div className="p-3">
+        <p>TMB Signatures: Tumor Mutational Burden Separated by Signatures</p>
+        <p className="m-0">
+          The bar plot below illustrates the level of tumor mutational burden
+          across different signatures from the selected signature set in the
+          selected cancer type. Across the top of the plot are the signatures
+          (in the selected cancer type) that were exhibited by at least one
+          sample. On the y-axis is the number of mutations per Megabase (log10),
+          and the x-axis denotes sample numbers. The green number is the total
+          number of samples with the selected cancer type (and therefore
+          evaluated for each signature). The blue number is the number of
+          samples with the selected cancer type that detected the mutational
+          signature from the reference signature set.
+        </p>
+      </div>
+      <hr />
       <Form className="p-3">
         <LoadingOverlay active={loading} />
-        <p>TMB Signatures: Tumor Mutational Burden Separated by Signatures</p>
         <Row>
           <Col>Select parameters from the left side panel.</Col>
           <Col />
@@ -86,20 +101,7 @@ export default function TmbSignatures({ calculateTmbSig }) {
         {plotPath && (
           <>
             <hr />
-            <p className="p-3 m-0">
-              The bar plot below illustrates the level of tumor mutational
-              burden across different signatures from the selected signature set
-              in the selected cancer type. Across the top of the plot are the
-              signatures (in the selected cancer type) that were exhibited by at
-              least one sample. On the y-axis is the number of mutations per
-              Megabase (log10), and the x-axis denotes sample numbers. The green
-              number is the total number of samples with the selected cancer
-              type (and therefore evaluated for each signature). The blue number
-              is the number of samples with the selected cancer type that
-              detected the mutational signature from the reference signature
-              set.
-            </p>
-            <hr />
+
             <Plot
               className="p-3"
               title="Tumor Mutational Burden Separated by Signatures"
