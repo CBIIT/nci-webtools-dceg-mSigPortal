@@ -131,8 +131,13 @@ export default function Exposure({ match }) {
   }, [exampleName]);
 
   // set selected tab on component render
+  // get new signature name options filtered by cancer type on first render
   useEffect(() => {
     mergeState({ exploration: { displayTab: 'exposure' } });
+    if (source == 'public') {
+      if (!gettingSignatureNames) getSignatureNames();
+      if (!gettingSampleNames) getSampleNames();
+    }
   }, []);
 
   // lazy load plots after loading signature names and sample names filtered by cancer type
@@ -171,7 +176,7 @@ export default function Exposure({ match }) {
     return ref.current;
   }
 
-  // get new signature name options filtered by cancer type on first mount
+  // get signature name options
   const prevSigNameOptions = usePrevious(signatureNameOptions || []);
   useEffect(() => {
     if (
