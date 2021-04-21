@@ -132,23 +132,26 @@ export default function Table({
         <Col md="8">
           <strong>{title}</strong>
         </Col>
-        <Col md="3">
-          {(globalSearch || globalSearch == '') && (
-            <GlobalFilter
-              globalFilter={globalFilter}
-              setGlobalFilter={setGlobalFilter}
-              handleSearch={(query) => mergeState({ globalFilter: query })}
-              title={title}
-            />
-          )}
-        </Col>
-        <Col md="1">
+        <Col />
+        {globalSearch ||
+          (globalSearch == '' && (
+            <Col md="auto">
+              <div style={{ width: '280px' }}>
+                <GlobalFilter
+                  globalFilter={globalFilter}
+                  setGlobalFilter={setGlobalFilter}
+                  handleSearch={(query) => mergeState({ globalFilter: query })}
+                  title={title}
+                />
+              </div>
+            </Col>
+          ))}
+        <Col md="auto">
           <Dropdown>
             <Dropdown.Toggle
               variant="secondary"
               size="sm"
               id={`${title.replace(/\s/g, '')}-controls`}
-              block
             >
               Columns
             </Dropdown.Toggle>
