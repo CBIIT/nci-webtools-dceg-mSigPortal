@@ -332,7 +332,6 @@ mutationalSignatureAssociation <- function(useCancer, cancerType, both, signatur
 
   error = signature_association(data = data_input, signature_name_input1 = signatureName1, signature_name_input2 = signatureName2, signature_both = both, output_plot = plotPath)
   if (!is.null(error)) stop(error)
-
 }
 
 mutationalSignatureDecomposition <- function(plotPath, dataPath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected) {
@@ -511,21 +510,19 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
 
     # seqmatrix_refdata_selected <- seqmatrix_refdata %>% filter(Study == common$study, Dataset == common$strategy, Profile == signature_refsets_selected$Profile[1])
     if (common$useCancerType) {
-      seqmatrixFiles <- seqmatrix_refdata_subset_files %>% filter(Study == common$study, Dataset == common$strategy, Cancer_Type == common$cancerType) %>% pull(file)
+      seqmatrixFile <- seqmatrix_refdata_subset_files %>% filter(Study == common$study, Dataset == common$strategy, Cancer_Type == common$cancerType) %>% pull(file)
     } else {
-      seqmatrixFiles <- seqmatrix_refdata_subset_files %>% filter(Study == common$study, Dataset == common$strategy, grepl('PanCancer', file, fixed = TRUE)) %>% pull(file)
+      seqmatrixFile <- paste0(common$study, '_', common$strategy, '_seqmatrix_refdata.RData')
     }
+
     seqmatrix_refdata_selected = NULL
-    for (file in seqmatrixFiles) {
-      if (bucket != '') {
-        file <- get_object(paste0(dataPath, 'Seqmatrix/', file), bucket)
-        seqmatrix_refdata_selected <- get(load(rawConnection(file)))
-      } else {
-        seqmatrix_refdata_selected <- get(load(paste0(dataPath, 'Seqmatrix/', file)))
-      }
+    if (bucket != '') {
+      file <- get_object(paste0(dataPath, 'Seqmatrix/', seqmatrixFile), bucket)
+      seqmatrix_refdata_selected <- get(load(rawConnection(file)))
+    } else {
+      seqmatrix_refdata_selected <- get(load(paste0(dataPath, 'Seqmatrix/', seqmatrixFile)))
     }
     seqmatrix_refdata_selected = seqmatrix_refdata_selected %>% filter(Profile == signature_refsets_selected$Profile[1])
-
     # Tumor Overall Mutational Burden
     if ('all' %in% fn || 'tmb' %in% fn) {
       fnTime = proc.time()
