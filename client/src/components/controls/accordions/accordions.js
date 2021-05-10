@@ -1,41 +1,54 @@
 import React, { useState } from 'react';
 import { Accordion, Card } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import './accordions.scss';
 
 const { Header, Body } = Card;
 const { Toggle, Collapse } = Accordion;
 
-export default function ({ components }) {
-  const [toggleState, setToggle] = useState({});
+// Bootstrap 4 Accordion with all cards open by default
+export default function Accordions({ components, bodyClass }) {
+  const [toggleCollapse, setCollpase] = useState(
+    components.reduce(
+      (acc, component, index) => ({
+        ...acc,
+        [`${index}`]: component.collapseDefault,
+      }),
+      {}
+    )
+  );
 
   return (
     <div className="accordions">
-      {components.map(({ title, component }, index) => {
+      {components.map(({ title, collapseDefault, component }, index) => {
         return (
-          <Accordion defaultActiveKey={index + ''} key={index + ''}>
+          <Accordion
+            defaultActiveKey={collapseDefault ? null : `${index}`}
+            key={`${index}`}
+          >
             <Card>
               <Toggle
-                className="font-weight-bold"
+                className="font-weight-bold d-flex justify-content-between"
                 as={Header}
-                eventKey={index + ''}
+                eventKey={`${index}`}
                 onClick={() =>
-                  setToggle({
-                    ...toggleState,
-                    [index + '']: !toggleState[index + ''],
+                  setCollpase({
+                    ...toggleCollapse,
+                    [`${index}`]: !toggleCollapse[`${index}`],
                   })
                 }
               >
-                {toggleState[index + ''] ? (
-                  <FontAwesomeIcon icon={faPlus} />
-                ) : (
-                  <FontAwesomeIcon icon={faMinus} />
-                )}{' '}
                 {title}
+                <FontAwesomeIcon
+                  className="align-self-center"
+                  icon={
+                    toggleCollapse[`${index}`] ? faChevronDown : faChevronUp
+                  }
+                />
               </Toggle>
-              <Collapse eventKey={index + ''}>
-                <Body>{component}</Body>
+              <Collapse eventKey={`${index}`}>
+                <Body className={bodyClass}>{component}</Body>
               </Collapse>
             </Card>
           </Accordion>
