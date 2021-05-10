@@ -488,7 +488,7 @@ export default function Results({ setOpenSidebar }) {
           <h4>Examples Queries</h4>
           {examples.map(({ title, external, path }, index) => (
             <div key={index}>
-              <Link to={`visualization/example/${path}`}>
+              <Link to={`/visualization/example/${path}`}>
                 <span className="sr-only">{title + ' link'}</span>
                 {title}
               </Link>
