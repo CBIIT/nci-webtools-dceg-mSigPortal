@@ -1,17 +1,11 @@
-/**
- * Log output from Express JS and R Wrapper
- */
-
-'use strict';
-
-const winston = require('winston');
-const { createLogger, format, transports } = winston;
-const { logs } = require('./config.json');
+const path = require('path');
+const { createLogger, format, transports } = require('winston');
+const { folder, level } = require('./config.json').logs;
 require('winston-daily-rotate-file');
-// winston.emitErrs = true;
+const { Console, DailyRotateFile } = transports;
 
-var logger = new createLogger({
-  level: logs.level || 'info',
+module.exports = new createLogger({
+  level: level || 'info',
   format: format.combine(
     format.errors({ stack: true }), // <-- use errors format
     format.colorize(),
@@ -21,38 +15,25 @@ var logger = new createLogger({
     format.timestamp({
       format: 'YYYY-MM-DD HH:mm:ss',
     }),
-    //
-    // The simple format outputs
-    // `${level}: ${message} ${[Object with everything else]}`
-    //
-    // format.simple(),
-    //
-    // Alternatively you could use this custom printf format if you
-    // want to control where the timestamp comes in your final message.
-    // Try replacing `format.simple()` above with this:
-    //
-    format.printf((info) => {
-      if (info.level === 'error') {
-        return `[${info.timestamp}] [${info.level}] ${info.stack}`;
-      } else {
-        return `[${info.timestamp}] [${info.level}] ${info.message}`;
+    format.printf(({ level, message, timestamp, stack }) => {
+      if (stack) {
+        // print log trace
+        return `[${timestamp}] [${level}] ${message} - ${stack}`;
       }
+      return `[${timestamp}] [${level}] ${message}`;
     })
   ),
   transports: [
-    new transports.DailyRotateFile({
-      filename: logs.folder + '/application-%DATE%.log',
+    new Console(),
+    new DailyRotateFile({
+      filename: path.resolve(folder, 'application-%DATE%.log'),
       datePattern: 'YYYY-MM-DD-HH',
       zippedArchive: false,
       maxSize: '1024m',
       timestamp: true,
       maxFiles: '1d',
       prepend: true,
-      colorize: true,
     }),
-    new transports.Console(),
   ],
   exitOnError: false,
 });
-
-module.exports = logger;
