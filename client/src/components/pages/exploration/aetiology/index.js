@@ -1022,7 +1022,7 @@ export default function Aetiology() {
           <Row className="justify-content-center">{getRefSig()}</Row>
         </div>
         <hr />
-        <div className="mx-auto px-5 py-3">{getCancerSpecificInfo()}</div>
+        <div className="mx-auto p-3">{getCancerSpecificInfo()}</div>
       </div>
     );
   }
