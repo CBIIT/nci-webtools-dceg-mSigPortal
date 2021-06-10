@@ -634,7 +634,7 @@ export default function Aetiology() {
                 (typeof info.Description == 'string' ? (
                   <p>{info.Description}</p>
                 ) : (
-                  info.Description.map((text) => <p>{text}</p>)
+                  info.Description.map((text, i) => <p key={i}>{text}</p>)
                 ))}
 
               {profileURL ? (
@@ -717,7 +717,7 @@ export default function Aetiology() {
                   <Check.Input
                     type="radio"
                     checked={all == false}
-                    onClick={(_) => mergeAetiology({ all: false })}
+                    onChange={() => mergeAetiology({ all: false })}
                   />
                   <Check.Label className="font-weight-normal">
                     Selected Etiology
@@ -727,7 +727,7 @@ export default function Aetiology() {
                   <Check.Input
                     type="radio"
                     checked={all == true}
-                    onClick={(_) => mergeAetiology({ all: true })}
+                    onChange={() => mergeAetiology({ all: true })}
                   />
                   <Check.Label className="font-weight-normal">
                     All Etiologies
@@ -933,7 +933,7 @@ export default function Aetiology() {
               {typeof info.Description == 'string' ? (
                 <p>{info.Description}</p>
               ) : (
-                info.Description.map((text) => <p>{text}</p>)
+                info.Description.map((text, i) => <p key={i}>{text}</p>)
               )}
 
               <Plot
@@ -983,7 +983,7 @@ export default function Aetiology() {
                   <Check.Input
                     type="radio"
                     checked={all == false}
-                    onClick={(_) => mergeAetiology({ all: false })}
+                    onChange={() => mergeAetiology({ all: false })}
                   />
                   <Check.Label className="font-weight-normal">
                     Selected Etiology
@@ -993,7 +993,7 @@ export default function Aetiology() {
                   <Check.Input
                     type="radio"
                     checked={all == true}
-                    onClick={(_) => mergeAetiology({ all: true })}
+                    onChange={() => mergeAetiology({ all: true })}
                   />
                   <Check.Label className="font-weight-normal">
                     All Etiologies
