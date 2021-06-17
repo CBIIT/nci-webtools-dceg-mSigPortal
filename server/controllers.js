@@ -179,26 +179,28 @@ async function getResults(req, res, next) {
   }
 }
 
-async function visualizeR(req, res, next) {
-  logger.info('/visualizeR: function ' + req.body.fn);
-  console.log('args', req.body);
+// Visualization Calculation functions
+async function visualizationCalc(req, res, next) {
+  const { fn, args, projectID } = req.body;
+  logger.debug(`/visualizationCalc: %o`, req.body);
+
+  // create save directory if needed
   const savePath = path.join(
     config.results.folder,
-    req.body.projectID,
+    projectID,
     'results',
-    req.body.fn,
+    fn,
     '/'
   );
-
   fs.mkdirSync(savePath, { recursive: true });
 
   try {
-    const wrapper = await r('services/R/visualizeWrapper.R', req.body.fn, {
-      ...req.body.args,
-      projectID: req.body.projectID,
+    const wrapper = await r('services/R/visualizeWrapper.R', fn, {
+      ...args,
+      projectID: projectID,
       pythonOutput: path.join(
         config.results.folder,
-        req.body.projectID,
+        projectID,
         'results/output'
       ),
       savePath: savePath,
@@ -211,56 +213,31 @@ async function visualizeR(req, res, next) {
     res.json({
       ...rest,
       debugR: stdout,
-      output: getRelativePath(output, req.body.projectID),
+      output: getRelativePath(output, projectID),
     });
   } catch (err) {
-    logger.info('/visualizeR: An error occured');
-    logger.error(err);
+    logger.info(`/visualizationCalc: An error occured with fn:${fn}`);
     res.status(500).json(err.message);
+    next(err);
   }
 }
 
-async function getReferenceSignatureSets(req, res, next) {
-  logger.info('/getReferenceSignatureSets: Calling R Wrapper');
-  console.log('args', req.body);
+// Visualization data/util functions
+async function visualizationData(req, res, next) {
+  const { fn, args } = req.body;
+  logger.debug(`/visualizationData: %o`, req.body);
 
   try {
-    const list = await r(
-      'services/R/visualizeWrapper.R',
-      'getReferenceSignatureSets',
-      {
-        profileType: req.body.profileType,
-        ...dataArgs,
-      }
-    );
-
-    // console.log('SignatureReferenceSets', list);
-
-    res.json(list);
-  } catch (err) {
-    logger.info('/getReferenceSignatureSets: An error occured');
-    logger.error(err);
-    res.status(500).json(err.message);
-  }
-}
-
-async function getSignaturesR(req, res, next) {
-  logger.info('/getSignaturesR: Calling R Wrapper');
-
-  try {
-    const list = await r('services/R/visualizeWrapper.R', 'getSignaturesR', {
-      profileType: req.body.profileType,
-      signatureSetName: req.body.signatureSetName,
+    const data = await r('services/R/visualizeWrapper.R', fn, {
+      ...args,
       ...dataArgs,
     });
 
-    // console.log('signatures', list);
-
-    res.json(list);
+    res.json(data);
   } catch (err) {
-    logger.info('/getSignaturesR: An error occured');
-    logger.error(err);
+    logger.info(`/visualizationData: An error occured with fn:${fn}`);
     res.status(500).json(err.message);
+    next(err);
   }
 }
 
@@ -366,22 +343,22 @@ function download(req, res, next) {
   }
 }
 
-async function explorationR(req, res, next) {
-  logger.info('/explorationR: function ' + req.body.fn);
-  console.log('args', req.body);
-  const projectID = req.body.projectID ? req.body.projectID : uuidv4();
-  const rootDir = path.join(config.results.folder, projectID);
-  const savePath = path.join(rootDir, 'results', req.body.fn, '/');
+async function explorationCalc(req, res, next) {
+  const { fn, args, projectID = uuidv4() } = req.body;
+  logger.debug('/explorationCalc: %o', req.body);
 
+  const rootDir = path.join(config.results.folder, projectID);
+  // create save directory if needed
+  const savePath = path.join(rootDir, 'results', fn, '/');
   fs.mkdirSync(savePath, { recursive: true });
 
   try {
-    const wrapper = await r('services/R/explorationWrapper.R', req.body.fn, {
-      ...req.body.args,
+    const wrapper = await r('services/R/explorationWrapper.R', fn, {
+      ...args,
       projectID: projectID,
       pythonOutput: path.join(
         config.results.folder,
-        req.body.projectID,
+        projectID,
         'results/output'
       ),
       rootDir: rootDir,
@@ -398,25 +375,28 @@ async function explorationR(req, res, next) {
       projectID: projectID,
     });
   } catch (err) {
-    logger.info(req.body.fn + ' failed');
+    logger.info(`/explorationCalc: An error occured with fn:${fn}`);
     res.json({ debugR: err.stderr });
+    next(err);
   }
 }
 
-async function getReferenceSignatureData(req, res, next) {
-  logger.info('/getReferenceSignatures: Request');
+async function explorationData(req, res, next) {
+  const { fn, args } = req.body;
+  logger.debug('/explorationData: %o', req.body);
 
-  const data = await r(
-    'services/R/explorationWrapper.R',
-    'getReferenceSignatureData',
-    {
-      ...req.body,
+  try {
+    const data = await r('services/R/explorationWrapper.R', fn, {
+      args: args,
       ...dataArgs,
-    }
-  ).catch(next);
+    });
 
-  logger.info('/getReferenceSignatures: Success');
-  res.json(JSON.parse(data));
+    res.json(JSON.parse(data));
+  } catch (err) {
+    logger.info(`/explorationData: An error occured with fn:${fn}`);
+    res.json({ debugR: err.stderr });
+    next(err);
+  }
 }
 
 async function submitQueue(req, res, next) {
@@ -578,42 +558,6 @@ async function getVisExample(req, res, next) {
   }
 }
 
-// get signature name options for exploration/exposure
-async function getSignatureNames(req, res, next) {
-  try {
-    const wrapper = await r(
-      'services/R/explorationWrapper.R',
-      'getSignatureNames',
-      {
-        args: req.body.args,
-        ...dataArgs,
-      }
-    );
-
-    res.json(JSON.parse(wrapper));
-  } catch (err) {
-    next(err);
-  }
-}
-
-// get sample name options for exploration/exposure
-async function getSampleNames(req, res, next) {
-  try {
-    const wrapper = await r(
-      'services/R/explorationWrapper.R',
-      'getSampleNames',
-      {
-        args: req.body.args,
-        ...dataArgs,
-      }
-    );
-
-    res.json(JSON.parse(wrapper));
-  } catch (err) {
-    next(err);
-  }
-}
-
 async function getExposureExample(req, res, next) {
   try {
     const { example } = req.params;
@@ -709,20 +653,17 @@ module.exports = {
   profilerExtraction,
   visualizationProfilerExtraction,
   getResults,
-  visualizeR,
-  getReferenceSignatureSets,
-  getSignaturesR,
+  visualizationCalc,
+  visualizationData,
   getSignaturesUser,
   getPublicData,
   upload,
   download,
-  explorationR,
-  getReferenceSignatureData,
+  explorationCalc,
+  explorationData,
   submitQueue,
   getQueueResults,
   getVisExample,
-  getSignatureNames,
-  getSampleNames,
   getExposureExample,
   getPublications,
   getImageS3,

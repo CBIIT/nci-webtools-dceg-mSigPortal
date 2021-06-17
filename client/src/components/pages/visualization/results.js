@@ -347,7 +347,7 @@ export default function Results({ setOpenSidebar }) {
   }
 
   function submitR(fn, args) {
-    return fetch(`api/visualizeR`, {
+    return fetch(`api/visualizationCalc`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -358,13 +358,16 @@ export default function Results({ setOpenSidebar }) {
   }
 
   function getRefSigOptions(profileType) {
-    return fetch(`api/getReferenceSignatureSets`, {
+    return fetch(`api/visualizationData`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ profileType: profileType }),
+      body: JSON.stringify({
+        fn: 'getReferenceSignatureSets',
+        args: { profileType: profileType },
+      }),
     });
   }
 

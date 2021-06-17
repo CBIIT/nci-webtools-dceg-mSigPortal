@@ -16,20 +16,17 @@ app.use('/api', apiRouter);
 const {
   visualizationProfilerExtraction,
   getResults,
-  visualizeR,
-  getReferenceSignatureSets,
-  getSignaturesR,
+  visualizationCalc,
+  visualizationData,
   getSignaturesUser,
   getPublicData,
   upload,
   download,
-  explorationR,
-  getReferenceSignatureData,
+  explorationCalc,
+  explorationData,
   submitQueue,
   getQueueResults,
   getVisExample,
-  getSignatureNames,
-  getSampleNames,
   getExposureExample,
   getPublications,
   getImageS3,
@@ -88,11 +85,9 @@ apiRouter.post('/profilerExtraction', visualizationProfilerExtraction);
 
 apiRouter.post('/getResults', getResults);
 
-apiRouter.post('/visualizeR', visualizeR);
+apiRouter.post('/visualizationCalc', visualizationCalc);
 
-apiRouter.post('/getReferenceSignatureSets', getReferenceSignatureSets);
-
-apiRouter.post('/getSignaturesR', getSignaturesR);
+apiRouter.post('/visualizationData', visualizationData);
 
 apiRouter.post('/getSignaturesUser', getSignaturesUser);
 
@@ -102,19 +97,15 @@ apiRouter.post('/upload', upload);
 
 apiRouter.get('/visualize/download', download);
 
-apiRouter.post('/explorationR', explorationR);
+apiRouter.post('/explorationCalc', explorationCalc);
 
-apiRouter.post('/getReferenceSignatureData', getReferenceSignatureData);
+apiRouter.post('/explorationData', explorationData);
 
 apiRouter.post('/queue', submitQueue);
 
 apiRouter.get('/getQueueResults/:id', getQueueResults);
 
 apiRouter.get('/getVisExample/:example', getVisExample);
-
-apiRouter.post('/getSignatureNames', getSignatureNames);
-
-apiRouter.post('/getSampleNames', getSampleNames);
 
 apiRouter.get('/getExposureExample/:example', getExposureExample);
 

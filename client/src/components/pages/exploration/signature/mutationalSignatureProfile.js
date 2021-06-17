@@ -508,8 +508,8 @@ export default function MutationalSignatureProfile({ submitR }) {
         Below you can enter any “Signature Source”, “Profile Name”, “Reference
         Signature Set”, “Experimental Strategy”, and “Signature Name” to observe
         what the mutational signature profile looks like for that specific
-        signature. Click the “+ Add Plot” button if you would like to look at more
-        than mutational signature profile at a time.
+        signature. Click the “+ Add Plot” button if you would like to look at
+        more than mutational signature profile at a time.
       </p>
       <hr />
       <Form className="p-3">

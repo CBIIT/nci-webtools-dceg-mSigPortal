@@ -11,6 +11,8 @@ module.exports = new createLogger({
     format.colorize(),
     format.timestamp(),
     format.prettyPrint(),
+    format.json(),
+    format.splat(),
     format.label({ label: '[mSigPortal]' }),
     format.timestamp({
       format: 'YYYY-MM-DD HH:mm:ss',

@@ -5,7 +5,10 @@ import ReferenceSignatures from './referenceSignatures';
 import MutationalSignatureProfile from './mutationalSignatureProfile';
 import CosineSimilarity from './cosineSimilarity';
 import MutationalSignatureComparison from './mutationalSignatureComparison';
-import { actions, getInitialState } from '../../../../services/store/exploration';
+import {
+  actions,
+  getInitialState,
+} from '../../../../services/store/exploration';
 
 const { Container, Content, Pane } = Tab;
 const { Item, Link } = Nav;
@@ -23,7 +26,7 @@ export default function Signature() {
   }, []);
 
   function submitR(fn, args) {
-    return fetch(`api/explorationR`, {
+    return fetch(`api/explorationCalc`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',

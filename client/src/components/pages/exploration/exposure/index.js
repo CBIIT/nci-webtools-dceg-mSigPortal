@@ -253,13 +253,14 @@ export default function Exposure({ match }) {
     mergeState({ exposure: { gettingSignatureNames: true } });
     try {
       const { stdout, output } = await (
-        await fetch(`api/getSignatureNames`, {
+        await fetch(`api/explorationData`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
+            fn: 'getSignatureNames',
             args: {
               study: study,
               strategy: strategy,
@@ -288,13 +289,14 @@ export default function Exposure({ match }) {
     mergeState({ exposure: { gettingSampleNames: true } });
     try {
       const { stdout, output } = await (
-        await fetch(`api/getSampleNames`, {
+        await fetch(`api/explorationData`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
+            fn: 'getSampleNames',
             args: {
               study: study,
               strategy: strategy,
@@ -319,7 +321,7 @@ export default function Exposure({ match }) {
 
   async function submitR(fn, args, id = projectID) {
     try {
-      const response = await fetch(`api/explorationR`, {
+      const response = await fetch(`api/explorationCalc`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',

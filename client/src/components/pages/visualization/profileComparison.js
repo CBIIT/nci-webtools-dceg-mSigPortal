@@ -221,15 +221,18 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     if (signatureSetName) {
       mergeProfileComparison({ refSubmitOverlay: true });
       try {
-        const response = await fetch(`api/getSignaturesR`, {
+        const response = await fetch(`api/visualizationData`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            profileType: profileType,
-            signatureSetName: signatureSetName,
+            fn: 'getSignatureNames',
+            args: {
+              profileType: profileType,
+              signatureSetName: signatureSetName,
+            },
           }),
         });
 
