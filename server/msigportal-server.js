@@ -69,13 +69,11 @@ function childProcess() {
   server.headersTimeout = 62 * 1000;
 }
 
-// serve public folder during local development
-if (process.env.NODE_ENV !== 'production')
-  // app.use(express.static(config.server.static));
-  app.use(express.static(path.resolve('www')));
+// app.use(express.static(config.server.static));
+app.use(express.static(path.resolve('www')));
 
 apiRouter.use('/results', express.static(config.results.folder));
-apiRouter.use('/public', express.static(config.data.localDatabase));
+// apiRouter.use('/public', express.static(config.data.localData));
 apiRouter.use(express.json());
 
 apiRouter.use((error, req, res, next) => {

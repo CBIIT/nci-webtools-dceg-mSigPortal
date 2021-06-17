@@ -8,8 +8,6 @@ const config = require('./config.json');
 const logger = require('./logger');
 const { profilerExtraction, parseCSV } = require('./controllers');
 
-const production = process.env.NODE_ENV === 'production';
-
 (async function main() {
   // update aws configuration if all keys are supplied, otherwise
   // fall back to default credentials/IAM role
@@ -132,10 +130,9 @@ async function processMessage(params) {
         projectID: id,
         pythonOutput: path.join(directory, 'results/output'),
         savePath: savePath,
-        dataPath: production
-          ? config.data.database
-          : path.join(config.data.localDatabase),
-        bucket: production ? config.data.bucket : '',
+        s3Data: config.data.s3,
+        localData: path.join(config.data.localData),
+        bucket: config.data.bucket,
       }
     );
     // const { stdout: rStdout } = JSON.parse(wrapper);

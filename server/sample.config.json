@@ -10,32 +10,30 @@
     "folder": "../tmp"
   },
   "aws": {
-    "region": "region",
-    "aws_access_key_id": "",
-    "aws_secret_access_key": ""
+    "region": ""
   },
   "data": {
     "folder": "../data",
     "examples": "../data/Examples/",
-    "localDatabase": "../data/Database/",
-    "database": "msigportal/Database/",
-    "bucket": "dataBucket"
+    "localData": "../data/Database/",
+    "s3": "msigportal/Database/",
+    "bucket": ""
   },
   "queue": {
-    "url": "sqsName",
-    "bucket": "queueBucket",
-    "inputKeyPrefix": "msigportal/input/",
-    "outputKeyPrefix": "msigportal/output/",
-    "errorUrl": "sqsName",
+    "url": "",
+    "bucket": "",
+    "inputKeyPrefix": "msigportal/queue/",
+    "outputKeyPrefix": "msigportal/queue/",
+    "errorUrl": "",
     "visibilityTimeout": 30,
     "pollInterval": 60
   },
   "email": {
-    "admin": "admin",
-    "sender": "sender",
+    "admin": "",
+    "sender": "",
     "baseUrl": "http://localhost:3000",
     "smtp": {
-      "host": "host",
+      "host": "",
       "port": 25
     }
   }
