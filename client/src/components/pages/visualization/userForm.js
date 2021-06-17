@@ -622,7 +622,7 @@ export default function UserForm() {
       <hr className="mb-3" />
       <div>
         <LoadingOverlay active={false} content={'Work in progress...'} />
-        <Group controlId="toggleQueue">
+        <Group controlId="toggleQueue" className="d-flex">
           <Label className="mr-auto">Submit this job to a Queue</Label>{' '}
           <Check inline>
             <Check.Input
