@@ -41,7 +41,7 @@ getPublicData <- function(study, cancerType, experimentalStrategy, s3Data, local
 
   s3load(paste0(s3Data, 'Seqmatrix/', infoFile), bucket)
 
-  svgfiles <- seqmatrix_refdata_info %>% mutate(Path = paste0(s3Data, localData, 'Seqmatrix/', Path))
+  svgfiles <- seqmatrix_refdata_info %>% mutate(Path = paste0(s3Data, 'Seqmatrix/', Path))
   if (cancerType == 'PanCancer') {
     svgfiles_public <- svgfiles %>% filter(Study == study, Dataset == experimentalStrategy)
   } else {
@@ -106,7 +106,7 @@ profilerSummaryPublic <- function(study, cancerType, experimentalStrategy, proje
     plotPath = paste0(savePath, 'profilerSummaryPublic.svg')
 
     publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
-    file <- get_object(paste0(s3Data, localData, 'Seqmatrix/', publicDataFile), bucket)
+    file <- get_object(paste0(s3Data, 'Seqmatrix/', publicDataFile), bucket)
     seqmatrix_refdata_public <- get(load(rawConnection(file)))
 
     data_input <- seqmatrix_refdata_public %>%
@@ -174,7 +174,7 @@ cosineSimilarityWithinPublic <- function(profileType, matrixSize, study, cancerT
 
     publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
 
-    file <- get_object(paste0(s3Data, localData, 'Seqmatrix/', publicDataFile), bucket)
+    file <- get_object(paste0(s3Data, 'Seqmatrix/', publicDataFile), bucket)
     seqmatrix_refdata_public <- get(load(rawConnection(file)))
 
 
@@ -263,7 +263,7 @@ cosineSimilarityRefSigPublic <- function(profileType, signatureSetName, study, c
       pivot_wider(names_from = Signature_name, values_from = Contribution)
 
     publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
-    file <- get_object(paste0(s3Data, localData, 'Seqmatrix/', publicDataFile), bucket)
+    file <- get_object(paste0(s3Data, 'Seqmatrix/', publicDataFile), bucket)
     seqmatrix_refdata_public <- get(load(rawConnection(file)))
 
 
@@ -311,7 +311,7 @@ cosineSimilarityPublic <- function(matrixFile, study, cancerType, profileName, p
 
     ## seqmatrix data from public data
     publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType) %>% pull(file)
-    file <- get_object(paste0(s3Data, localData, 'Seqmatrix/', publicDataFile), bucket)
+    file <- get_object(paste0(s3Data, 'Seqmatrix/', publicDataFile), bucket)
     publicData <- get(load(rawConnection(file)))
 
 
@@ -395,7 +395,7 @@ profileComparisonWithinPublic <- function(profileType, sampleName1, sampleName2,
     profile_name <- paste0(profileType, matrix_size)
 
     publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
-    file <- get_object(paste0(s3Data, localData, 'Seqmatrix/', publicDataFile), bucket)
+    file <- get_object(paste0(s3Data, 'Seqmatrix/', publicDataFile), bucket)
     seqmatrix_refdata_public <- get(load(rawConnection(file)))
 
 
@@ -501,7 +501,7 @@ profileComparisonRefSigPublic <- function(profileType, sampleName, signatureSetN
       profile2 <- refsig %>% select(MutationType, one_of(compare))
     }
     publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
-    file <- get_object(paste0(s3Data, localData, 'Seqmatrix/', publicDataFile), bucket)
+    file <- get_object(paste0(s3Data, 'Seqmatrix/', publicDataFile), bucket)
     seqmatrix_refdata_public <- get(load(rawConnection(file)))
 
 
@@ -544,7 +544,7 @@ profileComparisonPublic <- function(profileName, matrixFile, userSample, study, 
 
     ## seqmatrix data from public data
     publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType) %>% pull(file)
-    file <- get_object(paste0(s3Data, localData, 'Seqmatrix/', publicDataFile), bucket)
+    file <- get_object(paste0(s3Data, 'Seqmatrix/', publicDataFile), bucket)
     publicData <- get(load(rawConnection(file)))
 
 
@@ -643,10 +643,10 @@ mutationalPatternPublic <- function(study, cancerType, experimentalStrategy, pro
 
     if (cancerType != "PanCancer") {
       publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
-      file <- get_object(paste0(s3Data, localData, 'Seqmatrix/', publicDataFile), bucket)
+      file <- get_object(paste0(s3Data, 'Seqmatrix/', publicDataFile), bucket)
       seqmatrix_refdata <- get(load(rawConnection(file))) %>% filter(Study == study)
     } else {
-      file <- get_object(paste0(s3Data, localData, 'Seqmatrix/seqmatrix_refdata.RData'), bucket)
+      file <- get_object(paste0(s3Data, 'Seqmatrix/seqmatrix_refdata.RData'), bucket)
       seqmatrix_refdata <- get(load(rawConnection(file))) %>% filter(Study == study)
 
     }
@@ -798,7 +798,7 @@ pcaPublic <- function(profileType, signatureSetName, study, cancerType, experime
     matrix_size <- if_else(profileType == "SBS", "96", if_else(profileType == "DBS", "78", if_else(profileType == "ID", "83", NA_character_)))
 
     publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
-    file <- get_object(paste0(s3Data, localData, 'Seqmatrix/', publicDataFile), bucket)
+    file <- get_object(paste0(s3Data, 'Seqmatrix/', publicDataFile), bucket)
     seqmatrix_refdata_public <- get(load(rawConnection(file)))
 
     data_input <- seqmatrix_refdata_public %>% filter(Profile == profile_name) %>%
@@ -902,7 +902,7 @@ pcaWithPublic <- function(matrixFile, study, cancerType, profileName, projectID,
 
     ## seqmatrix data from public data
     publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType) %>% pull(file)
-    file <- get_object(paste0(s3Data, localData, 'Seqmatrix/', publicDataFile), bucket)
+    file <- get_object(paste0(s3Data, 'Seqmatrix/', publicDataFile), bucket)
     publicData <- get(load(rawConnection(file)))
 
     data_input2 <- publicData %>% filter(Profile == profileName) %>%
@@ -996,7 +996,6 @@ kataegis <- function(sample, highlight, min, max, chromosome, projectID, pythonO
 
       genome_build <- mutation_data$genome_build[1]
       mutdata <- mutation_data %>% filter(sample == sample) %>% dplyr::select(chr, pos, ref, alt)
-      print(paste0(localData, 'Others'))
       kataegis_result <- kataegis_rainfall_plot(mutdata, sample_name = sample, genome_build = genome_build, reference_data_folder = paste0(localData, 'Others'), chromsome = chromosome, kataegis_highligh = highlight, min.mut = min, max.dis = max, filename = kataegis)
 
       if (is.data.frame(kataegis_result)) {

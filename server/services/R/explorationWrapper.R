@@ -148,7 +148,7 @@ mutationalProfiles <- function(signatureSource, profileName, refSignatureSet, ex
   tryCatch({
     output = list()
 
-    path_profile <- paste0(s3Data, localData, 'Signature/Reference_Signature_Profiles_SVG/')
+    path_profile <- paste0(s3Data, 'Signature/Reference_Signature_Profiles_SVG/')
     signature_profile_files <- signature_refsets %>% select(Source, Profile, Signature_set_name, Dataset, Signature_name) %>% unique() %>% mutate(Path = str_replace_all(Signature_set_name, " ", "_"), Path = str_remove_all(Path, "[()]"), Path = paste0(path_profile, Path, "/", Signature_name, ".svg"))
     svgfile_selected <- signature_profile_files %>%
       filter(Source == signatureSource, Profile == profileName, Signature_set_name == refSignatureSet, Dataset == experimentalStrategy, Signature_name == signatureName) %>% pull(Path)
@@ -339,7 +339,7 @@ mutationalSignatureDecomposition <- function(plotPath, s3Data, localData, exposu
   } else {
     decompsite_input <- decompsite_input %>% separate(col = Sample_Names, into = c('Cancer_Type', 'Sample'), sep = '@')
     decompsite_distribution(decompsite = decompsite_input, output_plot = plotPath) # put the distribution plot online.
-    decompsite_input %>% write_delim(s3Data, localData, delim = '\t', col_names = T) ## put the link to download this table
+    decompsite_input %>% write_delim(s3Data, delim = '\t', col_names = T) ## put the link to download this table
   }
 }
 
@@ -495,7 +495,7 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
 
     seqmatrix_refdata_selected = NULL
 
-    file <- get_object(paste0(s3Data, localData, 'Seqmatrix/', seqmatrixFile), bucket)
+    file <- get_object(paste0(s3Data, 'Seqmatrix/', seqmatrixFile), bucket)
     seqmatrix_refdata_selected <- get(load(rawConnection(file)))
 
     seqmatrix_refdata_selected = seqmatrix_refdata_selected %>% filter(Profile == signature_refsets_selected$Profile[1])
