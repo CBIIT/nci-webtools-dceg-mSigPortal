@@ -228,7 +228,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            fn: 'getSignatureNames',
+            fn: 'getSignaturesR',
             args: {
               profileType: profileType,
               signatureSetName: signatureSetName,
