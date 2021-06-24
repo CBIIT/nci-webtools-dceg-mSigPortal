@@ -38,6 +38,8 @@ getPublicData <- function(study, cancerType, experimentalStrategy, s3Data, local
   if (study == 'PCAWG') { infoFile = 'PCAWG_WGS_seqmatrix_refdata_info.RData' }
   else if (study == 'TCGA') { infoFile = "TCGA_WES_seqmatrix_refdata_info.RData" }
   else if (study == 'Breast560') { infoFile = 'Breast560_WGS_seqmatrix_refdata_info.RData' }
+  else if (study == 'Sherlock-Lung-v1') { infoFile = 'Sherlock-Lung-v1_WGS_seqmatrix_refdata_info.RData' }
+  else if (study == 'ChernobylThyroid') { infoFile = 'ChernobylThyroid_WGS_seqmatrix_refdata_info.RData' }
 
   s3load(paste0(s3Data, 'Seqmatrix/', infoFile), bucket)
 
