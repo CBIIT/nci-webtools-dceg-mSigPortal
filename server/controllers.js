@@ -130,7 +130,6 @@ async function profilerExtraction(params) {
 }
 
 async function visualizationProfilerExtraction(req, res, next) {
-  req.setTimeout(15 * 60 * 1000);
   res.setTimeout(15 * 60 * 1000, () => {
     res.status(504).send('request timed out');
   });
