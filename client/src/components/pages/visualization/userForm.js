@@ -394,10 +394,12 @@ export default function UserForm() {
               isInvalid={checkValid ? !validFile : false}
               feedback="Please upload a data file"
               onChange={(e) => {
-                setInput(e.target.files[0]);
-                mergeVisualize({
-                  storeFilename: e.target.files[0].name,
-                });
+                if (e.target.files.length) {
+                  setInput(e.target.files[0]);
+                  mergeVisualize({
+                    storeFilename: e.target.files[0].name,
+                  });
+                }
               }}
               custom
             />
@@ -571,10 +573,12 @@ export default function UserForm() {
               }
               accept=".bed"
               onChange={(e) => {
-                setBed(e.target.files[0]);
-                mergeVisualize({
-                  bedFilename: e.target.files[0].name,
-                });
+                if (e.target.files.length) {
+                  setBed(e.target.files[0]);
+                  mergeVisualize({
+                    bedFilename: e.target.files[0].name,
+                  });
+                }
               }}
               custom
             />

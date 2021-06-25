@@ -1335,10 +1335,12 @@ export default function Exposure({ match }) {
                         isInvalid={checkValid ? !exposureValidity : false}
                         feedback="Upload an exposure file"
                         onChange={(e) => {
-                          setExposure(e.target.files[0]);
-                          mergeExposure({
-                            exposureFile: e.target.files[0].name,
-                          });
+                          if (e.target.files.length) {
+                            setExposure(e.target.files[0]);
+                            mergeExposure({
+                              exposureFile: e.target.files[0].name,
+                            });
+                          }
                         }}
                         custom
                       />
@@ -1357,10 +1359,12 @@ export default function Exposure({ match }) {
                         isInvalid={checkValid ? !matrixValidity : false}
                         feedback="Upload a matrix file"
                         onChange={(e) => {
-                          setMatrix(e.target.files[0]);
-                          mergeExposure({
-                            matrixFile: e.target.files[0].name,
-                          });
+                          if (e.target.files.length) {
+                            setMatrix(e.target.files[0]);
+                            mergeExposure({
+                              matrixFile: e.target.files[0].name,
+                            });
+                          }
                         }}
                         custom
                       />
@@ -1432,10 +1436,12 @@ export default function Exposure({ match }) {
                           isInvalid={checkValid ? !signatureValidity : false}
                           feedback="Upload a signature file"
                           onChange={(e) => {
-                            setSignature(e.target.files[0]);
-                            mergeExposure({
-                              signatureFile: e.target.files[0].name,
-                            });
+                            if (e.target.files.length) {
+                              setSignature(e.target.files[0]);
+                              mergeExposure({
+                                signatureFile: e.target.files[0].name,
+                              });
+                            }
                           }}
                           custom
                         />
