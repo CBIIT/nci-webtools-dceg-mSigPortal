@@ -183,7 +183,7 @@ export default function MutationalSignatureProfile({ submitR }) {
     mergeSigMutationalSigComparison({
       refSignatureSet2: set,
       signatureName2: signatureNameOptions[0],
-      signatureNameOptions2: signatureNameOptions2,
+      signatureNameOptions2: signatureNameOptions,
     });
   }
 
