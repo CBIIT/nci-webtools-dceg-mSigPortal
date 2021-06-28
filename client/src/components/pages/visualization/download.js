@@ -11,12 +11,18 @@ export default function Download() {
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const { projectID, downloads, statistics } = visualization.results;
+  const {
+    source,
+    study,
+    experimentalStrategy,
+    cancerType,
+  } = visualization.visualize;
   const [downloading, setDownload] = useState([]);
 
   async function downloadOutput(file) {
     setDownload((downloading) => [...downloading, file]);
     const response = await fetch(
-      `api/visualize/download?id=${projectID}&file=${file}`
+      `api/visualization/download?id=${projectID}&file=${file}`
     );
     if (response.ok) {
       const objectURL = URL.createObjectURL(await response.blob());
@@ -32,33 +38,83 @@ export default function Download() {
     }
     setDownload((downloading) => downloading.filter((item) => item != file));
   }
+
+  async function downloadPublic() {
+    setDownload([1]);
+    const response = await fetch(`api/visualization/downloadPublic`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        fn: 'downloadPublicData',
+        args: {
+          id: projectID,
+          study: study,
+          cancerType: cancerType,
+          experimentalStrategy: experimentalStrategy,
+        },
+      }),
+    });
+
+    if (response.ok) {
+      const objectURL = URL.createObjectURL(await response.blob());
+      const tempLink = document.createElement('a');
+
+      tempLink.href = `${objectURL}`;
+      tempLink.setAttribute(
+        'download',
+        `results/msigportal-${study}-${cancerType}-${experimentalStrategy}`
+      );
+      document.body.appendChild(tempLink);
+      tempLink.click();
+      document.body.removeChild(tempLink);
+    } else {
+      mergeError(`public data is not available`);
+    }
+    setDownload([]);
+  }
+
   return (
     <div className="bg-white border rounded p-4">
-      {statistics.length > 0 ? (
-        <div>
-          <p>{statistics}</p>
-          <p>
-            Using the following links to download different mutational profiles,
-            plots and the mapping information between mutation and each mutation
-            type.
-          </p>
-        </div>
-      ) : (
-        <p>No statistics available</p>
-      )}
-      {downloads.length > 0 ? (
-        <div>
-          {downloads.map((file) => (
-            <div key={file}>
-              <Button variant="link" onClick={() => downloadOutput(file)}>
-                <LoadingOverlay active={downloading.indexOf(file) != -1} />
-                Download {file.split('.')[0]}
-              </Button>
+      {source == 'user' ? (
+        <>
+          {statistics.length > 0 ? (
+            <div>
+              <p>{statistics}</p>
+              <p>
+                Using the following links to download different mutational
+                profiles, plots and the mapping information between mutation and
+                each mutation type.
+              </p>
             </div>
-          ))}
-        </div>
+          ) : (
+            <p>No statistics available</p>
+          )}
+          {downloads.length > 0 ? (
+            <div>
+              {downloads.map((file) => (
+                <div key={file}>
+                  <Button variant="link" onClick={() => downloadOutput(file)}>
+                    <LoadingOverlay active={downloading.indexOf(file) != -1} />
+                    Download {file.split('.')[0]}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p>No files available</p>
+          )}
+        </>
       ) : (
-        <p>No files available</p>
+        <div>
+          <Button variant="link" onClick={() => downloadPublic()}>
+            <LoadingOverlay active={downloading.length > 0} />
+            Download matrixes of different mutational profiles for selected
+            study
+          </Button>
+        </div>
       )}
     </div>
   );

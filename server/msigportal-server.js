@@ -21,7 +21,8 @@ const {
   getSignaturesUser,
   getPublicData,
   upload,
-  download,
+  visualizationDownload,
+  visualizationDownloadPublic,
   explorationCalc,
   explorationData,
   submitQueue,
@@ -95,7 +96,9 @@ apiRouter.post('/getPublicData', getPublicData);
 
 apiRouter.post('/upload', upload);
 
-apiRouter.get('/visualize/download', download);
+apiRouter.get('/visualization/download', visualizationDownload);
+
+apiRouter.post('/visualization/downloadPublic', visualizationDownloadPublic);
 
 apiRouter.post('/explorationCalc', explorationCalc);
 

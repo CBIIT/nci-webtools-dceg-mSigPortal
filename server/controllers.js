@@ -324,8 +324,10 @@ function upload(req, res, next) {
   form.parse(req);
 }
 
-function download(req, res, next) {
-  logger.info(`/visualize/download: id:${req.query.id} file:${req.query.file}`);
+function visualizationDownload(req, res, next) {
+  logger.info(
+    `/visualization/download: id:${req.query.id} file:${req.query.file}`
+  );
   const file = path.resolve(
     path.join(
       config.results.folder,
@@ -339,6 +341,45 @@ function download(req, res, next) {
   } else {
     logger.info('traversal error');
     res.status(500).end('Not found');
+  }
+}
+
+// Generate public data files for download
+async function visualizationDownloadPublic(req, res, next) {
+  logger.info(`/visualization/downloadPublic`);
+  const { id, ...args } = req.body.args;
+  const { study, cancerType, experimentalStrategy } = args;
+  const savePath = path.join(
+    config.results.folder,
+    id,
+    `results/msigportal-${study}-${cancerType}-${experimentalStrategy}`
+  );
+
+  try {
+    await r('services/R/visualizeWrapper.R', 'downloadPublicData', {
+      ...args,
+      ...dataArgs,
+      savePath,
+    });
+
+    const file = path.resolve(
+      path.join(
+        config.results.folder,
+        id,
+        `results/msigportal-${study}-${cancerType}-${experimentalStrategy}.tar.gz`
+      )
+    );
+
+    if (file.indexOf(path.resolve(config.results.folder)) == 0) {
+      res.download(file);
+    } else {
+      logger.error('visualizationDownloadPublic failed');
+      res.status(500).end('Not found');
+    }
+  } catch (err) {
+    logger.error(err);
+    res.status(500).json(err.message);
+    next(err);
   }
 }
 
@@ -657,7 +698,8 @@ module.exports = {
   getSignaturesUser,
   getPublicData,
   upload,
-  download,
+  visualizationDownload,
+  visualizationDownloadPublic,
   explorationCalc,
   explorationData,
   submitQueue,

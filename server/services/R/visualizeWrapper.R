@@ -1023,3 +1023,18 @@ kataegis <- function(sample, highlight, min, max, chromosome, projectID, pythonO
     return(toJSON(list('stdout' = stdout, 'output' = output, 'errors' = errors, 'data' = kataegisJSON), pretty = TRUE, auto_unbox = TRUE))
   })
 }
+
+downloadPublicData <- function(cancerType, experimentalStrategy, study, savePath, s3Data, localData, bucket) {
+  source('services/R/Sigvisualfunc.R')
+  s3load(paste0(s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), bucket)
+
+  publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% pull(file)
+  file <- get_object(paste0(s3Data, 'Seqmatrix/', publicDataFile), bucket)
+  seqmatrix_refdata_public <- get(load(rawConnection(file)))
+
+  # delcare variables for download fn
+  study <<- study
+  cancer_type <<- cancerType
+
+  seqmatrix_public_download(seqmatrix_refdata_public, savePath)
+}
