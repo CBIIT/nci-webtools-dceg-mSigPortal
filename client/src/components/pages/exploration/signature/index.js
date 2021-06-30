@@ -5,6 +5,7 @@ import ReferenceSignatures from './referenceSignatures';
 import MutationalSignatureProfile from './mutationalSignatureProfile';
 import CosineSimilarity from './cosineSimilarity';
 import MutationalSignatureComparison from './mutationalSignatureComparison';
+import Download from './download';
 import {
   actions,
   getInitialState,
@@ -68,6 +69,11 @@ export default function Signature() {
       ),
       key: 'mutationalSignatureComparison',
       title: 'Mutational Signatures Comparisons',
+    },
+    {
+      component: <Download />,
+      key: 'download',
+      title: 'Download',
     },
   ];
 
