@@ -95,6 +95,37 @@ getSampleNames <- function(args, s3Data, localData, bucket) {
   })
 }
 
+exposureDownload <- function(study, strategy, refSignatureSet, cancerType, projectID, pythonOutput, rootDir, savePath, s3Data, localData, bucket) {
+  s3load(paste0(s3Data, 'Exposure/exposure_refdata.RData'), bucket)
+
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+    exposure_refdata_selected <- exposure_refdata %>% filter(Study == study, Dataset == strategy, Signature_set_name == refSignatureSet, Cancer_Type == cancerType)
+
+    dfile_name <- paste(study, strategy, cancerType, str_remove_all(str_remove_all(refSignatureSet, '\\('), '\\)'), 'exposure_data.txt.gz', sep = '_')
+    dfile_name <- str_replace_all(dfile_name, ' +', '_')
+    filepath = paste0(savePath, '/', dfile_name)
+    exposure_refdata_input <- exposure_refdata_selected
+    exposure_refdata_input %>%
+      select(Sample, Signature_name, Exposure) %>%
+      pivot_wider(names_from = Signature_name, values_from = Exposure) %>%
+      write_delim(file = filepath, delim = '\t', col_names = T)
+
+
+    output = list(path = filepath, filename = dfile_name)
+  }, error = function(e) {
+    print(e)
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(list('stdout' = stdout, 'output' = output), auto_unbox = TRUE))
+  })
+}
+
 # Signature Explore -------------------------------------------------------
 # section 1: Current reference signatures in mSigPortal -------------------
 referenceSignatures <- function(projectID, pythonOutput, rootDir, savePath, s3Data, localData, bucket) {

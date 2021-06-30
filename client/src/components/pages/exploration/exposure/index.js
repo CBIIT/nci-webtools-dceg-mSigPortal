@@ -9,6 +9,7 @@ import MsDecomposition from './msDecomposition';
 import MsLandscape from './msLandscape';
 import MsPrevalence from './msPrevalence';
 import MSIndividual from './msIndividual';
+import Download from './download';
 import {
   actions as explorationActions,
   getInitialState,
@@ -330,7 +331,7 @@ export default function Exposure({ match }) {
         body: JSON.stringify({
           fn: fn,
           args: args,
-          projectID: id,
+          id,
         }),
       });
 
@@ -986,6 +987,33 @@ export default function Exposure({ match }) {
     mergeMsLandscape({ variableFile: file.name });
   }
 
+  async function exposureDownload() {
+    try {
+      const { output, projectID, debugR } = await submitR('exposureDownload', {
+        study: study,
+        strategy: strategy,
+        refSignatureSet: refSignatureSet,
+        cancerType: cancer,
+      });
+
+      const file = await fetch(`api/results/${projectID}${output.path}`);
+      if (file.ok) {
+        const objectURL = URL.createObjectURL(await file.blob());
+        const tempLink = document.createElement('a');
+
+        tempLink.href = `${objectURL}`;
+        tempLink.setAttribute('download', output.filename);
+        document.body.appendChild(tempLink);
+        tempLink.click();
+        document.body.removeChild(tempLink);
+      } else {
+        mergeError(`public data is not available`);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   const tabs = [
     {
       component: <TMB calculateTMB={calculateTMB} />,
@@ -1048,6 +1076,15 @@ export default function Exposure({ match }) {
       name: 'MS Individual',
       title: 'Mutational Signature in Individual Sample',
     },
+    source == 'public' ? (
+      {
+        component: <Download exposureDownload={exposureDownload} />,
+        key: 'download',
+        name: 'Download',
+      }
+    ) : (
+      <></>
+    ),
   ];
 
   const queries = [
@@ -1518,12 +1555,7 @@ export default function Exposure({ match }) {
               style={{ overflowX: 'auto' }}
             >
               {tabs.map(({ key, component }) => (
-                <Pane
-                  key={key}
-                  eventKey={key}
-                  className="border-0"
-                  style={{ minHeight: '7rem' }}
-                >
+                <Pane key={key} eventKey={key} className="border-0">
                   <LoadingOverlay
                     active={loading}
                     content={loadingMsg}

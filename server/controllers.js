@@ -385,7 +385,7 @@ async function visualizationDownloadPublic(req, res, next) {
 
 async function explorationCalc(req, res, next) {
   const { fn, args, projectID = uuidv4() } = req.body;
-  logger.debug('/explorationCalc: %o', req.body);
+  logger.debug('/explorationCalc: %o', { ...req.body, projectID });
 
   const rootDir = path.join(config.results.folder, projectID);
   // create save directory if needed
@@ -411,7 +411,7 @@ async function explorationCalc(req, res, next) {
     res.json({
       ...rest,
       debugR: stdout,
-      output: getRelativePath(output, projectID),
+      output: { ...output, ...getRelativePath(output, projectID) },
       projectID: projectID,
     });
   } catch (err) {
