@@ -65,7 +65,7 @@ export default function Download() {
       tempLink.href = `${objectURL}`;
       tempLink.setAttribute(
         'download',
-        `results/msigportal-${study}-${cancerType}-${experimentalStrategy}`
+        `msigportal-${study}-${cancerType}-${experimentalStrategy}`
       );
       document.body.appendChild(tempLink);
       tempLink.click();
