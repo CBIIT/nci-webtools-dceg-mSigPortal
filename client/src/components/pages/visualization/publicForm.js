@@ -136,7 +136,7 @@ export default function PublicForm() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            path: `msigportal/Database/Others/json/Visualization-Public.json`,
+            path: `Others/json/Visualization-Public.json`,
           }),
         })
       ).json();

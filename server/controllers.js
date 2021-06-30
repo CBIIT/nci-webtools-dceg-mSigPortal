@@ -676,12 +676,12 @@ async function getImageS3(req, res, next) {
 
 async function getFileS3(req, res, next) {
   // serve static files from s3
-  const key = req.body.path;
+  const { path } = req.body;
   const s3 = new AWS.S3();
 
   s3.getObject({
     Bucket: config.data.bucket,
-    Key: key,
+    Key: `msigportal/Database/${path}`,
   })
     .createReadStream()
     .on('error', next)

@@ -10,7 +10,6 @@ import { actions as modalActions } from '../../../services/store/modal';
 import Signature from './signature/index';
 import Exposure from './exposure';
 import Aetiology from './aetiology';
-import Download from './download';
 import './exploration.scss';
 
 const actions = { ...explorationActions, ...modalActions };
@@ -58,12 +57,10 @@ export default function Explore() {
         exposureSignature,
         signatureNames,
       ] = await Promise.all([
-        getFileS3(`msigportal/Database/Others/json/Exploring-Signature.json`),
-        getFileS3(
-          'msigportal/Database/Others/json/Exploring-Exposure-cancertype.json'
-        ),
-        getFileS3('msigportal/Database/Others/json/Exploring-Exposure.json'),
-        getFileS3('msigportal/Database/Others/json/Signature_name.json'),
+        getFileS3(`Others/json/Exploring-Signature.json`),
+        getFileS3('Others/json/Exploring-Exposure-cancertype.json'),
+        getFileS3('Others/json/Exploring-Exposure.json'),
+        getFileS3('Others/json/Signature_name.json'),
       ]);
 
       populateSignatureExp(signatureData);
@@ -267,7 +264,6 @@ export default function Explore() {
     { name: 'Etiology', id: 'etiology' },
     { name: 'Signature', id: 'signature' },
     { name: 'Exposure', id: 'exposure' },
-    { name: 'Download', id: 'download' },
   ];
 
   return (
@@ -337,7 +333,6 @@ export default function Explore() {
               <Exposure {...props} populateControls={populateControls} />
             )}
           />
-          <Route path="/exploration/download" component={Download} />
         </div>
       </div>
     </div>

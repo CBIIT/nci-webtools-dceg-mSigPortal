@@ -70,7 +70,7 @@ export default function Aetiology() {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              path: `msigportal/Database/Aetiology/${file}`,
+              path: `Aetiology/${file}`,
             }),
           })
         ).json();
