@@ -29,8 +29,8 @@
     "pollInterval": 60
   },
   "email": {
+    "support": "",
     "admin": "",
-    "sender": "",
     "baseUrl": "http://localhost:3000",
     "smtp": {
       "host": "",
