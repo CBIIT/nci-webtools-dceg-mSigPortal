@@ -4,15 +4,15 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
 import Select from '../../controls/select/select';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as visualizationActions } from '../../../services/store/visualization';
+import { actions as modalActions } from '../../../services/store/modal';
 import {
   value2d,
   filter2d,
   unique2d,
   defaultMatrix,
 } from '../../../services/utils';
-import { useSelector, useDispatch } from 'react-redux';
-import { actions as visualizationActions } from '../../../services/store/visualization';
-import { actions as modalActions } from '../../../services/store/modal';
 
 const actions = { ...visualizationActions, ...modalActions };
 const { Container, Content, Pane } = Tab;
@@ -47,10 +47,6 @@ export default function PCA({ submitR, getRefSigOptions }) {
     pca2Data,
     pca3Data,
     heatmapData,
-    pca1URL,
-    pca2URL,
-    pca3URL,
-    heatmapURL,
     pcaErr,
     debugR,
     submitOverlay,
@@ -65,9 +61,6 @@ export default function PCA({ submitR, getRefSigOptions }) {
     pubPca3,
     pubPca2Data,
     pubPca3Data,
-    pubPca1URL,
-    pubPca2URL,
-    pubPca3URL,
     display,
     pubPcaErr,
     pubSubmitOverlay,
@@ -101,44 +94,10 @@ export default function PCA({ submitR, getRefSigOptions }) {
     }
   }, [svgList]);
 
-  useEffect(() => {
-    pca1 ? setRPlot(pca1, 'pca1') : clearPlot('pca1');
-    pca2 ? setRPlot(pca2, 'pca2') : clearPlot('pca2');
-    pca3 ? setRPlot(pca3, 'pca3') : clearPlot('pca3');
-    heatmap ? setRPlot(heatmap, 'heatmap') : clearPlot('heatmap');
-    pubPca1 ? setRPlot(pubPca1, 'pubPca1') : clearPlot('pubPca1');
-    pubPca2 ? setRPlot(pubPca2, 'pubPca2') : clearPlot('pubPca2');
-    pubPca3 ? setRPlot(pubPca3, 'pubPca3') : clearPlot('pubPca3');
-  }, [pca1, pca2, pca3, heatmap, pubPca1, pubPca2, pubPca3]);
-
   function setOverlay(type, status) {
     type == 'within'
       ? mergePCA({ submitOverlay: status })
       : mergePCA({ pubSubmitOverlay: status });
-  }
-
-  async function setRPlot(plotPath, type) {
-    try {
-      const response = await fetch(`api/results/${projectID}${plotPath}`);
-
-      if (!response.ok) {
-        // console.log(await response.json());
-      } else {
-        const pic = await response.blob();
-        const objectURL = URL.createObjectURL(pic);
-
-        if (visualization.pca[`${type}URL`])
-          URL.revokeObjectURL(visualization.pca[`${type}URL`]);
-        mergePCA({ [`${type}URL`]: objectURL });
-      }
-    } catch (err) {
-      mergeError(err.message);
-    }
-  }
-
-  function clearPlot(type) {
-    URL.revokeObjectURL(visualization.pca[`${type}URL`]);
-    mergePCA({ [`${type}URL`]: '' });
   }
 
   // get Signature Reference Sets for dropdown options
@@ -365,13 +324,13 @@ export default function PCA({ submitR, getRefSigOptions }) {
             </div>
           )}
 
-          {pca1URL && (
+          {pca1 && (
             <div id="pca1Plot">
               <hr />
               <Plot
                 className="p-3"
                 downloadName={pca1.split('/').slice(-1)[0]}
-                plotURL={pca1URL}
+                plotPath={'api/results/' + projectID + pca1}
               />
               <p className="p-3">
                 The bar plot illustrates each of the principal components with
@@ -384,13 +343,13 @@ export default function PCA({ submitR, getRefSigOptions }) {
             </div>
           )}
 
-          {pca2URL && (
+          {pca2 && (
             <div id="pca2Plot">
               <hr />
               <Plot
                 className="p-3"
                 downloadName={pca2.split('/').slice(-1)[0]}
-                plotURL={pca2URL}
+                plotPath={'api/results/' + projectID + pca2}
                 txtPath={projectID + pca2Data}
               />
               <p className="p-3">
@@ -403,13 +362,13 @@ export default function PCA({ submitR, getRefSigOptions }) {
             </div>
           )}
 
-          {pca3URL && (
+          {pca3 && (
             <div id="pca3Plot">
               <hr />
               <Plot
                 className="p-3"
                 downloadName={pca3.split('/').slice(-1)[0]}
-                plotURL={pca3URL}
+                plotPath={'api/results/' + projectID + pca3}
                 txtPath={projectID + pca3Data}
               />
               <p className="p-3">
@@ -422,13 +381,13 @@ export default function PCA({ submitR, getRefSigOptions }) {
             </div>
           )}
 
-          {heatmapURL && (
+          {heatmap && (
             <div id="heatmapPlot">
               <hr />
               <Plot
                 className="p-3"
                 downloadName={heatmap.split('/').slice(-1)[0]}
-                plotURL={heatmapURL}
+                plotPath={'api/results/' + projectID + heatmap}
                 txtPath={projectID + heatmapData}
               />
               <p className="p-3">
@@ -527,13 +486,13 @@ export default function PCA({ submitR, getRefSigOptions }) {
             </div>
           )}
 
-          {pubPca1URL && (
+          {pubPca1 && (
             <div id="pubPca1Plot">
               <hr />
               <Plot
                 className="p-3"
                 downloadName={pubPca1.split('/').slice(-1)[0]}
-                plotURL={pubPca1URL}
+                plotPath={'api/results/' + projectID + pubPca1}
               />
               <p className="p-3">
                 The bar plot illustrates each of the principal components with
@@ -546,13 +505,13 @@ export default function PCA({ submitR, getRefSigOptions }) {
             </div>
           )}
 
-          {pubPca2URL && (
+          {pubPca2 && (
             <div id="pubPca2Plot">
               <hr />
               <Plot
                 className="p-3"
                 downloadName={pubPca2.split('/').slice(-1)[0]}
-                plotURL={pubPca2URL}
+                plotPath={'api/results/' + projectID + pubPca2}
                 txtPath={projectID + pubPca2Data}
               />
               <p className="p-3">
@@ -565,13 +524,13 @@ export default function PCA({ submitR, getRefSigOptions }) {
             </div>
           )}
 
-          {pubPca3URL && (
+          {pubPca3 && (
             <div id="pubPca3Plot">
               <hr />
               <Plot
                 className="p-3"
                 downloadName={pubPca3.split('/').slice(-1)[0]}
-                plotURL={pubPca3URL}
+                plotPath={'api/results/' + projectID + pubPca3}
                 txtPath={projectID + pubPca3Data}
               />
               <p className="p-3">

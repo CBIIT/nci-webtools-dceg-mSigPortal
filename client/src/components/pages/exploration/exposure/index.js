@@ -15,7 +15,6 @@ import {
   getInitialState,
 } from '../../../../services/store/exploration';
 import { actions as modalActions } from '../../../../services/store/modal';
-import { unique2d } from '../../../../services/utils';
 import Select from '../../../controls/select/select';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import {
@@ -23,6 +22,7 @@ import {
   SidebarPanel,
   MainPanel,
 } from '../../../controls/sidebar-container/sidebar-container';
+import { unique2d } from '../../../../services/utils';
 
 const actions = { ...explorationActions, ...modalActions };
 const { Group, Label, Check } = Form;

@@ -2,17 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button, Tab, Nav } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
-import Debug from '../../controls/debug/debug';
 import Select from '../../controls/select/select';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as visualizationActions } from '../../../services/store/visualization';
+import { actions as modalActions } from '../../../services/store/modal';
 import {
   value2d,
   filter2d,
   unique2d,
   defaultMatrix,
 } from '../../../services/utils';
-import { useSelector, useDispatch } from 'react-redux';
-import { actions as visualizationActions } from '../../../services/store/visualization';
-import { actions as modalActions } from '../../../services/store/modal';
 
 const actions = { ...visualizationActions, ...modalActions };
 
@@ -23,22 +22,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
   const dispatch = useDispatch();
   const visualization = useSelector((state) => state.visualization);
 
-  const mergeVisualize = (state) =>
-    dispatch(actions.mergeVisualization({ visualize: state }));
-  const mergeResults = (state) =>
-    dispatch(actions.mergeVisualization({ results: state }));
-  const mergeProfilerSummary = (state) =>
-    dispatch(actions.mergeVisualization({ profilerSummary: state }));
-  const mergeMutationalPattern = (state) =>
-    dispatch(actions.mergeVisualization({ mutationalPattern: state }));
   const mergeCosineSimilarity = (state) =>
     dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
-  const mergeProfileComparison = (state) =>
-    dispatch(actions.mergeVisualization({ profileComparison: state }));
-  const mergePCA = (state) =>
-    dispatch(actions.mergeVisualization({ pca: state }));
-  const mergeKataegis = (state) =>
-    dispatch(actions.mergeVisualization({ kataegis: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -71,9 +56,6 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
     refTxtPath,
     pubPlotPath,
     pubTxtPath,
-    withinPlotURL,
-    refPlotURL,
-    pubPlotURL,
     display,
     withinErr,
     refErr,
@@ -111,39 +93,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
     }
   }, [svgList]);
 
-  useEffect(() => {
-    withinPlotPath ? setRPlot(withinPlotPath, 'within') : clearPlot('within');
-    refPlotPath ? setRPlot(refPlotPath, 'ref') : clearPlot('ref');
-    pubPlotPath ? setRPlot(pubPlotPath, 'pub') : clearPlot('pub');
-  }, [withinPlotPath, refPlotPath, pubPlotPath]);
-
   function setOverlay(type, display) {
     mergeCosineSimilarity({ [`${type}SubmitOverlay`]: display });
-  }
-
-  async function setRPlot(plotPath, type) {
-    try {
-      const response = await fetch(`api/results/${projectID}${plotPath}`);
-      if (!response.ok) {
-        // console.log(await response.json());
-      } else {
-        const pic = await response.blob();
-        const objectURL = URL.createObjectURL(pic);
-
-        if (visualization.cosineSimilarity[`${type}PlotURL`])
-          URL.revokeObjectURL(visualization.cosineSimilarity[`${type}PlotURL`]);
-        mergeCosineSimilarity({
-          [`${type}PlotURL`]: objectURL,
-        });
-      }
-    } catch (err) {
-      mergeError(err.message);
-    }
-  }
-
-  function clearPlot(type) {
-    URL.revokeObjectURL(visualization.cosineSimilarity[`${type}PlotURL`]);
-    mergeCosineSimilarity({ [`${type}PlotURL`]: '' });
   }
 
   // get Signature Reference Sets for dropdown options
@@ -258,11 +209,13 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
   }
 
   function handleStudyChange(study) {
-    const cancerTypeOptions = unique2d(
-      'Cancer_Type',
-      matrixList.columns,
-      filter2d(study, pDataOptions.data)
-    );
+    const cancerTypeOptions = [
+      ...new Set(
+        pDataOptions
+          .filter((row) => row.Study == study)
+          .map((row) => row.Cancer_Type)
+      ),
+    ];
 
     mergeCosineSimilarity({
       pubStudy: study,
@@ -377,13 +330,13 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 </p>
               </div>
             )}
-            {withinPlotURL && (
+            {withinPlotPath && (
               <>
                 <hr />
                 <Plot
                   className="p-3"
                   downloadName={withinPlotPath.split('/').slice(-1)[0]}
-                  plotURL={withinPlotURL}
+                  plotPath={'api/results/' + projectID + withinPlotPath}
                   txtPath={projectID + withinTxtPath}
                 />
               </>
@@ -484,13 +437,13 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 </p>
               </div>
             )}
-            {refPlotURL && (
+            {refPlotPath && (
               <>
                 <hr />
                 <Plot
                   className="p-3"
                   downloadName={refPlotPath.split('/').slice(-1)[0]}
-                  plotURL={refPlotURL}
+                  plotPath={`api/results/${projectID}${refPlotPath}`}
                   txtPath={projectID + refTxtPath}
                 />
               </>
@@ -596,13 +549,13 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 </p>
               </div>
             )}
-            {pubPlotURL && (
+            {pubPlotPath && (
               <>
                 <hr />
                 <Plot
                   className="p-3"
                   downloadName={pubPlotPath.split('/').slice(-1)[0]}
-                  plotURL={pubPlotURL}
+                  plotPath={`api/results/${projectID}${pubPlotPath}`}
                   txtPath={projectID + pubTxtPath}
                 />
               </>

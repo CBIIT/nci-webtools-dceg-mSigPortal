@@ -12,10 +12,7 @@ import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import './visualization.scss';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  actions as visualizationActions,
-  getInitialState,
-} from '../../../services/store/visualization';
+import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
 
 const actions = { ...visualizationActions, ...modalActions };
@@ -111,7 +108,7 @@ export default function UserForm() {
           body: JSON.stringify({
             args: args,
             state: {
-              visualize: { ...visualization.visualize, submitted: true },
+              ...visualization,
             },
           }),
         });

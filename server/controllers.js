@@ -489,7 +489,7 @@ async function getQueueResults(req, res, next) {
     logger.info(`Fetch Queue Result: ${id}`);
 
     // validate id format
-    if (!validate(id)) throw `Invalid id`;
+    if (!validate(id)) next(new Error(`Invalid request`));
 
     // ensure output directory exists
     const resultsFolder = path.resolve(config.results.folder, id);
@@ -538,16 +538,14 @@ async function getQueueResults(req, res, next) {
       }
     }
 
-    let paramsFilePath = path.resolve(resultsFolder, `params.json`);
+    let paramsPath = path.resolve(resultsFolder, `params.json`);
 
-    if (fs.existsSync(paramsFilePath)) {
-      const params = JSON.parse(
-        String(await fs.promises.readFile(paramsFilePath))
-      );
+    if (fs.existsSync(paramsPath)) {
+      const data = JSON.parse(String(await fs.promises.readFile(paramsPath)));
 
-      res.json(params);
+      res.json(data);
     } else {
-      throw `Invalid id`;
+      next(new Error(`Params not found`));
     }
   } catch (error) {
     next(error);
@@ -709,4 +707,6 @@ module.exports = {
   getPublications,
   getImageS3,
   getFileS3,
+  to2dArray,
+  getRelativePath,
 };

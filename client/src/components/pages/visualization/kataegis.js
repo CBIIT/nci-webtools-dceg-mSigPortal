@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
-import Debug from '../../controls/debug/debug';
 import Select from '../../controls/select/select';
 import KataegisTable from './kataegisTable';
 import { useSelector, useDispatch } from 'react-redux';
@@ -31,7 +30,6 @@ export default function Kataegis({ submitR }) {
     chromosome,
     txtPath,
     plotPath,
-    plotURL,
     err,
     kataegisData,
     debugR,
@@ -40,42 +38,6 @@ export default function Kataegis({ submitR }) {
 
   const [invalidMin, setMin] = useState(false);
   const [invalidMax, setMax] = useState(false);
-
-  useEffect(() => {
-    if (plotPath) setRPlot(plotPath);
-    else clearPlot();
-  }, [plotPath]);
-
-  async function setRPlot(plotPath) {
-    if (plotPath) {
-      try {
-        const response = await fetch(`api/results/${projectID}${plotPath}`);
-        if (!response.ok) {
-          // console.log(await response.json());
-        } else {
-          const pic = await response.blob();
-          const objectURL = URL.createObjectURL(pic);
-
-          if (plotURL) URL.revokeObjectURL(plotURL);
-          mergeKataegis({
-            plotURL: objectURL,
-          });
-        }
-      } catch (err) {
-        mergeError(err.message);
-      }
-    } else {
-      if (plotURL) URL.revokeObjectURL(plotURL);
-      mergeKataegis({ err: true, plotURL: '' });
-    }
-  }
-
-  function clearPlot() {
-    if (plotURL) {
-      URL.revokeObjectURL(plotURL);
-      mergeKataegis({ plotPath: '', plotURL: '' });
-    }
-  }
 
   async function calculateR() {
     mergeKataegis({
@@ -255,12 +217,12 @@ export default function Kataegis({ submitR }) {
                 <p className="p-3 text-danger">{err}</p>
               </div>
             )}
-            <div style={{ display: plotURL ? 'block' : 'none' }}>
+            <div style={{ display: plotPath ? 'block' : 'none' }}>
               <hr />
               <Plot
                 className="p-3"
                 downloadName={plotPath.split('/').slice(-1)[0]}
-                plotURL={plotURL}
+                plotPath={'api/results/' + projectID + plotPath}
                 txtPath={txtPath ? projectID + txtPath : null}
               />
               <p className="p-3">

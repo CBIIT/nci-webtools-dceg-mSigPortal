@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
-import Debug from '../../controls/debug/debug';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
@@ -19,75 +18,26 @@ export default function ProfilerSummary({ submitR }) {
     study,
     cancerType,
     pubExperimentalStrategy,
-    loading: mainLoading,
   } = visualization.visualize;
   const { matrixList, projectID } = visualization.results;
-  const { filtered } = visualization.mutationalProfiles;
-  const {
-    plotPath,
-    plotURL,
-    err,
-    debugR,
-    loading,
-  } = visualization.profilerSummary;
+
+  const { plotPath, err, debugR, loading } = visualization.profilerSummary;
   useEffect(() => {
     // check if profiler summary already exists, else lazy-load calculate
-    const checkSummary = async () => {
-      const path =
-        source == 'user'
-          ? `/results/profilerSummary/profilerSummary.svg`
-          : `/results/profilerSummaryPublic/profilerSummaryPublic.svg`;
-      const check = await fetch(`api/results/${projectID}${path}`, {
-        method: 'HEAD',
-        cache: 'no-cache',
-      });
-
-      if (check.status === 200) {
-        setRPlot(path);
-      } else {
-        if (source == 'user') {
-          calculateR('profilerSummary', {
-            matrixList: JSON.stringify(matrixList),
-          });
-        } else if (source == 'public') {
-          calculateR('profilerSummaryPublic', {
-            study: study,
-            cancerType: cancerType,
-            experimentalStrategy: pubExperimentalStrategy,
-          });
-        }
+    if (!plotPath) {
+      if (source == 'user') {
+        calculateR('profilerSummary', {
+          matrixList: JSON.stringify(matrixList),
+        });
+      } else if (source == 'public') {
+        calculateR('profilerSummaryPublic', {
+          study: study,
+          cancerType: cancerType,
+          experimentalStrategy: pubExperimentalStrategy,
+        });
       }
-    };
-
-    if (filtered.length && !mainLoading.active && !plotURL) {
-      checkSummary();
     }
-  }, [filtered, mainLoading]);
-
-  async function setRPlot(plotPath) {
-    if (plotPath) {
-      try {
-        const response = await fetch(`api/results/${projectID}${plotPath}`);
-        if (!response.ok) {
-          // console.log(await response.json());
-        } else {
-          const pic = await response.blob();
-          const objectURL = URL.createObjectURL(pic);
-
-          if (plotURL) URL.revokeObjectURL(plotURL);
-          mergeProfilerSummary({
-            plotPath: plotPath,
-            plotURL: objectURL,
-          });
-        }
-      } catch (err) {
-        mergeError(err.message);
-      }
-    } else {
-      if (plotURL) URL.revokeObjectURL(plotURL);
-      mergeProfilerSummary({ err: true, plotURL: '' });
-    }
-  }
+  }, [plotPath]);
 
   async function calculateR(fn, args) {
     mergeProfilerSummary({
@@ -111,8 +61,11 @@ export default function ProfilerSummary({ submitR }) {
           mergeProfilerSummary({
             debugR: debugR,
             loading: false,
+            plotPath:
+              source == 'user'
+                ? '/results/profilerSummary/profilerSummary.svg'
+                : '/results/profilerSummaryPublic/profilerSummaryPublic.svg',
           });
-          setRPlot(output.plotPath, 'within');
         } else {
           mergeProfilerSummary({
             debugR: debugR,
@@ -144,12 +97,14 @@ export default function ProfilerSummary({ submitR }) {
         </p>
       </div>
       <hr />
-      <Plot
-        className="p-3"
-        downloadNam={plotPath.split('/').slice(-1)[0]}
-        plotURL={plotURL}
-        maxHeight="600px"
-      />
+      {plotPath && (
+        <Plot
+          className="p-3"
+          downloadName={plotPath.split('/').slice(-1)[0]}
+          plotPath={'api/results/' + projectID + plotPath}
+          maxHeight="600px"
+        />
+      )}
     </div>
   );
 }

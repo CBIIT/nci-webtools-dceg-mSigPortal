@@ -2,6 +2,9 @@ import React, { useEffect } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 import Plot from '../../controls/plot/plot';
 import Select from '../../controls/select/select';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as visualizationActions } from '../../../services/store/visualization';
+import { actions as modalActions } from '../../../services/store/modal';
 import {
   value2d,
   filter2d,
@@ -10,9 +13,6 @@ import {
   defaultMatrix,
   defaultFilter,
 } from '../../../services/utils';
-import { useSelector, useDispatch } from 'react-redux';
-import { actions as visualizationActions } from '../../../services/store/visualization';
-import { actions as modalActions } from '../../../services/store/modal';
 
 const actions = { ...visualizationActions, ...modalActions };
 
@@ -36,7 +36,7 @@ export default function MutationalProfiles() {
     profileOptions,
     matrixOptions,
     filterOptions,
-    plotURL,
+    plotPath,
     debug,
     displayDebug,
   } = visualization.mutationalProfiles;
@@ -45,13 +45,13 @@ export default function MutationalProfiles() {
 
   // set inital plot
   useEffect(() => {
-    if (!plotURL && displayTab == 'mutationalProfiles') {
+    if (!plotPath && displayTab == 'mutationalProfiles') {
       setPlot();
     }
   }, [filtered, displayTab]);
   // set new plots on dropdown change
   useEffect(() => {
-    if (plotURL && displayTab == 'mutationalProfiles') {
+    if (plotPath && displayTab == 'mutationalProfiles') {
       setPlot();
     }
   }, [selectName, selectProfile, selectMatrix, selectFilter]);
@@ -99,10 +99,10 @@ export default function MutationalProfiles() {
           const pic = await response.blob();
           const objectURL = URL.createObjectURL(pic);
 
-          if (plotURL.length) URL.revokeObjectURL(plotURL);
+          if (plotPath.length) URL.revokeObjectURL(plotPath);
 
           mergeMutationalProfiles({
-            plotURL: objectURL,
+            plotPath: objectURL,
           });
         }
       } catch (err) {
@@ -308,11 +308,13 @@ export default function MutationalProfiles() {
       </Form>
 
       <hr />
-      <Plot
-        className="p-3"
-        downloadName={getdownloadName()}
-        plotURL={plotURL}
-      />
+      {plotPath && (
+        <Plot
+          className="p-3"
+          downloadName={getdownloadName()}
+          plotPath={plotPath}
+        />
+      )}
       {/* <Button
         variant="link"
         className="p-0 mt-5"

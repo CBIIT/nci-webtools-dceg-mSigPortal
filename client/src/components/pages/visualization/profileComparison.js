@@ -13,17 +13,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
-import Debug from '../../controls/debug/debug';
 import Select from '../../controls/select/select';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as visualizationActions } from '../../../services/store/visualization';
+import { actions as modalActions } from '../../../services/store/modal';
 import {
   value2d,
   filter2d,
   unique2d,
   defaultMatrix,
 } from '../../../services/utils';
-import { useSelector, useDispatch } from 'react-redux';
-import { actions as visualizationActions } from '../../../services/store/visualization';
-import { actions as modalActions } from '../../../services/store/modal';
 
 const actions = { ...visualizationActions, ...modalActions };
 const { Group, Label, Control, Text } = Form;
@@ -74,9 +73,6 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     withinPlotPath,
     refPlotPath,
     pubPlotPath,
-    withinPlotURL,
-    refPlotURL,
-    pubPlotURL,
     pubTxtURL,
     display,
     withinErr,
@@ -152,41 +148,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     }
   }, [pDataOptions, pubStudy]);
 
-  useEffect(() => {
-    withinPlotPath ? setRPlot(withinPlotPath, 'within') : clearPlot('within');
-    refPlotPath ? setRPlot(refPlotPath, 'ref') : clearPlot('ref');
-    pubPlotPath ? setRPlot(pubPlotPath, 'pub') : clearPlot('pub');
-  }, [withinPlotPath, refPlotPath, pubPlotPath]);
-
   function setOverlay(type, status) {
     mergeProfileComparison({ [`${type}SubmitOverlay`]: status });
-  }
-
-  async function setRPlot(plotPath, type) {
-    try {
-      const response = await fetch(`api/results/${projectID}${plotPath}`);
-      if (!response.ok) {
-        // console.log(await response.json());
-      } else {
-        const pic = await response.blob();
-        const objectURL = URL.createObjectURL(pic);
-
-        if (visualization.profileComparison[`${type}PlotURL`])
-          URL.revokeObjectURL(
-            visualization.profileComparison[`${type}PlotURL`]
-          );
-        mergeProfileComparison({
-          [`${type}PlotURL`]: objectURL,
-        });
-      }
-    } catch (err) {
-      mergeError(err.message);
-    }
-  }
-
-  function clearPlot(type) {
-    URL.revokeObjectURL(visualization.profileComparison[`${type}PlotURL`]);
-    mergeProfileComparison({ [`${type}PlotURL`]: '' });
   }
 
   // get Signature Reference Sets for dropdown options
@@ -494,13 +457,13 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 <p>{withinErr}</p>
               </div>
             )}
-            {withinPlotURL && (
+            {withinPlotPath && (
               <>
                 <hr />
                 <Plot
                   className="p-3"
                   downloadName={withinPlotPath.split('/').slice(-1)[0]}
-                  plotURL={withinPlotURL}
+                  plotPath={'api/results/' + projectID + withinPlotPath}
                 />
                 <div className="p-3">
                   <p>
@@ -666,13 +629,13 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 <p className="text-danger">{refErr}</p>
               </div>
             )}
-            {refPlotURL && (
+            {refPlotPath && (
               <>
                 <hr />
                 <Plot
                   className="p-3"
                   downloadName={refPlotPath.split('/').slice(-1)[0]}
-                  plotURL={refPlotURL}
+                  plotPath={'api/results/' + projectID + refPlotPath}
                 />
                 <div className="p-3">
                   <p>
@@ -815,13 +778,13 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 <p>An error has occured. Please verify your input.</p>
               </div>
             )}
-            {pubPlotURL && (
+            {pubPlotPath && (
               <>
                 <hr />
                 <Plot
                   className="p-3"
                   downloadName={pubPlotPath.split('/').slice(-1)[0]}
-                  plotURL={pubPlotURL}
+                  plotPath={'api/results/' + projectID + pubPlotPath}
                 />
                 <div className="p-3">
                   <p>

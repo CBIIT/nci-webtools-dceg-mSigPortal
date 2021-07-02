@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
-import Debug from '../../controls/debug/debug';
-import { value2d, filter2d } from '../../../services/utils';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
+import { value2d, filter2d } from '../../../services/utils';
 
 const actions = { ...visualizationActions, ...modalActions };
 const { Group, Label, Control } = Form;
@@ -31,9 +30,7 @@ export default function MutationalPattern({ submitR }) {
     pattern,
     txtPath,
     plotPath,
-    plotURL,
     barPath,
-    barURL,
     err,
     debugR,
     loading,
@@ -41,89 +38,6 @@ export default function MutationalPattern({ submitR }) {
 
   const [invalidProportion, setProportion] = useState(false);
   const [invalidPattern, setPattern] = useState(false);
-
-  // load plots if they exist - used for precalculated examples
-  useEffect(() => {
-    const checkPlot = async () => {
-      const barchart =
-        source == 'user'
-          ? `/results/mutationalPattern/barchart.svg`
-          : `/results/mutationalPatternPublic/barchart.svg`;
-      let check = await fetch(`api/results/${projectID}${barchart}`, {
-        method: 'HEAD',
-        cache: 'no-cache',
-      });
-      if (check.status === 200) {
-        mergeMPEA({ barPath: barchart });
-      }
-
-      const mpea =
-        source == 'user'
-          ? `/results/mutationalPattern/mpea.svg`
-          : `/results/mutationalPatternPublic/mpea.svg`;
-      check = await fetch(`api/results/${projectID}${mpea}`, {
-        method: 'HEAD',
-        cache: 'no-cache',
-      });
-      if (check.status === 200) {
-        mergeMPEA({
-          plotPath: mpea,
-          txtPath: `/results/mutationalPatternPublic/mpea.txt`,
-        });
-      }
-    };
-
-    if (projectID) checkPlot();
-  }, [projectID]);
-
-  useEffect(() => {
-    plotPath ? setRPlot(plotPath, 'context') : clearPlot('context');
-    barPath ? setRPlot(barPath, 'barchart') : clearPlot('barchart');
-  }, [plotPath, barPath]);
-
-  async function setRPlot(plotPath, type) {
-    mergeMPEA({ loading: true });
-
-    if (plotPath) {
-      try {
-        const response = await fetch(`api/results/${projectID}${plotPath}`);
-        if (!response.ok) {
-          // console.log(await response.json());
-        } else {
-          const pic = await response.blob();
-          const objectURL = URL.createObjectURL(pic);
-
-          if (type == 'context') {
-            if (plotURL) URL.revokeObjectURL(plotURL);
-            mergeMPEA({
-              plotURL: objectURL,
-            });
-          } else {
-            if (barURL) URL.revokeObjectURL(barURL);
-            mergeMPEA({
-              barURL: objectURL,
-            });
-          }
-        }
-      } catch (err) {
-        mergeError(err.message);
-      }
-    } else {
-      if (plotURL) URL.revokeObjectURL(plotURL);
-      mergeMPEA({ err: true, plotURL: '' });
-    }
-    mergeMPEA({ loading: false });
-  }
-
-  function clearPlot(type) {
-    if (type == 'context') {
-      URL.revokeObjectURL(plotURL);
-      mergeMPEA({ plotURL: '' });
-    } else if (type == 'barchart') {
-      URL.revokeObjectURL(barURL);
-      mergeMPEA({ barURL: '' });
-    }
-  }
 
   async function calculateR(fn, args) {
     mergeMPEA({
@@ -139,7 +53,7 @@ export default function MutationalPattern({ submitR }) {
       const response = await submitR(fn, args);
       if (!response.ok) {
         const err = await response.json();
-        mergeMPEA({ debugR: err, loading: false });
+        mergeMPEA({ debugR: err });
       } else {
         const { debugR, output } = await response.json();
         if (Object.keys(output).length) {
@@ -153,14 +67,13 @@ export default function MutationalPattern({ submitR }) {
           mergeMPEA({
             debugR: debugR,
             err: true,
-            loading: false,
           });
         }
       }
     } catch (err) {
       mergeError(err.message);
-      mergeMPEA({ loading: false });
     }
+    mergeMPEA({ loading: false });
   }
 
   const plots = (
@@ -179,7 +92,7 @@ export default function MutationalPattern({ submitR }) {
             <Plot
               className="p-3"
               downloadName={barPath.split('/').slice(-1)[0]}
-              plotURL={barURL}
+              plotPath={'api/results/' + projectID + barPath}
             />
             <p className="p-3">
               This plot illustrates the frequency by count of each mutational
@@ -209,7 +122,7 @@ export default function MutationalPattern({ submitR }) {
             <Plot
               className="p-3"
               downloadName={plotPath.split('/').slice(-1)[0]}
-              plotURL={plotURL}
+              plotPath={'api/results/' + projectID + plotPath}
               txtPath={projectID + txtPath}
               title="Proportion of Mutational Pattern Context Compared to Other Contexts with the same SBS Mutation"
             />

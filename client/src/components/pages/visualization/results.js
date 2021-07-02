@@ -9,6 +9,9 @@ import PCA from './pca';
 import Kataegis from './kataegis';
 import Download from './download';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as visualizationActions } from '../../../services/store/visualization';
+import { actions as modalActions } from '../../../services/store/modal';
 import {
   value2d,
   filter2d,
@@ -17,9 +20,6 @@ import {
   defaultMatrix,
   defaultFilter,
 } from '../../../services/utils';
-import { useSelector, useDispatch } from 'react-redux';
-import { actions as visualizationActions } from '../../../services/store/visualization';
-import { actions as modalActions } from '../../../services/store/modal';
 
 const actions = { ...visualizationActions, ...modalActions };
 
@@ -60,8 +60,9 @@ export default function Results({ setOpenSidebar }) {
     if (source == 'user') {
       if (projectID && !Object.keys(svgList).length) {
         getResults();
-      } else if (Object.keys(svgList).length && !signatureSetOptions.length)
+      } else if (Object.keys(svgList).length && !signatureSetOptions.length) {
         loadData();
+      }
     } else {
       if (
         Object.keys(svgList).length > 0 &&
@@ -69,7 +70,7 @@ export default function Results({ setOpenSidebar }) {
       )
         mapPublicData();
     }
-  }, [svgList, projectID, source]);
+  }, [svgList, projectID]);
 
   // reload summary information
   async function getResults() {

@@ -75,9 +75,9 @@ apiRouter.use('/results', express.static(config.results.folder));
 apiRouter.use(express.json());
 
 apiRouter.use((error, req, res, next) => {
-  logger.error(error);
-  if (!error.statusCode) error.statusCode = 500;
-  res.status(error.statusCode).json(error.message);
+  const { name, message, stack } = error;
+  logger.error({ message, stack });
+  response.status(500).json(`${name}: ${message}`);
 });
 
 apiRouter.get('/ping', (req, res) => res.send(true));

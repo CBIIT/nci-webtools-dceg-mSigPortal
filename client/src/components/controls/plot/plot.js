@@ -11,7 +11,7 @@ import './plot.scss';
 export default function Plot({
   title,
   downloadName,
-  plotURL,
+  plotPath,
   txtPath,
   alt,
   maxHeight,
@@ -23,11 +23,10 @@ export default function Plot({
 
   const [loading, setLoading] = useState(false);
 
-  //   download text results files
-  async function downloadData(txtPath) {
+  async function download(path) {
     setLoading(true);
     try {
-      const response = await fetch(`api/results/${txtPath}`);
+      const response = await fetch(path);
 
       if (!response.ok) {
         const { msg } = await response.json();
@@ -38,7 +37,7 @@ export default function Plot({
         const tempLink = document.createElement('a');
 
         tempLink.href = objectURL;
-        tempLink.download = txtPath.split('/').slice(-1)[0];
+        tempLink.download = path.split('/').slice(-1)[0];
         document.body.appendChild(tempLink);
         tempLink.click();
         document.body.removeChild(tempLink);
@@ -49,6 +48,7 @@ export default function Plot({
     }
     setLoading(false);
   }
+
   const zoomProps = {
     wheel: { wheelEnabled: false, step: 3 },
     zoomIn: { step: 3 },
@@ -69,18 +69,18 @@ export default function Plot({
                 </Col>
                 <Col className="d-flex text-nowrap">
                   <div className="d-flex align-items-end ml-auto mb-auto">
-                    <a
-                      className="ml-auto"
-                      href={plotURL}
-                      download={downloadName || true}
+                    <Button
+                      className="p-0 border-0 ml-3"
+                      variant="link"
+                      onClick={() => download(plotPath)}
                     >
                       Download Plot
-                    </a>
+                    </Button>
                     {txtPath && (
                       <Button
                         className="p-0 border-0 ml-3"
                         variant="link"
-                        onClick={() => downloadData(txtPath)}
+                        onClick={() => download(`api/results/${txtPath}`)}
                       >
                         Download Data
                       </Button>
@@ -128,7 +128,7 @@ export default function Plot({
               <TransformComponent>
                 <img
                   className="w-100"
-                  src={plotURL}
+                  src={`${plotPath}#${Date.now()}`}
                   style={{ maxHeight: maxHeight || '500px' }}
                   alt={alt || 'Plot Unavailable'}
                 />

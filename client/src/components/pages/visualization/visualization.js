@@ -68,8 +68,7 @@ export default function Visualize({ match }) {
       const { args, state, timestamp } = await (
         await fetch(`api/getQueueResults/${id}`)
       ).json();
-      mergeVisualize(state.visualize);
-      mergeResults({ projectID: id });
+      dispatch(actions.mergeVisualization(state));
     } catch (error) {
       mergeError(error.toString());
     }
