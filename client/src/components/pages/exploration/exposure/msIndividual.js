@@ -14,14 +14,7 @@ const { Group } = Form;
 export default function MSIndividual({ calculateIndividual }) {
   const dispatch = useDispatch();
   const exploration = useSelector((state) => state.exploration);
-  const {
-    sample,
-    plotPath,
-    plotURL,
-    debugR,
-    err,
-    loading,
-  } = exploration.msIndividual;
+  const { sample, plotPath, debugR, err, loading } = exploration.msIndividual;
   const {
     projectID,
     publicSampleOptions,
@@ -36,10 +29,6 @@ export default function MSIndividual({ calculateIndividual }) {
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  useEffect(() => {
-    plotPath ? setRPlot(plotPath) : clearPlot();
-  }, [plotPath, err, debugR]);
-
   // choose inital sample
   useEffect(() => {
     if (source == 'public') {
@@ -48,37 +37,6 @@ export default function MSIndividual({ calculateIndividual }) {
       mergeMsIndividual({ sample: userSampleOptions[0] || '' });
     }
   }, [publicSampleOptions, userSampleOptions, source]);
-
-  async function setRPlot(plotPath) {
-    if (plotPath) {
-      try {
-        const response = await fetch(`api/results/${projectID}${plotPath}`);
-        if (!response.ok) {
-          // console.log(await response.json());
-        } else {
-          const pic = await response.blob();
-          const objectURL = URL.createObjectURL(pic);
-
-          if (plotURL) URL.revokeObjectURL(plotURL);
-          mergeMsIndividual({
-            plotURL: objectURL,
-          });
-        }
-      } catch (err) {
-        mergeError(err.message);
-      }
-    } else {
-      if (plotURL) URL.revokeObjectURL(plotURL);
-      mergeMsIndividual({ err: true, plotURL: '' });
-    }
-  }
-
-  function clearPlot() {
-    if (plotURL) {
-      URL.revokeObjectURL(plotURL);
-      mergeMsIndividual({ plotURL: '' });
-    }
-  }
 
   return (
     <div>
@@ -145,12 +103,11 @@ export default function MSIndividual({ calculateIndividual }) {
         {plotPath && (
           <>
             <hr />
-
             <Plot
               className="p-3"
               title="Mutational Signature in Individual Sample"
               downloadName={plotPath.split('/').slice(-1)[0]}
-              plotURL={plotURL}
+              plotPath={`api/results/${projectID}${plotPath}`}
               maxHeight="700px"
             />
           </>

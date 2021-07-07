@@ -11,7 +11,7 @@ const actions = { ...explorationActions, ...modalActions };
 export default function ReferenceSignatures({ submitR }) {
   const dispatch = useDispatch();
   const exploration = useSelector((state) => state.exploration);
-  const { plotPath, plotURL, debugR, err, loading } = exploration.sigRefSig;
+  const { plotPath, debugR, err, loading } = exploration.sigRefSig;
   // const { displayTab } = useSelector((state) => state.exploration);
 
   // useEffect(() => {
@@ -52,36 +52,12 @@ export default function ReferenceSignatures({ submitR }) {
   //   }
   // }
 
-  // async function setRPlot(plotPath) {
-  //   if (plotPath) {
-  //     try {
-  //       const response = await fetch(`api/results/${projectID}${plotPath}`);
-  //       if (!response.ok) {
-  //         // console.log(await response.json());
-  //       } else {
-  //         const pic = await response.blob();
-  //         const objectURL = URL.createObjectURL(pic);
-
-  //         if (plotURL) URL.revokeObjectURL(plotURL);
-  //         dispatchExpRefSig({
-  //           plotURL: objectURL,
-  //         });
-  //       }
-  //     } catch (err) {
-  //       mergeError(err.message );
-  //     }
-  //   } else {
-  //     if (plotURL) URL.revokeObjectURL(plotURL);
-  //     dispatchExpRefSig({ err: true, plotURL: '' });
-  //   }
-  // }
-
   return (
     <div id="plot">
       <div style={{ display: err ? 'block' : 'none' }}>
         <p>An error has occured. Please verify your input.</p>
       </div>
-      <div style={{ display: plotURL ? 'block' : 'none' }}>
+      <div style={{ display: plotPath ? 'block' : 'none' }}>
         <p className="p-3">
           The pie charts below displays the reference signatures currently
           available in mSigPortal. Each signature set included in mSigPortal is
@@ -94,8 +70,8 @@ export default function ReferenceSignatures({ submitR }) {
         <hr />
         <Plot
           className="p-3"
-          downloadName={plotURL.split('/').slice(-1)[0]}
-          plotURL={plotURL}
+          downloadName={plotPath.split('/').slice(-1)[0]}
+          plotPath={plotPath}
           maxHeight="600px"
         />
       </div>

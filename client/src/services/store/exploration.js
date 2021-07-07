@@ -30,8 +30,7 @@ export const getInitialState = () => ({
     refSigURL: '',
   },
   sigRefSig: {
-    plotPath: '',
-    plotURL: 'assets/images/mSigPortalReferenceSignatures.svg',
+    plotPath: 'assets/images/mSigPortalReferenceSignatures.svg',
     debugR: '',
     err: '',
     loading: false,
@@ -50,7 +49,6 @@ export const getInitialState = () => ({
         signatureName: '',
         signatureNameOptions: [],
         plotPath: '',
-        plotURL: '',
       },
     ],
     debugR: '',
@@ -65,7 +63,6 @@ export const getInitialState = () => ({
     refSignatureSetOptions1: [],
     refSignatureSetOptions2: [],
     plotPath: '',
-    plotURL: '',
     txtPath: '',
     debugR: '',
     err: '',
@@ -83,7 +80,6 @@ export const getInitialState = () => ({
     signatureName2: '',
     signatureNameOptions2: [],
     plotPath: '',
-    plotURL: '',
     debugR: '',
     err: '',
     loading: false,
@@ -122,7 +118,6 @@ export const getInitialState = () => ({
   },
   tmb: {
     plotPath: '',
-    plotURL: '',
     debugR: '',
     err: '',
     loading: false,
@@ -137,7 +132,6 @@ export const getInitialState = () => ({
   msBurden: {
     signatureName: '',
     plotPath: '',
-    plotURL: '',
     debugR: '',
     err: '',
     loading: false,
@@ -147,7 +141,6 @@ export const getInitialState = () => ({
     signatureName1: '',
     signatureName2: '',
     plotPath: '',
-    plotURL: '',
     txtPath: '',
     debugR: '',
     err: '',
@@ -155,7 +148,6 @@ export const getInitialState = () => ({
   },
   msDecomposition: {
     plotPath: '',
-    plotURL: '',
     txtPath: '',
     debugR: '',
     err: '',
@@ -164,7 +156,6 @@ export const getInitialState = () => ({
   msLandscape: {
     variableFile: '',
     plotPath: '',
-    plotURL: '',
     txtPath: '',
     debugR: '',
     err: '',
@@ -173,7 +164,6 @@ export const getInitialState = () => ({
   msPrevalence: {
     mutation: '100',
     plotPath: '',
-    plotURL: '',
     debugR: '',
     err: '',
     loading: false,
@@ -181,7 +171,6 @@ export const getInitialState = () => ({
   msIndividual: {
     sample: '',
     plotPath: '',
-    plotURL: '',
     debugR: '',
     err: '',
     loading: false,

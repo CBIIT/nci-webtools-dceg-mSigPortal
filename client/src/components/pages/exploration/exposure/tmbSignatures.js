@@ -1,60 +1,14 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import { actions as explorationActions } from '../../../../services/store/exploration';
-import { actions as modalActions } from '../../../../services/store/modal';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 
-const actions = { ...explorationActions, ...modalActions };
-
 export default function TmbSignatures({ calculateTmbSig }) {
-  const dispatch = useDispatch();
   const exploration = useSelector((state) => state.exploration);
-  const { plotPath, plotURL, debugR, err, loading } = exploration.tmbSignatures;
+  const { plotPath, debugR, err, loading } = exploration.tmbSignatures;
   const { projectID, source } = exploration.exposure;
-  const mergeExploration = (state) =>
-    dispatch(actions.mergeExploration({ exploration: state }));
-  const mergeTmbSignatures = (state) =>
-    dispatch(actions.mergeExploration({ tmbSignatures: state }));
-  const mergeError = (msg) =>
-    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
-
-  useEffect(() => {
-    plotPath ? setRPlot(plotPath) : clearPlot();
-  }, [plotPath, err, debugR]);
-
-  async function setRPlot(plotPath) {
-    if (plotPath) {
-      try {
-        const response = await fetch(`api/results/${projectID}${plotPath}`);
-        if (!response.ok) {
-          // console.log(await response.json());
-        } else {
-          const pic = await response.blob();
-          const objectURL = URL.createObjectURL(pic);
-
-          if (plotURL) URL.revokeObjectURL(plotURL);
-          mergeTmbSignatures({
-            plotURL: objectURL,
-          });
-        }
-      } catch (err) {
-        mergeError(err.message);
-      }
-    } else {
-      if (plotURL) URL.revokeObjectURL(plotURL);
-      mergeTmbSignatures({ err: true, plotURL: '' });
-    }
-  }
-
-  function clearPlot() {
-    if (plotURL) {
-      URL.revokeObjectURL(plotURL);
-      mergeTmbSignatures({ plotURL: '' });
-    }
-  }
 
   return (
     <div>
@@ -106,7 +60,7 @@ export default function TmbSignatures({ calculateTmbSig }) {
               className="p-3"
               title="Tumor Mutational Burden Separated by Signatures"
               downloadName={plotPath.split('/').slice(-1)[0]}
-              plotURL={plotURL}
+              plotPath={`api/results/${projectID}${plotPath}`}
             />
           </>
         )}

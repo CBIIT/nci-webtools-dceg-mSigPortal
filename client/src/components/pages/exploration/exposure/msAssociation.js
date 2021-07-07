@@ -19,7 +19,6 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
     signatureName1,
     signatureName2,
     plotPath,
-    plotURL,
     debugR,
     err,
     loading,
@@ -38,10 +37,6 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  useEffect(() => {
-    plotPath ? setRPlot(plotPath) : clearPlot();
-  }, [plotPath, err, debugR]);
-
   // apply default signature names
   useEffect(() => {
     if (source == 'public') {
@@ -56,37 +51,6 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
       });
     }
   }, [signatureNameOptions, userNameOptions, source]);
-
-  async function setRPlot(plotPath) {
-    if (plotPath) {
-      try {
-        const response = await fetch(`api/results/${projectID}${plotPath}`);
-        if (!response.ok) {
-          // console.log(await response.json());
-        } else {
-          const pic = await response.blob();
-          const objectURL = URL.createObjectURL(pic);
-
-          if (plotURL) URL.revokeObjectURL(plotURL);
-          mergeMsAssociation({
-            plotURL: objectURL,
-          });
-        }
-      } catch (err) {
-        mergeError(err.message);
-      }
-    } else {
-      if (plotURL) URL.revokeObjectURL(plotURL);
-      mergeMsAssociation({ err: true, plotURL: '' });
-    }
-  }
-
-  function clearPlot() {
-    if (plotURL) {
-      URL.revokeObjectURL(plotURL);
-      mergeMsAssociation({ plotURL: '' });
-    }
-  }
 
   return (
     <div>
@@ -169,12 +133,11 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
         {plotPath && (
           <>
             <hr />
-
             <Plot
               className="p-3"
               title="Mutational Signature Association"
               downloadName={plotPath.split('/').slice(-1)[0]}
-              plotURL={plotURL}
+              plotPath={`api/results/${projectID}${plotPath}`}
               maxHeight="900px"
             />
           </>

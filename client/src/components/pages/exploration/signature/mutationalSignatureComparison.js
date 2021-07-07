@@ -32,22 +32,11 @@ export default function MutationalSignatureProfile({ submitR }) {
     refSignatureSet2,
     refSignatureSetOptions2,
     plotPath,
-    plotURL,
     debugR,
     err,
     loading,
   } = exploration.sigMutationalSigComparison;
   const { displayTab, refSigData, projectID } = exploration.exploration;
-  useEffect(() => {
-    plotPath ? setRPlot(plotPath) : clearPlot();
-  }, [plotPath]);
-
-  function clearPlot() {
-    if (plotURL) {
-      URL.revokeObjectURL(plotURL);
-      mergeSigMutationalSigComparison({ plotURL: '' });
-    }
-  }
 
   async function calculateR(fn, args) {
     mergeSigMutationalSigComparison({
@@ -78,12 +67,10 @@ export default function MutationalSignatureProfile({ submitR }) {
             txtPath: output.textPath,
           });
         } else {
-          if (plotURL) URL.revokeObjectURL(plotURL);
           mergeSigMutationalSigComparison({
             debugR: debugR,
             loading: false,
             plotPath: '',
-            plotURL: '',
             txtPath: '',
             err: true,
           });
@@ -92,30 +79,6 @@ export default function MutationalSignatureProfile({ submitR }) {
     } catch (err) {
       mergeError(err.message);
       mergeSigMutationalSigComparison({ loading: false });
-    }
-  }
-
-  async function setRPlot(plotPath) {
-    if (plotPath) {
-      try {
-        const response = await fetch(`api/results/${projectID}${plotPath}`);
-        if (!response.ok) {
-          // console.log(await response.json());
-        } else {
-          const pic = await response.blob();
-          const objectURL = URL.createObjectURL(pic);
-
-          if (plotURL) URL.revokeObjectURL(plotURL);
-          mergeSigMutationalSigComparison({
-            plotURL: objectURL,
-          });
-        }
-      } catch (err) {
-        mergeError(err.message);
-      }
-    } else {
-      if (plotURL) URL.revokeObjectURL(plotURL);
-      mergeSigMutationalSigComparison({ err: true, plotURL: '' });
     }
   }
 
@@ -282,29 +245,32 @@ export default function MutationalSignatureProfile({ submitR }) {
         <div style={{ display: err ? 'block' : 'none' }} className="p-3">
           <p>An error has occured. Please verify your input.</p>
         </div>
-        <div style={{ display: plotURL ? 'block' : 'none' }}>
-          <hr />
-          <Plot
-            className="p-3"
-            downloadName={plotPath.split('/').slice(-1)[0]}
-            plotURL={plotURL}
-            maxHeight="1000px"
-          />
-          <div className="p-3">
-            <p>
-              The plot generated shows the mutational profile for the “Signature
-              Name 1” selected, the mutational profile for the “Signature Name
-              2” selected, and the difference between them. Also at the top of
-              the plot are measurements for RSS and cosine similarity.
-            </p>
-            <p>
-              RSS is the Residual Sum of Squares. It measures the discrepancy
-              between two profiles. Cosine similarity is how similar the
-              mutational profiles are to one another. For additional information
-              about RSS and cosine similarity, click here.
-            </p>
-          </div>
-        </div>
+        {plotPath && (
+          <>
+            <hr />
+            <Plot
+              className="p-3"
+              downloadName={plotPath.split('/').slice(-1)[0]}
+              plotPath={`api/results/${projectID}${plotPath}`}
+              maxHeight="1000px"
+            />
+            <div className="p-3">
+              <p>
+                The plot generated shows the mutational profile for the
+                “Signature Name 1” selected, the mutational profile for the
+                “Signature Name 2” selected, and the difference between them.
+                Also at the top of the plot are measurements for RSS and cosine
+                similarity.
+              </p>
+              <p>
+                RSS is the Residual Sum of Squares. It measures the discrepancy
+                between two profiles. Cosine similarity is how similar the
+                mutational profiles are to one another. For additional
+                information about RSS and cosine similarity, click here.
+              </p>
+            </div>
+          </>
+        )}
       </div>
       {/* <Debug msg={debugR} /> */}
     </div>

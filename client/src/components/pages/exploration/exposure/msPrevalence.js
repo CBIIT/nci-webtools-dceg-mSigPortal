@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { actions as explorationActions } from '../../../../services/store/exploration';
 import { actions as modalActions } from '../../../../services/store/modal';
 import Plot from '../../../controls/plot/plot';
-import Select from '../../../controls/select/select';
 import Debug from '../../../controls/debug/debug';
 
 const actions = { ...explorationActions, ...modalActions };
@@ -14,58 +13,14 @@ const { Group, Label, Control } = Form;
 export default function MsPrevalence({ calculatePrevalence }) {
   const dispatch = useDispatch();
   const exploration = useSelector((state) => state.exploration);
-  const {
-    mutation,
-    plotPath,
-    plotURL,
-    debugR,
-    err,
-    loading,
-  } = exploration.msPrevalence;
+  const { mutation, plotPath, debugR, err, loading } = exploration.msPrevalence;
   const { projectID, source } = exploration.exposure;
-  const mergeExploration = (state) =>
-    dispatch(actions.mergeExploration({ exploration: state }));
   const mergeMsPrevalence = (state) =>
     dispatch(actions.mergeExploration({ msPrevalence: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const [invalidMin, setMin] = useState(false);
-
-  useEffect(() => {
-    plotPath ? setRPlot(plotPath) : clearPlot();
-  }, [plotPath, err, debugR]);
-
-  async function setRPlot(plotPath) {
-    if (plotPath) {
-      try {
-        const response = await fetch(`api/results/${projectID}${plotPath}`);
-        if (!response.ok) {
-          // console.log(await response.json());
-        } else {
-          const pic = await response.blob();
-          const objectURL = URL.createObjectURL(pic);
-
-          if (plotURL) URL.revokeObjectURL(plotURL);
-          mergeMsPrevalence({
-            plotURL: objectURL,
-          });
-        }
-      } catch (err) {
-        mergeError(err.message);
-      }
-    } else {
-      if (plotURL) URL.revokeObjectURL(plotURL);
-      mergeMsPrevalence({ err: true, plotURL: '' });
-    }
-  }
-
-  function clearPlot() {
-    if (plotURL) {
-      URL.revokeObjectURL(plotURL);
-      mergeMsPrevalence({ plotURL: '' });
-    }
-  }
 
   return (
     <div>
@@ -137,16 +92,17 @@ export default function MsPrevalence({ calculatePrevalence }) {
             <p className="p-3 text-danger">{err}</p>
           </div>
         )}
-        <div style={{ display: plotURL ? 'block' : 'none' }}>
-          <hr />
-
-          <Plot
-            className="p-3"
-            title="Prevalence of Mutational Signature"
-            downloadName={plotPath.split('/').slice(-1)[0]}
-            plotURL={plotURL}
-          />
-        </div>
+        {plotPath && (
+          <>
+            <hr />
+            <Plot
+              className="p-3"
+              title="Prevalence of Mutational Signature"
+              downloadName={plotPath.split('/').slice(-1)[0]}
+              plotPath={`api/results/${projectID}${plotPath}`}
+            />
+          </>
+        )}
       </div>
       {/* <Debug msg={debugR} /> */}
     </div>

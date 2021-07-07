@@ -27,23 +27,12 @@ export default function MutationalSignatureProfile({ submitR }) {
     refSignatureSetOptions1,
     refSignatureSetOptions2,
     plotPath,
-    plotURL,
     txtPath,
     debugR,
     err,
     loading,
   } = exploration.sigCosineSimilarity;
   const { displayTab, refSigData, projectID } = exploration.exploration;
-  useEffect(() => {
-    plotPath ? setRPlot(plotPath) : clearPlot();
-  }, [plotPath]);
-
-  function clearPlot() {
-    if (plotURL) {
-      URL.revokeObjectURL(plotURL);
-      mergeSigCosineSimilarity({ plotURL: '' });
-    }
-  }
 
   async function calculateR(fn, args) {
     try {
@@ -85,30 +74,6 @@ export default function MutationalSignatureProfile({ submitR }) {
     } catch (err) {
       mergeError(err.message);
       mergeSigCosineSimilarity({ loading: false });
-    }
-  }
-
-  async function setRPlot(plotPath) {
-    if (plotPath) {
-      try {
-        const response = await fetch(`api/results/${projectID}${plotPath}`);
-        if (!response.ok) {
-          // console.log(await response.json());
-        } else {
-          const pic = await response.blob();
-          const objectURL = URL.createObjectURL(pic);
-
-          if (plotURL) URL.revokeObjectURL(plotURL);
-          mergeSigCosineSimilarity({
-            plotURL: objectURL,
-          });
-        }
-      } catch (err) {
-        mergeError(err.message);
-      }
-    } else {
-      if (plotURL) URL.revokeObjectURL(plotURL);
-      mergeSigCosineSimilarity({ err: true, plotURL: '' });
     }
   }
 
@@ -197,26 +162,27 @@ export default function MutationalSignatureProfile({ submitR }) {
           <p>An error has occured. Please verify your input.</p>
         </div>
         <hr />
-        <div style={{ display: plotURL ? 'block' : 'none' }}>
-          <Plot
-            className="p-3"
-            downloadName={plotPath.split('/').slice(-1)[0]}
-            plotURL={plotURL}
-            txtPath={projectID + txtPath}
-            maxHeight="1000px"
-            title="Cosine Similarity Among Mutational Signatures Between Reference Signature Sets"
-          />
-          <p className="p-3">
-            The Cosine Similarity Among Mutational Signatures Between Reference
-            Signature Sets plot highlights cosine similarity between two
-            mutational signature sets given a profile type. Along the bottom of
-            the heatmap are the signatures within the reference signature set
-            selected. Along the side of the heatmap are the signatures within
-            the second reference signature selected.
-          </p>
-        </div>
+        {plotPath && (
+          <>
+            <Plot
+              className="p-3"
+              downloadName={plotPath.split('/').slice(-1)[0]}
+              plotPath={`api/results/${projectID}${plotPath}`}
+              txtPath={projectID + txtPath}
+              maxHeight="1000px"
+              title="Cosine Similarity Among Mutational Signatures Between Reference Signature Sets"
+            />
+            <p className="p-3">
+              The Cosine Similarity Among Mutational Signatures Between
+              Reference Signature Sets plot highlights cosine similarity between
+              two mutational signature sets given a profile type. Along the
+              bottom of the heatmap are the signatures within the reference
+              signature set selected. Along the side of the heatmap are the
+              signatures within the second reference signature selected.
+            </p>
+          </>
+        )}
       </div>
-      {/* <Debug msg={debugR} /> */}
     </div>
   );
 }

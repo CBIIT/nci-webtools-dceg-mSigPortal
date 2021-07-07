@@ -486,7 +486,7 @@ export default function MutationalSignatureProfile({ submitR }) {
                 className="p-3"
                 title={plotTitle(plots[index])}
                 downloadName={plots[index].plotPath.split('/').slice(-1)[0]}
-                plotURL={plots[index].plotURL}
+                plotPath={plots[index].plotURL}
                 maxHeight="1000px"
               />
             </div>
@@ -585,16 +585,18 @@ export default function MutationalSignatureProfile({ submitR }) {
         <div style={{ display: err ? 'block' : 'none' }}>
           <p>An error has occured. Please verify your input.</p>
         </div>
-        <div style={{ display: plots[0].plotURL ? 'block' : 'none' }}>
-          <hr />
-          <Plot
-            className="p-3"
-            title={plotTitle(plots[0])}
-            downloadName={plots[0].plotPath.split('/').slice(-1)[0]}
-            plotURL={plots[0].plotURL}
-            maxHeight="1000px"
-          />
-        </div>
+        {plots[0].plotURL && (
+          <>
+            <hr />
+            <Plot
+              className="p-3"
+              title={plotTitle(plots[0])}
+              downloadName={plots[0].plotPath.split('/').slice(-1)[0]}
+              plotPath={plots[0].plotURL}
+              maxHeight="1000px"
+            />
+          </>
+        )}
       </div>
       {additionalPlots()}
       {/* <Debug msg={debugR} /> */}

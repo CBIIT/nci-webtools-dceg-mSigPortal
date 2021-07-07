@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -17,7 +17,6 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
   const {
     variableFile,
     plotPath,
-    plotURL,
     txtPath,
     debugR,
     err,
@@ -30,41 +29,6 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
     dispatch(actions.mergeExploration({ msLandscape: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
-
-  useEffect(() => {
-    plotPath ? setRPlot(plotPath) : clearPlot();
-  }, [plotPath, err, debugR]);
-
-  async function setRPlot(plotPath) {
-    if (plotPath) {
-      try {
-        const response = await fetch(`api/results/${projectID}${plotPath}`);
-        if (!response.ok) {
-          // console.log(await response.json());
-        } else {
-          const pic = await response.blob();
-          const objectURL = URL.createObjectURL(pic);
-
-          if (plotURL) URL.revokeObjectURL(plotURL);
-          mergeMsLandscape({
-            plotURL: objectURL,
-          });
-        }
-      } catch (err) {
-        mergeError(err.message);
-      }
-    } else {
-      if (plotURL) URL.revokeObjectURL(plotURL);
-      mergeMsLandscape({ err: true, plotURL: '' });
-    }
-  }
-
-  function clearPlot() {
-    if (plotURL) {
-      URL.revokeObjectURL(plotURL);
-      mergeMsLandscape({ plotURL: '' });
-    }
-  }
 
   return (
     <div>
@@ -136,17 +100,19 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
             <p className="p-3 text-danger">{err}</p>
           </div>
         )}
-        <div style={{ display: plotURL ? 'block' : 'none' }}>
-          <hr />
-          <Plot
-            className="p-3"
-            title="Landscape of Mutational Signature Activity"
-            downloadName={plotPath.split('/').slice(-1)[0]}
-            plotURL={plotURL}
-            txtPath={projectID + txtPath}
-            maxHeight="1100px"
-          />
-        </div>
+        {plotPath && (
+          <>
+            <hr />
+            <Plot
+              className="p-3"
+              title="Landscape of Mutational Signature Activity"
+              downloadName={plotPath.split('/').slice(-1)[0]}
+              plotPath={`api/results/${projectID}${plotPath}`}
+              txtPath={projectID + txtPath}
+              maxHeight="1100px"
+            />
+          </>
+        )}
       </div>
       {/* <Debug msg={debugR} /> */}
     </div>

@@ -16,7 +16,6 @@ export default function MsBurden({ calculateBurden }) {
   const {
     signatureName,
     plotPath,
-    plotURL,
     debugR,
     err,
     loading,
@@ -36,47 +35,12 @@ export default function MsBurden({ calculateBurden }) {
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   useEffect(() => {
-    plotPath ? setRPlot(plotPath) : clearPlot();
-  }, [plotPath, err, debugR]);
-
-  useEffect(() => {
     if (source == 'public') {
       mergeMsBurden({ signatureName: signatureNameOptions[0] });
     } else {
       mergeMsBurden({ signatureName: userNameOptions[0] || '' });
     }
   }, [signatureNameOptions, userNameOptions, source]);
-
-  async function setRPlot(plotPath) {
-    if (plotPath) {
-      try {
-        const response = await fetch(`api/results/${projectID}${plotPath}`);
-        if (!response.ok) {
-          // console.log(await response.json());
-        } else {
-          const pic = await response.blob();
-          const objectURL = URL.createObjectURL(pic);
-
-          if (plotURL) URL.revokeObjectURL(plotURL);
-          mergeMsBurden({
-            plotURL: objectURL,
-          });
-        }
-      } catch (err) {
-        mergeError(err.message);
-      }
-    } else {
-      if (plotURL) URL.revokeObjectURL(plotURL);
-      mergeMsBurden({ err: true, plotURL: '' });
-    }
-  }
-
-  function clearPlot() {
-    if (plotURL) {
-      URL.revokeObjectURL(plotURL);
-      mergeMsBurden({ plotURL: '' });
-    }
-  }
 
   return (
     <div>
@@ -134,12 +98,11 @@ export default function MsBurden({ calculateBurden }) {
         {plotPath && (
           <>
             <hr />
-
             <Plot
               className="p-3"
               title="Mutational Signature Burden Across Cancer Types"
               downloadName={plotPath.split('/').slice(-1)[0]}
-              plotURL={plotURL}
+              plotPath={`api/results/${projectID}${plotPath}`}
             />
           </>
         )}

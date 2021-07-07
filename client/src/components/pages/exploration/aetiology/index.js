@@ -642,7 +642,7 @@ export default function Aetiology() {
                   <Plot
                     className="p-3 border rounded mb-3"
                     maxHeight={'300px'}
-                    plotURL={profileURL}
+                    plotPath={profileURL}
                   />
 
                   {category == 'Cosmic Mutational Signatures' && (
@@ -667,7 +667,7 @@ export default function Aetiology() {
                           <Plot
                             className="p-3 border"
                             maxHeight={'500px'}
-                            plotURL={exposureURL}
+                            plotPath={exposureURL}
                           />
                         ) : (
                           <div className="p-3 border">
@@ -939,19 +939,19 @@ export default function Aetiology() {
               <Plot
                 className="p-3 border rounded mb-3"
                 maxHeight={'300px'}
-                plotURL={refSigURL}
+                plotPath={refSigURL}
               />
 
               <Plot
                 className="p-3 border rounded mb-3"
                 maxHeight={'300px'}
-                plotURL={tissueURL}
+                plotPath={tissueURL}
               />
 
               <Plot
                 className="p-3 border rounded mb-3"
                 maxHeight={'500px'}
-                plotURL={exposureURL}
+                plotPath={exposureURL}
               />
             </div>
           );
