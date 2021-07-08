@@ -374,6 +374,12 @@ export default function Results({ setOpenSidebar }) {
 
   const examples = [
     { title: 'VCF Example', path: 'vcfExample' },
+    { title: 'TCGA PanCancer', path: 'tcga-pancancer' },
+    { title: 'PCAWG PanCancer', path: 'pcawg-pancancer' },
+    { title: 'PCAWG Lung-AdenoCA', path: 'pcawg-lungadenoca' },
+    { title: 'PCAWG Lung-SCC', path: 'pcawg-lungscc' },
+    { title: 'PCAWG Breast-AdenoCA', path: 'pcawg-breastadenoca' },
+    { title: 'PCAWG Skin-Melanoma', path: 'pcawg-skinmelanoma' },
     {
       title: 'MBD4 defect is associated with hypermutated CpG>TpG pattern',
       external: {
@@ -492,7 +498,7 @@ export default function Results({ setOpenSidebar }) {
           <h4>Examples Queries</h4>
           {examples.map(({ title, external, path }, index) => (
             <div key={index}>
-              <Link to={`/visualization/example/${path}`}>
+              <Link to={`/visualization/example/${path}`} disabled>
                 <span className="sr-only">{title + ' link'}</span>
                 {title}
               </Link>

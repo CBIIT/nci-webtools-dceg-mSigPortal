@@ -45,12 +45,14 @@ export default function Visualize({ match }) {
 
   // when retrieving queued result, update id in store
   useEffect(() => {
-    if (type == 'queue') {
-      if (id) loadQueueResult(id);
-    } else if (type == 'example') {
-      if (id) loadExample(id);
+    if (id && !loading.active && !submitted) {
+      if (type == 'queue') {
+        loadQueueResult(id);
+      } else if (type == 'example') {
+        loadExample(id);
+      }
     }
-  }, [id]);
+  }, [id, loading.active]);
 
   function setOpenSidebar(bool) {
     mergeVisualize({ openSidebar: bool });
@@ -65,10 +67,10 @@ export default function Visualize({ match }) {
       },
     });
     try {
-      const { args, state, timestamp } = await (
+      const { args, visualization, timestamp } = await (
         await fetch(`api/getQueueResults/${id}`)
       ).json();
-      dispatch(actions.mergeVisualization(state));
+      dispatch(actions.mergeVisualization(visualization));
     } catch (error) {
       mergeError(error.toString());
     }
@@ -89,21 +91,12 @@ export default function Visualize({ match }) {
       const { projectID, state } = await (
         await fetch(`api/getVisExample/${id}`)
       ).json();
-      mergeVisualize(state.visualize);
-      // rehydrate state if available
-      if (state.profilerSummary) mergeProfilerSummary(state.profilerSummary);
-      if (state.mutationalPattern)
-        mergeMutationalPattern(state.mutationalPattern);
-      if (state.cosineSimilarity) mergeCosineSimilarity(state.cosineSimilarity);
-      if (state.profileComparison)
-        mergeProfileComparison(state.profileComparison);
-      if (state.pca) mergePCA(state.pca);
-      if (state.results) {
-        mergeResults({
-          ...state.results,
-          projectID: projectID,
-        });
-      } else mergeResults({ projectID: projectID });
+      dispatch(
+        actions.mergeVisualization({
+          ...state,
+          results: { ...state.results, projectID: projectID },
+        })
+      );
     } catch (error) {
       mergeError(error.toString());
     }

@@ -708,7 +708,7 @@ async function processMessage(params) {
     // upload parameters
     await s3
       .upload({
-        Body: JSON.stringify({ ...params, state: newState }),
+        Body: JSON.stringify({ ...params, visualization: newState }),
         Bucket: config.queue.bucket,
         Key: `${config.queue.outputKeyPrefix}${id}/params.json`,
       })

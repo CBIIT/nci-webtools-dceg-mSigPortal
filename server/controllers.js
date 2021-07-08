@@ -273,6 +273,13 @@ async function getPublicData(req, res, next) {
 
     let svgList = JSON.parse(list);
 
+    // save svg list
+    // const savePath = path.resolve(config.results.folder, projectID);
+    // fs.mkdirSync(savePath, {
+    //   recursive: true,
+    // });
+    // fs.writeFileSync(path.join(savePath, `svglist.json`), list);
+
     res.json({
       svgList: to2dArray(svgList),
       projectID: projectID,
@@ -587,7 +594,7 @@ async function getVisExample(req, res, next) {
         });
       }
 
-      res.json({ projectID: id, state: params.state });
+      res.json({ projectID: id, state: params.visualization });
     } else {
       throw `Invalid example`;
     }
