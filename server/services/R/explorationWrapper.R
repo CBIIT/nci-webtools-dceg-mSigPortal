@@ -348,7 +348,7 @@ mutationalSignatureAssociation <- function(useCancer, cancerType, both, signatur
   if (!is.null(error)) stop(error)
 }
 
-mutationalSignatureDecomposition <- function(plotPath, s3Data, localData, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected) {
+mutationalSignatureDecomposition <- function(plotPath, txtPath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected) {
   exposure_refdata_input <- exposure_refdata_selected %>% mutate(Sample = paste0(Cancer_Type, "@", Sample)) %>%
     select(Sample, Signature_name, Exposure) %>%
     pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure, values_fill = 0)
@@ -366,15 +366,15 @@ mutationalSignatureDecomposition <- function(plotPath, s3Data, localData, exposu
   decompsite_input <- drop_na(calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input))
 
   if (!is.data.frame(decompsite_input)) {
-    stop('Evaluating step failed due to missing the data')
+    stop('ERROR: Evaluating step failed due to missing the data')
   } else {
     decompsite_input <- decompsite_input %>% separate(col = Sample_Names, into = c('Cancer_Type', 'Sample'), sep = '@')
     decompsite_distribution(decompsite = decompsite_input, output_plot = plotPath) # put the distribution plot online.
-    decompsite_input %>% write_delim(s3Data, delim = '\t', col_names = T) ## put the link to download this table
+    decompsite_input %>% write_delim(txtPath, delim = '\t', col_names = T) ## put the link to download this table
   }
 }
 
-mutationalSignatureLandscape <- function(cancerType, vars3Data, localData, plotPath, exposure_refdata, signature_refsets, seqmatrix_refdata) {
+mutationalSignatureLandscape <- function(cancerType, varDataPath, plotPath, exposure_refdata, signature_refsets, seqmatrix_refdata) {
   exposure_refdata_input <- exposure_refdata %>% filter(Cancer_Type == cancerType) %>%
       select(Sample, Signature_name, Exposure) %>%
       pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure)
@@ -419,7 +419,7 @@ mutationalSignatureLandscape <- function(cancerType, vars3Data, localData, plotP
 
   # parameter: Cancer Type, Vardata_input_file
   if (stringi::stri_length(varDataPath) > 0) {
-    vardata_input <- read_delim(vars3Data, localData, delim = '\t', col_names = T)
+    vardata_input <- read_delim(varDataPath, delim = '\t', col_names = T)
 
     vardata1_input <- vardata_input %>% select(1:2)
     colnames(vardata1_input) <- c('Samples', 'Study')
@@ -482,10 +482,6 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
 
     totalTime = proc.time()
 
-    s3load(paste0(s3Data, 'Signature/signature_refsets.RData'), bucket)
-    s3load(paste0(s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), bucket)
-    s3load(paste0(s3Data, 'Exposure/exposure_refdata.RData'), bucket)
-
     output = list()
     errors = list()
     tmbPath = paste0(savePath, 'tumorMutationalBurden.svg')
@@ -505,31 +501,31 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
     landscape = fromJSON(landscape)
     prevalence = fromJSON(prevalence)
     individual = fromJSON(individual)
-    exposure_refdata_selected <- exposure_refdata %>% filter(Study == common$study, Dataset == common$strategy, Signature_set_name == common$refSignatureSet)
 
     genome <- case_when(
-    common$study == "PCAWG" ~ "GRCh37",
-    common$study == "TCGA" ~ "GRCh37",
-    TRUE ~ "GRCh37"
-  )
+      common$study == "PCAWG" ~ "GRCh37",
+      common$study == "TCGA" ~ "GRCh37",
+      TRUE ~ "GRCh37"
+    )
     genomesize = genome2size(genome)
 
-    signature_refsets_selected <- signature_refsets %>%
-      filter(Signature_set_name == common$refSignatureSet)
+    s3load(paste0(s3Data, 'Signature/signature_refsets.RData'), bucket)
+    s3load(paste0(s3Data, 'Exposure/', common$study, '_', common$strategy, '_exposure_refdata.RData'), bucket)
+    s3load(paste0(s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), bucket)
 
-    # seqmatrix_refdata_selected <- seqmatrix_refdata %>% filter(Study == common$study, Dataset == common$strategy, Profile == signature_refsets_selected$Profile[1])
+    # filter data
+    exposure_refdata_selected <- exposure_refdata %>% filter(Study == common$study, Dataset == common$strategy, Signature_set_name == common$refSignatureSet)
+    signature_refsets_selected <- signature_refsets %>% filter(Signature_set_name == common$refSignatureSet)
+
     if (common$useCancerType) {
       seqmatrixFile <- seqmatrix_refdata_subset_files %>% filter(Study == common$study, Dataset == common$strategy, Cancer_Type == common$cancerType) %>% pull(file)
     } else {
       seqmatrixFile <- paste0(common$study, '_', common$strategy, '_seqmatrix_refdata.RData')
     }
-
-    seqmatrix_refdata_selected = NULL
-
     file <- get_object(paste0(s3Data, 'Seqmatrix/', seqmatrixFile), bucket)
     seqmatrix_refdata_selected <- get(load(rawConnection(file)))
-
     seqmatrix_refdata_selected = seqmatrix_refdata_selected %>% filter(Profile == signature_refsets_selected$Profile[1])
+
     # Tumor Overall Mutational Burden
     if ('all' %in% fn || 'tmb' %in% fn) {
       fnTime = proc.time()
@@ -610,7 +606,7 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
         if (stringi::stri_length(landscape$variableFile) > 0) {
           varDataPath = file.path(rootDir, landscape$variableFile)
         }
-        mutationalSignatureLandscape(common$cancerType, vars3Data, localData, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+        mutationalSignatureLandscape(common$cancerType, varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
         output[['landscapePath']] = landscapePath
       }, error = function(e) {
         errors[['landscapeError']] <<- e$message
@@ -793,7 +789,7 @@ exposureUser <- function(fn, files, common, burden = '{}', association = '{}', l
         if (stringi::stri_length(landscape$variableFile) > 0) {
           varDataPath = file.path(rootDir, landscape$variableFile$signatureFile)
         }
-        mutationalSignatureLandscape(cancer_type_user, vars3Data, localData, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+        mutationalSignatureLandscape(cancer_type_user, varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
         output[['landscapePath']] = landscapePath
       }, error = function(e) {
         errors[['landscapeError']] <<- e$message

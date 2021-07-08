@@ -76,7 +76,7 @@ apiRouter.use(express.json());
 
 apiRouter.use((error, req, res, next) => {
   const { name, message, stack } = error;
-  logger.error({ message, stack });
+  logger.debug(error);
   response.status(500).json(`${name}: ${message}`);
 });
 

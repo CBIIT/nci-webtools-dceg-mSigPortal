@@ -17,7 +17,6 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
   const {
     variableFile,
     plotPath,
-    txtPath,
     debugR,
     err,
     loading,
@@ -108,7 +107,6 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
               title="Landscape of Mutational Signature Activity"
               downloadName={plotPath.split('/').slice(-1)[0]}
               plotPath={`api/results/${projectID}${plotPath}`}
-              txtPath={projectID + txtPath}
               maxHeight="1100px"
             />
           </>

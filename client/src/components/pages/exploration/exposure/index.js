@@ -331,7 +331,7 @@ export default function Exposure({ match }) {
         body: JSON.stringify({
           fn: fn,
           args: args,
-          id,
+          projectID: id,
         }),
       });
 
@@ -358,8 +358,8 @@ export default function Exposure({ match }) {
 
         if (source == 'user') {
           if (!projectID) {
-            const id = handleUpload();
-            await handleCalculate('tmb', id);
+            const { projectID, exposureData } = await handleUpload();
+            await handleCalculate('tmb', projectID);
           } else {
             await handleCalculate('tmb');
           }
@@ -387,8 +387,8 @@ export default function Exposure({ match }) {
 
         if (source == 'user') {
           if (!projectID) {
-            const id = handleUpload();
-            await handleCalculate('tmbSig', id);
+            const { projectID, exposureData } = await handleUpload();
+            await handleCalculate('tmbSig', projectID);
           } else {
             await handleCalculate('tmbSig');
           }
@@ -416,8 +416,8 @@ export default function Exposure({ match }) {
 
         if (source == 'user') {
           if (!projectID) {
-            const id = handleUpload();
-            await handleCalculate('burden', id);
+            const { projectID, exposureData } = await handleUpload();
+            await handleCalculate('burden', projectID);
           } else {
             await handleCalculate('burden');
           }
@@ -445,8 +445,8 @@ export default function Exposure({ match }) {
 
         if (source == 'user') {
           if (!projectID) {
-            const id = handleUpload();
-            await handleCalculate('decomposition', id);
+            const { projectID, exposureData } = await handleUpload();
+            await handleCalculate('decomposition', projectID);
           } else {
             await handleCalculate('decomposition');
           }
@@ -474,8 +474,8 @@ export default function Exposure({ match }) {
 
         if (source == 'user') {
           if (!projectID) {
-            const id = await handleUpload();
-            await handleCalculate('association', id);
+            const { projectID, exposureData } = await handleUpload();
+            await handleCalculate('association', projectID);
           } else {
             await handleCalculate('association');
           }
@@ -503,8 +503,8 @@ export default function Exposure({ match }) {
 
         if (source == 'user') {
           if (!projectID) {
-            const id = await handleUpload();
-            await handleCalculate('landscape', id);
+            const { projectID, exposureData } = await handleUpload();
+            await handleCalculate('landscape', projectID);
           } else {
             await handleCalculate('landscape');
           }
@@ -535,8 +535,8 @@ export default function Exposure({ match }) {
 
         if (source == 'user') {
           if (!projectID) {
-            const id = await handleUpload();
-            await handleCalculate('prevalence', id);
+            const { projectID, exposureData } = await handleUpload();
+            await handleCalculate('prevalence', projectID);
           } else {
             await handleCalculate('prevalence');
           }
@@ -563,8 +563,8 @@ export default function Exposure({ match }) {
 
         if (source == 'user') {
           if (!projectID) {
-            const id = await handleUpload();
-            await handleCalculate('individual', id);
+            const { projectID, exposureData } = await handleUpload();
+            await handleCalculate('individual', projectID);
           } else {
             await handleCalculate('individual');
           }
