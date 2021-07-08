@@ -731,13 +731,13 @@ async function processMessage(params) {
       originalTimestamp: timestamp,
       runTime: runtime,
       resultsUrl: `${config.email.baseUrl}/#/visualization/queue/${id}`,
-      supportEmail: config.email.support,
+      supportEmail: config.email.adminSupport,
     };
 
     // send user success email
     logger.info(`Sending user success email`);
     const userEmailResults = await mailer.sendMail({
-      from: config.email.admin,
+      from: config.email.adminSupport,
       to: state.visualize.email,
       subject: `mSigPortal Results - ${timestamp} EST`,
       html: await readTemplate(
@@ -760,14 +760,14 @@ async function processMessage(params) {
       originalTimestamp: timestamp,
       exception: err.toString(),
       processOutput: !stdout && !stderr ? null : stdout + stderr,
-      supportEmail: config.email.support,
+      supportEmail: config.email.adminSupport,
     };
 
-    // send admin error email
-    logger.info(`Sending admin error email`);
+    // send techSupport error email
+    logger.info(`Sending techSupport error email`);
     const adminEmailResults = await mailer.sendMail({
-      from: config.email.admin,
-      to: config.email.support,
+      from: config.email.adminSupport,
+      to: config.email.techSupport,
       subject: `mSigPortal Error: ${id} - ${timestamp} EST`, // searchable calculation error subject
       html: await readTemplate(
         __dirname + '/templates/admin-failure-email.html',
@@ -779,7 +779,7 @@ async function processMessage(params) {
     if (state.visualize.email) {
       logger.info(`Sending user error email`);
       const userEmailResults = await mailer.sendMail({
-        from: config.email.admin,
+        from: config.email.adminSupport,
         to: state.visualize.email,
         subject: 'mSigPortal Error',
         html: await readTemplate(
