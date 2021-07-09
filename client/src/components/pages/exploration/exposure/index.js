@@ -216,16 +216,11 @@ export default function Exposure({ match }) {
       },
     });
     try {
-      const { projectID, state } = await (
+      const { state } = await (
         await fetch(`api/getExposureExample/${id}`)
       ).json();
 
-      const { expExposure, ...rest } = state;
-
-      mergeState({
-        exposure: { expExposure, projectID: projectID },
-        ...rest,
-      });
+      mergeState(state);
     } catch (error) {
       mergeError(error.message);
     }
@@ -1095,19 +1090,19 @@ export default function Exposure({ match }) {
           name: 'Lung',
           title:
             'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Lung-AdenoCA; MSA SBS5 vs SBS40',
-          path: 'exposure1',
+          path: 'pcawg-lungadenoca',
         },
         {
           name: 'Skin',
           title:
             'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Skin-Melanoma; MSA SBS7a vs SBS7b',
-          path: 'exposure2',
+          path: 'pcawg-skinmelanoma',
         },
         {
           name: 'Breast',
           title:
             'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Breast-AdenoCA; MSA SBS3 vs SBS5',
-          path: 'exposure3',
+          path: 'pcawg-breastadenoca',
         },
       ],
     },

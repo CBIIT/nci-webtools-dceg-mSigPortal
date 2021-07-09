@@ -102,6 +102,7 @@ export default function Visualize({ match }) {
     }
     mergeVisualize({
       loading: { active: false },
+      submitted: true,
     });
   }
 

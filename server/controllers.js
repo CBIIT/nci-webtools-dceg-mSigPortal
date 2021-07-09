@@ -391,12 +391,14 @@ async function visualizationDownloadPublic(req, res, next) {
 }
 
 async function explorationCalc(req, res, next) {
-  const { fn, args, projectID = uuidv4() } = req.body;
-  logger.debug('/explorationCalc: %o', { ...req.body, projectID });
+  const { fn, args, projectID: id } = req.body;
+  logger.debug('/explorationCalc: %o', { ...req.body });
 
+  const projectID = id ? id : uuidv4();
   const rootDir = path.join(config.results.folder, projectID);
   // create save directory if needed
   const savePath = path.join(rootDir, 'results', fn, '/');
+
   fs.mkdirSync(savePath, { recursive: true });
 
   try {
@@ -565,7 +567,11 @@ async function getVisExample(req, res, next) {
     logger.info(`Fetching example: ${example}`);
 
     // check exists
-    const examplePath = path.resolve(config.data.examples, example);
+    const examplePath = path.resolve(
+      config.data.examples,
+      'visualization',
+      example
+    );
     const paramsPath = path.join(examplePath, `params.json`);
 
     if (fs.existsSync(paramsPath)) {
@@ -609,9 +615,8 @@ async function getExposureExample(req, res, next) {
     logger.info(`Fetching Exposure example: ${example}`);
 
     // check exists
-    const examplePath = path.resolve(config.data.examples, example);
+    const examplePath = path.resolve(config.data.examples, 'exposure', example);
     const paramsPath = path.join(examplePath, `params.json`);
-    console.log(paramsPath);
 
     if (fs.existsSync(paramsPath)) {
       const params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
@@ -622,7 +627,9 @@ async function getExposureExample(req, res, next) {
       await fs.promises.mkdir(resultsPath, { recursive: true });
       await fs.copy(examplePath, resultsPath);
 
-      res.json({ projectID: id, state: params.state });
+      res.json({
+        state: { ...params, exposure: { ...params.exposure, projectID: id } },
+      });
     } else {
       throw `Invalid example`;
     }
