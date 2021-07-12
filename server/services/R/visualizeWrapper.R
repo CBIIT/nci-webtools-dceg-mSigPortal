@@ -45,9 +45,9 @@ getPublicData <- function(study, cancerType, experimentalStrategy, s3Data, local
 
   svgfiles <- seqmatrix_refdata_info %>% mutate(Path = paste0(s3Data, 'Seqmatrix/', Path))
   if (cancerType == 'PanCancer') {
-    svgfiles_public <- svgfiles %>% filter(Study == study, Dataset == experimentalStrategy)
+    svgfiles_public <- svgfiles %>% filter(Study == study, Dataset == experimentalStrategy) %>% select(-Study)
   } else {
-    svgfiles_public <- svgfiles %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy)
+    svgfiles_public <- svgfiles %>% filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>% select(-Study)
   }
 
   return(toJSON(svgfiles_public, pretty = TRUE, auto_unbox = TRUE))
