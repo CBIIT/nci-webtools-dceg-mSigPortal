@@ -6,6 +6,7 @@ import {
   Col,
   Popover,
   OverlayTrigger,
+  InputGroup,
 } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
@@ -365,13 +366,15 @@ export default function UserForm() {
           </Col>
           <Col lg="6" className="p-0 d-flex">
             <Button
-              className="p-0 ml-auto font-14"
+              className={`p-0 ml-auto font-14 ${
+                inputFile.size ? 'text-danger' : ''
+              }`}
               disabled={submitted}
               variant="link"
               type="button"
-              onClick={() => loadExample()}
+              onClick={() => (inputFile.size ? removeFile() : loadExample())}
             >
-              Load Example Data
+              {inputFile.size ? 'Remove File' : 'Load Example Data'}
             </Button>
           </Col>
         </Row>
@@ -538,7 +541,9 @@ export default function UserForm() {
           </Col>
           <Col lg="6" className="p-0 d-flex">
             <Button
-              className="p-0 ml-auto font-14"
+              className={`p-0 ml-auto font-14 ${
+                bedFile.size ? 'text-danger' : ''
+              }`}
               disabled={
                 submitted ||
                 mutationSplit == 'True' ||
@@ -546,9 +551,9 @@ export default function UserForm() {
               }
               variant="link"
               type="button"
-              onClick={() => loadBed()}
+              onClick={() => (bedFile.size ? removeBedFile() : loadBed())}
             >
-              Load Example Bed
+              {bedFile.size ? 'Remove File' : 'Load Example Bed'}
             </Button>
           </Col>
         </Row>
