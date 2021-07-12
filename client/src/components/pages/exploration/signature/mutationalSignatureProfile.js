@@ -41,7 +41,7 @@ export default function MutationalSignatureProfile({ submitR }) {
     if (plots.length == 1 && plots[0].profileName && !plots[0].plotURL) {
       getInitalPlot();
     }
-  }, []);
+  }, [plots]);
 
   // dataFolder/Reference_Signature_Profiles_SVG/refSignatureSet/profileName+signatureName
   function buildPlotPath(profileName, refSignatureSet, signatureName) {
