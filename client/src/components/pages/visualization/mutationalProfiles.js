@@ -94,7 +94,8 @@ export default function MutationalProfiles() {
 
         if (!response.ok) {
           const msg = await response.text();
-          mergeError(msg);
+          console.log(msg);
+          // mergeError(msg);
         } else {
           const pic = await response.blob();
           const objectURL = URL.createObjectURL(pic);
@@ -201,7 +202,7 @@ export default function MutationalProfiles() {
           )
         ),
       ];
-
+      console.log(filteredPlots, matrixOptions);
       mergeMutationalProfiles({
         selectProfile: profile,
         selectMatrix: defaultMatrix(profile, matrixOptions),
