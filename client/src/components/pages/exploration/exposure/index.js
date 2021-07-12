@@ -351,16 +351,7 @@ export default function Exposure({ match }) {
           plotPath: '',
         });
 
-        if (source == 'user') {
-          if (!projectID) {
-            const { projectID, exposureData } = await handleUpload();
-            await handleCalculate('tmb', projectID);
-          } else {
-            await handleCalculate('tmb');
-          }
-        } else {
-          await handleCalculate('tmb');
-        }
+        await handleCalculate('tmb', projectID || (await uploadVariable()));
 
         mergeTMB({ loading: false });
       }
@@ -380,16 +371,7 @@ export default function Exposure({ match }) {
           plotPath: '',
         });
 
-        if (source == 'user') {
-          if (!projectID) {
-            const { projectID, exposureData } = await handleUpload();
-            await handleCalculate('tmbSig', projectID);
-          } else {
-            await handleCalculate('tmbSig');
-          }
-        } else {
-          await handleCalculate('tmbSig');
-        }
+        await handleCalculate('tmbSig', projectID || (await uploadVariable()));
 
         mergeTmbSignatures({ loading: false });
       }
@@ -409,16 +391,7 @@ export default function Exposure({ match }) {
           plotPath: '',
         });
 
-        if (source == 'user') {
-          if (!projectID) {
-            const { projectID, exposureData } = await handleUpload();
-            await handleCalculate('burden', projectID);
-          } else {
-            await handleCalculate('burden');
-          }
-        } else {
-          await handleCalculate('burden');
-        }
+        await handleCalculate('burden', projectID || (await uploadVariable()));
 
         mergeMsBurden({ loading: false });
       }
@@ -438,16 +411,10 @@ export default function Exposure({ match }) {
           plotPath: '',
         });
 
-        if (source == 'user') {
-          if (!projectID) {
-            const { projectID, exposureData } = await handleUpload();
-            await handleCalculate('decomposition', projectID);
-          } else {
-            await handleCalculate('decomposition');
-          }
-        } else {
-          await handleCalculate('decomposition');
-        }
+        await handleCalculate(
+          'decomposition',
+          projectID || (await uploadVariable())
+        );
 
         mergeMsDecomposition({ loading: false });
       }
@@ -467,16 +434,10 @@ export default function Exposure({ match }) {
           plotPath: '',
         });
 
-        if (source == 'user') {
-          if (!projectID) {
-            const { projectID, exposureData } = await handleUpload();
-            await handleCalculate('association', projectID);
-          } else {
-            await handleCalculate('association');
-          }
-        } else {
-          await handleCalculate('association');
-        }
+        await handleCalculate(
+          'association',
+          projectID || (await uploadVariable())
+        );
 
         mergeMsAssociation({ loading: false });
       }
@@ -496,19 +457,10 @@ export default function Exposure({ match }) {
           plotPath: '',
         });
 
-        if (source == 'user') {
-          if (!projectID) {
-            const { projectID, exposureData } = await handleUpload();
-            await handleCalculate('landscape', projectID);
-          } else {
-            await handleCalculate('landscape');
-          }
-        } else if (variableFileObj.size) {
-          const id = await uploadVariable();
-          await handleCalculate('landscape', id);
-        } else {
-          await handleCalculate('landscape');
-        }
+        await handleCalculate(
+          'landscape',
+          projectID || (await uploadVariable())
+        );
 
         mergeMsLandscape({ loading: false });
       }
@@ -528,16 +480,10 @@ export default function Exposure({ match }) {
           plotPath: '',
         });
 
-        if (source == 'user') {
-          if (!projectID) {
-            const { projectID, exposureData } = await handleUpload();
-            await handleCalculate('prevalence', projectID);
-          } else {
-            await handleCalculate('prevalence');
-          }
-        } else {
-          await handleCalculate('prevalence');
-        }
+        await handleCalculate(
+          'prevalence',
+          projectID || (await uploadVariable())
+        );
 
         mergeMsPrevalence({ loading: false });
       }
@@ -556,16 +502,10 @@ export default function Exposure({ match }) {
           plotPath: '',
         });
 
-        if (source == 'user') {
-          if (!projectID) {
-            const { projectID, exposureData } = await handleUpload();
-            await handleCalculate('individual', projectID);
-          } else {
-            await handleCalculate('individual');
-          }
-        } else {
-          await handleCalculate('individual');
-        }
+        await handleCalculate(
+          'individual',
+          projectID || (await uploadVariable())
+        );
 
         mergeMsIndividual({ loading: false });
       }
@@ -589,7 +529,6 @@ export default function Exposure({ match }) {
     try {
       if (source == 'user') {
         const { projectID, exposureData } = await handleUpload();
-
         // get signature name options, ignore sample key
         const nameOptions = exposureData.columns.filter(
           (key) => key != 'Samples'
@@ -613,17 +552,14 @@ export default function Exposure({ match }) {
           },
           msBurden: { signatureName: nameOptions[0] },
         };
-        mergeState(params);
 
+        await mergeState(params);
         await handleCalculate('all', projectID, params);
-      } else if (variableFileObj.size) {
-        const id = await uploadVariable();
-        await handleCalculate('all', id);
       } else {
-        await handleCalculate('all');
+        await handleCalculate('all', await uploadVariable());
       }
     } catch (err) {
-      mergeError(err.message);
+      mergeError(err);
     }
   }
 
@@ -904,6 +840,7 @@ export default function Exposure({ match }) {
                 }),
               })
             ).json();
+            await mergeExposure({ projectID });
             resolve({ projectID, exposureData });
           }
         } catch (err) {
@@ -947,11 +884,12 @@ export default function Exposure({ match }) {
   }
 
   // when using public data and only need to upload a variable data file
+  // also used to create a work directory and id
   async function uploadVariable() {
     return new Promise(async (resolve, reject) => {
       try {
         const data = new FormData();
-        data.append('variableFile', variableFileObj);
+        if (variableFileObj.size) data.append('variableFile', variableFileObj);
 
         let response = await fetch(`api/upload`, {
           method: 'POST',
@@ -968,6 +906,7 @@ export default function Exposure({ match }) {
           reject(error);
         } else {
           const { projectID } = await response.json();
+          await mergeExposure({ projectID });
           resolve(projectID);
         }
       } catch (err) {
