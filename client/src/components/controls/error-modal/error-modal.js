@@ -29,13 +29,16 @@ export function ErrorModal(props) {
       </Modal.Header>
 
       <Modal.Body style={{ backgroundColor: '#fafafa' }}>
-        <p>An error has occured. Please contact an admin for assistance.</p>
-        <p>tba@email.com</p>
         <p
-          className="m-0 w-100"
+          className="w-100"
           data-testid="ErrorModalMessage"
           dangerouslySetInnerHTML={{ __html: `Error: ${error.message}` }}
         />
+        <p>
+          An error has occured. If the issue persists, please contact an admin
+          for assistance.
+        </p>
+        <p>NCImSigPortalWebAdmin@mail.nih.gov</p>
       </Modal.Body>
 
       <Modal.Footer
