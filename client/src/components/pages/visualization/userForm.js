@@ -310,9 +310,9 @@ export default function UserForm() {
       <Title as="h3">Mutation Split</Title>
       <Content>
         <p>
-          For each sample, split mutations in to different groups according the
-          “Filter” column in VCF/CSV/TSV file. Splitting operation use the “;”
-          as separator.
+          For each sample, split mutations into different groups according to
+          the “Filter” column in VCF/CSV/TSV file. Splitting operation uses the
+          “;” as separator.
         </p>
       </Content>
     </Popover>
@@ -323,7 +323,7 @@ export default function UserForm() {
       <Title as="h3">Mutation Split</Title>
       <Content>
         <p>
-          A new sample called “All_Sample” will add to the result, which
+          A new sample called “All_Sample” will be added to the result, which
           combines the mutations from all samples.
         </p>
       </Content>
@@ -656,7 +656,7 @@ export default function UserForm() {
           </Control.Feedback>
           <Text className="text-muted">
             <i>
-              Note: if sending to queue, when computation is completed, a
+              Note: If sending to queue, when computation is completed, a
               notification will be sent to the e-mail entered above.
             </i>
           </Text>

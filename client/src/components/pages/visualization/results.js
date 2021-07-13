@@ -488,14 +488,15 @@ export default function Results({ setOpenSidebar }) {
         >
           <h4>Instructions</h4>
           <p>
-            Choose a Data Source and it's associated options to submit a query
+            Choose a Data Source and its associated options to submit a query
+            using the panel on the left
           </p>
           <hr />
-          <h4>Data Souce</h4>
+          <h4>Data Source</h4>
           <p>Public: Perform analysis using data available on the website</p>
           <p>User: Upload your own data</p>
           <hr />
-          <h4>Examples Queries</h4>
+          <h4>Example Queries</h4>
           {examples.map(({ title, external, path }, index) => (
             <div key={index}>
               <Link to={`/visualization/example/${path}`} disabled>

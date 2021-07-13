@@ -111,7 +111,7 @@ export default function Download() {
         <div>
           <Button variant="link" onClick={() => downloadPublic()}>
             <LoadingOverlay active={downloading.length > 0} />
-            Download matrixes of different mutational profiles for selected
+            Download matrices of different mutational profiles for selected
             study
           </Button>
         </div>

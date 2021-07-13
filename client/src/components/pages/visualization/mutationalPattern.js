@@ -169,7 +169,7 @@ export default function MutationalPattern({ submitR }) {
         <Form noValidate className="p-3">
           <LoadingOverlay active={loading} />
           <Row>
-            <Col lg="2">
+            <Col lg="auto">
               <Group
                 controlId="minimum"
                 title="Minimal Proportion mutations within Each Mutational Pattern"
@@ -190,7 +190,7 @@ export default function MutationalPattern({ submitR }) {
                 </Form.Control.Feedback>
               </Group>
             </Col>
-            <Col lg="2">
+            <Col lg="auto">
               <Group controlId="pattern">
                 <Label>Mutational Pattern</Label>
                 <Control

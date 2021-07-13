@@ -88,12 +88,13 @@ export default function ProfilerSummary({ submitR }) {
         <b>Number of Mutations Per Sample with Regard to Mutational Profile</b>
         <p>
           This plot illustrates the number of mutations in each tumor sample
-          from [Cancer Type] in selected [Study]. On the y-axis is the number of
-          mutations in log base 10, and on the x-axis is the sample index for
-          each sample of the selected cancer type (sorted by number of
-          mutations). The legend depicts the different colored lines used on the
-          plot to denote different mutational profiles (SBS= single-base
-          substitution, DBS= doublet-base substitution, ID=indel).
+          {source == 'public' && ` from Cancer Type: ${cancerType} in selected Study: ${study}`}. On
+          the y-axis is the number of mutations in log base 10, and on the
+          x-axis is the sample index for each sample of the selected cancer type
+          (sorted by number of mutations). The legend depicts the different
+          colored lines used on the plot to denote different mutational profiles
+          (SBS= single-base substitution, DBS= doublet-base substitution,
+          ID=indel).
         </p>
       </div>
       <hr />
