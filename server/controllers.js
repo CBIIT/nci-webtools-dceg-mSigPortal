@@ -64,8 +64,18 @@ async function getResultsFiles(resultsPath, id = '') {
   if (fs.existsSync(downloadsPath)) {
     downloads = fs
       .readdirSync(downloadsPath)
-      .filter((file) => file.endsWith('.tar.gz'))
+      .filter((file) => file.endsWith('.zip'))
       .map((file) => file);
+  }
+
+  if (fs.existsSync(path.join(downloadsPath, 'vcf_files_zip'))) {
+    downloads = [
+      ...downloads,
+      ...fs
+        .readdirSync(path.join(downloadsPath, 'vcf_files_zip'))
+        .filter((file) => file.endsWith('.zip'))
+        .map((file) => path.join('vcf_files_zip', file)),
+    ];
   }
 
   svgList.forEach(
