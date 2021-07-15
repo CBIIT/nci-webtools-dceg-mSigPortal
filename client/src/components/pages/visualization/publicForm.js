@@ -3,10 +3,7 @@ import { Form, Button, Row, Col, Popover } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Select from '../../controls/select/select';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  actions as visualizationActions,
-  getInitialState,
-} from '../../../services/store/visualization';
+import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
 
 const actions = { ...visualizationActions, ...modalActions };
@@ -19,12 +16,6 @@ export default function PublicForm() {
     dispatch(actions.mergeVisualization({ visualize: state }));
   const mergeResults = (state) =>
     dispatch(actions.mergeVisualization({ results: state }));
-  const mergeProfilerSummary = (state) =>
-    dispatch(actions.mergeVisualization({ profilerSummary: state }));
-  const mergeMutationalProfiles = (state) =>
-    dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
-  const mergeMutationalPattern = (state) =>
-    dispatch(actions.mergeVisualization({ mutationalPattern: state }));
   const mergeCosineSimilarity = (state) =>
     dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
   const mergeProfileComparison = (state) =>

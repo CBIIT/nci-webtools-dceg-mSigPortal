@@ -24,18 +24,6 @@ export default function Visualize({ match }) {
     dispatch(actions.mergeVisualization({ visualize: state }));
   const mergeResults = (state) =>
     dispatch(actions.mergeVisualization({ results: state }));
-  const mergeProfilerSummary = (state) =>
-    dispatch(actions.mergeVisualization({ profilerSummary: state }));
-  const mergeMutationalPattern = (state) =>
-    dispatch(actions.mergeVisualization({ mutationalPattern: state }));
-  const mergeCosineSimilarity = (state) =>
-    dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
-  const mergeProfileComparison = (state) =>
-    dispatch(actions.mergeVisualization({ profileComparison: state }));
-  const mergePCA = (state) =>
-    dispatch(actions.mergeVisualization({ pca: state }));
-  const mergeKataegis = (state) =>
-    dispatch(actions.mergeVisualization({ kataegis: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
