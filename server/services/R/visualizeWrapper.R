@@ -620,17 +620,16 @@ mutationalPattern <- function(matrixFile, proportion, pattern, projectID, python
 # Motif analysis ----------------------------------------------------------
 ###parameters:
 mutationalPatternPublic <- function(study, cancerType, experimentalStrategy, proportion, pattern, projectID, pythonOutput, savePath, s3Data, localData, bucket) {
-  source('services/R/Sigvisualfunc.R')
-
-  s3load(paste0(s3Data, 'Others/content_data_all.RData'), bucket)
-  s3load(paste0(s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), bucket)
-
-  stdout <- vector('character')
-  con <- textConnection('stdout', 'wr', local = TRUE)
-  sink(con, type = "message")
-  sink(con, type = "output")
-
   tryCatch({
+    source('services/R/Sigvisualfunc.R')
+
+    s3load(paste0(s3Data, 'Others/content_data_all.RData'), bucket)
+    s3load(paste0(s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), bucket)
+
+    stdout <- vector('character')
+    con <- textConnection('stdout', 'wr', local = TRUE)
+    sink(con, type = "message")
+    sink(con, type = "output")
     output = list()
     barPath = paste0(savePath, 'barchart.svg')
     plotPath = paste0(savePath, 'mpea.svg')
@@ -648,10 +647,9 @@ mutationalPatternPublic <- function(study, cancerType, experimentalStrategy, pro
       file <- get_object(paste0(s3Data, 'Seqmatrix/', publicDataFile), bucket)
       seqmatrix_refdata <- get(load(rawConnection(file))) %>% filter(Study == study)
     } else {
-      file <- get_object(paste0(s3Data, 'Seqmatrix/seqmatrix_refdata.RData'), bucket)
-      seqmatrix_refdata <- get(load(rawConnection(file))) %>% filter(Study == study)
-
+      s3load(paste0(s3Data, 'Seqmatrix/', study, '_', experimentalStrategy, '_seqmatrix_refdata.RData'), bucket)
     }
+
     data_input <- seqmatrix_refdata %>%
       filter(Profile == "SBS96") %>%
       mutate(Study = paste0(Study, "@", Cancer_Type)) %>%
