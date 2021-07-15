@@ -55,7 +55,7 @@ export default function Aetiology() {
 
   // set selected tab on component render
   useEffect(() => {
-    mergeState({ exploration: { displayTab: 'aetiology' } });
+    mergeState({ exploration: { displayTab: 'etiology' } });
   }, []);
 
   useEffect(() => {
