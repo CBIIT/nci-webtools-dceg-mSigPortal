@@ -32,6 +32,7 @@ const {
   getPublications,
   getImageS3,
   getFileS3,
+  downloadSession,
 } = require('./controllers');
 
 if (cluster.isMaster) {
@@ -72,7 +73,7 @@ app.use(express.static(path.resolve('www')));
 
 apiRouter.use('/results', express.static(config.results.folder));
 // apiRouter.use('/public', express.static(config.data.localData));
-apiRouter.use(express.json());
+apiRouter.use(express.json({ limit: '50mb' }));
 
 apiRouter.use((error, req, res, next) => {
   const { name, message, stack } = error;
@@ -117,3 +118,5 @@ apiRouter.get('/getPublications', getPublications);
 apiRouter.post('/getImageS3', getImageS3);
 
 apiRouter.post('/getFileS3', getFileS3);
+
+apiRouter.post('/downloadSession', downloadSession);

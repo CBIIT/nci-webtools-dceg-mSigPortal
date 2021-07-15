@@ -17,7 +17,9 @@ export default function Download() {
     experimentalStrategy,
     cancerType,
   } = visualization.visualize;
+
   const [downloading, setDownload] = useState([]);
+  const [downloadingSession, setSession] = useState(false);
 
   async function downloadOutput(file) {
     setDownload((downloading) => [...downloading, file]);
@@ -76,6 +78,54 @@ export default function Download() {
     setDownload([]);
   }
 
+  // downloads current sesssion from tmp/[id] along with redux state
+  async function downloadSession() {
+    setSession(true);
+
+    const response = await fetch(`api/downloadSession`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: projectID,
+        state: {
+          visualization: {
+            ...visualization,
+            visualize: {
+              ...visualization.visualize,
+              email: '',
+              queueMode: false,
+            },
+            results: {
+              ...visualization.results,
+              displayTab: 'profilerSummary',
+            },
+            mutationalProfiles: {
+              ...visualization.mutationalProfiles,
+              plotPath: '',
+            },
+          },
+        },
+      }),
+    });
+
+    if (response.ok) {
+      const objectURL = URL.createObjectURL(await response.blob());
+      const tempLink = document.createElement('a');
+
+      tempLink.href = `${objectURL}`;
+      tempLink.setAttribute('download', `msigportal-session.tgz`);
+      document.body.appendChild(tempLink);
+      tempLink.click();
+      document.body.removeChild(tempLink);
+    } else {
+      mergeError(`error`);
+    }
+    setSession(false);
+  }
+
   return (
     <div className="bg-white border rounded p-4">
       {source == 'user' ? (
@@ -116,6 +166,10 @@ export default function Download() {
           </Button>
         </div>
       )}
+      <Button variant="link" onClick={() => downloadSession()}>
+        <LoadingOverlay active={downloadingSession} />
+        Download Session
+      </Button>
     </div>
   );
 }

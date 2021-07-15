@@ -596,7 +596,7 @@ async function getVisExample(req, res, next) {
       // rename file paths with new ID if needed
       const svgPath = path.join(resultsPath, 'results', 'svg_files_list.txt');
       if (fs.existsSync(svgPath)) {
-        const oldID = params.args.projectID[1];
+        const oldID = params.visualization.results.projectID;
         const matrixPath = path.join(
           resultsPath,
           'results',
@@ -710,6 +710,31 @@ async function getFileS3(req, res, next) {
     .pipe(res);
 }
 
+async function downloadSession(req, res, next) {
+  logger.info(`/visualization/downloadSession`);
+
+  const { state, id } = req.body;
+  const session = path.resolve(config.results.folder, id);
+
+  if (fs.existsSync(session)) {
+    try {
+      await fs.promises.writeFile(
+        path.join(session, 'params.json'),
+        JSON.stringify(state)
+      );
+
+      tar
+        .c({ sync: true, gzip: true, C: config.results.folder }, [id])
+        .pipe(res);
+    } catch (err) {
+      next(err);
+    }
+  } else {
+    logger.info('traversal error');
+    res.status(500).end('Not found');
+  }
+}
+
 module.exports = {
   parseCSV,
   profilerExtraction,
@@ -733,4 +758,5 @@ module.exports = {
   getFileS3,
   to2dArray,
   getRelativePath,
+  downloadSession,
 };

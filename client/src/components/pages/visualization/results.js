@@ -374,20 +374,20 @@ export default function Results({ setOpenSidebar }) {
 
   const examples = [
     { title: 'VCF Example', path: 'vcfExample' },
-    // { title: 'TCGA PanCancer', path: 'tcga-pancancer' },
-    // { title: 'PCAWG PanCancer', path: 'pcawg-pancancer' },
+    { title: 'PCAWG PanCancer', path: 'pcawg-pancancer' },
     { title: 'PCAWG Lung-AdenoCA', path: 'pcawg-lungadenoca' },
     { title: 'PCAWG Lung-SCC', path: 'pcawg-lungscc' },
     { title: 'PCAWG Breast-AdenoCA', path: 'pcawg-breastadenoca' },
     { title: 'PCAWG Skin-Melanoma', path: 'pcawg-skinmelanoma' },
-    // {
-    //   title: 'MBD4 defect is associated with hypermutated CpG>TpG pattern',
-    //   external: {
-    //     name: 'PMID: 29760383',
-    //     href: 'https://pubmed.ncbi.nlm.nih.gov/29760383/',
-    //   },
-    //   path: 'tcgaPanCancer',
-    // },
+    { title: 'TCGA PanCancer', path: 'tcga-pancancer' },
+    {
+      title: 'MBD4 defect is associated with hypermutated CpG>TpG pattern',
+      external: {
+        name: 'PMID: 29760383',
+        href: 'https://pubmed.ncbi.nlm.nih.gov/29760383/',
+      },
+      path: 'mbd4_defect',
+    },
   ];
 
   return (
