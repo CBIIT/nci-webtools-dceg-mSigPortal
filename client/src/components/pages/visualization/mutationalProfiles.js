@@ -313,16 +313,16 @@ export default function MutationalProfiles() {
       </Form>
 
       <hr />
-      {plotPath && (
-        <div style={{ minHeight: '400px' }}>
-          <LoadingOverlay active={loading} />
+      <div style={{ minHeight: '400px' }}>
+        <LoadingOverlay active={loading} />
+        {plotPath && (
           <Plot
             className="p-3"
             downloadName={getdownloadName()}
             plotPath={plotPath}
           />
-        </div>
-      )}
+        )}
+      </div>
       {/* <Button
         variant="link"
         className="p-0 mt-5"
