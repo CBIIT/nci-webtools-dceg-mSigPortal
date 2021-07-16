@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 import Plot from '../../controls/plot/plot';
 import Select from '../../controls/select/select';
 import { useSelector, useDispatch } from 'react-redux';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
 import {
@@ -42,6 +43,7 @@ export default function MutationalProfiles() {
   } = visualization.mutationalProfiles;
 
   const { columns } = svgList;
+  const [loading, setLoading] = useState(false);
 
   // set inital plot
   useEffect(() => {
@@ -75,6 +77,7 @@ export default function MutationalProfiles() {
 
   async function setPlot() {
     if (filtered.length) {
+      setLoading(true);
       const plot = filtered[0];
 
       try {
@@ -109,6 +112,7 @@ export default function MutationalProfiles() {
       } catch (err) {
         mergeError(err.message);
       }
+      setLoading(false);
     }
   }
 
@@ -310,11 +314,14 @@ export default function MutationalProfiles() {
 
       <hr />
       {plotPath && (
-        <Plot
-          className="p-3"
-          downloadName={getdownloadName()}
-          plotPath={plotPath}
-        />
+        <div style={{ minHeight: '400px' }}>
+          <LoadingOverlay active={loading} />
+          <Plot
+            className="p-3"
+            downloadName={getdownloadName()}
+            plotPath={plotPath}
+          />
+        </div>
       )}
       {/* <Button
         variant="link"
