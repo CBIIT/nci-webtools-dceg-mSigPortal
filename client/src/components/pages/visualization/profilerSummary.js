@@ -18,13 +18,14 @@ export default function ProfilerSummary({ submitR }) {
     study,
     cancerType,
     pubExperimentalStrategy,
+    loading: mainLoading,
   } = visualization.visualize;
   const { matrixList, projectID } = visualization.results;
 
   const { plotPath, err, debugR, loading } = visualization.profilerSummary;
   useEffect(() => {
     // check if profiler summary already exists, else lazy-load calculate
-    if (!plotPath) {
+    if (!plotPath && !mainLoading.active) {
       if (source == 'user') {
         calculateR('profilerSummary', {
           matrixList: JSON.stringify(matrixList),
@@ -37,7 +38,7 @@ export default function ProfilerSummary({ submitR }) {
         });
       }
     }
-  }, [plotPath]);
+  }, [plotPath, mainLoading.active]);
 
   async function calculateR(fn, args) {
     mergeProfilerSummary({
@@ -83,7 +84,6 @@ export default function ProfilerSummary({ submitR }) {
 
   return (
     <div className="bg-white border rounded">
-      <LoadingOverlay active={loading} />
       <div className="p-3">
         <b>Number of Mutations Per Sample with Regard to Mutational Profile</b>
         <p>
@@ -99,14 +99,17 @@ export default function ProfilerSummary({ submitR }) {
         </p>
       </div>
       <hr />
-      {plotPath && (
-        <Plot
-          className="p-3"
-          downloadName={plotPath.split('/').slice(-1)[0]}
-          plotPath={'api/results/' + projectID + plotPath}
-          maxHeight="600px"
-        />
-      )}
+      <div style={{ minHeight: '500px' }}>
+        <LoadingOverlay active={loading} />
+        {plotPath && (
+          <Plot
+            className="p-3"
+            downloadName={plotPath.split('/').slice(-1)[0]}
+            plotPath={'api/results/' + projectID + plotPath}
+            maxHeight="600px"
+          />
+        )}
+      </div>
     </div>
   );
 }
