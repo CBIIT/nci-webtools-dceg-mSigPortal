@@ -580,18 +580,24 @@ async function getVisExample(req, res, next) {
     const examplePath = path.resolve(
       config.data.examples,
       'visualization',
-      example
+      `${example}.tgz`
     );
-    const paramsPath = path.join(examplePath, `params.json`);
 
-    if (fs.existsSync(paramsPath)) {
-      const params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
-
+    if (fs.existsSync(examplePath)) {
       // copy example to results with unique id
       const id = uuidv4();
       const resultsPath = path.resolve(config.results.folder, id);
       await fs.promises.mkdir(resultsPath, { recursive: true });
-      await fs.copy(examplePath, resultsPath);
+      // await fs.copy(examplePath, resultsPath);
+      await new Promise((resolve, reject) => {
+        fs.createReadStream(examplePath)
+          .on('end', () => resolve())
+          .on('error', (err) => reject(err))
+          .pipe(tar.x({ strip: 1, C: resultsPath }));
+      });
+
+      const paramsPath = path.join(resultsPath, `params.json`);
+      const params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
 
       // rename file paths with new ID if needed
       const svgPath = path.join(resultsPath, 'results', 'svg_files_list.txt');
