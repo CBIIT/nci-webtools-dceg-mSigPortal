@@ -3,6 +3,7 @@ import { Row, Col, Button, Form } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as explorationActions } from '../../../../services/store/exploration';
 import { actions as modalActions } from '../../../../services/store/modal';
+import { getJSON } from '../../../../services/utils';
 import Plot from '../../../controls/plot/plot';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import './aetiology.scss';
@@ -62,18 +63,7 @@ export default function Aetiology() {
     const getData = async () => {
       try {
         const file = categories.filter(({ name }) => name == category)[0].file;
-        const data = await (
-          await fetch(`api/getFileS3`, {
-            method: 'POST',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              path: `Aetiology/${file}`,
-            }),
-          })
-        ).json();
+        const data = await getJSON(`Aetiology/${file}`);
 
         const aetiologyOptions = [
           ...new Set(data.map(({ Aetiology }) => Aetiology)),

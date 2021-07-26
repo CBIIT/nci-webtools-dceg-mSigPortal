@@ -5,6 +5,7 @@ import Select from '../../controls/select/select';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
+import { getJSON } from '../../../services/utils';
 
 const actions = { ...visualizationActions, ...modalActions };
 
@@ -119,18 +120,9 @@ export default function PublicForm() {
   async function getPublicDataOptions() {
     mergeVisualize({ loadingPublic: true });
     try {
-      const pDataOptions = await (
-        await fetch(`api/getFileS3`, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            path: `Others/json/Visualization-Public.json`,
-          }),
-        })
-      ).json();
+      const pDataOptions = await getJSON(
+        `Others/json/Visualization-Public.json`
+      );
 
       const studyOptions = [...new Set(pDataOptions.map((data) => data.Study))];
       // default study

@@ -37,3 +37,33 @@ export function defaultMatrix(profile, matrixOptions) {
 export function defaultFilter(filterOptions) {
   return filterOptions.includes('NA') ? 'NA' : filterOptions[0];
 }
+
+export function getJSON(path) {
+  return fetch(`api/getFileS3`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      path: path,
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => data);
+}
+
+export function getBlob(path) {
+  return fetch(`api/getFileS3`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      path: path,
+    }),
+  })
+    .then((res) => res.blob())
+    .then((data) => data);
+}

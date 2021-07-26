@@ -7,6 +7,7 @@ import {
   getInitialState,
 } from '../../../services/store/exploration';
 import { actions as modalActions } from '../../../services/store/modal';
+import { getJSON } from '../../../services/utils';
 import Signature from './signature/index';
 import Exposure from './exposure';
 import Aetiology from './aetiology';
@@ -35,20 +36,6 @@ export default function Explore() {
     if (!exposureSignature.length) populateControls();
   }, []);
 
-  const getFileS3 = (path) =>
-    fetch(`api/getFileS3`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        path: path,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => data);
-
   async function populateControls() {
     try {
       let [
@@ -57,10 +44,10 @@ export default function Explore() {
         exposureSignature,
         signatureNames,
       ] = await Promise.all([
-        getFileS3(`Others/json/Exploring-Signature.json`),
-        getFileS3('Others/json/Exploring-Exposure-cancertype.json'),
-        getFileS3('Others/json/Exploring-Exposure.json'),
-        getFileS3('Others/json/Signature_name.json'),
+        getJSON(`Others/json/Exploring-Signature.json`),
+        getJSON('Others/json/Exploring-Exposure-cancertype.json'),
+        getJSON('Others/json/Exploring-Exposure.json'),
+        getJSON('Others/json/Signature_name.json'),
       ]);
 
       populateSignatureExp(signatureData);

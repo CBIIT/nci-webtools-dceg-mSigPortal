@@ -3,6 +3,7 @@ import { Button } from 'react-bootstrap';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { useDispatch } from 'react-redux';
 import { actions } from '../../../../services/store/modal';
+import { getBlob } from '../../../../services/utils';
 
 export default function Download() {
   const dispatch = useDispatch();
@@ -15,29 +16,16 @@ export default function Download() {
   async function downloadPublic() {
     setDownload(true);
     try {
-      const response = await fetch(`api/getFileS3`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          path: 'Signature/signature_refsets.txt.tar.gz',
-        }),
-      });
+      const objectURL = URL.createObjectURL(
+        await getBlob('Signature/signature_refsets.txt.tar.gz')
+      );
+      const tempLink = document.createElement('a');
 
-      if (response.ok) {
-        const objectURL = URL.createObjectURL(await response.blob());
-        const tempLink = document.createElement('a');
-
-        tempLink.href = `${objectURL}`;
-        tempLink.setAttribute('download', `signature_refsets.txt.tar.gz`);
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        document.body.removeChild(tempLink);
-      } else {
-        mergeError(`public data is not available`);
-      }
+      tempLink.href = `${objectURL}`;
+      tempLink.setAttribute('download', `signature_refsets.txt.tar.gz`);
+      document.body.appendChild(tempLink);
+      tempLink.click();
+      document.body.removeChild(tempLink);
     } catch (err) {
       console.log(err);
       mergeError(`public data is not available`);
