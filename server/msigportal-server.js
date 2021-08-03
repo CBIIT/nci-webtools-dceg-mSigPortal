@@ -33,6 +33,8 @@ const {
   getImageS3,
   getFileS3,
   downloadSession,
+  associationCalc,
+  associationData,
 } = require('./controllers');
 
 if (cluster.isMaster) {
@@ -120,3 +122,7 @@ apiRouter.post('/getImageS3', getImageS3);
 apiRouter.post('/getFileS3', getFileS3);
 
 apiRouter.post('/downloadSession', downloadSession);
+
+apiRouter.post('/associationCalc', associationCalc);
+
+apiRouter.post('/associationData', associationData);

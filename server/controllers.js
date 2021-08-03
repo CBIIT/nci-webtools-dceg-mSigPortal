@@ -458,6 +458,59 @@ async function explorationData(req, res, next) {
   }
 }
 
+async function associationCalc(req, res, next) {
+  const { fn, args, projectID: id } = req.body;
+  logger.debug('/assocationCalc: %o', { ...req.body });
+
+  const projectID = id ? id : uuidv4();
+  const rootDir = path.join(config.results.folder, projectID);
+  // create save directory if needed
+  const savePath = path.join(rootDir, 'results', fn, '/');
+
+  fs.mkdirSync(savePath, { recursive: true });
+
+  try {
+    const wrapper = await r('services/R/associationWrapper.R', fn, {
+      args,
+      projectID: projectID,
+      rootDir: rootDir,
+      savePath: savePath,
+      ...dataArgs,
+    });
+
+    const { stdout, output, ...rest } = JSON.parse(wrapper);
+
+    res.json({
+      ...rest,
+      debugR: stdout,
+      output: { ...output, ...getRelativePath(output, projectID) },
+      projectID: projectID,
+    });
+  } catch (err) {
+    logger.info(`/associationCalc: An error occured with fn:${fn}`);
+    res.json({ debugR: err.stderr });
+    next(err);
+  }
+}
+
+async function associationData(req, res, next) {
+  const { fn, args } = req.body;
+  logger.debug('/associationData: %o', req.body);
+
+  try {
+    const data = await r('services/R/associationWrapper.R', fn, {
+      args,
+      ...dataArgs,
+    });
+
+    res.json(JSON.parse(data));
+  } catch (err) {
+    logger.info(`/associationData: An error occured with fn:${fn}`);
+    res.json({ debugR: err.stderr });
+    next(err);
+  }
+}
+
 async function submitQueue(req, res, next) {
   const projectID = req.body.args.projectID[1];
   const sqs = new AWS.SQS();
@@ -765,4 +818,6 @@ module.exports = {
   to2dArray,
   getRelativePath,
   downloadSession,
+  associationCalc,
+  associationData,
 };
