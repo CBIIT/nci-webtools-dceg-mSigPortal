@@ -374,11 +374,11 @@ export default function Results({ setOpenSidebar }) {
 
   const examples = [
     { title: 'VCF Example', path: 'vcfExample' },
-    { title: 'PCAWG PanCancer', path: 'pcawg-pancancer' },
     { title: 'PCAWG Lung-AdenoCA', path: 'pcawg-lungadenoca' },
     { title: 'PCAWG Lung-SCC', path: 'pcawg-lungscc' },
     { title: 'PCAWG Breast-AdenoCA', path: 'pcawg-breastadenoca' },
     { title: 'PCAWG Skin-Melanoma', path: 'pcawg-skinmelanoma' },
+    { title: 'PCAWG PanCancer', path: 'pcawg-pancancer' },
     { title: 'TCGA PanCancer', path: 'tcga-pancancer' },
     {
       title: 'MBD4 defect is associated with hypermutated CpG>TpG pattern',
