@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Form, Row, Col, Tab, Button, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import {
@@ -34,6 +34,7 @@ export default function Association({ match }) {
     loading,
     submitted,
     err,
+    loadedParameters,
     exposureSignature,
     assocVarData,
     expVarList,
@@ -53,7 +54,6 @@ export default function Association({ match }) {
     dataSourceOptions,
     dataType,
     dataTypeOptions,
-
     assocVarOptions,
     regression,
     testType,
@@ -61,10 +61,11 @@ export default function Association({ match }) {
     ylab,
     variant1,
     variant2,
+    hidden,
+    pagination,
   } = useSelector((state) => state.association);
 
   const [loadingMsg, setLoadingMsg] = useState(null);
-  const [display, setDisplay] = useState('association');
 
   // populate controls on inital render
   useEffect(() => {
@@ -137,6 +138,19 @@ export default function Association({ match }) {
 
     mergeState({ loading: false });
   }
+
+  // reducer for creating table columns from objects
+  const reducer = (acc, column) => [
+    ...acc,
+    {
+      Header: column
+        .replace('_', ' ')
+        .replace(/(^\w{1})|(\s+\w{1})/g, (letter) => letter.toUpperCase()),
+      accessor: column,
+      id: column,
+      Cell: (e) => e.value || '',
+    },
+  ];
 
   function handleStudy(study) {
     const strategyOptions = [
@@ -292,7 +306,7 @@ export default function Association({ match }) {
   }
 
   async function handleLoadParameters() {
-    mergeState({ loading: true });
+    mergeState({ loading: true, loadedParameters: false });
     try {
       const collapseData = await (
         await fetch(`api/associationData`, {
@@ -320,6 +334,7 @@ export default function Association({ match }) {
       const { collapseVar1, collapseVar2 } = collapseData.output;
 
       mergeState({
+        loadedParameters: true,
         variant1: {
           collapseOptions: collapseVar1 || [],
         },
@@ -702,300 +717,325 @@ export default function Association({ match }) {
                 content={loadingMsg}
                 showIndicator={loadingMsg}
               />
-              <div>
-                <div className="mx-auto py-3 px-4">
-                  <span>Select Variables</span>
-                  <Row className="justify-content-center mt-3">
-                    <Col as="fieldset" md="8" className="border rounded">
-                      <legend>Association Variable</legend>
-                      <Row>
-                        <Col md="4">
-                          <Select
-                            disabled={loading || submitted}
-                            id="dataSource"
-                            label="Data Source"
-                            value={dataSource}
-                            options={dataSourceOptions}
-                            onChange={(e) => mergeState({ dataSource: e })}
-                          />
-                        </Col>
-                        <Col md="4">
-                          <Select
-                            disabled={loading || submitted}
-                            id="dataType"
-                            label="Data Type"
-                            value={dataType}
-                            options={dataTypeOptions}
-                            onChange={(e) => mergeState({ dataType: e })}
-                          />
-                        </Col>
-                        <Col md="4">
-                          <Select
-                            disabled={loading || submitted}
-                            id="variantName"
-                            label="Variant Name"
-                            value={variant1.name}
-                            options={assocVarOptions}
-                            onChange={(e) =>
-                              mergeState({ variant1: { name: e } })
-                            }
-                          />
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col as="fieldset" md="4" className="border rounded">
-                      <legend>Signature Exposure Variable</legend>
-                      <Row>
-                        <Col md="12">
-                          <Select
-                            disabled={loading || submitted}
-                            id="sigExpVar"
-                            label="Variant Name"
-                            value={variant2.name}
-                            options={expVarList}
-                            onChange={(e) =>
-                              mergeState({ variant2: { name: e } })
-                            }
-                          />
-                        </Col>
-                      </Row>
-                    </Col>
-                  </Row>
-                  <Row className="justify-content-end">
-                    <Col md="auto">
-                      <Button
-                        disabled={loading || submitted || !dataSource}
-                        className="w-100"
-                        variant="primary"
-                        onClick={() => handleLoadParameters()}
-                      >
-                        Load Parameters
-                      </Button>
-                    </Col>
-                  </Row>
-                </div>
-                <hr />
-                <div className="mx-auto py-3 px-4">
-                  <strong>Parameters</strong>
-                  <Row className="justify-content-center mt-3">
-                    <Col as="fieldset" md="12" className="border rounded">
-                      <legend>Plot</legend>
-                      <Row>
-                        <Col md="auto">
-                          <Group controlId="regression" className="d-flex">
-                            <Label className="mr-4">Regression</Label>
-                            <Check inline id="regression">
-                              <Check.Input
-                                disabled={loading || submitted}
-                                type="checkbox"
-                                value={regression}
-                                checked={regression}
-                                onChange={() =>
-                                  mergeState({
-                                    regression: !regression,
-                                  })
-                                }
-                              />
-                            </Check>
-                          </Group>
-                        </Col>
-                        <Col md="2">
-                          <Select
-                            disabled={loading || submitted}
-                            id="testType"
-                            label="Test Type"
-                            value={testType}
-                            options={['nonparametric', 'parametric']}
-                            onChange={(e) => mergeState({ testType: e })}
-                          />
-                        </Col>
-                        <Col md="auto">
-                          <Group controlId="xlab">
-                            <Label>X-label</Label>
-                            <Control
-                              value={xlab}
-                              placeholder={variant1.name}
-                              onChange={(e) =>
-                                mergeState({
-                                  xlab: e.target.value,
-                                })
-                              }
-                              isInvalid={false}
+              {assocVarData.length ? (
+                <div>
+                  <div className="mx-auto py-3 px-4">
+                    <Table
+                      title="Association Variable Data"
+                      data={assocVarData}
+                      columns={[
+                        ...new Set(
+                          ...assocVarData.map((row) => Object.keys(row))
+                        ),
+                      ].reduce(reducer, [])}
+                      pagination={pagination}
+                      hidden={hidden}
+                      mergeState={mergeState}
+                    />
+                  </div>
+                  <hr />
+                  <div className="mx-auto py-3 px-4">
+                    <h4>Select Variables</h4>
+                    <Row className="justify-content-center mt-3">
+                      <Col md="8">
+                        <strong>Association Variable</strong>
+                        <Row>
+                          <Col md="4">
+                            <Select
+                              disabled={loading || submitted}
+                              id="dataSource"
+                              label="Data Source"
+                              value={dataSource}
+                              options={dataSourceOptions}
+                              onChange={(e) => mergeState({ dataSource: e })}
                             />
-                            <Form.Control.Feedback type="invalid">
-                              Enter a valid label
-                            </Form.Control.Feedback>
-                          </Group>
-                        </Col>
-                        <Col md="auto">
-                          <Group controlId="ylab">
-                            <Label>Y-label</Label>
-                            <Control
-                              value={ylab}
-                              placeholder={variant2.name}
-                              onChange={(e) =>
-                                mergeState({
-                                  ylab: e.target.value,
-                                })
-                              }
-                              isInvalid={false}
+                          </Col>
+                          <Col md="4">
+                            <Select
+                              disabled={loading || submitted}
+                              id="dataType"
+                              label="Data Type"
+                              value={dataType}
+                              options={dataTypeOptions}
+                              onChange={(e) => mergeState({ dataType: e })}
                             />
-                            <Form.Control.Feedback type="invalid">
-                              Enter a valid label
-                            </Form.Control.Feedback>
-                          </Group>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col />
-                  </Row>
-                  <Row className="justify-content-center">
-                    <Col as="fieldset" md="12" className="border rounded">
-                      <legend>Association Variant</legend>
-                      <Row>
-                        <Col md="auto">
-                          <Group controlId="filter1" className="d-flex">
-                            <Label className="mr-4">Filtering (>0)</Label>
-                            <Check inline id="filter1">
-                              <Check.Input
-                                disabled={loading || submitted}
-                                type="checkbox"
-                                value={variant1.filter}
-                                checked={variant1.filter}
-                                onChange={() =>
-                                  mergeState({
-                                    variant1: { filter: !variant1.filter },
-                                  })
-                                }
-                              />
-                            </Check>
-                          </Group>
-                        </Col>
-                        <Col md="auto">
-                          <Group controlId="log2-1" className="d-flex">
-                            <Label className="mr-4">
-                              log<sub>2</sub>
-                            </Label>
-                            <Check inline id="log2-1">
-                              <Check.Input
-                                disabled={loading || submitted}
-                                type="checkbox"
-                                value={variant1.log2}
-                                checked={variant1.log2}
-                                onChange={() =>
-                                  mergeState({
-                                    variant1: { log2: !variant1.log2 },
-                                  })
-                                }
-                              />
-                            </Check>
-                          </Group>
-                        </Col>
-                        <Col md="3">
-                          <Select
-                            disabled={
-                              loading ||
-                              submitted ||
-                              !variant1.collapseOptions.length
-                            }
-                            id="collapse1"
-                            label="Collapse"
-                            value={
-                              variant1.collapseOptions.length
-                                ? variant1.collapse
-                                : 'None'
-                            }
-                            options={variant1.collapseOptions}
-                            onChange={(e) =>
-                              mergeState({ variant1: { collapse: e } })
-                            }
-                          />
-                        </Col>
-                      </Row>
-                    </Col>
-                  </Row>
-                  <Row className="justify-content-center">
-                    <Col as="fieldset" md="12" className="border rounded">
-                      <legend>Signature Exposure Variant</legend>
-                      <Row>
-                        <Col md="auto">
-                          <Group controlId="filter2" className="d-flex">
-                            <Label className="mr-4">Filtering (>0)</Label>
-                            <Check inline id="filter2">
-                              <Check.Input
-                                disabled={loading || submitted}
-                                type="checkbox"
-                                value={variant2.filter}
-                                checked={variant2.filter}
-                                onChange={() =>
-                                  mergeState({
-                                    variant2: { filter: !variant2.filter },
-                                  })
-                                }
-                              />
-                            </Check>
-                          </Group>
-                        </Col>
-                        <Col md="auto">
-                          <Group controlId="log2-2" className="d-flex">
-                            <Label className="mr-4">
-                              log<sub>2</sub>
-                            </Label>
-                            <Check inline id="log2-2">
-                              <Check.Input
-                                disabled={loading || submitted}
-                                type="checkbox"
-                                value={variant2.log2}
-                                checked={variant2.log2}
-                                onChange={() =>
-                                  mergeState({
-                                    variant2: { log2: !variant2.log2 },
-                                  })
-                                }
-                              />
-                            </Check>
-                          </Group>
-                        </Col>
-                        <Col md="3">
-                          <Select
-                            disabled={
-                              loading ||
-                              submitted ||
-                              !variant2.collapseOptions.length
-                            }
-                            id="collapse2"
-                            label="Collapse"
-                            value={
-                              variant2.collapseOptions.length
-                                ? variant2.collapse
-                                : 'None'
-                            }
-                            options={variant2.collapseOptions}
-                            onChange={(e) =>
-                              mergeState({ variant2: { collapse: e } })
-                            }
-                          />
-                        </Col>
-                      </Row>
-                    </Col>
-                  </Row>
-                  <Row className="justify-content-end">
-                    <Col md="auto">
-                      <Button
-                        disabled={loading || submitted}
-                        className="w-100"
-                        variant="primary"
-                        onClick={() => handleCalculate()}
-                      >
-                        Calculate
-                      </Button>
-                    </Col>
-                  </Row>
-                </div>
-                <hr />
-                <div className="mx-auto p-3">
-                  <strong>Results</strong>
-                  <div id="exposureAssociationPlot">
+                          </Col>
+                          <Col md="4">
+                            <Select
+                              disabled={loading || submitted}
+                              id="variantName"
+                              label="Variant Name"
+                              value={variant1.name}
+                              options={assocVarOptions}
+                              onChange={(e) =>
+                                mergeState({ variant1: { name: e } })
+                              }
+                            />
+                          </Col>
+                        </Row>
+                      </Col>
+                      <Col md="4">
+                        <strong>Signature Exposure Variable</strong>
+                        <Row>
+                          <Col md="12">
+                            <Select
+                              disabled={loading || submitted}
+                              id="sigExpVar"
+                              label="Variant Name"
+                              value={variant2.name}
+                              options={expVarList}
+                              onChange={(e) =>
+                                mergeState({ variant2: { name: e } })
+                              }
+                            />
+                          </Col>
+                        </Row>
+                      </Col>
+                    </Row>
+                    <Row className="justify-content-end">
+                      <Col md="auto">
+                        <Button
+                          disabled={loading || submitted || !dataSource}
+                          className="w-100"
+                          variant="primary"
+                          onClick={() => handleLoadParameters()}
+                        >
+                          Load Parameters
+                        </Button>
+                      </Col>
+                    </Row>
+                  </div>
+                  {loadedParameters ? (
+                    <>
+                      <hr />
+                      <div className="mx-auto py-3 px-4">
+                        <h4>Parameters</h4>
+                        <Row className="justify-content-center mt-3">
+                          <Col md="12">
+                            <Row>
+                              <Col md="auto">
+                                <Group
+                                  controlId="regression"
+                                  className="d-flex"
+                                >
+                                  <Label className="mr-4">Regression</Label>
+                                  <Check inline id="regression">
+                                    <Check.Input
+                                      disabled={loading || submitted}
+                                      type="checkbox"
+                                      value={regression}
+                                      checked={regression}
+                                      onChange={() =>
+                                        mergeState({
+                                          regression: !regression,
+                                        })
+                                      }
+                                    />
+                                  </Check>
+                                </Group>
+                              </Col>
+                              <Col md="2">
+                                <Select
+                                  disabled={loading || submitted}
+                                  id="testType"
+                                  label="Test Type"
+                                  value={testType}
+                                  options={['nonparametric', 'parametric']}
+                                  onChange={(e) => mergeState({ testType: e })}
+                                />
+                              </Col>
+                              <Col md="auto">
+                                <Group controlId="xlab">
+                                  <Label>X-label</Label>
+                                  <Control
+                                    value={xlab}
+                                    placeholder={variant1.name}
+                                    onChange={(e) =>
+                                      mergeState({
+                                        xlab: e.target.value,
+                                      })
+                                    }
+                                    isInvalid={false}
+                                  />
+                                  <Form.Control.Feedback type="invalid">
+                                    Enter a valid label
+                                  </Form.Control.Feedback>
+                                </Group>
+                              </Col>
+                              <Col md="auto">
+                                <Group controlId="ylab">
+                                  <Label>Y-label</Label>
+                                  <Control
+                                    value={ylab}
+                                    placeholder={variant2.name}
+                                    onChange={(e) =>
+                                      mergeState({
+                                        ylab: e.target.value,
+                                      })
+                                    }
+                                    isInvalid={false}
+                                  />
+                                  <Form.Control.Feedback type="invalid">
+                                    Enter a valid label
+                                  </Form.Control.Feedback>
+                                </Group>
+                              </Col>
+                            </Row>
+                          </Col>
+                          <Col />
+                        </Row>
+                        <Row className="justify-content-center">
+                          <Col md="12">
+                            <strong>Association Variant</strong>
+                            <Row>
+                              <Col md="auto">
+                                <Group controlId="filter1" className="d-flex">
+                                  <Label className="mr-4">Filtering (>0)</Label>
+                                  <Check inline id="filter1">
+                                    <Check.Input
+                                      disabled={loading || submitted}
+                                      type="checkbox"
+                                      value={variant1.filter}
+                                      checked={variant1.filter}
+                                      onChange={() =>
+                                        mergeState({
+                                          variant1: {
+                                            filter: !variant1.filter,
+                                          },
+                                        })
+                                      }
+                                    />
+                                  </Check>
+                                </Group>
+                              </Col>
+                              <Col md="auto">
+                                <Group controlId="log2-1" className="d-flex">
+                                  <Label className="mr-4">
+                                    log<sub>2</sub>
+                                  </Label>
+                                  <Check inline id="log2-1">
+                                    <Check.Input
+                                      disabled={loading || submitted}
+                                      type="checkbox"
+                                      value={variant1.log2}
+                                      checked={variant1.log2}
+                                      onChange={() =>
+                                        mergeState({
+                                          variant1: { log2: !variant1.log2 },
+                                        })
+                                      }
+                                    />
+                                  </Check>
+                                </Group>
+                              </Col>
+                              <Col md="3">
+                                <Select
+                                  disabled={
+                                    loading ||
+                                    submitted ||
+                                    !variant1.collapseOptions.length
+                                  }
+                                  id="collapse1"
+                                  label="Collapse"
+                                  value={
+                                    variant1.collapseOptions.length
+                                      ? variant1.collapse
+                                      : 'None'
+                                  }
+                                  options={variant1.collapseOptions}
+                                  onChange={(e) =>
+                                    mergeState({ variant1: { collapse: e } })
+                                  }
+                                />
+                              </Col>
+                            </Row>
+                          </Col>
+                        </Row>
+                        <Row className="justify-content-center">
+                          <Col md="12">
+                            <strong>Signature Exposure Variant</strong>
+                            <Row>
+                              <Col md="auto">
+                                <Group controlId="filter2" className="d-flex">
+                                  <Label className="mr-4">Filtering (>0)</Label>
+                                  <Check inline id="filter2">
+                                    <Check.Input
+                                      disabled={loading || submitted}
+                                      type="checkbox"
+                                      value={variant2.filter}
+                                      checked={variant2.filter}
+                                      onChange={() =>
+                                        mergeState({
+                                          variant2: {
+                                            filter: !variant2.filter,
+                                          },
+                                        })
+                                      }
+                                    />
+                                  </Check>
+                                </Group>
+                              </Col>
+                              <Col md="auto">
+                                <Group controlId="log2-2" className="d-flex">
+                                  <Label className="mr-4">
+                                    log<sub>2</sub>
+                                  </Label>
+                                  <Check inline id="log2-2">
+                                    <Check.Input
+                                      disabled={loading || submitted}
+                                      type="checkbox"
+                                      value={variant2.log2}
+                                      checked={variant2.log2}
+                                      onChange={() =>
+                                        mergeState({
+                                          variant2: { log2: !variant2.log2 },
+                                        })
+                                      }
+                                    />
+                                  </Check>
+                                </Group>
+                              </Col>
+                              <Col md="3">
+                                <Select
+                                  disabled={
+                                    loading ||
+                                    submitted ||
+                                    !variant2.collapseOptions.length
+                                  }
+                                  id="collapse2"
+                                  label="Collapse"
+                                  value={
+                                    variant2.collapseOptions.length
+                                      ? variant2.collapse
+                                      : 'None'
+                                  }
+                                  options={variant2.collapseOptions}
+                                  onChange={(e) =>
+                                    mergeState({ variant2: { collapse: e } })
+                                  }
+                                />
+                              </Col>
+                            </Row>
+                          </Col>
+                        </Row>
+                        <Row className="justify-content-end">
+                          <Col md="auto">
+                            <Button
+                              disabled={loading || submitted}
+                              className="w-100"
+                              variant="primary"
+                              onClick={() => handleCalculate()}
+                            >
+                              Calculate
+                            </Button>
+                          </Col>
+                        </Row>
+                      </div>
+                    </>
+                  ) : (
+                    <></>
+                  )}
+                  <div className="mx-auto p-3">
                     {err && (
                       <div>
                         <hr />
@@ -1004,6 +1044,8 @@ export default function Association({ match }) {
                     )}
                     {plotPath && (
                       <>
+                        <hr />
+                        <h4>Results</h4>
                         <hr />
                         <Plot
                           className="p-3"
@@ -1017,9 +1059,23 @@ export default function Association({ match }) {
                     )}
                     {/* <Debug msg={debugR} /> */}
                   </div>
+                  <hr />
                 </div>
-                <hr />
-              </div>
+              ) : (
+                <div className=" py-3 px-4">
+                  <h4>Instructions</h4>
+                  <p>
+                    Choose a Data Source and its associated options to submit a
+                    query using the panel on the left
+                  </p>
+                  <hr />
+                  <h4>Data Source</h4>
+                  <p>
+                    Public: Perform analysis using data available on the website
+                  </p>
+                  <p>User: Upload your own data</p>
+                </div>
+              )}
             </div>
           </MainPanel>
         </SidebarContainer>

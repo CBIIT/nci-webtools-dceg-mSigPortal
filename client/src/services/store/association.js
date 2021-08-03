@@ -6,6 +6,7 @@ export const getInitialState = () => ({
   loading: false,
   submitted: false,
   err: false,
+  loadedParameters: false,
   exposureSignature: [],
   assocVarData: [],
   expVarList: [],
@@ -43,6 +44,11 @@ export const getInitialState = () => ({
     log2: false,
     collapse: '',
     collapseOptions: [],
+  },
+  hidden: [],
+  pagination: {
+    pageIndex: 0,
+    pageSize: 10,
   },
 });
 
