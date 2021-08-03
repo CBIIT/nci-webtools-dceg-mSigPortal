@@ -12,14 +12,16 @@ export default function Select({
   options,
   onChange,
   disabled,
+  ...rest
 }) {
   const props = {
     styles: {
       menuPortal: (base) => ({ ...base, zIndex: 9999 }),
     },
     menuPortalTarget: document.body,
-    getOptionLabel: (option) => (option == 'NA' ? 'N/A' : option),
-    getOptionValue: (option) => option,
+    getOptionLabel: (option) =>
+      option.label || (option == 'NA' ? 'N/A' : option),
+    getOptionValue: (option) => option.value || option,
     filterOption: createFilter({ ignoreAccents: false }),
   };
 
@@ -33,6 +35,7 @@ export default function Select({
         onChange={onChange}
         isDisabled={disabled}
         {...props}
+        {...rest}
       />
     </Group>
   );
