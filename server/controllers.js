@@ -480,6 +480,8 @@ async function associationCalc(req, res, next) {
 
     const { stdout, output, ...rest } = JSON.parse(wrapper);
 
+    logger.debug(stdout);
+
     res.json({
       ...rest,
       debugR: stdout,
