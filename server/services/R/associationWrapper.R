@@ -102,10 +102,10 @@ loadCollapse <- function(args, s3Data, localData, bucket) {
     vardata_refdata_selected <- vardata_refdata_selected %>% filter(Sample %in% osamples)
     exposure_refdata_selected <- exposure_refdata_selected %>% filter(Sample %in% osamples)
 
-    exposure_refdata_selected <- exposure_refdata_selected %>% select(Sample, args$expVar)
+    exposure_refdata_selected <- exposure_refdata_selected %>% select(Sample, args$expVariant)
 
     vardata_refdata_selected <- vardata_refdata_selected %>%
-      filter(data_source == args$dataSource, data_type == args$dataType, variable_name == args$assocVar)
+      filter(data_source == args$dataSource, data_type == args$dataType, variable_name == args$assocVariant)
 
     if (unique(vardata_refdata_selected$variable_value_type) == "numeric") { vardata_refdata_selected$variable_value <- as.numeric(vardata_refdata_selected$variable_value) }
 
@@ -171,12 +171,9 @@ calculate <- function(args, projectID, rootDir, savePath, s3Data, localData, buc
     vardata_refdata_selected <- vardata_refdata_selected %>% filter(Sample %in% osamples)
     exposure_refdata_selected <- exposure_refdata_selected %>% filter(Sample %in% osamples)
 
-    # expsorue variant list
-    Exposure_varlist <- colnames(exposure_refdata_selected)[-c(1:2)]
-
-    exposure_refdata_selected <- exposure_refdata_selected %>% select(Sample, args$expVar)
+    exposure_refdata_selected <- exposure_refdata_selected %>% select(Sample, args$variant2$name)
     vardata_refdata_selected <- vardata_refdata_selected %>%
-      filter(data_source == args$dataSource, data_type == args$dataType, variable_name == args$assocVar)
+      filter(data_source == args$dataSource, data_type == args$dataType, variable_name == args$variant1$name)
 
     if (unique(vardata_refdata_selected$variable_value_type) == "numeric") { vardata_refdata_selected$variable_value <- as.numeric(vardata_refdata_selected$variable_value) }
 
@@ -185,10 +182,10 @@ calculate <- function(args, projectID, rootDir, savePath, s3Data, localData, buc
 
     data_input <- left_join(vardata_refdata_selected, exposure_refdata_selected)
 
-    mSigPortal_associaiton(data = data_input, Var1 = args$assocVar, Var2 = args$expVar, type = args$testType,
-      xlab = args$xlab, ylab = args$ylab, filter_zero1 = args$filter1, filter_zero2 = args$filter2,
-      log1 = args$log2_1, log2 = args$log2_2, collapse_var1 = args$collapse1,
-      collapse_var2 = args$collapse2, output_plot = plotPath)
+    mSigPortal_associaiton(data = data_input, Var1 = args$variant1$name, Var2 = args$variant2$name, type = args$testType,
+      xlab = args$xlab, ylab = args$ylab, filter_zero1 = args$variant1$filter, filter_zero2 = args$variant2$filter,
+      log1 = args$variant1$log2, log2 = args$variant2$log2, collapse_var1 = args$variant1$collapse,
+      collapse_var2 = args$variant2$collapse, output_plot = plotPath)
 
     ## asssociation_data.txt will output as download text file. 
     data_input %>% write_delim(file = dataPath, delim = '\t', col_names = T, na = '')
@@ -196,7 +193,6 @@ calculate <- function(args, projectID, rootDir, savePath, s3Data, localData, buc
     output = list('plotPath' = plotPath, 'dataPath' = dataPath)
   }, error = function(e) {
     print(e)
-    output[['error']] <<- e
   }, finally = {
     sink(con)
     sink(con)

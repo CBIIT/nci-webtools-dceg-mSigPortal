@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Form, Row, Col, Tab, Button, Nav } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   actions as associationActions,
@@ -21,7 +21,7 @@ import './association.scss';
 const actions = { ...associationActions, ...modalActions };
 const { Group, Label, Check, Control } = Form;
 
-export default function Association({ match }) {
+export default function Association() {
   const dispatch = useDispatch();
   const mergeState = async (state) =>
     await dispatch(actions.mergeAssociation({ ...state }));
@@ -31,13 +31,16 @@ export default function Association({ match }) {
 
   const {
     openSidebar,
-    loading,
+    loadingData,
+    loadingParams,
+    loadingCalculate,
     submitted,
     err,
-    loadedParameters,
     exposureSignature,
     assocVarData,
     expVarList,
+    assocVariant,
+    expVariant,
     projectID,
     plotPath,
     dataPath,
@@ -82,7 +85,7 @@ export default function Association({ match }) {
 
   // popualte side panel
   async function populateControls() {
-    mergeState({ loading: true });
+    mergeState({ loadingData: true });
 
     try {
       const exposureSignature = await getJSON(
@@ -136,7 +139,7 @@ export default function Association({ match }) {
       mergeError(err.message);
     }
 
-    mergeState({ loading: false });
+    mergeState({ loadingData: false });
   }
 
   // reducer for creating table columns from objects
@@ -257,7 +260,7 @@ export default function Association({ match }) {
       ),
     ];
 
-    mergeState({ variant1: { name: assocVarOptions[0] }, assocVarOptions });
+    mergeState({ assocVariant: assocVarOptions[0], assocVarOptions });
   }
 
   async function handleLoadData() {
@@ -276,7 +279,7 @@ export default function Association({ match }) {
         })
       ).json();
 
-    mergeState({ loading: true });
+    mergeState({ loadingData: true });
     try {
       const [assocVarData, exposureVariantData] = await Promise.all([
         getJSON(`Association/PCAWG_vardata.json`),
@@ -295,18 +298,16 @@ export default function Association({ match }) {
         expVarList,
         dataSource,
         dataSourceOptions,
-        variant2: {
-          name: expVarList[0],
-        },
+        expVariant: expVarList[0],
       });
     } catch (err) {
       mergeError(err.message);
     }
-    mergeState({ loading: false });
+    mergeState({ loadingData: false });
   }
 
   async function handleLoadParameters() {
-    mergeState({ loading: true, loadedParameters: false });
+    mergeState({ loadingParams: true });
     try {
       const collapseData = await (
         await fetch(`api/associationData`, {
@@ -324,8 +325,8 @@ export default function Association({ match }) {
               cancer,
               dataSource,
               dataType,
-              assocVar: variant1.name,
-              expVar: variant2.name,
+              assocVariant,
+              expVariant,
             },
           }),
         })
@@ -334,18 +335,19 @@ export default function Association({ match }) {
       const { collapseVar1, collapseVar2 } = collapseData.output;
 
       mergeState({
-        loadedParameters: true,
         variant1: {
+          name: assocVariant,
           collapseOptions: collapseVar1 || [],
         },
         variant2: {
+          name: expVariant,
           collapseOptions: collapseVar2 || [],
         },
       });
     } catch (err) {
       mergeError(err.message);
     }
-    mergeState({ loading: false });
+    mergeState({ loadingParams: false });
   }
 
   function handleReset() {
@@ -366,7 +368,7 @@ export default function Association({ match }) {
   }
 
   async function handleCalculate() {
-    mergeState({ loading: true, err: false });
+    mergeState({ loadingCalculate: true, err: false });
     try {
       const { debugR, output, projectID: id } = await (
         await fetch(`api/associationCalc`, {
@@ -385,18 +387,17 @@ export default function Association({ match }) {
               cancer,
               dataSource,
               dataType,
-              assocVar: variant1.name,
-              expVar: variant2.name,
-              collapse1: variant1.collapse || null,
-              collapse2: variant2.collapse || null,
-              filter1: variant1.filter,
-              filter2: variant2.filter,
-              log2_1: variant1.log2,
-              log2_2: variant2.log2,
-              regression,
               testType,
               xlab: xlab || variant1.name,
               ylab: ylab || variant2.name,
+              variant1: (() => {
+                const { collapseOptions, ...params } = variant1;
+                return params;
+              })(),
+              variant2: (() => {
+                const { collapseOptions, ...params } = variant2;
+                return params;
+              })(),
             },
           }),
         })
@@ -411,7 +412,7 @@ export default function Association({ match }) {
       mergeError(err.message);
       mergeState({ err: true });
     }
-    mergeState({ loading: false });
+    mergeState({ loadingCalculate: false });
   }
 
   return (
@@ -429,7 +430,12 @@ export default function Association({ match }) {
                     <Label className="mr-4">Data Source</Label>
                     <Check inline id="radioPublic">
                       <Check.Input
-                        disabled={loading || projectID}
+                        disabled={
+                          loadingData ||
+                          loadingParams ||
+                          loadingCalculate ||
+                          projectID
+                        }
                         type="radio"
                         value="public"
                         checked={source == 'public'}
@@ -441,7 +447,12 @@ export default function Association({ match }) {
                     </Check>
                     <Check inline id="radioUser">
                       <Check.Input
-                        disabled={loading || projectID}
+                        disabled={
+                          loadingData ||
+                          loadingParams ||
+                          loadingCalculate ||
+                          projectID
+                        }
                         type="radio"
                         value="user"
                         checked={source == 'user'}
@@ -460,7 +471,12 @@ export default function Association({ match }) {
                     <Col>
                       <Group>
                         <Select
-                          disabled={loading || submitted}
+                          disabled={
+                            loadingData ||
+                            loadingParams ||
+                            loadingCalculate ||
+                            submitted
+                          }
                           id="expStudyPublic"
                           label="Study"
                           value={study}
@@ -474,7 +490,12 @@ export default function Association({ match }) {
                     <Col>
                       <Group>
                         <Select
-                          disabled={loading || submitted}
+                          disabled={
+                            loadingData ||
+                            loadingParams ||
+                            loadingCalculate ||
+                            submitted
+                          }
                           id="tumorStrategy"
                           label="Experimental Strategy"
                           value={strategy}
@@ -488,7 +509,12 @@ export default function Association({ match }) {
                     <Col>
                       <Group>
                         <Select
-                          disabled={loading || submitted}
+                          disabled={
+                            loadingData ||
+                            loadingParams ||
+                            loadingCalculate ||
+                            submitted
+                          }
                           id="expSetPublic"
                           label="Reference Signature Set"
                           value={rsSet}
@@ -503,7 +529,12 @@ export default function Association({ match }) {
                       <Group>
                         <Select
                           className="mb-4"
-                          disabled={loading || submitted}
+                          disabled={
+                            loadingData ||
+                            loadingParams ||
+                            loadingCalculate ||
+                            submitted
+                          }
                           id="prevalenceCancerType"
                           label="Cancer Type"
                           value={cancer}
@@ -520,7 +551,9 @@ export default function Association({ match }) {
                   <Row>
                     <Col md="6">
                       <Button
-                        disabled={loading}
+                        disabled={
+                          loadingData || loadingParams || loadingCalculate
+                        }
                         className="w-100 mb-3"
                         variant="secondary"
                         onClick={() => handleReset()}
@@ -530,7 +563,12 @@ export default function Association({ match }) {
                     </Col>
                     <Col md="6">
                       <Button
-                        disabled={loading || submitted}
+                        disabled={
+                          loadingData ||
+                          loadingParams ||
+                          loadingCalculate ||
+                          submitted
+                        }
                         className="w-100"
                         variant="primary"
                         onClick={() => handleLoadData()}
@@ -547,7 +585,7 @@ export default function Association({ match }) {
                     <Group>
                       <Label>Upload Exposure File</Label>
                       <Form.File
-                        disabled={loading || submitted}
+                        disabled={loadingData || loadingParams || loadingCalculate || submitted}
                         id="uploadExposure"
                         label={exposureFileObj.name || 'Exposure File'}
                         accept=".txt"
@@ -571,7 +609,7 @@ export default function Association({ match }) {
                     <Group>
                       <Label>Upload Matrix File</Label>
                       <Form.File
-                        disabled={loading || submitted}
+                        disabled={loadingData || loadingParams || loadingCalculate || submitted}
                         id="uploadMatrix"
                         label={matrixFileObj.name || 'Matrix File'}
                         accept=".txt"
@@ -596,7 +634,7 @@ export default function Association({ match }) {
                       <Label className="mr-4">Use Public Signature Data</Label>
                       <Check inline id="toggleSignatureSource">
                         <Check.Input
-                          disabled={loading || submitted}
+                          disabled={loadingData || loadingParams || loadingCalculate || submitted}
                           type="checkbox"
                           value={usePublicSignature}
                           checked={usePublicSignature}
@@ -617,7 +655,7 @@ export default function Association({ match }) {
                       <Col>
                         <Group>
                           <Select
-                            disabled={loading || submitted}
+                            disabled={loadingData || loadingParams || loadingCalculate || submitted}
                             id="expStudyUser"
                             label="Study"
                             value={study}
@@ -631,7 +669,7 @@ export default function Association({ match }) {
                       <Col>
                         <Group>
                           <Select
-                            disabled={loading || submitted}
+                            disabled={loadingData || loadingParams || loadingCalculate || submitted}
                             id="exposureSignatureSet"
                             label="Reference Signature Set"
                             value={rsSet}
@@ -648,7 +686,7 @@ export default function Association({ match }) {
                       <Group>
                         <Label>Upload Signature Data</Label>
                         <Form.File
-                          disabled={loading || submitted}
+                          disabled={loadingData || loadingParams || loadingCalculate || submitted}
                           id="uploadSignature"
                           label={signatureFileObj.name || 'Signature File'}
                           accept=".txt"
@@ -672,7 +710,7 @@ export default function Association({ match }) {
                   <Col>
                     <Group>
                       <Select
-                        disabled={loading || submitted}
+                        disabled={loadingData || loadingParams || loadingCalculate || submitted}
                         id="exposureGenome"
                         label="Genome"
                         value={genome}
@@ -685,7 +723,7 @@ export default function Association({ match }) {
                 <Row>
                   <Col md="6">
                     <Button
-                      disabled={loading}
+                      disabled={loadingData || loadingParams || loadingCalculate }
                       className="w-100 mb-3"
                       variant="secondary"
                       onClick={() => handleReset()}
@@ -695,7 +733,7 @@ export default function Association({ match }) {
                   </Col>
                   <Col md="6">
                     <Button
-                      disabled={loading}
+                      disabled={loadingData || loadingParams || loadingCalculate }
                       className="w-100"
                       variant="primary"
                       onClick={() => {
@@ -713,7 +751,7 @@ export default function Association({ match }) {
           <MainPanel>
             <div className="bg-white border rounded">
               <LoadingOverlay
-                active={loading}
+                active={loadingData}
                 content={loadingMsg}
                 showIndicator={loadingMsg}
               />
@@ -735,6 +773,11 @@ export default function Association({ match }) {
                   </div>
                   <hr />
                   <div className="mx-auto py-3 px-4">
+                    <LoadingOverlay
+                      active={loadingParams}
+                      content={loadingMsg}
+                      showIndicator={loadingMsg}
+                    />
                     <h4>Select Variables</h4>
                     <Row className="justify-content-center mt-3">
                       <Col md="8">
@@ -742,7 +785,12 @@ export default function Association({ match }) {
                         <Row>
                           <Col md="4">
                             <Select
-                              disabled={loading || submitted}
+                              disabled={
+                                loadingData ||
+                                loadingParams ||
+                                loadingCalculate ||
+                                submitted
+                              }
                               id="dataSource"
                               label="Data Source"
                               value={dataSource}
@@ -752,7 +800,12 @@ export default function Association({ match }) {
                           </Col>
                           <Col md="4">
                             <Select
-                              disabled={loading || submitted}
+                              disabled={
+                                loadingData ||
+                                loadingParams ||
+                                loadingCalculate ||
+                                submitted
+                              }
                               id="dataType"
                               label="Data Type"
                               value={dataType}
@@ -762,14 +815,17 @@ export default function Association({ match }) {
                           </Col>
                           <Col md="4">
                             <Select
-                              disabled={loading || submitted}
-                              id="variantName"
-                              label="Variant Name"
-                              value={variant1.name}
-                              options={assocVarOptions}
-                              onChange={(e) =>
-                                mergeState({ variant1: { name: e } })
+                              disabled={
+                                loadingData ||
+                                loadingParams ||
+                                loadingCalculate ||
+                                submitted
                               }
+                              id="assocVariant"
+                              label="Variant Name"
+                              value={assocVariant}
+                              options={assocVarOptions}
+                              onChange={(e) => mergeState({ assocVariant: e })}
                             />
                           </Col>
                         </Row>
@@ -779,14 +835,17 @@ export default function Association({ match }) {
                         <Row>
                           <Col md="12">
                             <Select
-                              disabled={loading || submitted}
-                              id="sigExpVar"
-                              label="Variant Name"
-                              value={variant2.name}
-                              options={expVarList}
-                              onChange={(e) =>
-                                mergeState({ variant2: { name: e } })
+                              disabled={
+                                loadingData ||
+                                loadingParams ||
+                                loadingCalculate ||
+                                submitted
                               }
+                              id="expVariant"
+                              label="Variant Name"
+                              value={expVariant}
+                              options={expVarList}
+                              onChange={(e) => mergeState({ expVariant: e })}
                             />
                           </Col>
                         </Row>
@@ -795,7 +854,13 @@ export default function Association({ match }) {
                     <Row className="justify-content-end">
                       <Col md="auto">
                         <Button
-                          disabled={loading || submitted || !dataSource}
+                          disabled={
+                            loadingData ||
+                            loadingParams ||
+                            loadingCalculate ||
+                            submitted ||
+                            !dataSource
+                          }
                           className="w-100"
                           variant="primary"
                           onClick={() => handleLoadParameters()}
@@ -805,38 +870,27 @@ export default function Association({ match }) {
                       </Col>
                     </Row>
                   </div>
-                  {loadedParameters ? (
-                    <>
-                      <hr />
-                      <div className="mx-auto py-3 px-4">
-                        <h4>Parameters</h4>
+                  <hr />
+                  <div className="mx-auto py-3 px-4">
+                    <LoadingOverlay
+                      active={loadingCalculate}
+                      content={loadingMsg}
+                      showIndicator={loadingMsg}
+                    />
+                    <h4>Parameters</h4>
+                    {variant1.name && variant2.name ? (
+                      <>
                         <Row className="justify-content-center mt-3">
                           <Col md="12">
                             <Row>
-                              <Col md="auto">
-                                <Group
-                                  controlId="regression"
-                                  className="d-flex"
-                                >
-                                  <Label className="mr-4">Regression</Label>
-                                  <Check inline id="regression">
-                                    <Check.Input
-                                      disabled={loading || submitted}
-                                      type="checkbox"
-                                      value={regression}
-                                      checked={regression}
-                                      onChange={() =>
-                                        mergeState({
-                                          regression: !regression,
-                                        })
-                                      }
-                                    />
-                                  </Check>
-                                </Group>
-                              </Col>
                               <Col md="2">
                                 <Select
-                                  disabled={loading || submitted}
+                                  disabled={
+                                    loadingData ||
+                                    loadingParams ||
+                                    loadingCalculate ||
+                                    submitted
+                                  }
                                   id="testType"
                                   label="Test Type"
                                   value={testType}
@@ -893,7 +947,12 @@ export default function Association({ match }) {
                                   <Label className="mr-4">Filtering (>0)</Label>
                                   <Check inline id="filter1">
                                     <Check.Input
-                                      disabled={loading || submitted}
+                                      disabled={
+                                        loadingData ||
+                                        loadingParams ||
+                                        loadingCalculate ||
+                                        submitted
+                                      }
                                       type="checkbox"
                                       value={variant1.filter}
                                       checked={variant1.filter}
@@ -915,7 +974,12 @@ export default function Association({ match }) {
                                   </Label>
                                   <Check inline id="log2-1">
                                     <Check.Input
-                                      disabled={loading || submitted}
+                                      disabled={
+                                        loadingData ||
+                                        loadingParams ||
+                                        loadingCalculate ||
+                                        submitted
+                                      }
                                       type="checkbox"
                                       value={variant1.log2}
                                       checked={variant1.log2}
@@ -931,7 +995,9 @@ export default function Association({ match }) {
                               <Col md="3">
                                 <Select
                                   disabled={
-                                    loading ||
+                                    loadingData ||
+                                    loadingParams ||
+                                    loadingCalculate ||
                                     submitted ||
                                     !variant1.collapseOptions.length
                                   }
@@ -960,7 +1026,12 @@ export default function Association({ match }) {
                                   <Label className="mr-4">Filtering (>0)</Label>
                                   <Check inline id="filter2">
                                     <Check.Input
-                                      disabled={loading || submitted}
+                                      disabled={
+                                        loadingData ||
+                                        loadingParams ||
+                                        loadingCalculate ||
+                                        submitted
+                                      }
                                       type="checkbox"
                                       value={variant2.filter}
                                       checked={variant2.filter}
@@ -982,7 +1053,12 @@ export default function Association({ match }) {
                                   </Label>
                                   <Check inline id="log2-2">
                                     <Check.Input
-                                      disabled={loading || submitted}
+                                      disabled={
+                                        loadingData ||
+                                        loadingParams ||
+                                        loadingCalculate ||
+                                        submitted
+                                      }
                                       type="checkbox"
                                       value={variant2.log2}
                                       checked={variant2.log2}
@@ -998,7 +1074,9 @@ export default function Association({ match }) {
                               <Col md="3">
                                 <Select
                                   disabled={
-                                    loading ||
+                                    loadingData ||
+                                    loadingParams ||
+                                    loadingCalculate ||
                                     submitted ||
                                     !variant2.collapseOptions.length
                                   }
@@ -1021,7 +1099,12 @@ export default function Association({ match }) {
                         <Row className="justify-content-end">
                           <Col md="auto">
                             <Button
-                              disabled={loading || submitted}
+                              disabled={
+                                loadingData ||
+                                loadingParams ||
+                                loadingCalculate ||
+                                submitted
+                              }
                               className="w-100"
                               variant="primary"
                               onClick={() => handleCalculate()}
@@ -1030,21 +1113,23 @@ export default function Association({ match }) {
                             </Button>
                           </Col>
                         </Row>
-                      </div>
-                    </>
-                  ) : (
-                    <></>
-                  )}
-                  <div className="mx-auto p-3">
+                      </>
+                    ) : (
+                      <p className="d-flex justify-content-center text-muted">
+                        Select an Association Variant and Signature Exposure
+                        Variant
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <hr />
                     {err && (
-                      <div>
-                        <hr />
+                      <div className="mx-auto p-3">
                         <p className="p-3 text-danger">{err}</p>
                       </div>
                     )}
                     {plotPath && (
-                      <>
-                        <hr />
+                      <div className="mx-auto p-3">
                         <h4>Results</h4>
                         <hr />
                         <Plot
@@ -1055,7 +1140,7 @@ export default function Association({ match }) {
                           txtPath={projectID + dataPath}
                           maxHeight="800px"
                         />
-                      </>
+                      </div>
                     )}
                     {/* <Debug msg={debugR} /> */}
                   </div>
