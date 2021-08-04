@@ -23,7 +23,7 @@
     "promisify-child-process": "^4.1.1",
     "r-wrapper": "^1.1.0",
     "replace-in-file": "^6.1.0",
-    "tar": "^6.0.2",
+    "tar": "^6.1.2",
     "uuid": "^8.2.0",
     "winston": "^3.2.1",
     "winston-daily-rotate-file": "^4.4.2",
