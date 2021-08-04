@@ -268,7 +268,7 @@ export default function Table({
             }}
             aria-label="Select a pagination size"
           >
-            {[10, 25, 50, 100].map((option) => (
+            {[5, 10, 25, 50, 100].map((option) => (
               <option key={option} value={option}>
                 {option}
               </option>
