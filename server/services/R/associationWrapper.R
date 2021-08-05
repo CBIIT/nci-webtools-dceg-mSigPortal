@@ -22,15 +22,18 @@ loadData <- function(args, s3Data, localData, bucket) {
     exposure_data_file <- paste0(s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
     association_data_file <- paste0(s3Data, 'Association/', args$study, '_vardata.RData')
 
-    tryCatch({
+    error = tryCatch({
       s3load(exposure_data_file, bucket)
       s3load(association_data_file, bucket)
     }, error = function(e) {
-      msg = "ERROR: Exposure or assoicaiton variable data are not avaiable for selected study. please check input or select other study"
-      print(msg)
-      print(e)
-      stop(msg)
+      message = "ERROR: Exposure or association variable data are not avaiable for selected study. please check input or select another study"
+      return(list(message = message, error = e$message))
     })
+    if (is.list(error)) {
+      output = error
+      print(error$message)
+      stop(error$error)
+    }
 
     exposure_refdata_selected <- exposure_refdata %>% filter(Signature_set_name == args$rsSet, Cancer_Type == args$cancer)
 
@@ -52,13 +55,13 @@ loadData <- function(args, s3Data, localData, bucket) {
     # expsorue variant list
     Exposure_varlist <- colnames(exposure_refdata_selected)[-c(1:2)]
 
-    output = list('expVarList' = Exposure_varlist)
+    output = list(expVarList = Exposure_varlist)
   }, error = function(e) {
     print(e)
   }, finally = {
     sink(con)
     sink(con)
-    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+    return(toJSON(list(stdout = stdout, output = output), pretty = TRUE, auto_unbox = TRUE))
   })
 }
 
@@ -75,15 +78,18 @@ loadCollapse <- function(args, s3Data, localData, bucket) {
     exposure_data_file <- paste0(s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
     association_data_file <- paste0(s3Data, 'Association/', args$study, '_vardata.RData')
 
-    tryCatch({
+    error = tryCatch({
       s3load(exposure_data_file, bucket)
       s3load(association_data_file, bucket)
     }, error = function(e) {
-      msg = "ERROR: Exposure or assoicaiton variable data are not avaiable for selected study. please check input or select other study"
-      print(msg)
-      print(e)
-      stop(msg)
+      message = "ERROR: Exposure or association variable data are not avaiable for selected study. please check input or select another study"
+      return(list(message = message, error = e$message))
     })
+    if (is.list(error)) {
+      output = error
+      print(error$message)
+      stop(error$error)
+    }
 
     exposure_refdata_selected <- exposure_refdata %>% filter(Signature_set_name == args$rsSet, Cancer_Type == args$cancer)
 
@@ -119,7 +125,7 @@ loadCollapse <- function(args, s3Data, localData, bucket) {
     collapse_var2_list <- levels(data_input[[3]])
 
 
-    output = list('collapseVar1' = collapse_var1_list, 'collapseVar2' = collapse_var2_list)
+    output = list(collapseVar1 = collapse_var1_list, collapseVar2 = collapse_var2_list)
   }, error = function(e) {
     print(e)
   }, finally = {
@@ -144,15 +150,18 @@ calculate <- function(args, projectID, rootDir, savePath, s3Data, localData, buc
     exposure_data_file <- paste0(s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
     association_data_file <- paste0(s3Data, 'Association/', args$study, '_vardata.RData')
 
-    tryCatch({
+    error = tryCatch({
       s3load(exposure_data_file, bucket)
       s3load(association_data_file, bucket)
     }, error = function(e) {
-      msg = "ERROR: Exposure or assoicaiton variable data are not avaiable for selected study. please check input or select other study"
-      print(msg)
-      print(e)
-      stop(msg)
+      message = "ERROR: Exposure or association variable data are not avaiable for selected study. please check input or select another study"
+      return(list(message = message, error = e$message))
     })
+    if (is.list(error)) {
+      output = error
+      print(error$message)
+      stop(error$error)
+    }
 
     exposure_refdata_selected <- exposure_refdata %>% filter(Signature_set_name == args$rsSet, Cancer_Type == args$cancer)
 
@@ -190,13 +199,13 @@ calculate <- function(args, projectID, rootDir, savePath, s3Data, localData, buc
     ## asssociation_data.txt will output as download text file. 
     data_input %>% write_delim(file = dataPath, delim = '\t', col_names = T, na = '')
 
-    output = list('plotPath' = plotPath, 'dataPath' = dataPath)
+    output = list(plotPath = plotPath, dataPath = dataPath)
   }, error = function(e) {
     print(e)
   }, finally = {
     sink(con)
     sink(con)
-    return(toJSON(list('stdout' = stdout, 'output' = output), pretty = TRUE, auto_unbox = TRUE))
+    return(toJSON(list(stdout = stdout, output = output), pretty = TRUE, auto_unbox = TRUE))
   })
 }
 
