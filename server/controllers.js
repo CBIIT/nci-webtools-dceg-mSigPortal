@@ -478,15 +478,14 @@ async function associationCalc(req, res, next) {
       ...dataArgs,
     });
 
-    const { stdout, output, ...rest } = JSON.parse(wrapper);
+    const { stdout, ...rest } = JSON.parse(wrapper);
 
     logger.debug(stdout);
 
     res.json({
+      projectID,
+      stdout,
       ...rest,
-      debugR: stdout,
-      output: { ...output, ...getRelativePath(output, projectID) },
-      projectID: projectID,
     });
   } catch (err) {
     logger.info(`/associationCalc: An error occured with fn:${fn}`);

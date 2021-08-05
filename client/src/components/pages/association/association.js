@@ -34,8 +34,9 @@ export default function Association() {
     loadingData,
     loadingParams,
     loadingCalculate,
+    loadingRecalculate,
     submitted,
-    err,
+    error,
     exposureSignature,
     assocVarData,
     expVarList,
@@ -58,14 +59,15 @@ export default function Association() {
     dataType,
     dataTypeOptions,
     assocVarOptions,
-    regression,
+    signature,
+    signatureOptions,
     testType,
     xlab,
     ylab,
     variant1,
     variant2,
-    hidden,
-    pagination,
+    assocTable,
+    resultsTable,
   } = useSelector((state) => state.association);
 
   const [loadingMsg, setLoadingMsg] = useState(null);
@@ -82,6 +84,11 @@ export default function Association() {
   useEffect(() => {
     if (dataType) handleDataType();
   }, [dataType]);
+
+  // recalculate on new signature name selection
+  useEffect(() => {
+    if (signature) handleCalculate();
+  }, [signature]);
 
   // popualte side panel
   async function populateControls() {
@@ -135,8 +142,8 @@ export default function Association() {
         rsSet,
         rsSetOptions,
       });
-    } catch (err) {
-      mergeError(err.message);
+    } catch (error) {
+      mergeError(error);
     }
 
     mergeState({ loadingData: false });
@@ -291,8 +298,9 @@ export default function Association() {
       ];
       const dataSource = dataSourceOptions[0];
 
-      const { expVarList } = exposureVariantData.output;
-
+      const { expVarList, error } = exposureVariantData;
+      if (error) throw error.message;
+      
       mergeState({
         assocVarData,
         expVarList,
@@ -300,8 +308,8 @@ export default function Association() {
         dataSourceOptions,
         expVariant: expVarList[0],
       });
-    } catch (err) {
-      mergeError(err.message);
+    } catch (error) {
+      mergeError(error);
     }
     mergeState({ loadingData: false });
   }
@@ -332,7 +340,7 @@ export default function Association() {
         })
       ).json();
 
-      const { collapseVar1, collapseVar2 } = collapseData.output;
+      const { collapseVar1, collapseVar2 } = collapseData;
 
       mergeState({
         variant1: {
@@ -344,8 +352,8 @@ export default function Association() {
           collapseOptions: collapseVar2 || [],
         },
       });
-    } catch (err) {
-      mergeError(err.message);
+    } catch (error) {
+      mergeError(error);
     }
     mergeState({ loadingParams: false });
   }
@@ -368,9 +376,23 @@ export default function Association() {
   }
 
   async function handleCalculate() {
-    mergeState({ loadingCalculate: true, err: false });
+    mergeState({
+      loadingCalculate: signature ? false : true,
+      loadingRecalculate: signature ? true : false,
+      error: false,
+      plotPath: '',
+      dataPath: '',
+    });
     try {
-      const { debugR, output, projectID: id } = await (
+      const {
+        stdout,
+        error,
+        plotPath,
+        dataPath,
+        dataTable,
+        signatureOptions,
+        projectID: id,
+      } = await (
         await fetch(`api/associationCalc`, {
           method: 'POST',
           headers: {
@@ -378,7 +400,7 @@ export default function Association() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            fn: 'calculate',
+            fn: 'univariate',
             projectID,
             args: {
               study,
@@ -388,6 +410,7 @@ export default function Association() {
               dataSource,
               dataType,
               testType,
+              signature,
               xlab: xlab || variant1.name,
               ylab: ylab || variant2.name,
               variant1: (() => {
@@ -403,16 +426,24 @@ export default function Association() {
         })
       ).json();
 
+      if (error) {
+        throw error.error;
+      }
       mergeState({
         projectID: id,
-        plotPath: output.plotPath,
-        dataPath: output.dataPath,
+        plotPath,
+        dataPath,
+        resultsTable: { data: dataTable },
+        signatureOptions,
+        signature: signature ? signature : signatureOptions[0],
       });
-    } catch (err) {
-      mergeError(err.message);
-      mergeState({ err: true });
+    } catch (error) {
+      mergeState({ error: error });
     }
-    mergeState({ loadingCalculate: false });
+    mergeState({
+      loadingCalculate: false,
+      loadingRecalculate: false,
+    });
   }
 
   return (
@@ -552,7 +583,10 @@ export default function Association() {
                     <Col md="6">
                       <Button
                         disabled={
-                          loadingData || loadingParams || loadingCalculate
+                          loadingData ||
+                          loadingParams ||
+                          loadingCalculate ||
+                          loadingRecalculate
                         }
                         className="w-100 mb-3"
                         variant="secondary"
@@ -585,7 +619,7 @@ export default function Association() {
                     <Group>
                       <Label>Upload Exposure File</Label>
                       <Form.File
-                        disabled={loadingData || loadingParams || loadingCalculate || submitted}
+                        disabled={loadingData || loadingParams || loadingCalculate || loadingRecalculate || submitted}
                         id="uploadExposure"
                         label={exposureFileObj.name || 'Exposure File'}
                         accept=".txt"
@@ -609,7 +643,7 @@ export default function Association() {
                     <Group>
                       <Label>Upload Matrix File</Label>
                       <Form.File
-                        disabled={loadingData || loadingParams || loadingCalculate || submitted}
+                        disabled={loadingData || loadingParams || loadingCalculate || loadingRecalculate || submitted}
                         id="uploadMatrix"
                         label={matrixFileObj.name || 'Matrix File'}
                         accept=".txt"
@@ -634,7 +668,7 @@ export default function Association() {
                       <Label className="mr-4">Use Public Signature Data</Label>
                       <Check inline id="toggleSignatureSource">
                         <Check.Input
-                          disabled={loadingData || loadingParams || loadingCalculate || submitted}
+                          disabled={loadingData || loadingParams || loadingCalculate || loadingRecalculate || submitted}
                           type="checkbox"
                           value={usePublicSignature}
                           checked={usePublicSignature}
@@ -655,7 +689,7 @@ export default function Association() {
                       <Col>
                         <Group>
                           <Select
-                            disabled={loadingData || loadingParams || loadingCalculate || submitted}
+                            disabled={loadingData || loadingParams || loadingCalculate || loadingRecalculate || submitted}
                             id="expStudyUser"
                             label="Study"
                             value={study}
@@ -669,7 +703,7 @@ export default function Association() {
                       <Col>
                         <Group>
                           <Select
-                            disabled={loadingData || loadingParams || loadingCalculate || submitted}
+                            disabled={loadingData || loadingParams || loadingCalculate || loadingRecalculate || submitted}
                             id="exposureSignatureSet"
                             label="Reference Signature Set"
                             value={rsSet}
@@ -686,7 +720,7 @@ export default function Association() {
                       <Group>
                         <Label>Upload Signature Data</Label>
                         <Form.File
-                          disabled={loadingData || loadingParams || loadingCalculate || submitted}
+                          disabled={loadingData || loadingParams || loadingCalculate || loadingRecalculate || submitted}
                           id="uploadSignature"
                           label={signatureFileObj.name || 'Signature File'}
                           accept=".txt"
@@ -710,7 +744,7 @@ export default function Association() {
                   <Col>
                     <Group>
                       <Select
-                        disabled={loadingData || loadingParams || loadingCalculate || submitted}
+                        disabled={loadingData || loadingParams || loadingCalculate || loadingRecalculate || submitted}
                         id="exposureGenome"
                         label="Genome"
                         value={genome}
@@ -723,7 +757,7 @@ export default function Association() {
                 <Row>
                   <Col md="6">
                     <Button
-                      disabled={loadingData || loadingParams || loadingCalculate }
+                      disabled={loadingData || loadingParams || loadingCalculate || loadingRecalculate }
                       className="w-100 mb-3"
                       variant="secondary"
                       onClick={() => handleReset()}
@@ -733,7 +767,7 @@ export default function Association() {
                   </Col>
                   <Col md="6">
                     <Button
-                      disabled={loadingData || loadingParams || loadingCalculate }
+                      disabled={loadingData || loadingParams || loadingCalculate || loadingRecalculate }
                       className="w-100"
                       variant="primary"
                       onClick={() => {
@@ -766,9 +800,9 @@ export default function Association() {
                           ...assocVarData.map((row) => Object.keys(row))
                         ),
                       ].reduce(reducer, [])}
-                      pagination={pagination}
-                      hidden={hidden}
-                      mergeState={mergeState}
+                      pagination={assocTable.pagination}
+                      hidden={assocTable.hidden}
+                      mergeState={(e) => mergeState({ assocTable: { ...e } })}
                     />
                   </div>
                   <hr />
@@ -1123,23 +1157,68 @@ export default function Association() {
                   </div>
                   <div>
                     <hr />
-                    {err && (
-                      <div className="mx-auto p-3">
-                        <p className="p-3 text-danger">{err}</p>
-                      </div>
+                    {error && (
+                      <p className="p-3 d-flex justify-content-center text-danger">
+                        {error}
+                      </p>
                     )}
-                    {plotPath && (
+                    {resultsTable.data.length > 0 && (
                       <div className="mx-auto p-3">
                         <h4>Results</h4>
-                        <hr />
-                        <Plot
-                          className="p-3"
-                          // title="Association"
-                          downloadName={plotPath.split('/').slice(-1)[0]}
-                          plotPath={`api/results/${projectID}${plotPath}`}
-                          txtPath={projectID + dataPath}
-                          maxHeight="800px"
+                        <Table
+                          title="Association Group"
+                          data={resultsTable.data}
+                          columns={[
+                            ...new Set(
+                              ...resultsTable.data.map((row) =>
+                                Object.keys(row)
+                              )
+                            ),
+                          ].reduce(reducer, [])}
+                          pagination={resultsTable.pagination}
+                          hidden={resultsTable.hidden}
+                          mergeState={async (e) =>
+                            await mergeState({ resultsTable: { ...e } })
+                          }
                         />
+                        <Row>
+                          <Col>
+                            <p>
+                              Select an Association Variant and Signature
+                              Exposure Variant
+                            </p>
+                          </Col>
+                          <Col md="auto">
+                            <Select
+                              disabled={
+                                loadingData ||
+                                loadingParams ||
+                                loadingCalculate ||
+                                submitted
+                              }
+                              id="signature"
+                              label="Signature Name"
+                              value={signature}
+                              options={signatureOptions}
+                              onChange={(e) => mergeState({ signature: e })}
+                            />
+                          </Col>
+                        </Row>
+                        <LoadingOverlay
+                          active={loadingRecalculate}
+                          content={loadingMsg}
+                          showIndicator={loadingMsg}
+                        />
+                        {plotPath && (
+                          <Plot
+                            className="p-3 border rounded"
+                            // title="Association"
+                            downloadName={plotPath.split('/').slice(-1)[0]}
+                            plotPath={`api/results/${projectID}${plotPath}`}
+                            txtPath={projectID + dataPath}
+                            maxHeight="800px"
+                          />
+                        )}
                       </div>
                     )}
                     {/* <Debug msg={debugR} /> */}

@@ -6,8 +6,9 @@ export const getInitialState = () => ({
   loadingData: false,
   loadingParams: false,
   loadingCalculate: false,
+  loadingRecalculate: false,
   submitted: false,
-  err: false,
+  error: false,
   loadedParameters: false,
   exposureSignature: [],
   assocVarData: [],
@@ -31,6 +32,8 @@ export const getInitialState = () => ({
   dataType: '',
   dataTypeOptions: [],
   assocVarOptions: [],
+  signature: '',
+  signatureOptions: [],
   testType: 'nonparametric',
   xlab: '',
   ylab: '',
@@ -48,10 +51,20 @@ export const getInitialState = () => ({
     collapse: '',
     collapseOptions: [],
   },
-  hidden: [],
-  pagination: {
-    pageIndex: 0,
-    pageSize: 5,
+  assocTable: {
+    hidden: [],
+    pagination: {
+      pageIndex: 0,
+      pageSize: 5,
+    },
+  },
+  resultsTable: {
+    data: [],
+    hidden: [],
+    pagination: {
+      pageIndex: 0,
+      pageSize: 5,
+    },
   },
 });
 
