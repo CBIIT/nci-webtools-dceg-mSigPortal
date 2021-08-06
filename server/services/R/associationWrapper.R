@@ -58,6 +58,7 @@ loadData <- function(args, s3Data, localData, bucket) {
     output = list(expVarList = Exposure_varlist)
   }, error = function(e) {
     print(e)
+    output <<- append(output, list(uncaught_error = paste0(deparse(e$call), ': ', e$message)))
   }, finally = {
     sink(con)
     sink(con)
@@ -119,6 +120,7 @@ loadCollapse <- function(args, s3Data, localData, bucket) {
     output = list(collapseVar1 = collapse_var1_list, collapseVar2 = collapse_var2_list)
   }, error = function(e) {
     print(e)
+    output <<- append(output, list(uncaught_error = paste0(deparse(e$call), ': ', e$message)))
   }, finally = {
     sink(con)
     sink(con)
@@ -207,6 +209,8 @@ univariate <- function(args, projectID, rootDir, savePath, s3Data, localData, bu
     output = list(plotPath = getResultsPath(plotPath), dataPath = getResultsPath(dataPath), dataTable = result, signatureOptions = signature_name_list)
   }, error = function(e) {
     print(e)
+    print(names(e))
+    output <<- append(output, list(uncaught_error = paste0(deparse(e$call), ': ', e$message)))
   }, finally = {
     sink(con)
     sink(con)

@@ -141,7 +141,7 @@ export default function Univariate() {
   }
 
   async function handleLoadParameters() {
-    mergeState({ loadingParams: true });
+    mergeState({ loadingParams: true, error: false });
     try {
       const collapseData = await (
         await fetch(`api/associationData`, {
@@ -184,23 +184,6 @@ export default function Univariate() {
     mergeState({ loadingParams: false });
   }
 
-  function handleReset() {
-    const params = {
-      source,
-      exposureSignature,
-      studyOptions,
-      strategyOptions,
-      cancerOptions,
-      rsSetOptions,
-      study,
-      strategy,
-      cancer,
-      rsSet,
-    };
-    resetAssociation();
-    mergeState(params);
-  }
-
   async function handleCalculate() {
     mergeState({
       loadingCalculate: signature ? false : true,
@@ -213,6 +196,7 @@ export default function Univariate() {
       const {
         stdout,
         error,
+        uncaught_error,
         plotPath,
         dataPath,
         dataTable,
@@ -252,17 +236,24 @@ export default function Univariate() {
         })
       ).json();
 
-      if (error) {
+      if (uncaught_error) {
+        console.error('R error: ' + uncaught_error);
+        mergeState({
+          error:
+            'An error has occured. Please review your parameters and try again.',
+        });
+      } else if (error) {
         throw error.error;
+      } else {
+        mergeState({
+          projectID: id,
+          plotPath,
+          dataPath,
+          resultsTable: { data: dataTable },
+          signatureOptions,
+          signature: signature ? signature : signatureOptions[0],
+        });
       }
-      mergeState({
-        projectID: id,
-        plotPath,
-        dataPath,
-        resultsTable: { data: dataTable },
-        signatureOptions,
-        signature: signature ? signature : signatureOptions[0],
-      });
     } catch (error) {
       mergeState({ error: error });
     }
