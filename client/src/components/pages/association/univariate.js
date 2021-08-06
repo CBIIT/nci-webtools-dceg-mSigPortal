@@ -35,7 +35,7 @@ export default function Univariate() {
     cancer,
     cancerOptions,
     assocTable,
-  } = useSelector((state) => state.association.association);
+  } = useSelector((state) => state.association.associationState);
 
   const {
     loadingParams,
@@ -629,7 +629,8 @@ export default function Univariate() {
               <Row>
                 <Col md="auto">
                   <p>
-                    Select an Association Variant and Signature Exposure Variant
+                    Select a Signature Name to recalculate for a different
+                    Signature
                   </p>
                 </Col>
                 <Col md="auto">

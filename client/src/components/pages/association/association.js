@@ -21,7 +21,7 @@ const { Group, Label, Check } = Form;
 export default function Association() {
   const dispatch = useDispatch();
   const mergeState = async (state) =>
-    await dispatch(actions.mergeAssociation({ association: state }));
+    await dispatch(actions.mergeAssociation({ associationState: state }));
 
   const {
     displayTab,
@@ -31,7 +31,7 @@ export default function Association() {
     source,
     assocVarData,
     loadingData,
-  } = useSelector((state) => state.association.association);
+  } = useSelector((state) => state.association.associationState);
 
   const tabs = [
     { name: 'Univariate', id: 'univariate' },

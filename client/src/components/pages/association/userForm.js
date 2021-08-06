@@ -13,7 +13,7 @@ const { Group } = Form;
 export default function UserForm() {
   const dispatch = useDispatch();
   const mergeState = async (state) =>
-    await dispatch(actions.mergeAssociation({ association: state }));
+    await dispatch(actions.mergeAssociation({ associationState: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
   const resetAssociation = (_) => dispatch(actions.resetAssociation());
@@ -31,7 +31,7 @@ export default function UserForm() {
     strategy,
     cancer,
     rsSet,
-  } = useSelector((state) => state.association.association);
+  } = useSelector((state) => state.association.associationState);
 
   // populate controls on inital render
   useEffect(() => {

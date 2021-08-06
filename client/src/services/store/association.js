@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { mergeObject } from './utils';
 
 export const getInitialState = () => ({
-  association: {
+  associationState: {
     displayTab: 'univariate',
     openSidebar: true,
     loadingData: false,
