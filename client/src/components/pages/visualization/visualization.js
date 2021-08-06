@@ -128,7 +128,7 @@ export default function Visualize({ match }) {
                     disabled={!Object.keys(svgList).length}
                     style={{
                       textDecoration: 'none',
-                      fontSize: '11pt',
+                      fontSize: '12pt',
                       color: 'black',
                       fontWeight: '500',
                     }}
@@ -155,7 +155,7 @@ export default function Visualize({ match }) {
                     }
                     style={{
                       textDecoration: 'none',
-                      fontSize: '11pt',
+                      fontSize: '12pt',
                       color: 'black',
                       fontWeight: '500',
                     }}

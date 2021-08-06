@@ -267,7 +267,7 @@ export default function Explore() {
                     activeClassName="active-secondary-navlinks"
                     style={{
                       textDecoration: 'none',
-                      fontSize: '11pt',
+                      fontSize: '12pt',
                       color: 'black',
                       fontWeight: '500',
                     }}
@@ -291,7 +291,7 @@ export default function Explore() {
                     activeClassName="active-secondary-navlinks"
                     style={{
                       textDecoration: 'none',
-                      fontSize: '11pt',
+                      fontSize: '12pt',
                       color: 'black',
                       fontWeight: '500',
                     }}
