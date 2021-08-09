@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 export default function Download({ exposureDownload }) {
   const [downloading, setDownload] = useState(false);

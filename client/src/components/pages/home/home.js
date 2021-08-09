@@ -183,7 +183,7 @@ export default function Home({ links }) {
         {cardRow(links.slice(0, 1))}
         {cardRow(links.slice(1, 2))}
         {cardRow(links.slice(2, 3))}
-        {/* {cardRow(links.slice(3, 4))} */}
+        {cardRow(links.slice(3, 4))}
       </div>
     </>
   );

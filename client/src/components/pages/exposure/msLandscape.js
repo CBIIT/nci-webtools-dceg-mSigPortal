@@ -1,31 +1,31 @@
 import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import { actions as explorationActions } from '../../../../services/store/exploration';
-import { actions as modalActions } from '../../../../services/store/modal';
-import Plot from '../../../controls/plot/plot';
-import Select from '../../../controls/select/select';
-import Debug from '../../../controls/debug/debug';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { actions as exposureActions } from '../../../services/store/exposure';
+import { actions as modalActions } from '../../../services/store/modal';
+import Plot from '../../controls/plot/plot';
+import Select from '../../controls/select/select';
+import Debug from '../../controls/debug/debug';
 
-const actions = { ...explorationActions, ...modalActions };
+const actions = { ...exposureActions, ...modalActions };
 const { Label, Group } = Form;
 
 export default function MsLandscape({ calculateLandscape, handleVariable }) {
   const dispatch = useDispatch();
-  const exploration = useSelector((state) => state.exploration);
+  const exposure = useSelector((state) => state.exposure);
   const {
     variableFile,
     plotPath,
     debugR,
     err,
     loading,
-  } = exploration.msLandscape;
-  const { projectID, source } = exploration.exposure;
-  const mergeExploration = (state) =>
-    dispatch(actions.mergeExploration({ exploration: state }));
+  } = exposure.msLandscape;
+  const { projectID, source } = exposure.exposureState;
+  const mergeExposure = (state) =>
+    dispatch(actions.mergeExposure({ exposure: state }));
   const mergeMsLandscape = (state) =>
-    dispatch(actions.mergeExploration({ msLandscape: state }));
+    dispatch(actions.mergeExposure({ msLandscape: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 

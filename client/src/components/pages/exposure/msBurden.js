@@ -1,36 +1,29 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import { actions as explorationActions } from '../../../../services/store/exploration';
-import { actions as modalActions } from '../../../../services/store/modal';
-import Plot from '../../../controls/plot/plot';
-import Select from '../../../controls/select/select';
-import Debug from '../../../controls/debug/debug';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { actions as exposureActions } from '../../../services/store/exposure';
+import { actions as modalActions } from '../../../services/store/modal';
+import Plot from '../../controls/plot/plot';
+import Select from '../../controls/select/select';
+import Debug from '../../controls/debug/debug';
 
-const actions = { ...explorationActions, ...modalActions };
+const actions = { ...exposureActions, ...modalActions };
 
 export default function MsBurden({ calculateBurden }) {
   const dispatch = useDispatch();
-  const exploration = useSelector((state) => state.exploration);
-  const {
-    signatureName,
-    plotPath,
-    debugR,
-    err,
-    loading,
-  } = exploration.msBurden;
+  const exposure = useSelector((state) => state.exposure);
+
+  const { signatureName, plotPath, debugR, err, loading } = exposure.msBurden;
   const {
     projectID,
     signatureNameOptions,
     userNameOptions,
     source,
-    gettingSignatureNames,
-  } = exploration.exposure;
-  const mergeExploration = (state) =>
-    dispatch(actions.mergeExploration({ exploration: state }));
+  } = exposure.exposureState;
+
   const mergeMsBurden = (state) =>
-    dispatch(actions.mergeExploration({ msBurden: state }));
+    dispatch(actions.mergeExposure({ msBurden: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -60,8 +53,8 @@ export default function MsBurden({ calculateBurden }) {
       </div>
       <hr />
       <Form className="p-3">
-        <LoadingOverlay active={loading || gettingSignatureNames} />
-        <Row className="">
+        <LoadingOverlay active={loading} />
+        <Row>
           <Col lg="3">
             <Select
               className="mb-2"

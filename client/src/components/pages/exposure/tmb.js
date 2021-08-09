@@ -1,14 +1,14 @@
 import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import Plot from '../../../controls/plot/plot';
-import Debug from '../../../controls/debug/debug';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import Plot from '../../controls/plot/plot';
+import Debug from '../../controls/debug/debug';
 
 export default function TMB({ calculateTMB }) {
-  const exploration = useSelector((state) => state.exploration);
-  const { plotPath, debugR, err, loading } = exploration.tmb;
-  const { projectID, source } = exploration.exposure;
+  const exposure = useSelector((state) => state.exposure);
+  const { plotPath, debugR, err, loading } = exposure.tmb;
+  const { projectID, source } = exposure.exposureState;
 
   return (
     <div>
@@ -25,7 +25,7 @@ export default function TMB({ calculateTMB }) {
         </p>
       </div>
       <hr />
-      <Form className="p-3">
+      {/* <Form className="p-3">
         <LoadingOverlay active={loading} />
         <Row>
           <Col>Select parameters from the left side panel.</Col>
@@ -40,7 +40,7 @@ export default function TMB({ calculateTMB }) {
             </Button>
           </Col>
         </Row>
-      </Form>
+      </Form> */}
       <div id="tmbPlot">
         {err && (
           <div>

@@ -1,31 +1,30 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import { actions as explorationActions } from '../../../../services/store/exploration';
-import { actions as modalActions } from '../../../../services/store/modal';
-import Plot from '../../../controls/plot/plot';
-import Select from '../../../controls/select/select';
-import Debug from '../../../controls/debug/debug';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { actions as exposureActions } from '../../../services/store/exposure';
+import { actions as modalActions } from '../../../services/store/modal';
+import Plot from '../../controls/plot/plot';
+import Select from '../../controls/select/select';
+import Debug from '../../controls/debug/debug';
 
-const actions = { ...explorationActions, ...modalActions };
+const actions = { ...exposureActions, ...modalActions };
 const { Group } = Form;
 
 export default function MSIndividual({ calculateIndividual }) {
   const dispatch = useDispatch();
-  const exploration = useSelector((state) => state.exploration);
-  const { sample, plotPath, debugR, err, loading } = exploration.msIndividual;
+  const exposure = useSelector((state) => state.exposure);
+  const { sample, plotPath, debugR, err, loading } = exposure.msIndividual;
   const {
     projectID,
     publicSampleOptions,
     userSampleOptions,
     source,
-    gettingSampleNames,
-  } = exploration.exposure;
-  const mergeExploration = (state) =>
-    dispatch(actions.mergeExploration({ exploration: state }));
+  } = exposure.exposureState;
+  const mergeExposure = (state) =>
+    dispatch(actions.mergeExposure({ exposure: state }));
   const mergeMsIndividual = (state) =>
-    dispatch(actions.mergeExploration({ msIndividual: state }));
+    dispatch(actions.mergeExposure({ msIndividual: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -60,7 +59,7 @@ export default function MSIndividual({ calculateIndividual }) {
       </div>
       <hr />
       <Form className="p-3">
-        <LoadingOverlay active={loading || gettingSampleNames} />
+        <LoadingOverlay active={loading} />
         <Row className="">
           <Col lg="3">
             <Group>

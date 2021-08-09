@@ -1,23 +1,21 @@
 import React, { useEffect } from 'react';
 import { Row, Col, Button, Form } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
+import { actions as etiologyActions } from '../../../../services/store/etiology';
 import { actions as explorationActions } from '../../../../services/store/exploration';
 import { actions as modalActions } from '../../../../services/store/modal';
 import { getJSON } from '../../../../services/utils';
 import Plot from '../../../controls/plot/plot';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import './aetiology.scss';
+import './etiology.scss';
 
-const actions = { ...explorationActions, ...modalActions };
-const { Group, Label, Check } = Form;
+const actions = { ...etiologyActions, ...explorationActions, ...modalActions };
+const { Group, Check } = Form;
 
-export default function Aetiology() {
+export default function Etiology() {
   const dispatch = useDispatch();
-  const exploration = useSelector((state) => state.exploration);
-  const mergeAetiology = (state) =>
-    dispatch(actions.mergeExploration({ aetiology: state }));
-  const mergeState = async (state) =>
-    await dispatch(actions.mergeExploration({ ...state }));
+  const mergeEtiology = (state) =>
+    dispatch(actions.mergeEtiology({ etiologyState: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -38,7 +36,7 @@ export default function Aetiology() {
     exposureURL,
     tissueURL,
     refSigURL,
-  } = exploration.aetiology;
+  } = useSelector((state) => state.etiology.etiologyState);
 
   const categories = [
     { name: 'Cosmic Mutational Signatures', file: 'Aetiology_cosmic.json' },
@@ -54,9 +52,10 @@ export default function Aetiology() {
     { name: 'Others', file: '' },
   ];
 
-  // set selected tab on component render
   useEffect(() => {
-    mergeState({ exploration: { displayTab: 'etiology' } });
+    dispatch(
+      actions.mergeExploration({ exploration: { displayTab: 'etiology' } })
+    );
   }, []);
 
   useEffect(() => {
@@ -70,7 +69,7 @@ export default function Aetiology() {
         ];
         const studyOptions = [...new Set(data.map(({ Study }) => Study))];
 
-        mergeAetiology({
+        mergeEtiology({
           data: { [category]: data },
           aetiology: aetiologyOptions[0],
           study: studyOptions[0],
@@ -89,7 +88,7 @@ export default function Aetiology() {
         ...new Set(data[category].map(({ Study }) => Study)),
       ];
 
-      mergeAetiology({
+      mergeEtiology({
         aetiology: aetiologyOptions[0],
         study: studyOptions[0],
       });
@@ -124,7 +123,7 @@ export default function Aetiology() {
         getImageS3(`Profile/${fixFile(signature)}.svg`),
         getImageS3(`Exposure/${fixFile(`${signature}_${study}`)}.svg`),
       ]);
-      mergeAetiology({ profileURL: sig, exposureURL: tmb });
+      mergeEtiology({ profileURL: sig, exposureURL: tmb });
     };
 
     const getCancerSpecificPlots = async () => {
@@ -136,7 +135,7 @@ export default function Aetiology() {
         getImageS3(`Profile/${fixFile(refSig)}.svg`),
         getImageS3(`Exposure/${fixFile(tissue)}_PCAWG.svg`),
       ]);
-      mergeAetiology({
+      mergeEtiology({
         tissueURL: tissuePlot,
         refSigURL: refSigPlot,
         exposureURL: exposurePlot,
@@ -250,7 +249,7 @@ export default function Aetiology() {
           onClick={
             file && name != category
               ? async () => {
-                  mergeAetiology({
+                  mergeEtiology({
                     category: name,
                     aetiology: '',
                     signature: '',
@@ -287,7 +286,7 @@ export default function Aetiology() {
                   size="sm"
                   variant="dark"
                   onClick={() =>
-                    mergeAetiology({
+                    mergeEtiology({
                       aetiology: Aetiology,
                       signature: '',
                       selectedSource: '',
@@ -322,7 +321,7 @@ export default function Aetiology() {
                   size="sm"
                   variant="dark"
                   onClick={() =>
-                    mergeAetiology({
+                    mergeEtiology({
                       aetiology: Aetiology,
                       tissue: '',
                       refSig: '',
@@ -377,7 +376,7 @@ export default function Aetiology() {
         )
       );
 
-      mergeAetiology({ thumbnails: { [category]: newThumbnails } });
+      mergeEtiology({ thumbnails: { [category]: newThumbnails } });
     } catch (err) {
       mergeError(err.message);
     }
@@ -411,7 +410,7 @@ export default function Aetiology() {
           })
         )
       );
-      mergeAetiology({ tissueThumbnails: newThumbnails });
+      mergeEtiology({ tissueThumbnails: newThumbnails });
     } catch (err) {
       mergeError(err.message);
     }
@@ -446,7 +445,7 @@ export default function Aetiology() {
           })
         )
       );
-      mergeAetiology({ refSigThumbnails: newThumbnails });
+      mergeEtiology({ refSigThumbnails: newThumbnails });
     } catch (err) {
       mergeError(err.message);
     }
@@ -460,7 +459,7 @@ export default function Aetiology() {
             <Col key={index} lg="1" md="3" sm="4" className="mb-2 px-1">
               <div
                 onClick={() =>
-                  mergeAetiology({
+                  mergeEtiology({
                     aetiology: Aetiology,
                     signature: Signature,
                     selectedSource: Source_URL,
@@ -510,7 +509,7 @@ export default function Aetiology() {
                   }`}
                   title={`${aetiology} - ${Signature}`}
                   onClick={() =>
-                    mergeAetiology({
+                    mergeEtiology({
                       signature: Signature,
                       selectedSource: Source_URL,
                     })
@@ -554,7 +553,7 @@ export default function Aetiology() {
             <Button
               size="sm"
               variant="primary"
-              onClick={() => mergeAetiology({ study: Study })}
+              onClick={() => mergeEtiology({ study: Study })}
               className={study != Study ? 'disabled' : ''}
               block
             >
@@ -707,7 +706,7 @@ export default function Aetiology() {
                   <Check.Input
                     type="radio"
                     checked={all == false}
-                    onChange={() => mergeAetiology({ all: false })}
+                    onChange={() => mergeEtiology({ all: false })}
                   />
                   <Check.Label className="font-weight-normal">
                     Selected Etiology
@@ -717,7 +716,7 @@ export default function Aetiology() {
                   <Check.Input
                     type="radio"
                     checked={all == true}
-                    onChange={() => mergeAetiology({ all: true })}
+                    onChange={() => mergeEtiology({ all: true })}
                   />
                   <Check.Label className="font-weight-normal">
                     All Etiologies
@@ -764,7 +763,7 @@ export default function Aetiology() {
                 }`}
                 title={`${aetiology} - ${tissue['Tissue Specific Signature']}`}
                 onClick={() =>
-                  mergeAetiology({
+                  mergeEtiology({
                     aetiology: tissue.Aetiology,
                     tissue: tissue['Tissue Specific Signature'],
                     selectedSource:
@@ -814,7 +813,7 @@ export default function Aetiology() {
                   }`}
                   title={`${aetiology} - ${tissue['Tissue Specific Signature']}`}
                   onClick={() =>
-                    mergeAetiology({
+                    mergeEtiology({
                       tissue: tissue['Tissue Specific Signature'],
                       refSig: '',
                       selectedSource:
@@ -863,7 +862,7 @@ export default function Aetiology() {
                     refSig == v['Ref Signature'] ? 'active' : ''
                   }`}
                   title={`${v['Tissue Specific Signature']} - ${v['Ref Signature']}`}
-                  onClick={() => mergeAetiology({ refSig: v['Ref Signature'] })}
+                  onClick={() => mergeEtiology({ refSig: v['Ref Signature'] })}
                 >
                   <img
                     src={v.url}
@@ -973,7 +972,7 @@ export default function Aetiology() {
                   <Check.Input
                     type="radio"
                     checked={all == false}
-                    onChange={() => mergeAetiology({ all: false })}
+                    onChange={() => mergeEtiology({ all: false })}
                   />
                   <Check.Label className="font-weight-normal">
                     Selected Etiology
@@ -983,7 +982,7 @@ export default function Aetiology() {
                   <Check.Input
                     type="radio"
                     checked={all == true}
-                    onChange={() => mergeAetiology({ all: true })}
+                    onChange={() => mergeEtiology({ all: true })}
                   />
                   <Check.Label className="font-weight-normal">
                     All Etiologies

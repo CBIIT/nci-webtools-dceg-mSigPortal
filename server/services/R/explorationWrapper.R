@@ -55,7 +55,7 @@ getSignatureNames <- function(args, s3Data, localData, bucket) {
 
   tryCatch({
     output = list()
-    exposure_refdata_selected <- exposure_refdata %>% filter(Study == args$study, Dataset == args$strategy, Signature_set_name == args$refSignatureSet)
+    exposure_refdata_selected <- exposure_refdata %>% filter(Study == args$study, Dataset == args$strategy, Signature_set_name == args$rsSet)
 
     # available siganture name, Dropdown list for all the signature name
     signature_name_avail <- exposure_refdata_selected %>% filter(Cancer_Type == args$cancerType, Exposure > 0) %>% pull(Signature_name) %>% unique()
@@ -80,7 +80,7 @@ getSampleNames <- function(args, s3Data, localData, bucket) {
 
   tryCatch({
     output = list()
-    exposure_refdata_selected <- exposure_refdata %>% filter(Study == args$study, Dataset == args$strategy, Signature_set_name == args$refSignatureSet)
+    exposure_refdata_selected <- exposure_refdata %>% filter(Study == args$study, Dataset == args$strategy, Signature_set_name == args$rsSet)
 
     # available siganture name, Dropdown list for all the signature name
     sampleNames <- exposure_refdata_selected %>% filter(Cancer_Type == args$cancerType) %>% pull(Sample) %>% unique()
@@ -95,7 +95,7 @@ getSampleNames <- function(args, s3Data, localData, bucket) {
   })
 }
 
-exposureDownload <- function(study, strategy, refSignatureSet, cancerType, projectID, pythonOutput, rootDir, savePath, s3Data, localData, bucket) {
+exposureDownload <- function(study, strategy, rsSet, cancerType, projectID, pythonOutput, rootDir, savePath, s3Data, localData, bucket) {
   s3load(paste0(s3Data, 'Exposure/exposure_refdata.RData'), bucket)
 
   con <- textConnection('stdout', 'wr', local = TRUE)
@@ -104,9 +104,9 @@ exposureDownload <- function(study, strategy, refSignatureSet, cancerType, proje
 
   tryCatch({
     output = list()
-    exposure_refdata_selected <- exposure_refdata %>% filter(Study == study, Dataset == strategy, Signature_set_name == refSignatureSet, Cancer_Type == cancerType)
+    exposure_refdata_selected <- exposure_refdata %>% filter(Study == study, Dataset == strategy, Signature_set_name == rsSet, Cancer_Type == cancerType)
 
-    dfile_name <- paste(study, strategy, cancerType, str_remove_all(str_remove_all(refSignatureSet, '\\('), '\\)'), 'exposure_data.txt.gz', sep = '_')
+    dfile_name <- paste(study, strategy, cancerType, str_remove_all(str_remove_all(rsSet, '\\('), '\\)'), 'exposure_data.txt.gz', sep = '_')
     dfile_name <- str_replace_all(dfile_name, ' +', '_')
     filepath = paste0(savePath, '/', dfile_name)
     exposure_refdata_input <- exposure_refdata_selected
@@ -167,7 +167,7 @@ referenceSignatures <- function(projectID, pythonOutput, rootDir, savePath, s3Da
 }
 
 # section 2: Mutational signature profile  --------------------------------------------------------------
-mutationalProfiles <- function(signatureSource, profileName, refSignatureSet, experimentalStrategy, signatureName, projectID, pythonOutput, rootDir, savePath, s3Data, localData, bucket) {
+mutationalProfiles <- function(signatureSource, profileName, rsSet, experimentalStrategy, signatureName, projectID, pythonOutput, rootDir, savePath, s3Data, localData, bucket) {
   source('services/R/Sigvisualfunc.R')
 
   s3load(paste0(s3Data, 'Signature/signature_refsets.RData'), bucket)
@@ -182,7 +182,7 @@ mutationalProfiles <- function(signatureSource, profileName, refSignatureSet, ex
     path_profile <- paste0(s3Data, 'Signature/Reference_Signature_Profiles_SVG/')
     signature_profile_files <- signature_refsets %>% select(Source, Profile, Signature_set_name, Dataset, Signature_name) %>% unique() %>% mutate(Path = str_replace_all(Signature_set_name, " ", "_"), Path = str_remove_all(Path, "[()]"), Path = paste0(path_profile, Path, "/", Signature_name, ".svg"))
     svgfile_selected <- signature_profile_files %>%
-      filter(Source == signatureSource, Profile == profileName, Signature_set_name == refSignatureSet, Dataset == experimentalStrategy, Signature_name == signatureName) %>% pull(Path)
+      filter(Source == signatureSource, Profile == profileName, Signature_set_name == rsSet, Dataset == experimentalStrategy, Signature_name == signatureName) %>% pull(Path)
 
     # fix filename
     splitPath = strsplit(svgfile_selected, '/')[[1]]
@@ -203,7 +203,7 @@ mutationalProfiles <- function(signatureSource, profileName, refSignatureSet, ex
 }
 
 # section3: Cosine similarities among mutational signatures -------------------------
-cosineSimilarity <- function(profileName, refSignatureSet1, refSignatureSet2, projectID, pythonOutput, rootDir, savePath, s3Data, localData, bucket) {
+cosineSimilarity <- function(profileName, rsSet1, rsSet2, projectID, pythonOutput, rootDir, savePath, s3Data, localData, bucket) {
   # The parameters will be “Matrix Size”, “Reference Signature Set1” and “Reference Signature Set2”. 
   source('services/R/Sigvisualfunc.R')
 
@@ -220,12 +220,12 @@ cosineSimilarity <- function(profileName, refSignatureSet1, refSignatureSet2, pr
 
     signature_refsets %>% filter(Profile == profileName) %>% pull(Signature_set_name) %>% unique()
     sigrefset1_data <- signature_refsets %>%
-      filter(Profile == profileName, Signature_set_name == refSignatureSet1) %>%
+      filter(Profile == profileName, Signature_set_name == rsSet1) %>%
       select(Signature_name, MutationType, Contribution) %>%
       pivot_wider(names_from = Signature_name, values_from = Contribution)
 
     sigrefset2_data <- signature_refsets %>%
-      filter(Profile == profileName, Signature_set_name == refSignatureSet2) %>%
+      filter(Profile == profileName, Signature_set_name == rsSet2) %>%
       select(Signature_name, MutationType, Contribution) %>%
       pivot_wider(names_from = Signature_name, values_from = Contribution)
 
@@ -249,7 +249,7 @@ cosineSimilarity <- function(profileName, refSignatureSet1, refSignatureSet2, pr
 # section4: Mutational signatures comparisons
 ## A comparison of two reference signatures
 # There will be five parameters: “Profile Type”,  “Reference Signature Set1”, “Signature Name1”, “Reference Signature Set2”, “Signature Name2”;
-mutationalSignatureComparison <- function(profileName, refSignatureSet1, signatureName1, refSignatureSet2, signatureName2, projectID, pythonOutput, rootDir, savePath, s3Data, localData, bucket) {
+mutationalSignatureComparison <- function(profileName, rsSet1, signatureName1, rsSet2, signatureName2, projectID, pythonOutput, rootDir, savePath, s3Data, localData, bucket) {
   # The parameters will be “Matrix Size”, “Reference Signature Set1” and “Reference Signature Set2”. 
   source('services/R/Sigvisualfunc.R')
 
@@ -271,13 +271,13 @@ mutationalSignatureComparison <- function(profileName, refSignatureSet1, signatu
 
     signature_refsets %>% filter(Profile == profileName) %>% pull(Signature_set_name) %>% unique()
     profile1 <- signature_refsets %>%
-      filter(Profile == profileName, Signature_set_name == refSignatureSet1) %>%
+      filter(Profile == profileName, Signature_set_name == rsSet1) %>%
       select(Signature_name, MutationType, Contribution) %>%
       pivot_wider(names_from = Signature_name, values_from = Contribution) %>%
       select(MutationType, one_of(signatureName1))
 
     profile2 <- signature_refsets %>%
-      filter(Profile == profileName, Signature_set_name == refSignatureSet2) %>%
+      filter(Profile == profileName, Signature_set_name == rsSet2) %>%
       select(Signature_name, MutationType, Contribution) %>%
       pivot_wider(names_from = Signature_name, values_from = Contribution) %>%
       select(MutationType, one_of(signatureName2))
@@ -514,8 +514,8 @@ exposurePublic <- function(fn, common, burden = '{}', association = '{}', landsc
     s3load(paste0(s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), bucket)
 
     # filter data
-    exposure_refdata_selected <- exposure_refdata %>% filter(Study == common$study, Dataset == common$strategy, Signature_set_name == common$refSignatureSet)
-    signature_refsets_selected <- signature_refsets %>% filter(Signature_set_name == common$refSignatureSet)
+    exposure_refdata_selected <- exposure_refdata %>% filter(Study == common$study, Dataset == common$strategy, Signature_set_name == common$rsSet)
+    signature_refsets_selected <- signature_refsets %>% filter(Signature_set_name == common$rsSet)
 
     if (common$useCancerType) {
       seqmatrixFile <- seqmatrix_refdata_subset_files %>% filter(Study == common$study, Dataset == common$strategy, Cancer_Type == common$cancerType) %>% pull(file)
@@ -693,7 +693,7 @@ exposureUser <- function(fn, files, common, burden = '{}', association = '{}', l
       s3load(paste0(s3Data, 'Signature/signature_refsets.RData'), bucket)
 
       signature_refsets_selected <- signature_refsets %>%
-        filter(Signature_set_name == common$refSignatureSet) %>%
+        filter(Signature_set_name == common$rsSet) %>%
         select(MutationType, Signature_name, Contribution) %>%
         pivot_wider(names_from = Signature_name, values_from = Contribution)
     }

@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import { actions as explorationActions } from '../../../../services/store/exploration';
-import { actions as modalActions } from '../../../../services/store/modal';
-import Plot from '../../../controls/plot/plot';
-import Debug from '../../../controls/debug/debug';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { actions as exposureActions } from '../../../services/store/exposure';
+import { actions as modalActions } from '../../../services/store/modal';
+import Plot from '../../controls/plot/plot';
+import Debug from '../../controls/debug/debug';
 
-const actions = { ...explorationActions, ...modalActions };
+const actions = { ...exposureActions, ...modalActions };
 const { Group, Label, Control } = Form;
 
 export default function MsPrevalence({ calculatePrevalence }) {
   const dispatch = useDispatch();
-  const exploration = useSelector((state) => state.exploration);
-  const { mutation, plotPath, debugR, err, loading } = exploration.msPrevalence;
-  const { projectID, source } = exploration.exposure;
+  const exposure = useSelector((state) => state.exposure);
+  const { mutation, plotPath, debugR, err, loading } = exposure.msPrevalence;
+  const { projectID, source } = exposure.exposureState;
   const mergeMsPrevalence = (state) =>
-    dispatch(actions.mergeExploration({ msPrevalence: state }));
+    dispatch(actions.mergeExposure({ msPrevalence: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 

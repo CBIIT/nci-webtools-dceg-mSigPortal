@@ -1,21 +1,15 @@
 import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import Plot from '../../../controls/plot/plot';
-import Debug from '../../../controls/debug/debug';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import Plot from '../../controls/plot/plot';
+import Debug from '../../controls/debug/debug';
 
-export default function MsDecomposition({ calculateDecomposition }) {
+export default function MsDecomposition() {
   const dispatch = useDispatch();
-  const exploration = useSelector((state) => state.exploration);
-  const {
-    plotPath,
-    txtPath,
-    debugR,
-    err,
-    loading,
-  } = exploration.msDecomposition;
-  const { projectID, source } = exploration.exposure;
+  const exposure = useSelector((state) => state.exposure);
+  const { plotPath, txtPath, debugR, err, loading } = exposure.msDecomposition;
+  const { projectID, source } = exposure.exposureState;
 
   return (
     <div>
@@ -36,23 +30,7 @@ export default function MsDecomposition({ calculateDecomposition }) {
         </p>
       </div>
       <hr />
-      <Form className="p-3">
-        <LoadingOverlay active={loading} />
-        <Row>
-          <Col>Select parameters from the left side panel.</Col>
-          <Col />
-          <Col lg="2" className="d-flex">
-            <Button
-              disabled={source == 'user' && !projectID}
-              className="ml-auto mb-auto"
-              variant="primary"
-              onClick={calculateDecomposition}
-            >
-              Calculate
-            </Button>
-          </Col>
-        </Row>
-      </Form>
+
       <div id="decompositionPlot">
         {err && (
           <div>

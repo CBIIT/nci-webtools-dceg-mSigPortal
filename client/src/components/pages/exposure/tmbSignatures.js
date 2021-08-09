@@ -1,14 +1,14 @@
 import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import Plot from '../../../controls/plot/plot';
-import Debug from '../../../controls/debug/debug';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import Plot from '../../controls/plot/plot';
+import Debug from '../../controls/debug/debug';
 
-export default function TmbSignatures({ calculateTmbSig }) {
-  const exploration = useSelector((state) => state.exploration);
-  const { plotPath, debugR, err, loading } = exploration.tmbSignatures;
-  const { projectID, source } = exploration.exposure;
+export default function TmbSignatures() {
+  const exposure = useSelector((state) => state.exposure);
+  const { plotPath, debugR, err, loading } = exposure.tmbSignatures;
+  const { projectID, source } = exposure.exposureState;
 
   return (
     <div>
@@ -28,23 +28,6 @@ export default function TmbSignatures({ calculateTmbSig }) {
         </p>
       </div>
       <hr />
-      <Form className="p-3">
-        <LoadingOverlay active={loading} />
-        <Row>
-          <Col>Select parameters from the left side panel.</Col>
-          <Col />
-          <Col lg="2" className="d-flex">
-            <Button
-              disabled={source == 'user' && !projectID}
-              className="ml-auto mb-auto"
-              variant="primary"
-              onClick={calculateTmbSig}
-            >
-              Calculate
-            </Button>
-          </Col>
-        </Row>
-      </Form>
       <div id="tmbSigPlot">
         {err && (
           <div>

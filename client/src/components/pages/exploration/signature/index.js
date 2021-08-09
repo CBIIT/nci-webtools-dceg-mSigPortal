@@ -6,10 +6,7 @@ import MutationalSignatureProfile from './mutationalSignatureProfile';
 import CosineSimilarity from './cosineSimilarity';
 import MutationalSignatureComparison from './mutationalSignatureComparison';
 import Download from './download';
-import {
-  actions,
-  getInitialState,
-} from '../../../../services/store/exploration';
+import { actions } from '../../../../services/store/exploration';
 
 const { Container, Content, Pane } = Tab;
 const { Item, Link } = Nav;

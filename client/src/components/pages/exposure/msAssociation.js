@@ -1,19 +1,19 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import { actions as explorationActions } from '../../../../services/store/exploration';
-import { actions as modalActions } from '../../../../services/store/modal';
-import Plot from '../../../controls/plot/plot';
-import Select from '../../../controls/select/select';
-import Debug from '../../../controls/debug/debug';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { actions as exposureActions } from '../../../services/store/exposure';
+import { actions as modalActions } from '../../../services/store/modal';
+import Plot from '../../controls/plot/plot';
+import Select from '../../controls/select/select';
+import Debug from '../../controls/debug/debug';
 
-const actions = { ...explorationActions, ...modalActions };
+const actions = { ...exposureActions, ...modalActions };
 const { Group, Check } = Form;
 
-export default function MsAssociation({ calculateAssociation, handleSet }) {
+export default function MsAssociation({ calculateAssociation }) {
   const dispatch = useDispatch();
-  const exploration = useSelector((state) => state.exploration);
+  const exposure = useSelector((state) => state.exposure);
   const {
     both,
     signatureName1,
@@ -22,18 +22,17 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
     debugR,
     err,
     loading,
-  } = exploration.msAssociation;
+  } = exposure.msAssociation;
   const {
     projectID,
     signatureNameOptions,
     userNameOptions,
     source,
-    gettingSignatureNames,
-  } = exploration.exposure;
-  const mergeExploration = (state) =>
-    dispatch(actions.mergeExploration({ exploration: state }));
+  } = exposure.exposureState;
+  const mergeExposure = (state) =>
+    dispatch(actions.mergeExposure({ exposure: state }));
   const mergeMsAssociation = (state) =>
-    dispatch(actions.mergeExploration({ msAssociation: state }));
+    dispatch(actions.mergeExposure({ msAssociation: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -69,7 +68,7 @@ export default function MsAssociation({ calculateAssociation, handleSet }) {
       </div>
       <hr />
       <Form className="p-3">
-        <LoadingOverlay active={loading || gettingSignatureNames} />
+        <LoadingOverlay active={loading} />
         <Row>
           <Col lg="3">
             <Group controlId="toggleBothSamples">

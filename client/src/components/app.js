@@ -5,6 +5,7 @@ import Home from './pages/home/home';
 import About from './pages/about/about';
 import Visualization from './pages/visualization/visualization';
 import Exploration from './pages/exploration/exploration';
+import Exposure from './pages/exposure/exposure';
 import Refitting from './pages/refitting/refitting';
 import Association from './pages/association/association';
 import Publications from './pages/publications/publications';
@@ -38,6 +39,18 @@ export default function App() {
         'Systematically explore any reference or update to date published signatures with different profiles, version and etiology (endogenous vs Exogenous). Intergratively explore the landscape of signature exposure in different genomic studies, including TCGA, PCAWG, and our Sherlock-Lung study.',
       image: 'assets/images/explore.png',
       navIndex: 1,
+      color: '#2c71dd', // blue
+    },
+    {
+      route: '/exposure',
+      action: 'Exposure',
+      title: 'Exposure',
+      cardTitle: 'Exposure',
+      cardText: 'Exposure',
+      description:
+        'Systematically explore any reference or update to date published signatures with different profiles, version and etiology (endogenous vs Exogenous). Intergratively explore the landscape of signature exposure in different genomic studies, including TCGA, PCAWG, and our Sherlock-Lung study.',
+      image: 'assets/images/explore.png',
+      navIndex: 2,
       color: '#2c71dd', // blue
     },
     // {
@@ -177,6 +190,7 @@ export default function App() {
       <Route path="/about" component={About} />
       <Route path="/visualization/:type?/:id?" component={Visualization} />
       <Route path="/exploration" component={Exploration} />
+      <Route path="/exposure/:exampleName?" component={Exposure} />
       <Route path="/refitting" component={Refitting} />
       <Route path="/association" component={Association} />
       <Route path="/publications" component={Publications} />

@@ -2,15 +2,11 @@ import React, { useEffect } from 'react';
 import { Nav } from 'react-bootstrap';
 import { Route, Redirect, NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  actions as explorationActions,
-  getInitialState,
-} from '../../../services/store/exploration';
+import { actions as explorationActions } from '../../../services/store/exploration';
 import { actions as modalActions } from '../../../services/store/modal';
 import { getJSON } from '../../../services/utils';
 import Signature from './signature/index';
-import Exposure from './exposure';
-import Aetiology from './aetiology';
+import Etiology from './etiology/etiology';
 import './exploration.scss';
 
 const actions = { ...explorationActions, ...modalActions };
@@ -38,20 +34,8 @@ export default function Explore() {
 
   async function populateControls() {
     try {
-      let [
-        signatureData,
-        exposureCancer,
-        exposureSignature,
-        signatureNames,
-      ] = await Promise.all([
-        getJSON(`Others/json/Exploring-Signature.json`),
-        getJSON('Others/json/Exploring-Exposure-cancertype.json'),
-        getJSON('Others/json/Exploring-Exposure.json'),
-        getJSON('Others/json/Signature_name.json'),
-      ]);
-
+      let signatureData = await getJSON(`Others/json/Exploring-Signature.json`);
       populateSignatureExp(signatureData);
-      populateExposureExp(exposureCancer, exposureSignature, signatureNames);
     } catch (err) {
       mergeError(err.message);
     }
@@ -250,7 +234,6 @@ export default function Explore() {
   const tabs = [
     { name: 'Etiology', id: 'etiology' },
     { name: 'Signature', id: 'signature' },
-    { name: 'Exposure', id: 'exposure' },
   ];
 
   return (
@@ -312,14 +295,8 @@ export default function Explore() {
             path={`/exploration`}
             render={() => <Redirect to={`/exploration/${displayTab}`} />}
           />
-          <Route path="/exploration/etiology" component={Aetiology} />
+          <Route path="/exploration/etiology" component={Etiology} />
           <Route path="/exploration/signature" component={Signature} />
-          <Route
-            path="/exploration/exposure/:exampleName?"
-            render={(props) => (
-              <Exposure {...props} populateControls={populateControls} />
-            )}
-          />
         </div>
       </div>
     </div>

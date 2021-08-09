@@ -66,7 +66,6 @@ export default function Association() {
                   >
                     {name}
                   </Button>
-                  <div className="d-md-none w-100"></div>
                 </div>
               ))}
             </Nav>
@@ -138,18 +137,10 @@ export default function Association() {
                 </Group>
               </Col>
             </Row>
-            <Row
-              style={{
-                display: source == 'user' ? 'block' : 'none',
-              }}
-            >
+            <Row>
               <Col lg="auto" className="w-100">
+                {source == 'public' ? <PublicForm /> : <></>}
                 {/* <UserForm /> */}
-              </Col>
-            </Row>
-            <Row style={{ display: source == 'public' ? 'block' : 'none' }}>
-              <Col lg="auto" className="w-100">
-                <PublicForm />
               </Col>
             </Row>
           </div>
