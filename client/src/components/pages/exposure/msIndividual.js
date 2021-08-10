@@ -40,7 +40,7 @@ export default function MSIndividual({ calculateIndividual }) {
   return (
     <div>
       <div className="p-3">
-        <p>MS Individual: Mutational Signature in Individual Sample</p>
+        <b>Mutational Signature in Individual Sample</b>
         <p className="m-0">
           This page allows you to visualize the signature decomposition in
           individual samples. Selected the sample name and click “Calculate”

@@ -54,7 +54,7 @@ export default function MsAssociation({ calculateAssociation }) {
   return (
     <div>
       <div className="p-3">
-        <p>MS Association: Mutational Signature Association</p>
+        <b>Mutational Signature Association</b>
         <p className="m-0">
           The scatter plot below illustrates the associations between two
           selected. On the x-axis is the number of mutations (log 10) assigned

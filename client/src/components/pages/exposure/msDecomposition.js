@@ -1,23 +1,18 @@
 import React from 'react';
-import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
 
 export default function MsDecomposition() {
   const dispatch = useDispatch();
   const exposure = useSelector((state) => state.exposure);
-  const { plotPath, txtPath, debugR, err, loading } = exposure.msDecomposition;
-  const { projectID, source } = exposure.exposureState;
+  const { plotPath, txtPath, debugR, err } = exposure.msDecomposition;
+  const { projectID } = exposure.exposureState;
 
   return (
     <div>
       <div className="p-3">
-        <p>
-          MS Decomposition: Evaluating the Performance of Mutational Signature
-          Decomposition
-        </p>
+        <b>Evaluating the Performance of Mutational Signature Decomposition</b>
         <p className="m-0">
           This distribution plot below illustrates mutational signature
           decomposition distribution in selected cancer type (by selecting

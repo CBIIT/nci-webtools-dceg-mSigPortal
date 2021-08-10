@@ -38,7 +38,7 @@ export default function MsBurden({ calculateBurden }) {
   return (
     <div>
       <div className="p-3">
-        <p>MS Burden: Mutational Signature Burden Across Cancer Types</p>
+        <b>Mutational Signature Burden Across Cancer Types</b>
         <p className="m-0">
           The bar plot below illustrates the level of mutational signature
           burden across different cancer types with regard to a specific

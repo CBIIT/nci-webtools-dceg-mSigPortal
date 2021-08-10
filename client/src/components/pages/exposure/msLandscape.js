@@ -26,7 +26,7 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
   return (
     <div>
       <div className="p-3">
-        <p>MS Landscape: Landscape of Mutational Signature Activity</p>
+        <b>Landscape of Mutational Signature Activity</b>
         <p className="m-0">
           This page allows for you investigate the overall landscape of exposure
           of mutational signatures across samples of a given cancer type. In the

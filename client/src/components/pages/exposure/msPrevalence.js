@@ -25,7 +25,7 @@ export default function MsPrevalence({ calculatePrevalence }) {
   return (
     <div>
       <div className="p-3">
-        <p>MS Prevalence: Prevalence of Mutational Signature </p>
+        <b>Prevalence of Mutational Signature </b>
         <p>
           This page allows you to analyze the prevalence of signatures from the
           selected Study and Reference Signature Set by both sample and
