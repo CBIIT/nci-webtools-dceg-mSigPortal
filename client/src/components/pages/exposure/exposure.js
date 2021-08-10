@@ -175,7 +175,7 @@ export default function Exposure({ match }) {
           plotPath: '',
         });
 
-        await handleCalculate('burden', projectID || (await uploadVariable()));
+        await handleCalculate('burden');
 
         mergeMsBurden({ loading: false });
       }
@@ -195,10 +195,7 @@ export default function Exposure({ match }) {
           plotPath: '',
         });
 
-        await handleCalculate(
-          'association',
-          projectID || (await uploadVariable())
-        );
+        await handleCalculate('association');
 
         mergeMsAssociation({ loading: false });
       }
@@ -217,12 +214,9 @@ export default function Exposure({ match }) {
           err: false,
           plotPath: '',
         });
-
-        await handleCalculate(
-          'landscape',
-          projectID || (await uploadVariable())
-        );
-
+        const id = variableFileObj ? await uploadVariable() : projectID;
+        console.log(variableFileObj);
+        await handleCalculate('landscape', id);
         mergeMsLandscape({ loading: false });
       }
     } catch (error) {
@@ -241,10 +235,7 @@ export default function Exposure({ match }) {
           plotPath: '',
         });
 
-        await handleCalculate(
-          'prevalence',
-          projectID || (await uploadVariable())
-        );
+        await handleCalculate('prevalence');
 
         mergeMsPrevalence({ loading: false });
       }
@@ -263,10 +254,7 @@ export default function Exposure({ match }) {
           plotPath: '',
         });
 
-        await handleCalculate(
-          'individual',
-          projectID || (await uploadVariable())
-        );
+        await handleCalculate('individual');
 
         mergeMsIndividual({ loading: false });
       }
