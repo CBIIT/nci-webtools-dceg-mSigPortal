@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Row, Col, Nav, Button } from 'react-bootstrap';
 import {
   SidebarContainer,
@@ -27,7 +27,13 @@ export default function Visualize({ match }) {
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const { openSidebar, loading, source, submitted } = visualization.visualize;
+  const {
+    openSidebar,
+    loading,
+    source,
+    submitted,
+    queueExpired,
+  } = visualization.visualize;
   const { displayTab, svgList } = visualization.results;
   const { type, id } = match.params;
 
@@ -60,10 +66,13 @@ export default function Visualize({ match }) {
       ).json();
       dispatch(actions.mergeVisualization(visualization));
     } catch (error) {
-      mergeError(error.toString());
+      mergeVisualize({
+        queueExpired: true,
+      });
     }
     mergeVisualize({
       loading: { active: false },
+      submitted: true,
     });
   }
 
@@ -86,7 +95,7 @@ export default function Visualize({ match }) {
         })
       );
     } catch (error) {
-      mergeError(error.toString());
+      mergeError(`Example: ${id} does not exist`);
     }
     mergeVisualize({
       loading: { active: false },
@@ -226,6 +235,11 @@ export default function Visualize({ match }) {
           <hr className="d-lg-none" style={{ opacity: 0 }}></hr>
         </SidebarPanel>
         <MainPanel>
+          {queueExpired && (
+            <div className="bg-warning mb-3 p-3 border rounded">
+              <span>Queue results have expired</span>
+            </div>
+          )}
           <Results setOpenSidebar={(e) => setOpenSidebar(e)} />
         </MainPanel>
       </SidebarContainer>

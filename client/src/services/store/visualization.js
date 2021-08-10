@@ -31,6 +31,7 @@ export const getInitialState = () => ({
       content: null,
       showIndicator: false,
     },
+    queueExpired: false,
   },
   results: {
     error: '',

@@ -32,7 +32,7 @@ export function ErrorModal(props) {
         <p
           className="w-100"
           data-testid="ErrorModalMessage"
-          dangerouslySetInnerHTML={{ __html: `Error: ${error.message}` }}
+          dangerouslySetInnerHTML={{ __html: error.message }}
         />
         <p>
           An error has occured. If the issue persists, please contact an admin
