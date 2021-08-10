@@ -74,7 +74,6 @@ export default function Exposure({ match }) {
     exposureFile,
     matrixFile,
     signatureFile,
-    usePublicSignature,
     source,
     display,
     loading,
@@ -592,15 +591,18 @@ export default function Exposure({ match }) {
     window.location.hash = '#/exposure';
 
     const params = {
-      source: source,
+      source,
       study: 'PCAWG',
       strategy: 'WGS',
       rsSet: 'COSMIC v3 Signatures (SBS)',
       cancer: 'Lung-AdenoCA',
-      studyOptions: studyOptions,
-      strategyOptions: strategyOptions,
-      rsSetOptions: rsSetOptions,
-      cancerOptions: cancerOptions,
+      studyOptions,
+      strategyOptions,
+      rsSetOptions,
+      cancerOptions,
+      exposureCancer,
+      exposureSignature,
+      signatureNames,
     };
     resetExposure();
     mergeState(params);

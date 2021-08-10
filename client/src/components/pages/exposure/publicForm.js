@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import Select from '../../controls/select/select';
 import { useSelector, useDispatch } from 'react-redux';
@@ -37,9 +37,9 @@ export default function PublicForm({
     gettingSignatureNames,
     gettingSampleNames,
     useCancerType,
-    signatureNameOptions,
-    publicSampleOptions,
   } = useSelector((state) => state.exposure.exposureState);
+
+  const [queryNames, setQuery] = useState(false);
 
   // populate controls on inital render
   useEffect(() => {
@@ -48,9 +48,8 @@ export default function PublicForm({
 
   // call calculate after receiving signature and sample name options
   useEffect(() => {
-    if ((!submitted && signatureNameOptions.length, publicSampleOptions.length))
-      calculate();
-  }, [signatureNameOptions, publicSampleOptions, submitted]);
+    if (!submitted && queryNames) calculate();
+  }, [queryNames, submitted]);
 
   async function populateControls() {
     try {
@@ -117,25 +116,20 @@ export default function PublicForm({
       ),
     ];
 
-    const params = {
+    mergeState({
       study: study,
       studyOptions: studyOptions,
       strategy: strategy,
       strategyOptions: strategyOptions,
       cancer: cancer,
       cancerOptions: cancerOptions,
-      signatureNames: signatureNames,
       rsSet: rsSet,
       rsSetOptions: rsSetOptions,
       signatureNameOptions: signatureNameOptions,
       loading: false,
-    };
-
-    mergeState({
-      ...params,
-      exposureCancer: exposureCancer,
-      exposureSignature: exposureSignature,
-      signatureNames: signatureNames,
+      exposureCancer,
+      exposureSignature,
+      signatureNames,
     });
   }
 
@@ -174,33 +168,35 @@ export default function PublicForm({
 
   // get signature name options filtered by cancer type
   async function getSignatureNames() {
-    try {
-      const { stdout, output } = await (
-        await fetch(`api/explorationData`, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            fn: 'getSignatureNames',
-            args: {
-              study: study,
-              strategy: strategy,
-              rsSet: rsSet,
-              cancerType: cancer,
+    if (useCancerType) {
+      try {
+        const { stdout, output } = await (
+          await fetch(`api/explorationData`, {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
             },
-          }),
-        })
-      ).json();
+            body: JSON.stringify({
+              fn: 'getSignatureNames',
+              args: {
+                study: study,
+                strategy: strategy,
+                rsSet: rsSet,
+                cancerType: cancer,
+              },
+            }),
+          })
+        ).json();
 
-      if (output.data.length)
-        mergeState({
-          signatureNameOptions: output.data,
-        });
-      else console.log('No Signature Names Found');
-    } catch (err) {
-      mergeError(err.message);
+        if (output.data.length)
+          mergeState({
+            signatureNameOptions: output.data,
+          });
+        else console.log('No Signature Names Found');
+      } catch (err) {
+        mergeError(err.message);
+      }
     }
   }
 
@@ -209,6 +205,7 @@ export default function PublicForm({
     mergeState({ loading: true });
     await Promise.all([getSampleNames(), getSignatureNames()]);
     mergeState({ loading: false });
+    setQuery(true);
   }
 
   return (
@@ -325,7 +322,10 @@ export default function PublicForm({
             disabled={loading}
             className="w-100 mb-3"
             variant="secondary"
-            onClick={() => handleReset()}
+            onClick={() => {
+              setQuery(false);
+              handleReset();
+            }}
           >
             Reset
           </Button>
