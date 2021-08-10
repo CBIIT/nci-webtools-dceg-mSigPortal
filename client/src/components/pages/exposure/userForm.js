@@ -1,17 +1,16 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Select from '../../controls/select/select';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as exposureActions } from '../../../services/store/exposure';
 import { actions as modalActions } from '../../../services/store/modal';
-import { getJSON, unique2d } from '../../../services/utils';
+import { unique2d } from '../../../services/utils';
 
 const actions = { ...exposureActions, ...modalActions };
 const { Group, Check, Label } = Form;
 
 export default function PublicForm({
-  handleCalculate,
+  calculate,
   handleReset,
   handleStudy,
   handleSet,
@@ -38,32 +37,18 @@ export default function PublicForm({
   const [matrixFileObj, setMatrix] = useState(new File([], ''));
   const [signatureFileObj, setSignature] = useState(new File([], ''));
 
-  const [exposureValidity, setExposureValidity] = useState(false);
-  const [matrixValidity, setMatrixValidity] = useState(false);
-  const [signatureValidity, setSignatureValidity] = useState(false);
   const [checkValid, setCheckValid] = useState(false);
 
   function validateFiles() {
     setCheckValid(true);
-    exposureFileObj.size
-      ? setExposureValidity(true)
-      : setExposureValidity(false);
-    matrixFileObj.size ? setMatrixValidity(true) : setMatrixValidity(false);
-    signatureFileObj.size
-      ? setSignatureValidity(true)
-      : setSignatureValidity(false);
-
-    return exposureValidity && matrixValidity && signatureValidity;
+    return usePublicSignature
+      ? exposureFileObj.size && matrixFileObj.size
+      : exposureFileObj.size && matrixFileObj.size && signatureFileObj.size;
   }
 
   async function handleUpload() {
     return new Promise(async (resolve, reject) => {
-      if (
-        exposureValidity &&
-        matrixValidity &&
-        ((!usePublicSignature && signatureFileObj) ||
-          (usePublicSignature && rsSet))
-      ) {
+      if (validateFiles()) {
         try {
           const data = new FormData();
           data.append('exposureFile', exposureFileObj);
@@ -113,7 +98,7 @@ export default function PublicForm({
     });
   }
 
-  async function calculate() {
+  async function handleCalculate() {
     try {
       const { projectID, exposureData } = await handleUpload();
       // get signature name options, ignore sample key
@@ -127,7 +112,7 @@ export default function PublicForm({
         exposureData.data
       );
       const params = {
-        exposure: {
+        exposureState: {
           projectID: projectID,
           userNameOptions: nameOptions,
           userSampleOptions: sampleOptions,
@@ -140,8 +125,8 @@ export default function PublicForm({
         msBurden: { signatureName: nameOptions[0] },
       };
 
-      await mergeState(params);
-      await handleCalculate('all', projectID, params);
+      await dispatch(actions.mergeExposure(params));
+      await calculate('all', projectID, params);
     } catch (err) {
       mergeError(err);
     }
@@ -158,7 +143,7 @@ export default function PublicForm({
               id="uploadExposure"
               label={exposureFileObj.name || 'Exposure File'}
               accept=".txt"
-              isInvalid={checkValid ? !exposureValidity : false}
+              isInvalid={checkValid && !exposureFileObj.size}
               feedback="Upload an exposure file"
               onChange={(e) => {
                 if (e.target.files.length) {
@@ -182,7 +167,7 @@ export default function PublicForm({
               id="uploadMatrix"
               label={matrixFileObj.name || 'Matrix File'}
               accept=".txt"
-              isInvalid={checkValid ? !matrixValidity : false}
+              isInvalid={checkValid && !matrixFileObj.size}
               feedback="Upload a matrix file"
               onChange={(e) => {
                 if (e.target.files.length) {
@@ -244,7 +229,7 @@ export default function PublicForm({
                   value={rsSet}
                   options={rsSetOptions}
                   onChange={handleSet}
-                />{' '}
+                />
               </Group>
             </Col>
           </Row>
@@ -259,7 +244,7 @@ export default function PublicForm({
                 id="uploadSignature"
                 label={signatureFileObj.name || 'Signature File'}
                 accept=".txt"
-                isInvalid={checkValid ? !signatureValidity : false}
+                isInvalid={checkValid && !signatureFileObj.size}
                 feedback="Upload a signature file"
                 onChange={(e) => {
                   if (e.target.files.length) {
@@ -297,6 +282,9 @@ export default function PublicForm({
             variant="secondary"
             onClick={() => {
               setCheckValid(false);
+              setExposure(new File([], ''));
+              setMatrix(new File([], ''));
+              setSignature(new File([], ''));
               handleReset();
             }}
           >
@@ -309,10 +297,10 @@ export default function PublicForm({
             className="w-100"
             variant="primary"
             onClick={() => {
-              if (validateFiles()) calculate();
+              if (validateFiles()) handleCalculate();
             }}
           >
-            Calculate All
+            Calculate
           </Button>
         </Col>
       </Row>
