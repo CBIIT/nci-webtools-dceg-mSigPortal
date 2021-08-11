@@ -4,7 +4,7 @@ import { Navbar } from './controls/navbar/navbar';
 import Home from './pages/home/home';
 import About from './pages/about/about';
 import Visualization from './pages/visualization/visualization';
-import Exploration from './pages/exploration/exploration';
+import Catalog from './pages/catalog/catalog';
 import Exposure from './pages/exposure/exposure';
 import Refitting from './pages/refitting/refitting';
 import Association from './pages/association/association';
@@ -18,6 +18,19 @@ import { actions } from '../services/store/publications';
 export default function App() {
   const links = [
     {
+      route: '/catalog',
+      action: 'Catalog',
+      title: 'Catalog',
+      cardTitle: 'Signature Catalog',
+      cardText: 'Signature Catalog',
+      description:
+        'Systematically explore any reference or update to date published signatures with different profiles, version and etiology (endogenous vs Exogenous). Intergratively explore the landscape of signature exposure in different genomic studies, including TCGA, PCAWG, and our Sherlock-Lung study.',
+      image: 'assets/images/explore.png',
+      navIndex: 0,
+      color: '#2c71dd', // blue
+    },
+
+    {
       route: '/visualization',
       action: 'Visualization',
       title: 'Visualization',
@@ -26,20 +39,8 @@ export default function App() {
       description:
         'Interactively and comprehensively visualize mutation signature in both sample and study level, including different type and level of mutational profiles (SBS/INDEL/DBS/SV/CNV), PCA components and different mutational feature (kataegis mutation, mutation quality, drive gene mutation etc).',
       image: 'assets/images/visualize.png',
-      navIndex: 0,
-      color: '#fc8701', // orange
-    },
-    {
-      route: '/exploration',
-      action: 'Exploration',
-      title: 'Exploration',
-      cardTitle: 'Signature Exploration',
-      cardText: 'Signature Exploration',
-      description:
-        'Systematically explore any reference or update to date published signatures with different profiles, version and etiology (endogenous vs Exogenous). Intergratively explore the landscape of signature exposure in different genomic studies, including TCGA, PCAWG, and our Sherlock-Lung study.',
-      image: 'assets/images/explore.png',
       navIndex: 1,
-      color: '#2c71dd', // blue
+      color: '#fc8701', // orange
     },
     {
       route: '/exposure',
@@ -189,7 +190,7 @@ export default function App() {
       <Route path="/" exact={true} render={(_) => <Home links={links} />} />
       <Route path="/about" component={About} />
       <Route path="/visualization/:type?/:id?" component={Visualization} />
-      <Route path="/exploration" component={Exploration} />
+      <Route path="/catalog" component={Catalog} />
       <Route path="/exposure/:exampleName?" component={Exposure} />
       <Route path="/refitting" component={Refitting} />
       <Route path="/association" component={Association} />

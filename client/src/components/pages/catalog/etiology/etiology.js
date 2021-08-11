@@ -2,14 +2,14 @@ import React, { useEffect } from 'react';
 import { Row, Col, Button, Form } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as etiologyActions } from '../../../../services/store/etiology';
-import { actions as explorationActions } from '../../../../services/store/exploration';
+import { actions as catalogActions } from '../../../../services/store/catalog';
 import { actions as modalActions } from '../../../../services/store/modal';
 import { getJSON } from '../../../../services/utils';
 import Plot from '../../../controls/plot/plot';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import './etiology.scss';
 
-const actions = { ...etiologyActions, ...explorationActions, ...modalActions };
+const actions = { ...etiologyActions, ...catalogActions, ...modalActions };
 const { Group, Check } = Form;
 
 export default function Etiology() {
@@ -54,7 +54,7 @@ export default function Etiology() {
 
   useEffect(() => {
     dispatch(
-      actions.mergeExploration({ exploration: { displayTab: 'etiology' } })
+      actions.mergeCatalog({ catalog: { displayTab: 'etiology' } })
     );
   }, []);
 

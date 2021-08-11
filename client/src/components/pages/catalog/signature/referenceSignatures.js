@@ -3,19 +3,19 @@ import { Row, Col, Button } from 'react-bootstrap';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as explorationActions } from '../../../../services/store/exploration';
+import { actions as catalogActions } from '../../../../services/store/catalog';
 import { actions as modalActions } from '../../../../services/store/modal';
 
-const actions = { ...explorationActions, ...modalActions };
+const actions = { ...catalogActions, ...modalActions };
 
 export default function ReferenceSignatures({ submitR }) {
   const dispatch = useDispatch();
-  const exploration = useSelector((state) => state.exploration);
-  const { plotPath, debugR, err, loading } = exploration.sigRefSig;
-  // const { displayTab } = useSelector((state) => state.exploration);
+  const catalog = useSelector((state) => state.catalog);
+  const { plotPath, debugR, err, loading } = catalog.sigRefSig;
+  // const { displayTab } = useSelector((state) => state.catalog);
 
   // useEffect(() => {
-  //   if (!loading && !plotPath && displayTab == 'signatureExploration') {
+  //   if (!loading && !plotPath && displayTab == 'signatureCatalog') {
   //     calculateR('referenceSignatures', {});
   //   }
   // }, [plotPath, displayTab]);

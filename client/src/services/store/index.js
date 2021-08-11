@@ -1,4 +1,4 @@
-import { reducer as explorationReducer } from './exploration';
+import { reducer as catalogReducer } from './catalog';
 import { reducer as etiologyReducer } from './etiology';
 import { reducer as exposureReducer } from './exposure';
 import { reducer as visualizationReducer } from './visualization';
@@ -12,7 +12,7 @@ import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
 export const store = configureStore({
   reducer: {
     visualization: visualizationReducer,
-    exploration: explorationReducer,
+    catalog: catalogReducer,
     association: associationReducer,
     etiology: etiologyReducer,
     exposure: exposureReducer,

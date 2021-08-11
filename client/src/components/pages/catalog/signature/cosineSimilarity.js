@@ -5,18 +5,18 @@ import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as explorationActions } from '../../../../services/store/exploration';
+import { actions as catalogActions } from '../../../../services/store/catalog';
 import { actions as modalActions } from '../../../../services/store/modal';
 
-const actions = { ...explorationActions, ...modalActions };
+const actions = { ...catalogActions, ...modalActions };
 
 export default function MutationalSignatureProfile({ submitR }) {
   const dispatch = useDispatch();
-  const exploration = useSelector((state) => state.exploration);
-  const mergeExploration = (state) =>
-    dispatch(actions.mergeExploration({ exploration: state }));
+  const catalog = useSelector((state) => state.catalog);
+  const mergeCatalog = (state) =>
+    dispatch(actions.mergeCatalog({ catalog: state }));
   const mergeSigCosineSimilarity = (state) =>
-    dispatch(actions.mergeExploration({ sigCosineSimilarity: state }));
+    dispatch(actions.mergeCatalog({ sigCosineSimilarity: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
   const {
@@ -31,8 +31,8 @@ export default function MutationalSignatureProfile({ submitR }) {
     debugR,
     err,
     loading,
-  } = exploration.sigCosineSimilarity;
-  const { refSigData, projectID } = exploration.exploration;
+  } = catalog.sigCosineSimilarity;
+  const { refSigData, projectID } = catalog.catalog;
 
   async function calculateR(fn, args) {
     try {
@@ -54,7 +54,7 @@ export default function MutationalSignatureProfile({ submitR }) {
       } else {
         const { debugR, output, projectID: id } = await response.json();
         if (Object.keys(output).length) {
-          if (!projectID) mergeExploration({ projectID: id });
+          if (!projectID) mergeCatalog({ projectID: id });
           mergeSigCosineSimilarity({
             debugR: debugR,
             loading: false,

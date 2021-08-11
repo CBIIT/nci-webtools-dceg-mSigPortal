@@ -6,21 +6,21 @@ import MutationalSignatureProfile from './mutationalSignatureProfile';
 import CosineSimilarity from './cosineSimilarity';
 import MutationalSignatureComparison from './mutationalSignatureComparison';
 import Download from './download';
-import { actions } from '../../../../services/store/exploration';
+import { actions } from '../../../../services/store/catalog';
 
 const { Container, Content, Pane } = Tab;
 const { Item, Link } = Nav;
 
 export default function Signature() {
   const dispatch = useDispatch();
-  const exploration = useSelector((state) => state.exploration);
-  const mergeExploration = (state) =>
-    dispatch(actions.mergeExploration({ exploration: state }));
+  const catalog = useSelector((state) => state.catalog);
+  const mergeCatalog = (state) =>
+    dispatch(actions.mergeCatalog({ catalog: state }));
 
-  const { projectID, signatureDisplay } = exploration.exploration;
+  const { projectID, signatureDisplay } = catalog.catalog;
 
   useEffect(() => {
-    mergeExploration({ displayTab: 'signature' });
+    mergeCatalog({ displayTab: 'signature' });
   }, []);
 
   function submitR(fn, args) {
@@ -81,7 +81,7 @@ export default function Signature() {
         className="mt-2"
         defaultActiveKey={signatureDisplay}
         activeKey={signatureDisplay}
-        onSelect={(tab) => mergeExploration({ signatureDisplay: tab })}
+        onSelect={(tab) => mergeCatalog({ signatureDisplay: tab })}
       >
         <Nav variant="tabs">
           {tabs.map(({ key, title }) => (

@@ -2,27 +2,26 @@ import React, { useEffect } from 'react';
 import { Nav } from 'react-bootstrap';
 import { Route, Redirect, NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as explorationActions } from '../../../services/store/exploration';
+import { actions as catalogActions } from '../../../services/store/catalog';
 import { actions as modalActions } from '../../../services/store/modal';
 import { getJSON } from '../../../services/utils';
 import Signature from './signature/index';
 import Etiology from './etiology/etiology';
-import './exploration.scss';
 
-const actions = { ...explorationActions, ...modalActions };
+const actions = { ...catalogActions, ...modalActions };
 
 export default function Explore() {
   const dispatch = useDispatch();
-  const exploration = useSelector((state) => state.exploration);
-  const { exposureSignature, displayTab } = exploration.exploration;
-  const mergeExploration = (state) =>
-    dispatch(actions.mergeExploration({ exploration: state }));
+  const catalog = useSelector((state) => state.catalog);
+  const { exposureSignature, displayTab } = catalog.catalog;
+  const mergeCatalog = (state) =>
+    dispatch(actions.mergeCatalog({ catalog: state }));
   const mergeSigMutationalProfiles = (state) =>
-    dispatch(actions.mergeExploration({ sigMutationalProfiles: state }));
+    dispatch(actions.mergeCatalog({ sigMutationalProfiles: state }));
   const mergeSigMutationalSigComparison = (state) =>
-    dispatch(actions.mergeExploration({ sigMutationalSigComparison: state }));
+    dispatch(actions.mergeCatalog({ sigMutationalSigComparison: state }));
   const mergeSigCosineSimilarity = (state) =>
-    dispatch(actions.mergeExploration({ sigCosineSimilarity: state }));
+    dispatch(actions.mergeCatalog({ sigCosineSimilarity: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -109,7 +108,7 @@ export default function Explore() {
       ),
     ];
 
-    mergeExploration({
+    mergeCatalog({
       refSigData: data,
     });
 
@@ -173,7 +172,7 @@ export default function Explore() {
               {tabs.map(({ name, id }) => (
                 <div key={id} className="d-inline-block">
                   <NavLink
-                    className="secondary-navlinks px-3 py-1 d-inline-block explorationNav"
+                    className="secondary-navlinks px-3 py-1 d-inline-block catalogNav"
                     activeClassName="active-secondary-navlinks"
                     style={{
                       textDecoration: 'none',
@@ -182,7 +181,7 @@ export default function Explore() {
                       fontWeight: '500',
                     }}
                     exact={true}
-                    to={`/exploration/${id}`}
+                    to={`/catalog/${id}`}
                   >
                     {name}
                   </NavLink>
@@ -206,7 +205,7 @@ export default function Explore() {
                       fontWeight: '500',
                     }}
                     exact={true}
-                    to={`/exploration/${id}`}
+                    to={`/catalog/${id}`}
                   >
                     {name}
                   </NavLink>
@@ -219,11 +218,11 @@ export default function Explore() {
         <div className="mx-3 my-3">
           <Route
             exact
-            path={`/exploration`}
-            render={() => <Redirect to={`/exploration/${displayTab}`} />}
+            path={`/catalog`}
+            render={() => <Redirect to={`/catalog/${displayTab}`} />}
           />
-          <Route path="/exploration/etiology" component={Etiology} />
-          <Route path="/exploration/signature" component={Signature} />
+          <Route path="/catalog/etiology" component={Etiology} />
+          <Route path="/catalog/signature" component={Signature} />
         </div>
       </div>
     </div>
