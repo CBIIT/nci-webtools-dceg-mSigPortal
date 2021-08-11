@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
@@ -22,17 +22,17 @@ export default function MutationalSignatureProfile({ submitR }) {
   const {
     profileName,
     profileNameOptions,
-    refSignatureSet1,
-    refSignatureSet2,
-    refSignatureSetOptions1,
-    refSignatureSetOptions2,
+    rsSet1,
+    rsSet2,
+    rsSetOptions1,
+    rsSetOptions2,
     plotPath,
     txtPath,
     debugR,
     err,
     loading,
   } = exploration.sigCosineSimilarity;
-  const { displayTab, refSigData, projectID } = exploration.exploration;
+  const { refSigData, projectID } = exploration.exploration;
 
   async function calculateR(fn, args) {
     try {
@@ -79,16 +79,16 @@ export default function MutationalSignatureProfile({ submitR }) {
 
   function handleProfile(profile) {
     let filteredData = refSigData.filter((row) => row.Profile == profile);
-    const refSignatureSetOptions = [
+    const rsSetOptions = [
       ...new Set(filteredData.map((row) => row.Signature_set_name)),
     ];
 
     mergeSigCosineSimilarity({
       profileName: profile,
-      refSignatureSet1: refSignatureSetOptions[0],
-      refSignatureSet2: refSignatureSetOptions[1] || refSignatureSetOptions[0],
-      refSignatureSetOptions1: refSignatureSetOptions,
-      refSignatureSetOptions2: refSignatureSetOptions,
+      rsSet1: rsSetOptions[0],
+      rsSet2: rsSetOptions[1] || rsSetOptions[0],
+      rsSetOptions1: rsSetOptions,
+      rsSetOptions2: rsSetOptions,
     });
   }
 
@@ -122,22 +122,18 @@ export default function MutationalSignatureProfile({ submitR }) {
             <Select
               id="csRefSet1"
               label="Reference Signature Set 1"
-              value={refSignatureSet1}
-              options={refSignatureSetOptions1}
-              onChange={(set) =>
-                mergeSigCosineSimilarity({ refSignatureSet1: set })
-              }
+              value={rsSet1}
+              options={rsSetOptions1}
+              onChange={(set) => mergeSigCosineSimilarity({ rsSet1: set })}
             />
           </Col>
           <Col lg="4">
             <Select
               id="rcsRefSet2"
               label="Reference Signature Set 2"
-              value={refSignatureSet2}
-              options={refSignatureSetOptions2}
-              onChange={(set) =>
-                mergeSigCosineSimilarity({ refSignatureSet2: set })
-              }
+              value={rsSet2}
+              options={rsSetOptions2}
+              onChange={(set) => mergeSigCosineSimilarity({ rsSet2: set })}
             />
           </Col>
           <Col lg="1" className="d-flex justify-content-end">
@@ -147,8 +143,8 @@ export default function MutationalSignatureProfile({ submitR }) {
               onClick={() => {
                 calculateR('cosineSimilarity', {
                   profileName: profileName,
-                  refSignatureSet1: refSignatureSet1,
-                  refSignatureSet2: refSignatureSet2,
+                  rsSet1: rsSet1,
+                  rsSet2: rsSet2,
                 });
               }}
             >

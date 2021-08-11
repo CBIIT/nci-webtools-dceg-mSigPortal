@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
@@ -27,16 +27,16 @@ export default function MutationalSignatureProfile({ submitR }) {
     signatureNameOptions1,
     signatureName2,
     signatureNameOptions2,
-    refSignatureSet1,
-    refSignatureSetOptions1,
-    refSignatureSet2,
-    refSignatureSetOptions2,
+    rsSet1,
+    rsSetOptions1,
+    rsSet2,
+    rsSetOptions2,
     plotPath,
     debugR,
     err,
     loading,
   } = exploration.sigMutationalSigComparison;
-  const { displayTab, refSigData, projectID } = exploration.exploration;
+  const { refSigData, projectID } = exploration.exploration;
 
   async function calculateR(fn, args) {
     mergeSigMutationalSigComparison({
@@ -84,33 +84,32 @@ export default function MutationalSignatureProfile({ submitR }) {
 
   function handleProfile(profile) {
     let filteredData = refSigData.filter((row) => row.Profile == profile);
-    const refSignatureSetOptions = [
+    const rsSetOptions = [
       ...new Set(filteredData.map((row) => row.Signature_set_name)),
     ];
-    const refSignatureSet1 = refSignatureSetOptions[0];
-    const refSignatureSet2 =
-      refSignatureSetOptions[1] || refSignatureSetOptions[0];
+    const rsSet1 = rsSetOptions[0];
+    const rsSet2 = rsSetOptions[1] || rsSetOptions[0];
     const signatureNameOptions1 = [
       ...new Set(
         filteredData
-          .filter((row) => row.Signature_set_name == refSignatureSet1)
+          .filter((row) => row.Signature_set_name == rsSet1)
           .map((row) => row.Signature_name)
       ),
     ];
     const signatureNameOptions2 = [
       ...new Set(
         filteredData
-          .filter((row) => row.Signature_set_name == refSignatureSet2)
+          .filter((row) => row.Signature_set_name == rsSet2)
           .map((row) => row.Signature_name)
       ),
     ];
 
     mergeSigMutationalSigComparison({
       profileName: profile,
-      refSignatureSet1: refSignatureSet1,
-      refSignatureSet2: refSignatureSet2,
-      refSignatureSetOptions1: refSignatureSetOptions,
-      refSignatureSetOptions2: refSignatureSetOptions,
+      rsSet1: rsSet1,
+      rsSet2: rsSet2,
+      rsSetOptions1: rsSetOptions,
+      rsSetOptions2: rsSetOptions,
       signatureName1: signatureNameOptions1[0],
       signatureName2: signatureNameOptions2[0],
       signatureNameOptions1: signatureNameOptions1,
@@ -128,7 +127,7 @@ export default function MutationalSignatureProfile({ submitR }) {
     ];
 
     mergeSigMutationalSigComparison({
-      refSignatureSet1: set,
+      rsSet1: set,
       signatureName1: signatureNameOptions1[0],
       signatureNameOptions1: signatureNameOptions1,
     });
@@ -144,7 +143,7 @@ export default function MutationalSignatureProfile({ submitR }) {
     ];
 
     mergeSigMutationalSigComparison({
-      refSignatureSet2: set,
+      rsSet2: set,
       signatureName2: signatureNameOptions[0],
       signatureNameOptions2: signatureNameOptions,
     });
@@ -177,8 +176,8 @@ export default function MutationalSignatureProfile({ submitR }) {
             <Select
               id="mscRefSet1"
               label="Reference Signature Set 1"
-              value={refSignatureSet1}
-              options={refSignatureSetOptions1}
+              value={rsSet1}
+              options={rsSetOptions1}
               onChange={handleSet1}
             />
           </Col>
@@ -203,8 +202,8 @@ export default function MutationalSignatureProfile({ submitR }) {
             <Select
               id="mscSigSet2"
               label="Reference Signature Set 2"
-              value={refSignatureSet2}
-              options={refSignatureSetOptions2}
+              value={rsSet2}
+              options={rsSetOptions2}
               onChange={handleSet2}
             />
           </Col>
@@ -228,9 +227,9 @@ export default function MutationalSignatureProfile({ submitR }) {
               onClick={() => {
                 calculateR('mutationalSignatureComparison', {
                   profileName: profileName,
-                  refSignatureSet1: refSignatureSet1,
+                  rsSet1: rsSet1,
                   signatureName1: signatureName1,
-                  refSignatureSet2: refSignatureSet2,
+                  rsSet2: rsSet2,
                   signatureName2: signatureName2,
                 });
               }}

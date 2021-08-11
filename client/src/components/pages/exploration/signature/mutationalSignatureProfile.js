@@ -21,7 +21,7 @@ export default function MutationalSignatureProfile({ submitR }) {
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const { plots, debugR, err, loading } = exploration.sigMutationalProfiles;
-  const { displayTab, refSigData } = exploration.exploration;
+  const { refSigData } = exploration.exploration;
 
   // get inital plot
   useEffect(() => {
@@ -29,7 +29,7 @@ export default function MutationalSignatureProfile({ submitR }) {
       const plot = plots[0];
       const path = buildPlotPath(
         plot.profileName,
-        plot.refSignatureSet,
+        plot.rsSet,
         plot.signatureName
       );
       const url = await fetchPlot(path, 0);
@@ -43,12 +43,10 @@ export default function MutationalSignatureProfile({ submitR }) {
     }
   }, [plots]);
 
-  // dataFolder/Reference_Signature_Profiles_SVG/refSignatureSet/profileName+signatureName
-  function buildPlotPath(profileName, refSignatureSet, signatureName) {
+  // dataFolder/Reference_Signature_Profiles_SVG/rsSet/profileName+signatureName
+  function buildPlotPath(profileName, rsSet, signatureName) {
     const profile = profileName.match(/[a-z]+|\d+/gi).join('_');
-    const set = refSignatureSet
-      .replace(/\s/g, '_')
-      .replace(/[^a-zA-Z0-9-_]/gi, '');
+    const set = rsSet.replace(/\s/g, '_').replace(/[^a-zA-Z0-9-_]/gi, '');
     // s3 key
     return `msigportal/Database/Signature/Reference_Signature_Profiles_SVG/${set}/${profile}_plots_mSigPortal_${signatureName}.svg`;
   }
@@ -80,14 +78,14 @@ export default function MutationalSignatureProfile({ submitR }) {
       ...new Set(filteredData.map((row) => row.Profile)),
     ];
     const profileName = profileNameOptions[0];
-    const refSignatureSetOptions = [
+    const rsSetOptions = [
       ...new Set(
         filteredData
           .filter((row) => row.Source == source && row.Profile == profileName)
           .map((row) => row.Signature_set_name)
       ),
     ];
-    const refSignatureSet = refSignatureSetOptions[0];
+    const rsSet = rsSetOptions[0];
     const strategyOptions = [
       ...new Set(
         filteredData
@@ -95,7 +93,7 @@ export default function MutationalSignatureProfile({ submitR }) {
             (row) =>
               row.Source == source &&
               row.Profile == profileName &&
-              row.Signature_set_name == refSignatureSet
+              row.Signature_set_name == rsSet
           )
           .map((row) => row.Dataset)
       ),
@@ -108,18 +106,14 @@ export default function MutationalSignatureProfile({ submitR }) {
             (row) =>
               row.Source == source &&
               row.Profile == profileName &&
-              row.Signature_set_name == refSignatureSet &&
+              row.Signature_set_name == rsSet &&
               row.Dataset == strategy
           )
           .map((row) => row.Signature_name)
       ),
     ];
 
-    const plotPath = buildPlotPath(
-      profileName,
-      refSignatureSet,
-      signatureNameOptions[0]
-    );
+    const plotPath = buildPlotPath(profileName, rsSet, signatureNameOptions[0]);
     const plotURL = await fetchPlot(plotPath, index);
 
     let newPlots = plots.slice();
@@ -130,8 +124,8 @@ export default function MutationalSignatureProfile({ submitR }) {
       signatureSource: source,
       profileName: profileName,
       profileNameOptions: profileNameOptions,
-      refSignatureSet: refSignatureSet,
-      refSignatureSetOptions: refSignatureSetOptions,
+      rsSet: rsSet,
+      rsSetOptions: rsSetOptions,
       strategy: strategy,
       strategyOptions: strategyOptions,
       signatureName: signatureNameOptions[0],
@@ -148,10 +142,10 @@ export default function MutationalSignatureProfile({ submitR }) {
       (row) =>
         row.Source == plots[index].signatureSource && row.Profile == profile
     );
-    const refSignatureSetOptions = [
+    const rsSetOptions = [
       ...new Set(filteredData.map((row) => row.Signature_set_name)),
     ];
-    const refSignatureSet = refSignatureSetOptions[0];
+    const rsSet = rsSetOptions[0];
     const strategyOptions = [
       ...new Set(
         filteredData
@@ -159,7 +153,7 @@ export default function MutationalSignatureProfile({ submitR }) {
             (row) =>
               row.Source == plots[index].signatureSource &&
               row.Profile == profile &&
-              row.Signature_set_name == refSignatureSet
+              row.Signature_set_name == rsSet
           )
           .map((row) => row.Dataset)
       ),
@@ -172,18 +166,14 @@ export default function MutationalSignatureProfile({ submitR }) {
             (row) =>
               row.Source == plots[index].signatureSource &&
               row.Profile == profile &&
-              row.Signature_set_name == refSignatureSet &&
+              row.Signature_set_name == rsSet &&
               row.Dataset == strategy
           )
           .map((row) => row.Signature_name)
       ),
     ];
 
-    const plotPath = buildPlotPath(
-      profile,
-      refSignatureSet,
-      signatureNameOptions[0]
-    );
+    const plotPath = buildPlotPath(profile, rsSet, signatureNameOptions[0]);
 
     const plotURL = await fetchPlot(plotPath, index);
 
@@ -193,8 +183,8 @@ export default function MutationalSignatureProfile({ submitR }) {
       plotPath: plotPath,
       plotURL: plotURL,
       profileName: profile,
-      refSignatureSet: refSignatureSet,
-      refSignatureSetOptions: refSignatureSetOptions,
+      rsSet: rsSet,
+      rsSetOptions: rsSetOptions,
       strategy: strategy,
       strategyOptions: strategyOptions,
       signatureName: signatureNameOptions[0],
@@ -244,7 +234,7 @@ export default function MutationalSignatureProfile({ submitR }) {
       ...newPlots[index],
       plotPath: plotPath,
       plotURL: plotURL,
-      refSignatureSet: set,
+      rsSet: set,
       strategy: strategy,
       strategyOptions: strategyOptions,
       signatureName: signatureNameOptions[0],
@@ -261,7 +251,7 @@ export default function MutationalSignatureProfile({ submitR }) {
       (row) =>
         row.Source == plots[index].signatureSource &&
         row.Profile == plots[index].profileName &&
-        row.Signature_set_name == plots[index].refSignatureSet &&
+        row.Signature_set_name == plots[index].rsSet &&
         row.Dataset == strategy
     );
 
@@ -271,7 +261,7 @@ export default function MutationalSignatureProfile({ submitR }) {
 
     const plotPath = buildPlotPath(
       plots[index].profileName,
-      plots[index].refSignatureSet,
+      plots[index].rsSet,
       signatureNameOptions[0]
     );
 
@@ -295,7 +285,7 @@ export default function MutationalSignatureProfile({ submitR }) {
   async function handleName(name, index) {
     const plotPath = buildPlotPath(
       plots[index].profileName,
-      plots[index].refSignatureSet,
+      plots[index].rsSet,
       name
     );
 
@@ -327,7 +317,7 @@ export default function MutationalSignatureProfile({ submitR }) {
       ),
     ];
     const profileName = profileNameOptions[0];
-    const refSignatureSetOptions = [
+    const rsSetOptions = [
       ...new Set(
         refSigData
           .filter(
@@ -336,7 +326,7 @@ export default function MutationalSignatureProfile({ submitR }) {
           .map((row) => row.Signature_set_name)
       ),
     ];
-    const refSignatureSet = refSignatureSetOptions[0];
+    const rsSet = rsSetOptions[0];
 
     const strategyOptions = [
       ...new Set(
@@ -345,7 +335,7 @@ export default function MutationalSignatureProfile({ submitR }) {
             (row) =>
               row.Source == signatureSource &&
               row.Profile == profileName &&
-              row.Signature_set_name == refSignatureSet
+              row.Signature_set_name == rsSet
           )
           .map((row) => row.Dataset)
       ),
@@ -358,18 +348,14 @@ export default function MutationalSignatureProfile({ submitR }) {
             (row) =>
               row.Source == signatureSource &&
               row.Profile == profileName &&
-              row.Signature_set_name == refSignatureSet &&
+              row.Signature_set_name == rsSet &&
               row.Dataset == strategy
           )
           .map((row) => row.Signature_name)
       ),
     ];
 
-    const plotPath = buildPlotPath(
-      profileName,
-      refSignatureSet,
-      signatureNameOptions[0]
-    );
+    const plotPath = buildPlotPath(profileName, rsSet, signatureNameOptions[0]);
 
     const plotURL = await fetchPlot(plotPath, null);
 
@@ -383,8 +369,8 @@ export default function MutationalSignatureProfile({ submitR }) {
           signatureSourceOptions: signatureSourceOptions,
           profileName: profileName,
           profileNameOptions: profileNameOptions,
-          refSignatureSet: refSignatureSet,
-          refSignatureSetOptions: refSignatureSetOptions,
+          rsSet: rsSet,
+          rsSetOptions: rsSetOptions,
           strategy: strategy,
           strategyOptions: strategyOptions,
           signatureName: signatureNameOptions[0],
@@ -429,8 +415,8 @@ export default function MutationalSignatureProfile({ submitR }) {
             <Select
               id={'mspSet' + index}
               label="Reference Signature Set"
-              value={plots[index].refSignatureSet}
-              options={plots[index].refSignatureSetOptions}
+              value={plots[index].rsSet}
+              options={plots[index].rsSetOptions}
               onChange={(profile) => handleSet(profile, index)}
             />
           </Col>
@@ -497,8 +483,8 @@ export default function MutationalSignatureProfile({ submitR }) {
   };
 
   function plotTitle(plot) {
-    const { profileName, refSignatureSet, signatureName } = plot;
-    return `${profileName}/${refSignatureSet}: Mutational Signature Profile of ${signatureName}`;
+    const { profileName, rsSet, signatureName } = plot;
+    return `${profileName}/${rsSet}: Mutational Signature Profile of ${signatureName}`;
   }
 
   return (
@@ -536,8 +522,8 @@ export default function MutationalSignatureProfile({ submitR }) {
             <Select
               id="mspSet"
               label="Reference Signature Set"
-              value={plots[0].refSignatureSet}
-              options={plots[0].refSignatureSetOptions}
+              value={plots[0].rsSet}
+              options={plots[0].rsSetOptions}
               onChange={(set) => handleSet(set, 0)}
             />
           </Col>

@@ -17,8 +17,6 @@ export default function Explore() {
   const { exposureSignature, displayTab } = exploration.exploration;
   const mergeExploration = (state) =>
     dispatch(actions.mergeExploration({ exploration: state }));
-  const mergeExposure = (state) =>
-    dispatch(actions.mergeExploration({ exposure: state }));
   const mergeSigMutationalProfiles = (state) =>
     dispatch(actions.mergeExploration({ sigMutationalProfiles: state }));
   const mergeSigMutationalSigComparison = (state) =>
@@ -41,76 +39,6 @@ export default function Explore() {
     }
   }
 
-  async function populateExposureExp(
-    exposureCancer,
-    exposureSignature,
-    signatureNames
-  ) {
-    mergeExposure({ loading: true });
-
-    const studyOptions = [
-      ...new Set(exposureSignature.map((data) => data.Study)),
-    ];
-    const study = 'PCAWG'; // default
-
-    const strategyOptions = [
-      ...new Set(
-        exposureSignature
-          .filter((data) => data.Study == study)
-          .map((data) => data.Dataset)
-      ),
-    ];
-    const strategy = strategyOptions[0];
-
-    const refSignatureSetOptions = [
-      ...new Set(
-        exposureSignature
-          .filter((row) => row.Study == study && row.Dataset == strategy)
-          .map((row) => row.Signature_set_name)
-      ),
-    ];
-    const refSignatureSet = 'COSMIC v3 Signatures (SBS)'; // default
-
-    const cancerOptions = [
-      ...new Set(
-        exposureCancer
-          .filter((data) => data.Study == study && data.Dataset == strategy)
-          .map((data) => data.Cancer_Type)
-      ),
-    ];
-    const cancer = 'Lung-AdenoCA'; // default
-
-    const signatureNameOptions = [
-      ...new Set(
-        signatureNames
-          .filter((row) => row.Signature_set_name == refSignatureSet)
-          .map((row) => row.Signature_name)
-      ),
-    ];
-
-    const params = {
-      study: study,
-      studyOptions: studyOptions,
-      strategy: strategy,
-      strategyOptions: strategyOptions,
-      cancer: cancer,
-      cancerOptions: cancerOptions,
-      signatureNames: signatureNames,
-      refSignatureSet: refSignatureSet,
-      refSignatureSetOptions: refSignatureSetOptions,
-      signatureNameOptions: signatureNameOptions,
-      loading: false,
-    };
-
-    mergeExposure(params);
-
-    mergeExploration({
-      exposureCancer: exposureCancer,
-      exposureSignature: exposureSignature,
-      signatureNames: signatureNames,
-    });
-  }
-
   async function populateSignatureExp(data) {
     // set loading indicators
     mergeSigMutationalProfiles({ loading: true });
@@ -129,7 +57,7 @@ export default function Explore() {
       ),
     ];
     const profileName = profileNameOptions[0];
-    const refSignatureSetOptions = [
+    const rsSetOptions = [
       ...new Set(
         data
           .filter(
@@ -138,9 +66,8 @@ export default function Explore() {
           .map((row) => row.Signature_set_name)
       ),
     ];
-    const refSignatureSet = refSignatureSetOptions[0];
-    const refSignatureSet2 =
-      refSignatureSetOptions[1] || refSignatureSetOptions[0];
+    const rsSet = rsSetOptions[0];
+    const rsSet2 = rsSetOptions[1] || rsSetOptions[0];
 
     const strategyOptions = [
       ...new Set(
@@ -149,7 +76,7 @@ export default function Explore() {
             (row) =>
               row.Source == signatureSource &&
               row.Profile == profileName &&
-              row.Signature_set_name == refSignatureSet
+              row.Signature_set_name == rsSet
           )
           .map((row) => row.Dataset)
       ),
@@ -162,7 +89,7 @@ export default function Explore() {
             (row) =>
               row.Source == signatureSource &&
               row.Profile == profileName &&
-              row.Signature_set_name == refSignatureSet &&
+              row.Signature_set_name == rsSet &&
               row.Dataset == strategy
           )
           .map((row) => row.Signature_name)
@@ -175,7 +102,7 @@ export default function Explore() {
             (row) =>
               row.Source == signatureSource &&
               row.Profile == profileName &&
-              row.Signature_set_name == refSignatureSet2 &&
+              row.Signature_set_name == rsSet2 &&
               row.Dataset == strategy
           )
           .map((row) => row.Signature_name)
@@ -193,8 +120,8 @@ export default function Explore() {
           signatureSourceOptions: signatureSourceOptions,
           profileName: profileName,
           profileNameOptions: profileNameOptions,
-          refSignatureSet: refSignatureSet,
-          refSignatureSetOptions: refSignatureSetOptions,
+          rsSet: rsSet,
+          rsSetOptions: rsSetOptions,
           strategy: strategy,
           strategyOptions: strategyOptions,
           signatureName: signatureNameOptions[0],
@@ -209,20 +136,20 @@ export default function Explore() {
     mergeSigCosineSimilarity({
       profileName: profileName,
       profileNameOptions: profileNameOptions,
-      refSignatureSet1: refSignatureSetOptions[0],
-      refSignatureSet2: refSignatureSetOptions[1] || refSignatureSetOptions[0],
-      refSignatureSetOptions1: refSignatureSetOptions,
-      refSignatureSetOptions2: refSignatureSetOptions,
+      rsSet1: rsSetOptions[0],
+      rsSet2: rsSetOptions[1] || rsSetOptions[0],
+      rsSetOptions1: rsSetOptions,
+      rsSetOptions2: rsSetOptions,
       loading: false,
     });
 
     mergeSigMutationalSigComparison({
       profileName: profileName,
       profileNameOptions: profileNameOptions,
-      refSignatureSet1: refSignatureSet,
-      refSignatureSet2: refSignatureSet2,
-      refSignatureSetOptions1: refSignatureSetOptions,
-      refSignatureSetOptions2: refSignatureSetOptions,
+      rsSet1: rsSet,
+      rsSet2: rsSet2,
+      rsSetOptions1: rsSetOptions,
+      rsSetOptions2: rsSetOptions,
       signatureName1: signatureNameOptions[0],
       signatureNameOptions1: signatureNameOptions,
       signatureName2: signatureNameOptions2[0],

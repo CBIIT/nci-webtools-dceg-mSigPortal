@@ -72,7 +72,7 @@ export default function ReferenceSignatures({ submitR }) {
           className="p-3"
           downloadName={plotPath.split('/').slice(-1)[0]}
           plotPath={plotPath}
-          height="600px"
+          height="800px"
         />
       </div>
     </div>
