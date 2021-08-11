@@ -106,12 +106,10 @@ export default function Exposure({ match }) {
 
   async function loadExample(id) {
     mergeState({
-      exposure: {
-        loading: {
-          active: true,
-          content: 'Loading Example',
-          showIndicator: true,
-        },
+      loading: {
+        active: true,
+        content: 'Loading Example',
+        showIndicator: true,
       },
     });
     try {
@@ -119,14 +117,13 @@ export default function Exposure({ match }) {
         await fetch(`api/getExposureExample/${id}`)
       ).json();
 
-      mergeState(state);
+      dispatch(actions.mergeExposure(state));
     } catch (error) {
-      mergeError(error.message);
+      mergeError('Example does not exist');
     }
     mergeState({
-      exposure: {
-        loading: false,
-      },
+      loading: false,
+      submitted: true,
     });
   }
 

@@ -698,7 +698,7 @@ async function getExposureExample(req, res, next) {
       await fs.copy(examplePath, resultsPath);
 
       res.json({
-        state: { ...params, exposure: { ...params.exposure, projectID: id } },
+        state: { ...params, exposureState: { ...params.exposureState, projectID: id } },
       });
     } else {
       throw `Invalid example`;
