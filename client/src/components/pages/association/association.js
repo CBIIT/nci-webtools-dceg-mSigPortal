@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, Row, Col, Nav, Button } from 'react-bootstrap';
 import {
   SidebarContainer,
@@ -37,6 +37,11 @@ export default function Association() {
     { name: 'Univariate', id: 'univariate' },
     { name: 'Multivariate', id: 'multivariate' },
   ];
+
+  // automatically close sidebar
+  useEffect(() => {
+    if (submitted) mergeState({ openSidebar: false });
+  }, [submitted]);
 
   return (
     <div className="position-relative">

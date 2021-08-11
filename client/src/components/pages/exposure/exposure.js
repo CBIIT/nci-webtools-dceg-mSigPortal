@@ -105,6 +105,11 @@ export default function Exposure({ match }) {
     if (exampleName) loadExample(exampleName);
   }, [exampleName]);
 
+  // automatically close sidebar
+  useEffect(() => {
+    if (submitted) mergeState({ openSidebar: false });
+  }, [submitted]);
+
   async function loadExample(id) {
     mergeState({
       loading: {
