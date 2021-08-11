@@ -169,7 +169,7 @@ export default function MutationalSignatureProfile({ submitR }) {
               downloadName={plotPath.split('/').slice(-1)[0]}
               plotPath={`api/results/${projectID}${plotPath}`}
               txtPath={projectID + txtPath}
-              maxHeight="1000px"
+              height="1000px"
               title="Cosine Similarity Among Mutational Signatures Between Reference Signature Sets"
             />
             <p className="p-3">

@@ -119,7 +119,7 @@ export default function MsAssociation({ calculateAssociation }) {
               title="Mutational Signature Association"
               downloadName={plotPath.split('/').slice(-1)[0]}
               plotPath={`api/results/${projectID}${plotPath}`}
-              maxHeight="900px"
+              height="1100px"
             />
           </>
         )}

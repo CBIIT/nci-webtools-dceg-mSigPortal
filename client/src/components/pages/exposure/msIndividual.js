@@ -95,7 +95,7 @@ export default function MSIndividual({ calculateIndividual }) {
               title="Mutational Signature in Individual Sample"
               downloadName={plotPath.split('/').slice(-1)[0]}
               plotPath={`api/results/${projectID}${plotPath}`}
-              maxHeight="700px"
+              height="900px"
             />
           </>
         )}

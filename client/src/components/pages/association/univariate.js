@@ -647,7 +647,7 @@ export default function Univariate() {
                   downloadName={plotPath.split('/').slice(-1)[0]}
                   plotPath={`api/results/${projectID}${plotPath}`}
                   txtPath={projectID + dataPath}
-                  maxHeight="800px"
+                  height="800px"
                 />
               )}
             </div>

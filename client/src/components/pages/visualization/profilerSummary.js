@@ -106,7 +106,7 @@ export default function ProfilerSummary({ submitR }) {
             className="p-3"
             downloadName={plotPath.split('/').slice(-1)[0]}
             plotPath={'api/results/' + projectID + plotPath}
-            maxHeight="600px"
+            height="600px"
           />
         )}
       </div>

@@ -14,7 +14,7 @@ export default function Plot({
   plotPath,
   txtPath,
   alt,
-  maxHeight,
+  height,
   className,
   ...rest
 }) {
@@ -56,18 +56,21 @@ export default function Plot({
   };
 
   return (
-    <div>
+    <div className="d-flex justify-content-center">
       <LoadingOverlay active={loading} />
-      <div className={className} title="Ctrl + Mouse Wheel to zoom">
-        <TransformWrapper className="w-100" {...zoomProps}>
+      <div
+        className={`${className}`}
+        title="Ctrl + Mouse Wheel to zoom"
+        style={{ width: 'fit-content', height: '100%' }}
+      >
+        <TransformWrapper className="" {...zoomProps}>
           {({ zoomIn, zoomOut, resetTransform }) => (
             <React.Fragment>
-              <Row className="tools">
-                <Col />
-                <Col className="d-flex text-nowrap">
-                  {title && <strong className="mx-auto">{title}</strong>}
-                </Col>
-                <Col className="d-flex text-nowrap">
+              <div className="tools mb-3">
+                <div className="d-flex justify-content-center">
+                  {title && <strong className="mb-3">{title}</strong>}
+                </div>
+                <div className="d-flex">
                   <div className="d-flex align-items-end ml-auto mb-auto">
                     <Button
                       className="p-0 border-0 ml-3"
@@ -122,14 +125,14 @@ export default function Plot({
                       style={{ color: '#fafafa' }}
                     />
                   </Button>
-                </Col>
-              </Row>
+                </div>
+              </div>
 
               <TransformComponent>
                 <img
                   className="w-100"
                   src={`${plotPath}#${Date.now()}`}
-                  style={{ maxHeight: maxHeight || '500px' }}
+                  style={{ height: height || '600px' }}
                   alt={alt || 'Plot Unavailable'}
                 />
               </TransformComponent>

@@ -630,7 +630,7 @@ export default function Etiology() {
                 <div>
                   <Plot
                     className="p-3 border rounded mb-3"
-                    maxHeight={'300px'}
+                    height={'500px'}
                     plotPath={profileURL}
                   />
 
@@ -655,7 +655,7 @@ export default function Etiology() {
                         {exposureURL.length ? (
                           <Plot
                             className="p-3 border"
-                            maxHeight={'500px'}
+                            height={'600px'}
                             plotPath={exposureURL}
                           />
                         ) : (
@@ -927,19 +927,19 @@ export default function Etiology() {
 
               <Plot
                 className="p-3 border rounded mb-3"
-                maxHeight={'300px'}
+                height={'500px'}
                 plotPath={refSigURL}
               />
 
               <Plot
                 className="p-3 border rounded mb-3"
-                maxHeight={'300px'}
+                height={'500px'}
                 plotPath={tissueURL}
               />
 
               <Plot
                 className="p-3 border rounded mb-3"
-                maxHeight={'500px'}
+                height={'600px'}
                 plotPath={exposureURL}
               />
             </div>
