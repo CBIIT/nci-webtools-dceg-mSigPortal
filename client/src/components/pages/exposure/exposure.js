@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Form, Row, Col, Button, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import PublicForm from './publicForm';
@@ -596,33 +597,24 @@ export default function Exposure({ match }) {
     ),
   ];
 
-  const queries = [
+  const examples = [
     {
-      study: 'PCAWG',
-      examples: [
-        {
-          name: 'Lung',
-          title:
-            'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Lung-AdenoCA; MSA SBS5 vs SBS40',
-          path: 'pcawg-lungadenoca',
-        },
-        {
-          name: 'Skin',
-          title:
-            'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Skin-Melanoma; MSA SBS7a vs SBS7b',
-          path: 'pcawg-skinmelanoma',
-        },
-        {
-          name: 'Breast',
-          title:
-            'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Breast-AdenoCA; MSA SBS3 vs SBS5',
-          path: 'pcawg-breastadenoca',
-        },
-      ],
+      name: 'Lung',
+      title:
+        'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Lung-AdenoCA; MSA SBS5 vs SBS40',
+      path: 'pcawg-lungadenoca',
     },
     {
-      study: 'TBA',
-      examples: [],
+      name: 'Skin',
+      title:
+        'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Skin-Melanoma; MSA SBS7a vs SBS7b',
+      path: 'pcawg-skinmelanoma',
+    },
+    {
+      name: 'Breast',
+      title:
+        'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Breast-AdenoCA; MSA SBS3 vs SBS5',
+      path: 'pcawg-breastadenoca',
     },
   ];
 
@@ -694,71 +686,6 @@ export default function Exposure({ match }) {
       >
         <SidebarPanel>
           <div className="p-3 bg-white border rounded">
-            <strong>Example Queries</strong>
-            {queries.map(({ study, examples }, index) => {
-              return index == 0 ? (
-                <Row key={`${study}-${index}`} className="mb-2">
-                  <Col md="3">{study}:</Col>
-                  {examples.map(({ name, title, path }) => (
-                    <Col md="3" key={name + index}>
-                      <span className="mb-2" disabled={loading || submitted}>
-                        <a href={`#/exposure/${path}`} title={title}>
-                          {name}
-                        </a>
-                      </span>
-                    </Col>
-                  ))}
-                </Row>
-              ) : (
-                <>
-                  {expand ? (
-                    <>
-                      <Row className="mb-2">
-                        <Col md="3">{study}:</Col>
-                        {examples.map(({ name, title, path }) => (
-                          <Col md="3" key={`${study}-${name}`}>
-                            <span className="mb-2">
-                              <a
-                                href={`#/exploration/exposure/${path}`}
-                                title={title}
-                              >
-                                {name}
-                              </a>
-                            </span>
-                          </Col>
-                        ))}
-                      </Row>
-                      <Row>
-                        <Col md="6">
-                          <Button
-                            onClick={() => setExpand(false)}
-                            variant="link"
-                            className="p-0"
-                            style={{ textDecoration: 'none' }}
-                          >
-                            Show Less
-                          </Button>
-                        </Col>
-                      </Row>
-                    </>
-                  ) : (
-                    <Row>
-                      <Col md="6">
-                        <Button
-                          onClick={() => setExpand(true)}
-                          variant="link"
-                          className="p-0"
-                          style={{ textDecoration: 'none' }}
-                        >
-                          Show More
-                        </Button>
-                      </Col>
-                    </Row>
-                  )}
-                </>
-              );
-            })}
-            <hr className="mb-2" />
             <Row>
               <Col lg="auto">
                 <Group>
@@ -830,6 +757,24 @@ export default function Exposure({ match }) {
                   Public: Perform analysis using data available on the website
                 </p>
                 <p>User: Upload your own data</p>
+                <hr />
+                <h4>Example Queries</h4>
+                {examples.map(({ title, external, path }, index) => (
+                  <div key={index}>
+                    <Link to={`/exposure/${path}`} disabled>
+                      <span className="sr-only">{title + ' link'}</span>
+                      {title}
+                    </Link>
+                    {external && (
+                      <span>
+                        {'; '}
+                        <a href={external.href} target="_blank">
+                          {external.name}
+                        </a>
+                      </span>
+                    )}
+                  </div>
+                ))}
               </div>
             )}
           </div>
