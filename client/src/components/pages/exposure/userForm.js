@@ -56,7 +56,7 @@ export default function PublicForm({
           if (!usePublicSignature)
             data.append('signatureFile', signatureFileObj);
           // if (variableFileObj.size)
-          //   data.append('variableFile', variableFileObj);
+          //   dasel'variableFile', variableFileObj);
           let response = await fetch(`api/upload`, {
             method: 'POST',
             body: data,
@@ -209,7 +209,7 @@ export default function PublicForm({
             <Col>
               <Group>
                 <Select
-                  disabled={loading || submitted}
+                  disabled={loading || submitted || !studyOptions.length}
                   id="expStudyUser"
                   label="Study"
                   value={study}
@@ -223,7 +223,7 @@ export default function PublicForm({
             <Col>
               <Group>
                 <Select
-                  disabled={loading || submitted}
+                  disabled={loading || submitted || !rsSetOptions.length}
                   id="exposureSignatureSet"
                   label="Reference Signature Set"
                   value={rsSet}

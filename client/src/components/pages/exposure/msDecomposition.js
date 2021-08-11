@@ -1,10 +1,9 @@
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
 
 export default function MsDecomposition() {
-  const dispatch = useDispatch();
   const exposure = useSelector((state) => state.exposure);
   const { plotPath, txtPath, debugR, err } = exposure.msDecomposition;
   const { projectID } = exposure.exposureState;

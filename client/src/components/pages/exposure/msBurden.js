@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
@@ -24,16 +24,6 @@ export default function MsBurden({ calculateBurden }) {
 
   const mergeMsBurden = (state) =>
     dispatch(actions.mergeExposure({ msBurden: state }));
-  const mergeError = (msg) =>
-    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
-
-  useEffect(() => {
-    if (source == 'public') {
-      mergeMsBurden({ signatureName: signatureNameOptions[0] });
-    } else {
-      mergeMsBurden({ signatureName: userNameOptions[0] || '' });
-    }
-  }, [signatureNameOptions, userNameOptions, source]);
 
   return (
     <div>

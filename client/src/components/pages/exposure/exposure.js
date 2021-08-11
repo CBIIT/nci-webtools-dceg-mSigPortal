@@ -68,22 +68,15 @@ export default function Exposure({ match }) {
     rsSet,
     rsSetOptions,
     useCancerType,
-    signatureNameOptions,
-    publicSampleOptions,
     genome,
     exposureFile,
     matrixFile,
     signatureFile,
     source,
-    display,
     loading,
-    loadingMsg,
     projectID,
     openSidebar,
     submitted,
-    submitAll,
-    gettingSignatureNames,
-    gettingSampleNames,
   } = exposureStore.exposureState;
 
   const { loading: loadingMsBurden, ...burdenArgs } = exposureStore.msBurden;
@@ -110,33 +103,6 @@ export default function Exposure({ match }) {
   useEffect(() => {
     if (exampleName) loadExample(exampleName);
   }, [exampleName]);
-
-  // lazy load plots after loading signature names and sample names filtered by cancer type
-  useEffect(() => {
-    if (submitAll) {
-      if (!gettingSignatureNames) {
-        if (
-          !loadingMsBurden &&
-          !burdenArgs.plotPath &&
-          burdenArgs.signatureName
-        )
-          calculateBurden();
-        if (
-          !loadingMsAssociation &&
-          !associationArgs.plotPath &&
-          associationArgs.signatureName1
-        )
-          calculateAssociation();
-      }
-      if (
-        !gettingSampleNames &&
-        !loadingMsIndividual &&
-        !individualArgs.plotPath &&
-        individualArgs.sample
-      )
-        calculateIndividual();
-    }
-  }, [gettingSignatureNames, gettingSampleNames]);
 
   async function loadExample(id) {
     mergeState({
@@ -303,51 +269,31 @@ export default function Exposure({ match }) {
         useCancerType: useCancerType,
       }),
     };
-    if (
-      !loadingMsBurden &&
-      !gettingSignatureNames &&
-      (fn == 'all' || fn == 'burden')
-    ) {
+    if (fn == 'all' || fn == 'burden') {
       args.burden = JSON.stringify({
-        signatureName: burdenArgs.signatureName || signatureNameOptions[0],
-        ...params.msBurden,
+        signatureName: burdenArgs.signatureName,
       });
     }
-    if (
-      !loadingMsAssociation &&
-      !gettingSignatureNames &&
-      (fn == 'all' || fn == 'association')
-    ) {
+    if (fn == 'all' || fn == 'association') {
       args.association = JSON.stringify({
-        // useCancerType: associationArgs.toggleCancer,
         both: associationArgs.both,
-        signatureName1:
-          associationArgs.signatureName1 || signatureNameOptions[0],
-        signatureName2:
-          associationArgs.signatureName2 ||
-          signatureNameOptions[1] ||
-          signatureNameOptions[0],
-        ...params.msAssociation,
+        signatureName1: associationArgs.signatureName1,
+        signatureName2: associationArgs.signatureName2,
       });
     }
-    if (!loadingMsLandscape && (fn == 'all' || fn == 'landscape')) {
+    if (fn == 'all' || fn == 'landscape') {
       args.landscape = JSON.stringify({
         variableFile: landscapeArgs.variableFile,
       });
     }
-    if (!loadingMsPrevalence && (fn == 'all' || fn == 'prevalence')) {
+    if (fn == 'all' || fn == 'prevalence') {
       args.prevalence = JSON.stringify({
         mutation: parseFloat(prevalenceArgs.mutation) || 100,
       });
     }
-    if (
-      !loadingMsIndividual &&
-      !gettingSampleNames &&
-      (fn == 'all' || fn == 'individual')
-    ) {
+    if (fn == 'all' || fn == 'individual') {
       args.individual = JSON.stringify({
-        sample: individualArgs.sample || publicSampleOptions[0],
-        ...params.msIndividual,
+        sample: individualArgs.sample,
       });
     }
     if (source == 'user') {

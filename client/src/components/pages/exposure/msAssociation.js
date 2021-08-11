@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
@@ -29,27 +29,9 @@ export default function MsAssociation({ calculateAssociation }) {
     userNameOptions,
     source,
   } = exposure.exposureState;
-  const mergeExposure = (state) =>
-    dispatch(actions.mergeExposure({ exposure: state }));
+
   const mergeMsAssociation = (state) =>
     dispatch(actions.mergeExposure({ msAssociation: state }));
-  const mergeError = (msg) =>
-    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
-
-  // apply default signature names
-  useEffect(() => {
-    if (source == 'public') {
-      mergeMsAssociation({
-        signatureName1: signatureNameOptions[0],
-        signatureName2: signatureNameOptions[1],
-      });
-    } else {
-      mergeMsAssociation({
-        signatureName1: userNameOptions[0] || '',
-        signatureName2: userNameOptions[1] || '',
-      });
-    }
-  }, [signatureNameOptions, userNameOptions, source]);
 
   return (
     <div>

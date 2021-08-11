@@ -9,7 +9,7 @@ export default function Debug({ short, description, ...props }) {
       {!show ? short : description}{' '}
       <span>
         <Button
-          className="p-0 ml-3"
+          className="p-0 ml-3 border-0"
           variant="link"
           onClick={() => setShow(!show)}
         >

@@ -3,11 +3,10 @@ import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { actions as exposureActions } from '../../../services/store/exposure';
-import { actions as modalActions } from '../../../services/store/modal';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
 
-const actions = { ...exposureActions, ...modalActions };
+const actions = { ...exposureActions };
 const { Group, Label, Control } = Form;
 
 export default function MsPrevalence({ calculatePrevalence }) {
@@ -17,8 +16,6 @@ export default function MsPrevalence({ calculatePrevalence }) {
   const { projectID, source } = exposure.exposureState;
   const mergeMsPrevalence = (state) =>
     dispatch(actions.mergeExposure({ msPrevalence: state }));
-  const mergeError = (msg) =>
-    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const [invalidMin, setMin] = useState(false);
 

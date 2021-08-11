@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
@@ -21,21 +21,9 @@ export default function MSIndividual({ calculateIndividual }) {
     userSampleOptions,
     source,
   } = exposure.exposureState;
-  const mergeExposure = (state) =>
-    dispatch(actions.mergeExposure({ exposure: state }));
+
   const mergeMsIndividual = (state) =>
     dispatch(actions.mergeExposure({ msIndividual: state }));
-  const mergeError = (msg) =>
-    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
-
-  // choose inital sample
-  useEffect(() => {
-    if (source == 'public') {
-      mergeMsIndividual({ sample: publicSampleOptions[0] });
-    } else {
-      mergeMsIndividual({ sample: userSampleOptions[0] || '' });
-    }
-  }, [publicSampleOptions, userSampleOptions, source]);
 
   return (
     <div>

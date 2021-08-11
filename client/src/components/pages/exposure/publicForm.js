@@ -34,8 +34,6 @@ export default function PublicForm({
     strategy,
     cancer,
     rsSet,
-    gettingSignatureNames,
-    gettingSampleNames,
     useCancerType,
   } = useSelector((state) => state.exposure.exposureState);
 
@@ -155,12 +153,14 @@ export default function PublicForm({
         })
       ).json();
 
-      if (output.data.length) {
-        mergeState({
-          publicSampleOptions: output.data,
-        });
-        // mergeMsIndividual({ sample: output.data[0] });
-      } else console.log('No Sample Names Found');
+      if (output.data.length)
+        dispatch(
+          actions.mergeExposure({
+            exposureState: { publicSampleOptions: output.data },
+            msIndividual: { sample: output.data[0] },
+          })
+        );
+      else console.log('No Sample Names Found');
     } catch (err) {
       mergeError(err.message);
     }
@@ -190,9 +190,16 @@ export default function PublicForm({
         ).json();
 
         if (output.data.length)
-          mergeState({
-            signatureNameOptions: output.data,
-          });
+          dispatch(
+            actions.mergeExposure({
+              exposureState: { signatureNameOptions: output.data },
+              msBurden: { signatureName: output.data[0] },
+              msAssociation: {
+                signatureName1: output.data[0],
+                signatureName2: output.data[1] || output.data[0],
+              },
+            })
+          );
         else console.log('No Signature Names Found');
       } catch (err) {
         mergeError(err.message);
@@ -214,12 +221,7 @@ export default function PublicForm({
         <Col>
           <Group>
             <Select
-              disabled={
-                loading ||
-                submitted ||
-                gettingSignatureNames ||
-                gettingSampleNames
-              }
+              disabled={loading || submitted || !studyOptions.length}
               id="expStudyPublic"
               label="Study"
               value={study}
@@ -233,12 +235,7 @@ export default function PublicForm({
         <Col>
           <Group>
             <Select
-              disabled={
-                loading ||
-                submitted ||
-                gettingSignatureNames ||
-                gettingSampleNames
-              }
+              disabled={loading || submitted || !strategyOptions.length}
               id="tumorStrategy"
               label="Experimental Strategy"
               value={strategy}
@@ -252,12 +249,7 @@ export default function PublicForm({
         <Col>
           <Group>
             <Select
-              disabled={
-                loading ||
-                submitted ||
-                gettingSignatureNames ||
-                gettingSampleNames
-              }
+              disabled={loading || submitted || !rsSetOptions.length}
               id="expSetPublic"
               label="Reference Signature Set"
               value={rsSet}
@@ -272,12 +264,7 @@ export default function PublicForm({
           <Group>
             <Select
               className="mb-4"
-              disabled={
-                loading ||
-                submitted ||
-                gettingSignatureNames ||
-                gettingSampleNames
-              }
+              disabled={loading || submitted || !cancerOptions.length}
               id="prevalenceCancerType"
               label="Cancer Type"
               value={cancer}
@@ -295,19 +282,13 @@ export default function PublicForm({
         <Col>
           <Group controlId="toggleCancerType">
             <Check
-              disabled={
-                loading ||
-                submitted ||
-                gettingSampleNames ||
-                gettingSignatureNames
-              }
+              disabled={loading || submitted}
               type="checkbox"
               label="Cancer Type Only"
               value={useCancerType}
               checked={useCancerType}
               onChange={(e) => {
                 if (!useCancerType == false) handleSet(rsSet);
-
                 mergeState({
                   useCancerType: !useCancerType,
                 });
