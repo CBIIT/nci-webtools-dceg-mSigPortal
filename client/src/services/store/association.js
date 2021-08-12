@@ -3,7 +3,7 @@ import { mergeObject } from './utils';
 
 export const getInitialState = () => ({
   associationState: {
-    displayTab: 'univariate',
+    displayTab: 'instructions',
     openSidebar: true,
     loadingData: false,
     submitted: false,

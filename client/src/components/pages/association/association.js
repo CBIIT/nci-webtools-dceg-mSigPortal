@@ -5,11 +5,10 @@ import {
   SidebarPanel,
   MainPanel,
 } from '../../controls/sidebar-container/sidebar-container';
+import Instructions from '../association/instructions';
 import Univariate from './univariate';
 import UserForm from './userForm';
 import PublicForm from './publicForm';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/association';
 import { actions as modalActions } from '../../../services/store/modal';
@@ -34,13 +33,18 @@ export default function Association() {
   } = useSelector((state) => state.association.associationState);
 
   const tabs = [
-    { name: 'Univariate', id: 'univariate' },
-    { name: 'Multivariate', id: 'multivariate' },
+    {
+      name: 'Instructions',
+      id: 'instructions',
+      component: <Instructions loading={loadingData} />,
+    },
+    { name: 'Univariate', id: 'univariate', component: <Univariate /> },
+    { name: 'Multivariate', id: 'multivariate', component: <></> },
   ];
 
-  // automatically close sidebar
+  // automatically close side panel
   useEffect(() => {
-    if (submitted) mergeState({ openSidebar: false });
+    if (submitted) mergeState({ displayTab: 'univariate', openSidebar: false });
   }, [submitted]);
 
   return (
@@ -152,30 +156,7 @@ export default function Association() {
           <hr className="d-lg-none" style={{ opacity: 0 }}></hr>
         </SidebarPanel>
         <MainPanel>
-          <>
-            {assocVarData.length ? (
-              displayTab == 'univariate' ? (
-                <Univariate />
-              ) : (
-                <></>
-              )
-            ) : (
-              <div className="bg-white border rounded py-3 px-4">
-                <LoadingOverlay active={loadingData} />
-                <h4>Instructions</h4>
-                <p>
-                  Choose a Data Source and its associated options to submit a
-                  query using the panel on the left
-                </p>
-                <hr />
-                <h4>Data Source</h4>
-                <p>
-                  Public: Perform analysis using data available on the website
-                </p>
-                <p>User: Upload your own data</p>
-              </div>
-            )}
-          </>
+          {tabs.filter((tab) => tab.id == displayTab)[0].component}
         </MainPanel>
       </SidebarContainer>
     </div>

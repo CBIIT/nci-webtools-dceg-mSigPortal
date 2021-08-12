@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { Form, Row, Col, Button, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import PublicForm from './publicForm';
 import UserForm from './userForm';
+import Instructions from './instructions';
 import TMB from './tmb';
 import TmbSig from './tmbSignatures';
 import MsBurden from './msBurden';
@@ -15,7 +15,6 @@ import MSIndividual from './msIndividual';
 import Download from './download';
 import { actions as exposureActions } from '../../../services/store/exposure';
 import { actions as modalActions } from '../../../services/store/modal';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import {
   SidebarContainer,
   SidebarPanel,
@@ -105,9 +104,9 @@ export default function Exposure({ match }) {
     if (exampleName) loadExample(exampleName);
   }, [exampleName]);
 
-  // automatically close sidebar
+  // automatically close side panel
   useEffect(() => {
-    if (submitted) mergeState({ openSidebar: false });
+    if (submitted) mergeState({ displayTab: 'tmb', openSidebar: false });
   }, [submitted]);
 
   async function loadExample(id) {
@@ -547,6 +546,11 @@ export default function Exposure({ match }) {
 
   const tabs = [
     {
+      component: <Instructions loading={loading} />,
+      id: 'instructions',
+      name: 'Instructions',
+    },
+    {
       component: <TMB />,
       id: 'tmb',
       name: 'TMB',
@@ -600,27 +604,6 @@ export default function Exposure({ match }) {
     ) : (
       <></>
     ),
-  ];
-
-  const examples = [
-    {
-      name: 'Lung',
-      title:
-        'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Lung-AdenoCA; MSA SBS5 vs SBS40',
-      path: 'pcawg-lungadenoca',
-    },
-    {
-      name: 'Skin',
-      title:
-        'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Skin-Melanoma; MSA SBS7a vs SBS7b',
-      path: 'pcawg-skinmelanoma',
-    },
-    {
-      name: 'Breast',
-      title:
-        'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Breast-AdenoCA; MSA SBS3 vs SBS5',
-      path: 'pcawg-breastadenoca',
-    },
   ];
 
   return (
@@ -746,42 +729,7 @@ export default function Exposure({ match }) {
         </SidebarPanel>
         <MainPanel>
           <div className="bg-white border rounded">
-            {submitted ? (
-              tabs.filter((tab) => tab.id == displayTab)[0].component
-            ) : (
-              <div className="py-3 px-4">
-                <LoadingOverlay active={loading} />
-                <h4>Instructions</h4>
-                <p>
-                  Choose a Data Source and its associated options to submit a
-                  query using the panel on the left
-                </p>
-                <hr />
-                <h4>Data Source</h4>
-                <p>
-                  Public: Perform analysis using data available on the website
-                </p>
-                <p>User: Upload your own data</p>
-                <hr />
-                <h4>Example Queries</h4>
-                {examples.map(({ title, external, path }, index) => (
-                  <div key={index}>
-                    <Link to={`/exploration/${path}`} disabled>
-                      <span className="sr-only">{title + ' link'}</span>
-                      {title}
-                    </Link>
-                    {external && (
-                      <span>
-                        {'; '}
-                        <a href={external.href} target="_blank">
-                          {external.name}
-                        </a>
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+            {tabs.filter((tab) => tab.id == displayTab)[0].component}
           </div>
         </MainPanel>
       </SidebarContainer>

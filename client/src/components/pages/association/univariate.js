@@ -18,22 +18,15 @@ export default function Univariate() {
     await dispatch(actions.mergeAssociation({ univariate: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
-  const resetAssociation = (_) => dispatch(actions.resetAssociation());
 
   const {
     loadingData,
-    exposureSignature,
     assocVarData,
     expVarList,
-    source,
     study,
-    studyOptions,
     strategy,
-    strategyOptions,
     rsSet,
-    rsSetOptions,
     cancer,
-    cancerOptions,
     assocTable,
   } = useSelector((state) => state.association.associationState);
 

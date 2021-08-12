@@ -3,7 +3,7 @@ import { mergeObject } from './utils';
 
 export const getInitialState = () => ({
   exposureState: {
-    displayTab: 'tmb',
+    displayTab: 'instructions',
     exposureSignature: [],
     exposureCancer: [],
     refSigData: [],
