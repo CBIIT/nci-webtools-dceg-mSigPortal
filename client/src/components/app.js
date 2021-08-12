@@ -43,11 +43,11 @@ export default function App() {
       color: '#fc8701', // orange
     },
     {
-      route: '/exposure',
-      action: 'Exposure',
-      title: 'Exposure',
-      cardTitle: 'Exposure',
-      cardText: 'Exposure',
+      route: '/exploration',
+      action: 'Exploration',
+      title: 'Exploration',
+      cardTitle: 'Signature Exploration',
+      cardText: 'Signature Exploration',
       description:
         'Systematically explore any reference or update to date published signatures with different profiles, version and etiology (endogenous vs Exogenous). Intergratively explore the landscape of signature exposure in different genomic studies, including TCGA, PCAWG, and our Sherlock-Lung study.',
       image: 'assets/images/explore.png',
@@ -191,7 +191,7 @@ export default function App() {
       <Route path="/about" component={About} />
       <Route path="/visualization/:type?/:id?" component={Visualization} />
       <Route path="/catalog" component={Catalog} />
-      <Route path="/exposure/:exampleName?" component={Exposure} />
+      <Route path="/exploration/:exampleName?" component={Exposure} />
       <Route path="/refitting" component={Refitting} />
       <Route path="/association" component={Association} />
       <Route path="/publications" component={Publications} />

@@ -525,7 +525,7 @@ export default function Exposure({ match }) {
   }
 
   function handleReset() {
-    window.location.hash = '#/exposure';
+    window.location.hash = '#/exploration';
 
     const params = {
       source,
@@ -766,7 +766,7 @@ export default function Exposure({ match }) {
                 <h4>Example Queries</h4>
                 {examples.map(({ title, external, path }, index) => (
                   <div key={index}>
-                    <Link to={`/exposure/${path}`} disabled>
+                    <Link to={`/exploration/${path}`} disabled>
                       <span className="sr-only">{title + ' link'}</span>
                       {title}
                     </Link>
