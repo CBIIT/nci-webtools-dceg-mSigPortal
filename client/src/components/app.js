@@ -25,9 +25,9 @@ export default function App() {
       cardText: 'Signature Catalog',
       description:
         'Systematically explore any reference or update to date published signatures with different profiles, version and etiology (endogenous vs Exogenous). Intergratively explore the landscape of signature exposure in different genomic studies, including TCGA, PCAWG, and our Sherlock-Lung study.',
-      image: 'assets/images/explore.png',
+      image: 'assets/images/catalog.svg',
       navIndex: 0,
-      color: '#2c71dd', // blue
+      color: '#009192', // turquoise
     },
 
     {
