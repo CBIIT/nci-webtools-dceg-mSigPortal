@@ -75,7 +75,7 @@ export default function MSIndividual({ calculateIndividual }) {
               variant="primary"
               onClick={calculateIndividual}
             >
-              Calculate
+              Recalculate
             </Button>
           </Col>
         </Row>

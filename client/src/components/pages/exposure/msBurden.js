@@ -66,7 +66,7 @@ export default function MsBurden({ calculateBurden }) {
               variant="primary"
               onClick={calculateBurden}
             >
-              Calculate
+              Recalculate
             </Button>
           </Col>
         </Row>

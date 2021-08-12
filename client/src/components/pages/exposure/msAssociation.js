@@ -99,7 +99,7 @@ export default function MsAssociation({ calculateAssociation }) {
               variant="primary"
               onClick={calculateAssociation}
             >
-              Calculate
+              Recalculate
             </Button>
           </Col>
         </Row>

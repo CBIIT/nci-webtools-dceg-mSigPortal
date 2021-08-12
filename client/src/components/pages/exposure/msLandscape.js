@@ -70,7 +70,7 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
               variant="primary"
               onClick={calculateLandscape}
             >
-              Calculate
+              Recalculate
             </Button>
           </Col>
         </Row>

@@ -78,7 +78,7 @@ export default function MsPrevalence({ calculatePrevalence }) {
               }}
               disabled={source == 'user' && !projectID}
             >
-              Calculate
+              Recalculate
             </Button>
           </Col>
         </Row>
