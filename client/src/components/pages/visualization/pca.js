@@ -26,7 +26,6 @@ export default function PCA({ submitR, getRefSigOptions }) {
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const { matrixList, projectID, svgList } = visualization.results;
   const {
     source,
     study,
@@ -34,7 +33,10 @@ export default function PCA({ submitR, getRefSigOptions }) {
     cancerType,
     pubExperimentalStrategy,
     pDataOptions,
-  } = visualization.visualize;
+    matrixList,
+    projectID,
+    svgList,
+  } = visualization.state;
   const { profileOptions } = visualization.mutationalProfiles;
   const {
     profileType,

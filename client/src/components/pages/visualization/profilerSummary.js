@@ -19,13 +19,14 @@ export default function ProfilerSummary({ submitR }) {
     cancerType,
     pubExperimentalStrategy,
     loading: mainLoading,
-  } = visualization.visualize;
-  const { matrixList, projectID } = visualization.results;
+    matrixList,
+    projectID,
+  } = visualization.state;
 
   const { plotPath, err, debugR, loading } = visualization.profilerSummary;
   useEffect(() => {
     // check if profiler summary already exists, else lazy-load calculate
-    if (!plotPath && !mainLoading.active) {
+    if (!plotPath && !mainLoading.active && projectID) {
       if (source == 'user') {
         calculateR('profilerSummary', {
           matrixList: JSON.stringify(matrixList),

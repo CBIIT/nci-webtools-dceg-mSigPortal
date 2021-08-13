@@ -13,10 +13,8 @@ export default function PublicForm() {
   const dispatch = useDispatch();
   const visualization = useSelector((state) => state.visualization);
 
-  const mergeVisualize = (state) =>
-    dispatch(actions.mergeVisualization({ visualize: state }));
-  const mergeResults = (state) =>
-    dispatch(actions.mergeVisualization({ results: state }));
+  const mergeState = (state) =>
+    dispatch(actions.mergeVisualization({ state: state }));
   const mergeCosineSimilarity = (state) =>
     dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
   const mergeProfileComparison = (state) =>
@@ -39,23 +37,20 @@ export default function PublicForm() {
     loading,
     loadingPublic,
     source,
-  } = visualization.visualize;
+  } = visualization.state;
 
   useEffect(() => {
     if (!pDataOptions.length && !loadingPublic) getPublicDataOptions();
   }, [pDataOptions, source]);
 
   async function handleSubmit() {
-    // disable parameters after submit
-    mergeVisualize({ submitted: true });
-
     const args = {
       study: study,
       cancerType: cancerType,
       experimentalStrategy: pubExperimentalStrategy,
     };
 
-    mergeVisualize({
+    mergeState({
       loading: {
         active: true,
         content: 'Loading Public Data',
@@ -75,12 +70,12 @@ export default function PublicForm() {
       if (response.ok) {
         const { svgList, projectID } = await response.json();
 
-        mergeResults({
+        mergeState({
           svgList: svgList,
           projectID: projectID,
         });
       } else if (response.status == 504) {
-        mergeResults({
+        mergeState({
           error: 'Please Reset Your Parameters and Try again.',
         });
         mergeError({
@@ -89,17 +84,17 @@ export default function PublicForm() {
             'Your submission has timed out. Please try again by submitting this job to a queue instead.',
         });
       } else {
-        mergeResults({
+        mergeState({
           error: 'Please Reset Your Parameters and Try again.',
         });
       }
     } catch (err) {
       mergeError(err.message);
-      mergeResults({
+      mergeState({
         error: 'Please Reset Your Parameters and Try again.',
       });
     }
-    mergeVisualize({ loading: { active: false } });
+    mergeState({ loading: { active: false } });
   }
 
   function handleReset() {
@@ -114,11 +109,11 @@ export default function PublicForm() {
     };
     window.location.hash = '#/visualization';
     resetVisualization();
-    mergeVisualize(params);
+    mergeState(params);
   }
 
   async function getPublicDataOptions() {
-    mergeVisualize({ loadingPublic: true });
+    mergeState({ loadingPublic: true });
     try {
       const pDataOptions = await getJSON(
         `Others/json/Visualization-Public.json`
@@ -146,7 +141,7 @@ export default function PublicForm() {
         ),
       ];
 
-      mergeVisualize({
+      mergeState({
         pDataOptions: pDataOptions,
         study: study,
         studyOptions: studyOptions,
@@ -176,7 +171,7 @@ export default function PublicForm() {
     } catch (err) {
       mergeError(err.message);
     }
-    mergeVisualize({ loadingPublic: false });
+    mergeState({ loadingPublic: false });
   }
 
   function handleStudyChange(study) {
@@ -199,7 +194,7 @@ export default function PublicForm() {
       ),
     ];
 
-    mergeVisualize({
+    mergeState({
       study: study,
       cancerType: cancerTypeOptions[0],
       cancerTypeOptions: cancerTypeOptions,
@@ -217,7 +212,7 @@ export default function PublicForm() {
       ),
     ];
 
-    mergeVisualize({
+    mergeState({
       cancerType: cancer,
       pubExperimentalStrategy: pubExperimentOptions[0],
       pubExperimentOptions: pubExperimentOptions,
@@ -253,7 +248,7 @@ export default function PublicForm() {
         value={pubExperimentalStrategy}
         options={pubExperimentOptions}
         onChange={(pubExperimentalStrategy) =>
-          mergeVisualize({
+          mergeState({
             pubExperimentalStrategy: pubExperimentalStrategy,
           })
         }

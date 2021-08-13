@@ -45,8 +45,10 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     cancerType,
     pubExperimentalStrategy,
     pDataOptions,
-  } = visualization.visualize;
-  const { projectID, matrixList, svgList } = visualization.results;
+    projectID,
+    matrixList,
+    svgList,
+  } = visualization.state;
   const { profileOptions } = visualization.mutationalProfiles;
   const {
     withinProfileType,

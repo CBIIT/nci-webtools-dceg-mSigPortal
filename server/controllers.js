@@ -656,7 +656,7 @@ async function getVisExample(req, res, next) {
       // rename file paths with new ID if needed
       const svgPath = path.join(resultsPath, 'results', 'svg_files_list.txt');
       if (fs.existsSync(svgPath)) {
-        const oldID = params.visualization.results.projectID;
+        const oldID = params.visualization.state.projectID;
         const matrixPath = path.join(
           resultsPath,
           'results',
@@ -698,7 +698,10 @@ async function getExposureExample(req, res, next) {
       await fs.copy(examplePath, resultsPath);
 
       res.json({
-        state: { ...params, exposureState: { ...params.exposureState, projectID: id } },
+        state: {
+          ...params,
+          exposureState: { ...params.exposureState, projectID: id },
+        },
       });
     } else {
       throw `Invalid example`;

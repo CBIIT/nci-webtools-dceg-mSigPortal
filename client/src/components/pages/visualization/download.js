@@ -10,13 +10,15 @@ export default function Download() {
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const { projectID, downloads, statistics } = visualization.results;
   const {
     source,
     study,
     experimentalStrategy,
     cancerType,
-  } = visualization.visualize;
+    projectID,
+    downloads,
+    statistics,
+  } = visualization.state;
 
   const [downloading, setDownload] = useState([]);
   const [downloadingSession, setSession] = useState(false);
@@ -93,13 +95,10 @@ export default function Download() {
         state: {
           visualization: {
             ...visualization,
-            visualize: {
-              ...visualization.visualize,
+            state:{
+              ...visualization.state,
               email: '',
               queueMode: false,
-            },
-            results: {
-              ...visualization.results,
               displayTab: 'profilerSummary',
             },
             mutationalProfiles: {

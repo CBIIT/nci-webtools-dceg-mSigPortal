@@ -23,10 +23,8 @@ const { Title, Content } = Popover;
 export default function UserForm() {
   const dispatch = useDispatch();
   const visualization = useSelector((state) => state.visualization);
-  const mergeVisualize = (state) =>
-    dispatch(actions.mergeVisualization({ visualize: state }));
-  const mergeResults = (state) =>
-    dispatch(actions.mergeVisualization({ results: state }));
+  const mergeState = (state) =>
+    dispatch(actions.mergeVisualization({ state: state }));
   const mergeMutationalProfiles = (state) =>
     dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
   const mergeError = (msg) =>
@@ -57,7 +55,7 @@ export default function UserForm() {
     cancerType,
     pubExperimentOptions,
     pubExperimentalStrategy,
-  } = visualization.visualize;
+  } = visualization.state;
 
   const [inputFile, setInput] = useState(new File([], ''));
   const [bedFile, setBed] = useState(new File([], ''));
@@ -91,7 +89,7 @@ export default function UserForm() {
     }
 
     if (queueMode) {
-      mergeVisualize({
+      mergeState({
         loading: {
           active: true,
           content: 'Sending to Queue...',
@@ -114,7 +112,7 @@ export default function UserForm() {
           }),
         });
 
-        mergeVisualize({ loading: { active: false } });
+        mergeState({ loading: { active: false } });
 
         if (response.ok) {
           // placeholder alert with error modal
@@ -122,7 +120,7 @@ export default function UserForm() {
             `Your job was successfully submitted to the queue. You will recieve an email at ${email} with your results.`
           );
         } else {
-          mergeResults({
+          mergeState({
             error: 'Please Reset Your Parameters and Try again.',
             submitted: false,
           });
@@ -130,10 +128,10 @@ export default function UserForm() {
         }
       } catch (err) {
         mergeError(err.message);
-        mergeVisualize({ loading: { active: false } });
+        mergeState({ loading: { active: false } });
       }
     } else {
-      mergeVisualize({
+      mergeState({
         loading: {
           active: true,
           content: 'Calculating...',
@@ -150,12 +148,12 @@ export default function UserForm() {
           body: JSON.stringify(args),
         });
 
-        mergeVisualize({ loading: { active: false } });
+        mergeState({ loading: { active: false } });
 
         if (response.ok) {
           const results = await response.json();
 
-          mergeResults({
+          mergeState({
             projectID: projectID,
             svgList: results.svgList,
             statistics: results.statistics,
@@ -166,14 +164,14 @@ export default function UserForm() {
             debug: { stdout: results.stdout, stderr: results.stderr },
           });
         } else if (response.status == 504) {
-          mergeResults({
+          mergeState({
             error: 'Please Reset Your Parameters and Try again.',
           });
           mergeError(
             'Your submission has timed out. Please try again by submitting this job to a queue instead.'
           );
         } else {
-          mergeResults({
+          mergeState({
             error: 'Please Reset Your Parameters and Try again.',
           });
           const { stdout, stderr } = await response.json();
@@ -186,10 +184,10 @@ export default function UserForm() {
         }
       } catch (err) {
         mergeError(err.message);
-        mergeResults({
+        mergeState({
           error: 'Please Reset Your Parameters and Try again.',
         });
-        mergeVisualize({ loading: { active: false } });
+        mergeState({ loading: { active: false }, submitted: true });
       }
     }
   }
@@ -212,13 +210,12 @@ export default function UserForm() {
     setCheckValid(false);
     removeFile();
     removeBedFile();
-    mergeVisualize(params);
+    mergeState(params);
   }
 
   //   Uploads inputFile and returns a projectID
   async function uploadFile() {
-    mergeVisualize({
-      submitted: true,
+    mergeState({
       loading: {
         active: true,
         content: 'Uploading file...',
@@ -247,7 +244,7 @@ export default function UserForm() {
     } catch (err) {
       mergeError(err.message);
     } finally {
-      mergeVisualize({
+      mergeState({
         loading: {
           active: false,
         },
@@ -257,12 +254,12 @@ export default function UserForm() {
 
   function removeFile() {
     setInput(new File([], ''));
-    mergeVisualize({ storeFilename: '' });
+    mergeState({ storeFilename: '' });
   }
 
   function removeBedFile() {
     setBed(new File([], ''));
-    mergeVisualize({ bedFilename: '' });
+    mergeState({ bedFilename: '' });
   }
 
   function selectFormat(format) {
@@ -276,19 +273,19 @@ export default function UserForm() {
     if (format == 'catalog_csv')
       path = 'assets/exampleInput/demo_input_catalog.csv';
 
-    mergeVisualize({ inputFormat: format, exampleData: path });
+    mergeState({ inputFormat: format, exampleData: path });
   }
 
   async function loadExample() {
     const filename = exampleData.split('/').slice(-1)[0];
     setInput(new File([await (await fetch(exampleData)).blob()], filename));
-    mergeVisualize({ storeFilename: filename });
+    mergeState({ storeFilename: filename });
   }
 
   async function loadBed() {
     const filename = bedData.split('/').slice(-1)[0];
     setBed(new File([await (await fetch(bedData)).blob()], filename));
-    mergeVisualize({ bedFilename: filename });
+    mergeState({ bedFilename: filename });
   }
 
   function validateForm() {
@@ -369,7 +366,7 @@ export default function UserForm() {
               className={`p-0 ml-auto font-14 ${
                 inputFile.size ? 'text-danger' : ''
               }`}
-              disabled={submitted}
+              disabled={submitted || loading.active}
               variant="link"
               type="button"
               onClick={() => (inputFile.size ? removeFile() : loadExample())}
@@ -396,7 +393,7 @@ export default function UserForm() {
               onChange={(e) => {
                 if (e.target.files.length) {
                   setInput(e.target.files[0]);
-                  mergeVisualize({
+                  mergeState({
                     storeFilename: e.target.files[0].name,
                   });
                 }
@@ -411,7 +408,7 @@ export default function UserForm() {
         <Control
           as="select"
           value={selectedGenome}
-          onChange={(e) => mergeVisualize({ selectedGenome: e.target.value })}
+          onChange={(e) => mergeState({ selectedGenome: e.target.value })}
           disabled={
             submitted || ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
           }
@@ -430,7 +427,7 @@ export default function UserForm() {
             value="WGS"
             checked={experimentalStrategy == 'WGS'}
             onChange={(e) =>
-              mergeVisualize({ experimentalStrategy: e.target.value })
+              mergeState({ experimentalStrategy: e.target.value })
             }
             disabled={
               submitted || ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
@@ -444,7 +441,7 @@ export default function UserForm() {
             value="WES"
             checked={experimentalStrategy == 'WES'}
             onChange={(e) =>
-              mergeVisualize({ experimentalStrategy: e.target.value })
+              mergeState({ experimentalStrategy: e.target.value })
             }
             disabled={
               submitted || ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
@@ -487,7 +484,7 @@ export default function UserForm() {
             value={mutationSplit}
             checked={mutationSplit == 'True'}
             onChange={(e) =>
-              mergeVisualize({
+              mergeState({
                 mutationSplit: e.target.value == 'True' ? 'False' : 'True',
               })
             }
@@ -506,7 +503,7 @@ export default function UserForm() {
           size="sm"
           placeholder="Enter a filter"
           value={mutationFilter}
-          onChange={(e) => mergeVisualize({ mutationFilter: e.target.value })}
+          onChange={(e) => mergeState({ mutationFilter: e.target.value })}
           disabled={
             submitted ||
             mutationSplit == 'True' ||
@@ -546,6 +543,7 @@ export default function UserForm() {
               }`}
               disabled={
                 submitted ||
+                loading.active ||
                 mutationSplit == 'True' ||
                 ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
               }
@@ -577,7 +575,7 @@ export default function UserForm() {
               onChange={(e) => {
                 if (e.target.files.length) {
                   setBed(e.target.files[0]);
-                  mergeVisualize({
+                  mergeState({
                     bedFilename: e.target.files[0].name,
                   });
                 }
@@ -618,7 +616,7 @@ export default function UserForm() {
             value={collapseSample}
             checked={collapseSample == 'True'}
             onChange={(e) =>
-              mergeVisualize({
+              mergeState({
                 collapseSample: e.target.value == 'True' ? 'False' : 'True',
               })
             }
@@ -636,7 +634,7 @@ export default function UserForm() {
               disabled={submitted}
               checked={queueMode}
               onChange={(_) => {
-                mergeVisualize({ queueMode: !queueMode });
+                mergeState({ queueMode: !queueMode });
               }}
             />
           </Check>
@@ -647,7 +645,7 @@ export default function UserForm() {
             size="sm"
             value={email}
             type="email"
-            onChange={(e) => mergeVisualize({ email: e.target.value })}
+            onChange={(e) => mergeState({ email: e.target.value })}
             disabled={!queueMode || submitted}
             isInvalid={queueMode && checkValid ? !validEmail : false}
           />

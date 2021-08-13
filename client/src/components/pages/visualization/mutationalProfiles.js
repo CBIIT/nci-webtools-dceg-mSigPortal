@@ -25,8 +25,7 @@ export default function MutationalProfiles() {
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const { source } = visualization.visualize;
-  const { projectID, svgList, displayTab } = visualization.results;
+  const { source, projectID, svgList, displayTab } = visualization.state;
   const {
     filtered,
     selectName,

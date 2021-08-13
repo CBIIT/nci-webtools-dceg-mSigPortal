@@ -19,8 +19,8 @@ export default function Kataegis({ submitR }) {
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const { source, inputFormat } = visualization.visualize;
-  const { projectID } = visualization.results;
+  const { source, inputFormat, projectID } = visualization.state;
+
   const {
     sample,
     sampleOptions,

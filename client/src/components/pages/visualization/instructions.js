@@ -4,12 +4,12 @@ import { Link } from 'react-router-dom';
 export default function Instructions({ loading }) {
   const examples = [
     { title: 'VCF Example', path: 'vcfExample' },
-    { title: 'PCAWG Lung-AdenoCA', path: 'pcawg-lungadenoca' },
-    { title: 'PCAWG Lung-SCC', path: 'pcawg-lungscc' },
-    { title: 'PCAWG Breast-AdenoCA', path: 'pcawg-breastadenoca' },
-    { title: 'PCAWG Skin-Melanoma', path: 'pcawg-skinmelanoma' },
-    { title: 'PCAWG PanCancer', path: 'pcawg-pancancer' },
-    { title: 'TCGA PanCancer', path: 'tcga-pancancer' },
+    { title: 'PCAWG Lung-AdenoCA', path: 'pcawg-LungAdenoCA' },
+    { title: 'PCAWG Lung-SCC', path: 'pcawg-LungSCC' },
+    { title: 'PCAWG Breast-AdenoCA', path: 'pcawg-BreastAdenoCA' },
+    { title: 'PCAWG Skin-Melanoma', path: 'pcawg-SkinMelanoma' },
+    { title: 'PCAWG PanCancer', path: 'pcawg-PanCancer' },
+    { title: 'TCGA PanCancer', path: 'tcga-PanCancer' },
     {
       title: 'MBD4 defect is associated with hypermutated CpG>TpG pattern',
       external: {

@@ -112,7 +112,7 @@ async function downloadS3(id, savePath) {
  * @param {object} params
  */
 async function processMessage(params) {
-  const { args, state, timestamp } = params;
+  const { args, state: visualizationStore, timestamp } = params;
   const id = args.projectID[1];
   const s3 = new AWS.S3();
   const mailer = nodemailer.createTransport(config.email.smtp);
@@ -155,13 +155,10 @@ async function processMessage(params) {
     svgList = to2dArray(svgList);
 
     let newState = {
-      ...state,
-      visualize: {
-        ...state.visualize,
+      ...visualizationStore,
+      state: {
+        ...visualizationStore.state,
         submitted: true,
-      },
-      results: {
-        ...state.results,
         projectID: id,
       },
     };
@@ -738,7 +735,7 @@ async function processMessage(params) {
     logger.info(`Sending user success email`);
     const userEmailResults = await mailer.sendMail({
       from: config.email.adminSupport,
-      to: state.visualize.email,
+      to: visualizationStore.state.email,
       subject: `mSigPortal Results - ${timestamp} EST`,
       html: await readTemplate(
         __dirname + '/templates/user-success-email.html',
@@ -776,11 +773,11 @@ async function processMessage(params) {
     });
 
     // send user error email
-    if (state.visualize.email) {
+    if (visualizationStore.state.email) {
       logger.info(`Sending user error email`);
       const userEmailResults = await mailer.sendMail({
         from: config.email.adminSupport,
-        to: state.visualize.email,
+        to: visualizationStore.state.email,
         subject: 'mSigPortal Error',
         html: await readTemplate(
           __dirname + '/templates/user-failure-email.html',

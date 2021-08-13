@@ -23,8 +23,10 @@ export default function MutationalPattern({ submitR }) {
     study,
     cancerType,
     pubExperimentalStrategy,
-  } = visualization.visualize;
-  const { projectID, matrixList } = visualization.results;
+    projectID,
+    matrixList,
+  } = visualization.state;
+
   const {
     proportion,
     pattern,

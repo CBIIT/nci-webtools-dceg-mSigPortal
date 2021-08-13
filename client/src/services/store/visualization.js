@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { mergeObject } from './utils';
 
 export const getInitialState = () => ({
-  visualize: {
+  state: {
     source: 'public',
     inputFormat: 'vcf',
     selectedGenome: 'GRCh37',
@@ -32,11 +32,9 @@ export const getInitialState = () => ({
       showIndicator: false,
     },
     queueExpired: false,
-  },
-  results: {
     error: '',
     projectID: '',
-    displayTab: 'profilerSummary',
+    displayTab: 'instructions',
     downloads: {},
     svgList: {},
     matrixList: {},

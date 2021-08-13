@@ -34,9 +34,12 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
     cancerType,
     pubExperimentalStrategy,
     pDataOptions,
-  } = visualization.visualize;
+    projectID,
+    matrixList,
+    svgList,
+  } = visualization.state;
   const { profileOptions } = visualization.mutationalProfiles;
-  const { projectID, matrixList, svgList } = visualization.results;
+
   const {
     withinProfileType,
     withinMatrixSize,
