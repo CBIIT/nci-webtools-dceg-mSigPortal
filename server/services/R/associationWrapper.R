@@ -192,7 +192,7 @@ univariate <- function(args, projectID, rootDir, savePath, s3Data, localData, bu
     }
     ## put result as a short table above the figure
 
-    signature_name_list <- stringr::str_sort(unique(result[[1]]), numeric = TRUE) ## dropdown list for the signature name
+    signature_name_list <- unique(result[[1]]) ## dropdown list for the signature name
     signature_name_input <- if_else(args$signature != '', args$signature, signature_name_list[1]) ## by default, select the first signature name
 
     data_input <- data_input %>% filter(Signature_name == signature_name_input) %>% select(-Signature_name)
