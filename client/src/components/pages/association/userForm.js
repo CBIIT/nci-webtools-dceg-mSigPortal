@@ -132,12 +132,12 @@ export default function UserForm() {
 
     mergeState({ loadingData: true });
     try {
-      const [assocVarData, exposureVariantData] = await Promise.all([
+      const [assocVarData, exposureVariableData] = await Promise.all([
         getJSON(`Association/PCAWG_vardata.json`),
         loadData(),
       ]);
 
-      const { expVarList, error } = exposureVariantData;
+      const { expVarList, error } = exposureVariableData;
       if (error) throw error.message;
 
       mergeState({

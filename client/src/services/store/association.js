@@ -34,8 +34,8 @@ export const getInitialState = () => ({
     submitted: false,
     error: false,
     loadedParameters: false,
-    assocVariant: '',
-    expVariant: '',
+    assocVariable: '',
+    expVariable: '',
     projectID: '',
     plotPath: '',
     dataPath: '',
@@ -49,14 +49,14 @@ export const getInitialState = () => ({
     testType: 'nonparametric',
     xlab: '',
     ylab: '',
-    variant1: {
+    variable1: {
       name: '',
       filter: false,
       log2: false,
       collapse: '',
       collapseOptions: [],
     },
-    variant2: {
+    variable2: {
       name: '',
       filter: false,
       log2: false,

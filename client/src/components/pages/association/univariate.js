@@ -35,8 +35,8 @@ export default function Univariate() {
     loadingCalculate,
     loadingRecalculate,
     error,
-    assocVariant,
-    expVariant,
+    assocVariable,
+    expVariable,
     projectID,
     plotPath,
     dataPath,
@@ -50,8 +50,8 @@ export default function Univariate() {
     testType,
     xlab,
     ylab,
-    variant1,
-    variant2,
+    variable1,
+    variable2,
     resultsTable,
   } = useSelector((state) => state.association.univariate);
 
@@ -59,7 +59,7 @@ export default function Univariate() {
 
   // populate controls
   useEffect(() => {
-    if (assocVarData.length) {
+    if (assocVarData.length && !dataSource) {
       const dataSourceOptions = [
         ...new Set(assocVarData.map((row) => row.data_source)),
       ];
@@ -68,7 +68,7 @@ export default function Univariate() {
       mergeState({
         dataSource,
         dataSourceOptions,
-        expVariant: expVarList[0],
+        expVariable: expVarList[0],
       });
     }
   }, [assocVarData]);
@@ -91,12 +91,10 @@ export default function Univariate() {
   const reducer = (acc, column) => [
     ...acc,
     {
-      Header: column
-        .replace('_', ' ')
-        .replace(/(^\w{1})|(\s+\w{1})/g, (letter) => letter.toUpperCase()),
-      accessor: column,
+      Header: column,
+      accessor: (a) => a[column],
       id: column,
-      Cell: (e) => e.value || '',
+      // Cell: (e) => e.value || '',
     },
   ];
 
@@ -130,7 +128,7 @@ export default function Univariate() {
       ),
     ];
 
-    mergeState({ assocVariant: assocVarOptions[0], assocVarOptions });
+    mergeState({ assocVariable: assocVarOptions[0], assocVarOptions });
   }
 
   async function handleLoadParameters() {
@@ -152,8 +150,8 @@ export default function Univariate() {
               cancer,
               dataSource,
               dataType,
-              assocVariant,
-              expVariant,
+              assocVariable,
+              expVariable,
             },
           }),
         })
@@ -162,12 +160,12 @@ export default function Univariate() {
       const { collapseVar1, collapseVar2 } = collapseData;
 
       mergeState({
-        variant1: {
-          name: assocVariant,
+        variable1: {
+          name: assocVariable,
           collapseOptions: collapseVar1 || [],
         },
-        variant2: {
-          name: expVariant,
+        variable2: {
+          name: expVariable,
           collapseOptions: collapseVar2 || [],
         },
       });
@@ -214,14 +212,14 @@ export default function Univariate() {
               dataType,
               testType,
               signature,
-              xlab: xlab || variant1.name,
-              ylab: ylab || variant2.name,
-              variant1: (() => {
-                const { collapseOptions, ...params } = variant1;
+              xlab: xlab || variable1.name,
+              ylab: ylab || variable2.name,
+              variable1: (() => {
+                const { collapseOptions, ...params } = variable1;
                 return params;
               })(),
-              variant2: (() => {
-                const { collapseOptions, ...params } = variant2;
+              variable2: (() => {
+                const { collapseOptions, ...params } = variable2;
                 return params;
               })(),
             },
@@ -315,11 +313,11 @@ export default function Univariate() {
                 <Col md="4">
                   <Select
                     disabled={loadingData || loadingParams || loadingCalculate}
-                    id="assocVariant"
-                    label="Variant Name"
-                    value={assocVariant}
+                    id="assocVariable"
+                    label="Variable Name"
+                    value={assocVariable}
                     options={assocVarOptions}
-                    onChange={(e) => mergeState({ assocVariant: e })}
+                    onChange={(e) => mergeState({ assocVariable: e })}
                   />
                 </Col>
               </Row>
@@ -330,11 +328,11 @@ export default function Univariate() {
                 <Col md="12">
                   <Select
                     disabled={loadingData || loadingParams || loadingCalculate}
-                    id="expVariant"
-                    label="Variant Name"
-                    value={expVariant}
+                    id="expVariable"
+                    label="Variable Name"
+                    value={expVariable}
                     options={expVarList}
-                    onChange={(e) => mergeState({ expVariant: e })}
+                    onChange={(e) => mergeState({ expVariable: e })}
                   />
                 </Col>
               </Row>
@@ -366,7 +364,7 @@ export default function Univariate() {
             showIndicator={loadingMsg}
           />
           <h4>Parameters</h4>
-          {variant1.name && variant2.name ? (
+          {variable1.name && variable2.name ? (
             <>
               <Row className="justify-content-center mt-3">
                 <Col md="12">
@@ -388,7 +386,7 @@ export default function Univariate() {
                         <Label>X-label</Label>
                         <Control
                           value={xlab}
-                          placeholder={variant1.name}
+                          placeholder={variable1.name}
                           onChange={(e) =>
                             mergeState({
                               xlab: e.target.value,
@@ -406,7 +404,7 @@ export default function Univariate() {
                         <Label>Y-label</Label>
                         <Control
                           value={ylab}
-                          placeholder={variant2.name}
+                          placeholder={variable2.name}
                           onChange={(e) =>
                             mergeState({
                               ylab: e.target.value,
@@ -425,7 +423,7 @@ export default function Univariate() {
               </Row>
               <Row className="justify-content-center">
                 <Col md="12">
-                  <strong>Association Variant</strong>
+                  <strong>Association Variable</strong>
                   <Row>
                     <Col md="auto">
                       <Group controlId="filter1" className="d-flex">
@@ -436,12 +434,12 @@ export default function Univariate() {
                               loadingData || loadingParams || loadingCalculate
                             }
                             type="checkbox"
-                            value={variant1.filter}
-                            checked={variant1.filter}
+                            value={variable1.filter}
+                            checked={variable1.filter}
                             onChange={() =>
                               mergeState({
-                                variant1: {
-                                  filter: !variant1.filter,
+                                variable1: {
+                                  filter: !variable1.filter,
                                 },
                               })
                             }
@@ -460,11 +458,11 @@ export default function Univariate() {
                               loadingData || loadingParams || loadingCalculate
                             }
                             type="checkbox"
-                            value={variant1.log2}
-                            checked={variant1.log2}
+                            value={variable1.log2}
+                            checked={variable1.log2}
                             onChange={() =>
                               mergeState({
-                                variant1: { log2: !variant1.log2 },
+                                variable1: { log2: !variable1.log2 },
                               })
                             }
                           />
@@ -477,18 +475,18 @@ export default function Univariate() {
                           loadingData ||
                           loadingParams ||
                           loadingCalculate ||
-                          !variant1.collapseOptions.length
+                          !variable1.collapseOptions.length
                         }
                         id="collapse1"
                         label="Collapse"
                         value={
-                          variant1.collapseOptions.length
-                            ? variant1.collapse
+                          variable1.collapseOptions.length
+                            ? variable1.collapse
                             : 'None'
                         }
-                        options={variant1.collapseOptions}
+                        options={variable1.collapseOptions}
                         onChange={(e) =>
-                          mergeState({ variant1: { collapse: e } })
+                          mergeState({ variable1: { collapse: e } })
                         }
                       />
                     </Col>
@@ -497,7 +495,7 @@ export default function Univariate() {
               </Row>
               <Row className="justify-content-center">
                 <Col md="12">
-                  <strong>Signature Exposure Variant</strong>
+                  <strong>Signature Exposure Variable</strong>
                   <Row>
                     <Col md="auto">
                       <Group controlId="filter2" className="d-flex">
@@ -508,12 +506,12 @@ export default function Univariate() {
                               loadingData || loadingParams || loadingCalculate
                             }
                             type="checkbox"
-                            value={variant2.filter}
-                            checked={variant2.filter}
+                            value={variable2.filter}
+                            checked={variable2.filter}
                             onChange={() =>
                               mergeState({
-                                variant2: {
-                                  filter: !variant2.filter,
+                                variable2: {
+                                  filter: !variable2.filter,
                                 },
                               })
                             }
@@ -532,11 +530,11 @@ export default function Univariate() {
                               loadingData || loadingParams || loadingCalculate
                             }
                             type="checkbox"
-                            value={variant2.log2}
-                            checked={variant2.log2}
+                            value={variable2.log2}
+                            checked={variable2.log2}
                             onChange={() =>
                               mergeState({
-                                variant2: { log2: !variant2.log2 },
+                                variable2: { log2: !variable2.log2 },
                               })
                             }
                           />
@@ -549,18 +547,18 @@ export default function Univariate() {
                           loadingData ||
                           loadingParams ||
                           loadingCalculate ||
-                          !variant2.collapseOptions.length
+                          !variable2.collapseOptions.length
                         }
                         id="collapse2"
                         label="Collapse"
                         value={
-                          variant2.collapseOptions.length
-                            ? variant2.collapse
+                          variable2.collapseOptions.length
+                            ? variable2.collapse
                             : 'None'
                         }
-                        options={variant2.collapseOptions}
+                        options={variable2.collapseOptions}
                         onChange={(e) =>
-                          mergeState({ variant2: { collapse: e } })
+                          mergeState({ variable2: { collapse: e } })
                         }
                       />
                     </Col>
@@ -582,7 +580,7 @@ export default function Univariate() {
             </>
           ) : (
             <p className="d-flex justify-content-center text-muted">
-              Select an Association Variant and Signature Exposure Variant
+              Select an Association Variable and Signature Exposure Variable
             </p>
           )}
         </div>
