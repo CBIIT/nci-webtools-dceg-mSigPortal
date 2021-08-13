@@ -53,9 +53,7 @@ export default function Etiology() {
   ];
 
   useEffect(() => {
-    dispatch(
-      actions.mergeCatalog({ catalog: { displayTab: 'etiology' } })
-    );
+    dispatch(actions.mergeCatalog({ catalog: { displayTab: 'etiology' } }));
   }, []);
 
   useEffect(() => {

@@ -95,6 +95,7 @@ export default function UserForm() {
           content: 'Sending to Queue...',
           showIndicator: true,
         },
+        submitted: true,
       });
 
       try {
@@ -148,8 +149,6 @@ export default function UserForm() {
           body: JSON.stringify(args),
         });
 
-        mergeState({ loading: { active: false } });
-
         if (response.ok) {
           const results = await response.json();
 
@@ -187,8 +186,8 @@ export default function UserForm() {
         mergeState({
           error: 'Please Reset Your Parameters and Try again.',
         });
-        mergeState({ loading: { active: false }, submitted: true });
       }
+      mergeState({ loading: { active: false }, submitted: true });
     }
   }
 

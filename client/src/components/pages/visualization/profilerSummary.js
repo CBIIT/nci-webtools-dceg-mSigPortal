@@ -39,7 +39,7 @@ export default function ProfilerSummary({ submitR }) {
         });
       }
     }
-  }, [plotPath, mainLoading.active]);
+  }, [mainLoading.active, projectID]);
 
   async function calculateR(fn, args) {
     mergeProfilerSummary({

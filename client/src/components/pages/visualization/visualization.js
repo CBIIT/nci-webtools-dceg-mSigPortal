@@ -70,7 +70,7 @@ export default function Visualization({ match }) {
 
   // automatically close side panel
   useEffect(() => {
-    if (submitted)
+    if (submitted && projectID)
       mergeState({ displayTab: 'profilerSummary', openSidebar: false });
   }, [submitted]);
 

@@ -95,7 +95,7 @@ export default function Download() {
         state: {
           visualization: {
             ...visualization,
-            state:{
+            state: {
               ...visualization.state,
               email: '',
               queueMode: false,
