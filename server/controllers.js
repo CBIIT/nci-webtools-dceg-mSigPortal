@@ -79,7 +79,11 @@ async function getResultsFiles(resultsPath, id = '') {
     ];
   }
 
+  // convert to relative paths
   svgList.forEach(
+    (plot) => (plot.Path = getRelativePath({ Path: plot.Path }, id).Path)
+  );
+  matrixList.forEach(
     (plot) => (plot.Path = getRelativePath({ Path: plot.Path }, id).Path)
   );
 

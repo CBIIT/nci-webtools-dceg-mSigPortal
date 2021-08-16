@@ -72,7 +72,7 @@ profilerSummary <- function(matrixList, projectID, pythonOutput, savePath, s3Dat
 
     for (i in 1:dim(matrixList)[1]) {
       matrixfile_selected <- matrixList$Path[i]
-      data_input_tmp <- read_delim(matrixfile_selected, delim = '\t')
+      data_input_tmp <- read_delim(paste0(savePath, '../../', matrixfile_selected), delim = '\t')
       if (dim(data_input_tmp)[1] > 0) {
         data_input_tmp <- data_input_tmp %>% pivot_longer(cols = -MutationType) %>%
         group_by(name) %>%
@@ -142,7 +142,7 @@ cosineSimilarityWithin <- function(matrixFile, projectID, pythonOutput, savePath
     plotPath = paste0(savePath, 'cos_sim_within.svg')
     txtPath = paste0(savePath, 'cos_sim_within.txt')
 
-    data_input <- read_delim(matrixFile, delim = '\t')
+    data_input <- read_delim(paste0(savePath, '../../', matrixFile), delim = '\t')
     data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
     # Heatmap of cosine similarity within samples  and put on the web---------------------------
     cos_sim_res1 = cos_sim_df(data_input, data_input)
@@ -224,7 +224,7 @@ cosineSimilarityRefSig <- function(profileType, signatureSetName, matrixFile, pr
       select(Signature_name, MutationType, Contribution) %>%
       pivot_wider(names_from = Signature_name, values_from = Contribution)
 
-    data_input <- read_delim(matrixFile, delim = '\t')
+    data_input <- read_delim(paste0(savePath, '../../', matrixFile), delim = '\t')
     data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
     # Heatmap of cosine similarity to reference set signature and put on the web---------------------------
@@ -308,7 +308,7 @@ cosineSimilarityPublic <- function(matrixFile, study, cancerType, profileName, p
 
 
     ## input data
-    data_input <- read_delim(matrixFile, delim = '\t')
+    data_input <- read_delim(paste0(savePath, '../../', matrixFile), delim = '\t')
     data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
     ## seqmatrix data from public data
@@ -352,7 +352,7 @@ profileComparisonWithin <- function(profileType, sampleName1, sampleName2, matri
     plotPath = paste0(savePath, 'pro_com_within.svg')
     error = ''
 
-    data_input <- read_delim(matrixFile, delim = '\t')
+    data_input <- read_delim(paste0(savePath, '../../', matrixFile), delim = '\t')
     data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
     profile1 <- data_input %>% select(MutationType, one_of(sampleName1))
@@ -451,7 +451,7 @@ profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, c
       profile2 <- refsig %>% select(MutationType, one_of(compare))
     }
 
-    data_input <- read_delim(matrixFile, delim = '\t')
+    data_input <- read_delim(paste0(savePath, '../../', matrixFile), delim = '\t')
     data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
     profile1 <- data_input %>% select(MutationType, one_of(sampleName))
@@ -540,7 +540,7 @@ profileComparisonPublic <- function(profileName, matrixFile, userSample, study, 
     plotPath = paste0(savePath, 'pro_com_public.svg')
 
     ## input data
-    data_input <- read_delim(matrixFile, delim = '\t')
+    data_input <- read_delim(paste0(savePath, '../../', matrixFile), delim = '\t')
     data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
     profile1 <- data_input %>% select(MutationType, one_of(userSample))
 
@@ -581,7 +581,7 @@ mutationalPattern <- function(matrixFile, proportion, pattern, projectID, python
     plotPath = paste0(savePath, 'mpea.svg')
     txtPath = paste0(savePath, 'mpea.txt')
 
-    data_input <- read_delim(matrixFile, delim = '\t')
+    data_input <- read_delim(paste0(savePath, '../../', matrixFile), delim = '\t')
     data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0) %>%
       pivot_longer(cols = -MutationType) %>%
       mutate(Study = "Input") %>%
@@ -698,7 +698,7 @@ pca <- function(profileType, signatureSetName, matrixFile, projectID, pythonOutp
 
     profile_name <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
 
-    data_input <- read_delim(matrixFile, delim = '\t')
+    data_input <- read_delim(paste0(savePath, '../../', matrixFile), delim = '\t')
     data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
     # PCA plot ----------------------------------------------------------------
@@ -897,7 +897,7 @@ pcaWithPublic <- function(matrixFile, study, cancerType, profileName, projectID,
     pca3Data = paste0(savePath, 'pca3_data_with_public_.txt')
 
 
-    data_input1 <- read_delim(matrixFile, delim = '\t')
+    data_input1 <- read_delim(paste0(savePath, '../../', matrixFile), delim = '\t')
     data_input1 <- data_input1 %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
     ## seqmatrix data from public data
