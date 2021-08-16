@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { actions as catalogActions } from '../../../services/store/catalog';
 import { actions as modalActions } from '../../../services/store/modal';
 import { getJSON } from '../../../services/utils';
-import Signature from './signature/index';
+import Signature from './signature/signature';
 import Etiology from './etiology/etiology';
 
 const actions = { ...catalogActions, ...modalActions };

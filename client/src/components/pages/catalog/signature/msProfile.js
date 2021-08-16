@@ -473,6 +473,7 @@ export default function MutationalSignatureProfile({ submitR }) {
                 title={plotTitle(plots[index])}
                 downloadName={plots[index].plotPath.split('/').slice(-1)[0]}
                 plotPath={plots[index].plotURL}
+                height="500px"
               />
             </div>
           )}
@@ -578,6 +579,7 @@ export default function MutationalSignatureProfile({ submitR }) {
               title={plotTitle(plots[0])}
               downloadName={plots[0].plotPath.split('/').slice(-1)[0]}
               plotPath={plots[0].plotURL}
+              height="500px"
             />
           </>
         )}

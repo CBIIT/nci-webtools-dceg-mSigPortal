@@ -2,9 +2,9 @@ import React, { useEffect } from 'react';
 import { Tab, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import ReferenceSignatures from './referenceSignatures';
-import MutationalSignatureProfile from './mutationalSignatureProfile';
+import MutationalSignatureProfile from './msProfile';
 import CosineSimilarity from './cosineSimilarity';
-import MutationalSignatureComparison from './mutationalSignatureComparison';
+import MutationalSignatureComparison from './msComparison';
 import Download from './download';
 import { actions } from '../../../../services/store/catalog';
 

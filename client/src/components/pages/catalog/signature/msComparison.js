@@ -251,7 +251,7 @@ export default function MutationalSignatureProfile({ submitR }) {
               className="p-3"
               downloadName={plotPath.split('/').slice(-1)[0]}
               plotPath={`api/results/${projectID}${plotPath}`}
-              height="1000px"
+              height="700px"
             />
             <div className="p-3">
               <p>
