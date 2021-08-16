@@ -10,6 +10,7 @@ const r = require('r-wrapper').async;
 const AWS = require('aws-sdk');
 const XLSX = require('xlsx');
 const replace = require('replace-in-file');
+const glob = require('glob');
 const config = require('./config.json');
 
 if (config.aws) AWS.config.update(config.aws);
@@ -651,12 +652,19 @@ async function getVisExample(req, res, next) {
       });
 
       const paramsPath = path.join(resultsPath, `params.json`);
-      const params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
+      let params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
 
-      // rename file paths with new ID if needed
+      // rename file paths with new ID
+      const oldID = params.visualization.state.projectID;
+      await replace({
+        files: paramsPath,
+        from: new RegExp(`${oldID}`, 'g'),
+        to: id,
+      });
+      params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
+
       const svgPath = path.join(resultsPath, 'results', 'svg_files_list.txt');
       if (fs.existsSync(svgPath)) {
-        const oldID = params.visualization.state.projectID;
         const matrixPath = path.join(
           resultsPath,
           'results',
@@ -665,10 +673,18 @@ async function getVisExample(req, res, next) {
 
         await replace({
           files: [svgPath, matrixPath],
-          from: new RegExp(`/${oldID}/`, 'g'),
-          to: `/${id}/`,
+          from: new RegExp(`${oldID}`, 'g'),
+          to: id,
         });
       }
+      // rename files with new ID
+      glob(path.join(resultsPath, 'results/**'), (error, files) => {
+        files.forEach((file) => {
+          if (file.includes(oldID)) {
+            fs.renameSync(file, file.replace(oldID, id));
+          }
+        });
+      });
 
       res.json({ projectID: id, state: params.visualization });
     } else {

@@ -76,7 +76,7 @@ export default function Visualization({ match }) {
 
   // when retrieving queued result, update id in store
   useEffect(() => {
-    if (id && !loading.active && !submitted) {
+    if (id && !loading.active && !submitted && !projectID) {
       if (type == 'queue') {
         loadQueueResult(id);
       } else if (type == 'example') {
