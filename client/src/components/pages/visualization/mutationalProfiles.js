@@ -319,6 +319,7 @@ export default function MutationalProfiles() {
             className="p-3"
             downloadName={getdownloadName()}
             plotPath={plotPath}
+            height="500px"
           />
         )}
       </div>
