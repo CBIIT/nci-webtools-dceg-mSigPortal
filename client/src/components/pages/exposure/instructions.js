@@ -38,6 +38,11 @@ export default function Instructions({ loading }) {
       <p>User: Upload your own data</p>
       <hr />
       <h4>Example Queries</h4>
+      <p>
+        Choose an example query to view results for pre-selected parameters. You
+        must reset between queries.
+      </p>
+
       {examples.map(({ title, external, path }, index) => (
         <div key={index}>
           <Link to={`/exploration/${path}`} disabled>

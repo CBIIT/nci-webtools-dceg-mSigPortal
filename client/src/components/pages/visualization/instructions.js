@@ -21,7 +21,7 @@ export default function Instructions({ loading }) {
   ];
 
   return (
-    <div className="border rounded bg-white p-3">
+    <div className="border rounded bg-white py-3 px-4">
       <h4>Instructions</h4>
       <p>
         Choose a Data Source and its associated options to submit a query using
@@ -33,6 +33,10 @@ export default function Instructions({ loading }) {
       <p>User: Upload your own data</p>
       <hr />
       <h4>Example Queries</h4>
+      <p>
+        Choose an example query to view results for pre-selected parameters. You
+        must reset between queries.
+      </p>
       {examples.map(({ title, external, path }, index) => (
         <div key={index}>
           <Link to={`/visualization/example/${path}`} disabled>
