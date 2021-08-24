@@ -1,4 +1,4 @@
-FROM centos:latest
+FROM quay.io/centos/centos:stream8
 
 RUN dnf -y update \
     && dnf -y install \
