@@ -138,16 +138,19 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
 
   // get inital signatures from initially selected signature set
   useEffect(() => {
-    if (refProfileType && refSignatureSet && !refSignatures.length) {
+    if (refProfileType && refSignatureSet && !refSignatures.length)
       getSignatures(refProfileType, refSignatureSet);
-    }
   }, [refProfileType, refSignatureSet]);
+
+  // set initial study
+  useEffect(() => {
+    if (!pubStudy && study) handleStudyChange(study);
+  }, []);
 
   // get public data samples
   useEffect(() => {
-    if (!pubSampleOptions.length && source == 'user' && pubStudy) {
+    if (!pubSampleOptions.length && source == 'user' && pubStudy)
       getPublicSamples(pubStudy, pubCancerType);
-    }
   }, [pDataOptions, pubStudy]);
 
   function setOverlay(type, status) {
