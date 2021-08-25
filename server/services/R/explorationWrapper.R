@@ -262,6 +262,7 @@ mutationalSignatureComparison <- function(profileName, rsSet1, signatureName1, r
   tryCatch({
     output = list()
     plotPath = paste0(savePath, 'mutationalSignatureComparison.svg')
+    txtPath = paste0(savePath, 'mutationalSignatureComparison.txt')
 
     profile_name_input <- "SBS96" # profile type
     signatureset_name1 <- "COSMIC v3 Signatures (SBS)"
@@ -282,9 +283,9 @@ mutationalSignatureComparison <- function(profileName, rsSet1, signatureName1, r
       pivot_wider(names_from = Signature_name, values_from = Contribution) %>%
       select(MutationType, one_of(signatureName2))
 
-    plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, output_plot = plotPath)
+    plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, output_plot = plotPath, output_data = txtPath)
 
-    output = list('plotPath' = plotPath)
+    output = list(plotPath = plotPath, txtPath = txtPath)
   }, error = function(e) {
     print(e)
   }, finally = {

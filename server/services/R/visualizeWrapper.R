@@ -350,6 +350,7 @@ profileComparisonWithin <- function(profileType, sampleName1, sampleName2, matri
   tryCatch({
     output = list()
     plotPath = paste0(savePath, 'pro_com_within.svg')
+    txtPath = paste0(savePath, 'pro_com_within.txt')
     error = ''
 
     data_input <- read_delim(paste0(savePath, '../../', matrixFile), delim = '\t')
@@ -367,9 +368,9 @@ profileComparisonWithin <- function(profileType, sampleName1, sampleName2, matri
       stop(error)
     }
 
-    plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, output_plot = plotPath)
+    plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, output_plot = plotPath, output_data = txtPath)
 
-    output = list('plotPath' = plotPath)
+    output = list(plotPath = plotPath, txtPath = txtPath)
   }, error = function(e) {
     print(e)
   }, finally = {
@@ -392,6 +393,7 @@ profileComparisonWithinPublic <- function(profileType, sampleName1, sampleName2,
   tryCatch({
     output = list()
     plotPath = paste0(savePath, 'pro_com_within.svg')
+    txtPath = paste0(savePath, 'pro_com_within.txt')
 
     matrix_size <- if_else(profileType == "SBS", "96", if_else(profileType == "DBS", "78", if_else(profileType == "ID", "83", NA_character_)))
     profile_name <- paste0(profileType, matrix_size)
@@ -408,9 +410,9 @@ profileComparisonWithinPublic <- function(profileType, sampleName1, sampleName2,
 
     profile1 <- data_input %>% select(MutationType, one_of(sampleName1))
     profile2 <- data_input %>% select(MutationType, one_of(sampleName2))
-    plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, output_plot = plotPath)
+    plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, output_plot = plotPath, output_data = txtPath)
 
-    output = list('plotPath' = plotPath)
+    output = list(plotPath = plotPath, txtPath = txtPath)
   }, error = function(e) {
     print(e)
   }, finally = {
@@ -435,6 +437,7 @@ profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, c
   tryCatch({
     output = list()
     plotPath = paste0(savePath, 'pro_com_refsig.svg')
+    txtPath = paste0(savePath, 'pro_com_refsig.txt')
     error = ''
 
     profile_name <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
@@ -462,9 +465,9 @@ profileComparisonRefSig <- function(profileType, sampleName, signatureSetName, c
     }
 
     profile_names = c(colnames(profile1)[2], colnames(profile2)[2])
-    plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, profile_names = profile_names, output_plot = plotPath)
+    plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, profile_names = profile_names, output_plot = plotPath, output_data = txtPath)
 
-    output = list('plotPath' = plotPath)
+    output = list(plotPath = plotPath, txtPath = txtPath)
   }, error = function(e) {
     print(e)
   }, finally = {
@@ -488,6 +491,7 @@ profileComparisonRefSigPublic <- function(profileType, sampleName, signatureSetN
   tryCatch({
     output = list()
     plotPath = paste0(savePath, 'pro_com_refsig.svg')
+    txtPath = paste0(savePath, 'pro_com_refsig.txt')
 
     profile_name <- if_else(profileType == "SBS", "SBS96", if_else(profileType == "DBS", "DBS78", if_else(profileType == "ID", "ID83", NA_character_)))
 
@@ -512,9 +516,9 @@ profileComparisonRefSigPublic <- function(profileType, sampleName, signatureSetN
       filter(Sample %in% c(sampleName)) %>%
       pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations)
     profile_names = c(colnames(profile1)[2], colnames(profile2)[2])
-    plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, profile_names = profile_names, output_plot = plotPath)
+    plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, profile_names = profile_names, output_plot = plotPath, output_data = txtPath)
 
-    output = list('plotPath' = plotPath)
+    output = list(plotPath = plotPath, txtPath = txtPath)
   }, error = function(e) {
     print(e)
   }, finally = {
@@ -538,6 +542,7 @@ profileComparisonPublic <- function(profileName, matrixFile, userSample, study, 
   tryCatch({
     output = list()
     plotPath = paste0(savePath, 'pro_com_public.svg')
+    txtPath = paste0(savePath, 'pro_com_public.txt')
 
     ## input data
     data_input <- read_delim(paste0(savePath, '../../', matrixFile), delim = '\t')
@@ -555,9 +560,9 @@ profileComparisonPublic <- function(profileName, matrixFile, userSample, study, 
       filter(Sample == publicSample) %>%
       pivot_wider(names_from = Sample, values_from = Mutations)
 
-    plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, output_plot = plotPath)
+    plot_compare_profiles_diff(profile1, profile2, condensed = FALSE, output_plot = plotPath, output_data = txtPath)
 
-    output = list('plotPath' = plotPath)
+    output = list(plotPath = plotPath, txtPath = txtPath)
   }, error = function(e) {
     print(e)
   }, finally = {

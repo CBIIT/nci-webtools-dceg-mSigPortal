@@ -32,6 +32,7 @@ export default function MutationalSignatureProfile({ submitR }) {
     rsSet2,
     rsSetOptions2,
     plotPath,
+    txtPath,
     debugR,
     err,
     loading,
@@ -64,7 +65,7 @@ export default function MutationalSignatureProfile({ submitR }) {
             debugR: debugR,
             loading: false,
             plotPath: output.plotPath,
-            txtPath: output.textPath,
+            txtPath: output.txtPath,
           });
         } else {
           mergeSigMutationalSigComparison({
@@ -251,6 +252,7 @@ export default function MutationalSignatureProfile({ submitR }) {
               className="p-3"
               downloadName={plotPath.split('/').slice(-1)[0]}
               plotPath={`api/results/${projectID}${plotPath}`}
+              txtPath={projectID + txtPath}
               height="700px"
             />
             <div className="p-3">
