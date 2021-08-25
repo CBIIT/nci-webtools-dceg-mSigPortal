@@ -75,7 +75,9 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     withinPlotPath,
     refPlotPath,
     pubPlotPath,
-    pubTxtURL,
+    withinTxtPath,
+    refTxtPath,
+    pubTxtPath,
     display,
     withinErr,
     refErr,
@@ -231,6 +233,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       mergeProfileComparison({
         [`${type}Err`]: false,
         [`${type}PlotPath`]: '',
+        [`${type}TxtPath`]: '',
         debugR: '',
       });
 
@@ -243,7 +246,10 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
 
         mergeProfileComparison({ debugR: debugR });
         if (Object.keys(output).length) {
-          mergeProfileComparison({ [`${type}PlotPath`]: output.plotPath });
+          mergeProfileComparison({
+            [`${type}PlotPath`]: output.plotPath,
+            [`${type}TxtPath`]: output.txtPath,
+          });
         } else {
           mergeProfileComparison({
             [`${type}Err`]: error || debugR,
@@ -469,6 +475,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   className="p-3"
                   downloadName={withinPlotPath.split('/').slice(-1)[0]}
                   plotPath={'api/results/' + projectID + withinPlotPath}
+                  txtPath={projectID + withinTxtPath}
                 />
                 <div className="p-3">
                   <p>
@@ -641,6 +648,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   className="p-3"
                   downloadName={refPlotPath.split('/').slice(-1)[0]}
                   plotPath={'api/results/' + projectID + refPlotPath}
+                  txtPath={projectID + refTxtPath}
                 />
                 <div className="p-3">
                   <p>
@@ -790,6 +798,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   className="p-3"
                   downloadName={pubPlotPath.split('/').slice(-1)[0]}
                   plotPath={'api/results/' + projectID + pubPlotPath}
+                  txtPath={projectID + pubTxtPath}
                 />
                 <div className="p-3">
                   <p>
