@@ -43,12 +43,12 @@ export default function MutationalSignatureProfile({ submitR }) {
     }
   }, [plots]);
 
-  // dataFolder/Reference_Signature_Profiles_SVG/rsSet/profileName+signatureName
+  // dataFolder/all_svg/rsSet/profileName+signatureName
   function buildPlotPath(profileName, rsSet, signatureName) {
     const profile = profileName.match(/[a-z]+|\d+/gi).join('_');
     const set = rsSet.replace(/\s/g, '_').replace(/[^a-zA-Z0-9-_]/gi, '');
     // s3 key
-    return `msigportal/Database/Signature/Reference_Signature_Profiles_SVG/${set}/${profile}_plots_mSigPortal_${signatureName}.svg`;
+    return `msigportal/Database/Signature/all_svg/${set}/${profile}_plots_mSigPortal_${signatureName}.svg`;
   }
 
   async function fetchPlot(path, index = null) {
