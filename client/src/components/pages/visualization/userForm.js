@@ -6,10 +6,9 @@ import {
   Col,
   Popover,
   OverlayTrigger,
-  InputGroup,
 } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { faInfoCircle, faFolderMinus } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import './visualization.scss';
 import { useSelector, useDispatch } from 'react-redux';
@@ -376,29 +375,42 @@ export default function UserForm() {
         </Row>
         <Row>
           <Col>
-            <Form.File
-              disabled={submitted}
-              id="fileUpload"
-              label={
-                inputFile.size
-                  ? inputFile.name
-                  : storeFilename
-                  ? storeFilename
-                  : 'Upload Data File...'
-              }
-              accept=".csv, .tsv, .vcf, .gz, .tar, .tar.gz"
-              isInvalid={checkValid ? !validFile : false}
-              feedback="Please upload a data file"
-              onChange={(e) => {
-                if (e.target.files.length) {
-                  setInput(e.target.files[0]);
-                  mergeState({
-                    storeFilename: e.target.files[0].name,
-                  });
+            <div className="d-flex">
+              <Form.File
+                disabled={submitted}
+                id="fileUpload"
+                label={
+                  inputFile.size
+                    ? inputFile.name
+                    : storeFilename
+                    ? storeFilename
+                    : 'Upload Data File...'
                 }
-              }}
-              custom
-            />
+                accept=".csv, .tsv, .vcf, .gz, .tar, .tar.gz"
+                isInvalid={checkValid ? !validFile : false}
+                feedback="Please upload a data file"
+                onChange={(e) => {
+                  if (e.target.files.length) {
+                    setInput(e.target.files[0]);
+                    mergeState({
+                      storeFilename: e.target.files[0].name,
+                    });
+                  }
+                }}
+                custom
+              />
+              {inputFile.size > 0 && (
+                <Button
+                  className="ml-1"
+                  size="sm"
+                  title="Remove"
+                  variant="danger"
+                  onClick={removeFile}
+                >
+                  <FontAwesomeIcon icon={faFolderMinus} size="2x" />
+                </Button>
+              )}
+            </div>
           </Col>
         </Row>
       </Group>
@@ -556,31 +568,44 @@ export default function UserForm() {
         </Row>
         <Row>
           <Col>
-            <Form.File
-              disabled={
-                submitted ||
-                mutationSplit == 'True' ||
-                ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
-              }
-              id="uploadDataFile"
-              label={
-                bedFile.size
-                  ? bedFile.name
-                  : bedFilename
-                  ? bedFilename
-                  : 'Upload Bed File...'
-              }
-              accept=".bed"
-              onChange={(e) => {
-                if (e.target.files.length) {
-                  setBed(e.target.files[0]);
-                  mergeState({
-                    bedFilename: e.target.files[0].name,
-                  });
+            <div className="d-flex">
+              <Form.File
+                disabled={
+                  submitted ||
+                  mutationSplit == 'True' ||
+                  ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
                 }
-              }}
-              custom
-            />
+                id="uploadDataFile"
+                label={
+                  bedFile.size
+                    ? bedFile.name
+                    : bedFilename
+                    ? bedFilename
+                    : 'Upload Bed File...'
+                }
+                accept=".bed"
+                onChange={(e) => {
+                  if (e.target.files.length) {
+                    setBed(e.target.files[0]);
+                    mergeState({
+                      bedFilename: e.target.files[0].name,
+                    });
+                  }
+                }}
+                custom
+              />
+              {bedFile.size > 0 && (
+                <Button
+                  className="ml-1"
+                  size="sm"
+                  title="Remove"
+                  variant="danger"
+                  onClick={removeBedFile}
+                >
+                  <FontAwesomeIcon icon={faFolderMinus} size="2x" />
+                </Button>
+              )}
+            </div>
           </Col>
         </Row>
       </Group>

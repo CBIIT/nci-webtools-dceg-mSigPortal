@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFolderMinus } from '@fortawesome/free-solid-svg-icons';
 import Select from '../../controls/select/select';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as exposureActions } from '../../../services/store/exposure';
@@ -138,23 +140,37 @@ export default function PublicForm({
         <Col>
           <Group>
             <Label>Upload Exposure File</Label>
-            <Form.File
-              disabled={loading || submitted}
-              id="uploadExposure"
-              label={exposureFileObj.name || 'Exposure File'}
-              accept=".txt"
-              isInvalid={checkValid && !exposureFileObj.size}
-              feedback="Upload an exposure file"
-              onChange={(e) => {
-                if (e.target.files.length) {
-                  setExposure(e.target.files[0]);
-                  mergeState({
-                    exposureFile: e.target.files[0].name,
-                  });
-                }
-              }}
-              custom
-            />
+            <div className="d-flex">
+              <Form.File
+                disabled={loading || submitted}
+                id="uploadExposure"
+                label={exposureFileObj.name || 'Exposure File'}
+                accept=".txt"
+                isInvalid={checkValid && !exposureFileObj.size}
+                feedback="Upload an exposure file"
+                onChange={(e) => {
+                  if (e.target.files.length) {
+                    setExposure(e.target.files[0]);
+                    mergeState({ exposureFile: e.target.files[0].name });
+                  }
+                }}
+                custom
+              />
+              {exposureFileObj.size > 0 && (
+                <Button
+                  className="ml-1"
+                  size="sm"
+                  title="Remove"
+                  variant="danger"
+                  onClick={() => {
+                    setExposure(new File([], ''));
+                    mergeState({ exposureFile: '' });
+                  }}
+                >
+                  <FontAwesomeIcon icon={faFolderMinus} size="2x" />
+                </Button>
+              )}
+            </div>
           </Group>
         </Col>
       </Row>
@@ -162,23 +178,37 @@ export default function PublicForm({
         <Col>
           <Group>
             <Label>Upload Matrix File</Label>
-            <Form.File
-              disabled={loading || submitted}
-              id="uploadMatrix"
-              label={matrixFileObj.name || 'Matrix File'}
-              accept=".txt"
-              isInvalid={checkValid && !matrixFileObj.size}
-              feedback="Upload a matrix file"
-              onChange={(e) => {
-                if (e.target.files.length) {
-                  setMatrix(e.target.files[0]);
-                  mergeState({
-                    matrixFile: e.target.files[0].name,
-                  });
-                }
-              }}
-              custom
-            />
+            <div className="d-flex">
+              <Form.File
+                disabled={loading || submitted}
+                id="uploadMatrix"
+                label={matrixFileObj.name || 'Matrix File'}
+                accept=".txt"
+                isInvalid={checkValid && !matrixFileObj.size}
+                feedback="Upload a matrix file"
+                onChange={(e) => {
+                  if (e.target.files.length) {
+                    setMatrix(e.target.files[0]);
+                    mergeState({ matrixFile: e.target.files[0].name });
+                  }
+                }}
+                custom
+              />
+              {matrixFileObj.size > 0 && (
+                <Button
+                  className="ml-1"
+                  size="sm"
+                  title="Remove"
+                  variant="danger"
+                  onClick={() => {
+                    setMatrix(new File([], ''));
+                    mergeState({ matrixFile: '' });
+                  }}
+                >
+                  <FontAwesomeIcon icon={faFolderMinus} size="2x" />
+                </Button>
+              )}
+            </div>
           </Group>
         </Col>
       </Row>
@@ -239,23 +269,37 @@ export default function PublicForm({
           <Col>
             <Group>
               <Label>Upload Signature Data</Label>
-              <Form.File
-                disabled={loading || submitted}
-                id="uploadSignature"
-                label={signatureFileObj.name || 'Signature File'}
-                accept=".txt"
-                isInvalid={checkValid && !signatureFileObj.size}
-                feedback="Upload a signature file"
-                onChange={(e) => {
-                  if (e.target.files.length) {
-                    setSignature(e.target.files[0]);
-                    mergeState({
-                      signatureFile: e.target.files[0].name,
-                    });
-                  }
-                }}
-                custom
-              />
+              <div className="d-flex">
+                <Form.File
+                  disabled={loading || submitted}
+                  id="uploadSignature"
+                  label={signatureFileObj.name || 'Signature File'}
+                  accept=".txt"
+                  isInvalid={checkValid && !signatureFileObj.size}
+                  feedback="Upload a signature file"
+                  onChange={(e) => {
+                    if (e.target.files.length) {
+                      setSignature(e.target.files[0]);
+                      mergeState({ signatureFile: e.target.files[0].name });
+                    }
+                  }}
+                  custom
+                />
+                {signatureFileObj.size > 0 && (
+                  <Button
+                    className="ml-1"
+                    size="sm"
+                    title="Remove"
+                    variant="danger"
+                    onClick={() => {
+                      setSignature(new File([], ''));
+                      mergeState({ signatureFile: '' });
+                    }}
+                  >
+                    <FontAwesomeIcon icon={faFolderMinus} size="2x" />
+                  </Button>
+                )}
+              </div>
             </Group>
           </Col>
         </Row>
