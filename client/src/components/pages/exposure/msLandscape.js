@@ -57,6 +57,7 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
                     size="sm"
                     title="Remove"
                     variant="danger"
+                    disabled={loading}
                     onClick={() => {
                       handleVariable(new File([], ''));
                     }}

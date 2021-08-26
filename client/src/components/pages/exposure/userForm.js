@@ -162,6 +162,7 @@ export default function PublicForm({
                   size="sm"
                   title="Remove"
                   variant="danger"
+                  disabled={loading || submitted}
                   onClick={() => {
                     setExposure(new File([], ''));
                     mergeState({ exposureFile: '' });
@@ -200,6 +201,7 @@ export default function PublicForm({
                   size="sm"
                   title="Remove"
                   variant="danger"
+                  disabled={loading || submitted}
                   onClick={() => {
                     setMatrix(new File([], ''));
                     mergeState({ matrixFile: '' });
@@ -291,6 +293,7 @@ export default function PublicForm({
                     size="sm"
                     title="Remove"
                     variant="danger"
+                    disabled={loading || submitted}
                     onClick={() => {
                       setSignature(new File([], ''));
                       mergeState({ signatureFile: '' });

@@ -377,7 +377,7 @@ export default function UserForm() {
           <Col>
             <div className="d-flex">
               <Form.File
-                disabled={submitted}
+                disabled={submitted || loading.active}
                 id="fileUpload"
                 label={
                   inputFile.size
@@ -405,6 +405,7 @@ export default function UserForm() {
                   size="sm"
                   title="Remove"
                   variant="danger"
+                  disabled={submitted || loading.active}
                   onClick={removeFile}
                 >
                   <FontAwesomeIcon icon={faFolderMinus} size="2x" />
@@ -573,7 +574,8 @@ export default function UserForm() {
                 disabled={
                   submitted ||
                   mutationSplit == 'True' ||
-                  ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
+                  ['catalog_csv', 'catalog_tsv'].includes(inputFormat) ||
+                  loading.active
                 }
                 id="uploadDataFile"
                 label={
@@ -600,6 +602,7 @@ export default function UserForm() {
                   size="sm"
                   title="Remove"
                   variant="danger"
+                  disabled={submitted || loading.active}
                   onClick={removeBedFile}
                 >
                   <FontAwesomeIcon icon={faFolderMinus} size="2x" />
