@@ -339,13 +339,11 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
   }
 
   function handleProfile(profile) {
-    const matrixOptions = [
-      ...new Set(
-        svgList
-          .filter((plot) => plot.Profile_Type == profile)
-          .map((plot) => plot.Matrix_Size)
-      ),
-    ].sort((a, b) => a - b);
+    const matrixOptions = unique2d(
+      'Matrix_Size',
+      svgList.columns,
+      filter2d(profile, svgList.data)
+    );
 
     mergeProfileComparison({
       userProfileType: profile,
@@ -695,7 +693,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   label="Profile Type"
                   value={userProfileType}
                   options={profileOptions}
-                  onChange={handleProfile}
+                  onChange={(profile) => handleProfile(profile)}
                 />
               </Col>
               <Col lg="2">
