@@ -461,7 +461,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
           </Form>
           <div id="pcWithinPlot">
             {withinErr && (
-              <div>
+              <div className="p-3">
                 <p>An error has occured. Please verify your input.</p>
                 <p>{withinErr}</p>
               </div>
@@ -634,9 +634,9 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
           </Form>
           <div id="refPlotDownload">
             {refErr && (
-              <div>
+              <div className="p-3">
                 <p>An error has occured. Please verify your input.</p>
-                <p className="text-danger">{refErr}</p>
+                <p>{refErr}</p>
               </div>
             )}
             {refPlotPath && (
@@ -785,8 +785,9 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
           </Form>
           <div id="pcPubPlot">
             {pubErr && (
-              <div>
+              <div className="p-3">
                 <p>An error has occured. Please verify your input.</p>
+                <p>{pubErr}</p>
               </div>
             )}
             {pubPlotPath && (
