@@ -1,6 +1,8 @@
 import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFolderMinus } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Debug from '../../controls/debug/debug';
@@ -38,30 +40,34 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
       <Form className="p-3">
         <LoadingOverlay active={loading} />
         <Row className="">
-          <Col lg="4">
+          <Col lg="3">
             <Group controlId="landscape">
               <Label>Upload Variable Data</Label>
-              <Form.File
-                id="variableData"
-                label={variableFile || 'Upload here (optional)'}
-                // accept=''
-                onChange={(e) => handleVariable(e.target.files[0])}
-                custom
-              />
+              <div className="d-flex">
+                <Form.File
+                  id="variableData"
+                  label={variableFile || 'Upload here (optional)'}
+                  // accept=''
+                  onChange={(e) => handleVariable(e.target.files[0])}
+                  custom
+                />
+                {variableFile && (
+                  <Button
+                    className="ml-1"
+                    size="sm"
+                    title="Remove"
+                    variant="danger"
+                    onClick={() => {
+                      handleVariable(new File([], ''));
+                    }}
+                  >
+                    <FontAwesomeIcon icon={faFolderMinus} size="2x" />
+                  </Button>
+                )}
+              </div>
             </Group>
           </Col>
-          <Col lg="1" className="d-flex justify-content-end">
-            <Button
-              className="mt-auto mb-3"
-              variant="secondary"
-              onClick={() => {
-                handleVariable(new File([], ''));
-              }}
-              disabled={!variableFile}
-            >
-              Remove
-            </Button>
-          </Col>
+
           <Col />
           <Col lg="2" className="d-flex">
             <Button
