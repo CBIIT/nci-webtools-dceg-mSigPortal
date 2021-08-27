@@ -13,9 +13,6 @@ RUN dnf -y update \
     nodejs \
     && dnf clean all
 
-# Add custom httpd configuration
-COPY docker/msigportal.conf /etc/httpd/conf.d/msigportal.conf
-
 RUN mkdir /client
 
 WORKDIR /client
@@ -28,6 +25,9 @@ COPY client /client/
 
 RUN npm run build \
     && mv /client/build /var/www/html/mutational-signatures
+
+# Add custom httpd configuration
+COPY docker/httpd-msigportal.conf /etc/httpd/conf.d/httpd-msigportal.conf
 
 WORKDIR /var/www/html
 
