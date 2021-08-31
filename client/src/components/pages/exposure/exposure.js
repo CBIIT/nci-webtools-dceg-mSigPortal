@@ -530,7 +530,7 @@ export default function Exposure({ match }) {
       source,
       study: 'PCAWG',
       strategy: 'WGS',
-      rsSet: 'COSMIC v3 Signatures (SBS)',
+      rsSet: 'COSMIC_v3_Signatures_GRCh37_SBS96',
       cancer: 'Lung-AdenoCA',
       studyOptions,
       strategyOptions,

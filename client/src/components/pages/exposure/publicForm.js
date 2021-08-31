@@ -95,7 +95,7 @@ export default function PublicForm({
           .map((row) => row.Signature_set_name)
       ),
     ];
-    const rsSet = 'COSMIC v3 Signatures (SBS)'; // default
+    const rsSet = 'COSMIC_v3_Signatures_GRCh37_SBS96'; // default
 
     const cancerOptions = [
       ...new Set(

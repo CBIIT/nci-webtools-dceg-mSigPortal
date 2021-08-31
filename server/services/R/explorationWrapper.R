@@ -264,12 +264,6 @@ mutationalSignatureComparison <- function(profileName, rsSet1, signatureName1, r
     plotPath = paste0(savePath, 'mutationalSignatureComparison.svg')
     txtPath = paste0(savePath, 'mutationalSignatureComparison.txt')
 
-    profile_name_input <- "SBS96" # profile type
-    signatureset_name1 <- "COSMIC v3 Signatures (SBS)"
-    signatureset_name2 <- "COSMIC v3 Signatures (SBS)"
-    signature_name1 <- "SBS1"
-    signature_name2 <- "SBS5"
-
     signature_refsets %>% filter(Profile == profileName) %>% pull(Signature_set_name) %>% unique()
     profile1 <- signature_refsets %>%
       filter(Profile == profileName, Signature_set_name == rsSet1) %>%
