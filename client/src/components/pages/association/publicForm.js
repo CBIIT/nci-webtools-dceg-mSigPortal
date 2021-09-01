@@ -115,7 +115,7 @@ export default function PublicForm() {
   }
 
   async function handleLoadData() {
-    const loadData = async () =>
+    const getAssocVarData = async () =>
       (
         await fetch(`api/associationData`, {
           method: 'POST',
@@ -124,7 +124,21 @@ export default function PublicForm() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            fn: 'loadData',
+            fn: 'getAssocVarData',
+            args: { study, cancer },
+          }),
+        })
+      ).json();
+    const getExpVarData = async () =>
+      (
+        await fetch(`api/associationData`, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            fn: 'getExpVarData',
             args: { study, strategy, rsSet, cancer },
           }),
         })
@@ -132,13 +146,15 @@ export default function PublicForm() {
 
     mergeState({ loadingData: true });
     try {
-      const [assocVarData, exposureVariableData] = await Promise.all([
-        getJSON(`Association/PCAWG_vardata.json`),
-        loadData(),
+      const [assocResponse, expResponse] = await Promise.all([
+        getAssocVarData(),
+        getExpVarData(),
       ]);
 
-      const { expVarList, error } = exposureVariableData;
-      if (error) throw error.message;
+      const { assocVarData, error: assocError } = assocResponse;
+      const { expVarList, error: expError } = expResponse;
+      if (assocError) throw assocError.message;
+      if (expError) throw expError.message;
 
       mergeState({
         assocVarData,

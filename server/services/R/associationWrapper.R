@@ -1,16 +1,34 @@
 library(tidyverse)
-# library(cowplot)
-# library(ggsci)
-# library(ggrepel)
-# library(ggforce)
-# library(ggtext)
-# library(ggpubr)
 library(jsonlite)
-# library(stringr)
 library(aws.s3)
 source('services/R/utils.R')
 
-loadData <- function(args, s3Data, localData, bucket) {
+getAssocVarData <- function(args, s3Data, localData, bucket) {
+  con <- textConnection('stdout', 'wr', local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
+
+  tryCatch({
+    output = list()
+
+    # update later to select RData from args$study
+    s3load(paste0(s3Data, 'Association/PCAWG_vardata.RData'), bucket)
+
+    assocVarData <- vardata_refdata %>% filter(Cancer_Type == args$cancer)
+
+
+    output = list(assocVarData = assocVarData)
+  }, error = function(e) {
+    print(e)
+    output <<- append(output, list(uncaught_error = paste0(deparse(e$call), ': ', e$message)))
+  }, finally = {
+    sink(con)
+    sink(con)
+    return(toJSON(append(output, list(stdout = stdout)), pretty = TRUE, auto_unbox = TRUE))
+  })
+}
+
+getExpVarData <- function(args, s3Data, localData, bucket) {
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
   sink(con, type = "output")
