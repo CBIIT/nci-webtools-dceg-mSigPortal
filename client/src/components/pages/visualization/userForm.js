@@ -262,6 +262,7 @@ export default function UserForm() {
 
   function selectFormat(format) {
     removeFile();
+    removeBedFile();
     let path = '';
     if (format == 'vcf') path = 'assets/exampleInput/demo_input_multi.vcf.gz';
     if (format == 'csv') path = 'assets/exampleInput/demo_input_multi.csv';
