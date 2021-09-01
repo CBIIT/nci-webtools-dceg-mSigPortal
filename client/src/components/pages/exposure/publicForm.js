@@ -207,11 +207,12 @@ export default function PublicForm({
     }
   }
 
-  //   get signature and sample names. useEffect will call main calculate function
+  //  get signature and sample names. useEffect will call main calculate function
   async function handleCalculate() {
     mergeState({ loading: true });
     await Promise.all([getSampleNames(), getSignatureNames()]);
     mergeState({ loading: false });
+    // set to true after sample and signature names have been dispatched
     setQuery(true);
   }
 

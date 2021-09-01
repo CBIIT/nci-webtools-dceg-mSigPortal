@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolderMinus } from '@fortawesome/free-solid-svg-icons';
@@ -32,6 +32,7 @@ export default function PublicForm({
     usePublicSignature,
     genome,
     genomeOptions,
+    projectID,
   } = useSelector((state) => state.exposure.exposureState);
 
   const [exposureFileObj, setExposure] = useState(new File([], ''));
@@ -39,6 +40,13 @@ export default function PublicForm({
   const [signatureFileObj, setSignature] = useState(new File([], ''));
 
   const [checkValid, setCheckValid] = useState(false);
+
+  const [queryNames, setQuery] = useState(false);
+
+  // call calculate after receiving signature and sample name options
+  useEffect(() => {
+    if (!submitted && queryNames) calculate('all', projectID);
+  }, [queryNames, submitted]);
 
   function validateFiles() {
     setCheckValid(true);
@@ -99,34 +107,35 @@ export default function PublicForm({
     });
   }
 
+  //  get signature and sample names. useEffect will call main calculate function
   async function handleCalculate() {
     try {
       const { projectID, exposureData } = await handleUpload();
       // get signature name options, ignore sample key
-      const nameOptions = exposureData.columns.filter(
+      const nameOptions = Object.keys(exposureData[0]).filter(
         (key) => key != 'Samples'
       );
-
       const sampleOptions = [
         ...new Set(exposureData.map(({ Samples }) => Samples)),
       ];
 
-      const params = {
-        exposureState: {
-          projectID: projectID,
-          userNameOptions: nameOptions,
-          userSampleOptions: sampleOptions,
-        },
-        msIndividual: { sample: sampleOptions[0] },
-        msAssociation: {
-          signatureName1: nameOptions[0],
-          signatureName2: nameOptions[1],
-        },
-        msBurden: { signatureName: nameOptions[0] },
-      };
-
-      await dispatch(actions.mergeExposure(params));
-      await calculate('all', projectID, params);
+      dispatch(
+        actions.mergeExposure({
+          exposureState: {
+            projectID: projectID,
+            userNameOptions: nameOptions,
+            userSampleOptions: sampleOptions,
+          },
+          msIndividual: { sample: sampleOptions[0] },
+          msAssociation: {
+            signatureName1: nameOptions[0],
+            signatureName2: nameOptions[1],
+          },
+          msBurden: { signatureName: nameOptions[0] },
+        })
+      );
+      // set to true after sample and signature names have been dispatched
+      setQuery(true);
     } catch (err) {
       mergeError(err);
     }
@@ -330,6 +339,7 @@ export default function PublicForm({
               setExposure(new File([], ''));
               setMatrix(new File([], ''));
               setSignature(new File([], ''));
+              setQuery(false);
               handleReset();
             }}
           >
