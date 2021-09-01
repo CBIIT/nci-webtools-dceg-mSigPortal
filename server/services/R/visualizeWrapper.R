@@ -64,9 +64,7 @@ profilerSummary <- function(matrixList, projectID, pythonOutput, savePath, s3Dat
     output = list()
     plotPath = paste0(savePath, 'profilerSummary.svg')
 
-    matrixJSON = fromJSON(matrixList)
-    matrixList = data.frame(matrixJSON$data)
-    colnames(matrixList) = matrixJSON$columns
+    matrixList = fromJSON(matrixList)
 
     data_input <- tibble()
 

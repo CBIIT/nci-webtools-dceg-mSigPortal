@@ -10,17 +10,9 @@ const {
   profilerExtraction,
   parseCSV,
   getRelativePath,
-  to2dArray,
 } = require('./controllers');
 
-const {
-  value2d,
-  filter2d,
-  unique2d,
-  defaultProfile,
-  defaultMatrix,
-  defaultFilter,
-} = require('./utils');
+const { defaultProfile, defaultMatrix, defaultFilter } = require('./utils');
 
 (async function main() {
   // update aws configuration if all keys are supplied, otherwise
@@ -147,12 +139,11 @@ async function processMessage(params) {
     if (!fs.existsSync(svgPath))
       throw `svg file list does not exist at ${svgPath}`;
 
-    let matrixList = to2dArray(await parseCSV(matrixPath));
+    let matrixList = await parseCSV(matrixPath);
     let svgList = await parseCSV(svgPath);
     svgList.forEach(
       (plot) => (plot.Path = getRelativePath({ Path: plot.Path }, id).Path)
     );
-    svgList = to2dArray(svgList);
 
     let newState = {
       ...visualizationStore,
@@ -165,39 +156,46 @@ async function processMessage(params) {
 
     // get dropdown options
     // Mutational Profiles
-    const nameOptions = unique2d('Sample_Name', svgList.columns, svgList.data);
+    const nameOptions = [
+      ...new Set(svgList.map(({ Sample_Name }) => Sample_Name)),
+    ];
     const selectName = nameOptions[0];
-    const filteredPlots = filter2d(selectName, svgList.data);
-
-    const filteredProfileOptions = unique2d(
-      'Profile_Type',
-      svgList.columns,
-      filteredPlots
+    const filteredPlots = svgList.filter(
+      (row) => row.Sample_Name == selectName
     );
 
+    const filteredProfileOptions = [
+      ...new Set(filteredPlots.map(({ Profile_Type }) => Profile_Type)),
+    ];
     const profile = defaultProfile(filteredProfileOptions);
 
-    const filteredMatrixOptions = unique2d(
-      'Matrix_Size',
-      svgList.columns,
-      filter2d(profile, filteredPlots)
-    );
+    const filteredMatrixOptions = [
+      ...new Set(
+        filteredPlots
+          .filter((row) => row.Profile_Type == profile)
+          .map(({ Matrix_Size }) => Matrix_Size)
+      ),
+    ];
 
     const matrix = defaultMatrix(profile, filteredMatrixOptions);
 
-    const filteredFilterOptions = unique2d(
-      'Filter',
-      svgList.columns,
-      filter2d(matrix, filteredPlots)
-    );
+    const filteredFilterOptions = [
+      ...new Set(
+        filteredPlots
+          .filter((row) => row.Matrix_Size == matrix)
+          .map(({ Filter }) => Filter)
+      ),
+    ];
 
     const filter = defaultFilter(filteredFilterOptions);
 
-    const filteredMatrixList = unique2d(
-      'Matrix_Size',
-      matrixList.columns,
-      filter2d(profile, matrixList.data)
-    );
+    const filteredMatrixList = [
+      ...new Set(
+        matrixList
+          .filter((row) => row.Profile_Type == profile)
+          .map(({ Matrix_Size }) => Matrix_Size)
+      ),
+    ];
 
     newState = {
       ...newState,
@@ -218,22 +216,13 @@ async function processMessage(params) {
     // Cosine Similarity - Profile Comparison - PCA - Kataegis
     const sampleNameOptions = [
       ...new Set(
-        svgList.data.map((row) => {
-          if (value2d(row, 'Filter', svgList.columns) != 'NA')
-            return `${value2d(row, 'Sample_Name', svgList.columns)}@${value2d(
-              row,
-              'Filter',
-              svgList.columns
-            )}`;
-          else return value2d(row, 'Sample_Name', svgList.columns);
+        svgList.map((row) => {
+          if (row.Filter != 'NA') return `${row.Sample_Name}@${row.Filter}`;
+          else return row.Sample_Name;
         })
       ),
     ];
-    const profileOptions = unique2d(
-      'Profile_Type',
-      svgList.columns,
-      svgList.data
-    );
+    const profileOptions = [...new Set(svgList.map((row) => row.Profile_Type))];
 
     const selectProfile = defaultProfile(profileOptions);
     const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);
@@ -335,11 +324,11 @@ async function processMessage(params) {
         'services/R/visualizeWrapper.R',
         'cosineSimilarityWithin',
         {
-          matrixFile: value2d(
-            filter2d([selectProfile, selectMatrix], matrixList.data)[0],
-            'Path',
-            matrixList.columns
-          ),
+          matrixFile: matrixList.filter(
+            (row) =>
+              row.Profile_Type == selectProfile &&
+              row.Matrix_Size == selectMatrix
+          )[0].Path,
           savePath: csWithinPath,
           ...dataArgs,
           ...calcArgs,
@@ -369,14 +358,12 @@ async function processMessage(params) {
         {
           profileType: selectProfile,
           signatureSet: refSignatureSetOptions[0],
-          matrixFile: value2d(
-            filter2d(
-              [selectProfile, defaultMatrix(selectProfile, ['96', '78', '83'])],
-              matrixList.data
-            )[0],
-            'Path',
-            matrixList.columns
-          ),
+          matrixFile: matrixList.filter(
+            (row) =>
+              row.Profile_Type == selectProfile &&
+              row.Matrix_Size ==
+                defaultMatrix(selectProfile, ['96', '78', '83'])
+          )[0].Path,
           savePath: csRefPath,
           ...dataArgs,
           ...calcArgs,
@@ -408,11 +395,11 @@ async function processMessage(params) {
         'services/R/visualizeWrapper.R',
         'cosineSimilarityPublic',
         {
-          matrixFile: value2d(
-            filter2d([selectProfile, selectMatrix], matrixList.data)[0],
-            'Path',
-            matrixList.columns
-          ),
+          matrixFile: matrixList.filter(
+            (row) =>
+              row.Profile_Type == selectProfile &&
+              row.Matrix_Size == selectMatrix
+          )[0].Path,
           study: 'PCAWG',
           cancerType: 'Lung-AdenoCA',
           profileName: selectProfile + selectMatrix,
@@ -444,11 +431,9 @@ async function processMessage(params) {
         'services/R/visualizeWrapper.R',
         'mutationalPattern',
         {
-          matrixFile: value2d(
-            filter2d(['SBS', '96'], matrixList.data)[0],
-            'Path',
-            matrixList.columns
-          ),
+          matrixFile: matrixList.filter(
+            (row) => row.Profile_Type == 'SBS' && row.Matrix_Size == '96'
+          )[0].Path,
           proportion: parseFloat(0.8),
           pattern: 'NCG>NTG',
           savePath: mpPath,
@@ -484,14 +469,12 @@ async function processMessage(params) {
           profileType: selectProfile,
           sampleName1: sampleNameOptions[0],
           sampleName2: sampleNameOptions[1],
-          matrixFile: value2d(
-            filter2d(
-              [selectProfile, defaultMatrix(selectProfile, ['96', '78', '83'])],
-              matrixList.data
-            )[0],
-            'Path',
-            matrixList.columns
-          ),
+          matrixFile: matrixList.filter(
+            (row) =>
+              row.Profile_Type == selectProfile &&
+              row.Matrix_Size ==
+                defaultMatrix(selectProfile, ['96', '78', '83'])
+          )[0].Path,
           savePath: pcWithinPath,
           ...dataArgs,
           ...calcArgs,
@@ -526,14 +509,12 @@ async function processMessage(params) {
           sampleName: sampleNameOptions[0],
           signatureSet: refSignatureSetOptions[0],
           compare: 'SBS1',
-          matrixFile: value2d(
-            filter2d(
-              [selectProfile, defaultMatrix(selectProfile, ['96', '78', '83'])],
-              matrixList.data
-            )[0],
-            'Path',
-            matrixList.columns
-          ),
+          matrixFile: matrixList.filter(
+            (row) =>
+              row.Profile_Type == selectProfile &&
+              row.Matrix_Size ==
+                defaultMatrix(selectProfile, ['96', '78', '83'])
+          )[0].Path,
           savePath: pcRefPath,
           ...dataArgs,
           ...calcArgs,
@@ -565,11 +546,11 @@ async function processMessage(params) {
         'profileComparisonPublic',
         {
           profileName: selectProfile + selectMatrix,
-          matrixFile: value2d(
-            filter2d([selectProfile, selectMatrix], matrixList.data)[0],
-            'Path',
-            matrixList.columns
-          ),
+          matrixFile: matrixList.filter(
+            (row) =>
+              row.Profile_Type == selectProfile &&
+              row.Matrix_Size == selectMatrix
+          )[0].Path,
           userSample: sampleNameOptions[0],
           study: 'PCAWG',
           cancerType: 'Lung-AdenoCA',
@@ -600,14 +581,11 @@ async function processMessage(params) {
       const pca = await r('services/R/visualizeWrapper.R', 'pca', {
         profileType: selectProfile,
         signatureSet: refSignatureSetOptions[0],
-        matrixFile: value2d(
-          filter2d(
-            [selectProfile, defaultMatrix(selectProfile, ['96', '78', '83'])],
-            matrixList.data
-          )[0],
-          'Path',
-          matrixList.columns
-        ),
+        matrixFile: matrixList.filter(
+          (row) =>
+            row.Profile_Type == selectProfile &&
+            row.Matrix_Size == defaultMatrix(selectProfile, ['96', '78', '83'])
+        )[0].Path,
         savePath: pcaPath,
         ...dataArgs,
         ...calcArgs,
@@ -634,11 +612,11 @@ async function processMessage(params) {
         'services/R/visualizeWrapper.R',
         'pcaWithPublic',
         {
-          matrixFile: value2d(
-            filter2d([selectProfile, selectMatrix], matrixList.data)[0],
-            'Path',
-            matrixList.columns
-          ),
+          matrixFile: matrixList.filter(
+            (row) =>
+              row.Profile_Type == selectProfile &&
+              row.Matrix_Size == selectMatrix
+          )[0].Path,
           study: 'PCAWG',
           cancerType: 'Lung-AdenoCA',
           profileName: selectProfile + selectMatrix,

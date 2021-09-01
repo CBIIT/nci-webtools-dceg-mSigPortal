@@ -21,9 +21,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
 import {
-  value2d,
-  filter2d,
-  unique2d,
   defaultProfile,
   defaultMatrix,
   defaultFilter,
@@ -142,39 +139,33 @@ export default function Visualization({ match }) {
     });
 
     // Mutational Profiles
-    const nameOptions = unique2d('Sample_Name', svgList.columns, svgList.data);
+    const nameOptions = [...new Set(svgList.map((d) => d.Sample_Name))];
     const selectName = nameOptions[0];
-    const filteredPlots = filter2d(selectName, svgList.data);
-
-    const filteredProfileOptions = unique2d(
-      'Profile_Type',
-      svgList.columns,
-      filteredPlots
+    const filteredPlots = svgList.filter(
+      (row) => row.Sample_Name == selectName
     );
+
+    const filteredProfileOptions = [
+      ...new Set(filteredPlots.map((row) => row.Profile_Type)),
+    ];
 
     const profile = defaultProfile(filteredProfileOptions);
 
-    const filteredMatrixOptions = unique2d(
-      'Matrix_Size',
-      svgList.columns,
-      filter2d(profile, filteredPlots)
-    );
+    const filteredMatrixOptions = [
+      ...new Set(filteredPlots.map((row) => row.Matrix_Size)),
+    ];
 
     const matrix = defaultMatrix(profile, filteredMatrixOptions);
 
-    const filteredFilterOptions = unique2d(
-      'Filter',
-      svgList.columns,
-      filter2d(matrix, filteredPlots)
-    );
+    const filteredFilterOptions = [
+      ...new Set(filteredPlots.map((row) => row.Filter)),
+    ];
 
     const filter = defaultFilter(filteredFilterOptions);
 
-    const filteredMatrixList = unique2d(
-      'Matrix_Size',
-      matrixList.columns,
-      filter2d(profile, matrixList.data)
-    );
+    const filteredMatrixList = [
+      ...new Set(matrixList.map((row) => row.Matrix_Size)),
+    ];
 
     mergeMutationalProfiles({
       filtered: filteredPlots,
@@ -191,22 +182,13 @@ export default function Visualization({ match }) {
     // Cosine Similarity - Profile Comparison - PCA - Kataegis
     const sampleNameOptions = [
       ...new Set(
-        svgList.data.map((row) => {
-          if (value2d(row, 'Filter', svgList.columns) != 'NA')
-            return `${value2d(row, 'Sample_Name', svgList.columns)}@${value2d(
-              row,
-              'Filter',
-              svgList.columns
-            )}`;
-          else return value2d(row, 'Sample_Name', svgList.columns);
+        svgList.map((row) => {
+          if (row.Filter != 'NA') return `${row.Sample_Name}@${row.Filter}`;
+          else return row.Sample_Name;
         })
       ),
     ];
-    const profileOptions = unique2d(
-      'Profile_Type',
-      svgList.columns,
-      svgList.data
-    );
+    const profileOptions = [...new Set(svgList.map((row) => row.Profile_Type))];
 
     const selectProfile = defaultProfile(profileOptions);
     const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);
@@ -275,51 +257,39 @@ export default function Visualization({ match }) {
     });
 
     // Mutational Profiles
-    const nameOptions = unique2d('Sample', svgList.columns, svgList.data);
+    const nameOptions = [...new Set(svgList.map((row) => row.Sample))];
     const selectName = mutationalProfiles.selectName || nameOptions[0];
     const profileOptions = [
-      ...new Set(
-        svgList.data.map(
-          (row) => value2d(row, 'Profile', svgList.columns).match(/[a-z]+/gi)[0]
-        )
-      ),
+      ...new Set(svgList.map((row) => row.Profile.match(/[a-z]+/gi)[0])),
     ];
     const profile = defaultProfile(profileOptions);
     const matrixOptions = [
-      ...new Set(
-        svgList.data.map(
-          (row) => value2d(row, 'Profile', svgList.columns).match(/\d+/gi)[0]
-        )
-      ),
+      ...new Set(svgList.map((row) => row.Profile.match(/\d+/gi)[0])),
     ];
     const matrix = defaultMatrix(profile, matrixOptions);
     const filterOptions = ['NA'];
     const selectFilter = filterOptions[0];
 
-    const filteredPlots = filter2d(
-      [selectName, `${profile + matrix}`],
-      svgList.data
+    const filteredPlots = svgList.filter(
+      (row) => row.Sample == selectName && row.Profile == profile + matrix
     );
 
     const filteredProfileOptions = [
       ...new Set(
-        filter2d(selectName, svgList.data).map(
-          (row) => value2d(row, 'Profile', svgList.columns).match(/[a-z]+/gi)[0]
-        )
+        svgList
+          .filter((row) => row.Sample == selectName)
+          .map(({ Profile }) => Profile.match(/[a-z]+/gi)[0])
       ),
     ].sort();
 
     const filteredMatrixOptions = [
       ...new Set(
-        svgList.data
+        svgList
           .filter(
             (row) =>
-              row.includes(selectName) &&
-              value2d(row, 'Profile', svgList.columns).indexOf(profile) > -1
+              row.Sample == selectName && row.Profile.indexOf(profile) > -1
           )
-          .map(
-            (row) => value2d(row, 'Profile', svgList.columns).match(/\d+/gi)[0]
-          )
+          .map(({ Profile }) => Profile.match(/\d+/gi)[0])
       ),
     ].sort((a, b) => a - b);
 

@@ -6,12 +6,7 @@ import Select from '../../controls/select/select';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
-import {
-  value2d,
-  filter2d,
-  unique2d,
-  defaultMatrix,
-} from '../../../services/utils';
+import { defaultMatrix } from '../../../services/utils';
 
 const actions = { ...visualizationActions, ...modalActions };
 
@@ -76,14 +71,9 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
       if (source == 'user') {
         const samples = [
           ...new Set(
-            svgList.data.map((row) => {
-              if (value2d('Filter', row, svgList.columns) != 'NA')
-                return `${value2d(
-                  row,
-                  'Sample_Name',
-                  svgList.columns
-                )}@${value2d(row, 'Filter', svgList.columns)}`;
-              else return value2d(row, 'Sample_Name', svgList.columns);
+            svgList.map((row) => {
+              if (row.Filter != 'NA') return `${row.Sample_Name}@${row.Filter}`;
+              else return row.Sample_Name;
             })
           ),
         ];
@@ -169,11 +159,13 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
 
   function handleWithinProfileType(profileType) {
     if (source == 'user') {
-      const withinMatrixOptions = unique2d(
-        'Matrix_Size',
-        matrixList.columns,
-        filter2d(profileType, matrixList.data)
-      );
+      const withinMatrixOptions = [
+        ...new Set(
+          matrixList
+            .filter((row) => row.Profile_Type == profileType)
+            .map((row) => row.Matrix_Size)
+        ),
+      ].sort((a, b) => a - b);
 
       mergeCosineSimilarity({
         withinProfileType: profileType,
@@ -183,9 +175,9 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
     } else {
       const withinMatrixOptions = [
         ...new Set(
-          filter2d(profileType, svgList.data).map(
-            (row) => value2d(row, 'Profile', svgList.columns).match(/\d+/gi)[0]
-          )
+          svgList
+            .filter((row) => row.Profile.includes(profileType))
+            .map((row) => row.Profile.match(/\d+/gi)[0])
         ),
       ].sort((a, b) => a - b);
 
@@ -198,11 +190,13 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
   }
 
   function handlePublicProfileType(profileType) {
-    const userMatrixOptions = unique2d(
-      'Matrix_Size',
-      matrixList.columns,
-      filter2d(profileType, matrixList.data)
-    );
+    const userMatrixOptions = [
+      ...new Set(
+        matrixList
+          .filter((row) => row.Profile_Type == profileType)
+          .map((row) => row.Matrix_Size)
+      ),
+    ].sort((a, b) => a - b);
 
     mergeCosineSimilarity({
       userProfileType: profileType,
@@ -293,14 +287,11 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   onClick={() => {
                     if (source == 'user') {
                       calculateR('within', 'cosineSimilarityWithin', {
-                        matrixFile: value2d(
-                          filter2d(
-                            [withinProfileType, withinMatrixSize],
-                            matrixList.data
-                          )[0],
-                          'Path',
-                          matrixList.columns
-                        ),
+                        matrixFile: matrixList.filter(
+                          (row) =>
+                            row.Profile_Type == withinProfileType &&
+                            row.Matrix_Size == withinMatrixSize
+                        )[0].Path,
                       });
                     } else {
                       calculateR('within', 'cosineSimilarityWithinPublic', {
@@ -403,17 +394,12 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                       calculateR('ref', 'cosineSimilarityRefSig', {
                         profileType: refProfileType,
                         signatureSet: refSignatureSet,
-                        matrixFile: value2d(
-                          filter2d(
-                            [
-                              refProfileType,
-                              defaultMatrix(refProfileType, ['96', '78', '83']),
-                            ],
-                            matrixList.data
-                          )[0],
-                          'Path',
-                          matrixList.columns
-                        ),
+                        matrixFile: matrixList.filter(
+                          (row) =>
+                            row.Profile_Type == refProfileType &&
+                            row.Matrix_Size ==
+                              defaultMatrix(refProfileType, ['96', '78', '83'])
+                        )[0].Path,
                       });
                     } else {
                       calculateR('ref', 'cosineSimilarityRefSigPublic', {
@@ -523,14 +509,11 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   variant="primary"
                   onClick={() =>
                     calculateR('pub', 'cosineSimilarityPublic', {
-                      matrixFile: value2d(
-                        filter2d(
-                          [userProfileType, userMatrixSize],
-                          matrixList.data
-                        )[0],
-                        'Path',
-                        matrixList.columns
-                      ),
+                      matrixFile: matrixList.filter(
+                        (row) =>
+                          row.Profile_Type == userProfileType &&
+                          row.Matrix_Size == userMatrixSize
+                      )[0].Path,
                       study: pubStudy,
                       cancerType: pubCancerType,
                       profileName: userProfileType + userMatrixSize,

@@ -38,15 +38,6 @@ function parseCSV(filepath) {
   });
 }
 
-// convert array of objects into 2d array
-function to2dArray(list) {
-  if (list)
-    return {
-      columns: Object.keys(list[0]),
-      data: list.map((obj) => Object.values(obj)),
-    };
-}
-
 // retrieves parsed data files - modify paths if needed
 async function getResultsFiles(resultsPath, id = '') {
   const svgListPath = path.join(resultsPath, 'svg_files_list.txt');
@@ -88,9 +79,9 @@ async function getResultsFiles(resultsPath, id = '') {
   );
 
   return {
-    svgList: to2dArray(svgList),
+    svgList: svgList,
     statistics: statistics,
-    matrixList: to2dArray(matrixList),
+    matrixList: matrixList,
     downloads: downloads,
   };
 }
@@ -262,7 +253,7 @@ async function getSignaturesUser(req, res, next) {
     logger.debug(file);
     if (file.indexOf(path.resolve(config.results.folder)) == 0) {
       const data = await parseCSV(file);
-      res.json(to2dArray(data));
+      res.json(data);
     } else {
       logger.info('traversal error');
       res.status(500).end('Not found');
@@ -296,7 +287,7 @@ async function getPublicData(req, res, next) {
     // fs.writeFileSync(path.join(savePath, `svglist.json`), list);
 
     res.json({
-      svgList: to2dArray(svgList),
+      svgList: svgList,
       projectID: projectID,
     });
   } catch (err) {
@@ -839,7 +830,6 @@ module.exports = {
   getPublications,
   getImageS3,
   getFileS3,
-  to2dArray,
   getRelativePath,
   downloadSession,
   associationCalc,
