@@ -17,12 +17,7 @@ import Select from '../../controls/select/select';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
-import {
-  value2d,
-  filter2d,
-  unique2d,
-  defaultMatrix,
-} from '../../../services/utils';
+import { defaultMatrix } from '../../../services/utils';
 
 const actions = { ...visualizationActions, ...modalActions };
 const { Group, Label, Control, Text } = Form;
@@ -292,11 +287,12 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
 
       if (response.ok) {
         const { svgList } = await response.json();
-        const pubSamples = unique2d('Sample', svgList.columns, svgList.data);
+        const pubSamples = [...new Set(svgList.map(({ Sample }) => Sample))];
 
         mergeProfileComparison({
           pubSampleOptions: pubSamples,
           pubSampleName: pubSamples[0],
+          pubErr: false,
         });
       } else {
         mergeProfileComparison({
@@ -339,11 +335,13 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
   }
 
   function handleProfile(profile) {
-    const matrixOptions = unique2d(
-      'Matrix_Size',
-      svgList.columns,
-      filter2d(profile, svgList.data)
-    );
+    const matrixOptions = [
+      ...new Set(
+        svgList
+          .filter((row) => row.Profile_Type == profile)
+          .map(({ Matrix_Size }) => Matrix_Size)
+      ),
+    ];
 
     mergeProfileComparison({
       userProfileType: profile,
@@ -421,21 +419,16 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                         profileType: withinProfileType,
                         sampleName1: withinSampleName1,
                         sampleName2: withinSampleName2,
-                        matrixFile: value2d(
-                          filter2d(
-                            [
-                              withinProfileType,
+                        matrixFile: matrixList.filter(
+                          (row) =>
+                            row.Profile_Type == withinProfileType &&
+                            row.Matrix_Size ==
                               defaultMatrix(withinProfileType, [
                                 '96',
                                 '78',
                                 '83',
-                              ]),
-                            ],
-                            matrixList.data
-                          )[0],
-                          'Path',
-                          matrixList.columns
-                        ),
+                              ])
+                        )[0].Path,
                       });
                     } else {
                       calculateR('within', 'profileComparisonWithinPublic', {
@@ -598,21 +591,16 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                         sampleName: refSampleName,
                         signatureSet: refSignatureSet,
                         compare: refCompare,
-                        matrixFile: value2d(
-                          filter2d(
-                            [
-                              withinProfileType,
+                        matrixFile: matrixList.filter(
+                          (row) =>
+                            row.Profile_Type == withinProfileType &&
+                            row.Matrix_Size ==
                               defaultMatrix(withinProfileType, [
                                 '96',
                                 '78',
                                 '83',
-                              ]),
-                            ],
-                            matrixList.data
-                          )[0],
-                          'Path',
-                          matrixList.columns
-                        ),
+                              ])
+                        )[0].Path,
                       });
                     } else {
                       calculateR('ref', 'profileComparisonRefSigPublic', {
@@ -730,14 +718,11 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   onClick={() =>
                     calculateR('pub', 'profileComparisonPublic', {
                       profileName: userProfileType + userMatrixSize,
-                      matrixFile: value2d(
-                        filter2d(
-                          [userProfileType, userMatrixSize],
-                          matrixList.data
-                        )[0],
-                        'Path',
-                        matrixList.columns
-                      ),
+                      matrixFile: matrixList.filter(
+                        (row) =>
+                          row.Profile_Type == userProfileType &&
+                          row.Matrix_Size == userMatrixSize
+                      )[0].Path,
                       userSample: userSampleName,
                       study: pubStudy,
                       cancerType: pubCancerType,
@@ -785,8 +770,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
           </Form>
           <div id="pcPubPlot">
             {pubErr && (
-              <div className="p-3">
-                <p>An error has occured. Please verify your input.</p>
+              <div>
                 <p>{pubErr}</p>
               </div>
             )}

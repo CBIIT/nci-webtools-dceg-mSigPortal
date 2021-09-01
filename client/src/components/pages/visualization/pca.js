@@ -7,12 +7,7 @@ import Select from '../../controls/select/select';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
-import {
-  value2d,
-  filter2d,
-  unique2d,
-  defaultMatrix,
-} from '../../../services/utils';
+import { defaultMatrix } from '../../../services/utils';
 
 const actions = { ...visualizationActions, ...modalActions };
 const { Container, Content, Pane } = Tab;
@@ -76,14 +71,9 @@ export default function PCA({ submitR, getRefSigOptions }) {
       if (source == 'user') {
         const samples = [
           ...new Set(
-            svgList.data.map((row) => {
-              if (value2d(row, 'Filter', svgList.columns) != 'NA')
-                return `${value2d(
-                  row,
-                  'Sample_Name',
-                  svgList.columns
-                )}@${value2d(row, 'Filter', svgList.columns)}`;
-              else return value2d(row, 'Sample_Name', svgList.columns);
+            svgList.map((row) => {
+              if (row.Filter != 'NA') return `${row.Sample_Name}@${row.Filter}`;
+              else return row.Sample_Name;
             })
           ),
         ];
@@ -201,11 +191,13 @@ export default function PCA({ submitR, getRefSigOptions }) {
   }
 
   function handleProfileType(profileType) {
-    const userMatrixOptions = unique2d(
-      'Matrix_Size',
-      matrixList.columns,
-      filter2d(profileType, matrixList.data)
-    );
+    const userMatrixOptions = [
+      ...new Set(
+        svgList
+          .filter((plot) => plot.Profile_Type == profileType)
+          .map((plot) => plot.Matrix_Size)
+      ),
+    ].sort((a, b) => a - b);
 
     mergePCA({
       userProfileType: profileType,
@@ -283,17 +275,12 @@ export default function PCA({ submitR, getRefSigOptions }) {
                       calculateR('within', 'pca', {
                         profileType: profileType,
                         signatureSet: signatureSet,
-                        matrixFile: value2d(
-                          filter2d(
-                            [
-                              profileType,
-                              defaultMatrix(profileType, ['96', '78', '83']),
-                            ],
-                            matrixList.data
-                          )[0],
-                          'Path',
-                          matrixList.columns
-                        ),
+                        matrixFile: matrixList.filter(
+                          (row) =>
+                            row.Profile_Type == profileType &&
+                            row.Matrix_Size ==
+                              defaultMatrix(profileType, ['96', '78', '83'])
+                        )[0].Path,
                       });
                     } else {
                       calculateR('within', 'pcaPublic', {
@@ -459,14 +446,11 @@ export default function PCA({ submitR, getRefSigOptions }) {
                   variant="primary"
                   onClick={() =>
                     calculateR('pub', 'pcaWithPublic', {
-                      matrixFile: value2d(
-                        filter2d(
-                          [userProfileType, userMatrixSize],
-                          matrixList.data
-                        )[0],
-                        'Path',
-                        matrixList.columns
-                      ),
+                      matrixFile: matrixList.filter(
+                        (row) =>
+                          row.Profile_Type == userProfileType &&
+                          row.Matrix_Size == userMatrixSize
+                      )[0].Path,
                       study: pubStudy,
                       cancerType: pubCancerType,
                       profileName: userProfileType + userMatrixSize,

@@ -7,9 +7,6 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
 import {
-  value2d,
-  filter2d,
-  unique2d,
   defaultProfile,
   defaultMatrix,
   defaultFilter,
@@ -61,16 +58,8 @@ export default function MutationalProfiles() {
     if (filtered.length) {
       const plot = filtered[0];
       if (source == 'user')
-        return `${value2d(plot, 'Sample_Name', columns)}-${value2d(
-          'Profile_Type',
-          plot,
-          columns
-        )}-${value2d(plot, 'Matrix_Size', columns)}-${value2d(
-          'Filter',
-          plot,
-          columns
-        )}.svg`;
-      else return value2d(plot, 'Sample', columns).split('/').slice(-1)[0];
+        return `${plot.Sample_Name}-${plot.Profile_Type}-${plot.Matrix_Size}-${plot.Filter}.svg`;
+      else return plot.Sample.split('/').slice(-1)[0];
     } else return '';
   }
 
@@ -82,16 +71,14 @@ export default function MutationalProfiles() {
       try {
         const response =
           source == 'user'
-            ? await fetch(
-                `api/results/${projectID}/${value2d(plot, 'Path', columns)}`
-              )
+            ? await fetch(`api/results/${projectID}/${plot.Path}`)
             : await fetch(`api/getImageS3`, {
                 method: 'POST',
                 headers: {
                   Accept: 'image/svg',
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ path: value2d(plot, 'Path', columns) }),
+                body: JSON.stringify({ path: plot.Path }),
               });
 
         if (!response.ok) {
@@ -117,20 +104,28 @@ export default function MutationalProfiles() {
 
   function handleSample(name) {
     if (source == 'user') {
-      const filteredPlots = filter2d(name, svgList.data);
-      const profileOptions = unique2d('Profile_Type', columns, filteredPlots);
+      const filteredPlots = svgList.filter((row) => row.Sample_Name == name);
+      const profileOptions = [
+        ...new Set(filteredPlots.map(({ Profile_Type }) => Profile_Type)),
+      ];
       const profile = defaultProfile(profileOptions);
-      const matrixOptions = unique2d(
-        'Matrix_Size',
-        columns,
-        filter2d(profile, filteredPlots)
-      );
+      const matrixOptions = [
+        ...new Set(
+          filteredPlots
+            .filter((row) => row.Profile_Type == profile)
+            .map((row) => row.Matrix_Size)
+        ),
+      ];
       const matrix = defaultMatrix(profile, matrixOptions);
-      const filterOptions = unique2d(
-        'Filter',
-        columns,
-        filter2d(matrix, filteredPlots)
-      );
+      const filterOptions = [
+        ...new Set(
+          filteredPlots
+            .filter(
+              (row) => row.Matrix_Size == matrix && row.Profile_Type == profile
+            )
+            .map((row) => row.Filter)
+        ),
+      ];
 
       mergeMutationalProfiles({
         selectName: name,
@@ -143,20 +138,18 @@ export default function MutationalProfiles() {
         filtered: filteredPlots,
       });
     } else {
-      const filteredPlots = filter2d(name, svgList.data);
+      const filteredPlots = svgList.filter((row) => row.Sample == name);
       const profileOptions = [
         ...new Set(
-          filteredPlots.map(
-            (row) => value2d(row, 'Profile', columns).match(/[a-z]+/gi)[0]
-          )
+          filteredPlots.map((row) => row.Profile.match(/[a-z]+/gi)[0])
         ),
       ];
       const profile = defaultProfile(profileOptions);
       const matrixOptions = [
         ...new Set(
           filteredPlots
-            .filter((row) => value2d(row, 'Profile', columns).includes(profile))
-            .map((row) => value2d(row, 'Profile', columns).match(/\d+/gi)[0])
+            .filter((row) => row.Profile.includes(profile))
+            .map((row) => row.Profile.match(/\d+/gi)[0])
         ),
       ];
 
@@ -175,14 +168,20 @@ export default function MutationalProfiles() {
 
   function handleProfile(profile) {
     if (source == 'user') {
-      const filteredPlots = filter2d([selectName, profile], svgList.data);
-      const matrixOptions = unique2d('Matrix_Size', columns, filteredPlots);
-      const matrix = defaultMatrix(profile, matrixOptions);
-      const filterOptions = unique2d(
-        'Filter',
-        columns,
-        filter2d(matrix, filteredPlots)
+      const filteredPlots = svgList.filter(
+        (row) => row.Sample_Name == selectName && row.Profile_Type == profile
       );
+      const matrixOptions = [
+        ...new Set(filteredPlots.map((row) => row.Matrix_Size)),
+      ];
+      const matrix = defaultMatrix(profile, matrixOptions);
+      const filterOptions = [
+        ...new Set(
+          filteredPlots
+            .filter((row) => row.Matrix_Size == matrix)
+            .map((row) => row.Filter)
+        ),
+      ];
 
       mergeMutationalProfiles({
         selectProfile: profile,
@@ -193,19 +192,13 @@ export default function MutationalProfiles() {
         filtered: filteredPlots,
       });
     } else {
-      const filteredPlots = svgList.data.filter(
-        (row) =>
-          row.includes(selectName) &&
-          value2d(row, 'Profile', columns).indexOf(profile) > -1
+      const filteredPlots = svgList.filter(
+        (row) => row.Sample == selectName && row.Profile.indexOf(profile) > -1
       );
       const matrixOptions = [
-        ...new Set(
-          filteredPlots.map(
-            (row) => value2d(row, 'Profile', columns).match(/\d+/gi)[0]
-          )
-        ),
+        ...new Set(filteredPlots.map((row) => row.Profile.match(/\d+/gi)[0])),
       ];
-      console.log(filteredPlots, matrixOptions);
+
       mergeMutationalProfiles({
         selectProfile: profile,
         selectMatrix: defaultMatrix(profile, matrixOptions),
@@ -217,11 +210,15 @@ export default function MutationalProfiles() {
 
   function handleMatrix(matrix) {
     if (source == 'user') {
-      const filteredPlots = filter2d(
-        [selectName, selectProfile, matrix],
-        svgList.data
+      const filteredPlots = svgList.filter(
+        (row) =>
+          row.Sample_Name == selectName &&
+          row.Profile_Type == selectProfile &&
+          row.Matrix_Size == matrix
       );
-      const filterOptions = unique2d('Filter', columns, filteredPlots);
+      const filterOptions = [
+        ...new Set(filteredPlots.map((row) => row.Filter)),
+      ];
 
       mergeMutationalProfiles({
         selectMatrix: matrix,
@@ -230,9 +227,9 @@ export default function MutationalProfiles() {
         filtered: filteredPlots,
       });
     } else {
-      const filteredPlots = filter2d(
-        [selectName, `${selectProfile + matrix}`],
-        svgList.data
+      const filteredPlots = svgList.filter(
+        (row) =>
+          row.Sample == selectName && row.Profile == selectProfile + matrix
       );
 
       mergeMutationalProfiles({
@@ -243,9 +240,12 @@ export default function MutationalProfiles() {
   }
 
   function handleTag(tag) {
-    const filteredPlots = filter2d(
-      [selectName, selectProfile, selectMatrix, tag],
-      svgList.data
+    const filteredPlots = svgList.filter(
+      (row) =>
+        row.Sample_Name == selectName &&
+        row.Profile_Type == selectProfile &&
+        row.Matrix_Size == selectMatrix &&
+        row.Filter == tag
     );
 
     mergeMutationalProfiles({

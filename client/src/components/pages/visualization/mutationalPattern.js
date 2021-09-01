@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
-import { value2d, filter2d } from '../../../services/utils';
 
 const actions = { ...visualizationActions, ...modalActions };
 const { Group, Label, Control } = Form;
@@ -236,11 +235,10 @@ export default function MutationalPattern({ submitR }) {
                   ) {
                     if (source == 'user') {
                       calculateR('mutationalPattern', {
-                        matrixFile: value2d(
-                          filter2d(['SBS', '96'], matrixList.data)[0],
-                          'Path',
-                          matrixList.columns
-                        ),
+                        matrixFile: matrixList.filter(
+                          (row) =>
+                            row.Profile_Type == 'SBS' && row.Matrix_Size == '96'
+                        )[0].Path,
                         proportion: parseFloat(proportion),
                         pattern: pattern,
                       });

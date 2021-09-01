@@ -14,15 +14,14 @@ const { Group, Check } = Form;
 
 export default function Etiology() {
   const dispatch = useDispatch();
-  const mergeEtiology = (state) =>
-    dispatch(actions.mergeEtiology({ etiologyState: state }));
+  const mergeEtiology = (state) => dispatch(actions.mergeEtiology(state));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const {
     category,
-    aetiology,
-    signature,
+    etiology,
+    signatureName,
     tissue,
     refSig,
     study,
@@ -34,22 +33,26 @@ export default function Etiology() {
     selectedSource,
     profileURL,
     exposureURL,
+    strandbiasURL,
     tissueURL,
     refSigURL,
-  } = useSelector((state) => state.etiology.etiologyState);
+  } = useSelector((state) => state.etiology);
 
   const categories = [
-    { name: 'Cosmic Mutational Signatures', file: 'Aetiology_cosmic.json' },
+    {
+      name: 'Cosmic Mutational Signatures (v3.2)',
+      file: 'Etiology_cosmic.json',
+    },
     {
       name: 'Environmental Mutagenesis',
-      file: 'Aetiology_enviromental_mutagenesis.json',
+      file: 'Etiology_enviromental_mutagenesis.json',
     },
-    { name: 'Gene Edits', file: 'Aetiology_gene_edits.json' },
+    { name: 'Gene Edits', file: 'Etiology_gene_edits.json' },
     {
       name: 'Cancer Specific Signature',
-      file: 'Aetiology_cancer_specific_signatures.json',
+      file: 'Etiology_cancer_specific_signatures.json',
     },
-    { name: 'Others', file: '' },
+    { name: 'Others', file: 'Etiology_others.json' },
   ];
 
   useEffect(() => {
@@ -60,34 +63,35 @@ export default function Etiology() {
     const getData = async () => {
       try {
         const file = categories.filter(({ name }) => name == category)[0].file;
-        const data = await getJSON(`Aetiology/${file}`);
+        const data = await getJSON(`Etiology/${file}`);
 
-        const aetiologyOptions = [
-          ...new Set(data.map(({ Aetiology }) => Aetiology)),
+        const etiologyOptions = [
+          ...new Set(data.map(({ Etiology }) => Etiology)),
         ];
         const studyOptions = [...new Set(data.map(({ Study }) => Study))];
 
         mergeEtiology({
           data: { [category]: data },
-          aetiology: aetiologyOptions[0],
+          etiology: etiologyOptions[0],
           study: studyOptions[0],
         });
       } catch (e) {
-        mergeError(e);
+        mergeError(e.message);
+        console.error(e);
       }
     };
     if (!data[category]) {
       getData();
     } else {
-      const aetiologyOptions = [
-        ...new Set(data[category].map(({ Aetiology }) => Aetiology)),
+      const etiologyOptions = [
+        ...new Set(data[category].map(({ Etiology }) => Etiology)),
       ];
       const studyOptions = [
         ...new Set(data[category].map(({ Study }) => Study)),
       ];
 
       mergeEtiology({
-        aetiology: aetiologyOptions[0],
+        etiology: etiologyOptions[0],
         study: studyOptions[0],
       });
     }
@@ -103,7 +107,7 @@ export default function Etiology() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          path: `msigportal/Database/Aetiology/${path}`,
+          path: `msigportal/Database/Etiology/${path}`,
         }),
       }).then(async (res) => {
         if (res.ok) {
@@ -117,11 +121,18 @@ export default function Etiology() {
     const getPlots = async () => {
       if (profileURL) URL.revokeObjectURL(profileURL);
       if (exposureURL) URL.revokeObjectURL(exposureURL);
-      const [sig, tmb] = await Promise.all([
-        getImageS3(`Profile/${fixFile(signature)}.svg`),
-        getImageS3(`Exposure/${fixFile(`${signature}_${study}`)}.svg`),
+      if (strandbiasURL) URL.revokeObjectURL(strandbiasURL);
+
+      const [sig, tmb, strandBias] = await Promise.all([
+        getImageS3(`Profile/${fixFile(signatureName)}.svg`),
+        getImageS3(`Exposure/${fixFile(`${signatureName}_${study}`)}.svg`),
+        getImageS3(`Profile_StrandBias/${fixFile(signatureName)}.svg`),
       ]);
-      mergeEtiology({ profileURL: sig, exposureURL: tmb });
+      mergeEtiology({
+        profileURL: sig,
+        exposureURL: tmb,
+        strandbiasURL: strandBias,
+      });
     };
 
     const getCancerSpecificPlots = async () => {
@@ -140,9 +151,9 @@ export default function Etiology() {
       });
     };
 
-    if (signature && study) getPlots();
+    if (signatureName && study) getPlots();
     else if (tissue && refSig) getCancerSpecificPlots();
-  }, [signature, study, tissue, refSig]);
+  }, [signatureName, study, tissue, refSig]);
 
   // get thumbnails for standard categories
   useEffect(() => {
@@ -154,7 +165,7 @@ export default function Etiology() {
     ) {
       const signatures = data[category]
         .slice()
-        .filter(({ Study }) => Study == study)
+        .filter(({ Study }) => Study == study || !Study)
         .sort(naturalSort)
         .sort(profileSort);
 
@@ -202,10 +213,10 @@ export default function Etiology() {
       d = 0;
 
     sigOrder.forEach((profile, i) => {
-      if (a.Signature && a.Signature.includes(profile)) {
+      if (a['Signature Name'] && a['Signature Name'].includes(profile)) {
         c = i;
       }
-      if (b.Signature && b.Signature.includes(profile)) {
+      if (b['Signature Name'] && b['Signature Name'].includes(profile)) {
         d = i;
       }
     });
@@ -219,8 +230,8 @@ export default function Etiology() {
   }
 
   function naturalSort(a, b) {
-    if (a.Signature)
-      return a.Signature.localeCompare(b.Signature, undefined, {
+    if (a['Signature Name'])
+      return a['Signature Name'].localeCompare(b['Signature Name'], undefined, {
         numeric: true,
         sensitivity: 'base',
       });
@@ -249,8 +260,8 @@ export default function Etiology() {
               ? async () => {
                   mergeEtiology({
                     category: name,
-                    aetiology: '',
-                    signature: '',
+                    etiology: '',
+                    signatureName: '',
                     study: '',
                     selectedSource: '',
                   });
@@ -266,15 +277,15 @@ export default function Etiology() {
     ));
   }
 
-  function getAetiologies() {
+  function getEtiologies() {
     if (data[category] && data[category].length) {
       return (
         <Row className="justify-content-center">
-          {[...new Set(data[category].map((obj) => obj.Aetiology))]
+          {[...new Set(data[category].map((obj) => obj.Etiology))]
             .sort()
-            .map((Aetiology) => (
+            .map((Etiology) => (
               <Col
-                key={Aetiology}
+                key={Etiology}
                 lg={category == 'Gene Edits' ? '1' : '2'}
                 md="3"
                 sm="4"
@@ -285,15 +296,15 @@ export default function Etiology() {
                   variant="dark"
                   onClick={() =>
                     mergeEtiology({
-                      aetiology: Aetiology,
-                      signature: '',
+                      etiology: Etiology,
+                      signatureName: '',
                       selectedSource: '',
                     })
                   }
-                  className={aetiology != Aetiology ? 'disabled' : ''}
+                  className={etiology != Etiology ? 'disabled' : ''}
                   block
                 >
-                  {Aetiology}
+                  {Etiology}
                 </Button>
               </Col>
             ))}
@@ -307,29 +318,29 @@ export default function Etiology() {
       );
     }
   }
-  function getCancerAetiology() {
+  function getCancerEtiology() {
     if (data[category] && data[category].length) {
       return (
         <Row className="justify-content-center">
-          {[...new Set(data[category].map((obj) => obj.Aetiology))]
+          {[...new Set(data[category].map((obj) => obj.Etiology))]
             .sort()
-            .map((Aetiology) => (
-              <Col key={Aetiology} lg="2" md="3" sm="4" className="mb-3 d-flex">
+            .map((Etiology) => (
+              <Col key={Etiology} lg="2" md="3" sm="4" className="mb-3 d-flex">
                 <Button
                   size="sm"
                   variant="dark"
                   onClick={() =>
                     mergeEtiology({
-                      aetiology: Aetiology,
+                      etiology: Etiology,
                       tissue: '',
                       refSig: '',
                       selectedSource: '',
                     })
                   }
-                  className={aetiology != Aetiology ? 'disabled' : ''}
+                  className={etiology != Etiology ? 'disabled' : ''}
                   block
                 >
-                  {Aetiology}
+                  {Etiology}
                 </Button>
               </Col>
             ))}
@@ -348,7 +359,15 @@ export default function Etiology() {
     try {
       const newThumbnails = await Promise.all(
         signatures.map(
-          ({ Aetiology, Study, Signature, Source_URL, URL: alias_URL }) =>
+          ({
+            // note that each category has a different format for JSON objects
+            Etiology,
+            Study,
+            Signature,
+            'Signature Name': signatureName,
+            Source_URL,
+            URL: alias_URL,
+          }) =>
             fetch(`api/getImageS3`, {
               method: 'POST',
               headers: {
@@ -356,19 +375,19 @@ export default function Etiology() {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                path: `msigportal/Database/Aetiology/Profile_logo/${fixFile(
-                  Signature
+                path: `msigportal/Database/Etiology/Profile_logo/${fixFile(
+                  signatureName || Signature
                 )}.svg`,
               }),
             }).then(async (res) => {
               const blob = await res.blob();
               return {
-                Aetiology: Aetiology,
+                Etiology: Etiology,
                 Study: Study,
-                Signature: Signature,
+                signatureName: signatureName || Signature,
                 // use the Source_URL as a unique identifier
                 Source_URL: Source_URL || alias_URL,
-                url: URL.createObjectURL(blob),
+                thumbnailURL: URL.createObjectURL(blob),
               };
             })
         )
@@ -377,6 +396,7 @@ export default function Etiology() {
       mergeEtiology({ thumbnails: { [category]: newThumbnails } });
     } catch (err) {
       mergeError(err.message);
+      console.error(err);
     }
   }
 
@@ -393,17 +413,17 @@ export default function Etiology() {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              path: `msigportal/Database/Aetiology/Profile_logo/${fixFile(
+              path: `msigportal/Database/Etiology/Profile_logo/${fixFile(
                 tissue['Tissue Specific Signature']
               )}.svg`,
             }),
           }).then(async (res) => {
             const blob = await res.blob();
             return {
-              Aetiology: tissue.Aetiology,
+              Etiology: tissue.Etiology,
               'Tissue Specific Signature': tissue['Tissue Specific Signature'],
               'Ref Signature': tissue['Ref Signature'],
-              url: URL.createObjectURL(blob),
+              thumbnailURL: URL.createObjectURL(blob),
             };
           })
         )
@@ -411,6 +431,7 @@ export default function Etiology() {
       mergeEtiology({ tissueThumbnails: newThumbnails });
     } catch (err) {
       mergeError(err.message);
+      console.error(err);
     }
   }
 
@@ -427,18 +448,18 @@ export default function Etiology() {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              path: `msigportal/Database/Aetiology/Profile_logo/${fixFile(
+              path: `msigportal/Database/Etiology/Profile_logo/${fixFile(
                 refSig['Ref Signature']
               )}.svg`,
             }),
           }).then(async (res) => {
             const blob = await res.blob();
             return {
-              Aetiology: refSig.Aetiology,
+              Etiology: refSig.Etiology,
               'Tissue Specific Signature': refSig['Tissue Specific Signature'],
               'Ref Signature': refSig['Ref Signature'],
               'RefSig Proportion': refSig['RefSig Proportion'],
-              url: URL.createObjectURL(blob),
+              thumbnailURL: URL.createObjectURL(blob),
             };
           })
         )
@@ -446,6 +467,7 @@ export default function Etiology() {
       mergeEtiology({ refSigThumbnails: newThumbnails });
     } catch (err) {
       mergeError(err.message);
+      console.error(err);
     }
   }
 
@@ -453,33 +475,35 @@ export default function Etiology() {
     function getAllSignatures() {
       if (thumbnails[category] && thumbnails[category].length) {
         return thumbnails[category].map(
-          ({ Aetiology, Signature, url, Source_URL }, index) => (
+          ({ Etiology, signatureName, thumbnailURL, Source_URL }, index) => (
             <Col key={index} lg="1" md="3" sm="4" className="mb-2 px-1">
               <div
                 onClick={() =>
                   mergeEtiology({
-                    aetiology: Aetiology,
-                    signature: Signature,
+                    etiology: Etiology,
+                    signatureName: signatureName,
                     selectedSource: Source_URL,
                   })
                 }
                 className={`sigIcon border rounded ${
-                  aetiology != Aetiology
+                  etiology != Etiology
                     ? 'inactive'
                     : selectedSource == Source_URL
                     ? 'active'
                     : ''
                 }`}
-                title={`${Aetiology} - ${Signature}`}
+                title={`${Etiology} - ${signatureName}`}
               >
                 <img
-                  src={url}
+                  src={thumbnailURL}
                   className="w-100"
                   // height="70"
-                  alt={Signature}
+                  alt={signatureName}
                 />
                 <div className="sigLabel">
-                  <strong style={{ fontSize: '0.8rem' }}>{Signature}</strong>
+                  <strong style={{ fontSize: '0.8rem' }}>
+                    {signatureName}
+                  </strong>
                 </div>
               </div>
             </Col>
@@ -497,30 +521,30 @@ export default function Etiology() {
     function getSignatures() {
       if (thumbnails[category] && thumbnails[category].length) {
         return thumbnails[category]
-          .filter(({ Aetiology }) => Aetiology == aetiology)
-          .map(({ Signature, url, Source_URL }, index) => {
+          .filter(({ Etiology }) => Etiology == etiology)
+          .map(({ signatureName, thumbnailURL, Source_URL }, index) => {
             return (
               <Col key={index} md="2" sm="4" className="mb-3">
                 <div
                   className={`sigIcon border rounded ${
                     selectedSource == Source_URL ? 'active' : ''
                   }`}
-                  title={`${aetiology} - ${Signature}`}
+                  title={`${etiology} - ${signatureName}`}
                   onClick={() =>
                     mergeEtiology({
-                      signature: Signature,
+                      signatureName: signatureName,
                       selectedSource: Source_URL,
                     })
                   }
                 >
                   <img
-                    src={url}
+                    src={thumbnailURL}
                     className="w-100"
                     // height="110"
-                    alt={Signature}
+                    alt={signatureName}
                   />
                   <div className="sigLabel">
-                    <strong className="sigLabel">{Signature}</strong>
+                    <strong className="sigLabel">{signatureName}</strong>
                   </div>
                 </div>
               </Col>
@@ -541,8 +565,8 @@ export default function Etiology() {
           ...new Set(
             data[category]
               .filter(
-                ({ Aetiology, Signature }) =>
-                  Aetiology == aetiology && Signature == signature
+                ({ Etiology, 'Signature Name': signatureName }) =>
+                  Etiology == etiology && signatureName == signatureName
               )
               .map((obj) => obj.Study)
           ),
@@ -577,7 +601,7 @@ export default function Etiology() {
             <div>
               <div>
                 <strong>Signature Name: </strong>
-                {signature}
+                {signatureName}
               </div>
               {info.Mutagen && (
                 <div>
@@ -605,15 +629,11 @@ export default function Etiology() {
                   {info['Cell Line']}
                 </div>
               )}
-              {info.Source && (
+              {info.URL && (
                 <div>
                   <strong>Source: </strong>
-                  <a
-                    href={info.URL || info.Source_URL}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {info.Source}
+                  <a href={info.URL} target="_blank" rel="noreferrer">
+                    {info.URL}
                   </a>
                 </div>
               )}
@@ -632,41 +652,54 @@ export default function Etiology() {
                     plotPath={profileURL}
                   />
 
-                  {category == 'Cosmic Mutational Signatures' && (
-                    <>
-                      <>
-                        <Row className="justify-content-center">
-                          {getStudy()}
-                        </Row>
-                        <p>
-                          Select the cancer study to review the TMB of selected
-                          signatures. TMB shown as the numbers of mutations per
-                          megabase (log10) attributed to each mutational
-                          signature in samples where the signature is present.
-                          Only those cancer types with tumors in which signature
-                          activity is attributed are shown. The numbers below
-                          the dots for each cancer type indicate the number of
-                          tumors in which the signatures was attributed (above
-                          the horizontal bar, in blue) and the total number of
-                          tumors analyzed (below the blue bar, in green).
-                        </p>
-                        {exposureURL.length ? (
-                          <Plot
-                            className="p-3 border"
-                            height={'600px'}
-                            plotPath={exposureURL}
-                          />
-                        ) : (
-                          <div className="p-3 border">
-                            <p>
-                              A signature was not detected in any sample of the
-                              selected study
-                            </p>
-                          </div>
-                        )}
-                      </>
-                    </>
+                  {info.Description_strandbias && (
+                    <p>{info.Description_strandbias}</p>
                   )}
+                  {info.Description_strandbias && strandbiasURL && (
+                    <Plot
+                      className="p-3 border rounded mb-3"
+                      height={'500px'}
+                      plotPath={strandbiasURL}
+                    />
+                  )}
+
+                  {category == 'Cosmic Mutational Signatures (v3.2)' &&
+                    info.Study && (
+                      <>
+                        <>
+                          <Row className="justify-content-center">
+                            {getStudy()}
+                          </Row>
+                          <p>
+                            Select the cancer study to review the TMB of
+                            selected signatures. TMB shown as the numbers of
+                            mutations per megabase (log10) attributed to each
+                            mutational signature in samples where the signature
+                            is present. Only those cancer types with tumors in
+                            which signature activity is attributed are shown.
+                            The numbers below the dots for each cancer type
+                            indicate the number of tumors in which the
+                            signatures was attributed (above the horizontal bar,
+                            in blue) and the total number of tumors analyzed
+                            (below the blue bar, in green).
+                          </p>
+                          {exposureURL.length ? (
+                            <Plot
+                              className="p-3 border"
+                              height={'600px'}
+                              plotPath={exposureURL}
+                            />
+                          ) : (
+                            <div className="p-3 border">
+                              <p>
+                                A signature was not detected in any sample of
+                                the selected study
+                              </p>
+                            </div>
+                          )}
+                        </>
+                      </>
+                    )}
                 </div>
               ) : (
                 <div className="my-5">
@@ -700,7 +733,7 @@ export default function Etiology() {
             </Col>
             <Col sm="4">
               <Group className="d-flex justify-content-center">
-                <Check inline id="selectedAetiology">
+                <Check inline id="selectedEtiology">
                   <Check.Input
                     type="radio"
                     checked={all == false}
@@ -710,7 +743,7 @@ export default function Etiology() {
                     Selected Etiology
                   </Check.Label>
                 </Check>
-                <Check inline id="allAetiologies">
+                <Check inline id="allEtiologies">
                   <Check.Input
                     type="radio"
                     checked={all == true}
@@ -723,7 +756,7 @@ export default function Etiology() {
               </Group>
             </Col>
           </Row>
-          {getAetiologies()}
+          {getEtiologies()}
         </div>
         <hr />
         <div className="mx-auto p-3 pt-0">
@@ -751,7 +784,7 @@ export default function Etiology() {
             <Col key={index} lg="1" md="2" sm="4" className="mb-2 px-1">
               <div
                 className={`sigIcon border rounded ${
-                  aetiology != tissue.Aetiology
+                  etiology != tissue.Etiology
                     ? 'inactive'
                     : selectedSource ==
                       tissue['Tissue Specific Signature'] +
@@ -759,10 +792,10 @@ export default function Etiology() {
                     ? 'active'
                     : ''
                 }`}
-                title={`${aetiology} - ${tissue['Tissue Specific Signature']}`}
+                title={`${etiology} - ${tissue['Tissue Specific Signature']}`}
                 onClick={() =>
                   mergeEtiology({
-                    aetiology: tissue.Aetiology,
+                    etiology: tissue.Etiology,
                     tissue: tissue['Tissue Specific Signature'],
                     selectedSource:
                       tissue['Tissue Specific Signature'] +
@@ -771,7 +804,7 @@ export default function Etiology() {
                 }
               >
                 <img
-                  src={tissue.url}
+                  src={tissue.thumbnailURL}
                   className="w-100"
                   // height="110"
                   alt={tissue['Tissue Specific Signature']}
@@ -797,7 +830,7 @@ export default function Etiology() {
     function getTissues() {
       if (tissueThumbnails.length) {
         return tissueThumbnails
-          .filter(({ Aetiology }) => Aetiology == aetiology)
+          .filter(({ Etiology }) => Etiology == etiology)
           .map((tissue, index) => {
             return (
               <Col key={index} md="2" sm="4" className="mb-3">
@@ -809,7 +842,7 @@ export default function Etiology() {
                       ? 'active'
                       : ''
                   }`}
-                  title={`${aetiology} - ${tissue['Tissue Specific Signature']}`}
+                  title={`${etiology} - ${tissue['Tissue Specific Signature']}`}
                   onClick={() =>
                     mergeEtiology({
                       tissue: tissue['Tissue Specific Signature'],
@@ -821,7 +854,7 @@ export default function Etiology() {
                   }
                 >
                   <img
-                    src={tissue.url}
+                    src={tissue.thumbnailURL}
                     className="w-100"
                     // height="110"
                     alt={tissue['Tissue Specific Signature']}
@@ -849,8 +882,7 @@ export default function Etiology() {
         return refSigThumbnails
           .filter(
             (v) =>
-              v.Aetiology == aetiology &&
-              v['Tissue Specific Signature'] == tissue
+              v.Etiology == etiology && v['Tissue Specific Signature'] == tissue
           )
           .map((v, index) => {
             return (
@@ -863,7 +895,7 @@ export default function Etiology() {
                   onClick={() => mergeEtiology({ refSig: v['Ref Signature'] })}
                 >
                   <img
-                    src={v.url}
+                    src={v.thumbnailURL}
                     className="w-100"
                     // height="110"
                     alt={v['Ref Signature']}
@@ -966,7 +998,7 @@ export default function Etiology() {
             </Col>
             <Col sm="4">
               <Group className="d-flex justify-content-center">
-                <Check inline id="selectedAetiology">
+                <Check inline id="selectedEtiology">
                   <Check.Input
                     type="radio"
                     checked={all == false}
@@ -976,7 +1008,7 @@ export default function Etiology() {
                     Selected Etiology
                   </Check.Label>
                 </Check>
-                <Check inline id="allAetiologies">
+                <Check inline id="allEtiologies">
                   <Check.Input
                     type="radio"
                     checked={all == true}
@@ -989,7 +1021,7 @@ export default function Etiology() {
               </Group>
             </Col>
           </Row>
-          {getCancerAetiology()}
+          {getCancerEtiology()}
         </div>
         <hr />
         <div className="mx-auto p-3">

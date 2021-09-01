@@ -7,19 +7,19 @@ export default function Instructions({ loading }) {
     {
       name: 'Lung',
       title:
-        'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Lung-AdenoCA; MSA SBS5 vs SBS40',
+        'PCAWG/WGS/COSMIC_v3_Signatures_GRCh37_SBS96/ Lung-AdenoCA; MSA SBS5 vs SBS40',
       path: 'pcawg-lungadenoca',
     },
     {
       name: 'Skin',
       title:
-        'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Skin-Melanoma; MSA SBS7a vs SBS7b',
+        'PCAWG/WGS/COSMIC_v3_Signatures_GRCh37_SBS96/ Skin-Melanoma; MSA SBS7a vs SBS7b',
       path: 'pcawg-skinmelanoma',
     },
     {
       name: 'Breast',
       title:
-        'PCAWG/WGS/COSMIC v3 Signatures (SBS)/ Breast-AdenoCA; MSA SBS3 vs SBS5',
+        'PCAWG/WGS/COSMIC_v3_Signatures_GRCh37_SBS96/ Breast-AdenoCA; MSA SBS3 vs SBS5',
       path: 'pcawg-breastadenoca',
     },
   ];

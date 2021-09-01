@@ -6,7 +6,6 @@ import Select from '../../controls/select/select';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as exposureActions } from '../../../services/store/exposure';
 import { actions as modalActions } from '../../../services/store/modal';
-import { unique2d } from '../../../services/utils';
 
 const actions = { ...exposureActions, ...modalActions };
 const { Group, Check, Label } = Form;
@@ -108,11 +107,10 @@ export default function PublicForm({
         (key) => key != 'Samples'
       );
 
-      const sampleOptions = unique2d(
-        'Samples',
-        exposureData.columns,
-        exposureData.data
-      );
+      const sampleOptions = [
+        ...new Set(exposureData.map(({ Samples }) => Samples)),
+      ];
+
       const params = {
         exposureState: {
           projectID: projectID,
