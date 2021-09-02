@@ -21,7 +21,7 @@ export default function Download() {
   } = visualization.state;
 
   const [downloading, setDownload] = useState([]);
-  const [downloadingSession, setSession] = useState(false);
+  const [downloadingWorkspace, setWorkspace] = useState(false);
 
   async function downloadOutput(file) {
     setDownload((downloading) => [...downloading, file]);
@@ -84,10 +84,10 @@ export default function Download() {
   }
 
   // downloads current sesssion from tmp/[id] along with redux state
-  async function downloadSession() {
-    setSession(true);
+  async function downloadWorkspace() {
+    setWorkspace(true);
 
-    const response = await fetch(`api/downloadSession`, {
+    const response = await fetch(`api/downloadWorkspace`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -118,14 +118,14 @@ export default function Download() {
       const tempLink = document.createElement('a');
 
       tempLink.href = `${objectURL}`;
-      tempLink.setAttribute('download', `msigportal-session.tgz`);
+      tempLink.setAttribute('download', `msigportal-workspace.tgz`);
       document.body.appendChild(tempLink);
       tempLink.click();
       document.body.removeChild(tempLink);
     } else {
       mergeError(`error`);
     }
-    setSession(false);
+    setWorkspace(false);
   }
 
   return (
@@ -168,9 +168,9 @@ export default function Download() {
           </Button>
         </div>
       )}
-      <Button variant="link" onClick={() => downloadSession()}>
-        <LoadingOverlay active={downloadingSession} />
-        Download Session
+      <Button variant="link" onClick={() => downloadWorkspace()}>
+        <LoadingOverlay active={downloadingWorkspace} />
+        Download Workspace
       </Button>
     </div>
   );
