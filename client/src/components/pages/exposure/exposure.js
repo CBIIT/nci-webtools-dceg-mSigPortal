@@ -104,11 +104,6 @@ export default function Exposure({ match }) {
     if (exampleName) loadExample(exampleName);
   }, [exampleName]);
 
-  // automatically close side panel
-  useEffect(() => {
-    if (submitted) mergeState({ displayTab: 'tmb', openSidebar: false });
-  }, [submitted]);
-
   async function loadExample(id) {
     mergeState({
       loading: {
@@ -129,6 +124,8 @@ export default function Exposure({ match }) {
     mergeState({
       loading: false,
       submitted: true,
+      displayTab: 'tmb',
+      openSidebar: false,
     });
   }
 
@@ -365,6 +362,8 @@ export default function Exposure({ match }) {
           debugR: debugR,
         });
         mergeState({ submitted: true });
+        if (displayTab == 'instructions')
+          mergeState({ displayTab: 'tmb', openSidebar: false });
       } else {
         mergeError(debugR);
       }

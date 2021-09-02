@@ -42,11 +42,6 @@ export default function Association() {
     { name: 'Multivariate', id: 'multivariate', component: <></> },
   ];
 
-  // automatically close side panel
-  useEffect(() => {
-    if (submitted) mergeState({ displayTab: 'univariate', openSidebar: false });
-  }, [submitted]);
-
   return (
     <div className="position-relative">
       <div className="mx-3">

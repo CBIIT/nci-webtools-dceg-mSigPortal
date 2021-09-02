@@ -166,6 +166,8 @@ export default function PublicForm() {
         assocVarData,
         expVarList,
         assocFullDataPath: fullDataPath,
+        displayTab: 'univariate',
+        openSidebar: false,
       });
       dispatch(
         actions.mergeAssociation({

@@ -65,12 +65,6 @@ export default function Visualization({ match }) {
 
   const { type, id } = match.params;
 
-  // automatically close side panel
-  useEffect(() => {
-    if (submitted && projectID)
-      mergeState({ displayTab: 'profilerSummary', openSidebar: false });
-  }, [submitted]);
-
   // when retrieving queued result, update id in store
   useEffect(() => {
     if (id && !loading.active && !submitted && !projectID) {
@@ -344,6 +338,8 @@ export default function Visualization({ match }) {
         active: false,
       },
       submitted: true,
+      displayTab: 'profilerSummary',
+      openSidebar: false,
     });
   }
 
@@ -393,6 +389,8 @@ export default function Visualization({ match }) {
     mergeState({
       loading: { active: false },
       submitted: true,
+      displayTab: 'profilerSummary',
+      openSidebar: false,
     });
   }
 
@@ -420,6 +418,8 @@ export default function Visualization({ match }) {
     mergeState({
       loading: { active: false },
       submitted: true,
+      displayTab: 'profilerSummary',
+      openSidebar: false,
     });
   }
 

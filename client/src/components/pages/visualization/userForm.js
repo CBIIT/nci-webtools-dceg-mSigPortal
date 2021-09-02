@@ -186,7 +186,12 @@ export default function UserForm() {
           error: 'Please Reset Your Parameters and Try again.',
         });
       }
-      mergeState({ loading: { active: false }, submitted: true });
+      mergeState({
+        loading: { active: false },
+        submitted: true,
+        displayTab: 'profilerSummary',
+        openSidebar: false,
+      });
     }
   }
 
