@@ -91,8 +91,8 @@ export default function UserForm() {
       mergeState({
         loading: {
           active: true,
-          content: 'Sending to Queue...',
-          showIndicator: true,
+          // content: 'Sending to Queue...',
+          // showIndicator: true,
         },
         submitted: true,
       });
@@ -134,8 +134,8 @@ export default function UserForm() {
       mergeState({
         loading: {
           active: true,
-          content: 'Calculating...',
-          showIndicator: true,
+          // content: 'Calculating...',
+          // showIndicator: true,
         },
       });
       try {
@@ -216,8 +216,8 @@ export default function UserForm() {
     mergeState({
       loading: {
         active: true,
-        content: 'Uploading file...',
-        showIndicator: true,
+        // content: 'Uploading file...',
+        // showIndicator: true,
       },
     });
     try {

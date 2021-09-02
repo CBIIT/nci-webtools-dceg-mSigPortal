@@ -53,8 +53,8 @@ export default function PublicForm() {
     mergeState({
       loading: {
         active: true,
-        content: 'Loading Public Data',
-        showIndicator: true,
+        // content: 'Loading Public Data',
+        // showIndicator: true,
       },
     });
     try {

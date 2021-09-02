@@ -113,8 +113,8 @@ export default function Exposure({ match }) {
     mergeState({
       loading: {
         active: true,
-        content: 'Loading Example',
-        showIndicator: true,
+        // content: 'Loading Example',
+        // showIndicator: true,
       },
     });
     try {

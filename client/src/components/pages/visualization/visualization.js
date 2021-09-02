@@ -133,8 +133,8 @@ export default function Visualization({ match }) {
     mergeState({
       loading: {
         active: true,
-        content: 'Putting Data Into Session',
-        showIndicator: true,
+        // content: 'Putting Data Into Session',
+        // showIndicator: true,
       },
     });
 
@@ -251,8 +251,8 @@ export default function Visualization({ match }) {
     mergeState({
       loading: {
         active: true,
-        content: 'Putting Public Data Into Session',
-        showIndicator: true,
+        // content: 'Putting Public Data Into Session',
+        // showIndicator: true,
       },
     });
 
@@ -376,8 +376,8 @@ export default function Visualization({ match }) {
     mergeState({
       loading: {
         active: true,
-        content: 'Loading Queued Result',
-        showIndicator: true,
+        // content: 'Loading Queued Result',
+        // showIndicator: true,
       },
     });
     try {
@@ -400,8 +400,8 @@ export default function Visualization({ match }) {
     mergeState({
       loading: {
         active: true,
-        content: 'Loading Example',
-        showIndicator: true,
+        // content: 'Loading Example',
+        // showIndicator: true,
       },
     });
     try {
