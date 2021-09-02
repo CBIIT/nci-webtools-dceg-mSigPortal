@@ -339,8 +339,7 @@ mutationalSignatureAssociation <- function(useCancer, cancerType, both, signatur
     data_input <- data_input %>% filter(Cancer_Type == cancerType)
   }
 
-  error = signature_association(data = data_input, signature_name_input1 = signatureName1, signature_name_input2 = signatureName2, signature_both = both, output_plot = plotPath)
-  if (!is.null(error)) stop(error)
+  signature_association(data = data_input, signature_name_input1 = signatureName1, signature_name_input2 = signatureName2, signature_both = both, output_plot = plotPath)
 }
 
 mutationalSignatureDecomposition <- function(plotPath, txtPath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected) {
