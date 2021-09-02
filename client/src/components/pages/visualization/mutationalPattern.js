@@ -37,8 +37,9 @@ export default function MutationalPattern({ submitR }) {
     loading,
   } = visualization.mutationalPattern;
 
-  const [invalidProportion, setProportion] = useState(false);
-  const [invalidPattern, setPattern] = useState(false);
+  const [tmpProportion, setProportion] = useState(proportion);
+  const [invalidProportion, setProportionInvalid] = useState(false);
+  const [invalidPattern, setPatternInvalid] = useState(false);
 
   async function calculateR(fn, args) {
     mergeMPEA({
@@ -48,6 +49,7 @@ export default function MutationalPattern({ submitR }) {
       plotPath: '',
       txtPath: '',
       barPath: '',
+      proportion: tmpProportion,
     });
 
     try {
@@ -177,13 +179,9 @@ export default function MutationalPattern({ submitR }) {
               >
                 <Label>Minimal Proportion (0-1)</Label>
                 <Control
-                  value={proportion}
+                  value={tmpProportion}
                   placeholder="Ex. 0.8"
-                  onChange={(e) => {
-                    mergeMPEA({
-                      proportion: e.target.value,
-                    });
-                  }}
+                  onChange={(e) => setProportion(e.target.value)}
                   isInvalid={invalidProportion}
                 />
                 <Form.Control.Feedback type="invalid">
@@ -215,23 +213,23 @@ export default function MutationalPattern({ submitR }) {
                 className="ml-auto mb-auto"
                 variant="primary"
                 onClick={() => {
-                  if (!pattern) setPattern(true);
-                  else setPattern(false);
+                  if (!pattern) setPatternInvalid(true);
+                  else setPatternInvalid(false);
                   if (
-                    isNaN(proportion) ||
-                    !proportion ||
-                    proportion < 0 ||
-                    proportion > 1
+                    isNaN(tmpProportion) ||
+                    !tmpProportion ||
+                    tmpProportion < 0 ||
+                    tmpProportion > 1
                   )
-                    setProportion(true);
-                  else setProportion(false);
+                    setProportionInvalid(true);
+                  else setProportionInvalid(false);
 
                   if (
                     pattern &&
-                    proportion &&
-                    !isNaN(proportion) &&
-                    proportion >= 0 &&
-                    proportion <= 1
+                    tmpProportion &&
+                    !isNaN(tmpProportion) &&
+                    tmpProportion >= 0 &&
+                    tmpProportion <= 1
                   ) {
                     if (source == 'user') {
                       calculateR('mutationalPattern', {
@@ -239,7 +237,7 @@ export default function MutationalPattern({ submitR }) {
                           (row) =>
                             row.Profile_Type == 'SBS' && row.Matrix_Size == '96'
                         )[0].Path,
-                        proportion: parseFloat(proportion),
+                        proportion: parseFloat(tmpProportion),
                         pattern: pattern,
                       });
                     } else if (source == 'public') {
@@ -247,7 +245,7 @@ export default function MutationalPattern({ submitR }) {
                         study: study,
                         cancerType: cancerType,
                         experimentalStrategy: pubExperimentalStrategy,
-                        proportion: parseFloat(proportion),
+                        proportion: parseFloat(tmpProportion),
                         pattern: pattern,
                       });
                     }
