@@ -66,7 +66,7 @@ export const getInitialState = () => ({
     },
     resultsTable: {
       data: [],
-      hidden: [],
+      hidden: ['conf.level', 'conf.low', 'conf.high', 'statistic', 'df.error'],
       pagination: {
         pageIndex: 0,
         pageSize: 5,
