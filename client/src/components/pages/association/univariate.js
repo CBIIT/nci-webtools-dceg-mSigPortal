@@ -22,6 +22,7 @@ export default function Univariate() {
   const {
     loadingData,
     assocVarData,
+    assocFullDataPath,
     expVarList,
     study,
     strategy,
@@ -135,7 +136,7 @@ export default function Univariate() {
     mergeState({ loadingParams: true, error: false });
     try {
       const collapseData = await (
-        await fetch(`api/associationData`, {
+        await fetch(`api/associationWrapper`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -194,7 +195,7 @@ export default function Univariate() {
         signatureOptions,
         projectID: id,
       } = await (
-        await fetch(`api/associationCalc`, {
+        await fetch(`api/associationWrapper`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -254,6 +255,29 @@ export default function Univariate() {
     });
   }
 
+  // download data from project directory
+  async function download(path) {
+    try {
+      const filename = path.split('/')[path.split('/').length - 1];
+      const file = await fetch(`api/results/${projectID}${path}`);
+      if (file.ok) {
+        const objectURL = URL.createObjectURL(await file.blob());
+        const tempLink = document.createElement('a');
+
+        tempLink.href = `${objectURL}`;
+        tempLink.setAttribute('download', filename);
+        document.body.appendChild(tempLink);
+        tempLink.click();
+        document.body.removeChild(tempLink);
+      } else {
+        mergeError(`File is not available`);
+      }
+    } catch (err) {
+      console.log(err);
+      mergeError(`File is not available`);
+    }
+  }
+
   return (
     <div className="bg-white border rounded">
       <LoadingOverlay
@@ -277,6 +301,15 @@ export default function Univariate() {
               )
             }
           />
+          {assocFullDataPath && (
+            <Button
+              className="p-0"
+              variant="link"
+              onClick={() => download(assocFullDataPath)}
+            >
+              Download
+            </Button>
+          )}
         </div>
         <hr />
         <div className="mx-auto py-3 px-4">
@@ -594,20 +627,22 @@ export default function Univariate() {
           {resultsTable.data.length > 0 && (
             <div className="mx-auto p-3">
               <h4>Results</h4>
-              <Table
-                title="Association Group"
-                data={resultsTable.data}
-                columns={[
-                  ...new Set(
-                    ...resultsTable.data.map((row) => Object.keys(row))
-                  ),
-                ].reduce(reducer, [])}
-                pagination={resultsTable.pagination}
-                hidden={resultsTable.hidden}
-                mergeState={async (e) =>
-                  await mergeState({ resultsTable: { ...e } })
-                }
-              />
+              <div className="mb-4">
+                <Table
+                  title="Association Group"
+                  data={resultsTable.data}
+                  columns={[
+                    ...new Set(
+                      ...resultsTable.data.map((row) => Object.keys(row))
+                    ),
+                  ].reduce(reducer, [])}
+                  pagination={resultsTable.pagination}
+                  hidden={resultsTable.hidden}
+                  mergeState={async (e) =>
+                    await mergeState({ resultsTable: { ...e } })
+                  }
+                />
+              </div>
               <Row>
                 <Col md="auto">
                   <p>

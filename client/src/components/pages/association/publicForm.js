@@ -13,7 +13,7 @@ const { Group } = Form;
 export default function PublicForm() {
   const dispatch = useDispatch();
   const mergeState = async (state) =>
-    await dispatch(actions.mergeAssociation({ associationState: state }));
+    dispatch(actions.mergeAssociation({ associationState: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
   const resetAssociation = (_) => dispatch(actions.resetAssociation());
@@ -162,12 +162,18 @@ export default function PublicForm() {
       if (expError) throw expError.message;
 
       mergeState({
-        projectID,
+        submitted: true,
         assocVarData,
         expVarList,
         assocFullDataPath: fullDataPath,
-        submitted: true,
       });
+      dispatch(
+        actions.mergeAssociation({
+          univariate: {
+            projectID,
+          },
+        })
+      );
     } catch (error) {
       mergeError(error);
     }
