@@ -48,48 +48,64 @@ export default function Publications() {
         </div>
 
         {oraMemo.data && (
-          <Table
-            title="Original Research Papers Including Specific Mutational Signatures in mSigPortal"
-            columns={oraMemo.columns}
-            data={oraMemo.data}
-            hidden={oraHidden}
-            globalFilter={oraSearch}
-            pagination={oraPagination}
-            mergeState={(state) => dispatch(actions.mergeState({ orA: state }))}
-          />
+          <div className="mb-5">
+            <Table
+              title="Original Research Papers Including Specific Mutational Signatures in mSigPortal"
+              columns={oraMemo.columns}
+              data={oraMemo.data}
+              hidden={oraHidden}
+              globalFilter={oraSearch}
+              pagination={oraPagination}
+              mergeState={(state) =>
+                dispatch(actions.mergeState({ orA: state }))
+              }
+            />
+          </div>
         )}
         {orbMemo.data && (
-          <Table
-            title="Original Research Papers involved Mutational Signature Analyses"
-            columns={orbMemo.columns}
-            data={orbMemo.data}
-            hidden={orbHidden}
-            globalFilter={orbSearch}
-            pagination={orbPagination}
-            mergeState={(state) => dispatch(actions.mergeState({ orB: state }))}
-          />
+          <div className="mb-5">
+            <Table
+              title="Original Research Papers involved Mutational Signature Analyses"
+              columns={orbMemo.columns}
+              data={orbMemo.data}
+              hidden={orbHidden}
+              globalFilter={orbSearch}
+              pagination={orbPagination}
+              mergeState={(state) =>
+                dispatch(actions.mergeState({ orB: state }))
+              }
+            />
+          </div>
         )}
         {rpMemo.data && (
-          <Table
-            title="Review Papers Focued on Mutational Signatures"
-            columns={rpMemo.columns}
-            data={rpMemo.data}
-            hidden={rpHidden}
-            globalFilter={rpSearch}
-            pagination={rpPagination}
-            mergeState={(state) => dispatch(actions.mergeState({ rp: state }))}
-          />
+          <div className="mb-5">
+            <Table
+              title="Review Papers Focued on Mutational Signatures"
+              columns={rpMemo.columns}
+              data={rpMemo.data}
+              hidden={rpHidden}
+              globalFilter={rpSearch}
+              pagination={rpPagination}
+              mergeState={(state) =>
+                dispatch(actions.mergeState({ rp: state }))
+              }
+            />
+          </div>
         )}
         {cmMemo.data && (
-          <Table
-            title="Computational Methods, Databases or Websites for Mutational Signature Analyses"
-            columns={cmMemo.columns}
-            data={cmMemo.data}
-            hidden={cmHidden}
-            globalFilter={cmSearch}
-            pagination={cmPagination}
-            mergeState={(state) => dispatch(actions.mergeState({ cm: state }))}
-          />
+          <div className="mb-5">
+            <Table
+              title="Computational Methods, Databases or Websites for Mutational Signature Analyses"
+              columns={cmMemo.columns}
+              data={cmMemo.data}
+              hidden={cmHidden}
+              globalFilter={cmSearch}
+              pagination={cmPagination}
+              mergeState={(state) =>
+                dispatch(actions.mergeState({ cm: state }))
+              }
+            />
+          </div>
         )}
 
         <div className="mb-4">

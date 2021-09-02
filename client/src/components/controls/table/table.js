@@ -127,7 +127,7 @@ export default function Table({
   );
 
   return (
-    <div className="mb-5">
+    <div>
       <Row className="mb-2">
         <Col md="8">
           <strong>{title}</strong>
