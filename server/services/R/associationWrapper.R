@@ -3,21 +3,27 @@ library(jsonlite)
 library(aws.s3)
 source('services/R/utils.R')
 
-getAssocVarData <- function(args, s3Data, localData, bucket) {
+getAssocVarData <- function(args, dataArgs) {
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
   sink(con, type = "output")
 
   tryCatch({
     output = list()
+    fullDataPath = paste0(dataArgs$savePath, 'assocVarData.txt')
 
     # update later to select RData from args$study
-    s3load(paste0(s3Data, 'Association/PCAWG_vardata.RData'), bucket)
+    s3load(paste0(dataArgs$s3Data, 'Association/PCAWG_vardata.RData'), dataArgs$bucket)
 
-    assocVarData <- vardata_refdata %>% filter(Cancer_Type == args$cancer)
+    vardata_refdata_selected <- vardata_refdata %>% filter(Cancer_Type == args$cancer)
+    # clist will be used for the Assocaition Variable Data and Select Variables.
+    clist <- vardata_refdata_selected %>% select(data_source, data_type, variable_name, variable_value_type) %>% unique()
+
+    # save vardata_refdata_selected for download
+    vardata_refdata_selected %>% write_delim(file = fullDataPath, delim = '\t', col_names = T, na = '')
 
 
-    output = list(assocVarData = assocVarData)
+    output = list(assocVarData = clist, fullDataPath = getResultsPath(fullDataPath))
   }, error = function(e) {
     print(e)
     output <<- append(output, list(uncaught_error = paste0(deparse(e$call), ': ', e$message)))
@@ -28,7 +34,7 @@ getAssocVarData <- function(args, s3Data, localData, bucket) {
   })
 }
 
-getExpVarData <- function(args, s3Data, localData, bucket) {
+getExpVarData <- function(args, dataArgs) {
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
   sink(con, type = "output")
@@ -37,12 +43,12 @@ getExpVarData <- function(args, s3Data, localData, bucket) {
     output = list()
 
     # load exposure data files
-    exposure_data_file <- paste0(s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
-    association_data_file <- paste0(s3Data, 'Association/', args$study, '_vardata.RData')
+    exposure_data_file <- paste0(dataArgs$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
+    association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_vardata.RData')
 
     error = tryCatch({
-      s3load(exposure_data_file, bucket)
-      s3load(association_data_file, bucket)
+      s3load(exposure_data_file, dataArgs$bucket)
+      s3load(association_data_file, dataArgs$bucket)
     }, error = function(e) {
       message = "ERROR: Exposure or association variable data are not avaiable for selected study. please check input or select another study"
       return(list(message = message, error = e$message))
@@ -85,7 +91,7 @@ getExpVarData <- function(args, s3Data, localData, bucket) {
 }
 
 
-loadCollapse <- function(args, s3Data, localData, bucket) {
+loadCollapse <- function(args, dataArgs) {
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
   sink(con, type = "output")
@@ -94,10 +100,10 @@ loadCollapse <- function(args, s3Data, localData, bucket) {
     output = list()
 
     # load exposure data files
-    exposure_data_file <- paste0(s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
-    association_data_file <- paste0(s3Data, 'Association/', args$study, '_vardata.RData')
-    s3load(exposure_data_file, bucket)
-    s3load(association_data_file, bucket)
+    exposure_data_file <- paste0(dataArgs$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
+    association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_vardata.RData')
+    s3load(exposure_data_file, dataArgs$bucket)
+    s3load(association_data_file, dataArgs$bucket)
 
 
     exposure_refdata_selected <- exposure_refdata %>% filter(Signature_set_name == args$rsSet, Cancer_Type == args$cancer)
@@ -146,7 +152,7 @@ loadCollapse <- function(args, s3Data, localData, bucket) {
   })
 }
 
-univariate <- function(args, projectID, rootDir, savePath, s3Data, localData, bucket) {
+univariate <- function(args, dataArgs) {
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
   sink(con, type = "output")
@@ -154,14 +160,14 @@ univariate <- function(args, projectID, rootDir, savePath, s3Data, localData, bu
   tryCatch({
     source('services/R/Sigvisualfunc.R')
     output = list()
-    plotPath = paste0(savePath, 'association_result.svg')
-    dataPath = paste0(savePath, 'asssociation_data.txt')
+    plotPath = paste0(dataArgs$savePath, 'association_result.svg')
+    dataPath = paste0(dataArgs$savePath, 'asssociation_data.txt')
 
     # load exposure data files
-    exposure_data_file <- paste0(s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
-    association_data_file <- paste0(s3Data, 'Association/', args$study, '_vardata.RData')
-    s3load(exposure_data_file, bucket)
-    s3load(association_data_file, bucket)
+    exposure_data_file <- paste0(dataArgs$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
+    association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_vardata.RData')
+    s3load(exposure_data_file, dataArgs$bucket)
+    s3load(association_data_file, dataArgs$bucket)
 
     exposure_refdata_selected <- exposure_refdata %>% filter(Signature_set_name == args$rsSet, Cancer_Type == args$cancer)
 

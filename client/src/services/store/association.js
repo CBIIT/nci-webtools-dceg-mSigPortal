@@ -9,6 +9,7 @@ export const getInitialState = () => ({
     submitted: false,
     exposureSignature: [],
     assocVarData: [],
+    assocFullDataPath: '',
     expVarList: [],
     source: 'public',
     study: '',

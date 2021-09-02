@@ -454,7 +454,7 @@ async function explorationData(req, res, next) {
   }
 }
 
-async function associationCalc(req, res, next) {
+async function associationWrapper(req, res, next) {
   const { fn, args, projectID: id } = req.body;
   logger.debug('/assocationCalc: %o', { ...req.body });
 
@@ -468,10 +468,12 @@ async function associationCalc(req, res, next) {
   try {
     const wrapper = await r('services/R/associationWrapper.R', fn, {
       args,
-      projectID: projectID,
-      rootDir: rootDir,
-      savePath: savePath,
-      ...dataArgs,
+      dataArgs: {
+        ...dataArgs,
+        projectID: projectID,
+        rootDir: rootDir,
+        savePath: savePath,
+      },
     });
 
     const { stdout, ...rest } = JSON.parse(wrapper);
@@ -484,25 +486,7 @@ async function associationCalc(req, res, next) {
       ...rest,
     });
   } catch (err) {
-    logger.info(`/associationCalc: An error occured with fn:${fn}`);
-    res.json({ debugR: err.stderr });
-    next(err);
-  }
-}
-
-async function associationData(req, res, next) {
-  const { fn, args } = req.body;
-  logger.debug('/associationData: %o', req.body);
-
-  try {
-    const data = await r('services/R/associationWrapper.R', fn, {
-      args,
-      ...dataArgs,
-    });
-
-    res.json(JSON.parse(data));
-  } catch (err) {
-    logger.info(`/associationData: An error occured with fn:${fn}`);
+    logger.info(`/associationWrapper: An error occured with fn:${fn}`);
     res.json({ debugR: err.stderr });
     next(err);
   }
@@ -832,6 +816,5 @@ module.exports = {
   getFileS3,
   getRelativePath,
   downloadSession,
-  associationCalc,
-  associationData,
+  associationWrapper,
 };

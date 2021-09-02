@@ -117,7 +117,7 @@ export default function PublicForm() {
   async function handleLoadData() {
     const getAssocVarData = async () =>
       (
-        await fetch(`api/associationData`, {
+        await fetch(`api/associationWrapper`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -131,7 +131,7 @@ export default function PublicForm() {
       ).json();
     const getExpVarData = async () =>
       (
-        await fetch(`api/associationData`, {
+        await fetch(`api/associationWrapper`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -151,14 +151,21 @@ export default function PublicForm() {
         getExpVarData(),
       ]);
 
-      const { assocVarData, error: assocError } = assocResponse;
+      const {
+        assocVarData,
+        fullDataPath,
+        error: assocError,
+        projectID,
+      } = assocResponse;
       const { expVarList, error: expError } = expResponse;
       if (assocError) throw assocError.message;
       if (expError) throw expError.message;
 
       mergeState({
+        projectID,
         assocVarData,
         expVarList,
+        assocFullDataPath: fullDataPath,
         submitted: true,
       });
     } catch (error) {
