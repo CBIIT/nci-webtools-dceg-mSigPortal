@@ -33,7 +33,10 @@ export default function Download() {
       const tempLink = document.createElement('a');
 
       tempLink.href = `${objectURL}`;
-      tempLink.setAttribute('download', `${file}`);
+      tempLink.setAttribute(
+        'download',
+        file.split('/')[file.split('/').length - 1]
+      );
       document.body.appendChild(tempLink);
       tempLink.click();
       document.body.removeChild(tempLink);
@@ -147,7 +150,7 @@ export default function Download() {
                 <div key={file}>
                   <Button variant="link" onClick={() => downloadOutput(file)}>
                     <LoadingOverlay active={downloading.indexOf(file) != -1} />
-                    Download {file.split('.')[0]}
+                    Download {file.split('/')[file.split('/').length - 1]}
                   </Button>
                 </div>
               ))}
