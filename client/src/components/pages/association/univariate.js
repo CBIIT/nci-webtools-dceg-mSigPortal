@@ -56,8 +56,6 @@ export default function Univariate() {
     resultsTable,
   } = useSelector((state) => state.association.univariate);
 
-  const [loadingMsg, setLoadingMsg] = useState(null);
-
   // populate controls
   useEffect(() => {
     if (assocVarData.length && !dataSource) {
@@ -85,7 +83,10 @@ export default function Univariate() {
   // ignore if prevSignature was '' (first calculation)
   const prevSignature = usePrevious(signature);
   useEffect(() => {
-    if (signature && prevSignature != '') handleCalculate();
+    console.log(signature);
+    console.log(prevSignature);
+    if (signature && prevSignature && signature != prevSignature)
+      handleCalculate();
   }, [signature]);
 
   // reducer for creating table columns from objects
@@ -228,14 +229,14 @@ export default function Univariate() {
         })
       ).json();
 
-      if (uncaught_error) {
+      if (error) {
+        mergeState({ error: error.error });
+      } else if (uncaught_error) {
         console.error('R error: ' + uncaught_error);
         mergeState({
           error:
             'An error has occured. Please review your parameters and try again.',
         });
-      } else if (error) {
-        throw error.error;
       } else {
         mergeState({
           projectID: id,
@@ -280,11 +281,7 @@ export default function Univariate() {
 
   return (
     <div className="bg-white border rounded">
-      <LoadingOverlay
-        active={loadingData}
-        content={loadingMsg}
-        showIndicator={loadingMsg}
-      />
+      <LoadingOverlay active={loadingData} />
       <div>
         <div className="mx-auto py-3 px-4">
           <Table
@@ -313,11 +310,7 @@ export default function Univariate() {
         </div>
         <hr />
         <div className="mx-auto py-3 px-4">
-          <LoadingOverlay
-            active={loadingParams}
-            content={loadingMsg}
-            showIndicator={loadingMsg}
-          />
+          <LoadingOverlay active={loadingParams} />
           <h4>Select Variables</h4>
           <Row className="justify-content-center mt-3">
             <Col md="8">
@@ -391,11 +384,7 @@ export default function Univariate() {
         </div>
         <hr />
         <div className="mx-auto py-3 px-4">
-          <LoadingOverlay
-            active={loadingCalculate}
-            content={loadingMsg}
-            showIndicator={loadingMsg}
-          />
+          <LoadingOverlay active={loadingCalculate} />
           <h4>Parameters</h4>
           {variable1.name && variable2.name ? (
             <>
@@ -661,11 +650,7 @@ export default function Univariate() {
                   />
                 </Col>
               </Row>
-              <LoadingOverlay
-                active={loadingRecalculate}
-                content={loadingMsg}
-                showIndicator={loadingMsg}
-              />
+              <LoadingOverlay active={loadingRecalculate} />
               {plotPath && (
                 <Plot
                   className="p-3 border rounded"

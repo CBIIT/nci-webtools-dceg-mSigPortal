@@ -10,11 +10,23 @@ getAssocVarData <- function(args, dataArgs) {
 
   tryCatch({
     output = list()
-    fullDataPath = paste0(dataArgs$savePath, 'assocVarData.txt')
+    fullDataPath = paste0(dataArgs$savePath, 'vardata_refdata_selected.txt')
 
-    # update later to select RData from args$study
-    s3load(paste0(dataArgs$s3Data, 'Association/PCAWG_vardata.RData'), dataArgs$bucket)
+    association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_vardata.RData')
 
+    error = tryCatch({
+      s3load(association_data_file, dataArgs$bucket)
+    }, error = function(e) {
+      message = "ERROR: association variable data are not avaiable for selected study. please check input or select another study"
+      return(list(message = message, error = e$message))
+    })
+    if (is.list(error)) {
+      output = list(error = error)
+      print(error$message)
+      stop(error$error)
+    }
+
+    ## extract the variable information
     vardata_refdata_selected <- vardata_refdata %>% filter(Cancer_Type == args$cancer)
     # clist will be used for the Assocaition Variable Data and Select Variables.
     clist <- vardata_refdata_selected %>% select(data_source, data_type, variable_name, variable_value_type) %>% unique()
@@ -73,7 +85,6 @@ getExpVarData <- function(args, dataArgs) {
     # overlapped samples
     osamples <- intersect(unique(vardata_refdata_selected$Sample), unique(exposure_refdata_selected$Sample))
 
-    vardata_refdata_selected <- vardata_refdata_selected %>% filter(Sample %in% osamples)
     exposure_refdata_selected <- exposure_refdata_selected %>% filter(Sample %in% osamples)
 
     # expsorue variable list
@@ -196,6 +207,28 @@ univariate <- function(args, dataArgs) {
     vardata_refdata_selected <- vardata_refdata_selected %>%
       pivot_wider(id_cols = Sample, names_from = variable_name, values_from = variable_value)
 
+    error = tryCatch({
+      ## check data integration
+      vardata_refdata_selected <- exposure_refdata_selected %>% select(Sample) %>% unique() %>% left_join(vardata_refdata_selected)
+      ## including NA
+      if (length(unique(vardata_refdata_selected[[2]])) == 1) {
+        stop(paste0("mSigPortal Association failed: the selected variable name ", args$variable1$name, " have only unique value: ", unique(vardata_refdata_selected[[2]]), '.'))
+      }
+      tmpdata <- vardata_refdata_selected
+      colnames(tmpdata)[2] <- 'Variable'
+      tmpvalue <- tmpdata %>% count(Variable) %>% filter(n < 2) %>% dim() %>% .[[1]]
+
+      if (tmpvalue != 0) {
+        stop(paste0("mSigPortal Association failed: the selected variable name ", args$variable1$name, " have not enough obsevations for both levels."))
+      }
+    }, error = function(e) {
+      return(list(message = 'Data integration error', error = e$message))
+    })
+    if (is.list(error)) {
+      output = list(error = error)
+      print(error$message)
+      stop(error$error)
+    }
     ### combined dataset
     data_input <- left_join(vardata_refdata_selected, exposure_refdata_selected) %>% select(-Sample)
 
@@ -203,7 +236,7 @@ univariate <- function(args, dataArgs) {
     result <- tryCatch({
       mSigPortal_associaiton_group(data = data_input, Group_Var = "Signature_name",
       Var1 = args$variable1$name, Var2 = args$variable2$name, type = args$testType,
-      filter_zero1 = args$variable1$filter, filter_zero2 = args$variable2$filter,
+      filter1 = args$variable1$filter, filter2 = args$variable2$filter,
       log1 = args$variable1$log2, log2 = args$variable2$log2, collapse_var1 = args$variable1$collapse,
       collapse_var2 = args$variable2$collapse)
     }, error = function(e) {
@@ -223,7 +256,7 @@ univariate <- function(args, dataArgs) {
 
 
     mSigPortal_associaiton(data = data_input, Var1 = args$variable1$name, Var2 = args$variable2$name, type = args$testType,
-      xlab = args$xlab, ylab = args$ylab, filter_zero1 = args$variable1$filter, filter_zero2 = args$variable2$filter,
+      xlab = args$xlab, ylab = args$ylab, filter1 = args$variable1$filter, filter2 = args$variable2$filter,
       log1 = args$variable1$log2, log2 = args$variable2$log2, collapse_var1 = args$variable1$collapse,
       collapse_var2 = args$variable2$collapse, output_plot = plotPath)
 
