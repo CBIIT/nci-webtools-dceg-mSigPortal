@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import Select from '../../controls/select/select';
 import { useSelector, useDispatch } from 'react-redux';
@@ -35,9 +35,9 @@ export default function PublicForm({
     cancer,
     rsSet,
     useCancerType,
+    signatureNameOptions,
+    publicSampleOptions,
   } = useSelector((state) => state.exposure.exposureState);
-
-  const [queryNames, setQuery] = useState(false);
 
   // populate controls on inital render
   useEffect(() => {
@@ -46,8 +46,9 @@ export default function PublicForm({
 
   // call calculate after receiving signature and sample name options
   useEffect(() => {
-    if (!submitted && queryNames) calculate();
-  }, [queryNames, submitted]);
+    if (!submitted && signatureNameOptions.length && publicSampleOptions.length)
+      calculate();
+  }, [signatureNameOptions, publicSampleOptions]);
 
   async function populateControls() {
     try {
@@ -212,8 +213,6 @@ export default function PublicForm({
     mergeState({ loading: true });
     await Promise.all([getSampleNames(), getSignatureNames()]);
     mergeState({ loading: false });
-    // set to true after sample and signature names have been dispatched
-    setQuery(true);
   }
 
   return (
@@ -304,10 +303,7 @@ export default function PublicForm({
             disabled={loading}
             className="w-100 mb-3"
             variant="secondary"
-            onClick={() => {
-              setQuery(false);
-              handleReset();
-            }}
+            onClick={() => handleReset()}
           >
             Reset
           </Button>

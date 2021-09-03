@@ -617,12 +617,10 @@ export default function Exposure({ match }) {
                   <Button
                     variant="link"
                     className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
-                      id == displayTab && submitted
-                        ? 'active-secondary-navlinks'
-                        : ''
+                      id == displayTab ? 'active-secondary-navlinks' : ''
                     }`}
                     active={id == displayTab && submitted}
-                    disabled={!submitted}
+                    disabled={id != 'instructions' && !submitted}
                     style={{
                       textDecoration: 'none',
                       fontSize: '12pt',

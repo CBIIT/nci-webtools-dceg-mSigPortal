@@ -33,6 +33,8 @@ export default function PublicForm({
     genome,
     genomeOptions,
     projectID,
+    userNameOptions,
+    userSampleOptions,
   } = useSelector((state) => state.exposure.exposureState);
 
   const [exposureFileObj, setExposure] = useState(new File([], ''));
@@ -41,12 +43,11 @@ export default function PublicForm({
 
   const [checkValid, setCheckValid] = useState(false);
 
-  const [queryNames, setQuery] = useState(false);
-
   // call calculate after receiving signature and sample name options
   useEffect(() => {
-    if (!submitted && queryNames) calculate('all', projectID);
-  }, [queryNames, submitted]);
+    if (!submitted && userNameOptions.length && userSampleOptions.length)
+      calculate('all', projectID);
+  }, [userNameOptions, userSampleOptions]);
 
   function validateFiles() {
     setCheckValid(true);
@@ -134,8 +135,6 @@ export default function PublicForm({
           msBurden: { signatureName: nameOptions[0] },
         })
       );
-      // set to true after sample and signature names have been dispatched
-      setQuery(true);
     } catch (err) {
       mergeError(err);
     }
@@ -339,7 +338,6 @@ export default function PublicForm({
               setExposure(new File([], ''));
               setMatrix(new File([], ''));
               setSignature(new File([], ''));
-              setQuery(false);
               handleReset();
             }}
           >
