@@ -500,12 +500,10 @@ export default function Visualization({ match }) {
                   <Button
                     variant="link"
                     className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
-                      id == displayTab && Object.keys(svgList).length
-                        ? 'active-secondary-navlinks'
-                        : ''
+                      id == displayTab ? 'active-secondary-navlinks' : ''
                     }`}
-                    active={id == displayTab && Object.keys(svgList).length}
-                    disabled={!Object.keys(svgList).length}
+                    active={id == displayTab && submitted}
+                    disabled={id != 'instructions' && !submitted}
                     style={{
                       textDecoration: 'none',
                       fontSize: '12pt',

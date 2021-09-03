@@ -54,12 +54,12 @@ export default function Association() {
                   <Button
                     variant="link"
                     className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
-                      id == displayTab && Object.keys(expVarList).length
-                        ? 'active-secondary-navlinks'
-                        : ''
+                      id == displayTab ? 'active-secondary-navlinks' : ''
                     }`}
-                    active={id == displayTab && Object.keys(expVarList).length}
-                    disabled={!Object.keys(expVarList).length}
+                    active={id == displayTab && submitted}
+                    disabled={
+                      id != 'instructions' && !Object.keys(expVarList).length
+                    }
                     style={{
                       textDecoration: 'none',
                       fontSize: '12pt',
