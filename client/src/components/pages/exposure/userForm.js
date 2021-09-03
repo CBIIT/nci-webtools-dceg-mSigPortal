@@ -45,9 +45,14 @@ export default function PublicForm({
 
   // call calculate after receiving signature and sample name options
   useEffect(() => {
-    if (!submitted && userNameOptions.length && userSampleOptions.length)
+    if (
+      !submitted &&
+      !loading &&
+      userNameOptions.length &&
+      userSampleOptions.length
+    )
       calculate('all', projectID);
-  }, [userNameOptions, userSampleOptions]);
+  }, [userNameOptions, userSampleOptions, loading]);
 
   function validateFiles() {
     setCheckValid(true);
@@ -110,6 +115,7 @@ export default function PublicForm({
 
   //  get signature and sample names. useEffect will call main calculate function
   async function handleCalculate() {
+    mergeState({ loading: true });
     try {
       const { projectID, exposureData } = await handleUpload();
       // get signature name options, ignore sample key
@@ -138,6 +144,7 @@ export default function PublicForm({
     } catch (err) {
       mergeError(err);
     }
+    mergeState({ loading: false });
   }
 
   return (

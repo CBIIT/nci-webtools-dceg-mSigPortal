@@ -46,9 +46,14 @@ export default function PublicForm({
 
   // call calculate after receiving signature and sample name options
   useEffect(() => {
-    if (!submitted && signatureNameOptions.length && publicSampleOptions.length)
+    if (
+      !submitted &&
+      !loading &&
+      signatureNameOptions.length &&
+      publicSampleOptions.length
+    )
       calculate();
-  }, [signatureNameOptions, publicSampleOptions]);
+  }, [signatureNameOptions, publicSampleOptions, loading]);
 
   async function populateControls() {
     try {
@@ -211,7 +216,11 @@ export default function PublicForm({
   //  get signature and sample names. useEffect will call main calculate function
   async function handleCalculate() {
     mergeState({ loading: true });
-    await Promise.all([getSampleNames(), getSignatureNames()]);
+    try {
+      await Promise.all([getSampleNames(), getSignatureNames()]);
+    } catch (error) {
+      mergeError(error);
+    }
     mergeState({ loading: false });
   }
 
