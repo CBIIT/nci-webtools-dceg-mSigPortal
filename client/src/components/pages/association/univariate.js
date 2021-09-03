@@ -83,8 +83,6 @@ export default function Univariate() {
   // ignore if prevSignature was '' (first calculation)
   const prevSignature = usePrevious(signature);
   useEffect(() => {
-    console.log(signature);
-    console.log(prevSignature);
     if (signature && prevSignature && signature != prevSignature)
       handleCalculate();
   }, [signature]);
