@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Row, Col, Button, Form } from 'react-bootstrap';
+import { Row, Col, Button, Form, Card } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as etiologyActions } from '../../../../services/store/etiology';
 import { actions as catalogActions } from '../../../../services/store/catalog';
@@ -10,7 +10,7 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 import './etiology.scss';
 
 const actions = { ...etiologyActions, ...catalogActions, ...modalActions };
-const { Group, Check } = Form;
+const { Check } = Form;
 
 export default function Etiology() {
   const dispatch = useDispatch();
@@ -280,35 +280,37 @@ export default function Etiology() {
   function getEtiologies() {
     if (data[category] && data[category].length) {
       return (
-        <Row className="justify-content-center">
-          {[...new Set(data[category].map((obj) => obj.Etiology))]
-            .sort()
-            .map((Etiology) => (
-              <Col
-                key={Etiology}
-                lg={category == 'Gene Edits' ? '1' : '2'}
-                md="3"
-                sm="4"
-                className="mb-3 d-flex"
-              >
-                <Button
-                  size="sm"
-                  variant="dark"
-                  onClick={() =>
-                    mergeEtiology({
-                      etiology: Etiology,
-                      signatureName: '',
-                      selectedSource: '',
-                    })
-                  }
-                  className={etiology != Etiology ? 'disabled' : ''}
-                  block
+        <>
+          <Row className="justify-content-center">
+            {[...new Set(data[category].map((obj) => obj.Etiology))]
+              .sort()
+              .map((Etiology) => (
+                <Col
+                  key={Etiology}
+                  lg={category == 'Gene Edits' ? '1' : '2'}
+                  md="3"
+                  sm="4"
+                  className="mb-3 d-flex"
                 >
-                  {Etiology}
-                </Button>
-              </Col>
-            ))}
-        </Row>
+                  <Button
+                    size="sm"
+                    variant="dark"
+                    onClick={() =>
+                      mergeEtiology({
+                        etiology: Etiology,
+                        signatureName: '',
+                        selectedSource: '',
+                      })
+                    }
+                    className={etiology != Etiology ? 'disabled' : ''}
+                    block
+                  >
+                    {Etiology}
+                  </Button>
+                </Col>
+              ))}
+          </Row>
+        </>
       );
     } else {
       return (
@@ -565,8 +567,8 @@ export default function Etiology() {
           ...new Set(
             data[category]
               .filter(
-                ({ Etiology, 'Signature Name': signatureName }) =>
-                  Etiology == etiology && signatureName == signatureName
+                ({ Etiology, 'Signature Name': sigName }) =>
+                  Etiology == etiology && sigName == signatureName
               )
               .map((obj) => obj.Study)
           ),
@@ -715,25 +717,42 @@ export default function Etiology() {
             </p>
           );
         }
-      } else {
-        return (
-          <p className="d-flex justify-content-center text-muted">
-            Select a category, etiology, and signature to view more info
-          </p>
-        );
       }
     }
 
     return (
       <div>
-        <div className="mx-auto p-3 pt-0">
-          <Row>
-            <Col sm="4">
-              <strong>Etiologies</strong>
-            </Col>
-            <Col sm="4">
-              <Group className="d-flex justify-content-center">
-                <Check inline id="selectedEtiology">
+        <Card className="mb-3" bg="light">
+          <Card.Header className="text-center">
+            <h5>Etiologies</h5>
+          </Card.Header>
+          <Card.Body className="bg-white">
+            <Row className="justify-content-center mb-3">
+              <Col sm="auto">
+                <p>Select an etiology</p>
+              </Col>
+            </Row>
+            <div>{getEtiologies()}</div>
+          </Card.Body>
+        </Card>
+        <Card bg="light">
+          <Card.Header className="text-center">
+            <h5>Signatures</h5>
+          </Card.Header>
+          <Card.Body className="bg-white">
+            <Row className="justify-content-center mb-3">
+              <Col sm="auto">
+                <p>
+                  Select a signature to view more info. Choose{' '}
+                  <b>Selected Etiology</b> to see signatures in the selected
+                  etiology, or <b>All Signatures</b> to see signatures for every
+                  etiology.
+                </p>
+              </Col>
+            </Row>
+            <Row className="justify-content-center mb-3">
+              <Col sm="auto">
+                <Check id="selectedEtiology">
                   <Check.Input
                     type="radio"
                     checked={all == false}
@@ -743,35 +762,33 @@ export default function Etiology() {
                     Selected Etiology
                   </Check.Label>
                 </Check>
-                <Check inline id="allEtiologies">
+              </Col>
+              <Col sm="auto">
+                <Check id="allEtiologies">
                   <Check.Input
                     type="radio"
                     checked={all == true}
                     onChange={() => mergeEtiology({ all: true })}
                   />
                   <Check.Label className="font-weight-normal">
-                    All Etiologies
+                    All Signatures
                   </Check.Label>
                 </Check>
-              </Group>
-            </Col>
-          </Row>
-          {getEtiologies()}
-        </div>
-        <hr />
-        <div className="mx-auto p-3 pt-0">
-          <strong>Signatures</strong>
-          <Row className={`justify-content-center ${all ? 'd-none' : ''}`}>
-            {getSignatures()}
-          </Row>
-          <Row
-            className={`px-2 justify-content-center ${!all ? 'd-none' : ''}`}
-          >
-            {getAllSignatures()}
-          </Row>
-        </div>
-        <hr />
-        <div className="mx-auto p-3">{getInfo()}</div>
+              </Col>
+            </Row>
+
+            <Row className={`justify-content-center ${all ? 'd-none' : ''}`}>
+              {getSignatures()}
+            </Row>
+            <Row
+              className={`px-2 justify-content-center ${!all ? 'd-none' : ''}`}
+            >
+              {getAllSignatures()}
+            </Row>
+            <hr />
+            <div className="p-3">{getInfo()}</div>
+          </Card.Body>
+        </Card>
       </div>
     );
   }
@@ -909,8 +926,6 @@ export default function Etiology() {
               </Col>
             );
           });
-      } else {
-        return <p className="text-muted">Select a signature</p>;
       }
     }
 
@@ -981,24 +996,43 @@ export default function Etiology() {
             </p>
           );
         }
-      } else {
-        return (
-          <p className="d-flex justify-content-center text-muted">
-            Select a Reference Signature
-          </p>
-        );
       }
     }
     return (
       <div>
-        <div className="mx-auto p-3">
-          <Row>
-            <Col sm="4">
-              <strong>Etiologies</strong>
-            </Col>
-            <Col sm="4">
-              <Group className="d-flex justify-content-center">
-                <Check inline id="selectedEtiology">
+        <Card className="mb-3" bg="light">
+          <Card.Header className="text-center">
+            <h5>Etiologies</h5>
+          </Card.Header>
+          <Card.Body className="bg-white">
+            <div>
+              <Row className="justify-content-center mb-3">
+                <Col sm="auto">
+                  <p>Select an etiology</p>
+                </Col>
+              </Row>
+              {getCancerEtiology()}
+            </div>
+          </Card.Body>
+        </Card>
+        <Card className="mb-3" bg="light">
+          <Card.Header className="text-center">
+            <h5>Tissue Specific Signatures</h5>
+          </Card.Header>
+          <Card.Body className="bg-white">
+            <Row className="justify-content-center mb-3">
+              <Col sm="auto">
+                <p>
+                  Select a signature to view more info. Choose{' '}
+                  <b>Selected Etiology</b> to see signatures in the selected
+                  etiology, or <b>All Signatures</b> to see signatures for every
+                  etiology.
+                </p>
+              </Col>
+            </Row>
+            <Row className="justify-content-center mb-3">
+              <Col sm="auto">
+                <Check id="selectedEtiology">
                   <Check.Input
                     type="radio"
                     checked={all == false}
@@ -1008,51 +1042,67 @@ export default function Etiology() {
                     Selected Etiology
                   </Check.Label>
                 </Check>
-                <Check inline id="allEtiologies">
+              </Col>
+              <Col sm="auto">
+                <Check id="allEtiologies">
                   <Check.Input
                     type="radio"
                     checked={all == true}
                     onChange={() => mergeEtiology({ all: true })}
                   />
                   <Check.Label className="font-weight-normal">
-                    All Etiologies
+                    All Signatures
                   </Check.Label>
                 </Check>
-              </Group>
-            </Col>
-          </Row>
-          {getCancerEtiology()}
-        </div>
-        <hr />
-        <div className="mx-auto p-3">
-          <strong>Tissue Specific Signatures</strong>
-          <Row className={`justify-content-center ${all ? 'd-none' : ''}`}>
-            {getTissues()}
-          </Row>
-          <Row
-            className={`px-2 justify-content-center ${!all ? 'd-none' : ''}`}
-          >
-            {getAllTissues()}
-          </Row>
-        </div>
-        <hr />
-        <div className="mx-auto p-3">
-          <strong>Reference Signatures</strong>
-          <Row className="justify-content-center">{getRefSig()}</Row>
-        </div>
-        <hr />
-        <div className="mx-auto p-3">{getCancerSpecificInfo()}</div>
+              </Col>
+            </Row>
+            <Row className={`justify-content-center ${all ? 'd-none' : ''}`}>
+              {getTissues()}
+            </Row>
+            <Row
+              className={`px-2 justify-content-center ${!all ? 'd-none' : ''}`}
+            >
+              {getAllTissues()}
+            </Row>
+          </Card.Body>
+        </Card>
+        <Card bg="light">
+          <Card.Header className="text-center">
+            <h5>Reference Signatures</h5>
+          </Card.Header>
+          <Card.Body className="bg-white">
+            <Row className="justify-content-center mb-3">
+              <Col sm="auto">
+                <p>Select a reference signature</p>
+              </Col>
+            </Row>
+            <Row className="justify-content-center">{getRefSig()}</Row>
+            <hr />
+            <div className="p-3">{getCancerSpecificInfo()}</div>
+          </Card.Body>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="bg-white border rounded">
-      <div className="mx-auto p-3">
-        <strong className="mb-3">Categories</strong>
-        <Row className="justify-content-center">{getCategories()}</Row>
-      </div>
-      <hr />
+    <div>
+      <Card className="mb-3" bg="secondary">
+        <Card.Header as="h5" className="text-center">
+          Categories
+        </Card.Header>
+        <Card.Body className="bg-white">
+          <div className="mx-auto">
+            <Row className="justify-content-center mb-3">
+              <Col sm="auto">
+                <p>Select a category</p>
+              </Col>
+            </Row>
+            <Row className="justify-content-center">{getCategories()}</Row>
+          </div>
+        </Card.Body>
+      </Card>
+
       {category != 'Cancer Specific Signature' && standardView()}
       {category == 'Cancer Specific Signature' && cancerSpecificView()}
     </div>
