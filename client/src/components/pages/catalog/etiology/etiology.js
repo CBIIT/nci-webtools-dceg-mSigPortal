@@ -165,7 +165,14 @@ export default function Etiology() {
     ) {
       const signatures = data[category]
         .slice()
-        .filter(({ Study }) => Study == study || !Study)
+        .filter(
+          (value, index, array) =>
+            array.findIndex(
+              (t) => t['Signature Name'] === value['Signature Name']
+            ) === index || array.findIndex(
+              (t) => t['Signature'] === value['Signature']
+            ) === index
+        )
         .sort(naturalSort)
         .sort(profileSort);
 
