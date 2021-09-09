@@ -124,7 +124,7 @@ export default function Plot({
             <TransformComponent>
               <img
                 className="w-100"
-                src={`${plotPath}#${Date.now()}`}
+                src={plotPath}
                 style={{ maxHeight: height || '500px' }}
                 alt={alt || 'Plot Unavailable'}
               />
