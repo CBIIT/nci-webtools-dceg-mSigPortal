@@ -169,9 +169,9 @@ export default function Etiology() {
           (value, index, array) =>
             array.findIndex(
               (t) => t['Signature Name'] === value['Signature Name']
-            ) === index || array.findIndex(
-              (t) => t['Signature'] === value['Signature']
-            ) === index
+            ) === index ||
+            array.findIndex((t) => t['Signature'] === value['Signature']) ===
+              index
         )
         .sort(naturalSort)
         .sort(profileSort);
@@ -257,31 +257,35 @@ export default function Etiology() {
   }
 
   function getCategories() {
-    return categories.map(({ name, file }) => (
-      <Col key={name} lg="2" md="3" sm="4" className="mb-3 d-flex">
-        <Button
-          size="sm"
-          variant="dark"
-          onClick={
-            file && name != category
-              ? async () => {
-                  mergeEtiology({
-                    category: name,
-                    etiology: '',
-                    signatureName: '',
-                    study: '',
-                    selectedSource: '',
-                  });
-                }
-              : () => {}
-          }
-          className={category != name ? 'disabled' : ''}
-          block
-        >
-          {name}
-        </Button>
-      </Col>
-    ));
+    return (
+      <Row className="justify-content-center mb-3">
+        {categories.map(({ name, file }) => (
+          <Col key={name} lg="2" md="3" sm="4" className="mb-3 d-flex">
+            <Button
+              size="sm"
+              variant="dark"
+              onClick={
+                file && name != category
+                  ? async () => {
+                      mergeEtiology({
+                        category: name,
+                        etiology: '',
+                        signatureName: '',
+                        study: '',
+                        selectedSource: '',
+                      });
+                    }
+                  : () => {}
+              }
+              className={category != name ? 'disabled' : ''}
+              block
+            >
+              {name}
+            </Button>
+          </Col>
+        ))}
+      </Row>
+    );
   }
 
   function getEtiologies() {
@@ -729,73 +733,60 @@ export default function Etiology() {
 
     return (
       <div>
-        <Card className="mb-3" bg="light">
-          <Card.Header className="text-center">
-            <h5>Etiologies</h5>
-          </Card.Header>
-          <Card.Body className="bg-white">
-            <Row className="justify-content-center mb-3">
-              <Col sm="auto">
-                <p>Select an etiology</p>
-              </Col>
-            </Row>
-            <div>{getEtiologies()}</div>
-          </Card.Body>
-        </Card>
-        <Card bg="light">
-          <Card.Header className="text-center">
-            <h5>Signatures</h5>
-          </Card.Header>
-          <Card.Body className="bg-white">
-            <Row className="justify-content-center mb-3">
-              <Col sm="auto">
-                <p>
-                  Select a signature to view more info. Choose{' '}
-                  <b>Selected Etiology</b> to see signatures in the selected
-                  etiology, or <b>All Signatures</b> to see signatures for every
-                  etiology.
-                </p>
-              </Col>
-            </Row>
-            <Row className="justify-content-center mb-3">
-              <Col sm="auto">
-                <Check id="selectedEtiology">
-                  <Check.Input
-                    type="radio"
-                    checked={all == false}
-                    onChange={() => mergeEtiology({ all: false })}
-                  />
-                  <Check.Label className="font-weight-normal">
-                    Selected Etiology
-                  </Check.Label>
-                </Check>
-              </Col>
-              <Col sm="auto">
-                <Check id="allEtiologies">
-                  <Check.Input
-                    type="radio"
-                    checked={all == true}
-                    onChange={() => mergeEtiology({ all: true })}
-                  />
-                  <Check.Label className="font-weight-normal">
-                    All Signatures
-                  </Check.Label>
-                </Check>
-              </Col>
-            </Row>
+        <div className="mb-3">
+          <h5 className="separator">Etiologies</h5>
+          <div>{getEtiologies()}</div>
+        </div>
+        <div>
+          <h5 className="separator">Signatures</h5>
 
-            <Row className={`justify-content-center ${all ? 'd-none' : ''}`}>
-              {getSignatures()}
-            </Row>
-            <Row
-              className={`px-2 justify-content-center ${!all ? 'd-none' : ''}`}
-            >
-              {getAllSignatures()}
-            </Row>
-            <hr />
-            <div className="p-3">{getInfo()}</div>
-          </Card.Body>
-        </Card>
+          <Row className="justify-content-center mb-3">
+            <Col sm="auto">
+              <p>
+                Select a signature to view more info. Choose{' '}
+                <b>Selected Etiology</b> to see signatures in the selected
+                etiology, or <b>All Signatures</b> to see signatures for every
+                etiology.
+              </p>
+            </Col>
+          </Row>
+          <Row className="justify-content-center mb-3">
+            <Col sm="auto">
+              <Check id="selectedEtiology">
+                <Check.Input
+                  type="radio"
+                  checked={all == false}
+                  onChange={() => mergeEtiology({ all: false })}
+                />
+                <Check.Label className="font-weight-normal">
+                  Selected Etiology
+                </Check.Label>
+              </Check>
+            </Col>
+            <Col sm="auto">
+              <Check id="allEtiologies">
+                <Check.Input
+                  type="radio"
+                  checked={all == true}
+                  onChange={() => mergeEtiology({ all: true })}
+                />
+                <Check.Label className="font-weight-normal">
+                  All Signatures
+                </Check.Label>
+              </Check>
+            </Col>
+          </Row>
+
+          <Row className={`justify-content-center ${all ? 'd-none' : ''}`}>
+            {getSignatures()}
+          </Row>
+          <Row
+            className={`px-2 justify-content-center ${!all ? 'd-none' : ''}`}
+          >
+            {getAllSignatures()}
+          </Row>
+          <div className="p-3">{getInfo()}</div>
+        </div>
       </div>
     );
   }
@@ -903,36 +894,45 @@ export default function Etiology() {
 
     function getRefSig() {
       if (refSigThumbnails.length && tissue) {
-        return refSigThumbnails
-          .filter(
-            (v) =>
-              v.Etiology == etiology && v['Tissue Specific Signature'] == tissue
-          )
-          .map((v, index) => {
-            return (
-              <Col key={index} md="2" sm="4" className="mb-3">
-                <div
-                  className={`sigIcon border rounded ${
-                    refSig == v['Ref Signature'] ? 'active' : ''
-                  }`}
-                  title={`${v['Tissue Specific Signature']} - ${v['Ref Signature']}`}
-                  onClick={() => mergeEtiology({ refSig: v['Ref Signature'] })}
-                >
-                  <img
-                    src={v.thumbnailURL}
-                    className="w-100"
-                    // height="110"
-                    alt={v['Ref Signature']}
-                  />
-                  <div className="sigLabel">
-                    <strong className="sigLabel">
-                      {`${v['Ref Signature']} (${v['RefSig Proportion']})`}
-                    </strong>
-                  </div>
-                </div>
-              </Col>
-            );
-          });
+        return (
+          <Row className="justify-content-center">
+            {refSigThumbnails
+              .filter(
+                (v) =>
+                  v.Etiology == etiology &&
+                  v['Tissue Specific Signature'] == tissue
+              )
+              .map((v, index) => {
+                return (
+                  <Col key={index} md="2" sm="4" className="mb-3">
+                    <div
+                      className={`sigIcon border rounded ${
+                        refSig == v['Ref Signature'] ? 'active' : ''
+                      }`}
+                      title={`${v['Tissue Specific Signature']} - ${v['Ref Signature']}`}
+                      onClick={() =>
+                        mergeEtiology({ refSig: v['Ref Signature'] })
+                      }
+                    >
+                      <img
+                        src={v.thumbnailURL}
+                        className="w-100"
+                        // height="110"
+                        alt={v['Ref Signature']}
+                      />
+                      <div className="sigLabel">
+                        <strong className="sigLabel">
+                          {`${v['Ref Signature']} (${v['RefSig Proportion']})`}
+                        </strong>
+                      </div>
+                    </div>
+                  </Col>
+                );
+              })}
+          </Row>
+        );
+      } else {
+        return <p className="text-center text-muted">Select a Signature</p>;
       }
     }
 
@@ -1007,87 +1007,62 @@ export default function Etiology() {
     }
     return (
       <div>
-        <Card className="mb-3" bg="light">
-          <Card.Header className="text-center">
-            <h5>Etiologies</h5>
-          </Card.Header>
-          <Card.Body className="bg-white">
-            <div>
-              <Row className="justify-content-center mb-3">
-                <Col sm="auto">
-                  <p>Select an etiology</p>
-                </Col>
-              </Row>
-              {getCancerEtiology()}
-            </div>
-          </Card.Body>
-        </Card>
-        <Card className="mb-3" bg="light">
-          <Card.Header className="text-center">
-            <h5>Tissue Specific Signatures</h5>
-          </Card.Header>
-          <Card.Body className="bg-white">
-            <Row className="justify-content-center mb-3">
-              <Col sm="auto">
-                <p>
-                  Select a signature to view more info. Choose{' '}
-                  <b>Selected Etiology</b> to see signatures in the selected
-                  etiology, or <b>All Signatures</b> to see signatures for every
-                  etiology.
-                </p>
-              </Col>
-            </Row>
-            <Row className="justify-content-center mb-3">
-              <Col sm="auto">
-                <Check id="selectedEtiology">
-                  <Check.Input
-                    type="radio"
-                    checked={all == false}
-                    onChange={() => mergeEtiology({ all: false })}
-                  />
-                  <Check.Label className="font-weight-normal">
-                    Selected Etiology
-                  </Check.Label>
-                </Check>
-              </Col>
-              <Col sm="auto">
-                <Check id="allEtiologies">
-                  <Check.Input
-                    type="radio"
-                    checked={all == true}
-                    onChange={() => mergeEtiology({ all: true })}
-                  />
-                  <Check.Label className="font-weight-normal">
-                    All Signatures
-                  </Check.Label>
-                </Check>
-              </Col>
-            </Row>
-            <Row className={`justify-content-center ${all ? 'd-none' : ''}`}>
-              {getTissues()}
-            </Row>
-            <Row
-              className={`px-2 justify-content-center ${!all ? 'd-none' : ''}`}
-            >
-              {getAllTissues()}
-            </Row>
-          </Card.Body>
-        </Card>
-        <Card bg="light">
-          <Card.Header className="text-center">
-            <h5>Reference Signatures</h5>
-          </Card.Header>
-          <Card.Body className="bg-white">
-            <Row className="justify-content-center mb-3">
-              <Col sm="auto">
-                <p>Select a reference signature</p>
-              </Col>
-            </Row>
-            <Row className="justify-content-center">{getRefSig()}</Row>
-            <hr />
-            <div className="p-3">{getCancerSpecificInfo()}</div>
-          </Card.Body>
-        </Card>
+        <div className="mb-3">
+          <h5 className="separator">Etiologies</h5>
+          {getCancerEtiology()}
+        </div>
+        <div className="mb-3">
+          <h5 className="separator">Tissue Specific Signatures</h5>
+          <Row className="justify-content-center mb-3">
+            <Col sm="auto">
+              <p>
+                Select a signature to view more info. Choose{' '}
+                <b>Selected Etiology</b> to see signatures in the selected
+                etiology, or <b>All Signatures</b> to see signatures for every
+                etiology.
+              </p>
+            </Col>
+          </Row>
+          <Row className="justify-content-center mb-3">
+            <Col sm="auto">
+              <Check id="selectedEtiology">
+                <Check.Input
+                  type="radio"
+                  checked={all == false}
+                  onChange={() => mergeEtiology({ all: false })}
+                />
+                <Check.Label className="font-weight-normal">
+                  Selected Etiology
+                </Check.Label>
+              </Check>
+            </Col>
+            <Col sm="auto">
+              <Check id="allEtiologies">
+                <Check.Input
+                  type="radio"
+                  checked={all == true}
+                  onChange={() => mergeEtiology({ all: true })}
+                />
+                <Check.Label className="font-weight-normal">
+                  All Signatures
+                </Check.Label>
+              </Check>
+            </Col>
+          </Row>
+          <Row className={`justify-content-center ${all ? 'd-none' : ''}`}>
+            {getTissues()}
+          </Row>
+          <Row
+            className={`px-2 justify-content-center ${!all ? 'd-none' : ''}`}
+          >
+            {getAllTissues()}
+          </Row>
+        </div>
+        <div className="mb-3">
+          <h5 className="separator">Reference Signatures</h5>
+          {getRefSig()}
+          <div className="p-3">{getCancerSpecificInfo()}</div>
+        </div>
       </div>
     );
   }
@@ -1095,23 +1070,13 @@ export default function Etiology() {
   return (
     <div>
       <Card className="mb-3" bg="secondary">
-        <Card.Header as="h5" className="text-center">
-          Categories
-        </Card.Header>
         <Card.Body className="bg-white">
-          <div className="mx-auto">
-            <Row className="justify-content-center mb-3">
-              <Col sm="auto">
-                <p>Select a category</p>
-              </Col>
-            </Row>
-            <Row className="justify-content-center">{getCategories()}</Row>
-          </div>
+          <h5 className="separator">Categories</h5>
+          {getCategories()}
+          {category != 'Cancer Specific Signature' && standardView()}
+          {category == 'Cancer Specific Signature' && cancerSpecificView()}
         </Card.Body>
       </Card>
-
-      {category != 'Cancer Specific Signature' && standardView()}
-      {category == 'Cancer Specific Signature' && cancerSpecificView()}
     </div>
   );
 }
