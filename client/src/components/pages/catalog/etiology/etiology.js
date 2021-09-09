@@ -1068,15 +1068,11 @@ export default function Etiology() {
   }
 
   return (
-    <div>
-      <Card className="mb-3" bg="secondary">
-        <Card.Body className="bg-white">
-          <h5 className="separator">Categories</h5>
-          {getCategories()}
-          {category != 'Cancer Specific Signature' && standardView()}
-          {category == 'Cancer Specific Signature' && cancerSpecificView()}
-        </Card.Body>
-      </Card>
+    <div className="p-4 bg-white border rounded">
+      <h5 className="separator">Categories</h5>
+      {getCategories()}
+      {category != 'Cancer Specific Signature' && standardView()}
+      {category == 'Cancer Specific Signature' && cancerSpecificView()}
     </div>
   );
 }
