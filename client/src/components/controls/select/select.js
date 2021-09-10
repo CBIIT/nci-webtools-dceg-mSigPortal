@@ -12,11 +12,23 @@ export default function Select({
   options,
   onChange,
   disabled,
+  labelClass,
   ...rest
 }) {
   const props = {
     styles: {
       menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+      container: (base) => ({
+        ...base,
+        flex: 1,
+      }),
+      singleValue: ({
+        maxWidth,
+        position,
+        top,
+        transform,
+        ...otherStyles
+      }) => ({ ...otherStyles }),
     },
     menuPortalTarget: document.body,
     getOptionLabel: (option) =>
@@ -27,7 +39,7 @@ export default function Select({
 
   return (
     <Group controlId={id} className={className}>
-      <Label>{label}</Label>
+      {label && <Label className={labelClass}>{label}</Label>}
       <ReactSelect
         inputId={id}
         options={options}

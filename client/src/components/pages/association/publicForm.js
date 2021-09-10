@@ -348,7 +348,7 @@ export default function PublicForm() {
             variant="primary"
             onClick={() => handleLoadData()}
           >
-            Load Data
+            Load Study
           </Button>
         </Col>
       </Row>

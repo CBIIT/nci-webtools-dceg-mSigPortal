@@ -84,7 +84,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
   } = visualization.profileComparison;
 
   const popover = (
-    <Popover id="popover-basic">
+    <Popover id="popover-basic" style={{ minWidth: '400px' }}>
       <Title as="h3">{refSignatureSet}</Title>
       <Content>
         <Control

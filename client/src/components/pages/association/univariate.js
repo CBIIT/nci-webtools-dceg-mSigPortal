@@ -1,6 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Form, Row, Col, Button } from 'react-bootstrap';
+import React, { useEffect, useRef } from 'react';
+import {
+  Form,
+  Row,
+  Col,
+  Button,
+  OverlayTrigger,
+  Popover,
+} from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { actions as associationActions } from '../../../services/store/association';
 import { actions as modalActions } from '../../../services/store/modal';
 import Select from '../../controls/select/select';
@@ -41,10 +50,11 @@ export default function Univariate() {
     projectID,
     plotPath,
     dataPath,
-    dataSource,
-    dataSourceOptions,
-    dataType,
-    dataTypeOptions,
+    assocTablePath,
+    variableSource,
+    variableSourceOptions,
+    variableType,
+    variableTypeOptions,
     assocVarOptions,
     signature,
     signatureOptions,
@@ -58,26 +68,26 @@ export default function Univariate() {
 
   // populate controls
   useEffect(() => {
-    if (assocVarData.length && !dataSource) {
-      const dataSourceOptions = [
+    if (assocVarData.length && !variableSource) {
+      const variableSourceOptions = [
         ...new Set(assocVarData.map((row) => row.data_source)),
       ];
-      const dataSource = dataSourceOptions[0];
+      const variableSource = variableSourceOptions[0];
 
       mergeState({
-        dataSource,
-        dataSourceOptions,
+        variableSource,
+        variableSourceOptions,
         expVariable: expVarList[0],
       });
     }
   }, [assocVarData]);
   // filter dropdown options on change
   useEffect(() => {
-    if (dataSource) handleDataSource();
-  }, [dataSource]);
+    if (variableSource) handleVariableSource();
+  }, [variableSource]);
   useEffect(() => {
-    if (dataType) handleDataType();
-  }, [dataType]);
+    if (variableType) handleVariableType();
+  }, [variableType]);
 
   // recalculate on new signature name selection
   // ignore if prevSignature was '' (first calculation)
@@ -92,8 +102,9 @@ export default function Univariate() {
     ...acc,
     {
       Header: column,
-      accessor: (a) => a[column],
       id: column,
+      accessor: (a) => a[column],
+      sortMethod: (a, b) => Number(a) - Number(b),
       // Cell: (e) => e.value || '',
     },
   ];
@@ -107,23 +118,23 @@ export default function Univariate() {
     return ref.current;
   }
 
-  function handleDataSource() {
-    const dataTypeOptions = [
+  function handleVariableSource() {
+    const variableTypeOptions = [
       ...new Set(
         assocVarData
-          .filter((row) => row.data_source == dataSource)
+          .filter((row) => row.data_source == variableSource)
           .map((row) => row.data_type)
       ),
     ];
 
-    mergeState({ dataType: dataTypeOptions[0], dataTypeOptions });
+    mergeState({ variableType: variableTypeOptions[0], variableTypeOptions });
   }
 
-  function handleDataType() {
+  function handleVariableType() {
     const assocVarOptions = [
       ...new Set(
         assocVarData
-          .filter((row) => row.data_type == dataType)
+          .filter((row) => row.data_type == variableType)
           .map((row) => row.variable_name)
       ),
     ];
@@ -148,8 +159,8 @@ export default function Univariate() {
               strategy,
               rsSet,
               cancer,
-              dataSource,
-              dataType,
+              variableSource,
+              variableType,
               assocVariable,
               expVariable,
             },
@@ -190,6 +201,7 @@ export default function Univariate() {
         uncaught_error,
         plotPath,
         dataPath,
+        assocTablePath,
         dataTable,
         signatureOptions,
         projectID: id,
@@ -208,8 +220,8 @@ export default function Univariate() {
               strategy,
               rsSet,
               cancer,
-              dataSource,
-              dataType,
+              variableSource,
+              variableType,
               testType,
               signature,
               xlab: xlab || variable1.name,
@@ -240,6 +252,7 @@ export default function Univariate() {
           projectID: id,
           plotPath,
           dataPath,
+          assocTablePath,
           resultsTable: { data: dataTable },
           signatureOptions,
           signature: signature ? signature : signatureOptions[0],
@@ -254,200 +267,157 @@ export default function Univariate() {
     });
   }
 
-  // download data from project directory
-  async function download(path) {
-    try {
-      const filename = path.split('/')[path.split('/').length - 1];
-      const file = await fetch(`api/results/${projectID}${path}`);
-      if (file.ok) {
-        const objectURL = URL.createObjectURL(await file.blob());
-        const tempLink = document.createElement('a');
-
-        tempLink.href = `${objectURL}`;
-        tempLink.setAttribute('download', filename);
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        document.body.removeChild(tempLink);
-      } else {
-        mergeError(`File is not available`);
-      }
-    } catch (err) {
-      console.log(err);
-      mergeError(`File is not available`);
-    }
-  }
+  const thresholdInfo = (
+    <Popover>
+      <Popover.Content>
+        <p>Filter sample with variable value above this threshold</p>
+      </Popover.Content>
+    </Popover>
+  );
+  const logInfo = (
+    <Popover>
+      <Popover.Content>
+        <p>
+          Log<sub>2</sub> transform variable value
+        </p>
+      </Popover.Content>
+    </Popover>
+  );
+  const collapseInfo = (
+    <Popover>
+      <Popover.Content>
+        <p>
+          If variable value is factor, group variable value in to select
+          collapse level and other
+        </p>
+      </Popover.Content>
+    </Popover>
+  );
 
   return (
-    <div className="bg-white border rounded">
+    <div className="p-4 bg-white border rounded">
       <LoadingOverlay active={loadingData} />
-      <div>
-        <div className="mx-auto py-3 px-4">
-          <Table
-            title="Association Variable Data"
-            data={assocVarData}
-            columns={[
-              ...new Set(...assocVarData.map((row) => Object.keys(row))),
-            ].reduce(reducer, [])}
-            pagination={assocTable.pagination}
-            hidden={assocTable.hidden}
-            mergeState={async (e) =>
-              await dispatch(
-                actions.mergeAssociation({ association: { assocTable: e } })
-              )
-            }
-          />
-          {assocFullDataPath && (
+      <div className="mb-3">
+        <h5 className="separator">Variables</h5>
+
+        <Table
+          title="Available variables for selected study"
+          data={assocVarData}
+          columns={[
+            ...new Set(...assocVarData.map((row) => Object.keys(row))),
+          ].reduce(reducer, [])}
+          pagination={assocTable.pagination}
+          hidden={assocTable.hidden}
+          downloadName="Download Variable Data"
+          downloadLink={projectID + assocFullDataPath}
+          mergeState={async (e) =>
+            await dispatch(
+              actions.mergeAssociation({ association: { assocTable: e } })
+            )
+          }
+        />
+        <LoadingOverlay active={loadingParams} />
+        <p className="text-center">
+          Select the following variables for analysis
+        </p>
+        <Row className="justify-content-center mt-3">
+          <Col md="auto">
+            <Select
+              disabled={loadingData || loadingParams || loadingCalculate}
+              id="variableSource"
+              label="Variable Source"
+              value={variableSource}
+              options={variableSourceOptions}
+              onChange={(e) => mergeState({ variableSource: e })}
+            />
+          </Col>
+          <Col md="auto" lg="3" xl="2">
+            <Select
+              disabled={loadingData || loadingParams || loadingCalculate}
+              id="variableType"
+              label="Data Type"
+              value={variableType}
+              options={variableTypeOptions}
+              onChange={(e) => mergeState({ variableType: e })}
+            />
+          </Col>
+          <Col md="auto" lg="3" xl="2">
+            <Select
+              disabled={loadingData || loadingParams || loadingCalculate}
+              id="assocVariable"
+              label="Variant Name"
+              value={assocVariable}
+              options={assocVarOptions}
+              onChange={(e) => mergeState({ assocVariable: e })}
+            />
+          </Col>
+          <Col md="auto" lg="auto">
+            <Select
+              disabled={loadingData || loadingParams || loadingCalculate}
+              id="expVariable"
+              label="Signature Exposure Variable"
+              value={expVariable}
+              options={expVarList}
+              onChange={(e) => mergeState({ expVariable: e })}
+            />
+          </Col>
+        </Row>
+        <Row className="justify-content-end">
+          <Col md="auto">
             <Button
-              className="p-0"
-              variant="link"
-              onClick={() => download(assocFullDataPath)}
+              disabled={
+                loadingData ||
+                loadingParams ||
+                loadingCalculate ||
+                !variableSource
+              }
+              className="w-100"
+              variant="primary"
+              onClick={() => handleLoadParameters()}
             >
-              Download
+              Load Data
             </Button>
-          )}
-        </div>
-        <hr />
-        <div className="mx-auto py-3 px-4">
-          <LoadingOverlay active={loadingParams} />
-          <h4>Select Variables</h4>
-          <Row className="justify-content-center mt-3">
-            <Col md="8">
-              <strong>Association Variable</strong>
-              <Row>
-                <Col md="4">
-                  <Select
-                    disabled={loadingData || loadingParams || loadingCalculate}
-                    id="dataSource"
-                    label="Data Source"
-                    value={dataSource}
-                    options={dataSourceOptions}
-                    onChange={(e) => mergeState({ dataSource: e })}
-                  />
-                </Col>
-                <Col md="4">
-                  <Select
-                    disabled={loadingData || loadingParams || loadingCalculate}
-                    id="dataType"
-                    label="Data Type"
-                    value={dataType}
-                    options={dataTypeOptions}
-                    onChange={(e) => mergeState({ dataType: e })}
-                  />
-                </Col>
-                <Col md="4">
-                  <Select
-                    disabled={loadingData || loadingParams || loadingCalculate}
-                    id="assocVariable"
-                    label="Variable Name"
-                    value={assocVariable}
-                    options={assocVarOptions}
-                    onChange={(e) => mergeState({ assocVariable: e })}
-                  />
-                </Col>
-              </Row>
-            </Col>
-            <Col md="4">
-              <strong>Signature Exposure Variable</strong>
-              <Row>
-                <Col md="12">
-                  <Select
-                    disabled={loadingData || loadingParams || loadingCalculate}
-                    id="expVariable"
-                    label="Variable Name"
-                    value={expVariable}
-                    options={expVarList}
-                    onChange={(e) => mergeState({ expVariable: e })}
-                  />
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-          <Row className="justify-content-end">
-            <Col md="auto">
-              <Button
-                disabled={
-                  loadingData ||
-                  loadingParams ||
-                  loadingCalculate ||
-                  !dataSource
-                }
-                className="w-100"
-                variant="primary"
-                onClick={() => handleLoadParameters()}
-              >
-                Load Parameters
-              </Button>
-            </Col>
-          </Row>
-        </div>
-        <hr />
-        <div className="mx-auto py-3 px-4">
-          <LoadingOverlay active={loadingCalculate} />
-          <h4>Parameters</h4>
-          {variable1.name && variable2.name ? (
-            <>
-              <Row className="justify-content-center mt-3">
-                <Col md="12">
-                  <Row>
-                    <Col md="2">
-                      <Select
-                        disabled={
-                          loadingData || loadingParams || loadingCalculate
-                        }
-                        id="testType"
-                        label="Test Type"
-                        value={testType}
-                        options={['nonparametric', 'parametric']}
-                        onChange={(e) => mergeState({ testType: e })}
-                      />
-                    </Col>
-                    <Col md="auto">
-                      <Group controlId="xlab">
-                        <Label>X-label</Label>
-                        <Control
-                          value={xlab}
-                          placeholder={variable1.name}
-                          onChange={(e) =>
-                            mergeState({
-                              xlab: e.target.value,
-                            })
-                          }
-                          isInvalid={false}
-                        />
-                        <Form.Control.Feedback type="invalid">
-                          Enter a valid label
-                        </Form.Control.Feedback>
-                      </Group>
-                    </Col>
-                    <Col md="auto">
-                      <Group controlId="ylab">
-                        <Label>Y-label</Label>
-                        <Control
-                          value={ylab}
-                          placeholder={variable2.name}
-                          onChange={(e) =>
-                            mergeState({
-                              ylab: e.target.value,
-                            })
-                          }
-                          isInvalid={false}
-                        />
-                        <Form.Control.Feedback type="invalid">
-                          Enter a valid label
-                        </Form.Control.Feedback>
-                      </Group>
-                    </Col>
-                  </Row>
-                </Col>
-                <Col />
-              </Row>
-              <Row className="justify-content-center">
-                <Col md="12">
-                  <strong>Association Variable</strong>
+          </Col>
+        </Row>
+      </div>
+      <div className="mb-3">
+        <h5 className="separator">Parameters</h5>
+
+        <LoadingOverlay active={loadingCalculate} />
+        {variable1.name && variable2.name ? (
+          <>
+            <p className="text-center">
+              Select the following filtering and method for analysis
+            </p>
+            <Row className="justify-content-center">
+              <Col lg="auto">
+                <fieldset className="border rounded p-2">
+                  <legend className="font-weight-bold">
+                    Variable Filtering
+                  </legend>
                   <Row>
                     <Col md="auto">
                       <Group controlId="filter1" className="d-flex">
-                        <Label className="mr-4">Filtering (>0)</Label>
+                        <OverlayTrigger
+                          trigger="click"
+                          placement="top"
+                          overlay={thresholdInfo}
+                          rootClose
+                        >
+                          <Button
+                            aria-label="threshold info"
+                            variant="link"
+                            className="p-0 font-weight-bold mr-1"
+                          >
+                            <FontAwesomeIcon
+                              icon={faInfoCircle}
+                              style={{ verticalAlign: 'baseline' }}
+                            />
+                          </Button>
+                        </OverlayTrigger>
+                        <Label className="mr-2 font-weight-normal">
+                          Threshold
+                        </Label>
                         <Check inline id="filter1">
                           <Check.Input
                             disabled={
@@ -469,7 +439,24 @@ export default function Univariate() {
                     </Col>
                     <Col md="auto">
                       <Group controlId="log2-1" className="d-flex">
-                        <Label className="mr-4">
+                        <OverlayTrigger
+                          trigger="click"
+                          placement="top"
+                          overlay={logInfo}
+                          rootClose
+                        >
+                          <Button
+                            aria-label="log info"
+                            variant="link"
+                            className="p-0 font-weight-bold mr-1"
+                          >
+                            <FontAwesomeIcon
+                              icon={faInfoCircle}
+                              style={{ verticalAlign: 'baseline' }}
+                            />
+                          </Button>
+                        </OverlayTrigger>{' '}
+                        <Label className="mr-2 font-weight-normal">
                           log<sub>2</sub>
                         </Label>
                         <Check inline id="log2-1">
@@ -489,8 +476,26 @@ export default function Univariate() {
                         </Check>
                       </Group>
                     </Col>
-                    <Col md="3">
+                    <Col md="auto">
+                      <OverlayTrigger
+                        trigger="click"
+                        placement="top"
+                        overlay={collapseInfo}
+                        rootClose
+                      >
+                        <Button
+                          aria-label="collapse info"
+                          variant="link"
+                          className="p-0 font-weight-bold"
+                        >
+                          <FontAwesomeIcon
+                            icon={faInfoCircle}
+                            style={{ verticalAlign: 'baseline' }}
+                          />
+                        </Button>
+                      </OverlayTrigger>{' '}
                       <Select
+                        className="d-inline-flex mb-0"
                         disabled={
                           loadingData ||
                           loadingParams ||
@@ -499,6 +504,7 @@ export default function Univariate() {
                         }
                         id="collapse1"
                         label="Collapse"
+                        labelClass="mr-2 font-weight-normal"
                         value={
                           variable1.collapseOptions.length
                             ? variable1.collapse
@@ -511,15 +517,36 @@ export default function Univariate() {
                       />
                     </Col>
                   </Row>
-                </Col>
-              </Row>
-              <Row className="justify-content-center">
-                <Col md="12">
-                  <strong>Signature Exposure Variable</strong>
+                </fieldset>
+              </Col>
+              <Col lg="auto">
+                <fieldset className="border rounded p-2">
+                  <legend className="font-weight-bold">
+                    Signature Exposure Filtering
+                  </legend>
                   <Row>
                     <Col md="auto">
                       <Group controlId="filter2" className="d-flex">
-                        <Label className="mr-4">Filtering (>0)</Label>
+                        <OverlayTrigger
+                          trigger="click"
+                          placement="top"
+                          overlay={thresholdInfo}
+                          rootClose
+                        >
+                          <Button
+                            aria-label="threshold info"
+                            variant="link"
+                            className="p-0 font-weight-bold mr-1"
+                          >
+                            <FontAwesomeIcon
+                              icon={faInfoCircle}
+                              style={{ verticalAlign: 'baseline' }}
+                            />
+                          </Button>
+                        </OverlayTrigger>
+                        <Label className="mr-2 font-weight-normal">
+                          Threshold
+                        </Label>
                         <Check inline id="filter2">
                           <Check.Input
                             disabled={
@@ -541,7 +568,24 @@ export default function Univariate() {
                     </Col>
                     <Col md="auto">
                       <Group controlId="log2-2" className="d-flex">
-                        <Label className="mr-4">
+                        <OverlayTrigger
+                          trigger="click"
+                          placement="top"
+                          overlay={logInfo}
+                          rootClose
+                        >
+                          <Button
+                            aria-label="log info"
+                            variant="link"
+                            className="p-0 font-weight-bold mr-1"
+                          >
+                            <FontAwesomeIcon
+                              icon={faInfoCircle}
+                              style={{ verticalAlign: 'baseline' }}
+                            />
+                          </Button>
+                        </OverlayTrigger>
+                        <Label className="mr-2 font-weight-normal">
                           log<sub>2</sub>
                         </Label>
                         <Check inline id="log2-2">
@@ -561,7 +605,7 @@ export default function Univariate() {
                         </Check>
                       </Group>
                     </Col>
-                    <Col md="3">
+                    {/* <Col md="3">
                       <Select
                         disabled={
                           loadingData ||
@@ -581,42 +625,61 @@ export default function Univariate() {
                           mergeState({ variable2: { collapse: e } })
                         }
                       />
-                    </Col>
+                    </Col> */}
                   </Row>
-                </Col>
-              </Row>
-              <Row className="justify-content-end">
-                <Col md="auto">
-                  <Button
+                </fieldset>
+              </Col>
+              <Col lg="auto">
+                <fieldset className="border rounded p-2">
+                  <legend className="font-weight-bold">Method</legend>
+                  <Select
+                    className="mb-0"
                     disabled={loadingData || loadingParams || loadingCalculate}
-                    className="w-100"
-                    variant="primary"
-                    onClick={() => handleCalculate()}
-                  >
-                    Calculate
-                  </Button>
-                </Col>
-              </Row>
-            </>
-          ) : (
-            <p className="d-flex justify-content-center text-muted">
-              Select an Association Variable and Signature Exposure Variable
-            </p>
-          )}
-        </div>
-        <div>
-          <hr />
+                    id="testType"
+                    label=""
+                    value={testType}
+                    options={['nonparametric', 'parametric']}
+                    onChange={(e) => mergeState({ testType: e })}
+                  />
+                </fieldset>
+              </Col>
+            </Row>
+            <Row className="justify-content-end">
+              <Col md="auto">
+                <Button
+                  disabled={loadingData || loadingParams || loadingCalculate}
+                  className="w-100"
+                  variant="primary"
+                  onClick={() => handleCalculate()}
+                >
+                  Calculate
+                </Button>
+              </Col>
+            </Row>
+          </>
+        ) : (
+          <p className="d-flex justify-content-center text-muted">
+            Select an Association Variable and Signature Exposure Variable
+          </p>
+        )}
+      </div>
+      {(resultsTable.data.length > 0 || error) && (
+        <div className="mb-3">
+          <h5 className="separator">Results</h5>
           {error && (
             <p className="p-3 d-flex justify-content-center text-danger">
               {error}
             </p>
           )}
           {resultsTable.data.length > 0 && (
-            <div className="mx-auto p-3">
-              <h4>Results</h4>
+            <>
               <div className="mb-4">
+                <p className="text-center">
+                  Check the following table for the analyses result for all
+                  signatures
+                </p>
                 <Table
-                  title="Association Group"
+                  title=""
                   data={resultsTable.data}
                   columns={[
                     ...new Set(
@@ -625,18 +688,17 @@ export default function Univariate() {
                   ].reduce(reducer, [])}
                   pagination={resultsTable.pagination}
                   hidden={resultsTable.hidden}
+                  downloadName="Download Association Result"
+                  downloadLink={projectID + assocTablePath}
                   mergeState={async (e) =>
                     await mergeState({ resultsTable: { ...e } })
                   }
                 />
               </div>
-              <Row>
-                <Col md="auto">
-                  <p>
-                    Select a Signature Name to recalculate for a different
-                    Signature
-                  </p>
-                </Col>
+              <p className="text-center">
+                Select a Signature Name to recalculate for a different Signature
+              </p>
+              <Row className="justify-content-center">
                 <Col md="auto">
                   <Select
                     disabled={loadingData || loadingParams || loadingCalculate}
@@ -647,23 +709,49 @@ export default function Univariate() {
                     onChange={(e) => mergeState({ signature: e })}
                   />
                 </Col>
+                <Col md="auto">
+                  <Group controlId="xlab">
+                    <Label>Variable Title</Label>
+                    <Control
+                      value={xlab}
+                      placeholder={variable1.name}
+                      onChange={(e) => mergeState({ xlab: e.target.value })}
+                      isInvalid={false}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      Enter a valid label
+                    </Form.Control.Feedback>
+                  </Group>
+                </Col>
+                <Col md="auto">
+                  <Group controlId="ylab">
+                    <Label>Signature Exposure Title</Label>
+                    <Control
+                      value={ylab}
+                      placeholder={variable2.name}
+                      onChange={(e) => mergeState({ ylab: e.target.value })}
+                      isInvalid={false}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      Enter a valid label
+                    </Form.Control.Feedback>
+                  </Group>
+                </Col>
               </Row>
               <LoadingOverlay active={loadingRecalculate} />
               {plotPath && (
                 <Plot
                   className="p-3 border rounded"
-                  // title="Association"
                   downloadName={plotPath.split('/').slice(-1)[0]}
                   plotPath={`api/results/${projectID}${plotPath}`}
                   txtPath={projectID + dataPath}
                   height="800px"
                 />
               )}
-            </div>
+            </>
           )}
         </div>
-        <hr />
-      </div>
+      )}
     </div>
   );
 }

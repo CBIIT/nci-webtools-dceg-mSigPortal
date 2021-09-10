@@ -15,6 +15,8 @@ import {
   faSortUp,
   faSortDown,
 } from '@fortawesome/free-solid-svg-icons';
+import { useDispatch } from 'react-redux';
+import { actions as modalActions } from '../../../services/store/modal';
 
 function GlobalFilter({ globalFilter, setGlobalFilter, handleSearch, title }) {
   const [value, setValue] = React.useState(globalFilter);
@@ -83,7 +85,15 @@ export default function Table({
   globalFilter: globalSearch,
   pagination,
   mergeState,
+  downloadName,
+  downloadLink,
 }) {
+  const dispatch = useDispatch();
+  const mergeError = (msg) =>
+    dispatch(
+      modalActions.mergeModal({ error: { visible: true, message: msg } })
+    );
+
   const defaultColumn = useMemo(
     () => ({
       Filter: DefaultColumnFilter,
@@ -126,6 +136,29 @@ export default function Table({
     usePagination
   );
 
+  // download file from results directory
+  async function download(path) {
+    try {
+      const filename = path.split('/')[path.split('/').length - 1];
+      const file = await fetch(`api/results/${path}`);
+      if (file.ok) {
+        const objectURL = URL.createObjectURL(await file.blob());
+        const tempLink = document.createElement('a');
+
+        tempLink.href = `${objectURL}`;
+        tempLink.setAttribute('download', filename);
+        document.body.appendChild(tempLink);
+        tempLink.click();
+        document.body.removeChild(tempLink);
+      } else {
+        mergeError(`File is not available`);
+      }
+    } catch (err) {
+      console.log(err);
+      mergeError(`File is not available`);
+    }
+  }
+
   return (
     <div>
       <Row className="mb-2">
@@ -143,6 +176,17 @@ export default function Table({
                 title={title}
               />
             </div>
+          </Col>
+        )}
+        {downloadLink && (
+          <Col md="auto">
+            <Button
+              className="p-0 ml-auto"
+              variant="link"
+              onClick={() => download(downloadLink)}
+            >
+              {downloadName}
+            </Button>
           </Col>
         )}
 

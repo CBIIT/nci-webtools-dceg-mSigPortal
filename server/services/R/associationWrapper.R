@@ -137,7 +137,7 @@ loadCollapse <- function(args, dataArgs) {
     exposure_refdata_selected <- exposure_refdata_selected %>% select(Sample, Signature_name, args$expVariable)
 
     vardata_refdata_selected <- vardata_refdata_selected %>%
-      filter(data_source == args$dataSource, data_type == args$dataType, variable_name == args$assocVariable)
+      filter(data_source == args$variableSource, data_type == args$variableType, variable_name == args$assocVariable)
 
     if (unique(vardata_refdata_selected$variable_value_type) == "numeric") { vardata_refdata_selected$variable_value <- as.numeric(vardata_refdata_selected$variable_value) }
 
@@ -173,6 +173,7 @@ univariate <- function(args, dataArgs) {
     output = list()
     plotPath = paste0(dataArgs$savePath, 'association_result.svg')
     dataPath = paste0(dataArgs$savePath, 'asssociation_data.txt')
+    assocTablePath = paste0(dataArgs$savePath, 'asssociation_test.txt')
 
     # load exposure data files
     exposure_data_file <- paste0(dataArgs$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
@@ -200,7 +201,7 @@ univariate <- function(args, dataArgs) {
     exposure_refdata_selected <- exposure_refdata_selected %>% select(Sample, Signature_name, args$variable2$name)
 
     vardata_refdata_selected <- vardata_refdata_selected %>%
-      filter(data_source == args$dataSource, data_type == args$dataType, variable_name == args$variable1$name)
+      filter(data_source == args$variableSource, data_type == args$variableType, variable_name == args$variable1$name)
 
     if (unique(vardata_refdata_selected$variable_value_type) == "numeric") { vardata_refdata_selected$variable_value <- as.numeric(vardata_refdata_selected$variable_value) }
 
@@ -233,23 +234,24 @@ univariate <- function(args, dataArgs) {
     data_input <- left_join(vardata_refdata_selected, exposure_refdata_selected) %>% select(-Sample)
 
     ## association test by group of signature name
-    result <- tryCatch({
+    assocTable <- tryCatch({
       mSigPortal_associaiton_group(data = data_input, Group_Var = "Signature_name",
-      Var1 = args$variable1$name, Var2 = args$variable2$name, type = args$testType,
-      filter1 = args$variable1$filter, filter2 = args$variable2$filter,
-      log1 = args$variable1$log2, log2 = args$variable2$log2, collapse_var1 = args$variable1$collapse,
-      collapse_var2 = args$variable2$collapse)
+        Var1 = args$variable1$name, Var2 = args$variable2$name, type = args$testType,
+        filter1 = args$variable1$filter, filter2 = args$variable2$filter,
+        log1 = args$variable1$log2, log2 = args$variable2$log2, collapse_var1 = args$variable1$collapse,
+        collapse_var2 = args$variable2$collapse)
     }, error = function(e) {
       return(list(message = 'mSigPortal_associaiton_group() failed', error = e$message))
     })
-    if ('error' %in% names(result)) {
-      output = list(error = result)
-      print(result$message)
-      stop(result$error)
+    if ('error' %in% names(assocTable)) {
+      output = list(error = assocTable)
+      print(assocTable$message)
+      stop(assocTable$error)
     }
+    assocTable %>% write_delim(file = assocTablePath, delim = '\t', col_names = T, na = '')
     ## put result as a short table above the figure
 
-    signature_name_list <- unique(result[[1]]) ## dropdown list for the signature name
+    signature_name_list <- unique(assocTable[[1]]) ## dropdown list for the signature name
     signature_name_input <- if_else(args$signature != '', args$signature, signature_name_list[1]) ## by default, select the first signature name
 
     data_input <- data_input %>% filter(Signature_name == signature_name_input) %>% select(-Signature_name)
@@ -263,7 +265,7 @@ univariate <- function(args, dataArgs) {
     ## asssociation_data.txt will output as download text file. 
     data_input %>% write_delim(file = dataPath, delim = '\t', col_names = T, na = '')
 
-    output = list(plotPath = getResultsPath(plotPath), dataPath = getResultsPath(dataPath), dataTable = result, signatureOptions = signature_name_list)
+    output = list(plotPath = getResultsPath(plotPath), dataPath = getResultsPath(dataPath), assocTablePath = getResultsPath(assocTablePath), dataTable = assocTable, signatureOptions = signature_name_list)
   }, error = function(e) {
     print(e)
     print(names(e))
