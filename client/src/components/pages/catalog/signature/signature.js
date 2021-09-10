@@ -185,19 +185,19 @@ export default function Signature() {
         <ReferenceSignatures submitR={(fn, args) => submitR(fn, args)} />
       ),
       key: 'referenceSignatures',
-      title: 'Current Reference Signatures in mSigPortal',
+      title: 'RS in mSigPortal',
     },
     {
       component: (
         <MutationalSignatureProfile submitR={(fn, args) => submitR(fn, args)} />
       ),
       key: 'mutationalSignatureProfile',
-      title: 'Mutational Signature Profile',
+      title: 'RS Profile',
     },
     {
       component: <CosineSimilarity submitR={(fn, args) => submitR(fn, args)} />,
       key: 'cosineSimilarity',
-      title: 'Cosine Similarity Among Mutational Signatures',
+      title: 'RS Cosine Similarity',
     },
     {
       component: (
@@ -206,7 +206,7 @@ export default function Signature() {
         />
       ),
       key: 'mutationalSignatureComparison',
-      title: 'Mutational Signatures Comparisons',
+      title: 'RS Comparison',
     },
     {
       component: <Download />,
