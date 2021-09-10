@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { Row, Col, Button, Form, Card } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as etiologyActions } from '../../../../services/store/etiology';
 import { actions as catalogActions } from '../../../../services/store/catalog';
 import { actions as modalActions } from '../../../../services/store/modal';
 import { getJSON } from '../../../../services/utils';
@@ -9,12 +8,13 @@ import Plot from '../../../controls/plot/plot';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import './etiology.scss';
 
-const actions = { ...etiologyActions, ...catalogActions, ...modalActions };
+const actions = { ...catalogActions, ...modalActions };
 const { Check } = Form;
 
 export default function Etiology() {
   const dispatch = useDispatch();
-  const mergeEtiology = (state) => dispatch(actions.mergeEtiology(state));
+  const mergeEtiology = (state) =>
+    dispatch(actions.mergeCatalog({ etiology: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -36,7 +36,7 @@ export default function Etiology() {
     strandbiasURL,
     tissueURL,
     refSigURL,
-  } = useSelector((state) => state.etiology);
+  } = useSelector((state) => state.catalog.etiology);
 
   const categories = [
     {

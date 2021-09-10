@@ -1,5 +1,4 @@
 import { reducer as catalogReducer } from './catalog';
-import { reducer as etiologyReducer } from './etiology';
 import { reducer as exposureReducer } from './exposure';
 import { reducer as visualizationReducer } from './visualization';
 import { reducer as associationReducer } from './association';
@@ -14,7 +13,6 @@ export const store = configureStore({
     visualization: visualizationReducer,
     catalog: catalogReducer,
     association: associationReducer,
-    etiology: etiologyReducer,
     exposure: exposureReducer,
     modal: modalReducer,
     publications: publicationsReducer,
