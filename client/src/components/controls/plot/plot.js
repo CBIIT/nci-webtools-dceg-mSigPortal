@@ -16,6 +16,7 @@ export default function Plot({
   alt,
   height,
   className,
+  cacheBreaker = true,
   ...rest
 }) {
   const dispatch = useDispatch();
@@ -50,9 +51,9 @@ export default function Plot({
   }
 
   const zoomProps = {
-    wheel: { wheelEnabled: false, step: 3 },
-    zoomIn: { step: 3 },
-    zoomOut: { step: 3 },
+    wheel: { wheelEnabled: false, step: 5 },
+    zoomIn: { step: 5 },
+    zoomOut: { step: 5 },
   };
 
   return (
@@ -124,7 +125,7 @@ export default function Plot({
             <TransformComponent>
               <img
                 className="w-100"
-                src={plotPath}
+                src={plotPath + `${cacheBreaker ? `#${Date.now()}` : ''}`}
                 style={{ maxHeight: height || '500px' }}
                 alt={alt || 'Plot Unavailable'}
               />
