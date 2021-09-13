@@ -507,6 +507,17 @@ async function processMessage(params) {
         'results/profileComparisonRefSig/'
       );
       await fs.promises.mkdir(pcRefPath, { recursive: true });
+
+      const refCompare = await r(
+        'services/R/visualizeWrapper.R',
+        'getSignaturesR',
+        {
+          profileType: selectProfile,
+          signatureSetName: refSignatureSetOptions[0],
+          ...dataArgs,
+        }
+      );
+
       const profileComparisonRefSig = await r(
         'services/R/visualizeWrapper.R',
         'profileComparisonRefSig',
@@ -514,7 +525,7 @@ async function processMessage(params) {
           profileType: selectProfile,
           sampleName: sampleNameOptions[0],
           signatureSet: refSignatureSetOptions[0],
-          compare: 'SBS1',
+          compare: refCompare[0],
           matrixFile: matrixList.filter(
             (row) =>
               row.Profile_Type == selectProfile &&
