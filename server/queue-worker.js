@@ -144,6 +144,9 @@ async function processMessage(params) {
     svgList.forEach(
       (plot) => (plot.Path = getRelativePath({ Path: plot.Path }, id).Path)
     );
+    matrixList.forEach(
+      (plot) => (plot.Path = getRelativePath({ Path: plot.Path }, id).Path)
+    );
 
     let newState = {
       ...visualizationStore,
