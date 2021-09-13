@@ -307,8 +307,8 @@ async function processMessage(params) {
           plotPath: `/results/profilerSummary/profilerSummary.svg`,
         },
       };
-      // const { stdout } = JSON.parse(profilerSummary);
-      // logger.debug(stdout);
+      const { stdout } = JSON.parse(profilerSummary);
+      logger.debug(stdout);
     } catch (err) {
       logger.error(err);
     }
@@ -334,7 +334,10 @@ async function processMessage(params) {
           ...calcArgs,
         }
       );
+
       let { output, stdout } = JSON.parse(csWithin);
+      logger.debug(stdout);
+
       output = getRelativePath(output, id);
       newState = {
         ...newState,
