@@ -158,7 +158,11 @@ export default function Visualization({ match }) {
     const filter = defaultFilter(filteredFilterOptions);
 
     const filteredMatrixList = [
-      ...new Set(matrixList.map((row) => row.Matrix_Size)),
+      ...new Set(
+        matrixList
+          .filter((row) => row.Profile_Type == profile)
+          .map((row) => row.Matrix_Size)
+      ),
     ];
 
     mergeMutationalProfiles({
