@@ -97,8 +97,6 @@ export default function Exposure({ match }) {
     ...individualArgs
   } = exposureStore.msIndividual;
 
-  const [expand, setExpand] = useState(false);
-
   // load example if available
   useEffect(() => {
     if (exampleName) loadExample(exampleName);
