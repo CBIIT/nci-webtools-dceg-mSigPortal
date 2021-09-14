@@ -418,7 +418,7 @@ export default function UserForm() {
                   disabled={submitted || loading.active}
                   onClick={removeFile}
                 >
-                  <FontAwesomeIcon icon={faFolderMinus} size="2x" />
+                  <FontAwesomeIcon icon={faFolderMinus} size="lg" />
                 </Button>
               )}
             </div>
@@ -615,7 +615,7 @@ export default function UserForm() {
                   disabled={submitted || loading.active}
                   onClick={removeBedFile}
                 >
-                  <FontAwesomeIcon icon={faFolderMinus} size="2x" />
+                  <FontAwesomeIcon icon={faFolderMinus} size="lg" />
                 </Button>
               )}
             </div>

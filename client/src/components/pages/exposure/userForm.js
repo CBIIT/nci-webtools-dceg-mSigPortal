@@ -183,7 +183,7 @@ export default function PublicForm({
                     mergeState({ exposureFile: '' });
                   }}
                 >
-                  <FontAwesomeIcon icon={faFolderMinus} size="2x" />
+                  <FontAwesomeIcon icon={faFolderMinus} size="lg" />
                 </Button>
               )}
             </div>
@@ -224,7 +224,7 @@ export default function PublicForm({
                     mergeState({ matrixFile: '' });
                   }}
                 >
-                  <FontAwesomeIcon icon={faFolderMinus} size="2x" />
+                  <FontAwesomeIcon icon={faFolderMinus} size="lg" />
                 </Button>
               )}
             </div>
@@ -318,7 +318,7 @@ export default function PublicForm({
                       mergeState({ signatureFile: '' });
                     }}
                   >
-                    <FontAwesomeIcon icon={faFolderMinus} size="2x" />
+                    <FontAwesomeIcon icon={faFolderMinus} size="lg" />
                   </Button>
                 )}
               </div>

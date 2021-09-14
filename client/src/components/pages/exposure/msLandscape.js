@@ -64,7 +64,7 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
                       handleVariable(new File([], ''));
                     }}
                   >
-                    <FontAwesomeIcon icon={faFolderMinus} size="2x" />
+                    <FontAwesomeIcon icon={faFolderMinus} size="lg" />
                   </Button>
                 )}
               </div>
