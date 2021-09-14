@@ -543,6 +543,8 @@ async function processMessage(params) {
         ...newState,
         profileComparison: {
           ...newState.profileComparison,
+          refSignatures: refCompare,
+          refCompare: refCompare[0],
           refPlotPath: output.plotPath,
           debugR: stdout,
         },
