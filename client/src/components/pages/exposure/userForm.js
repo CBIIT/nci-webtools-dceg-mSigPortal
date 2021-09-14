@@ -158,6 +158,8 @@ export default function PublicForm({
                 disabled={loading || submitted}
                 id="uploadExposure"
                 label={exposureFileObj.name || 'Exposure File'}
+                title={exposureFileObj.name || 'Upload Exposure File'}
+                value={''}
                 accept=".txt"
                 isInvalid={checkValid && !exposureFileObj.size}
                 feedback="Upload an exposure file"
@@ -197,6 +199,8 @@ export default function PublicForm({
                 disabled={loading || submitted}
                 id="uploadMatrix"
                 label={matrixFileObj.name || 'Matrix File'}
+                title={matrixFileObj.name || 'Upload Matrix File'}
+                value={''}
                 accept=".txt"
                 isInvalid={checkValid && !matrixFileObj.size}
                 feedback="Upload a matrix file"
@@ -289,6 +293,8 @@ export default function PublicForm({
                   disabled={loading || submitted}
                   id="uploadSignature"
                   label={signatureFileObj.name || 'Signature File'}
+                  title={signatureFileObj.name || 'Upload Signature File'}
+                  value={''}
                   accept=".txt"
                   isInvalid={checkValid && !signatureFileObj.size}
                   feedback="Upload a signature file"

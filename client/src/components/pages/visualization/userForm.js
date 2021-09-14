@@ -282,14 +282,18 @@ export default function UserForm() {
 
   async function loadExample() {
     const filename = exampleData.split('/').slice(-1)[0];
-    setInput(new File([await (await fetch(exampleData)).blob()], filename));
-    mergeState({ storeFilename: filename });
+    if (storeFilename != filename) {
+      setInput(new File([await (await fetch(exampleData)).blob()], filename));
+      mergeState({ storeFilename: filename });
+    }
   }
 
   async function loadBed() {
     const filename = bedData.split('/').slice(-1)[0];
-    setBed(new File([await (await fetch(bedData)).blob()], filename));
-    mergeState({ bedFilename: filename });
+    if (bedFilename != filename) {
+      setBed(new File([await (await fetch(bedData)).blob()], filename));
+      mergeState({ bedFilename: filename });
+    }
   }
 
   function validateForm() {
@@ -367,15 +371,13 @@ export default function UserForm() {
           </Col>
           <Col lg="6" className="p-0 d-flex">
             <Button
-              className={`p-0 ml-auto font-14 ${
-                inputFile.size ? 'text-danger' : ''
-              }`}
+              className={`p-0 ml-auto font-14`}
               disabled={submitted || loading.active}
               variant="link"
               type="button"
-              onClick={() => (inputFile.size ? removeFile() : loadExample())}
+              onClick={() => loadExample()}
             >
-              {inputFile.size ? 'Remove File' : 'Load Example Data'}
+              Load Example Data
             </Button>
           </Col>
         </Row>
@@ -385,6 +387,8 @@ export default function UserForm() {
               <Form.File
                 disabled={submitted || loading.active}
                 id="fileUpload"
+                title={storeFilename || 'Upload Data File...'}
+                value={''}
                 label={
                   inputFile.size
                     ? inputFile.name
@@ -556,9 +560,7 @@ export default function UserForm() {
           </Col>
           <Col lg="6" className="p-0 d-flex">
             <Button
-              className={`p-0 ml-auto font-14 ${
-                bedFile.size ? 'text-danger' : ''
-              }`}
+              className={`p-0 ml-auto font-14`}
               disabled={
                 submitted ||
                 loading.active ||
@@ -567,9 +569,9 @@ export default function UserForm() {
               }
               variant="link"
               type="button"
-              onClick={() => (bedFile.size ? removeBedFile() : loadBed())}
+              onClick={() => loadBed()}
             >
-              {bedFile.size ? 'Remove File' : 'Load Example Bed'}
+              Load Example Bed
             </Button>
           </Col>
         </Row>
@@ -584,6 +586,8 @@ export default function UserForm() {
                   loading.active
                 }
                 id="uploadDataFile"
+                title={bedFilename || 'Upload Bed File...'}
+                value={''}
                 label={
                   bedFile.size
                     ? bedFile.name

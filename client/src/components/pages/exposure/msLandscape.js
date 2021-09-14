@@ -47,6 +47,8 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
                 <Form.File
                   id="variableData"
                   label={variableFile || 'Upload here (optional)'}
+                  title={variableFile || 'Upload here (optional)'}
+                  value={''}
                   // accept=''
                   onChange={(e) => handleVariable(e.target.files[0])}
                   custom
