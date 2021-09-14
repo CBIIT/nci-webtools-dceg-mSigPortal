@@ -2,9 +2,9 @@ import React, { useEffect } from 'react';
 import { Tab, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import ReferenceSignatures from './referenceSignatures';
-import MutationalSignatureProfile from './msProfile';
+import Profile from './rsProfile';
 import CosineSimilarity from './cosineSimilarity';
-import MutationalSignatureComparison from './msComparison';
+import Comparison from './rsComparison';
 import Download from './download';
 import { getJSON } from '../../../../services/utils';
 import { actions } from '../../../../services/store/catalog';
@@ -189,7 +189,7 @@ export default function Signature() {
     },
     {
       component: (
-        <MutationalSignatureProfile submitR={(fn, args) => submitR(fn, args)} />
+        <Profile submitR={(fn, args) => submitR(fn, args)} />
       ),
       key: 'mutationalSignatureProfile',
       title: 'RS Profile',
@@ -201,7 +201,7 @@ export default function Signature() {
     },
     {
       component: (
-        <MutationalSignatureComparison
+        <Comparison
           submitR={(fn, args) => submitR(fn, args)}
         />
       ),

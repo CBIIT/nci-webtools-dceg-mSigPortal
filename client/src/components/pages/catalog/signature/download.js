@@ -34,7 +34,7 @@ export default function Download() {
   }
 
   return (
-    <div className="p-4">
+    <div className="p-4" style={{ minHeight: '500px' }}>
       <Button variant="link" onClick={() => downloadPublic()}>
         <LoadingOverlay active={downloading.length > 0} />
         Download matrixes for all available mutational signatures in mSigPortal

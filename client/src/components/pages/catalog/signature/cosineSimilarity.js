@@ -93,7 +93,7 @@ export default function MutationalSignatureProfile({ submitR }) {
   }
 
   return (
-    <div>
+    <div style={{ minHeight: '500px' }}>
       <div className="p-3">
         <p>
           Cosine similarity, which is a measure of the similarity of signatures,

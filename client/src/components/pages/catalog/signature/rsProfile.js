@@ -12,7 +12,7 @@ import { actions as modalActions } from '../../../../services/store/modal';
 
 const actions = { ...catalogActions, ...modalActions };
 
-export default function MutationalSignatureProfile({ submitR }) {
+export default function Profile({ submitR }) {
   const dispatch = useDispatch();
   const catalog = useSelector((state) => state.catalog);
   const mergeSigMutationalProfiles = (state) =>

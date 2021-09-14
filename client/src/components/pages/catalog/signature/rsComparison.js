@@ -10,7 +10,7 @@ import { actions as modalActions } from '../../../../services/store/modal';
 
 const actions = { ...catalogActions, ...modalActions };
 
-export default function MutationalSignatureProfile({ submitR }) {
+export default function Comparison({ submitR }) {
   const dispatch = useDispatch();
   const catalog = useSelector((state) => state.catalog);
   const mergeCatalog = (state) =>
@@ -151,7 +151,7 @@ export default function MutationalSignatureProfile({ submitR }) {
   }
 
   return (
-    <div>
+    <div style={{ minHeight: '500px' }}>
       <p className="p-3">
         Below you can observe mutational signature comparisons signatures found
         in two different reference signature sets. Use the dropdown menus to
@@ -240,6 +240,7 @@ export default function MutationalSignatureProfile({ submitR }) {
           </Col>
         </Row>
       </Form>
+      <hr />
 
       <div id="mutationalSignatureComparison">
         <div style={{ display: err ? 'block' : 'none' }} className="p-3">
@@ -247,7 +248,6 @@ export default function MutationalSignatureProfile({ submitR }) {
         </div>
         {plotPath && (
           <>
-            <hr />
             <Plot
               className="p-3"
               downloadName={plotPath.split('/').slice(-1)[0]}
