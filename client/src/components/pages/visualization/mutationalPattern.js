@@ -82,16 +82,13 @@ export default function MutationalPattern({ submitR }) {
   const plots = (
     <div>
       {err && (
-        <div>
-          <hr />
-          <p className="p-3">An error has occured. Please verify your input.</p>
-        </div>
+        <p className="p-3">An error has occured. Please verify your input.</p>
       )}
 
       <div id="barchart">
         {barPath && (
           <>
-            <hr />
+            >
             <Plot
               className="p-3"
               downloadName={barPath.split('/').slice(-1)[0]}
@@ -121,7 +118,6 @@ export default function MutationalPattern({ submitR }) {
       <div id="context">
         {plotPath && (
           <>
-            <hr />
             <Plot
               className="p-3"
               downloadName={plotPath.split('/').slice(-1)[0]}
@@ -145,7 +141,7 @@ export default function MutationalPattern({ submitR }) {
 
   return (
     <div>
-      <div className="bg-white border rounded">
+      <div className="bg-white border rounded" style={{ minHeight: '500px' }}>
         <div className="p-3">
           <p>
             This page allows you to conduct a mutational pattern enrichment
@@ -207,8 +203,7 @@ export default function MutationalPattern({ submitR }) {
                 </Form.Control.Feedback>
               </Group>
             </Col>
-            <Col />
-            <Col lg="2" className="d-flex">
+            <Col lg="auto" className="d-flex">
               <Button
                 className="ml-auto mb-auto"
                 variant="primary"
@@ -257,6 +252,7 @@ export default function MutationalPattern({ submitR }) {
             </Col>
           </Row>
         </Form>
+        <hr />
         {plots}
       </div>
 

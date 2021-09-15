@@ -254,7 +254,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
           <Form className="p-3">
             <LoadingOverlay active={withinSubmitOverlay} />
             <Row>
-              <Col lg="2">
+              <Col lg="auto">
                 <Select
                   disabled={!multiSample}
                   id="csProfileType"
@@ -264,7 +264,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   onChange={handleWithinProfileType}
                 />
               </Col>
-              <Col lg="2">
+              <Col lg="auto">
                 <Select
                   disabled={!multiSample}
                   id="csMatrixSize"
@@ -278,8 +278,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   }
                 />
               </Col>
-              <Col />
-              <Col lg="2" className="d-flex">
+              <Col lg="auto" className="d-flex align-bottom">
                 <Button
                   className="ml-auto mb-auto"
                   disabled={!multiSample}
@@ -314,26 +313,20 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
               </Row>
             )}
           </Form>
-
+          <hr />
           <div id="withinPlot">
             {withinErr && (
-              <div>
-                <hr />
-                <p className="p-3">
-                  An error has occured. Please verify your input.
-                </p>
-              </div>
+              <p className="p-3">
+                An error has occured. Please verify your input.
+              </p>
             )}
             {withinPlotPath && (
-              <>
-                <hr />
-                <Plot
-                  className="p-3"
-                  downloadName={withinPlotPath.split('/').slice(-1)[0]}
-                  plotPath={'api/results/' + projectID + withinPlotPath}
-                  txtPath={projectID + withinTxtPath}
-                />
-              </>
+              <Plot
+                className="p-3"
+                downloadName={withinPlotPath.split('/').slice(-1)[0]}
+                plotPath={'api/results/' + projectID + withinPlotPath}
+                txtPath={projectID + withinTxtPath}
+              />
             )}
           </div>
         </div>
@@ -356,8 +349,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
           <hr />
           <Form className="p-3">
             <LoadingOverlay active={refSubmitOverlay} />
-            <Row className="justify-content-center">
-              <Col lg="2">
+            <Row>
+              <Col lg="auto">
                 <Select
                   id="csRefProfileType"
                   label="Profile Type"
@@ -371,7 +364,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   }}
                 />
               </Col>
-              <Col lg="3">
+              <Col lg="auto">
                 <Select
                   id="csRefSignatureSet"
                   label="Reference Signature Set"
@@ -384,8 +377,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   }}
                 />
               </Col>
-              <Col />
-              <Col lg="2" className="d-flex">
+              <Col lg="auto" className="d-flex">
                 <Button
                   className="ml-auto mb-auto"
                   variant="primary"
@@ -417,25 +409,20 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
               </Col>
             </Row>
           </Form>
+          <hr />
           <div id="refPlot">
             {refErr && (
-              <div>
-                <hr />
-                <p className="p-3">
-                  An error has occured. Please verify your input.
-                </p>
-              </div>
+              <p className="p-3">
+                An error has occured. Please verify your input.
+              </p>
             )}
             {refPlotPath && (
-              <>
-                <hr />
-                <Plot
-                  className="p-3"
-                  downloadName={refPlotPath.split('/').slice(-1)[0]}
-                  plotPath={`api/results/${projectID}${refPlotPath}`}
-                  txtPath={projectID + refTxtPath}
-                />
-              </>
+              <Plot
+                className="p-3"
+                downloadName={refPlotPath.split('/').slice(-1)[0]}
+                plotPath={`api/results/${projectID}${refPlotPath}`}
+                txtPath={projectID + refTxtPath}
+              />
             )}
           </div>
         </div>
@@ -461,8 +448,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
           <hr />
           <Form className="p-3">
             <LoadingOverlay active={pubSubmitOverlay} />
-            <Row className="justify-content-center">
-              <Col lg="2">
+            <Row>
+              <Col lg="auto">
                 <Select
                   id="csUserProfileType"
                   label="Profile Type"
@@ -471,7 +458,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   onChange={handlePublicProfileType}
                 />
               </Col>
-              <Col lg="2">
+              <Col lg="auto">
                 <Select
                   id="csUserMatrixSize"
                   label="Matrix Size"
@@ -484,7 +471,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   }
                 />
               </Col>
-              <Col lg="2">
+              <Col lg="auto">
                 <Select
                   id="csPubStudy"
                   label="Study"
@@ -493,7 +480,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   onChange={handleStudyChange}
                 />
               </Col>
-              <Col lg="2">
+              <Col lg="auto">
                 <Select
                   id="csPubCancerType"
                   label="Cancer Type"
@@ -502,8 +489,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   onChange={handleCancerChange}
                 />
               </Col>
-              <Col />
-              <Col lg="2" className="d-flex">
+              <Col lg="auto" className="d-flex">
                 <Button
                   className="ml-auto mb-auto"
                   variant="primary"
@@ -525,26 +511,20 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
               </Col>
             </Row>
           </Form>
-
+          <hr />
           <div id="pubPlot">
             {pubErr && (
-              <div>
-                <hr />
-                <p className="p-3">
-                  An error has occured. Please verify your input.
-                </p>
-              </div>
+              <p className="p-3">
+                An error has occured. Please verify your input.
+              </p>
             )}
             {pubPlotPath && (
-              <>
-                <hr />
-                <Plot
-                  className="p-3"
-                  downloadName={pubPlotPath.split('/').slice(-1)[0]}
-                  plotPath={`api/results/${projectID}${pubPlotPath}`}
-                  txtPath={projectID + pubTxtPath}
-                />
-              </>
+              <Plot
+                className="p-3"
+                downloadName={pubPlotPath.split('/').slice(-1)[0]}
+                plotPath={`api/results/${projectID}${pubPlotPath}`}
+                txtPath={projectID + pubTxtPath}
+              />
             )}
           </div>
         </div>
@@ -581,7 +561,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
         </Nav>
         <Content
           className={`bg-white tab-pane-bordered rounded-0 d-block`}
-          style={{ overflowX: 'auto' }}
+          style={{ overflowX: 'auto', minHeight: '500px' }}
         >
           {tabs.map(({ key, component }) => (
             <Pane key={key} eventKey={key} className="border-0">

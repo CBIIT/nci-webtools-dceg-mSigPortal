@@ -366,7 +366,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
           <Form className="p-3">
             <LoadingOverlay active={withinSubmitOverlay} />
             <Row>
-              <Col lg="2">
+              <Col lg="auto">
                 <Select
                   disabled={sampleOptions.length < 2}
                   id="pcProfileTypeWithin"
@@ -380,7 +380,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   }
                 />
               </Col>
-              <Col lg="4">
+              <Col lg="auto">
                 <Select
                   disabled={sampleOptions.length < 2}
                   id="pcSample1"
@@ -394,7 +394,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   }}
                 />
               </Col>
-              <Col lg="4">
+              <Col lg="auto">
                 <Select
                   disabled={sampleOptions.length < 2}
                   id="pcSample2"
@@ -408,7 +408,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   }}
                 />
               </Col>
-              <Col lg="2" className="d-flex">
+              <Col lg="auto" className="d-flex">
                 <Button
                   className="ml-auto mb-auto"
                   disabled={sampleOptions.length < 2}
@@ -452,6 +452,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
               </Row>
             )}
           </Form>
+          <hr />
           <div id="pcWithinPlot">
             {withinErr && (
               <div className="p-3">
@@ -461,7 +462,6 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
             )}
             {withinPlotPath && (
               <>
-                <hr />
                 <Plot
                   className="p-3"
                   downloadName={withinPlotPath.split('/').slice(-1)[0]}
@@ -505,7 +505,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
           <Form className="p-3">
             <LoadingOverlay active={refSubmitOverlay} />
             <Row>
-              <Col lg="2">
+              <Col lg="auto">
                 <Select
                   id="pcProfileTypeRef"
                   label="Profile Type"
@@ -519,7 +519,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   }}
                 />
               </Col>
-              <Col lg="3">
+              <Col lg="auto">
                 <Select
                   id="sampleNameRefSig"
                   label="Sample Name"
@@ -532,7 +532,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   }}
                 />
               </Col>
-              <Col lg="3">
+              <Col lg="auto">
                 <Select
                   id="pcRefSet"
                   label="Reference Signature Set"
@@ -546,7 +546,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   }}
                 />
               </Col>
-              <Col lg="3">
+              <Col lg="auto">
                 <Group controlId="signatureSet">
                   <Label>
                     Compare Signatures{' '}
@@ -579,7 +579,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   <Text className="text-muted">(Ex. 0.8*SBS5;0.1*SBS1)</Text>
                 </Group>
               </Col>
-              <Col lg="1" className="d-flex">
+              <Col lg="auto" className="d-flex">
                 <Button
                   className="ml-auto mb-auto"
                   style={{ marginBottom: '2.5rem' }}
@@ -620,6 +620,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
               </Col>
             </Row>
           </Form>
+          <hr />
           <div id="refPlotDownload">
             {refErr && (
               <div className="p-3">
@@ -629,7 +630,6 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
             )}
             {refPlotPath && (
               <>
-                <hr />
                 <Plot
                   className="p-3"
                   downloadName={refPlotPath.split('/').slice(-1)[0]}
@@ -675,7 +675,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
           <Form className="p-3">
             <LoadingOverlay active={pubSubmitOverlay} />
             <Row>
-              <Col lg="2">
+              <Col lg="auto">
                 <Select
                   id="pcUserProfileType"
                   label="Profile Type"
@@ -684,7 +684,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   onChange={(profile) => handleProfile(profile)}
                 />
               </Col>
-              <Col lg="2">
+              <Col lg="auto">
                 <Select
                   id="pcUserMatrixSize"
                   label="Matrix Size"
@@ -697,7 +697,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   }
                 />
               </Col>
-              <Col lg="4">
+              <Col lg="auto">
                 <Select
                   id="pcUserSampleName"
                   label="Sample Name"
@@ -710,8 +710,38 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   }}
                 />
               </Col>
-              <Col />
-              <Col lg="2" className="d-flex">
+              <Col lg="auto">
+                <Select
+                  id="pcPubStudy"
+                  label="Study"
+                  value={pubStudy}
+                  options={studyOptions}
+                  onChange={handleStudyChange}
+                />
+              </Col>
+              <Col lg="auto">
+                <Select
+                  id="pcPubCancerType"
+                  label="Cancer Type"
+                  value={pubCancerType}
+                  options={pubCancerTypeOptions}
+                  onChange={handleCancerChange}
+                />
+              </Col>
+              <Col lg="auto">
+                <Select
+                  id="pcPubSampleName"
+                  label="Public Sample Name"
+                  value={pubSampleName}
+                  options={pubSampleOptions}
+                  onChange={(name) => {
+                    mergeProfileComparison({
+                      pubSampleName: name,
+                    });
+                  }}
+                />
+              </Col>
+              <Col lg="auto" className="d-flex">
                 <Button
                   className="ml-auto mb-auto"
                   variant="primary"
@@ -734,40 +764,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 </Button>
               </Col>
             </Row>
-            <Row>
-              <Col lg="2">
-                <Select
-                  id="pcPubStudy"
-                  label="Study"
-                  value={pubStudy}
-                  options={studyOptions}
-                  onChange={handleStudyChange}
-                />
-              </Col>
-              <Col lg="3">
-                <Select
-                  id="pcPubCancerType"
-                  label="Cancer Type"
-                  value={pubCancerType}
-                  options={pubCancerTypeOptions}
-                  onChange={handleCancerChange}
-                />
-              </Col>
-              <Col lg="3">
-                <Select
-                  id="pcPubSampleName"
-                  label="Public Sample Name"
-                  value={pubSampleName}
-                  options={pubSampleOptions}
-                  onChange={(name) => {
-                    mergeProfileComparison({
-                      pubSampleName: name,
-                    });
-                  }}
-                />
-              </Col>
-            </Row>
           </Form>
+          <hr />
           <div id="pcPubPlot">
             {pubErr && (
               <div>
@@ -776,7 +774,6 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
             )}
             {pubPlotPath && (
               <>
-                <hr />
                 <Plot
                   className="p-3"
                   downloadName={pubPlotPath.split('/').slice(-1)[0]}
@@ -834,7 +831,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         </Nav>
         <TabContent
           className={`bg-white tab-pane-bordered rounded-0 d-block`}
-          style={{ overflowX: 'auto' }}
+          style={{ overflowX: 'auto', minHeight: '500px' }}
         >
           <div className="px-3 pt-3 pb-0">
             <p className="m-0">

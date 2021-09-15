@@ -188,9 +188,7 @@ export default function Signature() {
       title: 'RS in mSigPortal',
     },
     {
-      component: (
-        <Profile submitR={(fn, args) => submitR(fn, args)} />
-      ),
+      component: <Profile submitR={(fn, args) => submitR(fn, args)} />,
       key: 'mutationalSignatureProfile',
       title: 'RS Profile',
     },
@@ -200,11 +198,7 @@ export default function Signature() {
       title: 'RS Cosine Similarity',
     },
     {
-      component: (
-        <Comparison
-          submitR={(fn, args) => submitR(fn, args)}
-        />
-      ),
+      component: <Comparison submitR={(fn, args) => submitR(fn, args)} />,
       key: 'mutationalSignatureComparison',
       title: 'RS Comparison',
     },

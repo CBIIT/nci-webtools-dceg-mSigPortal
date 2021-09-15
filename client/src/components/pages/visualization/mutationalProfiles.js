@@ -271,7 +271,7 @@ export default function MutationalProfiles() {
       <hr />
       <Form className="p-3">
         <Row>
-          <Col lg="3">
+          <Col lg="auto">
             <Select
               id="mpSampleName"
               label="Sample Name"
@@ -280,7 +280,7 @@ export default function MutationalProfiles() {
               onChange={handleSample}
             />
           </Col>
-          <Col lg="3">
+          <Col lg="auto">
             <Select
               id="mpProfileType"
               label="Profile Type"
@@ -289,7 +289,7 @@ export default function MutationalProfiles() {
               onChange={handleProfile}
             />
           </Col>
-          <Col lg="3">
+          <Col lg="auto">
             <Select
               id="mpMatrixSize"
               label="Matrix Size"
@@ -298,7 +298,7 @@ export default function MutationalProfiles() {
               onChange={handleMatrix}
             />
           </Col>
-          <Col lg="3">
+          <Col lg="auto">
             <Select
               id="mpFilter"
               label="Filter"

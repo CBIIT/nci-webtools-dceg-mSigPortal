@@ -235,7 +235,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
           <Form className="p-3">
             <LoadingOverlay active={submitOverlay} />
             <Row>
-              <Col lg="2">
+              <Col lg="auto">
                 <Select
                   disabled={!multiSample}
                   id="pcaProfileType"
@@ -251,7 +251,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                 />
               </Col>
 
-              <Col lg="3">
+              <Col lg="auto">
                 <Select
                   disabled={!multiSample}
                   id="pcaRefSet"
@@ -265,7 +265,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                   }}
                 />
               </Col>
-              <Col lg="7" className="d-flex">
+              <Col lg="aitp" className="d-flex">
                 <Button
                   className="ml-auto mb-auto"
                   disabled={!multiSample}
@@ -304,18 +304,15 @@ export default function PCA({ submitR, getRefSigOptions }) {
             )}
           </Form>
 
+          <hr />
           {pcaErr && (
-            <div>
-              <hr />
-              <p className="p-3">
-                An error has occured. Please verify your input.
-              </p>
-            </div>
+            <p className="p-3">
+              An error has occured. Please verify your input.
+            </p>
           )}
 
           {pca1 && (
             <div id="pca1Plot">
-              <hr />
               <Plot
                 className="p-3"
                 downloadName={pca1.split('/').slice(-1)[0]}
@@ -402,7 +399,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
           <Form className="p-3">
             <LoadingOverlay active={pubSubmitOverlay} />
             <Row>
-              <Col lg="2">
+              <Col lg="auto">
                 <Select
                   id="pcaPubProfile"
                   label="Profile Type"
@@ -411,7 +408,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                   onChange={handleProfileType}
                 />
               </Col>
-              <Col lg="2">
+              <Col lg="auto">
                 <Select
                   id="pcaPubMatrixSize"
                   label="Matrix Size"
@@ -422,7 +419,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                   }}
                 />
               </Col>
-              <Col lg="2">
+              <Col lg="auto">
                 <Select
                   id="pcaPubStudy"
                   label="Study"
@@ -431,7 +428,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                   onChange={(study) => handleStudyChange(study)}
                 />
               </Col>
-              <Col lg="3">
+              <Col lg="auto">
                 <Select
                   id="pcaPubCancerType"
                   label="Cancer Type"
@@ -440,7 +437,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                   onChange={handleCancerChange}
                 />
               </Col>
-              <Col lg="3" className="d-flex">
+              <Col lg="auto" className="d-flex">
                 <Button
                   className="ml-auto mb-auto"
                   variant="primary"
@@ -462,19 +459,16 @@ export default function PCA({ submitR, getRefSigOptions }) {
               </Col>
             </Row>
           </Form>
+          <hr />
 
           {pubPcaErr && (
-            <div>
-              <hr />
-              <p className="p-3">
-                An error has occured. Please verify your input.
-              </p>
-            </div>
+            <p className="p-3">
+              An error has occured. Please verify your input.
+            </p>
           )}
 
           {pubPca1 && (
             <div id="pubPca1Plot">
-              <hr />
               <Plot
                 className="p-3"
                 downloadName={pubPca1.split('/').slice(-1)[0]}
@@ -557,7 +551,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
         </Nav>
         <Content
           className={`bg-white tab-pane-bordered rounded-0 d-block`}
-          style={{ overflowX: 'auto' }}
+          style={{ overflowX: 'auto', minHeight: '500px' }}
         >
           <div className="p-3">
             <p>

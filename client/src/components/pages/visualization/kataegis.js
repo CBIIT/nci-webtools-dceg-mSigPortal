@@ -91,7 +91,7 @@ export default function Kataegis({ submitR }) {
   return (
     <div>
       {source == 'user' && inputFormat == 'vcf' ? (
-        <div className="bg-white border rounded">
+        <div className="bg-white border rounded" style={{ minHeight: '500px' }}>
           <div className="p-3">
             <p>
               Below you can investigate instances of kataegis using a VCF file.
@@ -111,7 +111,7 @@ export default function Kataegis({ submitR }) {
           <Form noValidate className="p-3">
             <LoadingOverlay active={loading} />
             <Row>
-              <Col lg="3">
+              <Col lg="auto">
                 <Select
                   id="kataegisSamples"
                   label="Sample Name"
@@ -124,7 +124,7 @@ export default function Kataegis({ submitR }) {
                   }
                 />
               </Col>
-              <Col lg="1">
+              <Col lg="auto">
                 <Group controlId="toggleHighlight">
                   <Check
                     type="checkbox"
@@ -137,7 +137,7 @@ export default function Kataegis({ submitR }) {
                   />
                 </Group>
               </Col>
-              <Col lg="2">
+              <Col lg="auto">
                 <Group controlId="kataegisMin">
                   <Label>Minimum Number of Mutations</Label>
                   <Control
@@ -155,7 +155,7 @@ export default function Kataegis({ submitR }) {
                   </Form.Control.Feedback>
                 </Group>
               </Col>
-              <Col lg="2">
+              <Col lg="auto">
                 <Group controlId="kataegisMax">
                   <Label>Maximum Distance</Label>
                   <Control
@@ -173,7 +173,7 @@ export default function Kataegis({ submitR }) {
                   </Form.Control.Feedback>
                 </Group>
               </Col>
-              <Col lg="2">
+              <Col lg="auto">
                 <Select
                   id="kataegisChromosome"
                   label="Chromosome"
@@ -191,7 +191,7 @@ export default function Kataegis({ submitR }) {
                   }
                 />
               </Col>
-              <Col lg="2" className="d-flex">
+              <Col lg="auto" className="d-flex">
                 <Button
                   className="ml-auto mb-auto"
                   variant="primary"
@@ -209,16 +209,11 @@ export default function Kataegis({ submitR }) {
               </Col>
             </Row>
           </Form>
+          <hr />
 
           <div id="kataegisPlot">
-            {err && (
-              <div>
-                <hr />
-                <p className="p-3 text-danger">{err}</p>
-              </div>
-            )}
+            {err && <p className="p-3 text-danger">{err}</p>}
             <div style={{ display: plotPath ? 'block' : 'none' }}>
-              <hr />
               <Plot
                 className="p-3"
                 downloadName={plotPath.split('/').slice(-1)[0]}
