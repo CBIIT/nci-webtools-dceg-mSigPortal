@@ -26,7 +26,7 @@ export default function ProfilerSummary({ submitR }) {
   const { plotPath, err, debugR, loading } = visualization.profilerSummary;
   useEffect(() => {
     // check if profiler summary already exists, else lazy-load calculate
-    if (!plotPath && !mainLoading.active && projectID) {
+    if (!plotPath && !mainLoading.active && !loading && projectID) {
       if (source == 'user') {
         calculateR('profilerSummary', {
           matrixList: JSON.stringify(matrixList),
@@ -58,21 +58,17 @@ export default function ProfilerSummary({ submitR }) {
           debugR: err,
         });
       } else {
-        const { debugR, output } = await response.json();
-        if (Object.keys(output).length) {
+        const { output } = await response.json();
+        if (output.plotPath) {
           mergeProfilerSummary({
             debugR: debugR,
             loading: false,
-            plotPath:
-              source == 'user'
-                ? '/results/profilerSummary/profilerSummary.svg'
-                : '/results/profilerSummaryPublic/profilerSummaryPublic.svg',
+            plotPath: output.plotPath,
           });
         } else {
           mergeProfilerSummary({
-            debugR: debugR,
             loading: false,
-            err: true,
+            err: output.error || output.uncaughtError || true,
             plotPath: '',
           });
         }
@@ -106,7 +102,7 @@ export default function ProfilerSummary({ submitR }) {
           <Plot
             className="p-3"
             downloadName={plotPath.split('/').slice(-1)[0]}
-            plotPath={'api/results/' + projectID + plotPath}
+            plotPath={'api/results/' + plotPath}
             height="600px"
           />
         )}

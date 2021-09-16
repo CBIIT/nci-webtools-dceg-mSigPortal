@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button, Tab, Nav } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
-import Debug from '../../controls/debug/debug';
 import Select from '../../controls/select/select';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
@@ -101,7 +100,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
         const response = await getRefSigOptions(profileType);
 
         if (response.ok) {
-          const signatureSetOptions = await response.json();
+          const { output: signatureSetOptions } = await response.json();
 
           mergePCA({
             signatureSetOptions: signatureSetOptions,
@@ -145,11 +144,9 @@ export default function PCA({ submitR, getRefSigOptions }) {
         const err = await response.json();
         mergePCA({ debugR: err });
       } else {
-        const { debugR, output } = await response.json();
+        const { output } = await response.json();
 
-        mergePCA({ debugR: debugR });
-
-        if (Object.keys(output).length) {
+        if (output.pca1) {
           if (type == 'within') {
             mergePCA({
               pca1: output.pca1,
@@ -171,14 +168,10 @@ export default function PCA({ submitR, getRefSigOptions }) {
           }
         } else {
           if (type == 'within') {
-            mergePCA({
-              debugR: debugR,
-              pcaErr: true,
-            });
+            mergePCA({ pcaErr: output.error || output.uncaughtError || true });
           } else {
             mergePCA({
-              debugR: debugR,
-              pubPcaErr: true,
+              pubPcaErr: output.error || output.uncaughtError || true,
             });
           }
         }
@@ -316,7 +309,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
               <Plot
                 className="p-3"
                 downloadName={pca1.split('/').slice(-1)[0]}
-                plotPath={'api/results/' + projectID + pca1}
+                plotPath={'api/results/' + pca1}
               />
               <p className="p-3">
                 The bar plot illustrates each of the principal components with
@@ -335,7 +328,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
               <Plot
                 className="p-3"
                 downloadName={pca2.split('/').slice(-1)[0]}
-                plotPath={'api/results/' + projectID + pca2}
+                plotPath={'api/results/' + pca2}
                 txtPath={projectID + pca2Data}
               />
               <p className="p-3">
@@ -354,7 +347,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
               <Plot
                 className="p-3"
                 downloadName={pca3.split('/').slice(-1)[0]}
-                plotPath={'api/results/' + projectID + pca3}
+                plotPath={'api/results/' + pca3}
                 txtPath={projectID + pca3Data}
               />
               <p className="p-3">
@@ -373,7 +366,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
               <Plot
                 className="p-3"
                 downloadName={heatmap.split('/').slice(-1)[0]}
-                plotPath={'api/results/' + projectID + heatmap}
+                plotPath={'api/results/' + heatmap}
                 txtPath={projectID + heatmapData}
               />
               <p className="p-3">
@@ -472,7 +465,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
               <Plot
                 className="p-3"
                 downloadName={pubPca1.split('/').slice(-1)[0]}
-                plotPath={'api/results/' + projectID + pubPca1}
+                plotPath={'api/results/' + pubPca1}
               />
               <p className="p-3">
                 The bar plot illustrates each of the principal components with
@@ -491,7 +484,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
               <Plot
                 className="p-3"
                 downloadName={pubPca2.split('/').slice(-1)[0]}
-                plotPath={'api/results/' + projectID + pubPca2}
+                plotPath={'api/results/' + pubPca2}
                 txtPath={projectID + pubPca2Data}
               />
               <p className="p-3">
@@ -510,7 +503,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
               <Plot
                 className="p-3"
                 downloadName={pubPca3.split('/').slice(-1)[0]}
-                plotPath={'api/results/' + projectID + pubPca3}
+                plotPath={'api/results/' + pubPca3}
                 txtPath={projectID + pubPca3Data}
               />
               <p className="p-3">
@@ -571,7 +564,6 @@ export default function PCA({ submitR, getRefSigOptions }) {
           ))}
         </Content>
       </Container>
-      {/* <Debug msg={debugR} /> */}
     </div>
   );
 }

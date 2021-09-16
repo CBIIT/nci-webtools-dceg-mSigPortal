@@ -58,8 +58,8 @@ export default function MutationalPattern({ submitR }) {
         const err = await response.json();
         mergeMPEA({ debugR: err });
       } else {
-        const { debugR, output } = await response.json();
-        if (Object.keys(output).length) {
+        const { output } = await response.json();
+        if (output.plotPath) {
           mergeMPEA({
             debugR: debugR,
             plotPath: output.plotPath,
@@ -68,8 +68,7 @@ export default function MutationalPattern({ submitR }) {
           });
         } else {
           mergeMPEA({
-            debugR: debugR,
-            err: true,
+            err: output.error || output.uncaughtError || true,
           });
         }
       }
@@ -88,11 +87,10 @@ export default function MutationalPattern({ submitR }) {
       <div id="barchart">
         {barPath && (
           <>
-            >
             <Plot
               className="p-3"
               downloadName={barPath.split('/').slice(-1)[0]}
-              plotPath={'api/results/' + projectID + barPath}
+              plotPath={'api/results/' + barPath}
             />
             <p className="p-3">
               This plot illustrates the frequency by count of each mutational
@@ -121,7 +119,7 @@ export default function MutationalPattern({ submitR }) {
             <Plot
               className="p-3"
               downloadName={plotPath.split('/').slice(-1)[0]}
-              plotPath={'api/results/' + projectID + plotPath}
+              plotPath={'api/results/' + plotPath}
               txtPath={projectID + txtPath}
               title="Proportion of Mutational Pattern Context Compared to Other Contexts with the same SBS Mutation"
             />

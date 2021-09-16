@@ -58,17 +58,17 @@ export default function PublicForm() {
       },
     });
     try {
-      const response = await fetch(`api/getPublicData`, {
+      const response = await fetch(`api/visualizationWrapper`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(args),
+        body: JSON.stringify({ fn: 'getPublicData', args }),
       });
 
       if (response.ok) {
-        const { svgList, projectID } = await response.json();
+        const { output: svgList, projectID } = await response.json();
 
         mergeState({
           svgList: svgList,

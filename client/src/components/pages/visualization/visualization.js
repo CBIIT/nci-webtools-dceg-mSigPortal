@@ -191,7 +191,7 @@ export default function Visualization({ match }) {
     const selectProfile = defaultProfile(profileOptions);
     const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);
 
-    const refSignatureSetOptions = await (
+    const { output: refSignatureSetOptions } = await (
       await getRefSigOptions(selectProfile)
     ).json();
 
@@ -307,7 +307,7 @@ export default function Visualization({ match }) {
     const selectProfile = defaultProfile(profileOptions);
     const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);
 
-    const refSignatureSetOptions = await (
+    const { output: refSignatureSetOptions } = await (
       await getRefSigOptions(selectProfile)
     ).json();
 
@@ -348,7 +348,7 @@ export default function Visualization({ match }) {
   }
 
   function submitR(fn, args) {
-    return fetch(`api/visualizationCalc`, {
+    return fetch(`api/visualizationWrapper`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -359,7 +359,7 @@ export default function Visualization({ match }) {
   }
 
   function getRefSigOptions(profileType) {
-    return fetch(`api/visualizationData`, {
+    return fetch(`api/visualizationWrapper`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',

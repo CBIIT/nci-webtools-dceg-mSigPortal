@@ -743,7 +743,7 @@ export default function Univariate() {
                 <Plot
                   className="p-3 border rounded"
                   downloadName={plotPath.split('/').slice(-1)[0]}
-                  plotPath={`api/results/${projectID}${plotPath}`}
+                  plotPath={`api/results/${plotPath}`}
                   txtPath={projectID + dataPath}
                   height="800px"
                 />

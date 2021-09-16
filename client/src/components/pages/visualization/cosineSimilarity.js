@@ -61,7 +61,6 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
     withinSubmitOverlay,
     refSubmitOverlay,
     pubSubmitOverlay,
-    debugR,
   } = visualization.cosineSimilarity;
 
   // check for multiple sample input and disable params if true
@@ -98,7 +97,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
         const response = await getRefSigOptions(profileType);
 
         if (response.ok) {
-          const refSignatureSetOptions = await response.json();
+          const { output: refSignatureSetOptions } = await response.json();
 
           mergeCosineSimilarity({
             refSignatureSetOptions: refSignatureSetOptions,
@@ -128,25 +127,24 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
         [`${type}Err`]: false,
         [`${type}PlotPath`]: '',
         [`${type}TxtPath`]: '',
-        debugR: '',
       });
 
       const response = await submitR(fn, args);
       if (!response.ok) {
         const err = await response.json();
-        mergeCosineSimilarity({ debugR: err });
+        mergeCosineSimilarity({ [`${type}Err`]: err });
       } else {
-        const { debugR, output, error } = await response.json();
+        const { output } = await response.json();
+        const { plotPath, txtPath, error, uncaughtError } = output;
 
-        if (Object.keys(output).length) {
+        if (plotPath) {
           mergeCosineSimilarity({
-            [`${type}PlotPath`]: output.plotPath,
-            [`${type}TxtPath`]: output.txtPath,
+            [`${type}PlotPath`]: plotPath,
+            [`${type}TxtPath`]: txtPath,
           });
         } else {
           mergeCosineSimilarity({
-            [`${type}Err`]: error || debugR,
-            debugR: debugR || error || true,
+            [`${type}Err`]: error || uncaughtError || true,
           });
         }
       }
@@ -324,8 +322,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
               <Plot
                 className="p-3"
                 downloadName={withinPlotPath.split('/').slice(-1)[0]}
-                plotPath={'api/results/' + projectID + withinPlotPath}
-                txtPath={projectID + withinTxtPath}
+                plotPath={'api/results/' + withinPlotPath}
+                txtPath={withinTxtPath}
               />
             )}
           </div>
@@ -420,8 +418,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
               <Plot
                 className="p-3"
                 downloadName={refPlotPath.split('/').slice(-1)[0]}
-                plotPath={`api/results/${projectID}${refPlotPath}`}
-                txtPath={projectID + refTxtPath}
+                plotPath={`api/results/${refPlotPath}`}
+                txtPath={refTxtPath}
               />
             )}
           </div>
@@ -522,8 +520,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
               <Plot
                 className="p-3"
                 downloadName={pubPlotPath.split('/').slice(-1)[0]}
-                plotPath={`api/results/${projectID}${pubPlotPath}`}
-                txtPath={projectID + pubTxtPath}
+                plotPath={`api/results/${pubPlotPath}`}
+                txtPath={pubTxtPath}
               />
             )}
           </div>
@@ -570,7 +568,6 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
           ))}
         </Content>
       </Container>
-      {/* <Debug msg={debugR} /> */}
     </div>
   );
 }

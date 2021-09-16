@@ -17,8 +17,8 @@ if (config.aws) AWS.config.update(config.aws);
 
 const dataArgs = {
   s3Data: config.data.s3,
-  localData: path.join(config.data.localData),
   bucket: config.data.bucket,
+  localData: path.resolve(config.data.localData),
 };
 
 function parseCSV(filepath) {
@@ -185,62 +185,38 @@ async function getResults(req, res, next) {
 }
 
 // Visualization Calculation functions
-async function visualizationCalc(req, res, next) {
+async function visualizationWrapper(req, res, next) {
   const { fn, args, projectID } = req.body;
-  logger.debug(`/visualizationCalc: %o`, req.body);
+  logger.debug(`/visualizationWrapper: %o`, req.body);
 
-  // create save directory if needed
-  const savePath = path.join(
-    config.results.folder,
-    projectID,
-    'results',
-    fn,
-    '/'
-  );
-  fs.mkdirSync(savePath, { recursive: true });
+  // create directory for results if needed
+  const wd = projectID ? path.resolve(config.results.folder) : null;
+  const savePath = projectID ? path.join(projectID, 'results', fn, '/') : null;
+  if (projectID) fs.mkdirSync(path.join(wd, savePath), { recursive: true });
 
   try {
-    const wrapper = await r('services/R/visualizeWrapper.R', fn, {
-      ...args,
-      projectID: projectID,
-      pythonOutput: path.join(
-        config.results.folder,
-        projectID,
-        'results/output'
-      ),
-      savePath: savePath,
-      ...dataArgs,
+    const wrapper = await r('services/R/visualizeWrapper.R', 'wrapper', {
+      fn,
+      args,
+      dataArgs: {
+        ...dataArgs,
+        wd,
+        savePath,
+      },
     });
 
-    const { stdout, output, ...rest } = JSON.parse(wrapper);
-    // logger.debug(stdout);
+    const { stdout, ...rest } = JSON.parse(wrapper);
 
+    logger.debug(stdout);
+
+    // generate an id if getPublicData is called
     res.json({
+      projectID: fn == 'getPublicData' ? uuidv4() : projectID,
+      stdout,
       ...rest,
-      debugR: stdout,
-      output: getRelativePath(output, projectID),
     });
   } catch (err) {
-    logger.info(`/visualizationCalc: An error occured with fn:${fn}`);
-    res.status(500).json(err.message);
-    next(err);
-  }
-}
-
-// Visualization data/util functions
-async function visualizationData(req, res, next) {
-  const { fn, args } = req.body;
-  logger.debug(`/visualizationData: %o`, req.body);
-
-  try {
-    const data = await r('services/R/visualizeWrapper.R', fn, {
-      ...args,
-      ...dataArgs,
-    });
-
-    res.json(data);
-  } catch (err) {
-    logger.info(`/visualizationData: An error occured with fn:${fn}`);
+    logger.info(`/visualizationWrapper: An error occured with fn:${fn}`);
     res.status(500).json(err.message);
     next(err);
   }
@@ -260,38 +236,6 @@ async function getSignaturesUser(req, res, next) {
     }
   } catch (err) {
     logger.info('/getSignaturesUser: An error occured');
-    logger.error(err);
-    res.status(500).json(err.message);
-  }
-}
-
-async function getPublicData(req, res, next) {
-  logger.info('/getPublicOptions: Calling R Wrapper');
-  try {
-    const projectID = uuidv4();
-    const list = await r('services/R/visualizeWrapper.R', 'getPublicData', {
-      study: req.body.study,
-      cancerType: req.body.cancerType,
-      experimentalStrategy: req.body.experimentalStrategy,
-      ...dataArgs,
-    });
-    logger.info('/getPublicOptions: Complete');
-
-    let svgList = JSON.parse(list);
-
-    // save svg list
-    // const savePath = path.resolve(config.results.folder, projectID);
-    // fs.mkdirSync(savePath, {
-    //   recursive: true,
-    // });
-    // fs.writeFileSync(path.join(savePath, `svglist.json`), list);
-
-    res.json({
-      svgList: svgList,
-      projectID: projectID,
-    });
-  } catch (err) {
-    logger.info('/getPublicOptions: An error occured');
     logger.error(err);
     res.status(500).json(err.message);
   }
@@ -370,9 +314,8 @@ async function visualizationDownloadPublic(req, res, next) {
 
   try {
     await r('services/R/visualizeWrapper.R', 'downloadPublicData', {
-      ...args,
-      ...dataArgs,
-      savePath,
+      args,
+      dataArgs: { ...dataArgs, savePath },
     });
 
     const file = path.resolve(
@@ -460,10 +403,12 @@ async function associationWrapper(req, res, next) {
 
   const projectID = id ? id : uuidv4();
   const rootDir = path.join(config.results.folder, projectID);
-  // create save directory if needed
-  const savePath = path.join(rootDir, 'results', fn, '/');
 
-  fs.mkdirSync(savePath, { recursive: true });
+  // create save directory if needed
+  const savePath = projectID
+    ? path.join(rootDir, projectID, 'results', fn, '/')
+    : null;
+  if (savePath) fs.mkdirSync(savePath, { recursive: true });
 
   try {
     const wrapper = await r('services/R/associationWrapper.R', fn, {
@@ -798,10 +743,8 @@ module.exports = {
   profilerExtraction,
   visualizationProfilerExtraction,
   getResults,
-  visualizationCalc,
-  visualizationData,
+  visualizationWrapper,
   getSignaturesUser,
-  getPublicData,
   upload,
   visualizationDownload,
   visualizationDownloadPublic,
