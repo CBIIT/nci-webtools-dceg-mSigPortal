@@ -14,7 +14,7 @@ export const getInitialState = () => ({
   etiology: {
     category: 'Cosmic Mutational Signatures (v3.2)',
     etiology: 'APOBEC activity',
-    signatureName: '',
+    selectedSignature: '',
     tissue: '',
     refSig: '',
     study: 'PCAWG',
@@ -23,7 +23,6 @@ export const getInitialState = () => ({
     thumbnails: [],
     tissueThumbnails: [],
     refSigThumbnails: [],
-    selectedSource: '',
     profileURL: '',
     exposureURL: '',
     strandbiasURL: '',
