@@ -670,11 +670,8 @@ export default function Etiology() {
                   {category == 'Cosmic Mutational Signatures (v3.2)' &&
                     info.Study && (
                       <>
-                        <Row className="justify-content-center">
-                          {getStudy()}
-                        </Row>
                         <p>
-                          Select the cancer study to review the TMB of selected
+                          Select a cancer study to review the TMB of selected
                           signatures. TMB shown as the numbers of mutations per
                           megabase (log10) attributed to each mutational
                           signature in samples where the signature is present.
@@ -685,19 +682,15 @@ export default function Etiology() {
                           the horizontal bar, in blue) and the total number of
                           tumors analyzed (below the blue bar, in green).
                         </p>
-                        {exposureURL.length ? (
+                        <Row className="justify-content-center">
+                          {getStudy()}
+                        </Row>
+                        {exposureURL.length > 0 && (
                           <Plot
                             className="p-3 border"
                             height={'600px'}
                             plotPath={exposureURL}
                           />
-                        ) : (
-                          <div className="p-3 border">
-                            <p>
-                              A signature was not detected in any sample of the
-                              selected study
-                            </p>
-                          </div>
                         )}
                       </>
                     )}
