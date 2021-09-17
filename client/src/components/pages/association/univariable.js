@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import {
   Form,
   Row,
@@ -21,10 +21,10 @@ import Table from '../../controls/table/table';
 const actions = { ...associationActions, ...modalActions };
 const { Group, Label, Check, Control } = Form;
 
-export default function Univariate() {
+export default function Univariable() {
   const dispatch = useDispatch();
   const mergeState = async (state) =>
-    await dispatch(actions.mergeAssociation({ univariate: state }));
+    await dispatch(actions.mergeAssociation({ univariable: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -64,7 +64,7 @@ export default function Univariate() {
     variable1,
     variable2,
     resultsTable,
-  } = useSelector((state) => state.association.univariate);
+  } = useSelector((state) => state.association.univariable);
 
   // populate controls
   useEffect(() => {
@@ -104,7 +104,14 @@ export default function Univariate() {
       Header: column,
       id: column,
       accessor: (a) => a[column],
-      sortMethod: (a, b) => Number(a) - Number(b),
+      // sortType: useMemo(() => (rowA, rowB, columnId) => {
+      //   const a = Number(rowA.original[columnId]);
+      //   const b = Number(rowB.original[columnId]);
+      //   if (a > b) return 1;
+      //   if (b > a) return -1;
+      //   return 0;
+      // }),
+      // sortMethod: (a, b) => Number(a) - Number(b),
       // Cell: (e) => e.value || '',
     },
   ];
@@ -213,7 +220,7 @@ export default function Univariate() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            fn: 'univariate',
+            fn: 'univariable',
             projectID,
             args: {
               study,
@@ -267,30 +274,9 @@ export default function Univariate() {
     });
   }
 
-  const thresholdInfo = (
+  const popoverInfo = (text) => (
     <Popover>
-      <Popover.Content>
-        <p>Filter sample with variable value above this threshold</p>
-      </Popover.Content>
-    </Popover>
-  );
-  const logInfo = (
-    <Popover>
-      <Popover.Content>
-        <p>
-          Log<sub>2</sub> transform variable value
-        </p>
-      </Popover.Content>
-    </Popover>
-  );
-  const collapseInfo = (
-    <Popover>
-      <Popover.Content>
-        <p>
-          If variable value is factor, group variable value in to select
-          collapse level and other
-        </p>
-      </Popover.Content>
+      <Popover.Content>{text}</Popover.Content>
     </Popover>
   );
 
@@ -351,15 +337,143 @@ export default function Univariate() {
               onChange={(e) => mergeState({ assocVariable: e })}
             />
           </Col>
-          <Col md="auto" lg="auto">
-            <Select
-              disabled={loadingData || loadingParams || loadingCalculate}
-              id="expVariable"
-              label="Signature Exposure Variable"
-              value={expVariable}
-              options={expVarList}
-              onChange={(e) => mergeState({ expVariable: e })}
-            />
+          <Col lg="auto">
+            <fieldset className="border rounded p-2">
+              <legend className="font-weight-bold">Variable Filtering</legend>
+              <Row>
+                <Col md="auto">
+                  <div className="d-flex">
+                    <OverlayTrigger
+                      trigger="click"
+                      placement="top"
+                      overlay={popoverInfo(
+                        'Filter sample with variable value above this threshold'
+                      )}
+                      rootClose
+                    >
+                      <Button
+                        aria-label="threshold info"
+                        variant="link"
+                        className="p-0 font-weight-bold mr-1"
+                      >
+                        <FontAwesomeIcon
+                          icon={faInfoCircle}
+                          style={{ verticalAlign: 'super' }}
+                        />
+                      </Button>
+                    </OverlayTrigger>
+                    <Group
+                      controlId="variable1-threshold"
+                      className="d-flex mb-0"
+                    >
+                      <Label className="mr-2">Threshold</Label>
+                      <Control
+                        disabled={
+                          loadingData || loadingParams || loadingCalculate
+                        }
+                        value={variable1.filter}
+                        placeholder={'optional'}
+                        style={{ width: '90px' }}
+                        onChange={(e) =>
+                          mergeState({
+                            variable1: {
+                              filter: e.target.value,
+                            },
+                          })
+                        }
+                        isInvalid={false}
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        Enter a valid threshold
+                      </Form.Control.Feedback>
+                    </Group>
+                  </div>
+                </Col>
+                <Col md="auto">
+                  <Group controlId="log2-1" className="d-flex mb-0">
+                    <OverlayTrigger
+                      trigger="click"
+                      placement="top"
+                      overlay={popoverInfo([
+                        'Log',
+                        <sub>2</sub>,
+                        ' transform variable value',
+                      ])}
+                      rootClose
+                    >
+                      <Button
+                        aria-label="log info"
+                        variant="link"
+                        className="p-0 font-weight-bold mr-1"
+                      >
+                        <FontAwesomeIcon
+                          icon={faInfoCircle}
+                          style={{ verticalAlign: 'baseline' }}
+                        />
+                      </Button>
+                    </OverlayTrigger>{' '}
+                    <Label className="mr-2 font-weight-normal">
+                      log<sub>2</sub>
+                    </Label>
+                    <Check inline id="log2-1">
+                      <Check.Input
+                        disabled={
+                          loadingData || loadingParams || loadingCalculate
+                        }
+                        type="checkbox"
+                        value={variable1.log2}
+                        checked={variable1.log2}
+                        onChange={() =>
+                          mergeState({
+                            variable1: { log2: !variable1.log2 },
+                          })
+                        }
+                      />
+                    </Check>
+                  </Group>
+                </Col>
+                <Col md="auto">
+                  <OverlayTrigger
+                    trigger="click"
+                    placement="top"
+                    overlay={popoverInfo(
+                      'If variable value is factor, group variable value in to select collapse level and other'
+                    )}
+                    rootClose
+                  >
+                    <Button
+                      aria-label="collapse info"
+                      variant="link"
+                      className="p-0 font-weight-bold"
+                    >
+                      <FontAwesomeIcon
+                        icon={faInfoCircle}
+                        style={{ verticalAlign: 'baseline' }}
+                      />
+                    </Button>
+                  </OverlayTrigger>{' '}
+                  <Select
+                    className="d-inline-flex mb-0"
+                    disabled={
+                      loadingData ||
+                      loadingParams ||
+                      loadingCalculate ||
+                      !variable1.collapseOptions.length
+                    }
+                    id="collapse1"
+                    label="Collapse"
+                    labelClass="mr-2 font-weight-normal"
+                    value={
+                      variable1.collapseOptions.length
+                        ? variable1.collapse
+                        : 'None'
+                    }
+                    options={variable1.collapseOptions}
+                    onChange={(e) => mergeState({ variable1: { collapse: e } })}
+                  />
+                </Col>
+              </Row>
+            </fieldset>
           </Col>
         </Row>
         <Row className="justify-content-end">
@@ -390,134 +504,15 @@ export default function Univariate() {
               Select the following filtering and method for analysis
             </p>
             <Row className="justify-content-center">
-              <Col lg="auto">
-                <fieldset className="border rounded p-2">
-                  <legend className="font-weight-bold">
-                    Variable Filtering
-                  </legend>
-                  <Row>
-                    <Col md="auto">
-                      <Group controlId="filter1" className="d-flex">
-                        <OverlayTrigger
-                          trigger="click"
-                          placement="top"
-                          overlay={thresholdInfo}
-                          rootClose
-                        >
-                          <Button
-                            aria-label="threshold info"
-                            variant="link"
-                            className="p-0 font-weight-bold mr-1"
-                          >
-                            <FontAwesomeIcon
-                              icon={faInfoCircle}
-                              style={{ verticalAlign: 'baseline' }}
-                            />
-                          </Button>
-                        </OverlayTrigger>
-                        <Label className="mr-2 font-weight-normal">
-                          Threshold
-                        </Label>
-                        <Check inline id="filter1">
-                          <Check.Input
-                            disabled={
-                              loadingData || loadingParams || loadingCalculate
-                            }
-                            type="checkbox"
-                            value={variable1.filter}
-                            checked={variable1.filter}
-                            onChange={() =>
-                              mergeState({
-                                variable1: {
-                                  filter: !variable1.filter,
-                                },
-                              })
-                            }
-                          />
-                        </Check>
-                      </Group>
-                    </Col>
-                    <Col md="auto">
-                      <Group controlId="log2-1" className="d-flex">
-                        <OverlayTrigger
-                          trigger="click"
-                          placement="top"
-                          overlay={logInfo}
-                          rootClose
-                        >
-                          <Button
-                            aria-label="log info"
-                            variant="link"
-                            className="p-0 font-weight-bold mr-1"
-                          >
-                            <FontAwesomeIcon
-                              icon={faInfoCircle}
-                              style={{ verticalAlign: 'baseline' }}
-                            />
-                          </Button>
-                        </OverlayTrigger>{' '}
-                        <Label className="mr-2 font-weight-normal">
-                          log<sub>2</sub>
-                        </Label>
-                        <Check inline id="log2-1">
-                          <Check.Input
-                            disabled={
-                              loadingData || loadingParams || loadingCalculate
-                            }
-                            type="checkbox"
-                            value={variable1.log2}
-                            checked={variable1.log2}
-                            onChange={() =>
-                              mergeState({
-                                variable1: { log2: !variable1.log2 },
-                              })
-                            }
-                          />
-                        </Check>
-                      </Group>
-                    </Col>
-                    <Col md="auto">
-                      <OverlayTrigger
-                        trigger="click"
-                        placement="top"
-                        overlay={collapseInfo}
-                        rootClose
-                      >
-                        <Button
-                          aria-label="collapse info"
-                          variant="link"
-                          className="p-0 font-weight-bold"
-                        >
-                          <FontAwesomeIcon
-                            icon={faInfoCircle}
-                            style={{ verticalAlign: 'baseline' }}
-                          />
-                        </Button>
-                      </OverlayTrigger>{' '}
-                      <Select
-                        className="d-inline-flex mb-0"
-                        disabled={
-                          loadingData ||
-                          loadingParams ||
-                          loadingCalculate ||
-                          !variable1.collapseOptions.length
-                        }
-                        id="collapse1"
-                        label="Collapse"
-                        labelClass="mr-2 font-weight-normal"
-                        value={
-                          variable1.collapseOptions.length
-                            ? variable1.collapse
-                            : 'None'
-                        }
-                        options={variable1.collapseOptions}
-                        onChange={(e) =>
-                          mergeState({ variable1: { collapse: e } })
-                        }
-                      />
-                    </Col>
-                  </Row>
-                </fieldset>
+              <Col md="auto" lg="auto">
+                <Select
+                  disabled={loadingData || loadingParams || loadingCalculate}
+                  id="expVariable"
+                  label="Signature Exposure Variable"
+                  value={expVariable}
+                  options={expVarList}
+                  onChange={(e) => mergeState({ expVariable: e })}
+                />
               </Col>
               <Col lg="auto">
                 <fieldset className="border rounded p-2">
@@ -526,11 +521,13 @@ export default function Univariate() {
                   </legend>
                   <Row>
                     <Col md="auto">
-                      <Group controlId="filter2" className="d-flex">
+                      <div className="d-flex">
                         <OverlayTrigger
                           trigger="click"
                           placement="top"
-                          overlay={thresholdInfo}
+                          overlay={popoverInfo(
+                            'Filter sample with signature exposure value above this threshold'
+                          )}
                           rootClose
                         >
                           <Button
@@ -540,38 +537,47 @@ export default function Univariate() {
                           >
                             <FontAwesomeIcon
                               icon={faInfoCircle}
-                              style={{ verticalAlign: 'baseline' }}
+                              style={{ verticalAlign: 'super' }}
                             />
                           </Button>
                         </OverlayTrigger>
-                        <Label className="mr-2 font-weight-normal">
-                          Threshold
-                        </Label>
-                        <Check inline id="filter2">
-                          <Check.Input
+                        <Group
+                          controlId="variable2-threshold"
+                          className="d-flex mb-0"
+                        >
+                          <Label className="mr-2">Threshold</Label>
+                          <Control
                             disabled={
                               loadingData || loadingParams || loadingCalculate
                             }
-                            type="checkbox"
                             value={variable2.filter}
-                            checked={variable2.filter}
-                            onChange={() =>
+                            placeholder={'optional'}
+                            style={{ width: '90px' }}
+                            onChange={(e) =>
                               mergeState({
                                 variable2: {
-                                  filter: !variable2.filter,
+                                  filter: e.target.value,
                                 },
                               })
                             }
+                            isInvalid={false}
                           />
-                        </Check>
-                      </Group>
+                          <Form.Control.Feedback type="invalid">
+                            Enter a valid threshold
+                          </Form.Control.Feedback>
+                        </Group>
+                      </div>
                     </Col>
                     <Col md="auto">
-                      <Group controlId="log2-2" className="d-flex">
+                      <Group controlId="log2-2" className="d-flex mb-0">
                         <OverlayTrigger
                           trigger="click"
                           placement="top"
-                          overlay={logInfo}
+                          overlay={popoverInfo([
+                            'Log ',
+                            <sub>2</sub>,
+                            ' transform signature exposure value',
+                          ])}
                           rootClose
                         >
                           <Button

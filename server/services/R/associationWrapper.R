@@ -163,7 +163,7 @@ loadCollapse <- function(args, dataArgs) {
   })
 }
 
-univariate <- function(args, dataArgs) {
+univariable <- function(args, dataArgs) {
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
   sink(con, type = "output")

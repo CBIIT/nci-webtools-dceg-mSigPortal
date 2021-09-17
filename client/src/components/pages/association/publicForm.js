@@ -166,12 +166,12 @@ export default function PublicForm() {
         assocVarData,
         expVarList,
         assocFullDataPath: fullDataPath,
-        displayTab: 'univariate',
+        displayTab: 'univariable',
         openSidebar: false,
       });
       dispatch(
         actions.mergeAssociation({
-          univariate: {
+          univariable: {
             projectID,
           },
         })

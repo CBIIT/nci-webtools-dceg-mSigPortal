@@ -6,7 +6,7 @@ import {
   MainPanel,
 } from '../../controls/sidebar-container/sidebar-container';
 import Instructions from '../association/instructions';
-import Univariate from './univariate';
+import Univariable from './univariable';
 import UserForm from './userForm';
 import PublicForm from './publicForm';
 import { useSelector, useDispatch } from 'react-redux';
@@ -38,7 +38,7 @@ export default function Association() {
       id: 'instructions',
       component: <Instructions loading={loadingData} />,
     },
-    { name: 'Univariate', id: 'univariate', component: <Univariate /> },
+    { name: 'Univariable', id: 'univariable', component: <Univariable /> },
     { name: 'Multivariate', id: 'multivariate', component: <></> },
   ];
 

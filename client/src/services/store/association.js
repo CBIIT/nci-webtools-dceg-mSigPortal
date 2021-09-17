@@ -28,7 +28,7 @@ export const getInitialState = () => ({
       },
     },
   },
-  univariate: {
+  univariable: {
     loadingParams: false,
     loadingCalculate: false,
     loadingRecalculate: false,
@@ -53,14 +53,14 @@ export const getInitialState = () => ({
     ylab: '',
     variable1: {
       name: '',
-      filter: false,
+      filter: '',
       log2: false,
       collapse: '',
       collapseOptions: [],
     },
     variable2: {
       name: '',
-      filter: false,
+      filter: '',
       log2: false,
       collapse: '',
       collapseOptions: [],
