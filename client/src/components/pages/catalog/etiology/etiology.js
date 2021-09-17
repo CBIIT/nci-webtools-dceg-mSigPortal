@@ -150,7 +150,7 @@ export default function Etiology() {
       });
     };
 
-    if (selectedSignature && study) getPlots();
+    if (selectedSignature) getPlots();
     else if (tissue && refSig) getCancerSpecificPlots();
   }, [selectedSignature, study, tissue, refSig]);
 
