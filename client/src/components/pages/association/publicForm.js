@@ -252,18 +252,7 @@ export default function PublicForm() {
   }
 
   function handleSet(set) {
-    const rsSetOptions = [
-      ...new Set(
-        exposureSignature
-          .filter((row) => row.Signature_set_name == set)
-          .map((row) => row.Signature_name)
-      ),
-    ];
-
-    mergeState({
-      rsSet: set,
-      rsSetOptions: rsSetOptions,
-    });
+    mergeState({ rsSet: set });
   }
 
   return (
