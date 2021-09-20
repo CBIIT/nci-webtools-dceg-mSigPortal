@@ -368,7 +368,7 @@ export default function Univariable() {
                           loadingData || loadingParams || loadingCalculate
                         }
                         value={variable1.filter}
-                        placeholder={'optional'}
+                        placeholder={'Optional'}
                         style={{ width: '90px' }}
                         onChange={(e) =>
                           mergeState({
@@ -547,7 +547,7 @@ export default function Univariable() {
                               loadingData || loadingParams || loadingCalculate
                             }
                             value={variable2.filter}
-                            placeholder={'optional'}
+                            placeholder={'Optional'}
                             style={{ width: '90px' }}
                             onChange={(e) =>
                               mergeState({
