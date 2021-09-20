@@ -362,7 +362,7 @@ export default function Univariable() {
                       controlId="variable1-threshold"
                       className="d-flex mb-0"
                     >
-                      <Label className="mr-2">Threshold</Label>
+                      <Label className="mr-2 font-weight-normal">Threshold</Label>
                       <Control
                         disabled={
                           loadingData || loadingParams || loadingCalculate
@@ -541,7 +541,9 @@ export default function Univariable() {
                           controlId="variable2-threshold"
                           className="d-flex mb-0"
                         >
-                          <Label className="mr-2">Threshold</Label>
+                          <Label className="mr-2 font-weight-normal">
+                            Threshold
+                          </Label>
                           <Control
                             disabled={
                               loadingData || loadingParams || loadingCalculate
