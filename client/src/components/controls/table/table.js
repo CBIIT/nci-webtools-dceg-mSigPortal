@@ -78,7 +78,8 @@ function PaginationText({
 }
 
 export default function Table({
-  title,
+  title = '',
+  customTitle = <Col></Col>,
   columns,
   data,
   hidden,
@@ -162,9 +163,13 @@ export default function Table({
   return (
     <div>
       <Row className="mb-2">
-        <Col md="8">
-          <strong>{title}</strong>
-        </Col>
+        {title ? (
+          <Col>
+            <strong>{title}</strong>
+          </Col>
+        ) : (
+          customTitle
+        )}
         <Col />
         {(globalSearch || globalSearch == '') && (
           <Col md="auto">
@@ -189,7 +194,6 @@ export default function Table({
             </Button>
           </Col>
         )}
-
         <Col md="auto">
           <Dropdown>
             <Dropdown.Toggle

@@ -285,9 +285,14 @@ export default function Univariable() {
       <LoadingOverlay active={loadingData} />
       <div className="mb-3">
         <h5 className="separator">Variables</h5>
-
         <Table
-          title="Available variables for selected study"
+          customTitle={
+            <>
+              <Col />
+              <Col />
+              <Col>Available variables for selected study</Col>
+            </>
+          }
           data={assocVarData}
           columns={[
             ...new Set(...assocVarData.map((row) => Object.keys(row))),
