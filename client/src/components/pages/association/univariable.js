@@ -104,15 +104,6 @@ export default function Univariable() {
       Header: column,
       id: column,
       accessor: (a) => a[column],
-      // sortType: useMemo(() => (rowA, rowB, columnId) => {
-      //   const a = Number(rowA.original[columnId]);
-      //   const b = Number(rowB.original[columnId]);
-      //   if (a > b) return 1;
-      //   if (b > a) return -1;
-      //   return 0;
-      // }),
-      // sortMethod: (a, b) => Number(a) - Number(b),
-      // Cell: (e) => e.value || '',
     },
   ];
 
@@ -696,7 +687,13 @@ export default function Univariable() {
                     ...new Set(
                       ...resultsTable.data.map((row) => Object.keys(row))
                     ),
-                  ].reduce(reducer, [])}
+                  ]
+                    .reduce(reducer, [])
+                    .map((col) =>
+                      typeof resultsTable.data[0][col.Header] == 'number'
+                        ? { ...col, sortType: 'basic' }
+                        : col
+                    )}
                   pagination={resultsTable.pagination}
                   hidden={resultsTable.hidden}
                   downloadName="Download Association Result"
