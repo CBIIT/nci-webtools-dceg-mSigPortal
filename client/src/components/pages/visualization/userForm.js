@@ -347,6 +347,7 @@ export default function UserForm() {
           custom
         >
           <option value="vcf">VCF</option>
+          <option value="maf">MAF</option>
           <option value="csv">CSV</option>
           <option value="tsv">TSV</option>
           <option value="catalog_tsv">CATALOG TSV</option>
