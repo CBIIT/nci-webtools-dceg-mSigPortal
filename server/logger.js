@@ -7,6 +7,7 @@ module.exports = new createLogger({
   level: level || 'info',
   format: format.combine(
     format.colorize(),
+    format.splat(),
     format.timestamp({
       format: 'YYYY-MM-DD HH:mm:ss',
     }),
