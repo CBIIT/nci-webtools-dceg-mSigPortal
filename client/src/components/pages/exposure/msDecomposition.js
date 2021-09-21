@@ -39,7 +39,7 @@ export default function MsDecomposition() {
               className="p-3"
               title="Evaluating the Performance of Mutational Signature Decomposition"
               downloadName={plotPath.split('/').slice(-1)[0]}
-              plotPath={`api/results/${projectID}${plotPath}`}
+              plotPath={`api/results/${plotPath}`}
               txtPath={projectID + txtPath}
             />
           </>

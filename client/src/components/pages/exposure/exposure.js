@@ -418,7 +418,7 @@ export default function Exposure({ match }) {
         cancerType: cancer,
       });
 
-      const file = await fetch(`api/results/${projectID}${output.path}`);
+      const file = await fetch(`api/results/${output.path}`);
       if (file.ok) {
         const objectURL = URL.createObjectURL(await file.blob());
         const tempLink = document.createElement('a');

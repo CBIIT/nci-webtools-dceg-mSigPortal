@@ -32,7 +32,6 @@ export default function Kataegis({ submitR }) {
     plotPath,
     err,
     kataegisData,
-    debugR,
     loading,
   } = visualization.kataegis;
 
@@ -43,7 +42,6 @@ export default function Kataegis({ submitR }) {
     mergeKataegis({
       loading: true,
       err: false,
-      debugR: '',
       plotPath: '',
       kataegisData: [],
     });
@@ -58,25 +56,23 @@ export default function Kataegis({ submitR }) {
       });
       if (!response.ok) {
         const err = await response.json();
-        mergeKataegis({ debugR: err });
-
+        mergeKataegis({ err: err });
         mergeKataegis({ loading: false });
       } else {
-        const { debugR, output, errors, data } = await response.json();
-        if (Object.keys(output).length) {
+        const { output } = await response.json();
+        const { plotPath, txtPath, data, error, uncaughtError } = output;
+        if (plotPath) {
           mergeKataegis({
-            debugR: debugR,
-            plotPath: output.plotPath,
-            txtPath: output.txtPath,
+            plotPath: plotPath,
+            txtPath: txtPath,
             kataegisData: JSON.parse(data),
             loading: false,
           });
         } else {
           mergeKataegis({
-            debugR: debugR,
             plotPath: '',
             txtPath: '',
-            err: errors,
+            err: error || uncaughtError,
             kataegisData: [],
             loading: false,
           });
@@ -217,7 +213,7 @@ export default function Kataegis({ submitR }) {
               <Plot
                 className="p-3"
                 downloadName={plotPath.split('/').slice(-1)[0]}
-                plotPath={'api/results/' + projectID + plotPath}
+                plotPath={'api/results/' + plotPath}
                 txtPath={txtPath ? projectID + txtPath : null}
               />
               <p className="p-3">
@@ -251,7 +247,6 @@ export default function Kataegis({ submitR }) {
           </p>
         </div>
       )}
-      {/* <Debug msg={debugR} /> */}
     </div>
   );
 }

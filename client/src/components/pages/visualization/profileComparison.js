@@ -162,7 +162,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         const response = await getRefSigOptions(profileType);
 
         if (response.ok) {
-          const signatureSetOptions = await response.json();
+          const { output: signatureSetOptions } = await response.json();
 
           mergeProfileComparison({
             refSignatureSetOptions: signatureSetOptions,
@@ -186,7 +186,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     if (signatureSetName) {
       mergeProfileComparison({ refSubmitOverlay: true });
       try {
-        const response = await fetch(`api/visualizationData`, {
+        const response = await fetch(`api/visualizationWrapper`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -202,7 +202,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         });
 
         if (response.ok) {
-          const signatures = await response.json();
+          const { output: signatures } = await response.json();
 
           mergeProfileComparison({
             refSignatures: signatures,
@@ -237,18 +237,17 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         const err = await response.json();
         mergeProfileComparison({ debugR: err });
       } else {
-        const { debugR, output, error } = await response.json();
+        const { output } = await response.json();
 
         mergeProfileComparison({ debugR: debugR });
-        if (Object.keys(output).length) {
+        if (output.plotPath) {
           mergeProfileComparison({
             [`${type}PlotPath`]: output.plotPath,
             [`${type}TxtPath`]: output.txtPath,
           });
         } else {
           mergeProfileComparison({
-            [`${type}Err`]: error || debugR,
-            debugR: debugR || error || true,
+            [`${type}Err`]: output.error || output.uncaughtError || true,
           });
         }
       }
@@ -262,6 +261,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
   async function getPublicSamples(study, cancerType) {
     try {
       setOverlay('pub', true);
+
       const args = {
         study: study,
         cancerType: cancerType,
@@ -276,17 +276,17 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         ][0],
       };
 
-      const response = await fetch(`api/getPublicData`, {
+      const response = await fetch(`api/visualizationWrapper`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(args),
+        body: JSON.stringify({ fn: 'getPublicData', args }),
       });
 
       if (response.ok) {
-        const { svgList } = await response.json();
+        const { output: svgList } = await response.json();
         const pubSamples = [...new Set(svgList.map(({ Sample }) => Sample))];
 
         mergeProfileComparison({
@@ -465,8 +465,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 <Plot
                   className="p-3"
                   downloadName={withinPlotPath.split('/').slice(-1)[0]}
-                  plotPath={'api/results/' + projectID + withinPlotPath}
-                  txtPath={projectID + withinTxtPath}
+                  plotPath={'api/results/' + withinPlotPath}
+                  txtPath={withinTxtPath}
                 />
                 <div className="p-3">
                   <p>
@@ -633,8 +633,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 <Plot
                   className="p-3"
                   downloadName={refPlotPath.split('/').slice(-1)[0]}
-                  plotPath={'api/results/' + projectID + refPlotPath}
-                  txtPath={projectID + refTxtPath}
+                  plotPath={'api/results/' + refPlotPath}
+                  txtPath={refTxtPath}
                 />
                 <div className="p-3">
                   <p>
@@ -777,8 +777,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 <Plot
                   className="p-3"
                   downloadName={pubPlotPath.split('/').slice(-1)[0]}
-                  plotPath={'api/results/' + projectID + pubPlotPath}
-                  txtPath={projectID + pubTxtPath}
+                  plotPath={'api/results/' + pubPlotPath}
+                  txtPath={pubTxtPath}
                 />
                 <div className="p-3">
                   <p>

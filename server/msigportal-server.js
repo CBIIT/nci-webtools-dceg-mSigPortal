@@ -16,10 +16,8 @@ app.use('/api', apiRouter);
 const {
   visualizationProfilerExtraction,
   getResults,
-  visualizationCalc,
-  visualizationData,
+  visualizationWrapper,
   getSignaturesUser,
-  getPublicData,
   upload,
   visualizationDownload,
   visualizationDownloadPublic,
@@ -88,13 +86,9 @@ apiRouter.post('/profilerExtraction', visualizationProfilerExtraction);
 
 apiRouter.post('/getResults', getResults);
 
-apiRouter.post('/visualizationCalc', visualizationCalc);
-
-apiRouter.post('/visualizationData', visualizationData);
+apiRouter.post('/visualizationWrapper', visualizationWrapper);
 
 apiRouter.post('/getSignaturesUser', getSignaturesUser);
-
-apiRouter.post('/getPublicData', getPublicData);
 
 apiRouter.post('/upload', upload);
 
