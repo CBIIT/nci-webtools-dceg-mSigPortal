@@ -116,12 +116,9 @@ async function processMessage(params) {
 
     const dataArgs = {
       s3Data: config.data.s3,
-      localData: path.join(config.data.localData),
       bucket: config.data.bucket,
-    };
-    const calcArgs = {
-      projectID: id,
-      pythonOutput: path.join(directory, 'results/output'),
+      localData: path.resolve(config.data.localData),
+      wd: path.resolve(config.results.folder),
     };
 
     // python extraction
@@ -234,8 +231,8 @@ async function processMessage(params) {
       'services/R/visualizeWrapper.R',
       'getReferenceSignatureSets',
       {
-        profileType: selectProfile,
-        ...dataArgs,
+        args: { profileType: selectProfile },
+        dataArgs,
       }
     );
 
@@ -287,81 +284,90 @@ async function processMessage(params) {
     // R calculations
     // Profiler Summary
     try {
-      const profilerSummaryPath = path.join(
-        directory,
-        'results/profilerSummary/'
-      );
-      await fs.promises.mkdir(profilerSummaryPath, { recursive: true });
+      const profilerSummaryPath = path.join(id, 'results/profilerSummary/');
+      await fs.promises.mkdir(path.join(dataArgs.wd, profilerSummaryPath), {
+        recursive: true,
+      });
       const profilerSummary = await r(
         'services/R/visualizeWrapper.R',
-        'profilerSummary',
+        'wrapper',
         {
-          matrixList: JSON.stringify(matrixList),
-          savePath: profilerSummaryPath,
-          ...dataArgs,
-          ...calcArgs,
+          fn: 'profilerSummary',
+          args: {
+            matrixList: JSON.stringify(matrixList),
+          },
+          dataArgs: {
+            ...dataArgs,
+            savePath: profilerSummaryPath,
+          },
         }
       );
 
-      newState = {
-        ...newState,
-        profilerSummary: {
-          ...newState.profilerSummary,
-          plotPath: `/results/profilerSummary/profilerSummary.svg`,
-        },
-      };
-      const { stdout } = JSON.parse(profilerSummary);
-      logger.debug(stdout);
+      const { stdout, output } = JSON.parse(profilerSummary);
+      if (output.plotPath) {
+        newState = {
+          ...newState,
+          profilerSummary: {
+            ...newState.profilerSummary,
+            plotPath: output.plotPath,
+          },
+        };
+      } else {
+        logger.debug(stdout);
+        logger.error(output);
+      }
     } catch (err) {
       logger.error(err);
     }
 
     // cosinse similarity within
     try {
-      const csWithinPath = path.join(
-        directory,
-        'results/cosineSimilarityWithin/'
-      );
-      await fs.promises.mkdir(csWithinPath, { recursive: true });
-      const csWithin = await r(
-        'services/R/visualizeWrapper.R',
-        'cosineSimilarityWithin',
-        {
+      const csWithinPath = path.join(id, 'results/cosineSimilarityWithin/');
+      await fs.promises.mkdir(path.join(dataArgs.wd, csWithinPath), {
+        recursive: true,
+      });
+      const csWithin = await r('services/R/visualizeWrapper.R', 'wrapper', {
+        fn: 'cosineSimilarityWithin',
+        args: {
           matrixFile: matrixList.filter(
             (row) =>
               row.Profile_Type == selectProfile &&
               row.Matrix_Size == selectMatrix
           )[0].Path,
-          savePath: csWithinPath,
+        },
+        dataArgs: {
           ...dataArgs,
-          ...calcArgs,
-        }
-      );
+          savePath: csWithinPath,
+        },
+      });
 
       let { output, stdout } = JSON.parse(csWithin);
-      logger.debug(stdout);
-
-      output = getRelativePath(output, id);
-      newState = {
-        ...newState,
-        cosineSimilarity: {
-          ...newState.cosineSimilarity,
-          withinPlotPath: output.plotPath,
-          withinTxtPath: output.txtPath,
-          debugR: stdout,
-        },
-      };
+      if (output.plotPath) {
+        newState = {
+          ...newState,
+          cosineSimilarity: {
+            ...newState.cosineSimilarity,
+            withinPlotPath: output.plotPath,
+            withinTxtPath: output.txtPath,
+            debugR: stdout,
+          },
+        };
+      } else {
+        logger.debug(stdout);
+        logger.error(output);
+      }
     } catch (err) {
-      logger.debug(err);
+      logger.error(err);
     }
     // cosinse similarity ref
     try {
-      const csRefPath = path.join(directory, 'results/cosineSimilarityRefSig/');
-      await fs.promises.mkdir(csRefPath, { recursive: true });
-      const csRef = await r(
-        'services/R/visualizeWrapper.R',
-        'cosineSimilarityRefSig',
-        {
+      const csRefPath = path.join(id, 'results/cosineSimilarityRefSig/');
+      await fs.promises.mkdir(path.join(dataArgs.wd, csRefPath), {
+        recursive: true,
+      });
+      const csRef = await r('services/R/visualizeWrapper.R', 'wrapper', {
+        fn: 'cosineSimilarityRefSig',
+        args: {
           profileType: selectProfile,
           signatureSet: refSignatureSetOptions[0],
           matrixFile: matrixList.filter(
@@ -370,37 +376,41 @@ async function processMessage(params) {
               row.Matrix_Size ==
                 defaultMatrix(selectProfile, ['96', '78', '83'])
           )[0].Path,
-          savePath: csRefPath,
-          ...dataArgs,
-          ...calcArgs,
-        }
-      );
-      let { output, stdout } = JSON.parse(csRef);
-      output = getRelativePath(output, id);
-      newState = {
-        ...newState,
-        cosineSimilarity: {
-          ...newState.cosineSimilarity,
-          refPlotPath: output.plotPath,
-          refTxtPath: output.txtPath,
-          debugR: stdout,
         },
-      };
+        dataArgs: {
+          ...dataArgs,
+          savePath: csRefPath,
+        },
+      });
+      let { output, stdout } = JSON.parse(csRef);
+
+      if (output.plotPath) {
+        newState = {
+          ...newState,
+          cosineSimilarity: {
+            ...newState.cosineSimilarity,
+            refPlotPath: output.plotPath,
+            refTxtPath: output.txtPath,
+            debugR: stdout,
+          },
+        };
+      } else {
+        logger.debug(stdout);
+        logger.error(output);
+      }
     } catch (err) {
-      logger.debug(err);
+      logger.error(err);
     }
 
     // cosinse similarity public
     try {
-      const csPublicPath = path.join(
-        directory,
-        'results/cosineSimilarityPublic/'
-      );
-      await fs.promises.mkdir(csPublicPath, { recursive: true });
-      const csPublic = await r(
-        'services/R/visualizeWrapper.R',
-        'cosineSimilarityPublic',
-        {
+      const csPublicPath = path.join(id, 'results/cosineSimilarityPublic/');
+      await fs.promises.mkdir(path.join(dataArgs.wd, csPublicPath), {
+        recursive: true,
+      });
+      const csPublic = await r('services/R/visualizeWrapper.R', 'wrapper', {
+        fn: 'cosineSimilarityPublic',
+        args: {
           matrixFile: matrixList.filter(
             (row) =>
               row.Profile_Type == selectProfile &&
@@ -409,286 +419,364 @@ async function processMessage(params) {
           study: 'PCAWG',
           cancerType: 'Lung-AdenoCA',
           profileName: selectProfile + selectMatrix,
-          savePath: csPublicPath,
-          ...dataArgs,
-          ...calcArgs,
-        }
-      );
-      let { output, stdout } = JSON.parse(csPublic);
-      output = getRelativePath(output, id);
-      newState = {
-        ...newState,
-        cosineSimilarity: {
-          ...newState.cosineSimilarity,
-          pubPlotPath: output.plotPath,
-          pubTxtPath: output.txtPath,
-          debugR: stdout,
         },
-      };
+        dataArgs: {
+          ...dataArgs,
+          savePath: csPublicPath,
+        },
+      });
+      let { output, stdout } = JSON.parse(csPublic);
+
+      if (output.plotPath) {
+        newState = {
+          ...newState,
+          cosineSimilarity: {
+            ...newState.cosineSimilarity,
+            pubPlotPath: output.plotPath,
+            pubTxtPath: output.txtPath,
+            debugR: stdout,
+          },
+        };
+      } else {
+        logger.debug(stdout);
+        logger.error(output);
+      }
     } catch (err) {
-      logger.debug(err);
+      logger.error(err);
     }
 
     // mutational pattern
     try {
-      const mpPath = path.join(directory, 'results/mutationalPattern/');
-      await fs.promises.mkdir(mpPath, { recursive: true });
+      const mpPath = path.join(id, 'results/mutationalPattern/');
+      await fs.promises.mkdir(path.join(dataArgs.wd, mpPath), {
+        recursive: true,
+      });
       const mutationalPattern = await r(
         'services/R/visualizeWrapper.R',
-        'mutationalPattern',
+        'wrapper',
         {
-          matrixFile: matrixList.filter(
-            (row) => row.Profile_Type == 'SBS' && row.Matrix_Size == '96'
-          )[0].Path,
-          proportion: parseFloat(0.8),
-          pattern: 'NCG>NTG',
-          savePath: mpPath,
-          ...dataArgs,
-          ...calcArgs,
+          fn: 'mutationalPattern',
+          args: {
+            matrixFile: matrixList.filter(
+              (row) => row.Profile_Type == 'SBS' && row.Matrix_Size == '96'
+            )[0].Path,
+            proportion: parseFloat(0.8),
+            pattern: 'NCG>NTG',
+          },
+          dataArgs: {
+            ...dataArgs,
+            savePath: mpPath,
+          },
         }
       );
       let { output, stdout } = JSON.parse(mutationalPattern);
-      output = getRelativePath(output, id);
-      newState = {
-        ...newState,
-        mutationalPattern: {
-          ...newState.mutationalPattern,
-          ...output,
-          debugR: stdout,
-        },
-      };
+
+      if (output.plotPath) {
+        newState = {
+          ...newState,
+          mutationalPattern: {
+            ...newState.mutationalPattern,
+            ...output,
+            debugR: stdout,
+          },
+        };
+      } else {
+        logger.dbeug(stdout);
+        logger.error(output);
+      }
     } catch (err) {
-      logger.debug(err);
+      logger.error(err);
     }
 
     // profile comparison within
     try {
-      const pcWithinPath = path.join(
-        directory,
-        'results/profileComparisonWithin/'
-      );
-      await fs.promises.mkdir(pcWithinPath, { recursive: true });
+      const pcWithinPath = path.join(id, 'results/profileComparisonWithin/');
+      await fs.promises.mkdir(path.join(dataArgs.wd, pcWithinPath), {
+        recursive: true,
+      });
       const profileComparisonWithin = await r(
         'services/R/visualizeWrapper.R',
-        'profileComparisonWithin',
+        'wrapper',
         {
-          profileType: selectProfile,
-          sampleName1: sampleNameOptions[0],
-          sampleName2: sampleNameOptions[1],
-          matrixFile: matrixList.filter(
-            (row) =>
-              row.Profile_Type == selectProfile &&
-              row.Matrix_Size ==
-                defaultMatrix(selectProfile, ['96', '78', '83'])
-          )[0].Path,
-          savePath: pcWithinPath,
-          ...dataArgs,
-          ...calcArgs,
+          fn: 'profileComparisonWithin',
+          args: {
+            profileType: selectProfile,
+            sampleName1: sampleNameOptions[0],
+            sampleName2: sampleNameOptions[1],
+            matrixFile: matrixList.filter(
+              (row) =>
+                row.Profile_Type == selectProfile &&
+                row.Matrix_Size ==
+                  defaultMatrix(selectProfile, ['96', '78', '83'])
+            )[0].Path,
+          },
+          dataArgs: {
+            ...dataArgs,
+            savePath: pcWithinPath,
+          },
         }
       );
       let { output, stdout } = JSON.parse(profileComparisonWithin);
-      output = getRelativePath(output, id);
-      newState = {
-        ...newState,
-        profileComparison: {
-          ...newState.profileComparison,
-          withinPlotPath: output.plotPath,
-          debugR: stdout,
-        },
-      };
+
+      if (output.plotPath) {
+        newState = {
+          ...newState,
+          profileComparison: {
+            ...newState.profileComparison,
+            withinPlotPath: output.plotPath,
+            debugR: stdout,
+          },
+        };
+      } else {
+        logger.debug(stdout);
+        logger.error(output);
+      }
     } catch (err) {
-      logger.debug(err);
+      logger.error(err);
     }
 
     // profile comparison ref
     try {
-      const pcRefPath = path.join(
-        directory,
-        'results/profileComparisonRefSig/'
-      );
-      await fs.promises.mkdir(pcRefPath, { recursive: true });
+      const pcRefPath = path.join(id, 'results/profileComparisonRefSig/');
+      await fs.promises.mkdir(path.join(dataArgs.wd, pcRefPath), {
+        recursive: true,
+      });
 
       const refCompare = await r(
         'services/R/visualizeWrapper.R',
         'getSignaturesR',
         {
-          profileType: selectProfile,
-          signatureSetName: refSignatureSetOptions[0],
-          ...dataArgs,
+          args: {
+            profileType: selectProfile,
+            signatureSetName: refSignatureSetOptions[0],
+          },
+          dataArgs,
         }
       );
 
       const profileComparisonRefSig = await r(
         'services/R/visualizeWrapper.R',
-        'profileComparisonRefSig',
+        'wrapper',
         {
+          fn: 'profileComparisonRefSig',
+          args: {
+            profileType: selectProfile,
+            sampleName: sampleNameOptions[0],
+            signatureSet: refSignatureSetOptions[0],
+            compare: refCompare[0],
+            matrixFile: matrixList.filter(
+              (row) =>
+                row.Profile_Type == selectProfile &&
+                row.Matrix_Size ==
+                  defaultMatrix(selectProfile, ['96', '78', '83'])
+            )[0].Path,
+          },
+          dataArgs: {
+            ...dataArgs,
+            savePath: pcRefPath,
+          },
+        }
+      );
+      let { output, stdout } = JSON.parse(profileComparisonRefSig);
+
+      if (output.plotPath) {
+        newState = {
+          ...newState,
+          profileComparison: {
+            ...newState.profileComparison,
+            refSignatures: refCompare,
+            refCompare: refCompare[0],
+            refPlotPath: output.plotPath,
+            debugR: stdout,
+          },
+        };
+      } else {
+        logger.debug(stdout);
+        logger.error(output);
+      }
+    } catch (err) {
+      logger.error(err);
+    }
+
+    // profile comparison public
+    try {
+      const pcPubPath = path.join(id, 'results/profileComparisonPublic/');
+      await fs.promises.mkdir(path.join(dataArgs.wd, pcPubPath), {
+        recursive: true,
+      });
+      const profileComparisonPublic = await r(
+        'services/R/visualizeWrapper.R',
+        'wrapper',
+        {
+          fn: 'profileComparisonPublic',
+          args: {
+            profileName: selectProfile + selectMatrix,
+            matrixFile: matrixList.filter(
+              (row) =>
+                row.Profile_Type == selectProfile &&
+                row.Matrix_Size == selectMatrix
+            )[0].Path,
+            userSample: sampleNameOptions[0],
+            study: 'PCAWG',
+            cancerType: 'Lung-AdenoCA',
+            publicSample: 'SP53073',
+          },
+          dataArgs: {
+            ...dataArgs,
+            savePath: pcPubPath,
+          },
+        }
+      );
+      let { output, stdout } = JSON.parse(profileComparisonPublic);
+
+      if (output.plotPath) {
+        newState = {
+          ...newState,
+          profileComparison: {
+            ...newState.profileComparison,
+            pubPlotPath: output.plotPath,
+            debugR: stdout,
+          },
+        };
+      } else {
+        logger.debug(stdout);
+        logger.error(output);
+      }
+    } catch (err) {
+      logger.error(err);
+    }
+
+    // pca
+    try {
+      const pcaPath = path.join(id, 'results/pca/');
+      await fs.promises.mkdir(path.join(dataArgs.wd, pcaPath), {
+        recursive: true,
+      });
+      const pca = await r('services/R/visualizeWrapper.R', 'wrapper', {
+        fn: 'pca',
+        args: {
           profileType: selectProfile,
-          sampleName: sampleNameOptions[0],
           signatureSet: refSignatureSetOptions[0],
-          compare: refCompare[0],
           matrixFile: matrixList.filter(
             (row) =>
               row.Profile_Type == selectProfile &&
               row.Matrix_Size ==
                 defaultMatrix(selectProfile, ['96', '78', '83'])
           )[0].Path,
-          savePath: pcRefPath,
-          ...dataArgs,
-          ...calcArgs,
-        }
-      );
-      let { output, stdout } = JSON.parse(profileComparisonRefSig);
-      output = getRelativePath(output, id);
-      newState = {
-        ...newState,
-        profileComparison: {
-          ...newState.profileComparison,
-          refSignatures: refCompare,
-          refCompare: refCompare[0],
-          refPlotPath: output.plotPath,
-          debugR: stdout,
         },
-      };
-    } catch (err) {
-      logger.debug(err);
-    }
-
-    // profile comparison public
-    try {
-      const pcPubPath = path.join(
-        directory,
-        'results/profileComparisonPublic/'
-      );
-      await fs.promises.mkdir(pcPubPath, { recursive: true });
-      const profileComparisonPublic = await r(
-        'services/R/visualizeWrapper.R',
-        'profileComparisonPublic',
-        {
-          profileName: selectProfile + selectMatrix,
-          matrixFile: matrixList.filter(
-            (row) =>
-              row.Profile_Type == selectProfile &&
-              row.Matrix_Size == selectMatrix
-          )[0].Path,
-          userSample: sampleNameOptions[0],
-          study: 'PCAWG',
-          cancerType: 'Lung-AdenoCA',
-          publicSample: 'SP53073',
-          savePath: pcPubPath,
+        dataArgs: {
           ...dataArgs,
-          ...calcArgs,
-        }
-      );
-      let { output, stdout } = JSON.parse(profileComparisonPublic);
-      output = getRelativePath(output, id);
-      newState = {
-        ...newState,
-        profileComparison: {
-          ...newState.profileComparison,
-          pubPlotPath: output.plotPath,
-          debugR: stdout,
+          savePath: pcaPath,
         },
-      };
-    } catch (err) {
-      logger.debug(err);
-    }
-
-    // pca
-    try {
-      const pcaPath = path.join(directory, 'results/pca/');
-      await fs.promises.mkdir(pcaPath, { recursive: true });
-      const pca = await r('services/R/visualizeWrapper.R', 'pca', {
-        profileType: selectProfile,
-        signatureSet: refSignatureSetOptions[0],
-        matrixFile: matrixList.filter(
-          (row) =>
-            row.Profile_Type == selectProfile &&
-            row.Matrix_Size == defaultMatrix(selectProfile, ['96', '78', '83'])
-        )[0].Path,
-        savePath: pcaPath,
-        ...dataArgs,
-        ...calcArgs,
       });
       let { output, stdout } = JSON.parse(pca);
-      output = getRelativePath(output, id);
-      newState = {
-        ...newState,
-        pca: {
-          ...newState.pca,
-          ...output,
-          debugR: stdout,
-        },
-      };
+
+      if (output.pca1) {
+        newState = {
+          ...newState,
+          pca: {
+            ...newState.pca,
+            ...output,
+            debugR: stdout,
+          },
+        };
+      } else {
+        logger.debug(stdout);
+        logger.error(output);
+      }
     } catch (err) {
-      logger.debug(err);
+      logger.error(err);
     }
 
     // pca public
     try {
-      const pcaPublicPath = path.join(directory, 'results/pcaWithPublic/');
-      await fs.promises.mkdir(pcaPublicPath, { recursive: true });
+      const pcaPublicPath = path.join(id, 'results/pcaWithPublic/');
+      await fs.promises.mkdir(path.join(dataArgs.wd, pcaPublicPath), {
+        recursive: true,
+      });
       const pcaWithPublic = await r(
         'services/R/visualizeWrapper.R',
-        'pcaWithPublic',
+        'wrapper',
         {
-          matrixFile: matrixList.filter(
-            (row) =>
-              row.Profile_Type == selectProfile &&
-              row.Matrix_Size == selectMatrix
-          )[0].Path,
-          study: 'PCAWG',
-          cancerType: 'Lung-AdenoCA',
-          profileName: selectProfile + selectMatrix,
-          savePath: pcaPublicPath,
-          ...dataArgs,
-          ...calcArgs,
+          fn: 'pcaWithPublic',
+          args: {
+            matrixFile: matrixList.filter(
+              (row) =>
+                row.Profile_Type == selectProfile &&
+                row.Matrix_Size == selectMatrix
+            )[0].Path,
+            study: 'PCAWG',
+            cancerType: 'Lung-AdenoCA',
+            profileName: selectProfile + selectMatrix,
+          },
+          dataArgs: {
+            ...dataArgs,
+            savePath: pcaPublicPath,
+          },
         }
       );
       let { output, stdout } = JSON.parse(pcaWithPublic);
-      output = getRelativePath(output, id);
-      newState = {
-        ...newState,
-        pca: {
-          ...newState.pca,
-          pubPca1: output.pca1,
-          pubPca2: output.pca2,
-          pubPca3: output.pca3,
-          pubPca2Data: output.pca2Data,
-          pubPca3Data: output.pca3Data,
-          debugR: stdout,
-        },
-      };
+
+      if (output.pca1) {
+        newState = {
+          ...newState,
+          pca: {
+            ...newState.pca,
+            pubPca1: output.pca1,
+            pubPca2: output.pca2,
+            pubPca3: output.pca3,
+            pubPca2Data: output.pca2Data,
+            pubPca3Data: output.pca3Data,
+            debugR: stdout,
+          },
+        };
+      } else {
+        logger.debug(stdout);
+        logger.error(output);
+      }
     } catch (err) {
-      logger.debug(err);
+      logger.error(err);
     }
 
     // kataegis
     try {
-      const kataegisPath = path.join(directory, 'results/kataegis/');
-      await fs.promises.mkdir(kataegisPath, { recursive: true });
-      const kataegis = await r('services/R/visualizeWrapper.R', 'kataegis', {
-        sample: sampleNameOptions[0],
-        highlight: false,
-        min: parseInt(5),
-        max: parseInt(100),
-        chromosome: 'None',
-        savePath: kataegisPath,
-        ...dataArgs,
-        ...calcArgs,
+      const kataegisPath = path.join(id, 'results/kataegis/');
+      await fs.promises.mkdir(path.join(dataArgs.wd, kataegisPath), {
+        recursive: true,
       });
-      let { output, stdout, data } = JSON.parse(kataegis);
-      output = getRelativePath(output, id);
-      newState = {
-        ...newState,
-        kataegis: {
-          ...newState.kataegis,
-          ...output,
-          kataegisData: JSON.parse(data),
-          debugR: stdout,
+      const kataegis = await r('services/R/visualizeWrapper.R', 'wrapper', {
+        fn: 'kataegis',
+        args: {
+          sample: sampleNameOptions[0],
+          highlight: false,
+          min: parseInt(5),
+          max: parseInt(100),
+          chromosome: 'None',
         },
-      };
+        dataArgs: {
+          ...dataArgs,
+          savePath: kataegisPath,
+        },
+      });
+      let { output, stdout } = JSON.parse(kataegis);
+
+      if (output.plotPath) {
+        newState = {
+          ...newState,
+          kataegis: {
+            ...newState.kataegis,
+            plotPath: output.plotPath,
+            txtPath: output.txtPath,
+            kataegisData: JSON.parse(output.data),
+            debugR: stdout,
+          },
+        };
+      } else {
+        logger.debug(stdout);
+        logger.error(output);
+      }
     } catch (err) {
-      logger.debug(err);
+      logger.error(err);
     }
 
     const end = new Date().getTime();
