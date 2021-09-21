@@ -81,12 +81,6 @@ apiRouter.use(
 
 apiRouter.use(express.json({ limit: '50mb' }));
 
-apiRouter.use((error, req, res, next) => {
-  const { name, message, stack } = error;
-  logger.debug(error);
-  response.status(500).json(`${name}: ${message}`);
-});
-
 apiRouter.get('/ping', (req, res) => res.send(true));
 
 apiRouter.post('/profilerExtraction', visualizationProfilerExtraction);
@@ -124,3 +118,10 @@ apiRouter.post('/getFileS3', getFileS3);
 apiRouter.post('/downloadSession', downloadSession);
 
 apiRouter.post('/associationWrapper', associationWrapper);
+
+apiRouter.use((err, req, res, next) => {
+  logger.debug(err);
+  const { name, message, stack } = err;
+  logger.error(err);
+  res.status(500).json(`${name}: ${message}`);
+});

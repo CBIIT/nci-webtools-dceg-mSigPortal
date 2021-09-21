@@ -215,8 +215,7 @@ async function visualizationWrapper(req, res, next) {
       ...rest,
     });
   } catch (err) {
-    logger.info(`/visualizationWrapper: An error occured with fn:${fn}`);
-    res.status(500).json(err.message);
+    logger.error(`/visualizationWrapper: An error occured with fn: ${fn}`);
     next(err);
   }
 }
@@ -372,8 +371,7 @@ async function explorationCalc(req, res, next) {
       projectID: projectID,
     });
   } catch (err) {
-    logger.info(`/explorationCalc: An error occured with fn:${fn}`);
-    res.json({ debugR: err.stderr });
+    logger.error(`/explorationCalc: An error occured with fn: ${fn}`);
     next(err);
   }
 }
