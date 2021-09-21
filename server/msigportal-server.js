@@ -70,8 +70,15 @@ function childProcess() {
 // app.use(express.static(config.server.static));
 app.use(express.static(path.resolve('www')));
 
-apiRouter.use('/results', express.static(config.results.folder));
-// apiRouter.use('/public', express.static(config.data.localData));
+apiRouter.use(
+  '/results',
+  express.static(config.results.folder, {
+    setHeaders: (res, path, stat) => {
+      res.set('Cache-Control', 'max-age=0, must-revalidate');
+    },
+  })
+);
+
 apiRouter.use(express.json({ limit: '50mb' }));
 
 apiRouter.use((error, req, res, next) => {

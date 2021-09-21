@@ -125,7 +125,9 @@ export default function Plot({
             <TransformComponent>
               <img
                 className="w-100"
-                src={plotPath + `${cacheBreaker ? `#${Date.now()}` : ''}`}
+                src={
+                  plotPath + `${cacheBreaker ? `#${new Date().getTime()}` : ''}`
+                }
                 style={{ maxHeight: height || '500px' }}
                 alt={alt || 'Plot Unavailable'}
               />
