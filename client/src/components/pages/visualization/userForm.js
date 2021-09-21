@@ -699,7 +699,7 @@ export default function UserForm() {
         </Group>
       </div>
       <Row>
-        <Col lg="6">
+        <Col>
           <Button
             disabled={loading.active}
             className="w-100"
@@ -709,7 +709,7 @@ export default function UserForm() {
             Reset
           </Button>
         </Col>
-        <Col lg="6">
+        <Col>
           <Button
             disabled={submitted || loading.active}
             className="w-100"

@@ -255,7 +255,7 @@ export default function PublicForm() {
       />
 
       <Row>
-        <Col lg="6">
+        <Col>
           <Button
             disabled={loading.active || loadingPublic}
             className="w-100"
@@ -265,7 +265,7 @@ export default function PublicForm() {
             Reset
           </Button>
         </Col>
-        <Col lg="6">
+        <Col>
           <Button
             disabled={loading.active || loadingPublic || submitted}
             className="w-100"

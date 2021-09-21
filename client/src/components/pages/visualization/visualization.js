@@ -557,7 +557,7 @@ export default function Visualization({ match }) {
         collapsed={!openSidebar}
         onCollapsed={() => mergeState({ openSidebar: !openSidebar })}
       >
-        <SidebarPanel>
+        <SidebarPanel className="col-lg-3 col-md-5">
           <div className="p-3 bg-white border rounded">
             <Row>
               <Col lg="auto">
@@ -607,7 +607,7 @@ export default function Visualization({ match }) {
           </div>
           <hr className="d-lg-none" style={{ opacity: 0 }}></hr>
         </SidebarPanel>
-        <MainPanel>
+        <MainPanel className="col-lg-9 col-md-7">
           {queueExpired && (
             <div className="bg-warning mb-3 p-3 border rounded">
               <span>Queue results have expired</span>
