@@ -19,6 +19,7 @@ const dataArgs = {
   s3Data: config.data.s3,
   bucket: config.data.bucket,
   localData: path.resolve(config.data.localData),
+  wd: path.resolve(config.results.folder),
 };
 
 function parseCSV(filepath) {
@@ -103,7 +104,6 @@ function getRelativePath(paths, id = '') {
 }
 
 async function profilerExtraction(params) {
-  logger.info('/profilerExtraction: Spawning Python Process');
   // update path
   params.outputDir[1] = path.join(
     config.results.folder,
@@ -200,7 +200,6 @@ async function visualizationWrapper(req, res, next) {
       args,
       dataArgs: {
         ...dataArgs,
-        wd,
         savePath,
       },
     });

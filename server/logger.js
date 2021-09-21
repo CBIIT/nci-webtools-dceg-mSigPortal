@@ -2,32 +2,27 @@ const path = require('path');
 const { createLogger, format, transports } = require('winston');
 const { folder, level } = require('./config.json').logs;
 require('winston-daily-rotate-file');
-const { Console, DailyRotateFile } = transports;
 
 module.exports = new createLogger({
   level: level || 'info',
   format: format.combine(
-    format.errors({ stack: true }), // <-- use errors format
     format.colorize(),
-    format.timestamp(),
-    format.prettyPrint(),
-    format.json(),
-    format.splat(),
-    format.label({ label: '[mSigPortal]' }),
     format.timestamp({
       format: 'YYYY-MM-DD HH:mm:ss',
     }),
-    format.printf(({ level, message, timestamp, stack }) => {
-      if (stack) {
-        // print log trace
-        return `[${timestamp}] [${level}] ${message} - ${stack}`;
-      }
-      return `[${timestamp}] [${level}] ${message}`;
-    })
+    format.printf(
+      (info) =>
+        `[${info.timestamp}] [${info.level}] ${
+          info.stack ||
+          (typeof info.message === 'string'
+            ? info.message
+            : JSON.stringify(info.message))
+        }`
+    )
   ),
   transports: [
-    new Console(),
-    new DailyRotateFile({
+    new transports.Console(),
+    new transports.DailyRotateFile({
       filename: path.resolve(folder, 'application-%DATE%.log'),
       datePattern: 'YYYY-MM-DD-HH',
       zippedArchive: false,
