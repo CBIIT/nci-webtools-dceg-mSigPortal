@@ -594,7 +594,9 @@ export default function Etiology() {
     function getInfo() {
       if (data[category] && data[category].length && selectedSignature) {
         let info = data[category].filter(
-          (signature) => signature['Signature Name'] == selectedSignature
+          (signature) =>
+            signature['Signature Name'] == selectedSignature ||
+            signature['Signature'] == selectedSignature
         );
         if (info.length) {
           info = info[0];
@@ -909,7 +911,6 @@ export default function Etiology() {
             v['Ref Signature'] == refSig
         );
         if (info.length) {
-          console.log(info);
           info = info[0];
           return (
             <div>
