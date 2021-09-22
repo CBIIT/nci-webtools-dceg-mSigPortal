@@ -177,7 +177,7 @@ export default function Etiology() {
 
       getThumbnails(signatures);
     }
-  }, [data]);
+  }, [data, category]);
 
   // get tissue thumbnails
   useEffect(() => {
@@ -197,7 +197,7 @@ export default function Etiology() {
 
       getTissueThumbnails(uniqueTissues);
     }
-  }, [data]);
+  }, [data, category]);
 
   // get refsig thumbnails
   useEffect(() => {
