@@ -190,9 +190,9 @@ async function visualizationWrapper(req, res, next) {
   logger.debug(`/visualizationWrapper: %o`, req.body);
 
   // create directory for results if needed
-  const wd = projectID ? path.resolve(config.results.folder) : null;
   const savePath = projectID ? path.join(projectID, 'results', fn, '/') : null;
-  if (projectID) fs.mkdirSync(path.join(wd, savePath), { recursive: true });
+  if (projectID)
+    fs.mkdirSync(path.join(dataArgs.wd, savePath), { recursive: true });
 
   try {
     const wrapper = await r('services/R/visualizeWrapper.R', 'wrapper', {
@@ -337,59 +337,38 @@ async function visualizationDownloadPublic(req, res, next) {
   }
 }
 
-async function explorationCalc(req, res, next) {
-  const { fn, args, projectID: id } = req.body;
-  logger.debug('/explorationCalc: %o', { ...req.body });
+async function explorationWrapper(req, res, next) {
+  const { fn, args, projectID: id, type = 'calc' } = req.body;
+  logger.debug('/explorationWrapper: %o', { ...req.body });
 
-  const projectID = id ? id : uuidv4();
-  const rootDir = path.join(config.results.folder, projectID);
-  // create save directory if needed
-  const savePath = path.join(rootDir, 'results', fn, '/');
-
-  fs.mkdirSync(savePath, { recursive: true });
+  const projectID = id ? id : type == 'calc' ? uuidv4() : false;
+  // create directory for results if needed
+  const savePath = projectID ? path.join(projectID, 'results', fn, '/') : null;
+  if (projectID)
+    fs.mkdirSync(path.join(dataArgs.wd, savePath), { recursive: true });
 
   try {
-    const wrapper = await r('services/R/explorationWrapper.R', fn, {
-      ...args,
-      projectID: projectID,
-      pythonOutput: path.join(
-        config.results.folder,
+    const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
+      fn,
+      args,
+      dataArgs: {
+        ...dataArgs,
+        savePath,
         projectID,
-        'results/output'
-      ),
-      rootDir: rootDir,
-      savePath: savePath,
-      ...dataArgs,
+      },
     });
 
-    const { stdout, output, ...rest } = JSON.parse(wrapper);
+    const { stdout, ...rest } = JSON.parse(wrapper);
+
+    logger.debug(stdout);
 
     res.json({
+      projectID,
+      stdout,
       ...rest,
-      debugR: stdout,
-      output: { ...output, ...getRelativePath(output, projectID) },
-      projectID: projectID,
     });
   } catch (err) {
     logger.error(`/explorationCalc: An error occured with fn: ${fn}`);
-    next(err);
-  }
-}
-
-async function explorationData(req, res, next) {
-  const { fn, args } = req.body;
-  logger.debug('/explorationData: %o', req.body);
-
-  try {
-    const data = await r('services/R/explorationWrapper.R', fn, {
-      args: args,
-      ...dataArgs,
-    });
-
-    res.json(JSON.parse(data));
-  } catch (err) {
-    logger.info(`/explorationData: An error occured with fn:${fn}`);
-    res.json({ debugR: err.stderr });
     next(err);
   }
 }
@@ -745,8 +724,7 @@ module.exports = {
   upload,
   visualizationDownload,
   visualizationDownloadPublic,
-  explorationCalc,
-  explorationData,
+  explorationWrapper,
   submitQueue,
   getQueueResults,
   getVisExample,

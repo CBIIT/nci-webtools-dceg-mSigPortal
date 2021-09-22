@@ -57,23 +57,21 @@ export default function Comparison({ submitR }) {
           debugR: err,
         });
       } else {
-        const { debugR, output, projectID: id } = await response.json();
-        if (Object.keys(output).length) {
+        const { stdout, output, projectID: id } = await response.json();
+        if (output.plotPath) {
           if (!projectID) mergeCatalog({ projectID: id });
 
           mergeSigMutationalSigComparison({
-            debugR: debugR,
             loading: false,
             plotPath: output.plotPath,
             txtPath: output.txtPath,
           });
         } else {
           mergeSigMutationalSigComparison({
-            debugR: debugR,
             loading: false,
             plotPath: '',
             txtPath: '',
-            err: true,
+            err: output.error || output.uncaughtError || true,
           });
         }
       }
@@ -251,7 +249,7 @@ export default function Comparison({ submitR }) {
             <Plot
               className="p-3"
               downloadName={plotPath.split('/').slice(-1)[0]}
-              plotPath={`api/results/${projectID + plotPath}`}
+              plotPath={`api/results/${plotPath}`}
               txtPath={projectID + txtPath}
               height="700px"
             />

@@ -228,7 +228,7 @@ export default function Exposure({ match }) {
 
   async function submitR(fn, args, id = projectID) {
     try {
-      const response = await fetch(`api/explorationCalc`, {
+      const response = await fetch(`api/explorationWrapper`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -252,7 +252,7 @@ export default function Exposure({ match }) {
   }
 
   async function handleCalculate(fn = 'all', id = projectID, params = {}) {
-    mergeState({ loading: true });
+    mergeState({ loading: true, submitted: true });
 
     let rFn = 'exposurePublic';
     let args = {
@@ -302,68 +302,56 @@ export default function Exposure({ match }) {
       });
     }
     try {
-      const { debugR, output, errors, projectID: pID } = await submitR(
-        rFn,
-        args,
-        id
-      );
+      const { stdout, output, projectID: pID } = await submitR(rFn, args, id);
 
-      if (output) {
+      if (Object.keys(output).length) {
         mergeState({ projectID: pID });
 
         mergeTMB({
           plotPath: output.tmbPath,
-          err: errors.tmbError,
-          debugR: debugR,
+          err: output.tmbError,
         });
 
         mergeTmbSignatures({
           plotPath: output.signaturePath,
-          err: errors.signaturesError,
-          debugR: debugR,
+          err: output.signaturesError,
         });
 
         mergeMsDecomposition({
           plotPath: output.decompositionPath,
           txtPath: output.decompositionData,
-          err: errors.decompositionError,
-          debugR: debugR,
+          err: output.decompositionError,
         });
 
         mergeMsBurden({
           plotPath: output.burdenPath,
-          err: errors.burdenError,
-          debugR: debugR,
+          err: output.burdenError,
         });
 
         mergeMsAssociation({
           plotPath: output.associationPath,
-          err: errors.associationError,
-          debugR: debugR,
+          err: output.associationError,
         });
 
         mergeMsLandscape({
           plotPath: output.landscapePath,
-          err: errors.landscapeError,
-          debugR: debugR,
+          err: output.landscapeError,
         });
 
         mergeMsPrevalence({
           plotPath: output.prevalencePath,
-          err: errors.prevalenceError,
-          debugR: debugR,
+          err: output.prevalenceError,
         });
 
         mergeMsIndividual({
           plotPath: output.individualPath,
-          err: errors.individualError,
-          debugR: debugR,
+          err: output.individualError,
         });
         mergeState({ submitted: true });
         if (displayTab == 'instructions')
           mergeState({ displayTab: 'tmb', openSidebar: false });
       } else {
-        mergeError(debugR);
+        mergeError('');
       }
     } catch (err) {
       mergeError(err.message);
@@ -411,7 +399,7 @@ export default function Exposure({ match }) {
 
   async function exposureDownload() {
     try {
-      const { output, projectID, debugR } = await submitR('exposureDownload', {
+      const { output, projectID, stdout } = await submitR('exposureDownload', {
         study: study,
         strategy: strategy,
         rsSet: rsSet,

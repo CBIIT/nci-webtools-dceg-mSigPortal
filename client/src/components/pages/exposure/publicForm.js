@@ -141,7 +141,7 @@ export default function PublicForm({
   async function getSampleNames() {
     try {
       const { stdout, output } = await (
-        await fetch(`api/explorationData`, {
+        await fetch(`api/explorationWrapper`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -159,11 +159,11 @@ export default function PublicForm({
         })
       ).json();
 
-      if (output.data.length)
+      if (output.length)
         dispatch(
           actions.mergeExposure({
-            exposureState: { publicSampleOptions: output.data },
-            msIndividual: { sample: output.data[0] },
+            exposureState: { publicSampleOptions: output },
+            msIndividual: { sample: output[0] },
           })
         );
       else console.log('No Sample Names Found');
@@ -177,7 +177,7 @@ export default function PublicForm({
     if (useCancerType) {
       try {
         const { stdout, output } = await (
-          await fetch(`api/explorationData`, {
+          await fetch(`api/explorationWrapper`, {
             method: 'POST',
             headers: {
               Accept: 'application/json',
@@ -195,14 +195,14 @@ export default function PublicForm({
           })
         ).json();
 
-        if (output.data.length)
+        if (output.length)
           dispatch(
             actions.mergeExposure({
-              exposureState: { signatureNameOptions: output.data },
-              msBurden: { signatureName: output.data[0] },
+              exposureState: { signatureNameOptions: output },
+              msBurden: { signatureName: output[0] },
               msAssociation: {
-                signatureName1: output.data[0],
-                signatureName2: output.data[1] || output.data[0],
+                signatureName1: output[0],
+                signatureName2: output[1] || output[0],
               },
             })
           );

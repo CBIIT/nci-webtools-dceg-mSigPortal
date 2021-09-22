@@ -21,8 +21,7 @@ const {
   upload,
   visualizationDownload,
   visualizationDownloadPublic,
-  explorationCalc,
-  explorationData,
+  explorationWrapper,
   submitQueue,
   getQueueResults,
   getVisExample,
@@ -97,9 +96,7 @@ apiRouter.get('/visualization/download', visualizationDownload);
 
 apiRouter.post('/visualization/downloadPublic', visualizationDownloadPublic);
 
-apiRouter.post('/explorationCalc', explorationCalc);
-
-apiRouter.post('/explorationData', explorationData);
+apiRouter.post('/explorationWrapper', explorationWrapper);
 
 apiRouter.post('/queue', submitQueue);
 
