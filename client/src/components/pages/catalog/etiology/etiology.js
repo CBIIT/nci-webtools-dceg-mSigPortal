@@ -35,6 +35,7 @@ export default function Etiology() {
     strandbiasURL,
     tissueURL,
     refSigURL,
+    loading,
   } = useSelector((state) => state.catalog.etiology);
 
   const categories = [
@@ -60,6 +61,7 @@ export default function Etiology() {
 
   useEffect(() => {
     const getData = async () => {
+      mergeEtiology({ loading: true });
       try {
         const file = categories.filter(({ name }) => name == category)[0].file;
         const data = await getJSON(`Etiology/${file}`);
@@ -78,9 +80,10 @@ export default function Etiology() {
         mergeError(e.message);
         console.error(e);
       }
+      mergeEtiology({ loading: false });
     };
     if (!data[category]) {
-      getData();
+      if (!loading) getData();
     } else {
       const etiologyOptions = [
         ...new Set(data[category].map(({ Etiology }) => Etiology)),
@@ -94,7 +97,7 @@ export default function Etiology() {
         study: studyOptions[0],
       });
     }
-  }, [category]);
+  }, [category, loading]);
 
   // check if plot exists
   useEffect(() => {
@@ -160,7 +163,8 @@ export default function Etiology() {
       data[category] &&
       data[category].length &&
       !thumbnails[category] &&
-      category != 'Cancer Specific Signature'
+      category != 'Cancer Specific Signature' &&
+      !loading
     ) {
       const signatures = data[category]
         .slice()
@@ -177,7 +181,7 @@ export default function Etiology() {
 
       getThumbnails(signatures);
     }
-  }, [data, category]);
+  }, [data, category, loading]);
 
   // get tissue thumbnails
   useEffect(() => {
@@ -365,7 +369,7 @@ export default function Etiology() {
   }
 
   async function getThumbnails(signatures) {
-    mergeEtiology({ thumbnails: { [category]: [{}] } });
+    mergeEtiology({ loading: true });
     try {
       const chunks = signatures.reduce((all, one, i) => {
         const ch = Math.floor(i / 5);
@@ -432,6 +436,7 @@ export default function Etiology() {
       mergeError(err.message);
       console.error(err);
     }
+    mergeEtiology({ loading: false });
   }
 
   async function getTissueThumbnails(tissues) {

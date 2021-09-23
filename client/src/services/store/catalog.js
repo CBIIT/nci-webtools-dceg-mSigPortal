@@ -28,6 +28,7 @@ export const getInitialState = () => ({
     strandbiasURL: '',
     tissueURL: '',
     refSigURL: '',
+    loading: false,
   },
   sigRefSig: {
     plotPath: 'assets/images/mSigPortalReferenceSignatures.svg',
