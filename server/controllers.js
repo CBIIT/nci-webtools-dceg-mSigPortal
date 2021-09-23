@@ -665,13 +665,13 @@ async function getImageS3(req, res, next) {
   const key = req.body.path;
   const s3 = new AWS.S3();
 
-  res.setHeader('Content-Type', 'image/svg+xml');
   s3.getObject({
     Bucket: config.data.bucket,
     Key: key,
   })
     .createReadStream()
     .on('error', next)
+    .on('pipe', () => res.setHeader('Content-Type', 'image/svg+xml'))
     .pipe(res);
 }
 
