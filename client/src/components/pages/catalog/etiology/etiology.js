@@ -365,18 +365,17 @@ export default function Etiology() {
   }
 
   async function getThumbnails(signatures) {
+    mergeEtiology({ thumbnails: { [category]: [{}] } });
     try {
-      const newThumbnails = await Promise.all(
-        signatures.map(
-          ({
-            // note that each category has a different format for JSON objects
-            Etiology,
-            Study,
-            Signature,
-            'Signature Name': signatureName,
-            Source_URL,
-            URL: alias_URL,
-          }) =>
+      const chunks = signatures.reduce((all, one, i) => {
+        const ch = Math.floor(i / 5);
+        all[ch] = [].concat(all[ch] || [], one);
+        return all;
+      }, []);
+
+      const allThumbnails = chunks.map((chunk) =>
+        Promise.all(
+          chunk.map((signature) =>
             fetch(`api/getImageS3`, {
               method: 'POST',
               headers: {
@@ -385,22 +384,48 @@ export default function Etiology() {
               },
               body: JSON.stringify({
                 path: `msigportal/Database/Etiology/Profile_logo/${fixFile(
-                  signatureName || Signature
+                  signature['Signature Name'] || signature.Signature
                 )}.svg`,
               }),
             }).then(async (res) => {
               const blob = await res.blob();
               return {
-                Etiology: Etiology,
-                Study: Study,
-                signatureName: signatureName || Signature,
-                // use the Source_URL as a unique identifier
-                Source_URL: Source_URL || alias_URL,
+                Etiology: signature.Etiology,
+                Study: signature.Study,
+                signatureName:
+                  signature['Signature Name'] || signature.Signature,
                 thumbnailURL: URL.createObjectURL(blob),
               };
             })
+          )
         )
       );
+      const newThumbnails = (await Promise.all(allThumbnails)).flat();
+
+      // const newThumbnails = await Promise.all(
+      //   signatures.map((signature) =>
+      //     fetch(`api/getImageS3`, {
+      //       method: 'POST',
+      //       headers: {
+      //         Accept: 'image/svg',
+      //         'Content-Type': 'application/json',
+      //       },
+      //       body: JSON.stringify({
+      //         path: `msigportal/Database/Etiology/Profile_logo/${fixFile(
+      //           signature['Signature Name'] || signature.Signature
+      //         )}.svg`,
+      //       }),
+      //     }).then(async (res) => {
+      //       const blob = await res.blob();
+      //       return {
+      //         Etiology: signature.Etiology,
+      //         Study: signature.Study,
+      //         signatureName: signature['Signature Name'] || signature.Signature,
+      //         thumbnailURL: URL.createObjectURL(blob),
+      //       };
+      //     })
+      //   )
+      // );
 
       mergeEtiology({ thumbnails: { [category]: newThumbnails } });
     } catch (err) {
