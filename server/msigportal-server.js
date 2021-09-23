@@ -27,6 +27,7 @@ const {
   getVisExample,
   getExposureExample,
   getPublications,
+  getImageS3Batch,
   getImageS3,
   getFileS3,
   downloadSession,
@@ -107,6 +108,8 @@ apiRouter.get('/getVisExample/:example', getVisExample);
 apiRouter.get('/getExposureExample/:example', getExposureExample);
 
 apiRouter.get('/getPublications', getPublications);
+
+apiRouter.post('/getImageS3Batch', getImageS3Batch);
 
 apiRouter.post('/getImageS3', getImageS3);
 

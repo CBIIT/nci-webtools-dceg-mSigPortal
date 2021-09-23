@@ -660,6 +660,30 @@ async function getPublications(req, res, next) {
   }
 }
 
+async function getImageS3Batch(req, res, next) {
+  // serve static images from s3
+  const { keys } = req.body;
+  const s3 = new AWS.S3();
+
+  const batch = await Promise.all(
+    (keys || []).map((Key) =>
+      s3
+        .getObject({
+          Bucket: config.data.bucket,
+          Key,
+        })
+        .promise()
+        .then(
+          ({ Body }) =>
+            'data:image/svg+xml;base64,' + Buffer.from(Body).toString('base64')
+        )
+        .catch((err) => '')
+    )
+  );
+
+  res.json(batch);
+}
+
 async function getImageS3(req, res, next) {
   // serve static images from s3
   const key = req.body.path;
@@ -730,6 +754,7 @@ module.exports = {
   getVisExample,
   getExposureExample,
   getPublications,
+  getImageS3Batch,
   getImageS3,
   getFileS3,
   getRelativePath,
