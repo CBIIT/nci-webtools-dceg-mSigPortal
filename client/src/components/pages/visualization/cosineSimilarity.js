@@ -323,7 +323,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 className="p-3"
                 downloadName={withinPlotPath.split('/').slice(-1)[0]}
                 plotPath={'api/results/' + withinPlotPath}
-                txtPath={withinTxtPath}
+                txtPath={`api/results/${withinTxtPath}`}
               />
             )}
           </div>
@@ -419,7 +419,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 className="p-3"
                 downloadName={refPlotPath.split('/').slice(-1)[0]}
                 plotPath={`api/results/${refPlotPath}`}
-                txtPath={refTxtPath}
+                txtPath={`api/results/${refTxtPath}`}
               />
             )}
           </div>
@@ -521,7 +521,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 className="p-3"
                 downloadName={pubPlotPath.split('/').slice(-1)[0]}
                 plotPath={`api/results/${pubPlotPath}`}
-                txtPath={pubTxtPath}
+                txtPath={`api/results/${pubTxtPath}`}
               />
             )}
           </div>

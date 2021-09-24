@@ -120,7 +120,7 @@ export default function MutationalPattern({ submitR }) {
               className="p-3"
               downloadName={plotPath.split('/').slice(-1)[0]}
               plotPath={'api/results/' + plotPath}
-              txtPath={projectID + txtPath}
+              txtPath={`api/results/${txtPath}`}
               title="Proportion of Mutational Pattern Context Compared to Other Contexts with the same SBS Mutation"
             />
             <p className="p-3">

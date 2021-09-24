@@ -250,7 +250,7 @@ export default function Comparison({ submitR }) {
               className="p-3"
               downloadName={plotPath.split('/').slice(-1)[0]}
               plotPath={`api/results/${plotPath}`}
-              txtPath={projectID + txtPath}
+              txtPath={`api/results/${txtPath}`}
               height="700px"
             />
             <div className="p-3">

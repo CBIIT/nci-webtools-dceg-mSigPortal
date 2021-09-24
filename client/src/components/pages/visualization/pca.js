@@ -329,7 +329,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                 className="p-3"
                 downloadName={pca2.split('/').slice(-1)[0]}
                 plotPath={'api/results/' + pca2}
-                txtPath={projectID + pca2Data}
+                txtPath={`api/results/${pca2Data}`}
               />
               <p className="p-3">
                 The individual PCA plot based on the top two principal
@@ -348,7 +348,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                 className="p-3"
                 downloadName={pca3.split('/').slice(-1)[0]}
                 plotPath={'api/results/' + pca3}
-                txtPath={projectID + pca3Data}
+                txtPath={`api/results/${pca3Data}`}
               />
               <p className="p-3">
                 The variable PCA plot based on the top two principal components
@@ -367,7 +367,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                 className="p-3"
                 downloadName={heatmap.split('/').slice(-1)[0]}
                 plotPath={'api/results/' + heatmap}
-                txtPath={projectID + heatmapData}
+                txtPath={`api/results/${heatmapData}`}
               />
               <p className="p-3">
                 The heatmap shows cosine similarity between each principal
@@ -485,7 +485,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                 className="p-3"
                 downloadName={pubPca2.split('/').slice(-1)[0]}
                 plotPath={'api/results/' + pubPca2}
-                txtPath={projectID + pubPca2Data}
+                txtPath={`api/results/${pubPca2Data}`}
               />
               <p className="p-3">
                 The individual PCA plot based on the top two principal
@@ -504,7 +504,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                 className="p-3"
                 downloadName={pubPca3.split('/').slice(-1)[0]}
                 plotPath={'api/results/' + pubPca3}
-                txtPath={projectID + pubPca3Data}
+                txtPath={`api/results/${pubPca3Data}`}
               />
               <p className="p-3">
                 The variable PCA plot based on the top two principal components

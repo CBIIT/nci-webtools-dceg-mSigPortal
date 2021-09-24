@@ -362,7 +362,9 @@ export default function Univariable() {
                       controlId="variable1-threshold"
                       className="d-flex mb-0"
                     >
-                      <Label className="mr-2 font-weight-normal">Threshold</Label>
+                      <Label className="mr-2 font-weight-normal">
+                        Threshold
+                      </Label>
                       <Control
                         disabled={
                           loadingData || loadingParams || loadingCalculate
@@ -754,7 +756,7 @@ export default function Univariable() {
                   className="p-3 border rounded"
                   downloadName={plotPath.split('/').slice(-1)[0]}
                   plotPath={`api/results/${plotPath}`}
-                  txtPath={projectID + dataPath}
+                  txtPath={`api/results/${dataPath}`}
                   height="800px"
                 />
               )}

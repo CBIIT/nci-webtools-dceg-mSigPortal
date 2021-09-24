@@ -83,7 +83,7 @@ export default function Plot({
                     <Button
                       className="p-0 border-0 ml-3"
                       variant="link"
-                      onClick={() => download(`api/results/${txtPath}`)}
+                      onClick={() => download(txtPath)}
                     >
                       Download Data
                     </Button>

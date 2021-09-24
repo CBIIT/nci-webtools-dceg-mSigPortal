@@ -214,7 +214,7 @@ export default function Kataegis({ submitR }) {
                 className="p-3"
                 downloadName={plotPath.split('/').slice(-1)[0]}
                 plotPath={'api/results/' + plotPath}
-                txtPath={txtPath ? projectID + txtPath : null}
+                txtPath={txtPath ? `api/results/${txtPath}` : null}
               />
               <p className="p-3">
                 The rainfall plot illustrates the kataegis identified given the
