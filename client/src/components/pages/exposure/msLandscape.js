@@ -40,7 +40,7 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
       <Form className="p-3">
         <LoadingOverlay active={loading} />
         <Row className="">
-          <Col lg="3">
+          <Col lg="auto">
             <Group controlId="landscape">
               <Label>Upload Variable Data</Label>
               <div className="d-flex">
@@ -70,12 +70,10 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
               </div>
             </Group>
           </Col>
-
-          <Col />
-          <Col lg="2" className="d-flex">
+          <Col lg="auto" className="d-flex">
             <Button
               disabled={source == 'user' && !projectID}
-              className="ml-auto mb-auto"
+              className="mt-auto mb-3"
               variant="primary"
               onClick={calculateLandscape}
             >

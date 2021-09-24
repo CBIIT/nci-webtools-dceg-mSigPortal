@@ -42,7 +42,7 @@ export default function MsPrevalence({ calculatePrevalence }) {
       <Form noValidate className="p-3">
         <LoadingOverlay active={loading} />
         <Row>
-          <Col lg="5">
+          <Col lg="auto">
             <Group
               controlId="prevalenceMutations"
               title="Minimum Number of Mutations Within Each Signature"
@@ -65,10 +65,9 @@ export default function MsPrevalence({ calculatePrevalence }) {
               </Form.Control.Feedback>
             </Group>
           </Col>
-          <Col />
-          <Col lg="2" className="d-flex">
+          <Col lg="auto" className="d-flex">
             <Button
-              className="ml-auto mb-auto"
+              className="mt-auto mb-3"
               variant="primary"
               onClick={() => {
                 if (!mutation || isNaN(mutation)) setMin(true);

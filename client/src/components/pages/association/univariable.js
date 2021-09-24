@@ -466,9 +466,7 @@ export default function Univariable() {
               </Row>
             </fieldset>
           </Col>
-        </Row>
-        <Row className="justify-content-end">
-          <Col md="auto">
+          <Col md="auto" className="d-flex">
             <Button
               disabled={
                 loadingData ||
@@ -476,7 +474,7 @@ export default function Univariable() {
                 loadingCalculate ||
                 !variableSource
               }
-              className="w-100"
+              className="w-100 align-self-center"
               variant="primary"
               onClick={() => handleLoadParameters()}
             >
@@ -642,12 +640,10 @@ export default function Univariable() {
                   />
                 </fieldset>
               </Col>
-            </Row>
-            <Row className="justify-content-end">
-              <Col md="auto">
+              <Col md="auto" className="d-flex">
                 <Button
                   disabled={loadingData || loadingParams || loadingCalculate}
-                  className="w-100"
+                  className="w-100 align-self-center"
                   variant="primary"
                   onClick={() => handleCalculate()}
                 >

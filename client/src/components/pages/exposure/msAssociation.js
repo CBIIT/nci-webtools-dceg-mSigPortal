@@ -52,7 +52,7 @@ export default function MsAssociation({ calculateAssociation }) {
       <Form className="p-3">
         <LoadingOverlay active={loading} />
         <Row>
-          <Col lg="3">
+          <Col lg="auto">
             <Group controlId="toggleBothSamples">
               <Check
                 type="checkbox"
@@ -63,7 +63,7 @@ export default function MsAssociation({ calculateAssociation }) {
               />
             </Group>
           </Col>
-          <Col lg="2">
+          <Col lg="auto">
             <Select
               disabled={source == 'user' && !userNameOptions.length}
               id="associationSignatureName1"
@@ -75,7 +75,7 @@ export default function MsAssociation({ calculateAssociation }) {
               onChange={(name) => mergeMsAssociation({ signatureName1: name })}
             />
           </Col>
-          <Col lg="2">
+          <Col lg="auto">
             <Select
               disabled={source == 'user' && !userNameOptions.length}
               id="associationSignatureName2"
@@ -87,10 +87,9 @@ export default function MsAssociation({ calculateAssociation }) {
               onChange={(name) => mergeMsAssociation({ signatureName2: name })}
             />
           </Col>
-          <Col />
-          <Col lg="2" className="d-flex">
+          <Col lg="auto" className="d-flex">
             <Button
-              className="ml-auto mb-auto"
+              className="mt-auto mb-3"
               disabled={
                 !signatureName1 ||
                 !signatureName2 ||

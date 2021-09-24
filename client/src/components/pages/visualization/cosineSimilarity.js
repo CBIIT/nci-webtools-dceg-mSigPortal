@@ -278,7 +278,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
               </Col>
               <Col lg="auto" className="d-flex align-bottom">
                 <Button
-                  className="ml-auto mb-auto"
+                  className="mt-auto mb-3"
                   disabled={!multiSample}
                   variant="primary"
                   onClick={() => {
@@ -377,7 +377,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
               </Col>
               <Col lg="auto" className="d-flex">
                 <Button
-                  className="ml-auto mb-auto"
+                  className="mt-auto mb-3"
                   variant="primary"
                   onClick={() => {
                     if (source == 'user') {
@@ -489,7 +489,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
               </Col>
               <Col lg="auto" className="d-flex">
                 <Button
-                  className="ml-auto mb-auto"
+                  className="mt-auto mb-3"
                   variant="primary"
                   onClick={() =>
                     calculateR('pub', 'cosineSimilarityPublic', {

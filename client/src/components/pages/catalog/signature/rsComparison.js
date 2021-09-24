@@ -161,8 +161,8 @@ export default function Comparison({ submitR }) {
       <hr />
       <Form className="p-3">
         <LoadingOverlay active={loading} />
-        <Row className="justify-content-center">
-          <Col lg="3">
+        <Row className="">
+          <Col lg="auto">
             <Select
               id="mscProfileName"
               label="Profile Name"
@@ -171,7 +171,7 @@ export default function Comparison({ submitR }) {
               onChange={handleProfile}
             />
           </Col>
-          <Col lg="4">
+          <Col lg="auto">
             <Select
               id="mscRefSet1"
               label="Reference Signature Set 1"
@@ -180,7 +180,7 @@ export default function Comparison({ submitR }) {
               onChange={handleSet1}
             />
           </Col>
-          <Col lg="4">
+          <Col lg="auto">
             <Select
               id="mscSigName1"
               label="Signature Name 1"
@@ -193,11 +193,7 @@ export default function Comparison({ submitR }) {
               }
             />
           </Col>
-          <Col lg="1" />
-        </Row>
-        <Row>
-          <Col lg="3" />
-          <Col lg="4">
+          <Col lg="auto">
             <Select
               id="mscSigSet2"
               label="Reference Signature Set 2"
@@ -206,7 +202,7 @@ export default function Comparison({ submitR }) {
               onChange={handleSet2}
             />
           </Col>
-          <Col lg="4">
+          <Col lg="auto">
             <Select
               id="mscSetName2"
               label="Signature Name 2"
@@ -219,7 +215,7 @@ export default function Comparison({ submitR }) {
               }
             />
           </Col>
-          <Col lg="1" className="d-flex justify-content-end">
+          <Col lg="auto" className="d-flex">
             <Button
               className="mt-auto mb-3"
               variant="primary"

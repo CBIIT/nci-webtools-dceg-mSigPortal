@@ -203,7 +203,7 @@ export default function MutationalPattern({ submitR }) {
             </Col>
             <Col lg="auto" className="d-flex">
               <Button
-                className="ml-auto mb-auto"
+                className="mt-auto mb-3"
                 variant="primary"
                 onClick={() => {
                   if (!pattern) setPatternInvalid(true);

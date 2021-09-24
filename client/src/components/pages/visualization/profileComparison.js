@@ -410,7 +410,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
               </Col>
               <Col lg="auto" className="d-flex">
                 <Button
-                  className="ml-auto mb-auto"
+                  className="mt-auto mb-3"
                   disabled={sampleOptions.length < 2}
                   variant="primary"
                   onClick={() => {
@@ -581,7 +581,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
               </Col>
               <Col lg="auto" className="d-flex">
                 <Button
-                  className="ml-auto mb-auto"
+                  className="mt-auto"
                   style={{ marginBottom: '2.5rem' }}
                   variant="primary"
                   onClick={() => {
@@ -743,7 +743,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
               </Col>
               <Col lg="auto" className="d-flex">
                 <Button
-                  className="ml-auto mb-auto"
+                  className="mt-auto mb-3"
                   variant="primary"
                   onClick={() =>
                     calculateR('pub', 'profileComparisonPublic', {

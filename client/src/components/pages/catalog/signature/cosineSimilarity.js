@@ -106,8 +106,8 @@ export default function MutationalSignatureProfile({ submitR }) {
       <hr />
       <Form className="p-3">
         <LoadingOverlay active={loading} />
-        <Row className="justify-content-center">
-          <Col lg="3">
+        <Row className="">
+          <Col lg="auto">
             <Select
               id="csProfileName"
               label="Profile Name"
@@ -116,7 +116,7 @@ export default function MutationalSignatureProfile({ submitR }) {
               onChange={handleProfile}
             />
           </Col>
-          <Col lg="4">
+          <Col lg="auto">
             <Select
               id="csRefSet1"
               label="Reference Signature Set 1"
@@ -125,7 +125,7 @@ export default function MutationalSignatureProfile({ submitR }) {
               onChange={(set) => mergeSigCosineSimilarity({ rsSet1: set })}
             />
           </Col>
-          <Col lg="4">
+          <Col lg="auto">
             <Select
               id="rcsRefSet2"
               label="Reference Signature Set 2"
@@ -134,7 +134,7 @@ export default function MutationalSignatureProfile({ submitR }) {
               onChange={(set) => mergeSigCosineSimilarity({ rsSet2: set })}
             />
           </Col>
-          <Col lg="1" className="d-flex justify-content-end">
+          <Col lg="auto" className="d-flex justify-content-end">
             <Button
               className="mt-auto mb-3"
               variant="primary"

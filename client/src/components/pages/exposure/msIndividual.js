@@ -49,7 +49,7 @@ export default function MSIndividual({ calculateIndividual }) {
       <Form className="p-3">
         <LoadingOverlay active={loading} />
         <Row className="">
-          <Col lg="3">
+          <Col lg="auto">
             <Group>
               <Select
                 disabled={
@@ -67,10 +67,9 @@ export default function MSIndividual({ calculateIndividual }) {
               />
             </Group>
           </Col>
-          <Col />
-          <Col lg="2" className="d-flex">
+          <Col lg="auto" className="d-flex">
             <Button
-              className="ml-auto mb-auto"
+              className="mt-auto mb-3"
               disabled={!sample || (source == 'user' && !projectID)}
               variant="primary"
               onClick={calculateIndividual}

@@ -393,7 +393,7 @@ export default function Profile({ submitR }) {
     for (let index in plots) {
       controls.push(
         <Row className="mt-3" key={'control' + index}>
-          <Col lg="2">
+          <Col lg="auto">
             <Select
               id={`mspSource${index}`}
               label="Signature Source"
@@ -402,7 +402,7 @@ export default function Profile({ submitR }) {
               onChange={(source) => handleSource(source, index)}
             />
           </Col>
-          <Col lg="2">
+          <Col lg="auto">
             <Select
               id={'mspProfileName' + index}
               label="Profile Name"
@@ -411,7 +411,7 @@ export default function Profile({ submitR }) {
               onChange={(profile) => handleProfile(profile, index)}
             />
           </Col>
-          <Col lg="3">
+          <Col lg="auto">
             <Select
               id={'mspSet' + index}
               label="Reference Signature Set"
@@ -420,7 +420,7 @@ export default function Profile({ submitR }) {
               onChange={(profile) => handleSet(profile, index)}
             />
           </Col>
-          <Col lg="2">
+          <Col lg="auto">
             <Select
               id={'mspStrategy' + index}
               label="Experimental Strategy"
@@ -429,7 +429,7 @@ export default function Profile({ submitR }) {
               onChange={(strategy) => handleStrategy(strategy, index)}
             />
           </Col>
-          <Col lg="2">
+          <Col lg="auto">
             <Select
               id={'mspSigName' + index}
               label="Signature Name"
@@ -438,7 +438,7 @@ export default function Profile({ submitR }) {
               onChange={(name) => handleName(name, index)}
             />
           </Col>
-          <Col lg="1" className="d-flex">
+          <Col lg="auto" className="d-flex">
             <Button
               className="my-auto text-danger"
               variant="link"
@@ -500,8 +500,8 @@ export default function Profile({ submitR }) {
       <hr />
       <Form className="p-3">
         <LoadingOverlay active={loading} />
-        <Row>
-          <Col lg="2">
+        <Row className="">
+          <Col lg="auto">
             <Select
               id="mspSource"
               label="Signature Source"
@@ -510,7 +510,7 @@ export default function Profile({ submitR }) {
               onChange={(source) => handleSource(source, 0)}
             />
           </Col>
-          <Col lg="2">
+          <Col lg="auto">
             <Select
               id="mspProfileName"
               label="Profile Name"
@@ -519,7 +519,7 @@ export default function Profile({ submitR }) {
               onChange={(profile) => handleProfile(profile, 0)}
             />
           </Col>
-          <Col lg="3">
+          <Col lg="auto">
             <Select
               id="mspSet"
               label="Reference Signature Set"
@@ -528,7 +528,7 @@ export default function Profile({ submitR }) {
               onChange={(set) => handleSet(set, 0)}
             />
           </Col>
-          <Col lg="2">
+          <Col lg="auto">
             <Select
               id="mspStrategy"
               label="Experimental Strategy"
@@ -537,7 +537,7 @@ export default function Profile({ submitR }) {
               onChange={(strategy) => handleStrategy(strategy, 0)}
             />
           </Col>
-          <Col lg="2">
+          <Col lg="auto">
             <Select
               id="mspSigName"
               label="Signature Name"
@@ -546,12 +546,10 @@ export default function Profile({ submitR }) {
               onChange={(name) => handleName(name, 0)}
             />
           </Col>
-          <Col />
         </Row>
         <AdditionalControls />
         <Row className="mt-3">
-          <Col />
-          <Col md="4" className="d-flex">
+          <Col md="auto" className="d-flex">
             <Button
               className="ml-auto"
               variant="link"

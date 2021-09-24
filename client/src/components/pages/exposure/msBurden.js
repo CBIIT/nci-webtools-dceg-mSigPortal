@@ -45,7 +45,7 @@ export default function MsBurden({ calculateBurden }) {
       <Form className="p-3">
         <LoadingOverlay active={loading} />
         <Row>
-          <Col lg="3">
+          <Col lg="auto">
             <Select
               className="mb-2"
               disabled={source == 'user' && !userNameOptions.length}
@@ -58,11 +58,10 @@ export default function MsBurden({ calculateBurden }) {
               onChange={(name) => mergeMsBurden({ signatureName: name })}
             />
           </Col>
-          <Col />
-          <Col lg="2" className="d-flex">
+          <Col lg="auto" className="d-flex">
             <Button
               disabled={!signatureName || (source == 'user' && !projectID)}
-              className="ml-auto mb-auto"
+              className="mt-auto mb-2"
               variant="primary"
               onClick={calculateBurden}
             >

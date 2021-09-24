@@ -260,7 +260,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
               </Col>
               <Col lg="aitp" className="d-flex">
                 <Button
-                  className="ml-auto mb-auto"
+                  className="mt-auto mb-3"
                   disabled={!multiSample}
                   variant="primary"
                   onClick={() => {
@@ -432,7 +432,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
               </Col>
               <Col lg="auto" className="d-flex">
                 <Button
-                  className="ml-auto mb-auto"
+                  className="mt-auto mb-3"
                   variant="primary"
                   onClick={() =>
                     calculateR('pub', 'pcaWithPublic', {
