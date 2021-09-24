@@ -32,6 +32,7 @@ wrapper <- function(fn, args, dataArgs) {
 # Util Functions for retrieving data
 # get dataframe with column and filter arguments
 getReferenceSignatureData <- function(args, dataArgs) {
+  library(stringr)
   s3load(paste0(dataArgs$s3Data, 'Signature/signature_refsets.RData'), dataArgs$bucket)
 
   columns = unlist(args$columns, use.names = FALSE)
@@ -41,7 +42,7 @@ getReferenceSignatureData <- function(args, dataArgs) {
   # apply filters
   if (length(filters) > 0) {
     for (i in 1:length(names(filters))) {
-      data = data %>% filter(get(names(filters)[[i]]) == filters[[i]])
+      data = str_sort(data %>% filter(get(names(filters)[[i]]) == filters[[i]]), numeric = TRUE)
     }
   }
 
@@ -50,24 +51,26 @@ getReferenceSignatureData <- function(args, dataArgs) {
 
 # retrieve signature names filtered by cancer type
 getSignatureNames <- function(args, dataArgs) {
+  library(stringr)
   s3load(paste0(dataArgs$s3Data, 'Exposure/exposure_refdata.RData'), dataArgs$bucket)
 
   exposure_refdata_selected <- exposure_refdata %>% filter(Study == args$study, Dataset == args$strategy, Signature_set_name == args$rsSet)
 
   # available siganture name, Dropdown list for all the signature name
-  signature_name_avail <- exposure_refdata_selected %>% filter(Cancer_Type == args$cancerType, Exposure > 0) %>% pull(Signature_name) %>% unique()
+  signature_name_avail <- str_sort(exposure_refdata_selected %>% filter(Cancer_Type == args$cancerType, Exposure > 0) %>% pull(Signature_name) %>% unique(), numeric = TRUE)
 
   return(signature_name_avail)
 }
 
 # retrieve sample names filtered by cancer type
 getSampleNames <- function(args, dataArgs) {
+  library(stringr)
   s3load(paste0(dataArgs$s3Data, 'Exposure/exposure_refdata.RData'), dataArgs$bucket)
 
   exposure_refdata_selected <- exposure_refdata %>% filter(Study == args$study, Dataset == args$strategy, Signature_set_name == args$rsSet)
 
   # available siganture name, Dropdown list for all the signature name
-  sampleNames <- exposure_refdata_selected %>% filter(Cancer_Type == args$cancerType) %>% pull(Sample) %>% unique()
+  sampleNames <- str_sort(exposure_refdata_selected %>% filter(Cancer_Type == args$cancerType) %>% pull(Sample) %>% unique(), numeric = TRUE)
 
   return(sampleNames)
 }

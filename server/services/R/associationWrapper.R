@@ -37,7 +37,7 @@ getAssocVarData <- function(args, dataArgs) {
   ## extract the variable information
   vardata_refdata_selected <- vardata_refdata %>% filter(Cancer_Type == args$cancer)
   # clist will be used for the Assocaition Variable Data and Select Variables.
-  clist <- vardata_refdata_selected %>% select(data_source, data_type, variable_name, variable_value_type) %>% unique()
+  clist <- vardata_refdata_selected %>% select(data_source, data_type, variable_name, variable_value_type) %>% unique() %>% arrange(variable_name)
 
   # save vardata_refdata_selected for download
   vardata_refdata_selected %>% write_delim(file = fullDataPath, delim = '\t', col_names = T, na = '')

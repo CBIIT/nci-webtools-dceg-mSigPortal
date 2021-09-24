@@ -30,16 +30,18 @@ wrapper <- function(fn, args, dataArgs) {
 
 # get all Reference Signature Set options using profile_name (profile type and matrix size)
 getReferenceSignatureSets <- function(args, dataArgs) {
+  library(stringr)
   s3load(paste0(dataArgs$s3Data, 'Signature/signature_refsets.RData'), dataArgs$bucket)
 
   profile_name <- if_else(args$profileType == "SBS", "SBS96", if_else(args$profileType == "DBS", "DBS78", if_else(args$profileType == "ID", "ID83", NA_character_)))
-  signatureSets <- signature_refsets %>% filter(Profile == profile_name) %>% pull(Signature_set_name) %>% unique()
+  signatureSets <- str_sort(signature_refsets %>% filter(Profile == profile_name) %>% pull(Signature_set_name) %>% unique(), numeric = TRUE)
 
   return(signatureSets)
 }
 
 # get list of signatures in the selected signature set
 getSignaturesR <- function(args, dataArgs) {
+  library(stringr)
   s3load(paste0(dataArgs$s3Data, 'Signature/signature_refsets.RData'), dataArgs$bucket)
 
   profile_name <- if_else(args$profileType == "SBS", "SBS96", if_else(args$profileType == "DBS", "DBS78", if_else(args$profileType == "ID", "ID83", NA_character_)))
@@ -47,7 +49,7 @@ getSignaturesR <- function(args, dataArgs) {
   refsig <- signature_refsets_input %>%
       select(Signature_name, MutationType, Contribution) %>%
       pivot_wider(names_from = Signature_name, values_from = Contribution)
-  signatures <- colnames(refsig[1, -1])
+  signatures <- str_sort(colnames(refsig[1, -1]), numeric = TRUE)
 
   return(signatures)
 }
@@ -65,9 +67,9 @@ getPublicData <- function(args, dataArgs) {
 
   svgfiles <- seqmatrix_refdata_info %>% mutate(Path = paste0(dataArgs$s3Data, 'Seqmatrix/', Path))
   if (args$cancerType == 'PanCancer') {
-    svgfiles_public <- svgfiles %>% filter(Study == args$study, Dataset == args$experimentalStrategy) %>% select(-Study)
+    svgfiles_public <- svgfiles %>% filter(Study == args$study, Dataset == args$experimentalStrategy) %>% select(-Study) %>% arrange(Sample)
   } else {
-    svgfiles_public <- svgfiles %>% filter(Study == args$study, Cancer_Type == args$cancerType, Dataset == args$experimentalStrategy) %>% select(-Study)
+    svgfiles_public <- svgfiles %>% filter(Study == args$study, Cancer_Type == args$cancerType, Dataset == args$experimentalStrategy) %>% select(-Study) %>% arrange(Sample)
   }
 
   return(svgfiles_public)
