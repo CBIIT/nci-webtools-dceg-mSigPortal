@@ -143,7 +143,7 @@ export default function Univariable() {
   async function handleLoadParameters() {
     mergeState({ loadingParams: true, error: false });
     try {
-      const collapseData = await (
+      const { stdout, uncaughtError, output: collapseData } = await (
         await fetch(`api/associationWrapper`, {
           method: 'POST',
           headers: {
@@ -193,17 +193,7 @@ export default function Univariable() {
       dataPath: '',
     });
     try {
-      const {
-        stdout,
-        error,
-        uncaught_error,
-        plotPath,
-        dataPath,
-        assocTablePath,
-        dataTable,
-        signatureOptions,
-        projectID: id,
-      } = await (
+      const { projectID: id, stdout, uncaughtError, output } = await (
         await fetch(`api/associationWrapper`, {
           method: 'POST',
           headers: {
@@ -237,14 +227,17 @@ export default function Univariable() {
         })
       ).json();
 
-      if (error) {
-        mergeState({ error: error.error });
-      } else if (uncaught_error) {
-        console.error('R error: ' + uncaught_error);
-        mergeState({
-          error:
-            'An error has occured. Please review your parameters and try again.',
-        });
+      const {
+        plotPath,
+        dataPath,
+        assocTablePath,
+        dataTable,
+        signatureOptions,
+        error,
+      } = output;
+
+      if (error || uncaughtError) {
+        mergeState({ error: error || uncaughtError });
       } else {
         mergeState({
           projectID: id,

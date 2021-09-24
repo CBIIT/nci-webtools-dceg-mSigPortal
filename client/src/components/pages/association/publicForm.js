@@ -152,30 +152,24 @@ export default function PublicForm() {
       ]);
 
       const {
-        assocVarData,
-        fullDataPath,
-        error: assocError,
         projectID,
+        output: assocOutput,
+        uncaughtError: assocError,
       } = assocResponse;
-      const { expVarList, error: expError } = expResponse;
-      if (assocError) throw assocError.message;
-      if (expError) throw expError.message;
+      const { output: expOutput, uncaughtError: expError } = expResponse;
+
+      if (assocError) throw assocError;
+      if (expError) throw expError;
 
       mergeState({
         submitted: true,
-        assocVarData,
-        expVarList,
-        assocFullDataPath: fullDataPath,
+        assocVarData: assocOutput.assocVarData,
+        assocFullDataPath: assocOutput.fullDataPath,
+        expVarList: expOutput.expVarList,
         displayTab: 'univariable',
         openSidebar: false,
       });
-      dispatch(
-        actions.mergeAssociation({
-          univariable: {
-            projectID,
-          },
-        })
-      );
+      dispatch(actions.mergeAssociation({ univariable: { projectID } }));
     } catch (error) {
       mergeError(error);
     }

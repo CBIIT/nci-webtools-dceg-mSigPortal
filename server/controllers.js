@@ -378,21 +378,18 @@ async function associationWrapper(req, res, next) {
   logger.debug('/assocationCalc: %o', { ...req.body });
 
   const projectID = id ? id : uuidv4();
-  const rootDir = path.join(config.results.folder, projectID);
 
-  // create save directory if needed
-  const savePath = projectID
-    ? path.join(rootDir, projectID, 'results', fn, '/')
-    : null;
-  if (savePath) fs.mkdirSync(savePath, { recursive: true });
+  // create directory for results if needed
+  const savePath = projectID ? path.join(projectID, 'results', fn, '/') : null;
+  if (projectID)
+    fs.mkdirSync(path.join(dataArgs.wd, savePath), { recursive: true });
 
   try {
-    const wrapper = await r('services/R/associationWrapper.R', fn, {
+    const wrapper = await r('services/R/associationWrapper.R', 'wrapper', {
+      fn,
       args,
       dataArgs: {
         ...dataArgs,
-        projectID: projectID,
-        rootDir: rootDir,
         savePath: savePath,
       },
     });
@@ -407,8 +404,7 @@ async function associationWrapper(req, res, next) {
       ...rest,
     });
   } catch (err) {
-    logger.info(`/associationWrapper: An error occured with fn:${fn}`);
-    res.json({ debugR: err.stderr });
+    logger.error(`/associationWrapper: An error occured with fn:${fn}`);
     next(err);
   }
 }
