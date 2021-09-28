@@ -326,7 +326,7 @@ export default function Etiology() {
       );
     } else {
       return (
-        <div className="my-5">
+        <div style={{ minHeight: '100px' }}>
           <LoadingOverlay active={true} />
         </div>
       );
@@ -361,7 +361,7 @@ export default function Etiology() {
       );
     } else {
       return (
-        <div className="my-5">
+        <div style={{ minHeight: '100px' }}>
           <LoadingOverlay active={true} />
         </div>
       );
@@ -493,7 +493,7 @@ export default function Etiology() {
         );
       } else {
         return (
-          <div className="my-5">
+          <div style={{ minHeight: '100px' }}>
             <LoadingOverlay active={true} />
           </div>
         );
@@ -531,7 +531,7 @@ export default function Etiology() {
           });
       } else {
         return (
-          <div className="my-5">
+          <div style={{ minHeight: '100px' }}>
             <LoadingOverlay active={true} />
           </div>
         );
@@ -674,7 +674,7 @@ export default function Etiology() {
                     )}
                 </div>
               ) : (
-                <div className="my-5">
+                <div style={{ minHeight: '100px' }}>
                   <LoadingOverlay active={true} />
                 </div>
               )}
@@ -787,7 +787,7 @@ export default function Etiology() {
         });
       } else {
         return (
-          <div className="my-5">
+          <div style={{ minHeight: '100px' }}>
             <LoadingOverlay active={true} />
           </div>
         );
@@ -830,7 +830,7 @@ export default function Etiology() {
           });
       } else {
         return (
-          <div className="my-5">
+          <div style={{ minHeight: '100px' }}>
             <LoadingOverlay active={true} />
           </div>
         );
