@@ -104,10 +104,10 @@ loadCollapse <- function(args, dataArgs) {
   vardata_refdata_selected <- vardata_refdata_selected %>% filter(Sample %in% osamples)
   exposure_refdata_selected <- exposure_refdata_selected %>% filter(Sample %in% osamples)
 
-  exposure_refdata_selected <- exposure_refdata_selected %>% select(Sample, Signature_name, args$expVariable)
+  exposure_refdata_selected <- exposure_refdata_selected %>% select(Sample, Signature_name, args$expName)
 
   vardata_refdata_selected <- vardata_refdata_selected %>%
-      filter(data_source == args$variableSource, data_type == args$variableType, variable_name == args$assocVariable)
+      filter(data_source == args$source, data_type == args$type, variable_name == args$assocName)
 
   if (unique(vardata_refdata_selected$variable_value_type) == "numeric") { vardata_refdata_selected$variable_value <- as.numeric(vardata_refdata_selected$variable_value) }
 
@@ -154,10 +154,10 @@ univariable <- function(args, dataArgs) {
   vardata_refdata_selected <- vardata_refdata_selected %>% filter(Sample %in% osamples)
   exposure_refdata_selected <- exposure_refdata_selected %>% filter(Sample %in% osamples)
 
-  exposure_refdata_selected <- exposure_refdata_selected %>% select(Sample, Signature_name, args$variable2$name)
+  exposure_refdata_selected <- exposure_refdata_selected %>% select(Sample, Signature_name, args$exposureVar$name)
 
   vardata_refdata_selected <- vardata_refdata_selected %>%
-      filter(data_source == args$variableSource, data_type == args$variableType, variable_name == args$variable1$name)
+    filter(data_source == (args$associationVar[['source']]), data_type == args$associationVar$type, variable_name == args$associationVar$name)
 
   if (unique(vardata_refdata_selected$variable_value_type) == "numeric") { vardata_refdata_selected$variable_value <- as.numeric(vardata_refdata_selected$variable_value) }
 
@@ -169,14 +169,14 @@ univariable <- function(args, dataArgs) {
     vardata_refdata_selected <- exposure_refdata_selected %>% select(Sample) %>% unique() %>% left_join(vardata_refdata_selected)
     ## including NA
     if (length(unique(vardata_refdata_selected[[2]])) == 1) {
-      stop(paste0("mSigPortal Association failed: the selected variable name ", args$variable1$name, " have only unique value: ", unique(vardata_refdata_selected[[2]]), '.'))
+      stop(paste0("mSigPortal Association failed: the selected variable name ", args$associationVar$name, " have only unique value: ", unique(vardata_refdata_selected[[2]]), '.'))
     }
     tmpdata <- vardata_refdata_selected
     colnames(tmpdata)[2] <- 'Variable'
     tmpvalue <- tmpdata %>% count(Variable) %>% filter(n < 2) %>% dim() %>% .[[1]]
 
     if (tmpvalue != 0) {
-      stop(paste0("mSigPortal Association failed: the selected variable name ", args$variable1$name, " have not enough obsevations for both levels."))
+      stop(paste0("mSigPortal Association failed: the selected variable name ", args$associationVar$name, " have not enough obsevations for both levels."))
     }
   }, error = function(e) {
     return(list(error = e$message))
@@ -187,10 +187,10 @@ univariable <- function(args, dataArgs) {
 
   ## association test by group of signature name
   assocTable <- mSigPortal_associaiton_group(data = data_input, Group_Var = "Signature_name",
-    Var1 = args$variable1$name, Var2 = args$variable2$name, type = args$testType,
-    filter1 = args$variable1$filter, filter2 = args$variable2$filter,
-    log1 = args$variable1$log2, log2 = args$variable2$log2, collapse_var1 = args$variable1$collapse,
-    collapse_var2 = args$variable2$collapse)
+    Var1 = args$associationVar$name, Var2 = args$exposureVar$name, type = args$associationVar$type,
+    filter1 = args$associationVar$filter, filter2 = args$exposureVar$filter,
+    log1 = args$associationVar$log2, log2 = args$exposureVar$log2,
+    collapse_var1 = args$associationVar$collapse, collapse_var2 = NULL)
 
   assocTable %>% write_delim(file = assocTablePath, delim = '\t', col_names = T, na = '')
   ## put result as a short table above the figure
@@ -201,10 +201,12 @@ univariable <- function(args, dataArgs) {
   data_input <- data_input %>% filter(Signature_name == signature_name_input) %>% select(-Signature_name)
 
 
-  mSigPortal_associaiton(data = data_input, Var1 = args$variable1$name, Var2 = args$variable2$name, type = args$testType,
-    xlab = args$xlab, ylab = args$ylab, filter1 = args$variable1$filter, filter2 = args$variable2$filter,
-    log1 = args$variable1$log2, log2 = args$variable2$log2, collapse_var1 = args$variable1$collapse,
-    collapse_var2 = args$variable2$collapse, output_plot = plotPath)
+  mSigPortal_associaiton(data = data_input, Var1 = args$associationVar$name, Var2 = args$exposureVar$name, type = args$associationVar$type,
+    xlab = args$xlab, ylab = args$ylab,
+    filter1 = args$associationVar$filter, filter2 = args$exposureVar$filter,
+    log1 = args$associationVar$log2, log2 = args$exposureVar$log2,
+    collapse_var1 = args$associationVar$collapse, collapse_var2 = NULL,
+    output_plot = plotPath)
 
   ## asssociation_data.txt will output as download text file.
   data_input %>% write_delim(file = dataPath, delim = '\t', col_names = T, na = '')

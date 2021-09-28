@@ -9,7 +9,7 @@ import {
 } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { faInfoCircle, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { actions as associationActions } from '../../../services/store/association';
 import { actions as modalActions } from '../../../services/store/modal';
 import Select from '../../controls/select/select';
@@ -21,10 +21,10 @@ import Table from '../../controls/table/table';
 const actions = { ...associationActions, ...modalActions };
 const { Group, Label, Check, Control } = Form;
 
-export default function Univariable() {
+export default function Multivariable() {
   const dispatch = useDispatch();
   const mergeState = async (state) =>
-    await dispatch(actions.mergeAssociation({ univariable: state }));
+    await dispatch(actions.mergeAssociation({ multivariable: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -40,6 +40,7 @@ export default function Univariable() {
     assocTable,
   } = useSelector((state) => state.association.associationState);
 
+  const multivariable = useSelector((state) => state.association.multivariable);
   const {
     loadingParams,
     loadingCalculate,
@@ -54,10 +55,10 @@ export default function Univariable() {
     testType,
     xlab,
     ylab,
-    associationVar,
+    associationVars,
     exposureVar,
     resultsTable,
-  } = useSelector((state) => state.association.univariable);
+  } = multivariable;
 
   // populate controls
   useEffect(() => {
@@ -109,9 +110,9 @@ export default function Univariable() {
               strategy,
               rsSet,
               cancer,
-              source: associationVar.source,
-              type: associationVar.type,
-              assocName: associationVar.tmpName,
+              source: associationVars.source,
+              type: associationVars.type,
+              assocName: associationVars.tmpName,
               expName: exposureVar.name,
             },
           }),
@@ -121,8 +122,8 @@ export default function Univariable() {
       const { collapseVar1, collapseVar2 } = collapseData;
 
       mergeState({
-        associationVar: {
-          name: associationVar.tmpName,
+        associationVars: {
+          name: associationVars.tmpName,
           collapseOptions: collapseVar1 || [],
         },
         exposureVar: {
@@ -153,7 +154,7 @@ export default function Univariable() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            fn: 'univariable',
+            fn: 'multivariable',
             projectID,
             args: {
               study,
@@ -162,9 +163,9 @@ export default function Univariable() {
               cancer,
               testType,
               signature,
-              xlab: xlab || associationVar.name,
+              xlab: xlab || associationVars.name,
               ylab: ylab || exposureVar.name,
-              associationVar: (() => {
+              associationVars: (() => {
                 const {
                   sourceOptions,
                   typeOptions,
@@ -172,7 +173,7 @@ export default function Univariable() {
                   tmpName,
                   collapseOptions,
                   ...params
-                } = associationVar;
+                } = associationVars;
                 return params;
               })(),
               exposureVar: (() => {
@@ -222,6 +223,17 @@ export default function Univariable() {
     </Popover>
   );
 
+  function addParam() {
+    let newParams = associationVars.slice();
+    newParams.push({});
+    mergeState({ associationVars: newParams });
+  }
+  function removeParam(index) {
+    let newParams = associationVars.slice();
+    newParams.splice(index, 1);
+    mergeState({ associationVars: newParams });
+  }
+
   return (
     <div className="p-4 bg-white border rounded">
       <LoadingOverlay active={loadingData} />
@@ -254,18 +266,41 @@ export default function Univariable() {
           Select the following variables for analysis
         </p>
 
-        <AssocVarParams
-          hostState={useSelector((state) => state.association.univariable)}
-          paramState={associationVar}
-          mergeState={(e) => mergeState({ associationVar: e })}
-          handleLoadParameters={handleLoadParameters}
-        />
+        {associationVars.map((paramState, index) => (
+          <AssocVarParams
+            hostState={multivariable}
+            paramState={paramState}
+            mergeState={(e) => {
+              let newParams = associationVars.slice();
+              newParams[index] = { ...newParams[index], ...e };
+              mergeState({ associationVars: newParams });
+            }}
+            handleLoadParameters={() => {}} //handleLoadParameters}
+            remove={index != 0 ? () => removeParam(index) : false}
+            last={index == associationVars.length - 1}
+          />
+        ))}
+        <Row className="mt-3">
+          <Col md="auto" className="d-flex">
+            <Button
+              className="ml-auto"
+              variant="link"
+              onClick={() => addParam()}
+              title="Add Plot"
+              style={{ textDecoration: 'none' }}
+            >
+              <span className="text-nowrap" title="Add Assocation Variable">
+                <FontAwesomeIcon icon={faPlus} /> Add Association Variable
+              </span>
+            </Button>
+          </Col>
+        </Row>
       </div>
       <div className="mb-3">
         <h5 className="separator">Parameters</h5>
 
         <LoadingOverlay active={loadingCalculate} />
-        {associationVar.name && exposureVar.name ? (
+        {associationVars.name && exposureVar.name ? (
           <>
             <p className="text-center">
               Select the following filtering and method for analysis
@@ -493,7 +528,7 @@ export default function Univariable() {
                     <Label>Variable Title</Label>
                     <Control
                       value={xlab}
-                      placeholder={associationVar.name}
+                      placeholder={associationVars.name}
                       onChange={(e) => mergeState({ xlab: e.target.value })}
                       isInvalid={false}
                     />

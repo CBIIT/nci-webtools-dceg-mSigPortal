@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Form, Row, Col, Nav, Button } from 'react-bootstrap';
 import {
   SidebarContainer,
@@ -7,6 +7,7 @@ import {
 } from '../../controls/sidebar-container/sidebar-container';
 import Instructions from '../association/instructions';
 import Univariable from './univariable';
+import Multivariable from './multivariable';
 import UserForm from './userForm';
 import PublicForm from './publicForm';
 import { useSelector, useDispatch } from 'react-redux';
@@ -28,7 +29,6 @@ export default function Association() {
     submitted,
     expVarList,
     source,
-    assocVarData,
     loadingData,
   } = useSelector((state) => state.association.associationState);
 
@@ -39,7 +39,7 @@ export default function Association() {
       component: <Instructions loading={loadingData} />,
     },
     { name: 'Univariable', id: 'univariable', component: <Univariable /> },
-    { name: 'Multivariate', id: 'multivariate', component: <></> },
+    { name: 'Multivariate', id: 'multivariate', component: <Multivariable /> },
   ];
 
   return (
