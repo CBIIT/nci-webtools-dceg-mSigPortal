@@ -270,6 +270,7 @@ export default function UserForm() {
     removeBedFile();
     let path = '';
     if (format == 'vcf') path = 'assets/exampleInput/demo_input_multi.vcf.gz';
+    if (format == 'maf') path = 'assets/exampleInput/demo_input_multi_MAF.txt';
     if (format == 'csv') path = 'assets/exampleInput/demo_input_multi.csv';
     if (format == 'tsv') path = 'assets/exampleInput/demo_input_multi.tsv';
     if (format == 'catalog_tsv')
@@ -397,7 +398,7 @@ export default function UserForm() {
                     ? storeFilename
                     : 'Upload Data File...'
                 }
-                accept=".csv, .tsv, .vcf, .gz, .tar, .tar.gz"
+                accept=".csv, .tsv, .vcf, .gz, .tar, .tar.gz, .txt"
                 isInvalid={checkValid ? !validFile : false}
                 feedback="Please upload a data file"
                 onChange={(e) => {
