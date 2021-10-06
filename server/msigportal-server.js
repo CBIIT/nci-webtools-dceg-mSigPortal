@@ -73,9 +73,9 @@ app.use(express.static(path.resolve('www')));
 apiRouter.use(
   '/results',
   express.static(config.results.folder, {
-    setHeaders: (res, path, stat) => {
-      res.set('Cache-Control', 'max-age=0, must-revalidate');
-    },
+    // setHeaders: (res, path, stat) => {
+    //   res.set('Cache-Control', 'max-age=0, must-revalidate');
+    // },
   })
 );
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Row, Col } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -16,7 +16,6 @@ export default function Plot({
   alt,
   height,
   className,
-  cacheBreaker = true,
   ...rest
 }) {
   const dispatch = useDispatch();
@@ -55,6 +54,10 @@ export default function Plot({
     zoomIn: { step: 5 },
     zoomOut: { step: 5 },
   };
+
+  // fetch image to refresh cached image
+  // need to do this becuase plotpaths are always the same for recalculations
+  fetch(plotPath, { cache: 'reload', mode: 'no-cors' });
 
   return (
     <div
@@ -125,9 +128,7 @@ export default function Plot({
             <TransformComponent>
               <img
                 className="w-100"
-                src={
-                  plotPath + `${cacheBreaker ? `#${new Date().getTime()}` : ''}`
-                }
+                src={plotPath}
                 style={{ maxHeight: height || '500px' }}
                 alt={alt || 'Plot Unavailable'}
               />
