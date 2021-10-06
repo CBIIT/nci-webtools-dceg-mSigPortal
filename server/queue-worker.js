@@ -915,7 +915,7 @@ async function receiveMessage() {
             VisibilityTimeout: config.queue.visibilityTimeout,
           })
           .send();
-      }, 1000 * (config.queue.visibilityTimeout - 1));
+      }, 1000 * (config.queue.visibilityTimeout - 5));
 
       // processMessage should return a boolean status indicating success or failure
       const status = await processMessage(params);
