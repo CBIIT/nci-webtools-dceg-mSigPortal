@@ -140,19 +140,33 @@ export default function Visualization({ match }) {
     );
 
     const filteredProfileOptions = [
-      ...new Set(filteredPlots.map((row) => row.Profile_Type)),
+      ...new Set(
+        filteredPlots.map((row) => row.Profile_Type).sort((a, b) => a - b)
+      ),
     ];
 
     const profile = defaultProfile(filteredProfileOptions);
 
     const filteredMatrixOptions = [
-      ...new Set(filteredPlots.map((row) => row.Matrix_Size)),
+      ...new Set(
+        filteredPlots
+          .filter((row) => row.Profile_Type == profile)
+          .map((row) => row.Matrix_Size)
+          .sort((a, b) => a - b)
+      ),
     ];
 
     const matrix = defaultMatrix(profile, filteredMatrixOptions);
 
     const filteredFilterOptions = [
-      ...new Set(filteredPlots.map((row) => row.Filter)),
+      ...new Set(
+        filteredPlots
+          .filter(
+            (row) => row.Profile_Type == profile && row.Matrix_Size == matrix
+          )
+          .map((row) => row.Filter)
+          .sort((a, b) => a - b)
+      ),
     ];
 
     const filter = defaultFilter(filteredFilterOptions);
@@ -162,6 +176,7 @@ export default function Visualization({ match }) {
         matrixList
           .filter((row) => row.Profile_Type == profile)
           .map((row) => row.Matrix_Size)
+          .sort((a, b) => a - b)
       ),
     ];
 
