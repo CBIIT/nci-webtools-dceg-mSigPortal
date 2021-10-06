@@ -906,17 +906,16 @@ async function receiveMessage() {
       // logger.debug(message.Body);
 
       // while processing is not complete, update the message's visibilityTimeout
-      const intervalId = setInterval(
-        (_) =>
-          sqs
-            .changeMessageVisibility({
-              QueueUrl: QueueUrl,
-              ReceiptHandle: message.ReceiptHandle,
-              VisibilityTimeout: config.queue.visibilityTimeout,
-            })
-            .send(),
-        1000 * (config.queue.visibilityTimeout - 1)
-      );
+      const intervalId = setInterval((_) => {
+        logger.debug('refreshing visibility timeout');
+        sqs
+          .changeMessageVisibility({
+            QueueUrl: QueueUrl,
+            ReceiptHandle: message.ReceiptHandle,
+            VisibilityTimeout: config.queue.visibilityTimeout,
+          })
+          .send();
+      }, 1000 * (config.queue.visibilityTimeout - 1));
 
       // processMessage should return a boolean status indicating success or failure
       const status = await processMessage(params);
