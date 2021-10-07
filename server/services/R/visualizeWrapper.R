@@ -750,11 +750,11 @@ pcaWithPublic <- function(args, dataArgs) {
   s3load(paste0(dataArgs$s3Data, 'Signature/signature_refsets.RData'), dataArgs$bucket)
   s3load(paste0(dataArgs$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), dataArgs$bucket)
 
-  pca1 = paste0(dataArgs$savePath, 'pca1_with_public_.svg')
-  pca2 = paste0(dataArgs$savePath, 'pca2_with_public_.svg')
-  pca3 = paste0(dataArgs$savePath, 'pca3_with_public_.svg')
-  pca2Data = paste0(dataArgs$savePath, 'pca2_data_with_public_.txt')
-  pca3Data = paste0(dataArgs$savePath, 'pca3_data_with_public_.txt')
+  pca1 = paste0(dataArgs$savePath, 'pca1_with_public.svg')
+  pca2 = paste0(dataArgs$savePath, 'pca2_with_public.svg')
+  pca3 = paste0(dataArgs$savePath, 'pca3_with_public.svg')
+  pca2Data = paste0(dataArgs$savePath, 'pca2_data_with_public.txt')
+  pca3Data = paste0(dataArgs$savePath, 'pca3_data_with_public.txt')
 
 
   data_input1 <- read_delim(paste0(dataArgs$savePath, '../../', args$matrixFile), delim = '\t')
