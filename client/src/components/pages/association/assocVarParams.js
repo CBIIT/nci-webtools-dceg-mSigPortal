@@ -122,7 +122,7 @@ export default function AssocVarParams({
             onChange={(e) => mergeState({ source: e })}
           />
         </Col>
-        <Col md="auto" lg="3" xl="2">
+        <Col md="auto">
           <Select
             disabled={loadingData || loadingParams || loadingCalculate}
             id="type"
@@ -132,7 +132,7 @@ export default function AssocVarParams({
             onChange={(e) => mergeState({ type: e })}
           />
         </Col>
-        <Col md="auto" lg="3" xl="2">
+        <Col md="auto">
           <Select
             disabled={loadingData || loadingParams || loadingCalculate}
             id="assocVariable"
@@ -142,7 +142,7 @@ export default function AssocVarParams({
             onChange={(e) => mergeState({ tmpName: e })}
           />
         </Col>
-        <Col lg="auto">
+        <Col md="auto">
           <fieldset className="border rounded p-2">
             <legend className="font-weight-bold">Variable Filtering</legend>
             <Row>
