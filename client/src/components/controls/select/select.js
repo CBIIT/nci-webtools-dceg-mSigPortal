@@ -29,6 +29,11 @@ export default function Select({
         transform,
         ...otherStyles
       }) => ({ ...otherStyles }),
+      menu: (base) => ({
+        ...base,
+        width: 'max-content',
+        minWidth: '100%',
+      }),
     },
     menuPortalTarget: document.body,
     getOptionLabel: (option) =>
