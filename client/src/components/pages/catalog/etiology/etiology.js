@@ -630,6 +630,7 @@ export default function Etiology() {
                     className="p-3 border rounded mb-3"
                     height={'500px'}
                     plotPath={profileURL}
+                    cacheBreaker={false}
                   />
 
                   {info.Description_strandbias && (
@@ -640,6 +641,7 @@ export default function Etiology() {
                       className="p-3 border rounded mb-3"
                       height={'500px'}
                       plotPath={strandbiasURL}
+                      cacheBreaker={false}
                     />
                   )}
 

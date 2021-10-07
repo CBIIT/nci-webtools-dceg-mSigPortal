@@ -16,6 +16,7 @@ export default function Plot({
   alt,
   height,
   className,
+  cacheBreaker = true,
   ...rest
 }) {
   const dispatch = useDispatch();
@@ -55,9 +56,11 @@ export default function Plot({
     zoomOut: { step: 5 },
   };
 
-  // fetch image to refresh cached image
+  // fetch image to refresh cached image in chromium browsers
   // need to do this becuase plotpaths are always the same for recalculations
-  fetch(plotPath, { cache: 'reload', mode: 'no-cors' });
+  try {
+    fetch(plotPath, { cache: 'reload', mode: 'no-cors' });
+  } catch (_) {}
 
   return (
     <div
@@ -128,7 +131,9 @@ export default function Plot({
             <TransformComponent>
               <img
                 className="w-100"
-                src={plotPath}
+                src={
+                  plotPath + (cacheBreaker ? `#${new Date().getTime()}` : '')
+                }
                 style={{ maxHeight: height || '500px' }}
                 alt={alt || 'Plot Unavailable'}
               />
