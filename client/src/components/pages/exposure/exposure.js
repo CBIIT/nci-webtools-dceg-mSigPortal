@@ -80,22 +80,14 @@ export default function Exposure({ match }) {
   } = exposureStore.exposureState;
 
   const { loading: loadingMsBurden, ...burdenArgs } = exposureStore.msBurden;
-  const {
-    loading: loadingMsAssociation,
-    ...associationArgs
-  } = exposureStore.msAssociation;
-  const {
-    loading: loadingMsLandscape,
-    ...landscapeArgs
-  } = exposureStore.msLandscape;
-  const {
-    loading: loadingMsPrevalence,
-    ...prevalenceArgs
-  } = exposureStore.msPrevalence;
-  const {
-    loading: loadingMsIndividual,
-    ...individualArgs
-  } = exposureStore.msIndividual;
+  const { loading: loadingMsAssociation, ...associationArgs } =
+    exposureStore.msAssociation;
+  const { loading: loadingMsLandscape, ...landscapeArgs } =
+    exposureStore.msLandscape;
+  const { loading: loadingMsPrevalence, ...prevalenceArgs } =
+    exposureStore.msPrevalence;
+  const { loading: loadingMsIndividual, ...individualArgs } =
+    exposureStore.msIndividual;
 
   // load example if available
   useEffect(() => {

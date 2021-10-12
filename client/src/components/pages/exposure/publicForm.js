@@ -57,15 +57,12 @@ export default function PublicForm({
 
   async function populateControls() {
     try {
-      let [
-        exposureCancer,
-        exposureSignature,
-        signatureNames,
-      ] = await Promise.all([
-        getJSON('Others/json/Exploring-Exposure-cancertype.json'),
-        getJSON('Others/json/Exploring-Exposure.json'),
-        getJSON('Others/json/Signature_name.json'),
-      ]);
+      let [exposureCancer, exposureSignature, signatureNames] =
+        await Promise.all([
+          getJSON('Others/json/Exploring-Exposure-cancertype.json'),
+          getJSON('Others/json/Exploring-Exposure.json'),
+          getJSON('Others/json/Signature_name.json'),
+        ]);
 
       populateExposureExp(exposureCancer, exposureSignature, signatureNames);
     } catch (err) {

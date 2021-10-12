@@ -39,7 +39,11 @@ export default function Association() {
       component: <Instructions loading={loadingData} />,
     },
     { name: 'Univariable', id: 'univariable', component: <Univariable /> },
-    { name: 'Multivariable', id: 'multivariable', component: <Multivariable /> },
+    {
+      name: 'Multivariable',
+      id: 'multivariable',
+      component: <Multivariable />,
+    },
   ];
 
   return (

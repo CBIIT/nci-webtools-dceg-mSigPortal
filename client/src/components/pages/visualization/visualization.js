@@ -105,12 +105,8 @@ export default function Visualization({ match }) {
     });
 
     if (response.ok) {
-      const {
-        svgList,
-        statistics,
-        matrixList,
-        downloads,
-      } = await response.json();
+      const { svgList, statistics, matrixList, downloads } =
+        await response.json();
       mergeState({
         svgList: svgList,
         statistics: statistics,

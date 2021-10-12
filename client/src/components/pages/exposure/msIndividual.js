@@ -15,12 +15,8 @@ export default function MSIndividual({ calculateIndividual }) {
   const dispatch = useDispatch();
   const exposure = useSelector((state) => state.exposure);
   const { sample, plotPath, debugR, err, loading } = exposure.msIndividual;
-  const {
-    projectID,
-    publicSampleOptions,
-    userSampleOptions,
-    source,
-  } = exposure.exposureState;
+  const { projectID, publicSampleOptions, userSampleOptions, source } =
+    exposure.exposureState;
 
   const mergeMsIndividual = (state) =>
     dispatch(actions.mergeExposure({ msIndividual: state }));

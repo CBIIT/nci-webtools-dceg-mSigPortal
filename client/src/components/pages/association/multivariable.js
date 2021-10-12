@@ -146,7 +146,11 @@ export default function Multivariable() {
       dataPath: '',
     });
     try {
-      const { projectID: id, stdout, output } = await (
+      const {
+        projectID: id,
+        stdout,
+        output,
+      } = await (
         await fetch(`api/associationWrapper`, {
           method: 'POST',
           headers: {

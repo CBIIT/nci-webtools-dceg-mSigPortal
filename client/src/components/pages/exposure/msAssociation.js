@@ -23,12 +23,8 @@ export default function MsAssociation({ calculateAssociation }) {
     err,
     loading,
   } = exposure.msAssociation;
-  const {
-    projectID,
-    signatureNameOptions,
-    userNameOptions,
-    source,
-  } = exposure.exposureState;
+  const { projectID, signatureNameOptions, userNameOptions, source } =
+    exposure.exposureState;
 
   const mergeMsAssociation = (state) =>
     dispatch(actions.mergeExposure({ msAssociation: state }));
