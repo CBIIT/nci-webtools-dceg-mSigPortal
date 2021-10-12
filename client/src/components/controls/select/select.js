@@ -36,20 +36,24 @@ export default function Select({
       }),
     },
     menuPortalTarget: document.body,
-    getOptionLabel: (option) =>
-      option.label || (option == 'NA' ? 'N/A' : option),
-    getOptionValue: (option) => option.value || option,
+    getOptionLabel: ({ label }) => (label == 'NA' ? 'N/A' : label),
     filterOption: createFilter({ ignoreAccents: false }),
   };
+
+  // parse array of strings into array of option objects
+  const optionsObject =
+    typeof options[0] != 'object'
+      ? options.map((v) => ({ value: v, label: v }))
+      : options;
 
   return (
     <Group controlId={id} className={className}>
       {label && <Label className={labelClass}>{label}</Label>}
       <ReactSelect
         inputId={id}
-        options={options}
-        value={[value] || [options[0]]}
-        onChange={onChange}
+        options={optionsObject}
+        value={optionsObject.filter((option) => option.value === value)}
+        onChange={(option) => onChange(option.value)}
         isDisabled={disabled}
         {...props}
         {...rest}

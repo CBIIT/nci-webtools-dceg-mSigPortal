@@ -51,9 +51,8 @@ export default function Plot({
   }
 
   const zoomProps = {
-    wheel: { wheelEnabled: false, step: 5 },
-    zoomIn: { step: 5 },
-    zoomOut: { step: 5 },
+    pinch: { step: 0.1 },
+    wheel: { step: 0.1 },
   };
 
   // fetch image to refresh cached image in chromium browsers
@@ -99,7 +98,7 @@ export default function Plot({
                   size="sm"
                   className="ml-3"
                   variant="secondary"
-                  onClick={zoomIn}
+                  onClick={() => zoomIn(0.2)}
                   aria-label="zoom in"
                 >
                   <FontAwesomeIcon icon={faPlus} style={{ color: '#fafafa' }} />
@@ -108,7 +107,7 @@ export default function Plot({
                   size="sm"
                   className="ml-1"
                   variant="secondary"
-                  onClick={zoomOut}
+                  onClick={() => zoomOut(0.2)}
                   aria-label="zoom out"
                 >
                   <FontAwesomeIcon
@@ -120,7 +119,7 @@ export default function Plot({
                   size="sm"
                   className="ml-1"
                   variant="secondary"
-                  onClick={resetTransform}
+                  onClick={() => resetTransform()}
                   aria-label="reset zoom"
                 >
                   <FontAwesomeIcon icon={faHome} style={{ color: '#fafafa' }} />
