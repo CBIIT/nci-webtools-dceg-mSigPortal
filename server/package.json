@@ -13,24 +13,24 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.869.0",
+    "aws-sdk": "^2.1006.0",
     "compression": "^1.7.4",
     "express": "^4.17.1",
     "formidable": "^1.2.2",
-    "fs-extra": "^9.0.1",
-    "glob": "^7.1.7",
-    "nodemailer": "^6.4.16",
-    "papaparse": "^5.2.0",
+    "fs-extra": "^10.0.0",
+    "glob": "^7.2.0",
+    "nodemailer": "^6.7.0",
+    "papaparse": "^5.3.1",
     "promisify-child-process": "^4.1.1",
-    "r-wrapper": "^1.1.0",
-    "replace-in-file": "^6.1.0",
-    "tar": "^6.1.2",
-    "uuid": "^8.2.0",
-    "winston": "^3.2.1",
-    "winston-daily-rotate-file": "^4.4.2",
-    "xlsx": "^0.17.0"
+    "r-wrapper": "^1.1.2",
+    "replace-in-file": "^6.2.0",
+    "tar": "^6.1.11",
+    "uuid": "^8.3.2",
+    "winston": "^3.3.3",
+    "winston-daily-rotate-file": "^4.5.5",
+    "xlsx": "^0.17.2"
   },
   "devDependencies": {
-    "prettier": "^2.0.5"
+    "prettier": "^2.4.1"
   }
 }
