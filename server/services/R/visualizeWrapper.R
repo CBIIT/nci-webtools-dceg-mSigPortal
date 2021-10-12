@@ -798,10 +798,10 @@ pcaWithPublic <- function(args, dataArgs) {
     res.pca$x %>% as.data.frame() %>% rownames_to_column(var = 'Sample') %>% write_delim(pca2Data, delim = '\t', col_names = T)
 
     pcap3 <- fviz_pca_var(res.pca, axes = c(1, 2),
-                        col.var = "contrib", # Color by contributions to the PC
-                        gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
-                        repel = FALSE # Avoid text overlapping
-  )
+      col.var = "contrib", # Color by contributions to the PC
+      gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+      repel = FALSE # Avoid text overlapping
+    )
     ggsave(filename = pca3, plot = pcap3, width = 10, height = 7)
 
     # a link to download pca data2
