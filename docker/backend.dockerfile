@@ -20,6 +20,7 @@ RUN dnf -y update \
     nodejs \
     R \
     python3-pip \
+    python3-devel \
     libcurl-devel \
     libxml2-devel \
     git \
