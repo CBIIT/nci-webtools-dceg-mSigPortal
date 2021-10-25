@@ -41,10 +41,12 @@ export default function Select({
   };
 
   // parse array of strings into array of option objects
-  const optionsObject =
-    typeof options[0] != 'object'
+  // non array args return an empty array
+  const optionsObject = Array.isArray(options)
+    ? typeof options[0] != 'object'
       ? options.map((v) => ({ value: v, label: v }))
-      : options;
+      : options
+    : [];
 
   return (
     <Group controlId={id} className={className}>

@@ -48,7 +48,6 @@ export default function AssocVarParams({
         ...new Set(assocVarData.map((row) => row.data_source)),
       ];
       const source = sourceOptions[0];
-      console.log(source, sourceOptions);
 
       mergeState({ source, sourceOptions });
     }

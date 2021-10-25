@@ -123,11 +123,11 @@ export default function Univariable() {
       mergeState({
         associationVar: {
           name: associationVar.tmpName,
-          collapseOptions: collapseVar1 || [],
+          collapseOptions: Array.isArray(collapseVar1) ? collapseVar1 : [],
         },
         exposureVar: {
           name: expVarList[0],
-          collapseOptions: collapseVar2 || [],
+          collapseOptions: Array.isArray(collapseVar2) ? collapseVar2 : [],
         },
       });
     } catch (error) {
