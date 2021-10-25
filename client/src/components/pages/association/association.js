@@ -8,7 +8,7 @@ import {
 import Instructions from '../association/instructions';
 import Univariable from './univariable';
 import Multivariable from './multivariable';
-import UserForm from './userForm';
+// import UserForm from './userForm';
 import PublicForm from './publicForm';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/association';
@@ -114,7 +114,7 @@ export default function Association() {
       >
         <SidebarPanel>
           <div className="p-3 bg-white border rounded">
-            <Row>
+            {/* <Row>
               <Col lg="auto">
                 <Group>
                   <Label className="mr-4">Data Source</Label>
@@ -144,7 +144,7 @@ export default function Association() {
                   </Check>
                 </Group>
               </Col>
-            </Row>
+            </Row> */}
             <Row>
               <Col lg="auto" className="w-100">
                 {source == 'public' ? <PublicForm /> : <></>}
