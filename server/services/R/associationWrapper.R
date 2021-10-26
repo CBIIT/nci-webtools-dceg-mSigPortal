@@ -140,11 +140,11 @@ univariable <- function(args, dataArgs) {
   exposure_refdata_selected <- exposure_refdata %>% filter(Signature_set_name == args$rsSet, Cancer_Type == args$cancer)
 
   exposure_refdata_selected <- exposure_refdata_selected %>%
-        select(Sample, Signature_name, Signature_exposure = Exposure) %>%
-        group_by(Sample) %>%
-        mutate(Signature_exposure_ratio = Signature_exposure / sum(Signature_exposure), Signature_exposure_cat = if_else(Signature_exposure > 100, "Observed", "Not_observed")) %>%
-        ungroup() %>%
-        mutate(Signature_exposure_cat = factor(Signature_exposure_cat, level = c("Not_observed", "Observed")))
+    select(Sample, Signature_name, Signature_exposure = Exposure) %>%
+    group_by(Sample) %>%
+    mutate(Signature_exposure_ratio = Signature_exposure / sum(Signature_exposure), Signature_exposure_cat = if_else(Signature_exposure > 100, "Observed", "Not_observed")) %>%
+    ungroup() %>%
+    mutate(Signature_exposure_cat = factor(Signature_exposure_cat, level = c("Not_observed", "Observed")))
 
   vardata_refdata_selected <- vardata_refdata %>% filter(Cancer_Type == args$cancer)
 
@@ -157,7 +157,7 @@ univariable <- function(args, dataArgs) {
   exposure_refdata_selected <- exposure_refdata_selected %>% select(Sample, Signature_name, args$exposureVar$name)
 
   vardata_refdata_selected <- vardata_refdata_selected %>%
-    filter(data_source == (args$associationVar[['source']]), data_type == args$associationVar$type, variable_name == args$associationVar$name)
+    filter(data_source == (args$associationVar$source), data_type == args$associationVar$type, variable_name == args$associationVar$name)
 
   if (unique(vardata_refdata_selected$variable_value_type) == "numeric") { vardata_refdata_selected$variable_value <- as.numeric(vardata_refdata_selected$variable_value) }
 
@@ -212,6 +212,102 @@ univariable <- function(args, dataArgs) {
   data_input %>% write_delim(file = dataPath, delim = '\t', col_names = T, na = '')
 
   return(list(plotPath = plotPath, dataPath = dataPath, assocTablePath = assocTablePath, dataTable = assocTable, signatureOptions = signature_name_list))
+}
+
+loadCollapseMulti <- function(args, dataArgs) {
+  require(broom)
+  source('services/R/Sigvisualfunc.R')
+  setwd(dataArgs$wd)
+  # parse into array of objects
+  associationVars = split(args$associationVars, 1:nrow(args$associationVars))
+
+  # load exposure data files
+  exposure_data_file <- paste0(dataArgs$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
+  association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_vardata.RData')
+  s3load(exposure_data_file, dataArgs$bucket)
+  s3load(association_data_file, dataArgs$bucket)
+
+  exposure_refdata_selected <- exposure_refdata %>% filter(Signature_set_name == args$rsSet, Cancer_Type == args$cancer)
+
+  exposure_refdata_selected <- exposure_refdata_selected %>%
+    select(Sample, Signature_name, Signature_exposure = Exposure) %>%
+    group_by(Sample) %>%
+    mutate(Signature_exposure_ratio = Signature_exposure / sum(Signature_exposure), Signature_exposure_cat = if_else(Signature_exposure > 100, "Observed", "Not_observed")) %>%
+    ungroup() %>%
+    mutate(Signature_exposure_cat = factor(Signature_exposure_cat, level = c("Not_observed", "Observed")))
+
+  vardata_refdata_selected <- vardata_refdata %>% filter(Cancer_Type == args$cancer)
+
+  # overlapped samples
+  osamples <- intersect(unique(vardata_refdata_selected$Sample), unique(exposure_refdata_selected$Sample))
+
+  vardata_refdata_selected <- vardata_refdata_selected %>% filter(Sample %in% osamples)
+  exposure_refdata_selected <- exposure_refdata_selected %>% filter(Sample %in% osamples)
+
+  exposure_refdata_selected <- exposure_refdata_selected %>% select(Sample, Signature_name, args$exposureVar$name)
+
+  ### add more parameters according to user's input
+  vardata_refdata_selected <- multivariable_inputs(vardata_refdata_selected, associationVars)
+  data_input <- left_join(exposure_refdata_selected, vardata_refdata_selected) %>% select(-Sample)
+  return(list(collapse = levels(data_input)))
+}
+
+multivariable <- function(args, dataArgs) {
+  require(broom)
+  source('services/R/Sigvisualfunc.R')
+  setwd(dataArgs$wd)
+  plotPath = paste0(dataArgs$savePath, 'association_result.svg')
+  dataPath = paste0(dataArgs$savePath, 'asssociation_data.txt')
+  assocTablePath = paste0(dataArgs$savePath, 'asssociation_test.txt')
+  # parse into array of objects
+  associationVars = split(args$associationVars, 1:nrow(args$associationVars))
+
+  # load exposure data files
+  exposure_data_file <- paste0(dataArgs$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
+  association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_vardata.RData')
+  s3load(exposure_data_file, dataArgs$bucket)
+  s3load(association_data_file, dataArgs$bucket)
+
+  exposure_refdata_selected <- exposure_refdata %>% filter(Signature_set_name == args$rsSet, Cancer_Type == args$cancer)
+
+  exposure_refdata_selected <- exposure_refdata_selected %>%
+    select(Sample, Signature_name, Signature_exposure = Exposure) %>%
+    group_by(Sample) %>%
+    mutate(Signature_exposure_ratio = Signature_exposure / sum(Signature_exposure), Signature_exposure_cat = if_else(Signature_exposure > 100, "Observed", "Not_observed")) %>%
+    ungroup() %>%
+    mutate(Signature_exposure_cat = factor(Signature_exposure_cat, level = c("Not_observed", "Observed")))
+
+  vardata_refdata_selected <- vardata_refdata %>% filter(Cancer_Type == args$cancer)
+
+  # overlapped samples
+  osamples <- intersect(unique(vardata_refdata_selected$Sample), unique(exposure_refdata_selected$Sample))
+
+  vardata_refdata_selected <- vardata_refdata_selected %>% filter(Sample %in% osamples)
+  exposure_refdata_selected <- exposure_refdata_selected %>% filter(Sample %in% osamples)
+
+  exposure_refdata_selected <- exposure_refdata_selected %>% select(Sample, Signature_name, args$exposureVar$name)
+
+  ### add more parameters according to user's input
+  vardata_refdata_selected <- multivariable_inputs(vardata_refdata_selected, associationVars)
+  data_input <- left_join(exposure_refdata_selected, vardata_refdata_selected) %>% select(-Sample)
+
+  ## change variable name if detected special chacters ## 
+  colnames(data_input)[-c(1:2)] <- str_replace_all(str_replace(str_replace_all(colnames(data_input)[-c(1:2)], "[^[:alnum:]_ ]*", ""), "^[^[:alpha:]]*", ""), "  *", "_")
+
+  rformula = paste0(args$exposureVar$name, " ~ ", paste0(colnames(data_input)[-c(1:2)], collapse = ' + '))
+  ## regressionby group of signature name
+  result <- mSigPortal_associaiton_group(data = data_input, Group_Var = "Signature_name", type = "glm", regression = TRUE, formula = rformula)
+  result %>% write_delim(file = assocTablePath, delim = '\t', col_names = T, na = '')
+  # put result as a short table above the figure
+
+  signature_name_list <- unique(result[[1]]) ## drop-down list for the signature name
+  signature_name_input <- if_else(args$signature != '', args$signature, signature_name_list[1]) ## by default, select the first signature name
+  data_input <- data_input %>% filter(Signature_name == signature_name_input) %>% select(-Signature_name)
+
+  mSigPortal_associaiton(data = data_input, type = "glm", regression = TRUE, formula = rformula, output_plot = plotPath)
+  data_input %>% write_delim(file = dataPath, delim = '\t', col_names = T, na = '')
+
+  return(list(plotPath = plotPath, dataPath = dataPath, assocTablePath = assocTablePath, dataTable = result, signatureOptions = signature_name_list))
 }
 
 

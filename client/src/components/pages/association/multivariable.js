@@ -96,39 +96,46 @@ export default function Multivariable() {
   async function handleLoadParameters() {
     mergeState({ loadingParams: true, error: false });
     try {
-      const { stdout, output: collapseData } = await (
-        await fetch(`api/associationWrapper`, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            fn: 'loadCollapse',
-            args: {
-              study,
-              strategy,
-              rsSet,
-              cancer,
-              source: associationVars.source,
-              type: associationVars.type,
-              assocName: associationVars.tmpName,
-              expName: exposureVar.name,
-            },
-          }),
-        })
-      ).json();
+      // const { stdout, output: collapseData } = await (
+      //   await fetch(`api/associationWrapper`, {
+      //     method: 'POST',
+      //     headers: {
+      //       Accept: 'application/json',
+      //       'Content-Type': 'application/json',
+      //     },
+      //     body: JSON.stringify({
+      //       fn: 'loadCollapseMulti',
+      //       args: {
+      //         study,
+      //         strategy,
+      //         rsSet,
+      //         cancer,
+      //         expName: exposureVar.name,
+      //         associationVars: associationVars.map(
+      //           ({
+      //             sourceOptions,
+      //             typeOptions,
+      //             nameOptions,
+      //             tmpName,
+      //             collapseOptions,
+      //             ...params
+      //           }) => params
+      //         ),
+      //       },
+      //     }),
+      //   })
+      // ).json();
 
-      const { collapseVar1, collapseVar2 } = collapseData;
+      // const { collapseVar1, collapseVar2 } = collapseData;
 
       mergeState({
-        associationVars: {
-          name: associationVars.tmpName,
-          collapseOptions: collapseVar1 || [],
-        },
+        associationVars: associationVars.map((assocVar) => ({
+          ...assocVar,
+          name: assocVar.tmpName,
+        })),
         exposureVar: {
           name: expVarList[0],
-          collapseOptions: collapseVar2 || [],
+          // collapseOptions: collapseVar2 || [],
         },
       });
     } catch (error) {
@@ -169,17 +176,16 @@ export default function Multivariable() {
               signature,
               xlab: xlab || associationVars.name,
               ylab: ylab || exposureVar.name,
-              associationVars: (() => {
-                const {
+              associationVars: associationVars.map(
+                ({
                   sourceOptions,
                   typeOptions,
                   nameOptions,
                   tmpName,
                   collapseOptions,
                   ...params
-                } = associationVars;
-                return params;
-              })(),
+                }) => params
+              ),
               exposureVar: (() => {
                 const { nameOptions, ...params } = exposureVar;
                 return params;
@@ -229,7 +235,14 @@ export default function Multivariable() {
 
   function addParam() {
     let newParams = associationVars.slice();
-    newParams.push({});
+    newParams.push({
+      collapse: '',
+      filter: '',
+      log2: false,
+      name: '',
+      source: '',
+      type: '',
+    });
     mergeState({ associationVars: newParams });
   }
   function removeParam(index) {
@@ -279,12 +292,10 @@ export default function Multivariable() {
               newParams[index] = { ...newParams[index], ...e };
               mergeState({ associationVars: newParams });
             }}
-            handleLoadParameters={() => {}} //handleLoadParameters}
             remove={index != 0 ? () => removeParam(index) : false}
-            last={index == associationVars.length - 1}
           />
         ))}
-        <Row className="mt-3">
+        <Row className="mt-3 justify-content-between">
           <Col md="auto" className="d-flex">
             <Button
               className="ml-auto"
@@ -298,13 +309,23 @@ export default function Multivariable() {
               </span>
             </Button>
           </Col>
+          <Col md="auto" className="d-flex">
+            <Button
+              disabled={loadingData || loadingParams || loadingCalculate}
+              className="w-100 align-self-center"
+              variant="primary"
+              onClick={() => handleLoadParameters()}
+            >
+              Load Data
+            </Button>
+          </Col>
         </Row>
       </div>
       <div className="mb-3">
         <h5 className="separator">Parameters</h5>
-
         <LoadingOverlay active={loadingCalculate} />
-        {associationVars.name && exposureVar.name ? (
+        {associationVars.filter(({ name }) => name).length ==
+          associationVars.length && exposureVar.name ? (
           <>
             <p className="text-center">
               Select the following filtering and method for analysis
@@ -526,34 +547,6 @@ export default function Multivariable() {
                     options={signatureOptions}
                     onChange={(e) => mergeState({ signature: e })}
                   />
-                </Col>
-                <Col md="auto">
-                  <Group controlId="xlab">
-                    <Label>Variable Title</Label>
-                    <Control
-                      value={xlab}
-                      placeholder={associationVars.name}
-                      onChange={(e) => mergeState({ xlab: e.target.value })}
-                      isInvalid={false}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      Enter a valid label
-                    </Form.Control.Feedback>
-                  </Group>
-                </Col>
-                <Col md="auto">
-                  <Group controlId="ylab">
-                    <Label>Signature Exposure Title</Label>
-                    <Control
-                      value={ylab}
-                      placeholder={exposureVar.name}
-                      onChange={(e) => mergeState({ ylab: e.target.value })}
-                      isInvalid={false}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      Enter a valid label
-                    </Form.Control.Feedback>
-                  </Group>
                 </Col>
               </Row>
               <LoadingOverlay active={loadingRecalculate} />

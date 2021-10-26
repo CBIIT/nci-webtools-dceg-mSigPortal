@@ -20,7 +20,6 @@ export default function AssocVarParams({
   mergeState,
   handleLoadParameters,
   remove = false,
-  last = true,
 }) {
   const { loadingData, assocVarData } = useSelector(
     (state) => state.association.associationState
@@ -262,8 +261,8 @@ export default function AssocVarParams({
             </Row>
           </fieldset>
         </Col>
-        <Col md="auto" className="d-flex">
-          {last ? (
+        {handleLoadParameters && (
+          <Col md="auto" className="d-flex">
             <Button
               disabled={
                 loadingData || loadingParams || loadingCalculate || !source
@@ -274,10 +273,8 @@ export default function AssocVarParams({
             >
               Load Data
             </Button>
-          ) : (
-            <span style={{ width: '120px' }} />
-          )}
-        </Col>
+          </Col>
+        )}
       </Row>
     </div>
   );
