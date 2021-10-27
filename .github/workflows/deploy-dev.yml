@@ -1,9 +1,5 @@
 name: Deploy msigportal-dev
-on: 
-  push:
-    branches:
-    - msigportal/*-dev
-
+on: [push]
 jobs:
   Deploy:
     runs-on: ubuntu-latest
