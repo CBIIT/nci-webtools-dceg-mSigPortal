@@ -107,19 +107,33 @@ loadCollapse <- function(args, dataArgs) {
   exposure_refdata_selected <- exposure_refdata_selected %>% select(Sample, Signature_name, args$expName)
 
   vardata_refdata_selected <- vardata_refdata_selected %>%
-      filter(data_source == args$source, data_type == args$type, variable_name == args$assocName)
+    filter(data_source == args$source, data_type == args$type, variable_name == args$assocName)
 
   if (unique(vardata_refdata_selected$variable_value_type) == "numeric") { vardata_refdata_selected$variable_value <- as.numeric(vardata_refdata_selected$variable_value) }
 
   vardata_refdata_selected <- vardata_refdata_selected %>%
-      pivot_wider(id_cols = Sample, names_from = variable_name, values_from = variable_value)
+    pivot_wider(id_cols = Sample, names_from = variable_name, values_from = variable_value)
+
+  ## check data integration
+  vardata_refdata_selected <- exposure_refdata_selected %>% select(Sample) %>% unique() %>% left_join(vardata_refdata_selected)
+  ## including NA
+  if (length(unique(vardata_refdata_selected[[2]])) == 1) {
+    stop(paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " have only unique value: ", unique(vardata_refdata_selected[[2]]), '.'))
+  }
+  tmpdata <- vardata_refdata_selected
+  colnames(tmpdata)[2] <- 'Variable'
+  tmpvalue <- tmpdata %>% count(Variable) %>% filter(n < 2) %>% dim() %>% .[[1]]
+
+  if (tmpvalue != 0) {
+    stop(paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " have not enough obsevations for both levels."))
+  }
 
   ### combined dataset
   data_input <- left_join(vardata_refdata_selected, exposure_refdata_selected) %>% select(-Sample)
 
   ## dropdown list for collapse_var1 and collapse_var2
-  collapse_var1_list <- levels(data_input[[2]])
-  collapse_var2_list <- levels(data_input[[3]])
+  collapse_var1_list <- levels(data_input[[args$assocName]])
+  collapse_var2_list <- levels(data_input[[args$expName]])
 
   return(list(collapseVar1 = collapse_var1_list, collapseVar2 = collapse_var2_list))
 }
@@ -162,7 +176,7 @@ univariable <- function(args, dataArgs) {
   if (unique(vardata_refdata_selected$variable_value_type) == "numeric") { vardata_refdata_selected$variable_value <- as.numeric(vardata_refdata_selected$variable_value) }
 
   vardata_refdata_selected <- vardata_refdata_selected %>%
-      pivot_wider(id_cols = Sample, names_from = variable_name, values_from = variable_value)
+    pivot_wider(id_cols = Sample, names_from = variable_name, values_from = variable_value)
 
   tryCatch({
     ## check data integration
@@ -216,6 +230,7 @@ univariable <- function(args, dataArgs) {
 
 loadCollapseMulti <- function(args, dataArgs) {
   require(broom)
+  require(purrr)
   source('services/R/Sigvisualfunc.R')
   setwd(dataArgs$wd)
   # parse into array of objects
@@ -249,7 +264,10 @@ loadCollapseMulti <- function(args, dataArgs) {
   ### add more parameters according to user's input
   vardata_refdata_selected <- multivariable_inputs(vardata_refdata_selected, associationVars)
   data_input <- left_join(exposure_refdata_selected, vardata_refdata_selected) %>% select(-Sample)
-  return(list(collapse = levels(data_input)))
+
+  collapseOptions = map(associationVars, function(assocVar) levels(data_input[[assocVar$name]]))
+
+  return(collapseOptions)
 }
 
 multivariable <- function(args, dataArgs) {
@@ -291,23 +309,23 @@ multivariable <- function(args, dataArgs) {
   vardata_refdata_selected <- multivariable_inputs(vardata_refdata_selected, associationVars)
   data_input <- left_join(exposure_refdata_selected, vardata_refdata_selected) %>% select(-Sample)
 
-  ## change variable name if detected special chacters ## 
+  ## change variable name if detected special chacters ##
   colnames(data_input)[-c(1:2)] <- str_replace_all(str_replace(str_replace_all(colnames(data_input)[-c(1:2)], "[^[:alnum:]_ ]*", ""), "^[^[:alpha:]]*", ""), "  *", "_")
 
   rformula = paste0(args$exposureVar$name, " ~ ", paste0(colnames(data_input)[-c(1:2)], collapse = ' + '))
   ## regressionby group of signature name
-  result <- mSigPortal_associaiton_group(data = data_input, Group_Var = "Signature_name", type = "glm", regression = TRUE, formula = rformula)
-  result %>% write_delim(file = assocTablePath, delim = '\t', col_names = T, na = '')
+  assocTable <- mSigPortal_associaiton_group(data = data_input, Group_Var = "Signature_name", type = "glm", regression = TRUE, formula = rformula)
+  assocTable %>% write_delim(file = assocTablePath, delim = '\t', col_names = T, na = '')
   # put result as a short table above the figure
 
-  signature_name_list <- unique(result[[1]]) ## drop-down list for the signature name
+  signature_name_list <- unique(assocTable[[1]]) ## drop-down list for the signature name
   signature_name_input <- if_else(args$signature != '', args$signature, signature_name_list[1]) ## by default, select the first signature name
   data_input <- data_input %>% filter(Signature_name == signature_name_input) %>% select(-Signature_name)
 
   mSigPortal_associaiton(data = data_input, type = "glm", regression = TRUE, formula = rformula, output_plot = plotPath)
   data_input %>% write_delim(file = dataPath, delim = '\t', col_names = T, na = '')
 
-  return(list(plotPath = plotPath, dataPath = dataPath, assocTablePath = assocTablePath, dataTable = result, signatureOptions = signature_name_list))
+  return(list(plotPath = plotPath, dataPath = dataPath, assocTablePath = assocTablePath, dataTable = assocTable, signatureOptions = signature_name_list))
 }
 
 

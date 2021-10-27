@@ -86,7 +86,7 @@ export const getInitialState = () => ({
     assocTablePath: '',
     signature: '',
     signatureOptions: [],
-    testType: 'nonparametric',
+    testType: 'lm',
     xlab: '',
     ylab: '',
     associationVars: [

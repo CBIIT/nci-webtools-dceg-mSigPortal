@@ -96,47 +96,45 @@ export default function Multivariable() {
   async function handleLoadParameters() {
     mergeState({ loadingParams: true, error: false });
     try {
-      // const { stdout, output: collapseData } = await (
-      //   await fetch(`api/associationWrapper`, {
-      //     method: 'POST',
-      //     headers: {
-      //       Accept: 'application/json',
-      //       'Content-Type': 'application/json',
-      //     },
-      //     body: JSON.stringify({
-      //       fn: 'loadCollapseMulti',
-      //       args: {
-      //         study,
-      //         strategy,
-      //         rsSet,
-      //         cancer,
-      //         expName: exposureVar.name,
-      //         associationVars: associationVars.map(
-      //           ({
-      //             sourceOptions,
-      //             typeOptions,
-      //             nameOptions,
-      //             tmpName,
-      //             collapseOptions,
-      //             ...params
-      //           }) => params
-      //         ),
-      //       },
-      //     }),
-      //   })
-      // ).json();
-
-      // const { collapseVar1, collapseVar2 } = collapseData;
+      const { stdout, output: collapseData } = await (
+        await fetch(`api/associationWrapper`, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            fn: 'loadCollapseMulti',
+            args: {
+              study,
+              strategy,
+              rsSet,
+              cancer,
+              expName: exposureVar.name,
+              associationVars: associationVars.map(
+                ({
+                  sourceOptions,
+                  typeOptions,
+                  nameOptions,
+                  tmpName,
+                  collapseOptions,
+                  ...params
+                }) => params
+              ),
+            },
+          }),
+        })
+      ).json();
 
       mergeState({
-        associationVars: associationVars.map((assocVar) => ({
+        associationVars: associationVars.map((assocVar, i) => ({
           ...assocVar,
           name: assocVar.tmpName,
+          collapseOptions: Array.isArray(collapseData[i + 1])
+            ? collapseData[i + 1]
+            : [],
         })),
-        exposureVar: {
-          name: expVarList[0],
-          // collapseOptions: collapseVar2 || [],
-        },
+        exposureVar: { name: expVarList[0] },
       });
     } catch (error) {
       mergeError(error);
@@ -473,7 +471,7 @@ export default function Multivariable() {
                     id="testType"
                     label=""
                     value={testType}
-                    options={['nonparametric', 'parametric']}
+                    options={['lm', 'glm']}
                     onChange={(e) => mergeState({ testType: e })}
                   />
                 </fieldset>

@@ -92,24 +92,7 @@ export default function AssocVarParams({
 
   return (
     <div>
-      <Row className="justify-content-center mt-3">
-        <Col md="auto" className="d-flex">
-          {remove ? (
-            <Button
-              className="text-danger mb-3"
-              variant="link"
-              onClick={remove}
-              title="Add Plot"
-              style={{ textDecoration: 'none' }}
-            >
-              <span className="text-nowrap" title="Remove Variable">
-                <FontAwesomeIcon icon={faMinus} /> Remove
-              </span>
-            </Button>
-          ) : (
-            <span style={{ width: '101.867px' }} />
-          )}
-        </Col>
+      <Row className="justify-content-center mt-3 border rounded p-2">
         <Col md="auto">
           <Select
             disabled={loadingData || loadingParams || loadingCalculate}
@@ -140,6 +123,7 @@ export default function AssocVarParams({
             onChange={(e) => mergeState({ tmpName: e })}
           />
         </Col>
+
         <Col md="auto">
           <fieldset className="border rounded p-2">
             <legend className="font-weight-bold">Variable Filtering</legend>
@@ -260,6 +244,23 @@ export default function AssocVarParams({
               </Col>
             </Row>
           </fieldset>
+        </Col>
+        <Col md="auto" className="d-flex">
+          {remove ? (
+            <Button
+              className="text-danger mb-3 mr-auto"
+              variant="link"
+              onClick={remove}
+              title="Add Plot"
+              style={{ textDecoration: 'none' }}
+            >
+              <span className="text-nowrap" title="Remove Variable">
+                <FontAwesomeIcon icon={faMinus} /> Remove
+              </span>
+            </Button>
+          ) : (
+            <span style={{ width: '101.867px' }} />
+          )}
         </Col>
         {handleLoadParameters && (
           <Col md="auto" className="d-flex">
