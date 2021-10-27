@@ -1,0 +1,15 @@
+name: Deploy msigportal-dev
+on: 
+  push:
+    branches:
+    - msigportal/*-dev
+
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: List files in the repository
+        run: ls ${{ github.workspace }}
