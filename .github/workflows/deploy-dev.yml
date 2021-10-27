@@ -1,5 +1,9 @@
 name: Deploy msigportal-dev
-on: [push]
+on: 
+  push:
+    branches:
+      - *-dev
+
 jobs:
   Deploy:
     runs-on: ubuntu-latest
@@ -9,3 +13,4 @@ jobs:
 
       - name: List files in the repository
         run: ls ${{ github.workspace }}
+
