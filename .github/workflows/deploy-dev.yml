@@ -14,3 +14,12 @@ jobs:
       - name: List files in the repository
         run: ls ${{ github.workspace }}
 
+      - name: Build backend image
+        run: |
+          DOCKER_BUILDKIT=1
+          MSIGPORTAL_BACKEND_IMAGE=msigportal-backend
+
+          docker build \
+            -t $MSIGPORTAL_BACKEND_IMAGE \
+            -f docker/backend.dockerfile
+            .
