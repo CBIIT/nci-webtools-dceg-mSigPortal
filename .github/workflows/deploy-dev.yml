@@ -5,7 +5,32 @@ on:
       - '*-dev'
   workflow_dispatch:
 
+env:
+  DOCKER_BUILDKIT: 1
+  ECR_REPOSITORY: msigportal
+  IMAGE_TAG: backend-${{ github.branch }}
+
 jobs:
+  CodeQL:
+    runs-on: self-hosted
+    container: node:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: List files in the repository
+        run: ls ${{ github.workspace }}
+
+      # Initializes the CodeQL tools for scanning.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v1.0.20
+        with:
+          languages: 'javascript'
+          queries: security-and-quality
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
+
   Deploy:
     environment: Dev Deployment
     runs-on: self-hosted
@@ -16,16 +41,6 @@ jobs:
       - name: List files in the repository
         run: ls ${{ github.workspace }}
         
-      # Initializes the CodeQL tools for scanning.
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v1
-        with:
-          languages: 'javascript'
-          queries: security-and-quality
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v1
-
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
