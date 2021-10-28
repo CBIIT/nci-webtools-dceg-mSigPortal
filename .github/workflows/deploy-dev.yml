@@ -4,18 +4,18 @@ on:
     branches:
       - '*-dev'
   workflow_dispatch:
-    
 
 jobs:
   Deploy:
-    runs-on: ubuntu-latest
+    environment: Dev Deployment
+    runs-on: self-hosted
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
 
       - name: List files in the repository
         run: ls ${{ github.workspace }}
-
+        
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v1
@@ -25,13 +25,3 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
-
-      - name: Build backend image
-        run: |
-          DOCKER_BUILDKIT=1
-          MSIGPORTAL_BACKEND_IMAGE=msigportal-backend
-
-          docker build \
-            -t $MSIGPORTAL_BACKEND_IMAGE \
-            -f docker/backend.dockerfile \
-            .
