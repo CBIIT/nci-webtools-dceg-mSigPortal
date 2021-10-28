@@ -12,7 +12,7 @@ env:
 
 jobs:
   CodeQL:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     container: node:latest
     steps:
       - name: Check out repository
