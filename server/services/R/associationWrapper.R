@@ -81,6 +81,7 @@ getExpVarData <- function(args, dataArgs) {
 
 
 loadCollapse <- function(args, dataArgs) {
+  source('services/R/Sigvisualfunc.R')
   # load exposure data files
   exposure_data_file <- paste0(dataArgs$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
   association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_vardata.RData')
@@ -130,12 +131,13 @@ loadCollapse <- function(args, dataArgs) {
 
   ### combined dataset
   data_input <- left_join(vardata_refdata_selected, exposure_refdata_selected) %>% select(-Sample)
+  data_input <- validate_vardf(data_input)
 
   ## dropdown list for collapse_var1 and collapse_var2
   collapse_var1_list <- levels(data_input[[args$assocName]])
-  collapse_var2_list <- levels(data_input[[args$expName]])
+  # collapse_var2_list <- unique(data_input[[args$expName]])
 
-  return(list(collapseVar1 = collapse_var1_list, collapseVar2 = collapse_var2_list))
+  return(list(collapseVar1 = collapse_var1_list)) #, collapseVar2 = collapse_var2_list))
 }
 
 univariable <- function(args, dataArgs) {
@@ -264,6 +266,7 @@ loadCollapseMulti <- function(args, dataArgs) {
   ### add more parameters according to user's input
   vardata_refdata_selected <- multivariable_inputs(vardata_refdata_selected, associationVars)
   data_input <- left_join(exposure_refdata_selected, vardata_refdata_selected) %>% select(-Sample)
+  data_input <- validate_vardf(data_input)
 
   collapseOptions = map(associationVars, function(assocVar) levels(data_input[[assocVar$name]]))
 
