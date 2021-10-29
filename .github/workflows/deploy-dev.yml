@@ -35,6 +35,8 @@ jobs:
       DOCKER_BUILDKIT: 1
       BACKEND_IMAGE_TAG: backend-${{ github.sha }}
       BACKEND_IMAGE_TAG_LATEST: backend-latest
+      FRONTEND_IMAGE_TAG: frontend-${{ github.sha }}
+      FRONTEND_IMAGE_TAG_LATEST: frontend-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -66,3 +68,17 @@ jobs:
           docker push ${{ env.IMAGE_NAME }}:${{ env.BACKEND_IMAGE_TAG }}
           docker push ${{ env.IMAGE_NAME }}:${{ env.BACKEND_IMAGE_TAG_LATEST }}
           
+      - name: Build/Push Frontend Image
+        env:
+          IMAGE_NAME: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}'
+        run: |
+          docker build \
+            -t ${{ env.IMAGE_NAME }}:${{ env.FRONTEND_IMAGE_TAG }} \
+            -t ${{ env.IMAGE_NAME }}:${{ env.FRONTEND_IMAGE_TAG_LATEST }} \
+            --cache-from ${{ env.IMAGE_NAME }}:${{ env.FRONTEND_IMAGE_TAG_LATEST }} \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
+            -f docker/frontend.dockerfile \
+            ${{ github.workspace }}
+          
+          docker push ${{ env.IMAGE_NAME }}:${{ env.FRONTEND_IMAGE_TAG }}
+          docker push ${{ env.IMAGE_NAME }}:${{ env.FRONTEND_IMAGE_TAG_LATEST }}
