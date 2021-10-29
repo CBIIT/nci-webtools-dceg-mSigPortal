@@ -951,7 +951,7 @@ export default function Etiology() {
     return (
       <div>
         <div className="mb-3">
-          <h5 className="separator">Etiologies</h5>
+          <h5 className="separator">Tissue Types</h5>
           {getCancerEtiology()}
         </div>
         <div className="mb-3">
