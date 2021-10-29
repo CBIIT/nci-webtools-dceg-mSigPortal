@@ -4,6 +4,7 @@
     {
       "name": "msigportal-queue",
       "image": "",
+      "memoryReservation": "",
       "command": [
         "/usr/bin/npm",
         "run",

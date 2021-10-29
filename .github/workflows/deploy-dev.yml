@@ -92,6 +92,8 @@ jobs:
         env:
           containerDefinitions.0.image: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ env.FRONTEND_IMAGE_TAG }}
           containerDefinitions.1.image: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ env.BACKEND_IMAGE_TAG }}
+          containerDefinitions.0.memoryReservation: 0.5GB
+          containerDefinitions.1.memoryReservation: 6GB
           containerDefinitions.0.mountPoints.0.containerPath: ${{ secrets.CONTAINER_APACHE_LOGS_PATH }}
           containerDefinitions.1.mountPoints.0.containerPath: ${{ secrets.CONTAINER_LOGS_PATH }}
           containerDefinitions.1.mountPoints.1.containerPath: ${{ secrets.CONTAINER_TMP_PATH }}
@@ -109,6 +111,7 @@ jobs:
           files: ${{ env.ECS_QUEUE_TASK_DEFINITION_FILE }}
         env:
           containerDefinitions.0.image: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ env.BACKEND_IMAGE_TAG }}
+          containerDefinitions.0.memoryReservation: 6GB
           containerDefinitions.0.mountPoints.0.containerPath: ${{ secrets.CONTAINER_LOGS_PATH }}
           containerDefinitions.0.mountPoints.1.containerPath: ${{ secrets.CONTAINER_TMP_PATH }}
           containerDefinitions.0.mountPoints.2.containerPath: ${{ secrets.CONTAINER_DATA_PATH }}
