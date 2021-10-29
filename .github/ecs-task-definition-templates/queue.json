@@ -1,0 +1,62 @@
+{
+  "family": "msigportal-queue",
+  "containerDefinitions": [
+    {
+      "name": "msigportal-queue",
+      "image": "",
+      "command": [
+        "/usr/bin/npm",
+        "run",
+        "start-queue-worker"
+      ],
+      "mountPoints": [
+        {
+          "readOnly": null,
+          "containerPath": "",
+          "sourceVolume": "logs"
+        },
+        {
+          "readOnly": null,
+          "containerPath": "",
+          "sourceVolume": "tmp"
+        },
+        {
+          "readOnly": null,
+          "containerPath": "",
+          "sourceVolume": "data"
+        },
+        {
+          "readOnly": true,
+          "containerPath": "",
+          "sourceVolume": "config"
+        }
+      ]
+    }
+  ],
+  "volumes": [
+    {
+      "name": "logs",
+      "host": {
+        "sourcePath": ""
+      }
+    },
+    {
+      "name": "tmp",
+      "host": {
+        "sourcePath": ""
+      }
+    },
+    {
+      "name": "data",
+      "host": {
+        "sourcePath": ""
+      }
+    },
+    {
+      "name": "config",
+      "host": {
+        "sourcePath": ""
+      }
+    }
+  ]
+}

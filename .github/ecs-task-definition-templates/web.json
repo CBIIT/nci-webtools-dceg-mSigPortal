@@ -1,0 +1,84 @@
+{
+  "family": "msigportal-web",
+  "containerDefinitions": [
+    {
+      "name": "msigportal-frontend",
+      "image": "",
+      "portMappings": [
+        {
+          "hostPort": 0,
+          "protocol": "tcp",
+          "containerPort": 80
+        }
+      ],
+      "links": [
+        "msigportal-backend"
+      ],
+      "mountPoints": [
+        {
+          "readOnly": null,
+          "containerPath": "",
+          "sourceVolume": "apache_logs"
+        }
+      ]
+    },
+    {
+      "name": "msigportal-backend",
+      "image": "",
+      "mountPoints": [
+        {
+          "readOnly": null,
+          "containerPath": "",
+          "sourceVolume": "logs"
+        },
+        {
+          "readOnly": null,
+          "containerPath": "",
+          "sourceVolume": "tmp"
+        },
+        {
+          "readOnly": null,
+          "containerPath": "",
+          "sourceVolume": "data"
+        },
+        {
+          "readOnly": true,
+          "containerPath": "",
+          "sourceVolume": "config"
+        }
+      ]
+    }
+  ],
+  "volumes": [
+    {
+      "name": "apache_logs",
+      "host": {
+        "sourcePath": ""
+      }
+    },
+    {
+      "name": "logs",
+      "host": {
+        "sourcePath": ""
+      }
+    },
+    {
+      "name": "tmp",
+      "host": {
+        "sourcePath": ""
+      }
+    },
+    {
+      "name": "data",
+      "host": {
+        "sourcePath": ""
+      }
+    },
+    {
+      "name": "config",
+      "host": {
+        "sourcePath": ""
+      }
+    }
+  ]
+}
