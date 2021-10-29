@@ -33,7 +33,7 @@ jobs:
     runs-on: self-hosted
     env:
       DOCKER_BUILDKIT: 1
-      BACKEND_IMAGE_TAG: backend-{{ github.sha }}
+      BACKEND_IMAGE_TAG: backend-${{ github.sha }}
       BACKEND_IMAGE_TAG_LATEST: backend-latest
     steps:
       - name: Check out repository
