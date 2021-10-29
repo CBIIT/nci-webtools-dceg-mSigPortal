@@ -715,6 +715,8 @@ async function downloadSession(req, res, next) {
   const { state, id } = req.body;
   const session = path.resolve(config.results.folder, id);
 
+  logger.info(`Session folder: ${session}`);
+
   if (fs.existsSync(session)) {
     try {
       await fs.promises.writeFile(
