@@ -18,8 +18,7 @@ jobs:
       - name: List files in the repository
         run: ls ${{ github.workspace }}
 
-      # Initializes the CodeQL tools for scanning.
-      - name: Initialize CodeQL
+      - name: Initialize the CodeQL tools for scanning
         uses: github/codeql-action/init@v1.0.20
         with:
           languages: 'javascript'
@@ -55,7 +54,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
       
-      - name: Build/Push Backend Image
+      - name: Build and push backend image to ECR
         env:
           IMAGE_NAME: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}'
         run: |
@@ -70,7 +69,7 @@ jobs:
           docker push ${{ env.IMAGE_NAME }}:${{ env.BACKEND_IMAGE_TAG }}
           docker push ${{ env.IMAGE_NAME }}:${{ env.BACKEND_IMAGE_TAG_LATEST }}
           
-      - name: Build/Push Frontend Image
+      - name: Build and push frontend image to ECR
         env:
           IMAGE_NAME: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}'
         run: |
