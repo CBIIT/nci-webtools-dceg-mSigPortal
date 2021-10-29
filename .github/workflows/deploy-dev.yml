@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - '*-dev'
+      - master
+  pull_request:
+    branches:
+      - master      
   workflow_dispatch:
 
 jobs:
@@ -130,6 +134,7 @@ jobs:
   Deploy:
     environment: Dev Deployment
     runs-on: self-hosted
+    if: github.event_name != 'pull_request'
     needs: ['CodeQL', 'BuildFrontend', 'BuildBackend']
     env:
       DOCKER_BUILDKIT: 1
