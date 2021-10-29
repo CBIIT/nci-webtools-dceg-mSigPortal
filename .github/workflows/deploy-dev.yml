@@ -76,14 +76,16 @@ jobs:
           docker push ${{ env.IMAGE_NAME }}:${{ env.FRONTEND_IMAGE_TAG_LATEST }}
 
       - name: Scan backend image
-        uses: azure/container-scan@v0
+        uses: ClarusONE/container-scan@fdaa94a52f6b4eb553a4c6a232a25df442a1a0a1
         with:
           image-name: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ env.BACKEND_IMAGE_TAG }}
+          timeout: 30
 
       - name: Scan frontend image
-        uses: azure/container-scan@v0
+        uses: ClarusONE/container-scan@fdaa94a52f6b4eb553a4c6a232a25df442a1a0a1
         with:
           image-name: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ env.FRONTEND_IMAGE_TAG }}
+          timeout: 30
 
       - name: Configure web task definition file
         uses: microsoft/variable-substitution@v1
