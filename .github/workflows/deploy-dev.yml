@@ -5,11 +5,6 @@ on:
       - '*-dev'
   workflow_dispatch:
 
-env:
-  DOCKER_BUILDKIT: 1
-  ECR_REPOSITORY: msigportal
-  IMAGE_TAG: backend-${{ github.branch }}
-
 jobs:
   CodeQL:
     runs-on: ubuntu-latest
@@ -36,6 +31,10 @@ jobs:
   Deploy:
     environment: Dev Deployment
     runs-on: self-hosted
+    env:
+      DOCKER_BUILDKIT: 1
+      BACKEND_IMAGE_TAG: backend-{{ github.sha }}
+      BACKEND_IMAGE_TAG_LATEST: backend-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -51,3 +50,19 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
+      
+      - name: Build/Push Backend Image
+        env:
+          IMAGE_NAME: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}'
+        run: |
+          docker build \
+            -t $IMAGE_NAME:$BACKEND_IMAGE_TAG \
+            -t $IMAGE_NAME:$BACKEND_IMAGE_TAG_LATEST \
+            --cache-from $IMAGE_NAME:$BACKEND_IMAGE_TAG_LATEST \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
+            -f docker/backend.dockerfile \
+            ${{ github.workspace }}
+          
+          docker push $IMAGE_NAME:$BACKEND_IMAGE_TAG
+          docker push $IMAGE_NAME:$BACKEND_IMAGE_TAG_LATEST
+          
