@@ -79,23 +79,37 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ env.BACKEND_IMAGE_TAG }}'
-          format: 'table'
+          format: 'template'
+          template: '@/contrib/sarif.tpl'
           exit-code: '0'
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
           timeout: '30m'
+          output: 'trivy-results-backend.sarif'
+
+      - name: Upload Backend Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: 'trivy-results-backend.sarif'
 
       - name: Scan frontend image
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ env.FRONTEND_IMAGE_TAG }}'
-          format: 'table'
+          format: 'template'
+          template: '@/contrib/sarif.tpl'
           exit-code: '0'
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
           timeout: '30m'
+          output: 'trivy-results-frontend.sarif'
+
+      - name: Upload Frontend Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: 'trivy-results-frontend.sarif'
 
       - name: Configure web task definition file
         uses: microsoft/variable-substitution@v1
