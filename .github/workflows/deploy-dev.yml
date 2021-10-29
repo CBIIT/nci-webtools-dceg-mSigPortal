@@ -76,16 +76,26 @@ jobs:
           docker push ${{ env.IMAGE_NAME }}:${{ env.FRONTEND_IMAGE_TAG_LATEST }}
 
       - name: Scan backend image
-        uses: ClarusONE/container-scan@fdaa94a52f6b4eb553a4c6a232a25df442a1a0a1
+        uses: aquasecurity/trivy-action@master
         with:
-          image-name: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ env.BACKEND_IMAGE_TAG }}
-          timeout: 30
+          image-ref: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ env.BACKEND_IMAGE_TAG }}'
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+          timeout: '30m'
 
       - name: Scan frontend image
-        uses: ClarusONE/container-scan@fdaa94a52f6b4eb553a4c6a232a25df442a1a0a1
+        uses: aquasecurity/trivy-action@master
         with:
-          image-name: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ env.FRONTEND_IMAGE_TAG }}
-          timeout: 30
+          image-ref: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ env.FRONTEND_IMAGE_TAG }}'
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+          timeout: '30m'
 
       - name: Configure web task definition file
         uses: microsoft/variable-substitution@v1
