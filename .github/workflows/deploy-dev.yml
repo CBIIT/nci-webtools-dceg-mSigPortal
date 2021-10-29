@@ -37,6 +37,8 @@ jobs:
       BACKEND_IMAGE_TAG_LATEST: backend-latest
       FRONTEND_IMAGE_TAG: frontend-${{ github.sha }}
       FRONTEND_IMAGE_TAG_LATEST: frontend-latest
+      ECS_WEB_TASK_DEFINITION_FILE: ${{ github.workspace }}/.github/ecs-task-definition-templates/web.json
+      ECS_QUEUE_TASK_DEFINITION_FILE: ${{ github.workspace }}/.github/ecs-task-definition-templates/queue.json
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -82,3 +84,53 @@ jobs:
           
           docker push ${{ env.IMAGE_NAME }}:${{ env.FRONTEND_IMAGE_TAG }}
           docker push ${{ env.IMAGE_NAME }}:${{ env.FRONTEND_IMAGE_TAG_LATEST }}
+
+      - name: Configure web task definition file
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: ${{ env.ECS_WEB_TASK_DEFINITION_FILE }}
+        env:
+          containerDefinitions.0.image: ${{ env.FRONTEND_IMAGE }}
+          containerDefinitions.1.image: ${{ env.BACKEND_IMAGE }}
+          containerDefinitions.0.mountPoints.0.containerPath: ${{ secrets.CONTAINER_APACHE_LOGS_PATH }}
+          containerDefinitions.1.mountPoints.0.containerPath: ${{ secrets.CONTAINER_LOGS_PATH }}
+          containerDefinitions.1.mountPoints.1.containerPath: ${{ secrets.CONTAINER_TMP_PATH }}
+          containerDefinitions.1.mountPoints.2.containerPath: ${{ secrets.CONTAINER_DATA_PATH }}
+          containerDefinitions.1.mountPoints.3.containerPath: ${{ secrets.CONTAINER_CONFIG_PATH }}
+          volumes.0.host.sourcePath: ${{ secrets.HOST_APACHE_LOGS_PATH }}
+          volumes.1.host.sourcePath: ${{ secrets.HOST_LOGS_PATH }}
+          volumes.2.host.sourcePath: ${{ secrets.HOST_TMP_PATH }}
+          volumes.3.host.sourcePath: ${{ secrets.HOST_DATA_PATH }}
+          volumes.4.host.sourcePath: ${{ secrets.HOST_CONFIG_PATH }}
+
+      - name: Configure queue task definition file
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: ${{ env.ECS_QUEUE_TASK_DEFINITION_FILE }}
+        env:
+          containerDefinitions.0.image: ${{ env.BACKEND_IMAGE }}
+          containerDefinitions.0.mountPoints.0.containerPath: ${{ secrets.CONTAINER_LOGS_PATH }}
+          containerDefinitions.0.mountPoints.1.containerPath: ${{ secrets.CONTAINER_TMP_PATH }}
+          containerDefinitions.0.mountPoints.2.containerPath: ${{ secrets.CONTAINER_DATA_PATH }}
+          containerDefinitions.0.mountPoints.3.containerPath: ${{ secrets.CONTAINER_CONFIG_PATH }}
+          volumes.0.host.sourcePath: ${{ secrets.HOST_LOGS_PATH }}
+          volumes.1.host.sourcePath: ${{ secrets.HOST_TMP_PATH }}
+          volumes.2.host.sourcePath: ${{ secrets.HOST_DATA_PATH }}
+          volumes.3.host.sourcePath: ${{ secrets.HOST_CONFIG_PATH }}
+
+      - name: Deploy web service
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_WEB_TASK_DEFINITION_FILE }}
+          service: dev-msigportal-web
+          cluster: ${{ secrets.ECS_CLUSTER }}
+          force-new-deployment: true
+
+      - name: Deploy queue service
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_QUEUE_TASK_DEFINITION_FILE }}
+          service: dev-msigportal-queue
+          cluster: ${{ secrets.ECS_CLUSTER }}
+          force-new-deployment: true
+
