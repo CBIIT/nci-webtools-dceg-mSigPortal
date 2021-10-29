@@ -531,7 +531,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
         <Nav variant="tabs">
           <Item>
             <Link eventKey="within" as="button" className="outline-none">
-              <strong>PCA Within Samples</strong>
+              <strong>PCA Between Samples</strong>
             </Link>
           </Item>
           {source == 'user' && (
