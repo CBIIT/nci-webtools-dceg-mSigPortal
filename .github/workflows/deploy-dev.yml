@@ -13,7 +13,6 @@ env:
 jobs:
   CodeQL:
     runs-on: ubuntu-latest
-    container: node:latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
