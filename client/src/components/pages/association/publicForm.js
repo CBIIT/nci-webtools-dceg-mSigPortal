@@ -77,7 +77,7 @@ export default function PublicForm() {
             .map((data) => data.Cancer_Type)
         ),
       ];
-      const cancer = 'Lung-AdenoCA'; // default
+      const cancer = 'Panc-AdenoCA'; // default
 
       mergeState({
         exposureSignature,

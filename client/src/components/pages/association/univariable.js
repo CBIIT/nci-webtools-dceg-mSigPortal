@@ -417,7 +417,13 @@ export default function Univariable() {
                     id="testType"
                     label=""
                     value={testType}
-                    options={['nonparametric', 'parametric']}
+                    options={[
+                      'nonparametric',
+                      'parametric',
+                      'robust',
+                      'bayes',
+                      'skit',
+                    ]}
                     onChange={(e) => mergeState({ testType: e })}
                   />
                 </fieldset>

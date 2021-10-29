@@ -20,7 +20,6 @@ export default function AssocVarParams({
   mergeState,
   handleLoadParameters,
   remove = false,
-  last = true,
 }) {
   const { loadingData, assocVarData } = useSelector(
     (state) => state.association.associationState
@@ -93,24 +92,7 @@ export default function AssocVarParams({
 
   return (
     <div>
-      <Row className="justify-content-center mt-3">
-        <Col md="auto" className="d-flex">
-          {remove ? (
-            <Button
-              className="text-danger mb-3"
-              variant="link"
-              onClick={remove}
-              title="Add Plot"
-              style={{ textDecoration: 'none' }}
-            >
-              <span className="text-nowrap" title="Remove Variable">
-                <FontAwesomeIcon icon={faMinus} /> Remove
-              </span>
-            </Button>
-          ) : (
-            <span style={{ width: '101.867px' }} />
-          )}
-        </Col>
+      <Row className="justify-content-center mt-3 border rounded p-2">
         <Col md="auto">
           <Select
             disabled={loadingData || loadingParams || loadingCalculate}
@@ -141,6 +123,7 @@ export default function AssocVarParams({
             onChange={(e) => mergeState({ tmpName: e })}
           />
         </Col>
+
         <Col md="auto">
           <fieldset className="border rounded p-2">
             <legend className="font-weight-bold">Variable Filtering</legend>
@@ -263,7 +246,24 @@ export default function AssocVarParams({
           </fieldset>
         </Col>
         <Col md="auto" className="d-flex">
-          {last ? (
+          {remove ? (
+            <Button
+              className="text-danger mb-3 mr-auto"
+              variant="link"
+              onClick={remove}
+              title="Add Plot"
+              style={{ textDecoration: 'none' }}
+            >
+              <span className="text-nowrap" title="Remove Variable">
+                <FontAwesomeIcon icon={faMinus} /> Remove
+              </span>
+            </Button>
+          ) : (
+            <span style={{ width: '101.867px' }} />
+          )}
+        </Col>
+        {handleLoadParameters && (
+          <Col md="auto" className="d-flex">
             <Button
               disabled={
                 loadingData || loadingParams || loadingCalculate || !source
@@ -274,10 +274,8 @@ export default function AssocVarParams({
             >
               Load Data
             </Button>
-          ) : (
-            <span style={{ width: '120px' }} />
-          )}
-        </Col>
+          </Col>
+        )}
       </Row>
     </div>
   );
