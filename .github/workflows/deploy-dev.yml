@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - '*-dev'
+      - master
+  pull_request:
+    branches:
+      - master      
   workflow_dispatch:
 
 jobs:
@@ -21,17 +25,13 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
 
-  Deploy:
+  BuildBackend:
     environment: Dev Deployment
     runs-on: self-hosted
     env:
       DOCKER_BUILDKIT: 1
       BACKEND_IMAGE_TAG: backend-${{ github.sha }}
       BACKEND_IMAGE_TAG_LATEST: backend-latest
-      FRONTEND_IMAGE_TAG: frontend-${{ github.sha }}
-      FRONTEND_IMAGE_TAG_LATEST: frontend-latest
-      ECS_WEB_TASK_DEFINITION_FILE: ${{ github.workspace }}/.github/ecs-task-definition-templates/web.json
-      ECS_QUEUE_TASK_DEFINITION_FILE: ${{ github.workspace }}/.github/ecs-task-definition-templates/queue.json
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -60,6 +60,44 @@ jobs:
           docker push ${{ env.IMAGE_NAME }}:${{ env.BACKEND_IMAGE_TAG }}
           docker push ${{ env.IMAGE_NAME }}:${{ env.BACKEND_IMAGE_TAG_LATEST }}
           
+      - name: Scan backend image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ env.BACKEND_IMAGE_TAG }}'
+          format: 'template'
+          template: '@/contrib/sarif.tpl'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+          timeout: '30m'
+          output: 'trivy-results-backend.sarif'
+
+      - name: Upload Backend Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: 'trivy-results-backend.sarif'
+
+  BuildFrontend:
+    environment: Dev Deployment
+    runs-on: self-hosted
+    env:
+      DOCKER_BUILDKIT: 1
+      FRONTEND_IMAGE_TAG: frontend-${{ github.sha }}
+      FRONTEND_IMAGE_TAG_LATEST: frontend-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      
       - name: Build and push frontend image to ECR
         env:
           IMAGE_NAME: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}'
@@ -75,6 +113,48 @@ jobs:
           docker push ${{ env.IMAGE_NAME }}:${{ env.FRONTEND_IMAGE_TAG }}
           docker push ${{ env.IMAGE_NAME }}:${{ env.FRONTEND_IMAGE_TAG_LATEST }}
 
+      - name: Scan frontend image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ env.FRONTEND_IMAGE_TAG }}'
+          format: 'template'
+          template: '@/contrib/sarif.tpl'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+          timeout: '30m'
+          output: 'trivy-results-frontend.sarif'
+
+      - name: Upload Frontend Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: 'trivy-results-frontend.sarif'
+
+  Deploy:
+    environment: Dev Deployment
+    runs-on: self-hosted
+    if: github.event_name != 'pull_request'
+    needs: ['CodeQL', 'BuildFrontend', 'BuildBackend']
+    env:
+      DOCKER_BUILDKIT: 1
+      BACKEND_IMAGE_TAG: backend-${{ github.sha }}
+      FRONTEND_IMAGE_TAG: frontend-${{ github.sha }}
+      ECS_WEB_TASK_DEFINITION_FILE: ${{ github.workspace }}/.github/ecs-task-definition-templates/web.json
+      ECS_QUEUE_TASK_DEFINITION_FILE: ${{ github.workspace }}/.github/ecs-task-definition-templates/queue.json
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
       - name: Configure web task definition file
         uses: microsoft/variable-substitution@v1
         with:
@@ -82,8 +162,8 @@ jobs:
         env:
           containerDefinitions.0.image: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ env.FRONTEND_IMAGE_TAG }}
           containerDefinitions.1.image: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ env.BACKEND_IMAGE_TAG }}
-          containerDefinitions.0.memoryReservation: 500
-          containerDefinitions.1.memoryReservation: 6000
+          containerDefinitions.0.memoryReservation: 200
+          containerDefinitions.1.memoryReservation: 2000
           containerDefinitions.0.mountPoints.0.containerPath: ${{ secrets.CONTAINER_APACHE_LOGS_PATH }}
           containerDefinitions.1.mountPoints.0.containerPath: ${{ secrets.CONTAINER_LOGS_PATH }}
           containerDefinitions.1.mountPoints.1.containerPath: ${{ secrets.CONTAINER_TMP_PATH }}
@@ -101,7 +181,7 @@ jobs:
           files: ${{ env.ECS_QUEUE_TASK_DEFINITION_FILE }}
         env:
           containerDefinitions.0.image: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ env.BACKEND_IMAGE_TAG }}
-          containerDefinitions.0.memoryReservation: 6000
+          containerDefinitions.0.memoryReservation: 2000
           containerDefinitions.0.mountPoints.0.containerPath: ${{ secrets.CONTAINER_LOGS_PATH }}
           containerDefinitions.0.mountPoints.1.containerPath: ${{ secrets.CONTAINER_TMP_PATH }}
           containerDefinitions.0.mountPoints.2.containerPath: ${{ secrets.CONTAINER_DATA_PATH }}
