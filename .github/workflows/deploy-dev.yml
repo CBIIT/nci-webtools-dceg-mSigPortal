@@ -56,13 +56,13 @@ jobs:
           IMAGE_NAME: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}'
         run: |
           docker build \
-            -t $IMAGE_NAME:$BACKEND_IMAGE_TAG \
-            -t $IMAGE_NAME:$BACKEND_IMAGE_TAG_LATEST \
-            --cache-from $IMAGE_NAME:$BACKEND_IMAGE_TAG_LATEST \
+            -t ${{ env.IMAGE_NAME }}:${{ env.BACKEND_IMAGE_TAG }} \
+            -t ${{ env.IMAGE_NAME }}:${{ env.BACKEND_IMAGE_TAG_LATEST }} \
+            --cache-from ${{ env.IMAGE_NAME }}:${{ env.BACKEND_IMAGE_TAG_LATEST }} \
             --build-arg BUILDKIT_INLINE_CACHE=1 \
             -f docker/backend.dockerfile \
             ${{ github.workspace }}
           
-          docker push $IMAGE_NAME:$BACKEND_IMAGE_TAG
-          docker push $IMAGE_NAME:$BACKEND_IMAGE_TAG_LATEST
+          docker push ${{ env.IMAGE_NAME }}:${{ env.BACKEND_IMAGE_TAG }}
+          docker push ${{ env.IMAGE_NAME }}:${{ env.BACKEND_IMAGE_TAG_LATEST }}
           
