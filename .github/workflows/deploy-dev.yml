@@ -12,12 +12,6 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
 
-      - name: List environmental variables
-        run: env
-
-      - name: List files in the repository
-        run: ls ${{ github.workspace }}
-
       - name: Initialize the CodeQL tools for scanning
         uses: github/codeql-action/init@v1.0.20
         with:
@@ -41,9 +35,6 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
-
-      - name: List files in the repository
-        run: ls ${{ github.workspace }}
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
