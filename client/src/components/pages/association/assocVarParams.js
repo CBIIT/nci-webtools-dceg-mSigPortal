@@ -40,6 +40,22 @@ export default function AssocVarParams({
     collapseOptions = [],
   } = paramState;
 
+  const getTypeOptions = (source) => [
+    ...new Set(
+      assocVarData
+        .filter((row) => row.data_source == source)
+        .map((row) => row.data_type)
+    ),
+  ];
+
+  const getNameOptions = (source, type) => [
+    ...new Set(
+      assocVarData
+        .filter((row) => row.data_source == source && row.data_type == type)
+        .map((row) => row.variable_name)
+    ),
+  ];
+
   // populate controls
   useEffect(() => {
     if (assocVarData.length && !source) {
@@ -47,41 +63,42 @@ export default function AssocVarParams({
         ...new Set(assocVarData.map((row) => row.data_source)),
       ];
       const source = sourceOptions[0];
+      const typeOptions = getTypeOptions(source);
+      const type = typeOptions[0];
+      const nameOptions = getNameOptions(source, type);
 
-      mergeState({ source, sourceOptions });
+      mergeState({
+        source,
+        sourceOptions,
+        type,
+        typeOptions,
+        nameOptions,
+        tmpName: nameOptions[0],
+      });
     }
   }, [assocVarData]);
 
-  // filter dropdown options on change
-  useEffect(() => {
-    if (source) handleSource();
-  }, [source]);
-  useEffect(() => {
-    if (type) handleType();
-  }, [type]);
+  function handleSource(source) {
+    const typeOptions = getTypeOptions(source);
+    const nameOptions = getNameOptions(source, typeOptions[0]);
 
-  function handleSource() {
-    const typeOptions = [
-      ...new Set(
-        assocVarData
-          .filter((row) => row.data_source == source)
-          .map((row) => row.data_type)
-      ),
-    ];
-
-    mergeState({ type: typeOptions[0], typeOptions });
+    mergeState({
+      source,
+      type: typeOptions[0],
+      typeOptions,
+      tmpName: nameOptions[0],
+      nameOptions,
+    });
   }
 
-  function handleType() {
-    const nameOptions = [
-      ...new Set(
-        assocVarData
-          .filter((row) => row.data_type == type)
-          .map((row) => row.variable_name)
-      ),
-    ];
+  function handleType(type) {
+    const nameOptions = getNameOptions(source, type);
 
-    mergeState({ tmpName: nameOptions[0], nameOptions });
+    mergeState({
+      type,
+      tmpName: nameOptions[0],
+      nameOptions,
+    });
   }
 
   const popoverInfo = (text) => (
@@ -91,8 +108,8 @@ export default function AssocVarParams({
   );
 
   return (
-    <div>
-      <Row className="justify-content-center mt-3 border rounded p-2">
+    <div style={{ maxWidth: '1500' }}>
+      <Row className="mt-3 border rounded p-2">
         <Col md="auto">
           <Select
             disabled={loadingData || loadingParams || loadingCalculate}
@@ -100,7 +117,7 @@ export default function AssocVarParams({
             label="Variable Source"
             value={source}
             options={sourceOptions}
-            onChange={(e) => mergeState({ source: e })}
+            onChange={(e) => handleSource(e)}
           />
         </Col>
         <Col md="auto">
@@ -110,7 +127,7 @@ export default function AssocVarParams({
             label="Data Type"
             value={type}
             options={typeOptions}
-            onChange={(e) => mergeState({ type: e })}
+            onChange={(e) => handleType(e)}
           />
         </Col>
         <Col md="auto">
