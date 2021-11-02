@@ -134,7 +134,7 @@ export default function AssocVarParams({
           <Select
             disabled={loadingData || loadingParams || loadingCalculate}
             id="assocVariable"
-            label="Variant Name"
+            label="Variable Name"
             value={tmpName}
             options={nameOptions}
             onChange={(e) => mergeState({ tmpName: e })}
