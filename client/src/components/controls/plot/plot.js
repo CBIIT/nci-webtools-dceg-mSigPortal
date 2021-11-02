@@ -63,9 +63,9 @@ export default function Plot({
 
   return (
     <div
-      className={`${className}`}
+      className={`${className} mx-auto`}
       title="Ctrl + Mouse Wheel to zoom"
-      style={{ width: 'auto', height: '100%' }}
+      style={{ width: 'auto', height: '100%', maxWidth: '1500px' }}
     >
       <LoadingOverlay active={loading} />
       <TransformWrapper {...zoomProps}>
