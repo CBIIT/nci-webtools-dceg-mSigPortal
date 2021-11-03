@@ -709,8 +709,8 @@ async function getFileS3(req, res, next) {
     .pipe(res);
 }
 
-async function downloadSession(req, res, next) {
-  logger.info(`/visualization/downloadSession`);
+async function downloadWorkspace(req, res, next) {
+  logger.info(`/visualization/downloadWorkspace`);
 
   const { state, id } = req.body;
   const session = path.resolve(config.results.folder, id);
@@ -754,6 +754,6 @@ module.exports = {
   getImageS3,
   getFileS3,
   getRelativePath,
-  downloadSession,
+  downloadWorkspace,
   associationWrapper,
 };
