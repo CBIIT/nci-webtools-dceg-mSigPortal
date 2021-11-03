@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
+import Description from '../../controls/description/description';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { actions as exposureActions } from '../../../services/store/exposure';
 import Plot from '../../controls/plot/plot';
@@ -23,20 +24,10 @@ export default function MsPrevalence({ calculatePrevalence }) {
     <div>
       <div className="p-3">
         <b>Prevalence of Mutational Signature </b>
-        <p>
-          This page allows you to analyze the prevalence of signatures from the
-          selected Study and Reference Signature Set by both sample and
-          mutation. For prevalence by samples, Input the “Minimal Number of
-          Mutations Assigned to Each Signature” to set the smallest number of
-          mutations assigned to each signature within sample, which can have to
-          be included in the result.
-        </p>
-        <p className="m-0">
-          The pie chart on the left illustrates the prevalence of each
-          mutational signature by mutations. The bar plot on the right
-          illustrates the prevalence of each mutational signature by samples.
-          The colors represent each of the mutational signatures in both plots.
-        </p>
+        <Description
+          less="The following plot indicates both mutation and sample level prevalence of signatures from the selected Study."
+          more="For prevalence by samples, input the [Minimal Number of Mutations Assigned to Each Signature] to set the smallest number of mutations assigned to each signature to be considered detection of this mutational signature in each sample."
+        />
       </div>
       <hr />
       <Form noValidate className="p-3">
@@ -97,6 +88,13 @@ export default function MsPrevalence({ calculatePrevalence }) {
               downloadName={plotPath.split('/').slice(-1)[0]}
               plotPath={`api/results/${plotPath}`}
             />
+            <p className="p-3">
+              The pie chart on the left illustrates the prevalence of each
+              mutational signature by mutations. The bar plot on the right
+              illustrates the prevalence of each mutational signature by
+              samples. The colors represent each of the mutational signatures in
+              both plots.
+            </p>
           </>
         )}
       </div>

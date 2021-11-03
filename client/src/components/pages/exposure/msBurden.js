@@ -1,12 +1,12 @@
 import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
+import Description from '../../controls/description/description';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { actions as exposureActions } from '../../../services/store/exposure';
 import { actions as modalActions } from '../../../services/store/modal';
 import Plot from '../../controls/plot/plot';
 import Select from '../../controls/select/select';
-import Debug from '../../controls/debug/debug';
 
 const actions = { ...exposureActions, ...modalActions };
 
@@ -25,17 +25,10 @@ export default function MsBurden({ calculateBurden }) {
     <div>
       <div className="p-3">
         <b>Mutational Signature Burden Across Cancer Types</b>
-        <p className="m-0">
-          The bar plot below illustrates the level of mutational signature
-          burden across different cancer types with regard to a specific
-          signature. The signature selected is one from the Reference Signature
-          Set selected in the left panel. Across the top of the plot are the
-          cancer types. On the y-axis is the number of mutations per Megabase
-          (log10), and the x-axis denotes sample numbers. The green number is
-          the number of samples with the cancer type (across the top of the
-          plot), and the blue number is the number of samples in that cancer
-          type that detected the signature selected.
-        </p>
+        <Description
+          less="The bar plot below illustrates mutational signature burden across different cancer types with regard to a specific selected signature."
+          more="On the y-axis is the number of mutations per Mb (log10) assigned to selected signatures, and the x-axis denotes sample numbers. The green number is the number of samples for each cancer type, and the blue number is the number of samples in that cancer type that detected the selected signature."
+        />
       </div>
       <hr />
       <Form className="p-3">

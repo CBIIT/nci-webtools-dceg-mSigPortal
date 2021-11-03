@@ -4,6 +4,7 @@ import Plot from '../../controls/plot/plot';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
+import Description from '../../controls/description/description';
 
 const actions = { ...visualizationActions, ...modalActions };
 export default function ProfilerSummary({ submitR }) {
@@ -83,17 +84,11 @@ export default function ProfilerSummary({ submitR }) {
     <div className="bg-white border rounded">
       <div className="p-3">
         <b>Number of Mutations Per Sample with Regard to Mutational Profile</b>
-        <p>
-          This plot illustrates the number of mutations in each tumor sample
-          {source == 'public' &&
-            ` from Cancer Type: ${cancerType} in selected Study: ${study}`}
-          . On the y-axis is the number of mutations in log base 10, and on the
-          x-axis is the sample index for each sample of the selected cancer type
-          (sorted by number of mutations). The legend depicts the different
-          colored lines used on the plot to denote different mutational profiles
-          (SBS= single-base substitution, DBS= doublet-base substitution,
-          ID=indel).
-        </p>
+        <Description
+          className="m-0"
+          less="This plot illustrates the number of mutations in each tumor sample from [Cancer Type] in the selected [Study]."
+          more="On the y-axis is the number of mutations in log base 10 scale, and on the x-axis is the sample index for each sample of the selected cancer type (sorted by number of mutations in ascending order). The different colored lines represent different mutational profiles (SBS= single-base substitution, DBS= doublet-base substitution, ID=indel)."
+        />
       </div>
       <hr />
       <div style={{ minHeight: '500px' }}>

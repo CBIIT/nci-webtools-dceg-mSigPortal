@@ -3,10 +3,12 @@ import { Form, Row, Col, Button, Tab, Nav } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Select from '../../controls/select/select';
+import Description from '../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
 import { defaultMatrix } from '../../../services/utils';
+import { NavHashLink } from 'react-router-hash-link';
 
 const actions = { ...visualizationActions, ...modalActions };
 
@@ -230,25 +232,6 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
       key: 'within',
       component: (
         <div>
-          <div className="p-3">
-            <p>
-              Cosine similarity is a measure of the similarity of two matrix,
-              which can be helpful to compare two mutational profiles or
-              signatures. Below you can observe cosine similarity within sample
-              profiles (CS Between Samples), cosine similarity between sample
-              profiles and reference signatures (CS to Reference Signatures), or
-              if using your own data, cosine similarity between profiles from
-              your input data and profiles from public data (CS to Public Data).
-              Simply use the dropdown menus to select a “Profile Type”, and the
-              “Matrix Size”, Reference Signature Set”, or “Study”, depending on
-              the calculation being made.
-            </p>
-            <p>
-              Click <a href="#faq">here</a> to learn more about cosine
-              similarity.
-            </p>
-          </div>
-          <hr />
           <Form className="p-3">
             <LoadingOverlay active={withinSubmitOverlay} />
             <Row>
@@ -319,12 +302,21 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
               </p>
             )}
             {withinPlotPath && (
-              <Plot
-                className="p-3"
-                downloadName={withinPlotPath.split('/').slice(-1)[0]}
-                plotPath={'api/results/' + withinPlotPath}
-                txtPath={`api/results/${withinTxtPath}`}
-              />
+              <>
+                <Plot
+                  className="p-3"
+                  downloadName={withinPlotPath.split('/').slice(-1)[0]}
+                  plotPath={'api/results/' + withinPlotPath}
+                  txtPath={`api/results/${withinTxtPath}`}
+                />
+                <p className="p-3">
+                  The heatmap shows pairwise cosine similarity between the
+                  samples from the selected profile type. The text of the x-axis
+                  and y-axis are the sample names. This analysis will help to
+                  highlight the samples within the same cluster that may detect
+                  similar mutational signatures.
+                </p>
+              </>
             )}
           </div>
         </div>
@@ -334,17 +326,6 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
       key: 'reference',
       component: (
         <div>
-          <div className="p-3">
-            <p>
-              The CS to Reference Signatures plot Signature plot highlights
-              cosine similarity between profile in a given sample and a
-              reference signature set. Along the bottom of the heatmap are the
-              signatures within the reference signature set selected. Along the
-              side of the heatmap are the sample profiled from the input data
-              file.
-            </p>
-          </div>
-          <hr />
           <Form className="p-3">
             <LoadingOverlay active={refSubmitOverlay} />
             <Row>
@@ -415,12 +396,22 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
               </p>
             )}
             {refPlotPath && (
-              <Plot
-                className="p-3"
-                downloadName={refPlotPath.split('/').slice(-1)[0]}
-                plotPath={`api/results/${refPlotPath}`}
-                txtPath={`api/results/${refTxtPath}`}
-              />
+              <>
+                <Plot
+                  className="p-3"
+                  downloadName={refPlotPath.split('/').slice(-1)[0]}
+                  plotPath={`api/results/${refPlotPath}`}
+                  txtPath={`api/results/${refTxtPath}`}
+                />
+                <p className="p-3">
+                  The following heatmap shows pairwise cosine similarity between
+                  the mutational profiles of given samples and selected
+                  reference signature set. The text of the x-axis and y-axis
+                  show the reference signature names and the sample names,
+                  respectively. This analysis will help to identify potential
+                  dominant mutational signatures in selected samples.
+                </p>
+              </>
             )}
           </div>
         </div>
@@ -433,17 +424,6 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
       key: 'public',
       component: (
         <div>
-          <div className="p-3">
-            <p>
-              The CS to Public Data plot highlights cosine similarity between
-              sample profiles from the user dataset and the public data
-              available from the given study and cancer type. Along the bottom
-              of the heatmap are the samples from the selected public data.
-              Along the side of the heatmap are the samples from the input data
-              file.
-            </p>
-          </div>
-          <hr />
           <Form className="p-3">
             <LoadingOverlay active={pubSubmitOverlay} />
             <Row>
@@ -517,12 +497,21 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
               </p>
             )}
             {pubPlotPath && (
-              <Plot
-                className="p-3"
-                downloadName={pubPlotPath.split('/').slice(-1)[0]}
-                plotPath={`api/results/${pubPlotPath}`}
-                txtPath={`api/results/${pubTxtPath}`}
-              />
+              <>
+                <Plot
+                  className="p-3"
+                  downloadName={pubPlotPath.split('/').slice(-1)[0]}
+                  plotPath={`api/results/${pubPlotPath}`}
+                  txtPath={`api/results/${pubTxtPath}`}
+                />
+                <p className="p-3">
+                  The following heatmap shows pairwise cosine similarity between
+                  mutational profiles of samples from the user input and public
+                  dataset based on the selected study and cancer type. The text
+                  of the x-axis and y-axis show the sample names from the public
+                  dataset and user input, respectively.
+                </p>
+              </>
             )}
           </div>
         </div>
@@ -563,6 +552,31 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
         >
           {tabs.map(({ key, component }) => (
             <Pane key={key} eventKey={key} className="border-0">
+              <div className="p-3">
+                <Description
+                  less="Cosine similarity is a measure of the similarity of two
+                      matrices, which can be helpful to compare two mutational
+                      profiles or signatures."
+                  more={
+                    <span>
+                      Below you can explore cosine similarity between sample
+                      profiles (CS Between Samples), cosine similarity between
+                      sample profiles and reference signatures (CS to Reference
+                      Signatures), or, if using your own data, cosine similarity
+                      between profiles from your input data and profiles from
+                      public data (CS to Public Data). Simply use the dropdown
+                      menus to select a [Profile Type], [Matrix Size], or
+                      [Reference Signature Set]. Click here to learn more about
+                      cosine similarity. Click{' '}
+                      <NavHashLink to="/faq#cosine-similarity">
+                        here
+                      </NavHashLink>{' '}
+                      to learn more about cosine similarity.
+                    </span>
+                  }
+                />
+              </div>
+              <hr />
               {component}
             </Pane>
           ))}

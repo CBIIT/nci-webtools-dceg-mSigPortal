@@ -15,13 +15,9 @@ export default function TmbSignatures() {
         <b>Tumor Mutational Burden Separated by Signatures</b>
         <Description
           className="m-0"
-          short={
-            'The bar plot below illustrates the level of tumor mutational burden across different signatures from the selected signature set in the selected cancer type.'
-          }
-          description={
-            'The bar plot below illustrates the level of tumor mutational burden across different signatures from the selected signature set in the selected cancer type. Across the top of the plot are the signatures (in the selected cancer type) that were exhibited by at least one sample. On the y-axis is the number of mutations per Megabase (log10), and the x-axis denotes sample numbers. The green number is the total number of samples with the selected cancer type (and therefore evaluated for each signature). The blue number is the number of samples with the selected cancer type that detected the mutational signature from the reference signature set.'
-          }
-        />{' '}
+          less="The bar plot below illustrates tumor mutational burden across different signatures from the selected study and cancer type."
+          more="On the y-axis is the number of mutations per Mb (log10), and the x-axis denotes sample numbers. The green number is the total number of samples with the selected cancer type (and therefore evaluated for each signature). The blue number is the number of samples with the selected cancer type that detected the mutational signature from the reference signature set."
+        />
       </div>
       <hr />
       <div id="tmbSigPlot">

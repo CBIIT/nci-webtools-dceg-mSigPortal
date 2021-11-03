@@ -1,11 +1,11 @@
 import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
+import Description from '../../controls/description/description';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolderMinus } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
-import Debug from '../../controls/debug/debug';
 
 const { Label, Group } = Form;
 
@@ -19,21 +19,10 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
       <div className="p-3">
         <b>Landscape of Mutational Signature Activity</b>
         <p className="m-0">
-          This page allows for you investigate the overall landscape of exposure
-          of mutational signatures across samples of a given cancer type. In the
-          combined plot below, you will find a series of bar plots on top of one
-          another to form the overall plot. The x-axis is the samples for the
-          cancer type and study selected from the left panel. Starting with the
-          bottom plot, this illustrates the contribution of different signatures
-          within a sample. The colors that correspond to each mutational
-          signature can be found at the bottom in the “Mutational Signatures”
-          legend. Just above the contributions plot is a cosine similarity bar
-          of the mutation signatures deconvolution found in each sample. The
-          plot above the cosine similarity assignments is a plot that contains
-          the number of mutations in each sample assigned to each mutational
-          signature. The topmost plot is unsupervised clustering of the samples
-          based on signature contributions. Additional bars can add under the
-          clustering by uploading the variable data.
+          <Description
+            less="The following clustering of mutational signatures allows users to investigate the overall landscape of mutational signatures from the selected cancer type."
+            more="The combined plot below includes the following sub-plots from top to bottom: 1) Unsupervised clustering of all samples based on signature contributions; 2) Values from uploaded variable data assigned to each sample (optional); 3) Stacked bar plot that contains the number of mutations assigned to each mutational signature in each sample; 4) Cosine similarity between the original mutational pattern and reconstructed mutational pattern for each sample, which indicates the performance of mutational signature deconvolution; 5) Signature contribution plot, which illustrates the contribution of different signatures within a sample. The colors that correspond to each subplot can be found in the legend."
+          />
         </p>
       </div>
       <hr />

@@ -3,10 +3,12 @@ import { Form, Row, Col, Button } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Select from '../../controls/select/select';
+import Description from '../../controls/description/description';
 import KataegisTable from './kataegisTable';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
+import { NavHashLink } from 'react-router-hash-link';
 
 const actions = { ...visualizationActions, ...modalActions };
 const { Group, Check, Label, Control } = Form;
@@ -88,21 +90,30 @@ export default function Kataegis({ submitR }) {
     <div>
       {source == 'user' && inputFormat == 'vcf' ? (
         <div className="bg-white border rounded" style={{ minHeight: '500px' }}>
-          <div className="p-3">
-            <p>
-              Below you can investigate instances of kataegis using a VCF file.
-              Kataegis is localized substitution hypermutation, often
-              characterized by clusters of C>T and/or C>G mutations, commonly at
-              TpCpN trinucleotides. Click <a href="#faq">here</a> for additional
-              information about kataegis. Simply input the “Minimum Number of
-              Mutations” to qualify was kataegis, the “Maximum Distance” between
-              one mutation and the next within a given cluster of mutations
-              being considered for kataegis, and a “Chromosome” to be included
-              in the Kataegis results figure. If you would like for all
-              chromosomes to be output in the results table, leave the
-              “Chromosome” input as ‘None’.
-            </p>
-          </div>
+          <Description
+            className="p-3"
+            less="This analysis identifies the kataegis events from a VCF file input."
+            more={
+              <>
+                <span>
+                  Kataegis is a localized substitution hypermutation event,
+                  often characterized by clusters of C>T and/or C>G mutations,
+                  commonly at TpCpN trinucleotides (APOBEC mutations). Click{' '}
+                  <NavHashLink to="/faq#kataegis">here</NavHashLink> for
+                  additional information about kataegis.
+                </span>
+                <p className="mt-3">
+                  To identify kataegis, input the [Minimum Number of Mutations]
+                  required for kataegis, the [Maximum Distance] between one
+                  mutation and the next within a given cluster of mutations
+                  being considered for kataegis, and a [Chromosome] to be
+                  highlighted in the rainfall plot. By default, all chromosomes
+                  will be shown for the kataegis identification.
+                </p>
+              </>
+            }
+          />
+
           <hr />
           <Form noValidate className="p-3">
             <LoadingOverlay active={loading} />
@@ -217,21 +228,21 @@ export default function Kataegis({ submitR }) {
                 txtPath={txtPath ? `api/results/${txtPath}` : null}
               />
               <p className="p-3">
-                The rainfall plot illustrates the kataegis identified given the
-                input parameters. Along the y-axis is the inter-mutation
-                distance (bp, log10) from one mutation to the next. On the
-                x-axis is the position of the mutation in the genome by
-                chromosome. The colors represent the different mutation types.
-                The arrow will highlight the kataegis region when you select the
-                “Highlight”.
+                The rainfall plot illustrates the kataegis events identified
+                given the input parameters. The x-axis is the position of the
+                mutation in the genome separated by chromosome. The y-axis is
+                the inter-mutation distance (bp, log10) from one mutation to the
+                next. The colors represent different mutation types. The arrow
+                will highlight the kataegis region when you select the
+                “Highlight” option.
               </p>
               {kataegisData.length > 0 && (
                 <>
                   <p className="p-3">
                     The table below is a summary of the kataegis identification
-                    for the input file. The table can be filtered based on any
-                    of the columns by entering an appropriate value for the
-                    given column in the box above each column.{' '}
+                    based on the input parameters. The table can be filtered
+                    based on any of the columns by entering an appropriate
+                    value.
                   </p>
                   <KataegisTable />
                 </>
