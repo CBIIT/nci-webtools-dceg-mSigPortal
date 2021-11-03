@@ -133,7 +133,7 @@ export default function Plot({
                 src={
                   plotPath + (cacheBreaker ? `#${new Date().getTime()}` : '')
                 }
-                style={{ maxHeight: height || '500px' }}
+                style={{ maxHeight: height || '600px' }}
                 alt={alt || 'Plot Unavailable'}
               />
             </TransformComponent>
