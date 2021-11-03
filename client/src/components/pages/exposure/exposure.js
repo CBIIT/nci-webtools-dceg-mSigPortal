@@ -114,7 +114,6 @@ export default function Exposure({ match }) {
     mergeState({
       loading: false,
       submitted: true,
-      displayTab: 'tmb',
       openSidebar: false,
     });
   }
