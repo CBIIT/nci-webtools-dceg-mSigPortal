@@ -48,7 +48,7 @@ RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#eg
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerPlotting#egg=SigProfilerPlotting'
 
 # install genomes
-RUN python3.6 -c "from SigProfilerMatrixGenerator import install as genInstall; genInstall.install('GRCh37', rsync=False, bash=True); genInstall.install('GRCh38', rsync=False, bash=True); genInstall.install('mm10', rsync=False, bash=True)"
+# RUN python3.6 -c "from SigProfilerMatrixGenerator import install as genInstall; genInstall.install('GRCh37', rsync=False, bash=True); genInstall.install('GRCh38', rsync=False, bash=True); genInstall.install('mm10', rsync=False, bash=True)"
 
 # configure C++ Toolchain for installing dependency RStan - https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started
 RUN Rscript -e 'dotR <- file.path(Sys.getenv("HOME"), ".R"); dir.create(dotR); M <- file.path(dotR, "Makevars"); file.create(M); cat("\nCXX14FLAGS=-O3 -march=native -mtune=native -fPIC","CXX14=g++", file = M, sep = "\n", append = TRUE);'
@@ -72,3 +72,6 @@ RUN npm install
 COPY . /deploy/
 
 CMD npm start
+
+# docker build -t msigportal-backend -f backend.dockerfile ~/Projects/msigportal/
+# docker run -d -p 8330:8330 -v ~/Projects/msigportal/logs/:/deploy/logs -v ~/Projects/msigportal/tmp:/deploy/tmp -v ~/Projects/msigportal/config:/deploy/config -v ~/Projects/sigprofiler/tsb:/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb -e AWS_ACCESS_KEY_ID=key -e AWS_SECRET_ACCESS_KEY=key --name msigportal-backend msigportal-backend 
