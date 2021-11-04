@@ -273,7 +273,7 @@ export default function PublicForm({
               className="mb-4"
               disabled={loading || submitted || !cancerOptions.length}
               id="prevalenceCancerType"
-              label="Cancer Type"
+              label="Cancer Type or Group"
               value={cancer}
               options={cancerOptions}
               onChange={(cancer) =>
