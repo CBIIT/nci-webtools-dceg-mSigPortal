@@ -375,7 +375,7 @@ async function explorationWrapper(req, res, next) {
 
 async function associationWrapper(req, res, next) {
   const { fn, args, projectID: id } = req.body;
-  logger.debug('/assocationCalc: %o', { ...req.body });
+  logger.debug('/associationCalc: %o', { ...req.body });
 
   const projectID = id ? id : uuidv4();
 

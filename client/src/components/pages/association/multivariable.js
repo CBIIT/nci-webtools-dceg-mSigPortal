@@ -309,7 +309,7 @@ export default function Multivariable() {
               title="Add Plot"
               style={{ textDecoration: 'none' }}
             >
-              <span className="text-nowrap" title="Add Assocation Variable">
+              <span className="text-nowrap" title="Add Association Variable">
                 <FontAwesomeIcon icon={faPlus} /> Add Association Variable
               </span>
             </Button>

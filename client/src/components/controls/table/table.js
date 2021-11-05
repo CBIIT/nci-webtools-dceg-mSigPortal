@@ -202,7 +202,7 @@ export default function Table({
             <Dropdown.Toggle
               variant="secondary"
               size="sm"
-              id={`${title.replace(/\s/g, '')}-controls`}
+              id={`${title.replace(/\s/g, '')}-columns`}
             >
               Columns
             </Dropdown.Toggle>

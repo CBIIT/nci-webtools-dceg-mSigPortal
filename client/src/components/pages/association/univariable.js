@@ -412,6 +412,7 @@ export default function Univariable() {
                 <fieldset className="border rounded p-2">
                   <legend className="font-weight-bold">Method</legend>
                   <Select
+                    aria-label="Method"
                     className="mb-0"
                     disabled={loadingData || loadingParams || loadingCalculate}
                     id="testType"
@@ -462,7 +463,7 @@ export default function Univariable() {
                   signatures
                 </p>
                 <Table
-                  title=""
+                  title="Variable Association"
                   data={resultsTable.data}
                   columns={[
                     ...new Set(

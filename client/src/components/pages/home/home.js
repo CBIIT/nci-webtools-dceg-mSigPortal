@@ -70,7 +70,7 @@ export default function Home({ links }) {
                       }}
                     >
                       <img
-                        alt="icon"
+                        alt={cardTitle}
                         src={image}
                         height="105"
                         width="105"
