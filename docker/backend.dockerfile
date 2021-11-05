@@ -28,7 +28,7 @@ RUN rpm -i https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rp
 # configure C++ Toolchain for installing dependency RStan - https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started
 ENV MAKEFLAGS='-j2'
 RUN mkdir -p $HOME/.R && \
-    echo -e "CXX14FLAGS=-O3 -march=native -mtune=native -fPIC \n\CXX14=g++" >> $HOME/.R/Makevars
+    echo -e "CXX14FLAGS=-O3 -march=native -mtune=native -fPIC \nCXX14=g++" >> $HOME/.R/Makevars
 
 # install R packages
 RUN Rscript -e "install.packages(\
