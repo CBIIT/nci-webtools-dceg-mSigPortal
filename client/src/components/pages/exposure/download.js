@@ -13,7 +13,11 @@ export default function Download({ exposureDownload }) {
 
   return (
     <div className="p-4">
-      <Button variant="link" onClick={() => downloadPublic()}>
+      <p>
+        Use the following links to download all matrices of mutational signature
+        activities from selected study:{' '}
+      </p>
+      <Button className="p-0" variant="link" onClick={() => downloadPublic()}>
         <LoadingOverlay active={downloading} />
         Download matrixes for selected exposure of mutational signatures and
         study

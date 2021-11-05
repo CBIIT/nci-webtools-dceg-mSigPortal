@@ -554,7 +554,7 @@ async function getVisExample(req, res, next) {
       const oldID = params.visualization.state.projectID;
       await replace({
         files: paramsPath,
-        from: new RegExp(`${oldID}`, 'g'),
+        from: new RegExp(oldID, 'g'),
         to: id,
       });
       params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
@@ -569,7 +569,7 @@ async function getVisExample(req, res, next) {
 
         await replace({
           files: [svgPath, matrixPath],
-          from: new RegExp(`${oldID}`, 'g'),
+          from: new RegExp(oldID, 'g'),
           to: id,
         });
       }
@@ -601,13 +601,21 @@ async function getExposureExample(req, res, next) {
     const paramsPath = path.join(examplePath, `params.json`);
 
     if (fs.existsSync(paramsPath)) {
-      const params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
-
       // copy example to results with unique id
       const id = uuidv4();
       const resultsPath = path.resolve(config.results.folder, id);
       await fs.promises.mkdir(resultsPath, { recursive: true });
       await fs.copy(examplePath, resultsPath);
+
+      // rename file paths with new ID
+      let params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
+      const oldID = params.exposureState.projectID;
+      await replace({
+        files: paramsPath,
+        from: new RegExp(oldID, 'g'),
+        to: id,
+      });
+      params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
 
       res.json({
         state: {
@@ -709,8 +717,8 @@ async function getFileS3(req, res, next) {
     .pipe(res);
 }
 
-async function downloadSession(req, res, next) {
-  logger.info(`/visualization/downloadSession`);
+async function downloadWorkspace(req, res, next) {
+  logger.info(`/visualization/downloadWorkspace`);
 
   const { state, id } = req.body;
   const session = path.resolve(config.results.folder, id);
@@ -754,6 +762,6 @@ module.exports = {
   getImageS3,
   getFileS3,
   getRelativePath,
-  downloadSession,
+  downloadWorkspace,
   associationWrapper,
 };

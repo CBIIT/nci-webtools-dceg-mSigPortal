@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import Select from '../../controls/select/select';
+import Description from '../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as exposureActions } from '../../../services/store/exposure';
 import { actions as modalActions } from '../../../services/store/modal';
@@ -272,7 +273,7 @@ export default function PublicForm({
               className="mb-4"
               disabled={loading || submitted || !cancerOptions.length}
               id="prevalenceCancerType"
-              label="Cancer Type"
+              label="Cancer Type or Group"
               value={cancer}
               options={cancerOptions}
               onChange={(cancer) =>

@@ -72,7 +72,6 @@ RUN Rscript -e "BiocManager::install(\
         'TxDb.Hsapiens.UCSC.hg38.knownGene' \
     ))"
 
-
 # install python packages
 RUN pip3 install scipy statsmodels
 
@@ -88,11 +87,11 @@ RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#eg
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerPlotting#egg=SigProfilerPlotting'
 
 # install genomes
-RUN python3.6 -c "\
-from SigProfilerMatrixGenerator import install as genInstall; \
-genInstall.install('GRCh37', rsync=False, bash=True); \
-genInstall.install('GRCh38', rsync=False, bash=True); \
-genInstall.install('mm10', rsync=False, bash=True)"
+# RUN python3.6 -c "\
+# from SigProfilerMatrixGenerator import install as genInstall; \
+# genInstall.install('GRCh37', rsync=False, bash=True); \
+# genInstall.install('GRCh38', rsync=False, bash=True); \
+# genInstall.install('mm10', rsync=False, bash=True)"
 
 RUN mkdir -p /deploy/server /deploy/logs
 
@@ -107,3 +106,6 @@ RUN npm install
 COPY . /deploy/
 
 CMD npm start
+
+# docker build -t msigportal-backend -f backend.dockerfile ~/Projects/msigportal/
+# docker run -d -p 8330:8330 -v ~/Projects/msigportal/logs/:/deploy/logs -v ~/Projects/msigportal/tmp:/deploy/tmp -v ~/Projects/msigportal/config:/deploy/config -v ~/Projects/sigprofiler/tsb:/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb -e AWS_ACCESS_KEY_ID=key -e AWS_SECRET_ACCESS_KEY=key --name msigportal-backend msigportal-backend 

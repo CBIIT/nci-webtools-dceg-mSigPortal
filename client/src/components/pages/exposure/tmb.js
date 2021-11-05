@@ -15,12 +15,8 @@ export default function TMB() {
         <b>Tumor Mutational Burden</b>
         <Description
           className="m-0"
-          short={
-            'The bar plot below illustrates the level of tumor mutational burden (number of mutations per megabase) across different cancer types for selected study.'
-          }
-          description={
-            'The bar plot below illustrates the level of tumor mutational burden (number of mutations per megabase) across different cancer types for selected study. Across the top of the plot are the different cancer types. The y-axis is the number of mutations per megabase (log10), and the x-axis denotes sample numbers. The green number is the number of samples for a given cancer type, and the blue number is the number of samples that had mutation data for that cancer type.'
-          }
+          less="The bar plot below illustrates tumor mutational burden (number of mutations per Mb) across different cancer types for the selected study."
+          more="The y-axis is the number of mutations per Mb (log10), and the x-axis indicates cancer types. The green number is the number of samples for a given cancer type, and the blue number is the number of samples that have mutation data available for that cancer type."
         />
       </div>
       <hr />

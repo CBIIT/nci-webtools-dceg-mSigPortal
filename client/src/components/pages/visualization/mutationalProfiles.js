@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 import Plot from '../../controls/plot/plot';
 import Select from '../../controls/select/select';
+import Description from '../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { actions as visualizationActions } from '../../../services/store/visualization';
@@ -11,6 +12,7 @@ import {
   defaultMatrix,
   defaultFilter,
 } from '../../../services/utils';
+import { NavHashLink } from 'react-router-hash-link';
 
 const actions = { ...visualizationActions, ...modalActions };
 
@@ -257,16 +259,25 @@ export default function MutationalProfiles() {
   return (
     <div className="bg-white border rounded">
       <div className="p-3">
-        <p>
-          Below you can generate different mutational profiles for a given
-          sample. Use the dropdown arrow to select [Sample Name], [Profile Type]
-          and [Matrix Size]. The [Filter] will only available when you select
-          [Split Mutations According to Filter] for user data source.
-        </p>
-        <p>
-          For additional information on [Profile Type] and [Matrix Size], click{' '}
-          <a href="#faq">here.</a>
-        </p>
+        <Description
+          className="m-0"
+          less={
+            <span>
+              Below you can visualize different mutational profiles for a given
+              sample.
+            </span>
+          }
+          more={
+            <span>
+              {' '}
+              Use the dropdown arrow to select the [Sample Name], [Profile Type]
+              and [Matrix Size]. The [Filter] option is only available if [Split
+              Mutations According to Filter] is selected while analyzing user
+              data. For additional information on [Profile Type] and [Matrix
+              Size], click <NavHashLink to="/faq">here</NavHashLink>.
+            </span>
+          }
+        />
       </div>
       <hr />
       <Form className="p-3">

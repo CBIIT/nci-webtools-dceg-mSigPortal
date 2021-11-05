@@ -52,7 +52,7 @@ export default function Plot({
 
   const zoomProps = {
     pinch: { step: 0.1 },
-    wheel: { step: 0.1 },
+    wheel: { step: 0.01, activationKeys: ['z'] },
   };
 
   // fetch image to refresh cached image in chromium browsers
@@ -63,9 +63,9 @@ export default function Plot({
 
   return (
     <div
-      className={`${className}`}
-      title="Ctrl + Mouse Wheel to zoom"
-      style={{ width: 'auto', height: '100%' }}
+      className={`${className} mx-auto`}
+      title="Z + Mouse Wheel to zoom"
+      style={{ width: 'auto', height: '100%', maxWidth: '1500px' }}
     >
       <LoadingOverlay active={loading} />
       <TransformWrapper {...zoomProps}>
@@ -133,7 +133,7 @@ export default function Plot({
                 src={
                   plotPath + (cacheBreaker ? `#${new Date().getTime()}` : '')
                 }
-                style={{ maxHeight: height || '500px' }}
+                style={{ maxHeight: height || '600px' }}
                 alt={alt || 'Plot Unavailable'}
               />
             </TransformComponent>

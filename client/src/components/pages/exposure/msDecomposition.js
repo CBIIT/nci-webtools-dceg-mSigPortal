@@ -1,27 +1,20 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import Description from '../../controls/description/description';
 import Plot from '../../controls/plot/plot';
-import Debug from '../../controls/debug/debug';
 
 export default function MsDecomposition() {
   const exposure = useSelector((state) => state.exposure);
   const { plotPath, txtPath, debugR, err } = exposure.msDecomposition;
-  const { projectID } = exposure.exposureState;
 
   return (
     <div>
       <div className="p-3">
         <b>Evaluating the Performance of Mutational Signature Decomposition</b>
-        <p className="m-0">
-          This distribution plot below illustrates mutational signature
-          decomposition distribution in selected cancer type (by selecting
-          Cancer Type Only on the left panel) or across different cancer type.
-          Five different methods are used to measure the similarities of
-          original mutational profile matrix and reconstructed mutational
-          profile matrix across all the samples, including cosine similarity,
-          100-L1_Norm_%, 100-L2_Norm_%, KL_Divergence, and Pearson Correlation.
-          Click here for the detail of these evaluation method.
-        </p>
+        <Description
+          less="The distribution plot below illustrates mutational signature decomposition distribution in a selected cancer type (by selecting [Cancer Type Only] on the left panel) or across different cancer types."
+          more="Five different methods are used to measure the similarities of original mutational profile matrix and reconstructed mutational profile matrix across all the samples: cosine similarity, 100-L1_Norm_%, 100-L2_Norm_%, KL_Divergence, and Pearson Correlation. Click here for details of these evaluation methods."
+        />
       </div>
       <hr />
 

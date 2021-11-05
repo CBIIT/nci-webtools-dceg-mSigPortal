@@ -6,6 +6,7 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
+import Description from '../../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as catalogActions } from '../../../../services/store/catalog';
 import { actions as modalActions } from '../../../../services/store/modal';
@@ -490,13 +491,11 @@ export default function Profile({ submitR }) {
 
   return (
     <div>
-      <p className="p-3">
-        Below you can enter any “Signature Source”, “Profile Name”, “Reference
-        Signature Set”, “Experimental Strategy”, and “Signature Name” to observe
-        what the mutational signature profile looks like for that specific
-        signature. Click the “+ Add Plot” button if you would like to look at
-        more than mutational signature profile at a time.
-      </p>
+      <Description
+        className="p-3 m-0"
+        less="Enter any [Signature Source], [Profile Name], [Reference Signature Set], [Experimental Strategy], and [Signature Name] below to visualize the mutational signature profile."
+        more="Click ‘+ Add Plot’ to load one or more mutational signature profiles at the same time."
+      />
       <hr />
       <Form className="p-3">
         <LoadingOverlay active={loading} />

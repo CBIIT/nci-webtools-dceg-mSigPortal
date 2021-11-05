@@ -167,7 +167,7 @@ export default function Table({
     <div>
       <Row className="mb-2">
         {title ? (
-          <Col>
+          <Col md="auto">
             <strong>{title}</strong>
           </Col>
         ) : (

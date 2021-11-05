@@ -2,11 +2,12 @@ import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
-import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
+import Description from '../../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as catalogActions } from '../../../../services/store/catalog';
 import { actions as modalActions } from '../../../../services/store/modal';
+import { NavHashLink } from 'react-router-hash-link';
 
 const actions = { ...catalogActions, ...modalActions };
 
@@ -92,17 +93,20 @@ export default function MutationalSignatureProfile({ submitR }) {
 
   return (
     <div style={{ minHeight: '500px' }}>
-      <div className="p-3">
-        <p>
-          Cosine similarity, which is a measure of the similarity of signatures,
-          can be helpful to compare one signature to another. In the case below,
-          you are able to compare two reference mutational signatures. Simply
-          use the dropdown menus to enter a “Profile Name”, a “Reference
-          Signature Set 1”, and “Reference Signature Set 2”. This will compare
-          the mutational profile entered between the two reference signature
-          sets. Click here to learn more about cosine.
-        </p>
-      </div>
+      <Description
+        className="p-3"
+        less="Cosine similarity is a measure of the similarity of two signature matrices, which can be helpful to compare two mutational profiles or signatures."
+        more={
+          <span>
+            Below you can explore cosine similarity between two reference
+            mutational signature sets. Use the dropdown menus to enter a
+            [Profile Name], [Reference Signature Set 1], and [Reference
+            Signature Set 2]. Click{' '}
+            <NavHashLink to="/faq#cosine-similarity">here</NavHashLink> to learn
+            more about cosine similarity.
+          </span>
+        }
+      />
       <hr />
       <Form className="p-3">
         <LoadingOverlay active={loading} />
@@ -167,12 +171,10 @@ export default function MutationalSignatureProfile({ submitR }) {
               title="Cosine Similarity Among Mutational Signatures Between Reference Signature Sets"
             />
             <p className="p-3">
-              The Cosine Similarity Among Mutational Signatures Between
-              Reference Signature Sets plot highlights cosine similarity between
-              two mutational signature sets given a profile type. Along the
-              bottom of the heatmap are the signatures within the reference
-              signature set selected. Along the side of the heatmap are the
-              signatures within the second reference signature selected.
+              The heatmap above shows the cosine similarities between two
+              mutational signature sets given a profile type. The text on the
+              bottom and left show the signature names of the two selected
+              reference signature sets.
             </p>
           </>
         )}

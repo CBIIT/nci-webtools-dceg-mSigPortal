@@ -136,9 +136,8 @@ export default function Download() {
             <div>
               <p>{statistics}</p>
               <p>
-                Using the following links to download different mutational
-                profiles, plots and the mapping information between mutation and
-                each mutation type.
+                Use the following links to download all analyzed data and
+                visualization from selected or input dataset:
               </p>
             </div>
           ) : (

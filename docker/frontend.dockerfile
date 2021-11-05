@@ -33,3 +33,6 @@ EXPOSE 443
 
 CMD rm -rf /run/httpd/* /tmp/httpd* \
     && exec /usr/sbin/apachectl -DFOREGROUND
+
+# docker build -t msigportal-frontend -f frontend.dockerfile ~/Projects/msigportal/
+# docker run -d -p 8331:80 --name msigportal-frontend msigportal-frontend

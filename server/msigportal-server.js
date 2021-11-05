@@ -30,7 +30,7 @@ const {
   getImageS3Batch,
   getImageS3,
   getFileS3,
-  downloadSession,
+  downloadWorkspace,
   associationWrapper,
 } = require('./controllers');
 
@@ -115,7 +115,7 @@ apiRouter.post('/getImageS3', getImageS3);
 
 apiRouter.post('/getFileS3', getFileS3);
 
-apiRouter.post('/downloadSession', downloadSession);
+apiRouter.post('/downloadWorkspace', downloadWorkspace);
 
 apiRouter.post('/associationWrapper', associationWrapper);
 

@@ -2,11 +2,12 @@ import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
-import Debug from '../../../controls/debug/debug';
 import Select from '../../../controls/select/select';
+import Description from '../../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as catalogActions } from '../../../../services/store/catalog';
 import { actions as modalActions } from '../../../../services/store/modal';
+import { NavHashLink } from 'react-router-hash-link';
 
 const actions = { ...catalogActions, ...modalActions };
 
@@ -150,14 +151,11 @@ export default function Comparison({ submitR }) {
 
   return (
     <div style={{ minHeight: '500px' }}>
-      <p className="p-3">
-        Below you can observe mutational signature comparisons signatures found
-        in two different reference signature sets. Use the dropdown menus to
-        input a “Profile Name”, two Reference Signature Sets, and two Signatures
-        within the selected Signature Sets. This will allow for a calculation as
-        to the mutational profile of each signature given the profile type, as
-        well as the difference between the two mutational profiles.
-      </p>
+      <Description
+        className="p-3 m-0"
+        less="Below you can compare two mutational signatures from curated reference signature sets. "
+        more="Use the dropdown menus to input a [Profile Name], two [Reference Signature Sets], and two [Signature Names] within the selected Signature Sets."
+      />
       <hr />
       <Form className="p-3">
         <LoadingOverlay active={loading} />
@@ -249,19 +247,22 @@ export default function Comparison({ submitR }) {
               txtPath={`api/results/${txtPath}`}
               height="700px"
             />
-            <div className="p-3">
+            <div className="p-4">
               <p>
-                The plot generated shows the mutational profile for the
-                “Signature Name 1” selected, the mutational profile for the
-                “Signature Name 2” selected, and the difference between them.
-                Also at the top of the plot are measurements for RSS and cosine
-                similarity.
+                The plot above shows the mutational profiles of two selected
+                signatures, as well as the difference between them. The text at
+                the top of the plot indicates the profile similarity calculated
+                using Residual Sum of Squares (RSS) and cosine similarity
+                methods.
               </p>
               <p>
-                RSS is the Residual Sum of Squares. It measures the discrepancy
-                between two profiles. Cosine similarity is how similar the
-                mutational profiles are to one another. For additional
-                information about RSS and cosine similarity, click here.
+                Residual Sum of Squares (RSS) measures the discrepancy between
+                two mutational profiles. Cosine similarity measures how similar
+                two mutational profiles are. For example, two identical
+                mutational signatures will have RSS = 0 and Cosine similarity =
+                1. For additional information about RSS and cosine similarity,
+                click{' '}
+                <NavHashLink to="/faq#cosine-similarity">here</NavHashLink>.
               </p>
             </div>
           </>

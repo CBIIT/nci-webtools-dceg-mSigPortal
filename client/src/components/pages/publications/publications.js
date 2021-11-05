@@ -42,8 +42,8 @@ export default function Publications() {
       <div className="bg-white border p-3 mx-3">
         <div className="mb-4">
           <p>
-            An overview of published papers, tools, websites and databases
-            related to mutational signatures analysis.
+            An overview of published original research and review papers, tools,
+            websites and databases related to mutational signatures analysis.
           </p>
         </div>
 
@@ -65,7 +65,7 @@ export default function Publications() {
         {orbMemo.data && (
           <div className="mb-5">
             <Table
-              title="Original Research Papers involved Mutational Signature Analyses"
+              title="Original Research Papers Involved With Mutational Signature Analyses"
               columns={orbMemo.columns}
               data={orbMemo.data}
               hidden={orbHidden}
@@ -80,7 +80,7 @@ export default function Publications() {
         {rpMemo.data && (
           <div className="mb-5">
             <Table
-              title="Review Papers Focued on Mutational Signatures"
+              title="Review Papers Focused on Discussion of Mutational Signatures"
               columns={rpMemo.columns}
               data={rpMemo.data}
               hidden={rpHidden}
@@ -95,7 +95,7 @@ export default function Publications() {
         {cmMemo.data && (
           <div className="mb-5">
             <Table
-              title="Computational Methods, Databases or Websites for Mutational Signature Analyses"
+              title="Computational Methods, Tools, Databases or Websites for Mutational Signature Analyses"
               columns={cmMemo.columns}
               data={cmMemo.data}
               hidden={cmHidden}
@@ -110,6 +110,12 @@ export default function Publications() {
 
         <div className="mb-4">
           <h3>Citations</h3>
+          <p>
+            If you use the data on this website, please cite our paper: Tongwu
+            Zhang, Jian Sang, Alyssa Klein…. Maria Teresa Landi. Integrative
+            mutational signature portal (mSigPortal) for cancer genomic study.
+            (In Preparing)
+          </p>
         </div>
 
         <p>Last update: 20 JAN 2021.</p>

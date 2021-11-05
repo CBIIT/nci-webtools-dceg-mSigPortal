@@ -234,7 +234,7 @@ export default function PublicForm() {
       <Select
         className="mb-2"
         id="publicFromCancerType"
-        label="Cancer Type"
+        label="Cancer Type or Group"
         disabled={submitted}
         value={cancerType}
         options={cancerTypeOptions}

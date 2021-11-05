@@ -1,12 +1,12 @@
 import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
+import Description from '../../controls/description/description';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { actions as exposureActions } from '../../../services/store/exposure';
 import { actions as modalActions } from '../../../services/store/modal';
 import Plot from '../../controls/plot/plot';
 import Select from '../../controls/select/select';
-import Debug from '../../controls/debug/debug';
 
 const actions = { ...exposureActions, ...modalActions };
 const { Group, Check } = Form;
@@ -33,16 +33,10 @@ export default function MsAssociation({ calculateAssociation }) {
     <div>
       <div className="p-3">
         <b>Mutational Signature Association</b>
-        <p className="m-0">
-          The scatter plot below illustrates the associations between two
-          selected. On the x-axis is the number of mutations (log 10) assigned
-          to Signature Name 1, and on the y-axis is the number of mutations
-          (log10) assigned to Signature Name 2. Use the parameter on top panel
-          “Number of Mutations assigned to both signature >0” to remove the
-          samples without assigning any mutations to these selected two
-          signatures. Use the parameter on the left panel “Cancer Type Only” to
-          perform association analysis on selected the cancer type only.
-        </p>
+        <Description
+          less="The scatter plot below illustrates the associations between two selected mutational signatures."
+          more="On the x-axis is the number of mutations (log 10) assigned to Signature Name 1, and on the y-axis is the number of mutations (log10) assigned to Signature Name 2. Use the parameter from the top panel, [Samples Detected Both Signatures] to remove the samples that do not detect both signatures before running the association analysis. Use the parameter in the left panel [Cancer Type Only] to perform association analysis on the selected cancer type only."
+        />
       </div>
       <hr />
       <Form className="p-3">

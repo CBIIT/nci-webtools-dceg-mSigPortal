@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
+import Description from '../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
+import { NavHashLink } from 'react-router-hash-link';
 
 const actions = { ...visualizationActions, ...modalActions };
 const { Group, Label, Control } = Form;
@@ -141,26 +143,36 @@ export default function MutationalPattern({ submitR }) {
     <div>
       <div className="bg-white border rounded" style={{ minHeight: '500px' }}>
         <div className="p-3">
-          <p>
-            This page allows you to conduct a mutational pattern enrichment
-            analysis. This type of analysis aims to determine frequency and
-            enrichment of different types of mutational patterns. For more
-            information about mutational pattern enrichment, click{' '}
-            <a href="#faq">here</a>. Below are explanations of the inputs needed
-            for the analysis.
-          </p>
-          <p>
-            Minimal Proportion: For “Frequency of Mutational Pattern” plot, set
-            the minimal proportion of mutational patterns identified in all
-            samples from selected or input study. A slightly high proportion
-            like 0.5 are suggested.{' '}
-          </p>
-          <p>
-            Mutational Pattern: For the second enrichment plot, select the
-            mutational patten to identify the enrichment of specific mutation
-            context as suggested from “Frequency of Mutational Patten”. The
-            mutational pattern supports common nucleotide symbols.{' '}
-          </p>
+          <Description
+            less={
+              <p>
+                The aim of the mutational pattern enrichment analysis is to
+                determine frequency and enrichment of different types of
+                mutational patterns. For more information about mutational
+                pattern enrichment, click{' '}
+                <NavHashLink to="/faq#mpea">here</NavHashLink>.
+              </p>
+            }
+            more={
+              <>
+                <p>
+                  <i>Minimal Proportion:</i> For the “Frequency of Mutational
+                  Pattern” plot, set the minimal proportion of mutational
+                  patterns identified in all samples from selected or input
+                  study. A slightly high proportion, such as 0.5, is suggested.
+                </p>
+                <p>
+                  <i>Mutational Pattern:</i> For the enrichment plot of
+                  “Proportion of Mutational Pattern Context Compared to Other
+                  Contexts with the same SBS Mutation”, select the mutational
+                  pattern to identify the enrichment of specific mutation
+                  context as suggested from “Frequency of Mutational Pattern”.
+                  The mutational pattern supports common nucleotide symbols.
+                  Click here for common nucleotide symbol information.
+                </p>
+              </>
+            }
+          />
         </div>
         <hr />
         <Form noValidate className="p-3">

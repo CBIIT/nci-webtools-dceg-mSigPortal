@@ -24,7 +24,7 @@ export default function App() {
       cardTitle: 'Signature Catalog',
       cardText: 'Signature Catalog',
       description:
-        'Systematically explore any reference or update to date published signatures with different profiles, version and etiology (endogenous vs Exogenous). Intergratively explore the landscape of signature exposure in different genomic studies, including TCGA, PCAWG, and our Sherlock-Lung study.',
+        'Comprehensively exploring curated census of mutational signatures from scientific literature with different sources, mutational types, transcriptional strand bias, versions, proposed etiologies and tissue distribution from two major cancer genomic studies (<a href="https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga" target="_blank">TCGA</a> and <a href="https://dcc.icgc.org/pcawg" target="_blank">PCAWG</a>). In addition, it also allows users to visualize, compare and download all of these reference signatures.',
       image: 'assets/images/catalog.svg',
       navIndex: 0,
       color: '#009192', // turquoise
@@ -37,7 +37,7 @@ export default function App() {
       cardTitle: 'Signature Visualization',
       cardText: 'Visualize mutational profiles',
       description:
-        'Interactively and comprehensively visualize mutation signature in both sample and study level, including different type and level of mutational profiles (SBS/INDEL/DBS/SV/CNV), PCA components and different mutational feature (kataegis mutation, mutation quality, drive gene mutation etc).',
+        'Interactively visualizing and analyzing mutational profiles at the sample level from both user input (formats supported include VCF, MAF, CSV, TXT, catalog, etc) and collected cancer genomic studies from scientific literature. It allows users to perform a wide range of analyses including cosine similarity, enrichment analysis, mutational profile comparison, and principal components analysis for all different types of mutational profiles including SBS, INDEL, DBS, SV, and CNV. Kataegis identification is also supported for VCF input format. With respect to user input, all of these visualizations and analyses can be performed in different provided groups of assigned mutations in the same sample (such as clustered mutations vs non-clustered mutations; nonsynonymous mutations vs other mutations, etc).',
       image: 'assets/images/visualize.png',
       navIndex: 1,
       color: '#fc8701', // orange
@@ -49,7 +49,7 @@ export default function App() {
       cardTitle: 'Signature Exploration',
       cardText: 'Signature Exploration',
       description:
-        'Systematically explore any reference or update to date published signatures with different profiles, version and etiology (endogenous vs Exogenous). Intergratively explore the landscape of signature exposure in different genomic studies, including TCGA, PCAWG, and our Sherlock-Lung study.',
+        'Systematically exploring the mutational signature activities and performance of the mutational signature decomposition from user input, or collected public genomic studies (<a href="https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga" target="_blank">TCGA</a>, <a href="https://dcc.icgc.org/pcawg" target="_blank">PCAWG</a>, <a href="https://dceg.cancer.gov/research/cancer-types/lung/sherlock-lung-study" target="_blank">Sherlock-Lung</a>, etc.). This module allows users to perform analyses with mutational signature patterns and integratively explore the activities of each signature with different analyses and visualizations include tumor mutational burden (with or without separating by mutational signatures), evaluating  mutational signature decomposition, mutational signature association, sample clustering by mutational signatures, prevalence of each mutational signature, and decomposition of mutational signatures in individual samples.',
       image: 'assets/images/explore.png',
       navIndex: 2,
       color: '#2c71dd', // blue
@@ -73,7 +73,7 @@ export default function App() {
       cardTitle: 'Signature Association',
       cardText: 'Signature Association',
       description:
-        'Systematically analyze and visualize the association between mutational signature exposure and genomic or epigenomic features or other sample based variables (such as clinical data) in different genomic studies.',
+        'Statistically analyzing and visualizing associations between mutational signature activities using different measurements and collected sample level variables including genomic features, epigenomic features, mutational status, copy number alterations or clinical variables from different cancer genomic studies. In addition, this module allows users to select different statistical approaches for both univariable and multivariable association analysis.',
       image: 'assets/images/association.png',
       navIndex: 3,
       color: '#84368d', // purple

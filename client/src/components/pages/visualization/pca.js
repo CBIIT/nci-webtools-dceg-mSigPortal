@@ -3,6 +3,7 @@ import { Form, Row, Col, Button, Tab, Nav } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 import Select from '../../controls/select/select';
+import Description from '../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
@@ -312,12 +313,9 @@ export default function PCA({ submitR, getRefSigOptions }) {
                 plotPath={'api/results/' + pca1}
               />
               <p className="p-3">
-                The bar plot illustrates each of the principal components with
-                respect to the percentage of variation in the data that
-                component explains. On the y-axis is the dimension of the
-                component (each principal component), and on the x-axis is the
-                percentage of explained variance in the data by a particular
-                component.
+                The bar plot illustrates each of the principal components on the
+                x-axis and the percentage of variation that each component
+                explains on the y-axis.
               </p>
             </div>
           )}
@@ -333,10 +331,11 @@ export default function PCA({ submitR, getRefSigOptions }) {
               />
               <p className="p-3">
                 The individual PCA plot based on the top two principal
-                components helps to explain a majority of the variation in the
-                data. Each dot on the plot is a sample. The legend on the right
-                denotes the percent contribution (contrib) of each sample to the
-                principal components on the graph (Dim 1 and Dim 2).
+                components helps to explain a majority of the variation in
+                selected or input data. Each dot on the plot is a sample. The
+                legend on the right denotes the percent contribution (contrib)
+                of each sample to the principal components on the graph (Dim 1
+                and Dim 2).
               </p>
             </div>
           )}
@@ -371,11 +370,13 @@ export default function PCA({ submitR, getRefSigOptions }) {
               />
               <p className="p-3">
                 The heatmap shows cosine similarity between each principal
-                component and each mutational signature in the reference
-                signature set. Brighter colors denote higher levels of cosine
-                similarity between the principal component and the mutational
-                signature. Red dots in some of the boxes indicate a cosine
-                similarity of less than 0, denoting a negative correlation.
+                component and each mutational signature in the selected
+                reference signature set. Brighter colors denote higher levels of
+                cosine similarity between the principal component and the
+                mutational signature. Red dots in some of the boxes indicate a
+                cosine similarity less than 0, denoting a negative correlation
+                (e.g., a box with cosine similarity value of 0.8 and marked with
+                a red dot indicates a true cosine similarity of -0.8).
               </p>
             </div>
           )}
@@ -468,12 +469,9 @@ export default function PCA({ submitR, getRefSigOptions }) {
                 plotPath={'api/results/' + pubPca1}
               />
               <p className="p-3">
-                The bar plot illustrates each of the principal components with
-                respect to the percentage of variation in the data that
-                component explains. On the y-axis is the dimension of the
-                component (each principal component), and on the x-axis is the
-                percentage of explained variance in the data by a particular
-                component.
+                The bar plot illustrates each of the principal components on the
+                x-axis and the percentage of variation that each component
+                explains on the y-axis.
               </p>
             </div>
           )}
@@ -489,10 +487,11 @@ export default function PCA({ submitR, getRefSigOptions }) {
               />
               <p className="p-3">
                 The individual PCA plot based on the top two principal
-                components helps to explain a majority of the variation in the
-                data. Each dot on the plot is a sample. The legend on the right
-                denotes the percent contribution (contrib) of each sample to the
-                principal components on the graph (Dim 1 and Dim 2).
+                components helps to explain a majority of the variation in
+                selected or input data. Each dot on the plot is a sample. The
+                legend on the right denotes the percent contribution (contrib)
+                of each sample to the principal components on the graph (Dim 1
+                and Dim 2).
               </p>
             </div>
           )}
@@ -547,14 +546,10 @@ export default function PCA({ submitR, getRefSigOptions }) {
           style={{ overflowX: 'auto', minHeight: '500px' }}
         >
           <div className="p-3">
-            <p>
-              Below you can conduct a PCA analysis within samples, or a PCA with
-              Public Data for user input data only. PCA stands for Principal
-              Component Analysis, which helps to explain the variation found in
-              the data through the establishment of different principal
-              components. Each principal component can also be used to compare
-              with known mutational signatures.
-            </p>
+            <Description
+              less="Below you can conduct PCA analysis between samples, or a PCA with Public Data (for user input data only)."
+              more="PCA stands for Principal Component Analysis, which helps to explain the variation found in the data through the establishment of different principal components. Each principal component can also be used to compare with known mutational signatures."
+            />
           </div>
           <hr />
           {tabs.map(({ key, component }) => (
