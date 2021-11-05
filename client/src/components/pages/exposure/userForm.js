@@ -61,6 +61,25 @@ export default function PublicForm({
       : exposureFileObj.size && matrixFileObj.size && signatureFileObj.size;
   }
 
+  async function loadExample(type) {
+    const filepath = `assets/exampleInput/Sherlock_SBS96_${type}.txt`;
+    const filename = filepath.split('/').slice(-1)[0];
+    if (`${type}File` != filename) {
+      if (type == 'exposure') {
+        setExposure(new File([await (await fetch(filepath)).blob()], filename));
+        mergeState({ [`${type}File`]: filename });
+      } else if (type == 'matrix') {
+        setMatrix(new File([await (await fetch(filepath)).blob()], filename));
+        mergeState({ [`${type}File`]: filename });
+      } else if (type == 'signature') {
+        setSignature(
+          new File([await (await fetch(filepath)).blob()], filename)
+        );
+        mergeState({ [`${type}File`]: filename });
+      }
+    }
+  }
+
   async function handleUpload() {
     return new Promise(async (resolve, reject) => {
       if (validateFiles()) {
@@ -153,6 +172,30 @@ export default function PublicForm({
         <Col>
           <Group>
             <Label>Upload Exposure File</Label>
+            <Row className="m-0">
+              <Col lg="6" className="p-0">
+                <Button
+                  className="p-0 font-14"
+                  disabled={submitted}
+                  variant="link"
+                  href={'assets/exampleInput/Sherlock_SBS96_exposure.txt'}
+                  download
+                >
+                  Download Example
+                </Button>
+              </Col>
+              <Col lg="6" className="p-0 d-flex">
+                <Button
+                  className={`p-0 ml-auto font-14`}
+                  disabled={submitted || loading.active}
+                  variant="link"
+                  type="button"
+                  onClick={() => loadExample('exposure')}
+                >
+                  Load Example
+                </Button>
+              </Col>
+            </Row>
             <div className="d-flex">
               <Form.File
                 disabled={loading || submitted}
@@ -194,6 +237,30 @@ export default function PublicForm({
         <Col>
           <Group>
             <Label>Upload Matrix File</Label>
+            <Row className="m-0">
+              <Col lg="6" className="p-0">
+                <Button
+                  className="p-0 font-14"
+                  disabled={submitted}
+                  variant="link"
+                  href={'assets/exampleInput/Sherlock_SBS96_matrix.txt'}
+                  download
+                >
+                  Download Example
+                </Button>
+              </Col>
+              <Col lg="6" className="p-0 d-flex">
+                <Button
+                  className={`p-0 ml-auto font-14`}
+                  disabled={submitted || loading.active}
+                  variant="link"
+                  type="button"
+                  onClick={() => loadExample('matrix')}
+                >
+                  Load Example
+                </Button>
+              </Col>
+            </Row>
             <div className="d-flex">
               <Form.File
                 disabled={loading || submitted}
@@ -288,6 +355,30 @@ export default function PublicForm({
           <Col>
             <Group>
               <Label>Upload Signature Data</Label>
+              <Row className="m-0">
+                <Col lg="6" className="p-0">
+                  <Button
+                    className="p-0 font-14"
+                    disabled={submitted}
+                    variant="link"
+                    href={'assets/exampleInput/Sherlock_SBS96_signature.txt'}
+                    download
+                  >
+                    Download Example
+                  </Button>
+                </Col>
+                <Col lg="6" className="p-0 d-flex">
+                  <Button
+                    className={`p-0 ml-auto font-14`}
+                    disabled={submitted || loading.active}
+                    variant="link"
+                    type="button"
+                    onClick={() => loadExample('signature')}
+                  >
+                    Load Example
+                  </Button>
+                </Col>
+              </Row>
               <div className="d-flex">
                 <Form.File
                   disabled={loading || submitted}

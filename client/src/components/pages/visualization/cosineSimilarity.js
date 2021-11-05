@@ -235,7 +235,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
               Cosine similarity is a measure of the similarity of two matrix,
               which can be helpful to compare two mutational profiles or
               signatures. Below you can observe cosine similarity within sample
-              profiles (CS Within Samples), cosine similarity between sample
+              profiles (CS Between Samples), cosine similarity between sample
               profiles and reference signatures (CS to Reference Signatures), or
               if using your own data, cosine similarity between profiles from
               your input data and profiles from public data (CS to Public Data).
@@ -541,7 +541,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
         <Nav variant="tabs">
           <Item>
             <Link eventKey="within" as="button" className="outline-none">
-              <strong>CS Within Samples</strong>
+              <strong>CS Between Samples</strong>
             </Link>
           </Item>
           <Item>

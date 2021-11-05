@@ -119,7 +119,7 @@ export default function Multivariable() {
                   tmpName,
                   collapseOptions,
                   ...params
-                }) => params
+                }) => ({ ...params, name: tmpName })
               ),
             },
           }),
@@ -130,6 +130,9 @@ export default function Multivariable() {
         associationVars: associationVars.map((assocVar, i) => ({
           ...assocVar,
           name: assocVar.tmpName,
+          collapse: Array.isArray(collapseData[i + 1])
+            ? collapseData[i + 1][0]
+            : '',
           collapseOptions: Array.isArray(collapseData[i + 1])
             ? collapseData[i + 1]
             : [],
@@ -234,12 +237,16 @@ export default function Multivariable() {
   function addParam() {
     let newParams = associationVars.slice();
     newParams.push({
-      collapse: '',
-      filter: '',
-      log2: false,
-      name: '',
       source: '',
       type: '',
+      tmpName: '',
+      sourceOptions: [],
+      typeOptions: [],
+      nameOptions: [],
+      filter: '',
+      log2: false,
+      collapse: '',
+      collapseOptions: [],
     });
     mergeState({ associationVars: newParams });
   }

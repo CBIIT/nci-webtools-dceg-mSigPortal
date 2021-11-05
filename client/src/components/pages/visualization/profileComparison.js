@@ -813,7 +813,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         <Nav variant="tabs">
           <Item>
             <Link eventKey="within" as="button" className="outline-none">
-              <strong>PC Within Samples</strong>
+              <strong>PC Between Samples</strong>
             </Link>
           </Item>
           <Item>
@@ -836,7 +836,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
           <div className="px-3 pt-3 pb-0">
             <p className="m-0">
               Below you can observe mutational profile comparisons between
-              samples (PC Within Samples), between a sample and a signature from
+              samples (PC Between Samples), between a sample and a signature from
               a reference signature set (PC to Reference Signatures), or between
               user data and public data (PC to Public Data).
             </p>
