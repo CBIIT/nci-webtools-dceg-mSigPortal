@@ -1,46 +1,86 @@
-FROM quay.io/centos/centos:stream8
+FROM ${BACKEND_BASE_IMAGE:-oraclelinux:8-slim}
 
-RUN dnf -y update \
-    && dnf -y install \
-    dnf-plugins-core \
-    epel-release \
-    glibc-langpack-en \
-    && dnf config-manager --enable powertools \
-    && dnf -y module enable nodejs:13 \
-    && dnf -y install \
-    # gdal-devel \
-    # proj-devel \
-    # protobuf-devel \
-    # udunits2-devel \
-    v8-devel \
-    # https://download.fedoraproject.org/pub/epel/7/x86_64/Packages/j/jq-1.6-2.el7.x86_64.rpm \
-    # https://download.fedoraproject.org/pub/epel/7/x86_64/Packages/j/jq-devel-1.6-2.el7.x86_64.rpm \
-    libjpeg-turbo-devel \
-    openssl-devel \
-    nodejs \
-    R \
-    python3-pip \
-    python3-devel \
-    libcurl-devel \
-    libxml2-devel \
-    git \
-    rsync \
-    wget \
-    && dnf -y install \
-    gmp-devel \
-    mpfr-devel \
-    cairo \
-    cairo-devel \
-    # NLopt \
-    # NLopt-devel \
-    google-roboto-condensed-fonts \
-    && dnf clean all
+RUN rpm -i https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm && \
+    microdnf -y update && \
+    microdnf -y module enable nodejs:14 && \
+    microdnf -y --enablerepo=ol8_codeready_builder install \
+        # NLopt \
+        # NLopt-devel \
+        cairo \
+        cairo-devel \
+        git \
+        gmp-devel \
+        google-roboto-condensed-fonts \
+        libcurl-devel \
+        libjpeg-turbo-devel \
+        libxml2-devel \
+        mpfr-devel \
+        nodejs \
+        npm \
+        openssl-devel \
+        python3-devel \
+        python3-pip \
+        R \
+        rsync \
+        wget \
+    && microdnf clean all
+
+# configure C++ Toolchain for installing dependency RStan - https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started
+ENV MAKEFLAGS='-j2'
+RUN mkdir -p $HOME/.R && \
+    echo "CXX14FLAGS=-O3 -march=native -mtune=native -fPIC","CXX14=g++" >> $HOME/.R/Makevars
+
+# install R packages
+RUN Rscript -e "install.packages(\
+    c(\
+        'aws.ec2metadata', \
+        'aws.s3', \
+        'BiocManager', \
+        'car', \
+        'coop', \
+        'cowplot', \
+        'entropy', \
+        'factoextra', \
+        'FactoMineR', \
+        'ggdendro', \
+        'ggExtra', \
+        'ggforce', \
+        'ggpubr', \
+        'ggrepel', \
+        'ggridges', \
+        'ggsci', \
+        'ggside', \
+        'ggstatsplot', \
+        'ggtext', \
+        'hrbrthemes', \
+        'janitor', \
+        'scales', \
+        'svglite', \
+        'tidyverse' \
+    ), \
+    repos='https://cloud.r-project.org/', \
+    Ncpus = 2)"
+
+# install Bioc Packages
+RUN Rscript -e "BiocManager::install(\
+    c(\
+        'BSgenome.Hsapiens.UCSC.hg19', \
+        'BSgenome.Hsapiens.UCSC.hg38', \
+        'ChIPseeker', \
+        'org.Hs.eg.db', \
+        'TxDb.Hsapiens.UCSC.hg19.knownGene', \
+        'TxDb.Hsapiens.UCSC.hg38.knownGene' \
+    ))"
+
 
 # install python packages
 RUN pip3 install scipy statsmodels
 
 # install system fonts
-RUN cd /tmp; git clone https://github.com/xtmgah/SigProfilerPlotting; cp /tmp/SigProfilerPlotting/fonts/* /usr/share/fonts; fc-cache -fv;
+RUN cd /tmp && \
+    git clone https://github.com/xtmgah/SigProfilerPlotting && \
+    cp /tmp/SigProfilerPlotting/fonts/* /usr/share/fonts && \
+    fc-cache -fv;
 
 # install client python packages
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
@@ -48,16 +88,11 @@ RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#eg
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerPlotting#egg=SigProfilerPlotting'
 
 # install genomes
-RUN python3.6 -c "from SigProfilerMatrixGenerator import install as genInstall; genInstall.install('GRCh37', rsync=False, bash=True); genInstall.install('GRCh38', rsync=False, bash=True); genInstall.install('mm10', rsync=False, bash=True)"
-
-# configure C++ Toolchain for installing dependency RStan - https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started
-RUN Rscript -e 'dotR <- file.path(Sys.getenv("HOME"), ".R"); dir.create(dotR); M <- file.path(dotR, "Makevars"); file.create(M); cat("\nCXX14FLAGS=-O3 -march=native -mtune=native -fPIC","CXX14=g++", file = M, sep = "\n", append = TRUE);'
-
-# install R packages
-RUN Rscript -e "Sys.setenv(MAKEFLAGS = '-j2'); install.packages(c('tidyverse', 'hrbrthemes', 'ggExtra', 'ggsci', 'ggrepel', 'ggdendro', 'scales', 'ggforce', 'svglite', 'cowplot', 'car', 'FactoMineR', 'factoextra', 'coop', 'ggridges', 'ggtext', 'ggpubr', 'entropy', 'janitor', 'ggstatsplot', 'BiocManager', 'aws.s3', 'aws.ec2metadata', 'ggside'), repos='https://cloud.r-project.org/', Ncpus = 2)"
-
-# install Bioc Packages
-RUN Rscript -e 'BiocManager::install(c("BSgenome.Hsapiens.UCSC.hg19", "TxDb.Hsapiens.UCSC.hg19.knownGene", "BSgenome.Hsapiens.UCSC.hg38", "TxDb.Hsapiens.UCSC.hg38.knownGene", "ChIPseeker", "org.Hs.eg.db"))'
+RUN python3.6 -c "\
+from SigProfilerMatrixGenerator import install as genInstall; \
+genInstall.install('GRCh37', rsync=False, bash=True); \
+genInstall.install('GRCh38', rsync=False, bash=True); \
+genInstall.install('mm10', rsync=False, bash=True)"
 
 RUN mkdir -p /deploy/server /deploy/logs
 
