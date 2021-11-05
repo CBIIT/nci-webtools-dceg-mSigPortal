@@ -82,9 +82,9 @@ RUN cd /tmp && \
     fc-cache -fv;
 
 # install client python packages
-RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
-
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerPlotting#egg=SigProfilerPlotting'
+
+RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
 
 # install genomes
 # RUN python3.6 -c "\
