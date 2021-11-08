@@ -43,17 +43,6 @@ export default function MsAssociation({ calculateAssociation }) {
         <LoadingOverlay active={loading} />
         <Row>
           <Col lg="auto">
-            <Group controlId="toggleBothSamples">
-              <Check
-                type="checkbox"
-                label="Number of Mutations assigned to both signature > 0"
-                value={both}
-                checked={both}
-                onChange={(e) => mergeMsAssociation({ both: !both })}
-              />
-            </Group>
-          </Col>
-          <Col lg="auto">
             <Select
               disabled={source == 'user' && !userNameOptions.length}
               id="associationSignatureName1"
@@ -76,6 +65,17 @@ export default function MsAssociation({ calculateAssociation }) {
               }
               onChange={(name) => mergeMsAssociation({ signatureName2: name })}
             />
+          </Col>
+          <Col lg="auto">
+            <Group controlId="toggleBothSamples">
+              <Check
+                type="checkbox"
+                label="Samples Detected Both Signatures"
+                value={both}
+                checked={both}
+                onChange={(e) => mergeMsAssociation({ both: !both })}
+              />
+            </Group>
           </Col>
           <Col lg="auto" className="d-flex">
             <Button

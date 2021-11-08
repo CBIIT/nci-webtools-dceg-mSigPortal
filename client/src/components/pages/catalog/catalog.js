@@ -11,7 +11,7 @@ export default function Explore() {
 
   const tabs = [
     { name: 'Etiology', id: 'etiology' },
-    { name: 'Signature', id: 'signature' },
+    { name: 'Reference Signature', id: 'signature' },
   ];
 
   return (

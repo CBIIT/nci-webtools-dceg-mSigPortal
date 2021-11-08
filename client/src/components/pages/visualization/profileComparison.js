@@ -721,7 +721,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
               <Col lg="auto">
                 <Select
                   id="pcPubCancerType"
-                  label="Cancer Type"
+                  label="Cancer Type or Group"
                   value={pubCancerType}
                   options={pubCancerTypeOptions}
                   onChange={handleCancerChange}

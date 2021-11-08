@@ -425,7 +425,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
               <Col lg="auto">
                 <Select
                   id="pcaPubCancerType"
-                  label="Cancer Type"
+                  label="Cancer Type or Group"
                   value={pubCancerType}
                   options={pubCancerTypeOptions}
                   onChange={handleCancerChange}

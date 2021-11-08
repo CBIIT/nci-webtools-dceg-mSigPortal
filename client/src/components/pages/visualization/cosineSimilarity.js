@@ -461,7 +461,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
               <Col lg="auto">
                 <Select
                   id="csPubCancerType"
-                  label="Cancer Type"
+                  label="Cancer Type or Group"
                   value={pubCancerType || visualization.cancerType}
                   options={pubCancerTypeOptions}
                   onChange={handleCancerChange}
