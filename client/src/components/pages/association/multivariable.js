@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Form,
   Row,
@@ -59,6 +59,8 @@ export default function Multivariable() {
     exposureVar,
     resultsTable,
   } = multivariable;
+
+  const [warnLimit, showWarnLimit] = useState(false);
 
   // populate controls
   useEffect(() => {
@@ -235,7 +237,7 @@ export default function Multivariable() {
   );
 
   function addParam() {
-    if (associationVars.length < 11) {
+    if (associationVars.length < 10) {
       let newParams = associationVars.slice();
       newParams.push({
         source: '',
@@ -250,6 +252,9 @@ export default function Multivariable() {
         collapseOptions: [],
       });
       mergeState({ associationVars: newParams });
+    } else {
+      showWarnLimit(true);
+      setTimeout(() => showWarnLimit(false), 5000);
     }
   }
 
@@ -306,17 +311,29 @@ export default function Multivariable() {
         ))}
         <Row className="mt-3 justify-content-between">
           <Col md="auto" className="d-flex">
-            <Button
-              className="ml-auto"
-              variant="link"
-              onClick={() => addParam()}
-              title="Add Plot"
-              style={{ textDecoration: 'none' }}
+            <OverlayTrigger
+              show={warnLimit}
+              placement="bottom"
+              overlay={
+                <Popover>
+                  <Popover.Content className="text-danger">
+                    You may only use up to 10 variables
+                  </Popover.Content>
+                </Popover>
+              }
             >
-              <span className="text-nowrap" title="Add Association Variable">
-                <FontAwesomeIcon icon={faPlus} /> Add Association Variable
-              </span>
-            </Button>
+              <Button
+                className="ml-auto"
+                variant="link"
+                onClick={() => addParam()}
+                title="Add Plot"
+                style={{ textDecoration: 'none' }}
+              >
+                <span className="text-nowrap" title="Add Association Variable">
+                  <FontAwesomeIcon icon={faPlus} /> Add Association Variable
+                </span>
+              </Button>
+            </OverlayTrigger>
           </Col>
           <Col md="auto" className="d-flex">
             <Button
