@@ -235,21 +235,24 @@ export default function Multivariable() {
   );
 
   function addParam() {
-    let newParams = associationVars.slice();
-    newParams.push({
-      source: '',
-      type: '',
-      tmpName: '',
-      sourceOptions: [],
-      typeOptions: [],
-      nameOptions: [],
-      filter: '',
-      log2: false,
-      collapse: '',
-      collapseOptions: [],
-    });
-    mergeState({ associationVars: newParams });
+    if (associationVars.length < 11) {
+      let newParams = associationVars.slice();
+      newParams.push({
+        source: '',
+        type: '',
+        tmpName: '',
+        sourceOptions: [],
+        typeOptions: [],
+        nameOptions: [],
+        filter: '',
+        log2: false,
+        collapse: '',
+        collapseOptions: [],
+      });
+      mergeState({ associationVars: newParams });
+    }
   }
+
   function removeParam(index) {
     let newParams = associationVars.slice();
     newParams.splice(index, 1);
@@ -290,6 +293,7 @@ export default function Multivariable() {
 
         {associationVars.map((paramState, index) => (
           <AssocVarParams
+            index={index}
             hostState={multivariable}
             paramState={paramState}
             mergeState={(e) => {

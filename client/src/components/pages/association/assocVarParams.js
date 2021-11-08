@@ -15,6 +15,7 @@ import Select from '../../controls/select/select';
 const { Group, Label, Check, Control } = Form;
 
 export default function AssocVarParams({
+  index = 0,
   hostState,
   paramState,
   mergeState,
@@ -113,7 +114,7 @@ export default function AssocVarParams({
         <Col md="auto">
           <Select
             disabled={loadingData || loadingParams || loadingCalculate}
-            id="source"
+            id={'source-' + index}
             label="Variable Source"
             value={source}
             options={sourceOptions}
@@ -123,7 +124,7 @@ export default function AssocVarParams({
         <Col md="auto">
           <Select
             disabled={loadingData || loadingParams || loadingCalculate}
-            id="type"
+            id={'type-' + index}
             label="Data Type"
             value={type}
             options={typeOptions}
@@ -133,7 +134,7 @@ export default function AssocVarParams({
         <Col md="auto">
           <Select
             disabled={loadingData || loadingParams || loadingCalculate}
-            id="assocVariable"
+            id={'assocVariable-' + index}
             label="Variable Name"
             value={tmpName}
             options={nameOptions}
@@ -166,7 +167,10 @@ export default function AssocVarParams({
                       />
                     </Button>
                   </OverlayTrigger>
-                  <Group controlId="threshold" className="d-flex mb-0">
+                  <Group
+                    controlId={'threshold-' + index}
+                    className="d-flex mb-0"
+                  >
                     <Label className="mr-2 font-weight-normal">Threshold</Label>
                     <Control
                       disabled={
@@ -185,7 +189,7 @@ export default function AssocVarParams({
                 </div>
               </Col>
               <Col md="auto">
-                <Group controlId="log2-1" className="d-flex mb-0">
+                <Group controlId={'log2-1-' + index} className="d-flex mb-0">
                   <OverlayTrigger
                     trigger="click"
                     placement="top"
@@ -210,7 +214,7 @@ export default function AssocVarParams({
                   <Label className="mr-2 font-weight-normal">
                     log<sub>2</sub>
                   </Label>
-                  <Check inline id="log2-1">
+                  <Check>
                     <Check.Input
                       disabled={
                         loadingData || loadingParams || loadingCalculate
@@ -251,7 +255,7 @@ export default function AssocVarParams({
                     loadingCalculate ||
                     !collapseOptions.length
                   }
-                  id="collapse1"
+                  id={'collapse1-' + index}
                   label="Collapse"
                   labelClass="mr-2 font-weight-normal"
                   value={collapseOptions.length ? collapse : 'None'}
