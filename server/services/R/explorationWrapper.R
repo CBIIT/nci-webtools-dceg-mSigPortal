@@ -31,23 +31,23 @@ wrapper <- function(fn, args, dataArgs) {
 
 # Util Functions for retrieving data
 # get dataframe with column and filter arguments
-getReferenceSignatureData <- function(args, dataArgs) {
-  library(stringr)
-  s3load(paste0(dataArgs$s3Data, 'Signature/signature_refsets.RData'), dataArgs$bucket)
+# getReferenceSignatureData <- function(args, dataArgs) {
+#   library(stringr)
+#   s3load(paste0(dataArgs$s3Data, 'Signature/signature_refsets.RData'), dataArgs$bucket)
 
-  columns = unlist(args$columns, use.names = FALSE)
-  filters = args$filters
-  # get selected columns
-  data = signature_refsets %>% select(columns) %>% unique()
-  # apply filters
-  if (length(filters) > 0) {
-    for (i in 1:length(names(filters))) {
-      data = str_sort(data %>% filter(get(names(filters)[[i]]) == filters[[i]]), numeric = TRUE)
-    }
-  }
+#   columns = unlist(args$columns, use.names = FALSE)
+#   filters = args$filters
+#   # get selected columns
+#   data = signature_refsets %>% select(columns) %>% unique()
+#   # apply filters
+#   if (length(filters) > 0) {
+#     for (i in 1:length(names(filters))) {
+#       data = str_sort(data %>% filter(get(names(filters)[[i]]) == filters[[i]]), numeric = TRUE)
+#     }
+#   }
 
-  return(data)
-}
+#   return(data)
+# }
 
 # retrieve signature names filtered by cancer type
 getSignatureNames <- function(args, dataArgs) {
@@ -415,7 +415,12 @@ exposurePublic <- function(args, dataArgs) {
   )
   genomesize = genome2size(genome)
 
-  s3load(paste0(dataArgs$s3Data, 'Signature/signature_refsets.RData'), dataArgs$bucket)
+  study_signature_file <- paste0(dataArgs$s3Data, 'Exposure/Study_Signatures/', common$study, '_', common$strategy, '_signature_refsets.RData')
+  if (aws.s3::object_exists(study_signature_file, dataArgs$bucket)) {
+    s3load(study_signature_file, dataArgs$bucket)
+  } else {
+    s3load(paste0(dataArgs$s3Data, 'Signature/signature_refsets.RData'), dataArgs$bucket)
+  }
   s3load(paste0(dataArgs$s3Data, 'Exposure/', common$study, '_', common$strategy, '_exposure_refdata.RData'), dataArgs$bucket)
   s3load(paste0(dataArgs$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), dataArgs$bucket)
 
