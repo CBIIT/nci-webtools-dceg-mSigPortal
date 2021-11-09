@@ -208,6 +208,21 @@ export default function PublicForm({
       } catch (err) {
         mergeError(err.message);
       }
+    } else {
+      try {
+        dispatch(
+          actions.mergeExposure({
+            msBurden: { signatureName: signatureNameOptions[0] },
+            msAssociation: {
+              signatureName1: signatureNameOptions[0],
+              signatureName2:
+                signatureNameOptions[1] || signatureNameOptions[0],
+            },
+          })
+        );
+      } catch (err) {
+        mergeError(err.message);
+      }
     }
   }
 
@@ -291,7 +306,7 @@ export default function PublicForm({
             <Check
               disabled={loading || submitted}
               type="checkbox"
-              label="Cancer Type Only"
+              label="Cancer Type or Group Only"
               value={useCancerType}
               checked={useCancerType}
               onChange={(e) => {
