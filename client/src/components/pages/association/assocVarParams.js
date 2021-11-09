@@ -21,6 +21,7 @@ export default function AssocVarParams({
   mergeState,
   handleLoadParameters,
   remove = false,
+  duplicates = [],
 }) {
   const { loadingData, assocVarData } = useSelector(
     (state) => state.association.associationState
@@ -110,7 +111,11 @@ export default function AssocVarParams({
 
   return (
     <div style={{ maxWidth: '1500' }}>
-      <Row className="mt-3 border rounded p-2">
+      <Row
+        className={`mt-3 border rounded p-2 ${
+          duplicates.indexOf(index) > -1 ? 'border-danger' : ''
+        }`}
+      >
         <Col md="auto">
           <Select
             disabled={loadingData || loadingParams || loadingCalculate}

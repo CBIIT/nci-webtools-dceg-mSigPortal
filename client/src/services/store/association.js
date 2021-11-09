@@ -87,8 +87,6 @@ export const getInitialState = () => ({
     signature: '',
     signatureOptions: [],
     testType: 'lm',
-    xlab: '',
-    ylab: '',
     associationVars: [
       {
         source: '',

@@ -61,6 +61,7 @@ export default function Multivariable() {
   } = multivariable;
 
   const [warnLimit, showWarnLimit] = useState(false);
+  const [warnDupe, setDupe] = useState([]);
 
   // populate controls
   useEffect(() => {
@@ -95,56 +96,76 @@ export default function Multivariable() {
     return ref.current;
   }
 
-  async function handleLoadParameters() {
-    mergeState({ loadingParams: true, error: false });
-    try {
-      const { stdout, output: collapseData } = await (
-        await fetch(`api/associationWrapper`, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            fn: 'loadCollapseMulti',
-            args: {
-              study,
-              strategy,
-              rsSet,
-              cancer,
-              expName: exposureVar.name,
-              associationVars: associationVars.map(
-                ({
-                  sourceOptions,
-                  typeOptions,
-                  nameOptions,
-                  tmpName,
-                  collapseOptions,
-                  ...params
-                }) => ({ ...params, name: tmpName })
-              ),
-            },
-          }),
-        })
-      ).json();
+  // returns a mapping of input params and an array of indexes for duplicate inputs
+  function findDupes() {
+    const params = associationVars.map(({ source, type, tmpName }) => ({
+      source,
+      type,
+      name: tmpName,
+    }));
 
-      mergeState({
-        associationVars: associationVars.map((assocVar, i) => ({
-          ...assocVar,
-          name: assocVar.tmpName,
-          collapse: Array.isArray(collapseData[i + 1])
-            ? collapseData[i + 1][0]
-            : '',
-          collapseOptions: Array.isArray(collapseData[i + 1])
-            ? collapseData[i + 1]
-            : [],
-        })),
-        exposureVar: { name: expVarList[0] },
-      });
-    } catch (error) {
-      mergeError(error);
+    return params.reduce((a, e, i) => {
+      const input = `${e.source}|${e.type}|${e.name}`;
+      a[input] = a[input] ? [...a[input], i] : [];
+      return a;
+    }, {});
+  }
+
+  async function handleLoadParameters() {
+    const dupeIndexes = Object.values(findDupes()).flat();
+    setDupe(dupeIndexes);
+
+    if (!dupeIndexes.length) {
+      mergeState({ loadingParams: true, error: false });
+      try {
+        const { stdout, output: collapseData } = await (
+          await fetch(`api/associationWrapper`, {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              fn: 'loadCollapseMulti',
+              args: {
+                study,
+                strategy,
+                rsSet,
+                cancer,
+                expName: exposureVar.name,
+                associationVars: associationVars.map(
+                  ({
+                    sourceOptions,
+                    typeOptions,
+                    nameOptions,
+                    tmpName,
+                    collapseOptions,
+                    ...params
+                  }) => ({ ...params, name: tmpName })
+                ),
+              },
+            }),
+          })
+        ).json();
+
+        mergeState({
+          associationVars: associationVars.map((assocVar, i) => ({
+            ...assocVar,
+            name: assocVar.tmpName,
+            collapse: Array.isArray(collapseData[i + 1])
+              ? collapseData[i + 1][0]
+              : '',
+            collapseOptions: Array.isArray(collapseData[i + 1])
+              ? collapseData[i + 1]
+              : [],
+          })),
+          exposureVar: { name: expVarList[0] },
+        });
+      } catch (error) {
+        mergeError(error);
+      }
+      mergeState({ loadingParams: false });
     }
-    mergeState({ loadingParams: false });
   }
 
   async function handleCalculate() {
@@ -307,6 +328,7 @@ export default function Multivariable() {
               mergeState({ associationVars: newParams });
             }}
             remove={index != 0 ? () => removeParam(index) : false}
+            duplicates={warnDupe}
           />
         ))}
         <Row className="mt-3 justify-content-between">
@@ -317,7 +339,7 @@ export default function Multivariable() {
               overlay={
                 <Popover>
                   <Popover.Content className="text-danger">
-                    You may only use up to 10 variables
+                    You may only add up to 10 variables
                   </Popover.Content>
                 </Popover>
               }
@@ -335,11 +357,18 @@ export default function Multivariable() {
               </Button>
             </OverlayTrigger>
           </Col>
-          <Col md="auto" className="d-flex">
+          <Col md="auto">
+            {warnDupe.length > 0 && (
+              <span className="text-danger">
+                Please change or remove duplicate variables
+              </span>
+            )}
+          </Col>
+          <Col md="auto">
             <Button
               disabled={loadingData || loadingParams || loadingCalculate}
-              className="w-100 align-self-center"
               variant="primary"
+              style={{ width: 'fit-content' }}
               onClick={() => handleLoadParameters()}
             >
               Load Data
