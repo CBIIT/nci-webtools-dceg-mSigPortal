@@ -60,8 +60,11 @@ getPublicData <- function(args, dataArgs) {
   if (args$study == 'PCAWG') { infoFile = 'PCAWG_WGS_seqmatrix_refdata_info.RData' }
   else if (args$study == 'TCGA') { infoFile = "TCGA_WES_seqmatrix_refdata_info.RData" }
   else if (args$study == 'Breast560') { infoFile = 'Breast560_WGS_seqmatrix_refdata_info.RData' }
-  else if (args$study == 'Sherlock-Lung-v1') { infoFile = 'Sherlock-Lung-v1_WGS_seqmatrix_refdata_info.RData' }
+  else if (args$study == 'Sherlock-Lung-232') { infoFile = 'Sherlock-Lung-232_WGS_seqmatrix_refdata_info.RData' }
   else if (args$study == 'ChernobylThyroid') { infoFile = 'ChernobylThyroid_WGS_seqmatrix_refdata_info.RData' }
+  else if (args$study == 'Mutographs-ESCC') { infoFile = 'Mutographs-ESCC_WGS_seqmatrix_refdata_info.RData' }
+  else if (args$study == 'LCM-Normal-Tissues') { infoFile = 'LCM-Normal-Tissues_WGS_seqmatrix_refdata_info.RData' }
+  else stop('Cannot find public data file')
 
   s3load(paste0(dataArgs$s3Data, 'Seqmatrix/', infoFile), dataArgs$bucket)
 

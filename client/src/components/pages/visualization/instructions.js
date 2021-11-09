@@ -3,21 +3,23 @@ import { Link } from 'react-router-dom';
 
 export default function Instructions({ loading }) {
   const examples = [
-    { title: 'VCF Example', path: 'vcfExample' },
+    { title: 'VCF Example of User Input', path: 'vcfExample' },
+    { title: 'Sherlock-Lung-232', path: 'sherlock-lung-232' },
+    { title: 'Mutographs-ESCC', path: 'mutographs-escc' },
     { title: 'PCAWG Lung-AdenoCA', path: 'pcawg-LungAdenoCA' },
     { title: 'PCAWG Lung-SCC', path: 'pcawg-LungSCC' },
     { title: 'PCAWG Breast-AdenoCA', path: 'pcawg-BreastAdenoCA' },
     { title: 'PCAWG Skin-Melanoma', path: 'pcawg-SkinMelanoma' },
     { title: 'PCAWG PanCancer', path: 'pcawg-PanCancer' },
     { title: 'TCGA PanCancer', path: 'tcga-PanCancer' },
-    {
-      title: 'MBD4 defect is associated with hypermutated CpG>TpG pattern',
-      external: {
-        name: 'PMID: 29760383',
-        href: 'https://pubmed.ncbi.nlm.nih.gov/29760383/',
-      },
-      path: 'mbd4_defect',
-    },
+    // {
+    //   title: 'MBD4 defect is associated with hypermutated CpG>TpG pattern',
+    //   external: {
+    //     name: 'PMID: 29760383',
+    //     href: 'https://pubmed.ncbi.nlm.nih.gov/29760383/',
+    //   },
+    //   path: 'mbd4_defect',
+    // },
   ];
 
   return (
