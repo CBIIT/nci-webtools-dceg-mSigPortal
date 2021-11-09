@@ -589,54 +589,60 @@ export default function Exposure({ match }) {
           {/* for desktops and tablets */}
           <div className="d-none d-md-block">
             <Nav defaultActiveKey="profilerSummary">
-              {tabs.map(({ name, id }) => (
-                <div key={id} className="d-inline-block">
-                  <Button
-                    variant="link"
-                    className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
-                      id == displayTab ? 'active-secondary-navlinks' : ''
-                    }`}
-                    active={id == displayTab && submitted}
-                    disabled={id != 'instructions' && !submitted}
-                    style={{
-                      textDecoration: 'none',
-                      fontSize: '12pt',
-                      color: 'black',
-                      fontWeight: '500',
-                    }}
-                    onClick={() => mergeState({ displayTab: id })}
-                  >
-                    {name}
-                  </Button>
-                </div>
-              ))}
+              {tabs.map(({ name, id }) => {
+                if (name)
+                  return (
+                    <div key={id} className="d-inline-block">
+                      <Button
+                        variant="link"
+                        className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
+                          id == displayTab ? 'active-secondary-navlinks' : ''
+                        }`}
+                        active={id == displayTab && submitted}
+                        disabled={id != 'instructions' && !submitted}
+                        style={{
+                          textDecoration: 'none',
+                          fontSize: '12pt',
+                          color: 'black',
+                          fontWeight: '500',
+                        }}
+                        onClick={() => mergeState({ displayTab: id })}
+                      >
+                        {name}
+                      </Button>
+                    </div>
+                  );
+              })}
             </Nav>
           </div>
           {/* for mobile devices */}
           <div className="row d-md-none">
             <Nav defaultActiveKey="summary">
-              {tabs.map(({ name, id }) => (
-                <div key={id} className="col-12 text-center">
-                  <Button
-                    variant="link"
-                    className={
-                      id == displayTab && Object.keys(exposureCancer).length
-                        ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 active-secondary-navlinks'
-                        : 'secondary-navlinks px-3 py-1 d-inline-block border-0'
-                    }
-                    style={{
-                      textDecoration: 'none',
-                      fontSize: '12pt',
-                      color: 'black',
-                      fontWeight: '500',
-                    }}
-                    onClick={() => mergeState({ displayTab: id })}
-                  >
-                    {name}
-                  </Button>
-                  <div className="d-md-none w-100"></div>
-                </div>
-              ))}
+              {tabs.map(({ name, id }) => {
+                if (name)
+                  return (
+                    <div key={id} className="col-12 text-center">
+                      <Button
+                        variant="link"
+                        className={
+                          id == displayTab && Object.keys(exposureCancer).length
+                            ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 active-secondary-navlinks'
+                            : 'secondary-navlinks px-3 py-1 d-inline-block border-0'
+                        }
+                        style={{
+                          textDecoration: 'none',
+                          fontSize: '12pt',
+                          color: 'black',
+                          fontWeight: '500',
+                        }}
+                        onClick={() => mergeState({ displayTab: id })}
+                      >
+                        {name}
+                      </Button>
+                      <div className="d-md-none w-100"></div>
+                    </div>
+                  );
+              })}
             </Nav>
           </div>
         </div>

@@ -680,6 +680,7 @@ export default function UserForm() {
         </Group>
         <Group controlId="email">
           <Control
+            aria-label="Enter Email"
             placeholder="Enter Email"
             size="sm"
             value={email}

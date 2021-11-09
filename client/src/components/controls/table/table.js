@@ -260,7 +260,7 @@ export default function Table({
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column) => (
                 <th
-                  id={column.id.replace(/\s|\W/g, '')}
+                  id={(column.id + '-' + title).replace(/\s/g, '')}
                   {...column.getHeaderProps(column.getSortByToggleProps())}
                 >
                   <span title={column.tooltip}>{column.render('Header')}</span>
