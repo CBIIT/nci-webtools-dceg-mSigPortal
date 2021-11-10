@@ -55,9 +55,10 @@ getSignatureNames <- function(args, dataArgs) {
   s3load(paste0(dataArgs$s3Data, 'Exposure/exposure_refdata.RData'), dataArgs$bucket)
 
   exposure_refdata_selected <- exposure_refdata %>% filter(Study == args$study, Dataset == args$strategy, Signature_set_name == args$rsSet)
+  if (!is.null(args$cancerType)) exposure_refdata_selected <- exposure_refdata_selected %>% filter(Cancer_Type == args$cancerType)
 
   # available siganture name, Dropdown list for all the signature name
-  signature_name_avail <- str_sort(exposure_refdata_selected %>% filter(Cancer_Type == args$cancerType, Exposure > 0) %>% pull(Signature_name) %>% unique(), numeric = TRUE)
+  signature_name_avail <- str_sort(exposure_refdata_selected %>% filter(Exposure > 0) %>% pull(Signature_name) %>% unique(), numeric = TRUE)
 
   return(signature_name_avail)
 }

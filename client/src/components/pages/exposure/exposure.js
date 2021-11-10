@@ -58,7 +58,6 @@ export default function Exposure({ match }) {
     displayTab,
     exposureSignature,
     exposureCancer,
-    signatureNames,
     study,
     studyOptions,
     strategy,
@@ -484,19 +483,8 @@ export default function Exposure({ match }) {
     });
   }
 
-  function handleSet(set) {
-    const signatureNameOptions = [
-      ...new Set(
-        signatureNames
-          .filter((row) => row.Signature_set_name == set)
-          .map((row) => row.Signature_name)
-      ),
-    ];
-
-    mergeState({
-      rsSet: set,
-      signatureNameOptions: signatureNameOptions,
-    });
+  function handleSet(rsSet) {
+    mergeState({ rsSet });
   }
 
   function handleReset() {
@@ -514,7 +502,6 @@ export default function Exposure({ match }) {
       cancerOptions,
       exposureCancer,
       exposureSignature,
-      signatureNames,
     };
     resetExposure();
     mergeState(params);

@@ -58,24 +58,18 @@ export default function PublicForm({
 
   async function populateControls() {
     try {
-      let [exposureCancer, exposureSignature, signatureNames] =
-        await Promise.all([
-          getJSON('Others/json/Exploring-Exposure-cancertype.json'),
-          getJSON('Others/json/Exploring-Exposure.json'),
-          getJSON('Others/json/Signature_name.json'),
-        ]);
+      let [exposureCancer, exposureSignature] = await Promise.all([
+        getJSON('Others/json/Exploring-Exposure-cancertype.json'),
+        getJSON('Others/json/Exploring-Exposure.json'),
+      ]);
 
-      populateExposureExp(exposureCancer, exposureSignature, signatureNames);
+      populateExposureExp(exposureCancer, exposureSignature);
     } catch (err) {
       mergeError(err.message);
     }
   }
 
-  async function populateExposureExp(
-    exposureCancer,
-    exposureSignature,
-    signatureNames
-  ) {
+  async function populateExposureExp(exposureCancer, exposureSignature) {
     mergeState({ loading: true });
 
     const studyOptions = [
@@ -110,14 +104,6 @@ export default function PublicForm({
     ];
     const cancer = 'Lung-AdenoCA'; // default
 
-    const signatureNameOptions = [
-      ...new Set(
-        signatureNames
-          .filter((row) => row.Signature_set_name == rsSet)
-          .map((row) => row.Signature_name)
-      ),
-    ];
-
     mergeState({
       study: study,
       studyOptions: studyOptions,
@@ -127,11 +113,9 @@ export default function PublicForm({
       cancerOptions: cancerOptions,
       rsSet: rsSet,
       rsSetOptions: rsSetOptions,
-      signatureNameOptions: signatureNameOptions,
       loading: false,
       exposureCancer,
       exposureSignature,
-      signatureNames,
     });
   }
 
@@ -172,57 +156,40 @@ export default function PublicForm({
 
   // get signature name options filtered by cancer type
   async function getSignatureNames() {
-    if (useCancerType) {
-      try {
-        const { stdout, output } = await (
-          await fetch(`api/explorationWrapper`, {
-            method: 'POST',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
+    try {
+      const { stdout, output } = await (
+        await fetch(`api/explorationWrapper`, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            fn: 'getSignatureNames',
+            args: {
+              study: study,
+              strategy: strategy,
+              rsSet: rsSet,
+              cancerType: useCancerType ? cancer : null,
             },
-            body: JSON.stringify({
-              fn: 'getSignatureNames',
-              args: {
-                study: study,
-                strategy: strategy,
-                rsSet: rsSet,
-                cancerType: cancer,
-              },
-            }),
-          })
-        ).json();
+          }),
+        })
+      ).json();
 
-        if (output.length)
-          dispatch(
-            actions.mergeExposure({
-              exposureState: { signatureNameOptions: output },
-              msBurden: { signatureName: output[0] },
-              msAssociation: {
-                signatureName1: output[0],
-                signatureName2: output[1] || output[0],
-              },
-            })
-          );
-        else console.log('No Signature Names Found');
-      } catch (err) {
-        mergeError(err.message);
-      }
-    } else {
-      try {
+      if (output.length)
         dispatch(
           actions.mergeExposure({
-            msBurden: { signatureName: signatureNameOptions[0] },
+            exposureState: { signatureNameOptions: output },
+            msBurden: { signatureName: output[0] },
             msAssociation: {
-              signatureName1: signatureNameOptions[0],
-              signatureName2:
-                signatureNameOptions[1] || signatureNameOptions[0],
+              signatureName1: output[0],
+              signatureName2: output[1] || output[0],
             },
           })
         );
-      } catch (err) {
-        mergeError(err.message);
-      }
+      else console.log('No Signature Names Found');
+    } catch (err) {
+      mergeError(err.message);
     }
   }
 
