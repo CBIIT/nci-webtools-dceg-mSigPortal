@@ -218,17 +218,15 @@ export default function Etiology() {
   }, [data]);
 
   function profileSort(a, b) {
-    const sigOrder = ['SBS', 'DBS', 'ID'];
+    const sigOrder = [/SBS/g, /DBS/g, /ID/g];
     let c = 0,
       d = 0;
 
     sigOrder.forEach((profile, i) => {
-      if (a['Signature Name'] && a['Signature Name'].includes(profile)) {
-        c = i;
-      }
-      if (b['Signature Name'] && b['Signature Name'].includes(profile)) {
-        d = i;
-      }
+      const sigA = a['Signature Name'] || a.Signature;
+      const sigB = b['Signature Name'] || b.Signature;
+      if (sigA.match(profile)) c = i;
+      if (sigB.match(profile)) d = i;
     });
 
     return c - d;
@@ -240,8 +238,10 @@ export default function Etiology() {
   }
 
   function naturalSort(a, b) {
-    if (a['Signature Name'])
-      return a['Signature Name'].localeCompare(b['Signature Name'], undefined, {
+    const sigA = a['Signature Name'] || a.Signature || false;
+    const sigB = b['Signature Name'] || b.Signature || false;
+    if (sigA)
+      return sigA.localeCompare(sigB, undefined, {
         numeric: true,
         sensitivity: 'base',
       });
