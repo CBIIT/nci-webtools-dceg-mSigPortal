@@ -548,9 +548,9 @@ async function getVisExample(req, res, next) {
       });
 
       const paramsPath = path.join(resultsPath, `params.json`);
-      let params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
 
       // rename file paths with new ID
+      let params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
       const oldID = params.visualization.state.projectID;
       await replace({
         files: paramsPath,
@@ -597,15 +597,26 @@ async function getExposureExample(req, res, next) {
     logger.info(`Fetching Exposure example: ${example}`);
 
     // check exists
-    const examplePath = path.resolve(config.data.examples, 'exposure', example);
-    const paramsPath = path.join(examplePath, `params.json`);
+    const examplePath = path.resolve(
+      config.data.examples,
+      'exposure',
+      `${example}.tgz`
+    );
 
-    if (fs.existsSync(paramsPath)) {
+    if (fs.existsSync(examplePath)) {
       // copy example to results with unique id
       const id = uuidv4();
       const resultsPath = path.resolve(config.results.folder, id);
       await fs.promises.mkdir(resultsPath, { recursive: true });
-      await fs.copy(examplePath, resultsPath);
+      // await fs.copy(examplePath, resultsPath);
+      await new Promise((resolve, reject) => {
+        fs.createReadStream(examplePath)
+          .on('end', () => resolve())
+          .on('error', (err) => reject(err))
+          .pipe(tar.x({ strip: 1, C: resultsPath }));
+      });
+
+      const paramsPath = path.join(resultsPath, `params.json`);
 
       // rename file paths with new ID
       let params = JSON.parse(String(await fs.promises.readFile(paramsPath)));

@@ -5,22 +5,24 @@ import { Link } from 'react-router-dom';
 export default function Instructions({ loading }) {
   const examples = [
     {
-      name: 'Lung',
-      title:
-        'PCAWG/WGS/COSMIC_v3_Signatures_GRCh37_SBS96/ Lung-AdenoCA; MSA SBS5 vs SBS40',
+      title: 'Sherlock-Lung-232',
+      path: 'sherlock-lung-232',
+    },
+    {
+      title: 'PCAWG Lung-AdenoCA',
       path: 'pcawg-lungadenoca',
     },
     {
-      name: 'Skin',
-      title:
-        'PCAWG/WGS/COSMIC_v3_Signatures_GRCh37_SBS96/ Skin-Melanoma; MSA SBS7a vs SBS7b',
-      path: 'pcawg-skinmelanoma',
+      title: 'PCAWG Lung-SCC',
+      path: 'pcawg-lungscc',
     },
     {
-      name: 'Breast',
-      title:
-        'PCAWG/WGS/COSMIC_v3_Signatures_GRCh37_SBS96/ Breast-AdenoCA; MSA SBS3 vs SBS5',
+      title: 'PCAWG Breast-AdenoCA',
       path: 'pcawg-breastadenoca',
+    },
+    {
+      title: 'PCAWG Skin-Melanoma',
+      path: 'pcawg-skinmelanoma',
     },
   ];
 
