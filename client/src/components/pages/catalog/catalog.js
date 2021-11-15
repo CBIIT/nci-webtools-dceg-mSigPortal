@@ -10,7 +10,7 @@ export default function Explore() {
   const { displayTab } = catalog.catalog;
 
   const tabs = [
-    { name: 'Etiology', id: 'etiology' },
+    { name: 'Signature Catalog', id: 'etiology' },
     { name: 'Reference Signature', id: 'signature' },
   ];
 

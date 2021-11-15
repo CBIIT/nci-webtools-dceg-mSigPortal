@@ -41,18 +41,32 @@ export default function Etiology() {
   const categories = [
     {
       name: 'Cosmic Mutational Signatures (v3.2)',
+      author: 'Alexandrov et al., 2021',
+      etiologyTitle: 'Proposed Etiologies',
       file: 'Etiology_cosmic.json',
     },
     {
       name: 'Environmental Mutagenesis',
+      author: 'Nik-Zainal et al., 2019',
+      etiologyTitle: 'Proposed Mutagens',
       file: 'Etiology_enviromental_mutagenesis.json',
     },
-    { name: 'Gene Edits', file: 'Etiology_gene_edits.json' },
+    {
+      name: 'Gene Edits',
+      author: 'Nik-Zainal et al., 2018 and 2021',
+      file: 'Etiology_gene_edits.json',
+      etiologyTitle: 'Genes',
+    },
     {
       name: 'Cancer Specific Signature',
+      author: 'Nik-Zainal et al., 2020',
       file: 'Etiology_cancer_specific_signatures.json',
     },
-    { name: 'Others', file: 'Etiology_others.json' },
+    {
+      name: 'Others',
+      etiologyTitle: 'Proposed Etiologies',
+      file: 'Etiology_others.json',
+    },
   ];
 
   useEffect(() => {
@@ -262,7 +276,7 @@ export default function Etiology() {
   function getCategories() {
     return (
       <Row className="justify-content-center mb-3">
-        {categories.map(({ name, file }) => (
+        {categories.map(({ name, author, file }) => (
           <Col key={name} lg="2" md="3" sm="4" className="mb-3 d-flex">
             <Button
               size="sm"
@@ -282,7 +296,10 @@ export default function Etiology() {
               className={category != name ? 'disabled' : ''}
               block
             >
-              {name}
+              <div>
+                <div>{name}</div>
+                <div>{author}</div>
+              </div>
             </Button>
           </Col>
         ))}
@@ -693,7 +710,9 @@ export default function Etiology() {
     return (
       <div>
         <div className="mb-3">
-          <h5 className="separator">Etiologies</h5>
+          <h5 className="separator">
+            {categories.filter((cat) => cat.name == category)[0].etiologyTitle}
+          </h5>
           <div>{getEtiologies()}</div>
         </div>
         <div>

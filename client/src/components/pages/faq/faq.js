@@ -5,18 +5,6 @@ import { HashLink } from 'react-router-hash-link';
 export default function Faq() {
   const sections = [
     {
-      title: 'Release History',
-      id: 'release-history',
-      component: (
-        <div>
-          <i>mSigPortal 1.0.0</i>
-          <ul>
-            <li>Initial Release</li>
-          </ul>
-        </div>
-      ),
-    },
-    {
       title: 'What public data is available in mSigPortal?',
       id: 'public-data',
       component: (
@@ -448,6 +436,18 @@ export default function Faq() {
           relationships between input of a regression formula and a signature
           exposure variable.
         </p>
+      ),
+    },
+    {
+      title: 'Release History',
+      id: 'release-history',
+      component: (
+        <div>
+          <i>mSigPortal 1.0.0</i>
+          <ul>
+            <li>Initial Release</li>
+          </ul>
+        </div>
       ),
     },
   ];

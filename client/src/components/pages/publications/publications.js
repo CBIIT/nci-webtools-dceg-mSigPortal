@@ -118,7 +118,7 @@ export default function Publications() {
           </p>
         </div>
 
-        <p>Last update: 20 JAN 2021.</p>
+        <p>Last update: 15 Nov 2021.</p>
       </div>
     </div>
   );

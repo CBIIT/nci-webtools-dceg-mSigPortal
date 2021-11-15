@@ -136,7 +136,7 @@ export default function Home({ links }) {
               fontStyle: 'italic',
             }}
           >
-            Integrative Mutational Signatures Portal for Cancer Genomic Studies
+            Integrative Mutational Signature Portal for Cancer Genomic Studies
           </div>
           <div
             className="col-12 text-center mt-5"
@@ -153,7 +153,7 @@ export default function Home({ links }) {
         <hr className="w-75"></hr>
         <div className="px-3 text-center">
           <b>
-            Integrative mutational signatures portal for cancer genomic studies
+            Integrative mutational signature portal for cancer genomic studies
           </b>
         </div>
       </div>
