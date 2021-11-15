@@ -19,7 +19,6 @@ export default function AssocVarParams({
   hostState,
   paramState,
   mergeState,
-  handleLoadParameters,
   remove = false,
   duplicates = [],
 }) {
@@ -110,9 +109,9 @@ export default function AssocVarParams({
   );
 
   return (
-    <div style={{ maxWidth: '1500' }}>
+    <div>
       <Row
-        className={`mt-3 border rounded p-2 ${
+        className={`justify-content-center mt-3 border rounded p-2 ${
           duplicates.indexOf(index) > -1 ? 'border-danger' : ''
         }`}
       >
@@ -288,20 +287,6 @@ export default function AssocVarParams({
             <span style={{ width: '101.867px' }} />
           )}
         </Col>
-        {handleLoadParameters && (
-          <Col md="auto" className="d-flex">
-            <Button
-              disabled={
-                loadingData || loadingParams || loadingCalculate || !source
-              }
-              className="w-100 align-self-center"
-              variant="primary"
-              onClick={() => handleLoadParameters()}
-            >
-              Load Data
-            </Button>
-          </Col>
-        )}
       </Row>
     </div>
   );

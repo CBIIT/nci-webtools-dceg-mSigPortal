@@ -331,7 +331,11 @@ export default function Multivariable() {
             duplicates={warnDupe}
           />
         ))}
-        <Row className="mt-3 justify-content-between">
+
+        <Row
+          className="mx-auto mt-3 justify-content-between"
+          style={{ maxWidth: '1720px' }}
+        >
           <Col md="auto" className="d-flex">
             <OverlayTrigger
               show={warnLimit}
@@ -345,7 +349,6 @@ export default function Multivariable() {
               }
             >
               <Button
-                className="ml-auto"
                 variant="link"
                 onClick={() => addParam()}
                 title="Add Plot"

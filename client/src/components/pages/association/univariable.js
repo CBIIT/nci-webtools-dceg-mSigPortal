@@ -262,8 +262,27 @@ export default function Univariable() {
           hostState={useSelector((state) => state.association.univariable)}
           paramState={associationVar}
           mergeState={(e) => mergeState({ associationVar: e })}
-          handleLoadParameters={handleLoadParameters}
         />
+        <Row
+          className="mx-auto mt-3 justify-content-end"
+          style={{ maxWidth: '1720px' }}
+        >
+          <Col md="auto">
+            <Button
+              disabled={
+                loadingData ||
+                loadingParams ||
+                loadingCalculate ||
+                !associationVar.source
+              }
+              className="ml-auto align-self-center"
+              variant="primary"
+              onClick={() => handleLoadParameters()}
+            >
+              Load Data
+            </Button>
+          </Col>
+        </Row>
       </div>
       <div className="mb-3">
         <h5 className="separator">Parameters</h5>
