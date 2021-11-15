@@ -31,10 +31,8 @@ export const getInitialState = () => ({
     loading: false,
   },
   sigRefSig: {
-    plotPath: 'assets/images/mSigPortalReferenceSignatures.svg',
-    debugR: '',
+    plotPath: '',
     err: '',
-    loading: false,
   },
   sigMutationalProfiles: {
     plots: [
