@@ -100,20 +100,8 @@ export default function PublicForm() {
   }
 
   function handleReset() {
-    const params = {
-      source,
-      exposureSignature,
-      studyOptions,
-      strategyOptions,
-      cancerOptions,
-      rsSetOptions,
-      study: 'PCAWG',
-      strategy: 'WGS',
-      rsSet: 'COSMIC_v3_Signatures_GRCh37_SBS96',
-      cancer: 'Lung-AdenoCA',
-    };
     resetAssociation();
-    mergeState(params);
+    populateControls();
   }
 
   async function handleLoadData() {
