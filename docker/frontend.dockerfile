@@ -1,14 +1,17 @@
-FROM ${FRONTEND_BASE_IMAGE:-oraclelinux:8-slim}
+FROM ${FRONTEND_BASE_IMAGE:-quay.io/centos/centos:stream8}
 
-RUN microdnf -y update \
-    && microdnf -y module enable nodejs:14 \
-    && microdnf -y install \
+RUN dnf -y update \
+    && dnf -y install \
+    dnf-plugins-core \
+    epel-release \
+    glibc-langpack-en \
+    && dnf -y module enable nodejs:14 \
+    && dnf -y install \
     gcc-c++ \
     httpd \
     make \
     nodejs \
-    npm \
-    && microdnf clean all
+    && dnf clean all
 
 RUN mkdir /client
 
