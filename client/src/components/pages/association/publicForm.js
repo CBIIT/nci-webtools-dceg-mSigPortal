@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Form, Row, Col, Button } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Form, Row, Col, Button, Modal } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Select from '../../controls/select/select';
 import { useSelector, useDispatch } from 'react-redux';
@@ -32,6 +32,8 @@ export default function PublicForm() {
     cancer,
     rsSet,
   } = useSelector((state) => state.association.associationState);
+
+  const [missingModal, setMissing] = useState(false);
 
   // populate controls on inital render
   useEffect(() => {
@@ -115,65 +117,71 @@ export default function PublicForm() {
   }
 
   async function handleLoadData() {
-    const getAssocVarData = async () =>
-      (
-        await fetch(`api/associationWrapper`, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            fn: 'getAssocVarData',
-            args: { study, cancer },
-          }),
-        })
-      ).json();
-    const getExpVarData = async () =>
-      (
-        await fetch(`api/associationWrapper`, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            fn: 'getExpVarData',
-            args: { study, strategy, rsSet, cancer },
-          }),
-        })
-      ).json();
+    // tempoary - display warning for missing or incomplete studies
+    if (study == 'Mutographs-ESCC') {
+      setMissing(true);
+      mergeState({ submitted: true });
+    } else {
+      const getAssocVarData = async () =>
+        (
+          await fetch(`api/associationWrapper`, {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              fn: 'getAssocVarData',
+              args: { study, cancer },
+            }),
+          })
+        ).json();
+      const getExpVarData = async () =>
+        (
+          await fetch(`api/associationWrapper`, {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              fn: 'getExpVarData',
+              args: { study, strategy, rsSet, cancer },
+            }),
+          })
+        ).json();
 
-    mergeState({ loadingData: true });
-    try {
-      const [assocResponse, expResponse] = await Promise.all([
-        getAssocVarData(),
-        getExpVarData(),
-      ]);
+      mergeState({ loadingData: true });
+      try {
+        const [assocResponse, expResponse] = await Promise.all([
+          getAssocVarData(),
+          getExpVarData(),
+        ]);
 
-      const {
-        projectID,
-        output: assocOutput,
-        uncaughtError: assocError,
-      } = assocResponse;
-      const { output: expOutput, uncaughtError: expError } = expResponse;
+        const {
+          projectID,
+          output: assocOutput,
+          uncaughtError: assocError,
+        } = assocResponse;
+        const { output: expOutput, uncaughtError: expError } = expResponse;
 
-      if (assocError) throw assocError;
-      if (expError) throw expError;
+        if (assocError) throw assocError;
+        if (expError) throw expError;
 
-      mergeState({
-        submitted: true,
-        assocVarData: assocOutput.assocVarData,
-        assocFullDataPath: assocOutput.fullDataPath,
-        expVarList: expOutput.expVarList,
-        displayTab: 'univariable',
-        openSidebar: false,
-      });
-      dispatch(actions.mergeAssociation({ univariable: { projectID } }));
-    } catch (error) {
-      mergeError(error);
+        mergeState({
+          submitted: true,
+          assocVarData: assocOutput.assocVarData,
+          assocFullDataPath: assocOutput.fullDataPath,
+          expVarList: expOutput.expVarList,
+          displayTab: 'univariable',
+          openSidebar: false,
+        });
+        dispatch(actions.mergeAssociation({ univariable: { projectID } }));
+      } catch (error) {
+        mergeError(error);
+      }
+      mergeState({ loadingData: false });
     }
-    mergeState({ loadingData: false });
   }
 
   function handleStudy(study) {
@@ -250,91 +258,115 @@ export default function PublicForm() {
   }
 
   return (
-    <Form>
-      <LoadingOverlay active={!studyOptions.length} />
-      <Row>
-        <Col>
-          <Group>
-            <Select
-              disabled={loadingData || submitted}
-              id="expStudyPublic"
-              label="Study"
-              value={study}
-              options={studyOptions}
-              onChange={handleStudy}
-            />
-          </Group>
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <Group>
-            <Select
-              disabled={loadingData || submitted}
-              id="tumorStrategy"
-              label="Experimental Strategy"
-              value={strategy}
-              options={strategyOptions}
-              onChange={handleStrategy}
-            />
-          </Group>
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <Group>
-            <Select
-              disabled={loadingData || submitted}
-              id="expSetPublic"
-              label="Reference Signature Set"
-              value={rsSet}
-              options={rsSetOptions}
-              onChange={handleSet}
-            />
-          </Group>
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <Group>
-            <Select
-              className="mb-4"
-              disabled={loadingData || submitted}
-              id="prevalenceCancerType"
-              label="Cancer Type or Group"
-              value={cancer}
-              options={cancerOptions}
-              onChange={(cancer) =>
-                mergeState({
-                  cancer: cancer,
-                })
-              }
-            />
-          </Group>
-        </Col>
-      </Row>
-      <Row>
-        <Col md="6">
-          <Button
-            disabled={loadingData}
-            className="w-100 mb-3"
-            variant="secondary"
-            onClick={() => handleReset()}
-          >
-            Reset
+    <>
+      <Modal
+        data-testid="missingModal"
+        show={missingModal}
+        onHide={() => setMissing(false)}
+      >
+        <Modal.Body style={{ backgroundColor: '#fafafa' }}>
+          <p>Selected data is currently unavailable.</p>
+          <p>
+            {`${study}-${rsSet}-${cancer} will be added in a future release.`}
+          </p>
+        </Modal.Body>
+
+        <Modal.Footer
+          className="d-flex justify-content-center border-0"
+          style={{ backgroundColor: '#fafafa' }}
+        >
+          <Button variant="outline-secondary" onClick={() => setMissing(false)}>
+            Close
           </Button>
-        </Col>
-        <Col md="6">
-          <Button
-            disabled={loadingData || submitted}
-            className="w-100"
-            variant="primary"
-            onClick={() => handleLoadData()}
-          >
-            Load Study
-          </Button>
-        </Col>
-      </Row>
-    </Form>
+        </Modal.Footer>
+      </Modal>
+
+      <Form>
+        <LoadingOverlay active={!studyOptions.length} />
+        <Row>
+          <Col>
+            <Group>
+              <Select
+                disabled={loadingData || submitted}
+                id="expStudyPublic"
+                label="Study"
+                value={study}
+                options={studyOptions}
+                onChange={handleStudy}
+              />
+            </Group>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Group>
+              <Select
+                disabled={loadingData || submitted}
+                id="tumorStrategy"
+                label="Experimental Strategy"
+                value={strategy}
+                options={strategyOptions}
+                onChange={handleStrategy}
+              />
+            </Group>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Group>
+              <Select
+                disabled={loadingData || submitted}
+                id="expSetPublic"
+                label="Reference Signature Set"
+                value={rsSet}
+                options={rsSetOptions}
+                onChange={handleSet}
+              />
+            </Group>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Group>
+              <Select
+                className="mb-4"
+                disabled={loadingData || submitted}
+                id="prevalenceCancerType"
+                label="Cancer Type or Group"
+                value={cancer}
+                options={cancerOptions}
+                onChange={(cancer) =>
+                  mergeState({
+                    cancer: cancer,
+                  })
+                }
+              />
+            </Group>
+          </Col>
+        </Row>
+        <Row>
+          <Col md="6">
+            <Button
+              disabled={loadingData}
+              className="w-100 mb-3"
+              variant="secondary"
+              onClick={() => handleReset()}
+            >
+              Reset
+            </Button>
+          </Col>
+          <Col md="6">
+            <Button
+              disabled={loadingData || submitted}
+              className="w-100"
+              variant="primary"
+              onClick={() => handleLoadData()}
+            >
+              Load Study
+            </Button>
+          </Col>
+        </Row>
+      </Form>
+    </>
   );
 }
