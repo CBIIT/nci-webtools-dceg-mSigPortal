@@ -1,29 +1,40 @@
-FROM ${BACKEND_BASE_IMAGE:-oraclelinux:8-slim}
+FROM ${BACKEND_BASE_IMAGE:-quay.io/centos/centos:stream8}
 
-RUN rpm -i https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm && \
-    microdnf -y update && \
-    microdnf -y module enable nodejs:14 && \
-    microdnf -y --enablerepo=ol8_codeready_builder install \
-        # NLopt \
-        # NLopt-devel \
-        cairo \
-        cairo-devel \
-        git \
-        gmp-devel \
-        google-roboto-condensed-fonts \
-        libcurl-devel \
-        libjpeg-turbo-devel \
-        libxml2-devel \
-        mpfr-devel \
-        nodejs \
-        npm \
-        openssl-devel \
-        python3-devel \
-        python3-pip \
-        R \
-        rsync \
-        wget \
-    && microdnf clean all
+RUN dnf -y update \
+    && dnf -y install \
+    dnf-plugins-core \
+    epel-release \
+    glibc-langpack-en \
+    && dnf config-manager --enable powertools \
+    && dnf -y module enable nodejs:13 \
+    && dnf -y install \
+    # gdal-devel \
+    # proj-devel \
+    # protobuf-devel \
+    # udunits2-devel \
+    v8-devel \
+    # https://download.fedoraproject.org/pub/epel/7/x86_64/Packages/j/jq-1.6-2.el7.x86_64.rpm \
+    # https://download.fedoraproject.org/pub/epel/7/x86_64/Packages/j/jq-devel-1.6-2.el7.x86_64.rpm \
+    libjpeg-turbo-devel \
+    openssl-devel \
+    nodejs \
+    R \
+    python3-pip \
+    python3-devel \
+    libcurl-devel \
+    libxml2-devel \
+    git \
+    rsync \
+    wget \
+    && dnf -y install \
+    gmp-devel \
+    mpfr-devel \
+    cairo \
+    cairo-devel \
+    # NLopt \
+    # NLopt-devel \
+    google-roboto-condensed-fonts \
+    && dnf clean all
 
 # configure C++ Toolchain for installing dependency RStan - https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started
 ENV MAKEFLAGS='-j2'
