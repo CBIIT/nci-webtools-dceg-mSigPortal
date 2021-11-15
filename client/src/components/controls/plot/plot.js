@@ -71,62 +71,69 @@ export default function Plot({
       <TransformWrapper {...zoomProps}>
         {({ zoomIn, zoomOut, resetTransform }) => (
           <React.Fragment>
-            <div className="tools mb-3">
-              <div className="d-flex justify-content-center">
-                {title && <strong className="mb-3">{title}</strong>}
-              </div>
-              <div className="d-flex">
-                <div className="d-flex align-items-end ml-auto mb-auto">
-                  <Button
-                    className="p-0 border-0 ml-3"
-                    variant="link"
-                    onClick={() => download(plotPath)}
-                  >
-                    Download Plot
-                  </Button>
-                  {txtPath && (
+            {plotPath && (
+              <div className="tools mb-3">
+                <div className="d-flex justify-content-center">
+                  {title && <strong className="mb-3">{title}</strong>}
+                </div>
+                <div className="d-flex">
+                  <div className="d-flex align-items-end ml-auto mb-auto">
                     <Button
                       className="p-0 border-0 ml-3"
                       variant="link"
-                      onClick={() => download(txtPath)}
+                      onClick={() => download(plotPath)}
                     >
-                      Download Data
+                      Download Plot
                     </Button>
-                  )}
+                    {txtPath && (
+                      <Button
+                        className="p-0 border-0 ml-3"
+                        variant="link"
+                        onClick={() => download(txtPath)}
+                      >
+                        Download Data
+                      </Button>
+                    )}
+                  </div>
+                  <Button
+                    size="sm"
+                    className="ml-3"
+                    variant="secondary"
+                    onClick={() => zoomIn(0.2)}
+                    aria-label="zoom in"
+                  >
+                    <FontAwesomeIcon
+                      icon={faPlus}
+                      style={{ color: '#fafafa' }}
+                    />
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="ml-1"
+                    variant="secondary"
+                    onClick={() => zoomOut(0.2)}
+                    aria-label="zoom out"
+                  >
+                    <FontAwesomeIcon
+                      icon={faMinus}
+                      style={{ color: '#fafafa' }}
+                    />
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="ml-1"
+                    variant="secondary"
+                    onClick={() => resetTransform()}
+                    aria-label="reset zoom"
+                  >
+                    <FontAwesomeIcon
+                      icon={faHome}
+                      style={{ color: '#fafafa' }}
+                    />
+                  </Button>
                 </div>
-                <Button
-                  size="sm"
-                  className="ml-3"
-                  variant="secondary"
-                  onClick={() => zoomIn(0.2)}
-                  aria-label="zoom in"
-                >
-                  <FontAwesomeIcon icon={faPlus} style={{ color: '#fafafa' }} />
-                </Button>
-                <Button
-                  size="sm"
-                  className="ml-1"
-                  variant="secondary"
-                  onClick={() => zoomOut(0.2)}
-                  aria-label="zoom out"
-                >
-                  <FontAwesomeIcon
-                    icon={faMinus}
-                    style={{ color: '#fafafa' }}
-                  />
-                </Button>
-                <Button
-                  size="sm"
-                  className="ml-1"
-                  variant="secondary"
-                  onClick={() => resetTransform()}
-                  aria-label="reset zoom"
-                >
-                  <FontAwesomeIcon icon={faHome} style={{ color: '#fafafa' }} />
-                </Button>
               </div>
-            </div>
-
+            )}
             <TransformComponent>
               <img
                 className="w-100"

@@ -325,35 +325,13 @@ export default function MutationalProfiles() {
       <hr />
       <div style={{ minHeight: '400px' }}>
         <LoadingOverlay active={loading} />
-        {plotPath && (
-          <Plot
-            className="p-3"
-            downloadName={getdownloadName()}
-            plotPath={plotPath}
-            height="500px"
-          />
-        )}
+        <Plot
+          className="p-3"
+          downloadName={getdownloadName()}
+          plotPath={plotPath}
+          height="500px"
+        />
       </div>
-      {/* <Button
-        variant="link"
-        className="p-0 mt-5"
-        onClick={() =>
-          mergeMutationalProfiles({
-            displayDebug: !displayDebug,
-          })
-        }
-      >
-        Debug
-      </Button>
-      <pre
-        className="border rounded p-1 "
-        style={{ display: displayDebug ? 'block' : 'none' }}
-      >
-        <div>stdout</div>
-        <pre className="border">{debug.stdout}</pre>
-        <div>stderr</div>
-        <pre className="border">{debug.stderr}</pre>
-      </pre> */}
     </div>
   );
 }
