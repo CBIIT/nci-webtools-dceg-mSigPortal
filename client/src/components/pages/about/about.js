@@ -59,6 +59,14 @@ export default function About() {
             </a>
             .
           </p>
+          <br />
+          <div>
+            <h5>Release History</h5>
+            <i>mSigPortal 1.0.0</i>
+            <ul>
+              <li>Initial Release</li>
+            </ul>
+          </div>
         </Container>
       </div>
     </div>

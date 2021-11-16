@@ -438,18 +438,6 @@ export default function Faq() {
         </p>
       ),
     },
-    {
-      title: 'Release History',
-      id: 'release-history',
-      component: (
-        <div>
-          <i>mSigPortal 1.0.0</i>
-          <ul>
-            <li>Initial Release</li>
-          </ul>
-        </div>
-      ),
-    },
   ];
 
   return (
