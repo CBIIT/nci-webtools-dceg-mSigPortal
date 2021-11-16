@@ -9,6 +9,10 @@ export default function Instructions({ loading }) {
       path: 'sherlock-lung-232',
     },
     {
+      title: 'Mutographs-ESCC',
+      path: 'mutographs-escc',
+    },
+    {
       title: 'PCAWG Lung-AdenoCA',
       path: 'pcawg-lungadenoca',
     },
