@@ -499,7 +499,7 @@ export default function Etiology() {
                   src={thumbnailURL}
                   className="w-100"
                   // height="70"
-                  alt={signatureName}
+                  alt=""
                 />
                 <strong className="sigLabel" style={{ fontSize: '0.8rem' }}>
                   {signatureName}
@@ -539,7 +539,7 @@ export default function Etiology() {
                     src={thumbnailURL}
                     className="w-100"
                     // height="110"
-                    alt={signatureName}
+                    alt=""
                   />
                   <strong className="sigLabel">{signatureName}</strong>
                 </div>
@@ -803,7 +803,7 @@ export default function Etiology() {
                   src={tissueSig.thumbnailURL}
                   className="w-100"
                   // height="110"
-                  alt={tissueSig['Tissue Specific Signature']}
+                  alt=""
                 />
                 <strong className="sigLabel">
                   {tissueSig['Tissue Specific Signature']}
@@ -846,7 +846,7 @@ export default function Etiology() {
                     src={tissueSig.thumbnailURL}
                     className="w-100"
                     // height="110"
-                    alt={tissueSig['Tissue Specific Signature']}
+                    alt=""
                   />
                   <strong className="sigLabel">
                     {tissueSig['Tissue Specific Signature']}
@@ -890,7 +890,7 @@ export default function Etiology() {
                         src={v.thumbnailURL}
                         className="w-100"
                         // height="110"
-                        alt={v['Ref Signature']}
+                        alt=""
                       />
                       <strong className="sigLabel">
                         {`${v['Ref Signature']} (${v['RefSig Proportion']})`}
