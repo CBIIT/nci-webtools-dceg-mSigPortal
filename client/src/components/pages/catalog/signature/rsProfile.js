@@ -47,7 +47,7 @@ export default function Profile({ submitR }) {
   // dataFolder/all_svg/rsSet/profileName+signatureName
   function buildPlotPath(profileName, rsSet, signatureName) {
     const profile = profileName.match(/[a-z]+|\d+/gi).join('_');
-    const set = rsSet.replace(/\s/g, '_').replace(/[^a-zA-Z0-9-_]/gi, '');
+    const set = rsSet.replace(/\s/g, '_');
     // s3 key
     return `msigportal/Database/Signature/all_svg/${set}/${profile}_plots_mSigPortal_${signatureName}.svg`;
   }
@@ -69,7 +69,7 @@ export default function Profile({ submitR }) {
         URL.revokeObjectURL(plots[index].plotURL);
       return URL.createObjectURL(svg);
     } catch (err) {
-      mergeError(err.message);
+      return err;
     }
   }
 
