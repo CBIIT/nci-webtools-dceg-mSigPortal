@@ -52,7 +52,7 @@ export default function Etiology() {
       file: 'Etiology_enviromental_mutagenesis.json',
     },
     {
-      name: 'Gene Edits',
+      name: 'DNA Repair Gene Edits',
       author: 'Nik-Zainal et al., 2018 and 2021',
       file: 'Etiology_gene_edits.json',
       etiologyTitle: 'Genes',
@@ -600,6 +600,12 @@ export default function Etiology() {
                 <strong>Signature Name: </strong>
                 {info['Signature Name'] || info['Signature']}
               </div>
+              {info['Cell Line'] && (
+                <div>
+                  <strong>Cell Line: </strong>
+                  {info['Cell Line']}
+                </div>
+              )}
               {info.Mutagen && (
                 <div>
                   <strong>Mutagen: </strong>
@@ -626,12 +632,6 @@ export default function Etiology() {
                   <a href={info.Source_URL} target="_blank" rel="noreferrer">
                     {info.Source}
                   </a>
-                </div>
-              )}
-              {info['Cell Line'] && (
-                <div>
-                  <strong>Cell Line: </strong>
-                  {info['Cell Line']}
                 </div>
               )}
               {info.URL && (
