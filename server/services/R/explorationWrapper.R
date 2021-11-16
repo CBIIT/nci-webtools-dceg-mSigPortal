@@ -436,7 +436,7 @@ exposurePublic <- function(args, dataArgs) {
   }
   file <- get_object(paste0(dataArgs$s3Data, 'Seqmatrix/', seqmatrixFile), dataArgs$bucket)
   seqmatrix_refdata_selected <- get(load(rawConnection(file)))
-  seqmatrix_refdata_selected = seqmatrix_refdata_selected %>% filter(Profile == signature_refsets_selected$Profile[1])
+  seqmatrix_refdata_selected = seqmatrix_refdata_selected %>% filter(Profile == signature_refsets_selected$Profile[1], Cancer_Type == common$cancerType)
 
   # Tumor Overall Mutational Burden
   if ('all' %in% args$fn || 'tmb' %in% args$fn) {
