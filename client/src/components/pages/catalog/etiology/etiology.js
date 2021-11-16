@@ -598,7 +598,7 @@ export default function Etiology() {
             <div>
               <div>
                 <strong>Signature Name: </strong>
-                {info['Signature Name']}
+                {info['Signature Name'] || info['Signature']}
               </div>
               {info.Mutagen && (
                 <div>
@@ -617,6 +617,14 @@ export default function Etiology() {
                   <strong>Study: </strong>
                   <a href={info.Study_URL} target="_blank" rel="noreferrer">
                     {info.Study}
+                  </a>
+                </div>
+              )}
+              {info.Source && (
+                <div>
+                  <strong>Source: </strong>
+                  <a href={info.Source_URL} target="_blank" rel="noreferrer">
+                    {info.Source}
                   </a>
                 </div>
               )}
