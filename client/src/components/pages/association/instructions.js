@@ -13,7 +13,7 @@ export default function Instructions({ loading }) {
       <hr />
       <h4>Data Source</h4>
       <p>Public: Perform analysis using data available on the website</p>
-      <p>User: Upload your own data</p>
+      {/* <p>User: Upload your own data</p> */}
     </div>
   );
 }
