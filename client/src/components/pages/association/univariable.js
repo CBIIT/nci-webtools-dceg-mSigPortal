@@ -92,7 +92,7 @@ export default function Univariable() {
     return ref.current;
   }
 
-  async function handleLoadParameters() {
+  async function handleLoadData() {
     mergeState({ loadingParams: true, error: false });
     try {
       const { stdout, output: collapseData } = await (
@@ -125,15 +125,37 @@ export default function Univariable() {
           name: associationVar.tmpName,
           collapseOptions: Array.isArray(collapseVar1) ? collapseVar1 : [],
         },
-        exposureVar: {
-          name: expVarList[0],
-          collapseOptions: Array.isArray(collapseVar2) ? collapseVar2 : [],
-        },
+        // exposureVar: {
+        //   name: expVarList[0],
+        //   collapseOptions: Array.isArray(collapseVar2) ? collapseVar2 : [],
+        // },
       });
     } catch (error) {
       mergeError(error);
     }
     mergeState({ loadingParams: false });
+  }
+
+  function handleReset() {
+    mergeState({
+      associationVar: {
+        name: '',
+        filter: '',
+        log2: false,
+        collapse: '',
+        collapseOptions: [],
+      },
+      projectID: '',
+      plotPath: '',
+      dataPath: '',
+      assocTablePath: '',
+      resultsTable: { data: [] },
+      signatureOptions: [],
+      signature: '',
+      xlab: '',
+      ylab: '',
+      error: '',
+    });
   }
 
   async function handleCalculate() {
@@ -253,36 +275,46 @@ export default function Univariable() {
             )
           }
         />
-        <LoadingOverlay active={loadingParams} />
-        <p className="text-center">
-          Select the following variables for analysis
-        </p>
+        <div>
+          <LoadingOverlay active={loadingParams} />
+          <p className="text-center">
+            Select the following variables for analysis
+          </p>
 
-        <AssocVarParams
-          hostState={useSelector((state) => state.association.univariable)}
-          paramState={associationVar}
-          mergeState={(e) => mergeState({ associationVar: e })}
-        />
-        <Row
-          className="mx-auto mt-3 justify-content-end"
-          style={{ maxWidth: '1720px' }}
-        >
-          <Col md="auto">
-            <Button
-              disabled={
-                loadingData ||
-                loadingParams ||
-                loadingCalculate ||
-                !associationVar.source
-              }
-              className="ml-auto align-self-center"
-              variant="primary"
-              onClick={() => handleLoadParameters()}
-            >
-              Load Data
-            </Button>
-          </Col>
-        </Row>
+          <AssocVarParams
+            hostState={useSelector((state) => state.association.univariable)}
+            paramState={associationVar}
+            mergeState={(e) => mergeState({ associationVar: e })}
+          />
+          <Row
+            className="mx-auto mt-3 justify-content-end"
+            style={{ maxWidth: '1720px' }}
+          >
+            <Col md="auto">
+              <Button
+                disabled={loadingData}
+                className="mr-4 reset"
+                variant="secondary"
+                onClick={() => handleReset()}
+              >
+                Reset
+              </Button>
+              <Button
+                disabled={
+                  loadingData ||
+                  loadingParams ||
+                  loadingCalculate ||
+                  !associationVar.source ||
+                  resultsTable.data.length
+                }
+                variant="primary"
+                onClick={() => handleLoadData()}
+              >
+                Load Data
+              </Button>
+            </Col>
+          </Row>
+        </div>
       </div>
       <div className="mb-3">
         <h5 className="separator">Parameters</h5>
@@ -296,7 +328,12 @@ export default function Univariable() {
             <Row className="justify-content-center">
               <Col md="auto" lg="auto">
                 <Select
-                  disabled={loadingData || loadingParams || loadingCalculate}
+                  disabled={
+                    loadingData ||
+                    loadingParams ||
+                    loadingCalculate ||
+                    resultsTable.data.length
+                  }
                   id="expVariable"
                   label="Signature Exposure Variable"
                   value={exposureVar.name}
@@ -340,7 +377,10 @@ export default function Univariable() {
                           </Label>
                           <Control
                             disabled={
-                              loadingData || loadingParams || loadingCalculate
+                              loadingData ||
+                              loadingParams ||
+                              loadingCalculate ||
+                              resultsTable.data.length
                             }
                             value={exposureVar.filter}
                             placeholder={'Optional'}
@@ -389,7 +429,10 @@ export default function Univariable() {
                         <Check inline id="log2-2">
                           <Check.Input
                             disabled={
-                              loadingData || loadingParams || loadingCalculate
+                              loadingData ||
+                              loadingParams ||
+                              loadingCalculate ||
+                              resultsTable.data.length
                             }
                             type="checkbox"
                             value={exposureVar.log2}
@@ -433,7 +476,12 @@ export default function Univariable() {
                   <Select
                     aria-label="Method"
                     className="mb-0"
-                    disabled={loadingData || loadingParams || loadingCalculate}
+                    disabled={
+                      loadingData ||
+                      loadingParams ||
+                      loadingCalculate ||
+                      resultsTable.data.length
+                    }
                     id="testType"
                     label=""
                     value={testType}
@@ -450,7 +498,12 @@ export default function Univariable() {
               </Col>
               <Col md="auto" className="d-flex">
                 <Button
-                  disabled={loadingData || loadingParams || loadingCalculate}
+                  disabled={
+                    loadingData ||
+                    loadingParams ||
+                    loadingCalculate ||
+                    resultsTable.data.length
+                  }
                   className="w-100 align-self-center"
                   variant="primary"
                   onClick={() => handleCalculate()}

@@ -29,6 +29,7 @@ export default function AssocVarParams({
   const { loadingParams, loadingCalculate } = hostState;
 
   const {
+    name,
     source = '',
     type = '',
     tmpName = '',
@@ -77,7 +78,7 @@ export default function AssocVarParams({
         tmpName: nameOptions[0],
       });
     }
-  }, [assocVarData]);
+  }, [source]);
 
   function handleSource(source) {
     const typeOptions = getTypeOptions(source);
@@ -117,7 +118,7 @@ export default function AssocVarParams({
       >
         <Col md="auto">
           <Select
-            disabled={loadingData || loadingParams || loadingCalculate}
+            disabled={loadingData || loadingParams || loadingCalculate || name}
             id={'source-' + index}
             label="Variable Source"
             value={source}
@@ -127,7 +128,7 @@ export default function AssocVarParams({
         </Col>
         <Col md="auto">
           <Select
-            disabled={loadingData || loadingParams || loadingCalculate}
+            disabled={loadingData || loadingParams || loadingCalculate || name}
             id={'type-' + index}
             label="Data Type"
             value={type}
@@ -137,7 +138,7 @@ export default function AssocVarParams({
         </Col>
         <Col md="auto">
           <Select
-            disabled={loadingData || loadingParams || loadingCalculate}
+            disabled={loadingData || loadingParams || loadingCalculate || name}
             id={'assocVariable-' + index}
             label="Variable Name"
             value={tmpName}
@@ -178,7 +179,7 @@ export default function AssocVarParams({
                     <Label className="mr-2 font-weight-normal">Threshold</Label>
                     <Control
                       disabled={
-                        loadingData || loadingParams || loadingCalculate
+                        loadingData || loadingParams || loadingCalculate || name
                       }
                       value={filter}
                       placeholder={'Optional'}
@@ -221,7 +222,7 @@ export default function AssocVarParams({
                   <Check>
                     <Check.Input
                       disabled={
-                        loadingData || loadingParams || loadingCalculate
+                        loadingData || loadingParams || loadingCalculate || name
                       }
                       type="checkbox"
                       value={log2}
@@ -257,7 +258,8 @@ export default function AssocVarParams({
                     loadingData ||
                     loadingParams ||
                     loadingCalculate ||
-                    !collapseOptions.length
+                    !collapseOptions.length ||
+                    name
                   }
                   id={'collapse1-' + index}
                   label="Collapse"
@@ -273,6 +275,7 @@ export default function AssocVarParams({
         <Col md="auto" className="d-flex">
           {remove ? (
             <Button
+              disabled={name}
               className="text-danger mb-3 mr-auto"
               variant="link"
               onClick={remove}

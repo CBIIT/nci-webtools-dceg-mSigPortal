@@ -97,8 +97,8 @@ export default function Multivariable() {
   }
 
   // returns a mapping of input params and an array of indexes for duplicate inputs
-  function findDupes() {
-    const params = associationVars.map(({ source, type, tmpName }) => ({
+  function findDupes(assocVars = associationVars) {
+    const params = assocVars.map(({ source, type, tmpName }) => ({
       source,
       type,
       name: tmpName,
@@ -111,7 +111,7 @@ export default function Multivariable() {
     }, {});
   }
 
-  async function handleLoadParameters() {
+  async function handleLoadData() {
     const dupeIndexes = Object.values(findDupes()).flat();
     setDupe(dupeIndexes);
 
@@ -159,13 +159,42 @@ export default function Multivariable() {
               ? collapseData[i + 1]
               : [],
           })),
-          exposureVar: { name: expVarList[0] },
+          // exposureVar: { name: expVarList[0] },
         });
       } catch (error) {
         mergeError(error);
       }
       mergeState({ loadingParams: false });
     }
+  }
+
+  function handleReset() {
+    mergeState({
+      associationVars: [
+        {
+          source: '',
+          type: '',
+          tmpName: '',
+          sourceOptions: [],
+          typeOptions: [],
+          nameOptions: [],
+          filter: '',
+          log2: false,
+          collapse: '',
+          collapseOptions: [],
+        },
+      ],
+      projectID: '',
+      plotPath: '',
+      dataPath: '',
+      assocTablePath: '',
+      resultsTable: { data: [] },
+      signatureOptions: [],
+      signature: '',
+      xlab: '',
+      ylab: '',
+      error: '',
+    });
   }
 
   async function handleCalculate() {
@@ -282,6 +311,8 @@ export default function Multivariable() {
   function removeParam(index) {
     let newParams = associationVars.slice();
     newParams.splice(index, 1);
+    const dupeIndexes = Object.values(findDupes(newParams)).flat();
+    setDupe(dupeIndexes);
     mergeState({ associationVars: newParams });
   }
 
@@ -312,72 +343,90 @@ export default function Multivariable() {
             )
           }
         />
-        <LoadingOverlay active={loadingParams} />
-        <p className="text-center">
-          Select the following variables for analysis
-        </p>
+        <div>
+          <LoadingOverlay active={loadingParams} />
+          <p className="text-center">
+            Select the following variables for analysis
+          </p>
 
-        {associationVars.map((paramState, index) => (
-          <AssocVarParams
-            index={index}
-            hostState={multivariable}
-            paramState={paramState}
-            mergeState={(e) => {
-              let newParams = associationVars.slice();
-              newParams[index] = { ...newParams[index], ...e };
-              mergeState({ associationVars: newParams });
-            }}
-            remove={index != 0 ? () => removeParam(index) : false}
-            duplicates={warnDupe}
-          />
-        ))}
+          {associationVars.map((paramState, index) => (
+            <AssocVarParams
+              index={index}
+              hostState={multivariable}
+              paramState={paramState}
+              mergeState={(e) => {
+                let newParams = associationVars.slice();
+                newParams[index] = { ...newParams[index], ...e };
+                mergeState({ associationVars: newParams });
+              }}
+              remove={index != 0 ? () => removeParam(index) : false}
+              duplicates={warnDupe}
+            />
+          ))}
 
-        <Row
-          className="mx-auto mt-3 justify-content-between"
-          style={{ maxWidth: '1720px' }}
-        >
-          <Col md="auto" className="d-flex">
-            <OverlayTrigger
-              show={warnLimit}
-              placement="bottom"
-              overlay={
-                <Popover>
-                  <Popover.Content className="text-danger">
-                    You may only add up to 10 variables
-                  </Popover.Content>
-                </Popover>
-              }
-            >
-              <Button
-                variant="link"
-                onClick={() => addParam()}
-                title="Add Plot"
-                style={{ textDecoration: 'none' }}
+          <Row
+            className="mx-auto mt-3 justify-content-between"
+            style={{ maxWidth: '1720px' }}
+          >
+            <Col md="auto" className="d-flex">
+              <OverlayTrigger
+                show={warnLimit}
+                placement="bottom"
+                overlay={
+                  <Popover>
+                    <Popover.Content className="text-danger">
+                      You may only add up to 10 variables
+                    </Popover.Content>
+                  </Popover>
+                }
               >
-                <span className="text-nowrap" title="Add Association Variable">
-                  <FontAwesomeIcon icon={faPlus} /> Add Association Variable
+                <Button
+                  variant="link"
+                  onClick={() => addParam()}
+                  title="Add Plot"
+                  style={{ textDecoration: 'none' }}
+                >
+                  <span
+                    className="text-nowrap"
+                    title="Add Association Variable"
+                  >
+                    <FontAwesomeIcon icon={faPlus} /> Add Association Variable
+                  </span>
+                </Button>
+              </OverlayTrigger>
+            </Col>
+            <Col md="auto">
+              {warnDupe.length > 0 && (
+                <span className="text-danger">
+                  Please change or remove duplicate variables
                 </span>
+              )}
+            </Col>
+            <Col md="auto">
+              <Button
+                disabled={loadingData}
+                className="mr-4 reset"
+                variant="secondary"
+                onClick={() => handleReset()}
+              >
+                Reset
               </Button>
-            </OverlayTrigger>
-          </Col>
-          <Col md="auto">
-            {warnDupe.length > 0 && (
-              <span className="text-danger">
-                Please change or remove duplicate variables
-              </span>
-            )}
-          </Col>
-          <Col md="auto">
-            <Button
-              disabled={loadingData || loadingParams || loadingCalculate}
-              variant="primary"
-              style={{ width: 'fit-content' }}
-              onClick={() => handleLoadParameters()}
-            >
-              Load Data
-            </Button>
-          </Col>
-        </Row>
+              <Button
+                disabled={
+                  loadingData ||
+                  loadingParams ||
+                  loadingCalculate ||
+                  resultsTable.data.length
+                }
+                variant="primary"
+                style={{ width: 'fit-content' }}
+                onClick={() => handleLoadData()}
+              >
+                Load Data
+              </Button>
+            </Col>
+          </Row>
+        </div>
       </div>
       <div className="mb-3">
         <h5 className="separator">Parameters</h5>
@@ -391,7 +440,12 @@ export default function Multivariable() {
             <Row className="justify-content-center">
               <Col md="auto" lg="auto">
                 <Select
-                  disabled={loadingData || loadingParams || loadingCalculate}
+                  disabled={
+                    loadingData ||
+                    loadingParams ||
+                    loadingCalculate ||
+                    resultsTable.data.length
+                  }
                   id="expVariable"
                   label="Signature Exposure Variable"
                   value={exposureVar.name}
@@ -435,7 +489,10 @@ export default function Multivariable() {
                           </Label>
                           <Control
                             disabled={
-                              loadingData || loadingParams || loadingCalculate
+                              loadingData ||
+                              loadingParams ||
+                              loadingCalculate ||
+                              resultsTable.data.length
                             }
                             value={exposureVar.filter}
                             placeholder={'Optional'}
@@ -484,7 +541,10 @@ export default function Multivariable() {
                         <Check inline id="log2-2">
                           <Check.Input
                             disabled={
-                              loadingData || loadingParams || loadingCalculate
+                              loadingData ||
+                              loadingParams ||
+                              loadingCalculate ||
+                              resultsTable.data.length
                             }
                             type="checkbox"
                             value={exposureVar.log2}
@@ -527,7 +587,12 @@ export default function Multivariable() {
                   <legend className="font-weight-bold">Method</legend>
                   <Select
                     className="mb-0"
-                    disabled={loadingData || loadingParams || loadingCalculate}
+                    disabled={
+                      loadingData ||
+                      loadingParams ||
+                      loadingCalculate ||
+                      resultsTable.data.length
+                    }
                     id="testType"
                     label=""
                     value={testType}
@@ -538,7 +603,12 @@ export default function Multivariable() {
               </Col>
               <Col md="auto" className="d-flex">
                 <Button
-                  disabled={loadingData || loadingParams || loadingCalculate}
+                  disabled={
+                    loadingData ||
+                    loadingParams ||
+                    loadingCalculate ||
+                    resultsTable.data.length
+                  }
                   className="w-100 align-self-center"
                   variant="primary"
                   onClick={() => handleCalculate()}
