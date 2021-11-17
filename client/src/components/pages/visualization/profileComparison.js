@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Form,
   Row,
@@ -84,6 +84,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     refSubmitOverlay,
     pubSubmitOverlay,
   } = visualization.profileComparison;
+
+  const [invalidSignature, setInvalid] = useState(false);
 
   const popover = (
     <Popover id="popover-basic" style={{ minWidth: '400px' }}>
@@ -545,7 +547,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 />
               </Col>
               <Col lg="auto">
-                <Group controlId="signatureSet">
+                <Group controlId="refCompare">
                   <Label>
                     Compare Signatures{' '}
                     <OverlayTrigger
@@ -568,6 +570,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   </Label>
                   <Control
                     value={refCompare}
+                    isInvalid={invalidSignature}
                     onChange={(e) => {
                       mergeProfileComparison({
                         refCompare: e.target.value,
@@ -575,6 +578,9 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                     }}
                   />
                   <Text className="text-muted">(Ex. 0.8*SBS5;0.1*SBS1)</Text>
+                  <Form.Control.Feedback type="invalid">
+                    Enter a valid signature. Click info icon for options.
+                  </Form.Control.Feedback>
                 </Group>
               </Col>
               <Col lg="auto" className="d-flex">
@@ -583,33 +589,38 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                   style={{ marginBottom: '2.5rem' }}
                   variant="primary"
                   onClick={() => {
-                    if (source == 'user') {
-                      calculateR('ref', 'profileComparisonRefSig', {
-                        profileType: refProfileType,
-                        sampleName: refSampleName,
-                        signatureSet: refSignatureSet,
-                        compare: refCompare,
-                        matrixFile: matrixList.filter(
-                          (row) =>
-                            row.Profile_Type == withinProfileType &&
-                            row.Matrix_Size ==
-                              defaultMatrix(withinProfileType, [
-                                '96',
-                                '78',
-                                '83',
-                              ])
-                        )[0].Path,
-                      });
+                    if (refCompare) {
+                      setInvalid(false);
+                      if (source == 'user') {
+                        calculateR('ref', 'profileComparisonRefSig', {
+                          profileType: refProfileType,
+                          sampleName: refSampleName,
+                          signatureSet: refSignatureSet,
+                          compare: refCompare,
+                          matrixFile: matrixList.filter(
+                            (row) =>
+                              row.Profile_Type == withinProfileType &&
+                              row.Matrix_Size ==
+                                defaultMatrix(withinProfileType, [
+                                  '96',
+                                  '78',
+                                  '83',
+                                ])
+                          )[0].Path,
+                        });
+                      } else {
+                        calculateR('ref', 'profileComparisonRefSigPublic', {
+                          profileType: refProfileType,
+                          sampleName: refSampleName,
+                          signatureSet: refSignatureSet,
+                          compare: refCompare,
+                          study: study,
+                          cancerType: cancerType,
+                          experimentalStrategy: pubExperimentalStrategy,
+                        });
+                      }
                     } else {
-                      calculateR('ref', 'profileComparisonRefSigPublic', {
-                        profileType: refProfileType,
-                        sampleName: refSampleName,
-                        signatureSet: refSignatureSet,
-                        compare: refCompare,
-                        study: study,
-                        cancerType: cancerType,
-                        experimentalStrategy: pubExperimentalStrategy,
-                      });
+                      setInvalid(true);
                     }
                   }}
                 >
