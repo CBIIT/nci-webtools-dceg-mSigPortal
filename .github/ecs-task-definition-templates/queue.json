@@ -1,5 +1,5 @@
 {
-  "family": "msigportal-queue",
+  "family": "dev-msigportal-queue",
   "containerDefinitions": [
     {
       "name": "msigportal-queue",
