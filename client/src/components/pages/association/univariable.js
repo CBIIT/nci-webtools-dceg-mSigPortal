@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Form,
   Row,
@@ -59,6 +59,9 @@ export default function Univariable() {
     resultsTable,
   } = useSelector((state) => state.association.univariable);
 
+  const [invalidAssocFilter, setInvalidAssocFilter] = useState(false);
+  const [invalidExpFilter, setInvalidExpFilter] = useState(false);
+
   // populate controls
   useEffect(() => {
     if (expVarList.length && !exposureVar.name) {
@@ -93,50 +96,58 @@ export default function Univariable() {
   }
 
   async function handleLoadData() {
-    mergeState({ loadingParams: true, error: false });
-    try {
-      const { stdout, output: collapseData } = await (
-        await fetch(`api/associationWrapper`, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            fn: 'loadCollapse',
-            args: {
-              study,
-              strategy,
-              rsSet,
-              cancer,
-              source: associationVar.source,
-              type: associationVar.type,
-              assocName: associationVar.tmpName,
-              expName: exposureVar.name,
+    if (associationVar.filter && isNaN(associationVar.filter)) {
+      setInvalidAssocFilter(true);
+    } else {
+      setInvalidAssocFilter(false);
+
+      mergeState({ loadingParams: true, error: false });
+      try {
+        const { stdout, output: collapseData } = await (
+          await fetch(`api/associationWrapper`, {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
             },
-          }),
-        })
-      ).json();
+            body: JSON.stringify({
+              fn: 'loadCollapse',
+              args: {
+                study,
+                strategy,
+                rsSet,
+                cancer,
+                source: associationVar.source,
+                type: associationVar.type,
+                assocName: associationVar.tmpName,
+                expName: exposureVar.name,
+              },
+            }),
+          })
+        ).json();
 
-      const { collapseVar1, collapseVar2 } = collapseData;
+        const { collapseVar1, collapseVar2 } = collapseData;
 
-      mergeState({
-        associationVar: {
-          name: associationVar.tmpName,
-          collapseOptions: Array.isArray(collapseVar1) ? collapseVar1 : [],
-        },
-        // exposureVar: {
-        //   name: expVarList[0],
-        //   collapseOptions: Array.isArray(collapseVar2) ? collapseVar2 : [],
-        // },
-      });
-    } catch (error) {
-      mergeError(error);
+        mergeState({
+          associationVar: {
+            name: associationVar.tmpName,
+            collapseOptions: Array.isArray(collapseVar1) ? collapseVar1 : [],
+          },
+          // exposureVar: {
+          //   name: expVarList[0],
+          //   collapseOptions: Array.isArray(collapseVar2) ? collapseVar2 : [],
+          // },
+        });
+      } catch (error) {
+        mergeError(error);
+      }
+      mergeState({ loadingParams: false });
     }
-    mergeState({ loadingParams: false });
   }
 
   function handleReset() {
+    setInvalidAssocFilter(false);
+    setInvalidExpFilter(false);
     mergeState({
       associationVar: {
         name: '',
@@ -159,87 +170,93 @@ export default function Univariable() {
   }
 
   async function handleCalculate() {
-    mergeState({
-      loadingCalculate: signature ? false : true,
-      loadingRecalculate: signature ? true : false,
-      error: false,
-      plotPath: '',
-      dataPath: '',
-    });
-    try {
-      const {
-        projectID: id,
-        stdout,
-        output,
-      } = await (
-        await fetch(`api/associationWrapper`, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            fn: 'univariable',
-            projectID,
-            args: {
-              study,
-              strategy,
-              rsSet,
-              cancer,
-              testType,
-              signature,
-              xlab: xlab || associationVar.name,
-              ylab: ylab || exposureVar.name,
-              associationVar: (() => {
-                const {
-                  sourceOptions,
-                  typeOptions,
-                  nameOptions,
-                  tmpName,
-                  collapseOptions,
-                  ...params
-                } = associationVar;
-                return params;
-              })(),
-              exposureVar: (() => {
-                const { nameOptions, ...params } = exposureVar;
-                return params;
-              })(),
-            },
-          }),
-        })
-      ).json();
+    if (exposureVar.filter && isNaN(exposureVar.filter)) {
+      setInvalidExpFilter(true);
+    } else {
+      setInvalidExpFilter(false);
 
-      const {
-        plotPath,
-        dataPath,
-        assocTablePath,
-        dataTable,
-        signatureOptions,
-        error,
-        uncaughtError,
-      } = output;
-
-      if (error || uncaughtError) {
-        mergeState({ error: error || uncaughtError });
-      } else {
-        mergeState({
+      mergeState({
+        loadingCalculate: signature ? false : true,
+        loadingRecalculate: signature ? true : false,
+        error: false,
+        plotPath: '',
+        dataPath: '',
+      });
+      try {
+        const {
           projectID: id,
+          stdout,
+          output,
+        } = await (
+          await fetch(`api/associationWrapper`, {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              fn: 'univariable',
+              projectID,
+              args: {
+                study,
+                strategy,
+                rsSet,
+                cancer,
+                testType,
+                signature,
+                xlab: xlab || associationVar.name,
+                ylab: ylab || exposureVar.name,
+                associationVar: (() => {
+                  const {
+                    sourceOptions,
+                    typeOptions,
+                    nameOptions,
+                    tmpName,
+                    collapseOptions,
+                    ...params
+                  } = associationVar;
+                  return params;
+                })(),
+                exposureVar: (() => {
+                  const { nameOptions, ...params } = exposureVar;
+                  return params;
+                })(),
+              },
+            }),
+          })
+        ).json();
+
+        const {
           plotPath,
           dataPath,
           assocTablePath,
-          resultsTable: { data: dataTable },
+          dataTable,
           signatureOptions,
-          signature: signature ? signature : signatureOptions[0],
-        });
+          error,
+          uncaughtError,
+        } = output;
+
+        if (error || uncaughtError) {
+          mergeState({ error: error || uncaughtError });
+        } else {
+          mergeState({
+            projectID: id,
+            plotPath,
+            dataPath,
+            assocTablePath,
+            resultsTable: { data: dataTable },
+            signatureOptions,
+            signature: signature ? signature : signatureOptions[0],
+          });
+        }
+      } catch (error) {
+        mergeState({ error: error });
       }
-    } catch (error) {
-      mergeState({ error: error });
+      mergeState({
+        loadingCalculate: false,
+        loadingRecalculate: false,
+      });
     }
-    mergeState({
-      loadingCalculate: false,
-      loadingRecalculate: false,
-    });
   }
 
   const popoverInfo = (text) => (
@@ -285,6 +302,7 @@ export default function Univariable() {
             hostState={useSelector((state) => state.association.univariable)}
             paramState={associationVar}
             mergeState={(e) => mergeState({ associationVar: e })}
+            invalidFilter={invalidAssocFilter}
           />
           <Row
             className="mx-auto mt-3 justify-content-end"
@@ -305,7 +323,7 @@ export default function Univariable() {
                   loadingParams ||
                   loadingCalculate ||
                   !associationVar.source ||
-                  resultsTable.data.length
+                  associationVar.name
                 }
                 variant="primary"
                 onClick={() => handleLoadData()}
@@ -348,31 +366,28 @@ export default function Univariable() {
                   </legend>
                   <Row>
                     <Col md="auto">
-                      <div className="d-flex">
-                        <OverlayTrigger
-                          trigger="click"
-                          placement="top"
-                          overlay={popoverInfo(
-                            'Filter sample with signature exposure value above this threshold'
-                          )}
-                          rootClose
-                        >
-                          <Button
-                            aria-label="threshold info"
-                            variant="link"
-                            className="p-0 font-weight-bold mr-1"
-                          >
-                            <FontAwesomeIcon
-                              icon={faInfoCircle}
-                              style={{ verticalAlign: 'super' }}
-                            />
-                          </Button>
-                        </OverlayTrigger>
-                        <Group
-                          controlId="exposureVar-threshold"
-                          className="d-flex mb-0"
-                        >
+                      <Group controlId="exposureVar-threshold" className="mb-0">
+                        <div className="d-flex">
                           <Label className="mr-2 font-weight-normal">
+                            <OverlayTrigger
+                              trigger="click"
+                              placement="top"
+                              overlay={popoverInfo(
+                                'Filter sample with signature exposure value above this threshold'
+                              )}
+                              rootClose
+                            >
+                              <Button
+                                aria-label="threshold info"
+                                variant="link"
+                                className="p-0 font-weight-bold mr-1"
+                              >
+                                <FontAwesomeIcon
+                                  icon={faInfoCircle}
+                                  style={{ verticalAlign: 'baseline' }}
+                                />
+                              </Button>
+                            </OverlayTrigger>
                             Threshold
                           </Label>
                           <Control
@@ -392,38 +407,43 @@ export default function Univariable() {
                                 },
                               })
                             }
-                            isInvalid={false}
+                            isInvalid={invalidExpFilter}
                           />
-                          <Form.Control.Feedback type="invalid">
-                            Enter a valid threshold
+                        </div>
+                        {invalidExpFilter && (
+                          <Form.Control.Feedback
+                            className="d-block"
+                            type="invalid"
+                          >
+                            Enter a numeric threshold value
                           </Form.Control.Feedback>
-                        </Group>
-                      </div>
+                        )}
+                      </Group>
                     </Col>
                     <Col md="auto">
                       <Group controlId="log2-2" className="d-flex mb-0">
-                        <OverlayTrigger
-                          trigger="click"
-                          placement="top"
-                          overlay={popoverInfo([
-                            'Log ',
-                            <sub>2</sub>,
-                            ' transform signature exposure value',
-                          ])}
-                          rootClose
-                        >
-                          <Button
-                            aria-label="log info"
-                            variant="link"
-                            className="p-0 font-weight-bold mr-1"
-                          >
-                            <FontAwesomeIcon
-                              icon={faInfoCircle}
-                              style={{ verticalAlign: 'baseline' }}
-                            />
-                          </Button>
-                        </OverlayTrigger>
                         <Label className="mr-2 font-weight-normal">
+                          <OverlayTrigger
+                            trigger="click"
+                            placement="top"
+                            overlay={popoverInfo([
+                              'Log ',
+                              <sub>2</sub>,
+                              ' transform signature exposure value',
+                            ])}
+                            rootClose
+                          >
+                            <Button
+                              aria-label="log info"
+                              variant="link"
+                              className="p-0 font-weight-bold mr-1"
+                            >
+                              <FontAwesomeIcon
+                                icon={faInfoCircle}
+                                style={{ verticalAlign: 'baseline' }}
+                              />
+                            </Button>
+                          </OverlayTrigger>
                           log<sub>2</sub>
                         </Label>
                         <Check inline id="log2-2">

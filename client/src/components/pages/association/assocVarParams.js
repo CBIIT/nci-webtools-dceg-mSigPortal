@@ -21,6 +21,7 @@ export default function AssocVarParams({
   mergeState,
   remove = false,
   duplicates = [],
+  invalidFilter,
 }) {
   const { loadingData, assocVarData } = useSelector(
     (state) => state.association.associationState
@@ -152,31 +153,30 @@ export default function AssocVarParams({
             <legend className="font-weight-bold">Variable Filtering</legend>
             <Row>
               <Col md="auto">
-                <div className="d-flex">
-                  <OverlayTrigger
-                    trigger="click"
-                    placement="top"
-                    overlay={popoverInfo(
-                      'Filter sample with variable value above this threshold'
-                    )}
-                    rootClose
-                  >
-                    <Button
-                      aria-label="threshold info"
-                      variant="link"
-                      className="p-0 font-weight-bold mr-1"
-                    >
-                      <FontAwesomeIcon
-                        icon={faInfoCircle}
-                        style={{ verticalAlign: 'super' }}
-                      />
-                    </Button>
-                  </OverlayTrigger>
-                  <Group
-                    controlId={'threshold-' + index}
-                    className="d-flex mb-0"
-                  >
-                    <Label className="mr-2 font-weight-normal">Threshold</Label>
+                <Group controlId={'threshold-' + index} className="mb-0">
+                  <div className="d-flex">
+                    <Label className="mr-2 font-weight-normal">
+                      <OverlayTrigger
+                        trigger="click"
+                        placement="top"
+                        overlay={popoverInfo(
+                          'Filter sample with variable value above this threshold'
+                        )}
+                        rootClose
+                      >
+                        <Button
+                          aria-label="threshold info"
+                          variant="link"
+                          className="p-0 font-weight-bold mr-1"
+                        >
+                          <FontAwesomeIcon
+                            icon={faInfoCircle}
+                            style={{ verticalAlign: 'baseline' }}
+                          />
+                        </Button>
+                      </OverlayTrigger>
+                      Threshold
+                    </Label>
                     <Control
                       disabled={
                         loadingData || loadingParams || loadingCalculate || name
@@ -185,38 +185,40 @@ export default function AssocVarParams({
                       placeholder={'Optional'}
                       style={{ width: '90px' }}
                       onChange={(e) => mergeState({ filter: e.target.value })}
-                      isInvalid={false}
+                      isInvalid={invalidFilter}
                     />
-                    <Form.Control.Feedback type="invalid">
-                      Enter a valid threshold
+                  </div>
+                  {invalidFilter && (
+                    <Form.Control.Feedback className="d-block" type="invalid">
+                      Enter a numeric threshold value
                     </Form.Control.Feedback>
-                  </Group>
-                </div>
+                  )}
+                </Group>
               </Col>
               <Col md="auto">
                 <Group controlId={'log2-1-' + index} className="d-flex mb-0">
-                  <OverlayTrigger
-                    trigger="click"
-                    placement="top"
-                    overlay={popoverInfo([
-                      'Log',
-                      <sub>2</sub>,
-                      ' transform variable value',
-                    ])}
-                    rootClose
-                  >
-                    <Button
-                      aria-label="log info"
-                      variant="link"
-                      className="p-0 font-weight-bold mr-1"
-                    >
-                      <FontAwesomeIcon
-                        icon={faInfoCircle}
-                        style={{ verticalAlign: 'baseline' }}
-                      />
-                    </Button>
-                  </OverlayTrigger>{' '}
                   <Label className="mr-2 font-weight-normal">
+                    <OverlayTrigger
+                      trigger="click"
+                      placement="top"
+                      overlay={popoverInfo([
+                        'Log',
+                        <sub>2</sub>,
+                        ' transform variable value',
+                      ])}
+                      rootClose
+                    >
+                      <Button
+                        aria-label="log info"
+                        variant="link"
+                        className="p-0 font-weight-bold mr-1"
+                      >
+                        <FontAwesomeIcon
+                          icon={faInfoCircle}
+                          style={{ verticalAlign: 'baseline' }}
+                        />
+                      </Button>
+                    </OverlayTrigger>
                     log<sub>2</sub>
                   </Label>
                   <Check>
@@ -251,7 +253,7 @@ export default function AssocVarParams({
                       style={{ verticalAlign: 'baseline' }}
                     />
                   </Button>
-                </OverlayTrigger>
+                </OverlayTrigger>{' '}
                 <Select
                   className="d-inline-flex mb-0"
                   disabled={

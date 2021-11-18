@@ -63,6 +63,9 @@ export default function Multivariable() {
   const [warnLimit, showWarnLimit] = useState(false);
   const [warnDupe, setDupe] = useState([]);
 
+  const [invalidAssocFilter, setInvalidAssocFilter] = useState([]);
+  const [invalidExpFilter, setInvalidExpFilter] = useState(false);
+
   // populate controls
   useEffect(() => {
     if (expVarList.length && !exposureVar.name) {
@@ -115,7 +118,16 @@ export default function Multivariable() {
     const dupeIndexes = Object.values(findDupes()).flat();
     setDupe(dupeIndexes);
 
-    if (!dupeIndexes.length) {
+    const invalidFilters = associationVars
+      .filter((params) => params.filter)
+      .map((params, i) => {
+        if (isNaN(params.filter)) {
+          return i;
+        }
+      });
+    setInvalidAssocFilter(invalidFilters);
+
+    if (!dupeIndexes.length && !invalidFilters.length) {
       mergeState({ loadingParams: true, error: false });
       try {
         const { stdout, output: collapseData } = await (
@@ -198,86 +210,91 @@ export default function Multivariable() {
   }
 
   async function handleCalculate() {
-    mergeState({
-      loadingCalculate: signature ? false : true,
-      loadingRecalculate: signature ? true : false,
-      error: false,
-      plotPath: '',
-      dataPath: '',
-    });
-    try {
-      const {
-        projectID: id,
-        stdout,
-        output,
-      } = await (
-        await fetch(`api/associationWrapper`, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            fn: 'multivariable',
-            projectID,
-            args: {
-              study,
-              strategy,
-              rsSet,
-              cancer,
-              testType,
-              signature,
-              xlab: xlab || associationVars.name,
-              ylab: ylab || exposureVar.name,
-              associationVars: associationVars.map(
-                ({
-                  sourceOptions,
-                  typeOptions,
-                  nameOptions,
-                  tmpName,
-                  collapseOptions,
-                  ...params
-                }) => params
-              ),
-              exposureVar: (() => {
-                const { nameOptions, ...params } = exposureVar;
-                return params;
-              })(),
-            },
-          }),
-        })
-      ).json();
-
-      const {
-        plotPath,
-        dataPath,
-        assocTablePath,
-        dataTable,
-        signatureOptions,
-        error,
-        uncaughtError,
-      } = output;
-
-      if (error || uncaughtError) {
-        mergeState({ error: error || uncaughtError });
-      } else {
-        mergeState({
+    if (exposureVar.filter && isNaN(exposureVar.filter)) {
+      setInvalidExpFilter(true);
+    } else {
+      setInvalidExpFilter(false);
+      mergeState({
+        loadingCalculate: signature ? false : true,
+        loadingRecalculate: signature ? true : false,
+        error: false,
+        plotPath: '',
+        dataPath: '',
+      });
+      try {
+        const {
           projectID: id,
+          stdout,
+          output,
+        } = await (
+          await fetch(`api/associationWrapper`, {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              fn: 'multivariable',
+              projectID,
+              args: {
+                study,
+                strategy,
+                rsSet,
+                cancer,
+                testType,
+                signature,
+                xlab: xlab || associationVars.name,
+                ylab: ylab || exposureVar.name,
+                associationVars: associationVars.map(
+                  ({
+                    sourceOptions,
+                    typeOptions,
+                    nameOptions,
+                    tmpName,
+                    collapseOptions,
+                    ...params
+                  }) => params
+                ),
+                exposureVar: (() => {
+                  const { nameOptions, ...params } = exposureVar;
+                  return params;
+                })(),
+              },
+            }),
+          })
+        ).json();
+
+        const {
           plotPath,
           dataPath,
           assocTablePath,
-          resultsTable: { data: dataTable },
+          dataTable,
           signatureOptions,
-          signature: signature ? signature : signatureOptions[0],
-        });
+          error,
+          uncaughtError,
+        } = output;
+
+        if (error || uncaughtError) {
+          mergeState({ error: error || uncaughtError });
+        } else {
+          mergeState({
+            projectID: id,
+            plotPath,
+            dataPath,
+            assocTablePath,
+            resultsTable: { data: dataTable },
+            signatureOptions,
+            signature: signature ? signature : signatureOptions[0],
+          });
+        }
+      } catch (error) {
+        mergeState({ error: error });
       }
-    } catch (error) {
-      mergeState({ error: error });
+      mergeState({
+        loadingCalculate: false,
+        loadingRecalculate: false,
+      });
     }
-    mergeState({
-      loadingCalculate: false,
-      loadingRecalculate: false,
-    });
   }
 
   const popoverInfo = (text) => (
@@ -361,6 +378,7 @@ export default function Multivariable() {
               }}
               remove={index != 0 ? () => removeParam(index) : false}
               duplicates={warnDupe}
+              invalidFilter={invalidAssocFilter.indexOf(index) >= 0}
             />
           ))}
 
@@ -381,6 +399,12 @@ export default function Multivariable() {
                 }
               >
                 <Button
+                  disabled={
+                    loadingData ||
+                    loadingParams ||
+                    loadingCalculate ||
+                    associationVars[0].name
+                  }
                   variant="link"
                   onClick={() => addParam()}
                   title="Add Plot"
@@ -416,7 +440,7 @@ export default function Multivariable() {
                   loadingData ||
                   loadingParams ||
                   loadingCalculate ||
-                  resultsTable.data.length
+                  associationVars[0].name
                 }
                 variant="primary"
                 style={{ width: 'fit-content' }}
@@ -460,31 +484,28 @@ export default function Multivariable() {
                   </legend>
                   <Row>
                     <Col md="auto">
-                      <div className="d-flex">
-                        <OverlayTrigger
-                          trigger="click"
-                          placement="top"
-                          overlay={popoverInfo(
-                            'Filter sample with signature exposure value above this threshold'
-                          )}
-                          rootClose
-                        >
-                          <Button
-                            aria-label="threshold info"
-                            variant="link"
-                            className="p-0 font-weight-bold mr-1"
-                          >
-                            <FontAwesomeIcon
-                              icon={faInfoCircle}
-                              style={{ verticalAlign: 'super' }}
-                            />
-                          </Button>
-                        </OverlayTrigger>
-                        <Group
-                          controlId="exposureVar-threshold"
-                          className="d-flex mb-0"
-                        >
+                      <Group controlId="exposureVar-threshold" className="mb-0">
+                        <div className="d-flex">
                           <Label className="mr-2 font-weight-normal">
+                            <OverlayTrigger
+                              trigger="click"
+                              placement="top"
+                              overlay={popoverInfo(
+                                'Filter sample with signature exposure value above this threshold'
+                              )}
+                              rootClose
+                            >
+                              <Button
+                                aria-label="threshold info"
+                                variant="link"
+                                className="p-0 font-weight-bold mr-1"
+                              >
+                                <FontAwesomeIcon
+                                  icon={faInfoCircle}
+                                  style={{ verticalAlign: 'baseline' }}
+                                />
+                              </Button>
+                            </OverlayTrigger>
                             Threshold
                           </Label>
                           <Control
@@ -506,11 +527,16 @@ export default function Multivariable() {
                             }
                             isInvalid={false}
                           />
-                          <Form.Control.Feedback type="invalid">
-                            Enter a valid threshold
+                        </div>
+                        {invalidExpFilter && (
+                          <Form.Control.Feedback
+                            className="d-block"
+                            type="invalid"
+                          >
+                            Enter a numeric threshold value
                           </Form.Control.Feedback>
-                        </Group>
-                      </div>
+                        )}
+                      </Group>
                     </Col>
                     <Col md="auto">
                       <Group controlId="log2-2" className="d-flex mb-0">
