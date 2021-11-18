@@ -310,7 +310,7 @@ export default function Univariable() {
           >
             <Col md="auto">
               <Button
-                disabled={loadingData}
+                disabled={loadingData || loadingParams || loadingCalculate}
                 className="mr-4 reset"
                 variant="secondary"
                 onClick={() => handleReset()}
