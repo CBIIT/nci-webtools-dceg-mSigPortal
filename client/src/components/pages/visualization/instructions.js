@@ -6,6 +6,7 @@ export default function Instructions({ loading }) {
     { title: 'VCF Example of User Input', path: 'vcfExample' },
     { title: 'Sherlock-Lung-232', path: 'sherlock-lung-232' },
     { title: 'Mutographs-ESCC', path: 'mutographs-escc' },
+    { title: 'ChernobylThyroid', path: 'chernobyl-thyroid' },
     { title: 'PCAWG Lung-AdenoCA', path: 'pcawg-LungAdenoCA' },
     { title: 'PCAWG Lung-SCC', path: 'pcawg-LungSCC' },
     { title: 'PCAWG Breast-AdenoCA', path: 'pcawg-BreastAdenoCA' },
