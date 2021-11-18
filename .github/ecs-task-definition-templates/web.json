@@ -1,5 +1,5 @@
 {
-  "family": "msigportal-web",
+  "family": "dev-msigportal-web",
   "containerDefinitions": [
     {
       "name": "msigportal-frontend",
