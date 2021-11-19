@@ -151,9 +151,12 @@ async function visualizationProfilerExtraction(req, res, next) {
         ...(await getResultsFiles(resultsPath, req.body.projectID[1])),
       });
     } else {
-      logger.info(
+      logger.error(
         '/profilerExtraction: An Error Occured While Extracting Profiles'
       );
+      logger.error(stdout);
+      logger.error(stderr);
+
       res.status(500).json({
         stdout,
         stderr,

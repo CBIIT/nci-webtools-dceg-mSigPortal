@@ -131,6 +131,17 @@ async function processMessage(params) {
     const matrixPath = path.join(directory, 'results/matrix_files_list.txt');
     const svgPath = path.join(directory, 'results/svg_files_list.txt');
 
+    if (!fs.existsSync(svgPath)) {
+      logger.error(stdout);
+      logger.error(stderr);
+      let error = new Error(
+        'profilerExtraction: An Error Occured While Extracting Profiles'
+      );
+      error.stdout = stdout;
+      error.stderr = stderr;
+      throw error;
+    }
+
     if (!fs.existsSync(matrixPath))
       throw `matrix file lists does not exist at ${matrixPath}`;
     if (!fs.existsSync(svgPath))
@@ -846,7 +857,7 @@ async function processMessage(params) {
     };
 
     // send techSupport error email
-    logger.info(`Sending techSupport error email`);
+    logger.error(`Sending techSupport error email`);
     const adminEmailResults = await mailer.sendMail({
       from: config.email.adminSupport,
       to: config.email.techSupport,
@@ -859,7 +870,7 @@ async function processMessage(params) {
 
     // send user error email
     if (visualizationStore.state.email) {
-      logger.info(`Sending user error email`);
+      logger.error(`Sending user error email`);
       const userEmailResults = await mailer.sendMail({
         from: config.email.adminSupport,
         to: visualizationStore.state.email,
