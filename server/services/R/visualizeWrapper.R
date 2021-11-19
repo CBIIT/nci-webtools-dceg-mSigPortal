@@ -843,7 +843,8 @@ kataegis <- function(args, dataArgs) {
   mutationFile = list.files(mutationPath, pattern = "_mSigPortal_SNV")
   mutation_file = paste0(mutationPath, mutationFile)
 
-  if (args$chromosome == 'None') chromosome = NULL
+  chromosome = args$chromosome
+  if (chromosome == 'None') chromosome = NULL
   tryCatch({
     if (file.exists(mutation_file)) {
       mutation_data <- read_delim(file = mutation_file, delim = '\t', col_names = FALSE)
