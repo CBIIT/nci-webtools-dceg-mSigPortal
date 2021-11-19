@@ -630,7 +630,9 @@ export default function Visualization({ match }) {
               content={loading.content}
               showIndicator={loading.showIndicator}
             />
-            {tabs.filter((tab) => tab.id == displayTab)[0].component}
+            <div style={{ minHeight: '500px' }}>
+              {tabs.filter((tab) => tab.id == displayTab)[0].component}
+            </div>
           </div>
         </MainPanel>
       </SidebarContainer>

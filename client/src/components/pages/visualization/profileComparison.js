@@ -844,7 +844,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         </Nav>
         <TabContent
           className={`bg-white tab-pane-bordered rounded-0 d-block`}
-          style={{ overflowX: 'auto', minHeight: '500px' }}
+          style={{ overflowX: 'auto' }}
         >
           <div className="px-3 pt-3">
             Below you can perform mutational profile comparison analyses between

@@ -695,8 +695,10 @@ export default function Exposure({ match }) {
           </div>
         </SidebarPanel>
         <MainPanel>
-          <div className="bg-white border rounded">
-            {tabs.filter((tab) => tab.id == displayTab)[0].component}
+          <div style={{ minHeight: '500px' }}>
+            <div className="bg-white border rounded">
+              {tabs.filter((tab) => tab.id == displayTab)[0].component}
+            </div>
           </div>
         </MainPanel>
       </SidebarContainer>

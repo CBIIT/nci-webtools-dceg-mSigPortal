@@ -543,7 +543,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
         </Nav>
         <Content
           className={`bg-white tab-pane-bordered rounded-0 d-block`}
-          style={{ overflowX: 'auto', minHeight: '500px' }}
+          style={{ overflowX: 'auto' }}
         >
           <div className="p-3">
             <Description

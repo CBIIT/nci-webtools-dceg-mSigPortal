@@ -140,133 +140,128 @@ export default function MutationalPattern({ submitR }) {
   );
 
   return (
-    <div>
-      <div className="bg-white border rounded" style={{ minHeight: '500px' }}>
-        <div className="p-3">
-          <Description
-            less={
+    <div className="bg-white border rounded">
+      <div className="p-3">
+        <Description
+          less={
+            <p>
+              The aim of the mutational pattern enrichment analysis is to
+              determine frequency and enrichment of different types of
+              mutational patterns. For more information about mutational pattern
+              enrichment, click <NavHashLink to="/faq#mpea">here</NavHashLink>.
+            </p>
+          }
+          more={
+            <>
               <p>
-                The aim of the mutational pattern enrichment analysis is to
-                determine frequency and enrichment of different types of
-                mutational patterns. For more information about mutational
-                pattern enrichment, click{' '}
-                <NavHashLink to="/faq#mpea">here</NavHashLink>.
+                <i>Minimal Proportion:</i> For the “Frequency of Mutational
+                Pattern” plot, set the minimal proportion of mutational patterns
+                identified in all samples from selected or input study. A
+                slightly high proportion, such as 0.5, is suggested.
               </p>
-            }
-            more={
-              <>
-                <p>
-                  <i>Minimal Proportion:</i> For the “Frequency of Mutational
-                  Pattern” plot, set the minimal proportion of mutational
-                  patterns identified in all samples from selected or input
-                  study. A slightly high proportion, such as 0.5, is suggested.
-                </p>
-                <p>
-                  <i>Mutational Pattern:</i> For the enrichment plot of
-                  “Proportion of Mutational Pattern Context Compared to Other
-                  Contexts with the same SBS Mutation”, select the mutational
-                  pattern to identify the enrichment of specific mutation
-                  context as suggested from “Frequency of Mutational Pattern”.
-                  The mutational pattern supports common nucleotide symbols.
-                  Click here for common nucleotide symbol information.
-                </p>
-              </>
-            }
-          />
-        </div>
-        <hr />
-        <Form noValidate className="p-3">
-          <LoadingOverlay active={loading} />
-          <Row>
-            <Col lg="auto">
-              <Group
-                controlId="minimum"
-                title="Minimal Proportion mutations within Each Mutational Pattern"
-              >
-                <Label>Minimal Proportion (0-1)</Label>
-                <Control
-                  value={tmpProportion}
-                  placeholder="Ex. 0.8"
-                  onChange={(e) => setProportion(e.target.value)}
-                  isInvalid={invalidProportion}
-                />
-                <Form.Control.Feedback type="invalid">
-                  Please input a value form 0 to 1 for Minimal Proportion
-                </Form.Control.Feedback>
-              </Group>
-            </Col>
-            <Col lg="auto">
-              <Group controlId="pattern">
-                <Label>Mutational Pattern</Label>
-                <Control
-                  value={pattern}
-                  placeholder="Ex. NCG>NTG"
-                  onChange={(e) => {
-                    mergeMPEA({
-                      pattern: e.target.value,
-                    });
-                  }}
-                  isInvalid={invalidPattern}
-                />
-                <Form.Control.Feedback type="invalid">
-                  Enter a valid pattern
-                </Form.Control.Feedback>
-              </Group>
-            </Col>
-            <Col lg="auto" className="d-flex">
-              <Button
-                className="mt-auto mb-3"
-                variant="primary"
-                onClick={() => {
-                  if (!pattern) setPatternInvalid(true);
-                  else setPatternInvalid(false);
-                  if (
-                    isNaN(tmpProportion) ||
-                    !tmpProportion ||
-                    tmpProportion < 0 ||
-                    tmpProportion > 1
-                  )
-                    setProportionInvalid(true);
-                  else setProportionInvalid(false);
-
-                  if (
-                    pattern &&
-                    tmpProportion &&
-                    !isNaN(tmpProportion) &&
-                    tmpProportion >= 0 &&
-                    tmpProportion <= 1
-                  ) {
-                    if (source == 'user') {
-                      calculateR('mutationalPattern', {
-                        matrixFile: matrixList.filter(
-                          (row) =>
-                            row.Profile_Type == 'SBS' && row.Matrix_Size == '96'
-                        )[0].Path,
-                        proportion: parseFloat(tmpProportion),
-                        pattern: pattern,
-                      });
-                    } else if (source == 'public') {
-                      calculateR('mutationalPatternPublic', {
-                        study: study,
-                        cancerType: cancerType,
-                        experimentalStrategy: pubExperimentalStrategy,
-                        proportion: parseFloat(tmpProportion),
-                        pattern: pattern,
-                      });
-                    }
-                  }
-                }}
-              >
-                Calculate
-              </Button>
-            </Col>
-          </Row>
-        </Form>
-        <hr />
-        {plots}
+              <p>
+                <i>Mutational Pattern:</i> For the enrichment plot of
+                “Proportion of Mutational Pattern Context Compared to Other
+                Contexts with the same SBS Mutation”, select the mutational
+                pattern to identify the enrichment of specific mutation context
+                as suggested from “Frequency of Mutational Pattern”. The
+                mutational pattern supports common nucleotide symbols. Click
+                here for common nucleotide symbol information.
+              </p>
+            </>
+          }
+        />
       </div>
+      <hr />
+      <Form noValidate className="p-3">
+        <LoadingOverlay active={loading} />
+        <Row>
+          <Col lg="auto">
+            <Group
+              controlId="minimum"
+              title="Minimal Proportion mutations within Each Mutational Pattern"
+            >
+              <Label>Minimal Proportion (0-1)</Label>
+              <Control
+                value={tmpProportion}
+                placeholder="Ex. 0.8"
+                onChange={(e) => setProportion(e.target.value)}
+                isInvalid={invalidProportion}
+              />
+              <Form.Control.Feedback type="invalid">
+                Please input a value form 0 to 1 for Minimal Proportion
+              </Form.Control.Feedback>
+            </Group>
+          </Col>
+          <Col lg="auto">
+            <Group controlId="pattern">
+              <Label>Mutational Pattern</Label>
+              <Control
+                value={pattern}
+                placeholder="Ex. NCG>NTG"
+                onChange={(e) => {
+                  mergeMPEA({
+                    pattern: e.target.value,
+                  });
+                }}
+                isInvalid={invalidPattern}
+              />
+              <Form.Control.Feedback type="invalid">
+                Enter a valid pattern
+              </Form.Control.Feedback>
+            </Group>
+          </Col>
+          <Col lg="auto" className="d-flex">
+            <Button
+              className="mt-auto mb-3"
+              variant="primary"
+              onClick={() => {
+                if (!pattern) setPatternInvalid(true);
+                else setPatternInvalid(false);
+                if (
+                  isNaN(tmpProportion) ||
+                  !tmpProportion ||
+                  tmpProportion < 0 ||
+                  tmpProportion > 1
+                )
+                  setProportionInvalid(true);
+                else setProportionInvalid(false);
 
-      {/* <Debug msg={debugR} /> */}
+                if (
+                  pattern &&
+                  tmpProportion &&
+                  !isNaN(tmpProportion) &&
+                  tmpProportion >= 0 &&
+                  tmpProportion <= 1
+                ) {
+                  if (source == 'user') {
+                    calculateR('mutationalPattern', {
+                      matrixFile: matrixList.filter(
+                        (row) =>
+                          row.Profile_Type == 'SBS' && row.Matrix_Size == '96'
+                      )[0].Path,
+                      proportion: parseFloat(tmpProportion),
+                      pattern: pattern,
+                    });
+                  } else if (source == 'public') {
+                    calculateR('mutationalPatternPublic', {
+                      study: study,
+                      cancerType: cancerType,
+                      experimentalStrategy: pubExperimentalStrategy,
+                      proportion: parseFloat(tmpProportion),
+                      pattern: pattern,
+                    });
+                  }
+                }
+              }}
+            >
+              Calculate
+            </Button>
+          </Col>
+        </Row>
+      </Form>
+      <hr />
+      {plots}
     </div>
   );
 }

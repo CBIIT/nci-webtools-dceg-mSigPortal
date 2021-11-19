@@ -210,7 +210,7 @@ export default function Signature() {
   ];
 
   return (
-    <div>
+    <div style={{ minHeight: '500px' }}>
       <Container
         transition={false}
         className="mt-2"

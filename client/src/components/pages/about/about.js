@@ -4,7 +4,7 @@ import { Container } from 'react-bootstrap';
 export default function About() {
   return (
     <div className="mx-3">
-      <div className="bg-white border p-3 mx-3" style={{ minHeight: '420px' }}>
+      <div className="bg-white border p-3 mx-3" style={{ minHeight: '500px' }}>
         <Container fluid="xl">
           <p>
             mSigPortal was developed by Dr.{' '}

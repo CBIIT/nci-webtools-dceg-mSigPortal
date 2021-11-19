@@ -34,7 +34,7 @@ export default function Download() {
   }
 
   return (
-    <div className="p-4" style={{ minHeight: '500px' }}>
+    <div className="p-4">
       <p>
         Use the following link to download all matrices of collected mutational
         signatures:

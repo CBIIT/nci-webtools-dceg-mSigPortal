@@ -323,7 +323,7 @@ export default function MutationalProfiles() {
       </Form>
 
       <hr />
-      <div style={{ minHeight: '400px' }}>
+      <div>
         <LoadingOverlay active={loading} />
         <Plot
           className="p-3"

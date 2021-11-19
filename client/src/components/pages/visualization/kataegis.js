@@ -89,7 +89,7 @@ export default function Kataegis({ submitR }) {
   return (
     <div>
       {source == 'user' && inputFormat == 'vcf' ? (
-        <div className="bg-white border rounded" style={{ minHeight: '500px' }}>
+        <div className="bg-white border rounded">
           <Description
             className="p-3"
             less="This analysis identifies the kataegis events from a VCF file input."

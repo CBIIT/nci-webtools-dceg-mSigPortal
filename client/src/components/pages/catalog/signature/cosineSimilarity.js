@@ -92,7 +92,7 @@ export default function MutationalSignatureProfile({ submitR }) {
   }
 
   return (
-    <div style={{ minHeight: '500px' }}>
+    <div>
       <Description
         className="p-3"
         less="Cosine similarity is a measure of the similarity of two signature matrices, which can be helpful to compare two mutational profiles or signatures."

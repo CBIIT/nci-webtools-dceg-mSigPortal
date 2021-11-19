@@ -150,7 +150,7 @@ export default function Comparison({ submitR }) {
   }
 
   return (
-    <div style={{ minHeight: '500px' }}>
+    <div>
       <Description
         className="p-3 m-0"
         less="Below you can compare two mutational signatures from curated reference signature sets. "

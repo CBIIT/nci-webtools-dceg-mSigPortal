@@ -91,7 +91,7 @@ export default function ProfilerSummary({ submitR }) {
         />
       </div>
       <hr />
-      <div style={{ minHeight: '500px' }}>
+      <div>
         <LoadingOverlay active={loading} />
         {plotPath && (
           <Plot

@@ -548,7 +548,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
         </Nav>
         <Content
           className={`bg-white tab-pane-bordered rounded-0 d-block`}
-          style={{ overflowX: 'auto', minHeight: '500px' }}
+          style={{ overflowX: 'auto' }}
         >
           {tabs.map(({ key, component }) => (
             <Pane key={key} eventKey={key} className="border-0">

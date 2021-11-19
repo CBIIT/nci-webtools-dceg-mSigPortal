@@ -155,7 +155,9 @@ export default function Association() {
           <hr className="d-lg-none" style={{ opacity: 0 }}></hr>
         </SidebarPanel>
         <MainPanel>
-          {tabs.filter((tab) => tab.id == displayTab)[0].component}
+          <div style={{ minHeight: '500px' }}>
+            {tabs.filter((tab) => tab.id == displayTab)[0].component}
+          </div>
         </MainPanel>
       </SidebarContainer>
     </div>
