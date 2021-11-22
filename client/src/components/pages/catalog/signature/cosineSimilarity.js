@@ -95,13 +95,11 @@ export default function MutationalSignatureProfile({ submitR }) {
     <div>
       <Description
         className="p-3"
-        less="Cosine similarity is a measure of the similarity of two signature matrices, which can be helpful to compare two mutational profiles or signatures."
+        less="Cosine similarity is a measure of the similarity of two signature matrices, which can be helpful to compare two mutational profiles or signatures. Below you can explore cosine similarity between two reference mutational signature sets."
         more={
           <span>
-            Below you can explore cosine similarity between two reference
-            mutational signature sets. Use the dropdown menus to enter a
-            [Profile Name], [Reference Signature Set 1], and [Reference
-            Signature Set 2]. Click{' '}
+            Use the dropdown menus to enter a [Profile Name], [Reference
+            Signature Set 1], and [Reference Signature Set 2]. Click{' '}
             <NavHashLink to="/faq#cosine-similarity">here</NavHashLink> to learn
             more about cosine similarity.
           </span>
@@ -168,7 +166,7 @@ export default function MutationalSignatureProfile({ submitR }) {
               plotPath={`api/results/${plotPath}`}
               txtPath={`api/results/${txtPath}`}
               height="1000px"
-              title="Cosine Similarity Among Mutational Signatures Between Reference Signature Sets"
+              title="Cosine Similarity Among Mutational Signatures Between Two Reference Signature Sets"
             />
             <p className="p-3">
               The heatmap above shows the cosine similarities between two

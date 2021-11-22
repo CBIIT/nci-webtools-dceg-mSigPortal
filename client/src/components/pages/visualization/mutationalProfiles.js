@@ -274,7 +274,7 @@ export default function MutationalProfiles() {
               and [Matrix Size]. The [Filter] option is only available if [Split
               Mutations According to Filter] is selected while analyzing user
               data. For additional information on [Profile Type] and [Matrix
-              Size], click <NavHashLink to="/faq">here</NavHashLink>.
+              Size], click <NavHashLink to="/faq#sbs">here</NavHashLink>.
             </span>
           }
         />

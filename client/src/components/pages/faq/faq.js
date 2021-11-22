@@ -11,7 +11,7 @@ export default function Faq() {
         <p>
           Collected public data on mSigPortal includes sample level mutational
           profiles, mutational signatures decomposition and associated variables
-          collected from the scientific literature, such as,{' '}
+          collected from the scientific literature, such as{' '}
           <a href="https://dcc.icgc.org/pcawg" target="_blank">
             PCAWG
           </a>
@@ -46,7 +46,7 @@ export default function Faq() {
     },
     {
       title:
-        'What reference signatures are included for use in analysis in mSigPortal?',
+        'What reference signatures are included for use in analyses in mSigPortal?',
       id: 'reference-signatures',
       component: (
         <p>
@@ -73,7 +73,7 @@ export default function Faq() {
           ID), SigProfiler PCAWG Strand Signatures (SBS), SigProfiler PCAWG WXS
           Signatures (SBS), and Other Published Signatures (SBS, ID). Click{' '}
           <a href="/#/catalog/signature">here</a> for additional information
-          regarding the current reference signatures in mSigPortal.
+          regarding current reference signatures in mSigPortal.
         </p>
       ),
     },
@@ -145,7 +145,8 @@ export default function Faq() {
       ),
     },
     {
-      title: 'What are homopolymers, repeat units, and microhomology?',
+      title:
+        'What are homopolymers, repeat units, and microhomology for ID profile?',
       id: 'hrm',
       component: (
         <p>
@@ -179,216 +180,13 @@ export default function Faq() {
       ),
     },
     {
-      title: 'What is Residual Sum of Squares RSS?',
+      title: 'What is Residual Sum of Squares RSS (RSS)?',
       id: 'rss',
       component: (
         <p>
           Residual Sum of Squares (RSS) is the measure of discrepancy between
           two profiles. Smaller RSS values indicate a greater similarity between
           signatures.
-        </p>
-      ),
-    },
-    {
-      title: 'What is mutational pattern enrichment analysis?',
-      id: 'mpea',
-      component: (
-        <p>
-          This type of analysis aims to determine frequency and enrichment of
-          different types of mutational patterns. It is similar to a{' '}
-          <a href="https://www.gsea-msigdb.org/gsea/index.jsp" target="_blank">
-            {' '}
-            gene set enrichment analysis (GSEA)
-          </a>
-          , which identifies classes of genes that are over-represented in a
-          large set of genes, and may have an association with disease
-          phenotypes.
-        </p>
-      ),
-    },
-    {
-      title:
-        'What is the meaning behind base representation for the different mutational patterns?',
-      id: 'mpea-guide',
-      component: (
-        <div>
-          <p>
-            Traditionally, we see bases in the notation of A,T,C, and G.
-            However, there are often multiple possibilities as to the base to
-            the immediate 5’ and 3’ position of the mutated base. In these
-            cases, a different letter signifies potential bases. Use the
-            following table to investigate the different possibilities and the
-            letters they are represented by:
-          </p>
-          <p>
-            Example: Using the table below, a mutational pattern represented by
-            HCN>HTN is a C>T mutation. The H represents that the base in this
-            position could be A, C, or T. The N represents that the base in this
-            position could be A, T, C, or G.
-          </p>
-
-          <table className="w-auto table table-bordered table-striped">
-            <thead>
-              <tr>
-                <th>Letter to Represent the Base Possibilities</th>
-                <th>Base Possibilities</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>A</td>
-                <td>A</td>
-              </tr>
-              <tr>
-                <td>T</td>
-                <td>T</td>
-              </tr>
-              <tr>
-                <td>C</td>
-                <td>C</td>
-              </tr>
-              <tr>
-                <td>G</td>
-                <td>G</td>
-              </tr>
-              <tr>
-                <td>R</td>
-                <td>A, G</td>
-              </tr>
-              <tr>
-                <td>Y</td>
-                <td>C, T</td>
-              </tr>
-              <tr>
-                <td>S</td>
-                <td>G, C</td>
-              </tr>
-              <tr>
-                <td>W</td>
-                <td>A, T</td>
-              </tr>
-              <tr>
-                <td>K</td>
-                <td>G, T</td>
-              </tr>
-              <tr>
-                <td>M</td>
-                <td>A, C</td>
-              </tr>
-              <tr>
-                <td>B</td>
-                <td>C, G, T</td>
-              </tr>
-              <tr>
-                <td>D</td>
-                <td>A, G, T</td>
-              </tr>
-              <tr>
-                <td>H</td>
-                <td>A, C, T</td>
-              </tr>
-              <tr>
-                <td>V</td>
-                <td>A, C, G</td>
-              </tr>
-              <tr>
-                <td>N</td>
-                <td>A, T, C, G</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      ),
-    },
-    {
-      title: 'What is Principal Component Analysis (PCA)?',
-      id: 'pca',
-      component: (
-        <p>
-          Principal Component Analysis (PCA) is a dimensionality-reduction
-          method that helps to explain the variation found in the data through
-          the establishment of different principal components. Principal
-          components are new variables that are a linear combination of the
-          initial variables. These are uncorrelated to one another, and the
-          attempt is to obtain the maximum amount of variance within the first
-          components. The number of dimensions in the data equals the number of
-          principal components generated. In the case of mutational signatures,
-          each principal component can also be used to compare with known
-          mutational signatures{' '}
-          <a href="https://www.nature.com/articles/nbt0308-303" target="_blank">
-            (Ringnér, 2008)
-          </a>
-          .
-        </p>
-      ),
-    },
-    {
-      title: 'What is kataegis?',
-      id: 'kataegis',
-      component: (
-        <p>
-          Kataegis is localized substitution hypermutation, often characterized
-          by clusters of C>T and/or C>G mutations, commonly at TpCpN
-          trinucleotides. While it is common to think that mutations would occur
-          every million base pairs or so, these localized instances of
-          substitution hypermutations occur at much shorter base pair distances.
-          This occurrence can be visualized on a rainfall plot, leading to
-          kataegis getting its name from the greek word for thunderstorm. This
-          link contains a 3-minute video from Dr. Serena Nik-Zainal on the
-          basics of kataegis:{' '}
-          <a href="https://youtu.be/yQ3HDiM4-2s" target="_blank">
-            https://youtu.be/yQ3HDiM4-2s
-          </a>
-          .
-        </p>
-      ),
-    },
-    {
-      title: 'What is tumor mutational burden (TMB)?',
-      id: 'tmb',
-      component: (
-        <p>
-          Tumor mutational burden (TMB) is the number of mutations in the DNA of
-          cancer cells. TMB is calculated by the number of non-synonymous
-          somatic mutations (single nucleotide variants and small
-          insertions/deletions) per mega-base{' '}
-          <a
-            href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5461196/"
-            target="_blank"
-          >
-            (Zehir et al., 2017)
-          </a>
-          . Tumors with high mutational burden are thought to respond to
-          treatments that fall into the category of immunotherapy{' '}
-          <a
-            href="https://www.cancer.gov/publications/dictionaries/cancer-terms/def/tumor-mutational-burden"
-            target="_blank"
-          >
-            (NCI, 2021)
-          </a>
-          .
-        </p>
-      ),
-    },
-    {
-      title: 'What is mutational signature burden (MSB)?',
-      id: 'msb',
-      component: (
-        <p>
-          Mutational signature burden (MSB) is the number of mutations
-          associated with a given mutational signature in the DNA of cancer
-          cells.
-        </p>
-      ),
-    },
-    {
-      title: 'What is mutational signature decomposition?',
-      id: 'msd',
-      component: (
-        <p>
-          Mutational signature decomposition is when a given mutational profile
-          of a sample is broken down and then reconstructed through the
-          assignment of known mutational signatures.
         </p>
       ),
     },
@@ -419,7 +217,191 @@ export default function Faq() {
           L1 norm is the sum of the magnitudes of vectors in a space, and how
           one measures the distance between vectors. L2 norm is known as the
           Euclidean norm. It is the shortest distance to go from one point to
-          another.
+          another. For additional, detailed information, click{' '}
+          <a
+            href="https://www.kaggle.com/residentmario/l1-norms-versus-l2-norms"
+            target="_blank"
+          >
+            here
+          </a>
+          .
+        </p>
+      ),
+    },
+    {
+      title:
+        'What is the meaning of IUPAC codes for nucleotide bases indicating specific mutational types?',
+      id: 'iupac',
+      component: (
+        <div>
+          <p>
+            Traditionally, we see nucleotide bases in the notation of A, T, C,
+            and G. However, there are often multiple possibilities as to the
+            base to the immediate 5’ and 3’ position of the mutated base. The
+            International Union of Pure and Applied Chemistry (IUPAC) has a
+            system for giving codes to identify the nucleotide bases. Use the
+            following table to investigate the different possibilities and the
+            letters they are represented by:
+          </p>
+          <p>
+            Example: Using the table below, a mutational pattern represented by
+            HCN>HTN is a C>T mutation. The H indicates that the base in this
+            position could be A, C, or T. The N indicates that the base in this
+            position could be A, T, C, or G.
+          </p>
+          <table className="w-auto table table-bordered table-striped text-center">
+            <thead>
+              <tr>
+                <th>
+                  Letter to Represent
+                  <br />
+                  the Base Possibilities
+                </th>
+                <th>
+                  Base
+                  <br />
+                  Possibilities
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>R</td>
+                <td>A or G</td>
+              </tr>
+              <tr>
+                <td>Y</td>
+                <td>C or T</td>
+              </tr>
+              <tr>
+                <td>S</td>
+                <td>G or C</td>
+              </tr>
+              <tr>
+                <td>W</td>
+                <td>A or T</td>
+              </tr>
+              <tr>
+                <td>K</td>
+                <td>G or T</td>
+              </tr>
+              <tr>
+                <td>M</td>
+                <td>A or C</td>
+              </tr>
+              <tr>
+                <td>B</td>
+                <td>C, G, or T</td>
+              </tr>
+              <tr>
+                <td>D</td>
+                <td>A, G, or T</td>
+              </tr>
+              <tr>
+                <td>H</td>
+                <td>A, C, or T</td>
+              </tr>
+              <tr>
+                <td>V</td>
+                <td>A, C, or G</td>
+              </tr>
+              <tr>
+                <td>N</td>
+                <td>A, T, C, or G</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      ),
+    },
+    {
+      title: 'What is mutational pattern enrichment analysis?',
+      id: 'mpea',
+      component: (
+        <p>
+          This type of analysis aims to determine frequency and enrichment of
+          different mutational patterns considering the IUPAC codes of the bases
+          to the immediate 5’ and 3’ positions of the substitution. For
+          enrichment analysis, mSigPortal calculates and visualizes the
+          proportion of specific mutation pattern context (such as HCG>HTG) as
+          compared to other contexts with the same mutation type (such as C>G).
+          This analysis will help to identify the samples with specific
+          mutational context due to the same mutational process.
+        </p>
+      ),
+    },
+    {
+      title: 'What is Principal Component Analysis (PCA)?',
+      id: 'pca',
+      component: (
+        <p>
+          Principal Component Analysis (PCA) is a dimensionality-reduction
+          method that helps to explain the variation found in the data through
+          the establishment of different principal components. Principal
+          components are new variables that are a linear combination of the
+          initial variables. These are uncorrelated to one another, and the
+          attempt is to obtain the maximum amount of variance within the first
+          components. The number of dimensions in the data equals the number of
+          principal components generated. In the case of mutational signatures,
+          each principal component can also be used to compare known mutational
+          signatures{' '}
+          <a href="https://www.nature.com/articles/nbt0308-303" target="_blank">
+            (Ringnér, 2008)
+          </a>
+          .
+        </p>
+      ),
+    },
+    {
+      title: 'What is kataegis?',
+      id: 'kataegis',
+      component: (
+        <p>
+          Kataegis is localized substitution hypermutation, often characterized
+          by clusters of C>T and/or C>G mutations, commonly at TpCpN
+          trinucleotides. While it is common to think that mutations would occur
+          every million base pairs or so, these localized instances of
+          substitution hypermutations occur at much shorter base pair distances.
+          This occurrence can be visualized on a rainfall plot, leading to
+          kataegis getting its name from the greek word for thunderstorm.
+        </p>
+      ),
+    },
+    {
+      title: 'What is tumor mutational burden (TMB)?',
+      id: 'tmb',
+      component: (
+        <p>
+          Tumor mutational burden (TMB) is the number of mutations in the DNA of
+          cancer cells. TMB is calculated by the number of non-synonymous
+          somatic mutations (single nucleotide variants and small
+          insertions/deletions) per mega-base{' '}
+          <a
+            href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5461196/"
+            target="_blank"
+          >
+            (Zehir et al., 2017)
+          </a>
+          . Tumors with high mutational burden may respond to treatments that
+          fall into the category of immunotherapy{' '}
+          <a
+            href="https://www.cancer.gov/publications/dictionaries/cancer-terms/def/tumor-mutational-burden"
+            target="_blank"
+          >
+            (NCI, 2021)
+          </a>
+          .
+        </p>
+      ),
+    },
+    {
+      title: 'What is mutational signature burden (MSB)?',
+      id: 'msb',
+      component: (
+        <p>
+          Mutational signature burden (MSB) is the number of mutations
+          associated with a given mutational signature in the DNA of cancer
+          cells.
         </p>
       ),
     },
@@ -429,12 +411,13 @@ export default function Faq() {
       id: 'association',
       component: (
         <p>
-          Univariable and multivariable association tests can be performed using
-          mSigPortal. Univariable association tests investigate relationships
-          between a variable from provided data and a signature exposure
-          variable. Multivariable association tests investigate the
-          relationships between input of a regression formula and a signature
-          exposure variable.
+          Currently, only univariable and multivariable association tests can be
+          performed using mSigPortal. Univariable association tests investigate
+          relationships between a variable from provided data and a signature
+          exposure variable using different statistical tests depending on the
+          variables type. Multivariable association tests perform linear or
+          logistic regression based on data from the selected variables and a
+          signature exposure variable.
         </p>
       ),
     },
@@ -454,9 +437,9 @@ export default function Faq() {
           <div className="mt-3">
             <p>
               mSigPortal is designed to be an easy and intuitive web portal to
-              explore, visualize and analyze the mutational signature related
-              data for genomic studies. This documentation page collects the
-              most frequently asked questions about mSigPortal.
+              explore, visualize and analyze mutational signature related data
+              for genomic studies. This documentation page collects the most
+              frequently asked questions about mSigPortal.
             </p>
             <ListGroup>
               {sections.map(({ title, id }) => (

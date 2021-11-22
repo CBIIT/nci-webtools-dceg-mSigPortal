@@ -26,7 +26,7 @@ export default function MsPrevalence({ calculatePrevalence }) {
         <b>Prevalence of Mutational Signature </b>
         <Description
           less="The following plot indicates both mutation and sample level prevalence of signatures from the selected Study."
-          more="For prevalence by samples, input the [Minimal Number of Mutations Assigned to Each Signature] to set the smallest number of mutations assigned to each signature to be considered detection of this mutational signature in each sample."
+          more="For prevalence by samples, input the [Minimal Number of Mutations Assigned to Each Signature] to set the smallest number of mutations assigned to each signature required for the detection of the mutational signature in each sample."
         />
       </div>
       <hr />
@@ -84,7 +84,7 @@ export default function MsPrevalence({ calculatePrevalence }) {
             <hr />
             <Plot
               className="p-3"
-              title="Prevalence of Mutational Signature"
+              title="Prevalence of Mutational Signatures"
               downloadName={plotPath.split('/').slice(-1)[0]}
               plotPath={`api/results/${plotPath}`}
             />
@@ -92,8 +92,8 @@ export default function MsPrevalence({ calculatePrevalence }) {
               The pie chart on the left illustrates the prevalence of each
               mutational signature by mutations. The bar plot on the right
               illustrates the prevalence of each mutational signature by
-              samples. The colors represent each of the mutational signatures in
-              both plots.
+              samples. The colors represent the mutational signatures in both
+              plots.
             </p>
           </>
         )}

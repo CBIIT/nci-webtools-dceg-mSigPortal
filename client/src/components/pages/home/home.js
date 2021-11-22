@@ -21,19 +21,18 @@ export default function Home({ links }) {
               description,
               image,
               color,
-              examples,
             },
             index
           ) => (
             <div
-              className="d-flex bd-highlight w-100"
+              className="d-flex bd-highlight w-100 mb-5"
               key={title}
               style={{ marginRight: '1%' }}
             >
               <Card
                 key={title}
                 id={title}
-                className="mb-5 align-self-center p-2 bd-highlight"
+                className="align-self-center p-2 bd-highlight"
                 style={{
                   minWidth: '45%',
                   justifyContent: 'center',
@@ -89,7 +88,7 @@ export default function Home({ links }) {
                 </Card.Body>
               </Card>
               <div className="description d-none d-md-block">
-                <div>{parse(description)}</div>
+                <p>{parse(description)}</p>
               </div>
             </div>
           )

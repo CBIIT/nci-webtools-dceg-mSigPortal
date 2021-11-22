@@ -19,7 +19,6 @@ export default function TmbSignatures() {
           more="On the y-axis is the number of mutations per Mb (log10), and the x-axis denotes sample numbers. The green number is the total number of samples with the selected cancer type (and therefore evaluated for each signature). The blue number is the number of samples with the selected cancer type that detected the mutational signature from the reference signature set."
         />
       </div>
-      <hr />
       <div id="tmbSigPlot">
         {err && (
           <div>

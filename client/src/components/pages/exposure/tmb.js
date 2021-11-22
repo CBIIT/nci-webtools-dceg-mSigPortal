@@ -19,7 +19,6 @@ export default function TMB() {
           more="The y-axis is the number of mutations per Mb (log10), and the x-axis indicates cancer types. The green number is the number of samples for a given cancer type, and the blue number is the number of samples that have mutation data available for that cancer type."
         />
       </div>
-      <hr />
       <div id="tmbPlot">
         {err && (
           <div>

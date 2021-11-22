@@ -43,7 +43,7 @@ export default function Publications() {
         <div className="mb-4">
           <p>
             An overview of published original research and review papers, tools,
-            websites and databases related to mutational signatures analysis.
+            websites and databases related to mutational signature analyses.
           </p>
         </div>
 
@@ -65,7 +65,7 @@ export default function Publications() {
         {orbMemo.data && (
           <div className="mb-5">
             <Table
-              title="Original Research Papers Involved With Mutational Signature Analyses"
+              title="Original Research Papers Involved in Mutational Signature Analyses"
               columns={orbMemo.columns}
               data={orbMemo.data}
               hidden={orbHidden}
@@ -80,7 +80,7 @@ export default function Publications() {
         {rpMemo.data && (
           <div className="mb-5">
             <Table
-              title="Review Papers Focused on Discussion of Mutational Signatures"
+              title="Review Papers Focused on Mutational Signatures"
               columns={rpMemo.columns}
               data={rpMemo.data}
               hidden={rpHidden}
@@ -111,10 +111,11 @@ export default function Publications() {
         <div className="mb-4">
           <h3>Citations</h3>
           <p>
-            If you use the data on this website, please cite our paper: Tongwu
-            Zhang, Jian Sang, Alyssa Klein…. Maria Teresa Landi. Integrative
-            mutational signature portal (mSigPortal) for cancer genomic study.
-            (In Preparing)
+            If you use the data from this website, please cite our paper:
+            <br />
+            Tongwu Zhang, Jian Sang, Alyssa Klein…. Maria Teresa Landi.
+            Integrative mutational signature portal (mSigPortal) for cancer
+            genomic study (manuscript in preparation).
           </p>
         </div>
 

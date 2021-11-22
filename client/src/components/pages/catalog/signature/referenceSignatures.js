@@ -49,11 +49,16 @@ export default function ReferenceSignatures() {
   return (
     <div id="rsPlot">
       <LoadingOverlay active={loading} />
-      <Description
-        className="p-3 m-0"
-        less="The pie charts below display the current reference signatures (RS) available in mSigPortal for both human (GRCh37/38) and mouse genome (GRCm38)."
-        more="Each pie chart represents a given mutational signature defined by profile type (SBS, DBS, ID, RS) and its respective matrix size. Each signature set included in mSigPortal is denoted by a color in the legend on the right. The numbers and coloring in each chart represent the number of signatures included and the signature source, respectively."
-      />
+      <div className="p-3">
+        The pie charts below display the current reference signatures (RS)
+        available in mSigPortal for both human (GRCh37/38) and mouse genome
+        (GRCm38). Each pie chart represents a given mutational signature defined
+        by the profile type (SBS, DBS, ID, RS) and its respective matrix size.
+        Each signature set included in mSigPortal is denoted by a color in the
+        legend on the right. The numbers and coloring in each chart represent
+        the number of signatures included and the signature source,
+        respectively.
+      </div>
       <hr />
       <Plot
         className="p-3"

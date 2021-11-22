@@ -298,15 +298,18 @@ export default function PCA({ submitR, getRefSigOptions }) {
             )}
           </Form>
 
-          <hr />
           {pcaErr && (
-            <p className="p-3">
-              An error has occured. Please verify your input.
-            </p>
+            <>
+              <hr />
+              <p className="p-3">
+                An error has occured. Please verify your input.
+              </p>
+            </>
           )}
 
           {pca1 && (
             <div id="pca1Plot">
+              <hr />
               <Plot
                 className="p-3"
                 downloadName={pca1.split('/').slice(-1)[0]}
@@ -453,16 +456,18 @@ export default function PCA({ submitR, getRefSigOptions }) {
               </Col>
             </Row>
           </Form>
-          <hr />
-
           {pubPcaErr && (
-            <p className="p-3">
-              An error has occured. Please verify your input.
-            </p>
+            <>
+              <hr />
+              <p className="p-3">
+                An error has occured. Please verify your input.
+              </p>
+            </>
           )}
 
           {pubPca1 && (
             <div id="pubPca1Plot">
+              <hr />
               <Plot
                 className="p-3"
                 downloadName={pubPca1.split('/').slice(-1)[0]}
@@ -520,6 +525,12 @@ export default function PCA({ submitR, getRefSigOptions }) {
 
   return (
     <div>
+      <div className="bg-white border rounded mb-1 p-3">
+        <Description
+          less="Below you can conduct PCA analysis between samples, or a PCA with Public Data (for user input data only)."
+          more="PCA stands for Principal Component Analysis, which helps to explain the variation found in the data through the establishment of different principal components. Each principal component can also be used to compare with known mutational signatures."
+        />
+      </div>
       <Container
         transition={false}
         className="mt-2"
@@ -545,13 +556,6 @@ export default function PCA({ submitR, getRefSigOptions }) {
           className={`bg-white tab-pane-bordered rounded-0 d-block`}
           style={{ overflowX: 'auto' }}
         >
-          <div className="p-3">
-            <Description
-              less="Below you can conduct PCA analysis between samples, or a PCA with Public Data (for user input data only)."
-              more="PCA stands for Principal Component Analysis, which helps to explain the variation found in the data through the establishment of different principal components. Each principal component can also be used to compare with known mutational signatures."
-            />
-          </div>
-          <hr />
           {tabs.map(({ key, component }) => (
             <Pane key={key} eventKey={key} className="border-0">
               {component}

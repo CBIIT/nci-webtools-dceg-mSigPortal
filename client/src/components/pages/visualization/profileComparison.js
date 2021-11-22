@@ -359,10 +359,11 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       key: 'within',
       component: (
         <div>
-          <Description
-            className="p-3"
-            more="Input a [Profile Type] and two sample names ([Sample Name 1], [Sample Name 2]) to generate the mutational profile of each sample, as well as the difference between the two mutational profiles."
-          />
+          <p className="p-3 m-0">
+            Input a [Profile Type] and two sample names ([Sample Name 1],
+            [Sample Name 2]) to generate the mutational profile of each sample,
+            as well as the difference between the two mutational profiles.
+          </p>
 
           <hr />
           <Form className="p-3">
@@ -454,16 +455,19 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
               </Row>
             )}
           </Form>
-          <hr />
           <div id="pcWithinPlot">
             {withinErr && (
-              <div className="p-3">
-                <p>An error has occured. Please verify your input.</p>
-                <p>{withinErr}</p>
-              </div>
+              <>
+                <hr />
+                <div className="p-3">
+                  <p>An error has occured. Please verify your input.</p>
+                  <p>{withinErr}</p>
+                </div>
+              </>
             )}
             {withinPlotPath && (
               <>
+                <hr />
                 <Plot
                   className="p-3"
                   downloadName={withinPlotPath.split('/').slice(-1)[0]}
@@ -475,15 +479,16 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                     The plot above shows the mutational profiles of two selected
                     samples, as well as the difference between them. The text at
                     the top of the plot indicates the profile similarity
-                    calculated using RSS and cosine similarity methods.
+                    calculated using Residual Sum of Squares (RSS) and cosine
+                    similarity methods.
                   </p>
                   <p>
-                    Residual Sum of Squares (RSS) measures the discrepancy
-                    between two mutational profiles. Cosine similarity measures
-                    how similar two mutational profiles are. For example, two
-                    identical mutational profiles will have RSS = 0 and Cosine
-                    similarity = 1. For additional information about RSS and
-                    cosine similarity, click{' '}
+                    RSS measures the discrepancy between two mutational
+                    profiles. Cosine similarity measures how similar two
+                    mutational profiles are. For example, two identical
+                    mutational profiles will have RSS = 0 and Cosine similarity
+                    = 1. For additional information about RSS and cosine
+                    similarity, click{' '}
                     <NavHashLink to="/faq#cosine-similarity">here</NavHashLink>.
                   </p>
                 </div>
@@ -497,10 +502,15 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       key: 'reference',
       component: (
         <div>
-          <Description
-            className="p-3"
-            more="Input a [Profile Type], [Sample Name], [Reference Signature Set], and [Compare Signatures] parameter to generate the mutational profile of the sample, the signature profile from the reference set, and the difference between the two mutational profiles. The [Compare Signatures] can be a single reference signature name or a combined multiple reference signature name with different contributions (see example below [Compare Signatures])."
-          />
+          <p className="p-3 m-0">
+            Input a [Profile Type], [Sample Name], [Reference Signature Set],
+            and [Compare Signatures] parameter to generate the mutational
+            profile of the sample, the signature profile from the reference set,
+            and the difference between two mutational profiles. The [Compare
+            Signatures] can be a single reference signature name or a combined
+            multiple reference signature name with different contributions (see
+            example below [Compare Signatures]).
+          </p>
           <hr />
           <Form className="p-3">
             <LoadingOverlay active={refSubmitOverlay} />
@@ -629,16 +639,19 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
               </Col>
             </Row>
           </Form>
-          <hr />
           <div id="refPlotDownload">
             {refErr && (
-              <div className="p-3">
-                <p>An error has occured. Please verify your input.</p>
-                <p>{refErr}</p>
-              </div>
+              <>
+                <hr />
+                <div className="p-3">
+                  <p>An error has occured. Please verify your input.</p>
+                  <p>{refErr}</p>
+                </div>
+              </>
             )}
             {refPlotPath && (
               <>
+                <hr />
                 <Plot
                   className="p-3"
                   downloadName={refPlotPath.split('/').slice(-1)[0]}
@@ -651,15 +664,15 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                     sample, the signature from the selected reference signature
                     set, and the difference between them. The text at the top of
                     the plot indicates the profile similarity calculated using
-                    RSS and cosine similarity methods.
+                    Residual Sum of Squares (RSS) and cosine similarity methods.
                   </p>
                   <p>
-                    Residual Sum of Squares (RSS) measures the discrepancy
-                    between two mutational profiles. Cosine similarity measures
-                    how similar two mutational profiles are. For example, two
-                    identical mutational profiles will have RSS = 0 and Cosine
-                    similarity = 1. For additional information about RSS and
-                    cosine similarity, click{' '}
+                    RSS measures the discrepancy between two mutational
+                    profiles. Cosine similarity measures how similar two
+                    mutational profiles are. For example, two identical
+                    mutational profiles will have RSS = 0 and Cosine similarity
+                    = 1. For additional information about RSS and cosine
+                    similarity, click{' '}
                     <NavHashLink to="/faq#cosine-similarity">here</NavHashLink>.
                   </p>
                 </div>
@@ -676,11 +689,12 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
       key: 'public',
       component: (
         <div>
-          <Description
-            className="p-3"
-            more="Input a [Profile Type], [Matrix Size], [Sample Name] (from your input data), [Study], [Cancer Type], and [Public Sample Name] to generate the mutational profile of the input sample, the sample from the selected public data, and the difference between them."
-          />
-
+          <p className="p-3 m-0">
+            Input a [Profile Type], [Matrix Size], [Sample Name] (from your
+            input data), [Study], [Cancer Type], and [Public Sample Name] to
+            generate the mutational profile of the input sample, the sample from
+            the selected public data, and the difference between them.
+          </p>
           <hr />
           <Form className="p-3">
             <LoadingOverlay active={pubSubmitOverlay} />
@@ -775,15 +789,18 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
               </Col>
             </Row>
           </Form>
-          <hr />
           <div id="pcPubPlot">
             {pubErr && (
-              <div>
-                <p>{pubErr}</p>
-              </div>
+              <>
+                <hr />
+                <div className="p-3">
+                  <p>{pubErr}</p>
+                </div>
+              </>
             )}
             {pubPlotPath && (
               <>
+                <hr />
                 <Plot
                   className="p-3"
                   downloadName={pubPlotPath.split('/').slice(-1)[0]}
@@ -795,16 +812,16 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                     The plot above shows the mutational profile of the input
                     sample, the sample from the selected public data, and the
                     difference between them. The text on the top of the plot
-                    indicates the profile similarity calculated using RSS and
-                    cosine similarity methods.
+                    indicates the profile similarity calculated using Residual
+                    Sum of Squares (RSS) and cosine similarity methods.
                   </p>
                   <p>
-                    Residual Sum of Squares (RSS) measures the discrepancy
-                    between two mutational profiles. Cosine similarity measures
-                    how similar two mutational profiles are. For example, two
-                    identical mutational profiles will have RSS = 0 and Cosine
-                    similarity = 1. For additional information about RSS and
-                    cosine similarity, click{' '}
+                    RSS measures the discrepancy between two mutational
+                    profiles. Cosine similarity measures how similar two
+                    mutational profiles are. For example, two identical
+                    mutational profiles will have RSS = 0 and Cosine similarity
+                    = 1. For additional information about RSS and cosine
+                    similarity, click{' '}
                     <NavHashLink to="/faq#cosine-similarity">here</NavHashLink>.
                   </p>
                 </div>
@@ -816,6 +833,12 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     });
   return (
     <div>
+      <p className="bg-white border rounded p-3 mb-1">
+        Below you can perform mutational profile comparison analyses between
+        samples (PC Between Samples), between a sample and a signature from a
+        selected reference signature set (PC to Reference Signatures), or
+        between user data and public data (PC to Public Data).
+      </p>
       <Container
         transition={false}
         className="mt-2"
@@ -846,12 +869,6 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
           className={`bg-white tab-pane-bordered rounded-0 d-block`}
           style={{ overflowX: 'auto' }}
         >
-          <div className="px-3 pt-3">
-            Below you can perform mutational profile comparison analyses between
-            samples (PC Between Samples), between a sample and a signature from
-            a selected reference signature set (PC to Reference Signatures), or
-            between user data and public data (PC to Public Data).
-          </div>
           {tabs.map(({ key, component }) => (
             <Pane key={key} eventKey={key} className="border-0">
               {component}

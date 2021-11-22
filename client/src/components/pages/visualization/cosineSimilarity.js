@@ -294,15 +294,18 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
               </Row>
             )}
           </Form>
-          <hr />
           <div id="withinPlot">
             {withinErr && (
-              <p className="p-3">
-                An error has occured. Please verify your input.
-              </p>
+              <>
+                <hr />
+                <p className="p-3">
+                  An error has occured. Please verify your input.
+                </p>
+              </>
             )}
             {withinPlotPath && (
               <>
+                <hr />
                 <Plot
                   className="p-3"
                   downloadName={withinPlotPath.split('/').slice(-1)[0]}
@@ -310,11 +313,11 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   txtPath={`api/results/${withinTxtPath}`}
                 />
                 <p className="p-3">
-                  The heatmap shows pairwise cosine similarity between the
-                  samples from the selected profile type. The text of the x-axis
-                  and y-axis are the sample names. This analysis will help to
-                  highlight the samples within the same cluster that may detect
-                  similar mutational signatures.
+                  The heatmap shows pairwise cosine similarity between samples
+                  from the selected profile type. On the x-axis and y-axis are
+                  the sample names. This analysis will help to highlight the
+                  samples within the same cluster that may have similar
+                  mutational signatures.
                 </p>
               </>
             )}
@@ -388,15 +391,19 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
               </Col>
             </Row>
           </Form>
-          <hr />
+
           <div id="refPlot">
             {refErr && (
-              <p className="p-3">
-                An error has occured. Please verify your input.
-              </p>
+              <>
+                <hr />
+                <p className="p-3">
+                  An error has occured. Please verify your input.
+                </p>
+              </>
             )}
             {refPlotPath && (
               <>
+                <hr />
                 <Plot
                   className="p-3"
                   downloadName={refPlotPath.split('/').slice(-1)[0]}
@@ -405,11 +412,11 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 />
                 <p className="p-3">
                   The following heatmap shows pairwise cosine similarity between
-                  the mutational profiles of given samples and selected
-                  reference signature set. The text of the x-axis and y-axis
-                  show the reference signature names and the sample names,
-                  respectively. This analysis will help to identify potential
-                  dominant mutational signatures in selected samples.
+                  the mutational profiles of given samples and the selected
+                  reference signature set. On the x-axis and y-axis are the
+                  reference signature names and the sample names, respectively.
+                  This analysis will identify potential dominant mutational
+                  signatures in selected samples.
                 </p>
               </>
             )}
@@ -489,15 +496,18 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
               </Col>
             </Row>
           </Form>
-          <hr />
           <div id="pubPlot">
             {pubErr && (
-              <p className="p-3">
-                An error has occured. Please verify your input.
-              </p>
+              <>
+                <hr />
+                <p className="p-3">
+                  An error has occured. Please verify your input.
+                </p>
+              </>
             )}
             {pubPlotPath && (
               <>
+                <hr />
                 <Plot
                   className="p-3"
                   downloadName={pubPlotPath.split('/').slice(-1)[0]}
@@ -507,9 +517,9 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 <p className="p-3">
                   The following heatmap shows pairwise cosine similarity between
                   mutational profiles of samples from the user input and public
-                  dataset based on the selected study and cancer type. The text
-                  of the x-axis and y-axis show the sample names from the public
-                  dataset and user input, respectively.
+                  dataset based on the selected study and cancer type. On the
+                  x-axis and y-axis are the sample names from the public dataset
+                  and user input, respectively.
                 </p>
               </>
             )}

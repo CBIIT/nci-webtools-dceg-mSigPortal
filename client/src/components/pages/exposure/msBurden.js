@@ -27,7 +27,7 @@ export default function MsBurden({ calculateBurden }) {
         <b>Mutational Signature Burden Across Cancer Types</b>
         <Description
           less="The bar plot below illustrates mutational signature burden across different cancer types with regard to a specific selected signature."
-          more="On the y-axis is the number of mutations per Mb (log10) assigned to selected signatures, and the x-axis denotes sample numbers. The green number is the number of samples for each cancer type, and the blue number is the number of samples in that cancer type that detected the selected signature."
+          more="On the y-axis is the number of mutations per Mb (log10) assigned to selected signatures, and the x-axis denotes the sample numbers. The number in green denotes the number of samples for each cancer type, and the number in blue is the number of samples in that cancer type with the selected signature."
         />
       </div>
       <hr />
