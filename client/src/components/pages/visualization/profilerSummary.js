@@ -89,12 +89,28 @@ export default function ProfilerSummary({ submitR }) {
           less="This plot illustrates the number of mutations in each tumor sample from [Cancer Type] in the selected [Study]."
           more="On the y-axis is the number of mutations in log base 10 scale, and on the x-axis is the sample index for each sample of the selected cancer type (sorted by number of mutations in ascending order). The different colored lines represent different mutational profiles (SBS= single-base substitution, DBS= doublet-base substitution, ID=indel)."
         />
+        {/* <button
+          onClick={() =>
+            source == 'user'
+              ? calculateR('profilerSummary', {
+                  matrixList: JSON.stringify(matrixList),
+                })
+              : calculateR('profilerSummaryPublic', {
+                  study: study,
+                  cancerType: cancerType,
+                  experimentalStrategy: pubExperimentalStrategy,
+                })
+          }
+        >
+          calculate
+        </button> */}
       </div>
       <hr />
       <div>
         <LoadingOverlay active={loading} />
         {plotPath && (
           <Plot
+            title="Number of Mutations Per Sample with Regard to Mutational Profile"
             className="p-3"
             downloadName={plotPath.split('/').slice(-1)[0]}
             plotPath={'api/results/' + plotPath}
