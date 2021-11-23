@@ -1,9 +1,16 @@
 import React from 'react';
-import { Form, Row, Col, Button } from 'react-bootstrap';
+import {
+  Form,
+  Row,
+  Col,
+  Button,
+  OverlayTrigger,
+  Popover,
+} from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import Description from '../../controls/description/description';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFolderMinus } from '@fortawesome/free-solid-svg-icons';
+import { faFolderMinus, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
 
@@ -31,7 +38,24 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
         <Row className="">
           <Col lg="auto">
             <Group controlId="landscape">
-              <Label>Upload Variable Data</Label>
+              <Label>
+                Upload Variable Data{' '}
+                <OverlayTrigger
+                  trigger="hover"
+                  placement="top"
+                  overlay={
+                    <Popover id="upload-variable-info">
+                      <Popover.Content>
+                        A text file with header included two columns data:
+                        Samples and Variable Value
+                      </Popover.Content>
+                    </Popover>
+                  }
+                  rootClose
+                >
+                  <FontAwesomeIcon icon={faInfoCircle} className="btn-link" />
+                </OverlayTrigger>
+              </Label>
               <div className="d-flex">
                 <Form.File
                   id="variableData"
