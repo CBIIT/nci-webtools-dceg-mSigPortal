@@ -853,8 +853,8 @@ kataegis <- function(args, dataArgs) {
       genome_build <- mutation_data$genome_build[1]
       mutdata <- mutation_data %>% filter(sample == args$sample) %>% dplyr::select(chr, pos, ref, alt)
       kataegis_result <- kataegis_rainfall_plot(mutdata, sample_name = args$sample, genome_build = genome_build,
-      reference_data_folder = paste0(dataArgs$localData, '/Others'), chromsome = chromosome, kataegis_highligh = args$highlight,
-      min.mut = args$min, max.dis = args$max, filename = kataegis)
+        reference_data_folder = paste0(dataArgs$localData, '/Others'), chromsome = chromosome, kataegis_highligh = args$highlight,
+        min.mut = args$min, max.dis = args$max, filename = kataegis)
 
       if (is.data.frame(kataegis_result)) {
         kataegisData = paste0(dataArgs$savePath, 'kataegisData.txt')

@@ -67,7 +67,7 @@ export default function Kataegis({ submitR }) {
           mergeKataegis({
             plotPath: plotPath,
             txtPath: txtPath,
-            kataegisData: JSON.parse(data),
+            kataegisData: data ? JSON.parse(data) : [],
             loading: false,
           });
         } else {
@@ -216,38 +216,43 @@ export default function Kataegis({ submitR }) {
               </Col>
             </Row>
           </Form>
-          <hr />
 
           <div id="kataegisPlot">
-            {err && <p className="p-3 text-danger">{err}</p>}
-            <div style={{ display: plotPath ? 'block' : 'none' }}>
-              <Plot
-                className="p-3"
-                downloadName={plotPath.split('/').slice(-1)[0]}
-                plotPath={'api/results/' + plotPath}
-                txtPath={txtPath ? `api/results/${txtPath}` : null}
-              />
-              <p className="p-3">
-                The rainfall plot illustrates the kataegis events identified
-                given the input parameters. The x-axis is the position of the
-                mutation in the genome separated by chromosome. The y-axis is
-                the inter-mutation distance (bp, log10) from one mutation to the
-                next. The colors represent different mutation types. The arrow
-                will highlight the kataegis region when you select the
-                “Highlight” option.
-              </p>
-              {kataegisData.length > 0 && (
-                <>
-                  <p className="p-3">
-                    The table below is a summary of the kataegis identification
-                    based on the input parameters. The table can be filtered
-                    based on any of the columns by entering an appropriate
-                    value.
-                  </p>
-                  <KataegisTable />
-                </>
-              )}
-            </div>
+            {err && (
+              <>
+                <hr /> <p className="p-3 text-danger">{err}</p>
+              </>
+            )}
+            {plotPath && (
+              <>
+                <hr />
+                <Plot
+                  className="p-3"
+                  downloadName={plotPath.split('/').slice(-1)[0]}
+                  plotPath={'api/results/' + plotPath}
+                  txtPath={txtPath ? `api/results/${txtPath}` : null}
+                />
+                <p className="p-3">
+                  The rainfall plot illustrates the kataegis events identified
+                  given the input parameters. The x-axis is the position of the
+                  mutation in the genome separated by chromosome. The y-axis is
+                  the inter-mutation distance (bp, log10) from one mutation to
+                  the next. The colors represent different mutation types. The
+                  arrow will highlight the kataegis region when you select the
+                  “Highlight” option.
+                </p>
+              </>
+            )}
+            {kataegisData.length > 0 && (
+              <>
+                <p className="p-3">
+                  The table below is a summary of the kataegis identification
+                  based on the input parameters. The table can be filtered based
+                  on any of the columns by entering an appropriate value.
+                </p>
+                <KataegisTable />
+              </>
+            )}
           </div>
         </div>
       ) : (
