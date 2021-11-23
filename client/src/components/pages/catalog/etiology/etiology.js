@@ -58,7 +58,7 @@ export default function Etiology() {
       etiologyTitle: 'Genes',
     },
     {
-      name: 'Cancer Specific Signature',
+      name: 'Cancer Specific Signatures',
       author: 'Nik-Zainal et al., 2020',
       file: 'Etiology_cancer_specific_signatures.json',
     },
@@ -177,7 +177,7 @@ export default function Etiology() {
       data[category] &&
       data[category].length &&
       !thumbnails[category] &&
-      category != 'Cancer Specific Signature' &&
+      category != 'Cancer Specific Signatures' &&
       !loading
     ) {
       const signatures = data[category]
@@ -203,7 +203,7 @@ export default function Etiology() {
       data[category] &&
       data[category].length &&
       !tissueThumbnails.length &&
-      category == 'Cancer Specific Signature'
+      category == 'Cancer Specific Signatures'
     ) {
       const uniqueTissues = Object.values(
         data[category].reduce((c, e) => {
@@ -223,7 +223,7 @@ export default function Etiology() {
       data[category] &&
       data[category].length &&
       !refSigThumbnails.length &&
-      category == 'Cancer Specific Signature'
+      category == 'Cancer Specific Signatures'
     ) {
       const refsig = data[category].slice().sort(naturalSort);
 
@@ -1041,8 +1041,8 @@ export default function Etiology() {
     <div className="p-4 bg-white border rounded">
       <h5 className="separator">Categories</h5>
       {getCategories()}
-      {category != 'Cancer Specific Signature' && standardView()}
-      {category == 'Cancer Specific Signature' && cancerSpecificView()}
+      {category != 'Cancer Specific Signatures' && standardView()}
+      {category == 'Cancer Specific Signatures' && cancerSpecificView()}
     </div>
   );
 }
