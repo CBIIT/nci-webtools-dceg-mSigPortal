@@ -186,7 +186,7 @@ async function processMessage(params) {
           .filter((row) => row.Profile_Type == profile)
           .map(({ Matrix_Size }) => Matrix_Size)
       ),
-    ];
+    ].sort((a, b) => a - b);
 
     const matrix = defaultMatrix(profile, filteredMatrixOptions);
 

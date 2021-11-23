@@ -85,7 +85,7 @@ export default function MutationalProfiles() {
 
         if (!response.ok) {
           const msg = await response.text();
-          console.log(msg);
+          // console.log(msg);
           // mergeError(msg);
         } else {
           const pic = await response.blob();
@@ -117,7 +117,7 @@ export default function MutationalProfiles() {
             .filter((row) => row.Profile_Type == profile)
             .map((row) => row.Matrix_Size)
         ),
-      ];
+      ].sort((a, b) => a - b);
       const matrix = defaultMatrix(profile, matrixOptions);
       const filterOptions = [
         ...new Set(
@@ -153,7 +153,7 @@ export default function MutationalProfiles() {
             .filter((row) => row.Profile.includes(profile))
             .map((row) => row.Profile.match(/\d+/gi)[0])
         ),
-      ];
+      ].sort((a, b) => a - b);
 
       const matrix = defaultMatrix(profile, matrixOptions);
 
@@ -175,7 +175,7 @@ export default function MutationalProfiles() {
       );
       const matrixOptions = [
         ...new Set(filteredPlots.map((row) => row.Matrix_Size)),
-      ];
+      ].sort((a, b) => a - b);
       const matrix = defaultMatrix(profile, matrixOptions);
       const filterOptions = [
         ...new Set(
@@ -199,7 +199,7 @@ export default function MutationalProfiles() {
       );
       const matrixOptions = [
         ...new Set(filteredPlots.map((row) => row.Profile.match(/\d+/gi)[0])),
-      ];
+      ].sort((a, b) => a - b);
 
       mergeMutationalProfiles({
         selectProfile: profile,

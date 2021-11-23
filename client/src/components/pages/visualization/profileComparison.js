@@ -345,7 +345,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
           .filter((row) => row.Profile_Type == profile)
           .map(({ Matrix_Size }) => Matrix_Size)
       ),
-    ];
+    ].sort((a, b) => a - b);
 
     mergeProfileComparison({
       userProfileType: profile,

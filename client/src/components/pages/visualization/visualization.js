@@ -148,9 +148,8 @@ export default function Visualization({ match }) {
         filteredPlots
           .filter((row) => row.Profile_Type == profile)
           .map((row) => row.Matrix_Size)
-          .sort((a, b) => a - b)
       ),
-    ];
+    ].sort((a, b) => a - b);
 
     const matrix = defaultMatrix(profile, filteredMatrixOptions);
 
