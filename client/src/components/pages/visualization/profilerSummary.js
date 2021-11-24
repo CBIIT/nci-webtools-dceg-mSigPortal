@@ -82,6 +82,7 @@ export default function ProfilerSummary({ submitR }) {
 
   return (
     <div className="bg-white border rounded">
+      <LoadingOverlay active={loading} />
       <div className="p-3">
         <b>Number of Mutations Per Sample with Regard to Mutational Profile</b>
         <Description
@@ -105,17 +106,18 @@ export default function ProfilerSummary({ submitR }) {
           calculate
         </button> */}
       </div>
-      <hr />
       <div>
-        <LoadingOverlay active={loading} />
         {plotPath && (
-          <Plot
-            title="Number of Mutations Per Sample with Regard to Mutational Profile"
-            className="p-3"
-            downloadName={plotPath.split('/').slice(-1)[0]}
-            plotPath={'api/results/' + plotPath}
-            height="600px"
-          />
+          <>
+            <hr />
+            <Plot
+              title="Number of Mutations Per Sample with Regard to Mutational Profile"
+              className="p-3"
+              downloadName={plotPath.split('/').slice(-1)[0]}
+              plotPath={'api/results/' + plotPath}
+              height="600px"
+            />
+          </>
         )}
       </div>
     </div>
