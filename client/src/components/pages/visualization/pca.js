@@ -460,7 +460,8 @@ export default function PCA({ submitR, getRefSigOptions }) {
             <>
               <hr />
               <p className="p-3">
-                An error has occured. Please verify that your input includes the selected Profile Type and Matrix Size.
+                An error has occured. Please verify that the selected public
+                data also includes the selected Profile Type and Matrix Size.
               </p>
             </>
           )}
