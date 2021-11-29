@@ -68,10 +68,12 @@ export default function PublicForm() {
       });
 
       if (response.ok) {
-        const { output: svgList, projectID } = await response.json();
+        const { output, projectID } = await response.json();
+        if (output.error) throw output.error;
+        if (output.uncaughtError) throw output.uncaughtError;
 
         mergeState({
-          svgList: svgList,
+          svgList: output,
           projectID: projectID,
         });
       } else if (response.status == 504) {
