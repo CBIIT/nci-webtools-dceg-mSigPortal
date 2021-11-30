@@ -198,8 +198,6 @@ async function processMessage(params) {
       ),
     ];
 
-    const filter = defaultFilter(filteredFilterOptions);
-
     const filteredMatrixList = [
       ...new Set(
         matrixList
@@ -210,18 +208,7 @@ async function processMessage(params) {
 
     newState = {
       ...newState,
-      mutationalProfiles: {
-        ...newState.mutationalProfiles,
-        filtered: filteredPlots,
-        nameOptions: nameOptions,
-        profileOptions: filteredProfileOptions,
-        matrixOptions: filteredMatrixOptions,
-        filterOptions: filteredFilterOptions,
-        selectName: selectName,
-        selectProfile: profile,
-        selectMatrix: matrix,
-        selectFilter: filter,
-      },
+      state: { ...newState.state, profileOptions: filteredFilterOptions },
     };
 
     // Cosine Similarity - Profile Comparison - PCA - Kataegis

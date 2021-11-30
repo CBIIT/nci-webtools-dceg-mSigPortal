@@ -45,8 +45,9 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     projectID,
     matrixList,
     svgList,
+    profileOptions,
   } = visualization.state;
-  const { profileOptions } = visualization.mutationalProfiles;
+
   const {
     withinProfileType,
     withinSampleName1,

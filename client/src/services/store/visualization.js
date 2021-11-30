@@ -39,6 +39,7 @@ export const getInitialState = () => ({
     svgList: {},
     matrixList: {},
     statistics: '',
+    profileOptions: [],
   },
   profilerSummary: {
     plotPath: '',

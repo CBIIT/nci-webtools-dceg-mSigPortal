@@ -31,8 +31,9 @@ export default function PCA({ submitR, getRefSigOptions }) {
     matrixList,
     projectID,
     svgList,
+    profileOptions,
   } = visualization.state;
-  const { profileOptions } = visualization.mutationalProfiles;
+
   const {
     profileType,
     signatureSet,

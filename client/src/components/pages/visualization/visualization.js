@@ -283,6 +283,7 @@ export default function Visualization({ match }) {
       ),
     ].sort((a, b) => a - b);
 
+    mergeState({ profileOptions: profileOptions });
     // Cosine Similarity - Profile Comparison - PCA
     const selectProfile = defaultProfile(profileOptions);
     const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);
