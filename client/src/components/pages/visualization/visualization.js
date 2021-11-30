@@ -271,24 +271,6 @@ export default function Visualization({ match }) {
       ...new Set(svgList.map((row) => row.Profile.match(/[a-z]+/gi)[0])),
     ];
     const profile = defaultProfile(profileOptions);
-    const matrixOptions = [
-      ...new Set(svgList.map((row) => row.Profile.match(/\d+/gi)[0])),
-    ];
-    const matrix = defaultMatrix(profile, matrixOptions);
-    const filterOptions = ['NA'];
-    const selectFilter = filterOptions[0];
-
-    const filteredPlots = svgList.filter(
-      (row) => row.Sample == selectName && row.Profile == profile + matrix
-    );
-
-    const filteredProfileOptions = [
-      ...new Set(
-        svgList
-          .filter((row) => row.Sample == selectName)
-          .map(({ Profile }) => Profile.match(/[a-z]+/gi)[0])
-      ),
-    ].sort();
 
     const filteredMatrixOptions = [
       ...new Set(
@@ -300,18 +282,6 @@ export default function Visualization({ match }) {
           .map(({ Profile }) => Profile.match(/\d+/gi)[0])
       ),
     ].sort((a, b) => a - b);
-
-    mergeMutationalProfiles({
-      filtered: filteredPlots,
-      nameOptions: nameOptions,
-      profileOptions: filteredProfileOptions,
-      matrixOptions: filteredMatrixOptions,
-      filterOptions: filterOptions,
-      selectName: selectName,
-      selectProfile: profile,
-      selectMatrix: matrix,
-      selectFilter: selectFilter,
-    });
 
     // Cosine Similarity - Profile Comparison - PCA
     const selectProfile = defaultProfile(profileOptions);

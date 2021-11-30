@@ -36,13 +36,25 @@ export default function MutationalProfiles() {
     matrixOptions,
     filterOptions,
     plotPath,
-    debug,
-    displayDebug,
   } = visualization.mutationalProfiles;
 
-  const { columns } = svgList;
   const [loading, setLoading] = useState(false);
 
+  // populate controls
+  useEffect(() => {
+    if (!nameOptions.length) {
+      const names = [
+        ...new Set(
+          svgList
+            .filter((row) => row.Path != 'msigportal/Database/Seqmatrix/NA')
+            .map((row) => row.Sample || row.Sample_Name)
+        ),
+      ];
+
+      mergeMutationalProfiles({ nameOptions: names });
+      handleSample(names[0]);
+    }
+  }, [selectName]);
   // set inital plot
   useEffect(() => {
     if (!plotPath && displayTab == 'mutationalProfiles') {
@@ -140,7 +152,10 @@ export default function MutationalProfiles() {
         filtered: filteredPlots,
       });
     } else {
-      const filteredPlots = svgList.filter((row) => row.Sample == name);
+      const filteredPlots = svgList.filter(
+        (row) =>
+          row.Sample == name && row.Path != 'msigportal/Database/Seqmatrix/NA'
+      );
       const profileOptions = [
         ...new Set(
           filteredPlots.map((row) => row.Profile.match(/[a-z]+/gi)[0])
@@ -195,7 +210,10 @@ export default function MutationalProfiles() {
       });
     } else {
       const filteredPlots = svgList.filter(
-        (row) => row.Sample == selectName && row.Profile.indexOf(profile) > -1
+        (row) =>
+          row.Sample == selectName &&
+          row.Profile.indexOf(profile) > -1 &&
+          row.Path != 'msigportal/Database/Seqmatrix/NA'
       );
       const matrixOptions = [
         ...new Set(filteredPlots.map((row) => row.Profile.match(/\d+/gi)[0])),
@@ -231,7 +249,9 @@ export default function MutationalProfiles() {
     } else {
       const filteredPlots = svgList.filter(
         (row) =>
-          row.Sample == selectName && row.Profile == selectProfile + matrix
+          row.Sample == selectName &&
+          row.Profile == selectProfile + matrix &&
+          row.Path != 'msigportal/Database/Seqmatrix/NA'
       );
 
       mergeMutationalProfiles({
