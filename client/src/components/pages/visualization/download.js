@@ -104,10 +104,7 @@ export default function Download() {
               queueMode: false,
               displayTab: 'profilerSummary',
             },
-            mutationalProfiles: {
-              ...visualization.mutationalProfiles,
-              plotPath: '',
-            },
+            mutationalProfiles: {},
           },
         },
       }),
