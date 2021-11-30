@@ -87,6 +87,7 @@ export default function Download() {
   async function downloadWorkspace() {
     setWorkspace(true);
 
+    const { mutationalProfiles, ...rest } = visualization;
     const response = await fetch(`api/downloadWorkspace`, {
       method: 'POST',
       headers: {
@@ -97,24 +98,12 @@ export default function Download() {
         id: projectID,
         state: {
           visualization: {
-            ...visualization,
+            ...rest,
             state: {
-              ...visualization.state,
+              ...rest.state,
               email: '',
               queueMode: false,
               displayTab: 'profilerSummary',
-            },
-            mutationalProfiles: {
-              filtered: [],
-              selectName: '',
-              selectProfile: '',
-              selectMatrix: '',
-              selectFilter: '',
-              nameOptions: [],
-              profileOptions: [],
-              matrixOptions: [],
-              filterOptions: [],
-              plotPath: '',
             },
           },
         },
