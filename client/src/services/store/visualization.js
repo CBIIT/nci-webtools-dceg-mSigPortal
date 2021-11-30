@@ -57,8 +57,6 @@ export const getInitialState = () => ({
     matrixOptions: [],
     filterOptions: [],
     plotPath: '',
-    debug: { stdout: '', stderr: false },
-    displayDebug: false,
   },
   cosineSimilarity: {
     withinProfileType: '',
