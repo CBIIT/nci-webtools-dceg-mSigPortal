@@ -17,12 +17,12 @@ export default function Download() {
     setDownload(true);
     try {
       const objectURL = URL.createObjectURL(
-        await getBlob('Signature/signature_refsets.txt.tar.gz')
+        await getBlob('Signature/signature_refsets.txt.zip')
       );
       const tempLink = document.createElement('a');
 
       tempLink.href = `${objectURL}`;
-      tempLink.setAttribute('download', `signature_refsets.txt.tar.gz`);
+      tempLink.setAttribute('download', `signature_refsets.txt.zip`);
       document.body.appendChild(tempLink);
       tempLink.click();
       document.body.removeChild(tempLink);
