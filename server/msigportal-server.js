@@ -12,6 +12,9 @@ const apiRouter = express.Router();
 
 app.use(compression());
 app.use('/api', apiRouter);
+app.use(cors({
+  origin: '*'
+}));
 
 const {
   visualizationProfilerExtraction,
