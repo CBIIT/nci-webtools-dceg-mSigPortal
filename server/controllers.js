@@ -13,7 +13,6 @@ const replace = require('replace-in-file');
 const glob = require('glob');
 const config = require('./config.json');
 const archiver = require('archiver');
-const fs = require('fs');
 
 if (config.aws) AWS.config.update(config.aws);
 
