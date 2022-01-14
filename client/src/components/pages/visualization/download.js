@@ -115,7 +115,7 @@ export default function Download() {
       const tempLink = document.createElement('a');
 
       tempLink.href = `${objectURL}`;
-      tempLink.setAttribute('download', `msigportal-workspace.tgz`);
+      tempLink.setAttribute('download', `msigportal-workspace.zip`);
       document.body.appendChild(tempLink);
       tempLink.click();
       document.body.removeChild(tempLink);
