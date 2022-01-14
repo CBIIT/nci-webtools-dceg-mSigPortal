@@ -6,12 +6,14 @@ const fs = require('fs');
 const config = require('./config.json');
 const logger = require('./logger');
 const compression = require('compression');
+const cors = require('cors')
 
 const app = express();
 const apiRouter = express.Router();
 
 app.use(compression());
 app.use('/api', apiRouter);
+// app.use(cors());
 
 const {
   visualizationProfilerExtraction,
@@ -81,43 +83,43 @@ apiRouter.use(
 
 apiRouter.use(express.json({ limit: '50mb' }));
 
-apiRouter.get('/ping', (req, res) => res.send(true));
+apiRouter.get('/ping', cors(), (req, res) => res.send(true));
 
-apiRouter.post('/profilerExtraction', visualizationProfilerExtraction);
+apiRouter.post('/profilerExtraction', cors(), visualizationProfilerExtraction);
 
-apiRouter.post('/getResults', getResults);
+apiRouter.post('/getResults', cors(), getResults);
 
-apiRouter.post('/visualizationWrapper', visualizationWrapper);
+apiRouter.post('/visualizationWrapper', cors(), visualizationWrapper);
 
-apiRouter.post('/getSignaturesUser', getSignaturesUser);
+apiRouter.post('/getSignaturesUser', cors(), getSignaturesUser);
 
-apiRouter.post('/upload', upload);
+apiRouter.post('/upload', cors(), upload);
 
-apiRouter.get('/visualization/download', visualizationDownload);
+apiRouter.get('/visualization/download', cors(), visualizationDownload);
 
-apiRouter.post('/visualization/downloadPublic', visualizationDownloadPublic);
+apiRouter.post('/visualization/downloadPublic', cors(), visualizationDownloadPublic);
 
-apiRouter.post('/explorationWrapper', explorationWrapper);
+apiRouter.post('/explorationWrapper', cors(), explorationWrapper);
 
-apiRouter.post('/queue', submitQueue);
+apiRouter.post('/queue', cors(), submitQueue);
 
-apiRouter.get('/getQueueResults/:id', getQueueResults);
+apiRouter.get('/getQueueResults/:id', cors(), getQueueResults);
 
-apiRouter.get('/getVisExample/:example', getVisExample);
+apiRouter.get('/getVisExample/:example', cors(), getVisExample);
 
-apiRouter.get('/getExposureExample/:example', getExposureExample);
+apiRouter.get('/getExposureExample/:example', cors(), getExposureExample);
 
-apiRouter.get('/getPublications', getPublications);
+apiRouter.get('/getPublications', cors(), getPublications);
 
-apiRouter.post('/getImageS3Batch', getImageS3Batch);
+apiRouter.post('/getImageS3Batch', cors(), getImageS3Batch);
 
-apiRouter.post('/getImageS3', getImageS3);
+apiRouter.post('/getImageS3', cors(), getImageS3);
 
-apiRouter.post('/getFileS3', getFileS3);
+apiRouter.post('/getFileS3', cors(), getFileS3);
 
-apiRouter.post('/downloadWorkspace', downloadWorkspace);
+apiRouter.post('/downloadWorkspace', cors(), downloadWorkspace);
 
-apiRouter.post('/associationWrapper', associationWrapper);
+apiRouter.post('/associationWrapper', cors(), associationWrapper);
 
 apiRouter.use((err, req, res, next) => {
   logger.debug(err);

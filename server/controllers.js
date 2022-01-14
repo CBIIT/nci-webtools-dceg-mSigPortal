@@ -12,6 +12,7 @@ const XLSX = require('xlsx');
 const replace = require('replace-in-file');
 const glob = require('glob');
 const config = require('./config.json');
+const archiver = require('archiver');
 
 if (config.aws) AWS.config.update(config.aws);
 
@@ -736,6 +737,9 @@ async function downloadWorkspace(req, res, next) {
 
   const { state, id } = req.body;
   const session = path.resolve(config.results.folder, id);
+  const archive = archiver('zip', {
+    zlib: { level: 6 } // Sets the compression level.
+  });
 
   if (fs.existsSync(session)) {
     try {
@@ -744,9 +748,16 @@ async function downloadWorkspace(req, res, next) {
         JSON.stringify(state)
       );
 
-      tar
-        .c({ sync: true, gzip: true, C: config.results.folder }, [id])
+      archive.on('finish', function(error) {
+        return res.end();
+      });
+      archive
+        .directory(session, false)
+        .on('error', function(err) {
+            throw err;
+        })
         .pipe(res);
+      archive.finalize();
     } catch (err) {
       next(err);
     }
