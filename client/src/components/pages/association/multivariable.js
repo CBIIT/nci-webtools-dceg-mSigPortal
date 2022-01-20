@@ -353,7 +353,7 @@ export default function Multivariable() {
           pagination={assocTable.pagination}
           hidden={assocTable.hidden}
           downloadName="Download Variable Data"
-          downloadLink={projectID + assocFullDataPath}
+          downloadLink={assocFullDataPath}
           mergeState={(e) =>
             dispatch(
               actions.mergeAssociation({ association: { assocTable: e } })
