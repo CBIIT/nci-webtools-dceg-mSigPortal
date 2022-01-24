@@ -46,7 +46,7 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
                   overlay={
                     <Popover id="upload-variable-info">
                       <Popover.Content>
-                        A text file with header included two columns data:
+                        A text file with a header including two columns of data:
                         Samples and Variable Value
                       </Popover.Content>
                     </Popover>

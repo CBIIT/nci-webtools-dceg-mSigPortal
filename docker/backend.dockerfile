@@ -53,6 +53,7 @@ RUN Rscript -e "install.packages(\
         'entropy', \
         'factoextra', \
         'FactoMineR', \
+        'ggplot2', \
         'ggdendro', \
         'ggExtra', \
         'ggforce', \
