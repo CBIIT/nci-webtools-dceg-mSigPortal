@@ -237,7 +237,7 @@ export default function Univariable() {
         } = output;
 
         if (error || uncaughtError) {
-          mergeState({ error: error || uncaughtError });
+          mergeState({ error: error || 'An error has occured. Please review your input and try again. If the issue persists, please contact us: NCImSigPortalWebAdmin@mail.nih.gov' });
         } else {
           mergeState({
             projectID: id,
