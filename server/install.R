@@ -8,8 +8,7 @@ Sys.setenv(
 # options(warn = 2)
 
 tryCatch({
-  install.packages(
-    c(
+  packages = c(
         'aws.ec2metadata',
         'aws.s3',
         'BiocManager',
@@ -36,9 +35,12 @@ tryCatch({
         'svglite',
         'tidyverse',
         'PMCMRplus'
-    ),
-    repos = 'https://cloud.r-project.org/'
     )
+
+  install.packages(packages, repos = 'https://cloud.r-project.org/')
+
+  # verify packages are installed
+  lapply(packages, require, character.only = TRUE)
 
   BiocManager::install(
     c(
@@ -48,8 +50,7 @@ tryCatch({
         'org.Hs.eg.db',
         'TxDb.Hsapiens.UCSC.hg19.knownGene',
         'TxDb.Hsapiens.UCSC.hg38.knownGene'
-    )
-    )
+    ))
 }, warning = function(e) {
   stop(e)
 })
