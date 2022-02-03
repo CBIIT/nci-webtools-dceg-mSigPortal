@@ -40,7 +40,7 @@ tryCatch({
   install.packages(packages, repos = 'https://cloud.r-project.org/')
 
   # verify packages are installed
-  lapply(packages, require, character.only = TRUE)
+  # lapply(packages, require, character.only = TRUE)
 
   BiocManager::install(
     c(

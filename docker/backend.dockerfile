@@ -33,7 +33,7 @@ RUN dnf -y update \
     cairo-devel \
     # NLopt \
     # NLopt-devel \
-    # google-roboto-condensed-fonts \
+    google-roboto-condensed-fonts \
     && dnf clean all
 
 # configure C++ Toolchain for installing dependency RStan - https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started
