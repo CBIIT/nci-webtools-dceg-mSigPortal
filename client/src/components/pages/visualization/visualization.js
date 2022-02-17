@@ -247,6 +247,7 @@ export default function Visualization({ match }) {
     });
 
     mergeState({
+      profileOptions: profileOptions,
       loading: {
         active: false,
       },
