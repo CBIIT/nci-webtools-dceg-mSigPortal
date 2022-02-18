@@ -111,7 +111,9 @@ loadCollapse <- function(args, dataArgs) {
   vardata_refdata_selected <- vardata_refdata_selected %>%
     filter(data_source == args$source, data_type == args$type, variable_name == args$assocName)
 
-  if (unique(vardata_refdata_selected$variable_value_type) == "numeric") { vardata_refdata_selected$variable_value <- as.numeric(vardata_refdata_selected$variable_value) }
+  if (unique(vardata_refdata_selected$variable_value_type) == "numeric") {
+    vardata_refdata_selected$variable_value <- as.numeric(vardata_refdata_selected$variable_value)
+  }
 
   vardata_refdata_selected <- vardata_refdata_selected %>%
     pivot_wider(id_cols = Sample, names_from = variable_name, values_from = variable_value)
@@ -120,14 +122,16 @@ loadCollapse <- function(args, dataArgs) {
   vardata_refdata_selected <- exposure_refdata_selected %>% select(Sample) %>% unique() %>% left_join(vardata_refdata_selected)
   ## including NA
   if (length(unique(vardata_refdata_selected[[2]])) == 1) {
-    stop(paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " have only unique value: ", unique(vardata_refdata_selected[[2]]), '.'))
+    error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " have only unique value: ", unique(vardata_refdata_selected[[2]]), '.')
+    return(list(error = error))
   }
   tmpdata <- vardata_refdata_selected
   colnames(tmpdata)[2] <- 'Variable'
   tmpvalue <- tmpdata %>% count(Variable) %>% filter(n < 2) %>% dim() %>% .[[1]]
 
   if (tmpvalue != 0) {
-    stop(paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " have not enough obsevations for both levels."))
+    error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " have not enough obsevations for both levels.")
+    return(list(error = error))
   }
 
   ### combined dataset
@@ -181,33 +185,30 @@ univariable <- function(args, dataArgs) {
   vardata_refdata_selected <- vardata_refdata_selected %>%
     pivot_wider(id_cols = Sample, names_from = variable_name, values_from = variable_value)
 
-  tryCatch({
-    ## check data integration
-    vardata_refdata_selected <- exposure_refdata_selected %>% select(Sample) %>% unique() %>% left_join(vardata_refdata_selected)
-    ## including NA
-    if (length(unique(vardata_refdata_selected[[2]])) == 1) {
-      stop(paste0("mSigPortal Association failed: the selected variable name ", args$associationVar$name, " have only unique value: ", unique(vardata_refdata_selected[[2]]), '.'))
-    }
-    tmpdata <- vardata_refdata_selected
-    colnames(tmpdata)[2] <- 'Variable'
-    tmpvalue <- tmpdata %>% count(Variable) %>% filter(n < 2) %>% dim() %>% .[[1]]
+  ## check data integration
+  vardata_refdata_selected <- exposure_refdata_selected %>% select(Sample) %>% unique() %>% left_join(vardata_refdata_selected)
+  ## including NA
+  if (length(unique(vardata_refdata_selected[[2]])) == 1) {
+    error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " have only unique value: ", unique(vardata_refdata_selected[[2]]), '.')
+    return(list(error = error))
+  }
+  tmpdata <- vardata_refdata_selected
+  colnames(tmpdata)[2] <- 'Variable'
+  tmpvalue <- tmpdata %>% count(Variable) %>% filter(n < 2) %>% dim() %>% .[[1]]
 
-    if (tmpvalue != 0) {
-      stop(paste0("mSigPortal Association failed: the selected variable name ", args$associationVar$name, " have not enough obsevations for both levels."))
-    }
-  }, error = function(e) {
-    return(list(error = e$message))
-  })
+  if (tmpvalue != 0) {
+    error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " have not enough obsevations for both levels.")
+    return(list(error = error))
+  }
 
   ### combined dataset
   data_input <- left_join(vardata_refdata_selected, exposure_refdata_selected) %>% select(-Sample)
 
   ## association test by group of signature name
-  print(1)
   assocTable <- mSigPortal_associaiton_group(data = data_input, Group_Var = "Signature_name",
     Var1 = args$associationVar$name, Var2 = args$exposureVar$name, type = args$associationVar$type,
-  # filter1 = args$associationVar$filter, filter2 = args$exposureVar$filter,
-  # collapse_var1 = args$associationVar$collapse, collapse_var2 = NULL,
+    filter1 = args$associationVar$filter, filter2 = args$exposureVar$filter,
+    collapse_var1 = args$associationVar$collapse, collapse_var2 = NULL,
     log1 = args$associationVar$log2, log2 = args$exposureVar$log2
     )
 
@@ -219,14 +220,13 @@ univariable <- function(args, dataArgs) {
 
   data_input <- data_input %>% filter(Signature_name == signature_name_input) %>% select(-Signature_name)
 
-  print(2)
   mSigPortal_associaiton(data = data_input, Var1 = args$associationVar$name, Var2 = args$exposureVar$name, type = args$associationVar$type,
     xlab = args$xlab, ylab = args$ylab,
-  # filter1 = args$associationVar$filter, filter2 = args$exposureVar$filter,
-  # collapse_var1 = args$associationVar$collapse, collapse_var2 = NULL,
+    filter1 = args$associationVar$filter, filter2 = args$exposureVar$filter,
+    collapse_var1 = args$associationVar$collapse, collapse_var2 = NULL,
     log1 = args$associationVar$log2, log2 = args$exposureVar$log2,
     output_plot = plotPath)
-  print(3)
+
   ## asssociation_data.txt will output as download text file.
   data_input %>% write_delim(file = dataPath, delim = '\t', col_names = T, na = '')
 

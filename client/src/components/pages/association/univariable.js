@@ -45,6 +45,7 @@ export default function Univariable() {
     loadingCalculate,
     loadingRecalculate,
     error,
+    loadError,
     projectID,
     plotPath,
     dataPath,
@@ -126,18 +127,28 @@ export default function Univariable() {
           })
         ).json();
 
-        const { collapseVar1, collapseVar2 } = collapseData;
+        const { collapseVar1, collapseVar2, error, uncaughtError } =
+          collapseData;
 
-        mergeState({
-          associationVar: {
-            name: associationVar.tmpName,
-            collapseOptions: Array.isArray(collapseVar1) ? collapseVar1 : [],
-          },
-          // exposureVar: {
-          //   name: expVarList[0],
-          //   collapseOptions: Array.isArray(collapseVar2) ? collapseVar2 : [],
-          // },
-        });
+        if (error || uncaughtError) {
+          mergeState({
+            loadError:
+              error ||
+              'An error has occured. Please review your input and try again. If the issue persists, please contact us: NCImSigPortalWebAdmin@mail.nih.gov',
+          });
+        } else {
+          mergeState({
+            loadError: '',
+            associationVar: {
+              name: associationVar.tmpName,
+              collapseOptions: Array.isArray(collapseVar1) ? collapseVar1 : [],
+            },
+            // exposureVar: {
+            //   name: expVarList[0],
+            //   collapseOptions: Array.isArray(collapseVar2) ? collapseVar2 : [],
+            // },
+          });
+        }
       } catch (error) {
         mergeError(error);
       }
@@ -237,7 +248,11 @@ export default function Univariable() {
         } = output;
 
         if (error || uncaughtError) {
-          mergeState({ error: error || 'An error has occured. Please review your input and try again. If the issue persists, please contact us: NCImSigPortalWebAdmin@mail.nih.gov' });
+          mergeState({
+            error:
+              error ||
+              'An error has occured. Please review your input and try again. If the issue persists, please contact us: NCImSigPortalWebAdmin@mail.nih.gov',
+          });
         } else {
           mergeState({
             projectID: id,
@@ -332,6 +347,11 @@ export default function Univariable() {
               </Button>
             </Col>
           </Row>
+          {loadError && (
+            <p className="p-3 d-flex justify-content-center text-danger">
+              {loadError}
+            </p>
+          )}
         </div>
       </div>
       <div className="mb-3">
