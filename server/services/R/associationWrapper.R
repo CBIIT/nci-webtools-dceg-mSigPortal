@@ -14,7 +14,8 @@ wrapper <- function(fn, args, dataArgs) {
   tryCatch({
     output = get(fn)(args, dataArgs)
   }, error = function(e) {
-    output <<- append(output, list(uncaughtError = paste0(deparse(e$call), ': ', e$message)))
+    print(e)
+    output <<- append(output, list(uncaughtError = e$message))
   }, finally = {
     sink(con)
     sink(con)
@@ -202,11 +203,13 @@ univariable <- function(args, dataArgs) {
   data_input <- left_join(vardata_refdata_selected, exposure_refdata_selected) %>% select(-Sample)
 
   ## association test by group of signature name
+  print(1)
   assocTable <- mSigPortal_associaiton_group(data = data_input, Group_Var = "Signature_name",
     Var1 = args$associationVar$name, Var2 = args$exposureVar$name, type = args$associationVar$type,
-    filter1 = args$associationVar$filter, filter2 = args$exposureVar$filter,
-    log1 = args$associationVar$log2, log2 = args$exposureVar$log2,
-    collapse_var1 = args$associationVar$collapse, collapse_var2 = NULL)
+  # filter1 = args$associationVar$filter, filter2 = args$exposureVar$filter,
+  # collapse_var1 = args$associationVar$collapse, collapse_var2 = NULL,
+    log1 = args$associationVar$log2, log2 = args$exposureVar$log2
+    )
 
   assocTable %>% write_delim(file = assocTablePath, delim = '\t', col_names = T, na = '')
   ## put result as a short table above the figure
@@ -216,14 +219,14 @@ univariable <- function(args, dataArgs) {
 
   data_input <- data_input %>% filter(Signature_name == signature_name_input) %>% select(-Signature_name)
 
-
+  print(2)
   mSigPortal_associaiton(data = data_input, Var1 = args$associationVar$name, Var2 = args$exposureVar$name, type = args$associationVar$type,
     xlab = args$xlab, ylab = args$ylab,
-    filter1 = args$associationVar$filter, filter2 = args$exposureVar$filter,
+  # filter1 = args$associationVar$filter, filter2 = args$exposureVar$filter,
+  # collapse_var1 = args$associationVar$collapse, collapse_var2 = NULL,
     log1 = args$associationVar$log2, log2 = args$exposureVar$log2,
-    collapse_var1 = args$associationVar$collapse, collapse_var2 = NULL,
     output_plot = plotPath)
-
+  print(3)
   ## asssociation_data.txt will output as download text file.
   data_input %>% write_delim(file = dataPath, delim = '\t', col_names = T, na = '')
 

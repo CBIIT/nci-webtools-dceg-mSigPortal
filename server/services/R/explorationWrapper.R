@@ -21,7 +21,8 @@ wrapper <- function(fn, args, dataArgs) {
   tryCatch({
     output = get(fn)(args, dataArgs)
   }, error = function(e) {
-    output <<- append(output, list(uncaughtError = paste0(deparse(e$call), ': ', e$message)))
+    print(e)
+    output <<- append(output, list(uncaughtError = e$message))
   }, finally = {
     sink(con)
     sink(con)
