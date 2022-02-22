@@ -320,9 +320,24 @@ export default function Univariable() {
             invalidFilter={invalidAssocFilter}
           />
           <Row
-            className="mx-auto mt-3 justify-content-end"
+            className="mx-auto mt-3 justify-content-between"
             style={{ maxWidth: '1720px' }}
           >
+            <Col md="auto" lg="auto">
+              <Select
+                disabled={
+                  loadingData ||
+                  loadingParams ||
+                  loadingCalculate ||
+                  resultsTable.data.length
+                }
+                id="expVariable"
+                label="Signature Exposure Variable"
+                value={exposureVar.name}
+                options={expVarList}
+                onChange={(e) => mergeState({ exposureVar: { name: e } })}
+              />
+            </Col>
             <Col md="auto">
               <Button
                 disabled={loadingData || loadingParams || loadingCalculate}
@@ -364,21 +379,6 @@ export default function Univariable() {
               Select the following filtering and method for analysis
             </p>
             <Row className="justify-content-center">
-              <Col md="auto" lg="auto">
-                <Select
-                  disabled={
-                    loadingData ||
-                    loadingParams ||
-                    loadingCalculate ||
-                    resultsTable.data.length
-                  }
-                  id="expVariable"
-                  label="Signature Exposure Variable"
-                  value={exposureVar.name}
-                  options={expVarList}
-                  onChange={(e) => mergeState({ exposureVar: { name: e } })}
-                />
-              </Col>
               <Col lg="auto">
                 <fieldset className="border rounded p-2">
                   <legend className="font-weight-bold">

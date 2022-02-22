@@ -9,7 +9,7 @@ import {
 } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faInfoCircle, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { actions as associationActions } from '../../../services/store/association';
 import { actions as modalActions } from '../../../services/store/modal';
 import Select from '../../controls/select/select';
@@ -275,7 +275,11 @@ export default function Multivariable() {
         } = output;
 
         if (error || uncaughtError) {
-          mergeState({ error: error || 'An error has occured. Please review your input and try again. If the issue persists, please contact us: NCImSigPortalWebAdmin@mail.nih.gov' });
+          mergeState({
+            error:
+              error ||
+              'An error has occured. Please review your input and try again. If the issue persists, please contact us: NCImSigPortalWebAdmin@mail.nih.gov',
+          });
         } else {
           mergeState({
             projectID: id,
@@ -377,6 +381,10 @@ export default function Multivariable() {
                 mergeState({ associationVars: newParams });
               }}
               remove={index != 0 ? () => removeParam(index) : false}
+              add={
+                index == associationVars.length - 1 ? () => addParam() : false
+              }
+              warnLimit={warnLimit}
               duplicates={warnDupe}
               invalidFilter={invalidAssocFilter.indexOf(index) >= 0}
             />
@@ -386,38 +394,20 @@ export default function Multivariable() {
             className="mx-auto mt-3 justify-content-between"
             style={{ maxWidth: '1720px' }}
           >
-            <Col md="auto" className="d-flex">
-              <OverlayTrigger
-                show={warnLimit}
-                placement="bottom"
-                overlay={
-                  <Popover>
-                    <Popover.Content className="text-danger">
-                      You may only add up to 10 variables
-                    </Popover.Content>
-                  </Popover>
+            <Col md="auto" lg="auto">
+              <Select
+                disabled={
+                  loadingData ||
+                  loadingParams ||
+                  loadingCalculate ||
+                  resultsTable.data.length
                 }
-              >
-                <Button
-                  disabled={
-                    loadingData ||
-                    loadingParams ||
-                    loadingCalculate ||
-                    associationVars[0].name
-                  }
-                  variant="link"
-                  onClick={() => addParam()}
-                  title="Add Plot"
-                  style={{ textDecoration: 'none' }}
-                >
-                  <span
-                    className="text-nowrap"
-                    title="Add Association Variable"
-                  >
-                    <FontAwesomeIcon icon={faPlus} /> Add Association Variable
-                  </span>
-                </Button>
-              </OverlayTrigger>
+                id="expVariable"
+                label="Signature Exposure Variable"
+                value={exposureVar.name}
+                options={expVarList}
+                onChange={(e) => mergeState({ exposureVar: { name: e } })}
+              />
             </Col>
             <Col md="auto">
               {warnDupe.length > 0 && (
@@ -462,21 +452,6 @@ export default function Multivariable() {
               Select the following filtering and method for analysis
             </p>
             <Row className="justify-content-center">
-              <Col md="auto" lg="auto">
-                <Select
-                  disabled={
-                    loadingData ||
-                    loadingParams ||
-                    loadingCalculate ||
-                    resultsTable.data.length
-                  }
-                  id="expVariable"
-                  label="Signature Exposure Variable"
-                  value={exposureVar.name}
-                  options={expVarList}
-                  onChange={(e) => mergeState({ exposureVar: { name: e } })}
-                />
-              </Col>
               <Col lg="auto">
                 <fieldset className="border rounded p-2">
                   <legend className="font-weight-bold">

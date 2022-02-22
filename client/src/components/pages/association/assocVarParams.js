@@ -9,7 +9,11 @@ import {
 } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faInfoCircle, faMinus } from '@fortawesome/free-solid-svg-icons';
+import {
+  faInfoCircle,
+  faMinus,
+  faPlus,
+} from '@fortawesome/free-solid-svg-icons';
 import Select from '../../controls/select/select';
 
 const { Group, Label, Check, Control } = Form;
@@ -20,6 +24,9 @@ export default function AssocVarParams({
   paramState,
   mergeState,
   remove = false,
+  add = false,
+  warnLimit = false,
+
   duplicates = [],
   invalidFilter,
 }) {
@@ -27,7 +34,7 @@ export default function AssocVarParams({
     (state) => state.association.associationState
   );
 
-  const { loadingParams, loadingCalculate } = hostState;
+  const { loadingParams, loadingCalculate, associationVars } = hostState;
 
   const {
     name,
@@ -278,7 +285,7 @@ export default function AssocVarParams({
           {remove ? (
             <Button
               disabled={name}
-              className="text-danger mb-3 mr-auto"
+              className="text-danger mr-auto"
               variant="link"
               onClick={remove}
               title="Add Plot"
@@ -288,6 +295,38 @@ export default function AssocVarParams({
                 <FontAwesomeIcon icon={faMinus} /> Remove
               </span>
             </Button>
+          ) : (
+            <span style={{ width: '101.867px' }} />
+          )}
+          {add ? (
+            <OverlayTrigger
+              show={warnLimit}
+              placement="bottom"
+              overlay={
+                <Popover>
+                  <Popover.Content className="text-danger">
+                    You may only add up to 10 variables
+                  </Popover.Content>
+                </Popover>
+              }
+            >
+              <Button
+                disabled={
+                  loadingData ||
+                  loadingParams ||
+                  loadingCalculate ||
+                  associationVars[0].name
+                }
+                variant="link"
+                onClick={add}
+                title="Add Plot"
+                style={{ textDecoration: 'none' }}
+              >
+                <span className="text-nowrap" title="Add Association Variable">
+                  <FontAwesomeIcon icon={faPlus} /> Add Association Variable
+                </span>
+              </Button>
+            </OverlayTrigger>
           ) : (
             <span style={{ width: '101.867px' }} />
           )}
