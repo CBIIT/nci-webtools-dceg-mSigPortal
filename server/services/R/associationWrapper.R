@@ -178,7 +178,7 @@ univariable <- function(args, dataArgs) {
   exposure_refdata_selected <- exposure_refdata_selected %>% select(Sample, Signature_name, args$exposureVar$name)
 
   vardata_refdata_selected <- vardata_refdata_selected %>%
-    filter(data_source == (args$associationVar$source), data_type == args$associationVar$type, variable_name == args$associationVar$name)
+    filter(data_source == args$associationVar$source, data_type == args$associationVar$type, variable_name == args$associationVar$name)
 
   if (unique(vardata_refdata_selected$variable_value_type) == "numeric") { vardata_refdata_selected$variable_value <- as.numeric(vardata_refdata_selected$variable_value) }
 
@@ -320,7 +320,7 @@ multivariable <- function(args, dataArgs) {
 
   rformula = paste0(args$exposureVar$name, " ~ ", paste0(colnames(data_input)[-c(1:2)], collapse = ' + '))
   ## regressionby group of signature name
-  assocTable <- mSigPortal_associaiton_group(data = data_input, Group_Var = "Signature_name", type = "glm", regression = TRUE, formula = rformula)
+  assocTable <- mSigPortal_associaiton_group(data = data_input, Group_Var = "Signature_name", type = args$testType, regression = TRUE, formula = rformula)
   assocTable %>% write_delim(file = assocTablePath, delim = '\t', col_names = T, na = '')
   # put result as a short table above the figure
 
@@ -328,7 +328,7 @@ multivariable <- function(args, dataArgs) {
   signature_name_input <- if_else(args$signature != '', args$signature, signature_name_list[1]) ## by default, select the first signature name
   data_input <- data_input %>% filter(Signature_name == signature_name_input) %>% select(-Signature_name)
 
-  mSigPortal_associaiton(data = data_input, type = "glm", regression = TRUE, formula = rformula, output_plot = plotPath)
+  mSigPortal_associaiton(data = data_input, type = args$testType, regression = TRUE, formula = rformula, output_plot = plotPath)
   data_input %>% write_delim(file = dataPath, delim = '\t', col_names = T, na = '')
 
   return(list(plotPath = plotPath, dataPath = dataPath, assocTablePath = assocTablePath, dataTable = assocTable, signatureOptions = signature_name_list))
