@@ -122,7 +122,7 @@ loadCollapse <- function(args, dataArgs) {
   vardata_refdata_selected <- exposure_refdata_selected %>% select(Sample) %>% unique() %>% left_join(vardata_refdata_selected)
   ## including NA
   if (length(unique(vardata_refdata_selected[[2]])) == 1) {
-    error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " have only unique value: ", unique(vardata_refdata_selected[[2]]), '.')
+    error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " only has unique value: ", unique(vardata_refdata_selected[[2]]), '.')
     return(list(error = error))
   }
   tmpdata <- vardata_refdata_selected
@@ -130,7 +130,7 @@ loadCollapse <- function(args, dataArgs) {
   tmpvalue <- tmpdata %>% count(Variable) %>% filter(n < 2) %>% dim() %>% .[[1]]
 
   if (tmpvalue != 0) {
-    error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " have not enough obsevations for both levels.")
+    error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " does not have enough obsevations for both levels.")
     return(list(error = error))
   }
 
