@@ -4,6 +4,7 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 import { useDispatch } from 'react-redux';
 import { actions } from '../../../../services/store/modal';
 import { getBlob } from '../../../../services/utils';
+import { saveAs } from 'file-saver';
 
 export default function Download() {
   const dispatch = useDispatch();
@@ -16,16 +17,10 @@ export default function Download() {
   async function downloadPublic() {
     setDownload(true);
     try {
-      const objectURL = URL.createObjectURL(
-        await getBlob('Signature/signature_refsets.txt.zip')
+      saveAs(
+        await getBlob('Signature/signature_refsets.txt.zip'),
+        'signature_refsets.txt.zip'
       );
-      const tempLink = document.createElement('a');
-
-      tempLink.href = `${objectURL}`;
-      tempLink.setAttribute('download', `signature_refsets.txt.zip`);
-      document.body.appendChild(tempLink);
-      tempLink.click();
-      document.body.removeChild(tempLink);
     } catch (err) {
       console.log(err);
       mergeError(`public data is not available`);

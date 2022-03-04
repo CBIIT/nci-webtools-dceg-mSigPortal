@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
+import { saveAs } from 'file-saver';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions } from '../../../services/store/modal';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
@@ -39,14 +40,7 @@ export default function Download({ exposureDownload }) {
     });
 
     if (response.ok) {
-      const objectURL = URL.createObjectURL(await response.blob());
-      const tempLink = document.createElement('a');
-
-      tempLink.href = `${objectURL}`;
-      tempLink.setAttribute('download', `msigportal-workspace.zip`);
-      document.body.appendChild(tempLink);
-      tempLink.click();
-      document.body.removeChild(tempLink);
+      saveAs(await response.blob(), 'exposure-workspace.zip');
     } else {
       mergeError(`error`);
     }

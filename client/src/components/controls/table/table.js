@@ -16,6 +16,7 @@ import {
   faSortDown,
 } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch } from 'react-redux';
+import { saveAs } from 'file-saver';
 import { actions as modalActions } from '../../../services/store/modal';
 
 function GlobalFilter({ globalFilter, setGlobalFilter, handleSearch, title }) {
@@ -146,14 +147,7 @@ export default function Table({
       const filename = path.split('/')[path.split('/').length - 1];
       const file = await fetch(`api/results/${path}`);
       if (file.ok) {
-        const objectURL = URL.createObjectURL(await file.blob());
-        const tempLink = document.createElement('a');
-
-        tempLink.href = `${objectURL}`;
-        tempLink.setAttribute('download', filename);
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        document.body.removeChild(tempLink);
+        saveAs(await file.blob(), filename);
       } else {
         mergeError(`File is not available`);
       }

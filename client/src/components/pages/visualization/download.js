@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
+import { saveAs } from 'file-saver';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions } from '../../../services/store/modal';
@@ -29,17 +30,10 @@ export default function Download() {
       `api/visualization/download?id=${projectID}&file=${file}`
     );
     if (response.ok) {
-      const objectURL = URL.createObjectURL(await response.blob());
-      const tempLink = document.createElement('a');
-
-      tempLink.href = `${objectURL}`;
-      tempLink.setAttribute(
-        'download',
+      saveAs(
+        await response.blob(),
         file.split('/')[file.split('/').length - 1]
       );
-      document.body.appendChild(tempLink);
-      tempLink.click();
-      document.body.removeChild(tempLink);
     } else {
       mergeError(`${file} is not available`);
     }
@@ -66,17 +60,10 @@ export default function Download() {
     });
 
     if (response.ok) {
-      const objectURL = URL.createObjectURL(await response.blob());
-      const tempLink = document.createElement('a');
-
-      tempLink.href = `${objectURL}`;
-      tempLink.setAttribute(
-        'download',
-        `msigportal-${study}-${cancerType}-${experimentalStrategy}`
+      saveAs(
+        await response.blob(),
+        `msigportal-${study}-${cancerType}-${experimentalStrategy}.tar.gz`
       );
-      document.body.appendChild(tempLink);
-      tempLink.click();
-      document.body.removeChild(tempLink);
     } else {
       mergeError(`public data is not available`);
     }
@@ -111,14 +98,7 @@ export default function Download() {
     });
 
     if (response.ok) {
-      const objectURL = URL.createObjectURL(await response.blob());
-      const tempLink = document.createElement('a');
-
-      tempLink.href = `${objectURL}`;
-      tempLink.setAttribute('download', `msigportal-workspace.zip`);
-      document.body.appendChild(tempLink);
-      tempLink.click();
-      document.body.removeChild(tempLink);
+      saveAs(await response.blob(), 'visualization-workspace.zip');
     } else {
       mergeError(`error`);
     }

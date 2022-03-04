@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
+import { saveAs } from 'file-saver';
 import PublicForm from './publicForm';
 import UserForm from './userForm';
 import Instructions from './instructions';
@@ -398,14 +399,7 @@ export default function Exposure({ match }) {
 
       const file = await fetch(`api/results/${output.path}`);
       if (file.ok) {
-        const objectURL = URL.createObjectURL(await file.blob());
-        const tempLink = document.createElement('a');
-
-        tempLink.href = `${objectURL}`;
-        tempLink.setAttribute('download', output.filename);
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        document.body.removeChild(tempLink);
+        saveAs(await file.blob(), output.filename);
       } else {
         mergeError(`public data is not available`);
       }
