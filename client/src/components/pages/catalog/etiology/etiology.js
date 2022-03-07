@@ -1,15 +1,16 @@
-import React, { useEffect } from 'react';
-import { Row, Col, Button, Form, Card } from 'react-bootstrap';
+import { useEffect } from 'react';
+import { Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
+import axios from 'axios';
 import { actions as catalogActions } from '../../../../services/store/catalog';
 import { actions as modalActions } from '../../../../services/store/modal';
 import { getJSON } from '../../../../services/utils';
-import Plot from '../../../controls/plot/plot';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import General from './general';
+import CancerSpecific from './cancerSpecific';
+import Therapies from './therapies';
 import './etiology.scss';
 
 const actions = { ...catalogActions, ...modalActions };
-const { Check } = Form;
 
 export default function Etiology() {
   const dispatch = useDispatch();
@@ -20,12 +21,10 @@ export default function Etiology() {
 
   const {
     category,
-    etiology,
     selectedSignature,
     tissue,
     refSig,
     study,
-    all,
     data,
     thumbnails,
     tissueThumbnails,
@@ -54,13 +53,19 @@ export default function Etiology() {
     {
       name: 'DNA Repair Gene Edits',
       author: 'Nik-Zainal et al., 2018 and 2021',
-      file: 'Etiology_gene_edits.json',
       etiologyTitle: 'Genes',
+      file: 'Etiology_gene_edits.json',
     },
     {
       name: 'Cancer Specific Signatures',
       author: 'Nik-Zainal et al., 2020',
       file: 'Etiology_cancer_specific_signatures.json',
+    },
+    {
+      name: 'Cancer Therapies',
+      author: 'Lopez-Bigas et al., 2019',
+      etiologyTitle: 'Therapies',
+      file: 'Etiology_cancer_therapies.json',
     },
     {
       name: 'Others',
@@ -81,7 +86,9 @@ export default function Etiology() {
         const data = await getJSON(`Etiology/${file}`);
 
         const etiologyOptions = [
-          ...new Set(data.map(({ Etiology }) => Etiology)),
+          ...new Set(
+            data.map(({ Etiology, Treatments }) => Etiology || Treatments)
+          ),
         ];
         const studyOptions = [...new Set(data.map(({ Study }) => Study))];
 
@@ -100,7 +107,11 @@ export default function Etiology() {
       if (!loading) getData();
     } else {
       const etiologyOptions = [
-        ...new Set(data[category].map(({ Etiology }) => Etiology)),
+        ...new Set(
+          data[category].map(
+            ({ Etiology, Treatments }) => Etiology || Treatments
+          )
+        ),
       ];
       const studyOptions = [
         ...new Set(data[category].map(({ Study }) => Study)),
@@ -116,23 +127,14 @@ export default function Etiology() {
   // check if plot exists
   useEffect(() => {
     const getImageS3 = (path) =>
-      fetch(`api/getImageS3`, {
-        method: 'POST',
-        headers: {
-          Accept: 'image/svg',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          path: `msigportal/Database/Etiology/${path}`,
-        }),
-      }).then(async (res) => {
-        if (res.ok) {
-          const blob = await res.blob();
-          return URL.createObjectURL(blob);
-        } else {
-          return '';
-        }
-      });
+      axios
+        .post(
+          'api/getImageS3',
+          { path: `msigportal/Database/Etiology/${path}` },
+          { responseType: 'blob' }
+        )
+        .then((response) => URL.createObjectURL(response.data))
+        .catch((_) => '');
 
     const getPlots = async () => {
       if (profileURL) URL.revokeObjectURL(profileURL);
@@ -231,6 +233,29 @@ export default function Etiology() {
     }
   }, [data]);
 
+  // get therapy thumbnails
+  useEffect(() => {
+    if (
+      data[category] &&
+      data[category].length &&
+      !thumbnails[category] &&
+      category == 'Cancer Therapies' &&
+      !loading
+    ) {
+      const signatures = data[category]
+        .slice()
+        .filter(
+          (value, index, array) =>
+            array.findIndex((t) => t['Signature'] === value['Signature']) ===
+            index
+        )
+        .sort(naturalSort)
+        .sort(profileSort);
+
+      getTherapyThumbnails(signatures);
+    }
+  }, [data, category, loading]);
+
   function profileSort(a, b) {
     const sigOrder = [/SBS/g, /DBS/g, /ID/g];
     let c = 0,
@@ -307,94 +332,10 @@ export default function Etiology() {
     );
   }
 
-  function getEtiologies() {
-    if (data[category] && data[category].length) {
-      return (
-        <>
-          <Row className="justify-content-center">
-            {[...new Set(data[category].map((obj) => obj.Etiology))]
-              .sort()
-              .map((Etiology) => (
-                <Col
-                  key={Etiology}
-                  lg={category == 'Gene Edits' ? '1' : '2'}
-                  md="3"
-                  sm="4"
-                  className="mb-3 d-flex"
-                >
-                  <Button
-                    size="sm"
-                    variant="dark"
-                    onClick={() =>
-                      mergeEtiology({
-                        etiology: Etiology,
-                        selectedSignature: '',
-                      })
-                    }
-                    className={etiology != Etiology ? 'disabled' : ''}
-                    block
-                  >
-                    {Etiology}
-                  </Button>
-                </Col>
-              ))}
-          </Row>
-        </>
-      );
-    } else {
-      return (
-        <div style={{ minHeight: '100px' }}>
-          <LoadingOverlay active={true} />
-        </div>
-      );
-    }
-  }
-  function getCancerEtiology() {
-    if (data[category] && data[category].length) {
-      return (
-        <Row className="justify-content-center">
-          {[...new Set(data[category].map((obj) => obj.Etiology))]
-            .sort()
-            .map((Etiology) => (
-              <Col key={Etiology} lg="2" md="3" sm="4" className="mb-3 d-flex">
-                <Button
-                  size="sm"
-                  variant="dark"
-                  onClick={() =>
-                    mergeEtiology({
-                      etiology: Etiology,
-                      tissue: '',
-                      refSig: '',
-                    })
-                  }
-                  className={etiology != Etiology ? 'disabled' : ''}
-                  block
-                >
-                  {Etiology}
-                </Button>
-              </Col>
-            ))}
-        </Row>
-      );
-    } else {
-      return (
-        <div style={{ minHeight: '100px' }}>
-          <LoadingOverlay active={true} />
-        </div>
-      );
-    }
-  }
-
   async function getImageBatch(keyArr) {
-    return (
-      await fetch(`api/getImageS3Batch`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          keys: keyArr,
-        }),
-      })
-    ).json();
+    return axios
+      .post('api/getImageS3Batch', { keys: keyArr })
+      .then(({ data }) => data);
   }
 
   async function getThumbnails(signatures) {
@@ -473,576 +414,40 @@ export default function Etiology() {
     }
   }
 
-  function standardView() {
-    function getAllSignatures() {
-      if (thumbnails[category] && thumbnails[category].length) {
-        return thumbnails[category].map(
-          ({ Etiology, signatureName, thumbnailURL, Source_URL }, index) => (
-            <Col key={index} lg="1" md="3" sm="4" className="mb-2 px-1">
-              <div
-                onClick={() =>
-                  mergeEtiology({
-                    etiology: Etiology,
-                    selectedSignature: signatureName,
-                  })
-                }
-                className={`sigIcon border rounded ${
-                  etiology != Etiology
-                    ? 'inactive'
-                    : signatureName == selectedSignature
-                    ? 'active'
-                    : ''
-                }`}
-                title={`${Etiology} - ${signatureName}`}
-              >
-                <img
-                  src={thumbnailURL}
-                  className="w-100"
-                  // height="70"
-                  alt=""
-                />
-                <strong className="sigLabel" style={{ fontSize: '0.8rem' }}>
-                  {signatureName}
-                </strong>
-              </div>
-            </Col>
-          )
-        );
-      } else {
-        return (
-          <div style={{ minHeight: '100px' }}>
-            <LoadingOverlay active={true} />
-          </div>
-        );
-      }
+  async function getTherapyThumbnails(signatures) {
+    try {
+      const keys = signatures.map(
+        (signature) =>
+          `msigportal/Database/Etiology/Profile_logo/${fixFile(
+            signature.Signature
+          )}.svg`
+      );
+
+      const images = await getImageBatch(keys);
+
+      const thumbnails = signatures.map((signature, i) => ({
+        Etiology: signature.Treatments,
+        Study: signature.Study,
+        signatureName: signature.Signature,
+        thumbnailURL: images[i],
+      }));
+
+      mergeEtiology({ thumbnails: { [category]: thumbnails } });
+    } catch (err) {
+      mergeError(err.message);
+      console.error(err);
     }
-
-    function getSignatures() {
-      if (thumbnails[category] && thumbnails[category].length) {
-        return thumbnails[category]
-          .filter(({ Etiology }) => Etiology == etiology)
-          .map(({ signatureName, thumbnailURL, Source_URL }, index) => {
-            return (
-              <Col key={index} md="2" sm="4" className="mb-3">
-                <div
-                  className={`sigIcon border rounded ${
-                    signatureName == selectedSignature ? 'active' : ''
-                  }`}
-                  title={`${etiology} - ${signatureName}`}
-                  onClick={() =>
-                    mergeEtiology({
-                      selectedSignature: signatureName,
-                    })
-                  }
-                >
-                  <img
-                    src={thumbnailURL}
-                    className="w-100"
-                    // height="110"
-                    alt=""
-                  />
-                  <strong className="sigLabel">{signatureName}</strong>
-                </div>
-              </Col>
-            );
-          });
-      } else {
-        return (
-          <div style={{ minHeight: '100px' }}>
-            <LoadingOverlay active={true} />
-          </div>
-        );
-      }
-    }
-
-    function getStudy() {
-      if (data[category] && data[category].length) {
-        return [
-          ...new Set(
-            data[category]
-              .filter(
-                ({ Etiology, 'Signature Name': signatureName }) =>
-                  Etiology == etiology && signatureName == selectedSignature
-              )
-              .map((obj) => obj.Study)
-          ),
-        ].map((Study) => (
-          <Col key={Study} lg="2" md="3" sm="4" className="mb-3 d-flex">
-            <Button
-              size="sm"
-              variant="primary"
-              onClick={() => mergeEtiology({ study: Study })}
-              className={study != Study ? 'disabled' : ''}
-              block
-            >
-              {Study}
-            </Button>
-          </Col>
-        ));
-      } else {
-        return false;
-      }
-    }
-
-    function getInfo() {
-      if (data[category] && data[category].length && selectedSignature) {
-        let info = data[category].filter(
-          (signature) =>
-            signature['Signature Name'] == selectedSignature ||
-            signature['Signature'] == selectedSignature
-        );
-        if (info.length) {
-          info = info[0];
-
-          return (
-            <div>
-              <div>
-                <strong>Signature Name: </strong>
-                {info['Signature Name'] || info['Signature']}
-              </div>
-              {info['Cell Line'] && (
-                <div>
-                  <strong>Cell Line: </strong>
-                  {info['Cell Line']}
-                </div>
-              )}
-              {info.Mutagen && (
-                <div>
-                  <strong>Mutagen: </strong>
-                  {info.Mutagen}
-                </div>
-              )}
-              {info.Treatment && (
-                <div>
-                  <strong>Treatment: </strong>
-                  {info.Treatment}
-                </div>
-              )}
-              {info.Study && (
-                <div>
-                  <strong>Study: </strong>
-                  <a href={info.Study_URL} target="_blank" rel="noreferrer">
-                    {info.Study}
-                  </a>
-                </div>
-              )}
-              {info.Source && (
-                <div>
-                  <strong>Source: </strong>
-                  <a href={info.Source_URL} target="_blank" rel="noreferrer">
-                    {info.Source}
-                  </a>
-                </div>
-              )}
-              {info.URL && (
-                <div>
-                  <strong>Source: </strong>
-                  <a href={info.URL} target="_blank" rel="noreferrer">
-                    {info.URL}
-                  </a>
-                </div>
-              )}
-              {info.Description &&
-                (typeof info.Description == 'string' ? (
-                  <p>{info.Description}</p>
-                ) : (
-                  info.Description.map((text, i) => <p key={i}>{text}</p>)
-                ))}
-
-              {profileURL ? (
-                <div>
-                  <Plot
-                    className="p-3 border rounded mb-3"
-                    height={'500px'}
-                    plotPath={profileURL}
-                    cacheBreaker={false}
-                  />
-
-                  {info.Description_strandbias && (
-                    <p>{info.Description_strandbias}</p>
-                  )}
-                  {info.Description_strandbias && strandbiasURL && (
-                    <Plot
-                      className="p-3 border rounded mb-3"
-                      height={'500px'}
-                      plotPath={strandbiasURL}
-                      cacheBreaker={false}
-                    />
-                  )}
-
-                  {category == 'Cosmic Mutational Signatures (v3.2)' &&
-                    info.Study && (
-                      <>
-                        <p>
-                          Select a cancer study to review the TMB of selected
-                          signatures. TMB shown as the numbers of mutations per
-                          megabase (log10) attributed to each mutational
-                          signature in samples where the signature is present.
-                          Only those cancer types with tumors in which signature
-                          activity is attributed are shown. The numbers below
-                          the dots for each cancer type indicate the number of
-                          tumors in which the signatures was attributed (above
-                          the horizontal bar, in blue) and the total number of
-                          tumors analyzed (below the blue bar, in green).
-                        </p>
-                        <Row className="justify-content-center">
-                          {getStudy()}
-                        </Row>
-                        {exposureURL.length > 0 && (
-                          <Plot
-                            className="p-3 border"
-                            height={'600px'}
-                            plotPath={exposureURL}
-                          />
-                        )}
-                      </>
-                    )}
-                </div>
-              ) : (
-                <div style={{ minHeight: '100px' }}>
-                  <LoadingOverlay active={true} />
-                </div>
-              )}
-            </div>
-          );
-        } else {
-          return (
-            <p className="d-flex justify-content-center text-muted">
-              Error: No data found for {selectedSignature}
-            </p>
-          );
-        }
-      }
-    }
-
-    return (
-      <div>
-        <div className="mb-3">
-          <h5 className="separator">
-            {categories.filter((cat) => cat.name == category)[0].etiologyTitle}
-          </h5>
-          <div>{getEtiologies()}</div>
-        </div>
-        <div>
-          <h5 className="separator">Signatures</h5>
-
-          <Row className="justify-content-center mb-3">
-            <Col sm="auto">
-              <p>
-                Select a signature to view more info. Choose{' '}
-                <b>Selected Etiology</b> to see signatures in the selected
-                etiology, or <b>All Signatures</b> to see signatures for every
-                etiology.
-              </p>
-            </Col>
-          </Row>
-          <Row className="justify-content-center mb-3">
-            <Col sm="auto">
-              <Check id="selectedEtiology">
-                <Check.Input
-                  type="radio"
-                  checked={all == false}
-                  onChange={() => mergeEtiology({ all: false })}
-                />
-                <Check.Label className="font-weight-normal">
-                  Selected Etiology
-                </Check.Label>
-              </Check>
-            </Col>
-            <Col sm="auto">
-              <Check id="allEtiologies">
-                <Check.Input
-                  type="radio"
-                  checked={all == true}
-                  onChange={() => mergeEtiology({ all: true })}
-                />
-                <Check.Label className="font-weight-normal">
-                  All Signatures
-                </Check.Label>
-              </Check>
-            </Col>
-          </Row>
-
-          <Row className={`justify-content-center ${all ? 'd-none' : ''}`}>
-            {getSignatures()}
-          </Row>
-          <Row
-            className={`px-2 justify-content-center ${!all ? 'd-none' : ''}`}
-          >
-            {getAllSignatures()}
-          </Row>
-          <div className="p-3">{getInfo()}</div>
-        </div>
-      </div>
-    );
-  }
-
-  function cancerSpecificView() {
-    function getAllTissues() {
-      if (tissueThumbnails.length) {
-        return tissueThumbnails.map((tissueSig, index) => {
-          return (
-            <Col key={index} lg="1" md="2" sm="4" className="mb-2 px-1">
-              <div
-                className={`sigIcon border rounded ${
-                  etiology != tissueSig.Etiology
-                    ? 'inactive'
-                    : tissue == tissueSig['Tissue Specific Signature']
-                    ? 'active'
-                    : ''
-                }`}
-                title={`${etiology} - ${tissue['Tissue Specific Signature']}`}
-                onClick={() =>
-                  mergeEtiology({
-                    etiology: tissueSig.Etiology,
-                    tissue: tissueSig['Tissue Specific Signature'],
-                  })
-                }
-              >
-                <img
-                  src={tissueSig.thumbnailURL}
-                  className="w-100"
-                  // height="110"
-                  alt=""
-                />
-                <strong className="sigLabel">
-                  {tissueSig['Tissue Specific Signature']}
-                </strong>
-              </div>
-            </Col>
-          );
-        });
-      } else {
-        return (
-          <div style={{ minHeight: '100px' }}>
-            <LoadingOverlay active={true} />
-          </div>
-        );
-      }
-    }
-
-    function getTissues() {
-      if (tissueThumbnails.length) {
-        return tissueThumbnails
-          .filter(({ Etiology }) => Etiology == etiology)
-          .map((tissueSig, index) => {
-            return (
-              <Col key={index} md="2" sm="4" className="mb-3">
-                <div
-                  className={`sigIcon border rounded ${
-                    tissue == tissueSig['Tissue Specific Signature']
-                      ? 'active'
-                      : ''
-                  }`}
-                  title={`${etiology} - ${tissueSig['Tissue Specific Signature']}`}
-                  onClick={() =>
-                    mergeEtiology({
-                      tissue: tissueSig['Tissue Specific Signature'],
-                      refSig: '',
-                    })
-                  }
-                >
-                  <img
-                    src={tissueSig.thumbnailURL}
-                    className="w-100"
-                    // height="110"
-                    alt=""
-                  />
-                  <strong className="sigLabel">
-                    {tissueSig['Tissue Specific Signature']}
-                  </strong>
-                </div>
-              </Col>
-            );
-          });
-      } else {
-        return (
-          <div style={{ minHeight: '100px' }}>
-            <LoadingOverlay active={true} />
-          </div>
-        );
-      }
-    }
-
-    function getRefSig() {
-      if (refSigThumbnails.length && tissue) {
-        return (
-          <Row className="justify-content-center">
-            {refSigThumbnails
-              .filter(
-                (v) =>
-                  v.Etiology == etiology &&
-                  v['Tissue Specific Signature'] == tissue
-              )
-              .map((v, index) => {
-                return (
-                  <Col key={index} md="2" sm="4" className="mb-3">
-                    <div
-                      className={`sigIcon border rounded ${
-                        refSig == v['Ref Signature'] ? 'active' : ''
-                      }`}
-                      title={`${v['Tissue Specific Signature']} - ${v['Ref Signature']}`}
-                      onClick={() =>
-                        mergeEtiology({ refSig: v['Ref Signature'] })
-                      }
-                    >
-                      <img
-                        src={v.thumbnailURL}
-                        className="w-100"
-                        // height="110"
-                        alt=""
-                      />
-                      <strong className="sigLabel">
-                        {`${v['Ref Signature']} (${v['RefSig Proportion']})`}
-                      </strong>
-                    </div>
-                  </Col>
-                );
-              })}
-          </Row>
-        );
-      } else {
-        return <p className="text-center text-muted">Select a Signature</p>;
-      }
-    }
-
-    function getCancerSpecificInfo() {
-      if (data[category] && data[category].length && tissue && refSig) {
-        let info = data[category].filter(
-          (v) =>
-            v['Tissue Specific Signature'] == tissue &&
-            v['Ref Signature'] == refSig
-        );
-        if (info.length) {
-          info = info[0];
-          return (
-            <div>
-              <div>
-                <strong>Tissue Specific Signature: </strong>
-                {tissue}
-              </div>
-              <div>
-                <strong>Reference Signature: </strong>
-                {refSig}
-              </div>
-              <div>
-                <strong>RefSig Proportion: </strong>
-                {info['RefSig Proportion']}
-              </div>
-              <div>
-                <strong>Study: </strong>
-                <a href={info.Study_URL} target="_blank" rel="noreferrer">
-                  {info.Study}
-                </a>
-              </div>
-              <div>
-                <strong>Source: </strong>
-                <a href={info.Source_URL} target="_blank" rel="noreferrer">
-                  {info.Source}
-                </a>
-              </div>
-              {typeof info.Description == 'string' ? (
-                <p>{info.Description}</p>
-              ) : (
-                info.Description.map((text, i) => <p key={i}>{text}</p>)
-              )}
-
-              <Plot
-                className="p-3 border rounded mb-3"
-                height={'500px'}
-                plotPath={refSigURL}
-              />
-
-              <Plot
-                className="p-3 border rounded mb-3"
-                height={'500px'}
-                plotPath={tissueURL}
-              />
-
-              <Plot
-                className="p-3 border rounded mb-3"
-                height={'600px'}
-                plotPath={exposureURL}
-              />
-            </div>
-          );
-        } else {
-          return (
-            <p className="d-flex justify-content-center text-muted">
-              Error: No data found for {tissue} and {refSig}
-            </p>
-          );
-        }
-      }
-    }
-    return (
-      <div>
-        <div className="mb-3">
-          <h5 className="separator">Tissue Types</h5>
-          {getCancerEtiology()}
-        </div>
-        <div className="mb-3">
-          <h5 className="separator">Tissue Specific Signatures</h5>
-          <Row className="justify-content-center mb-3">
-            <Col sm="auto">
-              <p>
-                Select a signature to view more info. Choose{' '}
-                <b>Selected Etiology</b> to see signatures in the selected
-                etiology, or <b>All Signatures</b> to see signatures for every
-                etiology.
-              </p>
-            </Col>
-          </Row>
-          <Row className="justify-content-center mb-3">
-            <Col sm="auto">
-              <Check id="selectedEtiology">
-                <Check.Input
-                  type="radio"
-                  checked={all == false}
-                  onChange={() => mergeEtiology({ all: false })}
-                />
-                <Check.Label className="font-weight-normal">
-                  Selected Etiology
-                </Check.Label>
-              </Check>
-            </Col>
-            <Col sm="auto">
-              <Check id="allEtiologies">
-                <Check.Input
-                  type="radio"
-                  checked={all == true}
-                  onChange={() => mergeEtiology({ all: true })}
-                />
-                <Check.Label className="font-weight-normal">
-                  All Signatures
-                </Check.Label>
-              </Check>
-            </Col>
-          </Row>
-          <Row className={`justify-content-center ${all ? 'd-none' : ''}`}>
-            {getTissues()}
-          </Row>
-          <Row
-            className={`px-2 justify-content-center ${!all ? 'd-none' : ''}`}
-          >
-            {getAllTissues()}
-          </Row>
-        </div>
-        <div className="mb-3">
-          <h5 className="separator">Reference Signatures</h5>
-          {getRefSig()}
-          <div className="p-3">{getCancerSpecificInfo()}</div>
-        </div>
-      </div>
-    );
   }
 
   return (
     <div className="p-4 bg-white border rounded">
       <h5 className="separator">Categories</h5>
       {getCategories()}
-      {category != 'Cancer Specific Signatures' && standardView()}
-      {category == 'Cancer Specific Signatures' && cancerSpecificView()}
+      {category != 'Cancer Specific Signatures' &&
+        category != 'Cancer Therapies' && <General categories={categories} />}
+
+      {category == 'Cancer Specific Signatures' && <CancerSpecific />}
+      {category == 'Cancer Therapies' && <Therapies />}
     </div>
   );
 }
