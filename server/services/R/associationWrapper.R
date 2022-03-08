@@ -27,12 +27,12 @@ getAssocVarData <- function(args, dataArgs) {
   setwd(dataArgs$wd)
   fullDataPath = paste0(dataArgs$savePath, 'vardata_refdata_selected.txt')
 
-  association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_vardata.RData')
+  association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
 
   tryCatch({
     s3load(association_data_file, dataArgs$bucket)
   }, error = function(e) {
-    return(list(error = "ERROR: association variable data are not avaiable for selected study. please check input or select another study"))
+    stop("ERROR: association variable data are not avaiable for selected study. please check input or select another study")
   })
 
   ## extract the variable information
@@ -49,13 +49,13 @@ getAssocVarData <- function(args, dataArgs) {
 getExpVarData <- function(args, dataArgs) {
   # load exposure data files
   exposure_data_file <- paste0(dataArgs$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
-  association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_vardata.RData')
+  association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
 
   tryCatch({
     s3load(exposure_data_file, dataArgs$bucket)
     s3load(association_data_file, dataArgs$bucket)
   }, error = function(e) {
-    return(list(error = "ERROR: Exposure or association variable data are not avaiable for selected study. please check input or select another study"))
+    stop("ERROR: Exposure or association variable data are not avaiable for selected study. please check input or select another study")
   })
 
   exposure_refdata_selected <- exposure_refdata %>% filter(Signature_set_name == args$rsSet, Cancer_Type == args$cancer)
@@ -85,7 +85,7 @@ loadCollapse <- function(args, dataArgs) {
   source('services/R/Sigvisualfunc.R')
   # load exposure data files
   exposure_data_file <- paste0(dataArgs$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
-  association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_vardata.RData')
+  association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
   s3load(exposure_data_file, dataArgs$bucket)
   s3load(association_data_file, dataArgs$bucket)
 
@@ -123,7 +123,7 @@ loadCollapse <- function(args, dataArgs) {
   ## including NA
   if (length(unique(vardata_refdata_selected[[2]])) == 1) {
     error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " only has unique value: ", unique(vardata_refdata_selected[[2]]), '.')
-    return(list(error = error))
+    stop(error)
   }
   tmpdata <- vardata_refdata_selected
   colnames(tmpdata)[2] <- 'Variable'
@@ -131,7 +131,7 @@ loadCollapse <- function(args, dataArgs) {
 
   if (tmpvalue != 0) {
     error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " does not have enough obsevations for both levels.")
-    return(list(error = error))
+    stop(error)
   }
 
   ### combined dataset
@@ -154,7 +154,7 @@ univariable <- function(args, dataArgs) {
 
   # load exposure data files
   exposure_data_file <- paste0(dataArgs$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
-  association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_vardata.RData')
+  association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
   s3load(exposure_data_file, dataArgs$bucket)
   s3load(association_data_file, dataArgs$bucket)
 
@@ -190,7 +190,7 @@ univariable <- function(args, dataArgs) {
   ## including NA
   if (length(unique(vardata_refdata_selected[[2]])) == 1) {
     error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " have only unique value: ", unique(vardata_refdata_selected[[2]]), '.')
-    return(list(error = error))
+    stop(error)
   }
   tmpdata <- vardata_refdata_selected
   colnames(tmpdata)[2] <- 'Variable'
@@ -198,7 +198,7 @@ univariable <- function(args, dataArgs) {
 
   if (tmpvalue != 0) {
     error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " have not enough obsevations for both levels.")
-    return(list(error = error))
+    stop(error)
   }
 
   ### combined dataset
@@ -243,7 +243,7 @@ loadCollapseMulti <- function(args, dataArgs) {
 
   # load exposure data files
   exposure_data_file <- paste0(dataArgs$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
-  association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_vardata.RData')
+  association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
   s3load(exposure_data_file, dataArgs$bucket)
   s3load(association_data_file, dataArgs$bucket)
 
@@ -288,7 +288,7 @@ multivariable <- function(args, dataArgs) {
 
   # load exposure data files
   exposure_data_file <- paste0(dataArgs$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
-  association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_vardata.RData')
+  association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
   s3load(exposure_data_file, dataArgs$bucket)
   s3load(association_data_file, dataArgs$bucket)
 

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
+import axios from 'axios';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Select from '../../controls/select/select';
 import { useSelector, useDispatch } from 'react-redux';
@@ -116,35 +117,21 @@ export default function PublicForm() {
   }
 
   async function handleLoadData() {
-    const getAssocVarData = async () =>
-      (
-        await fetch(`api/associationWrapper`, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            fn: 'getAssocVarData',
-            args: { study, cancer },
-          }),
+    const getAssocVarData = () =>
+      axios
+        .post('api/associationWrapper', {
+          fn: 'getAssocVarData',
+          args: { study, strategy, rsSet, cancer },
         })
-      ).json();
-    const getExpVarData = async () =>
-      (
-        await fetch(`api/associationWrapper`, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            fn: 'getExpVarData',
-            args: { study, strategy, rsSet, cancer },
-          }),
-        })
-      ).json();
+        .then(({ data }) => data);
 
+    const getExpVarData = () =>
+      axios
+        .post('api/associationWrapper', {
+          fn: 'getExpVarData',
+          args: { study, strategy, rsSet, cancer },
+        })
+        .then(({ data }) => data);
     mergeState({ loadingData: true });
     try {
       const [assocResponse, expResponse] = await Promise.all([
@@ -152,15 +139,11 @@ export default function PublicForm() {
         getExpVarData(),
       ]);
 
-      const {
-        projectID,
-        output: assocOutput,
-        uncaughtError: assocError,
-      } = assocResponse;
-      const { output: expOutput, uncaughtError: expError } = expResponse;
+      const { projectID, output: assocOutput } = assocResponse;
+      const { output: expOutput } = expResponse;
 
-      if (assocError) throw assocError;
-      if (expError) throw expError;
+      if (assocOutput.uncaughtError) throw assocOutput.uncaughtError;
+      if (expOutput.uncaughtError) throw expOutput.uncaughtError;
 
       mergeState({
         submitted: true,
