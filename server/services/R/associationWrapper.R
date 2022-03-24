@@ -123,7 +123,7 @@ loadCollapse <- function(args, dataArgs) {
   ## including NA
   if (length(unique(vardata_refdata_selected[[2]])) == 1) {
     error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " only has unique value: ", unique(vardata_refdata_selected[[2]]), '.')
-    stop(error)
+    return(list(error = error))
   }
   tmpdata <- vardata_refdata_selected
   colnames(tmpdata)[2] <- 'Variable'
@@ -131,7 +131,7 @@ loadCollapse <- function(args, dataArgs) {
 
   if (tmpvalue != 0) {
     error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " does not have enough obsevations for both levels.")
-    stop(error)
+    return(list(error = error))
   }
 
   ### combined dataset
@@ -190,7 +190,7 @@ univariable <- function(args, dataArgs) {
   ## including NA
   if (length(unique(vardata_refdata_selected[[2]])) == 1) {
     error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " have only unique value: ", unique(vardata_refdata_selected[[2]]), '.')
-    stop(error)
+    return(list(error = error))
   }
   tmpdata <- vardata_refdata_selected
   colnames(tmpdata)[2] <- 'Variable'
@@ -198,7 +198,7 @@ univariable <- function(args, dataArgs) {
 
   if (tmpvalue != 0) {
     error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " have not enough obsevations for both levels.")
-    stop(error)
+    return(list(error = error))
   }
 
   ### combined dataset
