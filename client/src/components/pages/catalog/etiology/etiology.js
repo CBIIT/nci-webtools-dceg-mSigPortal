@@ -180,6 +180,7 @@ export default function Etiology() {
       data[category].length &&
       !thumbnails[category] &&
       category != 'Cancer Specific Signatures' &&
+      category != 'Cancer Therapies' &&
       !loading
     ) {
       const signatures = data[category]
