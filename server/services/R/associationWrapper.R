@@ -3,7 +3,7 @@ library(jsonlite)
 library(aws.s3)
 
 # capture console output for all functions called in wrapper
-wrapper <- function(fn, args, dataArgs) {
+wrapper <- function(fn, args, config) {
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
@@ -12,7 +12,7 @@ wrapper <- function(fn, args, dataArgs) {
   output = list()
 
   tryCatch({
-    output = get(fn)(args, dataArgs)
+    output = get(fn)(args, config)
   }, error = function(e) {
     print(e)
     output <<- append(output, list(uncaughtError = e$message))
@@ -23,14 +23,14 @@ wrapper <- function(fn, args, dataArgs) {
   })
 }
 
-getAssocVarData <- function(args, dataArgs) {
-  setwd(dataArgs$wd)
-  fullDataPath = paste0(dataArgs$savePath, 'vardata_refdata_selected.txt')
+getAssocVarData <- function(args, config) {
+  setwd(config$wd)
+  fullDataPath = paste0(config$savePath, 'vardata_refdata_selected.txt')
 
-  association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
+  association_data_file <- paste0(config$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
 
   tryCatch({
-    s3load(association_data_file, dataArgs$bucket)
+    s3load(association_data_file, config$bucket)
   }, error = function(e) {
     stop("ERROR: association variable data are not avaiable for selected study. please check input or select another study")
   })
@@ -46,14 +46,14 @@ getAssocVarData <- function(args, dataArgs) {
   return(list(assocVarData = clist, fullDataPath = fullDataPath))
 }
 
-getExpVarData <- function(args, dataArgs) {
+getExpVarData <- function(args, config) {
   # load exposure data files
-  exposure_data_file <- paste0(dataArgs$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
-  association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
+  exposure_data_file <- paste0(config$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
+  association_data_file <- paste0(config$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
 
   tryCatch({
-    s3load(exposure_data_file, dataArgs$bucket)
-    s3load(association_data_file, dataArgs$bucket)
+    s3load(exposure_data_file, config$bucket)
+    s3load(association_data_file, config$bucket)
   }, error = function(e) {
     stop("ERROR: Exposure or association variable data are not avaiable for selected study. please check input or select another study")
   })
@@ -81,13 +81,13 @@ getExpVarData <- function(args, dataArgs) {
 }
 
 
-loadCollapse <- function(args, dataArgs) {
+loadCollapse <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
   # load exposure data files
-  exposure_data_file <- paste0(dataArgs$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
-  association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
-  s3load(exposure_data_file, dataArgs$bucket)
-  s3load(association_data_file, dataArgs$bucket)
+  exposure_data_file <- paste0(config$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
+  association_data_file <- paste0(config$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
+  s3load(exposure_data_file, config$bucket)
+  s3load(association_data_file, config$bucket)
 
   exposure_refdata_selected <- exposure_refdata %>% filter(Signature_set_name == args$rsSet, Cancer_Type == args$cancer)
 
@@ -145,18 +145,18 @@ loadCollapse <- function(args, dataArgs) {
   return(list(collapseVar1 = collapse_var1_list)) #, collapseVar2 = collapse_var2_list))
 }
 
-univariable <- function(args, dataArgs) {
+univariable <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
-  setwd(dataArgs$wd)
-  plotPath = paste0(dataArgs$savePath, 'association_result.svg')
-  dataPath = paste0(dataArgs$savePath, 'asssociation_data.txt')
-  assocTablePath = paste0(dataArgs$savePath, 'asssociation_test.txt')
+  setwd(config$wd)
+  plotPath = paste0(config$savePath, 'association_result.svg')
+  dataPath = paste0(config$savePath, 'asssociation_data.txt')
+  assocTablePath = paste0(config$savePath, 'asssociation_test.txt')
 
   # load exposure data files
-  exposure_data_file <- paste0(dataArgs$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
-  association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
-  s3load(exposure_data_file, dataArgs$bucket)
-  s3load(association_data_file, dataArgs$bucket)
+  exposure_data_file <- paste0(config$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
+  association_data_file <- paste0(config$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
+  s3load(exposure_data_file, config$bucket)
+  s3load(association_data_file, config$bucket)
 
   exposure_refdata_selected <- exposure_refdata %>% filter(Signature_set_name == args$rsSet, Cancer_Type == args$cancer)
 
@@ -233,19 +233,19 @@ univariable <- function(args, dataArgs) {
   return(list(plotPath = plotPath, dataPath = dataPath, assocTablePath = assocTablePath, dataTable = assocTable, signatureOptions = signature_name_list))
 }
 
-loadCollapseMulti <- function(args, dataArgs) {
+loadCollapseMulti <- function(args, config) {
   require(broom)
   require(purrr)
   source('services/R/Sigvisualfunc.R')
-  setwd(dataArgs$wd)
+  setwd(config$wd)
   # parse into array of objects
   associationVars = split(args$associationVars, 1:nrow(args$associationVars))
 
   # load exposure data files
-  exposure_data_file <- paste0(dataArgs$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
-  association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
-  s3load(exposure_data_file, dataArgs$bucket)
-  s3load(association_data_file, dataArgs$bucket)
+  exposure_data_file <- paste0(config$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
+  association_data_file <- paste0(config$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
+  s3load(exposure_data_file, config$bucket)
+  s3load(association_data_file, config$bucket)
 
   exposure_refdata_selected <- exposure_refdata %>% filter(Signature_set_name == args$rsSet, Cancer_Type == args$cancer)
 
@@ -276,21 +276,21 @@ loadCollapseMulti <- function(args, dataArgs) {
   return(collapseOptions)
 }
 
-multivariable <- function(args, dataArgs) {
+multivariable <- function(args, config) {
   require(broom)
   source('services/R/Sigvisualfunc.R')
-  setwd(dataArgs$wd)
-  plotPath = paste0(dataArgs$savePath, 'association_result.svg')
-  dataPath = paste0(dataArgs$savePath, 'asssociation_data.txt')
-  assocTablePath = paste0(dataArgs$savePath, 'asssociation_test.txt')
+  setwd(config$wd)
+  plotPath = paste0(config$savePath, 'association_result.svg')
+  dataPath = paste0(config$savePath, 'asssociation_data.txt')
+  assocTablePath = paste0(config$savePath, 'asssociation_test.txt')
   # parse into array of objects
   associationVars = split(args$associationVars, 1:nrow(args$associationVars))
 
   # load exposure data files
-  exposure_data_file <- paste0(dataArgs$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
-  association_data_file <- paste0(dataArgs$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
-  s3load(exposure_data_file, dataArgs$bucket)
-  s3load(association_data_file, dataArgs$bucket)
+  exposure_data_file <- paste0(config$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
+  association_data_file <- paste0(config$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
+  s3load(exposure_data_file, config$bucket)
+  s3load(association_data_file, config$bucket)
 
   exposure_refdata_selected <- exposure_refdata %>% filter(Signature_set_name == args$rsSet, Cancer_Type == args$cancer)
 

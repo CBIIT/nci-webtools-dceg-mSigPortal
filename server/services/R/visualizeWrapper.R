@@ -9,7 +9,7 @@ library(jsonlite)
 library(aws.s3)
 
 # capture console output for all functions called in wrapper
-wrapper <- function(fn, args, dataArgs) {
+wrapper <- function(fn, args, config) {
   stdout <- vector('character')
   con <- textConnection('stdout', 'wr', local = TRUE)
   sink(con, type = "message")
@@ -18,7 +18,7 @@ wrapper <- function(fn, args, dataArgs) {
   output = list()
 
   tryCatch({
-    output = get(fn)(args, dataArgs)
+    output = get(fn)(args, config)
   }, error = function(e) {
     print(e)
     output <<- append(output, list(uncaughtError = e$message))
@@ -30,9 +30,9 @@ wrapper <- function(fn, args, dataArgs) {
 }
 
 # get all Reference Signature Set options using profile_name (profile type and matrix size)
-getReferenceSignatureSets <- function(args, dataArgs) {
+getReferenceSignatureSets <- function(args, config) {
   library(stringr)
-  s3load(paste0(dataArgs$s3Data, 'Signature/signature_refsets.RData'), dataArgs$bucket)
+  s3load(paste0(config$s3Data, 'Signature/signature_refsets.RData'), config$bucket)
 
   profile_name <- if_else(args$profileType == "SBS", "SBS96", if_else(args$profileType == "DBS", "DBS78", if_else(args$profileType == "ID", "ID83", NA_character_)))
   signatureSets <- str_sort(signature_refsets %>% filter(Profile == profile_name) %>% pull(Signature_set_name) %>% unique(), numeric = TRUE)
@@ -41,9 +41,9 @@ getReferenceSignatureSets <- function(args, dataArgs) {
 }
 
 # get list of signatures in the selected signature set
-getSignaturesR <- function(args, dataArgs) {
+getSignaturesR <- function(args, config) {
   library(stringr)
-  s3load(paste0(dataArgs$s3Data, 'Signature/signature_refsets.RData'), dataArgs$bucket)
+  s3load(paste0(config$s3Data, 'Signature/signature_refsets.RData'), config$bucket)
 
   profile_name <- if_else(args$profileType == "SBS", "SBS96", if_else(args$profileType == "DBS", "DBS78", if_else(args$profileType == "ID", "ID83", NA_character_)))
   signature_refsets_input <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == args$signatureSetName)
@@ -56,7 +56,7 @@ getSignaturesR <- function(args, dataArgs) {
 }
 
 # get public svgFiles and load into session
-getPublicData <- function(args, dataArgs) {
+getPublicData <- function(args, config) {
   infoFile = ''
   if (args$study == 'PCAWG') { infoFile = 'PCAWG_WGS_seqmatrix_refdata_info.RData' }
   else if (args$study == 'TCGA') { infoFile = "TCGA_WES_seqmatrix_refdata_info.RData" }
@@ -67,9 +67,9 @@ getPublicData <- function(args, dataArgs) {
   else if (args$study == 'LCM-Normal-Tissues') { infoFile = 'LCM-Normal-Tissues_WGS_seqmatrix_refdata_info.RData' }
   else stop('Cannot find public data file')
 
-  s3load(paste0(dataArgs$s3Data, 'Seqmatrix/', infoFile), dataArgs$bucket)
+  s3load(paste0(config$s3Data, 'Seqmatrix/', infoFile), config$bucket)
 
-  svgfiles <- seqmatrix_refdata_info %>% mutate(Path = paste0(dataArgs$s3Data, 'Seqmatrix/', Path))
+  svgfiles <- seqmatrix_refdata_info %>% mutate(Path = paste0(config$s3Data, 'Seqmatrix/', Path))
   if (args$cancerType == 'PanCancer') {
     svgfiles_public <- svgfiles %>% filter(Study == args$study, Dataset == args$experimentalStrategy) %>% select(-Study) %>% arrange(Sample)
   } else {
@@ -80,11 +80,11 @@ getPublicData <- function(args, dataArgs) {
 }
 
 # Tumor Mutation Burden ---------------------------------------------------
-profilerSummary <- function(args, dataArgs) {
+profilerSummary <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
-  setwd(dataArgs$wd)
+  setwd(config$wd)
 
-  plotPath = paste0(dataArgs$savePath, 'profilerSummary.svg')
+  plotPath = paste0(config$savePath, 'profilerSummary.svg')
 
   matrixList = fromJSON(args$matrixList)
 
@@ -92,7 +92,7 @@ profilerSummary <- function(args, dataArgs) {
 
   for (i in 1:dim(matrixList)[1]) {
     matrixfile_selected <- matrixList$Path[i]
-    data_input_tmp <- read_delim(paste0(dataArgs$savePath, '../../', matrixfile_selected), delim = '\t')
+    data_input_tmp <- read_delim(paste0(config$savePath, '../../', matrixfile_selected), delim = '\t')
     if (dim(data_input_tmp)[1] > 0) {
       data_input_tmp <- data_input_tmp %>% pivot_longer(cols = -MutationType) %>%
         group_by(name) %>%
@@ -107,16 +107,16 @@ profilerSummary <- function(args, dataArgs) {
   return(list(plotPath = plotPath))
 }
 
-profilerSummaryPublic <- function(args, dataArgs) {
+profilerSummaryPublic <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
-  setwd(dataArgs$wd)
+  setwd(config$wd)
 
-  s3load(paste0(dataArgs$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), dataArgs$bucket)
+  s3load(paste0(config$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), config$bucket)
 
-  plotPath = paste0(dataArgs$savePath, 'profilerSummaryPublic.svg')
+  plotPath = paste0(config$savePath, 'profilerSummaryPublic.svg')
 
   publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == args$study, Cancer_Type == args$cancerType, Dataset == args$experimentalStrategy) %>% pull(file)
-  file <- get_object(paste0(dataArgs$s3Data, 'Seqmatrix/', publicDataFile), dataArgs$bucket)
+  file <- get_object(paste0(config$s3Data, 'Seqmatrix/', publicDataFile), config$bucket)
   seqmatrix_refdata_public <- get(load(rawConnection(file)))
 
   data_input <- seqmatrix_refdata_public %>%
@@ -131,14 +131,14 @@ profilerSummaryPublic <- function(args, dataArgs) {
 
 ### Cosine Similarity tab ###
 # section 1: Cosine similarity within samples #
-cosineSimilarityWithin <- function(args, dataArgs) {
+cosineSimilarityWithin <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
-  setwd(dataArgs$wd)
+  setwd(config$wd)
 
-  plotPath = paste0(dataArgs$savePath, 'cos_sim_within.svg')
-  txtPath = paste0(dataArgs$savePath, 'cos_sim_within.txt')
+  plotPath = paste0(config$savePath, 'cos_sim_within.svg')
+  txtPath = paste0(config$savePath, 'cos_sim_within.txt')
 
-  data_input <- read_delim(paste0(dataArgs$savePath, '../../', args$matrixFile), delim = '\t')
+  data_input <- read_delim(paste0(config$savePath, '../../', args$matrixFile), delim = '\t')
   data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
   # Heatmap of cosine similarity within samples  and put on the web---------------------------
   tryCatch({
@@ -151,18 +151,18 @@ cosineSimilarityWithin <- function(args, dataArgs) {
   })
 }
 
-cosineSimilarityWithinPublic <- function(args, dataArgs) {
+cosineSimilarityWithinPublic <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
-  setwd(dataArgs$wd)
+  setwd(config$wd)
 
-  s3load(paste0(dataArgs$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), dataArgs$bucket)
+  s3load(paste0(config$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), config$bucket)
 
-  plotPath = paste0(dataArgs$savePath, 'cos_sim_within.svg')
-  txtPath = paste0(dataArgs$savePath, 'cos_sim_within.txt')
+  plotPath = paste0(config$savePath, 'cos_sim_within.svg')
+  txtPath = paste0(config$savePath, 'cos_sim_within.txt')
 
   publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == args$study, Cancer_Type == args$cancerType, Dataset == args$experimentalStrategy) %>% pull(file)
 
-  file <- get_object(paste0(dataArgs$s3Data, 'Seqmatrix/', publicDataFile), dataArgs$bucket)
+  file <- get_object(paste0(config$s3Data, 'Seqmatrix/', publicDataFile), config$bucket)
   seqmatrix_refdata_public <- get(load(rawConnection(file)))
 
   data_input <- seqmatrix_refdata_public %>% filter(Profile == paste0(args$profileType, args$matrixSize)) %>%
@@ -185,14 +185,14 @@ cosineSimilarityWithinPublic <- function(args, dataArgs) {
 # section 2: Cosine similarity  to reference signatures 
 # Two parameters need: Profile Type, Reference Signature Set
 # Profile Type only support SBS, DBS, ID
-cosineSimilarityRefSig <- function(args, dataArgs) {
+cosineSimilarityRefSig <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
-  setwd(dataArgs$wd)
+  setwd(config$wd)
 
-  s3load(paste0(dataArgs$s3Data, 'Signature/signature_refsets.RData'), dataArgs$bucket)
+  s3load(paste0(config$s3Data, 'Signature/signature_refsets.RData'), config$bucket)
 
-  plotPath = paste0(dataArgs$savePath, 'cos_sim_refsig.svg')
-  txtPath = paste0(dataArgs$savePath, 'cos_sim_refsig.txt')
+  plotPath = paste0(config$savePath, 'cos_sim_refsig.svg')
+  txtPath = paste0(config$savePath, 'cos_sim_refsig.txt')
 
   profile_name <- if_else(args$profileType == "SBS", "SBS96", if_else(args$profileType == "DBS", "DBS78", if_else(args$profileType == "ID", "ID83", NA_character_)))
   signature_refsets_data <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == args$signatureSet)
@@ -200,7 +200,7 @@ cosineSimilarityRefSig <- function(args, dataArgs) {
       select(Signature_name, MutationType, Contribution) %>%
       pivot_wider(names_from = Signature_name, values_from = Contribution)
 
-  data_input <- read_delim(paste0(dataArgs$savePath, '../../', args$matrixFile), delim = '\t')
+  data_input <- read_delim(paste0(config$savePath, '../../', args$matrixFile), delim = '\t')
   data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
   # Heatmap of cosine similarity to reference set signature and put on the web---------------------------
@@ -215,15 +215,15 @@ cosineSimilarityRefSig <- function(args, dataArgs) {
   })
 }
 
-cosineSimilarityRefSigPublic <- function(args, dataArgs) {
+cosineSimilarityRefSigPublic <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
-  setwd(dataArgs$wd)
+  setwd(config$wd)
 
-  s3load(paste0(dataArgs$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), dataArgs$bucket)
-  s3load(paste0(dataArgs$s3Data, 'Signature/signature_refsets.RData'), dataArgs$bucket)
+  s3load(paste0(config$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), config$bucket)
+  s3load(paste0(config$s3Data, 'Signature/signature_refsets.RData'), config$bucket)
 
-  plotPath = paste0(dataArgs$savePath, 'cos_sim_refsig.svg')
-  txtPath = paste0(dataArgs$savePath, 'cos_sim_refsig.txt')
+  plotPath = paste0(config$savePath, 'cos_sim_refsig.svg')
+  txtPath = paste0(config$savePath, 'cos_sim_refsig.txt')
 
   profile_name <- if_else(args$profileType == "SBS", "SBS96", if_else(args$profileType == "DBS", "DBS78", if_else(args$profileType == "ID", "ID83", NA_character_)))
   signature_refsets_data <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == args$signatureSet)
@@ -232,7 +232,7 @@ cosineSimilarityRefSigPublic <- function(args, dataArgs) {
     pivot_wider(names_from = Signature_name, values_from = Contribution)
 
   publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == args$study, Cancer_Type == args$cancerType, Dataset == args$experimentalStrategy) %>% pull(file)
-  file <- get_object(paste0(dataArgs$s3Data, 'Seqmatrix/', publicDataFile), dataArgs$bucket)
+  file <- get_object(paste0(config$s3Data, 'Seqmatrix/', publicDataFile), config$bucket)
   seqmatrix_refdata_public <- get(load(rawConnection(file)))
 
   data_input <- seqmatrix_refdata_public %>% filter(Profile == profile_name) %>%
@@ -254,22 +254,22 @@ cosineSimilarityRefSigPublic <- function(args, dataArgs) {
 
 # section 3: Cosine similarity to Public data -----------------------------
 # find the common profile between data and seqmatrix
-cosineSimilarityPublic <- function(args, dataArgs) {
+cosineSimilarityPublic <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
-  setwd(dataArgs$wd)
+  setwd(config$wd)
 
-  s3load(paste0(dataArgs$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), dataArgs$bucket)
+  s3load(paste0(config$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), config$bucket)
 
-  plotPath = paste0(dataArgs$savePath, 'cos_sim_public.svg')
-  txtPath = paste0(dataArgs$savePath, 'cos_sim_public.txt')
+  plotPath = paste0(config$savePath, 'cos_sim_public.svg')
+  txtPath = paste0(config$savePath, 'cos_sim_public.txt')
 
   ## input data
-  data_input <- read_delim(paste0(dataArgs$savePath, '../../', args$matrixFile), delim = '\t')
+  data_input <- read_delim(paste0(config$savePath, '../../', args$matrixFile), delim = '\t')
   data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
   ## seqmatrix data from public data
   publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == args$study, Cancer_Type == args$cancerType) %>% pull(file)
-  file <- get_object(paste0(dataArgs$s3Data, 'Seqmatrix/', publicDataFile), dataArgs$bucket)
+  file <- get_object(paste0(config$s3Data, 'Seqmatrix/', publicDataFile), config$bucket)
   publicData <- get(load(rawConnection(file)))
 
 
@@ -293,14 +293,14 @@ cosineSimilarityPublic <- function(args, dataArgs) {
 ### Profile Comparison tab ###
 # section 1: Cosine similarity within samples 
 # three parameters need: Profile Type, Sample Name1 and Sample Name2
-profileComparisonWithin <- function(args, dataArgs) {
+profileComparisonWithin <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
-  setwd(dataArgs$wd)
+  setwd(config$wd)
 
-  plotPath = paste0(dataArgs$savePath, 'pro_com_within.svg')
-  txtPath = paste0(dataArgs$savePath, 'pro_com_within.txt')
+  plotPath = paste0(config$savePath, 'pro_com_within.svg')
+  txtPath = paste0(config$savePath, 'pro_com_within.txt')
 
-  data_input <- read_delim(paste0(dataArgs$savePath, '../../', args$matrixFile), delim = '\t')
+  data_input <- read_delim(paste0(config$savePath, '../../', args$matrixFile), delim = '\t')
   data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
   profile1 <- data_input %>% select(MutationType, one_of(args$sampleName1))
@@ -322,20 +322,20 @@ profileComparisonWithin <- function(args, dataArgs) {
   })
 }
 
-profileComparisonWithinPublic <- function(args, dataArgs) {
+profileComparisonWithinPublic <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
-  setwd(dataArgs$wd)
+  setwd(config$wd)
 
-  s3load(paste0(dataArgs$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), dataArgs$bucket)
+  s3load(paste0(config$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), config$bucket)
 
-  plotPath = paste0(dataArgs$savePath, 'pro_com_within.svg')
-  txtPath = paste0(dataArgs$savePath, 'pro_com_within.txt')
+  plotPath = paste0(config$savePath, 'pro_com_within.svg')
+  txtPath = paste0(config$savePath, 'pro_com_within.txt')
 
   matrix_size <- if_else(args$profileType == "SBS", "96", if_else(args$profileType == "DBS", "78", if_else(args$profileType == "ID", "83", NA_character_)))
   profile_name <- paste0(args$profileType, matrix_size)
 
   publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == args$study, Cancer_Type == args$cancerType, Dataset == args$experimentalStrategy) %>% pull(file)
-  file <- get_object(paste0(dataArgs$s3Data, 'Seqmatrix/', publicDataFile), dataArgs$bucket)
+  file <- get_object(paste0(config$s3Data, 'Seqmatrix/', publicDataFile), config$bucket)
   seqmatrix_refdata_public <- get(load(rawConnection(file)))
 
 
@@ -357,14 +357,14 @@ profileComparisonWithinPublic <- function(args, dataArgs) {
 
 # section 2: Comparison to reference signatures # 
 # four parameters need: “Profile Type”, “Sample Name”, “Reference Signature Set” and “Compare Single Signature or Combined Signatures” # 
-profileComparisonRefSig <- function(args, dataArgs) {
+profileComparisonRefSig <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
-  setwd(dataArgs$wd)
+  setwd(config$wd)
 
-  s3load(paste0(dataArgs$s3Data, 'Signature/signature_refsets.RData'), dataArgs$bucket)
+  s3load(paste0(config$s3Data, 'Signature/signature_refsets.RData'), config$bucket)
 
-  plotPath = paste0(dataArgs$savePath, 'pro_com_refsig.svg')
-  txtPath = paste0(dataArgs$savePath, 'pro_com_refsig.txt')
+  plotPath = paste0(config$savePath, 'pro_com_refsig.svg')
+  txtPath = paste0(config$savePath, 'pro_com_refsig.txt')
 
   profile_name <- if_else(args$profileType == "SBS", "SBS96", if_else(args$profileType == "DBS", "DBS78", if_else(args$profileType == "ID", "ID83", NA_character_)))
 
@@ -380,7 +380,7 @@ profileComparisonRefSig <- function(args, dataArgs) {
     profile2 <- refsig %>% select(MutationType, one_of(args$compare))
   }
 
-  data_input <- read_delim(paste0(dataArgs$savePath, '../../', args$matrixFile), delim = '\t')
+  data_input <- read_delim(paste0(config$savePath, '../../', args$matrixFile), delim = '\t')
   data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
   profile1 <- data_input %>% select(MutationType, one_of(args$sampleName))
@@ -398,15 +398,15 @@ profileComparisonRefSig <- function(args, dataArgs) {
   })
 }
 
-profileComparisonRefSigPublic <- function(args, dataArgs) {
+profileComparisonRefSigPublic <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
-  setwd(dataArgs$wd)
+  setwd(config$wd)
 
-  s3load(paste0(dataArgs$s3Data, 'Signature/signature_refsets.RData'), dataArgs$bucket)
-  s3load(paste0(dataArgs$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), dataArgs$bucket)
+  s3load(paste0(config$s3Data, 'Signature/signature_refsets.RData'), config$bucket)
+  s3load(paste0(config$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), config$bucket)
 
-  plotPath = paste0(dataArgs$savePath, 'pro_com_refsig.svg')
-  txtPath = paste0(dataArgs$savePath, 'pro_com_refsig.txt')
+  plotPath = paste0(config$savePath, 'pro_com_refsig.svg')
+  txtPath = paste0(config$savePath, 'pro_com_refsig.txt')
 
   profile_name <- if_else(args$profileType == "SBS", "SBS96", if_else(args$profileType == "DBS", "DBS78", if_else(args$profileType == "ID", "ID83", NA_character_)))
 
@@ -423,7 +423,7 @@ profileComparisonRefSigPublic <- function(args, dataArgs) {
       profile2 <- refsig %>% select(MutationType, one_of(args$compare))
     }
     publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == args$study, Cancer_Type == args$cancerType, Dataset == args$experimentalStrategy) %>% pull(file)
-    file <- get_object(paste0(dataArgs$s3Data, 'Seqmatrix/', publicDataFile), dataArgs$bucket)
+    file <- get_object(paste0(config$s3Data, 'Seqmatrix/', publicDataFile), config$bucket)
     seqmatrix_refdata_public <- get(load(rawConnection(file)))
 
     profile1 <- seqmatrix_refdata_public %>% filter(Profile == profile_name) %>%
@@ -440,23 +440,23 @@ profileComparisonRefSigPublic <- function(args, dataArgs) {
 }
 
 # section 3: Profile Comparison to Public data ----------------------------
-profileComparisonPublic <- function(args, dataArgs) {
+profileComparisonPublic <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
-  setwd(dataArgs$wd)
+  setwd(config$wd)
 
-  s3load(paste0(dataArgs$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), dataArgs$bucket)
+  s3load(paste0(config$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), config$bucket)
 
-  plotPath = paste0(dataArgs$savePath, 'pro_com_public.svg')
-  txtPath = paste0(dataArgs$savePath, 'pro_com_public.txt')
+  plotPath = paste0(config$savePath, 'pro_com_public.svg')
+  txtPath = paste0(config$savePath, 'pro_com_public.txt')
 
   ## input data
-  data_input <- read_delim(paste0(dataArgs$savePath, '../../', args$matrixFile), delim = '\t')
+  data_input <- read_delim(paste0(config$savePath, '../../', args$matrixFile), delim = '\t')
   data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
   profile1 <- data_input %>% select(MutationType, one_of(args$userSample))
 
   ## seqmatrix data from public data
   publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == args$study, Cancer_Type == args$cancerType) %>% pull(file)
-  file <- get_object(paste0(dataArgs$s3Data, 'Seqmatrix/', publicDataFile), dataArgs$bucket)
+  file <- get_object(paste0(config$s3Data, 'Seqmatrix/', publicDataFile), config$bucket)
   publicData <- get(load(rawConnection(file)))
 
 
@@ -475,14 +475,14 @@ profileComparisonPublic <- function(args, dataArgs) {
 
 # Motif analysis ----------------------------------------------------------
 ###parameters:
-mutationalPattern <- function(args, dataArgs) {
+mutationalPattern <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
-  setwd(dataArgs$wd)
+  setwd(config$wd)
 
-  plotPath = paste0(dataArgs$savePath, 'mpea.svg')
-  txtPath = paste0(dataArgs$savePath, 'mpea.txt')
+  plotPath = paste0(config$savePath, 'mpea.svg')
+  txtPath = paste0(config$savePath, 'mpea.txt')
 
-  data_input <- read_delim(paste0(dataArgs$savePath, '../../', args$matrixFile), delim = '\t')
+  data_input <- read_delim(paste0(config$savePath, '../../', args$matrixFile), delim = '\t')
   data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0) %>%
       pivot_longer(cols = -MutationType) %>%
       mutate(Study = "Input") %>%
@@ -501,7 +501,7 @@ mutationalPattern <- function(args, dataArgs) {
     context_plot(data = data_input, pattern = args$pattern, data_return = TRUE) %>%
     arrange(desc(N1)) %>% write_delim(txtPath, delim = '\t', col_names = T)
     if (dim(data_tmp) > 0) {
-      barPath = paste0(dataArgs$savePath, 'barchart.svg')
+      barPath = paste0(config$savePath, 'barchart.svg')
       barchart_plot2(data = data_tmp, plot_width = 16, plot_height = 5, output_plot = barPath)
       return(list(barPath = barPath, plotPath = plotPath, txtPath = txtPath))
     } else {
@@ -515,16 +515,16 @@ mutationalPattern <- function(args, dataArgs) {
 
 # Motif analysis ----------------------------------------------------------
 ###parameters:
-mutationalPatternPublic <- function(args, dataArgs) {
+mutationalPatternPublic <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
-  setwd(dataArgs$wd)
+  setwd(config$wd)
 
-  s3load(paste0(dataArgs$s3Data, 'Others/content_data_all.RData'), dataArgs$bucket)
-  s3load(paste0(dataArgs$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), dataArgs$bucket)
+  s3load(paste0(config$s3Data, 'Others/content_data_all.RData'), config$bucket)
+  s3load(paste0(config$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), config$bucket)
 
-  barPath = paste0(dataArgs$savePath, 'barchart.svg')
-  plotPath = paste0(dataArgs$savePath, 'mpea.svg')
-  txtPath = paste0(dataArgs$savePath, 'mpea.txt')
+  barPath = paste0(config$savePath, 'barchart.svg')
+  plotPath = paste0(config$savePath, 'mpea.svg')
+  txtPath = paste0(config$savePath, 'mpea.txt')
 
   data_tmp <- content_data_all %>%
       filter(N1 > args$proportion, str_detect(Study, paste0("^", args$study, "@"))) %>%
@@ -536,10 +536,10 @@ mutationalPatternPublic <- function(args, dataArgs) {
 
     if (args$cancerType != "PanCancer") {
       publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == args$study, Cancer_Type == args$cancerType, Dataset == args$experimentalStrategy) %>% pull(file)
-      file <- get_object(paste0(dataArgs$s3Data, 'Seqmatrix/', publicDataFile), dataArgs$bucket)
+      file <- get_object(paste0(config$s3Data, 'Seqmatrix/', publicDataFile), config$bucket)
       seqmatrix_refdata <- get(load(rawConnection(file))) %>% filter(Study == args$study)
     } else {
-      s3load(paste0(dataArgs$s3Data, 'Seqmatrix/', args$study, '_', args$experimentalStrategy, '_seqmatrix_refdata.RData'), dataArgs$bucket)
+      s3load(paste0(config$s3Data, 'Seqmatrix/', args$study, '_', args$experimentalStrategy, '_seqmatrix_refdata.RData'), config$bucket)
     }
 
     data_input <- seqmatrix_refdata %>%
@@ -562,23 +562,23 @@ mutationalPatternPublic <- function(args, dataArgs) {
 ### “Principal Component Analysis” ###
 # Two parameters need: Profile Type, Reference Signature Set
 # Profile Type only support SBS, DBS, ID
-pca <- function(args, dataArgs) {
+pca <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
-  setwd(dataArgs$wd)
+  setwd(config$wd)
 
-  s3load(paste0(dataArgs$s3Data, 'Signature/signature_refsets.RData'), dataArgs$bucket)
+  s3load(paste0(config$s3Data, 'Signature/signature_refsets.RData'), config$bucket)
 
-  pca1 = paste0(dataArgs$savePath, 'pca1.svg')
-  pca2 = paste0(dataArgs$savePath, 'pca2.svg')
-  pca3 = paste0(dataArgs$savePath, 'pca3.svg')
-  heatmap = paste0(dataArgs$savePath, 'heatmap.svg')
-  pca2Data = paste0(dataArgs$savePath, 'pca2_data.txt')
-  pca3Data = paste0(dataArgs$savePath, 'pca3_data.txt')
-  heatmapData = paste0(dataArgs$savePath, 'heatmap_data.txt')
+  pca1 = paste0(config$savePath, 'pca1.svg')
+  pca2 = paste0(config$savePath, 'pca2.svg')
+  pca3 = paste0(config$savePath, 'pca3.svg')
+  heatmap = paste0(config$savePath, 'heatmap.svg')
+  pca2Data = paste0(config$savePath, 'pca2_data.txt')
+  pca3Data = paste0(config$savePath, 'pca3_data.txt')
+  heatmapData = paste0(config$savePath, 'heatmap_data.txt')
 
   profile_name <- if_else(args$profileType == "SBS", "SBS96", if_else(args$profileType == "DBS", "DBS78", if_else(args$profileType == "ID", "ID83", NA_character_)))
 
-  data_input <- read_delim(paste0(dataArgs$savePath, '../../', args$matrixFile), delim = '\t')
+  data_input <- read_delim(paste0(config$savePath, '../../', args$matrixFile), delim = '\t')
   data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
   # PCA plot ----------------------------------------------------------------
@@ -650,20 +650,20 @@ pca <- function(args, dataArgs) {
   })
 }
 
-pcaPublic <- function(args, dataArgs) {
+pcaPublic <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
-  setwd(dataArgs$wd)
+  setwd(config$wd)
 
-  s3load(paste0(dataArgs$s3Data, 'Signature/signature_refsets.RData'), dataArgs$bucket)
-  s3load(paste0(dataArgs$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), dataArgs$bucket)
+  s3load(paste0(config$s3Data, 'Signature/signature_refsets.RData'), config$bucket)
+  s3load(paste0(config$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), config$bucket)
 
-  pca1 = paste0(dataArgs$savePath, 'pca1.svg')
-  pca2 = paste0(dataArgs$savePath, 'pca2.svg')
-  pca3 = paste0(dataArgs$savePath, 'pca3.svg')
-  heatmap = paste0(dataArgs$savePath, 'heatmap.svg')
-  pca2Data = paste0(dataArgs$savePath, 'pca2_data.txt')
-  pca3Data = paste0(dataArgs$savePath, 'pca3_data.txt')
-  heatmapData = paste0(dataArgs$savePath, 'heatmap_data.txt')
+  pca1 = paste0(config$savePath, 'pca1.svg')
+  pca2 = paste0(config$savePath, 'pca2.svg')
+  pca3 = paste0(config$savePath, 'pca3.svg')
+  heatmap = paste0(config$savePath, 'heatmap.svg')
+  pca2Data = paste0(config$savePath, 'pca2_data.txt')
+  pca3Data = paste0(config$savePath, 'pca3_data.txt')
+  heatmapData = paste0(config$savePath, 'heatmap_data.txt')
 
 
 
@@ -671,7 +671,7 @@ pcaPublic <- function(args, dataArgs) {
   matrix_size <- if_else(args$profileType == "SBS", "96", if_else(args$profileType == "DBS", "78", if_else(args$profileType == "ID", "83", NA_character_)))
 
   publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == args$study, Cancer_Type == args$cancerType, Dataset == args$experimentalStrategy) %>% pull(file)
-  file <- get_object(paste0(dataArgs$s3Data, 'Seqmatrix/', publicDataFile), dataArgs$bucket)
+  file <- get_object(paste0(config$s3Data, 'Seqmatrix/', publicDataFile), config$bucket)
   seqmatrix_refdata_public <- get(load(rawConnection(file)))
 
   data_input <- seqmatrix_refdata_public %>% filter(Profile == profile_name) %>%
@@ -747,26 +747,26 @@ pcaPublic <- function(args, dataArgs) {
 }
 
 #  section 2 PCA together with public data --------------------------------
-pcaWithPublic <- function(args, dataArgs) {
+pcaWithPublic <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
-  setwd(dataArgs$wd)
+  setwd(config$wd)
 
-  s3load(paste0(dataArgs$s3Data, 'Signature/signature_refsets.RData'), dataArgs$bucket)
-  s3load(paste0(dataArgs$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), dataArgs$bucket)
+  s3load(paste0(config$s3Data, 'Signature/signature_refsets.RData'), config$bucket)
+  s3load(paste0(config$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), config$bucket)
 
-  pca1 = paste0(dataArgs$savePath, 'pca1_with_public.svg')
-  pca2 = paste0(dataArgs$savePath, 'pca2_with_public.svg')
-  pca3 = paste0(dataArgs$savePath, 'pca3_with_public.svg')
-  pca2Data = paste0(dataArgs$savePath, 'pca2_data_with_public.txt')
-  pca3Data = paste0(dataArgs$savePath, 'pca3_data_with_public.txt')
+  pca1 = paste0(config$savePath, 'pca1_with_public.svg')
+  pca2 = paste0(config$savePath, 'pca2_with_public.svg')
+  pca3 = paste0(config$savePath, 'pca3_with_public.svg')
+  pca2Data = paste0(config$savePath, 'pca2_data_with_public.txt')
+  pca3Data = paste0(config$savePath, 'pca3_data_with_public.txt')
 
 
-  data_input1 <- read_delim(paste0(dataArgs$savePath, '../../', args$matrixFile), delim = '\t')
+  data_input1 <- read_delim(paste0(config$savePath, '../../', args$matrixFile), delim = '\t')
   data_input1 <- data_input1 %>% select_if(~!is.numeric(.) || sum(.) > 0)
 
   ## seqmatrix data from public data
   publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == args$study, Cancer_Type == args$cancerType) %>% pull(file)
-  file <- get_object(paste0(dataArgs$s3Data, 'Seqmatrix/', publicDataFile), dataArgs$bucket)
+  file <- get_object(paste0(config$s3Data, 'Seqmatrix/', publicDataFile), config$bucket)
   publicData <- get(load(rawConnection(file)))
 
   data_input2 <- publicData %>% filter(Profile == args$profileName) %>%
@@ -832,15 +832,15 @@ pcaWithPublic <- function(args, dataArgs) {
 # Minimum Number of Mutations: default 5
 # Maximum Distance: 1000
 # Chromosome: default null; can choose from chr1:chr22, chrX and chrY
-kataegis <- function(args, dataArgs) {
+kataegis <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
-  setwd(dataArgs$wd)
+  setwd(config$wd)
 
-  kataegis = paste0(dataArgs$savePath, 'kataegis.svg')
+  kataegis = paste0(config$savePath, 'kataegis.svg')
   kataegisData = ''
   kataegisJSON = ''
 
-  mutationPath = paste0(dataArgs$savePath, '../')
+  mutationPath = paste0(config$savePath, '../')
   mutationFile = list.files(mutationPath, pattern = "_mSigPortal_SNV")
   mutation_file = paste0(mutationPath, mutationFile)
 
@@ -854,11 +854,11 @@ kataegis <- function(args, dataArgs) {
       genome_build <- mutation_data$genome_build[1]
       mutdata <- mutation_data %>% filter(sample == args$sample) %>% dplyr::select(chr, pos, ref, alt)
       kataegis_result <- kataegis_rainfall_plot(mutdata, sample_name = args$sample, genome_build = genome_build,
-        reference_data_folder = paste0(dataArgs$localData, '/Others'), chromsome = chromosome, kataegis_highligh = args$highlight,
+        reference_data_folder = paste0(config$localData, '/Others'), chromsome = chromosome, kataegis_highligh = args$highlight,
         min.mut = args$min, max.dis = args$max, filename = kataegis)
 
       if (is.data.frame(kataegis_result)) {
-        kataegisData = paste0(dataArgs$savePath, 'kataegisData.txt')
+        kataegisData = paste0(config$savePath, 'kataegisData.txt')
         kataegisJSON = toJSON(kataegis_result, auto_unbox = TRUE)
         kataegis_result %>% write_delim(kataegisData, delim = '\t', col_names = T)
       }
@@ -873,17 +873,25 @@ kataegis <- function(args, dataArgs) {
   })
 }
 
-downloadPublicData <- function(args, dataArgs) {
+downloadPublicData <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
-  s3load(paste0(dataArgs$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), dataArgs$bucket)
+  s3load(paste0(config$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), config$bucket)
 
   publicDataFile <- seqmatrix_refdata_subset_files %>% filter(Study == args$study, Cancer_Type == args$cancerType, Dataset == args$experimentalStrategy) %>% pull(file)
-  file <- get_object(paste0(dataArgs$s3Data, 'Seqmatrix/', publicDataFile), dataArgs$bucket)
+  file <- get_object(paste0(config$s3Data, 'Seqmatrix/', publicDataFile), config$bucket)
   seqmatrix_refdata_public <- get(load(rawConnection(file)))
 
   # delcare variables for download fn
   study <<- args$study
   cancer_type <<- args$cancerType
 
-  seqmatrix_public_download(seqmatrix_refdata_public, dataArgs$savePath)
+  seqmatrix_public_download(seqmatrix_refdata_public, config$savePath)
+}
+
+treeAndLeaf <- function(args, config) {
+  library(TreeAndLeaf)
+  library(networkD3)
+
+  source('services/R/Sigvisualfunc.R')
+
 }
