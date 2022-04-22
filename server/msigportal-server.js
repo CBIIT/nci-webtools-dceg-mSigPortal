@@ -6,7 +6,7 @@ const fs = require('fs');
 const config = require('./config.json');
 const logger = require('./logger');
 const compression = require('compression');
-const cors = require('cors')
+const cors = require('cors');
 
 const app = express();
 const apiRouter = express.Router();
@@ -97,7 +97,11 @@ apiRouter.post('/upload', cors(), upload);
 
 apiRouter.get('/visualization/download', cors(), visualizationDownload);
 
-apiRouter.post('/visualization/downloadPublic', cors(), visualizationDownloadPublic);
+apiRouter.post(
+  '/visualization/downloadPublic',
+  cors(),
+  visualizationDownloadPublic
+);
 
 apiRouter.post('/explorationWrapper', cors(), explorationWrapper);
 

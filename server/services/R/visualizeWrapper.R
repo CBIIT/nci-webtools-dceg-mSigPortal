@@ -894,4 +894,149 @@ treeAndLeaf <- function(args, config) {
 
   source('services/R/Sigvisualfunc.R')
 
+  s3load(paste0(config$s3Data, 'Seqmatrix/PCAWG_WGS_seqmatrix_refdata.RData'), config$bucket)
+  s3load(paste0(config$s3Data, 'Exposure/PCAWG_WGS_exposure_refdata.RData'), config$bucket)
+
+  seqmatrix_refdata0 <- seqmatrix_refdata
+  exposure_refdata0 <- exposure_refdata
+
+
+
+  seqmatrix_refdata <- seqmatrix_refdata %>% filter(Profile %in% c('SBS96', 'DBS78', 'ID83'))
+  seqmatrix_refdata_ratio <- seqmatrix_refdata %>% group_by(Sample, Profile) %>% mutate(Mutations = Mutations / sum(Mutations)) %>% ungroup()
+
+  pcawglist <- seqmatrix_refdata %>% select(Cancer_Type, Sample) %>% unique()
+
+  exposure_refdata <- exposure_refdata %>% filter(Signature_set_name == 'COSMIC_v3_Signatures_GRCh37_SBS96')
+
+  tmp <- exposure_refdata %>% filter(Exposure > 0) %>% pull(Signature_name) %>% unique()
+
+  exposure_refdata_ratio <- exposure_refdata %>%
+  filter(Signature_name %in% tmp) %>%
+  select(Sample, Cancer_Type, Signature_name, Exposure) %>%
+  group_by(Sample) %>%
+  mutate(Exposure = Exposure / sum(Exposure)) %>%
+  pivot_wider(names_from = Signature_name, values_from = Exposure) %>%
+  ungroup()
+
+  exposure_refdata <- exposure_refdata %>%
+  filter(Signature_name %in% tmp) %>%
+  select(Sample, Cancer_Type, Signature_name, Exposure) %>%
+  group_by(Sample) %>%
+  # mutate(Exposure=Exposure/sum(Exposure)) %>% 
+  pivot_wider(names_from = Signature_name, values_from = Exposure) %>%
+  ungroup()
+
+
+  ## add cosine similarity 
+  # cosdata <- read_delim('PCAWG_Decomposition_Quality.txt', delim = '\t', col_names = T) %>% separate(col = Sample_Names, into = c('Cancer_Type', 'Sample'), sep = '@', convert = T) %>% select(Cancer_Type, Sample, Cosine_similarity)
+
+
+  # # Read the data -----------------------------------------------------------
+  # 
+  dsigdata <- exposure_refdata_ratio %>% select(-Cancer_Type) %>% pivot_longer(cols = -Sample) %>% group_by(Sample) %>% arrange(desc(value)) %>% slice(1) %>% ungroup() %>% rename(Dsig = name, Dvalue = value)
+  dmdata <- seqmatrix_refdata %>% filter(Profile == 'SBS96') %>% mutate(Type = str_sub(MutationType, 3, 5)) %>% group_by(Sample, Type) %>% summarise(value = sum(Mutations)) %>% mutate(value = value / (sum(value))) %>% arrange(desc(value)) %>% slice(1) %>% ungroup() %>% rename(Dmut = Type, Dmvalue = value)
+  # 
+  tmp <- dsigdata %>% arrange(Dsig) %>% pull(Dsig) %>% unique()
+  # 
+  dsigcol <- SBScolor[tmp]
+  dsigcol[['SBS22']] <- 'yellow'
+  # 
+  dmcol <- c("#03BCEE", "#010101", "#E32926", "#CAC9C9", "#A1CE63", "#EBC6C4")
+
+  mdata <- seqmatrix_refdata_ratio %>%
+  select(MutationType, Mutations, Sample) %>%
+  pivot_wider(names_from = MutationType, values_from = Mutations)
+
+  mdata0 <- as.matrix(mdata[, -1])
+  rownames(mdata0) <- mdata$Sample
+
+  mdatax <- mdata %>%
+  select(Sample) %>%
+  left_join(exposure_refdata_ratio) %>%
+  mutate(APOBEC = SBS2 + SBS13) %>%
+  mutate(SBS17 = SBS17a + SBS17b) %>%
+  left_join(dsigdata) %>%
+  left_join(dmdata) %>%
+  left_join(
+    seqmatrix_refdata %>% filter(Profile == 'SBS96') %>% group_by(Sample) %>% summarise(Mutations = sum(Mutations)) %>% ungroup()
+  ) %>%
+  # left_join(cosdata) %>%
+  # mutate(Cosine_similarity = if_else(Cosine_similarity < 0.8, 0.8, Cosine_similarity))
+
+
+  # TreeAndLeaf -------------------------------------------------------------
+  hc <- hclust(dist(mdata0), "ward.D") # ave #ward.D
+  #plot(hc, main="Dendrogram for the PCAWG dataset", xlab="", sub="")
+
+  #-- Convert the 'hclust' object into a 'tree-and-leaf' object
+  tal <- treeAndLeaf(hc)
+
+  # convert to d3
+  wc <- cluster_walktrap(tal)
+  members <- membership(wc)
+
+  # Convert to object suitable for networkD3
+  d3 <- igraph_to_networkD3(tal, group = members)
+
+  # #--- Map attributes to the tree-and-leaf
+  # #Note: 'refcol = 0' indicates that 'dat' rownames will be used as mapping IDs
+  # tal <- att.mapv(tal, mdatax, refcol = 1)
+
+  # #--- Set graph attributes using the 'att.setv' wrapper function
+  # # pal <- pal_d3()(4)
+  # # tal <- att.setv(g = tal, from = "SP_Group", to = "nodeColor",cols = pal)
+  # #
+  # #tal <- att.setv(g = tal, from = "SBS4", to = "nodeColor",cols = pal,nquant = 8)
+  # # pal <- dsigcol
+  # # pal <- pal_d3()(4)
+
+
+  # # For dominant mutation types
+  # pal <- dmcol
+  # tal <- att.setv(g = tal, from = "Dmut", to = "nodeColor", cols = pal)
+  # update_color <- function() { addLegend.color(obj = rdp, tal, title = "Dominant MutationType", position = "bottomright") }
+
+
+  # # for cancer types
+  # cancertypes <- levels(as.factor(mdatax$Cancer_Type))
+  # pal <- pcawg.colour.palette(x = str_replace(cancertypes, '-', '.'), scheme = "tumour.subtype")
+  # #names(pal) <- cancertypes
+  # tal <- att.setv(g = tal, from = "Cancer_Type", to = "nodeColor", cols = pal)
+  # update_color <- function() { addLegend.color(obj = rdp, tal, title = "Cancer Type", position = "bottomright") }
+
+
+  # # For dominant signature
+  # pal <- dsigcol
+  # tal <- att.setv(g = tal, from = "Dsig", to = "nodeColor", cols = pal)
+  # update_color <- function() { addLegend.color(obj = rdp, tal, title = "Dominant Mutational Signature", position = "topright", vertical = T, dxtitle = 50) }
+
+
+  # # Cosine Similarity
+  # summary(mdatax$Cosine_similarity)
+  # breakstmp <- seq(min(mdatax$Cosine_similarity), 1, 0.01)
+  # pal <- viridis::viridis(n = length(breakstmp))
+  # tal <- att.setv(g = tal, from = "Cosine_similarity", to = "nodeColor", cols = pal, breaks = breakstmp)
+  # update_color <- function() { addLegend.color(obj = rdp, tal, title = "Cosine Similarity", position = "topright", vertical = T, dxtitle = 30) }
+
+
+  # tal <- att.setv(g = tal, from = "Mutations", to = "nodeSize", nquant = 8)
+  # #--- Set graph attributes using 'att.addv' and 'att.adde' functions
+  # tal <- att.addv(tal, "nodeFontSize", value = 1)
+  # tal <- att.adde(tal, "edgeWidth", value = 10)
+  # #--- Call RedeR application
+  # rdp <- RedPort()
+  # calld(rdp)
+  # resetd(rdp)
+  # addGraph(obj = rdp, g = tal, gzoom = 7.5)
+  # #--- Call 'relax' to fine-tune the leaf nodes
+  # relax(rdp, p1 = 25, p2 = 200, p3 = 10, p4 = 100, p5 = 10, ps = TRUE)
+
+
+  # #--- Add legends
+  # #addLegend.color(obj = rdp, tal, title = "SP_Group", position = "bottomright")
+  # addLegend.size(obj = rdp, tal, title = "Number of Mutations", position = "topleft", vertical = T,)
+  # #addLegend.color(obj = rdp, tal, title = "Dominant MutationType", position = "bottomright")
+  # update_color()
+
 }

@@ -190,6 +190,17 @@
         "snow"
       ]
     },
+    "BiocVersion": {
+      "Package": "BiocVersion",
+      "Version": "3.14.0",
+      "Source": "Bioconductor",
+      "git_url": "https://git.bioconductor.org/packages/BiocVersion",
+      "git_branch": "master",
+      "git_last_commit": "aa56d93",
+      "git_last_commit_date": "2021-05-19",
+      "Hash": "e57437f82a5c13263a9cf442b9796ba3",
+      "Requirements": []
+    },
     "Biostrings": {
       "Package": "Biostrings",
       "Version": "2.62.0",
@@ -608,6 +619,19 @@
         "Rcpp"
       ]
     },
+    "RedeR": {
+      "Package": "RedeR",
+      "Version": "1.42.0",
+      "Source": "Bioconductor",
+      "git_url": "https://git.bioconductor.org/packages/RedeR",
+      "git_branch": "RELEASE_3_14",
+      "git_last_commit": "1bd8c6a",
+      "git_last_commit_date": "2021-10-26",
+      "Hash": "d9054c973585fbf7d5b9656cfc946889",
+      "Requirements": [
+        "igraph"
+      ]
+    },
     "Rhtslib": {
       "Package": "Rhtslib",
       "Version": "1.26.0",
@@ -711,6 +735,21 @@
       "Repository": "CRAN",
       "Hash": "82fc819203a2818bd5c10f758991b492",
       "Requirements": []
+    },
+    "TreeAndLeaf": {
+      "Package": "TreeAndLeaf",
+      "Version": "1.6.1",
+      "Source": "Bioconductor",
+      "git_url": "https://git.bioconductor.org/packages/TreeAndLeaf",
+      "git_branch": "RELEASE_3_14",
+      "git_last_commit": "171d519",
+      "git_last_commit_date": "2021-10-27",
+      "Hash": "b8f10ab9082a4c3cbcc136006706ef4e",
+      "Requirements": [
+        "RedeR",
+        "ape",
+        "igraph"
+      ]
     },
     "TxDb.Hsapiens.UCSC.hg19.knownGene": {
       "Package": "TxDb.Hsapiens.UCSC.hg19.knownGene",
@@ -1327,9 +1366,10 @@
       "Version": "1.0.7",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "ef47665e64228a17609d6df877bf86f2",
+      "Hash": "36f1ae62f026c8ba9f9b5c9a08c03297",
       "Requirements": [
         "R6",
+        "ellipsis",
         "generics",
         "glue",
         "lifecycle",
@@ -2522,6 +2562,18 @@
       "Repository": "CRAN",
       "Hash": "7a7541cc284cb2ba3ba7eae645892af5",
       "Requirements": []
+    },
+    "networkD3": {
+      "Package": "networkD3",
+      "Version": "0.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "38310ec4ddb1398359abdd603c151067",
+      "Requirements": [
+        "htmlwidgets",
+        "igraph",
+        "magrittr"
+      ]
     },
     "nlme": {
       "Package": "nlme",
