@@ -10,7 +10,7 @@ import PublicForm from './publicForm';
 import Instructions from '../visualization/instructions';
 import ProfilerSummary from './profilerSummary';
 import MutationalProfiles from './mutationalProfiles';
-import TreeAndLeaf from './treeAndLeaf';
+import TreeAndLeaf from './treeLeaf/treeLeaf';
 import CosineSimilarity from './cosineSimilarity';
 import MutationalPattern from './mutationalPattern';
 import ProfileComparison from './profileComparison';
@@ -427,7 +427,7 @@ export default function Visualization({ match }) {
       component: <MutationalProfiles />,
     },
     {
-      name: 'Tree And Leaf',
+      name: 'Tree and Leaf',
       id: 'treeAndLeaf',
       component: <TreeAndLeaf />,
     },

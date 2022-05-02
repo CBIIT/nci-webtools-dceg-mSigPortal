@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { RecoilRoot } from 'recoil';
 import { HashRouter as Router, Route } from 'react-router-dom';
 import { Navbar } from './controls/navbar/navbar';
 import Home from './pages/home/home';
@@ -183,19 +184,21 @@ export default function App() {
   }, [publicationsState]);
 
   return (
-    <Router>
-      <ErrorModal />
-      <SuccessModal />
-      <Navbar links={links} />
-      <Route path="/" exact={true} render={(_) => <Home links={links} />} />
-      <Route path="/about" component={About} />
-      <Route path="/visualization/:type?/:id?" component={Visualization} />
-      <Route path="/catalog" component={Catalog} />
-      <Route path="/exploration/:exampleName?" component={Exposure} />
-      <Route path="/refitting" component={Refitting} />
-      <Route path="/association" component={Association} />
-      <Route path="/publications" component={Publications} />
-      <Route path="/faq" component={Faq} />
-    </Router>
+    <RecoilRoot>
+      <Router>
+        <ErrorModal />
+        <SuccessModal />
+        <Navbar links={links} />
+        <Route path="/" exact={true} render={(_) => <Home links={links} />} />
+        <Route path="/about" component={About} />
+        <Route path="/visualization/:type?/:id?" component={Visualization} />
+        <Route path="/catalog" component={Catalog} />
+        <Route path="/exploration/:exampleName?" component={Exposure} />
+        <Route path="/refitting" component={Refitting} />
+        <Route path="/association" component={Association} />
+        <Route path="/publications" component={Publications} />
+        <Route path="/faq" component={Faq} />
+      </Router>
+    </RecoilRoot>
   );
 }
