@@ -102,7 +102,6 @@ export default function Home({ links }) {
       <div style={{
         backgroundImage: `url("assets/images/placeholder-home-banner-bg.png")`,
         backgroundRepeat: 'no-repeat',
-        backgroundSize: 'contain',
         backgroundPosition: 'right'
       }}>
         <div className="container py-5">
@@ -166,7 +165,7 @@ export default function Home({ links }) {
       </div>
       <div style={{backgroundColor: '#283E5A'}}>
         <div className="container py-5">
-          <div className="row my-5">
+          <div className="row mt-3 mb-5">
             <div className="col-12">
               <div className='home-text-border mb-4'></div>
             </div>
@@ -176,29 +175,29 @@ export default function Home({ links }) {
                 lineHeight: '1.8em'
               }}>
                 Mutational signatures are characteristic combinations of types arising from{' '}
-                <br />
+                <br className="d-none d-md-block" />
                 specific mutagenesis processes such as DNA replication infidelity, defective{' '}
-                <br />
+                <br className="d-none d-md-block" />
                 DNA repair, DNA enzymatic editing and exogenous exposures. Analysis of{' '}
-                <br />
+                <br className="d-none d-md-block" />
                 mutational signatures is becoming routine in cancer genomics, providing a{' '} 
-                <br />
+                <br className="d-none d-md-block" />
                 novel opportunity for biomarker discovery, tumor diagnostics, and treatment{' '} 
-                <br />
+                <br className="d-none d-md-block" />
                 guidance. As the number of mutational signatures associated with known{' '} 
-                <br />
+                <br className="d-none d-md-block" />
                 etiologies has increased from many different cancer genomic studies, there is{' '} 
-                <br />
+                <br className="d-none d-md-block" />
                 a critical need for curated census as well as data sharing of mutational{' '} 
-                <br />
+                <br className="d-none d-md-block" />
                 signatures for public research. mSigPortal provides a platform that enables{' '} 
-                <br />
+                <br className="d-none d-md-block" />
                 users to explore, visualize, and analyze mutational signatures and relevant{' '} 
-                <br />
+                <br className="d-none d-md-block" />
                 signature data (such as mutational profile, proposed etiology, tissue{' '} 
-                <br />
+                <br className="d-none d-md-block" />
                 specificity, activity, and association) in cancer genomic studies from scientific{' '}
-                <br />
+                <br className="d-none d-md-block" />
                 literature or user input.{' '}
               </p>
             </div>
