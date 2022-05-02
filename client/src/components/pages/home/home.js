@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Card from 'react-bootstrap/Card';
-import { CardDeck } from 'react-bootstrap';
+import { CardDeck, Button } from 'react-bootstrap';
 import parse from 'html-react-parser';
 import './home.scss';
 
@@ -99,7 +99,113 @@ export default function Home({ links }) {
 
   return (
     <>
-      <div className="banner-container text-center d-none d-md-block">
+      <div style={{
+        backgroundImage: `url("assets/images/placeholder-home-banner-bg.png")`,
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'contain',
+        backgroundPosition: 'right'
+      }}>
+        <div className="container py-5">
+          <div className="row my-5">
+            <div className="col-12">
+              <span style={{
+                fontSize: '4em',
+                color: '#D62D4C',
+                letterSpacing: '3px'
+                }}>
+                mSIGPORTAL
+              </span>
+            </div>
+            <div className="col-12 mt-1 mb-3">
+              <span style={{
+                fontSize: '1.2em',
+                color: '#AA4A6D',
+                lineHeight: '1px',
+                letterSpacing: '1px'
+              }}>
+                Integrative Mutational Signature Portal
+              </span>
+              <br />
+              <span style={{
+                fontSize: '1.2em',
+                color: '#2F54A5',
+                lineHeight: '1px'
+              }}>
+                for Cancer Genomic Studies
+              </span>
+            </div>
+            <div className="col-12 my-2">
+              <p>
+                Facilitating broad investigation of mutational 
+                <br />
+                signatures to elucidate different mutagenesis 
+                <br />
+                processes involved in tumorigenesis.
+              </p>
+            </div>
+            <div className="col-12 my-2">
+              <Button
+                variant={'outline-dark'}
+                className="bg-white home-banner-nav-button"
+                onClick={(e) => e.preventDefault()}
+              >
+                <Link
+                  className="stretched-link m-2"
+                  to={'/catalog'}
+                  style={{
+                    textDecoration: 'none',
+                    color: '#D62D4C',
+                    fontWeight: '500'
+                  }}>
+                  Explore the Catalog
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style={{backgroundColor: '#283E5A'}}>
+        <div className="container py-5">
+          <div className="row my-5">
+            <div className="col-12">
+              <div className='home-text-border mb-4'></div>
+            </div>
+            <div className="col-12 text-light">
+              <p style={{
+                fontWeight: '200',
+                lineHeight: '1.8em'
+              }}>
+                Mutational signatures are characteristic combinations of types arising from{' '}
+                <br />
+                specific mutagenesis processes such as DNA replication infidelity, defective{' '}
+                <br />
+                DNA repair, DNA enzymatic editing and exogenous exposures. Analysis of{' '}
+                <br />
+                mutational signatures is becoming routine in cancer genomics, providing a{' '} 
+                <br />
+                novel opportunity for biomarker discovery, tumor diagnostics, and treatment{' '} 
+                <br />
+                guidance. As the number of mutational signatures associated with known{' '} 
+                <br />
+                etiologies has increased from many different cancer genomic studies, there is{' '} 
+                <br />
+                a critical need for curated census as well as data sharing of mutational{' '} 
+                <br />
+                signatures for public research. mSigPortal provides a platform that enables{' '} 
+                <br />
+                users to explore, visualize, and analyze mutational signatures and relevant{' '} 
+                <br />
+                signature data (such as mutational profile, proposed etiology, tissue{' '} 
+                <br />
+                specificity, activity, and association) in cancer genomic studies from scientific{' '}
+                <br />
+                literature or user input.{' '}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* <div className="banner-container text-center d-none d-md-block">
         <div className="image-blurred-edge">
           <img
             src="assets/images/msigportal-banner.png"
@@ -142,10 +248,10 @@ export default function Home({ links }) {
             style={{ width: '100%', fontSize: '14pt' }}
           ></div>
         </div>
-      </div>
+      </div> */}
 
       {/* mobile */}
-      <div className="text-center mt-2 d-md-none">
+      {/* <div className="text-center mt-2 d-md-none">
         <h1 className="text-dark">
           <b>mSigPortal</b>
         </h1>
@@ -190,7 +296,7 @@ export default function Home({ links }) {
         {cardRow(links.slice(1, 2))}
         {cardRow(links.slice(2, 3))}
         {cardRow(links.slice(3, 4))}
-      </div>
+      </div> */}
     </>
   );
 }

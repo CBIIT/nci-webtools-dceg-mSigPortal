@@ -10,6 +10,8 @@ import Refitting from './pages/refitting/refitting';
 import Association from './pages/association/association';
 import Publications from './pages/publications/publications';
 import Faq from './pages/faq/faq';
+import { Header } from './controls/header/header';
+import { Footer } from './controls/footer/footer';
 import { ErrorModal } from './controls/error-modal/error-modal';
 import { SuccessModal } from './controls/success-modal/success-modal';
 import { useSelector, useDispatch } from 'react-redux';
@@ -183,19 +185,25 @@ export default function App() {
   }, [publicationsState]);
 
   return (
-    <Router>
-      <ErrorModal />
-      <SuccessModal />
-      <Navbar links={links} />
-      <Route path="/" exact={true} render={(_) => <Home links={links} />} />
-      <Route path="/about" component={About} />
-      <Route path="/visualization/:type?/:id?" component={Visualization} />
-      <Route path="/catalog" component={Catalog} />
-      <Route path="/exploration/:exampleName?" component={Exposure} />
-      <Route path="/refitting" component={Refitting} />
-      <Route path="/association" component={Association} />
-      <Route path="/publications" component={Publications} />
-      <Route path="/faq" component={Faq} />
-    </Router>
+    <>
+      <Header />
+      <main>
+        <Router>
+          <ErrorModal />
+          <SuccessModal />
+          <Navbar links={links} />
+          <Route path="/" exact={true} render={(_) => <Home links={links} />} />
+          <Route path="/about" component={About} />
+          <Route path="/visualization/:type?/:id?" component={Visualization} />
+          <Route path="/catalog" component={Catalog} />
+          <Route path="/exploration/:exampleName?" component={Exposure} />
+          <Route path="/refitting" component={Refitting} />
+          <Route path="/association" component={Association} />
+          <Route path="/publications" component={Publications} />
+          <Route path="/faq" component={Faq} />
+        </Router>
+      </main>
+      <Footer />
+    </>
   );
 }
