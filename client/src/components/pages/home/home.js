@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Card from 'react-bootstrap/Card';
-import { CardDeck, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Animated } from "react-animated-css";
 import parse from 'html-react-parser';
 import './home.scss';
 
@@ -73,7 +73,22 @@ export default function Home({ links }) {
           </div>
         </div>
       </div>
-      <div style={{backgroundColor: '#283E5A'}}>
+      <div style={{backgroundColor: '#283E5A', position: 'relative'}}>
+        <div 
+          className="p-5 d-none d-md-block"
+          style={{
+          position: 'absolute',
+          right: '0px',
+          height: '100%',
+        }}>
+          <Animated animationIn="slideInRight" animationInDuration={2000} isVisible={true} style={{height: '100%'}}>
+            <img
+              alt={'DNA accent banner'}
+              src={'assets/images/placeholder-home-dna.png'}
+              height="100%"
+            />
+          </Animated>
+        </div>
         <div className="container py-5">
           <div className="row mt-3 mb-5">
             <div className="col-12">
