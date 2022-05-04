@@ -9,6 +9,7 @@ export default function TreeAndLeaf(props) {
     <Container
       fluid
       className="bg-white border rounded p-3 text-center"
+      style={{ minHeight: 500 }}
       {...props}
     >
       <ErrorBoundary
@@ -20,7 +21,7 @@ export default function TreeAndLeaf(props) {
         }
       >
         <Suspense fallback={<Loader message="Loading Plot" />}>
-          <D3TreeLeaf />
+          <D3TreeLeaf width={2500} height={2500} />
         </Suspense>
       </ErrorBoundary>
     </Container>

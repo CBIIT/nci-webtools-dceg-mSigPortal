@@ -3,17 +3,17 @@ import axios from 'axios';
 
 export const defaultTreeLeafData = { links: [], nodes: [] };
 
-export const treeLeafData = selector({
-  key: 'treeLeaf.plotState',
+export const getGraphData = selector({
+  key: 'treeLeaf.plotData',
   get: async ({ get }) => {
     try {
       const { data } = await axios.post('api/visualizationWrapper', {
-        fn: 'getTreeAndLeaf',
+        fn: 'getTreeLeaf',
       });
 
       return data.output;
     } catch (error) {
-      return defaultTreeLeafData;
+      return null;
     }
   },
 });

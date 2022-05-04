@@ -1020,10 +1020,42 @@ downloadPublicData <- function(args, config) {
   seqmatrix_public_download(seqmatrix_refdata_public, config$savePath)
 }
 
-getTreeAndLeaf <- function(args, config) {
+getHierarchy <- function(args, config) {
   library(TreeAndLeaf)
-  library(networkD3)
   library(igraph)
+  library(networkD3)
+
+  data(USArrests)
+  hc <- hclust(dist(USArrests), "ave")
+
+  return(list(data = as.radialNetwork(hc, "root")))
+}
+
+getTL <- function(args, config) {
+  library(TreeAndLeaf)
+  library(igraph)
+  library(networkD3)
+
+  data(USArrests)
+
+  hc <- hclust(dist(USArrests), "ave")
+
+  tal <- treeAndLeaf(hc)
+
+
+  # convert to d3
+  wc <- cluster_walktrap(tal)
+  members <- membership(wc)
+  # Convert to object suitable for networkD3
+  d3 <- igraph_to_networkD3(tal, group = members)
+
+  return(list(data = d3))
+}
+
+getTreeLeaf <- function(args, config) {
+  library(TreeAndLeaf)
+  library(igraph)
+  library(networkD3)
 
   source("services/R/Sigvisualfunc.R")
 
@@ -1132,67 +1164,9 @@ getTreeAndLeaf <- function(args, config) {
   # convert to d3
   wc <- cluster_walktrap(tal)
   members <- membership(wc)
-
   # Convert to object suitable for networkD3
   d3 <- igraph_to_networkD3(tal, group = members)
 
-  # #--- Map attributes to the tree-and-leaf
-  # #Note: 'refcol = 0' indicates that 'dat' rownames will be used as mapping IDs
-  # tal <- att.mapv(tal, mdatax, refcol = 1)
 
-  # #--- Set graph attributes using the 'att.setv' wrapper function
-  # # pal <- pal_d3()(4)
-  # # tal <- att.setv(g = tal, from = "SP_Group", to = "nodeColor",cols = pal)
-  # #
-  # #tal <- att.setv(g = tal, from = "SBS4", to = "nodeColor",cols = pal,nquant = 8)
-  # # pal <- dsigcol
-  # # pal <- pal_d3()(4)
-
-
-  # # For dominant mutation types
-  # pal <- dmcol
-  # tal <- att.setv(g = tal, from = "Dmut", to = "nodeColor", cols = pal)
-  # update_color <- function() { addLegend.color(obj = rdp, tal, title = "Dominant MutationType", position = "bottomright") }
-
-
-  # # for cancer types
-  # cancertypes <- levels(as.factor(mdatax$Cancer_Type))
-  # pal <- pcawg.colour.palette(x = str_replace(cancertypes, '-', '.'), scheme = "tumour.subtype")
-  # #names(pal) <- cancertypes
-  # tal <- att.setv(g = tal, from = "Cancer_Type", to = "nodeColor", cols = pal)
-  # update_color <- function() { addLegend.color(obj = rdp, tal, title = "Cancer Type", position = "bottomright") }
-
-
-  # # For dominant signature
-  # pal <- dsigcol
-  # tal <- att.setv(g = tal, from = "Dsig", to = "nodeColor", cols = pal)
-  # update_color <- function() { addLegend.color(obj = rdp, tal, title = "Dominant Mutational Signature", position = "topright", vertical = T, dxtitle = 50) }
-
-
-  # # Cosine Similarity
-  # summary(mdatax$Cosine_similarity)
-  # breakstmp <- seq(min(mdatax$Cosine_similarity), 1, 0.01)
-  # pal <- viridis::viridis(n = length(breakstmp))
-  # tal <- att.setv(g = tal, from = "Cosine_similarity", to = "nodeColor", cols = pal, breaks = breakstmp)
-  # update_color <- function() { addLegend.color(obj = rdp, tal, title = "Cosine Similarity", position = "topright", vertical = T, dxtitle = 30) }
-
-
-  # tal <- att.setv(g = tal, from = "Mutations", to = "nodeSize", nquant = 8)
-  # #--- Set graph attributes using 'att.addv' and 'att.adde' functions
-  # tal <- att.addv(tal, "nodeFontSize", value = 1)
-  # tal <- att.adde(tal, "edgeWidth", value = 10)
-  # #--- Call RedeR application
-  # rdp <- RedPort()
-  # calld(rdp)
-  # resetd(rdp)
-  # addGraph(obj = rdp, g = tal, gzoom = 7.5)
-  # #--- Call 'relax' to fine-tune the leaf nodes
-  # relax(rdp, p1 = 25, p2 = 200, p3 = 10, p4 = 100, p5 = 10, ps = TRUE)
-
-
-  # #--- Add legends
-  # #addLegend.color(obj = rdp, tal, title = "SP_Group", position = "bottomright")
-  # addLegend.size(obj = rdp, tal, title = "Number of Mutations", position = "topleft", vertical = T,)
-  # #addLegend.color(obj = rdp, tal, title = "Dominant MutationType", position = "bottomright")
-  # update_color()
+  return(list(graph = d3, hierarchy= as.radialNetwork(hc,''), attributes = mdatax))
 }
