@@ -3,11 +3,11 @@ import React from 'react';
 export function Header() {
 
   return (
-    <header class="bg-light">
+    <header className="bg-light">
       <div>
         <a
           href="/#/#root"
-          class="
+          className="
             sr-only sr-only-focusable
             d-block
             text-white
@@ -16,8 +16,8 @@ export function Header() {
           "
           >Skip to Main Content</a
         >
-        <div class="ml-4 mr-5">
-          <div class="p-2 d-none d-sm-block">
+        <div className="ml-4 mr-5">
+          <div className="p-2 d-none d-sm-block">
             <a href="https://dceg.cancer.gov/" target="_blank">
               <img
                 src="https://analysistools.cancer.gov/common/images/DCEG-logo.svg"
@@ -27,7 +27,7 @@ export function Header() {
             </a>
             {/* <a href="/#/">
               <img
-                class="d-none d-md-block"
+                className="d-none d-md-block"
                 src="assets/images/msigportal-logo.png"
                 alt="mSigPortal Logo"
                 height="80"
@@ -35,7 +35,7 @@ export function Header() {
               />
             </a> */}
           </div>
-          <div class="p-1 d-sm-none">
+          <div className="p-1 d-sm-none">
             <a href="https://dceg.cancer.gov/">
               <img
                 src="https://analysistools.cancer.gov/common/images/DCEG-logo.svg"
