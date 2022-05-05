@@ -3,6 +3,7 @@ import { Alert, Container } from 'react-bootstrap';
 import Loader from '../../../controls/loader/loader';
 import ErrorBoundary from '../../../controls/errorBoundary/error-boundary';
 import D3TreeLeaf from './treeLeafPlot';
+import TreeLeafForm from './treeLeafForm';
 
 export default function TreeAndLeaf(props) {
   return (
@@ -12,6 +13,7 @@ export default function TreeAndLeaf(props) {
       style={{ minHeight: 500 }}
       {...props}
     >
+      <TreeLeafForm />
       <ErrorBoundary
         fallback={
           <Alert variant="danger">

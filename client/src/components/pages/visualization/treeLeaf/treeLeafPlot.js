@@ -2,10 +2,12 @@ import { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 import cloneDeep from 'lodash/cloneDeep';
 import { useRecoilValue } from 'recoil';
-import { getGraphData } from './treeLeaf.state';
+import { getGraphData, formState } from './treeLeaf.state';
 
 export default function D3TreeLeaf({ width = 1000, height = 1000, ...props }) {
   const data = cloneDeep(useRecoilValue(getGraphData));
+  const form = useRecoilValue(formState);
+
   const nodeRef = useRef(null);
 
   useEffect(() => {
@@ -16,7 +18,7 @@ export default function D3TreeLeaf({ width = 1000, height = 1000, ...props }) {
         data.hierarchy,
         data.attributes.reduce((map, e) => ((map[e.Sample] = e), map), {}),
         {
-          label: (d) => '', //d.name,
+          label: (d) => (form.showLabels ? d.name : ''),
           width,
           height,
         }
@@ -267,6 +269,7 @@ function createRadialTree(
   }
 ) {
   console.log(data);
+  console.log(attributes);
   console.log(attributes['SP117655']);
   console.log(r(attributes['SP117655'].Mutations));
   console.log(typeof fill(attributes['SP117655'].Cosine_similarity));
