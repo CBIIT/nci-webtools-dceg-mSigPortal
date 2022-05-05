@@ -90,3 +90,22 @@
     rgba(247, 245, 244, 1) 100%
   );
 }
+
+.home-banner-nav-button {
+  border-radius: 0px !important;
+  border-color: #D62D4C !important;
+  border-width: 2px !important;
+}
+
+.home-text-border {
+  border: 3px solid #CF2C2C !important;
+  width: 75px;
+}
+
+.home-nav-card {
+  transition: background-color 250ms ease-out 50ms !important;
+}
+
+.home-nav-card:hover {
+  background-color: darkgrey !important;
+}
