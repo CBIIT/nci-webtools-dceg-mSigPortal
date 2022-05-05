@@ -16,7 +16,7 @@ export default function D3TreeLeaf({ width = 1000, height = 1000, ...props }) {
         data.hierarchy,
         data.attributes.reduce((map, e) => ((map[e.Sample] = e), map), {}),
         {
-          label: (d) => d.name,
+          label: (d) => '', //d.name,
           width,
           height,
         }

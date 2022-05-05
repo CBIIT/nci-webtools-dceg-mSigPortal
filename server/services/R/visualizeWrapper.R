@@ -1168,5 +1168,5 @@ getTreeLeaf <- function(args, config) {
   d3 <- igraph_to_networkD3(tal, group = members)
 
 
-  return(list(graph = d3, hierarchy= as.radialNetwork(hc,''), attributes = mdatax))
+  return(list(graph = d3, hierarchy = as.radialNetwork(hc, ""), attributes = mdatax))
 }
