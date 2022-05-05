@@ -4,7 +4,7 @@ import ReactSelect, { createFilter } from 'react-select';
 
 const { Group, Label } = Form;
 
-export default function Select({
+export default function CustomSelect({
   className,
   id,
   label,

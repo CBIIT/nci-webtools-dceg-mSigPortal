@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import Select from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select';
 import Description from '../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as exposureActions } from '../../../services/store/exposure';
@@ -209,7 +209,7 @@ export default function PublicForm({
       <Row>
         <Col>
           <Group>
-            <Select
+            <CustomSelect
               disabled={loading || submitted || !studyOptions.length}
               id="expStudyPublic"
               label="Study"
@@ -223,7 +223,7 @@ export default function PublicForm({
       <Row>
         <Col>
           <Group>
-            <Select
+            <CustomSelect
               disabled={loading || submitted || !strategyOptions.length}
               id="tumorStrategy"
               label="Experimental Strategy"
@@ -237,7 +237,7 @@ export default function PublicForm({
       <Row>
         <Col>
           <Group>
-            <Select
+            <CustomSelect
               disabled={loading || submitted || !rsSetOptions.length}
               id="expSetPublic"
               label="Reference Signature Set"
@@ -251,7 +251,7 @@ export default function PublicForm({
       <Row>
         <Col>
           <Group>
-            <Select
+            <CustomSelect
               className="mb-4"
               disabled={loading || submitted || !cancerOptions.length}
               id="prevalenceCancerType"

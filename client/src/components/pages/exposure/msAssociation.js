@@ -6,7 +6,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { actions as exposureActions } from '../../../services/store/exposure';
 import { actions as modalActions } from '../../../services/store/modal';
 import Plot from '../../controls/plot/plot';
-import Select from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select';
 
 const actions = { ...exposureActions, ...modalActions };
 const { Group, Check } = Form;
@@ -43,7 +43,7 @@ export default function MsAssociation({ calculateAssociation }) {
         <LoadingOverlay active={loading} />
         <Row>
           <Col lg="auto">
-            <Select
+            <CustomSelect
               disabled={source == 'user' && !userNameOptions.length}
               id="associationSignatureName1"
               label="Signature Name 1"
@@ -55,7 +55,7 @@ export default function MsAssociation({ calculateAssociation }) {
             />
           </Col>
           <Col lg="auto">
-            <Select
+            <CustomSelect
               disabled={source == 'user' && !userNameOptions.length}
               id="associationSignatureName2"
               label="Signature Name 2"

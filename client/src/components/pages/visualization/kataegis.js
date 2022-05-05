@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
-import Select from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select';
 import Description from '../../controls/description/description';
 import KataegisTable from './kataegisTable';
 import { useSelector, useDispatch } from 'react-redux';
@@ -119,7 +119,7 @@ export default function Kataegis({ submitR }) {
             <LoadingOverlay active={loading} />
             <Row>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   id="kataegisSamples"
                   label="Sample Name"
                   value={sample}
@@ -181,7 +181,7 @@ export default function Kataegis({ submitR }) {
                 </Group>
               </Col>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   id="kataegisChromosome"
                   label="Chromosome"
                   value={chromosome}

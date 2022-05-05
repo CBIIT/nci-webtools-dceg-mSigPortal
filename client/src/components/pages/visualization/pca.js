@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button, Tab, Nav } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
-import Select from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select';
 import Description from '../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
@@ -231,7 +231,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
             <LoadingOverlay active={submitOverlay} />
             <Row>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   disabled={!multiSample}
                   id="pcaProfileType"
                   label="Profile Type"
@@ -247,7 +247,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
               </Col>
 
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   disabled={!multiSample}
                   id="pcaRefSet"
                   label="Reference Signature Set"
@@ -398,7 +398,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
             <LoadingOverlay active={pubSubmitOverlay} />
             <Row>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   id="pcaPubProfile"
                   label="Profile Type"
                   value={userProfileType}
@@ -407,7 +407,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                 />
               </Col>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   id="pcaPubMatrixSize"
                   label="Matrix Size"
                   value={userMatrixSize}
@@ -418,7 +418,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                 />
               </Col>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   id="pcaPubStudy"
                   label="Study"
                   value={pubStudy}
@@ -427,7 +427,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
                 />
               </Col>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   id="pcaPubCancerType"
                   label="Cancer Type or Group"
                   value={pubCancerType}

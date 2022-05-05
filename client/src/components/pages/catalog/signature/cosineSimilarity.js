@@ -2,7 +2,7 @@ import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
-import Select from '../../../controls/select/select';
+import CustomSelect from '../../../controls/select/select';
 import Description from '../../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as catalogActions } from '../../../../services/store/catalog';
@@ -110,7 +110,7 @@ export default function MutationalSignatureProfile({ submitR }) {
         <LoadingOverlay active={loading} />
         <Row className="">
           <Col lg="auto">
-            <Select
+            <CustomSelect
               id="csProfileName"
               label="Profile Name"
               value={profileName}
@@ -119,7 +119,7 @@ export default function MutationalSignatureProfile({ submitR }) {
             />
           </Col>
           <Col lg="auto">
-            <Select
+            <CustomSelect
               id="csRefSet1"
               label="Reference Signature Set 1"
               value={rsSet1}
@@ -128,7 +128,7 @@ export default function MutationalSignatureProfile({ submitR }) {
             />
           </Col>
           <Col lg="auto">
-            <Select
+            <CustomSelect
               id="rcsRefSet2"
               label="Reference Signature Set 2"
               value={rsSet2}

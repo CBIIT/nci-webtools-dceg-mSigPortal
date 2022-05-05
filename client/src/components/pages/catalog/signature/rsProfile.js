@@ -5,7 +5,7 @@ import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
 import Debug from '../../../controls/debug/debug';
-import Select from '../../../controls/select/select';
+import CustomSelect from '../../../controls/select/select';
 import Description from '../../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as catalogActions } from '../../../../services/store/catalog';
@@ -395,7 +395,7 @@ export default function Profile({ submitR }) {
       controls.push(
         <Row className="mt-3" key={'control' + index}>
           <Col lg="auto">
-            <Select
+            <CustomSelect
               id={`mspSource${index}`}
               label="Signature Source"
               value={plots[index].signatureSource}
@@ -404,7 +404,7 @@ export default function Profile({ submitR }) {
             />
           </Col>
           <Col lg="auto">
-            <Select
+            <CustomSelect
               id={'mspProfileName' + index}
               label="Profile Name"
               value={plots[index].profileName}
@@ -413,7 +413,7 @@ export default function Profile({ submitR }) {
             />
           </Col>
           <Col lg="auto">
-            <Select
+            <CustomSelect
               id={'mspSet' + index}
               label="Reference Signature Set"
               value={plots[index].rsSet}
@@ -422,7 +422,7 @@ export default function Profile({ submitR }) {
             />
           </Col>
           <Col lg="auto">
-            <Select
+            <CustomSelect
               id={'mspStrategy' + index}
               label="Experimental Strategy"
               value={plots[index].strategy}
@@ -431,7 +431,7 @@ export default function Profile({ submitR }) {
             />
           </Col>
           <Col lg="auto">
-            <Select
+            <CustomSelect
               id={'mspSigName' + index}
               label="Signature Name"
               value={plots[index].signatureName}
@@ -501,7 +501,7 @@ export default function Profile({ submitR }) {
         <LoadingOverlay active={loading} />
         <Row className="">
           <Col lg="auto">
-            <Select
+            <CustomSelect
               id="mspSource"
               label="Signature Source"
               value={plots[0].signatureSource}
@@ -510,7 +510,7 @@ export default function Profile({ submitR }) {
             />
           </Col>
           <Col lg="auto">
-            <Select
+            <CustomSelect
               id="mspProfileName"
               label="Profile Name"
               value={plots[0].profileName}
@@ -519,7 +519,7 @@ export default function Profile({ submitR }) {
             />
           </Col>
           <Col lg="auto">
-            <Select
+            <CustomSelect
               id="mspSet"
               label="Reference Signature Set"
               value={plots[0].rsSet}
@@ -528,7 +528,7 @@ export default function Profile({ submitR }) {
             />
           </Col>
           <Col lg="auto">
-            <Select
+            <CustomSelect
               id="mspStrategy"
               label="Experimental Strategy"
               value={plots[0].strategy}
@@ -537,7 +537,7 @@ export default function Profile({ submitR }) {
             />
           </Col>
           <Col lg="auto">
-            <Select
+            <CustomSelect
               id="mspSigName"
               label="Signature Name"
               value={plots[0].signatureName}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button, Tab, Nav } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
-import Select from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select';
 import Description from '../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
@@ -236,7 +236,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
             <LoadingOverlay active={withinSubmitOverlay} />
             <Row>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   disabled={!multiSample}
                   id="csProfileType"
                   label="Profile Type"
@@ -246,7 +246,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 />
               </Col>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   disabled={!multiSample}
                   id="csMatrixSize"
                   label="Matrix Size"
@@ -333,7 +333,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
             <LoadingOverlay active={refSubmitOverlay} />
             <Row>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   id="csRefProfileType"
                   label="Profile Type"
                   value={refProfileType}
@@ -347,7 +347,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 />
               </Col>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   id="csRefSignatureSet"
                   label="Reference Signature Set"
                   value={refSignatureSet}
@@ -435,7 +435,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
             <LoadingOverlay active={pubSubmitOverlay} />
             <Row>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   id="csUserProfileType"
                   label="Profile Type"
                   value={userProfileType}
@@ -444,7 +444,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 />
               </Col>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   id="csUserMatrixSize"
                   label="Matrix Size"
                   value={userMatrixSize}
@@ -457,7 +457,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 />
               </Col>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   id="csPubStudy"
                   label="Study"
                   value={pubStudy || visualization.study}
@@ -466,7 +466,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 />
               </Col>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   id="csPubCancerType"
                   label="Cancer Type or Group"
                   value={pubCancerType || visualization.cancerType}

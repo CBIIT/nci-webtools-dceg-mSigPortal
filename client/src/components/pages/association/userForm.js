@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import Select from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as associationActions } from '../../../services/store/association';
 import { actions as modalActions } from '../../../services/store/modal';
@@ -240,7 +240,7 @@ export default function UserForm() {
       <Row>
         <Col>
           <Group>
-            <Select
+            <CustomSelect
               disabled={loadingData || submitted}
               id="expStudyPublic"
               label="Study"
@@ -254,7 +254,7 @@ export default function UserForm() {
       <Row>
         <Col>
           <Group>
-            <Select
+            <CustomSelect
               disabled={loadingData || submitted}
               id="tumorStrategy"
               label="Experimental Strategy"
@@ -268,7 +268,7 @@ export default function UserForm() {
       <Row>
         <Col>
           <Group>
-            <Select
+            <CustomSelect
               disabled={loadingData || submitted}
               id="expSetPublic"
               label="Reference Signature Set"
@@ -282,7 +282,7 @@ export default function UserForm() {
       <Row>
         <Col>
           <Group>
-            <Select
+            <CustomSelect
               className="mb-4"
               disabled={loadingData || submitted}
               id="prevalenceCancerType"

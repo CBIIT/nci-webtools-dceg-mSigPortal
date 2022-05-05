@@ -13,7 +13,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
-import Select from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select';
 import Description from '../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
@@ -371,7 +371,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
             <LoadingOverlay active={withinSubmitOverlay} />
             <Row>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   disabled={sampleOptions.length < 2}
                   id="pcProfileTypeWithin"
                   label="Profile Type"
@@ -385,7 +385,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 />
               </Col>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   disabled={sampleOptions.length < 2}
                   id="pcSample1"
                   label="Sample Name 1"
@@ -399,7 +399,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 />
               </Col>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   disabled={sampleOptions.length < 2}
                   id="pcSample2"
                   label="Sample Name 2"
@@ -517,7 +517,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
             <LoadingOverlay active={refSubmitOverlay} />
             <Row>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   id="pcProfileTypeRef"
                   label="Profile Type"
                   value={refProfileType}
@@ -531,7 +531,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 />
               </Col>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   id="sampleNameRefSig"
                   label="Sample Name"
                   value={refSampleName}
@@ -544,7 +544,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 />
               </Col>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   id="pcRefSet"
                   label="Reference Signature Set"
                   value={refSignatureSet}
@@ -701,7 +701,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
             <LoadingOverlay active={pubSubmitOverlay} />
             <Row>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   id="pcUserProfileType"
                   label="Profile Type"
                   value={userProfileType}
@@ -710,7 +710,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 />
               </Col>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   id="pcUserMatrixSize"
                   label="Matrix Size"
                   value={userMatrixSize}
@@ -723,7 +723,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 />
               </Col>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   id="pcUserSampleName"
                   label="Sample Name"
                   value={userSampleName}
@@ -736,7 +736,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 />
               </Col>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   id="pcPubStudy"
                   label="Study"
                   value={pubStudy}
@@ -745,7 +745,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 />
               </Col>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   id="pcPubCancerType"
                   label="Cancer Type or Group"
                   value={pubCancerType}
@@ -754,7 +754,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 />
               </Col>
               <Col lg="auto">
-                <Select
+                <CustomSelect
                   id="pcPubSampleName"
                   label="Public Sample Name"
                   value={pubSampleName}
