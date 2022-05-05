@@ -337,10 +337,14 @@ function createRadialTree(
   node
     .append('circle')
     .attr('fill', ({ data }) =>
-      data.name ? fill(attributes[data.name].Cosine_similarity) : 'stroke'
+      data.name && attributes[data.name]
+        ? fill(attributes[data.name].Cosine_similarity)
+        : 'stroke'
     )
     .attr('r', ({ data }) =>
-      data.name ? r(attributes[data.name].Mutations) : null
+      data.name && attributes[data.name]
+        ? r(attributes[data.name].Mutations)
+        : null
     );
 
   // add tooltips
