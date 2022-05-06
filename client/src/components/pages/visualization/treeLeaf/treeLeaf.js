@@ -13,7 +13,6 @@ export default function TreeAndLeaf(props) {
       style={{ minHeight: 500 }}
       {...props}
     >
-      <TreeLeafForm />
       <ErrorBoundary
         fallback={
           <Alert variant="danger">
@@ -23,7 +22,8 @@ export default function TreeAndLeaf(props) {
         }
       >
         <Suspense fallback={<Loader message="Loading Plot" />}>
-          <D3TreeLeaf width={1500} height={1500} />
+          <TreeLeafForm />
+          <D3TreeLeaf width={1000} height={1000} />
         </Suspense>
       </ErrorBoundary>
     </Container>
