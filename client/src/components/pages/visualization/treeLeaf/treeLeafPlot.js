@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import * as d3 from 'd3';
 import cloneDeep from 'lodash/cloneDeep';
 import { useRecoilValue } from 'recoil';
@@ -9,6 +10,7 @@ export default function D3TreeLeaf({ width = 1000, height = 1000, ...props }) {
   const form = useRecoilValue(formState);
 
   const nodeRef = useRef(null);
+
   const groupAttributesBySample = attributes.reduce(
     (map, e) => ((map[e.Sample] = e), map),
     {}
@@ -21,158 +23,168 @@ export default function D3TreeLeaf({ width = 1000, height = 1000, ...props }) {
       //   height,
       // });
 
-      const treeLeaf = createRadialTree(hierarchy, groupAttributesBySample, {
+      const plot = createRadialTree(hierarchy, groupAttributesBySample, {
         label: (d) => (form.showLabels ? d.name : ''),
         width,
         height,
       });
 
-      nodeRef.current.replaceChildren(treeLeaf);
+      nodeRef.current.replaceChildren(plot);
+      // tooltipRef.current.replaceChildren(tooltip);
     }
   }, [hierarchy, nodeRef, width, height]);
 
-  return <div ref={nodeRef} {...props} />;
+  return <div className="border rounded" ref={nodeRef} {...props} />;
 }
 
-export function createRadialForce(
-  data,
-  attributes,
-  {
-    width = 640, // outer width, in pixels
-    height = 400, // outer height, in pixels
-    margin = 60, // shorthand for margins
-    marginTop = margin, // top margin, in pixels
-    marginRight = margin, // right margin, in pixels
-    marginBottom = margin, // bottom margin, in pixels
-    marginLeft = margin, // left margin, in pixels
-    radius = Math.min(
-      width - marginLeft - marginRight,
-      height - marginTop - marginBottom
-    ) / 2, // outer radius
-    r = d3
-      .scaleLinear()
-      .domain([
-        0,
-        d3.max(Object.values(attributes).map(({ Mutations }) => Mutations)),
-      ])
-      .range([4, 20]), // radius of nodes
-    padding = 1, // horizontal padding for first and last column
-    fill = d3.scaleSequential(d3.interpolateRdYlGn), // fill for nodes
-    fillOpacity, // fill opacity for nodes
-    stroke = '#555', // stroke for links
-    strokeWidth = 1.5, // stroke width for links
-    strokeOpacity = 0.4, // stroke opacity for links
-    strokeLinejoin, // stroke line join for links
-    strokeLinecap, // stroke line cap for links
-    halo = '#fff', // color of label halo
-    haloWidth = 3, // padding around the labels
-    generationCount = 4,
-  }
-) {
-  const root = d3.cluster().size([2 * Math.PI, radius])(d3.hierarchy(data));
-  const links = root.links();
-  const nodes = root.descendants();
+// export function createRadialForce(
+//   data,
+//   attributes,
+//   {
+//     width = 640, // outer width, in pixels
+//     height = 400, // outer height, in pixels
+//     margin = 60, // shorthand for margins
+//     marginTop = margin, // top margin, in pixels
+//     marginRight = margin, // right margin, in pixels
+//     marginBottom = margin, // bottom margin, in pixels
+//     marginLeft = margin, // left margin, in pixels
+//     radius = Math.min(
+//       width - marginLeft - marginRight,
+//       height - marginTop - marginBottom
+//     ) / 2, // outer radius
+//     r = d3
+//       .scaleLinear()
+//       .domain([
+//         0,
+//         d3.max(Object.values(attributes).map(({ Mutations }) => Mutations)),
+//       ])
+//       .range([4, 20]), // radius of nodes
+//     padding = 1, // horizontal padding for first and last column
+//     fill = d3.scaleSequential(d3.interpolateRdYlGn), // fill for nodes
+//     fillOpacity, // fill opacity for nodes
+//     stroke = '#555', // stroke for links
+//     strokeWidth = 1.5, // stroke width for links
+//     strokeOpacity = 0.4, // stroke opacity for links
+//     strokeLinejoin, // stroke line join for links
+//     strokeLinecap, // stroke line cap for links
+//     halo = '#fff', // color of label halo
+//     haloWidth = 3, // padding around the labels
+//     generationCount = 4,
+//   }
+// ) {
+//   const root = d3.cluster().size([2 * Math.PI, radius])(d3.hierarchy(data));
+//   const links = root.links();
+//   const nodes = root.descendants();
 
-  console.log(nodes[0]);
-  console.log(links[0]);
+//   console.log(nodes[0]);
+//   console.log(links[0]);
 
-  const simulation = d3
-    .forceSimulation(nodes)
-    .force(
-      'link',
-      d3
-        .forceLink(links)
-        .id((d) => d.id)
-        .distance(0)
-        .strength(0.5)
-    )
-    .force('charge', d3.forceManyBody().strength(-10))
-    .force(
-      'radial',
-      d3
-        .forceRadial((d) =>
-          d.depth + 1 === 2
-            ? 10
-            : d3
-                .scaleLinear(d.depth + 1)
-                .domain([0, generationCount + 1])
-                .range([0, radius - 50])
-        )
-        .strength(0.5)
-    )
-    .force(
-      'collide',
-      d3
-        .forceCollide()
-        // @ts-ignore
-        .radius((d) => d.depth + 1)
-        .strength(0.8)
-    );
+//   const simulation = d3
+//     .forceSimulation(nodes)
+//     .force(
+//       'link',
+//       d3
+//         .forceLink(links)
+//         .id((d) => d.id)
+//         .distance(0)
+//         .strength(0.5)
+//     )
+//     .force('charge', d3.forceManyBody().strength(-10))
+//     .force(
+//       'radial',
+//       d3
+//         .forceRadial((d) =>
+//           d.depth + 1 === 2
+//             ? 10
+//             : d3
+//                 .scaleLinear(d.depth + 1)
+//                 .domain([0, generationCount + 1])
+//                 .range([0, radius - 50])
+//         )
+//         .strength(0.5)
+//     )
+//     .force(
+//       'collide',
+//       d3
+//         .forceCollide()
+//         // @ts-ignore
+//         .radius((d) => d.depth + 1)
+//         .strength(0.8)
+//     );
 
-  const svg = d3
-    .create('svg')
-    .attr('viewBox', [-width / 2, -height / 2, width, height]);
+//   const zoom = d3.zoom().scaleExtent([1, 5]).on('zoom', zoomed);
 
-  const link = svg
-    .append('g')
-    .selectAll('line')
-    .data(links)
-    .join('line')
-    .attr('stroke', 'black');
+//   function zoomed({ transform }) {
+//     g.attr('transform', transform);
+//   }
 
-  const node = svg
-    .append('g')
-    .selectAll('circle')
-    .data(nodes)
-    .join('circle')
-    .attr('stroke', '#fff')
-    .attr('stroke-opacity', 0.5)
-    .attr('fill', ({ data }) =>
-      data.name && attributes[data.name]
-        ? fill(attributes[data.name].Cosine_similarity)
-        : 'blue'
-    )
-    .attr('opacity', '0.6')
-    .attr('r', (d) => generationCount * 2 - (d.depth + 1))
-    .call(drag(simulation));
+//   const svg = d3
+//     .create('svg')
+//     .attr('width', width)
+//     .attr('height', height)
+//     .attr('viewBox', [-width / 2, -height / 2, width, height]);
+//   const g = svg.append('g');
 
-  simulation.on('tick', () => {
-    link
-      .attr('x1', (d) => d.source.x)
-      .attr('y1', (d) => d.source.y)
-      .attr('x2', (d) => d.target.x)
-      .attr('y2', (d) => d.target.y);
+//   d3.select('svg').call(zoom);
 
-    node.attr('cx', (d) => d.x).attr('cy', (d) => d.y);
-  });
+//   const link = g
+//     .selectAll('line')
+//     .data(links)
+//     .join('line')
+//     .attr('stroke', 'black');
 
-  function drag(simulation) {
-    function dragstarted(event, d) {
-      if (!event.active) simulation.alphaTarget(0.3).restart();
-      d.fx = d.x;
-      d.fy = d.y;
-    }
+//   const node = g
+//     .selectAll('circle')
+//     .data(nodes)
+//     .join('circle')
+//     .attr('stroke', '#fff')
+//     .attr('stroke-opacity', 0.5)
+//     .attr('fill', ({ data }) =>
+//       data.name && attributes[data.name]
+//         ? fill(attributes[data.name].Cosine_similarity)
+//         : 'blue'
+//     )
+//     .attr('opacity', '0.6')
+//     .attr('r', (d) => generationCount * 2 - (d.depth + 1))
+//     .call(drag(simulation));
 
-    function dragged(event, d) {
-      d.fx = event.x;
-      d.fy = event.y;
-    }
+//   simulation.on('tick', () => {
+//     link
+//       .attr('x1', (d) => d.source.x)
+//       .attr('y1', (d) => d.source.y)
+//       .attr('x2', (d) => d.target.x)
+//       .attr('y2', (d) => d.target.y);
 
-    function dragended(event, d) {
-      if (!event.active) simulation.alphaTarget(0);
-      d.fx = null;
-      d.fy = null;
-    }
+//     node.attr('cx', (d) => d.x).attr('cy', (d) => d.y);
+//   });
 
-    return d3
-      .drag()
-      .on('start', dragstarted)
-      .on('drag', dragged)
-      .on('end', dragended);
-  }
+//   function drag(simulation) {
+//     function dragstarted(event, d) {
+//       if (!event.active) simulation.alphaTarget(0.3).restart();
+//       d.fx = d.x;
+//       d.fy = d.y;
+//     }
 
-  return svg.node();
-}
+//     function dragged(event, d) {
+//       d.fx = event.x;
+//       d.fy = event.y;
+//     }
+
+//     function dragended(event, d) {
+//       if (!event.active) simulation.alphaTarget(0);
+//       d.fx = null;
+//       d.fy = null;
+//     }
+
+//     return d3
+//       .drag()
+//       .on('start', dragstarted)
+//       .on('drag', dragged)
+//       .on('end', dragended);
+//   }
+
+//   return svg.node();
+// }
 
 // Copyright 2022 Observable, Inc.
 // Released under the ISC license.
@@ -212,7 +224,7 @@ function createRadialTree(
         0,
         d3.max(Object.values(attributes).map(({ Mutations }) => Mutations)),
       ])
-      .range([4, 20]), // radius of nodes
+      .range([2, 20]), // radius of nodes
     padding = 1, // horizontal padding for first and last column
     fill = d3.scaleSequential(d3.interpolateRdYlGn), // fill for nodes
     fillOpacity, // fill opacity for nodes
@@ -225,9 +237,6 @@ function createRadialTree(
     haloWidth = 3, // padding around the labels
   }
 ) {
-  console.log(data);
-
-  console.log(attributes['SP117655']);
   // If id and parentId options are specified, or the path option, use d3.stratify
   // to convert tabular data to a hierarchy; otherwise we assume that the data is
   // specified as an object {children} with nested objects (a.k.a. the “flare.json”
@@ -251,15 +260,24 @@ function createRadialTree(
     .size([2 * Math.PI, radius])
     .separation(separation)(root);
 
-  const svg = d3
-    .create('svg')
+  const zoom = d3.zoom().scaleExtent([1, 5]).on('zoom', zoomed);
+
+  function zoomed({ transform }) {
+    d3.selectAll('g').attr('transform', transform);
+  }
+
+  const container = d3.create('div');
+  const svg = container
+    .append('svg')
     .attr('viewBox', [-marginLeft - radius, -marginTop - radius, width, height])
     .attr('width', width)
     .attr('height', height)
     .attr('style', 'max-width: 100%; height: auto; height: intrinsic;')
     .attr('font-family', 'sans-serif')
-    .attr('font-size', 10);
+    .attr('font-size', 10)
+    .call(zoom);
 
+  // add lines
   svg
     .append('g')
     .attr('fill', 'none')
@@ -279,6 +297,7 @@ function createRadialTree(
         .radius((d) => d.y)
     );
 
+  // add sample nodes
   const node = svg
     .append('g')
     .selectAll('a')
@@ -303,43 +322,45 @@ function createRadialTree(
       data.name && attributes[data.name]
         ? r(attributes[data.name].Mutations)
         : null
-    );
+    )
+    .on('mouseover', mouseover)
+    .on('mousemove', mousemove)
+    .on('mouseleave', mouseleave);
 
   // add tooltips
-  // node
-  //   .selectAll('circle')
-  //   .on('mouseover.tooltip', (e) => {
-  //     const div = d3.select(e.target).append('div');
+  const tooltip = container
+    .append('div')
+    .style('position', 'absolute')
+    .style('visibility', 'hidden')
+    .attr('class', 'bg-light border rounded p-1');
 
-  //     div.attr('id', 'details');
-  //     div.attr('class', 'tooltip');
+  function mouseover() {
+    tooltip.style('visibility', 'visible');
+  }
 
-  //     let rows = div
-  //       .append('table')
-  //       .selectAll('tr')
-  //       .data(Object.keys(e))
-  //       .enter()
-  //       .append('tr');
+  function mouseleave() {
+    tooltip.style('visibility', 'hidden');
+  }
 
-  //     console.log(div);
-  //     console.log(e);
-
-  //     rows.append('th').text((key) => key);
-  //     rows.append('td').text((key) => e[key]);
-  //   })
-  // .on('mousemove.tooltip', (e) => {
-  //   let div = d3.select('div#details');
-
-  //   // get height of tooltip
-  //   let bbox = div.node().getBoundingClientRect();
-
-  //   div.style('left', e.clientX + 'px');
-  //   div.style('top', e.clientY - bbox.height + 'px');
-  // })
-  // .on('mouseleave.tooltip', (d) => {
-  //   console.log('left');
-  //   d3.selectAll('div#details').remove();
-  // });
+  function mousemove(e, d) {
+    // console.log('event', e);
+    const sample = d.data.name;
+    const data = attributes[sample];
+    console.log(data);
+    const content = (
+      <div className="text-start">
+        <div>Sample: {sample}</div>
+        <div>Cancer Type: {data.Cancer_Type}</div>
+        <div>Cosine Similarity: {data.Cosine_similarity}</div>
+        <div>Mutations: {data.Mutations}</div>
+      </div>
+    );
+    tooltip
+      .html(renderToStaticMarkup(content))
+      // .html('Sample: ' + sample || 'none')
+      .style('left', e.pageX - 30 + 'px')
+      .style('top', e.pageY - 320 + 'px');
+  }
 
   if (title != null) node.append('title').text((d) => title(d.data, d));
 
@@ -357,5 +378,5 @@ function createRadialTree(
       .attr('stroke-width', haloWidth)
       .text((d, i) => L[i]);
 
-  return svg.node();
+  return container.node();
 }
