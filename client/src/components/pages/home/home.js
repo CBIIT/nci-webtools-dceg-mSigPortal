@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
 import { Animated } from "react-animated-css";
 import parse from 'html-react-parser';
 import './home.scss';
@@ -78,14 +78,17 @@ export default function Home({ links }) {
           className="p-5 d-none d-md-block"
           style={{
           position: 'absolute',
-          right: '0px',
+          // right: '0px',
           height: '100%',
+          overflow: 'hidden',
+          width: '100%'
         }}>
           <Animated animationIn="slideInRight" animationInDuration={2000} isVisible={true} style={{height: '100%'}}>
             <img
               alt={'DNA accent banner'}
               src={'assets/images/placeholder-home-dna.png'}
               height="100%"
+              style={{float: 'right'}}
             />
           </Animated>
         </div>
@@ -130,35 +133,17 @@ export default function Home({ links }) {
         </div>
       </div>
       <div className="bg-white py-5">
-        <div className="container">
-          <div 
-            className="d-none d-md-block"
-            style={{
-            fontSize: '1.5em',
-            color: '#D62D4C',
-            }}>
-            mSigPortal Modules
-          </div>
-          <div 
-            className="d-md-none text-center"
-            style={{
-            fontSize: '1.5em',
-            color: '#D62D4C',
-            }}>
-            mSigPortal Modules
-          </div>
-        </div>
         <div className="mx-5 my-4 px-2">
           <div className="row justify-content-center">
             {
               links.slice(0, 4).map(({cardTitle, image, exact, route, title, description}, idx) => 
               <OverlayTrigger
-                placement="auto"
-                delay={{ show: 100, hide: 1200 }}
+                placement="top"
+                // delay={{ hide: 1000 }}
                 overlay={(props) =>
-                  <Tooltip {...props}>
+                  <Popover {...props} className="p-3">
                     <p>{parse(description)}</p>
-                  </Tooltip>
+                  </Popover>
                 }>
                   <div className="col-auto d-flex align-items-center mx-1 my-1 home-nav-card" 
                     key={`home-nav-card-${idx}`}
