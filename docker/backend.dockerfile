@@ -62,14 +62,18 @@ RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#eg
 #     echo -e "CXX14FLAGS=-O3 -march=native -mtune=native -fPIC \nCXX14=g++" >> $HOME/.R/Makevars
 
 # install renv
-RUN Rscript -e "install.packages('renv', repos = 'https://cloud.r-project.org/')"
+RUN R -e "install.packages('renv', repos = 'https://cloud.r-project.org/')"
 
 # install R packages
 COPY server/renv.lock /deploy/server/
 
 WORKDIR /deploy/server
 
-RUN Rscript -e "renv::restore()"
+# set renv cache path to env from build arg
+ARG RENV_PATHS_CACHE_HOST=/~/Library/Caches/org.R-project.R/R/renv/cache
+ENV RENV_PATHS_CACHE=/$RENV_PATHS_CACHE_HOST
+
+RUN R -e "renv::restore()"
 
 # install python packages
 RUN pip3 install scipy statsmodels

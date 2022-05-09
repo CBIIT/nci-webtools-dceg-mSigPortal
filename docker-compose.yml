@@ -1,0 +1,27 @@
+version: '3'
+services:
+    backend:
+        build:
+            context: '.'
+            dockerfile: './docker/backend.dockerfile'
+            args: 
+                RENV_PATHS_CACHE_HOST: ~/Library/Caches/org.R-project.R/R/renv/cache
+        volumes:
+            - './server/config.json:/deploy/server/config.json:ro'
+            - './server/logs:/deploy/server/logs'
+            - './tmp:/deploy/tmp'
+            - '~/.aws/dceg:/root/.aws/credentials:ro'
+        ports: 
+            - '8330:8330'
+
+    # frontend:
+    #     build: 
+    #         context: '.'
+    #         dockerfile: './docker/frontend.dockerfile'
+    #         args:
+    #             APP_PATH: /mutational-signatures
+    #     environment:
+    #         API_BASE_URL: http://backend:8330
+    #         APP_PATH: /mutational-signatures
+    #     ports: 
+    #         - '8331:80'
