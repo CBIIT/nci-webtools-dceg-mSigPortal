@@ -1,4 +1,4 @@
-FROM ${BACKEND_BASE_IMAGE:-quay.io/centos/centos:stream8}
+FROM ${BACKEND_BASE_IMAGE:-quay.io/centos/centos:stream8} as renvCache 
 
 RUN dnf -y update \
     && dnf -y install \
@@ -8,14 +8,8 @@ RUN dnf -y update \
     && dnf config-manager --enable powertools \
     && dnf -y module enable nodejs:13 \
     && dnf -y install \
-    # gdal-devel \
-    # proj-devel \
-    # protobuf-devel \
-    # udunits2-devel \
     cmake \
     v8-devel \
-    # https://download.fedoraproject.org/pub/epel/7/x86_64/Packages/j/jq-1.6-2.el7.x86_64.rpm \
-    # https://download.fedoraproject.org/pub/epel/7/x86_64/Packages/j/jq-devel-1.6-2.el7.x86_64.rpm \
     libjpeg-turbo-devel \
     openssl-devel \
     nodejs \
@@ -31,8 +25,52 @@ RUN dnf -y update \
     gmp-devel \
     mpfr-devel \
     cairo-devel \
-    # NLopt \
-    # NLopt-devel \
+    google-roboto-condensed-fonts \
+    && dnf clean all
+
+# install renv
+RUN R -e "install.packages('renv', repos = 'https://cloud.r-project.org/')"
+
+# install R packages
+COPY server/renv.lock /deploy/server/
+
+WORKDIR /deploy/server
+
+# set renv cache path to env from build arg
+# ARG RENV_PATHS_CACHE_HOST=~/Library/Caches/org.R-project.R/R/renv/cache
+# ENV RENV_PATHS_CACHE=$RENV_PATHS_CACHE_HOST
+
+# RUN R -e "renv:::renv_paths_cache()"
+RUN R -e "renv::restore()"
+
+
+FROM ${BACKEND_BASE_IMAGE:-quay.io/centos/centos:stream8}
+
+RUN dnf -y update \
+    && dnf -y install \
+    dnf-plugins-core \
+    epel-release \
+    glibc-langpack-en \
+    && dnf config-manager --enable powertools \
+    && dnf -y module enable nodejs:13 \
+    && dnf -y install \
+    cmake \
+    v8-devel \
+    libjpeg-turbo-devel \
+    openssl-devel \
+    nodejs \
+    R \
+    python3-pip \
+    python3-devel \
+    libcurl-devel \
+    libxml2-devel \
+    git \
+    rsync \
+    wget \
+    && dnf -y install \
+    gmp-devel \
+    mpfr-devel \
+    cairo-devel \
     google-roboto-condensed-fonts \
     && dnf clean all
 
@@ -61,6 +99,9 @@ RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#eg
 # RUN mkdir -p $HOME/.R && \
 #     echo -e "CXX14FLAGS=-O3 -march=native -mtune=native -fPIC \nCXX14=g++" >> $HOME/.R/Makevars
 
+# copy renv cache from intermediate image
+COPY --from=renvCache /root/Library/Caches/org.R-project.R/R/renv/cache/v5/R-4.1/x86_64-redhat-linux-gnu /root/Library/Caches/org.R-project.R/R/renv/cache/v5/R-4.1/x86_64-redhat-linux-gnu
+
 # install renv
 RUN R -e "install.packages('renv', repos = 'https://cloud.r-project.org/')"
 
@@ -69,10 +110,7 @@ COPY server/renv.lock /deploy/server/
 
 WORKDIR /deploy/server
 
-# set renv cache path to env from build arg
-ARG RENV_PATHS_CACHE_HOST=/~/Library/Caches/org.R-project.R/R/renv/cache
-ENV RENV_PATHS_CACHE=/$RENV_PATHS_CACHE_HOST
-
+# RUN R -e "renv:::renv_paths_cache()"
 RUN R -e "renv::restore()"
 
 # install python packages

@@ -4,8 +4,6 @@ services:
         build:
             context: '.'
             dockerfile: './docker/backend.dockerfile'
-            args: 
-                RENV_PATHS_CACHE_HOST: ~/Library/Caches/org.R-project.R/R/renv/cache
         volumes:
             - './server/config.json:/deploy/server/config.json:ro'
             - './server/logs:/deploy/server/logs'
