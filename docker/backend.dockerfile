@@ -40,8 +40,8 @@ WORKDIR /deploy/server
 # ARG RENV_PATHS_CACHE_HOST=~/Library/Caches/org.R-project.R/R/renv/cache
 # ENV RENV_PATHS_CACHE=$RENV_PATHS_CACHE_HOST
 
-# RUN R -e "renv:::renv_paths_cache()"
 RUN R -e "renv::restore()"
+# RUN R -e "renv:::renv_paths_cache()"
 
 
 FROM ${BACKEND_BASE_IMAGE:-quay.io/centos/centos:stream8}
@@ -100,7 +100,7 @@ RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#eg
 #     echo -e "CXX14FLAGS=-O3 -march=native -mtune=native -fPIC \nCXX14=g++" >> $HOME/.R/Makevars
 
 # copy renv cache from intermediate image
-COPY --from=renvCache /root/Library/Caches/org.R-project.R/R/renv/cache/v5/R-4.1/x86_64-redhat-linux-gnu /root/Library/Caches/org.R-project.R/R/renv/cache/v5/R-4.1/x86_64-redhat-linux-gnu
+COPY --from=renvCache /root/.cache/R/renv/cache/v5/R-4.1/x86_64-redhat-linux-gnu /root/.cache/R/renv/cache/v5/R-4.1/x86_64-redhat-linux-gnu
 
 # install renv
 RUN R -e "install.packages('renv', repos = 'https://cloud.r-project.org/')"
