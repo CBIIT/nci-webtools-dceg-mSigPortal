@@ -197,7 +197,7 @@ async function visualizationWrapper(req, res, next) {
   // create directory for results if needed
   const savePath = projectID ? path.join(projectID, 'results', fn, '/') : null;
   if (projectID)
-    fs.mkdirSync(path.join(config.wd, savePath), { recursive: true });
+    fs.mkdirSync(path.join(rConfig.wd, savePath), { recursive: true });
 
   try {
     const wrapper = await r('services/R/visualizeWrapper.R', 'wrapper', {
@@ -350,7 +350,7 @@ async function explorationWrapper(req, res, next) {
   // create directory for results if needed
   const savePath = projectID ? path.join(projectID, 'results', fn, '/') : null;
   if (projectID)
-    fs.mkdirSync(path.join(config.wd, savePath), { recursive: true });
+    fs.mkdirSync(path.join(rConfig.wd, savePath), { recursive: true });
 
   try {
     const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
@@ -387,7 +387,7 @@ async function associationWrapper(req, res, next) {
   // create directory for results if needed
   const savePath = projectID ? path.join(projectID, 'results', fn, '/') : null;
   if (projectID)
-    fs.mkdirSync(path.join(config.wd, savePath), { recursive: true });
+    fs.mkdirSync(path.join(rConfig.wd, savePath), { recursive: true });
 
   try {
     const wrapper = await r('services/R/associationWrapper.R', 'wrapper', {

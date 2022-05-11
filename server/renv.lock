@@ -2621,6 +2621,15 @@
         "askpass"
       ]
     },
+    "org.Hs.eg.db": {
+      "Package": "org.Hs.eg.db",
+      "Version": "3.14.0",
+      "Source": "Bioconductor",
+      "Hash": "c2973e555d388f8aca8857c314bfbd2e",
+      "Requirements": [
+        "AnnotationDbi"
+      ]
+    },
     "paletteer": {
       "Package": "paletteer",
       "Version": "1.4.0",
