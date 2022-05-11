@@ -36,10 +36,6 @@ COPY server/renv.lock /deploy/server/
 
 WORKDIR /deploy/server
 
-# set renv cache path to env from build arg
-# ARG RENV_PATHS_CACHE_HOST=~/Library/Caches/org.R-project.R/R/renv/cache
-# ENV RENV_PATHS_CACHE=$RENV_PATHS_CACHE_HOST
-
 RUN R -e "renv::restore()"
 # RUN R -e "renv:::renv_paths_cache()"
 
@@ -110,7 +106,6 @@ COPY server/renv.lock /deploy/server/
 
 WORKDIR /deploy/server
 
-# RUN R -e "renv:::renv_paths_cache()"
 RUN R -e "renv::restore()"
 
 # install python packages
