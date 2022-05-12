@@ -46,7 +46,7 @@ export default function MultiSelect({
       onChange={onChange}
       isMulti
       formatCreateLabel={(userInput) => `${placeholder}: ${userInput}`}
-    //   {...customStyle}
+      //   {...customStyle}
       {...rest}
     />
   );
