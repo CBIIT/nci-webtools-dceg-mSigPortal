@@ -20,11 +20,6 @@ export default function D3TreeLeaf({ width = 1000, height = 1000, ...props }) {
 
   useEffect(() => {
     if (plotRef.current && hierarchy) {
-      // const [plot] = createRadialForce(hierarchy, groupAttributesBySample, {
-      //   width,
-      //   height,
-      // });
-
       const [plot, csLegend, mutationsLegend] = createRadialTree(
         hierarchy,
         groupAttributesBySample,
@@ -50,200 +45,6 @@ export default function D3TreeLeaf({ width = 1000, height = 1000, ...props }) {
   );
 }
 
-export function createRadialForce(
-  data,
-  attributes,
-  {
-    width = 640, // outer width, in pixels
-    height = 400, // outer height, in pixels
-    margin = 60, // shorthand for margins
-    marginTop = margin, // top margin, in pixels
-    marginRight = margin, // right margin, in pixels
-    marginBottom = margin, // bottom margin, in pixels
-    marginLeft = margin, // left margin, in pixels
-    radius = Math.min(
-      width - marginLeft - marginRight,
-      height - marginTop - marginBottom
-    ) / 2, // outer radius
-    r = d3.scaleSqrt().range([4, 20]), // radius of nodes
-
-    fill = d3.scaleSequential(d3.interpolatePRGn), // fill for nodes    fillOpacity, // fill opacity for nodes
-    stroke = '#555', // stroke for links
-    strokeWidth = 1.5, // stroke width for links
-    strokeOpacity = 0.4, // stroke opacity for links
-    strokeLinejoin, // stroke line join for links
-    strokeLinecap, // stroke line cap for links
-  }
-) {
-  const root = d3
-    .tree()
-    .size([2 * Math.PI, radius])
-    .separation((a, b) => (a.parent == b.parent ? 1 : 2))(d3.hierarchy(data));
-  const links = root.links();
-  const nodes = root.descendants();
-  const maxDepth = d3.max(nodes.map((d) => d.depth));
-
-  const scale = d3
-    .scaleLinear()
-    .domain([0, maxDepth + 1])
-    .range([0, radius - 50]);
-
-  console.log(nodes.map((d) => scale(d.depth)));
-
-  console.log(root);
-
-  const simulation = d3
-    .forceSimulation(nodes)
-    .force(
-      'link',
-      d3
-        .forceLink(links)
-        .id((d) => d.id)
-        .distance(0)
-        .strength(0.5)
-    )
-    .force('charge', d3.forceManyBody().strength(-10))
-    .force('radial', d3.forceRadial((d) => scale(d.depth)).strength(0.5))
-    .force(
-      'collide',
-      d3
-        .forceCollide()
-        // @ts-ignore
-        .radius((d) => d.depth)
-        .strength(0.8)
-    );
-
-  const zoom = d3.zoom().scaleExtent([1, 5]).on('zoom', zoomed);
-
-  function zoomed({ transform }) {
-    d3.selectAll('#plot').attr('transform', transform);
-  }
-
-  const container = d3.create('div');
-  const svg = container
-    .append('svg')
-    .attr('viewBox', [-width / 2, -height / 2, width, height])
-    .call(zoom);
-
-  // const link = svg
-  //   .append('g')
-  //   .attr('id', 'plot')
-  //   .selectAll('line')
-  //   .data(links)
-  //   .join('line')
-  //   .attr('stroke', 'black');
-
-  // const node = svg
-  //   .append('g')
-  //   .attr('id', 'plot')
-  //   .selectAll('circle')
-  //   .data(nodes)
-  //   .join('circle')
-  //   .attr('stroke', '#fff')
-  //   .attr('stroke-opacity', 0.5)
-  //   .attr('fill', ({ data }) =>
-  //     data.name && attributes[data.name]
-  //       ? fill(attributes[data.name].Cosine_similarity)
-  //       : 'blue'
-  //   )
-  //   .attr('opacity', '0.6')
-  //   .attr('r', (d) => maxDepth * 2 - d.depth)
-  //   .call(drag(simulation));
-
-  // add lines
-  const link = svg
-    .append('g')
-    .attr('id', 'plot')
-    .attr('fill', 'none')
-    .attr('stroke', stroke)
-    .attr('stroke-opacity', strokeOpacity)
-    .attr('stroke-linecap', strokeLinecap)
-    .attr('stroke-linejoin', strokeLinejoin)
-    .attr('stroke-width', strokeWidth)
-    .selectAll('line')
-    .data(links)
-    .join('line')
-    .attr(
-      'd',
-      d3
-        .linkRadial()
-        .angle((d) => d.x)
-        .radius((d) => d.y)
-    );
-
-  // add sample nodes
-  const node = svg
-    .append('g')
-    .attr('id', 'plot')
-    .selectAll('a')
-    .data(nodes)
-    .join('a')
-    .attr(
-      'transform',
-      (d) => `rotate(${(d.x * 180) / Math.PI - 90}) translate(${d.y},0)`
-    );
-
-  // gather range of attributes
-  const mutations = Object.values(attributes).map((e) => e.Mutations);
-  const cs = Object.values(attributes).map((e) => e.Cosine_similarity);
-  const mutationMin = d3.min(mutations);
-  const mutationMax = d3.max(mutations);
-  const csMin = d3.min(cs);
-  const csMax = d3.max(cs);
-
-  // set size and color of nodes
-  node
-    .append('circle')
-    .attr('fill', ({ data }) =>
-      data.name && attributes[data.name]
-        ? fill.domain([csMin, csMax])(attributes[data.name].Cosine_similarity)
-        : stroke
-    )
-    .attr('r', ({ data }) =>
-      data.name && attributes[data.name]
-        ? r.domain([mutationMin, mutationMax])(attributes[data.name].Mutations)
-        : null
-    )
-    .call(drag(simulation));
-
-  simulation.on('tick', () => {
-    link
-      .attr('x1', (d) => d.source.x)
-      .attr('y1', (d) => d.source.y)
-      .attr('x2', (d) => d.target.x)
-      .attr('y2', (d) => d.target.y);
-
-    node.attr('cx', (d) => d.x).attr('cy', (d) => d.y);
-  });
-
-  function drag(simulation) {
-    function dragstarted(event, d) {
-      if (!event.active) simulation.alphaTarget(0.3).restart();
-      d.fx = d.x;
-      d.fy = d.y;
-    }
-
-    function dragged(event, d) {
-      d.fx = event.x;
-      d.fy = event.y;
-    }
-
-    function dragended(event, d) {
-      if (!event.active) simulation.alphaTarget(0);
-      d.fx = null;
-      d.fy = null;
-    }
-
-    return d3
-      .drag()
-      .on('start', dragstarted)
-      .on('drag', dragged)
-      .on('end', dragended);
-  }
-
-  return [container.node()];
-}
-
 // Copyright 2022 Observable, Inc.
 // Released under the ISC license.
 // https://observablehq.com/@d3/radial-tree
@@ -257,17 +58,13 @@ function createRadialTree(
     parentId = Array.isArray(data) ? (d) => d.parentId : null, // if tabular data, given a node d, returns its parent’s identifier
     children, // if hierarchical data, given a d in data, returns its children
     tree = d3.tree, // layout algorithm (typically d3.tree or d3.cluster)
-    separation = tree === d3.tree
-      ? (a, b) => (a.parent == b.parent ? 1 : 2) / a.depth
-      : (a, b) => (a.parent == b.parent ? 1 : 2),
+    separation = (a, b) => (a.parent == b.parent ? 1 : 2) / a.depth,
     sort, // how to sort nodes prior to layout (e.g., (a, b) => d3.descending(a.height, b.height))
     label, // given a node d, returns the display name
     title, // given a node d, returns its hover text
-    link, // given a node d, its link (if any)
-    linkTarget = '_blank', // the target attribute for links (if any)
     width = 640, // outer width, in pixels
     height = 400, // outer height, in pixels
-    margin = 60, // shorthand for margins
+    margin = 0, // shorthand for margins
     marginTop = margin, // top margin, in pixels
     marginRight = margin, // right margin, in pixels
     marginBottom = margin, // bottom margin, in pixels
@@ -304,13 +101,52 @@ function createRadialTree(
   if (sort != null) root.sort(sort);
 
   // Compute labels and titles.
-  const descendants = root.descendants();
-  const L = label == null ? null : descendants.map((d) => label(d.data, d));
+  const nodes = root.descendants();
+  const L = label == null ? null : nodes.map((d) => label(d.data, d));
+
+  const links = root.links();
 
   // Compute the layout.
   tree()
     .size([2 * Math.PI, radius])
     .separation(separation)(root);
+
+  // const simulation = d3
+  //   .forceSimulation(nodes)
+  //   .force(
+  //     'link',
+  //     d3
+  //       .forceLink(links)
+  //       .id((d) => d.id)
+  //       .distance(0)
+  //       .strength(1)
+  //   )
+  //   .force('charge', d3.forceManyBody().strength(-10));
+
+  const drag = (simulation) => {
+    function dragstarted(event, d) {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    }
+
+    function dragged(event, d) {
+      d.fx = event.x;
+      d.fy = event.y;
+    }
+
+    function dragended(event, d) {
+      if (!event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    }
+
+    return d3
+      .drag()
+      .on('start', dragstarted)
+      .on('drag', dragged)
+      .on('end', dragended);
+  };
 
   const zoom = d3.zoom().scaleExtent([1, 5]).on('zoom', zoomed);
 
@@ -330,7 +166,7 @@ function createRadialTree(
     .call(zoom);
 
   // add lines
-  svg
+  const link = svg
     .append('g')
     .attr('id', 'plot')
     .attr('fill', 'none')
@@ -340,7 +176,7 @@ function createRadialTree(
     .attr('stroke-linejoin', strokeLinejoin)
     .attr('stroke-width', strokeWidth)
     .selectAll('path')
-    .data(root.links())
+    .data(links)
     .join('path')
     .attr(
       'd',
@@ -348,20 +184,6 @@ function createRadialTree(
         .linkRadial()
         .angle((d) => d.x)
         .radius((d) => d.y)
-    );
-
-  // add sample nodes
-  const node = svg
-    .append('g')
-    .attr('id', 'plot')
-    .selectAll('a')
-    .data(root.descendants())
-    .join('a')
-    // .attr('xlink:href', link == null ? null : (d) => link(d.data, d))
-    // .attr('target', link == null ? null : linkTarget)
-    .attr(
-      'transform',
-      (d) => `rotate(${(d.x * 180) / Math.PI - 90}) translate(${d.y},0)`
     );
 
   // gather range of attributes
@@ -372,8 +194,19 @@ function createRadialTree(
   const csMin = d3.min(cs);
   const csMax = d3.max(cs);
 
-  // set size and color of nodes
-  node
+  // add sample nodes
+  const node = svg
+    .append('g')
+    .attr('id', 'plot')
+    .selectAll('a')
+    .data(nodes)
+    .join('a')
+    // .attr('xlink:href', link == null ? null : (d) => link(d.data, d))
+    // .attr('target', link == null ? null : linkTarget)
+    .attr(
+      'transform',
+      (d) => `rotate(${(d.x * 180) / Math.PI - 90}) translate(${d.y},0)`
+    )
     .append('circle')
     .attr('fill', ({ data }) =>
       data.name && attributes[data.name]
@@ -388,6 +221,16 @@ function createRadialTree(
     .on('mouseover', mouseover)
     .on('mousemove', mousemove)
     .on('mouseleave', mouseleave);
+  // .call(drag(simulation));
+
+  // simulation.on('tick', () => {
+  //   link
+  //     .attr('x1', (d) => d.source.x)
+  //     .attr('y1', (d) => d.source.y)
+  //     .attr('x2', (d) => d.target.x)
+  //     .attr('y2', (d) => d.target.y);
+  //   node.attr('cx', (d) => d.x).attr('cy', (d) => d.y);
+  // });
 
   const csLegend = Legend(fill.domain([csMin, csMax]), {
     title: 'Cosine Similarity',
