@@ -4,6 +4,7 @@ import * as d3 from 'd3';
 import cloneDeep from 'lodash/cloneDeep';
 import { useRecoilValue } from 'recoil';
 import { getGraphData, formState } from './treeLeaf.state';
+import { flextree } from 'd3-flextree';
 
 export default function D3TreeLeaf({ width = 1000, height = 1000, ...props }) {
   const { hierarchy, attributes } = cloneDeep(useRecoilValue(getGraphData));
@@ -73,9 +74,9 @@ function createRadialTree(
       width - marginLeft - marginRight,
       height - marginTop - marginBottom
     ) / 2, // outer radius
-    r = d3.scaleSqrt().range([4, 20]), // radius of nodes
+    r = d3.scaleSqrt().range([5, 20]), // radius of nodes
     padding = 1, // horizontal padding for first and last column
-    fill = d3.scaleSequential(d3.interpolatePRGn), // fill for nodes
+    fill = d3.scaleSequential(d3.interpolateViridis), // fill for nodes
     fillOpacity, // fill opacity for nodes
     stroke = '#555', // stroke for links
     strokeWidth = 1.5, // stroke width for links
@@ -100,28 +101,16 @@ function createRadialTree(
   // Sort the nodes.
   if (sort != null) root.sort(sort);
 
-  // Compute labels and titles.
-  const nodes = root.descendants();
-  const L = label == null ? null : nodes.map((d) => label(d.data, d));
-
-  const links = root.links();
-
   // Compute the layout.
-  tree()
+  const radialTree = tree()
     .size([2 * Math.PI, radius])
     .separation(separation)(root);
 
-  // const simulation = d3
-  //   .forceSimulation(nodes)
-  //   .force(
-  //     'link',
-  //     d3
-  //       .forceLink(links)
-  //       .id((d) => d.id)
-  //       .distance(0)
-  //       .strength(1)
-  //   )
-  //   .force('charge', d3.forceManyBody().strength(-10));
+  // Compute labels and titles.
+  const nodes = radialTree.descendants();
+  const L = label == null ? null : nodes.map((d) => label(d.data, d));
+
+  const links = radialTree.links();
 
   const drag = (simulation) => {
     function dragstarted(event, d) {
@@ -290,6 +279,52 @@ function createRadialTree(
       .text((d, i) => L[i]);
 
   return [container.node(), csLegend];
+}
+
+function createRadialTree2(
+  data,
+  attributes,
+  {
+    // data is either tabular (array of objects) or hierarchy (nested objects)
+    path, // as an alternative to id and parentId, returns an array identifier, imputing internal nodes
+    id = Array.isArray(data) ? (d) => d.id : null, // if tabular data, given a d in data, returns a unique identifier (string)
+    parentId = Array.isArray(data) ? (d) => d.parentId : null, // if tabular data, given a node d, returns its parent’s identifier
+    children, // if hierarchical data, given a d in data, returns its children
+    layout = flextree, // layout algorithm (typically d3.tree or d3.cluster)
+    separation = (a, b) => (a.parent == b.parent ? 1 : 2) / a.depth,
+    sort, // how to sort nodes prior to layout (e.g., (a, b) => d3.descending(a.height, b.height))
+    label, // given a node d, returns the display name
+    title, // given a node d, returns its hover text
+    width = 640, // outer width, in pixels
+    height = 400, // outer height, in pixels
+    margin = 0, // shorthand for margins
+    marginTop = margin, // top margin, in pixels
+    marginRight = margin, // right margin, in pixels
+    marginBottom = margin, // bottom margin, in pixels
+    marginLeft = margin, // left margin, in pixels
+    radius = Math.min(
+      width - marginLeft - marginRight,
+      height - marginTop - marginBottom
+    ) / 2, // outer radius
+    r = d3.scaleSqrt().range([5, 20]), // radius of nodes
+    padding = 1, // horizontal padding for first and last column
+    fill = d3.scaleSequential(d3.interpolateViridis), // fill for nodes
+    fillOpacity, // fill opacity for nodes
+    stroke = '#555', // stroke for links
+    strokeWidth = 1.5, // stroke width for links
+    strokeOpacity = 0.4, // stroke opacity for links
+    strokeLinejoin, // stroke line join for links
+    strokeLinecap, // stroke line cap for links
+    halo = '#fff', // color of label halo
+    haloWidth = 3, // padding around the labels
+  }
+) {
+  console.log(data);
+  const tree = layout.hierarchy(data);
+  console.log(tree);
+  layout(tree);
+  console.log(tree);
+  return [];
 }
 
 // Copyright 2021, Observable Inc.
