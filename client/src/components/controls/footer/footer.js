@@ -1,9 +1,8 @@
-import React from 'react';
+import React from "react";
 
 export function Footer() {
-
   return (
-    <footer className="py-2" style={{backgroundColor: '#003C6C'}}>
+    <footer className="py-2" style={{ backgroundColor: "#003C6C" }}>
       <div className="mx-5 pl-2 pr-4">
         <div className="mt-4 text-light text-center">
           <div className="footer-nav text-left">
@@ -31,8 +30,9 @@ export function Footer() {
                     className="footer-link text-light"
                     href="mailto:NCImSigPortalWebAdmin@mail.nih.gov"
                     target="_blank"
-                    >Contact Us</a
                   >
+                    Contact Us
+                  </a>
                 </div>
               </div>
               <div className="col-md-auto footer-nav-col">
@@ -42,16 +42,18 @@ export function Footer() {
                     className="footer-link text-light"
                     href="https://dceg.cancer.gov/"
                     target="_blank"
-                    >DCEG</a
                   >
+                    DCEG
+                  </a>
                 </div>
                 <div className="my-2">
                   <a
                     className="footer-link text-light"
                     href="https://prevention.cancer.gov/"
                     target="_blank"
-                    >DCP</a
                   >
+                    DCP
+                  </a>
                 </div>
                 {/* <!-- <div className="my-2">
                 <a
@@ -69,32 +71,45 @@ export function Footer() {
                     className="footer-link text-light"
                     href="https://www.cancer.gov/policies/accessibility"
                     target="_blank"
-                    >Accessibility</a
                   >
+                    Accessibility
+                  </a>
                 </div>
                 <div className="my-2">
                   <a
                     className="footer-link text-light"
                     href="https://www.cancer.gov/policies/disclaimer"
                     target="_blank"
-                    >Disclaimer</a
                   >
+                    Disclaimer
+                  </a>
                 </div>
                 <div className="my-2">
                   <a
                     className="footer-link text-light"
                     href="https://www.cancer.gov/policies/foia"
                     target="_blank"
-                    >FOIA</a
                   >
+                    FOIA
+                  </a>
                 </div>
                 <div className="my-2">
                   <a
                     className="footer-link text-light"
                     href="https://www.cancer.gov/policies/comments"
                     target="_blank"
-                    >Comment Policy</a
                   >
+                    Comment Policy
+                  </a>
+                </div>
+                <div className="my-2">
+                  <a
+                    className="footer-link text-light"
+                    href="https://www.hhs.gov/vulnerability-disclosure-policy/index.html"
+                    target="_blank"
+                  >
+                    HHS Vulnerability Disclosure
+                  </a>
                 </div>
               </div>
             </div>
@@ -107,32 +122,36 @@ export function Footer() {
                   className="footer-link text-light"
                   href="http://www.hhs.gov/"
                   target="_blank"
-                  >U.S. Department of Health and Human Services</a
                 >
+                  U.S. Department of Health and Human Services
+                </a>
               </div>
               <div className="col-sm-auto">
                 <a
                   className="footer-link text-light"
                   href="http://www.nih.gov"
                   target="_blank"
-                  >National Institutes of Health</a
                 >
+                  National Institutes of Health
+                </a>
               </div>
               <div className="col-sm-auto">
                 <a
                   className="footer-link text-light"
                   href="https://www.cancer.gov/"
                   target="_blank"
-                  >National Cancer Institute</a
                 >
+                  National Cancer Institute
+                </a>
               </div>
               <div className="col-sm-auto">
                 <a
                   className="footer-link text-light"
                   href="http://usa.gov"
                   target="_blank"
-                  >USA.gov</a
                 >
+                  USA.gov
+                </a>
               </div>
             </div>
           </div>
