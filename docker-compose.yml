@@ -12,14 +12,14 @@ services:
         ports: 
             - '8330:8330'
 
-    # frontend:
-    #     build: 
-    #         context: '.'
-    #         dockerfile: './docker/frontend.dockerfile'
-    #         args:
-    #             APP_PATH: /mutational-signatures
-    #     environment:
-    #         API_BASE_URL: http://backend:8330
-    #         APP_PATH: /mutational-signatures
-    #     ports: 
-    #         - '8331:80'
+    frontend:
+        build: 
+            context: '.'
+            dockerfile: './docker/frontend.dockerfile'
+            args:
+                APP_PATH: /mutational-signatures
+        environment:
+            API_BASE_URL: http://backend:8330
+            APP_PATH: /mutational-signatures
+        ports: 
+            - '8331:80'
