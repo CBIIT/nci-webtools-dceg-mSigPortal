@@ -2,7 +2,7 @@ import React from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plot from '../../../controls/plot/plot';
-import Select from '../../../controls/select/select';
+import CustomSelect from '../../../controls/select/select';
 import Description from '../../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as catalogActions } from '../../../../services/store/catalog';
@@ -161,7 +161,7 @@ export default function Comparison({ submitR }) {
         <LoadingOverlay active={loading} />
         <Row className="">
           <Col lg="auto">
-            <Select
+            <CustomSelect
               id="mscProfileName"
               label="Profile Name"
               value={profileName}
@@ -170,7 +170,7 @@ export default function Comparison({ submitR }) {
             />
           </Col>
           <Col lg="auto">
-            <Select
+            <CustomSelect
               id="mscRefSet1"
               label="Reference Signature Set 1"
               value={rsSet1}
@@ -179,7 +179,7 @@ export default function Comparison({ submitR }) {
             />
           </Col>
           <Col lg="auto">
-            <Select
+            <CustomSelect
               id="mscSigName1"
               label="Signature Name 1"
               value={signatureName1}
@@ -192,7 +192,7 @@ export default function Comparison({ submitR }) {
             />
           </Col>
           <Col lg="auto">
-            <Select
+            <CustomSelect
               id="mscSigSet2"
               label="Reference Signature Set 2"
               value={rsSet2}
@@ -201,7 +201,7 @@ export default function Comparison({ submitR }) {
             />
           </Col>
           <Col lg="auto">
-            <Select
+            <CustomSelect
               id="mscSetName2"
               label="Signature Name 2"
               value={signatureName2}

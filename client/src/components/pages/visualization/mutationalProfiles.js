@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 import Plot from '../../controls/plot/plot';
-import Select from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select';
 import Description from '../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
@@ -303,7 +303,7 @@ export default function MutationalProfiles() {
       <Form className="p-3">
         <Row>
           <Col lg="auto">
-            <Select
+            <CustomSelect
               id="mpSampleName"
               label="Sample Name"
               value={selectName}
@@ -312,7 +312,7 @@ export default function MutationalProfiles() {
             />
           </Col>
           <Col lg="auto">
-            <Select
+            <CustomSelect
               id="mpProfileType"
               label="Profile Type"
               value={selectProfile}
@@ -321,7 +321,7 @@ export default function MutationalProfiles() {
             />
           </Col>
           <Col lg="auto">
-            <Select
+            <CustomSelect
               id="mpMatrixSize"
               label="Matrix Size"
               value={selectMatrix}
@@ -330,7 +330,7 @@ export default function MutationalProfiles() {
             />
           </Col>
           <Col lg="auto">
-            <Select
+            <CustomSelect
               id="mpFilter"
               label="Filter"
               value={selectFilter}

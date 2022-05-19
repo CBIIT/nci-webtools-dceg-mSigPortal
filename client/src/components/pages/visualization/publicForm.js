@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Form, Button, Row, Col, Popover } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import Select from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
@@ -224,7 +224,7 @@ export default function PublicForm() {
   return (
     <Form>
       <LoadingOverlay active={loadingPublic} />
-      <Select
+      <CustomSelect
         className="mb-2"
         id="publicFormStudy"
         label="Study"
@@ -233,7 +233,7 @@ export default function PublicForm() {
         options={studyOptions}
         onChange={handleStudyChange}
       />
-      <Select
+      <CustomSelect
         className="mb-2"
         id="publicFromCancerType"
         label="Cancer Type or Group"
@@ -242,7 +242,7 @@ export default function PublicForm() {
         options={cancerTypeOptions}
         onChange={handleCancerChange}
       />
-      <Select
+      <CustomSelect
         className="mb-4"
         id="publicFormStrategy"
         label="Experimental Strategy"

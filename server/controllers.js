@@ -16,7 +16,8 @@ const archiver = require('archiver');
 
 if (config.aws) AWS.config.update(config.aws);
 
-const dataArgs = {
+// config info for R functions
+const rConfig = {
   s3Data: config.data.s3,
   bucket: config.data.bucket,
   localData: path.resolve(config.data.localData),
@@ -196,14 +197,14 @@ async function visualizationWrapper(req, res, next) {
   // create directory for results if needed
   const savePath = projectID ? path.join(projectID, 'results', fn, '/') : null;
   if (projectID)
-    fs.mkdirSync(path.join(dataArgs.wd, savePath), { recursive: true });
+    fs.mkdirSync(path.join(rConfig.wd, savePath), { recursive: true });
 
   try {
     const wrapper = await r('services/R/visualizeWrapper.R', 'wrapper', {
       fn,
       args,
-      dataArgs: {
-        ...dataArgs,
+      config: {
+        ...rConfig,
         savePath,
       },
     });
@@ -317,7 +318,7 @@ async function visualizationDownloadPublic(req, res, next) {
   try {
     await r('services/R/visualizeWrapper.R', 'downloadPublicData', {
       args,
-      dataArgs: { ...dataArgs, savePath },
+      config: { ...rConfig, savePath },
     });
 
     const file = path.resolve(
@@ -349,14 +350,14 @@ async function explorationWrapper(req, res, next) {
   // create directory for results if needed
   const savePath = projectID ? path.join(projectID, 'results', fn, '/') : null;
   if (projectID)
-    fs.mkdirSync(path.join(dataArgs.wd, savePath), { recursive: true });
+    fs.mkdirSync(path.join(rConfig.wd, savePath), { recursive: true });
 
   try {
     const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
       fn,
       args,
-      dataArgs: {
-        ...dataArgs,
+      config: {
+        ...rConfig,
         savePath,
         projectID,
       },
@@ -386,14 +387,14 @@ async function associationWrapper(req, res, next) {
   // create directory for results if needed
   const savePath = projectID ? path.join(projectID, 'results', fn, '/') : null;
   if (projectID)
-    fs.mkdirSync(path.join(dataArgs.wd, savePath), { recursive: true });
+    fs.mkdirSync(path.join(rConfig.wd, savePath), { recursive: true });
 
   try {
     const wrapper = await r('services/R/associationWrapper.R', 'wrapper', {
       fn,
       args,
-      dataArgs: {
-        ...dataArgs,
+      config: {
+        ...rConfig,
         savePath: savePath,
       },
     });
@@ -738,7 +739,7 @@ async function downloadWorkspace(req, res, next) {
   const { state, id } = req.body;
   const session = path.resolve(config.results.folder, id);
   const archive = archiver('zip', {
-    zlib: { level: 6 } // Sets the compression level.
+    zlib: { level: 6 }, // Sets the compression level.
   });
 
   if (fs.existsSync(session)) {
@@ -748,13 +749,13 @@ async function downloadWorkspace(req, res, next) {
         JSON.stringify(state)
       );
 
-      archive.on('finish', function(error) {
+      archive.on('finish', function (error) {
         return res.end();
       });
       archive
         .directory(session, false)
-        .on('error', function(err) {
-            throw err;
+        .on('error', function (err) {
+          throw err;
         })
         .pipe(res);
       archive.finalize();

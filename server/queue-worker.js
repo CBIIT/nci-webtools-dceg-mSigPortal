@@ -114,7 +114,7 @@ async function processMessage(params) {
     const directory = path.resolve(config.results.folder, id);
     await fs.promises.mkdir(directory, { recursive: true });
 
-    const dataArgs = {
+    const rConfig = {
       s3Data: config.data.s3,
       bucket: config.data.bucket,
       localData: path.resolve(config.data.localData),
@@ -230,7 +230,7 @@ async function processMessage(params) {
       'getReferenceSignatureSets',
       {
         args: { profileType: selectProfile },
-        dataArgs,
+        config,
       }
     );
 
@@ -283,7 +283,7 @@ async function processMessage(params) {
     // Profiler Summary
     try {
       const profilerSummaryPath = path.join(id, 'results/profilerSummary/');
-      await fs.promises.mkdir(path.join(dataArgs.wd, profilerSummaryPath), {
+      await fs.promises.mkdir(path.join(config.wd, profilerSummaryPath), {
         recursive: true,
       });
       const profilerSummary = await r(
@@ -294,8 +294,8 @@ async function processMessage(params) {
           args: {
             matrixList: JSON.stringify(matrixList),
           },
-          dataArgs: {
-            ...dataArgs,
+          config: {
+            ...rConfig,
             savePath: profilerSummaryPath,
           },
         }
@@ -321,7 +321,7 @@ async function processMessage(params) {
     // cosinse similarity within
     try {
       const csWithinPath = path.join(id, 'results/cosineSimilarityWithin/');
-      await fs.promises.mkdir(path.join(dataArgs.wd, csWithinPath), {
+      await fs.promises.mkdir(path.join(config.wd, csWithinPath), {
         recursive: true,
       });
       const csWithin = await r('services/R/visualizeWrapper.R', 'wrapper', {
@@ -333,8 +333,8 @@ async function processMessage(params) {
               row.Matrix_Size == selectMatrix
           )[0].Path,
         },
-        dataArgs: {
-          ...dataArgs,
+        config: {
+          ...rConfig,
           savePath: csWithinPath,
         },
       });
@@ -360,7 +360,7 @@ async function processMessage(params) {
     // cosinse similarity ref
     try {
       const csRefPath = path.join(id, 'results/cosineSimilarityRefSig/');
-      await fs.promises.mkdir(path.join(dataArgs.wd, csRefPath), {
+      await fs.promises.mkdir(path.join(config.wd, csRefPath), {
         recursive: true,
       });
       const csRef = await r('services/R/visualizeWrapper.R', 'wrapper', {
@@ -375,8 +375,8 @@ async function processMessage(params) {
                 defaultMatrix(selectProfile, ['96', '78', '83'])
           )[0].Path,
         },
-        dataArgs: {
-          ...dataArgs,
+        config: {
+          ...rConfig,
           savePath: csRefPath,
         },
       });
@@ -403,7 +403,7 @@ async function processMessage(params) {
     // cosinse similarity public
     try {
       const csPublicPath = path.join(id, 'results/cosineSimilarityPublic/');
-      await fs.promises.mkdir(path.join(dataArgs.wd, csPublicPath), {
+      await fs.promises.mkdir(path.join(config.wd, csPublicPath), {
         recursive: true,
       });
       const csPublic = await r('services/R/visualizeWrapper.R', 'wrapper', {
@@ -418,8 +418,8 @@ async function processMessage(params) {
           cancerType: 'Lung-AdenoCA',
           profileName: selectProfile + selectMatrix,
         },
-        dataArgs: {
-          ...dataArgs,
+        config: {
+          ...rConfig,
           savePath: csPublicPath,
         },
       });
@@ -446,7 +446,7 @@ async function processMessage(params) {
     // mutational pattern
     try {
       const mpPath = path.join(id, 'results/mutationalPattern/');
-      await fs.promises.mkdir(path.join(dataArgs.wd, mpPath), {
+      await fs.promises.mkdir(path.join(config.wd, mpPath), {
         recursive: true,
       });
       const mutationalPattern = await r(
@@ -461,8 +461,8 @@ async function processMessage(params) {
             proportion: parseFloat(0.8),
             pattern: 'NCG>NTG',
           },
-          dataArgs: {
-            ...dataArgs,
+          config: {
+            ...rConfig,
             savePath: mpPath,
           },
         }
@@ -489,7 +489,7 @@ async function processMessage(params) {
     // profile comparison within
     try {
       const pcWithinPath = path.join(id, 'results/profileComparisonWithin/');
-      await fs.promises.mkdir(path.join(dataArgs.wd, pcWithinPath), {
+      await fs.promises.mkdir(path.join(config.wd, pcWithinPath), {
         recursive: true,
       });
       const profileComparisonWithin = await r(
@@ -508,8 +508,8 @@ async function processMessage(params) {
                   defaultMatrix(selectProfile, ['96', '78', '83'])
             )[0].Path,
           },
-          dataArgs: {
-            ...dataArgs,
+          config: {
+            ...rConfig,
             savePath: pcWithinPath,
           },
         }
@@ -536,7 +536,7 @@ async function processMessage(params) {
     // profile comparison ref
     try {
       const pcRefPath = path.join(id, 'results/profileComparisonRefSig/');
-      await fs.promises.mkdir(path.join(dataArgs.wd, pcRefPath), {
+      await fs.promises.mkdir(path.join(config.wd, pcRefPath), {
         recursive: true,
       });
 
@@ -548,7 +548,7 @@ async function processMessage(params) {
             profileType: selectProfile,
             signatureSetName: refSignatureSetOptions[0],
           },
-          dataArgs,
+          config,
         }
       );
 
@@ -569,8 +569,8 @@ async function processMessage(params) {
                   defaultMatrix(selectProfile, ['96', '78', '83'])
             )[0].Path,
           },
-          dataArgs: {
-            ...dataArgs,
+          config: {
+            ...rConfig,
             savePath: pcRefPath,
           },
         }
@@ -599,7 +599,7 @@ async function processMessage(params) {
     // profile comparison public
     try {
       const pcPubPath = path.join(id, 'results/profileComparisonPublic/');
-      await fs.promises.mkdir(path.join(dataArgs.wd, pcPubPath), {
+      await fs.promises.mkdir(path.join(config.wd, pcPubPath), {
         recursive: true,
       });
       const profileComparisonPublic = await r(
@@ -619,8 +619,8 @@ async function processMessage(params) {
             cancerType: 'Lung-AdenoCA',
             publicSample: 'SP53073',
           },
-          dataArgs: {
-            ...dataArgs,
+          config: {
+            ...rConfig,
             savePath: pcPubPath,
           },
         }
@@ -647,7 +647,7 @@ async function processMessage(params) {
     // pca
     try {
       const pcaPath = path.join(id, 'results/pca/');
-      await fs.promises.mkdir(path.join(dataArgs.wd, pcaPath), {
+      await fs.promises.mkdir(path.join(config.wd, pcaPath), {
         recursive: true,
       });
       const pca = await r('services/R/visualizeWrapper.R', 'wrapper', {
@@ -662,8 +662,8 @@ async function processMessage(params) {
                 defaultMatrix(selectProfile, ['96', '78', '83'])
           )[0].Path,
         },
-        dataArgs: {
-          ...dataArgs,
+        config: {
+          ...rConfig,
           savePath: pcaPath,
         },
       });
@@ -689,7 +689,7 @@ async function processMessage(params) {
     // pca public
     try {
       const pcaPublicPath = path.join(id, 'results/pcaWithPublic/');
-      await fs.promises.mkdir(path.join(dataArgs.wd, pcaPublicPath), {
+      await fs.promises.mkdir(path.join(config.wd, pcaPublicPath), {
         recursive: true,
       });
       const pcaWithPublic = await r(
@@ -707,8 +707,8 @@ async function processMessage(params) {
             cancerType: 'Lung-AdenoCA',
             profileName: selectProfile + selectMatrix,
           },
-          dataArgs: {
-            ...dataArgs,
+          config: {
+            ...rConfig,
             savePath: pcaPublicPath,
           },
         }
@@ -739,7 +739,7 @@ async function processMessage(params) {
     // kataegis
     try {
       const kataegisPath = path.join(id, 'results/kataegis/');
-      await fs.promises.mkdir(path.join(dataArgs.wd, kataegisPath), {
+      await fs.promises.mkdir(path.join(config.wd, kataegisPath), {
         recursive: true,
       });
       const kataegis = await r('services/R/visualizeWrapper.R', 'wrapper', {
@@ -751,8 +751,8 @@ async function processMessage(params) {
           max: parseInt(100),
           chromosome: 'None',
         },
-        dataArgs: {
-          ...dataArgs,
+        config: {
+          ...rConfig,
           savePath: kataegisPath,
         },
       });

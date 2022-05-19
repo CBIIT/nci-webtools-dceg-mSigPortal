@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { RecoilRoot } from 'recoil';
 import { HashRouter as Router, Route } from 'react-router-dom';
 import { Navbar } from './controls/navbar/navbar';
 import Home from './pages/home/home';
@@ -187,7 +188,7 @@ export default function App() {
   return (
     <>
       <Header />
-      <main>
+      <RecoilRoot>
         <Router>
           <ErrorModal />
           <SuccessModal />
@@ -202,7 +203,7 @@ export default function App() {
           <Route path="/publications" component={Publications} />
           <Route path="/faq" component={Faq} />
         </Router>
-      </main>
+      </RecoilRoot>
       <Footer />
     </>
   );

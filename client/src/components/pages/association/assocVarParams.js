@@ -14,7 +14,7 @@ import {
   faMinus,
   faPlus,
 } from '@fortawesome/free-solid-svg-icons';
-import Select from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select';
 
 const { Group, Label, Check, Control } = Form;
 
@@ -125,7 +125,7 @@ export default function AssocVarParams({
         }`}
       >
         <Col md="auto">
-          <Select
+          <CustomSelect
             disabled={loadingData || loadingParams || loadingCalculate || name}
             id={'source-' + index}
             label="Variable Source"
@@ -135,7 +135,7 @@ export default function AssocVarParams({
           />
         </Col>
         <Col md="auto">
-          <Select
+          <CustomSelect
             disabled={loadingData || loadingParams || loadingCalculate || name}
             id={'type-' + index}
             label="Data Type"
@@ -145,7 +145,7 @@ export default function AssocVarParams({
           />
         </Col>
         <Col md="auto">
-          <Select
+          <CustomSelect
             disabled={loadingData || loadingParams || loadingCalculate || name}
             id={'assocVariable-' + index}
             label="Variable Name"
@@ -261,7 +261,7 @@ export default function AssocVarParams({
                     />
                   </Button>
                 </OverlayTrigger>{' '}
-                <Select
+                <CustomSelect
                   className="d-inline-flex mb-0"
                   disabled={
                     loadingData ||

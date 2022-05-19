@@ -1,7 +1,6 @@
 import React from 'react';
 
 export function Header() {
-
   return (
     <header className="bg-light">
       <div>
@@ -14,8 +13,9 @@ export function Header() {
             bg-primary-dark
             text-center
           "
-          >Skip to Main Content</a
         >
+          Skip to Main Content
+        </a>
         <div className="ml-4 mr-5">
           <div className="p-2 d-none d-sm-block">
             <a href="https://dceg.cancer.gov/" target="_blank">

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolderMinus } from '@fortawesome/free-solid-svg-icons';
-import Select from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as exposureActions } from '../../../services/store/exposure';
 import { actions as modalActions } from '../../../services/store/modal';
@@ -324,7 +324,7 @@ export default function PublicForm({
           <Row>
             <Col>
               <Group>
-                <Select
+                <CustomSelect
                   disabled={loading || submitted || !studyOptions.length}
                   id="expStudyUser"
                   label="Study"
@@ -338,7 +338,7 @@ export default function PublicForm({
           <Row>
             <Col>
               <Group>
-                <Select
+                <CustomSelect
                   disabled={loading || submitted || !rsSetOptions.length}
                   id="exposureSignatureSet"
                   label="Reference Signature Set"
@@ -420,7 +420,7 @@ export default function PublicForm({
       <Row>
         <Col>
           <Group>
-            <Select
+            <CustomSelect
               disabled={loading || submitted}
               id="exposureGenome"
               label="Genome"

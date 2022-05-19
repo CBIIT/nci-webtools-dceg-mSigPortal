@@ -12,7 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { actions as associationActions } from '../../../services/store/association';
 import { actions as modalActions } from '../../../services/store/modal';
-import Select from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import AssocVarParams from './assocVarParams';
 import Plot from '../../controls/plot/plot';
@@ -324,7 +324,7 @@ export default function Univariable() {
             style={{ maxWidth: '1720px' }}
           >
             <Col md="auto" lg="auto">
-              <Select
+              <CustomSelect
                 disabled={
                   loadingData ||
                   loadingParams ||
@@ -487,7 +487,7 @@ export default function Univariable() {
                       </Group>
                     </Col>
                     {/* <Col md="3">
-                      <Select
+                      <CustomSelect
                         disabled={
                           loadingData ||
                           loadingParams ||
@@ -513,7 +513,7 @@ export default function Univariable() {
               <Col lg="auto">
                 <fieldset className="border rounded p-2">
                   <legend className="font-weight-bold">Method</legend>
-                  <Select
+                  <CustomSelect
                     aria-label="Method"
                     className="mb-0"
                     disabled={
@@ -602,7 +602,7 @@ export default function Univariable() {
               </p>
               <Row className="justify-content-center">
                 <Col md="auto">
-                  <Select
+                  <CustomSelect
                     disabled={loadingData || loadingParams || loadingCalculate}
                     id="signature"
                     label="Signature Name"

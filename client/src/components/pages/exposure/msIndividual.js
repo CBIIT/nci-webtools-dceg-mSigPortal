@@ -6,7 +6,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { actions as exposureActions } from '../../../services/store/exposure';
 import { actions as modalActions } from '../../../services/store/modal';
 import Plot from '../../controls/plot/plot';
-import Select from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select';
 import Debug from '../../controls/debug/debug';
 import { NavHashLink } from 'react-router-hash-link';
 
@@ -60,7 +60,7 @@ export default function MSIndividual({ calculateIndividual }) {
         <Row className="">
           <Col lg="auto">
             <Group>
-              <Select
+              <CustomSelect
                 disabled={
                   source == 'public'
                     ? !publicSampleOptions.length

@@ -6,7 +6,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { actions as exposureActions } from '../../../services/store/exposure';
 import { actions as modalActions } from '../../../services/store/modal';
 import Plot from '../../controls/plot/plot';
-import Select from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select';
 
 const actions = { ...exposureActions, ...modalActions };
 
@@ -35,7 +35,7 @@ export default function MsBurden({ calculateBurden }) {
         <LoadingOverlay active={loading} />
         <Row>
           <Col lg="auto">
-            <Select
+            <CustomSelect
               className="mb-2"
               disabled={source == 'user' && !userNameOptions.length}
               id="acrossSignatureName"
