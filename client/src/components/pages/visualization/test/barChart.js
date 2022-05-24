@@ -5,33 +5,31 @@ import Plot from "react-plotly.js";
 
 export default function BarChart() {
   console.log(barData);
-  var traceCnt = barData[0].contributions;
-  console.log(traceCnt);
   const traces = [];
   const valuesX = [];
   const valuesY = [];
 
-  for (let i = 0; i < barData.length; i++) {
+  for (let i = 0; i < barData[0].contributions.length; i++) {
     valuesX[i] = [];
     valuesY[i] = [];
-    for (let j = 0; j < barData[i].contributions.length; j++) {
-      valuesY[i].push(barData[i].contributions[j]);
-      valuesX[i].push(barData[i].mutationType);
+    for (let j = 0; j < barData.length; j++) {
+      valuesX[i].push(barData[j].mutationType);
+      valuesY[i].push(barData[j].contributions[i]);
     }
   }
 
-  for (let i = 0; i < barData.length; i++) {
+  console.log(valuesX);
+  console.log(valuesY);
+
+  for (let i = 0; i < 6; i++) {
     traces.push({
       x: valuesX[i],
       y: valuesY[i],
       type: "bar",
-      name: valuesX[i][0],
-      //text: valuesY[i].map(String),
+      name: valuesX[i][i],
+      text: valuesY[i].map(String),
     });
   }
-
-  console.log(traces);
-
   var xValue = ["A"];
   var xValue2 = ["F", "G", "H", "K", "L"];
   var xValue3 = ["M", "N", "O", "P", "J"];
