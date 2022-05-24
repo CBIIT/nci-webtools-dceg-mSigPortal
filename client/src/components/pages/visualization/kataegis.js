@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { Form, Row, Col, Button } from 'react-bootstrap';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import Plot from '../../controls/plot/plot';
-import CustomSelect from '../../controls/select/select';
-import Description from '../../controls/description/description';
-import KataegisTable from './kataegisTable';
-import { useSelector, useDispatch } from 'react-redux';
-import { actions as visualizationActions } from '../../../services/store/visualization';
-import { actions as modalActions } from '../../../services/store/modal';
-import { NavHashLink } from 'react-router-hash-link';
+import React, { useState } from "react";
+import { Form, Row, Col, Button } from "react-bootstrap";
+import { LoadingOverlay } from "../../controls/loading-overlay/loading-overlay";
+import Plot from "../../controls/plot/plot";
+import CustomSelect from "../../controls/select/select";
+import Description from "../../controls/description/description";
+import KataegisTable from "./kataegisTable";
+import { useSelector, useDispatch } from "react-redux";
+import { actions as visualizationActions } from "../../../services/store/visualization";
+import { actions as modalActions } from "../../../services/store/modal";
+import { NavHashLink } from "react-router-hash-link";
 
 const actions = { ...visualizationActions, ...modalActions };
 const { Group, Check, Label, Control } = Form;
@@ -44,12 +44,12 @@ export default function Kataegis({ submitR }) {
     mergeKataegis({
       loading: true,
       err: false,
-      plotPath: '',
+      plotPath: "",
       kataegisData: [],
     });
 
     try {
-      const response = await submitR('kataegis', {
+      const response = await submitR("kataegis", {
         sample: sample,
         highlight: highlight,
         min: parseInt(min),
@@ -72,8 +72,8 @@ export default function Kataegis({ submitR }) {
           });
         } else {
           mergeKataegis({
-            plotPath: '',
-            txtPath: '',
+            plotPath: "",
+            txtPath: "",
             err: error || uncaughtError,
             kataegisData: [],
             loading: false,
@@ -88,7 +88,7 @@ export default function Kataegis({ submitR }) {
 
   return (
     <div>
-      {source == 'user' && inputFormat == 'vcf' ? (
+      {source == "user" && inputFormat == "vcf" ? (
         <div className="bg-white border rounded">
           <Description
             className="p-3"
@@ -97,8 +97,9 @@ export default function Kataegis({ submitR }) {
               <>
                 <span>
                   Kataegis is a localized substitution hypermutation event,
-                  often characterized by clusters of C>T and/or C>G mutations,
-                  commonly at TpCpN trinucleotides (APOBEC mutations). Click{' '}
+                  often characterized by clusters of C&#x3c;T and/or C&#x3c;G
+                  mutations, commonly at TpCpN trinucleotides (APOBEC
+                  mutations). Click{" "}
                   <NavHashLink to="/faq#kataegis">here</NavHashLink> for
                   additional information about kataegis.
                 </span>
@@ -186,10 +187,10 @@ export default function Kataegis({ submitR }) {
                   label="Chromosome"
                   value={chromosome}
                   options={[
-                    'None',
-                    ...[...Array(23).keys()].slice(1).map((chr) => 'chr' + chr),
-                    'chrX',
-                    'chrY',
+                    "None",
+                    ...[...Array(23).keys()].slice(1).map((chr) => "chr" + chr),
+                    "chrX",
+                    "chrY",
                   ]}
                   onChange={(chromosome) =>
                     mergeKataegis({
@@ -228,8 +229,8 @@ export default function Kataegis({ submitR }) {
                 <hr />
                 <Plot
                   className="p-3"
-                  downloadName={plotPath.split('/').slice(-1)[0]}
-                  plotPath={'api/results/' + plotPath}
+                  downloadName={plotPath.split("/").slice(-1)[0]}
+                  plotPath={"api/results/" + plotPath}
                   txtPath={txtPath ? `api/results/${txtPath}` : null}
                 />
                 <p className="p-3">
