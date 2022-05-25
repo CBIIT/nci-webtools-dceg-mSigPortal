@@ -45,7 +45,7 @@ export default function BarChart() {
       marker: { color: colors[mutation] },
       x: signatures.map((e) => e.mutationType),
       y: signatures.map((e) => e.contribution),
-      showlegend: false,
+      //showlegend: false,
     })
   );
 
@@ -70,12 +70,29 @@ export default function BarChart() {
       xref: "x",
       yref: "paper",
       x0: signatures.map((e) => e.mutationType)[0],
-      y0: 0.53,
+      y0: 1.03,
       x1: signatures.map((e) => e.mutationType)[15],
-      y1: 0.5,
+      y1: 1,
       fillcolor: colors[mutation],
       line: {
         width: 0,
+      },
+    })
+  );
+
+  const annotations = Object.entries(groupByMutation).map(
+    ([mutation, signatures]) => ({
+      xref: "x",
+      yref: "paper",
+      x: signatures.map((e) => e.mutationType)[8],
+      xanchor: "bottom",
+      y: 1.05,
+      yanchor: "bottom",
+      text: mutation,
+      showarrow: false,
+      font: {
+        color: colors[mutation],
+        text: "bold",
       },
     })
   );
@@ -85,45 +102,50 @@ export default function BarChart() {
   console.log(data2);
   console.log(shapes);
 
-  const groups = Object.entries(groupByMutation);
-  for (let i = 0; i < groups.length; i++) {
-    valueTopX.push(groups[i][0]);
-    traces[i] = [];
-    valuesX[i] = [];
-    valuesY[i] = [];
-    for (let k = 0; k < groups[i][1].length; k++) {
-      valuesX[i].push(groups[i][1][k].mutationType);
-      valuesY[i].push(groups[i][1][k].contribution);
-      traces[i].push({
-        x: valuesX[i],
-        y: valuesY[i],
-        type: "bar",
-        name: groups[i][0],
-      });
-    }
-  }
+  // const groups = Object.entries(groupByMutation);
+  // for (let i = 0; i < groups.length; i++) {
+  //   valueTopX.push(groups[i][0]);
+  //   traces[i] = [];
+  //   valuesX[i] = [];
+  //   valuesY[i] = [];
+  //   for (let k = 0; k < groups[i][1].length; k++) {
+  //     valuesX[i].push(groups[i][1][k].mutationType);
+  //     valuesY[i].push(groups[i][1][k].contribution);
+  //     traces[i].push({
+  //       x: valuesX[i],
+  //       y: valuesY[i],
+  //       type: "bar",
+  //       name: groups[i][0],
+  //     });
+  //   }
+  // }
 
-  console.log(groups);
-  console.log(traces);
+  //console.log(groups);
+  //console.log(traces);
 
   var layout = {
     grid: {
-      rows: 2,
+      //rows: 2,
       columns: 1,
       roworder: "bottom to top",
       //subplots: [["xy"], ["xy2"]],
       ygap: 0.1,
     },
-    vertical_spacing: 0.05,
-    xaxis: { showline: true, tickangle: -90 },
-    yaxis: {
-      //  title: 'Percentage of Single Base Substitution',
-      tickformat: ".1%",
+    xaxis: {
+      title: "Substitution",
+      showline: true,
+      tickangle: -90,
       automargin: true,
+    },
+    yaxis: {
+      title: "Mutation probability",
+      //tickformat: ".1%",
+      autorange: true,
     },
     yaxis2: { visible: false, scaleanchor: "y", automargin: true },
     xaxis2: { visible: false },
     shapes: shapes,
+    annotations: annotations,
   };
 
   return (
