@@ -45,6 +45,7 @@ export default function BarChart() {
       marker: { color: colors[mutation] },
       x: signatures.map((e) => e.mutationType),
       y: signatures.map((e) => e.contribution),
+      showlegend: false,
     })
   );
 
@@ -63,19 +64,26 @@ export default function BarChart() {
     })
   );
 
-  const data = [...data1, ...data2];
+  const shapes = Object.entries(groupByMutation).map(
+    ([mutation, signatures]) => ({
+      type: "rect",
+      xref: "x",
+      yref: "paper",
+      x0: signatures.map((e) => e.mutationType)[0],
+      y0: 0.53,
+      x1: signatures.map((e) => e.mutationType)[15],
+      y1: 0.5,
+      fillcolor: colors[mutation],
+      line: {
+        width: 0,
+      },
+    })
+  );
+
+  const data = [...data1];
   console.log(data);
   console.log(data2);
-  // Object.entries(groupByMutation).forEach(([key, value]) => {
-  //   valueTopX.push(key);
-  //   console.log(value.length);
-
-  //   value.forEach((element, index) => {
-  //     valuesX.push(element.mutationType);
-  //     valuesY.push(element.contribution);
-  //     console.log(element);
-  //   });
-  // });
+  console.log(shapes);
 
   const groups = Object.entries(groupByMutation);
   for (let i = 0; i < groups.length; i++) {
@@ -98,119 +106,24 @@ export default function BarChart() {
   console.log(groups);
   console.log(traces);
 
-  var xValue = ["A"];
-  var xValue2 = ["F", "G", "H", "K", "L"];
-  var xValue3 = ["M", "N", "O", "P", "J"];
-
-  var yValue = [20, 40, 10, 15, 15];
-  var yValue2 = [15, 5, 25, 15, 80];
-
-  var trace1 = {
-    x: xValue,
-    y: yValue,
-
-    type: "bar",
-    name: "Blue",
-    text: yValue.map(String),
-    textposition: "auto",
-    hoverinfo: "none",
-    marker: {
-      color: "blue",
-    },
-  };
-
-  var trace2 = {
-    x: xValue2,
-    y: yValue2,
-
-    type: "bar",
-    name: "Orange",
-    text: yValue2.map(String),
-    textposition: "auto",
-    hoverinfo: "none",
-    marker: {
-      color: "orange",
-    },
-  };
-
-  var trace3 = {
-    x: xValue3,
-    y: yValue2,
-
-    type: "bar",
-    name: "Green",
-    text: yValue2.map(String),
-    textposition: "auto",
-    hoverinfo: "none",
-    marker: {
-      color: "green",
-    },
-  };
-
-  var trace4 = {
-    x: xValue,
-    y: [10],
-    text: "A>E",
-    textposition: "auto",
-    xaxis: "x2",
-    yaxis: "y2",
-    type: "bar",
-    marker: {
-      color: "blue",
-    },
-    showlegend: false,
-  };
-  var trace5 = {
-    x: xValue2,
-    y: [10],
-    text: "F>L",
-    textposition: "auto",
-    xaxis: "x2",
-    yaxis: "y2",
-    type: "bar",
-    marker: {
-      color: "orange",
-    },
-    showlegend: false,
-  };
-
-  var trace6 = {
-    x: xValue3,
-    y: [10],
-    text: "M>J",
-    textposition: "auto",
-    xaxis: "x2",
-    yaxis: "y2",
-    type: "bar",
-    marker: {
-      color: "green",
-    },
-    showlegend: false,
-  };
-
-  // var data = [
-  //   traces[0][0],
-  //   traces[1][0],
-  //   traces[2][0],
-  //   traces[3][0],
-  //   traces[4][0],
-  //   traces[5][0],
-  // ];
-
   var layout = {
     grid: {
       rows: 2,
       columns: 1,
       roworder: "bottom to top",
+      //subplots: [["xy"], ["xy2"]],
       ygap: 0.1,
     },
+    vertical_spacing: 0.05,
     xaxis: { showline: true, tickangle: -90 },
     yaxis: {
       //  title: 'Percentage of Single Base Substitution',
       tickformat: ".1%",
+      automargin: true,
     },
-    yaxis2: { visible: false, scaleanchor: "y" },
+    yaxis2: { visible: false, scaleanchor: "y", automargin: true },
     xaxis2: { visible: false },
+    shapes: shapes,
   };
 
   return (
