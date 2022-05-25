@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 
 export function Footer() {
   return (
-    <footer className="py-2" style={{ backgroundColor: "#003C6C" }}>
+    <footer className="py-2" style={{ backgroundColor: '#003C6C' }}>
       <div className="mx-5 pl-2 pr-4">
         <div className="mt-4 text-light text-center">
           <div className="footer-nav text-left">
