@@ -2,7 +2,10 @@ import { atom, selector } from 'recoil';
 import axios from 'axios';
 import sigPatternData from './sigPatternData.json';
 
-export const defaultFormState = { showLabels: false };
+export const defaultFormState = {
+  showLabels: false,
+  color: { label: '', value: '', continuous: false },
+};
 
 export const formState = atom({
   key: 'treeLeaf.formState',

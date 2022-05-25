@@ -4,14 +4,13 @@ import * as d3 from 'd3';
 import cloneDeep from 'lodash/cloneDeep';
 import { useRecoilValue } from 'recoil';
 import { getGraphData, formState } from './treeLeaf.state';
-import { flextree } from 'd3-flextree';
 
 export default function D3TreeLeaf({ width = 1000, height = 1000, ...props }) {
   const { hierarchy, attributes } = cloneDeep(useRecoilValue(getGraphData));
   const form = useRecoilValue(formState);
 
   const plotRef = useRef(null);
-  const csLegendRef = useRef(null);
+  const colorLegendRef = useRef(null);
   // const mutationsLegendRef = useRef(null);
 
   const groupAttributesBySample = attributes.reduce(
@@ -21,25 +20,25 @@ export default function D3TreeLeaf({ width = 1000, height = 1000, ...props }) {
 
   useEffect(() => {
     if (plotRef.current && hierarchy) {
-      const [plot, csLegend, mutationsLegend] = createRadialTree(
+      const [plot, colorLegend, mutationsLegend] = createRadialTree(
         hierarchy,
         groupAttributesBySample,
+        form,
         {
-          label: (d) => (form.showLabels ? d.name : ''),
           width,
           height,
         }
       );
 
       plotRef.current.replaceChildren(plot);
-      csLegendRef.current.replaceChildren(csLegend);
+      colorLegendRef.current.replaceChildren(colorLegend);
       // mutationsLegendRef.current.replaceChildren(mutationsLegend);
     }
   }, [hierarchy, plotRef, width, height]);
 
   return (
     <div className="border rounded p-3" {...props}>
-      <div ref={csLegendRef} />
+      <div ref={colorLegendRef} />
       {/* <div ref={mutationsLegendRef} /> */}
       <div ref={plotRef} />
     </div>
@@ -52,16 +51,13 @@ export default function D3TreeLeaf({ width = 1000, height = 1000, ...props }) {
 function createRadialTree(
   data,
   attributes,
+  form,
   {
-    // data is either tabular (array of objects) or hierarchy (nested objects)
-    path, // as an alternative to id and parentId, returns an array identifier, imputing internal nodes
-    id = Array.isArray(data) ? (d) => d.id : null, // if tabular data, given a d in data, returns a unique identifier (string)
-    parentId = Array.isArray(data) ? (d) => d.parentId : null, // if tabular data, given a node d, returns its parent’s identifier
     children, // if hierarchical data, given a d in data, returns its children
     tree = d3.tree, // layout algorithm (typically d3.tree or d3.cluster)
     separation = (a, b) => (a.parent == b.parent ? 1 : 2) / a.depth,
     sort, // how to sort nodes prior to layout (e.g., (a, b) => d3.descending(a.height, b.height))
-    label, // given a node d, returns the display name
+    label = (d) => (form.showLabels ? d.name : ''), // given a node d, returns the display name
     title, // given a node d, returns its hover text
     width = 640, // outer width, in pixels
     height = 400, // outer height, in pixels
@@ -76,7 +72,9 @@ function createRadialTree(
     ) / 2, // outer radius
     r = d3.scaleSqrt().range([5, 20]), // radius of nodes
     padding = 1, // horizontal padding for first and last column
-    fill = d3.scaleSequential(d3.interpolateViridis), // fill for nodes
+    fill = form.color.continuous
+      ? d3.scaleSequential(d3.interpolateViridis)
+      : d3.scaleOrdinal(d3.schemeCategory10), // fill for nodes
     fillOpacity, // fill opacity for nodes
     stroke = '#555', // stroke for links
     strokeWidth = 1.5, // stroke width for links
@@ -87,55 +85,29 @@ function createRadialTree(
     haloWidth = 3, // padding around the labels
   }
 ) {
-  // If id and parentId options are specified, or the path option, use d3.stratify
-  // to convert tabular data to a hierarchy; otherwise we assume that the data is
-  // specified as an object {children} with nested objects (a.k.a. the “flare.json”
-  // format), and use d3.hierarchy.
-  const root =
-    path != null
-      ? d3.stratify().path(path)(data)
-      : id != null || parentId != null
-      ? d3.stratify().id(id).parentId(parentId)(data)
-      : d3.hierarchy(data, children);
+  // gather range of attributes
+  const mutations = Object.values(attributes).map((e) => e.Mutations);
+  const cs = Object.values(attributes).map((e) => e.Cosine_similarity);
+  const mutationMin = d3.min(mutations);
+  const mutationMax = d3.max(mutations);
+  const csMin = d3.min(cs);
+  const csMax = d3.max(cs);
+
+  const treeData = d3.hierarchy(data, children);
 
   // Sort the nodes.
-  if (sort != null) root.sort(sort);
+  if (sort != null) treeData.sort(sort);
 
   // Compute the layout.
-  const radialTree = tree()
+  const root = tree()
     .size([2 * Math.PI, radius])
-    .separation(separation)(root);
+    .separation(separation)(treeData);
 
   // Compute labels and titles.
-  const nodes = radialTree.descendants();
+  const nodes = root.descendants();
   const L = label == null ? null : nodes.map((d) => label(d.data, d));
 
-  const links = radialTree.links();
-
-  const drag = (simulation) => {
-    function dragstarted(event, d) {
-      if (!event.active) simulation.alphaTarget(0.3).restart();
-      d.fx = d.x;
-      d.fy = d.y;
-    }
-
-    function dragged(event, d) {
-      d.fx = event.x;
-      d.fy = event.y;
-    }
-
-    function dragended(event, d) {
-      if (!event.active) simulation.alphaTarget(0);
-      d.fx = null;
-      d.fy = null;
-    }
-
-    return d3
-      .drag()
-      .on('start', dragstarted)
-      .on('drag', dragged)
-      .on('end', dragended);
-  };
+  const links = root.links();
 
   const zoom = d3.zoom().scaleExtent([1, 5]).on('zoom', zoomed);
 
@@ -175,14 +147,6 @@ function createRadialTree(
         .radius((d) => d.y)
     );
 
-  // gather range of attributes
-  const mutations = Object.values(attributes).map((e) => e.Mutations);
-  const cs = Object.values(attributes).map((e) => e.Cosine_similarity);
-  const mutationMin = d3.min(mutations);
-  const mutationMax = d3.max(mutations);
-  const csMin = d3.min(cs);
-  const csMax = d3.max(cs);
-
   // add sample nodes
   const node = svg
     .append('g')
@@ -199,7 +163,7 @@ function createRadialTree(
     .append('circle')
     .attr('fill', ({ data }) =>
       data.name && attributes[data.name]
-        ? fill.domain([csMin, csMax])(attributes[data.name].Cosine_similarity)
+        ? fill.domain([csMin, csMax])(attributes[data.name][form.color.value])
         : stroke
     )
     .attr('r', ({ data }) =>
@@ -210,22 +174,12 @@ function createRadialTree(
     .on('mouseover', mouseover)
     .on('mousemove', mousemove)
     .on('mouseleave', mouseleave);
-  // .call(drag(simulation));
 
-  // simulation.on('tick', () => {
-  //   link
-  //     .attr('x1', (d) => d.source.x)
-  //     .attr('y1', (d) => d.source.y)
-  //     .attr('x2', (d) => d.target.x)
-  //     .attr('y2', (d) => d.target.y);
-  //   node.attr('cx', (d) => d.x).attr('cy', (d) => d.y);
+  // const colorLegend = Legend(fill.domain([csMin, csMax]), {
+  //   title: 'Cosine Similarity',
+  //   // marginLeft: '1rem',
+  //   // marginTop: '1rem',
   // });
-
-  const csLegend = Legend(fill.domain([csMin, csMax]), {
-    title: 'Cosine Similarity',
-    // marginLeft: '1rem',
-    // marginTop: '1rem',
-  });
 
   // add tooltips
   const tooltip = container
@@ -243,7 +197,6 @@ function createRadialTree(
   }
 
   function mousemove(e, d) {
-    // console.log('event', e);
     const sample = d.data.name;
     const data = attributes[sample];
     console.log(data);
@@ -278,53 +231,7 @@ function createRadialTree(
       .attr('stroke-width', haloWidth)
       .text((d, i) => L[i]);
 
-  return [container.node(), csLegend];
-}
-
-function createRadialTree2(
-  data,
-  attributes,
-  {
-    // data is either tabular (array of objects) or hierarchy (nested objects)
-    path, // as an alternative to id and parentId, returns an array identifier, imputing internal nodes
-    id = Array.isArray(data) ? (d) => d.id : null, // if tabular data, given a d in data, returns a unique identifier (string)
-    parentId = Array.isArray(data) ? (d) => d.parentId : null, // if tabular data, given a node d, returns its parent’s identifier
-    children, // if hierarchical data, given a d in data, returns its children
-    layout = flextree, // layout algorithm (typically d3.tree or d3.cluster)
-    separation = (a, b) => (a.parent == b.parent ? 1 : 2) / a.depth,
-    sort, // how to sort nodes prior to layout (e.g., (a, b) => d3.descending(a.height, b.height))
-    label, // given a node d, returns the display name
-    title, // given a node d, returns its hover text
-    width = 640, // outer width, in pixels
-    height = 400, // outer height, in pixels
-    margin = 0, // shorthand for margins
-    marginTop = margin, // top margin, in pixels
-    marginRight = margin, // right margin, in pixels
-    marginBottom = margin, // bottom margin, in pixels
-    marginLeft = margin, // left margin, in pixels
-    radius = Math.min(
-      width - marginLeft - marginRight,
-      height - marginTop - marginBottom
-    ) / 2, // outer radius
-    r = d3.scaleSqrt().range([5, 20]), // radius of nodes
-    padding = 1, // horizontal padding for first and last column
-    fill = d3.scaleSequential(d3.interpolateViridis), // fill for nodes
-    fillOpacity, // fill opacity for nodes
-    stroke = '#555', // stroke for links
-    strokeWidth = 1.5, // stroke width for links
-    strokeOpacity = 0.4, // stroke opacity for links
-    strokeLinejoin, // stroke line join for links
-    strokeLinecap, // stroke line cap for links
-    halo = '#fff', // color of label halo
-    haloWidth = 3, // padding around the labels
-  }
-) {
-  console.log(data);
-  const tree = layout.hierarchy(data);
-  console.log(tree);
-  layout(tree);
-  console.log(tree);
-  return [];
+  return [container.node()];
 }
 
 // Copyright 2021, Observable Inc.
@@ -434,3 +341,90 @@ function Legend(
 
   return svg.node();
 }
+
+// Copyright 2021, Observable Inc.
+// Released under the ISC license.
+// https://observablehq.com/@d3/color-legend
+// function Swatches(
+//   color,
+//   {
+//     columns = null,
+//     format,
+//     unknown: formatUnknown,
+//     swatchSize = 15,
+//     swatchWidth = swatchSize,
+//     swatchHeight = swatchSize,
+//     marginLeft = 0,
+//   } = {}
+// ) {
+//   const id = `-swatches-${Math.random().toString(16).slice(2)}`;
+//   const unknown = formatUnknown == null ? undefined : color.unknown();
+//   const unknowns =
+//     unknown == null || unknown === d3.scaleImplicit ? [] : [unknown];
+//   const domain = color.domain().concat(unknowns);
+//   if (format === undefined) format = (x) => (x === unknown ? formatUnknown : x);
+
+//   function entity(character) {
+//     return `&#${character.charCodeAt(0).toString()};`;
+//   }
+
+//   if (columns !== null)
+//     return htl.html`<div style="display: flex; align-items: center; margin-left: ${+marginLeft}px; min-height: 33px; font: 10px sans-serif;">
+//   <style>
+
+// .${id}-item {
+//   break-inside: avoid;
+//   display: flex;
+//   align-items: center;
+//   padding-bottom: 1px;
+// }
+
+// .${id}-label {
+//   white-space: nowrap;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+//   max-width: calc(100% - ${+swatchWidth}px - 0.5em);
+// }
+
+// .${id}-swatch {
+//   width: ${+swatchWidth}px;
+//   height: ${+swatchHeight}px;
+//   margin: 0 0.5em 0 0;
+// }
+
+//   </style>
+//   <div style=${{ width: '100%', columns }}>${domain.map((value) => {
+//       const label = `${format(value)}`;
+//       return htl.html`<div class=${id}-item>
+//       <div class=${id}-swatch style=${{ background: color(value) }}></div>
+//       <div class=${id}-label title=${label}>${label}</div>
+//     </div>`;
+//     })}
+//   </div>
+// </div>`;
+
+//   return htl.html`<div style="display: flex; align-items: center; min-height: 33px; margin-left: ${+marginLeft}px; font: 10px sans-serif;">
+//   <style>
+
+// .${id} {
+//   display: inline-flex;
+//   align-items: center;
+//   margin-right: 1em;
+// }
+
+// .${id}::before {
+//   content: "";
+//   width: ${+swatchWidth}px;
+//   height: ${+swatchHeight}px;
+//   margin-right: 0.5em;
+//   background: var(--color);
+// }
+
+//   </style>
+//   <div>${domain.map(
+//     (value) =>
+//       htl.html`<span class="${id}" style="--color: ${color(value)}">${format(
+//         value
+//       )}</span>`
+//   )}</div>`;
+// }
