@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import barData from './data.json';
-//import Plot from "../../../controls/plot/plot";
-import Plot from 'react-plotly.js';
+import React, { useEffect, useState } from "react";
+import barData from "./data.json";
+import Plot from "react-plotly.js";
 
 export default function BarChart() {
   console.log(barData);
@@ -31,24 +30,42 @@ export default function BarChart() {
   console.log(groupByMutation);
 
   const colors = {
-    'C>A': 'blue',
-    'C>G': 'black',
-    'C>T': 'red',
-    'T>A': 'grey',
-    'T>C': 'green',
-    'T>G': 'pink',
+    "[C>A]": "blue",
+    "[C>G]": "black",
+    "[C>T]": "red",
+    "[T>A]": "grey",
+    "[T>C]": "green",
+    "[T>G]": "pink",
   };
 
-  const data = Object.entries(groupByMutation).map(
+  const data1 = Object.entries(groupByMutation).map(
     ([mutation, signatures]) => ({
       name: mutation,
-      type: 'bar',
+      type: "bar",
       marker: { color: colors[mutation] },
       x: signatures.map((e) => e.mutationType),
       y: signatures.map((e) => e.contribution),
     })
   );
 
+  const data2 = Object.entries(groupByMutation).map(
+    ([mutation, signatures]) => ({
+      name: mutation,
+      type: "bar",
+      marker: { color: colors[mutation] },
+      x: signatures.map((e) => e.mutationType),
+      y: [0.01],
+      xaxis: "x2",
+      yaxis: "y2",
+      text: mutation,
+      showlegend: false,
+      hoverinfo: "none",
+    })
+  );
+
+  const data = [...data1, ...data2];
+  console.log(data);
+  console.log(data2);
   // Object.entries(groupByMutation).forEach(([key, value]) => {
   //   valueTopX.push(key);
   //   console.log(value.length);
@@ -72,7 +89,7 @@ export default function BarChart() {
       traces[i].push({
         x: valuesX[i],
         y: valuesY[i],
-        type: 'bar',
+        type: "bar",
         name: groups[i][0],
       });
     }
@@ -81,9 +98,9 @@ export default function BarChart() {
   console.log(groups);
   console.log(traces);
 
-  var xValue = ['A'];
-  var xValue2 = ['F', 'G', 'H', 'K', 'L'];
-  var xValue3 = ['M', 'N', 'O', 'P', 'J'];
+  var xValue = ["A"];
+  var xValue2 = ["F", "G", "H", "K", "L"];
+  var xValue3 = ["M", "N", "O", "P", "J"];
 
   var yValue = [20, 40, 10, 15, 15];
   var yValue2 = [15, 5, 25, 15, 80];
@@ -92,13 +109,13 @@ export default function BarChart() {
     x: xValue,
     y: yValue,
 
-    type: 'bar',
-    name: 'Blue',
+    type: "bar",
+    name: "Blue",
     text: yValue.map(String),
-    textposition: 'auto',
-    hoverinfo: 'none',
+    textposition: "auto",
+    hoverinfo: "none",
     marker: {
-      color: 'blue',
+      color: "blue",
     },
   };
 
@@ -106,13 +123,13 @@ export default function BarChart() {
     x: xValue2,
     y: yValue2,
 
-    type: 'bar',
-    name: 'Orange',
+    type: "bar",
+    name: "Orange",
     text: yValue2.map(String),
-    textposition: 'auto',
-    hoverinfo: 'none',
+    textposition: "auto",
+    hoverinfo: "none",
     marker: {
-      color: 'orange',
+      color: "orange",
     },
   };
 
@@ -120,39 +137,39 @@ export default function BarChart() {
     x: xValue3,
     y: yValue2,
 
-    type: 'bar',
-    name: 'Green',
+    type: "bar",
+    name: "Green",
     text: yValue2.map(String),
-    textposition: 'auto',
-    hoverinfo: 'none',
+    textposition: "auto",
+    hoverinfo: "none",
     marker: {
-      color: 'green',
+      color: "green",
     },
   };
 
   var trace4 = {
     x: xValue,
     y: [10],
-    text: 'A>E',
-    textposition: 'auto',
-    xaxis: 'x2',
-    yaxis: 'y2',
-    type: 'bar',
+    text: "A>E",
+    textposition: "auto",
+    xaxis: "x2",
+    yaxis: "y2",
+    type: "bar",
     marker: {
-      color: 'blue',
+      color: "blue",
     },
     showlegend: false,
   };
   var trace5 = {
     x: xValue2,
     y: [10],
-    text: 'F>L',
-    textposition: 'auto',
-    xaxis: 'x2',
-    yaxis: 'y2',
-    type: 'bar',
+    text: "F>L",
+    textposition: "auto",
+    xaxis: "x2",
+    yaxis: "y2",
+    type: "bar",
     marker: {
-      color: 'orange',
+      color: "orange",
     },
     showlegend: false,
   };
@@ -160,13 +177,13 @@ export default function BarChart() {
   var trace6 = {
     x: xValue3,
     y: [10],
-    text: 'M>J',
-    textposition: 'auto',
-    xaxis: 'x2',
-    yaxis: 'y2',
-    type: 'bar',
+    text: "M>J",
+    textposition: "auto",
+    xaxis: "x2",
+    yaxis: "y2",
+    type: "bar",
     marker: {
-      color: 'green',
+      color: "green",
     },
     showlegend: false,
   };
@@ -184,15 +201,15 @@ export default function BarChart() {
     grid: {
       rows: 2,
       columns: 1,
-      roworder: 'bottom to top',
-      ygap: 0.0001,
+      roworder: "bottom to top",
+      ygap: 0.1,
     },
     xaxis: { showline: true, tickangle: -90 },
     yaxis: {
       //  title: 'Percentage of Single Base Substitution',
-      tickformat: '.1%',
+      tickformat: ".1%",
     },
-    yaxis2: { visible: false, scaleanchor: 'y' },
+    yaxis2: { visible: false, scaleanchor: "y" },
     xaxis2: { visible: false },
   };
 
@@ -201,7 +218,7 @@ export default function BarChart() {
       data={data}
       layout={layout}
       useResizeHandler={true}
-      style={{ width: '100%', height: '100%' }}
+      style={{ width: "100%", height: "100%" }}
     />
   );
 }
