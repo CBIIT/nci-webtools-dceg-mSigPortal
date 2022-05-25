@@ -8,28 +8,60 @@ export default function BarChart() {
   const traces = [];
   const valuesX = [];
   const valuesY = [];
+  const valueTopX = [];
 
-  for (let i = 0; i < barData[0].contributions.length; i++) {
+  const regex = /(\[.*\])/;
+  function average(arr) {
+    const sum = arr.reduce((a, b) => a + b, 0);
+    return sum / arr.length || 0;
+  }
+
+  const groupByMutation = barData.reduce((groups, v) => {
+    const mutation = v.mutationType.match(regex)[0];
+    const signature = {
+      mutationType: v.mutationType,
+      contribution: v.contributions[0],
+    };
+    groups[mutation] = groups[mutation]
+      ? [...groups[mutation], signature]
+      : [signature];
+    return groups;
+  }, {});
+
+  console.log(groupByMutation);
+
+  // Object.entries(groupByMutation).forEach(([key, value]) => {
+  //   valueTopX.push(key);
+  //   console.log(value.length);
+
+  //   value.forEach((element, index) => {
+  //     valuesX.push(element.mutationType);
+  //     valuesY.push(element.contribution);
+  //     console.log(element);
+  //   });
+  // });
+
+  const groups = Object.entries(groupByMutation);
+  for (let i = 0; i < groups.length; i++) {
+    valueTopX.push(groups[i][0]);
+    traces[i] = [];
     valuesX[i] = [];
     valuesY[i] = [];
-    for (let j = 0; j < barData.length; j++) {
-      valuesX[i].push(barData[j].mutationType);
-      valuesY[i].push(barData[j].contributions[i]);
+    for (let k = 0; k < groups[i][1].length; k++) {
+      valuesX[i].push(groups[i][1][k].mutationType);
+      valuesY[i].push(groups[i][1][k].contribution);
+      traces[i].push({
+        x: valuesX[i],
+        y: valuesY[i],
+        type: "bar",
+        name: groups[i][0],
+      });
     }
   }
 
-  console.log(valuesX);
-  console.log(valuesY);
+  console.log(groups);
+  console.log(traces);
 
-  for (let i = 0; i < 6; i++) {
-    traces.push({
-      x: valuesX[i],
-      y: valuesY[i],
-      type: "bar",
-      name: valuesX[i][i],
-      text: valuesY[i].map(String),
-    });
-  }
   var xValue = ["A"];
   var xValue2 = ["F", "G", "H", "K", "L"];
   var xValue3 = ["M", "N", "O", "P", "J"];
@@ -120,7 +152,14 @@ export default function BarChart() {
     showlegend: false,
   };
 
-  var data = [traces[0], traces[1]];
+  var data = [
+    traces[0][0],
+    traces[1][0],
+    traces[2][0],
+    traces[3][0],
+    traces[4][0],
+    traces[5][0],
+  ];
 
   var layout = {
     grid: {
@@ -135,7 +174,7 @@ export default function BarChart() {
 
   return (
     <Plot
-      data={traces}
+      data={data}
       layout={layout}
       useResizeHandler={true}
       style={{ width: "100%", height: "100%" }}
