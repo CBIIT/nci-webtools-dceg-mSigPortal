@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import * as d3 from 'd3';
+import * as htl from 'htl';
 import cloneDeep from 'lodash/cloneDeep';
 import { useRecoilValue } from 'recoil';
 import { getGraphData, formState } from './treeLeaf.state';
@@ -87,11 +88,15 @@ function createRadialTree(
 ) {
   // gather range of attributes
   const mutations = Object.values(attributes).map((e) => e.Mutations);
-  const cs = Object.values(attributes).map((e) => e.Cosine_similarity);
   const mutationMin = d3.min(mutations);
   const mutationMax = d3.max(mutations);
-  const csMin = d3.min(cs);
-  const csMax = d3.max(cs);
+
+  const colorValues = Object.values(attributes).map((e) => e[form.color.value]);
+  const colorMin = d3.min(colorValues);
+  const colorMax = d3.max(colorValues);
+  const colorFill = form.color.continuous
+    ? fill.domain([colorMin, colorMax])
+    : fill.domain(colorValues);
 
   const treeData = d3.hierarchy(data, children);
 
@@ -163,7 +168,7 @@ function createRadialTree(
     .append('circle')
     .attr('fill', ({ data }) =>
       data.name && attributes[data.name]
-        ? fill.domain([csMin, csMax])(attributes[data.name][form.color.value])
+        ? colorFill(attributes[data.name][form.color.value])
         : stroke
     )
     .attr('r', ({ data }) =>
@@ -175,11 +180,11 @@ function createRadialTree(
     .on('mousemove', mousemove)
     .on('mouseleave', mouseleave);
 
-  // const colorLegend = Legend(fill.domain([csMin, csMax]), {
-  //   title: 'Cosine Similarity',
-  //   // marginLeft: '1rem',
-  //   // marginTop: '1rem',
-  // });
+  const colorLegend = form.color.continuous
+    ? ContinuousLegend(colorFill, {
+        title: form.color.label,
+      })
+    : CategoricalLegned(colorFill);
 
   // add tooltips
   const tooltip = container
@@ -231,13 +236,13 @@ function createRadialTree(
       .attr('stroke-width', haloWidth)
       .text((d, i) => L[i]);
 
-  return [container.node()];
+  return [container.node(), colorLegend];
 }
 
 // Copyright 2021, Observable Inc.
 // Released under the ISC license.
 // https://observablehq.com/@d3/color-legend
-function Legend(
+function ContinuousLegend(
   color,
   {
     title,
@@ -341,90 +346,86 @@ function Legend(
 
   return svg.node();
 }
+function CategoricalLegned(
+  color,
+  {
+    columns = null,
+    format,
+    unknown: formatUnknown,
+    swatchSize = 15,
+    swatchWidth = swatchSize,
+    swatchHeight = swatchSize,
+    marginLeft = 0,
+  } = {}
+) {
+  const id = `-swatches-${Math.random().toString(16).slice(2)}`;
+  const unknown = formatUnknown == null ? undefined : color.unknown();
+  const unknowns =
+    unknown == null || unknown === d3.scaleImplicit ? [] : [unknown];
+  const domain = color.domain().concat(unknowns);
+  if (format === undefined) format = (x) => (x === unknown ? formatUnknown : x);
 
-// Copyright 2021, Observable Inc.
-// Released under the ISC license.
-// https://observablehq.com/@d3/color-legend
-// function Swatches(
-//   color,
-//   {
-//     columns = null,
-//     format,
-//     unknown: formatUnknown,
-//     swatchSize = 15,
-//     swatchWidth = swatchSize,
-//     swatchHeight = swatchSize,
-//     marginLeft = 0,
-//   } = {}
-// ) {
-//   const id = `-swatches-${Math.random().toString(16).slice(2)}`;
-//   const unknown = formatUnknown == null ? undefined : color.unknown();
-//   const unknowns =
-//     unknown == null || unknown === d3.scaleImplicit ? [] : [unknown];
-//   const domain = color.domain().concat(unknowns);
-//   if (format === undefined) format = (x) => (x === unknown ? formatUnknown : x);
+  function entity(character) {
+    return `&#${character.charCodeAt(0).toString()};`;
+  }
 
-//   function entity(character) {
-//     return `&#${character.charCodeAt(0).toString()};`;
-//   }
+  if (columns !== null)
+    return htl.html`<div style="display: flex; align-items: center; margin-left: ${+marginLeft}px; min-height: 33px; font: 10px sans-serif;">
+  <style>
 
-//   if (columns !== null)
-//     return htl.html`<div style="display: flex; align-items: center; margin-left: ${+marginLeft}px; min-height: 33px; font: 10px sans-serif;">
-//   <style>
+.${id}-item {
+  break-inside: avoid;
+  display: flex;
+  align-items: center;
+  padding-bottom: 1px;
+}
 
-// .${id}-item {
-//   break-inside: avoid;
-//   display: flex;
-//   align-items: center;
-//   padding-bottom: 1px;
-// }
+.${id}-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - ${+swatchWidth}px - 0.5em);
+}
 
-// .${id}-label {
-//   white-space: nowrap;
-//   overflow: hidden;
-//   text-overflow: ellipsis;
-//   max-width: calc(100% - ${+swatchWidth}px - 0.5em);
-// }
+.${id}-swatch {
+  width: ${+swatchWidth}px;
+  height: ${+swatchHeight}px;
+  margin: 0 0.5em 0 0;
+}
 
-// .${id}-swatch {
-//   width: ${+swatchWidth}px;
-//   height: ${+swatchHeight}px;
-//   margin: 0 0.5em 0 0;
-// }
+  </style>
+  <div style=${{ width: '100%', columns }}>${domain.map((value) => {
+      const label = `${format(value)}`;
+      return htl.html`<div class=${id}-item>
+      <div class=${id}-swatch style=${{ background: color(value) }}></div>
+      <div class=${id}-label title=${label}>${label}</div>
+    </div>`;
+    })}
+  </div>
+</div>`;
 
-//   </style>
-//   <div style=${{ width: '100%', columns }}>${domain.map((value) => {
-//       const label = `${format(value)}`;
-//       return htl.html`<div class=${id}-item>
-//       <div class=${id}-swatch style=${{ background: color(value) }}></div>
-//       <div class=${id}-label title=${label}>${label}</div>
-//     </div>`;
-//     })}
-//   </div>
-// </div>`;
+  return htl.html`<div style="display: flex; align-items: center; min-height: 33px; margin-left: ${+marginLeft}px; font: 10px sans-serif;">
+  <style>
 
-//   return htl.html`<div style="display: flex; align-items: center; min-height: 33px; margin-left: ${+marginLeft}px; font: 10px sans-serif;">
-//   <style>
+.${id} {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 1em;
+}
 
-// .${id} {
-//   display: inline-flex;
-//   align-items: center;
-//   margin-right: 1em;
-// }
+.${id}::before {
+  content: "";
+  width: ${+swatchWidth}px;
+  height: ${+swatchHeight}px;
+  margin-right: 0.5em;
+  background: var(--color);
+}
 
-// .${id}::before {
-//   content: "";
-//   width: ${+swatchWidth}px;
-//   height: ${+swatchHeight}px;
-//   margin-right: 0.5em;
-//   background: var(--color);
-// }
-
-//   </style>
-//   <div>${domain.map(
-//     (value) =>
-//       htl.html`<span class="${id}" style="--color: ${color(value)}">${format(
-//         value
-//       )}</span>`
-//   )}</div>`;
-// }
+  </style>
+  <div>${domain.map(
+    (value) =>
+      htl.html`<span class="${id}" style="--color: ${color(value)}">${format(
+        value
+      )}</span>`
+  )}</div>`;
+}
