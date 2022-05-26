@@ -68,7 +68,7 @@ export default function BarChart() {
       yref: "paper",
       x0: signatures.map((e) => e.mutationType)[0],
       y0: 1.03,
-      x1: signatures.map((e) => e.mutationType)[15],
+      x1: signatures.map((e) => e.mutationType)[signatures.length - 1],
       y1: 1,
       fillcolor: colors[mutation],
       line: {
@@ -81,7 +81,9 @@ export default function BarChart() {
     ([mutation, signatures]) => ({
       xref: "x",
       yref: "paper",
-      x: signatures.map((e) => e.mutationType)[8],
+      x: signatures.map((e) => e.mutationType)[
+        Math.round(signatures.length / 2)
+      ],
       xanchor: "bottom",
       y: 1.05,
       yanchor: "bottom",
@@ -89,7 +91,7 @@ export default function BarChart() {
       showarrow: false,
       font: {
         color: colors[mutation],
-        size: 15,
+        size: 18,
       },
     })
   );
@@ -106,7 +108,7 @@ export default function BarChart() {
       showticklabels: true,
       tickangle: -90,
       tickfont: {
-        size: 9,
+        size: 10,
       },
     },
     yaxis: {
