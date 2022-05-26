@@ -42,7 +42,7 @@ export default function BarChart() {
       x: signatures.map((e) => e.mutationType),
       y: signatures.map((e) => e.contribution),
       hoverinfo: "x+y",
-      //showlegend: false,
+      showlegend: false,
     })
   );
 
@@ -93,6 +93,7 @@ export default function BarChart() {
         color: colors[mutation],
         size: 18,
       },
+      align: "center",
     })
   );
 
