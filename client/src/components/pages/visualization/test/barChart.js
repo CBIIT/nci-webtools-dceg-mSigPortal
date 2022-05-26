@@ -10,6 +10,7 @@ export default function BarChart() {
   const valueTopX = [];
 
   const regex = /(\[.*\])/;
+  const regex2 = /[\[\]']+/g;
   function average(arr) {
     const sum = arr.reduce((a, b) => a + b, 0);
     return sum / arr.length || 0;
@@ -40,7 +41,7 @@ export default function BarChart() {
 
   const data1 = Object.entries(groupByMutation).map(
     ([mutation, signatures]) => ({
-      name: mutation,
+      name: mutation.replace(regex2, ""),
       type: "bar",
       marker: { color: colors[mutation] },
       x: signatures.map((e) => e.mutationType),
@@ -89,7 +90,7 @@ export default function BarChart() {
       xanchor: "bottom",
       y: 1.05,
       yanchor: "bottom",
-      text: "<b>" + mutation + "</b>",
+      text: "<b>" + mutation.replace(regex2, "") + "</b>",
       showarrow: false,
       font: {
         color: colors[mutation],
