@@ -6,10 +6,10 @@ services:
             dockerfile: './docker/backend.dockerfile'
         volumes:
             - './server/config.json:/deploy/server/config.json:ro'
-            - './server/logs:/deploy/server/logs'
+            - './logs:/deploy/server/logs'
             - './tmp:/deploy/tmp'
+            - './data:/deploy/data'
             - '~/.aws:/root/.aws:ro'
-            - './data'
         ports: 
             - '8330:8330'
 

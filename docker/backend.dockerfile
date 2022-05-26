@@ -1,5 +1,7 @@
 FROM ${BACKEND_BASE_IMAGE:-quay.io/centos/centos:stream8} as renvCache 
 
+ENV R_VERSION=4.1.2
+
 RUN dnf -y update \
     && dnf -y install \
     dnf-plugins-core \
@@ -13,7 +15,6 @@ RUN dnf -y update \
     libjpeg-turbo-devel \
     openssl-devel \
     nodejs \
-    R \
     python3-pip \
     python3-devel \
     libcurl-devel \
@@ -25,8 +26,12 @@ RUN dnf -y update \
     gmp-devel \
     mpfr-devel \
     cairo-devel \
-    google-roboto-condensed-fonts \
+    && dnf -y install https://cdn.rstudio.com/r/centos-8/pkgs/R-${R_VERSION}-1-1.x86_64.rpm \
     && dnf clean all
+
+# symlink R
+RUN ln -s /opt/R/${R_VERSION}/bin/R /usr/local/bin/R
+RUN ln -s /opt/R/${R_VERSION}/bin/Rscript /usr/local/bin/Rscript
 
 # install renv
 RUN R -e "install.packages('renv', repos = 'https://cloud.r-project.org/')"
@@ -42,6 +47,8 @@ RUN R -e "renv::restore()"
 
 FROM ${BACKEND_BASE_IMAGE:-quay.io/centos/centos:stream8}
 
+ENV R_VERSION=4.1.2
+
 RUN dnf -y update \
     && dnf -y install \
     dnf-plugins-core \
@@ -55,7 +62,6 @@ RUN dnf -y update \
     libjpeg-turbo-devel \
     openssl-devel \
     nodejs \
-    R \
     python3-pip \
     python3-devel \
     libcurl-devel \
@@ -68,7 +74,12 @@ RUN dnf -y update \
     mpfr-devel \
     cairo-devel \
     google-roboto-condensed-fonts \
+    && dnf -y install https://cdn.rstudio.com/r/centos-8/pkgs/R-${R_VERSION}-1-1.x86_64.rpm \
     && dnf clean all
+
+# symlink R
+RUN ln -s /opt/R/${R_VERSION}/bin/R /usr/local/bin/R
+RUN ln -s /opt/R/${R_VERSION}/bin/Rscript /usr/local/bin/Rscript
 
 RUN mkdir -p /deploy/server /deploy/logs
 

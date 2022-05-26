@@ -2,6 +2,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { formState, getGraphData } from './treeLeaf.state';
 import { Form, Row, Col } from 'react-bootstrap';
 import MultiSelect from '../../../controls/select/multiSelect';
+import Select from 'react-select';
 export default function TreeLeafForm() {
   const { attributes } = useRecoilValue(getGraphData);
   const [form, setForm] = useRecoilState(formState);
@@ -33,6 +34,29 @@ export default function TreeLeafForm() {
     return filterSampleOptions(inputValue, 40);
   }
 
+  const colorOptions = [
+    {
+      label: 'Cosine Similarity',
+      value: 'Cosine_similarity',
+      continuous: true,
+    },
+    {
+      label: 'Dominant Mutation',
+      value: 'Dmut',
+      continuous: false,
+    },
+    {
+      label: 'Dominant Signature',
+      value: 'Dsig',
+      continuous: false,
+    },
+    {
+      label: 'Cancer Type',
+      value: 'Cancer_Type',
+      continuous: false,
+    },
+  ];
+
   return (
     <Form>
       <Row>
@@ -44,6 +68,17 @@ export default function TreeLeafForm() {
               name="showLabels"
               checked={form.showLabels}
               onChange={handleChange}
+            />
+          </Form.Group>
+        </Col>
+        <Col md="auto">
+          <Form.Group controlId="color" className="mb-3">
+            <Form.Label>Color By</Form.Label>
+            <Select
+              name="color"
+              defaultValue={colorOptions[0]}
+              options={colorOptions}
+              onChange={(e) => mergeForm({ color: e })}
             />
           </Form.Group>
         </Col>

@@ -52,6 +52,7 @@ export default function CustomSelect({
     <Group controlId={id} className={className}>
       {label && <Label className={labelClass}>{label}</Label>}
       <ReactSelect
+        name={id}
         inputId={id}
         options={optionsObject}
         value={optionsObject.filter((option) => option.value === value)}
