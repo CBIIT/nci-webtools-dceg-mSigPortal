@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import barData from "./data.json";
 import Plot from "react-plotly.js";
 
-export default function BarChart() {
+export default function MultationalProfilesTest() {
   console.log(barData);
   const regex = /(\[.*\])/;
   const regex2 = /[\[\]']+/g;
@@ -26,12 +26,12 @@ export default function BarChart() {
   console.log(groupByMutation);
 
   const colors = {
-    "[C>A]": "blue",
+    "[C>A]": "#03BCEE",
     "[C>G]": "black",
-    "[C>T]": "red",
-    "[T>A]": "grey",
-    "[T>C]": "green",
-    "[T>G]": "pink",
+    "[C>T]": "#E32926",
+    "[T>A]": "#CAC9C9",
+    "[T>C]": "#A1CE63",
+    "[T>G]": "#EBC6C4",
   };
 
   const data1 = Object.entries(groupByMutation).map(
