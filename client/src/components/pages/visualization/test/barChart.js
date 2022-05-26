@@ -89,11 +89,11 @@ export default function BarChart() {
       xanchor: "bottom",
       y: 1.05,
       yanchor: "bottom",
-      text: mutation,
+      text: "<b>" + mutation + "</b>",
       showarrow: false,
       font: {
         color: colors[mutation],
-        text: "bold",
+        size: 15,
       },
     })
   );
@@ -102,6 +102,7 @@ export default function BarChart() {
   console.log(data);
   console.log(data2);
   console.log(shapes);
+  console.log(annotations);
 
   // const groups = Object.entries(groupByMutation);
   // for (let i = 0; i < groups.length; i++) {
