@@ -4,11 +4,6 @@ import Plot from "react-plotly.js";
 
 export default function BarChart() {
   console.log(barData);
-  const traces = [];
-  const valuesX = [];
-  const valuesY = [];
-  const valueTopX = [];
-
   const regex = /(\[.*\])/;
   const regex2 = /[\[\]']+/g;
   function average(arr) {
@@ -51,20 +46,20 @@ export default function BarChart() {
     })
   );
 
-  const data2 = Object.entries(groupByMutation).map(
-    ([mutation, signatures]) => ({
-      name: mutation,
-      type: "bar",
-      marker: { color: colors[mutation] },
-      x: signatures.map((e) => e.mutationType),
-      y: [0.01],
-      xaxis: "x2",
-      yaxis: "y2",
-      text: mutation,
-      showlegend: false,
-      hoverinfo: "none",
-    })
-  );
+  // const data2 = Object.entries(groupByMutation).map(
+  //   ([mutation, signatures]) => ({
+  //     name: mutation,
+  //     type: "bar",
+  //     marker: { color: colors[mutation] },
+  //     x: signatures.map((e) => e.mutationType),
+  //     y: [0.01],
+  //     xaxis: "x2",
+  //     yaxis: "y2",
+  //     text: mutation,
+  //     showlegend: false,
+  //     hoverinfo: "none",
+  //   })
+  // );
 
   const shapes = Object.entries(groupByMutation).map(
     ([mutation, signatures]) => ({
@@ -101,38 +96,10 @@ export default function BarChart() {
 
   const data = [...data1];
   console.log(data);
-  console.log(data2);
   console.log(shapes);
   console.log(annotations);
 
-  // const groups = Object.entries(groupByMutation);
-  // for (let i = 0; i < groups.length; i++) {
-  //   valueTopX.push(groups[i][0]);
-  //   traces[i] = [];
-  //   valuesX[i] = [];
-  //   valuesY[i] = [];
-  //   for (let k = 0; k < groups[i][1].length; k++) {
-  //     valuesX[i].push(groups[i][1][k].mutationType);
-  //     valuesY[i].push(groups[i][1][k].contribution);
-  //     traces[i].push({
-  //       x: valuesX[i],
-  //       y: valuesY[i],
-  //       type: "bar",
-  //       name: groups[i][0],
-  //     });
-  //   }
-  // }
-
-  //console.log(groups);
-  //console.log(traces);
-
   var layout = {
-    grid: {
-      //rows: 2,
-      columns: 1,
-      roworder: "bottom to top",
-      //subplots: [["xy"], ["xy2"]],
-    },
     xaxis: {
       title: "Substitution",
       showline: true,
@@ -147,8 +114,7 @@ export default function BarChart() {
       //tickformat: ".1%",
       autorange: true,
     },
-    // yaxis2: { visible: false, scaleanchor: "y", automargin: true },
-    // xaxis2: { visible: false },
+
     shapes: shapes,
     annotations: annotations,
   };
