@@ -13,6 +13,7 @@ const replace = require('replace-in-file');
 const glob = require('glob');
 const config = require('./config.json');
 const archiver = require('archiver');
+const { pick, pickBy } = require('lodash');
 
 if (config.aws) AWS.config.update(config.aws);
 
@@ -768,6 +769,26 @@ async function downloadWorkspace(req, res, next) {
   }
 }
 
+async function querySignature(req, res, next) {
+  const { filter, properties } = req.body;
+  const s3 = new AWS.S3();
+  const key = path.join(config.data.s3, 'Signature/signature_refsets.json');
+
+  const { Body } = await s3
+    .getObject({
+      Bucket: config.data.bucket,
+      Key: key,
+    })
+    .promise();
+
+  const signatureRefsets = JSON.parse(Body);
+  const query = Object.values(pickBy(signatureRefsets, filter)).map((e) =>
+    pick(e, properties)
+  );
+
+  res.json(query);
+}
+
 module.exports = {
   parseCSV,
   profilerExtraction,
@@ -790,4 +811,5 @@ module.exports = {
   getRelativePath,
   downloadWorkspace,
   associationWrapper,
+  querySignature,
 };

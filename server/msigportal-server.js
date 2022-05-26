@@ -34,6 +34,7 @@ const {
   getFileS3,
   downloadWorkspace,
   associationWrapper,
+  querySignature,
 } = require('./controllers');
 
 if (cluster.isMaster) {
@@ -124,6 +125,8 @@ apiRouter.post('/getFileS3', cors(), getFileS3);
 apiRouter.post('/downloadWorkspace', cors(), downloadWorkspace);
 
 apiRouter.post('/associationWrapper', cors(), associationWrapper);
+
+apiRouter.post('/querySignature', cors(), querySignature);
 
 apiRouter.use((err, req, res, next) => {
   logger.debug(err);
