@@ -2,7 +2,14 @@ import { atom, selector } from 'recoil';
 import axios from 'axios';
 import sigPatternData from './sigPatternData.json';
 
-export const defaultFormState = { showLabels: false };
+export const defaultFormState = {
+  showLabels: false,
+  color: {
+    label: 'Cosine Similarity',
+    value: 'Cosine_similarity',
+    continuous: true,
+  },
+};
 
 export const formState = atom({
   key: 'treeLeaf.formState',
