@@ -28,7 +28,7 @@ import {
 } from "../../../services/utils";
 import "./visualization.scss";
 
-import BarChart from "./test/barChart";
+import MultationalProfilesTest from "./test/multationalProfilesTest";
 
 const actions = { ...visualizationActions, ...modalActions };
 const { Group, Label, Check } = Form;
@@ -481,9 +481,9 @@ export default function Visualization({ match }) {
       component: <Download />,
     },
     {
-      name: "BarChart Test",
-      id: "barchart",
-      component: <BarChart />,
+      name: "Multational Profiles Test",
+      id: "multationalProfileTest",
+      component: <MultationalProfilesTest />,
     },
   ];
 
