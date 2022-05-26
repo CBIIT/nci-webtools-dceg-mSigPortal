@@ -45,6 +45,7 @@ export default function BarChart() {
       marker: { color: colors[mutation] },
       x: signatures.map((e) => e.mutationType),
       y: signatures.map((e) => e.contribution),
+      hoverinfo: "x+y",
       //showlegend: false,
     })
   );
@@ -129,21 +130,23 @@ export default function BarChart() {
       columns: 1,
       roworder: "bottom to top",
       //subplots: [["xy"], ["xy2"]],
-      ygap: 0.1,
     },
     xaxis: {
       title: "Substitution",
       showline: true,
+      showticklabels: true,
       tickangle: -90,
-      automargin: true,
+      tickfont: {
+        size: 9,
+      },
     },
     yaxis: {
       title: "Mutation probability",
       //tickformat: ".1%",
       autorange: true,
     },
-    yaxis2: { visible: false, scaleanchor: "y", automargin: true },
-    xaxis2: { visible: false },
+    // yaxis2: { visible: false, scaleanchor: "y", automargin: true },
+    // xaxis2: { visible: false },
     shapes: shapes,
     annotations: annotations,
   };
