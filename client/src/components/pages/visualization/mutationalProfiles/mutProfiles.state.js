@@ -1,6 +1,6 @@
-import { atom, selector } from 'recoil';
-import axios from 'axios';
-import { visualizationState } from '../visualization.state';
+import { atom, selector } from "recoil";
+import axios from "axios";
+import { visualizationState } from "../visualization.state";
 
 export const defaultFormState = {
   profile: {},
@@ -12,7 +12,7 @@ export const defaultFormState = {
 };
 
 export const formState = atom({
-  key: 'visualization.mutProfiles.formState',
+  key: "visualization.mutProfiles.formState",
   default: defaultFormState,
 });
 
@@ -41,20 +41,34 @@ export const formState = atom({
 // });
 
 export const getPlot = selector({
-  key: 'visualization.mutProfiles.plot',
+  key: "visualization.mutProfiles.plot",
   get: async ({ get }) => {
     try {
       const { profile } = get(formState);
 
       if (Object.keys(profile).length) {
-        const { data } = await axios.post('api/querySignature', {
+        const { data } = await axios.post("api/querySignature", {
           filter: { ...profile.value }, // filter given an object of key:values you want
-          properties: ['MutationType', 'Contribution'], // return objects containing these properties
+          properties: ["MutationType", "Contribution"], // return objects containing these properties
         });
 
+        console.log(profile);
+
+        console.log(data);
         const regex = /\[(.*)\]/;
+        const regex2 = /^.{0,2}/;
+        const regex3 = /^.{0,5}/;
+
         const groupByMutation = data.reduce((groups, e) => {
-          const mutation = e.MutationType.match(regex)[1];
+          let mutation;
+          if (profile.label === "SBS84") {
+            mutation = e.MutationType.match(regex)[1];
+          } else if (profile.label === "DBS1") {
+            mutation = e.MutationType.match(regex2)[0];
+          } else if (profile.label === "ID1") {
+            mutation = e.MutationType.match(regex3)[0];
+          }
+
           const signature = {
             mutationType: e.MutationType,
             contribution: e.Contribution,
@@ -65,32 +79,34 @@ export const getPlot = selector({
           return groups;
         }, {});
 
+        console.log(groupByMutation);
+
         const colors = {
-          'C>A': 'blue',
-          'C>G': 'black',
-          'C>T': 'red',
-          'T>A': 'grey',
-          'T>C': 'green',
-          'T>G': 'pink',
+          "C>A": "#03BCEE",
+          "C>G": "black",
+          "C>T": "#E32926",
+          "T>A": "#CAC9C9",
+          "T>C": "#A1CE63",
+          "T>G": "#EBC6C4",
         };
 
         const traces = Object.entries(groupByMutation).map(
           ([mutation, signatures]) => ({
             name: mutation,
-            type: 'bar',
+            type: "bar",
             marker: { color: colors[mutation] },
             x: signatures.map((e) => e.mutationType),
             y: signatures.map((e) => e.contribution),
-            hoverinfo: 'x+y',
+            hoverinfo: "x+y",
             showlegend: false,
           })
         );
 
         const shapes = Object.entries(groupByMutation).map(
           ([mutation, signatures]) => ({
-            type: 'rect',
-            xref: 'x',
-            yref: 'paper',
+            type: "rect",
+            xref: "x",
+            yref: "paper",
             x0: signatures.map((e) => e.mutationType)[0],
             y0: 1.03,
             x1: signatures.map((e) => e.mutationType)[signatures.length - 1],
@@ -104,27 +120,27 @@ export const getPlot = selector({
 
         const annotations = Object.entries(groupByMutation).map(
           ([mutation, signatures]) => ({
-            xref: 'x',
-            yref: 'paper',
+            xref: "x",
+            yref: "paper",
             x: signatures.map((e) => e.mutationType)[
               Math.round(signatures.length / 2)
             ],
-            xanchor: 'bottom',
+            xanchor: "bottom",
             y: 1.05,
-            yanchor: 'bottom',
-            text: '<b>' + mutation + '</b>',
+            yanchor: "bottom",
+            text: "<b>" + mutation + "</b>",
             showarrow: false,
             font: {
-              // color: colors[mutation],
+              color: colors[mutation],
               size: 18,
             },
-            align: 'center',
+            align: "center",
           })
         );
 
         const layout = {
           xaxis: {
-            title: 'Substitution',
+            title: "Substitution",
             showline: true,
             showticklabels: true,
             tickangle: -90,
@@ -133,7 +149,7 @@ export const getPlot = selector({
             },
           },
           yaxis: {
-            title: 'Mutation probability',
+            title: "Mutation probability",
             //tickformat: ".1%",
             autorange: true,
           },

@@ -61,7 +61,7 @@ export default function MultationalProfilesTest() {
   //   })
   // );
 
-  const shapes = Object.entries(groupByMutation).map(
+  const shapes1 = Object.entries(groupByMutation).map(
     ([mutation, signatures]) => ({
       type: "rect",
       xref: "x",
@@ -77,6 +77,24 @@ export default function MultationalProfilesTest() {
     })
   );
 
+  const shapes2 = Object.entries(groupByMutation).map(
+    ([mutation, signatures]) => ({
+      type: "rect",
+      xref: "x",
+      yref: "paper",
+      x0: signatures.map((e) => e.mutationType)[0],
+      y0: 1,
+      x1: signatures.map((e) => e.mutationType)[signatures.length - 1],
+      y1: 0,
+      fillcolor: colors[mutation],
+      line: {
+        width: 0,
+      },
+      opacity: 0.2,
+    })
+  );
+
+  const shapes = [...shapes1, ...shapes2];
   const annotations = Object.entries(groupByMutation).map(
     ([mutation, signatures]) => ({
       xref: "x",

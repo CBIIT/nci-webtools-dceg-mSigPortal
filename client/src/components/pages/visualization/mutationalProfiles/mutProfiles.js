@@ -1,9 +1,9 @@
-import { Suspense } from 'react';
-import { Alert, Container } from 'react-bootstrap';
-import Loader from '../../../controls/loader/loader';
-import ErrorBoundary from '../../../controls/errorBoundary/error-boundary';
-import MutProfilesForm from './mutProfiles-form';
-import MutProfilesPlot from './mutProfiles-plot';
+import { Suspense } from "react";
+import { Alert, Container } from "react-bootstrap";
+import Loader from "../../../controls/loader/loader";
+import ErrorBoundary from "../../../controls/errorBoundary/error-boundary";
+import MutProfilesForm from "./mutProfiles-form";
+import MutProfilesPlot from "./mutProfiles-plot";
 
 export default function MutationalProfiles(props) {
   return (
