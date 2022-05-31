@@ -59,12 +59,14 @@ export const getPlot = selector({
         const regex2 = /^.{0,3}/;
         const regex3 = /^.{0,7}/;
 
+        const IDAnnTopArray = ["1", "2", "3", "4", "5"];
+
         const groupByMutation = data.reduce((groups, e) => {
           let mutation;
           if (profile.label === "SBS84") {
             mutation = e.MutationType.match(regex)[1];
           } else if (profile.label === "DBS1") {
-            mutation = e.MutationType.match(e.MutationType.substring(0, 3));
+            mutation = e.MutationType.match(regex2)[0];
           } else if (profile.label === "ID1") {
             mutation = e.MutationType.match(regex3)[0];
           }
@@ -80,6 +82,11 @@ export const getPlot = selector({
         }, {});
 
         console.log(groupByMutation);
+        console.log(
+          groupByMutation.sort(
+            (a, b) => a.charCodeAt(a.length - 1) - b.charCodeAt(b.length - 1)
+          )
+        );
 
         const colors = {
           "C>A": "#03BCEE",
@@ -98,6 +105,41 @@ export const getPlot = selector({
           "TC>": "#FD8000",
           "TG>": "#CB98FD",
           "TT>": "#4C0299",
+          "1:Del:C": "#FBBD6F",
+          "1:Del:T": "#FE8002",
+          "1:Ins:C": "#AEDD8A",
+          "1:Ins:T": "#35A12E",
+          "2:Del:R": "#FCC9B4",
+          "3:Del:R": "#FB8969",
+          "4:Del:R": "#F04432",
+          "5:Del:R": "#BB1A1A",
+          "2:Ins:R": "#CFDFF0",
+          "3:Ins:R": "#93C3DE",
+          "4:Ins:R": "#4B97C7",
+          "5:Ins:R": "#1863AA",
+          "2:Del:M": "#E1E1EE",
+          "3:Del:M": "#B5B5D6",
+          "4:Del:M": "#8482BC",
+          "5:Del:M": "#62409A",
+        };
+
+        const annotationColors = {
+          "1:Del:C": "black",
+          "1:Del:T": "white",
+          "1:Ins:C": "black",
+          "1:Ins:T": "white",
+          "2:Del:R": "black",
+          "3:Del:R": "black",
+          "4:Del:R": "black",
+          "5:Del:R": "white",
+          "2:Ins:R": "black",
+          "3:Ins:R": "black",
+          "4:Ins:R": "black",
+          "5:Ins:R": "white",
+          "2:Del:M": "blacl",
+          "3:Del:M": "black",
+          "4:Del:M": "black",
+          "5:Del:M": "white",
         };
 
         const annText = (mutation, res) => {
@@ -106,8 +148,13 @@ export const getPlot = selector({
           } else if (profile.label === "DBS1") {
             res = "<b>" + mutation + "NN</b>";
           } else if (profile.label === "ID1") {
-            res = "<b>" + mutation + "</b>";
+            res = "<b>" + mutation.substring(mutation.length - 1) + "</b>";
           }
+          return res;
+        };
+
+        const annTopText = (arr, res) => {
+          res = "<b>" + arr + "</b>";
           return res;
         };
 
@@ -123,7 +170,7 @@ export const getPlot = selector({
           })
         );
 
-        const shapes = Object.entries(groupByMutation).map(
+        const shapes1 = Object.entries(groupByMutation).map(
           ([mutation, signatures]) => ({
             type: "rect",
             xref: "x",
@@ -139,7 +186,24 @@ export const getPlot = selector({
           })
         );
 
-        const annotations = Object.entries(groupByMutation).map(
+        const shapes2 = Object.entries(groupByMutation).map(
+          ([mutation, signatures]) => ({
+            type: "rect",
+            xref: "x",
+            yref: "paper",
+            x0: signatures.map((e) => e.mutationType)[0],
+            y0: -0.01,
+            x1: signatures.map((e) => e.mutationType)[signatures.length - 1],
+            y1: -0.04,
+            fillcolor: colors[mutation],
+            line: {
+              width: 0,
+            },
+            //layer: "below",
+          })
+        );
+
+        const annotationsOthers = Object.entries(groupByMutation).map(
           ([mutation, signatures]) => ({
             xref: "x",
             yref: "paper",
@@ -152,12 +216,38 @@ export const getPlot = selector({
             text: annText(mutation),
             showarrow: false,
             font: {
-              color: colors[mutation],
+              //color: colors[mutation],
               size: 18,
             },
             align: "center",
           })
         );
+
+        const annotationsID = Object.entries(groupByMutation).map(
+          ([mutation, signatures]) => ({
+            xref: "x",
+            yref: "paper",
+            x: signatures.map((e) => e.mutationType)[signatures.length / 2],
+            xanchor: "bottom",
+            y: 1,
+            yanchor: "bottom",
+            text: annText(mutation),
+            showarrow: false,
+            font: {
+              color: annotationColors[mutation],
+              size: 14,
+            },
+            align: "center",
+          })
+        );
+
+        let annotations = [...annotationsOthers];
+        let shapes = [...shapes1];
+
+        if (profile.label === "ID1") {
+          shapes = [...shapes1, ...shapes2];
+          annotations = [...annotationsOthers, ...annotationsID];
+        }
 
         const layout = {
           xaxis: {
