@@ -56,15 +56,15 @@ export const getPlot = selector({
 
         console.log(data);
         const regex = /\[(.*)\]/;
-        const regex2 = /^.{0,2}/;
-        const regex3 = /^.{0,5}/;
+        const regex2 = /^.{0,3}/;
+        const regex3 = /^.{0,7}/;
 
         const groupByMutation = data.reduce((groups, e) => {
           let mutation;
           if (profile.label === "SBS84") {
             mutation = e.MutationType.match(regex)[1];
           } else if (profile.label === "DBS1") {
-            mutation = e.MutationType.match(regex2)[0];
+            mutation = e.MutationType.match(e.MutationType.substring(0, 3));
           } else if (profile.label === "ID1") {
             mutation = e.MutationType.match(regex3)[0];
           }
@@ -88,6 +88,27 @@ export const getPlot = selector({
           "T>A": "#CAC9C9",
           "T>C": "#A1CE63",
           "T>G": "#EBC6C4",
+          "AC>": "#09BCED",
+          "AT>": "#0266CA",
+          "CC>": "#9FCE62",
+          "CG>": "#006501",
+          "CT>": "#FF9898",
+          "GC>": "#E22925",
+          "TA>": "#FEB065",
+          "TC>": "#FD8000",
+          "TG>": "#CB98FD",
+          "TT>": "#4C0299",
+        };
+
+        const annText = (mutation, res) => {
+          if (profile.label === "SBS84") {
+            res = "<b>" + mutation + "</b>";
+          } else if (profile.label === "DBS1") {
+            res = "<b>" + mutation + "NN</b>";
+          } else if (profile.label === "ID1") {
+            res = "<b>" + mutation + "</b>";
+          }
+          return res;
         };
 
         const traces = Object.entries(groupByMutation).map(
@@ -128,7 +149,7 @@ export const getPlot = selector({
             xanchor: "bottom",
             y: 1.05,
             yanchor: "bottom",
-            text: "<b>" + mutation + "</b>",
+            text: annText(mutation),
             showarrow: false,
             font: {
               color: colors[mutation],
