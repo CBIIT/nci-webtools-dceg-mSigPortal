@@ -56,7 +56,7 @@ function createRadialTree(
   {
     children, // if hierarchical data, given a d in data, returns its children
     tree = d3.tree, // layout algorithm (typically d3.tree or d3.cluster)
-    separation = (a, b) => (a.parent == b.parent ? 1 : 2) / a.depth,
+    separation = (a, b) => (a.parent == b.parent ? 1 : 1) / a.depth,
     sort, // how to sort nodes prior to layout (e.g., (a, b) => d3.descending(a.height, b.height))
     label = (d) => (form.showLabels ? d.name : ''), // given a node d, returns the display name
     title, // given a node d, returns its hover text
@@ -114,10 +114,20 @@ function createRadialTree(
 
   const links = root.links();
 
-  const zoom = d3.zoom().scaleExtent([1, 5]).on('zoom', zoomed);
+  const zoom = d3.zoom().scaleExtent([1, 10]).on('zoom', zoomed);
 
   function zoomed({ transform }) {
     d3.selectAll('#plot').attr('transform', transform);
+    node
+      .attr('r', ({ data }) =>
+        data.name && attributes[data.name]
+          ? r.domain([mutationMin, mutationMax])(
+              attributes[data.name].Mutations
+            ) / transform.k
+          : null
+      )
+      .attr('stroke-width', strokeWidth / transform.k);
+    link.attr('stroke-width', strokeWidth / transform.k);
   }
 
   const container = d3.create('div');
@@ -171,6 +181,8 @@ function createRadialTree(
         ? colorFill(attributes[data.name][form.color.value])
         : stroke
     )
+    .attr('stroke', stroke)
+    .attr('stroke-width', strokeWidth)
     .attr('r', ({ data }) =>
       data.name && attributes[data.name]
         ? r.domain([mutationMin, mutationMax])(attributes[data.name].Mutations)
