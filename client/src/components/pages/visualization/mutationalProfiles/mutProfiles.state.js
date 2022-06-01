@@ -80,13 +80,24 @@ export const getPlot = selector({
           return groups;
         }, {});
 
+        const sorted = Object.fromEntries(
+          Object.entries(groupByMutation).sort(([a, _], [b]) => {
+            console.log(a);
+            console.log(b);
+          })
+        );
+
+        console.log(sorted);
         let groupByFirstGroup = {},
           groupByMutationID = {},
           groupR = {},
           groupRDel = {},
           groupRIns = {},
           groupM = {};
-        let annotationsIDTop = {};
+        let annotationsIDTop = {},
+          annotationIDBot = {},
+          arrayID = [],
+          arrayIDAnnotation = [];
 
         if (profile.label === "ID1") {
           console.log(Object.values(groupByMutation)[0]);
@@ -157,7 +168,20 @@ export const getPlot = selector({
             r[m] = r[m] ? [...r[m], a] : [s];
             return r;
           }, {});
+          const arrayID1 = Object.keys(groupByFirstGroup).map(function (key) {
+            return groupByFirstGroup[key];
+          });
+          const arrayID2 = Object.keys(groupRDel).map(function (key) {
+            return groupRDel[key];
+          });
+          const arrayID3 = Object.keys(groupRIns).map(function (key) {
+            return groupRIns[key];
+          });
+          const arrayID4 = Object.keys(groupM).map(function (key) {
+            return groupM[key];
+          });
 
+          arrayID = [...arrayID1, ...arrayID2, ...arrayID3, ...arrayID4];
           // annotationsIDTop = Object.entries(groupByMutationID).map(
           //   ([mutation, signatures]) => ({
           //     xref: "x",
@@ -174,16 +198,14 @@ export const getPlot = selector({
           //     align: "center",
           //   })
           // );
+
+          const flattenObj = [].concat.apply([], arrayID);
+
+          console.log(flattenObj);
         }
 
-        console.log(groupR);
-        console.log(groupRDel);
-        console.log(groupRIns);
-        console.log(groupM);
-
-        console.log(groupByMutation);
-        console.log(groupByMutationID);
-        console.log(groupByFirstGroup);
+        console.log(annotationsIDTop);
+        console.log(arrayID);
 
         const colors = {
           "C>A": "#03BCEE",
@@ -247,11 +269,6 @@ export const getPlot = selector({
           } else if (profile.label === "ID1") {
             res = "<b>" + mutation.substring(mutation.length - 1) + "</b>";
           }
-          return res;
-        };
-
-        const annTopText = (arr, res) => {
-          res = "<b>" + arr + "</b>";
           return res;
         };
 
@@ -369,6 +386,8 @@ export const getPlot = selector({
           })
         );
 
+        console.log(groupByMutation);
+
         const annotationsID = Object.entries(groupByMutation).map(
           ([mutation, signatures]) => ({
             xref: "x",
@@ -391,7 +410,7 @@ export const getPlot = selector({
         let shapes = [...shapes1];
 
         if (profile.label === "ID1") {
-          shapes = [...shapes1, ...shapes2];
+          //shapes = [...shapes1, ...shapes2];
           annotations = [...annotationsID];
           traces = [...traces2, ...traces3, ...traces4, ...traces5];
         } else {
