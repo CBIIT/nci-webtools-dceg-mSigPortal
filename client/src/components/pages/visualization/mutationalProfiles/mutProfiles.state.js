@@ -58,8 +58,7 @@ export const getPlot = selector({
         const regex = /\[(.*)\]/;
         const regex2 = /^.{0,3}/;
         const regex3 = /^.{0,7}/;
-
-        const IDAnnTopArray = ["1", "2", "3", "4", "5"];
+        const regex4 = /^.{0,4}/;
 
         const groupByMutation = data.reduce((groups, e) => {
           let mutation;
@@ -81,12 +80,101 @@ export const getPlot = selector({
           return groups;
         }, {});
 
+        let groupByMutationID,
+          groupR,
+          groupRDel,
+          groupRIns,
+          groupM = {};
+        let annotationsIDTop = {};
+        if (profile.label === "ID1") {
+          groupByMutationID = data.reduce((groups, e) => {
+            let mutationID;
+            mutationID = e.MutationType.match(
+              e.MutationType.substring(
+                e.MutationType.length - 3,
+                e.MutationType.length - 2
+              )
+            );
+
+            const signature = {
+              mutationType: e.MutationType,
+              contribution: e.Contribution,
+            };
+            groups[mutationID] = groups[mutationID]
+              ? [...groups[mutationID], signature]
+              : [signature];
+            return groups;
+          }, {});
+
+          groupR = groupByMutationID["R"].reduce((r, a) => {
+            let m;
+            m = a.mutationType.match(a.mutationType.substr(2, 3));
+            const s = {
+              mutationType: a.mutationType,
+              contribution: a.contribution,
+            };
+            r[m] = r[m] ? [...r[m], a] : [s];
+            return r;
+          }, {});
+
+          groupRDel = groupR["Del"].reduce((r, a) => {
+            let m;
+            m = a.mutationType.match(a.mutationType.substr(0, 1));
+            const s = {
+              mutationType: a.mutationType,
+              contribution: a.contribution,
+            };
+            r[m] = r[m] ? [...r[m], a] : [s];
+            return r;
+          }, {});
+
+          groupRIns = groupR["Ins"].reduce((r, a) => {
+            let m;
+            m = a.mutationType.match(a.mutationType.substr(0, 1));
+            const s = {
+              mutationType: a.mutationType,
+              contribution: a.contribution,
+            };
+            r[m] = r[m] ? [...r[m], a] : [s];
+            return r;
+          }, {});
+
+          groupM = groupByMutationID["M"].reduce((r, a) => {
+            let m;
+            m = a.mutationType.match(a.mutationType.substr(0, 1));
+            const s = {
+              mutationType: a.mutationType,
+              contribution: a.contribution,
+            };
+            r[m] = r[m] ? [...r[m], a] : [s];
+            return r;
+          }, {});
+
+          // annotationsIDTop = Object.entries(groupByMutationID).map(
+          //   ([mutation, signatures]) => ({
+          //     xref: "x",
+          //     yref: "paper",
+          //     x: signatures.map((e) => e.mutationType)[signatures.length / 2],
+          //     xanchor: "bottom",
+          //     y: 1.05,
+          //     yanchor: "bottom",
+          //     text: "<b>" + mutation + "</b>",
+          //     showarrow: false,
+          //     font: {
+          //       size: 14,
+          //     },
+          //     align: "center",
+          //   })
+          // );
+        }
+
+        console.log(groupR);
+        console.log(groupRDel);
+        console.log(groupRIns);
+        console.log(groupM);
+
         console.log(groupByMutation);
-        console.log(
-          groupByMutation.sort(
-            (a, b) => a.charCodeAt(a.length - 1) - b.charCodeAt(b.length - 1)
-          )
-        );
+        console.log(groupByMutationID);
 
         const colors = {
           "C>A": "#03BCEE",
@@ -170,6 +258,8 @@ export const getPlot = selector({
           })
         );
 
+        console.log("traces", traces);
+
         const shapes1 = Object.entries(groupByMutation).map(
           ([mutation, signatures]) => ({
             type: "rect",
@@ -241,12 +331,14 @@ export const getPlot = selector({
           })
         );
 
-        let annotations = [...annotationsOthers];
+        let annotations = [];
         let shapes = [...shapes1];
 
         if (profile.label === "ID1") {
           shapes = [...shapes1, ...shapes2];
-          annotations = [...annotationsOthers, ...annotationsID];
+          annotations = [...annotationsID];
+        } else {
+          annotations = [...annotationsOthers];
         }
 
         const layout = {
