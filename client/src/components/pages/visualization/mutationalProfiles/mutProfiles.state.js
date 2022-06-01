@@ -89,7 +89,11 @@ export const getPlot = selector({
         let annotationsIDTop = {};
 
         if (profile.label === "ID1") {
-          console.log(Object.keys(groupByMutation)[0]);
+          console.log(Object.values(groupByMutation)[0]);
+
+          groupByFirstGroup = Object.fromEntries(
+            Object.entries(groupByMutation).slice(0, 4)
+          );
 
           groupByMutationID = data.reduce((groups, e) => {
             let mutationID;
