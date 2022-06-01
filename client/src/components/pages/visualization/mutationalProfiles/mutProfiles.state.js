@@ -80,13 +80,17 @@ export const getPlot = selector({
           return groups;
         }, {});
 
-        let groupByMutationID,
-          groupR,
-          groupRDel,
-          groupRIns,
+        let groupByFirstGroup = {},
+          groupByMutationID = {},
+          groupR = {},
+          groupRDel = {},
+          groupRIns = {},
           groupM = {};
         let annotationsIDTop = {};
+
         if (profile.label === "ID1") {
+          console.log(Object.keys(groupByMutation)[0]);
+
           groupByMutationID = data.reduce((groups, e) => {
             let mutationID;
             mutationID = e.MutationType.match(
@@ -119,7 +123,7 @@ export const getPlot = selector({
 
           groupRDel = groupR["Del"].reduce((r, a) => {
             let m;
-            m = a.mutationType.match(a.mutationType.substr(0, 1));
+            m = a.mutationType.match(a.mutationType.substr(0, 7));
             const s = {
               mutationType: a.mutationType,
               contribution: a.contribution,
@@ -130,7 +134,7 @@ export const getPlot = selector({
 
           groupRIns = groupR["Ins"].reduce((r, a) => {
             let m;
-            m = a.mutationType.match(a.mutationType.substr(0, 1));
+            m = a.mutationType.match(a.mutationType.substr(0, 7));
             const s = {
               mutationType: a.mutationType,
               contribution: a.contribution,
@@ -141,7 +145,7 @@ export const getPlot = selector({
 
           groupM = groupByMutationID["M"].reduce((r, a) => {
             let m;
-            m = a.mutationType.match(a.mutationType.substr(0, 1));
+            m = a.mutationType.match(a.mutationType.substr(0, 7));
             const s = {
               mutationType: a.mutationType,
               contribution: a.contribution,
@@ -175,6 +179,7 @@ export const getPlot = selector({
 
         console.log(groupByMutation);
         console.log(groupByMutationID);
+        console.log(groupByFirstGroup);
 
         const colors = {
           "C>A": "#03BCEE",
@@ -246,7 +251,7 @@ export const getPlot = selector({
           return res;
         };
 
-        const traces = Object.entries(groupByMutation).map(
+        const traces1 = Object.entries(groupByMutation).map(
           ([mutation, signatures]) => ({
             name: mutation,
             type: "bar",
@@ -258,7 +263,54 @@ export const getPlot = selector({
           })
         );
 
-        console.log("traces", traces);
+        const traces2 = Object.entries(groupByFirstGroup).map(
+          ([mutation, signatures]) => ({
+            name: mutation,
+            type: "bar",
+            marker: { color: colors[mutation] },
+            x: signatures.map((e) => e.mutationType),
+            y: signatures.map((e) => e.contribution),
+            hoverinfo: "x+y",
+            showlegend: false,
+          })
+        );
+        const traces3 = Object.entries(groupRDel).map(
+          ([mutation, signatures]) => ({
+            name: mutation,
+            type: "bar",
+            marker: { color: colors[mutation] },
+            x: signatures.map((e) => e.mutationType),
+            y: signatures.map((e) => e.contribution),
+            hoverinfo: "x+y",
+            showlegend: false,
+          })
+        );
+
+        const traces4 = Object.entries(groupRIns).map(
+          ([mutation, signatures]) => ({
+            name: mutation,
+            type: "bar",
+            marker: { color: colors[mutation] },
+            x: signatures.map((e) => e.mutationType),
+            y: signatures.map((e) => e.contribution),
+            hoverinfo: "x+y",
+            showlegend: false,
+          })
+        );
+
+        const traces5 = Object.entries(groupM).map(
+          ([mutation, signatures]) => ({
+            name: mutation,
+            type: "bar",
+            marker: { color: colors[mutation] },
+            x: signatures.map((e) => e.mutationType),
+            y: signatures.map((e) => e.contribution),
+            hoverinfo: "x+y",
+            showlegend: false,
+          })
+        );
+
+        let traces = [];
 
         const shapes1 = Object.entries(groupByMutation).map(
           ([mutation, signatures]) => ({
@@ -337,10 +389,13 @@ export const getPlot = selector({
         if (profile.label === "ID1") {
           shapes = [...shapes1, ...shapes2];
           annotations = [...annotationsID];
+          traces = [...traces2, ...traces3, ...traces4, ...traces5];
         } else {
           annotations = [...annotationsOthers];
+          traces = [...traces1];
         }
 
+        console.log(traces);
         const layout = {
           xaxis: {
             title: "Substitution",
@@ -361,7 +416,7 @@ export const getPlot = selector({
           annotations: annotations,
         };
 
-        return { data: [...traces], layout, config: {} };
+        return { data: traces, layout, config: {} };
       } else return { data: [], layout: {}, config: {} };
     } catch (error) {
       return { data: [], layout: {}, config: {} };
