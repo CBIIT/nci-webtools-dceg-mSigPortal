@@ -62,6 +62,59 @@ export const getPlot = selector({
         let showXlable = true;
         let xTitle = "";
         let yTitle = "";
+        const colors = {
+          "C>A": "#03BCEE",
+          "C>G": "black",
+          "C>T": "#E32926",
+          "T>A": "#CAC9C9",
+          "T>C": "#A1CE63",
+          "T>G": "#EBC6C4",
+          "AC>": "#09BCED",
+          "AT>": "#0266CA",
+          "CC>": "#9FCE62",
+          "CG>": "#006501",
+          "CT>": "#FF9898",
+          "GC>": "#E22925",
+          "TA>": "#FEB065",
+          "TC>": "#FD8000",
+          "TG>": "#CB98FD",
+          "TT>": "#4C0299",
+          "1:Del:C": "#FBBD6F",
+          "1:Del:T": "#FE8002",
+          "1:Ins:C": "#AEDD8A",
+          "1:Ins:T": "#35A12E",
+          "2:Del:R": "#FCC9B4",
+          "3:Del:R": "#FB8969",
+          "4:Del:R": "#F04432",
+          "5:Del:R": "#BB1A1A",
+          "2:Ins:R": "#CFDFF0",
+          "3:Ins:R": "#93C3DE",
+          "4:Ins:R": "#4B97C7",
+          "5:Ins:R": "#1863AA",
+          "2:Del:M": "#E1E1EE",
+          "3:Del:M": "#B5B5D6",
+          "4:Del:M": "#8482BC",
+          "5:Del:M": "#62409A",
+        };
+
+        const annotationColors = {
+          "1:Del:C": "black",
+          "1:Del:T": "white",
+          "1:Ins:C": "black",
+          "1:Ins:T": "white",
+          "2:Del:R": "black",
+          "3:Del:R": "black",
+          "4:Del:R": "black",
+          "5:Del:R": "white",
+          "2:Ins:R": "black",
+          "3:Ins:R": "black",
+          "4:Ins:R": "black",
+          "5:Ins:R": "white",
+          "2:Del:M": "blacl",
+          "3:Del:M": "black",
+          "4:Del:M": "black",
+          "5:Del:M": "white",
+        };
 
         const groupByMutation = data.reduce((groups, e) => {
           let mutation;
@@ -188,6 +241,19 @@ export const getPlot = selector({
           );
           console.log(arrayIDAnnotation);
 
+          Object.values(arrayID).map((key) => {
+            console.log(key);
+            if (key.length > 1) {
+              arrayIDAnnotationTop.push(
+                key[Math.floor(key.length / 2)].mutationType
+              );
+            } else {
+              arrayIDAnnotationTop.push(key[0].mutationType);
+            }
+          });
+
+          console.log(arrayIDAnnotationTop);
+
           console.log(groupByFirstGroup);
           console.log(arrayID1);
           console.log(arrayID2);
@@ -210,14 +276,29 @@ export const getPlot = selector({
           //     align: "center",
           //   })
           // );
-          annotationIDTop = Object.entries(arrayID).map(
-            ([mutation, index]) => ({
-              x: index.map((e) =>
-                index < 4 ? e.mutationType[index.length / 2] : e.mutationType[0]
-              ),
-              y: mutation,
-            })
-          );
+          annotationIDTop = arrayIDAnnotationTop.map((num, index) => {
+            const result = {
+              xref: "x",
+              yref: "paper",
+              x: num,
+              xanchor: "bottom",
+              y: 1,
+              yanchor: "bottom",
+              text:
+                index < 4
+                  ? "<b>" +
+                    num.substring(num.length - 3, num.length - 2) +
+                    "</b>"
+                  : "<b>" + num.substring(0, 1),
+              showarrow: false,
+              font: {
+                size: 14,
+                color: annotationColors[num.substring(0, num.length - 2)],
+              },
+              align: "center",
+            };
+            return result;
+          });
 
           console.log(annotationIDTop);
 
@@ -229,7 +310,7 @@ export const getPlot = selector({
               xanchor: "bottom",
               y: -0.08,
               yanchor: "bottom",
-              text: "<b>" + num.substr(num.length - 1, num.length) + "</b>",
+              text: "<b>" + num.substring(num.length - 1, num.length) + "</b>",
               showarrow: false,
               font: {
                 size: 14,
@@ -250,60 +331,6 @@ export const getPlot = selector({
         }
 
         console.log(annotationIDBot);
-
-        const colors = {
-          "C>A": "#03BCEE",
-          "C>G": "black",
-          "C>T": "#E32926",
-          "T>A": "#CAC9C9",
-          "T>C": "#A1CE63",
-          "T>G": "#EBC6C4",
-          "AC>": "#09BCED",
-          "AT>": "#0266CA",
-          "CC>": "#9FCE62",
-          "CG>": "#006501",
-          "CT>": "#FF9898",
-          "GC>": "#E22925",
-          "TA>": "#FEB065",
-          "TC>": "#FD8000",
-          "TG>": "#CB98FD",
-          "TT>": "#4C0299",
-          "1:Del:C": "#FBBD6F",
-          "1:Del:T": "#FE8002",
-          "1:Ins:C": "#AEDD8A",
-          "1:Ins:T": "#35A12E",
-          "2:Del:R": "#FCC9B4",
-          "3:Del:R": "#FB8969",
-          "4:Del:R": "#F04432",
-          "5:Del:R": "#BB1A1A",
-          "2:Ins:R": "#CFDFF0",
-          "3:Ins:R": "#93C3DE",
-          "4:Ins:R": "#4B97C7",
-          "5:Ins:R": "#1863AA",
-          "2:Del:M": "#E1E1EE",
-          "3:Del:M": "#B5B5D6",
-          "4:Del:M": "#8482BC",
-          "5:Del:M": "#62409A",
-        };
-
-        const annotationColors = {
-          "1:Del:C": "black",
-          "1:Del:T": "white",
-          "1:Ins:C": "black",
-          "1:Ins:T": "white",
-          "2:Del:R": "black",
-          "3:Del:R": "black",
-          "4:Del:R": "black",
-          "5:Del:R": "white",
-          "2:Ins:R": "black",
-          "3:Ins:R": "black",
-          "4:Ins:R": "black",
-          "5:Ins:R": "white",
-          "2:Del:M": "blacl",
-          "3:Del:M": "black",
-          "4:Del:M": "black",
-          "5:Del:M": "white",
-        };
 
         const annText = (mutation, res) => {
           if (profile.label === "SBS84") {
@@ -456,7 +483,7 @@ export const getPlot = selector({
 
         if (profile.label === "ID1") {
           shapes = [...shapes1, ...shapes2];
-          annotations = [...annotationsID, ...annotationIDBot];
+          annotations = [...annotationIDTop, ...annotationIDBot];
           traces = [...traces2, ...traces3, ...traces4, ...traces5];
         } else {
           annotations = [...annotationsOthers];
