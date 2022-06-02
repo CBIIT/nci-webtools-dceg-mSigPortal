@@ -113,11 +113,17 @@ function createRadialTree(
 
   const links = root.links();
 
-  const zoom = d3.zoom().scaleExtent([1, 10]).on('zoom', zoomed);
+  const zoom = d3
+    .zoom()
+    .scaleExtent([1, 10])
+    .on('zoom', zoomed)
+    .on('end', rescale);
 
   function zoomed({ transform }) {
     d3.selectAll('#plot').attr('transform', transform);
+  }
 
+  function rescale({ transform }) {
     node
       .select('circle')
       .attr('r', ({ data }) =>
@@ -208,7 +214,7 @@ function createRadialTree(
         d.x < Math.PI === !d.children ? 'start' : 'end'
       )
       .attr('paint-order', 'stroke')
-      .attr('stroke', halo)
+      // .attr('stroke', halo)
       .attr('stroke-width', haloWidth)
       .attr('font-size', '.75rem')
       .text((d, i) => d.data.name);
