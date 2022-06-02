@@ -59,6 +59,9 @@ export const getPlot = selector({
         const regex2 = /^.{0,3}/;
         const regex3 = /^.{0,7}/;
         const regex4 = /^.{0,4}/;
+        let showXlable = true;
+        let xTitle = "";
+        let yTitle = "";
 
         const groupByMutation = data.reduce((groups, e) => {
           let mutation;
@@ -80,26 +83,23 @@ export const getPlot = selector({
           return groups;
         }, {});
 
-        const sorted = Object.fromEntries(
-          Object.entries(groupByMutation).sort(([a, _], [b]) => {
-            console.log(a);
-            console.log(b);
-          })
-        );
-
-        console.log(sorted);
         let groupByFirstGroup = {},
           groupByMutationID = {},
           groupR = {},
           groupRDel = {},
           groupRIns = {},
-          groupM = {};
-        let annotationsIDTop = {},
+          groupM = {},
+          annotationIDTop = {},
           annotationIDBot = {},
+          annotationIDBotArr = {},
           arrayID = [],
-          arrayIDAnnotation = [];
+          arrayIDAnnotation = [],
+          arrayIDAnnotationTop = [];
 
         if (profile.label === "ID1") {
+          showXlable = false;
+          xTitle = "";
+          yTitle = "Number of Indels";
           console.log(Object.values(groupByMutation)[0]);
 
           groupByFirstGroup = Object.fromEntries(
@@ -182,6 +182,18 @@ export const getPlot = selector({
           });
 
           arrayID = [...arrayID1, ...arrayID2, ...arrayID3, ...arrayID4];
+
+          Object.values(arrayID).map((group) =>
+            group.map((e) => arrayIDAnnotation.push(e.mutationType))
+          );
+          console.log(arrayIDAnnotation);
+
+          console.log(groupByFirstGroup);
+          console.log(arrayID1);
+          console.log(arrayID2);
+          console.log(arrayID3);
+          console.log(arrayID4);
+          console.log(arrayID);
           // annotationsIDTop = Object.entries(groupByMutationID).map(
           //   ([mutation, signatures]) => ({
           //     xref: "x",
@@ -198,14 +210,46 @@ export const getPlot = selector({
           //     align: "center",
           //   })
           // );
+          annotationIDTop = Object.entries(arrayID).map(
+            ([mutation, index]) => ({
+              x: index.map((e) =>
+                index < 4 ? e.mutationType[index.length / 2] : e.mutationType[0]
+              ),
+              y: mutation,
+            })
+          );
 
-          const flattenObj = [].concat.apply([], arrayID);
+          console.log(annotationIDTop);
 
-          console.log(flattenObj);
+          annotationIDBot = arrayIDAnnotation.map((num) => {
+            const result = {
+              xref: "x",
+              yref: "paper",
+              x: num,
+              xanchor: "bottom",
+              y: -0.08,
+              yanchor: "bottom",
+              text: "<b>" + num.substr(num.length - 1, num.length) + "</b>",
+              showarrow: false,
+              font: {
+                size: 14,
+              },
+              align: "center",
+            };
+            return result;
+          });
+          console.log(annotationIDBot);
+        } else if (profile.label === "SBS84") {
+          showXlable = true;
+          xTitle = "Substitution";
+          yTitle = "Mutation Probability";
+        } else {
+          showXlable = true;
+          xTitle = "Double substitution";
+          yTitle = "Mutation Probability";
         }
 
-        console.log(annotationsIDTop);
-        console.log(arrayID);
+        console.log(annotationIDBot);
 
         const colors = {
           "C>A": "#03BCEE",
@@ -406,12 +450,13 @@ export const getPlot = selector({
           })
         );
 
+        console.log(annotationsID);
         let annotations = [];
         let shapes = [...shapes1];
 
         if (profile.label === "ID1") {
-          //shapes = [...shapes1, ...shapes2];
-          annotations = [...annotationsID];
+          shapes = [...shapes1, ...shapes2];
+          annotations = [...annotationsID, ...annotationIDBot];
           traces = [...traces2, ...traces3, ...traces4, ...traces5];
         } else {
           annotations = [...annotationsOthers];
@@ -421,16 +466,16 @@ export const getPlot = selector({
         console.log(traces);
         const layout = {
           xaxis: {
-            title: "Substitution",
+            title: xTitle,
             showline: true,
-            showticklabels: true,
+            showticklabels: showXlable,
             tickangle: -90,
             tickfont: {
               size: 10,
             },
           },
           yaxis: {
-            title: "Mutation probability",
+            title: yTitle,
             //tickformat: ".1%",
             autorange: true,
           },
