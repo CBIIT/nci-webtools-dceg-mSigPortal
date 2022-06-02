@@ -144,10 +144,32 @@ export const getPlot = selector({
           groupM = {},
           annotationIDTop = {},
           annotationIDBot = {},
-          annotationIDBotArr = {},
+          annotationsIDTopLabel = {},
+          annotationsIDBotLabel = {},
           arrayID = [],
           arrayIDAnnotation = [],
-          arrayIDAnnotationTop = [];
+          arrayIDAnnotationTop = [],
+          arrayIDAnnXTop = [
+            "1bp Deletion",
+            "1bp Insertion",
+            ">1bp Deletion at Repeats<br>(Deletion Length)",
+            ">1bp Insertions at Repeats<br> (Insertion Length)",
+            "Microhomology<br>(Deletion Length)",
+          ],
+          arrayIDAnnXBot = [
+            "Homopolymer Length",
+            "Homopolymer Length",
+            "Number of Repeat Units",
+            "Number of Repeat Units",
+            "Microhimology Length",
+          ],
+          arrayIDAnnXLabel = [
+            "1:Del:C:5",
+            "1:Ins:C:5",
+            "3:Del:R:5",
+            "3:Ins:R:5",
+            "4:Del:M:1",
+          ];
 
         if (profile.label === "ID1") {
           showXlable = false;
@@ -235,14 +257,13 @@ export const getPlot = selector({
           });
 
           arrayID = [...arrayID1, ...arrayID2, ...arrayID3, ...arrayID4];
+          console.log(arrayID1);
 
           Object.values(arrayID).map((group) =>
             group.map((e) => arrayIDAnnotation.push(e.mutationType))
           );
-          console.log(arrayIDAnnotation);
 
           Object.values(arrayID).map((key) => {
-            console.log(key);
             if (key.length > 1) {
               arrayIDAnnotationTop.push(
                 key[Math.floor(key.length / 2)].mutationType
@@ -252,30 +273,39 @@ export const getPlot = selector({
             }
           });
 
+          console.log(arrayIDAnnotation);
           console.log(arrayIDAnnotationTop);
 
-          console.log(groupByFirstGroup);
-          console.log(arrayID1);
-          console.log(arrayID2);
-          console.log(arrayID3);
-          console.log(arrayID4);
-          console.log(arrayID);
-          // annotationsIDTop = Object.entries(groupByMutationID).map(
-          //   ([mutation, signatures]) => ({
-          //     xref: "x",
-          //     yref: "paper",
-          //     x: signatures.map((e) => e.mutationType)[signatures.length / 2],
-          //     xanchor: "bottom",
-          //     y: 1.05,
-          //     yanchor: "bottom",
-          //     text: "<b>" + mutation + "</b>",
-          //     showarrow: false,
-          //     font: {
-          //       size: 14,
-          //     },
-          //     align: "center",
-          //   })
-          // );
+          annotationsIDTopLabel = arrayIDAnnXLabel.map((num, index) => ({
+            xref: "x",
+            yref: "paper",
+            x: num,
+            xanchor: "bottom",
+            y: 1.05,
+            yanchor: "bottom",
+            text: "<b>" + arrayIDAnnXTop[index] + "</b>",
+            showarrow: false,
+            font: {
+              size: 14,
+            },
+            align: "center",
+          }));
+
+          annotationsIDBotLabel = arrayIDAnnXLabel.map((num, index) => ({
+            xref: "x",
+            yref: "paper",
+            x: num,
+            xanchor: "bottom",
+            y: -0.105,
+            yanchor: "bottom",
+            text: "<b>" + arrayIDAnnXBot[index] + "</b>",
+            showarrow: false,
+            font: {
+              size: 14,
+            },
+            align: "center",
+          }));
+
           annotationIDTop = arrayIDAnnotationTop.map((num, index) => {
             const result = {
               xref: "x",
@@ -308,7 +338,7 @@ export const getPlot = selector({
               yref: "paper",
               x: num,
               xanchor: "bottom",
-              y: -0.08,
+              y: -0.075,
               yanchor: "bottom",
               text: "<b>" + num.substring(num.length - 1, num.length) + "</b>",
               showarrow: false,
@@ -457,8 +487,6 @@ export const getPlot = selector({
           })
         );
 
-        console.log(groupByMutation);
-
         const annotationsID = Object.entries(groupByMutation).map(
           ([mutation, signatures]) => ({
             xref: "x",
@@ -483,7 +511,12 @@ export const getPlot = selector({
 
         if (profile.label === "ID1") {
           shapes = [...shapes1, ...shapes2];
-          annotations = [...annotationIDTop, ...annotationIDBot];
+          annotations = [
+            ...annotationIDTop,
+            ...annotationIDBot,
+            ...annotationsIDTopLabel,
+            ...annotationsIDBotLabel,
+          ];
           traces = [...traces2, ...traces3, ...traces4, ...traces5];
         } else {
           annotations = [...annotationsOthers];
