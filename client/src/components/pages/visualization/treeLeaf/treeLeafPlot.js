@@ -35,7 +35,7 @@ export default function D3TreeLeaf({ width = 1000, height = 1000, ...props }) {
       colorLegendRef.current.replaceChildren(colorLegend);
       // mutationsLegendRef.current.replaceChildren(mutationsLegend);
     }
-  }, [hierarchy, plotRef, width, height]);
+  }, [hierarchy, form, plotRef, width, height]);
 
   return (
     <div className="border rounded p-3" {...props}>
@@ -56,9 +56,9 @@ function createRadialTree(
   {
     children, // if hierarchical data, given a d in data, returns its children
     tree = d3.tree, // layout algorithm (typically d3.tree or d3.cluster)
-    separation = (a, b) => (a.parent == b.parent ? 1 : 2) / a.depth,
+    separation = (a, b) => (a.parent == b.parent ? 1 : 1) / a.depth,
     sort, // how to sort nodes prior to layout (e.g., (a, b) => d3.descending(a.height, b.height))
-    label = (d) => (form.showLabels ? d.name : ''), // given a node d, returns the display name
+    label = (d) => d.name, // given a node d, returns the display name
     title, // given a node d, returns its hover text
     width = 640, // outer width, in pixels
     height = 400, // outer height, in pixels
@@ -110,14 +110,34 @@ function createRadialTree(
 
   // Compute labels and titles.
   const nodes = root.descendants();
-  const L = label == null ? null : nodes.map((d) => label(d.data, d));
 
   const links = root.links();
 
-  const zoom = d3.zoom().scaleExtent([1, 5]).on('zoom', zoomed);
+  const zoom = d3
+    .zoom()
+    .scaleExtent([1, 10])
+    .on('zoom', zoomed)
+    .on('end', rescale);
 
   function zoomed({ transform }) {
     d3.selectAll('#plot').attr('transform', transform);
+  }
+
+  function rescale({ transform }) {
+    node
+      .select('circle')
+      .attr('r', ({ data }) =>
+        data.name && attributes[data.name]
+          ? r.domain([mutationMin, mutationMax])(
+              attributes[data.name].Mutations
+            ) / transform.k
+          : null
+      )
+      .attr('stroke-width', strokeWidth / transform.k);
+
+    node.select('text').attr('font-size', `${0.75 / transform.k}rem`);
+
+    link.attr('stroke-width', strokeWidth / transform.k);
   }
 
   const container = d3.create('div');
@@ -164,13 +184,17 @@ function createRadialTree(
     .attr(
       'transform',
       (d) => `rotate(${(d.x * 180) / Math.PI - 90}) translate(${d.y},0)`
-    )
+    );
+
+  node
     .append('circle')
     .attr('fill', ({ data }) =>
       data.name && attributes[data.name]
         ? colorFill(attributes[data.name][form.color.value])
         : stroke
     )
+    .attr('stroke', stroke)
+    .attr('stroke-width', strokeWidth)
     .attr('r', ({ data }) =>
       data.name && attributes[data.name]
         ? r.domain([mutationMin, mutationMax])(attributes[data.name].Mutations)
@@ -180,11 +204,23 @@ function createRadialTree(
     .on('mousemove', mousemove)
     .on('mouseleave', mouseleave);
 
-  const colorLegend = form.color.continuous
-    ? ContinuousLegend(colorFill, {
-        title: form.color.label,
-      })
-    : CategoricalLegned(colorFill);
+  if (form.showLabels) {
+    node
+      .append('text')
+      .attr('transform', (d) => `rotate(${d.x >= Math.PI ? 180 : 0})`)
+      .attr('dy', '0.32em')
+      .attr('x', (d) => (d.x < Math.PI === !d.children ? 6 : -6))
+      .attr('text-anchor', (d) =>
+        d.x < Math.PI === !d.children ? 'start' : 'end'
+      )
+      .attr('paint-order', 'stroke')
+      // .attr('stroke', halo)
+      .attr('stroke-width', haloWidth)
+      .attr('font-size', '.75rem')
+      .text((d, i) => d.data.name);
+  }
+
+  if (title != null) node.append('title').text((d) => title(d.data, d));
 
   // add tooltips
   const tooltip = container
@@ -220,21 +256,11 @@ function createRadialTree(
       .style('top', e.pageY - 320 + 'px');
   }
 
-  if (title != null) node.append('title').text((d) => title(d.data, d));
-
-  if (L)
-    node
-      .append('text')
-      .attr('transform', (d) => `rotate(${d.x >= Math.PI ? 180 : 0})`)
-      .attr('dy', '0.32em')
-      .attr('x', (d) => (d.x < Math.PI === !d.children ? 6 : -6))
-      .attr('text-anchor', (d) =>
-        d.x < Math.PI === !d.children ? 'start' : 'end'
-      )
-      .attr('paint-order', 'stroke')
-      .attr('stroke', halo)
-      .attr('stroke-width', haloWidth)
-      .text((d, i) => L[i]);
+  const colorLegend = form.color.continuous
+    ? ContinuousLegend(colorFill, {
+        title: form.color.label,
+      })
+    : CategoricalLegned(colorFill);
 
   return [container.node(), colorLegend];
 }

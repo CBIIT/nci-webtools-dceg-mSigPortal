@@ -1,16 +1,15 @@
-FROM ${FRONTEND_BASE_IMAGE:-quay.io/centos/centos:stream8}
+FROM ${FRONTEND_BASE_IMAGE:-quay.io/centos/centos:stream9}
 
 RUN dnf -y update \
     && dnf -y install \
     dnf-plugins-core \
     epel-release \
-    glibc-langpack-en \
-    && dnf -y module enable nodejs:14 \
+    && curl -fsSL https://rpm.nodesource.com/setup_16.x | bash - \
     && dnf -y install \
     gcc-c++ \
     httpd \
-    make \
     nodejs \
+    make \
     && dnf clean all
 
 RUN mkdir /client
@@ -35,7 +34,7 @@ EXPOSE 80
 EXPOSE 443
 
 CMD rm -rf /run/httpd/* /tmp/httpd* \
-    && exec /usr/sbin/apachectl -DFOREGROUND
+    && exec /usr/sbin/httpd -DFOREGROUND
 
 # docker build -t msigportal-frontend -f frontend.dockerfile ~/Projects/msigportal/
 # docker run -d -p 8331:80 --name msigportal-frontend msigportal-frontend

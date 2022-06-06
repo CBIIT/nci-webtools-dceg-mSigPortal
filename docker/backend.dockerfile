@@ -1,50 +1,3 @@
-FROM ${BACKEND_BASE_IMAGE:-quay.io/centos/centos:stream8} as renvCache 
-
-ENV R_VERSION=4.1.2
-
-RUN dnf -y update \
-    && dnf -y install \
-    dnf-plugins-core \
-    epel-release \
-    glibc-langpack-en \
-    && dnf config-manager --enable powertools \
-    && dnf -y module enable nodejs:13 \
-    && dnf -y install \
-    cmake \
-    v8-devel \
-    libjpeg-turbo-devel \
-    openssl-devel \
-    nodejs \
-    python3-pip \
-    python3-devel \
-    libcurl-devel \
-    libxml2-devel \
-    git \
-    rsync \
-    wget \
-    && dnf -y install \
-    gmp-devel \
-    mpfr-devel \
-    cairo-devel \
-    && dnf -y install https://cdn.rstudio.com/r/centos-8/pkgs/R-${R_VERSION}-1-1.x86_64.rpm \
-    && dnf clean all
-
-# symlink R
-RUN ln -s /opt/R/${R_VERSION}/bin/R /usr/local/bin/R
-RUN ln -s /opt/R/${R_VERSION}/bin/Rscript /usr/local/bin/Rscript
-
-# install renv
-RUN R -e "install.packages('renv', repos = 'https://cloud.r-project.org/')"
-
-# install R packages
-COPY server/renv.lock /deploy/server/
-
-WORKDIR /deploy/server
-
-RUN R -e "renv::restore()"
-# RUN R -e "renv:::renv_paths_cache()"
-
-
 FROM ${BACKEND_BASE_IMAGE:-quay.io/centos/centos:stream8}
 
 ENV R_VERSION=4.1.2
@@ -105,9 +58,6 @@ RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#eg
 # ENV MAKEFLAGS='-j2'
 # RUN mkdir -p $HOME/.R && \
 #     echo -e "CXX14FLAGS=-O3 -march=native -mtune=native -fPIC \nCXX14=g++" >> $HOME/.R/Makevars
-
-# copy renv cache from intermediate image
-COPY --from=renvCache /root/.cache/R/renv/cache/v5/R-4.1/x86_64-redhat-linux-gnu /root/.cache/R/renv/cache/v5/R-4.1/x86_64-redhat-linux-gnu
 
 # install renv
 RUN R -e "install.packages('renv', repos = 'https://cloud.r-project.org/')"
