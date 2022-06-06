@@ -1,8 +1,8 @@
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { formState } from './mutProfiles.state';
-import { Form, Row, Col } from 'react-bootstrap';
-import CustomSelect from '../../../controls/select/select';
-import Select from 'react-select';
+import { useRecoilState, useRecoilValue } from "recoil";
+import { formState } from "./mutProfiles.state";
+import { Form, Row, Col } from "react-bootstrap";
+import CustomSelect from "../../../controls/select/select";
+import Select from "react-select";
 
 export default function TreeLeafForm() {
   const [form, setForm] = useRecoilState(formState);
@@ -11,33 +11,33 @@ export default function TreeLeafForm() {
   function handleChange(event) {
     let { name, value, checked, type } = event.target;
     mergeForm({
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === "checkbox" ? checked : value,
     });
   }
 
   const profileOptions = [
     {
-      label: 'SBS84',
+      label: "SBS96",
       value: {
-        Profile: 'SBS96',
-        Signature_set_name: 'COSMIC_v3_Signatures_GRCh37_SBS96',
-        Signature_name: 'SBS84',
+        Profile: "SBS96",
+        Signature_set_name: "COSMIC_v3_Signatures_GRCh37_SBS96",
+        Signature_name: "SBS84",
       },
     },
     {
-      label: 'DBS1',
+      label: "DBS78",
       value: {
-        Profile: 'DBS78',
-        Signature_set_name: 'COSMIC_v3_Signatures_GRCh37_DBS78',
-        Signature_name: 'DBS1',
+        Profile: "DBS78",
+        Signature_set_name: "COSMIC_v3_Signatures_GRCh37_DBS78",
+        Signature_name: "DBS1",
       },
     },
     {
-      label: 'ID1',
+      label: "ID1",
       value: {
-        Profile: 'ID83',
-        Signature_set_name: 'COSMIC_v3_Signatures_GRCh37_ID83',
-        Signature_name: 'ID1',
+        Profile: "ID83",
+        Signature_set_name: "COSMIC_v3_Signatures_GRCh37_ID83",
+        Signature_name: "ID1",
       },
     },
   ];

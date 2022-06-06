@@ -1,17 +1,21 @@
-export default function SBS96(data) {
+export default function DBS78(data) {
   const colors = {
-    "C>A": "#03BCEE",
-    "C>G": "black",
-    "C>T": "#E32926",
-    "T>A": "#CAC9C9",
-    "T>C": "#A1CE63",
-    "T>G": "#EBC6C4",
+    "AC>": "#09BCED",
+    "AT>": "#0266CA",
+    "CC>": "#9FCE62",
+    "CG>": "#006501",
+    "CT>": "#FF9898",
+    "GC>": "#E22925",
+    "TA>": "#FEB065",
+    "TC>": "#FD8000",
+    "TG>": "#CB98FD",
+    "TT>": "#4C0299",
   };
 
   // group data by dominant mutation
   const groupByMutation = data.reduce((groups, e, i) => {
-    const mutationRegex = /\[(.*)\]/;
-    const mutation = e.MutationType.match(mutationRegex)[1];
+    const mutationRegex = /^.{0,3}/;
+    const mutation = e.MutationType.match(mutationRegex)[0];
     const signature = {
       mutationType: e.MutationType,
       contribution: e.Contribution,
@@ -25,20 +29,21 @@ export default function SBS96(data) {
 
   console.log(groupByMutation);
   console.log(flatSorted);
-
   const traces = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex) => ({
       name: mutation,
       type: "bar",
       marker: { color: colors[mutation] },
-      //   x: signatures.map((e) => e.mutationType),
+      //x: signatures.map((e) => e.mutationType),
       x: signatures.map((e, i) => groupIndex * signatures.length + i),
       y: signatures.map((e) => e.contribution),
       hoverinfo: "x+y",
       showlegend: false,
+      groupindex: groupIndex,
+      signatureslen: signatures.length,
     })
   );
-
+  console.log(traces);
   const annotations = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex) => ({
       xref: "x",
@@ -47,7 +52,7 @@ export default function SBS96(data) {
       yanchor: "bottom",
       x: groupIndex * signatures.length + (signatures.length - 1) * 0.5,
       y: 1.04,
-      text: `<b>${mutation}</b>`,
+      text: `<b>${mutation}NN</b>`,
       showarrow: false,
       font: {
         size: 18,
@@ -55,7 +60,7 @@ export default function SBS96(data) {
       align: "center",
     })
   );
-
+  console.log(annotations);
   const shapes = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex) => ({
       type: "rect",
