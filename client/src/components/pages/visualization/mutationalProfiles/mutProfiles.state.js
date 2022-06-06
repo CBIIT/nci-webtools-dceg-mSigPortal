@@ -62,6 +62,8 @@ export const getPlot = selector({
         let showXlable = true;
         let xTitle = "";
         let yTitle = "";
+        let xValues = [];
+        let xTickText = [];
         const colors = {
           "C>A": "#03BCEE",
           "C>G": "black",
@@ -116,7 +118,7 @@ export const getPlot = selector({
           "5:Del:M": "white",
         };
 
-        const groupByMutation = data.reduce((groups, e) => {
+        const groupByMutation = data.reduce((groups, e, index) => {
           let mutation;
           if (profile.label === "SBS84") {
             mutation = e.MutationType.match(regex)[1];
@@ -135,6 +137,7 @@ export const getPlot = selector({
             : [signature];
           return groups;
         }, {});
+        console.log(xValues);
 
         let groupByFirstGroup = {},
           groupByMutationID = {},
@@ -257,20 +260,20 @@ export const getPlot = selector({
           });
 
           arrayID = [...arrayID1, ...arrayID2, ...arrayID3, ...arrayID4];
-          console.log(arrayID1);
-
-          Object.values(arrayID).map((group) =>
-            group.map((e) => arrayIDAnnotation.push(e.mutationType))
-          );
-
-          Object.values(arrayID).map((key) => {
-            if (key.length > 1) {
+          console.log(arrayID);
+          let cn = 0;
+          Object.values(arrayID).forEach((group) => {
+            if (group.length > 1) {
               arrayIDAnnotationTop.push(
-                key[Math.floor(key.length / 2)].mutationType
+                group[Math.floor(group.length / 2)].mutationType
               );
             } else {
-              arrayIDAnnotationTop.push(key[0].mutationType);
+              arrayIDAnnotationTop.push(group[0].mutationType);
             }
+            group.forEach((e) => {
+              arrayIDAnnotation.push(e.mutationType);
+              console.log(cn + 1);
+            });
           });
 
           console.log(arrayIDAnnotation);
@@ -358,7 +361,20 @@ export const getPlot = selector({
           showXlable = true;
           xTitle = "Double substitution";
           yTitle = "Mutation Probability";
+          const cnt = 0;
+          Object.entries(groupByMutation).map((entry) => {
+            const [key, value] = entry;
+            Object.entries(value).forEach((e) => {
+              const [k, v] = e;
+
+              xValues.push(cnt + 1);
+              xTickText.push(v.mutationType);
+            });
+          });
         }
+        console.log(groupByMutation);
+        console.log(xValues);
+        console.log(xTickText);
 
         console.log(annotationIDBot);
 
