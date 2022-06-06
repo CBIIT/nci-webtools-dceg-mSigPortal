@@ -89,8 +89,6 @@ export default function SBS96(data) {
     shapes: shapes,
     annotations: annotations,
   };
-  console.log(traces);
-  console.log(layout);
 
   return { traces, layout };
 }
