@@ -252,6 +252,24 @@ export default function ID83(data) {
   );
   console.log(annotations1);
 
+  const annotations2 = arrayIDAnnotation.map((num, index) => ({
+    xref: "x",
+    yref: "paper",
+    xanchor: "bottom",
+    yanchor: "bottom",
+    x: index,
+    y: -0.1,
+    text: "<b>" + num.substring(num.length - 1, num.length) + "</b>",
+    showarrow: false,
+    font: {
+      size: 14,
+    },
+    align: "center",
+    num: num,
+    index: index,
+  }));
+  console.log(annotations2);
+
   const shapes1 = Object.entries(arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
       type: "rect",
@@ -317,7 +335,7 @@ export default function ID83(data) {
 
   const layout = {
     xaxis: {
-      title: "",
+      showticklabels: false,
       showline: true,
       tickangle: -90,
       tickfont: {
@@ -325,7 +343,7 @@ export default function ID83(data) {
       },
       tickmode: "array",
       tickvals: flatSorted.map((_, i) => i),
-      ticktext: flatSorted.map((e) => e.mutationType),
+      //ticktext: flatSorted.map((e) => e.mutationType),
     },
     yaxis: {
       title: "Number of Idels",
@@ -333,7 +351,7 @@ export default function ID83(data) {
     },
 
     shapes: [...shapes1, ...shapes2],
-    annotations: [...annotations1],
+    annotations: [...annotations1, ...annotations2],
   };
 
   console.log(layout);
