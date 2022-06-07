@@ -41,8 +41,6 @@ export default function ID83(data) {
     groupRDel = {},
     groupRIns = {},
     groupM = {},
-    annotationIDTop = {},
-    annotationIDBot = {},
     annotationsIDTopLabel = {},
     annotationsIDBotLabel = {},
     arrayID = [],
@@ -62,13 +60,7 @@ export default function ID83(data) {
       "Number of Repeat Units",
       "Microhimology Length",
     ],
-    arrayIDAnnXLabel = [
-      "1:Del:C:5",
-      "1:Ins:C:5",
-      "3:Del:R:5",
-      "3:Ins:R:5",
-      "4:Del:M:1",
-    ];
+    arrayIDAnnXLabel = [5, 17, 35, 60, 76];
   // group data by dominant mutation
   const groupByMutation = data.reduce((groups, e, i) => {
     const mutationRegex = /^.{0,7}/;
@@ -270,6 +262,38 @@ export default function ID83(data) {
   }));
   console.log(annotations2);
 
+  annotationsIDTopLabel = arrayIDAnnXLabel.map((num, index) => ({
+    xref: "x",
+    yref: "paper",
+    x: num,
+    xanchor: "bottom",
+    y: 1.07,
+    yanchor: "bottom",
+    text: "<b>" + arrayIDAnnXTop[index] + "</b>",
+    showarrow: false,
+    font: {
+      size: 14,
+    },
+    align: "center",
+  }));
+
+  annotationsIDBotLabel = arrayIDAnnXLabel.map((num, index) => ({
+    xref: "x",
+    yref: "paper",
+    x: num,
+    xanchor: "bottom",
+    y: -0.15,
+    yanchor: "bottom",
+    text: "<b>" + arrayIDAnnXBot[index] + "</b>",
+    showarrow: false,
+    font: {
+      size: 14,
+    },
+    align: "center",
+  }));
+
+  console.log(annotationsIDTopLabel);
+
   const shapes1 = Object.entries(arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
       type: "rect",
@@ -351,7 +375,12 @@ export default function ID83(data) {
     },
 
     shapes: [...shapes1, ...shapes2],
-    annotations: [...annotations1, ...annotations2],
+    annotations: [
+      ...annotations1,
+      ...annotations2,
+      ...annotationsIDTopLabel,
+      ...annotationsIDBotLabel,
+    ],
   };
 
   console.log(layout);
