@@ -3,6 +3,7 @@ import axios from "axios";
 import { visualizationState } from "../visualization.state";
 import SBS96 from "../../../controls/mutationalSignature/sbs96";
 import DBS78 from "../../../controls/mutationalSignature/dbs78";
+import ID83 from "../../../controls/mutationalSignature/id83";
 
 export const defaultFormState = {
   profile: {},
@@ -64,6 +65,10 @@ export const getPlot = selector({
           console.log(data);
           const { traces, layout } = DBS78(data);
           return { data: [...traces], layout, config: {} };
+        } else if (profile.value.Profile === "ID83") {
+          console.log(data);
+          const { traces, layout } = ID83(data);
+          return { data: [...traces], layout, config: {} };
         }
 
         console.log(profile);
@@ -72,7 +77,6 @@ export const getPlot = selector({
         const regex = /\[(.*)\]/;
         const regex2 = /^.{0,3}/;
         const regex3 = /^.{0,7}/;
-        const regex4 = /^.{0,4}/;
         let showXlable = true;
         let xTitle = "";
         let yTitle = "";
@@ -136,7 +140,7 @@ export const getPlot = selector({
           let mutation;
           if (profile.label === "SBS84") {
             mutation = e.MutationType.match(regex)[1];
-          } else if (profile.label === "DBS1") {
+          } else if (profile.label === "DBS96") {
             mutation = e.MutationType.match(regex2)[0];
           } else if (profile.label === "ID1") {
             mutation = e.MutationType.match(regex3)[0];
@@ -188,7 +192,7 @@ export const getPlot = selector({
             "4:Del:M:1",
           ];
 
-        if (profile.label === "ID1") {
+        /*if (profile.label === "ID1") {
           showXlable = false;
           xTitle = "";
           yTitle = "Number of Indels";
@@ -384,6 +388,7 @@ export const getPlot = selector({
             });
           });
         }
+        */
         console.log(groupByMutation);
         console.log(xValues);
         console.log(xTickText);

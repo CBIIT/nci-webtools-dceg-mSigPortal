@@ -27,10 +27,6 @@ export default function DBS78(data) {
   }, {});
   const flatSorted = Object.values(groupByMutation).flat();
 
-  const xValues = flatSorted.map((e, i) => i);
-  console.log(xValues);
-  console.log(groupByMutation);
-  console.log(flatSorted);
   const traces = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
       name: mutation,
@@ -95,7 +91,7 @@ export default function DBS78(data) {
 
   const layout = {
     xaxis: {
-      title: "Substitution",
+      title: "Double Substitution",
       showline: true,
       tickangle: -90,
       tickfont: {
