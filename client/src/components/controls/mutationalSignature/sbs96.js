@@ -61,12 +61,16 @@ export default function SBS96(data) {
   );
 
   const shapes = Object.entries(groupByMutation).map(
-    ([mutation, signatures], groupIndex) => ({
-      type: "rect",
-      xref: "x",
-      yref: "paper",
-      x0: groupIndex * signatures.length - 0.4,
-      x1: groupIndex * signatures.length + signatures.length - 0.6,
+    ([mutation, _], groupIndex, array) => ({
+      type: 'rect',
+      xref: 'x',
+      yref: 'paper',
+      x0: array
+        .slice(0, groupIndex)
+        .reduce((x0, [_, sigs]) => x0 + sigs.length, -0.4),
+      x1: array
+        .slice(0, groupIndex + 1)
+        .reduce((x0, [_, sigs]) => x0 + sigs.length, -0.6),
       y0: 1.03,
       y1: 1,
       fillcolor: colors[mutation],
