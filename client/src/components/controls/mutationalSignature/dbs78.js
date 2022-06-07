@@ -27,10 +27,12 @@ export default function DBS78(data) {
   }, {});
   const flatSorted = Object.values(groupByMutation).flat();
 
+  const xValues = flatSorted.map((e, i) => i);
+  console.log(xValues);
   console.log(groupByMutation);
   console.log(flatSorted);
   const traces = Object.entries(groupByMutation).map(
-    ([mutation, signatures], groupIndex) => ({
+    ([mutation, signatures], groupIndex, array) => ({
       name: mutation,
       type: "bar",
       marker: { color: colors[mutation] },
@@ -45,12 +47,16 @@ export default function DBS78(data) {
   );
   console.log(traces);
   const annotations = Object.entries(groupByMutation).map(
-    ([mutation, signatures], groupIndex) => ({
+    ([mutation, signatures], groupIndex, array) => ({
       xref: "x",
       yref: "paper",
       xanchor: "bottom",
       yanchor: "bottom",
-      x: groupIndex * signatures.length + (signatures.length - 1) * 0.5,
+      x:
+        array
+          .slice(0, groupIndex)
+          .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) +
+        (signatures.length - 1) * 0.5,
       y: 1.04,
       text: `<b>${mutation}NN</b>`,
       showarrow: false,
@@ -62,12 +68,18 @@ export default function DBS78(data) {
   );
   console.log(annotations);
   const shapes = Object.entries(groupByMutation).map(
-    ([mutation, signatures], groupIndex) => ({
+    ([mutation, signatures], groupIndex, array) => ({
       type: "rect",
       xref: "x",
       yref: "paper",
-      x0: groupIndex * signatures.length - 0.4,
-      x1: groupIndex * signatures.length + signatures.length - 0.6,
+      x0: array
+        .slice(0, groupIndex)
+        .reduce((x0, [_, signatures]) => x0 + signatures.length, -0.4),
+      // x0: groupIndex * 16 - 0.4,
+      x1: array
+        .slice(0, groupIndex + 1)
+        .reduce((x0, [_, signatures]) => x0 + signatures.length, -0.6),
+      // x1: groupIndex * 16 + signatures.length - 0.6,
       y0: 1.03,
       y1: 1,
       fillcolor: colors[mutation],
@@ -76,6 +88,7 @@ export default function DBS78(data) {
       },
     })
   );
+  console.log(shapes);
 
   const layout = {
     xaxis: {

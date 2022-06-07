@@ -40,12 +40,16 @@ export default function SBS96(data) {
   );
 
   const annotations = Object.entries(groupByMutation).map(
-    ([mutation, signatures], groupIndex) => ({
+    ([mutation, signatures], groupIndex, array) => ({
       xref: "x",
       yref: "paper",
       xanchor: "bottom",
       yanchor: "bottom",
-      x: groupIndex * signatures.length + (signatures.length - 1) * 0.5,
+      x:
+        array
+          .slice(0, groupIndex)
+          .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) +
+        (signatures.length - 1) * 0.5,
       y: 1.04,
       text: `<b>${mutation}</b>`,
       showarrow: false,
