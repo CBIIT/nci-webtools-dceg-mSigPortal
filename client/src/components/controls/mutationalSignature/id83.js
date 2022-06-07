@@ -189,7 +189,15 @@ export default function ID83(data) {
     ([mutation, signatures], groupIndex, array) => ({
       name: mutation,
       type: "bar",
-      marker: { color: colors[mutation] },
+      marker: {
+        color:
+          colors[
+            signatures[0].mutationType.substring(
+              0,
+              signatures[0].mutationType.length - 2
+            )
+          ],
+      },
       //   x: signatures.map((e) => e.mutationType),
       //x: signatures.map((e, i) => groupIndex * signatures.length + i),
       x: signatures.map(
@@ -206,7 +214,7 @@ export default function ID83(data) {
 
   console.log(traces);
 
-  const annotations = Object.entries(arrayID).map(
+  const annotations1 = Object.entries(arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
       xref: "x",
       yref: "paper",
@@ -217,19 +225,35 @@ export default function ID83(data) {
           .slice(0, groupIndex)
           .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) +
         (signatures.length - 1) * 0.5,
-      y: 1.04,
-      text: `<b>${mutation}</b>`,
+      y: 1.0,
+      text:
+        groupIndex < 4
+          ? `<b>${signatures[0].mutationType.substring(
+              signatures[0].mutationType.length - 3,
+              signatures[0].mutationType.length - 2
+            )}</b>`
+          : `<b>${signatures[0].mutationType.substring(0, 1)}</b>`,
       showarrow: false,
       font: {
-        size: 16,
+        size: 14,
+        color:
+          annotationColors[
+            signatures[0].mutationType.substring(
+              0,
+              signatures[0].mutationType.length - 2
+            )
+          ],
       },
       align: "center",
+      signatures: signatures,
+      mutation: mutation,
+      groupIndex: groupIndex,
     })
   );
-  console.log(annotations);
+  console.log(annotations1);
 
-  const shapes = Object.entries(arrayID).map(
-    ([mutation, _], groupIndex, array) => ({
+  const shapes1 = Object.entries(arrayID).map(
+    ([mutation, signatures], groupIndex, array) => ({
       type: "rect",
       xref: "x",
       yref: "paper",
@@ -239,16 +263,57 @@ export default function ID83(data) {
       x1: array
         .slice(0, groupIndex + 1)
         .reduce((x0, [_, sigs]) => x0 + sigs.length, -0.6),
-      y0: 1.03,
+      y0: 1.06,
       y1: 1,
-      fillcolor: colors[mutation],
+      fillcolor:
+        colors[
+          signatures[0].mutationType.substring(
+            0,
+            signatures[0].mutationType.length - 2
+          )
+        ],
       line: {
         width: 0,
       },
       mutation: mutation,
+      signature: signatures[0].mutationType.substring(
+        0,
+        signatures[0].mutationType.length - 2
+      ),
     })
   );
-  console.log(shapes);
+  console.log(shapes1);
+
+  const shapes2 = Object.entries(arrayID).map(
+    ([mutation, signatures], groupIndex, array) => ({
+      type: "rect",
+      xref: "x",
+      yref: "paper",
+      x0: array
+        .slice(0, groupIndex)
+        .reduce((x0, [_, sigs]) => x0 + sigs.length, -0.4),
+      x1: array
+        .slice(0, groupIndex + 1)
+        .reduce((x0, [_, sigs]) => x0 + sigs.length, -0.6),
+      y0: -0.01,
+      y1: -0.05,
+      fillcolor:
+        colors[
+          signatures[0].mutationType.substring(
+            0,
+            signatures[0].mutationType.length - 2
+          )
+        ],
+      line: {
+        width: 0,
+      },
+      mutation: mutation,
+      signature: signatures[0].mutationType.substring(
+        0,
+        signatures[0].mutationType.length - 2
+      ),
+    })
+  );
 
   const layout = {
     xaxis: {
@@ -267,8 +332,8 @@ export default function ID83(data) {
       autorange: true,
     },
 
-    shapes: shapes,
-    annotations: annotations,
+    shapes: [...shapes1, ...shapes2],
+    annotations: [...annotations1],
   };
 
   console.log(layout);
