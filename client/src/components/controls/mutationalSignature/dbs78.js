@@ -37,12 +37,15 @@ export default function DBS78(data) {
       type: "bar",
       marker: { color: colors[mutation] },
       //x: signatures.map((e) => e.mutationType),
-      x: signatures.map((e, i) => groupIndex * signatures.length + i),
+      x: signatures.map(
+        (e, i) =>
+          array
+            .slice(0, groupIndex)
+            .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
+      ),
       y: signatures.map((e) => e.contribution),
       hoverinfo: "x+y",
       showlegend: false,
-      groupindex: groupIndex,
-      signatureslen: signatures.length,
     })
   );
   console.log(traces);
