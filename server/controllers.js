@@ -794,11 +794,11 @@ async function querySignature(req, res, next) {
 }
 
 async function queryExposure(req, res, next) {
-  const { study, strategy, filter, properties } = req.body;
+  const { file, filter, properties } = req.body;
   const s3 = new AWS.S3();
   const key = path.join(
     config.data.s3,
-    `Exposure/${study}_${strategy}_exposure_refdata.json`
+    `Exposure/${file.study}_${file.strategy}_exposure_refdata.json`
   );
 
   try {
