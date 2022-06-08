@@ -774,19 +774,50 @@ async function querySignature(req, res, next) {
   const s3 = new AWS.S3();
   const key = path.join(config.data.s3, 'Signature/signature_refsets.json');
 
-  const { Body } = await s3
-    .getObject({
-      Bucket: config.data.bucket,
-      Key: key,
-    })
-    .promise();
+  try {
+    const { Body } = await s3
+      .getObject({
+        Bucket: config.data.bucket,
+        Key: key,
+      })
+      .promise();
 
-  const signatureRefsets = JSON.parse(Body);
-  const query = Object.values(pickBy(signatureRefsets, filter)).map((e) =>
-    pick(e, properties)
+    const signatureRefsets = JSON.parse(Body);
+    const query = Object.values(pickBy(signatureRefsets, filter)).map((e) =>
+      pick(e, properties)
+    );
+
+    res.json(query);
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function queryExposure(req, res, next) {
+  const { study, strategy, filter, properties } = req.body;
+  const s3 = new AWS.S3();
+  const key = path.join(
+    config.data.s3,
+    `Exposure/${study}_${strategy}_exposure_refdata.json`
   );
 
-  res.json(query);
+  try {
+    const { Body } = await s3
+      .getObject({
+        Bucket: config.data.bucket,
+        Key: key,
+      })
+      .promise();
+
+    const signatureRefsets = JSON.parse(Body);
+    const query = Object.values(pickBy(signatureRefsets, filter)).map((e) =>
+      pick(e, properties)
+    );
+
+    res.json(query);
+  } catch (error) {
+    next(error);
+  }
 }
 
 module.exports = {
@@ -812,4 +843,5 @@ module.exports = {
   downloadWorkspace,
   associationWrapper,
   querySignature,
+  queryExposure,
 };
