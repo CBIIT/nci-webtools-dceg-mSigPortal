@@ -35,18 +35,8 @@ export default function ID83(data) {
     "4:Del:M": "black",
     "5:Del:M": "white",
   };
-  let groupByFirstGroup = {},
-    groupByMutationID = {},
-    groupR = {},
-    groupRDel = {},
-    groupRIns = {},
-    groupM = {},
-    annotationsIDTopLabel = {},
-    annotationsIDBotLabel = {},
-    arrayID = [],
-    arrayIDAnnotation = [],
-    arrayIDAnnotationTop = [],
-    arrayIDAnnXTop = [
+
+  const arrayIDAnnXTop = [
       "1bp Deletion",
       "1bp Insertion",
       ">1bp Deletion at Repeats<br>(Deletion Length)",
@@ -60,7 +50,9 @@ export default function ID83(data) {
       "Number of Repeat Units",
       "Microhimology Length",
     ],
-    arrayIDAnnXLabel = [5, 17, 35, 60, 76];
+    arrayIDAnnXLabel = [5, 18.5, 35, 60, 76],
+    arrayIDAnnotationTop = [],
+    arrayIDAnnotationBot = [];
   // group data by dominant mutation
   const groupByMutation = data.reduce((groups, e, i) => {
     const mutationRegex = /^.{0,7}/;
@@ -75,13 +67,11 @@ export default function ID83(data) {
     return groups;
   }, {});
 
-  console.log(groupByMutation);
-
-  groupByFirstGroup = Object.fromEntries(
+  const groupByFirstGroup = Object.fromEntries(
     Object.entries(groupByMutation).slice(0, 4)
   );
 
-  groupByMutationID = data.reduce((groups, e) => {
+  const groupByMutationID = data.reduce((groups, e) => {
     let mutationID;
     mutationID = e.MutationType.match(
       e.MutationType.substring(
@@ -99,7 +89,7 @@ export default function ID83(data) {
     return groups;
   }, {});
 
-  groupR = groupByMutationID["R"].reduce((r, a) => {
+  const groupR = groupByMutationID["R"].reduce((r, a) => {
     let m;
     m = a.mutationType.match(a.mutationType.substr(2, 3));
     const s = {
@@ -110,7 +100,7 @@ export default function ID83(data) {
     return r;
   }, {});
 
-  groupRDel = groupR["Del"].reduce((r, a) => {
+  const groupRDel = groupR["Del"].reduce((r, a) => {
     let m;
     m = a.mutationType.match(a.mutationType.substr(0, 7));
     const s = {
@@ -121,7 +111,7 @@ export default function ID83(data) {
     return r;
   }, {});
 
-  groupRIns = groupR["Ins"].reduce((r, a) => {
+  const groupRIns = groupR["Ins"].reduce((r, a) => {
     let m;
     m = a.mutationType.match(a.mutationType.substr(0, 7));
     const s = {
@@ -132,7 +122,7 @@ export default function ID83(data) {
     return r;
   }, {});
 
-  groupM = groupByMutationID["M"].reduce((r, a) => {
+  const groupM = groupByMutationID["M"].reduce((r, a) => {
     let m;
     m = a.mutationType.match(a.mutationType.substr(0, 7));
     const s = {
@@ -155,11 +145,12 @@ export default function ID83(data) {
     return groupM[key];
   });
 
-  arrayID = [...arrayID1, ...arrayID2, ...arrayID3, ...arrayID4];
-  console.log(arrayID);
+  const arrayID = [...arrayID1, ...arrayID2, ...arrayID3, ...arrayID4];
 
   const flatSorted = Object.values(arrayID).flat();
+
   console.log(flatSorted);
+  console.log(arrayID);
 
   Object.values(arrayID).forEach((group) => {
     if (group.length > 1) {
@@ -170,12 +161,9 @@ export default function ID83(data) {
       arrayIDAnnotationTop.push(group[0].mutationType);
     }
     group.forEach((e) => {
-      arrayIDAnnotation.push(e.mutationType);
+      arrayIDAnnotationBot.push(e.mutationType);
     });
   });
-
-  console.log(arrayIDAnnotation);
-  console.log(arrayIDAnnotationTop);
 
   const traces = Object.entries(arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
@@ -199,12 +187,12 @@ export default function ID83(data) {
             .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
       ),
       y: signatures.map((e) => e.contribution),
+      //text: signatures.map((e, i) => e.mutationType),
+      //hovertemplate: "%{signatures.map((e, i) => e.mutationType)}, %{y}",
       hoverinfo: "x+y",
       showlegend: false,
     })
   );
-
-  console.log(traces);
 
   const annotations1 = Object.entries(arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
@@ -242,9 +230,8 @@ export default function ID83(data) {
       groupIndex: groupIndex,
     })
   );
-  console.log(annotations1);
 
-  const annotations2 = arrayIDAnnotation.map((num, index) => ({
+  const annotations2 = arrayIDAnnotationBot.map((num, index) => ({
     xref: "x",
     yref: "paper",
     xanchor: "bottom",
@@ -260,9 +247,8 @@ export default function ID83(data) {
     num: num,
     index: index,
   }));
-  console.log(annotations2);
 
-  annotationsIDTopLabel = arrayIDAnnXLabel.map((num, index) => ({
+  const annotationsIDTopLabel = arrayIDAnnXLabel.map((num, index) => ({
     xref: "x",
     yref: "paper",
     x: num,
@@ -277,7 +263,7 @@ export default function ID83(data) {
     align: "center",
   }));
 
-  annotationsIDBotLabel = arrayIDAnnXLabel.map((num, index) => ({
+  const annotationsIDBotLabel = arrayIDAnnXLabel.map((num, index) => ({
     xref: "x",
     yref: "paper",
     x: num,
@@ -291,8 +277,6 @@ export default function ID83(data) {
     },
     align: "center",
   }));
-
-  console.log(annotationsIDTopLabel);
 
   const shapes1 = Object.entries(arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
@@ -324,7 +308,6 @@ export default function ID83(data) {
       ),
     })
   );
-  console.log(shapes1);
 
   const shapes2 = Object.entries(arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
@@ -367,7 +350,7 @@ export default function ID83(data) {
       },
       tickmode: "array",
       tickvals: flatSorted.map((_, i) => i),
-      //ticktext: flatSorted.map((e) => e.mutationType),
+      ticktext: flatSorted.map((e) => e.mutationType),
     },
     yaxis: {
       title: "Number of Idels",
@@ -383,6 +366,5 @@ export default function ID83(data) {
     ],
   };
 
-  console.log(layout);
   return { traces, layout };
 }
