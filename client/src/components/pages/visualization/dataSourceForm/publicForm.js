@@ -1,34 +1,26 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Form, Button, Row, Col } from 'react-bootstrap';
-import { useRecoilState, useResetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil';
 // import { useForm, Controller } from 'react-hook-form';
 import Select from 'react-select';
-import { sourceFormState } from '../visualization.state';
+import {
+  visualizationState,
+  publicFormState,
+  publicFormOptions,
+} from '../visualization.state';
 
 export default function PublicForm() {
-  const [formState, setForm] = useRecoilState(sourceFormState);
+  const [formState, setForm] = useRecoilState(publicFormState);
   const mergeForm = (state) => setForm({ ...formState, ...state });
-  const reset = useResetRecoilState(sourceFormState);
+  const reset = useResetRecoilState(publicFormState);
 
-  const {
-    study,
-    studyOptions,
-    cancerType,
-    cancerTypeOptions,
-    pubExperimentalStrategy,
-    pubExperimentOptions,
-    pDataOptions,
-    submitted,
-    loading,
-    loadingPublic,
-    source,
-  } = formState;
-
-  // useEffect(() => {
-  //   if (!pDataOptions.length && !loadingPublic) getPublicDataOptions();
-  // }, [pDataOptions, source]);
+  const { study, cancer, strategy } = formState;
+  const { studyOptions, cancerOptions, strategyOptions } =
+    useRecoilValue(publicFormOptions);
+  const { submitted } = useRecoilValue(visualizationState);
 
   function handleSelect(value, action) {
+    console.log(action);
     const { name } = action;
     mergeForm({ [name]: value });
   }
@@ -36,8 +28,8 @@ export default function PublicForm() {
   async function handleSubmit() {
     const args = {
       study: study,
-      cancerType: cancerType,
-      experimentalStrategy: pubExperimentalStrategy,
+      cancer: cancer,
+      strategy,
     };
 
     // mergeState({
@@ -91,13 +83,13 @@ export default function PublicForm() {
 
   function handleReset() {
     // const params = {
-    //   pDataOptions: pDataOptions,
+    //   data: data,
     //   studyOptions: studyOptions,
     //   study: studyOptions[0],
-    //   cancerTypeOptions: cancerTypeOptions,
-    //   cancerType: 'Lung-AdenoCA',
+    //   cancerOptions: cancerOptions,
+    //   cancer: 'Lung-AdenoCA',
     //   pubExperimentOptions: pubExperimentOptions,
-    //   pubExperimentalStrategy: pubExperimentOptions[0],
+    //   strategy: pubExperimentOptions[0],
     // };
     reset();
     window.location.hash = '#/visualization';
@@ -105,141 +97,110 @@ export default function PublicForm() {
     // mergeState(params);
   }
 
-  async function getPublicDataOptions() {
-    // try {
-    //   // const pDataOptions = await getJSON(
-    //   //   `Others/json/Visualization-Public.json`
-    //   // );
-    //   const studyOptions = [...new Set(pDataOptions.map((data) => data.Study))];
-    //   // default study
-    //   const study = 'PCAWG';
-    //   const cancerTypeOptions = [
-    //     ...new Set(
-    //       pDataOptions
-    //         .filter((data) => data.Study == study)
-    //         .map((data) => data.Cancer_Type)
-    //     ),
-    //   ];
-    //   //  default cancer type
-    //   const cancer = 'Lung-AdenoCA';
-    //   const pubExperimentOptions = [
-    //     ...new Set(
-    //       pDataOptions
-    //         .filter((data) => data.Study == study && data.Cancer_Type == cancer)
-    //         .map((data) => data.Dataset)
-    //     ),
-    //   ];
-    //   mergeState({
-    //     pDataOptions: pDataOptions,
-    //     study: study,
-    //     studyOptions: studyOptions,
-    //     cancerType: cancer,
-    //     cancerTypeOptions: cancerTypeOptions,
-    //     pubExperimentalStrategy: pubExperimentOptions[0],
-    //     pubExperimentOptions: pubExperimentOptions,
-    //   });
-    //   mergeCosineSimilarity({
-    //     pubStudy: study,
-    //     pubCancerType: cancer,
-    //     pubCancerTypeOptions: cancerTypeOptions,
-    //   });
-    //   mergeProfileComparison({
-    //     pubStudy: study,
-    //     pubCancerType: cancer,
-    //     pubCancerTypeOptions: cancerTypeOptions,
-    //   });
-    //   mergePCA({
-    //     pubStudy: study,
-    //     pubCancerType: cancer,
-    //     pubCancerTypeOptions: cancerTypeOptions,
-    //   });
-    // } catch (err) {
-    //   mergeError(err.message);
-    // }
+  // async function getPublicDataOptions() {
+  //   try {
+  //     // const data = await getJSON(
+  //     //   `Others/json/Visualization-Public.json`
+  //     // );
+  //     const studyOptions = [...new Set(data.map((data) => data.Study))];
+  //     // default study
+  //     const study = 'PCAWG';
+  //     const cancerOptions = [
+  //       ...new Set(
+  //         data
+  //           .filter((data) => data.Study == study)
+  //           .map((data) => data.Cancer_Type)
+  //       ),
+  //     ];
+  //     //  default cancer type
+  //     const cancer = 'Lung-AdenoCA';
+  //     const pubExperimentOptions = [
+  //       ...new Set(
+  //         data
+  //           .filter((data) => data.Study == study && data.Cancer_Type == cancer)
+  //           .map((data) => data.Dataset)
+  //       ),
+  //     ];
+  //     mergeState({
+  //       data: data,
+  //       study: study,
+  //       studyOptions: studyOptions,
+  //       cancer: cancer,
+  //       cancerOptions: cancerOptions,
+  //       strategy: pubExperimentOptions[0],
+  //       pubExperimentOptions: pubExperimentOptions,
+  //     });
+  //     mergeCosineSimilarity({
+  //       pubStudy: study,
+  //       pubcancer: cancer,
+  //       pubcancerOptions: cancerOptions,
+  //     });
+  //     mergeProfileComparison({
+  //       pubStudy: study,
+  //       pubcancer: cancer,
+  //       pubcancerOptions: cancerOptions,
+  //     });
+  //     mergePCA({
+  //       pubStudy: study,
+  //       pubcancer: cancer,
+  //       pubcancerOptions: cancerOptions,
+  //     });
+  //   } catch (err) {
+  //     mergeError(err.message);
+  //   }
+  // }
+
+  function selectValue(value, options) {
+    if (options.some((e) => e.value == value.value)) {
+      return value;
+    } else {
+      return options[0];
+    }
   }
-
-  function handleStudyChange(study) {
-    const cancerTypeOptions = [
-      ...new Set(
-        pDataOptions
-          .filter((data) => data.Study == study)
-          .map((data) => data.Cancer_Type)
-      ),
-    ];
-
-    const esOptions = [
-      ...new Set(
-        pDataOptions
-          .filter(
-            (data) =>
-              data.Study == study && data.Cancer_Type == cancerTypeOptions[0]
-          )
-          .map((data) => data.Dataset)
-      ),
-    ];
-
-    // mergeState({
-    //   study: study,
-    //   cancerType: cancerTypeOptions[0],
-    //   cancerTypeOptions: cancerTypeOptions,
-    //   pubExperimentalStrategy: esOptions[0],
-    //   pubExperimentOptions: esOptions,
-    // });
-  }
-
-  function handleCancerChange(cancer) {
-    const pubExperimentOptions = [
-      ...new Set(
-        pDataOptions
-          .filter((data) => data.Study == study && data.Cancer_Type == cancer)
-          .map((data) => data.Dataset)
-      ),
-    ];
-
-    // mergeState({
-    //   cancerType: cancer,
-    //   pubExperimentalStrategy: pubExperimentOptions[0],
-    //   pubExperimentOptions: pubExperimentOptions,
-    // });
-  }
-
 
   return (
     <Form>
-      <Form.Group>
+      <Form.Group controlId="study">
         <Form.Label>Study</Form.Label>
         <Select
           className="mb-2"
+          inputId="study"
           name="study"
           disabled={submitted}
-          value={study}
+          value={selectValue(study, studyOptions)}
           options={studyOptions}
           onChange={handleSelect}
         />
       </Form.Group>
-      <Select
-        className="mb-2"
-        id="publicFromCancerType"
-        label="Cancer Type or Group"
-        disabled={submitted}
-        value={cancerType}
-        options={cancerTypeOptions}
-        onChange={handleSelect}
-      />
-      <Select
-        className="mb-4"
-        id="publicFormStrategy"
-        label="Experimental Strategy"
-        disabled={submitted}
-        value={pubExperimentalStrategy}
-        options={pubExperimentOptions}
-        onChange={handleSelect}
-      />
+      <Form.Group controlId="cancer">
+        <Form.Label>Cancer Type or Group</Form.Label>
+        <Select
+          className="mb-2"
+          inputId="cancer"
+          name="cancer"
+          disabled={submitted}
+          value={selectValue(cancer, cancerOptions)}
+          options={cancerOptions}
+          onChange={handleSelect}
+        />
+      </Form.Group>
+      <Form.Group controlId="strategy">
+        <Form.Label>Experimental Strategy</Form.Label>
+        <Select
+          className="mb-4"
+          inputId="strategy"
+          name="strategy"
+          disabled={submitted}
+          value={selectValue(strategy, strategyOptions)}
+          options={strategyOptions}
+          onChange={handleSelect}
+        />
+      </Form.Group>
 
       <Row>
         <Col>
           <Button
-            disabled={loading.active || loadingPublic}
+            // disabled={loading.active || loadingPublic}
             className="w-100"
             variant="secondary"
             onClick={() => handleReset()}
@@ -249,7 +210,7 @@ export default function PublicForm() {
         </Col>
         <Col>
           <Button
-            disabled={loading.active || loadingPublic || submitted}
+            disabled={submitted}
             className="w-100"
             variant="primary"
             type="button"

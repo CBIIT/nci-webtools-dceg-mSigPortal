@@ -1,4 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense } from 'react';
+import { Alert, Container } from 'react-bootstrap';
+import Loader from '../../controls/loader/loader';
+import ErrorBoundary from '../../controls/errorBoundary/error-boundary';
 import { useRecoilState } from 'recoil';
 import { Form, Row, Col, Nav, Button } from 'react-bootstrap';
 import {
@@ -6,6 +9,8 @@ import {
   SidebarPanel,
   MainPanel,
 } from '../../controls/sidebar-container/sidebar-container';
+// import UserForm from './dataSourceForm/userForm';
+// import PublicForm from './dataSourceForm/publicForm';
 import UserForm from './userForm';
 import PublicForm from './publicForm';
 import Instructions from '../visualization/instructions';
@@ -602,51 +607,68 @@ export default function Visualization({ match }) {
       >
         <SidebarPanel className="col-lg-3 col-md-5">
           <div className="p-3 bg-white border rounded">
-            <Row>
-              <Col lg="auto">
-                <Group>
-                  <Label className="mr-4">Data Source</Label>
-                  <Check inline id="radioPublic">
-                    <Check.Input
-                      disabled={submitted || loading.active}
-                      type="radio"
-                      value="public"
-                      checked={source == 'public'}
-                      onChange={(e) => mergeState({ source: 'public' })}
-                    />
-                    <Check.Label className="font-weight-normal">
-                      Public
-                    </Check.Label>
-                  </Check>
-                  <Check inline id="radioUser">
-                    <Check.Input
-                      disabled={submitted || loading.active}
-                      type="radio"
-                      value="user"
-                      checked={source == 'user'}
-                      onChange={(e) => mergeState({ source: 'user' })}
-                    />
-                    <Check.Label className="font-weight-normal">
-                      User
-                    </Check.Label>
-                  </Check>
-                </Group>
-              </Col>
-            </Row>
-            <Row
-              style={{
-                display: source == 'user' ? 'block' : 'none',
-              }}
+            <ErrorBoundary
+              fallback={
+                <Alert variant="danger">
+                  An internal error prevented data from loading. Please contact
+                  the website administrator if this problem persists.
+                </Alert>
+              }
             >
-              <Col lg="auto" className="w-100">
-                <UserForm />
-              </Col>
-            </Row>
-            <Row style={{ display: source == 'public' ? 'block' : 'none' }}>
-              <Col lg="auto" className="w-100">
-                <PublicForm />
-              </Col>
-            </Row>
+              <Suspense
+                fallback={
+                  <div className="w-100 d-flex mx-auto">
+                    <Loader message="Loading" />
+                  </div>
+                }
+              >
+                <Row>
+                  <Col lg="auto">
+                    <Group>
+                      <Label className="mr-4">Data Source</Label>
+                      <Check inline id="radioPublic">
+                        <Check.Input
+                          disabled={submitted || loading.active}
+                          type="radio"
+                          value="public"
+                          checked={source == 'public'}
+                          onChange={(e) => mergeState({ source: 'public' })}
+                        />
+                        <Check.Label className="font-weight-normal">
+                          Public
+                        </Check.Label>
+                      </Check>
+                      <Check inline id="radioUser">
+                        <Check.Input
+                          disabled={submitted || loading.active}
+                          type="radio"
+                          value="user"
+                          checked={source == 'user'}
+                          onChange={(e) => mergeState({ source: 'user' })}
+                        />
+                        <Check.Label className="font-weight-normal">
+                          User
+                        </Check.Label>
+                      </Check>
+                    </Group>
+                  </Col>
+                </Row>
+                <Row
+                  style={{
+                    display: source == 'user' ? 'block' : 'none',
+                  }}
+                >
+                  <Col lg="auto" className="w-100">
+                    <UserForm />
+                  </Col>
+                </Row>
+                <Row style={{ display: source == 'public' ? 'block' : 'none' }}>
+                  <Col lg="auto" className="w-100">
+                    <PublicForm />
+                  </Col>
+                </Row>
+              </Suspense>
+            </ErrorBoundary>
           </div>
           <hr className="d-lg-none" style={{ opacity: 0 }}></hr>
         </SidebarPanel>
@@ -656,16 +678,27 @@ export default function Visualization({ match }) {
               <span>Queue results have expired</span>
             </div>
           )}
-          <div>
-            <LoadingOverlay
-              active={loading.active}
-              content={loading.content}
-              showIndicator={loading.showIndicator}
-            />
-            <div style={{ minHeight: '500px' }}>
-              {tabs.filter((tab) => tab.id == displayTab)[0].component}
-            </div>
-          </div>
+          <ErrorBoundary
+            fallback={
+              <Alert variant="danger">
+                An internal error prevented data from loading. Please contact
+                the website administrator if this problem persists.
+              </Alert>
+            }
+          >
+            <Suspense fallback={<Loader message="Loading" />}>
+              <div>
+                <LoadingOverlay
+                  active={loading.active}
+                  content={loading.content}
+                  showIndicator={loading.showIndicator}
+                />
+                <div style={{ minHeight: '500px' }}>
+                  {tabs.filter((tab) => tab.id == displayTab)[0].component}
+                </div>
+              </div>
+            </Suspense>
+          </ErrorBoundary>
         </MainPanel>
       </SidebarContainer>
     </div>
