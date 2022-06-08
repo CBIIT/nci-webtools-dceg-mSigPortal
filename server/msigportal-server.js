@@ -35,6 +35,7 @@ const {
   downloadWorkspace,
   associationWrapper,
   querySignature,
+  queryExposure,
 } = require('./controllers');
 
 if (cluster.isMaster) {
@@ -84,49 +85,51 @@ apiRouter.use(
 
 apiRouter.use(express.json({ limit: '50mb' }));
 
-apiRouter.get('/ping', cors(), (req, res) => res.send(true));
+apiRouter.get('/ping', (req, res) => res.send(true));
 
-apiRouter.post('/profilerExtraction', cors(), visualizationProfilerExtraction);
+apiRouter.post('/profilerExtraction', visualizationProfilerExtraction);
 
-apiRouter.post('/getResults', cors(), getResults);
+apiRouter.post('/getResults', getResults);
 
-apiRouter.post('/visualizationWrapper', cors(), visualizationWrapper);
+apiRouter.post('/visualizationWrapper', visualizationWrapper);
 
-apiRouter.post('/getSignaturesUser', cors(), getSignaturesUser);
+apiRouter.post('/getSignaturesUser', getSignaturesUser);
 
-apiRouter.post('/upload', cors(), upload);
+apiRouter.post('/upload', upload);
 
-apiRouter.get('/visualization/download', cors(), visualizationDownload);
+apiRouter.get('/visualization/download', visualizationDownload);
 
 apiRouter.post(
   '/visualization/downloadPublic',
-  cors(),
+
   visualizationDownloadPublic
 );
 
-apiRouter.post('/explorationWrapper', cors(), explorationWrapper);
+apiRouter.post('/explorationWrapper', explorationWrapper);
 
-apiRouter.post('/queue', cors(), submitQueue);
+apiRouter.post('/queue', submitQueue);
 
-apiRouter.get('/getQueueResults/:id', cors(), getQueueResults);
+apiRouter.get('/getQueueResults/:id', getQueueResults);
 
-apiRouter.get('/getVisExample/:example', cors(), getVisExample);
+apiRouter.get('/getVisExample/:example', getVisExample);
 
-apiRouter.get('/getExposureExample/:example', cors(), getExposureExample);
+apiRouter.get('/getExposureExample/:example', getExposureExample);
 
-apiRouter.get('/getPublications', cors(), getPublications);
+apiRouter.get('/getPublications', getPublications);
 
-apiRouter.post('/getImageS3Batch', cors(), getImageS3Batch);
+apiRouter.post('/getImageS3Batch', getImageS3Batch);
 
-apiRouter.post('/getImageS3', cors(), getImageS3);
+apiRouter.post('/getImageS3', getImageS3);
 
-apiRouter.post('/getFileS3', cors(), getFileS3);
+apiRouter.post('/getFileS3', getFileS3);
 
-apiRouter.post('/downloadWorkspace', cors(), downloadWorkspace);
+apiRouter.post('/downloadWorkspace', downloadWorkspace);
 
-apiRouter.post('/associationWrapper', cors(), associationWrapper);
+apiRouter.post('/associationWrapper', associationWrapper);
 
 apiRouter.post('/querySignature', cors(), querySignature);
+
+apiRouter.post('/queryExposure', cors(), queryExposure);
 
 apiRouter.use((err, req, res, next) => {
   logger.debug(err);

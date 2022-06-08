@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { Alert, Container } from 'react-bootstrap';
+import Loader from '../../controls/loader/loader';
+import ErrorBoundary from '../../controls/errorBoundary/error-boundary';
 import { Form, Row, Col, Button, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { saveAs } from 'file-saver';
@@ -14,6 +17,7 @@ import MsLandscape from './msLandscape';
 import MsPrevalence from './msPrevalence';
 import MSIndividual from './msIndividual';
 import Download from './download';
+import TMBAPI from './tmb/tmb.js';
 import { actions as exposureActions } from '../../../services/store/exposure';
 import { actions as modalActions } from '../../../services/store/modal';
 import {
@@ -513,6 +517,11 @@ export default function Exposure({ match }) {
       name: 'TMB',
     },
     {
+      component: <TMBAPI />,
+      id: 'tmbapi',
+      name: 'TMB API',
+    },
+    {
       component: <TmbSig />,
       id: 'tmbSig',
       name: 'TMB Signatures',
@@ -691,7 +700,18 @@ export default function Exposure({ match }) {
         <MainPanel>
           <div style={{ minHeight: '500px' }}>
             <div className="bg-white border rounded">
-              {tabs.filter((tab) => tab.id == displayTab)[0].component}
+              <ErrorBoundary
+                fallback={
+                  <Alert variant="danger">
+                    An internal error prevented data from loading. Please
+                    contact the website administrator if this problem persists.
+                  </Alert>
+                }
+              >
+                <Suspense fallback={<Loader message="Loading" />}>
+                  {tabs.filter((tab) => tab.id == displayTab)[0].component}
+                </Suspense>
+              </ErrorBoundary>
             </div>
           </div>
         </MainPanel>
