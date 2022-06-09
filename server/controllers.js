@@ -12,6 +12,7 @@ const XLSX = require('xlsx');
 const replace = require('replace-in-file');
 const glob = require('glob');
 const config = require('./config.json');
+const apiSpec = require('./apiSpec.json');
 const archiver = require('archiver');
 const { pick, pickBy } = require('lodash');
 
@@ -24,6 +25,12 @@ const rConfig = {
   localData: path.resolve(config.data.localData),
   wd: path.resolve(config.results.folder),
 };
+
+function getApiSpec(req, res) {
+  const url = `${req.protocol}://${req.get('host')}`;
+  const servers = [{ url }];
+  res.json({...apiSpec, servers});
+}
 
 function parseCSV(filepath) {
   const file = fs.createReadStream(filepath);
@@ -790,6 +797,7 @@ async function querySignature(req, res, next) {
 }
 
 module.exports = {
+  getApiSpec,
   parseCSV,
   profilerExtraction,
   visualizationProfilerExtraction,

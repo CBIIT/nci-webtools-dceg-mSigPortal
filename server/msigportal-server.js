@@ -11,11 +11,13 @@ const cors = require('cors');
 const app = express();
 const apiRouter = express.Router();
 
+app.set('trust proxy', true);
 app.use(compression());
 app.use('/api', apiRouter);
 // app.use(cors());
 
 const {
+  getApiSpec,
   visualizationProfilerExtraction,
   getResults,
   visualizationWrapper,
@@ -83,6 +85,8 @@ apiRouter.use(
 );
 
 apiRouter.use(express.json({ limit: '50mb' }));
+
+apiRouter.get('/', cors(), getApiSpec);
 
 apiRouter.get('/ping', cors(), (req, res) => res.send(true));
 
