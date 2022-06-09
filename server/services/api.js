@@ -1,6 +1,6 @@
 const express = require('express');
 const compression = require('compression');
-const webApiRoutes = require('./routes/analysis');
+const webApiRoutes = require('./routes/web');
 const publicApiRoutes = require('./routes/public');
 
 const apiRouter = express.Router();

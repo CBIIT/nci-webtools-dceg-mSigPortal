@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const logger = require('../logger');
+const logger = require('./logger');
 const { spawn } = require('promisify-child-process');
 const formidable = require('formidable');
 const fs = require('fs-extra');
@@ -12,12 +12,10 @@ const AWS = require('aws-sdk');
 const XLSX = require('xlsx');
 const replace = require('replace-in-file');
 const glob = require('glob');
-const config = require('../../config.json');
+const config = require('../config.json');
 const archiver = require('archiver');
 const { pick, pickBy } = require('lodash');
 const { gunzipSync } = require('zlib');
-
-const router = express.Router();
 
 if (config.aws) AWS.config.update(config.aws);
 
@@ -824,64 +822,28 @@ async function queryExposure(req, res, next) {
   }
 }
 
-router.use(
-  '/results',
-  express.static(config.results.folder, {
-    setHeaders: (res, path, stat) => {
-      res.set('Cache-Control', 'max-age=0, must-revalidate');
-    },
-  })
-);
-
-router.post('/profilerExtraction', visualizationProfilerExtraction);
-
-router.post('/getResults', getResults);
-
-router.post('/visualizationWrapper', visualizationWrapper);
-
-router.post('/getSignaturesUser', getSignaturesUser);
-
-router.post('/upload', upload);
-
-router.get('/visualization/download', visualizationDownload);
-
-router.post(
-  '/visualization/downloadPublic',
-
-  visualizationDownloadPublic
-);
-
-router.post('/explorationWrapper', explorationWrapper);
-
-router.post('/queue', submitQueue);
-
-router.get('/getQueueResults/:id', getQueueResults);
-
-router.get('/getVisExample/:example', getVisExample);
-
-router.get('/getExposureExample/:example', getExposureExample);
-
-router.get('/getPublications', getPublications);
-
-router.post('/getImageS3Batch', getImageS3Batch);
-
-router.post('/getImageS3', getImageS3);
-
-router.post('/getFileS3', getFileS3);
-
-router.post('/downloadWorkspace', downloadWorkspace);
-
-router.post('/associationWrapper', associationWrapper);
-
-router.post('/querySignature', querySignature);
-
-router.post('/queryExposure', queryExposure);
-
-router.use((err, req, res, next) => {
-  logger.debug(err);
-  const { name, message, stack } = err;
-  logger.error(err);
-  res.status(500).json(`${name}: ${message}`);
-});
-
-module.exports = router;
+module.exports = {
+  parseCSV,
+  profilerExtraction,
+  visualizationProfilerExtraction,
+  getResults,
+  visualizationWrapper,
+  getSignaturesUser,
+  upload,
+  visualizationDownload,
+  visualizationDownloadPublic,
+  explorationWrapper,
+  submitQueue,
+  getQueueResults,
+  getVisExample,
+  getExposureExample,
+  getPublications,
+  getImageS3Batch,
+  getImageS3,
+  getFileS3,
+  getRelativePath,
+  downloadWorkspace,
+  associationWrapper,
+  querySignature,
+  queryExposure,
+};
