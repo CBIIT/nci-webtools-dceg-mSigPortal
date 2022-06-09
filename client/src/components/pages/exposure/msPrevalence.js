@@ -86,7 +86,7 @@ export default function MsPrevalence({ calculatePrevalence }) {
               className="p-3"
               title="Prevalence of Mutational Signatures"
               downloadName={plotPath.split('/').slice(-1)[0]}
-              plotPath={`api/results/${plotPath}`}
+              plotPath={`web/results/${plotPath}`}
             />
             <p className="p-3">
               The pie chart on the left illustrates the prevalence of each

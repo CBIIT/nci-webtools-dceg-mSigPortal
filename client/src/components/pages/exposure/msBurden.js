@@ -73,7 +73,7 @@ export default function MsBurden({ calculateBurden }) {
               className="p-3"
               title="Mutational Signature Burden Across Cancer Types"
               downloadName={plotPath.split('/').slice(-1)[0]}
-              plotPath={`api/results/${plotPath}`}
+              plotPath={`web/results/${plotPath}`}
             />
           </>
         )}

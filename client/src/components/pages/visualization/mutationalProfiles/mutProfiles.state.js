@@ -31,7 +31,7 @@ export const formState = atom({
 //   get: async ({ get }) => {
 //     const { svgList } = get(visualizationState);
 //     try {
-//       const { data } = await axios.post('api/visualizationWrapper', {
+//       const { data } = await axios.post('web/visualizationWrapper', {
 //         fn: 'getTreeLeaf',
 //       });
 
@@ -50,7 +50,7 @@ export const getPlot = selector({
       const { profile } = get(formState);
 
       if (Object.keys(profile).length) {
-        const { data } = await axios.post("api/querySignature", {
+        const { data } = await axios.post("web/querySignature", {
           filter: { ...profile.value }, // filter given an object of key:values you want
           properties: ["MutationType", "Contribution"], // return objects containing these properties
         });

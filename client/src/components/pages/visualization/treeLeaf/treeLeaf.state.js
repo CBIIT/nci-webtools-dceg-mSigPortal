@@ -22,7 +22,7 @@ export const getGraphData = selector({
   key: 'treeLeaf.plotData',
   get: async ({ get }) => {
     try {
-      // const { data } = await axios.post('api/visualizationWrapper', {
+      // const { data } = await axios.post('web/visualizationWrapper', {
       //   fn: 'getTreeLeaf',
       // });
 
