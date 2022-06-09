@@ -50,33 +50,54 @@ export default function TMB(data, study) {
       groupIndex: groupIndex,
       array: array,
       type: "scatter",
-      marker: { symbol: "circle-open-dot" },
+      marker: { symbol: "circle-open" },
       mode: "markers",
-      // x: samples.sampleBurden.map(
-      //   (e, i) =>
-      //     array
-      //       .slice(0, groupIndex)
-      //       .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) +
-      //     i +
-      //     0.5
-      // ),
-      x: samples.sampleBurden.map((e) => e.sample),
+      testArray: samples.sampleBurden.map((e, i) => array.slice(0, groupIndex)),
+      testArray2: samples.sampleBurden
+        .map((e, i) => array[i][1].slice(0, groupIndex))
+        .reduce((x0, [_, sigs]) => x0 + sigs.length, 0),
+      x: samples.sampleBurden.map(
+        (e, i) => groupIndex * samples.sampleBurden.length + i
+      ),
       y: samples.sampleBurden.map((e) => e.burden),
     })
   );
-
+  console.log("traces:--");
   console.log(traces);
+  const annotations = Object.entries(cancerBurden).map(
+    ([cancer, samples], groupIndex, array) => ({
+      xref: "x",
+      yref: "paper",
+      x:
+        array
+          .slice(0, groupIndex)
+          .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) +
+        (samples.length - 1) * 0.5,
+      xanchor: "bottom",
+      y: 1.05,
+      yanchor: "bottom",
+      text: "<b>" + samples.cancer + "</b>",
+      showarrow: false,
+      font: {
+        size: 18,
+      },
+      align: "center",
+    })
+  );
+  console.log("annotations: --");
+  console.log(annotations);
 
   const layout = {
     xaxis: {
+      showticklabels: false,
       showline: true,
-      tickangle: 90,
+      tickangle: -90,
       tickfont: {
         size: 10,
       },
       tickmode: "array",
-      tickvals: flatSorted.map((_, i) => i),
-      ticktext: flatSorted.map((e) => e.mutationType),
+      //tickvals: flatSorted.map((_, i) => i),
+      //ticktext: flatSorted.map((e) => e.mutationType),
     },
     yaxis: {
       title: "Number of Mutations per Megabase",
@@ -84,8 +105,10 @@ export default function TMB(data, study) {
     },
 
     //shapes: shapes,
-    //annotations: annotations,
+    annotations: annotations,
   };
+  console.log("layout:");
+  console.log(layout);
 
   return { traces: [...traces], layout: { layout } };
 }

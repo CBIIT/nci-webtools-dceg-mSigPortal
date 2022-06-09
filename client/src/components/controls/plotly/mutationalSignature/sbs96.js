@@ -39,8 +39,10 @@ export default function SBS96(data) {
       y: signatures.map((e) => e.contribution),
       hoverinfo: "x+y",
       showlegend: false,
+      array: array,
     })
   );
+  console.log(traces);
 
   const annotations = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
