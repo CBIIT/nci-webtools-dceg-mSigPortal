@@ -4,7 +4,7 @@ const path = require('path');
 const express = require('express');
 const fs = require('fs');
 const config = require('./config.json');
-const logger = require('./logger');
+const logger = require('./services/logger');
 const { apiRouter } = require('./services/api');
 
 const app = express();
