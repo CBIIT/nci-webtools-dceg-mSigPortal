@@ -14,6 +14,7 @@ const glob = require('glob');
 const config = require('./config.json');
 const archiver = require('archiver');
 const { pick, pickBy } = require('lodash');
+const { gunzipSync } = require('zlib');
 
 if (config.aws) AWS.config.update(config.aws);
 
@@ -772,7 +773,7 @@ async function downloadWorkspace(req, res, next) {
 async function querySignature(req, res, next) {
   const { filter, properties } = req.body;
   const s3 = new AWS.S3();
-  const key = path.join(config.data.s3, 'Signature/signature_refsets.json');
+  const key = path.join(config.data.s3, 'Signature/signature_refsets.json.gz');
 
   try {
     const { Body } = await s3
@@ -782,7 +783,7 @@ async function querySignature(req, res, next) {
       })
       .promise();
 
-    const signatureRefsets = JSON.parse(Body);
+    const signatureRefsets = JSON.parse(gunzipSync(Body));
     const query = Object.values(pickBy(signatureRefsets, filter)).map((e) =>
       pick(e, properties)
     );
@@ -798,7 +799,7 @@ async function queryExposure(req, res, next) {
   const s3 = new AWS.S3();
   const key = path.join(
     config.data.s3,
-    `Exposure/${file.study}_${file.strategy}_exposure_refdata.json`
+    `Exposure/${file.study}_${file.strategy}_exposure_refdata.json.gz`
   );
 
   try {
@@ -809,7 +810,7 @@ async function queryExposure(req, res, next) {
       })
       .promise();
 
-    const signatureRefsets = JSON.parse(Body);
+    const signatureRefsets = JSON.parse(gunzipSync(Body));
     const query = Object.values(pickBy(signatureRefsets, filter)).map((e) =>
       pick(e, properties)
     );
