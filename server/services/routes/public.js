@@ -2,6 +2,7 @@ const { Router } = require('express');
 const cors = require('cors');
 const config = require('../../config.json');
 const apiSpec = require('../../apiSpec.json');
+const { querySignature, queryExposure } = require('../analysis');
 
 const router = Router();
 
@@ -14,5 +15,9 @@ router.get('/', (req, res) => {
 });
 
 router.get('/ping', (req, res) => res.send(true));
+
+router.get('/querySignature', querySignature);
+
+router.get('/queryExposure', queryExposure);
 
 module.exports = router;

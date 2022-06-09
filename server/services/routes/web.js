@@ -75,9 +75,9 @@ router.post('/downloadWorkspace', downloadWorkspace);
 
 router.post('/associationWrapper', associationWrapper);
 
-router.post('/querySignature', querySignature);
+router.get('/querySignature', querySignature);
 
-router.post('/queryExposure', queryExposure);
+router.get('/queryExposure', queryExposure);
 
 router.use((err, req, res, next) => {
   logger.debug(err);

@@ -14,7 +14,7 @@ const replace = require('replace-in-file');
 const glob = require('glob');
 const config = require('../config.json');
 const archiver = require('archiver');
-const { pick, pickBy } = require('lodash');
+const { pick, pickBy, omitBy, isNil } = require('lodash');
 const { gunzipSync } = require('zlib');
 
 if (config.aws) AWS.config.update(config.aws);
@@ -772,7 +772,16 @@ async function downloadWorkspace(req, res, next) {
 }
 
 async function querySignature(req, res, next) {
-  const { filter, properties } = req.body;
+  const { profile, signature, signature_set } = req.query;
+  const filter = omitBy(
+    {
+      Profile: profile,
+      Signature_name: signature,
+      Signature_set_name: signature_set,
+    },
+    isNil
+  );
+
   const s3 = new AWS.S3();
   const key = path.join(config.data.s3, 'Signature/signature_refsets.json.gz');
 
@@ -784,10 +793,8 @@ async function querySignature(req, res, next) {
       })
       .promise();
 
-    const signatureRefsets = JSON.parse(gunzipSync(Body));
-    const query = Object.values(pickBy(signatureRefsets, filter)).map((e) =>
-      pick(e, properties)
-    );
+    const data = JSON.parse(gunzipSync(Body));
+    const query = Object.values(pickBy(data, filter));
 
     res.json(query);
   } catch (error) {
@@ -796,11 +803,21 @@ async function querySignature(req, res, next) {
 }
 
 async function queryExposure(req, res, next) {
-  const { file, filter, properties } = req.body;
+  const { study, strategy, cancer, signature_set } = req.query;
+  const filter = omitBy(
+    {
+      Study: study,
+      Dataset: strategy,
+      Signature_set_name: signature_set,
+      Cancer_Type: cancer,
+    },
+    isNil
+  );
+
   const s3 = new AWS.S3();
   const key = path.join(
     config.data.s3,
-    `Exposure/${file.study}_${file.strategy}_exposure_refdata.json.gz`
+    `Exposure/${study}_${strategy}_exposure_refdata.json.gz`
   );
 
   try {
@@ -811,10 +828,8 @@ async function queryExposure(req, res, next) {
       })
       .promise();
 
-    const signatureRefsets = JSON.parse(gunzipSync(Body));
-    const query = Object.values(pickBy(signatureRefsets, filter)).map((e) =>
-      pick(e, properties)
-    );
+    const data = JSON.parse(gunzipSync(Body));
+    const query = Object.values(pickBy(data, filter));
 
     res.json(query);
   } catch (error) {
