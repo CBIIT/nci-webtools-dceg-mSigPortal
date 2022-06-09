@@ -52,12 +52,15 @@ export default function TMB(data, study) {
       type: "scatter",
       marker: { symbol: "circle-open-dot" },
       mode: "markers",
-      x: samples.sampleBurden.map(
-        (e, i) =>
-          array
-            .slice(0, groupIndex)
-            .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
-      ),
+      // x: samples.sampleBurden.map(
+      //   (e, i) =>
+      //     array
+      //       .slice(0, groupIndex)
+      //       .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) +
+      //     i +
+      //     0.5
+      // ),
+      x: samples.sampleBurden.map((e) => e.sample),
       y: samples.sampleBurden.map((e) => e.burden),
     })
   );
@@ -67,7 +70,7 @@ export default function TMB(data, study) {
   const layout = {
     xaxis: {
       showline: true,
-      tickangle: -90,
+      tickangle: 90,
       tickfont: {
         size: 10,
       },

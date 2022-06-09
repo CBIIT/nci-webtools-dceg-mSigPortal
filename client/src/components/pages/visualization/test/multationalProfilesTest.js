@@ -52,6 +52,7 @@ export default function MultationalProfilesTest() {
       y: signatures.map((e) => e.contribution),
       hoverinfo: "x+y",
       showlegend: false,
+      array: array,
     })
   );
 
