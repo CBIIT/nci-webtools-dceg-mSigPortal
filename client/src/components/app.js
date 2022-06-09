@@ -113,7 +113,7 @@ export default function App() {
 
   useEffect(() => {
     const getData = async () => {
-      const data = await (await fetch(`api/getPublications`)).json();
+      const data = await (await fetch(`web/getPublications`)).json();
 
       const reducer = (acc, column) => [
         ...acc,

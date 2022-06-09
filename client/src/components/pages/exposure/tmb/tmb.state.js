@@ -19,7 +19,7 @@ export const getPlot = selector({
       const { option } = get(formState);
 
       if (Object.keys(option).length) {
-        const { data } = await axios.post('api/queryExposure', {
+        const { data } = await axios.post('web/queryExposure', {
           file: option.value.file, // name of study and strategy for fetching the correct file
           filter: option.value.filter, // filter given an object of key:values you want
           properties: ['Cancer_Type', 'Sample', 'Exposure'], // return objects containing these properties

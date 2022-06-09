@@ -314,7 +314,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
               <Plot
                 className="p-3"
                 downloadName={pca1.split('/').slice(-1)[0]}
-                plotPath={'api/results/' + pca1}
+                plotPath={'web/results/' + pca1}
               />
               <p className="p-3">
                 The bar plot illustrates each of the principal components on the
@@ -330,8 +330,8 @@ export default function PCA({ submitR, getRefSigOptions }) {
               <Plot
                 className="p-3"
                 downloadName={pca2.split('/').slice(-1)[0]}
-                plotPath={'api/results/' + pca2}
-                txtPath={`api/results/${pca2Data}`}
+                plotPath={'web/results/' + pca2}
+                txtPath={`web/results/${pca2Data}`}
               />
               <p className="p-3">
                 The individual PCA plot based on the top two principal
@@ -350,8 +350,8 @@ export default function PCA({ submitR, getRefSigOptions }) {
               <Plot
                 className="p-3"
                 downloadName={pca3.split('/').slice(-1)[0]}
-                plotPath={'api/results/' + pca3}
-                txtPath={`api/results/${pca3Data}`}
+                plotPath={'web/results/' + pca3}
+                txtPath={`web/results/${pca3Data}`}
               />
               <p className="p-3">
                 The variable PCA plot based on the top two principal components
@@ -369,8 +369,8 @@ export default function PCA({ submitR, getRefSigOptions }) {
               <Plot
                 className="p-3"
                 downloadName={heatmap.split('/').slice(-1)[0]}
-                plotPath={'api/results/' + heatmap}
-                txtPath={`api/results/${heatmapData}`}
+                plotPath={'web/results/' + heatmap}
+                txtPath={`web/results/${heatmapData}`}
               />
               <p className="p-3">
                 The heatmap shows cosine similarity between each principal
@@ -473,7 +473,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
               <Plot
                 className="p-3"
                 downloadName={pubPca1.split('/').slice(-1)[0]}
-                plotPath={'api/results/' + pubPca1}
+                plotPath={'web/results/' + pubPca1}
               />
               <p className="p-3">
                 The bar plot illustrates each of the principal components on the
@@ -489,8 +489,8 @@ export default function PCA({ submitR, getRefSigOptions }) {
               <Plot
                 className="p-3"
                 downloadName={pubPca2.split('/').slice(-1)[0]}
-                plotPath={'api/results/' + pubPca2}
-                txtPath={`api/results/${pubPca2Data}`}
+                plotPath={'web/results/' + pubPca2}
+                txtPath={`web/results/${pubPca2Data}`}
               />
               <p className="p-3">
                 The individual PCA plot based on the top two principal
@@ -509,8 +509,8 @@ export default function PCA({ submitR, getRefSigOptions }) {
               <Plot
                 className="p-3"
                 downloadName={pubPca3.split('/').slice(-1)[0]}
-                plotPath={'api/results/' + pubPca3}
-                txtPath={`api/results/${pubPca3Data}`}
+                plotPath={'web/results/' + pubPca3}
+                txtPath={`web/results/${pubPca3Data}`}
               />
               <p className="p-3">
                 The variable PCA plot based on the top two principal components

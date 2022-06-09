@@ -5,14 +5,18 @@ const nodemailer = require('nodemailer');
 const r = require('r-wrapper').async;
 const tar = require('tar');
 const config = require('./config.json');
-const logger = require('./logger');
+const logger = require('./services/logger');
 const {
   profilerExtraction,
   parseCSV,
   getRelativePath,
-} = require('./controllers');
+} = require('./services/analysis');
 
-const { defaultProfile, defaultMatrix, defaultFilter } = require('./utils');
+const {
+  defaultProfile,
+  defaultMatrix,
+  defaultFilter,
+} = require('./services/utils');
 
 (async function main() {
   // update aws configuration if all keys are supplied, otherwise

@@ -131,7 +131,7 @@ export default function Multivariable() {
       mergeState({ loadingParams: true, error: false });
       try {
         const { stdout, output: collapseData } = await (
-          await fetch(`api/associationWrapper`, {
+          await fetch(`web/associationWrapper`, {
             method: 'POST',
             headers: {
               Accept: 'application/json',
@@ -227,7 +227,7 @@ export default function Multivariable() {
           stdout,
           output,
         } = await (
-          await fetch(`api/associationWrapper`, {
+          await fetch(`web/associationWrapper`, {
             method: 'POST',
             headers: {
               Accept: 'application/json',
@@ -683,8 +683,8 @@ export default function Multivariable() {
                 <Plot
                   className="p-3 border rounded"
                   downloadName={plotPath.split('/').slice(-1)[0]}
-                  plotPath={`api/results/${plotPath}`}
-                  txtPath={`api/results/${dataPath}`}
+                  plotPath={`web/results/${plotPath}`}
+                  txtPath={`web/results/${dataPath}`}
                   height="800px"
                 />
               )}

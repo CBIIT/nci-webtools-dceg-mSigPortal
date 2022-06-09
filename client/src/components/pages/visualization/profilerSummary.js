@@ -114,7 +114,7 @@ export default function ProfilerSummary({ submitR }) {
               title="Number of Mutations Per Sample with Regard to Mutational Profile"
               className="p-3"
               downloadName={plotPath.split('/').slice(-1)[0]}
-              plotPath={'api/results/' + plotPath}
+              plotPath={'web/results/' + plotPath}
               height="600px"
             />
           </>

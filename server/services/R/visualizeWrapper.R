@@ -1097,7 +1097,7 @@ getTreeLeaf <- function(args, config) {
 
 
   ## add cosine similarity
-  cosdata <- read_delim("PCAWG_Decomposition_Quality.txt", delim = "\t", col_names = T) %>%
+  cosdata <- read_delim("services/R/PCAWG_Decomposition_Quality.txt", delim = "\t", col_names = T) %>%
     separate(col = Sample_Names, into = c("Cancer_Type", "Sample"), sep = "@", convert = T) %>%
     select(Cancer_Type, Sample, Cosine_similarity)
 

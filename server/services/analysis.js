@@ -1,3 +1,4 @@
+const express = require('express');
 const path = require('path');
 const logger = require('./logger');
 const { spawn } = require('promisify-child-process');
@@ -11,8 +12,7 @@ const AWS = require('aws-sdk');
 const XLSX = require('xlsx');
 const replace = require('replace-in-file');
 const glob = require('glob');
-const config = require('./config.json');
-const apiSpec = require('./apiSpec.json');
+const config = require('../config.json');
 const archiver = require('archiver');
 const { pick, pickBy } = require('lodash');
 const { gunzipSync } = require('zlib');
@@ -26,12 +26,6 @@ const rConfig = {
   localData: path.resolve(config.data.localData),
   wd: path.resolve(config.results.folder),
 };
-
-function getApiSpec(req, res) {
-  const url = config.email.baseUrl;
-  const servers = [{ url }];
-  res.json({...apiSpec, servers});
-}
 
 function parseCSV(filepath) {
   const file = fs.createReadStream(filepath);
@@ -829,7 +823,6 @@ async function queryExposure(req, res, next) {
 }
 
 module.exports = {
-  getApiSpec,
   parseCSV,
   profilerExtraction,
   visualizationProfilerExtraction,

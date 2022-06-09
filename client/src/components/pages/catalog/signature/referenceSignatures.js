@@ -24,7 +24,7 @@ export default function ReferenceSignatures() {
       setLoading(true);
       try {
         const plotBlob = await (
-          await fetch(`api/getImageS3`, {
+          await fetch(`web/getImageS3`, {
             method: 'POST',
             headers: {
               Accept: 'image/svg',

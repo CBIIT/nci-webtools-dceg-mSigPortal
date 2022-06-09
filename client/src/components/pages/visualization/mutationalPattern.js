@@ -93,7 +93,7 @@ export default function MutationalPattern({ submitR }) {
             <Plot
               className="p-3"
               downloadName={barPath.split('/').slice(-1)[0]}
-              plotPath={'api/results/' + barPath}
+              plotPath={'web/results/' + barPath}
             />
             <p className="p-3">
               This plot illustrates the frequency by count of each mutational
@@ -122,8 +122,8 @@ export default function MutationalPattern({ submitR }) {
             <Plot
               className="p-3"
               downloadName={plotPath.split('/').slice(-1)[0]}
-              plotPath={'api/results/' + plotPath}
-              txtPath={`api/results/${txtPath}`}
+              plotPath={'web/results/' + plotPath}
+              txtPath={`web/results/${txtPath}`}
               title="Proportion of Mutational Pattern Context Compared to Other Contexts with the same SBS Mutation"
             />
             <p className="p-3">

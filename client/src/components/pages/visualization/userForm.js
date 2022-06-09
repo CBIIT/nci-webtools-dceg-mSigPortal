@@ -98,7 +98,7 @@ export default function UserForm() {
       });
 
       try {
-        const response = await fetch(`api/queue`, {
+        const response = await fetch(`web/queue`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -139,7 +139,7 @@ export default function UserForm() {
         },
       });
       try {
-        const response = await fetch(`api/profilerExtraction`, {
+        const response = await fetch(`web/profilerExtraction`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -229,7 +229,7 @@ export default function UserForm() {
       const data = new FormData();
       data.append('inputFile', inputFile);
       if (bedFile.size) data.append('bedFile', bedFile);
-      let response = await fetch(`api/upload`, {
+      let response = await fetch(`web/upload`, {
         method: 'POST',
         body: data,
       });
