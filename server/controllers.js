@@ -28,7 +28,7 @@ const rConfig = {
 };
 
 function getApiSpec(req, res) {
-  const url = `${req.protocol}://${req.get('host')}`;
+  const url = config.email.baseUrl;
   const servers = [{ url }];
   res.json({...apiSpec, servers});
 }
