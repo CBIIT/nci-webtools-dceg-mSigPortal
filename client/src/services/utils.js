@@ -20,7 +20,7 @@ export function defaultFilter(filterOptions) {
 }
 
 export function getJSON(path) {
-  return fetch(`api/getFileS3`, {
+  return fetch(`web/getFileS3`, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -35,7 +35,7 @@ export function getJSON(path) {
 }
 
 export function getBlob(path) {
-  return fetch(`api/getFileS3`, {
+  return fetch(`web/getFileS3`, {
     method: 'POST',
     headers: {
       Accept: 'application/json',

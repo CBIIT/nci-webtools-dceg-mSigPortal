@@ -58,7 +58,7 @@ export default function PublicForm() {
       },
     });
     try {
-      const response = await fetch(`api/visualizationWrapper`, {
+      const response = await fetch(`web/visualizationWrapper`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',

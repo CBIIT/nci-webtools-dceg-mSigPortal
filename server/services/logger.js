@@ -1,6 +1,6 @@
 const path = require('path');
 const { createLogger, format, transports } = require('winston');
-const { folder, level } = require('./config.json').logs;
+const { folder, level } = require('../config.json').logs;
 require('winston-daily-rotate-file');
 
 module.exports = new createLogger({

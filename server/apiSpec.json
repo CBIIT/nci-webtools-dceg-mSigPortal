@@ -1,0 +1,30 @@
+{
+  "openapi": "3.0.0",
+  "tags": [
+    {
+      "name": "Status"
+    }
+  ],
+  "paths": {
+    "/api/ping": {
+      "get": {
+        "tags": [
+          "Status"
+        ],
+        "summary": "Gets API status",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "500": {
+            "description": "API error"
+          }
+        }
+      }
+    }
+  }
+}

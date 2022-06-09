@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node msigportal-server.js",
+    "start": "node server.js",
     "start-queue-worker": "node queue-worker.js",
     "build": "npm run format",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -21,6 +21,7 @@
     "formidable": "^1.2.2",
     "fs-extra": "^10.0.0",
     "glob": "^7.2.0",
+    "lodash": "^4.17.21",
     "nodemailer": "^6.7.0",
     "papaparse": "^5.3.1",
     "promisify-child-process": "^4.1.1",

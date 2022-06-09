@@ -109,7 +109,7 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
               className="p-3"
               title="Landscape of Mutational Signature Activity"
               downloadName={plotPath.split('/').slice(-1)[0]}
-              plotPath={`api/results/${plotPath}`}
+              plotPath={`web/results/${plotPath}`}
               height="1500px"
             />
           </>

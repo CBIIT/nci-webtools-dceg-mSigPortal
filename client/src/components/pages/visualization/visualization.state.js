@@ -15,7 +15,7 @@ export const publicFormState = atom({
 export const publicDataSelector = selector({
   key: 'visualization.publicData',
   get: async ({ get }) => {
-    const { data } = await axios.post('api/getFileS3', {
+    const { data } = await axios.post('web/getFileS3', {
       path: 'Others/json/Visualization-Public.json',
     });
 
@@ -106,7 +106,7 @@ export const visualizationState = atom({
 //   key: 'visualization.state',
 //   get: async ({ get }) => {
 //     try {
-//       // const { data } = await axios.post('api/visualizationWrapper', {
+//       // const { data } = await axios.post('web/visualizationWrapper', {
 //       //   fn: 'getTreeLeaf',
 //       // });
 

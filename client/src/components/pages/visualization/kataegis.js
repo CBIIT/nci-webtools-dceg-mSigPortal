@@ -230,8 +230,8 @@ export default function Kataegis({ submitR }) {
                 <Plot
                   className="p-3"
                   downloadName={plotPath.split("/").slice(-1)[0]}
-                  plotPath={"api/results/" + plotPath}
-                  txtPath={txtPath ? `api/results/${txtPath}` : null}
+                  plotPath={"web/results/" + plotPath}
+                  txtPath={txtPath ? `web/results/${txtPath}` : null}
                 />
                 <p className="p-3">
                   The rainfall plot illustrates the kataegis events identified

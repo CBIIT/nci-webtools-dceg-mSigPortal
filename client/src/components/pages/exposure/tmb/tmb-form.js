@@ -16,24 +16,18 @@ export default function TreeLeafForm() {
     {
       label: 'Single',
       value: {
-        file: { study: 'PCAWG', strategy: 'WGS' },
-        filter: {
-          Study: 'PCAWG',
-          Dataset: 'WGS',
-          Signature_set_name: 'COSMIC_v3_Signatures_GRCh37_SBS96',
-          Cancer_Type: 'Lung-AdenoCA',
-        },
+        study: 'PCAWG',
+        strategy: 'WGS',
+        signature_set: 'COSMIC_v3_Signatures_GRCh37_SBS96',
+        cancer: 'Lung-AdenoCA',
       },
     },
     {
       label: 'Multi',
       value: {
-        file: { study: 'PCAWG', strategy: 'WGS' },
-        filter: {
-          Study: 'PCAWG',
-          Dataset: 'WGS',
-          Signature_set_name: 'COSMIC_v3_Signatures_GRCh37_SBS96',
-        },
+        study: 'PCAWG',
+        strategy: 'WGS',
+        signature_set: 'COSMIC_v3_Signatures_GRCh37_SBS96',
       },
     },
   ];

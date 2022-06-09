@@ -1,4 +1,5 @@
 /** We must specify variables before importing bootstrap in order to customize the generated css */
+@import "~swagger-ui-react/swagger-ui.css";
 
 $enable-shadows: true;
 // $enable-gradients: true;
@@ -307,4 +308,14 @@ select.form-control-sm {
 
 .hovertext {
   opacity: 0.8;
+}
+
+.swagger-ui {
+  font-family: var(--bs-body-font-family);
+
+  .wrapper {
+    margin: 0;
+    padding: 0;
+    max-width: 100% !important;
+  }
 }

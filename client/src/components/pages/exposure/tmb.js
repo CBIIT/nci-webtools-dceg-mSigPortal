@@ -33,7 +33,7 @@ export default function TMB() {
               className="p-3"
               title="Tumor Mutational Burden"
               downloadName={plotPath.split('/').slice(-1)[0]}
-              plotPath={`api/results/${plotPath}`}
+              plotPath={`web/results/${plotPath}`}
             />
           </>
         )}

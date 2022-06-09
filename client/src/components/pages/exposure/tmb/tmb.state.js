@@ -19,10 +19,8 @@ export const getPlot = selector({
       const { option } = get(formState);
 
       if (Object.keys(option).length) {
-        const { data } = await axios.post('api/queryExposure', {
-          file: option.value.file, // name of study and strategy for fetching the correct file
-          filter: option.value.filter, // filter given an object of key:values you want
-          properties: ['Cancer_Type', 'Sample', 'Exposure'], // return objects containing these properties
+        const { data } = await axios.get('web/queryExposure', {
+          params: option.value,
         });
 
         const { traces, layout } = TMB(data, 'PCAWG');
