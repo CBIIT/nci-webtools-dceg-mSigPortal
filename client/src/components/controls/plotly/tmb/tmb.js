@@ -39,7 +39,50 @@ export default function TMB(data, study) {
     return { cancer, sampleBurden };
   });
 
-  console.log(cancerBurden);
+  const flatSorted = Object.values(cancerBurden).flat();
 
-  return { traces: [], layout: {} };
+  console.log(cancerBurden);
+  console.log(flatSorted);
+  const traces = Object.entries(cancerBurden).map(
+    ([cancer, samples], groupIndex, array) => ({
+      cancer: samples.cancer,
+      samples: samples,
+      groupIndex: groupIndex,
+      array: array,
+      type: "scatter",
+      marker: { symbol: "circle-open-dot" },
+      mode: "markers",
+      x: samples.sampleBurden.map(
+        (e, i) =>
+          array
+            .slice(0, groupIndex)
+            .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
+      ),
+      y: samples.sampleBurden.map((e) => e.burden),
+    })
+  );
+
+  console.log(traces);
+
+  const layout = {
+    xaxis: {
+      showline: true,
+      tickangle: -90,
+      tickfont: {
+        size: 10,
+      },
+      tickmode: "array",
+      tickvals: flatSorted.map((_, i) => i),
+      ticktext: flatSorted.map((e) => e.mutationType),
+    },
+    yaxis: {
+      title: "Number of Mutations per Megabase",
+      autorange: true,
+    },
+
+    //shapes: shapes,
+    //annotations: annotations,
+  };
+
+  return { traces: [...traces], layout: { layout } };
 }
