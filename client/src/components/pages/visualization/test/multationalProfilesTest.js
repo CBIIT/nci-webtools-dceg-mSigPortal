@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import barData from "./data.json";
 import Plot from "react-plotly.js";
+import { chordTranspose } from "d3";
 
 export default function MultationalProfilesTest() {
   console.log(barData);
@@ -35,16 +36,26 @@ export default function MultationalProfilesTest() {
   };
 
   const data1 = Object.entries(groupByMutation).map(
-    ([mutation, signatures]) => ({
+    ([mutation, signatures], groupIndex, array) => ({
       name: mutation.replace(regex2, ""),
-      type: "bar",
-      marker: { color: colors[mutation] },
-      x: signatures.map((e) => e.mutationType),
+      type: "scatter",
+      marker: { color: colors[mutation], symbol: "circle-open-dot" },
+      mode: "markers",
+      x: signatures.map(
+        (e, i) =>
+          array
+            .slice(0, groupIndex)
+            .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) +
+          i +
+          0.5
+      ),
       y: signatures.map((e) => e.contribution),
       hoverinfo: "x+y",
       showlegend: false,
     })
   );
+
+  console.log(data1);
 
   // const data2 = Object.entries(groupByMutation).map(
   //   ([mutation, signatures]) => ({
@@ -62,13 +73,20 @@ export default function MultationalProfilesTest() {
   // );
 
   const shapes1 = Object.entries(groupByMutation).map(
-    ([mutation, signatures]) => ({
+    ([mutation, signatures], groupIndex, array) => ({
       type: "rect",
       xref: "x",
       yref: "paper",
-      x0: signatures.map((e) => e.mutationType)[0],
+      //x0: signatures.map((e) => e.mutationType)[0],
+      //x1: signatures.map((e) => e.mutationType)[signatures.length - 1],
+      x0: array
+        .slice(0, groupIndex)
+        .reduce((x0, [_, sigs]) => x0 + sigs.length, 0),
+      x1: array
+        .slice(0, groupIndex + 1)
+        .reduce((x0, [_, sigs]) => x0 + sigs.length, 0),
       y0: 1.03,
-      x1: signatures.map((e) => e.mutationType)[signatures.length - 1],
+
       y1: 1,
       fillcolor: colors[mutation],
       line: {
@@ -77,14 +95,22 @@ export default function MultationalProfilesTest() {
     })
   );
 
+  console.log(shapes1);
+
   const shapes2 = Object.entries(groupByMutation).map(
-    ([mutation, signatures]) => ({
+    ([mutation, signatures], groupIndex, array) => ({
       type: "rect",
       xref: "x",
       yref: "paper",
-      x0: signatures.map((e) => e.mutationType)[0],
+      //x0: signatures.map((e) => e.mutationType)[0],
       y0: 1,
-      x1: signatures.map((e) => e.mutationType)[signatures.length - 1],
+      //x1: signatures.map((e) => e.mutationType)[signatures.length - 1],
+      x0: array
+        .slice(0, groupIndex)
+        .reduce((x0, [_, sigs]) => x0 + sigs.length, 0),
+      x1: array
+        .slice(0, groupIndex + 1)
+        .reduce((x0, [_, sigs]) => x0 + sigs.length, 0),
       y1: 0,
       fillcolor: colors[mutation],
       line: {
@@ -96,12 +122,14 @@ export default function MultationalProfilesTest() {
 
   const shapes = [...shapes1, ...shapes2];
   const annotations = Object.entries(groupByMutation).map(
-    ([mutation, signatures]) => ({
+    ([mutation, signatures], groupIndex, array) => ({
       xref: "x",
       yref: "paper",
-      x: signatures.map((e) => e.mutationType)[
-        Math.round(signatures.length / 2)
-      ],
+      x:
+        array
+          .slice(0, groupIndex)
+          .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) +
+        (signatures.length - 1) * 0.5,
       xanchor: "bottom",
       y: 1.05,
       yanchor: "bottom",

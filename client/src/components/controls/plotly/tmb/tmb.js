@@ -1,5 +1,5 @@
 export default function TMB(data, study) {
-  const genome = { PCAWG: 'GRCh37', TCGA: 'GRCh37' };
+  const genome = { PCAWG: "GRCh37", TCGA: "GRCh37" };
   const genomeSize = { GRCh37: 3101976562 / Math.pow(10, 6) };
 
   const groupByCancer = data.reduce((groups, e) => {
@@ -22,6 +22,8 @@ export default function TMB(data, study) {
     },
     {}
   );
+
+  console.log(groupByCancer);
 
   const burdenQuotient = genomeSize[genome[study]];
   const cancerBurden = groupBySamples.map(({ cancer, samples }) => {
