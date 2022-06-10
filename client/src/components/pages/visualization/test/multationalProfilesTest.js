@@ -50,6 +50,19 @@ export default function MultationalProfilesTest() {
           0.5
       ),
       y: signatures.map((e) => e.contribution),
+      test0: signatures.map((e, i) => array.slice(0, groupIndex)),
+      testx0: signatures.map((e, i) =>
+        array.slice(0, groupIndex).reduce((x0, curr) => x0, 0)
+      ),
+      testcurr: signatures.map((e, i) =>
+        array.slice(0, groupIndex).reduce((x0, curr) => curr, 0)
+      ),
+      test1: signatures.map((e, i) =>
+        array.slice(0, groupIndex).reduce((x0, curr) => curr.length, 0)
+      ),
+      test2: signatures.map((e, i) =>
+        array.slice(0, groupIndex).reduce((x0, [_, curr]) => curr.length, 0)
+      ),
       hoverinfo: "x+y",
       showlegend: false,
       array: array,
@@ -121,6 +134,8 @@ export default function MultationalProfilesTest() {
     })
   );
 
+  console.log(shapes2);
+
   const shapes = [...shapes1, ...shapes2];
   const annotations = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
@@ -168,6 +183,7 @@ export default function MultationalProfilesTest() {
     shapes: shapes,
     annotations: annotations,
   };
+  console.log(layout);
 
   return (
     <Plot
