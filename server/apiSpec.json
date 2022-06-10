@@ -8,14 +8,124 @@
   "paths": {
     "/api/ping": {
       "get": {
-        "tags": [
-          "Status"
-        ],
+        "tags": ["Status"],
         "summary": "Gets API status",
-        "produces": [
-          "application/json"
-        ],
+        "produces": ["application/json"],
         "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "500": {
+            "description": "API error"
+          }
+        }
+      }
+    },
+    "/api/querySignature": {
+      "get": {
+        "tags": ["signature"],
+        "summary": "Retrieves signature data for mutational profile plots",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "profile",
+            "in": "query",
+            "description": "Select a profile to filter data by.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["DBS78", "ID83", "SBS96", "SBS192", "SBS288", "RS32"]
+            },
+            "value": "SBS96"
+          },
+          {
+            "name": "signature_set",
+            "in": "query",
+            "description": "Select signature set to filter data by. Signature set should correspond to the selected profile.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "COSMIC_v3_Signatures_GRCh37_SBS96",
+                "COSMIC_v3_Signatures_GRCh37_DBS78",
+                "COSMIC_v3_Signatures_GRCh37_ID83"
+              ]
+            },
+            "value": "COSMIC_v3_Signatures_GRCh37_SBS96"
+          },
+          {
+            "name": "signature",
+            "in": "query",
+            "description": "Select a signature name available in selected signature set",
+            "required": true,
+            "type": "string",
+            "value": "SBS84"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Query Signature Data"
+          },
+          "500": {
+            "description": "API error"
+          }
+        }
+      }
+    },
+    "/api/queryExposure": {
+      "get": {
+        "tags": ["exposure"],
+        "summary": "Retrieves Exploration/Exposure data",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "study",
+            "in": "query",
+            "description": "Select which study to query data from.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["PCAWG"]
+            },
+            "value": "PCAWG"
+          },
+          {
+            "name": "strategy",
+            "in": "query",
+            "description": "Select strategy (dataset) to filter data by.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["WGS"]
+            },
+            "value": "WGS"
+          },
+          {
+            "name": "signature_set",
+            "in": "query",
+            "description": "Select signature set to filter data by.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "COSMIC_v3_Signatures_GRCh37_SBS96",
+                "COSMIC_v3_Signatures_GRCh37_DBS78",
+                "COSMIC_v3_Signatures_GRCh37_ID83"
+              ]
+            },
+            "value": "COSMIC_v3_Signatures_GRCh37_SBS96"
+          },
+          {
+            "name": "cancer",
+            "in": "query",
+            "description": "Select cancer belonging to signature set",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful operation"
