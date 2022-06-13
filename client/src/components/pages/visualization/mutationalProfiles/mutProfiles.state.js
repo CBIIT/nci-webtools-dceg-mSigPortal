@@ -1,6 +1,5 @@
 import { atom, selector } from 'recoil';
 import axios from 'axios';
-import { visualizationState } from '../visualization.state';
 import SBS96 from '../../../controls/plotly/mutationalSignature/sbs96';
 import DBS78 from '../../../controls/plotly/mutationalSignature/dbs78';
 import ID83 from '../../../controls/plotly/mutationalSignature/id83';

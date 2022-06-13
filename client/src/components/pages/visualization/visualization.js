@@ -1,42 +1,40 @@
-import React, { useEffect, Suspense } from "react";
-import { Alert, Container } from "react-bootstrap";
-import Loader from "../../controls/loader/loader";
-import ErrorBoundary from "../../controls/errorBoundary/error-boundary";
-import { useRecoilState } from "recoil";
-import { Form, Row, Col, Nav, Button } from "react-bootstrap";
+import React, { useEffect, Suspense } from 'react';
+import { Alert, Container } from 'react-bootstrap';
+import Loader from '../../controls/loader/loader';
+import ErrorBoundary from '../../controls/errorBoundary/error-boundary';
+import { Form, Row, Col, Nav, Button } from 'react-bootstrap';
 import {
   SidebarContainer,
   SidebarPanel,
   MainPanel,
-} from "../../controls/sidebar-container/sidebar-container";
+} from '../../controls/sidebar-container/sidebar-container';
 // import UserForm from './dataSourceForm/userForm';
 // import PublicForm from './dataSourceForm/publicForm';
-import UserForm from "./userForm";
-import PublicForm from "./publicForm";
-import Instructions from "../visualization/instructions";
-import ProfilerSummary from "./profilerSummary";
-import MutationalProfiles from "./mutationalProfiles";
-import TreeAndLeaf from "./treeLeaf/treeLeaf";
-import MutationalProfiles2 from "./mutationalProfiles/mutProfiles";
-import CosineSimilarity from "./cosineSimilarity";
-import MutationalPattern from "./mutationalPattern";
-import ProfileComparison from "./profileComparison";
-import PCA from "./pca";
-import Kataegis from "./kataegis";
-import Download from "./download";
-import { LoadingOverlay } from "../../controls/loading-overlay/loading-overlay";
-import { useSelector, useDispatch } from "react-redux";
-import { actions as visualizationActions } from "../../../services/store/visualization";
-import { actions as modalActions } from "../../../services/store/modal";
+import UserForm from './userForm';
+import PublicForm from './publicForm';
+import Instructions from '../visualization/instructions';
+import ProfilerSummary from './profilerSummary';
+import MutationalProfiles from './mutationalProfiles';
+import TreeAndLeaf from './treeLeaf/treeLeaf';
+import MutationalProfiles2 from './mutationalProfiles/mutProfiles';
+import CosineSimilarity from './cosineSimilarity';
+import MutationalPattern from './mutationalPattern';
+import ProfileComparison from './profileComparison';
+import PCA from './pca';
+import Kataegis from './kataegis';
+import Download from './download';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as visualizationActions } from '../../../services/store/visualization';
+import { actions as modalActions } from '../../../services/store/modal';
 import {
   defaultProfile,
   defaultMatrix,
   defaultFilter,
-} from "../../../services/utils";
-import "./visualization.scss";
-import { visualizationState } from "./visualization.state";
+} from '../../../services/utils';
+import './visualization.scss';
 
-import MultationalProfilesTest from "./test/multationalProfilesTest";
+import MultationalProfilesTest from './test/multationalProfilesTest';
 
 const actions = { ...visualizationActions, ...modalActions };
 const { Group, Label, Check } = Form;
@@ -76,15 +74,12 @@ export default function Visualization({ match }) {
 
   const { type, id } = match.params;
 
-  const [recoilState, setRecoilState] = useRecoilState(visualizationState);
-  const mergeRecoil = (state) => setRecoilState({ ...recoilState, ...state });
-
   // when retrieving queued result, update id in store
   useEffect(() => {
     if (id && !loading.active && !submitted && !projectID) {
-      if (type == "queue") {
+      if (type == 'queue') {
         loadQueueResult(id);
-      } else if (type == "example") {
+      } else if (type == 'example') {
         loadExample(id);
       }
     }
@@ -92,7 +87,7 @@ export default function Visualization({ match }) {
 
   // get mapping of plots after retrieving projectID
   useEffect(() => {
-    if (source == "user") {
+    if (source == 'user') {
       if (projectID && !Object.keys(svgList).length) {
         getResults();
       } else if (Object.keys(svgList).length && !signatureSetOptions.length) {
@@ -112,8 +107,8 @@ export default function Visualization({ match }) {
     const response = await fetch(`web/getResults`, {
       method: 'POST',
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({ projectID: projectID }),
     });
@@ -122,12 +117,6 @@ export default function Visualization({ match }) {
       const { svgList, statistics, matrixList, downloads } =
         await response.json();
       mergeState({
-        svgList: svgList,
-        statistics: statistics,
-        matrixList: matrixList,
-        downloads: downloads,
-      });
-      mergeRecoil({
         svgList: svgList,
         statistics: statistics,
         matrixList: matrixList,
@@ -211,7 +200,7 @@ export default function Visualization({ match }) {
     const sampleNameOptions = [
       ...new Set(
         svgList.map((row) => {
-          if (row.Filter != "NA") return `${row.Sample_Name}@${row.Filter}`;
+          if (row.Filter != 'NA') return `${row.Sample_Name}@${row.Filter}`;
           else return row.Sample_Name;
         })
       ),
@@ -273,13 +262,6 @@ export default function Visualization({ match }) {
       },
       openSidebar: false,
     });
-    mergeRecoil({
-      profileOptions: profileOptions,
-      loading: {
-        active: false,
-      },
-      openSidebar: false,
-    });
   }
 
   // retrieve mapping of samples to plots from svgList file
@@ -312,7 +294,7 @@ export default function Visualization({ match }) {
     ].sort((a, b) => a - b);
 
     mergeState({ profileOptions: profileOptions });
-    mergeRecoil({ profileOptions: profileOptions });
+
     // Cosine Similarity - Profile Comparison - PCA
     const selectProfile = defaultProfile(profileOptions);
     const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);
@@ -352,15 +334,7 @@ export default function Visualization({ match }) {
         active: false,
       },
       submitted: true,
-      displayTab: "profilerSummary",
-      openSidebar: false,
-    });
-    mergeRecoil({
-      loading: {
-        active: false,
-      },
-      submitted: true,
-      displayTab: "profilerSummary",
+      displayTab: 'profilerSummary',
       openSidebar: false,
     });
   }
@@ -369,8 +343,8 @@ export default function Visualization({ match }) {
     return fetch(`web/visualizationWrapper`, {
       method: 'POST',
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({ fn: fn, args: args, projectID: projectID }),
     });
@@ -380,11 +354,11 @@ export default function Visualization({ match }) {
     return fetch(`web/visualizationWrapper`, {
       method: 'POST',
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        fn: "getReferenceSignatureSets",
+        fn: 'getReferenceSignatureSets',
         args: { profileType: profileType },
       }),
     });
@@ -407,20 +381,11 @@ export default function Visualization({ match }) {
       mergeState({
         queueExpired: true,
       });
-      mergeRecoil({
-        queueExpired: true,
-      });
     }
     mergeState({
       loading: { active: false },
       submitted: true,
-      displayTab: "profilerSummary",
-      openSidebar: false,
-    });
-    mergeRecoil({
-      loading: { active: false },
-      submitted: true,
-      displayTab: "profilerSummary",
+      displayTab: 'profilerSummary',
       openSidebar: false,
     });
   }
@@ -449,46 +414,40 @@ export default function Visualization({ match }) {
     mergeState({
       loading: { active: false },
       submitted: true,
-      displayTab: "profilerSummary",
-      openSidebar: false,
-    });
-    mergeRecoil({
-      loading: { active: false },
-      submitted: true,
-      displayTab: "profilerSummary",
+      displayTab: 'profilerSummary',
       openSidebar: false,
     });
   }
 
   const tabs = [
     {
-      name: "Instructions",
-      id: "instructions",
+      name: 'Instructions',
+      id: 'instructions',
       component: <Instructions />,
     },
     {
-      name: "Profiler Summary",
-      id: "profilerSummary",
+      name: 'Profiler Summary',
+      id: 'profilerSummary',
       component: <ProfilerSummary submitR={(fn, args) => submitR(fn, args)} />,
     },
     {
-      name: "Mutational Profiles",
-      id: "mutationalProfiles",
+      name: 'Mutational Profiles',
+      id: 'mutationalProfiles',
       component: <MutationalProfiles />,
     },
     {
-      name: "Tree and Leaf",
-      id: "treeAndLeaf",
+      name: 'Tree and Leaf',
+      id: 'treeAndLeaf',
       component: <TreeAndLeaf />,
     },
     {
-      name: "Mutational Profiles API",
-      id: "mutationalProfiles2",
+      name: 'Mutational Profiles API',
+      id: 'mutationalProfiles2',
       component: <MutationalProfiles2 />,
     },
     {
-      name: "Cosine Similarity",
-      id: "cosineSimilarity",
+      name: 'Cosine Similarity',
+      id: 'cosineSimilarity',
       component: (
         <CosineSimilarity
           getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
@@ -497,15 +456,15 @@ export default function Visualization({ match }) {
       ),
     },
     {
-      name: "Mutational Pattern Enrichment Analysis",
-      id: "mutationalPattern",
+      name: 'Mutational Pattern Enrichment Analysis',
+      id: 'mutationalPattern',
       component: (
         <MutationalPattern submitR={(fn, args) => submitR(fn, args)} />
       ),
     },
     {
-      name: "Profile Comparison",
-      id: "profileComparison",
+      name: 'Profile Comparison',
+      id: 'profileComparison',
       component: (
         <ProfileComparison
           getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
@@ -514,8 +473,8 @@ export default function Visualization({ match }) {
       ),
     },
     {
-      name: "PCA",
-      id: "pca",
+      name: 'PCA',
+      id: 'pca',
       component: (
         <PCA
           getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
@@ -524,18 +483,18 @@ export default function Visualization({ match }) {
       ),
     },
     {
-      name: "Kataegis Identification",
-      id: "kataegisIdentification",
+      name: 'Kataegis Identification',
+      id: 'kataegisIdentification',
       component: <Kataegis submitR={(fn, args) => submitR(fn, args)} />,
     },
     {
-      name: "Download",
-      id: "download",
+      name: 'Download',
+      id: 'download',
       component: <Download />,
     },
     {
-      name: "Multational Profiles Test",
-      id: "multationalProfileTest",
+      name: 'Multational Profiles Test',
+      id: 'multationalProfileTest',
       component: <MultationalProfilesTest />,
     },
   ];
@@ -552,15 +511,15 @@ export default function Visualization({ match }) {
                   <Button
                     variant="link"
                     className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
-                      id == displayTab ? "active-secondary-navlinks" : ""
+                      id == displayTab ? 'active-secondary-navlinks' : ''
                     }`}
                     active={id == displayTab && submitted}
-                    disabled={id != "instructions" && !submitted}
+                    disabled={id != 'instructions' && !submitted}
                     style={{
-                      textDecoration: "none",
-                      fontSize: "12pt",
-                      color: "black",
-                      fontWeight: "500",
+                      textDecoration: 'none',
+                      fontSize: '12pt',
+                      color: 'black',
+                      fontWeight: '500',
                     }}
                     onClick={() => mergeState({ displayTab: id })}
                   >
@@ -580,14 +539,14 @@ export default function Visualization({ match }) {
                     variant="link"
                     className={
                       id == displayTab && Object.keys(svgList).length
-                        ? "secondary-navlinks px-3 py-1 d-inline-block border-0 active-secondary-navlinks"
-                        : "secondary-navlinks px-3 py-1 d-inline-block border-0"
+                        ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 active-secondary-navlinks'
+                        : 'secondary-navlinks px-3 py-1 d-inline-block border-0'
                     }
                     style={{
-                      textDecoration: "none",
-                      fontSize: "12pt",
-                      color: "black",
-                      fontWeight: "500",
+                      textDecoration: 'none',
+                      fontSize: '12pt',
+                      color: 'black',
+                      fontWeight: '500',
                     }}
                     onClick={() => mergeState({ displayTab: id })}
                   >
@@ -631,8 +590,8 @@ export default function Visualization({ match }) {
                           disabled={submitted || loading.active}
                           type="radio"
                           value="public"
-                          checked={source == "public"}
-                          onChange={(e) => mergeState({ source: "public" })}
+                          checked={source == 'public'}
+                          onChange={(e) => mergeState({ source: 'public' })}
                         />
                         <Check.Label className="font-weight-normal">
                           Public
@@ -643,8 +602,8 @@ export default function Visualization({ match }) {
                           disabled={submitted || loading.active}
                           type="radio"
                           value="user"
-                          checked={source == "user"}
-                          onChange={(e) => mergeState({ source: "user" })}
+                          checked={source == 'user'}
+                          onChange={(e) => mergeState({ source: 'user' })}
                         />
                         <Check.Label className="font-weight-normal">
                           User
@@ -655,14 +614,14 @@ export default function Visualization({ match }) {
                 </Row>
                 <Row
                   style={{
-                    display: source == "user" ? "block" : "none",
+                    display: source == 'user' ? 'block' : 'none',
                   }}
                 >
                   <Col lg="auto" className="w-100">
                     <UserForm />
                   </Col>
                 </Row>
-                <Row style={{ display: source == "public" ? "block" : "none" }}>
+                <Row style={{ display: source == 'public' ? 'block' : 'none' }}>
                   <Col lg="auto" className="w-100">
                     <PublicForm />
                   </Col>
@@ -693,7 +652,7 @@ export default function Visualization({ match }) {
                   content={loading.content}
                   showIndicator={loading.showIndicator}
                 />
-                <div style={{ minHeight: "500px" }}>
+                <div style={{ minHeight: '500px' }}>
                   {tabs.filter((tab) => tab.id == displayTab)[0].component}
                 </div>
               </div>
