@@ -123,7 +123,8 @@
             "required": false,
             "schema": {
               "type": "string"
-            }
+            },
+            "value": "Lung-AdenoCA"
           }
         ],
         "responses": {
