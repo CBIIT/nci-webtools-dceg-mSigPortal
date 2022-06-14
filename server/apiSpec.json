@@ -22,7 +22,7 @@
         }
       }
     },
-    "/api/querySignature": {
+    "/api/signature": {
       "get": {
         "tags": ["signature"],
         "summary": "Retrieves signature data for mutational profile plots",

@@ -49,7 +49,7 @@ export const getPlot = selector({
       const { option } = get(formState);
 
       if (Object.keys(option).length) {
-        const { data } = await axios.get('web/querySignature', {
+        const { data } = await axios.get('web/signature', {
           params: option.value,
         });
 
