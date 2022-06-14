@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 import Plot from '../../controls/plot/plot';
-import CustomSelect from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select-old';
 import Description from '../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';

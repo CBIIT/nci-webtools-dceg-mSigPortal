@@ -1,7 +1,7 @@
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { formState } from './mutProfiles.state';
 import { Form, Row, Col } from 'react-bootstrap';
-import CustomSelect from '../../../controls/select/select';
+import CustomSelect from '../../../controls/select/select-old';
 import Select from 'react-select';
 
 export default function TreeLeafForm() {

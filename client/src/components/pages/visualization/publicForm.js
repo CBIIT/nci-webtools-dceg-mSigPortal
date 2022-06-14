@@ -1,53 +1,36 @@
 import React, { useEffect } from 'react';
 import { Form, Button, Row, Col, Popover } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import CustomSelect from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select-old';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
-import { getJSON } from '../../../services/utils';
+import axios from 'axios';
 
 const actions = { ...visualizationActions, ...modalActions };
 
 export default function PublicForm() {
   const dispatch = useDispatch();
-  const visualization = useSelector((state) => state.visualization);
+  const store = useSelector((state) => state.visualization);
 
   const mergeState = (state) =>
     dispatch(actions.mergeVisualization({ state: state }));
-  const mergeCosineSimilarity = (state) =>
-    dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
-  const mergeProfileComparison = (state) =>
-    dispatch(actions.mergeVisualization({ profileComparison: state }));
-  const mergePCA = (state) =>
-    dispatch(actions.mergeVisualization({ pca: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
   const resetVisualization = (_) => dispatch(actions.resetVisualization());
 
-  const {
-    study,
-    studyOptions,
-    cancerType,
-    cancerTypeOptions,
-    pubExperimentalStrategy,
-    pubExperimentOptions,
-    pDataOptions,
-    submitted,
-    loading,
-    loadingPublic,
-    source,
-  } = visualization.state;
+  const { study, cancer, strategy, data, loading } = store.publicForm;
+  const { source, submitted } = store.state;
 
   useEffect(() => {
-    if (!pDataOptions.length && !loadingPublic) getPublicDataOptions();
-  }, [pDataOptions, source]);
+    if (!data.length && !loading) getPublicDataOptions();
+  }, [data, source]);
 
   async function handleSubmit() {
     const args = {
-      study: study,
-      cancerType: cancerType,
-      experimentalStrategy: pubExperimentalStrategy,
+      study,
+      cancer,
+      strategy,
     };
 
     mergeState({
@@ -101,85 +84,73 @@ export default function PublicForm() {
 
   function handleReset() {
     const params = {
-      pDataOptions: pDataOptions,
-      studyOptions: studyOptions,
-      study: studyOptions[0],
-      cancerTypeOptions: cancerTypeOptions,
-      cancerType: 'Lung-AdenoCA',
-      pubExperimentOptions: pubExperimentOptions,
-      pubExperimentalStrategy: pubExperimentOptions[0],
+      data: data,
+      // studyOptions: studyOptions,
+      // study: studyOptions[0],
+      // cancerOptions: cancerOptions,
+      // cancer: 'Lung-AdenoCA',
+      // pubExperimentOptions: pubExperimentOptions,
+      // strategy: pubExperimentOptions[0],
     };
     window.location.hash = '#/visualization';
     resetVisualization();
     mergeState(params);
   }
 
+  const studyOptions = [...new Set(data.map((data) => data.Study))];
+  // default study
+
+  const cancerOptions = [
+    ...new Set(
+      data.filter((data) => data.Study == study).map((data) => data.Cancer_Type)
+    ),
+  ];
+  //  default cancer type
+
+  const pubExperimentOptions = [
+    ...new Set(
+      data
+        .filter((data) => data.Study == study && data.Cancer_Type == cancer)
+        .map((data) => data.Dataset)
+    ),
+  ];
+
   async function getPublicDataOptions() {
-    mergeState({ loadingPublic: true });
+    mergeState({ loading: true });
     try {
-      const pDataOptions = await getJSON(
-        `Others/json/Visualization-Public.json`
-      );
-
-      const studyOptions = [...new Set(pDataOptions.map((data) => data.Study))];
-      // default study
-      const study = 'PCAWG';
-
-      const cancerTypeOptions = [
-        ...new Set(
-          pDataOptions
-            .filter((data) => data.Study == study)
-            .map((data) => data.Cancer_Type)
-        ),
-      ];
-      //  default cancer type
-      const cancer = 'Lung-AdenoCA';
-
-      const pubExperimentOptions = [
-        ...new Set(
-          pDataOptions
-            .filter((data) => data.Study == study && data.Cancer_Type == cancer)
-            .map((data) => data.Dataset)
-        ),
-      ];
-
-      mergeState({
-        pDataOptions: pDataOptions,
-        study: study,
-        studyOptions: studyOptions,
-        cancerType: cancer,
-        cancerTypeOptions: cancerTypeOptions,
-        pubExperimentalStrategy: pubExperimentOptions[0],
-        pubExperimentOptions: pubExperimentOptions,
+      const { data } = await axios.post('web/getFileS3', {
+        path: `Others/json/Visualization-Public.json`,
       });
 
-      mergeCosineSimilarity({
-        pubStudy: study,
-        pubCancerType: cancer,
-        pubCancerTypeOptions: cancerTypeOptions,
-      });
+      mergeState({ data: data });
 
-      mergeProfileComparison({
-        pubStudy: study,
-        pubCancerType: cancer,
-        pubCancerTypeOptions: cancerTypeOptions,
-      });
+      // mergeCosineSimilarity({
+      //   pubStudy: study,
+      //   pubcancer: cancer,
+      //   pubcancerOptions: cancerOptions,
+      // });
 
-      mergePCA({
-        pubStudy: study,
-        pubCancerType: cancer,
-        pubCancerTypeOptions: cancerTypeOptions,
-      });
+      // mergeProfileComparison({
+      //   pubStudy: study,
+      //   pubcancer: cancer,
+      //   pubcancerOptions: cancerOptions,
+      // });
+
+      // mergePCA({
+      //   pubStudy: study,
+      //   pubcancer: cancer,
+      //   pubcancerOptions: cancerOptions,
+      // });
     } catch (err) {
       mergeError(err.message);
     }
-    mergeState({ loadingPublic: false });
+    mergeState({ loading: false });
   }
 
   function handleStudyChange(study) {
-    const cancerTypeOptions = [
+    const cancerOptions = [
       ...new Set(
-        pDataOptions
+        data
           .filter((data) => data.Study == study)
           .map((data) => data.Cancer_Type)
       ),
@@ -187,10 +158,10 @@ export default function PublicForm() {
 
     const esOptions = [
       ...new Set(
-        pDataOptions
+        data
           .filter(
             (data) =>
-              data.Study == study && data.Cancer_Type == cancerTypeOptions[0]
+              data.Study == study && data.Cancer_Type == cancerOptions[0]
           )
           .map((data) => data.Dataset)
       ),
@@ -198,9 +169,9 @@ export default function PublicForm() {
 
     mergeState({
       study: study,
-      cancerType: cancerTypeOptions[0],
-      cancerTypeOptions: cancerTypeOptions,
-      pubExperimentalStrategy: esOptions[0],
+      cancer: cancerOptions[0],
+      cancerOptions: cancerOptions,
+      strategy: esOptions[0],
       pubExperimentOptions: esOptions,
     });
   }
@@ -208,22 +179,22 @@ export default function PublicForm() {
   function handleCancerChange(cancer) {
     const pubExperimentOptions = [
       ...new Set(
-        pDataOptions
+        data
           .filter((data) => data.Study == study && data.Cancer_Type == cancer)
           .map((data) => data.Dataset)
       ),
     ];
 
     mergeState({
-      cancerType: cancer,
-      pubExperimentalStrategy: pubExperimentOptions[0],
+      cancer: cancer,
+      strategy: pubExperimentOptions[0],
       pubExperimentOptions: pubExperimentOptions,
     });
   }
 
   return (
     <Form>
-      <LoadingOverlay active={loadingPublic} />
+      <LoadingOverlay active={false} />
       <CustomSelect
         className="mb-2"
         id="publicFormStudy"
@@ -235,11 +206,11 @@ export default function PublicForm() {
       />
       <CustomSelect
         className="mb-2"
-        id="publicFromCancerType"
+        id="publicFromcancer"
         label="Cancer Type or Group"
         disabled={submitted}
-        value={cancerType}
-        options={cancerTypeOptions}
+        value={cancer}
+        options={cancerOptions}
         onChange={handleCancerChange}
       />
       <CustomSelect
@@ -247,11 +218,11 @@ export default function PublicForm() {
         id="publicFormStrategy"
         label="Experimental Strategy"
         disabled={submitted}
-        value={pubExperimentalStrategy}
+        value={strategy}
         options={pubExperimentOptions}
-        onChange={(pubExperimentalStrategy) =>
+        onChange={(strategy) =>
           mergeState({
-            pubExperimentalStrategy: pubExperimentalStrategy,
+            strategy: strategy,
           })
         }
       />
@@ -259,7 +230,7 @@ export default function PublicForm() {
       <Row>
         <Col>
           <Button
-            disabled={loading.active || loadingPublic}
+            disabled={loading.active || loading}
             className="w-100"
             variant="secondary"
             onClick={() => handleReset()}
@@ -269,7 +240,7 @@ export default function PublicForm() {
         </Col>
         <Col>
           <Button
-            disabled={loading.active || loadingPublic || submitted}
+            disabled={loading.active || loading || submitted}
             className="w-100"
             variant="primary"
             type="button"
