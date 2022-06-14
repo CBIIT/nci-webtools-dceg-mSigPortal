@@ -60,7 +60,7 @@ export default function TMB(data, study) {
     array: array,
     name: element.cancer,
     type: "scatter",
-    marker: { symbol: "circle-open" },
+    marker: { symbol: "circle-open", size: 5 },
     mode: "markers",
     y: element.sampleBurden.map((e) => e.burden),
     average: average(element.sampleBurden.map((e) => e.burden)),
@@ -73,7 +73,7 @@ export default function TMB(data, study) {
     //     0.5
     // ),
     x: element.sampleBurden.map(
-      (e, i) => index + (1 / element.sampleBurden.length) * i
+      (e, i) => index + 0.01 + (1 / (element.sampleBurden.length + 2)) * i
     ),
     showlegend: false,
   }));
@@ -98,7 +98,7 @@ export default function TMB(data, study) {
       size: 12,
     },
     align: "center",
-    textangle: 45,
+    textangle: -90,
   }));
   console.log("top label:--");
   console.log(topLabel);
@@ -115,11 +115,11 @@ export default function TMB(data, study) {
     // x1: array
     //   .slice(0, index + 1)
     //   .reduce((x0, curr) => x0 + curr.sampleBurden.length, 0),
-    x0: index + 0.2,
-    x1: index + 1 - 0.2,
+    x0: index,
+    x1: index + 1,
     y0: 0,
     y1: 1,
-    fillcolor: index % 2 === 0 ? "#grey" : "#F8F8F8",
+    fillcolor: index % 2 === 0 ? "gray" : "red",
     line: {
       width: 0,
     },
@@ -159,8 +159,6 @@ export default function TMB(data, study) {
     // },
     xaxis: {
       showticklabels: false,
-      //showline: true,
-      //tickangle: -90,
       tickfont: {
         size: 10,
       },
@@ -170,8 +168,10 @@ export default function TMB(data, study) {
       //ticktext: flatSorted.map((_, i) => i),
     },
     yaxis: {
-      title: "Number of Mutations per Megabase",
-      //autorange: true,
+      title: "Number of Mutations per Megabase<br>(log10)",
+      autorange: true,
+      zeroline: false,
+      //showline: true,
     },
 
     shapes: [...shapes, ...lines],
@@ -180,7 +180,9 @@ export default function TMB(data, study) {
   console.log("layout:");
   console.log(layout);
 
-  var config = { responsive: true };
+  var config = {
+    responsive: true,
+  };
 
   return { traces: [...traces], layout: layout, config };
   //return { traces, layout };
