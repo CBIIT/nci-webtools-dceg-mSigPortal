@@ -1,5 +1,6 @@
 import React, { useEffect, Suspense } from 'react';
 import { Alert, Container } from 'react-bootstrap';
+import axios from 'axios';
 import Loader from '../../controls/loader/loader';
 import ErrorBoundary from '../../controls/errorBoundary/error-boundary';
 import { Form, Row, Col, Nav, Button } from 'react-bootstrap';
@@ -8,8 +9,6 @@ import {
   SidebarPanel,
   MainPanel,
 } from '../../controls/sidebar-container/sidebar-container';
-// import UserForm from './dataSourceForm/userForm';
-// import PublicForm from './dataSourceForm/publicForm';
 import UserForm from './userForm';
 import PublicForm from './publicForm';
 import Instructions from '../visualization/instructions';
@@ -41,19 +40,19 @@ const { Group, Label, Check } = Form;
 
 export default function Visualization({ match }) {
   const dispatch = useDispatch();
-  const visualization = useSelector((state) => state.visualization);
+  const store = useSelector((state) => state.visualization);
   const mergeState = (state) =>
-    dispatch(actions.mergeVisualization({ state: state }));
-  const mergeMutationalProfiles = (state) =>
-    dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
-  const mergeKataegis = (state) =>
-    dispatch(actions.mergeVisualization({ kataegis: state }));
-  const mergeCosineSimilarity = (state) =>
-    dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
-  const mergeProfileComparison = (state) =>
-    dispatch(actions.mergeVisualization({ profileComparison: state }));
-  const mergePCA = (state) =>
-    dispatch(actions.mergeVisualization({ pca: state }));
+    dispatch(actions.mergeVisualization({ main: state }));
+  // const mergeMutationalProfiles = (state) =>
+  //   dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
+  // const mergeKataegis = (state) =>
+  //   dispatch(actions.mergeVisualization({ kataegis: state }));
+  // const mergeCosineSimilarity = (state) =>
+  //   dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
+  // const mergeProfileComparison = (state) =>
+  //   dispatch(actions.mergeVisualization({ profileComparison: state }));
+  // const mergePCA = (state) =>
+  //   dispatch(actions.mergeVisualization({ pca: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -68,9 +67,9 @@ export default function Visualization({ match }) {
     displayTab,
     svgList,
     matrixList,
-  } = visualization.state;
-  const mutationalProfiles = visualization.mutationalProfiles;
-  const { signatureSetOptions } = visualization.pca;
+  } = store.main;
+  const mutationalProfiles = store.mutationalProfiles;
+  const { signatureSetOptions } = store.pca;
 
   const { type, id } = match.params;
 
@@ -101,6 +100,63 @@ export default function Visualization({ match }) {
         mapPublicData();
     }
   }, [svgList, projectID]);
+
+  // handle public form submit
+  useEffect(() => {
+    if (submitted && source == 'public') handlePublicSubmit();
+  }, [submitted]);
+
+  async function handlePublicSubmit() {
+    try {
+      const args = {
+        study: store.publicForm.study,
+        cancerType: store.publicForm.cancer,
+        experimentalStrategy: store.publicForm.strategy,
+      };
+
+      mergeState({
+        loading: {
+          active: true,
+          // content: 'Loading Public Data',
+          // showIndicator: true,
+        },
+      });
+      const response = await axios.post(`web/visualizationWrapper`, {
+        fn: 'getPublicData',
+        args,
+      });
+
+      if (response.status == 200) {
+        const { output, projectID } = await response.data;
+        if (output.error) throw output.error;
+        if (output.uncaughtError) throw output.uncaughtError;
+
+        mergeState({
+          svgList: output,
+          projectID: projectID,
+        });
+      } else if (response.status == 504) {
+        mergeState({
+          error: 'Please Reset Your Parameters and Try again.',
+        });
+        mergeError({
+          visible: true,
+          message:
+            'Your submission has timed out. Please try again by submitting this job to a queue instead.',
+        });
+      } else {
+        mergeState({
+          error: 'Please Reset Your Parameters and Try again.',
+        });
+      }
+    } catch (err) {
+      mergeError(err.message);
+      mergeState({
+        error: 'Please Reset Your Parameters and Try again.',
+      });
+    }
+    mergeState({ loading: { active: false } });
+  }
 
   // reload summary information
   async function getResults() {
@@ -184,17 +240,17 @@ export default function Visualization({ match }) {
       ),
     ];
 
-    mergeMutationalProfiles({
-      filtered: filteredPlots,
-      nameOptions: nameOptions,
-      profileOptions: filteredProfileOptions,
-      matrixOptions: filteredMatrixOptions,
-      filterOptions: filteredFilterOptions,
-      selectName: selectName,
-      selectProfile: profile,
-      selectMatrix: matrix,
-      selectFilter: filter,
-    });
+    // mergeMutationalProfiles({
+    //   filtered: filteredPlots,
+    //   nameOptions: nameOptions,
+    //   profileOptions: filteredProfileOptions,
+    //   matrixOptions: filteredMatrixOptions,
+    //   filterOptions: filteredFilterOptions,
+    //   selectName: selectName,
+    //   selectProfile: profile,
+    //   selectMatrix: matrix,
+    //   selectFilter: filter,
+    // });
 
     // Cosine Similarity - Profile Comparison - PCA - Kataegis
     const sampleNameOptions = [
@@ -214,46 +270,46 @@ export default function Visualization({ match }) {
       await getRefSigOptions(selectProfile)
     ).json();
 
-    mergeCosineSimilarity({
-      withinProfileType: selectProfile,
-      refProfileType: selectProfile,
-      refSignatureSet: refSignatureSetOptions[0],
-      refSignatureSetOptions: refSignatureSetOptions,
-      withinMatrixSize: selectMatrix,
-      withinMatrixOptions: filteredMatrixList,
-      userProfileType: selectProfile,
-      userMatrixSize: selectMatrix,
-      userMatrixOptions: filteredMatrixOptions,
-    });
+    // mergeCosineSimilarity({
+    //   withinProfileType: selectProfile,
+    //   refProfileType: selectProfile,
+    //   refSignatureSet: refSignatureSetOptions[0],
+    //   refSignatureSetOptions: refSignatureSetOptions,
+    //   withinMatrixSize: selectMatrix,
+    //   withinMatrixOptions: filteredMatrixList,
+    //   userProfileType: selectProfile,
+    //   userMatrixSize: selectMatrix,
+    //   userMatrixOptions: filteredMatrixOptions,
+    // });
 
-    mergeProfileComparison({
-      withinProfileType: selectProfile,
-      withinSampleName1: sampleNameOptions[0],
-      withinSampleName2: sampleNameOptions[1],
-      sampleOptions: sampleNameOptions,
-      refProfileType: selectProfile,
-      refSampleName: sampleNameOptions[0],
-      refSignatureSet: refSignatureSetOptions[0],
-      refSignatureSetOptions: refSignatureSetOptions,
-      userProfileType: selectProfile,
-      userMatrixSize: selectMatrix,
-      userMatrixOptions: filteredMatrixOptions,
-      userSampleName: sampleNameOptions[0],
-    });
+    // mergeProfileComparison({
+    //   withinProfileType: selectProfile,
+    //   withinSampleName1: sampleNameOptions[0],
+    //   withinSampleName2: sampleNameOptions[1],
+    //   sampleOptions: sampleNameOptions,
+    //   refProfileType: selectProfile,
+    //   refSampleName: sampleNameOptions[0],
+    //   refSignatureSet: refSignatureSetOptions[0],
+    //   refSignatureSetOptions: refSignatureSetOptions,
+    //   userProfileType: selectProfile,
+    //   userMatrixSize: selectMatrix,
+    //   userMatrixOptions: filteredMatrixOptions,
+    //   userSampleName: sampleNameOptions[0],
+    // });
 
-    mergePCA({
-      profileType: selectProfile,
-      signatureSet: refSignatureSetOptions[0],
-      signatureSetOptions: refSignatureSetOptions,
-      userProfileType: selectProfile,
-      userMatrixSize: selectMatrix,
-      userMatrixOptions: filteredMatrixOptions,
-    });
+    // mergePCA({
+    //   profileType: selectProfile,
+    //   signatureSet: refSignatureSetOptions[0],
+    //   signatureSetOptions: refSignatureSetOptions,
+    //   userProfileType: selectProfile,
+    //   userMatrixSize: selectMatrix,
+    //   userMatrixOptions: filteredMatrixOptions,
+    // });
 
-    mergeKataegis({
-      sample: sampleNameOptions[0],
-      sampleOptions: sampleNameOptions,
-    });
+    // mergeKataegis({
+    //   sample: sampleNameOptions[0],
+    //   sampleOptions: sampleNameOptions,
+    // });
 
     mergeState({
       profileOptions: profileOptions,
@@ -303,31 +359,31 @@ export default function Visualization({ match }) {
       await getRefSigOptions(selectProfile)
     ).json();
 
-    mergeCosineSimilarity({
-      withinProfileType: selectProfile,
-      refProfileType: selectProfile,
-      refSignatureSet: refSignatureSetOptions[0],
-      refSignatureSetOptions: refSignatureSetOptions,
-      withinMatrixSize: selectMatrix,
-      withinMatrixOptions: filteredMatrixOptions,
-    });
+    // mergeCosineSimilarity({
+    //   withinProfileType: selectProfile,
+    //   refProfileType: selectProfile,
+    //   refSignatureSet: refSignatureSetOptions[0],
+    //   refSignatureSetOptions: refSignatureSetOptions,
+    //   withinMatrixSize: selectMatrix,
+    //   withinMatrixOptions: filteredMatrixOptions,
+    // });
 
-    mergeProfileComparison({
-      withinProfileType: selectProfile,
-      withinSampleName1: nameOptions[0],
-      withinSampleName2: nameOptions[1],
-      sampleOptions: nameOptions,
-      refProfileType: selectProfile,
-      refSampleName: nameOptions[0],
-      refSignatureSet: refSignatureSetOptions[0],
-      refSignatureSetOptions: refSignatureSetOptions,
-    });
+    // mergeProfileComparison({
+    //   withinProfileType: selectProfile,
+    //   withinSampleName1: nameOptions[0],
+    //   withinSampleName2: nameOptions[1],
+    //   sampleOptions: nameOptions,
+    //   refProfileType: selectProfile,
+    //   refSampleName: nameOptions[0],
+    //   refSignatureSet: refSignatureSetOptions[0],
+    //   refSignatureSetOptions: refSignatureSetOptions,
+    // });
 
-    mergePCA({
-      profileType: selectProfile,
-      signatureSet: refSignatureSetOptions[0],
-      signatureSetOptions: refSignatureSetOptions,
-    });
+    // mergePCA({
+    //   profileType: selectProfile,
+    //   signatureSet: refSignatureSetOptions[0],
+    //   signatureSetOptions: refSignatureSetOptions,
+    // });
 
     mergeState({
       loading: {
@@ -405,7 +461,7 @@ export default function Visualization({ match }) {
       dispatch(
         actions.mergeVisualization({
           ...visualizationStore,
-          state: { ...visualizationStore.state, projectID: projectID },
+          state: { ...visualizationStore.main, projectID: projectID },
         })
       );
     } catch (error) {
