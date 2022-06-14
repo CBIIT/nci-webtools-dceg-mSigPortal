@@ -6,7 +6,6 @@ import CustomSelect from '../../controls/select/select';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as associationActions } from '../../../services/store/association';
 import { actions as modalActions } from '../../../services/store/modal';
-import { getJSON } from '../../../services/utils';
 
 const actions = { ...associationActions, ...modalActions };
 const { Group } = Form;
@@ -44,9 +43,9 @@ export default function PublicForm() {
     mergeState({ loadingData: true });
 
     try {
-      const exposureSignature = await getJSON(
-        'Others/json/Exploring-Exposure.json'
-      );
+      const { data: exposureSignature } = await axios.post('web/getFileS3', {
+        path: 'Others/json/Exploring-Exposure.json',
+      });
 
       // hide unavailable studies
       const hideStudies = [
