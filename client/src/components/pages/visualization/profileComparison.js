@@ -46,7 +46,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     matrixList,
     svgList,
     profileOptions,
-  } = visualization.state;
+  } = visualization.main;
 
   const {
     withinProfileType,

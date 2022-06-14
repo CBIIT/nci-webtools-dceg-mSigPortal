@@ -2,7 +2,30 @@ import { createSlice } from '@reduxjs/toolkit';
 import { mergeObject } from './utils';
 
 export const getInitialState = () => ({
-  state: {
+  publicForm: {
+    defaultOptions: {
+      study: { label: 'PCAWG', value: 'PCAWG' },
+      cancer: { label: 'Lung-AdenoCA', value: 'Lung-AdenoCA' },
+      strategy: { label: 'WGS', value: 'WGS' },
+    },
+    study: null,
+    cancer: null,
+    strategy: null,
+    loading: false,
+    data: [],
+  },
+  useForm: {
+    inputFormat: 'vcf',
+    selectedGenome: 'GRCh37',
+    experimentalStrategy: 'WGS',
+    mutationSplit: 'False',
+    collapseSample: 'False',
+    mutationFilter: '',
+    queueMode: false,
+    email: '',
+  },
+  main: {
+    submitted: false,
     source: 'public',
     inputFormat: 'vcf',
     selectedGenome: 'GRCh37',
@@ -22,7 +45,6 @@ export const getInitialState = () => ({
     openSidebar: true,
     storeFilename: '',
     bedFilename: '',
-    submitted: false,
     exampleData: 'assets/exampleInput/demo_input_multi.vcf.gz',
     bedData: 'assets/exampleInput/demo_input_bed.bed',
     loadingPublic: false,

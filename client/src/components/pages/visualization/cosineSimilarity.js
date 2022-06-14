@@ -35,7 +35,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
     matrixList,
     svgList,
     profileOptions,
-  } = visualization.state;
+  } = visualization.main;
 
   const {
     withinProfileType,

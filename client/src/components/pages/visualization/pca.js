@@ -32,7 +32,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
     projectID,
     svgList,
     profileOptions,
-  } = visualization.state;
+  } = visualization.main;
 
   const {
     profileType,

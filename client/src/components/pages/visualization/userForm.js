@@ -54,7 +54,7 @@ export default function UserForm() {
     cancerType,
     pubExperimentOptions,
     pubExperimentalStrategy,
-  } = visualization.state;
+  } = visualization.main;
 
   const [inputFile, setInput] = useState(new File([], ''));
   const [bedFile, setBed] = useState(new File([], ''));

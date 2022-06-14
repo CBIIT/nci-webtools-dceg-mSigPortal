@@ -22,7 +22,7 @@ export default function ProfilerSummary({ submitR }) {
     loading: mainLoading,
     matrixList,
     projectID,
-  } = visualization.state;
+  } = visualization.main;
 
   const { plotPath, err, debugR, loading } = visualization.profilerSummary;
   useEffect(() => {
