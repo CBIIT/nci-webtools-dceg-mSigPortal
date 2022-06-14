@@ -65,6 +65,21 @@ export default function SBS96(data) {
     })
   );
 
+  const sampleAnnotation = {
+    xref: "paper",
+    yref: "paper",
+    xanchor: "bottom",
+    yanchor: "bottom",
+    x: 0,
+    y: 0.85,
+    text: "<b>Sample Name: 1234 subs</b>",
+    showarrow: false,
+    font: {
+      size: 18,
+    },
+    align: "center",
+  };
+
   const shapes = Object.entries(groupByMutation).map(
     ([mutation, _], groupIndex, array) => ({
       type: "rect",
@@ -103,7 +118,7 @@ export default function SBS96(data) {
     },
 
     shapes: shapes,
-    annotations: annotations,
+    annotations: [...annotations, sampleAnnotation],
   };
 
   return { traces, layout };

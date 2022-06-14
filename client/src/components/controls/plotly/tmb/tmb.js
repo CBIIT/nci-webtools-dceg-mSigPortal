@@ -158,7 +158,7 @@ export default function TMB(data, study) {
     //   yanchor: "top",
     // },
     xaxis: {
-      showticklabels: true,
+      showticklabels: false,
       //showline: true,
       //tickangle: -90,
       tickfont: {
@@ -171,7 +171,7 @@ export default function TMB(data, study) {
     },
     yaxis: {
       title: "Number of Mutations per Megabase",
-      autorange: true,
+      //autorange: true,
     },
 
     shapes: [...shapes, ...lines],
