@@ -64,14 +64,18 @@ export default function TMB(data, study) {
     mode: "markers",
     y: element.sampleBurden.map((e) => e.burden),
     average: average(element.sampleBurden.map((e) => e.burden)),
+    // x: element.sampleBurden.map(
+    //   (e, i) =>
+    //     array
+    //       .slice(0, index)
+    //       .reduce((x0, curr) => x0 + curr.sampleBurden.length, 0) +
+    //     i +
+    //     0.5
+    // ),
     x: element.sampleBurden.map(
-      (e, i) =>
-        array
-          .slice(0, index)
-          .reduce((x0, curr) => x0 + curr.sampleBurden.length, 0) +
-        i +
-        0.5
+      (e, i) => index + (1 / element.sampleBurden.length) * i
     ),
+    showlegend: false,
   }));
   console.log("traces:--");
   console.log(traces);
@@ -81,18 +85,20 @@ export default function TMB(data, study) {
     yref: "paper",
     xanchor: "bottom",
     yanchor: "bottom",
-    x:
-      array
-        .slice(0, index)
-        .reduce((x0, curr) => x0 + curr.sampleBurden.length, 0) +
-      (element.sampleBurden.length - 1) * 0.5,
-    y: 1.04,
+    // x:
+    //   array
+    //     .slice(0, index)
+    //     .reduce((x0, curr) => x0 + curr.sampleBurden.length, 0) +
+    //   (element.sampleBurden.length - 1) * 0.5,
+    x: (index + index + 1) * 0.5,
+    y: 1.0,
     text: `<b>${element.cancer}</b>`,
     showarrow: false,
     font: {
-      size: 10,
+      size: 12,
     },
     align: "center",
+    textangle: 45,
   }));
   console.log("top label:--");
   console.log(topLabel);
@@ -102,16 +108,18 @@ export default function TMB(data, study) {
     xref: "x",
     yref: "paper",
 
-    x0: array
-      .slice(0, index)
-      .reduce((x0, curr) => x0 + curr.sampleBurden.length, 0),
+    // x0: array
+    //   .slice(0, index)
+    //   .reduce((x0, curr) => x0 + curr.sampleBurden.length, 0),
 
-    x1: array
-      .slice(0, index + 1)
-      .reduce((x0, curr) => x0 + curr.sampleBurden.length, 0),
+    // x1: array
+    //   .slice(0, index + 1)
+    //   .reduce((x0, curr) => x0 + curr.sampleBurden.length, 0),
+    x0: index + 0.2,
+    x1: index + 1 - 0.2,
     y0: 0,
     y1: 1,
-    fillcolor: index % 2 === 0 ? "#E9E9E9" : "#F8F8F8",
+    fillcolor: index % 2 === 0 ? "#grey" : "#F8F8F8",
     line: {
       width: 0,
     },
@@ -123,13 +131,15 @@ export default function TMB(data, study) {
     xref: "x",
     yref: "y",
 
-    x0: array
-      .slice(0, index)
-      .reduce((x0, curr) => x0 + curr.sampleBurden.length, 0),
+    // x0: array
+    //   .slice(0, index)
+    //   .reduce((x0, curr) => x0 + curr.sampleBurden.length, 0),
 
-    x1: array
-      .slice(0, index + 1)
-      .reduce((x0, curr) => x0 + curr.sampleBurden.length, 0),
+    // x1: array
+    //   .slice(0, index + 1)
+    //   .reduce((x0, curr) => x0 + curr.sampleBurden.length, 0),
+    x0: index,
+    x1: index + 1,
 
     y0: average(element.sampleBurden.map((e) => e.burden)),
     y1: average(element.sampleBurden.map((e) => e.burden)),
@@ -143,18 +153,21 @@ export default function TMB(data, study) {
   console.log(shapes);
 
   const layout = {
-    title: "Tumor Mutational Burden Separated by Signatures",
+    // title: {
+    //   text: "Tumor Mutational Burden Separated by Signatures",
+    //   yanchor: "top",
+    // },
     xaxis: {
-      //showticklabels: true,
-      showline: true,
-      tickangle: -90,
+      showticklabels: true,
+      //showline: true,
+      //tickangle: -90,
       tickfont: {
         size: 10,
       },
       tickmode: "array",
       showgrid: false,
-      tickvals: flatSorted.map((_, i) => i),
-      ticktext: flatSorted.map((e) => e.mutationType),
+      //tickvals: flatSorted.map((_, i) => i),
+      //ticktext: flatSorted.map((_, i) => i),
     },
     yaxis: {
       title: "Number of Mutations per Megabase",
@@ -167,6 +180,8 @@ export default function TMB(data, study) {
   console.log("layout:");
   console.log(layout);
 
-  return { traces: [...traces], layout: layout };
+  var config = { responsive: true };
+
+  return { traces: [...traces], layout: layout, config };
   //return { traces, layout };
 }
