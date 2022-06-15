@@ -14,7 +14,7 @@ export const getInitialState = () => ({
     loading: false,
     data: [],
   },
-  useForm: {
+  userForm: {
     inputFormat: 'vcf',
     selectedGenome: 'GRCh37',
     experimentalStrategy: 'WGS',
@@ -70,6 +70,14 @@ export const getInitialState = () => ({
     loading: false,
   },
   mutationalProfiles: {
+    sample: null,
+    profile: null,
+    matrix: null,
+    filter: null,
+    data: [],
+    plot: null,
+    loading: false,
+
     filtered: [],
     selectName: '',
     selectProfile: '',
