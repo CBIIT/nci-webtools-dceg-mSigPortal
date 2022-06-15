@@ -771,43 +771,70 @@ async function downloadWorkspace(req, res, next) {
   }
 }
 
+const getDataUsingS3Select = (params) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const s3 = new AWS.S3();
+      const response = await s3.selectObjectContent(params).promise();
+      const events = response.Payload;
+      let records = [];
+
+      events.on('data', ({ Records, End }) => {
+        if (Records) {
+          records.push(Records.Payload);
+        } else if (End) {
+          let string = Buffer.concat(records).toString('utf8');
+          string = string.replace(/\,$/, '');
+          const results = JSON.parse(`[${string}]`);
+
+          resolve(results);
+        }
+      });
+      events.on('error', reject);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 async function querySignature(req, res, next) {
   const { study, cancer, strategy, sample, profile, matrix } = req.query;
-  const filter = omitBy(
-    {
-      Study: study,
-      Cancer_Type: cancer,
-      Dataset: strategy,
-      Sample: sample,
-      Profile: profile + matrix,
-    },
-    isNil
-  );
 
-  const s3 = new AWS.S3();
-  const key = path.join(
-    config.data.s3,
-    `Seqmatrix/${study}_${strategy}_seqmatrix_refdata.json.gz`
-  );
+  const query = [
+    'SELECT Sample, MutationType, Mutations FROM s3object s',
+    `WHERE Cancer_Type = '${cancer}'`,
+    `AND Sample = '${sample}' AND Profile = '${profile + matrix}'`,
+  ].join(' ');
+
+  const params = {
+    Bucket: config.data.bucket,
+    Key: path.join(
+      config.data.s3,
+      `Seqmatrix/${study}_${strategy}_seqmatrix_refdata.csv.gz`
+    ),
+    Expression: query,
+    ExpressionType: 'SQL',
+    InputSerialization: {
+      CSV: { FileHeaderInfo: 'USE' },
+      CompressionType: 'GZIP',
+    },
+    OutputSerialization: {
+      JSON: {
+        RecordDelimiter: ',',
+      },
+    },
+  };
 
   try {
-    const { Body } = await s3
-      .getObject({
-        Bucket: config.data.bucket,
-        Key: key,
-      })
-      .promise();
-
-    const data = JSON.parse(gunzipSync(Body));
-    const query = Object.values(pickBy(data, filter));
-
-    res.json(query);
+    const data = await getDataUsingS3Select(params);
+    res.json(data);
   } catch (error) {
     next(error);
   }
 }
 
 async function queryExposure(req, res, next) {
+  const s3 = new AWS.S3();
   const { study, strategy, cancer, signature_set } = req.query;
   const filter = omitBy(
     {
@@ -819,19 +846,19 @@ async function queryExposure(req, res, next) {
     isNil
   );
 
-  const s3 = new AWS.S3();
-  const key = path.join(
-    config.data.s3,
-    `Exposure/${study}_${strategy}_exposure_refdata.json.gz`
-  );
+  const params = {
+    Bucket: config.data.bucket,
+    Key: path.join(
+      config.data.s3,
+      `Exposure/${study}_${strategy}_exposure_refdata.json.gz`
+    ),
+    Expression: '',
+    ExpressionType: 'SQL',
+  };
 
   try {
-    const { Body } = await s3
-      .getObject({
-        Bucket: config.data.bucket,
-        Key: key,
-      })
-      .promise();
+    const { Body } = await s3.getObject(params).promise();
+    // const { Body } = await s3.selectObjectContent(params).promise();
 
     const data = JSON.parse(gunzipSync(Body));
     const query = Object.values(pickBy(data, filter));

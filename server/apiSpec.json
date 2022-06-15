@@ -61,6 +61,16 @@
             "value": "WGS"
           },
           {
+            "name": "sample",
+            "in": "query",
+            "description": "Select sample.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "value": "SP50263"
+          },
+          {
             "name": "profile",
             "in": "query",
             "description": "Select a profile type to filter data by.",
