@@ -5,21 +5,26 @@ import Plot from "react-plotly.js";
 
 export default function MutProfilePlot() {
   const { data, layout, config } = useRecoilValue(getPlot);
-
+  console.log(data);
   return (
     <div>
-      {data.length ? (
-        <Plot
-          className="w-100"
-          style={{ height: "500px" }}
-          data={cloneDeep(data)}
-          layout={cloneDeep(layout)}
-          config={cloneDeep(config)}
-          useResizeHandler
-        />
-      ) : (
-        <div>Select a Cancer Type</div>
-      )}
+      <div>
+        {data.length ? (
+          <div>
+            <h1 className="h5">Tumor Mutational Burden</h1>
+            <Plot
+              className="w-100"
+              style={{ height: "500px" }}
+              data={cloneDeep(data)}
+              layout={cloneDeep(layout)}
+              config={cloneDeep(config)}
+              useResizeHandler
+            />
+          </div>
+        ) : (
+          <div>Select a Cancer Type</div>
+        )}
+      </div>
     </div>
   );
 }
