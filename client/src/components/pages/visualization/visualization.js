@@ -43,16 +43,16 @@ export default function Visualization({ match }) {
   const store = useSelector((state) => state.visualization);
   const mergeState = (state) =>
     dispatch(actions.mergeVisualization({ main: state }));
-  // const mergeMutationalProfiles = (state) =>
-  //   dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
-  // const mergeKataegis = (state) =>
-  //   dispatch(actions.mergeVisualization({ kataegis: state }));
-  // const mergeCosineSimilarity = (state) =>
-  //   dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
-  // const mergeProfileComparison = (state) =>
-  //   dispatch(actions.mergeVisualization({ profileComparison: state }));
-  // const mergePCA = (state) =>
-  //   dispatch(actions.mergeVisualization({ pca: state }));
+  const mergeMutationalProfiles = (state) =>
+    dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
+  const mergeKataegis = (state) =>
+    dispatch(actions.mergeVisualization({ kataegis: state }));
+  const mergeCosineSimilarity = (state) =>
+    dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
+  const mergeProfileComparison = (state) =>
+    dispatch(actions.mergeVisualization({ profileComparison: state }));
+  const mergePCA = (state) =>
+    dispatch(actions.mergeVisualization({ pca: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -240,17 +240,17 @@ export default function Visualization({ match }) {
       ),
     ];
 
-    // mergeMutationalProfiles({
-    //   filtered: filteredPlots,
-    //   nameOptions: nameOptions,
-    //   profileOptions: filteredProfileOptions,
-    //   matrixOptions: filteredMatrixOptions,
-    //   filterOptions: filteredFilterOptions,
-    //   selectName: selectName,
-    //   selectProfile: profile,
-    //   selectMatrix: matrix,
-    //   selectFilter: filter,
-    // });
+    mergeMutationalProfiles({
+      filtered: filteredPlots,
+      nameOptions: nameOptions,
+      profileOptions: filteredProfileOptions,
+      matrixOptions: filteredMatrixOptions,
+      filterOptions: filteredFilterOptions,
+      selectName: selectName,
+      selectProfile: profile,
+      selectMatrix: matrix,
+      selectFilter: filter,
+    });
 
     // Cosine Similarity - Profile Comparison - PCA - Kataegis
     const sampleNameOptions = [
@@ -270,46 +270,46 @@ export default function Visualization({ match }) {
       await getRefSigOptions(selectProfile)
     ).json();
 
-    // mergeCosineSimilarity({
-    //   withinProfileType: selectProfile,
-    //   refProfileType: selectProfile,
-    //   refSignatureSet: refSignatureSetOptions[0],
-    //   refSignatureSetOptions: refSignatureSetOptions,
-    //   withinMatrixSize: selectMatrix,
-    //   withinMatrixOptions: filteredMatrixList,
-    //   userProfileType: selectProfile,
-    //   userMatrixSize: selectMatrix,
-    //   userMatrixOptions: filteredMatrixOptions,
-    // });
+    mergeCosineSimilarity({
+      withinProfileType: selectProfile,
+      refProfileType: selectProfile,
+      refSignatureSet: refSignatureSetOptions[0],
+      refSignatureSetOptions: refSignatureSetOptions,
+      withinMatrixSize: selectMatrix,
+      withinMatrixOptions: filteredMatrixList,
+      userProfileType: selectProfile,
+      userMatrixSize: selectMatrix,
+      userMatrixOptions: filteredMatrixOptions,
+    });
 
-    // mergeProfileComparison({
-    //   withinProfileType: selectProfile,
-    //   withinSampleName1: sampleNameOptions[0],
-    //   withinSampleName2: sampleNameOptions[1],
-    //   sampleOptions: sampleNameOptions,
-    //   refProfileType: selectProfile,
-    //   refSampleName: sampleNameOptions[0],
-    //   refSignatureSet: refSignatureSetOptions[0],
-    //   refSignatureSetOptions: refSignatureSetOptions,
-    //   userProfileType: selectProfile,
-    //   userMatrixSize: selectMatrix,
-    //   userMatrixOptions: filteredMatrixOptions,
-    //   userSampleName: sampleNameOptions[0],
-    // });
+    mergeProfileComparison({
+      withinProfileType: selectProfile,
+      withinSampleName1: sampleNameOptions[0],
+      withinSampleName2: sampleNameOptions[1],
+      sampleOptions: sampleNameOptions,
+      refProfileType: selectProfile,
+      refSampleName: sampleNameOptions[0],
+      refSignatureSet: refSignatureSetOptions[0],
+      refSignatureSetOptions: refSignatureSetOptions,
+      userProfileType: selectProfile,
+      userMatrixSize: selectMatrix,
+      userMatrixOptions: filteredMatrixOptions,
+      userSampleName: sampleNameOptions[0],
+    });
 
-    // mergePCA({
-    //   profileType: selectProfile,
-    //   signatureSet: refSignatureSetOptions[0],
-    //   signatureSetOptions: refSignatureSetOptions,
-    //   userProfileType: selectProfile,
-    //   userMatrixSize: selectMatrix,
-    //   userMatrixOptions: filteredMatrixOptions,
-    // });
+    mergePCA({
+      profileType: selectProfile,
+      signatureSet: refSignatureSetOptions[0],
+      signatureSetOptions: refSignatureSetOptions,
+      userProfileType: selectProfile,
+      userMatrixSize: selectMatrix,
+      userMatrixOptions: filteredMatrixOptions,
+    });
 
-    // mergeKataegis({
-    //   sample: sampleNameOptions[0],
-    //   sampleOptions: sampleNameOptions,
-    // });
+    mergeKataegis({
+      sample: sampleNameOptions[0],
+      sampleOptions: sampleNameOptions,
+    });
 
     mergeState({
       profileOptions: profileOptions,
@@ -359,31 +359,31 @@ export default function Visualization({ match }) {
       await getRefSigOptions(selectProfile)
     ).json();
 
-    // mergeCosineSimilarity({
-    //   withinProfileType: selectProfile,
-    //   refProfileType: selectProfile,
-    //   refSignatureSet: refSignatureSetOptions[0],
-    //   refSignatureSetOptions: refSignatureSetOptions,
-    //   withinMatrixSize: selectMatrix,
-    //   withinMatrixOptions: filteredMatrixOptions,
-    // });
+    mergeCosineSimilarity({
+      withinProfileType: selectProfile,
+      refProfileType: selectProfile,
+      refSignatureSet: refSignatureSetOptions[0],
+      refSignatureSetOptions: refSignatureSetOptions,
+      withinMatrixSize: selectMatrix,
+      withinMatrixOptions: filteredMatrixOptions,
+    });
 
-    // mergeProfileComparison({
-    //   withinProfileType: selectProfile,
-    //   withinSampleName1: nameOptions[0],
-    //   withinSampleName2: nameOptions[1],
-    //   sampleOptions: nameOptions,
-    //   refProfileType: selectProfile,
-    //   refSampleName: nameOptions[0],
-    //   refSignatureSet: refSignatureSetOptions[0],
-    //   refSignatureSetOptions: refSignatureSetOptions,
-    // });
+    mergeProfileComparison({
+      withinProfileType: selectProfile,
+      withinSampleName1: nameOptions[0],
+      withinSampleName2: nameOptions[1],
+      sampleOptions: nameOptions,
+      refProfileType: selectProfile,
+      refSampleName: nameOptions[0],
+      refSignatureSet: refSignatureSetOptions[0],
+      refSignatureSetOptions: refSignatureSetOptions,
+    });
 
-    // mergePCA({
-    //   profileType: selectProfile,
-    //   signatureSet: refSignatureSetOptions[0],
-    //   signatureSetOptions: refSignatureSetOptions,
-    // });
+    mergePCA({
+      profileType: selectProfile,
+      signatureSet: refSignatureSetOptions[0],
+      signatureSetOptions: refSignatureSetOptions,
+    });
 
     mergeState({
       loading: {
