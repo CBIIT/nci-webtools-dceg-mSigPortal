@@ -1,61 +1,58 @@
-import React, { useEffect, Suspense } from "react";
-import { Alert, Container } from "react-bootstrap";
-import Loader from "../../controls/loader/loader";
-import ErrorBoundary from "../../controls/errorBoundary/error-boundary";
-import { useRecoilState } from "recoil";
-import { Form, Row, Col, Nav, Button } from "react-bootstrap";
+import React, { useEffect, Suspense } from 'react';
+import { Alert, Container } from 'react-bootstrap';
+import axios from 'axios';
+import Loader from '../../controls/loader/loader';
+import ErrorBoundary from '../../controls/errorBoundary/error-boundary';
+import { Form, Row, Col, Nav, Button } from 'react-bootstrap';
 import {
   SidebarContainer,
   SidebarPanel,
   MainPanel,
-} from "../../controls/sidebar-container/sidebar-container";
-// import UserForm from './dataSourceForm/userForm';
-// import PublicForm from './dataSourceForm/publicForm';
-import UserForm from "./userForm";
-import PublicForm from "./publicForm";
-import Instructions from "../visualization/instructions";
-import ProfilerSummary from "./profilerSummary";
-import MutationalProfiles from "./mutationalProfiles";
-import TreeAndLeaf from "./treeLeaf/treeLeaf";
-import MutationalProfiles2 from "./mutationalProfiles/mutProfiles";
-import CosineSimilarity from "./cosineSimilarity";
-import MutationalPattern from "./mutationalPattern";
-import ProfileComparison from "./profileComparison";
-import PCA from "./pca";
-import Kataegis from "./kataegis";
-import Download from "./download";
-import { LoadingOverlay } from "../../controls/loading-overlay/loading-overlay";
-import { useSelector, useDispatch } from "react-redux";
-import { actions as visualizationActions } from "../../../services/store/visualization";
-import { actions as modalActions } from "../../../services/store/modal";
+} from '../../controls/sidebar-container/sidebar-container';
+import UserForm from './userForm';
+import PublicForm from './publicForm';
+import Instructions from '../visualization/instructions';
+import ProfilerSummary from './profilerSummary';
+import MutationalProfiles from './mutationalProfiles';
+import TreeAndLeaf from './treeLeaf/treeLeaf';
+import MutationalProfiles2 from './mutationalProfiles/mutProfiles';
+import CosineSimilarity from './cosineSimilarity';
+import MutationalPattern from './mutationalPattern';
+import ProfileComparison from './profileComparison';
+import PCA from './pca';
+import Kataegis from './kataegis';
+import Download from './download';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as visualizationActions } from '../../../services/store/visualization';
+import { actions as modalActions } from '../../../services/store/modal';
 import {
   defaultProfile,
   defaultMatrix,
   defaultFilter,
-} from "../../../services/utils";
-import "./visualization.scss";
-import { visualizationState } from "./visualization.state";
+} from '../../../services/utils';
+import './visualization.scss';
 
-import MultationalProfilesTest from "./test/multationalProfilesTest";
+import MultationalProfilesTest from './test/multationalProfilesTest';
 
 const actions = { ...visualizationActions, ...modalActions };
 const { Group, Label, Check } = Form;
 
 export default function Visualization({ match }) {
   const dispatch = useDispatch();
-  const visualization = useSelector((state) => state.visualization);
+  const store = useSelector((state) => state.visualization);
   const mergeState = (state) =>
-    dispatch(actions.mergeVisualization({ state: state }));
-  const mergeMutationalProfiles = (state) =>
-    dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
-  const mergeKataegis = (state) =>
-    dispatch(actions.mergeVisualization({ kataegis: state }));
-  const mergeCosineSimilarity = (state) =>
-    dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
-  const mergeProfileComparison = (state) =>
-    dispatch(actions.mergeVisualization({ profileComparison: state }));
-  const mergePCA = (state) =>
-    dispatch(actions.mergeVisualization({ pca: state }));
+    dispatch(actions.mergeVisualization({ main: state }));
+  // const mergeMutationalProfiles = (state) =>
+  //   dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
+  // const mergeKataegis = (state) =>
+  //   dispatch(actions.mergeVisualization({ kataegis: state }));
+  // const mergeCosineSimilarity = (state) =>
+  //   dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
+  // const mergeProfileComparison = (state) =>
+  //   dispatch(actions.mergeVisualization({ profileComparison: state }));
+  // const mergePCA = (state) =>
+  //   dispatch(actions.mergeVisualization({ pca: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -70,21 +67,18 @@ export default function Visualization({ match }) {
     displayTab,
     svgList,
     matrixList,
-  } = visualization.state;
-  const mutationalProfiles = visualization.mutationalProfiles;
-  const { signatureSetOptions } = visualization.pca;
+  } = store.main;
+  const mutationalProfiles = store.mutationalProfiles;
+  const { signatureSetOptions } = store.pca;
 
   const { type, id } = match.params;
-
-  const [recoilState, setRecoilState] = useRecoilState(visualizationState);
-  const mergeRecoil = (state) => setRecoilState({ ...recoilState, ...state });
 
   // when retrieving queued result, update id in store
   useEffect(() => {
     if (id && !loading.active && !submitted && !projectID) {
-      if (type == "queue") {
+      if (type == 'queue') {
         loadQueueResult(id);
-      } else if (type == "example") {
+      } else if (type == 'example') {
         loadExample(id);
       }
     }
@@ -92,7 +86,7 @@ export default function Visualization({ match }) {
 
   // get mapping of plots after retrieving projectID
   useEffect(() => {
-    if (source == "user") {
+    if (source == 'user') {
       if (projectID && !Object.keys(svgList).length) {
         getResults();
       } else if (Object.keys(svgList).length && !signatureSetOptions.length) {
@@ -107,13 +101,70 @@ export default function Visualization({ match }) {
     }
   }, [svgList, projectID]);
 
+  // handle public form submit
+  useEffect(() => {
+    if (submitted && source == 'public') handlePublicSubmit();
+  }, [submitted]);
+
+  async function handlePublicSubmit() {
+    try {
+      const args = {
+        study: store.publicForm.study,
+        cancerType: store.publicForm.cancer,
+        experimentalStrategy: store.publicForm.strategy,
+      };
+
+      mergeState({
+        loading: {
+          active: true,
+          // content: 'Loading Public Data',
+          // showIndicator: true,
+        },
+      });
+      const response = await axios.post(`web/visualizationWrapper`, {
+        fn: 'getPublicData',
+        args,
+      });
+
+      if (response.status == 200) {
+        const { output, projectID } = await response.data;
+        if (output.error) throw output.error;
+        if (output.uncaughtError) throw output.uncaughtError;
+
+        mergeState({
+          svgList: output,
+          projectID: projectID,
+        });
+      } else if (response.status == 504) {
+        mergeState({
+          error: 'Please Reset Your Parameters and Try again.',
+        });
+        mergeError({
+          visible: true,
+          message:
+            'Your submission has timed out. Please try again by submitting this job to a queue instead.',
+        });
+      } else {
+        mergeState({
+          error: 'Please Reset Your Parameters and Try again.',
+        });
+      }
+    } catch (err) {
+      mergeError(err.message);
+      mergeState({
+        error: 'Please Reset Your Parameters and Try again.',
+      });
+    }
+    mergeState({ loading: { active: false } });
+  }
+
   // reload summary information
   async function getResults() {
     const response = await fetch(`web/getResults`, {
       method: 'POST',
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({ projectID: projectID }),
     });
@@ -122,12 +173,6 @@ export default function Visualization({ match }) {
       const { svgList, statistics, matrixList, downloads } =
         await response.json();
       mergeState({
-        svgList: svgList,
-        statistics: statistics,
-        matrixList: matrixList,
-        downloads: downloads,
-      });
-      mergeRecoil({
         svgList: svgList,
         statistics: statistics,
         matrixList: matrixList,
@@ -195,23 +240,23 @@ export default function Visualization({ match }) {
       ),
     ];
 
-    mergeMutationalProfiles({
-      filtered: filteredPlots,
-      nameOptions: nameOptions,
-      profileOptions: filteredProfileOptions,
-      matrixOptions: filteredMatrixOptions,
-      filterOptions: filteredFilterOptions,
-      selectName: selectName,
-      selectProfile: profile,
-      selectMatrix: matrix,
-      selectFilter: filter,
-    });
+    // mergeMutationalProfiles({
+    //   filtered: filteredPlots,
+    //   nameOptions: nameOptions,
+    //   profileOptions: filteredProfileOptions,
+    //   matrixOptions: filteredMatrixOptions,
+    //   filterOptions: filteredFilterOptions,
+    //   selectName: selectName,
+    //   selectProfile: profile,
+    //   selectMatrix: matrix,
+    //   selectFilter: filter,
+    // });
 
     // Cosine Similarity - Profile Comparison - PCA - Kataegis
     const sampleNameOptions = [
       ...new Set(
         svgList.map((row) => {
-          if (row.Filter != "NA") return `${row.Sample_Name}@${row.Filter}`;
+          if (row.Filter != 'NA') return `${row.Sample_Name}@${row.Filter}`;
           else return row.Sample_Name;
         })
       ),
@@ -225,55 +270,48 @@ export default function Visualization({ match }) {
       await getRefSigOptions(selectProfile)
     ).json();
 
-    mergeCosineSimilarity({
-      withinProfileType: selectProfile,
-      refProfileType: selectProfile,
-      refSignatureSet: refSignatureSetOptions[0],
-      refSignatureSetOptions: refSignatureSetOptions,
-      withinMatrixSize: selectMatrix,
-      withinMatrixOptions: filteredMatrixList,
-      userProfileType: selectProfile,
-      userMatrixSize: selectMatrix,
-      userMatrixOptions: filteredMatrixOptions,
-    });
+    // mergeCosineSimilarity({
+    //   withinProfileType: selectProfile,
+    //   refProfileType: selectProfile,
+    //   refSignatureSet: refSignatureSetOptions[0],
+    //   refSignatureSetOptions: refSignatureSetOptions,
+    //   withinMatrixSize: selectMatrix,
+    //   withinMatrixOptions: filteredMatrixList,
+    //   userProfileType: selectProfile,
+    //   userMatrixSize: selectMatrix,
+    //   userMatrixOptions: filteredMatrixOptions,
+    // });
 
-    mergeProfileComparison({
-      withinProfileType: selectProfile,
-      withinSampleName1: sampleNameOptions[0],
-      withinSampleName2: sampleNameOptions[1],
-      sampleOptions: sampleNameOptions,
-      refProfileType: selectProfile,
-      refSampleName: sampleNameOptions[0],
-      refSignatureSet: refSignatureSetOptions[0],
-      refSignatureSetOptions: refSignatureSetOptions,
-      userProfileType: selectProfile,
-      userMatrixSize: selectMatrix,
-      userMatrixOptions: filteredMatrixOptions,
-      userSampleName: sampleNameOptions[0],
-    });
+    // mergeProfileComparison({
+    //   withinProfileType: selectProfile,
+    //   withinSampleName1: sampleNameOptions[0],
+    //   withinSampleName2: sampleNameOptions[1],
+    //   sampleOptions: sampleNameOptions,
+    //   refProfileType: selectProfile,
+    //   refSampleName: sampleNameOptions[0],
+    //   refSignatureSet: refSignatureSetOptions[0],
+    //   refSignatureSetOptions: refSignatureSetOptions,
+    //   userProfileType: selectProfile,
+    //   userMatrixSize: selectMatrix,
+    //   userMatrixOptions: filteredMatrixOptions,
+    //   userSampleName: sampleNameOptions[0],
+    // });
 
-    mergePCA({
-      profileType: selectProfile,
-      signatureSet: refSignatureSetOptions[0],
-      signatureSetOptions: refSignatureSetOptions,
-      userProfileType: selectProfile,
-      userMatrixSize: selectMatrix,
-      userMatrixOptions: filteredMatrixOptions,
-    });
+    // mergePCA({
+    //   profileType: selectProfile,
+    //   signatureSet: refSignatureSetOptions[0],
+    //   signatureSetOptions: refSignatureSetOptions,
+    //   userProfileType: selectProfile,
+    //   userMatrixSize: selectMatrix,
+    //   userMatrixOptions: filteredMatrixOptions,
+    // });
 
-    mergeKataegis({
-      sample: sampleNameOptions[0],
-      sampleOptions: sampleNameOptions,
-    });
+    // mergeKataegis({
+    //   sample: sampleNameOptions[0],
+    //   sampleOptions: sampleNameOptions,
+    // });
 
     mergeState({
-      profileOptions: profileOptions,
-      loading: {
-        active: false,
-      },
-      openSidebar: false,
-    });
-    mergeRecoil({
       profileOptions: profileOptions,
       loading: {
         active: false,
@@ -312,7 +350,7 @@ export default function Visualization({ match }) {
     ].sort((a, b) => a - b);
 
     mergeState({ profileOptions: profileOptions });
-    mergeRecoil({ profileOptions: profileOptions });
+
     // Cosine Similarity - Profile Comparison - PCA
     const selectProfile = defaultProfile(profileOptions);
     const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);
@@ -321,46 +359,38 @@ export default function Visualization({ match }) {
       await getRefSigOptions(selectProfile)
     ).json();
 
-    mergeCosineSimilarity({
-      withinProfileType: selectProfile,
-      refProfileType: selectProfile,
-      refSignatureSet: refSignatureSetOptions[0],
-      refSignatureSetOptions: refSignatureSetOptions,
-      withinMatrixSize: selectMatrix,
-      withinMatrixOptions: filteredMatrixOptions,
-    });
+    // mergeCosineSimilarity({
+    //   withinProfileType: selectProfile,
+    //   refProfileType: selectProfile,
+    //   refSignatureSet: refSignatureSetOptions[0],
+    //   refSignatureSetOptions: refSignatureSetOptions,
+    //   withinMatrixSize: selectMatrix,
+    //   withinMatrixOptions: filteredMatrixOptions,
+    // });
 
-    mergeProfileComparison({
-      withinProfileType: selectProfile,
-      withinSampleName1: nameOptions[0],
-      withinSampleName2: nameOptions[1],
-      sampleOptions: nameOptions,
-      refProfileType: selectProfile,
-      refSampleName: nameOptions[0],
-      refSignatureSet: refSignatureSetOptions[0],
-      refSignatureSetOptions: refSignatureSetOptions,
-    });
+    // mergeProfileComparison({
+    //   withinProfileType: selectProfile,
+    //   withinSampleName1: nameOptions[0],
+    //   withinSampleName2: nameOptions[1],
+    //   sampleOptions: nameOptions,
+    //   refProfileType: selectProfile,
+    //   refSampleName: nameOptions[0],
+    //   refSignatureSet: refSignatureSetOptions[0],
+    //   refSignatureSetOptions: refSignatureSetOptions,
+    // });
 
-    mergePCA({
-      profileType: selectProfile,
-      signatureSet: refSignatureSetOptions[0],
-      signatureSetOptions: refSignatureSetOptions,
-    });
+    // mergePCA({
+    //   profileType: selectProfile,
+    //   signatureSet: refSignatureSetOptions[0],
+    //   signatureSetOptions: refSignatureSetOptions,
+    // });
 
     mergeState({
       loading: {
         active: false,
       },
       submitted: true,
-      displayTab: "profilerSummary",
-      openSidebar: false,
-    });
-    mergeRecoil({
-      loading: {
-        active: false,
-      },
-      submitted: true,
-      displayTab: "profilerSummary",
+      displayTab: 'profilerSummary',
       openSidebar: false,
     });
   }
@@ -369,8 +399,8 @@ export default function Visualization({ match }) {
     return fetch(`web/visualizationWrapper`, {
       method: 'POST',
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({ fn: fn, args: args, projectID: projectID }),
     });
@@ -380,11 +410,11 @@ export default function Visualization({ match }) {
     return fetch(`web/visualizationWrapper`, {
       method: 'POST',
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        fn: "getReferenceSignatureSets",
+        fn: 'getReferenceSignatureSets',
         args: { profileType: profileType },
       }),
     });
@@ -407,20 +437,11 @@ export default function Visualization({ match }) {
       mergeState({
         queueExpired: true,
       });
-      mergeRecoil({
-        queueExpired: true,
-      });
     }
     mergeState({
       loading: { active: false },
       submitted: true,
-      displayTab: "profilerSummary",
-      openSidebar: false,
-    });
-    mergeRecoil({
-      loading: { active: false },
-      submitted: true,
-      displayTab: "profilerSummary",
+      displayTab: 'profilerSummary',
       openSidebar: false,
     });
   }
@@ -440,7 +461,7 @@ export default function Visualization({ match }) {
       dispatch(
         actions.mergeVisualization({
           ...visualizationStore,
-          state: { ...visualizationStore.state, projectID: projectID },
+          state: { ...visualizationStore.main, projectID: projectID },
         })
       );
     } catch (error) {
@@ -449,46 +470,40 @@ export default function Visualization({ match }) {
     mergeState({
       loading: { active: false },
       submitted: true,
-      displayTab: "profilerSummary",
-      openSidebar: false,
-    });
-    mergeRecoil({
-      loading: { active: false },
-      submitted: true,
-      displayTab: "profilerSummary",
+      displayTab: 'profilerSummary',
       openSidebar: false,
     });
   }
 
   const tabs = [
     {
-      name: "Instructions",
-      id: "instructions",
+      name: 'Instructions',
+      id: 'instructions',
       component: <Instructions />,
     },
     {
-      name: "Profiler Summary",
-      id: "profilerSummary",
+      name: 'Profiler Summary',
+      id: 'profilerSummary',
       component: <ProfilerSummary submitR={(fn, args) => submitR(fn, args)} />,
     },
     {
-      name: "Mutational Profiles",
-      id: "mutationalProfiles",
+      name: 'Mutational Profiles',
+      id: 'mutationalProfiles',
       component: <MutationalProfiles />,
     },
     {
-      name: "Tree and Leaf",
-      id: "treeAndLeaf",
+      name: 'Tree and Leaf',
+      id: 'treeAndLeaf',
       component: <TreeAndLeaf />,
     },
     {
-      name: "Mutational Profiles API",
-      id: "mutationalProfiles2",
+      name: 'Mutational Profiles API',
+      id: 'mutationalProfiles2',
       component: <MutationalProfiles2 />,
     },
     {
-      name: "Cosine Similarity",
-      id: "cosineSimilarity",
+      name: 'Cosine Similarity',
+      id: 'cosineSimilarity',
       component: (
         <CosineSimilarity
           getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
@@ -497,15 +512,15 @@ export default function Visualization({ match }) {
       ),
     },
     {
-      name: "Mutational Pattern Enrichment Analysis",
-      id: "mutationalPattern",
+      name: 'Mutational Pattern Enrichment Analysis',
+      id: 'mutationalPattern',
       component: (
         <MutationalPattern submitR={(fn, args) => submitR(fn, args)} />
       ),
     },
     {
-      name: "Profile Comparison",
-      id: "profileComparison",
+      name: 'Profile Comparison',
+      id: 'profileComparison',
       component: (
         <ProfileComparison
           getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
@@ -514,8 +529,8 @@ export default function Visualization({ match }) {
       ),
     },
     {
-      name: "PCA",
-      id: "pca",
+      name: 'PCA',
+      id: 'pca',
       component: (
         <PCA
           getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
@@ -524,18 +539,18 @@ export default function Visualization({ match }) {
       ),
     },
     {
-      name: "Kataegis Identification",
-      id: "kataegisIdentification",
+      name: 'Kataegis Identification',
+      id: 'kataegisIdentification',
       component: <Kataegis submitR={(fn, args) => submitR(fn, args)} />,
     },
     {
-      name: "Download",
-      id: "download",
+      name: 'Download',
+      id: 'download',
       component: <Download />,
     },
     {
-      name: "Multational Profiles Test",
-      id: "multationalProfileTest",
+      name: 'Multational Profiles Test',
+      id: 'multationalProfileTest',
       component: <MultationalProfilesTest />,
     },
   ];
@@ -552,15 +567,15 @@ export default function Visualization({ match }) {
                   <Button
                     variant="link"
                     className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
-                      id == displayTab ? "active-secondary-navlinks" : ""
+                      id == displayTab ? 'active-secondary-navlinks' : ''
                     }`}
                     active={id == displayTab && submitted}
-                    disabled={id != "instructions" && !submitted}
+                    disabled={id != 'instructions' && !submitted}
                     style={{
-                      textDecoration: "none",
-                      fontSize: "12pt",
-                      color: "black",
-                      fontWeight: "500",
+                      textDecoration: 'none',
+                      fontSize: '12pt',
+                      color: 'black',
+                      fontWeight: '500',
                     }}
                     onClick={() => mergeState({ displayTab: id })}
                   >
@@ -580,14 +595,14 @@ export default function Visualization({ match }) {
                     variant="link"
                     className={
                       id == displayTab && Object.keys(svgList).length
-                        ? "secondary-navlinks px-3 py-1 d-inline-block border-0 active-secondary-navlinks"
-                        : "secondary-navlinks px-3 py-1 d-inline-block border-0"
+                        ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 active-secondary-navlinks'
+                        : 'secondary-navlinks px-3 py-1 d-inline-block border-0'
                     }
                     style={{
-                      textDecoration: "none",
-                      fontSize: "12pt",
-                      color: "black",
-                      fontWeight: "500",
+                      textDecoration: 'none',
+                      fontSize: '12pt',
+                      color: 'black',
+                      fontWeight: '500',
                     }}
                     onClick={() => mergeState({ displayTab: id })}
                   >
@@ -631,8 +646,8 @@ export default function Visualization({ match }) {
                           disabled={submitted || loading.active}
                           type="radio"
                           value="public"
-                          checked={source == "public"}
-                          onChange={(e) => mergeState({ source: "public" })}
+                          checked={source == 'public'}
+                          onChange={(e) => mergeState({ source: 'public' })}
                         />
                         <Check.Label className="font-weight-normal">
                           Public
@@ -643,8 +658,8 @@ export default function Visualization({ match }) {
                           disabled={submitted || loading.active}
                           type="radio"
                           value="user"
-                          checked={source == "user"}
-                          onChange={(e) => mergeState({ source: "user" })}
+                          checked={source == 'user'}
+                          onChange={(e) => mergeState({ source: 'user' })}
                         />
                         <Check.Label className="font-weight-normal">
                           User
@@ -655,14 +670,14 @@ export default function Visualization({ match }) {
                 </Row>
                 <Row
                   style={{
-                    display: source == "user" ? "block" : "none",
+                    display: source == 'user' ? 'block' : 'none',
                   }}
                 >
                   <Col lg="auto" className="w-100">
                     <UserForm />
                   </Col>
                 </Row>
-                <Row style={{ display: source == "public" ? "block" : "none" }}>
+                <Row style={{ display: source == 'public' ? 'block' : 'none' }}>
                   <Col lg="auto" className="w-100">
                     <PublicForm />
                   </Col>
@@ -693,7 +708,7 @@ export default function Visualization({ match }) {
                   content={loading.content}
                   showIndicator={loading.showIndicator}
                 />
-                <div style={{ minHeight: "500px" }}>
+                <div style={{ minHeight: '500px' }}>
                   {tabs.filter((tab) => tab.id == displayTab)[0].component}
                 </div>
               </div>

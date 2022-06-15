@@ -26,7 +26,7 @@ export default function MutationalPattern({ submitR }) {
     pubExperimentalStrategy,
     projectID,
     matrixList,
-  } = visualization.state;
+  } = visualization.main;
 
   const {
     proportion,

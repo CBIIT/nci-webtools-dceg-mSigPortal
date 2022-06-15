@@ -559,7 +559,7 @@ async function getVisExample(req, res, next) {
 
       // rename file paths with new ID
       let params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
-      const oldID = params.visualization.state.projectID;
+      const oldID = params.visualization.main.projectID;
       await replace({
         files: paramsPath,
         from: new RegExp(oldID, 'g'),

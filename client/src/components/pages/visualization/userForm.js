@@ -21,9 +21,9 @@ const { Title, Content } = Popover;
 
 export default function UserForm() {
   const dispatch = useDispatch();
-  const visualization = useSelector((state) => state.visualization);
+  const store = useSelector((state) => state.visualization);
   const mergeState = (state) =>
-    dispatch(actions.mergeVisualization({ state: state }));
+    dispatch(actions.mergeVisualization({ main: state }));
   const mergeMutationalProfiles = (state) =>
     dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
   const mergeError = (msg) =>
@@ -54,7 +54,7 @@ export default function UserForm() {
     cancerType,
     pubExperimentOptions,
     pubExperimentalStrategy,
-  } = visualization.state;
+  } = store.main;
 
   const [inputFile, setInput] = useState(new File([], ''));
   const [bedFile, setBed] = useState(new File([], ''));
@@ -107,7 +107,7 @@ export default function UserForm() {
           body: JSON.stringify({
             args: args,
             state: {
-              ...visualization,
+              ...store,
             },
           }),
         });

@@ -13,7 +13,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Plot from '../../controls/plot/plot';
-import CustomSelect from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select-old';
 import Description from '../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
@@ -46,7 +46,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     matrixList,
     svgList,
     profileOptions,
-  } = visualization.state;
+  } = visualization.main;
 
   const {
     withinProfileType,

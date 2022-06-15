@@ -1,265 +1,152 @@
 import React, { useEffect } from 'react';
-import { Form, Button, Row, Col, Popover } from 'react-bootstrap';
+import { Form, Button, Row, Col } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import CustomSelect from '../../controls/select/select';
+import Select from '../../controls/select/selectForm';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
-import { getJSON } from '../../../services/utils';
+import axios from 'axios';
 
 const actions = { ...visualizationActions, ...modalActions };
 
 export default function PublicForm() {
   const dispatch = useDispatch();
-  const visualization = useSelector((state) => state.visualization);
+  const store = useSelector((state) => state.visualization);
 
   const mergeState = (state) =>
-    dispatch(actions.mergeVisualization({ state: state }));
-  const mergeCosineSimilarity = (state) =>
-    dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
-  const mergeProfileComparison = (state) =>
-    dispatch(actions.mergeVisualization({ profileComparison: state }));
-  const mergePCA = (state) =>
-    dispatch(actions.mergeVisualization({ pca: state }));
+    dispatch(actions.mergeVisualization({ publicForm: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
   const resetVisualization = (_) => dispatch(actions.resetVisualization());
 
-  const {
-    study,
-    studyOptions,
-    cancerType,
-    cancerTypeOptions,
-    pubExperimentalStrategy,
-    pubExperimentOptions,
-    pDataOptions,
-    submitted,
-    loading,
-    loadingPublic,
-    source,
-  } = visualization.state;
+  const { study, cancer, strategy, data, loading, defaultOptions } =
+    store.publicForm;
+  const { source, submitted } = store.main;
 
+  // get options data
   useEffect(() => {
-    if (!pDataOptions.length && !loadingPublic) getPublicDataOptions();
-  }, [pDataOptions, source]);
+    if (!data.length && !loading && source == 'public') getPublicDataOptions();
+  }, [data, source]);
+
+  // set default options
+  useEffect(() => {
+    if (data.length && study == null) mergeState({ ...defaultOptions });
+  }, [data]);
+
+  const studyOptions = () =>
+    data.length
+      ? [...new Set(data.map((e) => e.Study))].map((e) => ({
+          label: e,
+          value: e,
+        }))
+      : [];
+
+  const cancerOptions = (study) =>
+    study && data.length
+      ? [
+          ...new Set(
+            data.filter((e) => e.Study == study.value).map((e) => e.Cancer_Type)
+          ),
+        ].map((e) => ({ label: e, value: e }))
+      : [];
+
+  const strategyOptions = (study, cancer) =>
+    study && cancer && data.length
+      ? [
+          ...new Set(
+            data
+              .filter(
+                (e) => e.Study == study.value && e.Cancer_Type == cancer.value
+              )
+              .map((e) => e.Dataset)
+          ),
+        ].map((e) => ({ label: e, value: e }))
+      : [];
 
   async function handleSubmit() {
-    const args = {
-      study: study,
-      cancerType: cancerType,
-      experimentalStrategy: pubExperimentalStrategy,
-    };
-
-    mergeState({
-      loading: {
-        active: true,
-        // content: 'Loading Public Data',
-        // showIndicator: true,
-      },
-    });
-    try {
-      const response = await fetch(`web/visualizationWrapper`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ fn: 'getPublicData', args }),
-      });
-
-      if (response.ok) {
-        const { output, projectID } = await response.json();
-        if (output.error) throw output.error;
-        if (output.uncaughtError) throw output.uncaughtError;
-
-        mergeState({
-          svgList: output,
-          projectID: projectID,
-        });
-      } else if (response.status == 504) {
-        mergeState({
-          error: 'Please Reset Your Parameters and Try again.',
-        });
-        mergeError({
-          visible: true,
-          message:
-            'Your submission has timed out. Please try again by submitting this job to a queue instead.',
-        });
-      } else {
-        mergeState({
-          error: 'Please Reset Your Parameters and Try again.',
-        });
-      }
-    } catch (err) {
-      mergeError(err.message);
-      mergeState({
-        error: 'Please Reset Your Parameters and Try again.',
-      });
-    }
-    mergeState({ loading: { active: false } });
+    dispatch(actions.mergeVisualization({ main: { submitted: true } }));
   }
 
   function handleReset() {
-    const params = {
-      pDataOptions: pDataOptions,
-      studyOptions: studyOptions,
-      study: studyOptions[0],
-      cancerTypeOptions: cancerTypeOptions,
-      cancerType: 'Lung-AdenoCA',
-      pubExperimentOptions: pubExperimentOptions,
-      pubExperimentalStrategy: pubExperimentOptions[0],
-    };
+    const cacheData = { data: [...data], ...defaultOptions };
     window.location.hash = '#/visualization';
     resetVisualization();
-    mergeState(params);
+    mergeState(cacheData);
   }
 
   async function getPublicDataOptions() {
-    mergeState({ loadingPublic: true });
+    mergeState({ loading: true });
     try {
-      const pDataOptions = await getJSON(
-        `Others/json/Visualization-Public.json`
-      );
-
-      const studyOptions = [...new Set(pDataOptions.map((data) => data.Study))];
-      // default study
-      const study = 'PCAWG';
-
-      const cancerTypeOptions = [
-        ...new Set(
-          pDataOptions
-            .filter((data) => data.Study == study)
-            .map((data) => data.Cancer_Type)
-        ),
-      ];
-      //  default cancer type
-      const cancer = 'Lung-AdenoCA';
-
-      const pubExperimentOptions = [
-        ...new Set(
-          pDataOptions
-            .filter((data) => data.Study == study && data.Cancer_Type == cancer)
-            .map((data) => data.Dataset)
-        ),
-      ];
-
-      mergeState({
-        pDataOptions: pDataOptions,
-        study: study,
-        studyOptions: studyOptions,
-        cancerType: cancer,
-        cancerTypeOptions: cancerTypeOptions,
-        pubExperimentalStrategy: pubExperimentOptions[0],
-        pubExperimentOptions: pubExperimentOptions,
+      const { data } = await axios.post('web/getFileS3', {
+        path: `Others/json/Visualization-Public.json`,
       });
 
-      mergeCosineSimilarity({
-        pubStudy: study,
-        pubCancerType: cancer,
-        pubCancerTypeOptions: cancerTypeOptions,
-      });
-
-      mergeProfileComparison({
-        pubStudy: study,
-        pubCancerType: cancer,
-        pubCancerTypeOptions: cancerTypeOptions,
-      });
-
-      mergePCA({
-        pubStudy: study,
-        pubCancerType: cancer,
-        pubCancerTypeOptions: cancerTypeOptions,
-      });
+      mergeState({ data: data });
     } catch (err) {
       mergeError(err.message);
     }
-    mergeState({ loadingPublic: false });
+    mergeState({ loading: false });
   }
 
   function handleStudyChange(study) {
-    const cancerTypeOptions = [
-      ...new Set(
-        pDataOptions
-          .filter((data) => data.Study == study)
-          .map((data) => data.Cancer_Type)
-      ),
-    ];
-
-    const esOptions = [
-      ...new Set(
-        pDataOptions
-          .filter(
-            (data) =>
-              data.Study == study && data.Cancer_Type == cancerTypeOptions[0]
-          )
-          .map((data) => data.Dataset)
-      ),
-    ];
+    const cancers = cancerOptions(study);
+    const strategies = strategyOptions(study, cancers[0]);
 
     mergeState({
       study: study,
-      cancerType: cancerTypeOptions[0],
-      cancerTypeOptions: cancerTypeOptions,
-      pubExperimentalStrategy: esOptions[0],
-      pubExperimentOptions: esOptions,
+      cancer: cancers[0],
+      strategy: strategies[0],
     });
   }
 
   function handleCancerChange(cancer) {
-    const pubExperimentOptions = [
-      ...new Set(
-        pDataOptions
-          .filter((data) => data.Study == study && data.Cancer_Type == cancer)
-          .map((data) => data.Dataset)
-      ),
-    ];
+    const strategies = strategyOptions(study, cancer);
 
     mergeState({
-      cancerType: cancer,
-      pubExperimentalStrategy: pubExperimentOptions[0],
-      pubExperimentOptions: pubExperimentOptions,
+      cancer: cancer,
+      strategy: strategies[0],
     });
+  }
+
+  function handleStrategyChange(strategy) {
+    mergeState({ strategy });
   }
 
   return (
     <Form>
-      <LoadingOverlay active={loadingPublic} />
-      <CustomSelect
+      <LoadingOverlay active={loading} />
+      <Select
         className="mb-2"
-        id="publicFormStudy"
+        id="publicStudy"
         label="Study"
         disabled={submitted}
         value={study}
-        options={studyOptions}
+        options={studyOptions()}
         onChange={handleStudyChange}
       />
-      <CustomSelect
+      <Select
         className="mb-2"
-        id="publicFromCancerType"
+        id="publicCancer"
         label="Cancer Type or Group"
         disabled={submitted}
-        value={cancerType}
-        options={cancerTypeOptions}
+        value={cancer}
+        options={cancerOptions(study)}
         onChange={handleCancerChange}
       />
-      <CustomSelect
+      <Select
         className="mb-4"
-        id="publicFormStrategy"
+        id="publicStrategy"
         label="Experimental Strategy"
         disabled={submitted}
-        value={pubExperimentalStrategy}
-        options={pubExperimentOptions}
-        onChange={(pubExperimentalStrategy) =>
-          mergeState({
-            pubExperimentalStrategy: pubExperimentalStrategy,
-          })
-        }
+        value={strategy}
+        options={strategyOptions(study, cancer)}
+        onChange={handleStrategyChange}
       />
 
       <Row>
         <Col>
           <Button
-            disabled={loading.active || loadingPublic}
+            disabled={loading.active || loading}
             className="w-100"
             variant="secondary"
             onClick={() => handleReset()}
@@ -269,11 +156,11 @@ export default function PublicForm() {
         </Col>
         <Col>
           <Button
-            disabled={loading.active || loadingPublic || submitted}
+            disabled={loading.active || loading || submitted}
             className="w-100"
             variant="primary"
             type="button"
-            onClick={(e) => handleSubmit(e)}
+            onClick={() => handleSubmit()}
           >
             Submit
           </Button>

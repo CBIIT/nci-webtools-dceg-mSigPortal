@@ -19,7 +19,7 @@ export default function Download() {
     projectID,
     downloads,
     statistics,
-  } = visualization.state;
+  } = visualization.main;
 
   const [downloading, setDownload] = useState([]);
   const [downloadingWorkspace, setWorkspace] = useState(false);

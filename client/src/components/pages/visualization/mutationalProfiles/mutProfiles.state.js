@@ -1,6 +1,5 @@
 import { atom, selector } from 'recoil';
 import axios from 'axios';
-import { visualizationState } from '../visualization.state';
 import SBS96 from '../../../controls/plotly/mutationalSignature/sbs96';
 import DBS78 from '../../../controls/plotly/mutationalSignature/dbs78';
 import ID83 from '../../../controls/plotly/mutationalSignature/id83';
@@ -50,7 +49,7 @@ export const getPlot = selector({
       const { option } = get(formState);
 
       if (Object.keys(option).length) {
-        const { data } = await axios.get('web/querySignature', {
+        const { data } = await axios.get('web/signature', {
           params: option.value,
         });
 

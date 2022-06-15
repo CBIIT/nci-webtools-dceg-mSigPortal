@@ -9,22 +9,22 @@ import Description from '../../controls/description/description';
 const actions = { ...visualizationActions, ...modalActions };
 export default function ProfilerSummary({ submitR }) {
   const dispatch = useDispatch();
-  const visualization = useSelector((state) => state.visualization);
+  const store = useSelector((state) => state.visualization);
   const mergeProfilerSummary = (state) =>
     dispatch(actions.mergeVisualization({ profilerSummary: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
   const {
     source,
-    study,
-    cancerType,
-    pubExperimentalStrategy,
+
     loading: mainLoading,
     matrixList,
     projectID,
-  } = visualization.state;
+  } = store.main;
 
-  const { plotPath, err, debugR, loading } = visualization.profilerSummary;
+  const { study, cancer, strategy } = store.publicForm;
+
+  const { plotPath, err, debugR, loading } = store.profilerSummary;
   useEffect(() => {
     // check if profiler summary already exists, else lazy-load calculate
     if (!plotPath && !mainLoading.active && !loading && projectID) {
@@ -35,8 +35,8 @@ export default function ProfilerSummary({ submitR }) {
       } else if (source == 'public') {
         calculateR('profilerSummaryPublic', {
           study: study,
-          cancerType: cancerType,
-          experimentalStrategy: pubExperimentalStrategy,
+          cancerType: cancer,
+          experimentalStrategy: strategy,
         });
       }
     }

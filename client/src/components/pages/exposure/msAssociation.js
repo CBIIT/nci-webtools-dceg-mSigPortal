@@ -6,7 +6,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { actions as exposureActions } from '../../../services/store/exposure';
 import { actions as modalActions } from '../../../services/store/modal';
 import Plot from '../../controls/plot/plot';
-import CustomSelect from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select-old';
 
 const actions = { ...exposureActions, ...modalActions };
 const { Group, Check } = Form;

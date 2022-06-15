@@ -2,11 +2,10 @@ import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import axios from 'axios';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import CustomSelect from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select-old';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as associationActions } from '../../../services/store/association';
 import { actions as modalActions } from '../../../services/store/modal';
-import { getJSON } from '../../../services/utils';
 
 const actions = { ...associationActions, ...modalActions };
 const { Group } = Form;
@@ -44,9 +43,9 @@ export default function PublicForm() {
     mergeState({ loadingData: true });
 
     try {
-      const exposureSignature = await getJSON(
-        'Others/json/Exploring-Exposure.json'
-      );
+      const { data: exposureSignature } = await axios.post('web/getFileS3', {
+        path: 'Others/json/Exploring-Exposure.json',
+      });
 
       // hide unavailable studies
       const hideStudies = [

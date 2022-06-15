@@ -16,8 +16,8 @@ router.get('/', (req, res) => {
 
 router.get('/ping', (req, res) => res.send(true));
 
-router.get('/querySignature', querySignature);
+router.get('/signature', querySignature);
 
-router.get('/queryExposure', queryExposure);
+router.get('/exposure', queryExposure);
 
 module.exports = router;

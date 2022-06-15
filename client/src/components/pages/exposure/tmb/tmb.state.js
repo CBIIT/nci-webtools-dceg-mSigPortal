@@ -19,7 +19,7 @@ export const getPlot = selector({
       const { option } = get(formState);
 
       if (Object.keys(option).length) {
-        const { data } = await axios.get("web/queryExposure", {
+        const { data } = await axios.get("web/exposure", {
           params: option.value,
         });
 
