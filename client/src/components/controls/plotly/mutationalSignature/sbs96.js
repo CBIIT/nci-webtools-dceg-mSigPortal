@@ -111,10 +111,16 @@ export default function SBS96(data) {
       tickmode: "array",
       tickvals: flatSorted.map((_, i) => i),
       ticktext: flatSorted.map((e) => e.mutationType),
+      linecolor: "black",
+      linewidth: 2,
+      mirror: true,
     },
     yaxis: {
       title: "Mutation Probability",
       autorange: true,
+      linecolor: "black",
+      linewidth: 2,
+      mirror: true,
     },
 
     shapes: shapes,
