@@ -772,18 +772,23 @@ async function downloadWorkspace(req, res, next) {
 }
 
 async function querySignature(req, res, next) {
-  const { profile, signature, signature_set } = req.query;
+  const { study, cancer, strategy, sample, profile, matrix } = req.query;
   const filter = omitBy(
     {
-      Profile: profile,
-      Signature_name: signature,
-      Signature_set_name: signature_set,
+      Study: study,
+      Cancer_Type: cancer,
+      Dataset: strategy,
+      Sample: sample,
+      Profile: profile + matrix,
     },
     isNil
   );
 
   const s3 = new AWS.S3();
-  const key = path.join(config.data.s3, 'Signature/signature_refsets.json.gz');
+  const key = path.join(
+    config.data.s3,
+    `Seqmatrix/${study}_${strategy}_seqmatrix_refdata.json.gz`
+  );
 
   try {
     const { Body } = await s3
