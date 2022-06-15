@@ -90,8 +90,8 @@ export default function TMB(data, study) {
     //     .slice(0, index)
     //     .reduce((x0, curr) => x0 + curr.sampleBurden.length, 0) +
     //   (element.sampleBurden.length - 1) * 0.5,
-    //x: (index + index + 1) * 0.5,
-    x: index,
+    //x: array.length * 0.5,
+    x: array.length > 1 ? index : (index + index + 1) * 0.5,
     y: 1.0,
     text: `<b>${element.cancer}</b>`,
     showarrow: false,
