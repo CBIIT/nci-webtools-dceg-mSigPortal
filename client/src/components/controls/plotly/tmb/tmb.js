@@ -73,7 +73,7 @@ export default function TMB(data, study) {
     //     0.5
     // ),
     x: element.sampleBurden.map(
-      (e, i) => index + 0.01 + (1 / (element.sampleBurden.length + 2)) * i
+      (e, i) => index + 0.2 + (0.7 / (element.sampleBurden.length + 1)) * i
     ),
     showlegend: false,
   }));
@@ -90,7 +90,8 @@ export default function TMB(data, study) {
     //     .slice(0, index)
     //     .reduce((x0, curr) => x0 + curr.sampleBurden.length, 0) +
     //   (element.sampleBurden.length - 1) * 0.5,
-    x: (index + index + 1) * 0.5,
+    //x: (index + index + 1) * 0.5,
+    x: index,
     y: 1.0,
     text: `<b>${element.cancer}</b>`,
     showarrow: false,
@@ -98,7 +99,7 @@ export default function TMB(data, study) {
       size: 12,
     },
     align: "center",
-    textangle: -90,
+    textangle: 45,
   }));
   console.log("top label:--");
   console.log(topLabel);
