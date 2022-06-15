@@ -72,9 +72,16 @@ export default function TMB(data, study) {
     //     i +
     //     0.5
     // ),
-    x: element.sampleBurden.map(
-      (e, i) => index + 0.2 + (0.7 / (element.sampleBurden.length + 1)) * i
-    ),
+    x:
+      array.lenght > 1
+        ? element.sampleBurden.map(
+            (e, i) =>
+              index + 0.3 + (0.7 / (element.sampleBurden.length + 1)) * i
+          )
+        : element.sampleBurden.map(
+            (e, i) =>
+              index + 0.05 + (0.9 / (element.sampleBurden.length + 1)) * i
+          ),
     showlegend: false,
   }));
   console.log("traces:--");
@@ -93,16 +100,48 @@ export default function TMB(data, study) {
     //x: array.length * 0.5,
     x: array.length > 1 ? index : (index + index + 1) * 0.5,
     y: 1.0,
-    text: `<b>${element.cancer}</b>`,
+    text: `${element.cancer}`,
     showarrow: false,
     font: {
       size: 12,
     },
-    align: "center",
+    align: "right",
     textangle: 45,
   }));
   console.log("top label:--");
   console.log(topLabel);
+
+  const bottoLabel1 = cancerBurden.map((element, index, array) => ({
+    xref: "x",
+    yref: "paper",
+    xanchor: "bottom",
+    yanchor: "bottom",
+    x: (index + index + 1) * 0.5,
+    y: -0.12,
+    text: `${element.sampleBurden.length}<br> - <br>`,
+    showarrow: false,
+    font: {
+      size: 12,
+      color: "blue",
+    },
+    align: "center",
+  }));
+
+  const bottoLabel2 = cancerBurden.map((element, index, array) => ({
+    xref: "x",
+    yref: "paper",
+    xanchor: "bottom",
+    yanchor: "bottom",
+    x: (index + index + 1) * 0.5,
+    y: -0.17,
+    text: `${element.sampleBurden.length}`,
+    showarrow: false,
+    font: {
+      size: 12,
+      color: "green",
+    },
+    align: "center",
+  }));
 
   const shapes = cancerBurden.map((element, index, array) => ({
     type: "rect",
@@ -139,8 +178,8 @@ export default function TMB(data, study) {
     // x1: array
     //   .slice(0, index + 1)
     //   .reduce((x0, curr) => x0 + curr.sampleBurden.length, 0),
-    x0: index,
-    x1: index + 1,
+    x0: index + 0.1,
+    x1: index + 0.9,
 
     y0: average(element.sampleBurden.map((e) => e.burden)),
     y1: average(element.sampleBurden.map((e) => e.burden)),
@@ -163,6 +202,9 @@ export default function TMB(data, study) {
       tickfont: {
         size: 10,
       },
+      linecolor: "black",
+      linewidth: 2,
+      mirror: true,
       tickmode: "array",
       showgrid: false,
       //tickvals: flatSorted.map((_, i) => i),
@@ -173,16 +215,19 @@ export default function TMB(data, study) {
       autorange: true,
       zeroline: false,
       //showline: true,
+      linecolor: "black",
+      linewidth: 2,
+      mirror: true,
     },
 
     shapes: [...shapes, ...lines],
-    annotations: [...topLabel],
+    annotations: [...topLabel, ...bottoLabel1, ...bottoLabel2],
   };
   console.log("layout:");
   console.log(layout);
 
   var config = {
-    responsive: true,
+    //responsive: true,
   };
 
   return { traces: [...traces], layout: layout, config };
