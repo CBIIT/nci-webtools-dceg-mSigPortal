@@ -60,10 +60,11 @@ export default function TMB(data, study) {
     array: array,
     name: element.cancer,
     type: "scatter",
-    marker: { symbol: "circle-open", size: 5 },
+    marker: { symbol: "circle-open", size: 4, color: "black" },
     mode: "markers",
     y: element.sampleBurden.map((e) => e.burden),
     average: average(element.sampleBurden.map((e) => e.burden)),
+    hover: "y",
     // x: element.sampleBurden.map(
     //   (e, i) =>
     //     array
@@ -75,12 +76,10 @@ export default function TMB(data, study) {
     x:
       array.lenght > 1
         ? element.sampleBurden.map(
-            (e, i) =>
-              index + 0.3 + (0.7 / (element.sampleBurden.length + 1)) * i
+            (e, i) => index + 1 + (0.3 / element.sampleBurden.length) * i
           )
         : element.sampleBurden.map(
-            (e, i) =>
-              index + 0.05 + (0.9 / (element.sampleBurden.length + 1)) * i
+            (e, i) => index + 0.07 + (0.8 / element.sampleBurden.length) * i
           ),
     showlegend: false,
   }));
@@ -159,7 +158,7 @@ export default function TMB(data, study) {
     x1: index + 1,
     y0: 0,
     y1: 1,
-    fillcolor: index % 2 === 0 ? "gray" : "red",
+    fillcolor: index % 2 === 0 ? "gray" : "#F8F8F8",
     line: {
       width: 0,
     },
