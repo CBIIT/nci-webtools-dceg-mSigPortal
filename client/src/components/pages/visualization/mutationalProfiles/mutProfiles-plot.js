@@ -1,27 +1,90 @@
 import cloneDeep from 'lodash/cloneDeep';
-import { useRecoilValue } from 'recoil';
 import { Button, Row, Col } from 'react-bootstrap';
-import { getPlot, formState } from './mutProfiles.state';
 import Plot from 'react-plotly.js';
 import { downloadImage } from 'plotly.js';
 import { saveAs } from 'file-saver';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as visualizationActions } from '../../../../services/store/visualization';
+import SBS96 from '../../../controls/plotly/mutationalSignature/sbs96';
+import { useEffect } from 'react';
+import axios from 'axios';
+import DBS78 from '../../../controls/plotly/mutationalSignature/dbs78';
+import ID83 from '../../../controls/plotly/mutationalSignature/id83';
+import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
 export default function MutProfilePlot() {
-  const { data, layout, config } = useRecoilValue(getPlot);
-  const { option } = useRecoilValue(formState);
+  const dispatch = useDispatch();
+  const store = useSelector((state) => state.visualization);
+
+  const mergeState = (state) =>
+    dispatch(
+      visualizationActions.mergeVisualization({ mutationalProfiles: state })
+    );
+
+  const { sample, profile, matrix, data, plot, loading } =
+    store.mutationalProfiles;
+  const { study, cancer, strategy } = store.publicForm;
+
+  // get data
+  useEffect(() => {
+    if (sample && sample.value && profile.value && matrix.value)
+      getSignatureData();
+  }, [sample, profile, matrix]);
+
+  // generate plot
+  useEffect(() => {
+    if (data.length) generatePlot(data);
+  }, [data]);
+
+  async function getSignatureData() {
+    mergeState({ loading: true });
+    try {
+      const { data } = await axios.get('web/signature', {
+        params: {
+          study: study.value,
+          cancer: cancer.value,
+          strategy: strategy.value,
+          sample: sample.value,
+          profile: profile.value,
+          matrix: matrix.value,
+        },
+      });
+      mergeState({ data: data });
+    } catch (error) {}
+    mergeState({ loading: false });
+  }
+
+  function generatePlot(data) {
+    mergeState({ loading: true });
+    const profileMatrix = profile.value + matrix.value;
+    const { traces, layout } =
+      profileMatrix == 'SBS96'
+        ? SBS96(data)
+        : profileMatrix == 'DBS78'
+        ? DBS78(data)
+        : profileMatrix == 'ID83'
+        ? ID83(data)
+        : { traces: [], layout: {} };
+
+    mergeState({
+      plot: { data: [...traces], layout: layout, config: {} },
+      loading: false,
+    });
+  }
 
   const divId = 'mutationalProfilePlot';
   return (
     <div>
-      {data.length ? (
+      <LoadingOverlay active={loading} />
+      {plot && plot.data.length ? (
         <div>
           <Plot
             className="w-100"
             divId={divId}
             style={{ height: '500px' }}
-            data={cloneDeep(data)}
-            layout={cloneDeep(layout)}
-            config={cloneDeep(config)}
+            data={cloneDeep(plot.data)}
+            layout={cloneDeep(plot.layout)}
+            config={cloneDeep(plot.config)}
             useResizeHandler
           />
           <Row className="justify-content-center">
@@ -30,7 +93,7 @@ export default function MutProfilePlot() {
                 onClick={() =>
                   downloadImage(divId, {
                     format: 'png',
-                    filename: option.value.signature,
+                    filename: sample.value,
                   })
                 }
               >
@@ -42,7 +105,7 @@ export default function MutProfilePlot() {
                 onClick={() =>
                   downloadImage(divId, {
                     format: 'svg',
-                    filename: option.value.signature,
+                    filename: sample.value,
                   })
                 }
               >
@@ -53,10 +116,10 @@ export default function MutProfilePlot() {
               <Button
                 onClick={() =>
                   saveAs(
-                    new Blob([JSON.stringify(data)], {
+                    new Blob([JSON.stringify(plot)], {
                       type: 'application/json',
                     }),
-                    `${option.value.signature}.json`
+                    `${sample.value}.json`
                   )
                 }
               >
@@ -66,7 +129,7 @@ export default function MutProfilePlot() {
           </Row>
         </div>
       ) : (
-        <div>Select a Profile</div>
+        <div>Select a supported profile</div>
       )}
     </div>
   );

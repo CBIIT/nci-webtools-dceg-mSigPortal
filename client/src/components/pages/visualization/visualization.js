@@ -492,14 +492,14 @@ export default function Visualization({ match }) {
       component: <MutationalProfiles />,
     },
     {
-      name: 'Tree and Leaf',
-      id: 'treeAndLeaf',
-      component: <TreeAndLeaf />,
-    },
-    {
       name: 'Mutational Profiles API',
       id: 'mutationalProfiles2',
       component: <MutationalProfiles2 />,
+    },
+    {
+      name: 'Tree and Leaf',
+      id: 'treeAndLeaf',
+      component: <TreeAndLeaf />,
     },
     {
       name: 'Cosine Similarity',
