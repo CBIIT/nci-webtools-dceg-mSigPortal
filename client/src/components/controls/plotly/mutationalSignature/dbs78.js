@@ -11,8 +11,13 @@ export default function DBS78(data) {
     "TG>": "#CB98FD",
     "TT>": "#4C0299",
   };
-  console.log("data");
-  console.log(data);
+
+  const totalMutations = data.reduce((a, e) => a + parseInt(e.Mutations), 0);
+  const numberWithCommas = (x) =>
+    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+  //console.log(totalMutations);
+  //console.log("data");
+  //console.log(data);
   // group data by dominant mutation
   const groupByMutation = data.reduce((groups, e, i) => {
     const mutationRegex = /^.{0,3}/;
@@ -45,7 +50,7 @@ export default function DBS78(data) {
       showlegend: false,
     })
   );
-  console.log(traces);
+  //console.log(traces);
   const annotations = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
       xref: "x",
@@ -66,7 +71,7 @@ export default function DBS78(data) {
       align: "center",
     })
   );
-  console.log(annotations);
+  //console.log(annotations);
   const shapes = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
       type: "rect",
@@ -88,7 +93,7 @@ export default function DBS78(data) {
       },
     })
   );
-  console.log(shapes);
+  //console.log(shapes);
 
   const sampleAnnotation = {
     xref: "paper",
@@ -97,7 +102,12 @@ export default function DBS78(data) {
     yanchor: "bottom",
     x: 0,
     y: 0.85,
-    text: "<b>" + data[0].Sample + "</b>",
+    text:
+      "<b>" +
+      data[0].Sample +
+      ": " +
+      numberWithCommas(totalMutations) +
+      " double subs</b>",
     showarrow: false,
     font: {
       size: 18,
@@ -132,8 +142,8 @@ export default function DBS78(data) {
     annotations: [...annotations, sampleAnnotation],
   };
 
-  console.log("layout");
-  console.log(layout);
+  //console.log("layout");
+  //console.log(layout);
 
   return { traces, layout };
 }

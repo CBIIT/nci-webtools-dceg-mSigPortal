@@ -1,6 +1,6 @@
 export default function ID83(data) {
-  console.log("data");
-  console.log(data);
+  //console.log("data");
+  //console.log(data);
   const colors = {
     "1:Del:C": "#FBBD6F",
     "1:Del:T": "#FE8002",
@@ -55,6 +55,10 @@ export default function ID83(data) {
     arrayIDAnnXLabel = [5, 18.5, 35, 60, 76],
     arrayIDAnnotationTop = [],
     arrayIDAnnotationBot = [];
+
+  const totalMutations = data.reduce((a, e) => a + parseInt(e.Mutations), 0);
+  const numberWithCommas = (x) =>
+    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
   // group data by dominant mutation
   const groupByMutation = data.reduce((groups, e, i) => {
     const mutationRegex = /^.{0,7}/;
@@ -151,8 +155,8 @@ export default function ID83(data) {
 
   const flatSorted = Object.values(arrayID).flat();
 
-  console.log(flatSorted);
-  console.log(arrayID);
+  //console.log(flatSorted);
+  //console.log(arrayID);
 
   Object.values(arrayID).forEach((group) => {
     if (group.length > 1) {
@@ -287,7 +291,12 @@ export default function ID83(data) {
     yanchor: "bottom",
     x: 0,
     y: 0.85,
-    text: "<b>" + data[0].Sample + "</b>",
+    text:
+      "<b>" +
+      data[0].Sample +
+      ": " +
+      numberWithCommas(totalMutations) +
+      " indels</b>",
     showarrow: false,
     font: {
       size: 18,
@@ -383,7 +392,7 @@ export default function ID83(data) {
       sampleAnnotation,
     ],
   };
-  console.log("layout");
-  console.log(layout);
+  //console.log("layout");
+  //console.log(layout);
   return { traces, layout };
 }

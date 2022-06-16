@@ -67,8 +67,6 @@ export default function SBS192(data) {
       mutationType: e.MutationType.substring(2, e.MutationType.length),
       contribution: e.Mutations,
     };
-    console.log(signature);
-
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
       : [signature];
@@ -82,7 +80,6 @@ export default function SBS192(data) {
       mutationType: e.MutationType.substring(2, e.MutationType.length),
       contribution: e.Mutations,
     };
-    console.log(signature);
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
       : [signature];
@@ -293,7 +290,6 @@ export default function SBS192(data) {
   console.log(traces);
 
   const layout = {
-    barmode: "group",
     xaxis: {
       showticklabels: true,
       showline: true,

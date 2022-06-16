@@ -7,12 +7,12 @@ export default function SBS96(data) {
     "T>C": "#A1CE63",
     "T>G": "#EBC6C4",
   };
-  function sum(arr) {
-    const sum = arr.reduce((a, b) => a + b, 0);
-    return sum || 0;
-  }
-  console.log("data--:");
-  console.log(data);
+  const numberWithCommas = (x) =>
+    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+
+  const totalMutations = data.reduce((a, e) => a + parseInt(e.Mutations), 0);
+  //console.log("data--:");
+  //console.log(data);
   // group data by dominant mutation
   const groupByMutation = data.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
@@ -28,10 +28,10 @@ export default function SBS96(data) {
   }, {});
   const flatSorted = Object.values(groupByMutation).flat();
 
-  console.log("groupByMutation:");
-  console.log(groupByMutation);
-  console.log("FlatSorted");
-  console.log(flatSorted);
+  //console.log("groupByMutation:");
+  //console.log(groupByMutation);
+  //console.log("FlatSorted");
+  //console.log(flatSorted);
   const traces = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
       name: mutation,
@@ -46,14 +46,13 @@ export default function SBS96(data) {
             .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
       ),
       y: signatures.map((e) => e.contribution),
-      sum: sum(signatures.map((e) => e.contribution)),
       hoverinfo: "x+y",
       showlegend: false,
       array: array,
     })
   );
-  console.log("traces:");
-  console.log(traces);
+  //console.log("traces:");
+  //console.log(traces);
 
   const annotations = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
@@ -83,7 +82,12 @@ export default function SBS96(data) {
     yanchor: "bottom",
     x: 0,
     y: 0.85,
-    text: "<b>" + data[0].Sample + "</b>",
+    text:
+      "<b>" +
+      data[0].Sample +
+      ": " +
+      numberWithCommas(totalMutations) +
+      " subs </b>",
     showarrow: false,
     font: {
       size: 18,
@@ -137,8 +141,8 @@ export default function SBS96(data) {
     shapes: shapes,
     annotations: [...annotations, sampleAnnotation],
   };
-  console.log("layout");
-  console.log(layout);
+  //console.log("layout");
+  //console.log(layout);
 
   return { traces, layout };
 }
