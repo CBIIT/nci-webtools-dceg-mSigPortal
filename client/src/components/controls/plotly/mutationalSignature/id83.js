@@ -59,6 +59,8 @@ export default function ID83(data) {
   const totalMutations = data.reduce((a, e) => a + parseInt(e.Mutations), 0);
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+  const maxVal = Math.max(...data.map((o) => o.Mutations));
+
   // group data by dominant mutation
   const groupByMutation = data.reduce((groups, e, i) => {
     const mutationRegex = /^.{0,7}/;
@@ -379,12 +381,15 @@ export default function ID83(data) {
       ticktext: flatSorted.map((e) => e.mutationType),
       linecolor: "black",
       linewidth: 1,
+      mirror: true,
     },
     yaxis: {
       title: "Number of Idels",
-      autorange: true,
+      autorange: false,
+      range: [0, maxVal + 10],
       linecolor: "black",
       linewidth: 1,
+      mirror: true,
     },
 
     shapes: [...shapes1, ...shapes2],

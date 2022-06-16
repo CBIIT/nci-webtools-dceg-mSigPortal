@@ -13,11 +13,13 @@ export default function DBS78(data) {
   };
 
   const totalMutations = data.reduce((a, e) => a + parseInt(e.Mutations), 0);
+  const maxVal = Math.max(...data.map((o) => o.Mutations));
+  console.log(maxVal);
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
   //console.log(totalMutations);
-  //console.log("data");
-  //console.log(data);
+  console.log("data");
+  console.log(data);
   // group data by dominant mutation
   const groupByMutation = data.reduce((groups, e, i) => {
     const mutationRegex = /^.{0,3}/;
@@ -134,12 +136,15 @@ export default function DBS78(data) {
       ),
       linecolor: "black",
       linewidth: 1,
+      mirror: true,
     },
     yaxis: {
       title: "Number of Double Base Substitutions",
-      autorange: true,
+      autorange: false,
+      range: [0, maxVal + 1],
       linecolor: "black",
       linewidth: 1,
+      mirror: true,
     },
 
     shapes: shapes,
