@@ -7,14 +7,19 @@ export default function SBS96(data) {
     "T>C": "#A1CE63",
     "T>G": "#EBC6C4",
   };
-
+  function sum(arr) {
+    const sum = arr.reduce((a, b) => a + b, 0);
+    return sum || 0;
+  }
+  console.log("data--:");
+  console.log(data);
   // group data by dominant mutation
   const groupByMutation = data.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
     const mutation = e.MutationType.match(mutationRegex)[1];
     const signature = {
       mutationType: e.MutationType,
-      contribution: e.Contribution,
+      contribution: e.Mutations,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
@@ -23,6 +28,10 @@ export default function SBS96(data) {
   }, {});
   const flatSorted = Object.values(groupByMutation).flat();
 
+  console.log("groupByMutation:");
+  console.log(groupByMutation);
+  console.log("FlatSorted");
+  console.log(flatSorted);
   const traces = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
       name: mutation,
@@ -37,11 +46,13 @@ export default function SBS96(data) {
             .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
       ),
       y: signatures.map((e) => e.contribution),
+      sum: sum(signatures.map((e) => e.contribution)),
       hoverinfo: "x+y",
       showlegend: false,
       array: array,
     })
   );
+  console.log("traces:");
   console.log(traces);
 
   const annotations = Object.entries(groupByMutation).map(
@@ -72,7 +83,7 @@ export default function SBS96(data) {
     yanchor: "bottom",
     x: 0,
     y: 0.85,
-    text: "<b>Sample Name: 1234 subs</b>",
+    text: "<b>" + data[0].Sample + "</b>",
     showarrow: false,
     font: {
       size: 18,
@@ -91,8 +102,8 @@ export default function SBS96(data) {
       x1: array
         .slice(0, groupIndex + 1)
         .reduce((x0, [_, sigs]) => x0 + sigs.length, -0.6),
-      y0: 1.03,
-      y1: 1,
+      y0: 1.05,
+      y1: 1.01,
       fillcolor: colors[mutation],
       line: {
         width: 0,
@@ -102,7 +113,7 @@ export default function SBS96(data) {
 
   const layout = {
     xaxis: {
-      title: "Substitution",
+      showticklabels: true,
       showline: true,
       tickangle: -90,
       tickfont: {
@@ -116,7 +127,7 @@ export default function SBS96(data) {
       mirror: true,
     },
     yaxis: {
-      title: "Mutation Probability",
+      title: "Number of Single Base Substitutions",
       autorange: true,
       linecolor: "black",
       linewidth: 2,
@@ -126,6 +137,8 @@ export default function SBS96(data) {
     shapes: shapes,
     annotations: [...annotations, sampleAnnotation],
   };
+  console.log("layout");
+  console.log(layout);
 
   return { traces, layout };
 }

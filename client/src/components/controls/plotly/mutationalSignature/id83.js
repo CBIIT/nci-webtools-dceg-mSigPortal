@@ -1,4 +1,6 @@
 export default function ID83(data) {
+  console.log("data");
+  console.log(data);
   const colors = {
     "1:Del:C": "#FBBD6F",
     "1:Del:T": "#FE8002",
@@ -59,7 +61,7 @@ export default function ID83(data) {
     const mutation = e.MutationType.match(mutationRegex)[0];
     const signature = {
       mutationType: e.MutationType,
-      contribution: e.Contribution,
+      contribution: e.Mutations,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
@@ -81,7 +83,7 @@ export default function ID83(data) {
     );
     const signature = {
       mutationType: e.MutationType,
-      contribution: e.Contribution,
+      contribution: e.Mutations,
     };
     groups[mutationID] = groups[mutationID]
       ? [...groups[mutationID], signature]
@@ -205,7 +207,7 @@ export default function ID83(data) {
           .slice(0, groupIndex)
           .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) +
         (signatures.length - 1) * 0.5,
-      y: 1.0,
+      y: 1.01,
       text:
         groupIndex < 4
           ? `<b>${signatures[0].mutationType.substring(
@@ -278,6 +280,21 @@ export default function ID83(data) {
     align: "center",
   }));
 
+  const sampleAnnotation = {
+    xref: "paper",
+    yref: "paper",
+    xanchor: "bottom",
+    yanchor: "bottom",
+    x: 0,
+    y: 0.85,
+    text: "<b>" + data[0].Sample + "</b>",
+    showarrow: false,
+    font: {
+      size: 18,
+    },
+    align: "center",
+  };
+
   const shapes1 = Object.entries(arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
       type: "rect",
@@ -289,8 +306,8 @@ export default function ID83(data) {
       x1: array
         .slice(0, groupIndex + 1)
         .reduce((x0, [_, sigs]) => x0 + sigs.length, -0.6),
-      y0: 1.06,
-      y1: 1,
+      y0: 1.07,
+      y1: 1.01,
       fillcolor:
         colors[
           signatures[0].mutationType.substring(
@@ -363,8 +380,10 @@ export default function ID83(data) {
       ...annotations2,
       ...annotationsIDTopLabel,
       ...annotationsIDBotLabel,
+      sampleAnnotation,
     ],
   };
-
+  console.log("layout");
+  console.log(layout);
   return { traces, layout };
 }

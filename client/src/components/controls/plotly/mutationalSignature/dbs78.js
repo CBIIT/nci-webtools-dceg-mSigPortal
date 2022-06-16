@@ -11,14 +11,15 @@ export default function DBS78(data) {
     "TG>": "#CB98FD",
     "TT>": "#4C0299",
   };
-
+  console.log("data");
+  console.log(data);
   // group data by dominant mutation
   const groupByMutation = data.reduce((groups, e, i) => {
     const mutationRegex = /^.{0,3}/;
     const mutation = e.MutationType.match(mutationRegex)[0];
     const signature = {
       mutationType: e.MutationType,
-      contribution: e.Contribution,
+      contribution: e.Mutations,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
@@ -79,8 +80,8 @@ export default function DBS78(data) {
         .slice(0, groupIndex + 1)
         .reduce((x0, [_, signatures]) => x0 + signatures.length, -0.6),
       // x1: groupIndex * 16 + signatures.length - 0.6,
-      y0: 1.03,
-      y1: 1,
+      y0: 1.05,
+      y1: 1.01,
       fillcolor: colors[mutation],
       line: {
         width: 0,
@@ -89,9 +90,25 @@ export default function DBS78(data) {
   );
   console.log(shapes);
 
+  const sampleAnnotation = {
+    xref: "paper",
+    yref: "paper",
+    xanchor: "bottom",
+    yanchor: "bottom",
+    x: 0,
+    y: 0.85,
+    text: "<b>" + data[0].Sample + "</b>",
+    showarrow: false,
+    font: {
+      size: 18,
+    },
+    align: "center",
+  };
+
   const layout = {
     xaxis: {
-      title: "Double Substitution",
+      //title: "Double Substitution",
+      showticklabels: true,
       showline: true,
       tickangle: -90,
       tickfont: {
@@ -99,16 +116,24 @@ export default function DBS78(data) {
       },
       tickmode: "array",
       tickvals: flatSorted.map((_, i) => i),
-      ticktext: flatSorted.map((e) => e.mutationType),
+      ticktext: flatSorted.map((e) =>
+        e.mutationType.substring(
+          e.mutationType.length - 2,
+          e.mutationType.length
+        )
+      ),
     },
     yaxis: {
-      title: "Mutation Probability",
+      title: "Number of Double Base Substitutions",
       autorange: true,
     },
 
     shapes: shapes,
-    annotations: annotations,
+    annotations: [...annotations, sampleAnnotation],
   };
+
+  console.log("layout");
+  console.log(layout);
 
   return { traces, layout };
 }
