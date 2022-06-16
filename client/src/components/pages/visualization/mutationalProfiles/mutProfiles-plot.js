@@ -1,16 +1,17 @@
-import cloneDeep from 'lodash/cloneDeep';
-import { Button, Row, Col } from 'react-bootstrap';
-import Plot from 'react-plotly.js';
-import { downloadImage } from 'plotly.js';
-import { saveAs } from 'file-saver';
-import { useSelector, useDispatch } from 'react-redux';
-import { actions as visualizationActions } from '../../../../services/store/visualization';
-import SBS96 from '../../../controls/plotly/mutationalSignature/sbs96';
-import { useEffect } from 'react';
-import axios from 'axios';
-import DBS78 from '../../../controls/plotly/mutationalSignature/dbs78';
-import ID83 from '../../../controls/plotly/mutationalSignature/id83';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import cloneDeep from "lodash/cloneDeep";
+import { Button, Row, Col } from "react-bootstrap";
+import Plot from "react-plotly.js";
+import { downloadImage } from "plotly.js";
+import { saveAs } from "file-saver";
+import { useSelector, useDispatch } from "react-redux";
+import { actions as visualizationActions } from "../../../../services/store/visualization";
+import SBS96 from "../../../controls/plotly/mutationalSignature/sbs96";
+import SBS192 from "../../../controls/plotly/mutationalSignature/sbs192";
+import { useEffect } from "react";
+import axios from "axios";
+import DBS78 from "../../../controls/plotly/mutationalSignature/dbs78";
+import ID83 from "../../../controls/plotly/mutationalSignature/id83";
+import { LoadingOverlay } from "../../../controls/loading-overlay/loading-overlay";
 
 export default function MutProfilePlot() {
   const dispatch = useDispatch();
@@ -39,7 +40,7 @@ export default function MutProfilePlot() {
   async function getSignatureData() {
     mergeState({ loading: true });
     try {
-      const { data } = await axios.get('web/signature', {
+      const { data } = await axios.get("web/signature", {
         params: {
           study: study.value,
           cancer: cancer.value,
@@ -57,12 +58,15 @@ export default function MutProfilePlot() {
   function generatePlot(data) {
     mergeState({ loading: true });
     const profileMatrix = profile.value + matrix.value;
+    console.log(profileMatrix);
     const { traces, layout } =
-      profileMatrix == 'SBS96'
+      profileMatrix == "SBS96"
         ? SBS96(data)
-        : profileMatrix == 'DBS78'
+        : profileMatrix == "SBS192"
+        ? SBS192(data)
+        : profileMatrix == "DBS78"
         ? DBS78(data)
-        : profileMatrix == 'ID83'
+        : profileMatrix == "ID83"
         ? ID83(data)
         : { traces: [], layout: {} };
 
@@ -72,7 +76,7 @@ export default function MutProfilePlot() {
     });
   }
 
-  const divId = 'mutationalProfilePlot';
+  const divId = "mutationalProfilePlot";
   return (
     <div>
       <LoadingOverlay active={loading} />
@@ -81,7 +85,7 @@ export default function MutProfilePlot() {
           <Plot
             className="w-100"
             divId={divId}
-            style={{ height: '500px' }}
+            style={{ height: "500px" }}
             data={cloneDeep(plot.data)}
             layout={cloneDeep(plot.layout)}
             config={cloneDeep(plot.config)}
@@ -92,7 +96,7 @@ export default function MutProfilePlot() {
               <Button
                 onClick={() =>
                   downloadImage(divId, {
-                    format: 'png',
+                    format: "png",
                     filename: sample.value,
                   })
                 }
@@ -104,7 +108,7 @@ export default function MutProfilePlot() {
               <Button
                 onClick={() =>
                   downloadImage(divId, {
-                    format: 'svg',
+                    format: "svg",
                     filename: sample.value,
                   })
                 }
@@ -117,7 +121,7 @@ export default function MutProfilePlot() {
                 onClick={() =>
                   saveAs(
                     new Blob([JSON.stringify(plot)], {
-                      type: 'application/json',
+                      type: "application/json",
                     }),
                     `${sample.value}.json`
                   )
