@@ -1,4 +1,3 @@
-const express = require('express');
 const path = require('path');
 const logger = require('./logger');
 const { spawn } = require('promisify-child-process');
@@ -14,8 +13,6 @@ const replace = require('replace-in-file');
 const glob = require('glob');
 const config = require('../config.json');
 const archiver = require('archiver');
-const { pick, pickBy, omitBy, isNil } = require('lodash');
-const { gunzipSync } = require('zlib');
 
 if (config.aws) AWS.config.update(config.aws);
 
@@ -834,36 +831,36 @@ async function querySignature(req, res, next) {
 }
 
 async function queryExposure(req, res, next) {
-  const s3 = new AWS.S3();
   const { study, strategy, cancer, signature_set } = req.query;
-  const filter = omitBy(
-    {
-      Study: study,
-      Dataset: strategy,
-      Signature_set_name: signature_set,
-      Cancer_Type: cancer,
-    },
-    isNil
-  );
+
+  const query = [
+    'SELECT Cancer_Type, Sample, Exposure FROM s3object s',
+    `WHERE Signature_set_name = '${signature_set}'`,
+    cancer ? `AND Cancer_Type = '${cancer}'` : '',
+  ].join(' ');
 
   const params = {
     Bucket: config.data.bucket,
     Key: path.join(
       config.data.s3,
-      `Exposure/${study}_${strategy}_exposure_refdata.json.gz`
+      `Exposure/${study}_${strategy}_exposure_refdata.csv.gz`
     ),
-    Expression: '',
+    Expression: query,
     ExpressionType: 'SQL',
+    InputSerialization: {
+      CSV: { FileHeaderInfo: 'USE' },
+      CompressionType: 'GZIP',
+    },
+    OutputSerialization: {
+      JSON: {
+        RecordDelimiter: ',',
+      },
+    },
   };
 
   try {
-    const { Body } = await s3.getObject(params).promise();
-    // const { Body } = await s3.selectObjectContent(params).promise();
-
-    const data = JSON.parse(gunzipSync(Body));
-    const query = Object.values(pickBy(data, filter));
-
-    res.json(query);
+    const data = await getDataUsingS3Select(params);
+    res.json(data);
   } catch (error) {
     next(error);
   }
