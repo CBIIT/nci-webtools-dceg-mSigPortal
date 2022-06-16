@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { actions as visualizationActions } from "../../../../services/store/visualization";
 import SBS96 from "../../../controls/plotly/mutationalSignature/sbs96";
 import SBS192 from "../../../controls/plotly/mutationalSignature/sbs192";
+import SBS1536 from "../../../controls/plotly/mutationalSignature/sbs1536";
 import { useEffect } from "react";
 import axios from "axios";
 import DBS78 from "../../../controls/plotly/mutationalSignature/dbs78";
@@ -64,6 +65,8 @@ export default function MutProfilePlot() {
         ? SBS96(data)
         : profileMatrix == "SBS192"
         ? SBS192(data)
+        : profileMatrix == "SBS1536"
+        ? SBS1536(data)
         : profileMatrix == "DBS78"
         ? DBS78(data)
         : profileMatrix == "ID83"
