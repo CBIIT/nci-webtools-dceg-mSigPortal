@@ -101,7 +101,7 @@ export default function DBS78(data) {
     xanchor: "bottom",
     yanchor: "bottom",
     x: 0,
-    y: 0.85,
+    y: 0.9,
     text:
       "<b>" +
       data[0].Sample +
@@ -132,10 +132,14 @@ export default function DBS78(data) {
           e.mutationType.length
         )
       ),
+      linecolor: "black",
+      linewidth: 1,
     },
     yaxis: {
       title: "Number of Double Base Substitutions",
       autorange: true,
+      linecolor: "black",
+      linewidth: 1,
     },
 
     shapes: shapes,

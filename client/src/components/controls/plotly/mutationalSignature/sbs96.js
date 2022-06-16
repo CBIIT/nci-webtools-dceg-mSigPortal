@@ -81,7 +81,7 @@ export default function SBS96(data) {
     xanchor: "bottom",
     yanchor: "bottom",
     x: 0,
-    y: 0.85,
+    y: 0.9,
     text:
       "<b>" +
       data[0].Sample +
@@ -127,14 +127,14 @@ export default function SBS96(data) {
       tickvals: flatSorted.map((_, i) => i),
       ticktext: flatSorted.map((e) => e.mutationType),
       linecolor: "black",
-      linewidth: 2,
+      linewidth: 1,
       mirror: true,
     },
     yaxis: {
       title: "Number of Single Base Substitutions",
       autorange: true,
       linecolor: "black",
-      linewidth: 2,
+      linewidth: 1,
       mirror: true,
     },
 

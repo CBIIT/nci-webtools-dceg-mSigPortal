@@ -7,10 +7,7 @@ export default function SBS192(data) {
     "T>C": "#A1CE63",
     "T>G": "#EBC6C4",
   };
-  function sum(arr) {
-    const sum = arr.reduce((a, b) => a + b, 0);
-    return sum || 0;
-  }
+
   console.log("data--:");
   console.log(data);
 
@@ -25,29 +22,11 @@ export default function SBS192(data) {
     }
   });
 
-  console.log("group T");
-  console.log(arrayDataT);
-  console.log("group U");
-  console.log(arrayDataU);
-
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 
   const totalMutations = data.reduce((a, e) => a + parseInt(e.Mutations), 0);
   // group data by dominant mutation
-  const groupByMutation = data.reduce((groups, e, i) => {
-    const mutationRegex = /\[(.*)\]/;
-    const mutation = e.MutationType.match(mutationRegex)[1];
-    const signature = {
-      mutationType: e.MutationType,
-      contribution: e.Mutations,
-    };
-
-    groups[mutation] = groups[mutation]
-      ? [...groups[mutation], signature]
-      : [signature];
-    return groups;
-  }, {});
   const groupByMutationT = arrayDataT.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
     const mutation = e.MutationType.match(mutationRegex)[1];
@@ -131,8 +110,6 @@ export default function SBS192(data) {
     hoverinfo: "x+y",
     showlegend: true,
   };
-  console.log("traces U:");
-  console.log(tracesU);
 
   const annotations = Object.entries(groupByMutationU).map(
     ([mutation, signatures], groupIndex, array) => ({
@@ -161,13 +138,13 @@ export default function SBS192(data) {
     xanchor: "bottom",
     yanchor: "bottom",
     x: 0,
-    y: 0.85,
+    y: 0.9,
     text:
       "<b>" +
       data[0].Sample +
       ": " +
       numberWithCommas(totalMutations) +
-      " subs </b>",
+      " transcribed subs</b>",
     showarrow: false,
     font: {
       size: 18,
@@ -216,8 +193,6 @@ export default function SBS192(data) {
     })
   );
   const traces = [tracesT, tracesU];
-  console.log("traces:");
-  console.log(traces);
 
   const layout = {
     showlegend: true,
@@ -251,8 +226,6 @@ export default function SBS192(data) {
     shapes: [...shapes1, ...shapes2],
     annotations: [...annotations, sampleAnnotation],
   };
-  console.log("layout");
-  console.log(layout);
 
   return { traces, layout };
 }

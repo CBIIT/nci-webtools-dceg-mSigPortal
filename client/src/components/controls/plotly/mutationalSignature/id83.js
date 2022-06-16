@@ -290,7 +290,7 @@ export default function ID83(data) {
     xanchor: "bottom",
     yanchor: "bottom",
     x: 0,
-    y: 0.85,
+    y: 0.9,
     text:
       "<b>" +
       data[0].Sample +
@@ -377,10 +377,14 @@ export default function ID83(data) {
       tickmode: "array",
       tickvals: flatSorted.map((_, i) => i),
       ticktext: flatSorted.map((e) => e.mutationType),
+      linecolor: "black",
+      linewidth: 1,
     },
     yaxis: {
       title: "Number of Idels",
       autorange: true,
+      linecolor: "black",
+      linewidth: 1,
     },
 
     shapes: [...shapes1, ...shapes2],
