@@ -85,7 +85,7 @@ export default function MutProfilePlot() {
         </div>
       ) : (
         plot && (
-          <div>
+          <div className="mb-3">
             <Plot
               className="w-100"
               divId={divId}
