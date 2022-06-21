@@ -7,7 +7,7 @@ import { reducer as publicationsReducer } from './publications';
 
 import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
-import { apiQueries } from '../query/signature';
+import { apiQueries } from '../query/api';
 
 // provide rootReducer as an object of slice reducers
 export const store = configureStore({
