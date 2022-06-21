@@ -1,8 +1,5 @@
-import React, { useEffect, Suspense } from "react";
-import { Alert, Container } from "react-bootstrap";
+import React, { useEffect } from "react";
 import axios from "axios";
-import Loader from "../../controls/loader/loader";
-import ErrorBoundary from "../../controls/errorBoundary/error-boundary";
 import { Form, Row, Col, Nav, Button } from "react-bootstrap";
 import {
   SidebarContainer,
