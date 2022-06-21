@@ -71,9 +71,8 @@ export default function MutProfilePlot() {
 
   const divId = 'mutationalProfilePlot';
   const config = {
-    displayModeBar: true,
-    response: true,
-    displaylogo: false,
+    displayModeBar: false,
+    responsive: true,
   };
 
   return (
