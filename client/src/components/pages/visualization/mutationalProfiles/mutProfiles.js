@@ -11,6 +11,7 @@ export default function MutationalProfiles(props) {
       {...props}
     >
       <MutProfilesForm />
+      <hr />
       <MutProfilesPlot />
     </Container>
   );

@@ -795,35 +795,22 @@ const getDataUsingS3Select = (params) => {
 };
 
 async function querySignature(req, res, next) {
-  const { study, cancer, strategy, sample, profile, matrix } = req.query;
-
-  const query = [
-    'SELECT Sample, MutationType, Mutations FROM s3object s',
-    `WHERE Cancer_Type = '${cancer}'`,
-    `AND Sample = '${sample}' AND Profile = '${profile + matrix}'`,
-  ].join(' ');
-
-  const params = {
-    Bucket: config.data.bucket,
-    Key: path.join(
-      config.data.s3,
-      `Seqmatrix/${study}_${strategy}_seqmatrix_refdata.csv.gz`
-    ),
-    Expression: query,
-    ExpressionType: 'SQL',
-    InputSerialization: {
-      CSV: { FileHeaderInfo: 'USE' },
-      CompressionType: 'GZIP',
-    },
-    OutputSerialization: {
-      JSON: {
-        RecordDelimiter: ',',
-      },
-    },
-  };
-
   try {
-    const data = await getDataUsingS3Select(params);
+    const { study, cancer, strategy, sample, profile, matrix } = req.query;
+    const s3 = new AWS.S3();
+
+    const params = {
+      Bucket: config.data.bucket,
+      Key: path.join(
+        config.data.s3,
+        `Seqmatrix/query/${study}/${cancer}/${sample}/${strategy}/${
+          profile + matrix
+        }/data.json`
+      ),
+    };
+    const { Body } = await s3.getObject(params).promise();
+    const data = JSON.parse(Body);
+
     res.json(data);
   } catch (error) {
     next(error);

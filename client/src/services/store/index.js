@@ -5,7 +5,9 @@ import { reducer as associationReducer } from './association';
 import { reducer as modalReducer } from './modal';
 import { reducer as publicationsReducer } from './publications';
 
-import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
+import { setupListeners } from '@reduxjs/toolkit/query';
+import { apiQueries } from '../query/api';
 
 // provide rootReducer as an object of slice reducers
 export const store = configureStore({
@@ -16,8 +18,12 @@ export const store = configureStore({
     exposure: exposureReducer,
     modal: modalReducer,
     publications: publicationsReducer,
+    [apiQueries.reducerPath]: apiQueries.reducer,
   },
-  middleware: getDefaultMiddleware({
-    serializableCheck: false,
-  }),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: false }).concat(
+      apiQueries.middleware
+    ),
 });
+
+setupListeners(store.dispatch);
