@@ -131,6 +131,27 @@ export default function SBS192(data) {
       align: "center",
     })
   );
+  const xannotations = flatSortedU.map((num, index) => ({
+    xref: "x",
+    yref: "paper",
+    xanchor: "bottom",
+    yanchor: "bottom",
+    x: index,
+    y: -0.1,
+    text: num.mutationType.replace(
+      /\[(.*)\]/,
+      num.mutationType.substring(2, 3)
+    ),
+    showarrow: false,
+    font: {
+      size: 10,
+      color: colors[num.mutationType.substring(2, 5)],
+    },
+    align: "center",
+    num: num,
+    index: index,
+    textangle: -90,
+  }));
 
   const sampleAnnotation = {
     xref: "paper",
@@ -202,7 +223,7 @@ export default function SBS192(data) {
       y: 1,
     },
     xaxis: {
-      showticklabels: true,
+      showticklabels: false,
       showline: true,
       tickangle: -90,
       tickfont: {
@@ -224,7 +245,7 @@ export default function SBS192(data) {
     },
 
     shapes: [...shapes1, ...shapes2],
-    annotations: [...annotations, sampleAnnotation],
+    annotations: [...annotations, sampleAnnotation, ...xannotations],
   };
 
   return { traces, layout };
