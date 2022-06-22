@@ -118,16 +118,8 @@ export const getInitialState = () => ({
     pubSubmitOverlay: false,
   },
   mutationalPattern: {
-    proportion: '0.8',
-    pattern: 'NCG>NTG',
-    txtPath: '',
-    plotPath: '',
-    barPath: '',
-    barURL: '',
-    display: true,
-    err: false,
-    debugR: [],
-    loading: false,
+    proportion: '',
+    pattern: '',
   },
   profileComparison: {
     withinProfileType: '',
