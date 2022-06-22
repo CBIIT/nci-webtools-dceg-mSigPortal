@@ -71,20 +71,20 @@ export default function MultationalProfilesTest() {
 
   console.log(data1);
 
-  // const data2 = Object.entries(groupByMutation).map(
-  //   ([mutation, signatures]) => ({
-  //     name: mutation,
-  //     type: "bar",
-  //     marker: { color: colors[mutation] },
-  //     x: signatures.map((e) => e.mutationType),
-  //     y: [0.01],
-  //     xaxis: "x2",
-  //     yaxis: "y2",
-  //     text: mutation,
-  //     showlegend: false,
-  //     hoverinfo: "none",
-  //   })
-  // );
+  const data2 = Object.entries(groupByMutation).map(
+    ([mutation, signatures]) => ({
+      name: mutation,
+      type: "bar",
+      marker: { color: colors[mutation] },
+      x: signatures.map((e) => e.mutationType),
+      y: [0.01],
+      xaxis: "x2",
+      yaxis: "y2",
+      text: mutation,
+      showlegend: false,
+      hoverinfo: "none",
+    })
+  );
 
   const shapes1 = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
@@ -159,12 +159,16 @@ export default function MultationalProfilesTest() {
     })
   );
 
-  const data = [...data1];
+  const data = [...data1, ...data2];
   console.log(data);
   console.log(shapes);
   console.log(annotations);
 
   var layout = {
+    grid: {
+      rows: 2,
+      columns: 1,
+    },
     xaxis: {
       title: "Substitution",
       showline: true,

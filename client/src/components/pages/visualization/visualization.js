@@ -489,18 +489,18 @@ export default function Visualization({ match }) {
       component: <MutationalProfiles />,
     },
     {
-      name: 'Mutational Profiles API',
-      id: 'mutationalProfiles2',
+      name: "Mutational Profiles API",
+      id: "mutationalProfiles2",
       component: <MutationalProfiles2 />,
     },
     {
-      name: 'Tree and Leaf',
-      id: 'treeAndLeaf',
+      name: "Tree and Leaf",
+      id: "treeAndLeaf",
       component: <TreeAndLeaf />,
     },
     {
-      name: 'Cosine Similarity',
-      id: 'cosineSimilarity',
+      name: "Cosine Similarity",
+      id: "cosineSimilarity",
       component: (
         <CosineSimilarity
           getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
@@ -545,11 +545,11 @@ export default function Visualization({ match }) {
       id: "download",
       component: <Download />,
     },
-    // {
-    //   name: 'Multational Profiles Test',
-    //   id: 'multationalProfileTest',
-    //   component: <MultationalProfilesTest />,
-    // },
+    {
+      name: "Multational Profiles Test",
+      id: "multationalProfileTest",
+      component: <MultationalProfilesTest />,
+    },
   ];
 
   return (
@@ -628,8 +628,8 @@ export default function Visualization({ match }) {
                       disabled={submitted || loading.active}
                       type="radio"
                       value="public"
-                      checked={source == 'public'}
-                      onChange={(e) => mergeState({ source: 'public' })}
+                      checked={source == "public"}
+                      onChange={(e) => mergeState({ source: "public" })}
                     />
                     <Check.Label className="font-weight-normal">
                       Public
@@ -640,8 +640,8 @@ export default function Visualization({ match }) {
                       disabled={submitted || loading.active}
                       type="radio"
                       value="user"
-                      checked={source == 'user'}
-                      onChange={(e) => mergeState({ source: 'user' })}
+                      checked={source == "user"}
+                      onChange={(e) => mergeState({ source: "user" })}
                     />
                     <Check.Label className="font-weight-normal">
                       User
@@ -652,14 +652,14 @@ export default function Visualization({ match }) {
             </Row>
             <Row
               style={{
-                display: source == 'user' ? 'block' : 'none',
+                display: source == "user" ? "block" : "none",
               }}
             >
               <Col lg="auto" className="w-100">
                 <UserForm />
               </Col>
             </Row>
-            <Row style={{ display: source == 'public' ? 'block' : 'none' }}>
+            <Row style={{ display: source == "public" ? "block" : "none" }}>
               <Col lg="auto" className="w-100">
                 <PublicForm />
               </Col>
@@ -680,7 +680,7 @@ export default function Visualization({ match }) {
               content={loading.content}
               showIndicator={loading.showIndicator}
             />
-            <div style={{ minHeight: '500px' }}>
+            <div style={{ minHeight: "500px" }}>
               {tabs.filter((tab) => tab.id == displayTab)[0].component}
             </div>
           </div>

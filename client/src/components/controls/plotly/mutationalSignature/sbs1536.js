@@ -136,7 +136,7 @@ export default function SBS96(data) {
 
   console.log("FlatSorted--");
   console.log(flatSorted);
-  const traces = Object.entries(groupByTotal).map(
+  const tracesBar = Object.entries(groupByTotal).map(
     ([mutation, signatures], groupIndex, array) => ({
       name: mutation,
       type: "bar",
@@ -157,9 +157,54 @@ export default function SBS96(data) {
       signatures: signatures,
     })
   );
+  console.log("tracesBar:");
+  console.log(tracesBar);
+
+  const tracesHeat = Object.entries(groupByMutation1).map(
+    ([mutation, signatures], groupIndex, array) => ({
+      name: mutation,
+      type: "bar",
+      marker: { color: colors[mutation] },
+      //   x: signatures.map((e) => e.mutationType),
+      //x: signatures.map((e, i) => groupIndex * signatures.length + i),
+      x: signatures.map(
+        (e, i) =>
+          array
+            .slice(0, groupIndex)
+            .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
+      ),
+      y: signatures.map((e) => e.contribution),
+      hoverinfo: "x+y",
+      showlegend: false,
+      array: array,
+      mutation: mutation,
+      signatures: signatures,
+      xaxis: "x",
+      yaxis: "y2",
+    })
+  );
+  const tracesHeat1 = [
+    {
+      z: [
+        [1, null, 30, 50, 1],
+        [20, 1, 60, 80, 30],
+        [30, 60, 1, -10, 20],
+      ],
+      x: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      y: ["Morning", "Afternoon", "Evening"],
+      type: "heatmap",
+      hoverongaps: false,
+      xaxis: "x2",
+      yaxis: "y2",
+    },
+  ];
+  console.log("tracesHeat:");
+  console.log(tracesHeat);
+
+  const traces = [...tracesBar, ...tracesHeat];
+
   console.log("traces:");
   console.log(traces);
-
   const annotations = Object.entries(groupByTotal).map(
     ([mutation, signatures], groupIndex, array) => ({
       xref: "x",
@@ -225,6 +270,10 @@ export default function SBS96(data) {
   );
 
   const layout = {
+    grid: {
+      rows: 2,
+      columns: 1,
+    },
     xaxis: {
       showticklabels: true,
       showline: true,
@@ -246,6 +295,14 @@ export default function SBS96(data) {
       linecolor: "black",
       linewidth: 1,
       mirror: true,
+    },
+    yaxis2: {
+      title: "y2",
+      autorange: true,
+      linecolor: "black",
+      linewidth: 1,
+      mirror: true,
+      anchor: "x",
     },
 
     shapes: shapes,
