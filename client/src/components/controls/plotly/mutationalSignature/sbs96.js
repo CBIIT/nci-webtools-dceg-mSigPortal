@@ -30,8 +30,8 @@ export default function SBS96(data) {
   }, {});
   const flatSorted = Object.values(groupByMutation).flat();
 
-  //console.log("groupByMutation:");
-  //console.log(groupByMutation);
+  console.log("groupByMutation:");
+  console.log(groupByMutation);
   //console.log("FlatSorted");
   //console.log(flatSorted);
   const traces = Object.entries(groupByMutation).map(
@@ -53,8 +53,8 @@ export default function SBS96(data) {
       array: array,
     })
   );
-  //console.log("traces:");
-  //console.log(traces);
+  console.log("traces:");
+  console.log(traces);
 
   const annotations = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({

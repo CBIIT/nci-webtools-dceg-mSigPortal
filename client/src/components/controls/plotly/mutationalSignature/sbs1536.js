@@ -15,6 +15,7 @@ export default function SBS96(data) {
 
   console.log("data--:");
   console.log(data);
+
   // group data by dominant mutation
   const groupByMutation = data.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
@@ -28,7 +29,6 @@ export default function SBS96(data) {
       : [signature];
     return groups;
   }, {});
-  const flatSorted = Object.values(groupByMutation).flat();
 
   console.log("groupByMutation:---");
   console.log(groupByMutation);
@@ -83,9 +83,60 @@ export default function SBS96(data) {
   console.log("groupByMutationOuterInner:---");
   console.log(groupByMutationOuterInner);
 
+  const totalMutationsGroup = Object.entries(groupByMutationInner).map(
+    ([mutation, signatures], groupIndex, array) => ({
+      mutationType: mutation,
+      signatures: signatures,
+      groupIndex: groupIndex,
+      array: array,
+      total: signatures.reduce((a, e) => a + parseInt(e.contribution), 0),
+    })
+  );
+
+  console.log("totalMutationsGroup");
+  console.log(totalMutationsGroup);
+
+  const groupByTotal = totalMutationsGroup.reduce((groups, e, i) => {
+    const mutationRegex = /\[(.*)\]/;
+    const mutation = e.mutationType.match(mutationRegex)[1];
+
+    const signature = {
+      mutationType: e.mutationType,
+      contribution: e.total,
+    };
+    groups[mutation] = groups[mutation]
+      ? [...groups[mutation], signature]
+      : [signature];
+    return groups;
+  }, {});
+  console.log("groupByTotal");
+  console.log(groupByTotal);
+
+  const arrayDataX1 =
+    groupByMutationOuter[Object.keys(groupByMutationOuter)[0]];
+  console.log(arrayDataX1);
+
+  const groupByMutation1 = arrayDataX1.reduce((groups, e, i) => {
+    const mutationRegex = /\[(.*)\]/;
+    const mutation = e.mutationType.match(mutationRegex)[1];
+
+    const signature = {
+      mutationType: e.mutationType,
+      contribution: e.contribution,
+    };
+    groups[mutation] = groups[mutation]
+      ? [...groups[mutation], signature]
+      : [signature];
+    return groups;
+  }, {});
+  console.log("groupByMutation1");
+  console.log(groupByMutation1);
+
+  const flatSorted = Object.values(groupByTotal).flat();
+
   console.log("FlatSorted--");
   console.log(flatSorted);
-  const traces = Object.entries(groupByMutationInner).map(
+  const traces = Object.entries(groupByTotal).map(
     ([mutation, signatures], groupIndex, array) => ({
       name: mutation,
       type: "bar",
@@ -102,12 +153,14 @@ export default function SBS96(data) {
       hoverinfo: "x+y",
       showlegend: false,
       array: array,
+      mutation: mutation,
+      signatures: signatures,
     })
   );
   console.log("traces:");
   console.log(traces);
 
-  const annotations = Object.entries(groupByMutation).map(
+  const annotations = Object.entries(groupByTotal).map(
     ([mutation, signatures], groupIndex, array) => ({
       xref: "x",
       yref: "paper",
@@ -151,7 +204,7 @@ export default function SBS96(data) {
     align: "center",
   };
 
-  const shapes = Object.entries(groupByMutation).map(
+  const shapes = Object.entries(groupByTotal).map(
     ([mutation, _], groupIndex, array) => ({
       type: "rect",
       xref: "x",
@@ -188,8 +241,8 @@ export default function SBS96(data) {
     },
     yaxis: {
       title: "Number of Single Base Substitutions",
-      autorange: false,
-      range: [0, maxVal + 10],
+      autorange: true,
+
       linecolor: "black",
       linewidth: 1,
       mirror: true,
