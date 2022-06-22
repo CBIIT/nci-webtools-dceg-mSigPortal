@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button, Tab, Nav } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import Plot from '../../controls/plot/plot';
+import SvgContainer from '../../controls/svgContainer/svgContainer';
 import CustomSelect from '../../controls/select/select-old';
 import Description from '../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
@@ -311,7 +311,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
           {pca1 && (
             <div id="pca1Plot">
               <hr />
-              <Plot
+              <SvgContainer
                 className="p-3"
                 downloadName={pca1.split('/').slice(-1)[0]}
                 plotPath={'web/results/' + pca1}
@@ -327,7 +327,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
           {pca2 && (
             <div id="pca2Plot">
               <hr />
-              <Plot
+              <SvgContainer
                 className="p-3"
                 downloadName={pca2.split('/').slice(-1)[0]}
                 plotPath={'web/results/' + pca2}
@@ -347,7 +347,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
           {pca3 && (
             <div id="pca3Plot">
               <hr />
-              <Plot
+              <SvgContainer
                 className="p-3"
                 downloadName={pca3.split('/').slice(-1)[0]}
                 plotPath={'web/results/' + pca3}
@@ -366,7 +366,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
           {heatmap && (
             <div id="heatmapPlot">
               <hr />
-              <Plot
+              <SvgContainer
                 className="p-3"
                 downloadName={heatmap.split('/').slice(-1)[0]}
                 plotPath={'web/results/' + heatmap}
@@ -470,7 +470,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
           {pubPca1 && (
             <div id="pubPca1Plot">
               <hr />
-              <Plot
+              <SvgContainer
                 className="p-3"
                 downloadName={pubPca1.split('/').slice(-1)[0]}
                 plotPath={'web/results/' + pubPca1}
@@ -486,7 +486,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
           {pubPca2 && (
             <div id="pubPca2Plot">
               <hr />
-              <Plot
+              <SvgContainer
                 className="p-3"
                 downloadName={pubPca2.split('/').slice(-1)[0]}
                 plotPath={'web/results/' + pubPca2}
@@ -506,7 +506,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
           {pubPca3 && (
             <div id="pubPca3Plot">
               <hr />
-              <Plot
+              <SvgContainer
                 className="p-3"
                 downloadName={pubPca3.split('/').slice(-1)[0]}
                 plotPath={'web/results/' + pubPca3}

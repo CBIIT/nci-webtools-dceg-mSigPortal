@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import Description from '../../controls/description/description';
-import Plot from '../../controls/plot/plot';
+import SvgContainer from '../../controls/svgContainer/svgContainer';
 import { NavHashLink } from 'react-router-hash-link';
 
 export default function MsDecomposition() {
@@ -41,7 +41,7 @@ export default function MsDecomposition() {
         {plotPath && (
           <>
             <hr />
-            <Plot
+            <SvgContainer
               className="p-3"
               title="Evaluating the Performance of Mutational Signature Decomposition"
               downloadName={plotPath.split('/').slice(-1)[0]}

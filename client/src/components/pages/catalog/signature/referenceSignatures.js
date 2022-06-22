@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Description from '../../../controls/description/description';
-import Plot from '../../../controls/plot/plot';
+import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as catalogActions } from '../../../../services/store/catalog';
 import { actions as modalActions } from '../../../../services/store/modal';
@@ -60,7 +60,7 @@ export default function ReferenceSignatures() {
         respectively.
       </div>
       <hr />
-      <Plot
+      <SvgContainer
         className="p-3"
         downloadName={plotPath.split('/').slice(-1)[0]}
         plotPath={plotPath}

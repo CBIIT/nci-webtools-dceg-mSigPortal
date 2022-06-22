@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import Description from '../../controls/description/description';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { actions as exposureActions } from '../../../services/store/exposure';
-import Plot from '../../controls/plot/plot';
+import SvgContainer from '../../controls/svgContainer/svgContainer';
 import Debug from '../../controls/debug/debug';
 
 const actions = { ...exposureActions };
@@ -82,7 +82,7 @@ export default function MsPrevalence({ calculatePrevalence }) {
         {plotPath && (
           <>
             <hr />
-            <Plot
+            <SvgContainer
               className="p-3"
               title="Prevalence of Mutational Signatures"
               downloadName={plotPath.split('/').slice(-1)[0]}

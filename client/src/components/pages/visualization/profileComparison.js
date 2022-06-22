@@ -12,7 +12,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import Plot from '../../controls/plot/plot';
+import SvgContainer from '../../controls/svgContainer/svgContainer';
 import CustomSelect from '../../controls/select/select-old';
 import Description from '../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
@@ -469,7 +469,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
             {withinPlotPath && (
               <>
                 <hr />
-                <Plot
+                <SvgContainer
                   className="p-3"
                   downloadName={withinPlotPath.split('/').slice(-1)[0]}
                   plotPath={'web/results/' + withinPlotPath}
@@ -653,7 +653,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
             {refPlotPath && (
               <>
                 <hr />
-                <Plot
+                <SvgContainer
                   className="p-3"
                   downloadName={refPlotPath.split('/').slice(-1)[0]}
                   plotPath={'web/results/' + refPlotPath}
@@ -802,7 +802,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
             {pubPlotPath && (
               <>
                 <hr />
-                <Plot
+                <SvgContainer
                   className="p-3"
                   downloadName={pubPlotPath.split('/').slice(-1)[0]}
                   plotPath={'web/results/' + pubPlotPath}

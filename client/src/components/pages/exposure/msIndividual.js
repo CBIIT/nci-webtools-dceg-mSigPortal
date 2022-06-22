@@ -5,7 +5,7 @@ import Description from '../../controls/description/description';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { actions as exposureActions } from '../../../services/store/exposure';
 import { actions as modalActions } from '../../../services/store/modal';
-import Plot from '../../controls/plot/plot';
+import SvgContainer from '../../controls/svgContainer/svgContainer';
 import CustomSelect from '../../controls/select/select-old';
 import Debug from '../../controls/debug/debug';
 import { NavHashLink } from 'react-router-hash-link';
@@ -98,7 +98,7 @@ export default function MSIndividual({ calculateIndividual }) {
         {plotPath && (
           <>
             <hr />
-            <Plot
+            <SvgContainer
               className="p-3"
               title="Mutational Signature in Individual Samples"
               downloadName={plotPath.split('/').slice(-1)[0]}

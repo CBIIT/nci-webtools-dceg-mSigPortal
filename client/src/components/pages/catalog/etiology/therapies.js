@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { actions as catalogActions } from '../../../../services/store/catalog';
 import { actions as modalActions } from '../../../../services/store/modal';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import Plot from '../../../controls/plot/plot';
+import SvgContainer from '../../../controls/svgContainer/svgContainer';
 
 const actions = { ...catalogActions, ...modalActions };
 const { Check } = Form;
@@ -216,7 +216,7 @@ export default function General() {
 
             {profileURL ? (
               <div>
-                <Plot
+                <SvgContainer
                   className="p-3 border rounded mb-3"
                   height={'500px'}
                   plotPath={profileURL}
@@ -227,7 +227,7 @@ export default function General() {
                   <p>{info.Description_strandbias}</p>
                 )}
                 {info.Description_strandbias && strandbiasURL && (
-                  <Plot
+                  <SvgContainer
                     className="p-3 border rounded mb-3"
                     height={'500px'}
                     plotPath={strandbiasURL}
@@ -252,7 +252,7 @@ export default function General() {
                       </p>
                       <Row className="justify-content-center">{getStudy()}</Row>
                       {exposureURL.length > 0 && (
-                        <Plot
+                        <SvgContainer
                           className="p-3 border"
                           height={'600px'}
                           plotPath={exposureURL}

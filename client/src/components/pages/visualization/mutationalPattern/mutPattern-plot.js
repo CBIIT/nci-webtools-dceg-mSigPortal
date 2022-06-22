@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import Plot from '../../../controls/plot/plot';
+import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import { useMutationalPatternQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
@@ -57,7 +57,7 @@ export default function MutProfilePlot() {
       <div id="barchart">
         {data?.output.barPath && (
           <>
-            <Plot
+            <SvgContainer
               className="p-3"
               downloadName={data.output.barPath.split('/').slice(-1)[0]}
               plotPath={'web/results/' + data.output.barPath}
@@ -86,7 +86,7 @@ export default function MutProfilePlot() {
       <div id="context">
         {data?.output.plotPath && (
           <>
-            <Plot
+            <SvgContainer
               className="p-3"
               downloadName={data.output.plotPath.split('/').slice(-1)[0]}
               plotPath={'web/results/' + data.output.plotPath}

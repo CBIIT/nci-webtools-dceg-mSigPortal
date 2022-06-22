@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import Plot from '../../../controls/plot/plot';
+import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import Description from '../../../controls/description/description';
 import { useProfilerSummaryQuery } from './apiSlice';
 
@@ -79,7 +79,7 @@ export default function ProfilerSummary() {
       {plotPath && (
         <>
           <hr />
-          <Plot
+          <SvgContainer
             title="Number of Mutations Per Sample with Regard to Mutational Profile"
             className="p-3"
             downloadName={plotPath.split('/').slice(-1)[0]}

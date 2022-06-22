@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { actions as catalogActions } from '../../../../services/store/catalog';
 import { actions as modalActions } from '../../../../services/store/modal';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import Plot from '../../../controls/plot/plot';
+import SvgContainer from '../../../controls/svgContainer/svgContainer';
 
 const actions = { ...catalogActions, ...modalActions };
 const { Check } = Form;
@@ -232,19 +232,19 @@ export default function CancerSpecific() {
               info.Description.map((text, i) => <p key={i}>{text}</p>)
             )}
 
-            <Plot
+            <SvgContainer
               className="p-3 border rounded mb-3"
               height={'500px'}
               plotPath={refSigURL}
             />
 
-            <Plot
+            <SvgContainer
               className="p-3 border rounded mb-3"
               height={'500px'}
               plotPath={tissueURL}
             />
 
-            <Plot
+            <SvgContainer
               className="p-3 border rounded mb-3"
               height={'600px'}
               plotPath={exposureURL}
