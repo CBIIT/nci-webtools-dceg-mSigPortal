@@ -9,7 +9,7 @@ import {
 import UserForm from './userForm';
 import PublicForm from './publicForm';
 import Instructions from '../visualization/instructions';
-import ProfilerSummary from './profilerSummary';
+import ProfilerSummary from './profilerSummary/profilerSummary';
 import MutationalProfiles from './mutationalProfiles';
 import TreeAndLeaf from './treeLeaf/treeLeaf';
 import MutationalProfiles2 from './mutationalProfiles/mutProfiles';
@@ -482,7 +482,7 @@ export default function Visualization({ match }) {
     {
       name: 'Profiler Summary',
       id: 'profilerSummary',
-      component: <ProfilerSummary submitR={(fn, args) => submitR(fn, args)} />,
+      component: <ProfilerSummary />,
     },
     {
       name: 'Mutational Profiles',

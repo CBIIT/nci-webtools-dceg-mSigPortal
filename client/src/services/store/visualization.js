@@ -63,12 +63,6 @@ export const getInitialState = () => ({
     statistics: '',
     profileOptions: [],
   },
-  profilerSummary: {
-    plotPath: '',
-    err: '',
-    debugR: '',
-    loading: false,
-  },
   mutationalProfiles: {
     sample: null,
     profile: null,
