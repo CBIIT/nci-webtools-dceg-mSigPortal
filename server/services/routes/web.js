@@ -20,6 +20,7 @@ const {
   getFileS3,
   downloadWorkspace,
   associationWrapper,
+  signatureRefSets,
   querySignature,
   queryExposure,
 } = require('../analysis');
@@ -74,6 +75,8 @@ router.post('/getFileS3', getFileS3);
 router.post('/downloadWorkspace', downloadWorkspace);
 
 router.post('/associationWrapper', associationWrapper);
+
+router.get('/signatureRefSets', signatureRefSets);
 
 router.get('/signature', querySignature);
 
