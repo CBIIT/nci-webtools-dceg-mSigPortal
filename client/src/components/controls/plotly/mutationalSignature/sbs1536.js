@@ -30,11 +30,62 @@ export default function SBS96(data) {
   }, {});
   const flatSorted = Object.values(groupByMutation).flat();
 
-  //console.log("groupByMutation:");
-  //console.log(groupByMutation);
-  //console.log("FlatSorted");
-  //console.log(flatSorted);
-  const traces = Object.entries(groupByMutation).map(
+  console.log("groupByMutation:---");
+  console.log(groupByMutation);
+
+  const groupByMutationInner = data.reduce((groups, e, i) => {
+    const mutation = e.MutationType.substring(1, 8);
+
+    const signature = {
+      mutationType: e.MutationType,
+      contribution: e.Mutations,
+    };
+    groups[mutation] = groups[mutation]
+      ? [...groups[mutation], signature]
+      : [signature];
+    return groups;
+  }, {});
+
+  console.log("groupByMutationInner:---");
+  console.log(groupByMutationInner);
+
+  const groupByMutationOuter = data.reduce((groups, e, i) => {
+    const mutation =
+      e.MutationType[0] + e.MutationType[e.MutationType.length - 1];
+    const signature = {
+      mutationType: e.MutationType,
+      contribution: e.Mutations,
+    };
+    groups[mutation] = groups[mutation]
+      ? [...groups[mutation], signature]
+      : [signature];
+    return groups;
+  }, {});
+
+  console.log("groupByMutationOuter:---");
+  console.log(groupByMutationOuter);
+
+  const groupByMutationOuterInner = data.reduce((groups, e, i) => {
+    const mutation =
+      e.MutationType[0] +
+      e.MutationType.substring(2, 7) +
+      e.MutationType[e.MutationType.length - 1];
+    const signature = {
+      mutationType: e.MutationType,
+      contribution: e.Mutations,
+    };
+    groups[mutation] = groups[mutation]
+      ? [...groups[mutation], signature]
+      : [signature];
+    return groups;
+  }, {});
+
+  console.log("groupByMutationOuterInner:---");
+  console.log(groupByMutationOuterInner);
+
+  console.log("FlatSorted--");
+  console.log(flatSorted);
+  const traces = Object.entries(groupByMutationInner).map(
     ([mutation, signatures], groupIndex, array) => ({
       name: mutation,
       type: "bar",
@@ -53,8 +104,8 @@ export default function SBS96(data) {
       array: array,
     })
   );
-  //console.log("traces:");
-  //console.log(traces);
+  console.log("traces:");
+  console.log(traces);
 
   const annotations = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
@@ -76,6 +127,9 @@ export default function SBS96(data) {
       align: "center",
     })
   );
+
+  console.log("annotation:");
+  console.log(annotations);
 
   const sampleAnnotation = {
     xref: "paper",
@@ -144,8 +198,8 @@ export default function SBS96(data) {
     shapes: shapes,
     annotations: [...annotations, sampleAnnotation],
   };
-  //console.log("layout");
-  //console.log(layout);
+  console.log("layout");
+  console.log(layout);
 
   return { traces, layout };
 }

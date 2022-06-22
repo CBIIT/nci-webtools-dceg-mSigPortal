@@ -54,25 +54,26 @@ export default function MutProfilePlot() {
     const profileMatrix = profile.value + matrix.value;
 
     const { traces, layout } =
-      profileMatrix == 'SBS96'
+      profileMatrix == "SBS96"
         ? SBS96(data)
-        : profileMatrix == 'SBS192'
+        : profileMatrix == "SBS192"
         ? SBS192(data)
-        : profileMatrix == 'SBS1536'
+        : profileMatrix == "SBS1536"
         ? SBS1536(data)
-        : profileMatrix == 'DBS78'
+        : profileMatrix == "DBS78"
         ? DBS78(data)
-        : profileMatrix == 'ID83'
+        : profileMatrix == "ID83"
         ? ID83(data)
         : { traces: [], layout: {} };
 
     setPlot({ data: [...traces], layout });
   }
 
-  const divId = 'mutationalProfilePlot';
+  const divId = "mutationalProfilePlot";
   const config = {
-    displayModeBar: false,
+    displayModeBar: true,
     responsive: true,
+    displaylogo: false,
   };
 
   return (
@@ -89,7 +90,7 @@ export default function MutProfilePlot() {
             <Plot
               className="w-100"
               divId={divId}
-              style={{ height: '500px' }}
+              style={{ height: "500px" }}
               data={cloneDeep(plot.data)}
               layout={cloneDeep(plot.layout)}
               config={cloneDeep(config)}
@@ -100,7 +101,7 @@ export default function MutProfilePlot() {
                 <Button
                   onClick={() =>
                     downloadImage(divId, {
-                      format: 'png',
+                      format: "png",
                       filename: sample.value,
                     })
                   }
@@ -112,7 +113,7 @@ export default function MutProfilePlot() {
                 <Button
                   onClick={() =>
                     downloadImage(divId, {
-                      format: 'svg',
+                      format: "svg",
                       filename: sample.value,
                     })
                   }
@@ -125,7 +126,7 @@ export default function MutProfilePlot() {
                   onClick={() =>
                     saveAs(
                       new Blob([JSON.stringify(plot)], {
-                        type: 'application/json',
+                        type: "application/json",
                       }),
                       `${sample.value}.json`
                     )

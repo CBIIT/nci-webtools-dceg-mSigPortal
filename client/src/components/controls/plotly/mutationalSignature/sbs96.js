@@ -77,6 +77,28 @@ export default function SBS96(data) {
     })
   );
 
+  const xannotations = flatSorted.map((num, index) => ({
+    xref: "x",
+    yref: "paper",
+    xanchor: "bottom",
+    yanchor: "bottom",
+    x: index,
+    y: -0.1,
+    text: num.mutationType.replace(
+      /\[(.*)\]/,
+      num.mutationType.substring(2, 3)
+    ),
+    showarrow: false,
+    font: {
+      size: 10,
+      color: colors[num.mutationType.substring(2, 5)],
+    },
+    align: "center",
+    num: num,
+    index: index,
+    textangle: -90,
+  }));
+
   const sampleAnnotation = {
     xref: "paper",
     yref: "paper",
@@ -114,12 +136,15 @@ export default function SBS96(data) {
       line: {
         width: 0,
       },
+      mutation: mutation,
     })
   );
+  console.log("shapes");
+  console.log(shapes);
 
   const layout = {
     xaxis: {
-      showticklabels: true,
+      showticklabels: false,
       showline: true,
       tickangle: -90,
       tickfont: {
@@ -127,6 +152,9 @@ export default function SBS96(data) {
       },
       tickmode: "array",
       tickvals: flatSorted.map((_, i) => i),
+      // ticktext: flatSorted.map((e) =>
+      //   e.mutationType.replace(/\[(.*)\]/, e.mutationType.substring(2, 3))
+      // ),
       ticktext: flatSorted.map((e) => e.mutationType),
       linecolor: "black",
       linewidth: 1,
@@ -142,10 +170,10 @@ export default function SBS96(data) {
     },
 
     shapes: shapes,
-    annotations: [...annotations, sampleAnnotation],
+    annotations: [...annotations, sampleAnnotation, ...xannotations],
   };
-  //console.log("layout");
-  //console.log(layout);
+  console.log("layout");
+  console.log(layout);
 
   return { traces, layout };
 }
