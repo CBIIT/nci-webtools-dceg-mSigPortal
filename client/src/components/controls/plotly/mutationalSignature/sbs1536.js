@@ -139,7 +139,7 @@ export default function SBS96(data) {
     ([key, value], groupIndex, array) => {
       console.log(key);
       console.log(value);
-      heatmapY.push(key);
+      heatmapY.push(key.charAt(0) + " -- " + key.charAt(key.length - 1));
       heatmapZ.push(Object.entries(value).map(([k, v]) => v.contribution));
       heatmapX.push(
         value.map(
@@ -151,6 +151,10 @@ export default function SBS96(data) {
       );
     }
   );
+  var colorscaleValue = [
+    [0, "#38429C"],
+    [1, "#FFE127"],
+  ];
 
   console.log("heatmapY");
   console.log(heatmapY);
@@ -226,7 +230,8 @@ export default function SBS96(data) {
             .slice(0, groupIndex)
             .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
       ),
-      y: signatures.map((e) => e.contribution),
+      y: heatmapY,
+      z: Object.entries(signatures).map(([k, v]) => v.contribution),
       hoverinfo: "x+y",
       showlegend: false,
       array: array,
@@ -238,13 +243,7 @@ export default function SBS96(data) {
   );
   const tracesHeat1 = [
     {
-      //   z: [
-      //     [1, null, 30, 50, 1],
-      //     [20, 1, 60, 80, 30],
-      //     [30, 60, 1, -10, 20],
-      //   ],
-      //   x: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-      //   y: ["Morning", "Afternoon", "Evening"],
+      colorbar: { len: 0.5, y: 0.2 },
       z: heatmapZ,
       x: heatmapX[0],
       y: heatmapY,
@@ -325,13 +324,31 @@ export default function SBS96(data) {
     })
   );
 
+  const xannotations = flatSorted.map((num, index) => ({
+    xref: "x",
+    yref: "paper",
+    xanchor: "bottom",
+    yanchor: "bottom",
+    x: index,
+    y: -0.1,
+    text: num.mutationType.replace(/\[(.*)\]/, "-"),
+    showarrow: false,
+    font: {
+      size: 10,
+      //   color: colors[num.mutationType.substring(2, 5)],
+    },
+    align: "center",
+    num: num,
+    index: index,
+    textangle: -90,
+  }));
   const layout = {
     grid: {
       rows: 2,
       columns: 1,
     },
     xaxis: {
-      showticklabels: true,
+      showticklabels: false,
       showline: true,
       tickangle: -90,
       tickfont: {
@@ -345,7 +362,7 @@ export default function SBS96(data) {
       mirror: true,
     },
     yaxis: {
-      title: "Number of Single Base Substitutions",
+      //   title: "Number of Single Base Substitutions",
       autorange: true,
 
       linecolor: "black",
@@ -353,7 +370,6 @@ export default function SBS96(data) {
       mirror: true,
     },
     yaxis2: {
-      title: "y2",
       autorange: true,
       linecolor: "black",
       linewidth: 1,
@@ -362,7 +378,7 @@ export default function SBS96(data) {
     },
 
     shapes: shapes,
-    annotations: [...annotations, sampleAnnotation],
+    annotations: [...annotations, sampleAnnotation, ...xannotations],
   };
   console.log("layout");
   console.log(layout);
