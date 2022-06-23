@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
-import Plot from '../../controls/plot/plot';
+import SvgContainer from '../../controls/svgContainer/svgContainer';
 import CustomSelect from '../../controls/select/select-old';
 import Description from '../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
@@ -345,7 +345,7 @@ export default function MutationalProfiles() {
       <hr />
       <div>
         <LoadingOverlay active={loading} />
-        <Plot
+        <SvgContainer
           className="p-3"
           downloadName={getdownloadName()}
           plotPath={plotPath}

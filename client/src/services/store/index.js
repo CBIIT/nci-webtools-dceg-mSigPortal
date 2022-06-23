@@ -7,7 +7,7 @@ import { reducer as publicationsReducer } from './publications';
 
 import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
-import { apiQueries } from '../query/api';
+import { apiSlice } from '../apiSlice';
 
 // provide rootReducer as an object of slice reducers
 export const store = configureStore({
@@ -18,11 +18,11 @@ export const store = configureStore({
     exposure: exposureReducer,
     modal: modalReducer,
     publications: publicationsReducer,
-    [apiQueries.reducerPath]: apiQueries.reducer,
+    [apiSlice.reducerPath]: apiSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }).concat(
-      apiQueries.middleware
+      apiSlice.middleware
     ),
 });
 

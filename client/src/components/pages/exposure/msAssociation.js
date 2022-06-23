@@ -5,7 +5,7 @@ import Description from '../../controls/description/description';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { actions as exposureActions } from '../../../services/store/exposure';
 import { actions as modalActions } from '../../../services/store/modal';
-import Plot from '../../controls/plot/plot';
+import SvgContainer from '../../controls/svgContainer/svgContainer';
 import CustomSelect from '../../controls/select/select-old';
 
 const actions = { ...exposureActions, ...modalActions };
@@ -103,7 +103,7 @@ export default function MsAssociation({ calculateAssociation }) {
         {plotPath && (
           <>
             <hr />
-            <Plot
+            <SvgContainer
               className="p-3"
               title="Mutational Signature Association"
               downloadName={plotPath.split('/').slice(-1)[0]}

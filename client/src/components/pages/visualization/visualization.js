@@ -1,36 +1,36 @@
-import React, { useEffect } from "react";
-import axios from "axios";
-import { Form, Row, Col, Nav, Button } from "react-bootstrap";
+import React, { useEffect } from 'react';
+import axios from 'axios';
+import { Form, Row, Col, Nav, Button } from 'react-bootstrap';
 import {
   SidebarContainer,
   SidebarPanel,
   MainPanel,
-} from "../../controls/sidebar-container/sidebar-container";
-import UserForm from "./userForm";
-import PublicForm from "./publicForm";
-import Instructions from "../visualization/instructions";
-import ProfilerSummary from "./profilerSummary";
-import MutationalProfiles from "./mutationalProfiles";
-import TreeAndLeaf from "./treeLeaf/treeLeaf";
-import MutationalProfiles2 from "./mutationalProfiles/mutProfiles";
-import CosineSimilarity from "./cosineSimilarity";
-import MutationalPattern from "./mutationalPattern";
-import ProfileComparison from "./profileComparison";
-import PCA from "./pca";
-import Kataegis from "./kataegis";
-import Download from "./download";
-import { LoadingOverlay } from "../../controls/loading-overlay/loading-overlay";
-import { useSelector, useDispatch } from "react-redux";
-import { actions as visualizationActions } from "../../../services/store/visualization";
-import { actions as modalActions } from "../../../services/store/modal";
+} from '../../controls/sidebar-container/sidebar-container';
+import UserForm from './userForm';
+import PublicForm from './publicForm';
+import Instructions from '../visualization/instructions';
+import ProfilerSummary from './profilerSummary/profilerSummary';
+import MutationalProfiles from './mutationalProfiles';
+import TreeAndLeaf from './treeLeaf/treeLeaf';
+import MutationalProfiles2 from './mutationalProfiles/mutProfiles';
+import CosineSimilarity from './cosineSimilarity';
+import MutationalPattern from './mutationalPattern/mutationalPattern';
+import ProfileComparison from './profileComparison';
+import PCA from './pca';
+import Kataegis from './kataegis';
+import Download from './download';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as visualizationActions } from '../../../services/store/visualization';
+import { actions as modalActions } from '../../../services/store/modal';
 import {
   defaultProfile,
   defaultMatrix,
   defaultFilter,
-} from "../../../services/utils";
-import "./visualization.scss";
+} from '../../../services/utils';
+import './visualization.scss';
 
-import MultationalProfilesTest from "./test/multationalProfilesTest";
+import MultationalProfilesTest from './test/multationalProfilesTest';
 
 const actions = { ...visualizationActions, ...modalActions };
 const { Group, Label, Check } = Form;
@@ -73,9 +73,9 @@ export default function Visualization({ match }) {
   // when retrieving queued result, update id in store
   useEffect(() => {
     if (id && !loading.active && !submitted && !projectID) {
-      if (type == "queue") {
+      if (type == 'queue') {
         loadQueueResult(id);
-      } else if (type == "example") {
+      } else if (type == 'example') {
         loadExample(id);
       }
     }
@@ -83,7 +83,7 @@ export default function Visualization({ match }) {
 
   // get mapping of plots after retrieving projectID
   useEffect(() => {
-    if (source == "user") {
+    if (source == 'user') {
       if (projectID && !Object.keys(svgList).length) {
         getResults();
       } else if (Object.keys(svgList).length && !signatureSetOptions.length) {
@@ -100,7 +100,8 @@ export default function Visualization({ match }) {
 
   // handle public form submit
   useEffect(() => {
-    if (submitted && source == "public") handlePublicSubmit();
+    if (submitted && source == 'public' && !svgList.length)
+      handlePublicSubmit();
   }, [submitted]);
 
   async function handlePublicSubmit() {
@@ -119,7 +120,7 @@ export default function Visualization({ match }) {
         },
       });
       const response = await axios.post(`web/visualizationWrapper`, {
-        fn: "getPublicData",
+        fn: 'getPublicData',
         args,
       });
 
@@ -134,22 +135,22 @@ export default function Visualization({ match }) {
         });
       } else if (response.status == 504) {
         mergeState({
-          error: "Please Reset Your Parameters and Try again.",
+          error: 'Please Reset Your Parameters and Try again.',
         });
         mergeError({
           visible: true,
           message:
-            "Your submission has timed out. Please try again by submitting this job to a queue instead.",
+            'Your submission has timed out. Please try again by submitting this job to a queue instead.',
         });
       } else {
         mergeState({
-          error: "Please Reset Your Parameters and Try again.",
+          error: 'Please Reset Your Parameters and Try again.',
         });
       }
     } catch (err) {
       mergeError(err.message);
       mergeState({
-        error: "Please Reset Your Parameters and Try again.",
+        error: 'Please Reset Your Parameters and Try again.',
       });
     }
     mergeState({ loading: { active: false } });
@@ -158,10 +159,10 @@ export default function Visualization({ match }) {
   // reload summary information
   async function getResults() {
     const response = await fetch(`web/getResults`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({ projectID: projectID }),
     });
@@ -253,7 +254,7 @@ export default function Visualization({ match }) {
     const sampleNameOptions = [
       ...new Set(
         svgList.map((row) => {
-          if (row.Filter != "NA") return `${row.Sample_Name}@${row.Filter}`;
+          if (row.Filter != 'NA') return `${row.Sample_Name}@${row.Filter}`;
           else return row.Sample_Name;
         })
       ),
@@ -387,17 +388,17 @@ export default function Visualization({ match }) {
         active: false,
       },
       submitted: true,
-      displayTab: "profilerSummary",
+      displayTab: 'profilerSummary',
       openSidebar: false,
     });
   }
 
   function submitR(fn, args) {
     return fetch(`web/visualizationWrapper`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({ fn: fn, args: args, projectID: projectID }),
     });
@@ -405,13 +406,13 @@ export default function Visualization({ match }) {
 
   function getRefSigOptions(profileType) {
     return fetch(`web/visualizationWrapper`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        fn: "getReferenceSignatureSets",
+        fn: 'getReferenceSignatureSets',
         args: { profileType: profileType },
       }),
     });
@@ -438,7 +439,7 @@ export default function Visualization({ match }) {
     mergeState({
       loading: { active: false },
       submitted: true,
-      displayTab: "profilerSummary",
+      displayTab: 'profilerSummary',
       openSidebar: false,
     });
   }
@@ -467,25 +468,25 @@ export default function Visualization({ match }) {
     mergeState({
       loading: { active: false },
       submitted: true,
-      displayTab: "profilerSummary",
+      displayTab: 'profilerSummary',
       openSidebar: false,
     });
   }
 
   const tabs = [
     {
-      name: "Instructions",
-      id: "instructions",
+      name: 'Instructions',
+      id: 'instructions',
       component: <Instructions />,
     },
     {
-      name: "Profiler Summary",
-      id: "profilerSummary",
-      component: <ProfilerSummary submitR={(fn, args) => submitR(fn, args)} />,
+      name: 'Profiler Summary',
+      id: 'profilerSummary',
+      component: <ProfilerSummary />,
     },
     {
-      name: "Mutational Profiles",
-      id: "mutationalProfiles",
+      name: 'Mutational Profiles',
+      id: 'mutationalProfiles',
       component: <MutationalProfiles />,
     },
     {
@@ -509,15 +510,13 @@ export default function Visualization({ match }) {
       ),
     },
     {
-      name: "Mutational Pattern Enrichment Analysis",
-      id: "mutationalPattern",
-      component: (
-        <MutationalPattern submitR={(fn, args) => submitR(fn, args)} />
-      ),
+      name: 'Mutational Pattern Enrichment Analysis',
+      id: 'mutationalPattern',
+      component: <MutationalPattern />,
     },
     {
-      name: "Profile Comparison",
-      id: "profileComparison",
+      name: 'Profile Comparison',
+      id: 'profileComparison',
       component: (
         <ProfileComparison
           getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
@@ -526,8 +525,8 @@ export default function Visualization({ match }) {
       ),
     },
     {
-      name: "PCA",
-      id: "pca",
+      name: 'PCA',
+      id: 'pca',
       component: (
         <PCA
           getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
@@ -536,13 +535,13 @@ export default function Visualization({ match }) {
       ),
     },
     {
-      name: "Kataegis Identification",
-      id: "kataegisIdentification",
+      name: 'Kataegis Identification',
+      id: 'kataegisIdentification',
       component: <Kataegis submitR={(fn, args) => submitR(fn, args)} />,
     },
     {
-      name: "Download",
-      id: "download",
+      name: 'Download',
+      id: 'download',
       component: <Download />,
     },
     {
@@ -564,15 +563,15 @@ export default function Visualization({ match }) {
                   <Button
                     variant="link"
                     className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
-                      id == displayTab ? "active-secondary-navlinks" : ""
+                      id == displayTab ? 'active-secondary-navlinks' : ''
                     }`}
                     active={id == displayTab && submitted}
-                    disabled={id != "instructions" && !submitted}
+                    disabled={id != 'instructions' && !submitted}
                     style={{
-                      textDecoration: "none",
-                      fontSize: "12pt",
-                      color: "black",
-                      fontWeight: "500",
+                      textDecoration: 'none',
+                      fontSize: '12pt',
+                      color: 'black',
+                      fontWeight: '500',
                     }}
                     onClick={() => mergeState({ displayTab: id })}
                   >
@@ -592,14 +591,14 @@ export default function Visualization({ match }) {
                     variant="link"
                     className={
                       id == displayTab && Object.keys(svgList).length
-                        ? "secondary-navlinks px-3 py-1 d-inline-block border-0 active-secondary-navlinks"
-                        : "secondary-navlinks px-3 py-1 d-inline-block border-0"
+                        ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 active-secondary-navlinks'
+                        : 'secondary-navlinks px-3 py-1 d-inline-block border-0'
                     }
                     style={{
-                      textDecoration: "none",
-                      fontSize: "12pt",
-                      color: "black",
-                      fontWeight: "500",
+                      textDecoration: 'none',
+                      fontSize: '12pt',
+                      color: 'black',
+                      fontWeight: '500',
                     }}
                     onClick={() => mergeState({ displayTab: id })}
                   >

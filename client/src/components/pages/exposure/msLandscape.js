@@ -12,7 +12,7 @@ import Description from '../../controls/description/description';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolderMinus, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import Plot from '../../controls/plot/plot';
+import SvgContainer from '../../controls/svgContainer/svgContainer';
 
 const { Label, Group } = Form;
 
@@ -105,7 +105,7 @@ export default function MsLandscape({ calculateLandscape, handleVariable }) {
         {plotPath && (
           <>
             <hr />
-            <Plot
+            <SvgContainer
               className="p-3"
               title="Landscape of Mutational Signature Activity"
               downloadName={plotPath.split('/').slice(-1)[0]}

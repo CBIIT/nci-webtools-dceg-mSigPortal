@@ -3,7 +3,7 @@ import { Row, Col, Button, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import Plot from '../../../controls/plot/plot';
+import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import Debug from '../../../controls/debug/debug';
 import CustomSelect from '../../../controls/select/select-old';
 import Description from '../../../controls/description/description';
@@ -469,7 +469,7 @@ export default function Profile({ submitR }) {
               <span className="font-weight-bold p-3">
                 Plot {parseInt(index) + 1}
               </span>
-              <Plot
+              <SvgContainer
                 className="p-3"
                 title={plotTitle(plots[index])}
                 downloadName={plots[index].plotPath.split('/').slice(-1)[0]}
@@ -571,7 +571,7 @@ export default function Profile({ submitR }) {
         {plots[0].plotURL && (
           <>
             <hr />
-            <Plot
+            <SvgContainer
               className="p-3"
               title={plotTitle(plots[0])}
               downloadName={plots[0].plotPath.split('/').slice(-1)[0]}

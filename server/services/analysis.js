@@ -794,6 +794,31 @@ const getDataUsingS3Select = (params) => {
   });
 };
 
+async function signatureRefSets(req, res, next) {
+  try {
+    const { profile } = req.query;
+    const s3 = new AWS.S3();
+
+    const params = {
+      Bucket: config.data.bucket,
+      Key: path.join(config.data.s3, `Signature/signature_refsets.json.gz`),
+    };
+    const { Body } = await s3.getObject(params).promise();
+    const data = JSON.parse(Body);
+    const signatureSets = [
+      ...new Set(
+        data
+          .filter((e) => e.Profile == profile)
+          .map((e) => e.Signature_set_name)
+      ),
+    ];
+
+    res.json(signatureSets);
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function querySignature(req, res, next) {
   try {
     const { study, cancer, strategy, sample, profile, matrix } = req.query;
@@ -875,6 +900,7 @@ module.exports = {
   getRelativePath,
   downloadWorkspace,
   associationWrapper,
+  signatureRefSets,
   querySignature,
   queryExposure,
 };

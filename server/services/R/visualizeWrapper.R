@@ -133,7 +133,7 @@ profilerSummaryPublic <- function(args, config) {
 
   s3load(paste0(config$s3Data, "Seqmatrix/seqmatrix_refdata_subset_files.RData"), config$bucket)
 
-  plotPath <- paste0(config$savePath, "profilerSummaryPublic.svg")
+  plotPath <- paste0(config$savePath, "profilerSummary.svg")
 
   publicDataFile <- seqmatrix_refdata_subset_files %>%
     filter(Study == args$study, Cancer_Type == args$cancerType, Dataset == args$experimentalStrategy) %>%

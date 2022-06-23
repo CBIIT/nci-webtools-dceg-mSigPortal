@@ -15,7 +15,7 @@ import { actions as modalActions } from '../../../services/store/modal';
 import CustomSelect from '../../controls/select/select-old';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import AssocVarParams from './assocVarParams';
-import Plot from '../../controls/plot/plot';
+import SvgContainer from '../../controls/svgContainer/svgContainer';
 import Table from '../../controls/table/table';
 
 const actions = { ...associationActions, ...modalActions };
@@ -642,7 +642,7 @@ export default function Univariable() {
               </Row>
               <LoadingOverlay active={loadingRecalculate} />
               {plotPath && (
-                <Plot
+                <SvgContainer
                   className="p-3 border rounded"
                   downloadName={plotPath.split('/').slice(-1)[0]}
                   plotPath={`web/results/${plotPath}`}

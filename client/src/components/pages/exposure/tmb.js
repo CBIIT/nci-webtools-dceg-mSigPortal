@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import Description from '../../controls/description/description';
-import Plot from '../../controls/plot/plot';
+import SvgContainer from '../../controls/svgContainer/svgContainer';
 import Debug from '../../controls/debug/debug';
 
 export default function TMB() {
@@ -29,7 +29,7 @@ export default function TMB() {
         {plotPath && (
           <>
             <hr />
-            <Plot
+            <SvgContainer
               className="p-3"
               title="Tumor Mutational Burden"
               downloadName={plotPath.split('/').slice(-1)[0]}

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '../loading-overlay/loading-overlay';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faMinus, faHome } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch } from 'react-redux';
 import { actions } from '../../../services/store/modal';
-import './plot.scss';
+import './styles.scss';
 
-export default function Plot({
+export default function SvgContainer({
   title,
   downloadName,
   plotPath,
