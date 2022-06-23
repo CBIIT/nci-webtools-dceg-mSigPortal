@@ -132,6 +132,59 @@ export default function SBS96(data) {
   console.log("groupByMutation1");
   console.log(groupByMutation1);
 
+  const heatmapY = [];
+  const heatmapZ = [];
+  const heatmapX = [];
+  Object.entries(groupByMutationOuter).forEach(
+    ([key, value], groupIndex, array) => {
+      console.log(key);
+      console.log(value);
+      heatmapY.push(key);
+      heatmapZ.push(Object.entries(value).map(([k, v]) => v.contribution));
+      heatmapX.push(
+        value.map(
+          (e, i) =>
+            array
+              .slice(0, groupIndex)
+              .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
+        )
+      );
+    }
+  );
+
+  console.log("heatmapY");
+  console.log(heatmapY);
+  console.log("heatmapZ");
+  console.log(heatmapZ);
+  console.log("heatmapX");
+  console.log(heatmapX);
+
+  const groupByMutation2 = Object.entries(groupByMutationOuter).map(
+    ([mutation, signatures], groupIndex, array) => ({
+      name: mutation,
+      signatures: signatures,
+      groupIndex: groupIndex,
+      array: array,
+      total: signatures.reduce((a, e) => a + parseInt(e.contribution), 0),
+      z: signatures.map((e) => e.contribution),
+      x: signatures.map(
+        (e, i) =>
+          array
+            .slice(0, groupIndex)
+            .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
+      ),
+      //y: signatures.map((e) => e.contribution),
+      y: mutation,
+      hoverinfo: "x+y",
+      showlegend: false,
+      xaxis: "x",
+      yaxis: "y2",
+    })
+  );
+
+  console.log("groupByMutation2");
+  console.log(groupByMutation2);
+
   const flatSorted = Object.values(groupByTotal).flat();
 
   console.log("FlatSorted--");
@@ -163,7 +216,7 @@ export default function SBS96(data) {
   const tracesHeat = Object.entries(groupByMutation1).map(
     ([mutation, signatures], groupIndex, array) => ({
       name: mutation,
-      type: "bar",
+      type: "heatmap",
       marker: { color: colors[mutation] },
       //   x: signatures.map((e) => e.mutationType),
       //x: signatures.map((e, i) => groupIndex * signatures.length + i),
@@ -185,23 +238,26 @@ export default function SBS96(data) {
   );
   const tracesHeat1 = [
     {
-      z: [
-        [1, null, 30, 50, 1],
-        [20, 1, 60, 80, 30],
-        [30, 60, 1, -10, 20],
-      ],
-      x: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-      y: ["Morning", "Afternoon", "Evening"],
+      //   z: [
+      //     [1, null, 30, 50, 1],
+      //     [20, 1, 60, 80, 30],
+      //     [30, 60, 1, -10, 20],
+      //   ],
+      //   x: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      //   y: ["Morning", "Afternoon", "Evening"],
+      z: heatmapZ,
+      x: heatmapX[0],
+      y: heatmapY,
       type: "heatmap",
       hoverongaps: false,
-      xaxis: "x2",
+      xaxis: "x",
       yaxis: "y2",
     },
   ];
   console.log("tracesHeat:");
   console.log(tracesHeat);
 
-  const traces = [...tracesBar, ...tracesHeat];
+  const traces = [...tracesBar, ...tracesHeat1];
 
   console.log("traces:");
   console.log(traces);
