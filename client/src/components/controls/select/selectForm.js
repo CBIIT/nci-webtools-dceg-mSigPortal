@@ -1,16 +1,17 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
 import ReactSelect, { createFilter } from 'react-select';
+import { Controller } from 'react-hook-form';
 
 export default function Select({
-  className,
-  id,
+  name,
   label,
-  value,
   options,
-  onChange,
   disabled,
+  className,
   labelClass,
+  control,
+  rules,
   ...rest
 }) {
   const selectStyles = {
@@ -38,17 +39,23 @@ export default function Select({
   };
 
   return (
-    <Form.Group controlId={id} className={className}>
+    <Form.Group controlId={name} className={className}>
       {label && <Form.Label className={labelClass}>{label}</Form.Label>}
-      <ReactSelect
-        name={id}
-        inputId={id}
-        options={options}
-        value={value}
-        onChange={onChange}
-        isDisabled={disabled}
-        {...selectStyles}
-        {...rest}
+      <Controller
+        name={name}
+        control={control}
+        rules={rules}
+        render={({ field }) => (
+          <ReactSelect
+            {...selectStyles}
+            {...field}
+            name={name}
+            inputId={name}
+            options={options}
+            isDisabled={disabled}
+            {...rest}
+          />
+        )}
       />
     </Form.Group>
   );

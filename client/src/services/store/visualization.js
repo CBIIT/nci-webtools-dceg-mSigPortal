@@ -3,16 +3,9 @@ import { mergeObject } from './utils';
 
 export const getInitialState = () => ({
   publicForm: {
-    defaultOptions: {
-      study: { label: 'PCAWG', value: 'PCAWG' },
-      cancer: { label: 'Lung-AdenoCA', value: 'Lung-AdenoCA' },
-      strategy: { label: 'WGS', value: 'WGS' },
-    },
     study: null,
     cancer: null,
     strategy: null,
-    loading: false,
-    data: [],
   },
   userForm: {
     inputFormat: 'vcf',

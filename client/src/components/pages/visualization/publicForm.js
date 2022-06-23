@@ -1,152 +1,137 @@
-import React, { useEffect } from 'react';
 import { Form, Button, Row, Col } from 'react-bootstrap';
+import { useForm } from 'react-hook-form';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import Select from '../../controls/select/selectForm';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
-import axios from 'axios';
+import { useGetPublicDataOptionsQuery } from './apiSlice';
 
 const actions = { ...visualizationActions, ...modalActions };
 
 export default function PublicForm() {
-  const dispatch = useDispatch();
   const store = useSelector((state) => state.visualization);
+  const { submitted } = store.main;
 
+  const dispatch = useDispatch();
   const mergeState = (state) =>
     dispatch(actions.mergeVisualization({ publicForm: state }));
-  const mergeError = (msg) =>
-    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
   const resetVisualization = (_) => dispatch(actions.resetVisualization());
 
-  const { study, cancer, strategy, data, loading, defaultOptions } =
-    store.publicForm;
-  const { source, submitted } = store.main;
+  const { data, error, isFetching } = useGetPublicDataOptionsQuery();
 
-  // get options data
-  useEffect(() => {
-    if (!data.length && !loading && source == 'public') getPublicDataOptions();
-  }, [data, source]);
+  const defaultValues = {
+    study: { label: 'PCAWG', value: 'PCAWG' },
+    cancer: { label: 'Lung-AdenoCA', value: 'Lung-AdenoCA' },
+    strategy: { label: 'WGS', value: 'WGS' },
+  };
 
-  // set default options
-  useEffect(() => {
-    if (data.length && study == null) mergeState({ ...defaultOptions });
-  }, [data]);
+  const {
+    control,
+    handleSubmit,
+    reset: resetForm,
+    setValue,
+    watch,
+  } = useForm({ defaultValues });
 
-  const studyOptions = () =>
-    data.length
-      ? [...new Set(data.map((e) => e.Study))].map((e) => ({
-          label: e,
-          value: e,
-        }))
-      : [];
+  const formStudy = watch('study');
+  const formCancer = watch('cancer');
 
-  const cancerOptions = (study) =>
-    study && data.length
-      ? [
-          ...new Set(
-            data.filter((e) => e.Study == study.value).map((e) => e.Cancer_Type)
-          ),
-        ].map((e) => ({ label: e, value: e }))
-      : [];
+  function handleReset() {
+    window.location.hash = '#/visualization';
+    resetForm();
+    resetVisualization();
+  }
 
-  const strategyOptions = (study, cancer) =>
-    study && cancer && data.length
-      ? [
-          ...new Set(
-            data
-              .filter(
-                (e) => e.Study == study.value && e.Cancer_Type == cancer.value
-              )
-              .map((e) => e.Dataset)
-          ),
-        ].map((e) => ({ label: e, value: e }))
-      : [];
-
-  async function handleSubmit() {
+  async function onSubmit(data) {
+    mergeState(data);
     dispatch(actions.mergeVisualization({ main: { submitted: true } }));
   }
 
-  function handleReset() {
-    const cacheData = { data: [...data], ...defaultOptions };
-    window.location.hash = '#/visualization';
-    resetVisualization();
-    mergeState(cacheData);
-  }
+  const studyOptions = data
+    ? Object.keys(data).map((e) => ({ label: e, value: e }))
+    : [];
 
-  async function getPublicDataOptions() {
-    mergeState({ loading: true });
-    try {
-      const { data } = await axios.post('web/getFileS3', {
-        path: `Others/json/Visualization-Public.json`,
-      });
-
-      mergeState({ data: data });
-    } catch (err) {
-      mergeError(err.message);
+  const cancerOptions = (study) => {
+    if (data && study.value) {
+      const options = Object.keys(data[study.value]).map((e) => ({
+        label: e,
+        value: e,
+      }));
+      return options;
+    } else {
+      return [];
     }
-    mergeState({ loading: false });
-  }
+  };
+
+  const strategyOptions = (study, cancer) => {
+    if (data && study.value && cancer.value) {
+      const strategies = data[study.value][cancer.value];
+      if (strategies) {
+        const options = Object.values(strategies).map((e) => ({
+          label: e,
+          value: e,
+        }));
+        return options;
+      } else {
+        return [];
+      }
+    } else {
+      return [];
+    }
+  };
 
   function handleStudyChange(study) {
     const cancers = cancerOptions(study);
     const strategies = strategyOptions(study, cancers[0]);
 
-    mergeState({
-      study: study,
-      cancer: cancers[0],
-      strategy: strategies[0],
-    });
+    setValue('study', study);
+    setValue('cancer', cancers[0]);
+    setValue('strategy', strategies[0]);
   }
 
   function handleCancerChange(cancer) {
-    const strategies = strategyOptions(study, cancer);
+    const strategies = strategyOptions(formStudy, cancer);
 
-    mergeState({
-      cancer: cancer,
-      strategy: strategies[0],
-    });
-  }
-
-  function handleStrategyChange(strategy) {
-    mergeState({ strategy });
+    setValue('cancer', cancer);
+    setValue('strategy', strategies[0]);
   }
 
   return (
-    <Form>
-      <LoadingOverlay active={loading} />
+    <Form onSubmit={handleSubmit(onSubmit)}>
+      <LoadingOverlay active={isFetching} />
+      {error && <p>There was an error retrieving public data options</p>}
       <Select
         className="mb-2"
-        id="publicStudy"
+        name="study"
         label="Study"
         disabled={submitted}
-        value={study}
-        options={studyOptions()}
+        options={studyOptions}
+        control={control}
         onChange={handleStudyChange}
       />
       <Select
         className="mb-2"
-        id="publicCancer"
+        name="cancer"
         label="Cancer Type or Group"
         disabled={submitted}
-        value={cancer}
-        options={cancerOptions(study)}
+        options={cancerOptions(formStudy)}
+        control={control}
         onChange={handleCancerChange}
       />
       <Select
         className="mb-4"
-        id="publicStrategy"
+        name="strategy"
         label="Experimental Strategy"
         disabled={submitted}
-        value={strategy}
-        options={strategyOptions(study, cancer)}
-        onChange={handleStrategyChange}
+        options={strategyOptions(formStudy, formCancer)}
+        control={control}
       />
 
       <Row>
         <Col>
           <Button
-            disabled={loading.active || loading}
+            disabled={isFetching}
             className="w-100"
             variant="secondary"
             onClick={() => handleReset()}
@@ -156,11 +141,10 @@ export default function PublicForm() {
         </Col>
         <Col>
           <Button
-            disabled={loading.active || loading || submitted}
+            disabled={isFetching || submitted}
             className="w-100"
             variant="primary"
-            type="button"
-            onClick={() => handleSubmit()}
+            type="submit"
           >
             Submit
           </Button>
