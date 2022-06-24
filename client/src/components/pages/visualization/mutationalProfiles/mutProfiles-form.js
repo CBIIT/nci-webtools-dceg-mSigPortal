@@ -41,7 +41,7 @@ export default function TreeLeafForm() {
           ...new Set(
             svgList
               .filter((e) => e.Sample_Name || e.Sample == sample.value)
-              .map((e) => e.Profile.match(/[a-z]+/gi)[0])
+              .map((e) => e.profileType)
               .sort((a, b) => a - b)
           ),
         ].map((e) => ({ label: e, value: e }))
@@ -57,7 +57,7 @@ export default function TreeLeafForm() {
                   (e.Sample_Name || e.Sample) &&
                   e.Profile.indexOf(profile.value) > -1
               )
-              .map((e) => e.Profile.match(/\d+/gi)[0])
+              .map((e) => e.matrixSize)
               .sort((a, b) => a - b)
           ),
         ].map((e) => ({ label: e, value: e }))

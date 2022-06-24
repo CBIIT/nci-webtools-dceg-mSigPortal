@@ -157,16 +157,14 @@ export default function MutationalProfiles() {
           row.Sample == name && row.Path != 'msigportal/Database/Seqmatrix/NA'
       );
       const profileOptions = [
-        ...new Set(
-          filteredPlots.map((row) => row.Profile.match(/[a-z]+/gi)[0])
-        ),
+        ...new Set(filteredPlots.map((row) => row.profileType)),
       ];
       const profile = defaultProfile(profileOptions);
       const matrixOptions = [
         ...new Set(
           filteredPlots
             .filter((row) => row.Profile.includes(profile))
-            .map((row) => row.Profile.match(/\d+/gi)[0])
+            .map((row) => row.matrixSize)
         ),
       ].sort((a, b) => a - b);
 
@@ -216,7 +214,7 @@ export default function MutationalProfiles() {
           row.Path != 'msigportal/Database/Seqmatrix/NA'
       );
       const matrixOptions = [
-        ...new Set(filteredPlots.map((row) => row.Profile.match(/\d+/gi)[0])),
+        ...new Set(filteredPlots.map((row) => row.matrixSize)),
       ].sort((a, b) => a - b);
 
       mergeMutationalProfiles({

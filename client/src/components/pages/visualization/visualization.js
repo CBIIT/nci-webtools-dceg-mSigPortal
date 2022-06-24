@@ -7,7 +7,7 @@ import {
   MainPanel,
 } from '../../controls/sidebar-container/sidebar-container';
 import UserForm from './userForm';
-import PublicForm from './publicForm';
+import PublicForm from './publicForm/publicForm';
 import Instructions from '../visualization/instructions';
 import ProfilerSummary from './profilerSummary/profilerSummary';
 import MutationalProfiles from './mutationalProfiles';
@@ -129,8 +129,15 @@ export default function Visualization({ match }) {
         if (output.error) throw output.error;
         if (output.uncaughtError) throw output.uncaughtError;
 
+        // transform svgList
+        const svgList = output.map((e) => ({
+          ...e,
+          profileType: e.Profile.match(/[a-z]+/gi)[0],
+          matrixSize: e.Profile.match(/\d+/gi)[0],
+        }));
+
         mergeState({
-          svgList: output,
+          svgList,
           projectID: projectID,
         });
       } else if (response.status == 504) {
@@ -331,9 +338,7 @@ export default function Visualization({ match }) {
     // Mutational Profiles
     const nameOptions = [...new Set(svgList.map((row) => row.Sample))];
     const selectName = mutationalProfiles.selectName || nameOptions[0];
-    const profileOptions = [
-      ...new Set(svgList.map((row) => row.Profile.match(/[a-z]+/gi)[0])),
-    ];
+    const profileOptions = [...new Set(svgList.map((row) => row.profileType))];
     const profile = defaultProfile(profileOptions);
 
     const filteredMatrixOptions = [
@@ -343,7 +348,7 @@ export default function Visualization({ match }) {
             (row) =>
               row.Sample == selectName && row.Profile.indexOf(profile) > -1
           )
-          .map(({ Profile }) => Profile.match(/\d+/gi)[0])
+          .map((e) => e.matrixSize)
       ),
     ].sort((a, b) => a - b);
 

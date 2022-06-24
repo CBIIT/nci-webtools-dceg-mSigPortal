@@ -177,7 +177,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
         ...new Set(
           svgList
             .filter((row) => row.Profile.includes(profileType))
-            .map((row) => row.Profile.match(/\d+/gi)[0])
+            .map((row) => row.matrixSize)
         ),
       ].sort((a, b) => a - b);
 
