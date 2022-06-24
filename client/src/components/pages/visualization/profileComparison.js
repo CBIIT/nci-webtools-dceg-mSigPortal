@@ -343,8 +343,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     const matrixOptions = [
       ...new Set(
         svgList
-          .filter((row) => row.Profile_Type == profile)
-          .map(({ Matrix_Size }) => Matrix_Size)
+          .filter((row) => row.profileType == profile)
+          .map(({ matrixSize }) => matrixSize)
       ),
     ].sort((a, b) => a - b);
 
@@ -425,8 +425,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                         sampleName2: withinSampleName2,
                         matrixFile: matrixList.filter(
                           (row) =>
-                            row.Profile_Type == withinProfileType &&
-                            row.Matrix_Size ==
+                            row.profileType == withinProfileType &&
+                            row.matrixSize ==
                               defaultMatrix(withinProfileType, [
                                 '96',
                                 '78',
@@ -610,8 +610,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                           compare: refCompare,
                           matrixFile: matrixList.filter(
                             (row) =>
-                              row.Profile_Type == withinProfileType &&
-                              row.Matrix_Size ==
+                              row.profileType == withinProfileType &&
+                              row.matrixSize ==
                                 defaultMatrix(withinProfileType, [
                                   '96',
                                   '78',
@@ -775,8 +775,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                       profileName: userProfileType + userMatrixSize,
                       matrixFile: matrixList.filter(
                         (row) =>
-                          row.Profile_Type == userProfileType &&
-                          row.Matrix_Size == userMatrixSize
+                          row.profileType == userProfileType &&
+                          row.matrixSize == userMatrixSize
                       )[0].Path,
                       userSample: userSampleName,
                       study: pubStudy,

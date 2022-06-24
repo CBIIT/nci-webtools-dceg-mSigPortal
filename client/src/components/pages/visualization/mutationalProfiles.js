@@ -72,7 +72,7 @@ export default function MutationalProfiles() {
     if (filtered.length) {
       const plot = filtered[0];
       if (source == 'user')
-        return `${plot.Sample_Name}-${plot.Profile_Type}-${plot.Matrix_Size}-${plot.Filter}.svg`;
+        return `${plot.Sample_Name}-${plot.profileType}-${plot.matrixSize}-${plot.Filter}.svg`;
       else return plot.Sample.split('/').slice(-1)[0];
     } else return '';
   }
@@ -120,14 +120,14 @@ export default function MutationalProfiles() {
     if (source == 'user') {
       const filteredPlots = svgList.filter((row) => row.Sample_Name == name);
       const profileOptions = [
-        ...new Set(filteredPlots.map(({ Profile_Type }) => Profile_Type)),
+        ...new Set(filteredPlots.map(({ profileType }) => profileType)),
       ];
       const profile = defaultProfile(profileOptions);
       const matrixOptions = [
         ...new Set(
           filteredPlots
-            .filter((row) => row.Profile_Type == profile)
-            .map((row) => row.Matrix_Size)
+            .filter((row) => row.profileType == profile)
+            .map((row) => row.matrixSize)
         ),
       ].sort((a, b) => a - b);
       const matrix = defaultMatrix(profile, matrixOptions);
@@ -135,7 +135,7 @@ export default function MutationalProfiles() {
         ...new Set(
           filteredPlots
             .filter(
-              (row) => row.Matrix_Size == matrix && row.Profile_Type == profile
+              (row) => row.matrixSize == matrix && row.profileType == profile
             )
             .map((row) => row.Filter)
         ),
@@ -184,16 +184,16 @@ export default function MutationalProfiles() {
   function handleProfile(profile) {
     if (source == 'user') {
       const filteredPlots = svgList.filter(
-        (row) => row.Sample_Name == selectName && row.Profile_Type == profile
+        (row) => row.Sample_Name == selectName && row.profileType == profile
       );
       const matrixOptions = [
-        ...new Set(filteredPlots.map((row) => row.Matrix_Size)),
+        ...new Set(filteredPlots.map((row) => row.matrixSize)),
       ].sort((a, b) => a - b);
       const matrix = defaultMatrix(profile, matrixOptions);
       const filterOptions = [
         ...new Set(
           filteredPlots
-            .filter((row) => row.Matrix_Size == matrix)
+            .filter((row) => row.matrixSize == matrix)
             .map((row) => row.Filter)
         ),
       ];
@@ -231,8 +231,8 @@ export default function MutationalProfiles() {
       const filteredPlots = svgList.filter(
         (row) =>
           row.Sample_Name == selectName &&
-          row.Profile_Type == selectProfile &&
-          row.Matrix_Size == matrix
+          row.profileType == selectProfile &&
+          row.matrixSize == matrix
       );
       const filterOptions = [
         ...new Set(filteredPlots.map((row) => row.Filter)),
@@ -263,8 +263,8 @@ export default function MutationalProfiles() {
     const filteredPlots = svgList.filter(
       (row) =>
         row.Sample_Name == selectName &&
-        row.Profile_Type == selectProfile &&
-        row.Matrix_Size == selectMatrix &&
+        row.profileType == selectProfile &&
+        row.matrixSize == selectMatrix &&
         row.Filter == tag
     );
 

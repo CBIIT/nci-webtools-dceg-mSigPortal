@@ -189,8 +189,8 @@ export default function PCA({ submitR, getRefSigOptions }) {
     const userMatrixOptions = [
       ...new Set(
         svgList
-          .filter((plot) => plot.Profile_Type == profileType)
-          .map((plot) => plot.Matrix_Size)
+          .filter((plot) => plot.profileType == profileType)
+          .map((plot) => plot.matrixSize)
       ),
     ].sort((a, b) => a - b);
 
@@ -272,8 +272,8 @@ export default function PCA({ submitR, getRefSigOptions }) {
                         signatureSet: signatureSet,
                         matrixFile: matrixList.filter(
                           (row) =>
-                            row.Profile_Type == profileType &&
-                            row.Matrix_Size ==
+                            row.profileType == profileType &&
+                            row.matrixSize ==
                               defaultMatrix(profileType, ['96', '78', '83'])
                         )[0].Path,
                       });
@@ -443,8 +443,8 @@ export default function PCA({ submitR, getRefSigOptions }) {
                     calculateR('pub', 'pcaWithPublic', {
                       matrixFile: matrixList.filter(
                         (row) =>
-                          row.Profile_Type == userProfileType &&
-                          row.Matrix_Size == userMatrixSize
+                          row.profileType == userProfileType &&
+                          row.matrixSize == userMatrixSize
                       )[0].Path,
                       study: pubStudy,
                       cancerType: pubCancerType,

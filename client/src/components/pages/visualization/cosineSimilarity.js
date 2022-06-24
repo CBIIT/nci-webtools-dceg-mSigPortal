@@ -158,43 +158,27 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
   }
 
   function handleWithinProfileType(profileType) {
-    if (source == 'user') {
-      const withinMatrixOptions = [
-        ...new Set(
-          matrixList
-            .filter((row) => row.Profile_Type == profileType)
-            .map((row) => row.Matrix_Size)
-        ),
-      ].sort((a, b) => a - b);
+    const withinMatrixOptions = [
+      ...new Set(
+        svgList
+          .filter((e) => e.profileType == profileType)
+          .map((e) => e.matrixSize)
+      ),
+    ].sort((a, b) => a - b);
 
-      mergeCosineSimilarity({
-        withinProfileType: profileType,
-        withinMatrixSize: defaultMatrix(profileType, withinMatrixOptions),
-        withinMatrixOptions: withinMatrixOptions,
-      });
-    } else {
-      const withinMatrixOptions = [
-        ...new Set(
-          svgList
-            .filter((row) => row.Profile.includes(profileType))
-            .map((row) => row.matrixSize)
-        ),
-      ].sort((a, b) => a - b);
-
-      mergeCosineSimilarity({
-        withinProfileType: profileType,
-        withinMatrixSize: defaultMatrix(profileType, withinMatrixOptions),
-        withinMatrixOptions: withinMatrixOptions,
-      });
-    }
+    mergeCosineSimilarity({
+      withinProfileType: profileType,
+      withinMatrixSize: defaultMatrix(profileType, withinMatrixOptions),
+      withinMatrixOptions: withinMatrixOptions,
+    });
   }
 
   function handlePublicProfileType(profileType) {
     const userMatrixOptions = [
       ...new Set(
         matrixList
-          .filter((row) => row.Profile_Type == profileType)
-          .map((row) => row.Matrix_Size)
+          .filter((e) => e.profileType == profileType)
+          .map((e) => e.matrixSize)
       ),
     ].sort((a, b) => a - b);
 
@@ -268,9 +252,9 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                     if (source == 'user') {
                       calculateR('within', 'cosineSimilarityWithin', {
                         matrixFile: matrixList.filter(
-                          (row) =>
-                            row.Profile_Type == withinProfileType &&
-                            row.Matrix_Size == withinMatrixSize
+                          (e) =>
+                            e.profileType == withinProfileType &&
+                            e.matrixSize == withinMatrixSize
                         )[0].Path,
                       });
                     } else {
@@ -370,8 +354,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                         signatureSet: refSignatureSet,
                         matrixFile: matrixList.filter(
                           (row) =>
-                            row.Profile_Type == refProfileType &&
-                            row.Matrix_Size ==
+                            row.profileType == refProfileType &&
+                            row.matrixSize ==
                               defaultMatrix(refProfileType, ['96', '78', '83'])
                         )[0].Path,
                       });
@@ -482,8 +466,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                     calculateR('pub', 'cosineSimilarityPublic', {
                       matrixFile: matrixList.filter(
                         (row) =>
-                          row.Profile_Type == userProfileType &&
-                          row.Matrix_Size == userMatrixSize
+                          row.profileType == userProfileType &&
+                          row.matrixSize == userMatrixSize
                       )[0].Path,
                       study: pubStudy,
                       cancerType: pubCancerType,

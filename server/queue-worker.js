@@ -153,11 +153,20 @@ async function processMessage(params) {
 
     let matrixList = await parseCSV(matrixPath);
     let svgList = await parseCSV(svgPath);
-    svgList.forEach(
-      (plot) => (plot.Path = getRelativePath({ Path: plot.Path }, id).Path)
-    );
-    matrixList.forEach(
-      (plot) => (plot.Path = getRelativePath({ Path: plot.Path }, id).Path)
+
+    svgList = svgList.map(({ Profile_Type, Matrix_Size, Path, ...e }) => ({
+      ...e,
+      profileType: Profile_Type,
+      matrixSize: Matrix_Size,
+      Path: getRelativePath({ Path: Path }, id).Path,
+    }));
+    matrixList = matrixList.map(
+      ({ Profile_Type, Matrix_Size, Path, ...e }) => ({
+        ...e,
+        profileType: Profile_Type,
+        matrixSize: Matrix_Size,
+        Path: getRelativePath({ Path: Path }, id).Path,
+      })
     );
 
     let newState = {
@@ -180,15 +189,15 @@ async function processMessage(params) {
     );
 
     const filteredProfileOptions = [
-      ...new Set(filteredPlots.map(({ Profile_Type }) => Profile_Type)),
+      ...new Set(filteredPlots.map(({ profileType }) => profileType)),
     ];
     const profile = defaultProfile(filteredProfileOptions);
 
     const filteredMatrixOptions = [
       ...new Set(
         filteredPlots
-          .filter((row) => row.Profile_Type == profile)
-          .map(({ Matrix_Size }) => Matrix_Size)
+          .filter((row) => row.profileType == profile)
+          .map(({ matrixSize }) => matrixSize)
       ),
     ].sort((a, b) => a - b);
 
@@ -197,7 +206,7 @@ async function processMessage(params) {
     const filteredFilterOptions = [
       ...new Set(
         filteredPlots
-          .filter((row) => row.Matrix_Size == matrix)
+          .filter((row) => row.matrixSize == matrix)
           .map(({ Filter }) => Filter)
       ),
     ];
@@ -205,8 +214,8 @@ async function processMessage(params) {
     const filteredMatrixList = [
       ...new Set(
         matrixList
-          .filter((row) => row.Profile_Type == profile)
-          .map(({ Matrix_Size }) => Matrix_Size)
+          .filter((row) => row.profileType == profile)
+          .map(({ matrixSize }) => matrixSize)
       ),
     ];
 
@@ -224,7 +233,7 @@ async function processMessage(params) {
         })
       ),
     ];
-    const profileOptions = [...new Set(svgList.map((row) => row.Profile_Type))];
+    const profileOptions = [...new Set(svgList.map((row) => row.profileType))];
 
     const selectProfile = defaultProfile(profileOptions);
     const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);
@@ -333,8 +342,8 @@ async function processMessage(params) {
         args: {
           matrixFile: matrixList.filter(
             (row) =>
-              row.Profile_Type == selectProfile &&
-              row.Matrix_Size == selectMatrix
+              row.profileType == selectProfile &&
+              row.matrixSize == selectMatrix
           )[0].Path,
         },
         config: {
@@ -374,8 +383,8 @@ async function processMessage(params) {
           signatureSet: refSignatureSetOptions[0],
           matrixFile: matrixList.filter(
             (row) =>
-              row.Profile_Type == selectProfile &&
-              row.Matrix_Size ==
+              row.profileType == selectProfile &&
+              row.matrixSize ==
                 defaultMatrix(selectProfile, ['96', '78', '83'])
           )[0].Path,
         },
@@ -415,8 +424,8 @@ async function processMessage(params) {
         args: {
           matrixFile: matrixList.filter(
             (row) =>
-              row.Profile_Type == selectProfile &&
-              row.Matrix_Size == selectMatrix
+              row.profileType == selectProfile &&
+              row.matrixSize == selectMatrix
           )[0].Path,
           study: 'PCAWG',
           cancerType: 'Lung-AdenoCA',
@@ -460,7 +469,7 @@ async function processMessage(params) {
           fn: 'mutationalPattern',
           args: {
             matrixFile: matrixList.filter(
-              (row) => row.Profile_Type == 'SBS' && row.Matrix_Size == '96'
+              (row) => row.profileType == 'SBS' && row.matrixSize == '96'
             )[0].Path,
             proportion: parseFloat(0.8),
             pattern: 'NCG>NTG',
@@ -507,8 +516,8 @@ async function processMessage(params) {
             sampleName2: sampleNameOptions[1],
             matrixFile: matrixList.filter(
               (row) =>
-                row.Profile_Type == selectProfile &&
-                row.Matrix_Size ==
+                row.profileType == selectProfile &&
+                row.matrixSize ==
                   defaultMatrix(selectProfile, ['96', '78', '83'])
             )[0].Path,
           },
@@ -568,8 +577,8 @@ async function processMessage(params) {
             compare: refCompare[0],
             matrixFile: matrixList.filter(
               (row) =>
-                row.Profile_Type == selectProfile &&
-                row.Matrix_Size ==
+                row.profileType == selectProfile &&
+                row.matrixSize ==
                   defaultMatrix(selectProfile, ['96', '78', '83'])
             )[0].Path,
           },
@@ -615,8 +624,8 @@ async function processMessage(params) {
             profileName: selectProfile + selectMatrix,
             matrixFile: matrixList.filter(
               (row) =>
-                row.Profile_Type == selectProfile &&
-                row.Matrix_Size == selectMatrix
+                row.profileType == selectProfile &&
+                row.matrixSize == selectMatrix
             )[0].Path,
             userSample: sampleNameOptions[0],
             study: 'PCAWG',
@@ -661,8 +670,8 @@ async function processMessage(params) {
           signatureSet: refSignatureSetOptions[0],
           matrixFile: matrixList.filter(
             (row) =>
-              row.Profile_Type == selectProfile &&
-              row.Matrix_Size ==
+              row.profileType == selectProfile &&
+              row.matrixSize ==
                 defaultMatrix(selectProfile, ['96', '78', '83'])
           )[0].Path,
         },
@@ -704,8 +713,8 @@ async function processMessage(params) {
           args: {
             matrixFile: matrixList.filter(
               (row) =>
-                row.Profile_Type == selectProfile &&
-                row.Matrix_Size == selectMatrix
+                row.profileType == selectProfile &&
+                row.matrixSize == selectMatrix
             )[0].Path,
             study: 'PCAWG',
             cancerType: 'Lung-AdenoCA',
