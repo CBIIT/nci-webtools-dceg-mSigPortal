@@ -6,7 +6,7 @@ import {
   SidebarPanel,
   MainPanel,
 } from '../../controls/sidebar-container/sidebar-container';
-import UserForm from './userForm';
+import UserForm from './userForm/userForm';
 import PublicForm from './publicForm/publicForm';
 import Instructions from '../visualization/instructions';
 import ProfilerSummary from './profilerSummary/profilerSummary';
@@ -207,7 +207,7 @@ export default function Visualization({ match }) {
 
     const filteredProfileOptions = [
       ...new Set(
-        filteredPlots.map((row) => row.Profile_Type).sort((a, b) => a - b)
+        filteredPlots.map((row) => row.profileType).sort((a, b) => a - b)
       ),
     ];
 
@@ -216,8 +216,8 @@ export default function Visualization({ match }) {
     const filteredMatrixOptions = [
       ...new Set(
         filteredPlots
-          .filter((row) => row.Profile_Type == profile)
-          .map((row) => row.Matrix_Size)
+          .filter((row) => row.profileType == profile)
+          .map((row) => row.matrixSize)
       ),
     ].sort((a, b) => a - b);
 
@@ -227,7 +227,7 @@ export default function Visualization({ match }) {
       ...new Set(
         filteredPlots
           .filter(
-            (row) => row.Profile_Type == profile && row.Matrix_Size == matrix
+            (row) => row.profileType == profile && row.matrixSize == matrix
           )
           .map((row) => row.Filter)
           .sort((a, b) => a - b)
@@ -239,8 +239,8 @@ export default function Visualization({ match }) {
     const filteredMatrixList = [
       ...new Set(
         matrixList
-          .filter((row) => row.Profile_Type == profile)
-          .map((row) => row.Matrix_Size)
+          .filter((row) => row.profileType == profile)
+          .map((row) => row.matrixSize)
           .sort((a, b) => a - b)
       ),
     ];
@@ -266,7 +266,7 @@ export default function Visualization({ match }) {
         })
       ),
     ];
-    const profileOptions = [...new Set(svgList.map((row) => row.Profile_Type))];
+    const profileOptions = [...new Set(svgList.map((row) => row.profileType))];
 
     const selectProfile = defaultProfile(profileOptions);
     const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);

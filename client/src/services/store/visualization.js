@@ -3,18 +3,20 @@ import { mergeObject } from './utils';
 
 export const getInitialState = () => ({
   publicForm: {
-    study: null,
-    cancer: null,
-    strategy: null,
+    study: '',
+    cancer: '',
+    strategy: '',
   },
   userForm: {
-    inputFormat: 'vcf',
-    selectedGenome: 'GRCh37',
-    experimentalStrategy: 'WGS',
-    mutationSplit: 'False',
-    collapseSample: 'False',
-    mutationFilter: '',
-    queueMode: false,
+    inputFilename: '',
+    bedFilename: '',
+    inputFormat: '',
+    genome: '',
+    strategy: '',
+    mutationSplit: '',
+    collapse: false,
+    filter: '',
+    useQueue: false,
     email: '',
   },
   main: {
@@ -38,8 +40,6 @@ export const getInitialState = () => ({
     openSidebar: true,
     storeFilename: '',
     bedFilename: '',
-    exampleData: 'assets/exampleInput/demo_input_multi.vcf.gz',
-    bedData: 'assets/exampleInput/demo_input_bed.bed',
     loadingPublic: false,
     loading: {
       active: false,
