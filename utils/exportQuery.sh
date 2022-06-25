@@ -72,6 +72,8 @@ Rscript exportPartitionedTables.R Association/TCGA_WES_Transitional-cell-carcino
 Rscript exportPartitionedTables.R Association/TCGA_WES_UCS_vardata.RData vardata_refdata Sample Association/TCGA/WES/UCS
 Rscript exportPartitionedTables.R Association/TCGA_WES_Uterus-AdenoCa_vardata.RData vardata_refdata Sample Association/TCGA/WES/Uterus-AdenoCa
 
+Rscript exportPartitionedTables.R Exposure/exposure_refdata.RData exposure_refdata Study,Dataset,Cancer_Type,Signature_set_name Exposure
+
 Rscript exportPartitionedTables.R Seqmatrix/Breast560_WGS_seqmatrix_refdata.RData seqmatrix_refdata Study,Cancer_Type,Sample,Dataset,Profile Seqmatrix
 Rscript exportPartitionedTables.R Seqmatrix/ChernobylThyroid_WGS_seqmatrix_refdata.RData seqmatrix_refdata Study,Cancer_Type,Sample,Dataset,Profile Seqmatrix
 Rscript exportPartitionedTables.R Seqmatrix/LCM-Normal-Tissues_WGS_seqmatrix_refdata.RData seqmatrix_refdata Study,Cancer_Type,Sample,Dataset,Profile Seqmatrix
