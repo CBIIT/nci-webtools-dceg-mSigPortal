@@ -1,5 +1,8 @@
 # mSigPortal Database
 
+Notes:
+1. Sequencing Strategy/Dataset are used interchangably (eg: WES, WGS, etc)
+
 ## Association
 
 ### Files
@@ -29,6 +32,36 @@
 
 #### Partitioned JSON Paths
 - /Database/Association/*Study*/*Strategy*/*Cancer\_Type*/*Sample*/data.json
+
+
+## Exposure
+
+### Files
+- exposure_refdata.RData
+- *Study*\_*Dataset*\_exposure_refdata.RData (partition of exposure_refdata.RData on Study, Dataset column)
+
+### Columns
+1. Study
+2. Dataset
+3. Cancer_Type
+4. Organ
+5. Sample
+6. Signature_set_name
+7. Signature_name
+8. Exposure
+
+### Sample Rows
+|Study     |Dataset |Cancer_Type |Organ  |Sample   |Signature_set_name                            |Signature_name         | Exposure|
+|:---------|:-------|:-----------|:------|:--------|:---------------------------------------------|:----------------------|--------:|
+|Breast560 |WGS     |Breast      |Breast |PD10010a |Organ-specific_Cancer_Signatures_GRCh37_SBS96 |Breast_A (Breast_MMR1) |   0.0000|
+|Breast560 |WGS     |Breast      |Breast |PD10010a |Organ-specific_Cancer_Signatures_GRCh37_SBS96 |Breast_B (Breast_2)    |   0.0000|
+|Breast560 |WGS     |Breast      |Breast |PD10010a |Organ-specific_Cancer_Signatures_GRCh37_SBS96 |Breast_C (Breast_13)   |   0.0000|
+|Breast560 |WGS     |Breast      |Breast |PD10010a |Organ-specific_Cancer_Signatures_GRCh37_SBS96 |Breast_D (Breast_MMR2) |   0.0000|
+|Breast560 |WGS     |Breast      |Breast |PD10010a |Organ-specific_Cancer_Signatures_GRCh37_SBS96 |Breast_E (Breast_8)    |   0.0000|
+|Breast560 |WGS     |Breast      |Breast |PD10010a |Organ-specific_Cancer_Signatures_GRCh37_SBS96 |Breast_F (Breast_18)   | 299.5687|
+
+#### Partitioned JSON Paths
+- /Database/Exposure/*Study*/*Dataset*/*Cancer\_Type*/*Signature_set_name*/data.json
 
 
 ## Seqmatrix
