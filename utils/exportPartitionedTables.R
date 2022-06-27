@@ -1,18 +1,18 @@
 library(dplyr, warn.conflicts = FALSE)
+library(vroom)
 library(jsonlite)
 
 args <- commandArgs(trailingOnly = TRUE)
 
 if (length(args) == 0) {
-  stop("Usage: Rscript exportPartitionedTables.R inputFile inputDataKey group1,group2,group3 outputFolder/")
+  stop("Usage: Rscript exportPartitionedTables.R inputFile group1,group2,group3 outputFolder")
 }
 
 inputFile <- args[1]
-inputDataKey <- args[2]
-groups <- unlist(strsplit(args[3], ','))
-outputFolder <- args[4]
+groups <- unlist(strsplit(args[2], ','))
+outputFolder <- args[3]
 
-load(inputFile)
+inputData <- vroom(inputFile)
 
 dir.create(outputFolder, recursive = T, showWarnings = F)
 setwd(outputFolder)
@@ -30,7 +30,4 @@ writeJsonGroups <- function(datatable, groups) {
     group_walk(writeJsonGroup, .keep=T)
 }
 
-writeJsonGroups(
-  get(inputDataKey), 
-  groups
-)
+writeJsonGroups(inputData, groups)
