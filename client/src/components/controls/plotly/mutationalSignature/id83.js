@@ -1,4 +1,4 @@
-export default function ID83(data) {
+export default function ID83(data, sample) {
   //console.log("data");
   //console.log(data);
   const colors = {
@@ -295,7 +295,7 @@ export default function ID83(data) {
     y: 0.9,
     text:
       "<b>" +
-      data[0].Sample +
+      sample.value +
       ": " +
       numberWithCommas(totalMutations) +
       " indels</b>",

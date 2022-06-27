@@ -1,17 +1,17 @@
-import { useEffect, useState } from 'react';
-import cloneDeep from 'lodash/cloneDeep';
-import { Button, Row, Col } from 'react-bootstrap';
-import Plot from 'react-plotly.js';
-import { downloadImage } from 'plotly.js';
-import { saveAs } from 'file-saver';
-import { useSelector } from 'react-redux';
-import { useSignatureQuery } from '../../../../services/apiSlice';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import SBS96 from '../../../controls/plotly/mutationalSignature/sbs96';
-import SBS192 from '../../../controls/plotly/mutationalSignature/sbs192';
-import SBS1536 from '../../../controls/plotly/mutationalSignature/sbs1536';
-import DBS78 from '../../../controls/plotly/mutationalSignature/dbs78';
-import ID83 from '../../../controls/plotly/mutationalSignature/id83';
+import { useEffect, useState } from "react";
+import cloneDeep from "lodash/cloneDeep";
+import { Button, Row, Col } from "react-bootstrap";
+import Plot from "react-plotly.js";
+import { downloadImage } from "plotly.js";
+import { saveAs } from "file-saver";
+import { useSelector } from "react-redux";
+import { useSignatureQuery } from "../../../../services/apiSlice";
+import { LoadingOverlay } from "../../../controls/loading-overlay/loading-overlay";
+import SBS96 from "../../../controls/plotly/mutationalSignature/sbs96";
+import SBS192 from "../../../controls/plotly/mutationalSignature/sbs192";
+import SBS1536 from "../../../controls/plotly/mutationalSignature/sbs1536";
+import DBS78 from "../../../controls/plotly/mutationalSignature/dbs78";
+import ID83 from "../../../controls/plotly/mutationalSignature/id83";
 
 export default function MutProfilePlot() {
   const store = useSelector((state) => state.visualization);
@@ -47,23 +47,24 @@ export default function MutProfilePlot() {
 
   // generate plot
   useEffect(() => {
-    if (data.length) generatePlot(data);
-  }, [data]);
+    if (data.length) generatePlot(data, sample);
+  }, [data, sample]);
 
-  function generatePlot(data) {
+  console.log(sample);
+  function generatePlot(data, sample) {
     const profileMatrix = profile.value + matrix.value;
 
     const { traces, layout } =
       profileMatrix == "SBS96"
-        ? SBS96(data)
+        ? SBS96(data, sample)
         : profileMatrix == "SBS192"
-        ? SBS192(data)
+        ? SBS192(data, sample)
         : profileMatrix == "SBS1536"
-        ? SBS1536(data)
+        ? SBS1536(data, sample)
         : profileMatrix == "DBS78"
-        ? DBS78(data)
+        ? DBS78(data, sample)
         : profileMatrix == "ID83"
-        ? ID83(data)
+        ? ID83(data, sample)
         : { traces: [], layout: {} };
 
     setPlot({ data: [...traces], layout });

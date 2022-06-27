@@ -1,4 +1,4 @@
-export default function SBS96(data) {
+export default function SBS96(data, sample) {
   const colors = {
     "C>A": "#03BCEE",
     "C>G": "black",
@@ -108,7 +108,7 @@ export default function SBS96(data) {
     y: 0.9,
     text:
       "<b>" +
-      data[0].Sample +
+      sample.value +
       ": " +
       numberWithCommas(totalMutations) +
       " subs </b>",

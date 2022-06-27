@@ -1,4 +1,4 @@
-export default function SBS192(data) {
+export default function SBS192(data, sample) {
   const colors = {
     "C>A": "#03BCEE",
     "C>G": "black",
@@ -162,7 +162,7 @@ export default function SBS192(data) {
     y: 0.9,
     text:
       "<b>" +
-      data[0].Sample +
+      sample.value +
       ": " +
       numberWithCommas(totalMutations) +
       " transcribed subs</b>",

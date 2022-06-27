@@ -1,4 +1,4 @@
-export default function DBS78(data) {
+export default function DBS78(data, sample) {
   const colors = {
     "AC>": "#09BCED",
     "AT>": "#0266CA",
@@ -106,7 +106,7 @@ export default function DBS78(data) {
     y: 0.9,
     text:
       "<b>" +
-      data[0].Sample +
+      sample.value +
       ": " +
       numberWithCommas(totalMutations) +
       " double subs</b>",

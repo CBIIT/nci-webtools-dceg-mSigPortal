@@ -1,4 +1,4 @@
-export default function SBS96(data) {
+export default function SBS96(data, sample) {
   const colors = {
     "C>A": "#03BCEE",
     "C>G": "black",
@@ -62,8 +62,8 @@ export default function SBS96(data) {
     return groups;
   }, {});
 
-  //   console.log("groupByMutationOuter:---");
-  //   console.log(groupByMutationOuter);
+  console.log("groupByMutationOuter:---");
+  console.log(groupByMutationOuter);
 
   const groupByMutationOuterInner = data.reduce((groups, e, i) => {
     const mutation =
@@ -82,6 +82,27 @@ export default function SBS96(data) {
 
   console.log("groupByMutationOuterInner:---");
   console.log(groupByMutationOuterInner);
+
+  const groupByMutationTN = data.reduce((groups, e, i) => {
+    const mutation = e.MutationType[0] + e.MutationType.substring(2, 7);
+    const signature = {
+      mutationType: e.MutationType,
+      contribution: e.Mutations,
+    };
+    groups[mutation] = groups[mutation]
+      ? [...groups[mutation], signature]
+      : [signature];
+    return groups;
+  }, {});
+
+  console.log("groupByMutationTN:---");
+  console.log(groupByMutationTN);
+
+  Object.entries(groupByMutationTN).forEach(
+    ([key, value], groupIndex, array) => {
+      console.log(key);
+    }
+  );
 
   const totalMutationsGroup = Object.entries(groupByMutationInner).map(
     ([mutation, signatures], groupIndex, array) => ({
@@ -336,7 +357,7 @@ export default function SBS96(data) {
     y: 0.9,
     text:
       "<b>" +
-      data[0].Sample +
+      sample.value +
       ": " +
       numberWithCommas(totalMutations) +
       " subs </b>",
