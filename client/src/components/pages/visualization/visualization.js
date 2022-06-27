@@ -40,8 +40,6 @@ export default function Visualization({ match }) {
   const store = useSelector((state) => state.visualization);
   const mergeState = (state) =>
     dispatch(actions.mergeVisualization({ main: state }));
-  const mergeMutationalProfiles = (state) =>
-    dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
   const mergeKataegis = (state) =>
     dispatch(actions.mergeVisualization({ kataegis: state }));
   const mergeCosineSimilarity = (state) =>
@@ -134,11 +132,9 @@ export default function Visualization({ match }) {
     });
 
     // Mutational Profiles
-    const nameOptions = [...new Set(svgList.map((d) => d.Sample_Name))];
+    const nameOptions = [...new Set(svgList.map((d) => d.sample))];
     const selectName = nameOptions[0];
-    const filteredPlots = svgList.filter(
-      (row) => row.Sample_Name == selectName
-    );
+    const filteredPlots = svgList.filter((row) => row.sample == selectName);
 
     const filteredProfileOptions = [
       ...new Set(
@@ -180,24 +176,24 @@ export default function Visualization({ match }) {
       ),
     ];
 
-    mergeMutationalProfiles({
-      filtered: filteredPlots,
-      nameOptions: nameOptions,
-      profileOptions: filteredProfileOptions,
-      matrixOptions: filteredMatrixOptions,
-      filterOptions: filteredFilterOptions,
-      selectName: selectName,
-      selectProfile: profile,
-      selectMatrix: matrix,
-      selectFilter: filter,
-    });
+    // mergeMutationalProfiles({
+    //   filtered: filteredPlots,
+    //   nameOptions: nameOptions,
+    //   profileOptions: filteredProfileOptions,
+    //   matrixOptions: filteredMatrixOptions,
+    //   filterOptions: filteredFilterOptions,
+    //   selectName: selectName,
+    //   selectProfile: profile,
+    //   selectMatrix: matrix,
+    //   selectFilter: filter,
+    // });
 
     // Cosine Similarity - Profile Comparison - PCA - Kataegis
     const sampleNameOptions = [
       ...new Set(
         svgList.map((row) => {
-          if (row.Filter != 'NA') return `${row.Sample_Name}@${row.Filter}`;
-          else return row.Sample_Name;
+          if (row.Filter != 'NA') return `${row.sample}@${row.Filter}`;
+          else return row.samples;
         })
       ),
     ];
@@ -252,6 +248,7 @@ export default function Visualization({ match }) {
     });
 
     mergeState({
+      displayTab: 'profilerSummary',
       profileOptions: profileOptions,
       loading: {
         active: false,
@@ -271,7 +268,7 @@ export default function Visualization({ match }) {
     });
 
     // Mutational Profiles
-    const nameOptions = [...new Set(svgList.map((row) => row.Sample))];
+    const nameOptions = [...new Set(svgList.map((row) => row.sample))];
     const selectName = mutationalProfiles.selectName || nameOptions[0];
     const profileOptions = [...new Set(svgList.map((row) => row.profileType))];
     const profile = defaultProfile(profileOptions);
@@ -281,7 +278,7 @@ export default function Visualization({ match }) {
         svgList
           .filter(
             (row) =>
-              row.Sample == selectName && row.Profile.indexOf(profile) > -1
+              row.sample == selectName && row.Profile.indexOf(profile) > -1
           )
           .map((e) => e.matrixSize)
       ),
@@ -427,12 +424,8 @@ export default function Visualization({ match }) {
     {
       name: 'Mutational Profiles',
       id: 'mutationalProfiles',
-      component: <MutationalProfiles />,
-    },
-    {
-      name: 'Mutational Profiles API',
-      id: 'mutationalProfiles2',
-      component: <MutationalProfiles2 />,
+      component:
+        source == 'user' ? <MutationalProfiles /> : <MutationalProfiles2 />,
     },
     {
       name: 'Tree and Leaf',
@@ -613,7 +606,9 @@ export default function Visualization({ match }) {
             </div>
           )}
           {error && (
-            <div className="bg-danger text-white mb-3 p-3 border rounded">{error}</div>
+            <div className="bg-danger text-white mb-3 p-3 border rounded">
+              {error}
+            </div>
           )}
           <div>
             <LoadingOverlay

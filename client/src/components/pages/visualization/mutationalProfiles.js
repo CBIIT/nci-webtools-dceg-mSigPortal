@@ -47,7 +47,7 @@ export default function MutationalProfiles() {
         ...new Set(
           svgList
             .filter((row) => row.Path != 'msigportal/Database/Seqmatrix/NA')
-            .map((row) => row.Sample || row.Sample_Name)
+            .map((row) => row.sample)
         ),
       ];
 
@@ -72,8 +72,8 @@ export default function MutationalProfiles() {
     if (filtered.length) {
       const plot = filtered[0];
       if (source == 'user')
-        return `${plot.Sample_Name}-${plot.profileType}-${plot.matrixSize}-${plot.Filter}.svg`;
-      else return plot.Sample.split('/').slice(-1)[0];
+        return `${plot.sample}-${plot.profileType}-${plot.matrixSize}-${plot.Filter}.svg`;
+      else return plot.sample.split('/').slice(-1)[0];
     } else return '';
   }
 
@@ -118,7 +118,7 @@ export default function MutationalProfiles() {
 
   function handleSample(name) {
     if (source == 'user') {
-      const filteredPlots = svgList.filter((row) => row.Sample_Name == name);
+      const filteredPlots = svgList.filter((row) => row.sample == name);
       const profileOptions = [
         ...new Set(filteredPlots.map(({ profileType }) => profileType)),
       ];
@@ -154,7 +154,7 @@ export default function MutationalProfiles() {
     } else {
       const filteredPlots = svgList.filter(
         (row) =>
-          row.Sample == name && row.Path != 'msigportal/Database/Seqmatrix/NA'
+          row.sample == name && row.Path != 'msigportal/Database/Seqmatrix/NA'
       );
       const profileOptions = [
         ...new Set(filteredPlots.map((row) => row.profileType)),
@@ -184,7 +184,7 @@ export default function MutationalProfiles() {
   function handleProfile(profile) {
     if (source == 'user') {
       const filteredPlots = svgList.filter(
-        (row) => row.Sample_Name == selectName && row.profileType == profile
+        (row) => row.sample == selectName && row.profileType == profile
       );
       const matrixOptions = [
         ...new Set(filteredPlots.map((row) => row.matrixSize)),
@@ -209,7 +209,7 @@ export default function MutationalProfiles() {
     } else {
       const filteredPlots = svgList.filter(
         (row) =>
-          row.Sample == selectName &&
+          row.sample == selectName &&
           row.Profile.indexOf(profile) > -1 &&
           row.Path != 'msigportal/Database/Seqmatrix/NA'
       );
@@ -230,7 +230,7 @@ export default function MutationalProfiles() {
     if (source == 'user') {
       const filteredPlots = svgList.filter(
         (row) =>
-          row.Sample_Name == selectName &&
+          row.sample == selectName &&
           row.profileType == selectProfile &&
           row.matrixSize == matrix
       );
@@ -247,7 +247,7 @@ export default function MutationalProfiles() {
     } else {
       const filteredPlots = svgList.filter(
         (row) =>
-          row.Sample == selectName &&
+          row.sample == selectName &&
           row.Profile == selectProfile + matrix &&
           row.Path != 'msigportal/Database/Seqmatrix/NA'
       );
@@ -262,7 +262,7 @@ export default function MutationalProfiles() {
   function handleTag(tag) {
     const filteredPlots = svgList.filter(
       (row) =>
-        row.Sample_Name == selectName &&
+        row.sample == selectName &&
         row.profileType == selectProfile &&
         row.matrixSize == selectMatrix &&
         row.Filter == tag

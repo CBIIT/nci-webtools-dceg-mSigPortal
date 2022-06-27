@@ -17,7 +17,7 @@ import { actions as modalActions } from '../../../../services/store/modal';
 import {
   useUserFormUploadMutation,
   useSubmitQueueMutation,
-  useSubmitWebMutation,
+  useSubmitWebUserMutation,
 } from './apiSlice';
 
 const actions = { ...visualizationActions, ...modalActions };
@@ -45,7 +45,7 @@ export default function UserForm() {
   const [handleSubmitQueue, { isLoading: isQueueing, reset: resetQueue }] =
     useSubmitQueueMutation();
   const [handleSubmitWeb, { isLoading, reset: resetWeb }] =
-    useSubmitWebMutation();
+    useSubmitWebUserMutation();
 
   const formatOptions = [
     { label: 'VCF', value: 'vcf', example: 'demo_input_multi.vcf.gz' },
@@ -150,7 +150,6 @@ export default function UserForm() {
 
   // upload files and continue with web or queue submit
   async function onSubmit(data) {
-    console.log(data);
     try {
       const formData = new FormData();
       formData.append('inputFile', data.inputFile);
@@ -173,36 +172,32 @@ export default function UserForm() {
 
   async function submitWeb(args) {
     try {
-      const { svgList, stdout, stderr, ...rest } = await handleSubmitWeb(
-        args
-      ).unwrap();
+      mergeMain({ loading: { active: true } });
+      const { stdout, stderr, ...rest } = await handleSubmitWeb(args).unwrap();
 
-      mergeMain({
-        projectID,
-        svgList,
-        ...rest,
-      });
+      mergeMain({ projectID, ...rest });
     } catch (error) {
       if (error.originalStatus == 504) {
-        mergeState({
+        mergeMain({
           error: 'Please Reset Your Parameters and Try again.',
         });
         mergeError(
           'Your submission has timed out. Please try again by submitting this job to a queue instead.'
         );
       } else {
-        mergeState({
+        mergeMain({
           error: 'Please Reset Your Parameters and Try again.',
         });
         const { stdout, stderr } = error.data;
 
         const message = `<div>
-                  <pre>${stdout}</pre>
-                  <pre>${stderr}</pre>
-                </div>`;
+          <pre>${stdout}</pre>
+          <pre>${stderr}</pre>
+          </div>`;
         mergeError(message);
       }
     }
+    mergeMain({ loading: { active: false } });
   }
 
   async function submitQueue(args) {
@@ -615,7 +610,8 @@ export default function UserForm() {
                 <Form.Check.Input
                   {...field}
                   type="checkbox"
-                  disabled={submitted}
+                  // disabled={submitted}
+                  disabled={true}
                 />
               )}
             />

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
+import { useForm } from 'react-hook-form';
 import Select from '../../../controls/select/selectForm';
 import Description from '../../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
@@ -23,13 +24,17 @@ export default function TreeLeafForm() {
   const { svgList, source } = store.main;
   const { sample, profile, matrix, filter } = store.mutationalProfiles;
 
+  const { control, setValue, watch } = useForm();
+
   // populate controls
   useEffect(() => {
-    if (svgList.length && !sample) handleSample(sampleOptions[0]);
+    if (svgList.length && !sample) {
+      handleSample(sampleOptions[0]);
+    }
   }, [svgList]);
 
   const sampleOptions = svgList.length
-    ? [...new Set(svgList.map((d) => d.Sample_Name || d.Sample))].map((e) => ({
+    ? [...new Set(svgList.map((d) => d.sample))].map((e) => ({
         label: e,
         value: e,
       }))
@@ -40,7 +45,7 @@ export default function TreeLeafForm() {
       ? [
           ...new Set(
             svgList
-              .filter((e) => e.Sample_Name || e.Sample == sample.value)
+              .filter((e) => e.sample == sample.value)
               .map((e) => e.profileType)
               .sort((a, b) => a - b)
           ),
@@ -52,11 +57,7 @@ export default function TreeLeafForm() {
       ? [
           ...new Set(
             svgList
-              .filter(
-                (e) =>
-                  (e.Sample_Name || e.Sample) &&
-                  e.Profile.indexOf(profile.value) > -1
-              )
+              .filter((e) => e.sample && e.profileType == profile.value)
               .map((e) => e.matrixSize)
               .sort((a, b) => a - b)
           ),
@@ -69,9 +70,7 @@ export default function TreeLeafForm() {
           ...new Set(
             svgList
               .filter(
-                (e) =>
-                  (e.Sample_Name || e.Sample) &&
-                  e.Profile == profile.value + matrix.value
+                (e) => e.sample && e.Profile == profile.value + matrix.value
               )
               .map((e) => e.Filter)
               .sort((a, b) => a - b)
@@ -137,37 +136,41 @@ export default function TreeLeafForm() {
         <Row>
           <Col lg="auto">
             <Select
-              id="mpSample"
+              name="sample"
               label="Sample Name"
               value={sample}
               options={sampleOptions}
+              control={control}
               onChange={handleSample}
             />
           </Col>
           <Col lg="auto">
             <Select
-              id="mpProfile"
+              name="profile"
               label="Profile Type"
               value={profile}
               options={profileOptions(sample)}
+              control={control}
               onChange={handleProfile}
             />
           </Col>
           <Col lg="auto">
             <Select
-              id="mpMatrix"
+              name="matrix"
               label="Matrix Size"
               value={matrix}
               options={matrixOptions(sample, profile)}
+              control={control}
               onChange={handleMatrix}
             />
           </Col>
           <Col lg="auto">
             <Select
-              id="mpFilter"
+              name="filter"
               label="Filter"
               value={filter}
               options={filterOptions(sample, profile, matrix)}
+              control={control}
               onChange={handleFilter}
               disabled={source == 'public'}
             />

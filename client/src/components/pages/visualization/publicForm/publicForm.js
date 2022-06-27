@@ -55,14 +55,16 @@ export default function PublicForm() {
 
   async function onSubmit(data) {
     try {
+      mergeMain({ loading: { active: true } });
+      mergeState(data);
       const args = {
         study: data.study.value,
         cancerType: data.cancer.value,
         experimentalStrategy: data.strategy.value,
       };
-      const { output, projectID } = await handleSubmitWeb(args).unwrap();
+      const { svgList, projectID } = await handleSubmitWeb(args).unwrap();
 
-      mergeMain({ svgList: output.svgList, projectID: projectID });
+      mergeMain({ svgList: svgList, projectID: projectID });
     } catch (error) {
       if (error.originalStatus == 504) {
         mergeMain({
@@ -80,6 +82,7 @@ export default function PublicForm() {
         mergeError(error.data);
       }
     }
+    mergeMain({ loading: { active: false } });
   }
 
   const studyOptions = data

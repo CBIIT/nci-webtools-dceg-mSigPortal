@@ -18,7 +18,7 @@ export const vissualizationApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
-    submitWeb: builder.mutation({
+    submitWebUser: builder.mutation({
       query: (data) => ({
         url: 'profilerExtraction',
         method: 'POST',
@@ -26,8 +26,9 @@ export const vissualizationApiSlice = apiSlice.injectEndpoints({
       }),
       transformResponse: (data) => {
         const svgList = data.svgList.map(
-          ({ Profile_Type, Matrix_Size, ...e }) => ({
+          ({ Sample_Name, Profile_Type, Matrix_Size, ...e }) => ({
             ...e,
+            sample: Sample_Name,
             profileType: Profile_Type,
             matrixSize: Matrix_Size,
           })
@@ -48,5 +49,5 @@ export const vissualizationApiSlice = apiSlice.injectEndpoints({
 export const {
   useUserFormUploadMutation,
   useSubmitQueueMutation,
-  useSubmitWebMutation,
+  useSubmitWebUserMutation,
 } = vissualizationApiSlice;
