@@ -5,7 +5,10 @@ import Select from '../../../controls/select/selectForm';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../../services/store/visualization';
 import { actions as modalActions } from '../../../../services/store/modal';
-import { useGetPublicDataOptionsQuery } from './apiSlice';
+import {
+  useSubmitWebPublicMutation,
+  useGetPublicDataOptionsQuery,
+} from './apiSlice';
 
 const actions = { ...visualizationActions, ...modalActions };
 
@@ -17,8 +20,14 @@ export default function PublicForm() {
   const mergeState = (state) =>
     dispatch(actions.mergeVisualization({ publicForm: state }));
   const resetVisualization = (_) => dispatch(actions.resetVisualization());
+  const mergeMain = (state) =>
+    dispatch(actions.mergeVisualization({ main: state }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const { data, error, isFetching } = useGetPublicDataOptionsQuery();
+  const [handleSubmitWeb, { isLoading, reset: resetWeb }] =
+    useSubmitWebPublicMutation();
 
   const defaultValues = {
     study: { label: 'PCAWG', value: 'PCAWG' },
@@ -40,12 +49,37 @@ export default function PublicForm() {
   function handleReset() {
     window.location.hash = '#/visualization';
     resetForm();
+    resetWeb();
     resetVisualization();
   }
 
   async function onSubmit(data) {
-    mergeState(data);
-    dispatch(actions.mergeVisualization({ main: { submitted: true } }));
+    try {
+      const args = {
+        study: data.study.value,
+        cancerType: data.cancer.value,
+        experimentalStrategy: data.strategy.value,
+      };
+      const { output, projectID } = await handleSubmitWeb(args).unwrap();
+
+      mergeMain({ svgList: output.svgList, projectID: projectID });
+    } catch (error) {
+      if (error.originalStatus == 504) {
+        mergeMain({
+          error: 'Please Reset Your Parameters and Try again.',
+        });
+        mergeError({
+          visible: true,
+          message:
+            'Your submission has timed out. Please try again by submitting this job to a queue instead.',
+        });
+      } else {
+        mergeMain({
+          error: 'Please Reset Your Parameters and Try again.',
+        });
+        mergeError(error.data);
+      }
+    }
   }
 
   const studyOptions = data
@@ -99,7 +133,7 @@ export default function PublicForm() {
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
-      <LoadingOverlay active={isFetching} />
+      <LoadingOverlay active={isFetching || isLoading} />
       {error && <p>There was an error retrieving public data options</p>}
       <Select
         className="mb-2"
@@ -131,7 +165,7 @@ export default function PublicForm() {
       <Row>
         <Col>
           <Button
-            disabled={isFetching}
+            disabled={isFetching || isLoading}
             className="w-100"
             variant="secondary"
             onClick={() => handleReset()}
@@ -141,7 +175,7 @@ export default function PublicForm() {
         </Col>
         <Col>
           <Button
-            disabled={isFetching || submitted}
+            disabled={isFetching || isLoading || submitted}
             className="w-100"
             variant="primary"
             type="submit"

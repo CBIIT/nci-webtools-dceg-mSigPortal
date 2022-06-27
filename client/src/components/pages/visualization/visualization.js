@@ -98,71 +98,6 @@ export default function Visualization({ match }) {
     }
   }, [svgList, projectID]);
 
-  // handle public form submit
-  useEffect(() => {
-    if (submitted && source == 'public' && !svgList.length)
-      handlePublicSubmit();
-  }, [submitted]);
-
-  async function handlePublicSubmit() {
-    try {
-      const args = {
-        study: store.publicForm.study,
-        cancerType: store.publicForm.cancer,
-        experimentalStrategy: store.publicForm.strategy,
-      };
-
-      mergeState({
-        loading: {
-          active: true,
-          // content: 'Loading Public Data',
-          // showIndicator: true,
-        },
-      });
-      const response = await axios.post(`web/visualizationWrapper`, {
-        fn: 'getPublicData',
-        args,
-      });
-
-      if (response.status == 200) {
-        const { output, projectID } = await response.data;
-        if (output.error) throw output.error;
-        if (output.uncaughtError) throw output.uncaughtError;
-
-        // transform svgList
-        const svgList = output.map((e) => ({
-          ...e,
-          profileType: e.Profile.match(/[a-z]+/gi)[0],
-          matrixSize: e.Profile.match(/\d+/gi)[0],
-        }));
-
-        mergeState({
-          svgList,
-          projectID: projectID,
-        });
-      } else if (response.status == 504) {
-        mergeState({
-          error: 'Please Reset Your Parameters and Try again.',
-        });
-        mergeError({
-          visible: true,
-          message:
-            'Your submission has timed out. Please try again by submitting this job to a queue instead.',
-        });
-      } else {
-        mergeState({
-          error: 'Please Reset Your Parameters and Try again.',
-        });
-      }
-    } catch (err) {
-      mergeError(err.message);
-      mergeState({
-        error: 'Please Reset Your Parameters and Try again.',
-      });
-    }
-    mergeState({ loading: { active: false } });
-  }
-
   // reload summary information
   async function getResults() {
     const response = await fetch(`web/getResults`, {
@@ -677,7 +612,9 @@ export default function Visualization({ match }) {
               <span>Queue results have expired</span>
             </div>
           )}
-
+          {error && (
+            <div className="bg-danger text-white mb-3 p-3 border rounded">{error}</div>
+          )}
           <div>
             <LoadingOverlay
               active={loading.active}

@@ -3,6 +3,24 @@ import { groupBy } from 'lodash';
 
 export const vissualizationApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    submitWebPublic: builder.mutation({
+      query: (data) => ({
+        url: 'visualizationWrapper',
+        method: 'POST',
+        body: { fn: 'getPublicData', args: data },
+      }),
+      transformResponse: (data) => {
+        const svgList = data.svgList.map(({ Sample, ...e }) => ({
+          ...e,
+          // sample: Sample,
+          profileType: e.Profile.match(/[a-z]+/gi)[0],
+          matrixSize: e.Profile.match(/\d+/gi)[0],
+        }));
+
+        return { ...data, svgList };
+      },
+    }),
+
     getPublicDataOptions: builder.query({
       query: (_) => ({
         url: 'getFileS3',
@@ -27,4 +45,5 @@ export const vissualizationApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useGetPublicDataOptionsQuery } = vissualizationApiSlice;
+export const { useSubmitWebPublicMutation, useGetPublicDataOptionsQuery } =
+  vissualizationApiSlice;
