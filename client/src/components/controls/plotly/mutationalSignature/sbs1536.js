@@ -269,7 +269,7 @@ export default function SBS96(data) {
   //   console.log(tracesHeat1);
 
   const traceHeatMap = heatMapZFinal.map((num, index, array) => ({
-    colorbar: { len: 0.5, y: 0.2, autotick: false, tick0: 0, dtick: 3 },
+    colorbar: { len: 0.5, y: 0.2, autotick: true, tick0: 0, dtick: 0.005 },
     colorscale: [
       [0, "rgb(56,56,156"],
       [0.2, "rgb(56,56,156"],
@@ -418,6 +418,10 @@ export default function SBS96(data) {
       linewidth: 1,
       mirror: true,
       anchor: "x",
+      dtick: 1,
+      tickfont: {
+        size: 10,
+      },
     },
 
     shapes: shapes,
