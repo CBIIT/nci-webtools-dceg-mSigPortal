@@ -98,11 +98,39 @@ export default function SBS96(data, sample) {
   console.log("groupByMutationTN:---");
   console.log(groupByMutationTN);
 
-  Object.entries(groupByMutationTN).forEach(
-    ([key, value], groupIndex, array) => {
-      console.log(key);
-    }
-  );
+  //   const testObj = Object.fromEntries(
+  //     Object.entries(groupByMutationTN).map(([key, value]) => {
+  //       const sumVal = value.reduce((mutationSum, arrayVal) => {
+  //         const muType = arrayVal.mutationType;
+  //         const currMutationName = muType.substring(0, muType.length - 1);
+  //         if (mutationSum[currMutationName]) {
+  //           mutationSum[currMutationName] =
+  //             mutationSum[currMutationName] + arrayVal.contribution;
+  //         } else {
+  //           mutationSum[currMutationName] = arrayVal.contribution;
+  //         }
+  //       }, {});
+  //       return [key, sumVal];
+  //     })
+  //   );
+
+  //   console.log("testObj:---");
+  //   console.log(testObj);
+
+  const groupByMutationA = data.reduce((groups, e, i) => {
+    const mutation = e.MutationType.substring(0, 8);
+    const signature = {
+      mutationType: e.MutationType,
+      contribution: e.Mutations,
+    };
+    groups[mutation] = groups[mutation]
+      ? [...groups[mutation], signature]
+      : [signature];
+    return groups;
+  }, {});
+
+  console.log("groupByMutationA:---");
+  console.log(groupByMutationA);
 
   const totalMutationsGroup = Object.entries(groupByMutationInner).map(
     ([mutation, signatures], groupIndex, array) => ({
@@ -175,8 +203,8 @@ export default function SBS96(data, sample) {
 
   console.log("heatmapY");
   //   console.log(heatmapY);
-  //   console.log("heatmapZ");
-  //   console.log(heatmapZ);
+  console.log("heatmapZ");
+  console.log(heatmapZ);
   //   console.log("heatmapX");
   //   console.log(heatmapX);
 
