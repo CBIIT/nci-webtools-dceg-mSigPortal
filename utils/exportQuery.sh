@@ -1,20 +1,9 @@
 #!/bin/bash
 set -ex
 
-Rscript exportPartitionedTables.R Association/PCAWG_vardata.RData vardata_refdata Cancer_Type,Sample Association/PCAWG/WGS
-Rscript exportPartitionedTables.R Association/Sherlock-Lung-232_vardata.RData vardata_refdata Cancer_Type,Sample Association/Sherlock-Lung-232/WGS
-Rscript exportPartitionedTables.R Association/TCGA_vardata.RData vardata_refdata Cancer_Type,Sample Association/TCGA/WES
-
-Rscript exportPartitionedTables.R Exposure/exposure_refdata.RData exposure_refdata Study,Dataset,Cancer_Type,Signature_set_name Exposure
-
-Rscript exportPartitionedTables.R Seqmatrix/Breast560_WGS_seqmatrix_refdata.RData seqmatrix_refdata Study,Cancer_Type,Sample,Dataset,Profile Seqmatrix
-Rscript exportPartitionedTables.R Seqmatrix/ChernobylThyroid_WGS_seqmatrix_refdata.RData seqmatrix_refdata Study,Cancer_Type,Sample,Dataset,Profile Seqmatrix
-Rscript exportPartitionedTables.R Seqmatrix/LCM-Normal-Tissues_WGS_seqmatrix_refdata.RData seqmatrix_refdata Study,Cancer_Type,Sample,Dataset,Profile Seqmatrix
-Rscript exportPartitionedTables.R Seqmatrix/Mutographs-ESCC_WGS_seqmatrix_refdata.RData seqmatrix_refdata Study,Cancer_Type,Sample,Dataset,Profile Seqmatrix
-Rscript exportPartitionedTables.R Seqmatrix/PCAWG_WGS_seqmatrix_refdata.RData seqmatrix_refdata Study,Cancer_Type,Sample,Dataset,Profile Seqmatrix
-Rscript exportPartitionedTables.R Seqmatrix/Sherlock-Lung-232_WGS_seqmatrix_refdata.RData seqmatrix_refdata Study,Cancer_Type,Sample,Dataset,Profile Seqmatrix
-Rscript exportPartitionedTables.R Seqmatrix/TCGA_WES_seqmatrix_refdata.RData seqmatrix_refdata Study,Cancer_Type,Sample,Dataset,Profile Seqmatrix
-
-Rscript exportPartitionedTables.R Signature/signature_refsets.RData signature_refsets Profile Signature
-Rscript exportPartitionedTables.R Signature/signature_refsets.RData signature_refsets Profile,Signature_set_name Signature
+Rscript exportPartitionedTables.R Association/data.csv Study,Dataset,Cancer_Type,Sample Association
+Rscript exportPartitionedTables.R Exposure/data.csv Study,Dataset,Cancer_Type,Signature_set_name Exposure
+Rscript exportPartitionedTables.R Seqmatrix/data.csv Study,Cancer_Type,Sample,Dataset,Profile Seqmatrix
+Rscript exportPartitionedTables.R Signature/data.csv Profile Signature
+Rscript exportPartitionedTables.R Signature/data.csv Profile,Signature_set_name Signature
 
