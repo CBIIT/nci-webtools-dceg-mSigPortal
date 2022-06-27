@@ -48,7 +48,15 @@ export default function ProfilerSummary() {
       source == 'user'
         ? {
             fn: 'profilerSummary',
-            args: { matrixList: JSON.stringify(matrixList) },
+            args: {
+              matrixList: JSON.stringify(
+                matrixList.map(({ profileType, matrixSize, ...e }) => ({
+                  ...e,
+                  Profile_Type: profileType,
+                  Matrix_Size: matrixSize,
+                }))
+              ),
+            },
             projectID,
           }
         : {

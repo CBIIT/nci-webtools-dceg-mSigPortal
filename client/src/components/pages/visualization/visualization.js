@@ -6,8 +6,8 @@ import {
   SidebarPanel,
   MainPanel,
 } from '../../controls/sidebar-container/sidebar-container';
-import UserForm from './userForm';
-import PublicForm from './publicForm';
+import UserForm from './userForm/userForm';
+import PublicForm from './publicForm/publicForm';
 import Instructions from '../visualization/instructions';
 import ProfilerSummary from './profilerSummary/profilerSummary';
 import MutationalProfiles from './mutationalProfiles';
@@ -40,8 +40,6 @@ export default function Visualization({ match }) {
   const store = useSelector((state) => state.visualization);
   const mergeState = (state) =>
     dispatch(actions.mergeVisualization({ main: state }));
-  const mergeMutationalProfiles = (state) =>
-    dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
   const mergeKataegis = (state) =>
     dispatch(actions.mergeVisualization({ kataegis: state }));
   const mergeCosineSimilarity = (state) =>
@@ -98,64 +96,6 @@ export default function Visualization({ match }) {
     }
   }, [svgList, projectID]);
 
-  // handle public form submit
-  useEffect(() => {
-    if (submitted && source == 'public' && !svgList.length)
-      handlePublicSubmit();
-  }, [submitted]);
-
-  async function handlePublicSubmit() {
-    try {
-      const args = {
-        study: store.publicForm.study,
-        cancerType: store.publicForm.cancer,
-        experimentalStrategy: store.publicForm.strategy,
-      };
-
-      mergeState({
-        loading: {
-          active: true,
-          // content: 'Loading Public Data',
-          // showIndicator: true,
-        },
-      });
-      const response = await axios.post(`web/visualizationWrapper`, {
-        fn: 'getPublicData',
-        args,
-      });
-
-      if (response.status == 200) {
-        const { output, projectID } = await response.data;
-        if (output.error) throw output.error;
-        if (output.uncaughtError) throw output.uncaughtError;
-
-        mergeState({
-          svgList: output,
-          projectID: projectID,
-        });
-      } else if (response.status == 504) {
-        mergeState({
-          error: 'Please Reset Your Parameters and Try again.',
-        });
-        mergeError({
-          visible: true,
-          message:
-            'Your submission has timed out. Please try again by submitting this job to a queue instead.',
-        });
-      } else {
-        mergeState({
-          error: 'Please Reset Your Parameters and Try again.',
-        });
-      }
-    } catch (err) {
-      mergeError(err.message);
-      mergeState({
-        error: 'Please Reset Your Parameters and Try again.',
-      });
-    }
-    mergeState({ loading: { active: false } });
-  }
-
   // reload summary information
   async function getResults() {
     const response = await fetch(`web/getResults`, {
@@ -192,15 +132,13 @@ export default function Visualization({ match }) {
     });
 
     // Mutational Profiles
-    const nameOptions = [...new Set(svgList.map((d) => d.Sample_Name))];
+    const nameOptions = [...new Set(svgList.map((d) => d.sample))];
     const selectName = nameOptions[0];
-    const filteredPlots = svgList.filter(
-      (row) => row.Sample_Name == selectName
-    );
+    const filteredPlots = svgList.filter((row) => row.sample == selectName);
 
     const filteredProfileOptions = [
       ...new Set(
-        filteredPlots.map((row) => row.Profile_Type).sort((a, b) => a - b)
+        filteredPlots.map((row) => row.profileType).sort((a, b) => a - b)
       ),
     ];
 
@@ -209,8 +147,8 @@ export default function Visualization({ match }) {
     const filteredMatrixOptions = [
       ...new Set(
         filteredPlots
-          .filter((row) => row.Profile_Type == profile)
-          .map((row) => row.Matrix_Size)
+          .filter((row) => row.profileType == profile)
+          .map((row) => row.matrixSize)
       ),
     ].sort((a, b) => a - b);
 
@@ -220,7 +158,7 @@ export default function Visualization({ match }) {
       ...new Set(
         filteredPlots
           .filter(
-            (row) => row.Profile_Type == profile && row.Matrix_Size == matrix
+            (row) => row.profileType == profile && row.matrixSize == matrix
           )
           .map((row) => row.Filter)
           .sort((a, b) => a - b)
@@ -232,34 +170,34 @@ export default function Visualization({ match }) {
     const filteredMatrixList = [
       ...new Set(
         matrixList
-          .filter((row) => row.Profile_Type == profile)
-          .map((row) => row.Matrix_Size)
+          .filter((row) => row.profileType == profile)
+          .map((row) => row.matrixSize)
           .sort((a, b) => a - b)
       ),
     ];
 
-    mergeMutationalProfiles({
-      filtered: filteredPlots,
-      nameOptions: nameOptions,
-      profileOptions: filteredProfileOptions,
-      matrixOptions: filteredMatrixOptions,
-      filterOptions: filteredFilterOptions,
-      selectName: selectName,
-      selectProfile: profile,
-      selectMatrix: matrix,
-      selectFilter: filter,
-    });
+    // mergeMutationalProfiles({
+    //   filtered: filteredPlots,
+    //   nameOptions: nameOptions,
+    //   profileOptions: filteredProfileOptions,
+    //   matrixOptions: filteredMatrixOptions,
+    //   filterOptions: filteredFilterOptions,
+    //   selectName: selectName,
+    //   selectProfile: profile,
+    //   selectMatrix: matrix,
+    //   selectFilter: filter,
+    // });
 
     // Cosine Similarity - Profile Comparison - PCA - Kataegis
     const sampleNameOptions = [
       ...new Set(
         svgList.map((row) => {
-          if (row.Filter != 'NA') return `${row.Sample_Name}@${row.Filter}`;
-          else return row.Sample_Name;
+          if (row.Filter != 'NA') return `${row.sample}@${row.Filter}`;
+          else return row.samples;
         })
       ),
     ];
-    const profileOptions = [...new Set(svgList.map((row) => row.Profile_Type))];
+    const profileOptions = [...new Set(svgList.map((row) => row.profileType))];
 
     const selectProfile = defaultProfile(profileOptions);
     const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);
@@ -310,6 +248,7 @@ export default function Visualization({ match }) {
     });
 
     mergeState({
+      displayTab: 'profilerSummary',
       profileOptions: profileOptions,
       loading: {
         active: false,
@@ -329,11 +268,9 @@ export default function Visualization({ match }) {
     });
 
     // Mutational Profiles
-    const nameOptions = [...new Set(svgList.map((row) => row.Sample))];
+    const nameOptions = [...new Set(svgList.map((row) => row.sample))];
     const selectName = mutationalProfiles.selectName || nameOptions[0];
-    const profileOptions = [
-      ...new Set(svgList.map((row) => row.Profile.match(/[a-z]+/gi)[0])),
-    ];
+    const profileOptions = [...new Set(svgList.map((row) => row.profileType))];
     const profile = defaultProfile(profileOptions);
 
     const filteredMatrixOptions = [
@@ -341,9 +278,9 @@ export default function Visualization({ match }) {
         svgList
           .filter(
             (row) =>
-              row.Sample == selectName && row.Profile.indexOf(profile) > -1
+              row.sample == selectName && row.Profile.indexOf(profile) > -1
           )
-          .map(({ Profile }) => Profile.match(/\d+/gi)[0])
+          .map((e) => e.matrixSize)
       ),
     ].sort((a, b) => a - b);
 
@@ -487,12 +424,8 @@ export default function Visualization({ match }) {
     {
       name: 'Mutational Profiles',
       id: 'mutationalProfiles',
-      component: <MutationalProfiles />,
-    },
-    {
-      name: "Mutational Profiles API",
-      id: "mutationalProfiles2",
-      component: <MutationalProfiles2 />,
+      component:
+        source == 'user' ? <MutationalProfiles /> : <MutationalProfiles2 />,
     },
     {
       name: "Tree and Leaf",
@@ -672,7 +605,11 @@ export default function Visualization({ match }) {
               <span>Queue results have expired</span>
             </div>
           )}
-
+          {error && (
+            <div className="bg-danger text-white mb-3 p-3 border rounded">
+              {error}
+            </div>
+          )}
           <div>
             <LoadingOverlay
               active={loading.active}

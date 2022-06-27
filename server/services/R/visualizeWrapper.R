@@ -95,7 +95,7 @@ getPublicData <- function(args, config) {
       arrange(Sample)
   }
 
-  return(svgfiles_public)
+  return(list(svgList = svgfiles_public))
 }
 
 # Tumor Mutation Burden ---------------------------------------------------

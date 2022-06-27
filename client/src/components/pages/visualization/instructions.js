@@ -40,9 +40,9 @@ export default function Instructions({ loading }) {
         Choose an example query to view results for pre-selected parameters. You
         must reset between queries.
       </p>
-      {examples.map(({ title, external, path }, index) => (
+      {/* {examples.map(({ title, external, path }, index) => (
         <div key={index}>
-          <Link to={`/visualization/example/${path}`} disabled>
+          <Link to={`/visualization/example/${path}`}>
             <span className="sr-only">{title + ' link'}</span>
             {title}
           </Link>
@@ -55,7 +55,7 @@ export default function Instructions({ loading }) {
             </span>
           )}
         </div>
-      ))}
+      ))} */}
     </div>
   );
 }
