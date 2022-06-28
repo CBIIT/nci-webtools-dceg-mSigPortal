@@ -48,10 +48,9 @@ export default function MutProfilePlot() {
 
   // generate plot
   useEffect(() => {
-    if (data.length) generatePlot(data, sample);
-  }, [data, sample]);
+    if (data.length) generatePlot(data, sample.value);
+  }, [data]);
 
-  console.log(sample);
   function generatePlot(data, sample) {
     const profileMatrix = profile.value + matrix.value;
 
