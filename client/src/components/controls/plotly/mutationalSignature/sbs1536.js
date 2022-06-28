@@ -180,6 +180,14 @@ export default function SBS96(data, sample) {
   console.log("groupByTotal");
   console.log(groupByTotal);
 
+  const flatSorted = Object.values(groupByTotal).flat();
+  const mutationTitle = Object.keys(groupByTotal).flat();
+
+  console.log("FlatSorted--");
+  console.log(flatSorted);
+  console.log("mutationTitle--");
+  console.log(mutationTitle);
+
   const arrayDataX1 =
     groupByMutationOuter[Object.keys(groupByMutationOuter)[0]];
   console.log(arrayDataX1);
@@ -234,6 +242,7 @@ export default function SBS96(data, sample) {
   let heatMapZ3 = [];
   let heatMapZ4 = [];
   let heatMapZ5 = [];
+
   heatmapZ.forEach((item, index) => {
     // console.log(item);
     // console.log(index);
@@ -260,14 +269,11 @@ export default function SBS96(data, sample) {
     heatMapZ3,
     heatMapZ4,
     heatMapZ5,
+    //mutationTitle,
   ];
   console.log("heatMapZFinal");
   console.log(heatMapZFinal);
 
-  const flatSorted = Object.values(groupByTotal).flat();
-
-  console.log("FlatSorted--");
-  console.log(flatSorted);
   const tracesBar = Object.entries(groupByTotal).map(
     ([mutation, signatures], groupIndex, array) => ({
       name: mutation,
@@ -351,17 +357,19 @@ export default function SBS96(data, sample) {
       [1, "rgb(255,255,39)"],
     ],
     z: num,
-
     y: heatmapY,
     type: "heatmap",
     hoverongaps: false,
     xaxis: "x",
     yaxis: "y2",
     num: num,
+
     x: num.map(
       (e, i) =>
         array.slice(0, index).reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
     ),
+    hovertemplate:
+      "x: %{x}<br>" + "y: %{y}<br>" + "Value: %{z}" + "<extra></extra>",
   }));
 
   console.log("traceHeatMap");
@@ -403,11 +411,7 @@ export default function SBS96(data, sample) {
     x: 0,
     y: 0.9,
     text:
-      "<b>" +
-      sample.value +
-      ": " +
-      numberWithCommas(totalMutations) +
-      " subs </b>",
+      "<b>" + sample + ": " + numberWithCommas(totalMutations) + " subs </b>",
     showarrow: false,
     font: {
       size: 18,
