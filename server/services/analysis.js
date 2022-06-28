@@ -828,7 +828,7 @@ async function querySignature(req, res, next) {
       Bucket: config.data.bucket,
       Key: path.join(
         config.data.s3,
-        `Seqmatrix/query/${study}/${cancer}/${sample}/${strategy}/${
+        `Seqmatrix/${study}/${cancer}/${sample}/${strategy}/${
           profile + matrix
         }/data.json`
       ),
@@ -843,35 +843,20 @@ async function querySignature(req, res, next) {
 }
 
 async function queryExposure(req, res, next) {
-  const { study, strategy, cancer, signature_set } = req.query;
-
-  const query = [
-    'SELECT Cancer_Type, Sample, Exposure FROM s3object s',
-    `WHERE Signature_set_name = '${signature_set}'`,
-    cancer ? `AND Cancer_Type = '${cancer}'` : '',
-  ].join(' ');
-
-  const params = {
-    Bucket: config.data.bucket,
-    Key: path.join(
-      config.data.s3,
-      `Exposure/${study}_${strategy}_exposure_refdata.csv.gz`
-    ),
-    Expression: query,
-    ExpressionType: 'SQL',
-    InputSerialization: {
-      CSV: { FileHeaderInfo: 'USE' },
-      CompressionType: 'GZIP',
-    },
-    OutputSerialization: {
-      JSON: {
-        RecordDelimiter: ',',
-      },
-    },
-  };
-
   try {
-    const data = await getDataUsingS3Select(params);
+    const { study, strategy, cancer, signature_set } = req.query;
+    const s3 = new AWS.S3();
+
+    const params = {
+      Bucket: config.data.bucket,
+      Key: path.join(
+        config.data.s3,
+        `Exposure/${study}/${strategy}/${cancer}/${signature_set}/data.json`
+      ),
+    };
+    const { Body } = await s3.getObject(params).promise();
+    const data = JSON.parse(Body);
+
     res.json(data);
   } catch (error) {
     next(error);
