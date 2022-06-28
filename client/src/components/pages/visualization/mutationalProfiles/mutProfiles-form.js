@@ -164,17 +164,18 @@ export default function TreeLeafForm() {
               onChange={handleMatrix}
             />
           </Col>
-          <Col lg="auto">
-            <Select
-              name="filter"
-              label="Filter"
-              value={filter}
-              options={filterOptions(sample, profile, matrix)}
-              control={control}
-              onChange={handleFilter}
-              disabled={source == 'public'}
-            />
-          </Col>
+          {source == 'user' && (
+            <Col lg="auto">
+              <Select
+                name="filter"
+                label="Filter"
+                value={filter}
+                options={filterOptions(sample, profile, matrix)}
+                control={control}
+                onChange={handleFilter}
+              />
+            </Col>
+          )}
         </Row>
       </Form>
     </div>
