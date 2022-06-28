@@ -43,7 +43,7 @@
             "name": "cancer",
             "in": "query",
             "description": "Select cancer belonging to the study",
-            "required": false,
+            "required": true,
             "schema": {
               "type": "string"
             },
@@ -132,6 +132,16 @@
             "value": "WGS"
           },
           {
+            "name": "cancer",
+            "in": "query",
+            "description": "Select cancer belonging to signature set",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "value": "Lung-AdenoCA"
+          }
+          {
             "name": "signature_set",
             "in": "query",
             "description": "Select signature set to filter data by.",
@@ -146,16 +156,6 @@
             },
             "value": "COSMIC_v3_Signatures_GRCh37_SBS96"
           },
-          {
-            "name": "cancer",
-            "in": "query",
-            "description": "Select cancer belonging to signature set",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "value": "Lung-AdenoCA"
-          }
         ],
         "responses": {
           "200": {
