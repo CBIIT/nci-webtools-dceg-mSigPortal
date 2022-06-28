@@ -294,11 +294,7 @@ export default function ID83(data, sample) {
     x: 0,
     y: 0.9,
     text:
-      "<b>" +
-      sample +
-      ": " +
-      numberWithCommas(totalMutations) +
-      " indels</b>",
+      "<b>" + sample + ": " + numberWithCommas(totalMutations) + " indels</b>",
     showarrow: false,
     font: {
       size: 18,
@@ -369,6 +365,7 @@ export default function ID83(data, sample) {
   );
 
   const layout = {
+    hoverlabel: { bgcolor: "#FFF" },
     xaxis: {
       showticklabels: false,
       showline: true,
@@ -386,7 +383,7 @@ export default function ID83(data, sample) {
     yaxis: {
       title: "Number of Idels",
       autorange: false,
-      range: [0, maxVal + 10],
+      range: [0, maxVal + maxVal * 0.2],
       linecolor: "black",
       linewidth: 1,
       mirror: true,

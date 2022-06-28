@@ -14,7 +14,7 @@ export default function DBS78(data, sample) {
 
   const totalMutations = data.reduce((a, e) => a + parseInt(e.Mutations), 0);
   const maxVal = Math.max(...data.map((o) => o.Mutations));
-  console.log(maxVal);
+  //console.log(maxVal);
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
   //console.log(totalMutations);
@@ -118,6 +118,7 @@ export default function DBS78(data, sample) {
   };
 
   const layout = {
+    hoverlabel: { bgcolor: "#FFF" },
     xaxis: {
       //title: "Double Substitution",
       showticklabels: true,
@@ -141,7 +142,7 @@ export default function DBS78(data, sample) {
     yaxis: {
       title: "Number of Double Base Substitutions",
       autorange: false,
-      range: [0, maxVal + 1],
+      range: [0, maxVal + maxVal * 0.2],
       linecolor: "black",
       linewidth: 1,
       mirror: true,

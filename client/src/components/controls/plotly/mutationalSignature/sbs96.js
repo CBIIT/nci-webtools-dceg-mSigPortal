@@ -7,14 +7,16 @@ export default function SBS96(data, sample) {
     "T>C": "#A1CE63",
     "T>G": "#EBC6C4",
   };
+  console.log("data--:");
+  console.log(data);
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 
   const totalMutations = data.reduce((a, e) => a + parseInt(e.Mutations), 0);
   const maxVal = Math.max(...data.map((o) => o.Mutations));
+  // console.log("maxVal--:");
+  // console.log(maxVal);
 
-  console.log("data--:");
-  console.log(data);
   // group data by dominant mutation
   const groupByMutation = data.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
@@ -30,8 +32,8 @@ export default function SBS96(data, sample) {
   }, {});
   const flatSorted = Object.values(groupByMutation).flat();
 
-  console.log("groupByMutation:");
-  console.log(groupByMutation);
+  // console.log("groupByMutation:");
+  // console.log(groupByMutation);
   //console.log("FlatSorted");
   //console.log(flatSorted);
   const traces = Object.entries(groupByMutation).map(
@@ -53,8 +55,8 @@ export default function SBS96(data, sample) {
       array: array,
     })
   );
-  console.log("traces:");
-  console.log(traces);
+  // console.log("traces:");
+  // console.log(traces);
 
   const annotations = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
@@ -107,11 +109,7 @@ export default function SBS96(data, sample) {
     x: 0,
     y: 0.9,
     text:
-      "<b>" +
-      sample +
-      ": " +
-      numberWithCommas(totalMutations) +
-      " subs </b>",
+      "<b>" + sample + ": " + numberWithCommas(totalMutations) + " subs </b>",
     showarrow: false,
     font: {
       size: 18,
@@ -139,10 +137,11 @@ export default function SBS96(data, sample) {
       mutation: mutation,
     })
   );
-  console.log("shapes");
-  console.log(shapes);
+  // console.log("shapes");
+  // console.log(shapes);
 
   const layout = {
+    hoverlabel: { bgcolor: "#FFF" },
     xaxis: {
       showticklabels: false,
       showline: true,
@@ -163,7 +162,7 @@ export default function SBS96(data, sample) {
     yaxis: {
       title: "Number of Single Base Substitutions",
       autorange: false,
-      range: [0, maxVal + 10],
+      range: [0, maxVal + maxVal * 0.2],
       linecolor: "black",
       linewidth: 1,
       mirror: true,
@@ -172,8 +171,8 @@ export default function SBS96(data, sample) {
     shapes: shapes,
     annotations: [...annotations, sampleAnnotation, ...xannotations],
   };
-  console.log("layout");
-  console.log(layout);
+  // console.log("layout");
+  // console.log(layout);
 
   return { traces, layout };
 }
