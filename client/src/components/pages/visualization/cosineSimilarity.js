@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button, Tab, Nav } from 'react-bootstrap';
+import { NavHashLink } from 'react-router-hash-link';
+// import { useForm } from 'react-hook-form';
+import { useGetPublicDataOptionsQuery } from './publicForm/apiSlice';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../controls/svgContainer/svgContainer';
 import CustomSelect from '../../controls/select/select-old';
@@ -8,7 +11,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
 import { defaultMatrix } from '../../../services/utils';
-import { NavHashLink } from 'react-router-hash-link';
 
 const actions = { ...visualizationActions, ...modalActions };
 
@@ -17,25 +19,23 @@ const { Item, Link } = Nav;
 
 export default function CosineSimilarity({ submitR, getRefSigOptions }) {
   const dispatch = useDispatch();
-  const visualization = useSelector((state) => state.visualization);
+  const store = useSelector((state) => state.visualization);
 
-  const mergeCosineSimilarity = (state) =>
+  const mergeState = (state) =>
     dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const {
-    source,
-    study,
-    studyOptions,
-    cancerType,
-    pubExperimentalStrategy,
-    pDataOptions,
-    projectID,
-    matrixList,
-    svgList,
-    profileOptions,
-  } = visualization.main;
+  const { data, error, isFetching } = useGetPublicDataOptionsQuery();
+
+  const studyOptions = data
+    ? // ? Object.keys(data).map((e) => ({ label: e, value: e }))
+      Object.keys(data)
+    : [];
+
+  const { study, cancer, strategy } = store.publicForm;
+
+  const { source, matrixList, svgList, profileOptions } = store.main;
 
   const {
     withinProfileType,
@@ -63,7 +63,9 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
     withinSubmitOverlay,
     refSubmitOverlay,
     pubSubmitOverlay,
-  } = visualization.cosineSimilarity;
+  } = store.cosineSimilarity;
+
+  // const { control, watch } = useForm();
 
   // check for multiple sample input and disable params if true
   const [multiSample, setMultiSample] = useState(false);
@@ -73,8 +75,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
         const samples = [
           ...new Set(
             svgList.map((row) => {
-              if (row.Filter != 'NA') return `${row.Sample_Name}@${row.Filter}`;
-              else return row.Sample_Name;
+              if (row.Filter != 'NA') return `${row.sample}@${row.Filter}`;
+              else return row.sample;
             })
           ),
         ];
@@ -88,44 +90,44 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
   }, [svgList]);
 
   function setOverlay(type, display) {
-    mergeCosineSimilarity({ [`${type}SubmitOverlay`]: display });
+    mergeState({ [`${type}SubmitOverlay`]: display });
   }
 
   // get Signature Reference Sets for dropdown options
   async function getSignatureSet(profileType) {
     if (profileType) {
-      mergeCosineSimilarity({ refSubmitOverlay: true });
+      mergeState({ refSubmitOverlay: true });
       try {
         const response = await getRefSigOptions(profileType);
 
         if (response.ok) {
           const { output: refSignatureSetOptions } = await response.json();
 
-          mergeCosineSimilarity({
+          mergeState({
             refSignatureSetOptions: refSignatureSetOptions,
             refSignatureSet: refSignatureSetOptions[0],
             refSubmitOverlay: false,
           });
         } else {
           mergeError(await response.json());
-          mergeCosineSimilarity({ refSubmitOverlay: false });
+          mergeState({ refSubmitOverlay: false });
         }
       } catch (err) {
         mergeError(err.message);
-        mergeCosineSimilarity({ refSubmitOverlay: false });
+        mergeState({ refSubmitOverlay: false });
       }
     }
   }
 
   function setOverlay(type, status) {
-    mergeCosineSimilarity({ [`${type}SubmitOverlay`]: status });
+    mergeState({ [`${type}SubmitOverlay`]: status });
   }
 
   async function calculateR(type, fn, args) {
     try {
       setOverlay(type, true);
 
-      mergeCosineSimilarity({
+      mergeState({
         [`${type}Err`]: false,
         [`${type}PlotPath`]: '',
         [`${type}TxtPath`]: '',
@@ -134,18 +136,18 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
       const response = await submitR(fn, args);
       if (!response.ok) {
         const err = await response.json();
-        mergeCosineSimilarity({ [`${type}Err`]: err });
+        mergeState({ [`${type}Err`]: err });
       } else {
         const { output } = await response.json();
         const { plotPath, txtPath, error, uncaughtError } = output;
 
         if (plotPath) {
-          mergeCosineSimilarity({
+          mergeState({
             [`${type}PlotPath`]: plotPath,
             [`${type}TxtPath`]: txtPath,
           });
         } else {
-          mergeCosineSimilarity({
+          mergeState({
             [`${type}Err`]: error || uncaughtError || true,
           });
         }
@@ -158,47 +160,31 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
   }
 
   function handleWithinProfileType(profileType) {
-    if (source == 'user') {
-      const withinMatrixOptions = [
-        ...new Set(
-          matrixList
-            .filter((row) => row.Profile_Type == profileType)
-            .map((row) => row.Matrix_Size)
-        ),
-      ].sort((a, b) => a - b);
+    const withinMatrixOptions = [
+      ...new Set(
+        svgList
+          .filter((e) => e.profileType == profileType)
+          .map((e) => e.matrixSize)
+      ),
+    ].sort((a, b) => a - b);
 
-      mergeCosineSimilarity({
-        withinProfileType: profileType,
-        withinMatrixSize: defaultMatrix(profileType, withinMatrixOptions),
-        withinMatrixOptions: withinMatrixOptions,
-      });
-    } else {
-      const withinMatrixOptions = [
-        ...new Set(
-          svgList
-            .filter((row) => row.Profile.includes(profileType))
-            .map((row) => row.Profile.match(/\d+/gi)[0])
-        ),
-      ].sort((a, b) => a - b);
-
-      mergeCosineSimilarity({
-        withinProfileType: profileType,
-        withinMatrixSize: defaultMatrix(profileType, withinMatrixOptions),
-        withinMatrixOptions: withinMatrixOptions,
-      });
-    }
+    mergeState({
+      withinProfileType: profileType,
+      withinMatrixSize: defaultMatrix(profileType, withinMatrixOptions),
+      withinMatrixOptions: withinMatrixOptions,
+    });
   }
 
   function handlePublicProfileType(profileType) {
     const userMatrixOptions = [
       ...new Set(
         matrixList
-          .filter((row) => row.Profile_Type == profileType)
-          .map((row) => row.Matrix_Size)
+          .filter((e) => e.profileType == profileType)
+          .map((e) => e.matrixSize)
       ),
     ].sort((a, b) => a - b);
 
-    mergeCosineSimilarity({
+    mergeState({
       userProfileType: profileType,
       userMatrixSize: defaultMatrix(profileType, userMatrixOptions),
       userMatrixOptions: userMatrixOptions,
@@ -206,15 +192,9 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
   }
 
   function handleStudyChange(study) {
-    const cancerTypeOptions = [
-      ...new Set(
-        pDataOptions
-          .filter((row) => row.Study == study)
-          .map((row) => row.Cancer_Type)
-      ),
-    ];
+    const cancerTypeOptions = Object.keys(data[study]);
 
-    mergeCosineSimilarity({
+    mergeState({
       pubStudy: study,
       pubCancerType: cancerTypeOptions[0],
       pubCancerTypeOptions: cancerTypeOptions,
@@ -222,7 +202,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
   }
 
   function handleCancerChange(cancer) {
-    mergeCosineSimilarity({
+    mergeState({
       pubCancerType: cancer,
     });
   }
@@ -253,7 +233,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   value={withinMatrixSize}
                   options={withinMatrixOptions}
                   onChange={(matrix) =>
-                    mergeCosineSimilarity({
+                    mergeState({
                       withinMatrixSize: matrix,
                     })
                   }
@@ -268,18 +248,18 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                     if (source == 'user') {
                       calculateR('within', 'cosineSimilarityWithin', {
                         matrixFile: matrixList.filter(
-                          (row) =>
-                            row.Profile_Type == withinProfileType &&
-                            row.Matrix_Size == withinMatrixSize
+                          (e) =>
+                            e.profileType == withinProfileType &&
+                            e.matrixSize == withinMatrixSize
                         )[0].Path,
                       });
                     } else {
                       calculateR('within', 'cosineSimilarityWithinPublic', {
                         profileType: withinProfileType,
                         matrixSize: withinMatrixSize,
-                        study: study,
-                        cancerType: cancerType,
-                        experimentalStrategy: pubExperimentalStrategy,
+                        study: study.value,
+                        cancerType: cancer.value,
+                        experimentalStrategy: strategy.value,
                       });
                     }
                   }}
@@ -339,7 +319,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   value={refProfileType}
                   options={profileOptions}
                   onChange={(refProfileType) => {
-                    mergeCosineSimilarity({
+                    mergeState({
                       refProfileType: refProfileType,
                     });
                     getSignatureSet(refProfileType);
@@ -353,7 +333,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   value={refSignatureSet}
                   options={refSignatureSetOptions}
                   onChange={(refSignatureSet) => {
-                    mergeCosineSimilarity({
+                    mergeState({
                       refSignatureSet: refSignatureSet,
                     });
                   }}
@@ -370,8 +350,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                         signatureSet: refSignatureSet,
                         matrixFile: matrixList.filter(
                           (row) =>
-                            row.Profile_Type == refProfileType &&
-                            row.Matrix_Size ==
+                            row.profileType == refProfileType &&
+                            row.matrixSize ==
                               defaultMatrix(refProfileType, ['96', '78', '83'])
                         )[0].Path,
                       });
@@ -379,9 +359,9 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                       calculateR('ref', 'cosineSimilarityRefSigPublic', {
                         profileType: refProfileType,
                         signatureSet: refSignatureSet,
-                        study: study,
-                        cancerType: cancerType,
-                        experimentalStrategy: pubExperimentalStrategy,
+                        study: study.value,
+                        cancerType: cancer.value,
+                        experimentalStrategy: strategy.value,
                       });
                     }
                   }}
@@ -450,7 +430,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                   value={userMatrixSize}
                   options={userMatrixOptions}
                   onChange={(matrix) =>
-                    mergeCosineSimilarity({
+                    mergeState({
                       userMatrixSize: matrix,
                     })
                   }
@@ -460,7 +440,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 <CustomSelect
                   id="csPubStudy"
                   label="Study"
-                  value={pubStudy || visualization.study}
+                  value={pubStudy || study}
                   options={studyOptions}
                   onChange={handleStudyChange}
                 />
@@ -469,7 +449,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 <CustomSelect
                   id="csPubCancerType"
                   label="Cancer Type or Group"
-                  value={pubCancerType || visualization.cancerType}
+                  value={pubCancerType || cancer}
                   options={pubCancerTypeOptions}
                   onChange={handleCancerChange}
                 />
@@ -482,8 +462,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                     calculateR('pub', 'cosineSimilarityPublic', {
                       matrixFile: matrixList.filter(
                         (row) =>
-                          row.Profile_Type == userProfileType &&
-                          row.Matrix_Size == userMatrixSize
+                          row.profileType == userProfileType &&
+                          row.matrixSize == userMatrixSize
                       )[0].Path,
                       study: pubStudy,
                       cancerType: pubCancerType,
@@ -535,7 +515,7 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
         className="mt-2"
         defaultActiveKey={display}
         activeKey={display}
-        onSelect={(tab) => mergeCosineSimilarity({ display: tab })}
+        onSelect={(tab) => mergeState({ display: tab })}
       >
         <Nav variant="tabs">
           <Item>

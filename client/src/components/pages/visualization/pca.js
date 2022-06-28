@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button, Tab, Nav } from 'react-bootstrap';
+import { useGetPublicDataOptionsQuery } from './publicForm/apiSlice';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../controls/svgContainer/svgContainer';
 import CustomSelect from '../../controls/select/select-old';
@@ -15,24 +16,22 @@ const { Item, Link } = Nav;
 
 export default function PCA({ submitR, getRefSigOptions }) {
   const dispatch = useDispatch();
-  const visualization = useSelector((state) => state.visualization);
+  const store = useSelector((state) => state.visualization);
   const mergePCA = (state) =>
     dispatch(actions.mergeVisualization({ pca: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const {
-    source,
-    study,
-    studyOptions,
-    cancerType,
-    pubExperimentalStrategy,
-    pDataOptions,
-    matrixList,
-    projectID,
-    svgList,
-    profileOptions,
-  } = visualization.main;
+  const { data, error, isFetching } = useGetPublicDataOptionsQuery();
+
+  const studyOptions = data
+    ? // ? Object.keys(data).map((e) => ({ label: e, value: e }))
+      Object.keys(data)
+    : [];
+
+  const { study, cancer, strategy } = store.publicForm;
+
+  const { source, matrixList, projectID, svgList, profileOptions } = store.main;
 
   const {
     profileType,
@@ -62,7 +61,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
     display,
     pubPcaErr,
     pubSubmitOverlay,
-  } = visualization.pca;
+  } = store.pca;
 
   const [multiSample, setMultiSample] = useState(false);
 
@@ -73,8 +72,8 @@ export default function PCA({ submitR, getRefSigOptions }) {
         const samples = [
           ...new Set(
             svgList.map((row) => {
-              if (row.Filter != 'NA') return `${row.Sample_Name}@${row.Filter}`;
-              else return row.Sample_Name;
+              if (row.Filter != 'NA') return `${row.sample}@${row.Filter}`;
+              else return row.sample;
             })
           ),
         ];
@@ -189,8 +188,8 @@ export default function PCA({ submitR, getRefSigOptions }) {
     const userMatrixOptions = [
       ...new Set(
         svgList
-          .filter((plot) => plot.Profile_Type == profileType)
-          .map((plot) => plot.Matrix_Size)
+          .filter((plot) => plot.profileType == profileType)
+          .map((plot) => plot.matrixSize)
       ),
     ].sort((a, b) => a - b);
 
@@ -202,13 +201,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
   }
 
   function handleStudyChange(study) {
-    const cancerTypeOptions = [
-      ...new Set(
-        pDataOptions
-          .filter((data) => data.Study == study)
-          .map((data) => data.Cancer_Type)
-      ),
-    ];
+    const cancerTypeOptions = Object.keys(data[study]);
 
     mergePCA({
       pubStudy: study,
@@ -272,8 +265,8 @@ export default function PCA({ submitR, getRefSigOptions }) {
                         signatureSet: signatureSet,
                         matrixFile: matrixList.filter(
                           (row) =>
-                            row.Profile_Type == profileType &&
-                            row.Matrix_Size ==
+                            row.profileType == profileType &&
+                            row.matrixSize ==
                               defaultMatrix(profileType, ['96', '78', '83'])
                         )[0].Path,
                       });
@@ -281,9 +274,9 @@ export default function PCA({ submitR, getRefSigOptions }) {
                       calculateR('within', 'pcaPublic', {
                         profileType: profileType,
                         signatureSet: signatureSet,
-                        study: study,
-                        cancerType: cancerType,
-                        experimentalStrategy: pubExperimentalStrategy,
+                        study: study.value,
+                        cancerType: cancer.value,
+                        experimentalStrategy: strategy.value,
                       });
                     }
                   }}
@@ -443,8 +436,8 @@ export default function PCA({ submitR, getRefSigOptions }) {
                     calculateR('pub', 'pcaWithPublic', {
                       matrixFile: matrixList.filter(
                         (row) =>
-                          row.Profile_Type == userProfileType &&
-                          row.Matrix_Size == userMatrixSize
+                          row.profileType == userProfileType &&
+                          row.matrixSize == userMatrixSize
                       )[0].Path,
                       study: pubStudy,
                       cancerType: pubCancerType,

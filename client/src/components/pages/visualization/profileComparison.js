@@ -9,6 +9,7 @@ import {
   Tab,
   Nav,
 } from 'react-bootstrap';
+import { useGetPublicDataOptionsQuery } from './publicForm/apiSlice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
@@ -29,24 +30,22 @@ const { Item, Link } = Nav;
 
 export default function ProfileComparison({ submitR, getRefSigOptions }) {
   const dispatch = useDispatch();
-  const visualization = useSelector((state) => state.visualization);
+  const store = useSelector((state) => state.visualization);
   const mergeProfileComparison = (state) =>
     dispatch(actions.mergeVisualization({ profileComparison: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const {
-    source,
-    study,
-    studyOptions,
-    cancerType,
-    pubExperimentalStrategy,
-    pDataOptions,
-    projectID,
-    matrixList,
-    svgList,
-    profileOptions,
-  } = visualization.main;
+  const { study, cancer, strategy } = store.publicForm;
+
+  const { source, projectID, matrixList, svgList, profileOptions } = store.main;
+
+  const { data, error, isFetching } = useGetPublicDataOptionsQuery();
+
+  const studyOptions = data
+    ? // ? Object.keys(data).map((e) => ({ label: e, value: e }))
+      Object.keys(data)
+    : [];
 
   const {
     withinProfileType,
@@ -84,7 +83,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     withinSubmitOverlay,
     refSubmitOverlay,
     pubSubmitOverlay,
-  } = visualization.profileComparison;
+  } = store.profileComparison;
 
   const [invalidSignature, setInvalid] = useState(false);
 
@@ -146,14 +145,14 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
 
   // set initial study
   useEffect(() => {
-    if (!pubStudy && study) handleStudyChange(study);
+    if (!pubStudy && study) handleStudyChange(study.value);
   }, []);
 
   // get public data samples
   useEffect(() => {
     if (!pubSampleOptions.length && source == 'user' && pubStudy)
       getPublicSamples(pubStudy, pubCancerType);
-  }, [pDataOptions, pubStudy]);
+  }, [data, pubStudy]);
 
   function setOverlay(type, status) {
     mergeProfileComparison({ [`${type}SubmitOverlay`]: status });
@@ -271,13 +270,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         study: study,
         cancerType: cancerType,
         experimentalStrategy: [
-          ...new Set(
-            pDataOptions
-              .filter(
-                (data) => data.Study == study && data.Cancer_Type == cancerType
-              )
-              .map((data) => data.Dataset)
-          ),
+          ...new Set(Object.values(data[study][cancerType])),
         ][0],
       };
 
@@ -316,13 +309,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
   }
 
   function handleStudyChange(study) {
-    const cancerTypeOptions = [
-      ...new Set(
-        pDataOptions
-          .filter((data) => data.Study == study)
-          .map((data) => data.Cancer_Type)
-      ),
-    ];
+    const cancerTypeOptions = Object.keys(data[study]);
 
     mergeProfileComparison({
       pubStudy: study,
@@ -343,8 +330,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     const matrixOptions = [
       ...new Set(
         svgList
-          .filter((row) => row.Profile_Type == profile)
-          .map(({ Matrix_Size }) => Matrix_Size)
+          .filter((row) => row.profileType == profile)
+          .map(({ matrixSize }) => matrixSize)
       ),
     ].sort((a, b) => a - b);
 
@@ -425,8 +412,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                         sampleName2: withinSampleName2,
                         matrixFile: matrixList.filter(
                           (row) =>
-                            row.Profile_Type == withinProfileType &&
-                            row.Matrix_Size ==
+                            row.profileType == withinProfileType &&
+                            row.matrixSize ==
                               defaultMatrix(withinProfileType, [
                                 '96',
                                 '78',
@@ -439,9 +426,9 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                         profileType: withinProfileType,
                         sampleName1: withinSampleName1,
                         sampleName2: withinSampleName2,
-                        study: study,
-                        cancerType: cancerType,
-                        experimentalStrategy: pubExperimentalStrategy,
+                        study: study.value,
+                        cancerType: cancer.value,
+                        experimentalStrategy: strategy.value,
                       });
                     }
                   }}
@@ -610,8 +597,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                           compare: refCompare,
                           matrixFile: matrixList.filter(
                             (row) =>
-                              row.Profile_Type == withinProfileType &&
-                              row.Matrix_Size ==
+                              row.profileType == withinProfileType &&
+                              row.matrixSize ==
                                 defaultMatrix(withinProfileType, [
                                   '96',
                                   '78',
@@ -625,9 +612,9 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                           sampleName: refSampleName,
                           signatureSet: refSignatureSet,
                           compare: refCompare,
-                          study: study,
-                          cancerType: cancerType,
-                          experimentalStrategy: pubExperimentalStrategy,
+                          study: study.value,
+                          cancerType: cancer.value,
+                          experimentalStrategy: strategy.value,
                         });
                       }
                     } else {
@@ -775,8 +762,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                       profileName: userProfileType + userMatrixSize,
                       matrixFile: matrixList.filter(
                         (row) =>
-                          row.Profile_Type == userProfileType &&
-                          row.Matrix_Size == userMatrixSize
+                          row.profileType == userProfileType &&
+                          row.matrixSize == userMatrixSize
                       )[0].Path,
                       userSample: userSampleName,
                       study: pubStudy,

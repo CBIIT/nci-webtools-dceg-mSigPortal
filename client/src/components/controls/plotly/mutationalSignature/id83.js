@@ -295,7 +295,7 @@ export default function ID83(data, sample) {
     y: 0.9,
     text:
       "<b>" +
-      sample.value +
+      sample +
       ": " +
       numberWithCommas(totalMutations) +
       " indels</b>",
