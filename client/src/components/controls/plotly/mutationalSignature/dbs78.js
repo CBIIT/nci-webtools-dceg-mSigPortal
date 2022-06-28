@@ -118,6 +118,7 @@ export default function DBS78(data, sample) {
   };
 
   const layout = {
+    hoverlabel: { bgcolor: "#FFF" },
     xaxis: {
       //title: "Double Substitution",
       showticklabels: true,

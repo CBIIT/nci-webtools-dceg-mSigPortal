@@ -107,11 +107,7 @@ export default function SBS96(data, sample) {
     x: 0,
     y: 0.9,
     text:
-      "<b>" +
-      sample +
-      ": " +
-      numberWithCommas(totalMutations) +
-      " subs </b>",
+      "<b>" + sample + ": " + numberWithCommas(totalMutations) + " subs </b>",
     showarrow: false,
     font: {
       size: 18,
@@ -143,6 +139,7 @@ export default function SBS96(data, sample) {
   console.log(shapes);
 
   const layout = {
+    hoverlabel: { bgcolor: "#FFF" },
     xaxis: {
       showticklabels: false,
       showline: true,

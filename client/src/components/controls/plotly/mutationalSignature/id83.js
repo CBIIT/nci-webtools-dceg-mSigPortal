@@ -294,11 +294,7 @@ export default function ID83(data, sample) {
     x: 0,
     y: 0.9,
     text:
-      "<b>" +
-      sample +
-      ": " +
-      numberWithCommas(totalMutations) +
-      " indels</b>",
+      "<b>" + sample + ": " + numberWithCommas(totalMutations) + " indels</b>",
     showarrow: false,
     font: {
       size: 18,
@@ -369,6 +365,7 @@ export default function ID83(data, sample) {
   );
 
   const layout = {
+    hoverlabel: { bgcolor: "#FFF" },
     xaxis: {
       showticklabels: false,
       showline: true,

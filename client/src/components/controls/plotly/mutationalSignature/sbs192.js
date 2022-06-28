@@ -216,6 +216,7 @@ export default function SBS192(data, sample) {
   const traces = [tracesT, tracesU];
 
   const layout = {
+    hoverlabel: { bgcolor: "#FFF" },
     showlegend: true,
     legend: {
       x: 1,
