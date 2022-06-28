@@ -55,7 +55,7 @@ export default function PublicForm() {
 
   async function onSubmit(data) {
     try {
-      mergeMain({ loading: { active: true } });
+      mergeMain({ submitted: true, loading: { active: true } });
       mergeState(data);
       const args = {
         study: data.study.value,
@@ -136,7 +136,6 @@ export default function PublicForm() {
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
-      <LoadingOverlay active={isFetching || isLoading} />
       {error && <p>There was an error retrieving public data options</p>}
       <Select
         className="mb-2"

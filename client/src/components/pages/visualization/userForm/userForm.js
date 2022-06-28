@@ -151,6 +151,7 @@ export default function UserForm() {
   // upload files and continue with web or queue submit
   async function onSubmit(data) {
     try {
+      mergeMain({ submitted: true });
       const formData = new FormData();
       formData.append('inputFile', data.inputFile);
       if (bedFile.size) formData.append('bedFile', data.bedFile);
@@ -164,7 +165,6 @@ export default function UserForm() {
         inputFilename: data.inputFile.name,
         bedFilename: data.bedFile.name,
       });
-      mergeMain({ submitted: true });
     } catch (error) {
       mergeError('An error occured while uploading files. Please try again.');
     }
