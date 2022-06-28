@@ -140,7 +140,7 @@
               "type": "string"
             },
             "value": "Lung-AdenoCA"
-          }
+          },
           {
             "name": "signature_set",
             "in": "query",
@@ -155,7 +155,7 @@
               ]
             },
             "value": "COSMIC_v3_Signatures_GRCh37_SBS96"
-          },
+          }
         ],
         "responses": {
           "200": {
