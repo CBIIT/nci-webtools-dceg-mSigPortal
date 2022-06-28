@@ -24,6 +24,7 @@ export default function SBS192(data, sample) {
 
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+  const maxVal = Math.max(...data.map((o) => o.Mutations));
 
   const totalMutations = data.reduce((a, e) => a + parseInt(e.Mutations), 0);
   // group data by dominant mutation
@@ -239,7 +240,8 @@ export default function SBS192(data, sample) {
     },
     yaxis: {
       title: "Number of Single Base Substitutions",
-      autorange: true,
+      autorange: false,
+      range: [0, maxVal + maxVal * 0.2],
       linecolor: "black",
       linewidth: 2,
       mirror: true,
