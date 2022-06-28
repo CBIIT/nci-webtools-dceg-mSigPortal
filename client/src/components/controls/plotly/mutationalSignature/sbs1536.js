@@ -11,7 +11,6 @@ export default function SBS96(data, sample) {
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 
   const totalMutations = data.reduce((a, e) => a + parseInt(e.Mutations), 0);
-  const maxVal = Math.max(...data.map((o) => o.Mutations));
 
   console.log("data--:");
   console.log(data);
@@ -182,6 +181,10 @@ export default function SBS96(data, sample) {
 
   const flatSorted = Object.values(groupByTotal).flat();
   const mutationTitle = Object.keys(groupByTotal).flat();
+
+  const maxVal = Math.max(...flatSorted.map((o) => o.contribution));
+  console.log("MaxVal");
+  console.log(maxVal);
 
   console.log("FlatSorted--");
   console.log(flatSorted);

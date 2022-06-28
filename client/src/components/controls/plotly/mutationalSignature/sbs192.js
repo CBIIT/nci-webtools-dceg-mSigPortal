@@ -8,8 +8,8 @@ export default function SBS192(data, sample) {
     "T>G": "#EBC6C4",
   };
 
-  console.log("data--:");
-  console.log(data);
+  //   console.log("data--:");
+  //   console.log(data);
 
   const arrayDataT = [];
   const arrayDataU = [];
