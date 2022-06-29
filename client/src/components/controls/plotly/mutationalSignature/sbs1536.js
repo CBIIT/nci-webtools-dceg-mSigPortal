@@ -36,6 +36,10 @@ export default function SBS96(data, sample) {
   console.log("groupByMutation:---");
   console.log(groupByMutation);
 
+  const maxValMutation = Math.max(...data.map((o) => o.Mutations));
+  console.log("maxValMutation:---");
+  console.log(maxValMutation);
+
   const groupByMutationInner = data.reduce((groups, e, i) => {
     const mutation = e.MutationType.substring(1, 8);
 
@@ -191,8 +195,8 @@ export default function SBS96(data, sample) {
     heatMapZ3_5,
   ];
 
-  console.log("heatMapZFinal3");
-  console.log(heatMapZFinal3);
+  const maxZ3 = Math.max(...heatMapZFinal3.flat(Infinity));
+  console.log(maxZ3);
 
   const groupByMutationBack = data.reduce((groups, e, i) => {
     const mutation = e.MutationType.substring(1, e.MutationType.length);
@@ -369,6 +373,9 @@ export default function SBS96(data, sample) {
   console.log("heatMapZFinal");
   console.log(heatMapZFinal);
 
+  const maxZ = Math.max(...heatMapZFinal.flat(Infinity));
+  console.log(maxZ);
+
   const tracesBar = Object.entries(groupByTotal).map(
     ([mutation, signatures], groupIndex, array) => ({
       name: mutation,
@@ -394,7 +401,7 @@ export default function SBS96(data, sample) {
   console.log(tracesBar);
 
   const traceHeatMap = heatMapZFinal.map((num, index, array) => ({
-    colorbar: { len: 0.35, y: 0.15, autotick: true, tick0: 0, dtick: 0.005 },
+    colorbar: { len: 0.35, y: 0.15, autotick: true, tick0: 0 },
     colorscale: [
       [0, "rgb(56,56,156"],
       [0.2, "rgb(56,56,156"],
@@ -408,7 +415,7 @@ export default function SBS96(data, sample) {
       [1, "rgb(255,255,39)"],
     ],
     zmin: 0,
-    zmax: 0.005,
+    zmax: maxZ,
     z: num,
     y: heatmapY,
     type: "heatmap",
@@ -429,7 +436,7 @@ export default function SBS96(data, sample) {
   console.log(traceHeatMap);
 
   const traceHeatMap2 = heatMapZFinal3.map((num, index, array) => ({
-    colorbar: { len: 0.35, y: 0.5, autotick: true, tick0: 0, dtick: 0.01 },
+    colorbar: { len: 0.35, y: 0.5, autotick: true, tick0: 0 },
     colorscale: [
       [0, "rgb(56,56,156"],
       [0.2, "rgb(56,56,156"],
@@ -443,7 +450,7 @@ export default function SBS96(data, sample) {
       [1, "rgb(255,255,39)"],
     ],
     zmin: 0,
-    zmax: 0.017,
+    zmax: maxZ3,
     z: num,
     y: heatmapY3_c,
     type: "heatmap",
