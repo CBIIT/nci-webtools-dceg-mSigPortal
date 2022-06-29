@@ -819,7 +819,7 @@ async function signatureRefSets(req, res, next) {
   }
 }
 
-async function querySignature(req, res, next) {
+async function querySeqmatrix(req, res, next) {
   try {
     const { study, cancer, strategy, sample, profile, matrix } = req.query;
     const s3 = new AWS.S3();
@@ -863,6 +863,27 @@ async function queryExposure(req, res, next) {
   }
 }
 
+async function querySignature(req, res, next) {
+  try {
+    const { profile, signature_set } = req.query;
+    const s3 = new AWS.S3();
+
+    const params = {
+      Bucket: config.data.bucket,
+      Key: path.join(
+        config.data.s3,
+        `Signature/${profile}/${signature_set}/data.json`
+      ),
+    };
+    const { Body } = await s3.getObject(params).promise();
+    const data = JSON.parse(Body);
+
+    res.json(data);
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   parseCSV,
   profilerExtraction,
@@ -886,6 +907,7 @@ module.exports = {
   downloadWorkspace,
   associationWrapper,
   signatureRefSets,
-  querySignature,
+  querySeqmatrix,
   queryExposure,
+  querySignature,
 };

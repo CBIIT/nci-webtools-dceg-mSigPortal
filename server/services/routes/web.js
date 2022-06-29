@@ -21,8 +21,9 @@ const {
   downloadWorkspace,
   associationWrapper,
   signatureRefSets,
-  querySignature,
+  querySeqmatrix,
   queryExposure,
+  querySignature,
 } = require('../analysis');
 
 const router = express.Router();
@@ -78,10 +79,11 @@ router.post('/associationWrapper', associationWrapper);
 
 router.get('/signatureRefSets', signatureRefSets);
 
-router.get('/signature', querySignature);
+router.get('/seqmatrix', querySeqmatrix);
 
 router.get('/exposure', queryExposure);
 
+router.get('/signature', querySignature);
 router.use((err, req, res, next) => {
   logger.debug(err);
   const { name, message, stack } = err;
