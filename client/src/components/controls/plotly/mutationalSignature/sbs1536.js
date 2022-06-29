@@ -12,6 +12,10 @@ export default function SBS96(data, sample) {
 
   const totalMutations = data.reduce((a, e) => a + parseInt(e.Mutations), 0);
 
+  const chunks = (a, size) =>
+    Array.from(new Array(Math.ceil(a.length / size)), (_, i) =>
+      a.slice(i * size, i * size + size)
+    );
   console.log("data--:");
   console.log(data);
 
@@ -82,45 +86,7 @@ export default function SBS96(data, sample) {
   console.log("groupByMutationOuterInner:---");
   console.log(groupByMutationOuterInner);
 
-  const groupByMutationTN = data.reduce((groups, e, i) => {
-    const mutation = e.MutationType[0] + e.MutationType.substring(2, 7);
-    const signature = {
-      mutationType: e.MutationType,
-      contribution: e.Mutations,
-    };
-    groups[mutation] = groups[mutation]
-      ? [...groups[mutation], signature]
-      : [signature];
-    return groups;
-  }, {});
-
-  console.log("groupByMutationTN:---");
-  console.log(groupByMutationTN);
-
-  //   const testObj = Object.fromEntries(
-  //     Object.entries(groupByMutationTN).map(([key, value]) => {
-  //       const sumVal = value.reduce((mutationSum, arrayVal) => {
-  //         const muType = arrayVal.mutationType;
-  //         const currMutationName = muType.substring(0, muType.length - 1);
-  //         console.log(mutationSum);
-  //         console.log(arrayVal);
-  //         console.log(arrayVal.contribution);
-  //         //   if (mutationSum[currMutationName]) {
-  //         //     mutationSum[currMutationName] =
-  //         //       mutationSum[currMutationName] + arrayVal.contribution;
-  //         //   } else {
-  //         //     mutationSum[currMutationName] = arrayVal.contribution;
-  //         //   }
-  //         // }, {});
-  //       });
-  //       return [key, sumVal];
-  //     })
-  //   );
-
-  //   console.log("testObj:---");
-  //   console.log(testObj);
-
-  const groupByMutationSum4 = data.reduce((groups, e, i) => {
+  const groupByMutationFront = data.reduce((groups, e, i) => {
     const mutation = e.MutationType.substring(0, e.MutationType.length - 1);
     const signature = {
       mutationType: e.MutationType,
@@ -132,11 +98,104 @@ export default function SBS96(data, sample) {
     return groups;
   }, {});
 
-  console.log("groupByMutationSum4:---");
-  console.log(groupByMutationSum4);
+  console.log("groupByMutationFront:---");
+  console.log(groupByMutationFront);
 
-  const groupByMutationA = data.reduce((groups, e, i) => {
-    const mutation = e.MutationType.substring(0, 8);
+  const mutationSumFront = Object.entries(groupByMutationFront).map(
+    ([key, value]) => ({
+      mutationType: key,
+      contribution: value.reduce((a, e) => a + parseInt(e.contribution), 0),
+    })
+  );
+
+  console.log("mutationSumFront:---");
+  console.log(mutationSumFront);
+
+  const arrayMutationSumFront = Object.values(mutationSumFront).flat();
+
+  console.log("arrayMutationSumFront:---");
+  console.log(arrayMutationSumFront);
+
+  const groupByMutation2 = arrayMutationSumFront.reduce((groups, e, i) => {
+    const mutationRegex = /\[(.*)\]/;
+    const mutation = e.mutationType.match(mutationRegex)[1];
+    const signature = {
+      mutationType: e.mutationType,
+      contribution: e.contribution,
+    };
+    groups[mutation] = groups[mutation]
+      ? [...groups[mutation], signature]
+      : [signature];
+    return groups;
+  }, {});
+
+  console.log("groupByMutation2:---");
+  console.log(groupByMutation2);
+
+  const heatmapY3 = [];
+  const heatmapZ3 = [];
+  const heatmapX3 = [];
+  Object.entries(groupByMutation2).forEach(
+    ([key, value], groupIndex, array) => {
+      heatmapY3.push(Object.entries(value).map(([k, v]) => v.mutationType));
+      heatmapZ3.push(
+        Object.entries(value).map(([k, v]) => v.contribution / totalMutations)
+      );
+      heatmapX3.push(
+        value.map(
+          (e, i) =>
+            array
+              .slice(0, groupIndex)
+              .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
+        )
+      );
+    }
+  );
+
+  console.log("heatmapY3:---");
+  console.log(heatmapY3);
+  console.log("heatmapZ3:---");
+  console.log(heatmapZ3);
+  console.log("heatmapX3:---");
+  console.log(heatmapX3);
+
+  let heatmapY3_c = [
+    heatmapY3[0][0].charAt(0) + "-- N",
+    heatmapY3[0][16].charAt(0) + "-- N",
+    heatmapY3[0][32].charAt(0) + "-- N",
+    heatmapY3[0][48].charAt(0) + "-- N",
+  ];
+  console.log("heatmapY3_c:---");
+  console.log(heatmapY3_c);
+  let heatMapZ3_0 = chunks(heatmapZ3[0], 16);
+  let heatMapZ3_1 = chunks(heatmapZ3[1], 16);
+  let heatMapZ3_2 = chunks(heatmapZ3[2], 16);
+  let heatMapZ3_3 = chunks(heatmapZ3[3], 16);
+  let heatMapZ3_4 = chunks(heatmapZ3[4], 16);
+  let heatMapZ3_5 = chunks(heatmapZ3[5], 16);
+
+  heatmapZ3.forEach((item, index) => {});
+  console.log(heatMapZ3_0);
+  console.log(heatMapZ3_1);
+  console.log(heatMapZ3_2);
+  console.log(heatMapZ3_3);
+  console.log(heatMapZ3_4);
+  console.log(heatMapZ3_4);
+
+  const heatMapZFinal3 = [
+    heatMapZ3_0,
+    heatMapZ3_1,
+    heatMapZ3_2,
+    heatMapZ3_3,
+    heatMapZ3_4,
+    heatMapZ3_5,
+  ];
+
+  console.log("heatMapZFinal3");
+  console.log(heatMapZFinal3);
+
+  const groupByMutationBack = data.reduce((groups, e, i) => {
+    const mutation = e.MutationType.substring(1, e.MutationType.length);
     const signature = {
       mutationType: e.MutationType,
       contribution: e.Mutations,
@@ -147,8 +206,39 @@ export default function SBS96(data, sample) {
     return groups;
   }, {});
 
-  console.log("groupByMutationA:---");
-  console.log(groupByMutationA);
+  console.log("groupByMutationBack:---");
+  console.log(groupByMutationBack);
+
+  const mutationSumBack = Object.entries(groupByMutationBack).map(
+    ([key, value]) => ({
+      mutationType: key,
+      contribution: value.reduce((a, e) => a + parseInt(e.contribution), 0),
+    })
+  );
+
+  console.log("mutationSumBack:---");
+  console.log(mutationSumBack);
+
+  const arrayMutationSumBack = Object.values(mutationSumBack).flat();
+
+  console.log("arrayMutationSumBack:---");
+  console.log(arrayMutationSumBack);
+
+  const groupByMutation3 = arrayMutationSumBack.reduce((groups, e, i) => {
+    const mutationRegex = /\[(.*)\]/;
+    const mutation = e.mutationType.match(mutationRegex)[1];
+    const signature = {
+      mutationType: e.mutationType,
+      contribution: e.contribution,
+    };
+    groups[mutation] = groups[mutation]
+      ? [...groups[mutation], signature]
+      : [signature];
+    return groups;
+  }, {});
+
+  console.log("groupByMutation3:---");
+  console.log(groupByMutation3);
 
   const totalMutationsGroup = Object.entries(groupByMutationInner).map(
     ([mutation, signatures], groupIndex, array) => ({
@@ -231,14 +321,9 @@ export default function SBS96(data, sample) {
     }
   );
 
-  console.log("heatmapY");
-  //   console.log(heatmapY);
   console.log("heatmapZ");
   console.log(heatmapZ);
-  //   console.log("heatmapX");
-  //   console.log(heatmapX);
 
-  //const copyHeatMapZ = [...heatmapZ];
   let heatMapZ0 = [];
   let heatMapZ1 = [];
   let heatMapZ2 = [];
@@ -258,12 +343,19 @@ export default function SBS96(data, sample) {
     heatMapZ5.push(item.slice().splice(80, 16));
     //console.log(splitToChunks(item, 6));
   });
-  console.log(heatMapZ0);
-  console.log(heatMapZ1);
-  console.log(heatMapZ2);
-  console.log(heatMapZ3);
-  console.log(heatMapZ4);
-  console.log(heatMapZ5);
+  // console.log(heatMapZ0);
+  // console.log(heatMapZ1);
+  // console.log(heatMapZ2);
+  // console.log(heatMapZ3);
+  // console.log(heatMapZ4);
+  // console.log(heatMapZ5);
+
+  // let heatMapZ0 = chunks(heatmapZ[0], 16);
+  // let heatMapZ1 = chunks(heatmapZ[1], 16);
+  // let heatMapZ2 = chunks(heatmapZ[2], 16);
+  // let heatMapZ3 = chunks(heatmapZ[3], 16);
+  // let heatMapZ4 = chunks(heatmapZ[4], 16);
+  // let heatMapZ5 = chunks(heatmapZ[5], 16);
 
   const heatMapZFinal = [
     heatMapZ0,
@@ -301,52 +393,8 @@ export default function SBS96(data, sample) {
   console.log("tracesBar:");
   console.log(tracesBar);
 
-  const tracesHeat = Object.entries(groupByMutation).map(
-    ([mutation, signatures], groupIndex, array) => ({
-      name: mutation,
-      type: "heatmap",
-      marker: { color: colors[mutation] },
-      //   x: signatures.map((e) => e.mutationType),
-      //x: signatures.map((e, i) => groupIndex * signatures.length + i),
-      x: signatures.map(
-        (e, i) =>
-          array
-            .slice(0, groupIndex)
-            .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
-      ),
-      y: heatmapY,
-      z: Object.entries(signatures).map(([k, v]) => v.contribution),
-      hoverinfo: "x+y",
-      showlegend: false,
-      array: array,
-      mutation: mutation,
-      signatures: signatures,
-      xaxis: "x",
-      yaxis: "y2",
-      colorbar: { len: 0.5, y: 0.2 },
-    })
-  );
-
-  //   const tracesHeat1 = [
-  //     {
-  //       colorbar: { len: 0.5, y: 0.2 },
-  //       z: heatmapZ,
-  //       x: heatmapX[0],
-  //       y: heatmapY,
-  //       type: "heatmap",
-  //       hoverongaps: false,
-  //       xaxis: "x",
-  //       yaxis: "y2",
-  //     },
-  //   ];
-  console.log("tracesHeat:");
-  console.log(tracesHeat);
-
-  //   console.log("tracesHeat1:");
-  //   console.log(tracesHeat1);
-
   const traceHeatMap = heatMapZFinal.map((num, index, array) => ({
-    colorbar: { len: 0.5, y: 0.2, autotick: true, tick0: 0, dtick: 0.005 },
+    colorbar: { len: 0.35, y: 0.15, autotick: true, tick0: 0, dtick: 0.005 },
     colorscale: [
       [0, "rgb(56,56,156"],
       [0.2, "rgb(56,56,156"],
@@ -364,6 +412,39 @@ export default function SBS96(data, sample) {
     type: "heatmap",
     hoverongaps: false,
     xaxis: "x",
+    yaxis: "y3",
+    num: num,
+
+    x: num.map(
+      (e, i) =>
+        array.slice(0, index).reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
+    ),
+    hovertemplate:
+      "x: %{x}<br>" + "y: %{y}<br>" + "Value: %{z}" + "<extra></extra>",
+  }));
+
+  console.log("traceHeatMap");
+  console.log(traceHeatMap);
+
+  const traceHeatMap2 = heatMapZFinal3.map((num, index, array) => ({
+    colorbar: { len: 0.35, y: 0.5, autotick: true, tick0: 0, dtick: 0.01 },
+    colorscale: [
+      [0, "rgb(56,56,156"],
+      [0.2, "rgb(56,56,156"],
+      [0.2, "rgb(106,106,128"],
+      [0.4, "rgb(106,106,128"],
+      [0.4, "rgb(155,146,98"],
+      [0.6, "rgb(155,146,98"],
+      [0.6, "rgb(205,186,69"],
+      [0.8, "rgb(205,186,69"],
+      [0.8, "rgb(255,255,39)"],
+      [1, "rgb(255,255,39)"],
+    ],
+    z: num,
+    y: heatmapY3_c,
+    type: "heatmap",
+    hoverongaps: false,
+    xaxis: "x",
     yaxis: "y2",
     num: num,
 
@@ -378,7 +459,7 @@ export default function SBS96(data, sample) {
   console.log("traceHeatMap");
   console.log(traceHeatMap);
 
-  const traces = [...tracesBar, ...traceHeatMap];
+  const traces = [...tracesBar, ...traceHeatMap, ...traceHeatMap2];
 
   console.log("traces:");
   console.log(traces);
@@ -463,7 +544,7 @@ export default function SBS96(data, sample) {
   const layout = {
     hoverlabel: { bgcolor: "#FFF" },
     grid: {
-      rows: 2,
+      rows: 3,
       columns: 1,
     },
     xaxis: {
@@ -490,9 +571,14 @@ export default function SBS96(data, sample) {
     },
     yaxis2: {
       autorange: true,
-      linecolor: "black",
-      linewidth: 1,
-      mirror: true,
+      anchor: "x",
+      dtick: 1,
+      tickfont: {
+        size: 10,
+      },
+    },
+    yaxis3: {
+      autorange: true,
       anchor: "x",
       dtick: 1,
       tickfont: {
