@@ -575,7 +575,7 @@ export default function SBS96(data, sample) {
     yaxis: {
       //   title: "Number of Single Base Substitutions",
       autorange: false,
-      range: [0, maxVal + maxVal * 0.2],
+      range: [0, maxVal + maxVal * 0.35],
       linecolor: "black",
       linewidth: 1,
       mirror: true,
@@ -583,7 +583,7 @@ export default function SBS96(data, sample) {
     yaxis2: {
       autorange: true,
       anchor: "x",
-      dtick: 1,
+
       tickfont: {
         size: 10,
       },
