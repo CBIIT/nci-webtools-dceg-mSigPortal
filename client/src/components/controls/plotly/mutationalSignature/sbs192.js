@@ -241,7 +241,7 @@ export default function SBS192(data, sample) {
     yaxis: {
       title: "Number of Single Base Substitutions",
       autorange: false,
-      range: [0, maxVal + maxVal * 0.2],
+      range: [0, maxVal + maxVal * 0.35],
       linecolor: "black",
       linewidth: 2,
       mirror: true,
