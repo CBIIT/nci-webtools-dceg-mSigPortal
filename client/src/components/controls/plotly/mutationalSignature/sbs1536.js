@@ -64,7 +64,9 @@ export default function SBS96(data, sample) {
   ///// Bar Chart ////
 
   const totalMutationsGroup = Object.entries(groupByMutationInner).map(
-    ([mutation, signatures]) => ({
+    ([mutation, signatures], groupIndex, array) => ({
+      mutationType: mutation,
+      signatures: signatures,
       total: signatures.reduce((a, e) => a + parseInt(e.contribution), 0),
     })
   );
@@ -233,8 +235,8 @@ export default function SBS96(data, sample) {
     return groups;
   }, {});
 
-  console.log("groupByMutationBack:---");
-  console.log(groupByMutationBack);
+  // console.log("groupByMutationBack:---");
+  // console.log(groupByMutationBack);
 
   const mutationSumBack = Object.entries(groupByMutationBack).map(
     ([key, value]) => ({
@@ -243,8 +245,8 @@ export default function SBS96(data, sample) {
     })
   );
 
-  console.log("mutationSumBack:---");
-  console.log(mutationSumBack);
+  // console.log("mutationSumBack:---");
+  // console.log(mutationSumBack);
 
   // sort by the last letter
   mutationSumBack.sort((a, b) =>
@@ -416,8 +418,8 @@ export default function SBS96(data, sample) {
     ...traceHeatMap3,
   ];
 
-  console.log("traces:");
-  console.log(traces);
+  // console.log("traces:");
+  // console.log(traces);
   const annotations = Object.entries(groupByTotal).map(
     ([mutation, signatures], groupIndex, array) => ({
       xref: "x",
@@ -553,8 +555,8 @@ export default function SBS96(data, sample) {
     shapes: shapes,
     annotations: [...annotations, sampleAnnotation, ...xannotations],
   };
-  console.log("layout");
-  console.log(layout);
+  // console.log("layout");
+  // console.log(layout);
 
   return { traces, layout };
 }
