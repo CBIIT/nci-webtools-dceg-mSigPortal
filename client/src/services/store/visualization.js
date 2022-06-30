@@ -109,6 +109,10 @@ export const getInitialState = () => ({
     pattern: '',
   },
   profileComparison: {
+    withinForm: { profile: '', sample1: '', sample2: '' },
+    referenceForm: { profile: '', sample: '', signatureSet: '', compare: '' },
+    publicForm: {},
+
     withinProfileType: '',
     withinSampleName1: '',
     withinSampleName2: '',
@@ -133,13 +137,13 @@ export const getInitialState = () => ({
     withinPlotPath: '',
     refPlotPath: '',
     pubPlotPath: '',
-    display: 'within',
     refErr: false,
     pubErr: false,
     debugR: [],
     withinSubmitOverlay: false,
     refSubmitOverlay: false,
     pubSubmitOverlay: false,
+    display: 'within',
   },
   pca: {
     profileType: '',
