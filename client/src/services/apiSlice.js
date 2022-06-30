@@ -13,15 +13,8 @@ export const apiSlice = createApi({
     signature: builder.query({
       query: (params) => ({ url: 'signature', params }),
     }),
-    signatureRefSets: builder.query({
-      query: (params) => ({ url: 'signatureRefSets', params }),
-    }),
   }),
 });
 
-export const {
-  useSeqmatrixQuery,
-  useExposureQuery,
-  useSignatureQuery,
-  useSignatureRefSetsQuery,
-} = apiSlice;
+export const { useSeqmatrixQuery, useExposureQuery, useSignatureQuery } =
+  apiSlice;

@@ -20,7 +20,6 @@ const {
   getFileS3,
   downloadWorkspace,
   associationWrapper,
-  signatureRefSets,
   querySeqmatrix,
   queryExposure,
   querySignature,
@@ -76,8 +75,6 @@ router.post('/getFileS3', getFileS3);
 router.post('/downloadWorkspace', downloadWorkspace);
 
 router.post('/associationWrapper', associationWrapper);
-
-router.get('/signatureRefSets', signatureRefSets);
 
 router.get('/seqmatrix', querySeqmatrix);
 
