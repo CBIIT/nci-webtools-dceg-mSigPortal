@@ -334,6 +334,11 @@ export default function SBS288(data, sample) {
 
   const layout = {
     hoverlabel: { bgcolor: "#FFF" },
+    legend: {
+      x: 1,
+      xanchor: "right",
+      y: 0,
+    },
     grid: {
       rows: 1,
       columns: 2,
@@ -355,6 +360,7 @@ export default function SBS288(data, sample) {
       linecolor: "black",
       linewidth: 1,
       mirror: true,
+      domain: [0, 0.75],
     },
     yaxis: {
       title: "Number of Single Base Substitutions",
@@ -371,6 +377,7 @@ export default function SBS288(data, sample) {
       tickfont: {
         size: 10,
       },
+      domain: [0.8, 1],
     },
     yaxis2: {
       showline: true,
