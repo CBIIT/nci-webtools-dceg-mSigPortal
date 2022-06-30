@@ -4,11 +4,14 @@ export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({ baseUrl: 'web' }),
   endpoints: (builder) => ({
-    signature: builder.query({
-      query: (params) => ({ url: 'signature', params }),
+    seqmatrix: builder.query({
+      query: (params) => ({ url: 'seqmatrix', params }),
     }),
     exposure: builder.query({
       query: (params) => ({ url: 'exposure', params }),
+    }),
+    signature: builder.query({
+      query: (params) => ({ url: 'signature', params }),
     }),
     signatureRefSets: builder.query({
       query: (params) => ({ url: 'signatureRefSets', params }),
@@ -16,5 +19,9 @@ export const apiSlice = createApi({
   }),
 });
 
-export const { useSignatureQuery, useExposureQuery, useSignatureRefSetsQuery } =
-  apiSlice;
+export const {
+  useSeqmatrixQuery,
+  useExposureQuery,
+  useSignatureQuery,
+  useSignatureRefSetsQuery,
+} = apiSlice;

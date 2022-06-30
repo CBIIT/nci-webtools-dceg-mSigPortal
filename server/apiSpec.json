@@ -22,10 +22,10 @@
         }
       }
     },
-    "/api/signature": {
+    "/api/seqmatrix": {
       "get": {
-        "tags": ["signature"],
-        "summary": "Retrieves signature data for mutational profile plots",
+        "tags": ["seqmatrix"],
+        "summary": "Retrieves seqmatrix data",
         "produces": ["application/json"],
         "parameters": [
           {
@@ -155,6 +155,49 @@
               "type": "string"
             },
             "value": "Lung-AdenoCA"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "500": {
+            "description": "API error"
+          }
+        }
+      }
+    },
+    "/api/signature": {
+      "get": {
+        "tags": ["signature"],
+        "summary": "Retrieves signature data",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "profile",
+            "in": "query",
+            "description": "Select profile",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["SBS", "DBS", "ID"]
+            },
+            "value": "SBS"
+          },
+          {
+            "name": "signature_set",
+            "in": "query",
+            "description": "Select signature set to filter data by.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "COSMIC_v3_Signatures_GRCh37_SBS96",
+                "COSMIC_v3_Signatures_GRCh37_DBS78",
+                "COSMIC_v3_Signatures_GRCh37_ID83"
+              ]
+            },
+            "value": "COSMIC_v3_Signatures_GRCh37_SBS96"
           }
         ],
         "responses": {

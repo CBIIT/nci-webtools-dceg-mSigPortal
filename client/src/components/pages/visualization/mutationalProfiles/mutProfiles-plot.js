@@ -5,7 +5,7 @@ import Plot from "react-plotly.js";
 import { downloadImage } from "plotly.js";
 import { saveAs } from "file-saver";
 import { useSelector } from "react-redux";
-import { useSignatureQuery } from "../../../../services/apiSlice";
+import { useSeqmatrixQuery } from "../../../../services/apiSlice";
 import { LoadingOverlay } from "../../../controls/loading-overlay/loading-overlay";
 import SBS96 from "../../../controls/plotly/mutationalSignature/sbs96";
 import SBS192 from "../../../controls/plotly/mutationalSignature/sbs192";
@@ -27,7 +27,7 @@ export default function MutProfilePlot() {
     data = [],
     error,
     isFetching,
-  } = useSignatureQuery(params, {
+  } = useSeqmatrixQuery(params, {
     skip: !params,
   });
 
