@@ -22,9 +22,7 @@ export default function SBS96(data, sample) {
   ];
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-
   const totalMutations = data.reduce((a, e) => a + parseInt(e.Mutations), 0);
-
   const chunks = (a, size) =>
     Array.from(new Array(Math.ceil(a.length / size)), (_, i) =>
       a.slice(i * size, i * size + size)
@@ -37,7 +35,6 @@ export default function SBS96(data, sample) {
 
   const groupByMutationInner = data.reduce((groups, e, i) => {
     const mutation = e.MutationType.substring(1, 8);
-
     const signature = {
       mutationType: e.MutationType,
       contribution: e.Mutations,
@@ -61,7 +58,7 @@ export default function SBS96(data, sample) {
     return groups;
   }, {});
 
-  ///// Bar Chart ////
+  /////---------------- Bar Chart ---------------------------------////
 
   const totalMutationsGroup = Object.entries(groupByMutationInner).map(
     ([mutation, signatures], groupIndex, array) => ({
@@ -74,7 +71,6 @@ export default function SBS96(data, sample) {
   const groupByTotal = totalMutationsGroup.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
     const mutation = e.mutationType.match(mutationRegex)[1];
-
     const signature = {
       mutationType: e.mutationType,
       contribution: e.total,
@@ -109,23 +105,10 @@ export default function SBS96(data, sample) {
     })
   );
 
-  // const arrayDataX1 =
-  //   groupByMutationOuter[Object.keys(groupByMutationOuter)[0]];
-
-  // const groupByMutation1 = arrayDataX1.reduce((groups, e, i) => {
-  //   const mutationRegex = /\[(.*)\]/;
-  //   const mutation = e.mutationType.match(mutationRegex)[1];
-  //   const signature = {
-  //     mutationType: e.mutationType,
-  //     contribution: e.contribution,
-  //   };
-  //   groups[mutation] = groups[mutation]
-  //     ? [...groups[mutation], signature]
-  //     : [signature];
-  //   return groups;
-  // }, {});
-
   ////// ------- Heat Map 1 -----////
+  const heatmapY2 = [];
+  const heatmapZ2 = [];
+  const heatmapX2 = [];
 
   const groupByMutationFront = data.reduce((groups, e, i) => {
     const mutation = e.MutationType.substring(0, e.MutationType.length - 1);
@@ -160,9 +143,6 @@ export default function SBS96(data, sample) {
     return groups;
   }, {});
 
-  const heatmapY2 = [];
-  const heatmapZ2 = [];
-  const heatmapX2 = [];
   Object.entries(groupByMutation2).forEach(
     ([key, value], groupIndex, array) => {
       heatmapY2.push(Object.entries(value).map(([k, v]) => v.mutationType));
@@ -220,11 +200,14 @@ export default function SBS96(data, sample) {
     ),
     xgap: 0.1,
     ygap: 0.1,
-    hovertemplate:
-      "x: %{x}<br>" + "y: %{y}<br>" + "Value: %{z}" + "<extra></extra>",
+    hovertemplate: "x: %{x}<br>y: %{y}<br>Value: %{z}<extra></extra>",
   }));
 
   ////// ------------------- Heat Map 2 --------------------------------////
+
+  const heatmapY3 = [];
+  const heatmapZ3 = [];
+  const heatmapX3 = [];
   const groupByMutationBack = data.reduce((groups, e, i) => {
     const mutation = e.MutationType.substring(1, e.MutationType.length);
     const signature = {
@@ -282,9 +265,6 @@ export default function SBS96(data, sample) {
     return groups;
   }, {});
 
-  const heatmapY3 = [];
-  const heatmapZ3 = [];
-  const heatmapX3 = [];
   Object.entries(groupByMutation3).forEach(
     ([key, value], groupIndex, array) => {
       heatmapY3.push(Object.entries(value).map(([k, v]) => v.mutationType));
@@ -343,14 +323,21 @@ export default function SBS96(data, sample) {
     ),
     xgap: 0.1,
     ygap: 0.1,
-    hovertemplate:
-      "x: %{x}<br>" + "y: %{y}<br>" + "Value: %{z}" + "<extra></extra>",
+    hovertemplate: "x: %{x}<br>y: %{y}<br>Value: %{z}<extra></extra>",
   }));
 
   ////--------------------- Heat Map Total --------------------------//
   const heatmapY = [];
   const heatmapZ = [];
   const heatmapX = [];
+
+  let heatMapZ0 = [];
+  let heatMapZ1 = [];
+  let heatMapZ2 = [];
+  let heatMapZ3 = [];
+  let heatMapZ4 = [];
+  let heatMapZ5 = [];
+
   Object.entries(groupByMutationOuter).forEach(
     ([key, value], groupIndex, array) => {
       heatmapY.push(key.charAt(0) + "--" + key.charAt(key.length - 1));
@@ -367,13 +354,6 @@ export default function SBS96(data, sample) {
       );
     }
   );
-
-  let heatMapZ0 = [];
-  let heatMapZ1 = [];
-  let heatMapZ2 = [];
-  let heatMapZ3 = [];
-  let heatMapZ4 = [];
-  let heatMapZ5 = [];
 
   heatmapZ.forEach((item, index) => {
     heatMapZ0.push(item.slice().splice(0, 16));
@@ -411,8 +391,7 @@ export default function SBS96(data, sample) {
     ),
     xgap: 0.1,
     ygap: 0.1,
-    hovertemplate:
-      "x: %{x}<br>" + "y: %{y}<br>" + "Value: %{z}" + "<extra></extra>",
+    hovertemplate: "x: %{x}<br>y: %{y}<br>Value: %{z}<extra></extra>",
   }));
 
   const traces = [
@@ -510,7 +489,7 @@ export default function SBS96(data, sample) {
       showline: true,
       tickangle: -90,
       tickfont: {
-        size: 10,
+        size: 8,
       },
       tickmode: "array",
       tickvals: flatSorted.map((_, i) => i),
@@ -521,7 +500,7 @@ export default function SBS96(data, sample) {
     },
     yaxis: {
       //   title: "Number of Single Base Substitutions",
-      autorange: false,
+      autorange: true,
       range: [0, maxVal + maxVal * 0.35],
       linecolor: "black",
       linewidth: 1,
@@ -530,26 +509,35 @@ export default function SBS96(data, sample) {
     },
     yaxis2: {
       autorange: true,
+      linecolor: "black",
+      linewidth: 1,
+      mirror: true,
       anchor: "x",
       tickfont: {
-        size: 10,
+        size: 8,
       },
       domain: [0.54, 0.715],
     },
     yaxis3: {
       autorange: true,
+      linecolor: "black",
+      linewidth: 1,
+      mirror: true,
       anchor: "x",
       tickfont: {
-        size: 10,
+        size: 8,
       },
       domain: [0.36, 0.535],
     },
     yaxis4: {
       autorange: true,
+      linecolor: "black",
+      linewidth: 1,
+      mirror: true,
       anchor: "x",
-      dtick: 1,
+      //dtick: 1,
       tickfont: {
-        size: 10,
+        size: 8,
       },
       domain: [0, 0.35],
     },

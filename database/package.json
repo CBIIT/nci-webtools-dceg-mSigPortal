@@ -1,0 +1,19 @@
+{
+  "type": "module",
+  "scripts": {
+    "start": "node startQueueWorker.js",
+    "createDatabase": "node createDatabase.js",
+    "importDatabase": "node importDatabase.js -- "
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.120.0",
+    "@aws-sdk/client-sqs": "^3.118.1",
+    "csv-parse": "^5.2.1",
+    "knex": "^2.1.0",
+    "lodash": "^4.17.21",
+    "minimist": "^1.2.6",
+    "pg": "^8.7.3",
+    "winston": "^3.8.0",
+    "xlsx": "^0.18.5"
+  }
+}

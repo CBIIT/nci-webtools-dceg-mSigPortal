@@ -2,6 +2,7 @@
 /apache_logs
 /tmp
 /data
+node_modules
 
 *.meta
 *.vs
@@ -13,3 +14,5 @@
 
 mSigPortal_Profiler_Extraction.py
 Sigvisualfunc.R
+config.json
+database/data
