@@ -36,5 +36,12 @@
       "host": "",
       "port": 25
     }
+  },
+  "database": {
+    "host": "localhost",
+    "port": 5432,
+    "user": "msigportal",
+    "password": "msigportal",
+    "database": "msigportal"
   }
 }
