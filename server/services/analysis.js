@@ -842,18 +842,31 @@ async function querySignature(req, res, next) {
   try {
     const { profile, signature_set } = req.query;
     const s3 = new AWS.S3();
+    if (profile && signature_set) {
+      const params = {
+        Bucket: config.data.bucket,
+        Key: path.join(
+          config.data.s3,
+          `Signature/${profile}/${signature_set}/data.json`
+        ),
+      };
+      const { Body } = await s3.getObject(params).promise();
+      const data = JSON.parse(Body);
 
-    const params = {
-      Bucket: config.data.bucket,
-      Key: path.join(
-        config.data.s3,
-        `Signature/${profile}/${signature_set}/data.json`
-      ),
-    };
-    const { Body } = await s3.getObject(params).promise();
-    const data = JSON.parse(Body);
+      res.json(data);
+    } else if (profile) {
+      const params = {
+        Bucket: config.data.bucket,
+        Prefix: path.join(config.data.s3, `Signature/${profile}/`),
+        Delimiter: '/',
+      };
+      const { CommonPrefixes } = await s3.listObjectsV2(params).promise();
+      const signatureSets = CommonPrefixes.map((e) => path.basename(e.Prefix));
 
-    res.json(data);
+      res.json(signatureSets);
+    } else {
+      throw 'Missing profile and signature_set';
+    }
   } catch (error) {
     next(error);
   }
