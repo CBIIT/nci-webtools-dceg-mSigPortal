@@ -181,10 +181,10 @@ export default function SBS96(data, sample) {
   );
 
   let heatmapY2_c = [
-    heatmapY2[0][0].charAt(0) + "-- N",
-    heatmapY2[0][16].charAt(0) + "-- N",
-    heatmapY2[0][32].charAt(0) + "-- N",
-    heatmapY2[0][48].charAt(0) + "-- N",
+    heatmapY2[0][0].charAt(0) + "--N",
+    heatmapY2[0][16].charAt(0) + "--N",
+    heatmapY2[0][32].charAt(0) + "--N",
+    heatmapY2[0][48].charAt(0) + "--N",
   ];
 
   let heatMapZ2_0 = chunks(heatmapZ2[0], 16);
@@ -218,6 +218,8 @@ export default function SBS96(data, sample) {
       (e, i) =>
         array.slice(0, index).reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
     ),
+    xgap: 0.1,
+    ygap: 0.1,
     hovertemplate:
       "x: %{x}<br>" + "y: %{y}<br>" + "Value: %{z}" + "<extra></extra>",
   }));
@@ -339,6 +341,8 @@ export default function SBS96(data, sample) {
       (e, i) =>
         array.slice(0, index).reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
     ),
+    xgap: 0.1,
+    ygap: 0.1,
     hovertemplate:
       "x: %{x}<br>" + "y: %{y}<br>" + "Value: %{z}" + "<extra></extra>",
   }));
@@ -349,7 +353,7 @@ export default function SBS96(data, sample) {
   const heatmapX = [];
   Object.entries(groupByMutationOuter).forEach(
     ([key, value], groupIndex, array) => {
-      heatmapY.push(key.charAt(0) + " -- " + key.charAt(key.length - 1));
+      heatmapY.push(key.charAt(0) + "--" + key.charAt(key.length - 1));
       heatmapZ.push(
         Object.entries(value).map(([k, v]) => v.contribution / totalMutations)
       );
@@ -401,12 +405,12 @@ export default function SBS96(data, sample) {
     hoverongaps: false,
     xaxis: "x",
     yaxis: "y4",
-    num: num,
-
     x: num.map(
       (e, i) =>
         array.slice(0, index).reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
     ),
+    xgap: 0.1,
+    ygap: 0.1,
     hovertemplate:
       "x: %{x}<br>" + "y: %{y}<br>" + "Value: %{z}" + "<extra></extra>",
   }));
