@@ -88,15 +88,22 @@ export default function MutProfilePlot() {
       ) : (
         plot && (
           <div className="mb-3">
-            <Plot
-              className="w-100"
-              divId={divId}
-              style={{ height: "500px" }}
-              data={cloneDeep(plot.data)}
-              layout={cloneDeep(plot.layout)}
-              config={cloneDeep(config)}
-              useResizeHandler
-            />
+            <Row className="justify-content-center">
+              <Plot
+                {...(profile.value + matrix.value == "SBS1536"
+                  ? { className: "w-50" }
+                  : { className: "w-100" })}
+                divId={divId}
+                style={{
+                  height: "500px",
+                }}
+                data={cloneDeep(plot.data)}
+                layout={cloneDeep(plot.layout)}
+                config={cloneDeep(config)}
+                useResizeHandler
+              />
+            </Row>
+
             <Row className="justify-content-center">
               <Col sm="auto">
                 <Button
