@@ -180,9 +180,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["SBS", "DBS", "ID"]
+              "enum": ["SBS96", "DBS78", "ID83"]
             },
-            "value": "SBS"
+            "value": "SBS96"
           },
           {
             "name": "signature_set",
