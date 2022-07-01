@@ -3,14 +3,12 @@
     {
       "name": "prod",
       "script": "server.js",
-      "node_args": "--require dotenv/config",
       "exec_mode": "cluster",
       "instances": "max"
     },
     {
       "name": "dev",
       "script": "server.js",
-      "node_args": "--require dotenv/config",
       "watch": ["."],
       "ignore_watch": ["node_modules", "tmp", "logs"]
     }
