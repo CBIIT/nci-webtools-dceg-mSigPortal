@@ -1,7 +1,7 @@
 import { fileURLToPath, pathToFileURL } from "url";
 import { createRequire } from "module";
 import minimist from "minimist";
-import { createConnection, initializeSchema } from "./services/utils.js";
+import { initializeSchema } from "./services/utils.js";
 
 // determine if this script was launched from the command line
 const isMainModule = process.argv[1] === fileURLToPath(import.meta.url);
@@ -12,9 +12,8 @@ if (isMainModule) {
   const args = minimist(process.argv.slice(2));
   const schemaPath = pathToFileURL(args.schema || "./schema.js");
 
-  const connection = createConnection(config.database);
   const { schema } = await import(schemaPath);
-  await initializeSchema(connection, schema);
+  await initializeSchema(config.database, schema);
   console.log("Initialized all tables");
   process.exit(0);
 }
