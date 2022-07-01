@@ -11,8 +11,9 @@ const AWS = require('aws-sdk');
 const XLSX = require('xlsx');
 const replace = require('replace-in-file');
 const glob = require('glob');
-const config = require('../config.json');
 const archiver = require('archiver');
+const { getAssociationData, getExposureData, getSeqmatrixData, getSignatureData } = require('./query');
+const config = require('../config.json');
 
 if (config.aws) AWS.config.update(config.aws);
 
@@ -796,22 +797,32 @@ const getDataUsingS3Select = (params) => {
 
 async function querySeqmatrix(req, res, next) {
   try {
-    const { study, cancer, strategy, sample, profile, matrix } = req.query;
-    const s3 = new AWS.S3();
+    const { study, cancer, strategy, sample, profile, matrix, s3 } = req.query;
+    const connection = req.app.locals.connection;
 
-    const params = {
-      Bucket: config.data.bucket,
-      Key: path.join(
-        config.data.s3,
-        `Seqmatrix/${study}/${cancer}/${sample}/${strategy}/${
-          profile + matrix
-        }/data.json`
-      ),
-    };
-    const { Body } = await s3.getObject(params).promise();
-    const data = JSON.parse(Body);
+    if (connection && !s3) {
+      const query = { study, strategy, cancer, sample, profile, matrix };
+      const columns = ['mutationType', 'mutations'];
+      const data = await getSeqmatrixData(connection, query, columns);
+      res.json(data);
+    } else {
+      
+      const s3 = new AWS.S3();
 
-    res.json(data);
+      const params = {
+        Bucket: config.data.bucket,
+        Key: path.join(
+          config.data.s3,
+          `Seqmatrix/${study}/${cancer}/${sample}/${strategy}/${
+            profile + matrix
+          }/data.json`
+        ),
+      };
+      const { Body } = await s3.getObject(params).promise();
+      const data = JSON.parse(Body);
+
+      res.json(data);
+    }
   } catch (error) {
     next(error);
   }
@@ -819,20 +830,28 @@ async function querySeqmatrix(req, res, next) {
 
 async function queryExposure(req, res, next) {
   try {
-    const { study, strategy, cancer, signature_set } = req.query;
-    const s3 = new AWS.S3();
+    const { study, strategy, cancer, signature_set, s3 } = req.query;
+    const connection = req.app.locals.connection;
 
-    const params = {
-      Bucket: config.data.bucket,
-      Key: path.join(
-        config.data.s3,
-        `Exposure/${study}/${strategy}/${cancer}/${signature_set}/data.json`
-      ),
-    };
-    const { Body } = await s3.getObject(params).promise();
-    const data = JSON.parse(Body);
+    if (connection && !s3) {
+      const query = { study, strategy, cancer, signatureSetName: signature_set }
+      const columns = ['sample', 'signatureName', 'exposure'];
+      const data = await getExposureData(connection, query, columns);
+      res.json(data);
+    } else {
+      const s3 = new AWS.S3();
 
-    res.json(data);
+      const params = {
+        Bucket: config.data.bucket,
+        Key: path.join(
+          config.data.s3,
+          `Exposure/${study}/${strategy}/${cancer}/${signature_set}/data.json`
+        ),
+      };
+      const { Body } = await s3.getObject(params).promise();
+      const data = JSON.parse(Body);
+      res.json(data);
+    }
   } catch (error) {
     next(error);
   }
@@ -840,32 +859,43 @@ async function queryExposure(req, res, next) {
 
 async function querySignature(req, res, next) {
   try {
-    const { profile, signature_set } = req.query;
-    const s3 = new AWS.S3();
-    if (profile && signature_set) {
-      const params = {
-        Bucket: config.data.bucket,
-        Key: path.join(
-          config.data.s3,
-          `Signature/${profile}/${signature_set}/data.json`
-        ),
-      };
-      const { Body } = await s3.getObject(params).promise();
-      const data = JSON.parse(Body);
-
+    const { profile, matrix, signature_set, s3 } = req.query;
+    const connection = req.app.locals.connection;
+    
+    if (connection && !s3) {
+      const query = { profile, matrix, signatureSetName: signature_set }
+      const columns =  !signature_set
+        ? ['signatureSetName']
+        : ['strandInfo', 'strand', 'signatureName', 'mutationType', 'contribution'];
+      const data = await getSignatureData(connection, query, columns);
       res.json(data);
-    } else if (profile) {
-      const params = {
-        Bucket: config.data.bucket,
-        Prefix: path.join(config.data.s3, `Signature/${profile}/`),
-        Delimiter: '/',
-      };
-      const { CommonPrefixes } = await s3.listObjectsV2(params).promise();
-      const signatureSets = CommonPrefixes.map((e) => path.basename(e.Prefix));
-
-      res.json(signatureSets);
     } else {
-      throw 'Missing profile and signature_set';
+      const s3 = new AWS.S3();
+      if (profile && signature_set) {
+        const params = {
+          Bucket: config.data.bucket,
+          Key: path.join(
+            config.data.s3,
+            `Signature/${profile}/${signature_set}/data.json`
+          ),
+        };
+        const { Body } = await s3.getObject(params).promise();
+        const data = JSON.parse(Body);
+
+        res.json(data);
+      } else if (profile) {
+        const params = {
+          Bucket: config.data.bucket,
+          Prefix: path.join(config.data.s3, `Signature/${profile}/`),
+          Delimiter: '/',
+        };
+        const { CommonPrefixes } = await s3.listObjectsV2(params).promise();
+        const signatureSets = CommonPrefixes.map((e) => path.basename(e.Prefix));
+
+        res.json(signatureSets);
+      } else {
+        throw 'Missing profile and signature_set';
+      }
     }
   } catch (error) {
     next(error);
