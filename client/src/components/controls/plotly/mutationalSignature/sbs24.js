@@ -51,14 +51,14 @@ export default function SBS24(data, sample) {
   const tracesT = {
     name: "Transcrribed",
     type: "bar",
-    marker: { color: "blue" },
+    marker: { color: "#004765" },
 
     x: dataT.map((element, index, array) => element.contribution),
     y: dataU.map(
       (element, index, array) =>
         element.mutationType.substring(2, element.mutationType.length) + " "
     ),
-    hoverinfo: "x+y",
+    hoverinfo: "y+x",
     orientation: "h",
   };
 
@@ -66,25 +66,27 @@ export default function SBS24(data, sample) {
   const tracesU = {
     name: "Untranscribed",
     type: "bar",
-    marker: { color: "red" },
+    marker: { color: "#E32925" },
     x: dataU.map((element, index, array) => element.contribution),
     y: dataU.map(
       (element, index, array) =>
         element.mutationType.substring(2, element.mutationType.length) + " "
     ),
-    hoverinfo: "x+y",
+    hoverinfo: "y+x",
     orientation: "h",
   };
   console.log(tracesU);
 
-  const traces = [tracesT, tracesU];
+  const traces = [tracesU, tracesT];
 
   const layout = {
     hoverlabel: { bgcolor: "#FFF" },
+    bargap: 0.3,
     legend: {
       x: 1,
       xanchor: "right",
       y: 1,
+      traceorder: "reversed",
     },
     title: {
       text:

@@ -93,7 +93,7 @@ export default function SBS192(data, sample) {
   const tracesT = {
     name: "Transcrribed Strand",
     type: "bar",
-    marker: { color: "blue" },
+    marker: { color: "#004765" },
     x: flatSortedT.map((element, index, array) => index),
     y: flatSortedT.map((element, index, array) => element.contribution),
 
@@ -104,7 +104,7 @@ export default function SBS192(data, sample) {
   const tracesU = {
     name: "Untranscribed Strand",
     type: "bar",
-    marker: { color: "red" },
+    marker: { color: "#E32925" },
     x: flatSortedU.map((element, index, array) => index),
     y: flatSortedU.map((element, index, array) => element.contribution),
 

@@ -141,6 +141,7 @@ export default function SBS96(data, sample) {
 
   const layout = {
     hoverlabel: { bgcolor: "#FFF" },
+    bargap: 0.3,
     xaxis: {
       showticklabels: false,
       showline: true,

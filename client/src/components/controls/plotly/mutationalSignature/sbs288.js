@@ -251,7 +251,7 @@ export default function SBS288(data, sample) {
   const tracesT = {
     name: "Transcrribed",
     type: "bar",
-    marker: { color: "blue" },
+    marker: { color: "#004765" },
 
     x: flatSortedT.map((element, index, array) => element.total),
     y: flatSortedT.map(
@@ -267,7 +267,7 @@ export default function SBS288(data, sample) {
   const tracesU = {
     name: "Untranscribed",
     type: "bar",
-    marker: { color: "red" },
+    marker: { color: "#E32925" },
     x: flatSortedU.map((element, index, array) => element.total),
     y: flatSortedU.map(
       (element, index, array) => `<b>${element.mutationType}<b>`
@@ -282,7 +282,7 @@ export default function SBS288(data, sample) {
   const tracesN = {
     name: "Nontranscribed",
     type: "bar",
-    marker: { color: "green" },
+    marker: { color: "#008001" },
     x: flatSortedN.map((element, index, array) => element.total),
     y: flatSortedN.map(
       (element, index, array) => `<b>${element.mutationType}<b>`
@@ -294,7 +294,7 @@ export default function SBS288(data, sample) {
     orientation: "h",
   };
 
-  const traces = [...tracesBarTotal, tracesT, tracesU, tracesN];
+  const traces = [...tracesBarTotal, tracesN, tracesU, tracesT];
   console.log("traces:");
   console.log(traces);
   const xannotations = flatSortedTotal.map((num, index) => ({
@@ -381,10 +381,12 @@ export default function SBS288(data, sample) {
 
   const layout = {
     hoverlabel: { bgcolor: "#FFF" },
+    bargap: 0.3,
     legend: {
       x: 1,
       xanchor: "right",
       y: 0,
+      traceorder: "reversed",
     },
     grid: {
       rows: 1,
@@ -422,7 +424,7 @@ export default function SBS288(data, sample) {
       showticklabels: true,
       showline: true,
       tickfont: {
-        size: 10,
+        size: 12,
       },
       domain: [0.8, 1],
     },
@@ -430,7 +432,7 @@ export default function SBS288(data, sample) {
       showline: true,
       tickangle: 0,
       tickfont: {
-        size: 10,
+        size: 12,
       },
       anchor: "x2",
       categoryorder: "category descending",
