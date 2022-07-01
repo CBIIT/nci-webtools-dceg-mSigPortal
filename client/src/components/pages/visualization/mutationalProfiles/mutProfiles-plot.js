@@ -9,6 +9,7 @@ import { useSeqmatrixQuery } from "../../../../services/apiSlice";
 import { LoadingOverlay } from "../../../controls/loading-overlay/loading-overlay";
 import SBS96 from "../../../controls/plotly/mutationalSignature/sbs96";
 import SBS192 from "../../../controls/plotly/mutationalSignature/sbs192";
+import SBS288 from "../../../controls/plotly/mutationalSignature/sbs288";
 import SBS1536 from "../../../controls/plotly/mutationalSignature/sbs1536";
 import DBS78 from "../../../controls/plotly/mutationalSignature/dbs78";
 import ID83 from "../../../controls/plotly/mutationalSignature/id83";
@@ -55,22 +56,24 @@ export default function MutProfilePlot() {
     const profileMatrix = profile.value + matrix.value;
 
     const { traces, layout } =
-      profileMatrix == "SBS96"
+      profileMatrix == 'SBS96'
         ? SBS96(data, sample)
-        : profileMatrix == "SBS192"
+        : profileMatrix == 'SBS192'
         ? SBS192(data, sample)
+        : profileMatrix == "SBS288"
+        ? SBS288(data, sample)
         : profileMatrix == "SBS1536"
         ? SBS1536(data, sample)
-        : profileMatrix == "DBS78"
+        : profileMatrix == 'DBS78'
         ? DBS78(data, sample)
-        : profileMatrix == "ID83"
+        : profileMatrix == 'ID83'
         ? ID83(data, sample)
         : { traces: [], layout: {} };
 
     setPlot({ data: [...traces], layout });
   }
 
-  const divId = "mutationalProfilePlot";
+  const divId = 'mutationalProfilePlot';
   const config = {
     displayModeBar: true,
     responsive: true,
@@ -109,7 +112,7 @@ export default function MutProfilePlot() {
                 <Button
                   onClick={() =>
                     downloadImage(divId, {
-                      format: "png",
+                      format: 'png',
                       filename: sample.value,
                     })
                   }
@@ -121,7 +124,7 @@ export default function MutProfilePlot() {
                 <Button
                   onClick={() =>
                     downloadImage(divId, {
-                      format: "svg",
+                      format: 'svg',
                       filename: sample.value,
                     })
                   }
@@ -134,7 +137,7 @@ export default function MutProfilePlot() {
                   onClick={() =>
                     saveAs(
                       new Blob([JSON.stringify(plot)], {
-                        type: "application/json",
+                        type: 'application/json',
                       }),
                       `${sample.value}.json`
                     )
