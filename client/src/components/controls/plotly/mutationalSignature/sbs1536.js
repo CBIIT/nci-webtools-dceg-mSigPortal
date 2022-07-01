@@ -187,7 +187,7 @@ export default function SBS96(data, sample) {
     colorbar: { len: 0.25, y: 0.63, autotick: true, tick0: 0 },
     colorscale: heatmapColorscale,
     zmin: 0,
-    zmax: maxZ2,
+    zmax: maxZ2 + maxZ2 * 0.1,
     z: num,
     y: heatmapY2_c,
     type: "heatmap",
@@ -310,7 +310,7 @@ export default function SBS96(data, sample) {
     colorbar: { len: 0.25, y: 0.43, autotick: true, tick0: 0 },
     colorscale: heatmapColorscale,
     zmin: 0,
-    zmax: maxZ3,
+    zmax: maxZ3 + maxZ3 * 0.1,
     z: num,
     y: heatmapY3_c,
     type: "heatmap",
@@ -340,6 +340,18 @@ export default function SBS96(data, sample) {
 
   Object.entries(groupByMutationOuter).forEach(
     ([key, value], groupIndex, array) => {
+      value.sort((a, b) =>
+        a.mutationType.substring(2, 6) < b.mutationType.substring(2, 6)
+          ? -1
+          : b.mutationType.substring(2, 6) <
+            a.mutationType.substring(
+              a.mutationType.length - 1,
+              a.mutationType.length
+            )
+          ? 1
+          : 0
+      );
+      console.log(value);
       heatmapY.push(key.charAt(0) + "--" + key.charAt(key.length - 1));
       heatmapZ.push(
         Object.entries(value).map(([k, v]) => v.contribution / totalMutations)
@@ -354,6 +366,9 @@ export default function SBS96(data, sample) {
       );
     }
   );
+
+  console.log("groupByMutationOuter");
+  console.log(groupByMutationOuter);
 
   heatmapZ.forEach((item, index) => {
     heatMapZ0.push(item.slice().splice(0, 16));
@@ -378,7 +393,7 @@ export default function SBS96(data, sample) {
     colorbar: { len: 0.42, y: 0.15, autotick: true, tick0: 0 },
     colorscale: heatmapColorscale,
     zmin: 0,
-    zmax: maxZ,
+    zmax: maxZ + maxZ * 0.1,
     z: num,
     y: heatmapY,
     type: "heatmap",
