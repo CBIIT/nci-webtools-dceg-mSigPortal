@@ -1,3 +1,4 @@
+const util = require('util');
 const path = require('path');
 const { createLogger, format, transports } = require('winston');
 const { folder, level } = require('../config.json').logs;
@@ -14,10 +15,7 @@ module.exports = new createLogger({
     format.printf(
       (info) =>
         `[${info.timestamp}] [${info.level}] ${
-          info.stack ||
-          (typeof info.message === 'string'
-            ? info.message
-            : JSON.stringify(info.message))
+          info.stack || util.format(info.message)
         }`
     )
   ),
