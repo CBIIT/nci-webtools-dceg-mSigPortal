@@ -132,7 +132,7 @@
             "value": "WGS"
           },
           {
-            "name": "signature_set",
+            "name": "signatureSetName",
             "in": "query",
             "description": "Select signature set to filter data by.",
             "required": true,
@@ -185,7 +185,7 @@
             "value": "SBS96"
           },
           {
-            "name": "signature_set",
+            "name": "signatureSetName",
             "in": "query",
             "description": "Select signature set to filter data by.",
             "required": true,

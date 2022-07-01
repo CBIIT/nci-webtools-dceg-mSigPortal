@@ -107,8 +107,8 @@ export default function PcReference() {
   useEffect(() => {
     if (profile) {
       setSignatureSetQuery({
-        profile:
-          profile.value + defaultMatrix(profile.value, ['96', '78', '83']),
+        profile: profile.value,
+        matrix: defaultMatrix(profile.value, ['96', '78', '83']),
       });
     }
   }, [profile]);
@@ -116,9 +116,9 @@ export default function PcReference() {
   useEffect(() => {
     if (signatureSet) {
       setSignatureNamesQuery({
-        profile:
-          profile.value + defaultMatrix(profile.value, ['96', '78', '83']),
-        signature_set: signatureSet.value,
+        profile: profile.value,
+        matrix: defaultMatrix(profile.value, ['96', '78', '83']),
+        signatureSetName: signatureSet.value,
       });
     }
   }, [signatureSet]);
@@ -186,7 +186,7 @@ export default function PcReference() {
     }
   }
 
-  const signatureListPopover = (
+  const signatureListPopover = signatureSet && (
     <Popover id="popover-basic" style={{ minWidth: '400px' }}>
       <Popover.Title as="h3">{signatureSet.value}</Popover.Title>
       <Popover.Content>
@@ -282,6 +282,7 @@ export default function PcReference() {
                   rootClose
                 >
                   <Button
+                    disable={!signatureSet}
                     aria-label="compare signatures info"
                     variant="link"
                     className="p-0 font-weight-bold "

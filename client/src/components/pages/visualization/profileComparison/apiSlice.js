@@ -26,7 +26,8 @@ export const profilerSummaryApiSlice = apiSlice.injectEndpoints({
     signatureSets: builder.query({
       query: (params) => ({ url: 'signature', params }),
       transformResponse: (data) =>
-        [...data]
+        data
+          .map((e) => e.signatureSetName)
           .sort((a, b) =>
             a.localeCompare(b, undefined, { sensitivity: 'base' })
           )
@@ -34,9 +35,10 @@ export const profilerSummaryApiSlice = apiSlice.injectEndpoints({
     }),
     signatureNames: builder.query({
       query: (params) => ({ url: 'signature', params }),
-      transformResponse: (data) => [
-        ...new Set(data.map((e) => e.Signature_name)),
-      ],
+      transformResponse: (data) =>
+        [...new Set(data.map((e) => e.signatureName))].sort((a, b) =>
+          a.localeCompare(b, undefined, { sensitivity: 'base' })
+        ),
     }),
   }),
 });
