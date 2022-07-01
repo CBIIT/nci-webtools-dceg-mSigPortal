@@ -1,7 +1,6 @@
 export const schema = [
   {
     name: "association",
-    recreate: true,
     schema: (table) => {
       table.increments("id");
       table.string("study");
@@ -21,7 +20,6 @@ export const schema = [
 
   {
     name: "exposure",
-    recreate: true,
     schema: (table) => {
       table.increments("id");
       table.string("study");
@@ -38,7 +36,6 @@ export const schema = [
 
   {
     name: "seqmatrix",
-    recreate: true,
     schema: (table) => {
       table.increments("id");
       table.string("study");
@@ -55,7 +52,6 @@ export const schema = [
 
   {
     name: "signature",
-    recreate: true,
     schema: (table) => {
       table.increments("id");
       table.string("source");
@@ -74,12 +70,10 @@ export const schema = [
 
    {
     name: "importLog",
-    recreate: true,
     schema: (table, connection) => {
       table.increments("id");
       table.string("status");
       table.text("log");
-      table.boolean("cancelled").defaultTo(false);
       table.timestamp("createdAt").defaultTo(connection.fn.now());
       table.timestamp("updatedAt").defaultTo(connection.fn.now());
     },

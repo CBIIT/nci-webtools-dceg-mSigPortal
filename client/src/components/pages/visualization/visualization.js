@@ -16,6 +16,7 @@ import MutationalProfiles2 from './mutationalProfiles/mutProfiles';
 import CosineSimilarity from './cosineSimilarity';
 import MutationalPattern from './mutationalPattern/mutationalPattern';
 import ProfileComparison from './profileComparison';
+import ProfileComparison2 from './profileComparison/profileComparison';
 import PCA from './pca';
 import Kataegis from './kataegis';
 import Download from './download';
@@ -428,13 +429,13 @@ export default function Visualization({ match }) {
         source == 'user' ? <MutationalProfiles /> : <MutationalProfiles2 />,
     },
     {
-      name: "Tree and Leaf",
-      id: "treeAndLeaf",
+      name: 'Tree and Leaf',
+      id: 'treeAndLeaf',
       component: <TreeAndLeaf />,
     },
     {
-      name: "Cosine Similarity",
-      id: "cosineSimilarity",
+      name: 'Cosine Similarity',
+      id: 'cosineSimilarity',
       component: (
         <CosineSimilarity
           getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
@@ -450,13 +451,17 @@ export default function Visualization({ match }) {
     {
       name: 'Profile Comparison',
       id: 'profileComparison',
-      component: (
-        <ProfileComparison
-          getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
-          submitR={(fn, args) => submitR(fn, args)}
-        />
-      ),
+      component:
+        source == 'user' ? (
+          <ProfileComparison
+            getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
+            submitR={(fn, args) => submitR(fn, args)}
+          />
+        ) : (
+          <ProfileComparison2 />
+        ),
     },
+
     {
       name: 'PCA',
       id: 'pca',
@@ -478,8 +483,8 @@ export default function Visualization({ match }) {
       component: <Download />,
     },
     {
-      name: "Multational Profiles Test",
-      id: "multationalProfileTest",
+      name: 'Multational Profiles Test',
+      id: 'multationalProfileTest',
       component: <MultationalProfilesTest />,
     },
   ];
@@ -560,8 +565,8 @@ export default function Visualization({ match }) {
                       disabled={submitted || loading.active}
                       type="radio"
                       value="public"
-                      checked={source == "public"}
-                      onChange={(e) => mergeState({ source: "public" })}
+                      checked={source == 'public'}
+                      onChange={(e) => mergeState({ source: 'public' })}
                     />
                     <Check.Label className="font-weight-normal">
                       Public
@@ -572,8 +577,8 @@ export default function Visualization({ match }) {
                       disabled={submitted || loading.active}
                       type="radio"
                       value="user"
-                      checked={source == "user"}
-                      onChange={(e) => mergeState({ source: "user" })}
+                      checked={source == 'user'}
+                      onChange={(e) => mergeState({ source: 'user' })}
                     />
                     <Check.Label className="font-weight-normal">
                       User
@@ -584,14 +589,14 @@ export default function Visualization({ match }) {
             </Row>
             <Row
               style={{
-                display: source == "user" ? "block" : "none",
+                display: source == 'user' ? 'block' : 'none',
               }}
             >
               <Col lg="auto" className="w-100">
                 <UserForm />
               </Col>
             </Row>
-            <Row style={{ display: source == "public" ? "block" : "none" }}>
+            <Row style={{ display: source == 'public' ? 'block' : 'none' }}>
               <Col lg="auto" className="w-100">
                 <PublicForm />
               </Col>
@@ -616,7 +621,7 @@ export default function Visualization({ match }) {
               content={loading.content}
               showIndicator={loading.showIndicator}
             />
-            <div style={{ minHeight: "500px" }}>
+            <div style={{ minHeight: '500px' }}>
               {tabs.filter((tab) => tab.id == displayTab)[0].component}
             </div>
           </div>

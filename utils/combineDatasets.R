@@ -15,13 +15,77 @@ extract <- function(str, separator, index) {
     unlist(strsplit(str, separator))[index]
 }
 
+regex_extract <- function(str, pattern) {
+    regmatches(str, regexpr(pattern, str))
+}
+
 combineAssociationFiles <- function(x) {
-    x %>% 
-        mutate(
-            Study=extract(basename(filepath), '_' , 1),
-            Dataset=extract(basename(filepath), '_' , 2),
-            .before=Cancer_Type
-        )
+    x %>% mutate(
+        Study=extract(basename(filepath), '_' , 1),
+        Dataset=extract(basename(filepath), '_' , 2),
+        .before=Cancer_Type
+    ) %>% rename(
+        study=Study,
+        strategy=Dataset,
+        cancer=Cancer_Type,
+        sample=Sample,
+        icgcSpecimenId=icgc_specimen_id,
+        icgcDonorId=icgc_donor_id,
+        dataSource=data_source,
+        dataType=data_type,
+        variableName=variable_name,
+        variableValue=variable_value,
+        variableValueType=variable_value_type
+    )
+}
+
+combineExposureFiles <- function(x) {
+    x %>% rename(
+        study=Study,
+        strategy=Dataset,
+        cancer=Cancer_Type,
+        organ=Organ,
+        sample=Sample,
+        signatureSetName=Signature_set_name,
+        signatureName=Signature_name,
+        exposure=Exposure
+    )
+}
+
+combineSeqmatrixFiles <- function(x) {
+    x %>% mutate(
+        profile=regex_extract(Profile, '^[A-Z]+'),
+        matrix=regex_extract(Profile, '[0-9]+$'),
+        .before=Profile
+    ) %>% rename(
+        study=Study,
+        cancer=Cancer_Type,
+        sample=Sample,
+        strategy=Dataset,
+        mutationType=MutationType,
+        mutations=Mutations
+    ) %>% select(
+        -Profile
+    )
+}
+
+combineSignatureFiles <- function(x) {
+    x %>% mutate(
+        profile=regex_extract(Profile, '^[A-Z]+'),
+        matrix=regex_extract(Profile, '[0-9]+$'),
+         .before=Profile
+    ) %>% rename(
+        source=Source,
+        signatureSetName=Signature_set_name,
+        strategy=Dataset,
+        strandInfo=Strand_info,
+        strand=Strand,
+        signatureName=Signature_name,
+        mutationType=MutationType,
+        contribution=Contribution
+    ) %>% select(
+        -Profile
+    )
 }
 
 datasets <- sapply(inputFiles, function(f) get(load(f)), simplify=F)

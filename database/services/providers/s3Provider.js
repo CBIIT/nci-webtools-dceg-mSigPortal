@@ -1,7 +1,6 @@
 import {
   GetObjectAttributesCommand,
   GetObjectCommand,
-  ListObjectsV2Command,
   paginateListObjectsV2,
 } from "@aws-sdk/client-s3";
 

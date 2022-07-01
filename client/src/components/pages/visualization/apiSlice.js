@@ -9,7 +9,6 @@ export const vissualizationApiSlice = apiSlice.injectEndpoints({
         body: params,
       }),
     }),
-
     calculateUser: builder.query({
       query: (params) => ({
         url: 'visualizationWrapper',
