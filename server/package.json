@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "pm2-runtime start pm2.config.json --only prod",
+    "start:dev": "pm2-runtime start pm2.config.json --only dev",
     "start-queue-worker": "node queue-worker.js",
     "build": "npm run format",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -26,6 +27,7 @@
     "nodemailer": "^6.7.0",
     "papaparse": "^5.3.1",
     "pg": "^8.7.3",
+    "pm2": "^5.2.0",
     "promisify-child-process": "^4.1.1",
     "r-wrapper": "^1.1.2",
     "replace-in-file": "^6.2.0",
