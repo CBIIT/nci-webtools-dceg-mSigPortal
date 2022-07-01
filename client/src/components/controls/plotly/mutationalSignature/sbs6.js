@@ -13,9 +13,6 @@ export default function SBS6(data, sample) {
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 
   const totalMutations = data.reduce((a, e) => a + parseInt(e.Mutations), 0);
-  const maxVal = Math.max(...data.map((o) => o.Mutations));
-  // console.log("maxVal--:");
-  // console.log(maxVal);
 
   // group data by dominant mutation
   const groupByMutation = data.reduce((groups, e, i) => {
@@ -29,56 +26,68 @@ export default function SBS6(data, sample) {
       : [signature];
     return groups;
   }, {});
-  const flatSorted = Object.values(groupByMutation).flat();
-
-  console.log("groupByMutation:");
-  console.log(groupByMutation);
-  console.log("FlatSorted");
-  console.log(flatSorted);
 
   const traces = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
       name: mutation,
       type: "bar",
       marker: { color: colors[mutation] },
-      y: signatures.map((e) => `<b>${e.mutationType}<b>`),
+      y: signatures.map((e) => e.mutationType + " "),
       x: signatures.map((e) => e.contribution),
       hoverinfo: "x+y",
-      showlegend: false,
       orientation: "h",
     })
   );
-  //const traces = [trace1, trace2];
-  console.log("traces:");
-  console.log(traces);
+  const sampleAnnotation = {
+    xref: "paper",
+    yref: "paper",
+    xanchor: "bottom",
+    yanchor: "bottom",
+    x: 0,
+    y: 0.9,
+    text:
+      "<b>" + sample + ": " + numberWithCommas(totalMutations) + " subs </b>",
+    showarrow: false,
+    font: {
+      size: 24,
+    },
+    align: "center",
+  };
 
   const layout = {
     hoverlabel: { bgcolor: "#FFF" },
+    showlegend: false,
     title: {
-      title: {
-        text:
-          "<b>" +
-          sample +
-          ": " +
-          numberWithCommas(totalMutations) +
-          " subs </b>",
-        font: { size: 24 },
+      text:
+        "<b>" + sample + ": " + numberWithCommas(totalMutations) + " subs </b>",
+      font: {
+        size: 24,
       },
+      xref: "paper",
+      x: 0.05,
     },
     xaxis: {
-      title: "<b>Number of Single Base Substitutions</b>",
-      showticklabels: true,
-      showline: true,
+      title: {
+        text: "<b>Number of Single Base Substitution</b>",
+        font: {
+          size: 18,
+        },
+      },
       tickfont: {
-        size: 10,
+        size: 16,
       },
     },
     yaxis: {
+      tickfont: {
+        size: 16,
+      },
       categoryorder: "category descending",
     },
+
+    annotations: sampleAnnotation,
   };
+
   console.log("layout");
   console.log(layout);
-
   return { traces, layout };
 }
