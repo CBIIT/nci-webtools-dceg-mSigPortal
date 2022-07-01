@@ -7,6 +7,7 @@ import { saveAs } from "file-saver";
 import { useSelector } from "react-redux";
 import { useSeqmatrixQuery } from "../../../../services/apiSlice";
 import { LoadingOverlay } from "../../../controls/loading-overlay/loading-overlay";
+import SBS6 from "../../../controls/plotly/mutationalSignature/sbs6";
 import SBS96 from "../../../controls/plotly/mutationalSignature/sbs96";
 import SBS192 from "../../../controls/plotly/mutationalSignature/sbs192";
 import SBS288 from "../../../controls/plotly/mutationalSignature/sbs288";
@@ -56,7 +57,9 @@ export default function MutProfilePlot() {
     const profileMatrix = profile.value + matrix.value;
 
     const { traces, layout } =
-      profileMatrix == "SBS96"
+      profileMatrix == "SBS6"
+        ? SBS6(data, sample)
+        : profileMatrix == "SBS96"
         ? SBS96(data, sample)
         : profileMatrix == "SBS192"
         ? SBS192(data, sample)
