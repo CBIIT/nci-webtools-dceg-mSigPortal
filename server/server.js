@@ -3,6 +3,7 @@ const numCPUs = require('os').cpus().length;
 const path = require('path');
 const express = require('express');
 const fs = require('fs');
+const knex = require('knex');
 const config = require('./config.json');
 const logger = require('./services/logger');
 const { apiRouter } = require('./services/api');
@@ -26,6 +27,10 @@ function masterProcess() {
 
 function childProcess() {
   console.log(`Worker ${process.pid} started and finished`);
+
+  if (config.database) {
+    app.locals.connection = knex({ client: 'postgres', connection: config.database });
+  }
 
   const server = app.listen(config.server.port, () => {
     // create required folders
