@@ -39,26 +39,6 @@ export default function SBS288(data, sample) {
   console.log("maxVal--:");
   console.log(maxVal);
 
-  // group data by dominant mutation
-  const groupByMutation = data.reduce((groups, e, i) => {
-    const mutationRegex = /\[(.*)\]/;
-    const mutation = e.MutationType.match(mutationRegex)[1];
-    const signature = {
-      mutationType: e.MutationType,
-      contribution: e.Mutations,
-    };
-    groups[mutation] = groups[mutation]
-      ? [...groups[mutation], signature]
-      : [signature];
-    return groups;
-  }, {});
-  const flatSorted = Object.values(groupByMutation).flat();
-
-  console.log("groupByMutation:");
-  console.log(groupByMutation);
-  console.log("FlatSorted");
-  console.log(flatSorted);
-
   //// ------ bar char left  --------- //
 
   const groupByMutationWoFirstLetter = data.reduce((groups, e, i) => {
@@ -203,31 +183,71 @@ export default function SBS288(data, sample) {
   console.log("totalMutationsGroupN:");
   console.log(totalMutationsGroupN);
 
-  const annotations = Object.entries(groupByTotal).map(
+  const groupByFirstLetter = data.reduce((groups, e, i) => {
+    const mutation = e.MutationType.substring(0, 1);
+    const signature = {
+      mutationType: e.MutationType,
+      contribution: e.Mutations,
+    };
+    groups[mutation] = groups[mutation]
+      ? [...groups[mutation], signature]
+      : [signature];
+
+    return groups;
+  }, {});
+
+  console.log("groupByFirstLetter:");
+  console.log(groupByFirstLetter);
+
+  const totalGroupByFirstLetter = Object.entries(groupByFirstLetter).map(
     ([mutation, signatures], groupIndex, array) => ({
-      xref: "x",
-      yref: "paper",
-      xanchor: "bottom",
-      yanchor: "bottom",
-      x:
-        array
-          .slice(0, groupIndex)
-          .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) +
-        (signatures.length - 1) * 0.5,
-      y: 1.04,
-      text: `<b>${mutation}</b>`,
-      showarrow: false,
-      font: {
-        size: 18,
-      },
-      align: "center",
+      mutationType: mutation,
+      signatures: signatures,
+      total: signatures.reduce((a, e) => a + parseInt(e.contribution), 0),
     })
   );
+
+  console.log("totalGroupByFirstLetter:");
+  console.log(totalGroupByFirstLetter);
 
   const flatSortedT = Object.values(totalMutationsGroupT).flat();
   const flatSortedU = Object.values(totalMutationsGroupU).flat();
   const flatSortedN = Object.values(totalMutationsGroupN).flat();
+  const flatSortedFirstLetter = Object.values(totalGroupByFirstLetter).flat();
 
+  console.log(flatSortedT);
+  console.log(flatSortedU);
+  console.log(flatSortedN);
+  console.log(flatSortedFirstLetter);
+
+  Object.entries(flatSortedFirstLetter).forEach(
+    ([key, value], groupIndex, array) => {
+      if (value.mutationType === "T") {
+        value.mutationType = "All";
+        flatSortedT.push(value);
+      } else if (value.mutationType === "U") {
+        value.mutationType = "All";
+        flatSortedU.push(value);
+      } else {
+        value.mutationType = "All";
+        flatSortedN.push(value);
+      }
+    }
+  );
+
+  // sort by the first letter
+  //   flatSortedT.sort((a, b) =>
+  //     a.mutationType.substring(0, 1) < b.mutationType.substring(0, 1)
+  //       ? -1
+  //       : b.mutationType.substring(0, 1) < a.mutationType.substring(0, 1)
+  //       ? 1
+  //       : 0
+  //   );
+
+  console.log("New---");
+  console.log(flatSortedT);
+  console.log(flatSortedU);
+  console.log(flatSortedN);
   const tracesT = {
     name: "Transcrribed",
     type: "bar",
@@ -292,6 +312,27 @@ export default function SBS288(data, sample) {
     index: index,
     textangle: -90,
   }));
+
+  const annotations = Object.entries(groupByTotal).map(
+    ([mutation, signatures], groupIndex, array) => ({
+      xref: "x",
+      yref: "paper",
+      xanchor: "bottom",
+      yanchor: "bottom",
+      x:
+        array
+          .slice(0, groupIndex)
+          .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) +
+        (signatures.length - 1) * 0.5,
+      y: 1.04,
+      text: `<b>${mutation}</b>`,
+      showarrow: false,
+      font: {
+        size: 18,
+      },
+      align: "center",
+    })
+  );
 
   const sampleAnnotation = {
     xref: "paper",
@@ -386,6 +427,7 @@ export default function SBS288(data, sample) {
         size: 10,
       },
       anchor: "x2",
+      categoryorder: "category descending",
     },
 
     shapes: shapes,
