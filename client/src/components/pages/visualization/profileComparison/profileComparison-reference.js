@@ -34,7 +34,7 @@ export default function PcReference() {
     );
 
   const { study, cancer, strategy } = store.publicForm;
-  const { source, svgList, matrixList, projectID } = store.main;
+  const { source, samples, svgList, matrixList, projectID } = store.main;
   const { referenceForm } = store.profileComparison;
 
   // main form
@@ -80,8 +80,8 @@ export default function PcReference() {
   );
 
   // declare form Options
-  const profileOptions = svgList.length
-    ? [...new Set(svgList.map((e) => e.profileType))].map((e) => ({
+  const profileOptions = samples.length
+    ? [...new Set(samples.map((e) => e.profile))].map((e) => ({
         label: e,
         value: e,
       }))
@@ -125,11 +125,11 @@ export default function PcReference() {
 
   // get samples filtered by selected profile
   function getSampleOptions(profile) {
-    return svgList && profile
+    return samples && profile
       ? [
           ...new Set(
-            svgList
-              .filter((e) => e.profileType == profile.value)
+            samples
+              .filter((e) => e.profile == profile.value)
               .map((e) => e.sample)
           ),
         ].map((e) => ({
@@ -154,9 +154,8 @@ export default function PcReference() {
               compare: compare,
               matrixFile: matrixList.filter(
                 (e) =>
-                  e.profileType == profile.value &&
-                  e.matrixSize ==
-                    defaultMatrix(profile.value, ['96', '78', '83'])
+                  e.profile == profile.value &&
+                  e.matrix == defaultMatrix(profile.value, ['96', '78', '83'])
               )[0].Path,
             },
             projectID,

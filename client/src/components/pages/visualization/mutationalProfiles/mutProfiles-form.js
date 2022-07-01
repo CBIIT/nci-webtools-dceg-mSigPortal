@@ -21,54 +21,54 @@ export default function TreeLeafForm() {
   const mergeState = (state) =>
     dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
 
-  const { svgList, source } = store.main;
+  const { svgList, samples, source } = store.main;
   const { sample, profile, matrix, filter } = store.mutationalProfiles;
 
   const { control, setValue, watch } = useForm();
 
   // populate controls
   useEffect(() => {
-    if (svgList.length && !sample) {
+    if (samples.length && !sample) {
       handleSample(sampleOptions[0]);
     }
-  }, [svgList]);
+  }, [samples]);
 
-  const sampleOptions = svgList.length
-    ? [...new Set(svgList.map((d) => d.sample))].map((e) => ({
+  const sampleOptions = samples.length
+    ? [...new Set(samples.map((d) => d.sample))].map((e) => ({
         label: e,
         value: e,
       }))
     : [];
 
   const profileOptions = (sample) =>
-    sample && svgList.length
+    sample && samples.length
       ? [
           ...new Set(
-            svgList
+            samples
               .filter((e) => e.sample == sample.value)
-              .map((e) => e.profileType)
+              .map((e) => e.profile)
               .sort((a, b) => a - b)
           ),
         ].map((e) => ({ label: e, value: e }))
       : [];
 
   const matrixOptions = (sample, profile) =>
-    sample && profile && svgList.length
+    sample && profile && samples.length
       ? [
           ...new Set(
-            svgList
-              .filter((e) => e.sample && e.profileType == profile.value)
-              .map((e) => e.matrixSize)
+            samples
+              .filter((e) => e.sample && e.profile == profile.value)
+              .map((e) => e.matrix)
               .sort((a, b) => a - b)
           ),
         ].map((e) => ({ label: e, value: e }))
       : [];
 
   const filterOptions = (sample, profile, matrix) =>
-    sample && profile && matrix && svgList.length
+    sample && profile && matrix && samples.length
       ? [
           ...new Set(
-            svgList
+            samples
               .filter(
                 (e) => e.sample && e.Profile == profile.value + matrix.value
               )

@@ -63,6 +63,7 @@ export default function Visualization({ match }) {
     displayTab,
     svgList,
     matrixList,
+    samples,
   } = store.main;
   const mutationalProfiles = store.mutationalProfiles;
   const { signatureSetOptions } = store.pca;
@@ -89,13 +90,10 @@ export default function Visualization({ match }) {
         loadData();
       }
     } else {
-      if (
-        Object.keys(svgList).length > 0 &&
-        !mutationalProfiles.filtered.length
-      )
+      if (samples.length > 0 && !mutationalProfiles.filtered.length)
         mapPublicData();
     }
-  }, [svgList, projectID]);
+  }, [svgList, samples, projectID]);
 
   // reload summary information
   async function getResults() {
@@ -135,12 +133,10 @@ export default function Visualization({ match }) {
     // Mutational Profiles
     const nameOptions = [...new Set(svgList.map((d) => d.sample))];
     const selectName = nameOptions[0];
-    const filteredPlots = svgList.filter((row) => row.sample == selectName);
+    const filteredPlots = svgList.filter((e) => e.sample == selectName);
 
     const filteredProfileOptions = [
-      ...new Set(
-        filteredPlots.map((row) => row.profileType).sort((a, b) => a - b)
-      ),
+      ...new Set(filteredPlots.map((e) => e.profileType).sort((a, b) => a - b)),
     ];
 
     const profile = defaultProfile(filteredProfileOptions);
@@ -148,8 +144,8 @@ export default function Visualization({ match }) {
     const filteredMatrixOptions = [
       ...new Set(
         filteredPlots
-          .filter((row) => row.profileType == profile)
-          .map((row) => row.matrixSize)
+          .filter((e) => e.profileType == profile)
+          .map((e) => e.matrixSize)
       ),
     ].sort((a, b) => a - b);
 
@@ -158,10 +154,8 @@ export default function Visualization({ match }) {
     const filteredFilterOptions = [
       ...new Set(
         filteredPlots
-          .filter(
-            (row) => row.profileType == profile && row.matrixSize == matrix
-          )
-          .map((row) => row.Filter)
+          .filter((e) => e.profileType == profile && e.matrixSize == matrix)
+          .map((e) => e.Filter)
           .sort((a, b) => a - b)
       ),
     ];
@@ -171,8 +165,8 @@ export default function Visualization({ match }) {
     const filteredMatrixList = [
       ...new Set(
         matrixList
-          .filter((row) => row.profileType == profile)
-          .map((row) => row.matrixSize)
+          .filter((e) => e.profileType == profile)
+          .map((e) => e.matrixSize)
           .sort((a, b) => a - b)
       ),
     ];
@@ -192,13 +186,13 @@ export default function Visualization({ match }) {
     // Cosine Similarity - Profile Comparison - PCA - Kataegis
     const sampleNameOptions = [
       ...new Set(
-        svgList.map((row) => {
-          if (row.Filter != 'NA') return `${row.sample}@${row.Filter}`;
-          else return row.samples;
+        svgList.map((e) => {
+          if (e.Filter != 'NA') return `${e.sample}@${e.Filter}`;
+          else return e.samples;
         })
       ),
     ];
-    const profileOptions = [...new Set(svgList.map((row) => row.profileType))];
+    const profileOptions = [...new Set(svgList.map((e) => e.profileType))];
 
     const selectProfile = defaultProfile(profileOptions);
     const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);
@@ -258,7 +252,7 @@ export default function Visualization({ match }) {
     });
   }
 
-  // retrieve mapping of samples to plots from svgList file
+  // retrieve mapping of samples to plots from samples data
   async function mapPublicData() {
     mergeState({
       loading: {
@@ -269,19 +263,18 @@ export default function Visualization({ match }) {
     });
 
     // Mutational Profiles
-    const nameOptions = [...new Set(svgList.map((row) => row.sample))];
+    const nameOptions = [...new Set(samples.map((e) => e.sample))];
     const selectName = mutationalProfiles.selectName || nameOptions[0];
-    const profileOptions = [...new Set(svgList.map((row) => row.profileType))];
+    const profileOptions = [...new Set(samples.map((e) => e.profile))];
     const profile = defaultProfile(profileOptions);
 
     const filteredMatrixOptions = [
       ...new Set(
-        svgList
+        samples
           .filter(
-            (row) =>
-              row.sample == selectName && row.Profile.indexOf(profile) > -1
+            (e) => e.sample == selectName && e.profile.indexOf(profile) > -1
           )
-          .map((e) => e.matrixSize)
+          .map((e) => e.matrix)
       ),
     ].sort((a, b) => a - b);
 
@@ -521,14 +514,15 @@ export default function Visualization({ match }) {
             </Nav>
           </div>
           {/* for mobile devices */}
-          <div className="row d-md-none">
+          <div className="e d-md-none">
             <Nav defaultActiveKey="summary">
               {tabs.map(({ name, id }) => (
                 <div key={id} className="col-12 text-center">
                   <Button
                     variant="link"
                     className={
-                      id == displayTab && Object.keys(svgList).length
+                      id == displayTab &&
+                      (samples.length || Object.keys(svgList).length)
                         ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 active-secondary-navlinks'
                         : 'secondary-navlinks px-3 py-1 d-inline-block border-0'
                     }

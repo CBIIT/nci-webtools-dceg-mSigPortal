@@ -26,22 +26,10 @@ export const vissualizationApiSlice = apiSlice.injectEndpoints({
     }),
 
     submitWebPublic: builder.mutation({
-      query: (data) => ({
-        url: 'visualizationWrapper',
-        method: 'POST',
-        body: { fn: 'getPublicData', args: data },
+      query: (params) => ({
+        url: 'visualizationData',
+        params,
       }),
-      transformResponse: (data) => {
-        const { output, ...rest } = data;
-        const svgList = output.svgList.map(({ Sample, ...e }) => ({
-          ...e,
-          sample: Sample,
-          profileType: e.Profile.match(/[a-z]+/gi)[0],
-          matrixSize: e.Profile.match(/\d+/gi)[0],
-        }));
-
-        return { ...rest, svgList };
-      },
     }),
   }),
 });

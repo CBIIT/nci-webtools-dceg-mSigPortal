@@ -20,6 +20,7 @@ export const getInitialState = () => ({
     email: '',
   },
   main: {
+    samples: [],
     submitted: false,
     source: 'public',
     inputFormat: 'vcf',

@@ -23,6 +23,7 @@ const {
   querySeqmatrix,
   queryExposure,
   querySignature,
+  visualizationData,
 } = require('../analysis');
 
 const router = express.Router();
@@ -75,6 +76,8 @@ router.post('/getFileS3', getFileS3);
 router.post('/downloadWorkspace', downloadWorkspace);
 
 router.post('/associationWrapper', associationWrapper);
+
+router.get('/visualizationData', visualizationData);
 
 router.get('/seqmatrix', querySeqmatrix);
 
