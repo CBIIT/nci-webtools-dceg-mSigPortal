@@ -17,128 +17,64 @@ export default function SBS6(data, sample) {
   // console.log("maxVal--:");
   // console.log(maxVal);
 
-  const xval = [];
-  const yval = [];
-  data.forEach((array) => {
-    yval.push(array.MutationType);
-    xval.push(array.Mutations);
-  });
-  //   console.log(xval);
-  //   console.log(yval);
-  //   const traces = data.map((element, index) => ({
-  //     element: element,
-  //     idex: index,
-  //     name: element.MutationType,
-  //     type: "bar",
-  //     //marker: { color: colors[element.MutationType] },
-  //     x: xval.push(element.MutationType),
-  //     y: yval.push(element.Mutations),
-  //     hoverinfo: "x+y",
-  //   }));
-  //   console.log("traces:");
-  //   console.log(traces);
-  const trace1 = {};
-  const trace2 = {
-    type: "bar",
-    x: xval,
-    y: yval,
-    hoverinfo: "x+y",
-    orientation: "h",
-  };
-  const traces = [trace1, trace2];
+  // group data by dominant mutation
+  const groupByMutation = data.reduce((groups, e, i) => {
+    const mutation = e.MutationType.substring(0, e.MutationType.length);
+    const signature = {
+      mutationType: e.MutationType,
+      contribution: e.Mutations,
+    };
+    groups[mutation] = groups[mutation]
+      ? [...groups[mutation], signature]
+      : [signature];
+    return groups;
+  }, {});
+  const flatSorted = Object.values(groupByMutation).flat();
+
+  console.log("groupByMutation:");
+  console.log(groupByMutation);
+  console.log("FlatSorted");
+  console.log(flatSorted);
+
+  const traces = Object.entries(groupByMutation).map(
+    ([mutation, signatures], groupIndex, array) => ({
+      name: mutation,
+      type: "bar",
+      marker: { color: colors[mutation] },
+      y: signatures.map((e) => `<b>${e.mutationType}<b>`),
+      x: signatures.map((e) => e.contribution),
+      hoverinfo: "x+y",
+      showlegend: false,
+      orientation: "h",
+    })
+  );
+  //const traces = [trace1, trace2];
   console.log("traces:");
   console.log(traces);
 
-  //   const annotations = Object.entries(groupByMutation).map(
-  //     ([mutation, signatures], groupIndex, array) => ({
-  //       xref: "x",
-  //       yref: "paper",
-  //       xanchor: "bottom",
-  //       yanchor: "bottom",
-  //       x:
-  //         array
-  //           .slice(0, groupIndex)
-  //           .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) +
-  //         (signatures.length - 1) * 0.5,
-  //       y: 1.04,
-  //       text: `<b>${mutation}</b>`,
-  //       showarrow: false,
-  //       font: {
-  //         size: 18,
-  //       },
-  //       align: "center",
-  //     })
-  //   );
-
-  //   const xannotations = flatSorted.map((num, index) => ({
-  //     xref: "x",
-  //     yref: "paper",
-  //     xanchor: "bottom",
-  //     yanchor: "bottom",
-  //     x: index,
-  //     y: -0.1,
-  //     text: num.mutationType.replace(
-  //       /\[(.*)\]/,
-  //       num.mutationType.substring(2, 3)
-  //     ),
-  //     showarrow: false,
-  //     font: {
-  //       size: 10,
-  //       color: colors[num.mutationType.substring(2, 5)],
-  //     },
-  //     align: "center",
-  //     num: num,
-  //     index: index,
-  //     textangle: -90,
-  //   }));
-
-  //   const sampleAnnotation = {
-  //     xref: "paper",
-  //     yref: "paper",
-  //     xanchor: "bottom",
-  //     yanchor: "bottom",
-  //     x: 0,
-  //     y: 0.9,
-  //     text:
-  //       "<b>" + sample + ": " + numberWithCommas(totalMutations) + " subs </b>",
-  //     showarrow: false,
-  //     font: {
-  //       size: 18,
-  //     },
-  //     align: "center",
-  //   };
-
-  //   const shapes = Object.entries(groupByMutation).map(
-  //     ([mutation, _], groupIndex, array) => ({
-  //       type: "rect",
-  //       xref: "x",
-  //       yref: "paper",
-  //       x0: array
-  //         .slice(0, groupIndex)
-  //         .reduce((x0, [_, sigs]) => x0 + sigs.length, -0.4),
-  //       x1: array
-  //         .slice(0, groupIndex + 1)
-  //         .reduce((x0, [_, sigs]) => x0 + sigs.length, -0.6),
-  //       y0: 1.05,
-  //       y1: 1.01,
-  //       fillcolor: colors[mutation],
-  //       line: {
-  //         width: 0,
-  //       },
-  //       mutation: mutation,
-  //     })
-  //   );
-  //   // console.log("shapes");
-  //   // console.log(shapes);
-
   const layout = {
     hoverlabel: { bgcolor: "#FFF" },
+    title: {
+      title: {
+        text:
+          "<b>" +
+          sample +
+          ": " +
+          numberWithCommas(totalMutations) +
+          " subs </b>",
+        font: { size: 24 },
+      },
+    },
     xaxis: {
+      title: "<b>Number of Single Base Substitutions</b>",
       showticklabels: true,
       showline: true,
       tickfont: {
         size: 10,
       },
+    },
+    yaxis: {
+      categoryorder: "category descending",
     },
   };
   console.log("layout");

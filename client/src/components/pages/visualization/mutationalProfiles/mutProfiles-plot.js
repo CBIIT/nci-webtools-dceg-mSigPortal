@@ -96,7 +96,8 @@ export default function MutProfilePlot() {
           <div className="mb-3">
             <Row className="justify-content-center">
               <Plot
-                {...(profile.value + matrix.value == "SBS1536"
+                {...(profile.value + matrix.value === "SBS1536" ||
+                profile.value + matrix.value === "SBS6"
                   ? { className: "w-50" }
                   : { className: "w-100" })}
                 divId={divId}
