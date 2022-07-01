@@ -22,22 +22,22 @@ export default function SBS96(data, sample) {
   ];
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-  const totalMutations = data.reduce((a, e) => a + parseInt(e.Mutations), 0);
+  const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
   const chunks = (a, size) =>
     Array.from(new Array(Math.ceil(a.length / size)), (_, i) =>
       a.slice(i * size, i * size + size)
     );
   console.log("data--:");
   console.log(data);
-  // const maxValMutation = Math.max(...data.map((o) => o.Mutations));
+  // const maxValMutation = Math.max(...data.map((o) => o.mutations));
   // console.log("maxValMutation:---");
   // console.log(maxValMutation);
 
   const groupByMutationInner = data.reduce((groups, e, i) => {
-    const mutation = e.MutationType.substring(1, 8);
+    const mutation = e.mutationType.substring(1, 8);
     const signature = {
-      mutationType: e.MutationType,
-      contribution: e.Mutations,
+      mutationType: e.mutationType,
+      contribution: e.mutations,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
@@ -47,10 +47,10 @@ export default function SBS96(data, sample) {
 
   const groupByMutationOuter = data.reduce((groups, e, i) => {
     const mutation =
-      e.MutationType[0] + e.MutationType[e.MutationType.length - 1];
+      e.mutationType[0] + e.mutationType[e.mutationType.length - 1];
     const signature = {
-      mutationType: e.MutationType,
-      contribution: e.Mutations,
+      mutationType: e.mutationType,
+      contribution: e.mutations,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
@@ -111,10 +111,10 @@ export default function SBS96(data, sample) {
   const heatmapX2 = [];
 
   const groupByMutationFront = data.reduce((groups, e, i) => {
-    const mutation = e.MutationType.substring(0, e.MutationType.length - 1);
+    const mutation = e.mutationType.substring(0, e.mutationType.length - 1);
     const signature = {
-      mutationType: e.MutationType,
-      contribution: e.Mutations,
+      mutationType: e.mutationType,
+      contribution: e.mutations,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
@@ -209,10 +209,10 @@ export default function SBS96(data, sample) {
   const heatmapZ3 = [];
   const heatmapX3 = [];
   const groupByMutationBack = data.reduce((groups, e, i) => {
-    const mutation = e.MutationType.substring(1, e.MutationType.length);
+    const mutation = e.mutationType.substring(1, e.mutationType.length);
     const signature = {
-      mutationType: e.MutationType,
-      contribution: e.Mutations,
+      mutationType: e.mutationType,
+      contribution: e.mutations,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
@@ -230,8 +230,8 @@ export default function SBS96(data, sample) {
     })
   );
 
-  // console.log("mutationSumBack:---");
-  // console.log(mutationSumBack);
+  // console.log("mutationsumBack:---");
+  // console.log(mutationsumBack);
 
   // sort by the last letter
   mutationSumBack.sort((a, b) =>

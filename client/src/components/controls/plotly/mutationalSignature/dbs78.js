@@ -12,8 +12,8 @@ export default function DBS78(data, sample) {
     "TT>": "#4C0299",
   };
 
-  const totalMutations = data.reduce((a, e) => a + parseInt(e.Mutations), 0);
-  const maxVal = Math.max(...data.map((o) => o.Mutations));
+  const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
+  const maxVal = Math.max(...data.map((o) => o.mutations));
   //console.log(maxVal);
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
@@ -23,10 +23,10 @@ export default function DBS78(data, sample) {
   // group data by dominant mutation
   const groupByMutation = data.reduce((groups, e, i) => {
     const mutationRegex = /^.{0,3}/;
-    const mutation = e.MutationType.match(mutationRegex)[0];
+    const mutation = e.mutationType.match(mutationRegex)[0];
     const signature = {
-      mutationType: e.MutationType,
-      contribution: e.Mutations,
+      mutationType: e.mutationType,
+      contribution: e.mutations,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]

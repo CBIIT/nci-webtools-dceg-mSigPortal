@@ -15,9 +15,9 @@ export default function SBS288(data, sample) {
   const arrayDataN = [];
 
   Object.values(data).forEach((group) => {
-    if (group.MutationType.substring(0, 1) === "T") {
+    if (group.mutationType.substring(0, 1) === "T") {
       arrayDataT.push(group);
-    } else if (group.MutationType.substring(0, 1) === "U") {
+    } else if (group.mutationType.substring(0, 1) === "U") {
       arrayDataU.push(group);
     } else {
       arrayDataN.push(group);
@@ -34,18 +34,18 @@ export default function SBS288(data, sample) {
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 
-  const totalMutations = data.reduce((a, e) => a + parseInt(e.Mutations), 0);
-  const maxVal = Math.max(...data.map((o) => o.Mutations));
+  const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
+  const maxVal = Math.max(...data.map((o) => o.mutations));
   console.log("maxVal--:");
   console.log(maxVal);
 
   //// ------ bar char left  --------- //
 
   const groupByMutationWoFirstLetter = data.reduce((groups, e, i) => {
-    const mutation = e.MutationType.substring(2, e.MutationType.length);
+    const mutation = e.mutationType.substring(2, e.mutationType.length);
     const signature = {
-      mutationType: e.MutationType,
-      contribution: e.Mutations,
+      mutationType: e.mutationType,
+      contribution: e.mutations,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
@@ -104,10 +104,10 @@ export default function SBS288(data, sample) {
 
   const groupByMutationT = arrayDataT.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
-    const mutation = e.MutationType.match(mutationRegex)[1];
+    const mutation = e.mutationType.match(mutationRegex)[1];
     const signature = {
-      mutationType: e.MutationType.substring(2, e.MutationType.length),
-      contribution: e.Mutations,
+      mutationType: e.mutationType.substring(2, e.mutationType.length),
+      contribution: e.mutations,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
@@ -132,10 +132,10 @@ export default function SBS288(data, sample) {
 
   const groupByMutationU = arrayDataU.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
-    const mutation = e.MutationType.match(mutationRegex)[1];
+    const mutation = e.mutationType.match(mutationRegex)[1];
     const signature = {
-      mutationType: e.MutationType.substring(2, e.MutationType.length),
-      contribution: e.Mutations,
+      mutationType: e.mutationType.substring(2, e.mutationType.length),
+      contribution: e.mutations,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
@@ -159,10 +159,10 @@ export default function SBS288(data, sample) {
 
   const groupByMutationN = arrayDataN.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
-    const mutation = e.MutationType.match(mutationRegex)[1];
+    const mutation = e.mutationType.match(mutationRegex)[1];
     const signature = {
-      mutationType: e.MutationType.substring(2, e.MutationType.length),
-      contribution: e.Mutations,
+      mutationType: e.mutationType.substring(2, e.mutationType.length),
+      contribution: e.mutations,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
@@ -184,10 +184,10 @@ export default function SBS288(data, sample) {
   console.log(totalMutationsGroupN);
 
   const groupByFirstLetter = data.reduce((groups, e, i) => {
-    const mutation = e.MutationType.substring(0, 1);
+    const mutation = e.mutationType.substring(0, 1);
     const signature = {
-      mutationType: e.MutationType,
-      contribution: e.Mutations,
+      mutationType: e.mutationType,
+      contribution: e.mutations,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]

@@ -12,14 +12,14 @@ export default function SBS6(data, sample) {
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 
-  const totalMutations = data.reduce((a, e) => a + parseInt(e.Mutations), 0);
+  const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
 
   // group data by dominant mutation
   const groupByMutation = data.reduce((groups, e, i) => {
-    const mutation = e.MutationType.substring(0, e.MutationType.length);
+    const mutation = e.mutationType.substring(0, e.mutationType.length);
     const signature = {
-      mutationType: e.MutationType,
-      contribution: e.Mutations,
+      mutationType: e.mutationType,
+      contribution: e.mutations,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]

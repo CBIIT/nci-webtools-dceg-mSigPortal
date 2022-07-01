@@ -56,18 +56,18 @@ export default function ID83(data, sample) {
     arrayIDAnnotationTop = [],
     arrayIDAnnotationBot = [];
 
-  const totalMutations = data.reduce((a, e) => a + parseInt(e.Mutations), 0);
+  const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-  const maxVal = Math.max(...data.map((o) => o.Mutations));
+  const maxVal = Math.max(...data.map((o) => o.mutations));
 
   // group data by dominant mutation
   const groupByMutation = data.reduce((groups, e, i) => {
     const mutationRegex = /^.{0,7}/;
-    const mutation = e.MutationType.match(mutationRegex)[0];
+    const mutation = e.mutationType.match(mutationRegex)[0];
     const signature = {
-      mutationType: e.MutationType,
-      contribution: e.Mutations,
+      mutationType: e.mutationType,
+      contribution: e.mutations,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
@@ -81,15 +81,15 @@ export default function ID83(data, sample) {
 
   const groupByMutationID = data.reduce((groups, e) => {
     let mutationID;
-    mutationID = e.MutationType.match(
-      e.MutationType.substring(
-        e.MutationType.length - 3,
-        e.MutationType.length - 2
+    mutationID = e.mutationType.match(
+      e.mutationType.substring(
+        e.mutationType.length - 3,
+        e.mutationType.length - 2
       )
     );
     const signature = {
-      mutationType: e.MutationType,
-      contribution: e.Mutations,
+      mutationType: e.mutationType,
+      contribution: e.mutations,
     };
     groups[mutationID] = groups[mutationID]
       ? [...groups[mutationID], signature]

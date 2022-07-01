@@ -11,13 +11,13 @@ export default function SBS24(data, sample) {
   console.log(data);
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-  const totalMutations = data.reduce((a, e) => a + parseInt(e.Mutations), 0);
+  const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
 
   const groupByMutation = data.reduce((groups, e, i) => {
-    const mutation = e.MutationType.substring(2, e.MutationType.length);
+    const mutation = e.mutationType.substring(2, e.mutationType.length);
     const signature = {
-      mutationType: e.MutationType,
-      contribution: e.Mutations,
+      mutationType: e.mutationType,
+      contribution: e.mutations,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
