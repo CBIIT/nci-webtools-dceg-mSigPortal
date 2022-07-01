@@ -59,28 +59,28 @@ export default function MutProfilePlot() {
     const profileMatrix = profile.value + matrix.value;
 
     const { traces, layout } =
-      profileMatrix == 'SBS6'
+      profileMatrix == "SBS6"
         ? SBS6(data, sample)
         : profileMatrix == "SBS24"
         ? SBS24(data, sample)
         : profileMatrix == "SBS96"
         ? SBS96(data, sample)
-        : profileMatrix == 'SBS192'
+        : profileMatrix == "SBS192"
         ? SBS192(data, sample)
-        : profileMatrix == 'SBS288'
+        : profileMatrix == "SBS288"
         ? SBS288(data, sample)
-        : profileMatrix == 'SBS1536'
+        : profileMatrix == "SBS1536"
         ? SBS1536(data, sample)
-        : profileMatrix == 'DBS78'
+        : profileMatrix == "DBS78"
         ? DBS78(data, sample)
-        : profileMatrix == 'ID83'
+        : profileMatrix == "ID83"
         ? ID83(data, sample)
         : { traces: [], layout: {} };
 
     setPlot({ data: [...traces], layout });
   }
 
-  const divId = 'mutationalProfilePlot';
+  const divId = "mutationalProfilePlot";
   const config = {
     displayModeBar: true,
     responsive: true,
@@ -103,11 +103,16 @@ export default function MutProfilePlot() {
                 {...(profile.value + matrix.value === "SBS1536" ||
                 profile.value + matrix.value === "SBS6" ||
                 profile.value + matrix.value === "SBS24"
-                  ? { className: "w-50" }
-                  : { className: "w-75" })}
+                  ? { className: "w-70" }
+                  : { className: "w-95" })}
                 divId={divId}
+                // style={{
+                //   ...(profile.value + matrix.value === "SBS1536"
+                //     ? { height: "600px" }
+                //     : { height: "500px" }),
+                // }}
                 style={{
-                  height: '500px',
+                  height: "600px",
                 }}
                 data={cloneDeep(plot.data)}
                 layout={cloneDeep(plot.layout)}
@@ -121,7 +126,7 @@ export default function MutProfilePlot() {
                 <Button
                   onClick={() =>
                     downloadImage(divId, {
-                      format: 'png',
+                      format: "png",
                       filename: sample.value,
                     })
                   }
@@ -133,7 +138,7 @@ export default function MutProfilePlot() {
                 <Button
                   onClick={() =>
                     downloadImage(divId, {
-                      format: 'svg',
+                      format: "svg",
                       filename: sample.value,
                     })
                   }
@@ -146,7 +151,7 @@ export default function MutProfilePlot() {
                   onClick={() =>
                     saveAs(
                       new Blob([JSON.stringify(plot)], {
-                        type: 'application/json',
+                        type: "application/json",
                       }),
                       `${sample.value}.json`
                     )

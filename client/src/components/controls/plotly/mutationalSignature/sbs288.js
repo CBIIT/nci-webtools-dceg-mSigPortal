@@ -346,7 +346,7 @@ export default function SBS288(data, sample) {
     xanchor: "bottom",
     yanchor: "bottom",
     x: 0,
-    y: 0.9,
+    y: 0.92,
     text:
       "<b>" + sample + ": " + numberWithCommas(totalMutations) + " subs </b>",
     showarrow: false,

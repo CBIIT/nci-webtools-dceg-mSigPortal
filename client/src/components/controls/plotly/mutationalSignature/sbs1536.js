@@ -430,7 +430,7 @@ export default function SBS96(data, sample) {
     xanchor: "bottom",
     yanchor: "bottom",
     x: 0,
-    y: 0.9,
+    y: 0.95,
     text:
       "<b>" + sample + ": " + numberWithCommas(totalMutations) + " subs </b>",
     showarrow: false,
@@ -466,7 +466,7 @@ export default function SBS96(data, sample) {
     xanchor: "bottom",
     yanchor: "bottom",
     x: index,
-    y: -0.1,
+    y: -0.07,
     text: num.mutationType.replace(/\[(.*)\]/, "-"),
     showarrow: false,
     font: {
@@ -500,8 +500,8 @@ export default function SBS96(data, sample) {
     },
     yaxis: {
       //   title: "Number of Single Base Substitutions",
-      autorange: true,
-      range: [0, maxVal + maxVal * 0.35],
+      autorange: false,
+      range: [0, maxVal + maxVal * 0.2],
       linecolor: "black",
       linewidth: 1,
       mirror: true,
@@ -541,14 +541,14 @@ export default function SBS96(data, sample) {
       },
       domain: [0, 0.35],
     },
-    // with: 200,
-    // height: 500,
+    //with: 700,
+    height: 600,
     // autosize: false,
     shapes: shapes,
     annotations: [...annotations, sampleAnnotation, ...xannotations],
   };
   // console.log("layout");
-  // console.log(layout);
+  console.log(layout);
 
   return { traces, layout };
 }

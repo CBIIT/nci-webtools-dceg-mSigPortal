@@ -292,7 +292,7 @@ export default function ID83(data, sample) {
     xanchor: "bottom",
     yanchor: "bottom",
     x: 0,
-    y: 0.9,
+    y: 0.92,
     text:
       "<b>" + sample + ": " + numberWithCommas(totalMutations) + " indels</b>",
     showarrow: false,
@@ -383,7 +383,7 @@ export default function ID83(data, sample) {
     yaxis: {
       title: "Number of Idels",
       autorange: false,
-      range: [0, maxVal + maxVal * 0.35],
+      range: [0, maxVal + maxVal * 0.15],
       linecolor: "black",
       linewidth: 1,
       mirror: true,
