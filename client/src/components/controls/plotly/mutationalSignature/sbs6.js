@@ -38,21 +38,6 @@ export default function SBS6(data, sample) {
       orientation: "h",
     })
   );
-  const sampleAnnotation = {
-    xref: "paper",
-    yref: "paper",
-    xanchor: "bottom",
-    yanchor: "bottom",
-    x: 0,
-    y: 0.9,
-    text:
-      "<b>" + sample + ": " + numberWithCommas(totalMutations) + " subs </b>",
-    showarrow: false,
-    font: {
-      size: 24,
-    },
-    align: "center",
-  };
 
   const layout = {
     hoverlabel: { bgcolor: "#FFF" },
@@ -83,8 +68,6 @@ export default function SBS6(data, sample) {
       },
       categoryorder: "category descending",
     },
-
-    annotations: sampleAnnotation,
   };
 
   console.log("layout");

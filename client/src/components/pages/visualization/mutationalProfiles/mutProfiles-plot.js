@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { useSeqmatrixQuery } from "../../../../services/apiSlice";
 import { LoadingOverlay } from "../../../controls/loading-overlay/loading-overlay";
 import SBS6 from "../../../controls/plotly/mutationalSignature/sbs6";
+import SBS24 from "../../../controls/plotly/mutationalSignature/sbs24";
 import SBS96 from "../../../controls/plotly/mutationalSignature/sbs96";
 import SBS192 from "../../../controls/plotly/mutationalSignature/sbs192";
 import SBS288 from "../../../controls/plotly/mutationalSignature/sbs288";
@@ -59,6 +60,8 @@ export default function MutProfilePlot() {
     const { traces, layout } =
       profileMatrix == "SBS6"
         ? SBS6(data, sample)
+        : profileMatrix == "SBS24"
+        ? SBS24(data, sample)
         : profileMatrix == "SBS96"
         ? SBS96(data, sample)
         : profileMatrix == "SBS192"
@@ -97,7 +100,8 @@ export default function MutProfilePlot() {
             <Row className="justify-content-center">
               <Plot
                 {...(profile.value + matrix.value === "SBS1536" ||
-                profile.value + matrix.value === "SBS6"
+                profile.value + matrix.value === "SBS6" ||
+                profile.value + matrix.value === "SBS24"
                   ? { className: "w-50" }
                   : { className: "w-100" })}
                 divId={divId}
