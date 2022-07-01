@@ -12,7 +12,12 @@ const XLSX = require('xlsx');
 const replace = require('replace-in-file');
 const glob = require('glob');
 const archiver = require('archiver');
-const { getAssociationData, getExposureData, getSeqmatrixData, getSignatureData } = require('./query');
+const {
+  getAssociationData,
+  getExposureData,
+  getSeqmatrixData,
+  getSignatureData,
+} = require('./query');
 const config = require('../config.json');
 
 if (config.aws) AWS.config.update(config.aws);
@@ -799,14 +804,12 @@ async function querySeqmatrix(req, res, next) {
   try {
     const { study, cancer, strategy, sample, profile, matrix, s3 } = req.query;
     const connection = req.app.locals.connection;
-
-    if (connection && !s3) {
+    if (connection && s3 == 'false') {
       const query = { study, strategy, cancer, sample, profile, matrix };
       const columns = ['mutationType', 'mutations'];
       const data = await getSeqmatrixData(connection, query, columns);
       res.json(data);
     } else {
-      
       const s3 = new AWS.S3();
 
       const params = {
@@ -833,8 +836,13 @@ async function queryExposure(req, res, next) {
     const { study, strategy, cancer, signature_set, s3 } = req.query;
     const connection = req.app.locals.connection;
 
-    if (connection && !s3) {
-      const query = { study, strategy, cancer, signatureSetName: signature_set }
+    if (connection && s3 == 'false') {
+      const query = {
+        study,
+        strategy,
+        cancer,
+        signatureSetName: signature_set,
+      };
       const columns = ['sample', 'signatureName', 'exposure'];
       const data = await getExposureData(connection, query, columns);
       res.json(data);
@@ -861,12 +869,18 @@ async function querySignature(req, res, next) {
   try {
     const { profile, matrix, signature_set, s3 } = req.query;
     const connection = req.app.locals.connection;
-    
-    if (connection && !s3) {
-      const query = { profile, matrix, signatureSetName: signature_set }
-      const columns =  !signature_set
+
+    if (connection && s3 == 'false') {
+      const query = { profile, matrix, signatureSetName: signature_set };
+      const columns = !signature_set
         ? ['signatureSetName']
-        : ['strandInfo', 'strand', 'signatureName', 'mutationType', 'contribution'];
+        : [
+            'strandInfo',
+            'strand',
+            'signatureName',
+            'mutationType',
+            'contribution',
+          ];
       const data = await getSignatureData(connection, query, columns);
       res.json(data);
     } else {
@@ -890,7 +904,9 @@ async function querySignature(req, res, next) {
           Delimiter: '/',
         };
         const { CommonPrefixes } = await s3.listObjectsV2(params).promise();
-        const signatureSets = CommonPrefixes.map((e) => path.basename(e.Prefix));
+        const signatureSets = CommonPrefixes.map((e) =>
+          path.basename(e.Prefix)
+        );
 
         res.json(signatureSets);
       } else {
