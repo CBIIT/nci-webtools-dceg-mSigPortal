@@ -103,7 +103,7 @@ export default function MutProfilePlot() {
                 profile.value + matrix.value === "SBS6" ||
                 profile.value + matrix.value === "SBS24"
                   ? { className: "w-50" }
-                  : { className: "w-100" })}
+                  : { className: "w-75" })}
                 divId={divId}
                 style={{
                   height: "500px",
