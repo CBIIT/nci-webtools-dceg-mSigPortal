@@ -254,7 +254,9 @@ export default function SBS288(data, sample) {
     marker: { color: "blue" },
 
     x: flatSortedT.map((element, index, array) => element.total),
-    y: flatSortedT.map((element, index, array) => element.mutationType),
+    y: flatSortedT.map(
+      (element, index, array) => `<b>${element.mutationType}<b>`
+    ),
     xaxis: "x2",
     yaxis: "y2",
     hoverinfo: "x2+y2",
@@ -267,7 +269,9 @@ export default function SBS288(data, sample) {
     type: "bar",
     marker: { color: "red" },
     x: flatSortedU.map((element, index, array) => element.total),
-    y: flatSortedU.map((element, index, array) => element.mutationType),
+    y: flatSortedU.map(
+      (element, index, array) => `<b>${element.mutationType}<b>`
+    ),
     xaxis: "x2",
     yaxis: "y2",
     hoverinfo: "x2+y2",
@@ -280,7 +284,9 @@ export default function SBS288(data, sample) {
     type: "bar",
     marker: { color: "green" },
     x: flatSortedN.map((element, index, array) => element.total),
-    y: flatSortedN.map((element, index, array) => element.mutationType),
+    y: flatSortedN.map(
+      (element, index, array) => `<b>${element.mutationType}<b>`
+    ),
     xaxis: "x2",
     yaxis: "y2",
     hoverinfo: "x2+y2",
