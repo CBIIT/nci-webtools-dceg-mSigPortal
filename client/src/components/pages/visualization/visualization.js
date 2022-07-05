@@ -19,6 +19,7 @@ import MutationalPattern from './mutationalPattern/mutationalPattern';
 import ProfileComparison from './profileComparison';
 import ProfileComparison2 from './profileComparison/profileComparison';
 import PCA from './pca';
+import PCA2 from './pca/pca';
 import Kataegis from './kataegis';
 import Download from './download';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
@@ -441,12 +442,15 @@ export default function Visualization({ match }) {
     {
       name: 'PCA',
       id: 'pca',
-      component: (
-        <PCA
-          // getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
-          submitR={(fn, args) => submitR(fn, args)}
-        />
-      ),
+      component:
+        source == 'user' ? (
+          <PCA
+            // getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
+            submitR={(fn, args) => submitR(fn, args)}
+          />
+        ) : (
+          <PCA2 />
+        ),
     },
     {
       name: 'Kataegis Identification',
