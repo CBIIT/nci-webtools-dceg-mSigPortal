@@ -47,6 +47,15 @@ export default function SBS384(data, sample) {
     0
   );
 
+  const dataUT = [...dataT, ...dataU];
+  const maxVal = Math.max(...dataUT.map((o) => o.contribution));
+  console.log("maxVal--:");
+  console.log(maxVal);
+
+  console.log("dataT");
+  console.log(dataT);
+  console.log("dataU");
+  console.log(dataU);
   const groupByMutationU = dataU.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
     const mutation = e.mutationType.match(mutationRegex)[1];
@@ -61,6 +70,20 @@ export default function SBS384(data, sample) {
   }, {});
   console.log("groupByMutationU");
   console.log(groupByMutationU);
+  const flatSortedU = Object.values(groupByMutationU)
+    .flat()
+    .sort((a, b) =>
+      a.mutationType
+        .substring(0, 5)
+        .localeCompare(b.mutationType.substring(0, 5))
+    )
+    .sort((a, b) =>
+      a.mutationType
+        .substring(2, 5)
+        .localeCompare(b.mutationType.substring(2, 5))
+    );
+  console.log("flatSortedU");
+  console.log(flatSortedU);
 
   const groupByMutationT = dataT.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
@@ -77,28 +100,45 @@ export default function SBS384(data, sample) {
 
   console.log("groupByMutationT");
   console.log(groupByMutationT);
+  const flatSortedT = Object.values(groupByMutationT)
+    .flat()
+    .sort((a, b) =>
+      a.mutationType
+        .substring(0, 5)
+        .localeCompare(b.mutationType.substring(0, 5))
+    )
+    .sort((a, b) =>
+      a.mutationType
+        .substring(2, a.mutationType.length)
+        .localeCompare(b.mutationType.substring(2, a.mutationType.length))
+    )
+    .sort((a, b) =>
+      a.mutationType
+        .substring(0, 5)
+        .localeCompare(b.mutationType.substring(0, 5))
+    )
+    .sort((a, b) =>
+      a.mutationType
+        .substring(2, 5)
+        .localeCompare(b.mutationType.substring(2, 5))
+    );
+  console.log("flatSortedT");
+  console.log(flatSortedT);
 
-  const maxVal = Math.max(
-    [...dataT, ...dataU].map((o) => parseInt(o.contribution))
-  );
-  console.log("maxVal--:");
-  console.log(maxVal);
   console.log("dataT");
   console.log(dataT);
   console.log("dataU");
   console.log(dataU);
 
   const tracesT = {
-    name: "Transcrribed",
+    name: "Transcrribed Strand",
     type: "bar",
     marker: { color: "#004765" },
+    x: flatSortedT.map((element, index, array) => index),
+    y: flatSortedT.map((element, index, array) => element.contribution),
 
-    y: dataT.map((element, index, array) => element.contribution),
-    x: dataU.map(
-      (element, index, array) =>
-        element.mutationType.substring(2, element.mutationType.length) + " "
-    ),
     hoverinfo: "x+y",
+    showlegend: true,
   };
 
   console.log(tracesT);
@@ -106,12 +146,11 @@ export default function SBS384(data, sample) {
     name: "Untranscribed",
     type: "bar",
     marker: { color: "#E32925" },
-    y: dataU.map((element, index, array) => element.contribution),
-    x: dataU.map(
-      (element, index, array) =>
-        element.mutationType.substring(2, element.mutationType.length) + " "
-    ),
-    hoverinfo: "y+x",
+    x: flatSortedU.map((element, index, array) => index),
+    y: flatSortedU.map((element, index, array) => element.contribution),
+
+    hoverinfo: "x+y",
+    showlegend: true,
   };
   console.log(tracesU);
 
@@ -141,13 +180,13 @@ export default function SBS384(data, sample) {
   console.log("annotations:");
   console.log(annotations);
 
-  const xannotations = dataT.map((num, index) => ({
+  const xannotations = flatSortedT.map((num, index) => ({
     xref: "x",
     yref: "paper",
     xanchor: "bottom",
     yanchor: "bottom",
     x: index,
-    y: -0.1,
+    y: -0.065,
     text: num.mutationType.replace(
       /\[(.*)\]/,
       num.mutationType.substring(2, 3)
@@ -231,33 +270,28 @@ export default function SBS384(data, sample) {
       xanchor: "right",
       y: 1,
     },
-    title: {
-      text:
-        "<b>" + sample + ": " + numberWithCommas(totalMutations) + " subs </b>",
-      font: {
-        size: 24,
-      },
-      xref: "paper",
-      x: 0.05,
-    },
+
     xaxis: {
       showticklabels: false,
-      // title: {
-      //   text: "<b>Number of Single Base Substitution</b>",
-      //   font: {
-      //     size: 18,
-      //   },
-      // },
+      showline: true,
+      tickangle: -90,
       tickfont: {
-        size: 16,
+        size: 10,
       },
+      tickmode: "array",
+      tickvals: [...flatSortedT.map((_, i) => i)],
+      ticktext: [...flatSortedT.map((e) => e.mutationType)],
+      linecolor: "black",
+      linewidth: 2,
+      mirror: true,
     },
     yaxis: {
-      // autorange: false,
-      // range: [0, maxVal + maxVal * 0.35],
-      tickfont: {
-        size: 16,
-      },
+      title: "Number of Single Base Substitutions",
+      autorange: false,
+      range: [0, maxVal + maxVal * 0.15],
+      linecolor: "black",
+      linewidth: 2,
+      mirror: true,
       categoryorder: "category descending",
     },
     shapes: [...shapes1, ...shapes2],
