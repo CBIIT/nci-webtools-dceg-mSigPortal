@@ -20,6 +20,7 @@ export const getInitialState = () => ({
     email: '',
   },
   main: {
+    samples: [],
     submitted: false,
     source: 'public',
     inputFormat: 'vcf',
@@ -77,6 +78,10 @@ export const getInitialState = () => ({
     plotPath: '',
   },
   cosineSimilarity: {
+    withinForm: { profile: '', matrix: '' },
+    referenceForm: { profile: '', signatureSet: '' },
+    publicForm: {},
+
     withinProfileType: '',
     withinMatrixSize: '',
     withinMatrixOptions: [],
