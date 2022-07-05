@@ -14,6 +14,7 @@ import MutationalProfiles from './mutationalProfiles';
 import TreeAndLeaf from './treeLeaf/treeLeaf';
 import MutationalProfiles2 from './mutationalProfiles/mutProfiles';
 import CosineSimilarity from './cosineSimilarity';
+import CosineSimilarity2 from './cosineSimilarity/cosineSimilarity';
 import MutationalPattern from './mutationalPattern/mutationalPattern';
 import ProfileComparison from './profileComparison';
 import ProfileComparison2 from './profileComparison/profileComparison';
@@ -197,15 +198,13 @@ export default function Visualization({ match }) {
     const selectProfile = defaultProfile(profileOptions);
     const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);
 
-    const { output: refSignatureSetOptions } = await (
-      await getRefSigOptions(selectProfile)
-    ).json();
+    // const { output: refSignatureSetOptions } = await (
+    //   await getRefSigOptions(selectProfile)
+    // ).json();
 
     mergeCosineSimilarity({
       withinProfileType: selectProfile,
       refProfileType: selectProfile,
-      refSignatureSet: refSignatureSetOptions[0],
-      refSignatureSetOptions: refSignatureSetOptions,
       withinMatrixSize: selectMatrix,
       withinMatrixOptions: filteredMatrixList,
       userProfileType: selectProfile,
@@ -220,8 +219,8 @@ export default function Visualization({ match }) {
       sampleOptions: sampleNameOptions,
       refProfileType: selectProfile,
       refSampleName: sampleNameOptions[0],
-      refSignatureSet: refSignatureSetOptions[0],
-      refSignatureSetOptions: refSignatureSetOptions,
+      // refSignatureSet: refSignatureSetOptions[0],
+      // refSignatureSetOptions: refSignatureSetOptions,
       userProfileType: selectProfile,
       userMatrixSize: selectMatrix,
       userMatrixOptions: filteredMatrixOptions,
@@ -230,8 +229,8 @@ export default function Visualization({ match }) {
 
     mergePCA({
       profileType: selectProfile,
-      signatureSet: refSignatureSetOptions[0],
-      signatureSetOptions: refSignatureSetOptions,
+      // signatureSet: refSignatureSetOptions[0],
+      // signatureSetOptions: refSignatureSetOptions,
       userProfileType: selectProfile,
       userMatrixSize: selectMatrix,
       userMatrixOptions: filteredMatrixOptions,
@@ -284,34 +283,15 @@ export default function Visualization({ match }) {
     const selectProfile = defaultProfile(profileOptions);
     const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);
 
-    const { output: refSignatureSetOptions } = await (
-      await getRefSigOptions(selectProfile)
-    ).json();
-
     mergeCosineSimilarity({
       withinProfileType: selectProfile,
       refProfileType: selectProfile,
-      refSignatureSet: refSignatureSetOptions[0],
-      refSignatureSetOptions: refSignatureSetOptions,
       withinMatrixSize: selectMatrix,
       withinMatrixOptions: filteredMatrixOptions,
     });
 
-    mergeProfileComparison({
-      withinProfileType: selectProfile,
-      withinSampleName1: nameOptions[0],
-      withinSampleName2: nameOptions[1],
-      sampleOptions: nameOptions,
-      refProfileType: selectProfile,
-      refSampleName: nameOptions[0],
-      refSignatureSet: refSignatureSetOptions[0],
-      refSignatureSetOptions: refSignatureSetOptions,
-    });
-
     mergePCA({
       profileType: selectProfile,
-      signatureSet: refSignatureSetOptions[0],
-      signatureSetOptions: refSignatureSetOptions,
     });
 
     mergeState({
@@ -335,19 +315,19 @@ export default function Visualization({ match }) {
     });
   }
 
-  function getRefSigOptions(profileType) {
-    return fetch(`web/visualizationWrapper`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        fn: 'getReferenceSignatureSets',
-        args: { profileType: profileType },
-      }),
-    });
-  }
+  // function getRefSigOptions(profileType) {
+  //   return fetch(`web/visualizationWrapper`, {
+  //     method: 'POST',
+  //     headers: {
+  //       Accept: 'application/json',
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({
+  //       fn: 'getReferenceSignatureSets',
+  //       args: { profileType: profileType },
+  //     }),
+  //   });
+  // }
 
   async function loadQueueResult(id) {
     mergeState({
@@ -429,12 +409,15 @@ export default function Visualization({ match }) {
     {
       name: 'Cosine Similarity',
       id: 'cosineSimilarity',
-      component: (
-        <CosineSimilarity
-          getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
-          submitR={(fn, args) => submitR(fn, args)}
-        />
-      ),
+      component:
+        source == 'user' ? (
+          <CosineSimilarity
+            // getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
+            submitR={(fn, args) => submitR(fn, args)}
+          />
+        ) : (
+          <CosineSimilarity2 />
+        ),
     },
     {
       name: 'Mutational Pattern Enrichment Analysis',
@@ -447,7 +430,7 @@ export default function Visualization({ match }) {
       component:
         source == 'user' ? (
           <ProfileComparison
-            getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
+            // getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
             submitR={(fn, args) => submitR(fn, args)}
           />
         ) : (
@@ -460,7 +443,7 @@ export default function Visualization({ match }) {
       id: 'pca',
       component: (
         <PCA
-          getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
+          // getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
           submitR={(fn, args) => submitR(fn, args)}
         />
       ),
@@ -617,6 +600,11 @@ export default function Visualization({ match }) {
             />
             <div style={{ minHeight: '500px' }}>
               {tabs.filter((tab) => tab.id == displayTab)[0].component}
+              {/* {tabs.map((tab) => (
+                <div className={tab.id == displayTab ? 'd-block' : 'd-none'}>
+                  {tab.component}
+                </div>
+              ))} */}
             </div>
           </div>
         </MainPanel>

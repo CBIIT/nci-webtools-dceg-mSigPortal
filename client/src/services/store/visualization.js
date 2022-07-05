@@ -78,6 +78,10 @@ export const getInitialState = () => ({
     plotPath: '',
   },
   cosineSimilarity: {
+    withinForm: { profile: '', matrix: '' },
+    referenceForm: { profile: '', signatureSet: '' },
+    publicForm: {},
+
     withinProfileType: '',
     withinMatrixSize: '',
     withinMatrixOptions: [],
