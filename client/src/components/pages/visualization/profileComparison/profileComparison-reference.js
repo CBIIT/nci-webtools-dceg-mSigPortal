@@ -95,13 +95,11 @@ export default function PcReference() {
   }, [profileOptions]);
   // set intital signature set
   useEffect(() => {
-    if (!signatureSet && signatureSetOptions)
-      setValue('signatureSet', signatureSetOptions[0]);
+    if (signatureSetOptions) setValue('signatureSet', signatureSetOptions[0]);
   }, [signatureSetOptions]);
   // set initial signature
   useEffect(() => {
-    if (!compare && signatureNameOptions)
-      setValue('compare', signatureNameOptions[0]);
+    if (signatureNameOptions) setValue('compare', signatureNameOptions[0]);
   }, [signatureNameOptions]);
   // get signature sets when profile is selected
   useEffect(() => {

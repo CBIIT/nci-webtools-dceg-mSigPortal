@@ -5,10 +5,7 @@ import { useForm } from 'react-hook-form';
 import { NavHashLink } from 'react-router-hash-link';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions } from '../../../../services/store/visualization';
-import {
-  useCosineReferenceQuery,
-  useSignatureSetsQuery,
-} from './apiSlice';
+import { useCosineReferenceQuery, useSignatureSetsQuery } from './apiSlice';
 import Description from '../../../controls/description/description';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
@@ -64,16 +61,14 @@ export default function CsReference() {
       }))
     : [];
 
-  const sampleOptions = getSampleOptions(profile);
-
   // set inital profile
   useEffect(() => {
-    if (!profile && profileOptions.length) handleProfile(profileOptions[0]);
+    if (!profile && profileOptions.length)
+      setValue('profile', profileOptions[0]);
   }, [profileOptions]);
   // set intital signature set
   useEffect(() => {
-    if (!signatureSet && signatureSetOptions)
-      setValue('signatureSet', signatureSetOptions[0]);
+    if (signatureSetOptions) setValue('signatureSet', signatureSetOptions[0]);
   }, [signatureSetOptions]);
 
   // get signature sets when profile is selected
@@ -86,22 +81,6 @@ export default function CsReference() {
     }
   }, [profile]);
 
-  // get samples filtered by selected profile
-  function getSampleOptions(profile) {
-    return samples && profile
-      ? [
-          ...new Set(
-            samples
-              .filter((e) => e.profile == profile.value)
-              .map((e) => e.sample)
-          ),
-        ].map((e) => ({
-          label: e,
-          value: e,
-        }))
-      : [];
-  }
-
   function onSubmit(data) {
     mergeForm(data);
 
@@ -112,9 +91,7 @@ export default function CsReference() {
             fn: 'cosineSimilarityRefSig',
             args: {
               profileType: profile.value,
-              sampleName: sample.value,
               signatureSet: signatureSet.value,
-              compare: compare,
               matrixFile: matrixList.filter(
                 (e) =>
                   e.profile == profile.value &&
@@ -127,9 +104,7 @@ export default function CsReference() {
             fn: 'cosineSimilarityRefSigPublic',
             args: {
               profileType: profile.value,
-              sampleName: sample.value,
               signatureSet: signatureSet.value,
-              compare: compare,
               study: study.value,
               cancerType: cancer.value,
               experimentalStrategy: strategy.value,
@@ -137,15 +112,6 @@ export default function CsReference() {
             projectID,
           };
     setCalculationQuery(params);
-  }
-
-  function handleProfile(e) {
-    const samples = getSampleOptions(e);
-
-    setValue('profile', e);
-    if (samples.length) {
-      setValue('sample', samples[0]);
-    }
   }
 
   return (
@@ -182,20 +148,15 @@ export default function CsReference() {
               name="profile"
               label="Profile Type"
               options={profileOptions}
-              onChange={handleProfile}
               control={control}
             />
           </Col>
           <Col lg="auto">
             <Select
-              disabled={sampleOptions.length < 2 || fetchingSigSets}
+              disabled={fetchingSigSets}
               name="signatureSet"
               label="Reference Signature Set"
               options={signatureSetOptions}
-              onChange={(e) => {
-                setValue('signatureSet', e);
-                resetField('compare');
-              }}
               control={control}
             />
           </Col>
