@@ -12,6 +12,7 @@ import SBS24 from "../../../controls/plotly/mutationalSignature/sbs24";
 import SBS96 from "../../../controls/plotly/mutationalSignature/sbs96";
 import SBS192 from "../../../controls/plotly/mutationalSignature/sbs192";
 import SBS288 from "../../../controls/plotly/mutationalSignature/sbs288";
+import SBS384 from "../../../controls/plotly/mutationalSignature/sbs384";
 import SBS1536 from "../../../controls/plotly/mutationalSignature/sbs1536";
 import DBS78 from "../../../controls/plotly/mutationalSignature/dbs78";
 import ID83 from "../../../controls/plotly/mutationalSignature/id83";
@@ -69,6 +70,8 @@ export default function MutProfilePlot() {
         ? SBS192(data, sample)
         : profileMatrix == "SBS288"
         ? SBS288(data, sample)
+        : profileMatrix == "SBS384"
+        ? SBS384(data, sample)
         : profileMatrix == "SBS1536"
         ? SBS1536(data, sample)
         : profileMatrix == "DBS78"
@@ -85,6 +88,13 @@ export default function MutProfilePlot() {
     displayModeBar: true,
     responsive: true,
     displaylogo: false,
+    toImageButtonOptions: {
+      format: "svg",
+      filename: "plot_export",
+      height: 1000,
+      width: 1000,
+      scale: 1,
+    },
   };
 
   return (

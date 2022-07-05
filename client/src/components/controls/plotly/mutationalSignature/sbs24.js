@@ -11,7 +11,6 @@ export default function SBS24(data, sample) {
   console.log(data);
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-  const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
 
   const groupByMutation = data.reduce((groups, e, i) => {
     const mutation = e.mutationType.substring(2, e.mutationType.length);
@@ -43,6 +42,10 @@ export default function SBS24(data, sample) {
     }
   });
 
+  const totalMutations = [...dataT, ...dataU].reduce(
+    (a, e) => a + parseInt(e.contribution),
+    0
+  );
   console.log("dataT");
   console.log(dataT);
   console.log("dataU");

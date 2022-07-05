@@ -84,7 +84,7 @@ export default function SBS96(data, sample) {
     xanchor: "bottom",
     yanchor: "bottom",
     x: index,
-    y: -0.1,
+    y: -0.065,
     text: num.mutationType.replace(
       /\[(.*)\]/,
       num.mutationType.substring(2, 3)
