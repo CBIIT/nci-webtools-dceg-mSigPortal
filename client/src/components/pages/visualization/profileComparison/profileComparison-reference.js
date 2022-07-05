@@ -281,7 +281,7 @@ export default function PcReference() {
                   rootClose
                 >
                   <Button
-                    disable={!signatureSet}
+                    disabled={!signatureSet}
                     aria-label="compare signatures info"
                     variant="link"
                     className="p-0 font-weight-bold "
