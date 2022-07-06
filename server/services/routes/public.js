@@ -3,6 +3,7 @@ const cors = require('cors');
 const config = require('../../config.json');
 const apiSpec = require('../../apiSpec.json');
 const {
+  visualizationData,
   querySeqmatrix,
   queryExposure,
   querySignature,
@@ -25,5 +26,7 @@ router.get('/seqmatrix', querySeqmatrix);
 router.get('/exposure', queryExposure);
 
 router.get('/signature', querySignature);
+
+router.get('/visualizationData', visualizationData);
 
 module.exports = router;

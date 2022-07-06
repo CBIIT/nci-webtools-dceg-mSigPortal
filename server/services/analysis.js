@@ -800,32 +800,48 @@ const getDataUsingS3Select = (params) => {
   });
 };
 
+// query public seqmatrix data for visualization tab
+async function visualizationData(req, res, next) {
+  try {
+    const { study, cancer, strategy } = req.query;
+    const connection = req.app.locals.connection;
+    const projectID = uuidv4();
+
+    const query = { study, strategy, cancer };
+    const columns = ['profile', 'sample', 'profile', 'matrix'];
+    const data = await getSeqmatrixData(connection, query, columns);
+    res.json({ data, projectID });
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function querySeqmatrix(req, res, next) {
   try {
     const { study, cancer, strategy, sample, profile, matrix, s3 } = req.query;
     const connection = req.app.locals.connection;
-    if (connection && s3 == 'false') {
-      const query = { study, strategy, cancer, sample, profile, matrix };
-      const columns = ['mutationType', 'mutations'];
-      const data = await getSeqmatrixData(connection, query, columns);
-      res.json(data);
-    } else {
-      const s3 = new AWS.S3();
+    // if (connection && s3 == 'false') {
+    const query = { study, strategy, cancer, sample, profile, matrix };
+    const columns = ['mutationType', 'mutations'];
+    const data = await getSeqmatrixData(connection, query, columns);
+    res.json(data);
+    // } else {
+    //   const s3 = new AWS.S3();
 
-      const params = {
-        Bucket: config.data.bucket,
-        Key: path.join(
-          config.data.s3,
-          `Seqmatrix/${study}/${cancer}/${sample}/${strategy}/${
-            profile + matrix
-          }/data.json`
-        ),
-      };
-      const { Body } = await s3.getObject(params).promise();
-      const data = JSON.parse(Body);
+    //   const params = {
+    //     Bucket: config.data.bucket,
+    //     Key: path.join(
+    //       config.data.s3,
+    //       `Seqmatrix/${study}/${cancer}/${sample}/${strategy}/${
+    //         profile + matrix
+    //       }/data.json`
+    //     ),
+    //   };
+    //   const { Body } = await s3.getObject(params).promise();
+    //   const data = JSON.parse(Body);
 
-      res.json(data);
-    }
+    //   res.json(data);
+    // }
   } catch (error) {
     next(error);
   }
@@ -909,6 +925,7 @@ module.exports = {
   getRelativePath,
   downloadWorkspace,
   associationWrapper,
+  visualizationData,
   querySeqmatrix,
   queryExposure,
   querySignature,

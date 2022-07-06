@@ -16,8 +16,8 @@ import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { actions } from '../../../../services/store/visualization';
 import {
   useProfileComparisonReferenceQuery,
-  useSignatureSetsQuery,
-  useSignatureNamesQuery,
+  usePcSignatureSetsQuery,
+  usePcSignatureNamesQuery,
 } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
@@ -34,7 +34,7 @@ export default function PcReference() {
     );
 
   const { study, cancer, strategy } = store.publicForm;
-  const { source, svgList, matrixList, projectID } = store.main;
+  const { source, samples, svgList, matrixList, projectID } = store.main;
   const { referenceForm } = store.profileComparison;
 
   // main form
@@ -62,7 +62,7 @@ export default function PcReference() {
 
   // get signature sets
   const { data: signatureSetOptions, isFetching: fetchingSigSets } =
-    useSignatureSetsQuery(signatureSetQuery, {
+    usePcSignatureSetsQuery(signatureSetQuery, {
       skip: !signatureSetQuery,
     });
   // get signature names in set
@@ -70,7 +70,7 @@ export default function PcReference() {
     data: signatureNameOptions,
     isFetching: fetchingSigNames,
     refetch: refetchSignatureNames,
-  } = useSignatureNamesQuery(signatureNamesQuery, {
+  } = usePcSignatureNamesQuery(signatureNamesQuery, {
     skip: !signatureNamesQuery,
   });
   //   calculate plot
@@ -80,8 +80,8 @@ export default function PcReference() {
   );
 
   // declare form Options
-  const profileOptions = svgList.length
-    ? [...new Set(svgList.map((e) => e.profileType))].map((e) => ({
+  const profileOptions = samples.length
+    ? [...new Set(samples.map((e) => e.profile))].map((e) => ({
         label: e,
         value: e,
       }))
@@ -95,13 +95,11 @@ export default function PcReference() {
   }, [profileOptions]);
   // set intital signature set
   useEffect(() => {
-    if (!signatureSet && signatureSetOptions)
-      setValue('signatureSet', signatureSetOptions[0]);
+    if (signatureSetOptions) setValue('signatureSet', signatureSetOptions[0]);
   }, [signatureSetOptions]);
   // set initial signature
   useEffect(() => {
-    if (!compare && signatureNameOptions)
-      setValue('compare', signatureNameOptions[0]);
+    if (signatureNameOptions) setValue('compare', signatureNameOptions[0]);
   }, [signatureNameOptions]);
   // get signature sets when profile is selected
   useEffect(() => {
@@ -125,11 +123,11 @@ export default function PcReference() {
 
   // get samples filtered by selected profile
   function getSampleOptions(profile) {
-    return svgList && profile
+    return samples && profile
       ? [
           ...new Set(
-            svgList
-              .filter((e) => e.profileType == profile.value)
+            samples
+              .filter((e) => e.profile == profile.value)
               .map((e) => e.sample)
           ),
         ].map((e) => ({
@@ -154,9 +152,8 @@ export default function PcReference() {
               compare: compare,
               matrixFile: matrixList.filter(
                 (e) =>
-                  e.profileType == profile.value &&
-                  e.matrixSize ==
-                    defaultMatrix(profile.value, ['96', '78', '83'])
+                  e.profile == profile.value &&
+                  e.matrix == defaultMatrix(profile.value, ['96', '78', '83'])
               )[0].Path,
             },
             projectID,
@@ -282,7 +279,7 @@ export default function PcReference() {
                   rootClose
                 >
                   <Button
-                    disable={!signatureSet}
+                    disabled={!signatureSet}
                     aria-label="compare signatures info"
                     variant="link"
                     className="p-0 font-weight-bold "

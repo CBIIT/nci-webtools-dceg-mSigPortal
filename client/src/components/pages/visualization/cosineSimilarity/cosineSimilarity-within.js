@@ -5,43 +5,46 @@ import { useForm } from 'react-hook-form';
 import { NavHashLink } from 'react-router-hash-link';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions } from '../../../../services/store/visualization';
-import { useProfileComparisonWithinQuery } from './apiSlice';
+import { useCosineWithinQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
-import { defaultMatrix } from '../../../../services/utils';
+import Description from '../../../controls/description/description';
+import { defaultMatrix2 } from '../../../../services/utils';
 
-export default function PcWithin() {
+export default function CsWithin() {
   const dispatch = useDispatch();
   const store = useSelector((state) => state.visualization);
   const mergeForm = (state) =>
     dispatch(
       actions.mergeVisualization({
-        profileComparison: { ...store.profileComparison, withinForm: state },
+        cosineSimilarity: { ...store.cosineSimilarity, withinForm: state },
       })
     );
 
   const { study, cancer, strategy } = store.publicForm;
-  const { source, samples, svgList, matrixList, projectID } = store.main;
-  const { withinForm } = store.profileComparison;
+  const { source, samples, matrixList, projectID } = store.main;
+  const { withinForm } = store.cosineSimilarity;
 
-  const [params, setParams] = useState(null);
+  const [params, setParams] = useState('');
 
-  const { data, error, isFetching } = useProfileComparisonWithinQuery(params, {
+  const { data, error, isFetching } = useCosineWithinQuery(params, {
     skip: !params,
   });
 
-  function getSampleOptions(profile) {
+  function getMatrixOptions(profile) {
     return samples && profile
       ? [
           ...new Set(
             samples
               .filter((e) => e.profile == profile.value)
-              .map((e) => e.sample)
+              .map((e) => e.matrix)
           ),
-        ].map((e) => ({
-          label: e,
-          value: e,
-        }))
+        ]
+          .sort((a, b) => a - b)
+          .map((e) => ({
+            label: e,
+            value: e,
+          }))
       : [];
   }
 
@@ -49,7 +52,7 @@ export default function PcWithin() {
     defaultValues: withinForm,
   });
 
-  const { profile, sample1, sample2 } = watch();
+  const { profile, matrix } = watch();
 
   const profileOptions = samples.length
     ? [...new Set(samples.map((e) => e.profile))].map((e) => ({
@@ -58,7 +61,7 @@ export default function PcWithin() {
       }))
     : [];
 
-  const sampleOptions = getSampleOptions(profile);
+  const matrixOptions = getMatrixOptions(profile);
 
   // set inital parameters
   useEffect(() => {
@@ -67,30 +70,25 @@ export default function PcWithin() {
 
   function onSubmit(data) {
     mergeForm(data);
-
+    console.log(data);
     const params =
       source == 'user'
         ? {
-            fn: 'profileComparisonWithin',
+            fn: 'cosineSimilarityWithin',
             args: {
-              profileType: data.profile.value,
-              sampleName1: data.sample1.value,
-              sampleName2: data.sample2.value,
               matrixFile: matrixList.filter(
-                (row) =>
-                  row.profile == data.profile.value &&
-                  row.matrix ==
-                    defaultMatrix(data.profile.value, ['96', '78', '83'])
+                (e) =>
+                  e.profileType == data.profile.value &&
+                  e.matrixSize == data.matrix.value
               )[0].Path,
             },
             projectID,
           }
         : {
-            fn: 'profileComparisonWithinPublic',
+            fn: 'cosineSimilarityWithinPublic',
             args: {
               profileType: data.profile.value,
-              sampleName1: data.sample1.value,
-              sampleName2: data.sample2.value,
+              matrixSize: data.matrix.value,
               study: study.value,
               cancerType: cancer.value,
               experimentalStrategy: strategy.value,
@@ -101,24 +99,37 @@ export default function PcWithin() {
   }
 
   function handleProfile(e) {
-    const samples = getSampleOptions(e);
+    const matrixOptions = getMatrixOptions(e);
 
     setValue('profile', e);
     if (samples.length) {
-      setValue('sample1', samples[0]);
-      samples.length > 1
-        ? setValue('sample2', samples[1])
-        : setValue('sample2', samples[0]);
+      setValue('matrix', defaultMatrix2(e, matrixOptions));
     }
   }
 
   return (
     <div>
-      <p className="p-3 m-0">
-        Input a [Profile Type] and two sample names ([Sample Name 1], [Sample
-        Name 2]) to generate the mutational profile of each sample, as well as
-        the difference between the two mutational profiles.
-      </p>
+      <div className="p-3">
+        <Description
+          less="Cosine similarity is a measure of the similarity of two
+                      matrices, which can be helpful to compare two mutational
+                      profiles or signatures."
+          more={
+            <span>
+              Below you can explore cosine similarity between sample profiles
+              (CS Between Samples), cosine similarity between sample profiles
+              and reference signatures (CS to Reference Signatures), or, if
+              using your own data, cosine similarity between profiles from your
+              input data and profiles from public data (CS to Public Data).
+              Simply use the dropdown menus to select a [Profile Type], [Matrix
+              Size], or [Reference Signature Set]. Click here to learn more
+              about cosine similarity. Click{' '}
+              <NavHashLink to="/faq#cosine-similarity">here</NavHashLink> to
+              learn more about cosine similarity.
+            </span>
+          }
+        />
+      </div>
 
       <hr />
       <LoadingOverlay active={isFetching} />
@@ -136,26 +147,17 @@ export default function PcWithin() {
           </Col>
           <Col lg="auto">
             <Select
-              disabled={sampleOptions.length < 2}
-              name="sample1"
-              label="Sample Name 1"
-              options={sampleOptions}
-              control={control}
-            />
-          </Col>
-          <Col lg="auto">
-            <Select
-              disabled={sampleOptions.length < 2}
-              name="sample2"
-              label="Sample Name 2"
-              options={sampleOptions}
+              disabled={!matrixOptions.length}
+              name="matrix"
+              label="Matrix Size"
+              options={matrixOptions}
               control={control}
             />
           </Col>
           <Col lg="auto" className="d-flex">
             <Button
               className="mt-auto mb-3"
-              disabled={!profile || !sample1 || !sample2}
+              disabled={!profile || !matrix}
               variant="primary"
               type="submit"
             >
@@ -163,13 +165,8 @@ export default function PcWithin() {
             </Button>
           </Col>
         </Row>
-        {sampleOptions.length < 2 && (
-          <Row>
-            <Col>Unavailable - More than one Sample Required</Col>
-          </Row>
-        )}
       </Form>
-      <div id="pcWithinPlot">
+      <div id="csWithinPlot">
         {error && (
           <>
             <hr />
@@ -190,19 +187,11 @@ export default function PcWithin() {
             />
             <div className="p-3">
               <p>
-                The plot above shows the mutational profiles of two selected
-                samples, as well as the difference between them. The text at the
-                top of the plot indicates the profile similarity calculated
-                using Residual Sum of Squares (RSS) and cosine similarity
-                methods.
-              </p>
-              <p>
-                RSS measures the discrepancy between two mutational profiles.
-                Cosine similarity measures how similar two mutational profiles
-                are. For example, two identical mutational profiles will have
-                RSS = 0 and Cosine similarity = 1. For additional information
-                about RSS and cosine similarity, click{' '}
-                <NavHashLink to="/faq#cosine-similarity">here</NavHashLink>.
+                The heatmap shows pairwise cosine similarity between samples
+                from the selected profile type. On the x-axis and y-axis are the
+                sample names. This analysis will help to highlight the samples
+                within the same cluster that may have similar mutational
+                signatures.
               </p>
             </div>
           </>

@@ -14,10 +14,12 @@ import MutationalProfiles from './mutationalProfiles';
 import TreeAndLeaf from './treeLeaf/treeLeaf';
 import MutationalProfiles2 from './mutationalProfiles/mutProfiles';
 import CosineSimilarity from './cosineSimilarity';
+import CosineSimilarity2 from './cosineSimilarity/cosineSimilarity';
 import MutationalPattern from './mutationalPattern/mutationalPattern';
 import ProfileComparison from './profileComparison';
 import ProfileComparison2 from './profileComparison/profileComparison';
 import PCA from './pca';
+import PCA2 from './pca/pca';
 import Kataegis from './kataegis';
 import Download from './download';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
@@ -63,6 +65,7 @@ export default function Visualization({ match }) {
     displayTab,
     svgList,
     matrixList,
+    samples,
   } = store.main;
   const mutationalProfiles = store.mutationalProfiles;
   const { signatureSetOptions } = store.pca;
@@ -88,14 +91,15 @@ export default function Visualization({ match }) {
       } else if (Object.keys(svgList).length && !signatureSetOptions.length) {
         loadData();
       }
-    } else {
-      if (
-        Object.keys(svgList).length > 0 &&
-        !mutationalProfiles.filtered.length
-      )
-        mapPublicData();
     }
   }, [svgList, projectID]);
+
+  // switch to first tab after fetching samples
+  useEffect(() => {
+    if (samples.length && projectID) {
+      mergeState({ displayTab: 'profilerSummary' });
+    }
+  }, [samples, projectID]);
 
   // reload summary information
   async function getResults() {
@@ -135,12 +139,10 @@ export default function Visualization({ match }) {
     // Mutational Profiles
     const nameOptions = [...new Set(svgList.map((d) => d.sample))];
     const selectName = nameOptions[0];
-    const filteredPlots = svgList.filter((row) => row.sample == selectName);
+    const filteredPlots = svgList.filter((e) => e.sample == selectName);
 
     const filteredProfileOptions = [
-      ...new Set(
-        filteredPlots.map((row) => row.profileType).sort((a, b) => a - b)
-      ),
+      ...new Set(filteredPlots.map((e) => e.profileType).sort((a, b) => a - b)),
     ];
 
     const profile = defaultProfile(filteredProfileOptions);
@@ -148,8 +150,8 @@ export default function Visualization({ match }) {
     const filteredMatrixOptions = [
       ...new Set(
         filteredPlots
-          .filter((row) => row.profileType == profile)
-          .map((row) => row.matrixSize)
+          .filter((e) => e.profileType == profile)
+          .map((e) => e.matrixSize)
       ),
     ].sort((a, b) => a - b);
 
@@ -158,10 +160,8 @@ export default function Visualization({ match }) {
     const filteredFilterOptions = [
       ...new Set(
         filteredPlots
-          .filter(
-            (row) => row.profileType == profile && row.matrixSize == matrix
-          )
-          .map((row) => row.Filter)
+          .filter((e) => e.profileType == profile && e.matrixSize == matrix)
+          .map((e) => e.Filter)
           .sort((a, b) => a - b)
       ),
     ];
@@ -171,8 +171,8 @@ export default function Visualization({ match }) {
     const filteredMatrixList = [
       ...new Set(
         matrixList
-          .filter((row) => row.profileType == profile)
-          .map((row) => row.matrixSize)
+          .filter((e) => e.profileType == profile)
+          .map((e) => e.matrixSize)
           .sort((a, b) => a - b)
       ),
     ];
@@ -192,26 +192,24 @@ export default function Visualization({ match }) {
     // Cosine Similarity - Profile Comparison - PCA - Kataegis
     const sampleNameOptions = [
       ...new Set(
-        svgList.map((row) => {
-          if (row.Filter != 'NA') return `${row.sample}@${row.Filter}`;
-          else return row.samples;
+        svgList.map((e) => {
+          if (e.Filter != 'NA') return `${e.sample}@${e.Filter}`;
+          else return e.samples;
         })
       ),
     ];
-    const profileOptions = [...new Set(svgList.map((row) => row.profileType))];
+    const profileOptions = [...new Set(svgList.map((e) => e.profileType))];
 
     const selectProfile = defaultProfile(profileOptions);
     const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);
 
-    const { output: refSignatureSetOptions } = await (
-      await getRefSigOptions(selectProfile)
-    ).json();
+    // const { output: refSignatureSetOptions } = await (
+    //   await getRefSigOptions(selectProfile)
+    // ).json();
 
     mergeCosineSimilarity({
       withinProfileType: selectProfile,
       refProfileType: selectProfile,
-      refSignatureSet: refSignatureSetOptions[0],
-      refSignatureSetOptions: refSignatureSetOptions,
       withinMatrixSize: selectMatrix,
       withinMatrixOptions: filteredMatrixList,
       userProfileType: selectProfile,
@@ -226,8 +224,8 @@ export default function Visualization({ match }) {
       sampleOptions: sampleNameOptions,
       refProfileType: selectProfile,
       refSampleName: sampleNameOptions[0],
-      refSignatureSet: refSignatureSetOptions[0],
-      refSignatureSetOptions: refSignatureSetOptions,
+      // refSignatureSet: refSignatureSetOptions[0],
+      // refSignatureSetOptions: refSignatureSetOptions,
       userProfileType: selectProfile,
       userMatrixSize: selectMatrix,
       userMatrixOptions: filteredMatrixOptions,
@@ -236,8 +234,8 @@ export default function Visualization({ match }) {
 
     mergePCA({
       profileType: selectProfile,
-      signatureSet: refSignatureSetOptions[0],
-      signatureSetOptions: refSignatureSetOptions,
+      // signatureSet: refSignatureSetOptions[0],
+      // signatureSetOptions: refSignatureSetOptions,
       userProfileType: selectProfile,
       userMatrixSize: selectMatrix,
       userMatrixOptions: filteredMatrixOptions,
@@ -258,79 +256,6 @@ export default function Visualization({ match }) {
     });
   }
 
-  // retrieve mapping of samples to plots from svgList file
-  async function mapPublicData() {
-    mergeState({
-      loading: {
-        active: true,
-        // content: 'Putting Public Data Into Session',
-        // showIndicator: true,
-      },
-    });
-
-    // Mutational Profiles
-    const nameOptions = [...new Set(svgList.map((row) => row.sample))];
-    const selectName = mutationalProfiles.selectName || nameOptions[0];
-    const profileOptions = [...new Set(svgList.map((row) => row.profileType))];
-    const profile = defaultProfile(profileOptions);
-
-    const filteredMatrixOptions = [
-      ...new Set(
-        svgList
-          .filter(
-            (row) =>
-              row.sample == selectName && row.Profile.indexOf(profile) > -1
-          )
-          .map((e) => e.matrixSize)
-      ),
-    ].sort((a, b) => a - b);
-
-    mergeState({ profileOptions: profileOptions });
-
-    // Cosine Similarity - Profile Comparison - PCA
-    const selectProfile = defaultProfile(profileOptions);
-    const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);
-
-    const { output: refSignatureSetOptions } = await (
-      await getRefSigOptions(selectProfile)
-    ).json();
-
-    mergeCosineSimilarity({
-      withinProfileType: selectProfile,
-      refProfileType: selectProfile,
-      refSignatureSet: refSignatureSetOptions[0],
-      refSignatureSetOptions: refSignatureSetOptions,
-      withinMatrixSize: selectMatrix,
-      withinMatrixOptions: filteredMatrixOptions,
-    });
-
-    mergeProfileComparison({
-      withinProfileType: selectProfile,
-      withinSampleName1: nameOptions[0],
-      withinSampleName2: nameOptions[1],
-      sampleOptions: nameOptions,
-      refProfileType: selectProfile,
-      refSampleName: nameOptions[0],
-      refSignatureSet: refSignatureSetOptions[0],
-      refSignatureSetOptions: refSignatureSetOptions,
-    });
-
-    mergePCA({
-      profileType: selectProfile,
-      signatureSet: refSignatureSetOptions[0],
-      signatureSetOptions: refSignatureSetOptions,
-    });
-
-    mergeState({
-      loading: {
-        active: false,
-      },
-      submitted: true,
-      displayTab: 'profilerSummary',
-      openSidebar: false,
-    });
-  }
-
   function submitR(fn, args) {
     return fetch(`web/visualizationWrapper`, {
       method: 'POST',
@@ -342,19 +267,19 @@ export default function Visualization({ match }) {
     });
   }
 
-  function getRefSigOptions(profileType) {
-    return fetch(`web/visualizationWrapper`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        fn: 'getReferenceSignatureSets',
-        args: { profileType: profileType },
-      }),
-    });
-  }
+  // function getRefSigOptions(profileType) {
+  //   return fetch(`web/visualizationWrapper`, {
+  //     method: 'POST',
+  //     headers: {
+  //       Accept: 'application/json',
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({
+  //       fn: 'getReferenceSignatureSets',
+  //       args: { profileType: profileType },
+  //     }),
+  //   });
+  // }
 
   async function loadQueueResult(id) {
     mergeState({
@@ -436,12 +361,15 @@ export default function Visualization({ match }) {
     {
       name: 'Cosine Similarity',
       id: 'cosineSimilarity',
-      component: (
-        <CosineSimilarity
-          getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
-          submitR={(fn, args) => submitR(fn, args)}
-        />
-      ),
+      component:
+        source == 'user' ? (
+          <CosineSimilarity
+            // getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
+            submitR={(fn, args) => submitR(fn, args)}
+          />
+        ) : (
+          <CosineSimilarity2 />
+        ),
     },
     {
       name: 'Mutational Pattern Enrichment Analysis',
@@ -454,7 +382,7 @@ export default function Visualization({ match }) {
       component:
         source == 'user' ? (
           <ProfileComparison
-            getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
+            // getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
             submitR={(fn, args) => submitR(fn, args)}
           />
         ) : (
@@ -465,12 +393,15 @@ export default function Visualization({ match }) {
     {
       name: 'PCA',
       id: 'pca',
-      component: (
-        <PCA
-          getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
-          submitR={(fn, args) => submitR(fn, args)}
-        />
-      ),
+      component:
+        source == 'user' ? (
+          <PCA
+            // getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
+            submitR={(fn, args) => submitR(fn, args)}
+          />
+        ) : (
+          <PCA2 />
+        ),
     },
     {
       name: 'Kataegis Identification',
@@ -521,14 +452,15 @@ export default function Visualization({ match }) {
             </Nav>
           </div>
           {/* for mobile devices */}
-          <div className="row d-md-none">
+          <div className="e d-md-none">
             <Nav defaultActiveKey="summary">
               {tabs.map(({ name, id }) => (
                 <div key={id} className="col-12 text-center">
                   <Button
                     variant="link"
                     className={
-                      id == displayTab && Object.keys(svgList).length
+                      id == displayTab &&
+                      (samples.length || Object.keys(svgList).length)
                         ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 active-secondary-navlinks'
                         : 'secondary-navlinks px-3 py-1 d-inline-block border-0'
                     }
@@ -623,6 +555,11 @@ export default function Visualization({ match }) {
             />
             <div style={{ minHeight: '500px' }}>
               {tabs.filter((tab) => tab.id == displayTab)[0].component}
+              {/* {tabs.map((tab) => (
+                <div className={tab.id == displayTab ? 'd-block' : 'd-none'}>
+                  {tab.component}
+                </div>
+              ))} */}
             </div>
           </div>
         </MainPanel>
