@@ -1,12 +1,11 @@
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Select from '../../../controls/select/selectForm';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../../services/store/visualization';
 import { actions as modalActions } from '../../../../services/store/modal';
 import {
-  useSubmitWebPublicMutation,
+  useVisualizationPublicMutation,
   useGetPublicDataOptionsQuery,
 } from './apiSlice';
 
@@ -27,7 +26,7 @@ export default function PublicForm() {
 
   const { data, error, isFetching } = useGetPublicDataOptionsQuery();
   const [handleSubmitWeb, { isLoading, reset: resetWeb }] =
-    useSubmitWebPublicMutation();
+    useVisualizationPublicMutation();
 
   const defaultValues = {
     study: { label: 'PCAWG', value: 'PCAWG' },
@@ -62,7 +61,9 @@ export default function PublicForm() {
         cancer: data.cancer.value,
         strategy: data.strategy.value,
       };
-      const { data: samples, projectID } = await handleSubmitWeb(params).unwrap();
+      const { data: samples, projectID } = await handleSubmitWeb(
+        params
+      ).unwrap();
 
       mergeMain({ samples, projectID: projectID });
     } catch (error) {

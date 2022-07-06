@@ -16,7 +16,7 @@ export default function MsBurden({ calculateBurden }) {
 
   const { signatureName, plotPath, debugR, err, loading } = exposure.msBurden;
   const { projectID, signatureNameOptions, userNameOptions, source } =
-    exposure.exposureState;
+    exposure.main;
 
   const mergeMsBurden = (state) =>
     dispatch(actions.mergeExposure({ msBurden: state }));

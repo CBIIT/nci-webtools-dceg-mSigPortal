@@ -7,7 +7,7 @@ import Debug from '../../controls/debug/debug';
 export default function TMB() {
   const exposure = useSelector((state) => state.exposure);
   const { plotPath, debugR, err } = exposure.tmb;
-  const { projectID } = exposure.exposureState;
+  const { projectID } = exposure.main;
 
   return (
     <div>

@@ -18,7 +18,7 @@ export default function PublicForm({
 }) {
   const dispatch = useDispatch();
   const mergeState = async (state) =>
-    await dispatch(actions.mergeExposure({ exposureState: state }));
+    await dispatch(actions.mergeExposure({ main: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -35,7 +35,7 @@ export default function PublicForm({
     projectID,
     userNameOptions,
     userSampleOptions,
-  } = useSelector((state) => state.exposure.exposureState);
+  } = useSelector((state) => state.exposure.main);
 
   const [exposureFileObj, setExposure] = useState(new File([], ''));
   const [matrixFileObj, setMatrix] = useState(new File([], ''));
@@ -147,7 +147,7 @@ export default function PublicForm({
 
       dispatch(
         actions.mergeExposure({
-          exposureState: {
+          main: {
             projectID: projectID,
             userNameOptions: nameOptions,
             userSampleOptions: sampleOptions,

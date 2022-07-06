@@ -33,7 +33,7 @@ export default function Exposure({ match }) {
   const dispatch = useDispatch();
 
   const mergeState = (state) =>
-    dispatch(actions.mergeExposure({ exposureState: state }));
+    dispatch(actions.mergeExposure({ main: state }));
   const mergeTMB = (state) => dispatch(actions.mergeExposure({ tmb: state }));
   const mergeTmbSignatures = (state) =>
     dispatch(actions.mergeExposure({ tmbSignatures: state }));
@@ -81,7 +81,7 @@ export default function Exposure({ match }) {
     projectID,
     openSidebar,
     submitted,
-  } = exposureStore.exposureState;
+  } = exposureStore.main;
 
   const { loading: loadingMsBurden, ...burdenArgs } = exposureStore.msBurden;
   const { loading: loadingMsAssociation, ...associationArgs } =
