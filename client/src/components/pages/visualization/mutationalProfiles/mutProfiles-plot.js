@@ -120,15 +120,11 @@ export default function MutProfilePlot() {
               <Plot
                 {...(profile.value + matrix.value === "SBS1536" ||
                 profile.value + matrix.value === "SBS6" ||
-                profile.value + matrix.value === "SBS24"
+                profile.value + matrix.value === "SBS24" ||
+                profile.value + matrix.value === "ID28"
                   ? { className: "w-70" }
                   : { className: "w-95" })}
                 divId={divId}
-                // style={{
-                //   ...(profile.value + matrix.value === "SBS1536"
-                //     ? { height: "600px" }
-                //     : { height: "500px" }),
-                // }}
                 style={{
                   height: "600px",
                 }}
