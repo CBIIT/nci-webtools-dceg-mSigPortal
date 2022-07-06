@@ -1,4 +1,4 @@
-export default function ID83(data, sample) {
+export default function ID28(data, sample) {
   console.log("data");
   console.log(data);
   const colors = {
@@ -6,53 +6,19 @@ export default function ID83(data, sample) {
     "1:Del:T": "#FE8002",
     "1:Ins:C": "#AEDD8A",
     "1:Ins:T": "#35A12E",
-    "2:Del:R": "#FCC9B4",
-    "3:Del:R": "#FB8969",
-    "4:Del:R": "#F04432",
-    "5:Del:R": "#BB1A1A",
-    "2:Ins:R": "#CFDFF0",
-    "3:Ins:R": "#93C3DE",
-    "4:Ins:R": "#4B97C7",
-    "5:Ins:R": "#1863AA",
-    "2:Del:M": "#E1E1EE",
-    "3:Del:M": "#B5B5D6",
-    "4:Del:M": "#8482BC",
-    "5:Del:M": "#62409A",
+    "o:": "#1764AA",
   };
   const annotationColors = {
     "1:Del:C": "black",
     "1:Del:T": "white",
     "1:Ins:C": "black",
     "1:Ins:T": "white",
-    "2:Del:R": "black",
-    "3:Del:R": "black",
-    "4:Del:R": "black",
-    "5:Del:R": "white",
-    "2:Ins:R": "black",
-    "3:Ins:R": "black",
-    "4:Ins:R": "black",
-    "5:Ins:R": "white",
-    "2:Del:M": "blacl",
-    "3:Del:M": "black",
-    "4:Del:M": "black",
-    "5:Del:M": "white",
+    "o:": "#1764AA",
   };
 
-  const arrayIDAnnXTop = [
-      "1bp Deletion",
-      "1bp Insertion",
-      ">1bp Deletion at Repeats<br>(Deletion Length)",
-      ">1bp Insertions at Repeats<br> (Insertion Length)",
-      "Microhomology<br>(Deletion Length)",
-    ],
-    arrayIDAnnXBot = [
-      "Homopolymer Length",
-      "Homopolymer Length",
-      "Number of Repeat Units",
-      "Number of Repeat Units",
-      "Microhimology Length",
-    ],
-    arrayIDAnnXLabel = [5, 18.5, 35, 60, 76],
+  const arrayIDAnnXTop = ["1bp Deletion", "1bp Insertion", ">1bp"],
+    arrayIDAnnXBot = ["Homopolymer Length", "Homopolymer Length", "Type"],
+    arrayIDAnnXLabel = [5, 15, 25],
     arrayIDAnnotationTop = [],
     arrayIDAnnotationBot = [];
 
@@ -61,8 +27,14 @@ export default function ID83(data, sample) {
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
   const maxVal = Math.max(...data.map((o) => o.mutations));
 
+  const data1 = data.slice(0, data.length - 4);
+  const data2 = data.slice(-4);
+
+  console.log(data1);
+  console.log(data2);
+
   // group data by dominant mutation
-  const groupByMutation = data.reduce((groups, e, i) => {
+  const groupByMutation = data1.reduce((groups, e, i) => {
     const mutationRegex = /^.{0,7}/;
     const mutation = e.mutationType.match(mutationRegex)[0];
     const signature = {
@@ -79,7 +51,7 @@ export default function ID83(data, sample) {
     Object.entries(groupByMutation).slice(0, 4)
   );
 
-  const groupByMutationID = data.reduce((groups, e) => {
+  const groupByMutationID = data1.reduce((groups, e) => {
     let mutationID;
     mutationID = e.mutationType.match(
       e.mutationType.substring(
@@ -97,70 +69,37 @@ export default function ID83(data, sample) {
     return groups;
   }, {});
 
-  const groupR = groupByMutationID["R"].reduce((r, a) => {
-    let m;
-    m = a.mutationType.match(a.mutationType.substr(2, 3));
-    const s = {
-      mutationType: a.mutationType,
-      contribution: a.contribution,
-    };
-    r[m] = r[m] ? [...r[m], a] : [s];
-    return r;
-  }, {});
+  console.log("groupByMutationID");
+  console.log(groupByMutationID);
 
-  const groupRDel = groupR["Del"].reduce((r, a) => {
-    let m;
-    m = a.mutationType.match(a.mutationType.substr(0, 7));
-    const s = {
-      mutationType: a.mutationType,
-      contribution: a.contribution,
-    };
-    r[m] = r[m] ? [...r[m], a] : [s];
-    return r;
-  }, {});
-
-  const groupRIns = groupR["Ins"].reduce((r, a) => {
-    let m;
-    m = a.mutationType.match(a.mutationType.substr(0, 7));
-    const s = {
-      mutationType: a.mutationType,
-      contribution: a.contribution,
-    };
-    r[m] = r[m] ? [...r[m], a] : [s];
-    return r;
-  }, {});
-
-  const groupM = groupByMutationID["M"].reduce((r, a) => {
-    let m;
-    m = a.mutationType.match(a.mutationType.substr(0, 7));
-    const s = {
-      mutationType: a.mutationType,
-      contribution: a.contribution,
-    };
-    r[m] = r[m] ? [...r[m], a] : [s];
-    return r;
-  }, {});
   const arrayID1 = Object.keys(groupByFirstGroup).map(function (key) {
     return groupByFirstGroup[key];
   });
-  const arrayID2 = Object.keys(groupRDel).map(function (key) {
-    return groupRDel[key];
-  });
-  const arrayID3 = Object.keys(groupRIns).map(function (key) {
-    return groupRIns[key];
-  });
-  const arrayID4 = Object.keys(groupM).map(function (key) {
-    return groupM[key];
-  });
 
-  const arrayID = [...arrayID1, ...arrayID2, ...arrayID3, ...arrayID4];
+  const arrayID2_Mod = data2.map((element) => ({
+    mutationType: "o:" + element.mutationType,
+    contribution: element.mutations,
+  }));
 
+  const groupO = arrayID2_Mod.reduce((r, a) => {
+    let m;
+    m = a.mutationType.match(a.mutationType.substr(0, 1));
+    const s = {
+      mutationType: a.mutationType,
+      contribution: a.contribution,
+    };
+    r[m] = r[m] ? [...r[m], a] : [s];
+    return r;
+  }, {});
+
+  const arrayID2 = Object.keys(groupO).map(function (key) {
+    return groupO[key];
+  });
+  const arrayID = [...arrayID1, ...arrayID2];
   const flatSorted = Object.values(arrayID).flat();
 
-  //console.log(flatSorted);
-  //console.log(arrayID);
-
   Object.values(arrayID).forEach((group) => {
+    console.log(group);
     if (group.length > 1) {
       arrayIDAnnotationTop.push(
         group[Math.floor(group.length / 2)].mutationType
@@ -172,22 +111,25 @@ export default function ID83(data, sample) {
       arrayIDAnnotationBot.push(e.mutationType);
     });
   });
-
+  console.log("arrayIDAnnotationTop");
+  console.log(arrayIDAnnotationTop);
+  console.log("arrayIDAnnotationBot");
+  console.log(arrayIDAnnotationBot);
   const traces = Object.entries(arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
       name: mutation,
       type: "bar",
       marker: {
         color:
-          colors[
-            signatures[0].mutationType.substring(
-              0,
-              signatures[0].mutationType.length - 2
-            )
-          ],
+          signatures[0].mutationType.substring(0, 1) === "o"
+            ? "#1764AA"
+            : colors[
+                signatures[0].mutationType.substring(
+                  0,
+                  signatures[0].mutationType.length - 2
+                )
+              ],
       },
-      //   x: signatures.map((e) => e.mutationType),
-      //x: signatures.map((e, i) => groupIndex * signatures.length + i),
       x: signatures.map(
         (e, i) =>
           array
@@ -195,8 +137,6 @@ export default function ID83(data, sample) {
             .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
       ),
       y: signatures.map((e) => e.contribution),
-      //text: signatures.map((e, i) => e.mutationType),
-      //hovertemplate: "%{signatures.map((e, i) => e.mutationType)}, %{y}",
       hoverinfo: "x+y",
       showlegend: false,
     })
@@ -225,12 +165,14 @@ export default function ID83(data, sample) {
       font: {
         size: 14,
         color:
-          annotationColors[
-            signatures[0].mutationType.substring(
-              0,
-              signatures[0].mutationType.length - 2
-            )
-          ],
+          signatures[0].mutationType.substring(0, 1) === "o"
+            ? "#1764AA"
+            : annotationColors[
+                signatures[0].mutationType.substring(
+                  0,
+                  signatures[0].mutationType.length - 2
+                )
+              ],
       },
       align: "center",
       signatures: signatures,
@@ -245,12 +187,20 @@ export default function ID83(data, sample) {
     xanchor: "bottom",
     yanchor: "bottom",
     x: index,
-    y: -0.1,
-    text: "<b>" + num.substring(num.length - 1, num.length) + "</b>",
+    y: num.substring(0, 1) === "o" ? -0.12 : -0.1,
+    text:
+      num.substring(0, 1) === "o"
+        ? num === "o:complex"
+          ? "<b>comp</b>"
+          : num === "o:MH"
+          ? "<b>MH</b>"
+          : "<b>" + num.substring(num.length - 3, num.length) + "</b>"
+        : "<b>" + num.substring(num.length - 1, num.length) + "</b>",
     showarrow: false,
     font: {
-      size: 14,
+      size: num.substring(0, 1) === "o" ? 11 : 14,
     },
+    textangle: num.substring(0, 1) === "o" ? -90 : 0,
     align: "center",
     num: num,
     index: index,
@@ -276,7 +226,7 @@ export default function ID83(data, sample) {
     yref: "paper",
     x: num,
     xanchor: "bottom",
-    y: -0.15,
+    y: -0.18,
     yanchor: "bottom",
     text: "<b>" + arrayIDAnnXBot[index] + "</b>",
     showarrow: false,
@@ -316,12 +266,14 @@ export default function ID83(data, sample) {
       y0: 1.07,
       y1: 1.01,
       fillcolor:
-        colors[
-          signatures[0].mutationType.substring(
-            0,
-            signatures[0].mutationType.length - 2
-          )
-        ],
+        signatures[0].mutationType.substring(0, 1) === "o"
+          ? "#1764AA"
+          : colors[
+              signatures[0].mutationType.substring(
+                0,
+                signatures[0].mutationType.length - 2
+              )
+            ],
       line: {
         width: 0,
       },
@@ -347,12 +299,14 @@ export default function ID83(data, sample) {
       y0: -0.01,
       y1: -0.05,
       fillcolor:
-        colors[
-          signatures[0].mutationType.substring(
-            0,
-            signatures[0].mutationType.length - 2
-          )
-        ],
+        signatures[0].mutationType.substring(0, 1) === "o"
+          ? "#1764AA"
+          : colors[
+              signatures[0].mutationType.substring(
+                0,
+                signatures[0].mutationType.length - 2
+              )
+            ],
       line: {
         width: 0,
       },
