@@ -16,6 +16,7 @@ import SBS384 from "../../../controls/plotly/mutationalSignature/sbs384";
 import SBS1536 from "../../../controls/plotly/mutationalSignature/sbs1536";
 import DBS78 from "../../../controls/plotly/mutationalSignature/dbs78";
 import ID83 from "../../../controls/plotly/mutationalSignature/id83";
+import ID28 from "../../../controls/plotly/mutationalSignature/id28";
 
 export default function MutProfilePlot() {
   const store = useSelector((state) => state.visualization);
@@ -76,6 +77,8 @@ export default function MutProfilePlot() {
         ? SBS1536(data, sample)
         : profileMatrix == "DBS78"
         ? DBS78(data, sample)
+        : profileMatrix == "ID28"
+        ? ID28(data, sample)
         : profileMatrix == "ID83"
         ? ID83(data, sample)
         : { traces: [], layout: {} };
@@ -131,7 +134,7 @@ export default function MutProfilePlot() {
               />
             </Row>
 
-            <Row className="justify-content-center">
+            {/* <Row className="justify-content-center">
               <Col sm="auto">
                 <Button
                   onClick={() =>
@@ -170,7 +173,7 @@ export default function MutProfilePlot() {
                   Download JSON
                 </Button>
               </Col>
-            </Row>
+            </Row> */}
           </div>
         )
       )}
