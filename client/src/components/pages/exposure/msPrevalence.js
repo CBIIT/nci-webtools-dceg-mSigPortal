@@ -14,7 +14,7 @@ export default function MsPrevalence({ calculatePrevalence }) {
   const dispatch = useDispatch();
   const exposure = useSelector((state) => state.exposure);
   const { mutation, plotPath, debugR, err, loading } = exposure.msPrevalence;
-  const { projectID, source } = exposure.exposureState;
+  const { projectID, source } = exposure.main;
   const mergeMsPrevalence = (state) =>
     dispatch(actions.mergeExposure({ msPrevalence: state }));
 

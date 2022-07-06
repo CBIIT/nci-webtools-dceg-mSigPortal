@@ -19,7 +19,7 @@ export default function PublicForm({
 }) {
   const dispatch = useDispatch();
   const mergeState = async (state) =>
-    await dispatch(actions.mergeExposure({ exposureState: state }));
+    await dispatch(actions.mergeExposure({ main: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -38,7 +38,7 @@ export default function PublicForm({
     useCancerType,
     signatureNameOptions,
     publicSampleOptions,
-  } = useSelector((state) => state.exposure.exposureState);
+  } = useSelector((state) => state.exposure.main);
 
   // populate controls on inital render
   useEffect(() => {
@@ -144,7 +144,7 @@ export default function PublicForm({
       if (output.length)
         dispatch(
           actions.mergeExposure({
-            exposureState: { publicSampleOptions: output },
+            main: { publicSampleOptions: output },
             msIndividual: { sample: output[0] },
           })
         );
@@ -179,7 +179,7 @@ export default function PublicForm({
       if (output.length)
         dispatch(
           actions.mergeExposure({
-            exposureState: { signatureNameOptions: output },
+            main: { signatureNameOptions: output },
             msBurden: { signatureName: output[0] },
             msAssociation: {
               signatureName1: output[0],

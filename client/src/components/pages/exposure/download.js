@@ -31,10 +31,10 @@ export default function Download({ exposureDownload }) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id: exposure.exposureState.projectID,
+        id: exposure.main.projectID,
         state: {
           ...exposure,
-          exposureState: { ...exposure.exposureState, displayTab: 'tmb' },
+          main: { ...exposure.main, displayTab: 'tmb' },
         },
       }),
     });

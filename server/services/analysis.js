@@ -631,7 +631,7 @@ async function getExposureExample(req, res, next) {
 
       // rename file paths with new ID
       let params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
-      const oldID = params.exposureState.projectID;
+      const oldID = params.main.projectID;
       await replace({
         files: paramsPath,
         from: new RegExp(oldID, 'g'),
@@ -642,7 +642,7 @@ async function getExposureExample(req, res, next) {
       res.json({
         state: {
           ...params,
-          exposureState: { ...params.exposureState, projectID: id },
+          main: { ...params.main, projectID: id },
         },
       });
     } else {

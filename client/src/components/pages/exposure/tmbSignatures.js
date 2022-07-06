@@ -7,7 +7,7 @@ import Debug from '../../controls/debug/debug';
 export default function TmbSignatures() {
   const exposure = useSelector((state) => state.exposure);
   const { plotPath, debugR, err } = exposure.tmbSignatures;
-  const { projectID } = exposure.exposureState;
+  const { projectID } = exposure.main;
 
   return (
     <div>

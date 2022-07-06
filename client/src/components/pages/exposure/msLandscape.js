@@ -19,7 +19,7 @@ const { Label, Group } = Form;
 export default function MsLandscape({ calculateLandscape, handleVariable }) {
   const exposure = useSelector((state) => state.exposure);
   const { variableFile, plotPath, debugR, err, loading } = exposure.msLandscape;
-  const { projectID, source } = exposure.exposureState;
+  const { projectID, source } = exposure.main;
 
   return (
     <div>
