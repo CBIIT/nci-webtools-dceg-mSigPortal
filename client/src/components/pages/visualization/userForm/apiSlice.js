@@ -1,15 +1,14 @@
 import { apiSlice } from '../../../../services/apiSlice';
 
-export const vissualizationApiSlice = apiSlice.injectEndpoints({
+export const userFormApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    userFormUpload: builder.mutation({
+    visualizationUserUpload: builder.mutation({
       query: (formData) => ({
         url: 'upload',
         method: 'POST',
         body: formData,
       }),
     }),
-
     submitQueue: builder.mutation({
       query: (data) => ({
         url: 'queue',
@@ -17,8 +16,7 @@ export const vissualizationApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
-
-    submitWebUser: builder.mutation({
+    visualizationUser: builder.mutation({
       query: (data) => ({
         url: 'profilerExtraction',
         method: 'POST',
@@ -47,7 +45,7 @@ export const vissualizationApiSlice = apiSlice.injectEndpoints({
 });
 
 export const {
-  useUserFormUploadMutation,
+  useVisualizationUserUploadMutation,
   useSubmitQueueMutation,
-  useSubmitWebUserMutation,
-} = vissualizationApiSlice;
+  useVisualizationUserMutation,
+} = userFormApiSlice;

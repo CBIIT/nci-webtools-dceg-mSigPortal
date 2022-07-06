@@ -15,9 +15,9 @@ import Select from '../../../controls/select/selectForm';
 import { actions as visualizationActions } from '../../../../services/store/visualization';
 import { actions as modalActions } from '../../../../services/store/modal';
 import {
-  useUserFormUploadMutation,
+  useVisualizationUserUploadMutation,
   useSubmitQueueMutation,
-  useSubmitWebUserMutation,
+  useVisualizationUserMutation,
 } from './apiSlice';
 
 const actions = { ...visualizationActions, ...modalActions };
@@ -41,11 +41,11 @@ export default function UserForm() {
   const { submitted, source } = store.main;
 
   const [handleUpload, { isLoading: isUploading, reset: resetUpload }] =
-    useUserFormUploadMutation();
+    useVisualizationUserUploadMutation();
   const [handleSubmitQueue, { isLoading: isQueueing, reset: resetQueue }] =
     useSubmitQueueMutation();
   const [handleSubmitWeb, { isLoading, reset: resetWeb }] =
-    useSubmitWebUserMutation();
+    useVisualizationUserMutation();
 
   const formatOptions = [
     { label: 'VCF', value: 'vcf', example: 'demo_input_multi.vcf.gz' },

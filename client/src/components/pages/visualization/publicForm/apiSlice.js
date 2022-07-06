@@ -1,7 +1,7 @@
 import { apiSlice } from '../../../../services/apiSlice';
 import { groupBy } from 'lodash';
 
-export const vissualizationApiSlice = apiSlice.injectEndpoints({
+export const publicFormApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getPublicDataOptions: builder.query({
       query: (_) => ({
@@ -24,8 +24,7 @@ export const vissualizationApiSlice = apiSlice.injectEndpoints({
         return groupByCancer;
       },
     }),
-
-    submitWebPublic: builder.mutation({
+    visualizationPublic: builder.mutation({
       query: (params) => ({
         url: 'visualizationData',
         params,
@@ -34,5 +33,5 @@ export const vissualizationApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useSubmitWebPublicMutation, useGetPublicDataOptionsQuery } =
-  vissualizationApiSlice;
+export const { useVisualizationPublicMutation, useGetPublicDataOptionsQuery } =
+  publicFormApiSlice;
