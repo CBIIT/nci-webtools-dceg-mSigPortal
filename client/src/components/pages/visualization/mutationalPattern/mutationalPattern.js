@@ -4,12 +4,7 @@ import MutationalPatternPlot from './mutPattern-plot';
 
 export default function MutationalPattern(props) {
   return (
-    <Container
-      fluid
-      className="bg-white border rounded p-0"
-      style={{ minHeight: 500 }}
-      {...props}
-    >
+    <Container fluid className="bg-white border rounded p-0" {...props}>
       <MutationalPatternForm />
       <hr />
       <MutationalPatternPlot />
