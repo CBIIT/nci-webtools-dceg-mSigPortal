@@ -211,7 +211,7 @@ export default function SBS192(data, sample) {
       line: {
         width: 0,
       },
-      opacity: 0.2,
+      opacity: 0.15,
     })
   );
   const traces = [tracesT, tracesU];

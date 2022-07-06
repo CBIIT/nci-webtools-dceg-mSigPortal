@@ -258,7 +258,7 @@ export default function SBS384(data, sample) {
       line: {
         width: 0,
       },
-      opacity: 0.2,
+      opacity: 0.15,
     })
   );
 

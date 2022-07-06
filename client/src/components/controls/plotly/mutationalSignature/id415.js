@@ -1,4 +1,4 @@
-export default function ID83(data, sample) {
+export default function ID415(data, sample) {
   console.log("data");
   console.log(data);
   const colors = {
@@ -56,14 +56,29 @@ export default function ID83(data, sample) {
     arrayIDAnnotationTop = [],
     arrayIDAnnotationBot = [];
 
-  const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-  const maxVal = Math.max(...data.map((o) => o.mutations));
+  const arrayDataT = [];
+  const arrayDataU = [];
 
-  // group data by dominant mutation
-  const groupByMutation = data.reduce((groups, e, i) => {
-    const mutationRegex = /^.{0,7}/;
+  Object.values(data).forEach((group) => {
+    if (group.mutationType.substring(0, 1) === "T") {
+      arrayDataT.push(group);
+    } else if (group.mutationType.substring(0, 1) === "U") {
+      arrayDataU.push(group);
+    }
+  });
+
+  const totalMutations = [...arrayDataT, ...arrayDataU].reduce(
+    (a, e) => a + parseInt(e.mutations),
+    0
+  );
+  const dataUT = [...arrayDataT, ...arrayDataU];
+  const maxVal = Math.max(...dataUT.map((o) => o.mutations));
+
+  ///// --------- T Group ------------///////
+  const T_groupByMutation = arrayDataT.reduce((groups, e, i) => {
+    const mutationRegex = /^.{2,9}/;
     const mutation = e.mutationType.match(mutationRegex)[0];
     const signature = {
       mutationType: e.mutationType,
@@ -75,11 +90,11 @@ export default function ID83(data, sample) {
     return groups;
   }, {});
 
-  const groupByFirstGroup = Object.fromEntries(
-    Object.entries(groupByMutation).slice(0, 4)
+  const T_groupByFirstGroup = Object.fromEntries(
+    Object.entries(T_groupByMutation).slice(0, 4)
   );
 
-  const groupByMutationID = data.reduce((groups, e) => {
+  const T_groupByMutationID = arrayDataT.reduce((groups, e) => {
     let mutationID;
     mutationID = e.mutationType.match(
       e.mutationType.substring(
@@ -96,12 +111,10 @@ export default function ID83(data, sample) {
       : [signature];
     return groups;
   }, {});
-  console.log("groupByMutationID");
-  console.log(groupByMutationID);
 
-  const groupR = groupByMutationID["R"].reduce((r, a) => {
+  const T_groupR = T_groupByMutationID["R"].reduce((r, a) => {
     let m;
-    m = a.mutationType.match(a.mutationType.substr(2, 3));
+    m = a.mutationType.match(a.mutationType.substr(4, 3));
     const s = {
       mutationType: a.mutationType,
       contribution: a.contribution,
@@ -110,9 +123,7 @@ export default function ID83(data, sample) {
     return r;
   }, {});
 
-  console.log("groupR");
-  console.log(groupR);
-  const groupRDel = groupR["Del"].reduce((r, a) => {
+  const T_groupRDel = T_groupR["Del"].reduce((r, a) => {
     let m;
     m = a.mutationType.match(a.mutationType.substr(0, 7));
     const s = {
@@ -123,7 +134,7 @@ export default function ID83(data, sample) {
     return r;
   }, {});
 
-  const groupRIns = groupR["Ins"].reduce((r, a) => {
+  const T_groupRIns = T_groupR["Ins"].reduce((r, a) => {
     let m;
     m = a.mutationType.match(a.mutationType.substr(0, 7));
     const s = {
@@ -134,7 +145,7 @@ export default function ID83(data, sample) {
     return r;
   }, {});
 
-  const groupM = groupByMutationID["M"].reduce((r, a) => {
+  const T_groupM = T_groupByMutationID["M"].reduce((r, a) => {
     let m;
     m = a.mutationType.match(a.mutationType.substr(0, 7));
     const s = {
@@ -144,27 +155,153 @@ export default function ID83(data, sample) {
     r[m] = r[m] ? [...r[m], a] : [s];
     return r;
   }, {});
-  const arrayID1 = Object.keys(groupByFirstGroup).map(function (key) {
-    return groupByFirstGroup[key];
+  const T_arrayID1 = Object.keys(T_groupByFirstGroup).map(function (key) {
+    return T_groupByFirstGroup[key];
   });
-  const arrayID2 = Object.keys(groupRDel).map(function (key) {
-    return groupRDel[key];
+  const T_arrayID2 = Object.keys(T_groupRDel).map(function (key) {
+    return T_groupRDel[key];
   });
-  const arrayID3 = Object.keys(groupRIns).map(function (key) {
-    return groupRIns[key];
+  const T_arrayID3 = Object.keys(T_groupRIns).map(function (key) {
+    return T_groupRIns[key];
   });
-  const arrayID4 = Object.keys(groupM).map(function (key) {
-    return groupM[key];
+  const T_arrayID4 = Object.keys(T_groupM).map(function (key) {
+    return T_groupM[key];
   });
 
-  const arrayID = [...arrayID1, ...arrayID2, ...arrayID3, ...arrayID4];
+  const T_arrayID = [
+    ...T_arrayID1,
+    ...T_arrayID2,
+    ...T_arrayID3,
+    ...T_arrayID4,
+  ];
 
-  const flatSorted = Object.values(arrayID).flat();
+  const T_flatSorted = Object.values(T_arrayID).flat();
 
-  console.log(flatSorted);
-  console.log(arrayID);
+  ///// --------- U Group ------------///////
+  const U_groupByMutation = arrayDataU.reduce((groups, e, i) => {
+    const mutationRegex = /^.{2,9}/;
+    const mutation = e.mutationType.match(mutationRegex)[0];
+    const signature = {
+      mutationType: e.mutationType,
+      contribution: e.mutations,
+    };
+    groups[mutation] = groups[mutation]
+      ? [...groups[mutation], signature]
+      : [signature];
+    return groups;
+  }, {});
 
-  Object.values(arrayID).forEach((group) => {
+  const U_groupByFirstGroup = Object.fromEntries(
+    Object.entries(U_groupByMutation).slice(0, 4)
+  );
+
+  const U_groupByMutationID = arrayDataU.reduce((groups, e) => {
+    let mutationID;
+    mutationID = e.mutationType.match(
+      e.mutationType.substring(
+        e.mutationType.length - 3,
+        e.mutationType.length - 2
+      )
+    );
+    const signature = {
+      mutationType: e.mutationType,
+      contribution: e.mutations,
+    };
+    groups[mutationID] = groups[mutationID]
+      ? [...groups[mutationID], signature]
+      : [signature];
+    return groups;
+  }, {});
+
+  const U_groupR = U_groupByMutationID["R"].reduce((r, a) => {
+    let m;
+    m = a.mutationType.match(a.mutationType.substr(4, 3));
+    const s = {
+      mutationType: a.mutationType,
+      contribution: a.contribution,
+    };
+    r[m] = r[m] ? [...r[m], a] : [s];
+    return r;
+  }, {});
+
+  const U_groupRDel = U_groupR["Del"].reduce((r, a) => {
+    let m;
+    m = a.mutationType.match(a.mutationType.substr(0, 7));
+    const s = {
+      mutationType: a.mutationType,
+      contribution: a.contribution,
+    };
+    r[m] = r[m] ? [...r[m], a] : [s];
+    return r;
+  }, {});
+
+  const U_groupRIns = U_groupR["Ins"].reduce((r, a) => {
+    let m;
+    m = a.mutationType.match(a.mutationType.substr(0, 7));
+    const s = {
+      mutationType: a.mutationType,
+      contribution: a.contribution,
+    };
+    r[m] = r[m] ? [...r[m], a] : [s];
+    return r;
+  }, {});
+
+  const U_groupM = U_groupByMutationID["M"].reduce((r, a) => {
+    let m;
+    m = a.mutationType.match(a.mutationType.substr(0, 7));
+    const s = {
+      mutationType: a.mutationType,
+      contribution: a.contribution,
+    };
+    r[m] = r[m] ? [...r[m], a] : [s];
+    return r;
+  }, {});
+
+  const U_arrayID1 = Object.keys(U_groupByFirstGroup).map(function (key) {
+    return U_groupByFirstGroup[key];
+  });
+  const U_arrayID2 = Object.keys(U_groupRDel).map(function (key) {
+    return U_groupRDel[key];
+  });
+  const U_arrayID3 = Object.keys(U_groupRIns).map(function (key) {
+    return U_groupRIns[key];
+  });
+  const U_arrayID4 = Object.keys(U_groupM).map(function (key) {
+    return U_groupM[key];
+  });
+
+  const U_arrayID = [
+    ...U_arrayID1,
+    ...U_arrayID2,
+    ...U_arrayID3,
+    ...U_arrayID4,
+  ];
+  const U_flatSorted = Object.values(U_arrayID).flat();
+
+  //// ----------- plot ------------------//
+  const tracesT = {
+    name: "Transcrribed Strand",
+    type: "bar",
+    marker: { color: "#004765" },
+    x: T_flatSorted.map((element, index, array) => index),
+    y: T_flatSorted.map((element, index, array) => element.contribution),
+
+    hoverinfo: "x+y",
+    showlegend: true,
+  };
+
+  const tracesU = {
+    name: "Untranscribed Strand",
+    type: "bar",
+    marker: { color: "#E32925" },
+    x: U_flatSorted.map((element, index, array) => index),
+    y: U_flatSorted.map((element, index, array) => element.contribution),
+
+    hoverinfo: "x+y",
+    showlegend: true,
+  };
+
+  Object.values(T_arrayID).forEach((group) => {
     if (group.length > 1) {
       arrayIDAnnotationTop.push(
         group[Math.floor(group.length / 2)].mutationType
@@ -177,36 +314,9 @@ export default function ID83(data, sample) {
     });
   });
 
-  const traces = Object.entries(arrayID).map(
-    ([mutation, signatures], groupIndex, array) => ({
-      name: mutation,
-      type: "bar",
-      marker: {
-        color:
-          colors[
-            signatures[0].mutationType.substring(
-              0,
-              signatures[0].mutationType.length - 2
-            )
-          ],
-      },
-      //   x: signatures.map((e) => e.mutationType),
-      //x: signatures.map((e, i) => groupIndex * signatures.length + i),
-      x: signatures.map(
-        (e, i) =>
-          array
-            .slice(0, groupIndex)
-            .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
-      ),
-      y: signatures.map((e) => e.contribution),
-      //text: signatures.map((e, i) => e.mutationType),
-      //hovertemplate: "%{signatures.map((e, i) => e.mutationType)}, %{y}",
-      hoverinfo: "x+y",
-      showlegend: false,
-    })
-  );
+  const traces = [tracesT, tracesU];
 
-  const annotations1 = Object.entries(arrayID).map(
+  const annotations1 = Object.entries(T_arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
       xref: "x",
       yref: "paper",
@@ -224,22 +334,19 @@ export default function ID83(data, sample) {
               signatures[0].mutationType.length - 3,
               signatures[0].mutationType.length - 2
             )}</b>`
-          : `<b>${signatures[0].mutationType.substring(0, 1)}</b>`,
+          : `<b>${signatures[0].mutationType.substring(2, 3)}</b>`,
       showarrow: false,
       font: {
         size: 14,
         color:
           annotationColors[
             signatures[0].mutationType.substring(
-              0,
+              2,
               signatures[0].mutationType.length - 2
             )
           ],
       },
       align: "center",
-      signatures: signatures,
-      mutation: mutation,
-      groupIndex: groupIndex,
     })
   );
 
@@ -256,8 +363,6 @@ export default function ID83(data, sample) {
       size: 14,
     },
     align: "center",
-    num: num,
-    index: index,
   }));
 
   const annotationsIDTopLabel = arrayIDAnnXLabel.map((num, index) => ({
@@ -306,7 +411,7 @@ export default function ID83(data, sample) {
     align: "center",
   };
 
-  const shapes1 = Object.entries(arrayID).map(
+  const shapes1 = Object.entries(T_arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
       type: "rect",
       xref: "x",
@@ -322,22 +427,17 @@ export default function ID83(data, sample) {
       fillcolor:
         colors[
           signatures[0].mutationType.substring(
-            0,
+            2,
             signatures[0].mutationType.length - 2
           )
         ],
       line: {
         width: 0,
       },
-      mutation: mutation,
-      signature: signatures[0].mutationType.substring(
-        0,
-        signatures[0].mutationType.length - 2
-      ),
     })
   );
 
-  const shapes2 = Object.entries(arrayID).map(
+  const shapes2 = Object.entries(T_arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
       type: "rect",
       xref: "x",
@@ -353,23 +453,23 @@ export default function ID83(data, sample) {
       fillcolor:
         colors[
           signatures[0].mutationType.substring(
-            0,
+            2,
             signatures[0].mutationType.length - 2
           )
         ],
       line: {
         width: 0,
       },
-      mutation: mutation,
-      signature: signatures[0].mutationType.substring(
-        0,
-        signatures[0].mutationType.length - 2
-      ),
     })
   );
 
   const layout = {
     hoverlabel: { bgcolor: "#FFF" },
+    legend: {
+      x: 1,
+      xanchor: "right",
+      y: 1,
+    },
     xaxis: {
       showticklabels: false,
       showline: true,
@@ -378,8 +478,8 @@ export default function ID83(data, sample) {
         size: 10,
       },
       tickmode: "array",
-      tickvals: flatSorted.map((_, i) => i),
-      ticktext: flatSorted.map((e) => e.mutationType),
+      tickvals: T_flatSorted.map((_, i) => i),
+      ticktext: T_flatSorted.map((e) => e.mutationType),
       linecolor: "black",
       linewidth: 1,
       mirror: true,

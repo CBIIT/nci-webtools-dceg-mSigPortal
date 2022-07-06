@@ -15,8 +15,10 @@ import SBS288 from "../../../controls/plotly/mutationalSignature/sbs288";
 import SBS384 from "../../../controls/plotly/mutationalSignature/sbs384";
 import SBS1536 from "../../../controls/plotly/mutationalSignature/sbs1536";
 import DBS78 from "../../../controls/plotly/mutationalSignature/dbs78";
+import DBS186 from "../../../controls/plotly/mutationalSignature/dbs186";
 import ID83 from "../../../controls/plotly/mutationalSignature/id83";
 import ID28 from "../../../controls/plotly/mutationalSignature/id28";
+import ID415 from "../../../controls/plotly/mutationalSignature/id415";
 
 export default function MutProfilePlot() {
   const store = useSelector((state) => state.visualization);
@@ -59,7 +61,6 @@ export default function MutProfilePlot() {
 
   function generatePlot(data, sample) {
     const profileMatrix = profile.value + matrix.value;
-
     const { traces, layout } =
       profileMatrix == "SBS6"
         ? SBS6(data, sample)
@@ -77,10 +78,14 @@ export default function MutProfilePlot() {
         ? SBS1536(data, sample)
         : profileMatrix == "DBS78"
         ? DBS78(data, sample)
+        : profileMatrix == "DBS186"
+        ? DBS186(data, sample)
         : profileMatrix == "ID28"
         ? ID28(data, sample)
         : profileMatrix == "ID83"
         ? ID83(data, sample)
+        : profileMatrix == "ID415"
+        ? ID415(data, sample)
         : { traces: [], layout: {} };
 
     setPlot({ data: [...traces], layout });
