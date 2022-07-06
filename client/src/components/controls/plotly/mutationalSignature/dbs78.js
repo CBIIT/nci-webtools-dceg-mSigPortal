@@ -125,7 +125,7 @@ export default function DBS78(data, sample) {
       showline: true,
       tickangle: -90,
       tickfont: {
-        size: 10,
+        size: 12,
       },
       tickmode: "array",
       tickvals: flatSorted.map((_, i) => i),
@@ -142,7 +142,7 @@ export default function DBS78(data, sample) {
     yaxis: {
       title: "Number of Double Base Substitutions",
       autorange: false,
-      range: [0, maxVal + maxVal * 0.15],
+      range: [0, maxVal + maxVal * 0.3],
       linecolor: "black",
       linewidth: 1,
       mirror: true,

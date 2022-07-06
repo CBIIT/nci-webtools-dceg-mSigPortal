@@ -172,7 +172,7 @@ export default function DBS186(data, sample) {
       sample +
       ": " +
       numberWithCommas(totalMutations) +
-      " double subs</b>",
+      " transcribed double subs</b>",
     showarrow: false,
     font: {
       size: 18,
@@ -194,7 +194,7 @@ export default function DBS186(data, sample) {
       showline: true,
       tickangle: -90,
       tickfont: {
-        size: 14,
+        size: 18,
       },
       tickmode: "array",
       tickvals: T_flatSorted.map((_, i) => i),
@@ -216,7 +216,7 @@ export default function DBS186(data, sample) {
       linewidth: 1,
       mirror: true,
       tickfont: {
-        size: 14,
+        size: 16,
       },
     },
 
