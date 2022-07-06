@@ -16,8 +16,8 @@ import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { actions } from '../../../../services/store/visualization';
 import {
   useProfileComparisonReferenceQuery,
-  useSignatureSetsQuery,
-  useSignatureNamesQuery,
+  usePcSignatureSetsQuery,
+  usePcSignatureNamesQuery,
 } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
@@ -62,7 +62,7 @@ export default function PcReference() {
 
   // get signature sets
   const { data: signatureSetOptions, isFetching: fetchingSigSets } =
-    useSignatureSetsQuery(signatureSetQuery, {
+    usePcSignatureSetsQuery(signatureSetQuery, {
       skip: !signatureSetQuery,
     });
   // get signature names in set
@@ -70,7 +70,7 @@ export default function PcReference() {
     data: signatureNameOptions,
     isFetching: fetchingSigNames,
     refetch: refetchSignatureNames,
-  } = useSignatureNamesQuery(signatureNamesQuery, {
+  } = usePcSignatureNamesQuery(signatureNamesQuery, {
     skip: !signatureNamesQuery,
   });
   //   calculate plot

@@ -109,7 +109,7 @@ export default function CsWithin() {
 
   return (
     <div>
-      <p className="p-3">
+      <div className="p-3">
         <Description
           less="Cosine similarity is a measure of the similarity of two
                       matrices, which can be helpful to compare two mutational
@@ -129,7 +129,7 @@ export default function CsWithin() {
             </span>
           }
         />
-      </p>
+      </div>
 
       <hr />
       <LoadingOverlay active={isFetching} />

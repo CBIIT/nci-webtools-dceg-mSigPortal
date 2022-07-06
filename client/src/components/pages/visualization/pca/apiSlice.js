@@ -16,7 +16,7 @@ export const pcaApiSlice = apiSlice.injectEndpoints({
         body: params,
       }),
     }),
-    signatureSets: builder.query({
+    pcaSignatureSets: builder.query({
       query: (params) => ({ url: 'signature', params }),
       transformResponse: (data) =>
         data
@@ -29,5 +29,5 @@ export const pcaApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { usePcaWithinQuery, usePcaPublicQuery, useSignatureSetsQuery } =
+export const { usePcaWithinQuery, usePcaPublicQuery, usePcaSignatureSetsQuery } =
   pcaApiSlice;

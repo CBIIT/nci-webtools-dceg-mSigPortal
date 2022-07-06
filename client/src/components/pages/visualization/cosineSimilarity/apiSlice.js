@@ -2,28 +2,28 @@ import { apiSlice } from '../../../../services/apiSlice';
 
 export const cosineSimilarityApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    CosineWithin: builder.query({
+    cosineWithin: builder.query({
       query: (params) => ({
         url: 'visualizationWrapper',
         method: 'POST',
         body: params,
       }),
     }),
-    CosineReference: builder.query({
+    cosineReference: builder.query({
       query: (params) => ({
         url: 'visualizationWrapper',
         method: 'POST',
         body: params,
       }),
     }),
-    CosinePublic: builder.query({
+    cosinePublic: builder.query({
       query: (params) => ({
         url: 'visualizationWrapper',
         method: 'POST',
         body: params,
       }),
     }),
-    signatureSets: builder.query({
+    cosineSignatureSets: builder.query({
       query: (params) => ({ url: 'signature', params }),
       transformResponse: (data) =>
         data
@@ -40,5 +40,5 @@ export const {
   useCosineWithinQuery,
   useCosineReferenceQuery,
   useCosinePublicQuery,
-  useSignatureSetsQuery,
+  useCosineSignatureSetsQuery,
 } = cosineSimilarityApiSlice;

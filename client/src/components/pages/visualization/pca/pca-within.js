@@ -4,7 +4,7 @@ import Select from '../../../controls/select/selectForm';
 import { useForm } from 'react-hook-form';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions } from '../../../../services/store/visualization';
-import { usePcaWithinQuery, useSignatureSetsQuery } from './apiSlice';
+import { usePcaWithinQuery, usePcaSignatureSetsQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import { defaultMatrix } from '../../../../services/utils';
@@ -28,7 +28,7 @@ export default function CsWithin() {
 
   // get signature sets
   const { data: signatureSetOptions, isFetching: fetchingSigSets } =
-    useSignatureSetsQuery(signatureSetQuery, {
+    usePcaSignatureSetsQuery(signatureSetQuery, {
       skip: !signatureSetQuery,
     });
 

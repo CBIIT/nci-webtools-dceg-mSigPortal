@@ -23,7 +23,7 @@ export const profilerSummaryApiSlice = apiSlice.injectEndpoints({
         body: params,
       }),
     }),
-    signatureSets: builder.query({
+    pcSignatureSets: builder.query({
       query: (params) => ({ url: 'signature', params }),
       transformResponse: (data) =>
         data
@@ -33,7 +33,7 @@ export const profilerSummaryApiSlice = apiSlice.injectEndpoints({
           )
           .map((e) => ({ label: e, value: e })),
     }),
-    signatureNames: builder.query({
+    pcSignatureNames: builder.query({
       query: (params) => ({ url: 'signature', params }),
       transformResponse: (data) =>
         [...new Set(data.map((e) => e.signatureName))].sort((a, b) =>
@@ -47,6 +47,6 @@ export const {
   useProfileComparisonWithinQuery,
   useProfileComparisonReferenceQuery,
   useProfileComparisonPublicQuery,
-  useSignatureSetsQuery,
-  useSignatureNamesQuery,
+  usePcSignatureSetsQuery,
+  usePcSignatureNamesQuery,
 } = profilerSummaryApiSlice;
