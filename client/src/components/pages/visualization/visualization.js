@@ -91,11 +91,15 @@ export default function Visualization({ match }) {
       } else if (Object.keys(svgList).length && !signatureSetOptions.length) {
         loadData();
       }
-    } else {
-      if (samples.length > 0 && !mutationalProfiles.filtered.length)
-        mapPublicData();
     }
-  }, [svgList, samples, projectID]);
+  }, [svgList, projectID]);
+
+  // switch to first tab after fetching samples
+  useEffect(() => {
+    if (samples.length && projectID) {
+      mergeState({ displayTab: 'profilerSummary' });
+    }
+  }, [samples, projectID]);
 
   // reload summary information
   async function getResults() {
@@ -248,59 +252,6 @@ export default function Visualization({ match }) {
       loading: {
         active: false,
       },
-      openSidebar: false,
-    });
-  }
-
-  // retrieve mapping of samples to plots from samples data
-  async function mapPublicData() {
-    mergeState({
-      loading: {
-        active: true,
-        // content: 'Putting Public Data Into Session',
-        // showIndicator: true,
-      },
-    });
-
-    // Mutational Profiles
-    const nameOptions = [...new Set(samples.map((e) => e.sample))];
-    const selectName = mutationalProfiles.selectName || nameOptions[0];
-    const profileOptions = [...new Set(samples.map((e) => e.profile))];
-    const profile = defaultProfile(profileOptions);
-
-    const filteredMatrixOptions = [
-      ...new Set(
-        samples
-          .filter(
-            (e) => e.sample == selectName && e.profile.indexOf(profile) > -1
-          )
-          .map((e) => e.matrix)
-      ),
-    ].sort((a, b) => a - b);
-
-    mergeState({ profileOptions: profileOptions });
-
-    // Cosine Similarity - Profile Comparison - PCA
-    const selectProfile = defaultProfile(profileOptions);
-    const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);
-
-    mergeCosineSimilarity({
-      withinProfileType: selectProfile,
-      refProfileType: selectProfile,
-      withinMatrixSize: selectMatrix,
-      withinMatrixOptions: filteredMatrixOptions,
-    });
-
-    mergePCA({
-      profileType: selectProfile,
-    });
-
-    mergeState({
-      loading: {
-        active: false,
-      },
-      submitted: true,
-      displayTab: 'profilerSummary',
       openSidebar: false,
     });
   }
