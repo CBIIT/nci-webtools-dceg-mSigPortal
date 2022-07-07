@@ -1,5 +1,6 @@
 source("renv/activate.R")
 
+# https://github.com/grantmcdermott/renv-rspm
 ## Set default package source by operating system, so that we automatically pull
 ## in pre-built binary snapshots, rather than building from source.
 
