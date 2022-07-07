@@ -67,7 +67,7 @@ COPY server/renv.lock /deploy/server/
 
 WORKDIR /deploy/server
 
-RUN R -e "options(Ncpus=parallel::detectCores()); renv::restore()"
+RUN R -e "renv::restore()"
 
 # install python packages
 RUN pip3 install scipy statsmodels
