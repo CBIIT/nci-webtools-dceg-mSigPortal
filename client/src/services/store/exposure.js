@@ -2,7 +2,13 @@ import { createSlice } from '@reduxjs/toolkit';
 import { mergeObject } from './utils';
 
 export const getInitialState = () => ({
-  publicForm: {},
+  publicForm: {
+    study: '',
+    strategy: '',
+    signatureSet: '',
+    cancer: '',
+    cancerOnly: true,
+  },
   userForm: {},
   main: {
     displayTab: 'instructions',
