@@ -250,7 +250,7 @@ export default function ID83(data, sample) {
     text: "<b>" + num.substring(num.length - 1, num.length) + "</b>",
     showarrow: false,
     font: {
-      size: 14,
+      size: 12,
     },
     align: "center",
     num: num,
