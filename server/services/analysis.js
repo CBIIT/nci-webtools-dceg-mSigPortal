@@ -837,7 +837,7 @@ async function explorationTmbData(req, res, next) {
     const connection = req.app.locals.connection;
 
     const query = { study, strategy, signatureSetName };
-    const columns = ['cancer', 'exposure'];
+    const columns = ['cancer', 'sample', 'exposure'];
     const data = await getExposureData(connection, query, columns);
     res.json(data);
   } catch (error) {
