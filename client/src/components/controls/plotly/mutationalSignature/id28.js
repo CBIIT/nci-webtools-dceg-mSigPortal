@@ -1,6 +1,6 @@
 export default function ID28(data, sample) {
-  console.log("data");
-  console.log(data);
+  //.log("data");
+  //console.log(data);
   const colors = {
     "1:Del:C": "#FBBD6F",
     "1:Del:T": "#FE8002",

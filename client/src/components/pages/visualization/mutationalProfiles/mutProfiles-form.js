@@ -40,10 +40,12 @@ export default function TreeLeafForm() {
   }, [samples]);
 
   const sampleOptions = samples.length
-    ? [...new Set(samples.map((d) => d.sample))].map((e) => ({
-        label: e,
-        value: e,
-      }))
+    ? [...new Set(samples.map((d) => d.sample))]
+        .map((e) => ({
+          label: e,
+          value: e,
+        }))
+        .sort((a, b) => a - b)
     : [];
 
   const profileOptions = (sample) =>

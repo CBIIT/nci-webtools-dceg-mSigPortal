@@ -7,8 +7,8 @@ export default function SBS24(data, sample) {
     "T>C": "#A1CE63",
     "T>G": "#EBC6C4",
   };
-  console.log("data--:");
-  console.log(data);
+  //   console.log("data--:");
+  //   console.log(data);
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 
@@ -25,15 +25,9 @@ export default function SBS24(data, sample) {
   }, {});
   const flatSorted = Object.values(groupByMutation).flat();
 
-  console.log("groupByMutation:");
-  console.log(groupByMutation);
-  console.log("FlatSorted");
-  console.log(flatSorted);
   //group data by 1st letter
-
   const dataT = [];
   const dataU = [];
-
   Object.entries(flatSorted).forEach(([key, value], groupIndex, array) => {
     if (value.mutationType.substring(0, 1) === "T") {
       dataT.push(value);
@@ -46,10 +40,10 @@ export default function SBS24(data, sample) {
     (a, e) => a + parseInt(e.contribution),
     0
   );
-  console.log("dataT");
-  console.log(dataT);
-  console.log("dataU");
-  console.log(dataU);
+  //   console.log("dataT");
+  //   console.log(dataT);
+  //   console.log("dataU");
+  //   console.log(dataU);
 
   const tracesT = {
     name: "Transcrribed",
@@ -65,7 +59,7 @@ export default function SBS24(data, sample) {
     orientation: "h",
   };
 
-  console.log(tracesT);
+  //console.log(tracesT);
   const tracesU = {
     name: "Untranscribed",
     type: "bar",
@@ -78,7 +72,7 @@ export default function SBS24(data, sample) {
     hoverinfo: "y+x",
     orientation: "h",
   };
-  console.log(tracesU);
+  //console.log(tracesU);
 
   const traces = [tracesU, tracesT];
 

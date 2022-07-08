@@ -1,6 +1,6 @@
 export default function ID83(data, sample) {
-  console.log("data");
-  console.log(data);
+  // console.log("data");
+  // console.log(data);
   const colors = {
     "1:Del:C": "#FBBD6F",
     "1:Del:T": "#FE8002",
@@ -96,8 +96,8 @@ export default function ID83(data, sample) {
       : [signature];
     return groups;
   }, {});
-  console.log("groupByMutationID");
-  console.log(groupByMutationID);
+  // console.log("groupByMutationID");
+  // console.log(groupByMutationID);
 
   const groupR = groupByMutationID["R"].reduce((r, a) => {
     let m;
@@ -110,8 +110,8 @@ export default function ID83(data, sample) {
     return r;
   }, {});
 
-  console.log("groupR");
-  console.log(groupR);
+  // console.log("groupR");
+  // console.log(groupR);
   const groupRDel = groupR["Del"].reduce((r, a) => {
     let m;
     m = a.mutationType.match(a.mutationType.substr(0, 7));
@@ -160,9 +160,6 @@ export default function ID83(data, sample) {
   const arrayID = [...arrayID1, ...arrayID2, ...arrayID3, ...arrayID4];
 
   const flatSorted = Object.values(arrayID).flat();
-
-  console.log(flatSorted);
-  console.log(arrayID);
 
   Object.values(arrayID).forEach((group) => {
     if (group.length > 1) {

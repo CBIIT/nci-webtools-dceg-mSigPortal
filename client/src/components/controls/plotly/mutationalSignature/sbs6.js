@@ -7,8 +7,8 @@ export default function SBS6(data, sample) {
     "T>C": "#A1CE63",
     "T>G": "#EBC6C4",
   };
-  console.log("data--:");
-  console.log(data);
+  //   console.log("data--:");
+  //   console.log(data);
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 
@@ -69,8 +69,5 @@ export default function SBS6(data, sample) {
       categoryorder: "category descending",
     },
   };
-
-  console.log("layout");
-  console.log(layout);
   return { traces, layout };
 }

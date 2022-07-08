@@ -18,8 +18,8 @@ export default function DBS78(data, sample) {
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
   //console.log(totalMutations);
-  console.log("data");
-  console.log(data);
+  //console.log("data");
+  //console.log(data);
 
   const dataFilter = data.filter(
     (item) =>
@@ -35,7 +35,7 @@ export default function DBS78(data, sample) {
       item.mutationType.substring(0, 2) === "TT"
   );
 
-  console.log(dataFilter);
+  //console.log(dataFilter);
   // group data by dominant mutation
   const groupByMutation = dataFilter.reduce((groups, e, i) => {
     const mutation = e.mutationType.substring(0, 3);
@@ -50,12 +50,6 @@ export default function DBS78(data, sample) {
   }, {});
 
   const flatSorted = Object.values(groupByMutation).flat();
-
-  console.log("groupByMutation");
-  console.log(groupByMutation);
-
-  console.log("flatSorted");
-  console.log(flatSorted);
 
   const traces = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
@@ -75,21 +69,7 @@ export default function DBS78(data, sample) {
     })
   );
 
-  // const traces = newArray.map((num, index, array) => ({
-  //   name: num[0].mutationType.substring(0, 2),
-  //   type: "bar",
-  //   num: num,
-  //   //marker: { color: colors[num.mutationType.substring(0, 3)] },
-  //   //x: signatures.map((e) => e.mutationType),
-  //   x: num.map(
-  //     (e, i) =>
-  //       array.slice(0, index).reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
-  //   ),
-  //   y: num.map((e, i) => e.contribution),
-  //   hoverinfo: "x+y",
-  //   showlegend: false,
-  // }));
-  console.log(traces);
+  //console.log(traces);
   const annotations = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
       xref: "x",
