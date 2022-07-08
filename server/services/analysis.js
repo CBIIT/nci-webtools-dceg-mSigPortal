@@ -833,10 +833,10 @@ async function explorationOptions(req, res, next) {
 // query public exploration data for exploration tab
 async function explorationTmbData(req, res, next) {
   try {
-    const { study, strategy, signatureSetName, cancer } = req.query;
+    const { study, strategy, signatureSetName } = req.query;
     const connection = req.app.locals.connection;
 
-    const query = { study, strategy, signatureSetName, cancer };
+    const query = { study, strategy, signatureSetName };
     const columns = ['cancer', 'exposure'];
     const data = await getExposureData(connection, query, columns);
     res.json(data);
