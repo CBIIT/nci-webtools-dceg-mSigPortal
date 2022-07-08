@@ -29,11 +29,13 @@ export default function ID28(data, sample) {
 
   const data1 = data.slice(0, data.length - 4);
   const data2 = data.slice(-4);
+  data2.push(data2.shift());
 
   // group data by dominant mutation
   const groupByMutation = data1.reduce((groups, e, i) => {
     const mutationRegex = /^.{0,7}/;
     const mutation = e.mutationType.match(mutationRegex)[0];
+
     const signature = {
       mutationType: e.mutationType,
       contribution: e.mutations,
@@ -43,6 +45,8 @@ export default function ID28(data, sample) {
       : [signature];
     return groups;
   }, {});
+
+  //console.log(groupByMutation);
 
   const groupByFirstGroup = Object.fromEntries(
     Object.entries(groupByMutation).slice(0, 4)
@@ -152,7 +156,7 @@ export default function ID28(data, sample) {
       groupIndex: groupIndex,
     })
   );
-
+  console.log(annotations1);
   const annotations2 = arrayIDAnnotationBot.map((num, index) => ({
     xref: "x",
     yref: "paper",
@@ -160,6 +164,7 @@ export default function ID28(data, sample) {
     yanchor: "bottom",
     x: index,
     y: num.substring(0, 1) === "o" ? -0.12 : -0.1,
+    xnum: parseInt(num.substring(num.length - 1, num.length)),
     text:
       num.substring(0, 1) === "o"
         ? num === "o:complex"
@@ -167,6 +172,8 @@ export default function ID28(data, sample) {
           : num === "o:MH"
           ? "<b>MH</b>"
           : "<b>" + num.substring(num.length - 3, num.length) + "</b>"
+        : num.substring(num.length - 1, num.lenght) >= 5
+        ? "<b>" + num.substring(num.length - 1, num.length) + "+</b>"
         : "<b>" + num.substring(num.length - 1, num.length) + "</b>",
     showarrow: false,
     font: {
@@ -178,6 +185,7 @@ export default function ID28(data, sample) {
     index: index,
   }));
 
+  console.log(annotations2);
   const annotationsIDTopLabel = arrayIDAnnXLabel.map((num, index) => ({
     xref: "x",
     yref: "paper",
