@@ -1,14 +1,13 @@
-import React, { useState, useEffect, Suspense } from 'react';
-import { Alert, Container } from 'react-bootstrap';
-import Loader from '../../controls/loader/loader';
-import ErrorBoundary from '../../controls/errorBoundary/error-boundary';
+import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { saveAs } from 'file-saver';
-import PublicForm from './publicForm';
+import PublicForm from './publicForm/publicForm';
+// import PublicForm from './publicForm';
 import UserForm from './userForm';
 import Instructions from './instructions';
 import TMB from './tmb';
+import TMB2 from './tmb/tmb.js';
 import TmbSig from './tmbSignatures';
 import MsBurden from './msBurden';
 import MsAssociation from './msAssociation';
@@ -17,7 +16,6 @@ import MsLandscape from './msLandscape';
 import MsPrevalence from './msPrevalence';
 import MSIndividual from './msIndividual';
 import Download from './download';
-import TMBAPI from './tmb/tmb.js';
 import { actions as exposureActions } from '../../../services/store/exposure';
 import { actions as modalActions } from '../../../services/store/modal';
 import {
@@ -505,72 +503,87 @@ export default function Exposure({ match }) {
     mergeState(params);
   }
 
-  const tabs = [
-    {
-      component: <Instructions loading={loading} />,
-      id: 'instructions',
-      name: 'Instructions',
-    },
-    {
-      component: <TMB />,
-      id: 'tmb',
-      name: 'TMB',
-    },
-    {
-      component: <TMBAPI />,
-      id: 'tmbapi',
-      name: 'TMB API',
-    },
-    {
-      component: <TmbSig />,
-      id: 'tmbSig',
-      name: 'TMB Signatures',
-    },
-    {
-      component: <MsBurden calculateBurden={calculateBurden} />,
-      id: 'msBurden',
-      name: 'MS Burden',
-    },
-    {
-      component: <MsDecomposition />,
-      id: 'msDecomposition',
-      name: 'MS Decomposition',
-    },
-    {
-      component: <MsAssociation calculateAssociation={calculateAssociation} />,
-      id: 'msAssociation',
-      name: 'MS Association',
-    },
-    {
-      component: (
-        <MsLandscape
-          calculateLandscape={calculateLandscape}
-          handleVariable={handleVariable}
-        />
-      ),
-      id: 'msLandscape',
-      name: 'MS Landscape',
-    },
-    {
-      component: <MsPrevalence calculatePrevalence={calculatePrevalence} />,
-      id: 'msPrevalence',
-      name: 'MS Prevalence',
-    },
-    {
-      component: <MSIndividual calculateIndividual={calculateIndividual} />,
-      id: 'msIndividaul',
-      name: 'MS Individual',
-    },
-    source == 'public' ? (
-      {
-        component: <Download exposureDownload={exposureDownload} />,
-        id: 'download',
-        name: 'Download',
-      }
-    ) : (
-      <></>
-    ),
-  ];
+  const tabs =
+    source == 'user'
+      ? [
+          {
+            component: <Instructions loading={loading} />,
+            id: 'instructions',
+            name: 'Instructions',
+          },
+          {
+            component: <TMB />,
+            id: 'tmb',
+            name: 'TMB',
+          },
+          {
+            component: <TmbSig />,
+            id: 'tmbSig',
+            name: 'TMB Signatures',
+          },
+          {
+            component: <MsBurden calculateBurden={calculateBurden} />,
+            id: 'msBurden',
+            name: 'MS Burden',
+          },
+          {
+            component: <MsDecomposition />,
+            id: 'msDecomposition',
+            name: 'MS Decomposition',
+          },
+          {
+            component: (
+              <MsAssociation calculateAssociation={calculateAssociation} />
+            ),
+            id: 'msAssociation',
+            name: 'MS Association',
+          },
+          {
+            component: (
+              <MsLandscape
+                calculateLandscape={calculateLandscape}
+                handleVariable={handleVariable}
+              />
+            ),
+            id: 'msLandscape',
+            name: 'MS Landscape',
+          },
+          {
+            component: (
+              <MsPrevalence calculatePrevalence={calculatePrevalence} />
+            ),
+            id: 'msPrevalence',
+            name: 'MS Prevalence',
+          },
+          {
+            component: (
+              <MSIndividual calculateIndividual={calculateIndividual} />
+            ),
+            id: 'msIndividaul',
+            name: 'MS Individual',
+          },
+          source == 'public' ? (
+            {
+              component: <Download exposureDownload={exposureDownload} />,
+              id: 'download',
+              name: 'Download',
+            }
+          ) : (
+            <></>
+          ),
+        ]
+      : [
+          {
+            component: <Instructions loading={loading} />,
+            id: 'instructions',
+            name: 'Instructions',
+          },
+          {
+            component: <TMB2 />,
+            id: 'tmb',
+            name: 'TMB',
+          },
+        ];
 
   return (
     <div className="position-relative">
@@ -698,22 +711,7 @@ export default function Exposure({ match }) {
           </div>
         </SidebarPanel>
         <MainPanel>
-          <div style={{ minHeight: '500px' }}>
-            <div className="bg-white border rounded">
-              <ErrorBoundary
-                fallback={
-                  <Alert variant="danger">
-                    An internal error prevented data from loading. Please
-                    contact the website administrator if this problem persists.
-                  </Alert>
-                }
-              >
-                <Suspense fallback={<Loader message="Loading" />}>
-                  {tabs.filter((tab) => tab.id == displayTab)[0].component}
-                </Suspense>
-              </ErrorBoundary>
-            </div>
-          </div>
+          {tabs.filter((tab) => tab.id == displayTab)[0].component}
         </MainPanel>
       </SidebarContainer>
     </div>

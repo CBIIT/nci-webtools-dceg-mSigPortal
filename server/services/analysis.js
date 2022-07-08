@@ -816,6 +816,35 @@ async function visualizationData(req, res, next) {
   }
 }
 
+// query public exploration options for exploration tab
+async function explorationOptions(req, res, next) {
+  try {
+    const connection = req.app.locals.connection;
+
+    const query = { ...req.query };
+    const columns = ['study', 'strategy', 'cancer', 'signatureSetName'];
+    const data = await getExposureData(connection, query, columns);
+    res.json(data);
+  } catch (error) {
+    next(error);
+  }
+}
+
+// query public exploration data for exploration tab
+async function explorationTmbData(req, res, next) {
+  try {
+    const { study, strategy, signatureSetName } = req.query;
+    const connection = req.app.locals.connection;
+
+    const query = { study, strategy, signatureSetName };
+    const columns = ['cancer', 'exposure'];
+    const data = await getExposureData(connection, query, columns);
+    res.json(data);
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function querySeqmatrix(req, res, next) {
   try {
     const { study, cancer, strategy, sample, profile, matrix, s3 } = req.query;
@@ -926,6 +955,8 @@ module.exports = {
   downloadWorkspace,
   associationWrapper,
   visualizationData,
+  explorationOptions,
+  explorationTmbData,
   querySeqmatrix,
   queryExposure,
   querySignature,

@@ -1,37 +1,38 @@
 import React from 'react';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { Link } from 'react-router-dom';
+import { Container } from 'react-bootstrap';
 
-export default function Instructions({ loading }) {
+export default function Instructions({ props, loading }) {
   const examples = [
-    {
-      title: 'Sherlock-Lung-232',
-      path: 'sherlock-lung-232',
-    },
-    {
-      title: 'Mutographs-ESCC',
-      path: 'mutographs-escc',
-    },
-    {
-      title: 'PCAWG Lung-AdenoCA',
-      path: 'pcawg-lungadenoca',
-    },
-    {
-      title: 'PCAWG Lung-SCC',
-      path: 'pcawg-lungscc',
-    },
-    {
-      title: 'PCAWG Breast-AdenoCA',
-      path: 'pcawg-breastadenoca',
-    },
-    {
-      title: 'PCAWG Skin-Melanoma',
-      path: 'pcawg-skinmelanoma',
-    },
+    // {
+    //   title: 'Sherlock-Lung-232',
+    //   path: 'sherlock-lung-232',
+    // },
+    // {
+    //   title: 'Mutographs-ESCC',
+    //   path: 'mutographs-escc',
+    // },
+    // {
+    //   title: 'PCAWG Lung-AdenoCA',
+    //   path: 'pcawg-lungadenoca',
+    // },
+    // {
+    //   title: 'PCAWG Lung-SCC',
+    //   path: 'pcawg-lungscc',
+    // },
+    // {
+    //   title: 'PCAWG Breast-AdenoCA',
+    //   path: 'pcawg-breastadenoca',
+    // },
+    // {
+    //   title: 'PCAWG Skin-Melanoma',
+    //   path: 'pcawg-skinmelanoma',
+    // },
   ];
 
   return (
-    <div className="py-3 px-4">
+    <Container fluid className="bg-white border rounded p-3" {...props}>
       <LoadingOverlay active={loading} />
       <h4>Instructions</h4>
       <p>
@@ -65,6 +66,6 @@ export default function Instructions({ loading }) {
           )}
         </div>
       ))}
-    </div>
+    </Container>
   );
 }

@@ -24,6 +24,8 @@ const {
   queryExposure,
   querySignature,
   visualizationData,
+  explorationOptions,
+  explorationTmbData,
 } = require('../analysis');
 
 const router = express.Router();
@@ -78,6 +80,10 @@ router.post('/downloadWorkspace', downloadWorkspace);
 router.post('/associationWrapper', associationWrapper);
 
 router.get('/visualizationData', visualizationData);
+
+router.get('/explorationOptions', explorationOptions);
+
+router.get('/explorationTmbData', explorationTmbData);
 
 router.get('/seqmatrix', querySeqmatrix);
 
