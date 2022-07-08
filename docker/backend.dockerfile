@@ -78,7 +78,7 @@ COPY server/package*.json /deploy/server/
 RUN npm install
 
 # copy the rest of the application
-COPY . /deploy/
+COPY server .
 
 CMD npm start
 
