@@ -8,8 +8,8 @@ export const tmbApiSlice = apiSlice.injectEndpoints({
         url: 'explorationTmbData',
         params,
       }),
-      transformResponse: (data) => {
-        return TMB(data);
+      transformResponse: (data, meta, arg) => {
+        return TMB(data, arg.study);
       },
     }),
   }),
