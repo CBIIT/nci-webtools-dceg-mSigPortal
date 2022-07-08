@@ -1,6 +1,6 @@
 export default function ID28(data, sample) {
-  console.log("data");
-  console.log(data);
+  //.log("data");
+  //console.log(data);
   const colors = {
     "1:Del:C": "#FBBD6F",
     "1:Del:T": "#FE8002",
@@ -18,7 +18,7 @@ export default function ID28(data, sample) {
 
   const arrayIDAnnXTop = ["1bp Deletion", "1bp Insertion", ">1bp"],
     arrayIDAnnXBot = ["Homopolymer Length", "Homopolymer Length", "Type"],
-    arrayIDAnnXLabel = [5, 15, 25],
+    arrayIDAnnXLabel = [5, 17, 25],
     arrayIDAnnotationTop = [],
     arrayIDAnnotationBot = [];
 
@@ -29,9 +29,6 @@ export default function ID28(data, sample) {
 
   const data1 = data.slice(0, data.length - 4);
   const data2 = data.slice(-4);
-
-  console.log(data1);
-  console.log(data2);
 
   // group data by dominant mutation
   const groupByMutation = data1.reduce((groups, e, i) => {
@@ -50,27 +47,6 @@ export default function ID28(data, sample) {
   const groupByFirstGroup = Object.fromEntries(
     Object.entries(groupByMutation).slice(0, 4)
   );
-
-  const groupByMutationID = data1.reduce((groups, e) => {
-    let mutationID;
-    mutationID = e.mutationType.match(
-      e.mutationType.substring(
-        e.mutationType.length - 3,
-        e.mutationType.length - 2
-      )
-    );
-    const signature = {
-      mutationType: e.mutationType,
-      contribution: e.mutations,
-    };
-    groups[mutationID] = groups[mutationID]
-      ? [...groups[mutationID], signature]
-      : [signature];
-    return groups;
-  }, {});
-
-  console.log("groupByMutationID");
-  console.log(groupByMutationID);
 
   const arrayID1 = Object.keys(groupByFirstGroup).map(function (key) {
     return groupByFirstGroup[key];
@@ -99,7 +75,6 @@ export default function ID28(data, sample) {
   const flatSorted = Object.values(arrayID).flat();
 
   Object.values(arrayID).forEach((group) => {
-    console.log(group);
     if (group.length > 1) {
       arrayIDAnnotationTop.push(
         group[Math.floor(group.length / 2)].mutationType
@@ -111,10 +86,7 @@ export default function ID28(data, sample) {
       arrayIDAnnotationBot.push(e.mutationType);
     });
   });
-  console.log("arrayIDAnnotationTop");
-  console.log(arrayIDAnnotationTop);
-  console.log("arrayIDAnnotationBot");
-  console.log(arrayIDAnnotationBot);
+
   const traces = Object.entries(arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
       name: mutation,

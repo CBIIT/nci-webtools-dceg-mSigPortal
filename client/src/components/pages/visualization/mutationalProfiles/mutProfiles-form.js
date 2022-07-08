@@ -1,16 +1,16 @@
-import React, { useEffect } from 'react';
-import { Form, Row, Col } from 'react-bootstrap';
-import { useForm } from 'react-hook-form';
-import Select from '../../../controls/select/selectForm';
-import Description from '../../../controls/description/description';
-import { useSelector, useDispatch } from 'react-redux';
-import { actions as visualizationActions } from '../../../../services/store/visualization';
+import React, { useEffect } from "react";
+import { Form, Row, Col } from "react-bootstrap";
+import { useForm } from "react-hook-form";
+import Select from "../../../controls/select/selectForm";
+import Description from "../../../controls/description/description";
+import { useSelector, useDispatch } from "react-redux";
+import { actions as visualizationActions } from "../../../../services/store/visualization";
 import {
   defaultProfile2,
   defaultMatrix2,
   defaultFilter2,
-} from '../../../../services/utils';
-import { NavHashLink } from 'react-router-hash-link';
+} from "../../../../services/utils";
+import { NavHashLink } from "react-router-hash-link";
 
 const actions = { ...visualizationActions };
 
@@ -26,6 +26,12 @@ export default function TreeLeafForm() {
 
   const { control, setValue, watch } = useForm();
 
+  const supportMatrix = [6, 24, 96, 192, 288, 384, 1536, 78, 186, 28, 83, 415];
+  //const supportMatrixSBS = [6, 24, 96, 192, 288, 384, 1536];
+  //const supportMatrixDBS = [78, 186];
+  //const supportMatrixID = [28, 83, 415];
+  //const unSupportMatrix = [4608, 6144, 150, 1248, 2400, 2976, 332, 8628];
+
   // populate controls
   useEffect(() => {
     if (samples.length && !sample) {
@@ -34,10 +40,12 @@ export default function TreeLeafForm() {
   }, [samples]);
 
   const sampleOptions = samples.length
-    ? [...new Set(samples.map((d) => d.sample))].map((e) => ({
-        label: e,
-        value: e,
-      }))
+    ? [...new Set(samples.map((d) => d.sample))]
+        .map((e) => ({
+          label: e,
+          value: e,
+        }))
+        .sort((a, b) => a - b)
     : [];
 
   const profileOptions = (sample) =>
@@ -57,7 +65,12 @@ export default function TreeLeafForm() {
       ? [
           ...new Set(
             samples
-              .filter((e) => e.sample && e.profile == profile.value)
+              .filter(
+                (e) =>
+                  e.sample &&
+                  e.profile == profile.value &&
+                  supportMatrix.includes(e.matrix)
+              )
               .map((e) => e.matrix)
               .sort((a, b) => a - b)
           ),
@@ -164,7 +177,7 @@ export default function TreeLeafForm() {
               onChange={handleMatrix}
             />
           </Col>
-          {source == 'user' && (
+          {source == "user" && (
             <Col lg="auto">
               <Select
                 name="filter"

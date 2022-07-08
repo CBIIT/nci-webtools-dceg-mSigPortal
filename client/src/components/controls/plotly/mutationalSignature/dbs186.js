@@ -8,8 +8,8 @@ export default function DBS186(data, sample) {
 
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-  console.log("data");
-  console.log(data);
+  //console.log("data");
+  //console.log(data);
 
   const arrayDataT = [];
   const arrayDataU = [];

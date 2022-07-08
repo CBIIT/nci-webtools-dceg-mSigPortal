@@ -7,8 +7,8 @@ export default function SBS384(data, sample) {
     "T>C": "#A1CE63",
     "T>G": "#EBC6C4",
   };
-  console.log("data--:");
-  console.log(data);
+  // console.log("data--:");
+  // console.log(data);
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 
@@ -25,10 +25,6 @@ export default function SBS384(data, sample) {
   }, {});
   const flatSorted = Object.values(groupByMutation).flat();
 
-  console.log("groupByMutation:");
-  console.log(groupByMutation);
-  console.log("FlatSorted");
-  console.log(flatSorted);
   //group data by 1st letter
 
   const dataT = [];
@@ -49,13 +45,7 @@ export default function SBS384(data, sample) {
 
   const dataUT = [...dataT, ...dataU];
   const maxVal = Math.max(...dataUT.map((o) => o.contribution));
-  console.log("maxVal--:");
-  console.log(maxVal);
 
-  console.log("dataT");
-  console.log(dataT);
-  console.log("dataU");
-  console.log(dataU);
   const groupByMutationU = dataU.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
     const mutation = e.mutationType.match(mutationRegex)[1];
@@ -68,8 +58,7 @@ export default function SBS384(data, sample) {
       : [signature];
     return groups;
   }, {});
-  console.log("groupByMutationU");
-  console.log(groupByMutationU);
+
   const flatSortedU = Object.values(groupByMutationU)
     .flat()
     .sort((a, b) =>
@@ -82,8 +71,6 @@ export default function SBS384(data, sample) {
         .substring(2, 5)
         .localeCompare(b.mutationType.substring(2, 5))
     );
-  console.log("flatSortedU");
-  console.log(flatSortedU);
 
   const groupByMutationT = dataT.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
@@ -98,8 +85,6 @@ export default function SBS384(data, sample) {
     return groups;
   }, {});
 
-  console.log("groupByMutationT");
-  console.log(groupByMutationT);
   const flatSortedT = Object.values(groupByMutationT)
     .flat()
     .sort((a, b) =>
@@ -122,13 +107,6 @@ export default function SBS384(data, sample) {
         .substring(2, 5)
         .localeCompare(b.mutationType.substring(2, 5))
     );
-  console.log("flatSortedT");
-  console.log(flatSortedT);
-
-  console.log("dataT");
-  console.log(dataT);
-  console.log("dataU");
-  console.log(dataU);
 
   const tracesT = {
     name: "Transcrribed Strand",
@@ -141,7 +119,6 @@ export default function SBS384(data, sample) {
     showlegend: true,
   };
 
-  console.log(tracesT);
   const tracesU = {
     name: "Untranscribed",
     type: "bar",
@@ -152,7 +129,6 @@ export default function SBS384(data, sample) {
     hoverinfo: "x+y",
     showlegend: true,
   };
-  console.log(tracesU);
 
   const traces = [tracesT, tracesU];
 
@@ -177,9 +153,6 @@ export default function SBS384(data, sample) {
     })
   );
 
-  console.log("annotations:");
-  console.log(annotations);
-
   const xannotations = flatSortedT.map((num, index) => ({
     xref: "x",
     yref: "paper",
@@ -201,9 +174,6 @@ export default function SBS384(data, sample) {
     index: index,
     textangle: -90,
   }));
-
-  console.log("xannotations");
-  console.log(xannotations);
 
   const sampleAnnotation = {
     xref: "paper",
