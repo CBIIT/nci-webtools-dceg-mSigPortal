@@ -1,4 +1,6 @@
 export default function TMB(data, study) {
+  console.log("data:");
+  console.log(data);
   const genome = { PCAWG: "GRCh37", TCGA: "GRCh37" };
   const genomeSize = { GRCh37: 3101976562 / Math.pow(10, 6) };
 
@@ -7,15 +9,18 @@ export default function TMB(data, study) {
     return sum / arr.length || 0;
   }
   const groupByCancer = data.reduce((groups, e) => {
-    const cancerName = e.Cancer_Type;
+    const cancerName = e.cancer;
     groups[cancerName] = groups[cancerName] ? [...groups[cancerName], e] : [e];
     return groups;
   }, {});
 
+  console.log("group by cancer:");
+  console.log(groupByCancer);
+
   const groupBySamples = Object.entries(groupByCancer).map(
     ([cancerName, cancerArray]) => {
       const sampleGroups = cancerArray.reduce((sampleGroup, e) => {
-        const sampleName = e.Sample;
+        const sampleName = e.cancer;
         sampleGroup[sampleName] = sampleGroup[sampleName]
           ? [...sampleGroup[sampleName], e]
           : [e];
@@ -26,18 +31,19 @@ export default function TMB(data, study) {
     },
     {}
   );
-  console.log("data:");
-  console.log(data);
-  console.log("group by cancer:");
-  console.log(groupByCancer);
 
+  console.log("groupBySamples");
+  console.log(groupBySamples);
   const burdenQuotient = genomeSize[genome[study]];
+
+  console.log("burdenQuotient");
+  console.log(burdenQuotient);
   const cancerBurden = groupBySamples.map(({ cancer, samples }) => {
     const sampleBurden = Object.entries(samples).map(
-      ([sampleName, sampleArray]) => ({
-        sample: sampleName,
+      ([cancerName, sampleArray]) => ({
+        sample: cancerName,
         burden: Math.log10(
-          sampleArray.reduce((sum, e) => e.Exposure + sum, 0) / burdenQuotient
+          sampleArray.reduce((sum, e) => e.exposure + sum, 0) / burdenQuotient
         ),
       })
     );
