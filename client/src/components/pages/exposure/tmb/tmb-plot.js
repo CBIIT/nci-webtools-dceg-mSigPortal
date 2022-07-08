@@ -24,7 +24,7 @@ export default function MutProfilePlot() {
   }, [publicForm]);
 
   return (
-    <div>
+    <div style={{ minHeight: '400px' }}>
       <LoadingOverlay active={isFetching} />
       {data && (
         <Plot

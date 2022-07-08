@@ -1,7 +1,4 @@
-import React, { useState, useEffect, Suspense } from 'react';
-import { Alert, Container } from 'react-bootstrap';
-import Loader from '../../controls/loader/loader';
-import ErrorBoundary from '../../controls/errorBoundary/error-boundary';
+import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { saveAs } from 'file-saver';
@@ -714,22 +711,7 @@ export default function Exposure({ match }) {
           </div>
         </SidebarPanel>
         <MainPanel>
-          <div style={{ minHeight: '500px' }}>
-            <div className="bg-white border rounded">
-              <ErrorBoundary
-                fallback={
-                  <Alert variant="danger">
-                    An internal error prevented data from loading. Please
-                    contact the website administrator if this problem persists.
-                  </Alert>
-                }
-              >
-                <Suspense fallback={<Loader message="Loading" />}>
-                  {tabs.filter((tab) => tab.id == displayTab)[0].component}
-                </Suspense>
-              </ErrorBoundary>
-            </div>
-          </div>
+          {tabs.filter((tab) => tab.id == displayTab)[0].component}
         </MainPanel>
       </SidebarContainer>
     </div>
