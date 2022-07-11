@@ -1,11 +1,11 @@
 export default function SBS288(data, sample) {
   const colors = {
-    "C>A": "#03BCEE",
-    "C>G": "black",
-    "C>T": "#E32926",
-    "T>A": "#CAC9C9",
-    "T>C": "#A1CE63",
-    "T>G": "#EBC6C4",
+    'C>A': '#03BCEE',
+    'C>G': 'black',
+    'C>T': '#E32926',
+    'T>A': '#CAC9C9',
+    'T>C': '#A1CE63',
+    'T>G': '#EBC6C4',
   };
   //   console.log("data--:");
   //   console.log(data);
@@ -15,9 +15,9 @@ export default function SBS288(data, sample) {
   const arrayDataN = [];
 
   Object.values(data).forEach((group) => {
-    if (group.mutationType.substring(0, 1) === "T") {
+    if (group.mutationType.substring(0, 1) === 'T') {
       arrayDataT.push(group);
-    } else if (group.mutationType.substring(0, 1) === "U") {
+    } else if (group.mutationType.substring(0, 1) === 'U') {
       arrayDataU.push(group);
     } else {
       arrayDataN.push(group);
@@ -32,7 +32,7 @@ export default function SBS288(data, sample) {
   //   console.log(arrayDataN);
 
   const numberWithCommas = (x) =>
-    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
 
   const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
   const maxVal = Math.max(...data.map((o) => o.mutations));
@@ -84,7 +84,7 @@ export default function SBS288(data, sample) {
   const tracesBarTotal = Object.entries(groupByTotal).map(
     ([mutation, signatures], groupIndex, array) => ({
       name: mutation,
-      type: "bar",
+      type: 'bar',
       marker: { color: colors[mutation] },
       //   x: signatures.map((e) => e.mutationType),
       //x: signatures.map((e, i) => groupIndex * signatures.length + i),
@@ -95,7 +95,7 @@ export default function SBS288(data, sample) {
             .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
       ),
       y: signatures.map((e) => e.contribution),
-      hoverinfo: "x+y",
+      hoverinfo: 'x+y',
       showlegend: false,
     })
   );
@@ -222,14 +222,14 @@ export default function SBS288(data, sample) {
 
   Object.entries(flatSortedFirstLetter).forEach(
     ([key, value], groupIndex, array) => {
-      if (value.mutationType === "T") {
-        value.mutationType = "All";
+      if (value.mutationType === 'T') {
+        value.mutationType = 'All';
         flatSortedT.push(value);
-      } else if (value.mutationType === "U") {
-        value.mutationType = "All";
+      } else if (value.mutationType === 'U') {
+        value.mutationType = 'All';
         flatSortedU.push(value);
       } else {
-        value.mutationType = "All";
+        value.mutationType = 'All';
         flatSortedN.push(value);
       }
     }
@@ -249,59 +249,59 @@ export default function SBS288(data, sample) {
   //   console.log(flatSortedU);
   //   console.log(flatSortedN);
   const tracesT = {
-    name: "Transcrribed",
-    type: "bar",
-    marker: { color: "#004765" },
+    name: 'Transcrribed',
+    type: 'bar',
+    marker: { color: '#004765' },
 
     x: flatSortedT.map((element, index, array) => element.total),
     y: flatSortedT.map(
       (element, index, array) => `<b>${element.mutationType}<b>`
     ),
-    xaxis: "x2",
-    yaxis: "y2",
-    hoverinfo: "x2+y2",
+    xaxis: 'x2',
+    yaxis: 'y2',
+    hoverinfo: 'x2+y2',
     showlegend: true,
-    orientation: "h",
+    orientation: 'h',
   };
 
   const tracesU = {
-    name: "Untranscribed",
-    type: "bar",
-    marker: { color: "#E32925" },
+    name: 'Untranscribed',
+    type: 'bar',
+    marker: { color: '#E32925' },
     x: flatSortedU.map((element, index, array) => element.total),
     y: flatSortedU.map(
       (element, index, array) => `<b>${element.mutationType}<b>`
     ),
-    xaxis: "x2",
-    yaxis: "y2",
-    hoverinfo: "x2+y2",
+    xaxis: 'x2',
+    yaxis: 'y2',
+    hoverinfo: 'x2+y2',
     showlegend: true,
-    orientation: "h",
+    orientation: 'h',
   };
 
   const tracesN = {
-    name: "Nontranscribed",
-    type: "bar",
-    marker: { color: "#008001" },
+    name: 'Nontranscribed',
+    type: 'bar',
+    marker: { color: '#008001' },
     x: flatSortedN.map((element, index, array) => element.total),
     y: flatSortedN.map(
       (element, index, array) => `<b>${element.mutationType}<b>`
     ),
-    xaxis: "x2",
-    yaxis: "y2",
-    hoverinfo: "x2+y2",
+    xaxis: 'x2',
+    yaxis: 'y2',
+    hoverinfo: 'x2+y2',
     showlegend: true,
-    orientation: "h",
+    orientation: 'h',
   };
 
   const traces = [...tracesBarTotal, tracesN, tracesU, tracesT];
   //   console.log("traces:");
   //   console.log(traces);
   const xannotations = flatSortedTotal.map((num, index) => ({
-    xref: "x",
-    yref: "paper",
-    xanchor: "bottom",
-    yanchor: "bottom",
+    xref: 'x',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
     x: index,
     y: -0.1,
     text: num.mutationType.replace(
@@ -313,7 +313,7 @@ export default function SBS288(data, sample) {
       size: 10,
       color: colors[num.mutationType.substring(2, 5)],
     },
-    align: "center",
+    align: 'center',
     num: num,
     index: index,
     textangle: -90,
@@ -321,10 +321,10 @@ export default function SBS288(data, sample) {
 
   const annotations = Object.entries(groupByTotal).map(
     ([mutation, signatures], groupIndex, array) => ({
-      xref: "x",
-      yref: "paper",
-      xanchor: "bottom",
-      yanchor: "bottom",
+      xref: 'x',
+      yref: 'paper',
+      xanchor: 'bottom',
+      yanchor: 'bottom',
       x:
         array
           .slice(0, groupIndex)
@@ -336,31 +336,31 @@ export default function SBS288(data, sample) {
       font: {
         size: 18,
       },
-      align: "center",
+      align: 'center',
     })
   );
 
   const sampleAnnotation = {
-    xref: "paper",
-    yref: "paper",
-    xanchor: "bottom",
-    yanchor: "bottom",
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
     x: 0,
     y: 0.92,
     text:
-      "<b>" + sample + ": " + numberWithCommas(totalMutations) + " subs </b>",
+      '<b>' + sample + ': ' + numberWithCommas(totalMutations) + ' subs </b>',
     showarrow: false,
     font: {
       size: 18,
     },
-    align: "center",
+    align: 'center',
   };
 
   const shapes = Object.entries(groupByTotal).map(
     ([mutation, _], groupIndex, array) => ({
-      type: "rect",
-      xref: "x",
-      yref: "paper",
+      type: 'rect',
+      xref: 'x',
+      yref: 'paper',
       x0: array
         .slice(0, groupIndex)
         .reduce((x0, [_, sigs]) => x0 + sigs.length, -0.4),
@@ -380,18 +380,18 @@ export default function SBS288(data, sample) {
   // console.log(shapes);
 
   const layout = {
-    hoverlabel: { bgcolor: "#FFF" },
+    hoverlabel: { bgcolor: '#FFF' },
     bargap: 0.3,
     legend: {
       x: 1,
-      xanchor: "right",
+      xanchor: 'right',
       y: 0,
-      traceorder: "reversed",
+      traceorder: 'reversed',
     },
     grid: {
       rows: 1,
       columns: 2,
-      pattern: "independent",
+      pattern: 'independent',
     },
     xaxis: {
       showticklabels: false,
@@ -400,22 +400,22 @@ export default function SBS288(data, sample) {
       tickfont: {
         size: 10,
       },
-      tickmode: "array",
+      tickmode: 'array',
       tickvals: flatSortedTotal.map((_, i) => i),
       // ticktext: flatSorted.map((e) =>
       //   e.mutationType.replace(/\[(.*)\]/, e.mutationType.substring(2, 3))
       // ),
       ticktext: flatSortedTotal.map((e) => e.mutationType),
-      linecolor: "black",
+      linecolor: 'black',
       linewidth: 1,
       mirror: true,
       domain: [0, 0.77],
     },
     yaxis: {
-      title: "Number of Single Base Substitutions",
+      title: 'Number of Single Base Substitutions',
       autorange: false,
       range: [0, maxValTotal + maxValTotal * 0.15],
-      linecolor: "black",
+      linecolor: 'black',
       linewidth: 1,
       mirror: true,
     },
@@ -434,8 +434,8 @@ export default function SBS288(data, sample) {
       tickfont: {
         size: 12,
       },
-      anchor: "x2",
-      categoryorder: "category descending",
+      anchor: 'x2',
+      categoryorder: 'category descending',
     },
 
     shapes: shapes,

@@ -1,16 +1,16 @@
 export default function SBS96(data, sample) {
   const colors = {
-    "C>A": "#03BCEE",
-    "C>G": "black",
-    "C>T": "#E32926",
-    "T>A": "#CAC9C9",
-    "T>C": "#A1CE63",
-    "T>G": "#EBC6C4",
+    'C>A': '#03BCEE',
+    'C>G': 'black',
+    'C>T': '#E32926',
+    'T>A': '#CAC9C9',
+    'T>C': '#A1CE63',
+    'T>G': '#EBC6C4',
   };
   //console.log("data--:");
   //console.log(data);
   const numberWithCommas = (x) =>
-    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
 
   const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
   const maxVal = Math.max(...data.map((o) => o.mutations));
@@ -39,7 +39,7 @@ export default function SBS96(data, sample) {
   const traces = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
       name: mutation,
-      type: "bar",
+      type: 'bar',
       marker: { color: colors[mutation] },
       //   x: signatures.map((e) => e.mutationType),
       //x: signatures.map((e, i) => groupIndex * signatures.length + i),
@@ -50,7 +50,7 @@ export default function SBS96(data, sample) {
             .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
       ),
       y: signatures.map((e) => e.contribution),
-      hoverinfo: "x+y",
+      hoverinfo: 'x+y',
       showlegend: false,
     })
   );
@@ -59,10 +59,10 @@ export default function SBS96(data, sample) {
 
   const annotations = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
-      xref: "x",
-      yref: "paper",
-      xanchor: "bottom",
-      yanchor: "bottom",
+      xref: 'x',
+      yref: 'paper',
+      xanchor: 'bottom',
+      yanchor: 'bottom',
       x:
         array
           .slice(0, groupIndex)
@@ -74,15 +74,15 @@ export default function SBS96(data, sample) {
       font: {
         size: 18,
       },
-      align: "center",
+      align: 'center',
     })
   );
 
   const xannotations = flatSorted.map((num, index) => ({
-    xref: "x",
-    yref: "paper",
-    xanchor: "bottom",
-    yanchor: "bottom",
+    xref: 'x',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
     x: index,
     y: -0.065,
     text: num.mutationType.replace(
@@ -94,33 +94,33 @@ export default function SBS96(data, sample) {
       size: 10,
       color: colors[num.mutationType.substring(2, 5)],
     },
-    align: "center",
+    align: 'center',
     num: num,
     index: index,
     textangle: -90,
   }));
 
   const sampleAnnotation = {
-    xref: "paper",
-    yref: "paper",
-    xanchor: "bottom",
-    yanchor: "bottom",
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
     x: 0,
     y: 0.92,
     text:
-      "<b>" + sample + ": " + numberWithCommas(totalMutations) + " subs </b>",
+      '<b>' + sample + ': ' + numberWithCommas(totalMutations) + ' subs </b>',
     showarrow: false,
     font: {
       size: 18,
     },
-    align: "center",
+    align: 'center',
   };
 
   const shapes = Object.entries(groupByMutation).map(
     ([mutation, _], groupIndex, array) => ({
-      type: "rect",
-      xref: "x",
-      yref: "paper",
+      type: 'rect',
+      xref: 'x',
+      yref: 'paper',
       x0: array
         .slice(0, groupIndex)
         .reduce((x0, [_, sigs]) => x0 + sigs.length, -0.4),
@@ -140,7 +140,7 @@ export default function SBS96(data, sample) {
   // console.log(shapes);
 
   const layout = {
-    hoverlabel: { bgcolor: "#FFF" },
+    hoverlabel: { bgcolor: '#FFF' },
     bargap: 0.3,
     xaxis: {
       showticklabels: false,
@@ -149,21 +149,21 @@ export default function SBS96(data, sample) {
       tickfont: {
         size: 10,
       },
-      tickmode: "array",
+      tickmode: 'array',
       tickvals: flatSorted.map((_, i) => i),
       // ticktext: flatSorted.map((e) =>
       //   e.mutationType.replace(/\[(.*)\]/, e.mutationType.substring(2, 3))
       // ),
       ticktext: flatSorted.map((e) => e.mutationType),
-      linecolor: "black",
+      linecolor: 'black',
       linewidth: 1,
       mirror: true,
     },
     yaxis: {
-      title: "Number of Single Base Substitutions",
+      title: 'Number of Single Base Substitutions',
       autorange: false,
       range: [0, maxVal + maxVal * 0.15],
-      linecolor: "black",
+      linecolor: 'black',
       linewidth: 1,
       mirror: true,
     },

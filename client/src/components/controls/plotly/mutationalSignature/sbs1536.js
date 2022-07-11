@@ -1,33 +1,33 @@
 export default function SBS96(data, sample) {
   const colors = {
-    "C>A": "#03BCEE",
-    "C>G": "black",
-    "C>T": "#E32926",
-    "T>A": "#CAC9C9",
-    "T>C": "#A1CE63",
-    "T>G": "#EBC6C4",
+    'C>A': '#03BCEE',
+    'C>G': 'black',
+    'C>T': '#E32926',
+    'T>A': '#CAC9C9',
+    'T>C': '#A1CE63',
+    'T>G': '#EBC6C4',
   };
 
   const heatmapColorscale = [
-    [0, "rgb(56,56,156"],
-    [0.2, "rgb(56,56,156"],
-    [0.2, "rgb(106,106,128"],
-    [0.4, "rgb(106,106,128"],
-    [0.4, "rgb(155,146,98"],
-    [0.6, "rgb(155,146,98"],
-    [0.6, "rgb(205,186,69"],
-    [0.8, "rgb(205,186,69"],
-    [0.8, "rgb(255,255,39)"],
-    [1, "rgb(255,255,39)"],
+    [0, 'rgb(56,56,156'],
+    [0.2, 'rgb(56,56,156'],
+    [0.2, 'rgb(106,106,128'],
+    [0.4, 'rgb(106,106,128'],
+    [0.4, 'rgb(155,146,98'],
+    [0.6, 'rgb(155,146,98'],
+    [0.6, 'rgb(205,186,69'],
+    [0.8, 'rgb(205,186,69'],
+    [0.8, 'rgb(255,255,39)'],
+    [1, 'rgb(255,255,39)'],
   ];
   const numberWithCommas = (x) =>
-    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
   const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
   const chunks = (a, size) =>
     Array.from(new Array(Math.ceil(a.length / size)), (_, i) =>
       a.slice(i * size, i * size + size)
     );
-  console.log("data--:");
+  console.log('data--:');
   console.log(data);
   // const maxValMutation = Math.max(...data.map((o) => o.mutations));
   // console.log("maxValMutation:---");
@@ -89,7 +89,7 @@ export default function SBS96(data, sample) {
   const tracesBar = Object.entries(groupByTotal).map(
     ([mutation, signatures], groupIndex, array) => ({
       name: mutation,
-      type: "bar",
+      type: 'bar',
       marker: { color: colors[mutation] },
       //   x: signatures.map((e) => e.mutationType),
       //x: signatures.map((e, i) => groupIndex * signatures.length + i),
@@ -100,7 +100,7 @@ export default function SBS96(data, sample) {
             .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
       ),
       y: signatures.map((e) => e.contribution),
-      hoverinfo: "x+y",
+      hoverinfo: 'x+y',
       showlegend: false,
     })
   );
@@ -161,10 +161,10 @@ export default function SBS96(data, sample) {
   );
 
   let heatmapY2_c = [
-    heatmapY2[0][0].charAt(0) + "--N",
-    heatmapY2[0][16].charAt(0) + "--N",
-    heatmapY2[0][32].charAt(0) + "--N",
-    heatmapY2[0][48].charAt(0) + "--N",
+    heatmapY2[0][0].charAt(0) + '--N',
+    heatmapY2[0][16].charAt(0) + '--N',
+    heatmapY2[0][32].charAt(0) + '--N',
+    heatmapY2[0][48].charAt(0) + '--N',
   ];
 
   let heatMapZ2_0 = chunks(heatmapZ2[0], 16);
@@ -190,17 +190,17 @@ export default function SBS96(data, sample) {
     zmax: maxZ2 + maxZ2 * 0.1,
     z: num,
     y: heatmapY2_c,
-    type: "heatmap",
+    type: 'heatmap',
     hoverongaps: false,
-    xaxis: "x",
-    yaxis: "y2",
+    xaxis: 'x',
+    yaxis: 'y2',
     x: num.map(
       (e, i) =>
         array.slice(0, index).reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
     ),
     xgap: 0.1,
     ygap: 0.1,
-    hovertemplate: "x: %{x}<br>y: %{y}<br>Value: %{z}<extra></extra>",
+    hovertemplate: 'x: %{x}<br>y: %{y}<br>Value: %{z}<extra></extra>',
   }));
 
   ////// ------------------- Heat Map 2 --------------------------------////
@@ -283,10 +283,10 @@ export default function SBS96(data, sample) {
   );
 
   let heatmapY3_c = [
-    "N--" + heatmapY3[0][0].charAt(heatmapY3[0][0].length - 1),
-    "N--" + heatmapY3[0][16].charAt(heatmapY3[0][16].length - 1),
-    "N--" + heatmapY3[0][32].charAt(heatmapY3[0][32].length - 1),
-    "N--" + heatmapY3[0][48].charAt(heatmapY3[0][48].length - 1),
+    'N--' + heatmapY3[0][0].charAt(heatmapY3[0][0].length - 1),
+    'N--' + heatmapY3[0][16].charAt(heatmapY3[0][16].length - 1),
+    'N--' + heatmapY3[0][32].charAt(heatmapY3[0][32].length - 1),
+    'N--' + heatmapY3[0][48].charAt(heatmapY3[0][48].length - 1),
   ];
 
   let heatMapZ3_0 = chunks(heatmapZ3[0], 16);
@@ -313,17 +313,17 @@ export default function SBS96(data, sample) {
     zmax: maxZ3 + maxZ3 * 0.1,
     z: num,
     y: heatmapY3_c,
-    type: "heatmap",
+    type: 'heatmap',
     hoverongaps: false,
-    xaxis: "x",
-    yaxis: "y3",
+    xaxis: 'x',
+    yaxis: 'y3',
     x: num.map(
       (e, i) =>
         array.slice(0, index).reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
     ),
     xgap: 0.1,
     ygap: 0.1,
-    hovertemplate: "x: %{x}<br>y: %{y}<br>Value: %{z}<extra></extra>",
+    hovertemplate: 'x: %{x}<br>y: %{y}<br>Value: %{z}<extra></extra>',
   }));
 
   ////--------------------- Heat Map Total --------------------------//
@@ -352,7 +352,7 @@ export default function SBS96(data, sample) {
           : 0
       );
       console.log(value);
-      heatmapY.push(key.charAt(0) + "--" + key.charAt(key.length - 1));
+      heatmapY.push(key.charAt(0) + '--' + key.charAt(key.length - 1));
       heatmapZ.push(
         Object.entries(value).map(([k, v]) => v.contribution / totalMutations)
       );
@@ -367,7 +367,7 @@ export default function SBS96(data, sample) {
     }
   );
 
-  console.log("groupByMutationOuter");
+  console.log('groupByMutationOuter');
   console.log(groupByMutationOuter);
 
   heatmapZ.forEach((item, index) => {
@@ -396,17 +396,17 @@ export default function SBS96(data, sample) {
     zmax: maxZ + maxZ * 0.1,
     z: num,
     y: heatmapY,
-    type: "heatmap",
+    type: 'heatmap',
     hoverongaps: false,
-    xaxis: "x",
-    yaxis: "y4",
+    xaxis: 'x',
+    yaxis: 'y4',
     x: num.map(
       (e, i) =>
         array.slice(0, index).reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
     ),
     xgap: 0.1,
     ygap: 0.1,
-    hovertemplate: "x: %{x}<br>y: %{y}<br>Value: %{z}<extra></extra>",
+    hovertemplate: 'x: %{x}<br>y: %{y}<br>Value: %{z}<extra></extra>',
   }));
 
   const traces = [
@@ -420,10 +420,10 @@ export default function SBS96(data, sample) {
   // console.log(traces);
   const annotations = Object.entries(groupByTotal).map(
     ([mutation, signatures], groupIndex, array) => ({
-      xref: "x",
-      yref: "paper",
-      xanchor: "bottom",
-      yanchor: "bottom",
+      xref: 'x',
+      yref: 'paper',
+      xanchor: 'bottom',
+      yanchor: 'bottom',
       x:
         array
           .slice(0, groupIndex)
@@ -435,31 +435,31 @@ export default function SBS96(data, sample) {
       font: {
         size: 18,
       },
-      align: "center",
+      align: 'center',
     })
   );
 
   const sampleAnnotation = {
-    xref: "paper",
-    yref: "paper",
-    xanchor: "bottom",
-    yanchor: "bottom",
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
     x: 0,
     y: 0.95,
     text:
-      "<b>" + sample + ": " + numberWithCommas(totalMutations) + " subs </b>",
+      '<b>' + sample + ': ' + numberWithCommas(totalMutations) + ' subs </b>',
     showarrow: false,
     font: {
       size: 18,
     },
-    align: "center",
+    align: 'center',
   };
 
   const shapes = Object.entries(groupByTotal).map(
     ([mutation, _], groupIndex, array) => ({
-      type: "rect",
-      xref: "x",
-      yref: "paper",
+      type: 'rect',
+      xref: 'x',
+      yref: 'paper',
       x0: array
         .slice(0, groupIndex)
         .reduce((x0, [_, sigs]) => x0 + sigs.length, -0.4),
@@ -476,25 +476,25 @@ export default function SBS96(data, sample) {
   );
 
   const xannotations = flatSorted.map((num, index) => ({
-    xref: "x",
-    yref: "paper",
-    xanchor: "bottom",
-    yanchor: "bottom",
+    xref: 'x',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
     x: index,
     y: -0.07,
-    text: num.mutationType.replace(/\[(.*)\]/, "-"),
+    text: num.mutationType.replace(/\[(.*)\]/, '-'),
     showarrow: false,
     font: {
       size: 10,
       //   color: colors[num.mutationType.substring(2, 5)],
     },
-    align: "center",
+    align: 'center',
     num: num,
     index: index,
     textangle: -90,
   }));
   const layout = {
-    hoverlabel: { bgcolor: "#FFF" },
+    hoverlabel: { bgcolor: '#FFF' },
     grid: {
       rows: 4,
       columns: 1,
@@ -506,10 +506,10 @@ export default function SBS96(data, sample) {
       tickfont: {
         size: 8,
       },
-      tickmode: "array",
+      tickmode: 'array',
       tickvals: flatSorted.map((_, i) => i),
       ticktext: flatSorted.map((e) => e.mutationType),
-      linecolor: "black",
+      linecolor: 'black',
       linewidth: 1,
       mirror: true,
     },
@@ -517,17 +517,17 @@ export default function SBS96(data, sample) {
       //   title: "Number of Single Base Substitutions",
       autorange: false,
       range: [0, maxVal + maxVal * 0.2],
-      linecolor: "black",
+      linecolor: 'black',
       linewidth: 1,
       mirror: true,
       domain: [0.72, 1],
     },
     yaxis2: {
       autorange: true,
-      linecolor: "black",
+      linecolor: 'black',
       linewidth: 1,
       mirror: true,
-      anchor: "x",
+      anchor: 'x',
       tickfont: {
         size: 8,
       },
@@ -535,10 +535,10 @@ export default function SBS96(data, sample) {
     },
     yaxis3: {
       autorange: true,
-      linecolor: "black",
+      linecolor: 'black',
       linewidth: 1,
       mirror: true,
-      anchor: "x",
+      anchor: 'x',
       tickfont: {
         size: 8,
       },
@@ -546,10 +546,10 @@ export default function SBS96(data, sample) {
     },
     yaxis4: {
       autorange: true,
-      linecolor: "black",
+      linecolor: 'black',
       linewidth: 1,
       mirror: true,
-      anchor: "x",
+      anchor: 'x',
       //dtick: 1,
       tickfont: {
         size: 8,

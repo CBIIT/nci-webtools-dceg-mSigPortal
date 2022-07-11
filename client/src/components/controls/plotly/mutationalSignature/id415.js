@@ -2,69 +2,69 @@ export default function ID415(data, sample) {
   // console.log("data");
   // console.log(data);
   const colors = {
-    "1:Del:C": "#FBBD6F",
-    "1:Del:T": "#FE8002",
-    "1:Ins:C": "#AEDD8A",
-    "1:Ins:T": "#35A12E",
-    "2:Del:R": "#FCC9B4",
-    "3:Del:R": "#FB8969",
-    "4:Del:R": "#F04432",
-    "5:Del:R": "#BB1A1A",
-    "2:Ins:R": "#CFDFF0",
-    "3:Ins:R": "#93C3DE",
-    "4:Ins:R": "#4B97C7",
-    "5:Ins:R": "#1863AA",
-    "2:Del:M": "#E1E1EE",
-    "3:Del:M": "#B5B5D6",
-    "4:Del:M": "#8482BC",
-    "5:Del:M": "#62409A",
+    '1:Del:C': '#FBBD6F',
+    '1:Del:T': '#FE8002',
+    '1:Ins:C': '#AEDD8A',
+    '1:Ins:T': '#35A12E',
+    '2:Del:R': '#FCC9B4',
+    '3:Del:R': '#FB8969',
+    '4:Del:R': '#F04432',
+    '5:Del:R': '#BB1A1A',
+    '2:Ins:R': '#CFDFF0',
+    '3:Ins:R': '#93C3DE',
+    '4:Ins:R': '#4B97C7',
+    '5:Ins:R': '#1863AA',
+    '2:Del:M': '#E1E1EE',
+    '3:Del:M': '#B5B5D6',
+    '4:Del:M': '#8482BC',
+    '5:Del:M': '#62409A',
   };
   const annotationColors = {
-    "1:Del:C": "black",
-    "1:Del:T": "white",
-    "1:Ins:C": "black",
-    "1:Ins:T": "white",
-    "2:Del:R": "black",
-    "3:Del:R": "black",
-    "4:Del:R": "black",
-    "5:Del:R": "white",
-    "2:Ins:R": "black",
-    "3:Ins:R": "black",
-    "4:Ins:R": "black",
-    "5:Ins:R": "white",
-    "2:Del:M": "blacl",
-    "3:Del:M": "black",
-    "4:Del:M": "black",
-    "5:Del:M": "white",
+    '1:Del:C': 'black',
+    '1:Del:T': 'white',
+    '1:Ins:C': 'black',
+    '1:Ins:T': 'white',
+    '2:Del:R': 'black',
+    '3:Del:R': 'black',
+    '4:Del:R': 'black',
+    '5:Del:R': 'white',
+    '2:Ins:R': 'black',
+    '3:Ins:R': 'black',
+    '4:Ins:R': 'black',
+    '5:Ins:R': 'white',
+    '2:Del:M': 'blacl',
+    '3:Del:M': 'black',
+    '4:Del:M': 'black',
+    '5:Del:M': 'white',
   };
 
   const arrayIDAnnXTop = [
-      "1bp Deletion",
-      "1bp Insertion",
-      ">1bp Deletion at Repeats<br>(Deletion Length)",
-      ">1bp Insertions at Repeats<br> (Insertion Length)",
-      "Microhomology<br>(Deletion Length)",
+      '1bp Deletion',
+      '1bp Insertion',
+      '>1bp Deletion at Repeats<br>(Deletion Length)',
+      '>1bp Insertions at Repeats<br> (Insertion Length)',
+      'Microhomology<br>(Deletion Length)',
     ],
     arrayIDAnnXBot = [
-      "Homopolymer Length",
-      "Homopolymer Length",
-      "Number of Repeat Units",
-      "Number of Repeat Units",
-      "Microhimology Length",
+      'Homopolymer Length',
+      'Homopolymer Length',
+      'Number of Repeat Units',
+      'Number of Repeat Units',
+      'Microhimology Length',
     ],
     arrayIDAnnXLabel = [5, 18.5, 35, 60, 76],
     arrayIDAnnotationTop = [],
     arrayIDAnnotationBot = [];
 
   const numberWithCommas = (x) =>
-    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
   const arrayDataT = [];
   const arrayDataU = [];
 
   Object.values(data).forEach((group) => {
-    if (group.mutationType.substring(0, 1) === "T") {
+    if (group.mutationType.substring(0, 1) === 'T') {
       arrayDataT.push(group);
-    } else if (group.mutationType.substring(0, 1) === "U") {
+    } else if (group.mutationType.substring(0, 1) === 'U') {
       arrayDataU.push(group);
     }
   });
@@ -112,7 +112,7 @@ export default function ID415(data, sample) {
     return groups;
   }, {});
 
-  const T_groupR = T_groupByMutationID["R"].reduce((r, a) => {
+  const T_groupR = T_groupByMutationID['R'].reduce((r, a) => {
     let m;
     m = a.mutationType.match(a.mutationType.substr(4, 3));
     const s = {
@@ -123,7 +123,7 @@ export default function ID415(data, sample) {
     return r;
   }, {});
 
-  const T_groupRDel = T_groupR["Del"].reduce((r, a) => {
+  const T_groupRDel = T_groupR['Del'].reduce((r, a) => {
     let m;
     m = a.mutationType.match(a.mutationType.substr(0, 7));
     const s = {
@@ -134,7 +134,7 @@ export default function ID415(data, sample) {
     return r;
   }, {});
 
-  const T_groupRIns = T_groupR["Ins"].reduce((r, a) => {
+  const T_groupRIns = T_groupR['Ins'].reduce((r, a) => {
     let m;
     m = a.mutationType.match(a.mutationType.substr(0, 7));
     const s = {
@@ -145,7 +145,7 @@ export default function ID415(data, sample) {
     return r;
   }, {});
 
-  const T_groupM = T_groupByMutationID["M"].reduce((r, a) => {
+  const T_groupM = T_groupByMutationID['M'].reduce((r, a) => {
     let m;
     m = a.mutationType.match(a.mutationType.substr(0, 7));
     const s = {
@@ -213,7 +213,7 @@ export default function ID415(data, sample) {
     return groups;
   }, {});
 
-  const U_groupR = U_groupByMutationID["R"].reduce((r, a) => {
+  const U_groupR = U_groupByMutationID['R'].reduce((r, a) => {
     let m;
     m = a.mutationType.match(a.mutationType.substr(4, 3));
     const s = {
@@ -224,7 +224,7 @@ export default function ID415(data, sample) {
     return r;
   }, {});
 
-  const U_groupRDel = U_groupR["Del"].reduce((r, a) => {
+  const U_groupRDel = U_groupR['Del'].reduce((r, a) => {
     let m;
     m = a.mutationType.match(a.mutationType.substr(0, 7));
     const s = {
@@ -235,7 +235,7 @@ export default function ID415(data, sample) {
     return r;
   }, {});
 
-  const U_groupRIns = U_groupR["Ins"].reduce((r, a) => {
+  const U_groupRIns = U_groupR['Ins'].reduce((r, a) => {
     let m;
     m = a.mutationType.match(a.mutationType.substr(0, 7));
     const s = {
@@ -246,7 +246,7 @@ export default function ID415(data, sample) {
     return r;
   }, {});
 
-  const U_groupM = U_groupByMutationID["M"].reduce((r, a) => {
+  const U_groupM = U_groupByMutationID['M'].reduce((r, a) => {
     let m;
     m = a.mutationType.match(a.mutationType.substr(0, 7));
     const s = {
@@ -280,24 +280,24 @@ export default function ID415(data, sample) {
 
   //// ----------- plot ------------------//
   const tracesT = {
-    name: "Transcrribed Strand",
-    type: "bar",
-    marker: { color: "#004765" },
+    name: 'Transcrribed Strand',
+    type: 'bar',
+    marker: { color: '#004765' },
     x: T_flatSorted.map((element, index, array) => index),
     y: T_flatSorted.map((element, index, array) => element.contribution),
 
-    hoverinfo: "x+y",
+    hoverinfo: 'x+y',
     showlegend: true,
   };
 
   const tracesU = {
-    name: "Untranscribed Strand",
-    type: "bar",
-    marker: { color: "#E32925" },
+    name: 'Untranscribed Strand',
+    type: 'bar',
+    marker: { color: '#E32925' },
     x: U_flatSorted.map((element, index, array) => index),
     y: U_flatSorted.map((element, index, array) => element.contribution),
 
-    hoverinfo: "x+y",
+    hoverinfo: 'x+y',
     showlegend: true,
   };
 
@@ -318,10 +318,10 @@ export default function ID415(data, sample) {
 
   const annotations1 = Object.entries(T_arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
-      xref: "x",
-      yref: "paper",
-      xanchor: "bottom",
-      yanchor: "bottom",
+      xref: 'x',
+      yref: 'paper',
+      xanchor: 'bottom',
+      yanchor: 'bottom',
       x:
         array
           .slice(0, groupIndex)
@@ -346,76 +346,76 @@ export default function ID415(data, sample) {
             )
           ],
       },
-      align: "center",
+      align: 'center',
     })
   );
 
   const annotations2 = arrayIDAnnotationBot.map((num, index) => ({
-    xref: "x",
-    yref: "paper",
-    xanchor: "bottom",
-    yanchor: "bottom",
+    xref: 'x',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
     x: index,
     y: -0.1,
-    text: "<b>" + num.substring(num.length - 1, num.length) + "</b>",
+    text: '<b>' + num.substring(num.length - 1, num.length) + '</b>',
     showarrow: false,
     font: {
       size: 14,
     },
-    align: "center",
+    align: 'center',
   }));
 
   const annotationsIDTopLabel = arrayIDAnnXLabel.map((num, index) => ({
-    xref: "x",
-    yref: "paper",
+    xref: 'x',
+    yref: 'paper',
     x: num,
-    xanchor: "bottom",
+    xanchor: 'bottom',
     y: 1.07,
-    yanchor: "bottom",
-    text: "<b>" + arrayIDAnnXTop[index] + "</b>",
+    yanchor: 'bottom',
+    text: '<b>' + arrayIDAnnXTop[index] + '</b>',
     showarrow: false,
     font: {
       size: 14,
     },
-    align: "center",
+    align: 'center',
   }));
 
   const annotationsIDBotLabel = arrayIDAnnXLabel.map((num, index) => ({
-    xref: "x",
-    yref: "paper",
+    xref: 'x',
+    yref: 'paper',
     x: num,
-    xanchor: "bottom",
+    xanchor: 'bottom',
     y: -0.15,
-    yanchor: "bottom",
-    text: "<b>" + arrayIDAnnXBot[index] + "</b>",
+    yanchor: 'bottom',
+    text: '<b>' + arrayIDAnnXBot[index] + '</b>',
     showarrow: false,
     font: {
       size: 14,
     },
-    align: "center",
+    align: 'center',
   }));
 
   const sampleAnnotation = {
-    xref: "paper",
-    yref: "paper",
-    xanchor: "bottom",
-    yanchor: "bottom",
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
     x: 0,
     y: 0.92,
     text:
-      "<b>" + sample + ": " + numberWithCommas(totalMutations) + " indels</b>",
+      '<b>' + sample + ': ' + numberWithCommas(totalMutations) + ' indels</b>',
     showarrow: false,
     font: {
       size: 18,
     },
-    align: "center",
+    align: 'center',
   };
 
   const shapes1 = Object.entries(T_arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
-      type: "rect",
-      xref: "x",
-      yref: "paper",
+      type: 'rect',
+      xref: 'x',
+      yref: 'paper',
       x0: array
         .slice(0, groupIndex)
         .reduce((x0, [_, sigs]) => x0 + sigs.length, -0.4),
@@ -439,9 +439,9 @@ export default function ID415(data, sample) {
 
   const shapes2 = Object.entries(T_arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
-      type: "rect",
-      xref: "x",
-      yref: "paper",
+      type: 'rect',
+      xref: 'x',
+      yref: 'paper',
       x0: array
         .slice(0, groupIndex)
         .reduce((x0, [_, sigs]) => x0 + sigs.length, -0.4),
@@ -464,10 +464,10 @@ export default function ID415(data, sample) {
   );
 
   const layout = {
-    hoverlabel: { bgcolor: "#FFF" },
+    hoverlabel: { bgcolor: '#FFF' },
     legend: {
       x: 1,
-      xanchor: "right",
+      xanchor: 'right',
       y: 1,
     },
     xaxis: {
@@ -477,18 +477,18 @@ export default function ID415(data, sample) {
       tickfont: {
         size: 10,
       },
-      tickmode: "array",
+      tickmode: 'array',
       tickvals: T_flatSorted.map((_, i) => i),
       ticktext: T_flatSorted.map((e) => e.mutationType),
-      linecolor: "black",
+      linecolor: 'black',
       linewidth: 1,
       mirror: true,
     },
     yaxis: {
-      title: "Number of Idels",
+      title: 'Number of Idels',
       autorange: false,
       range: [0, maxVal + maxVal * 0.15],
-      linecolor: "black",
+      linecolor: 'black',
       linewidth: 1,
       mirror: true,
     },

@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
-import Plot from "react-plotly.js";
-import { cloneDeep } from "lodash";
-import { useSelector } from "react-redux";
-import { useTmbPlotQuery } from "./apiSlice";
-import { LoadingOverlay } from "../../../controls/loading-overlay/loading-overlay";
+import { useState, useEffect } from 'react';
+import Plot from 'react-plotly.js';
+import { cloneDeep } from 'lodash';
+import { useSelector } from 'react-redux';
+import { useTmbPlotQuery } from './apiSlice';
+import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
 export default function MutProfilePlot() {
   const publicForm = useSelector((state) => state.exposure.publicForm);
-  const [params, setParams] = useState("");
+  const [params, setParams] = useState('');
   const { data, error, isFetching } = useTmbPlotQuery(params, {
     skip: !params,
   });
@@ -24,12 +24,12 @@ export default function MutProfilePlot() {
   }, [publicForm]);
 
   return (
-    <div style={{ minHeight: "400px" }}>
+    <div style={{ minHeight: '400px' }}>
       <LoadingOverlay active={isFetching} />
       {data && (
         <Plot
           className="w-100"
-          style={{ height: "400px" }}
+          style={{ height: '400px' }}
           data={cloneDeep(data.traces)}
           layout={cloneDeep(data.layout)}
           config={cloneDeep(data.config)}

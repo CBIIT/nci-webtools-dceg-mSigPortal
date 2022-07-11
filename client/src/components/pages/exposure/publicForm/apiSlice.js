@@ -19,7 +19,5 @@ export const publicFormApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const {
-  useGetExplorationOptionsQuery,
-  useExplorationPublicMutation,
-} = publicFormApiSlice;
+export const { useGetExplorationOptionsQuery, useExplorationPublicMutation } =
+  publicFormApiSlice;

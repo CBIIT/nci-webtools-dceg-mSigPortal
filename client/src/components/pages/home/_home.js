@@ -1,9 +1,9 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { Button, OverlayTrigger, Popover } from "react-bootstrap";
-import { Animated } from "react-animated-css";
-import parse from "html-react-parser";
-import "./home.scss";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
+import { Animated } from 'react-animated-css';
+import parse from 'html-react-parser';
+import './home.scss';
 
 export default function Home({ links }) {
   return (
@@ -11,8 +11,8 @@ export default function Home({ links }) {
       <div
         style={{
           backgroundImage: `url("assets/images/placeholder-home-banner-bg.png")`,
-          backgroundRepeat: "no-repeat",
-          backgroundPosition: "right",
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'right',
         }}
       >
         <div className="container py-5">
@@ -20,9 +20,9 @@ export default function Home({ links }) {
             <div className="col-12">
               <span
                 style={{
-                  fontSize: "4em",
-                  color: "#D62D4C",
-                  letterSpacing: "3px",
+                  fontSize: '4em',
+                  color: '#D62D4C',
+                  letterSpacing: '3px',
                 }}
               >
                 mSigPortal
@@ -31,10 +31,10 @@ export default function Home({ links }) {
             <div className="col-12 mt-1 mb-3">
               <span
                 style={{
-                  fontSize: "1.2em",
-                  color: "#AA4A6D",
-                  lineHeight: "1px",
-                  letterSpacing: "1px",
+                  fontSize: '1.2em',
+                  color: '#AA4A6D',
+                  lineHeight: '1px',
+                  letterSpacing: '1px',
                 }}
               >
                 Integrative Mutational Signature Portal
@@ -42,9 +42,9 @@ export default function Home({ links }) {
               <br />
               <span
                 style={{
-                  fontSize: "1.2em",
-                  color: "#2F54A5",
-                  lineHeight: "1px",
+                  fontSize: '1.2em',
+                  color: '#2F54A5',
+                  lineHeight: '1px',
                 }}
               >
                 for Cancer Genomic Studies
@@ -61,17 +61,17 @@ export default function Home({ links }) {
             </div>
             <div className="col-12 my-2">
               <Button
-                variant={"outline-dark"}
+                variant={'outline-dark'}
                 className="bg-white home-banner-nav-button"
                 onClick={(e) => e.preventDefault()}
               >
                 <Link
                   className="stretched-link m-2"
-                  to={"/catalog"}
+                  to={'/catalog'}
                   style={{
-                    textDecoration: "none",
-                    color: "#D62D4C",
-                    fontWeight: "500",
+                    textDecoration: 'none',
+                    color: '#D62D4C',
+                    fontWeight: '500',
                   }}
                 >
                   Explore the Catalog
@@ -81,28 +81,28 @@ export default function Home({ links }) {
           </div>
         </div>
       </div>
-      <div style={{ backgroundColor: "#283E5A", position: "relative" }}>
+      <div style={{ backgroundColor: '#283E5A', position: 'relative' }}>
         <div
           className="p-5 d-none d-md-block"
           style={{
-            position: "absolute",
+            position: 'absolute',
             // right: '0px',
-            height: "100%",
-            overflow: "hidden",
-            width: "100%",
+            height: '100%',
+            overflow: 'hidden',
+            width: '100%',
           }}
         >
           <Animated
             animationIn="slideInRight"
             animationInDuration={2000}
             isVisible={true}
-            style={{ height: "100%" }}
+            style={{ height: '100%' }}
           >
             <img
-              alt={"DNA accent banner"}
-              src={"assets/images/placeholder-home-dna.png"}
+              alt={'DNA accent banner'}
+              src={'assets/images/placeholder-home-dna.png'}
               height="100%"
-              style={{ float: "right" }}
+              style={{ float: 'right' }}
             />
           </Animated>
         </div>
@@ -114,8 +114,8 @@ export default function Home({ links }) {
             <div className="col-12 text-light">
               <p
                 style={{
-                  fontWeight: "200",
-                  lineHeight: "1.8em",
+                  fontWeight: '200',
+                  lineHeight: '1.8em',
                 }}
               >
                 Mutational signatures are characteristic combinations of types
@@ -132,7 +132,7 @@ export default function Home({ links }) {
                 known <br className="d-none d-md-block" />
                 etiologies has increased from many different cancer genomic
                 studies, there is <br className="d-none d-md-block" />a critical
-                need for curated census as well as data sharing of mutational{" "}
+                need for curated census as well as data sharing of mutational{' '}
                 <br className="d-none d-md-block" />
                 signatures for public research. mSigPortal provides a platform
                 that enables <br className="d-none d-md-block" />
@@ -142,7 +142,7 @@ export default function Home({ links }) {
                 tissue <br className="d-none d-md-block" />
                 specificity, activity, and association) in cancer genomic
                 studies from scientific <br className="d-none d-md-block" />
-                literature or user input.{" "}
+                literature or user input.{' '}
               </p>
             </div>
           </div>
@@ -171,13 +171,13 @@ export default function Home({ links }) {
                       className="col-auto d-flex align-items-center mx-1 my-1 home-nav-card"
                       key={`home-nav-card-${idx}`}
                       style={{
-                        backgroundColor: "#EFEFEF",
-                        width: "300px",
-                        height: "300px",
+                        backgroundColor: '#EFEFEF',
+                        width: '300px',
+                        height: '300px',
                       }}
                     >
                       <Link className="stretched-link" exact={exact} to={route}>
-                        <span className="sr-only">{title + " link"}</span>
+                        <span className="sr-only">{title + ' link'}</span>
                       </Link>
                       <div className="text-center w-100">
                         <div className="">
@@ -189,15 +189,15 @@ export default function Home({ links }) {
                           />
                         </div>
                         <div className="mt-3">
-                          {cardTitle.split(" ").map((titleItem, idx) => (
+                          {cardTitle.split(' ').map((titleItem, idx) => (
                             <div
                               key={`home-nav-card-title-item-${titleItem}-${idx}`}
                             >
                               <span
                                 style={{
-                                  fontWeight: "800",
-                                  color: "#366D83",
-                                  letterSpacing: "1px",
+                                  fontWeight: '800',
+                                  color: '#366D83',
+                                  letterSpacing: '1px',
                                 }}
                               >
                                 {titleItem}

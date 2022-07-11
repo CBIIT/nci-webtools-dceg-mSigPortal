@@ -5,7 +5,10 @@ import { useForm } from 'react-hook-form';
 import { NavHashLink } from 'react-router-hash-link';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions } from '../../../../services/store/visualization';
-import { useCosineReferenceQuery, useCosineSignatureSetsQuery } from './apiSlice';
+import {
+  useCosineReferenceQuery,
+  useCosineSignatureSetsQuery,
+} from './apiSlice';
 import Description from '../../../controls/description/description';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';

@@ -342,8 +342,7 @@ async function processMessage(params) {
         args: {
           matrixFile: matrixList.filter(
             (row) =>
-              row.profileType == selectProfile &&
-              row.matrixSize == selectMatrix
+              row.profileType == selectProfile && row.matrixSize == selectMatrix
           )[0].Path,
         },
         config: {
@@ -384,8 +383,7 @@ async function processMessage(params) {
           matrixFile: matrixList.filter(
             (row) =>
               row.profileType == selectProfile &&
-              row.matrixSize ==
-                defaultMatrix(selectProfile, ['96', '78', '83'])
+              row.matrixSize == defaultMatrix(selectProfile, ['96', '78', '83'])
           )[0].Path,
         },
         config: {
@@ -424,8 +422,7 @@ async function processMessage(params) {
         args: {
           matrixFile: matrixList.filter(
             (row) =>
-              row.profileType == selectProfile &&
-              row.matrixSize == selectMatrix
+              row.profileType == selectProfile && row.matrixSize == selectMatrix
           )[0].Path,
           study: 'PCAWG',
           cancerType: 'Lung-AdenoCA',
@@ -671,8 +668,7 @@ async function processMessage(params) {
           matrixFile: matrixList.filter(
             (row) =>
               row.profileType == selectProfile &&
-              row.matrixSize ==
-                defaultMatrix(selectProfile, ['96', '78', '83'])
+              row.matrixSize == defaultMatrix(selectProfile, ['96', '78', '83'])
           )[0].Path,
         },
         config: {
