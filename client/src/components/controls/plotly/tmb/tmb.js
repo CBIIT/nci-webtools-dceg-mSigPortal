@@ -6,6 +6,7 @@ export default function TMB(data, study = 'PCAWG') {
   const genomeSize = { GRCh37: 3101976562 / Math.pow(10, 6) };
   const burden = (exposure) => Math.log10(exposure / genomeSize[genome[study]]);
 
+  console.log(data);
   function average(arr) {
     const sum = arr.reduce((a, b) => a + b, 0);
     return sum / arr.length || 0;
@@ -28,6 +29,10 @@ export default function TMB(data, study = 'PCAWG') {
   const totalCancer = cancerBurden.length;
   console.log(totalCancer);
 
+  const absYValue = cancerBurden
+    .map((o) => o.tmbs.map((e) => Math.abs(e)))
+    .flat();
+  const yMax = Math.max(...absYValue);
   const traces = cancerBurden.map((element, index, array) => ({
     element: element,
     index: index,
@@ -95,6 +100,20 @@ export default function TMB(data, study = 'PCAWG') {
       color: 'blue',
     },
     align: 'center',
+  }));
+
+  const bottoLabelline = cancerBurden.map((element, index, array) => ({
+    type: 'line',
+    xref: 'x',
+    yref: 'paper',
+    x0: index + 0.1,
+    x1: index + 0.9,
+    y0: -0.15,
+    y1: -0.15,
+    line: {
+      width: 1,
+      color: 'red',
+    },
   }));
 
   const bottoLabel2 = cancerBurden.map((element, index, array) => ({
@@ -184,16 +203,17 @@ export default function TMB(data, study = 'PCAWG') {
     },
     yaxis: {
       title: 'Number of Mutations per Megabase<br>(log10)',
-      autorange: true,
       zeroline: false,
       //showline: true,
       linecolor: 'black',
       linewidth: 2,
       mirror: true,
       automargin: true,
+      autorange: false,
+      range: [-Math.ceil(yMax), Math.ceil(yMax)],
     },
 
-    shapes: [...shapes, ...lines],
+    shapes: [...shapes, ...lines, ...bottoLabelline],
     annotations: [...topLabel, ...bottoLabel1, ...bottoLabel2],
   };
 
