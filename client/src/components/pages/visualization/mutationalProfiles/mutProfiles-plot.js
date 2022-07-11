@@ -1,24 +1,24 @@
-import { useEffect, useState } from "react";
-import cloneDeep from "lodash/cloneDeep";
-import { Button, Row, Col } from "react-bootstrap";
-import Plot from "react-plotly.js";
-import { downloadImage } from "plotly.js";
-import { saveAs } from "file-saver";
-import { useSelector } from "react-redux";
-import { useSeqmatrixQuery } from "../../../../services/apiSlice";
-import { LoadingOverlay } from "../../../controls/loading-overlay/loading-overlay";
-import SBS6 from "../../../controls/plotly/mutationalSignature/sbs6";
-import SBS24 from "../../../controls/plotly/mutationalSignature/sbs24";
-import SBS96 from "../../../controls/plotly/mutationalSignature/sbs96";
-import SBS192 from "../../../controls/plotly/mutationalSignature/sbs192";
-import SBS288 from "../../../controls/plotly/mutationalSignature/sbs288";
-import SBS384 from "../../../controls/plotly/mutationalSignature/sbs384";
-import SBS1536 from "../../../controls/plotly/mutationalSignature/sbs1536";
-import DBS78 from "../../../controls/plotly/mutationalSignature/dbs78";
-import DBS186 from "../../../controls/plotly/mutationalSignature/dbs186";
-import ID83 from "../../../controls/plotly/mutationalSignature/id83";
-import ID28 from "../../../controls/plotly/mutationalSignature/id28";
-import ID415 from "../../../controls/plotly/mutationalSignature/id415";
+import { useEffect, useState } from 'react';
+import cloneDeep from 'lodash/cloneDeep';
+import { Button, Row, Col } from 'react-bootstrap';
+import Plot from 'react-plotly.js';
+import { downloadImage } from 'plotly.js';
+import { saveAs } from 'file-saver';
+import { useSelector } from 'react-redux';
+import { useSeqmatrixQuery } from '../../../../services/apiSlice';
+import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import SBS6 from '../../../controls/plotly/mutationalSignature/sbs6';
+import SBS24 from '../../../controls/plotly/mutationalSignature/sbs24';
+import SBS96 from '../../../controls/plotly/mutationalSignature/sbs96';
+import SBS192 from '../../../controls/plotly/mutationalSignature/sbs192';
+import SBS288 from '../../../controls/plotly/mutationalSignature/sbs288';
+import SBS384 from '../../../controls/plotly/mutationalSignature/sbs384';
+import SBS1536 from '../../../controls/plotly/mutationalSignature/sbs1536';
+import DBS78 from '../../../controls/plotly/mutationalSignature/dbs78';
+import DBS186 from '../../../controls/plotly/mutationalSignature/dbs186';
+import ID83 from '../../../controls/plotly/mutationalSignature/id83';
+import ID28 from '../../../controls/plotly/mutationalSignature/id28';
+import ID415 from '../../../controls/plotly/mutationalSignature/id415';
 
 export default function MutProfilePlot() {
   const store = useSelector((state) => state.visualization);
@@ -48,7 +48,7 @@ export default function MutProfilePlot() {
         sample: sample.value,
         profile: profile.value,
         matrix: matrix.value,
-        s3: false,
+        type: 'mutationalProfiles',
       };
       setParams(params);
     }
@@ -62,43 +62,43 @@ export default function MutProfilePlot() {
   function generatePlot(data, sample) {
     const profileMatrix = profile.value + matrix.value;
     const { traces, layout } =
-      profileMatrix == "SBS6"
+      profileMatrix == 'SBS6'
         ? SBS6(data, sample)
-        : profileMatrix == "SBS24"
+        : profileMatrix == 'SBS24'
         ? SBS24(data, sample)
-        : profileMatrix == "SBS96"
+        : profileMatrix == 'SBS96'
         ? SBS96(data, sample)
-        : profileMatrix == "SBS192"
+        : profileMatrix == 'SBS192'
         ? SBS192(data, sample)
-        : profileMatrix == "SBS288"
+        : profileMatrix == 'SBS288'
         ? SBS288(data, sample)
-        : profileMatrix == "SBS384"
+        : profileMatrix == 'SBS384'
         ? SBS384(data, sample)
-        : profileMatrix == "SBS1536"
+        : profileMatrix == 'SBS1536'
         ? SBS1536(data, sample)
-        : profileMatrix == "DBS78"
+        : profileMatrix == 'DBS78'
         ? DBS78(data, sample)
-        : profileMatrix == "DBS186"
+        : profileMatrix == 'DBS186'
         ? DBS186(data, sample)
-        : profileMatrix == "ID28"
+        : profileMatrix == 'ID28'
         ? ID28(data, sample)
-        : profileMatrix == "ID83"
+        : profileMatrix == 'ID83'
         ? ID83(data, sample)
-        : profileMatrix == "ID415"
+        : profileMatrix == 'ID415'
         ? ID415(data, sample)
         : { traces: [], layout: {} };
 
     setPlot({ data: [...traces], layout });
   }
 
-  const divId = "mutationalProfilePlot";
+  const divId = 'mutationalProfilePlot';
   const config = {
     displayModeBar: true,
     responsive: true,
     displaylogo: false,
     toImageButtonOptions: {
-      format: "svg",
-      filename: "plot_export",
+      format: 'svg',
+      filename: 'plot_export',
       height: 1000,
       width: 1000,
       scale: 1,
@@ -118,15 +118,15 @@ export default function MutProfilePlot() {
           <div className="mb-3">
             <Row className="justify-content-center">
               <Plot
-                {...(profile.value + matrix.value === "SBS1536" ||
-                profile.value + matrix.value === "SBS6" ||
-                profile.value + matrix.value === "SBS24" ||
-                profile.value + matrix.value === "ID28"
-                  ? { className: "w-70" }
-                  : { className: "w-95" })}
+                {...(profile.value + matrix.value === 'SBS1536' ||
+                profile.value + matrix.value === 'SBS6' ||
+                profile.value + matrix.value === 'SBS24' ||
+                profile.value + matrix.value === 'ID28'
+                  ? { className: 'w-70' }
+                  : { className: 'w-95' })}
                 divId={divId}
                 style={{
-                  height: "600px",
+                  height: '600px',
                 }}
                 data={cloneDeep(plot.data)}
                 layout={cloneDeep(plot.layout)}

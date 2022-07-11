@@ -7,7 +7,7 @@ const {
   querySeqmatrix,
   queryExposure,
   querySignature,
-} = require('../analysis');
+} = require('../apiQuery');
 
 const router = Router();
 

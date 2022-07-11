@@ -3,7 +3,7 @@ const express = require('express');
 const fs = require('fs');
 const knex = require('knex');
 const logger = require('./services/logger');
-const { apiRouter } = require('./services/apiRouter');
+const { apiRouter } = require('./services/router');
 const config = require('./config.json');
 
 const app = createApp(config);
