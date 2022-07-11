@@ -19,6 +19,7 @@ export default function TMB(data, study = 'PCAWG') {
       const tmbs = Object.entries(groupBySample).map(([_, e]) =>
         burden(e.reduce((sum, e) => e.exposure + sum, 0))
       );
+      tmbs.sort((a, b) => a - b);
       return { cancer, tmbs };
     })
     .sort((a, b) => (a.cancer > b.cancer ? 1 : b.cancer > a.cancer ? -1 : 0));
@@ -33,7 +34,7 @@ export default function TMB(data, study = 'PCAWG') {
     array: array,
     name: `${element.cancer}`,
     type: 'scatter',
-    marker: { symbol: 'circle-open', size: 4, color: 'black' },
+    marker: { symbol: 'circle-open', size: 3, color: 'black' },
     mode: 'markers',
     y: element.tmbs.map((e) => e),
     average: average(element.tmbs.map((e) => e)),
@@ -46,15 +47,11 @@ export default function TMB(data, study = 'PCAWG') {
     //     i +
     //     0.5
     // ),
-    x:
-      array.length > 1
-        ? element.tmbs.map(
-            (e, i) => index + 0.7 + (0.3 / element.tmbs.length) * i
-          )
-        : element.tmbs.map(
-            (e, i) => index + 0.07 + (0.8 / element.tmbs.length) * i
-          ),
-    showlegend: true,
+
+    x: element.tmbs.map(
+      (e, i) => index + 0.1 + (0.8 / element.tmbs.length) * i
+    ),
+    showlegend: false,
   }));
 
   console.log('traces:--');
@@ -90,7 +87,7 @@ export default function TMB(data, study = 'PCAWG') {
     xanchor: 'bottom',
     yanchor: 'bottom',
     x: (index + index + 1) * 0.5,
-    y: -0.16,
+    y: -0.1,
     text: `${element.tmbs.length}`,
     showarrow: false,
     font: {
@@ -171,7 +168,7 @@ export default function TMB(data, study = 'PCAWG') {
     // },
 
     xaxis: {
-      showticklabels: true,
+      showticklabels: false,
       tickfont: {
         size: 10,
       },
