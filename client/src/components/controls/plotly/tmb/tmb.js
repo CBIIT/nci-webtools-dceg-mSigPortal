@@ -15,7 +15,8 @@ export default function TMB(data, study = "PCAWG") {
   // calculate burden per cancer/sample
   const cancerBurden = Object.entries(groupByCancer)
     .map(([cancer, values]) => {
-      const groupBySample = groupBy(values, "sample");
+      const groupBySample = groupBy(values, 'sample');
+      // sum exposure values per sample group and calculate burden
       const tmbs = Object.entries(groupBySample).map(([_, e]) =>
         burden(e.reduce((sum, e) => e.exposure + sum, 0))
       );
