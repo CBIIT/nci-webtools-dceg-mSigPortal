@@ -9,7 +9,7 @@
     "start-queue-worker": "node queue-worker.js",
     "build": "npm run format",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "format": "prettier --single-quote --write \"**/*.{js,json}\""
+    "format": "prettier --write \"**/*.{js,json}\""
   },
   "author": "",
   "license": "ISC",
@@ -39,5 +39,8 @@
   },
   "devDependencies": {
     "prettier": "^2.4.1"
+  },
+  "prettier": {
+    "singleQuote": true
   }
 }

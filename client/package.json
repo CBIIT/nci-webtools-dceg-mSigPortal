@@ -41,7 +41,7 @@
     "build": "npm run format && react-scripts --max_old_space_size=4096 build",
     "test": "react-scripts test --ci --reporters=default --reporters=jest-junit --watchAll=false",
     "eject": "react-scripts eject",
-    "format": "prettier --single-quote --write \"src/**/*.{js,json,css,scss}\""
+    "format": "prettier --write \"src/**/*.{js,json,css,scss}\""
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -65,5 +65,8 @@
     "jest-junit": "^11.0.1",
     "prettier": "^2.4.1",
     "sass": "^1.43.2"
+  },
+  "prettier": {
+    "singleQuote": true
   }
 }
