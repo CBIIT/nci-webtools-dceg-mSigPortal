@@ -48,7 +48,7 @@ export default function MutProfilePlot() {
         sample: sample.value,
         profile: profile.value,
         matrix: matrix.value,
-        s3: false,
+        type: 'mutationalProfiles',
       };
       setParams(params);
     }

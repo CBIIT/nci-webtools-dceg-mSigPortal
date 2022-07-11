@@ -4,7 +4,7 @@ import axios from 'axios';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import Description from '../../../controls/description/description';
-import { useProfilerSummaryQuery } from './apiSlice';
+import { useProfilerSummaryQuery, useProfilerSummary2Query } from './apiSlice';
 
 export default function ProfilerSummary() {
   const store = useSelector((state) => state.visualization);
@@ -39,11 +39,11 @@ export default function ProfilerSummary() {
       const response = await axios.head('web/results/' + path);
       setPath(path);
     } catch (error) {
-      calculateRequest();
+      fetchPlot();
     }
   }
 
-  function calculateRequest() {
+  function fetchPlot() {
     const params =
       source == 'user'
         ? {
@@ -69,6 +69,16 @@ export default function ProfilerSummary() {
             projectID,
           };
 
+    setParams(params);
+  }
+
+  function publicPlot() {
+    const params = {
+      study: study.value,
+      cancer: cancer.value,
+      strategy: strategy.value,
+      type: 'profilerSummary',
+    };
     setParams(params);
   }
 

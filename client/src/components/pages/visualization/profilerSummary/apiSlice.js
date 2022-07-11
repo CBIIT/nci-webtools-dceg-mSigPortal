@@ -9,7 +9,14 @@ export const profilerSummaryApiSlice = apiSlice.injectEndpoints({
         body: params,
       }),
     }),
+    profilerSummary2: builder.query({
+      query: (params) => ({
+        url: 'seqmatrix',
+        params,
+      }),
+    }),
   }),
 });
 
-export const { useProfilerSummaryQuery } = profilerSummaryApiSlice;
+export const { useProfilerSummaryQuery, useProfilerSummary2Query } =
+  profilerSummaryApiSlice;

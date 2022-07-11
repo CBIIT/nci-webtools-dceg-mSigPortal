@@ -12,12 +12,7 @@ const XLSX = require('xlsx');
 const replace = require('replace-in-file');
 const glob = require('glob');
 const archiver = require('archiver');
-const {
-  getAssociationData,
-  getExposureData,
-  getSeqmatrixData,
-  getSignatureData,
-} = require('./query');
+
 const config = require('../config.json');
 
 if (config.aws) AWS.config.update(config.aws);
@@ -800,138 +795,6 @@ const getDataUsingS3Select = (params) => {
   });
 };
 
-// query public seqmatrix data for visualization tab
-async function visualizationData(req, res, next) {
-  try {
-    const { study, cancer, strategy } = req.query;
-    const connection = req.app.locals.connection;
-    const projectID = uuidv4();
-
-    const query = { study, strategy, cancer };
-    const columns = ['profile', 'sample', 'profile', 'matrix'];
-    const data = await getSeqmatrixData(connection, query, columns);
-    res.json({ data, projectID });
-  } catch (error) {
-    next(error);
-  }
-}
-
-// query public exploration options for exploration tab
-async function explorationOptions(req, res, next) {
-  try {
-    const connection = req.app.locals.connection;
-
-    const query = { ...req.query };
-    const columns = ['study', 'strategy', 'cancer', 'signatureSetName'];
-    const data = await getExposureData(connection, query, columns);
-    res.json(data);
-  } catch (error) {
-    next(error);
-  }
-}
-
-// query public exploration data for exploration tab
-async function explorationTmbData(req, res, next) {
-  try {
-    const { study, strategy, signatureSetName } = req.query;
-    const connection = req.app.locals.connection;
-
-    const query = { study, strategy, signatureSetName };
-    const columns = ['cancer', 'sample', 'exposure'];
-    const data = await getExposureData(connection, query, columns);
-    res.json(data);
-  } catch (error) {
-    next(error);
-  }
-}
-
-async function querySeqmatrix(req, res, next) {
-  try {
-    const { study, cancer, strategy, sample, profile, matrix, s3 } = req.query;
-    const connection = req.app.locals.connection;
-    // if (connection && s3 == 'false') {
-    const query = { study, strategy, cancer, sample, profile, matrix };
-    const columns = ['mutationType', 'mutations'];
-    const data = await getSeqmatrixData(connection, query, columns);
-    res.json(data);
-    // } else {
-    //   const s3 = new AWS.S3();
-
-    //   const params = {
-    //     Bucket: config.data.bucket,
-    //     Key: path.join(
-    //       config.data.s3,
-    //       `Seqmatrix/${study}/${cancer}/${sample}/${strategy}/${
-    //         profile + matrix
-    //       }/data.json`
-    //     ),
-    //   };
-    //   const { Body } = await s3.getObject(params).promise();
-    //   const data = JSON.parse(Body);
-
-    //   res.json(data);
-    // }
-  } catch (error) {
-    next(error);
-  }
-}
-
-async function queryExposure(req, res, next) {
-  try {
-    const { study, strategy, cancer, signatureSetName, s3 } = req.query;
-    const connection = req.app.locals.connection;
-
-    if (connection && s3 == 'false') {
-      const query = {
-        study,
-        strategy,
-        cancer,
-        signatureSetName,
-      };
-      const columns = ['sample', 'signatureName', 'exposure'];
-      const data = await getExposureData(connection, query, columns);
-      res.json(data);
-    } else {
-      const s3 = new AWS.S3();
-
-      const params = {
-        Bucket: config.data.bucket,
-        Key: path.join(
-          config.data.s3,
-          `Exposure/${study}/${strategy}/${cancer}/${signatureSetName}/data.json`
-        ),
-      };
-      const { Body } = await s3.getObject(params).promise();
-      const data = JSON.parse(Body);
-      res.json(data);
-    }
-  } catch (error) {
-    next(error);
-  }
-}
-
-async function querySignature(req, res, next) {
-  try {
-    const { profile, matrix, signatureSetName } = req.query;
-    const connection = req.app.locals.connection;
-
-    const query = { profile, matrix, signatureSetName };
-    const columns = !signatureSetName
-      ? ['signatureSetName']
-      : [
-          'strandInfo',
-          'strand',
-          'signatureName',
-          'mutationType',
-          'contribution',
-        ];
-    const data = await getSignatureData(connection, query, columns);
-    res.json(data);
-  } catch (error) {
-    next(error);
-  }
-}
-
 module.exports = {
   parseCSV,
   profilerExtraction,
@@ -954,10 +817,4 @@ module.exports = {
   getRelativePath,
   downloadWorkspace,
   associationWrapper,
-  visualizationData,
-  explorationOptions,
-  explorationTmbData,
-  querySeqmatrix,
-  queryExposure,
-  querySignature,
 };

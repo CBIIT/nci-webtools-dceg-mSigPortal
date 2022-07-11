@@ -20,13 +20,16 @@ const {
   getFileS3,
   downloadWorkspace,
   associationWrapper,
+} = require('../apiAnalysis');
+
+const {
   querySeqmatrix,
   queryExposure,
   querySignature,
   visualizationData,
   explorationOptions,
   explorationTmbData,
-} = require('../analysis');
+} = require('../apiQuery');
 
 const router = express.Router();
 
@@ -90,6 +93,7 @@ router.get('/seqmatrix', querySeqmatrix);
 router.get('/exposure', queryExposure);
 
 router.get('/signature', querySignature);
+
 router.use((err, req, res, next) => {
   logger.debug(err);
   const { name, message, stack } = err;
