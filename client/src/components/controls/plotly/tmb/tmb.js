@@ -24,6 +24,8 @@ export default function TMB(data, study = 'PCAWG') {
     .sort((a, b) => (a.cancer > b.cancer ? 1 : b.cancer > a.cancer ? -1 : 0));
 
   console.log(cancerBurden);
+  const totalCancer = cancerBurden.length;
+  console.log(totalCancer);
 
   const traces = cancerBurden.map((element, index, array) => ({
     element: element,
@@ -89,7 +91,7 @@ export default function TMB(data, study = 'PCAWG') {
     yanchor: 'bottom',
     x: (index + index + 1) * 0.5,
     y: -0.16,
-    text: `${element.tmbs.length}<br> - <br>`,
+    text: `${element.tmbs.length}`,
     showarrow: false,
     font: {
       size: 12,
@@ -173,6 +175,8 @@ export default function TMB(data, study = 'PCAWG') {
       tickfont: {
         size: 10,
       },
+      autorange: false,
+      range: [0, totalCancer],
       linecolor: 'black',
       linewidth: 2,
       mirror: true,
