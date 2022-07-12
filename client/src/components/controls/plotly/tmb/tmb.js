@@ -33,6 +33,18 @@ export default function TMB(data, study) {
     .map((o) => o.tmbs.map((e) => Math.abs(e)))
     .flat();
   const yMax = Math.max(...absYValue);
+
+  cancerBurden.sort((a, b) =>
+    average(a.tmbs.map((e) => e)) < average(b.tmbs.map((e) => e))
+      ? -1
+      : average(b.tmbs.map((e) => e)) < average(a.tmbs.map((e) => e))
+      ? 1
+      : 0
+  );
+
+  console.log('sorted');
+  console.log(cancerBurden);
+
   const traces = cancerBurden.map((element, index, array) => ({
     element: element,
     index: index,
