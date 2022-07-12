@@ -77,7 +77,6 @@ export default function ProfilerSummary() {
       study: study.value,
       cancer: cancer.value,
       strategy: strategy.value,
-      type: 'profilerSummary',
     };
     setParams(params);
   }

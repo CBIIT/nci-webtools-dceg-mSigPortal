@@ -9,7 +9,7 @@ import {
   Tab,
   Nav,
 } from 'react-bootstrap';
-import { useGetPublicDataOptionsQuery } from './publicForm/apiSlice';
+import { useVisualizationOptionsQuery } from './publicForm/apiSlice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
@@ -40,7 +40,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
 
   const { source, projectID, matrixList, svgList, profileOptions } = store.main;
 
-  const { data, error, isFetching } = useGetPublicDataOptionsQuery();
+  const { data, error, isFetching } = useVisualizationOptionsQuery();
 
   const studyOptions = data
     ? // ? Object.keys(data).map((e) => ({ label: e, value: e }))

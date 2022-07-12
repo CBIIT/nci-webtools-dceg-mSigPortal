@@ -5,8 +5,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../../services/store/visualization';
 import { actions as modalActions } from '../../../../services/store/modal';
 import {
-  useGetPublicDataOptionsQuery,
-  usePublicSamplesMutation,
+  useVisualizationOptionsQuery,
+  useVisualizationSamplesMutation,
 } from './apiSlice';
 
 const actions = { ...visualizationActions, ...modalActions };
@@ -24,9 +24,9 @@ export default function PublicForm() {
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const { data, error, isFetching } = useGetPublicDataOptionsQuery();
-  const [getPublicSamples, { isLoading, reset: resetPublicSamples }] =
-    usePublicSamplesMutation();
+  const { data, error, isFetching } = useVisualizationOptionsQuery();
+  const [fetchSamples, { isLoading, reset: resetSamples }] =
+    useVisualizationSamplesMutation();
 
   const defaultValues = {
     study: { label: 'PCAWG', value: 'PCAWG' },
@@ -48,7 +48,7 @@ export default function PublicForm() {
   function handleReset() {
     window.location.hash = '#/visualization';
     resetForm();
-    resetPublicSamples();
+    resetSamples();
     resetVisualization();
   }
 
@@ -61,9 +61,7 @@ export default function PublicForm() {
         cancer: data.cancer.value,
         strategy: data.strategy.value,
       };
-      const { data: samples, projectID } = await getPublicSamples(
-        params
-      ).unwrap();
+      const { data: samples, projectID } = await fetchSamples(params).unwrap();
 
       mergeMain({ samples, projectID });
     } catch (error) {

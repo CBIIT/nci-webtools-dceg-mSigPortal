@@ -2,12 +2,21 @@ const { Router } = require('express');
 const cors = require('cors');
 const config = require('../../config.json');
 const apiSpec = require('../../apiSpec.json');
+
 const {
-  visualizationData,
+  visualizationOptions,
+  visualizationSamples,
+  mutationalProfiles,
+  profilerSummary,
   querySeqmatrix,
-  queryExposure,
   querySignature,
-} = require('../apiQuery');
+} = require('../analysis/visualization');
+
+const {
+  queryExposure,
+  explorationOptions,
+  explorationTmbData,
+} = require('../analysis/exploration');
 
 const router = Router();
 
@@ -27,6 +36,12 @@ router.get('/exposure', queryExposure);
 
 router.get('/signature', querySignature);
 
-router.get('/visualizationData', visualizationData);
+router.get('/visualizationOptions', visualizationOptions);
+
+router.get('/visualizationSamples', visualizationSamples);
+
+router.get('/mutationalProfiles', mutationalProfiles);
+
+router.get('/profilerSummary', profilerSummary);
 
 module.exports = router;

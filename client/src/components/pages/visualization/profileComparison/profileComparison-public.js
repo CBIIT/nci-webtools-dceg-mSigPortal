@@ -6,7 +6,7 @@ import { NavHashLink } from 'react-router-hash-link';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions } from '../../../../services/store/visualization';
 import { useProfileComparisonWithinQuery } from './apiSlice';
-import { useGetPublicDataOptionsQuery } from '../publicForm/apiSlice';
+import { useVisualizationOptionsQuery } from '../publicForm/apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import { defaultMatrix } from '../../../../services/utils';
@@ -27,7 +27,7 @@ export default function PcWithin() {
 
   const [params, setParams] = useState(null);
 
-  //   const { data: publicData } = useGetPublicDataOptionsQuery({
+  //   const { data: publicData } = useVisualizationOptionsQuery({
   //     skip: source == 'user',
   //   });
   const { data, error, isFetching } = useProfileComparisonWithinQuery(params, {

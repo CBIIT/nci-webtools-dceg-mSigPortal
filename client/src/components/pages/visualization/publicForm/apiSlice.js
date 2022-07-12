@@ -3,7 +3,7 @@ import { groupBy } from 'lodash';
 
 export const publicFormApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getPublicDataOptions: builder.query({
+    visualizationOptions: builder.query({
       query: (_) => ({
         url: 'getFileS3',
         method: 'POST',
@@ -24,14 +24,17 @@ export const publicFormApiSlice = apiSlice.injectEndpoints({
         return groupByCancer;
       },
     }),
-    publicSamples: builder.mutation({
+    // visualizationOptions: builder.query({
+    //   query: (_) => ({ url: 'visualizationOptions' }),
+    // }),
+    visualizationSamples: builder.mutation({
       query: (params) => ({
-        url: 'visualizationData',
+        url: 'visualizationSamples',
         params,
       }),
     }),
   }),
 });
 
-export const { useGetPublicDataOptionsQuery, usePublicSamplesMutation } =
+export const { useVisualizationOptionsQuery, useVisualizationSamplesMutation } =
   publicFormApiSlice;

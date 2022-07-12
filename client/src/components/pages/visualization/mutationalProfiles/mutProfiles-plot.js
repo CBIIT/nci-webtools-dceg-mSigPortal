@@ -5,7 +5,7 @@ import Plot from 'react-plotly.js';
 import { downloadImage } from 'plotly.js';
 import { saveAs } from 'file-saver';
 import { useSelector } from 'react-redux';
-import { useSeqmatrixQuery } from '../../../../services/apiSlice';
+import { useMutationalProfilesQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SBS6 from '../../../controls/plotly/mutationalSignature/sbs6';
 import SBS24 from '../../../controls/plotly/mutationalSignature/sbs24';
@@ -34,7 +34,7 @@ export default function MutProfilePlot() {
     data = [],
     error,
     isFetching,
-  } = useSeqmatrixQuery(params, {
+  } = useMutationalProfilesQuery(params, {
     skip: !params,
   });
 
@@ -48,7 +48,6 @@ export default function MutProfilePlot() {
         sample: sample.value,
         profile: profile.value,
         matrix: matrix.value,
-        type: 'mutationalProfiles',
       };
       setParams(params);
     }

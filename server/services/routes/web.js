@@ -1,6 +1,7 @@
 const express = require('express');
 const logger = require('../logger');
 const config = require('../../config.json');
+
 const {
   visualizationProfilerExtraction,
   getResults,
@@ -23,13 +24,19 @@ const {
 } = require('../apiAnalysis');
 
 const {
+  visualizationOptions,
+  visualizationSamples,
+  mutationalProfiles,
+  profilerSummary,
   querySeqmatrix,
-  queryExposure,
   querySignature,
-  visualizationData,
+} = require('../analysis/visualization');
+
+const {
+  queryExposure,
   explorationOptions,
   explorationTmbData,
-} = require('../apiQuery');
+} = require('../analysis/exploration');
 
 const router = express.Router();
 
@@ -82,7 +89,14 @@ router.post('/downloadWorkspace', downloadWorkspace);
 
 router.post('/associationWrapper', associationWrapper);
 
-router.get('/visualizationData', visualizationData);
+// db queries
+router.get('/visualizationOptions', visualizationOptions);
+
+router.get('/visualizationSamples', visualizationSamples);
+
+router.get('/mutationalProfiles', mutationalProfiles);
+
+router.get('/profilerSummary', profilerSummary);
 
 router.get('/explorationOptions', explorationOptions);
 
