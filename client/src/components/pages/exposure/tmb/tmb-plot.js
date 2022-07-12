@@ -22,14 +22,24 @@ export default function MutProfilePlot() {
       });
     }
   }, [publicForm]);
+  console.log(data);
+  console.log(publicForm);
+  if (data) {
+    console.log(data.traces.length);
+  }
 
   return (
-    <div style={{ minHeight: '400px' }}>
+    <div
+      class="container d-flex align-items-center justify-content-center"
+      style={{ minHeight: '400px' }}
+    >
       <LoadingOverlay active={isFetching} />
       {data && (
         <Plot
-          className="w-100"
-          style={{ height: '400px' }}
+          {...(data.traces.length > 1
+            ? { className: 'w-100' }
+            : { className: 'w-30' })}
+          style={{ height: '500px' }}
           data={cloneDeep(data.traces)}
           layout={cloneDeep(data.layout)}
           config={cloneDeep(data.config)}

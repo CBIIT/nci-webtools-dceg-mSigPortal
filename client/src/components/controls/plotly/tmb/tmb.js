@@ -4,7 +4,10 @@ export default function TMB(data, study) {
   // Calculate the number of mutations per megabase for each study
   const genome = { PCAWG: 'GRCh37', TCGA: 'GRCh37' };
   const genomeSize = { GRCh37: 3101976562 / Math.pow(10, 6) };
-  const burden = (exposure) => Math.log10(exposure / genomeSize[genome[study]]);
+
+  console.log(genome[study]);
+  //const burden = (exposure) => Math.log10(exposure / genomeSize[genome[study]]);
+  const burden = (exposure) => Math.log10(exposure / genomeSize.GRCh37);
 
   console.log(data);
   function average(arr) {
@@ -13,18 +16,22 @@ export default function TMB(data, study) {
   }
   const groupByCancer = groupBy(data, 'cancer');
 
+  console.log('groupByCancer');
+  console.log(groupByCancer);
+
   // calculate burden per cancer/sample
   const cancerBurden = Object.entries(groupByCancer)
     .map(([cancer, values]) => {
       const groupBySample = groupBy(values, 'sample');
-      const tmbs = Object.entries(groupBySample).map(([_, e]) =>
-        burden(e.reduce((sum, e) => e.exposure + sum, 0))
-      );
-      tmbs.sort((a, b) => a - b);
+      const tmbs = Object.entries(groupBySample)
+        .map(([_, e]) => burden(e.reduce((sum, e) => sum + e.exposure, 0)))
+        .sort((a, b) => a - b);
+
       return { cancer, tmbs };
     })
     .sort((a, b) => (a.cancer > b.cancer ? 1 : b.cancer > a.cancer ? -1 : 0));
 
+  console.log('cancerBurden');
   console.log(cancerBurden);
   const totalCancer = cancerBurden.length;
   console.log(totalCancer);
@@ -42,8 +49,8 @@ export default function TMB(data, study) {
       : 0
   );
 
-  console.log('sorted');
-  console.log(cancerBurden);
+  //console.log('sorted');
+  //console.log(cancerBurden);
 
   const traces = cancerBurden.map((element, index, array) => ({
     element: element,
@@ -117,8 +124,8 @@ export default function TMB(data, study) {
     type: 'line',
     xref: 'x',
     yref: 'paper',
-    x0: index + 0.3,
-    x1: index + 0.7,
+    x0: index + 0.4,
+    x1: index + 0.6,
     y0: -0.11,
     y1: -0.11,
     line: {
@@ -191,6 +198,8 @@ export default function TMB(data, study) {
     },
   }));
 
+  let tracesAutorange = true;
+  traces.length > 1 ? (tracesAutorange = false) : (tracesAutorange = true);
   const layout = {
     // title: {
     //   text: "Tumor Mutational Burden Separated by Signatures",
@@ -220,8 +229,8 @@ export default function TMB(data, study) {
       linewidth: 2,
       mirror: true,
       automargin: true,
-      autorange: false,
-      range: [-Math.ceil(yMax), Math.ceil(yMax)],
+      autorange: tracesAutorange,
+      range: [-Math.floor(yMax), Math.floor(yMax)],
     },
 
     shapes: [...shapes, ...lines, ...bottoLabelline],
