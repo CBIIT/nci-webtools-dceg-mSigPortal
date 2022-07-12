@@ -106,13 +106,13 @@ export default function TMB(data, study = 'PCAWG') {
     type: 'line',
     xref: 'x',
     yref: 'paper',
-    x0: index + 0.1,
-    x1: index + 0.9,
-    y0: -0.15,
-    y1: -0.15,
+    x0: index + 0.3,
+    x1: index + 0.7,
+    y0: -0.11,
+    y1: -0.11,
     line: {
       width: 1,
-      color: 'red',
+      color: 'black',
     },
   }));
 
