@@ -5,8 +5,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../../services/store/visualization';
 import { actions as modalActions } from '../../../../services/store/modal';
 import {
-  useVisualizationPublicMutation,
   useGetPublicDataOptionsQuery,
+  usePublicSamplesMutation,
 } from './apiSlice';
 
 const actions = { ...visualizationActions, ...modalActions };
@@ -25,8 +25,8 @@ export default function PublicForm() {
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const { data, error, isFetching } = useGetPublicDataOptionsQuery();
-  const [handleSubmitWeb, { isLoading, reset: resetWeb }] =
-    useVisualizationPublicMutation();
+  const [getPublicSamples, { isLoading, reset: resetPublicSamples }] =
+    usePublicSamplesMutation();
 
   const defaultValues = {
     study: { label: 'PCAWG', value: 'PCAWG' },
@@ -48,7 +48,7 @@ export default function PublicForm() {
   function handleReset() {
     window.location.hash = '#/visualization';
     resetForm();
-    resetWeb();
+    resetPublicSamples();
     resetVisualization();
   }
 
@@ -61,11 +61,11 @@ export default function PublicForm() {
         cancer: data.cancer.value,
         strategy: data.strategy.value,
       };
-      const { data: samples, projectID } = await handleSubmitWeb(
+      const { data: samples, projectID } = await getPublicSamples(
         params
       ).unwrap();
 
-      mergeMain({ samples, projectID: projectID });
+      mergeMain({ samples, projectID });
     } catch (error) {
       if (error.originalStatus == 504) {
         mergeMain({
