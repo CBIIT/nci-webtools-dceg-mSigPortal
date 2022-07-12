@@ -40,6 +40,10 @@ export default function SBS24(data, sample) {
     (a, e) => a + parseInt(e.contribution),
     0
   );
+
+  const dataTU = [...dataT, ...dataU];
+
+  const maxVal = Math.max(...dataTU.map((o) => o.contribution));
   //   console.log("dataT");
   //   console.log(dataT);
   //   console.log("dataU");
@@ -104,6 +108,8 @@ export default function SBS24(data, sample) {
       tickfont: {
         size: 16,
       },
+      autorange: false,
+      range: [0, maxVal + maxVal * 0.15],
     },
     yaxis: {
       tickfont: {

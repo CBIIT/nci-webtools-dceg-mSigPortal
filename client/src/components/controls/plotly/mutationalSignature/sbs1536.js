@@ -351,7 +351,7 @@ export default function SBS96(data, sample) {
           ? 1
           : 0
       );
-      console.log(value);
+      //console.log(value);
       heatmapY.push(key.charAt(0) + '--' + key.charAt(key.length - 1));
       heatmapZ.push(
         Object.entries(value).map(([k, v]) => v.contribution / totalMutations)
@@ -367,8 +367,8 @@ export default function SBS96(data, sample) {
     }
   );
 
-  console.log('groupByMutationOuter');
-  console.log(groupByMutationOuter);
+  //console.log('groupByMutationOuter');
+  //console.log(groupByMutationOuter);
 
   heatmapZ.forEach((item, index) => {
     heatMapZ0.push(item.slice().splice(0, 16));
@@ -493,6 +493,7 @@ export default function SBS96(data, sample) {
     index: index,
     textangle: -90,
   }));
+
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     grid: {
@@ -503,9 +504,9 @@ export default function SBS96(data, sample) {
       showticklabels: false,
       showline: true,
       tickangle: -90,
-      tickfont: {
-        size: 8,
-      },
+      // tickfont: {
+      //   size: 8,
+      // },
       tickmode: 'array',
       tickvals: flatSorted.map((_, i) => i),
       ticktext: flatSorted.map((e) => e.mutationType),
@@ -514,7 +515,7 @@ export default function SBS96(data, sample) {
       mirror: true,
     },
     yaxis: {
-      //   title: "Number of Single Base Substitutions",
+      title: 'Number of Single Base Substitutions',
       autorange: false,
       range: [0, maxVal + maxVal * 0.2],
       linecolor: 'black',
@@ -563,7 +564,7 @@ export default function SBS96(data, sample) {
     annotations: [...annotations, sampleAnnotation, ...xannotations],
   };
   // console.log("layout");
-  console.log(layout);
+  //console.log(layout);
 
   return { traces, layout };
 }
