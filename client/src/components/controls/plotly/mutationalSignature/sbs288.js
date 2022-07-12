@@ -409,7 +409,7 @@ export default function SBS288(data, sample) {
       linecolor: 'black',
       linewidth: 1,
       mirror: true,
-      domain: [0, 0.77],
+      domain: [0, 0.75],
     },
     yaxis: {
       title: 'Number of Single Base Substitutions',
