@@ -1,38 +1,38 @@
 export default function DBS78(data, sample) {
   const colors = {
-    "AC>": "#09BCED",
-    "AT>": "#0266CA",
-    "CC>": "#9FCE62",
-    "CG>": "#006501",
-    "CT>": "#FF9898",
-    "GC>": "#E22925",
-    "TA>": "#FEB065",
-    "TC>": "#FD8000",
-    "TG>": "#CB98FD",
-    "TT>": "#4C0299",
+    'AC>': '#09BCED',
+    'AT>': '#0266CA',
+    'CC>': '#9FCE62',
+    'CG>': '#006501',
+    'CT>': '#FF9898',
+    'GC>': '#E22925',
+    'TA>': '#FEB065',
+    'TC>': '#FD8000',
+    'TG>': '#CB98FD',
+    'TT>': '#4C0299',
   };
 
   const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
   const maxVal = Math.max(...data.map((o) => o.mutations));
   //console.log(maxVal);
   const numberWithCommas = (x) =>
-    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
   //console.log(totalMutations);
   //console.log("data");
   //console.log(data);
 
   const dataFilter = data.filter(
     (item) =>
-      item.mutationType.substring(0, 2) === "AC" ||
-      item.mutationType.substring(0, 2) === "AT" ||
-      item.mutationType.substring(0, 2) === "CC" ||
-      item.mutationType.substring(0, 2) === "CG" ||
-      item.mutationType.substring(0, 2) === "CT" ||
-      item.mutationType.substring(0, 2) === "GC" ||
-      item.mutationType.substring(0, 2) === "TA" ||
-      item.mutationType.substring(0, 2) === "TC" ||
-      item.mutationType.substring(0, 2) === "TG" ||
-      item.mutationType.substring(0, 2) === "TT"
+      item.mutationType.substring(0, 2) === 'AC' ||
+      item.mutationType.substring(0, 2) === 'AT' ||
+      item.mutationType.substring(0, 2) === 'CC' ||
+      item.mutationType.substring(0, 2) === 'CG' ||
+      item.mutationType.substring(0, 2) === 'CT' ||
+      item.mutationType.substring(0, 2) === 'GC' ||
+      item.mutationType.substring(0, 2) === 'TA' ||
+      item.mutationType.substring(0, 2) === 'TC' ||
+      item.mutationType.substring(0, 2) === 'TG' ||
+      item.mutationType.substring(0, 2) === 'TT'
   );
 
   //console.log(dataFilter);
@@ -54,7 +54,7 @@ export default function DBS78(data, sample) {
   const traces = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
       name: mutation,
-      type: "bar",
+      type: 'bar',
       marker: { color: colors[mutation] },
       //x: signatures.map((e) => e.mutationType),
       x: signatures.map(
@@ -64,7 +64,7 @@ export default function DBS78(data, sample) {
             .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
       ),
       y: signatures.map((e) => e.contribution),
-      hoverinfo: "x+y",
+      hoverinfo: 'x+y',
       showlegend: false,
     })
   );
@@ -72,10 +72,10 @@ export default function DBS78(data, sample) {
   //console.log(traces);
   const annotations = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
-      xref: "x",
-      yref: "paper",
-      xanchor: "bottom",
-      yanchor: "bottom",
+      xref: 'x',
+      yref: 'paper',
+      xanchor: 'bottom',
+      yanchor: 'bottom',
       x:
         array
           .slice(0, groupIndex)
@@ -87,15 +87,15 @@ export default function DBS78(data, sample) {
       font: {
         size: 18,
       },
-      align: "center",
+      align: 'center',
     })
   );
   //console.log(annotations);
   const shapes = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
-      type: "rect",
-      xref: "x",
-      yref: "paper",
+      type: 'rect',
+      xref: 'x',
+      yref: 'paper',
       x0: array
         .slice(0, groupIndex)
         .reduce((x0, [_, signatures]) => x0 + signatures.length, -0.4),
@@ -115,27 +115,27 @@ export default function DBS78(data, sample) {
   //console.log(shapes);
 
   const sampleAnnotation = {
-    xref: "paper",
-    yref: "paper",
-    xanchor: "bottom",
-    yanchor: "bottom",
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
     x: 0,
     y: 0.92,
     text:
-      "<b>" +
+      '<b>' +
       sample +
-      ": " +
+      ': ' +
       numberWithCommas(totalMutations) +
-      " double subs</b>",
+      ' double subs</b>',
     showarrow: false,
     font: {
       size: 18,
     },
-    align: "center",
+    align: 'center',
   };
 
   const layout = {
-    hoverlabel: { bgcolor: "#FFF" },
+    hoverlabel: { bgcolor: '#FFF' },
     xaxis: {
       //title: "Double Substitution",
       showticklabels: true,
@@ -144,7 +144,7 @@ export default function DBS78(data, sample) {
       tickfont: {
         size: 10,
       },
-      tickmode: "array",
+      tickmode: 'array',
       tickvals: flatSorted.map((_, i) => i),
       ticktext: flatSorted.map((e) =>
         e.mutationType.substring(
@@ -152,15 +152,15 @@ export default function DBS78(data, sample) {
           e.mutationType.length
         )
       ),
-      linecolor: "black",
+      linecolor: 'black',
       linewidth: 1,
       mirror: true,
     },
     yaxis: {
-      title: "Number of Double Base Substitutions",
+      title: 'Number of Double Base Substitutions',
       autorange: false,
       range: [0, maxVal + maxVal * 5],
-      linecolor: "black",
+      linecolor: 'black',
       linewidth: 1,
       mirror: true,
     },

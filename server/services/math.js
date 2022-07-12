@@ -7,15 +7,15 @@ function dotProduct(v1, v2) {
 }
 
 function magnitude(v) {
-    return Math.sqrt(dotProduct(v, v));
+  return Math.sqrt(dotProduct(v, v));
 }
 
 function cosineSimilarity(v1, v2) {
-    return dotProduct(v1, v2) / (magnitude(v1) * magnitude(v2));
+  return dotProduct(v1, v2) / (magnitude(v1) * magnitude(v2));
 }
 
 module.exports = {
-    dotProduct,
-    magnitude,
-    cosineSimilarity,
-}
+  dotProduct,
+  magnitude,
+  cosineSimilarity,
+};

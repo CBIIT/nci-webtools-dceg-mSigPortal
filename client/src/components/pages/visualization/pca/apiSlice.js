@@ -29,5 +29,8 @@ export const pcaApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { usePcaWithinQuery, usePcaPublicQuery, usePcaSignatureSetsQuery } =
-  pcaApiSlice;
+export const {
+  usePcaWithinQuery,
+  usePcaPublicQuery,
+  usePcaSignatureSetsQuery,
+} = pcaApiSlice;

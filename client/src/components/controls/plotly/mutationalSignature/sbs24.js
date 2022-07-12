@@ -1,16 +1,16 @@
 export default function SBS24(data, sample) {
   const colors = {
-    "C>A": "#03BCEE",
-    "C>G": "black",
-    "C>T": "#E32926",
-    "T>A": "#CAC9C9",
-    "T>C": "#A1CE63",
-    "T>G": "#EBC6C4",
+    'C>A': '#03BCEE',
+    'C>G': 'black',
+    'C>T': '#E32926',
+    'T>A': '#CAC9C9',
+    'T>C': '#A1CE63',
+    'T>G': '#EBC6C4',
   };
   //   console.log("data--:");
   //   console.log(data);
   const numberWithCommas = (x) =>
-    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
 
   const groupByMutation = data.reduce((groups, e, i) => {
     const mutation = e.mutationType.substring(2, e.mutationType.length);
@@ -29,9 +29,9 @@ export default function SBS24(data, sample) {
   const dataT = [];
   const dataU = [];
   Object.entries(flatSorted).forEach(([key, value], groupIndex, array) => {
-    if (value.mutationType.substring(0, 1) === "T") {
+    if (value.mutationType.substring(0, 1) === 'T') {
       dataT.push(value);
-    } else if (value.mutationType.substring(0, 1) === "U") {
+    } else if (value.mutationType.substring(0, 1) === 'U') {
       dataU.push(value);
     }
   });
@@ -46,57 +46,57 @@ export default function SBS24(data, sample) {
   //   console.log(dataU);
 
   const tracesT = {
-    name: "Transcrribed",
-    type: "bar",
-    marker: { color: "#004765" },
+    name: 'Transcrribed',
+    type: 'bar',
+    marker: { color: '#004765' },
 
     x: dataT.map((element, index, array) => element.contribution),
     y: dataU.map(
       (element, index, array) =>
-        element.mutationType.substring(2, element.mutationType.length) + " "
+        element.mutationType.substring(2, element.mutationType.length) + ' '
     ),
-    hoverinfo: "y+x",
-    orientation: "h",
+    hoverinfo: 'y+x',
+    orientation: 'h',
   };
 
   //console.log(tracesT);
   const tracesU = {
-    name: "Untranscribed",
-    type: "bar",
-    marker: { color: "#E32925" },
+    name: 'Untranscribed',
+    type: 'bar',
+    marker: { color: '#E32925' },
     x: dataU.map((element, index, array) => element.contribution),
     y: dataU.map(
       (element, index, array) =>
-        element.mutationType.substring(2, element.mutationType.length) + " "
+        element.mutationType.substring(2, element.mutationType.length) + ' '
     ),
-    hoverinfo: "y+x",
-    orientation: "h",
+    hoverinfo: 'y+x',
+    orientation: 'h',
   };
   //console.log(tracesU);
 
   const traces = [tracesU, tracesT];
 
   const layout = {
-    hoverlabel: { bgcolor: "#FFF" },
+    hoverlabel: { bgcolor: '#FFF' },
     bargap: 0.3,
     legend: {
       x: 1,
-      xanchor: "right",
+      xanchor: 'right',
       y: 1,
-      traceorder: "reversed",
+      traceorder: 'reversed',
     },
     title: {
       text:
-        "<b>" + sample + ": " + numberWithCommas(totalMutations) + " subs </b>",
+        '<b>' + sample + ': ' + numberWithCommas(totalMutations) + ' subs </b>',
       font: {
         size: 24,
       },
-      xref: "paper",
+      xref: 'paper',
       x: 0.05,
     },
     xaxis: {
       title: {
-        text: "<b>Number of Single Base Substitution</b>",
+        text: '<b>Number of Single Base Substitution</b>',
         font: {
           size: 18,
         },
@@ -109,7 +109,7 @@ export default function SBS24(data, sample) {
       tickfont: {
         size: 16,
       },
-      categoryorder: "category descending",
+      categoryorder: 'category descending',
     },
   };
   // console.log("layout");

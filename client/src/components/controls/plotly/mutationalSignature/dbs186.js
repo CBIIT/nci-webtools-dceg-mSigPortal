@@ -1,13 +1,13 @@
 export default function DBS186(data, sample) {
   const colors = {
-    "CC>": "#09BCEE",
-    "CT>": "#A0CE63",
-    "TC>": "#FE9898",
-    "TT>": "#FE8002",
+    'CC>': '#09BCEE',
+    'CT>': '#A0CE63',
+    'TC>': '#FE9898',
+    'TT>': '#FE8002',
   };
 
   const numberWithCommas = (x) =>
-    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
   //console.log("data");
   //console.log(data);
 
@@ -15,9 +15,9 @@ export default function DBS186(data, sample) {
   const arrayDataU = [];
 
   Object.values(data).forEach((group) => {
-    if (group.mutationType.substring(0, 1) === "T") {
+    if (group.mutationType.substring(0, 1) === 'T') {
       arrayDataT.push(group);
-    } else if (group.mutationType.substring(0, 1) === "U") {
+    } else if (group.mutationType.substring(0, 1) === 'U') {
       arrayDataU.push(group);
     }
   });
@@ -46,13 +46,13 @@ export default function DBS186(data, sample) {
   const T_flatSorted = Object.values(T_groupByMutation).flat();
 
   const tracesT = {
-    name: "Transcrribed Strand",
-    type: "bar",
-    marker: { color: "#004765" },
+    name: 'Transcrribed Strand',
+    type: 'bar',
+    marker: { color: '#004765' },
     x: T_flatSorted.map((element, index, array) => index),
     y: T_flatSorted.map((element, index, array) => element.contribution),
 
-    hoverinfo: "x+y",
+    hoverinfo: 'x+y',
     showlegend: true,
   };
 
@@ -71,13 +71,13 @@ export default function DBS186(data, sample) {
   const U_flatSorted = Object.values(U_groupByMutation).flat();
 
   const tracesU = {
-    name: "Untranscribed Strand",
-    type: "bar",
-    marker: { color: "#E32925" },
+    name: 'Untranscribed Strand',
+    type: 'bar',
+    marker: { color: '#E32925' },
     x: U_flatSorted.map((element, index, array) => index),
     y: U_flatSorted.map((element, index, array) => element.contribution),
 
-    hoverinfo: "x+y",
+    hoverinfo: 'x+y',
     showlegend: true,
   };
 
@@ -85,10 +85,10 @@ export default function DBS186(data, sample) {
 
   const annotations = Object.entries(T_groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
-      xref: "x",
-      yref: "paper",
-      xanchor: "bottom",
-      yanchor: "bottom",
+      xref: 'x',
+      yref: 'paper',
+      xanchor: 'bottom',
+      yanchor: 'bottom',
       x:
         array
           .slice(0, groupIndex)
@@ -100,15 +100,15 @@ export default function DBS186(data, sample) {
       font: {
         size: 18,
       },
-      align: "center",
+      align: 'center',
     })
   );
   //console.log(annotations);
   const shapes1 = Object.entries(T_groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
-      type: "rect",
-      xref: "x",
-      yref: "paper",
+      type: 'rect',
+      xref: 'x',
+      yref: 'paper',
       x0: array
         .slice(0, groupIndex)
         .reduce((x0, [_, signatures]) => x0 + signatures.length, -0.4),
@@ -133,9 +133,9 @@ export default function DBS186(data, sample) {
   );
   const shapes2 = Object.entries(T_groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
-      type: "rect",
-      xref: "x",
-      yref: "paper",
+      type: 'rect',
+      xref: 'x',
+      yref: 'paper',
       y0: 1,
       x0: array
         .slice(0, groupIndex)
@@ -161,31 +161,31 @@ export default function DBS186(data, sample) {
   //console.log(shapes);
 
   const sampleAnnotation = {
-    xref: "paper",
-    yref: "paper",
-    xanchor: "bottom",
-    yanchor: "bottom",
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
     x: 0,
     y: 0.92,
     text:
-      "<b>" +
+      '<b>' +
       sample +
-      ": " +
+      ': ' +
       numberWithCommas(totalMutations) +
-      " transcribed double subs</b>",
+      ' transcribed double subs</b>',
     showarrow: false,
     font: {
       size: 18,
     },
-    align: "center",
+    align: 'center',
   };
 
   const layout = {
-    hoverlabel: { bgcolor: "#FFF" },
+    hoverlabel: { bgcolor: '#FFF' },
     showlegend: true,
     legend: {
       x: 1,
-      xanchor: "right",
+      xanchor: 'right',
       y: 1,
     },
     xaxis: {
@@ -196,7 +196,7 @@ export default function DBS186(data, sample) {
       tickfont: {
         size: 18,
       },
-      tickmode: "array",
+      tickmode: 'array',
       tickvals: T_flatSorted.map((_, i) => i),
       ticktext: T_flatSorted.map((e) =>
         e.mutationType.substring(
@@ -204,15 +204,15 @@ export default function DBS186(data, sample) {
           e.mutationType.length
         )
       ),
-      linecolor: "black",
+      linecolor: 'black',
       linewidth: 1,
       mirror: true,
     },
     yaxis: {
-      title: "Number of Double Base Substitutions",
+      title: 'Number of Double Base Substitutions',
       autorange: false,
       range: [0, maxVal + maxVal * 5],
-      linecolor: "black",
+      linecolor: 'black',
       linewidth: 1,
       mirror: true,
       tickfont: {

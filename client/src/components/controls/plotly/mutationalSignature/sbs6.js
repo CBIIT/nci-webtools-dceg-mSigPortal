@@ -1,16 +1,16 @@
 export default function SBS6(data, sample) {
   const colors = {
-    "C>A": "#03BCEE",
-    "C>G": "black",
-    "C>T": "#E32926",
-    "T>A": "#CAC9C9",
-    "T>C": "#A1CE63",
-    "T>G": "#EBC6C4",
+    'C>A': '#03BCEE',
+    'C>G': 'black',
+    'C>T': '#E32926',
+    'T>A': '#CAC9C9',
+    'T>C': '#A1CE63',
+    'T>G': '#EBC6C4',
   };
   //   console.log("data--:");
   //   console.log(data);
   const numberWithCommas = (x) =>
-    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
 
   const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
 
@@ -30,30 +30,30 @@ export default function SBS6(data, sample) {
   const traces = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
       name: mutation,
-      type: "bar",
+      type: 'bar',
       marker: { color: colors[mutation] },
-      y: signatures.map((e) => e.mutationType + " "),
+      y: signatures.map((e) => e.mutationType + ' '),
       x: signatures.map((e) => e.contribution),
-      hoverinfo: "x+y",
-      orientation: "h",
+      hoverinfo: 'x+y',
+      orientation: 'h',
     })
   );
 
   const layout = {
-    hoverlabel: { bgcolor: "#FFF" },
+    hoverlabel: { bgcolor: '#FFF' },
     showlegend: false,
     title: {
       text:
-        "<b>" + sample + ": " + numberWithCommas(totalMutations) + " subs </b>",
+        '<b>' + sample + ': ' + numberWithCommas(totalMutations) + ' subs </b>',
       font: {
         size: 24,
       },
-      xref: "paper",
+      xref: 'paper',
       x: 0.05,
     },
     xaxis: {
       title: {
-        text: "<b>Number of Single Base Substitution</b>",
+        text: '<b>Number of Single Base Substitution</b>',
         font: {
           size: 18,
         },
@@ -66,7 +66,7 @@ export default function SBS6(data, sample) {
       tickfont: {
         size: 16,
       },
-      categoryorder: "category descending",
+      categoryorder: 'category descending',
     },
   };
   return { traces, layout };

@@ -2,29 +2,29 @@ export default function ID28(data, sample) {
   //.log("data");
   //console.log(data);
   const colors = {
-    "1:Del:C": "#FBBD6F",
-    "1:Del:T": "#FE8002",
-    "1:Ins:C": "#AEDD8A",
-    "1:Ins:T": "#35A12E",
-    "o:": "#1764AA",
+    '1:Del:C': '#FBBD6F',
+    '1:Del:T': '#FE8002',
+    '1:Ins:C': '#AEDD8A',
+    '1:Ins:T': '#35A12E',
+    'o:': '#1764AA',
   };
   const annotationColors = {
-    "1:Del:C": "black",
-    "1:Del:T": "white",
-    "1:Ins:C": "black",
-    "1:Ins:T": "white",
-    "o:": "#1764AA",
+    '1:Del:C': 'black',
+    '1:Del:T': 'white',
+    '1:Ins:C': 'black',
+    '1:Ins:T': 'white',
+    'o:': '#1764AA',
   };
 
-  const arrayIDAnnXTop = ["1bp Deletion", "1bp Insertion", ">1bp"],
-    arrayIDAnnXBot = ["Homopolymer Length", "Homopolymer Length", "Type"],
+  const arrayIDAnnXTop = ['1bp Deletion', '1bp Insertion', '>1bp'],
+    arrayIDAnnXBot = ['Homopolymer Length', 'Homopolymer Length', 'Type'],
     arrayIDAnnXLabel = [5, 17, 25],
     arrayIDAnnotationTop = [],
     arrayIDAnnotationBot = [];
 
   const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
   const numberWithCommas = (x) =>
-    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
   const maxVal = Math.max(...data.map((o) => o.mutations));
 
   const data1 = data.slice(0, data.length - 4);
@@ -57,7 +57,7 @@ export default function ID28(data, sample) {
   });
 
   const arrayID2_Mod = data2.map((element) => ({
-    mutationType: "o:" + element.mutationType,
+    mutationType: 'o:' + element.mutationType,
     contribution: element.mutations,
   }));
 
@@ -94,11 +94,11 @@ export default function ID28(data, sample) {
   const traces = Object.entries(arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
       name: mutation,
-      type: "bar",
+      type: 'bar',
       marker: {
         color:
-          signatures[0].mutationType.substring(0, 1) === "o"
-            ? "#1764AA"
+          signatures[0].mutationType.substring(0, 1) === 'o'
+            ? '#1764AA'
             : colors[
                 signatures[0].mutationType.substring(
                   0,
@@ -113,17 +113,17 @@ export default function ID28(data, sample) {
             .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
       ),
       y: signatures.map((e) => e.contribution),
-      hoverinfo: "x+y",
+      hoverinfo: 'x+y',
       showlegend: false,
     })
   );
 
   const annotations1 = Object.entries(arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
-      xref: "x",
-      yref: "paper",
-      xanchor: "bottom",
-      yanchor: "bottom",
+      xref: 'x',
+      yref: 'paper',
+      xanchor: 'bottom',
+      yanchor: 'bottom',
       x:
         array
           .slice(0, groupIndex)
@@ -141,8 +141,8 @@ export default function ID28(data, sample) {
       font: {
         size: 14,
         color:
-          signatures[0].mutationType.substring(0, 1) === "o"
-            ? "#1764AA"
+          signatures[0].mutationType.substring(0, 1) === 'o'
+            ? '#1764AA'
             : annotationColors[
                 signatures[0].mutationType.substring(
                   0,
@@ -150,7 +150,7 @@ export default function ID28(data, sample) {
                 )
               ],
       },
-      align: "center",
+      align: 'center',
       signatures: signatures,
       mutation: mutation,
       groupIndex: groupIndex,
@@ -158,85 +158,85 @@ export default function ID28(data, sample) {
   );
   console.log(annotations1);
   const annotations2 = arrayIDAnnotationBot.map((num, index) => ({
-    xref: "x",
-    yref: "paper",
-    xanchor: "bottom",
-    yanchor: "bottom",
+    xref: 'x',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
     x: index,
-    y: num.substring(0, 1) === "o" ? -0.12 : -0.1,
+    y: num.substring(0, 1) === 'o' ? -0.12 : -0.1,
     xnum: parseInt(num.substring(num.length - 1, num.length)),
     text:
-      num.substring(0, 1) === "o"
-        ? num === "o:complex"
-          ? "<b>comp</b>"
-          : num === "o:MH"
-          ? "<b>MH</b>"
-          : "<b>" + num.substring(num.length - 3, num.length) + "</b>"
+      num.substring(0, 1) === 'o'
+        ? num === 'o:complex'
+          ? '<b>comp</b>'
+          : num === 'o:MH'
+          ? '<b>MH</b>'
+          : '<b>' + num.substring(num.length - 3, num.length) + '</b>'
         : num.substring(num.length - 1, num.lenght) >= 5
-        ? "<b>" + num.substring(num.length - 1, num.length) + "+</b>"
-        : "<b>" + num.substring(num.length - 1, num.length) + "</b>",
+        ? '<b>' + num.substring(num.length - 1, num.length) + '+</b>'
+        : '<b>' + num.substring(num.length - 1, num.length) + '</b>',
     showarrow: false,
     font: {
-      size: num.substring(0, 1) === "o" ? 11 : 14,
+      size: num.substring(0, 1) === 'o' ? 11 : 14,
     },
-    textangle: num.substring(0, 1) === "o" ? -90 : 0,
-    align: "center",
+    textangle: num.substring(0, 1) === 'o' ? -90 : 0,
+    align: 'center',
     num: num,
     index: index,
   }));
 
   console.log(annotations2);
   const annotationsIDTopLabel = arrayIDAnnXLabel.map((num, index) => ({
-    xref: "x",
-    yref: "paper",
+    xref: 'x',
+    yref: 'paper',
     x: num,
-    xanchor: "bottom",
+    xanchor: 'bottom',
     y: 1.07,
-    yanchor: "bottom",
-    text: "<b>" + arrayIDAnnXTop[index] + "</b>",
+    yanchor: 'bottom',
+    text: '<b>' + arrayIDAnnXTop[index] + '</b>',
     showarrow: false,
     font: {
       size: 14,
     },
-    align: "center",
+    align: 'center',
   }));
 
   const annotationsIDBotLabel = arrayIDAnnXLabel.map((num, index) => ({
-    xref: "x",
-    yref: "paper",
+    xref: 'x',
+    yref: 'paper',
     x: num,
-    xanchor: "bottom",
+    xanchor: 'bottom',
     y: -0.18,
-    yanchor: "bottom",
-    text: "<b>" + arrayIDAnnXBot[index] + "</b>",
+    yanchor: 'bottom',
+    text: '<b>' + arrayIDAnnXBot[index] + '</b>',
     showarrow: false,
     font: {
       size: 14,
     },
-    align: "center",
+    align: 'center',
   }));
 
   const sampleAnnotation = {
-    xref: "paper",
-    yref: "paper",
-    xanchor: "bottom",
-    yanchor: "bottom",
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
     x: 0,
     y: 0.92,
     text:
-      "<b>" + sample + ": " + numberWithCommas(totalMutations) + " indels</b>",
+      '<b>' + sample + ': ' + numberWithCommas(totalMutations) + ' indels</b>',
     showarrow: false,
     font: {
       size: 18,
     },
-    align: "center",
+    align: 'center',
   };
 
   const shapes1 = Object.entries(arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
-      type: "rect",
-      xref: "x",
-      yref: "paper",
+      type: 'rect',
+      xref: 'x',
+      yref: 'paper',
       x0: array
         .slice(0, groupIndex)
         .reduce((x0, [_, sigs]) => x0 + sigs.length, -0.4),
@@ -246,8 +246,8 @@ export default function ID28(data, sample) {
       y0: 1.07,
       y1: 1.01,
       fillcolor:
-        signatures[0].mutationType.substring(0, 1) === "o"
-          ? "#1764AA"
+        signatures[0].mutationType.substring(0, 1) === 'o'
+          ? '#1764AA'
           : colors[
               signatures[0].mutationType.substring(
                 0,
@@ -267,9 +267,9 @@ export default function ID28(data, sample) {
 
   const shapes2 = Object.entries(arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
-      type: "rect",
-      xref: "x",
-      yref: "paper",
+      type: 'rect',
+      xref: 'x',
+      yref: 'paper',
       x0: array
         .slice(0, groupIndex)
         .reduce((x0, [_, sigs]) => x0 + sigs.length, -0.4),
@@ -279,8 +279,8 @@ export default function ID28(data, sample) {
       y0: -0.01,
       y1: -0.05,
       fillcolor:
-        signatures[0].mutationType.substring(0, 1) === "o"
-          ? "#1764AA"
+        signatures[0].mutationType.substring(0, 1) === 'o'
+          ? '#1764AA'
           : colors[
               signatures[0].mutationType.substring(
                 0,
@@ -299,7 +299,7 @@ export default function ID28(data, sample) {
   );
 
   const layout = {
-    hoverlabel: { bgcolor: "#FFF" },
+    hoverlabel: { bgcolor: '#FFF' },
     xaxis: {
       showticklabels: false,
       showline: true,
@@ -307,18 +307,18 @@ export default function ID28(data, sample) {
       tickfont: {
         size: 10,
       },
-      tickmode: "array",
+      tickmode: 'array',
       tickvals: flatSorted.map((_, i) => i),
       ticktext: flatSorted.map((e) => e.mutationType),
-      linecolor: "black",
+      linecolor: 'black',
       linewidth: 1,
       mirror: true,
     },
     yaxis: {
-      title: "Number of Idels",
+      title: 'Number of Idels',
       autorange: false,
       range: [0, maxVal + maxVal * 0.15],
-      linecolor: "black",
+      linecolor: 'black',
       linewidth: 1,
       mirror: true,
     },

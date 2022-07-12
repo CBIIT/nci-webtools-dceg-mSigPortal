@@ -6,6 +6,7 @@ export default function TMB(data, study = 'PCAWG') {
   const genomeSize = { GRCh37: 3101976562 / Math.pow(10, 6) };
   const burden = (exposure) => Math.log10(exposure / genomeSize[genome[study]]);
 
+  console.log(data);
   function average(arr) {
     const sum = arr.reduce((a, b) => a + b, 0);
     return sum / arr.length || 0;
@@ -16,23 +17,29 @@ export default function TMB(data, study = 'PCAWG') {
   const cancerBurden = Object.entries(groupByCancer)
     .map(([cancer, values]) => {
       const groupBySample = groupBy(values, 'sample');
-      // sum exposure values per sample group and calculate burden
       const tmbs = Object.entries(groupBySample).map(([_, e]) =>
         burden(e.reduce((sum, e) => e.exposure + sum, 0))
       );
+      tmbs.sort((a, b) => a - b);
       return { cancer, tmbs };
     })
     .sort((a, b) => (a.cancer > b.cancer ? 1 : b.cancer > a.cancer ? -1 : 0));
 
   console.log(cancerBurden);
+  const totalCancer = cancerBurden.length;
+  console.log(totalCancer);
 
+  const absYValue = cancerBurden
+    .map((o) => o.tmbs.map((e) => Math.abs(e)))
+    .flat();
+  const yMax = Math.max(...absYValue);
   const traces = cancerBurden.map((element, index, array) => ({
     element: element,
     index: index,
     array: array,
     name: `${element.cancer}`,
     type: 'scatter',
-    marker: { symbol: 'circle-open', size: 4, color: 'black' },
+    marker: { symbol: 'circle-open', size: 3, color: 'black' },
     mode: 'markers',
     y: element.tmbs.map((e) => e),
     average: average(element.tmbs.map((e) => e)),
@@ -45,16 +52,13 @@ export default function TMB(data, study = 'PCAWG') {
     //     i +
     //     0.5
     // ),
-    x:
-      array.length > 1
-        ? element.tmbs.map(
-            (e, i) => index + 0.7 + (0.3 / element.tmbs.length) * i
-          )
-        : element.tmbs.map(
-            (e, i) => index + 0.07 + (0.8 / element.tmbs.length) * i
-          ),
+
+    x: element.tmbs.map(
+      (e, i) => index + 0.1 + (0.8 / element.tmbs.length) * i
+    ),
     showlegend: false,
   }));
+
   console.log('traces:--');
   console.log(traces);
 
@@ -88,8 +92,8 @@ export default function TMB(data, study = 'PCAWG') {
     xanchor: 'bottom',
     yanchor: 'bottom',
     x: (index + index + 1) * 0.5,
-    y: -0.12,
-    text: `${element.tmbs.length}<br> - <br>`,
+    y: -0.1,
+    text: `${element.tmbs.length}`,
     showarrow: false,
     font: {
       size: 12,
@@ -98,13 +102,27 @@ export default function TMB(data, study = 'PCAWG') {
     align: 'center',
   }));
 
+  const bottoLabelline = cancerBurden.map((element, index, array) => ({
+    type: 'line',
+    xref: 'x',
+    yref: 'paper',
+    x0: index + 0.3,
+    x1: index + 0.7,
+    y0: -0.11,
+    y1: -0.11,
+    line: {
+      width: 1,
+      color: 'black',
+    },
+  }));
+
   const bottoLabel2 = cancerBurden.map((element, index, array) => ({
     xref: 'x',
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
     x: (index + index + 1) * 0.5,
-    y: -0.17,
+    y: -0.21,
     text: `${element.tmbs.length}`,
     showarrow: false,
     font: {
@@ -136,6 +154,8 @@ export default function TMB(data, study = 'PCAWG') {
     },
     opacity: 0.2,
   }));
+  console.log('shapes:--');
+  console.log(shapes);
 
   const lines = cancerBurden.map((element, index, array) => ({
     type: 'line',
@@ -160,19 +180,19 @@ export default function TMB(data, study = 'PCAWG') {
     },
   }));
 
-  console.log('shapes:--');
-  console.log(shapes);
-
   const layout = {
     // title: {
     //   text: "Tumor Mutational Burden Separated by Signatures",
     //   yanchor: "top",
     // },
+
     xaxis: {
       showticklabels: false,
       tickfont: {
         size: 10,
       },
+      autorange: false,
+      range: [0, totalCancer],
       linecolor: 'black',
       linewidth: 2,
       mirror: true,
@@ -183,18 +203,20 @@ export default function TMB(data, study = 'PCAWG') {
     },
     yaxis: {
       title: 'Number of Mutations per Megabase<br>(log10)',
-      autorange: true,
       zeroline: false,
       //showline: true,
       linecolor: 'black',
       linewidth: 2,
       mirror: true,
       automargin: true,
+      autorange: false,
+      range: [-Math.ceil(yMax), Math.ceil(yMax)],
     },
 
-    shapes: [...shapes, ...lines],
+    shapes: [...shapes, ...lines, ...bottoLabelline],
     annotations: [...topLabel, ...bottoLabel1, ...bottoLabel2],
   };
+
   console.log('layout:');
   console.log(layout);
 

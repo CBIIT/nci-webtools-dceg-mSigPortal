@@ -19,7 +19,10 @@ function createApp(config) {
   const app = express();
 
   if (config.database) {
-    app.locals.connection = knex({ client: 'postgres', connection: config.database });
+    app.locals.connection = knex({
+      client: 'postgres',
+      connection: config.database,
+    });
   }
 
   app.use(apiRouter);

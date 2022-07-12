@@ -30,7 +30,7 @@ export default function MutProfilePlot() {
         <Plot
           className="w-100"
           style={{ height: '400px' }}
-          data={cloneDeep(data.data)}
+          data={cloneDeep(data.traces)}
           layout={cloneDeep(data.layout)}
           config={cloneDeep(data.config)}
           useResizeHandler

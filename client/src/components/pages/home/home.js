@@ -1,9 +1,9 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import Card from "react-bootstrap/Card";
-import { CardDeck } from "react-bootstrap";
-import parse from "html-react-parser";
-import "./home.scss";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import Card from 'react-bootstrap/Card';
+import { CardDeck } from 'react-bootstrap';
+import parse from 'html-react-parser';
+import './home.scss';
 export default function Home({ links }) {
   function cardRow(links) {
     return (
@@ -27,18 +27,18 @@ export default function Home({ links }) {
             <div
               className="d-flex bd-highlight w-100"
               key={title}
-              style={{ marginRight: "1%" }}
+              style={{ marginRight: '1%' }}
             >
               <Card
                 key={title}
                 id={title}
                 className="mb-5 align-self-center p-2 bd-highlight"
                 style={{
-                  minWidth: "45%",
-                  justifyContent: "center",
-                  position: "relative",
-                  border: "1px solid #DADBE6",
-                  backgroundColor: "white",
+                  minWidth: '45%',
+                  justifyContent: 'center',
+                  position: 'relative',
+                  border: '1px solid #DADBE6',
+                  backgroundColor: 'white',
                   // minHeight: '280px'
                   // borderRadius: '10px'
                 }}
@@ -49,7 +49,7 @@ export default function Home({ links }) {
                   key={index}
                   to={route}
                 >
-                  <span className="sr-only">{title + " link"}</span>
+                  <span className="sr-only">{title + ' link'}</span>
                 </Link>
                 <Card.Body>
                   <div className="d-flex flex-row align-items-center justify-content-left">
@@ -57,14 +57,14 @@ export default function Home({ links }) {
                       className="rounded-circle"
                       style={{
                         //marginTop: '-15px',
-                        marginLeft: "-10px",
-                        marginRight: "10px",
-                        width: "120px",
-                        height: "120px",
-                        padding: "10px",
+                        marginLeft: '-10px',
+                        marginRight: '10px',
+                        width: '120px',
+                        height: '120px',
+                        padding: '10px',
                         backgroundColor: color,
-                        border: "4px solid white",
-                        fillOpacity: "0.5",
+                        border: '4px solid white',
+                        fillOpacity: '0.5',
                       }}
                     >
                       <img
@@ -73,13 +73,13 @@ export default function Home({ links }) {
                         height="105"
                         width="105"
                         style={{
-                          marginTop: "-13px",
-                          marginLeft: "-7px",
+                          marginTop: '-13px',
+                          marginLeft: '-7px',
                         }}
                       />
                     </div>
                     <Card.Title className="text-dark">
-                      <h2 style={{ fontSize: "1.75rem", marginBottom: "-5px" }}>
+                      <h2 style={{ fontSize: '1.75rem', marginBottom: '-5px' }}>
                         <b>{cardTitle}</b>
                       </h2>
                     </Card.Title>
@@ -103,9 +103,9 @@ export default function Home({ links }) {
             src="assets/images/msigportal-banner.png"
             alt="mSigPortal banner"
             style={{
-              width: "100%",
-              height: "250px",
-              filter: "contrast(2)",
+              width: '100%',
+              height: '250px',
+              filter: 'contrast(2)',
             }}
           ></img>
         </div>
@@ -115,29 +115,29 @@ export default function Home({ links }) {
               src="assets/images/logo-horizontal.png"
               alt="mSigPortal title"
               style={{
-                width: "325px",
-                height: "50px",
+                width: '325px',
+                height: '50px',
               }}
             ></img>
           </div>
           <div
             className="col-6 w-50 my-3 align-self-center"
-            style={{ borderTop: "3px solid", color: "rgb(200,37,6)" }}
+            style={{ borderTop: '3px solid', color: 'rgb(200,37,6)' }}
           ></div>
           <div
             className="col-12 text-center mt-2 font-weight-bold"
             style={{
-              width: "100%",
-              fontSize: "18pt",
-              color: "black",
-              fontStyle: "italic",
+              width: '100%',
+              fontSize: '18pt',
+              color: 'black',
+              fontStyle: 'italic',
             }}
           >
             Integrative Mutational Signature Portal for Cancer Genomic Studies
           </div>
           <div
             className="col-12 text-center mt-5"
-            style={{ width: "100%", fontSize: "14pt" }}
+            style={{ width: '100%', fontSize: '14pt' }}
           ></div>
         </div>
       </div>
@@ -156,7 +156,7 @@ export default function Home({ links }) {
       <div
         className="container align-middle"
         style={{
-          textAlign: "left",
+          textAlign: 'left',
         }}
       >
         Mutational signatures are characteristic combinations of mutation types
@@ -179,7 +179,7 @@ export default function Home({ links }) {
       </div>
       <div
         className="container align-middle text-center"
-        style={{ marginTop: "70px" }}
+        style={{ marginTop: '70px' }}
       >
         {cardRow(links.slice(0, 1))}
         {cardRow(links.slice(1, 2))}

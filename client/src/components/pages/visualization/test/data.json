@@ -1,1 +1,356 @@
-[{"mutationType":"A[C>A]A","contributions":[0.0035,0.0035,0.0035,0.0035,0.0035,0.0035]},{"mutationType":"A[C>A]C","contributions":[0.005,0.005,0.005,0.005,0.005,0.005]},{"mutationType":"A[C>A]G","contributions":[0.0005,0.0005,0.0005,0.0005,0.0005,0.0005]},{"mutationType":"A[C>A]T","contributions":[0.0093,0.0094,0.0093,0.0094,0.0093,0.0094]},{"mutationType":"A[C>G]A","contributions":[0.0068,0.0068,0.0068,0.0068,0.0068,0.0068]},{"mutationType":"A[C>G]C","contributions":[0.0108,0.0107,0.0108,0.0107,0.0108,0.0107]},{"mutationType":"A[C>G]G","contributions":[0,0,0,0,0,0]},{"mutationType":"A[C>G]T","contributions":[0.0296,0.0298,0.0296,0.0298,0.0296,0.0298]},{"mutationType":"A[C>T]A","contributions":[0.0539,0.0543,0.0539,0.0543,0.0539,0.0543]},{"mutationType":"A[C>T]C","contributions":[0.0421,0.0418,0.0421,0.0418,0.0421,0.0418]},{"mutationType":"A[C>T]G","contributions":[0.0025,0.0026,0.0025,0.0026,0.0025,0.0026]},{"mutationType":"A[C>T]T","contributions":[0.0543,0.0548,0.0543,0.0548,0.0543,0.0548]},{"mutationType":"A[T>A]A","contributions":[0.0016,0.0016,0.0016,0.0016,0.0016,0.0016]},{"mutationType":"A[T>A]C","contributions":[0.0004,0.0004,0.0004,0.0004,0.0004,0.0004]},{"mutationType":"A[T>A]G","contributions":[0.0001,0.0001,0.0001,0.0001,0.0001,0.0001]},{"mutationType":"A[T>A]T","contributions":[0.0107,0.0107,0.0107,0.0107,0.0107,0.0107]},{"mutationType":"A[T>C]A","contributions":[0,0,0,0,0,0]},{"mutationType":"A[T>C]C","contributions":[0.0003,0.0003,0.0003,0.0003,0.0003,0.0003]},{"mutationType":"A[T>C]G","contributions":[0,0,0,0,0,0]},{"mutationType":"A[T>C]T","contributions":[0.0094,0.0094,0.0094,0.0094,0.0094,0.0094]},{"mutationType":"A[T>G]A","contributions":[0.0001,0.0001,0.0001,0.0001,0.0001,0.0001]},{"mutationType":"A[T>G]C","contributions":[0.0013,0.0013,0.0013,0.0013,0.0013,0.0013]},{"mutationType":"A[T>G]G","contributions":[0.001,0.001,0.001,0.001,0.001,0.001]},{"mutationType":"A[T>G]T","contributions":[0.0018,0.0018,0.0018,0.0018,0.0018,0.0018]},{"mutationType":"C[C>A]A","contributions":[0,0,0,0,0,0]},{"mutationType":"C[C>A]C","contributions":[0.0052,0.0052,0.0052,0.0052,0.0052,0.0052]},{"mutationType":"C[C>A]G","contributions":[0.0001,0.0001,0.0001,0.0001,0.0001,0.0001]},{"mutationType":"C[C>A]T","contributions":[0.0056,0.0056,0.0056,0.0056,0.0056,0.0056]},{"mutationType":"C[C>G]A","contributions":[7.117e-06,7.0944e-06,7.12e-06,7.0974e-06,7.12e-06,7.0974e-06]},{"mutationType":"C[C>G]C","contributions":[0.0034,0.0034,0.0034,0.0034,0.0034,0.0034]},{"mutationType":"C[C>G]G","contributions":[2.1959e-06,2.2091e-06,2.2e-06,2.2132e-06,2.2e-06,2.2132e-06]},{"mutationType":"C[C>G]T","contributions":[0.0133,0.0133,0.0133,0.0133,0.0133,0.0133]},{"mutationType":"C[C>T]A","contributions":[0.018,0.018,0.018,0.018,0.018,0.018]},{"mutationType":"C[C>T]C","contributions":[0.0406,0.0402,0.0406,0.0402,0.0406,0.0402]},{"mutationType":"C[C>T]G","contributions":[0,0,0,0,0,0]},{"mutationType":"C[C>T]T","contributions":[0.0422,0.0421,0.0422,0.0421,0.0422,0.0421]},{"mutationType":"C[T>A]A","contributions":[0.0001,0.0001,0.0001,0.0001,0.0001,0.0001]},{"mutationType":"C[T>A]C","contributions":[0,0,0,0,0,0]},{"mutationType":"C[T>A]G","contributions":[0.0001,0.0001,0.0001,0.0001,0.0001,0.0001]},{"mutationType":"C[T>A]T","contributions":[0,0,0,0,0,0]},{"mutationType":"C[T>C]A","contributions":[0.0023,0.0023,0.0023,0.0023,0.0023,0.0023]},{"mutationType":"C[T>C]C","contributions":[3.2472e-06,3.2642e-06,3.25e-06,3.2669e-06,3.25e-06,3.2669e-06]},{"mutationType":"C[T>C]G","contributions":[0.0036,0.0036,0.0036,0.0036,0.0036,0.0036]},{"mutationType":"C[T>C]T","contributions":[0.0009,0.0009,0.0009,0.0009,0.0009,0.0009]},{"mutationType":"C[T>G]A","contributions":[0.0009,0.0009,0.0009,0.0009,0.0009,0.0009]},{"mutationType":"C[T>G]C","contributions":[0.0021,0.0022,0.0021,0.0022,0.0021,0.0022]},{"mutationType":"C[T>G]G","contributions":[0.0008,0.0008,0.0008,0.0008,0.0008,0.0008]},{"mutationType":"C[T>G]T","contributions":[0,0,0,0,0,0]},{"mutationType":"G[C>A]A","contributions":[0.0027,0.0027,0.0027,0.0027,0.0027,0.0027]},{"mutationType":"G[C>A]C","contributions":[0.0102,0.0101,0.0102,0.0101,0.0102,0.0101]},{"mutationType":"G[C>A]G","contributions":[0.0008,0.0008,0.0008,0.0008,0.0008,0.0008]},{"mutationType":"G[C>A]T","contributions":[0.0102,0.0102,0.0102,0.0102,0.0102,0.0102]},{"mutationType":"G[C>G]A","contributions":[0.0112,0.0112,0.0112,0.0112,0.0112,0.0112]},{"mutationType":"G[C>G]C","contributions":[0.0158,0.0156,0.0158,0.0156,0.0158,0.0156]},{"mutationType":"G[C>G]G","contributions":[0.0017,0.0017,0.0017,0.0017,0.0017,0.0017]},{"mutationType":"G[C>G]T","contributions":[0.0761,0.076,0.0761,0.076,0.0761,0.076]},{"mutationType":"G[C>T]A","contributions":[0.0892,0.0896,0.0892,0.0896,0.0892,0.0896]},{"mutationType":"G[C>T]C","contributions":[0.1116,0.1106,0.1116,0.1106,0.1116,0.1106]},{"mutationType":"G[C>T]G","contributions":[0.0092,0.0093,0.0092,0.0093,0.0092,0.0093]},{"mutationType":"G[C>T]T","contributions":[0.1804,0.1803,0.1804,0.1803,0.1804,0.1803]},{"mutationType":"G[T>A]A","contributions":[0.0011,0.0011,0.0011,0.0011,0.0011,0.0011]},{"mutationType":"G[T>A]C","contributions":[0.0001,0.0001,0.0001,0.0001,0.0001,0.0001]},{"mutationType":"G[T>A]G","contributions":[0.0003,0.0003,0.0003,0.0003,0.0003,0.0003]},{"mutationType":"G[T>A]T","contributions":[0.0001,0.0001,0.0001,0.0001,0.0001,0.0001]},{"mutationType":"G[T>C]A","contributions":[0,0,0,0,0,0]},{"mutationType":"G[T>C]C","contributions":[0.0009,0.0009,0.0009,0.0009,0.0009,0.0009]},{"mutationType":"G[T>C]G","contributions":[0.0002,0.0002,0.0002,0.0002,0.0002,0.0002]},{"mutationType":"G[T>C]T","contributions":[0.0037,0.0037,0.0037,0.0037,0.0037,0.0037]},{"mutationType":"G[T>G]A","contributions":[0,0,0,0,0,0]},{"mutationType":"G[T>G]C","contributions":[0.0012,0.0012,0.0012,0.0012,0.0012,0.0012]},{"mutationType":"G[T>G]G","contributions":[0.0002,0.0002,0.0002,0.0002,0.0002,0.0002]},{"mutationType":"G[T>G]T","contributions":[0.0013,0.0014,0.0013,0.0014,0.0013,0.0014]},{"mutationType":"T[C>A]A","contributions":[0.0021,0.0021,0.0021,0.0021,0.0021,0.0021]},{"mutationType":"T[C>A]C","contributions":[9.0644e-06,9.1223e-06,9.06e-06,9.1179e-06,9.06e-06,9.1179e-06]},{"mutationType":"T[C>A]G","contributions":[0,0,0,0,0,0]},{"mutationType":"T[C>A]T","contributions":[0.0012,0.0012,0.0012,0.0012,0.0012,0.0012]},{"mutationType":"T[C>G]A","contributions":[0,0,0,0,0,0]},{"mutationType":"T[C>G]C","contributions":[0.0001,0.0001,0.0001,0.0001,0.0001,0.0001]},{"mutationType":"T[C>G]G","contributions":[7.2057e-07,7.3772e-07,7.21e-07,7.3816e-07,7.21e-07,7.3816e-07]},{"mutationType":"T[C>G]T","contributions":[0.005,0.005,0.005,0.005,0.005,0.005]},{"mutationType":"T[C>T]A","contributions":[0.0001,0.0001,0.0001,0.0001,0.0001,0.0001]},{"mutationType":"T[C>T]C","contributions":[0.0269,0.0271,0.0269,0.0271,0.0269,0.0271]},{"mutationType":"T[C>T]G","contributions":[6.9238e-06,7.0886e-06,6.92e-06,7.0847e-06,6.92e-06,7.0847e-06]},{"mutationType":"T[C>T]T","contributions":[0.0168,0.0171,0.0168,0.0171,0.0168,0.0171]},{"mutationType":"T[T>A]A","contributions":[0.0066,0.0065,0.0066,0.0065,0.0066,0.0065]},{"mutationType":"T[T>A]C","contributions":[0.0009,0.0009,0.0009,0.0009,0.0009,0.0009]},{"mutationType":"T[T>A]G","contributions":[0.0008,0.0008,0.0008,0.0008,0.0008,0.0008]},{"mutationType":"T[T>A]T","contributions":[0.0071,0.0071,0.0071,0.0071,0.0071,0.0071]},{"mutationType":"T[T>C]A","contributions":[0.0004,0.0004,0.0004,0.0004,0.0004,0.0004]},{"mutationType":"T[T>C]C","contributions":[0.0005,0.0006,0.0005,0.0006,0.0005,0.0006]},{"mutationType":"T[T>C]G","contributions":[0,0,0,0,0,0]},{"mutationType":"T[T>C]T","contributions":[0.0098,0.0099,0.0098,0.0099,0.0098,0.0099]},{"mutationType":"T[T>G]A","contributions":[0.0019,0.0019,0.0019,0.0019,0.0019,0.0019]},{"mutationType":"T[T>G]C","contributions":[0.0007,0.0008,0.0007,0.0008,0.0007,0.0008]},{"mutationType":"T[T>G]G","contributions":[0,0,0,0,0,0]},{"mutationType":"T[T>G]T","contributions":[0.0066,0.0066,0.0066,0.0066,0.0066,0.0066]}]
+[
+  {
+    "mutationType": "A[C>A]A",
+    "contributions": [0.0035, 0.0035, 0.0035, 0.0035, 0.0035, 0.0035]
+  },
+  {
+    "mutationType": "A[C>A]C",
+    "contributions": [0.005, 0.005, 0.005, 0.005, 0.005, 0.005]
+  },
+  {
+    "mutationType": "A[C>A]G",
+    "contributions": [0.0005, 0.0005, 0.0005, 0.0005, 0.0005, 0.0005]
+  },
+  {
+    "mutationType": "A[C>A]T",
+    "contributions": [0.0093, 0.0094, 0.0093, 0.0094, 0.0093, 0.0094]
+  },
+  {
+    "mutationType": "A[C>G]A",
+    "contributions": [0.0068, 0.0068, 0.0068, 0.0068, 0.0068, 0.0068]
+  },
+  {
+    "mutationType": "A[C>G]C",
+    "contributions": [0.0108, 0.0107, 0.0108, 0.0107, 0.0108, 0.0107]
+  },
+  { "mutationType": "A[C>G]G", "contributions": [0, 0, 0, 0, 0, 0] },
+  {
+    "mutationType": "A[C>G]T",
+    "contributions": [0.0296, 0.0298, 0.0296, 0.0298, 0.0296, 0.0298]
+  },
+  {
+    "mutationType": "A[C>T]A",
+    "contributions": [0.0539, 0.0543, 0.0539, 0.0543, 0.0539, 0.0543]
+  },
+  {
+    "mutationType": "A[C>T]C",
+    "contributions": [0.0421, 0.0418, 0.0421, 0.0418, 0.0421, 0.0418]
+  },
+  {
+    "mutationType": "A[C>T]G",
+    "contributions": [0.0025, 0.0026, 0.0025, 0.0026, 0.0025, 0.0026]
+  },
+  {
+    "mutationType": "A[C>T]T",
+    "contributions": [0.0543, 0.0548, 0.0543, 0.0548, 0.0543, 0.0548]
+  },
+  {
+    "mutationType": "A[T>A]A",
+    "contributions": [0.0016, 0.0016, 0.0016, 0.0016, 0.0016, 0.0016]
+  },
+  {
+    "mutationType": "A[T>A]C",
+    "contributions": [0.0004, 0.0004, 0.0004, 0.0004, 0.0004, 0.0004]
+  },
+  {
+    "mutationType": "A[T>A]G",
+    "contributions": [0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001]
+  },
+  {
+    "mutationType": "A[T>A]T",
+    "contributions": [0.0107, 0.0107, 0.0107, 0.0107, 0.0107, 0.0107]
+  },
+  { "mutationType": "A[T>C]A", "contributions": [0, 0, 0, 0, 0, 0] },
+  {
+    "mutationType": "A[T>C]C",
+    "contributions": [0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003]
+  },
+  { "mutationType": "A[T>C]G", "contributions": [0, 0, 0, 0, 0, 0] },
+  {
+    "mutationType": "A[T>C]T",
+    "contributions": [0.0094, 0.0094, 0.0094, 0.0094, 0.0094, 0.0094]
+  },
+  {
+    "mutationType": "A[T>G]A",
+    "contributions": [0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001]
+  },
+  {
+    "mutationType": "A[T>G]C",
+    "contributions": [0.0013, 0.0013, 0.0013, 0.0013, 0.0013, 0.0013]
+  },
+  {
+    "mutationType": "A[T>G]G",
+    "contributions": [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]
+  },
+  {
+    "mutationType": "A[T>G]T",
+    "contributions": [0.0018, 0.0018, 0.0018, 0.0018, 0.0018, 0.0018]
+  },
+  { "mutationType": "C[C>A]A", "contributions": [0, 0, 0, 0, 0, 0] },
+  {
+    "mutationType": "C[C>A]C",
+    "contributions": [0.0052, 0.0052, 0.0052, 0.0052, 0.0052, 0.0052]
+  },
+  {
+    "mutationType": "C[C>A]G",
+    "contributions": [0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001]
+  },
+  {
+    "mutationType": "C[C>A]T",
+    "contributions": [0.0056, 0.0056, 0.0056, 0.0056, 0.0056, 0.0056]
+  },
+  {
+    "mutationType": "C[C>G]A",
+    "contributions": [
+      7.117e-6, 7.0944e-6, 7.12e-6, 7.0974e-6, 7.12e-6, 7.0974e-6
+    ]
+  },
+  {
+    "mutationType": "C[C>G]C",
+    "contributions": [0.0034, 0.0034, 0.0034, 0.0034, 0.0034, 0.0034]
+  },
+  {
+    "mutationType": "C[C>G]G",
+    "contributions": [
+      2.1959e-6, 2.2091e-6, 2.2e-6, 2.2132e-6, 2.2e-6, 2.2132e-6
+    ]
+  },
+  {
+    "mutationType": "C[C>G]T",
+    "contributions": [0.0133, 0.0133, 0.0133, 0.0133, 0.0133, 0.0133]
+  },
+  {
+    "mutationType": "C[C>T]A",
+    "contributions": [0.018, 0.018, 0.018, 0.018, 0.018, 0.018]
+  },
+  {
+    "mutationType": "C[C>T]C",
+    "contributions": [0.0406, 0.0402, 0.0406, 0.0402, 0.0406, 0.0402]
+  },
+  { "mutationType": "C[C>T]G", "contributions": [0, 0, 0, 0, 0, 0] },
+  {
+    "mutationType": "C[C>T]T",
+    "contributions": [0.0422, 0.0421, 0.0422, 0.0421, 0.0422, 0.0421]
+  },
+  {
+    "mutationType": "C[T>A]A",
+    "contributions": [0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001]
+  },
+  { "mutationType": "C[T>A]C", "contributions": [0, 0, 0, 0, 0, 0] },
+  {
+    "mutationType": "C[T>A]G",
+    "contributions": [0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001]
+  },
+  { "mutationType": "C[T>A]T", "contributions": [0, 0, 0, 0, 0, 0] },
+  {
+    "mutationType": "C[T>C]A",
+    "contributions": [0.0023, 0.0023, 0.0023, 0.0023, 0.0023, 0.0023]
+  },
+  {
+    "mutationType": "C[T>C]C",
+    "contributions": [
+      3.2472e-6, 3.2642e-6, 3.25e-6, 3.2669e-6, 3.25e-6, 3.2669e-6
+    ]
+  },
+  {
+    "mutationType": "C[T>C]G",
+    "contributions": [0.0036, 0.0036, 0.0036, 0.0036, 0.0036, 0.0036]
+  },
+  {
+    "mutationType": "C[T>C]T",
+    "contributions": [0.0009, 0.0009, 0.0009, 0.0009, 0.0009, 0.0009]
+  },
+  {
+    "mutationType": "C[T>G]A",
+    "contributions": [0.0009, 0.0009, 0.0009, 0.0009, 0.0009, 0.0009]
+  },
+  {
+    "mutationType": "C[T>G]C",
+    "contributions": [0.0021, 0.0022, 0.0021, 0.0022, 0.0021, 0.0022]
+  },
+  {
+    "mutationType": "C[T>G]G",
+    "contributions": [0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008]
+  },
+  { "mutationType": "C[T>G]T", "contributions": [0, 0, 0, 0, 0, 0] },
+  {
+    "mutationType": "G[C>A]A",
+    "contributions": [0.0027, 0.0027, 0.0027, 0.0027, 0.0027, 0.0027]
+  },
+  {
+    "mutationType": "G[C>A]C",
+    "contributions": [0.0102, 0.0101, 0.0102, 0.0101, 0.0102, 0.0101]
+  },
+  {
+    "mutationType": "G[C>A]G",
+    "contributions": [0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008]
+  },
+  {
+    "mutationType": "G[C>A]T",
+    "contributions": [0.0102, 0.0102, 0.0102, 0.0102, 0.0102, 0.0102]
+  },
+  {
+    "mutationType": "G[C>G]A",
+    "contributions": [0.0112, 0.0112, 0.0112, 0.0112, 0.0112, 0.0112]
+  },
+  {
+    "mutationType": "G[C>G]C",
+    "contributions": [0.0158, 0.0156, 0.0158, 0.0156, 0.0158, 0.0156]
+  },
+  {
+    "mutationType": "G[C>G]G",
+    "contributions": [0.0017, 0.0017, 0.0017, 0.0017, 0.0017, 0.0017]
+  },
+  {
+    "mutationType": "G[C>G]T",
+    "contributions": [0.0761, 0.076, 0.0761, 0.076, 0.0761, 0.076]
+  },
+  {
+    "mutationType": "G[C>T]A",
+    "contributions": [0.0892, 0.0896, 0.0892, 0.0896, 0.0892, 0.0896]
+  },
+  {
+    "mutationType": "G[C>T]C",
+    "contributions": [0.1116, 0.1106, 0.1116, 0.1106, 0.1116, 0.1106]
+  },
+  {
+    "mutationType": "G[C>T]G",
+    "contributions": [0.0092, 0.0093, 0.0092, 0.0093, 0.0092, 0.0093]
+  },
+  {
+    "mutationType": "G[C>T]T",
+    "contributions": [0.1804, 0.1803, 0.1804, 0.1803, 0.1804, 0.1803]
+  },
+  {
+    "mutationType": "G[T>A]A",
+    "contributions": [0.0011, 0.0011, 0.0011, 0.0011, 0.0011, 0.0011]
+  },
+  {
+    "mutationType": "G[T>A]C",
+    "contributions": [0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001]
+  },
+  {
+    "mutationType": "G[T>A]G",
+    "contributions": [0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003]
+  },
+  {
+    "mutationType": "G[T>A]T",
+    "contributions": [0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001]
+  },
+  { "mutationType": "G[T>C]A", "contributions": [0, 0, 0, 0, 0, 0] },
+  {
+    "mutationType": "G[T>C]C",
+    "contributions": [0.0009, 0.0009, 0.0009, 0.0009, 0.0009, 0.0009]
+  },
+  {
+    "mutationType": "G[T>C]G",
+    "contributions": [0.0002, 0.0002, 0.0002, 0.0002, 0.0002, 0.0002]
+  },
+  {
+    "mutationType": "G[T>C]T",
+    "contributions": [0.0037, 0.0037, 0.0037, 0.0037, 0.0037, 0.0037]
+  },
+  { "mutationType": "G[T>G]A", "contributions": [0, 0, 0, 0, 0, 0] },
+  {
+    "mutationType": "G[T>G]C",
+    "contributions": [0.0012, 0.0012, 0.0012, 0.0012, 0.0012, 0.0012]
+  },
+  {
+    "mutationType": "G[T>G]G",
+    "contributions": [0.0002, 0.0002, 0.0002, 0.0002, 0.0002, 0.0002]
+  },
+  {
+    "mutationType": "G[T>G]T",
+    "contributions": [0.0013, 0.0014, 0.0013, 0.0014, 0.0013, 0.0014]
+  },
+  {
+    "mutationType": "T[C>A]A",
+    "contributions": [0.0021, 0.0021, 0.0021, 0.0021, 0.0021, 0.0021]
+  },
+  {
+    "mutationType": "T[C>A]C",
+    "contributions": [
+      9.0644e-6, 9.1223e-6, 9.06e-6, 9.1179e-6, 9.06e-6, 9.1179e-6
+    ]
+  },
+  { "mutationType": "T[C>A]G", "contributions": [0, 0, 0, 0, 0, 0] },
+  {
+    "mutationType": "T[C>A]T",
+    "contributions": [0.0012, 0.0012, 0.0012, 0.0012, 0.0012, 0.0012]
+  },
+  { "mutationType": "T[C>G]A", "contributions": [0, 0, 0, 0, 0, 0] },
+  {
+    "mutationType": "T[C>G]C",
+    "contributions": [0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001]
+  },
+  {
+    "mutationType": "T[C>G]G",
+    "contributions": [
+      7.2057e-7, 7.3772e-7, 7.21e-7, 7.3816e-7, 7.21e-7, 7.3816e-7
+    ]
+  },
+  {
+    "mutationType": "T[C>G]T",
+    "contributions": [0.005, 0.005, 0.005, 0.005, 0.005, 0.005]
+  },
+  {
+    "mutationType": "T[C>T]A",
+    "contributions": [0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001]
+  },
+  {
+    "mutationType": "T[C>T]C",
+    "contributions": [0.0269, 0.0271, 0.0269, 0.0271, 0.0269, 0.0271]
+  },
+  {
+    "mutationType": "T[C>T]G",
+    "contributions": [
+      6.9238e-6, 7.0886e-6, 6.92e-6, 7.0847e-6, 6.92e-6, 7.0847e-6
+    ]
+  },
+  {
+    "mutationType": "T[C>T]T",
+    "contributions": [0.0168, 0.0171, 0.0168, 0.0171, 0.0168, 0.0171]
+  },
+  {
+    "mutationType": "T[T>A]A",
+    "contributions": [0.0066, 0.0065, 0.0066, 0.0065, 0.0066, 0.0065]
+  },
+  {
+    "mutationType": "T[T>A]C",
+    "contributions": [0.0009, 0.0009, 0.0009, 0.0009, 0.0009, 0.0009]
+  },
+  {
+    "mutationType": "T[T>A]G",
+    "contributions": [0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008]
+  },
+  {
+    "mutationType": "T[T>A]T",
+    "contributions": [0.0071, 0.0071, 0.0071, 0.0071, 0.0071, 0.0071]
+  },
+  {
+    "mutationType": "T[T>C]A",
+    "contributions": [0.0004, 0.0004, 0.0004, 0.0004, 0.0004, 0.0004]
+  },
+  {
+    "mutationType": "T[T>C]C",
+    "contributions": [0.0005, 0.0006, 0.0005, 0.0006, 0.0005, 0.0006]
+  },
+  { "mutationType": "T[T>C]G", "contributions": [0, 0, 0, 0, 0, 0] },
+  {
+    "mutationType": "T[T>C]T",
+    "contributions": [0.0098, 0.0099, 0.0098, 0.0099, 0.0098, 0.0099]
+  },
+  {
+    "mutationType": "T[T>G]A",
+    "contributions": [0.0019, 0.0019, 0.0019, 0.0019, 0.0019, 0.0019]
+  },
+  {
+    "mutationType": "T[T>G]C",
+    "contributions": [0.0007, 0.0008, 0.0007, 0.0008, 0.0007, 0.0008]
+  },
+  { "mutationType": "T[T>G]G", "contributions": [0, 0, 0, 0, 0, 0] },
+  {
+    "mutationType": "T[T>G]T",
+    "contributions": [0.0066, 0.0066, 0.0066, 0.0066, 0.0066, 0.0066]
+  }
+]

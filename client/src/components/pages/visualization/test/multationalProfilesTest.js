@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import barData from "./data.json";
-import Plot from "react-plotly.js";
-import { chordTranspose } from "d3";
+import React, { useEffect, useState } from 'react';
+import barData from './data.json';
+import Plot from 'react-plotly.js';
+import { chordTranspose } from 'd3';
 
 export default function MultationalProfilesTest() {
   console.log(barData);
@@ -27,20 +27,20 @@ export default function MultationalProfilesTest() {
   console.log(groupByMutation);
 
   const colors = {
-    "[C>A]": "#03BCEE",
-    "[C>G]": "black",
-    "[C>T]": "#E32926",
-    "[T>A]": "#CAC9C9",
-    "[T>C]": "#A1CE63",
-    "[T>G]": "#EBC6C4",
+    '[C>A]': '#03BCEE',
+    '[C>G]': 'black',
+    '[C>T]': '#E32926',
+    '[T>A]': '#CAC9C9',
+    '[T>C]': '#A1CE63',
+    '[T>G]': '#EBC6C4',
   };
 
   const data1 = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
-      name: mutation.replace(regex2, ""),
-      type: "scatter",
-      marker: { color: colors[mutation], symbol: "circle-open-dot" },
-      mode: "markers",
+      name: mutation.replace(regex2, ''),
+      type: 'scatter',
+      marker: { color: colors[mutation], symbol: 'circle-open-dot' },
+      mode: 'markers',
       x: signatures.map(
         (e, i) =>
           array
@@ -63,7 +63,7 @@ export default function MultationalProfilesTest() {
       test2: signatures.map((e, i) =>
         array.slice(0, groupIndex).reduce((x0, [_, curr]) => curr.length, 0)
       ),
-      hoverinfo: "x+y",
+      hoverinfo: 'x+y',
       showlegend: false,
       array: array,
     })
@@ -74,23 +74,23 @@ export default function MultationalProfilesTest() {
   const data2 = Object.entries(groupByMutation).map(
     ([mutation, signatures]) => ({
       name: mutation,
-      type: "bar",
+      type: 'bar',
       marker: { color: colors[mutation] },
       x: signatures.map((e) => e.mutationType),
       y: [0.01],
-      xaxis: "x2",
-      yaxis: "y2",
+      xaxis: 'x2',
+      yaxis: 'y2',
       text: mutation,
       showlegend: false,
-      hoverinfo: "none",
+      hoverinfo: 'none',
     })
   );
 
   const shapes1 = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
-      type: "rect",
-      xref: "x",
-      yref: "paper",
+      type: 'rect',
+      xref: 'x',
+      yref: 'paper',
       //x0: signatures.map((e) => e.mutationType)[0],
       //x1: signatures.map((e) => e.mutationType)[signatures.length - 1],
       x0: array
@@ -113,9 +113,9 @@ export default function MultationalProfilesTest() {
 
   const shapes2 = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
-      type: "rect",
-      xref: "x",
-      yref: "paper",
+      type: 'rect',
+      xref: 'x',
+      yref: 'paper',
       //x0: signatures.map((e) => e.mutationType)[0],
       y0: 1,
       //x1: signatures.map((e) => e.mutationType)[signatures.length - 1],
@@ -139,23 +139,23 @@ export default function MultationalProfilesTest() {
   const shapes = [...shapes1, ...shapes2];
   const annotations = Object.entries(groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
-      xref: "x",
-      yref: "paper",
+      xref: 'x',
+      yref: 'paper',
       x:
         array
           .slice(0, groupIndex)
           .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) +
         (signatures.length - 1) * 0.5,
-      xanchor: "bottom",
+      xanchor: 'bottom',
       y: 1.05,
-      yanchor: "bottom",
-      text: "<b>" + mutation.replace(regex2, "") + "</b>",
+      yanchor: 'bottom',
+      text: '<b>' + mutation.replace(regex2, '') + '</b>',
       showarrow: false,
       font: {
         color: colors[mutation],
         size: 18,
       },
-      align: "center",
+      align: 'center',
     })
   );
 
@@ -170,7 +170,7 @@ export default function MultationalProfilesTest() {
       columns: 1,
     },
     xaxis: {
-      title: "Substitution",
+      title: 'Substitution',
       showline: true,
       showticklabels: true,
       tickangle: -90,
@@ -179,7 +179,7 @@ export default function MultationalProfilesTest() {
       },
     },
     yaxis: {
-      title: "Mutation probability",
+      title: 'Mutation probability',
       //tickformat: ".1%",
       autorange: true,
     },
@@ -194,7 +194,7 @@ export default function MultationalProfilesTest() {
       data={data}
       layout={layout}
       useResizeHandler={true}
-      style={{ width: "100%", height: "100%" }}
+      style={{ width: '100%', height: '100%' }}
     />
   );
 }
