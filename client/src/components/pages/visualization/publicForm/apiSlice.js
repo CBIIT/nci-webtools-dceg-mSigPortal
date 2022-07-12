@@ -24,7 +24,7 @@ export const publicFormApiSlice = apiSlice.injectEndpoints({
         return groupByCancer;
       },
     }),
-    visualizationPublic: builder.mutation({
+    publicSamples: builder.mutation({
       query: (params) => ({
         url: 'visualizationData',
         params,
@@ -33,5 +33,5 @@ export const publicFormApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useVisualizationPublicMutation, useGetPublicDataOptionsQuery } =
+export const { useGetPublicDataOptionsQuery, usePublicSamplesMutation } =
   publicFormApiSlice;
