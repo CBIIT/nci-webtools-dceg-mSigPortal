@@ -14,6 +14,8 @@ export default function SBS6(data, sample) {
 
   const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
 
+  const maxVal = Math.max(...data.map((o) => o.mutations));
+
   // group data by dominant mutation
   const groupByMutation = data.reduce((groups, e, i) => {
     const mutation = e.mutationType.substring(0, e.mutationType.length);
@@ -61,6 +63,8 @@ export default function SBS6(data, sample) {
       tickfont: {
         size: 16,
       },
+      autorange: false,
+      range: [0, maxVal + maxVal * 0.15],
     },
     yaxis: {
       tickfont: {

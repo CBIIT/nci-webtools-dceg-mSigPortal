@@ -159,7 +159,7 @@ export default function DBS78(data, sample) {
     yaxis: {
       title: 'Number of Double Base Substitutions',
       autorange: false,
-      range: [0, maxVal + maxVal * 5],
+      range: [0, maxVal + maxVal * 0.2],
       linecolor: 'black',
       linewidth: 1,
       mirror: true,

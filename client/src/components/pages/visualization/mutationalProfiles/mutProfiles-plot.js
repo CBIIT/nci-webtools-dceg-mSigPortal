@@ -60,7 +60,7 @@ export default function MutProfilePlot() {
 
   function generatePlot(data, sample) {
     const profileMatrix = profile.value + matrix.value;
-    console.log(data);
+    //console.log(data);
     const { traces, layout } =
       profileMatrix == 'SBS6'
         ? SBS6(data, sample)

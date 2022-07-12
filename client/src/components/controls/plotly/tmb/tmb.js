@@ -1,6 +1,6 @@
 import { groupBy } from 'lodash';
 
-export default function TMB(data, study = 'PCAWG') {
+export default function TMB(data, study) {
   // Calculate the number of mutations per megabase for each study
   const genome = { PCAWG: 'GRCh37', TCGA: 'GRCh37' };
   const genomeSize = { GRCh37: 3101976562 / Math.pow(10, 6) };
@@ -33,6 +33,18 @@ export default function TMB(data, study = 'PCAWG') {
     .map((o) => o.tmbs.map((e) => Math.abs(e)))
     .flat();
   const yMax = Math.max(...absYValue);
+
+  cancerBurden.sort((a, b) =>
+    average(a.tmbs.map((e) => e)) < average(b.tmbs.map((e) => e))
+      ? -1
+      : average(b.tmbs.map((e) => e)) < average(a.tmbs.map((e) => e))
+      ? 1
+      : 0
+  );
+
+  console.log('sorted');
+  console.log(cancerBurden);
+
   const traces = cancerBurden.map((element, index, array) => ({
     element: element,
     index: index,
@@ -43,7 +55,7 @@ export default function TMB(data, study = 'PCAWG') {
     mode: 'markers',
     y: element.tmbs.map((e) => e),
     average: average(element.tmbs.map((e) => e)),
-    hovertemplate: 'Burden: %{y}<br>',
+    hovertemplate: 'Number of mutations: %{y}<br>',
     // x: element.tmbs.map(
     //   (e, i) =>
     //     array
@@ -56,7 +68,6 @@ export default function TMB(data, study = 'PCAWG') {
     x: element.tmbs.map(
       (e, i) => index + 0.1 + (0.8 / element.tmbs.length) * i
     ),
-    showlegend: false,
   }));
 
   console.log('traces:--');
@@ -74,14 +85,14 @@ export default function TMB(data, study = 'PCAWG') {
     //   (element.tmbs.length - 1) * 0.5,
     //x: array.length * 0.5,
     x: array.length > 1 ? index : (index + index + 1) * 0.5,
-    y: 1.0,
+    y: 1.01,
     text: `${element.cancer}`,
     showarrow: false,
-    // font: {
-    //   size: 12,
-    // },
-    align: 'right',
-    textangle: 45,
+    font: {
+      size: 10,
+    },
+    align: 'center',
+    textangle: 55,
   }));
   console.log('top label:--');
   console.log(topLabel);
@@ -185,7 +196,7 @@ export default function TMB(data, study = 'PCAWG') {
     //   text: "Tumor Mutational Burden Separated by Signatures",
     //   yanchor: "top",
     // },
-
+    showlegend: false,
     xaxis: {
       showticklabels: false,
       tickfont: {
