@@ -1,8 +1,8 @@
 const { v4: uuidv4 } = require('uuid');
 const {
   getAssociationData,
-  getExposureData,
   getSeqmatrixData,
+  getExposureData,
   getSignatureData,
 } = require('./query');
 
@@ -11,12 +11,33 @@ async function visualizationData(req, res, next) {
   try {
     const { study, cancer, strategy } = req.query;
     const connection = req.app.locals.connection;
-    const projectID = uuidv4();
 
     const query = { study, strategy, cancer };
     const columns = ['profile', 'sample', 'profile', 'matrix'];
     const data = await getSeqmatrixData(connection, query, columns);
+    const projectID = uuidv4();
+
     res.json({ data, projectID });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function querySeqmatrix(req, res, next) {
+  try {
+    const { type, ...query } = req.query;
+    const connection = req.app.locals.connection;
+
+    if (!type) throw "Seqmatrix API: Missing 'type' parameter";
+
+    let columns = [];
+    if (type == 'studies') columns = ['study', 'cancer', 'strategy'];
+    if (type == 'samples') columns = ['profile', 'sample', 'profile', 'matrix'];
+    if (type == 'mutationalProfiles') columns = ['mutationType', 'mutations'];
+    if (type == 'profilerSummary') columns = ['sample', 'profile', 'mutations'];
+
+    const data = await getSeqmatrixData(connection, query, columns);
+    res.json(data);
   } catch (error) {
     next(error);
   }
@@ -47,22 +68,6 @@ async function explorationTmbData(req, res, next) {
     const query = { study, strategy, signatureSetName };
     const columns = ['cancer', 'sample', 'exposure'];
     const data = await getExposureData(connection, query, columns);
-    res.json(data);
-  } catch (error) {
-    next(error);
-  }
-}
-
-async function querySeqmatrix(req, res, next) {
-  try {
-    const { type, ...query } = req.query;
-    const connection = req.app.locals.connection;
-
-    let columns = [];
-    if (type == 'mutationalProfiles') columns = ['mutationType', 'mutations'];
-    if (type == 'profilerSummary') columns = ['sample', 'profile', 'mutations'];
-
-    const data = await getSeqmatrixData(connection, query, columns);
     res.json(data);
   } catch (error) {
     next(error);
