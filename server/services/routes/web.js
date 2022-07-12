@@ -94,11 +94,9 @@ router.get('/exposure', queryExposure);
 
 router.get('/signature', querySignature);
 
-router.use((err, req, res, next) => {
-  logger.debug(err);
-  const { name, message, stack } = err;
-  logger.error(err);
-  res.status(500).json(`${name}: ${message}`);
+router.use((error, req, res, next) => {
+  logger.error(error);
+  res.status(500).json(error);
 });
 
 module.exports = router;
