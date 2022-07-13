@@ -9,7 +9,7 @@ export const tmbApiSlice = apiSlice.injectEndpoints({
         params,
       }),
       transformResponse: (data, meta, arg) => {
-        return TMB(data, arg.study);
+        return TMB(data);
       },
     }),
   }),
