@@ -481,11 +481,11 @@ export default function SBS96(data, sample) {
     xanchor: 'bottom',
     yanchor: 'bottom',
     x: index,
-    y: -0.07,
+    y: -0.05,
     text: num.mutationType.replace(/\[(.*)\]/, '-'),
     showarrow: false,
     font: {
-      size: 10,
+      size: 8,
       //   color: colors[num.mutationType.substring(2, 5)],
     },
     align: 'center',
@@ -494,8 +494,25 @@ export default function SBS96(data, sample) {
     textangle: -90,
   }));
 
+  const yLabelAnnotation = {
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'top',
+    yanchor: 'top',
+    x: -0.04,
+    y: 1.02,
+    text: '<b>Number of Single Base Substitutions</b>',
+    showarrow: false,
+    font: {
+      size: 7,
+    },
+    align: 'center',
+    textangle: -90,
+  };
+
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
+    height: 650,
     grid: {
       rows: 4,
       columns: 1,
@@ -513,15 +530,17 @@ export default function SBS96(data, sample) {
       linecolor: 'black',
       linewidth: 1,
       mirror: true,
+      tickformat: '~s',
     },
     yaxis: {
-      title: 'Number of Single Base Substitutions',
+      //title: 'Number of Single Base Substitutions',
       autorange: false,
       range: [0, maxVal + maxVal * 0.2],
       linecolor: 'black',
       linewidth: 1,
       mirror: true,
       domain: [0.72, 1],
+      tickformat: '~s',
     },
     yaxis2: {
       autorange: true,
@@ -557,11 +576,15 @@ export default function SBS96(data, sample) {
       },
       domain: [0, 0.35],
     },
-    //with: 700,
-    height: 600,
+
     // autosize: false,
     shapes: shapes,
-    annotations: [...annotations, sampleAnnotation, ...xannotations],
+    annotations: [
+      ...annotations,
+      sampleAnnotation,
+      ...xannotations,
+      yLabelAnnotation,
+    ],
   };
   // console.log("layout");
   //console.log(layout);

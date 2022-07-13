@@ -367,6 +367,8 @@ export default function ID83(data, sample) {
 
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
+    height: 500,
+    width: 1080,
     xaxis: {
       showticklabels: false,
       showline: true,
@@ -383,7 +385,7 @@ export default function ID83(data, sample) {
     },
     yaxis: {
       title: 'Number of Idels',
-      autorange: false,
+      autorange: true,
       range: [0, maxVal + maxVal * 0.15],
       linecolor: 'black',
       linewidth: 1,
@@ -399,7 +401,9 @@ export default function ID83(data, sample) {
       sampleAnnotation,
     ],
   };
+
+  var config = { responsive: true };
   //console.log("layout");
   //console.log(layout);
-  return { traces, layout };
+  return { traces, layout, config };
 }

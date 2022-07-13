@@ -382,6 +382,7 @@ export default function SBS288(data, sample) {
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     bargap: 0.3,
+    height: 450,
     legend: {
       x: 1,
       xanchor: 'right',
@@ -418,6 +419,7 @@ export default function SBS288(data, sample) {
       linecolor: 'black',
       linewidth: 1,
       mirror: true,
+      tickformat: '~s',
     },
 
     xaxis2: {
@@ -427,6 +429,7 @@ export default function SBS288(data, sample) {
         size: 12,
       },
       domain: [0.8, 1],
+      tickformat: '~s',
     },
     yaxis2: {
       showline: true,
@@ -436,6 +439,7 @@ export default function SBS288(data, sample) {
       },
       anchor: 'x2',
       categoryorder: 'category descending',
+      tickformat: '~s',
     },
 
     shapes: shapes,

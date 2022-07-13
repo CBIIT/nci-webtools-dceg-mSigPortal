@@ -173,7 +173,7 @@ export default function ID28(data, sample) {
           ? '<b>MH</b>'
           : '<b>' + num.substring(num.length - 3, num.length) + '</b>'
         : num.substring(num.length - 1, num.lenght) >= 5
-        ? '<b>' + num.substring(num.length - 1, num.length) + '+</b>'
+        ? '<b>' + num.substring(num.length - 1, num.length) + '</b>+'
         : '<b>' + num.substring(num.length - 1, num.length) + '</b>',
     showarrow: false,
     font: {
@@ -300,6 +300,8 @@ export default function ID28(data, sample) {
 
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
+    height: 600,
+    width: 750,
     xaxis: {
       showticklabels: false,
       showline: true,

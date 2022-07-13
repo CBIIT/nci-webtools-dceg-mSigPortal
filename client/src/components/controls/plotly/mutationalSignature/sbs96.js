@@ -84,7 +84,7 @@ export default function SBS96(data, sample) {
     xanchor: 'bottom',
     yanchor: 'bottom',
     x: index,
-    y: -0.065,
+    y: -0.1,
     text: num.mutationType.replace(
       /\[(.*)\]/,
       num.mutationType.substring(2, 3)
@@ -142,6 +142,8 @@ export default function SBS96(data, sample) {
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     bargap: 0.3,
+    height: 450,
+    width: 1080,
     xaxis: {
       showticklabels: false,
       showline: true,
@@ -158,6 +160,7 @@ export default function SBS96(data, sample) {
       linecolor: 'black',
       linewidth: 1,
       mirror: true,
+      tickformat: '~s',
     },
     yaxis: {
       title: 'Number of Single Base Substitutions',
@@ -166,6 +169,7 @@ export default function SBS96(data, sample) {
       linecolor: 'black',
       linewidth: 1,
       mirror: true,
+      tickformat: '~s',
     },
 
     shapes: shapes,
@@ -174,5 +178,6 @@ export default function SBS96(data, sample) {
   // console.log("layout");
   // console.log(layout);
 
+  //var config = { responsive: true };
   return { traces, layout };
 }

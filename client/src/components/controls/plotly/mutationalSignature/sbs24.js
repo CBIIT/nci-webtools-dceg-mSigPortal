@@ -83,6 +83,7 @@ export default function SBS24(data, sample) {
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     bargap: 0.3,
+    height: 600,
     legend: {
       x: 1,
       xanchor: 'right',
@@ -110,11 +111,13 @@ export default function SBS24(data, sample) {
       },
       autorange: false,
       range: [0, maxVal + maxVal * 0.15],
+      tickformat: '~s',
     },
     yaxis: {
       tickfont: {
         size: 16,
       },
+      tickformat: '~s',
       categoryorder: 'category descending',
     },
   };
