@@ -84,6 +84,7 @@ export default function SBS24(data, sample) {
     hoverlabel: { bgcolor: '#FFF' },
     bargap: 0.3,
     height: 600,
+    width: 750,
     legend: {
       x: 1,
       xanchor: 'right',

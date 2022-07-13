@@ -144,6 +144,7 @@ export default function SBS96(data, sample) {
     bargap: 0.3,
     height: 450,
     width: 1080,
+
     xaxis: {
       showticklabels: false,
       showline: true,

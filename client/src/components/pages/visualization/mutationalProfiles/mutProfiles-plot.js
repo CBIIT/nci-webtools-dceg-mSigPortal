@@ -117,7 +117,7 @@ export default function MutProfilePlot() {
       ) : (
         plot && (
           <div className="container mb-3">
-            <Row className="p-2 w-100 align-items-center d-flex">
+            <Row className="p-2 w-100 justify-content-center align-items-center d-flex">
               <Plot
                 // {...(profile.value + matrix.value === 'SBS1536' ||
                 // profile.value + matrix.value === 'SBS6' ||

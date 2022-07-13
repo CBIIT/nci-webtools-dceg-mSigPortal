@@ -512,7 +512,8 @@ export default function SBS96(data, sample) {
 
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
-    height: 650,
+    height: 700,
+    width: 1080,
     grid: {
       rows: 4,
       columns: 1,
