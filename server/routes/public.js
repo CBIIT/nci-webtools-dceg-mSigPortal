@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const cors = require('cors');
-const config = require('../../config.json');
-const apiSpec = require('../../apiSpec.json');
+const config = require('../config.json');
+const apiSpec = require('../apiSpec.json');
 
 const {
   visualizationOptions,
@@ -10,13 +10,13 @@ const {
   profilerSummary,
   querySeqmatrix,
   querySignature,
-} = require('../analysis/visualization');
+} = require('../services/analysis/visualization');
 
 const {
   queryExposure,
   explorationOptions,
   explorationTmbData,
-} = require('../analysis/exploration');
+} = require('../services/analysis/exploration');
 
 const router = Router();
 

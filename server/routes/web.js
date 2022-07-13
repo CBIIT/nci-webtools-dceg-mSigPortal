@@ -1,6 +1,6 @@
 const express = require('express');
-const logger = require('../logger');
-const config = require('../../config.json');
+const logger = require('../services/logger');
+const config = require('../config.json');
 
 const {
   visualizationProfilerExtraction,
@@ -21,7 +21,7 @@ const {
   getFileS3,
   downloadWorkspace,
   associationWrapper,
-} = require('../apiAnalysis');
+} = require('../services/apiAnalysis');
 
 const {
   visualizationOptions,
@@ -30,13 +30,13 @@ const {
   profilerSummary,
   querySeqmatrix,
   querySignature,
-} = require('../analysis/visualization');
+} = require('../services/analysis/visualization');
 
 const {
   queryExposure,
   explorationOptions,
   explorationTmbData,
-} = require('../analysis/exploration');
+} = require('../services/analysis/exploration');
 
 const router = express.Router();
 
