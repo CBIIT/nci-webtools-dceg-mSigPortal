@@ -12,18 +12,20 @@ RUN dnf -y update \
     make \
     && dnf clean all
 
-RUN mkdir /client
+RUN mkdir -p /app/client
 
-WORKDIR /client
+WORKDIR /app/client
 
-COPY client/package*.json /client/
+COPY client/package.json /app/client/
 
 RUN npm install
 
-COPY client /client/
+COPY client /app/client/
 
-RUN npm run build \
-    && mv /client/build /var/www/html/mutational-signatures
+RUN npm run build
+
+RUN mkdir -p /var/www/html/mutational-signatures \
+    && cp -r /app/client/build/* /var/www/html/mutational-signatures
 
 # Add custom httpd configuration
 COPY docker/httpd-msigportal.conf /etc/httpd/conf.d/httpd-msigportal.conf
