@@ -115,26 +115,24 @@ export default function MutProfilePlot() {
         </div>
       ) : (
         plot && (
-          <div className="container mb-3">
-            <Row className="p-2 w-100 justify-content-center align-items-center d-flex">
-              <Plot
-                // {...(profile.value + matrix.value === 'SBS1536' ||
-                // profile.value + matrix.value === 'SBS6' ||
-                // profile.value + matrix.value === 'SBS24' ||
-                // profile.value + matrix.value === 'ID28'
-                //   ? { className: 'w-70' }
-                //   : { className: 'w-100' })}
-                className="h-100"
-                divId={divId}
-                // style={{
-                //   height: '650px',
-                // }}
-                data={cloneDeep(plot.data)}
-                layout={cloneDeep(plot.layout)}
-                config={cloneDeep(config)}
-                useResizeHandler
-              />
-            </Row>
+          <div className="container w-100 align-content-center mb-3">
+            <Plot
+              // {...(profile.value + matrix.value === 'SBS1536' ||
+              // profile.value + matrix.value === 'SBS6' ||
+              // profile.value + matrix.value === 'SBS24' ||
+              // profile.value + matrix.value === 'ID28'
+              //   ? { className: 'w-70' }
+              //   : { className: 'w-100' })}
+              className="h-100 w-100"
+              divId={divId}
+              // style={{
+              //   height: '650px',
+              // }}
+              data={cloneDeep(plot.data)}
+              layout={cloneDeep(plot.layout)}
+              config={cloneDeep(config)}
+              useResizeHandler
+            />
 
             <Row className="justify-content-center">
               {/* <Col sm="auto">
