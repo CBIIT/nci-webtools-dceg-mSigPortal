@@ -36,7 +36,7 @@ async function explorationOptions(req, res, next) {
 }
 
 // query public exploration data for exploration tab
-async function explorationTmbData(req, res, next) {
+async function tmb(req, res, next) {
   try {
     const { study, strategy, signatureSetName } = req.query;
     const connection = req.app.locals.connection;
@@ -52,6 +52,6 @@ async function explorationTmbData(req, res, next) {
 
 module.exports = {
   explorationOptions,
-  explorationTmbData,
   queryExposure,
+  tmb,
 };

@@ -35,7 +35,7 @@ const {
 const {
   queryExposure,
   explorationOptions,
-  explorationTmbData,
+  tmb,
 } = require('../services/analysis/exploration');
 
 const router = express.Router();
@@ -89,7 +89,13 @@ router.post('/downloadWorkspace', downloadWorkspace);
 
 router.post('/associationWrapper', associationWrapper);
 
-// db queries
+router.get('/seqmatrix', querySeqmatrix);
+
+router.get('/exposure', queryExposure);
+
+router.get('/signature', querySignature);
+
+// visualization
 router.get('/visualizationOptions', visualizationOptions);
 
 router.get('/visualizationSamples', visualizationSamples);
@@ -98,15 +104,10 @@ router.get('/mutationalProfiles', mutationalProfiles);
 
 router.get('/profilerSummary', profilerSummary);
 
+// exploration
 router.get('/explorationOptions', explorationOptions);
 
-router.get('/explorationTmbData', explorationTmbData);
-
-router.get('/seqmatrix', querySeqmatrix);
-
-router.get('/exposure', queryExposure);
-
-router.get('/signature', querySignature);
+router.get('/tmb', tmb);
 
 router.use((error, req, res, next) => {
   logger.error(error);

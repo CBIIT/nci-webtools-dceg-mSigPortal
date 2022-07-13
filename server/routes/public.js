@@ -15,7 +15,7 @@ const {
 const {
   queryExposure,
   explorationOptions,
-  explorationTmbData,
+  tmb,
 } = require('../services/analysis/exploration');
 
 const router = Router();
@@ -36,6 +36,7 @@ router.get('/exposure', queryExposure);
 
 router.get('/signature', querySignature);
 
+// visualization
 router.get('/visualizationOptions', visualizationOptions);
 
 router.get('/visualizationSamples', visualizationSamples);
@@ -43,5 +44,10 @@ router.get('/visualizationSamples', visualizationSamples);
 router.get('/mutationalProfiles', mutationalProfiles);
 
 router.get('/profilerSummary', profilerSummary);
+
+// exploration
+router.get('/explorationOptions', explorationOptions);
+
+router.get('/tmb', tmb);
 
 module.exports = router;
