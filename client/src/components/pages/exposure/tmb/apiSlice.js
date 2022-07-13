@@ -5,7 +5,7 @@ export const tmbApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     tmbPlot: builder.query({
       query: (params) => ({
-        url: 'explorationTmbData',
+        url: 'tmb',
         params,
       }),
       transformResponse: (data, meta, arg) => {

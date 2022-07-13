@@ -1,6 +1,7 @@
 const express = require('express');
-const logger = require('../logger');
-const config = require('../../config.json');
+const logger = require('../services/logger');
+const config = require('../config.json');
+
 const {
   visualizationProfilerExtraction,
   getResults,
@@ -20,16 +21,22 @@ const {
   getFileS3,
   downloadWorkspace,
   associationWrapper,
-} = require('../apiAnalysis');
+} = require('../services/apiAnalysis');
 
 const {
+  visualizationOptions,
+  visualizationSamples,
+  mutationalProfiles,
+  profilerSummary,
   querySeqmatrix,
-  queryExposure,
   querySignature,
-  visualizationData,
+} = require('../services/analysis/visualization');
+
+const {
+  queryExposure,
   explorationOptions,
-  explorationTmbData,
-} = require('../apiQuery');
+  tmb,
+} = require('../services/analysis/exploration');
 
 const router = express.Router();
 
@@ -82,17 +89,25 @@ router.post('/downloadWorkspace', downloadWorkspace);
 
 router.post('/associationWrapper', associationWrapper);
 
-router.get('/visualizationData', visualizationData);
-
-router.get('/explorationOptions', explorationOptions);
-
-router.get('/explorationTmbData', explorationTmbData);
-
 router.get('/seqmatrix', querySeqmatrix);
 
 router.get('/exposure', queryExposure);
 
 router.get('/signature', querySignature);
+
+// visualization
+router.get('/visualizationOptions', visualizationOptions);
+
+router.get('/visualizationSamples', visualizationSamples);
+
+router.get('/mutationalProfiles', mutationalProfiles);
+
+router.get('/profilerSummary', profilerSummary);
+
+// exploration
+router.get('/explorationOptions', explorationOptions);
+
+router.get('/tmb', tmb);
 
 router.use((error, req, res, next) => {
   logger.error(error);

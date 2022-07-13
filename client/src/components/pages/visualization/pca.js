@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button, Tab, Nav } from 'react-bootstrap';
-import { useGetPublicDataOptionsQuery } from './publicForm/apiSlice';
+import { useVisualizationOptionsQuery } from './publicForm/apiSlice';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../controls/svgContainer/svgContainer';
 import CustomSelect from '../../controls/select/select-old';
@@ -22,7 +22,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const { data, error, isFetching } = useGetPublicDataOptionsQuery();
+  const { data, error, isFetching } = useVisualizationOptionsQuery();
 
   const studyOptions = data
     ? // ? Object.keys(data).map((e) => ({ label: e, value: e }))
