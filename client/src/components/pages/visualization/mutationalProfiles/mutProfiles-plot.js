@@ -163,7 +163,7 @@ export default function MutProfilePlot() {
                 <Button
                   onClick={() =>
                     saveAs(
-                      new Blob([JSON.stringify(plot)], {
+                      new Blob([JSON.stringify(data)], {
                         type: 'application/json',
                       }),
                       `${sample.value}.json`
