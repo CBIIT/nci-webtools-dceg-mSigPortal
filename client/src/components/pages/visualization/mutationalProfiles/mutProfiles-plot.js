@@ -115,28 +115,27 @@ export default function MutProfilePlot() {
         </div>
       ) : (
         plot && (
-          <div className="mb-3">
-            <Row className="justify-content-center">
-              <Plot
-                {...(profile.value + matrix.value === 'SBS1536' ||
-                profile.value + matrix.value === 'SBS6' ||
-                profile.value + matrix.value === 'SBS24' ||
-                profile.value + matrix.value === 'ID28'
-                  ? { className: 'w-70' }
-                  : { className: 'w-95' })}
-                divId={divId}
-                style={{
-                  height: '600px',
-                }}
-                data={cloneDeep(plot.data)}
-                layout={cloneDeep(plot.layout)}
-                config={cloneDeep(config)}
-                useResizeHandler
-              />
-            </Row>
+          <div className="container w-100 align-content-center mb-3">
+            <Plot
+              // {...(profile.value + matrix.value === 'SBS1536' ||
+              // profile.value + matrix.value === 'SBS6' ||
+              // profile.value + matrix.value === 'SBS24' ||
+              // profile.value + matrix.value === 'ID28'
+              //   ? { className: 'w-70' }
+              //   : { className: 'w-100' })}
+              className="h-100 w-100"
+              divId={divId}
+              // style={{
+              //   height: '650px',
+              // }}
+              data={cloneDeep(plot.data)}
+              layout={cloneDeep(plot.layout)}
+              config={cloneDeep(config)}
+              useResizeHandler
+            />
 
-            {/* <Row className="justify-content-center">
-              <Col sm="auto">
+            <Row className="justify-content-center">
+              {/* <Col sm="auto">
                 <Button
                   onClick={() =>
                     downloadImage(divId, {
@@ -159,13 +158,13 @@ export default function MutProfilePlot() {
                 >
                   Download SVG
                 </Button>
-              </Col>
+              </Col> */}
               <Col sm="auto">
                 <Button
                   onClick={() =>
                     saveAs(
                       new Blob([JSON.stringify(plot)], {
-                        type: "application/json",
+                        type: 'application/json',
                       }),
                       `${sample.value}.json`
                     )
@@ -174,7 +173,7 @@ export default function MutProfilePlot() {
                   Download JSON
                 </Button>
               </Col>
-            </Row> */}
+            </Row>
           </div>
         )
       )}

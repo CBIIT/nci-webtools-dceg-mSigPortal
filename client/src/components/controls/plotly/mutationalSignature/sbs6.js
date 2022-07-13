@@ -44,6 +44,8 @@ export default function SBS6(data, sample) {
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     showlegend: false,
+    height: 600,
+    width: 750,
     title: {
       text:
         '<b>' + sample + ': ' + numberWithCommas(totalMutations) + ' subs </b>',
@@ -64,7 +66,8 @@ export default function SBS6(data, sample) {
         size: 16,
       },
       autorange: false,
-      range: [0, maxVal + maxVal * 0.15],
+      range: [0, maxVal + maxVal * 0.25],
+      tickformat: '~s',
     },
     yaxis: {
       tickfont: {
@@ -72,6 +75,7 @@ export default function SBS6(data, sample) {
       },
       categoryorder: 'category descending',
     },
+    tickformat: '~s',
   };
   return { traces, layout };
 }

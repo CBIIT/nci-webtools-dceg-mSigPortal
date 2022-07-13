@@ -159,7 +159,7 @@ export default function SBS384(data, sample) {
     xanchor: 'bottom',
     yanchor: 'bottom',
     x: index,
-    y: -0.065,
+    y: -0.1,
     text: num.mutationType.replace(
       /\[(.*)\]/,
       num.mutationType.substring(2, 3)
@@ -235,6 +235,8 @@ export default function SBS384(data, sample) {
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     bargap: 0.3,
+    height: 450,
+    width: 1080,
     legend: {
       x: 1,
       xanchor: 'right',
@@ -251,17 +253,17 @@ export default function SBS384(data, sample) {
       tickmode: 'array',
       tickvals: [...flatSortedT.map((_, i) => i)],
       ticktext: [...flatSortedT.map((e) => e.mutationType)],
-      linecolor: 'black',
-      linewidth: 2,
-      mirror: true,
+      //linecolor: 'black',
+      //linewidth: 2,
+      //mirror: true,
     },
     yaxis: {
       title: 'Number of Single Base Substitutions',
       autorange: false,
       range: [0, maxVal + maxVal * 0.15],
-      linecolor: 'black',
-      linewidth: 2,
-      mirror: true,
+      //linecolor: 'black',
+      //linewidth: 2,
+      //mirror: true,
       categoryorder: 'category descending',
     },
     shapes: [...shapes1, ...shapes2],

@@ -219,6 +219,8 @@ export default function SBS192(data, sample) {
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     showlegend: true,
+    height: 450,
+    width: 1080,
     legend: {
       x: 1,
       xanchor: 'right',

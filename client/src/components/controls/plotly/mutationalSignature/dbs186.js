@@ -183,6 +183,9 @@ export default function DBS186(data, sample) {
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     showlegend: true,
+    height: 600,
+    width: 1080,
+
     legend: {
       x: 1,
       xanchor: 'right',

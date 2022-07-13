@@ -465,6 +465,8 @@ export default function ID415(data, sample) {
 
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
+    height: 500,
+    width: 1080,
     legend: {
       x: 1,
       xanchor: 'right',

@@ -1,5 +1,3 @@
-import { groupBy } from 'lodash';
-
 export default function TMB(data) {
   console.log(data);
   function average(arr) {
@@ -87,8 +85,8 @@ export default function TMB(data) {
     type: 'line',
     xref: 'x',
     yref: 'paper',
-    x0: index + 0.3,
-    x1: index + 0.7,
+    x0: index + 0.4,
+    x1: index + 0.6,
     y0: -0.11,
     y1: -0.11,
     line: {
@@ -161,6 +159,8 @@ export default function TMB(data) {
     },
   }));
 
+  let tracesAutorange = true;
+  traces.length > 1 ? (tracesAutorange = false) : (tracesAutorange = true);
   const layout = {
     // title: {
     //   text: "Tumor Mutational Burden Separated by Signatures",
@@ -190,8 +190,8 @@ export default function TMB(data) {
       linewidth: 2,
       mirror: true,
       automargin: true,
-      autorange: false,
-      range: [-Math.ceil(yMax), Math.ceil(yMax)],
+      autorange: tracesAutorange,
+      range: [-Math.floor(yMax), Math.floor(yMax)],
     },
 
     shapes: [...shapes, ...lines, ...bottoLabelline],
