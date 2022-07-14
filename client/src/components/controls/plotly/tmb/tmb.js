@@ -159,13 +159,14 @@ export default function TMB(data) {
     },
   }));
 
-  let tracesAutorange = true;
-  traces.length > 1 ? (tracesAutorange = false) : (tracesAutorange = true);
   const layout = {
     // title: {
     //   text: "Tumor Mutational Burden Separated by Signatures",
     //   yanchor: "top",
     // },
+    //width: totalCancer > 1 ? null : 200,
+    autosize: true,
+
     showlegend: false,
     xaxis: {
       showticklabels: false,
@@ -190,7 +191,7 @@ export default function TMB(data) {
       linewidth: 2,
       mirror: true,
       automargin: true,
-      autorange: tracesAutorange,
+      autorange: true,
       range: [-Math.floor(yMax), Math.floor(yMax)],
     },
 
