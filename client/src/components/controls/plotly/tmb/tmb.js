@@ -101,7 +101,7 @@ export default function TMB(data) {
     xanchor: 'bottom',
     yanchor: 'bottom',
     x: (index + index + 1) * 0.5,
-    y: -0.21,
+    y: -0.18,
     text: `${element.samples.length}`,
     showarrow: false,
     font: {
