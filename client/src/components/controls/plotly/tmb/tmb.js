@@ -166,7 +166,7 @@ export default function TMB(data) {
     // },
     //width: totalCancer > 1 ? null : 200,
     autosize: true,
-
+    height: 500,
     showlegend: false,
     xaxis: {
       showticklabels: false,
