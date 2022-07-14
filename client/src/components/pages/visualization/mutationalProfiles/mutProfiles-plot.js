@@ -115,7 +115,7 @@ export default function MutProfilePlot() {
         </div>
       ) : (
         plot && (
-          <Container fluid style={{ minHeight: '500px' }}>
+          <Container fluid style={{ minHeight: '500px' }} className="mb-3">
             <Row>
               <Col>
                 <Plot

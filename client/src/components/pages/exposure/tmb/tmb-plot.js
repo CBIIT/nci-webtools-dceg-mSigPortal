@@ -31,7 +31,7 @@ export default function MutProfilePlot() {
   return (
     <div
       class="container d-flex align-items-center justify-content-center"
-      style={{ minHeight: '400px' }}
+      style={{ minHeight: '500px' }}
     >
       <LoadingOverlay active={isFetching} />
       {data && (
