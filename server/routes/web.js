@@ -30,13 +30,13 @@ const {
   profilerSummary,
   querySeqmatrix,
   querySignature,
-} = require('../services/analysis/visualization');
+} = require('../services/analysis/visualization/visualization');
 
 const {
   queryExposure,
   explorationOptions,
   tmb,
-} = require('../services/analysis/exploration');
+} = require('../services/analysis/exploration/exploration');
 
 const router = express.Router();
 
