@@ -161,10 +161,10 @@ export default function SBS96(data, sample) {
   );
 
   let heatmapY2_c = [
-    heatmapY2[0][0].charAt(0) + '--N',
-    heatmapY2[0][16].charAt(0) + '--N',
-    heatmapY2[0][32].charAt(0) + '--N',
-    heatmapY2[0][48].charAt(0) + '--N',
+    heatmapY2[0][0].charAt(0) + '----N',
+    heatmapY2[0][16].charAt(0) + '----N',
+    heatmapY2[0][32].charAt(0) + '----N',
+    heatmapY2[0][48].charAt(0) + '----N',
   ];
 
   let heatMapZ2_0 = chunks(heatmapZ2[0], 16);
@@ -283,10 +283,10 @@ export default function SBS96(data, sample) {
   );
 
   let heatmapY3_c = [
-    'N--' + heatmapY3[0][0].charAt(heatmapY3[0][0].length - 1),
-    'N--' + heatmapY3[0][16].charAt(heatmapY3[0][16].length - 1),
-    'N--' + heatmapY3[0][32].charAt(heatmapY3[0][32].length - 1),
-    'N--' + heatmapY3[0][48].charAt(heatmapY3[0][48].length - 1),
+    'N----' + heatmapY3[0][0].charAt(heatmapY3[0][0].length - 1),
+    'N----' + heatmapY3[0][16].charAt(heatmapY3[0][16].length - 1),
+    'N----' + heatmapY3[0][32].charAt(heatmapY3[0][32].length - 1),
+    'N----' + heatmapY3[0][48].charAt(heatmapY3[0][48].length - 1),
   ];
 
   let heatMapZ3_0 = chunks(heatmapZ3[0], 16);
@@ -352,7 +352,7 @@ export default function SBS96(data, sample) {
           : 0
       );
       //console.log(value);
-      heatmapY.push(key.charAt(0) + '--' + key.charAt(key.length - 1));
+      heatmapY.push(key.charAt(0) + '----' + key.charAt(key.length - 1));
       heatmapZ.push(
         Object.entries(value).map(([k, v]) => v.contribution / totalMutations)
       );
@@ -499,7 +499,7 @@ export default function SBS96(data, sample) {
     yref: 'paper',
     xanchor: 'top',
     yanchor: 'top',
-    x: -0.04,
+    x: -0.045,
     y: 1.02,
     text: '<b>Number of Single Base Substitutions</b>',
     showarrow: false,
@@ -530,7 +530,7 @@ export default function SBS96(data, sample) {
       ticktext: flatSorted.map((e) => e.mutationType),
       linecolor: 'black',
       linewidth: 1,
-      mirror: true,
+      mirror: 'all',
       tickformat: '~s',
     },
     yaxis: {
@@ -539,17 +539,17 @@ export default function SBS96(data, sample) {
       range: [0, maxVal + maxVal * 0.2],
       linecolor: '#E0E0E0',
       linewidth: 1,
-      mirror: true,
+      mirror: 'all',
       domain: [0.72, 1],
       tickformat: '~s',
-      ticks: 'inside',
       showgrid: false,
     },
     yaxis2: {
       autorange: true,
       linecolor: '#E0E0E0',
       linewidth: 1,
-      mirror: true,
+      ticks: '',
+      mirror: 'all',
       anchor: 'x',
       tickfont: {
         size: 8,
@@ -560,7 +560,8 @@ export default function SBS96(data, sample) {
       autorange: true,
       linecolor: '#E0E0E0',
       linewidth: 1,
-      mirror: true,
+      ticks: '',
+      mirror: 'all',
       anchor: 'x',
       tickfont: {
         size: 8,
@@ -571,7 +572,8 @@ export default function SBS96(data, sample) {
       autorange: true,
       linecolor: '#E0E0E0',
       linewidth: 1,
-      mirror: true,
+      ticks: '',
+      mirror: 'all',
       anchor: 'x',
       //dtick: 1,
       tickfont: {

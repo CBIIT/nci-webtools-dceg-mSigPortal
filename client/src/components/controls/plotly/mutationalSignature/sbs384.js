@@ -183,7 +183,11 @@ export default function SBS384(data, sample) {
     x: 0,
     y: 0.88,
     text:
-      '<b>' + sample + ': ' + numberWithCommas(totalMutations) + ' subs </b>',
+      '<b>' +
+      sample +
+      ': ' +
+      numberWithCommas(totalMutations) +
+      ' transcribed subs </b>',
     showarrow: false,
     font: {
       size: 18,
@@ -253,17 +257,17 @@ export default function SBS384(data, sample) {
       tickmode: 'array',
       tickvals: [...flatSortedT.map((_, i) => i)],
       ticktext: [...flatSortedT.map((e) => e.mutationType)],
-      //linecolor: 'black',
-      //linewidth: 2,
-      //mirror: true,
+      linecolor: '#E0E0E0',
+      linewidth: 1,
+      mirror: 'all',
     },
     yaxis: {
       title: 'Number of Single Base Substitutions',
       autorange: false,
       range: [0, maxVal + maxVal * 0.2],
-      //linecolor: 'black',
-      //linewidth: 2,
-      //mirror: true,
+      linecolor: '#E0E0E0',
+      linewidth: 1,
+      mirror: 'all',
       categoryorder: 'category descending',
     },
     shapes: [...shapes1, ...shapes2],
