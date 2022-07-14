@@ -143,7 +143,7 @@ export default function SBS96(data, sample) {
     hoverlabel: { bgcolor: '#FFF' },
     bargap: 0.3,
     height: 450,
-    width: 1080,
+    // width: 1080,
     autosize: true,
 
     xaxis: {

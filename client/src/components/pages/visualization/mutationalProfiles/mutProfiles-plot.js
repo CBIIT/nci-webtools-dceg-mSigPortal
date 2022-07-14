@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
-import { Button, Row, Col } from 'react-bootstrap';
+import { Button, Container, Row, Col } from 'react-bootstrap';
 import Plot from 'react-plotly.js';
 import { downloadImage } from 'plotly.js';
 import { saveAs } from 'file-saver';
@@ -19,6 +19,8 @@ import DBS186 from '../../../controls/plotly/mutationalSignature/dbs186';
 import ID83 from '../../../controls/plotly/mutationalSignature/id83';
 import ID28 from '../../../controls/plotly/mutationalSignature/id28';
 import ID415 from '../../../controls/plotly/mutationalSignature/id415';
+
+import './plot.scss';
 
 export default function MutProfilePlot() {
   const store = useSelector((state) => state.visualization);
@@ -98,9 +100,7 @@ export default function MutProfilePlot() {
     displaylogo: false,
     toImageButtonOptions: {
       format: 'svg',
-      filename: 'plot_export',
-      height: 1000,
-      width: 1000,
+      filename: sample?.value || 'Mutational Profile',
       scale: 1,
     },
   };
@@ -115,27 +115,30 @@ export default function MutProfilePlot() {
         </div>
       ) : (
         plot && (
-          <div className="container w-100 align-content-center mb-3">
-            <Plot
-              // {...(profile.value + matrix.value === 'SBS1536' ||
-              // profile.value + matrix.value === 'SBS6' ||
-              // profile.value + matrix.value === 'SBS24' ||
-              // profile.value + matrix.value === 'ID28'
-              //   ? { className: 'w-70' }
-              //   : { className: 'w-100' })}
-              className="h-100 w-100"
-              divId={divId}
-              // style={{
-              //   height: '650px',
-              // }}
-              data={cloneDeep(plot.data)}
-              layout={cloneDeep(plot.layout)}
-              config={cloneDeep(config)}
-              useResizeHandler
-            />
-
-            <Row className="justify-content-center">
-              {/* <Col sm="auto">
+          <Container fluid style={{ minHeight: '500px' }}>
+            <Row>
+              <Col>
+                <Plot
+                  // {...(profile.value + matrix.value === 'SBS1536' ||
+                  // profile.value + matrix.value === 'SBS6' ||
+                  // profile.value + matrix.value === 'SBS24' ||
+                  // profile.value + matrix.value === 'ID28'
+                  //   ? { className: 'w-70' }
+                  //   : { className: 'w-100' })}
+                  className="w-100"
+                  divId={divId}
+                  // style={{
+                  //   height: '650px',
+                  // }}
+                  data={cloneDeep(plot.data)}
+                  layout={cloneDeep(plot.layout)}
+                  config={cloneDeep(config)}
+                  useResizeHandler
+                />
+              </Col>
+            </Row>
+            {/* <Row className="justify-content-center"> */}
+            {/* <Col sm="auto">
                 <Button
                   onClick={() =>
                     downloadImage(divId, {
@@ -159,6 +162,7 @@ export default function MutProfilePlot() {
                   Download SVG
                 </Button>
               </Col> */}
+            <Row>
               <Col sm="auto">
                 <Button
                   onClick={() =>
@@ -174,7 +178,7 @@ export default function MutProfilePlot() {
                 </Button>
               </Col>
             </Row>
-          </div>
+          </Container>
         )
       )}
     </>
