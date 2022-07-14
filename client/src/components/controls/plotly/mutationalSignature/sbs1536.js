@@ -396,6 +396,7 @@ export default function SBS96(data, sample) {
     zmax: maxZ + maxZ * 0.1,
     z: num,
     y: heatmapY,
+
     type: 'heatmap',
     hoverongaps: false,
     xaxis: 'x',
@@ -404,6 +405,9 @@ export default function SBS96(data, sample) {
       (e, i) =>
         array.slice(0, index).reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
     ),
+    test: heatmapY.map((a) => a.replace('----', `%{x}`)),
+    array: array,
+    num: num,
     xgap: 0.1,
     ygap: 0.1,
     hovertemplate: 'x: %{x}<br>y: %{y}<br>Value: %{z}<extra></extra>',
@@ -416,8 +420,8 @@ export default function SBS96(data, sample) {
     ...traceHeatMap3,
   ];
 
-  // console.log("traces:");
-  // console.log(traces);
+  //console.log('traces:');
+  //console.log(traces);
   const annotations = Object.entries(groupByTotal).map(
     ([mutation, signatures], groupIndex, array) => ({
       xref: 'x',
