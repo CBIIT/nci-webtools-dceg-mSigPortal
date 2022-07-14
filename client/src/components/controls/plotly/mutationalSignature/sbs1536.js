@@ -530,7 +530,7 @@ export default function SBS96(data, sample) {
       ticktext: flatSorted.map((e) => e.mutationType),
       linecolor: 'black',
       linewidth: 1,
-      mirror: 'all',
+      mirror: true,
       tickformat: '~s',
     },
     yaxis: {
