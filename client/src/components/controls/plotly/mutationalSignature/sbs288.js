@@ -408,21 +408,21 @@ export default function SBS288(data, sample) {
       //   e.mutationType.replace(/\[(.*)\]/, e.mutationType.substring(2, 3))
       // ),
       ticktext: flatSortedTotal.map((e) => e.mutationType),
-      linecolor: 'black',
+      linecolor: '#E0E0E0',
       linewidth: 1,
-      mirror: true,
+      mirror: 'all',
       domain: [0, 0.75],
     },
     yaxis: {
       title: 'Number of Single Base Substitutions',
       autorange: false,
       range: [0, maxValTotal + maxValTotal * 0.2],
-      linecolor: 'black',
+      linecolor: '#E0E0E0',
       linewidth: 1,
-      mirror: true,
       tickformat: '~s',
       ticks: 'inside',
       showgrid: false,
+      mirror: 'all',
     },
 
     xaxis2: {
@@ -433,6 +433,9 @@ export default function SBS288(data, sample) {
       },
       domain: [0.8, 1],
       tickformat: '~s',
+      ticks: 'outside',
+      linecolor: '#E0E0E0',
+      linewidth: 1,
     },
     yaxis2: {
       showline: true,
@@ -443,6 +446,9 @@ export default function SBS288(data, sample) {
       anchor: 'x2',
       categoryorder: 'category descending',
       tickformat: '~s',
+      ticks: 'outside',
+      linecolor: '#E0E0E0',
+      linewidth: 1,
     },
 
     shapes: shapes,
