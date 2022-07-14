@@ -54,8 +54,15 @@ async function tmb(req, res, next) {
 function calculateTmb(data, study) {
   // Calculate the number of mutations per megabase for each study
   const genome = { PCAWG: 'GRCh37', TCGA: 'GRCh37' };
-  const genomeSize = { GRCh37: 3101976562 / Math.pow(10, 6) };
-  const burden = (exposure) => Math.log10(exposure / genomeSize[genome[study]]);
+  const genomeSize = {
+    GRCh37: 3101976562 / Math.pow(10, 6),
+    GRCh38: 3217346917 / Math.pow(10, 6),
+    hg18: 3080436051 / Math.pow(10, 6),
+    hg19: 3101976562 / Math.pow(10, 6),
+    mmc9: 2654911517 / Math.pow(10, 6),
+    mmc10: 2725537669 / Math.pow(10, 6),
+  };
+  const burden = (exposure) => Math.log10(exposure / genomeSize.GRCh37);
 
   const groupByCancer = groupBy(data, 'cancer');
 
