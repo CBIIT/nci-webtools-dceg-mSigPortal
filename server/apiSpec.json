@@ -81,6 +81,16 @@
               "enum": ["96", "83", "78"]
             },
             "value": "96"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit response size",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "10"
           }
         ],
         "responses": {
@@ -135,6 +145,16 @@
               ]
             },
             "value": "COSMIC_v3_Signatures_GRCh37_SBS96"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit response size",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "10"
           }
         ],
         "responses": {
@@ -160,24 +180,46 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["SBS96", "DBS78", "ID83"]
+              "enum": ["SBS", "DBS", "ID"]
             },
-            "value": "SBS96"
+            "value": "SBS"
+          },
+          {
+            "name": "matrix",
+            "in": "query",
+            "description": "Select matrix",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["96", "78", "83"]
+            },
+            "value": "96"
           },
           {
             "name": "signatureSetName",
             "in": "query",
             "description": "Select signature set to filter data by.",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "enum": [
+                "",
                 "COSMIC_v3_Signatures_GRCh37_SBS96",
                 "COSMIC_v3_Signatures_GRCh37_DBS78",
                 "COSMIC_v3_Signatures_GRCh37_ID83"
               ]
             },
             "value": "COSMIC_v3_Signatures_GRCh37_SBS96"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit response size",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "10"
           }
         ],
         "responses": {
@@ -232,6 +274,16 @@
               ]
             },
             "value": "COSMIC_v3_Signatures_GRCh37_SBS96"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit response size",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "10"
           }
         ],
         "responses": {
