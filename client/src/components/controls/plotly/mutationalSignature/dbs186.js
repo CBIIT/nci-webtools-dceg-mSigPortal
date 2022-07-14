@@ -190,6 +190,9 @@ export default function DBS186(data, sample) {
       x: 1,
       xanchor: 'right',
       y: 1,
+      bgcolor: '#FFFFFF',
+      bordercolor: '#E1E1E1',
+      borderwidth: 1,
     },
     xaxis: {
       //title: "Double Substitution",
