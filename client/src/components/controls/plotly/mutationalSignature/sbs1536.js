@@ -513,7 +513,7 @@ export default function SBS96(data, sample) {
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     height: 700,
-    //width:1080,
+    width: 1080,
     grid: {
       rows: 4,
       columns: 1,
@@ -537,15 +537,17 @@ export default function SBS96(data, sample) {
       //title: 'Number of Single Base Substitutions',
       autorange: false,
       range: [0, maxVal + maxVal * 0.2],
-      linecolor: 'black',
+      linecolor: '#E0E0E0',
       linewidth: 1,
       mirror: true,
       domain: [0.72, 1],
       tickformat: '~s',
+      ticks: 'inside',
+      showgrid: false,
     },
     yaxis2: {
       autorange: true,
-      linecolor: 'black',
+      linecolor: '#E0E0E0',
       linewidth: 1,
       mirror: true,
       anchor: 'x',
@@ -556,7 +558,7 @@ export default function SBS96(data, sample) {
     },
     yaxis3: {
       autorange: true,
-      linecolor: 'black',
+      linecolor: '#E0E0E0',
       linewidth: 1,
       mirror: true,
       anchor: 'x',
@@ -567,7 +569,7 @@ export default function SBS96(data, sample) {
     },
     yaxis4: {
       autorange: true,
-      linecolor: 'black',
+      linecolor: '#E0E0E0',
       linewidth: 1,
       mirror: true,
       anchor: 'x',

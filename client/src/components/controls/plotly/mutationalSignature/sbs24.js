@@ -50,7 +50,7 @@ export default function SBS24(data, sample) {
   //   console.log(dataU);
 
   const tracesT = {
-    name: 'Transcrribed',
+    name: 'Transcribed Strand',
     type: 'bar',
     marker: { color: '#004765' },
 
@@ -65,7 +65,7 @@ export default function SBS24(data, sample) {
 
   //console.log(tracesT);
   const tracesU = {
-    name: 'Untranscribed',
+    name: 'Untranscribed Strand',
     type: 'bar',
     marker: { color: '#E32925' },
     x: dataU.map((element, index, array) => element.contribution),
@@ -93,7 +93,11 @@ export default function SBS24(data, sample) {
     },
     title: {
       text:
-        '<b>' + sample + ': ' + numberWithCommas(totalMutations) + ' subs </b>',
+        '<b>' +
+        sample +
+        ': ' +
+        numberWithCommas(totalMutations) +
+        ' transcribed subs </b>',
       font: {
         size: 24,
       },
@@ -102,7 +106,7 @@ export default function SBS24(data, sample) {
     },
     xaxis: {
       title: {
-        text: '<b>Number of Single Base Substitution</b>',
+        text: '<b>Number of Single Base Substitutions</b>',
         font: {
           size: 18,
         },
@@ -110,14 +114,20 @@ export default function SBS24(data, sample) {
       tickfont: {
         size: 16,
       },
+      ticks: 'outside',
+      linecolor: '#E0E0E0',
+      linewidth: 1,
+      showgrid: false,
       autorange: false,
-      range: [0, maxVal + maxVal * 0.15],
+      range: [0, maxVal + maxVal * 0.2],
       tickformat: '~s',
     },
     yaxis: {
       tickfont: {
         size: 16,
       },
+      linecolor: '#E0E0E0',
+      linewidth: 1,
       tickformat: '~s',
       categoryorder: 'category descending',
     },

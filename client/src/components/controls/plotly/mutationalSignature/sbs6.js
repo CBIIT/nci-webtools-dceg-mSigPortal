@@ -65,6 +65,10 @@ export default function SBS6(data, sample) {
       tickfont: {
         size: 16,
       },
+      ticks: 'outside',
+      linecolor: '#E0E0E0',
+      linewidth: 1,
+      showgrid: false,
       autorange: false,
       range: [0, maxVal + maxVal * 0.25],
       tickformat: '~s',
@@ -73,6 +77,8 @@ export default function SBS6(data, sample) {
       tickfont: {
         size: 16,
       },
+      linecolor: '#E0E0E0',
+      linewidth: 1,
       categoryorder: 'category descending',
     },
     tickformat: '~s',

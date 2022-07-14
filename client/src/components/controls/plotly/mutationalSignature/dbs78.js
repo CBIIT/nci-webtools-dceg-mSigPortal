@@ -120,7 +120,7 @@ export default function DBS78(data, sample) {
     xanchor: 'bottom',
     yanchor: 'bottom',
     x: 0,
-    y: 0.92,
+    y: 0.88,
     text:
       '<b>' +
       sample +

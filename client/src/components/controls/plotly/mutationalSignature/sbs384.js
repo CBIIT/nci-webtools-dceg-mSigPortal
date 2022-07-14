@@ -181,7 +181,7 @@ export default function SBS384(data, sample) {
     xanchor: 'bottom',
     yanchor: 'bottom',
     x: 0,
-    y: 0.92,
+    y: 0.88,
     text:
       '<b>' + sample + ': ' + numberWithCommas(totalMutations) + ' subs </b>',
     showarrow: false,
@@ -260,7 +260,7 @@ export default function SBS384(data, sample) {
     yaxis: {
       title: 'Number of Single Base Substitutions',
       autorange: false,
-      range: [0, maxVal + maxVal * 0.15],
+      range: [0, maxVal + maxVal * 0.2],
       //linecolor: 'black',
       //linewidth: 2,
       //mirror: true,
