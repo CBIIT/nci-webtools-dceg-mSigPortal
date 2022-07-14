@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import Plot from 'react-plotly.js';
+import { Button, Container, Row, Col } from 'react-bootstrap';
 import { cloneDeep } from 'lodash';
 import { useSelector } from 'react-redux';
 import { useTmbPlotQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
+import './plot.scss';
 export default function MutProfilePlot() {
   const publicForm = useSelector((state) => state.exposure.publicForm);
   const [params, setParams] = useState('');
@@ -29,24 +31,32 @@ export default function MutProfilePlot() {
   }
 
   return (
-    <div
-      class="container d-flex align-items-center justify-content-center"
-      style={{ minHeight: '500px' }}
-    >
+    <>
       <LoadingOverlay active={isFetching} />
       {data && (
-        <Plot
-          {...(data.traces.length > 1
-            ? { className: 'w-100' }
-            : { className: 'w-30' })}
-          style={{ height: '500px' }}
-          data={cloneDeep(data.traces)}
-          layout={cloneDeep(data.layout)}
-          config={cloneDeep(data.config)}
-          useResizeHandler
-        />
+        <Container fluid style={{ minHeight: '500px' }} className="mb-3">
+          <Row className="justify-content-center text-center">
+            <Col
+              {...(data.traces.length > 1
+                ? { className: '' }
+                : { className: 'col-md-4 content col-md-offset-3 ' })}
+            >
+              <Plot
+                // {...(data.traces.length > 1
+                //   ? { className: 'w-100' }
+                //   : { className: 'w-30' })}
+                // style={{ height: '500px' }}
+                className="w-100"
+                data={cloneDeep(data.traces)}
+                layout={cloneDeep(data.layout)}
+                config={cloneDeep(data.config)}
+                useResizeHandler
+              />
+            </Col>
+          </Row>
+        </Container>
       )}
       {error && <p>An error has occured</p>}
-    </div>
+    </>
   );
 }
