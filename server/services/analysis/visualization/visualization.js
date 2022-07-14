@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
-const { getSeqmatrixData, getSignatureData } = require('../query');
+const { getSeqmatrixData, getSignatureData } = require('../../query');
+const { SBS, DBS, ID } = require('./mutationalProfiles');
 
 // query public seqmatrix data for visualization tab
 async function visualizationOptions(req, res, next) {
@@ -35,12 +36,22 @@ async function visualizationSamples(req, res, next) {
 
 async function mutationalProfiles(req, res, next) {
   try {
-    // const { study,strategy,cancer, sample, profile, matrix } = req.query;
+    const { study, strategy, cancer, sample, profile, matrix } = req.query;
     const connection = req.app.locals.connection;
 
+    const query = { study, strategy, cancer, sample, profile, matrix };
     const columns = ['mutationType', 'mutations'];
-    const data = await getSeqmatrixData(connection, req.query, columns);
-    res.json(data);
+    const data = await getSeqmatrixData(connection, query, columns);
+
+    if (profile == 'SBS') {
+      res.json(SBS(data));
+    } else if (profile == 'DBS') {
+      res.json(data);
+    } else if (profile == 'ID') {
+      res.json(data);
+    } else {
+      throw 'mutationalProfiles: unsupported profile';
+    }
   } catch (error) {
     next(error);
   }
@@ -61,17 +72,11 @@ async function profilerSummary(req, res, next) {
 
 async function querySeqmatrix(req, res, next) {
   try {
-    const { type, ...query } = req.query;
+    const { study, strategy, cancer, sample, profile, matrix } = req.query;
     const connection = req.app.locals.connection;
 
-    if (!type) throw "Seqmatrix API: Missing 'type' parameter";
-
-    let columns = [];
-    if (type == 'studies') columns = ['study', 'cancer', 'strategy'];
-    if (type == 'samples') columns = ['profile', 'sample', 'profile', 'matrix'];
-    if (type == 'mutationalProfiles') columns = ['mutationType', 'mutations'];
-    if (type == 'profilerSummary') columns = ['sample', 'profile', 'mutations'];
-
+    const query = { study, strategy, cancer, sample, profile, matrix };
+    const columns = ['mutationType', 'mutations'];
     const data = await getSeqmatrixData(connection, query, columns);
     res.json(data);
   } catch (error) {
