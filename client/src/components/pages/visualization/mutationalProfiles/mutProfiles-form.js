@@ -55,7 +55,7 @@ export default function TreeLeafForm() {
             samples
               .filter((e) => e.sample == sample.value)
               .map((e) => e.profile)
-              .sort((a, b) => a - b)
+              .sort((a, b) => b.localeCompare(a))
           ),
         ].map((e) => ({ label: e, value: e }))
       : [];
