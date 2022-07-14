@@ -119,7 +119,7 @@ export default function CsReference() {
 
   return (
     <div>
-      <p className="p-3 m-0">
+      <div className="p-3 m-0">
         <Description
           less="Cosine similarity is a measure of the similarity of two
                       matrices, which can be helpful to compare two mutational
@@ -139,7 +139,7 @@ export default function CsReference() {
             </span>
           }
         />
-      </p>
+      </div>
 
       <hr />
       <LoadingOverlay active={isFetching} />
