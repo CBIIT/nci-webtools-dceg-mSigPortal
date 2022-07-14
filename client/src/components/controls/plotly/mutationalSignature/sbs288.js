@@ -390,6 +390,9 @@ export default function SBS288(data, sample) {
       xanchor: 'right',
       y: 0,
       traceorder: 'reversed',
+      bgcolor: '#FFFFFF',
+      bordercolor: '#E1E1E1',
+      borderwidth: 1,
     },
     grid: {
       rows: 1,

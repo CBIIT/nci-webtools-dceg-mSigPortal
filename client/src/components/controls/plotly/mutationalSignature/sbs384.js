@@ -246,6 +246,9 @@ export default function SBS384(data, sample) {
       x: 1,
       xanchor: 'right',
       y: 1,
+      bgcolor: '#FFFFFF',
+      bordercolor: '#E1E1E1',
+      borderwidth: 1,
     },
 
     xaxis: {

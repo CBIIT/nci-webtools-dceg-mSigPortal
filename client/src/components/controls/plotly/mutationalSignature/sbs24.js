@@ -90,6 +90,9 @@ export default function SBS24(data, sample) {
       xanchor: 'right',
       y: 1,
       traceorder: 'reversed',
+      bgcolor: '#FFFFFF',
+      bordercolor: '#E1E1E1',
+      borderwidth: 1,
     },
     title: {
       text:
