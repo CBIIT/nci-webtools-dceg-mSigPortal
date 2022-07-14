@@ -41,11 +41,11 @@ export default function TreeLeafForm() {
 
   const sampleOptions = samples.length
     ? [...new Set(samples.map((d) => d.sample))]
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
         .map((e) => ({
           label: e,
           value: e,
         }))
-        .sort((a, b) => a - b)
     : [];
 
   const profileOptions = (sample) =>
