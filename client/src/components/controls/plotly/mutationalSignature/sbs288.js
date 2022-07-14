@@ -436,6 +436,7 @@ export default function SBS288(data, sample) {
       ticks: 'outside',
       linecolor: '#E0E0E0',
       linewidth: 1,
+      showgrid: false,
     },
     yaxis2: {
       showline: true,
@@ -449,6 +450,7 @@ export default function SBS288(data, sample) {
       ticks: 'outside',
       linecolor: '#E0E0E0',
       linewidth: 1,
+      showgrid: false,
     },
 
     shapes: shapes,
