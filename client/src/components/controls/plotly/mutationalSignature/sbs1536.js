@@ -481,7 +481,7 @@ export default function SBS96(data, sample) {
     xanchor: 'bottom',
     yanchor: 'bottom',
     x: index,
-    y: -0.05,
+    y: -0.04,
     text: num.mutationType.replace(/\[(.*)\]/, '-'),
     showarrow: false,
     font: {
@@ -528,10 +528,11 @@ export default function SBS96(data, sample) {
       tickmode: 'array',
       tickvals: flatSorted.map((_, i) => i),
       ticktext: flatSorted.map((e) => e.mutationType),
-      linecolor: 'black',
+      linecolor: '#E0E0E0',
       linewidth: 1,
-      mirror: true,
+      mirror: 'all',
       tickformat: '~s',
+      ticks: '',
     },
     yaxis: {
       //title: 'Number of Single Base Substitutions',
