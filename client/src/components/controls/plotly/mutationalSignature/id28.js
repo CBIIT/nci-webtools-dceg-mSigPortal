@@ -301,7 +301,7 @@ export default function ID28(data, sample) {
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     height: 600,
-    width: 750,
+    //width: 750,
     xaxis: {
       showticklabels: false,
       showline: true,

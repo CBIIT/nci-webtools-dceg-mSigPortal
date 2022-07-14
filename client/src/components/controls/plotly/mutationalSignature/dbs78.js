@@ -137,7 +137,7 @@ export default function DBS78(data, sample) {
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     height: 500,
-    width: 1080,
+    //width:1080,
     xaxis: {
       //title: "Double Substitution",
       showticklabels: true,
