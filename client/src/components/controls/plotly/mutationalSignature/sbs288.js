@@ -384,6 +384,7 @@ export default function SBS288(data, sample) {
     bargap: 0.3,
     height: 450,
     //width:1080,
+    autosize: true,
     legend: {
       x: 1,
       xanchor: 'right',

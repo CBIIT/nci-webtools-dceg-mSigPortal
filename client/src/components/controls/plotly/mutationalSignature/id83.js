@@ -369,6 +369,7 @@ export default function ID83(data, sample) {
     hoverlabel: { bgcolor: '#FFF' },
     height: 500,
     //width:1080,
+    autosize: true,
     xaxis: {
       showticklabels: false,
       showline: true,
@@ -385,7 +386,7 @@ export default function ID83(data, sample) {
     },
     yaxis: {
       title: 'Number of Idels',
-      autorange: true,
+      autorange: false,
       range: [0, maxVal + maxVal * 0.2],
       linecolor: 'black',
       linewidth: 1,

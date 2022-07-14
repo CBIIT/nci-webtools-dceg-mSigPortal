@@ -221,6 +221,7 @@ export default function SBS192(data, sample) {
     showlegend: true,
     height: 450,
     //width:1080,
+    autosize: true,
     legend: {
       x: 1,
       xanchor: 'right',
