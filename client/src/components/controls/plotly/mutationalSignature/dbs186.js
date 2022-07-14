@@ -207,7 +207,7 @@ export default function DBS186(data, sample) {
           e.mutationType.length
         )
       ),
-      linecolor: 'black',
+      linecolor: '#E0E0E0',
       linewidth: 1,
       mirror: true,
     },
@@ -215,12 +215,13 @@ export default function DBS186(data, sample) {
       title: 'Number of Double Base Substitutions',
       autorange: false,
       range: [0, maxVal + maxVal * 5],
-      linecolor: 'black',
+      linecolor: '#E0E0E0',
       linewidth: 1,
       mirror: true,
       tickfont: {
         size: 16,
       },
+      showgrid: false,
     },
 
     shapes: [...shapes1, ...shapes2],

@@ -136,10 +136,10 @@ export default function DBS78(data, sample) {
 
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
-    height: 500,
+    height: 450,
     //width:1080,
+    autosize: true,
     xaxis: {
-      //title: "Double Substitution",
       showticklabels: true,
       showline: true,
       tickangle: -90,
@@ -154,7 +154,7 @@ export default function DBS78(data, sample) {
           e.mutationType.length
         )
       ),
-      linecolor: 'black',
+      linecolor: '#E0E0E0',
       linewidth: 1,
       mirror: true,
     },
@@ -162,9 +162,12 @@ export default function DBS78(data, sample) {
       title: 'Number of Double Base Substitutions',
       autorange: false,
       range: [0, maxVal + maxVal * 0.2],
-      linecolor: 'black',
+      linecolor: '#E0E0E0',
       linewidth: 1,
-      mirror: true,
+      tickformat: '~s',
+      ticks: 'inside',
+      showgrid: true,
+      mirror: 'all',
     },
 
     shapes: shapes,
