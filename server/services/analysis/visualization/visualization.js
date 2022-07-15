@@ -44,11 +44,11 @@ async function mutationalProfiles(req, res, next) {
     const data = await getSeqmatrixData(connection, query, columns, limit);
 
     if (query.profile == 'SBS') {
-      res.json(SBS(data));
+      res.json(SBS(data, query.matrix));
     } else if (query.profile == 'DBS') {
-      res.json(data);
+      res.json(DBS(data, query.matrix));
     } else if (query.profile == 'ID') {
-      res.json(data);
+      res.json(ID(data, query.matrix));
     } else {
       throw 'mutationalProfiles: unsupported profile';
     }
@@ -106,7 +106,7 @@ async function querySignature(req, res, next) {
 
 const router = Router();
 
-router.get('/seqmatrix', querySeqmatrix)
+router.get('/seqmatrix', querySeqmatrix);
 router.get('/signature', querySignature);
 router.get('/visualizationOptions', visualizationOptions);
 router.get('/visualizationSamples', visualizationSamples);

@@ -1,4 +1,4 @@
-function SBS(data) {
+function SBS(data, matrix) {
   const groupByBase = data.reduce((acc, e, i) => {
     const baseRegex = /\[(.*)\]/;
     const base = e.mutationType.match(baseRegex)[1];
@@ -17,9 +17,9 @@ function SBS(data) {
   return transform;
 }
 
-function DBS(data) {
+function DBS(data, matrix) {
   const groupByBase = data.reduce((acc, e, i) => {
-    const baseRegex = /\[(.*)\]/;
+    const baseRegex = /^(.{2})/;
     const base = e.mutationType.match(baseRegex)[1];
 
     acc[base] = acc[base] ? [...acc[base], e] : [e];
@@ -35,7 +35,7 @@ function DBS(data) {
   return transform;
 }
 
-function ID(data) {
+function ID(data, matrix) {
   const groupByBase = data.reduce((acc, e, i) => {
     const baseRegex = /\[(.*)\]/;
     const base = e.mutationType.match(baseRegex)[1];
