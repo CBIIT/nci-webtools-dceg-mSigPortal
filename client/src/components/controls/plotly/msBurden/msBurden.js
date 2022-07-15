@@ -1,4 +1,4 @@
-export default function TMBSignature(data) {
+export default function TMB(data) {
   console.log(data);
   function average(arr) {
     const sum = arr.reduce((a, b) => a + b, 0);
@@ -8,42 +8,31 @@ export default function TMBSignature(data) {
   const totalCancer = data.length;
   console.log(totalCancer);
 
-  const sampleArray = [];
-  data.map((element, index, array) => {
-    sampleArray.push(element.samples);
-  });
-  const flatSampleArray = sampleArray.flat();
-
-  const groupBySample = flatSampleArray.reduce((groups, e, i) => {
-    const sample = e.sample;
-    const signature = {
-      sample: e.sample,
-      tmb: e.tmb,
-    };
-    groups[sample] = groups[sample]
-      ? [...groups[sample], signature]
-      : [signature];
-    return groups;
-  }, {});
-
-  //console.log(groupBySample);
-  const totalSamples = Object.keys(groupBySample).length;
-
   const absYValue = data
     .map((o) => o.samples.map((e) => Math.abs(e.tmb)))
     .flat();
   const yMax = Math.max(...absYValue);
 
   const traces = data.map((element, index, array) => ({
-    //element: element,
-    //index: index,
-    //array: array,
-    name: `${element.cancer}`,
+    // element: element,
+    // index: index,
+    // array: array,
+    // name: `${element.cancer}`,
     type: 'scatter',
     marker: { symbol: 'circle-open', size: 3, color: 'black' },
     mode: 'markers',
     y: element.samples.map((e) => e.tmb),
+    // average: average(element.samples.map((e) => e.tmb)),
     hovertemplate: 'Number of mutations: %{y}<br>',
+    // x: element.samples.map(
+    //   (e, i) =>
+    //     array
+    //       .slice(0, index)
+    //       .reduce((x0, curr) => x0 + curr.samples.length, 0) +
+    //     i +
+    //     0.5
+    // ),
+
     x: element.samples.map(
       (e, i) => index + 0.1 + (0.8 / element.samples.length) * i
     ),
@@ -57,9 +46,15 @@ export default function TMBSignature(data) {
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
+    // x:
+    //   array
+    //     .slice(0, index)
+    //     .reduce((x0, curr) => x0 + curr.samples.length, 0) +
+    //   (element.samples.length - 1) * 0.5,
+    //x: array.length * 0.5,
     x: array.length > 1 ? index : (index + index + 1) * 0.5,
     y: 1.01,
-    text: `${element.signatureName}`,
+    text: `${element.cancer}`,
     showarrow: false,
     font: {
       size: 10,
@@ -107,7 +102,7 @@ export default function TMBSignature(data) {
     yanchor: 'bottom',
     x: (index + index + 1) * 0.5,
     y: -0.18,
-    text: totalSamples,
+    text: `${element.samples.length}`,
     showarrow: false,
     font: {
       size: 12,
@@ -120,6 +115,14 @@ export default function TMBSignature(data) {
     type: 'rect',
     xref: 'x',
     yref: 'paper',
+
+    // x0: array
+    //   .slice(0, index)
+    //   .reduce((x0, curr) => x0 + curr.samples.length, 0),
+
+    // x1: array
+    //   .slice(0, index + 1)
+    //   .reduce((x0, curr) => x0 + curr.samples.length, 0),
     x0: index,
     x1: index + 1,
     y0: 0,
@@ -137,8 +140,17 @@ export default function TMBSignature(data) {
     type: 'line',
     xref: 'x',
     yref: 'y',
+
+    // x0: array
+    //   .slice(0, index)
+    //   .reduce((x0, curr) => x0 + curr.samples.length, 0),
+
+    // x1: array
+    //   .slice(0, index + 1)
+    //   .reduce((x0, curr) => x0 + curr.samples.length, 0),
     x0: index + 0.1,
     x1: index + 0.9,
+
     y0: element.medianTmb,
     y1: element.medianTmb,
     line: {
@@ -148,6 +160,10 @@ export default function TMBSignature(data) {
   }));
 
   const layout = {
+    // title: {
+    //   text: "Tumor Mutational Burden Separated by Signatures",
+    //   yanchor: "top",
+    // },
     width: totalCancer > 1 ? null : 350,
     autosize: true,
     height: 500,

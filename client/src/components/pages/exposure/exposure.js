@@ -11,6 +11,7 @@ import TMB2 from './tmb/tmb.js';
 import TmbSig from './tmbSignatures';
 import TmbSig2 from './tmbSignature/tmbSignature.js';
 import MsBurden from './msBurden';
+import MsBurden2 from './msBurden/msBurden.js';
 import MsAssociation from './msAssociation';
 import MsDecomposition from './msDecomposition';
 import MsLandscape from './msLandscape';
@@ -588,6 +589,11 @@ export default function Exposure({ match }) {
             component: <TmbSig2 />,
             id: 'tmbSig',
             name: 'TMB Signatures',
+          },
+          {
+            component: <MsBurden2 />,
+            id: 'msBurden',
+            name: 'MS Burden',
           },
         ];
 
