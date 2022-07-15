@@ -20,7 +20,7 @@ export default function MutProfilePlot() {
       setParams({
         study: study.value,
         strategy: strategy.value,
-        signatureSet: signatureSetName.value,
+        signatureSetName: signatureSetName.value,
       });
     }
   }, [publicForm]);
