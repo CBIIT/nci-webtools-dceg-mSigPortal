@@ -6,11 +6,11 @@ export default function MutationalProfiles(props) {
   return (
     <Container fluid className="bg-white border rounded p-0" {...props}>
       <div className="p-3">
-        <b>Tumor Mutational Burden</b>
+        <b>Tumor Mutational Burden Separated by Signatures</b>
         <Description
           className="m-0"
-          less="The bar plot below illustrates tumor mutational burden (number of mutations per Mb) across different cancer types for the selected study."
-          more="The y-axis is the number of mutations per Mb (log10), and the x-axis indicates cancer types. The green number is the number of samples for a given cancer type, and the blue number is the number of samples that have mutation data available for that cancer type."
+          less="The bar plot below illustrates tumor mutational burden across different signatures from the selected study and cancer type."
+          more="On the y-axis is the number of mutations per Mb (log10), and the x-axis denotes sample numbers. The green number is the total number of samples with the selected cancer type (and therefore evaluated for each signature). The blue number is the number of samples with the selected cancer type that detected the mutational signature from the reference signature set."
         />
       </div>
       <hr />
