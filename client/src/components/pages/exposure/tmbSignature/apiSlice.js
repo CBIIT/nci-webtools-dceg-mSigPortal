@@ -15,4 +15,4 @@ export const tmbApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useTmbPlotQuery } = tmbApiSlice;
+export const { useTmbSignaturesPlotQuery } = tmbApiSlice;
