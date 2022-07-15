@@ -8,15 +8,36 @@ export default function TMBSignature(data) {
   const totalCancer = data.length;
   console.log(totalCancer);
 
+  const sampleArray = [];
+  data.map((element, index, array) => {
+    sampleArray.push(element.samples);
+  });
+  const flatSampleArray = sampleArray.flat();
+
+  const groupBySample = flatSampleArray.reduce((groups, e, i) => {
+    const sample = e.sample;
+    const signature = {
+      sample: e.sample,
+      tmb: e.tmb,
+    };
+    groups[sample] = groups[sample]
+      ? [...groups[sample], signature]
+      : [signature];
+    return groups;
+  }, {});
+
+  console.log(groupBySample);
+  const totalSamples = Object.keys(groupBySample).length;
+
   const absYValue = data
     .map((o) => o.samples.map((e) => Math.abs(e.tmb)))
     .flat();
   const yMax = Math.max(...absYValue);
 
   const traces = data.map((element, index, array) => ({
-    element: element,
-    index: index,
-    array: array,
+    //element: element,
+    //index: index,
+    //array: array,
     name: `${element.cancer}`,
     type: 'scatter',
     marker: { symbol: 'circle-open', size: 3, color: 'black' },
@@ -86,7 +107,7 @@ export default function TMBSignature(data) {
     yanchor: 'bottom',
     x: (index + index + 1) * 0.5,
     y: -0.18,
-    text: `${element.samples.length}`,
+    text: totalSamples,
     showarrow: false,
     font: {
       size: 12,
