@@ -276,6 +276,16 @@
             "value": "COSMIC_v3_Signatures_GRCh37_SBS96"
           },
           {
+            "name": "cancer",
+            "in": "query",
+            "description": "Select cancer to filter data by.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
             "name": "limit",
             "in": "query",
             "description": "Limit response size",
