@@ -587,7 +587,7 @@ export default function Exposure({ match }) {
           {
             component: <TmbSig2 />,
             id: 'tmbSig',
-            name: 'TMB Signature',
+            name: 'TMB Signatures',
           },
         ];
 
