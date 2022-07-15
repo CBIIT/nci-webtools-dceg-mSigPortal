@@ -1,3 +1,4 @@
+const { Router } = require('express');
 const { v4: uuidv4 } = require('uuid');
 const { getSeqmatrixData, getSignatureData } = require('../../query');
 const { SBS, DBS, ID } = require('./mutationalProfiles');
@@ -103,11 +104,13 @@ async function querySignature(req, res, next) {
   }
 }
 
-module.exports = {
-  visualizationOptions,
-  visualizationSamples,
-  mutationalProfiles,
-  profilerSummary,
-  querySeqmatrix,
-  querySignature,
-};
+const router = Router();
+
+router.get('/seqmatrix', querySeqmatrix)
+router.get('/signature', querySignature);
+router.get('/visualizationOptions', visualizationOptions);
+router.get('/visualizationSamples', visualizationSamples);
+router.get('/mutationalProfiles', mutationalProfiles);
+router.get('/profilerSummary', profilerSummary);
+
+module.exports = router;

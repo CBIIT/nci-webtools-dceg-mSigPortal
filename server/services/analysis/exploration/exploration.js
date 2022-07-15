@@ -1,3 +1,4 @@
+const { Router } = require('express');
 const { v4: uuidv4 } = require('uuid');
 const { getExposureData } = require('../../query');
 const { calculateTmb, calculateTmbSignature } = require('./tmb');
@@ -61,9 +62,11 @@ async function tmbSignature(req, res, next) {
   }
 }
 
-module.exports = {
-  explorationOptions,
-  queryExposure,
-  tmb,
-  tmbSignature,
-};
+const router = Router();
+
+router.get('/exposure', queryExposure);
+router.get('/explorationOptions', explorationOptions);
+router.get('/tmb', tmb);
+router.get('/tmbSignature', tmbSignature);
+
+module.exports = router;

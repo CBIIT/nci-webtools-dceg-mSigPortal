@@ -3,21 +3,8 @@ const cors = require('cors');
 const config = require('../config.json');
 const apiSpec = require('../apiSpec.json');
 
-const {
-  visualizationOptions,
-  visualizationSamples,
-  mutationalProfiles,
-  profilerSummary,
-  querySeqmatrix,
-  querySignature,
-} = require('../services/analysis/visualization/visualization');
-
-const {
-  queryExposure,
-  explorationOptions,
-  tmb,
-  tmbSignature,
-} = require('../services/analysis/exploration/exploration');
+const visualizationRoutes = require('../services/analysis/visualization/visualization');
+const explorationRoutes = require('../services/analysis/exploration/exploration');
 
 const router = Router();
 
@@ -31,26 +18,10 @@ router.get('/', (req, res) => {
 
 router.get('/ping', (req, res) => res.send(true));
 
-router.get('/seqmatrix', querySeqmatrix);
-
-router.get('/exposure', queryExposure);
-
-router.get('/signature', querySignature);
-
 // visualization
-router.get('/visualizationOptions', visualizationOptions);
-
-router.get('/visualizationSamples', visualizationSamples);
-
-router.get('/mutationalProfiles', mutationalProfiles);
-
-router.get('/profilerSummary', profilerSummary);
+router.use(visualizationRoutes);
 
 // exploration
-router.get('/explorationOptions', explorationOptions);
-
-router.get('/tmb', tmb);
-
-router.get('/tmbSignature', tmbSignature);
+router.use(explorationRoutes);
 
 module.exports = router;
