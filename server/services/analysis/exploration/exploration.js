@@ -48,10 +48,10 @@ async function explorationSamples(req, res, next) {
     const columns = ['sample', 'signatureName'];
     const data = await getExposureData(connection, query, columns);
     const samples = alphaNumericSort([...new Set(data.map((e) => e.sample))]);
-    const signatures = alphaNumericSort([
+    const signatureNames = alphaNumericSort([
       ...new Set(data.map((e) => e.signatureName)),
     ]);
-    res.json({ samples, signatures });
+    res.json({ samples, signatureNames });
   } catch (error) {
     next(error);
   }

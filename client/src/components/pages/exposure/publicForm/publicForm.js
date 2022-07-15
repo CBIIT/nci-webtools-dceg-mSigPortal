@@ -74,8 +74,8 @@ export default function PublicForm() {
         strategy: data.strategy.value,
         signatureSetName: data.signatureSetName.value,
       };
-      const { samples, signatures } = await fetchSamples(params).unwrap();
-      mergeMain({ displayTab: 'tmb', samples, signatures });
+      const { samples, signatureNames } = await fetchSamples(params).unwrap();
+      mergeMain({ displayTab: 'tmb', samples, signatureNames });
     } catch (error) {
       if (error.originalStatus == 504) {
         mergeMain({
