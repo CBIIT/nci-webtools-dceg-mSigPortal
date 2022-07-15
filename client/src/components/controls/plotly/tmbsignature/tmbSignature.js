@@ -14,10 +14,10 @@ export default function TMBSignature(data) {
   const yMax = Math.max(...absYValue);
 
   const traces = data.map((element, index, array) => ({
-    // element: element,
-    // index: index,
-    // array: array,
-    // name: `${element.cancer}`,
+    element: element,
+    index: index,
+    array: array,
+    name: `${element.cancer}`,
     type: 'scatter',
     marker: { symbol: 'circle-open', size: 3, color: 'black' },
     mode: 'markers',
@@ -38,7 +38,7 @@ export default function TMBSignature(data) {
     yanchor: 'bottom',
     x: array.length > 1 ? index : (index + index + 1) * 0.5,
     y: 1.01,
-    text: `${element.cancer}`,
+    text: `${element.signatureName}`,
     showarrow: false,
     font: {
       size: 10,
