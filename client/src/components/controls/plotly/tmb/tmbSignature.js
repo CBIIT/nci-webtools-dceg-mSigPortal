@@ -1,4 +1,4 @@
-export default function TMB(data) {
+export default function TMBSignature(data, arg) {
   console.log(data);
   function average(arr) {
     const sum = arr.reduce((a, b) => a + b, 0);

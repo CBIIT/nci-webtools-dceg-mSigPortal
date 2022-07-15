@@ -1,16 +1,15 @@
 import { apiSlice } from '../../../../services/apiSlice';
-import TMB from '../../../controls/plotly/tmb/tmb';
-import TMBSignatures from '../../../controls/plotly/tmb/tmbSignature';
+import TMBSignature from '../../../controls/plotly/tmb/tmbSignature';
 
 export const tmbApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    tmbPlot: builder.query({
+    tmbSignaturesPlot: builder.query({
       query: (params) => ({
         url: 'tmb',
         params,
       }),
       transformResponse: (data, meta, arg) => {
-        return TMB(data);
+        return TMBSignature(data, arg);
       },
     }),
   }),
