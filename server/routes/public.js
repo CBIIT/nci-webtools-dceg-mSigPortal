@@ -16,6 +16,7 @@ const {
   queryExposure,
   explorationOptions,
   tmb,
+  tmbSignature,
 } = require('../services/analysis/exploration/exploration');
 
 const router = Router();
@@ -49,5 +50,7 @@ router.get('/profilerSummary', profilerSummary);
 router.get('/explorationOptions', explorationOptions);
 
 router.get('/tmb', tmb);
+
+router.get('/tmbSignature', tmbSignature);
 
 module.exports = router;

@@ -276,6 +276,70 @@
             "value": "COSMIC_v3_Signatures_GRCh37_SBS96"
           },
           {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit response size",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "10"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "500": {
+            "description": "API error"
+          }
+        }
+      }
+    },
+    "/api/tmbSignature": {
+      "get": {
+        "tags": ["Exploration"],
+        "summary": "Retrives TMB Signature data for selected exposure dataset and cancer",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "study",
+            "in": "query",
+            "description": "Select which study to query data from.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["PCAWG"]
+            },
+            "value": "PCAWG"
+          },
+          {
+            "name": "strategy",
+            "in": "query",
+            "description": "Select strategy (dataset) to filter data by.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["WGS"]
+            },
+            "value": "WGS"
+          },
+          {
+            "name": "signatureSetName",
+            "in": "query",
+            "description": "Select signature set to filter data by.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "COSMIC_v3_Signatures_GRCh37_SBS96",
+                "COSMIC_v3_Signatures_GRCh37_DBS78",
+                "COSMIC_v3_Signatures_GRCh37_ID83"
+              ]
+            },
+            "value": "COSMIC_v3_Signatures_GRCh37_SBS96"
+          },
+          {
             "name": "cancer",
             "in": "query",
             "description": "Select cancer to filter data by.",
@@ -283,13 +347,13 @@
             "schema": {
               "type": "string"
             },
-            "value": ""
+            "value": "Lung-AdenoCA"
           },
           {
             "name": "limit",
             "in": "query",
             "description": "Limit response size",
-            "required": false,
+            "required": true,
             "schema": {
               "type": "string"
             },

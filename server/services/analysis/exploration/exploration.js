@@ -1,6 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 const { getExposureData } = require('../../query');
-const { calculateTmb } = require('./tmb');
+const { calculateTmb, calculateTmbSignature } = require('./tmb');
 
 async function queryExposure(req, res, next) {
   try {
@@ -44,8 +44,26 @@ async function tmb(req, res, next) {
   }
 }
 
+async function tmbSignature(req, res, next) {
+  try {
+    const { limit, ...query } = req.query;
+    const connection = req.app.locals.connection;
+
+    const columns = ['sample', 'signatureName', 'exposure'];
+    const data = await getExposureData(connection, query, columns, limit);
+    const tmbSignature = calculateTmbSignature(
+      data.filter((e) => e.exposure),
+      query.study
+    );
+    res.json(tmbSignature);
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   explorationOptions,
   queryExposure,
   tmb,
+  tmbSignature,
 };

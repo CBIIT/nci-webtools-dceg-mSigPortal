@@ -36,6 +36,7 @@ const {
   queryExposure,
   explorationOptions,
   tmb,
+  tmbSignature,
 } = require('../services/analysis/exploration/exploration');
 
 const router = express.Router();
@@ -108,6 +109,8 @@ router.get('/profilerSummary', profilerSummary);
 router.get('/explorationOptions', explorationOptions);
 
 router.get('/tmb', tmb);
+
+router.get('/tmbSignature', tmbSignature);
 
 router.use((error, req, res, next) => {
   logger.error(error);
