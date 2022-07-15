@@ -276,13 +276,19 @@
             "value": "COSMIC_v3_Signatures_GRCh37_SBS96"
           },
           {
+            "name": "signatureName",
+            "in": "query",
+            "description": "Select a signatureName to filter data by",
+            "required": false,
+            "schema": { "type": "string" },
+            "value": ""
+          },
+          {
             "name": "limit",
             "in": "query",
             "description": "Limit response size",
             "required": false,
-            "schema": {
-              "type": "string"
-            },
+            "schema": { "type": "string" },
             "value": "10"
           }
         ],

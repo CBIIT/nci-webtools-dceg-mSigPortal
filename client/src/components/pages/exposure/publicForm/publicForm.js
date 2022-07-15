@@ -6,8 +6,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { actions as exposureActions } from '../../../../services/store/exposure';
 import { actions as modalActions } from '../../../../services/store/modal';
 import {
-  useGetExplorationOptionsQuery,
-  useGetExplorationDataQuery,
+  useExplorationOptionsQuery,
+  useExplorationSamplesMutation,
   useExplorationPublicMutation,
 } from './apiSlice';
 
@@ -18,21 +18,23 @@ export default function PublicForm() {
   const { submitted } = store.main;
 
   const dispatch = useDispatch();
-  const mergeState = (state) =>
+  const mergeForm = (state) =>
     dispatch(actions.mergeExposure({ publicForm: state }));
   const resetExposure = (_) => dispatch(actions.resetExposure());
   const mergeMain = (state) => dispatch(actions.mergeExposure({ main: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const [params, setParams] = useState('');
+  const {
+    data: options,
+    error: optionsError,
+    isFetching: fetchingOptions,
+  } = useExplorationOptionsQuery();
 
-  const { data, error, isFetching } = useGetExplorationOptionsQuery();
-  // const { data: results, isFetching: fetchingResults } =
-  //   useGetExplorationDataQuery(params, { skip: !params });
-
-  const [handleSubmitWeb, { isLoading, reset: resetWeb }] =
-    useExplorationPublicMutation();
+  const [fetchSamples, { isLoading, reset: resetSamples }] =
+    useExplorationSamplesMutation();
+  // const [handleSubmitWeb, { isLoading, reset: resetWeb }] =
+  //   useExplorationPublicMutation();
 
   const defaultValues = {
     study: { label: 'PCAWG', value: 'PCAWG' },
@@ -55,58 +57,25 @@ export default function PublicForm() {
 
   const { study, strategy, signatureSetName, cancer } = watch();
 
-  const { data: signatureNames, isFetching: fetchingSignatureNames } =
-    useGetExplorationOptionsQuery(
-      {
-        study: study.value,
-        strategy: strategy.value,
-        signatureSetName: signatureSetName.value,
-        cancer: cancer.value,
-      },
-      { skip: !cancer }
-    );
-
   function handleReset() {
     window.location.hash = '#/exploration';
     resetForm();
-    resetWeb();
+    resetSamples();
     resetExposure();
   }
 
   async function onSubmit(data) {
     try {
       mergeMain({ submitted: true, loading: true });
-      mergeState(data);
-      setParams({
+      mergeForm(data);
+
+      const params = {
         study: data.study.value,
         strategy: data.strategy.value,
         signatureSetName: data.signatureSetName.value,
-        cancer: data.cancerOnly ? data.cancer.value : null,
-      });
-      // const params = {
-      //   fn: 'exposurePublic',
-      //   projectID,
-      //   args: {
-      //     fn: 'all',
-      //     common: {
-      //       study: data.study.value,
-      //       strategy: data.strategy.value,
-      //       rsSet: data.signatureSetName.value,
-      //       cancerType: data.cancer.value,
-      //       genome: 'GRCh37',
-      //       useCancerType: true,
-      //       // burden: {signatureName: },
-      //       association: {},
-      //       landscape: {},
-      //       prevalence: {},
-      //       individual: {},
-      //     },
-      //   },
-      // };
-      // const { data: result, projectID } = await handleSubmitWeb(
-      //   params
-      // ).unwrap();
-      mergeMain({ displayTab: 'tmb' });
+      };
+      const { samples, signatures } = await fetchSamples(params).unwrap();
+      mergeMain({ displayTab: 'tmb', samples, signatures });
     } catch (error) {
       if (error.originalStatus == 504) {
         mergeMain({
@@ -127,18 +96,18 @@ export default function PublicForm() {
     mergeMain({ loading: false });
   }
 
-  const studyOptions = data
-    ? [...new Set(data.map((e) => e.study))].map((e) => ({
+  const studyOptions = options
+    ? [...new Set(options.map((e) => e.study))].map((e) => ({
         label: e,
         value: e,
       }))
     : [];
 
   const strategyOptions = (study) => {
-    if (data && study.value) {
+    if (options && study.value) {
       return [
         ...new Set(
-          data.filter((e) => e.study == study.value).map((e) => e.strategy)
+          options.filter((e) => e.study == study.value).map((e) => e.strategy)
         ),
       ].map((e) => ({
         label: e,
@@ -150,10 +119,10 @@ export default function PublicForm() {
   };
 
   const signatureSetOptions = (study, strategy) => {
-    if (data && study.value && strategy.value) {
+    if (options && study.value && strategy.value) {
       return [
         ...new Set(
-          data
+          options
             .filter(
               (e) => e.study == study.value && e.strategy == strategy.value
             )
@@ -182,10 +151,10 @@ export default function PublicForm() {
   // const signatureNameOptions = getSignatureNameOptions();
 
   const cancerOptions = (study, strategy, signatureSetName) => {
-    if (data && study.value && strategy.value && signatureSetName.value) {
+    if (options && study.value && strategy.value && signatureSetName.value) {
       return [
         ...new Set(
-          data
+          options
             .filter(
               (e) =>
                 e.study == study.value &&
@@ -232,7 +201,7 @@ export default function PublicForm() {
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
-      {error && <p>There was an error retrieving public data options</p>}
+      {optionsError && <p>There was an error retrieving public data options</p>}
       <Select
         className="mb-2"
         name="study"
@@ -288,7 +257,7 @@ export default function PublicForm() {
       <Row>
         <Col>
           <Button
-            disabled={isFetching || isLoading}
+            disabled={fetchingOptions || isLoading}
             className="w-100"
             variant="secondary"
             onClick={() => handleReset()}
@@ -298,7 +267,7 @@ export default function PublicForm() {
         </Col>
         <Col>
           <Button
-            disabled={isFetching || isLoading || submitted}
+            disabled={fetchingOptions || isLoading || submitted}
             className="w-100"
             variant="primary"
             type="submit"
