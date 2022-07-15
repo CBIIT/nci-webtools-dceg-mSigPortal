@@ -590,11 +590,11 @@ export default function Exposure({ match }) {
             id: 'tmbSig',
             name: 'TMB Signatures',
           },
-          {
-            component: <MsBurden2 />,
-            id: 'msBurden',
-            name: 'MS Burden',
-          },
+          // {
+          //   component: <MsBurden2 />,
+          //   id: 'msBurden',
+          //   name: 'MS Burden',
+          // },
         ];
 
   return (
