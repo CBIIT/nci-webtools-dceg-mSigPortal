@@ -5,11 +5,11 @@ const { SBS, DBS, ID } = require('./mutationalProfiles');
 // query public seqmatrix data for visualization tab
 async function visualizationOptions(req, res, next) {
   try {
+    const { limit, ...query } = req.query;
     const connection = req.app.locals.connection;
 
-    const query = {};
     const columns = ['study', 'cancer', 'strategy'];
-    const data = await getSeqmatrixData(connection, query, columns);
+    const data = await getSeqmatrixData(connection, query, columns, limit);
     const projectID = uuidv4();
 
     res.json({ data, projectID });
@@ -20,12 +20,12 @@ async function visualizationOptions(req, res, next) {
 
 async function visualizationSamples(req, res, next) {
   try {
-    // const { study, cancer, strategy } = req.query;
+    const { limit, ...query } = req.query;
     const connection = req.app.locals.connection;
 
     // const query = { study, strategy, cancer };
     const columns = ['profile', 'sample', 'profile', 'matrix'];
-    const data = await getSeqmatrixData(connection, req.query, columns);
+    const data = await getSeqmatrixData(connection, query, columns, limit);
     const projectID = uuidv4();
 
     res.json({ data, projectID });
@@ -36,18 +36,17 @@ async function visualizationSamples(req, res, next) {
 
 async function mutationalProfiles(req, res, next) {
   try {
-    const { study, strategy, cancer, sample, profile, matrix } = req.query;
+    const { limit, ...query } = req.query;
     const connection = req.app.locals.connection;
 
-    const query = { study, strategy, cancer, sample, profile, matrix };
     const columns = ['mutationType', 'mutations'];
-    const data = await getSeqmatrixData(connection, query, columns);
+    const data = await getSeqmatrixData(connection, query, columns, limit);
 
-    if (profile == 'SBS') {
+    if (query.profile == 'SBS') {
       res.json(SBS(data));
-    } else if (profile == 'DBS') {
+    } else if (query.profile == 'DBS') {
       res.json(data);
-    } else if (profile == 'ID') {
+    } else if (query.profile == 'ID') {
       res.json(data);
     } else {
       throw 'mutationalProfiles: unsupported profile';
@@ -59,11 +58,11 @@ async function mutationalProfiles(req, res, next) {
 
 async function profilerSummary(req, res, next) {
   try {
-    // const { study, cancer, strategy } = req.query;
+    const { limit, ...query } = req.query;
     const connection = req.app.locals.connection;
 
     const columns = ['sample', 'profile', 'mutations'];
-    const data = await getSeqmatrixData(connection, req.query, columns);
+    const data = await getSeqmatrixData(connection, query, columns, limit);
     res.json(data);
   } catch (error) {
     next(error);
@@ -72,12 +71,11 @@ async function profilerSummary(req, res, next) {
 
 async function querySeqmatrix(req, res, next) {
   try {
-    const { study, strategy, cancer, sample, profile, matrix } = req.query;
+    const { limit, ...query } = req.query;
     const connection = req.app.locals.connection;
 
-    const query = { study, strategy, cancer, sample, profile, matrix };
     const columns = ['mutationType', 'mutations'];
-    const data = await getSeqmatrixData(connection, query, columns);
+    const data = await getSeqmatrixData(connection, query, columns, limit);
     res.json(data);
   } catch (error) {
     next(error);
@@ -86,11 +84,10 @@ async function querySeqmatrix(req, res, next) {
 
 async function querySignature(req, res, next) {
   try {
-    const { profile, matrix, signatureSetName } = req.query;
+    const { limit, ...query } = req.query;
     const connection = req.app.locals.connection;
 
-    const query = { profile, matrix, signatureSetName };
-    const columns = !signatureSetName
+    const columns = !query.signatureSetName
       ? ['signatureSetName']
       : [
           'strandInfo',
@@ -99,7 +96,7 @@ async function querySignature(req, res, next) {
           'mutationType',
           'contribution',
         ];
-    const data = await getSignatureData(connection, query, columns);
+    const data = await getSignatureData(connection, query, columns, limit);
     res.json(data);
   } catch (error) {
     next(error);
