@@ -8,9 +8,6 @@ export default function SBS96(data, sample) {
     'T>G': '#EBC6C4',
   };
 
-  const numberWithCommas = (x) =>
-    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
-
   const totalMutations = data.reduce(
     (total, mutation) =>
       total +
@@ -71,7 +68,11 @@ export default function SBS96(data, sample) {
     x: 0,
     y: 0.88,
     text:
-      '<b>' + sample + ': ' + numberWithCommas(totalMutations) + ' subs </b>',
+      '<b>' +
+      sample +
+      ': ' +
+      totalMutations.toLocaleString(undefined) +
+      ' subs </b>',
     showarrow: false,
     font: {
       size: 18,
@@ -127,7 +128,7 @@ export default function SBS96(data, sample) {
     yaxis: {
       title: 'Number of Single Base Substitutions',
       autorange: false,
-      range: [0, maxMutation + maxMutation * 0.2],
+      range: [0, maxMutation * 1.2],
       ticks: 'inside',
       linecolor: '#E0E0E0',
       linewidth: 1,
