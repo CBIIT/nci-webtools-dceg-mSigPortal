@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const { v4: uuidv4 } = require('uuid');
 const { getSeqmatrixData, getSignatureData } = require('../../query');
-const { SBS, DBS, ID } = require('./mutationalProfiles');
+const { baseSubstitution, indel } = require('./mutationalProfiles');
 
 // query public seqmatrix data for visualization tab
 async function visualizationOptions(req, res, next) {
@@ -43,12 +43,10 @@ async function mutationalProfiles(req, res, next) {
     const columns = ['mutationType', 'mutations'];
     const data = await getSeqmatrixData(connection, query, columns, limit);
 
-    if (query.profile == 'SBS') {
-      res.json(SBS(data, query.matrix));
-    } else if (query.profile == 'DBS') {
-      res.json(DBS(data, query.matrix));
+    if (query.profile == 'SBS' || query.profile == 'DBS') {
+      res.json(baseSubstitution(data, query.profile, query.matrix));
     } else if (query.profile == 'ID') {
-      res.json(ID(data, query.matrix));
+      res.json(indel(data, query.matrix));
     } else {
       throw 'mutationalProfiles: unsupported profile';
     }

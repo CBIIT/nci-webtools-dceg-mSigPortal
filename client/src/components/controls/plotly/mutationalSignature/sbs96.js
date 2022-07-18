@@ -12,41 +12,41 @@ export default function SBS96(data, sample) {
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
 
   const totalMutations = data.reduce(
-    (total, base) =>
+    (total, mutation) =>
       total +
-      base.mutationTypes.reduce((baseSum, e) => baseSum + e.mutations, 0),
+      mutation.data.reduce((mutationSum, e) => mutationSum + e.mutations, 0),
     0
   );
   const maxMutation = Math.max(
-    ...data.map((base) => base.mutationTypes.map((e) => e.mutations)).flat()
+    ...data.map((mutation) => mutation.data.map((e) => e.mutations)).flat()
   );
 
   const mutationTypeNames = data
     .map((group) =>
-      group.mutationTypes.map((e) => ({
-        base: group.base,
+      group.data.map((e) => ({
+        mutation: group.mutation,
         mutationType: e.mutationType,
       }))
     )
     .flat();
 
   const traces = data.map((group, groupIndex, array) => ({
-    name: group.base,
+    name: group.mutation,
     type: 'bar',
-    marker: { color: colors[group.base] },
-    x: [...group.mutationTypes.keys()].map(
+    marker: { color: colors[group.mutation] },
+    x: [...group.data.keys()].map(
       (e) =>
         e +
         array
           .slice(0, groupIndex)
-          .reduce((lastIndex, b) => lastIndex + b.mutationTypes.length, 0)
+          .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
     ),
-    y: group.mutationTypes.map((e) => e.mutations),
+    y: group.data.map((e) => e.mutations),
     hoverinfo: 'x+y',
     showlegend: false,
   }));
 
-  const baseAnnotation = data.map((group, groupIndex, array) => ({
+  const mutationAnnotation = data.map((group, groupIndex, array) => ({
     xref: 'x',
     yref: 'paper',
     xanchor: 'bottom',
@@ -54,10 +54,10 @@ export default function SBS96(data, sample) {
     x:
       array
         .slice(0, groupIndex)
-        .reduce((lastIndex, b) => lastIndex + b.mutationTypes.length, 0) +
-      (group.mutationTypes.length - 1) * 0.5,
+        .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
+      (group.data.length - 1) * 0.5,
     y: 1.04,
-    text: `<b>${group.base}</b>`,
+    text: `<b>${group.mutation}</b>`,
     showarrow: false,
     font: { size: 18 },
     align: 'center',
@@ -85,20 +85,20 @@ export default function SBS96(data, sample) {
     yref: 'paper',
     x0: array
       .slice(0, groupIndex)
-      .reduce((lastIndex, e) => lastIndex + e.mutationTypes.length, -0.35),
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.35),
     x1: array
       .slice(0, groupIndex + 1)
-      .reduce((lastIndex, e) => lastIndex + e.mutationTypes.length, -0.65),
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.65),
     y0: 1.05,
     y1: 1.01,
-    fillcolor: colors[group.base],
+    fillcolor: colors[group.mutation],
     line: {
       width: 0,
     },
   }));
 
-  function formatTickLabel(base, mutationType) {
-    const color = colors[base];
+  function formatTickLabel(mutation, mutationType) {
+    const color = colors[mutation];
     const regex = /^(.)\[(.).{2}\](.)$/;
     const match = mutationType.match(regex);
     return `${match[1]}<span style="color:${color}">${match[2]}</span>${match[3]}`;
@@ -118,7 +118,7 @@ export default function SBS96(data, sample) {
       tickmode: 'array',
       tickvals: mutationTypeNames.map((_, i) => i),
       ticktext: mutationTypeNames.map((e) =>
-        formatTickLabel(e.base, e.mutationType)
+        formatTickLabel(e.mutation, e.mutationType)
       ),
       linecolor: '#E0E0E0',
       linewidth: 1,
@@ -137,7 +137,7 @@ export default function SBS96(data, sample) {
     },
 
     shapes: shapes,
-    annotations: [...baseAnnotation, sampleAnnotation],
+    annotations: [...mutationAnnotation, sampleAnnotation],
   };
 
   return { traces, layout };

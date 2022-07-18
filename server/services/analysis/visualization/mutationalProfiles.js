@@ -1,56 +1,40 @@
-function SBS(data, matrix) {
-  const groupByBase = data.reduce((acc, e, i) => {
-    const baseRegex = /\[(.*)\]/;
-    const base = e.mutationType.match(baseRegex)[1];
+// organize seqmatrix data into a format suitable for graphing in plotly
+const regexMap = {
+  SBS96: /\[(.*)\]/,
+  DBS78: /^(.{2})/,
+};
 
-    acc[base] = acc[base] ? [...acc[base], e] : [e];
+function baseSubstitution(data, profile, matrix) {
+  const groupByMutation = data.reduce((acc, e, i) => {
+    const mutationRegex = regexMap[profile + matrix];
+    const mutation = e.mutationType.match(mutationRegex)[1];
+
+    acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
     return acc;
   }, {});
 
-  const transform = Object.entries(groupByBase).map(
-    ([base, mutationTypes]) => ({
-      base,
-      mutationTypes,
-    })
-  );
+  const transform = Object.entries(groupByMutation).map(([mutation, data]) => ({
+    mutation,
+    data,
+  }));
 
   return transform;
 }
 
-function DBS(data, matrix) {
-  const groupByBase = data.reduce((acc, e, i) => {
-    const baseRegex = /^(.{2})/;
-    const base = e.mutationType.match(baseRegex)[1];
+function indel(data, matrix) {
+  const groupByMutation = data.reduce((acc, e, i) => {
+    const mutationRegex = /\[(.*)\]/;
+    const mutation = e.mutationType.match(mutationRegex)[1];
 
-    acc[base] = acc[base] ? [...acc[base], e] : [e];
+    acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
     return acc;
   }, {});
 
-  const transform = Object.entries(groupByBase).map(
-    ([base, mutationTypes]) => ({
-      base,
-      mutationTypes,
-    })
-  );
+  const transform = Object.entries(groupByMutation).map(([mutation, data]) => ({
+    mutation,
+    data,
+  }));
   return transform;
 }
 
-function ID(data, matrix) {
-  const groupByBase = data.reduce((acc, e, i) => {
-    const baseRegex = /\[(.*)\]/;
-    const base = e.mutationType.match(baseRegex)[1];
-
-    acc[base] = acc[base] ? [...acc[base], e] : [e];
-    return acc;
-  }, {});
-
-  const transform = Object.entries(groupByBase).map(
-    ([base, mutationTypes]) => ({
-      base,
-      mutationTypes,
-    })
-  );
-  return transform;
-}
-
-module.exports = { SBS, DBS, ID };
+module.exports = { baseSubstitution, indel };
