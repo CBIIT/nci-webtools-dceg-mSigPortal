@@ -15,13 +15,12 @@ export default function MutProfilePlot() {
   });
 
   useEffect(() => {
-    const { study, strategy, signatureSetName, signatureName } = publicForm;
+    const { study, strategy, signatureSetName } = publicForm;
     if (study) {
       setParams({
         study: study.value,
         strategy: strategy.value,
         signatureSetName: signatureSetName.value,
-        signatureName: signatureName.value,
       });
     }
   }, [publicForm]);
