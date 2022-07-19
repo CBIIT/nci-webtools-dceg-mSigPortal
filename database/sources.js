@@ -67,4 +67,12 @@ export const sources = [
       "contribution",
     ],
   },
+
+  {
+    description: "Refresh materialized views",
+    type: "postImport",
+    callback: async (connection) => {
+      await connection.query('REFRESH MATERIALIZED VIEW "seqmatrixOption"');
+    }
+  }
 ];
