@@ -1,4 +1,4 @@
-export default function ID83(data, sample) {
+export default function ID83(unsortedData, sample) {
   const colors = {
     '1:Del:C': { shape: '#FBBD6F', text: 'black' },
     '1:Del:T': { shape: '#FE8002', text: 'white' },
@@ -18,6 +18,14 @@ export default function ID83(data, sample) {
     '5:Del:M': { shape: '#62409A', text: 'white' },
   };
 
+  // sort data according to colors
+  const indelOrder = Object.fromEntries(
+    Object.entries(Object.keys(colors)).map((a) => a.reverse())
+  );
+  const data = [...unsortedData].sort(
+    (a, b) => indelOrder[a.indel] - indelOrder[b.indel]
+  );
+
   const arrayIDAnnXTop = [
       '1bp Deletion',
       '1bp Insertion',
@@ -33,7 +41,6 @@ export default function ID83(data, sample) {
       'Microhimology Length',
     ],
     arrayIDAnnXLabel = [5, 18.5, 35, 60, 76],
-    arrayIDAnnotationTop = [],
     arrayIDAnnotationBot = [];
 
   const totalMutations = data.reduce(
@@ -206,7 +213,9 @@ export default function ID83(data, sample) {
         .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
       (group.data.length - 1) * 0.5,
     y: 1.01,
-    text: `<b>${group.indel.slice(-1)}</b>`,
+    text: `<b>${
+      group.indel[0] == '1' ? group.indel.slice(-1) : group.indel[0]
+    }</b>`,
     showarrow: false,
     font: {
       size: 14,
@@ -215,21 +224,19 @@ export default function ID83(data, sample) {
     align: 'center',
   }));
 
-  const annotations2 = arrayIDAnnotationBot.map((num, index) => ({
+  const xLabelAnnotation = indelNames.map((indel, index) => ({
     xref: 'x',
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
     x: index,
     y: -0.1,
-    text: '<b>' + num.substring(num.length - 1, num.length) + '</b>',
+    text: '<b>' + indel.index + '</b>',
     showarrow: false,
     font: {
       size: 12,
     },
     align: 'center',
-    num: num,
-    index: index,
   }));
 
   const annotationsIDTopLabel = arrayIDAnnXLabel.map((num, index) => ({
@@ -335,7 +342,7 @@ export default function ID83(data, sample) {
       mirror: 'all',
     },
     yaxis: {
-      title: 'Number of Idels',
+      title: 'Number of Indels',
       autorange: false,
       range: [0, maxMutation * 1.2],
       linecolor: 'black',
@@ -346,15 +353,12 @@ export default function ID83(data, sample) {
     shapes: [...topShapes, ...bottomShapes],
     annotations: [
       ...shapeAnnotations,
-      ...annotations2,
+      ...xLabelAnnotation,
       ...annotationsIDTopLabel,
       ...annotationsIDBotLabel,
       sampleAnnotation,
     ],
   };
 
-  var config = { responsive: true };
-  //console.log("layout");
-  //console.log(layout);
-  return { traces, layout, config };
+  return { traces, layout };
 }

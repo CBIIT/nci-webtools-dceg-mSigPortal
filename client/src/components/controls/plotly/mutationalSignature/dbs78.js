@@ -57,7 +57,7 @@ export default function DBS78(data, sample) {
         .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
       (group.data.length - 1) * 0.5,
     y: 1.04,
-    text: `<b>${group.mutation}</b>`,
+    text: `<b>${group.mutation}>NN</b>`,
     showarrow: false,
     font: { size: 18 },
     align: 'center',
@@ -93,7 +93,7 @@ export default function DBS78(data, sample) {
       sample +
       ': ' +
       totalMutations.toLocaleString(undefined) +
-      ' subs </b>',
+      ' double subs </b>',
     showarrow: false,
     font: {
       size: 18,
@@ -112,7 +112,7 @@ export default function DBS78(data, sample) {
       tickfont: { size: 11 },
       tickmode: 'array',
       tickvals: mutationTypeNames.map((_, i) => i),
-      ticktext: mutationTypeNames.map((e) => e.mutationType),
+      ticktext: mutationTypeNames.map((e) => e.mutationType.slice(-2)),
       linecolor: '#E0E0E0',
       linewidth: 1,
       mirror: 'all',
