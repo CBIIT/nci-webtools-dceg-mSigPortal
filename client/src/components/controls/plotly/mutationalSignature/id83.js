@@ -40,8 +40,7 @@ export default function ID83(unsortedData, sample) {
       'Number of Repeat Units',
       'Microhimology Length',
     ],
-    arrayIDAnnXLabel = [5, 18.5, 35, 60, 76],
-    arrayIDAnnotationBot = [];
+    arrayIDAnnXLabel = [5, 18.5, 35, 60, 76];
 
   const totalMutations = data.reduce(
     (total, indel) =>
@@ -60,131 +59,6 @@ export default function ID83(unsortedData, sample) {
     )
     .flat();
 
-  // const groupByFirstGroup = data.slice(0, 4);
-
-  // const groupByMutationID = data.reduce((groups, e) => {
-  //   let mutationID;
-  //   mutationID = e.mutationType.match(
-  //     e.mutationType.substring(
-  //       e.mutationType.length - 3,
-  //       e.mutationType.length - 2
-  //     )
-  //   );
-  //   const signature = {
-  //     mutationType: e.mutationType,
-  //     contribution: e.mutations,
-  //   };
-  //   groups[mutationID] = groups[mutationID]
-  //     ? [...groups[mutationID], signature]
-  //     : [signature];
-  //   return groups;
-  // }, {});
-  // console.log("groupByMutationID");
-  // console.log(groupByMutationID);
-
-  // const groupR = groupByMutationID['R'].reduce((r, a) => {
-  //   let m;
-  //   m = a.mutationType.match(a.mutationType.substr(2, 3));
-  //   const s = {
-  //     mutationType: a.mutationType,
-  //     contribution: a.contribution,
-  //   };
-  //   r[m] = r[m] ? [...r[m], a] : [s];
-  //   return r;
-  // }, {});
-
-  // // console.log("groupR");
-  // // console.log(groupR);
-  // const groupRDel = groupR['Del'].reduce((r, a) => {
-  //   let m;
-  //   m = a.mutationType.match(a.mutationType.substr(0, 7));
-  //   const s = {
-  //     mutationType: a.mutationType,
-  //     contribution: a.contribution,
-  //   };
-  //   r[m] = r[m] ? [...r[m], a] : [s];
-  //   return r;
-  // }, {});
-
-  // const groupRIns = groupR['Ins'].reduce((r, a) => {
-  //   let m;
-  //   m = a.mutationType.match(a.mutationType.substr(0, 7));
-  //   const s = {
-  //     mutationType: a.mutationType,
-  //     contribution: a.contribution,
-  //   };
-  //   r[m] = r[m] ? [...r[m], a] : [s];
-  //   return r;
-  // }, {});
-
-  // const groupM = groupByMutationID['M'].reduce((r, a) => {
-  //   let m;
-  //   m = a.mutationType.match(a.mutationType.substr(0, 7));
-  //   const s = {
-  //     mutationType: a.mutationType,
-  //     contribution: a.contribution,
-  //   };
-  //   r[m] = r[m] ? [...r[m], a] : [s];
-  //   return r;
-  // }, {});
-  // const arrayID1 = Object.keys(groupByFirstGroup).map(function (key) {
-  //   return groupByFirstGroup[key];
-  // });
-  // const arrayID2 = Object.keys(groupRDel).map(function (key) {
-  //   return groupRDel[key];
-  // });
-  // const arrayID3 = Object.keys(groupRIns).map(function (key) {
-  //   return groupRIns[key];
-  // });
-  // const arrayID4 = Object.keys(groupM).map(function (key) {
-  //   return groupM[key];
-  // });
-
-  // const arrayID = [...arrayID1, ...arrayID2, ...arrayID3, ...arrayID4];
-
-  // const flatSorted = Object.values(arrayID).flat();
-
-  // Object.values(arrayID).forEach((group) => {
-  //   if (group.length > 1) {
-  //     arrayIDAnnotationTop.push(
-  //       group[Math.floor(group.length / 2)].mutationType
-  //     );
-  //   } else {
-  //     arrayIDAnnotationTop.push(group[0].mutationType);
-  //   }
-  //   group.forEach((e) => {
-  //     arrayIDAnnotationBot.push(e.mutationType);
-  //   });
-  // });
-
-  // const traces = Object.entries(arrayID).map(
-  //   ([mutation, signatures], groupIndex, array) => ({
-  //     name: mutation,
-  //     type: 'bar',
-  //     marker: {
-  //       color:
-  //         colors[
-  //           signatures[0].mutationType.substring(
-  //             0,
-  //             signatures[0].mutationType.length - 2
-  //           )
-  //         ],
-  //     },
-  //     //   x: signatures.map((e) => e.mutationType),
-  //     //x: signatures.map((e, i) => groupIndex * signatures.length + i),
-  //     x: signatures.map(
-  //       (e, i) =>
-  //         array
-  //           .slice(0, groupIndex)
-  //           .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
-  //     ),
-  //     y: signatures.map((e) => e.contribution),
-  //     //text: signatures.map((e, i) => e.mutationType),
-  //     //hovertemplate: "%{signatures.map((e, i) => e.mutationType)}, %{y}",
-  //     hoverinfo: 'x+y',
-  //     showlegend: false,
-  //   })
-  // );
   const traces = data.map((group, groupIndex, array) => ({
     name: group.indel,
     type: 'bar',
