@@ -68,8 +68,13 @@ export async function recreateTable(connection, name, schemaFn) {
 export async function initializeSchema(connectionConfig, schema) {
   const connection = createConnection(connectionConfig);
   const tables = schema.filter(({ type }) => !type || type === "table");
+  const materializedViews = schema.filter(({ type }) => type === "materializedView");
 
   // drop tables in reverse order to avoid foreign key constraints
+  for (const { name } of [...materializedViews.reverse()]) {
+    await connection.schema.dropMaterializedViewIfExists(name);
+  }
+
   for (const { name } of [...tables].reverse()) {
     await connection.schema.dropTableIfExists(name);
   }
@@ -78,11 +83,15 @@ export async function initializeSchema(connectionConfig, schema) {
     await connection.schema.createTable(name, (table) => schema(table, connection));
   }
 
+  for (const { name, schema } of materializedViews) {
+    await connection.schema.createMaterializedView(name, (view) => schema(view, connection));
+  }
+
   return true;
 }
 
 export async function initializeSchemaForImport(connection, schema, sources) {
-  const shouldRecreateTable = (table) => sources.find((s) => s.table === table.name);
+  const shouldRecreateTable = (table) => sources.find((s) => s.table === table.name || table.dependsOn?.includes(s.table));
   const importSchema = schema.filter(shouldRecreateTable);
   return await initializeSchema(connection, importSchema);
 }
