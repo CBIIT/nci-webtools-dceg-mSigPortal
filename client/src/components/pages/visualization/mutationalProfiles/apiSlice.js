@@ -1,14 +1,38 @@
 import { apiSlice } from '../../../../services/apiSlice';
+import SBS6 from '../../../controls/plotly/mutationalSignature/sbs6';
+import SBS24 from '../../../controls/plotly/mutationalSignature/sbs24';
+import SBS96 from '../../../controls/plotly/mutationalSignature/sbs96';
+import SBS192 from '../../../controls/plotly/mutationalSignature/sbs192';
+import SBS288 from '../../../controls/plotly/mutationalSignature/sbs288';
+import SBS384 from '../../../controls/plotly/mutationalSignature/sbs384';
+import SBS1536 from '../../../controls/plotly/mutationalSignature/sbs1536';
+import DBS78 from '../../../controls/plotly/mutationalSignature/dbs78';
+import DBS186 from '../../../controls/plotly/mutationalSignature/dbs186';
+import ID83 from '../../../controls/plotly/mutationalSignature/id83';
+import ID28 from '../../../controls/plotly/mutationalSignature/id28';
+import ID415 from '../../../controls/plotly/mutationalSignature/id415';
 
 export const mutationalProfilesApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     mutationalProfiles: builder.query({
       query: (params) => ({ url: 'mutationalProfiles', params }),
       transformResponse: (data, meta, args) => {
-        if (args.profile == 'SBS' || args.profile == 'DBS') {
-          return baseSubstitution(data, args.profile, args.matrix);
-        } else if (args.profile == 'ID') {
-          return indel(data, args.matrix);
+        const { profile, matrix, sample } = args;
+        const profileMatrix = profile + matrix;
+
+        if (profileMatrix == 'SBS6') {
+          return SBS6(data, sample);
+        } else if (profileMatrix == 'SBS96') {
+          const transform = baseSubstitution(data, profileMatrix);
+          return SBS96(transform, sample);
+        } else if (profileMatrix == 'DBS78') {
+          const transform = baseSubstitution(data, profileMatrix);
+          return DBS78(transform, sample);
+        } else if (profileMatrix == 'ID83') {
+          const transform = indel(data, profileMatrix);
+          return ID83(transform, sample);
+        } else {
+          throw `Unsupported profile and matrix: ${profile} - ${matrix}`;
         }
       },
     }),
@@ -25,9 +49,9 @@ const regexMap = {
 };
 
 // SBS/DBS
-export function baseSubstitution(data, profile, matrix) {
+export function baseSubstitution(data, profileMatrix) {
   const groupByMutation = data.reduce((acc, e, i) => {
-    const mutationRegex = regexMap[profile + matrix];
+    const mutationRegex = regexMap[profileMatrix];
     const mutation = e.mutationType.match(mutationRegex)[1];
 
     acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
@@ -43,9 +67,9 @@ export function baseSubstitution(data, profile, matrix) {
 }
 
 // ID
-export function indel(data, matrix) {
+export function indel(data, profileMatrix) {
   const groupByIndel = data.reduce((acc, e, i) => {
-    const indel = e.mutationType.match(regexMap['ID' + matrix])[1];
+    const indel = e.mutationType.match(regexMap[profileMatrix])[1];
 
     acc[indel] = acc[indel] ? [...acc[indel], e] : [e];
     return acc;
