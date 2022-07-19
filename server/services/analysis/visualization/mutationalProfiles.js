@@ -2,6 +2,7 @@
 const regexMap = {
   SBS96: /\[(.*)\]/,
   DBS78: /^(.{2})/,
+  ID83: /^(.{7})/,
 };
 
 function baseSubstitution(data, profile, matrix) {
@@ -22,18 +23,19 @@ function baseSubstitution(data, profile, matrix) {
 }
 
 function indel(data, matrix) {
-  const groupByMutation = data.reduce((acc, e, i) => {
-    const mutationRegex = /\[(.*)\]/;
-    const mutation = e.mutationType.match(mutationRegex)[1];
+  // return data;
+  const groupByIndel = data.reduce((acc, e, i) => {
+    const indel = e.mutationType.match(regexMap['ID' + matrix])[1];
 
-    acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
+    acc[indel] = acc[indel] ? [...acc[indel], e] : [e];
     return acc;
   }, {});
 
-  const transform = Object.entries(groupByMutation).map(([mutation, data]) => ({
-    mutation,
+  const transform = Object.entries(groupByIndel).map(([indel, data]) => ({
+    indel,
     data,
   }));
+
   return transform;
 }
 
