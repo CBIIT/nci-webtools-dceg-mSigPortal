@@ -1,5 +1,7 @@
 export default function SBS24(data, sample) {
-  const { transcribed, untranscribed } = data;
+  // filter transcribed and untranscribed data
+  const transcribed = data.filter((e) => /^T:/.test(e.mutationType));
+  const untranscribed = data.filter((e) => /^U:/.test(e.mutationType));
 
   const totalMutations =
     transcribed.reduce((total, e) => total + e.mutations, 0) +

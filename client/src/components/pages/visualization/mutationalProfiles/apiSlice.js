@@ -23,20 +23,30 @@ export const mutationalProfilesApiSlice = apiSlice.injectEndpoints({
         if (profileMatrix == 'SBS6') {
           return SBS6(data, sample);
         } else if (profileMatrix == 'SBS24') {
-          // filter transcribed and untranscribed data
-          const transcribed = data.filter((e) => /^T:/.test(e.mutationType));
-          const untranscribed = data.filter((e) => /^U:/.test(e.mutationType));
-
-          return SBS24({ transcribed, untranscribed }, sample);
+          return SBS24(data, sample);
         } else if (profileMatrix == 'SBS96') {
           const transform = baseSubstitution(data, profileMatrix);
           return SBS96(transform, sample);
+        } else if (profileMatrix == 'SBS192') {
+          return SBS192(data, sample);
+        } else if (profileMatrix == 'SBS288') {
+          return SBS288(data, sample);
+        } else if (profileMatrix == 'SBS384') {
+          return SBS384(data, sample);
+        } else if (profileMatrix == 'SBS1536') {
+          return SBS1536(data, sample);
         } else if (profileMatrix == 'DBS78') {
           const transform = baseSubstitution(data, profileMatrix);
           return DBS78(transform, sample);
+        } else if (profileMatrix == 'DBS186') {
+          return DBS186(data, sample);
         } else if (profileMatrix == 'ID83') {
           const transform = indel(data, profileMatrix);
           return ID83(transform, sample);
+        } else if (profileMatrix == 'ID28') {
+          return ID28(data, sample);
+        } else if (profileMatrix == 'ID415') {
+          return ID415(data, sample);
         } else {
           throw `Unsupported profile and matrix: ${profile} - ${matrix}`;
         }
