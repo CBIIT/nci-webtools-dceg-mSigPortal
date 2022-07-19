@@ -7,39 +7,19 @@ export default function SBS6(data, sample) {
     'T>C': '#A1CE63',
     'T>G': '#EBC6C4',
   };
-  //   console.log("data--:");
-  //   console.log(data);
-  const numberWithCommas = (x) =>
-    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
 
-  const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
+  const totalMutations = data.reduce((total, e) => total + e.mutations, 0);
+  const maxMutation = Math.max(...data.map((e) => e.mutations));
 
-  const maxVal = Math.max(...data.map((o) => o.mutations));
-
-  // group data by dominant mutation
-  const groupByMutation = data.reduce((groups, e, i) => {
-    const mutation = e.mutationType.substring(0, e.mutationType.length);
-    const signature = {
-      mutationType: e.mutationType,
-      contribution: e.mutations,
-    };
-    groups[mutation] = groups[mutation]
-      ? [...groups[mutation], signature]
-      : [signature];
-    return groups;
-  }, {});
-
-  const traces = Object.entries(groupByMutation).map(
-    ([mutation, signatures], groupIndex, array) => ({
-      name: mutation,
-      type: 'bar',
-      marker: { color: colors[mutation] },
-      y: signatures.map((e) => e.mutationType + ' '),
-      x: signatures.map((e) => e.contribution),
-      hoverinfo: 'x+y',
-      orientation: 'h',
-    })
-  );
+  const traces = data.map((e) => ({
+    name: e.mutationType,
+    type: 'bar',
+    marker: { color: colors[e.mutationType] },
+    y: [e.mutationType],
+    x: [e.mutations],
+    hoverinfo: 'x+y',
+    orientation: 'h',
+  }));
 
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
@@ -48,7 +28,11 @@ export default function SBS6(data, sample) {
     width: 750,
     title: {
       text:
-        '<b>' + sample + ': ' + numberWithCommas(totalMutations) + ' subs </b>',
+        '<b>' +
+        sample +
+        ': ' +
+        totalMutations.toLocaleString(undefined) +
+        ' subs </b>',
       font: {
         size: 24,
       },
@@ -70,7 +54,7 @@ export default function SBS6(data, sample) {
       linewidth: 1,
       showgrid: false,
       autorange: false,
-      range: [0, maxVal + maxVal * 0.25],
+      range: [0, maxMutation * 1.25],
       tickformat: '~s',
     },
     yaxis: {
