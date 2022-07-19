@@ -22,6 +22,12 @@ export const mutationalProfilesApiSlice = apiSlice.injectEndpoints({
 
         if (profileMatrix == 'SBS6') {
           return SBS6(data, sample);
+        } else if (profileMatrix == 'SBS24') {
+          // filter transcribed and untranscribed data
+          const transcribed = data.filter((e) => /^T:/.test(e.mutationType));
+          const untranscribed = data.filter((e) => /^U:/.test(e.mutationType));
+
+          return SBS24({ transcribed, untranscribed }, sample);
         } else if (profileMatrix == 'SBS96') {
           const transform = baseSubstitution(data, profileMatrix);
           return SBS96(transform, sample);
@@ -43,6 +49,7 @@ export const { useMutationalProfilesQuery } = mutationalProfilesApiSlice;
 
 // organize seqmatrix data into a format suitable for graphing in plotly
 const regexMap = {
+  SBS24: /^.{2}(.*)$/,
   SBS96: /\[(.*)\]/,
   DBS78: /^(.{2})/,
   ID83: /^(.{7})/,
