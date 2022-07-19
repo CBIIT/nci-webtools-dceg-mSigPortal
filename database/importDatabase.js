@@ -41,6 +41,7 @@ export async function importDatabase(
   shouldCancel = async () => false
 ) {
   const tableSources = sources.filter((source) => source.table);
+  const postImportSteps = sources.filter((source) => source.type === "postImport");
   const connection = await createPostgresConnection(connectionConfig);
   let totalCount = 0;
 
@@ -63,6 +64,11 @@ export async function importDatabase(
 
       totalCount += results;
       logger.info(getStatusMessage({results, duration}));      
+    }
+
+    for (let postImportStep of postImportSteps) {
+      logger.info(`Running post-import step (${postImportStep.description})`);
+      await postImportStep.callback(connection);
     }
 
     return totalCount;

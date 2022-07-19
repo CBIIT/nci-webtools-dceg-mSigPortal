@@ -46,7 +46,33 @@ export const schema = [
       table.integer("matrix");
       table.string("mutationType");
       table.integer("mutations");
-      table.index(["study", "strategy", "cancer", "sample", "profile", "matrix"]);
+      table.index([
+        "study",
+        "strategy",
+        "cancer",
+        "sample",
+        "profile",
+        "matrix",
+      ]);
+    },
+  },
+
+  {
+    name: "seqmatrixOption",
+    type: "materializedView",
+    dependsOn: ["seqmatrix"],
+    schema: (view, connection) => {
+      const columns = [
+        "study",
+        "strategy",
+        "cancer",
+        "sample",
+        "profile",
+        "matrix"
+      ];
+      const query = connection("seqmatrix").distinct(columns);
+      view.columns(columns);
+      return view.as(query);
     },
   },
 
@@ -68,7 +94,7 @@ export const schema = [
     },
   },
 
-   {
+  {
     name: "importLog",
     schema: (table, connection) => {
       table.increments("id");
