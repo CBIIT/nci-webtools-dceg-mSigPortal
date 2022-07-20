@@ -1,6 +1,10 @@
 const { Router } = require('express');
 const { v4: uuidv4 } = require('uuid');
-const { getExposureData } = require('../../query');
+const {
+  getExposureData,
+  getSeqmatrixData,
+  getSignatureData,
+} = require('../../query');
 const { calculateTmb, calculateTmbSignature } = require('./tmb');
 
 function alphaNumericSort(array) {
@@ -89,6 +93,25 @@ async function tmbSignature(req, res, next) {
   }
 }
 
+async function msLandscape(req, res, next) {
+  try {
+    const { limit, ...query } = req.query;
+    const connection = req.app.locals.connection;
+
+    const exposureCol = ['sample', 'signatureName', 'exposure'];
+    const exposure = await getExposureData(
+      connection,
+      query,
+      exposureCol,
+      limit
+    );
+
+    res.json(true);
+  } catch (error) {
+    next(error);
+  }
+}
+
 const router = Router();
 
 router.get('/exposure', queryExposure);
@@ -96,5 +119,6 @@ router.get('/explorationOptions', explorationOptions);
 router.get('/explorationSamples', explorationSamples);
 router.get('/tmb', tmb);
 router.get('/tmbSignature', tmbSignature);
+router.get('/msLandscape', msLandscape);
 
 module.exports = router;
