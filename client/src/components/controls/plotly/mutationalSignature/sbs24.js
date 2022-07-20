@@ -33,7 +33,7 @@ export default function SBS24(data, sample) {
     orientation: 'h',
   };
 
-  const traces = [transcribedTraces, untranscribedTraces];
+  const traces = [untranscribedTraces, transcribedTraces];
 
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
