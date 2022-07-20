@@ -3,7 +3,7 @@ import MsBurden from '../../../controls/plotly//msBurden/msBurden';
 
 export const msBurdenApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    tmbSignaturesPlot: builder.query({
+    msBurden: builder.query({
       query: (params) => ({
         url: 'tmb',
         params,
@@ -15,4 +15,4 @@ export const msBurdenApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useTmbPlotQuery } = msBurdenApiSlice;
+export const { useMsBurdenQuery } = msBurdenApiSlice;

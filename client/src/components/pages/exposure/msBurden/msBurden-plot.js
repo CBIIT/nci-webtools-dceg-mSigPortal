@@ -3,27 +3,30 @@ import Plot from 'react-plotly.js';
 import { Button, Container, Row, Col } from 'react-bootstrap';
 import { cloneDeep } from 'lodash';
 import { useSelector } from 'react-redux';
-import { useTmbPlotQuery } from './apiSlice';
+import { useMsBurdenQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
 import './plot.scss';
 export default function MutProfilePlot() {
   const publicForm = useSelector((state) => state.exposure.publicForm);
   const [params, setParams] = useState('');
-  const { data, error, isFetching } = useTmbPlotQuery(params, {
+  const { data, error, isFetching } = useMsBurdenQuery(params, {
     skip: !params,
   });
 
+  const { signatureName } = useSelector((state) => state.exposure.msBurden);
+  const { study, strategy, signatureSetName } = publicForm;
+
   useEffect(() => {
-    const { study, strategy, signatureSetName } = publicForm;
-    if (study) {
+    if (signatureName) {
       setParams({
         study: study.value,
         strategy: strategy.value,
         signatureSetName: signatureSetName.value,
+        signatureName: signatureName.value,
       });
     }
-  }, [publicForm]);
+  }, [signatureName]);
   //console.log(data);
   //console.log(publicForm);
   if (data) {

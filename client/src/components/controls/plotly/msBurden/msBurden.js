@@ -1,10 +1,11 @@
-export default function TMB(data) {
+export default function MsBurden(data) {
   console.log(data);
   function average(arr) {
     const sum = arr.reduce((a, b) => a + b, 0);
     return sum / arr.length || 0;
   }
 
+  console.log(data);
   const totalCancer = data.length;
   console.log(totalCancer);
 

@@ -4,19 +4,18 @@ import { useForm } from 'react-hook-form';
 import Select from '../../../controls/select/selectForm';
 import Description from '../../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as visualizationActions } from '../../../../services/store/visualization';
-import {
-  defaultProfile2,
-  defaultMatrix2,
-  defaultFilter2,
-} from '../../../../services/utils';
+import { actions as exposureActions } from '../../../../services/store/exposure';
+
 import { NavHashLink } from 'react-router-hash-link';
 
-const actions = { ...visualizationActions };
+const actions = { ...exposureActions };
 
 export default function TreeLeafForm() {
   const dispatch = useDispatch();
   const store = useSelector((state) => state.exposure);
+
+  const mergeMsBurden = (state) =>
+    dispatch(actions.mergeExposure({ msBurden: state }));
 
   const { signatureNames } = store.main;
 
@@ -41,14 +40,20 @@ export default function TreeLeafForm() {
             <Select
               name="signatureNames"
               label="Signature Name"
-              value={signatureNames}
-              options={signatureNameOptions}
               control={control}
+              options={signatureNameOptions}
+              onChange={(name) => mergeMsBurden({ signatureName: name })}
             />
           </Col>
-          <Col>
-            <Button>Recalculate</Button>
-          </Col>
+          {/* <Col lg="auto" className="d-flex">
+            <Button
+              className="mt-auto mb-2"
+              variant="primary"
+              //onClick={}
+            >
+              Recalculate
+            </Button>
+          </Col> */}
         </Row>
       </Form>
     </div>
