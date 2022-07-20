@@ -8,25 +8,21 @@ export default function SBS288(data, sample) {
     'T>G': '#EBC6C4',
   };
 
-  const arrayDataT = [];
-  const arrayDataU = [];
-  const arrayDataN = [];
+  const transcribed = data.filter((e) => /^T:/.test(e.mutationType));
+  const untranscribed = data.filter((e) => /^U:/.test(e.mutationType));
+  const neutral = data.filter((e) => /^N:/.test(e.mutationType));
 
-  Object.values(data).forEach((group) => {
-    if (group.mutationType.substring(0, 1) === 'T') {
-      arrayDataT.push(group);
-    } else if (group.mutationType.substring(0, 1) === 'U') {
-      arrayDataU.push(group);
-    } else {
-      arrayDataN.push(group);
-    }
-  });
+  const totalMutations =
+    transcribed.reduce((total, e) => total + e.mutations, 0) +
+    untranscribed.reduce((total, e) => total + e.mutations, 0) +
+    neutral.reduce((total, e) => total + e.mutations, 0);
 
-  const numberWithCommas = (x) =>
-    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
-
-  const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
-  const maxVal = Math.max(...data.map((o) => o.mutations));
+  const maxMutation = Math.max(
+    ...[
+      ...transcribed.map((e) => e.mutations),
+      ...untranscribed.map((e) => e.mutations),
+    ]
+  );
 
   //// ------ bar char left  --------- //
 
@@ -87,7 +83,7 @@ export default function SBS288(data, sample) {
 
   //////------------- bar chart right ---------------//////
 
-  const groupByMutationT = arrayDataT.reduce((groups, e, i) => {
+  const groupByMutationT = transcribed.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
     const mutation = e.mutationType.match(mutationRegex)[1];
     const signature = {
@@ -109,7 +105,7 @@ export default function SBS288(data, sample) {
     })
   );
 
-  const groupByMutationU = arrayDataU.reduce((groups, e, i) => {
+  const groupByMutationU = untranscribed.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
     const mutation = e.mutationType.match(mutationRegex)[1];
     const signature = {
@@ -130,7 +126,7 @@ export default function SBS288(data, sample) {
     })
   );
 
-  const groupByMutationN = arrayDataN.reduce((groups, e, i) => {
+  const groupByMutationN = neutral.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
     const mutation = e.mutationType.match(mutationRegex)[1];
     const signature = {
@@ -192,7 +188,7 @@ export default function SBS288(data, sample) {
     }
   );
 
-  const tracesT = {
+  const transcribedTraces = {
     name: 'Transcrribed',
     type: 'bar',
     marker: { color: '#004765' },
@@ -208,7 +204,7 @@ export default function SBS288(data, sample) {
     orientation: 'h',
   };
 
-  const tracesU = {
+  const untranscribedTraces = {
     name: 'Untranscribed',
     type: 'bar',
     marker: { color: '#E32925' },
@@ -223,7 +219,7 @@ export default function SBS288(data, sample) {
     orientation: 'h',
   };
 
-  const tracesN = {
+  const neutralTraces = {
     name: 'Nontranscribed',
     type: 'bar',
     marker: { color: '#008001' },
@@ -238,29 +234,12 @@ export default function SBS288(data, sample) {
     orientation: 'h',
   };
 
-  const traces = [...tracesBarTotal, tracesN, tracesU, tracesT];
-
-  const xannotations = flatSortedTotal.map((num, index) => ({
-    xref: 'x',
-    yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'bottom',
-    x: index,
-    y: -0.1,
-    text: num.mutationType.replace(
-      /\[(.*)\]/,
-      num.mutationType.substring(2, 3)
-    ),
-    showarrow: false,
-    font: {
-      size: 10,
-      color: colors[num.mutationType.substring(2, 5)],
-    },
-    align: 'center',
-    num: num,
-    index: index,
-    textangle: -90,
-  }));
+  const traces = [
+    ...tracesBarTotal,
+    neutralTraces,
+    untranscribedTraces,
+    transcribedTraces,
+  ];
 
   const annotations = Object.entries(groupByTotal).map(
     ([mutation, signatures], groupIndex, array) => ({
@@ -288,10 +267,14 @@ export default function SBS288(data, sample) {
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
-    x: 0,
+    x: 0.02,
     y: 0.88,
     text:
-      '<b>' + sample + ': ' + numberWithCommas(totalMutations) + ' subs </b>',
+      '<b>' +
+      sample +
+      ': ' +
+      totalMutations.toLocaleString(undefined) +
+      ' subs </b>',
     showarrow: false,
     font: {
       size: 18,
@@ -423,8 +406,6 @@ export default function SBS288(data, sample) {
     shapes: shapes,
     annotations: [...annotations, sampleAnnotation],
   };
-  //   console.log("layout");
-  //   console.log(layout);
 
   return { traces, layout };
 }

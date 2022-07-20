@@ -163,7 +163,7 @@ export default function SBS384(data, sample) {
       '<b>' +
       sample +
       ': ' +
-      numberWithCommas(totalMutations) +
+      totalMutations.toLocaleString(undefined) +
       ' transcribed subs </b>',
     showarrow: false,
     font: {
@@ -220,8 +220,6 @@ export default function SBS384(data, sample) {
     })
   );
 
-  console.log(transformU);
-
   const mutationTypeNames = transformU
     .map((group) =>
       group.data.map((e) => ({
@@ -231,7 +229,6 @@ export default function SBS384(data, sample) {
     )
     .flat();
 
-  console.log(mutationTypeNames);
   function formatTickLabel(mutation, mutationType) {
     const color = colors[mutation];
     const regex = /^(.)\[(.).{2}\](.)$/;
@@ -282,8 +279,6 @@ export default function SBS384(data, sample) {
     shapes: [...shapes1, ...shapes2],
     annotations: [...annotations, sampleAnnotation],
   };
-  // console.log("layout");
-  // console.log(layout);
 
   return { traces, layout };
 }

@@ -102,7 +102,7 @@ export default function SBS96(data, sample) {
     const color = colors[mutation];
     const regex = /^(.)\[(.).{2}\](.)$/;
     const match = mutationType.match(regex);
-    return `${match[1]}<span style="color:${color}">${match[2]}</span>${match[3]}`;
+    return `${match[1]}<span style="color:${color}"><b>${match[2]}</b></span>${match[3]}`;
   }
 
   const layout = {

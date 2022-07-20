@@ -57,7 +57,6 @@ export default function SBS192(data, sample) {
     })
   );
 
-  console.log(transformU);
   const flatSortedT = Object.values(groupByMutationT)
     .flat()
     .sort((a, b) =>
@@ -137,22 +136,6 @@ export default function SBS192(data, sample) {
     })
   );
 
-  function formatTickLabel(mutation, mutationType) {
-    const color = colors[mutation];
-    const regex = /^(.)\[(.).{2}\](.)$/;
-    const match = mutationType.match(regex);
-    return `${match[1]}<span style="color:${color}">${match[2]}</span>${match[3]}`;
-  }
-
-  const mutationTypeNames = transformU
-    .map((group) =>
-      group.data.map((e) => ({
-        mutation: group.mutation,
-        mutationType: e.mutationType,
-      }))
-    )
-    .flat();
-
   const sampleAnnotation = {
     xref: 'paper',
     yref: 'paper',
@@ -214,6 +197,22 @@ export default function SBS192(data, sample) {
     })
   );
   const traces = [tracesT, tracesU];
+
+  function formatTickLabel(mutation, mutationType) {
+    const color = colors[mutation];
+    const regex = /^(.)\[(.).{2}\](.)$/;
+    const match = mutationType.match(regex);
+    return `${match[1]}<span style="color:${color}"><b>${match[2]}</b></span>${match[3]}`;
+  }
+
+  const mutationTypeNames = transformU
+    .map((group) =>
+      group.data.map((e) => ({
+        mutation: group.mutation,
+        mutationType: e.mutationType,
+      }))
+    )
+    .flat();
 
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
