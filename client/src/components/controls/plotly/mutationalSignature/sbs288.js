@@ -7,8 +7,6 @@ export default function SBS288(data, sample) {
     'T>C': '#A1CE63',
     'T>G': '#EBC6C4',
   };
-  //   console.log("data--:");
-  //   console.log(data);
 
   const arrayDataT = [];
   const arrayDataU = [];
@@ -24,20 +22,11 @@ export default function SBS288(data, sample) {
     }
   });
 
-  //   console.log("---- arrayDataT ---- ");
-  //   console.log(arrayDataT);
-  //   console.log("---- arrayDataU ---- ");
-  //   console.log(arrayDataU);
-  //   console.log("---- arrayDataN ---- ");
-  //   console.log(arrayDataN);
-
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
 
   const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
   const maxVal = Math.max(...data.map((o) => o.mutations));
-  //   console.log("maxVal--:");
-  //   console.log(maxVal);
 
   //// ------ bar char left  --------- //
 
@@ -52,8 +41,6 @@ export default function SBS288(data, sample) {
       : [signature];
     return groups;
   }, {});
-  //   console.log("groupByMutationWoFirstLetter");
-  //   console.log(groupByMutationWoFirstLetter);
 
   const totalMutationsGroup = Object.entries(groupByMutationWoFirstLetter).map(
     ([mutation, signatures], groupIndex, array) => ({
@@ -75,8 +62,6 @@ export default function SBS288(data, sample) {
       : [signature];
     return groups;
   }, {});
-  //   console.log("groupByTotal");
-  //   console.log(groupByTotal);
 
   const flatSortedTotal = Object.values(groupByTotal).flat();
   const maxValTotal = Math.max(...flatSortedTotal.map((o) => o.contribution));
@@ -116,9 +101,6 @@ export default function SBS288(data, sample) {
     return groups;
   }, {});
 
-  //   console.log("groupByMutationT:");
-  //   console.log(groupByMutationT);
-
   const totalMutationsGroupT = Object.entries(groupByMutationT).map(
     ([mutation, signatures], groupIndex, array) => ({
       mutationType: mutation,
@@ -126,9 +108,6 @@ export default function SBS288(data, sample) {
       total: signatures.reduce((a, e) => a + parseInt(e.contribution), 0),
     })
   );
-
-  //   console.log("totalMutationsGroupT:");
-  //   console.log(totalMutationsGroupT);
 
   const groupByMutationU = arrayDataU.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
@@ -143,9 +122,6 @@ export default function SBS288(data, sample) {
     return groups;
   }, {});
 
-  //   console.log("groupByMutationU:");
-  //   console.log(groupByMutationU);
-
   const totalMutationsGroupU = Object.entries(groupByMutationU).map(
     ([mutation, signatures], groupIndex, array) => ({
       mutationType: mutation,
@@ -153,9 +129,6 @@ export default function SBS288(data, sample) {
       total: signatures.reduce((a, e) => a + parseInt(e.contribution), 0),
     })
   );
-
-  //   console.log("totalMutationsGroupU:");
-  //   console.log(totalMutationsGroupU);
 
   const groupByMutationN = arrayDataN.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
@@ -169,8 +142,6 @@ export default function SBS288(data, sample) {
       : [signature];
     return groups;
   }, {});
-  //   console.log("groupByMutationN:");
-  //   console.log(groupByMutationN);
 
   const totalMutationsGroupN = Object.entries(groupByMutationN).map(
     ([mutation, signatures], groupIndex, array) => ({
@@ -179,9 +150,6 @@ export default function SBS288(data, sample) {
       total: signatures.reduce((a, e) => a + parseInt(e.contribution), 0),
     })
   );
-
-  //   console.log("totalMutationsGroupN:");
-  //   console.log(totalMutationsGroupN);
 
   const groupByFirstLetter = data.reduce((groups, e, i) => {
     const mutation = e.mutationType.substring(0, 1);
@@ -196,9 +164,6 @@ export default function SBS288(data, sample) {
     return groups;
   }, {});
 
-  //   console.log("groupByFirstLetter:");
-  //   console.log(groupByFirstLetter);
-
   const totalGroupByFirstLetter = Object.entries(groupByFirstLetter).map(
     ([mutation, signatures], groupIndex, array) => ({
       mutationType: mutation,
@@ -207,18 +172,10 @@ export default function SBS288(data, sample) {
     })
   );
 
-  //   console.log("totalGroupByFirstLetter:");
-  //   console.log(totalGroupByFirstLetter);
-
   const flatSortedT = Object.values(totalMutationsGroupT).flat();
   const flatSortedU = Object.values(totalMutationsGroupU).flat();
   const flatSortedN = Object.values(totalMutationsGroupN).flat();
   const flatSortedFirstLetter = Object.values(totalGroupByFirstLetter).flat();
-
-  //   console.log(flatSortedT);
-  //   console.log(flatSortedU);
-  //   console.log(flatSortedN);
-  //   console.log(flatSortedFirstLetter);
 
   Object.entries(flatSortedFirstLetter).forEach(
     ([key, value], groupIndex, array) => {
@@ -235,19 +192,6 @@ export default function SBS288(data, sample) {
     }
   );
 
-  // sort by the first letter
-  //   flatSortedT.sort((a, b) =>
-  //     a.mutationType.substring(0, 1) < b.mutationType.substring(0, 1)
-  //       ? -1
-  //       : b.mutationType.substring(0, 1) < a.mutationType.substring(0, 1)
-  //       ? 1
-  //       : 0
-  //   );
-
-  //   console.log("New---");
-  //   console.log(flatSortedT);
-  //   console.log(flatSortedU);
-  //   console.log(flatSortedN);
   const tracesT = {
     name: 'Transcrribed',
     type: 'bar',
@@ -295,8 +239,7 @@ export default function SBS288(data, sample) {
   };
 
   const traces = [...tracesBarTotal, tracesN, tracesU, tracesT];
-  //   console.log("traces:");
-  //   console.log(traces);
+
   const xannotations = flatSortedTotal.map((num, index) => ({
     xref: 'x',
     yref: 'paper',
@@ -356,6 +299,32 @@ export default function SBS288(data, sample) {
     align: 'center',
   };
 
+  const transformU = Object.entries(groupByMutationU).map(
+    ([mutation, data]) => ({
+      mutation,
+      data,
+    })
+  );
+
+  console.log(transformU);
+
+  const mutationTypeNames = transformU
+    .map((group) =>
+      group.data.map((e) => ({
+        mutation: group.mutation,
+        mutationType: e.mutationType,
+      }))
+    )
+    .flat();
+
+  console.log(mutationTypeNames);
+  function formatTickLabel(mutation, mutationType) {
+    const color = colors[mutation];
+    const regex = /^(.)\[(.).{2}\](.)$/;
+    const match = mutationType.match(regex);
+    return `${match[1]}<span style="color:${color}"><b>${match[2]}</b></span>${match[3]}`;
+  }
+
   const shapes = Object.entries(groupByTotal).map(
     ([mutation, _], groupIndex, array) => ({
       type: 'rect',
@@ -400,18 +369,17 @@ export default function SBS288(data, sample) {
       pattern: 'independent',
     },
     xaxis: {
-      showticklabels: false,
+      showticklabels: true,
       showline: true,
       tickangle: -90,
       tickfont: {
         size: 10,
       },
       tickmode: 'array',
-      tickvals: flatSortedTotal.map((_, i) => i),
-      // ticktext: flatSorted.map((e) =>
-      //   e.mutationType.replace(/\[(.*)\]/, e.mutationType.substring(2, 3))
-      // ),
-      ticktext: flatSortedTotal.map((e) => e.mutationType),
+      tickvals: mutationTypeNames.map((_, i) => i),
+      ticktext: mutationTypeNames.map((e) =>
+        formatTickLabel(e.mutation, e.mutationType)
+      ),
       linecolor: '#E0E0E0',
       linewidth: 1,
       mirror: 'all',
@@ -458,7 +426,7 @@ export default function SBS288(data, sample) {
     },
 
     shapes: shapes,
-    annotations: [...annotations, sampleAnnotation, ...xannotations],
+    annotations: [...annotations, sampleAnnotation],
   };
   //   console.log("layout");
   //   console.log(layout);

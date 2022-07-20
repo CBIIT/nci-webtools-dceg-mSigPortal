@@ -152,27 +152,6 @@ export default function SBS192(data, sample) {
       }))
     )
     .flat();
-  const xannotations = flatSortedU.map((num, index) => ({
-    xref: 'x',
-    yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'bottom',
-    x: index,
-    y: -0.1,
-    text: num.mutationType.replace(
-      /\[(.*)\]/,
-      num.mutationType.substring(2, 3)
-    ),
-    showarrow: false,
-    font: {
-      size: 10,
-      color: colors[num.mutationType.substring(2, 5)],
-    },
-    align: 'center',
-    num: num,
-    index: index,
-    textangle: -90,
-  }));
 
   const sampleAnnotation = {
     xref: 'paper',
