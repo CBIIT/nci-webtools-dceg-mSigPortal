@@ -8,9 +8,6 @@ export default function SBS384(data, sample) {
     'T>G': '#EBC6C4',
   };
 
-  const numberWithCommas = (x) =>
-    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
-
   const groupByMutation = data.reduce((groups, e, i) => {
     const mutation = e.mutationType.substring(2, e.mutationType.length);
     const signature = {
@@ -157,7 +154,7 @@ export default function SBS384(data, sample) {
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
-    x: 0.02,
+    x: 0.01,
     y: 0.88,
     text:
       '<b>' +

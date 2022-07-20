@@ -221,8 +221,8 @@ export default function ID28(data, sample) {
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
-    x: 0,
-    y: 0.9,
+    x: 0.01,
+    y: 0.88,
     text:
       '<b>' + sample + ': ' + numberWithCommas(totalMutations) + ' indels</b>',
     showarrow: false,
