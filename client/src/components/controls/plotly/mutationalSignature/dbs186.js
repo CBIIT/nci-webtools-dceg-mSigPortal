@@ -6,9 +6,6 @@ export default function DBS186(data, sample) {
     'TT>': '#FE8002',
   };
 
-  const numberWithCommas = (x) =>
-    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
-
   const arrayDataT = [];
   const arrayDataU = [];
 
@@ -162,16 +159,16 @@ export default function DBS186(data, sample) {
     xanchor: 'bottom',
     yanchor: 'bottom',
     x: 0.01,
-    y: 0.88,
+    y: 0.9,
     text:
       '<b>' +
       sample +
       ': ' +
-      numberWithCommas(totalMutations) +
+      totalMutations.toLocaleString(undefined) +
       ' transcribed double subs</b>',
     showarrow: false,
     font: {
-      size: 18,
+      size: 20,
     },
     align: 'center',
   };

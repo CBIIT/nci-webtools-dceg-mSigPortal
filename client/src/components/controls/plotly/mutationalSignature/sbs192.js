@@ -151,7 +151,7 @@ export default function SBS192(data, sample) {
       ' transcribed subs</b>',
     showarrow: false,
     font: {
-      size: 18,
+      size: 20,
     },
     align: 'center',
   };

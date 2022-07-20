@@ -87,7 +87,7 @@ export default function DBS78(data, sample) {
     xanchor: 'bottom',
     yanchor: 'bottom',
     x: 0.01,
-    y: 0.88,
+    y: 0.9,
     text:
       '<b>' +
       sample +
@@ -96,7 +96,7 @@ export default function DBS78(data, sample) {
       ' double subs </b>',
     showarrow: false,
     font: {
-      size: 18,
+      size: 20,
     },
     align: 'center',
   };

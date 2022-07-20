@@ -75,7 +75,7 @@ export default function SBS96(data, sample) {
       ' subs </b>',
     showarrow: false,
     font: {
-      size: 18,
+      size: 20,
     },
     align: 'center',
   };
