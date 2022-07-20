@@ -8,9 +8,6 @@ export default function SBS192(data, sample) {
     'T>G': '#EBC6C4',
   };
 
-  //   console.log("data--:");
-  //   console.log(data);
-
   const arrayDataT = [];
   const arrayDataU = [];
 
@@ -27,7 +24,6 @@ export default function SBS192(data, sample) {
   const maxVal = Math.max(...data.map((o) => o.mutations));
 
   const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
-  // group data by dominant mutation
   const groupByMutationT = arrayDataT.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
     const mutation = e.mutationType.match(mutationRegex)[1];
@@ -54,6 +50,14 @@ export default function SBS192(data, sample) {
     return groups;
   }, {});
 
+  const transformU = Object.entries(groupByMutationU).map(
+    ([mutation, data]) => ({
+      mutation,
+      data,
+    })
+  );
+
+  console.log(transformU);
   const flatSortedT = Object.values(groupByMutationT)
     .flat()
     .sort((a, b) =>
@@ -132,6 +136,22 @@ export default function SBS192(data, sample) {
       align: 'center',
     })
   );
+
+  function formatTickLabel(mutation, mutationType) {
+    const color = colors[mutation];
+    const regex = /^(.)\[(.).{2}\](.)$/;
+    const match = mutationType.match(regex);
+    return `${match[1]}<span style="color:${color}">${match[2]}</span>${match[3]}`;
+  }
+
+  const mutationTypeNames = transformU
+    .map((group) =>
+      group.data.map((e) => ({
+        mutation: group.mutation,
+        mutationType: e.mutationType,
+      }))
+    )
+    .flat();
   const xannotations = flatSortedU.map((num, index) => ({
     xref: 'x',
     yref: 'paper',
@@ -159,7 +179,7 @@ export default function SBS192(data, sample) {
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
-    x: 0,
+    x: 0.02,
     y: 0.88,
     text:
       '<b>' +
@@ -231,15 +251,19 @@ export default function SBS192(data, sample) {
       borderwidth: 1,
     },
     xaxis: {
-      showticklabels: false,
+      showticklabels: true,
       showline: true,
       tickangle: -90,
       tickfont: {
-        size: 10,
+        size: 11,
       },
       tickmode: 'array',
-      tickvals: [...flatSortedU.map((_, i) => i)],
-      ticktext: [...flatSortedU.map((e) => e.mutationType)],
+      // tickvals: [...flatSortedU.map((_, i) => i)],
+      // ticktext: [...flatSortedU.map((e) => e.mutationType)],
+      tickvals: mutationTypeNames.map((_, i) => i),
+      ticktext: mutationTypeNames.map((e) =>
+        formatTickLabel(e.mutation, e.mutationType)
+      ),
       linecolor: '#E0E0E0',
       linewidth: 1,
       mirror: 'all',
@@ -254,7 +278,7 @@ export default function SBS192(data, sample) {
     },
 
     shapes: [...shapes1, ...shapes2],
-    annotations: [...annotations, sampleAnnotation, ...xannotations],
+    annotations: [...annotations, sampleAnnotation],
   };
 
   return { traces, layout };

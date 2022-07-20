@@ -65,7 +65,7 @@ export default function SBS96(data, sample) {
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
-    x: 0,
+    x: 0.02,
     y: 0.88,
     text:
       '<b>' +
