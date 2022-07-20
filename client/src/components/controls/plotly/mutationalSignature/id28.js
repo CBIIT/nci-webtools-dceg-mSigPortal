@@ -156,7 +156,6 @@ export default function ID28(data, sample) {
       groupIndex: groupIndex,
     })
   );
-  console.log(annotations1);
   const annotations2 = arrayIDAnnotationBot.map((num, index) => ({
     xref: 'x',
     yref: 'paper',
@@ -185,7 +184,6 @@ export default function ID28(data, sample) {
     index: index,
   }));
 
-  console.log(annotations2);
   const annotationsIDTopLabel = arrayIDAnnXLabel.map((num, index) => ({
     xref: 'x',
     yref: 'paper',
@@ -227,7 +225,7 @@ export default function ID28(data, sample) {
       '<b>' + sample + ': ' + numberWithCommas(totalMutations) + ' indels</b>',
     showarrow: false,
     font: {
-      size: 18,
+      size: 20,
     },
     align: 'center',
   };

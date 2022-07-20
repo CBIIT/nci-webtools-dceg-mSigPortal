@@ -158,7 +158,7 @@ export default function ID83(unsortedData, sample) {
       ' indels</b>',
     showarrow: false,
     font: {
-      size: 18,
+      size: 20,
     },
     align: 'center',
   };
@@ -211,7 +211,7 @@ export default function ID83(unsortedData, sample) {
       tickmode: 'array',
       tickvals: indelNames.map((_, i) => i),
       ticktext: indelNames.map((e) => e.index),
-      linecolor: '#E0E0E0',
+      linecolor: 'black',
       linewidth: 1,
       mirror: 'all',
     },
