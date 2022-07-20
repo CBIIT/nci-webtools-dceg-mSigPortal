@@ -7,8 +7,7 @@ export default function SBS384(data, sample) {
     'T>C': '#A1CE63',
     'T>G': '#EBC6C4',
   };
-  // console.log("data--:");
-  // console.log(data);
+
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
 
@@ -153,34 +152,12 @@ export default function SBS384(data, sample) {
     })
   );
 
-  const xannotations = flatSortedT.map((num, index) => ({
-    xref: 'x',
-    yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'bottom',
-    x: index,
-    y: -0.1,
-    text: num.mutationType.replace(
-      /\[(.*)\]/,
-      num.mutationType.substring(2, 3)
-    ),
-    showarrow: false,
-    font: {
-      size: 10,
-      color: colors[num.mutationType.substring(2, 5)],
-    },
-    align: 'center',
-    num: num,
-    index: index,
-    textangle: -90,
-  }));
-
   const sampleAnnotation = {
     xref: 'paper',
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
-    x: 0,
+    x: 0.02,
     y: 0.88,
     text:
       '<b>' +
@@ -236,6 +213,32 @@ export default function SBS384(data, sample) {
     })
   );
 
+  const transformU = Object.entries(groupByMutationU).map(
+    ([mutation, data]) => ({
+      mutation,
+      data,
+    })
+  );
+
+  console.log(transformU);
+
+  const mutationTypeNames = transformU
+    .map((group) =>
+      group.data.map((e) => ({
+        mutation: group.mutation,
+        mutationType: e.mutationType,
+      }))
+    )
+    .flat();
+
+  console.log(mutationTypeNames);
+  function formatTickLabel(mutation, mutationType) {
+    const color = colors[mutation];
+    const regex = /^(.)\[(.).{2}\](.)$/;
+    const match = mutationType.match(regex);
+    return `${match[1]}<span style="color:${color}"><b>${match[2]}</b></span>${match[3]}`;
+  }
+
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     bargap: 0.3,
@@ -252,15 +255,17 @@ export default function SBS384(data, sample) {
     },
 
     xaxis: {
-      showticklabels: false,
+      showticklabels: true,
       showline: true,
       tickangle: -90,
       tickfont: {
         size: 10,
       },
       tickmode: 'array',
-      tickvals: [...flatSortedT.map((_, i) => i)],
-      ticktext: [...flatSortedT.map((e) => e.mutationType)],
+      tickvals: mutationTypeNames.map((_, i) => i),
+      ticktext: mutationTypeNames.map((e) =>
+        formatTickLabel(e.mutation, e.mutationType)
+      ),
       linecolor: '#E0E0E0',
       linewidth: 1,
       mirror: 'all',
@@ -275,7 +280,7 @@ export default function SBS384(data, sample) {
       categoryorder: 'category descending',
     },
     shapes: [...shapes1, ...shapes2],
-    annotations: [...annotations, sampleAnnotation, ...xannotations],
+    annotations: [...annotations, sampleAnnotation],
   };
   // console.log("layout");
   // console.log(layout);
