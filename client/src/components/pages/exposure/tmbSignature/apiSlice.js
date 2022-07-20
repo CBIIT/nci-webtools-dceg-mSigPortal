@@ -1,7 +1,7 @@
 import { apiSlice } from '../../../../services/apiSlice';
 import TMBSignature from '../../../controls/plotly/tmbsignature/tmbSignature';
 
-export const tmbApiSlice = apiSlice.injectEndpoints({
+export const tmbSignatureApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     tmbSignaturesPlot: builder.query({
       query: (params) => ({
@@ -15,4 +15,4 @@ export const tmbApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useTmbSignaturesPlotQuery } = tmbApiSlice;
+export const { useTmbSignaturesPlotQuery } = tmbSignatureApiSlice;

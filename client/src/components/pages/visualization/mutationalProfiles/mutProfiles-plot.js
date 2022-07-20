@@ -7,18 +7,6 @@ import { saveAs } from 'file-saver';
 import { useSelector } from 'react-redux';
 import { useMutationalProfilesQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import SBS6 from '../../../controls/plotly/mutationalSignature/sbs6';
-import SBS24 from '../../../controls/plotly/mutationalSignature/sbs24';
-import SBS96 from '../../../controls/plotly/mutationalSignature/sbs96';
-import SBS192 from '../../../controls/plotly/mutationalSignature/sbs192';
-import SBS288 from '../../../controls/plotly/mutationalSignature/sbs288';
-import SBS384 from '../../../controls/plotly/mutationalSignature/sbs384';
-import SBS1536 from '../../../controls/plotly/mutationalSignature/sbs1536';
-import DBS78 from '../../../controls/plotly/mutationalSignature/dbs78';
-import DBS186 from '../../../controls/plotly/mutationalSignature/dbs186';
-import ID83 from '../../../controls/plotly/mutationalSignature/id83';
-import ID28 from '../../../controls/plotly/mutationalSignature/id28';
-import ID415 from '../../../controls/plotly/mutationalSignature/id415';
 
 import './plot.scss';
 
@@ -30,13 +18,8 @@ export default function MutProfilePlot() {
   const { source } = store.main;
 
   const [params, setParams] = useState(null);
-  const [plot, setPlot] = useState(null);
 
-  const {
-    data = [],
-    error,
-    isFetching,
-  } = useMutationalProfilesQuery(params, {
+  const { data, error, isFetching } = useMutationalProfilesQuery(params, {
     skip: !params,
   });
 
@@ -54,44 +37,6 @@ export default function MutProfilePlot() {
       setParams(params);
     }
   }, [sample, profile, matrix]);
-
-  // generate plot
-  useEffect(() => {
-    if (data.length) generatePlot(data, sample.value);
-  }, [data]);
-
-  function generatePlot(data, sample) {
-    const profileMatrix = profile.value + matrix.value;
-    //console.log(data);
-    const { traces, layout } =
-      profileMatrix == 'SBS6'
-        ? SBS6(data, sample)
-        : profileMatrix == 'SBS24'
-        ? SBS24(data, sample)
-        : profileMatrix == 'SBS96'
-        ? SBS96(data, sample)
-        : profileMatrix == 'SBS192'
-        ? SBS192(data, sample)
-        : profileMatrix == 'SBS288'
-        ? SBS288(data, sample)
-        : profileMatrix == 'SBS384'
-        ? SBS384(data, sample)
-        : profileMatrix == 'SBS1536'
-        ? SBS1536(data, sample)
-        : profileMatrix == 'DBS78'
-        ? DBS78(data, sample)
-        : profileMatrix == 'DBS186'
-        ? DBS186(data, sample)
-        : profileMatrix == 'ID28'
-        ? ID28(data, sample)
-        : profileMatrix == 'ID83'
-        ? ID83(data, sample)
-        : profileMatrix == 'ID415'
-        ? ID415(data, sample)
-        : { traces: [], layout: {} };
-
-    setPlot({ data: [...traces], layout });
-  }
 
   const divId = 'mutationalProfilePlot';
   const config = {
@@ -111,27 +56,18 @@ export default function MutProfilePlot() {
       {error ? (
         <div className="text-center">
           <div>An error as occured</div>
-          <div>{error.data}</div>
+          <div>{error.message}</div>
         </div>
       ) : (
-        plot && (
+        data && (
           <Container fluid style={{ minHeight: '500px' }} className="mb-3">
             <Row>
               <Col>
                 <Plot
-                  // {...(profile.value + matrix.value === 'SBS1536' ||
-                  // profile.value + matrix.value === 'SBS6' ||
-                  // profile.value + matrix.value === 'SBS24' ||
-                  // profile.value + matrix.value === 'ID28'
-                  //   ? { className: 'w-70' }
-                  //   : { className: 'w-100' })}
                   className="w-100"
                   divId={divId}
-                  // style={{
-                  //   height: '650px',
-                  // }}
-                  data={cloneDeep(plot.data)}
-                  layout={cloneDeep(plot.layout)}
+                  data={cloneDeep(data.traces)}
+                  layout={cloneDeep(data.layout)}
                   config={cloneDeep(config)}
                   useResizeHandler
                 />

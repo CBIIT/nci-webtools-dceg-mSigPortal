@@ -1,42 +1,30 @@
-export default function ID83(data, sample) {
-  // console.log("data");
-  // console.log(data);
+export default function ID83(unsortedData, sample) {
   const colors = {
-    '1:Del:C': '#FBBD6F',
-    '1:Del:T': '#FE8002',
-    '1:Ins:C': '#AEDD8A',
-    '1:Ins:T': '#35A12E',
-    '2:Del:R': '#FCC9B4',
-    '3:Del:R': '#FB8969',
-    '4:Del:R': '#F04432',
-    '5:Del:R': '#BB1A1A',
-    '2:Ins:R': '#CFDFF0',
-    '3:Ins:R': '#93C3DE',
-    '4:Ins:R': '#4B97C7',
-    '5:Ins:R': '#1863AA',
-    '2:Del:M': '#E1E1EE',
-    '3:Del:M': '#B5B5D6',
-    '4:Del:M': '#8482BC',
-    '5:Del:M': '#62409A',
+    '1:Del:C': { shape: '#FBBD6F', text: 'black' },
+    '1:Del:T': { shape: '#FE8002', text: 'white' },
+    '1:Ins:C': { shape: '#AEDD8A', text: 'black' },
+    '1:Ins:T': { shape: '#35A12E', text: 'white' },
+    '2:Del:R': { shape: '#FCC9B4', text: 'black' },
+    '3:Del:R': { shape: '#FB8969', text: 'black' },
+    '4:Del:R': { shape: '#F04432', text: 'black' },
+    '5:Del:R': { shape: '#BB1A1A', text: 'white' },
+    '2:Ins:R': { shape: '#CFDFF0', text: 'black' },
+    '3:Ins:R': { shape: '#93C3DE', text: 'black' },
+    '4:Ins:R': { shape: '#4B97C7', text: 'black' },
+    '5:Ins:R': { shape: '#1863AA', text: 'white' },
+    '2:Del:M': { shape: '#E1E1EE', text: 'blacl' },
+    '3:Del:M': { shape: '#B5B5D6', text: 'black' },
+    '4:Del:M': { shape: '#8482BC', text: 'black' },
+    '5:Del:M': { shape: '#62409A', text: 'white' },
   };
-  const annotationColors = {
-    '1:Del:C': 'black',
-    '1:Del:T': 'white',
-    '1:Ins:C': 'black',
-    '1:Ins:T': 'white',
-    '2:Del:R': 'black',
-    '3:Del:R': 'black',
-    '4:Del:R': 'black',
-    '5:Del:R': 'white',
-    '2:Ins:R': 'black',
-    '3:Ins:R': 'black',
-    '4:Ins:R': 'black',
-    '5:Ins:R': 'white',
-    '2:Del:M': 'blacl',
-    '3:Del:M': 'black',
-    '4:Del:M': 'black',
-    '5:Del:M': 'white',
-  };
+
+  // sort data according to colors
+  const indelOrder = Object.fromEntries(
+    Object.entries(Object.keys(colors)).map((a) => a.reverse())
+  );
+  const data = [...unsortedData].sort(
+    (a, b) => indelOrder[a.indel] - indelOrder[b.indel]
+  );
 
   const arrayIDAnnXTop = [
       '1bp Deletion',
@@ -52,209 +40,77 @@ export default function ID83(data, sample) {
       'Number of Repeat Units',
       'Microhimology Length',
     ],
-    arrayIDAnnXLabel = [5, 18.5, 35, 60, 76],
-    arrayIDAnnotationTop = [],
-    arrayIDAnnotationBot = [];
+    arrayIDAnnXLabel = [5, 18.5, 35, 60, 76];
 
-  const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
-  const numberWithCommas = (x) =>
-    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
-  const maxVal = Math.max(...data.map((o) => o.mutations));
-
-  // group data by dominant mutation
-  const groupByMutation = data.reduce((groups, e, i) => {
-    const mutationRegex = /^.{0,7}/;
-    const mutation = e.mutationType.match(mutationRegex)[0];
-    const signature = {
-      mutationType: e.mutationType,
-      contribution: e.mutations,
-    };
-    groups[mutation] = groups[mutation]
-      ? [...groups[mutation], signature]
-      : [signature];
-    return groups;
-  }, {});
-
-  const groupByFirstGroup = Object.fromEntries(
-    Object.entries(groupByMutation).slice(0, 4)
+  const totalMutations = data.reduce(
+    (total, indel) =>
+      total + indel.data.reduce((indelSum, e) => indelSum + e.mutations, 0),
+    0
   );
-
-  const groupByMutationID = data.reduce((groups, e) => {
-    let mutationID;
-    mutationID = e.mutationType.match(
-      e.mutationType.substring(
-        e.mutationType.length - 3,
-        e.mutationType.length - 2
-      )
-    );
-    const signature = {
-      mutationType: e.mutationType,
-      contribution: e.mutations,
-    };
-    groups[mutationID] = groups[mutationID]
-      ? [...groups[mutationID], signature]
-      : [signature];
-    return groups;
-  }, {});
-  // console.log("groupByMutationID");
-  // console.log(groupByMutationID);
-
-  const groupR = groupByMutationID['R'].reduce((r, a) => {
-    let m;
-    m = a.mutationType.match(a.mutationType.substr(2, 3));
-    const s = {
-      mutationType: a.mutationType,
-      contribution: a.contribution,
-    };
-    r[m] = r[m] ? [...r[m], a] : [s];
-    return r;
-  }, {});
-
-  // console.log("groupR");
-  // console.log(groupR);
-  const groupRDel = groupR['Del'].reduce((r, a) => {
-    let m;
-    m = a.mutationType.match(a.mutationType.substr(0, 7));
-    const s = {
-      mutationType: a.mutationType,
-      contribution: a.contribution,
-    };
-    r[m] = r[m] ? [...r[m], a] : [s];
-    return r;
-  }, {});
-
-  const groupRIns = groupR['Ins'].reduce((r, a) => {
-    let m;
-    m = a.mutationType.match(a.mutationType.substr(0, 7));
-    const s = {
-      mutationType: a.mutationType,
-      contribution: a.contribution,
-    };
-    r[m] = r[m] ? [...r[m], a] : [s];
-    return r;
-  }, {});
-
-  const groupM = groupByMutationID['M'].reduce((r, a) => {
-    let m;
-    m = a.mutationType.match(a.mutationType.substr(0, 7));
-    const s = {
-      mutationType: a.mutationType,
-      contribution: a.contribution,
-    };
-    r[m] = r[m] ? [...r[m], a] : [s];
-    return r;
-  }, {});
-  const arrayID1 = Object.keys(groupByFirstGroup).map(function (key) {
-    return groupByFirstGroup[key];
-  });
-  const arrayID2 = Object.keys(groupRDel).map(function (key) {
-    return groupRDel[key];
-  });
-  const arrayID3 = Object.keys(groupRIns).map(function (key) {
-    return groupRIns[key];
-  });
-  const arrayID4 = Object.keys(groupM).map(function (key) {
-    return groupM[key];
-  });
-
-  const arrayID = [...arrayID1, ...arrayID2, ...arrayID3, ...arrayID4];
-
-  const flatSorted = Object.values(arrayID).flat();
-
-  Object.values(arrayID).forEach((group) => {
-    if (group.length > 1) {
-      arrayIDAnnotationTop.push(
-        group[Math.floor(group.length / 2)].mutationType
-      );
-    } else {
-      arrayIDAnnotationTop.push(group[0].mutationType);
-    }
-    group.forEach((e) => {
-      arrayIDAnnotationBot.push(e.mutationType);
-    });
-  });
-
-  const traces = Object.entries(arrayID).map(
-    ([mutation, signatures], groupIndex, array) => ({
-      name: mutation,
-      type: 'bar',
-      marker: {
-        color:
-          colors[
-            signatures[0].mutationType.substring(
-              0,
-              signatures[0].mutationType.length - 2
-            )
-          ],
-      },
-      //   x: signatures.map((e) => e.mutationType),
-      //x: signatures.map((e, i) => groupIndex * signatures.length + i),
-      x: signatures.map(
-        (e, i) =>
-          array
-            .slice(0, groupIndex)
-            .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
-      ),
-      y: signatures.map((e) => e.contribution),
-      //text: signatures.map((e, i) => e.mutationType),
-      //hovertemplate: "%{signatures.map((e, i) => e.mutationType)}, %{y}",
-      hoverinfo: 'x+y',
-      showlegend: false,
-    })
+  const maxMutation = Math.max(
+    ...data.map((indel) => indel.data.map((e) => e.mutations)).flat()
   );
+  const indelNames = data
+    .map((indel) =>
+      indel.data.map((e) => ({
+        indel: indel.indel,
+        index: e.mutationType.slice(-1),
+      }))
+    )
+    .flat();
 
-  const annotations1 = Object.entries(arrayID).map(
-    ([mutation, signatures], groupIndex, array) => ({
-      xref: 'x',
-      yref: 'paper',
-      xanchor: 'bottom',
-      yanchor: 'bottom',
-      x:
+  const traces = data.map((group, groupIndex, array) => ({
+    name: group.indel,
+    type: 'bar',
+    marker: { color: colors[group.indel].shape },
+    x: [...group.data.keys()].map(
+      (e) =>
+        e +
         array
           .slice(0, groupIndex)
-          .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) +
-        (signatures.length - 1) * 0.5,
-      y: 1.01,
-      text:
-        groupIndex < 4
-          ? `<b>${signatures[0].mutationType.substring(
-              signatures[0].mutationType.length - 3,
-              signatures[0].mutationType.length - 2
-            )}</b>`
-          : `<b>${signatures[0].mutationType.substring(0, 1)}</b>`,
-      showarrow: false,
-      font: {
-        size: 14,
-        color:
-          annotationColors[
-            signatures[0].mutationType.substring(
-              0,
-              signatures[0].mutationType.length - 2
-            )
-          ],
-      },
-      align: 'center',
-      signatures: signatures,
-      mutation: mutation,
-      groupIndex: groupIndex,
-    })
-  );
+          .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
+    ),
+    y: group.data.map((e) => e.mutations),
+    customdata: group.data.map((e) => ({ mutationType: e.mutationType })),
+    hovertemplate: '%{customdata.mutationType}, %{y}<extra></extra>',
+    showlegend: false,
+  }));
 
-  const annotations2 = arrayIDAnnotationBot.map((num, index) => ({
+  const shapeAnnotations = data.map((group, groupIndex, array) => ({
+    xref: 'x',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
+    x:
+      array
+        .slice(0, groupIndex)
+        .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
+      (group.data.length - 1) * 0.5,
+    y: 1.01,
+    text: `<b>${
+      group.indel[0] == '1' ? group.indel.slice(-1) : group.indel[0]
+    }</b>`,
+    showarrow: false,
+    font: {
+      size: 14,
+      color: colors[group.indel].text,
+    },
+    align: 'center',
+  }));
+
+  const xLabelAnnotation = indelNames.map((indel, index) => ({
     xref: 'x',
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
     x: index,
     y: -0.1,
-    text: '<b>' + num.substring(num.length - 1, num.length) + '</b>',
+    text: '<b>' + indel.index + '</b>',
     showarrow: false,
     font: {
       size: 12,
     },
     align: 'center',
-    num: num,
-    index: index,
   }));
 
   const annotationsIDTopLabel = arrayIDAnnXLabel.map((num, index) => ({
@@ -295,7 +151,11 @@ export default function ID83(data, sample) {
     x: 0,
     y: 0.88,
     text:
-      '<b>' + sample + ': ' + numberWithCommas(totalMutations) + ' indels</b>',
+      '<b>' +
+      sample +
+      ': ' +
+      totalMutations.toLocaleString(undefined) +
+      ' indels</b>',
     showarrow: false,
     font: {
       size: 18,
@@ -303,67 +163,41 @@ export default function ID83(data, sample) {
     align: 'center',
   };
 
-  const shapes1 = Object.entries(arrayID).map(
-    ([mutation, signatures], groupIndex, array) => ({
-      type: 'rect',
-      xref: 'x',
-      yref: 'paper',
-      x0: array
-        .slice(0, groupIndex)
-        .reduce((x0, [_, sigs]) => x0 + sigs.length, -0.4),
-      x1: array
-        .slice(0, groupIndex + 1)
-        .reduce((x0, [_, sigs]) => x0 + sigs.length, -0.6),
-      y0: 1.07,
-      y1: 1.01,
-      fillcolor:
-        colors[
-          signatures[0].mutationType.substring(
-            0,
-            signatures[0].mutationType.length - 2
-          )
-        ],
-      line: {
-        width: 0,
-      },
-      mutation: mutation,
-      signature: signatures[0].mutationType.substring(
-        0,
-        signatures[0].mutationType.length - 2
-      ),
-    })
-  );
+  const topShapes = data.map((group, groupIndex, array) => ({
+    type: 'rect',
+    xref: 'x',
+    yref: 'paper',
+    x0: array
+      .slice(0, groupIndex)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.4),
+    x1: array
+      .slice(0, groupIndex + 1)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.6),
+    y0: 1.07,
+    y1: 1.01,
+    fillcolor: colors[group.indel].shape,
+    line: {
+      width: 0,
+    },
+  }));
 
-  const shapes2 = Object.entries(arrayID).map(
-    ([mutation, signatures], groupIndex, array) => ({
-      type: 'rect',
-      xref: 'x',
-      yref: 'paper',
-      x0: array
-        .slice(0, groupIndex)
-        .reduce((x0, [_, sigs]) => x0 + sigs.length, -0.4),
-      x1: array
-        .slice(0, groupIndex + 1)
-        .reduce((x0, [_, sigs]) => x0 + sigs.length, -0.6),
-      y0: -0.01,
-      y1: -0.05,
-      fillcolor:
-        colors[
-          signatures[0].mutationType.substring(
-            0,
-            signatures[0].mutationType.length - 2
-          )
-        ],
-      line: {
-        width: 0,
-      },
-      mutation: mutation,
-      signature: signatures[0].mutationType.substring(
-        0,
-        signatures[0].mutationType.length - 2
-      ),
-    })
-  );
+  const bottomShapes = data.map((group, groupIndex, array) => ({
+    type: 'rect',
+    xref: 'x',
+    yref: 'paper',
+    x0: array
+      .slice(0, groupIndex)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.4),
+    x1: array
+      .slice(0, groupIndex + 1)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.6),
+    y0: -0.01,
+    y1: -0.05,
+    fillcolor: colors[group.indel].shape,
+    line: {
+      width: 0,
+    },
+  }));
 
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
@@ -373,38 +207,32 @@ export default function ID83(data, sample) {
     xaxis: {
       showticklabels: false,
       showline: true,
-      tickangle: -90,
-      tickfont: {
-        size: 10,
-      },
+      tickfont: { size: 11 },
       tickmode: 'array',
-      tickvals: flatSorted.map((_, i) => i),
-      ticktext: flatSorted.map((e) => e.mutationType),
-      linecolor: 'black',
+      tickvals: indelNames.map((_, i) => i),
+      ticktext: indelNames.map((e) => e.index),
+      linecolor: '#E0E0E0',
       linewidth: 1,
-      mirror: true,
+      mirror: 'all',
     },
     yaxis: {
-      title: 'Number of Idels',
+      title: 'Number of Indels',
       autorange: false,
-      range: [0, maxVal + maxVal * 0.2],
+      range: [0, maxMutation * 1.2],
       linecolor: 'black',
       linewidth: 1,
       mirror: true,
     },
 
-    shapes: [...shapes1, ...shapes2],
+    shapes: [...topShapes, ...bottomShapes],
     annotations: [
-      ...annotations1,
-      ...annotations2,
+      ...shapeAnnotations,
+      ...xLabelAnnotation,
       ...annotationsIDTopLabel,
       ...annotationsIDBotLabel,
       sampleAnnotation,
     ],
   };
 
-  var config = { responsive: true };
-  //console.log("layout");
-  //console.log(layout);
-  return { traces, layout, config };
+  return { traces, layout };
 }
