@@ -253,7 +253,8 @@ export default function SBS384(data, sample) {
       showline: true,
       tickangle: -90,
       tickfont: {
-        size: 10,
+        family: 'Courier New, monospace',
+        color: '#A0A0A0',
       },
       tickmode: 'array',
       tickvals: mutationTypeNames.map((_, i) => i),

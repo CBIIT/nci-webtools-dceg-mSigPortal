@@ -8,23 +8,25 @@ export default function SBS192(data, sample) {
     'T>G': '#EBC6C4',
   };
 
-  const arrayDataT = [];
-  const arrayDataU = [];
+  const transcribed = data.filter((e) => /^T:/.test(e.mutationType));
+  const untranscribed = data.filter((e) => /^U:/.test(e.mutationType));
 
-  Object.values(data).forEach((group) => {
-    if (group.mutationType.substring(0, 1) === 'T') {
-      arrayDataT.push(group);
-    } else {
-      arrayDataU.push(group);
-    }
-  });
+  const totalMutations =
+    transcribed.reduce((total, e) => total + e.mutations, 0) +
+    untranscribed.reduce((total, e) => total + e.mutations, 0);
+
+  const maxMutation = Math.max(
+    ...[
+      ...transcribed.map((e) => e.mutations),
+      ...untranscribed.map((e) => e.mutations),
+    ]
+  );
 
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
   const maxVal = Math.max(...data.map((o) => o.mutations));
 
-  const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
-  const groupByMutationT = arrayDataT.reduce((groups, e, i) => {
+  const groupByMutationT = transcribed.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
     const mutation = e.mutationType.match(mutationRegex)[1];
     const signature = {
@@ -37,7 +39,7 @@ export default function SBS192(data, sample) {
 
     return groups;
   }, {});
-  const groupByMutationU = arrayDataU.reduce((groups, e, i) => {
+  const groupByMutationU = untranscribed.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
     const mutation = e.mutationType.match(mutationRegex)[1];
     const signature = {
@@ -233,7 +235,7 @@ export default function SBS192(data, sample) {
       showline: true,
       tickangle: -90,
       tickfont: {
-        size: 11,
+        family: 'Courier New, monospace',
       },
       tickmode: 'array',
       // tickvals: [...flatSortedU.map((_, i) => i)],

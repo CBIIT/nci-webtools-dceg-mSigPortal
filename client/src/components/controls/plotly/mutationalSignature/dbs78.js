@@ -109,7 +109,10 @@ export default function DBS78(data, sample) {
     xaxis: {
       showline: true,
       tickangle: -90,
-      tickfont: { size: 11 },
+      tickfont: {
+        family: 'Courier New, monospace',
+        color: '#808080',
+      },
       tickmode: 'array',
       tickvals: mutationTypeNames.map((_, i) => i),
       ticktext: mutationTypeNames.map((e) => e.mutationType.slice(-2)),

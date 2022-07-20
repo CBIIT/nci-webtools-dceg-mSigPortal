@@ -540,9 +540,9 @@ export default function SBS96(data, sample) {
       showticklabels: false,
       showline: true,
       tickangle: -90,
-      // tickfont: {
-      //   size: 8,
-      // },
+      tickfont: {
+        family: 'Courier New, monospace',
+      },
       tickmode: 'array',
       tickvals: flatSorted.map((_, i) => i),
       ticktext: flatSorted.map((e) => e.mutationType),
@@ -562,6 +562,9 @@ export default function SBS96(data, sample) {
       domain: [0.72, 1],
       tickformat: '~s',
       showgrid: false,
+      tickfont: {
+        family: 'Courier New, monospace',
+      },
     },
     yaxis2: {
       autorange: true,
@@ -570,10 +573,10 @@ export default function SBS96(data, sample) {
       ticks: '',
       mirror: 'all',
       anchor: 'x',
-      tickfont: {
-        size: 8,
-      },
       domain: [0.54, 0.715],
+      tickfont: {
+        family: 'Courier New, monospace',
+      },
     },
     yaxis3: {
       autorange: true,
@@ -583,7 +586,7 @@ export default function SBS96(data, sample) {
       mirror: 'all',
       anchor: 'x',
       tickfont: {
-        size: 8,
+        family: 'Courier New, monospace',
       },
       domain: [0.36, 0.535],
     },
@@ -596,7 +599,7 @@ export default function SBS96(data, sample) {
       anchor: 'x',
       //dtick: 1,
       tickfont: {
-        size: 8,
+        family: 'Courier New, monospace',
       },
       domain: [0, 0.35],
     },

@@ -115,7 +115,10 @@ export default function SBS96(data, sample) {
     xaxis: {
       showline: true,
       tickangle: -90,
-      tickfont: { size: 11 },
+      tickfont: {
+        family: 'Courier New, monospace',
+        color: '#A0A0A0',
+      },
       tickmode: 'array',
       tickvals: mutationTypeNames.map((_, i) => i),
       ticktext: mutationTypeNames.map((e) =>
