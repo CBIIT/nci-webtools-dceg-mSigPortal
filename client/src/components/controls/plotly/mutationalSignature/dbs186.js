@@ -8,8 +8,6 @@ export default function DBS186(data, sample) {
 
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
-  //console.log("data");
-  //console.log(data);
 
   const arrayDataT = [];
   const arrayDataU = [];
@@ -103,7 +101,7 @@ export default function DBS186(data, sample) {
       align: 'center',
     })
   );
-  //console.log(annotations);
+
   const shapes1 = Object.entries(T_groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
       type: 'rect',
@@ -158,8 +156,6 @@ export default function DBS186(data, sample) {
     })
   );
 
-  //console.log(shapes);
-
   const sampleAnnotation = {
     xref: 'paper',
     yref: 'paper',
@@ -195,7 +191,6 @@ export default function DBS186(data, sample) {
       borderwidth: 1,
     },
     xaxis: {
-      //title: "Double Substitution",
       showticklabels: true,
       showline: true,
       tickangle: -90,
@@ -230,9 +225,6 @@ export default function DBS186(data, sample) {
     shapes: [...shapes1, ...shapes2],
     annotations: [...annotations, sampleAnnotation],
   };
-
-  //console.log("layout");
-  //console.log(layout);
 
   return { traces, layout };
 }

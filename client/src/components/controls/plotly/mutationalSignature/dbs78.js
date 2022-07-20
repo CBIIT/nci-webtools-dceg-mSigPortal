@@ -133,8 +133,5 @@ export default function DBS78(data, sample) {
     annotations: [...mutationAnnotation, sampleAnnotation],
   };
 
-  //console.log("layout");
-  //console.log(layout);
-
   return { traces, layout };
 }
