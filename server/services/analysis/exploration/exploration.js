@@ -63,7 +63,9 @@ async function tmb(req, res, next) {
     const connection = req.app.locals.connection;
 
     const columns = ['cancer', 'sample', 'exposure'];
-    const data = await getExposureData(connection, query, columns, limit);
+    const data = (
+      await getExposureData(connection, query, columns, limit)
+    ).filter((e) => e.exposure);
     const tmb = calculateTmb(data, query.study);
     res.json(tmb);
   } catch (error) {
@@ -77,11 +79,10 @@ async function tmbSignature(req, res, next) {
     const connection = req.app.locals.connection;
 
     const columns = ['sample', 'signatureName', 'exposure'];
-    const data = await getExposureData(connection, query, columns, limit);
-    const tmbSignature = calculateTmbSignature(
-      data.filter((e) => e.exposure),
-      query.study
-    );
+    const data = (
+      await getExposureData(connection, query, columns, limit)
+    ).filter((e) => e.exposure);
+    const tmbSignature = calculateTmbSignature(data, query.study);
     res.json(tmbSignature);
   } catch (error) {
     next(error);
