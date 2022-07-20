@@ -193,7 +193,7 @@ export default function DBS186(data, sample) {
       tickangle: -90,
       tickfont: {
         family: 'Courier New, monospace',
-        color: '#808080',
+        size: 22,
       },
       tickmode: 'array',
       tickvals: T_flatSorted.map((_, i) => i),

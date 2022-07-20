@@ -161,10 +161,10 @@ export default function SBS96(data, sample) {
   );
 
   let heatmapY2_c = [
-    heatmapY2[0][0].charAt(0) + '----N',
-    heatmapY2[0][16].charAt(0) + '----N',
-    heatmapY2[0][32].charAt(0) + '----N',
-    heatmapY2[0][48].charAt(0) + '----N',
+    heatmapY2[0][0].charAt(0) + '--N',
+    heatmapY2[0][16].charAt(0) + '--N',
+    heatmapY2[0][32].charAt(0) + '--N',
+    heatmapY2[0][48].charAt(0) + '--N',
   ];
 
   let heatMapZ2_0 = chunks(heatmapZ2[0], 16);
@@ -283,10 +283,10 @@ export default function SBS96(data, sample) {
   );
 
   let heatmapY3_c = [
-    'N----' + heatmapY3[0][0].charAt(heatmapY3[0][0].length - 1),
-    'N----' + heatmapY3[0][16].charAt(heatmapY3[0][16].length - 1),
-    'N----' + heatmapY3[0][32].charAt(heatmapY3[0][32].length - 1),
-    'N----' + heatmapY3[0][48].charAt(heatmapY3[0][48].length - 1),
+    'N--' + heatmapY3[0][0].charAt(heatmapY3[0][0].length - 1),
+    'N--' + heatmapY3[0][16].charAt(heatmapY3[0][16].length - 1),
+    'N--' + heatmapY3[0][32].charAt(heatmapY3[0][32].length - 1),
+    'N--' + heatmapY3[0][48].charAt(heatmapY3[0][48].length - 1),
   ];
 
   let heatMapZ3_0 = chunks(heatmapZ3[0], 16);
@@ -350,7 +350,7 @@ export default function SBS96(data, sample) {
           : 0
       );
       //console.log(value);
-      heatmapY.push(key.charAt(0) + '----' + key.charAt(key.length - 1));
+      heatmapY.push(key.charAt(0) + '--' + key.charAt(key.length - 1));
 
       //console.log(totalMutations);
       //console.log(value);
@@ -419,7 +419,7 @@ export default function SBS96(data, sample) {
       (e, i) =>
         array.slice(0, index).reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
     ),
-    test: heatmapY.map((a) => a.replace('----', `%{x}`)),
+    test: heatmapY.map((a) => a.replace('--', `%{x}`)),
     array: array,
     num: num,
     xgap: 0.1,
@@ -504,7 +504,7 @@ export default function SBS96(data, sample) {
     showarrow: false,
     font: {
       size: 8,
-      //   color: colors[num.mutationType.substring(2, 5)],
+      family: 'Courier New, monospace',
     },
     align: 'center',
     num: num,
@@ -542,6 +542,7 @@ export default function SBS96(data, sample) {
       tickangle: -90,
       tickfont: {
         family: 'Courier New, monospace',
+        size: 8,
       },
       tickmode: 'array',
       tickvals: flatSorted.map((_, i) => i),
@@ -564,6 +565,7 @@ export default function SBS96(data, sample) {
       showgrid: false,
       tickfont: {
         family: 'Courier New, monospace',
+        size: 8,
       },
     },
     yaxis2: {
@@ -576,6 +578,7 @@ export default function SBS96(data, sample) {
       domain: [0.54, 0.715],
       tickfont: {
         family: 'Courier New, monospace',
+        size: 8,
       },
     },
     yaxis3: {
@@ -587,6 +590,7 @@ export default function SBS96(data, sample) {
       anchor: 'x',
       tickfont: {
         family: 'Courier New, monospace',
+        size: 8,
       },
       domain: [0.36, 0.535],
     },
@@ -600,6 +604,7 @@ export default function SBS96(data, sample) {
       //dtick: 1,
       tickfont: {
         family: 'Courier New, monospace',
+        size: 8,
       },
       domain: [0, 0.35],
     },

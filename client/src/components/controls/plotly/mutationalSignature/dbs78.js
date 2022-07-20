@@ -111,7 +111,6 @@ export default function DBS78(data, sample) {
       tickangle: -90,
       tickfont: {
         family: 'Courier New, monospace',
-        color: '#808080',
       },
       tickmode: 'array',
       tickvals: mutationTypeNames.map((_, i) => i),
