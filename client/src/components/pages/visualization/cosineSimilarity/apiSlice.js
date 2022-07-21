@@ -26,10 +26,12 @@ export const cosineSimilarityApiSlice = apiSlice.injectEndpoints({
     cosineSignatureSets: builder.query({
       query: (params) => ({ url: 'signature', params }),
       transformResponse: (data) =>
-        data
-          .map((e) => e.signatureSetName)
+        [...new Set(data.map((e) => e.signatureSetName))]
           .sort((a, b) =>
-            a.localeCompare(b, undefined, { sensitivity: 'base' })
+            a.localeCompare(b, undefined, {
+              numeric: true,
+              sensitivity: 'base',
+            })
           )
           .map((e) => ({ label: e, value: e })),
     }),
