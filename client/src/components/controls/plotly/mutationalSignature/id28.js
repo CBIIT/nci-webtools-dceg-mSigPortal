@@ -13,7 +13,6 @@ export default function ID28(data, sample) {
     '1:Ins:T': 'white',
     'o:': '#1764AA',
   };
-  console.log(data);
   const arrayIDAnnXTop = ['1bp Deletion', '1bp Insertion', '>1bp'],
     arrayIDAnnXBot = ['Homopolymer Length', 'Homopolymer Length', 'Type'],
     arrayIDAnnXLabel = [5, 17, 25],
@@ -27,7 +26,7 @@ export default function ID28(data, sample) {
 
   const data1 = data.slice(0, data.length - 4);
   const data2 = data.slice(-4);
-  data2.push(data2.shift());
+  //data2.push(data2.shift());
 
   // group data by dominant mutation
   const groupByMutation = data1.reduce((groups, e, i) => {
@@ -114,7 +113,6 @@ export default function ID28(data, sample) {
     });
   });
 
-  console.log(arrayIDAnnotationBot);
   const traces = Object.entries(arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
       name: mutation,
