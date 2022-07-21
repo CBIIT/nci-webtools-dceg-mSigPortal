@@ -336,8 +336,6 @@ export default function ID415(data, sample) {
     });
   });
 
-  console.log(arrayIDAnnotationBot);
-
   const traces = [tracesT, tracesU];
 
   const annotations1 = Object.entries(T_arrayID).map(
