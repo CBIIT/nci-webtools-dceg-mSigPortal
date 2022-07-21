@@ -1,6 +1,4 @@
 export default function ID28(data, sample) {
-  //.log("data");
-  //console.log(data);
   const colors = {
     '1:Del:C': '#FBBD6F',
     '1:Del:T': '#FE8002',
@@ -340,7 +338,6 @@ export default function ID28(data, sample) {
       sampleAnnotation,
     ],
   };
-  //console.log("layout");
-  //console.log(layout);
+
   return { traces, layout };
 }
