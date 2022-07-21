@@ -24,8 +24,8 @@ const {
 } = require('../services/apiAnalysis');
 
 const visualizationRoutes = require('../services/analysis/visualization/visualization');
-
 const explorationRoutes = require('../services/analysis/exploration/exploration');
+const signatureRoutes = require('../services/analysis/signature/signature');
 
 const router = express.Router();
 
@@ -80,6 +80,7 @@ router.post('/associationWrapper', associationWrapper);
 
 // visualization
 router.use(visualizationRoutes);
+router.use(signatureRoutes);
 
 // exploration
 router.use(explorationRoutes);

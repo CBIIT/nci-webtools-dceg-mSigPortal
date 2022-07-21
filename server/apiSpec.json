@@ -83,95 +83,24 @@
             "value": "96"
           },
           {
-            "name": "limit",
+            "name": "mutationType",
             "in": "query",
-            "description": "Limit response size",
+            "description": "select mutation type",
             "required": false,
             "schema": {
               "type": "string"
             },
-            "value": "10"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Query Signature Data"
-          },
-          "500": {
-            "description": "API error"
-          }
-        }
-      }
-    },
-    "/api/mutationalProfiles": {
-      "get": {
-        "tags": ["Visualization"],
-        "summary": "Retrieves seqmatrix mutational profile data",
-        "produces": ["application/json"],
-        "parameters": [
-          {
-            "name": "study",
-            "in": "query",
-            "description": "Select which study to query data from.",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": ["PCAWG"]
-            },
-            "value": "PCAWG"
+            "value": ""
           },
           {
-            "name": "cancer",
+            "name": "mutations",
             "in": "query",
-            "description": "Select cancer belonging to the study",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "value": "Lung-AdenoCA"
-          },
-          {
-            "name": "strategy",
-            "in": "query",
-            "description": "Select strategy (dataset) of the study.",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": ["WGS"]
-            },
-            "value": "WGS"
-          },
-          {
-            "name": "sample",
-            "in": "query",
-            "description": "Select sample.",
+            "description": "select mutations value",
             "required": false,
             "schema": {
               "type": "string"
             },
-            "value": "SP50263"
-          },
-          {
-            "name": "profile",
-            "in": "query",
-            "description": "Select a profile type to filter data by.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": ["SBS", "DBS", "ID"]
-            },
-            "value": "SBS"
-          },
-          {
-            "name": "matrix",
-            "in": "query",
-            "description": "Select a matrix size that coresponds to the profile.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": ["96", "83", "78"]
-            },
-            "value": "96"
+            "value": ""
           },
           {
             "name": "limit",
@@ -236,6 +165,56 @@
               ]
             },
             "value": "COSMIC_v3_Signatures_GRCh37_SBS96"
+          },
+          {
+            "name": "organ",
+            "in": "query",
+            "description": "select organ",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "sample",
+            "in": "query",
+            "description": "select sample",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "signatureSetName",
+            "in": "query",
+            "description": "select signature set",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "signatureName",
+            "in": "query",
+            "description": "select signature",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "exposure",
+            "in": "query",
+            "description": "select exposure value",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
           },
           {
             "name": "limit",
@@ -303,75 +282,63 @@
             "value": "COSMIC_v3_Signatures_GRCh37_SBS96"
           },
           {
-            "name": "limit",
+            "name": "signatureName",
             "in": "query",
-            "description": "Limit response size",
+            "description": "select signature",
             "required": false,
             "schema": {
               "type": "string"
             },
-            "value": "10"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation"
-          },
-          "500": {
-            "description": "API error"
-          }
-        }
-      }
-    },
-    "/api/tmb": {
-      "get": {
-        "tags": ["Exploration"],
-        "summary": "Retrives TMB data for selected exposure dataset",
-        "produces": ["application/json"],
-        "parameters": [
-          {
-            "name": "study",
-            "in": "query",
-            "description": "Select which study to query data from.",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": ["PCAWG"]
-            },
-            "value": "PCAWG"
+            "value": ""
           },
           {
-            "name": "strategy",
+            "name": "source",
             "in": "query",
-            "description": "Select strategy (dataset) to filter data by.",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": ["WGS"]
-            },
-            "value": "WGS"
-          },
-          {
-            "name": "signatureSetName",
-            "in": "query",
-            "description": "Select signature set to filter data by.",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "COSMIC_v3_Signatures_GRCh37_SBS96",
-                "COSMIC_v3_Signatures_GRCh37_DBS78",
-                "COSMIC_v3_Signatures_GRCh37_ID83"
-              ]
-            },
-            "value": "COSMIC_v3_Signatures_GRCh37_SBS96"
-          },
-          {
-            "name": "signatureName",
-            "in": "query",
-            "description": "Select a signatureName to filter data by",
+            "description": "select source",
             "required": false,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "strandInfo",
+            "in": "query",
+            "description": "select strandInfo",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "strand",
+            "in": "query",
+            "description": "select strand",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "mutationType",
+            "in": "query",
+            "description": "select mutationType",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "contribution",
+            "in": "query",
+            "description": "select contribution value",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
             "value": ""
           },
           {
@@ -379,78 +346,6 @@
             "in": "query",
             "description": "Limit response size",
             "required": false,
-            "schema": { "type": "string" },
-            "value": "10"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation"
-          },
-          "500": {
-            "description": "API error"
-          }
-        }
-      }
-    },
-    "/api/tmbSignature": {
-      "get": {
-        "tags": ["Exploration"],
-        "summary": "Retrives TMB Signature data for selected exposure dataset and cancer",
-        "produces": ["application/json"],
-        "parameters": [
-          {
-            "name": "study",
-            "in": "query",
-            "description": "Select which study to query data from.",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": ["PCAWG"]
-            },
-            "value": "PCAWG"
-          },
-          {
-            "name": "strategy",
-            "in": "query",
-            "description": "Select strategy (dataset) to filter data by.",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": ["WGS"]
-            },
-            "value": "WGS"
-          },
-          {
-            "name": "signatureSetName",
-            "in": "query",
-            "description": "Select signature set to filter data by.",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "COSMIC_v3_Signatures_GRCh37_SBS96",
-                "COSMIC_v3_Signatures_GRCh37_DBS78",
-                "COSMIC_v3_Signatures_GRCh37_ID83"
-              ]
-            },
-            "value": "COSMIC_v3_Signatures_GRCh37_SBS96"
-          },
-          {
-            "name": "cancer",
-            "in": "query",
-            "description": "Select cancer to filter data by.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "value": "Lung-AdenoCA"
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "Limit response size",
-            "required": true,
             "schema": {
               "type": "string"
             },

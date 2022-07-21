@@ -31,7 +31,7 @@ export default function MsBurden(data, signatureName) {
   console.log(totalSamples);
 
   const absYValue = data
-    .map((o) => o.samples.map((e) => Math.abs(e.tmb)))
+    .map((o) => o.samples.map((e) => Math.abs(e.burden)))
     .flat();
   const yMax = Math.max(...absYValue);
 
@@ -43,8 +43,8 @@ export default function MsBurden(data, signatureName) {
     type: 'scatter',
     marker: { symbol: 'circle-open', size: 3, color: 'black' },
     mode: 'markers',
-    y: element.samples.map((e) => e.tmb),
-    // average: average(element.samples.map((e) => e.tmb)),
+    y: element.samples.map((e) => e.burden),
+    // average: average(element.samples.map((e) => e.burden)),
     hovertemplate: 'Number of mutations: %{y}<br>',
     // x: element.samples.map(
     //   (e, i) =>
@@ -173,8 +173,8 @@ export default function MsBurden(data, signatureName) {
     x0: index + 0.1,
     x1: index + 0.9,
 
-    y0: element.medianTmb,
-    y1: element.medianTmb,
+    y0: element.medianBurden,
+    y1: element.medianBurden,
     line: {
       width: 1,
       color: 'red',

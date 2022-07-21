@@ -1,7 +1,11 @@
 const { Router } = require('express');
 const { v4: uuidv4 } = require('uuid');
-const { getExposureData } = require('../../query');
-const { calculateTmb, calculateTmbSignature } = require('./tmb');
+const {
+  getExposureData,
+  getSeqmatrixData,
+  getSignatureData,
+} = require('../../query');
+const { addBurden } = require('./burden');
 
 function alphaNumericSort(array) {
   return array.sort((a, b) => {
@@ -16,9 +20,9 @@ async function queryExposure(req, res, next) {
     const { limit, ...query } = req.query;
     const connection = req.app.locals.connection;
 
-    const columns = ['sample', 'signatureName', 'exposure'];
+    const columns = '*';
     const data = await getExposureData(connection, query, columns, limit);
-    res.json(data);
+    res.json(addBurden(data));
   } catch (error) {
     next(error);
   }
@@ -57,44 +61,10 @@ async function explorationSamples(req, res, next) {
   }
 }
 
-async function tmb(req, res, next) {
-  try {
-    const { limit, ...query } = req.query;
-    const connection = req.app.locals.connection;
-
-    const columns = ['cancer', 'sample', 'exposure'];
-    const data = (
-      await getExposureData(connection, query, columns, limit)
-    ).filter((e) => e.exposure);
-    const tmb = calculateTmb(data, query.study);
-    res.json(tmb);
-  } catch (error) {
-    next(error);
-  }
-}
-
-async function tmbSignature(req, res, next) {
-  try {
-    const { limit, ...query } = req.query;
-    const connection = req.app.locals.connection;
-
-    const columns = ['sample', 'signatureName', 'exposure'];
-    const data = (
-      await getExposureData(connection, query, columns, limit)
-    ).filter((e) => e.exposure);
-    const tmbSignature = calculateTmbSignature(data, query.study);
-    res.json(tmbSignature);
-  } catch (error) {
-    next(error);
-  }
-}
-
 const router = Router();
 
 router.get('/exposure', queryExposure);
 router.get('/explorationOptions', explorationOptions);
 router.get('/explorationSamples', explorationSamples);
-router.get('/tmb', tmb);
-router.get('/tmbSignature', tmbSignature);
 
 module.exports = router;
