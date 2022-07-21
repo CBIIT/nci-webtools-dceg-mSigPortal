@@ -1,6 +1,10 @@
 const { Router } = require('express');
 const { v4: uuidv4 } = require('uuid');
-const { getSeqmatrixData, getSignatureData } = require('../../query');
+const {
+  getSeqmatrixData,
+  getSignatureData,
+  getSeqmatrixOptions,
+} = require('../../query');
 
 // query public seqmatrix data for visualization tab
 async function visualizationOptions(req, res, next) {
@@ -8,8 +12,8 @@ async function visualizationOptions(req, res, next) {
     const { limit, ...query } = req.query;
     const connection = req.app.locals.connection;
 
-    const columns = ['study', 'cancer', 'strategy'];
-    const data = await getSeqmatrixData(connection, query, columns, limit);
+    const columns = '*';
+    const data = await getSeqmatrixOptions(connection, query, columns, limit);
     const projectID = uuidv4();
 
     res.json({ data, projectID });
