@@ -15,7 +15,7 @@ import ID415 from '../../../controls/plotly/mutationalSignature/id415';
 export const mutationalProfilesApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     mutationalProfiles: builder.query({
-      query: (params) => ({ url: 'mutationalProfiles', params }),
+      query: (params) => ({ url: 'seqmatrix', params }),
       transformResponse: (data, meta, args) => {
         const { profile, matrix, sample } = args;
         const profileMatrix = profile + matrix;

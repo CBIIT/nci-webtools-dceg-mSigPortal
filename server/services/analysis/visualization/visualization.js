@@ -34,32 +34,6 @@ async function visualizationSamples(req, res, next) {
   }
 }
 
-async function mutationalProfiles(req, res, next) {
-  try {
-    const { limit, ...query } = req.query;
-    const connection = req.app.locals.connection;
-
-    const columns = ['mutationType', 'mutations'];
-    const data = await getSeqmatrixData(connection, query, columns, limit);
-    res.json(data);
-  } catch (error) {
-    next(error);
-  }
-}
-
-async function profilerSummary(req, res, next) {
-  try {
-    const { limit, ...query } = req.query;
-    const connection = req.app.locals.connection;
-
-    const columns = ['sample', 'profile', 'mutations'];
-    const data = await getSeqmatrixData(connection, query, columns, limit);
-    res.json(data);
-  } catch (error) {
-    next(error);
-  }
-}
-
 async function querySeqmatrix(req, res, next) {
   try {
     const { limit, ...query } = req.query;
@@ -92,7 +66,5 @@ router.get('/seqmatrix', querySeqmatrix);
 router.get('/signature', querySignature);
 router.get('/visualizationOptions', visualizationOptions);
 router.get('/visualizationSamples', visualizationSamples);
-router.get('/mutationalProfiles', mutationalProfiles);
-router.get('/profilerSummary', profilerSummary);
 
 module.exports = router;
