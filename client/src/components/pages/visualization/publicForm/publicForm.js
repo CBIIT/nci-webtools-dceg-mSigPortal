@@ -85,16 +85,24 @@ export default function PublicForm() {
   }
 
   const studyOptions = data
-    ? Object.keys(data).map((e) => ({ label: e, value: e }))
+    ? [...new Set(data.map((e) => e.study))].sort().map((e) => ({
+        label: e,
+        value: e,
+      }))
     : [];
 
   const cancerOptions = (study) => {
     if (data && study.value) {
-      const options = Object.keys(data[study.value]).map((e) => ({
-        label: e,
-        value: e,
-      }));
-      return options;
+      return [
+        ...new Set(
+          data.filter((e) => e.study == study.value).map((e) => e.cancer)
+        ),
+      ]
+        .sort()
+        .map((e) => ({
+          label: e,
+          value: e,
+        }));
     } else {
       return [];
     }
@@ -102,16 +110,18 @@ export default function PublicForm() {
 
   const strategyOptions = (study, cancer) => {
     if (data && study.value && cancer.value) {
-      const strategies = data[study.value][cancer.value];
-      if (strategies) {
-        const options = Object.values(strategies).map((e) => ({
+      return [
+        ...new Set(
+          data
+            .filter((e) => e.study == study.value && e.cancer == cancer.value)
+            .map((e) => e.strategy)
+        ),
+      ]
+        .sort()
+        .map((e) => ({
           label: e,
           value: e,
         }));
-        return options;
-      } else {
-        return [];
-      }
     } else {
       return [];
     }
@@ -140,7 +150,7 @@ export default function PublicForm() {
         className="mb-2"
         name="study"
         label="Study"
-        disabled={submitted}
+        disabled={submitted || isFetching}
         options={studyOptions}
         control={control}
         onChange={handleStudyChange}
@@ -149,7 +159,7 @@ export default function PublicForm() {
         className="mb-2"
         name="cancer"
         label="Cancer Type or Group"
-        disabled={submitted}
+        disabled={submitted || isFetching}
         options={cancerOptions(formStudy)}
         control={control}
         onChange={handleCancerChange}
@@ -158,7 +168,7 @@ export default function PublicForm() {
         className="mb-4"
         name="strategy"
         label="Experimental Strategy"
-        disabled={submitted}
+        disabled={submitted || isFetching}
         options={strategyOptions(formStudy, formCancer)}
         control={control}
       />
