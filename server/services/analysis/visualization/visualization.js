@@ -65,7 +65,7 @@ async function querySeqmatrix(req, res, next) {
     const { limit, ...query } = req.query;
     const connection = req.app.locals.connection;
 
-    const columns = ['mutationType', 'mutations'];
+    const columns = '*';
     const data = await getSeqmatrixData(connection, query, columns, limit);
     res.json(data);
   } catch (error) {
@@ -78,15 +78,7 @@ async function querySignature(req, res, next) {
     const { limit, ...query } = req.query;
     const connection = req.app.locals.connection;
 
-    const columns = !query.signatureSetName
-      ? ['signatureSetName']
-      : [
-          'strandInfo',
-          'strand',
-          'signatureName',
-          'mutationType',
-          'contribution',
-        ];
+    const columns = '*';
     const data = await getSignatureData(connection, query, columns, limit);
     res.json(data);
   } catch (error) {
