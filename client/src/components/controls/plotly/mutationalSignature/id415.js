@@ -1,6 +1,4 @@
 export default function ID415(data, sample) {
-  // console.log("data");
-  // console.log(data);
   const colors = {
     '1:Del:C': '#FBBD6F',
     '1:Del:T': '#FE8002',
@@ -56,28 +54,22 @@ export default function ID415(data, sample) {
     arrayIDAnnotationTop = [],
     arrayIDAnnotationBot = [];
 
-  const numberWithCommas = (x) =>
-    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
-  const arrayDataT = [];
-  const arrayDataU = [];
+  const transcribed = data.filter((e) => /^T:/.test(e.mutationType));
+  const untranscribed = data.filter((e) => /^U:/.test(e.mutationType));
 
-  Object.values(data).forEach((group) => {
-    if (group.mutationType.substring(0, 1) === 'T') {
-      arrayDataT.push(group);
-    } else if (group.mutationType.substring(0, 1) === 'U') {
-      arrayDataU.push(group);
-    }
-  });
+  const totalMutations =
+    transcribed.reduce((total, e) => total + e.mutations, 0) +
+    untranscribed.reduce((total, e) => total + e.mutations, 0);
 
-  const totalMutations = [...arrayDataT, ...arrayDataU].reduce(
-    (a, e) => a + parseInt(e.mutations),
-    0
+  const maxMutation = Math.max(
+    ...[
+      ...transcribed.map((e) => e.mutations),
+      ...untranscribed.map((e) => e.mutations),
+    ]
   );
-  const dataUT = [...arrayDataT, ...arrayDataU];
-  const maxVal = Math.max(...dataUT.map((o) => o.mutations));
 
   ///// --------- T Group ------------///////
-  const T_groupByMutation = arrayDataT.reduce((groups, e, i) => {
+  const T_groupByMutation = transcribed.reduce((groups, e, i) => {
     const mutationRegex = /^.{2,9}/;
     const mutation = e.mutationType.match(mutationRegex)[0];
     const signature = {
@@ -94,7 +86,7 @@ export default function ID415(data, sample) {
     Object.entries(T_groupByMutation).slice(0, 4)
   );
 
-  const T_groupByMutationID = arrayDataT.reduce((groups, e) => {
+  const T_groupByMutationID = transcribed.reduce((groups, e) => {
     let mutationID;
     mutationID = e.mutationType.match(
       e.mutationType.substring(
@@ -178,7 +170,7 @@ export default function ID415(data, sample) {
   const T_flatSorted = Object.values(T_arrayID).flat();
 
   ///// --------- U Group ------------///////
-  const U_groupByMutation = arrayDataU.reduce((groups, e, i) => {
+  const U_groupByMutation = untranscribed.reduce((groups, e, i) => {
     const mutationRegex = /^.{2,9}/;
     const mutation = e.mutationType.match(mutationRegex)[0];
     const signature = {
@@ -195,7 +187,7 @@ export default function ID415(data, sample) {
     Object.entries(U_groupByMutation).slice(0, 4)
   );
 
-  const U_groupByMutationID = arrayDataU.reduce((groups, e) => {
+  const U_groupByMutationID = untranscribed.reduce((groups, e) => {
     let mutationID;
     mutationID = e.mutationType.match(
       e.mutationType.substring(
@@ -302,6 +294,7 @@ export default function ID415(data, sample) {
   };
 
   Object.values(T_arrayID).forEach((group) => {
+    console.log(group);
     if (group.length > 1) {
       arrayIDAnnotationTop.push(
         group[Math.floor(group.length / 2)].mutationType
@@ -310,9 +303,40 @@ export default function ID415(data, sample) {
       arrayIDAnnotationTop.push(group[0].mutationType);
     }
     group.forEach((e) => {
-      arrayIDAnnotationBot.push(e.mutationType);
+      let lastNum = e.mutationType.substring(
+        e.mutationType.length - 1,
+        e.mutationType.length
+      );
+      let newNum;
+      if (
+        e.mutationType.substring(4, 9) === 'Del:C' ||
+        e.mutationType.substring(4, 9) === 'Del:T' ||
+        e.mutationType.substring(4, 9) === 'Del:R'
+      ) {
+        lastNum = +lastNum + 1;
+      }
+      if (
+        (e.mutationType.substring(4, 9) === 'Del:C' ||
+          e.mutationType.substring(4, 9) === 'Del:T' ||
+          e.mutationType.substring(4, 9) === 'Del:R') &
+        (+lastNum > 5)
+      ) {
+        newNum = lastNum + '+';
+      } else if (
+        e.mutationType.substring(4, 9) !== 'Del:C' &&
+        e.mutationType.substring(4, 9) !== 'Del:T' &&
+        e.mutationType.substring(4, 9) !== 'Del:R' &&
+        +lastNum > 4
+      ) {
+        newNum = lastNum + '+';
+      } else {
+        newNum = lastNum;
+      }
+      arrayIDAnnotationBot.push(newNum);
     });
   });
+
+  console.log(arrayIDAnnotationBot);
 
   const traces = [tracesT, tracesU];
 
@@ -357,10 +381,11 @@ export default function ID415(data, sample) {
     yanchor: 'bottom',
     x: index,
     y: -0.1,
-    text: '<b>' + num.substring(num.length - 1, num.length) + '</b>',
+    text: '<b>' + num + '</b>',
     showarrow: false,
     font: {
-      size: 14,
+      size: 12,
+      family: 'Times New Roman',
     },
     align: 'center',
   }));
@@ -375,7 +400,8 @@ export default function ID415(data, sample) {
     text: '<b>' + arrayIDAnnXTop[index] + '</b>',
     showarrow: false,
     font: {
-      size: 14,
+      size: 16,
+      family: 'Times New Roman',
     },
     align: 'center',
   }));
@@ -472,7 +498,8 @@ export default function ID415(data, sample) {
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     height: 500,
-    //width:1080,
+    //width: 1080,
+    autosize: true,
     legend: {
       x: 1,
       xanchor: 'right',
@@ -504,7 +531,7 @@ export default function ID415(data, sample) {
         },
       },
       autorange: false,
-      range: [0, maxVal + maxVal * 0.2],
+      range: [0, maxMutation + maxMutation * 0.2],
       linecolor: 'black',
       linewidth: 1,
       mirror: true,
@@ -519,7 +546,6 @@ export default function ID415(data, sample) {
       sampleAnnotation,
     ],
   };
-  //console.log("layout");
-  //console.log(layout);
+
   return { traces, layout };
 }

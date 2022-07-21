@@ -38,7 +38,7 @@ export default function ID83(unsortedData, sample) {
       'Homopolymer Length',
       'Number of Repeat Units',
       'Number of Repeat Units',
-      'Microhimology Length',
+      'Microhomology Length',
     ],
     arrayIDAnnXLabel = [5, 18.5, 35, 60, 76];
 
@@ -50,11 +50,17 @@ export default function ID83(unsortedData, sample) {
   const maxMutation = Math.max(
     ...data.map((indel) => indel.data.map((e) => e.mutations)).flat()
   );
+
+  console.log(data);
   const indelNames = data
     .map((indel) =>
       indel.data.map((e) => ({
         indel: indel.indel,
-        index: e.mutationType.slice(-1),
+        index:
+          indel.indel.substring(2, 5) == 'Del'
+            ? +e.mutationType.slice(-1) + 1
+            : e.mutationType.slice(-1),
+        //index: e.mutationType.slice(-1),
       }))
     )
     .flat();
@@ -123,7 +129,8 @@ export default function ID83(unsortedData, sample) {
     text: '<b>' + arrayIDAnnXTop[index] + '</b>',
     showarrow: false,
     font: {
-      size: 14,
+      size: 16,
+      family: 'Times New Roman',
     },
     align: 'center',
   }));
