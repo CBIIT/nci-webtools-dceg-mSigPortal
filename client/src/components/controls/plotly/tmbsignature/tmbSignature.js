@@ -18,7 +18,7 @@ export default function TMBSignature(data) {
     const sample = e.sample;
     const signature = {
       sample: e.sample,
-      tmb: e.tmb,
+      burden: e.burden,
     };
     groups[sample] = groups[sample]
       ? [...groups[sample], signature]
@@ -26,11 +26,8 @@ export default function TMBSignature(data) {
     return groups;
   }, {});
 
-  //console.log(groupBySample);
-  const totalSamples = Object.keys(groupBySample).length;
-
   const absYValue = data
-    .map((o) => o.samples.map((e) => Math.abs(e.tmb)))
+    .map((o) => o.samples.map((e) => Math.abs(e.burden)))
     .flat();
   const yMax = Math.max(...absYValue);
 
@@ -42,7 +39,7 @@ export default function TMBSignature(data) {
     type: 'scatter',
     marker: { symbol: 'circle-open', size: 3, color: 'black' },
     mode: 'markers',
-    y: element.samples.map((e) => e.tmb),
+    y: element.samples.map((e) => e.burden),
     hovertemplate: 'Number of mutations: %{y}<br>',
     x: element.samples.map(
       (e, i) => index + 0.1 + (0.8 / element.samples.length) * i
@@ -107,7 +104,7 @@ export default function TMBSignature(data) {
     yanchor: 'bottom',
     x: (index + index + 1) * 0.5,
     y: -0.18,
-    text: totalSamples,
+    text: element.totalSamples,
     showarrow: false,
     font: {
       size: 12,
@@ -139,8 +136,8 @@ export default function TMBSignature(data) {
     yref: 'y',
     x0: index + 0.1,
     x1: index + 0.9,
-    y0: element.medianTmb,
-    y1: element.medianTmb,
+    y0: element.medianBurden,
+    y1: element.medianBurden,
     line: {
       width: 1,
       color: 'red',
