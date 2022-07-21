@@ -168,7 +168,8 @@ export default function DBS186(data, sample) {
       ' transcribed double subs</b>',
     showarrow: false,
     font: {
-      size: 20,
+      size: 22,
+      family: 'Arial',
     },
     align: 'center',
   };
@@ -208,7 +209,13 @@ export default function DBS186(data, sample) {
       mirror: true,
     },
     yaxis: {
-      title: 'Number of Double Base Substitutions',
+      title: {
+        text: '<b>Number of Double Base Substitutions</b>',
+        font: {
+          family: 'Times New Roman',
+          size: 22,
+        },
+      },
       autorange: false,
       range: [0, maxVal + maxVal * 5],
       linecolor: '#E0E0E0',

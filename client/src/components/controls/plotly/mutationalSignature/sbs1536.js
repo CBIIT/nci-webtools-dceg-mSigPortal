@@ -469,6 +469,7 @@ export default function SBS96(data, sample) {
     showarrow: false,
     font: {
       size: 18,
+      family: 'Arial',
     },
     align: 'center',
   };
@@ -522,7 +523,8 @@ export default function SBS96(data, sample) {
     text: '<b>Number of Single Base Substitutions</b>',
     showarrow: false,
     font: {
-      size: 7,
+      //size: 7,
+      family: 'Times New Roman',
     },
     align: 'center',
     textangle: -90,

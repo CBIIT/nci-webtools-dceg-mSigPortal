@@ -97,6 +97,7 @@ export default function DBS78(data, sample) {
     showarrow: false,
     font: {
       size: 20,
+      family: 'Times New Roman',
     },
     align: 'center',
   };
@@ -120,7 +121,12 @@ export default function DBS78(data, sample) {
       mirror: 'all',
     },
     yaxis: {
-      title: 'Number of Double Base Substitutions',
+      title: {
+        text: '<b>Number of Double Base Substitutions</b>',
+        font: {
+          family: 'Times New Roman',
+        },
+      },
       autorange: false,
       range: [0, maxMutation * 1.2],
       linecolor: 'black',

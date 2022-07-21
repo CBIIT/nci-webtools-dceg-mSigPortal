@@ -57,7 +57,8 @@ export default function SBS24(data, sample) {
         totalMutations.toLocaleString(undefined) +
         ' transcribed subs </b>',
       font: {
-        size: 24,
+        size: 26,
+        family: 'Arial',
       },
       xref: 'paper',
       x: 0.05,
@@ -66,7 +67,8 @@ export default function SBS24(data, sample) {
       title: {
         text: '<b>Number of Single Base Substitutions</b>',
         font: {
-          size: 18,
+          size: 20,
+          family: 'Times New Roman',
         },
       },
       tickfont: {

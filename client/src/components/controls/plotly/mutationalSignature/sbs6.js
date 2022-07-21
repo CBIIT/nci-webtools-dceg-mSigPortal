@@ -34,16 +34,19 @@ export default function SBS6(data, sample) {
         totalMutations.toLocaleString(undefined) +
         ' subs </b>',
       font: {
-        size: 24,
+        size: 26,
+        family: 'Arial',
       },
       xref: 'paper',
-      x: 0.05,
+      x: 0.01,
+      y: 0,
     },
     xaxis: {
       title: {
-        text: '<b>Number of Single Base Substitution</b>',
+        text: '<b>Number of Single Base Substitutions</b>',
         font: {
-          size: 18,
+          size: 22,
+          family: 'Times New Roman',
         },
       },
       tickfont: {

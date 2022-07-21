@@ -277,7 +277,8 @@ export default function SBS288(data, sample) {
       ' subs </b>',
     showarrow: false,
     font: {
-      size: 20,
+      size: 22,
+      family: 'Arial',
     },
     align: 'center',
   };
@@ -365,7 +366,12 @@ export default function SBS288(data, sample) {
       domain: [0, 0.75],
     },
     yaxis: {
-      title: 'Number of Single Base Substitutions',
+      title: {
+        text: '<b>Number of Single Base Substitutions</b>',
+        font: {
+          family: 'Times New Roman',
+        },
+      },
       autorange: false,
       range: [0, maxValTotal + maxValTotal * 0.2],
       linecolor: '#E0E0E0',

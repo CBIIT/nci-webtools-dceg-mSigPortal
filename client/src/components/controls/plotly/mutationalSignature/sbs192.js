@@ -153,7 +153,8 @@ export default function SBS192(data, sample) {
       ' transcribed subs</b>',
     showarrow: false,
     font: {
-      size: 20,
+      size: 22,
+      family: 'Arial',
     },
     align: 'center',
   };
@@ -236,6 +237,7 @@ export default function SBS192(data, sample) {
       tickangle: -90,
       tickfont: {
         family: 'Courier New, monospace',
+        color: '#A0A0A0',
       },
       tickmode: 'array',
       // tickvals: [...flatSortedU.map((_, i) => i)],
@@ -249,7 +251,12 @@ export default function SBS192(data, sample) {
       mirror: 'all',
     },
     yaxis: {
-      title: 'Number of Single Base Substitutions',
+      title: {
+        text: '<b>Number of Single Base Substitutions</b>',
+        font: {
+          family: 'Times New Roman',
+        },
+      },
       autorange: false,
       range: [0, maxVal + maxVal * 0.2],
       linecolor: '#E0E0E0',
