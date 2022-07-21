@@ -97,7 +97,7 @@ export default function DBS78(data, sample) {
     showarrow: false,
     font: {
       size: 24,
-      family: 'Times New Roman',
+      family: 'Arial',
     },
     align: 'center',
   };
