@@ -50,11 +50,17 @@ export default function ID83(unsortedData, sample) {
   const maxMutation = Math.max(
     ...data.map((indel) => indel.data.map((e) => e.mutations)).flat()
   );
+
+  console.log(data);
   const indelNames = data
     .map((indel) =>
       indel.data.map((e) => ({
         indel: indel.indel,
-        index: e.mutationType.slice(-1),
+        index:
+          indel.indel.substring(2, 5) == 'Del'
+            ? +e.mutationType.slice(-1) + 1
+            : e.mutationType.slice(-1),
+        //index: e.mutationType.slice(-1),
       }))
     )
     .flat();

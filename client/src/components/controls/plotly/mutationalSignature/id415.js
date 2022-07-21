@@ -294,6 +294,7 @@ export default function ID415(data, sample) {
   };
 
   Object.values(T_arrayID).forEach((group) => {
+    console.log(group);
     if (group.length > 1) {
       arrayIDAnnotationTop.push(
         group[Math.floor(group.length / 2)].mutationType
@@ -302,9 +303,40 @@ export default function ID415(data, sample) {
       arrayIDAnnotationTop.push(group[0].mutationType);
     }
     group.forEach((e) => {
-      arrayIDAnnotationBot.push(e.mutationType);
+      let lastNum = e.mutationType.substring(
+        e.mutationType.length - 1,
+        e.mutationType.length
+      );
+      let newNum;
+      if (
+        e.mutationType.substring(4, 9) === 'Del:C' ||
+        e.mutationType.substring(4, 9) === 'Del:T' ||
+        e.mutationType.substring(4, 9) === 'Del:R'
+      ) {
+        lastNum = +lastNum + 1;
+      }
+      if (
+        (e.mutationType.substring(4, 9) === 'Del:C' ||
+          e.mutationType.substring(4, 9) === 'Del:T' ||
+          e.mutationType.substring(4, 9) === 'Del:R') &
+        (+lastNum > 5)
+      ) {
+        newNum = lastNum + '+';
+      } else if (
+        e.mutationType.substring(4, 9) !== 'Del:C' &&
+        e.mutationType.substring(4, 9) !== 'Del:T' &&
+        e.mutationType.substring(4, 9) !== 'Del:R' &&
+        +lastNum > 4
+      ) {
+        newNum = lastNum + '+';
+      } else {
+        newNum = lastNum;
+      }
+      arrayIDAnnotationBot.push(newNum);
     });
   });
+
+  console.log(arrayIDAnnotationBot);
 
   const traces = [tracesT, tracesU];
 
@@ -349,10 +381,11 @@ export default function ID415(data, sample) {
     yanchor: 'bottom',
     x: index,
     y: -0.1,
-    text: '<b>' + num.substring(num.length - 1, num.length) + '</b>',
+    text: '<b>' + num + '</b>',
     showarrow: false,
     font: {
-      size: 14,
+      size: 12,
+      family: 'Times New Roman',
     },
     align: 'center',
   }));
