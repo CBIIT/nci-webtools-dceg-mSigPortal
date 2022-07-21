@@ -1,10 +1,6 @@
 const { Router } = require('express');
 const { v4: uuidv4 } = require('uuid');
-const {
-  getSeqmatrixData,
-  getSignatureData,
-  getSeqmatrixOptions,
-} = require('../../query');
+const { getSeqmatrixData, getSeqmatrixOptions } = require('../../query');
 
 // query public seqmatrix data for visualization tab
 async function visualizationOptions(req, res, next) {
@@ -51,23 +47,9 @@ async function querySeqmatrix(req, res, next) {
   }
 }
 
-async function querySignature(req, res, next) {
-  try {
-    const { limit, ...query } = req.query;
-    const connection = req.app.locals.connection;
-
-    const columns = '*';
-    const data = await getSignatureData(connection, query, columns, limit);
-    res.json(data);
-  } catch (error) {
-    next(error);
-  }
-}
-
 const router = Router();
 
 router.get('/seqmatrix', querySeqmatrix);
-router.get('/signature', querySignature);
 router.get('/visualizationOptions', visualizationOptions);
 router.get('/visualizationSamples', visualizationSamples);
 
