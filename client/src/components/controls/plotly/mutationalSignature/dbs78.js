@@ -96,7 +96,7 @@ export default function DBS78(data, sample) {
       ' double subs </b>',
     showarrow: false,
     font: {
-      size: 20,
+      size: 24,
       family: 'Times New Roman',
     },
     align: 'center',
@@ -112,6 +112,7 @@ export default function DBS78(data, sample) {
       tickangle: -90,
       tickfont: {
         family: 'Courier New, monospace',
+        size: 14,
       },
       tickmode: 'array',
       tickvals: mutationTypeNames.map((_, i) => i),
@@ -133,8 +134,10 @@ export default function DBS78(data, sample) {
       linewidth: 1,
       tickformat: '~s',
       ticks: 'inside',
+      tickcolor: '#D3D3D3',
       showgrid: true,
       mirror: 'all',
+      gridcolor: '#F5F5F5',
     },
 
     shapes: shapes,

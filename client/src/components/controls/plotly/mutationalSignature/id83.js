@@ -159,7 +159,7 @@ export default function ID83(unsortedData, sample) {
       ' indels</b>',
     showarrow: false,
     font: {
-      size: 22,
+      size: 24,
       family: 'Arial',
     },
     align: 'center',
@@ -222,7 +222,7 @@ export default function ID83(unsortedData, sample) {
         text: '<b>Number of Indels</b>',
         font: {
           family: 'Times New Roman',
-          size: 20,
+          size: 18,
         },
       },
       autorange: false,

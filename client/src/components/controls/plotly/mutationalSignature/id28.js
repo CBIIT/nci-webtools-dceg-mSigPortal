@@ -204,7 +204,7 @@ export default function ID28(data, sample) {
     yref: 'paper',
     x: num,
     xanchor: 'bottom',
-    y: -0.15,
+    y: -0.16,
     yanchor: 'bottom',
     text: '<b>' + arrayIDAnnXBot[index] + '</b>',
     showarrow: false,
@@ -226,7 +226,7 @@ export default function ID28(data, sample) {
       '<b>' + sample + ': ' + numberWithCommas(totalMutations) + ' indels</b>',
     showarrow: false,
     font: {
-      size: 22,
+      size: 24,
       family: 'Arial',
     },
     align: 'center',

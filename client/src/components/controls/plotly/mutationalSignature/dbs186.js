@@ -168,7 +168,7 @@ export default function DBS186(data, sample) {
       ' transcribed double subs</b>',
     showarrow: false,
     font: {
-      size: 22,
+      size: 24,
       family: 'Arial',
     },
     align: 'center',
@@ -206,7 +206,7 @@ export default function DBS186(data, sample) {
       ),
       linecolor: '#E0E0E0',
       linewidth: 1,
-      mirror: true,
+      mirror: 'all',
     },
     yaxis: {
       title: {
@@ -218,13 +218,16 @@ export default function DBS186(data, sample) {
       },
       autorange: false,
       range: [0, maxVal + maxVal * 5],
+      ticks: 'inside',
       linecolor: '#E0E0E0',
+      tickcolor: '#D3D3D3',
       linewidth: 1,
-      mirror: true,
+      mirror: 'all',
       tickfont: {
         size: 16,
       },
-      showgrid: false,
+      showgrid: true,
+      gridcolor: '#F5F5F5',
     },
 
     shapes: [...shapes1, ...shapes2],

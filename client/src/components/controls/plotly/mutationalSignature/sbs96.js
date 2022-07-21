@@ -75,7 +75,7 @@ export default function SBS96(data, sample) {
       ' subs </b>',
     showarrow: false,
     font: {
-      size: 22,
+      size: 24,
       family: 'Arial',
     },
     align: 'center',
@@ -139,11 +139,13 @@ export default function SBS96(data, sample) {
       autorange: false,
       range: [0, maxMutation * 1.2],
       ticks: 'inside',
+      tickcolor: '#D3D3D3',
       linecolor: '#E0E0E0',
       linewidth: 1,
       mirror: 'all',
       tickformat: '~s',
-      showgrid: false,
+      showgrid: true,
+      gridcolor: '#F5F5F5',
     },
 
     shapes: shapes,

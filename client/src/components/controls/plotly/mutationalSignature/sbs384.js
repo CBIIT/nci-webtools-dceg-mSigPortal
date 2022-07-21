@@ -164,7 +164,7 @@ export default function SBS384(data, sample) {
       ' transcribed subs </b>',
     showarrow: false,
     font: {
-      size: 22,
+      size: 24,
       family: 'Arial',
     },
     align: 'center',
@@ -275,7 +275,7 @@ export default function SBS384(data, sample) {
       },
       autorange: false,
       range: [0, maxVal + maxVal * 0.2],
-      linecolor: '#E0E0E0',
+      tickcolor: '#D3D3D3',
       linewidth: 1,
       mirror: 'all',
       categoryorder: 'category descending',

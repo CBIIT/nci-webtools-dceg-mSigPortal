@@ -61,7 +61,8 @@ export default function SBS24(data, sample) {
         family: 'Arial',
       },
       xref: 'paper',
-      x: 0.05,
+      x: 0.01,
+      y: 0.9,
     },
     xaxis: {
       title: {

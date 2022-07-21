@@ -39,7 +39,7 @@ export default function SBS6(data, sample) {
       },
       xref: 'paper',
       x: 0.01,
-      y: 0,
+      y: 0.9,
     },
     xaxis: {
       title: {
