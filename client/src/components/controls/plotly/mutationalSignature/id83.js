@@ -138,7 +138,8 @@ export default function ID83(unsortedData, sample) {
     text: '<b>' + arrayIDAnnXBot[index] + '</b>',
     showarrow: false,
     font: {
-      size: 14,
+      size: 16,
+      family: 'Times New Roman',
     },
     align: 'center',
   }));
@@ -148,7 +149,7 @@ export default function ID83(unsortedData, sample) {
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
-    x: 0,
+    x: 0.01,
     y: 0.88,
     text:
       '<b>' +
@@ -158,7 +159,8 @@ export default function ID83(unsortedData, sample) {
       ' indels</b>',
     showarrow: false,
     font: {
-      size: 18,
+      size: 24,
+      family: 'Arial',
     },
     align: 'center',
   };
@@ -211,12 +213,18 @@ export default function ID83(unsortedData, sample) {
       tickmode: 'array',
       tickvals: indelNames.map((_, i) => i),
       ticktext: indelNames.map((e) => e.index),
-      linecolor: '#E0E0E0',
+      linecolor: 'black',
       linewidth: 1,
       mirror: 'all',
     },
     yaxis: {
-      title: 'Number of Indels',
+      title: {
+        text: '<b>Number of Indels</b>',
+        font: {
+          family: 'Times New Roman',
+          size: 18,
+        },
+      },
       autorange: false,
       range: [0, maxMutation * 1.2],
       linecolor: 'black',

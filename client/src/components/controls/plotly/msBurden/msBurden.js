@@ -1,13 +1,34 @@
-export default function MsBurden(data) {
+export default function MsBurden(data, signatureName) {
   console.log(data);
   function average(arr) {
     const sum = arr.reduce((a, b) => a + b, 0);
     return sum / arr.length || 0;
   }
 
-  console.log(data);
   const totalCancer = data.length;
   console.log(totalCancer);
+
+  const sampleArray = [];
+  data.map((element, index, array) => {
+    sampleArray.push(element.samples);
+  });
+  const flatSampleArray = sampleArray.flat();
+  const groupBySample = flatSampleArray.reduce((groups, e, i) => {
+    const sample = e.sample;
+    const signature = {
+      sample: e.sample,
+      tmb: e.tmb,
+    };
+    groups[sample] = groups[sample]
+      ? [...groups[sample], signature]
+      : [signature];
+    return groups;
+  }, {});
+
+  console.log(groupBySample);
+  const totalSamples = Object.keys(groupBySample).length;
+
+  console.log(totalSamples);
 
   const absYValue = data
     .map((o) => o.samples.map((e) => Math.abs(e.burden)))

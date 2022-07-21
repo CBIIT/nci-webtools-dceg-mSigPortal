@@ -65,7 +65,7 @@ export default function SBS96(data, sample) {
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
-    x: 0,
+    x: 0.01,
     y: 0.88,
     text:
       '<b>' +
@@ -75,7 +75,8 @@ export default function SBS96(data, sample) {
       ' subs </b>',
     showarrow: false,
     font: {
-      size: 18,
+      size: 24,
+      family: 'Arial',
     },
     align: 'center',
   };
@@ -102,7 +103,7 @@ export default function SBS96(data, sample) {
     const color = colors[mutation];
     const regex = /^(.)\[(.).{2}\](.)$/;
     const match = mutationType.match(regex);
-    return `${match[1]}<span style="color:${color}">${match[2]}</span>${match[3]}`;
+    return `${match[1]}<span style="color:${color}"><b>${match[2]}</b></span>${match[3]}`;
   }
 
   const layout = {
@@ -115,7 +116,10 @@ export default function SBS96(data, sample) {
     xaxis: {
       showline: true,
       tickangle: -90,
-      tickfont: { size: 11 },
+      tickfont: {
+        family: 'Courier New, monospace',
+        color: '#A0A0A0',
+      },
       tickmode: 'array',
       tickvals: mutationTypeNames.map((_, i) => i),
       ticktext: mutationTypeNames.map((e) =>
@@ -126,15 +130,22 @@ export default function SBS96(data, sample) {
       mirror: 'all',
     },
     yaxis: {
-      title: 'Number of Single Base Substitutions',
+      title: {
+        text: '<b>Number of Single Base Substitutions</b>',
+        font: {
+          family: 'Times New Roman',
+        },
+      },
       autorange: false,
       range: [0, maxMutation * 1.2],
       ticks: 'inside',
+      tickcolor: '#D3D3D3',
       linecolor: '#E0E0E0',
       linewidth: 1,
       mirror: 'all',
       tickformat: '~s',
-      showgrid: false,
+      showgrid: true,
+      gridcolor: '#F5F5F5',
     },
 
     shapes: shapes,

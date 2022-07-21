@@ -6,11 +6,6 @@ export default function DBS186(data, sample) {
     'TT>': '#FE8002',
   };
 
-  const numberWithCommas = (x) =>
-    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
-  //console.log("data");
-  //console.log(data);
-
   const arrayDataT = [];
   const arrayDataU = [];
 
@@ -103,7 +98,7 @@ export default function DBS186(data, sample) {
       align: 'center',
     })
   );
-  //console.log(annotations);
+
   const shapes1 = Object.entries(T_groupByMutation).map(
     ([mutation, signatures], groupIndex, array) => ({
       type: 'rect',
@@ -158,24 +153,23 @@ export default function DBS186(data, sample) {
     })
   );
 
-  //console.log(shapes);
-
   const sampleAnnotation = {
     xref: 'paper',
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
-    x: 0,
-    y: 0.88,
+    x: 0.01,
+    y: 0.9,
     text:
       '<b>' +
       sample +
       ': ' +
-      numberWithCommas(totalMutations) +
+      totalMutations.toLocaleString(undefined) +
       ' transcribed double subs</b>',
     showarrow: false,
     font: {
-      size: 18,
+      size: 24,
+      family: 'Arial',
     },
     align: 'center',
   };
@@ -195,12 +189,12 @@ export default function DBS186(data, sample) {
       borderwidth: 1,
     },
     xaxis: {
-      //title: "Double Substitution",
       showticklabels: true,
       showline: true,
       tickangle: -90,
       tickfont: {
-        size: 18,
+        family: 'Courier New, monospace',
+        size: 22,
       },
       tickmode: 'array',
       tickvals: T_flatSorted.map((_, i) => i),
@@ -212,27 +206,33 @@ export default function DBS186(data, sample) {
       ),
       linecolor: '#E0E0E0',
       linewidth: 1,
-      mirror: true,
+      mirror: 'all',
     },
     yaxis: {
-      title: 'Number of Double Base Substitutions',
+      title: {
+        text: '<b>Number of Double Base Substitutions</b>',
+        font: {
+          family: 'Times New Roman',
+          size: 22,
+        },
+      },
       autorange: false,
       range: [0, maxVal + maxVal * 5],
+      ticks: 'inside',
       linecolor: '#E0E0E0',
+      tickcolor: '#D3D3D3',
       linewidth: 1,
-      mirror: true,
+      mirror: 'all',
       tickfont: {
         size: 16,
       },
-      showgrid: false,
+      showgrid: true,
+      gridcolor: '#F5F5F5',
     },
 
     shapes: [...shapes1, ...shapes2],
     annotations: [...annotations, sampleAnnotation],
   };
-
-  //console.log("layout");
-  //console.log(layout);
 
   return { traces, layout };
 }

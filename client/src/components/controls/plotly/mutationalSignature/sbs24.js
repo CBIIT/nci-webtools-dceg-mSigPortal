@@ -33,7 +33,7 @@ export default function SBS24(data, sample) {
     orientation: 'h',
   };
 
-  const traces = [transcribedTraces, untranscribedTraces];
+  const traces = [untranscribedTraces, transcribedTraces];
 
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
@@ -57,16 +57,19 @@ export default function SBS24(data, sample) {
         totalMutations.toLocaleString(undefined) +
         ' transcribed subs </b>',
       font: {
-        size: 24,
+        size: 26,
+        family: 'Arial',
       },
       xref: 'paper',
-      x: 0.05,
+      x: 0.01,
+      y: 0.9,
     },
     xaxis: {
       title: {
         text: '<b>Number of Single Base Substitutions</b>',
         font: {
-          size: 18,
+          size: 20,
+          family: 'Times New Roman',
         },
       },
       tickfont: {

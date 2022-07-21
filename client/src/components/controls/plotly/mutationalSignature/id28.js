@@ -156,7 +156,6 @@ export default function ID28(data, sample) {
       groupIndex: groupIndex,
     })
   );
-  console.log(annotations1);
   const annotations2 = arrayIDAnnotationBot.map((num, index) => ({
     xref: 'x',
     yref: 'paper',
@@ -185,7 +184,6 @@ export default function ID28(data, sample) {
     index: index,
   }));
 
-  console.log(annotations2);
   const annotationsIDTopLabel = arrayIDAnnXLabel.map((num, index) => ({
     xref: 'x',
     yref: 'paper',
@@ -206,12 +204,13 @@ export default function ID28(data, sample) {
     yref: 'paper',
     x: num,
     xanchor: 'bottom',
-    y: -0.18,
+    y: -0.16,
     yanchor: 'bottom',
     text: '<b>' + arrayIDAnnXBot[index] + '</b>',
     showarrow: false,
     font: {
-      size: 14,
+      size: 16,
+      family: 'Times New Roman',
     },
     align: 'center',
   }));
@@ -221,13 +220,14 @@ export default function ID28(data, sample) {
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
-    x: 0,
+    x: 0.01,
     y: 0.9,
     text:
       '<b>' + sample + ': ' + numberWithCommas(totalMutations) + ' indels</b>',
     showarrow: false,
     font: {
-      size: 18,
+      size: 24,
+      family: 'Arial',
     },
     align: 'center',
   };
@@ -317,7 +317,13 @@ export default function ID28(data, sample) {
       mirror: true,
     },
     yaxis: {
-      title: 'Number of Idels',
+      title: {
+        text: '<b>Number of Indels</b>',
+        font: {
+          family: 'Times New Roman',
+          size: 20,
+        },
+      },
       autorange: false,
       range: [0, maxVal + maxVal * 0.25],
       linecolor: 'black',

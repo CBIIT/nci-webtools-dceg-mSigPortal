@@ -8,27 +8,25 @@ export default function SBS192(data, sample) {
     'T>G': '#EBC6C4',
   };
 
-  //   console.log("data--:");
-  //   console.log(data);
+  const transcribed = data.filter((e) => /^T:/.test(e.mutationType));
+  const untranscribed = data.filter((e) => /^U:/.test(e.mutationType));
 
-  const arrayDataT = [];
-  const arrayDataU = [];
+  const totalMutations =
+    transcribed.reduce((total, e) => total + e.mutations, 0) +
+    untranscribed.reduce((total, e) => total + e.mutations, 0);
 
-  Object.values(data).forEach((group) => {
-    if (group.mutationType.substring(0, 1) === 'T') {
-      arrayDataT.push(group);
-    } else {
-      arrayDataU.push(group);
-    }
-  });
+  const maxMutation = Math.max(
+    ...[
+      ...transcribed.map((e) => e.mutations),
+      ...untranscribed.map((e) => e.mutations),
+    ]
+  );
 
   const numberWithCommas = (x) =>
     x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
   const maxVal = Math.max(...data.map((o) => o.mutations));
 
-  const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
-  // group data by dominant mutation
-  const groupByMutationT = arrayDataT.reduce((groups, e, i) => {
+  const groupByMutationT = transcribed.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
     const mutation = e.mutationType.match(mutationRegex)[1];
     const signature = {
@@ -41,7 +39,7 @@ export default function SBS192(data, sample) {
 
     return groups;
   }, {});
-  const groupByMutationU = arrayDataU.reduce((groups, e, i) => {
+  const groupByMutationU = untranscribed.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
     const mutation = e.mutationType.match(mutationRegex)[1];
     const signature = {
@@ -53,6 +51,13 @@ export default function SBS192(data, sample) {
       : [signature];
     return groups;
   }, {});
+
+  const transformU = Object.entries(groupByMutationU).map(
+    ([mutation, data]) => ({
+      mutation,
+      data,
+    })
+  );
 
   const flatSortedT = Object.values(groupByMutationT)
     .flat()
@@ -132,34 +137,13 @@ export default function SBS192(data, sample) {
       align: 'center',
     })
   );
-  const xannotations = flatSortedU.map((num, index) => ({
-    xref: 'x',
-    yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'bottom',
-    x: index,
-    y: -0.1,
-    text: num.mutationType.replace(
-      /\[(.*)\]/,
-      num.mutationType.substring(2, 3)
-    ),
-    showarrow: false,
-    font: {
-      size: 10,
-      color: colors[num.mutationType.substring(2, 5)],
-    },
-    align: 'center',
-    num: num,
-    index: index,
-    textangle: -90,
-  }));
 
   const sampleAnnotation = {
     xref: 'paper',
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
-    x: 0,
+    x: 0.01,
     y: 0.88,
     text:
       '<b>' +
@@ -169,7 +153,8 @@ export default function SBS192(data, sample) {
       ' transcribed subs</b>',
     showarrow: false,
     font: {
-      size: 18,
+      size: 24,
+      family: 'Arial',
     },
     align: 'center',
   };
@@ -216,6 +201,22 @@ export default function SBS192(data, sample) {
   );
   const traces = [tracesT, tracesU];
 
+  function formatTickLabel(mutation, mutationType) {
+    const color = colors[mutation];
+    const regex = /^(.)\[(.).{2}\](.)$/;
+    const match = mutationType.match(regex);
+    return `${match[1]}<span style="color:${color}"><b>${match[2]}</b></span>${match[3]}`;
+  }
+
+  const mutationTypeNames = transformU
+    .map((group) =>
+      group.data.map((e) => ({
+        mutation: group.mutation,
+        mutationType: e.mutationType,
+      }))
+    )
+    .flat();
+
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     showlegend: true,
@@ -231,21 +232,31 @@ export default function SBS192(data, sample) {
       borderwidth: 1,
     },
     xaxis: {
-      showticklabels: false,
+      showticklabels: true,
       showline: true,
       tickangle: -90,
       tickfont: {
-        size: 10,
+        family: 'Courier New, monospace',
+        color: '#A0A0A0',
       },
       tickmode: 'array',
-      tickvals: [...flatSortedU.map((_, i) => i)],
-      ticktext: [...flatSortedU.map((e) => e.mutationType)],
+      // tickvals: [...flatSortedU.map((_, i) => i)],
+      // ticktext: [...flatSortedU.map((e) => e.mutationType)],
+      tickvals: mutationTypeNames.map((_, i) => i),
+      ticktext: mutationTypeNames.map((e) =>
+        formatTickLabel(e.mutation, e.mutationType)
+      ),
       linecolor: '#E0E0E0',
       linewidth: 1,
       mirror: 'all',
     },
     yaxis: {
-      title: 'Number of Single Base Substitutions',
+      title: {
+        text: '<b>Number of Single Base Substitutions</b>',
+        font: {
+          family: 'Times New Roman',
+        },
+      },
       autorange: false,
       range: [0, maxVal + maxVal * 0.2],
       linecolor: '#E0E0E0',
@@ -254,7 +265,7 @@ export default function SBS192(data, sample) {
     },
 
     shapes: [...shapes1, ...shapes2],
-    annotations: [...annotations, sampleAnnotation, ...xannotations],
+    annotations: [...annotations, sampleAnnotation],
   };
 
   return { traces, layout };

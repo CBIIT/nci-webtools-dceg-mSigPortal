@@ -86,8 +86,8 @@ export default function DBS78(data, sample) {
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
-    x: 0,
-    y: 0.88,
+    x: 0.01,
+    y: 0.9,
     text:
       '<b>' +
       sample +
@@ -96,7 +96,8 @@ export default function DBS78(data, sample) {
       ' double subs </b>',
     showarrow: false,
     font: {
-      size: 18,
+      size: 24,
+      family: 'Arial',
     },
     align: 'center',
   };
@@ -109,32 +110,39 @@ export default function DBS78(data, sample) {
     xaxis: {
       showline: true,
       tickangle: -90,
-      tickfont: { size: 11 },
+      tickfont: {
+        family: 'Courier New, monospace',
+        size: 14,
+      },
       tickmode: 'array',
       tickvals: mutationTypeNames.map((_, i) => i),
       ticktext: mutationTypeNames.map((e) => e.mutationType.slice(-2)),
-      linecolor: '#E0E0E0',
+      linecolor: 'black',
       linewidth: 1,
       mirror: 'all',
     },
     yaxis: {
-      title: 'Number of Double Base Substitutions',
+      title: {
+        text: '<b>Number of Double Base Substitutions</b>',
+        font: {
+          family: 'Times New Roman',
+        },
+      },
       autorange: false,
       range: [0, maxMutation * 1.2],
-      linecolor: '#E0E0E0',
+      linecolor: 'black',
       linewidth: 1,
       tickformat: '~s',
       ticks: 'inside',
+      tickcolor: '#D3D3D3',
       showgrid: true,
       mirror: 'all',
+      gridcolor: '#F5F5F5',
     },
 
     shapes: shapes,
     annotations: [...mutationAnnotation, sampleAnnotation],
   };
-
-  //console.log("layout");
-  //console.log(layout);
 
   return { traces, layout };
 }

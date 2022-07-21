@@ -7,10 +7,6 @@ export default function SBS384(data, sample) {
     'T>C': '#A1CE63',
     'T>G': '#EBC6C4',
   };
-  // console.log("data--:");
-  // console.log(data);
-  const numberWithCommas = (x) =>
-    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
 
   const groupByMutation = data.reduce((groups, e, i) => {
     const mutation = e.mutationType.substring(2, e.mutationType.length);
@@ -153,44 +149,23 @@ export default function SBS384(data, sample) {
     })
   );
 
-  const xannotations = flatSortedT.map((num, index) => ({
-    xref: 'x',
-    yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'bottom',
-    x: index,
-    y: -0.1,
-    text: num.mutationType.replace(
-      /\[(.*)\]/,
-      num.mutationType.substring(2, 3)
-    ),
-    showarrow: false,
-    font: {
-      size: 10,
-      color: colors[num.mutationType.substring(2, 5)],
-    },
-    align: 'center',
-    num: num,
-    index: index,
-    textangle: -90,
-  }));
-
   const sampleAnnotation = {
     xref: 'paper',
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
-    x: 0,
+    x: 0.01,
     y: 0.88,
     text:
       '<b>' +
       sample +
       ': ' +
-      numberWithCommas(totalMutations) +
+      totalMutations.toLocaleString(undefined) +
       ' transcribed subs </b>',
     showarrow: false,
     font: {
-      size: 18,
+      size: 24,
+      family: 'Arial',
     },
     align: 'center',
   };
@@ -236,6 +211,29 @@ export default function SBS384(data, sample) {
     })
   );
 
+  const transformU = Object.entries(groupByMutationU).map(
+    ([mutation, data]) => ({
+      mutation,
+      data,
+    })
+  );
+
+  const mutationTypeNames = transformU
+    .map((group) =>
+      group.data.map((e) => ({
+        mutation: group.mutation,
+        mutationType: e.mutationType,
+      }))
+    )
+    .flat();
+
+  function formatTickLabel(mutation, mutationType) {
+    const color = colors[mutation];
+    const regex = /^(.)\[(.).{2}\](.)$/;
+    const match = mutationType.match(regex);
+    return `${match[1]}<span style="color:${color}"><b>${match[2]}</b></span>${match[3]}`;
+  }
+
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     bargap: 0.3,
@@ -252,33 +250,39 @@ export default function SBS384(data, sample) {
     },
 
     xaxis: {
-      showticklabels: false,
+      showticklabels: true,
       showline: true,
       tickangle: -90,
       tickfont: {
-        size: 10,
+        family: 'Courier New, monospace',
+        color: '#A0A0A0',
       },
       tickmode: 'array',
-      tickvals: [...flatSortedT.map((_, i) => i)],
-      ticktext: [...flatSortedT.map((e) => e.mutationType)],
+      tickvals: mutationTypeNames.map((_, i) => i),
+      ticktext: mutationTypeNames.map((e) =>
+        formatTickLabel(e.mutation, e.mutationType)
+      ),
       linecolor: '#E0E0E0',
       linewidth: 1,
       mirror: 'all',
     },
     yaxis: {
-      title: 'Number of Single Base Substitutions',
+      title: {
+        text: '<b>Number of Single Base Substitutions</b>',
+        font: {
+          family: 'Times New Roman',
+        },
+      },
       autorange: false,
       range: [0, maxVal + maxVal * 0.2],
-      linecolor: '#E0E0E0',
+      tickcolor: '#D3D3D3',
       linewidth: 1,
       mirror: 'all',
       categoryorder: 'category descending',
     },
     shapes: [...shapes1, ...shapes2],
-    annotations: [...annotations, sampleAnnotation, ...xannotations],
+    annotations: [...annotations, sampleAnnotation],
   };
-  // console.log("layout");
-  // console.log(layout);
 
   return { traces, layout };
 }
