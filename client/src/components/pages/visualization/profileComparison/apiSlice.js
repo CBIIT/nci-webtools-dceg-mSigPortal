@@ -26,8 +26,7 @@ export const profilerSummaryApiSlice = apiSlice.injectEndpoints({
     pcSignatureSets: builder.query({
       query: (params) => ({ url: 'signature', params }),
       transformResponse: (data) =>
-        data
-          .map((e) => e.signatureSetName)
+        [...new Set(data.map((e) => e.signatureSetName))]
           .sort((a, b) =>
             a.localeCompare(b, undefined, { sensitivity: 'base' })
           )

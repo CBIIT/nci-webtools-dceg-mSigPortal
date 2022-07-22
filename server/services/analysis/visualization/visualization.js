@@ -12,7 +12,7 @@ async function visualizationOptions(req, res, next) {
     const data = await getSeqmatrixOptions(connection, query, columns, limit);
     const projectID = uuidv4();
 
-    res.json({ data, projectID });
+    res.json(data);
   } catch (error) {
     next(error);
   }
