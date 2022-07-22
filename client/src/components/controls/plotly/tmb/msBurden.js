@@ -68,12 +68,6 @@ export default function MsBurden(data, signatureName) {
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
-    // x:
-    //   array
-    //     .slice(0, index)
-    //     .reduce((x0, curr) => x0 + curr.samples.length, 0) +
-    //   (element.samples.length - 1) * 0.5,
-    //x: array.length * 0.5,
     x: array.length > 1 ? index : (index + index + 1) * 0.5,
     y: 1.01,
     text: `${element.cancer}`,
@@ -124,7 +118,8 @@ export default function MsBurden(data, signatureName) {
     yanchor: 'bottom',
     x: (index + index + 1) * 0.5,
     y: -0.18,
-    text: `${element.samples.length}`,
+    //text: `${element.samples.length}`,
+    text: element.totalSamples,
     showarrow: false,
     font: {
       size: 12,

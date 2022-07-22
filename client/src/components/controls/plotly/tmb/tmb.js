@@ -1,5 +1,6 @@
-export default function TMB(data) {
+export default function TMB(data, tmbTabName) {
   console.log(data);
+  console.log(tmbTabName);
   function average(arr) {
     const sum = arr.reduce((a, b) => a + b, 0);
     return sum / arr.length || 0;
@@ -38,23 +39,19 @@ export default function TMB(data) {
     ),
   }));
 
-  console.log('traces:--');
-  console.log(traces);
+  //console.log('traces:--');
+  //console.log(traces);
 
   const topLabel = data.map((element, index, array) => ({
+    element: element,
     xref: 'x',
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
-    // x:
-    //   array
-    //     .slice(0, index)
-    //     .reduce((x0, curr) => x0 + curr.samples.length, 0) +
-    //   (element.samples.length - 1) * 0.5,
-    //x: array.length * 0.5,
     x: array.length > 1 ? index : (index + index + 1) * 0.5,
     y: 1.01,
-    text: `${element.cancer}`,
+    text:
+      tmbTabName === 'TMB' ? `${element.cancer}` : `${element.signatureName}`,
     showarrow: false,
     font: {
       size: 10,
@@ -102,7 +99,8 @@ export default function TMB(data) {
     yanchor: 'bottom',
     x: (index + index + 1) * 0.5,
     y: -0.18,
-    text: `${element.samples.length}`,
+    //text: `${element.samples.length}`,
+    text: element.totalSamples,
     showarrow: false,
     font: {
       size: 12,
@@ -133,8 +131,8 @@ export default function TMB(data) {
     },
     opacity: 0.2,
   }));
-  console.log('shapes:--');
-  console.log(shapes);
+  //console.log('shapes:--');
+  //console.log(shapes);
 
   const lines = data.map((element, index, array) => ({
     type: 'line',
@@ -195,8 +193,8 @@ export default function TMB(data) {
     annotations: [...topLabel, ...bottoLabel1, ...bottoLabel2],
   };
 
-  console.log('layout:');
-  console.log(layout);
+  //console.log('layout:');
+  //console.log(layout);
 
   var config = {
     //responsive: true,

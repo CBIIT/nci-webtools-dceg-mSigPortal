@@ -19,7 +19,7 @@ export default function TreeLeafForm() {
 
   const { signatureNames } = store.main;
 
-  console.log(signatureNames);
+  //console.log(signatureNames);
   const { control, setValue, watch } = useForm();
 
   const signatureNameOptions = signatureNames.length

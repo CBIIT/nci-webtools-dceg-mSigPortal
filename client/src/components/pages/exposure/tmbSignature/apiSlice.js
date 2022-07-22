@@ -1,5 +1,6 @@
 import { explorationApiSlice } from '../../../../services/store/rootApi';
-import TMBSignature from '../../../controls/plotly/tmb/tmbSignature';
+//import TMBSignature from '../../../controls/plotly/tmb/tmbSignature';
+import TMBSignature from '../../../controls/plotly/tmb/tmb';
 import { groupBy } from 'lodash';
 
 export const tmbSignatureApiSlice = explorationApiSlice.injectEndpoints({
@@ -35,7 +36,7 @@ export const tmbSignatureApiSlice = explorationApiSlice.injectEndpoints({
           })
           .filter((e) => e.medianBurden)
           .sort((a, b) => a.medianBurden - b.medianBurden);
-        return TMBSignature(transform);
+        return TMBSignature(transform, 'TMBSignature');
       },
     }),
   }),
