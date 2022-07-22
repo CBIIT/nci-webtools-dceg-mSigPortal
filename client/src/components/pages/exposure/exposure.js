@@ -14,6 +14,7 @@ import MsBurden from './msBurden';
 import MsBurden2 from './msBurden/msBurden.js';
 import MsAssociation from './msAssociation';
 import MsDecomposition from './msDecomposition';
+import MsDecomposition2 from './msDecomposition/msDecomposition.js';
 import MsLandscape from './msLandscape';
 import MsPrevalence from './msPrevalence';
 import MSIndividual from './msIndividual';
@@ -595,6 +596,11 @@ export default function Exposure({ match }) {
             component: <MsBurden2 />,
             id: 'msBurden',
             name: 'MS Burden',
+          },
+          {
+            component: <MsDecomposition2 />,
+            id: 'msDecomposition',
+            name: 'MS Decomposition',
           },
         ];
 
