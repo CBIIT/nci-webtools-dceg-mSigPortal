@@ -1,5 +1,4 @@
 import { explorationApiSlice } from '../../../../services/store/rootApi';
-//import MsBurden from '../../../controls/plotly/tmb/msBurden';
 import MsBurden from '../../../controls/plotly/tmb/tmb';
 import { groupBy } from 'lodash';
 
@@ -43,7 +42,7 @@ export const msBurdenApiSlice = explorationApiSlice.injectEndpoints({
           .filter((e) => e.medianBurden)
           .sort((a, b) => a.medianBurden - b.medianBurden);
 
-        return MsBurden(transform);
+        return MsBurden(transform, 'MSBurden');
       },
     }),
   }),

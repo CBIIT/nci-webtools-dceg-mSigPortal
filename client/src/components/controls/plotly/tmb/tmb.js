@@ -1,13 +1,11 @@
 export default function TMB(data, tmbTabName) {
   console.log(data);
-  console.log(tmbTabName);
   function average(arr) {
     const sum = arr.reduce((a, b) => a + b, 0);
     return sum / arr.length || 0;
   }
 
   const totalCancer = data.length;
-  console.log(totalCancer);
 
   const absYValue = data
     .map((o) => o.samples.map((e) => Math.abs(e.burden)))
@@ -16,24 +14,12 @@ export default function TMB(data, tmbTabName) {
 
   const traces = data.map((element, index, array) => ({
     element: element,
-    // index: index,
-    // array: array,
-    // name: `${element.cancer}`,
     type: 'scatter',
     marker: { symbol: 'circle-open', size: 3, color: 'black' },
     mode: 'markers',
     y: element.samples.map((e) => e.burden),
     // average: average(element.samples.map((e) => e.tmb)),
     hovertemplate: 'Number of mutations: %{y}<br>',
-    // x: element.samples.map(
-    //   (e, i) =>
-    //     array
-    //       .slice(0, index)
-    //       .reduce((x0, curr) => x0 + curr.samples.length, 0) +
-    //     i +
-    //     0.5
-    // ),
-
     x: element.samples.map(
       (e, i) => index + 0.1 + (0.8 / element.samples.length) * i
     ),
@@ -103,8 +89,7 @@ export default function TMB(data, tmbTabName) {
     yanchor: 'bottom',
     x: (index + index + 1) * 0.5,
     y: -0.18,
-    //text: `${element.samples.length}`,
-    text: element.totalSamples,
+    text: `${element.totalSamples}`,
     showarrow: false,
     font: {
       size: 12,
