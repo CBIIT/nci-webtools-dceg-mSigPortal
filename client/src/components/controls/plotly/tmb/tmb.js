@@ -51,7 +51,9 @@ export default function TMB(data, tmbTabName) {
     x: array.length > 1 ? index : (index + index + 1) * 0.5,
     y: 1.01,
     text:
-      tmbTabName === 'TMB' ? `${element.cancer}` : `${element.signatureName}`,
+      tmbTabName === 'TMBSignature'
+        ? `${element.signatureName}`
+        : `${element.cancer}`,
     showarrow: false,
     font: {
       size: 10,
@@ -69,7 +71,9 @@ export default function TMB(data, tmbTabName) {
     yanchor: 'bottom',
     x: (index + index + 1) * 0.5,
     y: -0.1,
-    text: `${element.samples.length}`,
+    text: element.samples.filter(function (x) {
+      return x.burden != null;
+    }).length,
     showarrow: false,
     font: {
       size: 12,
