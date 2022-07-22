@@ -187,16 +187,6 @@
             "value": ""
           },
           {
-            "name": "signatureSetName",
-            "in": "query",
-            "description": "select signature set",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "value": ""
-          },
-          {
             "name": "signatureName",
             "in": "query",
             "description": "select signature",
