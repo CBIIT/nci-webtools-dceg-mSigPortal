@@ -1,4 +1,4 @@
-import { apiSlice } from '../../../../services/apiSlice';
+import { visualizationApiSlice } from '../../../../services/store/rootApi';
 import SBS6 from '../../../controls/plotly/mutationalSignature/sbs6';
 import SBS24 from '../../../controls/plotly/mutationalSignature/sbs24';
 import SBS96 from '../../../controls/plotly/mutationalSignature/sbs96';
@@ -12,48 +12,50 @@ import ID83 from '../../../controls/plotly/mutationalSignature/id83';
 import ID28 from '../../../controls/plotly/mutationalSignature/id28';
 import ID415 from '../../../controls/plotly/mutationalSignature/id415';
 
-export const mutationalProfilesApiSlice = apiSlice.injectEndpoints({
-  endpoints: (builder) => ({
-    mutationalProfiles: builder.query({
-      query: (params) => ({ url: 'seqmatrix', params }),
-      transformResponse: (data, meta, args) => {
-        const { profile, matrix, sample } = args;
-        const profileMatrix = profile + matrix;
+export const mutationalProfilesApiSlice = visualizationApiSlice.injectEndpoints(
+  {
+    endpoints: (builder) => ({
+      mutationalProfiles: builder.query({
+        query: (params) => ({ url: 'seqmatrix', params }),
+        transformResponse: (data, meta, args) => {
+          const { profile, matrix, sample } = args;
+          const profileMatrix = profile + matrix;
 
-        if (profileMatrix == 'SBS6') {
-          return SBS6(data, sample);
-        } else if (profileMatrix == 'SBS24') {
-          return SBS24(data, sample);
-        } else if (profileMatrix == 'SBS96') {
-          const transform = baseSubstitution(data, profileMatrix);
-          return SBS96(transform, sample);
-        } else if (profileMatrix == 'SBS192') {
-          return SBS192(data, sample);
-        } else if (profileMatrix == 'SBS288') {
-          return SBS288(data, sample);
-        } else if (profileMatrix == 'SBS384') {
-          return SBS384(data, sample);
-        } else if (profileMatrix == 'SBS1536') {
-          return SBS1536(data, sample);
-        } else if (profileMatrix == 'DBS78') {
-          const transform = baseSubstitution(data, profileMatrix);
-          return DBS78(transform, sample);
-        } else if (profileMatrix == 'DBS186') {
-          return DBS186(data, sample);
-        } else if (profileMatrix == 'ID83') {
-          const transform = indel(data, profileMatrix);
-          return ID83(transform, sample);
-        } else if (profileMatrix == 'ID28') {
-          return ID28(data, sample);
-        } else if (profileMatrix == 'ID415') {
-          return ID415(data, sample);
-        } else {
-          throw `Unsupported profile and matrix: ${profile} - ${matrix}`;
-        }
-      },
+          if (profileMatrix == 'SBS6') {
+            return SBS6(data, sample);
+          } else if (profileMatrix == 'SBS24') {
+            return SBS24(data, sample);
+          } else if (profileMatrix == 'SBS96') {
+            const transform = baseSubstitution(data, profileMatrix);
+            return SBS96(transform, sample);
+          } else if (profileMatrix == 'SBS192') {
+            return SBS192(data, sample);
+          } else if (profileMatrix == 'SBS288') {
+            return SBS288(data, sample);
+          } else if (profileMatrix == 'SBS384') {
+            return SBS384(data, sample);
+          } else if (profileMatrix == 'SBS1536') {
+            return SBS1536(data, sample);
+          } else if (profileMatrix == 'DBS78') {
+            const transform = baseSubstitution(data, profileMatrix);
+            return DBS78(transform, sample);
+          } else if (profileMatrix == 'DBS186') {
+            return DBS186(data, sample);
+          } else if (profileMatrix == 'ID83') {
+            const transform = indel(data, profileMatrix);
+            return ID83(transform, sample);
+          } else if (profileMatrix == 'ID28') {
+            return ID28(data, sample);
+          } else if (profileMatrix == 'ID415') {
+            return ID415(data, sample);
+          } else {
+            throw `Unsupported profile and matrix: ${profile} - ${matrix}`;
+          }
+        },
+      }),
     }),
-  }),
-});
+  }
+);
 
 export const { useMutationalProfilesQuery } = mutationalProfilesApiSlice;
 

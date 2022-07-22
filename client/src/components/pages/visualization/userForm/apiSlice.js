@@ -1,6 +1,6 @@
-import { apiSlice } from '../../../../services/apiSlice';
+import { visualizationApiSlice } from '../../../../services/store/rootApi';
 
-export const userFormApiSlice = apiSlice.injectEndpoints({
+export const userFormApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     visualizationUserUpload: builder.mutation({
       query: (formData) => ({

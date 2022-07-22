@@ -1,8 +1,8 @@
-import { apiSlice } from '../../../../services/apiSlice';
+import { explorationApiSlice } from '../../../../services/store/rootApi';
 import TMB from '../../../controls/plotly/tmb/tmb';
 import { groupBy } from 'lodash';
 
-export const tmbApiSlice = apiSlice.injectEndpoints({
+export const tmbApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     tmbPlot: builder.query({
       query: (params) => ({

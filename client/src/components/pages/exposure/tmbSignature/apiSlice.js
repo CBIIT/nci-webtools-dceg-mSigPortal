@@ -1,8 +1,8 @@
-import { apiSlice } from '../../../../services/apiSlice';
-import TMBSignature from '../../../controls/plotly/tmb/tmbSignature';
+import { explorationApiSlice } from '../../../../services/store/rootApi';
+import TMBSignature from '../../../controls/plotly/tmbsignature/tmbSignature';
 import { groupBy } from 'lodash';
 
-export const tmbSignatureApiSlice = apiSlice.injectEndpoints({
+export const tmbSignatureApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     tmbSignaturesPlot: builder.query({
       query: (params) => ({

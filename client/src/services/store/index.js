@@ -7,7 +7,11 @@ import { reducer as publicationsReducer } from './publications';
 
 import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
-import { apiSlice } from '../apiSlice';
+import {
+  optionsApiSlice,
+  visualizationApiSlice,
+  explorationApiSlice,
+} from './rootApi';
 
 // provide rootReducer as an object of slice reducers
 export const store = configureStore({
@@ -18,11 +22,16 @@ export const store = configureStore({
     exposure: exposureReducer,
     modal: modalReducer,
     publications: publicationsReducer,
-    [apiSlice.reducerPath]: apiSlice.reducer,
+
+    [optionsApiSlice.reducerPath]: optionsApiSlice.reducer,
+    [visualizationApiSlice.reducerPath]: visualizationApiSlice.reducer,
+    [explorationApiSlice.reducerPath]: explorationApiSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }).concat(
-      apiSlice.middleware
+      optionsApiSlice.middleware,
+      visualizationApiSlice.middleware,
+      explorationApiSlice.middleware
     ),
 });
 

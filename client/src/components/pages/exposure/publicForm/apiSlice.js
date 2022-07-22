@@ -1,13 +1,7 @@
-import { apiSlice } from '../../../../services/apiSlice';
+import { explorationApiSlice } from '../../../../services/store/rootApi';
 
-export const publicFormApiSlice = apiSlice.injectEndpoints({
+export const publicFormApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    explorationOptions: builder.query({
-      query: (params) => ({
-        url: 'explorationOptions',
-        params,
-      }),
-    }),
     explorationSamples: builder.mutation({
       query: (params) => ({
         url: 'explorationSamples',
@@ -25,8 +19,5 @@ export const publicFormApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const {
-  useExplorationOptionsQuery,
-  useExplorationSamplesMutation,
-  useExplorationPublicMutation,
-} = publicFormApiSlice;
+export const { useExplorationSamplesMutation, useExplorationPublicMutation } =
+  publicFormApiSlice;

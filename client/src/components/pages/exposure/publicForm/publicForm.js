@@ -6,7 +6,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { actions as exposureActions } from '../../../../services/store/exposure';
 import { actions as modalActions } from '../../../../services/store/modal';
 import {
+  resetExplorationApi,
   useExplorationOptionsQuery,
+} from '../../../../services/store/rootApi';
+import {
   useExplorationSamplesMutation,
   useExplorationPublicMutation,
 } from './apiSlice';
@@ -60,7 +63,8 @@ export default function PublicForm() {
   function handleReset() {
     window.location.hash = '#/exploration';
     resetForm();
-    resetSamples();
+    // resetSamples();
+    dispatch(resetExplorationApi);
     resetExposure();
   }
 

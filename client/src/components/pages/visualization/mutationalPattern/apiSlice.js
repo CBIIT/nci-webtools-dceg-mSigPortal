@@ -1,6 +1,6 @@
-import { apiSlice } from '../../../../services/apiSlice';
+import { visualizationApiSlice } from '../../../../services/store/rootApi';
 
-export const mutationalPatternApiSlice = apiSlice.injectEndpoints({
+export const mutationalPatternApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     mutationalPattern: builder.query({
       query: (params) => ({

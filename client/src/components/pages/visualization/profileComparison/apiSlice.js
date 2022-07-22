@@ -1,6 +1,6 @@
-import { apiSlice } from '../../../../services/apiSlice';
+import { visualizationApiSlice } from '../../../../services/store/rootApi';
 
-export const profilerSummaryApiSlice = apiSlice.injectEndpoints({
+export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     profileComparisonWithin: builder.query({
       query: (params) => ({

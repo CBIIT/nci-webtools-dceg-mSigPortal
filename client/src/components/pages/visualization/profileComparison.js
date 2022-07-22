@@ -9,7 +9,7 @@ import {
   Tab,
   Nav,
 } from 'react-bootstrap';
-import { useVisualizationOptionsQuery } from './publicForm/apiSlice';
+import { useVisualizationOptionsQuery } from '../../../services/store/rootApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';

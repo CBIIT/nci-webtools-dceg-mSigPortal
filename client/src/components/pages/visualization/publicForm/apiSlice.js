@@ -1,10 +1,7 @@
-import { apiSlice } from '../../../../services/apiSlice';
+import { visualizationApiSlice } from '../../../../services/store/rootApi';
 
-export const publicFormApiSlice = apiSlice.injectEndpoints({
+export const publicFormApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    visualizationOptions: builder.query({
-      query: (_) => ({ url: 'visualizationOptions' }),
-    }),
     visualizationSamples: builder.mutation({
       query: (params) => ({
         url: 'visualizationSamples',
@@ -14,5 +11,4 @@ export const publicFormApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useVisualizationOptionsQuery, useVisualizationSamplesMutation } =
-  publicFormApiSlice;
+export const { useVisualizationSamplesMutation } = publicFormApiSlice;

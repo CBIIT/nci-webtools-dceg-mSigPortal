@@ -1,8 +1,8 @@
-import { apiSlice } from '../../../../services/apiSlice';
-import MsBurden from '../../../controls/plotly/tmb/msBurden';
+import { explorationApiSlice } from '../../../../services/store/rootApi';
+import MsBurden from '../../../controls/plotly/msBurden/msBurden';
 import { groupBy } from 'lodash';
 
-export const msBurdenApiSlice = apiSlice.injectEndpoints({
+export const msBurdenApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     msBurden: builder.query({
       query: (params) => ({

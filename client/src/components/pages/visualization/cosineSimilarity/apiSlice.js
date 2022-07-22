@@ -1,6 +1,6 @@
-import { apiSlice } from '../../../../services/apiSlice';
+import { visualizationApiSlice } from '../../../../services/store/rootApi';
 
-export const cosineSimilarityApiSlice = apiSlice.injectEndpoints({
+export const cosineSimilarityApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     cosineWithin: builder.query({
       query: (params) => ({

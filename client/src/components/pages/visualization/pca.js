@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button, Tab, Nav } from 'react-bootstrap';
-import { useVisualizationOptionsQuery } from './publicForm/apiSlice';
+import { useVisualizationOptionsQuery } from '../../../services/store/rootApi';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../controls/svgContainer/svgContainer';
 import CustomSelect from '../../controls/select/select-old';

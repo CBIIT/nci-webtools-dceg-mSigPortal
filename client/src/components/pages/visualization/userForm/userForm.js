@@ -14,6 +14,7 @@ import { useForm, Controller } from 'react-hook-form';
 import Select from '../../../controls/select/selectForm';
 import { actions as visualizationActions } from '../../../../services/store/visualization';
 import { actions as modalActions } from '../../../../services/store/modal';
+import { resetVisualizationApi } from '../../../../services/store/rootApi';
 import {
   useVisualizationUserUploadMutation,
   useSubmitQueueMutation,
@@ -109,6 +110,7 @@ export default function UserForm() {
     resetQueue();
     resetWeb();
     resetVisualization();
+    dispatch(resetVisualizationApi);
     mergeMain({ source: 'user' });
   }
 

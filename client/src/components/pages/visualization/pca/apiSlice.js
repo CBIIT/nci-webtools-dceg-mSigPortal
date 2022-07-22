@@ -1,6 +1,6 @@
-import { apiSlice } from '../../../../services/apiSlice';
+import { visualizationApiSlice } from '../../../../services/store/rootApi';
 
-export const pcaApiSlice = apiSlice.injectEndpoints({
+export const pcaApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     PcaWithin: builder.query({
       query: (params) => ({

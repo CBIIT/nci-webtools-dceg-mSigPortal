@@ -5,9 +5,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../../services/store/visualization';
 import { actions as modalActions } from '../../../../services/store/modal';
 import {
+  resetVisualizationApi,
   useVisualizationOptionsQuery,
-  useVisualizationSamplesMutation,
-} from './apiSlice';
+} from '../../../../services/store/rootApi';
+import { useVisualizationSamplesMutation } from './apiSlice';
 
 const actions = { ...visualizationActions, ...modalActions };
 
@@ -48,7 +49,8 @@ export default function PublicForm() {
   function handleReset() {
     window.location.hash = '#/visualization';
     resetForm();
-    resetSamples();
+    // resetSamples();
+    dispatch(resetVisualizationApi);
     resetVisualization();
   }
 
