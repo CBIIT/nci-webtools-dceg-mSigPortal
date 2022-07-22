@@ -13,7 +13,6 @@ export default function ID28(data, sample) {
     '1:Ins:T': 'white',
     'o:': '#1764AA',
   };
-
   const arrayIDAnnXTop = ['1bp Deletion', '1bp Insertion', '>1bp'],
     arrayIDAnnXBot = ['Homopolymer Length', 'Homopolymer Length', 'Type'],
     arrayIDAnnXLabel = [5, 17, 25],
@@ -27,7 +26,7 @@ export default function ID28(data, sample) {
 
   const data1 = data.slice(0, data.length - 4);
   const data2 = data.slice(-4);
-  data2.push(data2.shift());
+  //data2.push(data2.shift());
 
   // group data by dominant mutation
   const groupByMutation = data1.reduce((groups, e, i) => {
@@ -85,7 +84,32 @@ export default function ID28(data, sample) {
       arrayIDAnnotationTop.push(group[0].mutationType);
     }
     group.forEach((e) => {
-      arrayIDAnnotationBot.push(e.mutationType);
+      //arrayIDAnnotationBot.push(e.mutationType);
+      let lastNum = e.mutationType.substring(
+        e.mutationType.length - 1,
+        e.mutationType.length
+      );
+      let newNum;
+      if (e.mutationType.substring(0, 1) === 'o') {
+        newNum = e.mutationType;
+      } else {
+        if (e.mutationType.substring(2, 5) === 'Del') {
+          lastNum = +lastNum + 1;
+        }
+
+        if ((e.mutationType.substring(2, 5) === 'Del') & (+lastNum > 5)) {
+          newNum = lastNum + '+';
+        } else if (
+          (e.mutationType.substring(2, 5) !== 'Del') &
+          (+lastNum > 4)
+        ) {
+          newNum = lastNum + '+';
+        } else {
+          newNum = lastNum + '';
+        }
+      }
+
+      arrayIDAnnotationBot.push(newNum);
     });
   });
 
@@ -169,9 +193,7 @@ export default function ID28(data, sample) {
           : num === 'o:MH'
           ? '<b>MH</b>'
           : '<b>' + num.substring(num.length - 3, num.length) + '</b>'
-        : num.substring(num.length - 1, num.lenght) >= 5
-        ? '<b>' + num.substring(num.length - 1, num.length) + '</b>+'
-        : '<b>' + num.substring(num.length - 1, num.length) + '</b>',
+        : '<b>' + num + '</b>',
     showarrow: false,
     font: {
       size: num.substring(0, 1) === 'o' ? 11 : 14,

@@ -26,16 +26,17 @@ export default function TMBSignature(data) {
     return groups;
   }, {});
 
+  console.log(groupBySample);
+
   const absYValue = data
     .map((o) => o.samples.map((e) => Math.abs(e.burden)))
     .flat();
   const yMax = Math.max(...absYValue);
 
   const traces = data.map((element, index, array) => ({
-    //element: element,
+    element: element,
     //index: index,
     //array: array,
-    name: `${element.cancer}`,
     type: 'scatter',
     marker: { symbol: 'circle-open', size: 3, color: 'black' },
     mode: 'markers',
