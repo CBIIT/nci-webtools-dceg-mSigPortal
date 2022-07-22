@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import axios from 'axios';
 import { Form, Row, Col, Nav, Button } from 'react-bootstrap';
 import {
   SidebarContainer,
@@ -434,8 +433,11 @@ export default function Visualization({ match }) {
                     className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
                       id == displayTab ? 'active-secondary-navlinks' : ''
                     }`}
-                    active={id == displayTab && submitted}
-                    disabled={id != 'instructions' && !submitted}
+                    active={id == displayTab}
+                    disabled={
+                      id != 'instructions' &&
+                      !(source == 'public' ? samples.length : matrixList.length)
+                    }
                     style={{
                       textDecoration: 'none',
                       fontSize: '12pt',

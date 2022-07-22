@@ -81,6 +81,7 @@ export default function Exposure({ match }) {
     projectID,
     openSidebar,
     submitted,
+    samples,
   } = exposureStore.main;
 
   const { loading: loadingMsBurden, ...burdenArgs } = exposureStore.msBurden;
@@ -614,7 +615,10 @@ export default function Exposure({ match }) {
                           id == displayTab ? 'active-secondary-navlinks' : ''
                         }`}
                         active={id == displayTab && submitted}
-                        disabled={id != 'instructions' && !submitted}
+                        disabled={
+                          id != 'instructions' &&
+                          !(source == 'public' ? samples.length : submitted)
+                        }
                         style={{
                           textDecoration: 'none',
                           fontSize: '12pt',
