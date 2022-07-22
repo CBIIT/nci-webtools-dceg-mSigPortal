@@ -167,6 +167,16 @@
             "value": "COSMIC_v3_Signatures_GRCh37_SBS96"
           },
           {
+            "name": "cancer",
+            "in": "query",
+            "description": "select cancer",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
             "name": "organ",
             "in": "query",
             "description": "select organ",
