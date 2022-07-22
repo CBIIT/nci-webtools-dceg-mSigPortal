@@ -14,7 +14,7 @@ export default function TMB(data) {
   const yMax = Math.max(...absYValue);
 
   const traces = data.map((element, index, array) => ({
-    // element: element,
+    element: element,
     // index: index,
     // array: array,
     // name: `${element.cancer}`,
@@ -160,10 +160,6 @@ export default function TMB(data) {
   }));
 
   const layout = {
-    // title: {
-    //   text: "Tumor Mutational Burden Separated by Signatures",
-    //   yanchor: "top",
-    // },
     width: totalCancer > 1 ? null : 350,
     autosize: true,
     height: 500,
