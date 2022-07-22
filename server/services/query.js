@@ -21,7 +21,7 @@ function getAssociationData(
   connection,
   query,
   columns = '*',
-  limit = 100000,
+  limit = 200000,
   offset = 0
 ) {
   return getData(connection, 'association', query, columns, limit, offset);
@@ -31,7 +31,7 @@ function getExposureData(
   connection,
   query,
   columns = '*',
-  limit = 100000,
+  limit = 200000,
   offset = 0
 ) {
   return getData(connection, 'exposure', query, columns, limit, offset);
@@ -41,7 +41,7 @@ function getSeqmatrixData(
   connection,
   query,
   columns = '*',
-  limit = 100000,
+  limit = 200000,
   offset = 0
 ) {
   return getData(connection, 'seqmatrix', query, columns, limit, offset);
@@ -61,7 +61,7 @@ function getSignatureData(
   connection,
   query,
   columns = '*',
-  limit = 100000,
+  limit = 200000,
   offset = 0
 ) {
   return getData(connection, 'signature', query, columns, limit, offset);
