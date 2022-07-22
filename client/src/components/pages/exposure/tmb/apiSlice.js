@@ -21,7 +21,10 @@ export const tmbApiSlice = explorationApiSlice.injectEndpoints({
               }))
               .sort((a, b) => a.burden - b.burden);
 
-            const burdens = samples.map((e) => e.burden);
+            const burdens = samples
+              .filter((e) => e.burden)
+              .map((e) => e.burden);
+
             const medianBurden =
               burdens.length % 2 == 0
                 ? (burdens[burdens.length / 2] +
