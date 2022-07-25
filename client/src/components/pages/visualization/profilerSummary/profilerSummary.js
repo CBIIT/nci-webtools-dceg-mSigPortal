@@ -1,89 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Container, Row, Col } from 'react-bootstrap';
+import Plot from 'react-plotly.js';
 import { useSelector } from 'react-redux';
-import axios from 'axios';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import Description from '../../../controls/description/description';
-import { useProfilerSummaryQuery, useProfilerSummary2Query } from './apiSlice';
+import profilerSummary from '../../../controls/plotly/profilerSummary/profilerSummary';
 
 export default function ProfilerSummary() {
   const store = useSelector((state) => state.visualization);
+  const { samples } = store.main;
 
-  const { source, matrixList, projectID } = store.main;
-  const { study, cancer, strategy } = store.publicForm;
-
-  const [params, setParams] = useState(null);
-  const [plotPath, setPath] = useState('');
-
-  const { data, error, isFetching } = useProfilerSummaryQuery(params, {
-    skip: !params,
-  });
+  const [plot, setPlot] = useState({});
 
   useEffect(() => {
-    // check if profiler summary already exists, else calculate
-    if (projectID) {
-      plotExists();
+    if (samples.length) {
+      const plot = profilerSummary(samples);
+
+      setPlot(plot);
     }
-  }, [projectID]);
-
-  // set path after calculation
-  useEffect(() => {
-    if (data?.output.plotPath) setPath(data.output.plotPath);
-  }, [data]);
-
-  async function plotExists() {
-    try {
-      const path = `${projectID}/results/profilerSummary${
-        source == 'public' ? 'Public' : ''
-      }/profilerSummary.svg`;
-      const response = await axios.head('web/results/' + path);
-      setPath(path);
-    } catch (error) {
-      fetchPlot();
-    }
-  }
-
-  function fetchPlot() {
-    const params =
-      source == 'user'
-        ? {
-            fn: 'profilerSummary',
-            args: {
-              matrixList: JSON.stringify(
-                matrixList.map(({ profileType, matrixSize, ...e }) => ({
-                  ...e,
-                  Profile_Type: profileType,
-                  Matrix_Size: matrixSize,
-                }))
-              ),
-            },
-            projectID,
-          }
-        : {
-            fn: 'profilerSummaryPublic',
-            args: {
-              study: study.value,
-              cancerType: cancer.value,
-              experimentalStrategy: strategy.value,
-            },
-            projectID,
-          };
-
-    setParams(params);
-  }
-
-  function publicPlot() {
-    const params = {
-      study: study.value,
-      cancer: cancer.value,
-      strategy: strategy.value,
-    };
-    setParams(params);
-  }
+  }, [samples]);
 
   return (
     <div className="bg-white border rounded">
-      <LoadingOverlay active={isFetching} />
       <div className="p-3">
         <b>Number of Mutations Per Sample with Regard to Mutational Profile</b>
         <Description
@@ -93,19 +31,24 @@ export default function ProfilerSummary() {
         />
       </div>
 
-      {plotPath && (
-        <>
-          <hr />
-          <SvgContainer
-            title="Number of Mutations Per Sample with Regard to Mutational Profile"
-            className="p-3"
-            downloadName={plotPath.split('/').slice(-1)[0]}
-            plotPath={'web/results/' + plotPath}
-            height="600px"
-          />
-        </>
-      )}
-      {error && (
+      <Container fluid style={{ minHeight: '500px' }} className="mb-3">
+        <Row>
+          <Col>
+            {plot ? (
+              <Plot
+                className="w-100"
+                data={plot.traces}
+                layout={plot.layout}
+                config={plot.config}
+                useResizeHandler
+              />
+            ) : (
+              <LoadingOverlay active={true} />
+            )}
+          </Col>
+        </Row>
+      </Container>
+      {false && (
         <p className="text-center">
           An error has occured. Please check your inputs and try again.
         </p>
