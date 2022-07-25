@@ -140,7 +140,7 @@ export default function SBS96(data, sample) {
       range: [0, maxMutation * 1.2],
       ticks: 'inside',
       tickcolor: '#D3D3D3',
-      linecolor: '#E0E0E0',
+      linecolor: '#D3D3D3',
       linewidth: 1,
       mirror: 'all',
       tickformat: '~s',
