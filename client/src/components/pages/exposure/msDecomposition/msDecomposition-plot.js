@@ -15,16 +15,18 @@ export default function MutProfilePlot() {
   });
 
   useEffect(() => {
-    const { study, strategy, signatureSetName } = publicForm;
+    const { study, strategy, signatureSetName, cancer } = publicForm;
     if (study) {
       setParams({
         study: study.value,
         strategy: strategy.value,
         signatureSetName: signatureSetName.value,
+        cancer: cancer.value,
       });
     }
   }, [publicForm]);
 
+  console.log(data);
   return (
     <>
       <LoadingOverlay active={isFetching} />
