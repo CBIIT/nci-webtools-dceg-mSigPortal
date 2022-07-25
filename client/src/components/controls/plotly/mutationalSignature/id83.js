@@ -51,7 +51,6 @@ export default function ID83(unsortedData, sample) {
     ...data.map((indel) => indel.data.map((e) => e.mutations)).flat()
   );
 
-  console.log(data);
   const indelNames = data
     .map((indel) =>
       indel.data.map((e) => ({
@@ -77,8 +76,19 @@ export default function ID83(unsortedData, sample) {
           .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
     ),
     y: group.data.map((e) => e.mutations),
-    customdata: group.data.map((e) => ({ mutationType: e.mutationType })),
-    hovertemplate: '%{customdata.mutationType}, %{y}<extra></extra>',
+    groupdata: group.data,
+    //customdata: group.data.map((e) => ({ mutationType: e.mutationType })),
+    customdata: group.data.map((e) => ({
+      mutationType:
+        e.mutationType.substring(2, 5) === 'Del' ? 'Deletion' : 'Insertion',
+      xval:
+        e.mutationType.substring(2, 5) === 'Del'
+          ? +e.mutationType.slice(-1) + 1
+          : e.mutationType.slice(-1),
+    })),
+    hovertemplate:
+      '<b>x</b>:%{customdata.mutationType}, %{customdata.xval}<br>' +
+      '<b>Number of indels</b>: %{y}<extra></extra>',
     showlegend: false,
   }));
 
