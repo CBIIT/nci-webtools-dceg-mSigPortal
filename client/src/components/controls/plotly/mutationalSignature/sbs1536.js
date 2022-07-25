@@ -33,6 +33,12 @@ export default function SBS96(data, sample) {
   // console.log("maxValMutation:---");
   // console.log(maxValMutation);
 
+  function formatTickLabel(mutation, mutationType) {
+    const color = colors[mutation];
+    const regex = /^(.)\[(.).{2}\](.)$/;
+    const match = mutationType.match(regex);
+    return `${match[1]}<span style="color:${color}"><b>${match[2]}</b></span>${match[3]}`;
+  }
   const groupByMutationInner = data.reduce((groups, e, i) => {
     const mutation = e.mutationType.substring(1, 8);
     const signature = {
@@ -184,7 +190,7 @@ export default function SBS96(data, sample) {
   ];
   const maxZ2 = Math.max(...heatMapZFinal2.flat(Infinity));
   const traceHeatMap2 = heatMapZFinal2.map((num, index, array) => ({
-    colorbar: { len: 0.22, y: 0.62, autotick: true, tick0: 0 },
+    colorbar: { len: 0.2, y: 0.625, autotick: true, tick0: 0 },
     colorscale: heatmapColorscale,
     zmin: 0,
     zmax: maxZ2 + maxZ2 * 0.1,
@@ -307,7 +313,7 @@ export default function SBS96(data, sample) {
 
   const maxZ3 = Math.max(...heatMapZFinal2.flat(Infinity));
   const traceHeatMap3 = heatMapZFinal3.map((num, index, array) => ({
-    colorbar: { len: 0.22, y: 0.44, autotick: true, tick0: 0 },
+    colorbar: { len: 0.2, y: 0.44, autotick: true, tick0: 0 },
     colorscale: heatmapColorscale,
     zmin: 0,
     zmax: maxZ3 + maxZ3 * 0.1,
