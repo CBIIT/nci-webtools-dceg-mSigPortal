@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { Controller, useForm } from 'react-hook-form';
 import Select from '../../../controls/select/selectForm';
+import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as exposureActions } from '../../../../services/store/exposure';
 import { actions as modalActions } from '../../../../services/store/modal';
@@ -31,7 +31,7 @@ export default function PublicForm() {
   const {
     data: options,
     error: optionsError,
-    isFetching: fetchingOptions,
+    isFetching,
   } = useExplorationOptionsQuery();
 
   const [fetchSamples, { isLoading, reset: resetSamples }] =
@@ -205,6 +205,7 @@ export default function PublicForm() {
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
+      <LoadingOverlay active={isFetching} />
       {optionsError && <p>There was an error retrieving public data options</p>}
       <Select
         className="mb-2"
@@ -261,7 +262,7 @@ export default function PublicForm() {
       <Row>
         <Col>
           <Button
-            disabled={fetchingOptions || isLoading}
+            disabled={isFetching || isLoading}
             className="w-100"
             variant="secondary"
             onClick={() => handleReset()}
@@ -271,7 +272,7 @@ export default function PublicForm() {
         </Col>
         <Col>
           <Button
-            disabled={fetchingOptions || isLoading || submitted}
+            disabled={isFetching || isLoading || submitted}
             className="w-100"
             variant="primary"
             type="submit"

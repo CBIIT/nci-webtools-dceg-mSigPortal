@@ -1,6 +1,7 @@
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import Select from '../../../controls/select/selectForm';
+import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../../services/store/visualization';
 import { actions as modalActions } from '../../../../services/store/modal';
@@ -63,9 +64,9 @@ export default function PublicForm() {
         cancer: data.cancer.value,
         strategy: data.strategy.value,
       };
-      const { data: samples, projectID } = await fetchSamples(params).unwrap();
+      const samples = await fetchSamples(params).unwrap();
 
-      mergeMain({ samples, projectID });
+      mergeMain({ samples });
     } catch (error) {
       if (error.originalStatus == 504) {
         mergeMain({
@@ -147,6 +148,7 @@ export default function PublicForm() {
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
+      <LoadingOverlay active={isFetching} />
       {error && <p>There was an error retrieving public data options</p>}
       <Select
         className="mb-2"
