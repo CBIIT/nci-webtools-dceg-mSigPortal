@@ -5,7 +5,9 @@ export default function profilerSummary(data) {
   const summaraizeMutations = Object.entries(groupBySampleProfile)
     .map(([sampleProfile, samples]) => {
       const [sample, profile] = sampleProfile.split('_');
-      const matrix = [...new Set(samples.map((e) => e.matrix))].sort();
+      const matrix = [...new Set(samples.map((e) => e.matrix))].sort(
+        (a, b) => a - b
+      );
       const mutations = samples.reduce((acc, e) => acc + e.mutations, 0);
       return {
         sample,
