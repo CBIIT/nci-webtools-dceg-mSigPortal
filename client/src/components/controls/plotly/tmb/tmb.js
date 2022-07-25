@@ -1,5 +1,6 @@
-export default function TMB(data, tmbTabName) {
+export default function TMB(data, tmbTabName, signatureName) {
   console.log(data);
+  console.log(signatureName);
   function average(arr) {
     const sum = arr.reduce((a, b) => a + b, 0);
     return sum / arr.length || 0;
@@ -146,6 +147,31 @@ export default function TMB(data, tmbTabName) {
     },
   }));
 
+  const signatureNameAnnotation = {
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
+    x: 0.01,
+    y: 0.9,
+    text: signatureName,
+    showarrow: false,
+    font: {
+      size: 18,
+      family: 'Arial',
+    },
+    align: 'center',
+  };
+  let annotations = [];
+  signatureName != null
+    ? (annotations = [
+        ...topLabel,
+        ...bottoLabel1,
+        ...bottoLabel2,
+        signatureNameAnnotation,
+      ])
+    : (annotations = [...topLabel, ...bottoLabel1, ...bottoLabel2]);
+
   const layout = {
     width: totalCancer > 1 ? null : 350,
     autosize: true,
@@ -179,7 +205,7 @@ export default function TMB(data, tmbTabName) {
     },
 
     shapes: [...shapes, ...lines, ...bottoLabelline],
-    annotations: [...topLabel, ...bottoLabel1, ...bottoLabel2],
+    annotations: annotations,
   };
 
   //console.log('layout:');

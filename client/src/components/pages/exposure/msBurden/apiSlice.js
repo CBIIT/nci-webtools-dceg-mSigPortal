@@ -10,6 +10,7 @@ export const msBurdenApiSlice = explorationApiSlice.injectEndpoints({
         params,
       }),
       transformResponse: (data, meta, arg) => {
+        const { signatureName } = arg;
         // calculate median burden across cancer types
         const groupByCancer = groupBy(data, 'cancer');
         const transform = Object.entries(groupByCancer)
@@ -42,7 +43,7 @@ export const msBurdenApiSlice = explorationApiSlice.injectEndpoints({
           .filter((e) => e.medianBurden)
           .sort((a, b) => a.medianBurden - b.medianBurden);
 
-        return MsBurden(transform, 'MSBurden');
+        return MsBurden(transform, 'MSBurden', signatureName);
       },
     }),
   }),
