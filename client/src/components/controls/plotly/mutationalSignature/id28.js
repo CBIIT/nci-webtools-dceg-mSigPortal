@@ -116,6 +116,7 @@ export default function ID28(data, sample) {
   const traces = Object.entries(arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
       name: mutation,
+      signature: signatures,
       type: 'bar',
       marker: {
         color:
@@ -135,7 +136,16 @@ export default function ID28(data, sample) {
             .reduce((x0, [_, sigs]) => x0 + sigs.length, 0) + i
       ),
       y: signatures.map((e) => e.contribution),
-      hoverinfo: 'x+y',
+      customdata: signatures.map((e) => ({
+        mutationType:
+          e.mutationType.substring(2, 5) === 'Del' ? 'Deletion' : 'Insertion',
+        xval:
+          e.mutationType.substring(2, 5) === 'Del'
+            ? +e.mutationType.slice(-1) + 1
+            : e.mutationType.slice(-1),
+      })),
+      hovertemplate: '<b>Number of indels</b>: %{y}<extra></extra>',
+      //hoverinfo: 'x+y',
       showlegend: false,
     })
   );

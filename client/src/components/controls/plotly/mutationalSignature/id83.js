@@ -51,7 +51,6 @@ export default function ID83(unsortedData, sample) {
     ...data.map((indel) => indel.data.map((e) => e.mutations)).flat()
   );
 
-  console.log(data);
   const indelNames = data
     .map((indel) =>
       indel.data.map((e) => ({
@@ -89,11 +88,9 @@ export default function ID83(unsortedData, sample) {
     })),
     hovertemplate:
       '<b>x</b>:%{customdata.mutationType}, %{customdata.xval}<br>' +
-      '<b>y</b>: %{y}<extra></extra>',
+      '<b>Number of indels</b>: %{y}<extra></extra>',
     showlegend: false,
   }));
-
-  console.log(traces);
 
   const shapeAnnotations = data.map((group, groupIndex, array) => ({
     xref: 'x',
