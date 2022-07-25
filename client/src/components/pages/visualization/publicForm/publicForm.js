@@ -66,7 +66,7 @@ export default function PublicForm() {
       };
       const samples = await fetchSamples(params).unwrap();
 
-      mergeMain({ samples });
+      mergeMain({ samples, projectID: 'debug' });
     } catch (error) {
       if (error.originalStatus == 504) {
         mergeMain({
