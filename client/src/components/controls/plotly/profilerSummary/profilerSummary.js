@@ -40,7 +40,11 @@ export default function profilerSummary(data) {
 
   const layout = {
     autosize: true,
-
+    legend: {
+      title: {
+        text: '<b>Profile</b>',
+      },
+    },
     xaxis: {
       title: 'Samples',
       showline: true,
@@ -48,6 +52,7 @@ export default function profilerSummary(data) {
     },
     yaxis: {
       title: 'log<sub>10</sub>(Mutations)',
+      ticks: 'outside',
       zeroline: false,
       showline: true,
       mirror: true,
