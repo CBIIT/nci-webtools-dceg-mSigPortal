@@ -10,6 +10,7 @@ export const tmbApiSlice = explorationApiSlice.injectEndpoints({
         params,
       }),
       transformResponse: (data, meta, arg) => {
+        console.log(data);
         // calculate median burden across cancer types
         const groupByCancer = groupBy(data, 'cancer');
         const transform = Object.entries(groupByCancer)

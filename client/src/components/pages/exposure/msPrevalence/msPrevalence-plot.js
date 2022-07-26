@@ -3,14 +3,14 @@ import Plot from 'react-plotly.js';
 import { Button, Container, Row, Col } from 'react-bootstrap';
 import { cloneDeep } from 'lodash';
 import { useSelector } from 'react-redux';
-import { useLazyMsPrevelenceQuery } from './apiSlice';
+import { useMsPrevelencePlotQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
 import './plot.scss';
 export default function MutProfilePlot() {
   const publicForm = useSelector((state) => state.exposure.publicForm);
   const [params, setParams] = useState('');
-  const { data, error, isFetching } = useLazyMsPrevelenceQuery(params, {
+  const { data, error, isFetching } = useMsPrevelencePlotQuery(params, {
     skip: !params,
   });
 

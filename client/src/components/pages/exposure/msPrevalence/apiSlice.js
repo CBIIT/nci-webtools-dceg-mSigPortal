@@ -1,18 +1,19 @@
 import { explorationApiSlice } from '../../../../services/store/rootApi';
-import msPrevalence from '../../../controls/plotly/msDecomposition/msDecomposition';
+import MsPrevalence from '../../../controls/plotly/msPrevalence/msPrevalence';
 import { groupBy } from 'lodash';
-import MsPrevalence from '../msPrevalence';
 
-export const msDecompositionApiSlice = explorationApiSlice.injectEndpoints({
+export const msPrevalenceApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    msPrevelence: builder.query({
+    msPrevelencePlot: builder.query({
       query: (params) => ({
         url: 'exposure',
         params,
       }),
       transformResponse: (data, meta, arg) => {
+        console.log(data);
         // calculate median burden across cancer types
         const groupByCancer = groupBy(data, 'cancer');
+        console.log(groupByCancer);
         const transform = Object.entries(groupByCancer)
           .map(([cancer, data]) => {
             const samples = Object.values(groupBy(data, 'sample'))
@@ -49,4 +50,4 @@ export const msDecompositionApiSlice = explorationApiSlice.injectEndpoints({
   }),
 });
 
-export const { useLazyMsPrevelenceQuery } = msDecompositionApiSlice;
+export const { useMsPrevelencePlotQuery } = msPrevalenceApiSlice;

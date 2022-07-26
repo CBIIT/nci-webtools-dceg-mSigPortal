@@ -17,7 +17,7 @@ import MsDecomposition from './msDecomposition';
 import MsDecomposition2 from './msDecomposition/msDecomposition.js';
 import MsLandscape from './msLandscape';
 import MsPrevalence from './msPrevalence';
-import MsPrevalence2 from './msPrevalence/msPrevelence.js';
+import MsPrevalence2 from './msPrevalence/msPrevalence.js';
 import MSIndividual from './msIndividual';
 import Download from './download';
 import { actions as exposureActions } from '../../../services/store/exposure';
