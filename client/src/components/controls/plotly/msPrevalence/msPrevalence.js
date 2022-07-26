@@ -1,7 +1,6 @@
 export default function MSPrevalence(data) {
   data.sort((a, b) => b.samples.length - a.samples.length);
   console.log(data);
-  const totalSamples = data[0].totalSamples;
   const traces = data.map((group, groupIndex, array) => ({
     group: group,
     array: array,
