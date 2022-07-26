@@ -275,12 +275,24 @@ export default function ID415(data, sample) {
     name: 'Transcrribed Strand',
     type: 'bar',
     marker: { color: '#004765' },
+    customedata: T_flatSorted.map((e, i, a) => ({
+      mutationOrder: e.mutationType.substring(0, 1),
+      mutationType:
+        e.mutationType.substring(2, 5) === 'Del' ? 'Deletion' : 'Insertion',
+      extraValue: e.mutationType.substring(6, 7),
+      xval:
+        e.mutationType.substring(2, 5) === 'Del'
+          ? +e.mutationType.slice(-1) + 1
+          : e.mutationType.slice(-1),
+    })),
     x: T_flatSorted.map((element, index, array) => index),
     y: T_flatSorted.map((element, index, array) => element.contribution),
-    hovertemplate: '<b>Number of indels</b>: %{y}<extra></extra>',
+    hovertemplate: '%{y} indels',
     //hoverinfo: 'x+y',
     showlegend: true,
   };
+
+  console.log(tracesT);
 
   const tracesU = {
     name: 'Untranscribed Strand',

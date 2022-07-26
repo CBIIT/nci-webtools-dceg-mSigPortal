@@ -94,7 +94,6 @@ export default function ID83(unsortedData, sample) {
     showlegend: false,
   }));
 
-  console.log(traces);
   const shapeAnnotations = data.map((group, groupIndex, array) => ({
     xref: 'x',
     yref: 'paper',
