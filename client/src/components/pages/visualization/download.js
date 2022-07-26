@@ -27,7 +27,7 @@ export default function Download() {
   async function downloadOutput(file) {
     setDownload((downloading) => [...downloading, file]);
     const response = await fetch(
-      `web/visualization/download?id=${projectID}&file=${file}`
+      `visualization/download?id=${projectID}&file=${file}`
     );
     if (response.ok) {
       saveAs(
@@ -42,7 +42,7 @@ export default function Download() {
 
   async function downloadPublic() {
     setDownload([1]);
-    const response = await fetch(`web/visualization/downloadPublic`, {
+    const response = await fetch(`visualization/downloadPublic`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -75,7 +75,7 @@ export default function Download() {
     setWorkspace(true);
 
     const { mutationalProfiles, ...rest } = visualization;
-    const response = await fetch(`web/downloadWorkspace`, {
+    const response = await fetch(`downloadWorkspace`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',

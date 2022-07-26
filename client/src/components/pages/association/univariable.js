@@ -105,7 +105,7 @@ export default function Univariable() {
       mergeState({ loadingParams: true, error: false });
       try {
         const { stdout, output: collapseData } = await (
-          await fetch(`web/associationWrapper`, {
+          await fetch(`associationWrapper`, {
             method: 'POST',
             headers: {
               Accept: 'application/json',
@@ -199,7 +199,7 @@ export default function Univariable() {
           stdout,
           output,
         } = await (
-          await fetch(`web/associationWrapper`, {
+          await fetch(`associationWrapper`, {
             method: 'POST',
             headers: {
               Accept: 'application/json',
@@ -645,8 +645,8 @@ export default function Univariable() {
                 <SvgContainer
                   className="p-3 border rounded"
                   downloadName={plotPath.split('/').slice(-1)[0]}
-                  plotPath={`web/results/${plotPath}`}
-                  txtPath={`web/results/${dataPath}`}
+                  plotPath={`results/${plotPath}`}
+                  txtPath={`results/${dataPath}`}
                   height="800px"
                 />
               )}

@@ -34,7 +34,7 @@ export default function TmbSignatures() {
               className="p-3"
               title="Tumor Mutational Burden Separated by Signatures"
               downloadName={plotPath.split('/').slice(-1)[0]}
-              plotPath={`web/results/${plotPath}`}
+              plotPath={`results/${plotPath}`}
             />
           </>
         )}

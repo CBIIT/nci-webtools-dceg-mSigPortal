@@ -117,7 +117,7 @@ export default function UserForm() {
   async function handleLoadData() {
     const loadData = async () =>
       (
-        await fetch(`web/associationWrapper`, {
+        await fetch(`associationWrapper`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',

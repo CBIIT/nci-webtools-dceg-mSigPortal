@@ -190,7 +190,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
     if (signatureSetName) {
       mergeProfileComparison({ refSubmitOverlay: true });
       try {
-        const response = await fetch(`web/visualizationWrapper`, {
+        const response = await fetch(`visualizationWrapper`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -274,7 +274,7 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
         ][0],
       };
 
-      const response = await fetch(`web/visualizationWrapper`, {
+      const response = await fetch(`visualizationWrapper`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -459,8 +459,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 <SvgContainer
                   className="p-3"
                   downloadName={withinPlotPath.split('/').slice(-1)[0]}
-                  plotPath={'web/results/' + withinPlotPath}
-                  txtPath={`web/results/${withinTxtPath}`}
+                  plotPath={'results/' + withinPlotPath}
+                  txtPath={`results/${withinTxtPath}`}
                 />
                 <div className="p-3">
                   <p>
@@ -643,8 +643,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 <SvgContainer
                   className="p-3"
                   downloadName={refPlotPath.split('/').slice(-1)[0]}
-                  plotPath={'web/results/' + refPlotPath}
-                  txtPath={`web/results/${refTxtPath}`}
+                  plotPath={'results/' + refPlotPath}
+                  txtPath={`results/${refTxtPath}`}
                 />
                 <div className="p-3">
                   <p>
@@ -792,8 +792,8 @@ export default function ProfileComparison({ submitR, getRefSigOptions }) {
                 <SvgContainer
                   className="p-3"
                   downloadName={pubPlotPath.split('/').slice(-1)[0]}
-                  plotPath={'web/results/' + pubPlotPath}
-                  txtPath={`web/results/${pubTxtPath}`}
+                  plotPath={'results/' + pubPlotPath}
+                  txtPath={`results/${pubTxtPath}`}
                 />
                 <div className="p-3">
                   <p>

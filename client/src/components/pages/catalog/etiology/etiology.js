@@ -129,7 +129,7 @@ export default function Etiology() {
     const getImageS3 = (path) =>
       axios
         .post(
-          'web/getImageS3',
+          'getImageS3',
           { path: `msigportal/Database/Etiology/${path}` },
           { responseType: 'blob' }
         )
@@ -335,7 +335,7 @@ export default function Etiology() {
 
   async function getImageBatch(keyArr) {
     return axios
-      .post('web/getImageS3Batch', { keys: keyArr })
+      .post('getImageS3Batch', { keys: keyArr })
       .then(({ data }) => data);
   }
 
