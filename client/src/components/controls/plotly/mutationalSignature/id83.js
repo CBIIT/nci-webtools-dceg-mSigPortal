@@ -87,7 +87,7 @@ export default function ID83(unsortedData, sample) {
           : e.mutationType.slice(-1),
     })),
     hovertemplate:
-      '<b>x</b>:%{customdata.mutationType}, %{customdata.xval}<br>' +
+      // '<b>x</b>:%{customdata.mutationType}, %{customdata.xval}<br>' +
       '<b>Number of indels</b>: %{y}<extra></extra>',
     showlegend: false,
   }));
