@@ -95,10 +95,10 @@ export default function Visualization({ match }) {
 
   // switch to first tab after fetching samples
   useEffect(() => {
-    if (samples.length && projectID) {
+    if (samples.length) {
       mergeState({ displayTab: 'profilerSummary' });
     }
-  }, [samples, projectID]);
+  }, [samples]);
 
   // reload summary information
   async function getResults() {

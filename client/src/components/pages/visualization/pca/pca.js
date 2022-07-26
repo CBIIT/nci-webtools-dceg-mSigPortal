@@ -16,12 +16,12 @@ export default function PCA() {
 
   return (
     <div>
-      <p className="bg-white border rounded p-3 mb-1">
+      <div className="bg-white border rounded p-3 mb-1">
         <Description
           less="Below you can conduct PCA analysis between samples, or a PCA with Public Data (for user input data only)."
           more="PCA stands for Principal Component Analysis, which helps to explain the variation found in the data through the establishment of different principal components. Each principal component can also be used to compare with known mutational signatures."
         />
-      </p>
+      </div>
       <Tab.Container
         transition={false}
         className="mt-2"
