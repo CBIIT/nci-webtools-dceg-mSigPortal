@@ -30,9 +30,6 @@ export default function TMB(data, tmbTabName, signatureName) {
     ),
   }));
 
-  console.log('traces:--');
-  console.log(traces);
-
   const topLabel = data.map((element, index, array) => ({
     element: element,
     xref: 'x',

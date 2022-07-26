@@ -40,7 +40,7 @@ export default function TreeLeafForm() {
             <Select
               name="signatureNames"
               label="Signature Name"
-              value={signatureNames}
+              //value={signatureNames}
               control={control}
               options={signatureNameOptions}
               onChange={(name) => mergeMsBurden({ signatureName: name })}

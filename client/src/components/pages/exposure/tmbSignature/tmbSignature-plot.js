@@ -26,10 +26,6 @@ export default function MutProfilePlot() {
     }
   }, [publicForm]);
   console.log(data);
-  //console.log(publicForm);
-  if (data) {
-    //console.log(data.traces.length);
-  }
 
   return (
     <>
