@@ -2,19 +2,22 @@
   "openapi": "3.0.0",
   "tags": [
     {
-      "name": "Visualization"
+      "name": "seqmatrix"
     },
     {
-      "name": "Exploration"
+      "name": "exposure"
     },
     {
-      "name": "Signature"
+      "name": "association"
+    },
+    {
+      "name": "signature"
     }
   ],
   "paths": {
     "/api/seqmatrix": {
       "get": {
-        "tags": ["Visualization"],
+        "tags": ["seqmatrix"],
         "summary": "Retrieves seqmatrix data",
         "produces": ["application/json"],
         "parameters": [
@@ -35,7 +38,7 @@
             "description": "Select cancer belonging to the study",
             "required": true,
             "schema": {
-              "type": "string"
+              "enum": ["Lung-AdenoCA"]
             },
             "value": "Lung-AdenoCA"
           },
@@ -53,7 +56,7 @@
           {
             "name": "sample",
             "in": "query",
-            "description": "Select sample.",
+            "description": "Enter sample.",
             "required": false,
             "schema": {
               "type": "string"
@@ -85,7 +88,7 @@
           {
             "name": "mutationType",
             "in": "query",
-            "description": "select mutation type",
+            "description": "Enter mutation type",
             "required": false,
             "schema": {
               "type": "string"
@@ -95,7 +98,7 @@
           {
             "name": "mutations",
             "in": "query",
-            "description": "select mutations value",
+            "description": "Enter mutations value",
             "required": false,
             "schema": {
               "type": "string"
@@ -125,7 +128,7 @@
     },
     "/api/exposure": {
       "get": {
-        "tags": ["Exploration"],
+        "tags": ["exposure"],
         "summary": "Retrieves Exposure data",
         "produces": ["application/json"],
         "parameters": [
@@ -154,7 +157,7 @@
           {
             "name": "signatureSetName",
             "in": "query",
-            "description": "Select signature set to filter data by.",
+            "description": "Enter signature set to filter data by.",
             "required": true,
             "schema": {
               "type": "string",
@@ -169,7 +172,7 @@
           {
             "name": "cancer",
             "in": "query",
-            "description": "select cancer",
+            "description": "Enter cancer",
             "required": false,
             "schema": {
               "type": "string"
@@ -179,7 +182,7 @@
           {
             "name": "organ",
             "in": "query",
-            "description": "select organ",
+            "description": "Enter organ",
             "required": false,
             "schema": {
               "type": "string"
@@ -189,7 +192,7 @@
           {
             "name": "sample",
             "in": "query",
-            "description": "select sample",
+            "description": "Enter sample",
             "required": false,
             "schema": {
               "type": "string"
@@ -199,7 +202,7 @@
           {
             "name": "signatureName",
             "in": "query",
-            "description": "select signature",
+            "description": "Enter signature",
             "required": false,
             "schema": {
               "type": "string"
@@ -209,7 +212,7 @@
           {
             "name": "exposure",
             "in": "query",
-            "description": "select exposure value",
+            "description": "Enter exposure value",
             "required": false,
             "schema": {
               "type": "string"
@@ -239,10 +242,32 @@
     },
     "/api/signature": {
       "get": {
-        "tags": ["Signature"],
+        "tags": ["signature"],
         "summary": "Retrieves signature data",
         "produces": ["application/json"],
         "parameters": [
+          {
+            "name": "source",
+            "in": "query",
+            "description": "Enter source",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["Reference_signatures", "Published_signatures"]
+            },
+            "value": "Reference_signatures"
+          },
+          {
+            "name": "strategy",
+            "in": "query",
+            "description": "Select strategy (dataset) of the study.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["TS", "WES", "WGS"]
+            },
+            "value": "WGS"
+          },
           {
             "name": "profile",
             "in": "query",
@@ -268,7 +293,7 @@
           {
             "name": "signatureSetName",
             "in": "query",
-            "description": "Select signature set to filter data by.",
+            "description": "Enter signature set to filter data by.",
             "required": false,
             "schema": {
               "type": "string",
@@ -282,29 +307,9 @@
             "value": "COSMIC_v3_Signatures_GRCh37_SBS96"
           },
           {
-            "name": "signatureName",
-            "in": "query",
-            "description": "select signature",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "value": ""
-          },
-          {
-            "name": "source",
-            "in": "query",
-            "description": "select source",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "value": ""
-          },
-          {
             "name": "strandInfo",
             "in": "query",
-            "description": "select strandInfo",
+            "description": "Enter strandInfo",
             "required": false,
             "schema": {
               "type": "string"
@@ -314,7 +319,17 @@
           {
             "name": "strand",
             "in": "query",
-            "description": "select strand",
+            "description": "Enter strand",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "signatureName",
+            "in": "query",
+            "description": "Enter signature",
             "required": false,
             "schema": {
               "type": "string"
@@ -324,7 +339,7 @@
           {
             "name": "mutationType",
             "in": "query",
-            "description": "select mutationType",
+            "description": "Enter mutationType",
             "required": false,
             "schema": {
               "type": "string"
@@ -334,7 +349,146 @@
           {
             "name": "contribution",
             "in": "query",
-            "description": "select contribution value",
+            "description": "Enter contribution value",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit response size",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "10"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "500": {
+            "description": "API error"
+          }
+        }
+      }
+    },
+    "/api/association": {
+      "get": {
+        "tags": ["association"],
+        "summary": "Retrieves association data",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "study",
+            "in": "query",
+            "description": "Select profile",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["PCAWG"]
+            },
+            "value": "PCAWG"
+          },
+          {
+            "name": "strategy",
+            "in": "query",
+            "description": "Select strategy (dataset) of the study.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["TS", "WES", "WGS"]
+            },
+            "value": "WGS"
+          },
+          {
+            "name": "cancer",
+            "in": "query",
+            "description": "Enter cancer",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "value": "Biliary-AdenoCA"
+          },
+          {
+            "name": "sample",
+            "in": "query",
+            "description": "Enter sample",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "icgcSpecimenId",
+            "in": "query",
+            "description": "Enter icgcSpecimenId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "icgcDonorld",
+            "in": "query",
+            "description": "Enter icgcDonorld",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "dataSource",
+            "in": "query",
+            "description": "Enter dataSource",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "dataType",
+            "in": "query",
+            "description": "Enter dataType",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "variableName",
+            "in": "query",
+            "description": "Enter variableName",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "variableValue",
+            "in": "query",
+            "description": "Enter variableValue",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "variableValueType",
+            "in": "query",
+            "description": "Enter variableValueType",
             "required": false,
             "schema": {
               "type": "string"
