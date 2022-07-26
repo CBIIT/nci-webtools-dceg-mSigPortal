@@ -1,14 +1,14 @@
 export default function MSPrevalence(data) {
   data.sort((a, b) => b.samples.length - a.samples.length);
   console.log(data);
-
+  const totalSamples = data[0].totalSamples;
   const traces = data.map((group, groupIndex, array) => ({
     group: group,
     array: array,
     name: group.signatureName,
     type: 'bar',
     x: [group.signatureName],
-    y: [group.samples.length / group.totalSamples],
+    y: [group.samples.length],
     hoverinfo: 'x+y',
     showlegend: false,
   }));
@@ -41,6 +41,7 @@ export default function MSPrevalence(data) {
         },
       },
       autorange: false,
+      range: [0, totalSamples],
       ticks: 'inside',
       tickcolor: '#D3D3D3',
       linecolor: '#D3D3D3',
