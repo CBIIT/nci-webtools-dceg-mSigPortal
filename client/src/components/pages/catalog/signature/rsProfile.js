@@ -55,7 +55,7 @@ export default function Profile({ submitR }) {
   async function fetchPlot(path, index = null) {
     try {
       const svg = await (
-        await fetch(`web/getImageS3`, {
+        await fetch(`getImageS3`, {
           method: 'POST',
           headers: {
             Accept: 'image/svg',

@@ -123,7 +123,7 @@ export default function PublicForm({
   async function getSampleNames() {
     try {
       const { stdout, output } = await (
-        await fetch(`web/explorationWrapper`, {
+        await fetch(`explorationWrapper`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -158,7 +158,7 @@ export default function PublicForm({
   async function getSignatureNames() {
     try {
       const { stdout, output } = await (
-        await fetch(`web/explorationWrapper`, {
+        await fetch(`explorationWrapper`, {
           method: 'POST',
           headers: {
             Accept: 'application/json',

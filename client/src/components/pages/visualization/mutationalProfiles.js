@@ -85,8 +85,8 @@ export default function MutationalProfiles() {
       try {
         const response =
           source == 'user'
-            ? await fetch(`web/results/${projectID}${plot.Path}`)
-            : await fetch(`web/getImageS3`, {
+            ? await fetch(`results/${projectID}${plot.Path}`)
+            : await fetch(`getImageS3`, {
                 method: 'POST',
                 headers: {
                   Accept: 'image/svg',

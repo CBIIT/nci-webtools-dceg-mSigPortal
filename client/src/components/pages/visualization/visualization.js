@@ -102,7 +102,7 @@ export default function Visualization({ match }) {
 
   // reload summary information
   async function getResults() {
-    const response = await fetch(`web/getResults`, {
+    const response = await fetch(`getResults`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -256,7 +256,7 @@ export default function Visualization({ match }) {
   }
 
   function submitR(fn, args) {
-    return fetch(`web/visualizationWrapper`, {
+    return fetch(`visualizationWrapper`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -267,7 +267,7 @@ export default function Visualization({ match }) {
   }
 
   // function getRefSigOptions(profileType) {
-  //   return fetch(`web/visualizationWrapper`, {
+  //   return fetch(`visualizationWrapper`, {
   //     method: 'POST',
   //     headers: {
   //       Accept: 'application/json',
@@ -290,7 +290,7 @@ export default function Visualization({ match }) {
     });
     try {
       const { args, visualization, timestamp } = await (
-        await fetch(`web/getQueueResults/${id}`)
+        await fetch(`getQueueResults/${id}`)
       ).json();
       dispatch(actions.mergeVisualization(visualization));
     } catch (error) {
@@ -316,7 +316,7 @@ export default function Visualization({ match }) {
     });
     try {
       const { projectID, state: visualizationStore } = await (
-        await fetch(`web/getVisExample/${id}`)
+        await fetch(`getVisExample/${id}`)
       ).json();
       dispatch(
         actions.mergeVisualization({

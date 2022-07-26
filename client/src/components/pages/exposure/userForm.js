@@ -91,7 +91,7 @@ export default function PublicForm({
             data.append('signatureFile', signatureFileObj);
           // if (variableFileObj.size)
           //   dasel'variableFile', variableFileObj);
-          let response = await fetch(`web/upload`, {
+          let response = await fetch(`upload`, {
             method: 'POST',
             body: data,
           });
@@ -108,7 +108,7 @@ export default function PublicForm({
             const { projectID, exposurePath } = await response.json();
 
             const exposureData = await (
-              await fetch('web/getSignaturesUser', {
+              await fetch('getSignaturesUser', {
                 method: 'POST',
                 headers: {
                   Accept: 'application/json',

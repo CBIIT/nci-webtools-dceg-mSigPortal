@@ -43,7 +43,7 @@ export default function PublicForm() {
     mergeState({ loadingData: true });
 
     try {
-      const { data: exposureSignature } = await axios.post('web/getFileS3', {
+      const { data: exposureSignature } = await axios.post('getFileS3', {
         path: 'Others/json/Exploring-Exposure.json',
       });
 
@@ -118,7 +118,7 @@ export default function PublicForm() {
   async function handleLoadData() {
     const getAssocVarData = () =>
       axios
-        .post('web/associationWrapper', {
+        .post('associationWrapper', {
           fn: 'getAssocVarData',
           args: { study, strategy, rsSet, cancer },
         })
@@ -126,7 +126,7 @@ export default function PublicForm() {
 
     const getExpVarData = () =>
       axios
-        .post('web/associationWrapper', {
+        .post('associationWrapper', {
           fn: 'getExpVarData',
           args: { study, strategy, rsSet, cancer },
         })
