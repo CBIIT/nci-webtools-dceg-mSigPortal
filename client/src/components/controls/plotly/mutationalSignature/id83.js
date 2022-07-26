@@ -79,19 +79,22 @@ export default function ID83(unsortedData, sample) {
     groupdata: group.data,
     //customdata: group.data.map((e) => ({ mutationType: e.mutationType })),
     customdata: group.data.map((e) => ({
+      mutationOrder: e.mutationType.substring(0, 1),
       mutationType:
         e.mutationType.substring(2, 5) === 'Del' ? 'Deletion' : 'Insertion',
+      extraValue: e.mutationType.substring(6, 7),
       xval:
         e.mutationType.substring(2, 5) === 'Del'
           ? +e.mutationType.slice(-1) + 1
           : e.mutationType.slice(-1),
     })),
     hovertemplate:
-      // '<b>x</b>:%{customdata.mutationType}, %{customdata.xval}<br>' +
-      '<b>Number of indels</b>: %{y}<extra></extra>',
+      '<b>%{customdata.mutationOrder} bp %{customdata.mutationType}, %{customdata.extraValue}, %{customdata.xval}</b><br>' +
+      '%{y} indels<extra></extra>',
     showlegend: false,
   }));
 
+  console.log(traces);
   const shapeAnnotations = data.map((group, groupIndex, array) => ({
     xref: 'x',
     yref: 'paper',
