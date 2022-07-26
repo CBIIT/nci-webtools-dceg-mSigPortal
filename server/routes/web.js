@@ -23,9 +23,18 @@ const {
   associationWrapper,
 } = require('../services/apiAnalysis');
 
-const visualizationRoutes = require('../services/analysis/visualization/visualization');
-const explorationRoutes = require('../services/analysis/exploration/exploration');
-const signatureRoutes = require('../services/analysis/signature/signature');
+const {
+  router: visualizationRoutes,
+} = require('../services/analysis/visualization/visualization');
+const {
+  router: explorationRoutes,
+} = require('../services/analysis/exploration/exploration');
+const {
+  router: signatureRoutes,
+} = require('../services/analysis/signature/signature');
+const {
+  router: associationRoutes,
+} = require('../services/analysis/association/association');
 
 const router = express.Router();
 
@@ -78,12 +87,10 @@ router.post('/downloadWorkspace', downloadWorkspace);
 
 router.post('/associationWrapper', associationWrapper);
 
-// visualization
 router.use(visualizationRoutes);
 router.use(signatureRoutes);
-
-// exploration
 router.use(explorationRoutes);
+router.use(associationRoutes);
 
 router.use((error, req, res, next) => {
   logger.error(error);

@@ -67,4 +67,4 @@ router.get('/exposure', queryExposure);
 router.get('/explorationOptions', explorationOptions);
 router.get('/explorationSamples', explorationSamples);
 
-module.exports = router;
+module.exports = { router, queryExposure };

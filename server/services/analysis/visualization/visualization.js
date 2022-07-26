@@ -53,4 +53,4 @@ router.get('/seqmatrix', querySeqmatrix);
 router.get('/visualizationOptions', visualizationOptions);
 router.get('/visualizationSamples', visualizationSamples);
 
-module.exports = router;
+module.exports = { router, querySeqmatrix };

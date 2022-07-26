@@ -19,4 +19,4 @@ const router = Router();
 
 router.get('/signature', querySignature);
 
-module.exports = router;
+module.exports = { router, querySignature };
