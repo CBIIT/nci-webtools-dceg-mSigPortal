@@ -16,6 +16,7 @@ import MsAssociation from './msAssociation';
 import MsDecomposition from './msDecomposition';
 import MsDecomposition2 from './msDecomposition/msDecomposition.js';
 import MsLandscape from './msLandscape';
+import MsLandscape2 from './msLandscape/msLanscape.js';
 import MsPrevalence from './msPrevalence';
 import MsPrevalence2 from './msPrevalence/msPrevalence.js';
 import MSIndividual from './msIndividual';
@@ -602,6 +603,11 @@ export default function Exposure({ match }) {
             component: <MsDecomposition2 />,
             id: 'msDecomposition',
             name: 'MS Decomposition',
+          },
+          {
+            component: <MsLandscape2 />,
+            id: 'msLandscape',
+            name: 'MS Landscape',
           },
           {
             component: <MsPrevalence2 />,
