@@ -1,7 +1,8 @@
-export default function MSPrevalence(data) {
-  data.sort((a, b) => b.samples.length - a.samples.length);
-  console.log(data);
-  const traces = data.map((group, groupIndex, array) => ({
+export default function MSPrevalence(groupBySignature, groupBySample) {
+  groupBySignature.sort((a, b) => b.samples.length - a.samples.length);
+  console.log(groupBySignature);
+  console.log(groupBySample);
+  const traces = groupBySignature.map((group, groupIndex, array) => ({
     group: group,
     array: array,
     name: group.signatureName,

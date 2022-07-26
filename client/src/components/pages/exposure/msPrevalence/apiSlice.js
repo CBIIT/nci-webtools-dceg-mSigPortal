@@ -14,6 +14,7 @@ export const msPrevalenceApiSlice = explorationApiSlice.injectEndpoints({
         console.log(data);
         // calculate median burden across cancer types
         const groupBySignature = groupBy(data, 'signatureName');
+        const groupBySample = groupBy(data, 'sample');
         const transform = Object.entries(groupBySignature)
           .map(([signatureName, data]) => {
             const samples = data
@@ -41,7 +42,7 @@ export const msPrevalenceApiSlice = explorationApiSlice.injectEndpoints({
           .filter((e) => e.medianBurden)
           .sort((a, b) => a.medianBurden - b.medianBurden);
 
-        return MsPrevalence(transform);
+        return MsPrevalence(transform, groupBySample);
       },
     }),
   }),
