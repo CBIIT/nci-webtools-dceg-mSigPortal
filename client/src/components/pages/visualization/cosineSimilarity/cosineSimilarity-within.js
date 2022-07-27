@@ -22,7 +22,7 @@ export default function CsWithin() {
     );
 
   const { study, cancer, strategy } = store.publicForm;
-  const { source, samples, matrixList, projectID } = store.main;
+  const { source, matrixData, matrixList, projectID } = store.main;
   const { withinForm } = store.cosineSimilarity;
 
   const [params, setParams] = useState('');
@@ -32,10 +32,10 @@ export default function CsWithin() {
   });
 
   function getMatrixOptions(profile) {
-    return samples && profile
+    return matrixData && profile
       ? [
           ...new Set(
-            samples
+            matrixData
               .filter((e) => e.profile == profile.value)
               .map((e) => e.matrix)
           ),
@@ -54,8 +54,8 @@ export default function CsWithin() {
 
   const { profile, matrix } = watch();
 
-  const profileOptions = samples.length
-    ? [...new Set(samples.map((e) => e.profile))].map((e) => ({
+  const profileOptions = matrixData.length
+    ? [...new Set(matrixData.map((e) => e.profile))].map((e) => ({
         label: e,
         value: e,
       }))
@@ -102,7 +102,7 @@ export default function CsWithin() {
     const matrixOptions = getMatrixOptions(e);
 
     setValue('profile', e);
-    if (samples.length) {
+    if (matrixOptions.length) {
       setValue('matrix', defaultMatrix2(e, matrixOptions));
     }
   }

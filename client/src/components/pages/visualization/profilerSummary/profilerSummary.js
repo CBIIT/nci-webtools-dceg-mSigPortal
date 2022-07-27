@@ -8,17 +8,16 @@ import profilerSummary from '../../../controls/plotly/profilerSummary/profilerSu
 
 export default function ProfilerSummary() {
   const store = useSelector((state) => state.visualization);
-  const { samples } = store.main;
+  const { matrixData } = store.main;
 
   const [plot, setPlot] = useState({});
 
   useEffect(() => {
-    if (samples.length) {
-      const plot = profilerSummary(samples);
-
+    if (matrixData.length) {
+      const plot = profilerSummary(matrixData);
       setPlot(plot);
     }
-  }, [samples]);
+  }, [matrixData]);
 
   return (
     <div className="bg-white border rounded">

@@ -9,7 +9,7 @@ import {
   resetVisualizationApi,
   useVisualizationOptionsQuery,
 } from '../../../../services/store/rootApi';
-import { useVisualizationSamplesMutation } from './apiSlice';
+import { usePublicMatrixMutation } from './apiSlice';
 
 const actions = { ...visualizationActions, ...modalActions };
 
@@ -27,8 +27,7 @@ export default function PublicForm() {
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const { data, error, isFetching } = useVisualizationOptionsQuery();
-  const [fetchSamples, { isLoading, reset: resetSamples }] =
-    useVisualizationSamplesMutation();
+  const [fetchMatrix, { isLoading }] = usePublicMatrixMutation();
 
   const defaultValues = {
     study: { label: 'PCAWG', value: 'PCAWG' },
@@ -64,9 +63,9 @@ export default function PublicForm() {
         cancer: data.cancer.value,
         strategy: data.strategy.value,
       };
-      const samples = await fetchSamples(params).unwrap();
+      const matrixData = await fetchMatrix(params).unwrap();
 
-      mergeMain({ samples, projectID: crypto.randomUUID() });
+      mergeMain({ matrixData, projectID: crypto.randomUUID() });
     } catch (error) {
       if (error.originalStatus == 504) {
         mergeMain({

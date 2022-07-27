@@ -64,7 +64,7 @@ export default function Visualization({ match }) {
     displayTab,
     svgList,
     matrixList,
-    samples,
+    matrixData,
   } = store.main;
   const mutationalProfiles = store.mutationalProfiles;
   const { signatureSetOptions } = store.pca;
@@ -95,10 +95,10 @@ export default function Visualization({ match }) {
 
   // switch to first tab after fetching samples
   useEffect(() => {
-    if (samples.length) {
+    if (matrixData.length) {
       mergeState({ displayTab: 'profilerSummary' });
     }
-  }, [samples]);
+  }, [matrixData]);
 
   // reload summary information
   async function getResults() {
@@ -436,7 +436,9 @@ export default function Visualization({ match }) {
                     active={id == displayTab}
                     disabled={
                       id != 'instructions' &&
-                      !(source == 'public' ? samples.length : matrixList.length)
+                      !(source == 'public'
+                        ? matrixData.length
+                        : matrixList.length)
                     }
                     style={{
                       textDecoration: 'none',
@@ -462,7 +464,7 @@ export default function Visualization({ match }) {
                     variant="link"
                     className={
                       id == displayTab &&
-                      (samples.length || Object.keys(svgList).length)
+                      (matrixData.length || Object.keys(svgList).length)
                         ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 active-secondary-navlinks'
                         : 'secondary-navlinks px-3 py-1 d-inline-block border-0'
                     }
