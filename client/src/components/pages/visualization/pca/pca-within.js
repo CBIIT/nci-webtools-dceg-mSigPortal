@@ -20,7 +20,7 @@ export default function CsWithin() {
     );
 
   const { study, cancer, strategy } = store.publicForm;
-  const { source, samples, matrixList, projectID } = store.main;
+  const { source, matrixData, matrixList, projectID } = store.main;
   const { withinForm } = store.pca;
 
   const [calculationQuery, setCalculationQuery] = useState('');
@@ -42,8 +42,8 @@ export default function CsWithin() {
 
   const { profile, signatureSet } = watch();
 
-  const profileOptions = samples.length
-    ? [...new Set(samples.map((e) => e.profile))].map((e) => ({
+  const profileOptions = matrixData.length
+    ? [...new Set(matrixData.map((e) => e.profile))].map((e) => ({
         label: e,
         value: e,
       }))

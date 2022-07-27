@@ -2,7 +2,7 @@ import { visualizationApiSlice } from '../../../../services/store/rootApi';
 
 export const publicFormApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    visualizationSamples: builder.mutation({
+    publicMatrix: builder.mutation({
       query: (params) => ({
         url: 'seqmatrix',
         params,
@@ -11,4 +11,4 @@ export const publicFormApiSlice = visualizationApiSlice.injectEndpoints({
   }),
 });
 
-export const { useVisualizationSamplesMutation } = publicFormApiSlice;
+export const { usePublicMatrixMutation } = publicFormApiSlice;
