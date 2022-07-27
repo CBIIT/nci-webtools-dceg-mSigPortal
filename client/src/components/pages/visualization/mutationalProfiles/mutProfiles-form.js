@@ -26,11 +26,11 @@ export default function TreeLeafForm() {
 
   const { control, setValue, watch } = useForm();
 
-  const supportMatrix = [6, 24, 96, 192, 288, 384, 1536, 78, 186, 28, 83, 415];
-  //const supportMatrixSBS = [6, 24, 96, 192, 288, 384, 1536];
-  //const supportMatrixDBS = [78, 186];
-  //const supportMatrixID = [28, 83, 415];
-  //const unSupportMatrix = [4608, 6144, 150, 1248, 2400, 2976, 332, 8628];
+  const supportMatrix = {
+    SBS: [6, 24, 96, 192, 288, 384, 1536],
+    DBS: [78, 186],
+    ID: [28, 83, 415],
+  };
 
   // populate controls
   useEffect(() => {
@@ -69,7 +69,7 @@ export default function TreeLeafForm() {
                 (e) =>
                   e.sample &&
                   e.profile == profile.value &&
-                  supportMatrix.includes(e.matrix)
+                  supportMatrix[e.profile].includes(e.matrix)
               )
               .map((e) => e.matrix)
               .sort((a, b) => a - b)
