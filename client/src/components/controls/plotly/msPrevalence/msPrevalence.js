@@ -4,7 +4,7 @@ export default function MSPrevalence(groupBySignature, groupBySample) {
   console.log(groupBySample);
   //console.log(mutation);
 
-  const minumumNumber = 100;
+  let minumumNumber = 100;
   // mutation === 'null'
   //   ? (minumumNumber = 100)
   //   : (minumumNumber = parseInt(mutation));
