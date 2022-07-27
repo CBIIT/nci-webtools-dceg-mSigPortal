@@ -1,9 +1,17 @@
-export default function MSPrevalence(groupBySignature, groupBySample) {
+export default function MSPrevalence(
+  groupBySignature,
+  groupBySample,
+  mutation
+) {
   groupBySignature.sort((a, b) => b.samples.length - a.samples.length);
   console.log(groupBySignature);
   console.log(groupBySample);
+  console.log(mutation);
 
-  const minumumNumber = 100;
+  let minumumNumber;
+  mutation === 'null'
+    ? (minumumNumber = 100)
+    : (minumumNumber = parseInt(mutation));
 
   const tracesPie = {
     type: 'pie',
@@ -20,6 +28,7 @@ export default function MSPrevalence(groupBySignature, groupBySample) {
     array: array,
     name: group.signatureName,
     type: 'bar',
+    minumumNumber: minumumNumber,
     lenght: group.samples.filter((e) => e.exposure >= minumumNumber),
 
     x: [group.signatureName],
@@ -36,7 +45,6 @@ export default function MSPrevalence(groupBySignature, groupBySample) {
         10 +
         '%',
     ],
-
     textposition: 'outside',
     xaxis: 'x2',
     yaxis: 'y2',
@@ -52,13 +60,43 @@ export default function MSPrevalence(groupBySignature, groupBySample) {
   const traces = [tracesPie, ...tracesBar];
 
   console.log(traces);
+
+  const titleAnnotations = [
+    {
+      xref: 'paper',
+      yref: 'paper',
+      showarrow: false,
+      x: 0.15,
+      y: 1.1,
+      xanchor: 'top',
+      text: '<b>Prevalence by mutations</b>',
+      font: {
+        size: 18,
+        family: 'Arial',
+      },
+    },
+    {
+      xref: 'x2 domain',
+      yref: 'paper',
+      showarrow: false,
+      x: 0.5,
+      y: 1.1,
+      xanchor: 'top',
+      text: '<b>Prevalence by samples</b>',
+      font: {
+        size: 18,
+        family: 'Arial',
+      },
+    },
+  ];
+
   const layout = {
     grid: { rows: 1, columns: 2 },
     hoverlabel: { bgcolor: '#FFF' },
     height: 450,
     //width: 500,
     autosize: true,
-    title: 'Prevalence of Mutational Signatures',
+    title: '<b>Prevalence of Mutational Signatures</b>',
     xaxis2: {
       showline: true,
       tickangle: -90,
@@ -67,9 +105,9 @@ export default function MSPrevalence(groupBySignature, groupBySample) {
       },
       tickmode: 'array',
 
-      linecolor: '#E0E0E0',
+      linecolor: 'black',
       linewidth: 1,
-      mirror: 'all',
+
       categoryorder: 'total descending',
     },
     yaxis2: {
@@ -83,13 +121,14 @@ export default function MSPrevalence(groupBySignature, groupBySample) {
       range: [0, 1.1],
       ticks: 'inside',
       tickcolor: '#D3D3D3',
-      linecolor: '#D3D3D3',
+      linecolor: 'black',
       linewidth: 1,
-      mirror: 'all',
+
       tickformat: ',.0%',
       showgrid: true,
       gridcolor: '#F5F5F5',
     },
+    annotations: titleAnnotations,
   };
 
   return { traces: traces, layout: layout };
