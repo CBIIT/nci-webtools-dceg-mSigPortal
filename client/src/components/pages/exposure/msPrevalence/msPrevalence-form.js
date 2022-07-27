@@ -9,18 +9,42 @@ const { Group, Label, Check, Control } = Form;
 export default function MsPrevalenceForm() {
   const dispatch = useDispatch();
   const store = useSelector((state) => state.exposure);
+  const { projectID, source } = store.main;
   const mergeMsPrevalence = (state) =>
     dispatch(actions.mergeExposure({ msPrevalence: state }));
 
-  const { mutation } = store.main;
-  console.log(mutation);
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
+
+  //const { mutation } = store.main;
+  //console.log(mutation);
 
   const [invalidMin, setMin] = useState(false);
+
+  async function calculatePrevalence() {
+    try {
+      if (source == 'user' && !projectID) {
+        mergeError('Missing Required Files');
+      } else {
+        mergeMsPrevalence({
+          loading: true,
+          err: false,
+          plotPath: '',
+        });
+
+        //await handleCalculate('prevalence');
+
+        mergeMsPrevalence({ loading: false });
+      }
+    } catch (error) {
+      mergeError(error.message);
+    }
+  }
 
   return (
     <div>
       <hr />
-      <Form className="p-3">
+      <Form noValidate className="p-3">
         <Row>
           <Col lg="auto">
             <Group
@@ -33,7 +57,7 @@ export default function MsPrevalenceForm() {
               <Control
                 type="num"
                 name="minnum"
-                value={mutation}
+                value="100"
                 placeholder="e.g. 100"
                 onChange={(e) => {
                   mergeMsPrevalence({
@@ -47,7 +71,17 @@ export default function MsPrevalenceForm() {
               </Form.Control.Feedback>
             </Group>
           </Col>
-          <Col lg="auto" className="d-flex"></Col>
+          <Col lg="auto" className="d-flex">
+            <Button
+              className="mt-auto mb-3"
+              variant="primary"
+              onClick={() => {
+                calculatePrevalence();
+              }}
+            >
+              Recalculate
+            </Button>
+          </Col>
         </Row>
       </Form>
     </div>

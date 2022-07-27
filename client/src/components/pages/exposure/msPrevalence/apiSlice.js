@@ -5,15 +5,16 @@ import { groupBy } from 'lodash';
 export const msPrevalenceApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     msPrevelencePlot: builder.query({
-      query: ({ mutation, ...params }) => ({
+      // query: ({ mutation, ...params }) => ({
+      query: (params) => ({
         url: 'exposure',
         params,
       }),
       transformResponse: (data, meta, arg) => {
         console.log('prevalence api');
         console.log(data);
-        const { mutation } = arg;
-        console.log(mutation);
+        //const { mutation } = arg;
+        //console.log(mutation);
 
         // calculate median burden across cancer types
         const groupBySignature = groupBy(data, 'signatureName');
@@ -45,7 +46,8 @@ export const msPrevalenceApiSlice = explorationApiSlice.injectEndpoints({
           .filter((e) => e.medianBurden)
           .sort((a, b) => a.medianBurden - b.medianBurden);
 
-        return MsPrevalence(transform, groupBySample, mutation);
+        //return MsPrevalence(transform, groupBySample, mutation);
+        return MsPrevalence(transform, groupBySample);
       },
     }),
   }),

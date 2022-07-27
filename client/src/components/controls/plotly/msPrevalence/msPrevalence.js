@@ -1,17 +1,13 @@
-export default function MSPrevalence(
-  groupBySignature,
-  groupBySample,
-  mutation
-) {
+export default function MSPrevalence(groupBySignature, groupBySample) {
   groupBySignature.sort((a, b) => b.samples.length - a.samples.length);
   console.log(groupBySignature);
   console.log(groupBySample);
-  console.log(mutation);
+  //console.log(mutation);
 
-  let minumumNumber;
-  mutation === 'null'
-    ? (minumumNumber = 100)
-    : (minumumNumber = parseInt(mutation));
+  const minumumNumber = 100;
+  // mutation === 'null'
+  //   ? (minumumNumber = 100)
+  //   : (minumumNumber = parseInt(mutation));
 
   const tracesPie = {
     type: 'pie',
@@ -29,7 +25,7 @@ export default function MSPrevalence(
     name: group.signatureName,
     type: 'bar',
     minumumNumber: minumumNumber,
-    lenght: group.samples.filter((e) => e.exposure >= minumumNumber),
+    lenght: group.samples.filter((e) => e.exposure >= 100),
 
     x: [group.signatureName],
     y: [
@@ -40,7 +36,8 @@ export default function MSPrevalence(
       Math.round(
         (group.samples.filter((e) => e.exposure >= minumumNumber).length /
           group.totalSamples) *
-          1000
+          minumumNumber *
+          10
       ) /
         10 +
         '%',

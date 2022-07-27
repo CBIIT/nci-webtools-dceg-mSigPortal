@@ -14,9 +14,9 @@ export default function MutProfilePlot() {
     skip: !params,
   });
 
-  const { mutation } = useSelector((state) => state.exposure.msPrevalence);
+  //const { mutation } = useSelector((state) => state.exposure.msPrevalence);
 
-  console.log(mutation);
+  //console.log(mutation);
   useEffect(() => {
     const { study, strategy, signatureSetName, cancer } = publicForm;
     if (study) {
@@ -25,7 +25,7 @@ export default function MutProfilePlot() {
         strategy: strategy.value,
         signatureSetName: signatureSetName.value,
         cancer: cancer.value,
-        mutation: mutation,
+        //mutation: mutation,
       });
     }
   }, [publicForm]);
