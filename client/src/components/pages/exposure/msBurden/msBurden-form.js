@@ -10,7 +10,7 @@ import { NavHashLink } from 'react-router-hash-link';
 
 const actions = { ...exposureActions };
 
-export default function TreeLeafForm() {
+export default function MsBurdenForm() {
   const dispatch = useDispatch();
   const store = useSelector((state) => state.exposure);
 

@@ -45,7 +45,7 @@ export default function MSPrevalence(groupBySignature, groupBySample) {
     height: 450,
     //width: 500,
     autosize: true,
-
+    title: 'Prevalence of Mutational Signatures',
     xaxis2: {
       showline: true,
       tickangle: -90,
