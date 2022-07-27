@@ -3,6 +3,8 @@ export default function MSPrevalence(groupBySignature, groupBySample) {
   console.log(groupBySignature);
   console.log(groupBySample);
 
+  const minumumNumber = 100;
+
   const tracesPie = {
     type: 'pie',
     labels: groupBySignature.map((group) => group.signatureName),
@@ -18,10 +20,21 @@ export default function MSPrevalence(groupBySignature, groupBySample) {
     array: array,
     name: group.signatureName,
     type: 'bar',
+    lenght: group.samples.filter((e) => e.exposure >= minumumNumber),
+
     x: [group.signatureName],
-    y: [group.samples.length / group.totalSamples],
+    y: [
+      group.samples.filter((e) => e.exposure >= minumumNumber).length /
+        group.totalSamples,
+    ],
     text: [
-      Math.round((group.samples.length / group.totalSamples) * 1000) / 10 + '%',
+      Math.round(
+        (group.samples.filter((e) => e.exposure >= minumumNumber).length /
+          group.totalSamples) *
+          1000
+      ) /
+        10 +
+        '%',
     ],
 
     textposition: 'outside',
@@ -57,6 +70,7 @@ export default function MSPrevalence(groupBySignature, groupBySample) {
       linecolor: '#E0E0E0',
       linewidth: 1,
       mirror: 'all',
+      categoryorder: 'total descending',
     },
     yaxis2: {
       title: {
