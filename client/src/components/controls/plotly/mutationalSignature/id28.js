@@ -144,7 +144,7 @@ export default function ID28(data, sample) {
             ? +e.mutationType.slice(-1) + 1
             : e.mutationType.slice(-1),
       })),
-      hovertemplate: '<b>Number of indels</b>: %{y}<extra></extra>',
+      hovertemplate: '%{y} indels<extra></extra>',
       //hoverinfo: 'x+y',
       showlegend: false,
     })
