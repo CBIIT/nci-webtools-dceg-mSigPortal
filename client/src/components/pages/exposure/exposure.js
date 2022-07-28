@@ -111,9 +111,7 @@ export default function Exposure({ match }) {
       },
     });
     try {
-      const { state } = await (
-        await fetch(`getExposureExample/${id}`)
-      ).json();
+      const { state } = await (await fetch(`getExposureExample/${id}`)).json();
 
       dispatch(actions.mergeExposure(state));
     } catch (error) {
