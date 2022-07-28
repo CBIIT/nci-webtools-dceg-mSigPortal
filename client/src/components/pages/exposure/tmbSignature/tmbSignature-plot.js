@@ -16,6 +16,7 @@ export default function MutProfilePlot() {
 
   useEffect(() => {
     const { study, strategy, signatureSetName, cancer } = publicForm;
+    //console.log(cancer);
     if (study) {
       setParams({
         study: study.value,

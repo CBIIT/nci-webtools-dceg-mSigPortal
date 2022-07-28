@@ -1,8 +1,8 @@
 export default function MSPrevalence(groupBySignature, groupBySample) {
   groupBySignature.sort(
     (a, b) =>
-      b.samples.reduce((a, b) => a + b.exposure, 0) -
-      a.samples.reduce((a, b) => a + b.exposure, 0)
+      a.samples.reduce((a, b) => a + b.exposure, 0) -
+      b.samples.reduce((a, b) => a + b.exposure, 0)
   );
   console.log(groupBySignature);
   console.log(groupBySample);
@@ -95,10 +95,11 @@ export default function MSPrevalence(groupBySignature, groupBySample) {
     textposition: 'inside',
     textinfo: 'percent',
     showlegend: false,
-    rotation: 180,
+
     marker: {
       colors: groupBySignature.map((group) => colors[group.signatureName]),
     },
+    direction: 'clockwise',
     sort: false,
   };
   console.log(tracesPie);
