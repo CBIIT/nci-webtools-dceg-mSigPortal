@@ -54,6 +54,19 @@ export default function PublicForm() {
     resetVisualization();
   }
 
+  async function* paginateQuery(endpoint, params) {
+    const limit = 1000000;
+    let offset = 0;
+    let result = [];
+
+    do {
+      result = await endpoint({ ...params, limit, offset }).unwrap();
+      offset += limit;
+      yield result;
+    } while (result.length >= limit);
+    return result;
+  }
+
   async function onSubmit(data) {
     try {
       mergeMain({ submitted: true, loading: { active: true } });
@@ -63,10 +76,16 @@ export default function PublicForm() {
         cancer: data.cancer.value,
         strategy: data.strategy.value,
       };
-      const matrixData = await fetchMatrix(params).unwrap();
+
+      let matrixData = [];
+      for await (const data of paginateQuery(fetchMatrix, params)) {
+        matrixData = [...matrixData, ...data];
+      }
+      // const matrixData = await fetchMatrix(params).unwrap();
 
       mergeMain({ matrixData, projectID: crypto.randomUUID() });
     } catch (error) {
+      console.log(error);
       if (error.originalStatus == 504) {
         mergeMain({
           error: 'Please Reset Your Parameters and Try again.',
