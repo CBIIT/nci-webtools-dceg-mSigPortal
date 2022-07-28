@@ -13,33 +13,19 @@ export default function DBS78(data, sample) {
   };
   const dbsdata = ['AC', 'AT', 'CC', 'CG', 'CT', 'GC', 'TA', 'TC', 'TG', 'TT'];
 
-  console.log(data);
-  // data.filter(
-  //   (e) =>
-  //     e.mutation === 'AC' ||
-  //     e.mutation === 'AT' ||
-  //     e.mutation === 'CC' ||
-  //     e.mutation === 'CG' ||
-  //     e.mutation === 'CT' ||
-  //     e.mutation === 'GC' ||
-  //     e.mutation === 'TA' ||
-  //     e.mutation === 'TC' ||
-  //     e.mutation === 'TG' ||
-  //     e.mutation === 'TT'
-  // );
-
-  data.filter((e) => dbsdata.includes(e.mutation));
-  console.log(data);
-  const totalMutations = data.reduce(
+  const datafilter = data.filter((e) => dbsdata.includes(e.mutation));
+  const totalMutations = datafilter.reduce(
     (total, mutation) =>
       total +
       mutation.data.reduce((mutationSum, e) => mutationSum + e.mutations, 0),
     0
   );
   const maxMutation = Math.max(
-    ...data.map((mutation) => mutation.data.map((e) => e.mutations)).flat()
+    ...datafilter
+      .map((mutation) => mutation.data.map((e) => e.mutations))
+      .flat()
   );
-  const mutationTypeNames = data
+  const mutationTypeNames = datafilter
     .map((group) =>
       group.data.map((e) => ({
         mutation: group.mutation,
@@ -48,7 +34,7 @@ export default function DBS78(data, sample) {
     )
     .flat();
 
-  const traces = data.map((group, groupIndex, array) => ({
+  const traces = datafilter.map((group, groupIndex, array) => ({
     name: group.mutation,
     type: 'bar',
     marker: { color: colors[group.mutation] },
@@ -64,7 +50,7 @@ export default function DBS78(data, sample) {
     showlegend: false,
   }));
 
-  const mutationAnnotation = data.map((group, groupIndex, array) => ({
+  const mutationAnnotation = datafilter.map((group, groupIndex, array) => ({
     xref: 'x',
     yref: 'paper',
     xanchor: 'bottom',
@@ -81,7 +67,7 @@ export default function DBS78(data, sample) {
     align: 'center',
   }));
 
-  const shapes = data.map((group, groupIndex, array) => ({
+  const shapes = datafilter.map((group, groupIndex, array) => ({
     type: 'rect',
     xref: 'x',
     yref: 'paper',
