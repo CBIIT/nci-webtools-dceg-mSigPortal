@@ -17,11 +17,17 @@ function alphaNumericSort(array) {
 }
 async function queryExposure(req, res, next) {
   try {
-    const { limit, ...query } = req.query;
+    const { limit, offset, ...query } = req.query;
     const connection = req.app.locals.connection;
 
     const columns = '*';
-    const data = await getExposureData(connection, query, columns, limit);
+    const data = await getExposureData(
+      connection,
+      query,
+      columns,
+      limit,
+      offset
+    );
     res.json(addBurden(data));
   } catch (error) {
     next(error);
