@@ -12,7 +12,7 @@ apiRouter.use(express.json({ limit: '50mb' }));
 apiRouter.use(compression());
 
 // register routes
-apiRouter.use('/', webApiRoutes);
+apiRouter.use('/web', webApiRoutes);
 apiRouter.use('/api', publicApiRoutes);
 
 module.exports = { apiRouter };

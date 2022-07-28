@@ -111,7 +111,9 @@ export default function Exposure({ match }) {
       },
     });
     try {
-      const { state } = await (await fetch(`getExposureExample/${id}`)).json();
+      const { state } = await (
+        await fetch(`web/getExposureExample/${id}`)
+      ).json();
 
       dispatch(actions.mergeExposure(state));
     } catch (error) {
@@ -225,7 +227,7 @@ export default function Exposure({ match }) {
 
   async function submitR(fn, args, id = projectID) {
     try {
-      const response = await fetch(`explorationWrapper`, {
+      const response = await fetch(`web/explorationWrapper`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -364,7 +366,7 @@ export default function Exposure({ match }) {
         const data = new FormData();
         if (variableFileObj.size) data.append('variableFile', variableFileObj);
 
-        let response = await fetch(`upload`, {
+        let response = await fetch(`web/upload`, {
           method: 'POST',
           body: data,
         });
@@ -403,7 +405,7 @@ export default function Exposure({ match }) {
         cancerType: cancer,
       });
 
-      const file = await fetch(`results/${output.path}`);
+      const file = await fetch(`web/results/${output.path}`);
       if (file.ok) {
         saveAs(await file.blob(), output.filename);
       } else {

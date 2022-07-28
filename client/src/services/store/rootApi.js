@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const optionsApiSlice = createApi({
   reducerPath: 'optionsApi',
-  baseQuery: fetchBaseQuery({ baseUrl: '' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'web' }),
   endpoints: (builder) => ({
     visualizationOptions: builder.query({
       query: (_) => ({ url: 'visualizationOptions' }),
@@ -21,13 +21,13 @@ export const { useVisualizationOptionsQuery, useExplorationOptionsQuery } =
 
 export const visualizationApiSlice = createApi({
   reducerPath: 'visualizationApi',
-  baseQuery: fetchBaseQuery({ baseUrl: '' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'web' }),
   endpoints: () => ({}),
 });
 
 export const explorationApiSlice = createApi({
   reducerPath: 'explorationApi',
-  baseQuery: fetchBaseQuery({ baseUrl: '' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'web' }),
   endpoints: () => ({}),
 });
 

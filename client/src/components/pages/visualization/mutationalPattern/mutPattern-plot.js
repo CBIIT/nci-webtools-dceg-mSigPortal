@@ -60,7 +60,7 @@ export default function MutProfilePlot() {
             <SvgContainer
               className="p-3"
               downloadName={data.output.barPath.split('/').slice(-1)[0]}
-              plotPath={'results/' + data.output.barPath}
+              plotPath={'web/results/' + data.output.barPath}
             />
             <p className="p-3">
               This plot illustrates the frequency by count of each mutational
@@ -89,8 +89,8 @@ export default function MutProfilePlot() {
             <SvgContainer
               className="p-3"
               downloadName={data.output.plotPath.split('/').slice(-1)[0]}
-              plotPath={'results/' + data.output.plotPath}
-              txtPath={`results/${data.output.txtPath}`}
+              plotPath={'web/results/' + data.output.plotPath}
+              txtPath={`web/results/${data.output.txtPath}`}
               title="Proportion of Mutational Pattern Context Compared to Other Contexts with the same SBS Mutation"
             />
             <p className="p-3">

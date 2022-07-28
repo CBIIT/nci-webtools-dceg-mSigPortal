@@ -165,7 +165,7 @@ export default function Signature() {
   }
 
   function submitR(fn, args) {
-    return fetch(`explorationWrapper`, {
+    return fetch(`web/explorationWrapper`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',

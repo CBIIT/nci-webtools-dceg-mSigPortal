@@ -243,8 +243,8 @@ export default function Comparison({ submitR }) {
             <SvgContainer
               className="p-3"
               downloadName={plotPath.split('/').slice(-1)[0]}
-              plotPath={`results/${plotPath}`}
-              txtPath={`results/${txtPath}`}
+              plotPath={`web/results/${plotPath}`}
+              txtPath={`web/results/${txtPath}`}
               height="700px"
             />
             <div className="p-4">

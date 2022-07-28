@@ -289,8 +289,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 <SvgContainer
                   className="p-3"
                   downloadName={withinPlotPath.split('/').slice(-1)[0]}
-                  plotPath={'results/' + withinPlotPath}
-                  txtPath={`results/${withinTxtPath}`}
+                  plotPath={'web/results/' + withinPlotPath}
+                  txtPath={`web/results/${withinTxtPath}`}
                 />
                 <p className="p-3">
                   The heatmap shows pairwise cosine similarity between samples
@@ -387,8 +387,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 <SvgContainer
                   className="p-3"
                   downloadName={refPlotPath.split('/').slice(-1)[0]}
-                  plotPath={`results/${refPlotPath}`}
-                  txtPath={`results/${refTxtPath}`}
+                  plotPath={`web/results/${refPlotPath}`}
+                  txtPath={`web/results/${refTxtPath}`}
                 />
                 <p className="p-3">
                   The following heatmap shows pairwise cosine similarity between
@@ -491,8 +491,8 @@ export default function CosineSimilarity({ submitR, getRefSigOptions }) {
                 <SvgContainer
                   className="p-3"
                   downloadName={pubPlotPath.split('/').slice(-1)[0]}
-                  plotPath={`results/${pubPlotPath}`}
-                  txtPath={`results/${pubTxtPath}`}
+                  plotPath={`web/results/${pubPlotPath}`}
+                  txtPath={`web/results/${pubTxtPath}`}
                 />
                 <p className="p-3">
                   The following heatmap shows pairwise cosine similarity between

@@ -131,7 +131,7 @@ export default function Multivariable() {
       mergeState({ loadingParams: true, error: false });
       try {
         const { stdout, output: collapseData } = await (
-          await fetch(`associationWrapper`, {
+          await fetch(`web/associationWrapper`, {
             method: 'POST',
             headers: {
               Accept: 'application/json',
@@ -227,7 +227,7 @@ export default function Multivariable() {
           stdout,
           output,
         } = await (
-          await fetch(`associationWrapper`, {
+          await fetch(`web/associationWrapper`, {
             method: 'POST',
             headers: {
               Accept: 'application/json',
@@ -683,8 +683,8 @@ export default function Multivariable() {
                 <SvgContainer
                   className="p-3 border rounded"
                   downloadName={plotPath.split('/').slice(-1)[0]}
-                  plotPath={`results/${plotPath}`}
-                  txtPath={`results/${dataPath}`}
+                  plotPath={`web/results/${plotPath}`}
+                  txtPath={`web/results/${dataPath}`}
                   height="800px"
                 />
               )}
