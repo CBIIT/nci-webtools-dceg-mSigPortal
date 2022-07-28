@@ -8,12 +8,16 @@ async function querySignature(req, res, next) {
     const connection = req.app.locals.connection;
 
     const columns = '*';
+    const rowMode = 'object';
+    const distinct = true;
     const data = await getSignatureData(
       connection,
       query,
       columns,
       limit,
-      offset
+      offset,
+      rowMode,
+      distinct
     );
     res.json(data);
   } catch (error) {

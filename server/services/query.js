@@ -7,16 +7,23 @@ function getData(
   columns = '*',
   limit = 1000000,
   offset = 0,
-  rowMode = 'object'
+  rowMode = 'object',
+  distinct = false
 ) {
   const conditions = pickBy(query, (v) => v !== undefined);
-  return connection
-    .distinct(columns)
+  let sqlQuery = connection
+    .select(columns)
     .from(table)
     .where(conditions)
     .limit(limit)
     .offset(offset, rowMode)
     .options({ rowMode: rowMode });
+
+  if (distinct) {
+    sqlQuery = sqlQuery.distinct(columns);
+  }
+
+  return sqlQuery;
 }
 
 function getAssociationData(
@@ -25,7 +32,8 @@ function getAssociationData(
   columns = '*',
   limit = 200000,
   offset = 0,
-  rowMode = 'object'
+  rowMode = 'object',
+  distinct = false
 ) {
   return getData(
     connection,
@@ -34,7 +42,8 @@ function getAssociationData(
     columns,
     limit,
     offset,
-    rowMode
+    rowMode,
+    distinct
   );
 }
 
@@ -44,7 +53,8 @@ function getExposureData(
   columns = '*',
   limit = 200000,
   offset = 0,
-  rowMode = 'object'
+  rowMode = 'object',
+  distinct = false
 ) {
   return getData(
     connection,
@@ -53,7 +63,8 @@ function getExposureData(
     columns,
     limit,
     offset,
-    rowMode
+    rowMode,
+    distinct
   );
 }
 
@@ -63,7 +74,8 @@ function getSeqmatrixData(
   columns = '*',
   limit = 200000,
   offset = 0,
-  rowMode = 'object'
+  rowMode = 'object',
+  distinct = false
 ) {
   return getData(
     connection,
@@ -72,7 +84,8 @@ function getSeqmatrixData(
     columns,
     limit,
     offset,
-    rowMode
+    rowMode,
+    distinct
   );
 }
 
@@ -82,7 +95,8 @@ function getSeqmatrixOptions(
   columns = '*',
   limit = 200000,
   offset = 0,
-  rowMode = 'object'
+  rowMode = 'object',
+  distinct = false
 ) {
   return getData(
     connection,
@@ -91,7 +105,8 @@ function getSeqmatrixOptions(
     columns,
     limit,
     offset,
-    rowMode
+    rowMode,
+    distinct
   );
 }
 
@@ -101,7 +116,8 @@ function getSignatureData(
   columns = '*',
   limit = 200000,
   offset = 0,
-  rowMode = 'object'
+  rowMode = 'object',
+  distinct = false,
 ) {
   return getData(
     connection,
@@ -110,7 +126,8 @@ function getSignatureData(
     columns,
     limit,
     offset,
-    rowMode
+    rowMode,
+    distinct
   );
 }
 
