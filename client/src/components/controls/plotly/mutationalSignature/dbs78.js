@@ -11,7 +11,25 @@ export default function DBS78(data, sample) {
     TG: '#CB98FD',
     TT: '#4C0299',
   };
+  const dbsdata = ['AC', 'AT', 'CC', 'CG', 'CT', 'GC', 'TA', 'TC', 'TG', 'TT'];
 
+  console.log(data);
+  // data.filter(
+  //   (e) =>
+  //     e.mutation === 'AC' ||
+  //     e.mutation === 'AT' ||
+  //     e.mutation === 'CC' ||
+  //     e.mutation === 'CG' ||
+  //     e.mutation === 'CT' ||
+  //     e.mutation === 'GC' ||
+  //     e.mutation === 'TA' ||
+  //     e.mutation === 'TC' ||
+  //     e.mutation === 'TG' ||
+  //     e.mutation === 'TT'
+  // );
+
+  data.filter((e) => dbsdata.includes(e.mutation));
+  console.log(data);
   const totalMutations = data.reduce(
     (total, mutation) =>
       total +
