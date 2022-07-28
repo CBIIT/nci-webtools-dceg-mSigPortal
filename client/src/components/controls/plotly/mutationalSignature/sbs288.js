@@ -199,7 +199,8 @@ export default function SBS288(data, sample) {
     ),
     xaxis: 'x2',
     yaxis: 'y2',
-    hoverinfo: 'x2+y2',
+    //hoverinfo: 'x2+y2',
+    hovertemplate: '<b>Transcrribed</b><br>%{y}, %{x} <extra></extra>',
     showlegend: true,
     orientation: 'h',
   };
@@ -214,7 +215,8 @@ export default function SBS288(data, sample) {
     ),
     xaxis: 'x2',
     yaxis: 'y2',
-    hoverinfo: 'x2+y2',
+    //hoverinfo: 'x2+y2',
+    hovertemplate: '<b>Untranscribed</b><br>%{y}, %{x} <extra></extra>',
     showlegend: true,
     orientation: 'h',
   };
@@ -229,7 +231,8 @@ export default function SBS288(data, sample) {
     ),
     xaxis: 'x2',
     yaxis: 'y2',
-    hoverinfo: 'x2+y2',
+    //hoverinfo: 'x2+y2',
+    hovertemplate: '<b>Nontranscribed</b><br>%{y}, %{x} <extra></extra>',
     showlegend: true,
     orientation: 'h',
   };
