@@ -36,7 +36,7 @@ async function visualizationSamples(req, res, next) {
 
 async function querySeqmatrix(req, res, next) {
   try {
-    const { limit, offset, ...query } = req.query;
+    const { limit, offset, rowMode, ...query } = req.query;
     const connection = req.app.locals.connection;
 
     const columns = '*';
@@ -45,7 +45,8 @@ async function querySeqmatrix(req, res, next) {
       query,
       columns,
       limit,
-      offset
+      offset,
+      rowMode
     );
     res.json(data);
   } catch (error) {
