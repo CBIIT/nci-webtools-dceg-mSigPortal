@@ -287,7 +287,7 @@ export default function ID415(data, sample) {
     })),
     x: T_flatSorted.map((element, index, array) => index),
     y: T_flatSorted.map((element, index, array) => element.contribution),
-    hovertemplate: '%{y} indels',
+    hovertemplate: '<b>Transcrribed Strand</b><br>%{y} indels <extra></extra>',
     //hoverinfo: 'x+y',
     showlegend: true,
   };
@@ -300,7 +300,7 @@ export default function ID415(data, sample) {
     marker: { color: '#E32925' },
     x: U_flatSorted.map((element, index, array) => index),
     y: U_flatSorted.map((element, index, array) => element.contribution),
-    hovertemplate: '<b>Number of indels</b>: %{y}<extra></extra>',
+    hovertemplate: '<b>Untranscribed Strand</b><br>%{y} indels <extra></extra>',
     //hoverinfo: 'x+y',
     showlegend: true,
   };

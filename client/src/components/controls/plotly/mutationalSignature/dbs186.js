@@ -46,8 +46,8 @@ export default function DBS186(data, sample) {
     marker: { color: '#004765' },
     x: T_flatSorted.map((element, index, array) => index),
     y: T_flatSorted.map((element, index, array) => element.contribution),
-
-    hoverinfo: 'x+y',
+    hovertemplate: '<b>Transcribed Strand</b><br>%{x}, %{y}<extra></extra>',
+    //hoverinfo: 'x+y',
     showlegend: true,
   };
 
@@ -71,8 +71,8 @@ export default function DBS186(data, sample) {
     marker: { color: '#E32925' },
     x: U_flatSorted.map((element, index, array) => index),
     y: U_flatSorted.map((element, index, array) => element.contribution),
-
-    hoverinfo: 'x+y',
+    hovertemplate: '<b>Untranscribed Strand</b><br>%{x}, %{y}<extra></extra>',
+    //hoverinfo: 'x+y',
     showlegend: true,
   };
 

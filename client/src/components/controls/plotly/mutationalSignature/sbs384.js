@@ -110,19 +110,19 @@ export default function SBS384(data, sample) {
     marker: { color: '#004765' },
     x: flatSortedT.map((element, index, array) => index),
     y: flatSortedT.map((element, index, array) => element.contribution),
-
-    hoverinfo: 'x+y',
+    hovertemplate: '<b>Transcrribed</b><br>%{x}, %{y} <extra></extra>',
+    //hoverinfo: 'x+y',
     showlegend: true,
   };
 
   const tracesU = {
-    name: 'Untranscribed',
+    name: 'Untranscribed Strand',
     type: 'bar',
     marker: { color: '#E32925' },
     x: flatSortedU.map((element, index, array) => index),
     y: flatSortedU.map((element, index, array) => element.contribution),
-
-    hoverinfo: 'x+y',
+    hovertemplate: '<b>Untranscribed Strand</b><br>%{x}, %{y} <extra></extra>',
+    //hoverinfo: 'x+y',
     showlegend: true,
   };
 
