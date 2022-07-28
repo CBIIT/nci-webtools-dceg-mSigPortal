@@ -16,8 +16,8 @@ export default function MsPrevalenceForm() {
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  //const { mutation } = store.main;
-  //console.log(mutation);
+  const { mutation } = store.main;
+  console.log(mutation);
 
   const [invalidMin, setMin] = useState(false);
 
@@ -57,7 +57,7 @@ export default function MsPrevalenceForm() {
               <Control
                 type="num"
                 name="minnum"
-                value="100"
+                value={mutation}
                 placeholder="e.g. 100"
                 onChange={(e) => {
                   mergeMsPrevalence({

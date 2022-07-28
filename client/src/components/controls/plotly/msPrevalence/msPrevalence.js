@@ -1,13 +1,25 @@
-export default function MSPrevalence(groupBySignature, groupBySample) {
+export default function MSPrevalence(groupBySignature, mutation) {
   groupBySignature.sort(
     (a, b) =>
       a.samples.reduce((a, b) => a + b.exposure, 0) -
       b.samples.reduce((a, b) => a + b.exposure, 0)
   );
   console.log(groupBySignature);
-  console.log(groupBySample);
-  //console.log(mutation);
+  console.log(mutation);
+  let minumumNumber = 100;
+  mutation === null || mutation === undefined
+    ? (minumumNumber = 100)
+    : (minumumNumber = parseInt(mutation));
 
+  // const groupBySignature_sortExposure = groupBySignature.sort(
+  //   (a, b) =>
+  //     b.samples.filter((e) => e.exposure >= minumumNumber).length /
+  //       a.totalSamples -
+  //     a.samples.filter((e) => e.exposure >= minumumNumber).length /
+  //       b.totalSamples
+  // );
+
+  // console.log(groupBySignature_sortExposure);
   const colors = {
     SBS1: '#4a9855',
     SBS2: '#e2a8ab',
@@ -80,11 +92,6 @@ export default function MSPrevalence(groupBySignature, groupBySample) {
     SBS92: '#0E1844',
     'SBS-others': '#cececa',
   };
-
-  let minumumNumber = 100;
-  // mutation === 'null'
-  //   ? (minumumNumber = 100)
-  //   : (minumumNumber = parseInt(mutation));
 
   const tracesPie = {
     type: 'pie',
