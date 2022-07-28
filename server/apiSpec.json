@@ -108,12 +108,22 @@
           {
             "name": "limit",
             "in": "query",
-            "description": "Limit response size",
+            "description": "Limit number of records returned",
             "required": false,
             "schema": {
               "type": "string"
             },
             "value": "10"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Skip number of records before return",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "0"
           }
         ],
         "responses": {
@@ -222,12 +232,22 @@
           {
             "name": "limit",
             "in": "query",
-            "description": "Limit response size",
+            "description": "Limit number of records returned",
             "required": false,
             "schema": {
               "type": "string"
             },
             "value": "10"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Skip number of records before return",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "0"
           }
         ],
         "responses": {
@@ -359,12 +379,22 @@
           {
             "name": "limit",
             "in": "query",
-            "description": "Limit response size",
+            "description": "Limit number of records returned",
             "required": false,
             "schema": {
               "type": "string"
             },
             "value": "10"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Skip number of records before return",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "0"
           }
         ],
         "responses": {
@@ -498,12 +528,22 @@
           {
             "name": "limit",
             "in": "query",
-            "description": "Limit response size",
+            "description": "Limit number of records returned",
             "required": false,
             "schema": {
               "type": "string"
             },
             "value": "10"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Skip number of records before return",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "0"
           }
         ],
         "responses": {

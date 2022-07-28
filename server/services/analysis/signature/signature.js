@@ -4,11 +4,17 @@ const { getSignatureData } = require('../../query');
 
 async function querySignature(req, res, next) {
   try {
-    const { limit, ...query } = req.query;
+    const { limit, offset, ...query } = req.query;
     const connection = req.app.locals.connection;
 
     const columns = '*';
-    const data = await getSignatureData(connection, query, columns, limit);
+    const data = await getSignatureData(
+      connection,
+      query,
+      columns,
+      limit,
+      offset
+    );
     res.json(data);
   } catch (error) {
     next(error);
