@@ -12,10 +12,13 @@ export default function MSPrevalence(groupBySignature, groupBySample) {
   const tracesPie = {
     type: 'pie',
     labels: groupBySignature.map((group) => group.signatureName),
-    values: groupBySignature.map((group) => group.samples.length),
+    values: groupBySignature.map((group) =>
+      group.samples.reduce((a, b) => a + b.exposure, 0)
+    ),
     textposition: 'inside',
     textinfo: 'label+percent',
     showlegend: false,
+    rotation: 180,
   };
   console.log(tracesPie);
 
