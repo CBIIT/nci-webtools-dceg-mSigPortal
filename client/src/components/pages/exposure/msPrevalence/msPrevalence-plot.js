@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Plot from 'react-plotly.js';
-import { Button, Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 import { cloneDeep } from 'lodash';
 import { useSelector } from 'react-redux';
 import { useMsPrevelencePlotQuery } from './apiSlice';
@@ -14,9 +14,8 @@ export default function MutProfilePlot() {
     skip: !params,
   });
 
-  //const { mutation } = useSelector((state) => state.exposure.msPrevalence);
+  const { minimum } = useSelector((state) => state.exposure.msPrevalence);
 
-  //console.log(mutation);
   useEffect(() => {
     const { study, strategy, signatureSetName, cancer } = publicForm;
     if (study) {
@@ -25,12 +24,11 @@ export default function MutProfilePlot() {
         strategy: strategy.value,
         signatureSetName: signatureSetName.value,
         cancer: cancer.value,
-        //mutation: mutation,
+        minimum,
       });
     }
-  }, [publicForm]);
+  }, [publicForm, minimum]);
 
-  console.log(data);
   return (
     <>
       <LoadingOverlay active={isFetching} />
