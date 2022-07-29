@@ -4,20 +4,28 @@ import Plot from 'react-plotly.js';
 import { useSelector } from 'react-redux';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Description from '../../../controls/description/description';
-import profilerSummary from '../../../controls/plotly/profilerSummary/profilerSummary';
+import { useProfilerSummaryQuery } from './apiSlice';
+import cloneDeep from 'lodash/cloneDeep';
 
 export default function ProfilerSummary() {
   const store = useSelector((state) => state.visualization);
-  const { matrixData } = store.main;
+  const publicForm = store.publicForm;
 
-  const [plot, setPlot] = useState({});
+  const [params, setParams] = useState();
+
+  const { data, error, isFetching } = useProfilerSummaryQuery(params, {
+    skip: !params,
+  });
 
   useEffect(() => {
-    if (matrixData.length) {
-      const plot = profilerSummary(matrixData);
-      setPlot(plot);
+    if (publicForm.study) {
+      setParams({
+        study: publicForm.study.value,
+        cancer: publicForm.cancer.value,
+        strategy: publicForm.strategy.value,
+      });
     }
-  }, [matrixData]);
+  }, [publicForm]);
 
   return (
     <div className="bg-white border rounded">
@@ -31,14 +39,15 @@ export default function ProfilerSummary() {
       </div>
 
       <Container fluid style={{ minHeight: '500px' }} className="mb-3">
+        <LoadingOverlay active={isFetching} />
         <Row>
           <Col>
-            {plot ? (
+            {data ? (
               <Plot
                 className="w-100"
-                data={plot.traces}
-                layout={plot.layout}
-                config={plot.config}
+                data={cloneDeep(data.traces)}
+                layout={cloneDeep(data.layout)}
+                config={cloneDeep(data.config)}
                 useResizeHandler
               />
             ) : (
@@ -47,7 +56,7 @@ export default function ProfilerSummary() {
           </Col>
         </Row>
       </Container>
-      {false && (
+      {error && (
         <p className="text-center">
           An error has occured. Please check your inputs and try again.
         </p>

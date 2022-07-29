@@ -77,11 +77,11 @@ export default function PublicForm() {
         strategy: data.strategy.value,
       };
 
-      let matrixData = [];
-      for await (const data of paginateQuery(fetchMatrix, params)) {
-        matrixData = [...matrixData, ...data];
-      }
-      // const matrixData = await fetchMatrix(params).unwrap();
+      // let matrixData = [];
+      // for await (const data of paginateQuery(fetchMatrix, params)) {
+      //   matrixData = [...matrixData, ...data];
+      // }
+      const matrixData = await fetchMatrix(params).unwrap();
 
       mergeMain({ matrixData, projectID: crypto.randomUUID() });
     } catch (error) {

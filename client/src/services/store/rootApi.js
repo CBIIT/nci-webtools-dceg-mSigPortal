@@ -5,7 +5,7 @@ export const optionsApiSlice = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: 'web' }),
   endpoints: (builder) => ({
     visualizationOptions: builder.query({
-      query: (_) => ({ url: 'visualizationOptions' }),
+      query: (_) => ({ url: 'seqmatrixOptions' }),
     }),
     explorationOptions: builder.query({
       query: (params) => ({
