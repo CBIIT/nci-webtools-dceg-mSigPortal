@@ -80,7 +80,7 @@ export const schema = [
     name: "seqmatrixSummary",
     type: "materializedView",
     dependsOn: ["seqmatrix"],
-    schema: (view, knex) => {
+    schema: (view, connection) => {
       const columns = [
         "study",
         "strategy",
@@ -97,9 +97,9 @@ export const schema = [
       ];
       const summaryColumns = [
         ...columns.slice(0, -3),
-        knex.raw(`string_agg(cast(matrix as text), '/') as matrix`),
-        knex.raw(`log10(sum("totalMutations")) as "logTotalMutations"`),
-        knex.raw(`avg("totalMutations") as "meanTotalMutations"`),
+        connection.raw(`string_agg(cast(matrix as text), '/') as matrix`),
+        connection.raw(`log10(sum("totalMutations")) as "logTotalMutations"`),
+        connection.raw(`avg("totalMutations") as "meanTotalMutations"`),
       ];
       const totalCountQuery = connection
         .select(totalCountColumns)
