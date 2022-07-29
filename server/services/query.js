@@ -110,6 +110,27 @@ function getSeqmatrixOptions(
   );
 }
 
+function getSeqmatrixSummary(
+  connection,
+  query,
+  columns = '*',
+  limit = 200000,
+  offset = 0,
+  rowMode = 'object',
+  distinct = false
+) {
+  return getData(
+    connection,
+    'seqmatrixSummary',
+    query,
+    columns,
+    limit,
+    offset,
+    rowMode,
+    distinct
+  );
+}
+
 function getSignatureData(
   connection,
   query,
@@ -117,7 +138,7 @@ function getSignatureData(
   limit = 200000,
   offset = 0,
   rowMode = 'object',
-  distinct = false,
+  distinct = false
 ) {
   return getData(
     connection,
@@ -137,5 +158,6 @@ module.exports = {
   getExposureData,
   getSeqmatrixData,
   getSeqmatrixOptions,
+  getSeqmatrixSummary,
   getSignatureData,
 };
