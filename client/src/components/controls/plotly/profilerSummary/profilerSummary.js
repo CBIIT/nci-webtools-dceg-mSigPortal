@@ -49,6 +49,7 @@ export default function profilerSummary(data) {
       title: 'Samples',
       showline: true,
       mirror: true,
+      tickangle: 45
     },
     yaxis: {
       title: 'log<sub>10</sub>(Mutations)',
