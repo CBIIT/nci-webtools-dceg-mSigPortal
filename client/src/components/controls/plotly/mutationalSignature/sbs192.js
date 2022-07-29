@@ -22,8 +22,6 @@ export default function SBS192(data, sample) {
     ]
   );
 
-  const numberWithCommas = (x) =>
-    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
   const maxVal = Math.max(...data.map((o) => o.mutations));
 
   const groupByMutationT = transcribed.reduce((groups, e, i) => {
@@ -149,7 +147,7 @@ export default function SBS192(data, sample) {
       '<b>' +
       sample +
       ': ' +
-      numberWithCommas(totalMutations) +
+      totalMutations.toLocaleString(undefined) +
       ' transcribed subs</b>',
     showarrow: false,
     font: {
