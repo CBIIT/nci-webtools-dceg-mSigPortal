@@ -130,7 +130,7 @@ export default function MSPrevalence(groupBySignature, mutation) {
       Math.round(
         (group.samples.filter((e) => e.exposure >= minumumNumber).length /
           group.totalSamples) *
-          minumumNumber *
+          100 *
           10
       ) /
         10 +
