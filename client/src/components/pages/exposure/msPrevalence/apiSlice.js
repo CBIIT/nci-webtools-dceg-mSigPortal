@@ -6,7 +6,7 @@ export const msPrevalenceApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     msPrevelencePlot: builder.query({
       // query: ({ mutation, ...params }) => ({
-      query: ({ minimum, params }) => ({
+      query: ({ minimum, ...params }) => ({
         url: 'exposure',
         params,
       }),
@@ -14,11 +14,12 @@ export const msPrevalenceApiSlice = explorationApiSlice.injectEndpoints({
         console.log('prevalence api');
         console.log(data);
         const { minimum } = arg;
-        //console.log(mutation);
+        console.log(minimum);
 
         // calculate median burden across cancer types
         const groupBySignature = groupBy(data, 'signatureName');
         const groupBySample = groupBy(data, 'sample');
+
         const transform = Object.entries(groupBySignature)
           .map(([signatureName, data]) => {
             const samples = data
