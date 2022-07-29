@@ -20,8 +20,7 @@ export default function ID28(data, sample) {
     arrayIDAnnotationBot = [];
 
   const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
-  const numberWithCommas = (x) =>
-    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
+
   const maxVal = Math.max(...data.map((o) => o.mutations));
 
   const data1 = data.slice(0, data.length - 4);
@@ -253,7 +252,11 @@ export default function ID28(data, sample) {
     x: 0.01,
     y: 0.9,
     text:
-      '<b>' + sample + ': ' + numberWithCommas(totalMutations) + ' indels</b>',
+      '<b>' +
+      sample +
+      ': ' +
+      totalMutations.toLocaleString(undefined) +
+      ' indels</b>',
     showarrow: false,
     font: {
       size: 24,
