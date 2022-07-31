@@ -95,6 +95,34 @@ export const schema = [
   },
 
   {
+    name: "etiology",
+    schema: (table) => {
+      table.increments("id");
+      table.string("category");
+      table.string("etiology");
+      table.string("tissueSpecificSignature");
+      table.string("refSignature");
+      table.string("refSignatureProportion");
+      table.string("treatment");
+      table.string("signature");
+      table.string("signatureExtractionMethod");
+      table.string("tumorType");
+      table.string("signatureName");
+      table.string("signatureSource");
+      table.string("mutagen");
+      table.string("cellLine");
+      table.string("url");
+      table.string("study");
+      table.string("studyUrl");
+      table.string("source");
+      table.string("sourceUrl");
+      table.string("description");
+      table.string("descriptionStrandBias");
+      table.index(["category"]);
+    },
+  },
+
+  {
     name: "importLog",
     schema: (table, connection) => {
       table.increments("id");
