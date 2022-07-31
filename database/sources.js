@@ -69,6 +69,98 @@ export const sources = [
   },
 
   {
+    sourcePath: "Etiology/Etiology_cancer_specific_signatures.csv",
+    table: "etiology",
+    description: "etilogy - cancer_specific_signatures",
+    columns: [
+      "etiology",
+      "tissueSpecificSignature",
+      "refSignature",
+      "refSignatureProportion",
+      "study",
+      "studyUrl",
+      "source",
+      "sourceUrl",
+      "description",
+      "category",
+    ]
+  },
+  {
+    sourcePath: "Etiology/Etiology_cancer_therapies.csv",
+    table: "etiology",
+    description: "etilogy - cancer_therapies",
+    columns: [
+      "treatment",
+      "signature",
+      "signatureExtractionMethod",
+      "tumorType",
+      "study",
+      "studyUrl",
+      "category",
+    ]
+  },
+  {
+    sourcePath: "Etiology/Etiology_cosmic.csv",
+    table: "etiology",
+    description: "etilogy - cosmic",
+    columns: [
+      "etiology",
+      "signatureName",
+      "signatureSource",
+      "url",
+      "description",
+      "descriptionStrandBias",
+      "study",
+      "category",
+    ]
+  },
+  {
+    sourcePath: "Etiology/Etiology_enviromental_mutagenesis.csv",
+    table: "etiology",
+    description: "etilogy - enviromental_mutagenesis",
+    columns: [
+      "etiology",
+      "signature",
+      "mutagen",
+      "treatment",
+      "study",
+      "studyUrl",
+      "source",
+      "sourceUrl",
+      "category",
+    ]
+  },
+  {
+    sourcePath: "Etiology/Etiology_gene_edits.csv",
+    table: "etiology",
+    description: "etilogy - gene_edits",
+    columns: [
+      "etiology",
+      "signature",
+      "cellLine",
+      "study",
+      "studyUrl",
+      "source",
+      "sourceUrl",
+      "category",
+    ]
+  },
+ 
+  {
+    sourcePath: "Etiology/Etiology_others.csv",
+    table: "etiology",
+    description: "etilogy - others",
+    columns: [
+      "etiology",
+      "signatureName",
+      "signatureSource",
+      "url",
+      "description",
+      "category",
+    ]
+  },
+
+  {
     description: "Refresh materialized views",
     type: "postImport",
     callback: async (connection) => {
