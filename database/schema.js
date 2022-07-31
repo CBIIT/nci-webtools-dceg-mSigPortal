@@ -158,8 +158,32 @@ export const schema = [
       table.string("studyUrl");
       table.string("source");
       table.string("sourceUrl");
-      table.string("description");
-      table.string("descriptionStrandBias");
+      table.text("description");
+      table.text("descriptionStrandBias");
+      table.index(["category"]);
+    },
+  },
+
+  {
+    name: "publication",
+    schema: (table) => {
+      table.increments("id");
+      table.string("category");
+      table.string("firstAuthor");
+      table.string("lastAuthor");
+      table.integer("year");
+      table.string("journal");
+      table.string("bioRxivOrPubmedId");
+      table.text("title");
+      table.string("doi");
+      table.string("note");
+      table.string("diseaseOrPhenotypeOrExposure");
+      table.string("cancerType");
+      table.string("experimentalStrategy");
+      table.string("softwareName");
+      table.string("computationalMethod");
+      table.string("programmingLanguage");
+      table.string("sourceUrl");
       table.index(["category"]);
     },
   },
