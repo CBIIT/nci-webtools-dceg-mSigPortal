@@ -71,7 +71,7 @@ export const sources = [
   {
     sourcePath: "Etiology/Etiology_cancer_specific_signatures.csv",
     table: "etiology",
-    description: "etilogy - cancer_specific_signatures",
+    description: "etiology - cancer_specific_signatures",
     columns: [
       "etiology",
       "tissueSpecificSignature",
@@ -88,7 +88,7 @@ export const sources = [
   {
     sourcePath: "Etiology/Etiology_cancer_therapies.csv",
     table: "etiology",
-    description: "etilogy - cancer_therapies",
+    description: "etiology - cancer_therapies",
     columns: [
       "treatment",
       "signature",
@@ -102,7 +102,7 @@ export const sources = [
   {
     sourcePath: "Etiology/Etiology_cosmic.csv",
     table: "etiology",
-    description: "etilogy - cosmic",
+    description: "etiology - cosmic",
     columns: [
       "etiology",
       "signatureName",
@@ -117,7 +117,7 @@ export const sources = [
   {
     sourcePath: "Etiology/Etiology_enviromental_mutagenesis.csv",
     table: "etiology",
-    description: "etilogy - enviromental_mutagenesis",
+    description: "etiology - enviromental_mutagenesis",
     columns: [
       "etiology",
       "signature",
@@ -133,7 +133,7 @@ export const sources = [
   {
     sourcePath: "Etiology/Etiology_gene_edits.csv",
     table: "etiology",
-    description: "etilogy - gene_edits",
+    description: "etiology - gene_edits",
     columns: [
       "etiology",
       "signature",
@@ -149,7 +149,7 @@ export const sources = [
   {
     sourcePath: "Etiology/Etiology_others.csv",
     table: "etiology",
-    description: "etilogy - others",
+    description: "etiology - others",
     columns: [
       "etiology",
       "signatureName",
