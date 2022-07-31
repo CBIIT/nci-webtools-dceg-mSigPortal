@@ -21,26 +21,26 @@ export default function TreeLeafForm() {
   const mergeState = (state) =>
     dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
 
-  const { svgList, samples, source } = store.main;
+  const { matrixData, source } = store.main;
   const { sample, profile, matrix, filter } = store.mutationalProfiles;
 
   const { control, setValue, watch } = useForm();
 
-  const supportMatrix = [6, 24, 96, 192, 288, 384, 1536, 78, 186, 28, 83, 415];
-  //const supportMatrixSBS = [6, 24, 96, 192, 288, 384, 1536];
-  //const supportMatrixDBS = [78, 186];
-  //const supportMatrixID = [28, 83, 415];
-  //const unSupportMatrix = [4608, 6144, 150, 1248, 2400, 2976, 332, 8628];
+  const supportMatrix = {
+    SBS: [6, 24, 96, 192, 288, 384, 1536],
+    DBS: [78, 186],
+    ID: [28, 83, 415],
+  };
 
   // populate controls
   useEffect(() => {
-    if (samples.length && !sample) {
+    if (matrixData.length && !sample) {
       handleSample(sampleOptions[0]);
     }
-  }, [samples]);
+  }, [matrixData]);
 
-  const sampleOptions = samples.length
-    ? [...new Set(samples.map((d) => d.sample))]
+  const sampleOptions = matrixData.length
+    ? [...new Set(matrixData.map((d) => d.sample))]
         .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
         .map((e) => ({
           label: e,
@@ -49,10 +49,10 @@ export default function TreeLeafForm() {
     : [];
 
   const profileOptions = (sample) =>
-    sample && samples.length
+    sample && matrixData.length
       ? [
           ...new Set(
-            samples
+            matrixData
               .filter((e) => e.sample == sample.value)
               .map((e) => e.profile)
               .sort((a, b) => b.localeCompare(a))
@@ -61,15 +61,15 @@ export default function TreeLeafForm() {
       : [];
 
   const matrixOptions = (sample, profile) =>
-    sample && profile && samples.length
+    sample && profile && matrixData.length
       ? [
           ...new Set(
-            samples
+            matrixData
               .filter(
                 (e) =>
                   e.sample &&
                   e.profile == profile.value &&
-                  supportMatrix.includes(e.matrix)
+                  supportMatrix[e.profile].includes(e.matrix)
               )
               .map((e) => e.matrix)
               .sort((a, b) => a - b)
@@ -78,10 +78,10 @@ export default function TreeLeafForm() {
       : [];
 
   const filterOptions = (sample, profile, matrix) =>
-    sample && profile && matrix && samples.length
+    sample && profile && matrix && matrixData.length
       ? [
           ...new Set(
-            samples
+            matrixData
               .filter(
                 (e) => e.sample && e.Profile == profile.value + matrix.value
               )

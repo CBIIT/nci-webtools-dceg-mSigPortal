@@ -1,9 +1,33 @@
 const { Router } = require('express');
 const { v4: uuidv4 } = require('uuid');
-const { getSeqmatrixData, getSeqmatrixOptions } = require('../../query');
+const {
+  getSeqmatrixData,
+  getSeqmatrixOptions,
+  getSeqmatrixSummary,
+} = require('../../query');
+
+async function querySeqmatrix(req, res, next) {
+  try {
+    const { limit, offset, rowMode, ...query } = req.query;
+    const connection = req.app.locals.connection;
+
+    const columns = '*';
+    const data = await getSeqmatrixData(
+      connection,
+      query,
+      columns,
+      limit,
+      offset,
+      rowMode
+    );
+    res.json(data);
+  } catch (error) {
+    next(error);
+  }
+}
 
 // query public seqmatrix data for visualization tab
-async function visualizationOptions(req, res, next) {
+async function seqmatrixOptions(req, res, next) {
   try {
     const { limit, ...query } = req.query;
     const connection = req.app.locals.connection;
@@ -18,29 +42,20 @@ async function visualizationOptions(req, res, next) {
   }
 }
 
-async function visualizationSamples(req, res, next) {
+async function seqmatrixSummary(req, res, next) {
   try {
-    const { limit, ...query } = req.query;
-    const connection = req.app.locals.connection;
-
-    // const query = { study, strategy, cancer };
-    const columns = ['profile', 'sample', 'profile', 'matrix'];
-    const data = await getSeqmatrixData(connection, query, columns, limit);
-    const projectID = uuidv4();
-
-    res.json({ data, projectID });
-  } catch (error) {
-    next(error);
-  }
-}
-
-async function querySeqmatrix(req, res, next) {
-  try {
-    const { limit, ...query } = req.query;
+    const { limit, offset, rowMode, ...query } = req.query;
     const connection = req.app.locals.connection;
 
     const columns = '*';
-    const data = await getSeqmatrixData(connection, query, columns, limit);
+    const data = await getSeqmatrixSummary(
+      connection,
+      query,
+      columns,
+      limit,
+      offset,
+      rowMode
+    );
     res.json(data);
   } catch (error) {
     next(error);
@@ -50,7 +65,7 @@ async function querySeqmatrix(req, res, next) {
 const router = Router();
 
 router.get('/seqmatrix', querySeqmatrix);
-router.get('/visualizationOptions', visualizationOptions);
-router.get('/visualizationSamples', visualizationSamples);
+router.get('/seqmatrixOptions', seqmatrixOptions);
+router.get('/seqmatrixSummary', seqmatrixSummary);
 
-module.exports = router;
+module.exports = { router, querySeqmatrix };

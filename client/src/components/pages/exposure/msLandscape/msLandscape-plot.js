@@ -1,33 +1,29 @@
 import { useState, useEffect } from 'react';
 import Plot from 'react-plotly.js';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Button, Container, Row, Col } from 'react-bootstrap';
 import { cloneDeep } from 'lodash';
 import { useSelector } from 'react-redux';
-import { useMsPrevelencePlotQuery } from './apiSlice';
+import { useMsLandscapePlotQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
 import './plot.scss';
-export default function MutProfilePlot() {
+export default function MsLandscapePlot() {
   const publicForm = useSelector((state) => state.exposure.publicForm);
   const [params, setParams] = useState('');
-  const { data, error, isFetching } = useMsPrevelencePlotQuery(params, {
+  const { data, error, isFetching } = useMsLandscapePlotQuery(params, {
     skip: !params,
   });
 
-  const { minimum } = useSelector((state) => state.exposure.msPrevalence);
-
   useEffect(() => {
-    const { study, strategy, signatureSetName, cancer } = publicForm;
+    const { study, strategy, signatureSetName } = publicForm;
     if (study) {
       setParams({
         study: study.value,
         strategy: strategy.value,
         signatureSetName: signatureSetName.value,
-        cancer: cancer.value,
-        minimum,
       });
     }
-  }, [publicForm, minimum]);
+  }, [publicForm]);
 
   return (
     <>

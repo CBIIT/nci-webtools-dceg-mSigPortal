@@ -15,19 +15,20 @@ export default function TMB(data, tmbTabName, signatureName) {
 
   const traces = data.map((element, index, array) => ({
     element: element,
+    cancer: element.cancer,
     type: 'scatter',
     marker: { symbol: 'circle-open', size: 3, color: 'black' },
     mode: 'markers',
     y: element.samples.map((e) => e.burden),
     // average: average(element.samples.map((e) => e.tmb)),
-    hovertemplate: 'Number of mutations: %{y}<br>',
+    hovertemplate:
+      tmbTabName === 'TMBSignature'
+        ? `<b>${element.signatureName}</b>` + '<br>%{y}<extra></extra>'
+        : `<b>${element.cancer}</b>` + '<br>%{y}<extra></extra>',
     x: element.samples.map(
       (e, i) => index + 0.1 + (0.8 / element.samples.length) * i
     ),
   }));
-
-  //console.log('traces:--');
-  //console.log(traces);
 
   const topLabel = data.map((element, index, array) => ({
     element: element,

@@ -1,5 +1,5 @@
 const path = require('path');
-const logger = require('./logger');
+const logger = require('../logger');
 const { spawn } = require('promisify-child-process');
 const formidable = require('formidable');
 const fs = require('fs-extra');
@@ -12,8 +12,8 @@ const XLSX = require('xlsx');
 const replace = require('replace-in-file');
 const glob = require('glob');
 const archiver = require('archiver');
-
-const config = require('../config.json');
+const express = require('express');
+const config = require('../../config.json');
 
 if (config.aws) AWS.config.update(config.aws);
 
@@ -795,7 +795,50 @@ const getDataUsingS3Select = (params) => {
   });
 };
 
+const router = express.Router();
+
+router.post('/profilerExtraction', visualizationProfilerExtraction);
+
+router.post('/getResults', getResults);
+
+router.post('/visualizationWrapper', visualizationWrapper);
+
+router.post('/getSignaturesUser', getSignaturesUser);
+
+router.post('/upload', upload);
+
+router.get('/visualization/download', visualizationDownload);
+
+router.post(
+  '/visualization/downloadPublic',
+
+  visualizationDownloadPublic
+);
+
+router.post('/explorationWrapper', explorationWrapper);
+
+router.post('/queue', submitQueue);
+
+router.get('/getQueueResults/:id', getQueueResults);
+
+router.get('/getVisExample/:example', getVisExample);
+
+router.get('/getExposureExample/:example', getExposureExample);
+
+router.get('/getPublications', getPublications);
+
+router.post('/getImageS3Batch', getImageS3Batch);
+
+router.post('/getImageS3', getImageS3);
+
+router.post('/getFileS3', getFileS3);
+
+router.post('/downloadWorkspace', downloadWorkspace);
+
+router.post('/associationWrapper', associationWrapper);
+
 module.exports = {
+  router,
   parseCSV,
   profilerExtraction,
   visualizationProfilerExtraction,

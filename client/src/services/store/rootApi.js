@@ -5,7 +5,7 @@ export const optionsApiSlice = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: 'web' }),
   endpoints: (builder) => ({
     visualizationOptions: builder.query({
-      query: (_) => ({ url: 'visualizationOptions' }),
+      query: (_) => ({ url: 'seqmatrixOptions' }),
     }),
     explorationOptions: builder.query({
       query: (params) => ({
@@ -31,6 +31,13 @@ export const explorationApiSlice = createApi({
   endpoints: () => ({}),
 });
 
+export const associationApiSlice = createApi({
+  reducerPath: 'associationApi',
+  baseQuery: fetchBaseQuery({ baseUrl: '' }),
+  endpoints: () => ({}),
+});
+
 export const resetOptionsApi = optionsApiSlice.util.resetApiState();
 export const resetVisualizationApi = visualizationApiSlice.util.resetApiState();
 export const resetExplorationApi = explorationApiSlice.util.resetApiState();
+export const resetAssociationApi = associationApiSlice.util.resetApiState();

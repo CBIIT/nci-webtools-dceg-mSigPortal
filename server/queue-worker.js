@@ -10,7 +10,7 @@ const {
   profilerExtraction,
   parseCSV,
   getRelativePath,
-} = require('./services/apiAnalysis');
+} = require('./services/analysis/analysis');
 
 const {
   defaultProfile,

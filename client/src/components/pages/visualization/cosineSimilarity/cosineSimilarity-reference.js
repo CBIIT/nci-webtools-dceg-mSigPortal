@@ -25,7 +25,7 @@ export default function CsReference() {
     );
 
   const { study, cancer, strategy } = store.publicForm;
-  const { source, samples, matrixList, projectID } = store.main;
+  const { source, matrixData, matrixList, projectID } = store.main;
   const { referenceForm } = store.cosineSimilarity;
 
   // main form
@@ -57,8 +57,8 @@ export default function CsReference() {
   );
 
   // declare form Options
-  const profileOptions = samples.length
-    ? [...new Set(samples.map((e) => e.profile))].map((e) => ({
+  const profileOptions = matrixData.length
+    ? [...new Set(matrixData.map((e) => e.profile))].map((e) => ({
         label: e,
         value: e,
       }))

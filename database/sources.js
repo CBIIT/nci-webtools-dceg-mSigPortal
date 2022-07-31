@@ -165,6 +165,7 @@ export const sources = [
     type: "postImport",
     callback: async (connection) => {
       await connection.query('REFRESH MATERIALIZED VIEW "seqmatrixOption"');
+      await connection.query('REFRESH MATERIALIZED VIEW "seqmatrixSummary"');
     }
   }
 ];

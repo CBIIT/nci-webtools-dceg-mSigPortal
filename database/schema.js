@@ -68,11 +68,53 @@ export const schema = [
         "cancer",
         "sample",
         "profile",
-        "matrix"
+        "matrix",
       ];
       const query = connection("seqmatrix").distinct(columns);
       view.columns(columns);
       return view.as(query);
+    },
+  },
+
+  {
+    name: "seqmatrixSummary",
+    type: "materializedView",
+    dependsOn: ["seqmatrix"],
+    schema: (view, connection) => {
+      const columns = [
+        "study",
+        "strategy",
+        "cancer",
+        "sample",
+        "profile",
+        "matrix",
+        "logTotalMutations",
+        "meanTotalMutations",
+      ];
+      const totalCountColumns = [
+        ...columns.slice(0, -2),
+        connection.raw('sum(mutations) as "totalMutations"'),
+      ];
+      const summaryColumns = [
+        ...columns.slice(0, -3),
+        connection.raw(`string_agg(cast(matrix as text), '/') as matrix`),
+        connection.raw(`log10(sum("totalMutations")) as "logTotalMutations"`),
+        connection.raw(`avg("totalMutations") as "meanTotalMutations"`),
+      ];
+      const totalCountQuery = connection
+        .select(totalCountColumns)
+        .from("seqmatrix")
+        .groupBy(totalCountColumns.slice(0, -1))
+        .orderBy(totalCountColumns.slice(0, -1).map((column) => ({ column })));
+      const summaryQuery = connection
+        .with("totalCounts", totalCountQuery)
+        .select(summaryColumns)
+        .from("totalCounts")
+        .where("totalMutations", ">", 0)
+        .groupBy(summaryColumns.slice(0, -3));
+
+      view.columns(columns);
+      return view.as(summaryQuery);
     },
   },
 

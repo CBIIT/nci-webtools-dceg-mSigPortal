@@ -16,6 +16,7 @@ export default function MutProfilePlot() {
 
   useEffect(() => {
     const { study, strategy, signatureSetName, cancer } = publicForm;
+    //console.log(cancer);
     if (study) {
       setParams({
         study: study.value,
@@ -26,10 +27,6 @@ export default function MutProfilePlot() {
     }
   }, [publicForm]);
   console.log(data);
-  //console.log(publicForm);
-  if (data) {
-    //console.log(data.traces.length);
-  }
 
   return (
     <>

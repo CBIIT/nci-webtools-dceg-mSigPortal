@@ -1,29 +1,25 @@
 import { explorationApiSlice } from '../../../../services/store/rootApi';
-import MsPrevalence from '../../../controls/plotly/msPrevalence/msPrevalence';
+import MsLandscape from '../../../controls/plotly/msLandscape/msLandscape';
 import { groupBy } from 'lodash';
 
-export const msPrevalenceApiSlice = explorationApiSlice.injectEndpoints({
+export const msLandscapeApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    msPrevelencePlot: builder.query({
-      // query: ({ mutation, ...params }) => ({
-      query: ({ minimum, ...params }) => ({
+    msLandscapePlot: builder.query({
+      query: (params) => ({
         url: 'exposure',
         params,
       }),
       transformResponse: (data, meta, arg) => {
-        console.log('prevalence api');
         console.log(data);
-        const { minimum } = arg;
-        console.log(minimum);
-
         // calculate median burden across cancer types
-        const groupBySignature = groupBy(data, 'signatureName');
-        const groupBySample = groupBy(data, 'sample');
-
-        const transform = Object.entries(groupBySignature)
-          .map(([signatureName, data]) => {
-            const samples = data
-              .filter((e) => e.exposure)
+        const groupByCancer = groupBy(data, 'cancer');
+        const transform = Object.entries(groupByCancer)
+          .map(([cancer, data]) => {
+            const samples = Object.values(groupBy(data, 'sample'))
+              .map((e) => ({
+                sample: e[0].sample,
+                burden: e[0].cancerBurden,
+              }))
               .sort((a, b) => a.burden - b.burden);
 
             const burdens = samples
@@ -38,20 +34,19 @@ export const msPrevalenceApiSlice = explorationApiSlice.injectEndpoints({
                 : burdens[Math.floor(burdens.length / 2)];
 
             return {
-              signatureName,
+              cancer,
               samples,
               medianBurden,
-              totalSamples: data.length,
+              totalSamples: samples.length,
             };
           })
           .filter((e) => e.medianBurden)
           .sort((a, b) => a.medianBurden - b.medianBurden);
 
-        return MsPrevalence(transform, minimum);
-        //return MsPrevalence(transform, groupBySample);
+        return MsLandscape(transform, 'MsLandscape');
       },
     }),
   }),
 });
 
-export const { useMsPrevelencePlotQuery } = msPrevalenceApiSlice;
+export const { useMsLandscapePlotQuery } = msLandscapeApiSlice;

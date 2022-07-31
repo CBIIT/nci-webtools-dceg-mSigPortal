@@ -22,8 +22,6 @@ export default function SBS192(data, sample) {
     ]
   );
 
-  const numberWithCommas = (x) =>
-    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
   const maxVal = Math.max(...data.map((o) => o.mutations));
 
   const groupByMutationT = transcribed.reduce((groups, e, i) => {
@@ -101,8 +99,8 @@ export default function SBS192(data, sample) {
     marker: { color: '#004765' },
     x: flatSortedT.map((element, index, array) => index),
     y: flatSortedT.map((element, index, array) => element.contribution),
-
-    hoverinfo: 'x+y',
+    hovertemplate: '<b>Transcribed Strand</b><br> %{x}, %{y}<extra></extra>',
+    //hoverinfo: 'x+y',
     showlegend: true,
   };
 
@@ -112,8 +110,8 @@ export default function SBS192(data, sample) {
     marker: { color: '#E32925' },
     x: flatSortedU.map((element, index, array) => index),
     y: flatSortedU.map((element, index, array) => element.contribution),
-
-    hoverinfo: 'x+y',
+    hovertemplate: '<b>Transcribed Strand</b><br> %{x}, %{y} <extra></extra>',
+    //hoverinfo: 'x+y',
     showlegend: true,
   };
 
@@ -149,7 +147,7 @@ export default function SBS192(data, sample) {
       '<b>' +
       sample +
       ': ' +
-      numberWithCommas(totalMutations) +
+      totalMutations.toLocaleString(undefined) +
       ' transcribed subs</b>',
     showarrow: false,
     font: {

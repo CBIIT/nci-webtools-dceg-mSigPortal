@@ -19,7 +19,8 @@ export default function SBS24(data, sample) {
     marker: { color: '#004765' },
     x: transcribed.map((e) => e.mutations),
     y: transcribed.map((e) => e.mutationType.slice(-3)),
-    hoverinfo: 'x+y',
+    //hoverinfo: 'x+y',
+    hovertemplate: '<b>Transcribed Strand</b><br>%{y}, %{x} <extra></extra>',
     orientation: 'h',
   };
 
@@ -29,7 +30,8 @@ export default function SBS24(data, sample) {
     marker: { color: '#E32925' },
     x: untranscribed.map((e) => e.mutations),
     y: untranscribed.map((e) => e.mutationType.slice(-3)),
-    hoverinfo: 'x+y',
+    //hoverinfo: 'x+y',
+    hovertemplate: '<b>Untranscribed Strand</b><br>%{y}, %{x} <extra></extra>',
     orientation: 'h',
   };
 

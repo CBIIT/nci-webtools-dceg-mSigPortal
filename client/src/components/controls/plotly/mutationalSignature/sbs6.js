@@ -17,7 +17,8 @@ export default function SBS6(data, sample) {
     marker: { color: colors[e.mutationType] },
     y: [e.mutationType],
     x: [e.mutations],
-    hoverinfo: 'x+y',
+    //hoverinfo: 'y+x',
+    hovertemplate: '%{y}, %{x} <extra></extra>',
     orientation: 'h',
   }));
 

@@ -20,8 +20,7 @@ export default function SBS96(data, sample) {
     [0.8, 'rgb(255,255,39)'],
     [1, 'rgb(255,255,39)'],
   ];
-  const numberWithCommas = (x) =>
-    x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
+
   const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
   const chunks = (a, size) =>
     Array.from(new Array(Math.ceil(a.length / size)), (_, i) =>
@@ -471,7 +470,11 @@ export default function SBS96(data, sample) {
     x: 0,
     y: 0.95,
     text:
-      '<b>' + sample + ': ' + numberWithCommas(totalMutations) + ' subs </b>',
+      '<b>' +
+      sample +
+      ': ' +
+      totalMutations.toLocaleString(undefined) +
+      ' subs </b>',
     showarrow: false,
     font: {
       size: 18,

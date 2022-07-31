@@ -21,7 +21,7 @@ export default function PcWithin() {
     );
 
   const { study, cancer, strategy } = store.publicForm;
-  const { source, samples, svgList, matrixList, projectID } = store.main;
+  const { source, matrixData, svgList, matrixList, projectID } = store.main;
   const { withinForm } = store.profileComparison;
 
   const [params, setParams] = useState(null);
@@ -31,10 +31,10 @@ export default function PcWithin() {
   });
 
   function getSampleOptions(profile) {
-    return samples && profile
+    return matrixData && profile
       ? [
           ...new Set(
-            samples
+            matrixData
               .filter((e) => e.profile == profile.value)
               .map((e) => e.sample)
           ),
@@ -51,8 +51,8 @@ export default function PcWithin() {
 
   const { profile, sample1, sample2 } = watch();
 
-  const profileOptions = samples.length
-    ? [...new Set(samples.map((e) => e.profile))].map((e) => ({
+  const profileOptions = matrixData.length
+    ? [...new Set(matrixData.map((e) => e.profile))].map((e) => ({
         label: e,
         value: e,
       }))

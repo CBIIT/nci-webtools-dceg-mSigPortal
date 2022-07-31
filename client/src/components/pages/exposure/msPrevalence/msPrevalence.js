@@ -1,6 +1,7 @@
 import { Container } from 'react-bootstrap';
 import MsPrevalence from './msPrevalence-plot';
 import Description from '../../../controls/description/description';
+import MsPrevalenceForm from './msPrevalence-form';
 
 export default function MutationalProfiles(props) {
   return (
@@ -13,7 +14,9 @@ export default function MutationalProfiles(props) {
           more="For prevalence by samples, input the [Minimal Number of Mutations Assigned to Each Signature] to set the smallest number of mutations assigned to each signature required for the detection of the mutational signature in each sample."
         />
       </div>
+      <MsPrevalenceForm />
       <hr />
+
       <MsPrevalence />
     </Container>
   );
