@@ -155,8 +155,32 @@ export const sources = [
       "signatureName",
       "signatureSource",
       "url",
-      "description",
+      "description", 
       "category",
+    ]
+  },
+
+  {
+    sourcePath: "Others/Publications.csv",
+    table: "publication",
+    description: "publications",
+    columns: [
+      "category",
+      "diseaseOrPhenotypeOrExposure",
+      "cancerType",
+      "experimentalStrategy",
+      "firstAuthor",
+      "lastAuthor",
+      "year",
+      "journal",
+      "bioRxivOrPubmedId",
+      "title",
+      "doi",
+      "note",
+      "softwareName",
+      "computationalMethod",
+      "programmingLanguage",
+      "sourceUrl",
     ]
   },
 
