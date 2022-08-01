@@ -173,6 +173,14 @@ export default function SBS288(data, sample) {
   const flatSortedN = Object.values(totalMutationsGroupN).flat();
   const flatSortedFirstLetter = Object.values(totalGroupByFirstLetter).flat();
 
+  const maxValByTotal = Math.max(
+    ...[
+      ...flatSortedT.map((e) => e.total),
+      ...flatSortedU.map((e) => e.total),
+      ...flatSortedN.map((e) => e.total),
+      ...flatSortedFirstLetter.map((e) => e.total),
+    ]
+  );
   Object.entries(flatSortedFirstLetter).forEach(
     ([key, value], groupIndex, array) => {
       if (value.mutationType === 'T') {
@@ -380,7 +388,7 @@ export default function SBS288(data, sample) {
       tickcolor: '#D3D3D3',
       linecolor: '#D3D3D3',
       linewidth: 1,
-      tickformat: '~s',
+      tickformat: maxValTotal >= 1000 ? '~s' : '',
       ticks: 'inside',
       showgrid: true,
       gridcolor: '#F5F5F5',
@@ -394,7 +402,7 @@ export default function SBS288(data, sample) {
         size: 12,
       },
       domain: [0.8, 1],
-      tickformat: '~s',
+      tickformat: maxValByTotal >= 1000 ? '~s' : '',
       ticks: 'outside',
       linecolor: '#E0E0E0',
       linewidth: 1,
