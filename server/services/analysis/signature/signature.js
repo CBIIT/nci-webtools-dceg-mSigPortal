@@ -1,6 +1,5 @@
 const { Router } = require('express');
-const { v4: uuidv4 } = require('uuid');
-const { getSignatureData } = require('../../query');
+const { getSignatureData, getSignatureOptions } = require('../../query');
 
 async function querySignature(req, res, next) {
   try {
@@ -25,8 +24,24 @@ async function querySignature(req, res, next) {
   }
 }
 
+// query public exploration options for exploration tab
+async function signatureOptions(req, res, next) {
+  try {
+    const { study, strategy, signatureSetName, cancer } = req.query;
+    const connection = req.app.locals.connection;
+
+    const query = { study, strategy, signatureSetName, cancer };
+    const columns = ['study', 'strategy', 'cancer', 'signatureSetName'];
+    const data = await getSignatureOptions(connection, query, columns);
+    res.json(data);
+  } catch (error) {
+    next(error);
+  }
+}
+
 const router = Router();
 
 router.get('/signature', querySignature);
+router.get('/signatureOptions', signatureOptions);
 
 module.exports = { router, querySignature };

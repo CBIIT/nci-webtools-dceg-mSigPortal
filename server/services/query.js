@@ -68,6 +68,27 @@ function getExposureData(
   );
 }
 
+function getExposureOptions(
+  connection,
+  query,
+  columns = '*',
+  limit = 200000,
+  offset = 0,
+  rowMode = 'object',
+  distinct = false
+) {
+  return getData(
+    connection,
+    'exposureOption',
+    query,
+    columns,
+    limit,
+    offset,
+    rowMode,
+    distinct
+  );
+}
+
 function getSeqmatrixData(
   connection,
   query,
@@ -152,6 +173,27 @@ function getSignatureData(
   );
 }
 
+function getSignatureOptions(
+  connection,
+  query,
+  columns = '*',
+  limit = 200000,
+  offset = 0,
+  rowMode = 'object',
+  distinct = false
+) {
+  return getData(
+    connection,
+    'signatureOption',
+    query,
+    columns,
+    limit,
+    offset,
+    rowMode,
+    distinct
+  );
+}
+
 function getEtiologyData(
   connection,
   query,
@@ -198,10 +240,12 @@ module.exports = {
   getData,
   getAssociationData,
   getExposureData,
+  getExposureOptions,
   getSeqmatrixData,
   getSeqmatrixOptions,
   getSeqmatrixSummary,
   getSignatureData,
+  getSignatureOptions,
   getEtiologyData,
   getPublicationData,
 };

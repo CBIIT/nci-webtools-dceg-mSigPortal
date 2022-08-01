@@ -7,7 +7,7 @@ import { actions as visualizationActions } from '../../../../services/store/visu
 import { actions as modalActions } from '../../../../services/store/modal';
 import {
   resetVisualizationApi,
-  useVisualizationOptionsQuery,
+  useSeqmatrixOptionsQuery,
 } from '../../../../services/store/rootApi';
 import { usePublicMatrixMutation } from './apiSlice';
 
@@ -26,7 +26,7 @@ export default function PublicForm() {
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const { data, error, isFetching } = useVisualizationOptionsQuery();
+  const { data, error, isFetching } = useSeqmatrixOptionsQuery();
   const [fetchMatrix, { isLoading }] = usePublicMatrixMutation();
 
   const defaultValues = {

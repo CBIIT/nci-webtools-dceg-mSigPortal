@@ -9,8 +9,12 @@ const {
 async function querySeqmatrix(req, res, next) {
   try {
     const { limit, offset, rowMode, ...query } = req.query;
-    const connection = req.app.locals.connection;
+    const { study, cancer, strategy } = query;
+    if (!study || !cancer || !strategy) {
+      throw 'Missing one or more of the following parameters: study, cancer, strategy';
+    }
 
+    const connection = req.app.locals.connection;
     const columns = '*';
     const data = await getSeqmatrixData(
       connection,
@@ -45,8 +49,12 @@ async function seqmatrixOptions(req, res, next) {
 async function seqmatrixSummary(req, res, next) {
   try {
     const { limit, offset, rowMode, ...query } = req.query;
-    const connection = req.app.locals.connection;
+    const { study, cancer, strategy } = query;
+    if (!study || !cancer || !strategy) {
+      throw 'Missing one or more of the following parameters: study, cancer, strategy';
+    }
 
+    const connection = req.app.locals.connection;
     const columns = '*';
     const data = await getSeqmatrixSummary(
       connection,

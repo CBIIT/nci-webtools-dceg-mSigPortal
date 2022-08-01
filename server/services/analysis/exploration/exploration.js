@@ -1,10 +1,6 @@
 const { Router } = require('express');
 const { v4: uuidv4 } = require('uuid');
-const {
-  getExposureData,
-  getSeqmatrixData,
-  getSignatureData,
-} = require('../../query');
+const { getExposureData, getExposureOptions } = require('../../query');
 const { addBurden } = require('./burden');
 
 function alphaNumericSort(array) {
@@ -42,7 +38,7 @@ async function explorationOptions(req, res, next) {
 
     const query = { study, strategy, signatureSetName, cancer };
     const columns = ['study', 'strategy', 'cancer', 'signatureSetName'];
-    const data = await getExposureData(connection, query, columns);
+    const data = await getExposureOptions(connection, query, columns);
     res.json(data);
   } catch (error) {
     next(error);
@@ -70,7 +66,7 @@ async function explorationSamples(req, res, next) {
 const router = Router();
 
 router.get('/exposure', queryExposure);
-router.get('/explorationOptions', explorationOptions);
+router.get('/exposureOptions', explorationOptions);
 router.get('/explorationSamples', explorationSamples);
 
 module.exports = { router, queryExposure };

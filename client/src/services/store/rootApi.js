@@ -4,20 +4,23 @@ export const optionsApiSlice = createApi({
   reducerPath: 'optionsApi',
   baseQuery: fetchBaseQuery({ baseUrl: 'web' }),
   endpoints: (builder) => ({
-    visualizationOptions: builder.query({
-      query: (_) => ({ url: 'seqmatrixOptions' }),
+    seqmatrixOptions: builder.query({
+      query: (params) => ({ url: 'seqmatrixOptions', params }),
     }),
-    explorationOptions: builder.query({
-      query: (params) => ({
-        url: 'explorationOptions',
-        params,
-      }),
+    exposureOptions: builder.query({
+      query: (params) => ({ url: 'exposureOptions', params }),
+    }),
+    signatureOptions: builder.query({
+      query: (params) => ({ url: 'signatureOptions', params }),
     }),
   }),
 });
 
-export const { useVisualizationOptionsQuery, useExplorationOptionsQuery } =
-  optionsApiSlice;
+export const {
+  useSeqmatrixOptionsQuery,
+  useExposureOptionsQuery,
+  useSignatureOptionsQuery,
+} = optionsApiSlice;
 
 export const visualizationApiSlice = createApi({
   reducerPath: 'visualizationApi',
