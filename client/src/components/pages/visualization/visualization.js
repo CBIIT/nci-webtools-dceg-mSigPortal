@@ -15,6 +15,7 @@ import MutationalProfiles2 from './mutationalProfiles/mutProfiles';
 import CosineSimilarity from './cosineSimilarity';
 import CosineSimilarity2 from './cosineSimilarity/cosineSimilarity';
 import MutationalPattern from './mutationalPattern/mutationalPattern';
+import MutationalPattern2 from './mutationalPattern2/mutationalPattern';
 import ProfileComparison from './profileComparison';
 import ProfileComparison2 from './profileComparison/profileComparison';
 import PCA from './pca';
@@ -413,9 +414,9 @@ export default function Visualization({ match }) {
       component: <Download />,
     },
     {
-      name: 'Multational Profiles Test',
-      id: 'multationalProfileTest',
-      component: <MultationalProfilesTest />,
+      name: 'Mutational Pattern Enrichment Analysis',
+      id: 'mutationalPattern2',
+      component: <MutationalPattern2 />,
     },
   ];
 
