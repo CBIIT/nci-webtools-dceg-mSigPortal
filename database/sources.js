@@ -1,4 +1,5 @@
 export const sources = [
+
   {
     sourcePath: "Association/data.csv",
     table: "association",
@@ -188,8 +189,10 @@ export const sources = [
     description: "Refresh materialized views",
     type: "postImport",
     callback: async (connection) => {
-      await connection.query('REFRESH MATERIALIZED VIEW "seqmatrixOption"');
-      await connection.query('REFRESH MATERIALIZED VIEW "seqmatrixSummary"');
+      await connection.query('refresh materialized view "exposureOption"');
+      await connection.query('refresh materialized view "seqmatrixOption"');
+      await connection.query('refresh materialized view "seqmatrixSummary"');
+      await connection.query('refresh materialized view "signatureOption"');
     }
   }
 ];
