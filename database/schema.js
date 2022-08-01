@@ -14,8 +14,15 @@ export const schema = [
       table.string("variableName");
       table.string("variableValue");
       table.string("variableValueType");
-      table.index(["study", "strategy", "cancer", "sample"]);
     },
+    index: (table) => {
+      table.index([
+        "study", 
+        "strategy", 
+        "cancer", 
+        "sample"
+      ]);
+    }
   },
 
   {
@@ -30,8 +37,42 @@ export const schema = [
       table.string("signatureSetName");
       table.string("signatureName");
       table.double("exposure");
-      table.index(["study", "strategy", "cancer", "signatureSetName"]);
     },
+    index: (table) => {
+      table.index([
+        "study", 
+        "strategy", 
+        "cancer", 
+        "signatureSetName"
+      ]);
+    }
+  },
+
+  {
+    name: "exposureOption",
+    type: "materializedView",
+    dependsOn: ["exposure"],
+    schema: (view, connection) => {
+      const columns = [
+        "study",
+        "strategy",
+        "cancer",
+        "signatureSetName", 
+        "signatureName"
+      ];
+      const query = connection("exposure").distinct(columns);
+      view.columns(columns);
+      view.as(query);
+    },
+    index: (table) => {
+      table.index([ 
+        "study",
+        "strategy",
+        "cancer",
+        "signatureSetName", 
+        "signatureName"
+      ]);
+    }
   },
 
   {
@@ -46,6 +87,8 @@ export const schema = [
       table.integer("matrix");
       table.string("mutationType");
       table.integer("mutations");
+    },
+    index: (table) => {
       table.index([
         "study",
         "strategy",
@@ -54,7 +97,7 @@ export const schema = [
         "profile",
         "matrix",
       ]);
-    },
+    }
   },
 
   {
@@ -74,6 +117,16 @@ export const schema = [
       view.columns(columns);
       return view.as(query);
     },
+    index: (table) => {
+      table.index([
+        "study",
+        "strategy",
+        "cancer",
+        "sample",
+        "profile",
+        "matrix",
+      ]);
+    }  
   },
 
   {
@@ -116,6 +169,16 @@ export const schema = [
       view.columns(columns);
       return view.as(summaryQuery);
     },
+    index: (table) => {
+      table.index([
+        "study",
+        "strategy",
+        "cancer",
+        "sample",
+        "profile",
+        "matrix",
+      ]);
+    }
   },
 
   {
@@ -132,8 +195,49 @@ export const schema = [
       table.string("signatureName");
       table.string("mutationType");
       table.double("contribution");
-      table.index(["profile", "matrix", "signatureSetName"]);
     },
+    index: (table) => {
+      table.index([
+        "profile", 
+        "matrix", 
+        "signatureSetName"
+      ]);
+    }
+  },
+
+
+  {
+    name: "signatureOption",
+    type: "materializedView",
+    dependsOn: ["signature"],
+    schema: (view, connection) => {
+      const columns = [
+        "source",
+        "strategy",
+        "profile",
+        "matrix",
+        "signatureSetName", 
+        "signatureName"
+      ];
+      const query = connection("signature").distinct(columns);
+      view.columns(columns);
+      return view.as(query);
+    },
+    index: (table) => {
+      table.index([
+        "source",
+        "strategy",
+        "profile",
+        "matrix",
+        "signatureSetName", 
+        "signatureName"
+      ]);
+
+      table.index([
+        "signatureSetName", 
+        "signatureName"
+      ]);
+    }
   },
 
   {
@@ -160,8 +264,10 @@ export const schema = [
       table.string("sourceUrl");
       table.text("description");
       table.text("descriptionStrandBias");
-      table.index(["category"]);
     },
+    index: (table) => {
+      table.index(["category"]);
+    }
   },
 
   {
@@ -184,8 +290,10 @@ export const schema = [
       table.string("computationalMethod");
       table.string("programmingLanguage");
       table.string("sourceUrl");
-      table.index(["category"]);
     },
+    index: (table) => {
+      table.index(["category"]);
+    }
   },
 
   {
