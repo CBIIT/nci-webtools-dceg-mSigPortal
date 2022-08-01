@@ -20,6 +20,7 @@ export default function profilerSummary(data) {
       showline: true,
       mirror: true,
       tickangle: 45,
+      range: [-1, traces[0].x.length],
     },
     yaxis: {
       title: 'log<sub>10</sub>(Mutations)',

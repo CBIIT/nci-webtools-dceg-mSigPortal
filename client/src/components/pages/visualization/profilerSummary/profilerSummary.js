@@ -28,7 +28,7 @@ export default function ProfilerSummary() {
   }, [publicForm]);
 
   return (
-    <div className="bg-white border rounded">
+    <div className="bg-white border rounded" style={{ minHeight: '600px' }}>
       <div className="p-3">
         <b>Number of Mutations Per Sample with Regard to Mutational Profile</b>
         <Description
@@ -38,11 +38,11 @@ export default function ProfilerSummary() {
         />
       </div>
 
-      <Container fluid style={{ minHeight: '500px' }} className="mb-3">
-        <LoadingOverlay active={isFetching} />
+      <LoadingOverlay active={isFetching} />
+      <Container fluid className="mb-3">
         <Row>
           <Col>
-            {data ? (
+            {data && (
               <Plot
                 className="w-100"
                 data={cloneDeep(data.traces)}
@@ -50,8 +50,6 @@ export default function ProfilerSummary() {
                 config={cloneDeep(data.config)}
                 useResizeHandler
               />
-            ) : (
-              <LoadingOverlay active={true} />
             )}
           </Col>
         </Row>
