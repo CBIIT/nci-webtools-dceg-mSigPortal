@@ -7,7 +7,7 @@ import { actions as exposureActions } from '../../../../services/store/exposure'
 import { actions as modalActions } from '../../../../services/store/modal';
 import {
   resetExplorationApi,
-  useExplorationOptionsQuery,
+  useExposureOptionsQuery,
 } from '../../../../services/store/rootApi';
 import {
   useExplorationSamplesMutation,
@@ -32,7 +32,7 @@ export default function PublicForm() {
     data: options,
     error: optionsError,
     isFetching,
-  } = useExplorationOptionsQuery();
+  } = useExposureOptionsQuery();
 
   const [fetchSamples, { isLoading, reset: resetSamples }] =
     useExplorationSamplesMutation();

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button, Tab, Nav } from 'react-bootstrap';
-import { useVisualizationOptionsQuery } from '../../../services/store/rootApi';
+import { useSeqmatrixOptionsQuery } from '../../../services/store/rootApi';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../controls/svgContainer/svgContainer';
 import CustomSelect from '../../controls/select/select-old';
@@ -22,7 +22,7 @@ export default function PCA({ submitR, getRefSigOptions }) {
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const { data, error, isFetching } = useVisualizationOptionsQuery();
+  const { data, error, isFetching } = useSeqmatrixOptionsQuery();
 
   const studyOptions = data
     ? // ? Object.keys(data).map((e) => ({ label: e, value: e }))
