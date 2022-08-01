@@ -143,7 +143,7 @@ export default function SBS96(data, sample) {
       linecolor: '#D3D3D3',
       linewidth: 1,
       mirror: 'all',
-      tickformat: '~s',
+      tickformat: maxMutation > 1000 ? '~s' : '',
       showgrid: true,
       gridcolor: '#F5F5F5',
     },

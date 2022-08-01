@@ -59,7 +59,7 @@ export default function SBS6(data, sample) {
       showgrid: false,
       autorange: false,
       range: [0, maxMutation * 1.25],
-      tickformat: '~s',
+      tickformat: maxMutation > 1000 ? '~s' : '',
     },
     yaxis: {
       tickfont: {
@@ -69,7 +69,7 @@ export default function SBS6(data, sample) {
       linewidth: 1,
       categoryorder: 'category descending',
     },
-    tickformat: '~s',
+    tickformat: maxMutation > 1000 ? '~s' : '',
   };
   return { traces, layout };
 }

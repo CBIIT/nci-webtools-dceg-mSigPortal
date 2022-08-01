@@ -136,7 +136,7 @@ export default function DBS78(data, sample) {
       range: [0, maxMutation * 1.2],
       linecolor: 'black',
       linewidth: 1,
-      tickformat: '~s',
+      tickformat: maxMutation > 1000 ? '~s' : '',
       ticks: 'inside',
       tickcolor: '#D3D3D3',
       showgrid: true,

@@ -83,7 +83,7 @@ export default function SBS24(data, sample) {
       showgrid: false,
       autorange: false,
       range: [0, maxMutation * 1.2],
-      tickformat: '~s',
+      tickformat: maxMutation > 1000 ? '~s' : '',
     },
     yaxis: {
       tickfont: {
@@ -91,7 +91,7 @@ export default function SBS24(data, sample) {
       },
       linecolor: '#E0E0E0',
       linewidth: 1,
-      tickformat: '~s',
+      tickformat: maxMutation > 1000 ? '~s' : '',
       categoryorder: 'category descending',
     },
   };

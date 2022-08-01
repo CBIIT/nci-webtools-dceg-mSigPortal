@@ -561,7 +561,7 @@ export default function SBS96(data, sample) {
       linecolor: '#D3D3D3',
       linewidth: 1,
       mirror: 'all',
-      tickformat: '~s',
+      tickformat: maxVal > 1000 ? '~s' : '',
       ticks: '',
     },
     yaxis: {
@@ -572,7 +572,7 @@ export default function SBS96(data, sample) {
       linewidth: 1,
       mirror: 'all',
       domain: [0.72, 1],
-      tickformat: '~s',
+      tickformat: maxVal > 1000 ? '~s' : '',
       tickfont: {
         family: 'Courier New, monospace',
         size: 8,

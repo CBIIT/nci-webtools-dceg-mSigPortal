@@ -17,7 +17,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     element: element,
     cancer: element.cancer,
     type: 'scatter',
-    marker: { symbol: 'circle-open', size: 3, color: 'black' },
+    marker: { symbol: 'circle-open', size: 4, color: 'black' },
     mode: 'markers',
     y: element.samples.map((e) => e.burden),
     // average: average(element.samples.map((e) => e.tmb)),
@@ -44,7 +44,7 @@ export default function TMB(data, tmbTabName, signatureName) {
         : `${element.cancer}`,
     showarrow: false,
     font: {
-      size: 10,
+      //size: 12,
     },
     align: 'center',
     textangle: 55,
@@ -58,7 +58,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     xanchor: 'bottom',
     yanchor: 'bottom',
     x: (index + index + 1) * 0.5,
-    y: -0.1,
+    y: -0.07,
     text: element.samples.filter(function (x) {
       return x.burden != null;
     }).length,
@@ -76,8 +76,8 @@ export default function TMB(data, tmbTabName, signatureName) {
     yref: 'paper',
     x0: index + 0.4,
     x1: index + 0.6,
-    y0: -0.11,
-    y1: -0.11,
+    y0: -0.07,
+    y1: -0.07,
     line: {
       width: 1,
       color: 'black',
@@ -90,7 +90,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     xanchor: 'bottom',
     yanchor: 'bottom',
     x: (index + index + 1) * 0.5,
-    y: -0.18,
+    y: -0.14,
     text: `${element.totalSamples}`,
     showarrow: false,
     font: {
@@ -204,7 +204,9 @@ export default function TMB(data, tmbTabName, signatureName) {
       autorange: true,
       range: [-Math.floor(yMax), Math.floor(yMax)],
     },
-
+    margin: {
+      t: 150,
+    },
     shapes: [...shapes, ...lines, ...bottoLabelline],
     annotations: annotations,
   };
