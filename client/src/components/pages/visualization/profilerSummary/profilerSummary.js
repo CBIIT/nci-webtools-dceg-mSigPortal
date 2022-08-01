@@ -28,7 +28,7 @@ export default function ProfilerSummary() {
   }, [publicForm]);
 
   return (
-    <div className="bg-white border rounded" style={{ minHeight: '600px' }}>
+    <div className="bg-white border rounded">
       <div className="p-3">
         <b>Number of Mutations Per Sample with Regard to Mutational Profile</b>
         <Description
@@ -44,6 +44,7 @@ export default function ProfilerSummary() {
           <Col>
             {data && (
               <Plot
+                style={{ height: '500px' }}
                 className="w-100"
                 data={cloneDeep(data.traces)}
                 layout={cloneDeep(data.layout)}
