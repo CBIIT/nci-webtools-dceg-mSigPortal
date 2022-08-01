@@ -1,4 +1,7 @@
 import { useEffect, useState } from 'react';
+import cloneDeep from 'lodash/cloneDeep';
+import { Button, Container, Row, Col } from 'react-bootstrap';
+import Plot from 'react-plotly.js';
 import { useSelector } from 'react-redux';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import { useMutationalPatternQuery } from './apiSlice';
@@ -17,6 +20,7 @@ export default function MutProfilePlot() {
   });
 
   // get data on form change
+
   useEffect(() => {
     if (proportion && pattern) {
       const params =
@@ -47,6 +51,18 @@ export default function MutProfilePlot() {
     }
   }, [proportion, pattern]);
 
+  const divId = 'mutationalPatternlot';
+  const config = {
+    displayModeBar: true,
+    responsive: true,
+    displaylogo: false,
+    toImageButtonOptions: {
+      format: 'svg',
+      filename: pattern?.value || 'Mutational Profile',
+      scale: 1,
+    },
+  };
+
   return (
     <>
       <LoadingOverlay active={isFetching} />
@@ -55,13 +71,22 @@ export default function MutProfilePlot() {
       )}
 
       <div id="barchart">
-        {data?.output.barPath && (
+        {data && (
           <>
-            <SvgContainer
-              className="p-3"
-              downloadName={data.output.barPath.split('/').slice(-1)[0]}
-              plotPath={'web/results/' + data.output.barPath}
-            />
+            <Container fluid style={{ minHeight: '500px' }} className="mb-3">
+              <Row>
+                <Col>
+                  <Plot
+                    className="w-100"
+                    divId={divId}
+                    data={cloneDeep(data.traces)}
+                    layout={cloneDeep(data.layout)}
+                    config={cloneDeep(config)}
+                    useResizeHandler
+                  />
+                </Col>
+              </Row>
+            </Container>
             <p className="p-3">
               This plot illustrates the frequency by count of each mutational
               pattern in the given study and cancer type or input dataset. The
