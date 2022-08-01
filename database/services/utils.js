@@ -69,6 +69,7 @@ export async function initializeSchema(connectionConfig, schema) {
   const connection = createConnection(connectionConfig);
   const tables = schema.filter(({ type }) => !type || type === "table");
   const materializedViews = schema.filter(({ type }) => type === "materializedView");
+  const indexedTables = schema.filter(s => typeof s.index === 'function')
 
   // drop tables in reverse order to avoid foreign key constraints
   for (const { name } of [...materializedViews.reverse()]) {
@@ -85,6 +86,10 @@ export async function initializeSchema(connectionConfig, schema) {
 
   for (const { name, schema } of materializedViews) {
     await connection.schema.createMaterializedView(name, (view) => schema(view, connection));
+  }
+
+  for (const { name, index } of indexedTables) {
+    await connection.schema.table(name, index);
   }
 
   return true;
