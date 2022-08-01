@@ -152,6 +152,48 @@ function getSignatureData(
   );
 }
 
+function getEtiologyData(
+  connection,
+  query,
+  columns = '*',
+  limit = 200000,
+  offset = 0,
+  rowMode = 'object',
+  distinct = false
+) {
+  return getData(
+    connection,
+    'etiology',
+    query,
+    columns,
+    limit,
+    offset,
+    rowMode,
+    distinct
+  );
+}
+
+function getPublicationData(
+  connection,
+  query,
+  columns = '*',
+  limit = 200000,
+  offset = 0,
+  rowMode = 'object',
+  distinct = false
+) {
+  return getData(
+    connection,
+    'publication',
+    query,
+    columns,
+    limit,
+    offset,
+    rowMode,
+    distinct
+  );
+}
+
 module.exports = {
   getData,
   getAssociationData,
@@ -160,4 +202,6 @@ module.exports = {
   getSeqmatrixOptions,
   getSeqmatrixSummary,
   getSignatureData,
+  getEtiologyData,
+  getPublicationData,
 };

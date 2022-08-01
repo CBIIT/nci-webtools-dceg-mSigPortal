@@ -13,6 +13,12 @@ const { querySignature } = require('../services/analysis/signature/signature');
 const {
   queryAssociation,
 } = require('../services/analysis/association/association');
+const {
+  queryEtiology,
+} = require('../services/analysis/etiology/etiology');
+const {
+  queryPublications,
+} = require('../services/analysis/publications/publications');
 
 const router = Router();
 
@@ -30,5 +36,7 @@ router.get('/seqmatrix', querySeqmatrix);
 router.get('/signature', querySignature);
 router.get('/exposure', queryExposure);
 router.get('/association', queryAssociation);
+router.use('/etiology', queryEtiology);
+router.use('/publications', queryPublications);
 
 module.exports = router;

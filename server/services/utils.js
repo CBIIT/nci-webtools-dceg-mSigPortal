@@ -1,3 +1,5 @@
+const { pickBy } = require('lodash');
+
 function defaultProfile(profileOptions) {
   if (profileOptions.includes('SBS')) return 'SBS';
   if (profileOptions.includes('DBS')) return 'DBS';
@@ -52,6 +54,10 @@ function defaultFilter2(filterOptions) {
     : filterOptions[0];
 }
 
+function pickNonNullValues(object) {
+  return pickBy(object, (v) => v !== null);
+}
+
 module.exports = {
   defaultProfile,
   defaultMatrix,
@@ -59,4 +65,5 @@ module.exports = {
   defaultProfile2,
   defaultMatrix2,
   defaultFilter2,
+  pickNonNullValues,
 };
