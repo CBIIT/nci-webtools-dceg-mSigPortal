@@ -6,18 +6,17 @@ import { useSelector } from 'react-redux';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import { useMutationalPatternQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-
+import './plot.scss';
 export default function MutProfilePlot() {
+  const publicForm = useSelector((state) => state.exposure.publicForm);
+  const [params, setParams] = useState('');
+  const { data, error, isFetching } = useMutationalPatternQuery(params, {
+    skip: !params,
+  });
   const store = useSelector((state) => state.visualization);
 
   const { proportion, pattern } = store.mutationalPattern;
   const { projectID, source, matrixList } = store.main;
-
-  const [params, setParams] = useState(null);
-
-  const { data, error, isFetching } = useMutationalPatternQuery(params, {
-    skip: !params,
-  });
 
   // get data on form change
 

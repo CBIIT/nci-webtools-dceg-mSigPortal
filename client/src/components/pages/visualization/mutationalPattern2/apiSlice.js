@@ -5,12 +5,15 @@ import { groupBy } from 'lodash';
 export const mutationalPatternApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     mutationalPattern: builder.query({
-      query: (params) => ({
+      query: ({ proportion, pattern, ...params }) => ({
         url: 'seqmatrix',
         body: params,
       }),
-      transformResponse: (data) => {
+      transformResponse: (data, meta, arg) => {
         console.log(data);
+        const { proportion, pattern } = arg;
+        console.log(proportion);
+        console.log(pattern);
         const groupByProfile = groupBy(data, 'profile');
 
         return mutationalPattern(groupByProfile);
