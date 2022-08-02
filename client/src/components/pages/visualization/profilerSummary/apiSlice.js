@@ -10,8 +10,11 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
         params,
       }),
       transformResponse: (data) => {
-        const groupByProfile = groupBy(data, 'profile');
-        const meanMutationsPerProfile = Object.values(groupByProfile)
+        const groupByProfileMatrix = groupBy(
+          data,
+          (e) => `${e.profile}_${e.matrix}`
+        );
+        const meanMutationsPerProfile = Object.values(groupByProfileMatrix)
           .map((samples) => {
             return {
               name: `${samples[0].profile}: ${samples[0].matrix}`,

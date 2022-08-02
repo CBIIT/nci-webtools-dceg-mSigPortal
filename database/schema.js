@@ -150,7 +150,7 @@ export const schema = [
       ];
       const summaryColumns = [
         ...columns.slice(0, -3),
-        connection.raw(`string_agg(cast(matrix as text), '/') as matrix`),
+        connection.raw(`string_agg(cast(matrix as text), '/' order by matrix asc) as matrix`),
         connection.raw(`log10(sum("totalMutations")) as "logTotalMutations"`),
         connection.raw(`avg("totalMutations") as "meanTotalMutations"`),
       ];
