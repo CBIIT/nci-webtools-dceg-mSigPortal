@@ -21,32 +21,15 @@ export default function MutProfilePlot() {
   // get data on form change
 
   useEffect(() => {
-    if (proportion && pattern) {
-      const params =
-        source == 'user'
-          ? {
-              fn: 'mutationalPattern',
-              args: {
-                matrixFile: matrixList.filter(
-                  (e) => e.profileType == 'SBS' && e.matrixSize == '96'
-                )[0].Path,
-                proportion: parseFloat(proportion),
-                pattern: pattern,
-              },
-              projectID,
-            }
-          : {
-              fn: 'mutationalPatternPublic',
-              args: {
-                study: store.publicForm.study.value,
-                cancerType: store.publicForm.cancer.value,
-                experimentalStrategy: store.publicForm.strategy.value,
-                proportion: parseFloat(proportion),
-                pattern: pattern,
-              },
-              projectID,
-            };
-      setParams(params);
+    const { study, cancer, strategy, proportion, pattern } = publicForm;
+    if (study) {
+      setParams({
+        study: study.value,
+        cancerType: cancer.value,
+        experimentalStrategy: strategy.value,
+        proportion: parseFloat(proportion),
+        pattern: pattern,
+      });
     }
   }, [proportion, pattern]);
 
@@ -57,7 +40,7 @@ export default function MutProfilePlot() {
     displaylogo: false,
     toImageButtonOptions: {
       format: 'svg',
-      filename: pattern?.value || 'Mutational Profile',
+      filename: pattern?.value || 'Mutational Pattern',
       scale: 1,
     },
   };
