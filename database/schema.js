@@ -164,7 +164,7 @@ export const schema = [
         .select(summaryColumns)
         .from("totalCounts")
         .where("totalMutations", ">", 0)
-        .groupBy(summaryColumns.slice(0, -3));
+        .groupBy([...summaryColumns.slice(0, -3), 'totalMutations']);
 
       view.columns(columns);
       return view.as(summaryQuery);
