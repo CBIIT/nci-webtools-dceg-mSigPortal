@@ -4,13 +4,13 @@ import { Button, Container, Row, Col } from 'react-bootstrap';
 import Plot from 'react-plotly.js';
 import { useSelector } from 'react-redux';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
-import { useMutationalPatternQuery } from './apiSlice';
+import { useMutationalPattern2Query } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import './plot.scss';
 export default function MutProfilePlot() {
   const publicForm = useSelector((state) => state.exposure.publicForm);
   const [params, setParams] = useState('');
-  const { data, error, isFetching } = useMutationalPatternQuery(params, {
+  const { data, error, isFetching } = useMutationalPattern2Query(params, {
     skip: !params,
   });
   const store = useSelector((state) => state.visualization);

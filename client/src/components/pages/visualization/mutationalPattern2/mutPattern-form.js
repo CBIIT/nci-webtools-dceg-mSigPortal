@@ -1,5 +1,5 @@
 import { Button, Form, Row, Col } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
 import { NavHashLink } from 'react-router-hash-link';
 import Description from '../../../controls/description/description';
@@ -13,12 +13,17 @@ export default function MutationalPatternForm() {
   const mergeState = (state) =>
     dispatch(actions.mergeVisualization({ mutationalPattern: state }));
 
+  const store = useSelector((state) => state.visualization);
+  const { proportion, pattern } = store.mutationalPattern;
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm({
-    defaultValues: { proportion: '0.8', pattern: 'NCG>NTG' },
+    defaultValues: {
+      proportion: proportion || '0.8',
+      pattern: pattern || 'NCG>NTG',
+    },
   });
 
   async function onSubmit(data) {
