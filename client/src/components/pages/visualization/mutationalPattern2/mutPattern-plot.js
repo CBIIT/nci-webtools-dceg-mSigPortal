@@ -25,13 +25,13 @@ export default function MutProfilePlot() {
     if (study) {
       setParams({
         study: study.value,
-        cancerType: cancer.value,
-        experimentalStrategy: strategy.value,
-        proportion: parseFloat(proportion),
-        pattern: pattern,
+        cancer: cancer.value,
+        strategy: strategy.value,
+        proportion,
+        pattern,
       });
     }
-  }, [proportion, pattern]);
+  }, [publicForm, proportion, pattern]);
 
   const divId = 'mutationalPatternlot';
   const config = {
