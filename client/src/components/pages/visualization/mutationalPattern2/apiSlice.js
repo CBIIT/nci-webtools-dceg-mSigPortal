@@ -1,5 +1,6 @@
 import { visualizationApiSlice } from '../../../../services/store/rootApi';
-import mutationalPattern from '../../../controls/plotly/mutationalPattern/mutationalPattern';
+import mutationalPatternBar from '../../../controls/plotly/mutationalPattern/mutationalPatternBar';
+import mutationalPatternScatter from '../../../controls/plotly/mutationalPattern/mutationalPatternScatter';
 import { groupBy } from 'lodash';
 
 export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
@@ -12,12 +13,34 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
         }),
         transformResponse: (data, meta, arg) => {
           console.log(data);
-          const { proportion, pattern } = arg;
-          console.log(proportion);
-          console.log(pattern);
-          const groupByProfile = groupBy(data, 'profile');
+          const { proportion, pattern, profile, matrix } = arg;
+          const regexMap = {
+            SBS24: /^.{2}(.*)$/,
+            SBS96: /\[(.*)\]/,
+            DBS78: /^(.{2})/,
+            ID83: /^(.{7})/,
+          };
+          const profileMatrix = profile + matrix;
+          const groupByMutationType = groupBy(data, 'mutationType');
+          console.log(groupByMutationType);
+          const groupByMutation = data.reduce((acc, e, i) => {
+            const mutationRegex = regexMap[profileMatrix];
+            const mutation = e.mutationType.match(mutationRegex)[1];
 
-          return mutationalPattern(groupByProfile);
+            acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
+            return acc;
+          }, {});
+
+          const transform = Object.entries(groupByMutation).map(
+            ([mutation, data]) => ({
+              mutation,
+              data,
+            })
+          );
+
+          console.log(transform);
+
+          return mutationalPatternScatter(transform, proportion, pattern);
         },
       }),
     }),

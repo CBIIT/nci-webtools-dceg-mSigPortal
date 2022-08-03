@@ -3,12 +3,11 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Button, Container, Row, Col } from 'react-bootstrap';
 import Plot from 'react-plotly.js';
 import { useSelector } from 'react-redux';
-import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import { useMutationalPattern2Query } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import './plot.scss';
 export default function MutProfilePlot() {
-  const publicForm = useSelector((state) => state.exposure.publicForm);
+  const publicForm = useSelector((state) => state.visualization.publicForm);
   const [params, setParams] = useState('');
   const { data, error, isFetching } = useMutationalPattern2Query(params, {
     skip: !params,
@@ -16,24 +15,26 @@ export default function MutProfilePlot() {
   const store = useSelector((state) => state.visualization);
 
   const { proportion, pattern } = store.mutationalPattern;
-  const { projectID, source, matrixList } = store.main;
 
   // get data on form change
 
   useEffect(() => {
     const { study, cancer, strategy } = publicForm;
-    if (study) {
+    if (proportion && pattern) {
       setParams({
         study: study.value,
         cancer: cancer.value,
         strategy: strategy.value,
-        proportion,
-        pattern,
+        profile: 'SBS',
+        matrix: '96',
+        proportion: parseFloat(proportion),
+        pattern: pattern,
       });
     }
   }, [publicForm, proportion, pattern]);
 
-  const divId = 'mutationalPatternlot';
+  const divId1 = 'mutationalPatternlot';
+  const divId2 = 'mutationalPatternlot2';
   const config = {
     displayModeBar: true,
     responsive: true,
@@ -60,7 +61,7 @@ export default function MutProfilePlot() {
                 <Col>
                   <Plot
                     className="w-100"
-                    divId={divId}
+                    divId={divId1}
                     data={cloneDeep(data.traces)}
                     layout={cloneDeep(data.layout)}
                     config={cloneDeep(config)}
@@ -91,15 +92,22 @@ export default function MutProfilePlot() {
         )}
       </div>
       <div id="context">
-        {data?.output.plotPath && (
+        {data && (
           <>
-            <SvgContainer
-              className="p-3"
-              downloadName={data.output.plotPath.split('/').slice(-1)[0]}
-              plotPath={'web/results/' + data.output.plotPath}
-              txtPath={`web/results/${data.output.txtPath}`}
-              title="Proportion of Mutational Pattern Context Compared to Other Contexts with the same SBS Mutation"
-            />
+            <Container fluid style={{ minHeight: '500px' }} className="mb-3">
+              <Row>
+                <Col>
+                  <Plot
+                    className="w-100"
+                    divId={divId2}
+                    data={cloneDeep(data.traces)}
+                    layout={cloneDeep(data.layout)}
+                    config={cloneDeep(config)}
+                    useResizeHandler
+                  />
+                </Col>
+              </Row>
+            </Container>
             <p className="p-3">
               This plot illustrates the mutational pattern context entered
               compared to other contexts with the same SBS mutation for each
