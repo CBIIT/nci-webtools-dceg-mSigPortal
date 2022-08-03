@@ -21,7 +21,7 @@ export default function MutProfilePlot() {
   // get data on form change
 
   useEffect(() => {
-    const { study, cancer, strategy, proportion, pattern } = publicForm;
+    const { study, cancer, strategy } = publicForm;
     if (study) {
       setParams({
         study: study.value,
