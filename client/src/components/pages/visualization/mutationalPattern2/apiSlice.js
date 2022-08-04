@@ -110,6 +110,17 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
           );
         },
       }),
+      pattern: builder.query({
+        query: ({ proportion, ...params }) => ({
+          url: 'pattern',
+          params,
+        }),
+        transformResponse: (data, meta, arg) => {
+          const { proportion } = arg;
+          const transform = data.filter((e) => e.n1 > proportion);
+          return transform;
+        },
+      }),
     }),
   }
 );
@@ -117,4 +128,5 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
 export const {
   useLazyMutationalPatternBarQuery,
   useLazyMutationalPatternScatterQuery,
+  usePatternQuery,
 } = mutationalPatternApiSlice2;

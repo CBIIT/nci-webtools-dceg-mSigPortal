@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import {
   useLazyMutationalPatternBarQuery,
   useLazyMutationalPatternScatterQuery,
+  usePatternQuery,
 } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import './plot.scss';
@@ -20,6 +21,16 @@ export default function MutProfilePlot() {
     useLazyMutationalPatternScatterQuery(params, {
       skip: !params,
     });
+
+  const [patternParams, setPatternParams] = useState('');
+  const {
+    data: patternData,
+    error: patternError,
+    isFetching: fetchingPattern,
+  } = usePatternQuery(patternParams, {
+    skip: !patternParams,
+  });
+
   const store = useSelector((state) => state.visualization);
 
   const { proportion, pattern } = store.mutationalPattern;
@@ -40,6 +51,15 @@ export default function MutProfilePlot() {
       });
     }
   }, [publicForm, proportion, pattern]);
+  useEffect(() => {
+    const { study } = publicForm;
+    if (study && proportion) {
+      setPatternParams({
+        study: study.value,
+        proportion: parseFloat(proportion),
+      });
+    }
+  }, [publicForm, proportion]);
 
   const divId1 = 'mutationalPatternlot';
   const divId2 = 'mutationalPatternlot2';
