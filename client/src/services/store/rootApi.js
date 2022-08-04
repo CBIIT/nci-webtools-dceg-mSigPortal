@@ -40,6 +40,12 @@ export const associationApiSlice = createApi({
   endpoints: () => ({}),
 });
 
+export const catalogApiSlice = createApi({
+  reducerPath: 'catalogApi',
+  baseQuery: fetchBaseQuery({ baseUrl: '' }),
+  endpoints: () => ({}),
+});
+
 export const resetOptionsApi = optionsApiSlice.util.resetApiState();
 export const resetVisualizationApi = visualizationApiSlice.util.resetApiState();
 export const resetExplorationApi = explorationApiSlice.util.resetApiState();

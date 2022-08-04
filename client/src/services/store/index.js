@@ -11,6 +11,7 @@ import {
   optionsApiSlice,
   visualizationApiSlice,
   explorationApiSlice,
+  catalogApiSlice,
 } from './rootApi';
 
 // provide rootReducer as an object of slice reducers
@@ -26,12 +27,14 @@ export const store = configureStore({
     [optionsApiSlice.reducerPath]: optionsApiSlice.reducer,
     [visualizationApiSlice.reducerPath]: visualizationApiSlice.reducer,
     [explorationApiSlice.reducerPath]: explorationApiSlice.reducer,
+    [catalogApiSlice.reducerPath]: catalogApiSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }).concat(
       optionsApiSlice.middleware,
       visualizationApiSlice.middleware,
-      explorationApiSlice.middleware
+      explorationApiSlice.middleware,
+      catalogApiSlice.middleware
     ),
 });
 
