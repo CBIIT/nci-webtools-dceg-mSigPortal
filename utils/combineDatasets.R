@@ -88,6 +88,23 @@ combineSignatureFiles <- function(x) {
     )
 }
 
+combinePatternFiles <- function(x) {
+   x %>% mutate(
+        study=regex_extract(Study, '^[a-zA-Z]+'),
+        cancer=regex_extract(Study, '[a-zA-Z]+$'),
+         .before=Study
+    ) %>% rename(
+        sample=Sample,
+        total=Total,
+        pattern=Pattern,
+        n0=N0,
+        n1=N1,
+        n2=N2
+    ) %>% select(
+        -Study
+    )
+}
+
 datasets <- sapply(inputFiles, function(f) get(load(f)), simplify=F)
 combinedDatasets <- bind_rows(datasets, .id="filepath")
 processedDatasets <- do.call(processorFunction, list(x=combinedDatasets)) %>% select(-filepath)

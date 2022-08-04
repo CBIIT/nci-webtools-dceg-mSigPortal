@@ -236,6 +236,27 @@ function getPublicationData(
   );
 }
 
+function getPatternData(
+  connection,
+  query,
+  columns = '*',
+  limit = 200000,
+  offset = 0,
+  rowMode = 'object',
+  distinct = false
+) {
+  return getData(
+    connection,
+    'pattern',
+    query,
+    columns,
+    limit,
+    offset,
+    rowMode,
+    distinct
+  );
+}
+
 module.exports = {
   getData,
   getAssociationData,
@@ -248,4 +269,5 @@ module.exports = {
   getSignatureOptions,
   getEtiologyData,
   getPublicationData,
+  getPatternData,
 };

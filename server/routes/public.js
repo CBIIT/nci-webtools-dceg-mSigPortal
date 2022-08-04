@@ -5,20 +5,20 @@ const apiSpec = require('../apiSpec.json');
 
 const {
   querySeqmatrix,
-} = require('../services/analysis/visualization/visualization');
+} = require('../services/api/visualization/visualization');
 const {
   queryExposure,
-} = require('../services/analysis/exploration/exploration');
-const { querySignature } = require('../services/analysis/signature/signature');
+} = require('../services/api/exploration/exploration');
+const { querySignature } = require('../services/api/signature/signature');
 const {
   queryAssociation,
-} = require('../services/analysis/association/association');
+} = require('../services/api/association/association');
 const {
   queryEtiology,
-} = require('../services/analysis/etiology/etiology');
+} = require('../services/api/etiology/etiology');
 const {
   queryPublications,
-} = require('../services/analysis/publications/publications');
+} = require('../services/api/publications/publications');
 
 const router = Router();
 

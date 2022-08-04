@@ -297,6 +297,28 @@ export const schema = [
   },
 
   {
+    name: "pattern",
+    schema: (table) => {
+      table.increments("id");
+      table.string("study");
+      table.string("cancer");
+      table.string("sample");
+      table.integer("total");
+      table.string("pattern");
+      table.integer("n0");
+      table.double("n1");
+      table.double("n2");
+    },
+    index: (table) => {
+      table.index([
+        "study",
+        "cancer",
+        "n1"
+      ]);
+    }
+  },
+
+  {
     name: "importLog",
     schema: (table, connection) => {
       table.increments("id");
