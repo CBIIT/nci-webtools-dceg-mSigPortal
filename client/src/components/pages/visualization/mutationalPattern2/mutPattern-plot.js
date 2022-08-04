@@ -3,24 +3,20 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Button, Container, Row, Col } from 'react-bootstrap';
 import Plot from 'react-plotly.js';
 import { useSelector } from 'react-redux';
-import {
-  useLazyMutationalPatternBarQuery,
-  useLazyMutationalPatternScatterQuery,
-  usePatternQuery,
-} from './apiSlice';
+import { useMutationalPatternScatterQuery, usePatternQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import './plot.scss';
 export default function MutProfilePlot() {
   const publicForm = useSelector((state) => state.visualization.publicForm);
-  const [params, setParams] = useState('');
-  const { dataScatter, errorScatter, isFetchingScatter } =
-    useLazyMutationalPatternBarQuery(params, {
-      skip: !params,
-    });
-  const { dataBar, errorBar, isFetchingBar } =
-    useLazyMutationalPatternScatterQuery(params, {
-      skip: !params,
-    });
+  const [scatterParams, setScatterParams] = useState('');
+
+  const {
+    data: scatterData,
+    error: scatterError,
+    isFetching: fetchingScatter,
+  } = useMutationalPatternScatterQuery(scatterParams, {
+    skip: !scatterParams,
+  });
 
   const [patternParams, setPatternParams] = useState('');
   const {
@@ -40,7 +36,7 @@ export default function MutProfilePlot() {
   useEffect(() => {
     const { study, cancer, strategy } = publicForm;
     if (proportion && pattern) {
-      setParams({
+      setScatterParams({
         study: study.value,
         cancer: cancer.value,
         strategy: strategy.value,
@@ -51,6 +47,7 @@ export default function MutProfilePlot() {
       });
     }
   }, [publicForm, proportion, pattern]);
+
   useEffect(() => {
     const { study } = publicForm;
     if (study && proportion) {
@@ -61,8 +58,8 @@ export default function MutProfilePlot() {
     }
   }, [publicForm, proportion]);
 
-  const divId1 = 'mutationalPatternlot';
-  const divId2 = 'mutationalPatternlot2';
+  const divId1 = 'mutationalPatternBarlot';
+  const divId2 = 'mutationalPatternScatterlot';
   const config = {
     displayModeBar: true,
     responsive: true,
@@ -76,20 +73,20 @@ export default function MutProfilePlot() {
 
   return (
     <>
-      <LoadingOverlay active={isFetchingBar} />
-      {errorBar && (
+      <LoadingOverlay active={fetchingPattern} />
+      {patternError && (
         <p className="p-3">An error has occured. Please verify your input.</p>
       )}
       <div id="barchart">
-        {dataBar && (
+        {patternData && (
           <Container fluid style={{ minHeight: '500px' }} className="mb-3">
             <Row>
               <Col>
                 <Plot
                   className="w-100"
                   divId={divId1}
-                  data={cloneDeep(dataBar.traces)}
-                  layout={cloneDeep(dataBar.layout)}
+                  data={cloneDeep(patternData.traces)}
+                  layout={cloneDeep(patternData.layout)}
                   config={cloneDeep(config)}
                   useResizeHandler
                 />
@@ -108,7 +105,7 @@ export default function MutProfilePlot() {
             </Row>
           </Container>
         )}
-        {dataBar?.output.plotPath && !dataBar?.output.barPath && (
+        {patternData?.output.plotPath && !patternData?.output.barPath && (
           <div className="p-3">
             <p>Frequency of Mutational Pattern</p>
             <p>
@@ -119,7 +116,7 @@ export default function MutProfilePlot() {
         )}
       </div>{' '}
       <div id="context">
-        {dataScatter && (
+        {scatterData && (
           <>
             <Container fluid style={{ minHeight: '500px' }} className="mb-3">
               <Row>
@@ -127,8 +124,8 @@ export default function MutProfilePlot() {
                   <Plot
                     className="w-100"
                     divId={divId2}
-                    data={cloneDeep(dataScatter.traces)}
-                    layout={cloneDeep(dataScatter.layout)}
+                    data={cloneDeep(scatterData.traces)}
+                    layout={cloneDeep(scatterData.layout)}
                     config={cloneDeep(config)}
                     useResizeHandler
                   />
