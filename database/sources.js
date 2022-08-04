@@ -186,6 +186,22 @@ export const sources = [
   },
 
   {
+    sourcePath: "Others/pattern.csv",
+    table: "pattern",
+    description: "pattern",
+    columns: [
+      "study",
+      "cancer",
+      "sample",
+      "total",
+      "pattern",
+      "n0",
+      "n1",
+      "n2"
+    ]
+  },
+
+  {
     description: "Refresh materialized views",
     type: "postImport",
     callback: async (connection) => {

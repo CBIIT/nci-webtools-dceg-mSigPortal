@@ -16,12 +16,11 @@ const {
 const {
   router: associationRoutes,
 } = require('../services/api/association/association');
-const {
-  router: etiologyRoutes,
-} = require('../services/api/etiology/etiology');
+const { router: etiologyRoutes } = require('../services/api/etiology/etiology');
 const {
   router: publicationsRoutes,
 } = require('../services/api/publications/publications');
+const { router: patternRoutes } = require('../services/api/pattern/pattern');
 
 const router = express.Router();
 
@@ -41,6 +40,7 @@ router.use(explorationRoutes);
 router.use(associationRoutes);
 router.use(etiologyRoutes);
 router.use(publicationsRoutes);
+router.use(patternRoutes);
 
 router.use((error, req, res, next) => {
   logger.error(error);
