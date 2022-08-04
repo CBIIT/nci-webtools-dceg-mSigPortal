@@ -8,14 +8,14 @@ import { actions as modalActions } from '../../../../services/store/modal';
 
 const actions = { ...catalogActions, ...modalActions };
 
-export default function ReferenceSignatures() {
+export default function Overview() {
   const dispatch = useDispatch();
   const mergeState = async (state) =>
     dispatch(actions.mergeCatalog({ sigRefSig: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
-  const catalog = useSelector((state) => state.catalog);
-  const { plotPath } = catalog.sigRefSig;
+  const store = useSelector((state) => state.catalog);
+  const { plotPath } = store.sigRefSig;
 
   const [loading, setLoading] = useState(false);
 

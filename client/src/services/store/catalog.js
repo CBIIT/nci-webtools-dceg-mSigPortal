@@ -2,8 +2,9 @@ import { createSlice } from '@reduxjs/toolkit';
 import { mergeObject } from './utils';
 
 export const getInitialState = () => ({
-  catalog: {
+  main: {
     displayTab: 'etiology',
+
     signatureDisplay: 'referenceSignatures',
     exposureSignature: [],
     exposureCancer: [],
@@ -29,6 +30,12 @@ export const getInitialState = () => ({
     tissueURL: '',
     refSigURL: '',
     loading: false,
+  },
+  referenceSignature: {
+    displayTab: 'overview',
+    refSigData: [],
+    exposureSignature: [],
+    projectID: '',
   },
   sigRefSig: {
     plotPath: '',

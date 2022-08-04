@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Tab, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import ReferenceSignatures from './referenceSignatures';
+import Overview from './overview';
 import Profile from './rsProfile';
 import CosineSimilarity from './cosineSimilarity';
 import Comparison from './rsComparison';
@@ -9,14 +9,11 @@ import Download from './download';
 import { getJSON } from '../../../../services/utils';
 import { actions } from '../../../../services/store/catalog';
 
-const { Container, Content, Pane } = Tab;
-const { Item, Link } = Nav;
-
-export default function Signature() {
+export default function ReferenceSignature() {
   const dispatch = useDispatch();
-  const catalog = useSelector((state) => state.catalog);
-  const mergeCatalog = (state) =>
-    dispatch(actions.mergeCatalog({ catalog: state }));
+  const store = useSelector((state) => state.catalog);
+  const mergeState = (state) =>
+    dispatch(actions.mergeCatalog({ referenceSignature: state }));
   const mergeSigMutationalProfiles = (state) =>
     dispatch(actions.mergeCatalog({ sigMutationalProfiles: state }));
   const mergeSigMutationalSigComparison = (state) =>
@@ -26,11 +23,7 @@ export default function Signature() {
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const { projectID, signatureDisplay, exposureSignature } = catalog.catalog;
-
-  useEffect(() => {
-    mergeCatalog({ displayTab: 'signature' });
-  }, []);
+  const { projectID, displayTab, exposureSignature } = store.referenceSignature;
 
   useEffect(() => {
     if (!exposureSignature.length) populateControls();
@@ -115,7 +108,7 @@ export default function Signature() {
       ),
     ];
 
-    mergeCatalog({
+    mergeState({
       refSigData: data,
     });
 
@@ -181,10 +174,8 @@ export default function Signature() {
 
   const tabs = [
     {
-      component: (
-        <ReferenceSignatures submitR={(fn, args) => submitR(fn, args)} />
-      ),
-      key: 'referenceSignatures',
+      component: <Overview submitR={(fn, args) => submitR(fn, args)} />,
+      key: 'overview',
       title: 'RS in mSigPortal',
     },
     {
@@ -211,33 +202,32 @@ export default function Signature() {
 
   return (
     <div style={{ minHeight: '500px' }}>
-      <Container
+      <Tab.Container
         transition={false}
         className="mt-2"
-        defaultActiveKey={signatureDisplay}
-        activeKey={signatureDisplay}
-        onSelect={(tab) => mergeCatalog({ signatureDisplay: tab })}
+        activeKey={displayTab}
+        onSelect={(tab) => mergeState({ displayTab: tab })}
       >
         <Nav variant="tabs">
           {tabs.map(({ key, title }) => (
-            <Item key={key}>
-              <Link eventKey={key} as="button" className="outline-none">
+            <Nav.Item key={key}>
+              <Nav.Link eventKey={key} as="button" className="outline-none">
                 <strong>{title}</strong>
-              </Link>
-            </Item>
+              </Nav.Link>
+            </Nav.Item>
           ))}
         </Nav>
-        <Content
+        <Tab.Content
           className={`bg-white tab-pane-bordered rounded-0 d-block`}
           style={{ overflowX: 'auto' }}
         >
           {tabs.map(({ key, component }) => (
-            <Pane key={key} eventKey={key} className="border-0">
+            <Tab.Pane key={key} eventKey={key} className="border-0">
               {component}
-            </Pane>
+            </Tab.Pane>
           ))}
-        </Content>
-      </Container>
+        </Tab.Content>
+      </Tab.Container>
     </div>
   );
 }

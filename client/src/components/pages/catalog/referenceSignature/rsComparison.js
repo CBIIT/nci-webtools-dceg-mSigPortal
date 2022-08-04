@@ -13,9 +13,9 @@ const actions = { ...catalogActions, ...modalActions };
 
 export default function Comparison({ submitR }) {
   const dispatch = useDispatch();
-  const catalog = useSelector((state) => state.catalog);
-  const mergeCatalog = (state) =>
-    dispatch(actions.mergeCatalog({ catalog: state }));
+  const store = useSelector((state) => state.catalog);
+  const mergeRS = (state) =>
+    dispatch(actions.mergeCatalog({ referenceSignature: state }));
   const mergeSigMutationalSigComparison = (state) =>
     dispatch(actions.mergeCatalog({ sigMutationalSigComparison: state }));
   const mergeError = (msg) =>
@@ -37,8 +37,8 @@ export default function Comparison({ submitR }) {
     debugR,
     err,
     loading,
-  } = catalog.sigMutationalSigComparison;
-  const { refSigData, projectID } = catalog.catalog;
+  } = store.sigMutationalSigComparison;
+  const { refSigData, projectID } = store.referenceSignature;
 
   async function calculateR(fn, args) {
     mergeSigMutationalSigComparison({
@@ -60,7 +60,7 @@ export default function Comparison({ submitR }) {
       } else {
         const { stdout, output, projectID: id } = await response.json();
         if (output.plotPath) {
-          if (!projectID) mergeCatalog({ projectID: id });
+          if (!projectID) mergeRS({ projectID: id });
 
           mergeSigMutationalSigComparison({
             loading: false,

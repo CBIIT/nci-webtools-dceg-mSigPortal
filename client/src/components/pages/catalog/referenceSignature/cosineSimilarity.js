@@ -13,9 +13,9 @@ const actions = { ...catalogActions, ...modalActions };
 
 export default function MutationalSignatureProfile({ submitR }) {
   const dispatch = useDispatch();
-  const catalog = useSelector((state) => state.catalog);
-  const mergeCatalog = (state) =>
-    dispatch(actions.mergeCatalog({ catalog: state }));
+  const store = useSelector((state) => state.catalog);
+  const mergeRS = (state) =>
+    dispatch(actions.mergeCatalog({ referenceSignature: state }));
   const mergeSigCosineSimilarity = (state) =>
     dispatch(actions.mergeCatalog({ sigCosineSimilarity: state }));
   const mergeError = (msg) =>
@@ -32,8 +32,8 @@ export default function MutationalSignatureProfile({ submitR }) {
     debugR,
     err,
     loading,
-  } = catalog.sigCosineSimilarity;
-  const { refSigData, projectID } = catalog.catalog;
+  } = store.sigCosineSimilarity;
+  const { refSigData, projectID } = store.referenceSignature;
 
   async function calculateR(fn, args) {
     try {
@@ -55,7 +55,7 @@ export default function MutationalSignatureProfile({ submitR }) {
       } else {
         const { stdout, output, projectID: id } = await response.json();
         if (output.plotPath) {
-          if (!projectID) mergeCatalog({ projectID: id });
+          if (!projectID) mergeRS({ projectID: id });
           mergeSigCosineSimilarity({
             loading: false,
             plotPath: output.plotPath,

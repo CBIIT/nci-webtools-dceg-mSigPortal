@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
-import Debug from '../../../controls/debug/debug';
+
 import CustomSelect from '../../../controls/select/select-old';
 import Description from '../../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
@@ -15,14 +15,14 @@ const actions = { ...catalogActions, ...modalActions };
 
 export default function Profile({ submitR }) {
   const dispatch = useDispatch();
-  const catalog = useSelector((state) => state.catalog);
+  const store = useSelector((state) => state.catalog);
   const mergeSigMutationalProfiles = (state) =>
     dispatch(actions.mergeCatalog({ sigMutationalProfiles: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const { plots, debugR, err, loading } = catalog.sigMutationalProfiles;
-  const { refSigData } = catalog.catalog;
+  const { plots, debugR, err, loading } = store.sigMutationalProfiles;
+  const { refSigData } = store.referenceSignature;
 
   // get inital plot
   useEffect(() => {
@@ -582,7 +582,6 @@ export default function Profile({ submitR }) {
         )}
       </div>
       {additionalPlots()}
-      {/* <Debug msg={debugR} /> */}
     </div>
   );
 }
