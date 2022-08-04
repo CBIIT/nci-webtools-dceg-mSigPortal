@@ -2,26 +2,26 @@ const express = require('express');
 const logger = require('../services/logger');
 const config = require('../config.json');
 
-const { router: analyisRoutes } = require('../services/analysis/analysis');
+const { router: analysisRoutes } = require('../services/api/analysis');
 
 const {
   router: visualizationRoutes,
-} = require('../services/analysis/visualization/visualization');
+} = require('../services/api/visualization/visualization');
 const {
   router: explorationRoutes,
-} = require('../services/analysis/exploration/exploration');
+} = require('../services/api/exploration/exploration');
 const {
   router: signatureRoutes,
-} = require('../services/analysis/signature/signature');
+} = require('../services/api/signature/signature');
 const {
   router: associationRoutes,
-} = require('../services/analysis/association/association');
+} = require('../services/api/association/association');
 const {
   router: etiologyRoutes,
-} = require('../services/analysis/etiology/etiology');
+} = require('../services/api/etiology/etiology');
 const {
   router: publicationsRoutes,
-} = require('../services/analysis/publications/publications');
+} = require('../services/api/publications/publications');
 
 const router = express.Router();
 
@@ -34,7 +34,7 @@ router.use(
   })
 );
 
-router.use(analyisRoutes);
+router.use(analysisRoutes);
 router.use(visualizationRoutes);
 router.use(signatureRoutes);
 router.use(explorationRoutes);
