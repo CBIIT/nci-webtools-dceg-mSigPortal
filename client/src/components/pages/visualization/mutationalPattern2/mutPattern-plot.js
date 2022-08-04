@@ -3,15 +3,23 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Button, Container, Row, Col } from 'react-bootstrap';
 import Plot from 'react-plotly.js';
 import { useSelector } from 'react-redux';
-import { useMutationalPattern2Query } from './apiSlice';
+import {
+  useLazyMutationalPatternBarQuery,
+  useLazyMutationalPatternScatterQuery,
+} from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import './plot.scss';
 export default function MutProfilePlot() {
   const publicForm = useSelector((state) => state.visualization.publicForm);
   const [params, setParams] = useState('');
-  const { data, error, isFetching } = useMutationalPattern2Query(params, {
-    skip: !params,
-  });
+  const { dataScatter, errorScatter, isFetchingScatter } =
+    useLazyMutationalPatternBarQuery(params, {
+      skip: !params,
+    });
+  const { dataBar, errorBar, isFetchingBar } =
+    useLazyMutationalPatternScatterQuery(params, {
+      skip: !params,
+    });
   const store = useSelector((state) => state.visualization);
 
   const { proportion, pattern } = store.mutationalPattern;
@@ -48,40 +56,39 @@ export default function MutProfilePlot() {
 
   return (
     <>
-      <LoadingOverlay active={isFetching} />
-      {error && (
+      <LoadingOverlay active={isFetchingBar} />
+      {errorBar && (
         <p className="p-3">An error has occured. Please verify your input.</p>
       )}
-
       <div id="barchart">
-        {data && (
-          <>
-            <Container fluid style={{ minHeight: '500px' }} className="mb-3">
-              <Row>
-                <Col>
-                  <Plot
-                    className="w-100"
-                    divId={divId1}
-                    data={cloneDeep(data.traces)}
-                    layout={cloneDeep(data.layout)}
-                    config={cloneDeep(config)}
-                    useResizeHandler
-                  />
-                </Col>
-              </Row>
-            </Container>
-            <p className="p-3">
-              This plot illustrates the frequency by count of each mutational
-              pattern in the given study and cancer type or input dataset. The
-              y-axis is the frequency of each mutational pattern across all
-              samples, and the x-axis includes each of the mutational patterns
-              present in the study and cancer type that meet the criteria for
-              the minimal proportion of mutations within each mutational
-              pattern.
-            </p>
-          </>
+        {dataBar && (
+          <Container fluid style={{ minHeight: '500px' }} className="mb-3">
+            <Row>
+              <Col>
+                <Plot
+                  className="w-100"
+                  divId={divId1}
+                  data={cloneDeep(dataBar.traces)}
+                  layout={cloneDeep(dataBar.layout)}
+                  config={cloneDeep(config)}
+                  useResizeHandler
+                />
+              </Col>
+            </Row>
+            <Row>
+              <div className="p-3">
+                This plot illustrates the frequency by count of each mutational
+                pattern in the given study and cancer type or input dataset. The
+                y-axis is the frequency of each mutational pattern across all
+                samples, and the x-axis includes each of the mutational patterns
+                present in the study and cancer type that meet the criteria for
+                the minimal proportion of mutations within each mutational
+                pattern.
+              </div>
+            </Row>
+          </Container>
         )}
-        {data?.output.plotPath && !data?.output.barPath && (
+        {dataBar?.output.plotPath && !dataBar?.output.barPath && (
           <div className="p-3">
             <p>Frequency of Mutational Pattern</p>
             <p>
@@ -90,9 +97,9 @@ export default function MutProfilePlot() {
             </p>
           </div>
         )}
-      </div>
+      </div>{' '}
       <div id="context">
-        {data && (
+        {dataScatter && (
           <>
             <Container fluid style={{ minHeight: '500px' }} className="mb-3">
               <Row>
@@ -100,8 +107,8 @@ export default function MutProfilePlot() {
                   <Plot
                     className="w-100"
                     divId={divId2}
-                    data={cloneDeep(data.traces)}
-                    layout={cloneDeep(data.layout)}
+                    data={cloneDeep(dataScatter.traces)}
+                    layout={cloneDeep(dataScatter.layout)}
                     config={cloneDeep(config)}
                     useResizeHandler
                   />
