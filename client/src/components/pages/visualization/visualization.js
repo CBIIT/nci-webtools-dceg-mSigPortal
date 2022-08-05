@@ -373,8 +373,8 @@ export default function Visualization({ match }) {
     },
     {
       name: 'Mutational Pattern Enrichment Analysis',
-      id: 'mutationalPattern',
-      component: <MutationalPattern />,
+      id: 'mutationalPattern2',
+      component: <MutationalPattern2 />,
     },
     {
       name: 'Profile Comparison',
@@ -412,11 +412,6 @@ export default function Visualization({ match }) {
       name: 'Download',
       id: 'download',
       component: <Download />,
-    },
-    {
-      name: 'Mutational Pattern Enrichment Analysis',
-      id: 'mutationalPattern2',
-      component: <MutationalPattern2 />,
     },
   ];
 
