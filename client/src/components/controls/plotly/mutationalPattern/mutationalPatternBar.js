@@ -1,16 +1,26 @@
 export default function mutationalPatternBar(data) {
   console.log(data);
 
-  const traces = data.map((patterndata, index, array) => ({
-    data: patterndata,
-    name: patterndata.pattern,
-    colorscale: 'Greens',
+  const traces = {
+    marker: {
+      colorscale: [
+        [0.0, 'rgb(19,43,67)'],
+        [0.1, 'rgb(21,47,72)'],
+        [0.2, 'rgb(26,57,86)'],
+        [0.3, 'rgb(27,59,88)'],
+        [0.4, 'rgb(42,88,128)'],
+        [0.6, 'rgb(52,108,155)'],
+        [0.8, 'rgb(180, 222, 44)'],
+        [1.0, 'rgb(86,177,247)'],
+      ],
+      color: data.map((patterndata, index, array) => patterndata.data.length),
+    },
+
     type: 'bar',
     hoverinfo: 'x+y',
-    x: [patterndata.pattern],
-    y: [patterndata.data.length],
-    showlegend: false,
-  }));
+    x: data.map((patterndata) => patterndata.pattern),
+    y: data.map((patterndata, index, array) => patterndata.data.length),
+  };
 
   console.log(traces);
   var layout = {
@@ -39,5 +49,5 @@ export default function mutationalPatternBar(data) {
     responsive: true,
   };
 
-  return { traces: traces, layout: layout, config };
+  return { traces: [traces], layout: layout, config };
 }
