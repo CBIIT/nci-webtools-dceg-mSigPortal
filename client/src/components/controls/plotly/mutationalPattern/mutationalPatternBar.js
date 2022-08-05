@@ -1,21 +1,40 @@
 export default function mutationalPatternBar(data) {
   console.log(data);
-  var trace1 = {
-    x: ['giraffes', 'orangutans', 'monkeys'],
-    y: [20, 14, 23],
-    name: 'SF Zoo',
-    type: 'bar',
-  };
 
-  var trace2 = {
-    x: ['giraffes', 'orangutans', 'monkeys'],
-    y: [12, 18, 29],
-    name: 'LA Zoo',
+  const traces = data.map((patterndata, index, array) => ({
+    data: patterndata,
+    name: patterndata.pattern,
+    colorscale: 'Greens',
     type: 'bar',
-  };
+    hoverinfo: 'x+y',
+    x: [patterndata.pattern],
+    y: [patterndata.data.length],
+    showlegend: false,
+  }));
 
-  var traces = [trace1, trace2];
-  var layout = { barmode: 'group' };
+  console.log(traces);
+  var layout = {
+    autosize: true,
+    height: 500,
+    xaxis: {
+      showline: true,
+      tickangle: -90,
+      tickfont: {
+        family: 'Arial',
+        color: 'black',
+      },
+      tickmode: 'array',
+      categoryorder: 'total descending',
+    },
+    yaxis: {
+      title: {
+        text: '<b>Frequency</b>',
+        font: {
+          family: 'Times New Roman',
+        },
+      },
+    },
+  };
   var config = {
     responsive: true,
   };

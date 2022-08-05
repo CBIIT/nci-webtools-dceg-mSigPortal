@@ -105,7 +105,7 @@ export default function MutProfilePlot() {
             </Row>
           </Container>
         )}
-        {patternData?.output.plotPath && !patternData?.output.barPath && (
+        {/* {patternData?.output.plotPath && !patternData?.output.barPath && (
           <div className="p-3">
             <p>Frequency of Mutational Pattern</p>
             <p>
@@ -113,7 +113,7 @@ export default function MutProfilePlot() {
               {proportion}
             </p>
           </div>
-        )}
+        )} */}
       </div>{' '}
       <div id="context">
         {scatterData && (
