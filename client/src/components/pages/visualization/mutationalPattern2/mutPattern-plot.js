@@ -35,7 +35,7 @@ export default function MutProfilePlot() {
 
   useEffect(() => {
     const { study, cancer, strategy } = publicForm;
-    if (proportion && pattern) {
+    if (study && pattern) {
       setScatterParams({
         study: study.value,
         cancer: cancer.value,

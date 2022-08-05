@@ -21,41 +21,66 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
           const subtype1 = pattern.substring(0, 1);
           const subtype2 = pattern.substring(2, 3);
 
-          const regexMap = {
-            SBS24: /^.{2}(.*)$/,
-            SBS96: /\[(.*)\]/,
-            DBS78: /^(.{2})/,
-            ID83: /^(.{7})/,
-          };
-          const profileMatrix = profile + matrix;
-          const groupByMutationType = groupBy(data, 'mutationType');
-          console.log(groupByMutationType);
-          const groupByMutation = data.reduce((acc, e, i) => {
-            const mutationRegex = regexMap[profileMatrix];
-            const mutation = e.mutationType.match(mutationRegex)[1];
-            acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
-            return acc;
-          }, {});
+          // const regexMap = {
+          //   SBS24: /^.{2}(.*)$/,
+          //   SBS96: /\[(.*)\]/,
+          //   DBS78: /^(.{2})/,
+          //   ID83: /^(.{7})/,
+          // };
+          // const profileMatrix = profile + matrix;
+          // const groupByMutationType = groupBy(data, 'mutationType');
+          // console.log(groupByMutationType);
+          // const groupBySample = groupBy(data, 'sample');
+          // console.log(groupBySample);
+          // const groupByMutation = data.reduce((acc, e, i) => {
+          //   const mutationRegex = regexMap[profileMatrix];
+          //   const mutation = e.mutationType.match(mutationRegex)[1];
+          //   acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
+          //   return acc;
+          // }, {});
 
-          const transform = Object.entries(groupByMutation).map(
-            ([mutation, data]) => {
-              const mutationSum = data.reduce((sum, e) => e.mutations + sum, 0);
-              return { mutation, data, mutationSum };
-            }
+          // const transform = Object.entries(groupByMutation).map(
+          //   ([mutation, data]) => {
+          //     const mutationSum = data.reduce((sum, e) => e.mutations + sum, 0);
+          //     return { mutation, data, mutationSum };
+          //   }
+          // );
+
+          // console.log(transform);
+          // const filter = transform.filter((e) => {
+          //   return e.mutation === type;
+          // });
+
+          const groupByStudySample = groupBy(
+            data,
+            (e) => `${e.study}_${e.sample}`
           );
-
-          console.log(transform);
-          const filter = transform.filter((e) => {
-            return e.mutation === type;
+          console.log(groupByStudySample);
+          const total = Object.values(groupByStudySample).map((samples) => {
+            return {
+              name: `${samples[0].study}_${samples[0].sample}`,
+              total: samples.reduce((acc, e) => acc + e.mutations, 0),
+            };
           });
-
-          return mutationalPatternScatter(
-            transform,
-            filter,
-            type,
-            subtype1,
-            subtype2
+          console.log(total);
+          const mutationTypeFilter = data.filter(
+            (e) => e.mutationType.substring(2, 5) === type
           );
+          console.log(mutationTypeFilter);
+          const groupByStudySampleType = groupBy(
+            mutationTypeFilter,
+            (e) => `${e.study}_${e.sample}_${e.mutationType}`
+          );
+          console.log(groupByStudySampleType);
+          const n0 = Object.values(groupByStudySampleType).map((samples) => {
+            return {
+              name: `${samples[0].study}_${samples[0].sample}_${samples[0].mutationType}`,
+              total: samples.reduce((acc, e) => acc + e.mutations, 0),
+            };
+          });
+          console.log(n0);
+
+          return mutationalPatternScatter(type, subtype1, subtype2);
         },
       }),
       pattern: builder.query({
