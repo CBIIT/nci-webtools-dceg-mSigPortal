@@ -209,6 +209,7 @@ export const sources = [
       await connection.query('refresh materialized view "seqmatrixOption"');
       await connection.query('refresh materialized view "seqmatrixSummary"');
       await connection.query('refresh materialized view "signatureOption"');
+      await connection.query('refresh materialized view "associationOption"');
     }
   }
 ];

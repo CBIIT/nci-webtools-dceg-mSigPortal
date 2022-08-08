@@ -47,6 +47,27 @@ function getAssociationData(
   );
 }
 
+function getAssociationOptions(
+  connection,
+  query,
+  columns = '*',
+  limit = 200000,
+  offset = 0,
+  rowMode = 'object',
+  distinct = false
+) {
+  return getData(
+    connection,
+    'associationOptions',
+    query,
+    columns,
+    limit,
+    offset,
+    rowMode,
+    distinct
+  );
+}
+
 function getExposureData(
   connection,
   query,
@@ -260,6 +281,7 @@ function getPatternData(
 module.exports = {
   getData,
   getAssociationData,
+  getAssociationOptions,
   getExposureData,
   getExposureOptions,
   getSeqmatrixData,
