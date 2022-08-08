@@ -26,12 +26,14 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
             groupBy(data, (e) => `${e.study}_${e.sample}`)
           ).map((samples) => {
             return {
+              //id: `${samples[0].id}`,
+              //cancer: `${samples[0].cancer}`,
               study: `${samples[0].study}`,
               sample: `${samples[0].sample}`,
-              mutationType: `${samples[0].mutationType}`,
-              mutation: `${samples[0].mutations}`,
-              profile: `${samples[0].profile}`,
-              strategy: `${samples[0].strategy}`,
+              //mutationType: `${samples[0].mutationType}`,
+              //mutation: `${samples[0].mutations}`,
+              //profile: `${samples[0].profile}`,
+              //strategy: `${samples[0].strategy}`,
               total: samples.reduce((acc, e) => acc + e.mutations, 0),
             };
           });
@@ -52,6 +54,8 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
           const tmpdata1 = Object.values(groupByStudySampleType).map(
             (samples) => {
               return {
+                //id: `${samples[0].id}`,
+                cancer: `${samples[0].cancer}`,
                 study: `${samples[0].study}`,
                 sample: `${samples[0].sample}`,
                 mutationType: `${samples[0].mutationType}`,
@@ -84,6 +88,8 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
           const tmpdata2 = Object.values(groupByStudySampleTypeFilter).map(
             (samples) => {
               return {
+                //id: `${samples[0].id}`,
+                cancer: `${samples[0].cancer}`,
                 study: `${samples[0].study}`,
                 sample: `${samples[0].sample}`,
                 mutationType: `${samples[0].mutationType}`,
@@ -100,16 +106,56 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
           // console.log(tmpdata2flat);
 
           function merge(a, b, prop) {
-            var reduced = a.filter(
-              (aitem) => !b.find((bitem) => aitem[prop] === bitem[prop])
-            );
+            var reduced = a.filter(function (aitem) {
+              return !b.find(function (bitem) {
+                return aitem[prop] === bitem[prop];
+              });
+            });
             return reduced.concat(b);
           }
           const result1 = merge(tmpdata0, tmpdata1, 'sample');
           console.log(result1);
-          const result2 = merge(result1, tmpdata2, 'sample');
-          console.log(result2);
+          // const result2 = merge(result1, tmpdata2, 'sample');
+          // console.log(result2);
 
+          const generateMergeKey = (columns) => (data) =>
+            columns.map((c) => data[c]).join('_');
+
+          const commonColumns = [
+            'study',
+            'sample',
+            // 'profile',
+            // 'strategy',
+            // 'cancer',
+          ];
+          const getMergeKey = generateMergeKey(commonColumns);
+          const groups = [
+            groupBy(tmpdata0, getMergeKey),
+            groupBy(tmpdata1, getMergeKey),
+            //groupBy(tmpdata2, getMergeKey),
+          ];
+
+          const allKeys = new Set(
+            groups.map((group) => Object.keys(group)).flat()
+          );
+
+          const mergedArray = [...allKeys]
+            .map((key) => groups.map((g) => g[key]))
+            .flat();
+
+          console.log(mergedArray);
+
+          function combine(datasets, keys) {
+            const groups = datasets.map((d) =>
+              groupBy(d, (d) => keys.map((k) => d[k]).join())
+            );
+            const allKeys = new Set(groups.map((g) => Object.keys(g)).flat());
+            return [...allKeys]
+              .map((k) => merge(...groups.map((g) => g[k] || [])))
+              .flat();
+          }
+          const result2 = combine([tmpdata0, tmpdata1], ['study', 'sample']);
+          console.log(result2);
           return mutationalPatternScatter(type, subtype1, subtype2);
         },
       }),
