@@ -2,6 +2,7 @@ import { visualizationApiSlice } from '../../../../services/store/rootApi';
 import mutationalPatternBar from '../../../controls/plotly/mutationalPattern/mutationalPatternBar';
 import mutationalPatternScatter from '../../../controls/plotly/mutationalPattern/mutationalPatternScatter';
 import { groupBy } from 'lodash';
+import { defaultMatrix2 } from '../../../../services/utils';
 
 export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
   {
@@ -30,11 +31,14 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
               mutationType: `${samples[0].mutationType}`,
               mutation: `${samples[0].mutations}`,
               profile: `${samples[0].profile}`,
-              trategy: `${samples[0].trategy}`,
+              strategy: `${samples[0].strategy}`,
               total: samples.reduce((acc, e) => acc + e.mutations, 0),
             };
           });
+          console.log('TMP DATA 0 ----');
           console.log(tmpdata0);
+          // const tmpdata0flat = tmpdata0.flat();
+          // console.log(tmpdata0flat);
 
           const mutationTypeFilter = data.filter(
             (e) => e.mutationType.substring(2, 5) === type
@@ -53,12 +57,15 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
                 mutationType: `${samples[0].mutationType}`,
                 mutation: `${samples[0].mutations}`,
                 profile: `${samples[0].profile}`,
-                trategy: `${samples[0].trategy}`,
+                strategy: `${samples[0].strategy}`,
                 n0: samples.reduce((acc, e) => acc + e.mutations, 0),
               };
             }
           );
+          console.log('TMP DATA 1 ----');
           console.log(tmpdata1);
+          // const tmpdata1flat = tmpdata1.flat();
+          // console.log(tmpdata1flat);
 
           const mutationTypeSubTypesFilter = data.filter((e) =>
             subtype1 === 'N'
@@ -82,12 +89,26 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
                 mutationType: `${samples[0].mutationType}`,
                 mutation: `${samples[0].mutations}`,
                 profile: `${samples[0].profile}`,
-                trategy: `${samples[0].trategy}`,
+                strategy: `${samples[0].strategy}`,
                 n1: samples.reduce((acc, e) => acc + e.mutations, 0),
               };
             }
           );
+          console.log('TMP DATA 2 ----');
           console.log(tmpdata2);
+          // const tmpdata2flat = tmpdata2.flat();
+          // console.log(tmpdata2flat);
+
+          function merge(a, b, prop) {
+            var reduced = a.filter(
+              (aitem) => !b.find((bitem) => aitem[prop] === bitem[prop])
+            );
+            return reduced.concat(b);
+          }
+          const result1 = merge(tmpdata0, tmpdata1, 'sample');
+          console.log(result1);
+          const result2 = merge(result1, tmpdata2, 'sample');
+          console.log(result2);
 
           return mutationalPatternScatter(type, subtype1, subtype2);
         },
