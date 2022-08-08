@@ -90,8 +90,8 @@ combineSignatureFiles <- function(x) {
 
 combinePatternFiles <- function(x) {
    x %>% mutate(
-        study=regex_extract(Study, '^[a-zA-Z]+'),
-        cancer=regex_extract(Study, '[a-zA-Z]+$'),
+        study=strsplit(Study, '@')[[1]][1],
+        cancer=strsplit(Study, '@')[[1]][2],
          .before=Study
     ) %>% rename(
         sample=Sample,
