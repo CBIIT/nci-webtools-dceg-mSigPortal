@@ -27,7 +27,6 @@ export default function mutationalPatternScatter(
     name: (maxMutationFilter / 100).toLocaleString(undefined),
     x: data1.map((e) => e.n1),
     y: data1.map((e) => e.n2),
-    customdata: data.map((e) => ({ total: e.total })),
     mode: 'markers',
     type: 'scatter',
     opacity: 1,
@@ -39,16 +38,6 @@ export default function mutationalPatternScatter(
       },
       size: 5,
     },
-    hovertemplate:
-      '<b>' +
-      pattern2 +
-      ':</b>' +
-      ' %{x} <br>' +
-      '<b>' +
-      pattern1 +
-      ':</b>' +
-      ' %{y}<br>' +
-      '<b>Total:</b> %{customdata.total}<extra></extra>',
     showlegend: true,
     legendgroup: 'size',
     legendgrouptitle: {
@@ -59,7 +48,6 @@ export default function mutationalPatternScatter(
     name: (maxMutationFilter / 10).toLocaleString(undefined),
     x: data2.map((e) => e.n1),
     y: data2.map((e) => e.n2),
-    customdata: data2.map((e) => ({ total: e.total })),
     mode: 'markers',
     type: 'scatter',
     opacity: 1,
@@ -71,16 +59,6 @@ export default function mutationalPatternScatter(
       },
       size: 10,
     },
-    hovertemplate:
-      '<b>' +
-      pattern2 +
-      ':</b>' +
-      ' %{x} <br>' +
-      '<b>' +
-      pattern1 +
-      ':</b>' +
-      ' %{y}<br>' +
-      '<b>Total:</b> %{customdata.total}<extra></extra>',
     showlegend: true,
     legendgroup: 'size',
     legendgrouptitle: {
@@ -91,7 +69,6 @@ export default function mutationalPatternScatter(
     name: maxMutationFilter.toLocaleString(undefined),
     x: data3.map((e) => e.n1),
     y: data3.map((e) => e.n2),
-    customdata: data3.map((e) => ({ total: e.total })),
     mode: 'markers',
     type: 'scatter',
     opacity: 1,
@@ -103,16 +80,6 @@ export default function mutationalPatternScatter(
       },
       size: 15,
     },
-    hovertemplate:
-      '<b>' +
-      pattern2 +
-      ':</b>' +
-      ' %{x} <br>' +
-      '<b>' +
-      pattern1 +
-      ':</b>' +
-      ' %{y}<br>' +
-      '<b>Total:</b> %{customdata.total}<extra></extra>',
     showlegend: true,
     legendgroup: 'size',
     legendgrouptitle: {
@@ -165,7 +132,10 @@ export default function mutationalPatternScatter(
   var layout = {
     height: 700,
     hoverlabel: { bgcolor: '#FFF' },
-    legend: {},
+    legend: {
+      x: 1,
+      y: 0.5,
+    },
     xaxis: {
       title: pattern2,
       range: [-0.1, 1.1],
