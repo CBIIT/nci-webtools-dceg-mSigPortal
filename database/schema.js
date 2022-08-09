@@ -26,6 +26,31 @@ export const schema = [
   },
 
   {
+    name: "associationOption",
+    type: "materializedView",
+    dependsOn: ["association"],
+    schema: (view, connection) => {
+      const columns = [
+        "study",
+        "strategy",
+        "cancer",
+        "sample",
+      ];
+      const query = connection("association").distinct(columns);
+      view.columns(columns);
+      return view.as(query);
+    },
+    index: (table) => {
+      table.index([
+        "study",
+        "strategy",
+        "cancer",
+        "sample",
+      ]);
+    }  
+  },
+
+  {
     name: "exposure",
     schema: (table) => {
       table.increments("id");

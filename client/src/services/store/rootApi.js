@@ -13,6 +13,9 @@ export const optionsApiSlice = createApi({
     signatureOptions: builder.query({
       query: (params) => ({ url: 'signatureOptions', params }),
     }),
+    associationOptions: builder.query({
+      query: (params) => ({ url: 'associationOptions', params }),
+    }),
   }),
 });
 
@@ -36,7 +39,13 @@ export const explorationApiSlice = createApi({
 
 export const associationApiSlice = createApi({
   reducerPath: 'associationApi',
-  baseQuery: fetchBaseQuery({ baseUrl: '' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'web' }),
+  endpoints: () => ({}),
+});
+
+export const catalogApiSlice = createApi({
+  reducerPath: 'catalogApi',
+  baseQuery: fetchBaseQuery({ baseUrl: 'web' }),
   endpoints: () => ({}),
 });
 

@@ -1,18 +1,26 @@
 import React from 'react';
 import { Nav } from 'react-bootstrap';
 import { Route, Redirect, NavLink } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import Signature from './signature/signature';
+import { useSelector, useDispatch } from 'react-redux';
+import ReferenceSignature from './referenceSignature/referenceSignatures';
 import Etiology from './etiology/etiology';
+import { actions } from '../../../services/store/catalog';
 
 export default function Explore() {
-  const catalog = useSelector((state) => state.catalog);
-  const { displayTab } = catalog.catalog;
+  const dispatch = useDispatch();
+  const mergeState = (state) => dispatch(actions.mergeCatalog({ main: state }));
+
+  const store = useSelector((state) => state.catalog);
+  const { displayTab } = store.main;
 
   const tabs = [
     { name: 'Signature Catalog', id: 'etiology' },
-    { name: 'Reference Signature', id: 'signature' },
+    { name: 'Reference Signature', id: 'referenceSignature' },
   ];
+
+  function handleTabChange(tab) {
+    mergeState({ displayTab: tab });
+  }
 
   return (
     <div className="px-0">
@@ -20,9 +28,9 @@ export default function Explore() {
         <div className="mx-3 bg-white border border-top-0">
           {/* for desktops and tablets */}
           <div className="d-none d-md-block">
-            <Nav defaultActiveKey="profilerSummary">
+            <Nav activeKey={displayTab}>
               {tabs.map(({ name, id }) => (
-                <div key={id} className="d-inline-block">
+                <Nav.Item key={id} className="d-inline-block">
                   <NavLink
                     className="secondary-navlinks px-3 py-1 d-inline-block catalogNav"
                     activeClassName="active-secondary-navlinks"
@@ -34,19 +42,20 @@ export default function Explore() {
                     }}
                     exact={true}
                     to={`/catalog/${id}`}
+                    onClick={() => handleTabChange(id)}
                   >
                     {name}
                   </NavLink>
                   <div className="d-md-none w-100"></div>
-                </div>
+                </Nav.Item>
               ))}
             </Nav>
           </div>
           {/* for mobile devices */}
           <div className="row d-md-none">
-            <Nav defaultActiveKey="summary">
+            <Nav activeKey={displayTab}>
               {tabs.map(({ name, id }) => (
-                <div key={id} className="col-12 text-center">
+                <Nav.Item key={id} className="col-12 text-center">
                   <NavLink
                     className="secondary-navlinks px-3 py-1 d-inline-block"
                     activeClassName="active-secondary-navlinks"
@@ -58,11 +67,12 @@ export default function Explore() {
                     }}
                     exact={true}
                     to={`/catalog/${id}`}
+                    onClick={() => handleTabChange(id)}
                   >
                     {name}
                   </NavLink>
                   <div className="d-md-none w-100"></div>
-                </div>
+                </Nav.Item>
               ))}
             </Nav>
           </div>
@@ -74,7 +84,7 @@ export default function Explore() {
             render={() => <Redirect to={`/catalog/${displayTab}`} />}
           />
           <Route path="/catalog/etiology" component={Etiology} />
-          <Route path="/catalog/signature" component={Signature} />
+          <Route path="/catalog/referenceSignature" component={ReferenceSignature} />
         </div>
       </div>
     </div>
