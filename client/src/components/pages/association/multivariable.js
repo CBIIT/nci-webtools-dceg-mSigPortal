@@ -38,7 +38,7 @@ export default function Multivariable() {
     rsSet,
     cancer,
     assocTable,
-  } = useSelector((state) => state.association.associationState);
+  } = useSelector((state) => state.association.main);
 
   const multivariable = useSelector((state) => state.association.multivariable);
   const {

@@ -23,6 +23,7 @@ export const {
   useSeqmatrixOptionsQuery,
   useExposureOptionsQuery,
   useSignatureOptionsQuery,
+  useAssociationOptionsQuery,
 } = optionsApiSlice;
 
 export const visualizationApiSlice = createApi({
