@@ -33,12 +33,17 @@ async function queryExposure(req, res, next) {
 // query public exploration options for exploration tab
 async function explorationOptions(req, res, next) {
   try {
-    const { study, strategy, signatureSetName, cancer } = req.query;
+    const { limit, offset, ...query } = req.query;
     const connection = req.app.locals.connection;
 
-    const query = { study, strategy, signatureSetName, cancer };
     const columns = ['study', 'strategy', 'cancer', 'signatureSetName'];
-    const data = await getExposureOptions(connection, query, columns);
+    const data = await getExposureOptions(
+      connection,
+      query,
+      columns,
+      limit,
+      offset
+    );
     res.json(data);
   } catch (error) {
     next(error);

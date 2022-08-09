@@ -4,21 +4,22 @@ const config = require('../config.json');
 const apiSpec = require('../apiSpec.json');
 
 const {
-  querySeqmatrix,
+  router: visualizationRoutes,
 } = require('../services/api/visualization/visualization');
 const {
-  queryExposure,
+  router: explorationRoutes,
 } = require('../services/api/exploration/exploration');
-const { querySignature } = require('../services/api/signature/signature');
 const {
-  queryAssociation,
+  router: signatureRoutes,
+} = require('../services/api/signature/signature');
+const {
+  router: associationRoutes,
 } = require('../services/api/association/association');
+const { router: etiologyRoutes } = require('../services/api/etiology/etiology');
 const {
-  queryEtiology,
-} = require('../services/api/etiology/etiology');
-const {
-  queryPublications,
+  router: publicationsRoutes,
 } = require('../services/api/publications/publications');
+const { router: patternRoutes } = require('../services/api/pattern/pattern');
 
 const router = Router();
 
@@ -32,11 +33,12 @@ router.get('/', (req, res) => {
 
 router.get('/ping', (req, res) => res.send(true));
 
-router.get('/seqmatrix', querySeqmatrix);
-router.get('/signature', querySignature);
-router.get('/exposure', queryExposure);
-router.get('/association', queryAssociation);
-router.use('/etiology', queryEtiology);
-router.use('/publications', queryPublications);
+router.use(visualizationRoutes);
+router.use(signatureRoutes);
+router.use(explorationRoutes);
+router.use(associationRoutes);
+router.use(etiologyRoutes);
+router.use(publicationsRoutes);
+router.use(patternRoutes);
 
 module.exports = router;
