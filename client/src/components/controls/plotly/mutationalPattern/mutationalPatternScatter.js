@@ -1,13 +1,12 @@
 export default function mutationalPatternScatter(
   data,
   type,
-  subtype1,
-  subtype2,
   pattern1,
   pattern2
 ) {
-  console.log(data);
-  console.log(type);
+  const maxSize = 40;
+  const maxTotal = Math.max(...data.map((o) => o.total));
+  console.log(maxTotal);
 
   var scattertrace = {
     x: data.map((e, i, a) => e.n1),
@@ -15,14 +14,23 @@ export default function mutationalPatternScatter(
     mode: 'markers',
     type: 'scatter',
 
-    marker: { size: 12 },
+    marker: {
+      color: '#499855',
+      line: {
+        color: 'black',
+        width: 0.5,
+      },
+      size: data.map((e, i, a) =>
+        e.total < 1000 ? 4 : e.total < 10000 ? 8 : 12
+      ),
+    },
   };
 
   console.log(scattertrace);
 
   const traces = [scattertrace];
   var layout = {
-    height: 600,
+    height: 700,
     xaxis: {
       title: pattern2,
       range: [0, 1],

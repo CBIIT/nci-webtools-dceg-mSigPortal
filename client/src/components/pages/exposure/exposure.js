@@ -600,12 +600,22 @@ export default function Exposure({ match }) {
             name: 'MS Burden',
           },
           {
-            component: <MsDecomposition2 />,
+            component: <MsDecomposition />,
             id: 'msDecomposition',
             name: 'MS Decomposition',
           },
+          // {
+          //   component: <MsLandscape2 />,
+          //   id: 'msLandscape',
+          //   name: 'MS Landscape',
+          // },
           {
-            component: <MsLandscape2 />,
+            component: (
+              <MsLandscape
+                calculateLandscape={calculateLandscape}
+                handleVariable={handleVariable}
+              />
+            ),
             id: 'msLandscape',
             name: 'MS Landscape',
           },

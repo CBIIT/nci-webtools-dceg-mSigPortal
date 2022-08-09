@@ -21,7 +21,7 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
             pattern.substring(5, 6);
           const subtype1 = pattern.substring(0, 1);
           const subtype2 = pattern.substring(2, 3);
-          const pattern1 = type + 'context';
+          const pattern1 = type + ' context';
           const pattern2 = pattern + ' other context';
 
           const tmpdata0 = Object.values(
@@ -87,29 +87,24 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
           const result0 = merge(tmpdata1, tmpdata0);
           const result1 = merge(tmpdata2, result0);
 
-          const result = result1.map((e) => {
-            let n2 = e.n0 - e.n1;
+          const result = result1
+            .map((e) => {
+              let n2 = e.n0 - e.n1;
 
-            return {
-              study: e.study,
-              sample: e.sample,
-              total: e.total,
-              type: pattern,
-              n0: e.n0,
-              n1: e.n1 / e.total,
-              n2: n2 / e.total,
-            };
-          });
+              return {
+                study: e.study,
+                sample: e.sample,
+                total: e.total,
+                type: pattern,
+                n0: e.n0,
+                n1: e.n1 / e.total,
+                n2: n2 / e.total,
+              };
+            })
+            .filter((e) => e.total > 200);
           console.log(result);
 
-          return mutationalPatternScatter(
-            result,
-            type,
-            subtype1,
-            subtype2,
-            pattern1,
-            pattern2
-          );
+          return mutationalPatternScatter(result, type, pattern1, pattern2);
         },
       }),
       pattern: builder.query({
