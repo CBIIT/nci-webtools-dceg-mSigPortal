@@ -14,7 +14,7 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
         }),
         transformResponse: (data, meta, arg) => {
           console.log(data);
-          const { proportion, pattern, profile, matrix } = arg;
+          const { pattern } = arg;
           const type =
             pattern.substring(1, 2) +
             pattern.substring(3, 4) +
@@ -27,7 +27,6 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
           const tmpdata0 = Object.values(
             groupBy(data, (e) => `${e.study}_${e.sample}`)
           ).map((samples) => {
-            //console.log(samples);
             return {
               study: `${samples[0].study}`,
               sample: `${samples[0].sample}`,
@@ -35,20 +34,14 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
               total: samples.reduce((acc, e) => acc + e.mutations, 0),
             };
           });
-          console.log('TMP DATA 0 ----');
-          console.log(tmpdata0);
-          // const tmpdata0flat = tmpdata0.flat();
-          // console.log(tmpdata0flat);
 
           const mutationTypeFilter = data.filter(
             (e) => e.mutationType.substring(2, 5) === type
           );
-          console.log(mutationTypeFilter);
           const groupByStudySampleType = groupBy(
             mutationTypeFilter,
             (e) => `${e.study}_${e.sample}`
           );
-          console.log(groupByStudySampleType);
           const tmpdata1 = Object.values(groupByStudySampleType).map(
             (samples) => {
               return {
@@ -58,10 +51,6 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
               };
             }
           );
-          console.log('TMP DATA 1 ----');
-          console.log(tmpdata1);
-          // const tmpdata1flat = tmpdata1.flat();
-          // console.log(tmpdata1flat);
 
           const mutationTypeSubTypesFilter = data.filter((e) =>
             subtype1 === 'N'
@@ -70,13 +59,10 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
               : e.mutationType.substring(2, 5) === type &&
                 e.mutationType.substring(0, 1) === subtype1
           );
-          console.log(mutationTypeSubTypesFilter);
           const groupByStudySampleTypeFilter = groupBy(
             mutationTypeSubTypesFilter,
-            //(e) => `${e.study}_${e.sample}_${e.mutationType}`
             (e) => `${e.study}_${e.sample}`
           );
-          console.log(groupByStudySampleTypeFilter);
 
           const tmpdata2 = Object.values(groupByStudySampleTypeFilter).map(
             (samples) => {
@@ -88,10 +74,6 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
               };
             }
           );
-          console.log('TMP DATA 2 ----');
-          console.log(tmpdata2);
-          // const tmpdata2flat = tmpdata2.flat();
-          // console.log(tmpdata2flat);
 
           const merge = (a1, a2) =>
             a1.map((itm) => ({
@@ -103,10 +85,7 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
             }));
 
           const result0 = merge(tmpdata1, tmpdata0);
-          console.log(result0);
-
           const result1 = merge(tmpdata2, result0);
-          console.log(result1);
 
           const result = result1.map((e) => {
             let n2 = e.n0 - e.n1;

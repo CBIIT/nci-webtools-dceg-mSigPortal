@@ -2,42 +2,39 @@ export default function mutationalPatternScatter(
   data,
   type,
   subtype1,
-  subtype2
+  subtype2,
+  pattern1,
+  pattern2
 ) {
   console.log(data);
   console.log(type);
 
-  var trace1 = {
-    x: [1, 2, 3, 4, 5],
-    y: [1, 6, 3, 6, 1],
+  var scattertrace = {
+    x: data.map((e, i, a) => e.n1),
+    y: data.map((e, i, a) => e.n2),
     mode: 'markers',
     type: 'scatter',
-    name: 'Team A',
-    text: ['A-1', 'A-2', 'A-3', 'A-4', 'A-5'],
+
     marker: { size: 12 },
   };
 
-  var trace2 = {
-    x: [1.5, 2.5, 3.5, 4.5, 5.5],
-    y: [4, 1, 7, 1, 4],
-    mode: 'markers',
-    type: 'scatter',
-    name: 'Team B',
-    text: ['B-a', 'B-b', 'B-c', 'B-d', 'B-e'],
-    marker: { size: 12 },
-  };
+  console.log(scattertrace);
 
+  const traces = [scattertrace];
   var layout = {
+    height: 600,
     xaxis: {
-      range: [0.75, 5.25],
+      title: pattern2,
+      range: [0, 1],
     },
     yaxis: {
-      range: [0, 8],
+      title: pattern1,
+      range: [0, 1],
     },
-    title: 'Data Labels Hover',
+    title:
+      'Proportion of Mutational Pattern Context Compared to Other Contexts with the same SBS Mutation',
   };
 
-  var traces = [trace1, trace2];
   var config = {
     responsive: true,
   };
