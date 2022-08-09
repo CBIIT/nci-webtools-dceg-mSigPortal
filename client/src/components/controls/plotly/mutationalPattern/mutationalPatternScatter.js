@@ -1,3 +1,5 @@
+import { text } from 'd3';
+
 export default function mutationalPatternScatter(
   data,
   type,
@@ -146,8 +148,13 @@ export default function mutationalPatternScatter(
       range: [-0.1, 1.1],
       zeroline: false,
     },
-    title:
-      'Proportion of Mutational Pattern Context Compared to Other Contexts with the same SBS Mutation',
+    title: {
+      text: '<b>Proportion of Mutational Pattern Context Compared to Other Contexts with the same SBS Mutation</b>',
+      font: {
+        family: 'Times New Roman',
+        size: 18,
+      },
+    },
   };
 
   var config = {

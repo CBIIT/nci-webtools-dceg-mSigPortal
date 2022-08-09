@@ -59,6 +59,13 @@ export default function mutationalPatternBar(data) {
       range: [0, maxVal + maxVal * 0.2],
       linecolor: 'black',
     },
+    title: {
+      text: '<b>Frequency of Mutational Pattern</b>',
+      font: {
+        family: 'Times New Roman',
+        size: 18,
+      },
+    },
   };
   var config = {
     responsive: true,
