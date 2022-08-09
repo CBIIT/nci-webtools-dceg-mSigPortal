@@ -21,16 +21,17 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
             pattern.substring(5, 6);
           const subtype1 = pattern.substring(0, 1);
           const subtype2 = pattern.substring(2, 3);
+          const pattern1 = type + 'context';
+          const pattern2 = pattern + ' other context';
 
           const tmpdata0 = Object.values(
             groupBy(data, (e) => `${e.study}_${e.sample}`)
           ).map((samples) => {
             //console.log(samples);
             return {
-              cancer: `${samples[0].cancer}`,
               study: `${samples[0].study}`,
               sample: `${samples[0].sample}`,
-              strategy: `${samples[0].strategy}`,
+              type: type,
               total: samples.reduce((acc, e) => acc + e.mutations, 0),
             };
           });
@@ -45,20 +46,14 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
           console.log(mutationTypeFilter);
           const groupByStudySampleType = groupBy(
             mutationTypeFilter,
-            (e) => `${e.study}_${e.sample}_${e.mutationType}`
+            (e) => `${e.study}_${e.sample}`
           );
           console.log(groupByStudySampleType);
           const tmpdata1 = Object.values(groupByStudySampleType).map(
             (samples) => {
               return {
-                //id: `${samples[0].id}`,
-                cancer: `${samples[0].cancer}`,
                 study: `${samples[0].study}`,
                 sample: `${samples[0].sample}`,
-                mutationType: `${samples[0].mutationType}`,
-                mutation: `${samples[0].mutations}`,
-                profile: `${samples[0].profile}`,
-                strategy: `${samples[0].strategy}`,
                 n0: samples.reduce((acc, e) => acc + e.mutations, 0),
               };
             }
@@ -78,21 +73,17 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
           console.log(mutationTypeSubTypesFilter);
           const groupByStudySampleTypeFilter = groupBy(
             mutationTypeSubTypesFilter,
-            (e) => `${e.study}_${e.sample}_${e.mutationType}`
+            //(e) => `${e.study}_${e.sample}_${e.mutationType}`
+            (e) => `${e.study}_${e.sample}`
           );
           console.log(groupByStudySampleTypeFilter);
 
           const tmpdata2 = Object.values(groupByStudySampleTypeFilter).map(
             (samples) => {
               return {
-                //id: `${samples[0].id}`,
-                cancer: `${samples[0].cancer}`,
                 study: `${samples[0].study}`,
                 sample: `${samples[0].sample}`,
-                mutationType: `${samples[0].mutationType}`,
-                mutation: `${samples[0].mutations}`,
-                profile: `${samples[0].profile}`,
-                strategy: `${samples[0].strategy}`,
+                type: type,
                 n1: samples.reduce((acc, e) => acc + e.mutations, 0),
               };
             }
@@ -102,40 +93,44 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
           // const tmpdata2flat = tmpdata2.flat();
           // console.log(tmpdata2flat);
 
-          const mergetmp0tmp1 = (a1, a2) =>
+          const merge = (a1, a2) =>
             a1.map((itm) => ({
               ...a2.find(
                 (item) =>
-                  item.sample === itm.sample &&
-                  item.cancer === itm.cancer &&
-                  item.study === itm.study &&
-                  item.strategy === itm.strategy &&
-                  item
+                  item.sample === itm.sample && item.study === itm.study && item
               ),
               ...itm,
             }));
 
-          const result0 = mergetmp0tmp1(tmpdata1, tmpdata0);
+          const result0 = merge(tmpdata1, tmpdata0);
           console.log(result0);
 
-          const mergeByMutType = (a1, a2) =>
-            a1.map((itm) => ({
-              ...a2.find(
-                (item) =>
-                  item.sample === itm.sample &&
-                  item.cancer === itm.cancer &&
-                  item.study === itm.study &&
-                  item.strategy === itm.strategy &&
-                  item.mutationType === itm.mutationType &&
-                  item
-              ),
-              ...itm,
-            }));
-
-          const result1 = mergeByMutType(tmpdata2, result0);
+          const result1 = merge(tmpdata2, result0);
           console.log(result1);
 
-          return mutationalPatternScatter(type, subtype1, subtype2);
+          const result = result1.map((e) => {
+            let n2 = e.n0 - e.n1;
+
+            return {
+              study: e.study,
+              sample: e.sample,
+              total: e.total,
+              type: pattern,
+              n0: e.n0,
+              n1: e.n1 / e.total,
+              n2: n2 / e.total,
+            };
+          });
+          console.log(result);
+
+          return mutationalPatternScatter(
+            result,
+            type,
+            subtype1,
+            subtype2,
+            pattern1,
+            pattern2
+          );
         },
       }),
       pattern: builder.query({
