@@ -168,11 +168,13 @@ export default function mutationalPatternScatter(
     legend: {},
     xaxis: {
       title: pattern2,
-      range: [0, 1],
+      range: [-0.1, 1.1],
+      zeroline: false,
     },
     yaxis: {
       title: pattern1,
-      range: [0, 1],
+      range: [-0.1, 1.1],
+      zeroline: false,
     },
     title:
       'Proportion of Mutational Pattern Context Compared to Other Contexts with the same SBS Mutation',
