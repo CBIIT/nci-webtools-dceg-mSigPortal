@@ -1,6 +1,6 @@
 export default function mutationalPatternBar(data) {
   console.log(data);
-
+  const maxVal = Math.max(...data.map((o) => o.data.length));
   const traces = {
     marker: {
       colorscale: [
@@ -55,6 +55,9 @@ export default function mutationalPatternBar(data) {
           family: 'Times New Roman',
         },
       },
+      autorange: false,
+      range: [0, maxVal + maxVal * 0.2],
+      linecolor: 'black',
     },
   };
   var config = {

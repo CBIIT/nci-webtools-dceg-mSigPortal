@@ -69,6 +69,7 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
               return {
                 study: `${samples[0].study}`,
                 sample: `${samples[0].sample}`,
+                cancer: `${samples[0].cancer}`,
                 type: type,
                 n1: samples.reduce((acc, e) => acc + e.mutations, 0),
               };
@@ -94,6 +95,7 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
               return {
                 study: e.study,
                 sample: e.sample,
+                cancer: e.cancer,
                 total: e.total,
                 type: pattern,
                 n0: e.n0,
