@@ -24,7 +24,8 @@ regex_group <- function(str, pattern) {
 }
 
 combineAssociationFiles <- function(x) {
-    x %>% mutate(
+    x %>% rowwise() 
+    %>% mutate(
         Study=extract(basename(filepath), '_' , 1),
         Dataset=extract(basename(filepath), '_' , 2),
         .before=Cancer_Type
@@ -93,8 +94,8 @@ combineSignatureFiles <- function(x) {
 }
 
 combinePatternFiles <- function(x) {
-   x %>% rowwise() %>% 
-   mutate(
+   x %>% rowwise() 
+   %>% mutate(
         study=regex_group(Study, '^(\\w+)'),
         cancer=regex_group(Study, '@(.+)$'),
          .before=Study
