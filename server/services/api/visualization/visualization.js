@@ -33,11 +33,11 @@ async function querySeqmatrix(req, res, next) {
 // query public seqmatrix data for visualization tab
 async function seqmatrixOptions(req, res, next) {
   try {
-    const { limit, ...query } = req.query;
+    const { limit, offset, ...query } = req.query;
     const connection = req.app.locals.connection;
 
     const columns = '*';
-    const data = await getSeqmatrixOptions(connection, query, columns, limit);
+    const data = await getSeqmatrixOptions(connection, query, columns, limit, offset);
     const projectID = uuidv4();
 
     res.json(data);

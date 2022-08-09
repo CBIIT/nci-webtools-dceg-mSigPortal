@@ -19,6 +19,10 @@ regex_extract <- function(str, pattern) {
     regmatches(str, regexpr(pattern, str))
 }
 
+regex_group <- function(str, pattern) {
+    regmatches(str, regexec(pattern, str))[[1]][2]
+}
+
 combineAssociationFiles <- function(x) {
     x %>% mutate(
         Study=extract(basename(filepath), '_' , 1),
@@ -89,9 +93,10 @@ combineSignatureFiles <- function(x) {
 }
 
 combinePatternFiles <- function(x) {
-   x %>% mutate(
-        study=strsplit(Study, '@')[[1]][1],
-        cancer=strsplit(Study, '@')[[1]][2],
+   x %>% rowwise() %>% 
+   mutate(
+        study=regex_group(Study, '^(\\w+)'),
+        cancer=regex_group(Study, '@(.+)$'),
          .before=Study
     ) %>% rename(
         sample=Sample,

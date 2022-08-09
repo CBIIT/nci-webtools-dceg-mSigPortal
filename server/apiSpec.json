@@ -1,23 +1,16 @@
 {
   "openapi": "3.0.0",
   "tags": [
-    {
-      "name": "seqmatrix"
-    },
-    {
-      "name": "exposure"
-    },
-    {
-      "name": "association"
-    },
-    {
-      "name": "signature"
-    }
+    { "name": "Mutational Signature" },
+    { "name": "Mutational Spectrum" },
+    { "name": "Mutational Activity" },
+    { "name": "Mutational Association" },
+    { "name": "Etiology" }
   ],
   "paths": {
     "/api/seqmatrix": {
       "get": {
-        "tags": ["seqmatrix"],
+        "tags": ["Mutational Spectrum"],
         "summary": "Retrieves seqmatrix data",
         "produces": ["application/json"],
         "parameters": [
@@ -27,8 +20,7 @@
             "description": "Select which study to query data from.",
             "required": true,
             "schema": {
-              "type": "string",
-              "enum": ["PCAWG"]
+              "type": "string"
             },
             "value": "PCAWG"
           },
@@ -37,9 +29,7 @@
             "in": "query",
             "description": "Select cancer belonging to the study",
             "required": true,
-            "schema": {
-              "enum": ["Lung-AdenoCA"]
-            },
+            "schema": {},
             "value": "Lung-AdenoCA"
           },
           {
@@ -48,8 +38,7 @@
             "description": "Select strategy (dataset) of the study.",
             "required": true,
             "schema": {
-              "type": "string",
-              "enum": ["WGS"]
+              "type": "string"
             },
             "value": "WGS"
           },
@@ -80,8 +69,7 @@
             "description": "Select a matrix size that coresponds to the profile.",
             "required": false,
             "schema": {
-              "type": "string",
-              "enum": ["96", "83", "78"]
+              "type": "string"
             },
             "value": "96"
           },
@@ -118,7 +106,7 @@
           {
             "name": "offset",
             "in": "query",
-            "description": "Skip number of records before return",
+            "description": "Records to skip",
             "required": false,
             "schema": {
               "type": "string"
@@ -128,7 +116,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Query Signature Data"
+            "description": "Successful operation"
           },
           "500": {
             "description": "API error"
@@ -136,9 +124,161 @@
         }
       }
     },
+
+    "/api/seqmatrixOptions": {
+      "get": {
+        "tags": ["Mutational Spectrum"],
+        "summary": "Retrieves seqmatrix options",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "study",
+            "in": "query",
+            "description": "Select which study to query data from.",
+            "required": false,
+            "schema": { "type": "string" },
+            "value": "PCAWG"
+          },
+          {
+            "name": "cancer",
+            "in": "query",
+            "description": "Select cancer belonging to the study",
+            "required": false,
+            "schema": { "type": "string" },
+            "value": ""
+          },
+          {
+            "name": "strategy",
+            "in": "query",
+            "description": "Select strategy (dataset) of the study.",
+            "required": false,
+            "schema": { "type": "string" },
+            "value": ""
+          },
+          {
+            "name": "sample",
+            "in": "query",
+            "description": "Enter sample.",
+            "required": false,
+            "schema": { "type": "string" },
+            "value": ""
+          },
+          {
+            "name": "profile",
+            "in": "query",
+            "description": "Select a profile type to filter data by.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["", "SBS", "DBS", "ID"]
+            },
+            "value": ""
+          },
+          {
+            "name": "matrix",
+            "in": "query",
+            "description": "Select a matrix size that coresponds to the profile.",
+            "required": false,
+            "schema": { "type": "string" },
+            "value": ""
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit number of records returned",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "10"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Records to skip",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "500": {
+            "description": "API error"
+          }
+        }
+      }
+    },
+
+    "/api/seqmatrixSummary": {
+      "get": {
+        "tags": ["Mutational Spectrum"],
+        "summary": "Retrieves seqmatrix summary",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "study",
+            "in": "query",
+            "description": "Select which study to query data from.",
+            "required": true,
+            "schema": { "type": "string" },
+            "value": "PCAWG"
+          },
+          {
+            "name": "cancer",
+            "in": "query",
+            "description": "Select cancer belonging to the study",
+            "required": true,
+            "schema": { "type": "string" },
+            "value": "Lung-AdenoCA"
+          },
+          {
+            "name": "strategy",
+            "in": "query",
+            "description": "Select strategy (dataset) of the study.",
+            "required": true,
+            "schema": { "type": "string" },
+            "value": "WGS"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit number of records returned",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "10"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Records to skip",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "500": {
+            "description": "API error"
+          }
+        }
+      }
+    },
+
     "/api/exposure": {
       "get": {
-        "tags": ["exposure"],
+        "tags": ["Mutational Activity"],
         "summary": "Retrieves Exposure data",
         "produces": ["application/json"],
         "parameters": [
@@ -147,10 +287,7 @@
             "in": "query",
             "description": "Select which study to query data from.",
             "required": true,
-            "schema": {
-              "type": "string",
-              "enum": ["PCAWG"]
-            },
+            "schema": { "type": "string" },
             "value": "PCAWG"
           },
           {
@@ -158,10 +295,7 @@
             "in": "query",
             "description": "Select strategy (dataset) to filter data by.",
             "required": true,
-            "schema": {
-              "type": "string",
-              "enum": ["WGS"]
-            },
+            "schema": { "type": "string" },
             "value": "WGS"
           },
           {
@@ -169,14 +303,7 @@
             "in": "query",
             "description": "Enter signature set to filter data by.",
             "required": true,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "COSMIC_v3_Signatures_GRCh37_SBS96",
-                "COSMIC_v3_Signatures_GRCh37_DBS78",
-                "COSMIC_v3_Signatures_GRCh37_ID83"
-              ]
-            },
+            "schema": { "type": "string" },
             "value": "COSMIC_v3_Signatures_GRCh37_SBS96"
           },
           {
@@ -184,9 +311,7 @@
             "in": "query",
             "description": "Enter cancer",
             "required": false,
-            "schema": {
-              "type": "string"
-            },
+            "schema": { "type": "string" },
             "value": ""
           },
           {
@@ -194,9 +319,7 @@
             "in": "query",
             "description": "Enter organ",
             "required": false,
-            "schema": {
-              "type": "string"
-            },
+            "schema": { "type": "string" },
             "value": ""
           },
           {
@@ -242,7 +365,7 @@
           {
             "name": "offset",
             "in": "query",
-            "description": "Skip number of records before return",
+            "description": "Records to skip",
             "required": false,
             "schema": {
               "type": "string"
@@ -260,9 +383,90 @@
         }
       }
     },
+
+    "/api/exposureOptions": {
+      "get": {
+        "tags": ["Mutational Activity"],
+        "summary": "Retrieves Exposure options",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "study",
+            "in": "query",
+            "description": "Select which study to query data from.",
+            "required": false,
+            "schema": { "type": "string" },
+            "value": "PCAWG"
+          },
+          {
+            "name": "strategy",
+            "in": "query",
+            "description": "Select strategy (dataset) to filter data by.",
+            "required": false,
+            "schema": { "type": "string" },
+            "value": ""
+          },
+          {
+            "name": "signatureSetName",
+            "in": "query",
+            "description": "Enter signature set to filter data by.",
+            "required": false,
+            "schema": { "type": "string" },
+            "value": ""
+          },
+          {
+            "name": "cancer",
+            "in": "query",
+            "description": "Enter cancer",
+            "required": false,
+            "schema": { "type": "string" },
+            "value": ""
+          },
+          {
+            "name": "signatureName",
+            "in": "query",
+            "description": "Enter signature",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit number of records returned",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "10"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Records to skip",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "500": {
+            "description": "API error"
+          }
+        }
+      }
+    },
+
     "/api/signature": {
       "get": {
-        "tags": ["signature"],
+        "tags": ["Mutational Signature"],
         "summary": "Retrieves signature data",
         "produces": ["application/json"],
         "parameters": [
@@ -389,7 +593,7 @@
           {
             "name": "offset",
             "in": "query",
-            "description": "Skip number of records before return",
+            "description": "Records to skip",
             "required": false,
             "schema": {
               "type": "string"
@@ -407,9 +611,110 @@
         }
       }
     },
+
+    "/api/signatureOptions": {
+      "get": {
+        "tags": ["Mutational Signature"],
+        "summary": "Retrieves signature data",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "source",
+            "in": "query",
+            "description": "Enter source",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["Reference_signatures", "Published_signatures"]
+            },
+            "value": "Reference_signatures"
+          },
+          {
+            "name": "strategy",
+            "in": "query",
+            "description": "Select strategy (dataset) of the study.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "WGS"
+          },
+          {
+            "name": "profile",
+            "in": "query",
+            "description": "Select profile",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["SBS", "DBS", "ID"]
+            },
+            "value": "SBS"
+          },
+          {
+            "name": "matrix",
+            "in": "query",
+            "description": "Select matrix",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "signatureSetName",
+            "in": "query",
+            "description": "Enter signature set to filter data by.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "signatureName",
+            "in": "query",
+            "description": "Enter signature",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit number of records returned",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "10"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Records to skip",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "500": {
+            "description": "API error"
+          }
+        }
+      }
+    },
+
     "/api/association": {
       "get": {
-        "tags": ["association"],
+        "tags": ["Mutational Association"],
         "summary": "Retrieves association data",
         "produces": ["application/json"],
         "parameters": [
@@ -538,7 +843,142 @@
           {
             "name": "offset",
             "in": "query",
-            "description": "Skip number of records before return",
+            "description": "Records to skip",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "500": {
+            "description": "API error"
+          }
+        }
+      }
+    },
+
+    "/api/associationOptions": {
+      "get": {
+        "tags": ["Mutational Association"],
+        "summary": "Retrieves association data",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "study",
+            "in": "query",
+            "description": "Select profile",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "PCAWG"
+          },
+          {
+            "name": "strategy",
+            "in": "query",
+            "description": "Select strategy (dataset) of the study.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "WGS"
+          },
+          {
+            "name": "cancer",
+            "in": "query",
+            "description": "Enter cancer",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sample",
+            "in": "query",
+            "description": "Enter sample",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit number of records returned",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "10"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Records to skip",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "500": {
+            "description": "API error"
+          }
+        }
+      }
+    },
+
+    "/api/etiology": {
+      "get": {
+        "tags": ["Etiology"],
+        "summary": "Retrieves association data",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "description": "Select profile",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "Cosmic"
+          },
+          {
+            "name": "etiology",
+            "in": "query",
+            "description": "Select strategy (dataset) of the study.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit number of records returned",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "10"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Records to skip",
             "required": false,
             "schema": {
               "type": "string"

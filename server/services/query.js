@@ -58,7 +58,7 @@ function getAssociationOptions(
 ) {
   return getData(
     connection,
-    'associationOptions',
+    'associationOption',
     query,
     columns,
     limit,
