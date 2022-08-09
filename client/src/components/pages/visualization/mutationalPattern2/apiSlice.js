@@ -25,15 +25,12 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
           const tmpdata0 = Object.values(
             groupBy(data, (e) => `${e.study}_${e.sample}`)
           ).map((samples) => {
+            //console.log(samples);
             return {
-              //id: `${samples[0].id}`,
-              //cancer: `${samples[0].cancer}`,
+              cancer: `${samples[0].cancer}`,
               study: `${samples[0].study}`,
               sample: `${samples[0].sample}`,
-              //mutationType: `${samples[0].mutationType}`,
-              //mutation: `${samples[0].mutations}`,
-              //profile: `${samples[0].profile}`,
-              //strategy: `${samples[0].strategy}`,
+              strategy: `${samples[0].strategy}`,
               total: samples.reduce((acc, e) => acc + e.mutations, 0),
             };
           });
@@ -105,57 +102,39 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
           // const tmpdata2flat = tmpdata2.flat();
           // console.log(tmpdata2flat);
 
-          function merge(a, b, prop) {
-            var reduced = a.filter(function (aitem) {
-              return !b.find(function (bitem) {
-                return aitem[prop] === bitem[prop];
-              });
-            });
-            return reduced.concat(b);
-          }
-          const result1 = merge(tmpdata0, tmpdata1, 'sample');
+          const mergetmp0tmp1 = (a1, a2) =>
+            a1.map((itm) => ({
+              ...a2.find(
+                (item) =>
+                  item.sample === itm.sample &&
+                  item.cancer === itm.cancer &&
+                  item.study === itm.study &&
+                  item.strategy === itm.strategy &&
+                  item
+              ),
+              ...itm,
+            }));
+
+          const result0 = mergetmp0tmp1(tmpdata1, tmpdata0);
+          console.log(result0);
+
+          const mergeByMutType = (a1, a2) =>
+            a1.map((itm) => ({
+              ...a2.find(
+                (item) =>
+                  item.sample === itm.sample &&
+                  item.cancer === itm.cancer &&
+                  item.study === itm.study &&
+                  item.strategy === itm.strategy &&
+                  item.mutationType === itm.mutationType &&
+                  item
+              ),
+              ...itm,
+            }));
+
+          const result1 = mergeByMutType(tmpdata2, result0);
           console.log(result1);
-          // const result2 = merge(result1, tmpdata2, 'sample');
-          // console.log(result2);
 
-          const generateMergeKey = (columns) => (data) =>
-            columns.map((c) => data[c]).join('_');
-
-          const commonColumns = [
-            'study',
-            'sample',
-            // 'profile',
-            // 'strategy',
-            // 'cancer',
-          ];
-          const getMergeKey = generateMergeKey(commonColumns);
-          const groups = [
-            groupBy(tmpdata0, getMergeKey),
-            groupBy(tmpdata1, getMergeKey),
-            //groupBy(tmpdata2, getMergeKey),
-          ];
-
-          const allKeys = new Set(
-            groups.map((group) => Object.keys(group)).flat()
-          );
-
-          const mergedArray = [...allKeys]
-            .map((key) => groups.map((g) => g[key]))
-            .flat();
-
-          console.log(mergedArray);
-
-          function combine(datasets, keys) {
-            const groups = datasets.map((d) =>
-              groupBy(d, (d) => keys.map((k) => d[k]).join())
-            );
-            const allKeys = new Set(groups.map((g) => Object.keys(g)).flat());
-            return [...allKeys]
-              .map((k) => merge(...groups.map((g) => g[k] || [])))
-              .flat();
-          }
-          const result2 = combine([tmpdata0, tmpdata1], ['study', 'sample']);
-          console.log(result2);
           return mutationalPatternScatter(type, subtype1, subtype2);
         },
       }),
