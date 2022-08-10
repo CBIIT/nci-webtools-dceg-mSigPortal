@@ -1,5 +1,12 @@
-export default function mutationalPatternBar(data) {
-  console.log(data);
+import { groupBy } from 'lodash';
+
+export default function mutationalPatternBar(rawData) {
+  const groupByPattern = groupBy(rawData, 'pattern');
+  const data = Object.entries(groupByPattern).map(([pattern, data]) => {
+    return { pattern, data };
+  });
+
+
   const maxVal = Math.max(...data.map((o) => o.data.length));
   const traces = {
     marker: {
@@ -34,7 +41,7 @@ export default function mutationalPatternBar(data) {
     y: data.map((patterndata, index, array) => patterndata.data.length),
   };
 
-  console.log(traces);
+
   var layout = {
     autosize: true,
     height: 500,

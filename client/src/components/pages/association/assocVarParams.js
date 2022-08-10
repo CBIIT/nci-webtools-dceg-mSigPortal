@@ -31,7 +31,7 @@ export default function AssocVarParams({
   invalidFilter,
 }) {
   const { loadingData, assocVarData } = useSelector(
-    (state) => state.association.associationState
+    (state) => state.association.main
   );
 
   const { loadingParams, loadingCalculate, associationVars } = hostState;

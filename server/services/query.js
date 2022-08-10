@@ -261,7 +261,7 @@ function getPatternData(
   connection,
   query,
   columns = '*',
-  limit = 200000,
+  limit = 400000,
   offset = 0,
   rowMode = 'object',
   distinct = false

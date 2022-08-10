@@ -9,7 +9,7 @@ import Instructions from '../association/instructions';
 import Univariable from './univariable';
 import Multivariable from './multivariable';
 // import UserForm from './userForm';
-import PublicForm from './publicForm';
+import PublicForm from './publicForm/publicForm';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/association';
 import { actions as modalActions } from '../../../services/store/modal';
@@ -21,7 +21,7 @@ const { Group, Label, Check } = Form;
 export default function Association() {
   const dispatch = useDispatch();
   const mergeState = async (state) =>
-    await dispatch(actions.mergeAssociation({ associationState: state }));
+    await dispatch(actions.mergeAssociation({ main: state }));
 
   const {
     displayTab,
@@ -30,7 +30,7 @@ export default function Association() {
     expVarList,
     source,
     loadingData,
-  } = useSelector((state) => state.association.associationState);
+  } = useSelector((state) => state.association.main);
 
   const tabs = [
     {

@@ -38,7 +38,7 @@ export default function Univariable() {
     rsSet,
     cancer,
     assocTable,
-  } = useSelector((state) => state.association.associationState);
+  } = useSelector((state) => state.association.main);
 
   const {
     loadingParams,

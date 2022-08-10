@@ -942,7 +942,7 @@
     "/api/etiology": {
       "get": {
         "tags": ["Etiology"],
-        "summary": "Retrieves association data",
+        "summary": "Retrieves etiology data",
         "produces": ["application/json"],
         "parameters": [
           {
