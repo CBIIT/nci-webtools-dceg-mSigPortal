@@ -1,51 +1,30 @@
 import { visualizationApiSlice } from '../../../../services/store/rootApi';
+import pcBetweenSamples from '../../../controls/plotly/profileComparision/pcBetweenSamples';
+import pcToReferenceSignatures from '../../../controls/plotly/profileComparision/pcToReferenceSignatures';
 
-export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
+export const profileComparision2 = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    profileComparisonWithin: builder.query({
-      query: (params) => ({
-        url: 'visualizationWrapper',
-        method: 'POST',
-        body: params,
+    pcBetweenSamples: builder.query({
+      query: ({ proportion, pattern, ...params }) => ({
+        url: 'seqmatrix',
+        params,
       }),
+      transformResponse: (data, meta, arg) => {
+        return pcBetweenSamples(data, arg);
+      },
     }),
-    profileComparisonReference: builder.query({
+    pcToReferenceSignatures: builder.query({
       query: (params) => ({
-        url: 'visualizationWrapper',
-        method: 'POST',
-        body: params,
+        url: 'seqmatrix',
+        params,
       }),
-    }),
-    profileComparisonPublic: builder.query({
-      query: (params) => ({
-        url: 'visualizationWrapper',
-        method: 'POST',
-        body: params,
-      }),
-    }),
-    pcSignatureSets: builder.query({
-      query: (params) => ({ url: 'signature', params }),
-      transformResponse: (data) =>
-        [...new Set(data.map((e) => e.signatureSetName))]
-          .sort((a, b) =>
-            a.localeCompare(b, undefined, { sensitivity: 'base' })
-          )
-          .map((e) => ({ label: e, value: e })),
-    }),
-    pcSignatureNames: builder.query({
-      query: (params) => ({ url: 'signature', params }),
-      transformResponse: (data) =>
-        [...new Set(data.map((e) => e.signatureName))].sort((a, b) =>
-          a.localeCompare(b, undefined, { sensitivity: 'base' })
-        ),
+
+      transformResponse: (data, meta, arg) => {
+        return pcToReferenceSignatures(data, arg);
+      },
     }),
   }),
 });
 
-export const {
-  useProfileComparisonWithinQuery,
-  useProfileComparisonReferenceQuery,
-  useProfileComparisonPublicQuery,
-  usePcSignatureSetsQuery,
-  usePcSignatureNamesQuery,
-} = profilerSummaryApiSlice;
+export const { usePcBetweenSamplesQuery, usePcToReferenceSignaturesQuery } =
+  profileComparision2;
