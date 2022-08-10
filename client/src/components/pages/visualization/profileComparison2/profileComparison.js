@@ -1,6 +1,6 @@
 import { Nav, Tab } from 'react-bootstrap';
-import PcWithin from './profileComparison-within';
-import PcReference from './profileComparison-reference';
+import PcBetweenSamplesForm from './pcBetweenSamples-form';
+import PcBetweenSamplesPlot from './pcBetweenSamples-plot';
 // import PcPublic from './profileComparison-public';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions } from '../../../../services/store/visualization';
@@ -53,10 +53,12 @@ export default function MutationalProfiles(props) {
           style={{ overflowX: 'auto' }}
         >
           <Tab.Pane key="within" eventKey="within" className="border-0">
-            <PcWithin />
+            <PcBetweenSamplesForm />
+            <hr />
+            <PcBetweenSamplesPlot />
           </Tab.Pane>
           <Tab.Pane key="reference" eventKey="reference" className="border-0">
-            <PcReference />
+            {/* <PcReference /> */}
           </Tab.Pane>
           {source == 'user' && (
             <Tab.Pane key="public" eventKey="public" className="border-0">

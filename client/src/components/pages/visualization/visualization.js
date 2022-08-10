@@ -17,7 +17,7 @@ import CosineSimilarity2 from './cosineSimilarity/cosineSimilarity';
 import MutationalPattern from './mutationalPattern/mutationalPattern';
 import MutationalPattern2 from './mutationalPattern2/mutationalPattern';
 import ProfileComparison from './profileComparison';
-import ProfileComparison2 from './profileComparison/profileComparison';
+import ProfileComparison2 from './profileComparison2/profileComparison';
 import PCA from './pca';
 import PCA2 from './pca/pca';
 import Kataegis from './kataegis';
@@ -375,13 +375,13 @@ export default function Visualization({ match }) {
       name: 'Mutational Pattern Enrichment Analysis',
       id: 'mutationalPattern2',
       component:
-        source == 'user' ? <MutationalPattern /> : <MutationalPattern2 />,
+        source === 'user' ? <MutationalPattern /> : <MutationalPattern2 />,
     },
     {
       name: 'Profile Comparison',
       id: 'profileComparison',
       component:
-        source == 'user' ? (
+        source === 'user' ? (
           <ProfileComparison
             // getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
             submitR={(fn, args) => submitR(fn, args)}
@@ -390,7 +390,11 @@ export default function Visualization({ match }) {
           <ProfileComparison2 />
         ),
     },
-
+    {
+      name: 'Profile Comparison 2',
+      id: 'profileComparison2',
+      component: <ProfileComparison2 />,
+    },
     {
       name: 'PCA',
       id: 'pca',
