@@ -13,7 +13,6 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
           params,
         }),
         transformResponse: (data, meta, arg) => {
-          console.log(data);
           const { pattern } = arg;
           const type =
             pattern.substring(1, 2) +
@@ -23,7 +22,6 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
           const subtype2 = pattern.substring(2, 3);
           const pattern1 = type + ' context';
           const pattern2 = pattern + ' other context';
-          console.log(type);
 
           const tmpdata0 = Object.values(
             groupBy(data, (e) => `${e.study}_${e.sample}`)
@@ -35,8 +33,6 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
               total: samples.reduce((acc, e) => acc + e.mutations, 0),
             };
           });
-          console.log('TMPDATA 0');
-          console.log(tmpdata0);
           const mutationTypeFilter = data.filter(
             (e) => e.mutationType.substring(2, 5) === type
           );
@@ -53,8 +49,6 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
               };
             }
           );
-          console.log('TMPDATA 1');
-          console.log(tmpdata1);
 
           function iupac(base) {
             let result = [];
@@ -94,7 +88,6 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
               iupac(subtype2).includes(e.mutationType.substring(6, 7))
           );
 
-          console.log(mutationTypeSubTypesFilter);
           const groupByStudySampleTypeFilter = groupBy(
             mutationTypeSubTypesFilter,
             (e) => `${e.study}_${e.sample}`
@@ -111,8 +104,6 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
               };
             }
           );
-          console.log('TMPDATA 2');
-          console.log(tmpdata2);
           const merge = (a1, a2) =>
             a1.map((itm) => ({
               ...a2.find(
@@ -141,8 +132,6 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
               };
             })
             .filter((e) => e.total > 200);
-          console.log(result);
-
           return mutationalPatternScatter(result, type, pattern1, pattern2);
         },
       }),
@@ -155,7 +144,6 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
           console.log(data);
           const { proportion } = arg;
           const transform = data.filter((e) => e.n1 > proportion);
-          console.log(transform);
           const groupByPattern = groupBy(transform, 'pattern');
           console.log(groupByPattern);
           const transform2 = Object.entries(groupByPattern).map(
