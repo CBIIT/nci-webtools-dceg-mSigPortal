@@ -34,8 +34,7 @@ export default function PublicForm() {
     isFetching,
   } = useExposureOptionsQuery();
 
-  const [fetchSamples, { isLoading, reset: resetSamples }] =
-    useExplorationSamplesMutation();
+  const [fetchSamples, { isLoading }] = useExplorationSamplesMutation();
   // const [handleSubmitWeb, { isLoading, reset: resetWeb }] =
   //   useExplorationPublicMutation();
 
@@ -63,7 +62,6 @@ export default function PublicForm() {
   function handleReset() {
     window.location.hash = '#/exploration';
     resetForm();
-    // resetSamples();
     dispatch(resetExplorationApi);
     resetExposure();
   }
