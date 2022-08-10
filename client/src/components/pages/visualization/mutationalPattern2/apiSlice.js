@@ -90,16 +90,10 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
           const mutationTypeSubTypesFilter = data.filter(
             (e) =>
               e.mutationType.substring(2, 5) === type &&
-              e.mutationType.substring(0, 1) === iupac(subtype1) &&
-              e.mutationType.substring(6, 7) === iupac(subtype2)
+              iupac(subtype1).includes(e.mutationType.substring(0, 1)) &&
+              iupac(subtype2).includes(e.mutationType.substring(6, 7))
           );
-          // const mutationTypeSubTypesFilter = data.filter((e) =>
-          //   subtype1 === 'N' && subtype2 !== 'N'
-          //     ? e.mutationType.substring(2, 5) === type &&
-          //       e.mutationType.substring(6, 7) === subtype2
-          //     : e.mutationType.substring(2, 5) === type &&
-          //       e.mutationType.substring(0, 1) === subtype1
-          // );
+
           console.log(mutationTypeSubTypesFilter);
           const groupByStudySampleTypeFilter = groupBy(
             mutationTypeSubTypesFilter,

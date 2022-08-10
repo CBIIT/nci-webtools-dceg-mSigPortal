@@ -42,7 +42,6 @@ export default function MutProfilePlot() {
         strategy: strategy.value,
         profile: 'SBS',
         matrix: '96',
-        proportion: parseFloat(proportion),
         pattern: pattern,
       });
     }
