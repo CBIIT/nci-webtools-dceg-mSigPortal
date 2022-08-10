@@ -110,23 +110,12 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
         },
       }),
       pattern: builder.query({
-        query: ({ proportion, ...params }) => ({
+        query: (params) => ({
           url: 'pattern',
           params,
         }),
-        transformResponse: (data, meta, arg) => {
-          console.log(data);
-          const { proportion } = arg;
-          const transform = data.filter((e) => e.n1 >= proportion);
-          console.log(transform);
-          const groupByPattern = groupBy(transform, 'pattern');
-          console.log(groupByPattern);
-          const transform2 = Object.entries(groupByPattern).map(
-            ([pattern, data]) => {
-              return { pattern, data };
-            }
-          );
-          return mutationalPatternBar(transform2);
+        transformResponse: (data) => {
+          return mutationalPatternBar(data);
         },
       }),
     }),
