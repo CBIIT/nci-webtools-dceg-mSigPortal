@@ -260,7 +260,6 @@ export default function PublicForm() {
       <Row>
         <Col>
           <Button
-            disabled={isFetching || isLoading}
             className="w-100"
             variant="secondary"
             onClick={() => handleReset()}

@@ -650,7 +650,6 @@ export default function UserForm() {
       <Row>
         <Col>
           <Button
-            disabled={isUploading || isQueueing || isLoading}
             className="w-100"
             variant="secondary"
             onClick={() => handleReset()}
