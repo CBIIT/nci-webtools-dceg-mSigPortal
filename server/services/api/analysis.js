@@ -106,6 +106,51 @@ function getRelativePath(paths, id = '') {
   return newPaths;
 }
 
+async function* getFiles(dir) {
+  const dirents = await fs.promises.readdir(dir, { withFileTypes: true });
+  for (const dirent of dirents) {
+    const res = path.resolve(dir, dirent.name);
+    if (dirent.isDirectory()) {
+      yield* getFiles(res);
+    } else {
+      yield res;
+    }
+  }
+}
+
+// transform all matrix files into a single json object
+async function getMatrices(path) {
+  let files = [];
+  const fileRegex = /\.all$/;
+  for await (const f of getFiles(path)) {
+    if (fileRegex.test(f)) files = [...files, f];
+  }
+  const profileRegex = /\.([A-Z]+)\d+.all$/;
+  const matrixRegex = /\.[A-Z]+(\d+).all$/;
+
+  return (
+    await Promise.all(
+      files.map(async (file) => {
+        const profile = file.match(profileRegex)[1];
+        const matrix = file.match(matrixRegex)[1];
+        const data = await parseCSV(file);
+        return data
+          .map((e) => {
+            const { MutationType, ...samples } = e;
+            return Object.entries(samples).map(([sample, mutations]) => ({
+              profile,
+              matrix,
+              mutationType: MutationType,
+              sample,
+              mutations,
+            }));
+          })
+          .flat();
+      })
+    )
+  ).flat();
+}
+
 async function profilerExtraction(params) {
   // update path
   params.outputDir[1] = path.join(
@@ -147,6 +192,11 @@ async function visualizationProfilerExtraction(req, res, next) {
     const { stdout, stderr, projectPath } = await profilerExtraction(req.body);
     const resultsPath = path.join(projectPath, 'results');
 
+    const matrixFiles = path.join(projectPath, 'results/output');
+    const matrices = JSON.stringify(await getMatrices(matrixFiles));
+    const matricesFile = path.join(projectPath, 'matrices.json');
+    fs.writeFileSync(matricesFile, matrices);
+
     if (fs.existsSync(path.join(resultsPath, 'svg_files_list.txt'))) {
       res.json({
         stdout,
@@ -165,11 +215,8 @@ async function visualizationProfilerExtraction(req, res, next) {
         stderr,
       });
     }
-  } catch ({ stdout, stderr }) {
-    res.status(500).json({
-      stdout,
-      stderr,
-    });
+  } catch (error) {
+    res.status(500).json(error);
   }
 }
 
