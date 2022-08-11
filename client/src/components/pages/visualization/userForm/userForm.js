@@ -41,12 +41,11 @@ export default function UserForm() {
   const { inputFilename, bedFilename, projectID, ...userForm } = store.userForm;
   const { submitted, source } = store.main;
 
-  const [handleUpload, { isLoading: isUploading, reset: resetUpload }] =
+  const [handleUpload, { isLoading: isUploading }] =
     useVisualizationUserUploadMutation();
-  const [handleSubmitQueue, { isLoading: isQueueing, reset: resetQueue }] =
+  const [handleSubmitQueue, { isLoading: isQueueing }] =
     useSubmitQueueMutation();
-  const [handleSubmitWeb, { isLoading, reset: resetWeb }] =
-    useVisualizationUserMutation();
+  const [handleSubmitWeb, { isLoading }] = useVisualizationUserMutation();
 
   const formatOptions = [
     { label: 'VCF', value: 'vcf', example: 'demo_input_multi.vcf.gz' },
@@ -106,9 +105,6 @@ export default function UserForm() {
   function handleReset() {
     window.location.hash = '#/visualization';
     resetForm(defaultFormValues);
-    resetUpload();
-    resetQueue();
-    resetWeb();
     resetVisualization();
     dispatch(resetVisualizationApi);
     mergeMain({ source: 'user' });
@@ -654,7 +650,6 @@ export default function UserForm() {
       <Row>
         <Col>
           <Button
-            disabled={isUploading || isQueueing || isLoading}
             className="w-100"
             variant="secondary"
             onClick={() => handleReset()}

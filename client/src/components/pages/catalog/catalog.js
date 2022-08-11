@@ -84,7 +84,10 @@ export default function Explore() {
             render={() => <Redirect to={`/catalog/${displayTab}`} />}
           />
           <Route path="/catalog/etiology" component={Etiology} />
-          <Route path="/catalog/referenceSignature" component={ReferenceSignature} />
+          <Route
+            path="/catalog/referenceSignature"
+            component={ReferenceSignature}
+          />
         </div>
       </div>
     </div>

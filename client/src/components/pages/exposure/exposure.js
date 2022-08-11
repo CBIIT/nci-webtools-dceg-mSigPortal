@@ -3,8 +3,7 @@ import { Form, Row, Col, Button, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { saveAs } from 'file-saver';
 import PublicForm from './publicForm/publicForm';
-// import PublicForm from './publicForm';
-import UserForm from './userForm';
+import UserForm from './userForm/userForm';
 import Instructions from './instructions';
 import TMB from './tmb';
 import TMB2 from './tmb/tmb.js';
@@ -57,6 +56,7 @@ export default function Exposure({ match }) {
   const resetExposure = (_) => dispatch(actions.resetExposure());
 
   const exposureStore = useSelector((state) => state.exposure);
+  const { userForm, publicForm } = exposureStore;
 
   const { exampleName } = match.params;
 
@@ -257,12 +257,15 @@ export default function Exposure({ match }) {
     let args = {
       fn: fn,
       common: JSON.stringify({
-        study: study,
-        strategy: strategy,
-        rsSet: rsSet,
-        cancerType: cancer,
-        genome: genome,
-        useCancerType: useCancerType,
+        study: source == 'user' ? userForm.study.value : publicForm.study.value,
+        strategy: publicForm.strategy.value,
+        rsSet:
+          source == 'user'
+            ? userForm.signatureSet.value
+            : publicForm.signatureSet.value,
+        cancerType: publicForm.cancer.value,
+        genome: userForm.genome.value,
+        useCancerType: publicForm.cancerOnly,
       }),
     };
     if (fn == 'all' || fn == 'burden') {
@@ -295,9 +298,9 @@ export default function Exposure({ match }) {
     if (source == 'user') {
       rFn = 'exposureUser';
       args.files = JSON.stringify({
-        exposureFile: exposureFile,
-        matrixFile: matrixFile,
-        signatureFile: signatureFile,
+        exposureFile: userForm.exposureFile,
+        matrixFile: userForm.matrixFile,
+        signatureFile: userForm.signatureFile,
       });
     }
     try {
@@ -399,10 +402,10 @@ export default function Exposure({ match }) {
   async function exposureDownload() {
     try {
       const { output, projectID, stdout } = await submitR('exposureDownload', {
-        study: study,
-        strategy: strategy,
-        rsSet: rsSet,
-        cancerType: cancer,
+        study: publicForm.study.value,
+        strategy: publicForm.strategy.value,
+        rsSet: publicForm.signatureSet.value,
+        cancerType: publicForm.cancer.value,
       });
 
       const file = await fetch(`web/results/${output.path}`);
@@ -743,12 +746,7 @@ export default function Exposure({ match }) {
                     handleSet={handleSet}
                   />
                 ) : (
-                  <UserForm
-                    calculate={handleCalculate}
-                    handleReset={handleReset}
-                    handleStudy={handleStudy}
-                    handleStrategy={handleStrategy}
-                  />
+                  <UserForm calculate={handleCalculate} />
                 )}
               </Col>
             </Row>
