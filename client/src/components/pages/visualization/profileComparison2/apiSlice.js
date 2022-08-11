@@ -5,7 +5,7 @@ import pcToReferenceSignatures from '../../../controls/plotly/profileComparision
 export const profileComparision2 = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     pcBetweenSamples: builder.query({
-      query: ({ proportion, pattern, ...params }) => ({
+      query: ({ params }) => ({
         url: 'seqmatrix',
         params,
       }),
