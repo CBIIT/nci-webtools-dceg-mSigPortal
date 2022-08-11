@@ -186,12 +186,8 @@ export default function UserForm() {
         mergeMain({
           error: 'Please Reset Your Parameters and Try again.',
         });
-        const { stdout, stderr } = error.data;
 
-        const message = `<div>
-          <pre>${stdout}</pre>
-          <pre>${stderr}</pre>
-          </div>`;
+        const message = Object.values(error.data);
         mergeError(message);
       }
     }

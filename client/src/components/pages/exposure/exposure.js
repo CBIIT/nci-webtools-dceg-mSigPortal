@@ -376,11 +376,8 @@ export default function Exposure({ match }) {
 
         if (!response.ok) {
           const { msg, error } = await response.json();
-          const message = `<div>
-                            <p>${msg}</p>
-                            ${error ? `<p>${error}</p>` : ''} 
-                          </div>`;
-          mergeError(message);
+
+          mergeError([msg, error]);
           reject(error);
         } else {
           const { projectID } = await response.json();

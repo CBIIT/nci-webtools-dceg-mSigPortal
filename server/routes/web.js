@@ -44,7 +44,7 @@ router.use(patternRoutes);
 
 router.use((error, req, res, next) => {
   logger.error(error);
-  res.status(500).json(error);
+  res.status(500).json([error.message]);
 });
 
 module.exports = router;
