@@ -377,21 +377,9 @@ export default function Visualization({ match }) {
       component:
         source === 'user' ? <MutationalPattern /> : <MutationalPattern2 />,
     },
+
     {
       name: 'Profile Comparison',
-      id: 'profileComparison',
-      component:
-        source === 'user' ? (
-          <ProfileComparison
-            // getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
-            submitR={(fn, args) => submitR(fn, args)}
-          />
-        ) : (
-          <ProfileComparison2 />
-        ),
-    },
-    {
-      name: 'Profile Comparison 2',
       id: 'profileComparison2',
       component: <ProfileComparison2 />,
     },
