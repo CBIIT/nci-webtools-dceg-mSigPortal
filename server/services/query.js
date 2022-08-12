@@ -29,7 +29,7 @@ function getData(
   }
 
   if (multipleConditions) {
-    Object.entries(multiple).forEach(([column, values]) => {
+    Object.entries(multipleConditions).forEach(([column, values]) => {
       sqlQuery = sqlQuery.whereIn(column, values.replace(/\s/g, '').split(','));
     });
   }
