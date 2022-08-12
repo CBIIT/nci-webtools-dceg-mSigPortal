@@ -10,7 +10,12 @@ function getData(
   rowMode = 'object',
   distinct = false
 ) {
-  const conditions = pickBy(query, (v) => v !== undefined);
+  const conditions = pickBy(query, (v) => v !== undefined && !v.includes(','));
+  const multipleConditions = pickBy(
+    query,
+    (v) => v !== undefined && v.includes(',')
+  );
+
   let sqlQuery = connection
     .select(columns)
     .from(table)
@@ -21,6 +26,12 @@ function getData(
 
   if (distinct) {
     sqlQuery = sqlQuery.distinct(columns);
+  }
+
+  if (multipleConditions) {
+    Object.entries(multiple).forEach(([column, values]) => {
+      sqlQuery = sqlQuery.whereIn(column, values.replace(/\s/g, '').split(','));
+    });
   }
 
   return sqlQuery;
