@@ -22,6 +22,10 @@ export default function ProfileComparisonForm() {
   const { matrixData, source } = store.main;
   const { withinForm } = store.profileComparison;
 
+  console.log(store.main);
+
+  console.log(matrixData);
+
   const { control, handleSubmit, watch, setValue } = useForm({
     defaultValues: withinForm,
   });

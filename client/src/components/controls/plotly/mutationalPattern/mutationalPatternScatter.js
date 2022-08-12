@@ -202,7 +202,7 @@ export default function mutationalPatternScatter(rawdata, arg) {
     name: result[0].study + '@' + result[0].cancer,
     x: result.map((e) => e.n1),
     y: result.map((e) => e.n2),
-    customdata: result.map((e) => ({ total: e.total })),
+    customdata: result.map((e) => ({ sample: e.sample, total: e.total })),
     mode: 'markers',
     type: 'scatter',
     opacity: 1,
@@ -221,6 +221,9 @@ export default function mutationalPatternScatter(rawdata, arg) {
       ),
     },
     hovertemplate:
+      '<b> Sample: ' +
+      '</b>' +
+      '%{customdata.sample} <br>' +
       '<b>' +
       pattern2 +
       ':</b>' +

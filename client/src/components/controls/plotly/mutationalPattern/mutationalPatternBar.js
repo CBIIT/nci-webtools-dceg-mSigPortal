@@ -63,6 +63,7 @@ export default function mutationalPatternBar(rawData) {
   };
 
   var layout = {
+    hoverlabel: { bgcolor: '#FFF' },
     autosize: true,
     height: 500,
     xaxis: {
