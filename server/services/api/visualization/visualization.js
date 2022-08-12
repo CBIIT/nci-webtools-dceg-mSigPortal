@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { v4: uuidv4 } = require('uuid');
+
 const {
   getSeqmatrixData,
   getSeqmatrixOptions,
@@ -37,8 +37,13 @@ async function seqmatrixOptions(req, res, next) {
     const connection = req.app.locals.connection;
 
     const columns = '*';
-    const data = await getSeqmatrixOptions(connection, query, columns, limit, offset);
-    const projectID = uuidv4();
+    const data = await getSeqmatrixOptions(
+      connection,
+      query,
+      columns,
+      limit,
+      offset
+    );
 
     res.json(data);
   } catch (error) {

@@ -6,12 +6,11 @@ const r = require('r-wrapper').async;
 const tar = require('tar');
 const config = require('./config.json');
 const logger = require('./services/logger');
+const { parseCSV } = require('./services/api/analysis');
 const {
-  profilerExtraction,
-  parseCSV,
   getRelativePath,
-} = require('./services/api/analysis');
-
+  profilerExtraction,
+} = require('./services/api/visualization/userVisualization');
 const {
   defaultProfile,
   defaultMatrix,
