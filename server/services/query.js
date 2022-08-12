@@ -30,7 +30,7 @@ function getData(
 
   if (multipleConditions) {
     Object.entries(multiple).forEach(([column, values]) => {
-      sqlQuery = sqlQuery.whereIn(column, values.split(','));
+      sqlQuery = sqlQuery.whereIn(column, values.replace(/\s/g, '').split(','));
     });
   }
 
