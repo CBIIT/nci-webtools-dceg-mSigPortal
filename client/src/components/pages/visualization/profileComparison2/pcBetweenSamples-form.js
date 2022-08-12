@@ -36,7 +36,7 @@ export default function ProfileComparisonForm() {
     ID: [83],
   };
   const profileOptions = (sample) =>
-    sample && matrixData.length
+    matrixData.length
       ? [
           ...new Set(
             matrixData
@@ -51,7 +51,16 @@ export default function ProfileComparisonForm() {
     mergeState(data);
   }
 
-  const sampleOptions = matrixData.length
+  const sample1Options = matrixData.length
+    ? [...new Set(matrixData.map((d) => d.sample))]
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+        .map((e) => ({
+          label: e,
+          value: e,
+        }))
+    : [];
+
+  const sample2Options = matrixData.length
     ? [...new Set(matrixData.map((d) => d.sample))]
         .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
         .map((e) => ({
@@ -128,19 +137,19 @@ export default function ProfileComparisonForm() {
             </Col>
             <Col lg="auto">
               <Select
-                disabled={sampleOptions.length < 2}
+                disabled={sample1Options.length < 2}
                 name="sample1"
                 label="Sample Name 1"
-                options={sampleOptions}
+                options={sample1Options}
                 control={control}
               />
             </Col>
             <Col lg="auto">
               <Select
-                disabled={sampleOptions.length < 2}
+                disabled={sample2Options.length < 2}
                 name="sample2"
                 label="Sample Name 2"
-                options={sampleOptions}
+                options={sample2Options}
                 control={control}
               />
             </Col>
@@ -155,11 +164,12 @@ export default function ProfileComparisonForm() {
               </Button>
             </Col>
           </Row>
-          {sampleOptions.length < 2 && (
-            <Row>
-              <Col>Unavailable - More than one Sample Required</Col>
-            </Row>
-          )}
+          {sample1Options.length < 2 ||
+            (sample2Options.length < 2 && (
+              <Row>
+                <Col>Unavailable - More than one Sample Required</Col>
+              </Row>
+            ))}
         </Form>
       </div>
       <hr />
