@@ -1,36 +1,61 @@
 import { visualizationApiSlice } from '../../../../services/store/rootApi';
 import pcBetweenSamples from '../../../controls/plotly/profileComparision/pcBetweenSamples';
-import pcToReferenceSignatures from '../../../controls/plotly/profileComparision/pcToReferenceSignatures';
-
-export const profileComparision2 = visualizationApiSlice.injectEndpoints({
+export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    pcBetweenSamples: builder.query({
-      query: ({ params }) => ({
-        url: 'seqmatrix',
-        params,
-      }),
-
-      transformResponse: (data, meta, args) => {
-        const { profile, sample1, sample2 } = args;
-        console.log(data);
-        console.log(profile);
-        console.log(sample1);
-        console.log(sample2);
-        return pcBetweenSamples(data, profile, sample1, sample2);
-      },
-    }),
-    pcToReferenceSignatures: builder.query({
+    // profileComparisonWithin: builder.query({
+    //   query: (params) => ({
+    //     url: 'visualizationWrapper',
+    //     method: 'POST',
+    //     body: params,
+    //   }),
+    // }),
+    profileComparisonWithin: builder.query({
       query: (params) => ({
         url: 'seqmatrix',
         params,
       }),
-
       transformResponse: (data, meta, arg) => {
-        return pcToReferenceSignatures(data, arg);
+        console.log(data);
+        return pcBetweenSamples(data, arg);
       },
+    }),
+    profileComparisonReference: builder.query({
+      query: (params) => ({
+        url: 'visualizationWrapper',
+        method: 'POST',
+        body: params,
+      }),
+    }),
+    profileComparisonPublic: builder.query({
+      query: (params) => ({
+        url: 'visualizationWrapper',
+        method: 'POST',
+        body: params,
+      }),
+    }),
+    pcSignatureSets: builder.query({
+      query: (params) => ({ url: 'signature', params }),
+      transformResponse: (data) =>
+        [...new Set(data.map((e) => e.signatureSetName))]
+          .sort((a, b) =>
+            a.localeCompare(b, undefined, { sensitivity: 'base' })
+          )
+          .map((e) => ({ label: e, value: e })),
+    }),
+    pcSignatureNames: builder.query({
+      query: (params) => ({ url: 'signature', params }),
+      transformResponse: (data) =>
+        [...new Set(data.map((e) => e.signatureName))].sort((a, b) =>
+          a.localeCompare(b, undefined, { sensitivity: 'base' })
+        ),
     }),
   }),
 });
 
-export const { usePcBetweenSamplesQuery, usePcToReferenceSignaturesQuery } =
-  profileComparision2;
+export const {
+  useProfileComparisonWithinQuery,
+  useProfileComparisonReferenceQuery,
+  useProfileComparisonPublicQuery,
+  usePcSignatureSetsQuery,
+  usePcSignatureNamesQuery,
+} = profilerSummaryApiSlice;
