@@ -4,8 +4,7 @@ export default function MSPrevalence(groupBySignature, mutation) {
       a.samples.reduce((a, b) => a + b.exposure, 0) -
       b.samples.reduce((a, b) => a + b.exposure, 0)
   );
-  console.log(groupBySignature);
-  console.log(mutation);
+
   let minumumNumber = 100;
   mutation === null || mutation === undefined
     ? (minumumNumber = 100)
@@ -102,15 +101,19 @@ export default function MSPrevalence(groupBySignature, mutation) {
     textposition: 'inside',
     textinfo: 'percent',
     showlegend: false,
-
     marker: {
       colors: groupBySignature.map((group) => colors[group.signatureName]),
     },
     direction: 'clockwise',
     sort: false,
+    domain: { x: [0, 0.2] },
+    customdata: groupBySignature.map((e) => ({
+      label: e.signatureName,
+      value: e.samples.reduce((a, b) => a + b.exposure, 0),
+    })),
+    hovertemplate: '<b>%{label}</b><br>%{value}<br>%{percent}<extra></extra>',
   };
   console.log(tracesPie);
-
   const tracesBar = groupBySignature.map((group, groupIndex, array) => ({
     group: group,
     array: array,
@@ -145,20 +148,18 @@ export default function MSPrevalence(groupBySignature, mutation) {
       row: 0,
       column: 1,
     },
+    hovertemplate: '<b>%{x}</b><br>%{y:.1%}<extra></extra>',
   }));
-  console.log(tracesBar);
 
   const traces = [tracesPie, ...tracesBar];
-
-  console.log(traces);
 
   const titleAnnotations = [
     {
       xref: 'paper',
       yref: 'paper',
       showarrow: false,
-      x: 0.15,
-      y: 1.1,
+      x: 0.05,
+      y: 1.15,
       xanchor: 'top',
       text: '<b>Prevalence by mutations</b>',
       font: {
@@ -171,7 +172,7 @@ export default function MSPrevalence(groupBySignature, mutation) {
       yref: 'paper',
       showarrow: false,
       x: 0.5,
-      y: 1.1,
+      y: 1.15,
       xanchor: 'top',
       text: '<b>Prevalence by samples</b>',
       font: {
@@ -185,9 +186,10 @@ export default function MSPrevalence(groupBySignature, mutation) {
     grid: { rows: 1, columns: 2 },
     hoverlabel: { bgcolor: '#FFF' },
     height: 450,
-    //width: 500,
+
     autosize: true,
     title: '<b>Prevalence of Mutational Signatures</b>',
+
     xaxis2: {
       showline: true,
       tickangle: -90,
@@ -195,11 +197,10 @@ export default function MSPrevalence(groupBySignature, mutation) {
         family: 'Arial, monospace',
       },
       tickmode: 'array',
-
       linecolor: 'black',
       linewidth: 1,
-
       categoryorder: 'total descending',
+      domain: [0.25, 1],
     },
     yaxis2: {
       title: {
