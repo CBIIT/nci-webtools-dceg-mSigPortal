@@ -9,9 +9,9 @@ const archiver = require('archiver');
 const r = require('r-wrapper').async;
 const AWS = require('aws-sdk');
 const tar = require('tar');
-const { parseCSV } = require('../analysis');
 const config = require('../../../config.json');
 const logger = require('../../logger');
+const { parseCSV, importUserSession } = require('../analysis');
 
 async function* getFiles(dir) {
   const dirents = await fs.promises.readdir(dir, { withFileTypes: true });
@@ -97,7 +97,7 @@ async function profilerExtraction(params) {
     const matricesFile = path.join(projectPath, 'matrices.json');
     fs.writeFileSync(matricesFile, matrices);
 
-    return { stdout, stderr, projectPath };
+    return { stdout, stderr, projectPath, matrices };
   } catch (error) {
     // const error = { code, signal, stdout, stderr };
     logger.info('Profiler Extraction Error');
@@ -159,14 +159,21 @@ async function userProfilerExtraction(req, res, next) {
   });
 
   try {
-    const { stdout, stderr, projectPath } = await profilerExtraction(req.body);
+    const userId = req.body.projectID[1];
+    const { stdout, stderr, projectPath, matrices } = await profilerExtraction(
+      req.body
+    );
     const resultsPath = path.join(projectPath, 'results');
+
+    // import matrices into user session table
+    const connection = req.app.locals.connection;
+    await importUserSession(connection, matrices);
 
     if (fs.existsSync(path.join(resultsPath, 'svg_files_list.txt'))) {
       res.json({
         stdout,
         stderr,
-        ...(await getResultsFiles(resultsPath, req.body.projectID[1])),
+        ...(await getResultsFiles(resultsPath, userId)),
       });
     } else {
       logger.error(

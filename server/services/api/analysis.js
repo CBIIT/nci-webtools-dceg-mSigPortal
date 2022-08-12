@@ -39,6 +39,13 @@ function parseCSV(filepath) {
   });
 }
 
+async function importUserSession(connection, data, userId) {
+  await connection
+    .withSchema(`session_${userId}`)
+    .createTable('seqmatrix', (table) => {});
+  return true;
+}
+
 function upload(req, res, next) {
   const projectID = randomUUID();
   const form = formidable({
@@ -335,6 +342,7 @@ router.post('/associationWrapper', associationWrapper);
 module.exports = {
   router,
   parseCSV,
+  importUserSession,
   upload,
   explorationWrapper,
   getExposureExample,
