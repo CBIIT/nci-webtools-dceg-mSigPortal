@@ -1,6 +1,5 @@
 import { visualizationApiSlice } from '../../../../services/store/rootApi';
 import profilerSummary from '../../../controls/plotly/profilerSummary/profilerSummary';
-import { groupBy } from 'lodash';
 
 export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -9,29 +8,7 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
         url: 'seqmatrixSummary',
         params,
       }),
-      transformResponse: (data) => {
-        const groupByProfileMatrix = groupBy(
-          data,
-          (e) => `${e.profile}_${e.matrix}`
-        );
-        const meanMutationsPerProfile = Object.values(groupByProfileMatrix)
-          .map((samples) => {
-            return {
-              name: `${samples[0].profile}: ${samples[0].matrix}`,
-              samples: samples.sort(
-                (a, b) => a.logTotalMutations - b.logTotalMutations
-              ),
-              mean:
-                samples.reduce(
-                  (acc, e) => acc + parseFloat(e.meanTotalMutations),
-                  0
-                ) / samples.length,
-            };
-          })
-          .sort((a, b) => b.mean - a.mean);
-
-        return profilerSummary(meanMutationsPerProfile);
-      },
+      transformResponse: (data) => profilerSummary(data),
     }),
   }),
 });
