@@ -1,5 +1,7 @@
 import { visualizationApiSlice } from '../../../../services/store/rootApi';
-import pcBetweenSamples from '../../../controls/plotly/profileComparision/pcBetweenSamples';
+import pcBetweenSamples_SBS from '../../../controls/plotly/profileComparision/pcBetweenSamples_SBS';
+import pcBetweenSamples_DBS from '../../../controls/plotly/profileComparision/pcBetweenSamples_DBS';
+import pcBetweenSamples_ID from '../../../controls/plotly/profileComparision/pcBetweenSamples_ID';
 export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // profileComparisonWithin: builder.query({
@@ -15,8 +17,13 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
         params,
       }),
       transformResponse: (data, meta, arg) => {
-        console.log(data);
-        return pcBetweenSamples(data, arg);
+        if (arg.profile === 'SBS') {
+          return pcBetweenSamples_SBS(data, arg);
+        } else if (arg.profile === 'DBS') {
+          return pcBetweenSamples_DBS(data, arg);
+        } else {
+          return pcBetweenSamples_ID(data, arg);
+        }
       },
     }),
     profileComparisonReference: builder.query({

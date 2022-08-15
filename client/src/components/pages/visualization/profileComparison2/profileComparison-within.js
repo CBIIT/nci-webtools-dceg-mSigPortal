@@ -37,8 +37,9 @@ export default function PcWithin() {
       ? [
           ...new Set(
             matrixData
-              .filter((e) => e.profile == profile.value)
+              .filter((e) => e.profile === profile.value)
               .map((e) => e.sample)
+              .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
           ),
         ].map((e) => ({
           label: e,
@@ -54,7 +55,11 @@ export default function PcWithin() {
   const { profile, sample1, sample2 } = watch();
 
   const profileOptions = matrixData.length
-    ? [...new Set(matrixData.map((e) => e.profile))].map((e) => ({
+    ? [
+        ...new Set(
+          matrixData.map((e) => e.profile).sort((a, b) => b.localeCompare(a))
+        ),
+      ].map((e) => ({
         label: e,
         value: e,
       }))
