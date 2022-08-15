@@ -7,7 +7,7 @@ export default function SBS96(data, sample) {
     'T>C': '#A1CE63',
     'T>G': '#EBC6C4',
   };
-
+  console.log(data);
   const totalMutations = data.reduce(
     (total, mutation) =>
       total +
