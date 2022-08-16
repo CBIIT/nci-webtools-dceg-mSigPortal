@@ -178,37 +178,139 @@ export default function pcBetweenSamples(rawData, args) {
     yref: 'paper',
     x0: array
       .slice(0, groupIndex)
-      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.35),
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
     x1: array
       .slice(0, groupIndex + 1)
-      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.65),
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
     y0: 1.05,
     y1: 1.01,
     fillcolor: colors[group.mutation],
     line: {
-      width: 0,
+      width: 1,
     },
   }));
 
+  const shapeLine3 = sample1data.map((group, groupIndex, array) => ({
+    type: 'rect',
+    xref: 'x',
+    yref: 'paper',
+    x0: array
+      .slice(0, groupIndex)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    x1: array
+      .slice(0, groupIndex + 1)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    y0: 0.67,
+    y1: 1,
+
+    line: {
+      width: 1,
+    },
+  }));
+
+  const shapeLine2 = sample2data.map((group, groupIndex, array) => ({
+    type: 'rect',
+    xref: 'x',
+    yref: 'paper',
+    x0: array
+      .slice(0, groupIndex)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    x1: array
+      .slice(0, groupIndex + 1)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    y0: 0.34,
+    y1: 0.66,
+
+    line: {
+      width: 1,
+    },
+  }));
+
+  const shapeLine1 = sample3data.map((group, groupIndex, array) => ({
+    type: 'rect',
+    xref: 'x',
+    yref: 'paper',
+    x0: array
+      .slice(0, groupIndex)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    x1: array
+      .slice(0, groupIndex + 1)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    y0: 0.33,
+    y1: 0,
+
+    line: {
+      width: 1,
+    },
+  }));
   const shapeRight3 = {
     type: 'rect',
     xref: 'paper',
-    yref: 'y3',
+    yref: 'paper',
     x0: 1,
-    x1: 1.03,
-    y0: 0,
-    y1: maxMutation1,
+    x1: 1.02,
+    y0: 0.67,
+    y1: 1,
   };
   const shapeRight2 = {
     type: 'rect',
     xref: 'paper',
-    yref: 'y2',
+    yref: 'paper',
     x0: 1,
-    x1: 1.03,
-    y0: 0,
-    y1: maxMutation2,
+    x1: 1.02,
+    y0: 0.34,
+    y1: 0.66,
   };
 
+  const shapeRight1 = {
+    type: 'rect',
+    xref: 'paper',
+    yref: 'paper',
+    x0: 1,
+    x1: 1.02,
+    y0: 0,
+    y1: 0.33,
+  };
+
+  const annotationLabelRight3 = {
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'middle',
+    yanchor: 'middle',
+    align: 'center',
+    x: 1.0175,
+    y: 0.835,
+    text: samples[0],
+    textangle: 90,
+    showarrow: false,
+  };
+  console.log(annotationLabelRight3);
+
+  const annotationLabelRight2 = {
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'middle',
+    yanchor: 'middle',
+    align: 'center',
+    x: 1.0175,
+    y: 0.505,
+    text: samples[1],
+    textangle: 90,
+    showarrow: false,
+  };
+
+  const annotationLabelRight1 = {
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'middle',
+    yanchor: 'middle',
+    align: 'center',
+    x: 1.0175,
+    y: 0.165,
+    text: 'Difference',
+    textangle: 90,
+    showarrow: false,
+  };
   const mutationAnnotation = sample1data.map((group, groupIndex, array) => ({
     xref: 'x',
     yref: 'paper',
@@ -261,8 +363,7 @@ export default function pcBetweenSamples(rawData, args) {
       linewidth: 1,
       mirror: 'all',
       tickfont: {
-        family: 'Courier New, monospace',
-        size: 8,
+        family: 'Arial',
       },
       showgrid: true,
       gridcolor: '#F5F5F5',
@@ -275,8 +376,7 @@ export default function pcBetweenSamples(rawData, args) {
       ticks: '',
       mirror: 'all',
       tickfont: {
-        family: 'Courier New, monospace',
-        size: 8,
+        family: 'Arial',
       },
       domain: [0.34, 0.66],
     },
@@ -287,13 +387,25 @@ export default function pcBetweenSamples(rawData, args) {
       ticks: '',
       mirror: 'all',
       tickfont: {
-        family: 'Courier New, monospace',
-        size: 8,
+        family: 'Arial',
       },
       domain: [0.67, 1],
     },
-    shapes: [...shapeTop, shapeRight2, shapeRight3],
-    annotations: [...mutationAnnotation],
+    shapes: [
+      ...shapeTop,
+      shapeRight3,
+      shapeRight2,
+      shapeRight1,
+      ...shapeLine3,
+      ...shapeLine2,
+      ...shapeLine1,
+    ],
+    annotations: [
+      ...mutationAnnotation,
+      annotationLabelRight3,
+      annotationLabelRight2,
+      annotationLabelRight1,
+    ],
   };
 
   return { traces, layout };
