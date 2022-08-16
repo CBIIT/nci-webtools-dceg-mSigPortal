@@ -177,6 +177,23 @@ export default function pcBetweenSamples(rawData, args) {
   const traces = [...trace2, ...trace3, ...trace1];
   console.log(traces);
 
+  const shapeTop = sample1data.map((group, groupIndex, array) => ({
+    type: 'rect',
+    xref: 'x',
+    yref: 'paper',
+    x0: array
+      .slice(0, groupIndex)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.35),
+    x1: array
+      .slice(0, groupIndex + 1)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.65),
+    y0: 1.05,
+    y1: 1.01,
+    fillcolor: colors[group.mutation],
+    line: {
+      width: 0,
+    },
+  }));
   function formatTickLabel(mutation, mutationType) {
     const color = colors[mutation];
     const regex = /^(.)\[(.).{2}\](.)$/;
@@ -244,6 +261,7 @@ export default function pcBetweenSamples(rawData, args) {
       },
       domain: [0.67, 1],
     },
+    shapes: shapeTop,
   };
 
   return { traces, layout };
