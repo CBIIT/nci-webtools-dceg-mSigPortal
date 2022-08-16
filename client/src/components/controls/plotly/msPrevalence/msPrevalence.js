@@ -102,7 +102,8 @@ export default function MSPrevalence(groupBySignature, mutation) {
       label: e.signatureName,
       value: e.samples.reduce((a, b) => a + b.exposure, 0),
     })),
-    hovertemplate: '<b>%{label}</b><br>%{value}<br>%{percent}<extra></extra>',
+    hovertemplate:
+      '<b>Signature Name:</b>%{label}<br><b>Total sample: </b>%{value}<br>%{percent}<extra></extra>',
   };
 
   const tracesBar = groupBySignature.map((group, groupIndex, array) => ({
