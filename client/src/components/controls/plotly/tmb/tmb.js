@@ -1,6 +1,4 @@
 export default function TMB(data, tmbTabName, signatureName) {
-  console.log(data);
-  console.log(signatureName);
   function average(arr) {
     const sum = arr.reduce((a, b) => a + b, 0);
     return sum / arr.length || 0;
@@ -19,12 +17,17 @@ export default function TMB(data, tmbTabName, signatureName) {
     type: 'scatter',
     marker: { symbol: 'circle-open', size: 4, color: 'black' },
     mode: 'markers',
+    customdata: element.samples.map((e) => ({
+      sampleName: e.sample,
+    })),
     y: element.samples.map((e) => e.burden),
     // average: average(element.samples.map((e) => e.tmb)),
     hovertemplate:
       tmbTabName === 'TMBSignature'
-        ? `<b>${element.signatureName}</b>` + '<br>%{y}<extra></extra>'
-        : `<b>${element.cancer}</b>` + '<br>%{y}<extra></extra>',
+        ? `<b>Sample Name:</b> %{customdata.sampleName}<br><b>Signature Name</b>: ${element.signatureName}` +
+          '<br><b>Mutation #: </b>%{y}<extra></extra>'
+        : `<b>Sample Name:</b> %{customdata.sampleName}<br><b>Cancer Name:</b>${element.cancer}` +
+          '<br><b>Mutation #: </b>%{y}<extra></extra>',
     x: element.samples.map(
       (e, i) => index + 0.1 + (0.8 / element.samples.length) * i
     ),
@@ -104,14 +107,6 @@ export default function TMB(data, tmbTabName, signatureName) {
     type: 'rect',
     xref: 'x',
     yref: 'paper',
-
-    // x0: array
-    //   .slice(0, index)
-    //   .reduce((x0, curr) => x0 + curr.samples.length, 0),
-
-    // x1: array
-    //   .slice(0, index + 1)
-    //   .reduce((x0, curr) => x0 + curr.samples.length, 0),
     x0: index,
     x1: index + 1,
     y0: 0,
@@ -129,17 +124,8 @@ export default function TMB(data, tmbTabName, signatureName) {
     type: 'line',
     xref: 'x',
     yref: 'y',
-
-    // x0: array
-    //   .slice(0, index)
-    //   .reduce((x0, curr) => x0 + curr.samples.length, 0),
-
-    // x1: array
-    //   .slice(0, index + 1)
-    //   .reduce((x0, curr) => x0 + curr.samples.length, 0),
     x0: index + 0.1,
     x1: index + 0.9,
-
     y0: element.medianBurden,
     y1: element.medianBurden,
     line: {

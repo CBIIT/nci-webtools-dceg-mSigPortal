@@ -14,7 +14,25 @@ export default function pcBetweenSamples(rawData, args) {
   const groupBySample = groupBy(rawData, 'sample');
   const sample1 = groupBySample[samples[0]].flat();
   const sample2 = groupBySample[samples[1]].flat();
-
+  console.log(sample1);
+  console.log(sample2);
+  const sample3 = sample1.map((s1k) => {
+    console.log(s1k.mutationType);
+    let result = [];
+    sample2.find((s2k) =>
+      s1k.mutationType === s2k.mutationTpe
+        ? (result = {
+            cancer: s1k.cancer,
+            mutationType: s1k.mutationType,
+            mutations: s1k.mutations - s2k.mutations,
+            profile: s1k.profile,
+            trategy: s1k.trategy,
+            study: s1k.study,
+          })
+        : {}
+    );
+    console.log(result);
+  });
   const groupByMutation1 = sample1.reduce((acc, e, i) => {
     const mutationRegex = /\[(.*)\]/;
     const mutation = e.mutationType.match(mutationRegex)[1];
@@ -22,7 +40,6 @@ export default function pcBetweenSamples(rawData, args) {
     return acc;
   }, {});
 
-  console.log(groupByMutation1);
   const sample1data = Object.entries(groupByMutation1).map(
     ([mutation, data]) => ({
       mutation,
@@ -38,7 +55,6 @@ export default function pcBetweenSamples(rawData, args) {
     return acc;
   }, {});
 
-  console.log(groupByMutation1);
   const sample2data = Object.entries(groupByMutation2).map(
     ([mutation, data]) => ({
       mutation,
