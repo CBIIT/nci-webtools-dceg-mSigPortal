@@ -10,15 +10,6 @@ export default function MSPrevalence(groupBySignature, mutation) {
     ? (minumumNumber = 100)
     : (minumumNumber = parseInt(mutation));
 
-  // const groupBySignature_sortExposure = groupBySignature.sort(
-  //   (a, b) =>
-  //     b.samples.filter((e) => e.exposure >= minumumNumber).length /
-  //       a.totalSamples -
-  //     a.samples.filter((e) => e.exposure >= minumumNumber).length /
-  //       b.totalSamples
-  // );
-
-  // console.log(groupBySignature_sortExposure);
   const colors = {
     SBS1: '#4a9855',
     SBS2: '#e2a8ab',
@@ -149,14 +140,13 @@ export default function MSPrevalence(groupBySignature, mutation) {
     },
     hovertemplate: '<b>%{x}</b><br>%{y:.1%}<extra></extra>',
   }));
-  console.log(tracesBar);
 
   const titleAnnotation = [
     {
       xref: 'paper',
       yref: 'paper',
       showarrow: false,
-      x: 0.05,
+      x: 0.0225,
       y: 1.15,
       xanchor: 'top',
       text: '<b>Prevalence by mutations</b>',
@@ -186,7 +176,7 @@ export default function MSPrevalence(groupBySignature, mutation) {
     x: 0.5,
     y: 0.5,
     xanchor: 'top',
-    text: '<b>No data has meet the requirement > 1% </b>',
+    text: '<b>No samples with prevalence greater than 1% </b>',
     font: {
       size: 18,
       family: 'Arial',
