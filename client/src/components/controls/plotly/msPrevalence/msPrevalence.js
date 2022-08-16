@@ -113,14 +113,13 @@ export default function MSPrevalence(groupBySignature, mutation) {
     })),
     hovertemplate: '<b>%{label}</b><br>%{value}<br>%{percent}<extra></extra>',
   };
-  console.log(tracesPie);
+
   const tracesBar = groupBySignature.map((group, groupIndex, array) => ({
     group: group,
     array: array,
     name: group.signatureName,
     type: 'bar',
     minumumNumber: minumumNumber,
-    lenght: group.samples.filter((e) => e.exposure >= 100),
     marker: {
       color: colors[group.signatureName],
     },
@@ -150,10 +149,9 @@ export default function MSPrevalence(groupBySignature, mutation) {
     },
     hovertemplate: '<b>%{x}</b><br>%{y:.1%}<extra></extra>',
   }));
+  console.log(tracesBar);
 
-  const traces = [tracesPie, ...tracesBar];
-
-  const titleAnnotations = [
+  const titleAnnotation = [
     {
       xref: 'paper',
       yref: 'paper',
@@ -181,15 +179,37 @@ export default function MSPrevalence(groupBySignature, mutation) {
       },
     },
   ];
+  const barAnnotation = {
+    xref: 'x2 domain',
+    yref: 'paper',
+    showarrow: false,
+    x: 0.5,
+    y: 0.5,
+    xanchor: 'top',
+    text: '<b>No data has meet the requirement > 1% </b>',
+    font: {
+      size: 18,
+      family: 'Arial',
+    },
+  };
+  let titleAnnotations = [];
+
+  const barTotal = tracesBar.reduce((total, e) => total + e.y, 0);
+  let traces = [];
+  if (barTotal[groupBySignature.length] < 0.1) {
+    traces = [tracesPie];
+    titleAnnotations = [...titleAnnotation, barAnnotation];
+  } else {
+    traces = [tracesPie, ...tracesBar];
+    titleAnnotations = [...titleAnnotation];
+  }
 
   const layout = {
     grid: { rows: 1, columns: 2 },
     hoverlabel: { bgcolor: '#FFF' },
     height: 450,
-
     autosize: true,
     title: '<b>Prevalence of Mutational Signatures</b>',
-
     xaxis2: {
       showline: true,
       tickangle: -90,

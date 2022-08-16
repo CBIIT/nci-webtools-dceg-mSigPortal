@@ -66,16 +66,11 @@ export default function pcBetweenSamples(rawData, args) {
   );
   console.log(sample2data);
 
-  // const groupByMutation3 = groupBy(
-  //   sampleDifferences,
-  //   (s) => /\[(.*)\]/.match(s.mutationType)[1]
-  // );
-  const groupByMutation3 = sampleDifferences.reduce((acc, e, i) => {
-    const mutationRegex = /\[(.*)\]/;
-    const mutation = e.mutationType.match(mutationRegex)[1];
-    acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
-    return acc;
-  }, {});
+  const groupByMutation3 = groupBy(
+    sampleDifferences,
+    (s) => s.mutationType.match(/\[(.*)\]/)[1]
+  );
+
   console.log(groupByMutation3);
 
   const sample3data = Object.entries(groupByMutation3).map(
@@ -194,6 +189,42 @@ export default function pcBetweenSamples(rawData, args) {
       width: 0,
     },
   }));
+
+  const shapeRight3 = {
+    type: 'rect',
+    xref: 'paper',
+    yref: 'y3',
+    x0: 1,
+    x1: 1.03,
+    y0: 0,
+    y1: maxMutation1,
+  };
+  const shapeRight2 = {
+    type: 'rect',
+    xref: 'paper',
+    yref: 'y2',
+    x0: 1,
+    x1: 1.03,
+    y0: 0,
+    y1: maxMutation2,
+  };
+
+  const mutationAnnotation = sample1data.map((group, groupIndex, array) => ({
+    xref: 'x',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
+    x:
+      array
+        .slice(0, groupIndex)
+        .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
+      (group.data.length - 1) * 0.5,
+    y: 1.01,
+    text: `<b>${group.mutation}</b>`,
+    showarrow: false,
+    font: { size: 16, color: 'white' },
+    align: 'center',
+  }));
   function formatTickLabel(mutation, mutationType) {
     const color = colors[mutation];
     const regex = /^(.)\[(.).{2}\](.)$/;
@@ -261,7 +292,8 @@ export default function pcBetweenSamples(rawData, args) {
       },
       domain: [0.67, 1],
     },
-    shapes: shapeTop,
+    shapes: [...shapeTop, shapeRight2, shapeRight3],
+    annotations: [...mutationAnnotation],
   };
 
   return { traces, layout };
