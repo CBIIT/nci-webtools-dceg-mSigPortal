@@ -16,23 +16,25 @@ export default function pcBetweenSamples(rawData, args) {
   const sample2 = groupBySample[samples[1]].flat();
   console.log(sample1);
   console.log(sample2);
-  const sample3 = sample1.map((s1k) => {
-    console.log(s1k.mutationType);
-    let result = [];
-    sample2.find((s2k) =>
-      s1k.mutationType === s2k.mutationTpe
-        ? (result = {
-            cancer: s1k.cancer,
-            mutationType: s1k.mutationType,
-            mutations: s1k.mutations - s2k.mutations,
-            profile: s1k.profile,
-            trategy: s1k.trategy,
-            study: s1k.study,
-          })
-        : {}
-    );
-    console.log(result);
-  });
+
+  const group1 = groupBy(sample1, 'mutationType');
+  Object.keys(group1);
+  console.log(group1);
+  const group2 = groupBy(sample2, 'mutationType');
+  Object.keys(group2);
+  console.log(group2);
+
+  let sampleDifferences = [];
+
+  for (let mutationType of Object.keys(group1)) {
+    const a = group1[mutationType][0];
+    const b = group2[mutationType][0];
+    const mutations = a.mutations - b.mutations;
+    //const cancer = a.cancer;
+    sampleDifferences.push({ mutationType, mutations });
+  }
+  console.log(sampleDifferences);
+
   const groupByMutation1 = sample1.reduce((acc, e, i) => {
     const mutationRegex = /\[(.*)\]/;
     const mutation = e.mutationType.match(mutationRegex)[1];
@@ -40,6 +42,7 @@ export default function pcBetweenSamples(rawData, args) {
     return acc;
   }, {});
 
+  console.log(groupByMutation1);
   const sample1data = Object.entries(groupByMutation1).map(
     ([mutation, data]) => ({
       mutation,
@@ -54,7 +57,7 @@ export default function pcBetweenSamples(rawData, args) {
     acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
     return acc;
   }, {});
-
+  console.log(groupByMutation2);
   const sample2data = Object.entries(groupByMutation2).map(
     ([mutation, data]) => ({
       mutation,
@@ -62,6 +65,26 @@ export default function pcBetweenSamples(rawData, args) {
     })
   );
   console.log(sample2data);
+
+  // const groupByMutation3 = groupBy(
+  //   sampleDifferences,
+  //   (s) => /\[(.*)\]/.match(s.mutationType)[1]
+  // );
+  const groupByMutation3 = sampleDifferences.reduce((acc, e, i) => {
+    const mutationRegex = /\[(.*)\]/;
+    const mutation = e.mutationType.match(mutationRegex)[1];
+    acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
+    return acc;
+  }, {});
+  console.log(groupByMutation3);
+
+  const sample3data = Object.entries(groupByMutation3).map(
+    ([mutation, data]) => ({
+      mutation,
+      data,
+    })
+  );
+  console.log(sample3data);
 
   const totalMutations1 = sample1data.reduce(
     (total, mutation) =>
@@ -135,7 +158,7 @@ export default function pcBetweenSamples(rawData, args) {
     yaxis: 'y2',
   }));
 
-  const trace3 = sample2data.map((group, groupIndex, array) => ({
+  const trace3 = sample3data.map((group, groupIndex, array) => ({
     name: group.mutation,
     type: 'bar',
     marker: { color: colors[group.mutation] },
