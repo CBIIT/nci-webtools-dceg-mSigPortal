@@ -37,7 +37,7 @@ export default function ProfilerSummary() {
           more="On the y-axis is the number of mutations in log base 10 scale, and on the x-axis is the sample index for each sample of the selected cancer type (sorted by number of mutations in ascending order). The different colored lines represent different mutational profiles (SBS= single-base substitution, DBS= doublet-base substitution, ID=indel)."
         />
       </div>
-
+      <hr />
       <LoadingOverlay active={isFetching} />
       <Container fluid className="mb-3">
         <Row>
