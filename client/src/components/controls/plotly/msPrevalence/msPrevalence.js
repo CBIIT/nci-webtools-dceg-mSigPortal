@@ -90,7 +90,7 @@ export default function MSPrevalence(groupBySignature, mutation) {
       group.samples.reduce((a, b) => a + b.exposure, 0)
     ),
     textposition: 'inside',
-    textinfo: 'percent',
+    texttemplate: '%{percent:.1%}',
     showlegend: false,
     marker: {
       colors: groupBySignature.map((group) => colors[group.signatureName]),
