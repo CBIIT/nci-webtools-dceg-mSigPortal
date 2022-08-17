@@ -107,11 +107,13 @@ export const sources = [
     columns: [
       "etiology",
       "signatureName",
-      "signatureSource",
-      "url",
-      "description",
-      "descriptionStrandBias",
       "study",
+      "studyUrl",
+      "genomeBuild",
+      "signatureSource",
+      "sourceUrl",
+      "description",
+      "tissueDistribution",
       "category",
     ]
   },
