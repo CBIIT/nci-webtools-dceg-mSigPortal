@@ -39,11 +39,36 @@ function parseCSV(filepath) {
   });
 }
 
-async function importUserSession(connection, data, userId) {
-  await connection
-    .withSchema(`session_${userId}`)
-    .createTable('seqmatrix', (table) => {});
-  return true;
+async function importUserSession(connection, data, userSchema) {
+  const tables = userSchema.filter(({ type }) => !type || type === 'table');
+  const materializedViews = userSchema.filter(
+    ({ type }) => type === 'materializedView'
+  );
+  const indexedTables = userSchema.filter((s) => typeof s.index === 'function');
+  const tableName = `seqmatrix`;
+
+  try {
+    for (const { name, schema } of tables) {
+      await connection.schema.createTable(name, (table) =>
+        schema(table, connection)
+      );
+    }
+
+    await connection.batchInsert(tableName, data, 100);
+
+    for (const { create } of materializedViews) {
+      await create(connection);
+    }
+
+    for (const { name, index } of indexedTables) {
+      await connection.schema.table(name, index);
+    }
+
+    return true;
+  } catch (error) {
+    logger.error(error);
+    return false;
+  }
 }
 
 function upload(req, res, next) {

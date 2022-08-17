@@ -12,6 +12,15 @@ const tar = require('tar');
 const config = require('../../../config.json');
 const logger = require('../../logger');
 const { parseCSV, importUserSession } = require('../analysis');
+const { schema } = require('./userSchema');
+
+// config info for R functions
+const rConfig = {
+  s3Data: config.data.s3,
+  bucket: config.data.bucket,
+  localData: path.resolve(config.data.localData),
+  wd: path.resolve(config.results.folder),
+};
 
 async function* getFiles(dir) {
   const dirents = await fs.promises.readdir(dir, { withFileTypes: true });
@@ -93,9 +102,9 @@ async function profilerExtraction(params) {
 
     // parse matrix files and transform into single json file
     const matrixFiles = path.join(projectPath, 'results/output');
-    const matrices = JSON.stringify(await getMatrices(matrixFiles));
+    const matrices = await getMatrices(matrixFiles);
     const matricesFile = path.join(projectPath, 'matrices.json');
-    fs.writeFileSync(matricesFile, matrices);
+    fs.writeFileSync(matricesFile, JSON.stringify(matrices));
 
     return { stdout, stderr, projectPath, matrices };
   } catch (error) {
@@ -166,8 +175,10 @@ async function userProfilerExtraction(req, res, next) {
     const resultsPath = path.join(projectPath, 'results');
 
     // import matrices into user session table
-    const connection = req.app.locals.connection;
-    await importUserSession(connection, matrices);
+    const connection = req.app.locals.sqlite(userId, 'visualization');
+    const importStatus = await importUserSession(connection, matrices, schema);
+    if (!importStatus)
+      next(new Error('Failed to import matrix data into database'));
 
     if (fs.existsSync(path.join(resultsPath, 'svg_files_list.txt'))) {
       res.json({
