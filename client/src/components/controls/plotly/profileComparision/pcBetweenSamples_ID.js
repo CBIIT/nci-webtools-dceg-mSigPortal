@@ -392,9 +392,9 @@ export default function pcBetweenSamples(rawData, args) {
       (group.data.length - 1) * 0.5,
     y: 1.01,
     text:
-      group.mutation.substring(0, 5) === '2:Del' ||
-      group.mutation.substring(0, 5) === '3:Del' ||
-      group.mutation.substring(0, 5) === '4:Del'
+      group.mutation === '2:Del:M' ||
+      group.mutation === '3:Del:M' ||
+      group.mutation === '4:Del:M'
         ? group.mutation.substring(0, 1)
         : group.mutation,
     showarrow: false,
