@@ -31,7 +31,7 @@ export default function MutProfilePlot() {
         study: study.value,
         cancer: cancer.value,
         strategy: strategy.value,
-        userId: source == 'user' ? projectID : null,
+        ...(source == 'user' && { userId: projectID }),
         sample: sample.value,
         profile: profile.value,
         matrix: matrix.value,

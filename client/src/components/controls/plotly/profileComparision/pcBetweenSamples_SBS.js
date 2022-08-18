@@ -396,7 +396,7 @@ export default function pcBetweenSamples(rawData, args) {
     },
     yaxis2: {
       autorange: false,
-      range: [0, maxMutations * 1.3],
+      range: [0, maxMutations * 1.2],
       linecolor: '#D3D3D3',
       linewidth: 1,
       ticks: '',
@@ -408,7 +408,7 @@ export default function pcBetweenSamples(rawData, args) {
     },
     yaxis3: {
       autorange: false,
-      range: [0, maxMutations * 1.3],
+      range: [0, maxMutations * 1.2],
       linecolor: '#D3D3D3',
       linewidth: 1,
       ticks: '',

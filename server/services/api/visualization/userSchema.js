@@ -29,108 +29,45 @@ const schema = [
         ].join(' ')
       );
     },
-    schema: (view, connection) => {
-      const columns = ['profile', 'matrix', 'sample'];
-      const query = connection('seqmatrix').distinct(columns);
-      return view.as(query);
-    },
     index: (table) => {
       table.index(['profile', 'matrix', 'sample']);
     },
   },
 
-  //   {
-  //     name: 'seqmatrixSummary',
-  //     type: 'materializedView',
-  //     dependsOn: ['seqmatrix'],
-  //     create: (connection) => {
-  //       const columns = [
-  //         'study',
-  //         'strategy',
-  //         'cancer',
-  //         'sample',
-  //         'profile',
-  //         'matrix',
-  //         'logTotalMutations',
-  //         'meanTotalMutations',
-  //       ];
-
-  //       const totalCountColumns = [
-  //         ...columns.slice(0, -2),
-  //         connection.raw('sum(mutations) as "totalMutations"'),
-  //       ];
-  //       const summaryColumns = [
-  //         ...columns.slice(0, -3),
-  //         connection.raw(
-  //           `string_agg(cast(matrix as text), '/' order by matrix asc) as matrix`
-  //         ),
-  //         connection.raw(`log10(sum("totalMutations")) as "logTotalMutations"`),
-  //         connection.raw(`avg("totalMutations") as "meanTotalMutations"`),
-  //       ];
-  //       const totalCountQuery = connection
-  //         .select(totalCountColumns)
-  //         .from('seqmatrix')
-  //         .groupBy(totalCountColumns.slice(0, -1))
-  //         .orderBy(totalCountColumns.slice(0, -1).map((column) => ({ column })));
-  //       const summaryQuery = connection
-  //         .with('totalCounts', totalCountQuery)
-  //         .select(summaryColumns)
-  //         .from('totalCounts')
-  //         .where('totalMutations', '>', 0)
-  //         .groupBy([...summaryColumns.slice(0, -3), 'totalMutations']);
-
-  //       view.columns(columns);
-  //       return view.as(summaryQuery);
-  //     },
-  //     schema: (view, connection) => {
-  //       const columns = [
-  //         'study',
-  //         'strategy',
-  //         'cancer',
-  //         'sample',
-  //         'profile',
-  //         'matrix',
-  //         'logTotalMutations',
-  //         'meanTotalMutations',
-  //       ];
-  //       const totalCountColumns = [
-  //         ...columns.slice(0, -2),
-  //         connection.raw('sum(mutations) as "totalMutations"'),
-  //       ];
-  //       const summaryColumns = [
-  //         ...columns.slice(0, -3),
-  //         connection.raw(
-  //           `string_agg(cast(matrix as text), '/' order by matrix asc) as matrix`
-  //         ),
-  //         connection.raw(`log10(sum("totalMutations")) as "logTotalMutations"`),
-  //         connection.raw(`avg("totalMutations") as "meanTotalMutations"`),
-  //       ];
-  //       const totalCountQuery = connection
-  //         .select(totalCountColumns)
-  //         .from('seqmatrix')
-  //         .groupBy(totalCountColumns.slice(0, -1))
-  //         .orderBy(totalCountColumns.slice(0, -1).map((column) => ({ column })));
-  //       const summaryQuery = connection
-  //         .with('totalCounts', totalCountQuery)
-  //         .select(summaryColumns)
-  //         .from('totalCounts')
-  //         .where('totalMutations', '>', 0)
-  //         .groupBy([...summaryColumns.slice(0, -3), 'totalMutations']);
-
-  //       view.columns(columns);
-  //       return view.as(summaryQuery);
-  //     },
-  //     index: (table) => {
-  //       table.index([
-  //         'study',
-  //         'strategy',
-  //         'cancer',
-  //         'sample',
-  //         'profile',
-  //         'matrix',
-  //       ]);
-  //     },
-  //   },
+  {
+    name: 'seqmatrixSummary',
+    type: 'materializedView',
+    dependsOn: ['seqmatrix'],
+    create: (connection) => {
+      return connection.raw(
+        `
+          CREATE TABLE seqmatrixSummary AS
+          WITH records AS (
+            SELECT        
+                sample,
+                profile,
+                matrix,
+                sum(mutations) as totalMutations
+            FROM seqmatrix
+            GROUP BY sample, profile, matrix
+            ORDER BY sample, profile, matrix
+          )
+          SELECT
+            sample,
+            profile,
+            group_concat(cast(matrix as text), '/') as matrix,
+            log10(sum(totalMutations)) as logTotalMutations,
+            avg(totalMutations) as meanTotalMutations
+          FROM records r
+          WHERE totalMutations > 0
+          GROUP BY sample, profile, totalMutations
+          `
+      );
+    },
+    index: (table) => {
+      table.index(['sample', 'profile', 'matrix']);
+    },
+  },
 ];
 
 module.exports = { schema };

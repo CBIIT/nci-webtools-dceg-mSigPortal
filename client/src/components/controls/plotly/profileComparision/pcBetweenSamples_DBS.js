@@ -3,12 +3,7 @@ import { groupBy } from 'lodash';
 export default function pcBetweenSamples(rawData, args) {
   console.log(rawData);
   console.log(args);
-  const groupBySample = groupBy(rawData, 'sample');
-  console.log(groupBySample);
-  // const maxMutation = Math.max(
-  //   ...rawData.map((mutation) => mutation.data.map((e) => e.mutations)).flat()
-  // );
-  // console.log(maxMutation);
+
   const colors = {
     AC: '#09BCED',
     AT: '#0266CA',
@@ -21,8 +16,7 @@ export default function pcBetweenSamples(rawData, args) {
     TG: '#CB98FD',
     TT: '#4C0299',
   };
-<<<<<<< Updated upstream
-=======
+
   const dbsdata = ['AC', 'AT', 'CC', 'CG', 'CT', 'GC', 'TA', 'TC', 'TG', 'TT'];
 
   const samples = args.sample.split(',');
@@ -367,6 +361,7 @@ export default function pcBetweenSamples(rawData, args) {
     textangle: -90,
     showarrow: false,
   };
+
   const layout = {
     height: 700,
     hoverlabel: { bgcolor: '#FFF' },
@@ -404,7 +399,7 @@ export default function pcBetweenSamples(rawData, args) {
     },
     yaxis2: {
       autorange: false,
-      range: [0, maxMutations * 1.3],
+      range: [0, maxMutations * 1.2],
       linecolor: '#D3D3D3',
       linewidth: 1,
       ticks: '',
@@ -416,7 +411,8 @@ export default function pcBetweenSamples(rawData, args) {
     },
     yaxis3: {
       autorange: false,
-      range: [0, maxMutations * 1.3],
+      range: [0, maxMutations * 1.2],
+
       linecolor: '#D3D3D3',
       linewidth: 1,
       ticks: '',
@@ -445,5 +441,4 @@ export default function pcBetweenSamples(rawData, args) {
   };
 
   return { traces, layout };
->>>>>>> Stashed changes
 }

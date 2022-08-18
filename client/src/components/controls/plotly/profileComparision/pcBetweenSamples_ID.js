@@ -152,7 +152,6 @@ export default function pcBetweenSamples(rawData, args) {
       }))
     )
     .flat();
-  console.log(indelNames);
 
   const trace1 = sample1data.map((group, groupIndex, array) => ({
     name: group.mutation,
@@ -417,7 +416,7 @@ export default function pcBetweenSamples(rawData, args) {
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     height: 700,
-    title: '<b>RSS = ' + rss + '; Cosine Sumularity =' + cosine + '</b>',
+    title: '<b>RSS = ' + rss + '; Cosine Simularity =' + cosine + '</b>',
     grid: {
       rows: 3,
       column: 1,
@@ -448,7 +447,7 @@ export default function pcBetweenSamples(rawData, args) {
     },
     yaxis2: {
       autorange: false,
-      range: [0, maxMutations * 1.3],
+      range: [0, maxMutations * 1.2],
       linecolor: '#D3D3D3',
       linewidth: 1,
       ticks: '',
@@ -460,7 +459,7 @@ export default function pcBetweenSamples(rawData, args) {
     },
     yaxis3: {
       autorange: false,
-      range: [0, maxMutations * 1.3],
+      range: [0, maxMutations * 1.2],
       linecolor: '#D3D3D3',
       linewidth: 1,
       ticks: '',
