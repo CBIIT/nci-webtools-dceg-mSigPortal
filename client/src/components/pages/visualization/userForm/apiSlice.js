@@ -16,7 +16,7 @@ export const userFormApiSlice = visualizationApiSlice.injectEndpoints({
         body: data,
       }),
     }),
-    visualizationUser: builder.mutation({
+    profilerExtraction: builder.mutation({
       query: (data) => ({
         url: 'profilerExtraction',
         method: 'POST',
@@ -41,11 +41,18 @@ export const userFormApiSlice = visualizationApiSlice.injectEndpoints({
         return { ...data, svgList, matrixList };
       },
     }),
+    userMatrix: builder.mutation({
+      query: (params) => ({
+        url: 'seqmatrixOptions',
+        params,
+      }),
+    }),
   }),
 });
 
 export const {
   useVisualizationUserUploadMutation,
   useSubmitQueueMutation,
-  useVisualizationUserMutation,
+  useProfilerExtractionMutation,
+  useUserMatrixMutation,
 } = userFormApiSlice;

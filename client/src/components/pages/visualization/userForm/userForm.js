@@ -18,7 +18,8 @@ import { resetVisualizationApi } from '../../../../services/store/rootApi';
 import {
   useVisualizationUserUploadMutation,
   useSubmitQueueMutation,
-  useVisualizationUserMutation,
+  useProfilerExtractionMutation,
+  useUserMatrixMutation,
 } from './apiSlice';
 
 const actions = { ...visualizationActions, ...modalActions };
@@ -45,7 +46,8 @@ export default function UserForm() {
     useVisualizationUserUploadMutation();
   const [handleSubmitQueue, { isLoading: isQueueing }] =
     useSubmitQueueMutation();
-  const [handleSubmitWeb, { isLoading }] = useVisualizationUserMutation();
+  const [profilerExtraction, { isLoading }] = useProfilerExtractionMutation();
+  const [fetchMatrix, { isLoading: loadingMatrix }] = useUserMatrixMutation();
 
   const formatOptions = [
     { label: 'VCF', value: 'vcf', example: 'demo_input_multi.vcf.gz' },
@@ -171,9 +173,12 @@ export default function UserForm() {
   async function submitWeb(args) {
     try {
       mergeMain({ loading: { active: true } });
-      const { stdout, stderr, ...rest } = await handleSubmitWeb(args).unwrap();
+      const { stdout, stderr, ...rest } = await profilerExtraction(
+        args
+      ).unwrap();
+      const matrixData = await fetchMatrix({ userId: projectID }).unwrap();
 
-      mergeMain({ projectID, ...rest });
+      mergeMain({ projectID, matrixData, ...rest });
     } catch (error) {
       if (error.originalStatus == 504) {
         mergeMain({
