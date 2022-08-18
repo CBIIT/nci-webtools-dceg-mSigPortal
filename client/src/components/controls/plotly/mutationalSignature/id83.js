@@ -63,7 +63,7 @@ export default function ID83(unsortedData, sample) {
       }))
     )
     .flat();
-
+  console.log(indelNames);
   const traces = data.map((group, groupIndex, array) => ({
     name: group.indel,
     type: 'bar',

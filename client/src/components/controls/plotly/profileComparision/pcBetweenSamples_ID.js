@@ -3,12 +3,14 @@ import { groupBy } from 'lodash';
 export default function pcBetweenSamples(rawData, args) {
   console.log(rawData);
   console.log(args);
+  const samples = args.sample.split(',');
+
   const groupBySample = groupBy(rawData, 'sample');
-  console.log(groupBySample);
-  // const maxMutation = Math.max(
-  //   ...rawData.map((mutation) => mutation.data.map((e) => e.mutations)).flat()
-  // );
-  // console.log(maxMutation);
+  const sample1 = groupBySample[samples[0]].flat();
+  const sample2 = groupBySample[samples[1]].flat();
+  console.log(sample1);
+  console.log(sample2);
+
   const colors = {
     '1:Del:C': { shape: '#FBBD6F', text: 'black' },
     '1:Del:T': { shape: '#FE8002', text: 'white' },
@@ -27,4 +29,48 @@ export default function pcBetweenSamples(rawData, args) {
     '4:Del:M': { shape: '#8482BC', text: 'black' },
     '5:Del:M': { shape: '#62409A', text: 'white' },
   };
+
+  const groupByMutation1 = sample1.reduce((acc, e, i) => {
+    const mutationRegex = /^(.{7})/;
+    const mutation = e.mutationType.match(mutationRegex)[1];
+    acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
+    return acc;
+  }, {});
+
+  console.log(groupByMutation1);
+  const sample1data = Object.entries(groupByMutation1).map(
+    ([mutation, data]) => ({
+      mutation,
+      data,
+    })
+  );
+  console.log(sample1data);
+
+  const groupByMutation2 = sample2.reduce((acc, e, i) => {
+    const mutationRegex = /^(.{7})/;
+    const mutation = e.mutationType.match(mutationRegex)[1];
+    acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
+    return acc;
+  }, {});
+  console.log(groupByMutation2);
+  const sample2data = Object.entries(groupByMutation2).map(
+    ([mutation, data]) => ({
+      mutation,
+      data,
+    })
+  );
+  console.log(sample2data);
+  const indelNames = sample1data
+    .map((indel) =>
+      indel.data.map((e) => ({
+        indel: indel.indel,
+        index:
+          indel.indel.substring(2, 5) == 'Del'
+            ? +e.mutationType.slice(-1) + 1
+            : e.mutationType.slice(-1),
+        //index: e.mutationType.slice(-1),
+      }))
+    )
+    .flat();
+  console.log(indelNames);
 }
