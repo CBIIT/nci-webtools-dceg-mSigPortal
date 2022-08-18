@@ -14,38 +14,6 @@ export default function pcBetweenSamples(rawData, args) {
   const sample1 = groupBySample[samples[0]].flat();
   const sample2 = groupBySample[samples[1]].flat();
 
-  const totalMutations1_5 = sample1.reduce(
-    (a, b, i) => (i <= 5 ? a + b.mutations : a),
-    0
-  );
-  console.log(totalMutations1_5);
-
-  const sample1_5 = sample1.map((e, i) =>
-    i <= 5 ? e.mutations / totalMutations1_5 : 0
-  );
-  console.log(sample1_5);
-
-  const totalMutations2_5 = sample2.reduce(
-    (a, b, i) => (i <= 5 ? a + b.mutations : a),
-    0
-  );
-  console.log(totalMutations2_5);
-
-  const sample2_5 = sample2.map((e, i) =>
-    i <= 5 ? e.mutations / totalMutations2_5 : 0
-  );
-  console.log(sample2_5);
-
-  const diffNumber = (arr1, arr2) =>
-    arr1.map(function (num, idx) {
-      return num - arr2[idx];
-    });
-
-  const diff = diffNumber(sample1_5, sample2_5);
-  const sum_diff = diff.reduce((a, b, i) => (i <= 5 ? a + b : a), 0);
-  console.log(sum_diff);
-  const rss = sum_diff * sum_diff;
-
   const groupByMutation1 = sample1.reduce((acc, e, i) => {
     const mutationRegex = /\[(.*)\]/;
     const mutation = e.mutationType.match(mutationRegex)[1];
@@ -108,6 +76,8 @@ export default function pcBetweenSamples(rawData, args) {
   Object.keys(group2);
 
   let sampleDifferences = [];
+  let s1mutations = [];
+  let s2mutations = [];
 
   for (let mutationType of Object.keys(group1)) {
     const a = group1[mutationType][0];
@@ -116,6 +86,8 @@ export default function pcBetweenSamples(rawData, args) {
       a.mutations / totalMutations1 - b.mutations / totalMutations2;
     //const cancer = a.cancer;
     sampleDifferences.push({ mutationType, mutations });
+    s1mutations.push(a.mutations / totalMutations1);
+    s2mutations.push(b.mutations / totalMutations2);
   }
 
   const groupByMutation3 = groupBy(
@@ -129,6 +101,27 @@ export default function pcBetweenSamples(rawData, args) {
       data,
     })
   );
+
+  const squarediff = sampleDifferences.map((e) => Math.pow(e.mutations, 2));
+  const rss = squarediff.reduce((a, b, i) => a + b, 0).toExponential(3);
+
+  function dotp(x, y) {
+    function dotp_sum(a, b) {
+      return a + b;
+    }
+    function dotp_times(a, i) {
+      return x[i] * y[i];
+    }
+    return x.map(dotp_times).reduce(dotp_sum, 0);
+  }
+
+  function cosineSimilarity(A, B) {
+    var similarity =
+      dotp(A, B) / (Math.sqrt(dotp(A, A)) * Math.sqrt(dotp(B, B)));
+    return similarity;
+  }
+  const cosine = cosineSimilarity(s1mutations, s2mutations).toFixed(3);
+  console.log(cosine);
 
   const mutationTypeNames = sample1data
     .map((group) =>
@@ -345,6 +338,19 @@ export default function pcBetweenSamples(rawData, args) {
     font: { size: 16, color: 'white' },
     align: 'center',
   }));
+
+  const yTitleAnnotation = {
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'middle',
+    yanchor: 'middle',
+    align: 'center',
+    x: -0.055,
+    y: 0.5,
+    text: '<b>Relative contribution</b>',
+    textangle: -90,
+    showarrow: false,
+  };
   function formatTickLabel(mutation, mutationType) {
     const color = colors[mutation];
     const regex = /^(.)\[(.).{2}\](.)$/;
@@ -358,6 +364,7 @@ export default function pcBetweenSamples(rawData, args) {
       rows: 3,
       column: 1,
     },
+    title: '<b>RSS: ' + rss + ', Cosine Sumularity:' + cosine + '</b>',
     xaxis: {
       showline: true,
       tickangle: -90,
@@ -425,6 +432,7 @@ export default function pcBetweenSamples(rawData, args) {
       annotationLabelRight3,
       annotationLabelRight2,
       annotationLabelRight1,
+      yTitleAnnotation,
     ],
   };
 
