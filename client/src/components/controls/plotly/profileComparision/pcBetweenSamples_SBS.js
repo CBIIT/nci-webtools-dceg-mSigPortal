@@ -128,7 +128,6 @@ export default function pcBetweenSamples(rawData, args) {
       }))
     )
     .flat();
-  console.log(mutationTypeNames);
   const trace1 = sample1data.map((group, groupIndex, array) => ({
     name: group.mutation,
     type: 'bar',
@@ -177,7 +176,6 @@ export default function pcBetweenSamples(rawData, args) {
     hoverinfo: 'x+y',
     showlegend: false,
   }));
-  console.log(trace3);
   const traces = [...trace2, ...trace3, ...trace1];
 
   const shapeTop = sample1data.map((group, groupIndex, array) => ({
@@ -295,7 +293,6 @@ export default function pcBetweenSamples(rawData, args) {
     textangle: 90,
     showarrow: false,
   };
-  console.log(annotationLabelRight3);
 
   const annotationLabelRight2 = {
     xref: 'paper',
