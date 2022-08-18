@@ -60,17 +60,171 @@ export default function pcBetweenSamples(rawData, args) {
     })
   );
   console.log(sample2data);
+  // const indelNames = sample1data
+  //   .map((indel) =>
+  //     indel.mutation.substring(0, 5) === '2:Del' ||
+  //     indel.mutation.substring(0, 5) === '3:Del' ||
+  //     indel.mutation.substring(0, 5) === '4:Del'
+  //       ? indel.mutation.substring(0, 1)
+  //       : indel.mutation
+  //   )
+  //   .flat();
   const indelNames = sample1data
     .map((indel) =>
       indel.data.map((e) => ({
-        indel: indel.indel,
+        indel: e.mutationType,
         index:
-          indel.indel.substring(2, 5) == 'Del'
+          e.mutationType.substring(2, 5) === 'Del'
             ? +e.mutationType.slice(-1) + 1
             : e.mutationType.slice(-1),
-        //index: e.mutationType.slice(-1),
       }))
     )
     .flat();
+
   console.log(indelNames);
+  const xLabelAnnotation = indelNames.map((indel, index) => ({
+    xref: 'x',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
+    x: index,
+    y: -0.1,
+    text: '<b>' + indel.index + '</b>',
+    showarrow: false,
+    font: {
+      size: 12,
+    },
+    align: 'center',
+  }));
+  console.log(xLabelAnnotation);
+  console.log(sample1data);
+  const trace1 = sample1data.map((group, groupIndex, array) => ({
+    name: group.mutation,
+    type: 'bar',
+    marker: { color: colors[group.mutation].shape },
+    x: [...group.data.keys()].map(
+      (e) =>
+        e +
+        array
+          .slice(0, groupIndex)
+          .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
+    ),
+    y: group.data.map((e) => e.mutations),
+    groupdata: group.data,
+    customdata: group.data.map((e) => ({
+      mutationOrder: e.mutationType.substring(0, 1),
+      mutationType:
+        e.mutationType.substring(2, 5) === 'Del' ? 'Deletion' : 'Insertion',
+      extraValue: e.mutationType.substring(6, 7),
+      xval:
+        e.mutationType.substring(2, 5) === 'Del'
+          ? +e.mutationType.slice(-1) + 1
+          : e.mutationType.slice(-1),
+    })),
+    hovertemplate:
+      '<b>%{customdata.mutationOrder} bp %{customdata.mutationType}, %{customdata.extraValue}, %{customdata.xval}</b><br>' +
+      '%{y} indels<extra></extra>',
+    showlegend: false,
+    hoverinfo: 'x+y',
+    yaxis: 'y3',
+  }));
+  const trace2 = sample2data.map((group, groupIndex, array) => ({
+    name: group.mutation,
+    type: 'bar',
+    marker: { color: colors[group.mutation].shape },
+    x: [...group.data.keys()].map(
+      (e) =>
+        e +
+        array
+          .slice(0, groupIndex)
+          .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
+    ),
+    y: group.data.map((e) => e.mutations),
+    groupdata: group.data,
+    customdata: group.data.map((e) => ({
+      mutationOrder: e.mutationType.substring(0, 1),
+      mutationType:
+        e.mutationType.substring(2, 5) === 'Del' ? 'Deletion' : 'Insertion',
+      extraValue: e.mutationType.substring(6, 7),
+      xval:
+        e.mutationType.substring(2, 5) === 'Del'
+          ? +e.mutationType.slice(-1) + 1
+          : e.mutationType.slice(-1),
+    })),
+    hovertemplate:
+      '<b>%{customdata.mutationOrder} bp %{customdata.mutationType}, %{customdata.extraValue}, %{customdata.xval}</b><br>' +
+      '%{y} indels<extra></extra>',
+    showlegend: false,
+    hoverinfo: 'x+y',
+    yaxis: 'y2',
+  }));
+  console.log(trace1);
+  const traces = [...trace1, ...trace2];
+  const layout = {
+    hoverlabel: { bgcolor: '#FFF' },
+    height: 500,
+    grid: {
+      rows: 3,
+      column: 1,
+    },
+    autosize: true,
+    xaxis: {
+      showticklabels: false,
+      showline: true,
+      tickfont: { size: 11 },
+      tickmode: 'array',
+      tickvals: indelNames.map((_, i) => i),
+      ticktext: indelNames.map((e) => e.index),
+      linecolor: 'black',
+      linewidth: 1,
+      mirror: 'all',
+    },
+    yaxis: {
+      autorange: true,
+      linecolor: '#D3D3D3',
+      linewidth: 1,
+      mirror: 'all',
+      tickfont: {
+        family: 'Arial',
+      },
+      showgrid: true,
+      gridcolor: '#F5F5F5',
+      domain: [0, 0.33],
+    },
+    yaxis2: {
+      autorange: true,
+      //range: [0, maxMutations * 1.3],
+      linecolor: '#D3D3D3',
+      linewidth: 1,
+      ticks: '',
+      mirror: 'all',
+      tickfont: {
+        family: 'Arial',
+      },
+      domain: [0.34, 0.66],
+    },
+    yaxis3: {
+      autorange: true,
+      //range: [0, maxMutations * 1.3],
+      linecolor: '#D3D3D3',
+      linewidth: 1,
+      ticks: '',
+      mirror: 'all',
+      tickfont: {
+        family: 'Arial',
+      },
+      domain: [0.67, 1],
+    },
+
+    //shapes: [...topShapes, ...bottomShapes],
+    annotations: [
+      //   ...shapeAnnotations,
+      ...xLabelAnnotation,
+      //   ...annotationsIDTopLabel,
+      //   ...annotationsIDBotLabel,
+      //   sampleAnnotation,
+    ],
+  };
+
+  return { traces, layout };
 }
