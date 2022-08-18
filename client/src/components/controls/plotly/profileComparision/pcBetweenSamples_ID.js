@@ -106,29 +106,31 @@ export default function pcBetweenSamples(rawData, args) {
       data,
     })
   );
-  const indelNames = sample1data
-    .map((indel) =>
-      indel.data.map((e) => ({
-        indel: e.mutationType,
+  const indelNames0 = sample1data.map((indel) =>
+    indel.data.map((e) => ({
+      indel: e.mutationType,
+      index:
+        e.mutationType.substring(2, 5) === 'Del' &&
+        e.mutationType.substring(2, 7) !== 'Del:M'
+          ? +e.mutationType.slice(-1) + 1
+          : e.mutationType.slice(-1),
+    }))
+  );
+  const indelNames = indelNames0
+    .map((e) =>
+      e.map((el, i) => ({
+        indel: el.indel,
         index:
-          e.mutationType.substring(2, 5) === 'Del' &&
-          e.mutationType.substring(2, 7) !== 'Del:M'
-            ? +e.mutationType.slice(-1) + 1
-            : e.mutationType.slice(-1),
+          i < e.length - 1
+            ? el.index
+            : e.length >= 5
+            ? el.index + '+'
+            : el.index,
+        length: e.length,
+        i: i,
       }))
     )
     .flat();
-  // const indelNames = indelNames0
-  //   .map((e) =>
-  //     e.map((el, i) => ({
-  //       indel: el.indel,
-  //       index: i < e.length - 1 ? el.index : el.index + '+',
-  //       length: e.length,
-  //       i: i,
-  //     }))
-  //   )
-  //   .flat();
-
   console.log(indelNames);
 
   const trace1 = sample1data.map((group, groupIndex, array) => ({
@@ -144,17 +146,16 @@ export default function pcBetweenSamples(rawData, args) {
     ),
     y: group.data.map((e) => e.mutations / totalMutations1),
     customdata: group.data.map((e) => ({
-      mutationOrder: e.mutationType.substring(0, 1),
-      mutationType: e.mutationType.substring(0, 5),
-      extraValue: e.mutationType.substring(6, 7),
+      mutationType: e.mutationType.substring(0, 7),
       xval:
-        e.mutationType.substring(2, 5) === 'Del'
+        e.mutationType.substring(2, 5) === 'Del' &&
+        e.mutationType.substring(2, 7) !== 'Del:M'
           ? +e.mutationType.slice(-1) + 1
           : e.mutationType.slice(-1),
     })),
 
     hovertemplate:
-      '<b>%{customdata.mutationType}, %{customdata.extraValue}, %{customdata.xval}</b><br>' +
+      '<b>%{customdata.mutationType}, %{customdata.xval}</b><br>' +
       '%{y}<extra></extra>',
     showlegend: false,
     hoverinfo: 'x+y',
@@ -173,17 +174,16 @@ export default function pcBetweenSamples(rawData, args) {
     ),
     y: group.data.map((e) => e.mutations / totalMutations2),
     customdata: group.data.map((e) => ({
-      mutationOrder: e.mutationType.substring(0, 1),
-      mutationType: e.mutationType.substring(0, 5),
-      extraValue: e.mutationType.substring(6, 7),
+      mutationType: e.mutationType.substring(0, 7),
       xval:
-        e.mutationType.substring(2, 5) === 'Del'
+        e.mutationType.substring(2, 5) === 'Del' &&
+        e.mutationType.substring(2, 7) !== 'Del:M'
           ? +e.mutationType.slice(-1) + 1
           : e.mutationType.slice(-1),
     })),
 
     hovertemplate:
-      '<b>%{customdata.mutationType}, %{customdata.extraValue}, %{customdata.xval}</b><br>' +
+      '<b>%{customdata.mutationType}, %{customdata.xval}</b><br>' +
       '%{y}<extra></extra>',
     showlegend: false,
     hoverinfo: 'x+y',
@@ -202,17 +202,16 @@ export default function pcBetweenSamples(rawData, args) {
     ),
     y: group.data.map((e) => e.mutations),
     customdata: group.data.map((e) => ({
-      mutationOrder: e.mutationType.substring(0, 1),
-      mutationType: e.mutationType.substring(0, 5),
-      extraValue: e.mutationType.substring(6, 7),
+      mutationType: e.mutationType.substring(0, 7),
       xval:
-        e.mutationType.substring(2, 5) === 'Del'
+        e.mutationType.substring(2, 5) === 'Del' &&
+        e.mutationType.substring(2, 7) !== 'Del:M'
           ? +e.mutationType.slice(-1) + 1
           : e.mutationType.slice(-1),
     })),
 
     hovertemplate:
-      '<b>%{customdata.mutationType}, %{customdata.extraValue}, %{customdata.xval}</b><br>' +
+      '<b>%{customdata.mutationType}, %{customdata.xval}</b><br>' +
       '%{y}<extra></extra>',
     showlegend: false,
     hoverinfo: 'x+y',
