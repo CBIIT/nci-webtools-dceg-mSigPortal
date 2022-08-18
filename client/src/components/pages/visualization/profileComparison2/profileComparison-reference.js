@@ -226,9 +226,13 @@ export default function PcReference() {
   return (
     <div>
       <p className="p-3 m-0">
-        Input a [Profile Type] and two sample names ([Sample Name 1], [Sample
-        Name 2]) to generate the mutational profile of each sample, as well as
-        the difference between the two mutational profiles.
+        Input a [Profile Type], [Sample Name], [Reference Signature Set], and
+        [Compare Signatures] parameter to generate the mutational profile of the
+        sample, the signature profile from the reference set, and the difference
+        between two mutational profiles. The [Compare Signatures] can be a
+        single reference signature name or a combined multiple reference
+        signature name with different contributions (see example below [Compare
+        Signatures]).
       </p>
 
       <hr />
