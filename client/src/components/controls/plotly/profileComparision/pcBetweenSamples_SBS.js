@@ -13,9 +13,8 @@ export default function pcBetweenSamples(rawData, args) {
   const groupBySample = groupBy(rawData, 'sample');
   const sample1 = groupBySample[samples[0]].flat();
   const sample2 = groupBySample[samples[1]].flat();
-
+  const mutationRegex = /\[(.*)\]/;
   const groupByMutation1 = sample1.reduce((acc, e, i) => {
-    const mutationRegex = /\[(.*)\]/;
     const mutation = e.mutationType.match(mutationRegex)[1];
     acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
     return acc;
@@ -29,7 +28,6 @@ export default function pcBetweenSamples(rawData, args) {
   );
 
   const groupByMutation2 = sample2.reduce((acc, e, i) => {
-    const mutationRegex = /\[(.*)\]/;
     const mutation = e.mutationType.match(mutationRegex)[1];
     acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
     return acc;
@@ -92,7 +90,7 @@ export default function pcBetweenSamples(rawData, args) {
 
   const groupByMutation3 = groupBy(
     sampleDifferences,
-    (s) => s.mutationType.match(/\[(.*)\]/)[1]
+    (s) => s.mutationType.match(mutationRegex)[1]
   );
 
   const sample3data = Object.entries(groupByMutation3).map(
@@ -262,6 +260,7 @@ export default function pcBetweenSamples(rawData, args) {
     x1: 1.02,
     y0: 0.67,
     y1: 1,
+    fillcolor: '#F0F0F0',
   };
   const shapeRight2 = {
     type: 'rect',
@@ -271,6 +270,7 @@ export default function pcBetweenSamples(rawData, args) {
     x1: 1.02,
     y0: 0.34,
     y1: 0.66,
+    fillcolor: '#F0F0F0',
   };
 
   const shapeRight1 = {
@@ -281,6 +281,7 @@ export default function pcBetweenSamples(rawData, args) {
     x1: 1.02,
     y0: 0,
     y1: 0.33,
+    fillcolor: '#F0F0F0',
   };
 
   const annotationLabelRight3 = {
@@ -345,7 +346,7 @@ export default function pcBetweenSamples(rawData, args) {
     xanchor: 'middle',
     yanchor: 'middle',
     align: 'center',
-    x: -0.055,
+    x: -0.051,
     y: 0.5,
     text: '<b>Relative contribution</b>',
     textangle: -90,
@@ -364,7 +365,7 @@ export default function pcBetweenSamples(rawData, args) {
       rows: 3,
       column: 1,
     },
-    title: '<b>RSS: ' + rss + ', Cosine Sumularity:' + cosine + '</b>',
+    title: '<b>RSS = ' + rss + '; Cosine Sumularity =' + cosine + '</b>',
     xaxis: {
       showline: true,
       tickangle: -90,

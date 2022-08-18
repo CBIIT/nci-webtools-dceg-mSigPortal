@@ -1,16 +1,10 @@
 import { groupBy } from 'lodash';
 
 export default function pcBetweenSamples(rawData, args) {
-  console.log(rawData);
-  console.log(args);
   const samples = args.sample.split(',');
-
   const groupBySample = groupBy(rawData, 'sample');
   const sample1 = groupBySample[samples[0]].flat();
   const sample2 = groupBySample[samples[1]].flat();
-  console.log(sample1);
-  console.log(sample2);
-
   const colors = {
     '1:Del:C': { shape: '#FBBD6F', text: 'black' },
     '1:Del:T': { shape: '#FE8002', text: 'white' },
@@ -29,25 +23,21 @@ export default function pcBetweenSamples(rawData, args) {
     '4:Del:M': { shape: '#8482BC', text: 'black' },
     '5:Del:M': { shape: '#62409A', text: 'white' },
   };
-
+  const mutationRegex = /^(.{7})/;
   const groupByMutation1 = sample1.reduce((acc, e, i) => {
-    const mutationRegex = /^(.{7})/;
     const mutation = e.mutationType.match(mutationRegex)[1];
     acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
     return acc;
   }, {});
 
-  console.log(groupByMutation1);
   const sample1data = Object.entries(groupByMutation1).map(
     ([mutation, data]) => ({
       mutation,
       data,
     })
   );
-  console.log(sample1data);
 
   const groupByMutation2 = sample2.reduce((acc, e, i) => {
-    const mutationRegex = /^(.{7})/;
     const mutation = e.mutationType.match(mutationRegex)[1];
     acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
     return acc;
@@ -59,16 +49,63 @@ export default function pcBetweenSamples(rawData, args) {
       data,
     })
   );
-  console.log(sample2data);
-  // const indelNames = sample1data
-  //   .map((indel) =>
-  //     indel.mutation.substring(0, 5) === '2:Del' ||
-  //     indel.mutation.substring(0, 5) === '3:Del' ||
-  //     indel.mutation.substring(0, 5) === '4:Del'
-  //       ? indel.mutation.substring(0, 1)
-  //       : indel.mutation
-  //   )
-  //   .flat();
+
+  const totalMutations1 = sample1data.reduce(
+    (total, mutation) =>
+      total +
+      mutation.data.reduce((mutationSum, e) => mutationSum + e.mutations, 0),
+    0
+  );
+  const maxMutation1 = Math.max(
+    ...sample1data
+      .map((mutation) =>
+        mutation.data.map((e) => e.mutations / totalMutations1)
+      )
+      .flat()
+  );
+
+  const totalMutations2 = sample2data.reduce(
+    (total, mutation) =>
+      total +
+      mutation.data.reduce((mutationSum, e) => mutationSum + e.mutations, 0),
+    0
+  );
+  const maxMutation2 = Math.max(
+    ...sample2data
+      .map((mutation) =>
+        mutation.data.map((e) => e.mutations / totalMutations2)
+      )
+      .flat()
+  );
+  const maxMutations = Math.max(maxMutation1, maxMutation2);
+  const group1 = groupBy(sample1, 'mutationType');
+  Object.keys(group1);
+  const group2 = groupBy(sample2, 'mutationType');
+  Object.keys(group2);
+
+  let sampleDifferences = [];
+  let s1mutations = [];
+  let s2mutations = [];
+
+  for (let mutationType of Object.keys(group1)) {
+    const a = group1[mutationType][0];
+    const b = group2[mutationType][0];
+    const mutations =
+      a.mutations / totalMutations1 - b.mutations / totalMutations2;
+    sampleDifferences.push({ mutationType, mutations });
+    s1mutations.push(a.mutations / totalMutations1);
+    s2mutations.push(b.mutations / totalMutations2);
+  }
+  const groupByMutation3 = groupBy(
+    sampleDifferences,
+    (s) => s.mutationType.match(mutationRegex)[1]
+  );
+  const sample3data = Object.entries(groupByMutation3).map(
+    ([mutation, data]) => ({
+      mutation,
+      data,
+    })
+  );
   const indelNames = sample1data
     .map((indel) =>
       indel.data.map((e) => ({
@@ -109,25 +146,25 @@ export default function pcBetweenSamples(rawData, args) {
           .slice(0, groupIndex)
           .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
     ),
-    y: group.data.map((e) => e.mutations),
-    groupdata: group.data,
+    y: group.data.map((e) => e.mutations / totalMutations1),
     customdata: group.data.map((e) => ({
       mutationOrder: e.mutationType.substring(0, 1),
-      mutationType:
-        e.mutationType.substring(2, 5) === 'Del' ? 'Deletion' : 'Insertion',
+      mutationType: e.mutationType.substring(0, 5),
       extraValue: e.mutationType.substring(6, 7),
       xval:
         e.mutationType.substring(2, 5) === 'Del'
           ? +e.mutationType.slice(-1) + 1
           : e.mutationType.slice(-1),
     })),
+
     hovertemplate:
-      '<b>%{customdata.mutationOrder} bp %{customdata.mutationType}, %{customdata.extraValue}, %{customdata.xval}</b><br>' +
-      '%{y} indels<extra></extra>',
+      '<b>%{customdata.mutationType}, %{customdata.extraValue}, %{customdata.xval}</b><br>' +
+      '%{y}<extra></extra>',
     showlegend: false,
     hoverinfo: 'x+y',
     yaxis: 'y3',
   }));
+  console.log(trace1);
   const trace2 = sample2data.map((group, groupIndex, array) => ({
     name: group.mutation,
     type: 'bar',
@@ -139,45 +176,250 @@ export default function pcBetweenSamples(rawData, args) {
           .slice(0, groupIndex)
           .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
     ),
-    y: group.data.map((e) => e.mutations),
-    groupdata: group.data,
+    y: group.data.map((e) => e.mutations / totalMutations2),
     customdata: group.data.map((e) => ({
       mutationOrder: e.mutationType.substring(0, 1),
-      mutationType:
-        e.mutationType.substring(2, 5) === 'Del' ? 'Deletion' : 'Insertion',
+      mutationType: e.mutationType.substring(0, 5),
       extraValue: e.mutationType.substring(6, 7),
       xval:
         e.mutationType.substring(2, 5) === 'Del'
           ? +e.mutationType.slice(-1) + 1
           : e.mutationType.slice(-1),
     })),
+
     hovertemplate:
-      '<b>%{customdata.mutationOrder} bp %{customdata.mutationType}, %{customdata.extraValue}, %{customdata.xval}</b><br>' +
-      '%{y} indels<extra></extra>',
+      '<b>%{customdata.mutationType}, %{customdata.extraValue}, %{customdata.xval}</b><br>' +
+      '%{y}<extra></extra>',
     showlegend: false,
     hoverinfo: 'x+y',
     yaxis: 'y2',
   }));
+  const trace3 = sample3data.map((group, groupIndex, array) => ({
+    name: group.mutation,
+    type: 'bar',
+    marker: { color: colors[group.mutation].shape },
+    x: [...group.data.keys()].map(
+      (e) =>
+        e +
+        array
+          .slice(0, groupIndex)
+          .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
+    ),
+    y: group.data.map((e) => e.mutations),
+    customdata: group.data.map((e) => ({
+      mutationOrder: e.mutationType.substring(0, 1),
+      mutationType: e.mutationType.substring(0, 5),
+      extraValue: e.mutationType.substring(6, 7),
+      xval:
+        e.mutationType.substring(2, 5) === 'Del'
+          ? +e.mutationType.slice(-1) + 1
+          : e.mutationType.slice(-1),
+    })),
+
+    hovertemplate:
+      '<b>%{customdata.mutationType}, %{customdata.extraValue}, %{customdata.xval}</b><br>' +
+      '%{y}<extra></extra>',
+    showlegend: false,
+    hoverinfo: 'x+y',
+  }));
   console.log(trace1);
-  const traces = [...trace1, ...trace2];
+  const traces = [...trace1, ...trace2, ...trace3];
+
+  const shapeTop = sample1data.map((group, groupIndex, array) => ({
+    type: 'rect',
+    xref: 'x',
+    yref: 'paper',
+    x0: array
+      .slice(0, groupIndex)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    x1: array
+      .slice(0, groupIndex + 1)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    y0: 1.0,
+    y1: 1.05,
+    fillcolor: colors[group.mutation].shape,
+    line: {
+      width: 1,
+    },
+  }));
+  console.log(shapeTop);
+
+  const shapeLine3 = sample1data.map((group, groupIndex, array) => ({
+    type: 'rect',
+    xref: 'x',
+    yref: 'paper',
+    x0: array
+      .slice(0, groupIndex)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    x1: array
+      .slice(0, groupIndex + 1)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    y0: 0.67,
+    y1: 1,
+
+    line: {
+      width: 1,
+    },
+  }));
+
+  const shapeLine2 = sample2data.map((group, groupIndex, array) => ({
+    type: 'rect',
+    xref: 'x',
+    yref: 'paper',
+    x0: array
+      .slice(0, groupIndex)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    x1: array
+      .slice(0, groupIndex + 1)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    y0: 0.34,
+    y1: 0.66,
+
+    line: {
+      width: 1,
+    },
+  }));
+
+  const shapeLine1 = sample3data.map((group, groupIndex, array) => ({
+    type: 'rect',
+    xref: 'x',
+    yref: 'paper',
+    x0: array
+      .slice(0, groupIndex)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    x1: array
+      .slice(0, groupIndex + 1)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    y0: 0.33,
+    y1: 0,
+
+    line: {
+      width: 1,
+    },
+  }));
+  const shapeRight3 = {
+    type: 'rect',
+    xref: 'paper',
+    yref: 'paper',
+    x0: 1,
+    x1: 1.02,
+    y0: 0.67,
+    y1: 1,
+    fillcolor: '#F0F0F0',
+  };
+  const shapeRight2 = {
+    type: 'rect',
+    xref: 'paper',
+    yref: 'paper',
+    x0: 1,
+    x1: 1.02,
+    y0: 0.34,
+    y1: 0.66,
+    fillcolor: '#F0F0F0',
+  };
+
+  const shapeRight1 = {
+    type: 'rect',
+    xref: 'paper',
+    yref: 'paper',
+    x0: 1,
+    x1: 1.02,
+    y0: 0,
+    y1: 0.33,
+    fillcolor: '#F0F0F0',
+  };
+
+  const annotationLabelRight3 = {
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'middle',
+    yanchor: 'middle',
+    align: 'center',
+    x: 1.0175,
+    y: 0.835,
+    text: samples[0],
+    textangle: 90,
+    showarrow: false,
+  };
+  console.log(annotationLabelRight3);
+
+  const annotationLabelRight2 = {
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'middle',
+    yanchor: 'middle',
+    align: 'center',
+    x: 1.0175,
+    y: 0.505,
+    text: samples[1],
+    textangle: 90,
+    showarrow: false,
+  };
+
+  const annotationLabelRight1 = {
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'middle',
+    yanchor: 'middle',
+    align: 'center',
+    x: 1.0175,
+    y: 0.165,
+    text: 'Difference',
+    textangle: 90,
+    showarrow: false,
+  };
+  const mutationAnnotation = sample1data.map((group, groupIndex, array) => ({
+    xref: 'x',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
+    x:
+      array
+        .slice(0, groupIndex)
+        .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
+      (group.data.length - 1) * 0.5,
+    y: 1.01,
+    text:
+      group.mutation.substring(0, 5) === '2:Del' ||
+      group.mutation.substring(0, 5) === '3:Del' ||
+      group.mutation.substring(0, 5) === '4:Del'
+        ? group.mutation.substring(0, 1)
+        : group.mutation,
+    showarrow: false,
+    font: { color: 'white' },
+    align: 'center',
+  }));
+
+  const yTitleAnnotation = {
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'middle',
+    yanchor: 'middle',
+    align: 'center',
+    x: -0.051,
+    y: 0.5,
+    text: '<b>Relative contribution</b>',
+    textangle: -90,
+    showarrow: false,
+  };
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
-    height: 500,
+    height: 700,
     grid: {
       rows: 3,
       column: 1,
     },
     autosize: true,
     xaxis: {
-      showticklabels: false,
+      showticklabels: true,
       showline: true,
       tickfont: { size: 11 },
       tickmode: 'array',
       tickvals: indelNames.map((_, i) => i),
       ticktext: indelNames.map((e) => e.index),
+      tickangle: -90,
       linecolor: 'black',
       linewidth: 1,
-      mirror: 'all',
     },
     yaxis: {
       autorange: true,
@@ -192,8 +434,8 @@ export default function pcBetweenSamples(rawData, args) {
       domain: [0, 0.33],
     },
     yaxis2: {
-      autorange: true,
-      //range: [0, maxMutations * 1.3],
+      autorange: false,
+      range: [0, maxMutations * 1.3],
       linecolor: '#D3D3D3',
       linewidth: 1,
       ticks: '',
@@ -204,8 +446,8 @@ export default function pcBetweenSamples(rawData, args) {
       domain: [0.34, 0.66],
     },
     yaxis3: {
-      autorange: true,
-      //range: [0, maxMutations * 1.3],
+      autorange: false,
+      range: [0, maxMutations * 1.3],
       linecolor: '#D3D3D3',
       linewidth: 1,
       ticks: '',
@@ -216,13 +458,22 @@ export default function pcBetweenSamples(rawData, args) {
       domain: [0.67, 1],
     },
 
-    //shapes: [...topShapes, ...bottomShapes],
+    shapes: [
+      ...shapeTop,
+      shapeRight3,
+      shapeRight2,
+      shapeRight1,
+      ...shapeLine3,
+      ...shapeLine2,
+      ...shapeLine1,
+    ],
     annotations: [
-      //   ...shapeAnnotations,
-      ...xLabelAnnotation,
-      //   ...annotationsIDTopLabel,
-      //   ...annotationsIDBotLabel,
-      //   sampleAnnotation,
+      ...mutationAnnotation,
+      annotationLabelRight3,
+      annotationLabelRight2,
+      annotationLabelRight1,
+      yTitleAnnotation,
+      //...xLabelAnnotation,
     ],
   };
 
