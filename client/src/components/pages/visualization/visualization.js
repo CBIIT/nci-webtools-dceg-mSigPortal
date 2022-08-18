@@ -350,8 +350,7 @@ export default function Visualization({ match }) {
     {
       name: 'Mutational Profiles',
       id: 'mutationalProfiles',
-      component:
-        source == 'user' ? <MutationalProfiles /> : <MutationalProfiles2 />,
+      component: <MutationalProfiles2 />,
     },
     {
       name: 'Tree and Leaf',

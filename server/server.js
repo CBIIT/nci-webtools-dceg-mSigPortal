@@ -24,6 +24,14 @@ function createApp(config) {
       connection: config.database,
     });
   }
+  app.locals.sqlite = (userId, db) =>
+    knex({
+      client: 'better-sqlite3',
+      connection: () => ({
+        filename: path.join(config.results.folder, userId, `${db}.sqlite3`),
+      }),
+      useNullAsDefault: true,
+    });
 
   app.use(apiRouter);
   // app.use(express.static(config.server.static));

@@ -9,15 +9,11 @@ export function ErrorModal(props) {
   const dispatch = useDispatch();
   const mergeError = (state) => dispatch(actions.mergeModal({ error: state }));
 
-  const error = useSelector((state) => state.modal['error']);
+  const { visible, message } = useSelector((state) => state.modal.error);
   const closeErrorModal = () => mergeError({ visible: false });
 
   return (
-    <Modal
-      data-testid="ErrorModal"
-      show={error.visible}
-      onHide={closeErrorModal}
-    >
+    <Modal show={visible} onHide={closeErrorModal}>
       <Modal.Header style={{ backgroundColor: '#d32f2f' }}>
         <Modal.Title className="d-flex justify-content-center w-100">
           <FontAwesomeIcon
@@ -29,16 +25,15 @@ export function ErrorModal(props) {
       </Modal.Header>
 
       <Modal.Body style={{ backgroundColor: '#fafafa' }}>
-        <p
-          className="w-100"
-          data-testid="ErrorModalMessage"
-          dangerouslySetInnerHTML={{ __html: error.message }}
-        />
+        <div className="w-100">{message}</div>
+        <br />
         <p>
           An error has occured. If the issue persists, please contact an admin
-          for assistance.
+          for assistance.{' '}
+          <a href="mailto:mSigPortalWebAdmin@mail.nih.gov">
+            mSigPortalWebAdmin@mail.nih.gov
+          </a>
         </p>
-        <p>NCImSigPortalWebAdmin@mail.nih.gov</p>
       </Modal.Body>
 
       <Modal.Footer
