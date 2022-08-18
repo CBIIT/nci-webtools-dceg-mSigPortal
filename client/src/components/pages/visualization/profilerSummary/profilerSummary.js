@@ -10,6 +10,7 @@ import cloneDeep from 'lodash/cloneDeep';
 export default function ProfilerSummary() {
   const store = useSelector((state) => state.visualization);
   const publicForm = store.publicForm;
+  const { source, projectID } = store.main;
 
   const [params, setParams] = useState();
 
@@ -18,14 +19,15 @@ export default function ProfilerSummary() {
   });
 
   useEffect(() => {
-    if (publicForm.study) {
+    if (projectID) {
       setParams({
         study: publicForm.study.value,
         cancer: publicForm.cancer.value,
         strategy: publicForm.strategy.value,
+        ...(source == 'user' && { userId: projectID }),
       });
     }
-  }, [publicForm]);
+  }, [projectID]);
 
   return (
     <div className="bg-white border rounded">
