@@ -8,6 +8,9 @@ const {
   router: visualizationRoutes,
 } = require('../services/api/visualization/visualization');
 const {
+  router: userVisualizationRoutes,
+} = require('../services/api/visualization/userVisualization');
+const {
   router: explorationRoutes,
 } = require('../services/api/exploration/exploration');
 const {
@@ -35,6 +38,7 @@ router.use(
 
 router.use(analysisRoutes);
 router.use(visualizationRoutes);
+router.use(userVisualizationRoutes);
 router.use(signatureRoutes);
 router.use(explorationRoutes);
 router.use(associationRoutes);
@@ -44,7 +48,7 @@ router.use(patternRoutes);
 
 router.use((error, req, res, next) => {
   logger.error(error);
-  res.status(500).json(error);
+  res.status(500).json([error.message]);
 });
 
 module.exports = router;

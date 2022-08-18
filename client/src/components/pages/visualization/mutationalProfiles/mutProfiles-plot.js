@@ -15,13 +15,14 @@ export default function MutProfilePlot() {
 
   const { sample, profile, matrix } = store.mutationalProfiles;
   const { study, cancer, strategy } = store.publicForm;
-  const { source } = store.main;
+  const { source, projectID } = store.main;
 
   const [params, setParams] = useState(null);
 
   const { data, error, isFetching } = useMutationalProfilesQuery(params, {
     skip: !params,
   });
+  console.log(store.main);
 
   // get data on form change
   useEffect(() => {
@@ -30,6 +31,7 @@ export default function MutProfilePlot() {
         study: study.value,
         cancer: cancer.value,
         strategy: strategy.value,
+        userId: source == 'user' ? projectID : null,
         sample: sample.value,
         profile: profile.value,
         matrix: matrix.value,

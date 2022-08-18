@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { v4: uuidv4 } = require('uuid');
+
 const {
   getSeqmatrixData,
   getSeqmatrixOptions,
@@ -8,13 +8,16 @@ const {
 
 async function querySeqmatrix(req, res, next) {
   try {
-    const { limit, offset, rowMode, ...query } = req.query;
+    const { limit, offset, rowMode, userId, ...query } = req.query;
     const { study, cancer, strategy } = query;
-    if (!study || !cancer || !strategy) {
+    if (!userId && (!study || !cancer || !strategy)) {
       throw 'Missing one or more of the following parameters: study, cancer, strategy';
     }
 
-    const connection = req.app.locals.connection;
+    const connection = userId
+      ? req.app.locals.sqlite(userId, 'visualization')
+      : req.app.locals.connection;
+
     const columns = '*';
     const data = await getSeqmatrixData(
       connection,
@@ -33,12 +36,20 @@ async function querySeqmatrix(req, res, next) {
 // query public seqmatrix data for visualization tab
 async function seqmatrixOptions(req, res, next) {
   try {
-    const { limit, offset, ...query } = req.query;
-    const connection = req.app.locals.connection;
+    const { limit, offset, userId, ...query } = req.query;
+
+    const connection = userId
+      ? req.app.locals.sqlite(userId, 'visualization')
+      : req.app.locals.connection;
 
     const columns = '*';
-    const data = await getSeqmatrixOptions(connection, query, columns, limit, offset);
-    const projectID = uuidv4();
+    const data = await getSeqmatrixOptions(
+      connection,
+      query,
+      columns,
+      limit,
+      offset
+    );
 
     res.json(data);
   } catch (error) {
@@ -48,13 +59,16 @@ async function seqmatrixOptions(req, res, next) {
 
 async function seqmatrixSummary(req, res, next) {
   try {
-    const { limit, offset, rowMode, ...query } = req.query;
+    const { limit, offset, rowMode, userId, ...query } = req.query;
     const { study, cancer, strategy } = query;
-    if (!study || !cancer || !strategy) {
+    if (!userId && (!study || !cancer || !strategy)) {
       throw 'Missing one or more of the following parameters: study, cancer, strategy';
     }
 
-    const connection = req.app.locals.connection;
+    const connection = userId
+      ? req.app.locals.sqlite(userId, 'visualization')
+      : req.app.locals.connection;
+
     const columns = '*';
     const data = await getSeqmatrixSummary(
       connection,
