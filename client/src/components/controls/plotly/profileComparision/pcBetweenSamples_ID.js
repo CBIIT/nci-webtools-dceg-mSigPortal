@@ -1,3 +1,4 @@
+import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import { groupBy } from 'lodash';
 
 export default function pcBetweenSamples(rawData, args) {
@@ -42,7 +43,6 @@ export default function pcBetweenSamples(rawData, args) {
     acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
     return acc;
   }, {});
-  console.log(groupByMutation2);
   const sample2data = Object.entries(groupByMutation2).map(
     ([mutation, data]) => ({
       mutation,
@@ -111,30 +111,26 @@ export default function pcBetweenSamples(rawData, args) {
       indel.data.map((e) => ({
         indel: e.mutationType,
         index:
-          e.mutationType.substring(2, 5) === 'Del'
+          e.mutationType.substring(2, 5) === 'Del' &&
+          e.mutationType.substring(2, 7) !== 'Del:M'
             ? +e.mutationType.slice(-1) + 1
             : e.mutationType.slice(-1),
       }))
     )
     .flat();
+  // const indelNames = indelNames0
+  //   .map((e) =>
+  //     e.map((el, i) => ({
+  //       indel: el.indel,
+  //       index: i < e.length - 1 ? el.index : el.index + '+',
+  //       length: e.length,
+  //       i: i,
+  //     }))
+  //   )
+  //   .flat();
 
   console.log(indelNames);
-  const xLabelAnnotation = indelNames.map((indel, index) => ({
-    xref: 'x',
-    yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'bottom',
-    x: index,
-    y: -0.1,
-    text: '<b>' + indel.index + '</b>',
-    showarrow: false,
-    font: {
-      size: 12,
-    },
-    align: 'center',
-  }));
-  console.log(xLabelAnnotation);
-  console.log(sample1data);
+
   const trace1 = sample1data.map((group, groupIndex, array) => ({
     name: group.mutation,
     type: 'bar',
@@ -164,7 +160,6 @@ export default function pcBetweenSamples(rawData, args) {
     hoverinfo: 'x+y',
     yaxis: 'y3',
   }));
-  console.log(trace1);
   const trace2 = sample2data.map((group, groupIndex, array) => ({
     name: group.mutation,
     type: 'bar',
@@ -222,7 +217,6 @@ export default function pcBetweenSamples(rawData, args) {
     showlegend: false,
     hoverinfo: 'x+y',
   }));
-  console.log(trace1);
   const traces = [...trace1, ...trace2, ...trace3];
 
   const shapeTop = sample1data.map((group, groupIndex, array) => ({
@@ -242,7 +236,6 @@ export default function pcBetweenSamples(rawData, args) {
       width: 1,
     },
   }));
-  console.log(shapeTop);
 
   const shapeLine3 = sample1data.map((group, groupIndex, array) => ({
     type: 'rect',
@@ -341,7 +334,6 @@ export default function pcBetweenSamples(rawData, args) {
     textangle: 90,
     showarrow: false,
   };
-  console.log(annotationLabelRight3);
 
   const annotationLabelRight2 = {
     xref: 'paper',
