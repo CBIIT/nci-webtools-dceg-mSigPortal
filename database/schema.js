@@ -272,6 +272,7 @@ export const schema = [
       table.string("category");
       table.string("etiology");
       table.string("tissueSpecificSignature");
+      table.text("tissueDistribution");
       table.string("refSignature");
       table.string("refSignatureProportion");
       table.string("treatment");
@@ -289,6 +290,7 @@ export const schema = [
       table.string("sourceUrl");
       table.text("description");
       table.text("descriptionStrandBias");
+      table.text("genomeBuild");
     },
     index: (table) => {
       table.index(["category"]);
