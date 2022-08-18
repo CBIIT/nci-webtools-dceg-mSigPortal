@@ -8,10 +8,9 @@ RUN dnf -y update \
     epel-release \
     glibc-langpack-en \
     && dnf config-manager --enable powertools \
-    && dnf -y module enable nodejs:13 \
+    && curl -fsSL https://rpm.nodesource.com/setup_16.x | bash - \
     && dnf -y install \
     cmake \
-    v8-devel \
     libjpeg-turbo-devel \
     openssl-devel \
     nodejs \
