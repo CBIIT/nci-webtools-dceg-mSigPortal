@@ -106,6 +106,27 @@ export default function pcBetweenSamples(rawData, args) {
       data,
     })
   );
+
+  const squarediff = sampleDifferences.map((e) => Math.pow(e.mutations, 2));
+  const rss = squarediff.reduce((a, b, i) => a + b, 0).toExponential(3);
+
+  function dotp(x, y) {
+    function dotp_sum(a, b) {
+      return a + b;
+    }
+    function dotp_times(a, i) {
+      return x[i] * y[i];
+    }
+    return x.map(dotp_times).reduce(dotp_sum, 0);
+  }
+
+  function cosineSimilarity(A, B) {
+    var similarity =
+      dotp(A, B) / (Math.sqrt(dotp(A, A)) * Math.sqrt(dotp(B, B)));
+    return similarity;
+  }
+  const cosine = cosineSimilarity(s1mutations, s2mutations).toFixed(3);
+
   const indelNames0 = sample1data.map((indel) =>
     indel.data.map((e) => ({
       indel: e.mutationType,
@@ -396,6 +417,7 @@ export default function pcBetweenSamples(rawData, args) {
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     height: 700,
+    title: '<b>RSS = ' + rss + '; Cosine Sumularity =' + cosine + '</b>',
     grid: {
       rows: 3,
       column: 1,

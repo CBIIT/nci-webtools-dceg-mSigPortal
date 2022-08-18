@@ -119,7 +119,6 @@ export default function pcBetweenSamples(rawData, args) {
     return similarity;
   }
   const cosine = cosineSimilarity(s1mutations, s2mutations).toFixed(3);
-  console.log(cosine);
 
   const mutationTypeNames = sample1data
     .map((group) =>
@@ -365,7 +364,7 @@ export default function pcBetweenSamples(rawData, args) {
       rows: 3,
       column: 1,
     },
-    title: '<b>RSS = ' + rss + '; Cosine Sumularity =' + cosine + '</b>',
+    title: '<b>RSS = ' + rss + '; Cosine Simularity =' + cosine + '</b>',
     xaxis: {
       showline: true,
       tickangle: -90,
