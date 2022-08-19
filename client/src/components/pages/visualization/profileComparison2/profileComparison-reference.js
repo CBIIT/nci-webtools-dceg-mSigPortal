@@ -37,7 +37,12 @@ export default function PcReference() {
   const { study, cancer, strategy } = store.publicForm;
   const { source, matrixData, svgList, matrixList, projectID } = store.main;
   const { referenceForm } = store.profileComparison;
-
+  console.log('study:');
+  console.log(study);
+  console.log('cancer:');
+  console.log(cancer);
+  console.log('strategy');
+  console.log(strategy);
   // main form
   const {
     control,
@@ -84,6 +89,10 @@ export default function PcReference() {
     { skip: !calculationQuery }
   );
 
+  console.log('data1');
+  console.log(data1);
+  console.log('data2');
+  console.log(data2);
   const data = { ...data1, ...data2 };
   console.log(data);
 
@@ -149,11 +158,14 @@ export default function PcReference() {
     mergeForm(data);
 
     const { profile, sample, signatureSet, compare } = data;
-    const params =
+    const params1 =
       source == 'user'
         ? {
             fn: 'profileComparisonRefSig',
             args: {
+              study: study.value,
+              cancer: cancer.value,
+              strategy: strategy.value,
               profileType: profile.value,
               sampleName: sample.value,
               signatureSet: signatureSet.value,
@@ -169,17 +181,60 @@ export default function PcReference() {
         : {
             fn: 'profileComparisonRefSigPublic',
             args: {
+              study: study.value,
+              cancer: cancer.value,
+              strategy: strategy.value,
+              profile: profile.value,
+              sample: sample.value,
+              matrix:
+                data.profile.value === 'SBS'
+                  ? '96'
+                  : data.profile.value === 'DBS'
+                  ? '78'
+                  : '83',
+            },
+            projectID,
+          };
+    const params2 =
+      source == 'user'
+        ? {
+            fn: 'profileComparisonRefSig',
+            args: {
+              study: study.value,
+              cancer: cancer.value,
+              strategy: strategy.value,
               profileType: profile.value,
               sampleName: sample.value,
               signatureSet: signatureSet.value,
               compare: compare,
+              matrixFile: matrixList.filter(
+                (e) =>
+                  e.profile == profile.value &&
+                  e.matrix == defaultMatrix(profile.value, ['96', '78', '83'])
+              )[0].Path,
+            },
+            projectID,
+          }
+        : {
+            fn: 'profileComparisonRefSigPublic',
+            args: {
               study: study.value,
-              cancerType: cancer.value,
-              experimentalStrategy: strategy.value,
+              cancer: cancer.value,
+              strategy: strategy.value,
+              profile: profile.value,
+              matrix:
+                data.profile.value === 'SBS'
+                  ? '96'
+                  : data.profile.value === 'DBS'
+                  ? '78'
+                  : '83',
+
+              signatureSetName: signatureSet.value,
+              signatureName: compare.value,
             },
             projectID,
           };
-    setCalculationQuery(params);
+    setCalculationQuery(params1, params2);
   }
 
   function handleProfile(e) {
