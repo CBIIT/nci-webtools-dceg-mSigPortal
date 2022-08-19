@@ -15,7 +15,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { actions } from '../../../../services/store/visualization';
 import {
-  useProfileComparisonReferenceQuery,
+  useProfileComparisonReference1Query,
+  useProfileComparisonReference2Query,
   usePcSignatureSetsQuery,
   usePcSignatureNamesQuery,
 } from './apiSlice';
@@ -74,10 +75,17 @@ export default function PcReference() {
     skip: !signatureNamesQuery,
   });
   //   calculate plot
-  const { data, error, isFetching } = useProfileComparisonReferenceQuery(
+  const { data1, error1, isFetching1 } = useProfileComparisonReference1Query(
     calculationQuery,
     { skip: !calculationQuery }
   );
+  const { data2, error2, isFetching2 } = useProfileComparisonReference2Query(
+    calculationQuery,
+    { skip: !calculationQuery }
+  );
+
+  const data = { ...data1, ...data2 };
+  console.log(data);
 
   // declare form Options
   const profileOptions = matrixData.length
@@ -236,7 +244,7 @@ export default function PcReference() {
       </p>
 
       <hr />
-      <LoadingOverlay active={isFetching} />
+      <LoadingOverlay active={isFetching1} />
       <Form className="p-3" onSubmit={handleSubmit(onSubmit)}>
         <Row>
           <Col lg="auto">
@@ -333,24 +341,24 @@ export default function PcReference() {
         )}
       </Form>
       <div id="pcReferencePlot">
-        {error && (
+        {error1 && (
           <>
             <hr />
             <div className="p-3">
               <p>An error has occured. Please verify your input.</p>
-              <p>{error.data}</p>
+              <p>{error1.data}</p>
             </div>
           </>
         )}
-        {data?.output.plotPath && (
+        {data && (
           <>
             <hr />
-            <SvgContainer
+            {/* <SvgContainer
               className="p-3"
               downloadName={data.output.plotPath.split('/').slice(-1)[0]}
               plotPath={'web/results/' + data.output.plotPath}
               txtPath={`web/results/${data.output.plotPath}`}
-            />
+            /> */}
             <div className="p-3">
               <p>
                 The plot above shows the mutational profiles of two selected

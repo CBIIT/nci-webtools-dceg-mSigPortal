@@ -4,13 +4,6 @@ import pcBetweenSamples_DBS from '../../../controls/plotly/profileComparision/pc
 import pcBetweenSamples_ID from '../../../controls/plotly/profileComparision/pcBetweenSamples_ID';
 export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    // profileComparisonWithin: builder.query({
-    //   query: (params) => ({
-    //     url: 'visualizationWrapper',
-    //     method: 'POST',
-    //     body: params,
-    //   }),
-    // }),
     profileComparisonWithin: builder.query({
       query: (params) => ({
         url: 'seqmatrix',
@@ -26,12 +19,27 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
         }
       },
     }),
-    profileComparisonReference: builder.query({
+    profileComparisonReference1: builder.query({
       query: (params) => ({
-        url: 'visualizationWrapper',
-        method: 'POST',
-        body: params,
+        url: 'seqmatrix',
+        params,
       }),
+      transformResponse: (data, meta, arg) => {
+        console.log(data);
+        console.log(arg);
+        return { ...data, arg };
+      },
+    }),
+    profileComparisonReference2: builder.query({
+      query: (params) => ({
+        url: 'signatrue',
+        params,
+      }),
+      transformResponse: (data, meta, arg) => {
+        console.log(data);
+        console.log(arg);
+        return { ...data, arg };
+      },
     }),
     profileComparisonPublic: builder.query({
       query: (params) => ({
@@ -61,7 +69,8 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
 
 export const {
   useProfileComparisonWithinQuery,
-  useProfileComparisonReferenceQuery,
+  useProfileComparisonReference1Query,
+  useProfileComparisonReference2Query,
   useProfileComparisonPublicQuery,
   usePcSignatureSetsQuery,
   usePcSignatureNamesQuery,
