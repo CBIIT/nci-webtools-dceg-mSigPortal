@@ -158,6 +158,7 @@ export default function PcReference() {
     mergeForm(data);
 
     const { profile, sample, signatureSet, compare } = data;
+    console.log(compare);
     const params1 =
       source == 'user'
         ? {
@@ -166,8 +167,8 @@ export default function PcReference() {
               study: study.value,
               cancer: cancer.value,
               strategy: strategy.value,
-              profileType: profile.value,
-              sampleName: sample.value,
+              profile: profile.value,
+              sample: sample.value,
               signatureSet: signatureSet.value,
               compare: compare,
               matrixFile: matrixList.filter(
@@ -204,7 +205,7 @@ export default function PcReference() {
               cancer: cancer.value,
               strategy: strategy.value,
               profileType: profile.value,
-              sampleName: sample.value,
+              sample: sample.value,
               signatureSet: signatureSet.value,
               compare: compare,
               matrixFile: matrixList.filter(
@@ -230,10 +231,12 @@ export default function PcReference() {
                   : '83',
 
               signatureSetName: signatureSet.value,
-              signatureName: compare.value,
+              signatureName: compare,
             },
             projectID,
           };
+    console.log(params1);
+    console.log(params2);
     setCalculationQuery(params1, params2);
   }
 
@@ -416,11 +419,11 @@ export default function PcReference() {
             /> */}
             <div className="p-3">
               <p>
-                The plot above shows the mutational profiles of two selected
-                samples, as well as the difference between them. The text at the
-                top of the plot indicates the profile similarity calculated
-                using Residual Sum of Squares (RSS) and cosine similarity
-                methods.
+                The plot above shows the mutational profiles of a selected
+                sample, the signature from the selected reference signature set,
+                and the difference between them. The text at the top of the plot
+                indicates the profile similarity calculated using Residual Sum
+                of Squares (RSS) and cosine similarity methods.
               </p>
               <p>
                 RSS measures the discrepancy between two mutational profiles.
