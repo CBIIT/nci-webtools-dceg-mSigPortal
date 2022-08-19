@@ -109,6 +109,38 @@ combinePatternFiles <- function(x) {
     )
 }
 
+combineEtiology <- function(x) {
+    x %>% rename(
+        study=Study,
+        strategy=Dataset,
+        cancer=Cancer_Type,
+        organ=Organ,
+        sample=Sample,
+        signatureSetName=Signature_set_name,
+        mutations=Total_Mutations,
+        cosineSimilarity=Cosine_similarity,
+        sampleSize=Sample_size,
+        signatureName=Signature_name,
+        exposure=Exposure,
+        burden=Burden,
+        signatureSize=Signature_Size
+    ) %>% select(
+        -Study_Name,
+        -Sample_Names
+    )
+}
+
+combineEtiologyOrgan <- function(x) {
+    x %>% rename(
+        signature=Signature,
+        cohort=Cohort,
+        organ=Organ,
+        prevalence=Prevalence,
+        organSpecificSignature="Organ-Specific Signature",
+        contribution=Contribution
+    ) 
+}
+
 datasets <- sapply(inputFiles, function(f) get(load(f)), simplify=F)
 combinedDatasets <- bind_rows(datasets, .id="filepath")
 processedDatasets <- do.call(processorFunction, list(x=combinedDatasets)) %>% select(-filepath)
