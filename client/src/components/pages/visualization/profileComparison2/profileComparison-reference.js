@@ -62,7 +62,8 @@ export default function PcReference() {
   });
   const { search } = watchSearch();
 
-  const [calculationQuery, setCalculationQuery] = useState('');
+  const [calculationQuery1, setCalculationQuery1] = useState('');
+  const [calculationQuery2, setCalculationQuery2] = useState('');
   const [signatureSetQuery, setSignatureSetQuery] = useState('');
   const [signatureNamesQuery, setSignatureNamesQuery] = useState('');
 
@@ -79,14 +80,16 @@ export default function PcReference() {
   } = usePcSignatureNamesQuery(signatureNamesQuery, {
     skip: !signatureNamesQuery,
   });
-  //   calculate plot
+  //   seqmatrix api
   const { data1, error1, isFetching1 } = useProfileComparisonReference1Query(
-    calculationQuery,
-    { skip: !calculationQuery }
+    calculationQuery1,
+    { skip: !calculationQuery1 }
   );
+
+  //signature api
   const { data2, error2, isFetching2 } = useProfileComparisonReference2Query(
-    calculationQuery,
-    { skip: !calculationQuery }
+    calculationQuery2,
+    { skip: !calculationQuery2 }
   );
 
   console.log('data1');
@@ -158,7 +161,6 @@ export default function PcReference() {
     mergeForm(data);
 
     const { profile, sample, signatureSet, compare } = data;
-    console.log(compare);
     const params1 =
       source == 'user'
         ? {
@@ -180,34 +182,28 @@ export default function PcReference() {
             projectID,
           }
         : {
-            fn: 'profileComparisonRefSigPublic',
-            args: {
-              study: study.value,
-              cancer: cancer.value,
-              strategy: strategy.value,
-              profile: profile.value,
-              sample: sample.value,
-              matrix:
-                data.profile.value === 'SBS'
-                  ? '96'
-                  : data.profile.value === 'DBS'
-                  ? '78'
-                  : '83',
-            },
-            projectID,
+            study: study.value,
+            cancer: cancer.value,
+            strategy: strategy.value,
+            profile: profile.value,
+            sample: sample.value,
+            matrix:
+              data.profile.value === 'SBS'
+                ? '96'
+                : data.profile.value === 'DBS'
+                ? '78'
+                : '83',
           };
     const params2 =
       source == 'user'
         ? {
             fn: 'profileComparisonRefSig',
             args: {
-              study: study.value,
-              cancer: cancer.value,
               strategy: strategy.value,
               profileType: profile.value,
               sample: sample.value,
-              signatureSet: signatureSet.value,
-              compare: compare,
+              signatureSetName: signatureSet.value,
+              signatureName: compare,
               matrixFile: matrixList.filter(
                 (e) =>
                   e.profile == profile.value &&
@@ -217,27 +213,21 @@ export default function PcReference() {
             projectID,
           }
         : {
-            fn: 'profileComparisonRefSigPublic',
-            args: {
-              study: study.value,
-              cancer: cancer.value,
-              strategy: strategy.value,
-              profile: profile.value,
-              matrix:
-                data.profile.value === 'SBS'
-                  ? '96'
-                  : data.profile.value === 'DBS'
-                  ? '78'
-                  : '83',
-
-              signatureSetName: signatureSet.value,
-              signatureName: compare,
-            },
-            projectID,
+            strategy: strategy.value,
+            profile: profile.value,
+            matrix:
+              data.profile.value === 'SBS'
+                ? '96'
+                : data.profile.value === 'DBS'
+                ? '78'
+                : '83',
+            signatureSetName: signatureSet.value,
+            signatureName: compare,
           };
     console.log(params1);
     console.log(params2);
-    setCalculationQuery(params1, params2);
+    setCalculationQuery1(params1);
+    setCalculationQuery2(params2);
   }
 
   function handleProfile(e) {
