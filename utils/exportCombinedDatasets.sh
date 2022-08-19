@@ -6,3 +6,5 @@ Rscript combineDatasets.R 'Exposure/exposure_refdata.RData' combineExposureFiles
 Rscript combineDatasets.R 'Seqmatrix/*_*_seqmatrix_refdata.RData' combineSeqmatrixFiles Seqmatrix/data.csv
 Rscript combineDatasets.R 'Signature/signature_refsets.RData' combineSignatureFiles Signature/data.csv
 Rscript combineDatasets.R 'Others/content_data_all.RData' combinePatternFiles Others/pattern.csv
+Rscript combineDatasets.R 'Etiology/aetiology_exposure.RData' combineEtiology Etiology/etiology.csv
+Rscript combineDatasets.R 'Etiology/aetiology_organ_specific_signature.RData' combineEtiologyOrgan Etiology/etiologyOrgan.csv
