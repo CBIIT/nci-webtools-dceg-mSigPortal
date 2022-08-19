@@ -1,6 +1,6 @@
 import { groupBy } from 'lodash';
 
-export default function pcBetweenSamples(rawData, args) {
+export default function pcBetweenSamples(samples, sample1, sample2) {
   const colors = {
     'C>A': '#03BCEE',
     'C>G': 'black',
@@ -9,10 +9,7 @@ export default function pcBetweenSamples(rawData, args) {
     'T>C': '#A1CE63',
     'T>G': '#EBC6C4',
   };
-  const samples = args.sample.split(',');
-  const groupBySample = groupBy(rawData, 'sample');
-  const sample1 = groupBySample[samples[0]].flat();
-  const sample2 = groupBySample[samples[1]].flat();
+
   const mutationRegex = /\[(.*)\]/;
   const groupByMutation1 = sample1.reduce((acc, e, i) => {
     const mutation = e.mutationType.match(mutationRegex)[1];

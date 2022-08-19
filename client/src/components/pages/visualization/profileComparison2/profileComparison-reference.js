@@ -81,23 +81,29 @@ export default function PcReference() {
     skip: !signatureNamesQuery,
   });
   //   seqmatrix api
-  const { data1, error1, isFetching1 } = useProfileComparisonReference1Query(
-    calculationQuery1,
-    { skip: !calculationQuery1 }
-  );
+  const {
+    data: data1,
+    error: error1,
+    isFetching: isFetching1,
+  } = useProfileComparisonReference1Query(calculationQuery1, {
+    skip: !calculationQuery1,
+  });
 
   //signature api
-  const { data2, error2, isFetching2 } = useProfileComparisonReference2Query(
-    calculationQuery2,
-    { skip: !calculationQuery2 }
-  );
-
-  console.log('data1');
-  console.log(data1);
-  console.log('data2');
-  console.log(data2);
-  const data = { ...data1, ...data2 };
-  console.log(data);
+  const {
+    data: data2,
+    error: error2,
+    isFetching: isFetching2,
+  } = useProfileComparisonReference2Query(calculationQuery2, {
+    skip: !calculationQuery2,
+  });
+  if ((data1 != null) & (data2 != null)) {
+    console.log('data1');
+    console.log(data1);
+    console.log('data2');
+    console.log(data2);
+    console.log(data1.arg);
+  }
 
   // declare form Options
   const profileOptions = matrixData.length
@@ -396,7 +402,7 @@ export default function PcReference() {
             </div>
           </>
         )}
-        {data && (
+        {data1 && data2 && (
           <>
             <hr />
             {/* <SvgContainer
