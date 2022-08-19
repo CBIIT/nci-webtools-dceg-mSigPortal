@@ -213,6 +213,7 @@ export default function PcReference() {
             projectID,
           }
         : {
+            source: 'Published_signature',
             strategy: strategy.value,
             profile: profile.value,
             matrix:
