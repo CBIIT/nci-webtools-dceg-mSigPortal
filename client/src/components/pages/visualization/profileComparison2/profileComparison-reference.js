@@ -213,7 +213,6 @@ export default function PcReference() {
             projectID,
           }
         : {
-            source: 'Published_signature',
             strategy: strategy.value,
             profile: profile.value,
             matrix:
@@ -225,8 +224,6 @@ export default function PcReference() {
             signatureSetName: signatureSet.value,
             signatureName: compare,
           };
-    console.log(params1);
-    console.log(params2);
     setCalculationQuery1(params1);
     setCalculationQuery2(params2);
   }

@@ -32,7 +32,7 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
     }),
     profileComparisonReference2: builder.query({
       query: (params) => ({
-        url: 'signatrue',
+        url: 'signature',
         params,
       }),
       transformResponse: (data, meta, arg) => {
