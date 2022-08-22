@@ -26,8 +26,7 @@ export const mutationalProfilesApiSlice = visualizationApiSlice.injectEndpoints(
           } else if (profileMatrix == 'SBS24') {
             return SBS24(data, sample);
           } else if (profileMatrix == 'SBS96') {
-            const transform = baseSubstitution(data, profileMatrix);
-            return SBS96(transform, sample);
+            return SBS96(data, args);
           } else if (profileMatrix == 'SBS192') {
             return SBS192(data, sample);
           } else if (profileMatrix == 'SBS288') {
@@ -37,13 +36,11 @@ export const mutationalProfilesApiSlice = visualizationApiSlice.injectEndpoints(
           } else if (profileMatrix == 'SBS1536') {
             return SBS1536(data, sample);
           } else if (profileMatrix == 'DBS78') {
-            const transform = baseSubstitution(data, profileMatrix);
-            return DBS78(transform, sample);
+            return DBS78(data, args);
           } else if (profileMatrix == 'DBS186') {
             return DBS186(data, sample);
           } else if (profileMatrix == 'ID83') {
-            const transform = indel(data, profileMatrix);
-            return ID83(transform, sample);
+            return ID83(data, args);
           } else if (profileMatrix == 'ID28') {
             return ID28(data, sample);
           } else if (profileMatrix == 'ID415') {
@@ -58,46 +55,3 @@ export const mutationalProfilesApiSlice = visualizationApiSlice.injectEndpoints(
 );
 
 export const { useMutationalProfilesQuery } = mutationalProfilesApiSlice;
-
-// organize seqmatrix data into a format suitable for graphing in plotly
-const regexMap = {
-  SBS24: /^.{2}(.*)$/,
-  SBS96: /\[(.*)\]/,
-  DBS78: /^(.{2})/,
-  ID83: /^(.{7})/,
-};
-
-// SBS/DBS
-export function baseSubstitution(data, profileMatrix) {
-  const groupByMutation = data.reduce((acc, e, i) => {
-    const mutationRegex = regexMap[profileMatrix];
-    const mutation = e.mutationType.match(mutationRegex)[1];
-
-    acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
-    return acc;
-  }, {});
-
-  const transform = Object.entries(groupByMutation).map(([mutation, data]) => ({
-    mutation,
-    data,
-  }));
-
-  return transform;
-}
-
-// ID
-export function indel(data, profileMatrix) {
-  const groupByIndel = data.reduce((acc, e, i) => {
-    const indel = e.mutationType.match(regexMap[profileMatrix])[1];
-
-    acc[indel] = acc[indel] ? [...acc[indel], e] : [e];
-    return acc;
-  }, {});
-
-  const transform = Object.entries(groupByIndel).map(([indel, data]) => ({
-    indel,
-    data,
-  }));
-
-  return transform;
-}

@@ -1,4 +1,4 @@
-export default function SBS96(data, sample) {
+export default function SBS96(rawData, args) {
   const colors = {
     'C>A': '#03BCEE',
     'C>G': 'black',
@@ -7,7 +7,21 @@ export default function SBS96(data, sample) {
     'T>C': '#A1CE63',
     'T>G': '#EBC6C4',
   };
-  console.log(data);
+  const { profile, matrix, sample } = args;
+
+  const groupByMutation = rawData.reduce((acc, e, i) => {
+    const mutationRegex = /\[(.*)\]/;
+    const mutation = e.mutationType.match(mutationRegex)[1];
+
+    acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
+    return acc;
+  }, {});
+
+  const data = Object.entries(groupByMutation).map(([mutation, data]) => ({
+    mutation,
+    data,
+  }));
+
   const totalMutations = data.reduce(
     (total, mutation) =>
       total +
