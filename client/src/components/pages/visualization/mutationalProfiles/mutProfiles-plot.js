@@ -1,9 +1,6 @@
 import { useEffect, useState } from 'react';
-import cloneDeep from 'lodash/cloneDeep';
-import { Button, Container, Row, Col } from 'react-bootstrap';
-import Plot from 'react-plotly.js';
-import { downloadImage } from 'plotly.js';
-import { saveAs } from 'file-saver';
+
+import Plotly from '../../../controls/plotly/plot/plot';
 import { useSelector } from 'react-redux';
 import { useMutationalProfilesQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -39,18 +36,6 @@ export default function MutProfilePlot() {
     }
   }, [sample, profile, matrix]);
 
-  const divId = 'mutationalProfilePlot';
-  const config = {
-    displayModeBar: true,
-    responsive: true,
-    displaylogo: false,
-    toImageButtonOptions: {
-      format: 'svg',
-      filename: sample?.value || 'Mutational Profile',
-      scale: 1,
-    },
-  };
-
   return (
     <>
       <LoadingOverlay active={isFetching} />
@@ -61,61 +46,13 @@ export default function MutProfilePlot() {
         </div>
       ) : (
         data && (
-          <Container fluid style={{ minHeight: '500px' }} className="mb-3">
-            <Row>
-              <Col>
-                <Plot
-                  className="w-100"
-                  divId={divId}
-                  data={cloneDeep(data.traces)}
-                  layout={cloneDeep(data.layout)}
-                  config={cloneDeep(config)}
-                  useResizeHandler
-                />
-              </Col>
-            </Row>
-            {/* <Row className="justify-content-center"> */}
-            {/* <Col sm="auto">
-                <Button
-                  onClick={() =>
-                    downloadImage(divId, {
-                      format: "png",
-                      filename: sample.value,
-                    })
-                  }
-                >
-                  Download PNG
-                </Button>
-              </Col>
-              <Col sm="auto">
-                <Button
-                  onClick={() =>
-                    downloadImage(divId, {
-                      format: "svg",
-                      filename: sample.value,
-                    })
-                  }
-                >
-                  Download SVG
-                </Button>
-              </Col> */}
-            <Row>
-              <Col sm="auto">
-                <Button
-                  onClick={() =>
-                    saveAs(
-                      new Blob([JSON.stringify(data)], {
-                        type: 'application/json',
-                      }),
-                      `${sample.value}.json`
-                    )
-                  }
-                >
-                  Download JSON
-                </Button>
-              </Col>
-            </Row>
-          </Container>
+          <Plotly
+            data={data.traces}
+            layout={data.layout}
+            config={data.config}
+            divId="mutationalProfilePlot"
+            filename={sample?.value || 'Mutational Profile'}
+          />
         )
       )}
     </>
