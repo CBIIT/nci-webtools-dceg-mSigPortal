@@ -22,7 +22,6 @@ export default function MutProfilePlot() {
   const { data, error, isFetching } = useMutationalProfilesQuery(params, {
     skip: !params,
   });
-  console.log(store.main);
 
   // get data on form change
   useEffect(() => {
