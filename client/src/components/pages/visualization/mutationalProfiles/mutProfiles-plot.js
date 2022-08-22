@@ -5,8 +5,6 @@ import { useSelector } from 'react-redux';
 import { useMutationalProfilesQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
-import './plot.scss';
-
 export default function MutProfilePlot() {
   const store = useSelector((state) => state.visualization);
 

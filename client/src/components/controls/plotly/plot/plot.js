@@ -4,6 +4,8 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
 import { saveAs } from 'file-saver';
 
+import './plot.scss';
+
 export default function Plotly({
   data,
   layout,
