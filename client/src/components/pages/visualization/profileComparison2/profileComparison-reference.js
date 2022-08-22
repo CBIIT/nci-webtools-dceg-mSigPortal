@@ -107,7 +107,11 @@ export default function PcReference() {
 
   // declare form Options
   const profileOptions = matrixData.length
-    ? [...new Set(matrixData.map((e) => e.profile))].map((e) => ({
+    ? [
+        ...new Set(
+          matrixData.map((e) => e.profile).sort((a, b) => b.localeCompare(a))
+        ),
+      ].map((e) => ({
         label: e,
         value: e,
       }))
@@ -155,6 +159,7 @@ export default function PcReference() {
             matrixData
               .filter((e) => e.profile == profile.value)
               .map((e) => e.sample)
+              .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
           ),
         ].map((e) => ({
           label: e,
