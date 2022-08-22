@@ -97,7 +97,7 @@ export default function Visualization({ match }) {
   // switch to first tab after fetching samples
   useEffect(() => {
     if (matrixData.length) {
-      mergeState({ displayTab: 'profilerSummary' });
+      mergeState({ displayTab: 'profilerSummary', openSidebar: false });
     }
   }, [matrixData]);
 
@@ -247,12 +247,12 @@ export default function Visualization({ match }) {
     });
 
     mergeState({
-      displayTab: 'profilerSummary',
+      // displayTab: 'profilerSummary',
       profileOptions: profileOptions,
       loading: {
         active: false,
       },
-      openSidebar: false,
+      // openSidebar: false,
     });
   }
 
@@ -302,8 +302,8 @@ export default function Visualization({ match }) {
     mergeState({
       loading: { active: false },
       submitted: true,
-      displayTab: 'profilerSummary',
-      openSidebar: false,
+      // displayTab: 'profilerSummary',
+      // openSidebar: false,
     });
   }
 
@@ -331,8 +331,8 @@ export default function Visualization({ match }) {
     mergeState({
       loading: { active: false },
       submitted: true,
-      displayTab: 'profilerSummary',
-      openSidebar: false,
+      // displayTab: 'profilerSummary',
+      // openSidebar: false,
     });
   }
 
