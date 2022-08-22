@@ -23,6 +23,7 @@ import {
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import { defaultMatrix } from '../../../../services/utils';
+import pcBetweenSamples_SBS from '../../../controls/plotly/profileComparision/pcBetweenSamples_SBS';
 
 export default function PcReference() {
   const dispatch = useDispatch();
@@ -103,6 +104,16 @@ export default function PcReference() {
     console.log('data2');
     console.log(data2);
     console.log(data1.arg);
+    console.log(data2.arg);
+    const compares = [data1.arg.sample, data2.arg.signatureName];
+    console.log(compares);
+    const dat1temp = Object.values(data1);
+    const sample1 = dat1temp.slice(0, dat1temp.length - 1);
+    console.log(sample1);
+    const dat2temp = Object.values(data2);
+    const sample2 = dat2temp.slice(0, dat2temp.length - 1);
+    console.log(sample2);
+    //pcBetweenSamples_SBS(compares);
   }
 
   // declare form Options
