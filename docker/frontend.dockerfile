@@ -1,4 +1,4 @@
-FROM ${FRONTEND_BASE_IMAGE:-quay.io/centos/centos:stream9}
+FROM ${FRONTEND_BASE_IMAGE:-quay.io/centos/centos:stream8}
 
 RUN dnf -y update \
     && dnf -y install \
