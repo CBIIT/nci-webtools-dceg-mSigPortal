@@ -1,7 +1,7 @@
 import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import { groupBy } from 'lodash';
 
-export default function pcBetweenSamples(samples, sample1, sample2) {
+export default function pcBetweenSamples_ID(samples, sample1, sample2) {
   const colors = {
     '1:Del:C': { shape: '#FBBD6F', text: 'black' },
     '1:Del:T': { shape: '#FE8002', text: 'white' },

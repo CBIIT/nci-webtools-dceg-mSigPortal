@@ -1,6 +1,11 @@
 import { groupBy } from 'lodash';
 
-export default function pcBetweenSamples(samples, sample1, sample2, tab) {
+export default function pcReferenceSignature_SBS(
+  samples,
+  sample1,
+  sample2,
+  tab
+) {
   const colors = {
     'C>A': '#03BCEE',
     'C>G': 'black',
@@ -9,7 +14,9 @@ export default function pcBetweenSamples(samples, sample1, sample2, tab) {
     'T>C': '#A1CE63',
     'T>G': '#EBC6C4',
   };
-
+  console.log(samples);
+  console.log(sample1);
+  console.log(sample2);
   const mutationRegex = /\[(.*)\]/;
   const groupByMutation1 = sample1.reduce((acc, e, i) => {
     const mutation = e.mutationType.match(mutationRegex)[1];
@@ -53,13 +60,13 @@ export default function pcBetweenSamples(samples, sample1, sample2, tab) {
   const totalMutations2 = sample2data.reduce(
     (total, mutation) =>
       total +
-      mutation.data.reduce((mutationSum, e) => mutationSum + e.mutations, 0),
+      mutation.data.reduce((mutationSum, e) => mutationSum + e.contribution, 0),
     0
   );
   const maxMutation2 = Math.max(
     ...sample2data
       .map((mutation) =>
-        mutation.data.map((e) => e.mutations / totalMutations2)
+        mutation.data.map((e) => e.contribution / totalMutations2)
       )
       .flat()
   );
@@ -78,12 +85,13 @@ export default function pcBetweenSamples(samples, sample1, sample2, tab) {
     const a = group1[mutationType][0];
     const b = group2[mutationType][0];
     const mutations =
-      a.mutations / totalMutations1 - b.mutations / totalMutations2;
+      a.mutations / totalMutations1 - b.contribution / totalMutations2;
     //const cancer = a.cancer;
     sampleDifferences.push({ mutationType, mutations });
     s1mutations.push(a.mutations / totalMutations1);
-    s2mutations.push(b.mutations / totalMutations2);
+    s2mutations.push(b.contribution / totalMutations2);
   }
+  console.log(sampleDifferences);
 
   const groupByMutation3 = groupBy(
     sampleDifferences,
@@ -97,6 +105,7 @@ export default function pcBetweenSamples(samples, sample1, sample2, tab) {
     })
   );
   console.log(sample3data);
+
   const squarediff = sampleDifferences.map((e) => Math.pow(e.mutations, 2));
   const rss = squarediff.reduce((a, b, i) => a + b, 0).toExponential(3);
 

@@ -17,11 +17,11 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
         const sample1 = groupBySample[samples[0]].flat();
         const sample2 = groupBySample[samples[1]].flat();
         if (arg.profile === 'SBS') {
-          return pcBetweenSamples_SBS(samples, sample1, sample2);
+          return pcBetweenSamples_SBS(samples, sample1, sample2, 'samples');
         } else if (arg.profile === 'DBS') {
-          return pcBetweenSamples_DBS(samples, sample1, sample2);
+          return pcBetweenSamples_DBS(samples, sample1, sample2, 'samples');
         } else {
-          return pcBetweenSamples_ID(samples, sample1, sample2);
+          return pcBetweenSamples_ID(samples, sample1, sample2, 'samples');
         }
       },
     }),

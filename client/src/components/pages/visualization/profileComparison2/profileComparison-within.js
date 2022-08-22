@@ -31,7 +31,6 @@ export default function PcWithin() {
   const { data, error, isFetching } = useProfileComparisonWithinQuery(params, {
     skip: !params,
   });
-
   function getSampleOptions(profile) {
     return matrixData && profile
       ? [
@@ -87,7 +86,7 @@ export default function PcWithin() {
           : '83',
       sample: data.sample1.value + ',' + data.sample2.value,
     };
-    console.log(params);
+    console.log(data);
     setParams(params);
   }
 

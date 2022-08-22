@@ -7,6 +7,7 @@ import {
   Popover,
   OverlayTrigger,
 } from 'react-bootstrap';
+import Plot from 'react-plotly.js';
 import Select from '../../../controls/select/selectForm';
 import { useForm, Controller } from 'react-hook-form';
 import { NavHashLink } from 'react-router-hash-link';
@@ -20,10 +21,13 @@ import {
   usePcSignatureSetsQuery,
   usePcSignatureNamesQuery,
 } from './apiSlice';
+import { cloneDeep } from 'lodash';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import { defaultMatrix } from '../../../../services/utils';
-import pcBetweenSamples_SBS from '../../../controls/plotly/profileComparision/pcBetweenSamples_SBS';
+import pcReferenceSignature_SBS from '../../../controls/plotly/profileComparision/pcReferenceSignature_SBS';
+import pcBetweenSamples_DBS from '../../../controls/plotly/profileComparision/pcBetweenSamples_DBS';
+import pcBetweenSamples_ID from '../../../controls/plotly/profileComparision/pcBetweenSamples_ID';
 
 export default function PcReference() {
   const dispatch = useDispatch();
@@ -98,6 +102,7 @@ export default function PcReference() {
   } = useProfileComparisonReference2Query(calculationQuery2, {
     skip: !calculationQuery2,
   });
+  let datatotal;
   if ((data1 != null) & (data2 != null)) {
     console.log('data1');
     console.log(data1);
@@ -113,7 +118,14 @@ export default function PcReference() {
     const dat2temp = Object.values(data2);
     const sample2 = dat2temp.slice(0, dat2temp.length - 1);
     console.log(sample2);
-    //pcBetweenSamples_SBS(compares);
+    datatotal = [sample1, sample2];
+    if (data1.arg.profile === 'SBS') {
+      pcReferenceSignature_SBS(compares, sample1, sample2, 'signatures');
+    } else if (data1.arg.profile === 'DBS') {
+      pcBetweenSamples_DBS(compares, sample1, sample2, 'signatures');
+    } else {
+      pcBetweenSamples_ID(compares, sample1, sample2, 'signatures');
+    }
   }
 
   // declare form Options
@@ -421,12 +433,14 @@ export default function PcReference() {
         {data1 && data2 && (
           <>
             <hr />
-            {/* <SvgContainer
-              className="p-3"
-              downloadName={data.output.plotPath.split('/').slice(-1)[0]}
-              plotPath={'web/results/' + data.output.plotPath}
-              txtPath={`web/results/${data.output.plotPath}`}
-            /> */}
+
+            <Plot
+              className="w-100"
+              data={cloneDeep([data1, data2].traces)}
+              layout={cloneDeep([data1, data2].layout)}
+              config={cloneDeep([data1, data2].config)}
+              useResizeHandler
+            />
             <div className="p-3">
               <p>
                 The plot above shows the mutational profiles of a selected
