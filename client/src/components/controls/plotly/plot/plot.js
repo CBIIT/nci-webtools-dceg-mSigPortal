@@ -12,7 +12,7 @@ export default function Plotly({
   config,
   divId,
   filename,
-  rawData,
+  originalData,
   ...rest
 }) {
   const defaultConfig = {
@@ -73,7 +73,7 @@ export default function Plotly({
             variant="link"
             onClick={() =>
               saveAs(
-                new Blob([JSON.stringify(rawData)], {
+                new Blob([JSON.stringify(data)], {
                   type: 'application/json',
                 }),
                 `${filename}.json`
