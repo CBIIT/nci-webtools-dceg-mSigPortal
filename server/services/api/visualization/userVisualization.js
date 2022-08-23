@@ -13,7 +13,6 @@ const config = require('../../../config.json');
 const logger = require('../../logger');
 const { parseCSV, importUserSession } = require('../analysis');
 const { schema } = require('./userSchema');
-const { performance } = require('perf_hooks');
 
 // config info for R functions
 const rConfig = {
@@ -95,25 +94,15 @@ async function profilerExtraction(params) {
   logger.debug('/profilerExtraction: CLI args\n' + cli);
 
   try {
-    const startP = performance.now();
     const { stdout, stderr } = await spawn(
       'python3',
       ['services/python/mSigPortal_Profiler_Extraction.py', ...cli],
       { encoding: 'utf8' }
     );
-    const endP = performance.now();
 
     // parse matrix files and transform into single json file
     const matrixFiles = path.join(projectPath, 'results/output');
-    const start = performance.now();
     const matrices = await getMatrices(matrixFiles);
-    const end = performance.now();
-    logger.debug([
-      'transform matrix',
-      end - start,
-      'extraction',
-      endP - startP,
-    ]);
     const matricesFile = path.join(projectPath, 'matrices.json');
     fs.writeFileSync(matricesFile, JSON.stringify(matrices));
 
