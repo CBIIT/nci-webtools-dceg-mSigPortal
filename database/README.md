@@ -1,5 +1,23 @@
 # mSigPortal Database
 
+## Getting Started
+
+### Importing Data
+1. Ensure config.json exists and specifies a Postgres database configuration and s3 bucket/key prefix
+2. If starting from a clean database, run the createDatabase.js script
+ - node createDatabase.js --schema schema.js
+3. Sync the msigportal Database/ folder from the s3 folder to a local folder (eg: data/)
+4. Copy over the scripts in the utils/ folder to the data folder
+5. Run the following scripts:
+ - exportCombinedDatasets.sh
+ - exportEtiology.sh
+ - exportPublications.sh
+6. Sync the local Data folder to the s3 Database/ folder
+7. Execute the startDatabaseImport.js script with the following arguments:
+ - node startDatabaseImport.js --schema schema.js --sources sources.js --provider s3 s3://bucket-name/msigportal/Database
+ - Optionally, we can execute the database import using local files:
+ - node startDatabaseImport.js --schema schema.js --sources sources.js --provider local path/to/data/folder
+
 Notes:
 1. Sequencing Strategy/Dataset are used interchangably (eg: WES, WGS, etc)
 
@@ -30,9 +48,6 @@ Notes:
 |Breast-DCIS |SP2143 |SP2143           |DO1000        |clinical data |clinical variables |tumour_histological_type |Duct micropapillary carcinoma |character           |
 |Breast-DCIS |SP2143 |SP2143           |DO1000        |clinical data |clinical variables |tumour_grade             |G2                            |character           |
 
-#### Partitioned JSON Paths
-- /Database/Association/*Study*/*Strategy*/*Cancer\_Type*/*Sample*/data.json
-
 
 ## Exposure
 
@@ -59,9 +74,6 @@ Notes:
 |Breast560 |WGS     |Breast      |Breast |PD10010a |Organ-specific_Cancer_Signatures_GRCh37_SBS96 |Breast_D (Breast_MMR2) |   0.0000|
 |Breast560 |WGS     |Breast      |Breast |PD10010a |Organ-specific_Cancer_Signatures_GRCh37_SBS96 |Breast_E (Breast_8)    |   0.0000|
 |Breast560 |WGS     |Breast      |Breast |PD10010a |Organ-specific_Cancer_Signatures_GRCh37_SBS96 |Breast_F (Breast_18)   | 299.5687|
-
-#### Partitioned JSON Paths
-- /Database/Exposure/*Study*/*Dataset*/*Cancer\_Type*/*Signature_set_name*/data.json
 
 
 ## Seqmatrix
@@ -90,10 +102,6 @@ Notes:
 |PCAWG |Biliary-AdenoCA |SP117712 |WGS     |SBS96   |A[C>A]A      |       192|
 
 
-### Partitioned JSON Paths
-- /Database/Seqmatrix/*Study*/*Cancer\_Type*/*Sample*/*Dataset*/*Profile*/data.json
-
-
 ## Signature
 
 ### Files
@@ -119,8 +127,3 @@ Notes:
 |Published_signatures |DBS78   |Other_Published_Signatures_GRCh37_DBS78 |WGS     |N           |NA     |DBS_BPA_WGS    |AC>GA        |    0.0049635|
 |Published_signatures |DBS78   |Other_Published_Signatures_GRCh37_DBS78 |WGS     |N           |NA     |DBS_BPA_WGS    |AC>GG        |    0.0083474|
 |Published_signatures |DBS78   |Other_Published_Signatures_GRCh37_DBS78 |WGS     |N           |NA     |DBS_BPA_WGS    |AC>GT        |    0.0275530|
-
-### Partitioned JSON Paths
-- /Database/Signature/*Profile*/data.json
-- /Database/Signature/*Profile*/*Signature_set_name*/data.json
-

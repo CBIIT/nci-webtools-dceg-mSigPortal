@@ -1,31 +1,38 @@
-export default function DBS78(data, sample) {
+export default function SBS96(rawData, args) {
   const colors = {
-    AC: '#09BCED',
-    AT: '#0266CA',
-    CC: '#9FCE62',
-    CG: '#006501',
-    CT: '#FF9898',
-    GC: '#E22925',
-    TA: '#FEB065',
-    TC: '#FD8000',
-    TG: '#CB98FD',
-    TT: '#4C0299',
+    'C>A': '#03BCEE',
+    'C>G': 'black',
+    'C>T': '#E32926',
+    'T>A': '#CAC9C9',
+    'T>C': '#A1CE63',
+    'T>G': '#EBC6C4',
   };
-  const dbsdata = ['AC', 'AT', 'CC', 'CG', 'CT', 'GC', 'TA', 'TC', 'TG', 'TT'];
+  const { profile, matrix, sample } = args;
 
-  const datafilter = data.filter((e) => dbsdata.includes(e.mutation));
-  const totalMutations = datafilter.reduce(
+  const groupByMutation = rawData.reduce((acc, e, i) => {
+    const mutationRegex = /\[(.*)\]/;
+    const mutation = e.mutationType.match(mutationRegex)[1];
+
+    acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
+    return acc;
+  }, {});
+
+  const data = Object.entries(groupByMutation).map(([mutation, data]) => ({
+    mutation,
+    data,
+  }));
+
+  const totalMutations = data.reduce(
     (total, mutation) =>
       total +
       mutation.data.reduce((mutationSum, e) => mutationSum + e.mutations, 0),
     0
   );
   const maxMutation = Math.max(
-    ...datafilter
-      .map((mutation) => mutation.data.map((e) => e.mutations))
-      .flat()
+    ...data.map((mutation) => mutation.data.map((e) => e.mutations)).flat()
   );
-  const mutationTypeNames = datafilter
+
+  const mutationTypeNames = data
     .map((group) =>
       group.data.map((e) => ({
         mutation: group.mutation,
@@ -34,7 +41,7 @@ export default function DBS78(data, sample) {
     )
     .flat();
 
-  const traces = datafilter.map((group, groupIndex, array) => ({
+  const traces = data.map((group, groupIndex, array) => ({
     name: group.mutation,
     type: 'bar',
     marker: { color: colors[group.mutation] },
@@ -50,7 +57,7 @@ export default function DBS78(data, sample) {
     showlegend: false,
   }));
 
-  const mutationAnnotation = datafilter.map((group, groupIndex, array) => ({
+  const mutationAnnotation = data.map((group, groupIndex, array) => ({
     xref: 'x',
     yref: 'paper',
     xanchor: 'bottom',
@@ -61,13 +68,34 @@ export default function DBS78(data, sample) {
         .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
       (group.data.length - 1) * 0.5,
     y: 1.04,
-    text: `<b>${group.mutation}>NN</b>`,
+    text: `<b>${group.mutation}</b>`,
     showarrow: false,
     font: { size: 18 },
     align: 'center',
   }));
 
-  const shapes = datafilter.map((group, groupIndex, array) => ({
+  const sampleAnnotation = {
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
+    x: 0.01,
+    y: 0.88,
+    text:
+      '<b>' +
+      sample +
+      ': ' +
+      totalMutations.toLocaleString(undefined) +
+      ' subs </b>',
+    showarrow: false,
+    font: {
+      size: 24,
+      family: 'Arial',
+    },
+    align: 'center',
+  };
+
+  const shapes = data.map((group, groupIndex, array) => ({
     type: 'rect',
     xref: 'x',
     yref: 'paper',
@@ -85,62 +113,52 @@ export default function DBS78(data, sample) {
     },
   }));
 
-  const sampleAnnotation = {
-    xref: 'paper',
-    yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'bottom',
-    x: 0.01,
-    y: 0.9,
-    text:
-      '<b>' +
-      sample +
-      ': ' +
-      totalMutations.toLocaleString(undefined) +
-      ' double subs </b>',
-    showarrow: false,
-    font: {
-      size: 24,
-      family: 'Arial',
-    },
-    align: 'center',
-  };
+  function formatTickLabel(mutation, mutationType) {
+    const color = colors[mutation];
+    const regex = /^(.)\[(.).{2}\](.)$/;
+    const match = mutationType.match(regex);
+    return `${match[1]}<span style="color:${color}"><b>${match[2]}</b></span>${match[3]}`;
+  }
 
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
+    bargap: 0.3,
     height: 450,
-    //width:1080,
+    // width: 1080,
     autosize: true,
+
     xaxis: {
       showline: true,
       tickangle: -90,
       tickfont: {
         family: 'Courier New, monospace',
-        size: 14,
+        color: '#A0A0A0',
       },
       tickmode: 'array',
       tickvals: mutationTypeNames.map((_, i) => i),
-      ticktext: mutationTypeNames.map((e) => e.mutationType.slice(-2)),
-      linecolor: 'black',
+      ticktext: mutationTypeNames.map((e) =>
+        formatTickLabel(e.mutation, e.mutationType)
+      ),
+      linecolor: '#E0E0E0',
       linewidth: 1,
       mirror: 'all',
     },
     yaxis: {
       title: {
-        text: '<b>Number of Double Base Substitutions</b>',
+        text: '<b>Number of Single Base Substitutions</b>',
         font: {
           family: 'Times New Roman',
         },
       },
       autorange: false,
       range: [0, maxMutation * 1.2],
-      linecolor: 'black',
-      linewidth: 1,
-      tickformat: maxMutation > 1000 ? '~s' : '',
       ticks: 'inside',
       tickcolor: '#D3D3D3',
-      showgrid: true,
+      linecolor: '#D3D3D3',
+      linewidth: 1,
       mirror: 'all',
+      tickformat: maxMutation > 1000 ? '~s' : '',
+      showgrid: true,
       gridcolor: '#F5F5F5',
     },
 

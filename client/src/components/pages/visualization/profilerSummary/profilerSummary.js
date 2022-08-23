@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
-import Plot from 'react-plotly.js';
+import Plotly from '../../../controls/plotly/plot/plot';
 import { useSelector } from 'react-redux';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Description from '../../../controls/description/description';
 import { useProfilerSummaryQuery } from './apiSlice';
-import cloneDeep from 'lodash/cloneDeep';
 
 export default function ProfilerSummary() {
   const store = useSelector((state) => state.visualization);
@@ -41,22 +39,20 @@ export default function ProfilerSummary() {
       </div>
       <hr />
       <LoadingOverlay active={isFetching} />
-      <Container fluid className="mb-3">
-        <Row>
-          <Col>
-            {data && (
-              <Plot
-                style={{ height: '500px' }}
-                className="w-100"
-                data={cloneDeep(data.traces)}
-                layout={cloneDeep(data.layout)}
-                config={cloneDeep(data.config)}
-                useResizeHandler
-              />
-            )}
-          </Col>
-        </Row>
-      </Container>
+      {data && (
+        <Plotly
+          style={{ height: '500px' }}
+          className="w-100"
+          data={data.traces}
+          layout={data.layout}
+          config={data.config}
+          filename={
+            source == 'public'
+              ? `${publicForm.study.value}_profiler-summary`
+              : 'profiler-summary'
+          }
+        />
+      )}
       {error && (
         <p className="text-center">
           An error has occured. Please check your inputs and try again.

@@ -1,4 +1,4 @@
-export default function ID83(unsortedData, sample) {
+export default function ID83(rawData, args) {
   const colors = {
     '1:Del:C': { shape: '#FBBD6F', text: 'black' },
     '1:Del:T': { shape: '#FE8002', text: 'white' },
@@ -17,6 +17,20 @@ export default function ID83(unsortedData, sample) {
     '4:Del:M': { shape: '#8482BC', text: 'black' },
     '5:Del:M': { shape: '#62409A', text: 'white' },
   };
+
+  const { profile, matrix, sample } = args;
+
+  const groupByIndel = rawData.reduce((acc, e, i) => {
+    const indel = e.mutationType.match(/^(.{7})/)[1];
+
+    acc[indel] = acc[indel] ? [...acc[indel], e] : [e];
+    return acc;
+  }, {});
+
+  const unsortedData = Object.entries(groupByIndel).map(([indel, data]) => ({
+    indel,
+    data,
+  }));
 
   // sort data according to colors
   const indelOrder = Object.fromEntries(

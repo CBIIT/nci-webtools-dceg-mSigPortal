@@ -50,17 +50,17 @@ const schema = [
                 sum(mutations) as totalMutations
             FROM seqmatrix
             GROUP BY sample, profile, matrix
-            ORDER BY sample, profile, matrix
           )
           SELECT
             sample,
             profile,
             group_concat(cast(matrix as text), '/') as matrix,
-            log10(sum(totalMutations)) as logTotalMutations,
+            log10(totalMutations) as logTotalMutations,
             avg(totalMutations) as meanTotalMutations
           FROM records r
           WHERE totalMutations > 0
           GROUP BY sample, profile, totalMutations
+          ORDER BY profile
           `
       );
     },
