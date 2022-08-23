@@ -1,7 +1,7 @@
 import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import { groupBy } from 'lodash';
 
-export default function pcBetweenSamples_ID(samples, sample1, sample2) {
+export default function pcBetweenSamples_ID(samples, sample1, sample2, tab) {
   const colors = {
     '1:Del:C': { shape: '#FBBD6F', text: 'black' },
     '1:Del:T': { shape: '#FE8002', text: 'white' },
@@ -63,13 +63,23 @@ export default function pcBetweenSamples_ID(samples, sample1, sample2) {
   const totalMutations2 = sample2data.reduce(
     (total, mutation) =>
       total +
-      mutation.data.reduce((mutationSum, e) => mutationSum + e.mutations, 0),
+      mutation.data.reduce(
+        (mutationSum, e) =>
+          tab === 'samples'
+            ? mutationSum + e.mutations
+            : mutationSum + e.contribution,
+        0
+      ),
     0
   );
   const maxMutation2 = Math.max(
     ...sample2data
       .map((mutation) =>
-        mutation.data.map((e) => e.mutations / totalMutations2)
+        mutation.data.map((e) =>
+          tab === 'samples'
+            ? e.mutations / totalMutations2
+            : e.contribution / totalMutations2
+        )
       )
       .flat()
   );
@@ -78,6 +88,8 @@ export default function pcBetweenSamples_ID(samples, sample1, sample2) {
   Object.keys(group1);
   const group2 = groupBy(sample2, 'mutationType');
   Object.keys(group2);
+  console.log(group1);
+  console.log(group2);
 
   let sampleDifferences = [];
   let s1mutations = [];
@@ -86,12 +98,21 @@ export default function pcBetweenSamples_ID(samples, sample1, sample2) {
   for (let mutationType of Object.keys(group1)) {
     const a = group1[mutationType][0];
     const b = group2[mutationType][0];
-    const mutations =
-      a.mutations / totalMutations1 - b.mutations / totalMutations2;
+    let mutations;
+    tab === 'samples'
+      ? (mutations =
+          a.mutations / totalMutations1 - b.mutations / totalMutations2)
+      : (mutations =
+          a.mutations / totalMutations1 - b.contribution / totalMutations2);
     sampleDifferences.push({ mutationType, mutations });
     s1mutations.push(a.mutations / totalMutations1);
-    s2mutations.push(b.mutations / totalMutations2);
+    s2mutations.push(
+      tab === 'samples'
+        ? b.mutations / totalMutations2
+        : b.contribution / totalMutations2
+    );
   }
+  console.log(sampleDifferences);
   const groupByMutation3 = groupBy(
     sampleDifferences,
     (s) => s.mutationType.match(mutationRegex)[1]
@@ -102,7 +123,8 @@ export default function pcBetweenSamples_ID(samples, sample1, sample2) {
       data,
     })
   );
-
+  console.log(groupByMutation3);
+  console.log(sample3data);
   const squarediff = sampleDifferences.map((e) => Math.pow(e.mutations, 2));
   const rss = squarediff.reduce((a, b, i) => a + b, 0).toExponential(3);
 
@@ -188,7 +210,11 @@ export default function pcBetweenSamples_ID(samples, sample1, sample2) {
           .slice(0, groupIndex)
           .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
     ),
-    y: group.data.map((e) => e.mutations / totalMutations2),
+    y: group.data.map((e) =>
+      tab === 'samples'
+        ? e.mutations / totalMutations2
+        : e.contribution / totalMutations2
+    ),
     customdata: group.data.map((e) => ({
       mutationType: e.mutationType.substring(0, 7),
       xval:
@@ -232,6 +258,8 @@ export default function pcBetweenSamples_ID(samples, sample1, sample2) {
     showlegend: false,
     hoverinfo: 'x+y',
   }));
+
+  console.log(trace3);
   const traces = [...trace1, ...trace2, ...trace3];
 
   const shapeTop = sample1data.map((group, groupIndex, array) => ({

@@ -86,8 +86,13 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
   for (let mutationType of Object.keys(group1)) {
     const a = group1[mutationType][0];
     const b = group2[mutationType][0];
-    const mutations =
-      a.mutations / totalMutations1 - b.mutations / totalMutations2;
+    let mutations;
+    tab === 'samples'
+      ? (mutations =
+          a.mutations / totalMutations1 - b.mutations / totalMutations2)
+      : (mutations =
+          a.mutations / totalMutations1 - b.contribution / totalMutations2);
+
     //const cancer = a.cancer;
     sampleDifferences.push({ mutationType, mutations });
     s1mutations.push(a.mutations / totalMutations1);

@@ -25,7 +25,7 @@ import { cloneDeep } from 'lodash';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import { defaultMatrix } from '../../../../services/utils';
-import pcReferenceSamples_SBS from '../../../controls/plotly/profileComparision/pcReferenceSignature_SBS';
+import pcReferenceSamples_SBS from '../../../controls/plotly/profileComparision/pcBetweenSamples_SBS';
 import pcBetweenSamples_DBS from '../../../controls/plotly/profileComparision/pcBetweenSamples_DBS';
 import pcBetweenSamples_ID from '../../../controls/plotly/profileComparision/pcBetweenSamples_ID';
 
