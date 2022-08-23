@@ -11,6 +11,7 @@ const XLSX = require('xlsx');
 const replace = require('replace-in-file');
 const express = require('express');
 const config = require('../../config.json');
+const { performance } = require('perf_hooks');
 
 if (config.aws) AWS.config.update(config.aws);
 
@@ -48,17 +49,32 @@ async function importUserSession(connection, data, userSchema) {
   const tableName = `seqmatrix`;
 
   try {
+    const schemaStart = performance.now();
     for (const { name, schema } of tables) {
       await connection.schema.createTable(name, (table) =>
         schema(table, connection)
       );
     }
+    const schemaEnd = performance.now();
 
+    const insertStart = performance.now();
     await connection.batchInsert(tableName, data, 100);
+    const insertEnd = performance.now();
 
+    const viewStart = performance.now();
     for (const { create } of materializedViews) {
       await create(connection);
     }
+    const viewEnd = performance.now();
+
+    logger.debug([
+      'schema',
+      'insert',
+      'materialized',
+      schemaEnd - schemaStart,
+      insertEnd - insertStart,
+      viewEnd - viewStart,
+    ]);
 
     for (const { name, index } of indexedTables) {
       await connection.schema.table(name, index);
