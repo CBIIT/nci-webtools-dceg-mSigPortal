@@ -16,7 +16,7 @@ export const mutationalProfilesApiSlice = visualizationApiSlice.injectEndpoints(
   {
     endpoints: (builder) => ({
       mutationalProfiles: builder.query({
-        query: (params) => ({ url: 'seqmatrix', params }),
+        query: (params) => ({ url: 'mutational_spectrum', params }),
         transformResponse: (data, meta, args) => {
           const { profile, matrix, sample } = args;
           const profileMatrix = profile + matrix;

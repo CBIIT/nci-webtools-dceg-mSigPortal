@@ -43,7 +43,7 @@ export const userFormApiSlice = visualizationApiSlice.injectEndpoints({
     }),
     userMatrix: builder.mutation({
       query: (params) => ({
-        url: 'seqmatrixOptions',
+        url: 'mutational_spectrum_options',
         params,
       }),
     }),

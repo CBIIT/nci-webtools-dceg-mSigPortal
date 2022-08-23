@@ -5,16 +5,16 @@ export const optionsApiSlice = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: 'web' }),
   endpoints: (builder) => ({
     seqmatrixOptions: builder.query({
-      query: (params) => ({ url: 'seqmatrixOptions', params }),
+      query: (params) => ({ url: 'mutational_spectrum_options', params }),
     }),
     exposureOptions: builder.query({
-      query: (params) => ({ url: 'exposureOptions', params }),
+      query: (params) => ({ url: 'mutational_activity_options', params }),
     }),
     signatureOptions: builder.query({
-      query: (params) => ({ url: 'signatureOptions', params }),
+      query: (params) => ({ url: 'mutational_signature_options', params }),
     }),
     associationOptions: builder.query({
-      query: (params) => ({ url: 'associationOptions', params }),
+      query: (params) => ({ url: 'mutational_association_options', params }),
     }),
   }),
 });

@@ -70,8 +70,8 @@ async function explorationSamples(req, res, next) {
 
 const router = Router();
 
-router.get('/exposure', queryExposure);
-router.get('/exposureOptions', explorationOptions);
+router.get('/mutational_activity', queryExposure);
+router.get('/mutational_activity_options', explorationOptions);
 router.get('/explorationSamples', explorationSamples);
 
 module.exports = { router, queryExposure };

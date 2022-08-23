@@ -6,7 +6,7 @@ export const msBurdenApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     msBurden: builder.query({
       query: (params) => ({
-        url: 'exposure',
+        url: 'mutational_activity',
         params,
       }),
       transformResponse: (data, meta, arg) => {

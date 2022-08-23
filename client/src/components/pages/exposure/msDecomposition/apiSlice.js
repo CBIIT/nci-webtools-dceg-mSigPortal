@@ -6,7 +6,7 @@ export const msDecompositionApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     msDecomposition: builder.query({
       query: (params) => ({
-        url: 'exposure',
+        url: 'mutational_activity',
         params,
       }),
       transformResponse: (data, meta, arg) => {

@@ -46,7 +46,7 @@ async function signatureOptions(req, res, next) {
 
 const router = Router();
 
-router.get('/signature', querySignature);
-router.get('/signatureOptions', signatureOptions);
+router.get('/mutational_signature', querySignature);
+router.get('/mutational_signature_options', signatureOptions);
 
 module.exports = { router, querySignature };

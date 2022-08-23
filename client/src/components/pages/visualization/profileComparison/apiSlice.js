@@ -24,7 +24,7 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
       }),
     }),
     pcSignatureSets: builder.query({
-      query: (params) => ({ url: 'signature', params }),
+      query: (params) => ({ url: 'mutational_signature', params }),
       transformResponse: (data) =>
         [...new Set(data.map((e) => e.signatureSetName))]
           .sort((a, b) =>
@@ -33,7 +33,7 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
           .map((e) => ({ label: e, value: e })),
     }),
     pcSignatureNames: builder.query({
-      query: (params) => ({ url: 'signature', params }),
+      query: (params) => ({ url: 'mutational_signature', params }),
       transformResponse: (data) =>
         [...new Set(data.map((e) => e.signatureName))].sort((a, b) =>
           a.localeCompare(b, undefined, { sensitivity: 'base' })

@@ -86,8 +86,8 @@ async function seqmatrixSummary(req, res, next) {
 
 const router = Router();
 
-router.get('/seqmatrix', querySeqmatrix);
-router.get('/seqmatrixOptions', seqmatrixOptions);
-router.get('/seqmatrixSummary', seqmatrixSummary);
+router.get('/mutational_spectrum', querySeqmatrix);
+router.get('/mutational_spectrum_options', seqmatrixOptions);
+router.get('/mutational_spectrum_summary', seqmatrixSummary);
 
 module.exports = { router, querySeqmatrix };

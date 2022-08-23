@@ -9,7 +9,7 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
     endpoints: (builder) => ({
       mutationalPatternScatter: builder.query({
         query: ({ proportion, pattern, ...params }) => ({
-          url: 'seqmatrix',
+          url: 'mutational_spectrum',
           params,
         }),
         transformResponse: (data, meta, arg) => {

@@ -4,7 +4,7 @@ export const publicFormApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     publicMatrix: builder.mutation({
       query: (params) => ({
-        url: 'seqmatrixOptions',
+        url: 'mutational_spectrum_options',
         params,
       }),
     }),

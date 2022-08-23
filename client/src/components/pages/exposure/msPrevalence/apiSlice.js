@@ -7,7 +7,7 @@ export const msPrevalenceApiSlice = explorationApiSlice.injectEndpoints({
     msPrevelencePlot: builder.query({
       // query: ({ mutation, ...params }) => ({
       query: ({ minimum, ...params }) => ({
-        url: 'exposure',
+        url: 'mutational_activity',
         params,
       }),
       transformResponse: (data, meta, arg) => {

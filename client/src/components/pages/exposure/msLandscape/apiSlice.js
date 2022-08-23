@@ -6,7 +6,7 @@ export const msLandscapeApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     msLandscapePlot: builder.query({
       query: (params) => ({
-        url: 'exposure',
+        url: 'mutational_activity',
         params,
       }),
       transformResponse: (data, meta, arg) => {

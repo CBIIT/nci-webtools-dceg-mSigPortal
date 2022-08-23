@@ -4,7 +4,7 @@ export const publicFormApiSlice = associationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     associationPublic: builder.mutation({
       query: (params) => ({
-        url: 'associationOptions',
+        url: 'mutational_association_options',
         params,
       }),
     }),

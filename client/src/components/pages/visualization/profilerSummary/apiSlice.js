@@ -5,7 +5,7 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     profilerSummary: builder.query({
       query: (params) => ({
-        url: 'seqmatrixSummary',
+        url: 'mutational_spectrum_summary',
         params,
       }),
       transformResponse: (data) => profilerSummary(data),

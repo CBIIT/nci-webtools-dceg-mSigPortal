@@ -7,7 +7,7 @@ export const tmbSignatureApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     tmbSignaturesPlot: builder.query({
       query: (params) => ({
-        url: 'exposure',
+        url: 'mutational_activity',
         params,
       }),
       transformResponse: (data, meta, arg) => {

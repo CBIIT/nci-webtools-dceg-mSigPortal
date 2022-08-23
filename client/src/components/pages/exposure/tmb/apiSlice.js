@@ -6,7 +6,7 @@ export const tmbApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     tmbPlot: builder.query({
       query: (params) => ({
-        url: 'exposure',
+        url: 'mutational_activity',
         params,
       }),
       transformResponse: (data, meta, arg) => {
