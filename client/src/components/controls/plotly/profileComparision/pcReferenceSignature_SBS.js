@@ -161,11 +161,12 @@ export default function pcReferenceSignature_SBS(
           .slice(0, groupIndex)
           .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
     ),
-    y: group.data.map((e) => e.mutations / totalMutations2),
+    y: group.data.map((e) => e.contribution / totalMutations2),
     hoverinfo: 'x+y',
     showlegend: false,
     yaxis: 'y2',
   }));
+  console.log(trace2);
 
   const trace3 = sample3data.map((group, groupIndex, array) => ({
     name: group.mutation,

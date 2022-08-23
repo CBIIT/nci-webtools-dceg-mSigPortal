@@ -25,7 +25,7 @@ import { cloneDeep } from 'lodash';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import { defaultMatrix } from '../../../../services/utils';
-import pcReferenceSignature_SBS from '../../../controls/plotly/profileComparision/pcReferenceSignature_SBS';
+import pcReferenceSamples_SBS from '../../../controls/plotly/profileComparision/pcReferenceSignature_SBS';
 import pcBetweenSamples_DBS from '../../../controls/plotly/profileComparision/pcBetweenSamples_DBS';
 import pcBetweenSamples_ID from '../../../controls/plotly/profileComparision/pcBetweenSamples_ID';
 
@@ -102,7 +102,7 @@ export default function PcReference() {
   } = useProfileComparisonReference2Query(calculationQuery2, {
     skip: !calculationQuery2,
   });
-  let datatotal;
+  let data;
   if ((data1 != null) & (data2 != null)) {
     console.log('data1');
     console.log(data1);
@@ -118,13 +118,13 @@ export default function PcReference() {
     const dat2temp = Object.values(data2);
     const sample2 = dat2temp.slice(0, dat2temp.length - 1);
     console.log(sample2);
-    datatotal = [sample1, sample2];
+
     if (data1.arg.profile === 'SBS') {
-      pcReferenceSignature_SBS(compares, sample1, sample2, 'signatures');
+      data = pcReferenceSamples_SBS(compares, sample1, sample2, 'signatures');
     } else if (data1.arg.profile === 'DBS') {
-      pcBetweenSamples_DBS(compares, sample1, sample2, 'signatures');
+      data = pcBetweenSamples_DBS(compares, sample1, sample2, 'signatures');
     } else {
-      pcBetweenSamples_ID(compares, sample1, sample2, 'signatures');
+      data = pcBetweenSamples_ID(compares, sample1, sample2, 'signatures');
     }
   }
 
@@ -436,9 +436,9 @@ export default function PcReference() {
 
             <Plot
               className="w-100"
-              data={cloneDeep([data1, data2].traces)}
-              layout={cloneDeep([data1, data2].layout)}
-              config={cloneDeep([data1, data2].config)}
+              data={cloneDeep(data.traces)}
+              layout={cloneDeep(data.layout)}
+              config={cloneDeep(data.config)}
               useResizeHandler
             />
             <div className="p-3">
