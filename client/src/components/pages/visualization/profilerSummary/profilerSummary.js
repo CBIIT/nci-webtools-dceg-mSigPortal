@@ -46,6 +46,11 @@ export default function ProfilerSummary() {
           data={data.traces}
           layout={data.layout}
           config={data.config}
+          filename={
+            source == 'public'
+              ? `${publicForm.study.value}_profiler-summary`
+              : 'profiler-summary'
+          }
         />
       )}
       {error && (
