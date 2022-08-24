@@ -1,6 +1,6 @@
 import { groupBy } from 'lodash';
 
-export default function pcBetweenSamples(samples, sample1, sample2) {
+export default function pcBetweenSamples(samples, sample1, sample2, tab) {
   const colors = {
     AC: '#09BCED',
     AT: '#0266CA',
@@ -70,13 +70,23 @@ export default function pcBetweenSamples(samples, sample1, sample2) {
   const totalMutations2 = sample2data.reduce(
     (total, mutation) =>
       total +
-      mutation.data.reduce((mutationSum, e) => mutationSum + e.mutations, 0),
+      mutation.data.reduce(
+        (mutationSum, e) =>
+          tab === 'samples'
+            ? mutationSum + e.mutations
+            : mutationSum + e.contribution,
+        0
+      ),
     0
   );
   const maxMutation2 = Math.max(
     ...sample2data
       .map((mutation) =>
-        mutation.data.map((e) => e.mutations / totalMutations2)
+        mutation.data.map((e) =>
+          tab === 'samples'
+            ? e.mutations / totalMutations2
+            : e.contribution / totalMutations2
+        )
       )
       .flat()
   );
@@ -94,11 +104,19 @@ export default function pcBetweenSamples(samples, sample1, sample2) {
   for (let mutationType of Object.keys(group1)) {
     const a = group1[mutationType][0];
     const b = group2[mutationType][0];
-    const mutations =
-      a.mutations / totalMutations1 - b.mutations / totalMutations2;
+    let mutations;
+    tab === 'samples'
+      ? (mutations =
+          a.mutations / totalMutations1 - b.mutations / totalMutations2)
+      : (mutations =
+          a.mutations / totalMutations1 - b.contribution / totalMutations2);
     sampleDifferences.push({ mutationType, mutations });
     s1mutations.push(a.mutations / totalMutations1);
-    s2mutations.push(b.mutations / totalMutations2);
+    s2mutations.push(
+      tab === 'samples'
+        ? b.mutations / totalMutations2
+        : b.contribution / totalMutations2
+    );
   }
 
   const groupByMutation3 = groupBy(
@@ -160,7 +178,11 @@ export default function pcBetweenSamples(samples, sample1, sample2) {
           .slice(0, groupIndex)
           .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
     ),
-    y: group.data.map((e) => e.mutations / totalMutations2),
+    y: group.data.map((e) =>
+      tab === 'samples'
+        ? e.mutations / totalMutations2
+        : e.contribution / totalMutations2
+    ),
     hoverinfo: 'x+y',
     showlegend: false,
     yaxis: 'y2',

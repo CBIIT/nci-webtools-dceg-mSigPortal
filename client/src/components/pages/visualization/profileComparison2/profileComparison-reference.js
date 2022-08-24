@@ -182,7 +182,7 @@ export default function PcReference() {
             matrixData
               .filter((e) => e.profile == profile.value)
               .map((e) => e.sample)
-              .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+            //.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
           ),
         ].map((e) => ({
           label: e,
