@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import {
   Form,
   Button,
@@ -40,7 +39,7 @@ export default function UserForm() {
   const resetVisualization = (_) => dispatch(actions.resetVisualization());
 
   const { inputFilename, bedFilename, projectID, ...userForm } = store.userForm;
-  const { submitted, source } = store.main;
+  const { submitted } = store.main;
 
   const [handleUpload, { isLoading: isUploading }] =
     useVisualizationUserUploadMutation();
@@ -165,68 +164,60 @@ export default function UserForm() {
         inputFilename: data.inputFile.name,
         bedFilename: data.bedFile.name,
       });
+
+      // python cli args
+      const args = {
+        inputFormat: ['-f', data.inputFormat.value],
+        inputFile: ['-i', filePaths.filePath],
+        projectID: ['-p', projectID],
+        genomeAssemblyVersion: ['-g', data.genome.value],
+        strategy: ['-t', data.strategy],
+        outputDir: ['-o', projectID],
+      };
+
+      if (useQueue) {
+        try {
+          await handleSubmitQueue({ args, state: { ...store } });
+
+          mergeSuccess(
+            `Your job was successfully submitted to the queue. You will recieve an email at ${userForm.email} with your results.`
+          );
+        } catch (err) {
+          mergeError('Failed to submit to queue. Please Try Again.');
+        }
+      } else {
+        try {
+          mergeMain({ loading: { active: true } });
+          const { stdout, stderr, ...rest } = await profilerExtraction(
+            args
+          ).unwrap();
+          const matrixData = await fetchMatrix({ userId: projectID }).unwrap();
+
+          mergeMain({ projectID, matrixData, ...rest });
+        } catch (error) {
+          if (error.originalStatus == 504) {
+            mergeMain({
+              error: 'Please Reset Your Parameters and Try again.',
+            });
+            mergeError(
+              'Your submission has timed out. Please try again by submitting this job to a queue instead.'
+            );
+          } else {
+            mergeMain({
+              error: 'Please Reset Your Parameters and Try again.',
+            });
+
+            const message = Object.values(error.data);
+            mergeError(message);
+          }
+        } finally {
+          mergeMain({ loading: { active: false } });
+        }
+      }
     } catch (error) {
       mergeError('An error occured while uploading files. Please try again.');
     }
   }
-
-  async function submitWeb(args) {
-    try {
-      mergeMain({ loading: { active: true } });
-      const { stdout, stderr, ...rest } = await profilerExtraction(
-        args
-      ).unwrap();
-      const matrixData = await fetchMatrix({ userId: projectID }).unwrap();
-
-      mergeMain({ projectID, matrixData, ...rest });
-    } catch (error) {
-      if (error.originalStatus == 504) {
-        mergeMain({
-          error: 'Please Reset Your Parameters and Try again.',
-        });
-        mergeError(
-          'Your submission has timed out. Please try again by submitting this job to a queue instead.'
-        );
-      } else {
-        mergeMain({
-          error: 'Please Reset Your Parameters and Try again.',
-        });
-
-        const message = Object.values(error.data);
-        mergeError(message);
-      }
-    }
-    mergeMain({ loading: { active: false } });
-  }
-
-  async function submitQueue(args) {
-    try {
-      await handleSubmitQueue({ args, state: { ...store } });
-
-      mergeSuccess(
-        `Your job was successfully submitted to the queue. You will recieve an email at ${userForm.email} with your results.`
-      );
-    } catch (err) {
-      mergeError('Failed to submit to queue. Please Try Again.');
-    }
-  }
-
-  // perform web or queue submit after file upload and form is merged
-  useEffect(() => {
-    if (source == 'user' && projectID) {
-      const pythonArgs = {
-        inputFormat: ['-f', userForm.inputFormat.value],
-        inputFile: ['-i', userForm.filePath],
-        projectID: ['-p', projectID],
-        genomeAssemblyVersion: ['-g', userForm.genome.value],
-        strategy: ['-t', userForm.strategy],
-        outputDir: ['-o', projectID],
-      };
-
-      if (useQueue) submitQueue(pythonArgs);
-      else submitWeb(pythonArgs);
-    }
-  }, [projectID]);
 
   const msPopover = (
     <Popover id="popover-basic">
