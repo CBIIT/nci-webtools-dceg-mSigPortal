@@ -35,10 +35,10 @@ async function* getFiles(dir) {
 }
 
 // transform all matrix files into a single json object
-async function getMatrices(path) {
+async function getMatrices(matrixFolder) {
   let files = [];
   const fileRegex = /\.all$/;
-  for await (const f of getFiles(path)) {
+  for await (const f of getFiles(matrixFolder)) {
     if (fileRegex.test(f)) files = [...files, f];
   }
   const profileRegex = /\.([A-Z]+)\d+.all$/;
@@ -53,13 +53,17 @@ async function getMatrices(path) {
         return data
           .map((e) => {
             const { MutationType, ...samples } = e;
-            return Object.entries(samples).map(([sample, mutations]) => ({
-              profile,
-              matrix,
-              mutationType: MutationType,
-              sample,
-              mutations,
-            }));
+            return Object.entries(samples).map(([sample, mutations]) => {
+              const splitSample = sample.split('@');
+              return {
+                sample: splitSample[0],
+                filter: splitSample[1] || '',
+                profile,
+                matrix,
+                mutationType: MutationType,
+                mutations,
+              };
+            });
           })
           .flat();
       })
