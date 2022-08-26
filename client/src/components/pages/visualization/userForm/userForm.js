@@ -263,7 +263,7 @@ export default function UserForm() {
       </Content>
     </Popover>
   );
-  console.log(filter);
+
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
       <Select
