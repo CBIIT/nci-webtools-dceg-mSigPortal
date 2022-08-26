@@ -27,7 +27,7 @@ export const getInitialState = () => ({
 
     loading: {
       active: false,
-      content: null,
+      content: '',
       showIndicator: false,
     },
     queueExpired: false,
@@ -39,13 +39,14 @@ export const getInitialState = () => ({
     matrixList: {},
     statistics: '',
   },
+  profilerSummary: { filter: '' },
   mutationalProfiles: {
-    sample: null,
-    profile: null,
-    matrix: null,
-    filter: null,
+    sample: '',
+    profile: '',
+    matrix: '',
+    filter: '',
     data: [],
-    plot: null,
+    plot: '',
     loading: false,
 
     filtered: [],
