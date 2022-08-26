@@ -3,6 +3,7 @@ import { Tab, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import Overview from './overview';
 import Profile from './rsProfile';
+//import RsProfile from './rsProfile/rsProfileForm';
 import CosineSimilarity from './cosineSimilarity';
 import Comparison from './rsComparison';
 import Download from './download';
@@ -183,6 +184,11 @@ export default function ReferenceSignature() {
       key: 'mutationalSignatureProfile',
       title: 'RS Profile',
     },
+    // {
+    //   component: <RsProfile submitR={(fn, args) => submitR(fn, args)} />,
+    //   key: 'mutationalSignatureProfile2',
+    //   title: 'RS Profile 2',
+    // },
     {
       component: <CosineSimilarity submitR={(fn, args) => submitR(fn, args)} />,
       key: 'cosineSimilarity',
