@@ -152,8 +152,9 @@ export default function PcReference() {
               compare: compare,
               matrixFile: matrixList.filter(
                 (e) =>
-                  e.profile == profile.value &&
-                  e.matrix == defaultMatrix(profile.value, ['96', '78', '83'])
+                  e.profileType == profile.value &&
+                  e.matrixSize ==
+                    defaultMatrix(profile.value, ['96', '78', '83'])
               )[0].Path,
             },
             projectID,
@@ -223,6 +224,7 @@ export default function PcReference() {
     </Popover>
   );
 
+  console.log(data);
   return (
     <div>
       <p className="p-3 m-0">
@@ -329,12 +331,12 @@ export default function PcReference() {
         )}
       </Form>
       <div id="pcReferencePlot">
-        {error && (
+        {data?.output.error && (
           <>
             <hr />
             <div className="p-3">
               <p>An error has occured. Please verify your input.</p>
-              <p>{error.data}</p>
+              <p>{data?.output.error}</p>
             </div>
           </>
         )}
