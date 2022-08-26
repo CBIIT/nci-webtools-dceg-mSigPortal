@@ -40,15 +40,15 @@ export default function profilerSummary(rawData) {
     };
   });
 
-  const bottomMargin = (labels) => {
-    const longest = labels.reduce((a, e) => (a > e.length ? a : e.length), 0);
-    if (longest < 10) return 60;
-    else return longest * 6;
-  };
+  // find the longest label to calculate extra height margin
+  const labels = traces[0].x;
+  const longest = labels.reduce((a, e) => (a > e.length ? a : e.length), 0);
+  const extraMargin = longest < 10 ? 60 : longest * 7;
 
   const layout = {
     autosize: true,
-    margin: { t: 40, b: bottomMargin(traces[0].x) },
+    height: 500 + extraMargin,
+    margin: { t: 40, b: extraMargin },
     legend: {
       title: {
         text: '<b>Profile</b>',
