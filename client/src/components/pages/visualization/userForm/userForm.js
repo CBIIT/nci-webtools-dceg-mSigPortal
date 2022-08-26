@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle, faFolderMinus } from '@fortawesome/free-solid-svg-icons';
 import { useForm, Controller } from 'react-hook-form';
 import Select from '../../../controls/select/selectForm';
+import MultiSelect from '../../../controls/select/multiSelect';
 import { actions as visualizationActions } from '../../../../services/store/visualization';
 import { actions as modalActions } from '../../../../services/store/modal';
 import { resetVisualizationApi } from '../../../../services/store/rootApi';
@@ -77,7 +78,7 @@ export default function UserForm() {
     genome: genomeOptions[0],
     strategy: 'WGS',
     mutationSplit: false,
-    filter: '',
+    filter: [],
     bedFile: '',
     collapse: false,
     useQueue: false,
@@ -184,8 +185,11 @@ export default function UserForm() {
 
         if (data.bedFile) args['bedFile'] = ['-b', filePaths.bedPath];
 
-        if (data.filter) {
-          args['mutationFilter'] = ['-F', data.filter];
+        if (data.filter.length) {
+          args['mutationFilter'] = [
+            '-F',
+            data.filter.map((e) => e.value).join('@'),
+          ];
         } else {
           args['mutationSplit'] = ['-s', data.mutationSplit ? 'True' : 'False'];
         }
@@ -259,7 +263,7 @@ export default function UserForm() {
       </Content>
     </Popover>
   );
-
+  console.log(filter);
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
       <Select
@@ -443,7 +447,7 @@ export default function UserForm() {
       </Form.Group>
       <Form.Group controlId="filter">
         <Form.Label>
-          Select Filter{' '}
+          Select Filter(s){' '}
           <span className="text-muted font-italic font-weight-normal">
             (optional)
           </span>
@@ -452,10 +456,8 @@ export default function UserForm() {
           name="filter"
           control={control}
           render={({ field }) => (
-            <Form.Control
+            <MultiSelect
               {...field}
-              type="text"
-              size="sm"
               placeholder="Enter a filter"
               disabled={
                 submitted ||
@@ -465,9 +467,6 @@ export default function UserForm() {
             />
           )}
         />
-        <Form.Text className="text-muted">
-          Use @ to separate multiple filters
-        </Form.Text>
       </Form.Group>
       <hr className="mb-3" />
       <Form.Group controlId="dataFileUpload">

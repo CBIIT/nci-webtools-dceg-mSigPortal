@@ -15,27 +15,6 @@ export default function MultiSelect({
       DropdownIndicator: () => null,
       IndicatorSeparator: () => null,
     },
-    styles: {
-      control: (provided, state) => ({
-        ...provided,
-        borderRadius: '2rem',
-        borderColor: 'rgb(111, 208, 178)',
-        boxShadow: state.isFocused
-          ? '0 0 0 0.25rem rgba(111, 208, 178, 0.25)'
-          : 'none',
-        ':hover': {
-          borderColor: 'rgb(111, 208, 178)',
-        },
-      }),
-      multiValue: (provided, state) => ({
-        ...provided,
-        borderRadius: '.75rem',
-      }),
-      multiValueRemove: (provided, state) => ({
-        ...provided,
-        borderRadius: '0 .75rem .75rem 0',
-      }),
-    },
   };
 
   return (
@@ -46,7 +25,7 @@ export default function MultiSelect({
       onChange={onChange}
       isMulti
       formatCreateLabel={(userInput) => `${placeholder}: ${userInput}`}
-      //   {...customStyle}
+      {...customStyle}
       {...rest}
     />
   );
