@@ -95,13 +95,16 @@ export default function UserForm() {
     formState: { errors },
   } = useForm({ defaultValues: defaultFormValues });
 
-  const inputFormat = watch('inputFormat');
-  const inputFile = watch('inputFile');
-  const bedFile = watch('bedFile');
-  const strategy = watch('strategy');
-  const mutationSplit = watch('mutationSplit');
-  const filter = watch('filter');
-  const useQueue = watch('useQueue');
+  const {
+    inputFormat,
+    inputFile,
+    bedFile,
+    strategy,
+    mutationSplit,
+    filter,
+    collapse,
+    useQueue,
+  } = watch();
 
   function handleReset() {
     window.location.hash = '#/visualization';
@@ -166,7 +169,7 @@ export default function UserForm() {
       });
 
       // python cli args
-      const args = {
+      let args = {
         inputFormat: ['-f', data.inputFormat.value],
         inputFile: ['-i', filePaths.filePath],
         projectID: ['-p', projectID],
@@ -174,6 +177,19 @@ export default function UserForm() {
         strategy: ['-t', data.strategy],
         outputDir: ['-o', projectID],
       };
+
+      // conditionally include mutation split and mutation filter params
+      if (['vcf', 'csv', 'tsv'].includes(inputFormat.value)) {
+        args['collapseSample'] = ['-c', data.collapse ? 'True' : 'False'];
+
+        if (data.bedFile) args['bedFile'] = ['-b', filePaths.bedPath];
+
+        if (data.filter) {
+          args['mutationFilter'] = ['-F', data.filter];
+        } else {
+          args['mutationSplit'] = ['-s', data.mutationSplit ? 'True' : 'False'];
+        }
+      }
 
       if (useQueue) {
         try {
@@ -413,6 +429,7 @@ export default function UserForm() {
               <Form.Check.Input
                 {...field}
                 type="checkbox"
+                checked={mutationSplit}
                 disabled={
                   submitted ||
                   filter.length ||
@@ -577,6 +594,7 @@ export default function UserForm() {
               <Form.Check.Input
                 {...field}
                 type="checkbox"
+                checked={collapse}
                 disabled={
                   submitted ||
                   ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
