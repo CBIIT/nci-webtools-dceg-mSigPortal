@@ -73,7 +73,7 @@ export default function Plotly({
             variant="link"
             onClick={() =>
               saveAs(
-                new Blob([JSON.stringify(data)], {
+                new Blob([JSON.stringify({ traces: data, layout })], {
                   type: 'application/json',
                 }),
                 `${filename}.json`
