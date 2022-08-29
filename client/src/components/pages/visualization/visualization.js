@@ -380,8 +380,7 @@ export default function Visualization({ match }) {
     {
       name: 'Profile Comparison',
       id: 'profileComparison',
-      component:
-        source === 'user' ? <ProfileComparison /> : <ProfileComparison2 />,
+      component: <ProfileComparison2 />,
     },
     {
       name: 'PCA',
