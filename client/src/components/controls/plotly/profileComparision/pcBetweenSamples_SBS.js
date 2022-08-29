@@ -1,6 +1,11 @@
 import { groupBy } from 'lodash';
 
 export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
+  console.log(samples);
+
+  console.log(sample1);
+  console.log(sample2);
+  console.log(tab);
   const colors = {
     'C>A': '#03BCEE',
     'C>G': 'black',
@@ -15,13 +20,14 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
     acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
     return acc;
   }, {});
-
+  console.log(groupByMutation1);
   const sample1data = Object.entries(groupByMutation1).map(
     ([mutation, data]) => ({
       mutation,
       data,
     })
   );
+  console.log(sample1data);
 
   const groupByMutation2 = sample2.reduce((acc, e, i) => {
     const mutation = e.mutationType.match(mutationRegex)[1];
@@ -35,12 +41,16 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
     })
   );
 
+  console.log(groupByMutation2);
+  console.log(sample2data);
+
   const totalMutations1 = sample1data.reduce(
     (total, mutation) =>
       total +
       mutation.data.reduce((mutationSum, e) => mutationSum + e.mutations, 0),
     0
   );
+  console.log(totalMutations1);
   const maxMutation1 = Math.max(
     ...sample1data
       .map((mutation) =>
@@ -48,7 +58,7 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
       )
       .flat()
   );
-
+  console.log(maxMutation1);
   const totalMutations2 = sample2data.reduce(
     (total, mutation) =>
       total +
@@ -61,6 +71,7 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
       ),
     0
   );
+  console.log(totalMutations2);
   const maxMutation2 = Math.max(
     ...sample2data
       .map((mutation) =>
@@ -72,8 +83,10 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
       )
       .flat()
   );
+  console.log(maxMutation2);
   const maxMutations = Math.max(maxMutation1, maxMutation2);
 
+  console.log(maxMutations);
   const group1 = groupBy(sample1, 'mutationType');
   Object.keys(group1);
   const group2 = groupBy(sample2, 'mutationType');
@@ -143,6 +156,7 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
       }))
     )
     .flat();
+  console.log(mutationTypeNames);
   const trace1 = sample1data.map((group, groupIndex, array) => ({
     name: group.mutation,
     type: 'bar',
@@ -159,6 +173,9 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
     showlegend: false,
     yaxis: 'y3',
   }));
+
+  console.log(trace1);
+
   const trace2 = sample2data.map((group, groupIndex, array) => ({
     name: group.mutation,
     type: 'bar',
@@ -179,7 +196,7 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
     showlegend: false,
     yaxis: 'y2',
   }));
-
+  console.log(trace2);
   const trace3 = sample3data.map((group, groupIndex, array) => ({
     name: group.mutation,
     type: 'bar',
@@ -451,6 +468,6 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
       yTitleAnnotation,
     ],
   };
-
+  console.log(traces);
   return { traces, layout };
 }

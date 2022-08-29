@@ -16,8 +16,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { actions } from '../../../../services/store/visualization';
 import {
-  useProfileComparisonReference1Query,
-  useProfileComparisonReference2Query,
+  useProfileComparisonReferenceQuery,
   usePcSignatureSetsQuery,
   usePcSignatureNamesQuery,
 } from './apiSlice';
@@ -42,12 +41,7 @@ export default function PcReference() {
   const { study, cancer, strategy } = store.publicForm;
   const { source, matrixData, svgList, matrixList, projectID } = store.main;
   const { referenceForm } = store.profileComparison;
-  console.log('study:');
-  console.log(study);
-  console.log('cancer:');
-  console.log(cancer);
-  console.log('strategy');
-  console.log(strategy);
+
   // main form
   const {
     control,
@@ -67,8 +61,7 @@ export default function PcReference() {
   });
   const { search } = watchSearch();
 
-  const [calculationQuery1, setCalculationQuery1] = useState('');
-  const [calculationQuery2, setCalculationQuery2] = useState('');
+  const [calculationQuery, setCalculationQuery] = useState('');
   const [signatureSetQuery, setSignatureSetQuery] = useState('');
   const [signatureNamesQuery, setSignatureNamesQuery] = useState('');
 
@@ -86,47 +79,12 @@ export default function PcReference() {
     skip: !signatureNamesQuery,
   });
   //   seqmatrix api
-  const {
-    data: data1,
-    error: error1,
-    isFetching: isFetching1,
-  } = useProfileComparisonReference1Query(calculationQuery1, {
-    skip: !calculationQuery1,
-  });
-
-  //signature api
-  const {
-    data: data2,
-    error: error2,
-    isFetching: isFetching2,
-  } = useProfileComparisonReference2Query(calculationQuery2, {
-    skip: !calculationQuery2,
-  });
-  let data;
-  if ((data1 != null) & (data2 != null)) {
-    console.log('data1');
-    console.log(data1);
-    console.log('data2');
-    console.log(data2);
-    console.log(data1.arg);
-    console.log(data2.arg);
-    const compares = [data1.arg.sample, data2.arg.signatureName];
-    console.log(compares);
-    const dat1temp = Object.values(data1);
-    const sample1 = dat1temp.slice(0, dat1temp.length - 1);
-    console.log(sample1);
-    const dat2temp = Object.values(data2);
-    const sample2 = dat2temp.slice(0, dat2temp.length - 1);
-    console.log(sample2);
-
-    if (data1.arg.profile === 'SBS') {
-      data = pcReferenceSamples_SBS(compares, sample1, sample2, 'signatures');
-    } else if (data1.arg.profile === 'DBS') {
-      data = pcBetweenSamples_DBS(compares, sample1, sample2, 'signatures');
-    } else {
-      data = pcBetweenSamples_ID(compares, sample1, sample2, 'signatures');
+  const { data, error, isFetching } = useProfileComparisonReferenceQuery(
+    calculationQuery,
+    {
+      skip: !calculationQuery,
     }
-  }
+  );
 
   // declare form Options
   const profileOptions = matrixData.length
@@ -164,6 +122,7 @@ export default function PcReference() {
     }
   }, [profile]);
   // get signature names when signature set is selected
+
   useEffect(() => {
     if (signatureSet) {
       setSignatureNamesQuery({
@@ -190,13 +149,13 @@ export default function PcReference() {
         }))
       : [];
   }
-
+  console.log(data);
   function onSubmit(data) {
     mergeForm(data);
-
+    console.log(data);
     const { profile, sample, signatureSet, compare } = data;
-    const params1 =
-      source == 'user'
+    const params_spectrum =
+      source === 'user'
         ? {
             fn: 'profileComparisonRefSig',
             args: {
@@ -209,8 +168,8 @@ export default function PcReference() {
               compare: compare,
               matrixFile: matrixList.filter(
                 (e) =>
-                  e.profile == profile.value &&
-                  e.matrix == defaultMatrix(profile.value, ['96', '78', '83'])
+                  e.profile === profile.value &&
+                  e.matrix === defaultMatrix(profile.value, ['96', '78', '83'])
               )[0].Path,
             },
             projectID,
@@ -228,8 +187,8 @@ export default function PcReference() {
                 ? '78'
                 : '83',
           };
-    const params2 =
-      source == 'user'
+    const params_signature =
+      source === 'user'
         ? {
             fn: 'profileComparisonRefSig',
             args: {
@@ -240,8 +199,8 @@ export default function PcReference() {
               signatureName: compare,
               matrixFile: matrixList.filter(
                 (e) =>
-                  e.profile == profile.value &&
-                  e.matrix == defaultMatrix(profile.value, ['96', '78', '83'])
+                  e.profile === profile.value &&
+                  e.matrix === defaultMatrix(profile.value, ['96', '78', '83'])
               )[0].Path,
             },
             projectID,
@@ -258,8 +217,11 @@ export default function PcReference() {
             signatureSetName: signatureSet.value,
             signatureName: compare,
           };
-    setCalculationQuery1(params1);
-    setCalculationQuery2(params2);
+
+    console.log(data);
+    setCalculationQuery({ params_spectrum, params_signature });
+    console.log(calculationQuery);
+    //setCalculationQuery2(params2);
   }
 
   function handleProfile(e) {
@@ -324,7 +286,7 @@ export default function PcReference() {
       </p>
 
       <hr />
-      <LoadingOverlay active={isFetching1} />
+      <LoadingOverlay active={isFetching} />
       <Form className="p-3" onSubmit={handleSubmit(onSubmit)}>
         <Row>
           <Col lg="auto">
@@ -421,16 +383,16 @@ export default function PcReference() {
         )}
       </Form>
       <div id="pcReferencePlot">
-        {error1 && (
+        {error && (
           <>
             <hr />
             <div className="p-3">
               <p>An error has occured. Please verify your input.</p>
-              <p>{error1.data}</p>
+              <p>{error.data}</p>
             </div>
           </>
         )}
-        {data1 && data2 && (
+        {data && (
           <>
             <hr />
 

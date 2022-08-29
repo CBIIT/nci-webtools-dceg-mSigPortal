@@ -3,6 +3,7 @@ import pcBetweenSamples_SBS from '../../../controls/plotly/profileComparision/pc
 import pcBetweenSamples_DBS from '../../../controls/plotly/profileComparision/pcBetweenSamples_DBS';
 import pcBetweenSamples_ID from '../../../controls/plotly/profileComparision/pcBetweenSamples_ID';
 import { groupBy } from 'lodash';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query';
 
 export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -25,28 +26,84 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
         }
       },
     }),
-    profileComparisonReference1: builder.query({
-      query: (params) => ({
-        url: 'mutational_spectrum',
-        params,
-      }),
-      transformResponse: (data, meta, arg) => {
-        console.log(data);
-        console.log(arg);
-        return { ...data, arg };
+    // profileComparisonReference1: builder.query({
+    //   query: (params) => ({
+    //     url: 'mutational_spectrum',
+    //     params,
+    //   }),
+    //   transformResponse: (data, meta, arg) => {
+    //     console.log(data);
+    //     console.log(arg);
+    //     return { ...data, arg };
+    //   },
+    // }),
+    // profileComparisonReference2: builder.query({
+    //   query: (params) => ({
+    //     url: 'mutational_signature',
+    //     params,
+    //   }),
+    //   transformResponse: (data, meta, arg) => {
+    //     console.log(data);
+    //     console.log(arg);
+    //     return { ...data, arg };
+    //   },
+    // }),
+
+    profileComparisonReference: builder.query({
+      async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
+        console.log(_arg);
+        // get a random user
+        const { data: spectrumData, error: spectrumError } = await fetchWithBQ(
+          'mutational_spectrum?' + new URLSearchParams(_arg.params_spectrum)
+        );
+        if (spectrumError) return { error: spectrumError };
+
+        const { data: signatureData, error: signatureError } =
+          await fetchWithBQ(
+            'mutational_signature?' + new URLSearchParams(_arg.params_signature)
+          );
+        if (signatureError) return { error: signatureError };
+
+        console.log(spectrumData);
+        console.log(signatureData);
+        // console.log(_arg);
+        const samples = [
+          _arg.params_spectrum.sample,
+          _arg.params_signature.signatureName,
+        ];
+        // console.log(samples);
+        if (_arg.params_spectrum.profile === 'SBS') {
+          // return pcBetweenSamples_SBS(
+          //   samples,
+          //   spectrumData,
+          //   signatureData,
+          //   'reference'
+          // );
+          return pcBetweenSamples_SBS({
+            samples: samples,
+            sample1: spectrumData,
+            sample2: signatureData,
+            tab: 'reference',
+          });
+        } else if (_arg.params_spectrum.profile === 'DBS') {
+          return pcBetweenSamples_DBS(
+            samples,
+            spectrumData,
+            signatureData,
+            'reference'
+          );
+        } else {
+          return pcBetweenSamples_ID(
+            samples,
+            spectrumData,
+            signatureData,
+            'reference'
+          );
+        }
+        //return { spectrumData, signatureData };
       },
     }),
-    profileComparisonReference2: builder.query({
-      query: (params) => ({
-        url: 'mutational_signature',
-        params,
-      }),
-      transformResponse: (data, meta, arg) => {
-        console.log(data);
-        console.log(arg);
-        return { ...data, arg };
-      },
-    }),
+
     profileComparisonPublic: builder.query({
       query: (params) => ({
         url: 'visualizationWrapper',
@@ -65,7 +122,7 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
     }),
     pcSignatureNames: builder.query({
       query: (params) => ({ url: 'mutational_signature', params }),
-      transformResponse: (data) =>
+      transformResponse: (data, meta, arg) =>
         [...new Set(data.map((e) => e.signatureName))].sort((a, b) =>
           a.localeCompare(b, undefined, { sensitivity: 'base' })
         ),
@@ -75,8 +132,8 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
 
 export const {
   useProfileComparisonWithinQuery,
-  useProfileComparisonReference1Query,
-  useProfileComparisonReference2Query,
+
+  useProfileComparisonReferenceQuery,
   useProfileComparisonPublicQuery,
   usePcSignatureSetsQuery,
   usePcSignatureNamesQuery,

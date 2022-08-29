@@ -70,6 +70,7 @@ export default function PcWithin() {
   useEffect(() => {
     if (!profile && profileOptions.length) handleProfile(profileOptions[0]);
   }, [profileOptions]);
+  console.log(data);
 
   function onSubmit(data) {
     mergeForm(data);
