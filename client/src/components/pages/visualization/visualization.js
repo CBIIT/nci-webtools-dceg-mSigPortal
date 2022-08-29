@@ -16,7 +16,7 @@ import CosineSimilarity from './cosineSimilarity';
 import CosineSimilarity2 from './cosineSimilarity/cosineSimilarity';
 import MutationalPattern from './mutationalPattern/mutationalPattern';
 import MutationalPattern2 from './mutationalPattern2/mutationalPattern';
-import ProfileComparison from './profileComparison';
+import ProfileComparison from './profileComparison/profileComparison';
 import ProfileComparison2 from './profileComparison2/profileComparison';
 import PCA from './pca';
 import PCA2 from './pca/pca';
@@ -379,7 +379,7 @@ export default function Visualization({ match }) {
 
     {
       name: 'Profile Comparison',
-      id: 'profileComparison2',
+      id: 'profileComparison',
       component: <ProfileComparison2 />,
     },
     {

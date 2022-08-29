@@ -67,7 +67,7 @@ export default function TreeLeafForm() {
             matrixData
               .filter(
                 (e) =>
-                  e.sample &&
+                  e.sample == sample.value &&
                   e.profile == profile.value &&
                   supportMatrix[e.profile].includes(e.matrix)
               )
@@ -83,12 +83,15 @@ export default function TreeLeafForm() {
           ...new Set(
             matrixData
               .filter(
-                (e) => e.sample && e.Profile == profile.value + matrix.value
+                (e) =>
+                  e.sample == sample.value &&
+                  e.profile == profile.value &&
+                  supportMatrix[e.profile].includes(matrix.value)
               )
-              .map((e) => e.Filter)
+              .map((e) => e.filter)
               .sort((a, b) => a - b)
           ),
-        ].map((e) => ({ label: e, value: e }))
+        ].map((e) => ({ label: e ? e : 'N/A', value: e }))
       : [];
 
   function handleSample(sample) {

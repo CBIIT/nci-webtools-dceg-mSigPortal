@@ -8,7 +8,7 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 export default function MutProfilePlot() {
   const store = useSelector((state) => state.visualization);
 
-  const { sample, profile, matrix } = store.mutationalProfiles;
+  const { sample, profile, matrix, filter } = store.mutationalProfiles;
   const { study, cancer, strategy } = store.publicForm;
   const { source, projectID } = store.main;
 
@@ -25,14 +25,14 @@ export default function MutProfilePlot() {
         study: study.value,
         cancer: cancer.value,
         strategy: strategy.value,
-        ...(source == 'user' && { userId: projectID }),
+        ...(source == 'user' && { userId: projectID, filter: filter.value }),
         sample: sample.value,
         profile: profile.value,
         matrix: matrix.value,
       };
       setParams(params);
     }
-  }, [sample, profile, matrix]);
+  }, [sample, profile, matrix, filter]);
 
   return (
     <>

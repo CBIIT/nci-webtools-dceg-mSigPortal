@@ -13,7 +13,6 @@ const config = require('../../../config.json');
 const logger = require('../../logger');
 const { parseCSV, importUserSession } = require('../analysis');
 const { schema } = require('./userSchema');
-const { performance } = require('perf_hooks');
 
 // config info for R functions
 const rConfig = {
@@ -36,10 +35,10 @@ async function* getFiles(dir) {
 }
 
 // transform all matrix files into a single json object
-async function getMatrices(path) {
+async function getMatrices(matrixFolder) {
   let files = [];
   const fileRegex = /\.all$/;
-  for await (const f of getFiles(path)) {
+  for await (const f of getFiles(matrixFolder)) {
     if (fileRegex.test(f)) files = [...files, f];
   }
   const profileRegex = /\.([A-Z]+)\d+.all$/;
@@ -54,13 +53,17 @@ async function getMatrices(path) {
         return data
           .map((e) => {
             const { MutationType, ...samples } = e;
-            return Object.entries(samples).map(([sample, mutations]) => ({
-              profile,
-              matrix,
-              mutationType: MutationType,
-              sample,
-              mutations,
-            }));
+            return Object.entries(samples).map(([sample, mutations]) => {
+              const splitSample = sample.split('@');
+              return {
+                sample: splitSample[0],
+                filter: splitSample[1] || '',
+                profile,
+                matrix,
+                mutationType: MutationType,
+                mutations,
+              };
+            });
           })
           .flat();
       })
@@ -95,25 +98,15 @@ async function profilerExtraction(params) {
   logger.debug('/profilerExtraction: CLI args\n' + cli);
 
   try {
-    const startP = performance.now();
     const { stdout, stderr } = await spawn(
       'python3',
       ['services/python/mSigPortal_Profiler_Extraction.py', ...cli],
       { encoding: 'utf8' }
     );
-    const endP = performance.now();
 
     // parse matrix files and transform into single json file
     const matrixFiles = path.join(projectPath, 'results/output');
-    const start = performance.now();
     const matrices = await getMatrices(matrixFiles);
-    const end = performance.now();
-    logger.debug([
-      'transform matrix',
-      end - start,
-      'extraction',
-      endP - startP,
-    ]);
     const matricesFile = path.join(projectPath, 'matrices.json');
     fs.writeFileSync(matricesFile, JSON.stringify(matrices));
 

@@ -49,7 +49,6 @@ export default function PublicForm() {
   function handleReset() {
     window.location.hash = '#/visualization';
     resetForm();
-    // resetSamples();
     dispatch(resetVisualizationApi);
     resetVisualization();
   }

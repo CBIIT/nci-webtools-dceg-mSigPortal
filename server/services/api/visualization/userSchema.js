@@ -3,14 +3,15 @@ const schema = [
     name: 'seqmatrix',
     schema: (table) => {
       table.increments('id');
+      table.string('sample');
       table.string('profile');
       table.integer('matrix');
-      table.string('sample');
       table.string('mutationType');
       table.integer('mutations');
+      table.string('filter');
     },
     index: (table) => {
-      table.index(['profile', 'matrix', 'sample']);
+      table.index(['profile', 'matrix', 'sample', 'filter']);
     },
   },
 
@@ -19,7 +20,7 @@ const schema = [
     type: 'materializedView',
     dependsOn: ['seqmatrix'],
     create: (connection) => {
-      const columns = ['profile', 'matrix', 'sample'];
+      const columns = ['profile', 'matrix', 'sample', 'filter'];
 
       return connection.raw(
         [
@@ -30,7 +31,7 @@ const schema = [
       );
     },
     index: (table) => {
-      table.index(['profile', 'matrix', 'sample']);
+      table.index(['profile', 'matrix', 'sample', 'filter']);
     },
   },
 
@@ -44,16 +45,18 @@ const schema = [
           CREATE TABLE seqmatrixSummary AS
           WITH records AS (
             SELECT        
-                sample,
-                profile,
-                matrix,
-                sum(mutations) as totalMutations
+              sample || '@' || filter as sample,
+              profile,
+              matrix,
+              filter,
+              sum(mutations) as totalMutations
             FROM seqmatrix
-            GROUP BY sample, profile, matrix
+            GROUP BY sample, filter, profile, matrix
           )
           SELECT
             sample,
             profile,
+            filter,
             group_concat(cast(matrix as text), '/') as matrix,
             log10(totalMutations) as logTotalMutations,
             avg(totalMutations) as meanTotalMutations
@@ -65,7 +68,7 @@ const schema = [
       );
     },
     index: (table) => {
-      table.index(['sample', 'profile', 'matrix']);
+      table.index(['sample', 'profile', 'matrix', 'filter']);
     },
   },
 ];

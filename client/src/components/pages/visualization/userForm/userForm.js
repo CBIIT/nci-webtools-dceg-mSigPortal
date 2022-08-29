@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import {
   Form,
   Button,
@@ -12,6 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle, faFolderMinus } from '@fortawesome/free-solid-svg-icons';
 import { useForm, Controller } from 'react-hook-form';
 import Select from '../../../controls/select/selectForm';
+import MultiSelect from '../../../controls/select/multiSelect';
 import { actions as visualizationActions } from '../../../../services/store/visualization';
 import { actions as modalActions } from '../../../../services/store/modal';
 import { resetVisualizationApi } from '../../../../services/store/rootApi';
@@ -40,7 +40,7 @@ export default function UserForm() {
   const resetVisualization = (_) => dispatch(actions.resetVisualization());
 
   const { inputFilename, bedFilename, projectID, ...userForm } = store.userForm;
-  const { submitted, source } = store.main;
+  const { submitted } = store.main;
 
   const [handleUpload, { isLoading: isUploading }] =
     useVisualizationUserUploadMutation();
@@ -78,7 +78,7 @@ export default function UserForm() {
     genome: genomeOptions[0],
     strategy: 'WGS',
     mutationSplit: false,
-    filter: '',
+    filter: [],
     bedFile: '',
     collapse: false,
     useQueue: false,
@@ -96,13 +96,16 @@ export default function UserForm() {
     formState: { errors },
   } = useForm({ defaultValues: defaultFormValues });
 
-  const inputFormat = watch('inputFormat');
-  const inputFile = watch('inputFile');
-  const bedFile = watch('bedFile');
-  const strategy = watch('strategy');
-  const mutationSplit = watch('mutationSplit');
-  const filter = watch('filter');
-  const useQueue = watch('useQueue');
+  const {
+    inputFormat,
+    inputFile,
+    bedFile,
+    strategy,
+    mutationSplit,
+    filter,
+    collapse,
+    useQueue,
+  } = watch();
 
   function handleReset() {
     window.location.hash = '#/visualization';
@@ -165,68 +168,76 @@ export default function UserForm() {
         inputFilename: data.inputFile.name,
         bedFilename: data.bedFile.name,
       });
+
+      // python cli args
+      let args = {
+        inputFormat: ['-f', data.inputFormat.value],
+        inputFile: ['-i', filePaths.filePath],
+        projectID: ['-p', projectID],
+        genomeAssemblyVersion: ['-g', data.genome.value],
+        strategy: ['-t', data.strategy],
+        outputDir: ['-o', projectID],
+      };
+
+      // conditionally include mutation split and mutation filter params
+      if (['vcf', 'csv', 'tsv'].includes(inputFormat.value)) {
+        args['collapseSample'] = ['-c', data.collapse ? 'True' : 'False'];
+
+        if (data.bedFile) args['bedFile'] = ['-b', filePaths.bedPath];
+
+        if (data.filter.length) {
+          args['mutationFilter'] = [
+            '-F',
+            data.filter.map((e) => e.value).join('@'),
+          ];
+        } else {
+          args['mutationSplit'] = ['-s', data.mutationSplit ? 'True' : 'False'];
+        }
+      }
+
+      if (useQueue) {
+        try {
+          await handleSubmitQueue({ args, state: { ...store } });
+
+          mergeSuccess(
+            `Your job was successfully submitted to the queue. You will recieve an email at ${userForm.email} with your results.`
+          );
+        } catch (err) {
+          mergeError('Failed to submit to queue. Please Try Again.');
+        }
+      } else {
+        try {
+          mergeMain({ loading: { active: true } });
+          const { stdout, stderr, ...rest } = await profilerExtraction(
+            args
+          ).unwrap();
+          const matrixData = await fetchMatrix({ userId: projectID }).unwrap();
+
+          mergeMain({ projectID, matrixData, ...rest });
+        } catch (error) {
+          if (error.originalStatus == 504) {
+            mergeMain({
+              error: 'Please Reset Your Parameters and Try again.',
+            });
+            mergeError(
+              'Your submission has timed out. Please try again by submitting this job to a queue instead.'
+            );
+          } else {
+            mergeMain({
+              error: 'Please Reset Your Parameters and Try again.',
+            });
+
+            const message = Object.values(error.data);
+            mergeError(message);
+          }
+        } finally {
+          mergeMain({ loading: { active: false } });
+        }
+      }
     } catch (error) {
       mergeError('An error occured while uploading files. Please try again.');
     }
   }
-
-  async function submitWeb(args) {
-    try {
-      mergeMain({ loading: { active: true } });
-      const { stdout, stderr, ...rest } = await profilerExtraction(
-        args
-      ).unwrap();
-      const matrixData = await fetchMatrix({ userId: projectID }).unwrap();
-
-      mergeMain({ projectID, matrixData, ...rest });
-    } catch (error) {
-      if (error.originalStatus == 504) {
-        mergeMain({
-          error: 'Please Reset Your Parameters and Try again.',
-        });
-        mergeError(
-          'Your submission has timed out. Please try again by submitting this job to a queue instead.'
-        );
-      } else {
-        mergeMain({
-          error: 'Please Reset Your Parameters and Try again.',
-        });
-
-        const message = Object.values(error.data);
-        mergeError(message);
-      }
-    }
-    mergeMain({ loading: { active: false } });
-  }
-
-  async function submitQueue(args) {
-    try {
-      await handleSubmitQueue({ args, state: { ...store } });
-
-      mergeSuccess(
-        `Your job was successfully submitted to the queue. You will recieve an email at ${userForm.email} with your results.`
-      );
-    } catch (err) {
-      mergeError('Failed to submit to queue. Please Try Again.');
-    }
-  }
-
-  // perform web or queue submit after file upload and form is merged
-  useEffect(() => {
-    if (source == 'user' && projectID) {
-      const pythonArgs = {
-        inputFormat: ['-f', userForm.inputFormat.value],
-        inputFile: ['-i', userForm.filePath],
-        projectID: ['-p', projectID],
-        genomeAssemblyVersion: ['-g', userForm.genome.value],
-        strategy: ['-t', userForm.strategy],
-        outputDir: ['-o', projectID],
-      };
-
-      if (useQueue) submitQueue(pythonArgs);
-      else submitWeb(pythonArgs);
-    }
-  }, [projectID]);
 
   const msPopover = (
     <Popover id="popover-basic">
@@ -422,6 +433,7 @@ export default function UserForm() {
               <Form.Check.Input
                 {...field}
                 type="checkbox"
+                checked={mutationSplit}
                 disabled={
                   submitted ||
                   filter.length ||
@@ -435,7 +447,7 @@ export default function UserForm() {
       </Form.Group>
       <Form.Group controlId="filter">
         <Form.Label>
-          Select Filter{' '}
+          Select Filter(s){' '}
           <span className="text-muted font-italic font-weight-normal">
             (optional)
           </span>
@@ -444,10 +456,8 @@ export default function UserForm() {
           name="filter"
           control={control}
           render={({ field }) => (
-            <Form.Control
+            <MultiSelect
               {...field}
-              type="text"
-              size="sm"
               placeholder="Enter a filter"
               disabled={
                 submitted ||
@@ -457,9 +467,6 @@ export default function UserForm() {
             />
           )}
         />
-        <Form.Text className="text-muted">
-          Use @ to separate multiple filters
-        </Form.Text>
       </Form.Group>
       <hr className="mb-3" />
       <Form.Group controlId="dataFileUpload">
@@ -586,6 +593,7 @@ export default function UserForm() {
               <Form.Check.Input
                 {...field}
                 type="checkbox"
+                checked={collapse}
                 disabled={
                   submitted ||
                   ['catalog_csv', 'catalog_tsv'].includes(inputFormat)

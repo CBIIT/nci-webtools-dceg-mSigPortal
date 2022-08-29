@@ -60,12 +60,11 @@ export default function MutationalProfiles(props) {
           </Tab.Pane>
           {source == 'user' && (
             <Tab.Pane key="public" eventKey="public" className="border-0">
-              {/* <PcWithin /> */}
+              {/* <PcPublic /> */}
             </Tab.Pane>
           )}
         </Tab.Content>
       </Tab.Container>
-      {/* <Debug msg={debugR} /> */}
     </div>
   );
 }
