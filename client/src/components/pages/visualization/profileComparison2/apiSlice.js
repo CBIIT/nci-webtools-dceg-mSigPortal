@@ -68,45 +68,40 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
         console.log(signatureData);
         // console.log(_arg);
 
-        return { spectrumData, signatureData };
-      },
-      transformResponse: (data, meta, arg) => {
-        console.log(data);
-        console.log(meta);
-        console.log(arg);
-        //   const samples = [
-        //   _arg.params_spectrum.sample,
-        //   _arg.params_signature.signatureName,
-        // ];
-        // // console.log(samples);
-        // if (_arg.params_spectrum.profile === 'SBS') {
-        //   return pcBetweenSamples_SBS(
-        //     samples,
-        //     spectrumData,
-        //     signatureData,
-        //     'reference'
-        //   );
-        //   // return pcBetweenSamples_SBS({
-        //   //   samples: samples,
-        //   //   sample1: spectrumData,
-        //   //   sample2: signatureData,
-        //   //   tab: 'reference',
-        //   // });
-        // } else if (_arg.params_spectrum.profile === 'DBS') {
-        //   return pcBetweenSamples_DBS(
-        //     samples,
-        //     spectrumData,
-        //     signatureData,
-        //     'reference'
-        //   );
-        // } else {
-        //   return pcBetweenSamples_ID(
-        //     samples,
-        //     spectrumData,
-        //     signatureData,
-        //     'reference'
-        //   );
-        // }}
+        // return { data: spectrumData, signatureData, arg: _arg };
+        const samples = [
+          _arg.params_spectrum.sample,
+          _arg.params_signature.signatureName,
+        ];
+
+        if (_arg.params_spectrum.profile === 'SBS') {
+          return {
+            data: pcBetweenSamples_SBS(
+              samples,
+              spectrumData,
+              signatureData,
+              'reference'
+            ),
+          };
+        } else if (_arg.params_spectrum.profile === 'DBS') {
+          return {
+            data: pcBetweenSamples_DBS(
+              samples,
+              spectrumData,
+              signatureData,
+              'reference'
+            ),
+          };
+        } else {
+          return {
+            data: pcBetweenSamples_ID(
+              samples,
+              spectrumData,
+              signatureData,
+              'reference'
+            ),
+          };
+        }
       },
     }),
 
