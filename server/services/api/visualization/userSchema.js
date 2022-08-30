@@ -45,7 +45,7 @@ const schema = [
           CREATE TABLE seqmatrixSummary AS
           WITH records AS (
             SELECT        
-              sample || '@' || filter as sample,
+              sample || IIF(filter != '', '@', '') || COALESCE(filter, '') AS sample,
               profile,
               matrix,
               filter,
@@ -57,7 +57,7 @@ const schema = [
             sample,
             profile,
             filter,
-            group_concat(cast(matrix as text), '/') as matrix,
+            GROUP_CONCAT(cast(matrix as text), '/') AS matrix,
             log10(totalMutations) as logTotalMutations,
             avg(totalMutations) as meanTotalMutations
           FROM records r
