@@ -21,16 +21,19 @@ export default function profilerSummary(rawData) {
     })
     .sort((a, b) => b.mean - a.mean);
 
-  // sort samples of other profiles to match the sample order of the profile with the largest mean
-  const sampleOrder = data[0].samples.map((s) => s.sample);
-  const sortedSamples = data.map((e) => ({
+  // sort samples of other profiles to match the sample order of the profile with the largest mean mutation value
+  const topSamples = data[0].samples.map((s) => s.sample);
+  const allSamples = [...new Set(rawData.map((e) => e.sample))].sort(
+    (a, b) => topSamples.indexOf(a) - topSamples.indexOf(b)
+  );
+  const sortedData = data.map((e) => ({
     ...e,
     samples: e.samples.sort(
-      (a, b) => sampleOrder.indexOf(a.sample) - sampleOrder.indexOf(b.sample)
+      (a, b) => allSamples.indexOf(a.sample) - allSamples.indexOf(b.sample)
     ),
   }));
 
-  const traces = sortedSamples.map((e, i, array) => {
+  const traces = sortedData.map((e, i, array) => {
     return {
       name: e.name,
       x: e.samples.map((s) => s.sample),
@@ -60,7 +63,9 @@ export default function profilerSummary(rawData) {
       showline: true,
       mirror: true,
       tickangle: 45,
-      range: [-1, traces[0].x.length],
+      type: 'category',
+      categoryorder: 'array',
+      categoryarray: allSamples,
     },
     yaxis: {
       title: 'log<sub>10</sub>(Mutations)',
