@@ -67,40 +67,46 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
         console.log(spectrumData);
         console.log(signatureData);
         // console.log(_arg);
-        const samples = [
-          _arg.params_spectrum.sample,
-          _arg.params_signature.signatureName,
-        ];
-        // console.log(samples);
-        if (_arg.params_spectrum.profile === 'SBS') {
-          // return pcBetweenSamples_SBS(
-          //   samples,
-          //   spectrumData,
-          //   signatureData,
-          //   'reference'
-          // );
-          return pcBetweenSamples_SBS({
-            samples: samples,
-            sample1: spectrumData,
-            sample2: signatureData,
-            tab: 'reference',
-          });
-        } else if (_arg.params_spectrum.profile === 'DBS') {
-          return pcBetweenSamples_DBS(
-            samples,
-            spectrumData,
-            signatureData,
-            'reference'
-          );
-        } else {
-          return pcBetweenSamples_ID(
-            samples,
-            spectrumData,
-            signatureData,
-            'reference'
-          );
-        }
-        //return { spectrumData, signatureData };
+
+        return { spectrumData, signatureData };
+      },
+      transformResponse: (data, meta, arg) => {
+        console.log(data);
+        console.log(meta);
+        console.log(arg);
+        //   const samples = [
+        //   _arg.params_spectrum.sample,
+        //   _arg.params_signature.signatureName,
+        // ];
+        // // console.log(samples);
+        // if (_arg.params_spectrum.profile === 'SBS') {
+        //   return pcBetweenSamples_SBS(
+        //     samples,
+        //     spectrumData,
+        //     signatureData,
+        //     'reference'
+        //   );
+        //   // return pcBetweenSamples_SBS({
+        //   //   samples: samples,
+        //   //   sample1: spectrumData,
+        //   //   sample2: signatureData,
+        //   //   tab: 'reference',
+        //   // });
+        // } else if (_arg.params_spectrum.profile === 'DBS') {
+        //   return pcBetweenSamples_DBS(
+        //     samples,
+        //     spectrumData,
+        //     signatureData,
+        //     'reference'
+        //   );
+        // } else {
+        //   return pcBetweenSamples_ID(
+        //     samples,
+        //     spectrumData,
+        //     signatureData,
+        //     'reference'
+        //   );
+        // }}
       },
     }),
 
