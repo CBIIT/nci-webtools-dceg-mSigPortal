@@ -1,173 +1,153 @@
 export const schema = [
   {
-    name: "association",
+    name: 'association',
     schema: (table) => {
-      table.increments("id");
-      table.string("study");
-      table.string("strategy");
-      table.string("cancer");
-      table.string("sample");
-      table.string("icgcSpecimenId");
-      table.string("icgcDonorId");
-      table.string("dataSource");
-      table.string("dataType");
-      table.string("variableName");
-      table.string("variableValue");
-      table.string("variableValueType");
+      table.increments('id');
+      table.string('study');
+      table.string('strategy');
+      table.string('cancer');
+      table.string('sample');
+      table.string('icgcSpecimenId');
+      table.string('icgcDonorId');
+      table.string('dataSource');
+      table.string('dataType');
+      table.string('variableName');
+      table.string('variableValue');
+      table.string('variableValueType');
     },
     index: (table) => {
-      table.index([
-        "study", 
-        "strategy", 
-        "cancer", 
-        "sample"
-      ]);
-    }
+      table.index(['study', 'strategy', 'cancer', 'sample']);
+    },
   },
 
   {
-    name: "associationOption",
-    type: "materializedView",
-    dependsOn: ["association"],
+    name: 'associationOption',
+    type: 'materializedView',
+    dependsOn: ['association'],
     schema: (view, connection) => {
-      const columns = [
-        "study",
-        "strategy",
-        "cancer",
-        "sample",
-      ];
-      const query = connection("association").distinct(columns);
+      const columns = ['study', 'strategy', 'cancer', 'sample'];
+      const query = connection('association').distinct(columns);
       view.columns(columns);
       return view.as(query);
     },
     index: (table) => {
-      table.index([
-        "study",
-        "strategy",
-        "cancer",
-        "sample",
-      ]);
-    }  
+      table.index(['study', 'strategy', 'cancer', 'sample']);
+    },
   },
 
   {
-    name: "exposure",
+    name: 'exposure',
     schema: (table) => {
-      table.increments("id");
-      table.string("study");
-      table.string("strategy");
-      table.string("cancer");
-      table.string("organ");
-      table.string("sample");
-      table.string("signatureSetName");
-      table.string("signatureName");
-      table.double("exposure");
+      table.increments('id');
+      table.string('study');
+      table.string('strategy');
+      table.string('cancer');
+      table.string('organ');
+      table.string('sample');
+      table.string('signatureSetName');
+      table.string('signatureName');
+      table.double('exposure');
     },
     index: (table) => {
-      table.index([
-        "study", 
-        "strategy", 
-        "cancer", 
-        "signatureSetName"
-      ]);
-    }
+      table.index(['study', 'strategy', 'cancer', 'signatureSetName']);
+    },
   },
 
   {
-    name: "exposureOption",
-    type: "materializedView",
-    dependsOn: ["exposure"],
+    name: 'exposureOption',
+    type: 'materializedView',
+    dependsOn: ['exposure'],
     schema: (view, connection) => {
       const columns = [
-        "study",
-        "strategy",
-        "cancer",
-        "signatureSetName", 
-        "signatureName"
+        'study',
+        'strategy',
+        'cancer',
+        'signatureSetName',
+        'signatureName',
       ];
-      const query = connection("exposure").distinct(columns);
+      const query = connection('exposure').distinct(columns);
       view.columns(columns);
       view.as(query);
     },
     index: (table) => {
-      table.index([ 
-        "study",
-        "strategy",
-        "cancer",
-        "signatureSetName", 
-        "signatureName"
+      table.index([
+        'study',
+        'strategy',
+        'cancer',
+        'signatureSetName',
+        'signatureName',
       ]);
-    }
+    },
   },
 
   {
-    name: "seqmatrix",
+    name: 'seqmatrix',
     schema: (table) => {
-      table.increments("id");
-      table.string("study");
-      table.string("strategy");
-      table.string("cancer");
-      table.string("sample");
-      table.string("profile");
-      table.integer("matrix");
-      table.string("mutationType");
-      table.integer("mutations");
+      table.increments('id');
+      table.string('study');
+      table.string('strategy');
+      table.string('cancer');
+      table.string('sample');
+      table.string('profile');
+      table.integer('matrix');
+      table.string('mutationType');
+      table.integer('mutations');
     },
     index: (table) => {
       table.index([
-        "study",
-        "strategy",
-        "cancer",
-        "sample",
-        "profile",
-        "matrix",
+        'study',
+        'strategy',
+        'cancer',
+        'sample',
+        'profile',
+        'matrix',
       ]);
-    }
+    },
   },
 
   {
-    name: "seqmatrixOption",
-    type: "materializedView",
-    dependsOn: ["seqmatrix"],
+    name: 'seqmatrixOption',
+    type: 'materializedView',
+    dependsOn: ['seqmatrix'],
     schema: (view, connection) => {
       const columns = [
-        "study",
-        "strategy",
-        "cancer",
-        "sample",
-        "profile",
-        "matrix",
+        'study',
+        'strategy',
+        'cancer',
+        'sample',
+        'profile',
+        'matrix',
       ];
-      const query = connection("seqmatrix").distinct(columns);
+      const query = connection('seqmatrix').distinct(columns);
       view.columns(columns);
       return view.as(query);
     },
     index: (table) => {
       table.index([
-        "study",
-        "strategy",
-        "cancer",
-        "sample",
-        "profile",
-        "matrix",
+        'study',
+        'strategy',
+        'cancer',
+        'sample',
+        'profile',
+        'matrix',
       ]);
-    }  
+    },
   },
 
   {
-    name: "seqmatrixSummary",
-    type: "materializedView",
-    dependsOn: ["seqmatrix"],
+    name: 'seqmatrixSummary',
+    type: 'materializedView',
+    dependsOn: ['seqmatrix'],
     schema: (view, connection) => {
       const columns = [
-        "study",
-        "strategy",
-        "cancer",
-        "sample",
-        "profile",
-        "matrix",
-        "logTotalMutations",
-        "meanTotalMutations",
+        'study',
+        'strategy',
+        'cancer',
+        'sample',
+        'profile',
+        'matrix',
+        'logTotalMutations',
+        'meanTotalMutations',
       ];
       const totalCountColumns = [
         ...columns.slice(0, -2),
@@ -175,20 +155,22 @@ export const schema = [
       ];
       const summaryColumns = [
         ...columns.slice(0, -3),
-        connection.raw(`string_agg(cast(matrix as text), '/' order by matrix asc) as matrix`),
+        connection.raw(
+          `string_agg(cast(matrix as text), '/' order by matrix asc) as matrix`
+        ),
         connection.raw(`log10("totalMutations") as "logTotalMutations"`),
         connection.raw(`avg("totalMutations") as "meanTotalMutations"`),
       ];
       const totalCountQuery = connection
         .select(totalCountColumns)
-        .from("seqmatrix")
+        .from('seqmatrix')
         .groupBy(totalCountColumns.slice(0, -1))
         .orderBy(totalCountColumns.slice(0, -1).map((column) => ({ column })));
       const summaryQuery = connection
-        .with("totalCounts", totalCountQuery)
+        .with('totalCounts', totalCountQuery)
         .select(summaryColumns)
-        .from("totalCounts")
-        .where("totalMutations", ">", 0)
+        .from('totalCounts')
+        .where('totalMutations', '>', 0)
         .groupBy([...summaryColumns.slice(0, -3), 'totalMutations']);
 
       view.columns(columns);
@@ -196,163 +178,153 @@ export const schema = [
     },
     index: (table) => {
       table.index([
-        "study",
-        "strategy",
-        "cancer",
-        "sample",
-        "profile",
-        "matrix",
+        'study',
+        'strategy',
+        'cancer',
+        'sample',
+        'profile',
+        'matrix',
       ]);
-    }
+    },
   },
 
   {
-    name: "signature",
+    name: 'signature',
     schema: (table) => {
-      table.increments("id");
-      table.string("source");
-      table.string("strategy");
-      table.string("profile");
-      table.integer("matrix");
-      table.string("signatureSetName");
-      table.string("strandInfo");
-      table.string("strand");
-      table.string("signatureName");
-      table.string("mutationType");
-      table.double("contribution");
+      table.increments('id');
+      table.string('source');
+      table.string('strategy');
+      table.string('profile');
+      table.integer('matrix');
+      table.string('signatureSetName');
+      table.string('strandInfo');
+      table.string('strand');
+      table.string('signatureName');
+      table.string('mutationType');
+      table.double('contribution');
     },
     index: (table) => {
-      table.index([
-        "profile", 
-        "matrix", 
-        "signatureSetName"
-      ]);
-    }
+      table.index(['profile', 'matrix', 'signatureSetName']);
+    },
   },
 
-
   {
-    name: "signatureOption",
-    type: "materializedView",
-    dependsOn: ["signature"],
+    name: 'signatureOption',
+    type: 'materializedView',
+    dependsOn: ['signature'],
     schema: (view, connection) => {
       const columns = [
-        "source",
-        "strategy",
-        "profile",
-        "matrix",
-        "signatureSetName", 
-        "signatureName"
+        'source',
+        'strategy',
+        'profile',
+        'matrix',
+        'signatureSetName',
+        'signatureName',
       ];
-      const query = connection("signature").distinct(columns);
+      const query = connection('signature').distinct(columns);
       view.columns(columns);
       return view.as(query);
     },
     index: (table) => {
       table.index([
-        "source",
-        "strategy",
-        "profile",
-        "matrix",
-        "signatureSetName", 
-        "signatureName"
+        'source',
+        'strategy',
+        'profile',
+        'matrix',
+        'signatureSetName',
+        'signatureName',
       ]);
 
-      table.index([
-        "signatureSetName", 
-        "signatureName"
-      ]);
-    }
+      table.index(['signatureSetName', 'signatureName']);
+    },
   },
 
   {
-    name: "etiology",
+    name: 'etiologyOptions',
     schema: (table) => {
-      table.increments("id");
-      table.string("category");
-      table.string("etiology");
-      table.string("tissueSpecificSignature");
-      table.text("tissueDistribution");
-      table.string("refSignature");
-      table.string("refSignatureProportion");
-      table.string("treatment");
-      table.string("signature");
-      table.string("signatureExtractionMethod");
-      table.string("tumorType");
-      table.string("signatureName");
-      table.string("signatureSource");
-      table.string("mutagen");
-      table.string("cellLine");
-      table.string("url");
-      table.string("study");
-      table.string("studyUrl");
-      table.string("source");
-      table.string("sourceUrl");
-      table.text("description");
-      table.text("descriptionStrandBias");
-      table.text("genomeBuild");
+      table.increments('id');
+      table.string('category');
+      table.string('etiologyDisplay');
+      table.string('etiology');
+      table.string('signature');
+      table.string('study');
+      table.string('studyUrl');
+      table.text('genomeBuild');
+      table.string('signatureSource');
+      table.string('source');
+      table.string('sourceUrl');
+      table.string('cohort');
+      table.boolean('cosmic_v3_2');
+      table.boolean('refSig_v1');
+      table.text('descriptionStrandBias');
+      table.text('descriptionBaseContext');
+      table.text('description');
+      table.text('note');
+      table.string('cisMutation');
+      table.text('tissueDistribution');
+      table.string('mutagen');
+      table.string('treatment');
+      table.string('cellLine');
+      table.string('signatureExtractionMethod');
+      table.string('tumorType');
     },
     index: (table) => {
-      table.index(["category"]);
-    }
+      table.index(['category']);
+    },
   },
 
   {
-    name: "publication",
+    name: 'publication',
     schema: (table) => {
-      table.increments("id");
-      table.string("category");
-      table.string("firstAuthor");
-      table.string("lastAuthor");
-      table.integer("year");
-      table.string("journal");
-      table.string("bioRxivOrPubmedId");
-      table.text("title");
-      table.string("doi");
-      table.string("note");
-      table.string("diseaseOrPhenotypeOrExposure");
-      table.string("cancerType");
-      table.string("experimentalStrategy");
-      table.string("softwareName");
-      table.string("computationalMethod");
-      table.string("programmingLanguage");
-      table.string("sourceUrl");
+      table.increments('id');
+      table.string('category');
+      table.string('firstAuthor');
+      table.string('lastAuthor');
+      table.integer('year');
+      table.string('journal');
+      table.string('bioRxivOrPubmedId');
+      table.text('title');
+      table.string('doi');
+      table.string('note');
+      table.string('diseaseOrPhenotypeOrExposure');
+      table.string('cancerType');
+      table.string('experimentalStrategy');
+      table.string('softwareName');
+      table.string('computationalMethod');
+      table.string('programmingLanguage');
+      table.string('sourceUrl');
     },
     index: (table) => {
-      table.index(["category"]);
-    }
+      table.index(['category']);
+    },
   },
 
   {
-    name: "pattern",
+    name: 'pattern',
     schema: (table) => {
-      table.increments("id");
-      table.string("study");
-      table.string("cancer");
-      table.string("sample");
-      table.integer("total");
-      table.string("pattern");
-      table.integer("n0");
-      table.double("n1");
-      table.double("n2");
+      table.increments('id');
+      table.string('study');
+      table.string('cancer');
+      table.string('sample');
+      table.integer('total');
+      table.string('pattern');
+      table.integer('n0');
+      table.double('n1');
+      table.double('n2');
     },
     index: (table) => {
-      table.index([
-        "study",
-        "cancer",
-        "n1"
-      ]);
-    }
+      table.index(['study', 'cancer', 'n1']);
+    },
   },
 
   {
-    name: "importLog",
+    name: 'importLog',
     schema: (table, connection) => {
-      table.increments("id");
-      table.string("status");
-      table.text("log");
-      table.timestamp("createdAt").defaultTo(connection.fn.now());
-      table.timestamp("updatedAt").defaultTo(connection.fn.now());
+      table.increments('id');
+      table.string('status');
+      table.text('log');
+      table.timestamp('createdAt').defaultTo(connection.fn.now());
+      table.timestamp('updatedAt').defaultTo(connection.fn.now());
     },
   },
 ];

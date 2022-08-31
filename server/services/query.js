@@ -226,7 +226,7 @@ function getSignatureOptions(
   );
 }
 
-function getEtiologyData(
+function getEtiologyOptions(
   connection,
   query,
   columns = '*',
@@ -237,7 +237,7 @@ function getEtiologyData(
 ) {
   return getData(
     connection,
-    'etiology',
+    'etiologyOptions',
     query,
     columns,
     limit,
@@ -300,7 +300,7 @@ module.exports = {
   getSeqmatrixSummary,
   getSignatureData,
   getSignatureOptions,
-  getEtiologyData,
+  getEtiologyOptions,
   getPublicationData,
   getPatternData,
 };

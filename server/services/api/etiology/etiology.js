@@ -1,14 +1,14 @@
 const { Router } = require('express');
-const { getEtiologyData } = require('../../query');
+const { getEtiologyOptions } = require('../../query');
 const { pickNonNullValues } = require('../../utils');
 
-async function queryEtiology(req, res, next) {
+async function queryEtiologyOptions(req, res, next) {
   try {
     const { limit, offset, ...query } = req.query;
     const connection = req.app.locals.connection;
 
     const columns = '*';
-    const data = await getEtiologyData(
+    const data = await getEtiologyOptions(
       connection,
       query,
       columns,
@@ -24,6 +24,6 @@ async function queryEtiology(req, res, next) {
 
 const router = Router();
 
-router.get('/etiology', queryEtiology);
+router.get('/etiologyOptions', queryEtiologyOptions);
 
-module.exports = { router, queryEtiology };
+module.exports = { router, queryEtiologyOptions };
