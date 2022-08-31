@@ -26,28 +26,6 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
         }
       },
     }),
-    // profileComparisonReference1: builder.query({
-    //   query: (params) => ({
-    //     url: 'mutational_spectrum',
-    //     params,
-    //   }),
-    //   transformResponse: (data, meta, arg) => {
-    //     console.log(data);
-    //     console.log(arg);
-    //     return { ...data, arg };
-    //   },
-    // }),
-    // profileComparisonReference2: builder.query({
-    //   query: (params) => ({
-    //     url: 'mutational_signature',
-    //     params,
-    //   }),
-    //   transformResponse: (data, meta, arg) => {
-    //     console.log(data);
-    //     console.log(arg);
-    //     return { ...data, arg };
-    //   },
-    // }),
 
     profileComparisonReference: builder.query({
       async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
@@ -64,11 +42,6 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
           );
         if (signatureError) return { error: signatureError };
 
-        console.log(spectrumData);
-        console.log(signatureData);
-        // console.log(_arg);
-
-        // return { data: spectrumData, signatureData, arg: _arg };
         const samples = [
           _arg.params_spectrum.sample,
           _arg.params_signature.signatureName,
