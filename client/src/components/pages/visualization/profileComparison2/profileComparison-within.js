@@ -70,7 +70,6 @@ export default function PcWithin() {
   useEffect(() => {
     if (!profile && profileOptions.length) handleProfile(profileOptions[0]);
   }, [profileOptions]);
-  console.log(data);
 
   function onSubmit(data) {
     mergeForm(data);
@@ -87,7 +86,6 @@ export default function PcWithin() {
           : '83',
       sample: data.sample1.value + ',' + data.sample2.value,
     };
-    console.log(data);
     setParams(params);
   }
 

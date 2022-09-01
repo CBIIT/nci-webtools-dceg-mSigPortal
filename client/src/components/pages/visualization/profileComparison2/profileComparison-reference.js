@@ -149,10 +149,8 @@ export default function PcReference() {
         }))
       : [];
   }
-  console.log(data);
   function onSubmit(data) {
     mergeForm(data);
-    console.log(data);
     const { profile, sample, signatureSet, compare } = data;
     const params_spectrum =
       source === 'user'
@@ -218,10 +216,7 @@ export default function PcReference() {
             signatureName: compare,
           };
 
-    console.log(data);
     setCalculationQuery({ params_spectrum, params_signature });
-    console.log(calculationQuery);
-    //setCalculationQuery2(params2);
   }
 
   function handleProfile(e) {
