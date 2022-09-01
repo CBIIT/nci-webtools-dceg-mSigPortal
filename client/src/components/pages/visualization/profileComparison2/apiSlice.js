@@ -29,53 +29,71 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
 
     profileComparisonReference: builder.query({
       async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
-        console.log(_arg);
-        // get a random user
-        const { data: spectrumData, error: spectrumError } = await fetchWithBQ(
-          'mutational_spectrum?' + new URLSearchParams(_arg.params_spectrum)
-        );
-        if (spectrumError) return { error: spectrumError };
-
-        const { data: signatureData, error: signatureError } =
-          await fetchWithBQ(
-            'mutational_signature?' + new URLSearchParams(_arg.params_signature)
-          );
-        if (signatureError) return { error: signatureError };
-
-        const samples = [
-          _arg.params_spectrum.sample,
-          _arg.params_signature.signatureName,
-        ];
-
-        if (_arg.params_spectrum.profile === 'SBS') {
-          return {
-            data: pcBetweenSamples_SBS(
-              samples,
-              spectrumData,
-              signatureData,
-              'reference'
+        try {
+          const res = await Promise.all([
+            fetchWithBQ(
+              '/mutational_spectrum?' +
+                new URLSearchParams(_arg.params_spectrum)
             ),
-          };
-        } else if (_arg.params_spectrum.profile === 'DBS') {
-          return {
-            data: pcBetweenSamples_DBS(
-              samples,
-              spectrumData,
-              signatureData,
-              'reference'
+            fetchWithBQ(
+              '/mutational_signature?' +
+                new URLSearchParams(_arg.params_signature)
             ),
-          };
-        } else {
-          return {
-            data: pcBetweenSamples_ID(
-              samples,
-              spectrumData,
-              signatureData,
-              'reference'
-            ),
-          };
+          ]);
+
+          const spectrumData = res[0]['data'];
+          const signatureData = res[1]['data'];
+          const samples = [
+            _arg.params_spectrum.sample,
+            _arg.params_signature.signatureName,
+          ];
+
+          if (_arg.params_spectrum.profile === 'SBS') {
+            return {
+              data: pcBetweenSamples_SBS(
+                samples,
+                spectrumData,
+                signatureData,
+                'reference'
+              ),
+            };
+          } else if (_arg.params_spectrum.profile === 'DBS') {
+            return {
+              data: pcBetweenSamples_DBS(
+                samples,
+                spectrumData,
+                signatureData,
+                'reference'
+              ),
+            };
+          } else {
+            return {
+              data: pcBetweenSamples_ID(
+                samples,
+                spectrumData,
+                signatureData,
+                'reference'
+              ),
+            };
+          }
+        } catch (error) {
+          return { error };
         }
       },
+
+      // async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
+      //   console.log(_arg);
+
+      //   const { data: spectrumData, error: spectrumError } = await fetchWithBQ(
+      //     'mutational_spectrum?' + new URLSearchParams(_arg.params_spectrum)
+      //   );
+      //   if (spectrumError) return { error: spectrumError };
+
+      //   const { data: signatureData, error: signatureError } =
+      //     await fetchWithBQ(
+      //       'mutational_signature?' + new URLSearchParams(_arg.params_signature)
+      //     );
+      //   if (signatureError) return { error: signatureError };
     }),
 
     profileComparisonPublic: builder.query({

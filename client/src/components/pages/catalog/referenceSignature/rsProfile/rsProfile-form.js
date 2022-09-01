@@ -13,19 +13,27 @@ import { useForm } from 'react-hook-form';
 import Select from '../../../../controls/select/selectForm';
 import { useSignatureOptionsQuery } from '../../../../../services/store/rootApi';
 import { useRsProfileQuery } from './apiSlice';
+import {
+  defaultProfile2,
+  defaultMatrix2,
+  defaultFilter2,
+} from '../../../../../services/utils';
+
 const actions = { ...catalogActions, ...modalActions };
 
 export default function Profile({ submitR }) {
   const dispatch = useDispatch();
   const store = useSelector((state) => state.catalog);
+
   const mergeSigMutationalProfiles = (state) =>
     dispatch(actions.mergeCatalog({ sigMutationalProfiles: state }));
+
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const { source, matrixData, matrixList, projectID } = store.main;
+  const { source, matrixList, projectID } = store.main;
   const { plots, debugR, err, loading } = store.sigMutationalProfiles;
-  const { refSigData } = store.referenceSignature;
+  const { refSigData, sample, profile, matrix } = store.referenceSignature;
 
   const { control, setValue, watch } = useForm();
 
@@ -42,6 +50,12 @@ export default function Profile({ submitR }) {
   } = useSignatureOptionsQuery();
   console.log(optiondata);
 
+  useEffect(() => {
+    if (optiondata) {
+      handleSource(signatureSourceOptions[0]);
+    }
+  }, []);
+
   const signatureSourceOptions = optiondata
     ? [...new Set(optiondata.map((e) => e.source))].sort().map((e) => ({
         label: e,
@@ -49,6 +63,85 @@ export default function Profile({ submitR }) {
       }))
     : [];
   console.log(signatureSourceOptions);
+
+  const profileOptions = (source) =>
+    source
+      ? [
+          ...new Set(
+            optiondata
+              .filter((e) => e.source === source.value)
+              .map((e) => e.profile)
+              .sort((a, b) => b.localeCompare(a))
+          ),
+        ].map((e) => ({ label: e, value: e }))
+      : [];
+  console.log(profileOptions);
+
+  const matrixOptions = (source, profile) =>
+    source && profile
+      ? [
+          ...new Set(
+            optiondata
+              .filter(
+                (e) =>
+                  e.sample == sample.value &&
+                  e.profile == profile.value &&
+                  supportMatrix[e.profile].includes(e.matrix)
+              )
+              .map((e) => e.matrix)
+              .sort((a, b) => a - b)
+          ),
+        ].map((e) => ({ label: e, value: e }))
+      : [];
+  console.log(matrixOptions);
+
+  const referenceSignatureSetOption = (source, profile, matrix) =>
+    source && profile && matrix
+      ? [
+          ...new Set(
+            optiondata
+              .filter(
+                (e) =>
+                  e.source == source.value &&
+                  e.profile == profile.value &&
+                  supportMatrix[e.profile].includes(e.matrix)
+              )
+              .map((e) => e.matrix)
+              .sort((a, b) => a - b)
+          ),
+        ]
+      : [];
+  console.log(referenceSignatureSetOption);
+
+  const strategyOptions = (source, profile, matrix) =>
+    optiondata
+      ? [
+          ...new Set(
+            optiondata.map((e) => e.strategy).sort((a, b) => b.localeCompare(a))
+          ),
+        ].map((e) => ({ label: e, value: e }))
+      : [];
+  console.log(strategyOptions);
+
+  const signatureNameOptions = optiondata
+    ? [
+        ...new Set(
+          optiondata
+            .map((e) => e.signatureName)
+            .sort((a, b) => b.localeCompare(a))
+        ),
+      ].map((e) => ({ label: e, value: e }))
+    : [];
+  console.log(signatureNameOptions);
+
+  function handleSource(source) {
+    const profiles = profileOptions(source);
+    const profile = defaultProfile2(profiles);
+    const matrices = matrixOptions(sample, profile);
+    const matrix = defaultMatrix2(profile, matrices);
+
+    mergeSigMutationalProfiles({ source, profile, matrix });
+  }
 
   const {
     data: plotdata,
@@ -72,9 +165,10 @@ export default function Profile({ submitR }) {
             <CustomSelect
               id="mspSource"
               label="Signature Source"
-              //value={signatureSourceOptions}
+              value={source}
               options={signatureSourceOptions}
-              //onChange={(source) => handleSource(source, 0)}
+              control={control}
+              onChange={handleSource}
             />
           </Col>
           <Col lg="auto">

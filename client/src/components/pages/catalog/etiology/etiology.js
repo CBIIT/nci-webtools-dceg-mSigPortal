@@ -141,11 +141,11 @@ export default function Etiology() {
       if (exposureURL) URL.revokeObjectURL(exposureURL);
       if (strandbiasURL) URL.revokeObjectURL(strandbiasURL);
 
-      const [sig, tmb, strandBias] = await Promise.all([
+      const [sig, tmb, strandBias] = await [
         getImageS3(`Profile/${fixFile(selectedSignature)}.svg`),
         getImageS3(`Exposure/${fixFile(`${selectedSignature}_${study}`)}.svg`),
         getImageS3(`Profile_StrandBias/${fixFile(selectedSignature)}.svg`),
-      ]);
+      ];
       mergeEtiology({
         profileURL: sig,
         exposureURL: tmb,
