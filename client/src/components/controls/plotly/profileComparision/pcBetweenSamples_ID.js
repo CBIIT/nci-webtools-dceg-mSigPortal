@@ -88,8 +88,6 @@ export default function pcBetweenSamples_ID(samples, sample1, sample2, tab) {
   Object.keys(group1);
   const group2 = groupBy(sample2, 'mutationType');
   Object.keys(group2);
-  console.log(group1);
-  console.log(group2);
 
   let sampleDifferences = [];
   let s1mutations = [];
@@ -112,7 +110,6 @@ export default function pcBetweenSamples_ID(samples, sample1, sample2, tab) {
         : b.contribution / totalMutations2
     );
   }
-  console.log(sampleDifferences);
   const groupByMutation3 = groupBy(
     sampleDifferences,
     (s) => s.mutationType.match(mutationRegex)[1]
@@ -123,8 +120,7 @@ export default function pcBetweenSamples_ID(samples, sample1, sample2, tab) {
       data,
     })
   );
-  console.log(groupByMutation3);
-  console.log(sample3data);
+
   const squarediff = sampleDifferences.map((e) => Math.pow(e.mutations, 2));
   const rss = squarediff.reduce((a, b, i) => a + b, 0).toExponential(3);
 
@@ -259,7 +255,6 @@ export default function pcBetweenSamples_ID(samples, sample1, sample2, tab) {
     hoverinfo: 'x+y',
   }));
 
-  console.log(trace3);
   const traces = [...trace1, ...trace2, ...trace3];
 
   const shapeTop = sample1data.map((group, groupIndex, array) => ({
