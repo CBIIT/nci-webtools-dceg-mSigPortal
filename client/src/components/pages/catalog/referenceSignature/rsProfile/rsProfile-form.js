@@ -323,25 +323,27 @@ export default function Profile({ submitR }) {
         <div style={{ display: err ? 'block' : 'none' }}>
           <p>An error has occured. Please verify your input.</p>
         </div>
-        {plots[0].plotURL && (
+        {/* {plots[0].plotURL && (
           <>
             <hr />
-            {/* <SvgContainer
+            <SvgContainer
               className="p-3"
               //title={plotTitle(plots[0])}
               downloadName={plots[0].plotPath.split('/').slice(-1)[0]}
               plotPath={plots[0].plotURL}
               height="500px"
-            /> */}
-            optiondata && (
-            <Plotly
-              data={optiondata.traces}
-              layout={optiondata.layout}
-              config={optiondata.config}
-              divId="mutationalProfilePlot"
-              filename={sample?.value || 'Mutational Profile'}
             />
+            
           </>
+        )} */}
+        {optiondata && (
+          <Plotly
+            data={optiondata.traces}
+            layout={optiondata.layout}
+            config={optiondata.config}
+            divId="mutationalProfilePlot"
+            filename={sample?.value || 'Mutational Profile'}
+          />
         )}
       </div>
       {/* {additionalPlots()} */}
