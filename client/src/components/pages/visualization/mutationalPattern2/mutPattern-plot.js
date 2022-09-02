@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { useMutationalPatternScatterQuery, usePatternQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import './plot.scss';
-export default function MutProfilePlot() {
+export default function MutPatternPlot() {
   const publicForm = useSelector((state) => state.visualization.publicForm);
   const [scatterParams, setScatterParams] = useState('');
 

@@ -3,6 +3,7 @@ import { Row, Col, Button, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../../../controls/loading-overlay/loading-overlay';
+import Plotly from '../../../../controls/plotly/plot/plot';
 import SvgContainer from '../../../../controls/svgContainer/svgContainer';
 import CustomSelect from '../../../../controls/select/select-old';
 import Description from '../../../../controls/description/description';
@@ -14,9 +15,9 @@ import Select from '../../../../controls/select/selectForm';
 import { useSignatureOptionsQuery } from '../../../../../services/store/rootApi';
 import { useRsProfileQuery } from './apiSlice';
 import {
-  defaultProfile2,
-  defaultMatrix2,
-  defaultFilter2,
+  defaultProfile,
+  defaultMatrix,
+  defaultFilter,
 } from '../../../../../services/utils';
 
 const actions = { ...catalogActions, ...modalActions };
@@ -33,7 +34,15 @@ export default function Profile({ submitR }) {
 
   const { source, matrixList, projectID } = store.main;
   const { plots, debugR, err, loading } = store.sigMutationalProfiles;
-  const { refSigData, sample, profile, matrix } = store.referenceSignature;
+  const {
+    refSigData,
+    sample,
+    profile,
+    matrix,
+    signatureSet,
+    strategy,
+    signatureName,
+  } = store.referenceSignature;
 
   const { control, setValue, watch } = useForm();
 
@@ -75,7 +84,6 @@ export default function Profile({ submitR }) {
           ),
         ].map((e) => ({ label: e, value: e }))
       : [];
-  console.log(profileOptions);
 
   const matrixOptions = (source, profile) =>
     source && profile
@@ -93,7 +101,6 @@ export default function Profile({ submitR }) {
           ),
         ].map((e) => ({ label: e, value: e }))
       : [];
-  console.log(matrixOptions);
 
   const referenceSignatureSetOption = (source, profile, matrix) =>
     source && profile && matrix
@@ -111,36 +118,113 @@ export default function Profile({ submitR }) {
           ),
         ]
       : [];
-  console.log(referenceSignatureSetOption);
 
-  const strategyOptions = (source, profile, matrix) =>
-    optiondata
+  const strategyOptions = (source, profile, matrix, signatureSet) =>
+    source && profile && matrix && signatureSet
       ? [
           ...new Set(
             optiondata.map((e) => e.strategy).sort((a, b) => b.localeCompare(a))
           ),
         ].map((e) => ({ label: e, value: e }))
       : [];
-  console.log(strategyOptions);
 
-  const signatureNameOptions = optiondata
-    ? [
-        ...new Set(
-          optiondata
-            .map((e) => e.signatureName)
-            .sort((a, b) => b.localeCompare(a))
-        ),
-      ].map((e) => ({ label: e, value: e }))
-    : [];
-  console.log(signatureNameOptions);
+  const signatureNameOptions = (
+    source,
+    profile,
+    matrix,
+    signatureSet,
+    strategy
+  ) =>
+    source && profile && matrix && signatureSet && strategy
+      ? [
+          ...new Set(
+            optiondata
+              .map((e) => e.signatureName)
+              .sort((a, b) => b.localeCompare(a))
+          ),
+        ].map((e) => ({ label: e, value: e }))
+      : [];
 
   function handleSource(source) {
     const profiles = profileOptions(source);
-    const profile = defaultProfile2(profiles);
-    const matrices = matrixOptions(sample, profile);
-    const matrix = defaultMatrix2(profile, matrices);
+    const profile = defaultProfile(profiles);
 
-    mergeSigMutationalProfiles({ source, profile, matrix });
+    mergeSigMutationalProfiles({
+      source: source,
+      profile: profile,
+      matrix: matrix,
+      signatureSet: signatureSet,
+    });
+  }
+
+  function handleProfile(profile) {
+    const matrices = matrixOptions(sample, profile);
+    const matrix = defaultMatrix(profile, matrices);
+    const signatureSet = referenceSignatureSetOption(source, profile, matrix);
+    const strategy = strategyOptions(source, profile, matrix, signatureSet);
+    const signatureName = signatureNameOptions(
+      source,
+      profile,
+      matrix,
+      signatureSet,
+      strategy
+    );
+    mergeSigMutationalProfiles({
+      profile: profile,
+      matrix: matrix,
+      signatureSet: signatureSet,
+      strategy: strategy,
+      signatureName: signatureName,
+    });
+  }
+
+  function handleMatrix(matrix) {
+    const signatureSet = referenceSignatureSetOption(source, profile, matrix);
+    const strategy = strategyOptions(source, profile, matrix, signatureSet);
+    const signatureName = signatureNameOptions(
+      source,
+      profile,
+      matrix,
+      signatureSet,
+      strategy
+    );
+    mergeSigMutationalProfiles({
+      matrix: matrix,
+      signatureSet: signatureSet,
+      strategy: strategy,
+      signatureName: signatureName,
+    });
+  }
+
+  function handleSet(signatureSet) {
+    const strategy = strategyOptions(signatureSet);
+    const signatureName = signatureNameOptions(
+      source,
+      profile,
+      matrix,
+      signatureSet,
+      strategy
+    );
+    mergeSigMutationalProfiles({
+      signatureSet: signatureSet,
+      strategy: strategy,
+      signatureName: signatureName,
+    });
+  }
+
+  function handleStrategy(trategy) {
+    const signatureName = signatureNameOptions(trategy);
+
+    mergeSigMutationalProfiles({
+      strategy: strategy,
+      signatureName: signatureName,
+    });
+  }
+
+  function handleName(signatureName) {
+    mergeSigMutationalProfiles({
+      signatureName: signatureName,
+    });
   }
 
   const {
@@ -175,36 +259,45 @@ export default function Profile({ submitR }) {
             <CustomSelect
               id="mspProfileName"
               label="Profile Name"
-              value={plots[0].profileName}
-              options={plots[0].profileNameOptions}
-              //onChange={(profile) => handleProfile(profile, 0)}
+              value={profile}
+              options={profileOptions}
+              onChange={handleProfile}
+            />
+          </Col>
+          <Col lg="auto">
+            <CustomSelect
+              id="mspMatrix"
+              label="Matrix"
+              value={matrix}
+              options={matrixOptions}
+              onChange={handleMatrix}
             />
           </Col>
           <Col lg="auto">
             <CustomSelect
               id="mspSet"
               label="Reference Signature Set"
-              value={plots[0].rsSet}
-              options={plots[0].rsSetOptions}
-              //onChange={(set) => handleSet(set, 0)}
+              value={signatureSet}
+              options={referenceSignatureSetOption}
+              onChange={handleSet}
             />
           </Col>
           <Col lg="auto">
             <CustomSelect
               id="mspStrategy"
               label="Experimental Strategy"
-              value={plots[0].strategy}
-              options={plots[0].strategyOptions}
-              //onChange={(strategy) => handleStrategy(strategy, 0)}
+              value={strategy}
+              options={strategyOptions}
+              onChange={handleStrategy}
             />
           </Col>
           <Col lg="auto">
             <CustomSelect
               id="mspSigName"
               label="Signature Name"
-              value={plots[0].signatureName}
-              options={plots[0].signatureNameOptions}
-              //onChange={(name) => handleName(name, 0)}
+              value={signatureName}
+              options={signatureNameOptions}
+              onChange={handleName}
             />
           </Col>
         </Row>
@@ -233,12 +326,20 @@ export default function Profile({ submitR }) {
         {plots[0].plotURL && (
           <>
             <hr />
-            <SvgContainer
+            {/* <SvgContainer
               className="p-3"
               //title={plotTitle(plots[0])}
               downloadName={plots[0].plotPath.split('/').slice(-1)[0]}
               plotPath={plots[0].plotURL}
               height="500px"
+            /> */}
+            optiondata && (
+            <Plotly
+              data={optiondata.traces}
+              layout={optiondata.layout}
+              config={optiondata.config}
+              divId="mutationalProfilePlot"
+              filename={sample?.value || 'Mutational Profile'}
             />
           </>
         )}
