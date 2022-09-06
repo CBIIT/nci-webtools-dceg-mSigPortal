@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../../../controls/loading-overlay/loading-overlay';
 import Plotly from '../../../../controls/plotly/plot/plot';
-import SvgContainer from '../../../../controls/svgContainer/svgContainer';
 import Description from '../../../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as catalogActions } from '../../../../../services/store/catalog';
@@ -50,6 +49,7 @@ export default function Profile({ submitR }) {
     SBS: [6, 24, 96, 192, 288, 384, 1536],
     DBS: [78, 186],
     ID: [28, 83, 415],
+    RS: [32],
   };
 
   const {
@@ -63,7 +63,7 @@ export default function Profile({ submitR }) {
     if (optiondata) {
       handleSource(signatureSourceOptions[0]);
     }
-  }, []);
+  }, [optiondata]);
 
   const signatureSourceOptions = optiondata
     ? [...new Set(optiondata.map((e) => e.source))].sort().map((e) => ({
@@ -73,7 +73,7 @@ export default function Profile({ submitR }) {
     : [];
 
   const profileOptions = (source) =>
-    source
+    source && optiondata.length
       ? [
           ...new Set(
             optiondata
@@ -85,15 +85,12 @@ export default function Profile({ submitR }) {
       : [];
 
   const matrixOptions = (source, profile) =>
-    source && profile
+    source && profile && optiondata.length
       ? [
           ...new Set(
             optiondata
               .filter(
-                (e) =>
-                  e.source == source.value &&
-                  e.profile == profile.value &&
-                  supportMatrix[e.profile].includes(e.matrix)
+                (e) => e.source === source.value && e.profile === profile.value
               )
               .map((e) => e.matrix)
               .sort((a, b) => a - b)
@@ -104,33 +101,33 @@ export default function Profile({ submitR }) {
   const referenceSignatureSetOption = (source, profile, matrix) =>
     //console.log(source, profile, matrix);
 
-    source && profile && matrix
+    source && profile && matrix && optiondata.length
       ? [
           ...new Set(
             optiondata
               .filter(
                 (e) =>
-                  e.source == source.value &&
-                  e.profile == profile.value &&
-                  supportMatrix[e.profile].includes(matrix.value)
+                  e.source === source.value &&
+                  e.profile === profile.value &&
+                  e.matrix === matrix.value
               )
-              .map((e) => e.matrix)
-              .sort((a, b) => a - b)
+              .map((e) => e.signatureSetName)
+              .sort((a, b) => b.localeCompare(a))
           ),
         ]
       : [];
 
   const strategyOptions = (source, profile, matrix, signatureSetName) =>
-    source && profile && matrix && signatureSetName
+    source && profile && matrix && signatureSetName && optiondata.length
       ? [
           ...new Set(
             optiondata
               .filter(
                 (e) =>
-                  e.source == source.value &&
-                  e.profile == profile.value &&
-                  supportMatrix[e.profile].includes(matrix.value) &&
-                  e.signatureName == source.value
+                  e.source === source.value &&
+                  e.profile === profile.value &&
+                  e.matrix === matrix.value &&
+                  e.signatureSetName === signatureSetName.value
               )
               .map((e) => e.strategy)
               .sort((a, b) => b.localeCompare(a))
@@ -145,10 +142,24 @@ export default function Profile({ submitR }) {
     signatureSetName,
     strategy
   ) =>
-    source && profile && matrix && signatureSetName && strategy
+    source &&
+    profile &&
+    matrix &&
+    signatureSetName &&
+    strategy &&
+    optiondata.length
       ? [
           ...new Set(
             optiondata
+              .filter(
+                (e) =>
+                  e.source === source.value &&
+                  e.profile === profile.value &&
+                  e.matrix === matrix.value &&
+                  e.signatureSetName === signatureSetName.value &&
+                  e.strategy === strategy.value
+              )
+              .map((e) => e.strategy)
               .map((e) => e.signatureName)
               .sort((a, b) => b.localeCompare(a))
           ),
@@ -165,7 +176,6 @@ export default function Profile({ submitR }) {
       profile,
       matrix
     );
-    console.log(signatureSetName);
     const strategy = strategyOptions(source, profile, matrix, signatureSetName);
     const signatureName = signatureNameOptions(
       source,
@@ -191,7 +201,6 @@ export default function Profile({ submitR }) {
       profile,
       matrix
     );
-    console.log(signatureSetName);
     const strategy = strategyOptions(source, profile, matrix, signatureSetName);
     const signatureName = signatureNameOptions(
       source,
@@ -209,13 +218,11 @@ export default function Profile({ submitR }) {
   }
 
   function handleMatrix(matrix) {
-    console.log(matrix);
     const signatureSetName = referenceSignatureSetOption(
       source,
       profile,
       matrix
     );
-    console.log(signatureSetName);
     const strategy = strategyOptions(source, profile, matrix, signatureSetName);
     const signatureName = signatureNameOptions(
       source,
@@ -282,7 +289,7 @@ export default function Profile({ submitR }) {
             <Select
               name="source"
               label="Signature Source"
-              //value={source}
+              value={source}
               options={signatureSourceOptions}
               control={control}
               onChange={handleSource}
@@ -292,7 +299,7 @@ export default function Profile({ submitR }) {
             <Select
               name="profile"
               label="Profile Name"
-              //value={profile}
+              value={profile}
               options={profileOptions(source)}
               control={control}
               onChange={handleProfile}
@@ -302,7 +309,7 @@ export default function Profile({ submitR }) {
             <Select
               name="matrix"
               label="Matrix"
-              //value={matrix}
+              value={matrix}
               options={matrixOptions(source, profile)}
               control={control}
               onChange={handleMatrix}
@@ -312,7 +319,7 @@ export default function Profile({ submitR }) {
             <Select
               name="signatureSetName"
               label="Reference Signature Set"
-              //value={signatureSet}
+              value={signatureSetName}
               options={referenceSignatureSetOption(source, profile, matrix)}
               control={control}
               onChange={handleSet}
@@ -335,7 +342,7 @@ export default function Profile({ submitR }) {
           </Col>
           <Col lg="auto">
             <Select
-              name="signature"
+              name="signatureName"
               label="Signature Name"
               //value={signatureName}
               options={signatureNameOptions(

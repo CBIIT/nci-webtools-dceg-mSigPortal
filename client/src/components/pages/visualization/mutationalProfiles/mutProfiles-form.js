@@ -38,7 +38,7 @@ export default function TreeLeafForm() {
       handleSample(sampleOptions[0]);
     }
   }, [matrixData]);
-
+  console.log(matrixData);
   const sampleOptions = matrixData.length
     ? [...new Set(matrixData.map((d) => d.sample))]
         .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
