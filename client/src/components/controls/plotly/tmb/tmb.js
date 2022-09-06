@@ -1,3 +1,5 @@
+import { faCommentDollar } from '@fortawesome/free-solid-svg-icons';
+
 export default function TMB(data, tmbTabName, signatureName) {
   function average(arr) {
     const sum = arr.reduce((a, b) => a + b, 0);
@@ -39,21 +41,24 @@ export default function TMB(data, tmbTabName, signatureName) {
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
-    x: array.length > 1 ? index : (index + index + 1) * 0.5,
+    //x: array.length > 1 ? index : (index + index + 1) * 0.5,
+    x: index,
     y: 1.01,
     text:
-      tmbTabName === 'TMBSignature'
-        ? `${element.signatureName}`
-        : `${element.cancer}`,
+      tmbTabName === 'TMBSignature' && element.signatureName.length < 13
+        ? element.signatureName
+        : tmbTabName === 'TMBSignature' && element.signatureName.length > 13
+        ? element.signatureName.substring(0, 13) + '...'
+        : tmbTabName !== 'TMBSignature' && element.cancer.length < 13
+        ? element.cancer
+        : element.cancer.substring(0, 13) + '...',
     showarrow: false,
     font: {
       //size: 12,
     },
     align: 'center',
-    textangle: 55,
+    textangle: 60,
   }));
-  console.log('top label:--');
-  console.log(topLabel);
 
   const bottoLabel1 = data.map((element, index, array) => ({
     xref: 'x',
@@ -117,8 +122,6 @@ export default function TMB(data, tmbTabName, signatureName) {
     },
     opacity: 0.2,
   }));
-  //console.log('shapes:--');
-  //console.log(shapes);
 
   const lines = data.map((element, index, array) => ({
     type: 'line',

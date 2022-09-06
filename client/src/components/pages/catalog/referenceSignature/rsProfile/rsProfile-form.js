@@ -5,7 +5,6 @@ import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../../../controls/loading-overlay/loading-overlay';
 import Plotly from '../../../../controls/plotly/plot/plot';
 import SvgContainer from '../../../../controls/svgContainer/svgContainer';
-import CustomSelect from '../../../../controls/select/select-old';
 import Description from '../../../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as catalogActions } from '../../../../../services/store/catalog';
@@ -14,11 +13,7 @@ import { useForm } from 'react-hook-form';
 import Select from '../../../../controls/select/selectForm';
 import { useSignatureOptionsQuery } from '../../../../../services/store/rootApi';
 import { useRsProfileQuery } from './apiSlice';
-import {
-  defaultProfile,
-  defaultMatrix,
-  defaultFilter,
-} from '../../../../../services/utils';
+import { defaultProfile2, defaultMatrix2 } from '../../../../../services/utils';
 
 const actions = { ...catalogActions, ...modalActions };
 
@@ -32,19 +27,24 @@ export default function Profile({ submitR }) {
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const { source, matrixList, projectID } = store.main;
+  const { matrixList, projectID } = store.main;
   const { plots, debugR, err, loading } = store.sigMutationalProfiles;
-  const {
-    refSigData,
-    sample,
-    profile,
-    matrix,
-    signatureSet,
-    strategy,
-    signatureName,
-  } = store.referenceSignature;
+  const { refSigData, sample, signatureName } = store.referenceSignature;
 
-  const { control, setValue, watch } = useForm();
+  const defaultValues = {
+    source: '',
+    profile: '',
+    matrix: '',
+    signatureSetName: '',
+    strategy: '',
+    signatureName: '',
+  };
+
+  const { control, setValue, watch } = useForm({ defaultValues });
+
+  const { source, profile, matrix, signatureSetName, strategy } = watch();
+
+  console.log(watch());
 
   const supportMatrix = {
     SBS: [6, 24, 96, 192, 288, 384, 1536],
@@ -71,7 +71,6 @@ export default function Profile({ submitR }) {
         value: e,
       }))
     : [];
-  console.log(signatureSourceOptions);
 
   const profileOptions = (source) =>
     source
@@ -92,7 +91,7 @@ export default function Profile({ submitR }) {
             optiondata
               .filter(
                 (e) =>
-                  e.sample == sample.value &&
+                  e.source == source.value &&
                   e.profile == profile.value &&
                   supportMatrix[e.profile].includes(e.matrix)
               )
@@ -103,6 +102,8 @@ export default function Profile({ submitR }) {
       : [];
 
   const referenceSignatureSetOption = (source, profile, matrix) =>
+    //console.log(source, profile, matrix);
+
     source && profile && matrix
       ? [
           ...new Set(
@@ -111,7 +112,7 @@ export default function Profile({ submitR }) {
                 (e) =>
                   e.source == source.value &&
                   e.profile == profile.value &&
-                  supportMatrix[e.profile].includes(e.matrix)
+                  supportMatrix[e.profile].includes(matrix.value)
               )
               .map((e) => e.matrix)
               .sort((a, b) => a - b)
@@ -119,11 +120,20 @@ export default function Profile({ submitR }) {
         ]
       : [];
 
-  const strategyOptions = (source, profile, matrix, signatureSet) =>
-    source && profile && matrix && signatureSet
+  const strategyOptions = (source, profile, matrix, signatureSetName) =>
+    source && profile && matrix && signatureSetName
       ? [
           ...new Set(
-            optiondata.map((e) => e.strategy).sort((a, b) => b.localeCompare(a))
+            optiondata
+              .filter(
+                (e) =>
+                  e.source == source.value &&
+                  e.profile == profile.value &&
+                  supportMatrix[e.profile].includes(matrix.value) &&
+                  e.signatureName == source.value
+              )
+              .map((e) => e.strategy)
+              .sort((a, b) => b.localeCompare(a))
           ),
         ].map((e) => ({ label: e, value: e }))
       : [];
@@ -132,10 +142,10 @@ export default function Profile({ submitR }) {
     source,
     profile,
     matrix,
-    signatureSet,
+    signatureSetName,
     strategy
   ) =>
-    source && profile && matrix && signatureSet && strategy
+    source && profile && matrix && signatureSetName && strategy
       ? [
           ...new Set(
             optiondata
@@ -147,84 +157,107 @@ export default function Profile({ submitR }) {
 
   function handleSource(source) {
     const profiles = profileOptions(source);
-    const profile = defaultProfile(profiles);
+    const profile = defaultProfile2(profiles);
+    const matrices = matrixOptions(sample, profile);
+    const matrix = defaultMatrix2(profile, matrices);
+    const signatureSetName = referenceSignatureSetOption(
+      source,
+      profile,
+      matrix
+    );
+    console.log(signatureSetName);
+    const strategy = strategyOptions(source, profile, matrix, signatureSetName);
+    const signatureName = signatureNameOptions(
+      source,
+      profile,
+      matrix,
+      signatureSetName,
+      strategy
+    );
 
-    mergeSigMutationalProfiles({
-      source: source,
-      profile: profile,
-      matrix: matrix,
-      signatureSet: signatureSet,
-    });
+    setValue('source', source);
+    setValue('profile', profile);
+    setValue('matrix', matrix);
+    setValue('signatureSetName', signatureSetName);
+    setValue('strategy', strategy);
+    setValue('signatureName', signatureName);
   }
 
   function handleProfile(profile) {
     const matrices = matrixOptions(sample, profile);
-    const matrix = defaultMatrix(profile, matrices);
-    const signatureSet = referenceSignatureSetOption(source, profile, matrix);
-    const strategy = strategyOptions(source, profile, matrix, signatureSet);
+    const matrix = defaultMatrix2(profile, matrices);
+    const signatureSetName = referenceSignatureSetOption(
+      source,
+      profile,
+      matrix
+    );
+    console.log(signatureSetName);
+    const strategy = strategyOptions(source, profile, matrix, signatureSetName);
     const signatureName = signatureNameOptions(
       source,
       profile,
       matrix,
-      signatureSet,
+      signatureSetName,
       strategy
     );
-    mergeSigMutationalProfiles({
-      profile: profile,
-      matrix: matrix,
-      signatureSet: signatureSet,
-      strategy: strategy,
-      signatureName: signatureName,
-    });
+
+    setValue('profile', profile);
+    setValue('matrix', matrix);
+    setValue('signatureSetName', signatureSetName);
+    setValue('strategy', strategy);
+    setValue('signatureName', signatureName);
   }
 
   function handleMatrix(matrix) {
-    const signatureSet = referenceSignatureSetOption(source, profile, matrix);
-    const strategy = strategyOptions(source, profile, matrix, signatureSet);
+    console.log(matrix);
+    const signatureSetName = referenceSignatureSetOption(
+      source,
+      profile,
+      matrix
+    );
+    console.log(signatureSetName);
+    const strategy = strategyOptions(source, profile, matrix, signatureSetName);
     const signatureName = signatureNameOptions(
       source,
       profile,
       matrix,
-      signatureSet,
+      signatureSetName,
       strategy
     );
-    mergeSigMutationalProfiles({
-      matrix: matrix,
-      signatureSet: signatureSet,
-      strategy: strategy,
-      signatureName: signatureName,
-    });
+
+    setValue('matrix', matrix);
+    setValue('signatureSetName', signatureSetName);
+    setValue('strategy', strategy);
+    setValue('signatureName', signatureName);
   }
 
-  function handleSet(signatureSet) {
-    const strategy = strategyOptions(signatureSet);
+  function handleSet(signatureSetName) {
+    const strategy = strategyOptions(source, profile, matrix, signatureSetName);
     const signatureName = signatureNameOptions(
       source,
       profile,
       matrix,
-      signatureSet,
+      signatureSetName,
       strategy
     );
-    mergeSigMutationalProfiles({
-      signatureSet: signatureSet,
-      strategy: strategy,
-      signatureName: signatureName,
-    });
+
+    setValue('signatureSetName', signatureSetName);
+    setValue('strategy', strategy);
+    setValue('signatureName', signatureName);
   }
 
   function handleStrategy(trategy) {
     const signatureName = signatureNameOptions(trategy);
-
-    mergeSigMutationalProfiles({
-      strategy: strategy,
-      signatureName: signatureName,
-    });
+    setValue('strategy', strategy);
+    setValue('signatureName', signatureName);
   }
 
   function handleName(signatureName) {
     mergeSigMutationalProfiles({
       signatureName: signatureName,
     });
+
+    setValue('signatureName', signatureName);
   }
 
   const {
@@ -246,57 +279,73 @@ export default function Profile({ submitR }) {
         <LoadingOverlay active={loading} />
         <Row className="">
           <Col lg="auto">
-            <CustomSelect
-              id="mspSource"
+            <Select
+              name="source"
               label="Signature Source"
-              value={source}
+              //value={source}
               options={signatureSourceOptions}
               control={control}
               onChange={handleSource}
             />
           </Col>
           <Col lg="auto">
-            <CustomSelect
-              id="mspProfileName"
+            <Select
+              name="profile"
               label="Profile Name"
-              value={profile}
-              options={profileOptions}
+              //value={profile}
+              options={profileOptions(source)}
+              control={control}
               onChange={handleProfile}
             />
           </Col>
           <Col lg="auto">
-            <CustomSelect
-              id="mspMatrix"
+            <Select
+              name="matrix"
               label="Matrix"
-              value={matrix}
-              options={matrixOptions}
+              //value={matrix}
+              options={matrixOptions(source, profile)}
+              control={control}
               onChange={handleMatrix}
             />
           </Col>
           <Col lg="auto">
-            <CustomSelect
-              id="mspSet"
+            <Select
+              name="signatureSetName"
               label="Reference Signature Set"
-              value={signatureSet}
-              options={referenceSignatureSetOption}
+              //value={signatureSet}
+              options={referenceSignatureSetOption(source, profile, matrix)}
+              control={control}
               onChange={handleSet}
             />
           </Col>
           <Col lg="auto">
-            <CustomSelect
-              id="mspStrategy"
+            <Select
+              name="strategy"
               label="Experimental Strategy"
-              value={strategy}
-              options={strategyOptions}
+              //value={strategy}
+              options={strategyOptions(
+                source,
+                profile,
+                matrix,
+                signatureSetName
+              )}
+              control={control}
               onChange={handleStrategy}
             />
           </Col>
           <Col lg="auto">
-            <CustomSelect
-              id="mspSigName"
+            <Select
+              name="signature"
               label="Signature Name"
-              value={signatureName}
-              options={signatureNameOptions}
+              //value={signatureName}
+              options={signatureNameOptions(
+                source,
+                profile,
+                matrix,
+                signatureSetName,
+                strategy
+              )}
+              control={control}
               onChange={handleName}
             />
           </Col>
