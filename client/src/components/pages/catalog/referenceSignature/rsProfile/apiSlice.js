@@ -3,9 +3,9 @@ import { groupBy } from 'lodash';
 
 export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    rsProfile: builder.query({
+    rsProfileOptions: builder.query({
       query: (params) => ({
-        url: 'mutational_signature',
+        url: 'mutational_signature_options',
         params,
       }),
       transformResponse: (data, meta, arg) => {
@@ -13,7 +13,21 @@ export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
         return { data };
       },
     }),
+    rsProfileData: builder.query({
+      query: (params) => ({
+        url: 'mutational_signature',
+        params,
+      }),
+      transformResponse: (data, meta, args) => {
+        const { profile, matrix } = args;
+        const profileMatrix = profile + matrix;
+        console.log(profileMatrix);
+        console.log(data);
+        return { data };
+      },
+    }),
   }),
 });
 
-export const { useRsProfileQuery } = rsProfileApiSlice;
+export const { useRsProfileOptionsQuery, useRsProfileDataQuery } =
+  rsProfileApiSlice;

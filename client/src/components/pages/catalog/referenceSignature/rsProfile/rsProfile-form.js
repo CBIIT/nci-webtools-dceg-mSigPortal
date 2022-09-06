@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Row, Col, Button, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -11,7 +11,7 @@ import { actions as modalActions } from '../../../../../services/store/modal';
 import { useForm } from 'react-hook-form';
 import Select from '../../../../controls/select/selectForm';
 import { useSignatureOptionsQuery } from '../../../../../services/store/rootApi';
-import { useRsProfileQuery } from './apiSlice';
+import { useRsProfileOptionsQuery, useRsProfileDataQuery } from './apiSlice';
 import { defaultProfile2, defaultMatrix2 } from '../../../../../services/utils';
 
 const actions = { ...catalogActions, ...modalActions };
@@ -29,6 +29,8 @@ export default function Profile({ submitR }) {
   const { matrixList, projectID } = store.main;
   const { plots, debugR, err, loading } = store.sigMutationalProfiles;
   const { refSigData, sample, signatureName } = store.referenceSignature;
+
+  const [params, setParams] = useState(null);
 
   // const defaultValues = {
   //   source: { label: 'Published_signature', value: 'Published_signature' },
@@ -66,7 +68,7 @@ export default function Profile({ submitR }) {
     data: optiondata,
     error: optionError,
     isFetching: optionFetching,
-  } = useSignatureOptionsQuery();
+  } = useRsProfileOptionsQuery();
   console.log(optiondata);
 
   useEffect(() => {
@@ -280,8 +282,32 @@ export default function Profile({ submitR }) {
     data: plotdata,
     error: plotError,
     isFetching: plotFetching,
-  } = useRsProfileQuery();
+  } = useRsProfileDataQuery(params, {
+    skip: !params,
+  });
   console.log(plotdata);
+
+  // get data on form change
+  useEffect(() => {
+    if (
+      source.value &&
+      profile.value &&
+      matrix.value &&
+      signatureSetName.value &&
+      strategy.value &&
+      signatureName.value
+    ) {
+      const params = {
+        source: source.value,
+        profile: profile.value,
+        matrix: matrix.value,
+        signatureSetName: signatureSetName.value,
+        strategy: strategy.value,
+        signatureName: signatureName.value,
+      };
+      setParams(params);
+    }
+  }, [source, profile, matrix, signatureSetName, strategy, signatureName]);
 
   return (
     <div>
@@ -401,11 +427,11 @@ export default function Profile({ submitR }) {
             
           </>
         )} */}
-        {optiondata && (
+        {plotdata && (
           <Plotly
-            data={optiondata.traces}
-            layout={optiondata.layout}
-            config={optiondata.config}
+            data={plotdata.traces}
+            layout={plotdata.layout}
+            config={plotdata.config}
             divId="mutationalProfilePlot"
             filename={sample?.value || 'Mutational Profile'}
           />
