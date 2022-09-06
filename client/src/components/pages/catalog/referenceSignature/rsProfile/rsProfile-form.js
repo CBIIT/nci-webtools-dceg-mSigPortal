@@ -30,6 +30,17 @@ export default function Profile({ submitR }) {
   const { plots, debugR, err, loading } = store.sigMutationalProfiles;
   const { refSigData, sample, signatureName } = store.referenceSignature;
 
+  // const defaultValues = {
+  //   source: { label: 'Published_signature', value: 'Published_signature' },
+  //   profile: { label: 'SBS', value: 'SBS' },
+  //   matrix: { label: '96', value: '96' },
+  //   signatureSetName: {
+  //     label: 'Other_Published_Signatures_GRCh37_SBS96',
+  //     value: 'Other_Published_Signatures_GRCh37_SBS96',
+  //   },
+  //   strategy: { label: 'WGS', value: 'WGS' },
+  //   signatureName: { label: '', value: '' },
+  // };
   const defaultValues = {
     source: '',
     profile: '',
@@ -38,7 +49,6 @@ export default function Profile({ submitR }) {
     strategy: '',
     signatureName: '',
   };
-
   const { control, setValue, watch } = useForm({ defaultValues });
 
   const { source, profile, matrix, signatureSetName, strategy } = watch();
@@ -114,7 +124,7 @@ export default function Profile({ submitR }) {
               .map((e) => e.signatureSetName)
               .sort((a, b) => b.localeCompare(a))
           ),
-        ]
+        ].map((e) => ({ label: e, value: e }))
       : [];
 
   const strategyOptions = (source, profile, matrix, signatureSetName) =>
@@ -159,7 +169,6 @@ export default function Profile({ submitR }) {
                   e.signatureSetName === signatureSetName.value &&
                   e.strategy === strategy.value
               )
-              .map((e) => e.strategy)
               .map((e) => e.signatureName)
               .sort((a, b) => b.localeCompare(a))
           ),
@@ -253,8 +262,8 @@ export default function Profile({ submitR }) {
     setValue('signatureName', signatureName);
   }
 
-  function handleStrategy(trategy) {
-    const signatureName = signatureNameOptions(trategy);
+  function handleStrategy(strategy) {
+    const signatureName = signatureNameOptions(strategy);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
   }
