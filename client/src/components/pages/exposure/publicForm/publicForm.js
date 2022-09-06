@@ -99,7 +99,7 @@ export default function PublicForm() {
   }
 
   const studyOptions = options
-    ? [...new Set(options.map((e) => e.study))].map((e) => ({
+    ? [...new Set(options.map((e) => e.study))].sort().map((e) => ({
         label: e,
         value: e,
       }))

@@ -151,10 +151,15 @@ export default function PublicForm() {
   }, [exposureOptions]);
 
   const studyOptions = associationOptions
-    ? [...new Set(associationOptions.map((e) => e.study))].sort().map((e) => ({
-        label: e,
-        value: e,
-      }))
+    ? [...new Set(associationOptions.map((e) => e.study))]
+        .sort(
+          new Intl.Collator('en', { numeric: true, sensitivity: 'accent' })
+            .compare
+        )
+        .map((e) => ({
+          label: e,
+          value: e,
+        }))
     : [];
 
   const strategyOptions = (study) => {
