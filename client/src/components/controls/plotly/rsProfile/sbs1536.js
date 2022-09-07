@@ -1,4 +1,4 @@
-export default function SBS1536(data, sample, tab) {
+export default function SBS1536(data, sample) {
   const colors = {
     'C>A': '#03BCEE',
     'C>G': 'black',
@@ -21,7 +21,7 @@ export default function SBS1536(data, sample, tab) {
     [1, 'rgb(255,255,39)'],
   ];
 
-  const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
+  const totalMutations = data.reduce((a, e) => a + parseInt(e.contribution), 0);
   const chunks = (a, size) =>
     Array.from(new Array(Math.ceil(a.length / size)), (_, i) =>
       a.slice(i * size, i * size + size)
@@ -42,7 +42,7 @@ export default function SBS1536(data, sample, tab) {
     const mutation = e.mutationType.substring(1, 8);
     const signature = {
       mutationType: e.mutationType,
-      contribution: e.mutations,
+      contribution: e.contribution,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
@@ -55,7 +55,7 @@ export default function SBS1536(data, sample, tab) {
       e.mutationType[0] + e.mutationType[e.mutationType.length - 1];
     const signature = {
       mutationType: e.mutationType,
-      contribution: e.mutations,
+      contribution: e.contribution,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
@@ -119,7 +119,7 @@ export default function SBS1536(data, sample, tab) {
     const mutation = e.mutationType.substring(0, e.mutationType.length - 1);
     const signature = {
       mutationType: e.mutationType,
-      contribution: e.mutations,
+      contribution: e.contribution,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
@@ -217,7 +217,7 @@ export default function SBS1536(data, sample, tab) {
     const mutation = e.mutationType.substring(1, e.mutationType.length);
     const signature = {
       mutationType: e.mutationType,
-      contribution: e.mutations,
+      contribution: e.contribution,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
@@ -469,12 +469,7 @@ export default function SBS1536(data, sample, tab) {
     yanchor: 'bottom',
     x: 0,
     y: 0.95,
-    text:
-      '<b>' +
-      sample +
-      ': ' +
-      totalMutations.toLocaleString(undefined) +
-      ' subs </b>',
+    text: '<b>' + sample + '  </b>',
     showarrow: false,
     font: {
       size: 18,

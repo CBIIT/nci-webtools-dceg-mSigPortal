@@ -1,4 +1,4 @@
-export default function SBS288(data, sample) {
+export default function SBS288(data, sample, tab) {
   const colors = {
     'C>A': '#03BCEE',
     'C>G': 'black',
@@ -8,29 +8,30 @@ export default function SBS288(data, sample) {
     'T>G': '#EBC6C4',
   };
   console.log(data);
+
   const transcribed = data.filter((e) => /^T:/.test(e.mutationType));
   const untranscribed = data.filter((e) => /^U:/.test(e.mutationType));
   const neutral = data.filter((e) => /^N:/.test(e.mutationType));
 
   const totalMutations =
-    transcribed.reduce((total, e) => total + e.mutations, 0) +
-    untranscribed.reduce((total, e) => total + e.mutations, 0) +
-    neutral.reduce((total, e) => total + e.mutations, 0);
-
+    transcribed.reduce((total, e) => total + e.contribution, 0) +
+    untranscribed.reduce((total, e) => total + e.contribution, 0) +
+    neutral.reduce((total, e) => total + e.contribution, 0);
+  console.log(totalMutations);
   const maxMutation = Math.max(
     ...[
-      ...transcribed.map((e) => e.mutations),
-      ...untranscribed.map((e) => e.mutations),
+      ...transcribed.map((e) => e?.mutations || e?.contribution),
+      ...untranscribed.map((e) => e?.mutations || e?.contribution),
     ]
   );
-
+  console.log(maxMutation);
   //// ------ bar char left  --------- //
 
   const groupByMutationWoFirstLetter = data.reduce((groups, e, i) => {
     const mutation = e.mutationType.substring(2, e.mutationType.length);
     const signature = {
       mutationType: e.mutationType,
-      contribution: e.mutations,
+      contribution: e.contribution,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
@@ -42,7 +43,10 @@ export default function SBS288(data, sample) {
     ([mutation, signatures], groupIndex, array) => ({
       mutationType: mutation,
       signatures: signatures,
-      total: signatures.reduce((a, e) => a + parseInt(e.contribution), 0),
+      total: signatures.reduce(
+        (a, e) => a + parseInt(e?.mutations || e?.contribution),
+        0
+      ),
     })
   );
 
@@ -61,7 +65,6 @@ export default function SBS288(data, sample) {
 
   const flatSortedTotal = Object.values(groupByTotal).flat();
   const maxValTotal = Math.max(...flatSortedTotal.map((o) => o.contribution));
-  console.log(maxValTotal);
 
   const tracesBarTotal = Object.entries(groupByTotal).map(
     ([mutation, signatures], groupIndex, array) => ({
@@ -89,7 +92,7 @@ export default function SBS288(data, sample) {
     const mutation = e.mutationType.match(mutationRegex)[1];
     const signature = {
       mutationType: e.mutationType.substring(2, e.mutationType.length),
-      contribution: e.mutations,
+      contribution: e?.mutations || e?.contribution,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
@@ -111,7 +114,7 @@ export default function SBS288(data, sample) {
     const mutation = e.mutationType.match(mutationRegex)[1];
     const signature = {
       mutationType: e.mutationType.substring(2, e.mutationType.length),
-      contribution: e.mutations,
+      contribution: e?.mutations || e?.contribution,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
@@ -132,7 +135,7 @@ export default function SBS288(data, sample) {
     const mutation = e.mutationType.match(mutationRegex)[1];
     const signature = {
       mutationType: e.mutationType.substring(2, e.mutationType.length),
-      contribution: e.mutations,
+      contribution: e?.mutations || e?.contribution,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
@@ -144,7 +147,10 @@ export default function SBS288(data, sample) {
     ([mutation, signatures], groupIndex, array) => ({
       mutationType: mutation,
       signatures: signatures,
-      total: signatures.reduce((a, e) => a + parseInt(e.contribution), 0),
+      total: signatures.reduce(
+        (a, e) => a + parseInt(e?.mutations || e?.contribution),
+        0
+      ),
     })
   );
 
@@ -152,7 +158,7 @@ export default function SBS288(data, sample) {
     const mutation = e.mutationType.substring(0, 1);
     const signature = {
       mutationType: e.mutationType,
-      contribution: e.mutations,
+      contribution: e?.mutations || e?.contribution,
     };
     groups[mutation] = groups[mutation]
       ? [...groups[mutation], signature]
@@ -165,7 +171,10 @@ export default function SBS288(data, sample) {
     ([mutation, signatures], groupIndex, array) => ({
       mutationType: mutation,
       signatures: signatures,
-      total: signatures.reduce((a, e) => a + parseInt(e.contribution), 0),
+      total: signatures.reduce(
+        (a, e) => a + parseInt(e?.mutations || e?.contribution),
+        0
+      ),
     })
   );
 
@@ -282,11 +291,13 @@ export default function SBS288(data, sample) {
     x: 0.01,
     y: 0.88,
     text:
-      '<b>' +
-      sample +
-      ': ' +
-      totalMutations.toLocaleString(undefined) +
-      ' subs </b>',
+      tab === 'rsProfile'
+        ? '<b>' + sample + '</b>'
+        : '<b>' +
+          sample +
+          ': ' +
+          totalMutations.toLocaleString(undefined) +
+          ' subs </b>',
     showarrow: false,
     font: {
       size: 24,
