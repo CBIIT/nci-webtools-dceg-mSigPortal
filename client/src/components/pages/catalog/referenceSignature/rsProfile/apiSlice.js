@@ -32,11 +32,13 @@ export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
         } else if (profileMatrix === 'SBS192') {
           return SBS192(data, signatureName, 'rsProfile');
         } else if (profileMatrix === 'SBS288') {
-          return SBS288(data, signatureName, 'rsProfile');
+          return SBS288(data, signatureName);
         } else if (profileMatrix === 'SBS1536') {
-          return SBS1536(data, signatureName, 'rsProfile');
+          return SBS1536(data, signatureName);
         } else if (profileMatrix === 'ID83') {
-          return ID83(data, signatureName, 'rsProfile');
+          return ID83(data, signatureName);
+        } else if (profileMatrix === 'DBS78') {
+          return DBS78(data, signatureName);
         }
       },
     }),
