@@ -36,7 +36,7 @@ export const mutationalProfilesApiSlice = visualizationApiSlice.injectEndpoints(
           } else if (profileMatrix == 'SBS1536') {
             return SBS1536(data, sample);
           } else if (profileMatrix == 'DBS78') {
-            return DBS78(data, args);
+            return DBS78(data, sample);
           } else if (profileMatrix == 'DBS186') {
             return DBS186(data, sample);
           } else if (profileMatrix == 'ID83') {
