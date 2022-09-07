@@ -180,14 +180,9 @@ export default function ReferenceSignature() {
       title: 'RS in mSigPortal',
     },
     {
-      component: <Profile submitR={(fn, args) => submitR(fn, args)} />,
-      key: 'mutationalSignatureProfile',
-      title: 'RS Profile',
-    },
-    {
       component: <RsProfile />,
       key: 'RSProfile',
-      title: 'RS Profile 2',
+      title: 'RS Profile',
     },
     {
       component: <CosineSimilarity submitR={(fn, args) => submitR(fn, args)} />,
