@@ -1,4 +1,4 @@
-export default function DBS78(rawData, args) {
+export default function DBS78(rawData, sample) {
   const colors = {
     AC: '#09BCED',
     AT: '#0266CA',
@@ -12,7 +12,6 @@ export default function DBS78(rawData, args) {
     TT: '#4C0299',
   };
   const dbsdata = ['AC', 'AT', 'CC', 'CG', 'CT', 'GC', 'TA', 'TC', 'TG', 'TT'];
-  const { profile, matrix, sample } = args;
 
   const groupByMutation = rawData.reduce((acc, e, i) => {
     const mutationRegex = /^(.{2})/;

@@ -12,7 +12,7 @@ export default function DBS78(rawData, sample) {
     TT: '#4C0299',
   };
   const dbsdata = ['AC', 'AT', 'CC', 'CG', 'CT', 'GC', 'TA', 'TC', 'TG', 'TT'];
-
+  console.log(sample);
   const groupByMutation = rawData.reduce((acc, e, i) => {
     const mutationRegex = /^(.{2})/;
     const mutation = e.mutationType.match(mutationRegex)[1];

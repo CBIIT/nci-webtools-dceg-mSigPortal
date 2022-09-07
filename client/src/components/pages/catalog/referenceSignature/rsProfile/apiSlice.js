@@ -4,7 +4,7 @@ import SBS96 from '../../../../controls/plotly/mutationalProfiles/sbs96';
 import SBS192 from '../../../../controls/plotly/mutationalProfiles/sbs192';
 import SBS288 from '../../../../controls/plotly/rsProfile/sbs288';
 import SBS1536 from '../../../../controls/plotly/rsProfile/sbs1536';
-import DBS78 from '../../../../controls/plotly/mutationalProfiles/dbs78';
+import DBS78 from '../../../../controls/plotly/rsProfile/dbs78';
 
 export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -24,6 +24,7 @@ export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
         const { profile, matrix, signatureName } = args;
         const profileMatrix = profile + matrix;
         console.log(profileMatrix);
+        console.log(signatureName);
         console.log(data);
         if (profileMatrix === 'SBS96') {
           return SBS96(data, signatureName, 'rsProfile');
