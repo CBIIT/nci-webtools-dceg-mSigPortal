@@ -18,11 +18,11 @@ loadJson <- function(filepath) {
   dataset
 }
 
-CancerSpecificSignatures <- function(x) {
+CancerSpecificSignatures_2022 <- function(x) {
   x %>%
     mutate(
       category = processorFunction,
-      etiologyDisplay = "Tissue Types",
+      etiologyDisplay = "Propoosed Etiologies",
     ) %>%
     rename(
       etiology = Etiology,
@@ -40,6 +40,25 @@ CancerSpecificSignatures <- function(x) {
       description = Description,
       note = Note,
       cisMutation = "Mutation Identified in Cis"
+    )
+}
+
+CancerSpecificSignatures <- function(x) {
+  x %>%
+    mutate(
+      category = processorFunction,
+      etiologyDisplay = "Tissue Types",
+    ) %>%
+    rename(
+      etiology = Etiology,
+      signature = "Tissue Specific Signature",
+      referenceSignature = "Ref Signature",
+      refSigProportion = "RefSig Proportion",
+      study = Study,
+      studyUrl = Study_URL,
+      source = Source,
+      sourceUrl = Source_URL,
+      description = Description,
     )
 }
 

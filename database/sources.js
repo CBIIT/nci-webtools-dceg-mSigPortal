@@ -71,7 +71,7 @@ export const sources = [
   {
     sourcePath: 'Etiology/Etiology_cancer_specific_signatures_2022.csv',
     table: 'etiologyOptions',
-    description: 'etiology - cancer_specific_signatures',
+    description: 'etiology - cancer_specific_signatures_2022',
     columns: [
       'etiology',
       'signature',
@@ -88,6 +88,24 @@ export const sources = [
       'note',
       'cisMutation',
       'descriptionBaseContext',
+      'category',
+      'etiologyDisplay',
+    ],
+  },
+  {
+    sourcePath: 'Etiology/Etiology_cancer_specific_signatures.csv',
+    table: 'etiologyOptions',
+    description: 'etiology - cancer_specific_signatures',
+    columns: [
+      'etiology',
+      'signature',
+      'referenceSignature',
+      'refSigProportion',
+      'study',
+      'studyUrl',
+      'source',
+      'sourceUrl',
+      'description',
       'category',
       'etiologyDisplay',
     ],

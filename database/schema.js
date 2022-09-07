@@ -247,6 +247,8 @@ export const schema = [
       table.string('etiologyDisplay');
       table.string('etiology');
       table.string('signature');
+      table.string('referenceSignature');
+      table.double('refSigProportion');
       table.string('study');
       table.string('studyUrl');
       table.text('genomeBuild');
