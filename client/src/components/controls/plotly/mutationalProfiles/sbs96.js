@@ -1,4 +1,4 @@
-export default function SBS96(rawData, args) {
+export default function SBS96(rawData, sample, tab) {
   const colors = {
     'C>A': '#03BCEE',
     'C>G': 'black',
@@ -7,7 +7,8 @@ export default function SBS96(rawData, args) {
     'T>C': '#A1CE63',
     'T>G': '#EBC6C4',
   };
-  const { profile, matrix, sample } = args;
+  //const { profile, matrix, sample } = args;
+  console.log(tab);
 
   const groupByMutation = rawData.reduce((acc, e, i) => {
     const mutationRegex = /\[(.*)\]/;
@@ -25,11 +26,18 @@ export default function SBS96(rawData, args) {
   const totalMutations = data.reduce(
     (total, mutation) =>
       total +
-      mutation.data.reduce((mutationSum, e) => mutationSum + e.mutations, 0),
+      mutation.data.reduce(
+        (mutationSum, e) => mutationSum + (e?.mutations || e?.contribution),
+        0
+      ),
     0
   );
   const maxMutation = Math.max(
-    ...data.map((mutation) => mutation.data.map((e) => e.mutations)).flat()
+    ...data
+      .map((mutation) =>
+        mutation.data.map((e) => e?.mutations || e?.contribution)
+      )
+      .flat()
   );
 
   const mutationTypeNames = data
@@ -52,7 +60,7 @@ export default function SBS96(rawData, args) {
           .slice(0, groupIndex)
           .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
     ),
-    y: group.data.map((e) => e.mutations),
+    y: group.data.map((e) => e?.mutations || e?.contribution),
     hoverinfo: 'x+y',
     showlegend: false,
   }));
@@ -82,11 +90,13 @@ export default function SBS96(rawData, args) {
     x: 0.01,
     y: 0.88,
     text:
-      '<b>' +
-      sample +
-      ': ' +
-      totalMutations.toLocaleString(undefined) +
-      ' subs </b>',
+      tab === 'rsProfile'
+        ? '<b>' + sample + '</b>'
+        : '<b>' +
+          sample +
+          ': ' +
+          totalMutations.toLocaleString(undefined) +
+          ' subs </b>',
     showarrow: false,
     font: {
       size: 24,

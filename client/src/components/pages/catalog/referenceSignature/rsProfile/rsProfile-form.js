@@ -28,7 +28,7 @@ export default function Profile({ submitR }) {
 
   const { matrixList, projectID } = store.main;
   const { plots, debugR, err, loading } = store.sigMutationalProfiles;
-  const { refSigData, sample, signatureName } = store.referenceSignature;
+  const { refSigData, sample } = store.referenceSignature;
 
   const [params, setParams] = useState(null);
 
@@ -53,7 +53,8 @@ export default function Profile({ submitR }) {
   };
   const { control, setValue, watch } = useForm({ defaultValues });
 
-  const { source, profile, matrix, signatureSetName, strategy } = watch();
+  const { source, profile, matrix, signatureSetName, strategy, signatureName } =
+    watch();
 
   console.log(watch());
 
@@ -75,13 +76,15 @@ export default function Profile({ submitR }) {
     if (optiondata) {
       handleSource(signatureSourceOptions[0]);
     }
-  }, [optiondata]);
+  }, []);
 
   const signatureSourceOptions = optiondata
-    ? [...new Set(optiondata.map((e) => e.source))].sort().map((e) => ({
-        label: e,
-        value: e,
-      }))
+    ? [...new Set(optiondata.map((e) => e.source))]
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+        .map((e) => ({
+          label: e,
+          value: e,
+        }))
     : [];
 
   const profileOptions = (source) =>
@@ -91,7 +94,7 @@ export default function Profile({ submitR }) {
             optiondata
               .filter((e) => e.source === source.value)
               .map((e) => e.profile)
-              .sort((a, b) => b.localeCompare(a))
+              .sort((a, b) => a.localeCompare(b))
           ),
         ].map((e) => ({ label: e, value: e }))
       : [];
@@ -124,7 +127,7 @@ export default function Profile({ submitR }) {
                   e.matrix === matrix.value
               )
               .map((e) => e.signatureSetName)
-              .sort((a, b) => b.localeCompare(a))
+              .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
           ),
         ].map((e) => ({ label: e, value: e }))
       : [];
@@ -142,7 +145,7 @@ export default function Profile({ submitR }) {
                   e.signatureSetName === signatureSetName.value
               )
               .map((e) => e.strategy)
-              .sort((a, b) => b.localeCompare(a))
+              .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
           ),
         ].map((e) => ({ label: e, value: e }))
       : [];
@@ -172,7 +175,7 @@ export default function Profile({ submitR }) {
                   e.strategy === strategy.value
               )
               .map((e) => e.signatureName)
-              .sort((a, b) => b.localeCompare(a))
+              .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
           ),
         ].map((e) => ({ label: e, value: e }))
       : [];
@@ -244,7 +247,7 @@ export default function Profile({ submitR }) {
     );
 
     setValue('matrix', matrix);
-    setValue('signatureSetName', signatureSetName);
+    setValue('signatureSetName', signatureSetName[0]);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
   }
@@ -271,31 +274,24 @@ export default function Profile({ submitR }) {
   }
 
   function handleName(signatureName) {
-    mergeSigMutationalProfiles({
-      signatureName: signatureName,
-    });
-
     setValue('signatureName', signatureName);
   }
 
-  const {
-    data: plotdata,
-    error: plotError,
-    isFetching: plotFetching,
-  } = useRsProfileDataQuery(params, {
-    skip: !params,
-  });
-  console.log(plotdata);
-
   // get data on form change
   useEffect(() => {
+    console.log(source);
+    console.log(profile);
+    console.log(matrix);
+    console.log(signatureSetName);
+    console.log(strategy);
+    console.log(signatureName);
     if (
-      source.value &&
-      profile.value &&
-      matrix.value &&
-      signatureSetName.value &&
-      strategy.value &&
-      signatureName.value
+      source?.value &&
+      profile?.value &&
+      matrix?.value &&
+      signatureSetName?.value &&
+      strategy?.value &&
+      signatureName?.value
     ) {
       const params = {
         source: source.value,
@@ -305,9 +301,19 @@ export default function Profile({ submitR }) {
         strategy: strategy.value,
         signatureName: signatureName.value,
       };
+      console.log(params);
       setParams(params);
     }
   }, [source, profile, matrix, signatureSetName, strategy, signatureName]);
+
+  const {
+    data: plotdata,
+    error: plotError,
+    isFetching: plotFetching,
+  } = useRsProfileDataQuery(params, {
+    skip: !params,
+  });
+  console.log(plotdata);
 
   return (
     <div>
@@ -334,7 +340,7 @@ export default function Profile({ submitR }) {
             <Select
               name="profile"
               label="Profile Name"
-              value={profile}
+              //value={profile}
               options={profileOptions(source)}
               control={control}
               onChange={handleProfile}
@@ -344,7 +350,7 @@ export default function Profile({ submitR }) {
             <Select
               name="matrix"
               label="Matrix"
-              value={matrix}
+              //value={matrix}
               options={matrixOptions(source, profile)}
               control={control}
               onChange={handleMatrix}
@@ -354,7 +360,7 @@ export default function Profile({ submitR }) {
             <Select
               name="signatureSetName"
               label="Reference Signature Set"
-              value={signatureSetName}
+              //value={signatureSetName}
               options={referenceSignatureSetOption(source, profile, matrix)}
               control={control}
               onChange={handleSet}
