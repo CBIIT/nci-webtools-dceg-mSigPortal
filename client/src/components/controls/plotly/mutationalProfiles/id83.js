@@ -26,7 +26,7 @@ export default function ID83(rawData, args) {
     acc[indel] = acc[indel] ? [...acc[indel], e] : [e];
     return acc;
   }, {});
-
+  console.log(groupByIndel);
   const unsortedData = Object.entries(groupByIndel).map(([indel, data]) => ({
     indel,
     data,
@@ -108,7 +108,7 @@ export default function ID83(rawData, args) {
       '%{y} indels<extra></extra>',
     showlegend: false,
   }));
-
+  console.log(traces);
   const shapeAnnotations = data.map((group, groupIndex, array) => ({
     xref: 'x',
     yref: 'paper',
@@ -130,6 +130,8 @@ export default function ID83(rawData, args) {
     },
     align: 'center',
   }));
+
+  console.log(shapeAnnotations);
 
   const xLabelAnnotation = indelNames.map((indel, index) => ({
     xref: 'x',

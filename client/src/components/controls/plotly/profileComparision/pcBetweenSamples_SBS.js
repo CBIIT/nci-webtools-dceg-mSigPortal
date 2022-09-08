@@ -9,6 +9,10 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
     'T>C': '#A1CE63',
     'T>G': '#EBC6C4',
   };
+  console.log(samples);
+  console.log(sample1);
+  console.log(sample2);
+  console.log(tab);
   const mutationRegex = /\[(.*)\]/;
   const groupByMutation1 = sample1.reduce((acc, e, i) => {
     const mutation = e.mutationType.match(mutationRegex)[1];

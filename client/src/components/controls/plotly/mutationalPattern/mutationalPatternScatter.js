@@ -1,7 +1,6 @@
 import { groupBy } from 'lodash';
 
 export default function mutationalPatternScatter(rawdata, arg) {
-  console.log(rawdata);
   const { pattern } = arg;
   const type =
     pattern.substring(1, 2) + pattern.substring(3, 4) + pattern.substring(5, 6);

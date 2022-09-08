@@ -5,7 +5,7 @@ export default function mutationalPatternBar(rawData) {
   const data = Object.entries(groupByPattern).map(([pattern, data]) => {
     return { pattern, data };
   });
-
+  console.log(rawData);
   const maxVal = Math.max(...data.map((o) => o.data.length));
   const traces = {
     marker: {
@@ -61,7 +61,7 @@ export default function mutationalPatternBar(rawData) {
     x: data.map((patterndata) => patterndata.pattern),
     y: data.map((patterndata, index, array) => patterndata.data.length),
   };
-
+  console.log(traces);
   var layout = {
     hoverlabel: { bgcolor: '#FFF' },
     autosize: true,
