@@ -31,7 +31,7 @@ export default function ID83(rawData, args) {
     indel,
     data,
   }));
-
+  console.log(unsortedData);
   // sort data according to colors
   const indelOrder = Object.fromEntries(
     Object.entries(Object.keys(colors)).map((a) => a.reverse())
@@ -39,7 +39,7 @@ export default function ID83(rawData, args) {
   const data = [...unsortedData].sort(
     (a, b) => indelOrder[a.indel] - indelOrder[b.indel]
   );
-
+  console.log(data);
   const arrayIDAnnXTop = [
       '1bp Deletion',
       '1bp Insertion',
@@ -78,7 +78,7 @@ export default function ID83(rawData, args) {
     )
     .flat();
   console.log(indelNames);
-  console.log(data);
+
   const traces = data.map((group, groupIndex, array) => ({
     name: group.indel,
     type: 'bar',

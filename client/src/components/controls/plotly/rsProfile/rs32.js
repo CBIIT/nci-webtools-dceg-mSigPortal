@@ -31,8 +31,8 @@ export default function RS32(rawData, sample) {
     'non-clustered_inv_100Kb-1Mb': 'mediumorchid',
     'clustered_inv_1-10Kb': 'thistle',
     'non-clustered_inv_1-10Kb': 'thistle',
-    'clustered_trans': 'thistle',
-    'non-clustered_trans': 'thistle',
+    clustered_trans: 'gray',
+    'non-clustered_trans': 'gray',
   };
 
   const clusterd = [];
@@ -47,6 +47,13 @@ export default function RS32(rawData, sample) {
 
   console.log(nonClustered);
   console.log(clusterd);
+  const groupByCluster = rawData.reduce((acc, e, i) => {
+    const indel = e.mutationType.substring(0, 3);
+
+    acc[indel] = acc[indel] ? [...acc[indel], e] : [e];
+    return acc;
+  }, {});
+  console.log(groupByCluster);
 
   const groupByIndelCluster = clusterd.reduce((acc, e, i) => {
     const indel = e.mutationType.substring(0, 13);
@@ -56,36 +63,96 @@ export default function RS32(rawData, sample) {
   }, {});
   console.log(groupByIndelCluster);
 
-  const indelNames = clusterd
-    .map((e, i) => ({
-      indel: e.mutationType.substring(14, e.mutationType.length - 1),
-      index: i,
-    }))
+  const groupByIndelNonCluster = nonClustered.reduce((acc, e, i) => {
+    const indel = e.mutationType.substring(0, 17);
+
+    acc[indel] = acc[indel] ? [...acc[indel], e] : [e];
+    return acc;
+  }, {});
+  console.log(groupByIndelNonCluster);
+
+  const clusterGroup = Object.entries(groupByIndelCluster).map(
+    ([indel, data]) => ({
+      indel,
+      data,
+    })
+  );
+  console.log(clusterGroup);
+
+  const nonClusterGroup = Object.entries(groupByIndelNonCluster).map(
+    ([indel, data]) => ({
+      indel,
+      data,
+    })
+  );
+  console.log(nonClusterGroup);
+
+  const data = [...clusterGroup, ...nonClusterGroup];
+  console.log(data);
+  const indelNames = data
+    .map((indel) =>
+      indel.data.map((e, i) => ({
+        indel: indel.mutationType,
+        index: i,
+      }))
+    )
     .flat();
   console.log(indelNames);
 
   const arrayTop1 = ['Clustered', 'Non-Clustered'];
-  const arrayTop2 = [''];
 
   const traces = rawData.map((group, groupIndex, array) => ({
     group: group,
-    name: 'Clustered',
+    name: group.indel,
     type: 'bar',
     marker: {
       color: colors[group.mutationType],
       line: {
         color: 'black',
-        width: 1.5,
+        width: 1,
       },
     },
     x: [group.mutationType],
     y: [group.contribution],
-    hoverinfo: 'x+y',
+    hover: 'x+y',
     showlegend: false,
   }));
   console.log(traces);
-
-  const topShapes = rawData.map((group, groupIndex, array) => ({
+  const traces1 = data.map((group, groupIndex, array) => ({
+    group: group,
+    name: group.indel,
+    type: 'bar',
+    marker: { color: colors[group.mutationType] },
+    x: [...group.data.keys()].map(
+      (e) =>
+        e +
+        array
+          .slice(0, groupIndex)
+          .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
+    ),
+    y: group.data.map((e) => e.contribution),
+    showlegend: false,
+  }));
+  console.log(traces1);
+  const topShapes0 = data.map((group, groupIndex, array) => ({
+    group: group,
+    name: group.indel,
+    type: 'bar',
+    marker: { color: colors[group.mutationType] },
+    x: [...group.data.keys()].map(
+      (e) =>
+        e +
+        array
+          .slice(0, groupIndex)
+          .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
+    ),
+    y: group.data.map((e) => e.contribution),
+    showlegend: false,
+  }));
+  console.log(topShapes0);
+  const topShapes = data.map((group, groupIndex, array) => ({
+    group: group,
+    array: array,
     type: 'rect',
     xref: 'x',
     yref: 'paper',
@@ -102,6 +169,7 @@ export default function RS32(rawData, sample) {
       width: 0,
     },
   }));
+  console.log(topShapes);
 
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
