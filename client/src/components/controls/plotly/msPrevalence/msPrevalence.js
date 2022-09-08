@@ -142,6 +142,8 @@ export default function MSPrevalence(groupBySignature, mutation) {
     hovertemplate: '<b>%{x}</b><br>%{y:.1%}<extra></extra>',
   }));
 
+  console.log(tracesBar);
+
   const titleAnnotation = [
     {
       xref: 'paper',
@@ -185,9 +187,12 @@ export default function MSPrevalence(groupBySignature, mutation) {
   };
   let titleAnnotations = [];
 
-  const barTotal = tracesBar.reduce((total, e) => total + e.y, 0);
+  //const barTotal = tracesBar.reduce((total, e) => total + e.y, 0);
+
+  const yMax = Math.max(...tracesBar.map((o) => o.y));
   let traces = [];
-  if (barTotal[groupBySignature.length] < 0.1) {
+  // if (barTotal[groupBySignature.length] < 0.01) {
+  if (yMax < 0.01) {
     traces = [tracesPie];
     titleAnnotations = [...titleAnnotation, barAnnotation];
   } else {
