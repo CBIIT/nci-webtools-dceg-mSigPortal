@@ -200,7 +200,6 @@ export default function MSPrevalence(groupBySignature, mutation) {
     hoverlabel: { bgcolor: '#FFF' },
     height: 450,
     autosize: true,
-    title: '<b>Prevalence of Mutational Signatures</b>',
     xaxis2: {
       showline: true,
       tickangle: -90,
