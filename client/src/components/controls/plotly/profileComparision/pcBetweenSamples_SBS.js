@@ -304,7 +304,8 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
     align: 'center',
     x: 1.0175,
     y: 0.835,
-    text: samples[0],
+    text:
+      samples[0].length > 16 ? samples[0].substring(0, 16) + '...' : samples[0],
     textangle: 90,
     showarrow: false,
   };
@@ -317,7 +318,8 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
     align: 'center',
     x: 1.0175,
     y: 0.505,
-    text: samples[1],
+    text:
+      samples[1].length > 16 ? samples[1].substring(0, 16) + '...' : samples[1],
     textangle: 90,
     showarrow: false,
   };
