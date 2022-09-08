@@ -95,7 +95,7 @@ async function profilerExtraction(params) {
   const args = Object.values(params);
   const cli = args.reduce((params, arg) => [...params, ...arg]);
 
-  logger.debug('/profilerExtraction: CLI args\n' + cli);
+  logger.debug('/profilerExtraction: CLI args\n' + cli.join(' '));
 
   try {
     const { stdout, stderr } = await spawn(
