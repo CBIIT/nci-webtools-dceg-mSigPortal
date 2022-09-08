@@ -1,5 +1,3 @@
-import { max } from 'd3';
-
 export default function SBS96(rawData, sample, tab) {
   const colors = {
     'C>A': '#03BCEE',
@@ -28,12 +26,13 @@ export default function SBS96(rawData, sample, tab) {
   const totalMutations = data.reduce(
     (total, mutation) =>
       total +
-      mutation.data.reduce((mutationSum, e) => mutationSum + e.mutations, 0),
+      mutation.data.reduce((mutationSum, e) => mutationSum + e.contribution, 0),
     0
   );
   const maxMutation = Math.max(
-    ...data.map((mutation) => mutation.data.map((e) => e.mutations)).flat()
+    ...data.map((mutation) => mutation.data.map((e) => e.contribution)).flat()
   );
+
   const mutationTypeNames = data
     .map((group) =>
       group.data.map((e) => ({
@@ -54,7 +53,7 @@ export default function SBS96(rawData, sample, tab) {
           .slice(0, groupIndex)
           .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
     ),
-    y: group.data.map((e) => e.mutations),
+    y: group.data.map((e) => e.contribution),
     hoverinfo: 'x+y',
     showlegend: false,
   }));
@@ -84,11 +83,13 @@ export default function SBS96(rawData, sample, tab) {
     x: 0.01,
     y: 0.88,
     text:
-      '<b>' +
-      sample +
-      ': ' +
-      totalMutations.toLocaleString(undefined) +
-      ' subs </b>',
+      tab === 'rsProfile'
+        ? '<b>' + sample + '</b>'
+        : '<b>' +
+          sample +
+          ': ' +
+          totalMutations.toLocaleString(undefined) +
+          ' subs </b>',
     showarrow: false,
     font: {
       size: 24,

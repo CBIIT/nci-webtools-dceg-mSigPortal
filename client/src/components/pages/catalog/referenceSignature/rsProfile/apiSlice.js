@@ -1,11 +1,12 @@
 import { catalogApiSlice } from '../../../../../services/store/rootApi';
 import { groupBy } from 'lodash';
-import SBS96 from '../../../../controls/plotly/mutationalProfiles/sbs96';
-import SBS192 from '../../../../controls/plotly/mutationalProfiles/sbs192';
+import SBS96 from '../../../../controls/plotly/rsProfile/sbs96';
+import SBS192 from '../../../../controls/plotly/rsProfile/sbs192';
 import SBS288 from '../../../../controls/plotly/rsProfile/sbs288';
 import SBS1536 from '../../../../controls/plotly/rsProfile/sbs1536';
 import DBS78 from '../../../../controls/plotly/rsProfile/dbs78';
 import ID83 from '../../../../controls/plotly/rsProfile/id83';
+import RS32 from '../../../../controls/plotly/rsProfile/rs32';
 
 export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -39,6 +40,8 @@ export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
           return ID83(data, signatureName);
         } else if (profileMatrix === 'DBS78') {
           return DBS78(data, signatureName);
+        } else if (profileMatrix === 'RS32') {
+          return RS32(data, signatureName);
         }
       },
     }),

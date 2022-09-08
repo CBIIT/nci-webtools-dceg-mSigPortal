@@ -18,19 +18,32 @@ export default function RS32(rawData, sample) {
     '4:Del:M': { shape: '#8482BC', text: 'black' },
     '5:Del:M': { shape: '#62409A', text: 'white' },
   };
-  const groupByMutationType = groupBy(rawData, 'mutationType');
-  console.log(groupByMutationType);
-  const groupByIndel = rawData.reduce((acc, e, i) => {
+
+  const clusterd = [];
+  const nonClustered = [];
+  rawData.map((e) => {
+    if (e.mutationType.substring(0, 3) === 'non') {
+      nonClustered.push(e);
+    } else {
+      clusterd.push(e);
+    }
+  });
+
+  console.log(nonClustered);
+  console.log(clusterd);
+  const groupByIndelCluster = clusterd.reduce((acc, e, i) => {
     const indel = e.mutationType.match(/^(.{7})/)[1];
 
     acc[indel] = acc[indel] ? [...acc[indel], e] : [e];
     return acc;
   }, {});
 
-  const unsortedData = Object.entries(groupByIndel).map(([indel, data]) => ({
-    indel,
-    data,
-  }));
+  const unsortedData = Object.entries(groupByIndelCluster).map(
+    ([indel, data]) => ({
+      indel,
+      data,
+    })
+  );
 
   // sort data according to colors
   const indelOrder = Object.fromEntries(
