@@ -1,86 +1,95 @@
 export default function MSPrevalence(groupBySignature, mutation) {
-  groupBySignature.sort(
-    (a, b) =>
-      a.samples.reduce((a, b) => a + b.exposure, 0) -
-      b.samples.reduce((a, b) => a + b.exposure, 0)
-  );
+  // groupBySignature.sort(
+  //   (a, b) =>
+  //     a.samples.reduce((a, b) => a + b.exposure, 0) -
+  //     b.samples.reduce((a, b) => a + b.exposure, 0)
+  // );
 
   let minumumNumber = 100;
   mutation === null || mutation === undefined
     ? (minumumNumber = 100)
     : (minumumNumber = parseInt(mutation));
 
+  groupBySignature.sort(
+    (a, b) =>
+      b.samples.filter((e) => e.exposure >= minumumNumber).length /
+        b.totalSamples -
+      a.samples.filter((e) => e.exposure >= minumumNumber).length /
+        a.totalSamples
+  );
+
+  console.log(groupBySignature);
   const colors = {
-    SBS1: '#4a9855',
-    SBS2: '#e2a8ab',
-    SBS3: '#40004b',
-    SBS4: '#5aa1ca',
-    SBS5: '#305d39',
-    SBS6: '#785940',
-    SBS7a: '#6e70b7',
-    SBS7b: '#ff7f00',
-    SBS7c: '#fec44f',
-    SBS7d: '#846a2a',
-    SBS8: '#cab2d6',
-    SBS9: '#f4a582',
-    SBS10a: '#8dd3c7',
-    SBS10b: '#5e4fa2',
-    SBS10c: '#761429',
-    SBS11: '#9e0142',
-    SBS12: '#ffed6f',
-    SBS13: '#e41a1c',
-    SBS14: '#ffffbf',
-    SBS15: '#4d4d4d',
-    SBS16: '#513276',
-    SBS17a: '#df4c7d',
-    SBS17b: '#08519c',
-    SBS18: '#b3de69',
-    SBS19: '#dfc27d',
-    SBS20: '#b2182b',
-    SBS21: '#9ecae1',
-    SBS22: '#01665e',
-    SBS23: '#d53e4f',
-    SBS24: '#1c9099',
-    SBS25: '#35978f',
-    SBS26: '#ec7014',
-    SBS27: '#f46d43',
-    SBS28: '#de77ae',
-    SBS29: '#fdae61',
-    SBS30: '#d9d9d9',
-    SBS31: '#f781bf',
-    SBS32: '#dd1c77',
-    SBS33: '#b25d7e',
-    SBS34: '#fee08b',
-    SBS35: '#fc8d59',
-    SBS36: 'yellow',
-    SBS37: '#e6f598',
-    SBS38: '#abdda4',
-    SBS39: '#636363',
-    SBS40: '#b15928',
-    SBS41: '#fccde5',
-    SBS42: '#ae017e',
-    SBS43: '#66c2a5',
-    SBS44: '#8c6bb1',
-    SBS45: '#3288bd',
-    SBS46: '#e6f598',
-    SBS47: '#bababa',
-    SBS48: '#5e4fa2',
-    SBS49: '#40004b',
-    SBS50: '#762a83',
-    SBS51: '#9970ab',
-    SBS52: '#c2a5cf',
-    SBS53: '#e7d4e8',
-    SBS54: '#fcc5c0',
-    SBS55: '#d9f0d3',
-    SBS56: '#8c510a',
-    SBS57: '#a6dba0',
-    SBS58: '#5aae61',
-    SBS59: '#1b7837',
-    SBS60: '#00441b',
-    SBS84: '#063C3C',
-    SBS85: '#AA9139',
-    SBS92: '#0E1844',
-    'SBS-others': '#cececa',
+    1: '#4a9855',
+    2: '#e2a8ab',
+    3: '#40004b',
+    4: '#5aa1ca',
+    5: '#305d39',
+    6: '#785940',
+    '7a': '#6e70b7',
+    '7b': '#ff7f00',
+    '7c': '#fec44f',
+    '7d': '#846a2a',
+    8: '#cab2d6',
+    9: '#f4a582',
+    '10a': '#8dd3c7',
+    '10b': '#5e4fa2',
+    '10c': '#761429',
+    11: '#9e0142',
+    12: '#ffed6f',
+    13: '#e41a1c',
+    14: '#ffffbf',
+    15: '#4d4d4d',
+    16: '#513276',
+    '17a': '#df4c7d',
+    '17b': '#08519c',
+    18: '#b3de69',
+    19: '#dfc27d',
+    20: '#b2182b',
+    21: '#9ecae1',
+    22: '#01665e',
+    23: '#d53e4f',
+    24: '#1c9099',
+    25: '#35978f',
+    26: '#ec7014',
+    27: '#f46d43',
+    28: '#de77ae',
+    29: '#fdae61',
+    30: '#d9d9d9',
+    31: '#f781bf',
+    32: '#dd1c77',
+    33: '#b25d7e',
+    34: '#fee08b',
+    35: '#fc8d59',
+    36: 'yellow',
+    37: '#e6f598',
+    38: '#abdda4',
+    39: '#636363',
+    40: '#b15928',
+    41: '#fccde5',
+    42: '#ae017e',
+    43: '#66c2a5',
+    44: '#8c6bb1',
+    45: '#3288bd',
+    46: '#e6f598',
+    47: '#bababa',
+    48: '#5e4fa2',
+    49: '#40004b',
+    50: '#762a83',
+    51: '#9970ab',
+    52: '#c2a5cf',
+    53: '#e7d4e8',
+    54: '#fcc5c0',
+    55: '#d9f0d3',
+    56: '#8c510a',
+    57: '#a6dba0',
+    58: '#5aae61',
+    59: '#1b7837',
+    60: '#00441b',
+    84: '#063C3C',
+    85: '#AA9139',
+    92: '#0E1844',
+    '-others': '#cececa',
   };
 
   const tracesPie = {
@@ -93,10 +102,15 @@ export default function MSPrevalence(groupBySignature, mutation) {
     texttemplate: '%{percent:.1%}',
     showlegend: false,
     marker: {
-      colors: groupBySignature.map((group) => colors[group.signatureName]),
+      colors: groupBySignature.map(
+        (group) => colors[group.signatureName.replace(/^\D*/, '')]
+      ),
     },
+    test: groupBySignature.map((group) =>
+      group.signatureName.replace(/^\D*/, '')
+    ),
     direction: 'clockwise',
-    sort: false,
+    sort: true,
     domain: { x: [0, 0.2] },
     customdata: groupBySignature.map((e) => ({
       label: e.signatureName,
@@ -105,15 +119,14 @@ export default function MSPrevalence(groupBySignature, mutation) {
     hovertemplate:
       '<b>Signature Name:</b>%{label}<br><b>Total sample: </b>%{value}<br>%{percent}<extra></extra>',
   };
-
+  console.log(tracesPie);
   const tracesBar = groupBySignature.map((group, groupIndex, array) => ({
     group: group,
     array: array,
     name: group.signatureName,
     type: 'bar',
-    minumumNumber: minumumNumber,
     marker: {
-      color: colors[group.signatureName],
+      color: colors[group.signatureName.replace(/^\D*/, '')],
     },
     x: [group.signatureName],
     y: [
@@ -130,20 +143,26 @@ export default function MSPrevalence(groupBySignature, mutation) {
         10 +
         '%',
     ],
+    customdata: groupBySignature.map((group) => ({
+      signatureName: group.signatureName,
+    })),
     textposition: 'outside',
     xaxis: 'x2',
     yaxis: 'y2',
-    hoverinfo: 'x2+y2',
+    //hoverinfo: 'x2+y2',
+    hovertemplate:
+      '<b> signatureName: ' +
+      '</b>' +
+      '%{x} <br>' +
+      '<b>Frequency: </b>' +
+      '%{y}',
     showlegend: false,
     domain: {
       row: 0,
       column: 1,
     },
-    hovertemplate: '<b>%{x}</b><br>%{y:.1%}<extra></extra>',
   }));
-
   console.log(tracesBar);
-
   const titleAnnotation = [
     {
       xref: 'paper',
@@ -187,11 +206,8 @@ export default function MSPrevalence(groupBySignature, mutation) {
   };
   let titleAnnotations = [];
 
-  //const barTotal = tracesBar.reduce((total, e) => total + e.y, 0);
-
   const yMax = Math.max(...tracesBar.map((o) => o.y));
   let traces = [];
-  // if (barTotal[groupBySignature.length] < 0.01) {
   if (yMax < 0.01) {
     traces = [tracesPie];
     titleAnnotations = [...titleAnnotation, barAnnotation];
@@ -200,6 +216,13 @@ export default function MSPrevalence(groupBySignature, mutation) {
     titleAnnotations = [...titleAnnotation];
   }
 
+  const names = groupBySignature.map((group) => ({
+    signatureName:
+      group.signatureName.length > 10
+        ? group.signatureName.substring(0, 10) + '...'
+        : group.signatureName,
+  }));
+  console.log(names);
   const layout = {
     grid: { rows: 1, columns: 2 },
     hoverlabel: { bgcolor: '#FFF' },
@@ -212,8 +235,11 @@ export default function MSPrevalence(groupBySignature, mutation) {
         family: 'Arial, monospace',
       },
       tickmode: 'array',
+      tickvals: names.map((_, i) => i),
+      ticktext: names.map((e) => e.signatureName),
       linecolor: 'black',
       linewidth: 1,
+      type: 'category',
       categoryorder: 'total descending',
       domain: [0.25, 1],
     },
@@ -235,6 +261,7 @@ export default function MSPrevalence(groupBySignature, mutation) {
       showgrid: true,
       gridcolor: '#F5F5F5',
     },
+
     annotations: titleAnnotations,
   };
 
