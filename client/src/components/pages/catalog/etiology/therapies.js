@@ -16,7 +16,7 @@ export default function General() {
   const {
     category,
     etiology,
-    selectedSignature,
+    signature,
     study,
     all,
     data,
@@ -47,7 +47,7 @@ export default function General() {
                     onClick={() =>
                       mergeEtiology({
                         etiology: Treatments,
-                        selectedSignature: '',
+                        signature: '',
                       })
                     }
                     className={etiology != Treatments ? 'disabled' : ''}
@@ -78,13 +78,13 @@ export default function General() {
               onClick={() =>
                 mergeEtiology({
                   etiology: Etiology,
-                  selectedSignature: signatureName,
+                  signature: signatureName,
                 })
               }
               className={`sigIcon border rounded ${
                 etiology != Etiology
                   ? 'inactive'
-                  : signatureName == selectedSignature
+                  : signatureName == signature
                   ? 'active'
                   : ''
               }`}
@@ -121,12 +121,12 @@ export default function General() {
             <Col key={index} md="2" sm="4" className="mb-3">
               <div
                 className={`sigIcon border rounded ${
-                  signatureName == selectedSignature ? 'active' : ''
+                  signatureName == signature ? 'active' : ''
                 }`}
                 title={`${etiology} - ${signatureName}`}
                 onClick={() =>
                   mergeEtiology({
-                    selectedSignature: signatureName,
+                    signature: signatureName,
                   })
                 }
               >
@@ -157,7 +157,7 @@ export default function General() {
           data[category]
             .filter(
               ({ Etiology, 'Signature Name': signatureName }) =>
-                Etiology == etiology && signatureName == selectedSignature
+                Etiology == etiology && signatureName == signature
             )
             .map((obj) => obj.Study)
         ),
@@ -180,9 +180,9 @@ export default function General() {
   }
 
   function getInfo() {
-    if (data[category] && data[category].length && selectedSignature) {
+    if (data[category] && data[category].length && signature) {
       let info = data[category].filter(
-        (signature) => signature['Signature'] == selectedSignature
+        (signature) => signature['Signature'] == signature
       );
       if (info.length) {
         info = info[0];
@@ -271,7 +271,7 @@ export default function General() {
       } else {
         return (
           <p className="d-flex justify-content-center text-muted">
-            Error: No data found for {selectedSignature}
+            Error: No data found for {signature}
           </p>
         );
       }

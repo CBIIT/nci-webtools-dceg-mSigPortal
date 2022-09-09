@@ -1,72 +1,72 @@
 export const sources = [
-  {
-    sourcePath: 'Association/data.csv',
-    table: 'association',
-    description: 'association data',
-    columns: [
-      'study',
-      'strategy',
-      'cancer',
-      'sample',
-      'icgcSpecimenId',
-      'icgcDonorId',
-      'dataSource',
-      'dataType',
-      'variableName',
-      'variableValue',
-      'variableValueType',
-    ],
-  },
+  // {
+  //   sourcePath: 'Association/data.csv',
+  //   table: 'association',
+  //   description: 'association data',
+  //   columns: [
+  //     'study',
+  //     'strategy',
+  //     'cancer',
+  //     'sample',
+  //     'icgcSpecimenId',
+  //     'icgcDonorId',
+  //     'dataSource',
+  //     'dataType',
+  //     'variableName',
+  //     'variableValue',
+  //     'variableValueType',
+  //   ],
+  // },
 
-  {
-    sourcePath: 'Exposure/data.csv',
-    table: 'exposure',
-    description: 'exposure data',
-    columns: [
-      'study',
-      'strategy',
-      'cancer',
-      'organ',
-      'sample',
-      'signatureSetName',
-      'signatureName',
-      'exposure',
-    ],
-  },
+  // {
+  //   sourcePath: 'Exposure/data.csv',
+  //   table: 'exposure',
+  //   description: 'exposure data',
+  //   columns: [
+  //     'study',
+  //     'strategy',
+  //     'cancer',
+  //     'organ',
+  //     'sample',
+  //     'signatureSetName',
+  //     'signatureName',
+  //     'exposure',
+  //   ],
+  // },
 
-  {
-    sourcePath: 'Seqmatrix/data.csv',
-    table: 'seqmatrix',
-    description: 'seqmatrix data',
-    columns: [
-      'study',
-      'cancer',
-      'sample',
-      'strategy',
-      'profile',
-      'matrix',
-      'mutationType',
-      'mutations',
-    ],
-  },
+  // {
+  //   sourcePath: 'Seqmatrix/data.csv',
+  //   table: 'seqmatrix',
+  //   description: 'seqmatrix data',
+  //   columns: [
+  //     'study',
+  //     'cancer',
+  //     'sample',
+  //     'strategy',
+  //     'profile',
+  //     'matrix',
+  //     'mutationType',
+  //     'mutations',
+  //   ],
+  // },
 
-  {
-    sourcePath: 'Signature/data.csv',
-    table: 'signature',
-    description: 'signature data',
-    columns: [
-      'source',
-      'profile',
-      'matrix',
-      'signatureSetName',
-      'strategy',
-      'strandInfo',
-      'strand',
-      'signatureName',
-      'mutationType',
-      'contribution',
-    ],
-  },
+  // {
+  //   sourcePath: 'Signature/data.csv',
+  //   table: 'signature',
+  //   description: 'signature data',
+  //   columns: [
+  //     'source',
+  //     'profile',
+  //     'matrix',
+  //     'signatureSetName',
+  //     'strategy',
+  //     'strandInfo',
+  //     'strand',
+  //     'signatureName',
+  //     'mutationType',
+  //     'contribution',
+  //   ],
+  // },
 
   {
     sourcePath: 'Etiology/Etiology_cancer_specific_signatures_2022.csv',
@@ -192,55 +192,55 @@ export const sources = [
     ],
   },
 
-  {
-    sourcePath: 'Others/Publications.csv',
-    table: 'publication',
-    description: 'publications',
-    columns: [
-      'category',
-      'diseaseOrPhenotypeOrExposure',
-      'cancerType',
-      'experimentalStrategy',
-      'firstAuthor',
-      'lastAuthor',
-      'year',
-      'journal',
-      'bioRxivOrPubmedId',
-      'title',
-      'doi',
-      'note',
-      'softwareName',
-      'computationalMethod',
-      'programmingLanguage',
-      'sourceUrl',
-    ],
-  },
+  // {
+  //   sourcePath: 'Others/Publications.csv',
+  //   table: 'publication',
+  //   description: 'publications',
+  //   columns: [
+  //     'category',
+  //     'diseaseOrPhenotypeOrExposure',
+  //     'cancerType',
+  //     'experimentalStrategy',
+  //     'firstAuthor',
+  //     'lastAuthor',
+  //     'year',
+  //     'journal',
+  //     'bioRxivOrPubmedId',
+  //     'title',
+  //     'doi',
+  //     'note',
+  //     'softwareName',
+  //     'computationalMethod',
+  //     'programmingLanguage',
+  //     'sourceUrl',
+  //   ],
+  // },
 
-  {
-    sourcePath: 'Others/pattern.csv',
-    table: 'pattern',
-    description: 'pattern',
-    columns: [
-      'study',
-      'cancer',
-      'sample',
-      'total',
-      'pattern',
-      'n0',
-      'n1',
-      'n2',
-    ],
-  },
+  // {
+  //   sourcePath: 'Others/pattern.csv',
+  //   table: 'pattern',
+  //   description: 'pattern',
+  //   columns: [
+  //     'study',
+  //     'cancer',
+  //     'sample',
+  //     'total',
+  //     'pattern',
+  //     'n0',
+  //     'n1',
+  //     'n2',
+  //   ],
+  // },
 
-  {
-    description: 'Refresh materialized views',
-    type: 'postImport',
-    callback: async (connection) => {
-      await connection.query('refresh materialized view "exposureOption"');
-      await connection.query('refresh materialized view "seqmatrixOption"');
-      await connection.query('refresh materialized view "seqmatrixSummary"');
-      await connection.query('refresh materialized view "signatureOption"');
-      await connection.query('refresh materialized view "associationOption"');
-    },
-  },
+  // {
+  //   description: 'Refresh materialized views',
+  //   type: 'postImport',
+  //   callback: async (connection) => {
+  //     await connection.query('refresh materialized view "exposureOption"');
+  //     await connection.query('refresh materialized view "seqmatrixOption"');
+  //     await connection.query('refresh materialized view "seqmatrixSummary"');
+  //     await connection.query('refresh materialized view "signatureOption"');
+  //     await connection.query('refresh materialized view "associationOption"');
+  //   },
+  // },
 ];

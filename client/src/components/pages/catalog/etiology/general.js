@@ -16,7 +16,7 @@ export default function General({ categories }) {
   const {
     category,
     etiology,
-    selectedSignature,
+    signature,
     study,
     all,
     data,
@@ -36,7 +36,7 @@ export default function General({ categories }) {
               .map((Etiology) => (
                 <Col
                   key={Etiology}
-                  lg={category == 'Gene Edits' ? '1' : '2'}
+                  lg={category == 'GeneEdits' ? '1' : '2'}
                   md="3"
                   sm="4"
                   className="mb-3 d-flex"
@@ -47,7 +47,7 @@ export default function General({ categories }) {
                     onClick={() =>
                       mergeEtiology({
                         etiology: Etiology,
-                        selectedSignature: '',
+                        signature: '',
                       })
                     }
                     className={etiology != Etiology ? 'disabled' : ''}
@@ -78,13 +78,13 @@ export default function General({ categories }) {
               onClick={() =>
                 mergeEtiology({
                   etiology: Etiology,
-                  selectedSignature: signatureName,
+                  signature: signatureName,
                 })
               }
               className={`sigIcon border rounded ${
                 etiology != Etiology
                   ? 'inactive'
-                  : signatureName == selectedSignature
+                  : signatureName == signature
                   ? 'active'
                   : ''
               }`}
@@ -121,12 +121,12 @@ export default function General({ categories }) {
             <Col key={index} md="2" sm="4" className="mb-3">
               <div
                 className={`sigIcon border rounded ${
-                  signatureName == selectedSignature ? 'active' : ''
+                  signatureName == signature ? 'active' : ''
                 }`}
                 title={`${etiology} - ${signatureName}`}
                 onClick={() =>
                   mergeEtiology({
-                    selectedSignature: signatureName,
+                    signature: signatureName,
                   })
                 }
               >
@@ -157,7 +157,7 @@ export default function General({ categories }) {
           data[category]
             .filter(
               ({ Etiology, 'Signature Name': signatureName }) =>
-                Etiology == etiology && signatureName == selectedSignature
+                Etiology == etiology && signatureName == signature
             )
             .map((obj) => obj.Study)
         ),
@@ -180,11 +180,11 @@ export default function General({ categories }) {
   }
 
   function getInfo() {
-    if (data[category] && data[category].length && selectedSignature) {
+    if (data[category] && data[category].length && signature) {
       let info = data[category].filter(
         (signature) =>
-          signature['Signature Name'] == selectedSignature ||
-          signature['Signature'] == selectedSignature
+          signature['Signature Name'] == signature ||
+          signature['Signature'] == signature
       );
       if (info.length) {
         info = info[0];
@@ -301,7 +301,7 @@ export default function General({ categories }) {
       } else {
         return (
           <p className="d-flex justify-content-center text-muted">
-            Error: No data found for {selectedSignature}
+            Error: No data found for {signature}
           </p>
         );
       }
@@ -312,7 +312,7 @@ export default function General({ categories }) {
     <div>
       <div className="mb-3">
         <h5 className="separator">
-          {categories.filter((cat) => cat.name == category)[0].etiologyTitle}
+          {categories.filter((e) => e.category == category)[0].etiologyTitle}
         </h5>
         <div>{getEtiologies()}</div>
       </div>

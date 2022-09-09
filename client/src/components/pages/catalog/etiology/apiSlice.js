@@ -8,7 +8,14 @@ export const etiologyApiSlice = catalogApiSlice.injectEndpoints({
         params,
       }),
     }),
+    thumbnails: builder.query({
+      query: (body) => ({
+        url: 'getImageS3Batch',
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useEtiologyOptionsQuery } = etiologyApiSlice;
+export const { useEtiologyOptionsQuery, useThumbnailsQuery } = etiologyApiSlice;
