@@ -22,7 +22,7 @@ CancerSpecificSignatures_2022 <- function(x) {
   x %>%
     mutate(
       category = processorFunction,
-      etiologyDisplay = "Propoosed Etiologies",
+      etiologyDisplay = "Proposed Etiologies",
     ) %>%
     rename(
       etiology = Etiology,
