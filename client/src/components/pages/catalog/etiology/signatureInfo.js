@@ -20,9 +20,9 @@ export default function SignatureInfo({ data }) {
       e.etiology == etiology &&
       e.signature == signature &&
       (category == 'CancerSpecificSignatures'
-        ? e.referenceSignature == referenceSignature
+        ? e.json.referenceSignature == referenceSignature
         : true)
-  )[0];
+  )[0]?.json;
 
   // split description string delimited by key:
   const descriptionRegex = /(\w*\s?\w+:)/g;
@@ -181,7 +181,7 @@ export default function SignatureInfo({ data }) {
             description.map(
               (e, i, arr) =>
                 i % 2 == 0 && (
-                  <p>
+                  <p key={i}>
                     <strong>{e}</strong>
                     {arr[i + 1]}
                   </p>
