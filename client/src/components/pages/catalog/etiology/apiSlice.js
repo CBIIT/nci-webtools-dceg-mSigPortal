@@ -2,13 +2,20 @@ import { catalogApiSlice } from '../../../../services/store/rootApi';
 
 export const etiologyApiSlice = catalogApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    etiology: builder.query({
+    etiologyOptions: builder.query({
       query: (params) => ({
-        url: 'etiology',
+        url: 'etiologyOptions',
         params,
+      }),
+    }),
+    thumbnails: builder.query({
+      query: (body) => ({
+        url: 'getImageS3Batch',
+        method: 'POST',
+        body,
       }),
     }),
   }),
 });
 
-export const { useEtiologyQuery } = etiologyApiSlice;
+export const { useEtiologyOptionsQuery, useThumbnailsQuery } = etiologyApiSlice;

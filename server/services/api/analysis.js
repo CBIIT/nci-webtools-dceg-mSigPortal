@@ -272,19 +272,25 @@ async function getImageS3Batch(req, res, next) {
   const { keys } = req.body;
   const s3 = new AWS.S3();
 
-  const batch = await Promise.all(
-    (keys || []).map((Key) =>
-      s3
-        .getObject({
-          Bucket: config.data.bucket,
-          Key,
-        })
-        .promise()
-        .then(
-          ({ Body }) =>
-            'data:image/svg+xml;base64,' + Buffer.from(Body).toString('base64')
-        )
-        .catch((err) => '')
+  const batch = Object.fromEntries(
+    await Promise.all(
+      (keys || []).map((Key) => {
+        const key = decodeURIComponent(Key);
+        return s3
+          .getObject({
+            Bucket: config.data.bucket,
+            Key: key,
+          })
+          .promise()
+          .then(({ Body }) => [
+            [path.parse(key).name],
+            'data:image/svg+xml;base64,' + Buffer.from(Body).toString('base64'),
+          ])
+          .catch((error) => {
+            logger.error(`${key}: ${error.message}`);
+            return [[path.parse(key).name], 'no image available'];
+          });
+      })
     )
   );
 
