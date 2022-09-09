@@ -40,7 +40,9 @@ CancerSpecificSignatures_2022 <- function(x) {
       description = Description,
       note = Note,
       cisMutation = "Mutation Identified in Cis"
-    )
+    ) %>%
+    mutate(json = toJSON(unbox(across()))) %>%
+    select(category, etiology, signature, json)
 }
 
 CancerSpecificSignatures <- function(x) {
@@ -59,7 +61,9 @@ CancerSpecificSignatures <- function(x) {
       source = Source,
       sourceUrl = Source_URL,
       description = Description,
-    )
+    ) %>%
+    mutate(json = toJSON(unbox(across()))) %>%
+    select(category, etiology, signature, json)
 }
 
 Cosmic <- function(x) {
@@ -78,7 +82,9 @@ Cosmic <- function(x) {
       sourceUrl = Source_URL,
       description = Description,
       tissueDistribution = Tissue_Distribution
-    )
+    ) %>%
+    mutate(json = toJSON(unbox(across()))) %>%
+    select(category, etiology, signature, json)
 }
 
 EnviromentalMutagenesis <- function(x) {
@@ -96,7 +102,9 @@ EnviromentalMutagenesis <- function(x) {
       studyUrl = Study_URL,
       source = Source,
       sourceUrl = Source_URL,
-    )
+    ) %>%
+    mutate(json = toJSON(unbox(across()))) %>%
+    select(category, etiology, signature, json)
 }
 
 GeneEdits <- function(x) {
@@ -113,7 +121,9 @@ GeneEdits <- function(x) {
       studyUrl = Study_URL,
       source = Source,
       sourceUrl = Source_URL,
-    )
+    ) %>%
+    mutate(json = toJSON(unbox(across()))) %>%
+    select(category, etiology, signature, json)
 }
 
 CancerTherapies <- function(x) {
@@ -129,7 +139,9 @@ CancerTherapies <- function(x) {
       tumorType = Tumor_Type,
       study = Study,
       studyUrl = Study_URL,
-    )
+    ) %>%
+    mutate(json = toJSON(unbox(across()))) %>%
+    select(category, etiology, signature, json)
 }
 
 Others <- function(x) {
@@ -144,7 +156,9 @@ Others <- function(x) {
       signatureSource = "Signature Source",
       sourceUrl = URL,
       description = Description
-    )
+    ) %>%
+    mutate(json = toJSON(unbox(across()))) %>%
+    select(category, etiology, signature, json)
 }
 
 dataset <- loadJson(inputFile)
