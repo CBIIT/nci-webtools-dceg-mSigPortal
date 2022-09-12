@@ -146,7 +146,7 @@ export default function RS32(rawData, sample) {
     showlegend: false,
   }));
   console.log(traces1);
-  const topShapes0 = data.map((group, groupIndex, array) => ({
+  const topShapes = data.map((group, groupIndex, array) => ({
     group: group,
     name: group.indel,
     type: 'rect',
@@ -173,7 +173,36 @@ export default function RS32(rawData, sample) {
     },
     showlegend: false,
   }));
-  console.log(topShapes0);
+  console.log(topShapes);
+  const topShapeAnnitations = data.map((group, groupIndex, array) => ({
+    xref: 'x',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
+    x:
+      array
+        .slice(0, groupIndex)
+        .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
+      (group.data.length - 1) * 0.5,
+    y: 1.01,
+    text:
+      group.indel.substring(group.indel.length - 3, group.indel.length) !==
+      'tra'
+        ? group.indel
+            .substring(group.indel.length - 3, group.indel.length)
+            .charAt(0)
+            .toUpperCase() +
+          group.indel
+            .substring(group.indel.length - 3, group.indel.length)
+            .slice(1)
+        : 'T',
+    showarrow: false,
+    font: {
+      size: 14,
+      color: 'white',
+    },
+    align: 'center',
+  }));
   const topShapeCluster = {
     type: 'rect',
     xref: 'x',
@@ -186,6 +215,21 @@ export default function RS32(rawData, sample) {
     line: {
       width: 0,
     },
+  };
+  const topShapeClusterAnnotation = {
+    xref: 'x',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
+    x: 7.5,
+    y: 1.08,
+    text: `Clustered`,
+    showarrow: false,
+    font: {
+      size: 14,
+      color: 'white',
+    },
+    align: 'center',
   };
   console.log(topShapeCluster);
   const topShapeNonluster = {
@@ -201,6 +245,21 @@ export default function RS32(rawData, sample) {
       width: 0,
     },
   };
+  const topShapeNonClusterAnnotation = {
+    xref: 'x',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
+    x: 23.5,
+    y: 1.08,
+    text: `Non-Clustered`,
+    showarrow: false,
+    font: {
+      size: 14,
+      color: 'white',
+    },
+    align: 'center',
+  };
   const separateLine = {
     type: 'line',
     xref: 'x',
@@ -209,19 +268,22 @@ export default function RS32(rawData, sample) {
     x1: 15.5,
     y0: 0,
     y1: 1,
+    line: {
+      color: '#808080',
+      width: 1,
+    },
   };
+
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     height: 500,
-    //width:1080,
     autosize: true,
     xaxis: {
       showticklabels: true,
       showline: true,
       tickfont: { size: 11 },
       tickmode: 'array',
-      //tickvals: indelNames.map((_, i) => i),
-      //ticktext: indelNames.map((e) => e.index),
+
       linecolor: 'black',
       linewidth: 1,
       mirror: 'all',
@@ -241,14 +303,12 @@ export default function RS32(rawData, sample) {
       mirror: true,
     },
 
-    shapes: [...topShapes0, topShapeCluster, topShapeNonluster, separateLine],
-    // annotations: [
-    //   ...shapeAnnotations,
-    //   ...xLabelAnnotation,
-    //   ...annotationsIDTopLabel,
-    //   ...annotationsIDBotLabel,
-    //   sampleAnnotation,
-    // ],
+    shapes: [...topShapes, topShapeCluster, topShapeNonluster, separateLine],
+    annotations: [
+      ...topShapeAnnitations,
+      topShapeClusterAnnotation,
+      topShapeNonClusterAnnotation,
+    ],
   };
 
   return { traces, layout };
