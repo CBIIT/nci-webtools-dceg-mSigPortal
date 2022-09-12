@@ -30,34 +30,34 @@ export default function SignatureInfo({ data }) {
     .split(descriptionRegex)
     .filter((e) => e.length);
 
-  function getStudy() {
-    if (data[category] && data[category].length) {
-      return [
-        ...new Set(
-          data[category]
-            .filter(
-              ({ Etiology, 'Signature Name': signatureName }) =>
-                Etiology == etiology && signatureName == signature
-            )
-            .map((obj) => obj.Study)
-        ),
-      ].map((Study) => (
-        <Col key={Study} lg="2" md="3" sm="4" className="mb-3 d-flex">
-          <Button
-            size="sm"
-            variant="primary"
-            onClick={() => mergeEtiology({ study: Study })}
-            className={study != Study ? 'disabled' : ''}
-            block
-          >
-            {Study}
-          </Button>
-        </Col>
-      ));
-    } else {
-      return false;
-    }
-  }
+  // function getStudy() {
+  //   if (data[category] && data[category].length) {
+  //     return [
+  //       ...new Set(
+  //         data[category]
+  //           .filter(
+  //             ({ Etiology, 'Signature Name': signatureName }) =>
+  //               Etiology == etiology && signatureName == signature
+  //           )
+  //           .map((obj) => obj.Study)
+  //       ),
+  //     ].map((Study) => (
+  //       <Col key={Study} lg="2" md="3" sm="4" className="mb-3 d-flex">
+  //         <Button
+  //           size="sm"
+  //           variant="primary"
+  //           onClick={() => mergeEtiology({ study: Study })}
+  //           className={study != Study ? 'disabled' : ''}
+  //           block
+  //         >
+  //           {Study}
+  //         </Button>
+  //       </Col>
+  //     ));
+  //   } else {
+  //     return false;
+  //   }
+  // }
 
   return (
     <Container fluid="xl" className="p-3">
