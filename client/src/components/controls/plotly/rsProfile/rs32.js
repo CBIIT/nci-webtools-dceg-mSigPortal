@@ -33,6 +33,10 @@ export default function RS32(rawData, sample) {
     'non-clustered_inv_1-10Kb': 'thistle',
     clustered_trans: 'gray',
     'non-clustered_trans': 'gray',
+    del: '#800001',
+    tds: '#FF8C00',
+    inv: '#6A5ACD',
+    tra: '#696969',
   };
 
   const clusterd = [];
@@ -54,6 +58,14 @@ export default function RS32(rawData, sample) {
     return acc;
   }, {});
   console.log(groupByCluster);
+
+  const groupByClusterData = Object.entries(groupByCluster).map(
+    ([mutation, data]) => ({
+      mutation,
+      data,
+    })
+  );
+  console.log(groupByClusterData);
 
   const groupByIndelCluster = clusterd.reduce((acc, e, i) => {
     const indel = e.mutationType.substring(0, 13);
@@ -137,40 +149,67 @@ export default function RS32(rawData, sample) {
   const topShapes0 = data.map((group, groupIndex, array) => ({
     group: group,
     name: group.indel,
-    type: 'bar',
-    marker: { color: colors[group.mutationType] },
-    x: [...group.data.keys()].map(
-      (e) =>
-        e +
-        array
-          .slice(0, groupIndex)
-          .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
-    ),
-    y: group.data.map((e) => e.contribution),
-    showlegend: false,
-  }));
-  console.log(topShapes0);
-  const topShapes = data.map((group, groupIndex, array) => ({
-    group: group,
-    array: array,
     type: 'rect',
     xref: 'x',
     yref: 'paper',
+    marker: {
+      color:
+        colors[
+          group.indel.substring(group.indel.length - 3, group.indel.length)
+        ],
+    },
     x0: array
       .slice(0, groupIndex)
-      .reduce((lastIndex, e) => lastIndex + e.length, -0.4),
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.4),
     x1: array
       .slice(0, groupIndex + 1)
-      .reduce((lastIndex, e) => lastIndex + e.length, -0.6),
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.6),
     y0: 1.07,
     y1: 1.01,
-    fillcolor: colors[group.mutationType],
+    fillcolor:
+      colors[group.indel.substring(group.indel.length - 3, group.indel.length)],
     line: {
       width: 0,
     },
+    showlegend: false,
   }));
-  console.log(topShapes);
-
+  console.log(topShapes0);
+  const topShapeCluster = {
+    type: 'rect',
+    xref: 'x',
+    yref: 'paper',
+    x0: -0.4,
+    x1: 15.4,
+    y0: 1.14,
+    y1: 1.08,
+    fillcolor: '#808080',
+    line: {
+      width: 0,
+    },
+  };
+  console.log(topShapeCluster);
+  const topShapeNonluster = {
+    type: 'rect',
+    xref: 'x',
+    yref: 'paper',
+    x0: 15.6,
+    x1: 31.4,
+    y0: 1.14,
+    y1: 1.08,
+    fillcolor: '#000000',
+    line: {
+      width: 0,
+    },
+  };
+  const separateLine = {
+    type: 'line',
+    xref: 'x',
+    yref: 'paper',
+    x0: 15.5,
+    x1: 15.5,
+    y0: 0,
+    y1: 1,
+  };
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     height: 500,
@@ -202,7 +241,7 @@ export default function RS32(rawData, sample) {
       mirror: true,
     },
 
-    shapes: [...topShapes],
+    shapes: [...topShapes0, topShapeCluster, topShapeNonluster, separateLine],
     // annotations: [
     //   ...shapeAnnotations,
     //   ...xLabelAnnotation,
