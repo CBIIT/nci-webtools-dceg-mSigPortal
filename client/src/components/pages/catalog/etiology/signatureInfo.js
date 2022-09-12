@@ -27,8 +27,8 @@ export default function SignatureInfo({ data }) {
   // split description string delimited by key:
   const descriptionRegex = /(\w*\s?\w+:)/g;
   const description = metadata?.description
-    .split(descriptionRegex)
-    .filter((e) => e.length);
+    ? metadata.description.split(descriptionRegex).filter((e) => e.length)
+    : '';
 
   // function getStudy() {
   //   if (data[category] && data[category].length) {
@@ -177,7 +177,7 @@ export default function SignatureInfo({ data }) {
               {metadata.note}
             </div>
           )}
-          {description.length && description.length > 1 ? (
+          {description.length > 1 ? (
             description.map(
               (e, i, arr) =>
                 i % 2 == 0 && (
