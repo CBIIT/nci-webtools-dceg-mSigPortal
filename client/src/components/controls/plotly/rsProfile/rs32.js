@@ -38,15 +38,12 @@ export default function RS32(rawData, sample) {
     inv: '#6A5ACD',
     tra: '#696969',
   };
-  console.log(rawData);
-  console.log(sample);
+
   const totalMutations = rawData.reduce(
     (total, indel) => total + indel.contribution,
     0
   );
-  console.log(totalMutations);
   const maxMutation = Math.max(...rawData.map((indel) => indel.contribution));
-  console.log(maxMutation);
   const clusterd = [];
   const nonClustered = [];
   rawData.map((e) => {
@@ -57,15 +54,12 @@ export default function RS32(rawData, sample) {
     }
   });
 
-  console.log(nonClustered);
-  console.log(clusterd);
   const groupByCluster = rawData.reduce((acc, e, i) => {
     const indel = e.mutationType.substring(0, 3);
 
     acc[indel] = acc[indel] ? [...acc[indel], e] : [e];
     return acc;
   }, {});
-  console.log(groupByCluster);
 
   const groupByClusterData = Object.entries(groupByCluster).map(
     ([mutation, data]) => ({
@@ -73,7 +67,6 @@ export default function RS32(rawData, sample) {
       data,
     })
   );
-  console.log(groupByClusterData);
 
   const groupByIndelCluster = clusterd.reduce((acc, e, i) => {
     const indel = e.mutationType.substring(0, 13);
@@ -81,7 +74,6 @@ export default function RS32(rawData, sample) {
     acc[indel] = acc[indel] ? [...acc[indel], e] : [e];
     return acc;
   }, {});
-  console.log(groupByIndelCluster);
 
   const groupByIndelNonCluster = nonClustered.reduce((acc, e, i) => {
     const indel = e.mutationType.substring(0, 17);
@@ -89,7 +81,6 @@ export default function RS32(rawData, sample) {
     acc[indel] = acc[indel] ? [...acc[indel], e] : [e];
     return acc;
   }, {});
-  console.log(groupByIndelNonCluster);
 
   const clusterGroup = Object.entries(groupByIndelCluster).map(
     ([indel, data]) => ({
@@ -97,7 +88,6 @@ export default function RS32(rawData, sample) {
       data,
     })
   );
-  console.log(clusterGroup);
 
   const nonClusterGroup = Object.entries(groupByIndelNonCluster).map(
     ([indel, data]) => ({
@@ -105,10 +95,8 @@ export default function RS32(rawData, sample) {
       data,
     })
   );
-  console.log(nonClusterGroup);
 
   const data = [...clusterGroup, ...nonClusterGroup];
-  console.log(data);
   const mutationTypeNames = data
     .map((group) =>
       group.data.map((e, i) => ({
@@ -116,7 +104,6 @@ export default function RS32(rawData, sample) {
       }))
     )
     .flat();
-  console.log(mutationTypeNames);
 
   const traces = rawData.map((group, groupIndex, array) => ({
     group: group,
@@ -138,7 +125,6 @@ export default function RS32(rawData, sample) {
     hoverinfo: 'x+y',
     showlegend: false,
   }));
-  console.log(traces);
   const traces1 = data.map((group, groupIndex, array) => ({
     group: group,
     name: group.indel,
@@ -154,7 +140,6 @@ export default function RS32(rawData, sample) {
     y: group.data.map((e) => e.contribution),
     showlegend: false,
   }));
-  console.log(traces1);
   const topShapes = data.map((group, groupIndex, array) => ({
     group: group,
     name: group.indel,
@@ -182,7 +167,6 @@ export default function RS32(rawData, sample) {
     },
     showlegend: false,
   }));
-  console.log(topShapes);
   const topShapeAnnitations = data.map((group, groupIndex, array) => ({
     xref: 'x',
     yref: 'paper',
@@ -240,7 +224,6 @@ export default function RS32(rawData, sample) {
     },
     align: 'center',
   };
-  console.log(topShapeCluster);
   const topShapeNonluster = {
     type: 'rect',
     xref: 'x',
