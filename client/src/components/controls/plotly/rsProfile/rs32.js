@@ -38,7 +38,15 @@ export default function RS32(rawData, sample) {
     inv: '#6A5ACD',
     tra: '#696969',
   };
-
+  console.log(rawData);
+  console.log(sample);
+  const totalMutations = rawData.reduce(
+    (total, indel) => total + indel.contribution,
+    0
+  );
+  console.log(totalMutations);
+  const maxMutation = Math.max(...rawData.map((indel) => indel.contribution));
+  console.log(maxMutation);
   const clusterd = [];
   const nonClustered = [];
   rawData.map((e) => {
@@ -101,17 +109,14 @@ export default function RS32(rawData, sample) {
 
   const data = [...clusterGroup, ...nonClusterGroup];
   console.log(data);
-  const indelNames = data
-    .map((indel) =>
-      indel.data.map((e, i) => ({
-        indel: indel.mutationType,
-        index: i,
+  const mutationTypeNames = data
+    .map((group) =>
+      group.data.map((e, i) => ({
+        mutationType: e.mutationType.split('_').pop(),
       }))
     )
     .flat();
-  console.log(indelNames);
-
-  const arrayTop1 = ['Clustered', 'Non-Clustered'];
+  console.log(mutationTypeNames);
 
   const traces = rawData.map((group, groupIndex, array) => ({
     group: group,
@@ -126,7 +131,11 @@ export default function RS32(rawData, sample) {
     },
     x: [group.mutationType],
     y: [group.contribution],
-    hover: 'x+y',
+    customdata: {
+      mutationType: group.mutationType,
+      contribution: group.contribution,
+    },
+    hoverinfo: 'x+y',
     showlegend: false,
   }));
   console.log(traces);
@@ -273,7 +282,21 @@ export default function RS32(rawData, sample) {
       width: 1,
     },
   };
-
+  const sampleAnnotation = {
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
+    x: 0.01,
+    y: 0.88,
+    text: '<b>' + sample + '</b>',
+    showarrow: false,
+    font: {
+      size: 18,
+      family: 'Arial',
+    },
+    align: 'center',
+  };
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     height: 500,
@@ -281,12 +304,15 @@ export default function RS32(rawData, sample) {
     xaxis: {
       showticklabels: true,
       showline: true,
+      tickangle: -90,
       tickfont: { size: 11 },
       tickmode: 'array',
 
       linecolor: 'black',
       linewidth: 1,
       mirror: 'all',
+      tickvals: mutationTypeNames.map((_, i) => i),
+      ticktext: mutationTypeNames.map((e) => e.mutationType),
     },
     yaxis: {
       title: {
@@ -296,8 +322,9 @@ export default function RS32(rawData, sample) {
           size: 18,
         },
       },
-      autorange: true,
-      //range: [0, maxMutation * 1.2],
+      autorange: false,
+      range: [0, maxMutation * 1.25],
+      tickformat: ',.1%',
       linecolor: 'black',
       linewidth: 1,
       mirror: true,
@@ -308,6 +335,7 @@ export default function RS32(rawData, sample) {
       ...topShapeAnnitations,
       topShapeClusterAnnotation,
       topShapeNonClusterAnnotation,
+      sampleAnnotation,
     ],
   };
 
