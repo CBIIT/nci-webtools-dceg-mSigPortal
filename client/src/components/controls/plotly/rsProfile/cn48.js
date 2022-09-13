@@ -35,6 +35,9 @@ export default function CN48(rawData, sample) {
     '3-4': '#7D26CD',
     '5-8': '#CD8500',
     '9+': '#8B0A50',
+    homdel: '#0000CD',
+    LOH: '#FFFFFF',
+    het: 'black',
   };
 
   const totalMutations = rawData.reduce(
@@ -45,22 +48,6 @@ export default function CN48(rawData, sample) {
 
   var sortOrder = ['0-100kb', '100kb-1Mb', '1Mb-10Mb', '10Mb-40Mb', '>40Mb']; // Declare a array that defines the order of the elements to be sorted.
 
-  const hd = [];
-  const LOH = [];
-  const het = [];
-  rawData.map((e) => {
-    const names = e.mutationType.split(':');
-    if (names[1] === 'LOH') {
-      LOH.push(e);
-    } else if (names[1] === 'het') {
-      het.push(e);
-    } else {
-      hd.push(e);
-    }
-  });
-  console.log(hd);
-  console.log(LOH);
-  console.log(het);
   const groupByCluster = rawData.reduce((acc, e, i) => {
     const names = e.mutationType.split(':');
 
@@ -190,7 +177,27 @@ export default function CN48(rawData, sample) {
     showlegend: false,
   }));
   console.log(topShapes);
-
+  const topShapeAnnitations = sortGroupByFirst2Data.map(
+    (group, groupIndex, array) => ({
+      xref: 'x',
+      yref: 'paper',
+      xanchor: 'bottom',
+      yanchor: 'bottom',
+      x:
+        array
+          .slice(0, groupIndex)
+          .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
+        (group.data.length - 1) * 0.5,
+      y: 1.01,
+      text: group.mutation.split(':')[0],
+      showarrow: false,
+      font: {
+        size: 14,
+        color: 'white',
+      },
+      align: 'center',
+    })
+  );
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     height: 500,
@@ -225,12 +232,12 @@ export default function CN48(rawData, sample) {
     },
 
     shapes: [...topShapes],
-    // annotations: [
-    //   //...topShapeAnnitations,
-    //   //topShapeClusterAnnotation,
-    //   //topShapeNonClusterAnnotation,
-    //   //sampleAnnotation,
-    // ],
+    annotations: [
+      ...topShapeAnnitations,
+      //   //topShapeClusterAnnotation,
+      //   //topShapeNonClusterAnnotation,
+      //   //sampleAnnotation,
+    ],
   };
 
   return { traces, layout };
