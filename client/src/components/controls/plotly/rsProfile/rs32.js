@@ -140,6 +140,7 @@ export default function RS32(rawData, sample) {
     y: group.data.map((e) => e.contribution),
     showlegend: false,
   }));
+
   const topShapes = data.map((group, groupIndex, array) => ({
     group: group,
     name: group.indel,
@@ -167,6 +168,8 @@ export default function RS32(rawData, sample) {
     },
     showlegend: false,
   }));
+  console.log(data);
+  console.log(topShapes);
   const topShapeAnnitations = data.map((group, groupIndex, array) => ({
     xref: 'x',
     yref: 'paper',

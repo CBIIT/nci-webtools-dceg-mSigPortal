@@ -93,23 +93,41 @@ export default function CN48(rawData, sample) {
     })
   );
   console.log(groupbyfirst2Data);
+  const thesort = (arr) => {
+    // first grab the obj that is not getting sorted
+    let first = arr.shift();
+    // add the sortable tag
+    let narr = arr
+      .map((a) => ({ ...a, tag: a.mutation.split(':')[1] }))
+      .sort((a, b) => b.tag.localeCompare(a.tag)) // sort it
+      .map((a) => {
+        delete a.tag;
+        return a;
+      }); // remove the custom tag
+    narr.unshift(first);
+    return narr;
+  };
 
-  function compareMutations(a, b) {
-    let [countA, nameA] = a.mutation.split(':');
+  const sortGroupByFirst2Data = thesort(groupbyfirst2Data);
 
-    let [countB, nameB] = b.mutation.split(':');
-
-    let nameComparison = nameA.localeCompare(nameB);
-
-    let countComparison = parseInt(countA) - parseInt(countB);
-
-    if (nameComparison == 0) {
-      return countComparison;
-    } else {
-      return nameComparison;
-    }
-  }
-  console.log(groupbyfirst2Data.sort(compareMutations));
+  // function compareMutations(a, b) {
+  //   let [countA, nameA] = a.mutation.split(':');
+  //   let [countB, nameB] = b.mutation.split(':');
+  //   let nameComparison = nameA.localeCompare(nameB);
+  //   let countComparison = parseInt(countA) - parseInt(countB);
+  //   if (nameComparison == 0) {
+  //     return countComparison;
+  //   } else {
+  //     return nameComparison;
+  //   }
+  // }
+  // const sortArray = groupbyfirst2Data.sort(compareMutations);
+  // const firstPart = sortArray.slice(0, 4);
+  // const secondPart = sortArray.slice(4, 10);
+  // const customSortArray = [...secondPart, ...firstPart];
+  // console.log(customSortArray);
+  // console.log(firstPart);
+  // console.log(secondPart);
   const dataD = groupByClusterData
     .map((indel) => indel.data.map((e) => e))
     .flat();
@@ -149,26 +167,27 @@ export default function CN48(rawData, sample) {
   }));
   console.log(traces);
 
-  const topShapes = dataD.map((group, groupIndex, array) => ({
+  console.log(sortGroupByFirst2Data);
+  const topShapes = sortGroupByFirst2Data.map((group, groupIndex, array) => ({
     group: group,
-    name: group.indel,
+    name: group.mutation,
     type: 'rect',
     xref: 'x',
     yref: 'paper',
 
-    // x0: array
-    //   .slice(0, groupIndex)
-    //   .reduce((lastIndex, e) => lastIndex + e.data.length, -0.4),
-    // x1: array
-    //   .slice(0, groupIndex + 1)
-    //   .reduce((lastIndex, e) => lastIndex + e.data.length, -0.6),
-    // y0: 1.07,
-    // y1: 1.01,
-    // fillcolor: colors[group.indel.split(':')[0]],
-    // line: {
-    //   width: 0,
-    // },
-    // showlegend: false,
+    x0: array
+      .slice(0, groupIndex)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.4),
+    x1: array
+      .slice(0, groupIndex + 1)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.6),
+    y0: 1.07,
+    y1: 1.01,
+    fillcolor: colors[group.mutation.split(':')[0]],
+    line: {
+      width: 0,
+    },
+    showlegend: false,
   }));
   console.log(topShapes);
 
