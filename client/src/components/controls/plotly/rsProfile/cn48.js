@@ -128,7 +128,7 @@ export default function CN48(rawData, sample) {
 
   const traces = dataD.map((group, groupIndex, array) => ({
     group: group,
-    name: group.indel,
+    name: group.mutationType,
     color: group.mutationType.split(':')[0] + group.mutationType.split(':')[2],
     type: 'bar',
     marker: {
@@ -145,11 +145,17 @@ export default function CN48(rawData, sample) {
     },
     x: [group.mutationType],
     y: [group.contribution],
-    customdata: {
-      mutationType: group.mutationType,
-      contribution: group.contribution,
-    },
-    hoverinfo: 'x+y',
+    customdata: [
+      {
+        type: group.mutationType.split(':')[1],
+        xval: group.mutationType.split(':')[2],
+        contribution: group.contribution,
+      },
+    ],
+    //hoverinfo: 'x+y',
+    hovertemplate:
+      '<b>%{customdata.type}</b><br>' +
+      '%{customdata.xval} <br>Proportion: %{y}<extra></extra>',
     showlegend: false,
   }));
   console.log(traces);
@@ -172,7 +178,7 @@ export default function CN48(rawData, sample) {
     y1: 1.01,
     fillcolor: colors[group.mutation.split(':')[0]],
     line: {
-      width: 0,
+      width: 1,
     },
     showlegend: false,
   }));
@@ -198,6 +204,51 @@ export default function CN48(rawData, sample) {
       align: 'center',
     })
   );
+  const topTitleShapes = groupByClusterData.map((group, groupIndex, array) => ({
+    group: group,
+    name: group.mutation,
+    type: 'rect',
+    xref: 'x',
+    yref: 'paper',
+
+    x0: array
+      .slice(0, groupIndex)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.4),
+    x1: array
+      .slice(0, groupIndex + 1)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.6),
+    y0: 1.14,
+    y1: 1.08,
+    fillcolor: colors[group.mutation.split(':')[0]],
+    line: {
+      width: 1,
+    },
+    showlegend: false,
+  }));
+  console.log(topTitleShapes);
+  const topTitleShapesAnnitations = groupByClusterData.map(
+    (group, groupIndex, array) => ({
+      group: group,
+      xref: 'x',
+      yref: 'paper',
+      xanchor: 'bottom',
+      yanchor: 'bottom',
+      x:
+        array
+          .slice(0, groupIndex)
+          .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
+        (group.data.length - 1) * 0.5,
+      y: 1.08,
+      text: group.mutation.charAt(0).toUpperCase() + group.mutation.slice(1),
+      showarrow: false,
+      font: {
+        size: 14,
+        color: group.mutation === 'LOH' ? 'black' : 'white',
+      },
+      align: 'center',
+    })
+  );
+  console.log(topTitleShapesAnnitations);
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     height: 500,
@@ -231,11 +282,10 @@ export default function CN48(rawData, sample) {
       mirror: true,
     },
 
-    shapes: [...topShapes],
+    shapes: [...topShapes, ...topTitleShapes],
     annotations: [
       ...topShapeAnnitations,
-      //   //topShapeClusterAnnotation,
-      //   //topShapeNonClusterAnnotation,
+      ...topTitleShapesAnnitations,
       //   //sampleAnnotation,
     ],
   };
