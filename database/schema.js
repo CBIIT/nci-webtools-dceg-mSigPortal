@@ -244,31 +244,9 @@ export const schema = [
     schema: (table) => {
       table.increments('id');
       table.string('category');
-      table.string('etiologyDisplay');
       table.string('etiology');
       table.string('signature');
-      table.string('referenceSignature');
-      table.double('refSigProportion');
-      table.string('study');
-      table.string('studyUrl');
-      table.text('genomeBuild');
-      table.string('signatureSource');
-      table.string('source');
-      table.string('sourceUrl');
-      table.string('cohort');
-      table.boolean('cosmic_v3_2');
-      table.boolean('refSig_v1');
-      table.text('descriptionStrandBias');
-      table.text('descriptionBaseContext');
-      table.text('description');
-      table.text('note');
-      table.string('cisMutation');
-      table.text('tissueDistribution');
-      table.string('mutagen');
-      table.string('treatment');
-      table.string('cellLine');
-      table.string('signatureExtractionMethod');
-      table.string('tumorType');
+      table.json('json');
     },
     index: (table) => {
       table.index(['category']);

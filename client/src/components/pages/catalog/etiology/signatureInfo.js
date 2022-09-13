@@ -20,44 +20,44 @@ export default function SignatureInfo({ data }) {
       e.etiology == etiology &&
       e.signature == signature &&
       (category == 'CancerSpecificSignatures'
-        ? e.referenceSignature == referenceSignature
+        ? e.json.referenceSignature == referenceSignature
         : true)
-  )[0];
+  )[0]?.json;
 
   // split description string delimited by key:
   const descriptionRegex = /(\w*\s?\w+:)/g;
   const description = metadata?.description
-    .split(descriptionRegex)
-    .filter((e) => e.length);
+    ? metadata.description.split(descriptionRegex).filter((e) => e.length)
+    : '';
 
-  function getStudy() {
-    if (data[category] && data[category].length) {
-      return [
-        ...new Set(
-          data[category]
-            .filter(
-              ({ Etiology, 'Signature Name': signatureName }) =>
-                Etiology == etiology && signatureName == signature
-            )
-            .map((obj) => obj.Study)
-        ),
-      ].map((Study) => (
-        <Col key={Study} lg="2" md="3" sm="4" className="mb-3 d-flex">
-          <Button
-            size="sm"
-            variant="primary"
-            onClick={() => mergeEtiology({ study: Study })}
-            className={study != Study ? 'disabled' : ''}
-            block
-          >
-            {Study}
-          </Button>
-        </Col>
-      ));
-    } else {
-      return false;
-    }
-  }
+  // function getStudy() {
+  //   if (data[category] && data[category].length) {
+  //     return [
+  //       ...new Set(
+  //         data[category]
+  //           .filter(
+  //             ({ Etiology, 'Signature Name': signatureName }) =>
+  //               Etiology == etiology && signatureName == signature
+  //           )
+  //           .map((obj) => obj.Study)
+  //       ),
+  //     ].map((Study) => (
+  //       <Col key={Study} lg="2" md="3" sm="4" className="mb-3 d-flex">
+  //         <Button
+  //           size="sm"
+  //           variant="primary"
+  //           onClick={() => mergeEtiology({ study: Study })}
+  //           className={study != Study ? 'disabled' : ''}
+  //           block
+  //         >
+  //           {Study}
+  //         </Button>
+  //       </Col>
+  //     ));
+  //   } else {
+  //     return false;
+  //   }
+  // }
 
   return (
     <Container fluid="xl" className="p-3">
@@ -177,11 +177,11 @@ export default function SignatureInfo({ data }) {
               {metadata.note}
             </div>
           )}
-          {description.length && description.length > 1 ? (
+          {description.length > 1 ? (
             description.map(
               (e, i, arr) =>
                 i % 2 == 0 && (
-                  <p>
+                  <p key={i}>
                     <strong>{e}</strong>
                     {arr[i + 1]}
                   </p>

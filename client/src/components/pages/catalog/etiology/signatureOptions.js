@@ -32,7 +32,7 @@ export default function SignatureOptions({ data }) {
   // for category CancerSpecificSignatures
   const { data: refSigThumbnails } = useThumbnailsQuery(
     {
-      keys: data.map((e) => getThumbnailKey(e.referenceSignature)),
+      keys: data.map((e) => getThumbnailKey(e.json.referenceSignature)),
     },
     { skip: category != 'CancerSpecificSignatures' }
   );
@@ -223,25 +223,25 @@ export default function SignatureOptions({ data }) {
                   <Col key={i} md="2" sm="4" className="mb-3">
                     <div
                       className={`sigIcon border rounded ${
-                        referenceSignature == e.referenceSignature
+                        referenceSignature == e.json.referenceSignature
                           ? 'active'
                           : ''
                       }`}
-                      title={`${e.signature} - ${e.referenceSignature}`}
+                      title={`${e.signature} - ${e.json.referenceSignature}`}
                       onClick={() =>
                         mergeEtiology({
-                          referenceSignature: e.referenceSignature,
+                          referenceSignature: e.json.referenceSignature,
                         })
                       }
                     >
                       <img
-                        src={refSigThumbnails[e.referenceSignature]}
+                        src={refSigThumbnails[e.json.referenceSignature]}
                         className="w-100"
                         // height="110"
                         alt=""
                       />
                       <strong className="sigLabel">
-                        {`${e.referenceSignature} (${e.refSigProportion})`}
+                        {`${e.json.referenceSignature} (${e.json.refSigProportion})`}
                       </strong>
                     </div>
                   </Col>
