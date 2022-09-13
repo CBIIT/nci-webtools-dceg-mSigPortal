@@ -42,6 +42,9 @@ export default function CN48(rawData, sample) {
     0
   );
   const maxMutation = Math.max(...rawData.map((indel) => indel.contribution));
+
+  var sortOrder = ['0-100kb', '100kb-1Mb', '1Mb-10Mb', '10Mb-40Mb', '>40Mb']; // Declare a array that defines the order of the elements to be sorted.
+
   const hd = [];
   const LOH = [];
   const het = [];
@@ -83,7 +86,30 @@ export default function CN48(rawData, sample) {
     return acc;
   }, {});
   console.log(groupbyfirst2);
+  const groupbyfirst2Data = Object.entries(groupbyfirst2).map(
+    ([mutation, data]) => ({
+      mutation,
+      data,
+    })
+  );
+  console.log(groupbyfirst2Data);
 
+  function compareMutations(a, b) {
+    let [countA, nameA] = a.mutation.split(':');
+
+    let [countB, nameB] = b.mutation.split(':');
+
+    let nameComparison = nameA.localeCompare(nameB);
+
+    let countComparison = parseInt(countA) - parseInt(countB);
+
+    if (nameComparison == 0) {
+      return countComparison;
+    } else {
+      return nameComparison;
+    }
+  }
+  console.log(groupbyfirst2Data.sort(compareMutations));
   const dataD = groupByClusterData
     .map((indel) => indel.data.map((e) => e))
     .flat();
