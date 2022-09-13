@@ -1,42 +1,40 @@
 import { groupBy } from 'lodash';
-export default function RS32(rawData, sample) {
+export default function CN48(rawData, sample) {
   const colors = {
-    'clustered_del_>10Mb': 'deeppink',
-    'non-clustered_del_>10Mb': 'deeppink',
-    'clustered_del_1Mb-10Mb': 'hotpink',
-    'non-clustered_del_1Mb-10Mb': 'hotpink',
-    'clustered_del_10-100Kb': 'lightpink',
-    'non-clustered_del_10-100Kb': 'lightpink',
-    'clustered_del_100Kb-1Mb': 'palevioletred',
-    'non-clustered_del_100Kb-1Mb': 'palevioletred',
-    'clustered_del_1-10Kb': 'lavenderblush',
-    'non-clustered_del_1-10Kb': 'lavenderblush',
-    'clustered_tds_>10Mb': 'saddlebrown',
-    'non-clustered_tds_>10Mb': 'saddlebrown',
-    'clustered_tds_1Mb-10Mb': 'sienna',
-    'non-clustered_tds_1Mb-10Mb': 'sienna',
-    'clustered_tds_10-100Kb': 'sandybrown',
-    'non-clustered_tds_10-100Kb': 'sandybrown',
-    'clustered_tds_100Kb-1Mb': 'peru',
-    'non-clustered_tds_100Kb-1Mb': 'peru',
-    'clustered_tds_1-10Kb': 'linen',
-    'non-clustered_tds_1-10Kb': 'linen',
-    'clustered_inv_>10Mb': 'rebeccapurple',
-    'non-clustered_inv_>10Mb': 'rebeccapurple',
-    'clustered_inv_1Mb-10Mb': 'blueviolet',
-    'non-clustered_inv_1Mb-10Mb': 'blueviolet',
-    'clustered_inv_10-100Kb': 'plum',
-    'non-clustered_inv_10-100Kb': 'plum',
-    'clustered_inv_100Kb-1Mb': 'mediumorchid',
-    'non-clustered_inv_100Kb-1Mb': 'mediumorchid',
-    'clustered_inv_1-10Kb': 'thistle',
-    'non-clustered_inv_1-10Kb': 'thistle',
-    clustered_trans: 'gray',
-    'non-clustered_trans': 'gray',
-    del: '#800001',
-    tds: '#FF8C00',
-    inv: '#6A5ACD',
-    tra: '#696969',
+    '0:0-100kb': '#F0F8FF',
+    '0:100kb-1Mb': '#787CE6',
+    '0:>1Mb': '#0000CD',
+    '1:0-100kb': '#EBEBEB',
+    '1:100kb-1Mb': '#C5C5C5',
+    '1:1Mb-10Mb': '#9F9F9F',
+    '1:10Mb-40Mb': '#797979',
+    '1:>40Mb': '#545454',
+    '2:0-100kb': '#F5FFFA',
+    '2:100kb-1Mb': '#C0E2C3',
+    '2:1Mb-10Mb': '#8BC48E',
+    '2:10Mb-40Mb': '#56A858',
+    '2:>40Mb': '#228B22',
+    '3-4:0-100kb': '#FFF0F5',
+    '3-4:100kb-1Mb': '#DEBDEB',
+    '3-4:1Mb-10Mb': '#BE8BE1',
+    '3-4:10Mb-40Mb': '#9D58D7',
+    '3-4:>40Mb': '#7D26CD',
+    '5-8:0-100kb': '#FFFAF0',
+    '5-8:100kb-1Mb': '#F2DCB3',
+    '5-8:1Mb-10Mb': '#E6BF78',
+    '5-8:10Mb-40Mb': '#D9A23C',
+    '5-8:>40Mb': '#CD8500',
+    '9+:0-100kb': '#FFE4E1',
+    '9+:100kb-1Mb': '#E2ADBC',
+    '9+:1Mb-10Mb': '#C47798',
+    '9+:10Mb-40Mb': '#A84074',
+    '9+:>40Mb': '#8B0A50',
+    0: '#0000CD',
+    1: '#545454',
+    2: '#228B22',
+    '3-4': '#7D26CD',
+    '5-8': '#CD8500',
+    '9+': '#8B0A50',
   };
 
   const totalMutations = rawData.reduce(
@@ -44,22 +42,29 @@ export default function RS32(rawData, sample) {
     0
   );
   const maxMutation = Math.max(...rawData.map((indel) => indel.contribution));
-  const clusterd = [];
-  const nonClustered = [];
+  const hd = [];
+  const LOH = [];
+  const het = [];
   rawData.map((e) => {
-    if (e.mutationType.substring(0, 3) === 'non') {
-      nonClustered.push(e);
+    const names = e.mutationType.split(':');
+    if (names[1] === 'LOH') {
+      LOH.push(e);
+    } else if (names[1] === 'het') {
+      het.push(e);
     } else {
-      clusterd.push(e);
+      hd.push(e);
     }
   });
-
+  console.log(hd);
+  console.log(LOH);
+  console.log(het);
   const groupByCluster = rawData.reduce((acc, e, i) => {
-    const indel = e.mutationType.substring(0, 3);
+    const names = e.mutationType.split(':');
 
-    acc[indel] = acc[indel] ? [...acc[indel], e] : [e];
+    acc[names[1]] = acc[names[1]] ? [...acc[names[1]], e] : [e];
     return acc;
   }, {});
+  console.log(groupByCluster);
 
   const groupByClusterData = Object.entries(groupByCluster).map(
     ([mutation, data]) => ({
@@ -67,50 +72,79 @@ export default function RS32(rawData, sample) {
       data,
     })
   );
+  console.log(groupByClusterData);
 
-  const groupByIndelCluster = clusterd.reduce((acc, e, i) => {
+  const groupByIndelhd = hd.reduce((acc, e, i) => {
     const indel = e.mutationType.substring(0, 13);
 
     acc[indel] = acc[indel] ? [...acc[indel], e] : [e];
     return acc;
   }, {});
-  console.log(groupByIndelCluster);
-  const groupByIndelNonCluster = nonClustered.reduce((acc, e, i) => {
+  console.log(groupByIndelhd);
+  const groupByIndelLOH = LOH.reduce((acc, e, i) => {
     const indel = e.mutationType.substring(0, 17);
 
     acc[indel] = acc[indel] ? [...acc[indel], e] : [e];
     return acc;
   }, {});
 
-  const clusterGroup = Object.entries(groupByIndelCluster).map(
+  const groupByIndelHet = het.reduce((acc, e, i) => {
+    const indel = e.mutationType.substring(0, 17);
+
+    acc[indel] = acc[indel] ? [...acc[indel], e] : [e];
+    return acc;
+  }, {});
+  console.log(groupByIndelLOH);
+  const groupByIndelhdGroup = Object.entries(groupByIndelhd).map(
     ([indel, data]) => ({
       indel,
       data,
     })
   );
 
-  const nonClusterGroup = Object.entries(groupByIndelNonCluster).map(
+  const groupByIndelLOHGroup = Object.entries(groupByIndelLOH).map(
+    ([indel, data]) => ({
+      indel,
+      data,
+    })
+  );
+  const groupByIndelHetGroup = Object.entries(groupByIndelHet).map(
     ([indel, data]) => ({
       indel,
       data,
     })
   );
 
-  const data = [...clusterGroup, ...nonClusterGroup];
-  const mutationTypeNames = data
+  const data = [
+    ...groupByIndelhdGroup,
+    ...groupByIndelLOHGroup,
+    ...groupByIndelHetGroup,
+  ];
+  console.log(data);
+
+  const dataD = data.map((indel) => indel.data.map((e) => e)).flat();
+  console.log(dataD);
+  const mutationTypeNames = dataD
     .map((group) =>
       group.data.map((e, i) => ({
-        mutationType: e.mutationType.split('_').pop(),
+        mutationType: e.mutationType.split(':')[2],
       }))
     )
     .flat();
+  console.log(mutationTypeNames);
 
-  const traces = rawData.map((group, groupIndex, array) => ({
+  const traces = dataD.map((group, groupIndex, array) => ({
     group: group,
     name: group.indel,
+    color: group.mutationType.split(':')[0] + group.mutationType.split(':')[2],
     type: 'bar',
     marker: {
-      color: colors[group.mutationType],
+      color:
+        colors[
+          group.mutationType.split(':')[0] +
+            ':' +
+            group.mutationType.split(':')[2]
+        ],
       line: {
         color: 'black',
         width: 1,
@@ -125,6 +159,7 @@ export default function RS32(rawData, sample) {
     hoverinfo: 'x+y',
     showlegend: false,
   }));
+  console.log(traces);
   const traces1 = data.map((group, groupIndex, array) => ({
     group: group,
     name: group.indel,
@@ -167,6 +202,8 @@ export default function RS32(rawData, sample) {
     },
     showlegend: false,
   }));
+  console.log(topShapes);
+
   const topShapeAnnitations = data.map((group, groupIndex, array) => ({
     xref: 'x',
     yref: 'paper',
@@ -252,19 +289,7 @@ export default function RS32(rawData, sample) {
     },
     align: 'center',
   };
-  const separateLine = {
-    type: 'line',
-    xref: 'x',
-    yref: 'paper',
-    x0: 15.5,
-    x1: 15.5,
-    y0: 0,
-    y1: 1,
-    line: {
-      color: '#808080',
-      width: 1,
-    },
-  };
+
   const sampleAnnotation = {
     xref: 'paper',
     yref: 'paper',
@@ -287,19 +312,19 @@ export default function RS32(rawData, sample) {
     xaxis: {
       showticklabels: true,
       showline: true,
-      tickangle: -90,
-      tickfont: { size: 11 },
+      //tickangle: -90,
+      //tickfont: { size: 11 },
       tickmode: 'array',
 
       linecolor: 'black',
       linewidth: 1,
       mirror: 'all',
-      tickvals: mutationTypeNames.map((_, i) => i),
-      ticktext: mutationTypeNames.map((e) => e.mutationType),
+      // tickvals: mutationTypeNames.map((_, i) => i),
+      // ticktext: mutationTypeNames.map((e) => e.mutationType),
     },
     yaxis: {
       title: {
-        text: '<b>Percentage(%)</b>',
+        text: '<b>Proportion</b>',
         font: {
           family: 'Times New Roman',
           size: 18,
@@ -307,13 +332,13 @@ export default function RS32(rawData, sample) {
       },
       autorange: false,
       range: [0, maxMutation * 1.25],
-      tickformat: ',.1%',
+      //tickformat: ',.1%',
       linecolor: 'black',
       linewidth: 1,
       mirror: true,
     },
 
-    shapes: [...topShapes, topShapeCluster, topShapeNonluster, separateLine],
+    shapes: [...topShapes],
     annotations: [
       ...topShapeAnnitations,
       topShapeClusterAnnotation,

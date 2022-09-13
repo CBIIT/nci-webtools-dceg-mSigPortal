@@ -7,6 +7,7 @@ import SBS1536 from '../../../../controls/plotly/rsProfile/sbs1536';
 import DBS78 from '../../../../controls/plotly/rsProfile/dbs78';
 import ID83 from '../../../../controls/plotly/rsProfile/id83';
 import RS32 from '../../../../controls/plotly/rsProfile/rs32';
+import CN48 from '../../../../controls/plotly/rsProfile/cn48';
 
 export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -42,6 +43,8 @@ export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
           return DBS78(data, signatureName);
         } else if (profileMatrix === 'RS32') {
           return RS32(data, signatureName);
+        } else if (profileMatrix === 'CN48') {
+          return CN48(data, signatureName);
         }
       },
     }),
