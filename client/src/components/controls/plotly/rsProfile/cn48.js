@@ -247,6 +247,21 @@ export default function CN48(rawData, sample) {
       align: 'center',
     })
   );
+  const sampleAnnotation = {
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
+    x: 0.01,
+    y: 0.88,
+    text: '<b>' + sample + '</b>',
+    showarrow: false,
+    font: {
+      size: 24,
+      family: 'Arial',
+    },
+    align: 'center',
+  };
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     height: 500,
@@ -284,7 +299,7 @@ export default function CN48(rawData, sample) {
     annotations: [
       ...topShapeAnnitations,
       ...topTitleShapesAnnitations,
-      //   //sampleAnnotation,
+      sampleAnnotation,
     ],
   };
 
