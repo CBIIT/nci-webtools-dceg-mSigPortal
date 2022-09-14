@@ -84,6 +84,7 @@ export default function CN48(rawData, sample) {
       data,
     })
   );
+  console.log(groupbyfirst2Data);
   const thesort = (arr) => {
     // first grab the obj that is not getting sorted
     let first = arr.shift();

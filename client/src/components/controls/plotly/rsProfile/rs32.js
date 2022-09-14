@@ -44,6 +44,9 @@ export default function RS32(rawData, sample) {
     0
   );
   const maxMutation = Math.max(...rawData.map((indel) => indel.contribution));
+
+  var sortOrder = ['1-10Kb', '10-100Kb', '100Kb-1Mb', '1Mb-10Mb', '>10Mb']; // Declare a array that defines the order of the elements to be sorted.
+
   const clusterd = [];
   const nonClustered = [];
   rawData.map((e) => {
@@ -54,58 +57,82 @@ export default function RS32(rawData, sample) {
     }
   });
 
-  const groupByCluster = rawData.reduce((acc, e, i) => {
-    const indel = e.mutationType.substring(0, 3);
-
-    acc[indel] = acc[indel] ? [...acc[indel], e] : [e];
-    return acc;
-  }, {});
-
-  const groupByClusterData = Object.entries(groupByCluster).map(
-    ([mutation, data]) => ({
-      mutation,
-      data,
-    })
-  );
-
   const groupByIndelCluster = clusterd.reduce((acc, e, i) => {
     const indel = e.mutationType.substring(0, 13);
 
     acc[indel] = acc[indel] ? [...acc[indel], e] : [e];
     return acc;
   }, {});
-  console.log(groupByIndelCluster);
+
   const groupByIndelNonCluster = nonClustered.reduce((acc, e, i) => {
     const indel = e.mutationType.substring(0, 17);
 
     acc[indel] = acc[indel] ? [...acc[indel], e] : [e];
     return acc;
   }, {});
-
   const clusterGroup = Object.entries(groupByIndelCluster).map(
     ([indel, data]) => ({
-      indel,
-      data,
+      indel: indel,
+      data: data,
     })
   );
 
   const nonClusterGroup = Object.entries(groupByIndelNonCluster).map(
     ([indel, data]) => ({
-      indel,
-      data,
+      indel: indel,
+      data: data,
     })
   );
+  console.log(nonClusterGroup);
 
   const data = [...clusterGroup, ...nonClusterGroup];
-  const mutationTypeNames = data
-    .map((group) =>
-      group.data.map((e, i) => ({
-        mutationType: e.mutationType.split('_').pop(),
-      }))
-    )
+
+  const sortGroup1 = clusterGroup.map((element, index, array) => ({
+    mutation: element.mutation,
+    data: element.data.sort(function (a, b) {
+      return (
+        sortOrder.indexOf(a.mutationType.split('_')[2]) -
+        sortOrder.indexOf(b.mutationType.split('_')[2])
+      );
+    }),
+  }));
+
+  const sortedData1 = sortGroup1
+    .map((indel) => indel.data.map((e) => e))
     .flat();
 
-  const traces = rawData.map((group, groupIndex, array) => ({
+  const sortGroup2 = nonClusterGroup.map((element, index, array) => ({
+    mutation: element.mutation,
+    data: element.data.sort(function (a, b) {
+      return (
+        sortOrder.indexOf(a.mutationType.split('_')[2]) -
+        sortOrder.indexOf(b.mutationType.split('_')[2])
+      );
+    }),
+  }));
+
+  const sortedData2 = sortGroup2
+    .map((indel) => indel.data.map((e) => e))
+    .flat();
+
+  const sortData = [...sortedData1, ...sortedData2];
+  console.log(sortData);
+  const mutationTypeNames = sortData.map((group, i) => ({
+    mutationType:
+      group.mutationType.split('_')[2] === '' ||
+      group.mutationType.split('_')[2] === 'undefined'
+        ? group.mutationType.split('_')[1]
+        : group.mutationType.split('_')[2],
+    index: i,
+  }));
+  console.log(mutationTypeNames);
+
+  const mutationTypeNames0 = sortData.map((group, i) =>
+    console.log(group.mutationType.split('_')[2])
+  );
+  console.log(mutationTypeNames0);
+
+  const traces = sortData.map((group, groupIndex, array) => ({
     group: group,
     name: group.indel,
     type: 'bar',
@@ -123,21 +150,6 @@ export default function RS32(rawData, sample) {
       contribution: group.contribution,
     },
     hoverinfo: 'x+y',
-    showlegend: false,
-  }));
-  const traces1 = data.map((group, groupIndex, array) => ({
-    group: group,
-    name: group.indel,
-    type: 'bar',
-    marker: { color: colors[group.mutationType] },
-    x: [...group.data.keys()].map(
-      (e) =>
-        e +
-        array
-          .slice(0, groupIndex)
-          .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
-    ),
-    y: group.data.map((e) => e.contribution),
     showlegend: false,
   }));
 
@@ -168,8 +180,7 @@ export default function RS32(rawData, sample) {
     },
     showlegend: false,
   }));
-  console.log(data);
-  console.log(topShapes);
+
   const topShapeAnnitations = data.map((group, groupIndex, array) => ({
     xref: 'x',
     yref: 'paper',
