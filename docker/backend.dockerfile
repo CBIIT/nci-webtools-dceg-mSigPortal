@@ -3,6 +3,7 @@ FROM public.ecr.aws/amazonlinux/amazonlinux:2022
 RUN dnf -y update \
  && dnf -y install \
     cairo-devel \
+    cmake \
     git \
     gmp-devel \
     libcurl-devel \
@@ -17,7 +18,6 @@ RUN dnf -y update \
     R \
     rsync \
     wget \
-    cmake \
  && dnf clean all
 
 RUN mkdir -p /deploy/server /deploy/logs
