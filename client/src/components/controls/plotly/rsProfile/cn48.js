@@ -61,7 +61,6 @@ export default function CN48(rawData, sample) {
     acc[names[1]] = acc[names[1]] ? [...acc[names[1]], e] : [e];
     return acc;
   }, {});
-  console.log(groupByCluster);
 
   const groupByClusterData = Object.entries(groupByCluster).map(
     ([mutation, data]) => ({
@@ -69,7 +68,6 @@ export default function CN48(rawData, sample) {
       data: data,
     })
   );
-  console.log(groupByClusterData);
 
   const groupbyfirst2 = rawData.reduce((acc, e, i) => {
     const names = e.mutationType.split(':');
@@ -79,14 +77,13 @@ export default function CN48(rawData, sample) {
       : [e];
     return acc;
   }, {});
-  console.log(groupbyfirst2);
+
   const groupbyfirst2Data = Object.entries(groupbyfirst2).map(
     ([mutation, data]) => ({
       mutation,
       data,
     })
   );
-  console.log(groupbyfirst2Data);
   const thesort = (arr) => {
     // first grab the obj that is not getting sorted
     let first = arr.shift();
@@ -103,7 +100,6 @@ export default function CN48(rawData, sample) {
   };
 
   const sortGroupByFirst2Data = thesort(groupbyfirst2Data);
-  console.log(sortGroupByFirst2Data);
 
   const sortGroupByFirst2DataInside = sortGroupByFirst2Data.map(
     (element, index, array) => ({
@@ -116,7 +112,6 @@ export default function CN48(rawData, sample) {
       }),
     })
   );
-  console.log(sortGroupByFirst2DataInside);
 
   const sortedData = sortGroupByFirst2DataInside
     .map((indel) => indel.data.map((e) => e))
@@ -131,8 +126,6 @@ export default function CN48(rawData, sample) {
     mutationType: group.mutationType.split(':')[2],
     index: i,
   }));
-
-  console.log(mutationTypeNames);
 
   const traces = sortedData.map((group, groupIndex, array) => ({
     group: group,
@@ -166,7 +159,6 @@ export default function CN48(rawData, sample) {
       '%{customdata.xval} <br>Proportion: %{y}<extra></extra>',
     showlegend: false,
   }));
-  console.log(traces);
 
   console.log(sortGroupByFirst2Data);
   const topShapes = sortGroupByFirst2Data.map((group, groupIndex, array) => ({
@@ -190,7 +182,6 @@ export default function CN48(rawData, sample) {
     },
     showlegend: false,
   }));
-  console.log(topShapes);
   const topShapeAnnitations = sortGroupByFirst2Data.map(
     (group, groupIndex, array) => ({
       xref: 'x',
@@ -256,7 +247,6 @@ export default function CN48(rawData, sample) {
       align: 'center',
     })
   );
-  console.log(topTitleShapesAnnitations);
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     height: 500,
