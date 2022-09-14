@@ -254,6 +254,45 @@ export const schema = [
   },
 
   {
+    name: 'etiology',
+    schema: (table) => {
+      table.increments('id');
+      table.string('study');
+      table.string('strategy');
+      table.string('cancer');
+      table.string('organ');
+      table.string('sample');
+      table.string('signatureSetName');
+      table.integer('mutations');
+      table.double('cosineSimilarity');
+      table.integer('sampleSize');
+      table.string('signatureName');
+      table.double('exposure');
+      table.double('burden');
+      table.integer('signatureSize');
+    },
+    index: (table) => {
+      table.index(['study', 'strategy', 'cancer', 'signatureSetName']);
+    },
+  },
+
+  {
+    name: 'etiologyOrgan',
+    schema: (table) => {
+      table.increments('id');
+      table.string('signature');
+      table.string('cohort');
+      table.string('organ');
+      table.string('prevalence');
+      table.string('organSpecificSignature');
+      table.string('contribution');
+    },
+    index: (table) => {
+      table.index(['signature', 'cohort', 'organ']);
+    },
+  },
+
+  {
     name: 'publication',
     schema: (table) => {
       table.increments('id');

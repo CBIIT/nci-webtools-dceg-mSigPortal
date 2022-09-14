@@ -247,6 +247,48 @@ function getEtiologyOptions(
   );
 }
 
+function getEtiologyData(
+  connection,
+  query,
+  columns = '*',
+  limit = 200000,
+  offset = 0,
+  rowMode = 'object',
+  distinct = false
+) {
+  return getData(
+    connection,
+    'etiology',
+    query,
+    columns,
+    limit,
+    offset,
+    rowMode,
+    distinct
+  );
+}
+
+function getEtiologyOrganData(
+  connection,
+  query,
+  columns = '*',
+  limit = 200000,
+  offset = 0,
+  rowMode = 'object',
+  distinct = false
+) {
+  return getData(
+    connection,
+    'etiologyOrgan',
+    query,
+    columns,
+    limit,
+    offset,
+    rowMode,
+    distinct
+  );
+}
+
 function getPublicationData(
   connection,
   query,
@@ -301,6 +343,8 @@ module.exports = {
   getSignatureData,
   getSignatureOptions,
   getEtiologyOptions,
+  getEtiologyData,
+  getEtiologyOrganData,
   getPublicationData,
   getPatternData,
 };

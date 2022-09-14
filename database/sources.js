@@ -115,6 +115,41 @@ export const sources = [
   },
 
   {
+    sourcePath: 'Etiology/aetiology_exposure.csv',
+    table: 'etiology',
+    description: 'etiology - aetiology_expoosure',
+    columns: [
+      'study',
+      'strategy',
+      'cancer',
+      'organ',
+      'sample',
+      'signatureSetName',
+      'mutations',
+      'cosineSimilarity',
+      'sampleSize',
+      'signatureName',
+      'exposure',
+      'burden',
+      'signatureSize',
+    ],
+  },
+
+  {
+    sourcePath: 'Etiology/aetiology_organ_specific_signature.csv',
+    table: 'etiologyOrgan',
+    description: 'etiologyOrgan - aetiology_organ_specific_signature',
+    columns: [
+      'signature',
+      'cohort',
+      'organ',
+      'prevalence',
+      'organSpecificSignature',
+      'contribution',
+    ],
+  },
+
+  {
     sourcePath: 'Others/Publications.csv',
     table: 'publication',
     description: 'publications',
