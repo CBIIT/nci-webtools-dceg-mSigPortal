@@ -46,7 +46,14 @@ export default function CN48(rawData, sample) {
   );
   const maxMutation = Math.max(...rawData.map((indel) => indel.contribution));
 
-  var sortOrder = ['0-100kb', '100kb-1Mb', '1Mb-10Mb', '10Mb-40Mb', '>40Mb']; // Declare a array that defines the order of the elements to be sorted.
+  var sortOrder = [
+    '0-100kb',
+    '100kb-1Mb',
+    '>1Mb',
+    '1Mb-10Mb',
+    '10Mb-40Mb',
+    '>40Mb',
+  ]; // Declare a array that defines the order of the elements to be sorted.
 
   const groupByCluster = rawData.reduce((acc, e, i) => {
     const names = e.mutationType.split(':');
@@ -58,8 +65,8 @@ export default function CN48(rawData, sample) {
 
   const groupByClusterData = Object.entries(groupByCluster).map(
     ([mutation, data]) => ({
-      mutation,
-      data,
+      mutation: mutation,
+      data: data,
     })
   );
   console.log(groupByClusterData);
@@ -96,19 +103,38 @@ export default function CN48(rawData, sample) {
   };
 
   const sortGroupByFirst2Data = thesort(groupbyfirst2Data);
+  console.log(sortGroupByFirst2Data);
 
-  const dataD = groupByClusterData
+  const sortGroupByFirst2DataInside = sortGroupByFirst2Data.map(
+    (element, index, array) => ({
+      mutation: element.mutation,
+      data: element.data.sort(function (a, b) {
+        return (
+          sortOrder.indexOf(a.mutationType.split(':')[2]) -
+          sortOrder.indexOf(b.mutationType.split(':')[2])
+        );
+      }),
+    })
+  );
+  console.log(sortGroupByFirst2DataInside);
+
+  const sortedData = sortGroupByFirst2DataInside
     .map((indel) => indel.data.map((e) => e))
     .flat();
-  console.log(dataD);
-  const mutationTypeNames = dataD.map((group, i) => ({
+  console.log(sortedData);
+
+  // const dataD = groupByClusterData
+  //   .map((indel) => indel.data.map((e) => e))
+  //   .flat();
+  // console.log(dataD);
+  const mutationTypeNames = sortedData.map((group, i) => ({
     mutationType: group.mutationType.split(':')[2],
     index: i,
   }));
 
   console.log(mutationTypeNames);
 
-  const traces = dataD.map((group, groupIndex, array) => ({
+  const traces = sortedData.map((group, groupIndex, array) => ({
     group: group,
     name: group.mutationType,
     color: group.mutationType.split(':')[0] + group.mutationType.split(':')[2],
