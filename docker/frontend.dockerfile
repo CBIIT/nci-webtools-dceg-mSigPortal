@@ -1,16 +1,13 @@
-FROM ${FRONTEND_BASE_IMAGE:-quay.io/centos/centos:stream8}
+FROM public.ecr.aws/amazonlinux/amazonlinux:2022
 
 RUN dnf -y update \
-    && dnf -y install \
-    dnf-plugins-core \
-    epel-release \
-    && curl -fsSL https://rpm.nodesource.com/setup_16.x | bash - \
-    && dnf -y install \
+ && dnf -y install \
     gcc-c++ \
     httpd \
-    nodejs \
     make \
-    && dnf clean all
+    nodejs \
+    npm \
+ && dnf clean all
 
 RUN mkdir -p /app/client
 

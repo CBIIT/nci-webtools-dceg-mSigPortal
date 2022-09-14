@@ -1,37 +1,24 @@
-FROM ${BACKEND_BASE_IMAGE:-quay.io/centos/centos:stream8}
-
-ENV R_VERSION=4.1.2
+FROM public.ecr.aws/amazonlinux/amazonlinux:2022
 
 RUN dnf -y update \
-    && dnf -y install \
-    dnf-plugins-core \
-    epel-release \
-    glibc-langpack-en \
-    && dnf config-manager --enable powertools \
-    && curl -fsSL https://rpm.nodesource.com/setup_16.x | bash - \
-    && dnf -y install \
-    cmake \
-    libjpeg-turbo-devel \
-    openssl-devel \
-    nodejs \
-    python3-pip \
-    python3-devel \
-    libcurl-devel \
-    libxml2-devel \
+ && dnf -y install \
+    cairo-devel \
     git \
+    gmp-devel \
+    libcurl-devel \
+    libjpeg-turbo-devel \
+    libxml2-devel \
+    mpfr-devel \
+    nodejs \
+    npm \
+    openssl-devel \
+    python3-devel \
+    python3-pip \
+    R \
     rsync \
     wget \
-    && dnf -y install \
-    gmp-devel \
-    mpfr-devel \
-    cairo-devel \
-    google-roboto-condensed-fonts \
-    && dnf -y install https://cdn.rstudio.com/r/centos-8/pkgs/R-${R_VERSION}-1-1.x86_64.rpm \
-    && dnf clean all
-
-# symlink R
-RUN ln -s /opt/R/${R_VERSION}/bin/R /usr/local/bin/R
-RUN ln -s /opt/R/${R_VERSION}/bin/Rscript /usr/local/bin/Rscript
+    cmake \
+ && dnf clean all
 
 RUN mkdir -p /deploy/server /deploy/logs
 
