@@ -97,24 +97,6 @@ export default function CN48(rawData, sample) {
 
   const sortGroupByFirst2Data = thesort(groupbyfirst2Data);
 
-  // function compareMutations(a, b) {
-  //   let [countA, nameA] = a.mutation.split(':');
-  //   let [countB, nameB] = b.mutation.split(':');
-  //   let nameComparison = nameA.localeCompare(nameB);
-  //   let countComparison = parseInt(countA) - parseInt(countB);
-  //   if (nameComparison == 0) {
-  //     return countComparison;
-  //   } else {
-  //     return nameComparison;
-  //   }
-  // }
-  // const sortArray = groupbyfirst2Data.sort(compareMutations);
-  // const firstPart = sortArray.slice(0, 4);
-  // const secondPart = sortArray.slice(4, 10);
-  // const customSortArray = [...secondPart, ...firstPart];
-  // console.log(customSortArray);
-  // console.log(firstPart);
-  // console.log(secondPart);
   const dataD = groupByClusterData
     .map((indel) => indel.data.map((e) => e))
     .flat();
