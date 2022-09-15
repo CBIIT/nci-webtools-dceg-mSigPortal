@@ -123,12 +123,7 @@ export default function RS32(rawData, sample) {
       : group.mutationType.split('_')[2],
     index: i,
   }));
-  console.log(mutationTypeNames);
 
-  const mutationTypeNames0 = sortData.map((group, i) =>
-    console.log(group.mutationType.split('_')[2])
-  );
-  console.log(mutationTypeNames0);
 
   const traces = sortData.map((group, groupIndex, array) => ({
     group: group,
