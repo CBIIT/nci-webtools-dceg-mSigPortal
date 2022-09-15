@@ -315,6 +315,117 @@ export default function Profile({ submitR }) {
   });
   console.log(plotdata);
 
+  const AdditionalControls = () => {
+    let controls = [];
+    for (let index in plots) {
+      controls.push(
+        <Row className="">
+          <Col lg="auto">
+            <Select
+              name="source"
+              label="Signature Source"
+              value={source}
+              options={signatureSourceOptions}
+              control={control}
+              onChange={handleSource}
+            />
+          </Col>
+          <Col lg="auto">
+            <Select
+              name="profile"
+              label="Profile Name"
+              //value={profile}
+              options={profileOptions(source)}
+              control={control}
+              onChange={handleProfile}
+            />
+          </Col>
+          <Col lg="auto">
+            <Select
+              name="matrix"
+              label="Matrix"
+              //value={matrix}
+              options={matrixOptions(source, profile)}
+              control={control}
+              onChange={handleMatrix}
+            />
+          </Col>
+          <Col lg="auto">
+            <Select
+              name="signatureSetName"
+              label="Reference Signature Set"
+              //value={signatureSetName}
+              options={referenceSignatureSetOption(source, profile, matrix)}
+              control={control}
+              onChange={handleSet}
+            />
+          </Col>
+          <Col lg="auto">
+            <Select
+              name="strategy"
+              label="Experimental Strategy"
+              //value={strategy}
+              options={strategyOptions(
+                source,
+                profile,
+                matrix,
+                signatureSetName
+              )}
+              control={control}
+              onChange={handleStrategy}
+            />
+          </Col>
+          <Col lg="auto">
+            <Select
+              name="signatureName"
+              label="Signature Name"
+              //value={signatureName}
+              options={signatureNameOptions(
+                source,
+                profile,
+                matrix,
+                signatureSetName,
+                strategy
+              )}
+              control={control}
+              onChange={handleName}
+            />
+          </Col>
+        </Row>
+      );
+    }
+    return controls.slice(1);
+  };
+
+  const additionalPlots = () => {
+    let display = [];
+    for (let index in plots) {
+      display.push(
+        <div id={'plot' + index} key={'plot' + index}>
+          <div style={{ display: err ? 'block' : 'none' }}>
+            <p>An error has occured. Please verify your input.</p>
+          </div>
+          {plots[index].plotURL && (
+            <div style={{ display: plots[index].plotURL ? 'block' : 'none' }}>
+              <hr />
+              <span className="font-weight-bold p-3">
+                Plot {parseInt(index) + 1}
+              </span>
+              <Plotly
+                data={plotdata.traces}
+                layout={plotdata.layout}
+                config={plotdata.config}
+                divId="mutationalProfilePlot"
+                filename={sample?.value || 'Mutational Profile'}
+              />
+            </div>
+          )}
+        </div>
+      );
+    }
+    return display.slice(1);
+  };
+
   return (
     <div>
       <Description
@@ -398,7 +509,7 @@ export default function Profile({ submitR }) {
             />
           </Col>
         </Row>
-        {/* <AdditionalControls /> */}
+        <AdditionalControls />
         <Row className="mt-3">
           <Col md="auto" className="d-flex">
             <Button
@@ -443,7 +554,7 @@ export default function Profile({ submitR }) {
           />
         )}
       </div>
-      {/* {additionalPlots()} */}
+      {additionalPlots()}
     </div>
   );
 }

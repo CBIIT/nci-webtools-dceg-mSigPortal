@@ -128,7 +128,11 @@ export default function MSPrevalence(groupBySignature, mutation) {
     marker: {
       color: colors[group.signatureName.replace(/^\D*/, '')],
     },
-    x: [group.signatureName],
+    x:
+      group.signatureName.length > 10
+        ? [group.signatureName.substring(0, 10) + '...']
+        : [group.signatureName],
+
     y: [
       group.samples.filter((e) => e.exposure >= minumumNumber).length /
         group.totalSamples,
@@ -153,9 +157,9 @@ export default function MSPrevalence(groupBySignature, mutation) {
     hovertemplate:
       '<b> signatureName: ' +
       '</b>' +
-      '%{x} <br>' +
+      '%{customdata.signatureName}<br>' +
       '<b>Frequency: </b>' +
-      '%{y}',
+      '%{y:.1%}',
     showlegend: false,
     domain: {
       row: 0,
@@ -235,8 +239,8 @@ export default function MSPrevalence(groupBySignature, mutation) {
         family: 'Arial, monospace',
       },
       tickmode: 'array',
-      tickvals: names.map((_, i) => i),
-      ticktext: names.map((e) => e.signatureName),
+      //tickvals: names.map((_, i) => i),
+      //ticktext: names.map((e) => e.signatureName),
       linecolor: 'black',
       linewidth: 1,
       type: 'category',
