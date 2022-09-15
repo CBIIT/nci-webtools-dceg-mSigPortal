@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlay } from '../../../../controls/loading-overlay/loading-overlay';
 import Plotly from '../../../../controls/plotly/plot/plot';
-import Description from '../../../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as catalogActions } from '../../../../../services/store/catalog';
 import { actions as modalActions } from '../../../../../services/store/modal';
@@ -16,18 +15,18 @@ import { defaultProfile2, defaultMatrix2 } from '../../../../../services/utils';
 
 const actions = { ...catalogActions, ...modalActions };
 
-export default function Profile({ submitR }) {
+export default function ProfileFormPlot({ options, index }) {
   const dispatch = useDispatch();
   const store = useSelector((state) => state.catalog);
 
-  const mergeSigMutationalProfiles = (state) =>
-    dispatch(actions.mergeCatalog({ sigMutationalProfiles: state }));
+  const mergeRsProfiles = (state) =>
+    dispatch(actions.mergeCatalog({ rSProfiles: state }));
 
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const { matrixList, projectID } = store.main;
-  const { plots, debugR, err, loading } = store.sigMutationalProfiles;
+  const { plots, debugR, err, loading } = store.rSProfiles;
   const { refSigData, sample } = store.referenceSignature;
 
   const [params, setParams] = useState(null);
@@ -43,15 +42,15 @@ export default function Profile({ submitR }) {
   //   strategy: { label: 'WGS', value: 'WGS' },
   //   signatureName: { label: '', value: '' },
   // };
-  const defaultValues = {
-    source: '',
-    profile: '',
-    matrix: '',
-    signatureSetName: '',
-    strategy: '',
-    signatureName: '',
-  };
-  const { control, setValue, watch } = useForm({ defaultValues });
+  // const defaultValues = {
+  //   source: '',
+  //   profile: '',
+  //   matrix: '',
+  //   signatureSetName: '',
+  //   strategy: '',
+  //   signatureName: '',
+  // };
+  const { control, setValue, watch } = useForm({ options });
 
   const { source, profile, matrix, signatureSetName, strategy, signatureName } =
     watch();
@@ -315,125 +314,24 @@ export default function Profile({ submitR }) {
   });
   console.log(plotdata);
 
-  const AdditionalControls = () => {
-    let controls = [];
-    for (let index in plots) {
-      controls.push(
-        <Row className="">
-          <Col lg="auto">
-            <Select
-              name="source"
-              label="Signature Source"
-              value={source}
-              options={signatureSourceOptions}
-              control={control}
-              onChange={handleSource}
-            />
-          </Col>
-          <Col lg="auto">
-            <Select
-              name="profile"
-              label="Profile Name"
-              //value={profile}
-              options={profileOptions(source)}
-              control={control}
-              onChange={handleProfile}
-            />
-          </Col>
-          <Col lg="auto">
-            <Select
-              name="matrix"
-              label="Matrix"
-              //value={matrix}
-              options={matrixOptions(source, profile)}
-              control={control}
-              onChange={handleMatrix}
-            />
-          </Col>
-          <Col lg="auto">
-            <Select
-              name="signatureSetName"
-              label="Reference Signature Set"
-              //value={signatureSetName}
-              options={referenceSignatureSetOption(source, profile, matrix)}
-              control={control}
-              onChange={handleSet}
-            />
-          </Col>
-          <Col lg="auto">
-            <Select
-              name="strategy"
-              label="Experimental Strategy"
-              //value={strategy}
-              options={strategyOptions(
-                source,
-                profile,
-                matrix,
-                signatureSetName
-              )}
-              control={control}
-              onChange={handleStrategy}
-            />
-          </Col>
-          <Col lg="auto">
-            <Select
-              name="signatureName"
-              label="Signature Name"
-              //value={signatureName}
-              options={signatureNameOptions(
-                source,
-                profile,
-                matrix,
-                signatureSetName,
-                strategy
-              )}
-              control={control}
-              onChange={handleName}
-            />
-          </Col>
-        </Row>
-      );
-    }
-    return controls.slice(1);
-  };
-
-  const additionalPlots = () => {
-    let display = [];
-    for (let index in plots) {
-      display.push(
-        <div id={'plot' + index} key={'plot' + index}>
-          <div style={{ display: err ? 'block' : 'none' }}>
-            <p>An error has occured. Please verify your input.</p>
-          </div>
-          {plots[index].plotURL && (
-            <div style={{ display: plots[index].plotURL ? 'block' : 'none' }}>
-              <hr />
-              <span className="font-weight-bold p-3">
-                Plot {parseInt(index) + 1}
-              </span>
-              <Plotly
-                data={plotdata.traces}
-                layout={plotdata.layout}
-                config={plotdata.config}
-                divId="mutationalProfilePlot"
-                filename={sample?.value || 'Mutational Profile'}
-              />
-            </div>
-          )}
-        </div>
-      );
-    }
-    return display.slice(1);
-  };
+  function addPlots() {
+    mergeRsProfiles({
+      plots: [
+        ...plots,
+        {
+          source: '',
+          profile: '',
+          matrix: '',
+          signatureSetName: '',
+          strategy: '',
+          signatureName: '',
+        },
+      ],
+    });
+  }
 
   return (
     <div>
-      <Description
-        className="p-3 m-0"
-        less="Enter any [Signature Source], [Profile Name], [Reference Signature Set], [Experimental Strategy], and [Signature Name] below to visualize the mutational signature profile."
-        more="Click ‘+ Add Plot’ to load one or more mutational signature profiles at the same time."
-      />
-      <hr />
       <Form className="p-3">
         <LoadingOverlay active={loading} />
         <Row className="">
@@ -509,13 +407,13 @@ export default function Profile({ submitR }) {
             />
           </Col>
         </Row>
-        <AdditionalControls />
+        {/* <AdditionalControls /> */}
         <Row className="mt-3">
           <Col md="auto" className="d-flex">
             <Button
               className="ml-auto"
               variant="link"
-              //onClick={() => addPlots()}
+              onClick={() => addPlots()}
               title="Add Plot"
               style={{ textDecoration: 'none' }}
             >
@@ -531,19 +429,7 @@ export default function Profile({ submitR }) {
         <div style={{ display: err ? 'block' : 'none' }}>
           <p>An error has occured. Please verify your input.</p>
         </div>
-        {/* {plots[0].plotURL && (
-          <>
-            <hr />
-            <SvgContainer
-              className="p-3"
-              //title={plotTitle(plots[0])}
-              downloadName={plots[0].plotPath.split('/').slice(-1)[0]}
-              plotPath={plots[0].plotURL}
-              height="500px"
-            />
-            
-          </>
-        )} */}
+
         {plotdata && (
           <Plotly
             data={plotdata.traces}
@@ -554,7 +440,7 @@ export default function Profile({ submitR }) {
           />
         )}
       </div>
-      {additionalPlots()}
+      {/* {additionalPlots()} */}
     </div>
   );
 }

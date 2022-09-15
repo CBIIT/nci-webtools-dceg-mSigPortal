@@ -147,19 +147,24 @@ export default function MSPrevalence(groupBySignature, mutation) {
         10 +
         '%',
     ],
-    customdata: groupBySignature.map((group) => ({
-      signatureName: group.signatureName,
-    })),
+    // customdata: groupBySignature.map((group) => ({
+    //   signatureName: group.signatureName,
+    // })),
+    customdata: [
+      {
+        signatureName: group.signatureName,
+      },
+    ],
     textposition: 'outside',
     xaxis: 'x2',
     yaxis: 'y2',
-    hoverinfo: 'x2+y2',
-    // hovertemplate:
-    //   '<b> signatureName: ' +
-    //   '</b>' +
-    //   '%{customdata.signatureName}<br>' +
-    //   '<b>Frequency: </b>' +
-    //   '%{y:.1%}',
+    //hoverinfo: 'x2+y2',
+    hovertemplate:
+      '<b> signatureName: ' +
+      '</b>' +
+      '%{customdata.signatureName}<br>' +
+      '<b>Frequency: </b>' +
+      '%{y:.1%}',
     showlegend: false,
     domain: {
       row: 0,

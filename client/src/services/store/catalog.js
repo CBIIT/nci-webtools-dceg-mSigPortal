@@ -40,25 +40,17 @@ export const getInitialState = () => ({
     plotPath: '',
     err: '',
   },
-  sigMutationalProfiles: {
+  rSProfiles: {
     plots: [
       {
-        signatureSource: '',
-        signatureSourceOptions: [],
-        profileName: '',
-        profileNameOptions: [],
-        rsSet: '',
-        rsSetOptions: [],
+        source: '',
+        profile: '',
+        matrix: '',
+        signatureSetName: '',
         strategy: '',
-        strategyOptions: [],
         signatureName: '',
-        signatureNameOptions: [],
-        plotPath: '',
       },
     ],
-    debugR: '',
-    err: '',
-    loading: false,
   },
   sigCosineSimilarity: {
     profileName: '',

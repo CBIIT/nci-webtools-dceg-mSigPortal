@@ -3,7 +3,7 @@ import { Tab, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import Overview from './overview';
 import Profile from './rsProfile';
-import RsProfile from './rsProfile/rsProfile-form';
+import RsProfile from './rsProfile/rsProfile';
 import CosineSimilarity from './cosineSimilarity';
 import Comparison from './rsComparison';
 import Download from './download';
