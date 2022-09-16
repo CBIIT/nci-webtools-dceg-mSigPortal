@@ -1,8 +1,11 @@
+import { useEffect, useState } from 'react';
 import { Row, Col, Button, Container } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as catalogActions } from '../../../../services/store/catalog';
 import { actions as modalActions } from '../../../../services/store/modal';
+import { useEtiologyDataQuery, useEtiologyProfileQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import Plotly from '../../../controls/plotly/plot/plot';
 
 const actions = { ...catalogActions, ...modalActions };
 
@@ -24,40 +27,27 @@ export default function SignatureInfo({ data }) {
         : true)
   )[0]?.json;
 
+  const [params, setParams] = useState(false);
+
+  const { data: etiologyData, isFetching } = useEtiologyDataQuery(params, {
+    skip: !params,
+  });
+
+  useEffect(() => {
+    if (metadata) {
+      setParams({
+        signatureName: metadata.signature,
+        study: study.split('_')[0],
+        strategy: study.split('_')[1],
+      });
+    }
+  }, [metadata, study]);
+
   // split description string delimited by key:
   const descriptionRegex = /(\w*\s?\w+:)/g;
   const description = metadata?.description
     ? metadata.description.split(descriptionRegex).filter((e) => e.length)
     : '';
-
-  // function getStudy() {
-  //   if (data[category] && data[category].length) {
-  //     return [
-  //       ...new Set(
-  //         data[category]
-  //           .filter(
-  //             ({ Etiology, 'Signature Name': signatureName }) =>
-  //               Etiology == etiology && signatureName == signature
-  //           )
-  //           .map((obj) => obj.Study)
-  //       ),
-  //     ].map((Study) => (
-  //       <Col key={Study} lg="2" md="3" sm="4" className="mb-3 d-flex">
-  //         <Button
-  //           size="sm"
-  //           variant="primary"
-  //           onClick={() => mergeEtiology({ study: Study })}
-  //           className={study != Study ? 'disabled' : ''}
-  //           block
-  //         >
-  //           {Study}
-  //         </Button>
-  //       </Col>
-  //     ));
-  //   } else {
-  //     return false;
-  //   }
-  // }
 
   return (
     <Container fluid="xl" className="p-3">
@@ -159,12 +149,6 @@ export default function SignatureInfo({ data }) {
               </a>
             </div>
           )}
-          {metadata.tissueDistribution && (
-            <div>
-              <strong>Tissue Distribution: </strong>
-              {metadata.tissueDistribution}
-            </div>
-          )}
           {metadata.descriptionStrandBias && (
             <div>
               <strong>Strand Bias: </strong>
@@ -190,55 +174,61 @@ export default function SignatureInfo({ data }) {
           ) : (
             <p>{description}</p>
           )}
-
-          {/* {profileURL ? (
+          {metadata.tissueDistribution && (
             <div>
-              <SvgContainer
-                className="p-3 border rounded mb-3"
-                height={'500px'}
-                plotPath={profileURL}
-                cacheBreaker={false}
-              />
-
-              {metadata.Description_strandbias && (
-                <p>{metadata.Description_strandbias}</p>
-              )}
-              {metadata.Description_strandbias && strandbiasURL && (
-                <SvgContainer
-                  className="p-3 border rounded mb-3"
-                  height={'500px'}
-                  plotPath={strandbiasURL}
-                  cacheBreaker={false}
-                />
-              )}
-
-              {category == 'Cosmic' && metadata.study && (
-                <>
-                  <p>
-                    Select a cancer study to review the TMB of selected
-                    signatures. TMB shown as the numbers of mutations per
-                    megabase (log10) attributed to each mutational signature in
-                    samples where the signature is present. Only those cancer
-                    types with tumors in which signature activity is attributed
-                    are shown. The numbers below the dots for each cancer type
-                    indicate the number of tumors in which the signatures was
-                    attributed (above the horizontal bar, in blue) and the total
-                    number of tumors analyzed (below the blue bar, in green).
-                  </p>
-                  <Row className="justify-content-center">{getStudy()}</Row>
-                  {exposureURL.length > 0 && (
-                    <SvgContainer
-                      className="p-3 border"
-                      height={'600px'}
-                      plotPath={exposureURL}
-                    />
-                  )}
-                </>
-              )}
+              <strong>Tissue Distribution: </strong>
+              {metadata.tissueDistribution}
             </div>
-          ) : (
-            <div style={{ minHeight: '100px' }}>
-              <LoadingOverlay active={true} />
+          )}
+          <div className="my-4">
+            <LoadingOverlay active={isFetching} />
+            <Row className="justify-content-center">
+              {['TCGA_WES', 'PCAWG_WGS', 'ICGC_WGS', 'GEL_WGS'].map((e) => (
+                <Col key={e} lg="2" md="3" sm="4" className="mb-3 d-flex">
+                  <Button
+                    size="sm"
+                    variant="primary"
+                    onClick={() => mergeEtiology({ study: e })}
+                    className={study != e ? 'disabled' : ''}
+                    block
+                  >
+                    {e}
+                  </Button>
+                </Col>
+              ))}
+            </Row>
+            {etiologyData?.distributionPlot && (
+              <Plotly
+                data={etiologyData.distributionPlot.traces}
+                layout={etiologyData.distributionPlot.layout}
+                config={etiologyData.distributionPlot.config}
+              />
+            )}
+          </div>
+          {/* {etiologyData?.data && (
+            <div>
+              <LoadingOverlay active={isFetching} />
+              <Row className="justify-content-center">
+                {etiologyData.data.map((e) => (
+                  <Col
+                    key={e.signatureName}
+                    lg="2"
+                    md="3"
+                    sm="4"
+                    className="mb-3 d-flex"
+                  >
+                    <Button
+                      size="sm"
+                      variant="primary"
+                      onClick={() => mergeEtiology({ study: e })}
+                      className={study != e ? 'disabled' : ''}
+                      block
+                    >
+                      {e.signatureName}
+                    </Button>
+                  </Col>
+                ))}
+              </Row>
             </div>
           )} */}
         </div>

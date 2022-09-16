@@ -5,7 +5,7 @@
     { "name": "Mutational Spectrum" },
     { "name": "Mutational Activity" },
     { "name": "Mutational Association" },
-    { "name": "Etiology" }
+    { "name": "Signature Etiology" }
   ],
   "paths": {
     "/api/mutational_spectrum_options": {
@@ -877,9 +877,9 @@
       }
     },
 
-    "/api/etiology": {
+    "/api/signature_etiology": {
       "get": {
-        "tags": ["Etiology"],
+        "tags": ["Signature Etiology"],
         "summary": "Retrieves etiology data",
         "produces": ["application/json"],
         "parameters": [
