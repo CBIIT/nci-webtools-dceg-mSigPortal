@@ -329,7 +329,13 @@ export default function ProfileFormPlot({ options, index }) {
       ],
     });
   }
+  function removePlots(index) {
+    if (plots[index.plotURL]) Object.revokeObjectURL(plots[index].plotURL);
+    let newPlots = plots.slice();
+    newPlots.splice(index, 1);
 
+    mergeRsProfiles({ plots: newPlots });
+  }
   return (
     <div>
       <Form className="p-3">
@@ -419,6 +425,21 @@ export default function ProfileFormPlot({ options, index }) {
             >
               <span className="text-nowrap" title="Add Plot">
                 <FontAwesomeIcon icon={faPlus} /> Add Plot
+              </span>
+            </Button>
+          </Col>
+        </Row>
+        <Row className="mt-3">
+          <Col md="auto" className="d-flex">
+            <Button
+              className="ml-auto"
+              variant="link"
+              onClick={() => removePlots()}
+              title="Add Plot"
+              style={{ textDecoration: 'none' }}
+            >
+              <span className="text-nowrap" title="Remove Plot">
+                <FontAwesomeIcon icon={faMinus} /> Remove Plot
               </span>
             </Button>
           </Col>
