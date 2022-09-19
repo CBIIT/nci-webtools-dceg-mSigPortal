@@ -330,7 +330,7 @@ export default function ProfileFormPlot({ options, index }) {
     });
   }
   function removePlots(index) {
-    if (plots[index.plotURL]) Object.revokeObjectURL(plots[index].plotURL);
+    // if (plots[index.plotURL]) Object.revokeObjectURL(plots[index].plotURL);
     let newPlots = plots.slice();
     newPlots.splice(index, 1);
 

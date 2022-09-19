@@ -103,11 +103,12 @@ export default function MSPrevalence(groupBySignature, mutation) {
     showlegend: false,
     marker: {
       colors: groupBySignature.map(
-        (group) => colors[group.signatureName.replace(/^\D*/, '')]
+        (group) =>
+          colors[group.signatureName.replace(/^\D*/, '').replace(')', '')]
       ),
     },
     test: groupBySignature.map((group) =>
-      group.signatureName.replace(/^\D*/, '')
+      group.signatureName.replace(/^\D*/, '').replace(')', '')
     ),
     direction: 'clockwise',
     sort: true,
@@ -126,7 +127,7 @@ export default function MSPrevalence(groupBySignature, mutation) {
     name: group.signatureName,
     type: 'bar',
     marker: {
-      color: colors[group.signatureName.replace(/^\D*/, '')],
+      color: colors[group.signatureName.replace(/^\D*/, '').replace(')', '')],
     },
     x:
       group.signatureName.length > 10
