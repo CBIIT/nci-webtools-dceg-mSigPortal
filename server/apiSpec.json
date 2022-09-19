@@ -214,6 +214,68 @@
       }
     },
 
+    "/api/mutational_spectrum_summary": {
+      "get": {
+        "tags": ["Mutational Spectrum"],
+        "summary": "Retrieves seqmatrix summary",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "study",
+            "in": "query",
+            "description": "Select which study to query data from.",
+            "required": true,
+            "schema": { "type": "string" },
+            "value": "PCAWG"
+          },
+          {
+            "name": "cancer",
+            "in": "query",
+            "description": "Select cancer belonging to the study",
+            "required": true,
+            "schema": { "type": "string" },
+            "value": "Lung-AdenoCA"
+          },
+          {
+            "name": "strategy",
+            "in": "query",
+            "description": "Select strategy (dataset) of the study.",
+            "required": true,
+            "schema": { "type": "string" },
+            "value": "WGS"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit number of records returned",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "10"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Records to skip",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "500": {
+            "description": "API error"
+          }
+        }
+      }
+    },
+
     "/api/mutational_activity_options": {
       "get": {
         "tags": ["Mutational Activity"],
