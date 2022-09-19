@@ -414,36 +414,39 @@ export default function ProfileFormPlot({ options, index }) {
           </Col>
         </Row>
         {/* <AdditionalControls /> */}
-        <Row className="mt-3">
-          <Col md="auto" className="d-flex">
-            <Button
-              className="ml-auto"
-              variant="link"
-              onClick={() => addPlots()}
-              title="Add Plot"
-              style={{ textDecoration: 'none' }}
-            >
-              <span className="text-nowrap" title="Add Plot">
-                <FontAwesomeIcon icon={faPlus} /> Add Plot
-              </span>
-            </Button>
-          </Col>
-        </Row>
-        <Row className="mt-3">
-          <Col md="auto" className="d-flex">
-            <Button
-              className="ml-auto"
-              variant="link"
-              onClick={() => removePlots(index)}
-              title={'Remove Plot ' + (parseInt(index) + 1)}
-              style={{ textDecoration: 'none' }}
-            >
-              <span className="text-nowrap" title="Remove Plot">
-                <FontAwesomeIcon icon={faMinus} /> Remove Plot
-              </span>
-            </Button>
-          </Col>
-        </Row>
+        {index === 0 ? (
+          <Row className="mt-3">
+            <Col md="auto" className="d-flex">
+              <Button
+                className="ml-auto"
+                variant="link"
+                onClick={() => addPlots()}
+                title="Add Plot"
+                style={{ textDecoration: 'none' }}
+              >
+                <span className="text-nowrap" title="Add Plot">
+                  <FontAwesomeIcon icon={faPlus} /> Add Plot
+                </span>
+              </Button>
+            </Col>
+          </Row>
+        ) : (
+          <Row className="mt-3">
+            <Col md="auto" className="d-flex">
+              <Button
+                className="ml-auto"
+                variant="link"
+                onClick={() => removePlots(index)}
+                title={'Remove Plot ' + (parseInt(index) + 1)}
+                style={{ textDecoration: 'none' }}
+              >
+                <span className="text-nowrap" title="Remove Plot">
+                  <FontAwesomeIcon icon={faMinus} /> Remove Plot
+                </span>
+              </Button>
+            </Col>
+          </Row>
+        )}
       </Form>
 
       <div id="plot0">
