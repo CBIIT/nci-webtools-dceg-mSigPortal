@@ -30,6 +30,8 @@ export default function TreeLeafForm() {
     SBS: [6, 24, 96, 192, 288, 384, 1536],
     DBS: [78, 186],
     ID: [28, 83, 415],
+    RS: [32],
+    CN: [48],
   };
 
   // populate controls

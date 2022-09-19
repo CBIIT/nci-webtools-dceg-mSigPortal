@@ -434,8 +434,8 @@ export default function ProfileFormPlot({ options, index }) {
             <Button
               className="ml-auto"
               variant="link"
-              onClick={() => removePlots()}
-              title="Add Plot"
+              onClick={() => removePlots(index)}
+              title={'Remove Plot ' + (parseInt(index) + 1)}
               style={{ textDecoration: 'none' }}
             >
               <span className="text-nowrap" title="Remove Plot">
