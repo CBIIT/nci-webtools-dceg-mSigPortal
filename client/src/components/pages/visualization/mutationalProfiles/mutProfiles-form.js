@@ -24,7 +24,7 @@ export default function TreeLeafForm() {
   const { matrixData, source } = store.main;
   const { sample, profile, matrix, filter } = store.mutationalProfiles;
 
-  const { control, setValue, watch } = useForm();
+  const { control } = useForm();
 
   const supportMatrix = {
     SBS: [6, 24, 96, 192, 288, 384, 1536],
@@ -40,7 +40,7 @@ export default function TreeLeafForm() {
       handleSample(sampleOptions[0]);
     }
   }, [matrixData]);
-  console.log(matrixData);
+
   const sampleOptions = matrixData.length
     ? [...new Set(matrixData.map((d) => d.sample))]
         .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
