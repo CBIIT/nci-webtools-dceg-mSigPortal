@@ -946,19 +946,129 @@
         "produces": ["application/json"],
         "parameters": [
           {
-            "name": "category",
+            "name": "study",
             "in": "query",
-            "description": "Select profile",
+            "description": "Select study",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "strategy",
+            "in": "query",
+            "description": "Select strategy (dataset) of the study.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "signatureName",
+            "in": "query",
+            "description": "Select signature name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "cancer",
+            "in": "query",
+            "description": "Select cancer",
             "required": false,
             "schema": {
               "type": "string"
             },
-            "value": "Cosmic"
+            "value": ""
           },
           {
-            "name": "etiology",
+            "name": "organ",
             "in": "query",
-            "description": "Select strategy (dataset) of the study.",
+            "description": "Select organ",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "sample",
+            "in": "query",
+            "description": "Select sample",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "signatureSetName",
+            "in": "query",
+            "description": "Select signature set name.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "mutations",
+            "in": "query",
+            "description": "Select mutations",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "cosineSimilarity",
+            "in": "query",
+            "description": "Select cosine similarity",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "sampleSize",
+            "in": "query",
+            "description": "Select sample size",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "exposure",
+            "in": "query",
+            "description": "Select exposure",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "burden",
+            "in": "query",
+            "description": "Select burden",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "signatureSize",
+            "in": "query",
+            "description": "Select signature size",
             "required": false,
             "schema": {
               "type": "string"
