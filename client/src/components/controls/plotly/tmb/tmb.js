@@ -44,7 +44,7 @@ export default function TMB(data, tmbTabName, signatureName) {
       size: 0,
       color: ['blue'],
     },
-    name: 'the number of samples that have mutation data available for that cancer type',
+    name: 'Available Samples',
   };
 
   const traceLabelGreen = {
@@ -55,7 +55,7 @@ export default function TMB(data, tmbTabName, signatureName) {
       size: 0,
       color: ['green'],
     },
-    name: 'the number of samples for a given cancer type',
+    name: 'Total Samples in Cancer Type',
   };
 
   const topLabel = data.map((element, index, array) => ({
@@ -198,9 +198,9 @@ export default function TMB(data, tmbTabName, signatureName) {
   const longest = labels.reduce((a, e) => (a > e.length ? a : e.length), 0);
   const extraMargin = longest < 10 ? 60 : longest * 7;
 
-  console.log(labels);
-  console.log(longest);
-  console.log(extraMargin);
+  //console.log(labels);
+  //console.log(longest);
+  //console.log(extraMargin);
 
   const layout = {
     width: totalCancer > 1 ? null : 350,
