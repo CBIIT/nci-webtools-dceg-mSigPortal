@@ -33,30 +33,56 @@ export default function TMB(data, tmbTabName, signatureName) {
     x: element.samples.map(
       (e, i) => index + 0.1 + (0.8 / element.samples.length) * i
     ),
+    showlegend: false,
   }));
+
+  const traceLabelBlue = {
+    type: 'bar',
+    y: [0],
+    x: [0],
+    marker: {
+      size: 0,
+      color: ['blue'],
+    },
+    name: 'the number of samples that have mutation data available for that cancer type',
+  };
+
+  const traceLabelGreen = {
+    type: 'bar',
+    y: [0],
+    x: [0],
+    marker: {
+      size: 0,
+      color: ['green'],
+    },
+    name: 'the number of samples for a given cancer type',
+  };
 
   const topLabel = data.map((element, index, array) => ({
     element: element,
     xref: 'x',
     yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'bottom',
+    xanchor: 'left',
+    yanchor: 'top',
     //x: array.length > 1 ? index : (index + index + 1) * 0.5,
     x: index,
-    y: 1.01,
+    //y: 1.01,
+    y: 0,
+    // text:
+    //   tmbTabName === 'TMBSignature' && element.signatureName.length < 13
+    //     ? element.signatureName
+    //     : tmbTabName === 'TMBSignature' && element.signatureName.length > 13
+    //     ? element.signatureName.substring(0, 13) + '...'
+    //     : tmbTabName !== 'TMBSignature' && element.cancer.length < 13
+    //     ? element.cancer
+    //     : element.cancer.substring(0, 13) + '...',
     text:
-      tmbTabName === 'TMBSignature' && element.signatureName.length < 13
-        ? element.signatureName
-        : tmbTabName === 'TMBSignature' && element.signatureName.length > 13
-        ? element.signatureName.substring(0, 13) + '...'
-        : tmbTabName !== 'TMBSignature' && element.cancer.length < 13
-        ? element.cancer
-        : element.cancer.substring(0, 13) + '...',
+      tmbTabName === 'TMBSignature' ? element.signatureName : element.cancer,
     showarrow: false,
     font: {
       //size: 12,
     },
-    align: 'center',
+    align: 'left',
     textangle: 60,
   }));
 
@@ -66,7 +92,8 @@ export default function TMB(data, tmbTabName, signatureName) {
     xanchor: 'bottom',
     yanchor: 'bottom',
     x: (index + index + 1) * 0.5,
-    y: -0.07,
+    //y: -0.07,
+    y: 1.1,
     text: element.samples.filter(function (x) {
       return x.burden != null;
     }).length,
@@ -84,8 +111,10 @@ export default function TMB(data, tmbTabName, signatureName) {
     yref: 'paper',
     x0: index + 0.4,
     x1: index + 0.6,
-    y0: -0.07,
-    y1: -0.07,
+    //y0: -0.07,
+    //y1: -0.07,
+    y0: 1.1,
+    y1: 1.1,
     line: {
       width: 1,
       color: 'black',
@@ -98,7 +127,8 @@ export default function TMB(data, tmbTabName, signatureName) {
     xanchor: 'bottom',
     yanchor: 'bottom',
     x: (index + index + 1) * 0.5,
-    y: -0.14,
+    //y: -0.14,
+    y: 1.01,
     text: `${element.totalSamples}`,
     showarrow: false,
     font: {
@@ -143,7 +173,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     xanchor: 'bottom',
     yanchor: 'bottom',
     x: 0.01,
-    y: 0.9,
+    y: 0.895,
     text: signatureName,
     showarrow: false,
     font: {
@@ -162,11 +192,21 @@ export default function TMB(data, tmbTabName, signatureName) {
       ])
     : (annotations = [...topLabel, ...bottoLabel1, ...bottoLabel2]);
 
+  // find the longest label to calculate extra height margin
+
+  const labels = topLabel.map((e) => e.text);
+  const longest = labels.reduce((a, e) => (a > e.length ? a : e.length), 0);
+  const extraMargin = longest < 10 ? 60 : longest * 7;
+
+  console.log(labels);
+  console.log(longest);
+  console.log(extraMargin);
+
   const layout = {
     width: totalCancer > 1 ? null : 350,
     autosize: true,
     height: 500,
-    showlegend: false,
+    legend: { orientation: 'h', x: 0, y: 1.3 },
     xaxis: {
       showticklabels: false,
       tickfont: {
@@ -194,7 +234,7 @@ export default function TMB(data, tmbTabName, signatureName) {
       range: [-Math.floor(yMax), Math.floor(yMax)],
     },
     margin: {
-      t: 150,
+      b: extraMargin,
     },
     shapes: [...shapes, ...lines, ...bottoLabelline],
     annotations: annotations,
@@ -207,6 +247,10 @@ export default function TMB(data, tmbTabName, signatureName) {
     //responsive: true,
   };
 
-  return { traces: [...traces], layout: layout, config };
+  return {
+    traces: [...traces, traceLabelBlue, traceLabelGreen],
+    layout: layout,
+    config,
+  };
   //return { traces, layout };
 }
