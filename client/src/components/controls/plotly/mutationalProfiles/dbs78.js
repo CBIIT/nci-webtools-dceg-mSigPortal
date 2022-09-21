@@ -1,4 +1,12 @@
-export default function DBS78(rawData, sample) {
+import {
+  createSampleAnnotation,
+  getMaxMutations,
+  groupDataByMutation,
+  createMutationShapes,
+  createMutationAnnotations,
+} from './utils';
+
+export default function DBS78(apiData) {
   const colors = {
     AC: '#09BCED',
     AT: '#0266CA',
@@ -11,43 +19,16 @@ export default function DBS78(rawData, sample) {
     TG: '#CB98FD',
     TT: '#4C0299',
   };
-  const dbsdata = ['AC', 'AT', 'CC', 'CG', 'CT', 'GC', 'TA', 'TC', 'TG', 'TT'];
+  const mutationRegex = /^(.{2})/;
 
-  const groupByMutation = rawData.reduce((acc, e, i) => {
-    const mutationRegex = /^(.{2})/;
-    const mutation = e.mutationType.match(mutationRegex)[1];
+  const data = groupDataByMutation(apiData, mutationRegex);
+  const maxMutation = getMaxMutations(apiData);
 
-    acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
-    return acc;
-  }, {});
-
-  const data = Object.entries(groupByMutation).map(([mutation, data]) => ({
-    mutation,
-    data,
-  }));
-
-  const datafilter = data.filter((e) => dbsdata.includes(e.mutation));
-  const totalMutations = datafilter.reduce(
-    (total, mutation) =>
-      total +
-      mutation.data.reduce((mutationSum, e) => mutationSum + e.mutations, 0),
-    0
-  );
-  const maxMutation = Math.max(
-    ...datafilter
-      .map((mutation) => mutation.data.map((e) => e.mutations))
-      .flat()
-  );
-  const mutationTypeNames = datafilter
-    .map((group) =>
-      group.data.map((e) => ({
-        mutation: group.mutation,
-        mutationType: e.mutationType,
-      }))
-    )
+  const mutationTypeNames = data
+    .map((group) => group.data.map((e) => e.mutationType.slice(-2)))
     .flat();
 
-  const traces = datafilter.map((group, groupIndex, array) => ({
+  const traces = data.map((group, groupIndex, array) => ({
     name: group.mutation,
     type: 'bar',
     marker: { color: colors[group.mutation] },
@@ -58,66 +39,14 @@ export default function DBS78(rawData, sample) {
           .slice(0, groupIndex)
           .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
     ),
-    y: group.data.map((e) => e.mutations),
+    y: group.data.map((e) => e.mutations || e.contribution),
     hoverinfo: 'x+y',
     showlegend: false,
   }));
 
-  const mutationAnnotation = datafilter.map((group, groupIndex, array) => ({
-    xref: 'x',
-    yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'bottom',
-    x:
-      array
-        .slice(0, groupIndex)
-        .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
-      (group.data.length - 1) * 0.5,
-    y: 1.04,
-    text: `<b>${group.mutation}>NN</b>`,
-    showarrow: false,
-    font: { size: 18 },
-    align: 'center',
-  }));
-
-  const shapes = datafilter.map((group, groupIndex, array) => ({
-    type: 'rect',
-    xref: 'x',
-    yref: 'paper',
-    x0: array
-      .slice(0, groupIndex)
-      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.35),
-    x1: array
-      .slice(0, groupIndex + 1)
-      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.65),
-    y0: 1.05,
-    y1: 1.01,
-    fillcolor: colors[group.mutation],
-    line: {
-      width: 0,
-    },
-  }));
-
-  const sampleAnnotation = {
-    xref: 'paper',
-    yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'bottom',
-    x: 0.01,
-    y: 0.9,
-    text:
-      '<b>' +
-      sample +
-      ': ' +
-      totalMutations.toLocaleString(undefined) +
-      ' double subs </b>',
-    showarrow: false,
-    font: {
-      size: 24,
-      family: 'Arial',
-    },
-    align: 'center',
-  };
+  const sampleAnnotation = createSampleAnnotation(apiData);
+  const mutationAnnotation = createMutationAnnotations(data);
+  const mutationShapes = createMutationShapes(data, colors);
 
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
@@ -133,14 +62,16 @@ export default function DBS78(rawData, sample) {
       },
       tickmode: 'array',
       tickvals: mutationTypeNames.map((_, i) => i),
-      ticktext: mutationTypeNames.map((e) => e.mutationType.slice(-2)),
+      ticktext: mutationTypeNames.map((e) => e),
       linecolor: 'black',
       linewidth: 1,
       mirror: 'all',
     },
     yaxis: {
       title: {
-        text: '<b>Number of Double Base Substitutions</b>',
+        text: apiData[0].mutations
+          ? '<b>Number of Double Base Substitutions</b>'
+          : '<b>Percentage of Double Base Substitutions</b>',
         font: {
           family: 'Times New Roman',
         },
@@ -149,7 +80,7 @@ export default function DBS78(rawData, sample) {
       range: [0, maxMutation * 1.2],
       linecolor: 'black',
       linewidth: 1,
-      tickformat: maxMutation > 1000 ? '~s' : '',
+      tickformat: apiData[0].contribution ? '.1%' : '~s',
       ticks: 'inside',
       tickcolor: '#D3D3D3',
       showgrid: true,
@@ -157,7 +88,7 @@ export default function DBS78(rawData, sample) {
       gridcolor: '#F5F5F5',
     },
 
-    shapes: shapes,
+    shapes: mutationShapes,
     annotations: [...mutationAnnotation, sampleAnnotation],
   };
 
