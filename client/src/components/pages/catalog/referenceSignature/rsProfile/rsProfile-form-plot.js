@@ -62,7 +62,14 @@ export default function ProfileFormPlot({ options, index }) {
     DBS: [78, 186],
     ID: [28, 83, 415],
     RS: [32],
+    CN: [48],
   };
+
+  // useEffect(() => {
+  //   if (optiondata) {
+  //     handleSource(signatureSourceOptions[0]);
+  //   }
+  // }, []);
 
   const {
     data: optiondata,
@@ -70,12 +77,6 @@ export default function ProfileFormPlot({ options, index }) {
     isFetching: optionFetching,
   } = useRsProfileOptionsQuery();
   console.log(optiondata);
-
-  useEffect(() => {
-    if (optiondata) {
-      handleSource(signatureSourceOptions[0]);
-    }
-  }, []);
 
   const signatureSourceOptions = optiondata
     ? [...new Set(optiondata.map((e) => e.source))]
@@ -85,6 +86,13 @@ export default function ProfileFormPlot({ options, index }) {
           value: e,
         }))
     : [];
+
+  // set inital source
+  useEffect(() => {
+    if (!source && signatureSourceOptions.length)
+      handleSource(signatureSourceOptions[0]);
+    //setValue('source', signatureSourceOptions[0]);
+  }, [signatureSourceOptions]);
 
   const profileOptions = (source) =>
     source && optiondata.length
@@ -104,7 +112,10 @@ export default function ProfileFormPlot({ options, index }) {
           ...new Set(
             optiondata
               .filter(
-                (e) => e.source === source.value && e.profile === profile.value
+                (e) =>
+                  e.source === source.value &&
+                  e.profile === profile.value &&
+                  supportMatrix[e.profile].includes(e.matrix)
               )
               .map((e) => e.matrix)
               .sort((a, b) => a - b)
@@ -230,6 +241,27 @@ export default function ProfileFormPlot({ options, index }) {
     setValue('signatureName', signatureName);
   }
 
+  // function handleMatrix(matrix) {
+  //   const signatureSetName = referenceSignatureSetOption(
+  //     source,
+  //     profile,
+  //     matrix
+  //   );
+  //   const strategy = strategyOptions(source, profile, matrix, signatureSetName);
+  //   const signatureName = signatureNameOptions(
+  //     source,
+  //     profile,
+  //     matrix,
+  //     signatureSetName,
+  //     strategy
+  //   );
+
+  //   setValue('matrix', matrix);
+  //   setValue('signatureSetName', signatureSetName);
+  //   setValue('strategy', strategy);
+  //   setValue('signatureName', signatureName);
+  // }
+
   function handleMatrix(matrix) {
     const signatureSetName = referenceSignatureSetOption(
       source,
@@ -246,7 +278,7 @@ export default function ProfileFormPlot({ options, index }) {
     );
 
     setValue('matrix', matrix);
-    setValue('signatureSetName', signatureSetName[0]);
+    setValue('signatureSetName', signatureSetName);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
   }
@@ -330,7 +362,7 @@ export default function ProfileFormPlot({ options, index }) {
     });
   }
   function removePlots(index) {
-    // if (plots[index.plotURL]) Object.revokeObjectURL(plots[index].plotURL);
+    //if (plots[index.plotURL]) Object.revokeObjectURL(plots[index].plotURL);
     let newPlots = plots.slice();
     newPlots.splice(index, 1);
 

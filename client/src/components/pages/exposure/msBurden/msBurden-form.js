@@ -19,7 +19,7 @@ export default function MsBurdenForm() {
 
   const { signatureNames } = store.main;
 
-  //console.log(signatureNames);
+  console.log(signatureNames);
   const { control, setValue, watch } = useForm();
 
   const signatureNameOptions = signatureNames.length
@@ -31,6 +31,39 @@ export default function MsBurdenForm() {
         }))
     : [];
 
+  // function getSignatureOptions(signatureNames) {
+  //   return signatureNames.length
+  //     ? [...new Set(signatureNames.map((d) => d))]
+  //         .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+  //         .map((e) => ({
+  //           label: e,
+  //           value: e,
+  //         }))
+  //     : [];
+  // }
+  // const signatureNameOptions = getSignatureOptions(signatureNames);
+
+  console.log(signatureNameOptions);
+  console.log(signatureNames);
+  console.log(signatureNameOptions[0]);
+  console.log(mergeMsBurden(signatureNameOptions[0]));
+
+  // set inital
+  useEffect(() => {
+    if (!signatureNames && signatureNameOptions.length)
+      //mergeMsBurden(signatureNameOptions[0]);
+      setValue('signatureName', signatureNameOptions[0]);
+    //mergeMsBurden({ signatureName: signatureNameOptions[0] });
+  }, [signatureNameOptions]);
+
+  // function handleSignatureName(name) {
+  //   const signatureNames = getSignatureOptions(name);
+
+  //   //mergeMsBurden({ signatureName: name })}
+  //   //setValue('signatureName', signatureNames[0]);
+  //   mergeMsBurden({ signatureName: signatureNames });
+  // }
+
   return (
     <div>
       <hr />
@@ -40,10 +73,11 @@ export default function MsBurdenForm() {
             <Select
               name="signatureNames"
               label="Signature Name"
-              //value={signatureNames}
+              value={signatureNames}
               control={control}
               options={signatureNameOptions}
               onChange={(name) => mergeMsBurden({ signatureName: name })}
+              //onChange={handleSignatureName}
             />
           </Col>
           {/* <Col lg="auto" className="d-flex">
