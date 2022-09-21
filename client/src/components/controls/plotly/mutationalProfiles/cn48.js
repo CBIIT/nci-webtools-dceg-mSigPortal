@@ -1,5 +1,6 @@
-import { groupBy } from 'lodash';
-export default function CN48(rawData, sample) {
+import { getMaxMutations } from './utils';
+
+export default function CN48(apiData, sample) {
   const colors = {
     '0:0-100kb': '#F0F8FF',
     '0:100kb-1Mb': '#787CE6',
@@ -40,11 +41,7 @@ export default function CN48(rawData, sample) {
     het: 'black',
   };
 
-  const totalMutations = rawData.reduce(
-    (total, indel) => total + indel.contribution,
-    0
-  );
-  const maxMutation = Math.max(...rawData.map((indel) => indel.contribution));
+  const maxMutation = getMaxMutations(apiData);
 
   var sortOrder = [
     '0-100kb',
@@ -55,7 +52,7 @@ export default function CN48(rawData, sample) {
     '>40Mb',
   ]; // Declare a array that defines the order of the elements to be sorted.
 
-  const groupByCluster = rawData.reduce((acc, e, i) => {
+  const groupByCluster = apiData.reduce((acc, e, i) => {
     const names = e.mutationType.split(':');
 
     acc[names[1]] = acc[names[1]] ? [...acc[names[1]], e] : [e];
@@ -69,7 +66,7 @@ export default function CN48(rawData, sample) {
     })
   );
 
-  const groupbyfirst2 = rawData.reduce((acc, e, i) => {
+  const groupbyfirst2 = apiData.reduce((acc, e, i) => {
     const names = e.mutationType.split(':');
 
     acc[names[0] + ':' + names[1]] = acc[names[0] + ':' + names[1]]
@@ -84,7 +81,7 @@ export default function CN48(rawData, sample) {
       data,
     })
   );
-  console.log(groupbyfirst2Data);
+
   const thesort = (arr) => {
     // first grab the obj that is not getting sorted
     let first = arr.shift();
@@ -115,14 +112,8 @@ export default function CN48(rawData, sample) {
   );
 
   const sortedData = sortGroupByFirst2DataInside
-    .map((indel) => indel.data.map((e) => e))
+    .map((group) => group.data.map((e) => e))
     .flat();
-  console.log(sortedData);
-
-  // const dataD = groupByClusterData
-  //   .map((indel) => indel.data.map((e) => e))
-  //   .flat();
-  // console.log(dataD);
   const mutationTypeNames = sortedData.map((group, i) => ({
     mutationType: group.mutationType.split(':')[2],
     index: i,
@@ -161,7 +152,6 @@ export default function CN48(rawData, sample) {
     showlegend: false,
   }));
 
-  console.log(sortGroupByFirst2Data);
   const topShapes = sortGroupByFirst2Data.map((group, groupIndex, array) => ({
     group: group,
     name: group.mutation,
@@ -225,7 +215,7 @@ export default function CN48(rawData, sample) {
     },
     showlegend: false,
   }));
-  console.log(topTitleShapes);
+
   const topTitleShapesAnnitations = groupByClusterData.map(
     (group, groupIndex, array) => ({
       group: group,
