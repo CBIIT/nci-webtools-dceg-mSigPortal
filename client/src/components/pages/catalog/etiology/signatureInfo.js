@@ -309,16 +309,18 @@ export default function SignatureInfo({ data }) {
           ) : (
             <p>{description}</p>
           )}
-          {profilePlot && (
-            <div className="my-3 border rounded">
-              <LoadingOverlay active={fetchingProfile} />
+          <div className="my-3 border rounded">
+            <LoadingOverlay active={fetchingProfile} />
+            {profilePlot ? (
               <Plotly
                 data={profilePlot.traces}
                 layout={profilePlot.layout}
                 config={profilePlot.config}
               />
-            </div>
-          )}
+            ) : (
+              <div className="text-center my-4">No data available</div>
+            )}
+          </div>
 
           {metadata.tissueDistribution && (
             <div>
@@ -350,7 +352,7 @@ export default function SignatureInfo({ data }) {
                 config={distributionPlot.config}
               />
             ) : (
-              <div className="text-center">No data available</div>
+              <div className="text-center my-4">No data available</div>
             )}
           </div>
         </div>
