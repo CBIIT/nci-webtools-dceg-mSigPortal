@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Row, Col, Button, Container } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as catalogActions } from '../../../../services/store/catalog';
-import { actions as modalActions } from '../../../../services/store/modal';
-import { useEtiologyDataQuery, useEtiologyProfileQuery } from './apiSlice';
+import { actions } from '../../../../services/store/catalog';
+import {
+  useEtiologyDistribtuionQuery,
+  useEtiologySignatureQuery,
+} from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plotly from '../../../controls/plotly/plot/plot';
-
-const actions = { ...catalogActions, ...modalActions };
 
 export default function SignatureInfo({ data }) {
   const dispatch = useDispatch();
@@ -27,21 +27,156 @@ export default function SignatureInfo({ data }) {
         : true)
   )[0]?.json;
 
-  const [params, setParams] = useState(false);
+  const [distributionParams, setDistributionParams] = useState(false);
+  const { data: distributionPlot, isFetching: fetchingDistribution } =
+    useEtiologyDistribtuionQuery(distributionParams, {
+      skip: !distributionParams,
+    });
 
-  const { data: etiologyData, isFetching } = useEtiologyDataQuery(params, {
-    skip: !params,
-  });
+  const [signatureParams, setSignatureParams] = useState(false);
+  const { data: profilePlot, isFetching: fetchingProfile } =
+    useEtiologySignatureQuery(signatureParams, {
+      skip: !signatureParams,
+    });
 
+  const studyOptions = [
+    {
+      label: 'PCAWG WGS',
+      value: { study: 'PCAWG', strategy: 'WGS' },
+    },
+    {
+      label: 'TCGA WES',
+      value: { study: 'TCGA', strategy: 'WES' },
+    },
+    {
+      label: 'ICGC WGS',
+      value: { study: 'ICGC-Science-2022', strategy: 'WGS' },
+    },
+    {
+      label: 'GEL WGS',
+      value: { study: 'GEL-Science-2022', strategy: 'WGS' },
+    },
+    {
+      label: 'Hartwig WGS',
+      value: { study: 'Hartwig-Science-2022', strategy: 'WGS' },
+    },
+  ];
+
+  // set intial study
+  useEffect(() => {
+    if (!study) {
+      mergeEtiology({ study: studyOptions[0] });
+    }
+  }, [metadata]);
+
+  // get distribution plot
   useEffect(() => {
     if (metadata) {
-      setParams({
+      setDistributionParams({
         signatureName: metadata.signature,
-        study: study.split('_')[0],
-        strategy: study.split('_')[1],
+        ...study.value,
       });
     }
   }, [metadata, study]);
+
+  // get profile plot
+  useEffect(() => {
+    if (metadata) {
+      const params = getSignatureParams(category, metadata.signature);
+      if (params) {
+        setSignatureParams({
+          signatureName: metadata.signature,
+          signatureSetName: params.signatureSetName,
+          profile: params.profile,
+        });
+      }
+    }
+  }, [metadata]);
+
+  // return a valid signatureSetName and profile depending on the selected category and signature
+  function getSignatureParams(category, signature) {
+    if (category == 'Cosmic') {
+      return signature.includes('SBS')
+        ? {
+            signatureSetName: 'COSMIC_v3.3_Signatures_GRCh37_SBS96',
+            profile: 'SBS96',
+          }
+        : signature.includes('DBS')
+        ? {
+            signatureSetName: 'COSMIC_v3.3_Signatures_GRCh37_DBS78',
+            profile: 'DBS78',
+          }
+        : signature.includes('ID')
+        ? {
+            signatureSetName: 'COSMIC_v3.3_Signatures_GRCh37_ID83',
+            profile: 'ID83',
+          }
+        : signature.includes('CN')
+        ? {
+            signatureSetName: 'COSMIC_v3.3_Signatures_GRCh37_CN48',
+            profile: 'CN48',
+          }
+        : false;
+    } else if (category == 'CancerSpecificSignatures_2022') {
+      return signature.includes('SBS')
+        ? {
+            signatureSetName: 'Cancer_Reference_Signatures_2022_GRCh37_SBS96',
+            profile: 'SBS96',
+          }
+        : signature.includes('DBS')
+        ? {
+            signatureSetName: 'Cancer_Reference_Signatures_2022_GRCh37_DBS78',
+            profile: 'DBS78',
+          }
+        : false;
+    } else if (category == 'EnviromentalMutagenesis') {
+      return signature.includes('SBS')
+        ? {
+            signatureSetName: 'Environmental_Mutagen_Signatures_GRCh37_SBS96',
+            profile: 'SBS96',
+          }
+        : signature.includes('DBS')
+        ? {
+            signatureSetName: 'Environmental_Mutagen_Signatures_GRCh37_DBS78',
+            profile: 'DBS78',
+          }
+        : false;
+    } else if (category == 'GeneEdits') {
+      return signature.includes('SBS')
+        ? {
+            signatureSetName: 'Gene_Edits_Signatures_GRCh37_SBS96',
+            profile: 'SBS96',
+          }
+        : false;
+    } else if (category == 'CancerSpecificSignatures') {
+      return {
+        signatureSetName: 'Cancer_Reference_Signatures_GRCh37_SBS96',
+        // signatureSetName: 'Organ-specific_Cancer_Signatures_GRCh37_SBS96',
+        profile: 'SBS96',
+      };
+    } else if (category == 'CancerTherapies') {
+      return signature.includes('SBS')
+        ? {
+            signatureSetName: 'Cancer_Therapies_Signatures_GRCh37_SBS96',
+            profile: 'SBS96',
+          }
+        : signature.includes('DBS')
+        ? {
+            signatureSetName: 'Cancer_Therapies_Signatures_GRCh37_DBS78',
+            profile: 'DBS78',
+          }
+        : false;
+    } else if (category == 'Others') {
+      return false;
+      //   return signature.includes('SBS')
+      //     ? {
+      //         source: 'Published_signatures',
+      //         signatureSetName: 'Organ-specific_Cancer_Signatures_GRCh37_SBS96',
+      //         profile: 'SBS96',
+      //       }
+      //     : false;
+    }
+  }
 
   // split description string delimited by key:
   const descriptionRegex = /(\w*\s?\w+:)/g;
@@ -174,63 +309,50 @@ export default function SignatureInfo({ data }) {
           ) : (
             <p>{description}</p>
           )}
+          {profilePlot && (
+            <div className="my-3 border rounded">
+              <LoadingOverlay active={fetchingProfile} />
+              <Plotly
+                data={profilePlot.traces}
+                layout={profilePlot.layout}
+                config={profilePlot.config}
+              />
+            </div>
+          )}
+
           {metadata.tissueDistribution && (
             <div>
               <strong>Tissue Distribution: </strong>
               {metadata.tissueDistribution}
             </div>
           )}
-          <div className="my-4">
-            <LoadingOverlay active={isFetching} />
+          <div className="my-3 pt-3 border rounded">
+            <LoadingOverlay active={fetchingDistribution} />
             <Row className="justify-content-center">
-              {['TCGA_WES', 'PCAWG_WGS', 'ICGC_WGS', 'GEL_WGS'].map((e) => (
-                <Col key={e} lg="2" md="3" sm="4" className="mb-3 d-flex">
+              {studyOptions.map((e) => (
+                <Col key={e.label} lg="2" md="3" sm="4" className="mb-3 d-flex">
                   <Button
                     size="sm"
                     variant="primary"
                     onClick={() => mergeEtiology({ study: e })}
-                    className={study != e ? 'disabled' : ''}
+                    className={study.label != e.label ? 'disabled' : ''}
                     block
                   >
-                    {e}
+                    {e.label}
                   </Button>
                 </Col>
               ))}
             </Row>
-            {etiologyData?.distributionPlot && (
+            {distributionPlot?.traces.length ? (
               <Plotly
-                data={etiologyData.distributionPlot.traces}
-                layout={etiologyData.distributionPlot.layout}
-                config={etiologyData.distributionPlot.config}
+                data={distributionPlot.traces}
+                layout={distributionPlot.layout}
+                config={distributionPlot.config}
               />
+            ) : (
+              <div className="text-center">No data available</div>
             )}
           </div>
-          {/* {etiologyData?.data && (
-            <div>
-              <LoadingOverlay active={isFetching} />
-              <Row className="justify-content-center">
-                {etiologyData.data.map((e) => (
-                  <Col
-                    key={e.signatureName}
-                    lg="2"
-                    md="3"
-                    sm="4"
-                    className="mb-3 d-flex"
-                  >
-                    <Button
-                      size="sm"
-                      variant="primary"
-                      onClick={() => mergeEtiology({ study: e })}
-                      className={study != e ? 'disabled' : ''}
-                      block
-                    >
-                      {e.signatureName}
-                    </Button>
-                  </Col>
-                ))}
-              </Row>
-            </div>
-          )} */}
         </div>
       )}
     </Container>
