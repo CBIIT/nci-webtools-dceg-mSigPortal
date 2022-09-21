@@ -16,11 +16,9 @@ export default function MsBurdenForm() {
 
   const mergeMsBurden = (state) =>
     dispatch(actions.mergeExposure({ msBurden: state }));
-
+  console.log(store);
   const { signatureNames } = store.main;
-
-  console.log(signatureNames);
-  const { control, setValue, watch } = useForm();
+  const { signatureName } = store.msBurden;
 
   const signatureNameOptions = signatureNames.length
     ? [...new Set(signatureNames.map((d) => d))]
@@ -31,38 +29,16 @@ export default function MsBurdenForm() {
         }))
     : [];
 
-  // function getSignatureOptions(signatureNames) {
-  //   return signatureNames.length
-  //     ? [...new Set(signatureNames.map((d) => d))]
-  //         .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-  //         .map((e) => ({
-  //           label: e,
-  //           value: e,
-  //         }))
-  //     : [];
-  // }
-  // const signatureNameOptions = getSignatureOptions(signatureNames);
-
-  console.log(signatureNameOptions);
-  console.log(signatureNames);
-  console.log(signatureNameOptions[0]);
-  console.log(mergeMsBurden(signatureNameOptions[0]));
+  const { control, setValue, watch } = useForm({
+    defaultValues: signatureName,
+  });
 
   // set inital
   useEffect(() => {
-    if (!signatureNames && signatureNameOptions.length)
-      //mergeMsBurden(signatureNameOptions[0]);
-      setValue('signatureName', signatureNameOptions[0]);
-    //mergeMsBurden({ signatureName: signatureNameOptions[0] });
+    if (!signatureName && signatureNameOptions.length) {
+      mergeMsBurden({ signatureName: signatureNameOptions[0] });
+    }
   }, [signatureNameOptions]);
-
-  // function handleSignatureName(name) {
-  //   const signatureNames = getSignatureOptions(name);
-
-  //   //mergeMsBurden({ signatureName: name })}
-  //   //setValue('signatureName', signatureNames[0]);
-  //   mergeMsBurden({ signatureName: signatureNames });
-  // }
 
   return (
     <div>
@@ -71,9 +47,9 @@ export default function MsBurdenForm() {
         <Row>
           <Col lg="auto">
             <Select
-              name="signatureNames"
+              name="signatureName"
               label="Signature Name"
-              value={signatureNames}
+              value={signatureName}
               control={control}
               options={signatureNameOptions}
               onChange={(name) => mergeMsBurden({ signatureName: name })}
