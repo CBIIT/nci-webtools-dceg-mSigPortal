@@ -54,6 +54,27 @@ function defaultFilter2(filterOptions) {
     : filterOptions[0];
 }
 
+function defaultSignatureSet(signatureSetOptions) {
+  const options = options.map(({ value }) => value);
+  return options.includes('NA')
+    ? { label: 'NA', value: 'NA' }
+    : signatureSetOptions[0];
+}
+
+function defaultStrategy(strategyOptions) {
+  const options = options.map(({ value }) => value);
+  return options.includes('NA')
+    ? { label: 'NA', value: 'NA' }
+    : strategyOptions[0];
+}
+
+function defaultSignatureName(signatureNameOptions) {
+  const options = options.map(({ value }) => value);
+  return options.includes('NA')
+    ? { label: 'NA', value: 'NA' }
+    : signatureNameOptions[0];
+}
+
 function pickNonNullValues(object) {
   return pickBy(object, (v) => v !== null);
 }
@@ -66,4 +87,7 @@ module.exports = {
   defaultMatrix2,
   defaultFilter2,
   pickNonNullValues,
+  defaultSignatureSet,
+  defaultStrategy,
+  defaultSignatureName,
 };

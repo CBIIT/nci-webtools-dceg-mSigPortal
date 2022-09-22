@@ -116,8 +116,6 @@ export default function ProfileFormPlot({ options, index }) {
       : [];
 
   const referenceSignatureSetOption = (source, profile, matrix) =>
-    //console.log(source, profile, matrix);
-
     source && profile && matrix && optiondata.length
       ? [
           ...new Set(
@@ -342,24 +340,7 @@ export default function ProfileFormPlot({ options, index }) {
   }, [signatureSourceOptions]);
 
   console.log(matrixOptions[0]);
-  // set inital profile
-  // useEffect(() => {
-  //   if (!profile && profileOptions.length) {
-  //     handleProfile(profileOptions[0]);
-  //   }
-  // }, [profileOptions]);
-  // set inital matrix
-  // useEffect(() => {
-  //   if (!matrix && matrixOptions.length) handleMatrix(matrixOptions[0]);
-  // }, [matrixOptions]);
-  // useEffect(() => {
-  //   if (profile) {
-  //     setSignatureSetQuery({
-  //       profile: profile.value,
-  //       matrix: defaultMatrix(profile.value, ['96', '78', '83']),
-  //     });
-  //   }
-  //}, [profile]);
+  console.log(signatureSetName);
 
   // set inital signature set name
   // useEffect(() => {
