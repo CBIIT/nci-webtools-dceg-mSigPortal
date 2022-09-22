@@ -28,20 +28,24 @@ export default function ProfileFormPlot({ options, index }) {
   const { matrixList, projectID } = store.main;
   const { plots, debugR, err, loading } = store.rSProfiles;
   const { refSigData, sample } = store.referenceSignature;
+  console.log(store);
 
   const [params, setParams] = useState(null);
 
-  // const defaultValues = {
-  //   source: { label: 'Published_signature', value: 'Published_signature' },
-  //   profile: { label: 'SBS', value: 'SBS' },
-  //   matrix: { label: '96', value: '96' },
-  //   signatureSetName: {
-  //     label: 'Other_Published_Signatures_GRCh37_SBS96',
-  //     value: 'Other_Published_Signatures_GRCh37_SBS96',
-  //   },
-  //   strategy: { label: 'WGS', value: 'WGS' },
-  //   signatureName: { label: '', value: '' },
-  // };
+  const defaultValues = {
+    source: { label: 'Published_signature', value: 'Published_signature' },
+    profile: { label: 'SBS', value: 'SBS' },
+    matrix: { label: '96', value: '96' },
+    signatureSetName: {
+      label: 'Other_Published_Signatures_GRCh37_SBS96',
+      value: 'Other_Published_Signatures_GRCh37_SBS96',
+    },
+    strategy: { label: 'WGS', value: 'WGS' },
+    signatureName: {
+      label: 'SBS_5-FU_organoids_WGS',
+      value: 'BS_5-FU_organoids_WGS',
+    },
+  };
   // const defaultValues = {
   //   source: '',
   //   profile: '',
@@ -50,7 +54,8 @@ export default function ProfileFormPlot({ options, index }) {
   //   strategy: '',
   //   signatureName: '',
   // };
-  const { control, setValue, watch } = useForm({ options });
+  const { control, setValue, watch } = useForm();
+  //const { control, setValue, watch } = useForm();
 
   const { source, profile, matrix, signatureSetName, strategy, signatureName } =
     watch();
@@ -64,12 +69,6 @@ export default function ProfileFormPlot({ options, index }) {
     RS: [32],
     CN: [48],
   };
-
-  // useEffect(() => {
-  //   if (optiondata) {
-  //     handleSource(signatureSourceOptions[0]);
-  //   }
-  // }, []);
 
   const {
     data: optiondata,
@@ -86,13 +85,6 @@ export default function ProfileFormPlot({ options, index }) {
           value: e,
         }))
     : [];
-
-  // set inital source
-  useEffect(() => {
-    if (!source && signatureSourceOptions.length)
-      handleSource(signatureSourceOptions[0]);
-    //setValue('source', signatureSourceOptions[0]);
-  }, [signatureSourceOptions]);
 
   const profileOptions = (source) =>
     source && optiondata.length
@@ -134,10 +126,10 @@ export default function ProfileFormPlot({ options, index }) {
                 (e) =>
                   e.source === source.value &&
                   e.profile === profile.value &&
-                  e.matrix === matrix.value
+                  supportMatrix[e.profile].includes(e.matrix)
               )
               .map((e) => e.signatureSetName)
-              .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+            // .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
           ),
         ].map((e) => ({ label: e, value: e }))
       : [];
@@ -151,7 +143,7 @@ export default function ProfileFormPlot({ options, index }) {
                 (e) =>
                   e.source === source.value &&
                   e.profile === profile.value &&
-                  e.matrix === matrix.value &&
+                  supportMatrix[e.profile].includes(e.matrix) &&
                   e.signatureSetName === signatureSetName.value
               )
               .map((e) => e.strategy)
@@ -180,7 +172,7 @@ export default function ProfileFormPlot({ options, index }) {
                 (e) =>
                   e.source === source.value &&
                   e.profile === profile.value &&
-                  e.matrix === matrix.value &&
+                  supportMatrix[e.profile].includes(e.matrix) &&
                   e.signatureSetName === signatureSetName.value &&
                   e.strategy === strategy.value
               )
@@ -193,7 +185,7 @@ export default function ProfileFormPlot({ options, index }) {
   function handleSource(source) {
     const profiles = profileOptions(source);
     const profile = defaultProfile2(profiles);
-    const matrices = matrixOptions(sample, profile);
+    const matrices = matrixOptions(source, profile);
     const matrix = defaultMatrix2(profile, matrices);
     const signatureSetName = referenceSignatureSetOption(
       source,
@@ -208,17 +200,31 @@ export default function ProfileFormPlot({ options, index }) {
       signatureSetName,
       strategy
     );
-
+    console.log(source);
+    console.log(profile);
+    console.log(matrices);
+    console.log(matrix);
+    console.log(signatureSetName);
+    console.log(strategy);
+    console.log(signatureName);
     setValue('source', source);
     setValue('profile', profile);
     setValue('matrix', matrix);
     setValue('signatureSetName', signatureSetName);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
+    // mergeRsProfiles({
+    //   source,
+    //   profile,
+    //   matrix,
+    //   signatureSetName,
+    //   strategy,
+    //   signatureName,
+    // });
   }
 
   function handleProfile(profile) {
-    const matrices = matrixOptions(sample, profile);
+    const matrices = matrixOptions(source, profile);
     const matrix = defaultMatrix2(profile, matrices);
     const signatureSetName = referenceSignatureSetOption(
       source,
@@ -233,34 +239,26 @@ export default function ProfileFormPlot({ options, index }) {
       signatureSetName,
       strategy
     );
+    console.log(profile);
+    console.log(matrix);
+    console.log(matrices);
+    console.log(signatureSetName);
+    console.log(strategy);
+    console.log(signatureName);
 
     setValue('profile', profile);
     setValue('matrix', matrix);
     setValue('signatureSetName', signatureSetName);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
+    // mergeRsProfiles({
+    //   profile,
+    //   matrix,
+    //   signatureSetName,
+    //   strategy,
+    //   signatureName,
+    // });
   }
-
-  // function handleMatrix(matrix) {
-  //   const signatureSetName = referenceSignatureSetOption(
-  //     source,
-  //     profile,
-  //     matrix
-  //   );
-  //   const strategy = strategyOptions(source, profile, matrix, signatureSetName);
-  //   const signatureName = signatureNameOptions(
-  //     source,
-  //     profile,
-  //     matrix,
-  //     signatureSetName,
-  //     strategy
-  //   );
-
-  //   setValue('matrix', matrix);
-  //   setValue('signatureSetName', signatureSetName);
-  //   setValue('strategy', strategy);
-  //   setValue('signatureName', signatureName);
-  // }
 
   function handleMatrix(matrix) {
     const signatureSetName = referenceSignatureSetOption(
@@ -276,11 +274,22 @@ export default function ProfileFormPlot({ options, index }) {
       signatureSetName,
       strategy
     );
+    console.log(profile);
+    console.log(matrix);
+    console.log(signatureSetName);
+    console.log(strategy);
+    console.log(signatureName);
 
     setValue('matrix', matrix);
     setValue('signatureSetName', signatureSetName);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
+    // mergeRsProfiles({
+    //   matrix,
+    //   signatureSetName,
+    //   strategy,
+    //   signatureName,
+    // });
   }
 
   function handleSet(signatureSetName) {
@@ -293,21 +302,70 @@ export default function ProfileFormPlot({ options, index }) {
       strategy
     );
 
+    console.log(profile);
+    console.log(matrix);
+    console.log(signatureSetName);
+    console.log(strategy);
+    console.log(signatureName);
+
     setValue('signatureSetName', signatureSetName);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
+
+    // mergeRsProfiles({
+    //   signatureSetName,
+    //   strategy,
+    //   signatureName,
+    // });
   }
 
   function handleStrategy(strategy) {
     const signatureName = signatureNameOptions(strategy);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
+    // mergeRsProfiles({
+    //   strategy,
+    //   signatureName,
+    // });
   }
 
   function handleName(signatureName) {
     setValue('signatureName', signatureName);
+    // mergeRsProfiles({
+    //   signatureName,
+    // });
   }
+  // set inital source
+  useEffect(() => {
+    if (!source && signatureSourceOptions.length)
+      handleSource(signatureSourceOptions[0]);
+  }, [signatureSourceOptions]);
 
+  console.log(matrixOptions[0]);
+  // set inital profile
+  // useEffect(() => {
+  //   if (!profile && profileOptions.length) {
+  //     handleProfile(profileOptions[0]);
+  //   }
+  // }, [profileOptions]);
+  // set inital matrix
+  // useEffect(() => {
+  //   if (!matrix && matrixOptions.length) handleMatrix(matrixOptions[0]);
+  // }, [matrixOptions]);
+  // useEffect(() => {
+  //   if (profile) {
+  //     setSignatureSetQuery({
+  //       profile: profile.value,
+  //       matrix: defaultMatrix(profile.value, ['96', '78', '83']),
+  //     });
+  //   }
+  //}, [profile]);
+
+  // set inital signature set name
+  // useEffect(() => {
+  //   if (!signatureSetName && referenceSignatureSetOption.length)
+  //     handleSet(referenceSignatureSetOption[0]);
+  // }, [referenceSignatureSetOption]);
   // get data on form change
   useEffect(() => {
     console.log(source);
@@ -387,7 +445,7 @@ export default function ProfileFormPlot({ options, index }) {
             <Select
               name="profile"
               label="Profile Name"
-              //value={profile}
+              value={profile}
               options={profileOptions(source)}
               control={control}
               onChange={handleProfile}
@@ -397,7 +455,7 @@ export default function ProfileFormPlot({ options, index }) {
             <Select
               name="matrix"
               label="Matrix"
-              //value={matrix}
+              value={matrix}
               options={matrixOptions(source, profile)}
               control={control}
               onChange={handleMatrix}
@@ -407,7 +465,7 @@ export default function ProfileFormPlot({ options, index }) {
             <Select
               name="signatureSetName"
               label="Reference Signature Set"
-              //value={signatureSetName}
+              value={signatureSetName}
               options={referenceSignatureSetOption(source, profile, matrix)}
               control={control}
               onChange={handleSet}
@@ -417,7 +475,7 @@ export default function ProfileFormPlot({ options, index }) {
             <Select
               name="strategy"
               label="Experimental Strategy"
-              //value={strategy}
+              value={strategy}
               options={strategyOptions(
                 source,
                 profile,
@@ -432,7 +490,7 @@ export default function ProfileFormPlot({ options, index }) {
             <Select
               name="signatureName"
               label="Signature Name"
-              //value={signatureName}
+              value={signatureName}
               options={signatureNameOptions(
                 source,
                 profile,
@@ -492,7 +550,7 @@ export default function ProfileFormPlot({ options, index }) {
             layout={plotdata.layout}
             config={plotdata.config}
             divId="mutationalProfilePlot"
-            filename={sample?.value || 'Mutational Profile'}
+            filename={source?.value || 'Mutational Profile'}
           />
         )}
       </div>

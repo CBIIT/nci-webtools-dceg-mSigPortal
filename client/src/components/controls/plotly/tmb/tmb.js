@@ -206,7 +206,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     width: totalCancer > 1 ? null : 350,
     autosize: true,
     height: 500,
-    legend: { orientation: 'h', x: 0, y: 1.3 },
+    legend: { orientation: 'h', x: 0, y: 1.35 },
     xaxis: {
       showticklabels: false,
       tickfont: {
