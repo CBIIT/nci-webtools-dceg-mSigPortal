@@ -41,9 +41,12 @@ RUN cd /tmp && \
     cp /tmp/SigProfilerPlotting/fonts/* /usr/share/fonts && \
     fc-cache -fv;
 
-# install client python packages
-RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerPlotting#egg=SigProfilerPlotting'
+# install python packages
+# RUN pip3 install pandas 
 
+# install client python packages
+RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerClusters#egg=SigProfilerClusters'
+RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerPlotting#egg=SigProfilerPlotting'
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
 
 # install genomes
@@ -68,8 +71,6 @@ WORKDIR /deploy/server
 
 RUN R -e "options(Ncpus=parallel::detectCores()); renv::restore()"
 
-# install python packages
-RUN pip3 install scipy statsmodels
 
 # use build cache for npm packages
 COPY server/package*.json /deploy/server/
