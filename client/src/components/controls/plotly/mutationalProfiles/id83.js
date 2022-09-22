@@ -1,4 +1,10 @@
-export default function ID83(rawData, args) {
+import {
+  getMaxMutations,
+  getTotalMutations,
+  groupDataByMutation,
+} from './utils';
+
+export default function ID83(apiData) {
   const colors = {
     '1:Del:C': { shape: '#FBBD6F', text: 'black' },
     '1:Del:T': { shape: '#FE8002', text: 'white' },
@@ -18,28 +24,29 @@ export default function ID83(rawData, args) {
     '5:Del:M': { shape: '#62409A', text: 'white' },
   };
 
-  const { profile, matrix, sample } = args;
+  // const groupByIndel = apiData.reduce((acc, e, i) => {
+  //   const indel = e.mutationType.match(/^(.{7})/)[1];
 
-  const groupByIndel = rawData.reduce((acc, e, i) => {
-    const indel = e.mutationType.match(/^(.{7})/)[1];
+  //   acc[indel] = acc[indel] ? [...acc[indel], e] : [e];
+  //   return acc;
+  // }, {});
 
-    acc[indel] = acc[indel] ? [...acc[indel], e] : [e];
-    return acc;
-  }, {});
-  console.log(groupByIndel);
-  const unsortedData = Object.entries(groupByIndel).map(([indel, data]) => ({
-    indel,
-    data,
-  }));
-  console.log(unsortedData);
-  // sort data according to colors
-  const indelOrder = Object.fromEntries(
-    Object.entries(Object.keys(colors)).map((a) => a.reverse())
-  );
-  const data = [...unsortedData].sort(
-    (a, b) => indelOrder[a.indel] - indelOrder[b.indel]
-  );
-  console.log(data);
+  // const unsortedData = Object.entries(groupByIndel).map(([indel, data]) => ({
+  //   indel,
+  //   data,
+  // }));
+
+  // // sort data according to colors
+  // const indelOrder = Object.fromEntries(
+  //   Object.entries(Object.keys(colors)).map((a) => a.reverse())
+  // );
+  // const data = [...unsortedData].sort(
+  //   (a, b) => indelOrder[a.indel] - indelOrder[b.indel]
+  // );
+
+  const indelRegex = /^(.{7})/;
+  const data = groupDataByMutation(apiData, indelRegex);
+
   const arrayIDAnnXTop = [
       '1bp Deletion',
       '1bp Insertion',
@@ -56,33 +63,26 @@ export default function ID83(rawData, args) {
     ],
     arrayIDAnnXLabel = [5, 18.5, 35, 60, 76];
 
-  const totalMutations = data.reduce(
-    (total, indel) =>
-      total + indel.data.reduce((indelSum, e) => indelSum + e.mutations, 0),
-    0
-  );
-  const maxMutation = Math.max(
-    ...data.map((indel) => indel.data.map((e) => e.mutations)).flat()
-  );
+  const totalMutations = getTotalMutations(apiData);
+  const maxMutation = getMaxMutations(apiData);
 
   const indelNames = data
     .map((indel) =>
       indel.data.map((e) => ({
-        indel: indel.indel,
+        indel: indel.mutation,
         index:
-          indel.indel.substring(2, 5) == 'Del'
+          indel.mutation.substring(2, 5) == 'Del'
             ? +e.mutationType.slice(-1) + 1
             : e.mutationType.slice(-1),
         //index: e.mutationType.slice(-1),
       }))
     )
     .flat();
-  console.log(indelNames);
 
   const traces = data.map((group, groupIndex, array) => ({
-    name: group.indel,
+    name: group.mutation,
     type: 'bar',
-    marker: { color: colors[group.indel].shape },
+    marker: { color: colors[group.mutation].shape },
     x: [...group.data.keys()].map(
       (e) =>
         e +
@@ -90,7 +90,7 @@ export default function ID83(rawData, args) {
           .slice(0, groupIndex)
           .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
     ),
-    y: group.data.map((e) => e.mutations),
+    y: group.data.map((e) => e.mutations || e.contribution),
     groupdata: group.data,
     //customdata: group.data.map((e) => ({ mutationType: e.mutationType })),
     customdata: group.data.map((e) => ({
@@ -108,7 +108,7 @@ export default function ID83(rawData, args) {
       '%{y} indels<extra></extra>',
     showlegend: false,
   }));
-  console.log(traces);
+
   const shapeAnnotations = data.map((group, groupIndex, array) => ({
     xref: 'x',
     yref: 'paper',
@@ -121,17 +121,15 @@ export default function ID83(rawData, args) {
       (group.data.length - 1) * 0.5,
     y: 1.01,
     text: `<b>${
-      group.indel[0] == '1' ? group.indel.slice(-1) : group.indel[0]
+      group.mutation[0] == '1' ? group.mutation.slice(-1) : group.mutation[0]
     }</b>`,
     showarrow: false,
     font: {
       size: 14,
-      color: colors[group.indel].text,
+      color: colors[group.mutation].text,
     },
     align: 'center',
   }));
-
-  console.log(shapeAnnotations);
 
   const xLabelAnnotation = indelNames.map((indel, index) => ({
     xref: 'x',
@@ -187,12 +185,9 @@ export default function ID83(rawData, args) {
     yanchor: 'bottom',
     x: 0.01,
     y: 0.88,
-    text:
-      '<b>' +
-      sample +
-      ': ' +
-      totalMutations.toLocaleString(undefined) +
-      ' indels</b>',
+    text: apiData[0].sample
+      ? `<b>${apiData[0].sample}: ${totalMutations.toLocaleString()} Indels</b>`
+      : `<b>${apiData[0].signatureName}</b>`,
     showarrow: false,
     font: {
       size: 24,
@@ -213,7 +208,7 @@ export default function ID83(rawData, args) {
       .reduce((lastIndex, e) => lastIndex + e.data.length, -0.6),
     y0: 1.07,
     y1: 1.01,
-    fillcolor: colors[group.indel].shape,
+    fillcolor: colors[group.mutation].shape,
     line: {
       width: 0,
     },
@@ -231,7 +226,7 @@ export default function ID83(rawData, args) {
       .reduce((lastIndex, e) => lastIndex + e.data.length, -0.6),
     y0: -0.01,
     y1: -0.05,
-    fillcolor: colors[group.indel].shape,
+    fillcolor: colors[group.mutation].shape,
     line: {
       width: 0,
     },

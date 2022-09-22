@@ -27,7 +27,7 @@ export default function CategoryOptions({ categories }) {
   return (
     <Row className="justify-content-center mb-3">
       {categories.map((e) => (
-        <Col key={e.name} lg="2" md="3" sm="4" className="mb-3 d-flex">
+        <Col key={e.name} lg="3" md="3" sm="4" className="mb-3 d-flex">
           <Button
             size="sm"
             variant="dark"

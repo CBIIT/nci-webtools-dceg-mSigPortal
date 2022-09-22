@@ -17,7 +17,7 @@ export const getInitialState = () => ({
     etiology: '',
     signature: '',
     referrenceSignature: '',
-    study: 'TCGA_WES',
+    study: '',
     showAllSignatures: false,
   },
   referenceSignature: {

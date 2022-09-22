@@ -1,6 +1,12 @@
-import { max } from 'd3';
+import {
+  createSampleAnnotation,
+  getMaxMutations,
+  groupDataByMutation,
+  createMutationShapes,
+  createMutationAnnotations,
+} from './utils';
 
-export default function SBS96(rawData, sample, tab) {
+export default function SBS96(apiData) {
   const colors = {
     'C>A': '#03BCEE',
     'C>G': 'black',
@@ -9,31 +15,11 @@ export default function SBS96(rawData, sample, tab) {
     'T>C': '#A1CE63',
     'T>G': '#EBC6C4',
   };
-  //const { profile, matrix, sample } = args;
-  console.log(rawData);
+  const mutationRegex = /\[(.*)\]/;
 
-  const groupByMutation = rawData.reduce((acc, e, i) => {
-    const mutationRegex = /\[(.*)\]/;
-    const mutation = e.mutationType.match(mutationRegex)[1];
+  const data = groupDataByMutation(apiData, mutationRegex);
+  const maxMutation = getMaxMutations(apiData);
 
-    acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
-    return acc;
-  }, {});
-
-  const data = Object.entries(groupByMutation).map(([mutation, data]) => ({
-    mutation,
-    data,
-  }));
-
-  const totalMutations = data.reduce(
-    (total, mutation) =>
-      total +
-      mutation.data.reduce((mutationSum, e) => mutationSum + e.mutations, 0),
-    0
-  );
-  const maxMutation = Math.max(
-    ...data.map((mutation) => mutation.data.map((e) => e.mutations)).flat()
-  );
   const mutationTypeNames = data
     .map((group) =>
       group.data.map((e) => ({
@@ -54,66 +40,14 @@ export default function SBS96(rawData, sample, tab) {
           .slice(0, groupIndex)
           .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
     ),
-    y: group.data.map((e) => e.mutations),
+    y: group.data.map((e) => e.mutations || e.contribution),
     hoverinfo: 'x+y',
     showlegend: false,
   }));
 
-  const mutationAnnotation = data.map((group, groupIndex, array) => ({
-    xref: 'x',
-    yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'bottom',
-    x:
-      array
-        .slice(0, groupIndex)
-        .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
-      (group.data.length - 1) * 0.5,
-    y: 1.04,
-    text: `<b>${group.mutation}</b>`,
-    showarrow: false,
-    font: { size: 18 },
-    align: 'center',
-  }));
-
-  const sampleAnnotation = {
-    xref: 'paper',
-    yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'bottom',
-    x: 0.01,
-    y: 0.88,
-    text:
-      '<b>' +
-      sample +
-      ': ' +
-      totalMutations.toLocaleString(undefined) +
-      ' subs </b>',
-    showarrow: false,
-    font: {
-      size: 24,
-      family: 'Arial',
-    },
-    align: 'center',
-  };
-
-  const shapes = data.map((group, groupIndex, array) => ({
-    type: 'rect',
-    xref: 'x',
-    yref: 'paper',
-    x0: array
-      .slice(0, groupIndex)
-      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.35),
-    x1: array
-      .slice(0, groupIndex + 1)
-      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.65),
-    y0: 1.05,
-    y1: 1.01,
-    fillcolor: colors[group.mutation],
-    line: {
-      width: 0,
-    },
-  }));
+  const sampleAnnotation = createSampleAnnotation(apiData);
+  const mutationAnnotation = createMutationAnnotations(data);
+  const mutationShapes = createMutationShapes(data, colors);
 
   function formatTickLabel(mutation, mutationType) {
     const color = colors[mutation];
@@ -147,7 +81,9 @@ export default function SBS96(rawData, sample, tab) {
     },
     yaxis: {
       title: {
-        text: '<b>Number of Single Base Substitutions</b>',
+        text: apiData[0].mutations
+          ? '<b>Number of Single Base Substitutions</b>'
+          : '<b>Percentage of Single Base Substitutions</b>',
         font: {
           family: 'Times New Roman',
         },
@@ -159,12 +95,12 @@ export default function SBS96(rawData, sample, tab) {
       linecolor: '#D3D3D3',
       linewidth: 1,
       mirror: 'all',
-      tickformat: maxMutation > 1000 ? '~s' : '',
+      tickformat: apiData[0].contribution ? '.1%' : '~s',
       showgrid: true,
       gridcolor: '#F5F5F5',
     },
 
-    shapes: shapes,
+    shapes: mutationShapes,
     annotations: [...mutationAnnotation, sampleAnnotation],
   };
 

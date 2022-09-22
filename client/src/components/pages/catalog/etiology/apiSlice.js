@@ -4,6 +4,7 @@ import TMB from '../../../controls/plotly/tmb/tmb';
 import SBS96 from '../../../controls/plotly/mutationalProfiles/sbs96';
 import DBS78 from '../../../controls/plotly/mutationalProfiles/dbs78';
 import ID83 from '../../../controls/plotly/mutationalProfiles/id83';
+import CN48 from '../../../controls/plotly/mutationalProfiles/cn48';
 
 export const etiologyApiSlice = catalogApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -13,7 +14,7 @@ export const etiologyApiSlice = catalogApiSlice.injectEndpoints({
         params,
       }),
     }),
-    etiologyData: builder.query({
+    etiologyDistribtuion: builder.query({
       query: (params) => ({
         url: 'signatureEtiology',
         params,
@@ -51,22 +52,20 @@ export const etiologyApiSlice = catalogApiSlice.injectEndpoints({
           .filter((e) => e.medianBurden)
           .sort((a, b) => a.medianBurden - b.medianBurden);
 
-        return {
-          distributionPlot: TMB(transform, '', arg.signatureName),
-          data: transform,
-        };
+        return TMB(transform, '', arg.signatureName);
       },
     }),
-    etiologyProfile: builder.query({
-      query: (params) => ({
-        url: 'signatureEtiology',
+    etiologySignature: builder.query({
+      query: ({ profile, ...params }) => ({
+        url: 'mutational_signature',
         params,
       }),
-      transformResponse: (data, _, arg) => {
-        if (arg.signatureName.includes(/sbs/gi)) return SBS96(data);
-        else if (arg.signatureName.includes(/dbs/gi)) return DBS78(data);
-        else if (arg.signatureName.includes(/id/gi)) return ID83(data);
-        else throw 'No supported profiles for ' + arg.signatureName;
+      transformResponse: (data, _, params) => {
+        if (params.profile == 'SBS96') return SBS96(data);
+        else if (params.profile == 'DBS78') return DBS78(data);
+        else if (params.profile == 'ID83') return ID83(data);
+        else if (params.profile == 'CN48') return CN48(data);
+        else return false;
       },
     }),
     thumbnails: builder.query({
@@ -81,7 +80,7 @@ export const etiologyApiSlice = catalogApiSlice.injectEndpoints({
 
 export const {
   useEtiologyOptionsQuery,
-  useEtiologyDataQuery,
-  useEtiologyProfileQuery,
+  useEtiologyDistribtuionQuery,
+  useEtiologySignatureQuery,
   useThumbnailsQuery,
 } = etiologyApiSlice;

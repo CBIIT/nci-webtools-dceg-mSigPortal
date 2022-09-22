@@ -15,7 +15,7 @@ export default function EtiologyOptions({ data }) {
 
   return (
     <div className="mb-3">
-      <h5 className="separator">{data[0].etiologyDisplay}</h5>
+      <h5 className="separator">{data[0].json.etiologyDisplay}</h5>
       {data ? (
         <Row className="justify-content-center">
           {[...new Set(data.map((e) => e.etiology))].sort().map((e) => (

@@ -272,7 +272,7 @@ export const schema = [
       table.integer('signatureSize');
     },
     index: (table) => {
-      table.index(['study', 'strategy', 'cancer', 'signatureSetName']);
+      table.index(['study', 'strategy', 'signatureName', 'signatureSetName']);
     },
   },
 
