@@ -185,7 +185,7 @@ export default function SignatureInfo({ data }) {
     : '';
 
   return (
-    <Container fluid="xl" className="p-3">
+    <Container fluid className="p-3">
       {metadata && (
         <div>
           <div>
