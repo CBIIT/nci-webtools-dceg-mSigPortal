@@ -52,6 +52,27 @@ export function defaultFilter2(filterOptions) {
     : filterOptions[0];
 }
 
+export function defaultSignatureSet(signatureSetOptions) {
+  const options = signatureSetOptions.map(({ value }) => value);
+  return options.includes('NA')
+    ? { label: 'NA', value: 'NA' }
+    : signatureSetOptions[0];
+}
+
+export function defaultStrategy(strategyOptions) {
+  const options = strategyOptions.map(({ value }) => value);
+  return options.includes('NA')
+    ? { label: 'NA', value: 'NA' }
+    : strategyOptions[0];
+}
+
+export function defaultSignatureName(signatureNameOptions) {
+  const options = signatureNameOptions.map(({ value }) => value);
+  return options.includes('NA')
+    ? { label: 'NA', value: 'NA' }
+    : signatureNameOptions[0];
+}
+
 export function getJSON(path) {
   return fetch(`web/getFileS3`, {
     method: 'POST',

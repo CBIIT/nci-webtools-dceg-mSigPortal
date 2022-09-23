@@ -11,7 +11,13 @@ import { useForm } from 'react-hook-form';
 import Select from '../../../../controls/select/selectForm';
 import { useSignatureOptionsQuery } from '../../../../../services/store/rootApi';
 import { useRsProfileOptionsQuery, useRsProfileDataQuery } from './apiSlice';
-import { defaultProfile2, defaultMatrix2 } from '../../../../../services/utils';
+import {
+  defaultProfile2,
+  defaultMatrix2,
+  defaultSignatureSet,
+  defaultStrategy,
+  defaultSignatureName,
+} from '../../../../../services/utils';
 
 const actions = { ...catalogActions, ...modalActions };
 
@@ -185,19 +191,27 @@ export default function ProfileFormPlot({ options, index }) {
     const profile = defaultProfile2(profiles);
     const matrices = matrixOptions(source, profile);
     const matrix = defaultMatrix2(profile, matrices);
-    const signatureSetName = referenceSignatureSetOption(
+    const signatureSetNames = referenceSignatureSetOption(
       source,
       profile,
       matrix
     );
-    const strategy = strategyOptions(source, profile, matrix, signatureSetName);
-    const signatureName = signatureNameOptions(
+    const signatureSetName = defaultSignatureSet(signatureSetNames);
+    const strategies = strategyOptions(
+      source,
+      profile,
+      matrix,
+      signatureSetName
+    );
+    const strategy = defaultStrategy(strategies);
+    const signatureNames = signatureNameOptions(
       source,
       profile,
       matrix,
       signatureSetName,
       strategy
     );
+    const signatureName = defaultSignatureName(signatureNames);
     console.log(source);
     console.log(profile);
     console.log(matrices);
@@ -211,72 +225,66 @@ export default function ProfileFormPlot({ options, index }) {
     setValue('signatureSetName', signatureSetName);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
-    // mergeRsProfiles({
-    //   source,
-    //   profile,
-    //   matrix,
-    //   signatureSetName,
-    //   strategy,
-    //   signatureName,
-    // });
+
   }
 
   function handleProfile(profile) {
     const matrices = matrixOptions(source, profile);
     const matrix = defaultMatrix2(profile, matrices);
-    const signatureSetName = referenceSignatureSetOption(
+    const signatureSetNames = referenceSignatureSetOption(
       source,
       profile,
       matrix
     );
-    const strategy = strategyOptions(source, profile, matrix, signatureSetName);
-    const signatureName = signatureNameOptions(
+    const signatureSetName = defaultSignatureSet(signatureSetNames);
+    const strategies = strategyOptions(
+      source,
+      profile,
+      matrix,
+      signatureSetName
+    );
+    const strategy = defaultStrategy(strategies);
+    const signatureNames = signatureNameOptions(
       source,
       profile,
       matrix,
       signatureSetName,
       strategy
     );
-    console.log(profile);
-    console.log(matrix);
-    console.log(matrices);
-    console.log(signatureSetName);
-    console.log(strategy);
-    console.log(signatureName);
+    const signatureName = defaultSignatureName(signatureNames);
+
 
     setValue('profile', profile);
     setValue('matrix', matrix);
     setValue('signatureSetName', signatureSetName);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
-    // mergeRsProfiles({
-    //   profile,
-    //   matrix,
-    //   signatureSetName,
-    //   strategy,
-    //   signatureName,
-    // });
+
   }
 
   function handleMatrix(matrix) {
-    const signatureSetName = referenceSignatureSetOption(
+    const signatureSetNames = referenceSignatureSetOption(
       source,
       profile,
       matrix
     );
-    const strategy = strategyOptions(source, profile, matrix, signatureSetName);
-    const signatureName = signatureNameOptions(
+    const signatureSetName = defaultSignatureSet(signatureSetNames);
+    const strategies = strategyOptions(
+      source,
+      profile,
+      matrix,
+      signatureSetName
+    );
+    const strategy = defaultStrategy(strategies);
+    const signatureNames = signatureNameOptions(
       source,
       profile,
       matrix,
       signatureSetName,
       strategy
     );
-    console.log(profile);
-    console.log(matrix);
-    console.log(signatureSetName);
-    console.log(strategy);
-    console.log(signatureName);
+    const signatureName = defaultSignatureName(signatureNames);
+
 
     setValue('matrix', matrix);
     setValue('signatureSetName', signatureSetName);
@@ -291,14 +299,21 @@ export default function ProfileFormPlot({ options, index }) {
   }
 
   function handleSet(signatureSetName) {
-    const strategy = strategyOptions(source, profile, matrix, signatureSetName);
-    const signatureName = signatureNameOptions(
+    const strategies = strategyOptions(
+      source,
+      profile,
+      matrix,
+      signatureSetName
+    );
+    const strategy = defaultStrategy(strategies);
+    const signatureNames = signatureNameOptions(
       source,
       profile,
       matrix,
       signatureSetName,
       strategy
     );
+    const signatureName = defaultSignatureName(signatureNames);
 
     console.log(profile);
     console.log(matrix);
@@ -310,15 +325,18 @@ export default function ProfileFormPlot({ options, index }) {
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
 
-    // mergeRsProfiles({
-    //   signatureSetName,
-    //   strategy,
-    //   signatureName,
-    // });
+
   }
 
   function handleStrategy(strategy) {
-    const signatureName = signatureNameOptions(strategy);
+    const signatureNames = signatureNameOptions(
+      source,
+      profile,
+      matrix,
+      signatureSetName,
+      strategy
+    );
+    const signatureName = defaultSignatureName(signatureNames);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
     // mergeRsProfiles({
