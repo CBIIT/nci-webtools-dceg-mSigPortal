@@ -85,7 +85,7 @@ export default function ProfileFormPlot({ options, index }) {
 
   const signatureSourceOptions = optiondata
     ? [...new Set(optiondata.map((e) => e.source))]
-        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+        .sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))
         .map((e) => ({
           label: e,
           value: e,
@@ -212,20 +212,13 @@ export default function ProfileFormPlot({ options, index }) {
       strategy
     );
     const signatureName = defaultSignatureName(signatureNames);
-    console.log(source);
-    console.log(profile);
-    console.log(matrices);
-    console.log(matrix);
-    console.log(signatureSetName);
-    console.log(strategy);
-    console.log(signatureName);
+
     setValue('source', source);
     setValue('profile', profile);
     setValue('matrix', matrix);
     setValue('signatureSetName', signatureSetName);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
-
   }
 
   function handleProfile(profile) {
@@ -253,13 +246,11 @@ export default function ProfileFormPlot({ options, index }) {
     );
     const signatureName = defaultSignatureName(signatureNames);
 
-
     setValue('profile', profile);
     setValue('matrix', matrix);
     setValue('signatureSetName', signatureSetName);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
-
   }
 
   function handleMatrix(matrix) {
@@ -285,17 +276,10 @@ export default function ProfileFormPlot({ options, index }) {
     );
     const signatureName = defaultSignatureName(signatureNames);
 
-
     setValue('matrix', matrix);
     setValue('signatureSetName', signatureSetName);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
-    // mergeRsProfiles({
-    //   matrix,
-    //   signatureSetName,
-    //   strategy,
-    //   signatureName,
-    // });
   }
 
   function handleSet(signatureSetName) {
@@ -315,17 +299,9 @@ export default function ProfileFormPlot({ options, index }) {
     );
     const signatureName = defaultSignatureName(signatureNames);
 
-    console.log(profile);
-    console.log(matrix);
-    console.log(signatureSetName);
-    console.log(strategy);
-    console.log(signatureName);
-
     setValue('signatureSetName', signatureSetName);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
-
-
   }
 
   function handleStrategy(strategy) {
