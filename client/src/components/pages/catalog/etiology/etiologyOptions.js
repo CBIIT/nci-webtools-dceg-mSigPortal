@@ -13,35 +13,54 @@ export default function EtiologyOptions({ data }) {
 
   const { category, etiology } = useSelector((state) => state.catalog.etiology);
 
+  // use natural sort
+  // order "CN:" prefixed etiologies to the end
+  function etiologySort(a, b) {
+    if (a.includes('CN:')) {
+      return 1;
+    } else if (b.includes('CN:')) {
+      return -1;
+    } else if (a)
+      return a.localeCompare(b, undefined, {
+        numeric: true,
+        sensitivity: 'base',
+      });
+    else {
+      return 0;
+    }
+  }
+
   return (
     <div className="mb-3">
       <h5 className="separator">{data[0].json.etiologyDisplay}</h5>
       {data ? (
         <Row className="justify-content-center">
-          {[...new Set(data.map((e) => e.etiology))].sort().map((e) => (
-            <Col
-              key={e}
-              lg={category == 'GeneEdits' ? '1' : '2'}
-              md="3"
-              sm="4"
-              className="mb-3 d-flex"
-            >
-              <Button
-                size="sm"
-                variant="dark"
-                onClick={() =>
-                  mergeEtiology({
-                    etiology: e,
-                    signature: '',
-                  })
-                }
-                className={etiology != e ? 'disabled' : ''}
-                block
+          {[...new Set(data.map((e) => e.etiology))]
+            .sort(etiologySort)
+            .map((e) => (
+              <Col
+                key={e}
+                lg={category == 'GeneEdits' ? '1' : '2'}
+                md="3"
+                sm="4"
+                className="mb-3 d-flex"
               >
-                {e}
-              </Button>
-            </Col>
-          ))}
+                <Button
+                  size="sm"
+                  variant="dark"
+                  onClick={() =>
+                    mergeEtiology({
+                      etiology: e,
+                      signature: '',
+                    })
+                  }
+                  className={etiology != e ? 'disabled' : ''}
+                  block
+                >
+                  {e}
+                </Button>
+              </Col>
+            ))}
         </Row>
       ) : (
         <div style={{ minHeight: '100px' }}>
