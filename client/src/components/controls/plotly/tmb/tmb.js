@@ -55,7 +55,7 @@ export default function TMB(data, tmbTabName, signatureName) {
       size: 0,
       color: ['green'],
     },
-    name: 'Total Samples in Cancer Type',
+    name: 'Total Samples',
   };
 
   const topLabel = data.map((element, index, array) => ({
@@ -197,16 +197,12 @@ export default function TMB(data, tmbTabName, signatureName) {
   const labels = topLabel.map((e) => e.text);
   const longest = labels.reduce((a, e) => (a > e.length ? a : e.length), 0);
   const extraMargin = longest < 10 ? 60 : longest * 7;
-
-  //console.log(labels);
-  //console.log(longest);
-  //console.log(extraMargin);
-
+  console.log(labels);
   const layout = {
     width: totalCancer > 1 ? null : 350,
     autosize: true,
     height: 500,
-    legend: { orientation: 'h', x: 0, y: 1.35 },
+    legend: { orientation: 'h', x: 0.25, y: 1.35 },
     xaxis: {
       showticklabels: false,
       tickfont: {
@@ -240,15 +236,12 @@ export default function TMB(data, tmbTabName, signatureName) {
     annotations: annotations,
   };
 
-  //console.log('layout:');
-  //console.log(layout);
-
   var config = {
     //responsive: true,
   };
 
   return {
-    traces: [...traces, traceLabelBlue, traceLabelGreen],
+    traces: [...traces, traceLabelGreen, traceLabelBlue],
     layout: layout,
     config,
   };

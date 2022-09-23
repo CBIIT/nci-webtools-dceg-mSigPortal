@@ -129,10 +129,11 @@ export default function MSPrevalence(groupBySignature, mutation) {
     marker: {
       color: colors[group.signatureName.replace(/^\D*/, '').replace(')', '')],
     },
-    x:
-      group.signatureName.length > 10
-        ? [group.signatureName.substring(0, 10) + '...']
-        : [group.signatureName],
+    // x:
+    //   group.signatureName.length > 10
+    //     ? [group.signatureName.substring(0, 10) + '...']
+    //     : [group.signatureName],
+    x: [group.signatureName],
 
     y: [
       group.samples.filter((e) => e.exposure >= minumumNumber).length /
@@ -226,13 +227,17 @@ export default function MSPrevalence(groupBySignature, mutation) {
     titleAnnotations = [...titleAnnotation];
   }
 
-  const names = groupBySignature.map((group) => ({
-    signatureName:
-      group.signatureName.length > 10
-        ? group.signatureName.substring(0, 10) + '...'
-        : group.signatureName,
-  }));
+  const names = groupBySignature.map(
+    (group) => group.signatureName
+    // group.signatureName.length > 10
+    //   ? group.signatureName.substring(0, 10) + '...'
+    //   : group.signatureName,
+  );
+  const longest = names.reduce((a, e) => (a > e.length ? a : e.length), 0);
+  const extraMargin = longest < 10 ? 60 : longest * 7;
+
   console.log(names);
+  console.log(extraMargin);
   const layout = {
     grid: { rows: 1, columns: 2 },
     hoverlabel: { bgcolor: '#FFF' },
@@ -271,7 +276,9 @@ export default function MSPrevalence(groupBySignature, mutation) {
       showgrid: true,
       gridcolor: '#F5F5F5',
     },
-
+    margin: {
+      b: extraMargin,
+    },
     annotations: titleAnnotations,
   };
 
