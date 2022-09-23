@@ -7,7 +7,6 @@ import {
   Popover,
   OverlayTrigger,
 } from 'react-bootstrap';
-import Plot from 'react-plotly.js';
 import Select from '../../../controls/select/selectForm';
 import { useForm, Controller } from 'react-hook-form';
 import { NavHashLink } from 'react-router-hash-link';
@@ -20,13 +19,9 @@ import {
   usePcSignatureSetsQuery,
   usePcSignatureNamesQuery,
 } from './apiSlice';
-import { cloneDeep } from 'lodash';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import { defaultMatrix } from '../../../../services/utils';
-import pcReferenceSamples_SBS from '../../../controls/plotly/profileComparision/pcBetweenSamples_SBS';
-import pcBetweenSamples_DBS from '../../../controls/plotly/profileComparision/pcBetweenSamples_DBS';
-import pcBetweenSamples_ID from '../../../controls/plotly/profileComparision/pcBetweenSamples_ID';
+import Plotly from '../../../controls/plotly/plot/plot';
 
 export default function PcReference() {
   const dispatch = useDispatch();
@@ -39,7 +34,7 @@ export default function PcReference() {
     );
 
   const { study, cancer, strategy } = store.publicForm;
-  const { source, matrixData, svgList, matrixList, projectID } = store.main;
+  const { source, matrixData, matrixList, projectID } = store.main;
   const { referenceForm } = store.profileComparison;
 
   // main form
@@ -391,12 +386,11 @@ export default function PcReference() {
           <>
             <hr />
 
-            <Plot
+            <Plotly
               className="w-100"
-              data={cloneDeep(data.traces)}
-              layout={cloneDeep(data.layout)}
-              config={cloneDeep(data.config)}
-              useResizeHandler
+              data={data.traces}
+              layout={data.layout}
+              config={data.config}
             />
             <div className="p-3">
               <p>

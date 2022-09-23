@@ -152,8 +152,8 @@ export default function PcReference() {
               compare: compare,
               matrixFile: matrixList.filter(
                 (e) =>
-                  e.profileType == profile.value &&
-                  e.matrixSize ==
+                  e.profile == profile.value &&
+                  e.matrix ==
                     defaultMatrix(profile.value, ['96', '78', '83'])
               )[0].Path,
             },

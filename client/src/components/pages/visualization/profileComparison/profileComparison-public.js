@@ -39,7 +39,7 @@ export default function PcWithin() {
       ? [
           ...new Set(
             svgList
-              .filter((e) => e.profileType == profile.value)
+              .filter((e) => e.profile == profile.value)
               .map((e) => e.sample)
           ),
         ].map((e) => ({

@@ -14,8 +14,7 @@ import TreeAndLeaf from './treeLeaf/treeLeaf';
 import CosineSimilarity from './cosineSimilarity/cosineSimilarity';
 import MutationalPattern from './mutationalPattern/mutationalPattern';
 import MutationalPattern2 from './mutationalPattern2/mutationalPattern';
-import ProfileComparison from './profileComparison/profileComparison';
-import ProfileComparison2 from './profileComparison2/profileComparison';
+import ProfileComparison from './profileComparison2/profileComparison';
 import PCA from './pca';
 import PCA2 from './pca/pca';
 import Kataegis from './kataegis';
@@ -24,14 +23,9 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
-import {
-  defaultProfile,
-  defaultMatrix,
-  defaultFilter,
-} from '../../../services/utils';
 import './visualization.scss';
 
-import MultationalProfilesTest from './test/multationalProfilesTest';
+// import MultationalProfilesTest from './test/multationalProfilesTest';
 
 const actions = { ...visualizationActions, ...modalActions };
 const { Group, Label, Check } = Form;
@@ -371,8 +365,7 @@ export default function Visualization({ match }) {
     {
       name: 'Profile Comparison',
       id: 'profileComparison',
-      component:
-        source == 'user' ? <ProfileComparison /> : <ProfileComparison2 />,
+      component: <ProfileComparison />,
     },
     {
       name: 'PCA',

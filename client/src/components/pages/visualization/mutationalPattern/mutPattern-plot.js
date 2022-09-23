@@ -25,7 +25,7 @@ export default function MutProfilePlot() {
               fn: 'mutationalPattern',
               args: {
                 matrixFile: matrixList.filter(
-                  (e) => e.profileType == 'SBS' && e.matrixSize == '96'
+                  (e) => e.profile == 'SBS' && e.matrix == '96'
                 )[0].Path,
                 proportion: parseFloat(proportion),
                 pattern: pattern,

@@ -3,7 +3,6 @@ import pcBetweenSamples_SBS from '../../../controls/plotly/profileComparision/pc
 import pcBetweenSamples_DBS from '../../../controls/plotly/profileComparision/pcBetweenSamples_DBS';
 import pcBetweenSamples_ID from '../../../controls/plotly/profileComparision/pcBetweenSamples_ID';
 import { groupBy } from 'lodash';
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query';
 
 export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -80,20 +79,6 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
           return { error };
         }
       },
-
-      // async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
-      //   console.log(_arg);
-
-      //   const { data: spectrumData, error: spectrumError } = await fetchWithBQ(
-      //     'mutational_spectrum?' + new URLSearchParams(_arg.params_spectrum)
-      //   );
-      //   if (spectrumError) return { error: spectrumError };
-
-      //   const { data: signatureData, error: signatureError } =
-      //     await fetchWithBQ(
-      //       'mutational_signature?' + new URLSearchParams(_arg.params_signature)
-      //     );
-      //   if (signatureError) return { error: signatureError };
     }),
 
     profileComparisonPublic: builder.query({

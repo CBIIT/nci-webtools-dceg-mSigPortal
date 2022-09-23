@@ -1,7 +1,7 @@
 import { Nav, Tab } from 'react-bootstrap';
 import CsWithin from './cosineSimilarity-within';
 import CsReference from './cosineSimilarity-reference';
-// import CsPublic from './cosineSimilarity-public';
+import CsPublic from './cosineSimilarity-public';
 import { useSelector, useDispatch } from 'react-redux';
 import { NavHashLink } from 'react-router-hash-link';
 import { actions } from '../../../../services/store/visualization';
@@ -66,7 +66,7 @@ export default function CosineSimilarity() {
           </Tab.Pane>
           {source == 'user' && (
             <Tab.Pane key="public" eventKey="public" className="border-0">
-              {/* <CsPublic /> */}
+              <CsPublic />
             </Tab.Pane>
           )}
         </Tab.Content>

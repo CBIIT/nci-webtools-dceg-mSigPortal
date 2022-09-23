@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import Plot from 'react-plotly.js';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import Select from '../../../controls/select/selectForm';
 import { useForm } from 'react-hook-form';
@@ -7,10 +6,8 @@ import { NavHashLink } from 'react-router-hash-link';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions } from '../../../../services/store/visualization';
 import { useProfileComparisonWithinQuery } from './apiSlice';
-import { cloneDeep } from 'lodash';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import SvgContainer from '../../../controls/svgContainer/svgContainer';
-import { defaultMatrix } from '../../../../services/utils';
+import Plotly from '../../../controls/plotly/plot/plot';
 
 export default function PcWithin() {
   const dispatch = useDispatch();
@@ -23,7 +20,7 @@ export default function PcWithin() {
     );
 
   const { study, cancer, strategy } = store.publicForm;
-  const { source, matrixData, svgList, matrixList, projectID } = store.main;
+  const { source, matrixData, projectID } = store.main;
   const { withinForm } = store.profileComparison;
 
   const [params, setParams] = useState(null);
@@ -74,9 +71,14 @@ export default function PcWithin() {
   function onSubmit(data) {
     mergeForm(data);
     const params = {
-      study: study.value,
-      cancer: cancer.value,
-      strategy: strategy.value,
+      ...(source == 'public' && {
+        study: study.value,
+        cancer: cancer.value,
+        strategy: strategy.value,
+      }),
+
+      ...(source == 'user' && { userId: projectID }),
+
       profile: data.profile.value,
       matrix:
         data.profile.value === 'SBS'
@@ -171,13 +173,11 @@ export default function PcWithin() {
         {data && (
           <>
             <hr />
-
-            <Plot
+            <Plotly
               className="w-100"
-              data={cloneDeep(data.traces)}
-              layout={cloneDeep(data.layout)}
-              config={cloneDeep(data.config)}
-              useResizeHandler
+              data={data.traces}
+              layout={data.layout}
+              config={data.config}
             />
             <div className="p-3">
               <p>

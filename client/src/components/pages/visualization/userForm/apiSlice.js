@@ -26,8 +26,8 @@ export const userFormApiSlice = visualizationApiSlice.injectEndpoints({
         const matrixList = data.matrixList.map(
           ({ Profile_Type, Matrix_Size, ...e }) => ({
             ...e,
-            profileType: Profile_Type,
-            matrixSize: Matrix_Size,
+            profile: Profile_Type,
+            matrix: Matrix_Size,
           })
         );
         return { ...data, matrixList };

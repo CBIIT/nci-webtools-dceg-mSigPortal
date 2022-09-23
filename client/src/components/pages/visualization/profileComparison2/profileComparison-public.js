@@ -39,7 +39,7 @@ export default function PcWithin() {
       ? [
           ...new Set(
             svgList
-              .filter((e) => e.profileType == profile.value)
+              .filter((e) => e.profile == profile.value)
               .map((e) => e.sample)
           ),
         ].map((e) => ({
@@ -55,7 +55,7 @@ export default function PcWithin() {
   const { profile, sample1, sample2 } = watch();
 
   const profileOptions = svgList.length
-    ? [...new Set(svgList.map((e) => e.profileType))].map((e) => ({
+    ? [...new Set(svgList.map((e) => e.profile))].map((e) => ({
         label: e,
         value: e,
       }))

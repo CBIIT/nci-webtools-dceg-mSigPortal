@@ -9,9 +9,10 @@ import { useCosineWithinQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import Description from '../../../controls/description/description';
-import { defaultMatrix2 } from '../../../../services/utils';
+import { defaultMatrix2, defaultMatrix } from '../../../../services/utils';
+import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
 
-export default function CsWithin() {
+export default function CsPublic() {
   const dispatch = useDispatch();
   const store = useSelector((state) => state.visualization);
   const mergeForm = (state) =>
@@ -21,8 +22,7 @@ export default function CsWithin() {
       })
     );
 
-  const { study, cancer, strategy } = store.publicForm;
-  const { source, matrixData, matrixList, projectID } = store.main;
+  const { matrixData, matrixList, projectID } = store.main;
   const { withinForm } = store.cosineSimilarity;
 
   const [params, setParams] = useState('');
@@ -31,8 +31,23 @@ export default function CsWithin() {
     skip: !params,
   });
 
-  function getMatrixOptions(profile) {
-    return matrixData && profile
+  const { data: publicOptions } = useSeqmatrixOptionsQuery();
+
+  const { control, handleSubmit, watch, setValue } = useForm({
+    defaultValues: withinForm,
+  });
+
+  const { profile, matrix, study, cancer } = watch();
+
+  const profileOptions = matrixData.length
+    ? [...new Set(matrixData.map((e) => e.profile))].map((e) => ({
+        label: e,
+        value: e,
+      }))
+    : [];
+
+  const matrixOptions = (profile) =>
+    matrixData && profile
       ? [
           ...new Set(
             matrixData
@@ -46,63 +61,70 @@ export default function CsWithin() {
             value: e,
           }))
       : [];
-  }
 
-  const { control, handleSubmit, watch, setValue } = useForm({
-    defaultValues: withinForm,
-  });
-
-  const { profile, matrix } = watch();
-
-  const profileOptions = matrixData.length
-    ? [...new Set(matrixData.map((e) => e.profile))].map((e) => ({
+  const studyOptions = publicOptions.length
+    ? [...new Set(publicOptions.map((e) => e.study))].map((e) => ({
         label: e,
         value: e,
       }))
     : [];
 
-  const matrixOptions = getMatrixOptions(profile);
+  const cancerOptions = (study) =>
+    publicOptions && study
+      ? [
+          ...new Set(
+            publicOptions
+              .filter((e) => e.study == study.value)
+              .map((e) => e.cancer)
+          ),
+        ]
+          .sort((a, b) => a - b)
+          .map((e) => ({
+            label: e,
+            value: e,
+          }))
+      : [];
 
   // set inital parameters
   useEffect(() => {
     if (!profile && profileOptions.length) handleProfile(profileOptions[0]);
   }, [profileOptions]);
+  useEffect(() => {
+    if (!study && studyOptions.length) handleStudy(studyOptions[0]);
+  }, [studyOptions]);
 
   function onSubmit(data) {
     mergeForm(data);
-    const params =
-      source == 'user'
-        ? {
-            fn: 'cosineSimilarityWithin',
-            args: {
-              matrixFile: matrixList.filter(
-                (e) =>
-                  e.profile == data.profile.value &&
-                  e.matrix == data.matrix.value
-              )[0].Path,
-            },
-            projectID,
-          }
-        : {
-            fn: 'cosineSimilarityWithinPublic',
-            args: {
-              profileType: data.profile.value,
-              matrixSize: data.matrix.value,
-              study: study.value,
-              cancerType: cancer.value,
-              experimentalStrategy: strategy.value,
-            },
-            projectID,
-          };
+    const params = {
+      fn: 'cosineSimilarityPublic',
+      args: {
+        profileName: data.profile.value + data.matrix.value,
+        study: data.study.value,
+        cancerType: data.cancer.value,
+        matrixFile: matrixList.filter(
+          (e) =>
+            e.profile == data.profile.value &&
+            e.matrix == defaultMatrix(data.profile.value, ['96', '78', '83'])
+        )[0].Path,
+      },
+      projectID,
+    };
     setParams(params);
   }
 
   function handleProfile(e) {
-    const matrixOptions = getMatrixOptions(e);
-
+    const matrices = matrixOptions(e);
     setValue('profile', e);
-    if (matrixOptions.length) {
-      setValue('matrix', defaultMatrix2(e, matrixOptions));
+    if (matrices.length) {
+      setValue('matrix', defaultMatrix2(e, matrices));
+    }
+  }
+
+  function handleStudy(e) {
+    const cancers = cancerOptions(e);
+    setValue('study', e);
+    if (cancers.length) {
+      setValue('cancer', cancers[0]);
     }
   }
 
@@ -146,17 +168,36 @@ export default function CsWithin() {
           </Col>
           <Col lg="auto">
             <Select
-              disabled={!matrixOptions.length}
+              disabled={!profile}
               name="matrix"
               label="Matrix Size"
-              options={matrixOptions}
+              options={matrixOptions(profile)}
+              control={control}
+            />
+          </Col>
+          <Col lg="auto">
+            <Select
+              disabled={!studyOptions.length}
+              name="study"
+              label="Study"
+              options={studyOptions}
+              onChange={handleStudy}
+              control={control}
+            />
+          </Col>
+          <Col lg="auto">
+            <Select
+              disabled={!study}
+              name="cancer"
+              label="Cancer Type"
+              options={cancerOptions(study)}
               control={control}
             />
           </Col>
           <Col lg="auto" className="d-flex">
             <Button
               className="mt-auto mb-3"
-              disabled={!profile || !matrix}
+              disabled={!profile || !matrix || !study || !cancer}
               variant="primary"
               type="submit"
             >

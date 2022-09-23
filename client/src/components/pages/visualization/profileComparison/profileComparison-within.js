@@ -78,8 +78,8 @@ export default function PcWithin() {
               sampleName2: data.sample2.value,
               matrixFile: matrixList.filter(
                 (e) =>
-                  e.profileType == data.profile.value &&
-                  e.matrixSize ==
+                  e.profile == data.profile.value &&
+                  e.matrix ==
                     defaultMatrix(data.profile.value, ['96', '78', '83'])
               )[0].Path,
             },
