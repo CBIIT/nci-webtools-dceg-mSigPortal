@@ -10,13 +10,13 @@ export const etiologyApiSlice = catalogApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     etiologyOptions: builder.query({
       query: (params) => ({
-        url: 'signatureEtiologyOptions',
+        url: 'signature_etiology_options',
         params,
       }),
     }),
     etiologyDistribtuion: builder.query({
       query: (params) => ({
-        url: 'signatureEtiology',
+        url: 'signature_etiology',
         params,
       }),
       transformResponse: (data, _, arg) => {
