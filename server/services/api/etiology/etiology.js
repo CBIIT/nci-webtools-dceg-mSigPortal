@@ -45,8 +45,8 @@ async function queryEtiology(req, res, next) {
 
 const router = Router();
 
-router.get('/signatureEtiologyOptions', queryEtiologyOptions);
+router.get('/signature_etiology_options', queryEtiologyOptions);
 
-router.get('/signatureEtiology', queryEtiology);
+router.get('/signature_etiology', queryEtiology);
 
 module.exports = { router, queryEtiologyOptions };

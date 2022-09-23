@@ -45,7 +45,7 @@ export default function DBS78(apiData) {
   }));
 
   const sampleAnnotation = createSampleAnnotation(apiData);
-  const mutationAnnotation = createMutationAnnotations(data);
+  const mutationAnnotation = createMutationAnnotations(data, '>NN');
   const mutationShapes = createMutationShapes(data, colors);
 
   const layout = {

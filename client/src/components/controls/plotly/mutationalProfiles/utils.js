@@ -69,7 +69,7 @@ export function createMutationShapes(data, colors) {
   }));
 }
 
-export function createMutationAnnotations(data) {
+export function createMutationAnnotations(data, appendedText = '') {
   return data.map((group, groupIndex, array) => ({
     xref: 'x',
     yref: 'paper',
@@ -81,7 +81,7 @@ export function createMutationAnnotations(data) {
         .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
       (group.data.length - 1) * 0.5,
     y: 1.04,
-    text: `<b>${group.mutation}>NN</b>`,
+    text: `<b>${group.mutation + appendedText}</b>`,
     showarrow: false,
     font: { size: 18 },
     align: 'center',

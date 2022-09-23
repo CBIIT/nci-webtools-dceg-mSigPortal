@@ -1,6 +1,6 @@
-import { getMaxMutations } from './utils';
+import { getMaxMutations, createSampleAnnotation } from './utils';
 
-export default function CN48(apiData, sample) {
+export default function CN48(apiData) {
   const colors = {
     '0:0-100kb': '#F0F8FF',
     '0:100kb-1Mb': '#787CE6',
@@ -238,21 +238,7 @@ export default function CN48(apiData, sample) {
       align: 'center',
     })
   );
-  const sampleAnnotation = {
-    xref: 'paper',
-    yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'bottom',
-    x: 0.01,
-    y: 0.88,
-    text: '<b>' + sample + '</b>',
-    showarrow: false,
-    font: {
-      size: 24,
-      family: 'Arial',
-    },
-    align: 'center',
-  };
+  const sampleAnnotation = createSampleAnnotation(apiData);
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     height: 500,
