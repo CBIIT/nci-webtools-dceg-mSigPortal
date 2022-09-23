@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const { randomUUID } = require('crypto');
 const { validate } = require('uuid');
-const { spawn } = require('promisify-child-process');
+const { spawn } = require('child_process');
 const fs = require('fs-extra');
 const path = require('path');
 const glob = require('glob');
@@ -88,46 +88,72 @@ function getRelativePath(paths, id = '') {
 }
 
 async function profilerExtraction(params) {
-  const projectPath = path.join(config.results.folder, params.projectID[1]);
-  // update path
-  params.outputDir[1] = path.join(projectPath, 'results');
+  return new Promise((resolve, reject) => {
+    const projectPath = path.join(config.results.folder, params.projectID[1]);
+    // update path
+    params.outputDir[1] = path.join(projectPath, 'results');
 
-  const args = Object.values(params);
-  const cli = args.reduce((params, arg) => [...params, ...arg]);
+    logger.debug(projectPath);
+    const args = Object.values(params);
+    const cli = args.reduce((params, arg) => [...params, ...arg]);
 
-  logger.debug('/profilerExtraction: CLI args\n' + cli.join(' '));
+    logger.debug('/profilerExtraction: CLI args\n' + cli.join(' '));
 
-  try {
-    const { stdout, stderr } = await spawn(
+    let scriptOutput;
+    const pythonProcess = spawn(
       'python3',
       ['services/python/mSigPortal_Profiler_Extraction.py', ...cli],
       { encoding: 'utf8' }
     );
 
-    // parse matrix files and transform into single json file
-    const matrixFiles = path.join(projectPath, 'results/output');
-    const matrices = await getMatrices(matrixFiles);
-    const matricesFile = path.join(projectPath, 'matrices.json');
-    fs.writeFileSync(matricesFile, JSON.stringify(matrices));
+    pythonProcess.stdout.setEncoding('utf8');
+    pythonProcess.stdout.on('data', (data) => {
+      scriptOutput += data.toString();
+    });
 
-    return { stdout, stderr, projectPath, matrices };
-  } catch (error) {
-    // const error = { code, signal, stdout, stderr };
-    logger.info('Profiler Extraction Error');
-    throw error;
-  }
+    pythonProcess.stderr.setEncoding('utf8');
+    pythonProcess.stderr.on('data', (data) => {
+      scriptOutput += data.toString();
+    });
+
+    pythonProcess.on('error', (error) => {
+      logger.error('Profiler Extraction Error');
+      logger.error(error);
+      return reject({ scriptOutput, error });
+    });
+
+    pythonProcess.on('close', async (code) => {
+      if (code == 0) {
+        try {
+          // parse matrix files and transform into single json file
+          const matrixFiles = path.join(projectPath, 'results/output');
+          const matrices = await getMatrices(matrixFiles);
+          const matricesFile = path.join(projectPath, 'matrices.json');
+          fs.writeFileSync(matricesFile, JSON.stringify(matrices));
+
+          resolve({ scriptOutput, projectPath, matrices });
+        } catch (error) {
+          logger.error('Error parsing output');
+          logger.error(scriptOutput);
+          reject({ scriptOutput, error });
+        }
+      } else {
+        logger.error('Profiler Extraction Error');
+        logger.error(scriptOutput);
+        reject({ scriptOutput });
+      }
+    });
+  });
 }
 
 // retrieves parsed data files - modify paths if needed
 async function getResultsFiles(resultsPath, id = '') {
-  const svgListPath = path.join(resultsPath, 'svg_files_list.txt');
   const statisticsPath = path.join(resultsPath, 'Statistics.txt');
   const matrixPath = path.join(resultsPath, 'matrix_files_list.txt');
   const downloadsPath = path.join(resultsPath, 'output');
   let matrixList = [];
   let statistics = '';
   let downloads = [];
-  let svgList = await parseCSV(svgListPath);
 
   if (fs.existsSync(matrixPath)) matrixList = await parseCSV(matrixPath);
   if (fs.existsSync(statisticsPath))
@@ -151,15 +177,11 @@ async function getResultsFiles(resultsPath, id = '') {
   }
 
   // convert to relative paths
-  svgList.forEach(
-    (plot) => (plot.Path = getRelativePath({ Path: plot.Path }, id).Path)
-  );
   matrixList.forEach(
     (plot) => (plot.Path = getRelativePath({ Path: plot.Path }, id).Path)
   );
 
   return {
-    svgList: svgList,
     statistics: statistics,
     matrixList: matrixList,
     downloads: downloads,
@@ -173,7 +195,7 @@ async function userProfilerExtraction(req, res, next) {
 
   try {
     const userId = req.body.projectID[1];
-    const { stdout, stderr, projectPath, matrices } = await profilerExtraction(
+    const { scriptOutput, projectPath, matrices } = await profilerExtraction(
       req.body
     );
     const resultsPath = path.join(projectPath, 'results');
@@ -186,20 +208,16 @@ async function userProfilerExtraction(req, res, next) {
 
     if (fs.existsSync(path.join(resultsPath, 'svg_files_list.txt'))) {
       res.json({
-        stdout,
-        stderr,
+        scriptOutput,
         ...(await getResultsFiles(resultsPath, userId)),
       });
     } else {
       logger.error(
         '/profilerExtraction: An Error Occured While Extracting Profiles'
       );
-      logger.error(stdout);
-      logger.error(stderr);
 
       res.status(500).json({
-        stdout,
-        stderr,
+        scriptOutput,
       });
     }
   } catch (error) {
@@ -244,14 +262,12 @@ async function visualizationWrapper(req, res, next) {
       },
     });
 
-    const { stdout, ...rest } = JSON.parse(wrapper);
-
-    logger.debug(stdout);
+    const { scriptOutput, ...rest } = JSON.parse(wrapper);
 
     // generate an id if getPublicData is called
     res.json({
       projectID: fn == 'getPublicData' ? randomUUID() : projectID,
-      stdout,
+      scriptOutput,
       ...rest,
     });
   } catch (err) {

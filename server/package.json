@@ -29,7 +29,6 @@
     "papaparse": "^5.3.1",
     "pg": "^8.7.3",
     "pm2": "^5.2.0",
-    "promisify-child-process": "^4.1.1",
     "r-wrapper": "^1.1.2",
     "replace-in-file": "^6.2.0",
     "tar": "^6.1.11",

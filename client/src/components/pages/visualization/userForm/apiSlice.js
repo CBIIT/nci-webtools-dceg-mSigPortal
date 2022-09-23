@@ -23,14 +23,6 @@ export const userFormApiSlice = visualizationApiSlice.injectEndpoints({
         body: data,
       }),
       transformResponse: (data) => {
-        const svgList = data.svgList.map(
-          ({ Sample_Name, Profile_Type, Matrix_Size, ...e }) => ({
-            ...e,
-            sample: Sample_Name,
-            profileType: Profile_Type,
-            matrixSize: Matrix_Size,
-          })
-        );
         const matrixList = data.matrixList.map(
           ({ Profile_Type, Matrix_Size, ...e }) => ({
             ...e,
@@ -38,7 +30,7 @@ export const userFormApiSlice = visualizationApiSlice.injectEndpoints({
             matrixSize: Matrix_Size,
           })
         );
-        return { ...data, svgList, matrixList };
+        return { ...data, matrixList };
       },
     }),
     userMatrix: builder.mutation({
