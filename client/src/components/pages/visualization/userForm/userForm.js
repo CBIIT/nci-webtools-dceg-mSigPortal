@@ -83,6 +83,8 @@ export default function UserForm() {
     collapse: false,
     useQueue: false,
     email: '',
+    seqInfo: false,
+    cluster: false,
   };
 
   const {
@@ -105,6 +107,8 @@ export default function UserForm() {
     filter,
     collapse,
     useQueue,
+    seqInfo,
+    cluster,
   } = watch();
 
   function handleReset() {
@@ -177,6 +181,8 @@ export default function UserForm() {
         genomeAssemblyVersion: ['-g', data.genome.value],
         strategy: ['-t', data.strategy],
         outputDir: ['-o', projectID],
+        seqInfo: ['-S', seqInfo ? 'True' : 'False'],
+        cluster: ['-C', cluster ? 'True' : 'False'],
       };
 
       // conditionally include mutation split and mutation filter params
@@ -215,21 +221,10 @@ export default function UserForm() {
 
           mergeMain({ projectID, matrixData, ...rest });
         } catch (error) {
-          if (error.originalStatus == 504) {
-            mergeMain({
-              error: 'Please Reset Your Parameters and Try again.',
-            });
-            mergeError(
-              'Your submission has timed out. Please try again by submitting this job to a queue instead.'
-            );
-          } else {
-            mergeMain({
-              error: 'Please Reset Your Parameters and Try again.',
-            });
-
-            const message = Object.values(error.data);
-            mergeError(message);
-          }
+          mergeMain({
+            error: 'Please Reset Your Parameters and Try again.',
+          });
+          mergeError(error.data.scriptOutput);
         } finally {
           mergeMain({ loading: { active: false } });
         }
@@ -238,19 +233,6 @@ export default function UserForm() {
       mergeError('An error occured while uploading files. Please try again.');
     }
   }
-
-  const msPopover = (
-    <Popover id="popover-basic">
-      <Title as="h3">Mutation Split</Title>
-      <Content>
-        <p>
-          For each sample, split mutations into different groups according to
-          the “Filter” column in VCF/CSV/TSV file. Splitting operation uses the
-          “;” as separator.
-        </p>
-      </Content>
-    </Popover>
-  );
 
   const csPopover = (
     <Popover id="popover-basic">
@@ -410,7 +392,18 @@ export default function UserForm() {
           <OverlayTrigger
             trigger="click"
             placement="top"
-            overlay={msPopover}
+            overlay={
+              <Popover id="popover-basic">
+                <Title as="h3">Mutation Split</Title>
+                <Content>
+                  <p>
+                    For each sample, split mutations into different groups
+                    according to the “Filter” column in VCF/CSV/TSV file.
+                    Splitting operation uses the “;” as separator.
+                  </p>
+                </Content>
+              </Popover>
+            }
             rootClose
           >
             <Button
@@ -599,6 +592,84 @@ export default function UserForm() {
                   ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
                 }
               />
+            )}
+          />
+        </Form.Check>
+      </Form.Group>
+      <hr className="mb-3" />
+      <Form.Group controlId="seqInfo" className="d-flex">
+        <Form.Label className="mr-auto">
+          Generate Sequence Info{' '}
+          <OverlayTrigger
+            trigger="click"
+            placement="top"
+            overlay={
+              <Popover id="popover-basic">
+                <Title as="h3">Sequence Info</Title>
+                <Content>
+                  <p>TBA</p>
+                </Content>
+              </Popover>
+            }
+            rootClose
+          >
+            <Button
+              variant="link"
+              className="p-0 font-weight-bold"
+              aria-label="about sequence info"
+            >
+              <FontAwesomeIcon
+                icon={faInfoCircle}
+                style={{ verticalAlign: 'baseline' }}
+              />
+            </Button>
+          </OverlayTrigger>
+        </Form.Label>
+        <Form.Check inline id="seqInfo">
+          <Controller
+            name="seqInfo"
+            control={control}
+            render={({ field }) => (
+              <Form.Check.Input {...field} type="checkbox" checked={seqInfo} />
+            )}
+          />
+        </Form.Check>
+      </Form.Group>
+      <hr className="mb-3" />
+      <Form.Group controlId="cluster" className="d-flex">
+        <Form.Label className="mr-auto">
+          Cluster Analysis{' '}
+          <OverlayTrigger
+            trigger="click"
+            placement="top"
+            overlay={
+              <Popover id="popover-basic">
+                <Title as="h3">Cluster Analysis</Title>
+                <Content>
+                  <p>TBA</p>
+                </Content>
+              </Popover>
+            }
+            rootClose
+          >
+            <Button
+              variant="link"
+              className="p-0 font-weight-bold"
+              aria-label="about cluster analysis"
+            >
+              <FontAwesomeIcon
+                icon={faInfoCircle}
+                style={{ verticalAlign: 'baseline' }}
+              />
+            </Button>
+          </OverlayTrigger>
+        </Form.Label>
+        <Form.Check inline id="cluster">
+          <Controller
+            name="cluster"
+            control={control}
+            render={({ field }) => (
+              <Form.Check.Input {...field} type="checkbox" checked={cluster} />
             )}
           />
         </Form.Check>
