@@ -11,6 +11,7 @@
     "@reduxjs/toolkit": "^1.8.2",
     "axios": "^0.26.0",
     "bootstrap": "^4.5.0",
+    "bootstrap-icons": "^1.9.1",
     "d3": "^7.4.4",
     "d3-flextree": "^2.1.2",
     "file-saver": "^2.0.5",
