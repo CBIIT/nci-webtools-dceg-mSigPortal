@@ -133,8 +133,7 @@ async function profilerExtraction(params) {
 
           resolve({ scriptOutput, projectPath, matrices });
         } catch (error) {
-          logger.error('Error parsing output');
-          logger.error(scriptOutput);
+          logger.error('Error parsing matrix data. ');
           reject({ scriptOutput, error });
         }
       } else {
@@ -213,7 +212,7 @@ async function userProfilerExtraction(req, res, next) {
       });
     } else {
       logger.error(
-        '/profilerExtraction: An Error Occured While Extracting Profiles'
+        '/profilerExtraction: An error occured while extracting profiles'
       );
 
       res.status(500).json({
@@ -221,7 +220,9 @@ async function userProfilerExtraction(req, res, next) {
       });
     }
   } catch (error) {
-    next(error);
+    logger.error('/profilerExtraction: Caught error while extracting profiles');
+    logger.error(error);
+    res.status(500).json(error);
   }
 }
 
