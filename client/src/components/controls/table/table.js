@@ -1,3 +1,4 @@
+// to be replaced by table2
 import React, { useMemo } from 'react';
 import BTable from 'react-bootstrap/Table';
 import { Dropdown, Form, Row, Col, Button } from 'react-bootstrap';
