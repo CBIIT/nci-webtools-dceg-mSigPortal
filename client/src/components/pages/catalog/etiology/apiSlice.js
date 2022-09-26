@@ -68,6 +68,32 @@ export const etiologyApiSlice = catalogApiSlice.injectEndpoints({
         else return false;
       },
     }),
+    etiologyOrganTable: builder.query({
+      query: (params) => ({
+        url: 'signature_etiology_organ',
+        params,
+      }),
+      transformResponse: (data) => {
+        // reducer for creating table columns from objects
+        const reducer = (acc, column) => [
+          ...acc,
+          {
+            Header: column,
+            id: column,
+            accessor: (a) => a[column],
+          },
+        ];
+        
+        return {
+          data,
+          columns: [...new Set(...data.map((e) => Object.keys(e)))].reduce(
+            reducer,
+            []
+          ),
+          cohortOptions: [...new Set(data.map((e) => e.cohort))],
+        };
+      },
+    }),
     thumbnails: builder.query({
       query: (body) => ({
         url: 'getImageS3Batch',
@@ -82,5 +108,6 @@ export const {
   useEtiologyOptionsQuery,
   useEtiologyDistribtuionQuery,
   useEtiologySignatureQuery,
+  useEtiologyOrganTableQuery,
   useThumbnailsQuery,
 } = etiologyApiSlice;
