@@ -199,7 +199,6 @@ export default function PcReference() {
             projectID,
           }
         : {
-            strategy: strategy.value,
             profile: profile.value,
             matrix:
               data.profile.value === 'SBS'
