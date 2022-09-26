@@ -185,178 +185,187 @@ export default function SignatureInfo({ data }) {
     : '';
 
   return (
-    <Container fluid className="p-3">
+    <div>
       {metadata && (
-        <div>
-          <div>
-            <strong>Etiology: </strong>
-            {metadata.etiology}
-          </div>
-          <div>
-            <strong>Signature: </strong>
-            {metadata.signature}
-          </div>
-          {metadata.referenceSignature && (
-            <div>
-              <strong>Reference Signature : </strong>
-              {metadata.referenceSignature}
-            </div>
-          )}
-          {metadata.cellLine && (
-            <div>
-              <strong>Cell Line: </strong>
-              {metadata.cellLine}
-            </div>
-          )}
-          {metadata.mutagen && (
-            <div>
-              <strong>Mutagen: </strong>
-              {metadata.mutagen}
-            </div>
-          )}
-          {metadata.treatment && (
-            <div>
-              <strong>Treatment: </strong>
-              {metadata.treatment}
-            </div>
-          )}
-          {metadata.refSigProportion && (
-            <div>
-              <strong>Reference Signature Proportion: </strong>
-              {metadata.refSigProportion}
-            </div>
-          )}
-          {metadata.genomeBuild && (
-            <div>
-              <strong>Genome Build: </strong>
-              {metadata.genomeBuild}
-            </div>
-          )}
-          {metadata.cosmic_v3_2 && (
-            <div>
-              <strong>Identified in COSMICv3.2</strong>
-            </div>
-          )}
-          {metadata.refSig_v1 && (
-            <div>
-              <strong>Identified in RefSigv1</strong>
-            </div>
-          )}
-          {metadata.cohort && (
-            <div>
-              <strong>Cohort: </strong>
-              {metadata.cohort}
-            </div>
-          )}
-          {metadata.signatureExtractionMethod && (
-            <div>
-              <strong>Signature Extraction Method: </strong>
-              {metadata.signatureExtractionMethod}
-            </div>
-          )}
-          {metadata.tumorType && (
-            <div>
-              <strong>Tumor Type: </strong>
-              {metadata.tumorType}
-            </div>
-          )}
-          {metadata.study && (
-            <div>
-              <strong>Study: </strong>
-              <a href={metadata.studyUrl} target="_blank" rel="noreferrer">
-                {metadata.study}
-              </a>
-            </div>
-          )}
-          {metadata.signatureSource && (
-            <div>
-              <strong>Source: </strong>
-              <a href={metadata.sourceUrl} target="_blank" rel="noreferrer">
-                {metadata.signatureSource}
-              </a>
-            </div>
-          )}
-          {metadata.source && (
-            <div>
-              <strong>Source: </strong>
-              <a href={metadata.sourceUrl} target="_blank" rel="noreferrer">
-                {metadata.source}
-              </a>
-            </div>
-          )}
-          {metadata.descriptionStrandBias && (
-            <div>
-              <strong>Strand Bias: </strong>
-              {metadata.descriptionStrandBias}
-            </div>
-          )}
-          {metadata.note && (
-            <div>
-              <strong>Note: </strong>
-              {metadata.note}
-            </div>
-          )}
-          {description.length > 1 ? (
-            description.map(
-              (e, i, arr) =>
-                i % 2 == 0 && (
-                  <p key={i}>
-                    <strong>{e}</strong>
-                    {arr[i + 1]}
-                  </p>
-                )
-            )
-          ) : (
-            <p>{description}</p>
-          )}
-          <div className="my-3 border rounded">
-            <LoadingOverlay active={fetchingProfile} />
-            {profilePlot ? (
-              <Plotly
-                data={profilePlot.traces}
-                layout={profilePlot.layout}
-                config={profilePlot.config}
-              />
-            ) : (
-              <div className="text-center my-4">No data available</div>
-            )}
-          </div>
-
+        <>
           {metadata.tissueDistribution && (
-            <div>
-              <strong>Tissue Distribution: </strong>
-              {metadata.tissueDistribution}
-            </div>
+            <>
+              <h5 className="separator my-3">Tissue Distribution</h5>
+              <div className="p-3">
+                <div>{metadata.tissueDistribution}</div>
+                <div className="my-3 pt-3 border rounded">
+                  <LoadingOverlay active={fetchingDistribution} />
+                  <Row className="justify-content-center">
+                    {studyOptions.map((e) => (
+                      <Col
+                        key={e.label}
+                        lg="2"
+                        md="3"
+                        sm="4"
+                        className="mb-3 d-flex"
+                      >
+                        <Button
+                          size="sm"
+                          variant="primary"
+                          onClick={() => mergeEtiology({ study: e })}
+                          className={study.label != e.label ? 'disabled' : ''}
+                          block
+                        >
+                          {e.label}
+                        </Button>
+                      </Col>
+                    ))}
+                  </Row>
+                  {distributionPlot?.traces.length ? (
+                    <Plotly
+                      data={distributionPlot.traces}
+                      layout={distributionPlot.layout}
+                      config={distributionPlot.config}
+                    />
+                  ) : (
+                    <div className="text-center my-4">No data available</div>
+                  )}
+                </div>
+              </div>
+            </>
           )}
-          <div className="my-3 pt-3 border rounded">
-            <LoadingOverlay active={fetchingDistribution} />
-            <Row className="justify-content-center">
-              {studyOptions.map((e) => (
-                <Col key={e.label} lg="2" md="3" sm="4" className="mb-3 d-flex">
-                  <Button
-                    size="sm"
-                    variant="primary"
-                    onClick={() => mergeEtiology({ study: e })}
-                    className={study.label != e.label ? 'disabled' : ''}
-                    block
-                  >
-                    {e.label}
-                  </Button>
-                </Col>
-              ))}
-            </Row>
-            {distributionPlot?.traces.length ? (
-              <Plotly
-                data={distributionPlot.traces}
-                layout={distributionPlot.layout}
-                config={distributionPlot.config}
-              />
-            ) : (
-              <div className="text-center my-4">No data available</div>
+          <div className="p-3">
+            <div>
+              <strong>Etiology: </strong>
+              {metadata.etiology}
+            </div>
+            <div>
+              <strong>Signature: </strong>
+              {metadata.signature}
+            </div>
+            {metadata.referenceSignature && (
+              <div>
+                <strong>Reference Signature : </strong>
+                {metadata.referenceSignature}
+              </div>
             )}
+            {metadata.cellLine && (
+              <div>
+                <strong>Cell Line: </strong>
+                {metadata.cellLine}
+              </div>
+            )}
+            {metadata.mutagen && (
+              <div>
+                <strong>Mutagen: </strong>
+                {metadata.mutagen}
+              </div>
+            )}
+            {metadata.treatment && (
+              <div>
+                <strong>Treatment: </strong>
+                {metadata.treatment}
+              </div>
+            )}
+            {metadata.refSigProportion && (
+              <div>
+                <strong>Reference Signature Proportion: </strong>
+                {metadata.refSigProportion}
+              </div>
+            )}
+            {metadata.genomeBuild && (
+              <div>
+                <strong>Genome Build: </strong>
+                {metadata.genomeBuild}
+              </div>
+            )}
+            {metadata.cosmic_v3_2 && (
+              <div>
+                <strong>Identified in COSMICv3.2</strong>
+              </div>
+            )}
+            {metadata.refSig_v1 && (
+              <div>
+                <strong>Identified in RefSigv1</strong>
+              </div>
+            )}
+            {metadata.cohort && (
+              <div>
+                <strong>Cohort: </strong>
+                {metadata.cohort}
+              </div>
+            )}
+            {metadata.signatureExtractionMethod && (
+              <div>
+                <strong>Signature Extraction Method: </strong>
+                {metadata.signatureExtractionMethod}
+              </div>
+            )}
+            {metadata.tumorType && (
+              <div>
+                <strong>Tumor Type: </strong>
+                {metadata.tumorType}
+              </div>
+            )}
+            {metadata.study && (
+              <div>
+                <strong>Study: </strong>
+                <a href={metadata.studyUrl} target="_blank" rel="noreferrer">
+                  {metadata.study}
+                </a>
+              </div>
+            )}
+            {metadata.signatureSource && (
+              <div>
+                <strong>Source: </strong>
+                <a href={metadata.sourceUrl} target="_blank" rel="noreferrer">
+                  {metadata.signatureSource}
+                </a>
+              </div>
+            )}
+            {metadata.source && (
+              <div>
+                <strong>Source: </strong>
+                <a href={metadata.sourceUrl} target="_blank" rel="noreferrer">
+                  {metadata.source}
+                </a>
+              </div>
+            )}
+            {metadata.descriptionStrandBias && (
+              <div>
+                <strong>Strand Bias: </strong>
+                {metadata.descriptionStrandBias}
+              </div>
+            )}
+            {metadata.note && (
+              <div>
+                <strong>Note: </strong>
+                {metadata.note}
+              </div>
+            )}
+            {description.length > 1 ? (
+              description.map(
+                (e, i, arr) =>
+                  i % 2 == 0 && (
+                    <p key={i}>
+                      <strong>{e}</strong>
+                      {arr[i + 1]}
+                    </p>
+                  )
+              )
+            ) : (
+              <p>{description}</p>
+            )}
+            <div className="my-3 border rounded">
+              <LoadingOverlay active={fetchingProfile} />
+              {profilePlot ? (
+                <Plotly
+                  data={profilePlot.traces}
+                  layout={profilePlot.layout}
+                  config={profilePlot.config}
+                />
+              ) : (
+                <div className="text-center my-4">No data available</div>
+              )}
+            </div>
           </div>
-        </div>
+        </>
       )}
-    </Container>
+    </div>
   );
 }
