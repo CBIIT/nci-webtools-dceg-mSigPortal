@@ -25,12 +25,28 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
       data,
     })
   );
+  let groupByMutation2;
+  if (sample2.length > 96) {
+    const groupMutationType = groupBy(sample2, (e) => `${e.mutationType}`);
+    console.log(groupMutationType);
+    Object.values(groupMutationType).map((e, i) => {
+      console.log(e);
+      e.reduce((a, b, i, arr) => {
+        const result = {
+          mutationType: a.mutationType,
+          contribution: (a.contribution + b.contribution) / arr.length,
+        };
+        console.log(result);
+      });
+    });
+  } else {
+    groupByMutation2 = sample2.reduce((acc, e, i) => {
+      const mutation = e.mutationType.match(mutationRegex)[1];
+      acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
+      return acc;
+    }, {});
+  }
 
-  const groupByMutation2 = sample2.reduce((acc, e, i) => {
-    const mutation = e.mutationType.match(mutationRegex)[1];
-    acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
-    return acc;
-  }, {});
   const sample2data = Object.entries(groupByMutation2).map(
     ([mutation, data]) => ({
       mutation,
