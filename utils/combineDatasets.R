@@ -158,6 +158,7 @@ combineEtiologyOrgan <- function(x) {
 
 combineEtiologySignature <- function(x) {
     x %>%
+        rowwise() %>%
         mutate(
             etiology = stringr::str_split(Etiology, "\n")[[1]][1],
             author = stringr::str_split(Etiology, "\n")[[1]][2],
