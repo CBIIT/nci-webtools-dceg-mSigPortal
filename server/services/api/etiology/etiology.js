@@ -3,6 +3,7 @@ const {
   getEtiologyOptions,
   getEtiologyData,
   getEtiologyOrganData,
+  getEtiologySignatureData,
 } = require('../../query');
 const { pickNonNullValues } = require('../../utils');
 
@@ -66,6 +67,26 @@ async function queryEtiologyOrgan(req, res, next) {
   }
 }
 
+async function queryEtiologySignature(req, res, next) {
+  try {
+    const { limit, offset, ...query } = req.query;
+    const connection = req.app.locals.connection;
+
+    const columns = '*';
+    const data = await getEtiologySignatureData(
+      connection,
+      query,
+      columns,
+      limit,
+      offset
+    );
+    const records = data.map(pickNonNullValues);
+    res.json(records);
+  } catch (error) {
+    next(error);
+  }
+}
+
 const router = Router();
 
 router.get('/signature_etiology_options', queryEtiologyOptions);
@@ -73,5 +94,7 @@ router.get('/signature_etiology_options', queryEtiologyOptions);
 router.get('/signature_etiology', queryEtiology);
 
 router.get('/signature_etiology_organ', queryEtiologyOrgan);
+
+router.get('/signature_etiology_signature', queryEtiologySignature);
 
 module.exports = { router, queryEtiologyOptions };

@@ -293,6 +293,30 @@ export const schema = [
   },
 
   {
+    name: 'etiologySignature',
+    schema: (table) => {
+      table.increments('id');
+      table.string('etiology');
+      table.string('author');
+      table.string('profile');
+      table.string('matrix');
+      table.string('signatureSetName');
+      table.string('signatureName');
+      table.string('mutationType');
+      table.string('contribution');
+    },
+    index: (table) => {
+      table.index([
+        'etiology',
+        'profile',
+        'matrix',
+        'signatureSetName',
+        'signatureName',
+      ]);
+    },
+  },
+
+  {
     name: 'publication',
     schema: (table) => {
       table.increments('id');
