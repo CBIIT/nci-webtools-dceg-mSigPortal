@@ -44,15 +44,10 @@ export default function MSPrevalence(data, minimum) {
       a.samples.filter((e) => e.exposure >= minumumNumber).length /
         a.totalSamples
   );
-  console.log(dataResult);
   const defaultNames = ['SBS', 'DBS', 'ID'];
   const names = dataResult.map((group) => group.signatureName);
   const longest = names.reduce((a, e) => (a > e.length ? a : e.length), 0);
   const extraMargin = longest < 10 ? 60 : longest * 7;
-
-  console.log(names);
-  console.log(longest);
-  console.log(extraMargin);
 
   const contains = defaultNames.some((element) => {
     if (names[0].includes(element)) {
@@ -61,7 +56,6 @@ export default function MSPrevalence(data, minimum) {
 
     return false;
   });
-  console.log(contains);
 
   let colors = {};
 
@@ -73,11 +67,9 @@ export default function MSPrevalence(data, minimum) {
       } while (randomColors.indexOf(color) >= 0);
       randomColors.push('#' + ('000000' + color.toString(16)).slice(-6));
     }
-    console.log(randomColors);
     names.forEach((element, index) => {
       colors[element] = randomColors[index];
     });
-    console.log(colors);
   } else {
     colors = {
       1: '#4a9855',
@@ -182,7 +174,6 @@ export default function MSPrevalence(data, minimum) {
     hovertemplate:
       '<b>Signature Name:</b>%{label}<br><b>Total sample: </b>%{value}<br>%{percent}<extra></extra>',
   };
-  console.log(tracesPie);
   const tracesBar = dataResult.map((group, groupIndex, array) => ({
     group: group,
     array: array,
@@ -237,7 +228,6 @@ export default function MSPrevalence(data, minimum) {
       column: 1,
     },
   }));
-  console.log(tracesBar);
   const titleAnnotation = [
     {
       xref: 'paper',
