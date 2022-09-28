@@ -56,15 +56,15 @@ export const etiologyApiSlice = catalogApiSlice.injectEndpoints({
       },
     }),
     etiologySignature: builder.query({
-      query: ({ profile, ...params }) => ({
+      query: (params) => ({
         url: 'mutational_signature',
         params,
       }),
       transformResponse: (data, _, params) => {
-        if (params.profile == 'SBS96') return SBS96(data);
-        else if (params.profile == 'DBS78') return DBS78(data);
-        else if (params.profile == 'ID83') return ID83(data);
-        else if (params.profile == 'CN48') return CN48(data);
+        if (params.profile + params.matrix == 'SBS96') return SBS96(data);
+        else if (params.profile + params.matrix == 'DBS78') return DBS78(data);
+        else if (params.profile + params.matrix == 'ID83') return ID83(data);
+        else if (params.profile + params.matrix == 'CN48') return CN48(data);
         else return false;
       },
     }),
@@ -83,7 +83,6 @@ export const etiologyApiSlice = catalogApiSlice.injectEndpoints({
             accessor: (a) => a[column],
           },
         ];
-        
         return {
           data,
           columns: [...new Set(...data.map((e) => Object.keys(e)))].reduce(
