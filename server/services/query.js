@@ -289,27 +289,6 @@ function getEtiologyOrganData(
   );
 }
 
-function getEtiologySignatureData(
-  connection,
-  query,
-  columns = '*',
-  limit = 200000,
-  offset = 0,
-  rowMode = 'object',
-  distinct = false
-) {
-  return getData(
-    connection,
-    'etiologySignature',
-    query,
-    columns,
-    limit,
-    offset,
-    rowMode,
-    distinct
-  );
-}
-
 function getPublicationData(
   connection,
   query,
@@ -366,7 +345,6 @@ module.exports = {
   getEtiologyOptions,
   getEtiologyData,
   getEtiologyOrganData,
-  getEtiologySignatureData,
   getPublicationData,
   getPatternData,
 };
