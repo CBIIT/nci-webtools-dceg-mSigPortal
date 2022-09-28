@@ -31,9 +31,7 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
     const groupMutationType = groupBy(sample2, (e) => e.mutationType);
 
     Object.values(groupMutationType).map((e) => {
-      console.log(e);
       const arr = Object.values(e);
-      console.log(arr);
 
       const sum = (prev, cur) => ({
         mutationType: prev.mutationType,

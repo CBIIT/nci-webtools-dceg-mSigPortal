@@ -30,11 +30,38 @@ export default function pcBetweenSamples(samples, sample1, sample2, tab) {
     })
   );
 
-  const groupByMutation2 = sample2.reduce((acc, e, i) => {
-    const mutation = e.mutationType.match(mutationRegex)[1];
-    acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
-    return acc;
-  }, {});
+  let groupByMutation2 = [];
+  let array = [];
+  if (sample2.length > 96) {
+    const groupMutationType = groupBy(sample2, (e) => e.mutationType);
+
+    Object.values(groupMutationType).map((e) => {
+      const arr = Object.values(e);
+
+      const sum = (prev, cur) => ({
+        mutationType: prev.mutationType,
+        contribution: prev.contribution + cur.contribution,
+      });
+      const avg = arr.reduce(sum).contribution / arr.length;
+      const result = {
+        mutationType: arr.reduce(sum).mutationType,
+        contribution: avg,
+      };
+      array.push(result);
+    });
+
+    groupByMutation2 = array.reduce((acc, e, i) => {
+      const mutation = e.mutationType.match(mutationRegex)[1];
+      acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
+      return acc;
+    }, {});
+  } else {
+    groupByMutation2 = sample2.reduce((acc, e, i) => {
+      const mutation = e.mutationType.match(mutationRegex)[1];
+      acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
+      return acc;
+    }, {});
+  }
   const sample2data = Object.entries(groupByMutation2).map(
     ([mutation, data]) => ({
       mutation,
