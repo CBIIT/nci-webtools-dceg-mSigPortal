@@ -150,6 +150,22 @@ export const sources = [
   },
 
   {
+    sourcePath: 'Etiology/etiologySignature.csv',
+    table: 'etiologySignature',
+    description: 'etiologySignature - signature data for etiology',
+    columns: [
+      'etiology',
+      'author',
+      'profile',
+      'matrix',
+      'signatureSetName',
+      'signatureName',
+      'mutationType',
+      'contribution',
+    ],
+  },
+
+  {
     sourcePath: 'Others/Publications.csv',
     table: 'publication',
     description: 'publications',

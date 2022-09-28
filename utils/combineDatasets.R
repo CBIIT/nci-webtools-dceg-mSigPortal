@@ -156,6 +156,27 @@ combineEtiologyOrgan <- function(x) {
     )
 }
 
+combineEtiologySignature <- function(x) {
+    x %>%
+        mutate(
+            etiology = stringr::str_split(Etiology, "\n")[[1]][1],
+            author = stringr::str_split(Etiology, "\n")[[1]][2],
+            profile = regex_extract(Profile, "^[A-Z]+"),
+            matrix = regex_extract(Profile, "[0-9]+$"),
+            .before = Profile
+        ) %>%
+        rename(
+            signatureSetName = Signature_set_name,
+            signatureName = Signature_name,
+            mutationType = MutationType,
+            contribution = Contribution
+        ) %>%
+        select(
+            -Etiology,
+            -Profile
+        )
+}
+
 datasets <- sapply(inputFiles, function(f) get(load(f)), simplify = F)
 combinedDatasets <- bind_rows(datasets, .id = "filepath")
 processedDatasets <- do.call(processorFunction, list(x = combinedDatasets)) %>% select(-filepath)

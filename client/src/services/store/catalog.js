@@ -18,6 +18,7 @@ export const getInitialState = () => ({
     signature: '',
     referrenceSignature: '',
     study: '',
+    cohort: '',
     showAllSignatures: false,
   },
   referenceSignature: {

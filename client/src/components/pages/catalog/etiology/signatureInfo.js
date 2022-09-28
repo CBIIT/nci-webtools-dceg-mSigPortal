@@ -1,20 +1,22 @@
 import { useEffect, useState } from 'react';
-import { Row, Col, Button, Container } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions } from '../../../../services/store/catalog';
 import {
   useEtiologyDistribtuionQuery,
   useEtiologySignatureQuery,
+  useEtiologyOrganTableQuery,
 } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plotly from '../../../controls/plotly/plot/plot';
+import Table from '../../../controls/table/table2';
 
 export default function SignatureInfo({ data }) {
   const dispatch = useDispatch();
   const mergeEtiology = (state) =>
     dispatch(actions.mergeCatalog({ etiology: state }));
 
-  const { category, etiology, signature, referenceSignature, study } =
+  const { category, etiology, signature, referenceSignature, study, cohort } =
     useSelector((state) => state.catalog.etiology);
 
   // filter by selected etiology and signature
@@ -27,17 +29,28 @@ export default function SignatureInfo({ data }) {
         : true)
   )[0]?.json;
 
+  // fetch etiology distribution plot data
   const [distributionParams, setDistributionParams] = useState(false);
   const { data: distributionPlot, isFetching: fetchingDistribution } =
     useEtiologyDistribtuionQuery(distributionParams, {
       skip: !distributionParams,
     });
 
+  // fetch signature plot data
   const [signatureParams, setSignatureParams] = useState(false);
   const { data: profilePlot, isFetching: fetchingProfile } =
     useEtiologySignatureQuery(signatureParams, {
       skip: !signatureParams,
     });
+
+  // fetch organ table data
+  const { data: organTable, isFetching: fetchingOrgan } =
+    useEtiologyOrganTableQuery(
+      { signature: metadata?.signature },
+      {
+        skip: !metadata || category != 'CancerSpecificSignatures_2022',
+      }
+    );
 
   const studyOptions = [
     {
@@ -188,47 +201,6 @@ export default function SignatureInfo({ data }) {
     <div>
       {metadata && (
         <>
-          {metadata.tissueDistribution && (
-            <>
-              <h5 className="separator my-3">Tissue Distribution</h5>
-              <div className="p-3">
-                <div>{metadata.tissueDistribution}</div>
-                <div className="my-3 pt-3 border rounded">
-                  <LoadingOverlay active={fetchingDistribution} />
-                  <Row className="justify-content-center">
-                    {studyOptions.map((e) => (
-                      <Col
-                        key={e.label}
-                        lg="2"
-                        md="3"
-                        sm="4"
-                        className="mb-3 d-flex"
-                      >
-                        <Button
-                          size="sm"
-                          variant="primary"
-                          onClick={() => mergeEtiology({ study: e })}
-                          className={study.label != e.label ? 'disabled' : ''}
-                          block
-                        >
-                          {e.label}
-                        </Button>
-                      </Col>
-                    ))}
-                  </Row>
-                  {distributionPlot?.traces.length ? (
-                    <Plotly
-                      data={distributionPlot.traces}
-                      layout={distributionPlot.layout}
-                      config={distributionPlot.config}
-                    />
-                  ) : (
-                    <div className="text-center my-4">No data available</div>
-                  )}
-                </div>
-              </div>
-            </>
-          )}
           <div className="p-3">
             <div>
               <strong>Etiology: </strong>
@@ -364,6 +336,109 @@ export default function SignatureInfo({ data }) {
               )}
             </div>
           </div>
+          {(category == 'Cosmic' ||
+            category == 'CancerSpecificSignatures_2022') && (
+            <>
+              <h5 className="separator my-3">Tissue Distribution</h5>
+              <div className="p-3">
+                <div>{metadata.tissueDistribution}</div>
+                <div className="my-3 pt-3 border rounded">
+                  <LoadingOverlay active={fetchingDistribution} />
+                  <Row className="justify-content-center">
+                    {studyOptions.map((e) => (
+                      <Col
+                        key={e.label}
+                        lg="2"
+                        md="3"
+                        sm="4"
+                        className="mb-3 d-flex"
+                      >
+                        <Button
+                          size="sm"
+                          variant="primary"
+                          onClick={() => mergeEtiology({ study: e })}
+                          className={study.label != e.label ? 'disabled' : ''}
+                          block
+                        >
+                          {e.label}
+                        </Button>
+                      </Col>
+                    ))}
+                  </Row>
+                  {distributionPlot?.traces.length ? (
+                    <Plotly
+                      data={distributionPlot.traces}
+                      layout={distributionPlot.layout}
+                      config={distributionPlot.config}
+                    />
+                  ) : (
+                    <div className="text-center my-4">No data available</div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+          {organTable && (
+            <>
+              <h5 className="separator my-3">Organ-Specific Signatures</h5>
+              <div className="p-3">
+                <div className="my-3">
+                  <LoadingOverlay active={fetchingOrgan} />
+                  <Row className="justify-content-center">
+                    {organTable.cohortOptions.length &&
+                      organTable.cohortOptions.map((e) => (
+                        <Col
+                          key={e}
+                          lg="2"
+                          md="3"
+                          sm="4"
+                          className="mb-3 d-flex"
+                        >
+                          <Button
+                            size="sm"
+                            variant="primary"
+                            onClick={() => mergeEtiology({ cohort: e })}
+                            className={cohort != e ? 'disabled' : ''}
+                            block
+                          >
+                            {e}
+                          </Button>
+                        </Col>
+                      ))}
+                    <Col lg="2" md="3" sm="4" className="mb-3 d-flex">
+                      <Button
+                        size="sm"
+                        variant="primary"
+                        onClick={() => mergeEtiology({ cohort: '' })}
+                        className={cohort != '' ? 'disabled' : ''}
+                        block
+                      >
+                        All Cohorts
+                      </Button>
+                    </Col>
+                  </Row>
+                  {organTable?.data ? (
+                    <Table
+                      className="border mt-3"
+                      data={organTable.data.filter((e) =>
+                        cohort ? e.cohort == cohort : true
+                      )}
+                      columns={organTable.columns}
+                      options={{
+                        initialState: {
+                          hiddenColumns: ['id', 'signature'],
+                        },
+                      }}
+                      customOptions={{ hideColumns: true }}
+                      striped
+                    />
+                  ) : (
+                    <div className="text-center my-4">No data available</div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </>
       )}
     </div>
