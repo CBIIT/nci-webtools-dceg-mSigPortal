@@ -175,8 +175,6 @@ export default function MSPrevalence(data, minimum) {
       '<b>Signature Name:</b>%{label}<br><b>Total sample: </b>%{value}<br>%{percent}<extra></extra>',
   };
   const tracesBar = dataResult.map((group, groupIndex, array) => ({
-    group: group,
-    array: array,
     name: group.signatureName,
     type: 'bar',
     marker: {
@@ -184,12 +182,7 @@ export default function MSPrevalence(data, minimum) {
         ? colors[group.signatureName.replace(/^\D*/, '').replace(')', '')]
         : colors[group.signatureName],
     },
-    // x:
-    //   group.signatureName.length > 10
-    //     ? [group.signatureName.substring(0, 10) + '...']
-    //     : [group.signatureName],
     x: [group.signatureName],
-
     y: [
       group.samples.filter((e) => e.exposure >= minumumNumber).length /
         group.totalSamples,
@@ -204,9 +197,6 @@ export default function MSPrevalence(data, minimum) {
         10 +
         '%',
     ],
-    // customdata: groupBySignature.map((group) => ({
-    //   signatureName: group.signatureName,
-    // })),
     customdata: [
       {
         signatureName: group.signatureName,

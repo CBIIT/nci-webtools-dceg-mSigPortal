@@ -10,14 +10,8 @@ export const msPrevalenceApiSlice = explorationApiSlice.injectEndpoints({
         params,
       }),
       transformResponse: (data, meta, arg) => {
-        console.log('prevalence api');
-        console.log(data);
-        console.log(arg);
         const { minimum } = arg;
-        console.log(minimum);
-
         return MsPrevalence(data, minimum);
-        //return MsPrevalence(transform, groupBySample);
       },
     }),
   }),
