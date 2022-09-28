@@ -25,6 +25,7 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
       data,
     })
   );
+  console.log(sample2);
   let groupByMutation2 = [];
   let array = [];
   if (sample2.length > 96) {
