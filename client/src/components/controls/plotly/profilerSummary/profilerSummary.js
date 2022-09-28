@@ -1,6 +1,7 @@
 import { groupBy } from 'lodash';
 
 export default function profilerSummary(rawData) {
+  const maxVal = Math.max(...rawData.map((o) => o.logTotalMutations));
   const groupByProfileMatrix = groupBy(
     rawData,
     (e) => `${e.profile}_${e.matrix}`
@@ -20,7 +21,6 @@ export default function profilerSummary(rawData) {
       };
     })
     .sort((a, b) => b.mean - a.mean);
-
   // sort samples of other profiles to match the sample order of the profile with the largest mean mutation value
   const topSamples = data[0].samples.map((s) => s.sample);
   const allSamples = [...new Set(rawData.map((e) => e.sample))].sort(
@@ -42,6 +42,22 @@ export default function profilerSummary(rawData) {
       type: 'scatter',
     };
   });
+
+  const annotation = {
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
+    x: 0.01,
+    y: 0.9,
+    text: '<b> Total Sample Count: ' + allSamples.length + ' samples</b>',
+    showarrow: false,
+    font: {
+      size: 24,
+      family: 'Arial',
+    },
+    align: 'center',
+  };
 
   // find the longest label to calculate extra height margin
   const labels = traces[0].x;
@@ -73,7 +89,10 @@ export default function profilerSummary(rawData) {
       zeroline: false,
       showline: true,
       mirror: true,
+      autorange: false,
+      range: [0, maxVal + maxVal * 0.2],
     },
+    annotations: [annotation],
   };
 
   const config = {

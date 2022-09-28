@@ -306,7 +306,7 @@ export default function PcReference() {
                 )}
               />
               <Form.Text className="text-muted">
-                (Ex. 0.8*SBS5;0.1*SBS1)
+                (Ex. 0.8*SBS5,0.1*SBS1)
               </Form.Text>
               <Form.Control.Feedback type="invalid">
                 Enter a valid signature. Click info icon for options.
