@@ -38,10 +38,27 @@ export default function SignatureInfo({ data }) {
 
   // fetch signature plot data
   const [signatureParams, setSignatureParams] = useState(false);
-  const { data: profilePlot, isFetching: fetchingProfile } =
+  const { data: signaturePlot, isFetching: fetchingProfile } =
     useEtiologySignatureQuery(signatureParams, {
       skip: !signatureParams,
     });
+
+  // fetch reference signature plot data
+  const { data: refSigPlot, isFetching: fetchingRefSig } =
+    useEtiologySignatureQuery(
+      {
+        signatureName: `Ref.Sig.${referenceSignature?.match(/\d+/) || ''}`,
+        signatureSetName: 'Cancer_Reference_Signatures_GRCh37_SBS96',
+        profile: 'SBS',
+        matrix: '96',
+        // signatureSetName: 'Cancer_Reference_Signatures_GRCh37_RS32',
+        // profile: 'RS',
+        // matrix: '32',
+      },
+      {
+        skip: !referenceSignature,
+      }
+    );
 
   // fetch organ table data
   const { data: organTable, isFetching: fetchingOrgan } =
@@ -84,7 +101,10 @@ export default function SignatureInfo({ data }) {
 
   // get distribution plot
   useEffect(() => {
-    if (metadata) {
+    if (
+      metadata &&
+      (category == 'Cosmic' || category == 'CancerSpecificSignatures_2022')
+    ) {
       setDistributionParams({
         signatureName: metadata.signature,
         ...study.value,
@@ -99,95 +119,120 @@ export default function SignatureInfo({ data }) {
       if (params) {
         setSignatureParams({
           signatureName: metadata.signature,
-          signatureSetName: params.signatureSetName,
-          profile: params.profile,
+          ...params,
         });
       }
     }
   }, [metadata]);
-
   // return a valid signatureSetName and profile depending on the selected category and signature
   function getSignatureParams(category, signature) {
     if (category == 'Cosmic') {
       return signature.includes('SBS')
         ? {
             signatureSetName: 'COSMIC_v3.3_Signatures_GRCh37_SBS96',
-            profile: 'SBS96',
+            profile: 'SBS',
+            matrix: '96',
           }
         : signature.includes('DBS')
         ? {
             signatureSetName: 'COSMIC_v3.3_Signatures_GRCh37_DBS78',
-            profile: 'DBS78',
+            profile: 'DBS',
+            matrix: '78',
           }
         : signature.includes('ID')
         ? {
             signatureSetName: 'COSMIC_v3.3_Signatures_GRCh37_ID83',
-            profile: 'ID83',
+            profile: 'ID',
+            matrix: '83',
           }
         : signature.includes('CN')
         ? {
             signatureSetName: 'COSMIC_v3.3_Signatures_GRCh37_CN48',
-            profile: 'CN48',
+            profile: 'CN',
+            matrix: '48',
           }
         : false;
     } else if (category == 'CancerSpecificSignatures_2022') {
       return signature.includes('SBS')
         ? {
             signatureSetName: 'Cancer_Reference_Signatures_2022_GRCh37_SBS96',
-            profile: 'SBS96',
+            profile: 'SBS',
+            matrix: '96',
           }
         : signature.includes('DBS')
         ? {
             signatureSetName: 'Cancer_Reference_Signatures_2022_GRCh37_DBS78',
-            profile: 'DBS78',
+            profile: 'DBS',
+            matrix: '78',
           }
         : false;
     } else if (category == 'EnviromentalMutagenesis') {
       return signature.includes('SBS')
         ? {
             signatureSetName: 'Environmental_Mutagen_Signatures_GRCh37_SBS96',
-            profile: 'SBS96',
+            signatureName: metadata.signature.replace(/\s+\(SBS\)/, ''),
+            profile: 'SBS',
+            matrix: '96',
           }
         : signature.includes('DBS')
         ? {
             signatureSetName: 'Environmental_Mutagen_Signatures_GRCh37_DBS78',
-            profile: 'DBS78',
+            signatureName: metadata.signature.replace(/\s+\(DBS\)/, ''),
+            profile: 'DBS',
+            matrix: '78',
+          }
+        : signature.includes('ID')
+        ? {
+            signatureSetName: 'Environmental_Mutagen_Signatures_GRCh37_ID29',
+            signatureName: metadata.signature.replace(/\s+\(ID\)/, ''),
+            profile: 'ID',
+            matrix: '29',
           }
         : false;
     } else if (category == 'GeneEdits') {
-      return signature.includes('SBS')
-        ? {
-            signatureSetName: 'Gene_Edits_Signatures_GRCh37_SBS96',
-            profile: 'SBS96',
-          }
-        : false;
+      return {
+        signatureSetName: 'Gene_Edits_Signatures_GRCh37_SBS96',
+        signatureName: metadata.signature.replace(/\s+\(SBS\)/, ''),
+        profile: 'SBS',
+        matrix: '96',
+      };
     } else if (category == 'CancerSpecificSignatures') {
       return {
-        signatureSetName: 'Cancer_Reference_Signatures_GRCh37_SBS96',
-        // signatureSetName: 'Organ-specific_Cancer_Signatures_GRCh37_SBS96',
-        profile: 'SBS96',
+        signatureSetName: 'Organ-specific_Cancer_Signatures_GRCh37_SBS96',
+        profile: 'SBS',
+        matrix: '96',
       };
     } else if (category == 'CancerTherapies') {
       return signature.includes('SBS')
         ? {
             signatureSetName: 'Cancer_Therapies_Signatures_GRCh37_SBS96',
-            profile: 'SBS96',
+            profile: 'SBS',
+            matrix: '96',
           }
         : signature.includes('DBS')
         ? {
             signatureSetName: 'Cancer_Therapies_Signatures_GRCh37_DBS78',
-            profile: 'DBS78',
+            profile: 'DBS',
+            matrix: '78',
           }
         : false;
     } else if (category == 'Others') {
-      return false;
-      //   return signature.includes('SBS')
-      //     ? {
-      //         source: 'Published_signatures',
-      //         signatureSetName: 'Organ-specific_Cancer_Signatures_GRCh37_SBS96',
-      //         profile: 'SBS96',
-      //       }
-      //     : false;
+      return signature.includes('SBS')
+        ? {
+            profile: 'SBS',
+            matrix: '96',
+          }
+        : signature.includes('DBS')
+        ? {
+            profile: 'DBS',
+            matrix: '78',
+          }
+        : signature.includes('ID')
+        ? {
+            profile: 'ID',
+            matrix: '83',
+          }
+        : false;
     }
   }
 
@@ -323,13 +368,27 @@ export default function SignatureInfo({ data }) {
             ) : (
               <p>{description}</p>
             )}
+            {category == 'CancerSpecificSignatures' && (
+              <div className="my-3 border rounded">
+                <LoadingOverlay active={fetchingProfile} />
+                {refSigPlot ? (
+                  <Plotly
+                    data={refSigPlot.traces}
+                    layout={refSigPlot.layout}
+                    config={refSigPlot.config}
+                  />
+                ) : (
+                  <div className="text-center my-4">No data available</div>
+                )}
+              </div>
+            )}
             <div className="my-3 border rounded">
               <LoadingOverlay active={fetchingProfile} />
-              {profilePlot ? (
+              {signaturePlot ? (
                 <Plotly
-                  data={profilePlot.traces}
-                  layout={profilePlot.layout}
-                  config={profilePlot.config}
+                  data={signaturePlot.traces}
+                  layout={signaturePlot.layout}
+                  config={signaturePlot.config}
                 />
               ) : (
                 <div className="text-center my-4">No data available</div>

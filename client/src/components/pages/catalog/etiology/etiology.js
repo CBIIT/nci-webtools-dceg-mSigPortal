@@ -80,7 +80,7 @@ export default function Etiology() {
     <Container fluid className="p-4 bg-white border rounded">
       <h5 className="separator">Categories</h5>
       <CategoryOptions categories={categories} />
-      {data && data[0].category == category ? (
+      {data && data[0]?.category == category ? (
         <>
           <EtiologyOptions data={data} />
           <SignatureOptions data={data} />
