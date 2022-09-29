@@ -101,6 +101,23 @@ combineSignatureFiles <- function(x) {
         )
 }
 
+signatureSummary <- function(x) {
+    x %>%
+        mutate(
+            profile = regex_extract(Profile, "^[A-Z]+"),
+            matrix = regex_extract(Profile, "[0-9]+$"),
+            .before = Profile
+        ) %>%
+        rename(
+            species = Species,
+            signatureSetName = Signature_set_name,
+            count = N
+        ) %>%
+        select(
+            -Profile
+        )
+}
+
 combinePatternFiles <- function(x) {
     x %>%
         rowwise() %>%
