@@ -397,6 +397,7 @@ export default function ProfileFormPlot({ options, index }) {
   function removePlots(index) {
     //if (plots[index.plotURL]) Object.revokeObjectURL(plots[index].plotURL);
     let newPlots = plots.slice();
+    console.log(newPlots);
     newPlots.splice(index, 1);
 
     mergeRsProfiles({ plots: newPlots });

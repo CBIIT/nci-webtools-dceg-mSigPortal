@@ -24,6 +24,8 @@ export function defaultProfile2(profileOptions) {
   if (options.includes('SBS')) return { label: 'SBS', value: 'SBS' };
   if (options.includes('DBS')) return { label: 'DBS', value: 'DBS' };
   if (options.includes('ID')) return { label: 'ID', value: 'ID' };
+  if (options.includes('RS')) return { label: 'RS', value: 'RS' };
+  if (options.includes('CN')) return { label: 'CN', value: 'CN' };
 }
 
 export function defaultMatrix2(profile, matrixOptions) {
