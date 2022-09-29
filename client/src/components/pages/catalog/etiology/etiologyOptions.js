@@ -13,13 +13,25 @@ export default function EtiologyOptions({ data }) {
 
   const { category, etiology } = useSelector((state) => state.catalog.etiology);
 
-  // use natural sort
+  // custom sort rules for etiology options
   // order "CN:" prefixed etiologies to the end
+  // custom order for "Unknown" etiology
+  // otherwise use natural sort
   function etiologySort(a, b) {
-    if (a.includes('CN:')) {
+    const cnRegex = /^CN:/;
+    const unkRegex = /^Unknown/;
+    const unkOrder = [
+      'Unknown',
+      'Unknown chemotherapy treatment',
+      'Unknown (clock-like signature)',
+    ];
+
+    if (a.match(cnRegex)) {
       return 1;
-    } else if (b.includes('CN:')) {
+    } else if (b.match(cnRegex)) {
       return -1;
+    } else if (a.match(unkRegex) || b.match(unkRegex)) {
+      return unkOrder.indexOf(a) - unkOrder.indexOf(b);
     } else if (a)
       return a.localeCompare(b, undefined, {
         numeric: true,
