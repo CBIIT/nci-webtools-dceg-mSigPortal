@@ -63,7 +63,7 @@ export default function MSPrevalence(data, minimum) {
     var randomColors = [];
     while (randomColors.length < names.length) {
       do {
-        var color = Math.floor(Math.random() * 1000000000 + 1);
+        var color = Math.floor(Math.random() * 10000000000 + 1);
       } while (randomColors.indexOf(color) >= 0);
       randomColors.push('#' + ('000000' + color.toString(16)).slice(-6));
     }

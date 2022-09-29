@@ -43,6 +43,16 @@ export function defaultMatrix2(profile, matrixOptions) {
     return options.includes('83')
       ? { label: '83', value: '83' }
       : matrixOptions[0];
+
+  if (profile.value == 'RS')
+    return options.includes('32')
+      ? { label: '32', value: '32' }
+      : matrixOptions[0];
+
+  if (profile.value == 'CN')
+    return options.includes('48')
+      ? { label: '48', value: '48' }
+      : matrixOptions[0];
 }
 
 export function defaultFilter2(filterOptions) {
