@@ -467,7 +467,7 @@
     "/api/mutational_signature_options": {
       "get": {
         "tags": ["Mutational Signature"],
-        "summary": "Retrieves signature data",
+        "summary": "Retrieves signature options",
         "produces": ["application/json"],
         "parameters": [
           {
@@ -712,10 +712,98 @@
       }
     },
 
+    "/api/mutational_signature_summary": {
+      "get": {
+        "tags": ["Mutational Signature"],
+        "summary": "Retrieves signature summary",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "species",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "profile",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "matrix",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "signatureSetName",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "description": "number of unique signatures in signature set",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit number of records returned",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "10"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Records to skip",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "500": {
+            "description": "API error"
+          }
+        }
+      }
+    },
+
     "/api/mutational_association_options": {
       "get": {
         "tags": ["Mutational Association"],
-        "summary": "Retrieves association data",
+        "summary": "Retrieves association options",
         "produces": ["application/json"],
         "parameters": [
           {
@@ -1110,7 +1198,7 @@
     "/api/signature_etiology_options": {
       "get": {
         "tags": ["Signature Etiology"],
-        "summary": "Retrieves etiology data",
+        "summary": "Retrieves etiology options",
         "produces": ["application/json"],
         "parameters": [
           {
