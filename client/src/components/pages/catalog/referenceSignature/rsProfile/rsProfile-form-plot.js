@@ -34,7 +34,6 @@ export default function ProfileFormPlot({ options, index }) {
   const { matrixList, projectID } = store.main;
   const { plots, debugR, err, loading } = store.rSProfiles;
   const { refSigData, sample } = store.referenceSignature;
-  console.log(store);
 
   const [params, setParams] = useState(null);
 
@@ -81,7 +80,6 @@ export default function ProfileFormPlot({ options, index }) {
     error: optionError,
     isFetching: optionFetching,
   } = useRsProfileOptionsQuery();
-  console.log(optiondata);
 
   const signatureSourceOptions = optiondata
     ? [...new Set(optiondata.map((e) => e.source))]
@@ -333,9 +331,6 @@ export default function ProfileFormPlot({ options, index }) {
       handleSource(signatureSourceOptions[0]);
   }, [signatureSourceOptions]);
 
-  console.log(matrixOptions[0]);
-  console.log(signatureSetName);
-
   // set inital signature set name
   // useEffect(() => {
   //   if (!signatureSetName && referenceSignatureSetOption.length)
@@ -343,12 +338,6 @@ export default function ProfileFormPlot({ options, index }) {
   // }, [referenceSignatureSetOption]);
   // get data on form change
   useEffect(() => {
-    console.log(source);
-    console.log(profile);
-    console.log(matrix);
-    console.log(signatureSetName);
-    console.log(strategy);
-    console.log(signatureName);
     if (
       source?.value &&
       profile?.value &&
@@ -377,25 +366,124 @@ export default function ProfileFormPlot({ options, index }) {
   } = useRsProfileDataQuery(params, {
     skip: !params,
   });
-  console.log(plotdata);
 
+  // function addPlots() {
+  //   mergeRsProfiles({
+  //     plots: [
+  //       ...plots,
+  //       {
+  //         source: '',
+  //         profile: '',
+  //         matrix: '',
+  //         signatureSetName: '',
+  //         strategy: '',
+  //         signatureName: '',
+  //       },
+  //     ],
+  //   });
+  // }
+  console.log(refSigData);
   function addPlots() {
+    const signatureSourceOptions = [
+      ...new Set(refSigData.map((row) => row.Source)),
+    ];
+    const signatureSource = signatureSourceOptions[0];
+    const profileNameOptions = [
+      ...new Set(
+        refSigData
+          .filter((row) => row.Source == signatureSource)
+          .map((row) => row.Profile)
+      ),
+    ];
+    console.log(profileNameOptions);
+    const profileName = profileNameOptions[0];
+    //const profileName = defaultProfile2(profileNameOptions);
+
+    const matrixOptions = [
+      ...new Set(
+        refSigData
+          .filter(
+            (row) => row.Source == signatureSource && row.Profile == profileName
+          )
+          .map((row) => row.matrix)
+      ),
+    ];
+    const matrix = matrixOptions[0];
+
+    const rsSetOptions = [
+      ...new Set(
+        refSigData
+          .filter(
+            (row) =>
+              row.Source == signatureSource &&
+              row.Profile == profileName &&
+              row.Matrix == matrix
+          )
+          .map((row) => row.Signature_set_name)
+      ),
+    ];
+    const rsSet = rsSetOptions[0];
+
+    const strategyOptions = [
+      ...new Set(
+        refSigData
+          .filter(
+            (row) =>
+              row.Source == signatureSource &&
+              row.Profile == profileName &&
+              row.Matrix == matrix &&
+              row.Signature_set_name == rsSet
+          )
+          .map((row) => row.Dataset)
+      ),
+    ];
+    const strategy = strategyOptions[0];
+    const signatureNameOptions = [
+      ...new Set(
+        refSigData
+          .filter(
+            (row) =>
+              row.Source == signatureSource &&
+              row.Profile == profileName &&
+              row.matrix == matrix &&
+              row.Signature_set_name == rsSet &&
+              row.Dataset == strategy
+          )
+          .map((row) => row.Signature_name)
+      ),
+    ];
+
     mergeRsProfiles({
       plots: [
         ...plots,
         {
-          source: '',
-          profile: '',
-          matrix: '',
-          signatureSetName: '',
-          strategy: '',
-          signatureName: '',
+          source: signatureSource,
+          profile: profileName,
+          matrix: matrix,
+          signatureSetName: rsSet,
+          strategy: strategy,
+          signatureName: signatureNameOptions[0],
+
+          // signatureSource: signatureSource,
+          // signatureSourceOptions: signatureSourceOptions,
+          // profileName: profileName,
+          // profileNameOptions: profileNameOptions,
+          // rsSet: rsSet,
+          // rsSetOptions: rsSetOptions,
+          // strategy: strategy,
+          // strategyOptions: strategyOptions,
+          // signatureName: signatureNameOptions[0],
+          // signatureNameOptions: signatureNameOptions,
         },
       ],
     });
   }
+  console.log(plots);
+  console.log('----');
   function removePlots(index) {
     //if (plots[index.plotURL]) Object.revokeObjectURL(plots[index].plotURL);
+    console.log(index);
+    console.log(plots);
     let newPlots = plots.slice();
     console.log(newPlots);
     newPlots.splice(index, 1);
@@ -508,7 +596,8 @@ export default function ProfileFormPlot({ options, index }) {
               >
                 <span className="text-nowrap" title="Remove Plot">
                   <FontAwesomeIcon icon={faMinus} /> Remove Plot
-                </span>
+                </span>{' '}
+                {parseInt(index) + 1}
               </Button>
             </Col>
           </Row>
