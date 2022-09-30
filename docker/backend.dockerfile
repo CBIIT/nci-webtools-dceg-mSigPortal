@@ -1,7 +1,8 @@
 FROM public.ecr.aws/amazonlinux/amazonlinux:2022
 
 RUN dnf -y update \
- && dnf -y install \
+    && dnf -y install \
+    dnf-plugins-core \
     cairo-devel \
     cmake \
     git \
@@ -15,10 +16,29 @@ RUN dnf -y update \
     openssl-devel \
     python3-devel \
     python3-pip \
-    R \
+    python3-setuptools \
     rsync \
-    wget \
- && dnf clean all
+    wget \ 
+    which \
+    && dnf -y builddep R \
+    && dnf clean all
+
+#  install R from source 
+ENV R_VERSION=4.1.3 
+RUN cd /tmp && \
+    curl -O https://cran.rstudio.com/src/base/R-4/R-${R_VERSION}.tar.gz && \
+    tar -xzvf R-${R_VERSION}.tar.gz 
+RUN cd /tmp/R-${R_VERSION} && \
+    ./configure \
+    --prefix=/opt/R/${R_VERSION} \
+    --enable-memory-profiling \
+    --enable-R-shlib \
+    --with-blas \
+    --with-lapack && \
+    make && \
+    make install
+RUN ln -s /opt/R/${R_VERSION}/bin/R /usr/local/bin/R && \
+    ln -s /opt/R/${R_VERSION}/bin/Rscript /usr/local/bin/Rscript
 
 RUN mkdir -p /deploy/server /deploy/logs
 
@@ -27,6 +47,21 @@ RUN cd /tmp && \
     git clone https://github.com/xtmgah/SigProfilerPlotting && \
     cp /tmp/SigProfilerPlotting/fonts/* /usr/share/fonts && \
     fc-cache -fv;
+
+# configure C++ Toolchain for installing dependency RStan - https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started
+# ENV MAKEFLAGS='-j2'
+# RUN mkdir -p $HOME/.R && \
+#     echo -e "CXX14FLAGS=-O3 -march=native -mtune=native -fPIC \nCXX14=g++" >> $HOME/.R/Makevars
+
+# install renv
+RUN R -e "install.packages('renv', repos = 'https://cloud.r-project.org/')"
+
+# install R packages
+COPY server/renv.lock /deploy/server/
+
+WORKDIR /deploy/server
+
+RUN R -e "options(Ncpus=parallel::detectCores()); renv::restore()"
 
 # install python packages
 # RUN pip3 install pandas 
@@ -43,20 +78,6 @@ RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#eg
 # genInstall.install('GRCh38', rsync=False, bash=True); \
 # genInstall.install('mm10', rsync=False, bash=True)"
 
-# configure C++ Toolchain for installing dependency RStan - https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started
-# ENV MAKEFLAGS='-j2'
-# RUN mkdir -p $HOME/.R && \
-#     echo -e "CXX14FLAGS=-O3 -march=native -mtune=native -fPIC \nCXX14=g++" >> $HOME/.R/Makevars
-
-# install renv
-RUN R -e "install.packages('renv', repos = 'https://cloud.r-project.org/')"
-
-# install R packages
-COPY server/renv.lock /deploy/server/
-
-WORKDIR /deploy/server
-
-RUN R -e "options(Ncpus=parallel::detectCores()); renv::restore()"
 
 
 # use build cache for npm packages
