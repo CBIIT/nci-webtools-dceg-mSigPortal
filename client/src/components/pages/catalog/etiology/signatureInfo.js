@@ -71,12 +71,12 @@ export default function SignatureInfo({ data }) {
 
   const studyOptions = [
     {
-      label: 'PCAWG WGS',
-      value: { study: 'PCAWG', strategy: 'WGS' },
-    },
-    {
       label: 'TCGA WES',
       value: { study: 'TCGA', strategy: 'WES' },
+    },
+    {
+      label: 'PCAWG WGS',
+      value: { study: 'PCAWG', strategy: 'WGS' },
     },
     {
       label: 'ICGC WGS',
@@ -95,7 +95,7 @@ export default function SignatureInfo({ data }) {
   // set intial study
   useEffect(() => {
     if (!study) {
-      mergeEtiology({ study: studyOptions[0] });
+      mergeEtiology({ study: studyOptions[1] });
     }
   }, [metadata]);
 

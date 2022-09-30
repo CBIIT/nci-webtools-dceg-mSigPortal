@@ -247,6 +247,21 @@ export const schema = [
   },
 
   {
+    name: 'signatureSummary',
+    schema: (table) => {
+      table.increments('id');
+      table.string('species');
+      table.string('profile');
+      table.integer('matrix');
+      table.string('signatureSetName');
+      table.string('count');
+    },
+    index: (table) => {
+      table.index(['profile', 'matrix', 'signatureSetName']);
+    },
+  },
+
+  {
     name: 'etiologyOptions',
     schema: (table) => {
       table.increments('id');

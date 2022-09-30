@@ -226,6 +226,27 @@ function getSignatureOptions(
   );
 }
 
+function getSignatureSummary(
+  connection,
+  query,
+  columns = '*',
+  limit = 200000,
+  offset = 0,
+  rowMode = 'object',
+  distinct = false
+) {
+  return getData(
+    connection,
+    'signatureSummary',
+    query,
+    columns,
+    limit,
+    offset,
+    rowMode,
+    distinct
+  );
+}
+
 function getEtiologyOptions(
   connection,
   query,
@@ -342,6 +363,7 @@ module.exports = {
   getSeqmatrixSummary,
   getSignatureData,
   getSignatureOptions,
+  getSignatureSummary,
   getEtiologyOptions,
   getEtiologyData,
   getEtiologyOrganData,

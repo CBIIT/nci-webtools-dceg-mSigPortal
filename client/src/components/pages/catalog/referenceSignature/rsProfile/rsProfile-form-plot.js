@@ -9,7 +9,6 @@ import { actions as catalogActions } from '../../../../../services/store/catalog
 import { actions as modalActions } from '../../../../../services/store/modal';
 import { useForm } from 'react-hook-form';
 import Select from '../../../../controls/select/selectForm';
-import { useSignatureOptionsQuery } from '../../../../../services/store/rootApi';
 import { useRsProfileOptionsQuery, useRsProfileDataQuery } from './apiSlice';
 import {
   defaultProfile2,
@@ -32,40 +31,23 @@ export default function ProfileFormPlot({ options, index }) {
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const { matrixList, projectID } = store.main;
-  const { plots, debugR, err, loading } = store.rSProfiles;
   const { refSigData, sample } = store.referenceSignature;
+
+  const { plots, err, loading } = store.rSProfiles;
 
   const [params, setParams] = useState(null);
 
   const defaultValues = {
-    source: { label: 'Published_signature', value: 'Published_signature' },
-    profile: { label: 'SBS', value: 'SBS' },
-    matrix: { label: '96', value: '96' },
-    signatureSetName: {
-      label: 'Other_Published_Signatures_GRCh37_SBS96',
-      value: 'Other_Published_Signatures_GRCh37_SBS96',
-    },
-    strategy: { label: 'WGS', value: 'WGS' },
-    signatureName: {
-      label: 'SBS_5-FU_organoids_WGS',
-      value: 'BS_5-FU_organoids_WGS',
-    },
+    source: '',
+    profile: '',
+    matrix: '',
+    signatureSetName: '',
+    strategy: '',
+    signatureName: '',
   };
-  // const defaultValues = {
-  //   source: '',
-  //   profile: '',
-  //   matrix: '',
-  //   signatureSetName: '',
-  //   strategy: '',
-  //   signatureName: '',
-  // };
-  const { control, setValue, watch } = useForm();
-  //const { control, setValue, watch } = useForm();
-
+  const { control, setValue, watch } = useForm({ defaultValues });
   const { source, profile, matrix, signatureSetName, strategy, signatureName } =
     watch();
-
-  console.log(watch());
 
   const supportMatrix = {
     SBS: [6, 24, 96, 192, 288, 384, 1536],
@@ -76,13 +58,13 @@ export default function ProfileFormPlot({ options, index }) {
   };
 
   const {
-    data: optiondata,
+    data: signatureOptions,
     error: optionError,
     isFetching: optionFetching,
   } = useRsProfileOptionsQuery();
 
-  const signatureSourceOptions = optiondata
-    ? [...new Set(optiondata.map((e) => e.source))]
+  const signatureSourceOptions = signatureOptions
+    ? [...new Set(signatureOptions.map((e) => e.source))]
         .sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))
         .map((e) => ({
           label: e,
@@ -91,10 +73,10 @@ export default function ProfileFormPlot({ options, index }) {
     : [];
 
   const profileOptions = (source) =>
-    source && optiondata.length
+    source && signatureOptions.length
       ? [
           ...new Set(
-            optiondata
+            signatureOptions
               .filter((e) => e.source === source.value)
               .map((e) => e.profile)
               .sort((a, b) => a.localeCompare(b))
@@ -103,10 +85,10 @@ export default function ProfileFormPlot({ options, index }) {
       : [];
 
   const matrixOptions = (source, profile) =>
-    source && profile && optiondata.length
+    source && profile && signatureOptions.length
       ? [
           ...new Set(
-            optiondata
+            signatureOptions
               .filter(
                 (e) =>
                   e.source === source.value &&
@@ -120,15 +102,15 @@ export default function ProfileFormPlot({ options, index }) {
       : [];
 
   const referenceSignatureSetOption = (source, profile, matrix) =>
-    source && profile && matrix && optiondata.length
+    source && profile && matrix && signatureOptions.length
       ? [
           ...new Set(
-            optiondata
+            signatureOptions
               .filter(
                 (e) =>
                   e.source === source.value &&
                   e.profile === profile.value &&
-                  supportMatrix[e.profile].includes(e.matrix)
+                  e.matrix === matrix.value
               )
               .map((e) => e.signatureSetName)
             // .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
@@ -137,15 +119,15 @@ export default function ProfileFormPlot({ options, index }) {
       : [];
 
   const strategyOptions = (source, profile, matrix, signatureSetName) =>
-    source && profile && matrix && signatureSetName && optiondata.length
+    source && profile && matrix && signatureSetName && signatureOptions.length
       ? [
           ...new Set(
-            optiondata
+            signatureOptions
               .filter(
                 (e) =>
                   e.source === source.value &&
                   e.profile === profile.value &&
-                  supportMatrix[e.profile].includes(e.matrix) &&
+                  e.matrix === matrix.value &&
                   e.signatureSetName === signatureSetName.value
               )
               .map((e) => e.strategy)
@@ -166,15 +148,15 @@ export default function ProfileFormPlot({ options, index }) {
     matrix &&
     signatureSetName &&
     strategy &&
-    optiondata.length
+    signatureOptions.length
       ? [
           ...new Set(
-            optiondata
+            signatureOptions
               .filter(
                 (e) =>
                   e.source === source.value &&
                   e.profile === profile.value &&
-                  supportMatrix[e.profile].includes(e.matrix) &&
+                  e.matrix === matrix.value &&
                   e.signatureSetName === signatureSetName.value &&
                   e.strategy === strategy.value
               )
@@ -313,17 +295,10 @@ export default function ProfileFormPlot({ options, index }) {
     const signatureName = defaultSignatureName(signatureNames);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
-    // mergeRsProfiles({
-    //   strategy,
-    //   signatureName,
-    // });
   }
 
   function handleName(signatureName) {
     setValue('signatureName', signatureName);
-    // mergeRsProfiles({
-    //   signatureName,
-    // });
   }
   // set inital source
   useEffect(() => {
@@ -331,11 +306,6 @@ export default function ProfileFormPlot({ options, index }) {
       handleSource(signatureSourceOptions[0]);
   }, [signatureSourceOptions]);
 
-  // set inital signature set name
-  // useEffect(() => {
-  //   if (!signatureSetName && referenceSignatureSetOption.length)
-  //     handleSet(referenceSignatureSetOption[0]);
-  // }, [referenceSignatureSetOption]);
   // get data on form change
   useEffect(() => {
     if (
@@ -354,7 +324,7 @@ export default function ProfileFormPlot({ options, index }) {
         strategy: strategy.value,
         signatureName: signatureName.value,
       };
-      console.log(params);
+
       setParams(params);
     }
   }, [source, profile, matrix, signatureSetName, strategy, signatureName]);
