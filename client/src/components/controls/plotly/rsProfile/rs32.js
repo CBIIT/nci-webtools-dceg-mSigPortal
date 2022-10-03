@@ -83,7 +83,6 @@ export default function RS32(rawData, sample) {
       data: data,
     })
   );
-  console.log(nonClusterGroup);
 
   const data = [...clusterGroup, ...nonClusterGroup];
 
@@ -116,14 +115,12 @@ export default function RS32(rawData, sample) {
     .flat();
 
   const sortData = [...sortedData1, ...sortedData2];
-  console.log(sortData);
   const mutationTypeNames = sortData.map((group, i) => ({
     mutationType: !group.mutationType.split('_')[2]
       ? group.mutationType.split('_')[1]
       : group.mutationType.split('_')[2],
     index: i,
   }));
-
 
   const traces = sortData.map((group, groupIndex, array) => ({
     group: group,

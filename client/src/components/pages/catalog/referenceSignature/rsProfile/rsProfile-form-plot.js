@@ -352,98 +352,51 @@ export default function ProfileFormPlot({ options, index }) {
   //     ],
   //   });
   // }
-  console.log(refSigData);
+  //console.log(refSigData);
   function addPlots() {
-    const signatureSourceOptions = [
-      ...new Set(refSigData.map((row) => row.Source)),
-    ];
-    const signatureSource = signatureSourceOptions[0];
-    const profileNameOptions = [
-      ...new Set(
-        refSigData
-          .filter((row) => row.Source == signatureSource)
-          .map((row) => row.Profile)
-      ),
-    ];
-    console.log(profileNameOptions);
-    const profileName = profileNameOptions[0];
-    //const profileName = defaultProfile2(profileNameOptions);
+    const signatureSource = {
+      label: 'Reference_signatures',
+      value: 'Reference_signatures',
+    };
+    const profiles = profileOptions(signatureSource);
 
-    const matrixOptions = [
-      ...new Set(
-        refSigData
-          .filter(
-            (row) => row.Source == signatureSource && row.Profile == profileName
-          )
-          .map((row) => row.matrix)
-      ),
-    ];
-    const matrix = matrixOptions[0];
+    console.log(profiles);
+    const profile = defaultProfile2(profiles);
 
-    const rsSetOptions = [
-      ...new Set(
-        refSigData
-          .filter(
-            (row) =>
-              row.Source == signatureSource &&
-              row.Profile == profileName &&
-              row.Matrix == matrix
-          )
-          .map((row) => row.Signature_set_name)
-      ),
-    ];
-    const rsSet = rsSetOptions[0];
-
-    const strategyOptions = [
-      ...new Set(
-        refSigData
-          .filter(
-            (row) =>
-              row.Source == signatureSource &&
-              row.Profile == profileName &&
-              row.Matrix == matrix &&
-              row.Signature_set_name == rsSet
-          )
-          .map((row) => row.Dataset)
-      ),
-    ];
-    const strategy = strategyOptions[0];
-    const signatureNameOptions = [
-      ...new Set(
-        refSigData
-          .filter(
-            (row) =>
-              row.Source == signatureSource &&
-              row.Profile == profileName &&
-              row.matrix == matrix &&
-              row.Signature_set_name == rsSet &&
-              row.Dataset == strategy
-          )
-          .map((row) => row.Signature_name)
-      ),
-    ];
+    const matrices = matrixOptions(source, profile);
+    const matrix = defaultMatrix2(profile, matrices);
+    const signatureSetNames = referenceSignatureSetOption(
+      source,
+      profile,
+      matrix
+    );
+    const signatureSetName = defaultSignatureSet(signatureSetNames);
+    const strategies = strategyOptions(
+      source,
+      profile,
+      matrix,
+      signatureSetName
+    );
+    const strategy = defaultStrategy(strategies);
+    const signatureNames = signatureNameOptions(
+      source,
+      profile,
+      matrix,
+      signatureSetName,
+      strategy
+    );
+    const signatureName = defaultSignatureName(signatureNames);
 
     mergeRsProfiles({
       plots: [
         ...plots,
         {
           source: signatureSource,
-          profile: profileName,
+          profile: profile,
           matrix: matrix,
-          signatureSetName: rsSet,
+          signatureSetName: signatureSetName,
           strategy: strategy,
-          signatureName: signatureNameOptions[0],
-
-          // signatureSource: signatureSource,
-          // signatureSourceOptions: signatureSourceOptions,
-          // profileName: profileName,
-          // profileNameOptions: profileNameOptions,
-          // rsSet: rsSet,
-          // rsSetOptions: rsSetOptions,
-          // strategy: strategy,
-          // strategyOptions: strategyOptions,
-          // signatureName: signatureNameOptions[0],
-          // signatureNameOptions: signatureNameOptions,
+          signatureName: signatureName,
         },
       ],
     });
@@ -453,10 +406,11 @@ export default function ProfileFormPlot({ options, index }) {
   function removePlots(index) {
     //if (plots[index.plotURL]) Object.revokeObjectURL(plots[index].plotURL);
     console.log(index);
-    console.log(plots);
+    //console.log(plots);
     let newPlots = plots.slice();
-    console.log(newPlots);
+    //console.log(newPlots);
     newPlots.splice(index, 1);
+    //console.log(newPlots);
 
     mergeRsProfiles({ plots: newPlots });
   }
@@ -589,6 +543,7 @@ export default function ProfileFormPlot({ options, index }) {
           />
         )}
       </div>
+      <hr></hr>
       {/* {additionalPlots()} */}
     </div>
   );

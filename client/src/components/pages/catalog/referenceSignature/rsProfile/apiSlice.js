@@ -23,12 +23,12 @@ export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
         params,
       }),
       transformResponse: (data, meta, args) => {
-        console.log(args);
+        //console.log(args);
         const { profile, matrix, signatureName } = args;
         const profileMatrix = profile + matrix;
-        console.log(profileMatrix);
-        console.log(signatureName);
-        console.log(data);
+        // console.log(profileMatrix);
+        // console.log(signatureName);
+        // console.log(data);
         if (profileMatrix === 'SBS96') {
           return SBS96(data, signatureName, 'rsProfile');
         } else if (profileMatrix === 'SBS192') {

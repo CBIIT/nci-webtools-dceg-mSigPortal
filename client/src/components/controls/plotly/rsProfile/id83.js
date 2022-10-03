@@ -75,8 +75,7 @@ export default function ID83(rawData, sample) {
       }))
     )
     .flat();
-  console.log(indelNames);
-  console.log(data);
+
   const traces = data.map((group, groupIndex, array) => ({
     name: group.indel,
     type: 'bar',
@@ -106,7 +105,6 @@ export default function ID83(rawData, sample) {
       '%{y} indels<extra></extra>',
     showlegend: false,
   }));
-  console.log(traces);
   const shapeAnnotations = data.map((group, groupIndex, array) => ({
     xref: 'x',
     yref: 'paper',
