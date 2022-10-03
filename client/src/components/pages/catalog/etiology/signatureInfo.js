@@ -199,6 +199,7 @@ export default function SignatureInfo({ data }) {
     } else if (category == 'CancerSpecificSignatures') {
       return {
         signatureSetName: 'Organ-specific_Cancer_Signatures_GRCh37_SBS96',
+        signatureName: metadata.signature + '%',
         profile: 'SBS',
         matrix: '96',
       };
