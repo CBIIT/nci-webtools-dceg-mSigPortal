@@ -199,6 +199,14 @@ export default function ProfileFormPlot({ options, index }) {
     setValue('signatureSetName', signatureSetName);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
+    // mergeRsProfiles({
+    //   source: source,
+    //   profile: profile,
+    //   matrix: matrix,
+    //   signatureSetName: signatureSetName,
+    //   strategy: strategy,
+    //   signatureName: signatureName,
+    // });
   }
 
   function handleProfile(profile) {
@@ -231,6 +239,13 @@ export default function ProfileFormPlot({ options, index }) {
     setValue('signatureSetName', signatureSetName);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
+    // mergeRsProfiles({
+    //   profile,
+    //   matrix,
+    //   signatureSetName,
+    //   strategy,
+    //   signatureName,
+    // });
   }
 
   function handleMatrix(matrix) {
@@ -260,6 +275,12 @@ export default function ProfileFormPlot({ options, index }) {
     setValue('signatureSetName', signatureSetName);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
+    // mergeRsProfiles({
+    //   matrix,
+    //   signatureSetName,
+    //   strategy,
+    //   signatureName,
+    // });
   }
 
   function handleSet(signatureSetName) {
@@ -282,6 +303,12 @@ export default function ProfileFormPlot({ options, index }) {
     setValue('signatureSetName', signatureSetName);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
+
+    // mergeRsProfiles({
+    //   signatureSetName,
+    //   strategy,
+    //   signatureName,
+    // });
   }
 
   function handleStrategy(strategy) {
@@ -295,10 +322,18 @@ export default function ProfileFormPlot({ options, index }) {
     const signatureName = defaultSignatureName(signatureNames);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
+
+    //   mergeRsProfiles({
+    //     strategy,
+    //     signatureName,
+    //   });
   }
 
   function handleName(signatureName) {
     setValue('signatureName', signatureName);
+    // mergeRsProfiles({
+    //   signatureName,
+    // });
   }
   // set inital source
   useEffect(() => {
@@ -354,6 +389,9 @@ export default function ProfileFormPlot({ options, index }) {
   // }
   //console.log(refSigData);
   function addPlots() {
+    console.log(index);
+    console.log(plots);
+    console.log(plots.length);
     const signatureSource = {
       label: 'Reference_signatures',
       value: 'Reference_signatures',
@@ -397,20 +435,23 @@ export default function ProfileFormPlot({ options, index }) {
           signatureSetName: signatureSetName,
           strategy: strategy,
           signatureName: signatureName,
+          index: plots.length,
         },
       ],
     });
   }
-  console.log(plots);
-  console.log('----');
+  //console.log(plots);
+  //console.log('----');
   function removePlots(index) {
     //if (plots[index.plotURL]) Object.revokeObjectURL(plots[index].plotURL);
     console.log(index);
     //console.log(plots);
     let newPlots = plots.slice();
     //console.log(newPlots);
-    newPlots.splice(index, 1);
-    //console.log(newPlots);
+    //newPlots.splice(index, 1);
+    console.log(newPlots);
+    const removed = newPlots.splice(index, 1);
+    console.log(removed);
 
     mergeRsProfiles({ plots: newPlots });
   }
@@ -528,7 +569,7 @@ export default function ProfileFormPlot({ options, index }) {
         )}
       </Form>
 
-      <div id="plot0">
+      <div id="plot">
         <div style={{ display: err ? 'block' : 'none' }}>
           <p>An error has occured. Please verify your input.</p>
         </div>

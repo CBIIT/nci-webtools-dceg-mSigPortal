@@ -3,6 +3,7 @@ import { Tab, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import Overview from './overview';
 import Profile from './rsProfile';
+import RsInMsigportal from './rsInMsigportal/rsInMsigportal-plot';
 import RsProfile from './rsProfile/rsProfile';
 import CosineSimilarity from './cosineSimilarity';
 import Comparison from './rsComparison';
@@ -174,10 +175,15 @@ export default function ReferenceSignature() {
   }
 
   const tabs = [
+    // {
+    //   component: <Overview submitR={(fn, args) => submitR(fn, args)} />,
+    //   key: 'overview',
+    //   title: 'RS in mSigPortal',
+    // },
     {
-      component: <Overview submitR={(fn, args) => submitR(fn, args)} />,
-      key: 'overview',
-      title: 'RS in mSigPortal',
+      component: <RsInMsigportal />,
+      key: 'RSInMsigportal',
+      title: 'RS In Msigportal',
     },
     {
       component: <RsProfile />,
