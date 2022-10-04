@@ -229,16 +229,19 @@ export default function SignatureInfo({ data }) {
     } else if (category == 'Others') {
       return signature.includes('SBS')
         ? {
+            signatureSetName: 'Other_Published_Signatures_%',
             profile: 'SBS',
             matrix: '96',
           }
         : signature.includes('DBS')
         ? {
+            signatureSetName: 'Other_Published_Signatures_%',
             profile: 'DBS',
             matrix: '78',
           }
         : signature.includes('ID')
         ? {
+            signatureSetName: 'Other_Published_Signatures_%',
             profile: 'ID',
             matrix: '83',
           }
