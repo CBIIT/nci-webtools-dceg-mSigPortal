@@ -9,10 +9,7 @@ import {
   resetExplorationApi,
   useExposureOptionsQuery,
 } from '../../../../services/store/rootApi';
-import {
-  useExplorationSamplesMutation,
-  useExplorationPublicMutation,
-} from './apiSlice';
+import { useExplorationSamplesMutation } from './apiSlice';
 
 const actions = { ...exposureActions, ...modalActions };
 
@@ -75,6 +72,7 @@ export default function PublicForm() {
         study: data.study.value,
         strategy: data.strategy.value,
         signatureSetName: data.signatureSetName.value,
+        ...(data.cancerOnly && { cancer: data.cancer.value }),
       };
       const { samples, signatureNames } = await fetchSamples(params).unwrap();
       mergeMain({ displayTab: 'tmb', samples, signatureNames });

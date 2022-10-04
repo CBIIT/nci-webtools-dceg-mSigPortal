@@ -15,7 +15,7 @@ export default function MutProfilePlot() {
   });
 
   const { signatureName } = useSelector((state) => state.exposure.msBurden);
-  const { study, strategy, signatureSetName } = publicForm;
+  const { study, strategy, signatureSetName, cancer, cancerOnly } = publicForm;
 
   useEffect(() => {
     if (signatureName) {
@@ -24,14 +24,10 @@ export default function MutProfilePlot() {
         strategy: strategy.value,
         signatureSetName: signatureSetName.value,
         signatureName: signatureName.value,
+        ...(cancerOnly && { cancer: cancer.value }),
       });
     }
   }, [signatureName]);
-  //console.log(data);
-  //console.log(publicForm);
-  if (data) {
-    //console.log(data.traces.length);
-  }
 
   return (
     <>
