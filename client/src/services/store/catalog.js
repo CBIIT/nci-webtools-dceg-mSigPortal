@@ -28,7 +28,7 @@ export const getInitialState = () => ({
     projectID: '',
   },
   sigRefSig: {
-    plotPath: '',
+    plot: '',
     err: '',
   },
   rSProfiles: {

@@ -27,6 +27,12 @@ export default function ProfileFormPlot({ options, index }) {
   const mergeRsProfiles = (state) =>
     dispatch(actions.mergeCatalog({ rSProfiles: state }));
 
+  const mergeState = (state) => {
+    let newPlot = plots.slice();
+    newPlot[index] = { ...newPlot[index], ...state };
+    mergeRsProfiles({ plots: newPlot });
+  };
+
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -45,6 +51,7 @@ export default function ProfileFormPlot({ options, index }) {
     strategy: '',
     signatureName: '',
   };
+  //const { control, setValue, watch } = useForm({ defaultValues: plots[index] });
   const { control, setValue, watch } = useForm({ defaultValues });
   const { source, profile, matrix, signatureSetName, strategy, signatureName } =
     watch();
@@ -199,7 +206,7 @@ export default function ProfileFormPlot({ options, index }) {
     setValue('signatureSetName', signatureSetName);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
-    // mergeRsProfiles({
+    // mergeState({
     //   source: source,
     //   profile: profile,
     //   matrix: matrix,
@@ -239,7 +246,7 @@ export default function ProfileFormPlot({ options, index }) {
     setValue('signatureSetName', signatureSetName);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
-    // mergeRsProfiles({
+    // mergeState({
     //   profile,
     //   matrix,
     //   signatureSetName,
@@ -275,7 +282,7 @@ export default function ProfileFormPlot({ options, index }) {
     setValue('signatureSetName', signatureSetName);
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
-    // mergeRsProfiles({
+    // mergeState({
     //   matrix,
     //   signatureSetName,
     //   strategy,
@@ -304,7 +311,7 @@ export default function ProfileFormPlot({ options, index }) {
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
 
-    // mergeRsProfiles({
+    // mergeState({
     //   signatureSetName,
     //   strategy,
     //   signatureName,
@@ -323,15 +330,15 @@ export default function ProfileFormPlot({ options, index }) {
     setValue('strategy', strategy);
     setValue('signatureName', signatureName);
 
-    //   mergeRsProfiles({
-    //     strategy,
-    //     signatureName,
-    //   });
+    // mergeState({
+    //   strategy,
+    //   signatureName,
+    // });
   }
 
   function handleName(signatureName) {
     setValue('signatureName', signatureName);
-    // mergeRsProfiles({
+    // mergeState({
     //   signatureName,
     // });
   }

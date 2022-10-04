@@ -5,6 +5,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     const sum = arr.reduce((a, b) => a + b, 0);
     return sum / arr.length || 0;
   }
+  console.log(data);
 
   const totalCancer = data.length;
 

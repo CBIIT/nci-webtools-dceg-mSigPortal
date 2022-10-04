@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { LoadingOverlay } from '../../../../controls/loading-overlay/loading-overlay';
-import Description from '../../../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as catalogActions } from '../../../../../services/store/catalog';
 import { actions as modalActions } from '../../../../../services/store/modal';
@@ -12,22 +11,21 @@ const actions = { ...catalogActions, ...modalActions };
 
 export default function RsInMsigportal() {
   const dispatch = useDispatch();
-  const mergeState = async (state) =>
+  const mergeRsInMsigportal = async (state) =>
     dispatch(actions.mergeCatalog({ sigRefSig: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
   const store = useSelector((state) => state.catalog);
-  const { plotPath } = store.sigRefSig;
+  const { plot } = store.sigRefSig;
 
-  const [params, setParams] = useState('');
+  const [params, setParams] = useState(null);
 
   const [loading, setLoading] = useState(false);
 
-  const { data, error, isFetching } = useRsInMsigportalDataQuery(params, {
-    skip: !params,
-  });
+  const { data, error, isFetching } = useRsInMsigportalDataQuery();
 
   console.log(data);
+  console.log(error);
   return (
     <div id="rsPlot">
       <LoadingOverlay active={loading} />

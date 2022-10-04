@@ -3,6 +3,7 @@ import { groupBy } from 'lodash';
 export default function MSPrevalence(data, minimum) {
   // calculate median burden across cancer types
   const groupBySignature = groupBy(data, 'signatureName');
+  console.log(data);
 
   const dataResult = Object.entries(groupBySignature)
     .map(([signatureName, data]) => {
@@ -218,6 +219,8 @@ export default function MSPrevalence(data, minimum) {
       column: 1,
     },
   }));
+
+  console.log(tracesBar);
   const titleAnnotation = [
     {
       xref: 'paper',
