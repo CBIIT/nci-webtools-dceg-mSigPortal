@@ -182,8 +182,8 @@ export default function ReferenceSignature() {
     // },
     {
       component: <RsInMsigportal />,
-      key: 'RSInMsigportal',
-      title: 'RS In Msigportal',
+      key: 'overview',
+      title: 'RS In mSigportal',
     },
     {
       component: <RsProfile />,
