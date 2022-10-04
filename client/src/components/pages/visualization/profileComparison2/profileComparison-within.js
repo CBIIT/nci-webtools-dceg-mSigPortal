@@ -86,7 +86,7 @@ export default function PcWithin() {
           : data.profile.value === 'DBS'
           ? '78'
           : '83',
-      sample: data.sample1.value + ',' + data.sample2.value,
+      sample: data.sample1.value + ';' + data.sample2.value,
     };
     setParams(params);
   }

@@ -38,36 +38,45 @@ export default function SignatureInfo({ data }) {
 
   // fetch signature plot data
   const [signatureParams, setSignatureParams] = useState(false);
-  const { data: signaturePlot, isFetching: fetchingProfile } =
-    useEtiologySignatureQuery(signatureParams, {
-      skip: !signatureParams,
-    });
+  const {
+    data: signaturePlot,
+    isFetching: fetchingProfile,
+    error: sigPlotError,
+  } = useEtiologySignatureQuery(signatureParams, {
+    skip: !signatureParams,
+  });
 
   // fetch reference signature plot data
-  const { data: refSigPlot, isFetching: fetchingRefSig } =
-    useEtiologySignatureQuery(
-      {
-        signatureName: `Ref.Sig.${referenceSignature?.match(/\d+/) || ''}`,
-        signatureSetName: 'Cancer_Reference_Signatures_GRCh37_SBS96',
-        profile: 'SBS',
-        matrix: '96',
-        // signatureSetName: 'Cancer_Reference_Signatures_GRCh37_RS32',
-        // profile: 'RS',
-        // matrix: '32',
-      },
-      {
-        skip: !referenceSignature,
-      }
-    );
+  const {
+    data: refSigPlot,
+    isFetching: fetchingRefSig,
+    error: refSigPlotError,
+  } = useEtiologySignatureQuery(
+    {
+      signatureName: `Ref.Sig.${referenceSignature?.match(/\d+/) || ''}`,
+      signatureSetName: 'Cancer_Reference_Signatures_GRCh37_SBS96',
+      profile: 'SBS',
+      matrix: '96',
+      // signatureSetName: 'Cancer_Reference_Signatures_GRCh37_RS32',
+      // profile: 'RS',
+      // matrix: '32',
+    },
+    {
+      skip: !referenceSignature,
+    }
+  );
 
   // fetch organ table data
-  const { data: organTable, isFetching: fetchingOrgan } =
-    useEtiologyOrganTableQuery(
-      { signature: metadata?.signature },
-      {
-        skip: !metadata || category != 'CancerSpecificSignatures_2022',
-      }
-    );
+  const {
+    data: organTable,
+    isFetching: fetchingOrgan,
+    error: organTableError,
+  } = useEtiologyOrganTableQuery(
+    { signature: metadata?.signature },
+    {
+      skip: !metadata || category != 'CancerSpecificSignatures_2022',
+    }
+  );
 
   const studyOptions = [
     {
@@ -199,6 +208,7 @@ export default function SignatureInfo({ data }) {
     } else if (category == 'CancerSpecificSignatures') {
       return {
         signatureSetName: 'Organ-specific_Cancer_Signatures_GRCh37_SBS96',
+        signatureName: metadata.signature + '%',
         profile: 'SBS',
         matrix: '96',
       };
@@ -219,16 +229,19 @@ export default function SignatureInfo({ data }) {
     } else if (category == 'Others') {
       return signature.includes('SBS')
         ? {
+            signatureSetName: 'Other_Published_Signatures_%',
             profile: 'SBS',
             matrix: '96',
           }
         : signature.includes('DBS')
         ? {
+            signatureSetName: 'Other_Published_Signatures_%',
             profile: 'DBS',
             matrix: '78',
           }
         : signature.includes('ID')
         ? {
+            signatureSetName: 'Other_Published_Signatures_%',
             profile: 'ID',
             matrix: '83',
           }
@@ -371,7 +384,7 @@ export default function SignatureInfo({ data }) {
             {category == 'CancerSpecificSignatures' && (
               <div className="my-3 border rounded">
                 <LoadingOverlay active={fetchingProfile} />
-                {refSigPlot ? (
+                {refSigPlot && !refSigPlotError ? (
                   <Plotly
                     data={refSigPlot.traces}
                     layout={refSigPlot.layout}
@@ -384,7 +397,7 @@ export default function SignatureInfo({ data }) {
             )}
             <div className="my-3 border rounded">
               <LoadingOverlay active={fetchingProfile} />
-              {signaturePlot ? (
+              {signaturePlot && !sigPlotError ? (
                 <Plotly
                   data={signaturePlot.traces}
                   layout={signaturePlot.layout}
@@ -437,67 +450,68 @@ export default function SignatureInfo({ data }) {
               </div>
             </>
           )}
-          {organTable && (
-            <>
-              <h5 className="separator my-3">Organ-Specific Signatures</h5>
-              <div className="p-3">
-                <div className="my-3">
-                  <LoadingOverlay active={fetchingOrgan} />
-                  <Row className="justify-content-center">
-                    {organTable.cohortOptions.length &&
-                      organTable.cohortOptions.map((e) => (
-                        <Col
-                          key={e}
-                          lg="2"
-                          md="3"
-                          sm="4"
-                          className="mb-3 d-flex"
-                        >
-                          <Button
-                            size="sm"
-                            variant="primary"
-                            onClick={() => mergeEtiology({ cohort: e })}
-                            className={cohort != e ? 'disabled' : ''}
-                            block
+          {organTable &&
+            !organTableError(
+              <>
+                <h5 className="separator my-3">Organ-Specific Signatures</h5>
+                <div className="p-3">
+                  <div className="my-3">
+                    <LoadingOverlay active={fetchingOrgan} />
+                    <Row className="justify-content-center">
+                      {organTable.cohortOptions.length &&
+                        organTable.cohortOptions.map((e) => (
+                          <Col
+                            key={e}
+                            lg="2"
+                            md="3"
+                            sm="4"
+                            className="mb-3 d-flex"
                           >
-                            {e}
-                          </Button>
-                        </Col>
-                      ))}
-                    <Col lg="2" md="3" sm="4" className="mb-3 d-flex">
-                      <Button
-                        size="sm"
-                        variant="primary"
-                        onClick={() => mergeEtiology({ cohort: '' })}
-                        className={cohort != '' ? 'disabled' : ''}
-                        block
-                      >
-                        All Cohorts
-                      </Button>
-                    </Col>
-                  </Row>
-                  {organTable?.data ? (
-                    <Table
-                      className="border mt-3"
-                      data={organTable.data.filter((e) =>
-                        cohort ? e.cohort == cohort : true
-                      )}
-                      columns={organTable.columns}
-                      options={{
-                        initialState: {
-                          hiddenColumns: ['id', 'signature'],
-                        },
-                      }}
-                      customOptions={{ hideColumns: true }}
-                      striped
-                    />
-                  ) : (
-                    <div className="text-center my-4">No data available</div>
-                  )}
+                            <Button
+                              size="sm"
+                              variant="primary"
+                              onClick={() => mergeEtiology({ cohort: e })}
+                              className={cohort != e ? 'disabled' : ''}
+                              block
+                            >
+                              {e}
+                            </Button>
+                          </Col>
+                        ))}
+                      <Col lg="2" md="3" sm="4" className="mb-3 d-flex">
+                        <Button
+                          size="sm"
+                          variant="primary"
+                          onClick={() => mergeEtiology({ cohort: '' })}
+                          className={cohort != '' ? 'disabled' : ''}
+                          block
+                        >
+                          All Cohorts
+                        </Button>
+                      </Col>
+                    </Row>
+                    {organTable?.data ? (
+                      <Table
+                        className="border mt-3"
+                        data={organTable.data.filter((e) =>
+                          cohort ? e.cohort == cohort : true
+                        )}
+                        columns={organTable.columns}
+                        options={{
+                          initialState: {
+                            hiddenColumns: ['id', 'signature'],
+                          },
+                        }}
+                        customOptions={{ hideColumns: true }}
+                        striped
+                      />
+                    ) : (
+                      <div className="text-center my-4">No data available</div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </>
-          )}
+              </>
+            )}
         </>
       )}
     </div>

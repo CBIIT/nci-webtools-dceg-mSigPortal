@@ -1,4 +1,4 @@
-const { pickBy } = require('lodash');
+const { pickBy, cond } = require('lodash');
 
 function getData(
   connection,
@@ -10,16 +10,13 @@ function getData(
   rowMode = 'object',
   distinct = false
 ) {
-  const conditions = pickBy(query, (v) => v !== undefined && !v.includes(','));
-  const multipleConditions = pickBy(
-    query,
-    (v) => v !== undefined && v.includes(',')
-  );
+  const conditions = pickBy(query, (v) => v && !v.includes('%'));
+  const patterns = pickBy(query, (v) => v && v.includes('%'));
 
   let sqlQuery = connection
     .select(columns)
     .from(table)
-    .where(conditions)
+    // .where(conditions)
     .limit(limit)
     .offset(offset, rowMode)
     .options({ rowMode: rowMode });
@@ -28,9 +25,27 @@ function getData(
     sqlQuery = sqlQuery.distinct(columns);
   }
 
-  if (multipleConditions) {
-    Object.entries(multipleConditions).forEach(([column, values]) => {
-      sqlQuery = sqlQuery.whereIn(column, values.replace(/\s/g, '').split(','));
+  // apply where conditions to query
+  // use WHERE IN query on conditions delimited by semi-colons (;)
+  if (conditions) {
+    Object.entries(conditions).forEach(([column, values]) => {
+      const splitValues = values.split(';');
+      if (splitValues.length > 1) {
+        sqlQuery.whereIn(
+          column,
+          splitValues.map((e) => e.trim())
+        );
+      } else {
+        splitValues.forEach((v) => {
+          sqlQuery = sqlQuery.andWhere(column, v.trim());
+        });
+      }
+    });
+  }
+
+  if (patterns) {
+    Object.entries(patterns).forEach(([column, values]) => {
+      sqlQuery = sqlQuery.andWhere(column, 'like', values.trim());
     });
   }
 

@@ -60,7 +60,7 @@ export default function ProfilerSummary() {
   }, [matrixData, filter]);
 
   return (
-    <div className="bg-white border rounded">
+    <div className="bg-white border rounded" style={{ minHeight: '500px' }}>
       <div className="p-3">
         <b>Number of Mutations Per Sample with Regard to Mutational Profile</b>
         <Description
@@ -96,7 +96,6 @@ export default function ProfilerSummary() {
       <LoadingOverlay active={isFetching} />
       {data && (
         <Plotly
-          style={{ minHeight: '500px' }}
           className="w-100"
           data={data.traces}
           layout={data.layout}

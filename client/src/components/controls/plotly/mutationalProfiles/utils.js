@@ -80,7 +80,7 @@ export function createMutationAnnotations(data, appendedText = '') {
         .slice(0, groupIndex)
         .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
       (group.data.length - 1) * 0.5,
-    y: 1.04,
+    y: 1.05,
     text: `<b>${group.mutation + appendedText}</b>`,
     showarrow: false,
     font: { size: 18 },

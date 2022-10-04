@@ -5,6 +5,7 @@ import SBS96 from '../../../controls/plotly/mutationalProfiles/sbs96';
 import DBS78 from '../../../controls/plotly/mutationalProfiles/dbs78';
 import ID83 from '../../../controls/plotly/mutationalProfiles/id83';
 import CN48 from '../../../controls/plotly/mutationalProfiles/cn48';
+import ID29 from '../../../controls/plotly/mutationalProfiles/id29';
 
 export const etiologyApiSlice = catalogApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -65,6 +66,7 @@ export const etiologyApiSlice = catalogApiSlice.injectEndpoints({
         else if (params.profile + params.matrix == 'DBS78') return DBS78(data);
         else if (params.profile + params.matrix == 'ID83') return ID83(data);
         else if (params.profile + params.matrix == 'CN48') return CN48(data);
+        else if (params.profile + params.matrix == 'ID29') return ID29(data);
         else return false;
       },
     }),
