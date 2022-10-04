@@ -25,7 +25,7 @@ export default function RsInMsigportal() {
   const { data, error, isFetching } = useRsInMsigportalDataQuery();
 
   console.log(data);
-  console.log(error);
+
   return (
     <div id="rsPlot">
       <LoadingOverlay active={loading} />
@@ -49,9 +49,9 @@ export default function RsInMsigportal() {
         data && (
           <Plotly
             className="w-100"
-            data={data.traces}
-            layout={data.layout}
-            config={data.config}
+            data={cloneDeep(data.traces)}
+            layout={cloneDeep(data.layout)}
+            config={cloneDeep(data.config)}
           />
         )
       )}

@@ -23,38 +23,36 @@ export default function RsInMsigportal(rawData) {
     (item) => `"${item.profile}${item.matrix}"`
   );
   console.log(grouped);
-
-  const tracesPie0 = {
-    type: 'pie',
-    // labels: grouped[0].map((group) => group.signatureName),
-    // values: grouped[0].map((group) =>
-    //   group.samples.reduce((a, b) => a + b.exposure, 0)
-    // ),
-
-    textposition: 'inside',
-  };
+  const dataArray = [];
+  Object.values(grouped).map((e) => dataArray.push(e));
+  console.log(dataArray);
 
   const tracePies = Object.entries(grouped).map(
     ([key, element], index, array) => ({
       type: 'pie',
       e: element,
-
+      textposition: 'inside',
       labels: element.map((e) => e.signatureSetName),
       values: element.map((e) => parseInt(e.count)),
       name: key,
+      domain: {
+        row: index <= 4 ? 0 : 1,
+        column: index <= 4 ? index : index - 5,
+      },
     })
   );
   console.log(tracePies);
-  const traces = [tracePies[0]];
+  const traces = [...tracePies];
+  //const traces = [pie0, pie1];
   console.log(traces);
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     height: 500,
     autosize: true,
-    grid: { rows: 2, columns: 4 },
+    grid: { rows: 2, columns: 5 },
   };
-  var config = {
+  const config = {
     //responsive: true,
   };
-  return { traces, layout, config };
+  return { traces: traces, layout: layout, config };
 }

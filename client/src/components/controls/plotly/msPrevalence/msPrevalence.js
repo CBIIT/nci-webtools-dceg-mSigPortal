@@ -4,6 +4,7 @@ export default function MSPrevalence(data, minimum) {
   // calculate median burden across cancer types
   const groupBySignature = groupBy(data, 'signatureName');
   console.log(data);
+  console.log(groupBySignature);
 
   const dataResult = Object.entries(groupBySignature)
     .map(([signatureName, data]) => {
@@ -32,7 +33,7 @@ export default function MSPrevalence(data, minimum) {
   //     a.samples.reduce((a, b) => a + b.exposure, 0) -
   //     b.samples.reduce((a, b) => a + b.exposure, 0)
   // );
-
+  console.log(dataResult);
   let minumumNumber = 100;
   minimum === null || minimum === undefined
     ? (minumumNumber = 100)
@@ -57,6 +58,7 @@ export default function MSPrevalence(data, minimum) {
 
     return false;
   });
+  console.log(contains);
 
   let colors = {};
 
@@ -175,6 +177,7 @@ export default function MSPrevalence(data, minimum) {
     hovertemplate:
       '<b>Signature Name:</b>%{label}<br><b>Total sample: </b>%{value}<br>%{percent}<extra></extra>',
   };
+  console.log(tracesPie);
   const tracesBar = dataResult.map((group, groupIndex, array) => ({
     name: group.signatureName,
     type: 'bar',
