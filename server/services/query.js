@@ -25,9 +25,11 @@ function getData(
     sqlQuery = sqlQuery.distinct(columns);
   }
 
+  // apply where conditions to query
+  // use WHERE IN query on conditions delimited by semi-colons (;)
   if (conditions) {
     Object.entries(conditions).forEach(([column, values]) => {
-      const splitValues = values.split(',');
+      const splitValues = values.split(';');
       if (splitValues.length > 1) {
         sqlQuery.whereIn(
           column,

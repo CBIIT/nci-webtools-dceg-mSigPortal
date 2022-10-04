@@ -12,7 +12,7 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
         params,
       }),
       transformResponse: (data, meta, arg) => {
-        const samples = arg.sample.split(',');
+        const samples = arg.sample.split(';');
         const groupBySample = groupBy(data, 'sample');
         const sample1 = groupBySample[samples[0]].flat();
         const sample2 = groupBySample[samples[1]].flat();
