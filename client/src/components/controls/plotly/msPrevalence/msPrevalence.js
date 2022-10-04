@@ -259,7 +259,7 @@ export default function MSPrevalence(data, minimum) {
     x: 0.5,
     y: 0.5,
     xanchor: 'top',
-    text: '<b>No samples with prevalence greater than 1% </b>',
+    text: '<b>No signature with prevalence greater than 1%</b>',
     font: {
       size: 18,
       family: 'Arial',
