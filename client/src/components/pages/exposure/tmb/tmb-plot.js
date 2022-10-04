@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
-import Plot from 'react-plotly.js';
-import { Button, Container, Row, Col } from 'react-bootstrap';
-import { cloneDeep } from 'lodash';
+import Plotly from '../../../controls/plotly/plot/plot';
 import { useSelector } from 'react-redux';
 import { useTmbPlotQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -30,22 +28,16 @@ export default function MutProfilePlot() {
   return (
     <>
       <LoadingOverlay active={isFetching} />
-      {data && (
-        <Container fluid style={{ minHeight: '500px' }} className="mb-3">
-          <Row>
-            <Col>
-              <Plot
-                className="w-100"
-                data={cloneDeep(data.traces)}
-                layout={cloneDeep(data.layout)}
-                config={cloneDeep(data.config)}
-                useResizeHandler
-              />
-            </Col>
-          </Row>
-        </Container>
+      {data && !error ? (
+        <Plotly
+          className="w-100"
+          data={data.traces}
+          layout={data.layout}
+          config={data.config}
+        />
+      ) : (
+        <div className="text-center my-4">No data available</div>
       )}
-      {error && <p>An error has occured</p>}
     </>
   );
 }

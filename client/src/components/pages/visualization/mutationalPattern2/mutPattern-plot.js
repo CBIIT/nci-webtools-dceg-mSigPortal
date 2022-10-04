@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
-import cloneDeep from 'lodash/cloneDeep';
-import { Button, Container, Row, Col } from 'react-bootstrap';
-import Plot from 'react-plotly.js';
+import Plotly from '../../../controls/plotly/plot/plot';
 import { useSelector } from 'react-redux';
 import { useMutationalPatternScatterQuery, usePatternQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -32,7 +30,6 @@ export default function MutPatternPlot() {
   const { proportion, pattern } = store.mutationalPattern;
 
   // get data on form change
-
   useEffect(() => {
     const { study, cancer, strategy } = publicForm;
     if (study && pattern) {
@@ -77,60 +74,39 @@ export default function MutPatternPlot() {
         <p className="p-3">An error has occured. Please verify your input.</p>
       )}
       <div id="barchart">
-        {patternData && (
-          <Container fluid style={{ minHeight: '500px' }} className="mb-3">
-            <Row>
-              <Col>
-                <Plot
-                  className="w-100"
-                  divId={divId1}
-                  data={cloneDeep(patternData.traces)}
-                  layout={cloneDeep(patternData.layout)}
-                  config={cloneDeep(config)}
-                  useResizeHandler
-                />
-              </Col>
-            </Row>
-            <Row>
-              <div className="p-3">
-                This plot illustrates the frequency by count of each mutational
-                pattern in the given study and cancer type or input dataset. The
-                y-axis is the frequency of each mutational pattern across all
-                samples, and the x-axis includes each of the mutational patterns
-                present in the study and cancer type that meet the criteria for
-                the minimal proportion of mutations within each mutational
-                pattern.
-              </div>
-            </Row>
-          </Container>
-        )}
-        {/* {patternData?.output.plotPath && !patternData?.output.barPath && (
-          <div className="p-3">
-            <p>Frequency of Mutational Pattern</p>
-            <p>
-              No mutational pattern with proportion of mutations large than{' '}
-              {proportion}
-            </p>
-          </div>
-        )} */}
-      </div>{' '}
-      <div id="context">
-        {scatterData && (
+        {patternData && !patternError ? (
           <>
-            <Container fluid style={{ minHeight: '500px' }} className="mb-3">
-              <Row>
-                <Col>
-                  <Plot
-                    className="w-100"
-                    divId={divId2}
-                    data={cloneDeep(scatterData.traces)}
-                    layout={cloneDeep(scatterData.layout)}
-                    config={cloneDeep(config)}
-                    useResizeHandler
-                  />
-                </Col>
-              </Row>
-            </Container>
+            <Plotly
+              className="w-100"
+              divId={divId1}
+              data={patternData.traces}
+              layout={patternData.layout}
+              config={config}
+            />
+            <p className="p-3">
+              This plot illustrates the frequency by count of each mutational
+              pattern in the given study and cancer type or input dataset. The
+              y-axis is the frequency of each mutational pattern across all
+              samples, and the x-axis includes each of the mutational patterns
+              present in the study and cancer type that meet the criteria for
+              the minimal proportion of mutations within each mutational
+              pattern.
+            </p>
+          </>
+        ) : (
+          <div className="text-center my-4">No data available</div>
+        )}
+      </div>
+      <div id="context">
+        {scatterData && !scatterError ? (
+          <>
+            <Plotly
+              className="w-100"
+              divId={divId2}
+              data={scatterData.traces}
+              layout={scatterData.layout}
+              config={config}
+            />
             <p className="p-3">
               This plot illustrates the mutational pattern context entered
               compared to other contexts with the same SBS mutation for each
@@ -140,6 +116,8 @@ export default function MutPatternPlot() {
               as TCGA PanCancer), different colors will be used.
             </p>
           </>
+        ) : (
+          <div className="text-center my-4">No data available</div>
         )}
       </div>
     </>
