@@ -1,14 +1,37 @@
-export function groupDataByMutation(apiData, regex) {
+export function groupDataByMutation(
+  apiData,
+  mutationRegex,
+  mutationOrder = [],
+  mutationTypeSortRegex = false
+) {
   const groupByMutation = apiData.reduce((acc, e) => {
-    const mutation = e.mutationType.match(regex)[1];
+    const mutation = e.mutationType.match(mutationRegex)[1];
     acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
     return acc;
   }, {});
 
-  return Object.entries(groupByMutation).map(([mutation, data]) => ({
-    mutation,
-    data,
-  }));
+  function mutationTypeSort(a, b) {
+    if (mutationTypeSortRegex) {
+      return a.mutationType
+        .match(mutationTypeSortRegex)[1]
+        .localeCompare(b.mutationType.match(mutationTypeSortRegex)[1]);
+    } else {
+      return a.mutationType.localeCompare(b.mutationType);
+    }
+  }
+
+  function mutationGroupSort(a, b) {
+    return (
+      mutationOrder.indexOf(a.mutation) - mutationOrder.indexOf(b.mutation)
+    );
+  }
+
+  return Object.entries(groupByMutation)
+    .map(([mutation, data]) => ({
+      mutation,
+      data: data.sort(mutationTypeSort),
+    }))
+    .sort(mutationGroupSort);
 }
 
 export function getTotalMutations(apiData) {
@@ -26,7 +49,7 @@ export function getMaxMutations(apiData) {
   );
 }
 
-export function createSampleAnnotation(apiData) {
+export function createSampleAnnotation(apiData, text = '') {
   const totalMutations = getTotalMutations(apiData);
   return {
     xref: 'paper',
@@ -36,9 +59,9 @@ export function createSampleAnnotation(apiData) {
     x: 0.01,
     y: 0.88,
     text: apiData[0].sample
-      ? `<b>${
-          apiData[0].sample
-        }: ${totalMutations.toLocaleString()} Substiutions</b>`
+      ? `<b>${apiData[0].sample}: ${totalMutations.toLocaleString()} ${
+          text || 'Substiutions'
+        }</b>`
       : `<b>${apiData[0].signatureName}</b>`,
     showarrow: false,
     font: {

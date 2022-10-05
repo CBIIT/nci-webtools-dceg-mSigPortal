@@ -2,10 +2,12 @@ import { catalogApiSlice } from '../../../../services/store/rootApi';
 import { groupBy } from 'lodash';
 import TMB from '../../../controls/plotly/tmb/tmb';
 import SBS96 from '../../../controls/plotly/mutationalProfiles/sbs96';
+import SBS192 from '../../../controls/plotly/mutationalProfiles/sbs192';
 import DBS78 from '../../../controls/plotly/mutationalProfiles/dbs78';
 import ID83 from '../../../controls/plotly/mutationalProfiles/id83';
 import CN48 from '../../../controls/plotly/mutationalProfiles/cn48';
 import ID29 from '../../../controls/plotly/mutationalProfiles/id29';
+import RS32 from '../../../controls/plotly/mutationalProfiles/rs32';
 
 export const etiologyApiSlice = catalogApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -62,11 +64,14 @@ export const etiologyApiSlice = catalogApiSlice.injectEndpoints({
         params,
       }),
       transformResponse: (data, _, params) => {
-        if (params.profile + params.matrix == 'SBS96') return SBS96(data);
-        else if (params.profile + params.matrix == 'DBS78') return DBS78(data);
-        else if (params.profile + params.matrix == 'ID83') return ID83(data);
-        else if (params.profile + params.matrix == 'CN48') return CN48(data);
-        else if (params.profile + params.matrix == 'ID29') return ID29(data);
+        const profileMatrix = params.profile + params.matrix;
+        if (profileMatrix == 'SBS96') return SBS96(data);
+        else if (profileMatrix == 'SBS192') return SBS192(data);
+        else if (profileMatrix == 'DBS78') return DBS78(data);
+        else if (profileMatrix == 'ID83') return ID83(data);
+        else if (profileMatrix == 'CN48') return CN48(data);
+        else if (profileMatrix == 'ID29') return ID29(data);
+        else if (profileMatrix == 'RS32') return RS32(data);
         else return false;
       },
     }),
