@@ -1,20 +1,10 @@
 import { groupBy, countBy } from 'lodash';
 export default function RsInMsigportal(rawData) {
-  console.log(rawData);
-
-  //   const grouped = groupBy(
-  //     rawData,
-  //     (item) => `"${item.species}_${item.profile}_${item.matrix}"`
-  //   );
-  //   console.log(grouped);
-
   const groupBySpecies = groupBy(rawData, (item) => `${item.species}`);
   const groupByignatureSetName = groupBy(
     rawData,
     (item) => `${item.signatureSetName}`
   );
-  console.log(groupBySpecies);
-  console.log(groupByignatureSetName);
 
   const signatureSetName = Object.keys(groupByignatureSetName).map((e) => e);
 
@@ -29,8 +19,6 @@ export default function RsInMsigportal(rawData) {
   Object.keys(groupByignatureSetName).map((e, i) => {
     colors[e] = randomColors[i];
   });
-  console.log(colors);
-  console.log(signatureSetName);
   let dataHuman = [];
   let dataMm9 = [];
   let dataRn6 = [];
@@ -59,10 +47,8 @@ export default function RsInMsigportal(rawData) {
     dataRn6,
     (item) => `${item.profile}${item.matrix}`
   );
-  console.log(groupedHuman);
   const dataArray = [];
   Object.values(groupedHuman).map((e) => dataArray.push(e));
-  console.log(dataArray);
 
   const tracePies0 = Object.entries(groupedHuman).map(
     ([key, element], index, array) => ({
@@ -313,14 +299,7 @@ export default function RsInMsigportal(rawData) {
     },
   ];
 
-  console.log(pieTitles0);
-  console.log(tracePies0);
-  console.log(tracePies1);
-  console.log(tracePies2);
-  console.log(annotationTitle0);
   const traces = [...tracePies0, ...tracePies1, ...tracePies2];
-  //const traces = [pie0, pie1];
-  console.log(traces);
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     height: 900,
