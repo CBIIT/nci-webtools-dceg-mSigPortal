@@ -88,7 +88,7 @@ export default function RsInMsigportal(rawData) {
             ? Math.round((index * (1 / 5) + 0.2) * 10) / 10
             : Math.round(((index - 4) * (1 / 5) + 0.2) * 10) / 10,
         ],
-        y: [index < 4 ? 0.6 : 0.8, index < 4 ? 0.75 : 0.95],
+        y: [index < 4 ? 0.55 : 0.78, index < 4 ? 0.72 : 0.95],
       },
     })
   );
@@ -117,7 +117,7 @@ export default function RsInMsigportal(rawData) {
             ? Math.round((index * (1 / 5) + 0.2) * 10) / 10
             : Math.round(((index - 4) * (1 / 5) + 0.2) * 10) / 10,
         ],
-        y: [0.3, 0.45],
+        y: [0.3, 0.47],
       },
     })
   );
@@ -146,7 +146,7 @@ export default function RsInMsigportal(rawData) {
             ? Math.round((index * (1 / 5) + 0.2) * 10) / 10
             : Math.round(((index - 4) * (1 / 5) + 0.2) * 10) / 10,
         ],
-        y: [0, 0.15],
+        y: [0, 0.17],
       },
     })
   );
@@ -161,7 +161,7 @@ export default function RsInMsigportal(rawData) {
       text: key,
       x: index < 4 ? index * (1 / 5) + 0.1 : (index - 4) * (1 / 5) + 0.1,
 
-      y: index < 4 ? 0.75 : 0.95,
+      y: index < 4 ? 0.72 : 0.95,
     })
   );
 
@@ -174,7 +174,7 @@ export default function RsInMsigportal(rawData) {
       showarrow: false,
       text: key,
       x: index < 4 ? index * (1 / 5) + 0.1 : (index - 4) * (1 / 5) + 0.1,
-      y: 0.45,
+      y: 0.47,
     })
   );
 
@@ -187,7 +187,7 @@ export default function RsInMsigportal(rawData) {
       showarrow: false,
       text: key,
       x: index < 4 ? index * (1 / 5) + 0.1 : (index - 4) * (1 / 5) + 0.1,
-      y: 0.15,
+      y: 0.17,
     })
   );
   const annotationTitle0 = {
@@ -197,6 +197,9 @@ export default function RsInMsigportal(rawData) {
     yanchor: 'bottom',
     showarrow: false,
     text: Object.keys(groupBySpecies)[0],
+    font: {
+      size: 16,
+    },
     x: 0.5,
     y: 1,
   };
@@ -208,7 +211,10 @@ export default function RsInMsigportal(rawData) {
     yanchor: 'bottom',
     showarrow: false,
     text: Object.keys(groupBySpecies)[1],
-    x: 0.5,
+    font: {
+      size: 16,
+    },
+    x: 0.25,
     y: 0.5,
   };
 
@@ -218,10 +224,94 @@ export default function RsInMsigportal(rawData) {
     xanchor: 'bottom',
     yanchor: 'bottom',
     showarrow: false,
-    text: Object.keys(groupBySpecies)[1],
-    x: 0.5,
-    y: 0.2,
+    text: Object.keys(groupBySpecies)[2],
+    font: {
+      size: 16,
+    },
+    x: 0.15,
+    y: 0.23,
   };
+
+  const shapes = [
+    {
+      type: 'line',
+      xref: 'paper',
+      yref: 'paper',
+      x0: 0,
+      y0: 1.01,
+      x1: 0.4,
+      y1: 1.01,
+      line: {
+        color: 'gray',
+        width: 3,
+      },
+    },
+    {
+      type: 'line',
+      xref: 'paper',
+      yref: 'paper',
+      x0: 0.6,
+      y0: 1.01,
+      x1: 1,
+      y1: 1.01,
+      line: {
+        color: 'gray',
+        width: 3,
+      },
+    },
+    {
+      type: 'line',
+      xref: 'paper',
+      yref: 'paper',
+      x0: 0,
+      y0: 0.51,
+      x1: 0.25,
+      y1: 0.51,
+      line: {
+        color: 'gray',
+        width: 3,
+      },
+    },
+    {
+      type: 'line',
+      xref: 'paper',
+      yref: 'paper',
+      x0: 0.42,
+      y0: 0.51,
+      x1: 0.7,
+      y1: 0.51,
+      line: {
+        color: 'gray',
+        width: 3,
+      },
+    },
+    {
+      type: 'line',
+      xref: 'paper',
+      yref: 'paper',
+      x0: 0,
+      y0: 0.24,
+      x1: 0.15,
+      y1: 0.24,
+      line: {
+        color: 'gray',
+        width: 3,
+      },
+    },
+    {
+      type: 'line',
+      xref: 'paper',
+      yref: 'paper',
+      x0: 0.31,
+      y0: 0.24,
+      x1: 0.7,
+      y1: 0.24,
+      line: {
+        color: 'gray',
+        width: 3,
+      },
+    },
+  ];
 
   console.log(pieTitles0);
   console.log(tracePies0);
@@ -248,6 +338,7 @@ export default function RsInMsigportal(rawData) {
       annotationTitle1,
       annotationTitle2,
     ],
+    shapes: [...shapes],
   };
   const config = {
     //responsive: true,
