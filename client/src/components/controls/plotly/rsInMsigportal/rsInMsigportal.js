@@ -1,4 +1,4 @@
-import { groupBy, countBy } from 'lodash';
+import { groupBy } from 'lodash';
 export default function RsInMsigportal(rawData) {
   const groupBySpecies = groupBy(rawData, (item) => `${item.species}`);
   const groupByignatureSetName = groupBy(
@@ -77,7 +77,6 @@ export default function RsInMsigportal(rawData) {
         '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
     })
   );
-  console.log(tracePies0);
   const tracePies1 = Object.entries(groupedMm9).map(
     ([key, element], index, array) => ({
       type: 'pie',
