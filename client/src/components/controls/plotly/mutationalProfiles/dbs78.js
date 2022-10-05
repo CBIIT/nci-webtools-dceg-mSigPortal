@@ -20,8 +20,9 @@ export default function DBS78(apiData) {
     TT: '#4C0299',
   };
   const mutationRegex = /^(.{2})/;
+  const mutationOrder = Object.keys(colors);
 
-  const data = groupDataByMutation(apiData, mutationRegex);
+  const data = groupDataByMutation(apiData, mutationRegex, mutationOrder);
   const maxMutation = getMaxMutations(apiData);
 
   const mutationTypeNames = data

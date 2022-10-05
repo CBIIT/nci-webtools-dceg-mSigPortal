@@ -16,8 +16,9 @@ export default function SBS96(apiData) {
     'T>G': '#EBC6C4',
   };
   const mutationRegex = /\[(.*)\]/;
+  const mutationOrder = Object.keys(colors);
 
-  const data = groupDataByMutation(apiData, mutationRegex);
+  const data = groupDataByMutation(apiData, mutationRegex, mutationOrder);
   const maxMutation = getMaxMutations(apiData);
 
   const mutationTypeNames = data
