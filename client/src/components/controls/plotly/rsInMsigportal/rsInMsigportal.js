@@ -53,7 +53,6 @@ export default function RsInMsigportal(rawData) {
   const tracePies0 = Object.entries(groupedHuman).map(
     ([key, element], index, array) => ({
       type: 'pie',
-      e: element,
       marker: {
         color: element.map((e) => colors[e.signatureSetName]),
       },
@@ -64,8 +63,6 @@ export default function RsInMsigportal(rawData) {
       direction: 'clockwise',
       name: key,
       domain: {
-        // row: index <= 4 ? 0 : 1,
-        // column: index <= 4 ? index : index - 5,
         x: [
           index < 4
             ? Math.round(index * (1 / 5) * 10) / 10
@@ -76,9 +73,11 @@ export default function RsInMsigportal(rawData) {
         ],
         y: [index < 4 ? 0.55 : 0.78, index < 4 ? 0.72 : 0.95],
       },
+      hovertemplate:
+        '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
     })
   );
-
+  console.log(tracePies0);
   const tracePies1 = Object.entries(groupedMm9).map(
     ([key, element], index, array) => ({
       type: 'pie',
@@ -93,8 +92,6 @@ export default function RsInMsigportal(rawData) {
       direction: 'clockwise',
       name: key,
       domain: {
-        // row: index <= 4 ? 0 : 1,
-        // column: index <= 4 ? index : index - 5,
         x: [
           index < 4
             ? Math.round(index * (1 / 5) * 10) / 10
@@ -105,6 +102,8 @@ export default function RsInMsigportal(rawData) {
         ],
         y: [0.3, 0.47],
       },
+      hovertemplate:
+        '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
     })
   );
 
@@ -122,8 +121,6 @@ export default function RsInMsigportal(rawData) {
       direction: 'clockwise',
       name: key,
       domain: {
-        // row: index <= 4 ? 0 : 1,
-        // column: index <= 4 ? index : index - 5,
         x: [
           index < 4
             ? Math.round(index * (1 / 5) * 10) / 10
@@ -134,6 +131,8 @@ export default function RsInMsigportal(rawData) {
         ],
         y: [0, 0.17],
       },
+      hovertemplate:
+        '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
     })
   );
 
@@ -146,7 +145,6 @@ export default function RsInMsigportal(rawData) {
       showarrow: false,
       text: key,
       x: index < 4 ? index * (1 / 5) + 0.1 : (index - 4) * (1 / 5) + 0.1,
-
       y: index < 4 ? 0.72 : 0.95,
     })
   );
