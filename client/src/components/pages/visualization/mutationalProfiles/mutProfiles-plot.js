@@ -37,21 +37,19 @@ export default function MutProfilePlot() {
   return (
     <>
       <LoadingOverlay active={isFetching} />
-      {error ? (
+      {data && !error ? (
+        <Plotly
+          data={data.traces}
+          layout={data.layout}
+          config={data.config}
+          divId="mutationalProfilePlot"
+          filename={sample?.value || 'Mutational Profile'}
+        />
+      ) : (
         <div className="text-center">
           <div>An error as occured</div>
-          <div>{error.message}</div>
+          <div>{error?.message}</div>
         </div>
-      ) : (
-        data && (
-          <Plotly
-            data={data.traces}
-            layout={data.layout}
-            config={data.config}
-            divId="mutationalProfilePlot"
-            filename={sample?.value || 'Mutational Profile'}
-          />
-        )
       )}
     </>
   );

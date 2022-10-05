@@ -26,7 +26,7 @@ export function getMaxMutations(apiData) {
   );
 }
 
-export function createSampleAnnotation(apiData) {
+export function createSampleAnnotation(apiData, text = '') {
   const totalMutations = getTotalMutations(apiData);
   return {
     xref: 'paper',
@@ -36,9 +36,9 @@ export function createSampleAnnotation(apiData) {
     x: 0.01,
     y: 0.88,
     text: apiData[0].sample
-      ? `<b>${
-          apiData[0].sample
-        }: ${totalMutations.toLocaleString()} Substiutions</b>`
+      ? `<b>${apiData[0].sample}: ${totalMutations.toLocaleString()} ${
+          text || 'Substiutions'
+        }</b>`
       : `<b>${apiData[0].signatureName}</b>`,
     showarrow: false,
     font: {
