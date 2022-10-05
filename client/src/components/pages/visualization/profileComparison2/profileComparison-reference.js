@@ -245,7 +245,7 @@ export default function PcReference() {
                   variant="link"
                   onClick={() => {
                     if (compare.length) {
-                      setValue('compare', compare + `,${signature}`);
+                      setValue('compare', compare + `;${signature}`);
                     } else {
                       setValue('compare', signature);
                     }

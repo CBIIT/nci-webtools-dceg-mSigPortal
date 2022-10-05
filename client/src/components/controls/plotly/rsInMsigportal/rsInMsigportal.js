@@ -1,4 +1,4 @@
-import { groupBy } from 'lodash';
+import { groupBy, countBy } from 'lodash';
 export default function RsInMsigportal(rawData) {
   console.log(rawData);
 
@@ -8,26 +8,69 @@ export default function RsInMsigportal(rawData) {
   //   );
   //   console.log(grouped);
 
-  const data = rawData.reduce((acc, e, i) => {
-    const human = '(GRCh37/38)';
-    const species = e.species.includes(human);
+  const groupBySpecies = groupBy(rawData, (item) => `${item.species}`);
+  const groupByignatureSetName = groupBy(
+    rawData,
+    (item) => `${item.signatureSetName}`
+  );
+  console.log(groupBySpecies);
+  console.log(groupByignatureSetName);
 
-    acc[species] = acc[species] ? [...acc[species], e] : [e];
-    return acc;
-  }, {});
+  const signatureSetName = Object.keys(groupByignatureSetName).map((e) => e);
 
-  const humanData = data.true;
-  console.log(humanData);
-  const grouped = groupBy(humanData, (item) => `${item.profile}${item.matrix}`);
-  console.log(grouped);
+  var randomColors = [];
+  while (randomColors.length < signatureSetName.length) {
+    do {
+      var color = Math.floor(Math.random() * 10000000000 + 1);
+    } while (randomColors.indexOf(color) >= 0);
+    randomColors.push('#' + ('000000' + color.toString(16)).slice(-6));
+  }
+  let colors = {};
+  Object.keys(groupByignatureSetName).map((e, i) => {
+    colors[e] = randomColors[i];
+  });
+  console.log(colors);
+  console.log(signatureSetName);
+  let dataHuman = [];
+  let dataMm9 = [];
+  let dataRn6 = [];
+  Object.entries(groupBySpecies).map(([key, val], index) => {
+    if (key.includes('(GRCh37/38)')) {
+      dataHuman.push(val);
+    } else if (key.includes('(mm9/10)')) {
+      dataMm9.push(val);
+    } else {
+      dataRn6.push(val);
+    }
+  });
+  dataHuman = dataHuman.flat();
+  dataMm9 = dataMm9.flat();
+  dataRn6 = dataRn6.flat();
+
+  const groupedHuman = groupBy(
+    dataHuman,
+    (item) => `${item.profile}${item.matrix}`
+  );
+  const groupedMm9 = groupBy(
+    dataMm9,
+    (item) => `${item.profile}${item.matrix}`
+  );
+  const groupedRn6 = groupBy(
+    dataRn6,
+    (item) => `${item.profile}${item.matrix}`
+  );
+  console.log(groupedHuman);
   const dataArray = [];
-  Object.values(grouped).map((e) => dataArray.push(e));
+  Object.values(groupedHuman).map((e) => dataArray.push(e));
   console.log(dataArray);
 
-  const tracePies = Object.entries(grouped).map(
+  const tracePies0 = Object.entries(groupedHuman).map(
     ([key, element], index, array) => ({
       type: 'pie',
       e: element,
+      marker: {
+        color: element.map((e) => colors[e.signatureSetName]),
+      },
       textposition: 'inside',
       labels: element.map((e) => e.signatureSetName),
       values: element.map((e) => parseInt(e.count)),
@@ -45,11 +88,70 @@ export default function RsInMsigportal(rawData) {
             ? Math.round((index * (1 / 5) + 0.2) * 10) / 10
             : Math.round(((index - 4) * (1 / 5) + 0.2) * 10) / 10,
         ],
-        y: [index < 4 ? 0 : 0.5, index < 4 ? 0.4 : 0.9],
+        y: [index < 4 ? 0.6 : 0.8, index < 4 ? 0.75 : 0.95],
       },
     })
   );
-  const pieTitles = Object.entries(grouped).map(
+
+  const tracePies1 = Object.entries(groupedMm9).map(
+    ([key, element], index, array) => ({
+      type: 'pie',
+      e: element,
+      marker: {
+        color: element.map((e) => colors[e.signatureSetName]),
+      },
+      textposition: 'inside',
+      labels: element.map((e) => e.signatureSetName),
+      values: element.map((e) => parseInt(e.count)),
+      texttemplate: '%{value}',
+      direction: 'clockwise',
+      name: key,
+      domain: {
+        // row: index <= 4 ? 0 : 1,
+        // column: index <= 4 ? index : index - 5,
+        x: [
+          index < 4
+            ? Math.round(index * (1 / 5) * 10) / 10
+            : Math.round((index - 4) * (1 / 5) * 10) / 10,
+          index < 4
+            ? Math.round((index * (1 / 5) + 0.2) * 10) / 10
+            : Math.round(((index - 4) * (1 / 5) + 0.2) * 10) / 10,
+        ],
+        y: [0.3, 0.45],
+      },
+    })
+  );
+
+  const tracePies2 = Object.entries(groupedRn6).map(
+    ([key, element], index, array) => ({
+      type: 'pie',
+      e: element,
+      marker: {
+        color: element.map((e) => colors[e.signatureSetName]),
+      },
+      textposition: 'inside',
+      labels: element.map((e) => e.signatureSetName),
+      values: element.map((e) => parseInt(e.count)),
+      texttemplate: '%{value}',
+      direction: 'clockwise',
+      name: key,
+      domain: {
+        // row: index <= 4 ? 0 : 1,
+        // column: index <= 4 ? index : index - 5,
+        x: [
+          index < 4
+            ? Math.round(index * (1 / 5) * 10) / 10
+            : Math.round((index - 4) * (1 / 5) * 10) / 10,
+          index < 4
+            ? Math.round((index * (1 / 5) + 0.2) * 10) / 10
+            : Math.round(((index - 4) * (1 / 5) + 0.2) * 10) / 10,
+        ],
+        y: [0, 0.15],
+      },
+    })
+  );
+
+  const pieTitles0 = Object.entries(groupedHuman).map(
     ([key, element], index, array) => ({
       xref: 'paper',
       yref: 'paper',
@@ -57,28 +159,95 @@ export default function RsInMsigportal(rawData) {
       yanchor: 'bottom',
       showarrow: false,
       text: key,
-      //   x: [
-      //     index <= 4 ? index * (1 / 5) : (index - 5) * (1 / 5),
-      //     index <= 4 ? index * (1 / 5) + 0.2 : (index - 5) * (1 / 5) + 0.2,
-      //   ],
-      //   y: [index <= 4 ? 0 : 0.6, index <= 4 ? 0.4 : 1],
       x: index < 4 ? index * (1 / 5) + 0.1 : (index - 4) * (1 / 5) + 0.1,
 
-      y: index < 4 ? 0.4 : 0.9,
+      y: index < 4 ? 0.75 : 0.95,
     })
   );
 
-  console.log(pieTitles);
-  console.log(tracePies);
-  const traces = [...tracePies];
+  const pieTitles1 = Object.entries(groupedMm9).map(
+    ([key, element], index, array) => ({
+      xref: 'paper',
+      yref: 'paper',
+      xanchor: 'bottom',
+      yanchor: 'bottom',
+      showarrow: false,
+      text: key,
+      x: index < 4 ? index * (1 / 5) + 0.1 : (index - 4) * (1 / 5) + 0.1,
+      y: 0.45,
+    })
+  );
+
+  const pieTitles2 = Object.entries(groupedRn6).map(
+    ([key, element], index, array) => ({
+      xref: 'paper',
+      yref: 'paper',
+      xanchor: 'bottom',
+      yanchor: 'bottom',
+      showarrow: false,
+      text: key,
+      x: index < 4 ? index * (1 / 5) + 0.1 : (index - 4) * (1 / 5) + 0.1,
+      y: 0.15,
+    })
+  );
+  const annotationTitle0 = {
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
+    showarrow: false,
+    text: Object.keys(groupBySpecies)[0],
+    x: 0.5,
+    y: 1,
+  };
+
+  const annotationTitle1 = {
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
+    showarrow: false,
+    text: Object.keys(groupBySpecies)[1],
+    x: 0.5,
+    y: 0.5,
+  };
+
+  const annotationTitle2 = {
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
+    showarrow: false,
+    text: Object.keys(groupBySpecies)[1],
+    x: 0.5,
+    y: 0.2,
+  };
+
+  console.log(pieTitles0);
+  console.log(tracePies0);
+  console.log(tracePies1);
+  console.log(tracePies2);
+  console.log(annotationTitle0);
+  const traces = [...tracePies0, ...tracePies1, ...tracePies2];
   //const traces = [pie0, pie1];
   console.log(traces);
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
-    height: 500,
+    height: 900,
     autosize: true,
-    grid: { rows: 2, columns: 5 },
-    annotations: pieTitles,
+    legend: {
+      x: 1,
+      xanchor: 'right',
+      y: 0,
+    },
+    annotations: [
+      ...pieTitles0,
+      ...pieTitles1,
+      ...pieTitles2,
+      annotationTitle0,
+      annotationTitle1,
+      annotationTitle2,
+    ],
   };
   const config = {
     //responsive: true,
