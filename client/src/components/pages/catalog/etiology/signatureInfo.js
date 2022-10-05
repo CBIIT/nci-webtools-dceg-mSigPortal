@@ -52,15 +52,19 @@ export default function SignatureInfo({ data }) {
     isFetching: fetchingRefSig,
     error: refSigPlotError,
   } = useEtiologySignatureQuery(
-    {
-      signatureName: `Ref.Sig.${referenceSignature?.match(/\d+/) || ''}`,
-      signatureSetName: 'Cancer_Reference_Signatures_GRCh37_SBS96',
-      profile: 'SBS',
-      matrix: '96',
-      // signatureSetName: 'Cancer_Reference_Signatures_GRCh37_RS32',
-      // profile: 'RS',
-      // matrix: '32',
-    },
+    referenceSignature == 'RefSig'
+      ? {
+          signatureName: referenceSignature,
+          signatureSetName: 'Cancer_Reference_Signatures_GRCh37_RS32',
+          profile: 'RS',
+          matrix: '32',
+        }
+      : {
+          signatureName: `Ref.Sig.${referenceSignature?.match(/\d+/) || ''}`,
+          signatureSetName: 'Cancer_Reference_Signatures_GRCh37_SBS96',
+          profile: 'SBS',
+          matrix: '96',
+        },
     {
       skip: !referenceSignature,
     }
@@ -134,6 +138,7 @@ export default function SignatureInfo({ data }) {
     }
   }, [metadata]);
   // return a valid signatureSetName and profile depending on the selected category and signature
+  // refer to Database/Etiology/signature_refsets_etiology.RData for what parameters to use
   function getSignatureParams(category, signature) {
     if (category == 'Cosmic') {
       return signature.includes('SBS')
@@ -227,25 +232,37 @@ export default function SignatureInfo({ data }) {
           }
         : false;
     } else if (category == 'Others') {
-      return signature.includes('SBS')
-        ? {
-            signatureSetName: 'Other_Published_Signatures_%',
-            profile: 'SBS',
-            matrix: '96',
-          }
-        : signature.includes('DBS')
-        ? {
-            signatureSetName: 'Other_Published_Signatures_%',
-            profile: 'DBS',
-            matrix: '78',
-          }
-        : signature.includes('ID')
-        ? {
-            signatureSetName: 'Other_Published_Signatures_%',
-            profile: 'ID',
-            matrix: '83',
-          }
-        : false;
+      const sbs192Signatures = [
+        'SBS_GA_exp_TSB_WES',
+        'SBS_pks_transcStrand_WGS',
+        'SBS_BaP_exp_TSB_WGS',
+      ];
+      if (sbs192Signatures.includes(signature)) {
+        return {
+          signatureSetName: 'Other_Published_Signatures_GRCh37_SBS192',
+          profile: 'SBS',
+          matrix: '192',
+        };
+      } else
+        return signature.includes('SBS')
+          ? {
+              signatureSetName: 'Other_Published_Signatures_%',
+              profile: 'SBS',
+              matrix: '96',
+            }
+          : signature.includes('DBS')
+          ? {
+              signatureSetName: 'Other_Published_Signatures_%',
+              profile: 'DBS',
+              matrix: '78',
+            }
+          : signature.includes('ID')
+          ? {
+              signatureSetName: 'Other_Published_Signatures_%',
+              profile: 'ID',
+              matrix: '83',
+            }
+          : false;
     }
   }
 
