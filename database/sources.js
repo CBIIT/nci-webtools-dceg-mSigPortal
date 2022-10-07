@@ -68,12 +68,12 @@ export const sources = [
   //   ],
   // },
 
-  {
-    sourcePath: 'Signature/summary.csv',
-    table: 'signatureSummary',
-    description: 'signature summary',
-    columns: ['species', 'profile', 'matrix', 'signatureSetName', 'count'],
-  },
+  // {
+  //   sourcePath: 'Signature/summary.csv',
+  //   table: 'signatureSummary',
+  //   description: 'signature summary',
+  //   columns: ['species', 'profile', 'matrix', 'signatureSetName', 'count'],
+  // },
 
   // {
   //   sourcePath: 'Etiology/Etiology_cancer_specific_signatures_2022.csv',
@@ -142,19 +142,19 @@ export const sources = [
   //   ],
   // },
 
-  // {
-  //   sourcePath: 'Etiology/aetiology_organ_specific_signature.csv',
-  //   table: 'etiologyOrgan',
-  //   description: 'etiologyOrgan - aetiology_organ_specific_signature',
-  //   columns: [
-  //     'signature',
-  //     'cohort',
-  //     'organ',
-  //     'prevalence',
-  //     'organSpecificSignature',
-  //     'contribution',
-  //   ],
-  // },
+  {
+    sourcePath: 'Etiology/etiologyOrgan.csv',
+    table: 'etiologyOrgan',
+    description: 'etiologyOrgan - aetiology_organ_specific_signature',
+    columns: [
+      'signature',
+      'cohort',
+      'organ',
+      'prevalence',
+      'organSpecificSignature',
+      'contribution',
+    ],
+  },
 
   // {
   //   sourcePath: 'Others/Publications.csv',
