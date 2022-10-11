@@ -71,7 +71,7 @@ export default function RsInMsigportal(rawData) {
             ? Math.round((index * (1 / 5) + 0.2) * 10) / 10
             : Math.round(((index - 4) * (1 / 5) + 0.2) * 10) / 10,
         ],
-        y: [index < 4 ? 0.55 : 0.78, index < 4 ? 0.72 : 0.95],
+        y: [index < 4 ? 0.55 : 0.78, index < 4 ? 0.75 : 0.98],
       },
       hovertemplate:
         '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
@@ -99,7 +99,7 @@ export default function RsInMsigportal(rawData) {
             ? Math.round((index * (1 / 5) + 0.2) * 10) / 10
             : Math.round(((index - 4) * (1 / 5) + 0.2) * 10) / 10,
         ],
-        y: [0.3, 0.47],
+        y: [0.265, 0.465],
       },
       hovertemplate:
         '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
@@ -128,7 +128,7 @@ export default function RsInMsigportal(rawData) {
             ? Math.round((index * (1 / 5) + 0.2) * 10) / 10
             : Math.round(((index - 4) * (1 / 5) + 0.2) * 10) / 10,
         ],
-        y: [0, 0.17],
+        y: [0, 0.2],
       },
       hovertemplate:
         '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
@@ -144,7 +144,7 @@ export default function RsInMsigportal(rawData) {
       showarrow: false,
       text: key,
       x: index < 4 ? index * (1 / 5) + 0.1 : (index - 4) * (1 / 5) + 0.1,
-      y: index < 4 ? 0.72 : 0.95,
+      y: index < 4 ? 0.75 : 0.98,
     })
   );
 
@@ -170,7 +170,7 @@ export default function RsInMsigportal(rawData) {
       showarrow: false,
       text: key,
       x: index < 4 ? index * (1 / 5) + 0.1 : (index - 4) * (1 / 5) + 0.1,
-      y: 0.17,
+      y: 0.2,
     })
   );
   const annotationTitle0 = {
@@ -222,7 +222,7 @@ export default function RsInMsigportal(rawData) {
       yref: 'paper',
       x0: 0,
       y0: 1.01,
-      x1: 0.42,
+      x1: 0.35,
       y1: 1.01,
       line: {
         color: 'gray',
@@ -233,7 +233,7 @@ export default function RsInMsigportal(rawData) {
       type: 'line',
       xref: 'paper',
       yref: 'paper',
-      x0: 0.58,
+      x0: 0.64,
       y0: 1.01,
       x1: 1,
       y1: 1.01,
@@ -248,7 +248,7 @@ export default function RsInMsigportal(rawData) {
       yref: 'paper',
       x0: 0,
       y0: 0.51,
-      x1: 0.24,
+      x1: 0.23,
       y1: 0.51,
       line: {
         color: 'gray',
@@ -259,7 +259,7 @@ export default function RsInMsigportal(rawData) {
       type: 'line',
       xref: 'paper',
       yref: 'paper',
-      x0: 0.38,
+      x0: 0.5,
       y0: 0.51,
       x1: 0.7,
       y1: 0.51,
@@ -285,7 +285,7 @@ export default function RsInMsigportal(rawData) {
       type: 'line',
       xref: 'paper',
       yref: 'paper',
-      x0: 0.28,
+      x0: 0.38,
       y0: 0.24,
       x1: 0.7,
       y1: 0.24,
@@ -300,6 +300,7 @@ export default function RsInMsigportal(rawData) {
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     height: 900,
+    width: 1080,
     autosize: true,
     legend: {
       title: { text: 'Signature Set Name' },
