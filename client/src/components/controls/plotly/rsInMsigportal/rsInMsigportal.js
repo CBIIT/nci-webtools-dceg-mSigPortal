@@ -184,7 +184,7 @@ export default function RsInMsigportal(rawData) {
       size: 16,
     },
     x: 0.5,
-    y: 1,
+    y: 1.02,
   };
 
   const annotationTitle1 = {
@@ -221,9 +221,9 @@ export default function RsInMsigportal(rawData) {
       xref: 'paper',
       yref: 'paper',
       x0: 0,
-      y0: 1.01,
+      y0: 1.03,
       x1: 0.35,
-      y1: 1.01,
+      y1: 1.03,
       line: {
         color: 'gray',
         width: 3,
@@ -234,9 +234,9 @@ export default function RsInMsigportal(rawData) {
       xref: 'paper',
       yref: 'paper',
       x0: 0.64,
-      y0: 1.01,
+      y0: 1.03,
       x1: 1,
-      y1: 1.01,
+      y1: 1.03,
       line: {
         color: 'gray',
         width: 3,
