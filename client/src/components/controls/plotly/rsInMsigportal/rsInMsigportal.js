@@ -299,7 +299,7 @@ export default function RsInMsigportal(rawData) {
   const traces = [...tracePies0, ...tracePies1, ...tracePies2];
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
-    height: 900,
+    height: 975,
     width: 1080,
     autosize: true,
     legend: {
