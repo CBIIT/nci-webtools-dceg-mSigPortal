@@ -5,7 +5,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     const sum = arr.reduce((a, b) => a + b, 0);
     return sum / arr.length || 0;
   }
-  console.log(data);
+  //console.log(data);
 
   const totalCancer = data.length;
 
@@ -198,7 +198,7 @@ export default function TMB(data, tmbTabName, signatureName) {
   const labels = topLabel.map((e) => e.text);
   const longest = labels.reduce((a, e) => (a > e.length ? a : e.length), 0);
   const extraMargin = longest < 10 ? 60 : longest * 7;
-  console.log(labels);
+  ///console.log(labels);
   const layout = {
     width: totalCancer > 1 ? null : 350,
     autosize: true,
@@ -232,6 +232,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     },
     margin: {
       b: extraMargin,
+      t: 140,
     },
     shapes: [...shapes, ...lines, ...bottoLabelline],
     annotations: annotations,
