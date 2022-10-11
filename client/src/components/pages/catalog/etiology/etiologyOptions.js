@@ -21,9 +21,9 @@ export default function EtiologyOptions({ data }) {
     const cnRegex = /^CN:/;
     const unkRegex = /^Unknown/;
     const unkOrder = [
-      'Unknown',
       'Unknown chemotherapy treatment',
       'Unknown (clock-like signature)',
+      'Unknown',
     ];
 
     if (a.match(cnRegex)) {

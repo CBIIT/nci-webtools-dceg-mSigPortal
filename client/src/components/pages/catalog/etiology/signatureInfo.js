@@ -467,68 +467,67 @@ export default function SignatureInfo({ data }) {
               </div>
             </>
           )}
-          {organTable &&
-            !organTableError(
-              <>
-                <h5 className="separator my-3">Organ-Specific Signatures</h5>
-                <div className="p-3">
-                  <div className="my-3">
-                    <LoadingOverlay active={fetchingOrgan} />
-                    <Row className="justify-content-center">
-                      {organTable.cohortOptions.length &&
-                        organTable.cohortOptions.map((e) => (
-                          <Col
-                            key={e}
-                            lg="2"
-                            md="3"
-                            sm="4"
-                            className="mb-3 d-flex"
-                          >
-                            <Button
-                              size="sm"
-                              variant="primary"
-                              onClick={() => mergeEtiology({ cohort: e })}
-                              className={cohort != e ? 'disabled' : ''}
-                              block
-                            >
-                              {e}
-                            </Button>
-                          </Col>
-                        ))}
-                      <Col lg="2" md="3" sm="4" className="mb-3 d-flex">
-                        <Button
-                          size="sm"
-                          variant="primary"
-                          onClick={() => mergeEtiology({ cohort: '' })}
-                          className={cohort != '' ? 'disabled' : ''}
-                          block
+          {organTable && !organTableError && (
+            <>
+              <h5 className="separator my-3">Organ-Specific Signatures</h5>
+              <div className="p-3">
+                <div className="my-3">
+                  <LoadingOverlay active={fetchingOrgan} />
+                  <Row className="justify-content-center">
+                    {organTable.cohortOptions.length &&
+                      organTable.cohortOptions.map((e) => (
+                        <Col
+                          key={e}
+                          lg="2"
+                          md="3"
+                          sm="4"
+                          className="mb-3 d-flex"
                         >
-                          All Cohorts
-                        </Button>
-                      </Col>
-                    </Row>
-                    {organTable?.data ? (
-                      <Table
-                        className="border mt-3"
-                        data={organTable.data.filter((e) =>
-                          cohort ? e.cohort == cohort : true
-                        )}
-                        columns={organTable.columns}
-                        options={{
-                          initialState: {
-                            hiddenColumns: ['id', 'signature'],
-                          },
-                        }}
-                        customOptions={{ hideColumns: true }}
-                        striped
-                      />
-                    ) : (
-                      <div className="text-center my-4">No data available</div>
-                    )}
-                  </div>
+                          <Button
+                            size="sm"
+                            variant="primary"
+                            onClick={() => mergeEtiology({ cohort: e })}
+                            className={cohort != e ? 'disabled' : ''}
+                            block
+                          >
+                            {e}
+                          </Button>
+                        </Col>
+                      ))}
+                    <Col lg="2" md="3" sm="4" className="mb-3 d-flex">
+                      <Button
+                        size="sm"
+                        variant="primary"
+                        onClick={() => mergeEtiology({ cohort: '' })}
+                        className={cohort != '' ? 'disabled' : ''}
+                        block
+                      >
+                        All Cohorts
+                      </Button>
+                    </Col>
+                  </Row>
+                  {organTable?.data ? (
+                    <Table
+                      className="border mt-3"
+                      data={organTable.data.filter((e) =>
+                        cohort ? e.cohort == cohort : true
+                      )}
+                      columns={organTable.columns}
+                      options={{
+                        initialState: {
+                          hiddenColumns: ['id', 'signature'],
+                        },
+                      }}
+                      customOptions={{ hideColumns: true }}
+                      striped
+                    />
+                  ) : (
+                    <div className="text-center my-4">No data available</div>
+                  )}
                 </div>
-              </>
-            )}
+              </div>
+            </>
+          )}
         </>
       )}
     </div>
