@@ -600,7 +600,7 @@ export default function Exposure({ match }) {
             name: 'MS Burden',
           },
           {
-            component: <MsDecomposition />,
+            component: <MsDecomposition2 />,
             id: 'msDecomposition',
             name: 'MS Decomposition',
           },

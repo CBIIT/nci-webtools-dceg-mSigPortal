@@ -12,6 +12,7 @@ export default function MutProfilePlot() {
     skip: !params,
   });
 
+  console.log(data);
   useEffect(() => {
     const { study, strategy, signatureSetName, cancer } = publicForm;
     if (study) {

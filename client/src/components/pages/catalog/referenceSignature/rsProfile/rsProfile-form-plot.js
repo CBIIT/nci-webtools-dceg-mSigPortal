@@ -51,8 +51,8 @@ export default function ProfileFormPlot({ options, index }) {
     strategy: '',
     signatureName: '',
   };
-  //const { control, setValue, watch } = useForm({ defaultValues: plots[index] });
-  const { control, setValue, watch } = useForm({ defaultValues });
+  const { control, setValue, watch } = useForm({ defaultValues: plots[index] });
+  //const { control, setValue, watch } = useForm({ defaultValues });
   const { source, profile, matrix, signatureSetName, strategy, signatureName } =
     watch();
 
@@ -540,24 +540,8 @@ export default function ProfileFormPlot({ options, index }) {
           </Col>
         </Row>
         {/* <AdditionalControls /> */}
-        {index === 0 ? (
-          <Row className="mt-3">
-            <Col md="auto" className="d-flex">
-              <Button
-                className="ml-auto"
-                variant="link"
-                onClick={() => addPlots()}
-                title="Add Plot"
-                style={{ textDecoration: 'none' }}
-              >
-                <span className="text-nowrap" title="Add Plot">
-                  <FontAwesomeIcon icon={faPlus} /> Add Plot
-                </span>
-              </Button>
-            </Col>
-          </Row>
-        ) : (
-          <Row className="mt-3">
+        <Row className="mt-3">
+          {index != 0 ? (
             <Col md="auto" className="d-flex">
               <Button
                 className="ml-auto"
@@ -572,8 +556,10 @@ export default function ProfileFormPlot({ options, index }) {
                 {parseInt(index) + 1}
               </Button>
             </Col>
-          </Row>
-        )}
+          ) : (
+            <Col md="auto" className="d-flex"></Col>
+          )}
+        </Row>
       </Form>
 
       <div id="plot">
@@ -590,7 +576,27 @@ export default function ProfileFormPlot({ options, index }) {
             filename={source?.value || 'Mutational Profile'}
           />
         )}
+        <Row className="mt-3 d-flex flex-column">
+          {index === plots.length - 1 ? (
+            <Col md="auto" className="d-flex justify-content-end">
+              <Button
+                className="ml-auto"
+                variant="link"
+                onClick={() => addPlots()}
+                title="Add Plot"
+                style={{ textDecoration: 'none' }}
+              >
+                <span className="text-nowrap" title="Add Plot">
+                  <FontAwesomeIcon icon={faPlus} /> Add Plot
+                </span>
+              </Button>
+            </Col>
+          ) : (
+            <Col md="auto" className="d-flex justify-content-start"></Col>
+          )}
+        </Row>
       </div>
+
       <hr></hr>
       {/* {additionalPlots()} */}
     </div>

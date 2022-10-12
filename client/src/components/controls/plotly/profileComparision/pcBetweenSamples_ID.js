@@ -166,6 +166,8 @@ export default function pcBetweenSamples_ID(samples, sample1, sample2, tab) {
       dotp(A, B) / (Math.sqrt(dotp(A, A)) * Math.sqrt(dotp(B, B)));
     return similarity;
   }
+  console.log(s1mutations);
+  console.log(s2mutations);
   const cosine = cosineSimilarity(s1mutations, s2mutations).toFixed(3);
 
   const indelNames0 = sample1data.map((indel) =>

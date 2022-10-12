@@ -32,6 +32,8 @@ export const msDecompositionApiSlice = explorationApiSlice.injectEndpoints({
                   2
                 : burdens[Math.floor(burdens.length / 2)];
 
+            console.log(samples);
+
             return {
               cancer,
               samples,
