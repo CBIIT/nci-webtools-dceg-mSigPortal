@@ -604,21 +604,21 @@ export default function Exposure({ match }) {
             id: 'msDecomposition',
             name: 'MS Decomposition',
           },
-          // {
-          //   component: <MsLandscape2 />,
-          //   id: 'msLandscape',
-          //   name: 'MS Landscape',
-          // },
           {
-            component: (
-              <MsLandscape
-                calculateLandscape={calculateLandscape}
-                handleVariable={handleVariable}
-              />
-            ),
+            component: <MsLandscape2 />,
             id: 'msLandscape',
             name: 'MS Landscape',
           },
+          // {
+          //   component: (
+          //     <MsLandscape
+          //       calculateLandscape={calculateLandscape}
+          //       handleVariable={handleVariable}
+          //     />
+          //   ),
+          //   id: 'msLandscape',
+          //   name: 'MS Landscape',
+          // },
           {
             component: <MsPrevalence2 />,
             id: 'msPrevalence',

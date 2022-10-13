@@ -1,52 +1,37 @@
-export default function MsLandscape(data, tmbTabName, signatureName) {
+import { groupBy } from 'lodash';
+
+export default function MsLandscape(data, arg) {
   console.log(data);
-  console.log(signatureName);
-  function average(arr) {
-    const sum = arr.reduce((a, b) => a + b, 0);
-    return sum / arr.length || 0;
-  }
+  console.log(arg);
+  const rawDataActivity = data[0]['data']; //exposure data
+  const rawDataSignature = data[1]['data']; //signature data
+  const rawDataSpectrum = data[2]['data']; //seqmatrix data
+  console.log('activity/exposure data');
+  console.log(rawDataActivity);
+  console.log('signature data');
+  console.log(rawDataSignature);
+  console.log('spectrum/seqmatrix data');
+  console.log(rawDataSpectrum);
 
-  const totalCancer = data.length;
+  const groupByMutationType_signature = groupBy(
+    rawDataSignature,
+    'mutationType'
+  );
+  console.log(groupByMutationType_signature);
 
-  const absYValue = data
-    .map((o) => o.samples.map((e) => Math.abs(e.burden)))
-    .flat();
-  const yMax = Math.max(...absYValue);
+  const groupByMutationType_spectrum = groupBy(rawDataSpectrum, 'mutationType');
+  console.log(groupByMutationType_spectrum);
 
   const traces = [];
 
-  //console.log('traces:--');
-  //console.log(traces);
-
-  const topLabel = [];
-  console.log('top label:--');
-  console.log(topLabel);
-
-  const bottoLabel1 = [];
-
-  const bottoLabelline = [];
-
-  const bottoLabel2 = [];
-
   const shapes = [];
-  //console.log('shapes:--');
-  //console.log(shapes);
 
   const lines = [];
 
-  const signatureNameAnnotation = [];
   let annotations = [];
-  signatureName != null
-    ? (annotations = [
-        ...topLabel,
-        ...bottoLabel1,
-        ...bottoLabel2,
-        signatureNameAnnotation,
-      ])
-    : (annotations = [...topLabel, ...bottoLabel1, ...bottoLabel2]);
 
   const layout = {
-    width: totalCancer > 1 ? null : 350,
+    // width: totalCancer > 1 ? null : 350,
     autosize: true,
     height: 500,
     showlegend: false,
@@ -55,9 +40,9 @@ export default function MsLandscape(data, tmbTabName, signatureName) {
       tickfont: {
         size: 10,
       },
-      autorange: false,
-      range: [0, totalCancer],
-      linecolor: 'black',
+      //autorange: false,
+      //range: [0, totalCancer],
+      // linecolor: 'black',
       linewidth: 2,
       mirror: true,
       tickmode: 'array',
@@ -74,10 +59,10 @@ export default function MsLandscape(data, tmbTabName, signatureName) {
       mirror: true,
       automargin: true,
       autorange: true,
-      range: [-Math.floor(yMax), Math.floor(yMax)],
+      //range: [-Math.floor(yMax), Math.floor(yMax)],
     },
 
-    shapes: [...shapes, ...lines, ...bottoLabelline],
+    shapes: [...shapes, ...lines],
     annotations: annotations,
   };
 
