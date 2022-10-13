@@ -553,7 +553,7 @@ export default function ProfileFormPlot({ options, index }) {
                 <span className="text-nowrap" title="Remove Plot">
                   <FontAwesomeIcon icon={faMinus} /> Remove Plot
                 </span>{' '}
-                {parseInt(index) + 1}
+                {/* {parseInt(index) + 1} */}
               </Button>
             </Col>
           ) : (
@@ -576,9 +576,9 @@ export default function ProfileFormPlot({ options, index }) {
             filename={source?.value || 'Mutational Profile'}
           />
         )}
-        <Row className="mt-3 d-flex flex-column">
+        <Row className="mr-3">
           {index === plots.length - 1 ? (
-            <Col md="auto" className="d-flex justify-content-end">
+            <Col className="d-flex justify-content-end">
               <Button
                 className="ml-auto"
                 variant="link"
@@ -592,7 +592,7 @@ export default function ProfileFormPlot({ options, index }) {
               </Button>
             </Col>
           ) : (
-            <Col md="auto" className="d-flex justify-content-start"></Col>
+            <Col></Col>
           )}
         </Row>
       </div>
