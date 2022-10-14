@@ -13,6 +13,8 @@ export default function MsLandscape(data, arg) {
   console.log('spectrum/seqmatrix data');
   console.log(rawDataSpectrum);
 
+  const groupBySample_activity = groupBy(rawDataActivity, 'sample');
+  console.log(groupBySample_activity);
   const groupByMutationType_signature = groupBy(
     rawDataSignature,
     'mutationType'
