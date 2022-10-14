@@ -20,25 +20,26 @@ RUN dnf -y update \
     rsync \
     wget \ 
     which \
-    && dnf -y builddep R \
+    R-4.1.3 \
+    # && dnf -y builddep R \
     && dnf clean all
 
 #  install R from source 
-ENV R_VERSION=4.1.3 
-RUN cd /tmp && \
-    curl -O https://cran.rstudio.com/src/base/R-4/R-${R_VERSION}.tar.gz && \
-    tar -xzvf R-${R_VERSION}.tar.gz 
-RUN cd /tmp/R-${R_VERSION} && \
-    ./configure \
-    --prefix=/opt/R/${R_VERSION} \
-    --enable-memory-profiling \
-    --enable-R-shlib \
-    --with-blas \
-    --with-lapack && \
-    make && \
-    make install
-RUN ln -s /opt/R/${R_VERSION}/bin/R /usr/local/bin/R && \
-    ln -s /opt/R/${R_VERSION}/bin/Rscript /usr/local/bin/Rscript
+# ENV R_VERSION=4.1.3 
+# RUN cd /tmp && \
+#     curl -O https://cran.rstudio.com/src/base/R-4/R-${R_VERSION}.tar.gz && \
+#     tar -xzvf R-${R_VERSION}.tar.gz 
+# RUN cd /tmp/R-${R_VERSION} && \
+#     ./configure \
+#     --prefix=/opt/R/${R_VERSION} \
+#     --enable-memory-profiling \
+#     --enable-R-shlib \
+#     --with-blas \
+#     --with-lapack && \
+#     make && \
+#     make install
+# RUN ln -s /opt/R/${R_VERSION}/bin/R /usr/local/bin/R && \
+#     ln -s /opt/R/${R_VERSION}/bin/Rscript /usr/local/bin/Rscript
 
 RUN mkdir -p /deploy/server /deploy/logs
 
