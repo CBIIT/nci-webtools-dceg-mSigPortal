@@ -21,25 +21,7 @@ RUN dnf -y update \
     wget \ 
     which \
     R-4.1.3 \
-    # && dnf -y builddep R \
     && dnf clean all
-
-#  install R from source 
-# ENV R_VERSION=4.1.3 
-# RUN cd /tmp && \
-#     curl -O https://cran.rstudio.com/src/base/R-4/R-${R_VERSION}.tar.gz && \
-#     tar -xzvf R-${R_VERSION}.tar.gz 
-# RUN cd /tmp/R-${R_VERSION} && \
-#     ./configure \
-#     --prefix=/opt/R/${R_VERSION} \
-#     --enable-memory-profiling \
-#     --enable-R-shlib \
-#     --with-blas \
-#     --with-lapack && \
-#     make && \
-#     make install
-# RUN ln -s /opt/R/${R_VERSION}/bin/R /usr/local/bin/R && \
-#     ln -s /opt/R/${R_VERSION}/bin/Rscript /usr/local/bin/Rscript
 
 RUN mkdir -p /deploy/server /deploy/logs
 
@@ -54,15 +36,10 @@ RUN cd /tmp && \
 # RUN mkdir -p $HOME/.R && \
 #     echo -e "CXX14FLAGS=-O3 -march=native -mtune=native -fPIC \nCXX14=g++" >> $HOME/.R/Makevars
 
-# install renv
-RUN R -e "install.packages('renv', repos = 'https://cloud.r-project.org/')"
-
-# install R packages
+# install R packages with renv
 COPY server/renv.lock /deploy/server/
-
 WORKDIR /deploy/server
-
-RUN R -e "options(Ncpus=parallel::detectCores()); renv::restore()"
+RUN R -e "options(Ncpus=parallel::detectCores()); install.packages('renv', repos = 'https://cloud.r-project.org/'); renv::restore()"
 
 # install python packages
 # RUN pip3 install pandas 
