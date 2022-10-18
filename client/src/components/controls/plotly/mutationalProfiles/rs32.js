@@ -124,7 +124,6 @@ export default function RS32(rawData, sample) {
     index: i,
   }));
 
-
   const traces = sortData.map((group, groupIndex, array) => ({
     group: group,
     name: group.indel,
