@@ -16,8 +16,16 @@ export default function SBS192(apiData) {
     'T>G': '#EBC6C4',
   };
   const mutationRegex = /\[(.*)\]/;
-  const mutationTypeSortRegex = /^\w\:(.*)/;
-  const mutationOrder = Object.keys(colors);
+  const mutationTypeSort = (a, b) => {
+    const mutationTypeRegex = /^\w\:(.*)/;
+    return a.mutationType
+      .match(mutationTypeRegex)[1]
+      .localeCompare(b.mutationType.match(mutationTypeRegex)[1]);
+  };
+  const mutationGroupSort = (a, b) => {
+    const order = Object.keys(colors);
+    return order.indexOf(a.mutation) - order.indexOf(b.mutation);
+  };
 
   const transcribed = apiData.filter((e) => /^T:/.test(e.mutationType));
   const untranscribed = apiData.filter((e) => /^U:/.test(e.mutationType));
@@ -25,14 +33,14 @@ export default function SBS192(apiData) {
   const transcribedGroups = groupDataByMutation(
     transcribed,
     mutationRegex,
-    mutationOrder,
-    mutationTypeSortRegex
+    mutationGroupSort,
+    mutationTypeSort
   );
   const untranscribedGroups = groupDataByMutation(
     untranscribed,
     mutationRegex,
-    mutationOrder,
-    mutationTypeSortRegex
+    mutationGroupSort,
+    mutationTypeSort
   );
   const maxMutation = getMaxMutations(apiData);
 
