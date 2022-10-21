@@ -24,28 +24,13 @@ export default function ID83(apiData) {
     '5:Del:M': { shape: '#62409A', text: 'white' },
   };
 
-  // const groupByIndel = apiData.reduce((acc, e, i) => {
-  //   const indel = e.mutationType.match(/^(.{7})/)[1];
-
-  //   acc[indel] = acc[indel] ? [...acc[indel], e] : [e];
-  //   return acc;
-  // }, {});
-
-  // const unsortedData = Object.entries(groupByIndel).map(([indel, data]) => ({
-  //   indel,
-  //   data,
-  // }));
-
-  // // sort data according to colors
-  // const indelOrder = Object.fromEntries(
-  //   Object.entries(Object.keys(colors)).map((a) => a.reverse())
-  // );
-  // const data = [...unsortedData].sort(
-  //   (a, b) => indelOrder[a.indel] - indelOrder[b.indel]
-  // );
-
   const indelRegex = /^(.{7})/;
-  const data = groupDataByMutation(apiData, indelRegex);
+  const mutationGroupSort = (a, b) => {
+    const order = Object.keys(colors);
+    return order.indexOf(a.mutation) - order.indexOf(b.mutation);
+  };
+
+  const data = groupDataByMutation(apiData, indelRegex, mutationGroupSort);
 
   const arrayIDAnnXTop = [
       '1bp Deletion',
