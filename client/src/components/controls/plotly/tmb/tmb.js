@@ -36,7 +36,7 @@ export default function TMB(data, tmbTabName, signatureName) {
       size: 0,
       color: ['blue'],
     },
-    name: 'Available Samples',
+    name: 'Number of samples with detected signatures',
     hoverinfo: 'skip',
   };
 
@@ -48,7 +48,7 @@ export default function TMB(data, tmbTabName, signatureName) {
       size: 0,
       color: ['green'],
     },
-    name: 'Total Samples',
+    name: 'Total number of samples',
     hoverinfo: 'skip',
   };
 
@@ -77,7 +77,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     yanchor: 'bottom',
     x: (index + index + 1) * 0.5,
     //y: -0.07,
-    y: 1.1,
+    y: 1.06,
     text: element.samples.filter(function (x) {
       return x.burden != null;
     }).length,
@@ -95,8 +95,8 @@ export default function TMB(data, tmbTabName, signatureName) {
     yref: 'paper',
     x0: index + 0.4,
     x1: index + 0.6,
-    y0: 1.1,
-    y1: 1.1,
+    y0: 1.06,
+    y1: 1.06,
     line: {
       width: 1,
       color: 'black',
@@ -110,7 +110,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     yanchor: 'bottom',
     x: (index + index + 1) * 0.5,
     //y: -0.14,
-    y: 1.05,
+    y: 1.01,
     text: `${element.totalSamples}`,
     showarrow: false,
     font: {
@@ -184,10 +184,10 @@ export default function TMB(data, tmbTabName, signatureName) {
   const extraMargin = longest < 10 ? 60 : longest * 7.5;
 
   const layout = {
-    width: totalCancer > 4 ? null : 300 + 200 * totalCancer - 1,
+    width: totalCancer > 4 ? null : 400 + 150 * (totalCancer - 1),
     autosize: true,
     height: 500 + extraMargin,
-    legend: { orientation: 'h', x: 0.25, y: 1.25 },
+    legend: { orientation: 'h', x: 0.05, y: 1.25 },
     xaxis: {
       showticklabels: false,
       tickfont: {
@@ -215,6 +215,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     margin: {
       b: extraMargin,
       t: 140,
+      l: 0,
     },
     shapes: [...shapes, ...lines, ...countDivider],
     annotations: annotations,
