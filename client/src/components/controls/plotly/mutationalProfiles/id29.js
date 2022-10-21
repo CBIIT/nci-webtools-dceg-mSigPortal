@@ -86,7 +86,6 @@ export default function ID29(apiData) {
     autosize: true,
 
     xaxis: {
-      title: 'Indel',
       showline: true,
       tickangle: 45,
       tickfont: {
