@@ -52,14 +52,13 @@ export default function ID83(apiData) {
   const maxMutation = getMaxMutations(apiData);
 
   const indelNames = data
-    .map((indel) =>
-      indel.data.map((e) => ({
-        indel: indel.mutation,
+    .map((group) =>
+      group.data.map((e) => ({
+        indel: group.mutation,
         index:
-          indel.mutation.substring(2, 5) == 'Del'
+          group.mutation.includes('Del') && group.mutation.slice(-1) != 'M'
             ? +e.mutationType.slice(-1) + 1
             : e.mutationType.slice(-1),
-        //index: e.mutationType.slice(-1),
       }))
     )
     .flat();
