@@ -51,6 +51,9 @@ RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerPlotting#egg=SigPr
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
 
 # install genomes
+RUN python3 -c \
+    "from SigProfilerMatrixGenerator import install as genInstall; \
+    genInstall.install('GRCh37', rsync=False, bash=True);"
 # RUN python3 -c "\
 # from SigProfilerMatrixGenerator import install as genInstall; \
 # genInstall.install('GRCh37', rsync=False, bash=True); \
