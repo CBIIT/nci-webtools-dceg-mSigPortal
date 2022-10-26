@@ -1,13 +1,11 @@
 import { visualizationApiSlice } from '../../../../services/store/rootApi';
 import mutationalPatternBar from '../../../controls/plotly/mutationalPattern/mutationalPatternBar';
 import mutationalPatternScatter from '../../../controls/plotly/mutationalPattern/mutationalPatternScatter';
-import { groupBy } from 'lodash';
-import { defaultMatrix2 } from '../../../../services/utils';
 
 export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
   {
     endpoints: (builder) => ({
-      mutationalPatternScatter: builder.query({
+      mpeaScatter: builder.query({
         query: ({ proportion, pattern, ...params }) => ({
           url: 'mutational_spectrum',
           params,
@@ -16,7 +14,7 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
           return mutationalPatternScatter(data, arg);
         },
       }),
-      pattern: builder.query({
+      mpeaBar: builder.query({
         query: (params) => ({
           url: 'pattern',
           params,
@@ -30,5 +28,5 @@ export const mutationalPatternApiSlice2 = visualizationApiSlice.injectEndpoints(
   }
 );
 
-export const { useMutationalPatternScatterQuery, usePatternQuery } =
+export const { useMpeaScatterQuery, useMpeaBarQuery } =
   mutationalPatternApiSlice2;

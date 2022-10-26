@@ -357,9 +357,8 @@ export default function Visualization({ match }) {
     },
     {
       name: 'Mutational Pattern Enrichment Analysis',
-      id: 'mutationalPattern2',
-      component:
-        source === 'user' ? <MutationalPattern /> : <MutationalPattern2 />,
+      id: 'mutationalPattern',
+      component: <MutationalPattern2 />,
     },
 
     {
