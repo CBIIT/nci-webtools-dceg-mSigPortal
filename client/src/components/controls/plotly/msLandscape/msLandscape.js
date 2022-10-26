@@ -127,6 +127,7 @@ export default function MsLandscape(data, arg) {
     const data2 = orignal_genomes;
     const data3 = signature;
     const data4 = signature_activaties;
+    console.log(data2);
   }
   const traces = Object.entries(groupBySignatureName_activity).map(
     ([key, value]) => ({
@@ -150,27 +151,12 @@ export default function MsLandscape(data, arg) {
     height: 500,
     showlegend: false,
     barmode: 'stack',
-    xaxis: {
-      showticklabels: false,
-      tickfont: {
-        size: 10,
-      },
 
-      linewidth: 2,
-      mirror: true,
-      tickmode: 'array',
-      showgrid: false,
-      //tickvals: flatSorted.map((_, i) => i),
-      //ticktext: flatSorted.map((_, i) => i),
-    },
     yaxis: { title: 'Number of mutation' },
 
     shapes: [...shapes, ...lines],
     annotations: annotations,
   };
-
-  //console.log('layout:');
-  //console.log(layout);
 
   var config = {
     //responsive: true,

@@ -64,9 +64,10 @@ export const msLandscapeApiSlice = explorationApiSlice.injectEndpoints({
             ), //seqmatrix
           ]);
 
-          // console.log(res);
-          // console.log(_arg);
-          return MsLandscape(res, _arg);
+          console.log(res);
+          console.log(_arg);
+          //return MsLandscape(res, _arg);
+          return { data: MsLandscape(res, _arg) };
         } catch (error) {
           return { error };
         }
