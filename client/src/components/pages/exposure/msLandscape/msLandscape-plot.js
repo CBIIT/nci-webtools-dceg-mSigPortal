@@ -18,6 +18,7 @@ export default function MsLandscapePlot() {
       skip: !calculationQuery,
     }
   );
+  console.log(data);
 
   // useEffect(() => {
   //   const { study, strategy, signatureSetName } = publicForm;
