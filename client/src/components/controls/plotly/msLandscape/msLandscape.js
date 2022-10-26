@@ -23,7 +23,23 @@ export default function MsLandscape(data, arg) {
 
   const groupByMutationType_spectrum = groupBy(rawDataSpectrum, 'mutationType');
   console.log(groupByMutationType_spectrum);
+  console.log(groupBy(rawDataSpectrum, 'cancer'));
+  const orignal_genomes = rawDataSpectrum;
+  const signature = groupByMutationType_signature;
+  const signature_activaties = rawDataActivity;
 
+  //  decompsite_input <- calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
+  //calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
+
+  function calculate_similarities(
+    orignal_genomes,
+    signature,
+    signature_activaties
+  ) {
+    const data2 = orignal_genomes;
+    const data3 = signature;
+    const data4 = signature_activaties;
+  }
   const traces = [];
 
   const shapes = [];
