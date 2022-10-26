@@ -1,5 +1,5 @@
 import { Container } from 'react-bootstrap';
-import TmbPlot from './msLandscape-plot';
+import MsLandscapePlot from './msLandscape-plot';
 import Description from '../../../controls/description/description';
 
 export default function MutationalProfiles(props) {
@@ -14,7 +14,7 @@ export default function MutationalProfiles(props) {
         />
       </div>
       <hr />
-      <TmbPlot />
+      <MsLandscapePlot />
     </Container>
   );
 }

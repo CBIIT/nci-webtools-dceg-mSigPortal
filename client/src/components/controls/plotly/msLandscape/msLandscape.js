@@ -155,9 +155,7 @@ export default function MsLandscape(data, arg) {
       tickfont: {
         size: 10,
       },
-      //autorange: false,
-      //range: [0, totalCancer],
-      // linecolor: 'black',
+
       linewidth: 2,
       mirror: true,
       tickmode: 'array',
@@ -165,17 +163,7 @@ export default function MsLandscape(data, arg) {
       //tickvals: flatSorted.map((_, i) => i),
       //ticktext: flatSorted.map((_, i) => i),
     },
-    yaxis: {
-      title: 'Number of Mutations per Megabase<br>(log10)',
-      zeroline: false,
-      //showline: true,
-      linecolor: 'black',
-      linewidth: 2,
-      mirror: true,
-      automargin: true,
-      autorange: true,
-      //range: [-Math.floor(yMax), Math.floor(yMax)],
-    },
+    yaxis: { title: 'Number of mutation' },
 
     shapes: [...shapes, ...lines],
     annotations: annotations,
@@ -188,6 +176,5 @@ export default function MsLandscape(data, arg) {
     //responsive: true,
   };
 
-  return { traces: [...traces], layout: layout, config };
-  //return { traces, layout };
+  return { traces, layout, config };
 }
