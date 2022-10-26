@@ -51,9 +51,8 @@ RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerPlotting#egg=SigPr
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
 
 # install genomes
-RUN python3 -c \
-    "from SigProfilerMatrixGenerator import install as genInstall; \
-    genInstall.install('GRCh37', rsync=False, bash=True);"
+## NOTE: genomes do not need to be installed. They are saved on the host in [app]/data and mounted as a volume to the 
+## sigprofilermatrixgenerator install directory. Verify path with "pip3 list"
 # RUN python3 -c "\
 # from SigProfilerMatrixGenerator import install as genInstall; \
 # genInstall.install('GRCh37', rsync=False, bash=True); \
