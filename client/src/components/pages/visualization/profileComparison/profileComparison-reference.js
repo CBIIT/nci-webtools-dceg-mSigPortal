@@ -153,8 +153,7 @@ export default function PcReference() {
               matrixFile: matrixList.filter(
                 (e) =>
                   e.profile == profile.value &&
-                  e.matrix ==
-                    defaultMatrix(profile.value, ['96', '78', '83'])
+                  e.matrix == defaultMatrix(profile.value, ['96', '78', '83'])
               )[0].Path,
             },
             projectID,

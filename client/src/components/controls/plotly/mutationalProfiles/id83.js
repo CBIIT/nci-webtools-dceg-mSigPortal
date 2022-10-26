@@ -24,28 +24,13 @@ export default function ID83(apiData) {
     '5:Del:M': { shape: '#62409A', text: 'white' },
   };
 
-  // const groupByIndel = apiData.reduce((acc, e, i) => {
-  //   const indel = e.mutationType.match(/^(.{7})/)[1];
-
-  //   acc[indel] = acc[indel] ? [...acc[indel], e] : [e];
-  //   return acc;
-  // }, {});
-
-  // const unsortedData = Object.entries(groupByIndel).map(([indel, data]) => ({
-  //   indel,
-  //   data,
-  // }));
-
-  // // sort data according to colors
-  // const indelOrder = Object.fromEntries(
-  //   Object.entries(Object.keys(colors)).map((a) => a.reverse())
-  // );
-  // const data = [...unsortedData].sort(
-  //   (a, b) => indelOrder[a.indel] - indelOrder[b.indel]
-  // );
-
   const indelRegex = /^(.{7})/;
-  const data = groupDataByMutation(apiData, indelRegex);
+  const mutationGroupSort = (a, b) => {
+    const order = Object.keys(colors);
+    return order.indexOf(a.mutation) - order.indexOf(b.mutation);
+  };
+
+  const data = groupDataByMutation(apiData, indelRegex, mutationGroupSort);
 
   const arrayIDAnnXTop = [
       '1bp Deletion',
@@ -67,14 +52,13 @@ export default function ID83(apiData) {
   const maxMutation = getMaxMutations(apiData);
 
   const indelNames = data
-    .map((indel) =>
-      indel.data.map((e) => ({
-        indel: indel.mutation,
+    .map((group) =>
+      group.data.map((e) => ({
+        indel: group.mutation,
         index:
-          indel.mutation.substring(2, 5) == 'Del'
+          group.mutation.includes('Del') && group.mutation.slice(-1) != 'M'
             ? +e.mutationType.slice(-1) + 1
             : e.mutationType.slice(-1),
-        //index: e.mutationType.slice(-1),
       }))
     )
     .flat();

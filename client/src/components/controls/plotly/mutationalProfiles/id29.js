@@ -16,14 +16,39 @@ export default function ID29(apiData) {
     '[->1]': '#009e73',
     '[-]': '#911eb4',
   };
-  const mutationRegex = /(\[.*\])/;
+  const mutationTypeSort = (a, b) => {
+    const mutationTypeOrder = [
+      'A',
+      'G',
+      'C',
+      'T',
+      'CC',
+      'TT',
+      'LR',
+      'NonR',
+      'Rep',
+      'MH',
+    ];
+    const mutationRegex = /\[.*\](.*)/;
 
-  const mutationSort = (a, b) => {
+    return (
+      mutationTypeOrder.indexOf(a.mutationType.match(mutationRegex)[1]) -
+      mutationTypeOrder.indexOf(b.mutationType.match(mutationRegex)[1])
+    );
+  };
+  const groupRegex = /(\[.*\])/;
+
+  const mutationGroupSort = (a, b) => {
     const order = Object.keys(colors);
     return order.indexOf(a.mutation) - order.indexOf(b.mutation);
   };
 
-  const data = groupDataByMutation(apiData, mutationRegex).sort(mutationSort);
+  const data = groupDataByMutation(
+    apiData,
+    groupRegex,
+    mutationGroupSort,
+    mutationTypeSort
+  );
   const maxMutation = getMaxMutations(apiData);
 
   const mutationTypeNames = data
@@ -61,7 +86,6 @@ export default function ID29(apiData) {
     autosize: true,
 
     xaxis: {
-      title: 'Indel',
       showline: true,
       tickangle: 45,
       tickfont: {

@@ -454,7 +454,7 @@ export default function SignatureInfo({ data }) {
                       </Col>
                     ))}
                   </Row>
-                  {distributionPlot?.traces.length ? (
+                  {distributionPlot ? (
                     <Plotly
                       data={distributionPlot.traces}
                       layout={distributionPlot.layout}
