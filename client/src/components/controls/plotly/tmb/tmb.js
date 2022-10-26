@@ -36,7 +36,7 @@ export default function TMB(data, tmbTabName, signatureName) {
       size: 0,
       color: ['blue'],
     },
-    name: 'Number of samples with detected signatures',
+    name: 'Number of samples detected signature',
     hoverinfo: 'skip',
   };
 

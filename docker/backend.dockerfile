@@ -20,6 +20,7 @@ RUN dnf -y update \
     rsync \
     wget \ 
     which \
+    tar \
     R-4.1.3 \
     && dnf clean all
 
