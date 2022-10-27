@@ -330,7 +330,7 @@ export default function SBS1536(data, sample, tab) {
     ygap: 0.1,
     hovertemplate: 'x: %{x}<br>y: %{y}<br>Value: %{z}<extra></extra>',
   }));
-
+  console.log(traceHeatMap3);
   ////--------------------- Heat Map Total --------------------------//
   const heatmapY = [];
   const heatmapZ = [];

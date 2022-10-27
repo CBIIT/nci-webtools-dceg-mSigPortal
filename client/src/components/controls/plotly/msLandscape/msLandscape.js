@@ -85,6 +85,18 @@ export default function MsLandscape(data, arg) {
     92: '#0E1844',
     '-others': '#cececa',
   };
+  const heatmapColorscale = [
+    [0, 'rgb(34,7,139)'],
+    [0.6, 'rgb(34,7,139)'],
+    [0.6, 'rgb(34,7,139)'],
+    [0.7, 'rgb(123,8,163)'],
+    [0.7, 'rgb(128,12,162)'],
+    [0.8, 'rgb(200,69,125)'],
+    [0.8, 'rgb(208,79,117)'],
+    [0.9, 'rgb(245,149,70)'],
+    [0.9, 'rgb(247,152,67)'],
+    [1, 'rgb(241,246,34)'],
+  ];
 
   const groupBySample_activity = groupBy(rawDataActivity, 'sample');
   console.log(groupBySample_activity);
@@ -156,8 +168,35 @@ export default function MsLandscape(data, arg) {
       marker: {
         color: colors[key.replace(/^\D*/, '')],
       },
+      showlegend: true,
     })
   );
+
+  const traces2 = Object.entries(groupBySignatureName_activity).map(
+    ([key, value], index) => ({
+      z: [index],
+      x: value.map((e) => e.sample),
+      y: [],
+      type: 'heatmap',
+      colorscale: heatmapColorscale,
+      colorbar: {
+        orientation: 'h',
+        borderwidth: 1,
+        xanchor: 'left',
+        yanchor: 'top',
+        tick0: 1000,
+        y: 0,
+        dtick: 500,
+        len: 0.15,
+        thickness: 10,
+        x: 1,
+      },
+      hoverongaps: false,
+      xaxis: 'x',
+      yaxis: 'y2',
+    })
+  );
+  console.log(traces2);
 
   console.log(traces1);
   const traces3 = Object.entries(groupBySignatureName_activity).map(
@@ -170,7 +209,7 @@ export default function MsLandscape(data, arg) {
       type: 'bar',
       x: value.map((e) => e.sample),
       y: value.map((e, i) => e.exposure),
-      //showlegend: true,
+      showlegend: true,
       marker: {
         color: colors[key.replace(/^\D*/, '')],
       },
@@ -180,7 +219,7 @@ export default function MsLandscape(data, arg) {
   );
   console.log(traces3);
 
-  const traces = [...traces3, ...traces1];
+  const traces = [...traces3, ...traces2, ...traces1];
   console.log(traces);
 
   const shapes = [];
@@ -194,14 +233,15 @@ export default function MsLandscape(data, arg) {
     autosize: true,
     height: 1080,
     barmode: 'stack',
-
+    //legend: { orientation: 'h' },
     xaxis: {
       tickmode: 'array',
       tickvals: xAxisName.map((_, i) => i),
       ticktext: xAxisName.map((e) => e.sample),
     },
-    yaxis: { title: 'Signature contribution', domain: [0, 0.4] },
-    yaxis3: { title: 'Number of mutation', domain: [0.5, 1] },
+    yaxis: { title: 'Signature contribution', domain: [0, 0.45] },
+    yaxis2: { title: '...', domain: [0.46, 0.52] },
+    yaxis3: { title: 'Number of mutation', domain: [0.55, 1] },
 
     shapes: [...shapes, ...lines],
     annotations: annotations,
