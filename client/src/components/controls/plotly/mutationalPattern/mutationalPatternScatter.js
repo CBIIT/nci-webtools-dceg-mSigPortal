@@ -1,6 +1,6 @@
 import { groupBy } from 'lodash';
 
-export default function mutationalPatternScatter(rawdata, arg) {
+export default function mutationalPatternScatter(inputData, arg) {
   const { pattern } = arg;
   const type =
     pattern.substring(1, 2) + pattern.substring(3, 4) + pattern.substring(5, 6);
@@ -10,7 +10,7 @@ export default function mutationalPatternScatter(rawdata, arg) {
   const pattern2 = pattern + ' other context';
 
   const tmpdata0 = Object.values(
-    groupBy(rawdata, (e) => `${e.study}_${e.sample}`)
+    groupBy(inputData, (e) => `${e.study}_${e.sample}`)
   ).map((samples) => {
     return {
       study: `${samples[0].study}`,
@@ -19,8 +19,8 @@ export default function mutationalPatternScatter(rawdata, arg) {
       total: samples.reduce((acc, e) => acc + e.mutations, 0),
     };
   });
-  console.log(tmpdata0);
-  const mutationTypeFilter = rawdata.filter(
+
+  const mutationTypeFilter = inputData.filter(
     (e) => e.mutationType.substring(2, 5) === type
   );
   const groupByStudySampleType = groupBy(
@@ -66,7 +66,7 @@ export default function mutationalPatternScatter(rawdata, arg) {
     }
     return result;
   }
-  const mutationTypeSubTypesFilter = rawdata.filter(
+  const mutationTypeSubTypesFilter = inputData.filter(
     (e) =>
       e.mutationType.substring(2, 5) === type &&
       iupac(subtype1).includes(e.mutationType.substring(0, 1)) &&

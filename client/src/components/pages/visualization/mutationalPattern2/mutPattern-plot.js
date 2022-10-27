@@ -1,45 +1,49 @@
 import { useEffect, useState } from 'react';
 import Plotly from '../../../controls/plotly/plot/plot';
 import { useSelector } from 'react-redux';
-import { useMutationalPatternScatterQuery, usePatternQuery } from './apiSlice';
+import { useMpeaScatterQuery, useMpeaBarQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import './plot.scss';
 export default function MutPatternPlot() {
-  const publicForm = useSelector((state) => state.visualization.publicForm);
+  const store = useSelector((state) => state.visualization);
+  const publicForm = store.publicForm;
+  const { source, projectID } = store.main;
+  const { proportion, pattern } = store.mutationalPattern;
+
   const [scatterParams, setScatterParams] = useState('');
 
   const {
     data: scatterData,
     error: scatterError,
     isFetching: fetchingScatter,
-  } = useMutationalPatternScatterQuery(scatterParams, {
+  } = useMpeaScatterQuery(scatterParams, {
     skip: !scatterParams,
   });
 
-  const [patternParams, setPatternParams] = useState('');
+  const [barParams, setBarParams] = useState('');
   const {
     data: patternData,
     error: patternError,
     isFetching: fetchingPattern,
-  } = usePatternQuery(patternParams, {
-    skip: !patternParams,
+  } = useMpeaBarQuery(barParams, {
+    skip: !barParams,
   });
 
-  const store = useSelector((state) => state.visualization);
-
-  const { proportion, pattern } = store.mutationalPattern;
-
+  console.log(scatterParams);
   // get data on form change
   useEffect(() => {
     const { study, cancer, strategy } = publicForm;
-    if (study && pattern) {
+    if (pattern) {
       setScatterParams({
-        study: study.value,
-        cancer: cancer.value,
-        strategy: strategy.value,
         profile: 'SBS',
         matrix: '96',
         pattern: pattern,
+        ...(source == 'public' && {
+          study: study.value,
+          cancer: cancer.value,
+          strategy: strategy.value,
+        }),
+        ...(source == 'user' && { userId: projectID }),
       });
     }
   }, [publicForm, proportion, pattern]);
@@ -47,7 +51,7 @@ export default function MutPatternPlot() {
   useEffect(() => {
     const { study } = publicForm;
     if (study && proportion) {
-      setPatternParams({
+      setBarParams({
         study: study.value,
         proportion: parseFloat(proportion),
       });

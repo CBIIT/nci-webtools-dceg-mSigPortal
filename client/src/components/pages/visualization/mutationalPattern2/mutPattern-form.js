@@ -8,13 +8,13 @@ import { actions as visualizationActions } from '../../../../services/store/visu
 const actions = { ...visualizationActions };
 
 export default function MutationalPatternForm() {
-  const dispatch = useDispatch();
+  const store = useSelector((state) => state.visualization);
+  const { proportion, pattern } = store.mutationalPattern;
 
+  const dispatch = useDispatch();
   const mergeState = (state) =>
     dispatch(actions.mergeVisualization({ mutationalPattern: state }));
 
-  const store = useSelector((state) => state.visualization);
-  const { proportion, pattern } = store.mutationalPattern;
   const {
     control,
     handleSubmit,
