@@ -283,6 +283,7 @@ export default function PcReference() {
               disabled={!profileOptions.length}
               name="profile"
               label="Profile Type"
+              className="m-auto"
               options={profileOptions}
               onChange={handleProfile}
               control={control}
@@ -291,6 +292,7 @@ export default function PcReference() {
           <Col lg="auto">
             <Select
               disabled={sampleOptions.length < 2}
+              className="m-auto"
               name="sample"
               label="Sample Name"
               options={sampleOptions}
@@ -300,6 +302,7 @@ export default function PcReference() {
           <Col lg="auto">
             <Select
               disabled={sampleOptions.length < 2 || fetchingSigSets}
+              className="m-auto"
               name="signatureSet"
               label="Reference Signature Set"
               options={signatureSetOptions}
@@ -311,8 +314,8 @@ export default function PcReference() {
               control={control}
             />
           </Col>
-          <Col lg="auto">
-            <Form.Group controlId="compare">
+          <Col lg="auto" className="d-flex">
+            <Form.Group controlId="compare" className="m-auto">
               <Form.Label>
                 Compare Signatures{' '}
                 <OverlayTrigger
@@ -354,9 +357,9 @@ export default function PcReference() {
               </Form.Control.Feedback>
             </Form.Group>
           </Col>
-          <Col lg="auto" className="d-flex">
+          <Col lg="auto" className="d-flex justify-content-end">
             <Button
-              className="mt-auto mb-3"
+              className="m-auto"
               disabled={!profile || !sample || !signatureSet || !compare}
               variant="primary"
               type="submit"
