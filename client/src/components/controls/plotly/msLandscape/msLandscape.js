@@ -95,13 +95,16 @@ export default function MsLandscape(data, arg) {
   );
   console.log(groupBySignatureName_activity);
 
-  const dataSignature = Object.entries(groupBySignatureName_activity).map(
+  const dataSignature = Object.entries(groupBySample_activity).map(
     ([key, value]) => ({
       signatureName: key,
-      data: value,
+      total: value.reduce((a, e) => a + parseInt(e.exposure), 0),
+      sample: value.map((e) => e.sample),
+      exposure: value.map((e) => e.exposure),
     })
   );
   console.log(dataSignature);
+  console.log(dataSignature[1]);
 
   const groupByMutationType_signature = groupBy(
     rawDataSignature,
@@ -132,7 +135,13 @@ export default function MsLandscape(data, arg) {
   const barCharColor = Object.keys(groupBySignatureName_activity);
   console.log(barCharColor);
 
-  const traces = Object.entries(groupBySignatureName_activity).map(
+  const xAxisName = Object.values(groupBySignatureName_activity)[0]
+    .map((e) => ({
+      sample: e.sample,
+    }))
+    .flat();
+  console.log(xAxisName.map((e) => e));
+  const traces1 = Object.entries(groupBySignatureName_activity).map(
     ([key, value]) => ({
       key: key,
       value: value,
@@ -141,29 +150,35 @@ export default function MsLandscape(data, arg) {
       name: key,
       type: 'bar',
       x: value.map((e) => e.sample),
-      y: value.map((e) => e.exposure),
-      // marker: {
-      //   color: barCharColor.map((e) => colors[e.replace(/^\D*/, '')]),
-      // },
+      y: value.map((e, i) => e.exposure / dataSignature[i].total),
+      total: value.map((e, i) => dataSignature[i].total),
+      marker: {
+        color: colors[key.replace(/^\D*/, '')],
+      },
     })
   );
+  console.log(traces1);
+  const traces2 = Object.entries(groupBySignatureName_activity).map(
+    ([key, value]) => ({
+      key: key,
+      value: value,
+      map: barCharColor.map((e) => e),
+      co: barCharColor.map((e) => e.replace(/^\D*/, '')),
+      name: key,
+      type: 'bar',
+      x: value.map((e) => e.sample),
+      y: value.map((e, i) => e.exposure),
 
-  // const traces = Object.entries(groupBySample_activity).map(([key, value]) => ({
-  //   key: key,
-  //   value: value,
-  //   map: value.map((group) => group.signatureName),
-  //   name: key,
-  //   type: 'bar',
-  //   x: xValue,
-  //   y: value.map((e) => e.exposure),
-  //   hovertemplate: '%{y}, %{x} <extra></extra>',
-  //   marker: {
-  //     colors: value.map(
-  //       (group) =>
-  //         colors[group.signatureName.replace(/^\D*/, '').replace(')', '')]
-  //     ),
-  //   },
-  // }));
+      marker: {
+        color: colors[key.replace(/^\D*/, '')],
+      },
+      xaxis: 'x',
+      yaxis: 'y2',
+    })
+  );
+  console.log(traces2);
+
+  const traces = [...traces2, ...traces1];
   console.log(traces);
 
   const shapes = [];
@@ -177,8 +192,15 @@ export default function MsLandscape(data, arg) {
     autosize: true,
     height: 500,
     barmode: 'stack',
+    showlegend: true,
 
-    yaxis: { title: 'Number of mutation' },
+    xaxis: {
+      tickmode: 'array',
+      tickvals: xAxisName.map((_, i) => i),
+      ticktext: xAxisName.map((e) => e.sample),
+    },
+    yaxis: { title: 'Signature contribution', domain: [0, 0.49] },
+    yaxis2: { title: 'Number of mutation', domain: [0.5, 1] },
 
     shapes: [...shapes, ...lines],
     annotations: annotations,
