@@ -154,6 +154,13 @@ export default function MSPrevalence(data, minimum) {
     values: dataResult.map((group) =>
       group.samples.reduce((a, b) => a + b.exposure, 0)
     ),
+    marker: {
+      colors: dataResult.map((group) =>
+        contains
+          ? colors[group.signatureName.replace(/^\D*/, '').replace(')', '')]
+          : colors[group.signatureName]
+      ),
+    },
     textposition: 'inside',
     texttemplate: '%{percent:.1%}',
     showlegend: false,

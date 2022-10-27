@@ -129,14 +129,41 @@ export default function MsLandscape(data, arg) {
     const data4 = signature_activaties;
     console.log(data2);
   }
+  const barCharColor = Object.keys(groupBySignatureName_activity);
+  console.log(barCharColor);
+
   const traces = Object.entries(groupBySignatureName_activity).map(
     ([key, value]) => ({
+      key: key,
+      value: value,
+      map: barCharColor.map((e) => e),
+      co: barCharColor.map((e) => e.replace(/^\D*/, '')),
       name: key,
       type: 'bar',
       x: value.map((e) => e.sample),
       y: value.map((e) => e.exposure),
+      // marker: {
+      //   color: barCharColor.map((e) => colors[e.replace(/^\D*/, '')]),
+      // },
     })
   );
+
+  // const traces = Object.entries(groupBySample_activity).map(([key, value]) => ({
+  //   key: key,
+  //   value: value,
+  //   map: value.map((group) => group.signatureName),
+  //   name: key,
+  //   type: 'bar',
+  //   x: xValue,
+  //   y: value.map((e) => e.exposure),
+  //   hovertemplate: '%{y}, %{x} <extra></extra>',
+  //   marker: {
+  //     colors: value.map(
+  //       (group) =>
+  //         colors[group.signatureName.replace(/^\D*/, '').replace(')', '')]
+  //     ),
+  //   },
+  // }));
   console.log(traces);
 
   const shapes = [];
@@ -149,7 +176,6 @@ export default function MsLandscape(data, arg) {
     // width: totalCancer > 1 ? null : 350,
     autosize: true,
     height: 500,
-    showlegend: false,
     barmode: 'stack',
 
     yaxis: { title: 'Number of mutation' },
