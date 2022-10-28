@@ -168,37 +168,33 @@ export default function MsLandscape(data, arg) {
       marker: {
         color: colors[key.replace(/^\D*/, '')],
       },
-      showlegend: true,
+      showlegend: false,
+      // customdata: value.map((e, i) => ({
+      //   xValue: e.exposure / dataSignature[i].total != 0 ? e.sample : '',
+      //   yValue:
+      //     e.exposure / dataSignature[i].total != 0
+      //       ? e.exposure / dataSignature[i].total
+      //       : '',
+      // })),
+      // hovertemplate:
+      //   '%{customdata.xValue}  %{customdata.yValue}<extra></extra>',
     })
   );
-
-  const traces2 = Object.entries(groupBySignatureName_activity).map(
-    ([key, value], index) => ({
-      z: [index],
-      x: value.map((e) => e.sample),
-      y: [],
+  console.log(traces1);
+  const traces2 = [
+    {
+      z: [xAxisName.map((_, i) => i / 65)],
+      x: xAxisName.map((e) => e.sample),
       type: 'heatmap',
       colorscale: heatmapColorscale,
-      colorbar: {
-        orientation: 'h',
-        borderwidth: 1,
-        xanchor: 'left',
-        yanchor: 'top',
-        tick0: 1000,
-        y: 0,
-        dtick: 500,
-        len: 0.15,
-        thickness: 10,
-        x: 1,
-      },
+
       hoverongaps: false,
       xaxis: 'x',
       yaxis: 'y2',
-    })
-  );
+    },
+  ];
   console.log(traces2);
 
-  console.log(traces1);
   const traces3 = Object.entries(groupBySignatureName_activity).map(
     ([key, value]) => ({
       key: key,
@@ -209,7 +205,7 @@ export default function MsLandscape(data, arg) {
       type: 'bar',
       x: value.map((e) => e.sample),
       y: value.map((e, i) => e.exposure),
-      showlegend: true,
+      //showlegend: true,
       marker: {
         color: colors[key.replace(/^\D*/, '')],
       },
@@ -229,11 +225,25 @@ export default function MsLandscape(data, arg) {
   let annotations = [];
 
   const layout = {
-    // width: totalCancer > 1 ? null : 350,
     autosize: true,
     height: 1080,
-    barmode: 'stack',
-    //legend: { orientation: 'h' },
+    barmode: 'relative',
+    legend: { orientation: 'h', title: { text: 'Signatures Name' } },
+    coloraxis: {
+      colorbar: {
+        title: { text: 'cosine similarity' },
+        orientation: 'h',
+        //borderwidth: 1,
+        //xanchor: 'left',
+        //yanchor: 'top',
+        //tick0: 0,
+        //y: 1,
+        //dtick: 500,
+        //len: 0.15,
+        //thickness: 10,
+        //x: 0,
+      },
+    },
     xaxis: {
       tickmode: 'array',
       tickvals: xAxisName.map((_, i) => i),
