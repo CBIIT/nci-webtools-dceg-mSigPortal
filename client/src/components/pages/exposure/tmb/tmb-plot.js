@@ -28,6 +28,8 @@ export default function MutProfilePlot() {
   return (
     <>
       <LoadingOverlay active={isFetching} />
+      <br></br>
+      <h5 className="d-flex justify-content-center">Tumor Mutational Burden</h5>
       {data && !error ? (
         <Plotly
           className="w-100"

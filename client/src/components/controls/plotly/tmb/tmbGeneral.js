@@ -137,7 +137,8 @@ export default function TMB(data, tmbTabName, signatureName) {
     width: totalCancer > 4 ? null : 400 + 150 * (totalCancer - 1),
     autosize: true,
     height: 500 + extraMargin,
-    legend: { orientation: 'h', x: 0.05, y: 1.25 },
+    legend: { orientation: 'h', x: 0.05, y: 1.15 },
+    //title: { text: 'Tumor Mutational Burden' },
     xaxis: {
       showticklabels: false,
       tickfont: {
@@ -164,7 +165,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     },
     margin: {
       b: extraMargin,
-      t: 140,
+      t: 100,
       l: 0,
     },
     shapes: [...shapes, ...lines],

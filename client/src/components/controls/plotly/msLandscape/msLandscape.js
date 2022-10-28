@@ -147,7 +147,11 @@ export default function MsLandscape(data, arg) {
     const data3 = signature;
     const data4 = signature_activaties;
     console.log(data2);
+    console.log(data3);
+    console.log(data4);
   }
+
+  console.log(calculate_similarities);
   const barCharColor = Object.keys(groupBySignatureName_activity);
   console.log(barCharColor);
 
