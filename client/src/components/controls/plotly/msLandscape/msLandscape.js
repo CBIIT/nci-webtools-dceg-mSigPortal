@@ -179,12 +179,12 @@ export default function MsLandscape(data, arg) {
       // hovertemplate:
       //   '%{customdata.xValue}  %{customdata.yValue}<extra></extra>',
       test: value.map((d, i) => d.exposure / dataSignature[i].total),
-      text: value.map((d, i) =>
-        d.exposure / dataSignature[i].total != 0
-          ? d.exposure / dataSignature[i].total + '' + d.sample
-          : ''
-      ),
-      hovertemplate: '%{text}<extra></extra>',
+      // text: value.map((d, i) =>
+      //   d.exposure / dataSignature[i].total != 0
+      //     ? d.exposure / dataSignature[i].total + '' + d.sample
+      //     : null
+      // ),
+      // hovertemplate: '%{text}<extra></extra>',
     })
   );
   console.log(traces1);
@@ -234,7 +234,8 @@ export default function MsLandscape(data, arg) {
   const layout = {
     autosize: true,
     height: 1080,
-    barmode: 'relative',
+    barmode: 'stack',
+    hovermode: 'closest',
     legend: { orientation: 'h', title: { text: 'Signatures Name' } },
     coloraxis: {
       colorbar: {
