@@ -132,12 +132,31 @@ export default function MsLandscape(data, arg) {
   console.log(groupByMutationType_spectrum);
   console.log(groupBy(rawDataSpectrum, 'cancer'));
   const orignal_genomes = rawDataSpectrum;
-  const signature = groupByMutationType_signature;
+  //const signature = groupByMutationType_signature;
+  const signature = rawDataSignature;
   const signature_activaties = rawDataActivity;
 
   //  decompsite_input <- calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
   //calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
+  function dotp(x, y) {
+    function dotp_sum(a, b) {
+      return a + b;
+    }
+    function dotp_times(a, i) {
+      return x[i] * y[i];
+    }
+    return x.map(dotp_times).reduce(dotp_sum, 0);
+  }
+  function cosineSimilarity(A, B) {
+    var similarity =
+      dotp(A, B) / (Math.sqrt(dotp(A, A)) * Math.sqrt(dotp(B, B)));
+    return similarity;
+  }
+  //const cosine = cosineSimilarity(s1mutations, s2mutations).toFixed(3);
 
+  function uniq(a) {
+    return Array.from(new Set(a));
+  }
   function calculate_similarities(
     orignal_genomes,
     signature,
@@ -149,9 +168,26 @@ export default function MsLandscape(data, arg) {
     console.log(data2);
     console.log(data3);
     console.log(data4);
+
+    const sample_name_total = data4.map((e) => e.sample);
+    const sample_name_tmp = data2.map((e) => e.sample);
+    const sample_name = uniq(
+      sample_name_total.filter((x) => sample_name_tmp.includes(x))
+    );
+    console.log(sample_name);
+
+    const signature_name_total = data4.map((e) => e.signatureName);
+    const signature_name_tmp = data3.map((e) => e.signatureName);
+    const signature_name = uniq(
+      signature_name_total.filter((x) => signature_name_tmp.includes(x))
+    );
+    console.log(signature_name_total);
+    console.log(signature_name_tmp);
+    console.log(signature_name);
   }
 
-  console.log(calculate_similarities);
+  calculate_similarities(orignal_genomes, signature, signature_activaties);
+
   const barCharColor = Object.keys(groupBySignatureName_activity);
   console.log(barCharColor);
 
@@ -177,22 +213,7 @@ export default function MsLandscape(data, arg) {
         color: colors[key.replace(/^\D*/, '')],
       },
       showlegend: false,
-      // customdata: value.map((e, i) => ({
-      //   xValue: e.exposure / dataSignature[i].total != 0 ? e.sample : '',
-      //   yValue:
-      //     e.exposure / dataSignature[i].total != 0
-      //       ? e.exposure / dataSignature[i].total
-      //       : '',
-      // })),
-      // hovertemplate:
-      //   '%{customdata.xValue}  %{customdata.yValue}<extra></extra>',
       test: value.map((d, i) => d.exposure / dataSignature[i].total),
-      // text: value.map((d, i) =>
-      //   d.exposure / dataSignature[i].total != 0
-      //     ? d.exposure / dataSignature[i].total + '' + d.sample
-      //     : null
-      // ),
-      // hovertemplate: '%{text}<extra></extra>',
     })
   );
   console.log(traces1);
@@ -204,21 +225,21 @@ export default function MsLandscape(data, arg) {
       xaxis: 'x',
       yaxis: 'y2',
       type: 'heatmap',
-      // colorscale: heatmapColorscale,
-      // colorbar: {
-      //   title: { text: 'cosine similarity' },
-      //   orientation: 'h',
-      //   //borderwidth: 1,
-      //   //xanchor: 'left',
-      //   //yanchor: 'top',
-      //   //tick0: 0,
-      //   //y: 1,
-      //   dtick: 0.1,
-      //   //len: 0.15,
-      //   //thickness: 10,
-      //   //x: 0,
-      //   tickmode: 'array',
-      // },
+      colorscale: heatmapColorscale,
+      colorbar: {
+        title: { text: 'cosine similarity' },
+        orientation: 'h',
+        //borderwidth: 1,
+        //xanchor: 'left',
+        //yanchor: 'top',
+        tick0: 0.6,
+        //y: 1,
+        dtick: 0.1,
+        //len: 0.15,
+        //thickness: 10,
+        //x: 0,
+        tickmode: 'array',
+      },
       xgap: 0.2,
     },
   ];
