@@ -15,6 +15,7 @@ export const tmbSignatureApiSlice = explorationApiSlice.injectEndpoints({
         //console.log(data);
         // calculate median burden across samples
         const groupBySignature = groupBy(data, 'signatureName');
+        console.log(groupBySignature);
         const transform = Object.entries(groupBySignature)
           .map(([signatureName, data]) => {
             const samples = data

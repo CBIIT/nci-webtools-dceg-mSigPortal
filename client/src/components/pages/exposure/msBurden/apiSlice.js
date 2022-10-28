@@ -7,12 +7,14 @@ export const msBurdenApiSlice = explorationApiSlice.injectEndpoints({
     msBurden: builder.query({
       query: (params) => ({
         url: 'mutational_activity',
-        params,
+        params: { ...params, limit: 1000000 },
       }),
       transformResponse: (data, meta, arg) => {
+        console.log(data);
         const { signatureName } = arg;
         // calculate median burden across cancer types
         const groupByCancer = groupBy(data, 'cancer');
+        console.log(groupByCancer);
         const transform = Object.entries(groupByCancer)
           .map(([cancer, data]) => {
             const samples = Object.values(groupBy(data, 'sample'))

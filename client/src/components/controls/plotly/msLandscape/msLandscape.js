@@ -87,7 +87,11 @@ export default function MsLandscape(data, arg) {
   };
   const heatmapColorscale = [
     [0, 'rgb(34,7,139)'],
-    [0.6, 'rgb(34,7,139)'],
+    [0.1, 'rgb(34,7,139)'],
+    [0.2, 'rgb(34,7,139)'],
+    [0.3, 'rgb(34,7,139)'],
+    [0.4, 'rgb(34,7,139)'],
+    [0.5, 'rgb(34,7,139)'],
     [0.6, 'rgb(34,7,139)'],
     [0.7, 'rgb(123,8,163)'],
     [0.7, 'rgb(128,12,162)'],
@@ -192,12 +196,26 @@ export default function MsLandscape(data, arg) {
     {
       z: [xAxisName.map((_, i) => i / 65)],
       x: xAxisName.map((e) => e.sample),
-      type: 'heatmap',
-      colorscale: heatmapColorscale,
-
       hoverongaps: false,
       xaxis: 'x',
       yaxis: 'y2',
+      type: 'heatmap',
+      // colorscale: heatmapColorscale,
+      // colorbar: {
+      //   title: { text: 'cosine similarity' },
+      //   orientation: 'h',
+      //   //borderwidth: 1,
+      //   //xanchor: 'left',
+      //   //yanchor: 'top',
+      //   //tick0: 0,
+      //   //y: 1,
+      //   dtick: 0.1,
+      //   //len: 0.15,
+      //   //thickness: 10,
+      //   //x: 0,
+      //   tickmode: 'array',
+      // },
+      xgap: 0.2,
     },
   ];
   console.log(traces2);
@@ -237,28 +255,14 @@ export default function MsLandscape(data, arg) {
     barmode: 'stack',
     hovermode: 'closest',
     legend: { orientation: 'h', title: { text: 'Signatures Name' } },
-    coloraxis: {
-      colorbar: {
-        title: { text: 'cosine similarity' },
-        orientation: 'h',
-        //borderwidth: 1,
-        //xanchor: 'left',
-        //yanchor: 'top',
-        //tick0: 0,
-        //y: 1,
-        //dtick: 500,
-        //len: 0.15,
-        //thickness: 10,
-        //x: 0,
-      },
-    },
+
     xaxis: {
       tickmode: 'array',
       tickvals: xAxisName.map((_, i) => i),
       ticktext: xAxisName.map((e) => e.sample),
     },
     yaxis: { title: 'Signature contribution', domain: [0, 0.45] },
-    yaxis2: { title: '...', domain: [0.46, 0.52] },
+    yaxis2: { title: 'Cosine Similarity', domain: [0.46, 0.52] },
     yaxis3: { title: 'Number of mutation', domain: [0.55, 1] },
 
     shapes: [...shapes, ...lines],
