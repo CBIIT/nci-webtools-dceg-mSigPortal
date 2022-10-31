@@ -101,6 +101,18 @@ export default function MsLandscape(data, arg) {
     [0.9, 'rgb(247,152,67)'],
     [1, 'rgb(241,246,34)'],
   ];
+  // const heatmapColorscale = [
+  //   [0.5, 'rgb(56,56,156'],
+  //   [0.6, 'rgb(56,56,156'],
+  //   [0.6, 'rgb(106,106,128'],
+  //   [0.7, 'rgb(106,106,128'],
+  //   [0.7, 'rgb(155,146,98'],
+  //   [0.8, 'rgb(155,146,98'],
+  //   [0.8, 'rgb(205,186,69'],
+  //   [0.9, 'rgb(205,186,69'],
+  //   [0.9, 'rgb(255,255,39)'],
+  //   [1, 'rgb(255,255,39)'],
+  // ];
 
   const groupBySample_activity = groupBy(rawDataActivity, 'sample');
   console.log(groupBySample_activity);
@@ -228,17 +240,16 @@ export default function MsLandscape(data, arg) {
       colorscale: heatmapColorscale,
       colorbar: {
         title: { text: 'cosine similarity' },
-        orientation: 'h',
+        //orientation: 'h',
         //borderwidth: 1,
         //xanchor: 'left',
         //yanchor: 'top',
-        tick0: 0.6,
         //y: 1,
-        dtick: 0.1,
+        tickmode: 'array',
+        tickvals: [0, 0.6, 0.7, 0.8, 0.9, 1],
         //len: 0.15,
         //thickness: 10,
         //x: 0,
-        tickmode: 'array',
       },
       xgap: 0.2,
     },
@@ -279,7 +290,11 @@ export default function MsLandscape(data, arg) {
     height: 1080,
     barmode: 'stack',
     hovermode: 'closest',
-    legend: { orientation: 'h', title: { text: 'Signatures Name' } },
+    legend: {
+      orientation: 'h',
+      title: { text: 'Signatures Name' },
+      traceorder: 'normal',
+    },
 
     xaxis: {
       tickmode: 'array',
