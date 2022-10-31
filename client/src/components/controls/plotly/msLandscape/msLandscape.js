@@ -85,34 +85,53 @@ export default function MsLandscape(data, arg) {
     92: '#0E1844',
     '-others': '#cececa',
   };
+  // const heatmapColorscale = [
+  //   [0, 'rgb(34,7,139)'],
+  //   [0.1, 'rgb(34,7,139)'],
+  //   [0.2, 'rgb(34,7,139)'],
+  //   [0.3, 'rgb(34,7,139)'],
+  //   [0.4, 'rgb(34,7,139)'],
+  //   [0.5, 'rgb(34,7,139)'],
+  //   [0.6, 'rgb(34,7,139)'],
+  //   [0.7, 'rgb(34,7,139)'],
+  //   [0.7, 'rgb(128,12,162)'],
+  //   [0.8, 'rgb(200,69,125)'],
+  //   [0.8, 'rgb(208,79,117)'],
+  //   [0.9, 'rgb(245,149,70)'],
+  //   [0.9, 'rgb(247,152,67)'],
+  //   [1, 'rgb(241,246,34)'],
+  // ];
   const heatmapColorscale = [
     [0, 'rgb(34,7,139)'],
     [0.1, 'rgb(34,7,139)'],
+
+    [0.1, 'rgb(34,7,139)'],
+    [0.2, 'rgb(34,7,139)'],
+
     [0.2, 'rgb(34,7,139)'],
     [0.3, 'rgb(34,7,139)'],
+
+    [0.3, 'rgb(34,7,139)'],
+    [0.4, 'rgb(34,7,139)'],
+
     [0.4, 'rgb(34,7,139)'],
     [0.5, 'rgb(34,7,139)'],
+
+    [0.5, 'rgb(34,7,139)'],
     [0.6, 'rgb(34,7,139)'],
-    [0.7, 'rgb(123,8,163)'],
+
+    [0.6, 'rgb(128,12,162)'],
     [0.7, 'rgb(128,12,162)'],
+
+    [0.7, 'rgb(200,69,125)'],
     [0.8, 'rgb(200,69,125)'],
+
     [0.8, 'rgb(208,79,117)'],
     [0.9, 'rgb(245,149,70)'],
+
     [0.9, 'rgb(247,152,67)'],
-    [1, 'rgb(241,246,34)'],
+    [1.0, 'rgb(241,246,34)'],
   ];
-  // const heatmapColorscale = [
-  //   [0.5, 'rgb(56,56,156'],
-  //   [0.6, 'rgb(56,56,156'],
-  //   [0.6, 'rgb(106,106,128'],
-  //   [0.7, 'rgb(106,106,128'],
-  //   [0.7, 'rgb(155,146,98'],
-  //   [0.8, 'rgb(155,146,98'],
-  //   [0.8, 'rgb(205,186,69'],
-  //   [0.9, 'rgb(205,186,69'],
-  //   [0.9, 'rgb(255,255,39)'],
-  //   [1, 'rgb(255,255,39)'],
-  // ];
 
   const groupBySample_activity = groupBy(rawDataActivity, 'sample');
   console.log(groupBySample_activity);
@@ -122,6 +141,16 @@ export default function MsLandscape(data, arg) {
     'signatureName'
   );
   console.log(groupBySignatureName_activity);
+
+  // const ordered = {};
+  // Object.keys(groupBySignatureName_activity)
+  //   .sort()
+  //   .reverse()
+  //   .forEach(function (key) {
+  //     ordered[key] = groupBySignatureName_activity[key];
+  //   });
+
+  // console.log(ordered);
 
   const dataSignature = Object.entries(groupBySample_activity).map(
     ([key, value]) => ({
@@ -209,8 +238,9 @@ export default function MsLandscape(data, arg) {
     }))
     .flat();
   console.log(xAxisName.map((e) => e));
-  const traces1 = Object.entries(groupBySignatureName_activity).map(
-    ([key, value]) => ({
+  const traces1 = Object.entries(groupBySignatureName_activity)
+    .reverse()
+    .map(([key, value]) => ({
       key: key,
       value: value,
       map: barCharColor.map((e) => e),
@@ -226,8 +256,7 @@ export default function MsLandscape(data, arg) {
       },
       showlegend: false,
       test: value.map((d, i) => d.exposure / dataSignature[i].total),
-    })
-  );
+    }));
   console.log(traces1);
   const traces2 = [
     {
@@ -256,8 +285,9 @@ export default function MsLandscape(data, arg) {
   ];
   console.log(traces2);
 
-  const traces3 = Object.entries(groupBySignatureName_activity).map(
-    ([key, value]) => ({
+  const traces3 = Object.entries(groupBySignatureName_activity)
+    .reverse()
+    .map(([key, value]) => ({
       key: key,
       value: value,
       map: barCharColor.map((e) => e),
@@ -272,8 +302,14 @@ export default function MsLandscape(data, arg) {
       },
       xaxis: 'x',
       yaxis: 'y3',
-    })
-  );
+      // transforms: [
+      //   {
+      //     type: 'sort',
+      //     target: 'y',
+      //     order: 'descending',
+      //   },
+      // ],
+    }));
   console.log(traces3);
 
   const traces = [...traces3, ...traces2, ...traces1];
@@ -300,6 +336,8 @@ export default function MsLandscape(data, arg) {
       tickmode: 'array',
       tickvals: xAxisName.map((_, i) => i),
       ticktext: xAxisName.map((e) => e.sample),
+      type: 'category',
+      tickangle: -90,
     },
     yaxis: { title: 'Signature contribution', domain: [0, 0.45] },
     yaxis2: { title: 'Cosine Similarity', domain: [0.46, 0.52] },
