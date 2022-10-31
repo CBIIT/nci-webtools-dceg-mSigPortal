@@ -329,7 +329,7 @@ export default function MsLandscape(data, arg) {
     legend: {
       orientation: 'h',
       title: { text: 'Signatures Name' },
-      traceorder: 'normal',
+      traceorder: 'reversed',
     },
 
     xaxis: {
