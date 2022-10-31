@@ -74,6 +74,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     },
     align: 'center',
   }));
+  console.log(totalCountAnnotation);
 
   const shapes = data.map((element, index, array) => ({
     type: 'rect',
@@ -137,7 +138,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     width: totalCancer > 4 ? null : 400 + 150 * (totalCancer - 1),
     autosize: true,
     height: 500 + extraMargin,
-    legend: { orientation: 'h', x: 0.05, y: 1.15 },
+    legend: { orientation: 'h', x: totalCancer > 4 ? 0.4 : 0.2, y: 1.15 },
     //title: { text: 'Tumor Mutational Burden' },
     xaxis: {
       showticklabels: false,

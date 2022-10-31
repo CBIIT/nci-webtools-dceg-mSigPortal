@@ -269,7 +269,7 @@ export default function MsLandscape(data, arg) {
       colorscale: heatmapColorscale,
       colorbar: {
         title: { text: 'cosine similarity' },
-        //orientation: 'h',
+        orientation: 'h',
         //borderwidth: 1,
         //xanchor: 'left',
         //yanchor: 'top',
@@ -328,7 +328,7 @@ export default function MsLandscape(data, arg) {
     hovermode: 'closest',
     legend: {
       orientation: 'h',
-      title: { text: 'Signatures Name' },
+      // title: { text: 'Signatures Name' },
       traceorder: 'reversed',
     },
 
@@ -340,7 +340,7 @@ export default function MsLandscape(data, arg) {
       tickangle: -90,
     },
     yaxis: { title: 'Signature contribution', domain: [0, 0.45] },
-    yaxis2: { title: 'Cosine Similarity', domain: [0.46, 0.52] },
+    yaxis2: { title: '', domain: [0.46, 0.52] },
     yaxis3: { title: 'Number of mutation', domain: [0.55, 1] },
 
     shapes: [...shapes, ...lines],
