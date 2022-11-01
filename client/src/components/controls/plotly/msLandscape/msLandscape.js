@@ -263,9 +263,17 @@ export default function MsLandscape(data, arg) {
     //console.log(signature_name_tmp);
     console.log(signature_name);
 
-    const genomes = data2;
+    const dataSample = groupBy(
+      data2.map((e) => ({
+        mutation: e.mutation,
+        sample: e.sample,
+      })),
+      'sample'
+    );
+    console.log(dataSample);
+    const genomes = dataSample;
     // const est_genomes = data3 * data4;
-    // console.log(genomes);
+    console.log(genomes);
     // console.log(est_genomes);
   }
 
