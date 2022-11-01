@@ -29,7 +29,6 @@ export default function MutPatternPlot() {
     skip: !barParams,
   });
 
-  console.log(scatterParams);
   // get data on form change
   useEffect(() => {
     const { study, cancer, strategy } = publicForm;
@@ -78,7 +77,7 @@ export default function MutPatternPlot() {
         <p className="p-3">An error has occured. Please verify your input.</p>
       )}
       <div id="barchart">
-        {patternData && !patternError ? (
+        {patternData && !patternError && (
           <>
             <Plotly
               className="w-100"
@@ -97,12 +96,10 @@ export default function MutPatternPlot() {
               pattern.
             </p>
           </>
-        ) : (
-          <div className="text-center my-4">No data available</div>
         )}
       </div>
       <div id="context">
-        {scatterData && !scatterError ? (
+        {scatterData && !scatterError && (
           <>
             <Plotly
               className="w-100"
@@ -120,8 +117,6 @@ export default function MutPatternPlot() {
               as TCGA PanCancer), different colors will be used.
             </p>
           </>
-        ) : (
-          <div className="text-center my-4">No data available</div>
         )}
       </div>
     </>
