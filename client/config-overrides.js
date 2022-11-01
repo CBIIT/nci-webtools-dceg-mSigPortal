@@ -7,6 +7,8 @@ module.exports = function override(config, env) {
     buffer: require.resolve('buffer/'),
     path: require.resolve('path-browserify'),
     fs: false,
+    stream: require.resolve('stream-browserify'),
+    assert: require.resolve('assert/'),
   };
 
   config.plugins.push(
