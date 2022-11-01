@@ -218,6 +218,7 @@ export default function PublicForm() {
                 e.strategy == strategy.value &&
                 e.signatureSetName == signatureSet.value
             )
+            .sort()
             .map((e) => e.cancer)
         ),
       ]

@@ -161,17 +161,19 @@ export default function PublicForm() {
                 e.strategy == strategy.value &&
                 e.signatureSetName == signatureSetName.value
             )
+
             .map((e) => e.cancer)
         ),
-      ].map((e) => ({
-        label: e,
-        value: e,
-      }));
+      ]
+        .sort()
+        .map((e) => ({
+          label: e,
+          value: e,
+        }));
     } else {
       return [];
     }
   };
-
   function handleStudyChange(study) {
     const strategies = strategyOptions(study);
     const signatureSets = signatureSetOptions(study, strategies[0]);

@@ -439,6 +439,7 @@ export default function Exposure({ match }) {
       ...new Set(
         exposureCancer
           .filter((data) => data.Study == study && data.Dataset == strategy)
+          .sort()
           .map((data) => data.Cancer_Type)
       ),
     ];
@@ -470,6 +471,7 @@ export default function Exposure({ match }) {
       ...new Set(
         exposureCancer
           .filter((data) => data.Study == study && data.Dataset == strategy)
+          .sort()
           .map((data) => data.Cancer_Type)
       ),
     ];

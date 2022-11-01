@@ -89,7 +89,7 @@ export default function PublicForm() {
             .filter((data) => data.Study == study && data.Dataset == strategy)
             .map((data) => data.Cancer_Type)
         ),
-      ];
+      ].sort();
       const cancer = 'Panc-AdenoCA'; // default
 
       mergeState({

@@ -76,7 +76,7 @@ export default function UserForm() {
             .filter((data) => data.Study == study && data.Dataset == strategy)
             .map((data) => data.Cancer_Type)
         ),
-      ];
+      ].sort();
       const cancer = 'Lung-AdenoCA'; // default
 
       mergeState({
@@ -205,9 +205,10 @@ export default function UserForm() {
       ...new Set(
         exposureSignature
           .filter((data) => data.Study == study && data.Dataset == strategy)
+
           .map((data) => data.Cancer_Type)
       ),
-    ];
+    ].sort();
 
     handleSet(rsSet);
 

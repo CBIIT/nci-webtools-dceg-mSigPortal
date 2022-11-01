@@ -118,15 +118,6 @@ export default function MsLandscape(data, arg) {
     [1.0, 'rgb(241,246,34)'],
   ];
 
-  const groupBySample_activity = groupBy(rawDataActivity, 'sample');
-  console.log(groupBySample_activity);
-
-  const groupBySignatureName_activity = groupBy(
-    rawDataActivity,
-    'signatureName'
-  );
-  console.log(groupBySignatureName_activity);
-
   // const ordered = {};
   // Object.keys(groupBySignatureName_activity)
   //   .sort()
@@ -137,7 +128,39 @@ export default function MsLandscape(data, arg) {
 
   // console.log(ordered);
 
-  const dataSignature = Object.entries(groupBySample_activity).map(
+  const exposure_refdata_input = rawDataActivity.map((group) => ({
+    exposure: group.exposure,
+    sample: group.sample,
+    signatureName: group.signatureName,
+  }));
+  console.log('exposure_refdata_input');
+  console.log(exposure_refdata_input);
+  const seqmatrix_refdata_input = rawDataSpectrum.map((group) => ({
+    mutation: group.mutations,
+    mutationType: group.mutationType,
+    sample: group.sample,
+  }));
+  console.log('seqmatrix_refdata_input');
+  console.log(seqmatrix_refdata_input);
+
+  const signature_refsets_input = rawDataSignature.map((group) => ({
+    contribution: group.contribution,
+    mutationType: group.mutationType,
+    signatureName: group.signatureName,
+  }));
+  console.log('signature_refsets_input');
+  console.log(signature_refsets_input);
+
+  const groupBySample_exposure = groupBy(exposure_refdata_input, 'sample');
+  console.log(groupBySample_exposure);
+
+  const groupBySignatureName_exposure = groupBy(
+    exposure_refdata_input,
+    'signatureName'
+  );
+  console.log(groupBySignatureName_exposure);
+
+  const dataSignature = Object.entries(groupBySample_exposure).map(
     ([key, value]) => ({
       signatureName: key,
       total: value.reduce((a, e) => a + parseInt(e.exposure), 0),
@@ -157,10 +180,6 @@ export default function MsLandscape(data, arg) {
   const groupByMutationType_spectrum = groupBy(rawDataSpectrum, 'mutationType');
   console.log(groupByMutationType_spectrum);
   console.log(groupBy(rawDataSpectrum, 'cancer'));
-  const orignal_genomes = rawDataSpectrum;
-  //const signature = groupByMutationType_signature;
-  const signature = rawDataSignature;
-  const signature_activaties = rawDataActivity;
 
   //  decompsite_input <- calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
   //calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
@@ -245,23 +264,27 @@ export default function MsLandscape(data, arg) {
     console.log(signature_name);
 
     const genomes = data2;
-    const est_genomes = data3 * data4;
-    console.log(genomes);
-    console.log(est_genomes);
+    // const est_genomes = data3 * data4;
+    // console.log(genomes);
+    // console.log(est_genomes);
   }
 
-  calculate_similarities(orignal_genomes, signature, signature_activaties);
+  calculate_similarities(
+    seqmatrix_refdata_input,
+    signature_refsets_input,
+    exposure_refdata_input
+  );
 
-  const barCharColor = Object.keys(groupBySignatureName_activity);
+  const barCharColor = Object.keys(groupBySignatureName_exposure);
   console.log(barCharColor);
 
-  const xAxisName = Object.values(groupBySignatureName_activity)[0]
+  const xAxisName = Object.values(groupBySignatureName_exposure)[0]
     .map((e) => ({
       sample: e.sample,
     }))
     .flat();
   console.log(xAxisName.map((e) => e));
-  const traces1 = Object.entries(groupBySignatureName_activity)
+  const traces1 = Object.entries(groupBySignatureName_exposure)
     .reverse()
     .map(([key, value]) => ({
       key: key,
@@ -308,7 +331,7 @@ export default function MsLandscape(data, arg) {
   ];
   console.log(traces2);
 
-  const traces3 = Object.entries(groupBySignatureName_activity)
+  const traces3 = Object.entries(groupBySignatureName_exposure)
     .reverse()
     .map(([key, value]) => ({
       key: key,
