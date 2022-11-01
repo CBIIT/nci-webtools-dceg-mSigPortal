@@ -46,7 +46,7 @@ export function createSampleAnnotation(apiData, text = '') {
     y: 0.88,
     text: apiData[0].sample
       ? `<b>${apiData[0].sample}: ${totalMutations.toLocaleString()} ${
-          text || 'Substiutions'
+          text || 'Substitutions'
         }</b>`
       : `<b>${apiData[0].signatureName}</b>`,
     showarrow: false,
