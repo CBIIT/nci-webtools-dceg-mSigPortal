@@ -370,7 +370,7 @@ export default function MsLandscape(data, arg) {
       // title: { text: 'Signatures Name' },
       traceorder: 'reversed',
       x: 0,
-      y: -0.15,
+      y: -0.157,
     },
 
     xaxis: {
