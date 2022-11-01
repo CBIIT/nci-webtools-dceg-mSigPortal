@@ -90,7 +90,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     },
     align: 'center',
   }));
-
+  console.log(groupCountAnnotation);
   const countDivider = data.map((element, index, array) => ({
     type: 'line',
     xref: 'x',
@@ -121,6 +121,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     },
     align: 'center',
   }));
+  console.log(totalCountAnnotation);
 
   const shapes = data.map((element, index, array) => ({
     type: 'rect',

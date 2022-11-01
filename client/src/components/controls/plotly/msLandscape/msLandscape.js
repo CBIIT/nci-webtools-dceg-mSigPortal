@@ -85,22 +85,7 @@ export default function MsLandscape(data, arg) {
     92: '#0E1844',
     '-others': '#cececa',
   };
-  // const heatmapColorscale = [
-  //   [0, 'rgb(34,7,139)'],
-  //   [0.1, 'rgb(34,7,139)'],
-  //   [0.2, 'rgb(34,7,139)'],
-  //   [0.3, 'rgb(34,7,139)'],
-  //   [0.4, 'rgb(34,7,139)'],
-  //   [0.5, 'rgb(34,7,139)'],
-  //   [0.6, 'rgb(34,7,139)'],
-  //   [0.7, 'rgb(34,7,139)'],
-  //   [0.7, 'rgb(128,12,162)'],
-  //   [0.8, 'rgb(200,69,125)'],
-  //   [0.8, 'rgb(208,79,117)'],
-  //   [0.9, 'rgb(245,149,70)'],
-  //   [0.9, 'rgb(247,152,67)'],
-  //   [1, 'rgb(241,246,34)'],
-  // ];
+
   const heatmapColorscale = [
     [0, 'rgb(34,7,139)'],
     [0.1, 'rgb(34,7,139)'],
@@ -120,16 +105,16 @@ export default function MsLandscape(data, arg) {
     [0.5, 'rgb(34,7,139)'],
     [0.6, 'rgb(34,7,139)'],
 
-    [0.6, 'rgb(128,12,162)'],
-    [0.7, 'rgb(128,12,162)'],
+    [0.6, 'rgb(34,7,139)'],
+    [0.7, 'rgb(124,9,163)'],
 
-    [0.7, 'rgb(200,69,125)'],
-    [0.8, 'rgb(200,69,125)'],
+    [0.7, 'rgb(145,22,156)'],
+    [0.8, 'rgb(202,72,122)'],
 
-    [0.8, 'rgb(208,79,117)'],
-    [0.9, 'rgb(245,149,70)'],
+    [0.8, 'rgb(220,94,103)'],
+    [0.9, 'rgb(244,145,72)'],
 
-    [0.9, 'rgb(247,152,67)'],
+    [0.9, 'rgb(252,165,55)'],
     [1.0, 'rgb(241,246,34)'],
   ];
 
@@ -195,6 +180,36 @@ export default function MsLandscape(data, arg) {
   }
   //const cosine = cosineSimilarity(s1mutations, s2mutations).toFixed(3);
 
+  //matrix multiplication
+  // function matrixDot(A, B) {
+  //   var result = new Array(A.length)
+  //     .fill(0)
+  //     .map((row) => new Array(B[0].length).fill(0));
+
+  //   return result.map((row, i) => {
+  //     return row.map((val, j) => {
+  //       return A[i].reduce((sum, elm, k) => sum + elm * B[k][j], 0);
+  //     });
+  //   });
+  // }
+  function multiply(a, b) {
+    var aNumRows = a.length,
+      aNumCols = a[0].length,
+      bNumRows = b.length,
+      bNumCols = b[0].length,
+      m = new Array(aNumRows); // initialize array of rows
+    for (var r = 0; r < aNumRows; ++r) {
+      m[r] = new Array(bNumCols); // initialize the current row
+      for (var c = 0; c < bNumCols; ++c) {
+        m[r][c] = 0; // initialize the current cell
+        for (var i = 0; i < aNumCols; ++i) {
+          m[r][c] += a[r][i] * b[i][c];
+        }
+      }
+    }
+    return m;
+  }
+
   function uniq(a) {
     return Array.from(new Set(a));
   }
@@ -206,8 +221,11 @@ export default function MsLandscape(data, arg) {
     const data2 = orignal_genomes;
     const data3 = signature;
     const data4 = signature_activaties;
+    console.log('data2: ');
     console.log(data2);
+    console.log('data3: ');
     console.log(data3);
+    console.log('data4: ');
     console.log(data4);
 
     const sample_name_total = data4.map((e) => e.sample);
@@ -222,9 +240,14 @@ export default function MsLandscape(data, arg) {
     const signature_name = uniq(
       signature_name_total.filter((x) => signature_name_tmp.includes(x))
     );
-    console.log(signature_name_total);
-    console.log(signature_name_tmp);
+    //console.log(signature_name_total);
+    //console.log(signature_name_tmp);
     console.log(signature_name);
+
+    const genomes = data2;
+    const est_genomes = data3 * data4;
+    console.log(genomes);
+    console.log(est_genomes);
   }
 
   calculate_similarities(orignal_genomes, signature, signature_activaties);
@@ -315,11 +338,27 @@ export default function MsLandscape(data, arg) {
   const traces = [...traces3, ...traces2, ...traces1];
   console.log(traces);
 
+  const text = {
+    x: 0,
+    y: -0.157,
+    xanchor: 'left',
+    yanchor: 'bottom',
+    xref: 'paper',
+    yref: 'paper',
+    text: 'Signatures Name:',
+    showarrow: false,
+    font: {
+      family: 'Arial',
+      size: 17,
+      color: 'rgb(37,37,37)',
+    },
+  };
+
   const shapes = [];
 
   const lines = [];
 
-  let annotations = [];
+  let annotations = [text];
 
   const layout = {
     autosize: true,
@@ -330,6 +369,8 @@ export default function MsLandscape(data, arg) {
       orientation: 'h',
       // title: { text: 'Signatures Name' },
       traceorder: 'reversed',
+      x: 0,
+      y: -0.15,
     },
 
     xaxis: {
@@ -339,9 +380,9 @@ export default function MsLandscape(data, arg) {
       type: 'category',
       tickangle: -90,
     },
-    yaxis: { title: 'Signature contribution', domain: [0, 0.45] },
-    yaxis2: { title: '', domain: [0.46, 0.52] },
-    yaxis3: { title: 'Number of mutation', domain: [0.55, 1] },
+    yaxis: { title: 'Signature contribution', domain: [0, 0.47] },
+    yaxis2: { title: '', domain: [0.47, 0.51] },
+    yaxis3: { title: 'Number of mutation', domain: [0.53, 1] },
 
     shapes: [...shapes, ...lines],
     annotations: annotations,
