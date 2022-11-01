@@ -4,11 +4,12 @@ export default function mutationalPatternScatter(inputData, arg) {
   const { pattern } = arg;
   const type =
     pattern.substring(1, 2) + pattern.substring(3, 4) + pattern.substring(5, 6);
-  const subtype1 = pattern.substring(0, 1);
-  const subtype2 = pattern.substring(2, 3);
-  const pattern1 = type + ' context';
+  const subtype1 = pattern.split('>')[0][0];
+  const subtype2 = pattern.split('>')[0].slice(-1);
+  // const subtype1 = pattern.substring(0, 1);
+  // const subtype2 = pattern.substring(2, 3);
+  const pattern1 = pattern + ' context';
   const pattern2 = pattern + ' other context';
-
   const tmpdata0 = Object.values(
     groupBy(inputData, (e) => `${e.study}_${e.sample}`)
   ).map((samples) => {
@@ -118,25 +119,23 @@ export default function mutationalPatternScatter(inputData, arg) {
     .filter((e) => e.total > 200);
 
   const maxTotal = Math.max(...result.map((o) => o.total));
-  console.log(maxTotal);
-  console.log(maxTotal.toExponential());
+
   function format_output(output) {
-    var n = Math.log(output) / Math.LN10;
-    var x = Math.round(n);
+    let n = Math.log(output) / Math.LN10;
+    let x = Math.round(n);
     if (x < 0) x = 0;
     let out = '1';
-    for (var i = 0; i <= x; i++) out += '0';
+    for (let i = 0; i <= x; i++) out += '0';
     return out / 10;
   }
   const maxMutationFilter = format_output(maxTotal);
-  console.log(maxMutationFilter);
   const data1 = result.filter((o) => o.total < maxMutationFilter / 100);
   const data2 = result.filter(
     (o) => o.total < maxMutationFilter / 10 && o.total > maxMutationFilter / 100
   );
   const data3 = result.filter((o) => o.total > maxMutationFilter / 10);
 
-  var trace1 = {
+  let trace1 = {
     name: (maxMutationFilter / 100).toLocaleString(undefined),
     x: data1.map((e) => e.n1),
     y: data1.map((e) => e.n2),
@@ -157,7 +156,7 @@ export default function mutationalPatternScatter(inputData, arg) {
       text: 'Number of mutations',
     },
   };
-  var trace2 = {
+  let trace2 = {
     name: (maxMutationFilter / 10).toLocaleString(undefined),
     x: data2.map((e) => e.n1),
     y: data2.map((e) => e.n2),
@@ -178,7 +177,7 @@ export default function mutationalPatternScatter(inputData, arg) {
       text: 'Number of mutations',
     },
   };
-  var trace3 = {
+  let trace3 = {
     name: maxMutationFilter.toLocaleString(undefined),
     x: data3.map((e) => e.n1),
     y: data3.map((e) => e.n2),
@@ -199,8 +198,12 @@ export default function mutationalPatternScatter(inputData, arg) {
       text: 'Number of mutations',
     },
   };
-  var trace4 = {
-    name: result[0].study + '@' + result[0].cancer,
+
+  let trace4 = {
+    name:
+      result[0]?.study != 'undefined'
+        ? result[0].study + '@' + result[0].cancer
+        : 'Input',
     x: result.map((e) => e.n1),
     y: result.map((e) => e.n2),
     customdata: result.map((e) => ({ sample: e.sample, total: e.total })),
@@ -222,7 +225,7 @@ export default function mutationalPatternScatter(inputData, arg) {
       ),
     },
     hovertemplate:
-      '<b> Sample: ' +
+      '<b>Sample: ' +
       '</b>' +
       '%{customdata.sample} <br>' +
       '<b>' +
@@ -240,12 +243,8 @@ export default function mutationalPatternScatter(inputData, arg) {
     },
   };
 
-  console.log(trace1);
-
-  console.log(trace4);
-
   const traces = [trace1, trace2, trace3, trace4];
-  var layout = {
+  let layout = {
     height: 700,
     hoverlabel: { bgcolor: '#FFF' },
     legend: {
@@ -271,7 +270,7 @@ export default function mutationalPatternScatter(inputData, arg) {
     },
   };
 
-  var config = {
+  let config = {
     responsive: true,
   };
 
