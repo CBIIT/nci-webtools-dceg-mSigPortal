@@ -1,5 +1,6 @@
 import { explorationApiSlice } from '../../../../services/store/rootApi';
 import TMB from '../../../controls/plotly/tmb/tmbGeneral';
+//import TMB from '../../../controls/plotly/tmb/tmb';
 import { groupBy } from 'lodash';
 
 export const tmbApiSlice = explorationApiSlice.injectEndpoints({

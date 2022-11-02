@@ -263,17 +263,41 @@ export default function MsLandscape(data, arg) {
     //console.log(signature_name_tmp);
     console.log(signature_name);
 
-    const dataSample = groupBy(
+    const dataSample2 = groupBy(
       data2.map((e) => ({
         mutation: e.mutation,
         sample: e.sample,
       })),
       'sample'
     );
-    console.log(dataSample);
-    const genomes = dataSample;
+
+    const dataSample3 = groupBy(
+      data3.map((e) => ({
+        contribution: e.contribution,
+        signatureName: e.signatureName,
+      })),
+      'signatureName'
+    );
+
+    const dataSample4 = groupBy(
+      data4.map((e) => ({
+        exposure: e.exposure,
+        signatureName: e.signatureName,
+      })),
+      'signatureName'
+    );
+    const array4 = [];
+    Object.values(dataSample4).forEach((group) => {
+      //console.log(group);
+      group.map((e) => console.log(e.exposure));
+    });
+    console.log(dataSample2);
+    console.log(dataSample3);
+    console.log(dataSample4);
+    console.log(array4);
+    //const genomes = Object.values(data2).map((e) => e.mutation);
+    //console.log(genomes);
     // const est_genomes = data3 * data4;
-    console.log(genomes);
     // console.log(est_genomes);
   }
 
@@ -407,7 +431,6 @@ export default function MsLandscape(data, arg) {
       traceorder: 'reversed',
       x: 0,
       y: -0.157,
-      
     },
 
     xaxis: {

@@ -2,6 +2,7 @@ export default function TMB(data, tmbTabName, signatureName) {
   const totalCancer = data.length;
   console.log(totalCancer);
   console.log(data);
+  console.log(tmbTabName);
 
   const absYValue = data
     .map((o) => o.samples.map((e) => Math.abs(e.burden)))
@@ -168,18 +169,45 @@ export default function TMB(data, tmbTabName, signatureName) {
     align: 'center',
   };
   let annotations = [];
-  signatureName != null
-    ? (annotations = [
+  // signatureName != null
+  //   ? (annotations = [
+  //       ...groupLabel,
+  //       ...groupCountAnnotation,
+  //       ...totalCountAnnotation,
+  //       signatureNameAnnotation,
+  //     ])
+  //   : (annotations = [
+  //       ...groupLabel,
+  //       ...groupCountAnnotation,
+  //       ...totalCountAnnotation,
+  //     ]);
+
+  if (tmbTabName === 'TMB') {
+    if (signatureName != null) {
+      annotations = [
+        ...groupLabel,
+        ...totalCountAnnotation,
+        signatureNameAnnotation,
+      ];
+    } else {
+      annotations = [...groupLabel, ...totalCountAnnotation];
+    }
+  } else {
+    if (signatureName != null) {
+      annotations = [
         ...groupLabel,
         ...groupCountAnnotation,
         ...totalCountAnnotation,
         signatureNameAnnotation,
-      ])
-    : (annotations = [
+      ];
+    } else {
+      annotations = [
         ...groupLabel,
         ...groupCountAnnotation,
         ...totalCountAnnotation,
-      ]);
+      ];
+    }
+  }
 
   // find the longest label to calculate extra height margin
   const labels = groupLabel.map((e) => e.text);
@@ -190,7 +218,11 @@ export default function TMB(data, tmbTabName, signatureName) {
     width: totalCancer > 4 ? null : 400 + 150 * (totalCancer - 1),
     autosize: true,
     height: 500 + extraMargin,
-    legend: { orientation: 'h', x: 0.05, y: 1.25 },
+    legend: {
+      orientation: 'h',
+      x: 0.05,
+      y: tmbTabName === 'TMB' ? 1.15 : 1.25,
+    },
     xaxis: {
       showticklabels: false,
       tickfont: {
@@ -217,10 +249,13 @@ export default function TMB(data, tmbTabName, signatureName) {
     },
     margin: {
       b: extraMargin,
-      t: 140,
+      t: tmbTabName === 'TMB' ? 120 : 140,
       l: 0,
     },
-    shapes: [...shapes, ...lines, ...countDivider],
+    shapes:
+      tmbTabName === 'TMB'
+        ? [...shapes, ...lines]
+        : [...shapes, ...lines, ...countDivider],
     annotations: annotations,
   };
 
@@ -229,7 +264,10 @@ export default function TMB(data, tmbTabName, signatureName) {
   };
 
   return {
-    traces: [...traces, traceLabelGreen, traceLabelBlue],
+    traces:
+      tmbTabName === 'TMB'
+        ? [...traces, traceLabelGreen]
+        : [...traces, traceLabelGreen, traceLabelBlue],
     layout: layout,
     config,
   };
