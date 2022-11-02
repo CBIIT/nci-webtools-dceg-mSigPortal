@@ -1,4 +1,5 @@
 import { groupBy } from 'lodash';
+import { First } from 'react-bootstrap/esm/PageItem';
 
 export default function MsLandscape(data, arg) {
   console.log(data);
@@ -368,10 +369,14 @@ export default function MsLandscape(data, arg) {
     console.log(array3);
     console.log(dataSample4);
     console.log(array4);
+    const array3_trans = array3[0].map((_, colIndex) =>
+      array3.map((row) => row[colIndex])
+    );
+    console.log(array3_trans);
     const genomes = array2;
-
-    //const est_genomes = matrixMul(array3, array4);
-    //console.log(est_genomes);
+    console.log(genomes);
+    const est_genomes = multiplyMatrices(array3_trans, array4);
+    console.log(est_genomes);
   }
 
   calculate_similarities(
