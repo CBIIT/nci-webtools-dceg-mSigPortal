@@ -1,5 +1,4 @@
 import { explorationApiSlice } from '../../../../services/store/rootApi';
-//import TMBSignature from '../../../controls/plotly/tmb/tmbSignature';
 import TMBSignature from '../../../controls/plotly/tmb/tmb';
 import { groupBy } from 'lodash';
 
@@ -11,11 +10,8 @@ export const tmbSignatureApiSlice = explorationApiSlice.injectEndpoints({
         params,
       }),
       transformResponse: (data, meta, arg) => {
-        //console.log('tmbsignature api');
-        //console.log(data);
         // calculate median burden across samples
         const groupBySignature = groupBy(data, 'signatureName');
-        console.log(groupBySignature);
         const transform = Object.entries(groupBySignature)
           .map(([signatureName, data]) => {
             const samples = data
@@ -37,7 +33,8 @@ export const tmbSignatureApiSlice = explorationApiSlice.injectEndpoints({
               signatureName,
               samples,
               medianBurden,
-              totalSamples: data.length,
+              sampleSize: data.length,
+              signatureSize: burdens.length,
             };
           })
           .filter((e) => e.medianBurden)

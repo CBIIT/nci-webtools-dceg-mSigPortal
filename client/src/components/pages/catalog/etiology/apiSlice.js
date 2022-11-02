@@ -50,7 +50,8 @@ export const etiologyApiSlice = catalogApiSlice.injectEndpoints({
                 cancer,
                 samples,
                 medianBurden,
-                totalSamples: samples.length,
+                sampleSize: data[0].sampleSize,
+                signatureSize: data[0].signatureSize,
               };
             })
             .filter((e) => e.medianBurden)

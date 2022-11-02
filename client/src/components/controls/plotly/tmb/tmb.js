@@ -1,8 +1,5 @@
 export default function TMB(data, tmbTabName, signatureName) {
   const totalCancer = data.length;
-  console.log(totalCancer);
-  console.log(data);
-  console.log(tmbTabName);
 
   const absYValue = data
     .map((o) => o.samples.map((e) => Math.abs(e.burden)))
@@ -73,7 +70,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     textangle: totalCancer > 4 ? 60 : 0,
   }));
 
-  const groupCountAnnotation = data.map((element, index, array) => ({
+  const signatureCountAnnotation = data.map((element, index, array) => ({
     xref: 'x',
     yref: 'paper',
     xanchor: 'bottom',
@@ -81,9 +78,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     x: (index + index + 1) * 0.5,
     //y: -0.07,
     y: 1.06,
-    text: element.samples.filter(function (x) {
-      return x.burden != null;
-    }).length,
+    text: element.signatureSize,
     showarrow: false,
     font: {
       size: 12,
@@ -91,7 +86,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     },
     align: 'center',
   }));
-  console.log(groupCountAnnotation);
+
   const countDivider = data.map((element, index, array) => ({
     type: 'line',
     xref: 'x',
@@ -106,15 +101,14 @@ export default function TMB(data, tmbTabName, signatureName) {
     },
   }));
 
-  const totalCountAnnotation = data.map((element, index, array) => ({
+  const sampleCountAnnotation = data.map((element, index, array) => ({
     xref: 'x',
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
     x: (index + index + 1) * 0.5,
-    //y: -0.14,
     y: 1.01,
-    text: `${element.totalSamples}`,
+    text: `${element.sampleSize}`,
     showarrow: false,
     font: {
       size: 12,
@@ -122,7 +116,6 @@ export default function TMB(data, tmbTabName, signatureName) {
     },
     align: 'center',
   }));
-  console.log(totalCountAnnotation);
 
   const shapes = data.map((element, index, array) => ({
     type: 'rect',
@@ -173,38 +166,38 @@ export default function TMB(data, tmbTabName, signatureName) {
   //   ? (annotations = [
   //       ...groupLabel,
   //       ...groupCountAnnotation,
-  //       ...totalCountAnnotation,
+  //       ...sampleCountAnnotation,
   //       signatureNameAnnotation,
   //     ])
   //   : (annotations = [
   //       ...groupLabel,
   //       ...groupCountAnnotation,
-  //       ...totalCountAnnotation,
+  //       ...sampleCountAnnotation,
   //     ]);
 
   if (tmbTabName === 'TMB') {
     if (signatureName != null) {
       annotations = [
         ...groupLabel,
-        ...totalCountAnnotation,
+        ...sampleCountAnnotation,
         signatureNameAnnotation,
       ];
     } else {
-      annotations = [...groupLabel, ...totalCountAnnotation];
+      annotations = [...groupLabel, ...sampleCountAnnotation];
     }
   } else {
     if (signatureName != null) {
       annotations = [
         ...groupLabel,
-        ...groupCountAnnotation,
-        ...totalCountAnnotation,
+        ...signatureCountAnnotation,
+        ...sampleCountAnnotation,
         signatureNameAnnotation,
       ];
     } else {
       annotations = [
         ...groupLabel,
-        ...groupCountAnnotation,
-        ...totalCountAnnotation,
+        ...signatureCountAnnotation,
+        ...sampleCountAnnotation,
       ];
     }
   }

@@ -16,7 +16,7 @@ export default function MsBurdenForm() {
 
   const mergeMsBurden = (state) =>
     dispatch(actions.mergeExposure({ msBurden: state }));
-  console.log(store);
+
   const { signatureNames } = store.main;
   const { signatureName } = store.msBurden;
 
