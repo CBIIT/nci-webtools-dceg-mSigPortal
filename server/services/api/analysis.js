@@ -111,42 +111,6 @@ function upload(req, res, next) {
   form.parse(req);
 }
 
-async function explorationWrapper(req, res, next) {
-  const { fn, args, projectID: id, type = 'calc' } = req.body;
-  logger.debug('/explorationWrapper: %o', { ...req.body });
-
-  const projectID = id ? id : type == 'calc' ? randomUUID() : false;
-  // create directory for results if needed
-  const savePath = projectID ? path.join(projectID, 'results', fn, '/') : null;
-  if (projectID)
-    fs.mkdirSync(path.join(rConfig.wd, savePath), { recursive: true });
-
-  try {
-    const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
-      fn,
-      args,
-      config: {
-        ...rConfig,
-        savePath,
-        projectID,
-      },
-    });
-
-    const { stdout, ...rest } = JSON.parse(wrapper);
-
-    logger.debug(stdout);
-
-    res.json({
-      projectID,
-      stdout,
-      ...rest,
-    });
-  } catch (err) {
-    logger.error(`/explorationCalc: An error occured with fn: ${fn}`);
-    next(err);
-  }
-}
-
 async function associationWrapper(req, res, next) {
   const { fn, args, projectID: id } = req.body;
   logger.debug('/associationCalc: %o', { ...req.body });
@@ -356,8 +320,6 @@ const router = express.Router();
 
 router.post('/upload', upload);
 
-router.post('/explorationWrapper', explorationWrapper);
-
 router.get('/getExposureExample/:example', getExposureExample);
 
 router.get('/getPublications', getPublications);
@@ -375,7 +337,6 @@ module.exports = {
   parseCSV,
   importUserSession,
   upload,
-  explorationWrapper,
   getExposureExample,
   getPublications,
   getImageS3Batch,
