@@ -321,17 +321,21 @@ export default function MsLandscape(data, arg) {
       yaxis: 'y2',
       type: 'heatmap',
       colorscale: heatmapColorscale,
-      zmin: 0,
+      zmin: 0.6,
       zmax: 1,
       colorbar: {
         orientation: 'h',
+        x: 0.5,
+        y: -0.5,
         bordercolor: 'gray',
         tickmode: 'array',
-        tickvals: [0, 0.6, 0.7, 0.8, 0.9, 1],
+        tickvals: [0.6, 0.7, 0.8, 0.9, 1],
         title: {
           text: 'Cosine Similarity',
           font: {
-            //size: 16,
+            family: 'Arial',
+            size: 17,
+            color: 'rgb(37,37,37)',
           },
         },
       },
@@ -403,6 +407,7 @@ export default function MsLandscape(data, arg) {
       traceorder: 'reversed',
       x: 0,
       y: -0.157,
+      
     },
 
     xaxis: {
