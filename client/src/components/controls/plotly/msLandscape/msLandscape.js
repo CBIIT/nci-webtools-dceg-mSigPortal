@@ -197,6 +197,11 @@ export default function MsLandscape(data, arg) {
   console.log(groupByMutationType_spectrum);
   console.log(groupBy(filterDataSpectrum, 'cancer'));
 
+  const sortSignatureName = (sourceArray) => {
+    const sortByLocation = (a, b) =>
+      a.signatureName.localeCompare(b.signatureName, 'en', { numeric: true });
+    return sourceArray.sort(sortByLocation);
+  };
   //  decompsite_input <- calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
   //calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
   function dotp(x, y) {
@@ -330,7 +335,7 @@ export default function MsLandscape(data, arg) {
       'sample'
     );
     const dataSample3 = groupBy(
-      newData3.map((e) => ({
+      sortSignatureName(newData3).map((e) => ({
         contribution: e.contribution,
         signatureName: e.signatureName,
       })),
@@ -338,7 +343,7 @@ export default function MsLandscape(data, arg) {
     );
 
     const dataSample4 = groupBy(
-      data4.map((e) => ({
+      sortSignatureName(data4).map((e) => ({
         exposure: e.exposure,
         signatureName: e.signatureName,
       })),
@@ -351,7 +356,6 @@ export default function MsLandscape(data, arg) {
     });
     const array3 = [];
     Object.values(dataSample3).forEach((group) => {
-      //console.log(group);
       array3.push(group.map((e) => e.contribution));
     });
     const array4 = [];
