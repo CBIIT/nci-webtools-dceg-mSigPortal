@@ -286,14 +286,25 @@ export default function MsLandscape(data, arg) {
       })),
       'signatureName'
     );
+    const array2 = [];
+    Object.values(dataSample2).forEach((group) => {
+      //console.log(group);
+      array2.push(group.map((e) => e.exposure));
+    });
+    const array3 = [];
+    Object.values(dataSample3).forEach((group) => {
+      //console.log(group);
+      array3.push(group.map((e) => e.exposure));
+    });
     const array4 = [];
     Object.values(dataSample4).forEach((group) => {
-      //console.log(group);
-      group.map((e) => console.log(e.exposure));
+      array4.push(group.map((e) => e.exposure));
     });
     console.log(dataSample2);
     console.log(dataSample3);
     console.log(dataSample4);
+    console.log(array2);
+    console.log(array3);
     console.log(array4);
     //const genomes = Object.values(data2).map((e) => e.mutation);
     //console.log(genomes);

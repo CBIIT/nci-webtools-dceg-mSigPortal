@@ -220,7 +220,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     height: 500 + extraMargin,
     legend: {
       orientation: 'h',
-      x: 0.05,
+      x: 0.2,
       y: tmbTabName === 'TMB' ? 1.15 : 1.25,
     },
     xaxis: {
