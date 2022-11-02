@@ -11,23 +11,27 @@ library(aws.s3)
 
 # capture console output for all functions called in wrapper
 wrapper <- function(fn, args, config) {
-  stdout <- vector('character')
-  con <- textConnection('stdout', 'wr', local = TRUE)
+  stdout <- vector("character")
+  con <- textConnection("stdout", "wr", local = TRUE)
   sink(con, type = "message")
   sink(con, type = "output")
 
-  output = list()
+  output <- list()
 
-  tryCatch({
-    output = get(fn)(args, config)
-  }, error = function(e) {
-    print(e)
-    output <<- append(output, list(uncaughtError = e$message))
-  }, finally = {
-    sink(con)
-    sink(con)
-    return(toJSON(list(stdout = stdout, output = output), pretty = TRUE, auto_unbox = TRUE))
-  })
+  tryCatch(
+    {
+      output <- get(fn)(args, config)
+    },
+    error = function(e) {
+      print(e)
+      output <<- append(output, list(uncaughtError = e$message))
+    },
+    finally = {
+      sink(con)
+      sink(con)
+      return(toJSON(list(stdout = stdout, output = output), pretty = TRUE, auto_unbox = TRUE))
+    }
+  )
 }
 
 # Util Functions for retrieving data
@@ -53,7 +57,7 @@ wrapper <- function(fn, args, config) {
 # retrieve signature names filtered by cancer type
 getSignatureNames <- function(args, config) {
   library(stringr)
-  s3load(paste0(config$s3Data, 'Exposure/exposure_refdata.RData'), config$bucket)
+  s3load(paste0(config$s3Data, "Exposure/exposure_refdata.RData"), config$bucket)
 
   exposure_refdata_selected <- exposure_refdata %>% filter(Study == args$study, Dataset == args$strategy, Signature_set_name == args$rsSet)
   if (!is.null(args$cancerType)) exposure_refdata_selected <- exposure_refdata_selected %>% filter(Cancer_Type == args$cancerType)
@@ -67,7 +71,7 @@ getSignatureNames <- function(args, config) {
 # retrieve sample names filtered by cancer type
 getSampleNames <- function(args, config) {
   library(stringr)
-  s3load(paste0(config$s3Data, 'Exposure/exposure_refdata.RData'), config$bucket)
+  s3load(paste0(config$s3Data, "Exposure/exposure_refdata.RData"), config$bucket)
 
   exposure_refdata_selected <- exposure_refdata %>% filter(Study == args$study, Dataset == args$strategy, Signature_set_name == args$rsSet)
 
@@ -78,19 +82,19 @@ getSampleNames <- function(args, config) {
 }
 
 exposureDownload <- function(args, config) {
-  s3load(paste0(config$s3Data, 'Exposure/exposure_refdata.RData'), config$bucket)
+  s3load(paste0(config$s3Data, "Exposure/exposure_refdata.RData"), config$bucket)
   setwd(config$wd)
 
   exposure_refdata_selected <- exposure_refdata %>% filter(Study == args$study, Dataset == args$strategy, Signature_set_name == args$rsSet, Cancer_Type == args$cancerType)
 
-  dfile_name <- paste(args$study, args$strategy, args$cancerType, str_remove_all(str_remove_all(args$rsSet, '\\('), '\\)'), 'exposure_data.txt.gz', sep = '_')
-  dfile_name <- str_replace_all(dfile_name, ' +', '_')
-  filepath = paste0(config$savePath, '/', dfile_name)
+  dfile_name <- paste(args$study, args$strategy, args$cancerType, str_remove_all(str_remove_all(args$rsSet, "\\("), "\\)"), "exposure_data.txt.gz", sep = "_")
+  dfile_name <- str_replace_all(dfile_name, " +", "_")
+  filepath <- paste0(config$savePath, "/", dfile_name)
   exposure_refdata_input <- exposure_refdata_selected
   exposure_refdata_input %>%
     select(Sample, Signature_name, Exposure) %>%
     pivot_wider(names_from = Signature_name, values_from = Exposure) %>%
-    write_delim(file = filepath, delim = '\t', col_names = T)
+    write_delim(file = filepath, delim = "\t", col_names = T)
 
   return(list(path = filepath, filename = dfile_name))
 }
@@ -98,23 +102,24 @@ exposureDownload <- function(args, config) {
 # Catalog - Signature  -------------------------------------------------------
 # section 1: Current reference signatures in mSigPortal -------------------
 referenceSignatures <- function(args, config) {
-  s3load(paste0(config$s3Data, 'Signature/signature_refsets.RData'), config$bucket)
-  source('services/R/Sigvisualfunc.R')
+  s3load(paste0(config$s3Data, "Signature/signature_refsets.RData"), config$bucket)
+  source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
-  plotPath = paste0(config$savePath, '/reference_signatures.svg')
+  plotPath <- paste0(config$savePath, "/reference_signatures.svg")
 
   nsig_data <- signature_refsets %>%
-      group_by(Profile, Signature_set_name) %>%
-      summarise(N = n_distinct(Signature_name)) %>%
-      ungroup() %>%
-      mutate(Profile = factor(Profile, levels = c("SBS96", "SBS192", "SBS1536", "ID83", "DBS78", "RS32")))
+    group_by(Profile, Signature_set_name) %>%
+    summarise(N = n_distinct(Signature_name)) %>%
+    ungroup() %>%
+    mutate(Profile = factor(Profile, levels = c("SBS96", "SBS192", "SBS1536", "ID83", "DBS78", "RS32")))
 
-  nsig_data <- nsig_data %>% left_join(
+  nsig_data <- nsig_data %>%
+    left_join(
       nsig_data %>% group_by(Profile) %>% summarise(Total = sum(N))
-      ) %>%
-      mutate(freq = N / Total) %>%
-      mutate(N2 = if_else(freq > 0.02, as.character(N), ""))
+    ) %>%
+    mutate(freq = N / Total) %>%
+    mutate(N2 = if_else(freq > 0.02, as.character(N), ""))
 
   # put the follow pie-chart on website
   signature_piechart(nsig_data, sigsetcolor, output_plot = plotPath)
@@ -124,53 +129,60 @@ referenceSignatures <- function(args, config) {
 
 # section 2: Mutational signature profile  --------------------------------------------------------------
 mutationalProfiles <- function(args, config) {
-  s3load(paste0(config$s3Data, 'Signature/signature_refsets.RData'), config$bucket)
-  source('services/R/Sigvisualfunc.R')
+  s3load(paste0(config$s3Data, "Signature/signature_refsets.RData"), config$bucket)
+  source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
-  path_profile <- paste0(config$s3Data, 'Signature/Reference_Signature_Profiles_SVG/')
-  signature_profile_files <- signature_refsets %>% select(Source, Profile, Signature_set_name, Dataset, Signature_name) %>% unique() %>% mutate(Path = str_replace_all(Signature_set_name, " ", "_"), Path = str_remove_all(Path, "[()]"), Path = paste0(path_profile, Path, "/", Signature_name, ".svg"))
+  path_profile <- paste0(config$s3Data, "Signature/Reference_Signature_Profiles_SVG/")
+  signature_profile_files <- signature_refsets %>%
+    select(Source, Profile, Signature_set_name, Dataset, Signature_name) %>%
+    unique() %>%
+    mutate(Path = str_replace_all(Signature_set_name, " ", "_"), Path = str_remove_all(Path, "[()]"), Path = paste0(path_profile, Path, "/", Signature_name, ".svg"))
   svgfile_selected <- signature_profile_files %>%
-      filter(Source == args$signatureSource, Profile == args$profileName, Signature_set_name == args$rsSet, Dataset == args$experimentalStrategy, Signature_name == args$signatureName) %>% pull(Path)
+    filter(Source == args$signatureSource, Profile == args$profileName, Signature_set_name == args$rsSet, Dataset == args$experimentalStrategy, Signature_name == args$signatureName) %>%
+    pull(Path)
 
   # fix filename
-  splitPath = strsplit(svgfile_selected, '/')[[1]]
-  profileType = str_extract_all(args$profileName, "[aA-zZ]+")
-  matrixSize = str_extract_all(args$profileName, "[0-9]+")
-  filenamePrefix = paste0(profileType, '_', matrixSize, '_plots_mSigPortal_')
-  splitPath[length(splitPath)] = paste0(filenamePrefix, splitPath[length(splitPath)])
-  newPath = paste0(splitPath, collapse = "/")
+  splitPath <- strsplit(svgfile_selected, "/")[[1]]
+  profileType <- str_extract_all(args$profileName, "[aA-zZ]+")
+  matrixSize <- str_extract_all(args$profileName, "[0-9]+")
+  filenamePrefix <- paste0(profileType, "_", matrixSize, "_plots_mSigPortal_")
+  splitPath[length(splitPath)] <- paste0(filenamePrefix, splitPath[length(splitPath)])
+  newPath <- paste0(splitPath, collapse = "/")
 
   return(list(plotPath = newPath))
 }
 
 # section3: Cosine similarities among mutational signatures -------------------------
 cosineSimilarity <- function(args, config) {
-  # The parameters will be “Matrix Size”, “Reference Signature Set1” and “Reference Signature Set2”. 
-  source('services/R/Sigvisualfunc.R')
-  s3load(paste0(config$s3Data, 'Signature/signature_refsets.RData'), config$bucket)
+  # The parameters will be “Matrix Size”, “Reference Signature Set1” and “Reference Signature Set2”.
+  source("services/R/Sigvisualfunc.R")
+  s3load(paste0(config$s3Data, "Signature/signature_refsets.RData"), config$bucket)
   setwd(config$wd)
 
-  plotPath = paste0(config$savePath, 'signature_cos_sim_res.svg')
-  txtPath = paste0(config$savePath, 'signature_cos_sim_res.txt')
+  plotPath <- paste0(config$savePath, "signature_cos_sim_res.svg")
+  txtPath <- paste0(config$savePath, "signature_cos_sim_res.txt")
 
-  signature_refsets %>% filter(Profile == args$profileName) %>% pull(Signature_set_name) %>% unique()
+  signature_refsets %>%
+    filter(Profile == args$profileName) %>%
+    pull(Signature_set_name) %>%
+    unique()
   sigrefset1_data <- signature_refsets %>%
-      filter(Profile == args$profileName, Signature_set_name == args$rsSet1) %>%
-      select(Signature_name, MutationType, Contribution) %>%
-      pivot_wider(names_from = Signature_name, values_from = Contribution)
+    filter(Profile == args$profileName, Signature_set_name == args$rsSet1) %>%
+    select(Signature_name, MutationType, Contribution) %>%
+    pivot_wider(names_from = Signature_name, values_from = Contribution)
 
   sigrefset2_data <- signature_refsets %>%
-      filter(Profile == args$profileName, Signature_set_name == args$rsSet2) %>%
-      select(Signature_name, MutationType, Contribution) %>%
-      pivot_wider(names_from = Signature_name, values_from = Contribution)
+    filter(Profile == args$profileName, Signature_set_name == args$rsSet2) %>%
+    select(Signature_name, MutationType, Contribution) %>%
+    pivot_wider(names_from = Signature_name, values_from = Contribution)
 
-  cos_sim_res = cos_sim_df(sigrefset1_data, sigrefset2_data)
+  cos_sim_res <- cos_sim_df(sigrefset1_data, sigrefset2_data)
 
   # put this heatmap on the web
   plot_cosine_heatmap_df(cos_sim_res, cluster_rows = TRUE, plot_values = FALSE, output_plot = plotPath)
   # add a link bellow the heatmap
-  cos_sim_res %>% write_delim(txtPath, delim = '\t', col_names = T)
+  cos_sim_res %>% write_delim(txtPath, delim = "\t", col_names = T)
 
   return(list(plotPath = plotPath, txtPath = txtPath))
 }
@@ -179,15 +191,18 @@ cosineSimilarity <- function(args, config) {
 ## A comparison of two reference signatures
 # There will be five parameters: “Profile Type”,  “Reference Signature Set1”, “Signature Name1”, “Reference Signature Set2”, “Signature Name2”;
 mutationalSignatureComparison <- function(args, config) {
-  # The parameters will be “Matrix Size”, “Reference Signature Set1” and “Reference Signature Set2”. 
-  s3load(paste0(config$s3Data, 'Signature/signature_refsets.RData'), config$bucket)
-  source('services/R/Sigvisualfunc.R')
+  # The parameters will be “Matrix Size”, “Reference Signature Set1” and “Reference Signature Set2”.
+  s3load(paste0(config$s3Data, "Signature/signature_refsets.RData"), config$bucket)
+  source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
-  plotPath = paste0(config$savePath, 'mutationalSignatureComparison.svg')
-  txtPath = paste0(config$savePath, 'mutationalSignatureComparison.txt')
+  plotPath <- paste0(config$savePath, "mutationalSignatureComparison.svg")
+  txtPath <- paste0(config$savePath, "mutationalSignatureComparison.txt")
 
-  signature_refsets %>% filter(Profile == args$profileName) %>% pull(Signature_set_name) %>% unique()
+  signature_refsets %>%
+    filter(Profile == args$profileName) %>%
+    pull(Signature_set_name) %>%
+    unique()
   profile1 <- signature_refsets %>%
     filter(Profile == args$profileName, Signature_set_name == args$rsSet1) %>%
     select(Signature_name, MutationType, Contribution) %>%
@@ -217,10 +232,10 @@ tumorMutationalBurden <- function(genomesize, plotPath, exposure_refdata) {
 
 mutationalSignatureBurdenSeparated <- function(genomesize, cancerType, plotPath, exposure_refdata) {
   data_input <- exposure_refdata %>%
-  filter(Cancer_Type == cancerType) %>%
-  mutate(Burden = log10((Exposure) / genomesize)) %>%
-  select(-Cancer_Type) %>%
-  rename(Cancer_Type = Signature_name)
+    filter(Cancer_Type == cancerType) %>%
+    mutate(Burden = log10((Exposure) / genomesize)) %>%
+    select(-Cancer_Type) %>%
+    rename(Cancer_Type = Signature_name)
   # put this barplot on the web
 
   TMBplot(data_input, output_plot = plotPath)
@@ -228,10 +243,10 @@ mutationalSignatureBurdenSeparated <- function(genomesize, cancerType, plotPath,
 
 mutationalSignatureBurdenAcrossCancer <- function(signatureName, genomesize, plotPath, exposure_refdata) {
   data_input <- exposure_refdata %>%
-      filter(Signature_name == signatureName) %>%
-      group_by(Cancer_Type, Sample) %>%
-      summarise(Burden = log10(sum(Exposure) / genomesize)) %>%
-      ungroup()
+    filter(Signature_name == signatureName) %>%
+    group_by(Cancer_Type, Sample) %>%
+    summarise(Burden = log10(sum(Exposure) / genomesize)) %>%
+    ungroup()
   # put this barplot on the web
   TMBplot(data_input, output_plot = plotPath, addnote = signatureName)
 }
@@ -244,7 +259,6 @@ mutationalSignatureAssociation <- function(useCancer, cancerType, both, signatur
       filter(Signature_name == signatureName1) %>%
       rename(Exposure1 = Exposure) %>%
       select(-Signature_name),
-
     exposure_refdata %>%
       filter(Signature_name == signatureName2) %>%
       rename(Exposure2 = Exposure) %>%
@@ -259,7 +273,8 @@ mutationalSignatureAssociation <- function(useCancer, cancerType, both, signatur
 }
 
 mutationalSignatureDecomposition <- function(plotPath, txtPath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected) {
-  exposure_refdata_input <- exposure_refdata_selected %>% mutate(Sample = paste0(Cancer_Type, "@", Sample)) %>%
+  exposure_refdata_input <- exposure_refdata_selected %>%
+    mutate(Sample = paste0(Cancer_Type, "@", Sample)) %>%
     select(Sample, Signature_name, Exposure) %>%
     pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure, values_fill = 0)
 
@@ -268,7 +283,8 @@ mutationalSignatureDecomposition <- function(plotPath, txtPath, exposure_refdata
     pivot_wider(id_cols = MutationType, names_from = Signature_name, values_from = Contribution) %>%
     arrange(MutationType) # have to sort the mutationtype
 
-  seqmatrix_refdata_input <- seqmatrix_refdata_selected %>% mutate(Sample = paste0(Cancer_Type, "@", Sample)) %>%
+  seqmatrix_refdata_input <- seqmatrix_refdata_selected %>%
+    mutate(Sample = paste0(Cancer_Type, "@", Sample)) %>%
     select(MutationType, Sample, Mutations) %>%
     pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
     arrange(MutationType) ## have to sort the mutation type
@@ -276,45 +292,49 @@ mutationalSignatureDecomposition <- function(plotPath, txtPath, exposure_refdata
   decompsite_input <- drop_na(calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input))
 
   if (!is.data.frame(decompsite_input)) {
-    stop('ERROR: Evaluating step failed due to missing the data')
+    stop("ERROR: Evaluating step failed due to missing the data")
   } else {
-    decompsite_input <- decompsite_input %>% separate(col = Sample_Names, into = c('Cancer_Type', 'Sample'), sep = '@')
+    decompsite_input <- decompsite_input %>% separate(col = Sample_Names, into = c("Cancer_Type", "Sample"), sep = "@")
     decompsite_distribution(decompsite = decompsite_input, output_plot = plotPath) # put the distribution plot online.
-    decompsite_input %>% write_delim(txtPath, delim = '\t', col_names = T) ## put the link to download this table
+    decompsite_input %>% write_delim(txtPath, delim = "\t", col_names = T) ## put the link to download this table
   }
 }
 
 mutationalSignatureLandscape <- function(cancerType, varDataPath, plotPath, exposure_refdata, signature_refsets, seqmatrix_refdata) {
-  exposure_refdata_input <- exposure_refdata %>% filter(Cancer_Type == cancerType) %>%
-      select(Sample, Signature_name, Exposure) %>%
-      pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure)
+  exposure_refdata_input <- exposure_refdata %>%
+    filter(Cancer_Type == cancerType) %>%
+    select(Sample, Signature_name, Exposure) %>%
+    pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure)
 
   signature_refsets_input <- signature_refsets %>%
-      select(MutationType, Signature_name, Contribution) %>%
-      pivot_wider(id_cols = MutationType, names_from = Signature_name, values_from = Contribution) %>%
-      arrange(MutationType) # have to sort the mutationtype
+    select(MutationType, Signature_name, Contribution) %>%
+    pivot_wider(id_cols = MutationType, names_from = Signature_name, values_from = Contribution) %>%
+    arrange(MutationType) # have to sort the mutationtype
 
-  seqmatrix_refdata_input <- seqmatrix_refdata %>% filter(Cancer_Type == cancerType) %>%
-      select(MutationType, Sample, Mutations) %>%
-      pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
-      arrange(MutationType) ## have to sort the mutationtype
+  seqmatrix_refdata_input <- seqmatrix_refdata %>%
+    filter(Cancer_Type == cancerType) %>%
+    select(MutationType, Sample, Mutations) %>%
+    pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
+    arrange(MutationType) ## have to sort the mutationtype
 
   decompsite_input <- calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
 
 
   data_input <- exposure_refdata %>%
-      filter(Cancer_Type == cancerType) %>%
-      select(Sample, Signature_name, Exposure) %>%
-      pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure) %>%
-      rename(Samples = Sample)
+    filter(Cancer_Type == cancerType) %>%
+    select(Sample, Signature_name, Exposure) %>%
+    pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure) %>%
+    rename(Samples = Sample)
 
-  data_input <- data_input %>% select_if(~!is.numeric(.) || sum(.) > 0)
+  data_input <- data_input %>% select_if(~ !is.numeric(.) || sum(.) > 0)
   data_input <- data_input %>% filter(rowAny(across(where(is.numeric), ~ .x > 0)))
 
   sigdata <- data_input
 
   if (!is.data.frame(decompsite_input)) {
-    cosinedata <- sigdata %>% select(Samples) %>% mutate(Similarity = NA_real_)
+    cosinedata <- sigdata %>%
+      select(Samples) %>%
+      mutate(Similarity = NA_real_)
   } else {
     cosinedata <- decompsite_input %>% select(Samples = Sample_Names, Similarity = Cosine_similarity)
   }
@@ -329,21 +349,20 @@ mutationalSignatureLandscape <- function(cancerType, varDataPath, plotPath, expo
 
   # parameter: Cancer Type, Vardata_input_file
   if (stringi::stri_length(varDataPath) > 0) {
-    vardata_input <- read_delim(varDataPath, delim = '\t', col_names = T)
+    vardata_input <- read_delim(varDataPath, delim = "\t", col_names = T)
 
     vardata1_input <- vardata_input %>% select(1:2)
-    colnames(vardata1_input) <- c('Samples', 'Study')
+    colnames(vardata1_input) <- c("Samples", "Study")
     vardata1_cat_input <- if_else(is.character(vardata1_input$Study), TRUE, FALSE)
 
     if (dim(vardata_input)[2] > 2) {
       vardata2_input <- vardata_input %>% select(1, 3)
-      colnames(vardata2_input) <- c('Samples', 'Purity')
+      colnames(vardata2_input) <- c("Samples", "Purity")
       vardata2_cat_input <- if_else(is.character(vardata2_input$Purity), TRUE, FALSE)
     } else {
       vardata2_input <- NULL
       vardata2_cat_input <- FALSE
     }
-
   } else {
     vardata_input <- NULL
     vardata1_input <- NULL
@@ -363,241 +382,274 @@ mutationalSignaturePrevalence <- function(mutation, cancerType, plotPath, exposu
     select(Sample, Signature_name, Exposure) %>%
     pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure) %>%
     rename(Samples = Sample)
-  sigdata <- sigdata %>% select_if(~!is.numeric(.) || sum(.) > 0)
+  sigdata <- sigdata %>% select_if(~ !is.numeric(.) || sum(.) > 0)
 
-  nsams <- sigdata %>% pivot_longer(cols = -Samples) %>% filter(value > 100) %>% dim()
+  nsams <- sigdata %>%
+    pivot_longer(cols = -Samples) %>%
+    filter(value > 100) %>%
+    dim()
 
   if (nsams[1] > 0) {
     prevalence_plot(sigdata = sigdata, nmutation = mutation, output_plot = plotPath)
   } else {
-    stop(paste0('No signature in any sample with number of mutation larger than ', mutation))
+    stop(paste0("No signature in any sample with number of mutation larger than ", mutation))
   }
 }
 
 mutationalSignatureIndividual <- function(sample, cancerType, plotPath, exposure_refdata, signature_refsets, seqmatrix_refdata) {
   require(scales)
-  exposure_refdata_input <- exposure_refdata %>% filter(Sample == sample) %>% select(Signature_name, Exposure)
+  exposure_refdata_input <- exposure_refdata %>%
+    filter(Sample == sample) %>%
+    select(Signature_name, Exposure)
   signature_refsets_input <- signature_refsets %>% select(Signature_name, MutationType, Contribution)
-  seqmatrix_refdata_input <- seqmatrix_refdata %>% filter(Sample == sample) %>% select(MutationType, Mutations)
+  seqmatrix_refdata_input <- seqmatrix_refdata %>%
+    filter(Sample == sample) %>%
+    select(MutationType, Mutations)
 
   plot_individual_samples(exposure_refdata_input = exposure_refdata_input, signature_refsets_input = signature_refsets_input, seqmatrix_refdata_input = seqmatrix_refdata_input, condensed = FALSE, output_plot = plotPath)
 }
 
 # exposurePublic <- function(fn, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', individual = '{}', projectID, pythonOutput, rootDir, config$savePath, config$s3Data, config$localData, config$bucket) {
 exposurePublic <- function(args, config) {
-  source('services/R/Sigvisualfunc.R')
+  source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
-  totalTime = proc.time()
+  totalTime <- proc.time()
 
-  output = list()
-  errors = list()
-  tmbPath = paste0(config$savePath, 'tumorMutationalBurden.svg')
-  signaturePath = paste0(config$savePath, 'tmbSeparated.svg')
-  burdenPath = paste0(config$savePath, 'burdenAcrossCancer.svg')
-  associationPath = paste0(config$savePath, 'mutationalSignatureAssociation.svg')
-  decompositionPath = paste0(config$savePath, 'mutationalSignatureDecomposition.svg')
-  decompositionData = paste0(config$savePath, 'mutationalSignatureDecomposition.txt')
-  landscapePath = paste0(config$savePath, 'landscapeMutationalSignature.svg')
-  prevalencePath = paste0(config$savePath, 'prevalenceMutationalSignature.svg')
-  individualPath = paste0(config$savePath, 'msIndividual.svg')
+  output <- list()
+  errors <- list()
+  tmbPath <- paste0(config$savePath, "tumorMutationalBurden.svg")
+  signaturePath <- paste0(config$savePath, "tmbSeparated.svg")
+  burdenPath <- paste0(config$savePath, "burdenAcrossCancer.svg")
+  associationPath <- paste0(config$savePath, "mutationalSignatureAssociation.svg")
+  decompositionPath <- paste0(config$savePath, "mutationalSignatureDecomposition.svg")
+  decompositionData <- paste0(config$savePath, "mutationalSignatureDecomposition.txt")
+  landscapePath <- paste0(config$savePath, "landscapeMutationalSignature.svg")
+  prevalencePath <- paste0(config$savePath, "prevalenceMutationalSignature.svg")
+  individualPath <- paste0(config$savePath, "msIndividual.svg")
 
   # parse arguments
-  common = fromJSON(args$common)
-  burden = if (is.null(args$burden)) list() else fromJSON(args$burden)
-  association = if (is.null(args$association)) list() else fromJSON(args$association)
-  landscape = if (is.null(args$landscape)) list() else fromJSON(args$landscape)
-  prevalence = if (is.null(args$prevalence)) list() else fromJSON(args$prevalence)
-  individual = if (is.null(args$individual)) list() else fromJSON(args$individual)
+  common <- fromJSON(args$common)
+  burden <- if (is.null(args$burden)) list() else fromJSON(args$burden)
+  association <- if (is.null(args$association)) list() else fromJSON(args$association)
+  landscape <- if (is.null(args$landscape)) list() else fromJSON(args$landscape)
+  prevalence <- if (is.null(args$prevalence)) list() else fromJSON(args$prevalence)
+  individual <- if (is.null(args$individual)) list() else fromJSON(args$individual)
 
   genome <- case_when(
     common$study == "PCAWG" ~ "GRCh37",
     common$study == "TCGA" ~ "GRCh37",
     TRUE ~ "GRCh37"
   )
-  genomesize = genome2size(genome)
+  genomesize <- genome2size(genome)
 
-  study_signature_file <- paste0(config$s3Data, 'Exposure/Study_Signatures/', common$study, '_', common$strategy, '_signature_refsets.RData')
+  study_signature_file <- paste0(config$s3Data, "Exposure/Study_Signatures/", common$study, "_", common$strategy, "_signature_refsets.RData")
   if (aws.s3::object_exists(study_signature_file, config$bucket)) {
     s3load(study_signature_file, config$bucket)
   } else {
-    s3load(paste0(config$s3Data, 'Signature/signature_refsets.RData'), config$bucket)
+    s3load(paste0(config$s3Data, "Signature/signature_refsets.RData"), config$bucket)
   }
-  s3load(paste0(config$s3Data, 'Exposure/', common$study, '_', common$strategy, '_exposure_refdata.RData'), config$bucket)
-  s3load(paste0(config$s3Data, 'Seqmatrix/seqmatrix_refdata_subset_files.RData'), config$bucket)
+  s3load(paste0(config$s3Data, "Exposure/", common$study, "_", common$strategy, "_exposure_refdata.RData"), config$bucket)
+  s3load(paste0(config$s3Data, "Seqmatrix/seqmatrix_refdata_subset_files.RData"), config$bucket)
 
   # filter data
   exposure_refdata_selected <- exposure_refdata %>% filter(Study == common$study, Dataset == common$strategy, Signature_set_name == common$rsSet)
   signature_refsets_selected <- signature_refsets %>% filter(Signature_set_name == common$rsSet)
 
   if (common$useCancerType) {
-    seqmatrixFile <- seqmatrix_refdata_subset_files %>% filter(Study == common$study, Dataset == common$strategy, Cancer_Type == common$cancerType) %>% pull(file)
+    seqmatrixFile <- seqmatrix_refdata_subset_files %>%
+      filter(Study == common$study, Dataset == common$strategy, Cancer_Type == common$cancerType) %>%
+      pull(file)
   } else {
-    seqmatrixFile <- paste0(common$study, '_', common$strategy, '_seqmatrix_refdata.RData')
+    seqmatrixFile <- paste0(common$study, "_", common$strategy, "_seqmatrix_refdata.RData")
   }
-  file <- get_object(paste0(config$s3Data, 'Seqmatrix/', seqmatrixFile), config$bucket)
+  file <- get_object(paste0(config$s3Data, "Seqmatrix/", seqmatrixFile), config$bucket)
   seqmatrix_refdata_selected <- get(load(rawConnection(file)))
-  seqmatrix_refdata_selected = seqmatrix_refdata_selected %>% filter(Profile == signature_refsets_selected$Profile[1], Cancer_Type == common$cancerType)
+  seqmatrix_refdata_selected <- seqmatrix_refdata_selected %>% filter(Profile == signature_refsets_selected$Profile[1], Cancer_Type == common$cancerType)
 
   # Tumor Overall Mutational Burden
-  if ('all' %in% args$fn || 'tmb' %in% args$fn) {
-    fnTime = proc.time()
-    tryCatch({
-      print('Tumor Mutational Burden')
-      tumorMutationalBurden(genomesize, tmbPath, exposure_refdata_selected)
-      output[['tmbPath']] = tmbPath
-    }, error = function(e) {
-      errors[['tmbError']] <<- e$message
-      print(e)
-    })
-    print(paste0("Tumor Mutational Burden Runtime: ", (proc.time() - fnTime)[['elapsed']]))
+  if ("all" %in% args$fn || "tmb" %in% args$fn) {
+    fnTime <- proc.time()
+    tryCatch(
+      {
+        print("Tumor Mutational Burden")
+        tumorMutationalBurden(genomesize, tmbPath, exposure_refdata_selected)
+        output[["tmbPath"]] <- tmbPath
+      },
+      error = function(e) {
+        errors[["tmbError"]] <<- e$message
+        print(e)
+      }
+    )
+    print(paste0("Tumor Mutational Burden Runtime: ", (proc.time() - fnTime)[["elapsed"]]))
   }
 
   # Tumor Mutational Burden separated by signatures
-  if ('all' %in% args$fn || 'tmbSig' %in% args$fn) {
-    fnTime = proc.time()
-    tryCatch({
-      print('Tumor Mutational Burden Separated by Signatures')
-      mutationalSignatureBurdenSeparated(genomesize, common$cancerType, signaturePath, exposure_refdata_selected)
-      output[['signaturePath']] = signaturePath
-    }, error = function(e) {
-      errors[['signatureError']] <<- e$message
-      print(e)
-    })
-    print(paste0("Tumor Mutational Burden Separated by Signatures Runtime: ", (proc.time() - fnTime)[['elapsed']]))
+  if ("all" %in% args$fn || "tmbSig" %in% args$fn) {
+    fnTime <- proc.time()
+    tryCatch(
+      {
+        print("Tumor Mutational Burden Separated by Signatures")
+        mutationalSignatureBurdenSeparated(genomesize, common$cancerType, signaturePath, exposure_refdata_selected)
+        output[["signaturePath"]] <- signaturePath
+      },
+      error = function(e) {
+        errors[["signatureError"]] <<- e$message
+        print(e)
+      }
+    )
+    print(paste0("Tumor Mutational Burden Separated by Signatures Runtime: ", (proc.time() - fnTime)[["elapsed"]]))
   }
 
   # Mutational signature burden across cancer types
   if (length(burden)) {
-    fnTime = proc.time()
-    tryCatch({
-      print('Mutational Signature Burden Across Cancer Types')
-      mutationalSignatureBurdenAcrossCancer(burden$signatureName, genomesize, burdenPath, exposure_refdata_selected)
-      output[['burdenPath']] = burdenPath
-    }, error = function(e) {
-      errors[['burdenError']] <<- e$message
-      print(e)
-    })
-    print(paste0("Mutational Signature Burden Across Cancer Types Runtime: ", (proc.time() - fnTime)[['elapsed']]))
+    fnTime <- proc.time()
+    tryCatch(
+      {
+        print("Mutational Signature Burden Across Cancer Types")
+        mutationalSignatureBurdenAcrossCancer(burden$signatureName, genomesize, burdenPath, exposure_refdata_selected)
+        output[["burdenPath"]] <- burdenPath
+      },
+      error = function(e) {
+        errors[["burdenError"]] <<- e$message
+        print(e)
+      }
+    )
+    print(paste0("Mutational Signature Burden Across Cancer Types Runtime: ", (proc.time() - fnTime)[["elapsed"]]))
   }
 
   # Mutational Signature Association
   print(association)
   if (length(association)) {
-    fnTime = proc.time()
-    tryCatch({
-      print('Mutational Signature Association')
-      mutationalSignatureAssociation(common$useCancerType, common$cancerType, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
-      output[['associationPath']] = associationPath
-    }, error = function(e) {
-      errors[['associationError']] <<- e$message
-      print(e)
-    })
-    print(paste0("Mutational Signature Association Runtime: ", (proc.time() - fnTime)[['elapsed']]))
+    fnTime <- proc.time()
+    tryCatch(
+      {
+        print("Mutational Signature Association")
+        mutationalSignatureAssociation(common$useCancerType, common$cancerType, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
+        output[["associationPath"]] <- associationPath
+      },
+      error = function(e) {
+        errors[["associationError"]] <<- e$message
+        print(e)
+      }
+    )
+    print(paste0("Mutational Signature Association Runtime: ", (proc.time() - fnTime)[["elapsed"]]))
   }
 
   # Evaluating the Performance of Mutational Signature Decomposition --------
-  if ('all' %in% args$fn || 'decomposition' %in% args$fn) {
-    fnTime = proc.time()
-    tryCatch({
-      print('Evaluating the Performance of Mutational Signature Decomposition')
-      mutationalSignatureDecomposition(decompositionPath, decompositionData, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
-      output[['decompositionPath']] = decompositionPath
-      output[['decompositionData']] = decompositionData
-    }, error = function(e) {
-      errors[['decompositionError']] <<- e$message
-      print(e)
-    })
-    print(paste0("Evaluating the Performance of Mutational Signature Decomposition Runtime: ", (proc.time() - fnTime)[['elapsed']]))
+  if ("all" %in% args$fn || "decomposition" %in% args$fn) {
+    fnTime <- proc.time()
+    tryCatch(
+      {
+        print("Evaluating the Performance of Mutational Signature Decomposition")
+        mutationalSignatureDecomposition(decompositionPath, decompositionData, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+        output[["decompositionPath"]] <- decompositionPath
+        output[["decompositionData"]] <- decompositionData
+      },
+      error = function(e) {
+        errors[["decompositionError"]] <<- e$message
+        print(e)
+      }
+    )
+    print(paste0("Evaluating the Performance of Mutational Signature Decomposition Runtime: ", (proc.time() - fnTime)[["elapsed"]]))
   }
 
   # Landscape of Mutational Signature Activity
-  if ('all' %in% args$fn | 'landscape' %in% args$fn) {
-    fnTime = proc.time()
-    tryCatch({
-      print('Landscape of Mutational Signature Activity')
-      varDataPath = ''
-      if (stringi::stri_length(landscape$variableFile) > 0) {
-        varDataPath = file.path(paste0(config$wd, '/', config$projectID), landscape$variableFile)
+  if ("all" %in% args$fn | "landscape" %in% args$fn) {
+    fnTime <- proc.time()
+    tryCatch(
+      {
+        print("Landscape of Mutational Signature Activity")
+        varDataPath <- ""
+        if (stringi::stri_length(landscape$variableFile) > 0) {
+          varDataPath <- file.path(paste0(config$wd, "/", config$projectID), landscape$variableFile)
+        }
+        mutationalSignatureLandscape(common$cancerType, varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+        output[["landscapePath"]] <- landscapePath
+      },
+      error = function(e) {
+        errors[["landscapeError"]] <<- e$message
+        print(e)
       }
-      mutationalSignatureLandscape(common$cancerType, varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
-      output[['landscapePath']] = landscapePath
-    }, error = function(e) {
-      errors[['landscapeError']] <<- e$message
-      print(e)
-    })
-    print(paste0("Landscape of Mutational Signature Activity Runtime: ", (proc.time() - fnTime)[['elapsed']]))
+    )
+    print(paste0("Landscape of Mutational Signature Activity Runtime: ", (proc.time() - fnTime)[["elapsed"]]))
   }
 
   # Prevalence plot
-  if ('all' %in% args$fn | 'prevalence' %in% args$fn) {
-    fnTime = proc.time()
-    tryCatch({
-      print('Prevalence of Mutational Signature')
-      mutationalSignaturePrevalence(prevalence$mutation, common$cancerType, prevalencePath, exposure_refdata_selected)
-      output[['prevalencePath']] = prevalencePath
-    }, error = function(e) {
-      errors[['prevalenceError']] <<- e$message
-      print(e)
-    })
-    print(paste0("Prevalence of Mutational Signature Runtime: ", (proc.time() - fnTime)[['elapsed']]))
+  if ("all" %in% args$fn | "prevalence" %in% args$fn) {
+    fnTime <- proc.time()
+    tryCatch(
+      {
+        print("Prevalence of Mutational Signature")
+        mutationalSignaturePrevalence(prevalence$mutation, common$cancerType, prevalencePath, exposure_refdata_selected)
+        output[["prevalencePath"]] <- prevalencePath
+      },
+      error = function(e) {
+        errors[["prevalenceError"]] <<- e$message
+        print(e)
+      }
+    )
+    print(paste0("Prevalence of Mutational Signature Runtime: ", (proc.time() - fnTime)[["elapsed"]]))
   }
 
   # Individual plot
   if (length(individual)) {
-    fnTime = proc.time()
-    tryCatch({
-      print('Mutational Signature in Individual Sample')
-      mutationalSignatureIndividual(individual$sample, common$cancerType, individualPath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
-      output[['individualPath']] = individualPath
-    }, error = function(e) {
-      errors[['individualError']] <<- e$message
-      print(e)
-    })
-    print(paste0("Prevalence of Mutational Signature Runtime: ", (proc.time() - fnTime)[['elapsed']]))
+    fnTime <- proc.time()
+    tryCatch(
+      {
+        print("Mutational Signature in Individual Sample")
+        mutationalSignatureIndividual(individual$sample, common$cancerType, individualPath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+        output[["individualPath"]] <- individualPath
+      },
+      error = function(e) {
+        errors[["individualError"]] <<- e$message
+        print(e)
+      }
+    )
+    print(paste0("Prevalence of Mutational Signature Runtime: ", (proc.time() - fnTime)[["elapsed"]]))
   }
 
 
-  print(paste0("TotalRuntime: ", (proc.time() - totalTime)[['elapsed']]))
+  print(paste0("TotalRuntime: ", (proc.time() - totalTime)[["elapsed"]]))
   return(c(output, errors))
 }
 
 # exposureUser <- function(args$fn, files, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', individual = '{}', projectID, pythonOutput, rootDir, config$savePath, config$s3Data, config$localData, config$bucket) {
 exposureUser <- function(args, config) {
-  source('services/R/Sigvisualfunc.R')
+  source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
-  output = list()
-  errors = list()
-  totalTime = proc.time()
-  tmbPath = paste0(config$savePath, 'tumorMutationalBurden.svg')
-  signaturePath = paste0(config$savePath, 'tmbSeparated.svg')
-  burdenPath = paste0(config$savePath, 'burdenAcrossCancer.svg')
-  associationPath = paste0(config$savePath, 'mutationalSignatureAssociation.svg')
-  decompositionPath = paste0(config$savePath, 'mutationalSignatureDecomposition.svg')
-  decompositionData = paste0(config$savePath, 'mutationalSignatureDecomposition.txt')
-  landscapePath = paste0(config$savePath, 'landscapeMutationalSignature.svg')
-  prevalencePath = paste0(config$savePath, 'prevalenceMutationalSignature.svg')
-  individualPath = paste0(config$savePath, 'msIndividual.svg')
+  output <- list()
+  errors <- list()
+  totalTime <- proc.time()
+  tmbPath <- paste0(config$savePath, "tumorMutationalBurden.svg")
+  signaturePath <- paste0(config$savePath, "tmbSeparated.svg")
+  burdenPath <- paste0(config$savePath, "burdenAcrossCancer.svg")
+  associationPath <- paste0(config$savePath, "mutationalSignatureAssociation.svg")
+  decompositionPath <- paste0(config$savePath, "mutationalSignatureDecomposition.svg")
+  decompositionData <- paste0(config$savePath, "mutationalSignatureDecomposition.txt")
+  landscapePath <- paste0(config$savePath, "landscapeMutationalSignature.svg")
+  prevalencePath <- paste0(config$savePath, "prevalenceMutationalSignature.svg")
+  individualPath <- paste0(config$savePath, "msIndividual.svg")
 
   # parse arguments
-  common = fromJSON(args$common)
-  files = fromJSON(args$files)
-  burden = if (is.null(args$burden)) list() else fromJSON(args$burden)
-  association = if (is.null(args$association)) list() else fromJSON(args$association)
-  landscape = if (is.null(args$landscape)) list() else fromJSON(args$landscape)
-  prevalence = if (is.null(args$prevalence)) list() else fromJSON(args$prevalence)
-  individual = if (is.null(args$individual)) list() else fromJSON(args$individual)
+  common <- fromJSON(args$common)
+  files <- fromJSON(args$files)
+  burden <- if (is.null(args$burden)) list() else fromJSON(args$burden)
+  association <- if (is.null(args$association)) list() else fromJSON(args$association)
+  landscape <- if (is.null(args$landscape)) list() else fromJSON(args$landscape)
+  prevalence <- if (is.null(args$prevalence)) list() else fromJSON(args$prevalence)
+  individual <- if (is.null(args$individual)) list() else fromJSON(args$individual)
 
-  exposure_refdata_selected <- read_delim(file.path(paste0(config$wd, '/', config$projectID), files$exposureFile), delim = '\t', col_names = T)
-  seqmatrix_refdata_selected <- read_delim(file.path(paste0(config$wd, '/', config$projectID), files$matrixFile), delim = '\t', col_names = T)
+  exposure_refdata_selected <- read_delim(file.path(paste0(config$wd, "/", config$projectID), files$exposureFile), delim = "\t", col_names = T)
+  seqmatrix_refdata_selected <- read_delim(file.path(paste0(config$wd, "/", config$projectID), files$matrixFile), delim = "\t", col_names = T)
 
   if (stringi::stri_length(files$signatureFile) > 0) {
     # if using user uploaded signature file
-    signature_refsets_selected <- read_delim(file.path(paste0(config$wd, '/', config$projectID), files$signatureFile), delim = '\t', col_names = T)
+    signature_refsets_selected <- read_delim(file.path(paste0(config$wd, "/", config$projectID), files$signatureFile), delim = "\t", col_names = T)
   } else {
     # else use public signature data
-    s3load(paste0(config$s3Data, 'Signature/signature_refsets.RData'), config$bucket)
+    s3load(paste0(config$s3Data, "Signature/signature_refsets.RData"), config$bucket)
 
     signature_refsets_selected <- signature_refsets %>%
       filter(Signature_set_name == common$rsSet) %>%
@@ -612,127 +664,183 @@ exposureUser <- function(args, config) {
   colnames(exposure_refdata_selected)[1] <- "Sample"
   colnames(seqmatrix_refdata_selected)[1] <- "MutationType"
   colnames(signature_refsets_selected)[1] <- "MutationType"
-  seqmatrix_refdata_selected <- seqmatrix_refdata_selected %>% select(1, any_of(exposure_refdata_selected$Sample)) %>% profile_format_df()
-  signature_refsets_selected <- signature_refsets_selected %>% select(MutationType, any_of(colnames(exposure_refdata_selected))) %>% profile_format_df()
+  seqmatrix_refdata_selected <- seqmatrix_refdata_selected %>%
+    select(1, any_of(exposure_refdata_selected$Sample)) %>%
+    profile_format_df()
+  signature_refsets_selected <- signature_refsets_selected %>%
+    select(MutationType, any_of(colnames(exposure_refdata_selected))) %>%
+    profile_format_df()
 
-  exposure_refdata_selected <- exposure_refdata_selected %>% pivot_longer(cols = -Sample, names_to = "Signature_name", values_to = "Exposure") %>% mutate(Cancer_Type = cancer_type_user)
-  signature_refsets_selected <- signature_refsets_selected %>% select(-Type, - SubType) %>% pivot_longer(cols = -MutationType, names_to = "Signature_name", values_to = "Contribution")
-  seqmatrix_refdata_selected <- seqmatrix_refdata_selected %>% select(-Type, - SubType) %>% pivot_longer(cols = -MutationType, names_to = "Sample", values_to = "Mutations") %>% mutate(Cancer_Type = cancer_type_user)
+  exposure_refdata_selected <- exposure_refdata_selected %>%
+    pivot_longer(cols = -Sample, names_to = "Signature_name", values_to = "Exposure") %>%
+    mutate(Cancer_Type = cancer_type_user)
+  signature_refsets_selected <- signature_refsets_selected %>%
+    select(-Type, -SubType) %>%
+    pivot_longer(cols = -MutationType, names_to = "Signature_name", values_to = "Contribution")
+  seqmatrix_refdata_selected <- seqmatrix_refdata_selected %>%
+    select(-Type, -SubType) %>%
+    pivot_longer(cols = -MutationType, names_to = "Sample", values_to = "Mutations") %>%
+    mutate(Cancer_Type = cancer_type_user)
 
 
   ## Tumor Overall Mutational Burden
-  if ('all' %in% args$fn || 'tmb' %in% args$fn) {
-    fnTime = proc.time()
-    tryCatch({
-      print('Tumor Mutational Burden')
-      tumorMutationalBurden(genomesize, tmbPath, exposure_refdata_selected)
-      output[['tmbPath']] = tmbPath
-    }, error = function(e) {
-      errors[['tmbError']] <<- e$message
-      print(e)
-    })
-    print(paste0("Tumor Mutational Burden Runtime: ", (proc.time() - fnTime)[['elapsed']]))
+  if ("all" %in% args$fn || "tmb" %in% args$fn) {
+    fnTime <- proc.time()
+    tryCatch(
+      {
+        print("Tumor Mutational Burden")
+        tumorMutationalBurden(genomesize, tmbPath, exposure_refdata_selected)
+        output[["tmbPath"]] <- tmbPath
+      },
+      error = function(e) {
+        errors[["tmbError"]] <<- e$message
+        print(e)
+      }
+    )
+    print(paste0("Tumor Mutational Burden Runtime: ", (proc.time() - fnTime)[["elapsed"]]))
   }
 
   # Tumor Mutational Burden separated by signatures
-  if ('all' %in% args$fn || 'tmbSig' %in% args$fn) {
-    fnTime = proc.time()
-    tryCatch({
-      print('Tumor Mutational Burden Separated by Signatures')
-      mutationalSignatureBurdenSeparated(genomesize, cancer_type_user, signaturePath, exposure_refdata_selected)
-      output[['signaturePath']] = signaturePath
-    }, error = function(e) {
-      errors[['signatureError']] <<- e$message
-      print(e)
-    })
-    print(paste0("Tumor Mutational Burden Separated by Signatures Runtime: ", (proc.time() - fnTime)[['elapsed']]))
+  if ("all" %in% args$fn || "tmbSig" %in% args$fn) {
+    fnTime <- proc.time()
+    tryCatch(
+      {
+        print("Tumor Mutational Burden Separated by Signatures")
+        mutationalSignatureBurdenSeparated(genomesize, cancer_type_user, signaturePath, exposure_refdata_selected)
+        output[["signaturePath"]] <- signaturePath
+      },
+      error = function(e) {
+        errors[["signatureError"]] <<- e$message
+        print(e)
+      }
+    )
+    print(paste0("Tumor Mutational Burden Separated by Signatures Runtime: ", (proc.time() - fnTime)[["elapsed"]]))
   }
   # Mutational signature burden across cancer types
   if (length(burden)) {
-    fnTime = proc.time()
-    tryCatch({
-      print('Mutational Signature Burden Across Cancer Types')
-      mutationalSignatureBurdenAcrossCancer(burden$signatureName, genomesize, burdenPath, exposure_refdata_selected)
-      output[['burdenPath']] = burdenPath
-    }, error = function(e) {
-      errors[['burdenError']] <<- e$message
-      print(e)
-    })
-    print(paste0("Mutational Signature Burden Across Cancer Types Runtime: ", (proc.time() - fnTime)[['elapsed']]))
+    fnTime <- proc.time()
+    tryCatch(
+      {
+        print("Mutational Signature Burden Across Cancer Types")
+        mutationalSignatureBurdenAcrossCancer(burden$signatureName, genomesize, burdenPath, exposure_refdata_selected)
+        output[["burdenPath"]] <- burdenPath
+      },
+      error = function(e) {
+        errors[["burdenError"]] <<- e$message
+        print(e)
+      }
+    )
+    print(paste0("Mutational Signature Burden Across Cancer Types Runtime: ", (proc.time() - fnTime)[["elapsed"]]))
   }
   # Mutational Signature Association
   if (length(association)) {
-    fnTime = proc.time()
-    tryCatch({
-      print('Mutational Signature Association')
-      mutationalSignatureAssociation(common$useCancerType, cancer_type_user, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
-      output[['associationPath']] = associationPath
-    }, error = function(e) {
-      errors[['associationError']] <<- e$message
-      print(e)
-    })
-    print(paste0("Mutational Signature Association Runtime: ", (proc.time() - fnTime)[['elapsed']]))
+    fnTime <- proc.time()
+    tryCatch(
+      {
+        print("Mutational Signature Association")
+        mutationalSignatureAssociation(common$useCancerType, cancer_type_user, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
+        output[["associationPath"]] <- associationPath
+      },
+      error = function(e) {
+        errors[["associationError"]] <<- e$message
+        print(e)
+      }
+    )
+    print(paste0("Mutational Signature Association Runtime: ", (proc.time() - fnTime)[["elapsed"]]))
   }
   # Evaluating the Performance of Mutational Signature Decomposition --------
-  if ('all' %in% args$fn || 'decomposition' %in% args$fn) {
-    fnTime = proc.time()
-    tryCatch({
-      print('Evaluating the Performance of Mutational Signature Decomposition')
-      mutationalSignatureDecomposition(decompositionPath, decompositionData, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
-      output[['decompositionPath']] = decompositionPath
-      output[['decompositionData']] = decompositionData
-    }, error = function(e) {
-      errors[['decompositionError']] <<- e$message
-      print(e)
-    })
-    print(paste0("Evaluating the Performance of Mutational Signature Decomposition Runtime: ", (proc.time() - fnTime)[['elapsed']]))
+  if ("all" %in% args$fn || "decomposition" %in% args$fn) {
+    fnTime <- proc.time()
+    tryCatch(
+      {
+        print("Evaluating the Performance of Mutational Signature Decomposition")
+        mutationalSignatureDecomposition(decompositionPath, decompositionData, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+        output[["decompositionPath"]] <- decompositionPath
+        output[["decompositionData"]] <- decompositionData
+      },
+      error = function(e) {
+        errors[["decompositionError"]] <<- e$message
+        print(e)
+      }
+    )
+    print(paste0("Evaluating the Performance of Mutational Signature Decomposition Runtime: ", (proc.time() - fnTime)[["elapsed"]]))
   }
   # Landscape of Mutational Signature Activity
-  if ('all' %in% args$fn | 'landscape' %in% args$fn) {
-    fnTime = proc.time()
-    tryCatch({
-      print('Landscape of Mutational Signature Activity')
-      varDataPath = ''
-      if (stringi::stri_length(landscape$variableFile) > 0) {
-        varDataPath = file.path(paste0(config$wd, '/', config$projectID), landscape$variableFile$signatureFile)
+  if ("all" %in% args$fn | "landscape" %in% args$fn) {
+    fnTime <- proc.time()
+    tryCatch(
+      {
+        print("Landscape of Mutational Signature Activity")
+        varDataPath <- ""
+        if (stringi::stri_length(landscape$variableFile) > 0) {
+          varDataPath <- file.path(paste0(config$wd, "/", config$projectID), landscape$variableFile$signatureFile)
+        }
+        mutationalSignatureLandscape(cancer_type_user, varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+        output[["landscapePath"]] <- landscapePath
+      },
+      error = function(e) {
+        errors[["landscapeError"]] <<- e$message
+        print(e)
       }
-      mutationalSignatureLandscape(cancer_type_user, varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
-      output[['landscapePath']] = landscapePath
-    }, error = function(e) {
-      errors[['landscapeError']] <<- e$message
-      print(e)
-    })
-    print(paste0("Landscape of Mutational Signature Activity Runtime: ", (proc.time() - fnTime)[['elapsed']]))
+    )
+    print(paste0("Landscape of Mutational Signature Activity Runtime: ", (proc.time() - fnTime)[["elapsed"]]))
   }
   # Prevalence plot
-  if ('all' %in% args$fn | 'prevalence' %in% args$fn) {
-    fnTime = proc.time()
-    tryCatch({
-      print('Prevalence of Mutational Signature')
-      mutationalSignaturePrevalence(prevalence$mutation, cancer_type_user, prevalencePath, exposure_refdata_selected)
-      output[['prevalencePath']] = prevalencePath
-    }, error = function(e) {
-      errors[['prevalenceError']] <<- e$message
-      print(e)
-    })
-    print(paste0("Prevalence of Mutational Signature Runtime: ", (proc.time() - fnTime)[['elapsed']]))
+  if ("all" %in% args$fn | "prevalence" %in% args$fn) {
+    fnTime <- proc.time()
+    tryCatch(
+      {
+        print("Prevalence of Mutational Signature")
+        mutationalSignaturePrevalence(prevalence$mutation, cancer_type_user, prevalencePath, exposure_refdata_selected)
+        output[["prevalencePath"]] <- prevalencePath
+      },
+      error = function(e) {
+        errors[["prevalenceError"]] <<- e$message
+        print(e)
+      }
+    )
+    print(paste0("Prevalence of Mutational Signature Runtime: ", (proc.time() - fnTime)[["elapsed"]]))
   }
 
   # Individual plot
   if (length(individual)) {
-    fnTime = proc.time()
-    tryCatch({
-      print('Mutational Signature in Individual Sample')
-      mutationalSignatureIndividual(individual$sample, common$cancerType, individualPath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
-      output[['individualPath']] = individualPath
-    }, error = function(e) {
-      errors[['individualError']] <<- e$message
-      print(e)
-    })
-    print(paste0("Prevalence of Mutational Signature Runtime: ", (proc.time() - fnTime)[['elapsed']]))
+    fnTime <- proc.time()
+    tryCatch(
+      {
+        print("Mutational Signature in Individual Sample")
+        mutationalSignatureIndividual(individual$sample, common$cancerType, individualPath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+        output[["individualPath"]] <- individualPath
+      },
+      error = function(e) {
+        errors[["individualError"]] <<- e$message
+        print(e)
+      }
+    )
+    print(paste0("Prevalence of Mutational Signature Runtime: ", (proc.time() - fnTime)[["elapsed"]]))
   }
 
 
-  print(paste0("Total Runtime: ", (proc.time() - totalTime)[['elapsed']]))
+  print(paste0("Total Runtime: ", (proc.time() - totalTime)[["elapsed"]]))
   return(c(output, errors))
+}
+
+# get order of clusters after calculating hierarchy
+hierarchicalClusterOrder <- function(args, config) {
+  source("services/R/Sigvisualfunc.R")
+
+  data <- args$data %>%
+    select(sample, signatureName, exposure) %>%
+    pivot_wider(id_cols = sample, names_from = signatureName, values_from = exposure) %>%
+    select_if(~ !is.numeric(.) || sum(.) > 0) %>%
+    filter(rowAny(across(where(is.numeric), ~ .x > 0))) %>%
+    select(where(~ is.character(.x) || sum(.x) != 0)) %>%
+    janitor::adorn_percentages("row")
+
+  mdata <- as.matrix(data[, -1])
+  rownames(mdata) <- data$sample
+
+  clustern <- ifelse(dim(mdata)[1] < 10, 2L, 5)
+
+  cluster <- factoextra::hcut(mdata, k = clustern, hc_func = "hclust", hc_metric = "euclidean", hc_method = "ward.D2", stand = TRUE)$cluster
+  return(as.list(cluster))
 }

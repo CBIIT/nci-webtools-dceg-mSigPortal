@@ -433,6 +433,17 @@
             "value": ""
           },
           {
+            "name": "orderByCluster",
+            "in": "query",
+            "description": "Apply hierarchical clustering to the data and sort by the order of the resulting cluster object",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "enum": [true, false]
+            },
+            "value": false
+          },
+          {
             "name": "limit",
             "in": "query",
             "description": "Limit number of records returned",
