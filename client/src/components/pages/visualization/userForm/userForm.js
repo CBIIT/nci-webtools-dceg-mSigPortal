@@ -605,9 +605,13 @@ export default function UserForm() {
             placement="top"
             overlay={
               <Popover id="popover-basic">
-                <Title as="h3">Sequence Info</Title>
+                <Title as="h3">Generate Sequencing Info</Title>
                 <Content>
-                  <p>TBA</p>
+                  <p>
+                    Generating a new text file that contains the
+                    SigProfilerMatrixGenerator classification for each
+                    mutationCluster
+                  </p>
                 </Content>
               </Popover>
             }
@@ -638,15 +642,15 @@ export default function UserForm() {
       <hr className="mb-3" />
       <Form.Group controlId="cluster" className="d-flex">
         <Form.Label className="mr-auto">
-          Cluster Analysis{' '}
+          Clustered Mutation Analysis{' '}
           <OverlayTrigger
             trigger="click"
             placement="top"
             overlay={
               <Popover id="popover-basic">
-                <Title as="h3">Cluster Analysis</Title>
+                <Title as="h3">Clustered Mutation Analysis</Title>
                 <Content>
-                  <p>TBA</p>
+                  <p> Examining clustered mutations with SigProfilerClusters</p>
                 </Content>
               </Popover>
             }
@@ -655,7 +659,7 @@ export default function UserForm() {
             <Button
               variant="link"
               className="p-0 font-weight-bold"
-              aria-label="about cluster analysis"
+              aria-label="about cluster mutation analysis"
             >
               <FontAwesomeIcon
                 icon={faInfoCircle}
