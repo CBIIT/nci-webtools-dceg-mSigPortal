@@ -7,7 +7,7 @@ export const getInitialState = () => ({
     strategy: '',
     signatureSet: '',
     cancer: '',
-    cancerOnly: true,
+    useAllCancer: false,
   },
   userForm: {},
   main: {

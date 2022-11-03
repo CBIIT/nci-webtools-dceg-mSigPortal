@@ -1,4 +1,13 @@
-import { Form, Button, Row, Col } from 'react-bootstrap';
+import {
+  Form,
+  Button,
+  Row,
+  Col,
+  Popover,
+  OverlayTrigger,
+} from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { Controller, useForm } from 'react-hook-form';
 import Select from '../../../controls/select/selectForm';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -43,7 +52,7 @@ export default function PublicForm() {
       value: 'COSMIC_v3_Signatures_GRCh37_SBS96',
     },
     cancer: { label: 'Lung-AdenoCA', value: 'Lung-AdenoCA' },
-    cancerOnly: true,
+    useAllCancer: false,
   };
 
   const {
@@ -72,7 +81,7 @@ export default function PublicForm() {
         study: data.study.value,
         strategy: data.strategy.value,
         signatureSetName: data.signatureSetName.value,
-        ...(data.cancerOnly && { cancer: data.cancer.value }),
+        ...(!data.useAllCancer && { cancer: data.cancer.value }),
       };
       const { samples, signatureNames } = await fetchSamples(params).unwrap();
       mergeMain({ displayTab: 'tmb', samples, signatureNames });
@@ -240,21 +249,50 @@ export default function PublicForm() {
         options={cancerOptions(study, strategy, signatureSetName)}
         control={control}
       />
-      <Form.Group>
-        <Controller
-          name="cancerOnly"
-          control={control}
-          render={({ field }) => (
-            <Form.Check
-              {...field}
-              id="cancerOnly"
-              disabled={submitted}
-              type="checkbox"
-              label="Cancer Type or Group Only"
-              checked={field.value}
-            />
-          )}
-        />
+      <Form.Group controlId="useAllCancer" className="d-flex">
+        <Form.Label className="mr-auto">
+          Use all cancer types for TMB and MS Burden plots{' '}
+          <OverlayTrigger
+            trigger="click"
+            placement="right"
+            overlay={
+              <Popover id="popover-basic">
+                {/* <Popover.Title as="h3">About</Popover.Title> */}
+                <Popover.Content>
+                  <p>
+                    Check this to use all cancer types for TMB and MS Burden
+                  </p>
+                </Popover.Content>
+              </Popover>
+            }
+            rootClose
+          >
+            <Button
+              variant="link"
+              className="p-0 font-weight-bold"
+              aria-label="All cancer types option info"
+            >
+              <FontAwesomeIcon
+                icon={faInfoCircle}
+                style={{ verticalAlign: 'baseline' }}
+              />
+            </Button>
+          </OverlayTrigger>
+        </Form.Label>
+        <Form.Check inline>
+          <Controller
+            name="useAllCancer"
+            control={control}
+            render={({ field }) => (
+              <Form.Check.Input
+                {...field}
+                type="checkbox"
+                disabled={submitted}
+                checked={field.value}
+              />
+            )}
+          />
+        </Form.Check>
       </Form.Group>
 
       <Row>

@@ -265,7 +265,7 @@ export default function Exposure({ match }) {
             : publicForm.signatureSet.value,
         cancerType: publicForm.cancer.value,
         genome: userForm.genome.value,
-        useCancerType: publicForm.cancerOnly,
+        useCancerType: !publicForm.useAllCancer,
       }),
     };
     if (fn == 'all' || fn == 'burden') {

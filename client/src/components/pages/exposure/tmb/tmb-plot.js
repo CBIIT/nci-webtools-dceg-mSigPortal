@@ -13,14 +13,14 @@ export default function MutProfilePlot() {
   });
 
   useEffect(() => {
-    const { study, strategy, signatureSetName, cancer, cancerOnly } =
+    const { study, strategy, signatureSetName, cancer, useAllCancer } =
       publicForm;
     if (study) {
       setParams({
         study: study.value,
         strategy: strategy.value,
         signatureSetName: signatureSetName.value,
-        ...(cancerOnly && { cancer: cancer.value }),
+        ...(!useAllCancer && { cancer: cancer.value }),
       });
     }
   }, [publicForm]);
