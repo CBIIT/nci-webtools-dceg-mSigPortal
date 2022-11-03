@@ -250,8 +250,22 @@ export default function PublicForm() {
         control={control}
       />
       <Form.Group controlId="useAllCancer" className="d-flex">
-        <Form.Label className="mr-auto">
-          Use all cancer types for TMB and MS Burden plots{' '}
+        <Form.Check inline className="mr-1">
+          <Controller
+            name="useAllCancer"
+            control={control}
+            render={({ field }) => (
+              <Form.Check.Input
+                {...field}
+                type="checkbox"
+                disabled={submitted}
+                checked={field.value}
+              />
+            )}
+          />
+        </Form.Check>
+        <Form.Label className="font-weight-normal" style={{ fontSize: '12px' }}>
+          Use all cancer types for TMB and MS Burden{' '}
           <OverlayTrigger
             trigger="click"
             placement="right"
@@ -279,20 +293,6 @@ export default function PublicForm() {
             </Button>
           </OverlayTrigger>
         </Form.Label>
-        <Form.Check inline>
-          <Controller
-            name="useAllCancer"
-            control={control}
-            render={({ field }) => (
-              <Form.Check.Input
-                {...field}
-                type="checkbox"
-                disabled={submitted}
-                checked={field.value}
-              />
-            )}
-          />
-        </Form.Check>
       </Form.Group>
 
       <Row>
