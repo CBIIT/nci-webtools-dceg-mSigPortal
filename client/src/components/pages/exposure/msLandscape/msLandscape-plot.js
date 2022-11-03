@@ -1,12 +1,26 @@
 import { useState, useEffect } from 'react';
+import {
+  Form,
+  Row,
+  Col,
+  Button,
+  OverlayTrigger,
+  Popover,
+} from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFolderMinus, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import Plotly from '../../../controls/plotly/plot/plot';
 import { useSelector } from 'react-redux';
 import { useMsLandscapePlotQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
 import './plot.scss';
+
+const { Label, Group } = Form;
 export default function MsLandscapePlot() {
   const publicForm = useSelector((state) => state.exposure.publicForm);
+  const exposure = useSelector((state) => state.exposure);
+  const { variableFile, plotPath, debugR, err, loading } = exposure.msLandscape;
   // const [params, setParams] = useState('');
   // const { data, error, isFetching } = useMsLandscapePlotQuery(params, {
   //   skip: !params,
@@ -18,8 +32,6 @@ export default function MsLandscapePlot() {
       skip: !calculationQuery,
     }
   );
-  console.log(calculationQuery);
-  console.log(data);
 
   // useEffect(() => {
   //   const { study, strategy, signatureSetName } = publicForm;
@@ -59,6 +71,69 @@ export default function MsLandscapePlot() {
 
   return (
     <>
+      <Form className="p-3">
+        <LoadingOverlay active={isFetching} />
+        <Row className="">
+          <Col lg="auto">
+            <Group controlId="landscape">
+              <Label>
+                Upload Variable Data{' '}
+                <OverlayTrigger
+                  trigger="hover"
+                  placement="top"
+                  overlay={
+                    <Popover id="upload-variable-info">
+                      <Popover.Content>
+                        A text file with a header including two columns of data:
+                        Samples and Variable Value
+                      </Popover.Content>
+                    </Popover>
+                  }
+                  rootClose
+                >
+                  <FontAwesomeIcon icon={faInfoCircle} className="btn-link" />
+                </OverlayTrigger>
+              </Label>
+              <div className="d-flex">
+                <Form.File
+                  id="variableData"
+                  label={variableFile || 'Upload here (optional)'}
+                  title={variableFile || 'Upload here (optional)'}
+                  value={''}
+                  // accept=''
+                  //onChange={(e) => handleVariable(e.target.files[0])}
+                  custom
+                />
+                {variableFile && (
+                  <Button
+                    className="ml-1"
+                    size="sm"
+                    title="Remove"
+                    variant="danger"
+                    disabled={loading}
+                    //onClick={() => {
+                    //  handleVariable(new File([], ''));
+                    //}}
+                  >
+                    <FontAwesomeIcon icon={faFolderMinus} size="lg" />
+                  </Button>
+                )}
+              </div>
+            </Group>
+          </Col>
+          <Col lg="auto" className="d-flex">
+            <Button
+              // disabled={source == 'user' && !projectID}
+              className="mt-auto mb-3"
+              variant="primary"
+              // onClick={calculateLandscape}
+            >
+              Recalculate
+            </Button>
+          </Col>
+        </Row>
+      </Form>
+      <hr />
       <LoadingOverlay active={isFetching} />
       {data && !error ? (
         <Plotly
