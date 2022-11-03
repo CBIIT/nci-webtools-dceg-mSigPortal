@@ -49,8 +49,11 @@ async function queryExposure(req, res, next) {
         const { output: sampleClusterOrder } = JSON.parse(wrapper);
 
         const orderedData = data.sort(
-          (a, b) => sampleClusterOrder[a.sample] - sampleClusterOrder[b.sample]
+          (a, b) =>
+            sampleClusterOrder.indexOf(a.sample) -
+            sampleClusterOrder.indexOf(b.sample)
         );
+
         res.json(addBurden(orderedData));
       } catch (err) {
         logger.error(`/explorationCalc: An error occured with fn: ${fn}`);

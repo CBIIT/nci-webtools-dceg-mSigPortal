@@ -841,6 +841,7 @@ hierarchicalClusterOrder <- function(args, config) {
 
   clustern <- ifelse(dim(mdata)[1] < 10, 2L, 5)
 
-  cluster <- factoextra::hcut(mdata, k = clustern, hc_func = "hclust", hc_metric = "euclidean", hc_method = "ward.D2", stand = TRUE)$cluster
-  return(as.list(cluster))
+  cluster <- factoextra::hcut(mdata, k = clustern, hc_func = "hclust", hc_metric = "euclidean", hc_method = "ward.D2", stand = TRUE)
+
+  return(as.list(cluster$labels[cluster$order]))
 }
