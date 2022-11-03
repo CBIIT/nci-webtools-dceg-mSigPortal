@@ -650,7 +650,7 @@ export default function UserForm() {
               <Popover id="popover-basic">
                 <Title as="h3">Clustered Mutation Analysis</Title>
                 <Content>
-                  <p> Examining clustered mutations with SigProfilerClusters</p>
+                  <p>Examining clustered mutations with SigProfilerClusters</p>
                 </Content>
               </Popover>
             }
