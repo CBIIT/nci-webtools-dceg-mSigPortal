@@ -1,7 +1,5 @@
 export default function TMB(data, tmbTabName, signatureName) {
   const totalCancer = data.length;
-  console.log(totalCancer);
-  console.log(data);
 
   const absYValue = data
     .map((o) => o.samples.map((e) => Math.abs(e.burden)))
@@ -72,7 +70,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     textangle: totalCancer > 4 ? 60 : 0,
   }));
 
-  const groupCountAnnotation = data.map((element, index, array) => ({
+  const signatureCountAnnotation = data.map((element, index, array) => ({
     xref: 'x',
     yref: 'paper',
     xanchor: 'bottom',
@@ -80,9 +78,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     x: (index + index + 1) * 0.5,
     //y: -0.07,
     y: 1.06,
-    text: element.samples.filter(function (x) {
-      return x.burden != null;
-    }).length,
+    text: element.signatureSize,
     showarrow: false,
     font: {
       size: 12,
@@ -90,7 +86,7 @@ export default function TMB(data, tmbTabName, signatureName) {
     },
     align: 'center',
   }));
-  console.log(groupCountAnnotation);
+
   const countDivider = data.map((element, index, array) => ({
     type: 'line',
     xref: 'x',
@@ -105,15 +101,14 @@ export default function TMB(data, tmbTabName, signatureName) {
     },
   }));
 
-  const totalCountAnnotation = data.map((element, index, array) => ({
+  const sampleCountAnnotation = data.map((element, index, array) => ({
     xref: 'x',
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
     x: (index + index + 1) * 0.5,
-    //y: -0.14,
     y: 1.01,
-    text: `${element.totalSamples}`,
+    text: `${element.sampleSize}`,
     showarrow: false,
     font: {
       size: 12,
@@ -121,7 +116,6 @@ export default function TMB(data, tmbTabName, signatureName) {
     },
     align: 'center',
   }));
-  console.log(totalCountAnnotation);
 
   const shapes = data.map((element, index, array) => ({
     type: 'rect',
@@ -168,18 +162,45 @@ export default function TMB(data, tmbTabName, signatureName) {
     align: 'center',
   };
   let annotations = [];
-  signatureName != null
-    ? (annotations = [
+  // signatureName != null
+  //   ? (annotations = [
+  //       ...groupLabel,
+  //       ...groupCountAnnotation,
+  //       ...sampleCountAnnotation,
+  //       signatureNameAnnotation,
+  //     ])
+  //   : (annotations = [
+  //       ...groupLabel,
+  //       ...groupCountAnnotation,
+  //       ...sampleCountAnnotation,
+  //     ]);
+
+  if (tmbTabName === 'TMB') {
+    if (signatureName != null) {
+      annotations = [
         ...groupLabel,
-        ...groupCountAnnotation,
-        ...totalCountAnnotation,
+        ...sampleCountAnnotation,
         signatureNameAnnotation,
-      ])
-    : (annotations = [
+      ];
+    } else {
+      annotations = [...groupLabel, ...sampleCountAnnotation];
+    }
+  } else {
+    if (signatureName != null) {
+      annotations = [
         ...groupLabel,
-        ...groupCountAnnotation,
-        ...totalCountAnnotation,
-      ]);
+        ...signatureCountAnnotation,
+        ...sampleCountAnnotation,
+        signatureNameAnnotation,
+      ];
+    } else {
+      annotations = [
+        ...groupLabel,
+        ...signatureCountAnnotation,
+        ...sampleCountAnnotation,
+      ];
+    }
+  }
 
   // find the longest label to calculate extra height margin
   const labels = groupLabel.map((e) => e.text);
@@ -190,7 +211,11 @@ export default function TMB(data, tmbTabName, signatureName) {
     width: totalCancer > 4 ? null : 400 + 150 * (totalCancer - 1),
     autosize: true,
     height: 500 + extraMargin,
-    legend: { orientation: 'h', x: 0.05, y: 1.25 },
+    legend: {
+      orientation: 'h',
+      x: 0.2,
+      y: tmbTabName === 'TMB' ? 1.15 : 1.25,
+    },
     xaxis: {
       showticklabels: false,
       tickfont: {
@@ -217,10 +242,13 @@ export default function TMB(data, tmbTabName, signatureName) {
     },
     margin: {
       b: extraMargin,
-      t: 140,
+      t: tmbTabName === 'TMB' ? 120 : 140,
       l: 0,
     },
-    shapes: [...shapes, ...lines, ...countDivider],
+    shapes:
+      tmbTabName === 'TMB'
+        ? [...shapes, ...lines]
+        : [...shapes, ...lines, ...countDivider],
     annotations: annotations,
   };
 
@@ -229,7 +257,10 @@ export default function TMB(data, tmbTabName, signatureName) {
   };
 
   return {
-    traces: [...traces, traceLabelGreen, traceLabelBlue],
+    traces:
+      tmbTabName === 'TMB'
+        ? [...traces, traceLabelGreen]
+        : [...traces, traceLabelGreen, traceLabelBlue],
     layout: layout,
     config,
   };

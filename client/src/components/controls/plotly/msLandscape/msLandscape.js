@@ -1,4 +1,5 @@
 import { groupBy } from 'lodash';
+import { First } from 'react-bootstrap/esm/PageItem';
 
 export default function MsLandscape(data, arg) {
   console.log(data);
@@ -127,7 +128,20 @@ export default function MsLandscape(data, arg) {
   //   });
 
   // console.log(ordered);
+  const mutationType = [];
 
+  const mType = groupBy(rawDataSignature, 'mutationType');
+  Object.keys(mType).map((e) => mutationType.push(e));
+  console.log(mutationType);
+
+  const filterDataSpectrum = rawDataSpectrum.filter((e) =>
+    mutationType.includes(e.mutationType)
+  );
+
+  const filterDataSignature = rawDataSignature.filter((e) =>
+    mutationType.includes(e.mutationType)
+  );
+  console.log(filterDataSpectrum);
   const exposure_refdata_input = rawDataActivity.map((group) => ({
     exposure: group.exposure,
     sample: group.sample,
@@ -135,7 +149,7 @@ export default function MsLandscape(data, arg) {
   }));
   console.log('exposure_refdata_input');
   console.log(exposure_refdata_input);
-  const seqmatrix_refdata_input = rawDataSpectrum.map((group) => ({
+  const seqmatrix_refdata_input = filterDataSpectrum.map((group) => ({
     mutation: group.mutations,
     mutationType: group.mutationType,
     sample: group.sample,
@@ -143,7 +157,7 @@ export default function MsLandscape(data, arg) {
   console.log('seqmatrix_refdata_input');
   console.log(seqmatrix_refdata_input);
 
-  const signature_refsets_input = rawDataSignature.map((group) => ({
+  const signature_refsets_input = filterDataSignature.map((group) => ({
     contribution: group.contribution,
     mutationType: group.mutationType,
     signatureName: group.signatureName,
@@ -177,10 +191,18 @@ export default function MsLandscape(data, arg) {
   );
   console.log(groupByMutationType_signature);
 
-  const groupByMutationType_spectrum = groupBy(rawDataSpectrum, 'mutationType');
+  const groupByMutationType_spectrum = groupBy(
+    filterDataSpectrum,
+    'mutationType'
+  );
   console.log(groupByMutationType_spectrum);
-  console.log(groupBy(rawDataSpectrum, 'cancer'));
+  console.log(groupBy(filterDataSpectrum, 'cancer'));
 
+  const sortSignatureName = (sourceArray) => {
+    const sortByLocation = (a, b) =>
+      a.signatureName.localeCompare(b.signatureName, 'en', { numeric: true });
+    return sourceArray.sort(sortByLocation);
+  };
   //  decompsite_input <- calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
   //calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
   function dotp(x, y) {
@@ -200,33 +222,73 @@ export default function MsLandscape(data, arg) {
   //const cosine = cosineSimilarity(s1mutations, s2mutations).toFixed(3);
 
   //matrix multiplication
-  // function matrixDot(A, B) {
-  //   var result = new Array(A.length)
-  //     .fill(0)
-  //     .map((row) => new Array(B[0].length).fill(0));
+  function matrixDot(A, B) {
+    var result = new Array(A.length)
+      .fill(0)
+      .map((row) => new Array(B[0].length).fill(0));
 
-  //   return result.map((row, i) => {
-  //     return row.map((val, j) => {
-  //       return A[i].reduce((sum, elm, k) => sum + elm * B[k][j], 0);
-  //     });
-  //   });
-  // }
-  function multiply(a, b) {
-    var aNumRows = a.length,
-      aNumCols = a[0].length,
-      bNumRows = b.length,
-      bNumCols = b[0].length,
-      m = new Array(aNumRows); // initialize array of rows
-    for (var r = 0; r < aNumRows; ++r) {
-      m[r] = new Array(bNumCols); // initialize the current row
-      for (var c = 0; c < bNumCols; ++c) {
-        m[r][c] = 0; // initialize the current cell
-        for (var i = 0; i < aNumCols; ++i) {
-          m[r][c] += a[r][i] * b[i][c];
+    return result.map((row, i) => {
+      return row.map((val, j) => {
+        return A[i].reduce((sum, elm, k) => sum + elm * B[k][j], 0);
+      });
+    });
+  }
+
+  const multiplyMatrices = (a, b) => {
+    if (!Array.isArray(a) || !Array.isArray(b) || !a.length || !b.length) {
+      throw new Error('arguments should be in 2-dimensional array format');
+    }
+    let x = a.length,
+      z = a[0].length,
+      y = b[0].length;
+    console.log(x);
+    console.log(y);
+    console.log(z);
+    console.log(b.length);
+    if (b.length !== z) {
+      // XxZ & ZxY => XxY
+      throw new Error(
+        'number of columns in the first matrix should bethe same as the number of rows in the second'
+      );
+    }
+    let productRow = Array.apply(null, new Array(y)).map(
+      Number.prototype.valueOf,
+      0
+    );
+    let product = new Array(x);
+    for (let p = 0; p < x; p++) {
+      product[p] = productRow.slice();
+    }
+    for (let i = 0; i < x; i++) {
+      for (let j = 0; j < y; j++) {
+        for (let k = 0; k < z; k++) {
+          product[i][j] += a[i][k] * b[k][j];
         }
       }
     }
-    return m;
+    return product;
+  };
+
+  function matrixMul(m1, m2) {
+    const fil_m1 = m1.length;
+    const col_m1 = m1[0].length;
+    const fil_m2 = m2.length;
+    const col_m2 = m2[0].length;
+    console.log('m1 lenght: ' + fil_m1);
+    console.log('m1 col: ' + col_m1);
+    console.log('m2 lenght: ' + fil_m2);
+    console.log('m2 col: ' + col_m2);
+    if (col_m1 != fil_m2) throw 'Matrices cannot be multiplied';
+    let multiplication = new Array(fil_m1);
+    for (let x = 0; x < multiplication.length; x++)
+      multiplication[x] = new Array(col_m2).fill(0);
+    for (let x = 0; x < multiplication.length; x++) {
+      for (let y = 0; y < multiplication[x].length; y++) {
+        for (let z = 0; z < col_m1; z++) {
+          multiplication[x][y] = multiplication[x][y] + m1[x][z] * m2[z][y];
+        }
+      }
+    }
   }
 
   function uniq(a) {
@@ -262,19 +324,59 @@ export default function MsLandscape(data, arg) {
     //console.log(signature_name_total);
     //console.log(signature_name_tmp);
     console.log(signature_name);
-
-    const dataSample = groupBy(
+    const newData3 = data3.filter((e) =>
+      signature_name.includes(e.signatureName)
+    );
+    console.log(newData3);
+    const dataSample2 = groupBy(
       data2.map((e) => ({
         mutation: e.mutation,
         sample: e.sample,
       })),
       'sample'
     );
-    console.log(dataSample);
-    const genomes = dataSample;
-    // const est_genomes = data3 * data4;
+    const dataSample3 = groupBy(
+      sortSignatureName(newData3).map((e) => ({
+        contribution: e.contribution,
+        signatureName: e.signatureName,
+      })),
+      'signatureName'
+    );
+
+    const dataSample4 = groupBy(
+      sortSignatureName(data4).map((e) => ({
+        exposure: e.exposure,
+        signatureName: e.signatureName,
+      })),
+      'signatureName'
+    );
+    const array2 = [];
+    Object.values(dataSample2).forEach((group) => {
+      //console.log(group);
+      array2.push(group.map((e) => e.mutation));
+    });
+    const array3 = [];
+    Object.values(dataSample3).forEach((group) => {
+      array3.push(group.map((e) => e.contribution));
+    });
+    const array4 = [];
+    Object.values(dataSample4).forEach((group) => {
+      array4.push(group.map((e) => e.exposure));
+    });
+    console.log(dataSample2);
+    console.log(array2);
+    console.log(dataSample3);
+    console.log(array3);
+    console.log(dataSample4);
+    console.log(array4);
+    const array3_trans = array3[0].map((_, colIndex) =>
+      array3.map((row) => row[colIndex])
+    );
+    console.log(array3_trans);
+    const genomes = array2;
     console.log(genomes);
-    // console.log(est_genomes);
+    const est_genomes = multiplyMatrices(array3_trans, array4);
+    console.log(est_genomes);
   }
 
   calculate_similarities(
@@ -321,17 +423,21 @@ export default function MsLandscape(data, arg) {
       yaxis: 'y2',
       type: 'heatmap',
       colorscale: heatmapColorscale,
-      zmin: 0,
+      zmin: 0.6,
       zmax: 1,
       colorbar: {
         orientation: 'h',
+        x: 0.5,
+        y: -0.5,
         bordercolor: 'gray',
         tickmode: 'array',
-        tickvals: [0, 0.6, 0.7, 0.8, 0.9, 1],
+        tickvals: [0.6, 0.7, 0.8, 0.9, 1],
         title: {
           text: 'Cosine Similarity',
           font: {
-            //size: 16,
+            family: 'Arial',
+            size: 17,
+            color: 'rgb(37,37,37)',
           },
         },
       },

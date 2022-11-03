@@ -10,11 +10,9 @@ export const msBurdenApiSlice = explorationApiSlice.injectEndpoints({
         params: { ...params, limit: 1000000 },
       }),
       transformResponse: (data, meta, arg) => {
-        console.log(data);
         const { signatureName } = arg;
         // calculate median burden across cancer types
         const groupByCancer = groupBy(data, 'cancer');
-        console.log(groupByCancer);
         const transform = Object.entries(groupByCancer)
           .map(([cancer, data]) => {
             const samples = Object.values(groupBy(data, 'sample'))
@@ -39,7 +37,8 @@ export const msBurdenApiSlice = explorationApiSlice.injectEndpoints({
               cancer,
               samples,
               medianBurden,
-              totalSamples: samples.length,
+              sampleSize: samples.length,
+              signatureSize: burdens.length,
             };
           })
           .filter((e) => e.medianBurden)

@@ -39,6 +39,7 @@ export default function MsLandscapePlot() {
         strategy: strategy.value,
         signatureSetName: signatureSetName.value,
         cancer: cancer.value,
+        orderByCluster: true,
       };
       const params_spectrum = {
         study: study.value,
