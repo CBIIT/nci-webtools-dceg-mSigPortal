@@ -51,7 +51,7 @@ export default function UserForm() {
 
   const formatOptions = [
     { label: 'VCF', value: 'vcf', example: 'demo_input_multi.vcf.gz' },
-    { label: 'MAF', value: 'maf', example: 'demo_input_multi.MAF.gz' },
+    { label: 'MAF', value: 'maf', example: 'demo_input_multi_MAF.txt' },
     { label: 'CSV', value: 'csv', example: 'demo_input_multi.csv' },
     { label: 'TSV', value: 'tsv', example: 'demo_input_multi.tsv' },
     {
