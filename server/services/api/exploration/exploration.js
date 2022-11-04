@@ -56,7 +56,7 @@ async function queryExposure(req, res, next) {
 
         res.json(addBurden(orderedData));
       } catch (err) {
-        logger.error(`/explorationCalc: An error occured with fn: ${fn}`);
+        logger.error(`An error while calculating clusters`);
         next(err);
       }
     } else {
