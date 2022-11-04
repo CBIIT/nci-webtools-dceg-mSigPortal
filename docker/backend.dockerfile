@@ -12,7 +12,6 @@ RUN dnf -y update \
     libxml2-devel \
     mpfr-devel \
     nodejs \
-    npm \
     openssl-devel \
     python3-devel \
     python3-pip \
