@@ -500,7 +500,7 @@ export default function MsLandscape(data, arg) {
 
   const layout = {
     autosize: true,
-    height: 1080,
+    height: 1200,
     barmode: 'stack',
     hovermode: 'closest',
     legend: {
@@ -517,11 +517,17 @@ export default function MsLandscape(data, arg) {
       ticktext: xAxisName.map((e) => e.sample),
       type: 'category',
       tickangle: -90,
+      ticks: '',
     },
     yaxis: { title: 'Signature contribution', domain: [0, 0.47] },
-    yaxis2: { title: '', domain: [0.47, 0.51] },
+    yaxis2: {
+      title: '',
+      domain: [0.47, 0.51],
+      showticklabels: false,
+      ticks: '',
+    },
     yaxis3: { title: 'Number of mutation', domain: [0.53, 1] },
-
+    bargap: 0.04,
     shapes: [...shapes, ...lines],
     annotations: annotations,
   };
