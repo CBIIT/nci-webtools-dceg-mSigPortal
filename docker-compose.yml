@@ -28,8 +28,8 @@ services:
     database:
         image: postgres
         environment:
-        POSTGRES_USER: msigportal
-        POSTGRES_PASSWORD: msigportal
-        POSTGRES_DB: msigportal
+            POSTGRES_USER: msigportal
+            POSTGRES_PASSWORD: msigportal
+            POSTGRES_DB: msigportal
         ports:
         - "5432:5432"
