@@ -607,6 +607,14 @@ export default function Exposure({ match }) {
             name: 'MS Decomposition',
           },
           {
+            component: (
+              <MsAssociation calculateAssociation={calculateAssociation} />
+            ),
+            id: 'msAssociation',
+            name: 'MS Association',
+          },
+
+          {
             component: <MsLandscape2 />,
             id: 'msLandscape',
             name: 'MS Landscape',
@@ -625,6 +633,18 @@ export default function Exposure({ match }) {
             component: <MsPrevalence2 />,
             id: 'msPrevalence',
             name: 'MS Prevalence',
+          },
+          {
+            component: (
+              <MSIndividual calculateIndividual={calculateIndividual} />
+            ),
+            id: 'msIndividual',
+            name: 'MS Individual',
+          },
+          {
+            component: <Download exposureDownload={exposureDownload} />,
+            id: 'download',
+            name: 'Download',
           },
         ];
 
