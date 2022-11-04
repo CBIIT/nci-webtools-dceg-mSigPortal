@@ -50,7 +50,8 @@ export default function MSPrevalence(data, minimum) {
   const names = dataResult.map((group) => group.signatureName);
   const longest = names.reduce((a, e) => (a > e.length ? a : e.length), 0);
   const extraMargin = longest < 10 ? 60 : longest * 7;
-
+  console.log(names);
+  console.log(longest);
   const contains = defaultNames.some((element) => {
     if (names[0].includes(element)) {
       return true;

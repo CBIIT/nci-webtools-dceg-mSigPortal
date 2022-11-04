@@ -476,9 +476,18 @@ export default function MsLandscape(data, arg) {
   const traces = [...traces3, ...traces2, ...traces1];
   console.log(traces);
 
+  const longest = xAxisName.reduce(
+    (a, e) => (a > e.sample.length ? a : e.sample.length),
+    0
+  );
+  const extraMargin = longest < 10 ? -0.157 : (longest * -0.027) / 2;
+  console.log(longest);
+  console.log(extraMargin);
+
   const text = {
     x: 0,
-    y: -0.157,
+    //y: -0.157,
+    y: extraMargin,
     xanchor: 'left',
     yanchor: 'bottom',
     xref: 'paper',
@@ -491,7 +500,7 @@ export default function MsLandscape(data, arg) {
       color: 'rgb(37,37,37)',
     },
   };
-
+  console.log(text);
   const shapes = [];
 
   const lines = [];
@@ -508,7 +517,7 @@ export default function MsLandscape(data, arg) {
       // title: { text: 'Signatures Name' },
       traceorder: 'reversed',
       x: 0,
-      y: -0.157,
+      y: extraMargin,
     },
 
     xaxis: {
@@ -527,6 +536,7 @@ export default function MsLandscape(data, arg) {
       ticks: '',
     },
     yaxis3: { title: 'Number of mutation', domain: [0.53, 1] },
+
     bargap: 0.04,
     shapes: [...shapes, ...lines],
     annotations: annotations,
