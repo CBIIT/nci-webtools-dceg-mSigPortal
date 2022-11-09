@@ -177,25 +177,6 @@ export default function MsLandscape(data, arg) {
   );
   console.log(groupBySignatureName_exposure);
 
-  function groupBy1(objectArray, property) {
-    return objectArray.reduce(function (acc, obj) {
-      var key = obj[property];
-      if (!acc[key]) {
-        acc[key] = [];
-      }
-      if (obj.exposure !== 0) {
-        acc[key].push(obj);
-      }
-
-      return acc;
-    }, {});
-  }
-  const groupBySignatureName_exposure2 = groupBy1(
-    exposure_refdata_input,
-    'signatureName'
-  );
-  console.log(groupBySignatureName_exposure2);
-
   const dataSignature = Object.entries(groupBySample_exposure).map(
     ([key, value]) => ({
       signatureName: key,
@@ -410,9 +391,6 @@ export default function MsLandscape(data, arg) {
   const barCharColor = Object.keys(groupBySignatureName_exposure);
   console.log(barCharColor);
 
-  const barCharColor2 = Object.keys(groupBySignatureName_exposure2);
-  console.log(barCharColor2);
-
   const xAxisName = Object.values(groupBySignatureName_exposure)[0]
     .map((e) => ({
       sample: e.sample,
@@ -547,7 +525,7 @@ export default function MsLandscape(data, arg) {
     },
 
     xaxis: {
-      tickmode: 'array',
+      //tickmode: 'array',
       tickvals: xAxisName.map((_, i) => i),
       ticktext: xAxisName.map((e) => e.sample),
       type: 'category',
