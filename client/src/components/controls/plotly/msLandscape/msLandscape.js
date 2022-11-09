@@ -147,8 +147,10 @@ export default function MsLandscape(data, arg) {
     sample: group.sample,
     signatureName: group.signatureName,
   }));
+  //.filter((obj) => obj.exposure !== 0);
   console.log('exposure_refdata_input');
   console.log(exposure_refdata_input);
+
   const seqmatrix_refdata_input = filterDataSpectrum.map((group) => ({
     mutation: group.mutations,
     mutationType: group.mutationType,
@@ -162,6 +164,7 @@ export default function MsLandscape(data, arg) {
     mutationType: group.mutationType,
     signatureName: group.signatureName,
   }));
+
   console.log('signature_refsets_input');
   console.log(signature_refsets_input);
 
@@ -182,8 +185,8 @@ export default function MsLandscape(data, arg) {
       exposure: value.map((e) => e.exposure),
     })
   );
+  //.filter((obj) => obj.exposure !== 0);
   console.log(dataSignature);
-  console.log(dataSignature[1]);
 
   const groupByMutationType_signature = groupBy(
     rawDataSignature,
@@ -412,6 +415,7 @@ export default function MsLandscape(data, arg) {
       },
       showlegend: false,
       test: value.map((d, i) => d.exposure / dataSignature[i].total),
+      expo: value.map((e, i) => e.exposure),
     }));
   console.log(traces1);
   const traces2 = [
@@ -428,7 +432,7 @@ export default function MsLandscape(data, arg) {
       colorbar: {
         orientation: 'h',
         x: 0.5,
-        y: -0.5,
+        y: -0.3,
         bordercolor: 'gray',
         tickmode: 'array',
         tickvals: [0.6, 0.7, 0.8, 0.9, 1],
@@ -455,8 +459,8 @@ export default function MsLandscape(data, arg) {
       co: barCharColor.map((e) => e.replace(/^\D*/, '')),
       name: key,
       type: 'bar',
-      x: value.map((e) => e.sample),
-      y: value.map((e, i) => e.exposure),
+      x: value.filter((obj) => obj.exposure !== 0).map((e) => e.sample),
+      y: value.filter((obj) => obj.exposure !== 0).map((e, i) => e.exposure),
       //showlegend: true,
       marker: {
         color: colors[key.replace(/^\D*/, '')],
@@ -492,7 +496,7 @@ export default function MsLandscape(data, arg) {
     yanchor: 'bottom',
     xref: 'paper',
     yref: 'paper',
-    text: 'Signatures Name:',
+    text: 'Mutational Signatures:',
     showarrow: false,
     font: {
       family: 'Arial',
@@ -521,7 +525,7 @@ export default function MsLandscape(data, arg) {
     },
 
     xaxis: {
-      tickmode: 'array',
+      //tickmode: 'array',
       tickvals: xAxisName.map((_, i) => i),
       ticktext: xAxisName.map((e) => e.sample),
       type: 'category',
