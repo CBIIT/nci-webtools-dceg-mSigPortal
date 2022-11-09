@@ -432,7 +432,7 @@ export default function MsLandscape(data, arg) {
       colorbar: {
         orientation: 'h',
         x: 0.5,
-        y: -0.3,
+        y: xAxisName.length > 250 ? -0.2 : -0.3,
         bordercolor: 'gray',
         tickmode: 'array',
         tickvals: [0.6, 0.7, 0.8, 0.9, 1],
@@ -484,14 +484,15 @@ export default function MsLandscape(data, arg) {
     (a, e) => (a > e.sample.length ? a : e.sample.length),
     0
   );
-  const extraMargin = longest < 10 ? -0.157 : (longest * -0.027) / 2;
+  const extraMargin =
+    longest > 0 && longest < 10 ? -0.157 : (longest * -0.027) / 2;
   console.log(longest);
   console.log(extraMargin);
 
   const text = {
     x: 0,
-    //y: -0.157,
-    y: extraMargin,
+    y: xAxisName.length > 250 ? -0.03 : extraMargin,
+
     xanchor: 'left',
     yanchor: 'bottom',
     xref: 'paper',
@@ -518,19 +519,20 @@ export default function MsLandscape(data, arg) {
     hovermode: 'closest',
     legend: {
       orientation: 'h',
-      // title: { text: 'Signatures Name' },
+      //title: { text: 'Signatures Name<br>' },
       traceorder: 'reversed',
       x: 0,
-      y: extraMargin,
+      y: xAxisName.length > 250 ? -0.03 : extraMargin,
     },
 
     xaxis: {
-      //tickmode: 'array',
+      tickmode: 'array',
       tickvals: xAxisName.map((_, i) => i),
       ticktext: xAxisName.map((e) => e.sample),
       type: 'category',
       tickangle: -90,
       ticks: '',
+      showticklabels: xAxisName.length > 250 ? false : true,
     },
     yaxis: { title: 'Signature contribution', domain: [0, 0.47] },
     yaxis2: {
