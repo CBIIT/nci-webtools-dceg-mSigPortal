@@ -147,8 +147,10 @@ export default function MsLandscape(data, arg) {
     sample: group.sample,
     signatureName: group.signatureName,
   }));
+  //.filter((obj) => obj.exposure !== 0);
   console.log('exposure_refdata_input');
   console.log(exposure_refdata_input);
+
   const seqmatrix_refdata_input = filterDataSpectrum.map((group) => ({
     mutation: group.mutations,
     mutationType: group.mutationType,
@@ -162,6 +164,7 @@ export default function MsLandscape(data, arg) {
     mutationType: group.mutationType,
     signatureName: group.signatureName,
   }));
+
   console.log('signature_refsets_input');
   console.log(signature_refsets_input);
 
@@ -174,6 +177,25 @@ export default function MsLandscape(data, arg) {
   );
   console.log(groupBySignatureName_exposure);
 
+  function groupBy1(objectArray, property) {
+    return objectArray.reduce(function (acc, obj) {
+      var key = obj[property];
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      if (obj.exposure !== 0) {
+        acc[key].push(obj);
+      }
+
+      return acc;
+    }, {});
+  }
+  const groupBySignatureName_exposure2 = groupBy1(
+    exposure_refdata_input,
+    'signatureName'
+  );
+  console.log(groupBySignatureName_exposure2);
+
   const dataSignature = Object.entries(groupBySample_exposure).map(
     ([key, value]) => ({
       signatureName: key,
@@ -182,8 +204,8 @@ export default function MsLandscape(data, arg) {
       exposure: value.map((e) => e.exposure),
     })
   );
+  //.filter((obj) => obj.exposure !== 0);
   console.log(dataSignature);
-  console.log(dataSignature[1]);
 
   const groupByMutationType_signature = groupBy(
     rawDataSignature,
@@ -388,6 +410,9 @@ export default function MsLandscape(data, arg) {
   const barCharColor = Object.keys(groupBySignatureName_exposure);
   console.log(barCharColor);
 
+  const barCharColor2 = Object.keys(groupBySignatureName_exposure2);
+  console.log(barCharColor2);
+
   const xAxisName = Object.values(groupBySignatureName_exposure)[0]
     .map((e) => ({
       sample: e.sample,
@@ -412,6 +437,7 @@ export default function MsLandscape(data, arg) {
       },
       showlegend: false,
       test: value.map((d, i) => d.exposure / dataSignature[i].total),
+      expo: value.map((e, i) => e.exposure),
     }));
   console.log(traces1);
   const traces2 = [
@@ -455,8 +481,8 @@ export default function MsLandscape(data, arg) {
       co: barCharColor.map((e) => e.replace(/^\D*/, '')),
       name: key,
       type: 'bar',
-      x: value.map((e) => e.sample),
-      y: value.map((e, i) => e.exposure),
+      x: value.filter((obj) => obj.exposure !== 0).map((e) => e.sample),
+      y: value.filter((obj) => obj.exposure !== 0).map((e, i) => e.exposure),
       //showlegend: true,
       marker: {
         color: colors[key.replace(/^\D*/, '')],
@@ -492,7 +518,7 @@ export default function MsLandscape(data, arg) {
     yanchor: 'bottom',
     xref: 'paper',
     yref: 'paper',
-    text: 'Signatures Name:',
+    text: 'Mutational Signatures:',
     showarrow: false,
     font: {
       family: 'Arial',
