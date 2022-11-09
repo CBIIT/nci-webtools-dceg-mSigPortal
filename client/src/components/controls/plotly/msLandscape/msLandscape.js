@@ -432,7 +432,7 @@ export default function MsLandscape(data, arg) {
       colorbar: {
         orientation: 'h',
         x: 0.5,
-        y: -0.3,
+        y: xAxisName.length > 250 ? -0.2 : -0.3,
         bordercolor: 'gray',
         tickmode: 'array',
         tickvals: [0.6, 0.7, 0.8, 0.9, 1],
