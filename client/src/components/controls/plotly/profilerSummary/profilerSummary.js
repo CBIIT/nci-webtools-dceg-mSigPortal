@@ -1,9 +1,9 @@
 import { groupBy } from 'lodash';
 
-export default function profilerSummary(rawData) {
-  const maxVal = Math.max(...rawData.map((o) => o.logTotalMutations));
+export default function profilerSummary(inputData) {
+  const maxVal = Math.max(...inputData.map((o) => o.logTotalMutations));
   const groupByProfileMatrix = groupBy(
-    rawData,
+    inputData,
     (e) => `${e.profile}_${e.matrix}`
   );
   console.log(groupByProfileMatrix);
@@ -26,7 +26,7 @@ export default function profilerSummary(rawData) {
   console.log(data);
   // sort samples of other profiles to match the sample order of the profile with the largest mean mutation value
   const topSamples = data[0].samples.map((s) => s.sample);
-  const allSamples = [...new Set(rawData.map((e) => e.sample))].sort(
+  const allSamples = [...new Set(inputData.map((e) => e.sample))].sort(
     (a, b) => topSamples.indexOf(a) - topSamples.indexOf(b)
   );
   const sortedData = data.map((e) => ({
