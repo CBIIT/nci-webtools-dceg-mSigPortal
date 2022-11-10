@@ -826,8 +826,6 @@ exposureUser <- function(args, config) {
 
 # get order of clusters after calculating hierarchy
 hierarchicalClusterOrder <- function(args, config) {
-  source("services/R/Sigvisualfunc.R")
-
   data <- args$data %>%
     select(sample, signatureName, exposure) %>%
     pivot_wider(id_cols = sample, names_from = signatureName, values_from = exposure) %>%
@@ -844,4 +842,55 @@ hierarchicalClusterOrder <- function(args, config) {
   cluster <- factoextra::hcut(mdata, k = clustern, hc_func = "hclust", hc_metric = "euclidean", hc_method = "ward.D2", stand = TRUE)
 
   return(as.list(cluster$labels[cluster$order]))
+}
+
+msLandscape <- function(args, config) {
+  source("services/R/Sigvisualfunc.R")
+
+  exposureData <- args$exposureData %>%
+    select(Sample = sample, Signature_name = signatureName, Exposure = exposure) %>%
+    pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure)
+
+  signatureData <- args$signatureData %>%
+    select(MutationType = mutationType, Signature_name = signatureName, Contribution = contribution) %>%
+    pivot_wider(id_cols = MutationType, names_from = Signature_name, values_from = Contribution) %>%
+    arrange(MutationType) # have to sort the mutationtype
+
+  seqmatrixData <- args$seqmatrixData %>%
+    filter(profile == args$signatureData$profile[1], matrix == args$signatureData$matrix[1]) %>%
+    select(MutationType = mutationType, Sample = sample, Mutations = mutations) %>%
+    pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
+    arrange(MutationType) ## have to sort the mutationtype
+
+  decompsite_input <- calculate_similarities(orignal_genomes = seqmatrixData, signature = signatureData, signature_activaties = exposureData)
+
+  transformExposure <- args$exposureData %>%
+    select(sample, signatureName, exposure) %>%
+    pivot_wider(id_cols = sample, names_from = signatureName, values_from = exposure) %>%
+    select_if(~ !is.numeric(.) || sum(.) > 0) %>%
+    filter(rowAny(across(where(is.numeric), ~ .x > 0)))
+
+  if (!is.data.frame(decompsite_input)) {
+    cosineData <- transformExposure %>%
+      select(sample) %>%
+      mutate(similarity = NA_real_)
+  } else {
+    cosineData <- decompsite_input %>% select(sample = Sample_Names, similarity = Cosine_similarity)
+  }
+
+  # calculate hierarchy
+  transformExposure <- transformExposure %>%
+    select(where(~ is.character(.x) || sum(.x) != 0)) %>%
+    janitor::adorn_percentages("row")
+  mdata <- as.matrix(transformExposure[, -1])
+  rownames(mdata) <- transformExposure$sample
+  clustern <- ifelse(dim(mdata)[1] < 10, 2L, 5)
+  cluster <- factoextra::hcut(mdata, k = clustern, hc_func = "hclust", hc_metric = "euclidean", hc_method = "ward.D2", stand = TRUE)
+
+  # sort according to hierarchy order
+  exposureData <- args$exposureData %>%
+    arrange(factor(sample, levels = cluster$labels[cluster$order])) %>%
+    filter(exposure > 0)
+
+  return(list(cosineData = cosineData, exposureData = exposureData))
 }

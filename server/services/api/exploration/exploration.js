@@ -1,6 +1,11 @@
 const { Router } = require('express');
 const { randomUUID } = require('crypto');
-const { getExposureData, getExposureOptions } = require('../../query');
+const {
+  getExposureData,
+  getExposureOptions,
+  getSignatureData,
+  getSeqmatrixData,
+} = require('../../query');
 const { addBurden } = require('./burden');
 const r = require('r-wrapper').async;
 const path = require('path');
@@ -140,11 +145,75 @@ async function explorationWrapper(req, res, next) {
   }
 }
 
+// query 3 separate tables and return exposure data sorted by clusters and cosine similarity
+async function msLandscape(req, res, next) {
+  logger.debug('/msLandscape: ' + JSON.stringify(req.body));
+  try {
+    const {
+      params_activity,
+      params_spectrum,
+      params_signature,
+      projectID: id,
+    } = req.body;
+
+    const connection = req.app.locals.connection;
+    const columns = '*';
+
+    const exposureData = await getExposureData(
+      connection,
+      params_activity,
+      columns
+    );
+    const signatureData = await getSignatureData(
+      connection,
+      params_signature,
+      columns
+    );
+    const seqmatrixData = await getSeqmatrixData(
+      connection,
+      params_spectrum,
+      columns
+    );
+
+    // console.log(exposureData[0]);
+    // console.log(signatureData[0]);
+    console.log(seqmatrixData[0]);
+    const fn = 'msLandscape';
+    const args = { exposureData, signatureData, seqmatrixData };
+    const projectID = id || randomUUID();
+
+    const savePath = path.join(projectID, 'results', fn, '/');
+    fs.mkdirSync(path.join(rConfig.wd, savePath), { recursive: true });
+
+    const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
+      fn,
+      args,
+      config: {
+        ...rConfig,
+        savePath,
+        projectID,
+      },
+    });
+
+    const { stdout, ...rest } = JSON.parse(wrapper);
+
+    res.json({
+      projectID,
+      stdout,
+      ...rest,
+    });
+  } catch (err) {
+    logger.error(`/msLandscape: An error occured `);
+    next(err);
+  }
+}
+
 const router = Router();
 
 router.get('/mutational_activity', queryExposure);
 router.get('/mutational_activity_options', explorationOptions);
 router.get('/explorationSamples', explorationSamples);
 router.post('/explorationWrapper', explorationWrapper);
+router.post('/msLandscape', msLandscape);
 
 module.exports = { router, queryExposure };
