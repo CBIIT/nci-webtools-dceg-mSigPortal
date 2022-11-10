@@ -14,6 +14,29 @@ const schema = [
       table.index(['profile', 'matrix', 'sample', 'filter']);
     },
   },
+  {
+    name: 'cluster',
+    schema: (table) => {
+      table.increments('id');
+      table.string('sample');
+      table.string('genome');
+      table.string('mutType');
+      table.string('chr');
+      table.integer('start');
+      table.integer('end');
+      table.string('ref');
+      table.string('alt');
+      table.string('mutClass');
+      table.integer('IMDplot');
+      table.integer('group');
+      table.integer('IMD');
+      table.double('VAF/CCF');
+      table.string('subclass');
+    },
+    index: (table) => {
+      table.index(['sample']);
+    },
+  },
 
   {
     name: 'seqmatrixOption',
