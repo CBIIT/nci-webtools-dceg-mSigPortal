@@ -367,6 +367,27 @@ function getPatternData(
   );
 }
 
+function getClusterData(
+  connection,
+  query,
+  columns = '*',
+  limit = 200000,
+  offset = 0,
+  rowMode = 'object',
+  distinct = false
+) {
+  return getData(
+    connection,
+    'cluster',
+    query,
+    columns,
+    limit,
+    offset,
+    rowMode,
+    distinct
+  );
+}
+
 module.exports = {
   getData,
   getAssociationData,
@@ -384,4 +405,5 @@ module.exports = {
   getEtiologyOrganData,
   getPublicationData,
   getPatternData,
+  getClusterData,
 };

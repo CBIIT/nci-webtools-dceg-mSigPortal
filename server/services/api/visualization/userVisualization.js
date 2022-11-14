@@ -131,7 +131,31 @@ async function profilerExtraction(params) {
           const matricesFile = path.join(projectPath, 'matrices.json');
           fs.writeFileSync(matricesFile, JSON.stringify(matrices));
 
-          resolve({ scriptOutput, projectPath, matrices });
+          // parse cluster data if option was used
+          let cluster = [];
+          if (params?.cluster[1] == 'True') {
+            const clusterFile = path.join(
+              projectPath,
+              `results/Cluster/Result/${params.projectID[1]}_clustered_class_All.txt`
+            );
+            const clusterData = fs.existsSync(clusterFile)
+              ? await parseCSV(clusterFile)
+              : [];
+            // filter cluster objects for relevent values and rename keys if needed
+            if (clusterData.length) {
+              cluster = clusterData.map((e) => {
+                const { project, samples, ID, __parsed_extra, ...rest } = e;
+                if (__parsed_extra) logger.debug(__parsed_extra);
+                return { sample: samples, ...rest };
+              });
+            }
+          }
+          resolve({
+            scriptOutput,
+            projectPath,
+            matrices,
+            ...(cluster && { cluster }),
+          });
         } catch (error) {
           logger.error('Error parsing matrix data. ');
           reject({ scriptOutput, error });
@@ -194,14 +218,20 @@ async function userProfilerExtraction(req, res, next) {
 
   try {
     const userId = req.body.projectID[1];
-    const { scriptOutput, projectPath, matrices } = await profilerExtraction(
-      req.body
-    );
+    const {
+      scriptOutput,
+      projectPath,
+      matrices: seqmatrix,
+      cluster,
+    } = await profilerExtraction(req.body);
     const resultsPath = path.join(projectPath, 'results');
-
-    // import matrices into user session table
+    // import data into user session table
     const connection = req.app.locals.sqlite(userId, 'visualization');
-    const importStatus = await importUserSession(connection, matrices, schema);
+    const importStatus = await importUserSession(
+      connection,
+      { seqmatrix, cluster },
+      schema
+    );
     if (!importStatus)
       next(new Error('Failed to import matrix data into database'));
 
