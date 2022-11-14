@@ -826,6 +826,8 @@ exposureUser <- function(args, config) {
 
 # get order of clusters after calculating hierarchy
 hierarchicalClusterOrder <- function(args, config) {
+  source("services/R/Sigvisualfunc.R")
+
   data <- args$data %>%
     select(sample, signatureName, exposure) %>%
     pivot_wider(id_cols = sample, names_from = signatureName, values_from = exposure) %>%

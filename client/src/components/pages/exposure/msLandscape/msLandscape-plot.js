@@ -72,7 +72,6 @@ export default function MsLandscapePlot() {
   return (
     <>
       <Form className="p-3">
-        <LoadingOverlay active={isFetching} />
         <Row className="">
           <Col lg="auto">
             <Group controlId="landscape">
