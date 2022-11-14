@@ -11,7 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolderMinus, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import Plotly from '../../../controls/plotly/plot/plot';
 import { useSelector } from 'react-redux';
-import { useMsLandscapePlotQuery } from './apiSlice';
+import { useMsLandscapePlot2Query } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
 import './plot.scss';
@@ -26,7 +26,8 @@ export default function MsLandscapePlot() {
   //   skip: !params,
   // });
   const [calculationQuery, setCalculationQuery] = useState('');
-  const { data, error, isFetching } = useMsLandscapePlotQuery(
+  // const { data, error, isFetching } = useMsLandscapePlotQuery(
+  const { data, error, isFetching } = useMsLandscapePlot2Query(
     calculationQuery,
     {
       skip: !calculationQuery,
@@ -51,7 +52,7 @@ export default function MsLandscapePlot() {
         strategy: strategy.value,
         signatureSetName: signatureSetName.value,
         cancer: cancer.value,
-        orderByCluster: true,
+        //orderByCluster: true,
       };
       const params_spectrum = {
         study: study.value,

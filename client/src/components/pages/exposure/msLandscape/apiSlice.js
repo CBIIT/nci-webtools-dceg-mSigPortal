@@ -11,7 +11,10 @@ export const msLandscapeApiSlice = explorationApiSlice.injectEndpoints({
       }),
       transformResponse: (data) => {
         const { cosineData, exposureData } = data.output;
-        return true;
+        //return true;
+        console.log(cosineData);
+        console.log(exposureData);
+        return { dataCosine: cosineData, dataExposure: exposureData };
       },
     }),
 
@@ -45,4 +48,5 @@ export const msLandscapeApiSlice = explorationApiSlice.injectEndpoints({
   }),
 });
 
-export const { useMsLandscapePlotQuery } = msLandscapeApiSlice;
+export const { useMsLandscapePlotQuery, useMsLandscapePlot2Query } =
+  msLandscapeApiSlice;

@@ -1,12 +1,12 @@
 import { groupBy } from 'lodash';
 import { First } from 'react-bootstrap/esm/PageItem';
 
-export default function MsLandscape(data, arg) {
-  console.log(data);
-  console.log(arg);
-  const rawDataActivity = data[0]['data']; //exposure data
-  const rawDataSignature = data[1]['data']; //signature data
-  const rawDataSpectrum = data[2]['data']; //seqmatrix data
+export default function MsLandscape(cosineData, exposureData) {
+  console.log(cosineData);
+  console.log(exposureData);
+  const rawDataActivity = cosineData[0]['data']; //exposure data
+  const rawDataSignature = cosineData[1]['data']; //signature data
+  const rawDataSpectrum = cosineData[2]['data']; //seqmatrix data
   console.log('activity/exposure data');
   console.log(rawDataActivity);
   console.log('signature data');
@@ -537,7 +537,7 @@ export default function MsLandscape(data, arg) {
     yaxis: { title: 'Signature contribution', domain: [0, 0.47] },
     yaxis2: {
       title: '',
-      domain: [0.47, 0.51],
+      domain: [0.49, 0.5],
       showticklabels: false,
       ticks: '',
     },
