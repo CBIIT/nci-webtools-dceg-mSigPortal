@@ -132,21 +132,23 @@ async function profilerExtraction(params) {
           fs.writeFileSync(matricesFile, JSON.stringify(matrices));
 
           // parse cluster data if option was used
-          let cluster = false;
-          if (params?.cluster[1]) {
+          let cluster = [];
+          if (params?.cluster[1] == 'True') {
             const clusterFile = path.join(
               projectPath,
               `results/Cluster/Result/${params.projectID[1]}_clustered_class_All.txt`
             );
             const clusterData = fs.existsSync(clusterFile)
               ? await parseCSV(clusterFile)
-              : false;
+              : [];
             // filter cluster objects for relevent values and rename keys if needed
-            cluster = clusterData.map((e) => {
-              const { project, samples, ID, __parsed_extra, ...rest } = e;
-              if (__parsed_extra) logger.debug(__parsed_extra);
-              return { sample: samples, ...rest };
-            });
+            if (clusterData.length) {
+              cluster = clusterData.map((e) => {
+                const { project, samples, ID, __parsed_extra, ...rest } = e;
+                if (__parsed_extra) logger.debug(__parsed_extra);
+                return { sample: samples, ...rest };
+              });
+            }
           }
           resolve({
             scriptOutput,
