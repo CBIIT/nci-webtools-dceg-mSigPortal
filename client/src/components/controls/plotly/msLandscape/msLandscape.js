@@ -460,7 +460,7 @@ export default function MsLandscape(cosineData, exposureData) {
 
   const sortSignatureName = (sourceArray) => {
     const sortByLocation = (a, b) =>
-      b.signatureName.localeCompare(a.signatureName, 'en', { numeric: true });
+      a.signatureName.localeCompare(b.signatureName, 'en', { numeric: true });
     return sourceArray.sort(sortByLocation);
   };
 
@@ -496,28 +496,26 @@ export default function MsLandscape(cosineData, exposureData) {
   );
   console.log(dataSignature);
 
-  const traces1 = Object.entries(groupBySignatureName_exposure).map(
-    ([key, value]) => ({
+  const traces1 = Object.entries(groupBySignatureName_exposure)
+    .reverse()
+    .map(([key, value]) => ({
       key: key,
       value: value,
       map: barCharColor.map((e) => e),
       co: barCharColor.map((e) => e.replace(/^\D*/, '')),
+      //showlegend: true,
       name: key,
       type: 'bar',
-
-      x: value.filter((obj) => obj.exposure !== 0).map((e) => e.sample),
-      y: value
-        .filter((obj) => obj.exposure !== 0)
-        .map((e, i) => e.exposure / dataSignature[i].total),
-      total: value.reduce((a, e) => a + parseInt(e.exposure), 0),
+      x: value.map((e) => e.sample),
+      y: value.map((e, i) => e.exposure / dataSignature[i].total),
+      total: value.map((e, i) => dataSignature[i].total),
       marker: {
         color: colors[key.replace(/^\D*/, '')],
       },
       showlegend: false,
       test: value.map((d, i) => d.exposure / dataSignature[i].total),
       expo: value.map((e, i) => e.exposure),
-    })
-  );
+    }));
   console.log(traces1);
   const traces2 = [
     {
@@ -551,7 +549,7 @@ export default function MsLandscape(cosineData, exposureData) {
   ];
   console.log(traces2);
   const traces3 = Object.entries(groupBySignatureName_exposure)
-    // .reverse()
+    .reverse()
     .map(([key, value]) => ({
       key: key,
       value: value,
@@ -634,7 +632,7 @@ export default function MsLandscape(cosineData, exposureData) {
     yaxis: { title: 'Signature contribution', domain: [0, 0.47] },
     yaxis2: {
       title: '',
-      domain: [0.49, 0.5],
+      domain: [0.485, 0.5],
       showticklabels: false,
       ticks: '',
     },
