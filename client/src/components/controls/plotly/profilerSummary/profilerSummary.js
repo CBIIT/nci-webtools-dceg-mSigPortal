@@ -6,7 +6,7 @@ export default function profilerSummary(inputData) {
     inputData,
     (e) => `${e.profile}_${e.matrix}`
   );
-  console.log(groupByProfileMatrix);
+
   const data = Object.values(groupByProfileMatrix)
     .map((samples) => {
       return {
@@ -23,7 +23,6 @@ export default function profilerSummary(inputData) {
     })
     .sort((a, b) => b.mean - a.mean);
 
-  console.log(data);
   // sort samples of other profiles to match the sample order of the profile with the largest mean mutation value
   const topSamples = data[0].samples.map((s) => s.sample);
   const allSamples = [...new Set(inputData.map((e) => e.sample))].sort(

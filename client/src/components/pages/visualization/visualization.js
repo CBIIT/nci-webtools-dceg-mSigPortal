@@ -17,7 +17,7 @@ import MutationalPattern2 from './mutationalPattern2/mutationalPattern';
 import ProfileComparison from './profileComparison2/profileComparison';
 import PCA from './pca';
 import PCA2 from './pca/pca';
-import Kataegis from './kataegis';
+import ClusteredIdentification from './clustered/clustered';
 import Download from './download';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
@@ -379,10 +379,10 @@ export default function Visualization({ match }) {
           <PCA2 />
         ),
     },
-    {
-      name: 'Kataegis Identification',
-      id: 'kataegisIdentification',
-      component: <Kataegis submitR={(fn, args) => submitR(fn, args)} />,
+    source == 'user' && {
+      name: 'Clustered Mutations Identification',
+      id: 'cluster',
+      component: <ClusteredIdentification />,
     },
     {
       name: 'Download',
@@ -398,33 +398,35 @@ export default function Visualization({ match }) {
           {/* for desktops and tablets */}
           <div className="d-none d-md-block">
             <Nav defaultActiveKey="profilerSummary">
-              {tabs.map(({ name, id }) => (
-                <div key={id} className="d-inline-block">
-                  <Button
-                    variant="link"
-                    className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
-                      id == displayTab ? 'active-secondary-navlinks' : ''
-                    }`}
-                    active={id == displayTab}
-                    disabled={
-                      id != 'instructions' &&
-                      !(source == 'public'
-                        ? matrixData.length
-                        : matrixList.length)
-                    }
-                    style={{
-                      textDecoration: 'none',
-                      fontSize: '12pt',
-                      color: 'black',
-                      fontWeight: '500',
-                    }}
-                    onClick={() => mergeState({ displayTab: id })}
-                  >
-                    {name}
-                  </Button>
-                  <div className="d-md-none w-100"></div>
-                </div>
-              ))}
+              {tabs
+                .filter((e) => e)
+                .map(({ name, id }) => (
+                  <div key={id} className="d-inline-block">
+                    <Button
+                      variant="link"
+                      className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
+                        id == displayTab ? 'active-secondary-navlinks' : ''
+                      }`}
+                      active={id == displayTab}
+                      disabled={
+                        id != 'instructions' &&
+                        !(source == 'public'
+                          ? matrixData.length
+                          : matrixList.length)
+                      }
+                      style={{
+                        textDecoration: 'none',
+                        fontSize: '12pt',
+                        color: 'black',
+                        fontWeight: '500',
+                      }}
+                      onClick={() => mergeState({ displayTab: id })}
+                    >
+                      {name}
+                    </Button>
+                    <div className="d-md-none w-100"></div>
+                  </div>
+                ))}
             </Nav>
           </div>
           {/* for mobile devices */}
