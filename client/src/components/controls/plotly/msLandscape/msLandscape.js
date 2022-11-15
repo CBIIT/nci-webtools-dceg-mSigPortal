@@ -458,21 +458,24 @@ export default function MsLandscape(cosineData, exposureData) {
   //   }));
   // console.log(traces3);
 
-  const groupBySignatureName_exposure = groupBy(exposureData, 'signatureName');
+  const sortSignatureName = (sourceArray) => {
+    const sortByLocation = (a, b) =>
+      b.signatureName.localeCompare(a.signatureName, 'en', { numeric: true });
+    return sourceArray.sort(sortByLocation);
+  };
+
+  const groupBySignatureName_exposure = groupBy(
+    sortSignatureName(exposureData),
+    'signatureName'
+  );
   console.log(groupBySignatureName_exposure);
-
-  const xAxisName = Object.values(groupBySignatureName_exposure)[0]
-    .map((e) => ({
-      sample: e.sample,
-    }))
-    .flat();
-  console.log(xAxisName.map((e) => e));
-
-  const xAxis = xAxisName.map((e) => e.sample);
-  console.log(xAxis);
 
   const groupBySample_exposure = groupBy(exposureData, 'sample');
   console.log(groupBySample_exposure);
+
+  const xAxis = Object.keys(groupBySample_exposure).flat();
+
+  console.log(xAxis);
 
   cosineData.sort((a, b) => xAxis.indexOf(a.sample) - xAxis.indexOf(b.sample));
   console.log(cosineData);
@@ -482,9 +485,9 @@ export default function MsLandscape(cosineData, exposureData) {
 
   const dataSignature = Object.entries(groupBySample_exposure).map(
     ([key, value]) => ({
-      signatureName: key,
+      sample: key,
       total: value.reduce((a, e) => a + parseInt(e.exposure), 0),
-      sample: value.map((e) => e.sample),
+      signatureName: value.map((e) => e.signatureName),
       exposure: value.map((e) => e.exposure),
       exposureNorm: value.map(
         (e) => e.exposure / value.reduce((a, e) => a + parseInt(e.exposure), 0)
@@ -501,12 +504,12 @@ export default function MsLandscape(cosineData, exposureData) {
       co: barCharColor.map((e) => e.replace(/^\D*/, '')),
       name: key,
       type: 'bar',
-      x: value.map((e) => e.sample),
-      y: value.map(
-        (e, i) =>
-          e.exposure / value.reduce((a, e) => a + parseInt(e.exposure), 0)
-      ),
-      total: value.map((e, i) => dataSignature[i].total),
+
+      x: value.filter((obj) => obj.exposure !== 0).map((e) => e.sample),
+      y: value
+        .filter((obj) => obj.exposure !== 0)
+        .map((e, i) => e.exposure / dataSignature[i].total),
+      total: value.reduce((a, e) => a + parseInt(e.exposure), 0),
       marker: {
         color: colors[key.replace(/^\D*/, '')],
       },
@@ -530,7 +533,7 @@ export default function MsLandscape(cosineData, exposureData) {
       colorbar: {
         orientation: 'h',
         x: 0.5,
-        y: xAxisName.length > 250 ? -0.2 : -0.3,
+        y: xAxis.length > 250 ? -0.2 : -0.3,
         bordercolor: 'gray',
         tickmode: 'array',
         tickvals: [0.6, 0.7, 0.8, 0.9, 1],
@@ -577,10 +580,7 @@ export default function MsLandscape(cosineData, exposureData) {
   const traces = [...traces3, ...traces2, ...traces1];
   console.log(traces);
 
-  const longest = xAxisName.reduce(
-    (a, e) => (a > e.sample.length ? a : e.sample.length),
-    0
-  );
+  const longest = xAxis.reduce((a, e) => (a > e.length ? a : e.length), 0);
   const extraMargin =
     longest > 0 && longest < 10 ? -0.157 : (longest * -0.027) / 2;
   console.log(longest);
@@ -588,7 +588,7 @@ export default function MsLandscape(cosineData, exposureData) {
 
   const text = {
     x: 0,
-    y: xAxisName.length > 250 ? -0.03 : extraMargin,
+    y: xAxis.length > 250 ? -0.03 : extraMargin,
 
     xanchor: 'left',
     yanchor: 'bottom',
@@ -619,17 +619,17 @@ export default function MsLandscape(cosineData, exposureData) {
       //title: { text: 'Signatures Name<br>' },
       traceorder: 'reversed',
       x: 0,
-      y: xAxisName.length > 250 ? -0.03 : extraMargin,
+      y: xAxis.length > 250 ? -0.03 : extraMargin,
     },
 
     xaxis: {
       tickmode: 'array',
-      tickvals: xAxisName.map((_, i) => i),
-      ticktext: xAxisName.map((e) => e.sample),
+      tickvals: xAxis.map((_, i) => i),
+      ticktext: xAxis.map((e) => e),
       type: 'category',
       tickangle: -90,
       ticks: '',
-      showticklabels: xAxisName.length > 250 ? false : true,
+      showticklabels: xAxis.length > 250 ? false : true,
     },
     yaxis: { title: 'Signature contribution', domain: [0, 0.47] },
     yaxis2: {
