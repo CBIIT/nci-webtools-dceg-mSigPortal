@@ -503,7 +503,6 @@ export default function MsLandscape(cosineData, exposureData) {
       value: value,
       map: barCharColor.map((e) => e),
       co: barCharColor.map((e) => e.replace(/^\D*/, '')),
-      //showlegend: true,
       name: key,
       type: 'bar',
       x: value.map((e) => e.sample),
@@ -513,8 +512,7 @@ export default function MsLandscape(cosineData, exposureData) {
         color: colors[key.replace(/^\D*/, '')],
       },
       showlegend: false,
-      test: value.map((d, i) => d.exposure / dataSignature[i].total),
-      expo: value.map((e, i) => e.exposure),
+      exposure: value.map((e, i) => e.exposure),
     }));
   console.log(traces1);
   const traces2 = [
