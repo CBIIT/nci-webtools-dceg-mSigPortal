@@ -14,37 +14,37 @@ export const msLandscapeApiSlice = explorationApiSlice.injectEndpoints({
         //return true;
         console.log(cosineData);
         console.log(exposureData);
-        return { dataCosine: cosineData, dataExposure: exposureData };
+        return MsLandscape(cosineData, exposureData);
       },
     }),
 
-    msLandscapePlot: builder.query({
-      async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
-        try {
-          const res = await Promise.all([
-            fetchWithBQ(
-              '/mutational_activity?' +
-                new URLSearchParams(_arg.params_activity)
-            ), //exposure
-            fetchWithBQ(
-              '/mutational_signature?' +
-                new URLSearchParams(_arg.params_signature)
-            ), //signature
-            fetchWithBQ(
-              '/mutational_spectrum?' +
-                new URLSearchParams(_arg.params_spectrum)
-            ), //seqmatrix
-          ]);
+    // msLandscapePlot: builder.query({
+    //   async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
+    //     try {
+    //       const res = await Promise.all([
+    //         fetchWithBQ(
+    //           '/mutational_activity?' +
+    //             new URLSearchParams(_arg.params_activity)
+    //         ), //exposure
+    //         fetchWithBQ(
+    //           '/mutational_signature?' +
+    //             new URLSearchParams(_arg.params_signature)
+    //         ), //signature
+    //         fetchWithBQ(
+    //           '/mutational_spectrum?' +
+    //             new URLSearchParams(_arg.params_spectrum)
+    //         ), //seqmatrix
+    //       ]);
 
-          console.log(res);
-          console.log(_arg);
-          //return MsLandscape(res, _arg);
-          return { data: MsLandscape(res, _arg) };
-        } catch (error) {
-          return { error };
-        }
-      },
-    }),
+    //       console.log(res);
+    //       console.log(_arg);
+    //       //return MsLandscape(res, _arg);
+    //       return { data: MsLandscape(res, _arg) };
+    //     } catch (error) {
+    //       return { error };
+    //     }
+    //   },
+    // }),
   }),
 });
 
