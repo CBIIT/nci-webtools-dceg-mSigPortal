@@ -19,6 +19,7 @@ const schema = [
     schema: (table) => {
       table.increments('id');
       table.string('sample');
+      table.string('geneId');
       table.string('genome');
       table.string('mutType');
       table.string('chr');

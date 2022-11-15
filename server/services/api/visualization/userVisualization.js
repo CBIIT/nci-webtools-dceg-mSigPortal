@@ -145,8 +145,7 @@ async function profilerExtraction(params) {
             if (clusterData.length) {
               cluster = clusterData.map((e) => {
                 const { project, samples, ID, __parsed_extra, ...rest } = e;
-                if (__parsed_extra) logger.debug(__parsed_extra);
-                return { sample: samples, ...rest };
+                return { sample: samples, geneId: ID, ...rest };
               });
             }
           }
