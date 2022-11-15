@@ -183,7 +183,7 @@ export default function Table({
                 variant="secondary"
                 size="sm"
                 id={`toggle-umap-columns`}
-                className="mr-1"
+                className="mr-1 mb-3"
               >
                 Columns
               </Dropdown.Toggle>

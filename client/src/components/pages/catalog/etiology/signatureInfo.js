@@ -508,7 +508,7 @@ export default function SignatureInfo({ data }) {
                   </Row>
                   {organTable?.data ? (
                     <Table
-                      className="border mt-3"
+                      className="border"
                       data={organTable.data.filter((e) =>
                         cohort ? e.cohort == cohort : true
                       )}
