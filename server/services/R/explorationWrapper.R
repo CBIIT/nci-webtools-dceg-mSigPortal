@@ -893,6 +893,8 @@ msLandscape <- function(args, config) {
   exposureData <- args$exposureData %>%
     arrange(factor(sample, levels = cluster$labels[cluster$order])) %>%
     filter(exposure > 0)
+  cosineData <- cosineData %>%
+    arrange(factor(sample, levels = cluster$labels[cluster$order]))
 
   return(list(cosineData = cosineData, exposureData = exposureData))
 }
