@@ -824,28 +824,6 @@ exposureUser <- function(args, config) {
   return(c(output, errors))
 }
 
-# get order of clusters after calculating hierarchy
-hierarchicalClusterOrder <- function(args, config) {
-  source("services/R/Sigvisualfunc.R")
-
-  data <- args$data %>%
-    select(sample, signatureName, exposure) %>%
-    pivot_wider(id_cols = sample, names_from = signatureName, values_from = exposure) %>%
-    select_if(~ !is.numeric(.) || sum(.) > 0) %>%
-    filter(rowAny(across(where(is.numeric), ~ .x > 0))) %>%
-    select(where(~ is.character(.x) || sum(.x) != 0)) %>%
-    janitor::adorn_percentages("row")
-
-  mdata <- as.matrix(data[, -1])
-  rownames(mdata) <- data$sample
-
-  clustern <- ifelse(dim(mdata)[1] < 10, 2L, 5)
-
-  cluster <- factoextra::hcut(mdata, k = clustern, hc_func = "hclust", hc_metric = "euclidean", hc_method = "ward.D2", stand = TRUE)
-
-  return(as.list(cluster$labels[cluster$order]))
-}
-
 msLandscape <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
 

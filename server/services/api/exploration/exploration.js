@@ -43,30 +43,7 @@ async function queryExposure(req, res, next) {
       offset
     );
 
-    if (orderByCluster) {
-      try {
-        const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
-          fn: 'hierarchicalClusterOrder',
-          args: { data },
-          config: { ...rConfig },
-        });
-
-        const { output: sampleClusterOrder } = JSON.parse(wrapper);
-
-        const orderedData = data.sort(
-          (a, b) =>
-            sampleClusterOrder.indexOf(a.sample) -
-            sampleClusterOrder.indexOf(b.sample)
-        );
-
-        res.json(addBurden(orderedData));
-      } catch (err) {
-        logger.error(`An error while calculating clusters`);
-        next(err);
-      }
-    } else {
-      res.json(addBurden(data));
-    }
+    res.json(addBurden(data));
   } catch (error) {
     next(error);
   }
