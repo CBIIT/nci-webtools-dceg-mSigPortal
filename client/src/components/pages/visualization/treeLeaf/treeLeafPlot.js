@@ -21,13 +21,15 @@ export default function D3TreeLeaf({ width = 1000, height = 1000, ...props }) {
 
   useEffect(() => {
     if (plotRef.current && hierarchy) {
-      const [plot, colorLegend, mutationsLegend] = createRadialTree(
+      console.log({hierarchy})
+      const [plot, colorLegend, mutationsLegend] = createForceDirectedTree(
         hierarchy,
         groupAttributesBySample,
         form,
         {
           width,
           height,
+          radius: Math.min(width, height) / 2,
         }
       );
 
@@ -45,6 +47,283 @@ export default function D3TreeLeaf({ width = 1000, height = 1000, ...props }) {
     </div>
   );
 }
+
+// Copyright 2022 Observable, Inc.
+// Released under the ISC license.
+// https://observablehq.com/@d3/force-directed-tree
+function createForceDirectedTree(
+  data,
+  attributes,
+  form,
+  {
+    children, // if hierarchical data, given a d in data, returns its children
+    tree = d3.tree, // layout algorithm (typically d3.tree or d3.cluster)
+    separation = (a, b) => (a.parent == b.parent ? 1 : 1) / a.depth,
+    sort, // how to sort nodes prior to layout (e.g., (a, b) => d3.descending(a.height, b.height))
+    label = (d) => d.name, // given a node d, returns the display name
+    title, // given a node d, returns its hover text
+    width = 640, // outer width, in pixels
+    height = 400, // outer height, in pixels
+    margin = 0, // shorthand for margins
+    marginTop = margin, // top margin, in pixels
+    marginRight = margin, // right margin, in pixels
+    marginBottom = margin, // bottom margin, in pixels
+    marginLeft = margin, // left margin, in pixels
+    radius = Math.min(
+      width - marginLeft - marginRight,
+      height - marginTop - marginBottom
+    ) / 2, // outer radius
+    r = d3.scaleSqrt().range([5, 20]), // radius of nodes
+    padding = 1, // horizontal padding for first and last column
+    fill = form.color.continuous
+      ? d3.scaleSequential(d3.interpolateViridis)
+      : d3.scaleOrdinal(d3.schemeCategory10), // fill for nodes
+    fillOpacity, // fill opacity for nodes
+    stroke = '#555', // stroke for links
+    strokeWidth = 1.5, // stroke width for links
+    strokeOpacity = 0.4, // stroke opacity for links
+    strokeLinejoin, // stroke line join for links
+    strokeLinecap, // stroke line cap for links
+    halo = '#fff', // color of label halo
+    haloWidth = 3, // padding around the labels
+    scale = 1,
+  }
+) {
+  // gather range of attributes
+  const mutations = Object.values(attributes).map((e) => e.Mutations);
+  const mutationMin = d3.min(mutations);
+  const mutationMax = d3.max(mutations);
+
+  const colorValues = Object.values(attributes).map((e) => e[form.color.value]);
+  const colorMin = d3.min(colorValues);
+  const colorMax = d3.max(colorValues);
+  const colorFill = form.color.continuous
+    ? fill.domain([colorMin, colorMax])
+    : fill.domain(colorValues);
+
+  const treeData = d3.hierarchy(data, children);
+
+  // Sort the nodes.
+  if (sort != null) treeData.sort(sort);
+
+  // Compute the layout.
+  const root = d3.tree()
+    .size([2 * Math.PI, radius])
+    .separation(separation)(treeData);
+
+  treeData.each(d => {
+    let angle = d.x;
+    let distance = d.y;
+    d.x = distance * Math.cos(angle) * scale;
+    d.y = distance * Math.sin(angle) * scale;
+  });
+
+  // Compute labels and titles.
+  const nodes = root.descendants();
+  const links = root.links();
+  console.log(nodes, links);
+
+  const simulation = d3
+    .forceSimulation(nodes)
+    .force(
+      "link",
+      d3
+        .forceLink(links)
+        .id((d) => d.id)
+        .distance(1)
+        .strength(1)
+    )
+    .force("charge", d3.forceManyBody().strength(-5))
+    // .force("center", d3.forceCenter().strength(1))
+    .force("x", d3.forceX().strength(0.05))
+    .force("y", d3.forceY().strength(0.05))
+      .force('collision', d3.forceCollide().radius(({ data, children }) =>
+        !children && data.name && attributes[data.name]
+          ? r.domain([mutationMin, mutationMax])(attributes[data.name].Mutations)
+          : 0
+        ))
+
+  const zoom = d3
+    .zoom()
+    .scaleExtent([1, 10])
+    .on('zoom', zoomed)
+    .on('end', rescale);
+
+  function zoomed({ transform }) {
+    d3.selectAll('#plot').attr('transform', transform);
+  }
+
+  function rescale({ transform }) {
+    node
+      .select('circle')
+      .attr('r', ({ data }) =>
+        data.name && attributes[data.name]
+          ? r.domain([mutationMin, mutationMax])(
+              attributes[data.name].Mutations
+            ) / transform.k
+          : null
+      )
+      .attr('stroke-width', strokeWidth / transform.k);
+
+    node.select('text').attr('font-size', `${0.75 / transform.k}rem`);
+
+    link.attr('stroke-width', strokeWidth / transform.k);
+  }
+
+  const container = d3.create('div');
+  const svg = container
+    .append('svg')
+    .attr('viewBox', [-marginLeft - radius, -marginTop - radius, width, height])
+    .attr('width', width)
+    .attr('height', height)
+    .attr('style', 'max-width: 100%; height: auto; height: intrinsic;')
+    .attr('font-family', 'sans-serif')
+    .attr('font-size', 10)
+    // .call(zoom);
+
+  // add lines
+  const link = svg
+    .append('g')
+    .attr('id', 'plot')
+    .attr('fill', 'none')
+    .attr('stroke', stroke)
+    .attr('stroke-opacity', strokeOpacity)
+    .attr('stroke-linecap', strokeLinecap)
+    .attr('stroke-linejoin', strokeLinejoin)
+    .attr('stroke-width', strokeWidth)
+    .selectAll('path')
+    .data(links)
+    .join('line')
+    .attr("x1", (d) => d.source.x)
+    .attr("y1", (d) => d.source.y)
+    .attr("x2", (d) => d.target.x)
+    .attr("y2", (d) => d.target.y);
+
+
+  const node = svg.append("g")
+    .attr("fill", "#fff")
+    .attr("stroke", "#000")
+    .attr("stroke-width", 1.5)
+  .selectAll("circle")
+  .data(nodes)
+  .join("circle")
+    .attr('fill', ({ data }) =>
+      data.name && attributes[data.name]
+        ? colorFill(attributes[data.name][form.color.value])
+        : stroke
+    )
+    .attr('stroke', stroke)
+    .attr('stroke-width', strokeWidth)
+    .attr('r', ({ data, children }) =>
+      !children && data.name && attributes[data.name]
+        ? r.domain([mutationMin, mutationMax])(attributes[data.name].Mutations)
+        : 0
+    )
+    .attr("cx", (d) => d.x)
+    .attr("cy", (d) => d.y)
+    .on('mouseover', mouseover)
+    .on('mousemove', mousemove)
+    .on('mouseleave', mouseleave)
+    .call(drag(simulation));    
+
+    simulation.on("tick", () => {
+      link
+          .attr("x1", d => d.source.x)
+          .attr("y1", d => d.source.y)
+          .attr("x2", d => d.target.x)
+          .attr("y2", d => d.target.y);
+  
+      node
+          .attr("cx", d => d.x)
+          .attr("cy", d => d.y);
+    });
+
+  if (form.showLabels) {
+    node
+      .append('text')
+      .attr('transform', (d) => `rotate(${d.x >= Math.PI ? 180 : 0})`)
+      .attr('dy', '0.32em')
+      .attr('x', (d) => (d.x < Math.PI === !d.children ? 6 : -6))
+      .attr('text-anchor', (d) =>
+        d.x < Math.PI === !d.children ? 'start' : 'end'
+      )
+      .attr('paint-order', 'stroke')
+      // .attr('stroke', halo)
+      .attr('stroke-width', haloWidth)
+      .attr('font-size', '.75rem')
+      .text((d, i) => d.data.name);
+  }
+
+  if (title != null) node.append('title').text((d) => title(d.data, d));
+
+  // add tooltips
+  const tooltip = container
+    .append('div')
+    .style('position', 'absolute')
+    .style('visibility', 'hidden')
+    .attr('class', 'bg-light border rounded p-1');
+
+  function mouseover() {
+    tooltip.style('visibility', 'visible');
+  }
+
+  function mouseleave() {
+    tooltip.style('visibility', 'hidden');
+  }
+
+  function mousemove(e, d) {
+    const sample = d.data.name;
+    const data = attributes[sample];
+    console.log(data);
+    const content = (
+      <div className="text-start">
+        <div>Sample: {sample}</div>
+        <div>Cancer Type: {data.Cancer_Type}</div>
+        <div>Cosine Similarity: {data.Cosine_similarity}</div>
+        <div>Mutations: {data.Mutations}</div>
+      </div>
+    );
+    tooltip
+      .html(renderToStaticMarkup(content))
+      // .html('Sample: ' + sample || 'none')
+      .style('left', e.pageX - 30 + 'px')
+      .style('top', e.pageY - 320 + 'px');
+  }
+
+  function drag(simulation) {
+  
+    function dragstarted(event, d) {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    }
+    
+    function dragged(event, d) {
+      d.fx = event.x;
+      d.fy = event.y;
+    }
+    
+    function dragended(event, d) {
+      if (!event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    }
+    
+    return d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended);
+  }
+
+  const colorLegend = form.color.continuous
+    ? ContinuousLegend(colorFill, {
+        title: form.color.label,
+      })
+    : CategoricalLegned(colorFill);
+
+  return [container.node(), colorLegend];
+}
+
 
 // Copyright 2022 Observable, Inc.
 // Released under the ISC license.
@@ -149,7 +428,7 @@ function createRadialTree(
     .attr('style', 'max-width: 100%; height: auto; height: intrinsic;')
     .attr('font-family', 'sans-serif')
     .attr('font-size', 10)
-    .call(zoom);
+    // .call(zoom);
 
   // add lines
   const link = svg

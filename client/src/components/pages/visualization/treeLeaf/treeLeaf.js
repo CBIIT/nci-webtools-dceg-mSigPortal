@@ -23,7 +23,7 @@ export default function TreeAndLeaf(props) {
       >
         <Suspense fallback={<Loader message="Loading Plot" />}>
           <TreeLeafForm />
-          <D3TreeLeaf width={1500} height={1500} />
+          <D3TreeLeaf width={2000} height={2000} />
         </Suspense>
       </ErrorBoundary>
     </Container>
