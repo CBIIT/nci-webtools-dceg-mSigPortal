@@ -162,7 +162,7 @@ function createForceDirectedTree(
     .attr('viewBox', [-marginLeft - radius, -marginTop - radius, width, height])
     .attr('width', width)
     .attr('height', height)
-    .attr('style', 'max-width: 100%; height: auto; height: intrinsic;')
+    .attr('style', 'max-width: 100%; height: auto; height: intrinsic; width: 100%;')
     .attr('font-family', 'sans-serif')
     .attr('font-size', 10)
     .call(zoom);
