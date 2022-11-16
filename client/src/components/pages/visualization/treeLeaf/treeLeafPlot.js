@@ -86,7 +86,8 @@ function createForceDirectedTree(
     strokeLinecap, // stroke line cap for links
     halo = '#fff', // color of label halo
     haloWidth = 3, // padding around the labels
-    scale = 1,
+    scale = 2,
+    highlightQuery = null,
   }
 ) {
   // gather range of attributes
@@ -106,6 +107,8 @@ function createForceDirectedTree(
   // Sort the nodes.
   if (sort != null) treeData.sort(sort);
 
+  separation = (a, b) => (a.parent == b.parent ? 1 : 2) / a.depth;
+
   // Compute the layout.
   const root = d3.tree()
     .size([2 * Math.PI, radius])
@@ -123,6 +126,12 @@ function createForceDirectedTree(
   const links = root.links();
   console.log(nodes, links);
 
+  const nodeRadius = ({ data, children }) =>
+  !children && data.name && attributes[data.name]
+    ? r.domain([mutationMin, mutationMax])(attributes[data.name].Mutations)
+    : 0;
+
+
   const simulation = d3
     .forceSimulation(nodes)
     .force(
@@ -133,58 +142,35 @@ function createForceDirectedTree(
         .distance(1)
         .strength(1)
     )
-    .force("charge", d3.forceManyBody().strength(-5))
+    .force("charge", d3.forceManyBody().strength(d => { return d.children ? -15 : 15 }))
     // .force("center", d3.forceCenter().strength(1))
-    .force("x", d3.forceX().strength(0.05))
-    .force("y", d3.forceY().strength(0.05))
-      .force('collision', d3.forceCollide().radius(({ data, children }) =>
-        !children && data.name && attributes[data.name]
-          ? r.domain([mutationMin, mutationMax])(attributes[data.name].Mutations)
-          : 0
-        ))
+    .force("x", d3.forceX().strength(0.005))
+    .force("y", d3.forceY().strength(0.005))
+    .force('collision', d3.forceCollide().radius(nodeRadius))
+
+  // simulation.stop();
+  // simulation.tick(10);
 
   const zoom = d3
     .zoom()
-    .scaleExtent([1, 10])
     .on('zoom', zoomed)
-    .on('end', rescale);
-
-  function zoomed({ transform }) {
-    d3.selectAll('#plot').attr('transform', transform);
-  }
-
-  function rescale({ transform }) {
-    node
-      .select('circle')
-      .attr('r', ({ data }) =>
-        data.name && attributes[data.name]
-          ? r.domain([mutationMin, mutationMax])(
-              attributes[data.name].Mutations
-            ) / transform.k
-          : null
-      )
-      .attr('stroke-width', strokeWidth / transform.k);
-
-    node.select('text').attr('font-size', `${0.75 / transform.k}rem`);
-
-    link.attr('stroke-width', strokeWidth / transform.k);
-  }
 
   const container = d3.create('div');
   const svg = container
     .append('svg')
+    .attr('id', 'plot')
     .attr('viewBox', [-marginLeft - radius, -marginTop - radius, width, height])
     .attr('width', width)
     .attr('height', height)
     .attr('style', 'max-width: 100%; height: auto; height: intrinsic;')
     .attr('font-family', 'sans-serif')
     .attr('font-size', 10)
-    // .call(zoom);
+    .call(zoom);
 
   // add lines
   const link = svg
     .append('g')
-    .attr('id', 'plot')
+    .attr('id', 'links')
     .attr('fill', 'none')
     .attr('stroke', stroke)
     .attr('stroke-opacity', strokeOpacity)
@@ -198,33 +184,48 @@ function createForceDirectedTree(
     .attr("y1", (d) => d.source.y)
     .attr("x2", (d) => d.target.x)
     .attr("y2", (d) => d.target.y);
+  
+  const searchValues = form.searchSamples?.map(s => s.value) || [];
+  const highlightedColor = 'yellow';
 
+  function getNodeColor({ data }) {
+    if (data.name && searchValues.includes(data.name[0])) {
+      return highlightedColor;
+    }
 
-  const node = svg.append("g")
+    return data.name && attributes[data.name]
+      ? colorFill(attributes[data.name][form.color.value])
+      : stroke
+  }
+
+  function getNodeOpacity({ data }) {
+    if (!searchValues?.length || (data.name && searchValues.includes(data.name[0]))) {
+      return 1;
+    }
+
+    return 0.8;
+  }
+
+  const node = svg
+    .append("g")
+    .attr('id', 'nodes')
     .attr("fill", "#fff")
     .attr("stroke", "#000")
     .attr("stroke-width", 1.5)
   .selectAll("circle")
   .data(nodes)
   .join("circle")
-    .attr('fill', ({ data }) =>
-      data.name && attributes[data.name]
-        ? colorFill(attributes[data.name][form.color.value])
-        : stroke
-    )
+    .attr('id', d => d.data.name[0])
+    .attr('fill', getNodeColor)
+    .attr('opacity', getNodeOpacity)
     .attr('stroke', stroke)
     .attr('stroke-width', strokeWidth)
-    .attr('r', ({ data, children }) =>
-      !children && data.name && attributes[data.name]
-        ? r.domain([mutationMin, mutationMax])(attributes[data.name].Mutations)
-        : 0
-    )
+    .attr('r', nodeRadius)
     .attr("cx", (d) => d.x)
     .attr("cy", (d) => d.y)
     .on('mouseover', mouseover)
     .on('mousemove', mousemove)
     .on('mouseleave', mouseleave)
-    .call(drag(simulation));    
 
     simulation.on("tick", () => {
       link
@@ -238,23 +239,11 @@ function createForceDirectedTree(
           .attr("cy", d => d.y);
     });
 
-  if (form.showLabels) {
-    node
-      .append('text')
-      .attr('transform', (d) => `rotate(${d.x >= Math.PI ? 180 : 0})`)
-      .attr('dy', '0.32em')
-      .attr('x', (d) => (d.x < Math.PI === !d.children ? 6 : -6))
-      .attr('text-anchor', (d) =>
-        d.x < Math.PI === !d.children ? 'start' : 'end'
-      )
-      .attr('paint-order', 'stroke')
-      // .attr('stroke', halo)
-      .attr('stroke-width', haloWidth)
-      .attr('font-size', '.75rem')
-      .text((d, i) => d.data.name);
-  }
-
   if (title != null) node.append('title').text((d) => title(d.data, d));
+
+  function zoomed({ transform }) {
+    d3.selectAll('#plot g').attr('transform', transform);
+  }
 
   // add tooltips
   const tooltip = container
@@ -274,7 +263,7 @@ function createForceDirectedTree(
   function mousemove(e, d) {
     const sample = d.data.name;
     const data = attributes[sample];
-    console.log(data);
+    // console.log(data);
     const content = (
       <div className="text-start">
         <div>Sample: {sample}</div>
@@ -290,30 +279,6 @@ function createForceDirectedTree(
       .style('top', e.pageY - 320 + 'px');
   }
 
-  function drag(simulation) {
-  
-    function dragstarted(event, d) {
-      if (!event.active) simulation.alphaTarget(0.3).restart();
-      d.fx = d.x;
-      d.fy = d.y;
-    }
-    
-    function dragged(event, d) {
-      d.fx = event.x;
-      d.fy = event.y;
-    }
-    
-    function dragended(event, d) {
-      if (!event.active) simulation.alphaTarget(0);
-      d.fx = null;
-      d.fy = null;
-    }
-    
-    return d3.drag()
-        .on("start", dragstarted)
-        .on("drag", dragged)
-        .on("end", dragended);
-  }
 
   const colorLegend = form.color.continuous
     ? ContinuousLegend(colorFill, {
