@@ -5,6 +5,7 @@ const {
   getSeqmatrixOptions,
   getSeqmatrixSummary,
   getClusterData,
+  getRefgenomeData,
 } = require('../../query');
 
 async function querySeqmatrix(req, res, next) {
@@ -89,8 +90,8 @@ async function queryCluster(req, res, next) {
   try {
     const { limit, offset, rowMode, userId, ...query } = req.query;
     const { study, cancer, strategy } = query;
-    if (!userId && (!study || !cancer || !strategy)) {
-      throw 'Missing one or more of the following parameters: study, cancer, strategy';
+    if (!userId) {
+      throw 'This API is only available for user data calculations';
     }
 
     const connection = req.app.locals.sqlite(userId, 'visualization');
@@ -110,11 +111,33 @@ async function queryCluster(req, res, next) {
   }
 }
 
+async function queryRefgenome(req, res, next) {
+  try {
+    const { limit, offset, rowMode, userId, ...query } = req.query;
+
+    const connection = req.app.locals.connection;
+
+    const columns = '*';
+    const data = await getRefgenomeData(
+      connection,
+      query,
+      columns,
+      limit,
+      offset,
+      rowMode
+    );
+    res.json(data);
+  } catch (error) {
+    next(error);
+  }
+}
+
 const router = Router();
 
 router.get('/mutational_spectrum', querySeqmatrix);
 router.get('/mutational_spectrum_options', seqmatrixOptions);
 router.get('/mutational_spectrum_summary', seqmatrixSummary);
 router.get('/cluster', queryCluster);
+router.get('/refgenome', queryRefgenome);
 
 module.exports = { router, querySeqmatrix };

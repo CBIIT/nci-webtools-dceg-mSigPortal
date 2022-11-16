@@ -195,6 +195,18 @@ combineEtiologySignature <- function(x) {
         )
 }
 
+combineRefgenome <- function(x) {
+    x %>%
+        rowwise() %>%
+        mutate(
+            chr = regex_group(chr, "chr(.*)"),
+        ) %>%
+        rename(
+            start = start2,
+            end = end2,
+        ) 
+}
+
 datasets <- sapply(inputFiles, function(f) get(load(f)), simplify = F)
 combinedDatasets <- bind_rows(datasets, .id = "filepath")
 processedDatasets <- do.call(processorFunction, list(x = combinedDatasets)) %>% select(-filepath)

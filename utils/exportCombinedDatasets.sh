@@ -10,3 +10,4 @@ Rscript combineDatasets.R 'Others/content_data_all.RData' combinePatternFiles Ot
 Rscript combineDatasets.R 'Etiology/aetiology_exposure.RData' combineEtiology Etiology/etiology.csv
 Rscript combineDatasets.R 'Etiology/aetiology_organ_specific_signature.RData' combineEtiologyOrgan Etiology/etiologyOrgan.csv
 Rscript combineDatasets.R 'Etiology/signature_refsets_etiology.RData' combineEtiologySignature Etiology/etiologySignature.csv
+Rscript combineDatasets.R 'Others/refgenome.RData' combineRefgenome Others/refgenome.csv

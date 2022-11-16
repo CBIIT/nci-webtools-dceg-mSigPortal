@@ -388,6 +388,27 @@ function getClusterData(
   );
 }
 
+function getRefgenomeData(
+  connection,
+  query,
+  columns = '*',
+  limit = 200000,
+  offset = 0,
+  rowMode = 'object',
+  distinct = false
+) {
+  return getData(
+    connection,
+    'refgenome',
+    query,
+    columns,
+    limit,
+    offset,
+    rowMode,
+    distinct
+  );
+}
+
 module.exports = {
   getData,
   getAssociationData,
@@ -406,4 +427,5 @@ module.exports = {
   getPublicationData,
   getPatternData,
   getClusterData,
+  getRefgenomeData,
 };

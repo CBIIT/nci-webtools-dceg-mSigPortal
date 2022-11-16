@@ -359,6 +359,21 @@ export const schema = [
   },
 
   {
+    name: 'refgenome',
+    schema: (table) => {
+      table.increments('id');
+      table.string('genome');
+      table.string('chr');
+      table.double('len');
+      table.double('start');
+      table.double('end');
+    },
+    index: (table) => {
+      table.index(['genome']);
+    },
+  },
+
+  {
     name: 'importLog',
     schema: (table, connection) => {
       table.increments('id');
