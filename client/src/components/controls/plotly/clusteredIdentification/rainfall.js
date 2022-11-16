@@ -1,7 +1,17 @@
 import { groupBy } from 'lodash';
-import chromosomePositions from './chrPositions.json';
 
-export default function Rainfall(inputData) {
+// genome info is an object containing the start and end positions for each chromosome within the genome
+export default function Rainfall(inputData, genomeInfo) {
+  function getRange(array) {
+    let min = array[0];
+    let max = array[0];
+    for (let item of array) {
+      if (item < min) min = item;
+      if (item > max) max = item;
+    }
+    return [min, max];
+  }
+
   const subclassInfo = {
     ClassIA: { name: 'DBS', color: 'red' },
     ClassIB: { name: 'MBS', color: 'black' },
@@ -13,16 +23,14 @@ export default function Rainfall(inputData) {
     Clust: { name: 'Clust', color: 'orange' },
   };
   const subclassPriority = ['Non-clust', 'Simulation'];
+  const chrOrder = Object.keys(genomeInfo);
 
-  const chrPositions = chromosomePositions[inputData[0].genome];
-  const chrOrder = Object.keys(chrPositions);
-  const sortChr = (a, b) => chrOrder.indexOf(a.chr) - chrOrder.indexOf(b.chr);
-
+  // group data by classes and sort chromosomes
   const groupBySubclass = groupBy(inputData, (e) => e.subclass);
   const data = Object.entries(groupBySubclass)
     .map(([subclass, d]) => ({
       name: subclassInfo[subclass].name,
-      data: d.sort(sortChr),
+      data: d.sort((a, b) => chrOrder.indexOf(a.chr) - chrOrder.indexOf(b.chr)),
     }))
     .sort((a, b) =>
       subclassPriority.includes(a.name)
@@ -32,10 +40,14 @@ export default function Rainfall(inputData) {
         : a.name.localeCompare(b.name)
     );
 
+  // determine y coordinates for each bin
+  const yCoordinates = inputData.map((e) => e['IMD']);
+  const [_, yMax] = getRange(yCoordinates);
+
   const traces = data.map((d) => {
     return {
       name: d.name,
-      x: d.data.map((e) => e.start + chrPositions[e.chr].start),
+      x: d.data.map((e) => e.start + genomeInfo[e.chr].start),
       y: d.data.map((e) => e['IMD']),
       text: d.data.map((e) =>
         [
@@ -53,34 +65,38 @@ export default function Rainfall(inputData) {
     };
   });
 
+  const bufferMargin = 1000000;
   const layout = {
     autosize: true,
     height: 500,
-    // legend: {
-    //   title: {
-    //     text: '<b>Classes</b>',
-    //   },
-    //   x: 1.01,
-    //   y: 0.5,
-    // },
     xaxis: {
-      mirror: true,
       showgrid: false,
       showline: true,
       tickmode: 'array',
-      tickvals: Object.values(chrPositions).map((e) => e.center),
+      tickvals: Object.values(genomeInfo).map((e) => e.end - e.len / 2),
       ticktext: chrOrder,
       tickangle: 0,
     },
     yaxis: {
       title: 'Distance between mutations in a single event (log<sub>10</sub>)',
-      ticks: 'outside',
       zeroline: false,
-      showline: true,
-      mirror: true,
+      ticks: 'outside',
+      // range: [-bufferMargin, yMax + bufferMargin],
+      type: 'log',
       // exponentformat: 'power',
       // tickformat: '',
     },
+    shapes: [
+      // chromosome dividers
+      // ...Object.values(genomeInfo).map((e) => ({
+      //   type: 'line',
+      //   x0: e.end,
+      //   x1: e.end,
+      //   y0: 0,
+      //   y1: yMax,
+      //   line: { width: 1 },
+      // })),
+    ],
   };
 
   const config = {

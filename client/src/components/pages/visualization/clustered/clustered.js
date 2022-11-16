@@ -1,7 +1,4 @@
 import { useEffect, useState, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
-import Select from '../../../controls/select/selectForm';
-import { Container, Form, Row, Col } from 'react-bootstrap';
 import Table from '../../../controls/table/table2';
 import Plotly from '../../../controls/plotly/plot/plot';
 import { useSelector, useDispatch } from 'react-redux';
