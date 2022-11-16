@@ -50,6 +50,14 @@ RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerClusters#egg=SigPr
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerPlotting#egg=SigProfilerPlotting'
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
 
+# install bcftools
+RUN cd /tmp \
+    && curl -L https://github.com/samtools/bcftools/releases/download/1.16/bcftools-1.16.tar.bz2 | tar xj \
+    && cd bcftools-1.16 \
+    && ./configure --enable-libcurl --prefix=/tmp/bcftools-1.16  \
+    && make && make install \
+    && mv ./bcftools /usr/local/bin
+
 # install genomes
 ## NOTE: genomes do not need to be installed. They are saved on the host in [app]/data and mounted as a volume to the 
 ## sigprofilermatrixgenerator install directory. Verify path with "pip3 list"
