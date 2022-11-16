@@ -61,17 +61,6 @@ export default function TreeLeafForm() {
     <Form>
       <Row>
         <Col md="auto">
-          <Form.Group controlId="showLabels" className="mb-3">
-            <Form.Check
-              label="Label Samples"
-              type="switch"
-              name="showLabels"
-              checked={form.showLabels}
-              onChange={handleChange}
-            />
-          </Form.Group>
-        </Col>
-        <Col md="auto">
           <Form.Group controlId="color" className="mb-3">
             <Form.Label>Color By</Form.Label>
             <Select
