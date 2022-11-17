@@ -169,25 +169,8 @@ export const getInitialState = () => ({
     pubPcaErr: false,
     pubSubmitOverlay: false,
   },
-  kataegis: {
+  clustered: {
     sample: '',
-    sampleOptions: '',
-    highlight: false,
-    min: '5',
-    max: '100',
-    chromosome: 'None',
-    txtPath: '',
-    plotPath: '',
-    kataegisData: [],
-    pagination: {
-      pageIndex: 0,
-      pageSize: 10,
-    },
-    hidden: [],
-    display: true,
-    err: false,
-    debugR: [],
-    loading: false,
   },
 });
 

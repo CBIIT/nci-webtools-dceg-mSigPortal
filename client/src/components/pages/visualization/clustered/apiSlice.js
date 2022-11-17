@@ -19,12 +19,9 @@ export const clusteredApiSlice = visualizationApiSlice.injectEndpoints({
             return obj;
           }, {});
 
-          const rainfall = Rainfall(
-            data.filter((e) => e.sample == 'SC420396'),
-            genomeInfo
-          );
+          const plot = Rainfall(data, genomeInfo);
 
-          return { data: { rainfall, table: data } };
+          return { data: { plot, table: data } };
         } catch (error) {
           console.log(error);
           return { error };
