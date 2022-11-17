@@ -4,10 +4,7 @@ import './navbar.scss';
 
 export function Navbar({ links }) {
   return (
-    <div
-      className="text-white gradient shadow-sm"
-      style={{ backgroundColor: '#728EAC' }}
-    >
+    <div className="text-white gradient shadow-sm bg-dark">
       <div className="container d-none d-md-flex justify-content-center">
         {[{ route: '/', title: 'Home', exact: true }]
           .concat(links)
