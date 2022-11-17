@@ -71,7 +71,7 @@ export default function Rainfall(inputData, genomeInfo) {
     height: 500,
     xaxis: {
       showgrid: false,
-      showline: true,
+      showline: false,
       tickmode: 'array',
       tickvals: Object.values(genomeInfo).map((e) => e.end - e.len / 2),
       ticktext: chrOrder,
@@ -81,21 +81,31 @@ export default function Rainfall(inputData, genomeInfo) {
       title: 'Distance between mutations in a single event (log<sub>10</sub>)',
       zeroline: false,
       ticks: 'outside',
-      // range: [-bufferMargin, yMax + bufferMargin],
       type: 'log',
-      // exponentformat: 'power',
-      // tickformat: '',
+      exponentformat: 'power',
     },
     shapes: [
       // chromosome dividers
-      // ...Object.values(genomeInfo).map((e) => ({
-      //   type: 'line',
-      //   x0: e.end,
-      //   x1: e.end,
-      //   y0: 0,
-      //   y1: yMax,
-      //   line: { width: 1 },
-      // })),
+      ...Object.values(genomeInfo).map((e) => ({
+        type: 'line',
+        xref: 'x',
+        yref: 'paper',
+        x0: e.end,
+        x1: e.end,
+        y0: 0,
+        y1: 1,
+        line: { width: 1 },
+      })),
+      {
+        type: 'line',
+        xref: 'x',
+        yref: 'paper',
+        x0: 0,
+        x1: 0,
+        y0: 0,
+        y1: 1,
+        line: { width: 1 },
+      },
     ],
   };
 
