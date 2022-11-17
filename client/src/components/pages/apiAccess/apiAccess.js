@@ -7,7 +7,7 @@ export default function APIAccess() {
     <div className="mx-3">
       <div className="bg-white border p-3 mx-3">
         <div className="mb-4">
-          <h1 class="h2">API Access</h1>
+          <h1 className="h2">API Access</h1>
           <hr />
           <SwaggerUI
             url={process.env.PUBLIC_URL + '/api'}
