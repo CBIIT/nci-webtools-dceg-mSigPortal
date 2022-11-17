@@ -2,16 +2,6 @@ import { groupBy } from 'lodash';
 
 // genome info is an object containing the start and end positions for each chromosome within the genome
 export default function Rainfall(inputData, genomeInfo) {
-  function getRange(array) {
-    let min = array[0];
-    let max = array[0];
-    for (let item of array) {
-      if (item < min) min = item;
-      if (item > max) max = item;
-    }
-    return [min, max];
-  }
-
   const subclassInfo = {
     ClassIA: { name: 'DBS', color: 'red' },
     ClassIB: { name: 'MBS', color: 'black' },
@@ -39,12 +29,28 @@ export default function Rainfall(inputData, genomeInfo) {
         ? 1
         : a.name.localeCompare(b.name)
     );
+  // extra margin for visualizing data and window size for bin
+  const binSize = 10000000;
 
-  // determine y coordinates for each bin
-  const yCoordinates = inputData.map((e) => e['IMD']);
-  const [_, yMax] = getRange(yCoordinates);
+  // count the number of mutations along the length of the genome per bin size
+  const sortedData = data.reduce((a, e) => [...a, ...e.data], []);
+  const densityPlot = {
+    name: 'Density',
+    x: sortedData.map((e) => e.start + genomeInfo[e.chr].start),
+    y: sortedData.map((e) => e['IMD']),
+    histfunc: 'count',
+    type: 'histogram',
+    xbins: { size: binSize },
+    // hovertext: sortedData.map((e) => [`Chromosome: ${e.chr}`].join('<br>')),
+    // hovertemplate:
+    //   '%{hovertext}<br>Position: %{x}<br>Count: %{y}<extra></extra>',
+    color: 'blue',
+    showlegend: false,
+    xaxis: 'x',
+    yaxis: 'y2',
+  };
 
-  const traces = data.map((d) => {
+  const rainfallTraces = data.map((d) => {
     return {
       name: d.name,
       x: d.data.map((e) => e.start + genomeInfo[e.chr].start),
@@ -65,13 +71,16 @@ export default function Rainfall(inputData, genomeInfo) {
     };
   });
 
-  const bufferMargin = 1000000;
   const layout = {
     autosize: true,
-    height: 500,
+    height: 800,
     xaxis: {
+      title: 'Chromosome',
+      mirror: true,
+      showline: true,
+      zeroline: false,
       showgrid: false,
-      showline: false,
+      range: [-binSize, genomeInfo['Y'].end + binSize],
       tickmode: 'array',
       tickvals: Object.values(genomeInfo).map((e) => e.end - e.len / 2),
       ticktext: chrOrder,
@@ -79,38 +88,34 @@ export default function Rainfall(inputData, genomeInfo) {
     },
     yaxis: {
       title: 'Distance between mutations in a single event (log<sub>10</sub>)',
+      domain: [0, 0.78],
+      mirror: true,
+      showline: true,
       zeroline: false,
       ticks: 'outside',
       type: 'log',
       exponentformat: 'power',
     },
+    yaxis2: { title: 'Density', domain: [0.8, 1] },
     shapes: [
       // chromosome dividers
-      ...Object.values(genomeInfo).map((e) => ({
-        type: 'line',
-        xref: 'x',
-        yref: 'paper',
-        x0: e.end,
-        x1: e.end,
-        y0: 0,
-        y1: 1,
-        line: { width: 1 },
-      })),
-      {
-        type: 'line',
-        xref: 'x',
-        yref: 'paper',
-        x0: 0,
-        x1: 0,
-        y0: 0,
-        y1: 1,
-        line: { width: 1 },
-      },
+      ...Object.values(genomeInfo)
+        .slice(0, -1)
+        .map((e) => ({
+          type: 'line',
+          xref: 'x',
+          yref: 'paper',
+          x0: e.end,
+          x1: e.end,
+          y0: 0,
+          y1: 0.78,
+          line: { width: 0.5 },
+        })),
     ],
   };
 
   const config = {
     responsive: true,
   };
-  return { traces, layout, config };
+  return { traces: [densityPlot, ...rainfallTraces], layout, config };
 }
