@@ -122,7 +122,7 @@ combinePatternFiles <- function(x) {
     x %>%
         rowwise() %>%
         mutate(
-            study = regex_group(Study, "^(\\w+)"),
+            study = regex_group(Study, "^(.+)@"),
             cancer = regex_group(Study, "@(.+)$"),
             .before = Study
         ) %>%
@@ -204,7 +204,7 @@ combineRefgenome <- function(x) {
         rename(
             start = start2,
             end = end2,
-        ) 
+        )
 }
 
 datasets <- sapply(inputFiles, function(f) get(load(f)), simplify = F)
