@@ -59,7 +59,7 @@ RUN cd /tmp \
     && make \
     && make install \
     && mv ./bcftools /usr/local/bin \
-    && chmod +x /usr/local/bin\bcftools
+    && chmod +x /usr/local/bin/bcftools
 
 # install genomes
 ## NOTE: genomes do not need to be installed. They are saved on the host in [app]/data and mounted as a volume to the 
