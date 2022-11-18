@@ -18,7 +18,7 @@ export default function ClusteredPlot() {
 
   // query cluster data
   useEffect(() => {
-    if (cluster) {
+    if (cluster && projectID && sample) {
       const params = {
         userId: projectID,
         sample: sample.value,
