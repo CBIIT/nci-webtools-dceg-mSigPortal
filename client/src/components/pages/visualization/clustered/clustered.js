@@ -34,10 +34,15 @@ export default function ClusteredIdentification() {
         }
       />
       <hr />
-      {cluster && projectID && inputFormat == 'vcf'}
-      <ClusteredForm />
-      <hr />
-      <ClusteredPlot />
+      {cluster && projectID && inputFormat.value == 'vcf' ? (
+        <>
+          <ClusteredForm />
+          <hr />
+          <ClusteredPlot />
+        </>
+      ) : (
+        <div>Analysis is only available for VCF file input</div>
+      )}
     </div>
   );
 }
