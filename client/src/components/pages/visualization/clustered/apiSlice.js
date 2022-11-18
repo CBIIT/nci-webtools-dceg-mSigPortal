@@ -19,9 +19,11 @@ export const clusteredApiSlice = visualizationApiSlice.injectEndpoints({
             return obj;
           }, {});
 
-          const plot = Rainfall(data, genomeInfo);
+          const plotAndTable = Rainfall(data, genomeInfo);
 
-          return { data: { plot, table: data } };
+          return {
+            data: plotAndTable,
+          };
         } catch (error) {
           console.log(error);
           return { error };

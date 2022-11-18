@@ -121,9 +121,9 @@ export default function ClusteredPlot() {
         <>
           <Plotly
             className="w-100"
-            data={data.plot.traces}
-            layout={data.plot.layout}
-            config={data.plot.config}
+            data={data.traces}
+            layout={data.layout}
+            config={data.config}
           />
           <p className="p-3">
             The table below is a summary of the kataegis identification based on

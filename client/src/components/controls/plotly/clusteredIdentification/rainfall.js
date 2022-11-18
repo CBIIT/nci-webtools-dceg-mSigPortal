@@ -12,23 +12,15 @@ export default function Rainfall(inputData, genomeInfo) {
     Simulation: { name: 'Simulation', color: 'grey' },
     Clust: { name: 'Clust', color: 'orange' },
   };
-  const subclassPriority = ['Non-clust', 'Simulation'];
   const chrOrder = Object.keys(genomeInfo);
 
   // group data by classes and sort chromosomes
   const groupBySubclass = groupBy(inputData, (e) => e.subclass);
-  const data = Object.entries(groupBySubclass)
-    .map(([subclass, d]) => ({
-      name: subclassInfo[subclass].name,
-      data: d.sort((a, b) => chrOrder.indexOf(a.chr) - chrOrder.indexOf(b.chr)),
-    }))
-    .sort((a, b) =>
-      subclassPriority.includes(a.name)
-        ? -1
-        : subclassPriority.includes(b.name)
-        ? 1
-        : a.name.localeCompare(b.name)
-    );
+  const data = Object.entries(groupBySubclass).map(([subclass, d]) => ({
+    name: subclassInfo[subclass].name,
+    data: d.sort((a, b) => chrOrder.indexOf(a.chr) - chrOrder.indexOf(b.chr)),
+  }));
+
   // extra margin for visualizing data and window size for bin
   const binSize = 10000000;
 
@@ -41,9 +33,6 @@ export default function Rainfall(inputData, genomeInfo) {
     histfunc: 'count',
     type: 'histogram',
     xbins: { size: binSize },
-    // hovertext: sortedData.map((e) => [`Chromosome: ${e.chr}`].join('<br>')),
-    // hovertemplate:
-    //   '%{hovertext}<br>Position: %{x}<br>Count: %{y}<extra></extra>',
     color: 'blue',
     showlegend: false,
     xaxis: 'x',
@@ -75,7 +64,7 @@ export default function Rainfall(inputData, genomeInfo) {
     autosize: true,
     height: 800,
     xaxis: {
-      title: 'Chromosome',
+      title: { text: 'Chromosome', font: { size: 18 } },
       mirror: true,
       showline: true,
       zeroline: false,
@@ -87,7 +76,10 @@ export default function Rainfall(inputData, genomeInfo) {
       tickangle: 0,
     },
     yaxis: {
-      title: 'Distance between mutations in a single event (log<sub>10</sub>)',
+      title: {
+        text: 'Distance between mutations in a single event (log<sub>10</sub>)',
+        font: { size: 18 },
+      },
       domain: [0, 0.78],
       mirror: true,
       showline: true,
@@ -96,7 +88,10 @@ export default function Rainfall(inputData, genomeInfo) {
       type: 'log',
       exponentformat: 'power',
     },
-    yaxis2: { title: 'Density', domain: [0.8, 1] },
+    yaxis2: {
+      title: { text: 'Density', font: { size: 18 } },
+      domain: [0.8, 1],
+    },
     shapes: [
       // chromosome dividers
       ...Object.values(genomeInfo)
@@ -112,10 +107,23 @@ export default function Rainfall(inputData, genomeInfo) {
           line: { width: 0.5 },
         })),
     ],
+    legend: {
+      orientation: 'h',
+      xanchor: 'center',
+      x: 0.5,
+    },
   };
 
   const config = {
     responsive: true,
   };
-  return { traces: [densityPlot, ...rainfallTraces], layout, config };
+
+  // data table - filter out subclass: non-clust
+  const table = inputData
+    .filter((e) => e.subclass != 'Non-clust')
+    .map((e) => ({
+      ...e,
+      subclass: `${e.subclass} (${subclassInfo[e.subclass].name})`,
+    }));
+  return { traces: [densityPlot, ...rainfallTraces], layout, config, table };
 }
