@@ -1,7 +1,15 @@
-import React from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { useExampleHeaderQuery } from './userForm/apiSlice';
 
-export default function Instructions({ loading }) {
+export default function Instructions() {
+  const { inputFormat } = useSelector((state) => state.visualization.userForm);
+
+  // get file header from example input files
+  const { data, error } = useExampleHeaderQuery(inputFormat.label, {
+    skip: !inputFormat?.label,
+  });
+
   const examples = [
     { title: 'VCF Example of User Input', path: 'vcfExample' },
     { title: 'Sherlock-Lung-232', path: 'sherlock-lung-232' },
@@ -40,6 +48,7 @@ export default function Instructions({ loading }) {
         Choose an example query to view results for pre-selected parameters. You
         must reset between queries.
       </p>
+      TBA
       {/* {examples.map(({ title, external, path }, index) => (
         <div key={index}>
           <Link to={`/visualization/example/${path}`}>
@@ -56,6 +65,13 @@ export default function Instructions({ loading }) {
           )}
         </div>
       ))} */}
+      <hr />
+      <h4>Examples of file header for each supported format</h4>
+      <p>
+        Choose different file formats under <b>Data Source: User</b> to view different
+        examples of file headers
+      </p>
+      <pre className="border rounded bg-light p-3">{data}</pre>
     </div>
   );
 }

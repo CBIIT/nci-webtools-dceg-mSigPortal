@@ -10,7 +10,11 @@ export const getInitialState = () => ({
   userForm: {
     inputFilename: '',
     bedFilename: '',
-    inputFormat: '',
+    inputFormat: {
+      label: 'VCF',
+      value: 'vcf',
+      example: 'demo_input_multi.vcf.gz',
+    },
     genome: '',
     strategy: '',
     mutationSplit: '',

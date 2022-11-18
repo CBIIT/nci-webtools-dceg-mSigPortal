@@ -131,6 +131,7 @@ export default function UserForm() {
     removeFile();
     removeBedFile();
     setValue('inputFormat', format);
+    mergeState({ inputFormat: format });
   }
 
   async function loadExample() {

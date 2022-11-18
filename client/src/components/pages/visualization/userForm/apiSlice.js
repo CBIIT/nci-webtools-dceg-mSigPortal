@@ -39,6 +39,19 @@ export const userFormApiSlice = visualizationApiSlice.injectEndpoints({
         params,
       }),
     }),
+    exampleHeader: builder.query({
+      async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
+        try {
+          const data = await (
+            await fetch(`assets/exampleHeader/Header_${_arg}.txt`)
+          ).text();
+          return { data };
+        } catch (error) {
+          console.log(error);
+          return { error };
+        }
+      },
+    }),
   }),
 });
 
@@ -47,4 +60,5 @@ export const {
   useSubmitQueueMutation,
   useProfilerExtractionMutation,
   useUserMatrixMutation,
+  useExampleHeaderQuery,
 } = userFormApiSlice;
