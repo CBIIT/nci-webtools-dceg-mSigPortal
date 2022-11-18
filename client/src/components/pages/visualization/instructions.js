@@ -6,9 +6,12 @@ export default function Instructions() {
   const { inputFormat } = useSelector((state) => state.visualization.userForm);
 
   // get file header from example input files
-  const { data, error } = useExampleHeaderQuery(inputFormat.label, {
-    skip: !inputFormat?.label,
-  });
+  const { data, error } = useExampleHeaderQuery(
+    inputFormat.value.toUpperCase(),
+    {
+      skip: !inputFormat?.value,
+    }
+  );
 
   const examples = [
     { title: 'VCF Example of User Input', path: 'vcfExample' },
@@ -68,8 +71,8 @@ export default function Instructions() {
       <hr />
       <h4>Examples of file header for each supported format</h4>
       <p>
-        Choose different file formats under <b>Data Source: User</b> to view different
-        examples of file headers
+        Choose different file formats under <b>Data Source: User</b> to view
+        different examples of file headers
       </p>
       <pre className="border rounded bg-light p-3">{data}</pre>
     </div>
