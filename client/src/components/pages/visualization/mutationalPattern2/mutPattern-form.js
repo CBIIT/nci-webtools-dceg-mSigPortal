@@ -75,12 +75,14 @@ export default function MutationalPatternForm() {
               <Controller
                 name="proportion"
                 control={control}
-                type="number"
                 rules={{ required: true, min: 0, max: 1 }}
                 render={({ field }) => (
                   <Form.Control
                     {...field}
                     type="number"
+                    min="0"
+                    max="1"
+                    step="0.1"
                     placeholder="Ex. 0.8"
                     isInvalid={errors.proportion}
                   />
