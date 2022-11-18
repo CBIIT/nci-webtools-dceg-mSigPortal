@@ -1,13 +1,4 @@
-import {
-  Form,
-  Button,
-  Row,
-  Col,
-  Popover,
-  OverlayTrigger,
-} from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { Form, Button, Row, Col } from 'react-bootstrap';
 import { Controller, useForm } from 'react-hook-form';
 import Select from '../../../controls/select/selectForm';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -265,33 +256,7 @@ export default function PublicForm() {
           />
         </Form.Check>
         <Form.Label className="font-weight-normal" style={{ fontSize: '12px' }}>
-          Use all cancer types for TMB and MS Burden{' '}
-          <OverlayTrigger
-            trigger="click"
-            placement="right"
-            overlay={
-              <Popover id="popover-basic">
-                {/* <Popover.Title as="h3">About</Popover.Title> */}
-                <Popover.Content>
-                  <p>
-                    Check this to use all cancer types for TMB and MS Burden
-                  </p>
-                </Popover.Content>
-              </Popover>
-            }
-            rootClose
-          >
-            <Button
-              variant="link"
-              className="p-0 font-weight-bold"
-              aria-label="All cancer types option info"
-            >
-              <FontAwesomeIcon
-                icon={faInfoCircle}
-                style={{ verticalAlign: 'baseline' }}
-              />
-            </Button>
-          </OverlayTrigger>
+          Use all Cancer Types or Groups for TMB and MS Burden plots
         </Form.Label>
       </Form.Group>
 
