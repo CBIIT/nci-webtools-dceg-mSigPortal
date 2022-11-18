@@ -2,9 +2,10 @@ FROM public.ecr.aws/amazonlinux/amazonlinux:2022
 
 RUN dnf -y update \
     && dnf -y install \
-    dnf-plugins-core \
+    bzip2 \
     cairo-devel \
     cmake \
+    dnf-plugins-core \
     git \
     gmp-devel \
     libcurl-devel \
@@ -17,11 +18,11 @@ RUN dnf -y update \
     python3-devel \
     python3-pip \
     python3-setuptools \
+    R-4.1.3 \
     rsync \
+    tar \
     wget \ 
     which \
-    tar \
-    R-4.1.3 \
     && dnf clean all
 
 RUN mkdir -p /deploy/server /deploy/logs
@@ -55,8 +56,10 @@ RUN cd /tmp \
     && curl -L https://github.com/samtools/bcftools/releases/download/1.16/bcftools-1.16.tar.bz2 | tar xj \
     && cd bcftools-1.16 \
     && ./configure --enable-libcurl --prefix=/tmp/bcftools-1.16  \
-    && make && make install \
-    && mv ./bcftools /usr/local/bin
+    && make \
+    && make install \
+    && mv ./bcftools /usr/local/bin \
+    && chmod +x /usr/local/bin\bcftools
 
 # install genomes
 ## NOTE: genomes do not need to be installed. They are saved on the host in [app]/data and mounted as a volume to the 
