@@ -74,6 +74,7 @@ export default function Instructions() {
         Choose different file formats under <b>Data Source: User</b> to view
         different examples of file headers
       </p>
+      <b>{inputFormat.label}</b>
       <pre className="border rounded bg-light p-3">{data}</pre>
     </div>
   );
