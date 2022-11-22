@@ -1,66 +1,103 @@
 import { useEffect, useState } from 'react';
+import Plotly from '../../../controls/plotly/plot/plot';
 import { useSelector } from 'react-redux';
-import SvgContainer from '../../../controls/svgContainer/svgContainer';
-import { useMutationalPatternQuery } from './apiSlice';
+import { useMpeaScatterQuery, useMpeaBarQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-
-export default function MutProfilePlot() {
+import './plot.scss';
+export default function MutPatternPlot() {
   const store = useSelector((state) => state.visualization);
-
+  const publicForm = store.publicForm;
+  const { source, projectID, matrixList } = store.main;
   const { proportion, pattern } = store.mutationalPattern;
-  const { projectID, source, matrixList } = store.main;
 
-  const [params, setParams] = useState(null);
+  const [scatterParams, setScatterParams] = useState('');
 
-  const { data, error, isFetching } = useMutationalPatternQuery(params, {
-    skip: !params,
+  const {
+    data: scatterData,
+    error: scatterError,
+    isFetching: fetchingScatter,
+  } = useMpeaScatterQuery(scatterParams, {
+    skip: !scatterParams,
+  });
+
+  const [barParams, setBarParams] = useState('');
+  const {
+    data: patternData,
+    error: patternError,
+    isFetching: fetchingPattern,
+  } = useMpeaBarQuery(barParams, {
+    skip: !barParams,
   });
 
   // get data on form change
   useEffect(() => {
-    if (proportion && pattern) {
-      const params =
-        source == 'user'
-          ? {
-              fn: 'mutationalPattern',
-              args: {
-                matrixFile: matrixList.filter(
-                  (e) => e.profile == 'SBS' && e.matrix == '96'
-                )[0].Path,
-                proportion: parseFloat(proportion),
-                pattern: pattern,
-              },
-              projectID,
-            }
-          : {
-              fn: 'mutationalPatternPublic',
-              args: {
-                study: store.publicForm.study.value,
-                cancerType: store.publicForm.cancer.value,
-                experimentalStrategy: store.publicForm.strategy.value,
-                proportion: parseFloat(proportion),
-                pattern: pattern,
-              },
-              projectID,
-            };
-      setParams(params);
+    const { study, cancer, strategy } = publicForm;
+    if (pattern) {
+      setScatterParams({
+        profile: 'SBS',
+        matrix: '96',
+        pattern: pattern,
+        ...(source == 'public' && {
+          study: study.value,
+          cancer: cancer.value,
+          strategy: strategy.value,
+        }),
+        ...(source == 'user' && { userId: projectID }),
+      });
     }
-  }, [proportion, pattern]);
+  }, [publicForm, proportion, pattern]);
+
+  useEffect(() => {
+    if (source == 'public') {
+      const { study } = publicForm;
+      if (study && proportion) {
+        setBarParams({
+          study: study.value,
+          proportion: proportion,
+        });
+      }
+    } else {
+      if (proportion && pattern) {
+        setBarParams({
+          pattern,
+          proportion,
+          matrixFile: matrixList.filter(
+            (e) => e.profile == 'SBS' && e.matrix == '96'
+          )[0].Path,
+          userId: projectID,
+        });
+      }
+    }
+  }, [publicForm, proportion, matrixList]);
+
+  const divId1 = 'mutationalPatternBarlot';
+  const divId2 = 'mutationalPatternScatterlot';
+  const config = {
+    displayModeBar: true,
+    responsive: true,
+    displaylogo: false,
+    toImageButtonOptions: {
+      format: 'svg',
+      filename: pattern?.value || 'Mutational Pattern',
+      scale: 1,
+    },
+  };
 
   return (
     <>
-      <LoadingOverlay active={isFetching} />
-      {error && (
+      <LoadingOverlay active={fetchingPattern} />
+      {patternError && (
         <p className="p-3">An error has occured. Please verify your input.</p>
       )}
-
       <div id="barchart">
-        {data?.output.barPath && (
+        {patternData && !patternError && (
           <>
-            <SvgContainer
-              className="p-3"
-              downloadName={data.output.barPath.split('/').slice(-1)[0]}
-              plotPath={'web/results/' + data.output.barPath}
+            <Plotly
+              className="w-100"
+              divId={divId1}
+              data={patternData.traces}
+              layout={patternData.layout}
+              config={config}
             />
             <p className="p-3">
               This plot illustrates the frequency by count of each mutational
@@ -73,25 +110,16 @@ export default function MutProfilePlot() {
             </p>
           </>
         )}
-        {data?.output.plotPath && !data?.output.barPath && (
-          <div className="p-3">
-            <p>Frequency of Mutational Pattern</p>
-            <p>
-              No mutational pattern with proportion of mutations large than{' '}
-              {proportion}
-            </p>
-          </div>
-        )}
       </div>
       <div id="context">
-        {data?.output.plotPath && (
+        {scatterData && !scatterError && (
           <>
-            <SvgContainer
-              className="p-3"
-              downloadName={data.output.plotPath.split('/').slice(-1)[0]}
-              plotPath={'web/results/' + data.output.plotPath}
-              txtPath={`web/results/${data.output.txtPath}`}
-              title="Proportion of Mutational Pattern Context Compared to Other Contexts with the same SBS Mutation"
+            <Plotly
+              className="w-100"
+              divId={divId2}
+              data={scatterData.traces}
+              layout={scatterData.layout}
+              config={config}
             />
             <p className="p-3">
               This plot illustrates the mutational pattern context entered

@@ -1,5 +1,5 @@
 import { Button, Form, Row, Col } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
 import { NavHashLink } from 'react-router-hash-link';
 import Description from '../../../controls/description/description';
@@ -8,8 +8,10 @@ import { actions as visualizationActions } from '../../../../services/store/visu
 const actions = { ...visualizationActions };
 
 export default function MutationalPatternForm() {
-  const dispatch = useDispatch();
+  const store = useSelector((state) => state.visualization);
+  const { proportion, pattern } = store.mutationalPattern;
 
+  const dispatch = useDispatch();
   const mergeState = (state) =>
     dispatch(actions.mergeVisualization({ mutationalPattern: state }));
 
@@ -18,11 +20,15 @@ export default function MutationalPatternForm() {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    defaultValues: { proportion: '0.8', pattern: 'NCG>NTG' },
+    defaultValues: {
+      proportion: proportion || 0.8,
+      pattern: pattern || 'NCG>NTG',
+    },
   });
 
   async function onSubmit(data) {
-    mergeState(data);
+    const { pattern, proportion } = data;
+    mergeState({ pattern, proportion: parseFloat(proportion) });
   }
 
   return (
@@ -70,12 +76,14 @@ export default function MutationalPatternForm() {
               <Controller
                 name="proportion"
                 control={control}
-                type="number"
                 rules={{ required: true, min: 0, max: 1 }}
                 render={({ field }) => (
                   <Form.Control
                     {...field}
                     type="number"
+                    min="0"
+                    max="1"
+                    step="0.01"
                     placeholder="Ex. 0.8"
                     isInvalid={errors.proportion}
                   />

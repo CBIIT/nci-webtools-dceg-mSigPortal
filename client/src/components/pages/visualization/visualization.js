@@ -13,7 +13,6 @@ import MutationalProfiles from './mutationalProfiles/mutProfiles';
 import TreeAndLeaf from './treeLeaf/treeLeaf';
 import CosineSimilarity from './cosineSimilarity/cosineSimilarity';
 import MutationalPattern from './mutationalPattern/mutationalPattern';
-import MutationalPattern2 from './mutationalPattern2/mutationalPattern';
 import ProfileComparison from './profileComparison2/profileComparison';
 import PCA from './pca';
 import PCA2 from './pca/pca';
@@ -358,7 +357,7 @@ export default function Visualization({ match }) {
     {
       name: 'Mutational Pattern Enrichment Analysis',
       id: 'mutationalPattern',
-      component: <MutationalPattern2 />,
+      component: <MutationalPattern />,
     },
 
     {
