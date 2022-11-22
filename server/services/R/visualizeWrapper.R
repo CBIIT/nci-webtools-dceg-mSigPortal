@@ -543,6 +543,26 @@ profileComparisonPublic <- function(args, config) {
   )
 }
 
+mpeaUser <- function(args, config) {
+  source("services/R/Sigvisualfunc.R")
+  data_input <- read_delim(args$matrixFile, delim = "\t")
+  data_input <- data_input %>%
+    select_if(~ !is.numeric(.) || sum(.) > 0) %>%
+    pivot_longer(cols = -MutationType) %>%
+    mutate(Study = "Input") %>%
+    select(Study, Sample = name, MutationType, Mutations = value) %>%
+    mutate(Type = str_sub(MutationType, 3, 5), SubType1 = str_sub(MutationType, 1, 1), SubType2 = str_sub(str_sub(MutationType, 7, 7))) %>%
+    select(Study, Sample, MutationType, Type, SubType1, SubType2, Mutations)
+
+  content_all_tmp <- content_extraction(data_input)
+  data <- content_all_tmp %>%
+    filter(N1 > args$proportion) %>%
+    # add_count(Pattern, sort = T) %>%
+    # select(pattern = Pattern, n)
+    select(pattern = Pattern, n1 = N1)
+  return(data)
+}
+
 # Motif analysis ----------------------------------------------------------
 ### parameters:
 mutationalPattern <- function(args, config) {
