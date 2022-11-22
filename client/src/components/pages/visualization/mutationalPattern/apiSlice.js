@@ -20,7 +20,8 @@ export const mutationalPatternApiSlice = visualizationApiSlice.injectEndpoints({
       }),
 
       transformResponse: (data) => {
-        return mutationalPatternBar(data);
+        if (data.length) return mutationalPatternBar(data);
+        else return {};
       },
     }),
   }),

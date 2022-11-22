@@ -3,7 +3,7 @@ import Plotly from '../../../controls/plotly/plot/plot';
 import { useSelector } from 'react-redux';
 import { useMpeaScatterQuery, useMpeaBarQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import './plot.scss';
+
 export default function MutPatternPlot() {
   const store = useSelector((state) => state.visualization);
   const publicForm = store.publicForm;
@@ -85,12 +85,12 @@ export default function MutPatternPlot() {
 
   return (
     <>
-      <LoadingOverlay active={fetchingPattern} />
       {patternError && (
         <p className="p-3">An error has occured. Please verify your input.</p>
       )}
-      <div id="barchart">
-        {patternData && !patternError && (
+      <div id="barchart" style={{ minHeight: '200px' }}>
+        <LoadingOverlay active={fetchingPattern} />
+        {patternData && patternData?.traces && !patternError && (
           <>
             <Plotly
               className="w-100"
@@ -110,8 +110,19 @@ export default function MutPatternPlot() {
             </p>
           </>
         )}
+        {patternData && !patternData?.traces && !fetchingPattern && (
+          <div className="p-3 text-center">
+            <b>Frequency of Mutational Pattern</b>
+            <p>
+              No mutational pattern with proportion of mutations large than{' '}
+              {proportion}. Try a lower proportion value.
+            </p>
+          </div>
+        )}
       </div>
-      <div id="context">
+      <hr />
+      <div id="context" style={{ minHeight: '200px' }}>
+        <LoadingOverlay active={fetchingScatter} />
         {scatterData && !scatterError && (
           <>
             <Plotly
