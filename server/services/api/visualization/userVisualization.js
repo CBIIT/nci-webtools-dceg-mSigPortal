@@ -272,6 +272,10 @@ async function getResults(req, res, next) {
   }
 }
 
+async function wrapper(fn, args) {
+  return await JSON.parse(await r('services/R/visualizeWrapper.R', fn, args));
+}
+
 // Visualization Calculation functions
 async function visualizationWrapper(req, res, next) {
   const { fn, args, projectID } = req.body;
@@ -283,7 +287,7 @@ async function visualizationWrapper(req, res, next) {
     fs.mkdirSync(path.join(rConfig.wd, savePath), { recursive: true });
 
   try {
-    const wrapper = await r('services/R/visualizeWrapper.R', 'wrapper', {
+    const { scriptOutput, ...rest } = await wrapper('wrapper', {
       fn,
       args,
       config: {
@@ -291,8 +295,6 @@ async function visualizationWrapper(req, res, next) {
         savePath,
       },
     });
-
-    const { scriptOutput, ...rest } = JSON.parse(wrapper);
 
     // generate an id if getPublicData is called
     res.json({
@@ -620,6 +622,7 @@ module.exports = {
   getRelativePath,
   profilerExtraction,
   getResultsFiles,
+  wrapper,
   visualizationWrapper,
   visualizationDownload,
   visualizationDownloadPublic,
