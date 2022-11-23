@@ -14,7 +14,7 @@ export const optionsApiSlice = createApi({
       query: (params) => ({ url: 'mutational_signature_options', params }),
     }),
     associationOptions: builder.query({
-      query: (params) => ({ url: 'mutational_association_options', params }),
+      query: (params) => ({ url: 'signature_association_options', params }),
     }),
   }),
 });

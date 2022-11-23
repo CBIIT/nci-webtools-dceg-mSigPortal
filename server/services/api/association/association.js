@@ -41,7 +41,7 @@ async function associationOptions(req, res, next) {
 
 const router = Router();
 
-router.get('/mutational_association', queryAssociation);
-router.get('/mutational_association_options', associationOptions);
+router.get('/signature_association', queryAssociation);
+router.get('/signature_association_options', associationOptions);
 
 module.exports = { router, queryAssociation, associationOptions };

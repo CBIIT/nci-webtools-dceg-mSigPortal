@@ -4,7 +4,7 @@
     { "name": "Mutational Signature" },
     { "name": "Mutational Spectrum" },
     { "name": "Signature Activity" },
-    { "name": "Mutational Association" },
+    { "name": "Signature Association" },
     { "name": "Signature Etiology" }
   ],
   "paths": {
@@ -800,9 +800,9 @@
       }
     },
 
-    "/api/mutational_association_options": {
+    "/api/signature_association_options": {
       "get": {
-        "tags": ["Mutational Association"],
+        "tags": ["Signature Association"],
         "summary": "Retrieves association options",
         "produces": ["application/json"],
         "parameters": [
@@ -877,9 +877,9 @@
       }
     },
 
-    "/api/mutational_association": {
+    "/api/signature_association": {
       "get": {
-        "tags": ["Mutational Association"],
+        "tags": ["Signature Association"],
         "summary": "Retrieves association data",
         "produces": ["application/json"],
         "parameters": [
