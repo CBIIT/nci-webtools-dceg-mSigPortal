@@ -62,7 +62,7 @@ export default function mutationalPatternBar(inputData) {
     y: data.map((patterndata, index, array) => patterndata.data.length),
   };
 
-  var layout = {
+  const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     autosize: true,
     height: 500,
@@ -95,9 +95,15 @@ export default function mutationalPatternBar(inputData) {
       },
     },
   };
-  var config = {
+  const config = {
+    displayModeBar: true,
     responsive: true,
+    displaylogo: false,
+    toImageButtonOptions: {
+      format: 'svg',
+      filename: 'Frequency of Mutational Pattern',
+    },
   };
 
-  return { traces: [traces], layout: layout, config };
+  return { traces: [traces], layout, config };
 }

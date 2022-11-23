@@ -270,8 +270,14 @@ export default function mutationalPatternScatter(inputData, arg) {
     },
   };
 
-  let config = {
+  const config = {
+    displayModeBar: true,
     responsive: true,
+    displaylogo: false,
+    toImageButtonOptions: {
+      format:'svg',
+      filename: 'Proportion of Mutational Pattern',
+    },
   };
 
   return { traces: traces, layout: layout, config };
