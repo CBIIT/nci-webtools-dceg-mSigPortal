@@ -99,12 +99,12 @@ export default function Rainfall(inputData, genomeInfo) {
         .map((e) => ({
           type: 'line',
           xref: 'x',
-          yref: 'paper',
-          x0: e.end,
-          x1: e.end,
-          y0: 0,
-          y1: 0.78,
-          line: { width: 0.5 },
+          yref: 'y',
+          x0: -binSize,
+          x1: genomeInfo['Y'].end + binSize,
+          y0: Math.pow(10, 3),
+          y1: Math.pow(10, 3),
+          line: { width: 0.5, color: 'red' },
         })),
     ],
     legend: {
