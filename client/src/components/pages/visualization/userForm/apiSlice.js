@@ -43,7 +43,9 @@ export const userFormApiSlice = visualizationApiSlice.injectEndpoints({
       async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
         try {
           const data = await (
-            await fetch(`assets/exampleHeader/Header_${_arg}.txt`)
+            await fetch(
+              `https://raw.githubusercontent.com/xtmgah/mSigPortal/master/Input_Format/Header_${_arg}.txt`
+            )
           ).text();
           return { data };
         } catch (error) {
