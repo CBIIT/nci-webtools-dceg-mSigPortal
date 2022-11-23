@@ -464,6 +464,76 @@
       }
     },
 
+    "/api/signature_landscape": {
+      "get": {
+        "tags": ["Signature Activity"],
+        "summary": "Retrieves data required for the MS Landscape visualization",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "study",
+            "in": "query",
+            "description": "Select which study to query data from.",
+            "required": true,
+            "schema": { "type": "string" },
+            "value": "PCAWG"
+          },
+          {
+            "name": "strategy",
+            "in": "query",
+            "description": "Select strategy (dataset) to filter data by.",
+            "required": true,
+            "schema": { "type": "string" },
+            "value": "WGS"
+          },
+          {
+            "name": "signatureSetName",
+            "in": "query",
+            "description": "Enter signature set to filter data by.",
+            "required": true,
+            "schema": { "type": "string" },
+            "value": "COSMIC_v3_Signatures_GRCh37_SBS96"
+          },
+          {
+            "name": "cancer",
+            "in": "query",
+            "description": "Enter cancer",
+            "required": false,
+            "schema": { "type": "string" },
+            "value": "Lung-AdenoCA"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit number of records returned",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "10"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Records to skip",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "500": {
+            "description": "API error"
+          }
+        }
+      }
+    },
+
     "/api/mutational_signature_options": {
       "get": {
         "tags": ["Mutational Signature"],

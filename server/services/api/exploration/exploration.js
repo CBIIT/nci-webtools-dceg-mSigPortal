@@ -124,50 +124,33 @@ async function explorationWrapper(req, res, next) {
 
 // query 3 separate tables and return exposure data sorted by clusters and cosine similarity
 async function msLandscape(req, res, next) {
-  logger.debug('/msLandscape: ' + JSON.stringify(req.body));
   try {
-    const {
-      params_activity,
-      params_spectrum,
-      params_signature,
-      projectID: id,
-    } = req.body;
+    const { study, strategy, signatureSetName, cancer, userId } = req.query;
 
     const connection = req.app.locals.connection;
     const columns = '*';
 
-    const exposureData = await getExposureData(
-      connection,
-      params_activity,
-      columns
-    );
+    const exposureData = await getExposureData(connection, req.query, columns);
     const signatureData = await getSignatureData(
       connection,
-      params_signature,
+      { signatureSetName },
       columns
     );
     const seqmatrixData = await getSeqmatrixData(
       connection,
-      params_spectrum,
+      { study, strategy, cancer },
       columns
     );
 
-    // console.log(exposureData[0]);
-    // console.log(signatureData[0]);
-    console.log(seqmatrixData[0]);
     const fn = 'msLandscape';
     const args = { exposureData, signatureData, seqmatrixData };
-    const projectID = id || randomUUID();
-
-    const savePath = path.join(projectID, 'results', fn, '/');
-    fs.mkdirSync(path.join(rConfig.wd, savePath), { recursive: true });
+    const projectID = userId || randomUUID();
 
     const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
       fn,
       args,
       config: {
         ...rConfig,
-        savePath,
         projectID,
       },
     });
@@ -191,6 +174,6 @@ router.get('/signature_activity', queryExposure);
 router.get('/signature_activity_options', explorationOptions);
 router.get('/explorationSamples', explorationSamples);
 router.post('/explorationWrapper', explorationWrapper);
-router.post('/msLandscape', msLandscape);
+router.get('/signature_landscape', msLandscape);
 
 module.exports = { router, queryExposure };

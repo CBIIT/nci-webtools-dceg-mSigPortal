@@ -11,7 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolderMinus, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import Plotly from '../../../controls/plotly/plot/plot';
 import { useSelector } from 'react-redux';
-import { useMsLandscapePlot2Query } from './apiSlice';
+import { useMsLandscapePlotQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
 import './plot.scss';
@@ -26,12 +26,9 @@ export default function MsLandscapePlot() {
   //   skip: !params,
   // });
   const [calculationQuery, setCalculationQuery] = useState('');
-  // const { data, error, isFetching } = useMsLandscapePlotQuery(
-  const { data, error, isFetching } = useMsLandscapePlot2Query(
+  const { data, error, isFetching } = useMsLandscapePlotQuery(
     calculationQuery,
-    {
-      skip: !calculationQuery,
-    }
+    { skip: !calculationQuery }
   );
 
   // useEffect(() => {
@@ -47,25 +44,11 @@ export default function MsLandscapePlot() {
   useEffect(() => {
     const { study, strategy, signatureSetName, cancer } = publicForm;
     if (study) {
-      const params_activity = {
-        study: study.value,
-        strategy: strategy.value,
-        signatureSetName: signatureSetName.value,
-        cancer: cancer.value,
-        //orderByCluster: true,
-      };
-      const params_spectrum = {
-        study: study.value,
-        strategy: strategy.value,
-        cancer: cancer.value,
-      };
-      const params_signature = {
-        signatureSetName: signatureSetName.value,
-      };
       setCalculationQuery({
-        params_activity,
-        params_signature,
-        params_spectrum,
+        study: study.value,
+        strategy: strategy.value,
+        signatureSetName: signatureSetName.value,
+        cancer: cancer.value,
       });
     }
   }, [publicForm]);

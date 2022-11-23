@@ -3,17 +3,13 @@ import MsLandscape from '../../../controls/plotly/msLandscape/msLandscape';
 
 export const msLandscapeApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    msLandscapePlot2: builder.query({
-      query: (body) => ({
-        url: 'msLandscape',
-        method: 'POST',
-        body,
+    msLandscapePlot: builder.query({
+      query: (params) => ({
+        url: 'signature_landscape',
+        params,
       }),
       transformResponse: (data) => {
         const { cosineData, exposureData } = data.output;
-        //return true;
-        console.log(cosineData);
-        console.log(exposureData);
         return MsLandscape(cosineData, exposureData);
       },
     }),
