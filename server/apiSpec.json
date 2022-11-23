@@ -501,26 +501,6 @@
             "required": false,
             "schema": { "type": "string" },
             "value": "Lung-AdenoCA"
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "Limit number of records returned",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "value": "10"
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "description": "Records to skip",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "value": "0"
           }
         ],
         "responses": {

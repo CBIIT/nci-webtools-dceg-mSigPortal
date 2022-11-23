@@ -125,31 +125,24 @@ async function explorationWrapper(req, res, next) {
 // query 3 separate tables and return exposure data sorted by clusters and cosine similarity
 async function msLandscape(req, res, next) {
   try {
-    const {
-      study,
-      strategy,
-      signatureSetName,
-      cancer,
-      userId,
-      ...queryOptions
-    } = req.query;
+    const { study, strategy, signatureSetName, cancer, userId } = req.query;
 
     const connection = req.app.locals.connection;
     const columns = '*';
 
     const exposureData = await getExposureData(
       connection,
-      { study, strategy, signatureSetName, cancer, ...queryOptions },
+      { study, strategy, signatureSetName, cancer },
       columns
     );
     const signatureData = await getSignatureData(
       connection,
-      { signatureSetName, ...queryOptions },
+      { signatureSetName },
       columns
     );
     const seqmatrixData = await getSeqmatrixData(
       connection,
-      { study, strategy, cancer, ...queryOptions },
+      { study, strategy, cancer },
       columns
     );
 
