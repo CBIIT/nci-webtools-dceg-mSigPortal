@@ -6,7 +6,7 @@ export const msDecompositionApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // msDecomposition: builder.query({
     //   query: (params) => ({
-    //     url: 'mutational_activity',
+    //     url: 'signature_activity',
     //     params,
     //   }),
     //   transformResponse: (data, meta, arg) => {
@@ -54,14 +54,14 @@ export const msDecompositionApiSlice = explorationApiSlice.injectEndpoints({
         try {
           console.log(_arg);
           console.log(
-            '/mutational_activity?' + new URLSearchParams(_arg.params_activity)
+            '/signature_activity?' + new URLSearchParams(_arg.params_activity)
           );
           console.log(
             '/mutational_spectrum' + new URLSearchParams(_arg.params_spectrum)
           );
           const res = await Promise.all([
             fetchWithBQ(
-              '/mutational_activity?' +
+              '/signature_activity?' +
                 new URLSearchParams(_arg.params_activity)
             ), //exposure
             fetchWithBQ(

@@ -8,7 +8,7 @@ export const optionsApiSlice = createApi({
       query: (params) => ({ url: 'mutational_spectrum_options', params }),
     }),
     exposureOptions: builder.query({
-      query: (params) => ({ url: 'mutational_activity_options', params }),
+      query: (params) => ({ url: 'signature_activity_options', params }),
     }),
     signatureOptions: builder.query({
       query: (params) => ({ url: 'mutational_signature_options', params }),

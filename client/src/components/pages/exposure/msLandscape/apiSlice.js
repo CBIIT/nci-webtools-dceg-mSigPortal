@@ -23,7 +23,7 @@ export const msLandscapeApiSlice = explorationApiSlice.injectEndpoints({
     //     try {
     //       const res = await Promise.all([
     //         fetchWithBQ(
-    //           '/mutational_activity?' +
+    //           '/signature_activity?' +
     //             new URLSearchParams(_arg.params_activity)
     //         ), //exposure
     //         fetchWithBQ(

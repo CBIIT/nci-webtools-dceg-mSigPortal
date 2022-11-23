@@ -3,7 +3,7 @@
   "tags": [
     { "name": "Mutational Signature" },
     { "name": "Mutational Spectrum" },
-    { "name": "Mutational Activity" },
+    { "name": "Signature Activity" },
     { "name": "Mutational Association" },
     { "name": "Signature Etiology" }
   ],
@@ -276,9 +276,9 @@
       }
     },
 
-    "/api/mutational_activity_options": {
+    "/api/signature_activity_options": {
       "get": {
-        "tags": ["Mutational Activity"],
+        "tags": ["Signature Activity"],
         "summary": "Retrieves Exposure options",
         "produces": ["application/json"],
         "parameters": [
@@ -356,9 +356,9 @@
       }
     },
 
-    "/api/mutational_activity": {
+    "/api/signature_activity": {
       "get": {
-        "tags": ["Mutational Activity"],
+        "tags": ["Signature Activity"],
         "summary": "Retrieves Exposure data",
         "produces": ["application/json"],
         "parameters": [

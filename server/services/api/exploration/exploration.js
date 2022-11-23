@@ -187,8 +187,8 @@ async function msLandscape(req, res, next) {
 
 const router = Router();
 
-router.get('/mutational_activity', queryExposure);
-router.get('/mutational_activity_options', explorationOptions);
+router.get('/signature_activity', queryExposure);
+router.get('/signature_activity_options', explorationOptions);
 router.get('/explorationSamples', explorationSamples);
 router.post('/explorationWrapper', explorationWrapper);
 router.post('/msLandscape', msLandscape);
