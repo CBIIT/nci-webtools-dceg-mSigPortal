@@ -125,6 +125,7 @@ export default function ClusteredPlot() {
             layout={data.layout}
             config={data.config}
           />
+          <hr />
           <p className="p-3">
             The table below is a summary of the kataegis identification based on
             the input parameters. The table can be filtered based on any of the
