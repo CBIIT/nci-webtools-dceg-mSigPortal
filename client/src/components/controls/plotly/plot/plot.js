@@ -29,19 +29,6 @@ export default function Plotly({
   return (
     <Container fluid>
       <Row>
-        <Col>
-          <Plot
-            className="w-100"
-            divId={divId}
-            data={cloneDeep(data)}
-            layout={cloneDeep(layout)}
-            config={cloneDeep({ ...defaultConfig, ...config })}
-            useResizeHandler
-            {...rest}
-          />
-        </Col>
-      </Row>
-      <Row>
         {/* <Col sm="auto">
           <Button
             variant="link"
@@ -68,7 +55,7 @@ export default function Plotly({
             Download SVG
           </Button>
         </Col> */}
-        <Col>
+        <Col className="d-flex justify-content-end">
           <Button
             variant="link"
             onClick={() =>
@@ -80,8 +67,21 @@ export default function Plotly({
               )
             }
           >
-            Download JSON
+            Download Plotly Data
           </Button>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <Plot
+            className="w-100"
+            divId={divId}
+            data={cloneDeep(data)}
+            layout={cloneDeep(layout)}
+            config={cloneDeep({ ...defaultConfig, ...config })}
+            useResizeHandler
+            {...rest}
+          />
         </Col>
       </Row>
     </Container>
