@@ -297,12 +297,12 @@ export default function Table({
         </BootstrapTable>
       </div>
 
-      <div className="d-flex flex-wrap align-items-center justify-content-end p-3">
-        {/* <div>
+      <div className="d-flex flex-wrap align-items-center justify-content-between p-3">
+        <div>
           Showing rows {(1 + pageIndex * pageSize).toLocaleString()}-
           {Math.min(rows.length, (pageIndex + 1) * pageSize).toLocaleString()}{' '}
           of {rows.length.toLocaleString()}
-        </div> */}
+        </div>
 
         <div className="d-flex flex-row justify-content-end my-auto text-primary">
           <div className="d-flex align-items-center">
