@@ -635,7 +635,12 @@ export default function UserForm() {
             name="seqInfo"
             control={control}
             render={({ field }) => (
-              <Form.Check.Input {...field} type="checkbox" checked={seqInfo} />
+              <Form.Check.Input
+                {...field}
+                type="checkbox"
+                checked={seqInfo}
+                disabled={submitted}
+              />
             )}
           />
         </Form.Check>
@@ -674,7 +679,12 @@ export default function UserForm() {
             name="cluster"
             control={control}
             render={({ field }) => (
-              <Form.Check.Input {...field} type="checkbox" checked={cluster} />
+              <Form.Check.Input
+                {...field}
+                type="checkbox"
+                checked={cluster}
+                disabled={submitted}
+              />
             )}
           />
         </Form.Check>
