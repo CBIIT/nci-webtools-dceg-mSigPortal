@@ -136,11 +136,13 @@ export default function ClusteredPlot() {
               className="border"
               data={data.table}
               columns={columns}
-              customOptions={{ hideColumns: true, download: true }}
+              customOptions={{
+                hideColumns: true,
+                download: 'clustered_mutations_identification',
+              }}
               options={{
                 initialState: {
                   hiddenColumns: ['id'],
-                  download: true,
                 },
               }}
               striped
