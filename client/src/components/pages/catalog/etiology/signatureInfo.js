@@ -518,7 +518,7 @@ export default function SignatureInfo({ data }) {
                           hiddenColumns: ['id', 'signature'],
                         },
                       }}
-                      customOptions={{ hideColumns: true }}
+                      customOptions={{ hideColumns: true, download: true }}
                       striped
                     />
                   ) : (

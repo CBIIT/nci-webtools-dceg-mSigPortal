@@ -135,7 +135,7 @@ export default function ClusteredPlot() {
               className="border"
               data={data.table}
               columns={columns}
-              customOptions={{ hideColumns: true }}
+              customOptions={{ hideColumns: true, download: true }}
               options={{
                 initialState: {
                   hiddenColumns: ['id'],

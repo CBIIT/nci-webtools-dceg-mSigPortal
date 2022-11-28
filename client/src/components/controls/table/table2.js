@@ -172,7 +172,7 @@ export default function Table({
               variant="link"
               onClick={() => handleSaveCSV(data, customOptions.download)}
             >
-              Save CSV
+              Download Table
             </Button>
           </Col>
         )}
