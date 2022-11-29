@@ -2,6 +2,29 @@ import { atom, selector } from 'recoil';
 import axios from 'axios';
 import sigPatternData from './sigPatternData.json';
 
+export const colorOptions = [
+  {
+    label: 'Cosine Similarity',
+    value: 'Cosine_similarity',
+    continuous: true,
+  },
+  {
+    label: 'Dominant Mutation',
+    value: 'Dmut',
+    continuous: false,
+  },
+  {
+    label: 'Dominant Signature',
+    value: 'Dsig',
+    continuous: false,
+  },
+  {
+    label: 'Cancer Type',
+    value: 'Cancer_Type',
+    continuous: false,
+  },
+];
+
 export const defaultFormState = {
   showLabels: false,
   color: {
@@ -18,7 +41,7 @@ export const formState = atom({
 
 export const defaultTreeLeafData = { links: [], nodes: [] };
 
-export const getGraphData = selector({
+export const graphDataSelector = selector({
   key: 'treeLeaf.plotData',
   get: async ({ get }) => {
     try {
