@@ -1,10 +1,11 @@
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { formState, getGraphData } from './treeLeaf.state';
+import { formState, graphDataSelector, colorOptions } from './treeLeaf.state';
 import { Form, Row, Col } from 'react-bootstrap';
 import MultiSelect from '../../../controls/select/multiSelect';
 import Select from 'react-select';
+
 export default function TreeLeafForm() {
-  const { attributes } = useRecoilValue(getGraphData);
+  const { attributes } = useRecoilValue(graphDataSelector);
   const [form, setForm] = useRecoilState(formState);
   const mergeForm = (state) => setForm({ ...form, ...state });
 
@@ -33,29 +34,6 @@ export default function TreeLeafForm() {
   async function handleSearchOptions(inputValue) {
     return filterSampleOptions(inputValue, 40);
   }
-
-  const colorOptions = [
-    {
-      label: 'Cosine Similarity',
-      value: 'Cosine_similarity',
-      continuous: true,
-    },
-    {
-      label: 'Dominant Mutation',
-      value: 'Dmut',
-      continuous: false,
-    },
-    {
-      label: 'Dominant Signature',
-      value: 'Dsig',
-      continuous: false,
-    },
-    {
-      label: 'Cancer Type',
-      value: 'Cancer_Type',
-      continuous: false,
-    },
-  ];
 
   return (
     <Form>
