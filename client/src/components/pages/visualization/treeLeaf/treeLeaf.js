@@ -1,11 +1,13 @@
 import { Suspense } from 'react';
-import { Alert, Container } from 'react-bootstrap';
+import { Alert, Button, Container } from 'react-bootstrap';
 import Loader from '../../../controls/loader/loader';
 import ErrorBoundary from '../../../controls/errorBoundary/error-boundary';
 import D3TreeLeaf from './treeLeafPlot';
 import TreeLeafForm from './treeLeafForm';
+import { exportSvg } from './treeLeaf.utils';
 
 export default function TreeAndLeaf(props) {
+  const plotId = 'treeLeafPlot';
   return (
     <Container
       fluid
@@ -22,8 +24,11 @@ export default function TreeAndLeaf(props) {
         }
       >
         <Suspense fallback={<Loader message="Loading Plot" />}>
-          <TreeLeafForm />
-          <D3TreeLeaf width={2000} height={2000} />
+          <div className="d-flex justify-content-between align-items-end">
+            <TreeLeafForm />
+            <Button variant="link" onClick={() => exportSvg(`#${plotId}`, 'treeLeaf.svg')}>Export Plot</Button>
+          </div>
+          <D3TreeLeaf id={plotId} width={2000} height={2000} />
         </Suspense>
       </ErrorBoundary>
     </Container>
