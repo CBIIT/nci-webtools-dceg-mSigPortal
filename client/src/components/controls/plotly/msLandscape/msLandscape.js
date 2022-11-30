@@ -110,354 +110,6 @@ export default function MsLandscape(cosineData, exposureData) {
     [1.0, 'rgb(241,246,34)'],
   ];
 
-  // const mutationType = [];
-
-  // const mType = groupBy(rawDataSignature, 'mutationType');
-  // Object.keys(mType).map((e) => mutationType.push(e));
-  // console.log(mutationType);
-
-  // const filterDataSpectrum = rawDataSpectrum.filter((e) =>
-  //   mutationType.includes(e.mutationType)
-  // );
-
-  // const filterDataSignature = rawDataSignature.filter((e) =>
-  //   mutationType.includes(e.mutationType)
-  // );
-  // console.log(filterDataSpectrum);
-  // const exposure_refdata_input = rawDataActivity.map((group) => ({
-  //   exposure: group.exposure,
-  //   sample: group.sample,
-  //   signatureName: group.signatureName,
-  // }));
-  // console.log('exposure_refdata_input');
-  // console.log(exposure_refdata_input);
-
-  // const seqmatrix_refdata_input = filterDataSpectrum.map((group) => ({
-  //   mutation: group.mutations,
-  //   mutationType: group.mutationType,
-  //   sample: group.sample,
-  // }));
-  // console.log('seqmatrix_refdata_input');
-  // console.log(seqmatrix_refdata_input);
-
-  // const signature_refsets_input = filterDataSignature.map((group) => ({
-  //   contribution: group.contribution,
-  //   mutationType: group.mutationType,
-  //   signatureName: group.signatureName,
-  // }));
-
-  // console.log('signature_refsets_input');
-  // console.log(signature_refsets_input);
-
-  // const groupBySample_exposure = groupBy(exposure_refdata_input, 'sample');
-  // console.log(groupBySample_exposure);
-
-  // const groupBySignatureName_exposure = groupBy(
-  //   exposure_refdata_input,
-  //   'signatureName'
-  // );
-  // console.log(groupBySignatureName_exposure);
-
-  // const dataSignature = Object.entries(groupBySample_exposure).map(
-  //   ([key, value]) => ({
-  //     signatureName: key,
-  //     total: value.reduce((a, e) => a + parseInt(e.exposure), 0),
-  //     sample: value.map((e) => e.sample),
-  //     exposure: value.map((e) => e.exposure),
-  //   })
-  // );
-  // //.filter((obj) => obj.exposure !== 0);
-  // console.log(dataSignature);
-
-  // const groupByMutationType_signature = groupBy(
-  //   rawDataSignature,
-  //   'mutationType'
-  // );
-  // console.log(groupByMutationType_signature);
-
-  // const groupByMutationType_spectrum = groupBy(
-  //   filterDataSpectrum,
-  //   'mutationType'
-  // );
-  // console.log(groupByMutationType_spectrum);
-  // console.log(groupBy(filterDataSpectrum, 'cancer'));
-
-  // const sortSignatureName = (sourceArray) => {
-  //   const sortByLocation = (a, b) =>
-  //     a.signatureName.localeCompare(b.signatureName, 'en', { numeric: true });
-  //   return sourceArray.sort(sortByLocation);
-  // };
-  // //  decompsite_input <- calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
-  // //calculate_similarities(orignal_genomes = seqmatrix_refdata_input, signature = signature_refsets_input, signature_activaties = exposure_refdata_input)
-  // function dotp(x, y) {
-  //   function dotp_sum(a, b) {
-  //     return a + b;
-  //   }
-  //   function dotp_times(a, i) {
-  //     return x[i] * y[i];
-  //   }
-  //   return x.map(dotp_times).reduce(dotp_sum, 0);
-  // }
-  // function cosineSimilarity(A, B) {
-  //   var similarity =
-  //     dotp(A, B) / (Math.sqrt(dotp(A, A)) * Math.sqrt(dotp(B, B)));
-  //   return similarity;
-  // }
-  // //const cosine = cosineSimilarity(s1mutations, s2mutations).toFixed(3);
-
-  // //matrix multiplication
-  // function matrixDot(A, B) {
-  //   var result = new Array(A.length)
-  //     .fill(0)
-  //     .map((row) => new Array(B[0].length).fill(0));
-
-  //   return result.map((row, i) => {
-  //     return row.map((val, j) => {
-  //       return A[i].reduce((sum, elm, k) => sum + elm * B[k][j], 0);
-  //     });
-  //   });
-  // }
-
-  // const multiplyMatrices = (a, b) => {
-  //   if (!Array.isArray(a) || !Array.isArray(b) || !a.length || !b.length) {
-  //     throw new Error('arguments should be in 2-dimensional array format');
-  //   }
-  //   let x = a.length,
-  //     z = a[0].length,
-  //     y = b[0].length;
-  //   console.log(x);
-  //   console.log(y);
-  //   console.log(z);
-  //   console.log(b.length);
-  //   if (b.length !== z) {
-  //     // XxZ & ZxY => XxY
-  //     throw new Error(
-  //       'number of columns in the first matrix should bethe same as the number of rows in the second'
-  //     );
-  //   }
-  //   let productRow = Array.apply(null, new Array(y)).map(
-  //     Number.prototype.valueOf,
-  //     0
-  //   );
-  //   let product = new Array(x);
-  //   for (let p = 0; p < x; p++) {
-  //     product[p] = productRow.slice();
-  //   }
-  //   for (let i = 0; i < x; i++) {
-  //     for (let j = 0; j < y; j++) {
-  //       for (let k = 0; k < z; k++) {
-  //         product[i][j] += a[i][k] * b[k][j];
-  //       }
-  //     }
-  //   }
-  //   return product;
-  // };
-
-  // function matrixMul(m1, m2) {
-  //   const fil_m1 = m1.length;
-  //   const col_m1 = m1[0].length;
-  //   const fil_m2 = m2.length;
-  //   const col_m2 = m2[0].length;
-  //   console.log('m1 lenght: ' + fil_m1);
-  //   console.log('m1 col: ' + col_m1);
-  //   console.log('m2 lenght: ' + fil_m2);
-  //   console.log('m2 col: ' + col_m2);
-  //   if (col_m1 != fil_m2) throw 'Matrices cannot be multiplied';
-  //   let multiplication = new Array(fil_m1);
-  //   for (let x = 0; x < multiplication.length; x++)
-  //     multiplication[x] = new Array(col_m2).fill(0);
-  //   for (let x = 0; x < multiplication.length; x++) {
-  //     for (let y = 0; y < multiplication[x].length; y++) {
-  //       for (let z = 0; z < col_m1; z++) {
-  //         multiplication[x][y] = multiplication[x][y] + m1[x][z] * m2[z][y];
-  //       }
-  //     }
-  //   }
-  // }
-
-  // function uniq(a) {
-  //   return Array.from(new Set(a));
-  // }
-  // function calculate_similarities(
-  //   orignal_genomes,
-  //   signature,
-  //   signature_activaties
-  // ) {
-  //   const data2 = orignal_genomes;
-  //   const data3 = signature;
-  //   const data4 = signature_activaties;
-  //   console.log('data2: ');
-  //   console.log(data2);
-  //   console.log('data3: ');
-  //   console.log(data3);
-  //   console.log('data4: ');
-  //   console.log(data4);
-
-  //   const sample_name_total = data4.map((e) => e.sample);
-  //   const sample_name_tmp = data2.map((e) => e.sample);
-  //   const sample_name = uniq(
-  //     sample_name_total.filter((x) => sample_name_tmp.includes(x))
-  //   );
-  //   console.log(sample_name);
-
-  //   const signature_name_total = data4.map((e) => e.signatureName);
-  //   const signature_name_tmp = data3.map((e) => e.signatureName);
-  //   const signature_name = uniq(
-  //     signature_name_total.filter((x) => signature_name_tmp.includes(x))
-  //   );
-  //   //console.log(signature_name_total);
-  //   //console.log(signature_name_tmp);
-  //   console.log(signature_name);
-  //   const newData3 = data3.filter((e) =>
-  //     signature_name.includes(e.signatureName)
-  //   );
-  //   console.log(newData3);
-  //   const dataSample2 = groupBy(
-  //     data2.map((e) => ({
-  //       mutation: e.mutation,
-  //       sample: e.sample,
-  //     })),
-  //     'sample'
-  //   );
-  //   const dataSample3 = groupBy(
-  //     sortSignatureName(newData3).map((e) => ({
-  //       contribution: e.contribution,
-  //       signatureName: e.signatureName,
-  //     })),
-  //     'signatureName'
-  //   );
-
-  //   const dataSample4 = groupBy(
-  //     sortSignatureName(data4).map((e) => ({
-  //       exposure: e.exposure,
-  //       signatureName: e.signatureName,
-  //     })),
-  //     'signatureName'
-  //   );
-  //   const array2 = [];
-  //   Object.values(dataSample2).forEach((group) => {
-  //     //console.log(group);
-  //     array2.push(group.map((e) => e.mutation));
-  //   });
-  //   const array3 = [];
-  //   Object.values(dataSample3).forEach((group) => {
-  //     array3.push(group.map((e) => e.contribution));
-  //   });
-  //   const array4 = [];
-  //   Object.values(dataSample4).forEach((group) => {
-  //     array4.push(group.map((e) => e.exposure));
-  //   });
-  //   console.log(dataSample2);
-  //   console.log(array2);
-  //   console.log(dataSample3);
-  //   console.log(array3);
-  //   console.log(dataSample4);
-  //   console.log(array4);
-  //   const array3_trans = array3[0].map((_, colIndex) =>
-  //     array3.map((row) => row[colIndex])
-  //   );
-  //   console.log(array3_trans);
-  //   const genomes = array2;
-  //   console.log(genomes);
-  //   const est_genomes = multiplyMatrices(array3_trans, array4);
-  //   console.log(est_genomes);
-  // }
-
-  // calculate_similarities(
-  //   seqmatrix_refdata_input,
-  //   signature_refsets_input,
-  //   exposure_refdata_input
-  // );
-
-  // const barCharColor = Object.keys(groupBySignatureName_exposure);
-  // console.log(barCharColor);
-
-  // const xAxisName = Object.values(groupBySignatureName_exposure)[0]
-  //   .map((e) => ({
-  //     sample: e.sample,
-  //   }))
-  //   .flat();
-  // console.log(xAxisName.map((e) => e));
-  // const traces1 = Object.entries(groupBySignatureName_exposure)
-  //   .reverse()
-  //   .map(([key, value]) => ({
-  //     key: key,
-  //     value: value,
-  //     map: barCharColor.map((e) => e),
-  //     co: barCharColor.map((e) => e.replace(/^\D*/, '')),
-  //     //showlegend: true,
-  //     name: key,
-  //     type: 'bar',
-  //     x: value.map((e) => e.sample),
-  //     y: value.map((e, i) => e.exposure / dataSignature[i].total),
-  //     total: value.map((e, i) => dataSignature[i].total),
-  //     marker: {
-  //       color: colors[key.replace(/^\D*/, '')],
-  //     },
-  //     showlegend: false,
-  //     test: value.map((d, i) => d.exposure / dataSignature[i].total),
-  //     expo: value.map((e, i) => e.exposure),
-  //   }));
-  // console.log(traces1);
-  // const traces2 = [
-  //   {
-  //     z: [xAxisName.map((_, i) => i / 65)],
-  //     x: xAxisName.map((e) => e.sample),
-  //     hoverongaps: false,
-  //     xaxis: 'x',
-  //     yaxis: 'y2',
-  //     type: 'heatmap',
-  //     colorscale: heatmapColorscale,
-  //     zmin: 0.6,
-  //     zmax: 1,
-  //     colorbar: {
-  //       orientation: 'h',
-  //       x: 0.5,
-  //       y: xAxisName.length > 250 ? -0.2 : -0.3,
-  //       bordercolor: 'gray',
-  //       tickmode: 'array',
-  //       tickvals: [0.6, 0.7, 0.8, 0.9, 1],
-  //       title: {
-  //         text: 'Cosine Similarity',
-  //         font: {
-  //           family: 'Arial',
-  //           size: 17,
-  //           color: 'rgb(37,37,37)',
-  //         },
-  //       },
-  //     },
-  //     xgap: 0.2,
-  //   },
-  // ];
-  // console.log(traces2);
-
-  // const traces3 = Object.entries(groupBySignatureName_exposure)
-  //   .reverse()
-  //   .map(([key, value]) => ({
-  //     key: key,
-  //     value: value,
-  //     map: barCharColor.map((e) => e),
-  //     co: barCharColor.map((e) => e.replace(/^\D*/, '')),
-  //     name: key,
-  //     type: 'bar',
-  //     x: value.filter((obj) => obj.exposure !== 0).map((e) => e.sample),
-  //     y: value.filter((obj) => obj.exposure !== 0).map((e, i) => e.exposure),
-  //     //showlegend: true,
-  //     marker: {
-  //       color: colors[key.replace(/^\D*/, '')],
-  //     },
-  //     xaxis: 'x',
-  //     yaxis: 'y3',
-  //     // transforms: [
-  //     //   {
-  //     //     type: 'sort',
-  //     //     target: 'y',
-  //     //     order: 'descending',
-  //     //   },
-  //     // ],
-  //   }));
-  // console.log(traces3);
-
   const sortSignatureName = (sourceArray) => {
     const sortByLocation = (a, b) =>
       a.signatureName.localeCompare(b.signatureName, 'en', { numeric: true });
@@ -483,20 +135,38 @@ export default function MsLandscape(cosineData, exposureData) {
   const barCharColor = Object.keys(groupBySignatureName_exposure);
   console.log(barCharColor);
 
-  const dataSignature = Object.entries(groupBySample_exposure).map(
-    ([key, value]) => ({
-      sample: key,
-      total: value.reduce((a, e) => a + parseInt(e.exposure), 0),
-      signatureName: value.map((e) => e.signatureName),
-      exposure: value.map((e) => e.exposure),
-      exposureNorm: value.map(
-        (e) => e.exposure / value.reduce((a, e) => a + parseInt(e.exposure), 0)
-      ),
-    })
-  );
-  console.log(dataSignature);
+  // const dataSignature = Object.entries(groupBySample_exposure).map(
+  //   ([key, value]) => ({
+  //     sample: key,
+  //     total: value.reduce((a, e) => a + parseInt(e.exposure), 0),
+  //     signatureName: value.map((e) => e.signatureName),
+  //     exposure: value.map((e) => e.exposure),
+  //     exposureNorm: value.map(
+  //       (e) => e.exposure / value.reduce((a, e) => a + parseInt(e.exposure), 0)
+  //     ),
+  //   })
+  // );
+  // console.log(dataSignature);
 
-  const traces1 = Object.entries(groupBySignatureName_exposure)
+  const dataSignature2 = Object.entries(groupBySample_exposure)
+
+    .map(([sample, data]) => {
+      const total = data.reduce((a, e) => a + parseInt(e.exposure), 0);
+
+      return data.map((e) => ({ ...e, total }));
+    })
+
+    .flat();
+
+  console.log(dataSignature2);
+
+  const groupBySignatureName_exposure2 = groupBy(
+    sortSignatureName(dataSignature2),
+    'signatureName'
+  );
+  console.log(groupBySignatureName_exposure2);
+
+  const traces1 = Object.entries(groupBySignatureName_exposure2)
     .reverse()
     .map(([key, value]) => ({
       key: key,
@@ -506,8 +176,7 @@ export default function MsLandscape(cosineData, exposureData) {
       name: key,
       type: 'bar',
       x: value.map((e) => e.sample),
-      y: value.map((e, i) => e.exposure / dataSignature[i].total),
-      total: value.map((e, i) => dataSignature[i].total),
+      y: value.map((e, i) => e.exposure / e.total),
       marker: {
         color: colors[key.replace(/^\D*/, '')],
       },
@@ -546,7 +215,7 @@ export default function MsLandscape(cosineData, exposureData) {
     },
   ];
   console.log(traces2);
-  const traces3 = Object.entries(groupBySignatureName_exposure)
+  const traces3 = Object.entries(groupBySignatureName_exposure2)
     .reverse()
     .map(([key, value]) => ({
       key: key,
