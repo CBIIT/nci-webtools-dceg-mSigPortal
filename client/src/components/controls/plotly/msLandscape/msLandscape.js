@@ -190,8 +190,8 @@ export default function MsLandscape(cosineData, exposureData) {
   console.log(tracesNormalize);
   const tracesHeatMap = [
     {
-      z: [sortedCosin.map((e) => e.similarity)],
-      x: sortedCosin.map((e) => e.sample),
+      z: [cosineData.map((e) => e.similarity)],
+      x: cosineData.map((e) => e.sample),
       hoverongaps: false,
       xaxis: 'x',
       yaxis: 'y2',
@@ -299,6 +299,7 @@ export default function MsLandscape(cosineData, exposureData) {
       tickangle: -90,
       ticks: '',
       showticklabels: xAxis.length > 250 ? false : true,
+      zeroline: false,
     },
     yaxis: { title: 'Signature contribution', domain: [0, 0.49] },
     yaxis2: {
