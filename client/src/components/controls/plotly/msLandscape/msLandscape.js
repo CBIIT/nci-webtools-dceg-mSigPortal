@@ -171,7 +171,7 @@ export default function MsLandscape(cosineData, exposureData) {
   console.log(barCharColor);
 
   const tracesNormalize = Object.entries(groupBySignatureName_exposure2)
-    //.reverse()
+    .reverse()
     .map(([key, value]) => ({
       key: key,
       value: value,
@@ -220,7 +220,7 @@ export default function MsLandscape(cosineData, exposureData) {
   ];
   console.log(tracesHeatMap);
   const tracesStackedBar = Object.entries(groupBySignatureName_exposure2)
-    //.reverse()
+    .reverse()
     .map(([key, value]) => ({
       key: key,
       value: value,
@@ -246,7 +246,7 @@ export default function MsLandscape(cosineData, exposureData) {
     }));
   console.log(tracesStackedBar);
 
-  const traces = [...tracesStackedBar, ...tracesHeatMap, ...tracesNormalize];
+  const traces = [...tracesHeatMap, ...tracesStackedBar, ...tracesNormalize];
   console.log(traces);
 
   const longest = xAxis.reduce((a, e) => (a > e.length ? a : e.length), 0);
