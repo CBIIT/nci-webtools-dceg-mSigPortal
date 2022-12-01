@@ -4,6 +4,7 @@ import { useExampleHeaderQuery } from './userForm/apiSlice';
 
 export default function Instructions() {
   const { inputFormat } = useSelector((state) => state.visualization.userForm);
+  const { source } = useSelector((state) => state.visualization.main);
 
   // get file header from example input files
   const { data, error } = useExampleHeaderQuery(
@@ -68,14 +69,18 @@ export default function Instructions() {
           )}
         </div>
       ))} */}
-      <hr />
-      <h4>Examples of file header for each supported format</h4>
-      <p>
-        Choose different file formats under <b>Data Source: User</b> to view
-        different examples of file headers
-      </p>
-      <b>{inputFormat.label}</b>
-      <pre className="border rounded bg-light p-3">{data}</pre>
+      {source == 'user' && (
+        <>
+          <hr />
+          <h4>Examples of file header for each supported format</h4>
+          <p>
+            Choose different file formats under <b>Data Source: User</b> to view
+            different examples of file headers
+          </p>
+          <b>{inputFormat.label}</b>
+          <pre className="border rounded bg-light p-3">{data}</pre>
+        </>
+      )}
     </div>
   );
 }
