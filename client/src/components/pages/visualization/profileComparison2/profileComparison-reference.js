@@ -34,7 +34,7 @@ export default function PcReference() {
     );
 
   const { study, cancer, strategy } = store.publicForm;
-  const { source, matrixData, matrixList, projectID } = store.main;
+  const { source, matrixData, projectID } = store.main;
   const { referenceForm } = store.profileComparison;
 
   // main form
@@ -147,68 +147,33 @@ export default function PcReference() {
   function onSubmit(data) {
     mergeForm(data);
     const { profile, sample, signatureSet, compare } = data;
-    const params_spectrum =
-      source === 'user'
-        ? {
-            fn: 'profileComparisonRefSig',
-            args: {
-              study: study.value,
-              cancer: cancer.value,
-              strategy: strategy.value,
-              profile: profile.value,
-              sample: sample.value,
-              signatureSet: signatureSet.value,
-              compare: compare,
-              matrixFile: matrixList.filter(
-                (e) =>
-                  e.profile === profile.value &&
-                  e.matrix === defaultMatrix(profile.value, ['96', '78', '83'])
-              )[0].Path,
-            },
-            projectID,
-          }
-        : {
-            study: study.value,
-            cancer: cancer.value,
-            strategy: strategy.value,
-            profile: profile.value,
-            sample: sample.value,
-            matrix:
-              data.profile.value === 'SBS'
-                ? '96'
-                : data.profile.value === 'DBS'
-                ? '78'
-                : '83',
-          };
-    const params_signature =
-      source === 'user'
-        ? {
-            fn: 'profileComparisonRefSig',
-            args: {
-              strategy: strategy.value,
-              profileType: profile.value,
-              sample: sample.value,
-              signatureSetName: signatureSet.value,
-              signatureName: compare,
-              matrixFile: matrixList.filter(
-                (e) =>
-                  e.profile === profile.value &&
-                  e.matrix === defaultMatrix(profile.value, ['96', '78', '83'])
-              )[0].Path,
-            },
-            projectID,
-          }
-        : {
-            profile: profile.value,
-            matrix:
-              data.profile.value === 'SBS'
-                ? '96'
-                : data.profile.value === 'DBS'
-                ? '78'
-                : '83',
-            signatureSetName: signatureSet.value,
-            signatureName: compare,
-          };
+    const params_spectrum = {
+      ...(source == 'public' && {
+        study: study.value,
+        cancer: cancer.value,
+        strategy: strategy.value,
+      }),
+      ...(source == 'user' && { userId: projectID }),
+      profile: profile.value,
+      sample: sample.value,
+      matrix:
+        data.profile.value === 'SBS'
+          ? '96'
+          : data.profile.value === 'DBS'
+          ? '78'
+          : '83',
+    };
+    const params_signature = {
+      profile: profile.value,
+      matrix:
+        data.profile.value === 'SBS'
+          ? '96'
+          : data.profile.value === 'DBS'
+          ? '78'
+          : '83',
+      signatureSetName: signatureSet.value,
+      signatureName: compare,
+    };
 
     setCalculationQuery({ params_spectrum, params_signature });
   }
@@ -349,9 +314,6 @@ export default function PcReference() {
                   />
                 )}
               />
-              <Form.Text className="text-muted">
-                (Ex. 0.8*SBS5;0.1*SBS1)
-              </Form.Text>
               <Form.Control.Feedback type="invalid">
                 Enter a valid signature. Click info icon for options.
               </Form.Control.Feedback>

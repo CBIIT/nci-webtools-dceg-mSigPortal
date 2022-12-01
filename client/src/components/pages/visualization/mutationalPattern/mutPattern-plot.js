@@ -163,7 +163,11 @@ export default function MutPatternPlot() {
       <div id="barchart">
         {fetchingPattern && (
           <div style={{ minHeight: '150px' }}>
-            <LoadingOverlay active={fetchingPattern} />
+            <LoadingOverlay
+              active={fetchingPattern}
+              showIndicator={true}
+              content="Loading Frequency Plot"
+            />
           </div>
         )}
         {patternData && patternData?.traces && !patternError && (
