@@ -116,11 +116,11 @@ export default function MsLandscape(cosineData, exposureData) {
     return sourceArray.sort(sortByLocation);
   };
 
-  const groupBySignatureName_exposure = groupBy(
-    sortSignatureName(exposureData),
-    'signatureName'
-  );
-  console.log(groupBySignatureName_exposure);
+  // const groupBySignatureName_exposure = groupBy(
+  //   sortSignatureName(exposureData),
+  //   'signatureName'
+  // );
+  // console.log(groupBySignatureName_exposure);
 
   const groupBySample_exposure = groupBy(exposureData, 'sample');
   console.log(groupBySample_exposure);
@@ -129,11 +129,10 @@ export default function MsLandscape(cosineData, exposureData) {
 
   console.log(xAxis);
 
-  cosineData.sort((a, b) => xAxis.indexOf(a.sample) - xAxis.indexOf(b.sample));
-  console.log(cosineData);
-
-  const barCharColor = Object.keys(groupBySignatureName_exposure);
-  console.log(barCharColor);
+  const sortedCosin = cosineData.sort(
+    (a, b) => xAxis.indexOf(a.sample) - xAxis.indexOf(b.sample)
+  );
+  console.log(sortedCosin);
 
   // const dataSignature = Object.entries(groupBySample_exposure).map(
   //   ([key, value]) => ({
@@ -162,12 +161,16 @@ export default function MsLandscape(cosineData, exposureData) {
 
   const groupBySignatureName_exposure2 = groupBy(
     sortSignatureName(dataSignature2),
+    //dataSignature2,
     'signatureName'
   );
   console.log(groupBySignatureName_exposure2);
 
+  const barCharColor = Object.keys(groupBySignatureName_exposure2);
+  console.log(barCharColor);
+
   const traces1 = Object.entries(groupBySignatureName_exposure2)
-    .reverse()
+    //.reverse()
     .map(([key, value]) => ({
       key: key,
       value: value,
@@ -186,8 +189,8 @@ export default function MsLandscape(cosineData, exposureData) {
   console.log(traces1);
   const traces2 = [
     {
-      z: [cosineData.map((e) => e.similarity)],
-      x: cosineData.map((e) => e.sample),
+      z: [sortedCosin.map((e) => e.similarity)],
+      x: sortedCosin.map((e) => e.sample),
       hoverongaps: false,
       xaxis: 'x',
       yaxis: 'y2',
@@ -211,12 +214,12 @@ export default function MsLandscape(cosineData, exposureData) {
           },
         },
       },
-      xgap: 0.2,
+      xgap: 0.3,
     },
   ];
   console.log(traces2);
   const traces3 = Object.entries(groupBySignatureName_exposure2)
-    .reverse()
+    //.reverse()
     .map(([key, value]) => ({
       key: key,
       value: value,
