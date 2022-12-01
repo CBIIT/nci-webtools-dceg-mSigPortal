@@ -40,6 +40,8 @@ export default function Visualization({ match }) {
     dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
   const mergeProfileComparison = (state) =>
     dispatch(actions.mergeVisualization({ profileComparison: state }));
+  const mergeMutationalProfiles = (state) =>
+    dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
   const mergePCA = (state) =>
     dispatch(actions.mergeVisualization({ pca: state }));
   const mergeError = (msg) =>
@@ -328,6 +330,14 @@ export default function Visualization({ match }) {
     });
   }
 
+  function handleTreeAndLeafSelect(data) {
+    const sample = data.Sample;
+    const profile = data.Dsig.replace(/\d+/g, '');
+    const matrix = +data.Dsig.replace(profile, '');
+    const mutationalProfilesFormState = { sample, profile, matrix };
+    mergeState({ displayTab: 'mutationalProfiles', openSidebar: false });
+  }
+
   const tabs = [
     {
       name: 'Instructions',
@@ -347,7 +357,7 @@ export default function Visualization({ match }) {
     {
       name: 'Tree and Leaf',
       id: 'treeAndLeaf',
-      component: <TreeAndLeaf />,
+      component: <TreeAndLeaf onSelect={handleTreeAndLeafSelect} />,
     },
     {
       name: 'Cosine Similarity',
