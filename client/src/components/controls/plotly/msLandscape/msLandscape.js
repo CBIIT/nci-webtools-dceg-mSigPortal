@@ -165,11 +165,12 @@ export default function MsLandscape(cosineData, exposureData) {
     'signatureName'
   );
   console.log(groupBySignatureName_exposure2);
+  console.log(Object.entries(groupBySignatureName_exposure2).reverse());
 
   const barCharColor = Object.keys(groupBySignatureName_exposure2);
   console.log(barCharColor);
 
-  const traces1 = Object.entries(groupBySignatureName_exposure2)
+  const tracesNormalize = Object.entries(groupBySignatureName_exposure2)
     //.reverse()
     .map(([key, value]) => ({
       key: key,
@@ -186,8 +187,8 @@ export default function MsLandscape(cosineData, exposureData) {
       showlegend: false,
       exposure: value.map((e, i) => e.exposure),
     }));
-  console.log(traces1);
-  const traces2 = [
+  console.log(tracesNormalize);
+  const tracesHeatMap = [
     {
       z: [sortedCosin.map((e) => e.similarity)],
       x: sortedCosin.map((e) => e.sample),
@@ -214,11 +215,11 @@ export default function MsLandscape(cosineData, exposureData) {
           },
         },
       },
-      xgap: 0.3,
+      xgap: 2,
     },
   ];
-  console.log(traces2);
-  const traces3 = Object.entries(groupBySignatureName_exposure2)
+  console.log(tracesHeatMap);
+  const tracesStackedBar = Object.entries(groupBySignatureName_exposure2)
     //.reverse()
     .map(([key, value]) => ({
       key: key,
@@ -243,9 +244,9 @@ export default function MsLandscape(cosineData, exposureData) {
         },
       ],
     }));
-  console.log(traces3);
+  console.log(tracesStackedBar);
 
-  const traces = [...traces3, ...traces2, ...traces1];
+  const traces = [...tracesStackedBar, ...tracesHeatMap, ...tracesNormalize];
   console.log(traces);
 
   const longest = xAxis.reduce((a, e) => (a > e.length ? a : e.length), 0);
@@ -285,7 +286,7 @@ export default function MsLandscape(cosineData, exposureData) {
     legend: {
       orientation: 'h',
       //title: { text: 'Signatures Name<br>' },
-      traceorder: 'reversed',
+      traceorder: 'normal',
       x: 0,
       y: xAxis.length > 250 ? -0.03 : extraMargin,
     },
@@ -299,14 +300,14 @@ export default function MsLandscape(cosineData, exposureData) {
       ticks: '',
       showticklabels: xAxis.length > 250 ? false : true,
     },
-    yaxis: { title: 'Signature contribution', domain: [0, 0.47] },
+    yaxis: { title: 'Signature contribution', domain: [0, 0.49] },
     yaxis2: {
       title: '',
-      domain: [0.485, 0.5],
+      domain: [0.475, 0.493],
       showticklabels: false,
       ticks: '',
     },
-    yaxis3: { title: 'Number of mutation', domain: [0.53, 1] },
+    yaxis3: { title: 'Number of mutation', domain: [0.5, 1] },
 
     bargap: 0.04,
     shapes: [...shapes, ...lines],
