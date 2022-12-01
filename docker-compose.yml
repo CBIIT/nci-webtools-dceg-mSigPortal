@@ -31,5 +31,7 @@ services:
             POSTGRES_USER: msigportal
             POSTGRES_PASSWORD: msigportal
             POSTGRES_DB: msigportal
+        volumes:
+            - './data:/var/lib/postgresql/data'
         ports:
         - "5432:5432"
