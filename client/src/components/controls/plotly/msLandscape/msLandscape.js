@@ -110,6 +110,62 @@ export default function MsLandscape(cosineData, exposureData) {
     [1.0, 'rgb(241,246,34)'],
   ];
 
+  function signatureSort(a, b) {
+    return a[0].signatureName.localeCompare(b[0].signatureName, 'en', {
+      numeric: true,
+    });
+  }
+
+  const groupBySignatureName = groupBy(exposureData, 'signatureName');
+  const stackedBarTraces = Object.values(groupBySignatureName)
+    .sort(signatureSort)
+    .reverse()
+    .map((sigArray) => ({
+      type: 'bar',
+      showlegend: true,
+      name: sigArray[0].signatureName,
+      x: sigArray.map((e) => e.sample),
+      y: sigArray.map((e) => e.exposure),
+      marker: {
+        color: colors[sigArray[0].signatureName.replace(/^\D*/, '')],
+      },
+      xaxis: 'x',
+      yaxis: 'y3',
+      transforms: [
+        {
+          type: 'sort',
+          target: 'y',
+          order: 'descending',
+        },
+      ],
+    }));
+    
+  const normalizedBarTraces = Object.values(groupBySignatureName)
+    .sort(signatureSort)
+    .reverse()
+    .map((sigArray) => {
+      const groupBySample = groupBy(sigArray, 'sample');
+      const totalPerSample = Object.entries(groupBySample).reduce(
+        (obj, [sample, data]) => ({
+          ...obj,
+          [sample]: data.reduce((total, e) => total + e.exposure, 0),
+        }),
+        {}
+      );
+
+      return {
+        type: 'bar',
+        name: sigArray[0].signatureName,
+        x: sigArray.map((e) => e.sample),
+        y: sigArray.map((e) => e.exposure / totalPerSample[e.sample]),
+        marker: {
+          color: colors[sigArray[0].signatureName.replace(/^\D*/, '')],
+        },
+      };
+    });
+
+  console.log(normalizedBarTraces);
+
   const sortSignatureName = (sourceArray) => {
     const sortByLocation = (a, b) =>
       a.signatureName.localeCompare(b.signatureName, 'en', { numeric: true });
@@ -125,9 +181,7 @@ export default function MsLandscape(cosineData, exposureData) {
   const groupBySample_exposure = groupBy(exposureData, 'sample');
   console.log(groupBySample_exposure);
 
-  const xAxis = Object.keys(groupBySample_exposure).flat();
-
-  console.log(xAxis);
+  const xAxis = cosineData.map((e) => e.sample);
 
   const sortedCosin = cosineData.sort(
     (a, b) => xAxis.indexOf(a.sample) - xAxis.indexOf(b.sample)
@@ -171,7 +225,7 @@ export default function MsLandscape(cosineData, exposureData) {
   console.log(barCharColor);
 
   const tracesNormalize = Object.entries(groupBySignatureName_exposure2)
-    //.reverse()
+    .reverse()
     .map(([key, value]) => ({
       key: key,
       value: value,
@@ -246,7 +300,13 @@ export default function MsLandscape(cosineData, exposureData) {
     }));
   console.log(tracesStackedBar);
 
-  const traces = [...tracesStackedBar, ...tracesHeatMap, ...tracesNormalize];
+  const traces = [
+    ...tracesHeatMap,
+    ...stackedBarTraces,
+    // ...normalizedBarTraces,
+    ...tracesNormalize,
+  ];
+  // const traces = [...tracesHeatMap, ...tracesStackedBar, ...tracesNormalize];
   console.log(traces);
 
   const longest = xAxis.reduce((a, e) => (a > e.length ? a : e.length), 0);
@@ -293,7 +353,8 @@ export default function MsLandscape(cosineData, exposureData) {
 
     xaxis: {
       tickmode: 'array',
-      tickvals: xAxis.map((_, i) => i),
+      tickvals: xAxis.map((e) => e),
+      // tickvals: xAxis.map((_, i) => i),
       ticktext: xAxis.map((e) => e),
       type: 'category',
       tickangle: -90,
