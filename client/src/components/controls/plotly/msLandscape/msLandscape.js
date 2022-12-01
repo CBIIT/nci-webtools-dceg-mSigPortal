@@ -286,7 +286,7 @@ export default function MsLandscape(cosineData, exposureData) {
     legend: {
       orientation: 'h',
       //title: { text: 'Signatures Name<br>' },
-      traceorder: 'normal',
+      traceorder: 'reserved',
       x: 0,
       y: xAxis.length > 250 ? -0.03 : extraMargin,
     },
