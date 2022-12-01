@@ -1,7 +1,4 @@
-import * as d3 from "d3";
-
 export function exportSvg(selector, filename) {
-  // const svg = d3.select(selector).select('svg');
   const svgString = new XMLSerializer().serializeToString(document.querySelector(selector));
   const svgBlob = new Blob([svgString], { type: 'image/svg+xml' });
   const svgUrl = URL.createObjectURL(svgBlob);

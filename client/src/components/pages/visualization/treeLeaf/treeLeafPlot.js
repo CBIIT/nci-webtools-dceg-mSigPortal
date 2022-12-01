@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
+import { useSelector } from 'react-redux';
 import * as d3 from 'd3';
 import cloneDeep from 'lodash/cloneDeep';
 import { useRecoilValue } from 'recoil';
@@ -11,6 +12,7 @@ export default function D3TreeLeaf({ id = 'treeleaf-plot', width = 1000, height 
   const form = useRecoilValue(formState);
   const graphData = useRecoilValue(graphDataSelector);
   const { hierarchy, attributes } = cloneDeep(graphData) || {};
+  const publicForm = useSelector((state) => state.visualization.publicForm);
   const plotData = {
     data: hierarchy,
     attributes: groupBy(attributes, 'Sample'),
@@ -21,6 +23,7 @@ export default function D3TreeLeaf({ id = 'treeleaf-plot', width = 1000, height 
     width,
     height,
     radius: Math.min(width, height) / 2,
+    plotTitle: `${publicForm?.study?.label} - ${form.color.label}`,
   };
   const plotEvents = {
     onClick: onSelect,
@@ -79,6 +82,7 @@ function createForceDirectedTree(
     haloWidth = 3, // padding around the labels
     scale = 2,
     highlightQuery = null,
+    plotTitle,
   },
   { onClick }
 ) {
@@ -162,8 +166,12 @@ function createForceDirectedTree(
     .attr('font-size', 10)
     .call(zoom);
 
+  // add tree container
+  const treeGroup = svg.append('g')
+    .attr('transform', `translate(0, 20)`)
+
   // add lines
-  const link = svg
+  const link = treeGroup
     .append('g')
     .attr('id', 'treeleaf-links')
     .attr('fill', 'none')
@@ -204,7 +212,7 @@ function createForceDirectedTree(
     return 0.8;
   }
 
-  const node = svg
+  const node = treeGroup
     .append('g')
     .attr('id', 'treeleaf-nodes')
     .attr('fill', '#fff')
@@ -288,6 +296,21 @@ function createForceDirectedTree(
     }
   }
 
+  // append title
+  svg
+    .append('g')
+    .attr('id', 'treeleaf-title')
+    .attr('transform', `translate(0, ${-height/2 + 10})`)
+    .append('text')
+    .attr('x', 0)
+    .attr('y', 0)
+    .attr('fill', 'black')
+    .attr('text-anchor', 'center')
+    .attr('font-weight', 'bold')
+    .attr('class', 'title')    
+    .text(plotTitle);
+
+  // append legend
   const legendParams = {
     svg,
     color: colorFill,
