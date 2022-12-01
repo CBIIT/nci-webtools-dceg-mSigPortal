@@ -6,7 +6,7 @@ import { useRecoilValue } from 'recoil';
 import { formState, graphDataSelector } from './treeLeaf.state';
 import { groupBy } from './treeLeaf.utils';
 
-export default function D3TreeLeaf({ id = 'treeleaf-plot', width = 1000, height = 1000, ...props }) {
+export default function D3TreeLeaf({ id = 'treeleaf-plot', width = 1000, height = 1000, onSelect, ...props }) {
   const plotRef = useRef(null);
   const form = useRecoilValue(formState);
   const graphData = useRecoilValue(graphDataSelector);
@@ -22,10 +22,13 @@ export default function D3TreeLeaf({ id = 'treeleaf-plot', width = 1000, height 
     height,
     radius: Math.min(width, height) / 2,
   };
+  const plotEvents = {
+    onClick: onSelect,
+  }
 
   useEffect(() => {
     if (plotRef.current && plotData.data) {
-      const plot = createForceDirectedTree(plotData, plotLayout);
+      const plot = createForceDirectedTree(plotData, plotLayout, plotEvents);
       plotRef.current.replaceChildren(plot);
     }
   }, [plotRef, plotData, plotLayout]);
@@ -76,7 +79,8 @@ function createForceDirectedTree(
     haloWidth = 3, // padding around the labels
     scale = 2,
     highlightQuery = null,
-  }
+  },
+  { onClick }
 ) {
   // gather range of attributes
   const mutations = Object.values(attributes).map((e) => e.Mutations);
@@ -217,9 +221,11 @@ function createForceDirectedTree(
     .attr('r', nodeRadius)
     .attr('cx', (d) => d.x)
     .attr('cy', (d) => d.y)
+    .attr('class', 'c-pointer')
     .on('mouseover', mouseover)
     .on('mousemove', mousemove)
-    .on('mouseleave', mouseleave);
+    .on('mouseleave', mouseleave)
+    .on('click', click);
 
   simulation.on('tick', () => {
     link
@@ -272,6 +278,14 @@ function createForceDirectedTree(
       // .html('Sample: ' + sample || 'none')
       .style('left', e.pageX - 30 + 'px')
       .style('top', e.pageY - 320 + 'px');
+  }
+
+  function click(e, d) {
+    const sample = d.data.name;
+    const data = attributes[sample];
+    if (typeof onClick === "function") {
+      onClick(data);
+    }
   }
 
   const legendParams = {

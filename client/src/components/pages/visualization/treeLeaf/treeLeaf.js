@@ -28,7 +28,7 @@ export default function TreeAndLeaf(props) {
             <TreeLeafForm />
             <Button variant="link" onClick={() => exportSvg(`#${plotId}`, 'treeLeaf.svg')}>Export Plot</Button>
           </div>
-          <D3TreeLeaf id={plotId} width={2000} height={2000} />
+          <D3TreeLeaf id={plotId} width={2000} height={2000} onSelect={props.onSelect} />
         </Suspense>
       </ErrorBoundary>
     </Container>
