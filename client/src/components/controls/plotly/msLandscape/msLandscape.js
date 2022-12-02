@@ -2,9 +2,6 @@ import { groupBy } from 'lodash';
 import { First } from 'react-bootstrap/esm/PageItem';
 
 export default function MsLandscape(cosineData, exposureData) {
-  console.log(cosineData);
-  console.log(exposureData);
-
   let colors = {
     1: '#4a9855',
     2: '#e2a8ab',
@@ -218,11 +215,8 @@ export default function MsLandscape(cosineData, exposureData) {
     //dataSignature2,
     'signatureName'
   );
-  console.log(groupBySignatureName_exposure2);
-  console.log(Object.entries(groupBySignatureName_exposure2).reverse());
 
   const barCharColor = Object.keys(groupBySignatureName_exposure2);
-  console.log(barCharColor);
 
   const tracesNormalize = Object.entries(groupBySignatureName_exposure2)
     .reverse()
@@ -241,7 +235,7 @@ export default function MsLandscape(cosineData, exposureData) {
       showlegend: false,
       exposure: value.map((e, i) => e.exposure),
     }));
-  console.log(tracesNormalize);
+
   const tracesHeatMap = [
     {
       z: [cosineData.map((e) => e.similarity)],
@@ -257,7 +251,7 @@ export default function MsLandscape(cosineData, exposureData) {
         orientation: 'h',
         x: 0.5,
         y: xAxis.length > 250 ? -0.2 : -0.3,
-        bordercolor: 'gray',
+        bordercolor: 'black',
         tickmode: 'array',
         tickvals: [0.6, 0.7, 0.8, 0.9, 1],
         title: {
@@ -269,10 +263,16 @@ export default function MsLandscape(cosineData, exposureData) {
           },
         },
       },
-      xgap: 2,
+      marker: {
+        line: {
+          color: 'rgb(231, 99, 250)',
+          width: 2,
+        },
+      },
+      xgap: 0.4,
     },
   ];
-  console.log(tracesHeatMap);
+
   const tracesStackedBar = Object.entries(groupBySignatureName_exposure2)
     .reverse()
     .map(([key, value]) => ({
@@ -298,16 +298,12 @@ export default function MsLandscape(cosineData, exposureData) {
         },
       ],
     }));
-  console.log(tracesStackedBar);
 
   const traces = [...tracesHeatMap, ...tracesStackedBar, ...tracesNormalize];
-  console.log(traces);
 
   const longest = xAxis.reduce((a, e) => (a > e.length ? a : e.length), 0);
   const extraMargin =
     longest > 0 && longest < 10 ? -0.157 : (longest * -0.027) / 2;
-  console.log(longest);
-  console.log(extraMargin);
 
   const text = {
     x: 0,
@@ -325,10 +321,6 @@ export default function MsLandscape(cosineData, exposureData) {
       color: 'rgb(37,37,37)',
     },
   };
-  console.log(text);
-  const shapes = [];
-
-  const lines = [];
 
   let annotations = [text];
 
@@ -354,7 +346,9 @@ export default function MsLandscape(cosineData, exposureData) {
       tickangle: -90,
       ticks: '',
       showticklabels: xAxis.length > 250 ? false : true,
+      showgrid: false,
       zeroline: false,
+      showline: false,
     },
     yaxis: { title: 'Signature contribution', domain: [0, 0.49] },
     yaxis2: {
@@ -366,7 +360,6 @@ export default function MsLandscape(cosineData, exposureData) {
     yaxis3: { title: 'Number of mutation', domain: [0.5, 1] },
 
     bargap: 0.04,
-    shapes: [...shapes, ...lines],
     annotations: annotations,
   };
 
