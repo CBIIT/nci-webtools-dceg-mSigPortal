@@ -345,7 +345,7 @@ export default function MsLandscape(cosineData, exposureData) {
       type: 'category',
       tickangle: -90,
       ticks: '',
-      showticklabels: xAxis.length > 250 ? false : true,
+      showticklabels: xAxis.length > 230 ? false : true,
       showgrid: false,
       zeroline: false,
       showline: false,
