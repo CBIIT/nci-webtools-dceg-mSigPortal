@@ -34,14 +34,21 @@ export default function ClusteredIdentification() {
         }
       />
       <hr />
-      {cluster && projectID && inputFormat.value == 'vcf' ? (
+      {cluster && projectID && inputFormat.value == 'vcf' && (
         <>
           <ClusteredForm />
           <hr />
           <ClusteredPlot />
         </>
-      ) : (
-        <div>Analysis is only available for VCF file input</div>
+      )}
+      {inputFormat.value == 'vcf' && !cluster && (
+        <div className="p-3">
+          Calculation must be performed with the "Clustered Mutational Analysis"
+          option enabled in the inital submission.
+        </div>
+      )}
+      {inputFormat.value != 'vcf' && (
+        <div className="p-3">Analysis is only available for VCF file input.</div>
       )}
     </div>
   );
