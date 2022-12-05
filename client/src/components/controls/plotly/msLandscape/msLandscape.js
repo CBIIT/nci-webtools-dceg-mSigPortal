@@ -2,78 +2,104 @@ import { groupBy } from 'lodash';
 import { First } from 'react-bootstrap/esm/PageItem';
 
 export default function MsLandscape(cosineData, exposureData) {
-  let colors = {
-    1: '#4a9855',
-    2: '#e2a8ab',
-    3: '#40004b',
-    4: '#5aa1ca',
-    5: '#305d39',
-    6: '#785940',
-    '7a': '#6e70b7',
-    '7b': '#ff7f00',
-    '7c': '#fec44f',
-    '7d': '#846a2a',
-    8: '#cab2d6',
-    9: '#f4a582',
-    '10a': '#8dd3c7',
-    '10b': '#5e4fa2',
-    '10c': '#761429',
-    11: '#9e0142',
-    12: '#ffed6f',
-    13: '#e41a1c',
-    14: '#ffffbf',
-    15: '#4d4d4d',
-    16: '#513276',
-    '17a': '#df4c7d',
-    '17b': '#08519c',
-    18: '#b3de69',
-    19: '#dfc27d',
-    20: '#b2182b',
-    21: '#9ecae1',
-    22: '#01665e',
-    23: '#d53e4f',
-    24: '#1c9099',
-    25: '#35978f',
-    26: '#ec7014',
-    27: '#f46d43',
-    28: '#de77ae',
-    29: '#fdae61',
-    30: '#d9d9d9',
-    31: '#f781bf',
-    32: '#dd1c77',
-    33: '#b25d7e',
-    34: '#fee08b',
-    35: '#fc8d59',
-    36: 'yellow',
-    37: '#e6f598',
-    38: '#abdda4',
-    39: '#636363',
-    40: '#b15928',
-    41: '#fccde5',
-    42: '#ae017e',
-    43: '#66c2a5',
-    44: '#8c6bb1',
-    45: '#3288bd',
-    46: '#e6f598',
-    47: '#bababa',
-    48: '#5e4fa2',
-    49: '#40004b',
-    50: '#762a83',
-    51: '#9970ab',
-    52: '#c2a5cf',
-    53: '#e7d4e8',
-    54: '#fcc5c0',
-    55: '#d9f0d3',
-    56: '#8c510a',
-    57: '#a6dba0',
-    58: '#5aae61',
-    59: '#1b7837',
-    60: '#00441b',
-    84: '#063C3C',
-    85: '#AA9139',
-    92: '#0E1844',
-    '-others': '#cececa',
-  };
+  console.log(cosineData);
+  const defaultNames = ['SBS', 'DBS', 'ID'];
+  const names = exposureData.map((group) => group.signatureName);
+  const contains = defaultNames.some((element) => {
+    if (names[0].includes(element)) {
+      return true;
+    }
+
+    return false;
+  });
+  console.log(names);
+  console.log(contains);
+  let colors = {};
+  if (!contains) {
+    var randomColors = [];
+    while (randomColors.length < names.length) {
+      do {
+        var color = Math.floor(Math.random() * 10000000000 + 1);
+      } while (randomColors.indexOf(color) >= 0);
+      randomColors.push('#' + ('000000' + color.toString(16)).slice(-6));
+    }
+    names.forEach((element, index) => {
+      colors[element] = randomColors[index];
+    });
+  } else {
+    colors = {
+      1: '#4a9855',
+      2: '#e2a8ab',
+      3: '#40004b',
+      4: '#5aa1ca',
+      5: '#305d39',
+      6: '#785940',
+      '7a': '#6e70b7',
+      '7b': '#ff7f00',
+      '7c': '#fec44f',
+      '7d': '#846a2a',
+      8: '#cab2d6',
+      9: '#f4a582',
+      '10a': '#8dd3c7',
+      '10b': '#5e4fa2',
+      '10c': '#761429',
+      11: '#9e0142',
+      12: '#ffed6f',
+      13: '#e41a1c',
+      14: '#ffffbf',
+      15: '#4d4d4d',
+      16: '#513276',
+      '17a': '#df4c7d',
+      '17b': '#08519c',
+      18: '#b3de69',
+      19: '#dfc27d',
+      20: '#b2182b',
+      21: '#9ecae1',
+      22: '#01665e',
+      23: '#d53e4f',
+      24: '#1c9099',
+      25: '#35978f',
+      26: '#ec7014',
+      27: '#f46d43',
+      28: '#de77ae',
+      29: '#fdae61',
+      30: '#d9d9d9',
+      31: '#f781bf',
+      32: '#dd1c77',
+      33: '#b25d7e',
+      34: '#fee08b',
+      35: '#fc8d59',
+      36: 'yellow',
+      37: '#e6f598',
+      38: '#abdda4',
+      39: '#636363',
+      40: '#b15928',
+      41: '#fccde5',
+      42: '#ae017e',
+      43: '#66c2a5',
+      44: '#8c6bb1',
+      45: '#3288bd',
+      46: '#e6f598',
+      47: '#bababa',
+      48: '#5e4fa2',
+      49: '#40004b',
+      50: '#762a83',
+      51: '#9970ab',
+      52: '#c2a5cf',
+      53: '#e7d4e8',
+      54: '#fcc5c0',
+      55: '#d9f0d3',
+      56: '#8c510a',
+      57: '#a6dba0',
+      58: '#5aae61',
+      59: '#1b7837',
+      60: '#00441b',
+      84: '#063C3C',
+      85: '#AA9139',
+      92: '#0E1844',
+      '-others': '#cececa',
+    };
+  }
 
   const heatmapColorscale = [
     [0, 'rgb(34,7,139)'],
@@ -114,6 +140,7 @@ export default function MsLandscape(cosineData, exposureData) {
   }
 
   const groupBySignatureName = groupBy(exposureData, 'signatureName');
+
   const stackedBarTraces = Object.values(groupBySignatureName)
     .sort(signatureSort)
     .reverse()
@@ -223,29 +250,29 @@ export default function MsLandscape(cosineData, exposureData) {
     .map(([key, value]) => ({
       key: key,
       value: value,
-      map: barCharColor.map((e) => e),
-      co: barCharColor.map((e) => e.replace(/^\D*/, '')),
+      //map: barCharColor.map((e) => e),
+      //co: barCharColor.map((e) => e.replace(/^\D*/, '')),
       name: key,
       type: 'bar',
       x: value.map((e) => e.sample),
       y: value.map((e, i) => e.exposure / e.total),
       marker: {
-        color: colors[key.replace(/^\D*/, '')],
+        color: contains ? colors[key.replace(/^\D*/, '')] : colors[key],
       },
       showlegend: false,
       exposure: value.map((e, i) => e.exposure),
     }));
-
+  console.log(tracesNormalize);
   const tracesHeatMap = [
     {
       z: [cosineData.map((e) => e.similarity)],
       x: cosineData.map((e) => e.sample),
-      hoverongaps: false,
+      //hoverongaps: false,
       xaxis: 'x',
       yaxis: 'y2',
       type: 'heatmap',
       colorscale: heatmapColorscale,
-      zmin: 0.6,
+      zmin: 0,
       zmax: 1,
       colorbar: {
         orientation: 'h',
@@ -253,7 +280,7 @@ export default function MsLandscape(cosineData, exposureData) {
         y: xAxis.length > 250 ? -0.2 : -0.3,
         bordercolor: 'black',
         tickmode: 'array',
-        tickvals: [0.6, 0.7, 0.8, 0.9, 1],
+        tickvals: [0, 0.6, 0.7, 0.8, 0.9, 1],
         title: {
           text: 'Cosine Similarity',
           font: {
@@ -263,30 +290,33 @@ export default function MsLandscape(cosineData, exposureData) {
           },
         },
       },
-      marker: {
-        line: {
-          color: 'rgb(231, 99, 250)',
-          width: 2,
-        },
-      },
-      xgap: 0.4,
+      // marker: {
+      //   line: {
+      //     color: 'rgb(231, 99, 250)',
+      //     width: 2,
+      //   },
+      // },
+      xgap: 0.2,
     },
   ];
-
+  console.log(tracesHeatMap);
   const tracesStackedBar = Object.entries(groupBySignatureName_exposure2)
     .reverse()
     .map(([key, value]) => ({
       key: key,
       value: value,
-      map: barCharColor.map((e) => e),
-      co: barCharColor.map((e) => e.replace(/^\D*/, '')),
+      //map: barCharColor.map((e) => e),
+      //co: barCharColor.map((e) => e.replace(/^\D*/, '')),
       name: key,
       type: 'bar',
       x: value.filter((obj) => obj.exposure !== 0).map((e) => e.sample),
       y: value.filter((obj) => obj.exposure !== 0).map((e, i) => e.exposure),
       //showlegend: true,
+      // marker: {
+      //   color: colors[key.replace(/^\D*/, '')],
+      // },
       marker: {
-        color: colors[key.replace(/^\D*/, '')],
+        color: contains ? colors[key.replace(/^\D*/, '')] : colors[key],
       },
       xaxis: 'x',
       yaxis: 'y3',
@@ -298,7 +328,7 @@ export default function MsLandscape(cosineData, exposureData) {
         },
       ],
     }));
-
+  console.log(tracesStackedBar);
   const traces = [...tracesHeatMap, ...tracesStackedBar, ...tracesNormalize];
 
   const longest = xAxis.reduce((a, e) => (a > e.length ? a : e.length), 0);

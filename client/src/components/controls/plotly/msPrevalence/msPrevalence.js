@@ -165,13 +165,13 @@ export default function MSPrevalence(data, minimum) {
     textposition: 'inside',
     texttemplate: '%{percent:.1%}',
     showlegend: false,
-    marker: {
-      colors: dataResult.map((group) =>
-        contains
-          ? colors[group.signatureName.replace(/^\D*/, '').replace(')', '')]
-          : colors[group.signatureName]
-      ),
-    },
+    // marker: {
+    //   colors: dataResult.map((group) =>
+    //     contains
+    //       ? colors[group.signatureName.replace(/^\D*/, '').replace(')', '')]
+    //       : colors[group.signatureName]
+    //   ),
+    // },
     test: dataResult.map((group) =>
       group.signatureName.replace(/^\D*/, '').replace(')', '')
     ),
