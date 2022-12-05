@@ -85,7 +85,7 @@ export default function MutPatternPlot() {
         });
       }
     }
-  }, [study, proportion, matrixList]);
+  }, [proportion, pattern]);
 
   async function onSubmit(data) {
     const { pattern, proportion } = data;

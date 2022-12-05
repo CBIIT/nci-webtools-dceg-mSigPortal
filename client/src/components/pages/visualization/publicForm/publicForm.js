@@ -113,35 +113,58 @@ export default function PublicForm() {
 
   const cancerOptions = (study) => {
     if (data && study.value) {
-      return [
-        ...new Set(
-          data.filter((e) => e.study == study.value).map((e) => e.cancer)
-        ),
-      ]
-        .sort()
-        .map((e) => ({
-          label: e,
-          value: e,
-        }));
+      const options = [
+        ...[
+          ...new Set(
+            data.filter((e) => e.study == study.value).map((e) => e.cancer)
+          ),
+        ]
+          .sort()
+          .map((e) => ({
+            label: e,
+            value: e,
+          })),
+      ];
+      if (study.value == 'PCAWG' || study.value == 'TCGA') {
+        return [
+          ...options,
+          {
+            label: 'PanCancer',
+            value: '*ALL',
+          },
+        ];
+      } else {
+        return options;
+      }
     } else {
       return [];
     }
   };
 
   const strategyOptions = (study, cancer) => {
-    if (data && study.value && cancer.value) {
-      return [
-        ...new Set(
-          data
-            .filter((e) => e.study == study.value && e.cancer == cancer.value)
-            .map((e) => e.strategy)
-        ),
-      ]
-        .sort()
-        .map((e) => ({
-          label: e,
-          value: e,
-        }));
+    if (data && study.value) {
+      const options =
+        cancer.value == '*ALL'
+          ? [
+              ...new Set(
+                data
+                  .filter((e) => e.study == study.value)
+                  .map((e) => e.strategy)
+              ),
+            ]
+          : [
+              ...new Set(
+                data
+                  .filter(
+                    (e) => e.study == study.value && e.cancer == cancer.value
+                  )
+                  .map((e) => e.strategy)
+              ),
+            ];
+      return options.sort().map((e) => ({
+        label: e,
+        value: e,
+      }));
     } else {
       return [];
     }

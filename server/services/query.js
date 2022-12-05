@@ -5,22 +5,27 @@ function getData(
   table,
   query,
   columns = '*',
-  limit = 1000000,
+  limit,
   offset = 0,
   rowMode = 'object',
   distinct = false
 ) {
-  const conditions = pickBy(query, (v) => v && !v.includes('%'));
+  const conditions = pickBy(
+    query,
+    (v) => v && !v.includes('%') && !v.includes('*ALL')
+  );
   const patterns = pickBy(query, (v) => v && v.includes('%'));
 
   let sqlQuery = connection
     .select(columns)
     .from(table)
     // .where(conditions)
-    .limit(limit)
     .offset(offset, rowMode)
     .options({ rowMode: rowMode });
 
+  if (limit) {
+    sqlQuery = sqlQuery.limit(limit || 100000);
+  }
   if (distinct) {
     sqlQuery = sqlQuery.distinct(columns);
   }
