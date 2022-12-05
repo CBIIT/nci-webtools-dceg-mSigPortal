@@ -129,21 +129,25 @@ async function msLandscape(req, res, next) {
 
     const connection = req.app.locals.connection;
     const columns = '*';
+    const limit = false;
 
     const exposureData = await getExposureData(
       connection,
       { study, strategy, signatureSetName, cancer },
-      columns
+      columns,
+      limit
     );
     const signatureData = await getSignatureData(
       connection,
       { signatureSetName },
-      columns
+      columns,
+      limit
     );
     const seqmatrixData = await getSeqmatrixData(
       connection,
       { study, strategy, cancer },
-      columns
+      columns,
+      limit
     );
 
     const fn = 'msLandscape';
