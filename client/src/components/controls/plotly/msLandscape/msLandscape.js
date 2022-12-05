@@ -49,6 +49,7 @@ export default function MsLandscape(cosineData, exposureData) {
       14: '#ffffbf',
       15: '#4d4d4d',
       16: '#513276',
+      17: '#ef4c7d',
       '17a': '#df4c7d',
       '17b': '#08519c',
       18: '#b3de69',
@@ -96,7 +97,9 @@ export default function MsLandscape(cosineData, exposureData) {
       60: '#00441b',
       84: '#063C3C',
       85: '#AA9139',
+      88: '#BB9139',
       92: '#0E1844',
+      110: '#5E1855',
       '-others': '#cececa',
     };
   }
@@ -242,8 +245,6 @@ export default function MsLandscape(cosineData, exposureData) {
     //dataSignature2,
     'signatureName'
   );
-
-  const barCharColor = Object.keys(groupBySignatureName_exposure2);
 
   const tracesNormalize = Object.entries(groupBySignatureName_exposure2)
     .reverse()
