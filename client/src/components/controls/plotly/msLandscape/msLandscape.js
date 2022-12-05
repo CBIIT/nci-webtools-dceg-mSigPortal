@@ -3,6 +3,7 @@ import { First } from 'react-bootstrap/esm/PageItem';
 
 export default function MsLandscape(cosineData, exposureData) {
   console.log(cosineData);
+  console.log(exposureData);
   const defaultNames = ['SBS', 'DBS', 'ID'];
   const names = exposureData.map((group) => group.signatureName);
   const contains = defaultNames.some((element) => {
@@ -136,7 +137,10 @@ export default function MsLandscape(cosineData, exposureData) {
     [1.0, 'rgb(241,246,34)'],
   ];
   const xAxis = cosineData.map((e) => e.sample);
-  const longest = xAxis.reduce((a, e) => (a > e.length ? a : e.length), 0);
+  //const longest = xAxis.reduce((a, e) => (a > e.length ? a : e.length), 0);
+  var longest = xAxis.sort(function (a, b) {
+    return b.length - a.length;
+  })[0].length;
   const extraMargin =
     longest > 0 && longest < 10 ? -0.157 : (longest * -0.027) / 2;
 
@@ -148,7 +152,22 @@ export default function MsLandscape(cosineData, exposureData) {
       numeric: true,
     });
   }
-
+  let colorBarLoc;
+  if (xAxis.length > 250) {
+    if (longest > 30) {
+      colorBarLoc = -0.3;
+    } else {
+      colorBarLoc = -0.2;
+    }
+  } else {
+    if (longest > 30) {
+      colorBarLoc = -0.7;
+    } else if (longest > 15) {
+      colorBarLoc = -0.4;
+    } else {
+      colorBarLoc = -0.3;
+    }
+  }
   const groupBySignatureName = groupBy(exposureData, 'signatureName');
 
   const stackedBarTraces = Object.values(groupBySignatureName)
@@ -277,7 +296,7 @@ export default function MsLandscape(cosineData, exposureData) {
       colorbar: {
         orientation: 'h',
         x: 0.5,
-        y: xAxis.length > 30 ? extraMargin - 0.2 : -0.3,
+        y: colorBarLoc,
 
         bordercolor: 'black',
         tickmode: 'array',
