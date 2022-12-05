@@ -5,7 +5,7 @@ function getData(
   table,
   query,
   columns = '*',
-  limit = 1000000,
+  limit,
   offset = 0,
   rowMode = 'object',
   distinct = false
@@ -20,10 +20,12 @@ function getData(
     .select(columns)
     .from(table)
     // .where(conditions)
-    .limit(limit)
     .offset(offset, rowMode)
     .options({ rowMode: rowMode });
 
+  if (limit) {
+    sqlQuery = sqlQuery.limit(limit || 100000);
+  }
   if (distinct) {
     sqlQuery = sqlQuery.distinct(columns);
   }
