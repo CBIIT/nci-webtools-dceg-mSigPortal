@@ -250,8 +250,6 @@ export default function MsLandscape(cosineData, exposureData) {
     .map(([key, value]) => ({
       key: key,
       value: value,
-      //map: barCharColor.map((e) => e),
-      //co: barCharColor.map((e) => e.replace(/^\D*/, '')),
       name: key,
       type: 'bar',
       x: value.map((e) => e.sample),
@@ -261,6 +259,8 @@ export default function MsLandscape(cosineData, exposureData) {
       },
       showlegend: false,
       exposure: value.map((e, i) => e.exposure),
+      hovertemplate:
+        '<b>Signature contribution: </b>%{y} <br><b>Sample: </b> %{x}',
     }));
   console.log(tracesNormalize);
   const tracesHeatMap = [
@@ -280,7 +280,7 @@ export default function MsLandscape(cosineData, exposureData) {
         y: xAxis.length > 250 ? -0.2 : -0.3,
         bordercolor: 'black',
         tickmode: 'array',
-        tickvals: [0, 0.6, 0.7, 0.8, 0.9, 1],
+        tickvals: [0.6, 0.7, 0.8, 0.9, 1],
         title: {
           text: 'Cosine Similarity',
           font: {
@@ -290,13 +290,9 @@ export default function MsLandscape(cosineData, exposureData) {
           },
         },
       },
-      // marker: {
-      //   line: {
-      //     color: 'rgb(231, 99, 250)',
-      //     width: 2,
-      //   },
-      // },
-      xgap: 0.2,
+      xgap: 0.5,
+      hovertemplate:
+        '<b>Sample: </b> %{x}<br> <b>Similarity: </b>%{z} <extra></extra>',
     },
   ];
   console.log(tracesHeatMap);
@@ -305,8 +301,6 @@ export default function MsLandscape(cosineData, exposureData) {
     .map(([key, value]) => ({
       key: key,
       value: value,
-      //map: barCharColor.map((e) => e),
-      //co: barCharColor.map((e) => e.replace(/^\D*/, '')),
       name: key,
       type: 'bar',
       x: value.filter((obj) => obj.exposure !== 0).map((e) => e.sample),
@@ -327,6 +321,7 @@ export default function MsLandscape(cosineData, exposureData) {
           order: 'descending',
         },
       ],
+      hovertemplate: '<b>Number of mutation: </b>%{y} <br><b>Sample: </b> %{x}',
     }));
   console.log(tracesStackedBar);
   const traces = [...tracesHeatMap, ...tracesStackedBar, ...tracesNormalize];
