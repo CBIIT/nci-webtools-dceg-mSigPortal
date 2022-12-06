@@ -160,7 +160,7 @@ export default function MsLandscape(cosineData, exposureData) {
       colorBarLoc = -0.2;
     }
   } else {
-    if (longest > 30) {
+    if (longest > 25) {
       colorBarLoc = -0.7;
     } else if (longest > 15) {
       colorBarLoc = -0.4;

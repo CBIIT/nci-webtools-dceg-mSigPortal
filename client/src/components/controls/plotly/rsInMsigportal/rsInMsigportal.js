@@ -71,7 +71,7 @@ export default function RsInMsigportal(rawData) {
             ? Math.round((index * (1 / 5) + 0.2) * 10) / 10
             : Math.round(((index - 4) * (1 / 5) + 0.2) * 10) / 10,
         ],
-        y: [index < 4 ? 0.55 : 0.78, index < 4 ? 0.75 : 0.98],
+        y: [index < 4 ? 0.55 : 0.78, index < 4 ? 0.745 : 0.975],
       },
       hovertemplate:
         '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
@@ -99,7 +99,7 @@ export default function RsInMsigportal(rawData) {
             ? Math.round((index * (1 / 5) + 0.2) * 10) / 10
             : Math.round(((index - 4) * (1 / 5) + 0.2) * 10) / 10,
         ],
-        y: [0.265, 0.465],
+        y: [0.265, 0.46],
       },
       hovertemplate:
         '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
@@ -128,7 +128,7 @@ export default function RsInMsigportal(rawData) {
             ? Math.round((index * (1 / 5) + 0.2) * 10) / 10
             : Math.round(((index - 4) * (1 / 5) + 0.2) * 10) / 10,
         ],
-        y: [0, 0.2],
+        y: [0, 0.195],
       },
       hovertemplate:
         '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
@@ -143,7 +143,7 @@ export default function RsInMsigportal(rawData) {
       yanchor: 'bottom',
       showarrow: false,
       text: key,
-      x: index < 4 ? index * (1 / 5) + 0.1 : (index - 4) * (1 / 5) + 0.1,
+      x: index < 4 ? index * (1 / 5) + 0.0975 : (index - 4) * (1 / 5) + 0.0975,
       y: index < 4 ? 0.75 : 0.98,
     })
   );
@@ -156,8 +156,8 @@ export default function RsInMsigportal(rawData) {
       yanchor: 'bottom',
       showarrow: false,
       text: key,
-      x: index < 4 ? index * (1 / 5) + 0.1 : (index - 4) * (1 / 5) + 0.1,
-      y: 0.47,
+      x: index < 4 ? index * (1 / 5) + 0.0975 : (index - 4) * (1 / 5) + 0.0975,
+      y: 0.46,
     })
   );
 
@@ -169,7 +169,7 @@ export default function RsInMsigportal(rawData) {
       yanchor: 'bottom',
       showarrow: false,
       text: key,
-      x: index < 4 ? index * (1 / 5) + 0.1 : (index - 4) * (1 / 5) + 0.1,
+      x: index < 4 ? index * (1 / 5) + 0.0975 : (index - 4) * (1 / 5) + 0.0975,
       y: 0.2,
     })
   );
