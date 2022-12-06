@@ -303,7 +303,7 @@ export default function RsInMsigportal(rawData) {
     width: 1080,
     autosize: true,
     legend: {
-      title: { text: 'Signature Set Name' },
+      title: { text: '\t Signature Set Name' },
       x: 1,
       xanchor: 'right',
       y: 0,
