@@ -156,7 +156,7 @@ export default function RsInMsigportal(rawData) {
       yanchor: 'bottom',
       showarrow: false,
       text: key,
-      x: index < 4 ? index * (1 / 5) + 0.0975 : (index - 4) * (1 / 5) + 0.0975,
+      x: index < 4 ? index * (1 / 5) + 0.085 : (index - 4) * (1 / 5) + 0.085,
       y: 0.46,
     })
   );
@@ -169,7 +169,7 @@ export default function RsInMsigportal(rawData) {
       yanchor: 'bottom',
       showarrow: false,
       text: key,
-      x: index < 4 ? index * (1 / 5) + 0.0975 : (index - 4) * (1 / 5) + 0.0975,
+      x: index < 4 ? index * (1 / 5) + 0.08 : (index - 4) * (1 / 5) + 0.08,
       y: 0.2,
     })
   );
