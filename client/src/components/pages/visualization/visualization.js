@@ -410,11 +410,11 @@ export default function Visualization({ match }) {
               {tabs
                 .filter((e) => e)
                 .map(({ name, id }) => (
-                  <div key={id} className="d-inline-block">
+                  <div key={id} className="d-inline-block ">
                     <Button
                       variant="link"
                       className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
-                        id == displayTab ? 'active-secondary-navlinks' : ''
+                        id == displayTab ? 'bg-visualization text-white' : ''
                       }`}
                       active={id == displayTab}
                       disabled={
@@ -426,7 +426,7 @@ export default function Visualization({ match }) {
                       style={{
                         textDecoration: 'none',
                         fontSize: '12pt',
-                        color: 'black',
+                        color: '#3a7867',
                         fontWeight: '500',
                       }}
                       onClick={() => mergeState({ displayTab: id })}
@@ -448,13 +448,13 @@ export default function Visualization({ match }) {
                     className={
                       id == displayTab &&
                       (matrixData.length || Object.keys(svgList).length)
-                        ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 active-secondary-navlinks'
+                        ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-visualization text-white'
                         : 'secondary-navlinks px-3 py-1 d-inline-block border-0'
                     }
                     style={{
                       textDecoration: 'none',
                       fontSize: '12pt',
-                      color: 'black',
+                      color: '#3a7867',
                       fontWeight: '500',
                     }}
                     onClick={() => mergeState({ displayTab: id })}

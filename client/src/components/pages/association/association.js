@@ -54,11 +54,11 @@ export default function Association() {
           <div className="d-none d-md-block">
             <Nav defaultActiveKey="profilerSummary">
               {tabs.map(({ name, id }) => (
-                <div key={id} className="d-inline-block">
+                <div key={id} className="d-inline-block ">
                   <Button
                     variant="link"
-                    className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
-                      id == displayTab ? 'active-secondary-navlinks' : ''
+                    className={`secondary-navlinks px-3 py-1 d-inline-block border-0 association ${
+                      id == displayTab ? 'bg-association text-white' : ''
                     }`}
                     active={id == displayTab && submitted}
                     disabled={
@@ -67,7 +67,7 @@ export default function Association() {
                     style={{
                       textDecoration: 'none',
                       fontSize: '12pt',
-                      color: 'black',
+                      color: '#b83d47',
                       fontWeight: '500',
                     }}
                     onClick={() => mergeState({ displayTab: id })}
@@ -87,13 +87,13 @@ export default function Association() {
                     variant="link"
                     className={
                       id == displayTab && Object.keys(expVarList).length
-                        ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 active-secondary-navlinks'
+                        ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-association text-white'
                         : 'secondary-navlinks px-3 py-1 d-inline-block border-0'
                     }
                     style={{
                       textDecoration: 'none',
                       fontSize: '12pt',
-                      color: 'black',
+                      color: '#b83d47',
                       fontWeight: '500',
                     }}
                     onClick={() => mergeState({ displayTab: id })}

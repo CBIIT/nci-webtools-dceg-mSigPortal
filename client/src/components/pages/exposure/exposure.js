@@ -661,8 +661,10 @@ export default function Exposure({ match }) {
                     <div key={id} className="d-inline-block">
                       <Button
                         variant="link"
-                        className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
-                          id == displayTab ? 'active-secondary-navlinks' : ''
+                        className={`secondary-navlinks px-3 py-1 d-inline-block border-0 text-exploration ${
+                          id == displayTab
+                            ? 'bg-exploration text-white'
+                            : 'text-exploration'
                         }`}
                         active={id == displayTab && submitted}
                         disabled={
@@ -672,7 +674,7 @@ export default function Exposure({ match }) {
                         style={{
                           textDecoration: 'none',
                           fontSize: '12pt',
-                          color: 'black',
+                          color: '#837244',
                           fontWeight: '500',
                         }}
                         onClick={() => mergeState({ displayTab: id })}
@@ -695,13 +697,13 @@ export default function Exposure({ match }) {
                         variant="link"
                         className={
                           id == displayTab && Object.keys(exposureCancer).length
-                            ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 active-secondary-navlinks'
+                            ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-exploration text-white'
                             : 'secondary-navlinks px-3 py-1 d-inline-block border-0'
                         }
                         style={{
                           textDecoration: 'none',
                           fontSize: '12pt',
-                          color: 'black',
+                          color: '#837244',
                           fontWeight: '500',
                         }}
                         onClick={() => mergeState({ displayTab: id })}
