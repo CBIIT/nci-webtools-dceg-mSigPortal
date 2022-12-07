@@ -218,7 +218,11 @@ export default function ReferenceSignature() {
         <Nav variant="tabs">
           {tabs.map(({ key, title }) => (
             <Nav.Item key={key}>
-              <Nav.Link eventKey={key} as="button" className="outline-none">
+              <Nav.Link
+                eventKey={key}
+                as="button"
+                className="outline-none catalog"
+              >
                 <strong>{title}</strong>
               </Nav.Link>
             </Nav.Item>

@@ -24,20 +24,20 @@ export default function Explore() {
 
   return (
     <div className="px-0">
-      <div className="mx-3">
-        <div className="mx-3 bg-white border border-top-0">
+      <div className="">
+        <div className="d-flex justify-content-center border border-catalog border-top-0 border-left-0 border-right-0">
           {/* for desktops and tablets */}
           <div className="d-none d-md-block">
             <Nav activeKey={displayTab}>
               {tabs.map(({ name, id }) => (
                 <Nav.Item key={id} className="d-inline-block">
                   <NavLink
-                    className="secondary-navlinks px-3 py-1 d-inline-block catalogNav"
-                    activeClassName="active-secondary-navlinks"
+                    className="secondary-navlinks px-3 py-1 d-inline-block catalogNav text-catalog"
+                    activeClassName="bg-catalog text-white"
                     style={{
                       textDecoration: 'none',
                       fontSize: '12pt',
-                      color: 'black',
+                      //color: 'black',
                       fontWeight: '500',
                     }}
                     exact={true}
@@ -57,12 +57,12 @@ export default function Explore() {
               {tabs.map(({ name, id }) => (
                 <Nav.Item key={id} className="col-12 text-center">
                   <NavLink
-                    className="secondary-navlinks px-3 py-1 d-inline-block"
-                    activeClassName="active-secondary-navlinks"
+                    className="secondary-navlinks px-3 py-1 d-inline-block text-catalog"
+                    activeClassName="bg-catalog text-white"
                     style={{
                       textDecoration: 'none',
                       fontSize: '12pt',
-                      color: 'black',
+                      //color: 'black',
                       fontWeight: '500',
                     }}
                     exact={true}
