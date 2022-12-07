@@ -9,6 +9,7 @@ import Catalog from './pages/catalog/catalog';
 import Exposure from './pages/exposure/exposure';
 import Refitting from './pages/refitting/refitting';
 import Association from './pages/association/association';
+import Extraction from './pages/extraction/extraction';
 import Publications from './pages/publications/publications';
 import Faq from './pages/faq/faq';
 import APIAccess from './pages/apiAccess/apiAccess';
@@ -83,26 +84,38 @@ export default function App() {
       color: '#84368d', // purple
     },
     {
+      route: '/extraction',
+      action: 'Extraction',
+      title: 'Extraction',
+      cardTitle: 'Signature Extraction',
+      cardText: 'Signature Extraction',
+      description:
+        'Statistically analyzing and visualizing associations between mutational signature activities (using different measurements) and collected sample level variables including genomic features, epigenomic features, mutational status, copy number alterations or clinical variables from different cancer genomic studies. In addition, this module allows users to select different statistical approaches for both univariable and multivariable association analyses.',
+      image: 'assets/images/association.png',
+      navIndex: 4,
+      color: '#84368d', // purple
+    },
+    {
       route: '/publications',
       title: 'Publications',
-      navIndex: 4,
+      navIndex: 5,
     },
     {
       route: '/apiaccess',
       title: 'API Access',
-      navIndex: 5,
+      navIndex: 6,
     },
     {
       route: '/faq',
       title: 'FAQ',
-      navIndex: 6,
+      navIndex: 7,
     },
     {
       route: '/about',
       title: 'About',
       // cardTitle: 'About',
       image: 'assets/images/gwas.svg',
-      navIndex: 7,
+      navIndex: 8,
     },
   ];
 
@@ -206,6 +219,7 @@ export default function App() {
           <Route path="/exploration/:exampleName?" component={Exposure} />
           <Route path="/refitting" component={Refitting} />
           <Route path="/association" component={Association} />
+          <Route path="/extraction" component={Extraction} />
           <Route path="/publications" component={Publications} />
           <Route path="/faq" component={Faq} />
           <Route path="/apiaccess" component={APIAccess} />

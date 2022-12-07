@@ -5,7 +5,7 @@ import './navbar.scss';
 export function Navbar({ links }) {
   return (
     <div className="text-white gradient shadow-sm bg-dark">
-      <div className="container d-none d-md-flex justify-content-center">
+      <div className="container d-none d-xl-flex text-nowrap justify-content-center">
         {[{ route: '/', title: 'Home', exact: true }]
           .concat(links)
           .filter((link) => link.title)
@@ -23,14 +23,13 @@ export function Navbar({ links }) {
               >
                 {title}
               </NavLink>
-              <div className="d-lg-none w-100"></div>
             </div>
           ))}
         {/* <pre>{JSON.stringify(links)}</pre> */}
       </div>
 
       {/*Mobile View*/}
-      <div className="container d-flex flex-column d-md-none" align="center">
+      <div className="container d-flex flex-column d-xl-none" align="center">
         {[{ route: '/', title: 'Home', exact: true }]
           .concat(links)
           .filter((link) => link.title)
