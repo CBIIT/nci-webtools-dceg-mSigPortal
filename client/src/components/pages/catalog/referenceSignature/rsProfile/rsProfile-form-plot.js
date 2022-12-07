@@ -451,6 +451,7 @@ export default function ProfileFormPlot({ options, index }) {
   //console.log('----');
   function removePlots(index) {
     //if (plots[index.plotURL]) Object.revokeObjectURL(plots[index].plotURL);
+    console.log('index: -- ');
     console.log(index);
     //console.log(plots);
     let newPlots = plots.slice();

@@ -56,6 +56,11 @@ a:focus {
 
 /** Bootstrap Overrides **/
 
+h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 100;
+}
+
 .outline-none {
   outline: none !important;
   background-color: #f7f5f4;
@@ -151,6 +156,9 @@ a:focus {
   border: none;
   box-shadow: none;
 }
+.text-primary {
+  color: #252525;
+}
 
 .text-orange {
   color: orange !important;
@@ -162,6 +170,18 @@ a:focus {
 
 .text-green {
   color: #2cc799 !important;
+}
+
+.text-purple {
+  color: #8e4b86 !important;
+}
+
+.text-lavender {
+  color: #f1e4ef;
+}
+
+.text-lightgray {
+  color: #f5f5f5;
 }
 
 .flex-shrink-auto {
@@ -339,4 +359,28 @@ select.form-control-sm {
 
 .w-30 {
   width: 30%;
+}
+
+.bg-nav-signature-catalog {
+  background-color: #37622a;
+}
+
+.bg-nav-signature-visualization {
+  background-color: #2c5b4e;
+}
+
+.bg-nav-signature-extraction {
+  background-color: #2f4a64;
+}
+
+.bg-nav-signature-exploration {
+  background-color: #5a4e2e;
+}
+
+.bg-nav-signature-association {
+  background-color: #7f282f;
+}
+
+.bg-nav-signature-api {
+  background-color: #1a1121;
 }
