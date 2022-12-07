@@ -82,12 +82,24 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
     }),
 
     profileComparisonPublic: builder.query({
-      query: (params) => ({
-        url: 'visualizationWrapper',
-        method: 'POST',
-        body: params,
-      }),
+      async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
+        try {
+          const [userData, publicData] = await Promise.all([
+            fetchWithBQ(
+              '/mutational_spectrum?' + new URLSearchParams(_arg.userParams)
+            ), //seqmatrix
+            fetchWithBQ(
+              '/mutational_spectrum?' + new URLSearchParams(_arg.publicParams)
+            ),
+          ]);
+
+          return { data: { userData, publicData } };
+        } catch (error) {
+          return { error };
+        }
+      },
     }),
+
     pcSignatureSets: builder.query({
       query: (params) => ({ url: 'mutational_signature', params }),
       transformResponse: (data) =>
