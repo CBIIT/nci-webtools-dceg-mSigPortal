@@ -54,6 +54,10 @@ a:focus {
   text-decoration: underline;
 }
 
+.no-wrap {
+  flex: 0 0 auto;
+}
+
 /** Bootstrap Overrides **/
 
 h1 {

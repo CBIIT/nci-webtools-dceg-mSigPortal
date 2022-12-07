@@ -5,7 +5,7 @@ import './navbar.scss';
 export function Navbar({ links }) {
   return (
     <div className="shadow-sm bg-nav">
-      <div className="container d-none d-md-flex justify-content-center">
+      <div className="d-none d-md-flex justify-content-center">
         {[{ route: '/', title: 'Home', exact: true }]
           .concat(links)
           .filter((link) => link.title)
@@ -29,7 +29,7 @@ export function Navbar({ links }) {
       </div>
 
       {/*Mobile View*/}
-      <div className="container d-flex flex-column d-xl-none" align="center">
+      <div className="container d-flex flex-column d-md-none" align="center">
         {[{ route: '/', title: 'Home', exact: true }]
           .concat(links)
           .filter((link) => link.title)
