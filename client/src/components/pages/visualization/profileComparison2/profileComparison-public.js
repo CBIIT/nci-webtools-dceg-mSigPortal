@@ -6,12 +6,11 @@ import { NavHashLink } from 'react-router-hash-link';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions } from '../../../../services/store/visualization';
 import { useProfileComparisonWithinQuery } from './apiSlice';
-import { useSeqmatrixOptionsQuery } from '../publicForm/apiSlice';
+import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import SvgContainer from '../../../controls/svgContainer/svgContainer';
-import { defaultMatrix } from '../../../../services/utils';
+import Plotly from '../../../controls/plotly/plot/plot';
 
-export default function PcWithin() {
+export default function PcPublic() {
   const dispatch = useDispatch();
   const store = useSelector((state) => state.visualization);
   const mergeForm = (state) =>
@@ -21,47 +20,78 @@ export default function PcWithin() {
       })
     );
 
-  const { study, cancer, strategy } = store.publicForm;
-  const { source, svgList, matrixList, projectID } = store.main;
+  const { matrixData, projectID } = store.main;
   const { withinForm } = store.profileComparison;
 
   const [params, setParams] = useState(null);
 
-  //   const { data: publicData } = useSeqmatrixOptionsQuery({
-  //     skip: source == 'user',
-  //   });
   const { data, error, isFetching } = useProfileComparisonWithinQuery(params, {
     skip: !params,
   });
 
-  const getSampleOptions = (profile) =>
-    svgList && profile
+  const { data: publicOptions, isFetching: fetchingPublicOptions } =
+    useSeqmatrixOptionsQuery();
+
+  const studyOptions = publicOptions
+    ? [...new Set(publicOptions.map((e) => e.study))].sort().map((e) => ({
+        label: e,
+        value: e,
+      }))
+    : [];
+
+  const cancerOptions = (study) => {
+    if (publicOptions && study?.value) {
+      return [
+        ...[
+          ...new Set(
+            publicOptions
+              .filter((e) => e.study == study.value)
+              .map((e) => e.cancer)
+          ),
+        ]
+          .sort()
+          .map((e) => ({
+            label: e,
+            value: e,
+          })),
+      ];
+    } else {
+      return [];
+    }
+  };
+
+  function sampleOptions(profile) {
+    return matrixData && profile
       ? [
           ...new Set(
-            svgList
-              .filter((e) => e.profile == profile.value)
+            matrixData
+              .filter((e) => e.profile === profile.value)
               .map((e) => e.sample)
+              .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
           ),
         ].map((e) => ({
           label: e,
           value: e,
         }))
       : [];
+  }
 
   const { control, handleSubmit, watch, setValue } = useForm({
     defaultValues: withinForm,
   });
 
-  const { profile, sample1, sample2 } = watch();
+  const { profile, matrix, sample, study, cancer, publicSample } = watch();
 
-  const profileOptions = svgList.length
-    ? [...new Set(svgList.map((e) => e.profile))].map((e) => ({
+  const profileOptions = matrixData.length
+    ? [
+        ...new Set(
+          matrixData.map((e) => e.profile).sort((a, b) => b.localeCompare(a))
+        ),
+      ].map((e) => ({
         label: e,
         value: e,
       }))
     : [];
-
-  const sampleOptions = getSampleOptions(profile);
 
   // set inital parameters
   useEffect(() => {
@@ -70,41 +100,29 @@ export default function PcWithin() {
 
   function onSubmit(data) {
     mergeForm(data);
-
-    const params =
-      source == 'user'
-        ? {
-            fn: 'profileComparisonWithin',
-            args: {
-              profileType: data.profile.value,
-              sampleName1: data.sample1.value,
-              sampleName2: data.sample2.value,
-              matrixFile: matrixList.filter(
-                (row) =>
-                  row.profileType == data.profile.value &&
-                  row.matrixSize ==
-                    defaultMatrix(data.profile.value, ['96', '78', '83'])
-              )[0].Path,
-            },
-            projectID,
-          }
-        : {
-            fn: 'profileComparisonWithinPublic',
-            args: {
-              profileType: data.profile.value,
-              sampleName1: data.sample1.value,
-              sampleName2: data.sample2.value,
-              study: study.value,
-              cancerType: cancer.value,
-              experimentalStrategy: strategy.value,
-            },
-            projectID,
-          };
+    const params = {
+      userParams: {
+        userId: projectID,
+        profile: data.profile.value,
+        matrix:
+          data.profile.value === 'SBS'
+            ? '96'
+            : data.profile.value === 'DBS'
+            ? '78'
+            : '83',
+        sample: data.sample.value,
+      },
+      publicParams: {
+        study: data.study.value,
+        cancer: data.cancer.value,
+        sample: data.publicSample.value,
+      },
+    };
     setParams(params);
   }
 
   function handleProfile(e) {
-    const samples = getSampleOptions(e);
+    const samples = sampleOptions(e);
 
     setValue('profile', e);
     if (samples.length) {
@@ -118,9 +136,10 @@ export default function PcWithin() {
   return (
     <div>
       <p className="p-3 m-0">
-        Input a [Profile Type] and two sample names ([Sample Name 1], [Sample
-        Name 2]) to generate the mutational profile of each sample, as well as
-        the difference between the two mutational profiles.
+        Input a [Profile Type], [Matrix Size], [Sample Name] (from your input
+        data), [Study], [Cancer Type], and [Public Sample Name] to generate the
+        mutational profile of the input sample, the sample from the selected
+        public data, and the difference between them.
       </p>
 
       <hr />
@@ -139,26 +158,51 @@ export default function PcWithin() {
           </Col>
           <Col lg="auto">
             <Select
-              disabled={sampleOptions.length < 2}
-              name="sample1"
-              label="Sample Name 1"
-              options={sampleOptions}
+              disabled={true}
+              name="matrix"
+              label="Sample Matrix size"
+              options={[]}
+              control={control}
+            />
+          </Col>
+          <Col lg="auto">
+            <Select
+              disabled={!sampleOptions(profile).length}
+              name="sample"
+              label="Sample Name"
+              options={sampleOptions(profile)}
+              control={control}
+            />
+          </Col>
+          <Col lg="auto">
+            <Select
+              name="study"
+              label="Study"
+              options={studyOptions}
+              control={control}
+            />
+          </Col>
+          <Col lg="auto">
+            <Select
+              name="cancer"
+              label="Cancer Type or Gorup"
+              options={cancerOptions(study)}
               control={control}
             />
           </Col>
           <Col lg="auto">
             <Select
               disabled={sampleOptions.length < 2}
-              name="sample2"
-              label="Sample Name 2"
-              options={sampleOptions}
+              name="sample"
+              label="Sample Name"
+              options={sampleOptions(study, cancer)}
               control={control}
             />
           </Col>
           <Col lg="auto" className="d-flex">
             <Button
               className="mt-auto mb-3"
-              disabled={!profile || !sample1 || !sample2}
+              disabled={!profile || !sample || !publicSample}
               variant="primary"
               type="submit"
             >
@@ -182,14 +226,14 @@ export default function PcWithin() {
             </div>
           </>
         )}
-        {data?.output.plotPath && (
+        {data && (
           <>
             <hr />
-            <SvgContainer
-              className="p-3"
-              downloadName={data.output.plotPath.split('/').slice(-1)[0]}
-              plotPath={'web/results/' + data.output.plotPath}
-              txtPath={`web/results/${data.output.plotPath}`}
+            <Plotly
+              className="w-100"
+              data={data.traces}
+              layout={data.layout}
+              config={data.config}
             />
             <div className="p-3">
               <p>

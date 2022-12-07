@@ -23,14 +23,13 @@ export function Navbar({ links }) {
               >
                 {title}
               </NavLink>
-              <div className="d-lg-none w-100"></div>
             </div>
           ))}
         {/* <pre>{JSON.stringify(links)}</pre> */}
       </div>
 
       {/*Mobile View*/}
-      <div className="container d-flex flex-column d-md-none" align="center">
+      <div className="container d-flex flex-column d-xl-none" align="center">
         {[{ route: '/', title: 'Home', exact: true }]
           .concat(links)
           .filter((link) => link.title)
