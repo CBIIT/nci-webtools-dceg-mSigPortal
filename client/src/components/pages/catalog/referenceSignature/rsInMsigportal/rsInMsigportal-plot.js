@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { LoadingOverlay } from '../../../../controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as catalogActions } from '../../../../../services/store/catalog';
@@ -23,8 +23,6 @@ export default function RsInMsigportal() {
   const [loading, setLoading] = useState(false);
 
   const { data, error, isFetching } = useRsInMsigportalDataQuery();
-
-  console.log(data);
 
   return (
     <div id="rsPlot">
