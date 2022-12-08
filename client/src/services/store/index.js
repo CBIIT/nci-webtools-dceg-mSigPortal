@@ -1,9 +1,10 @@
 import { reducer as catalogReducer } from './catalog';
-import { reducer as exposureReducer } from './exposure';
 import { reducer as visualizationReducer } from './visualization';
+import { reducer as exposureReducer } from './exposure';
 import { reducer as associationReducer } from './association';
-import { reducer as modalReducer } from './modal';
+import { reducer as extractionReducer } from './extraction';
 import { reducer as publicationsReducer } from './publications';
+import { reducer as modalReducer } from './modal';
 
 import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
@@ -13,23 +14,26 @@ import {
   explorationApiSlice,
   catalogApiSlice,
   associationApiSlice,
+  extractionApiSlice,
 } from './rootApi';
 
 // provide rootReducer as an object of slice reducers
 export const store = configureStore({
   reducer: {
-    visualization: visualizationReducer,
     catalog: catalogReducer,
-    association: associationReducer,
+    visualization: visualizationReducer,
     exposure: exposureReducer,
-    modal: modalReducer,
+    association: associationReducer,
+    extraction: extractionReducer,
     publications: publicationsReducer,
+    modal: modalReducer,
 
     [optionsApiSlice.reducerPath]: optionsApiSlice.reducer,
     [visualizationApiSlice.reducerPath]: visualizationApiSlice.reducer,
     [explorationApiSlice.reducerPath]: explorationApiSlice.reducer,
     [catalogApiSlice.reducerPath]: catalogApiSlice.reducer,
     [associationApiSlice.reducerPath]: associationApiSlice.reducer,
+    [extractionApiSlice.reducerPath]: extractionApiSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }).concat(
@@ -37,7 +41,8 @@ export const store = configureStore({
       visualizationApiSlice.middleware,
       explorationApiSlice.middleware,
       catalogApiSlice.middleware,
-      associationApiSlice.middleware
+      associationApiSlice.middleware,
+      extractionApiSlice.middleware
     ),
 });
 
