@@ -1,5 +1,4 @@
 import { catalogApiSlice } from '../../../../../services/store/rootApi';
-import { groupBy } from 'lodash';
 import RsInMsigportal from '../../../../controls/plotly/rsInMsigportal/rsInMsigportal';
 
 export const rsInMsigportalApiSlice = catalogApiSlice.injectEndpoints({
@@ -10,8 +9,6 @@ export const rsInMsigportalApiSlice = catalogApiSlice.injectEndpoints({
         params,
       }),
       transformResponse: (data, meta, args) => {
-        console.log(args);
-        console.log(data);
         return RsInMsigportal(data);
       },
     }),

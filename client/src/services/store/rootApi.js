@@ -26,6 +26,12 @@ export const {
   useAssociationOptionsQuery,
 } = optionsApiSlice;
 
+export const catalogApiSlice = createApi({
+  reducerPath: 'catalogApi',
+  baseQuery: fetchBaseQuery({ baseUrl: 'web' }),
+  endpoints: () => ({}),
+});
+
 export const visualizationApiSlice = createApi({
   reducerPath: 'visualizationApi',
   baseQuery: fetchBaseQuery({ baseUrl: 'web' }),
@@ -44,8 +50,8 @@ export const associationApiSlice = createApi({
   endpoints: () => ({}),
 });
 
-export const catalogApiSlice = createApi({
-  reducerPath: 'catalogApi',
+export const extractionApiSlice = createApi({
+  reducerPath: 'extractionApi',
   baseQuery: fetchBaseQuery({ baseUrl: 'web' }),
   endpoints: () => ({}),
 });
@@ -54,3 +60,4 @@ export const resetOptionsApi = optionsApiSlice.util.resetApiState();
 export const resetVisualizationApi = visualizationApiSlice.util.resetApiState();
 export const resetExplorationApi = explorationApiSlice.util.resetApiState();
 export const resetAssociationApi = associationApiSlice.util.resetApiState();
+export const resetExtractionApi = extractionApiSlice.util.resetApiState();
