@@ -167,13 +167,13 @@ export default function Home({ links }) {
                 <p class="card-text">
                   All existing human and mouse signatures based on different
                   genome builds and algorithm versions <br />
-                  <a href="" target="_blank">
-                    Read More
-                  </a>
+                  <a href="/#/about">Read More</a>
                 </p>
               </div>
-              <div class="">
-                <Button class="btn btn-catalog">Go to catalog </Button>
+              <div class="p-3">
+                <a href="/#/catalog" class="btn btn-catalog">
+                  Go to catalog
+                </a>
               </div>
             </div>
           </div>
@@ -187,13 +187,13 @@ export default function Home({ links }) {
                 <p class="card-text">
                   Allow identication of signature features at sample level and
                   sicovery of new signatures <br />
-                  <a href="" target="_blank">
-                    Read More
-                  </a>
+                  <a href="/#/about">Read More</a>
                 </p>
               </div>
-              <div class="">
-                <div class="btn btn-visualization">Go to visualization</div>
+              <div class="p-3">
+                <a href="/#/visualization" class="btn btn-visualization">
+                  Go to visualization
+                </a>
               </div>
             </div>
           </div>
@@ -205,13 +205,13 @@ export default function Home({ links }) {
                 <p class="card-text">
                   Extract and compare muational signatures using
                   state-of-the-art algorithms <br />
-                  <a href="" target="_blank">
-                    Read More
-                  </a>
+                  <a href="/#/about">Read More</a>
                 </p>
               </div>
-              <div class="">
-                <div class="btn btn-extraction">Go to extraction</div>
+              <div class="p-3">
+                <a href="/#/extraction" class="btn btn-extraction">
+                  Go to extraction
+                </a>
               </div>
             </div>
           </div>
@@ -225,13 +225,13 @@ export default function Home({ links }) {
                 <p class="card-text">
                   Explore etiological factors associated with signature at
                   sample level <br />
-                  <a href="" target="_blank">
-                    Read More
-                  </a>
+                  <a href="/#/about">Read More</a>
                 </p>
               </div>
-              <div class="">
-                <div class="btn btn-exploration">Go to exploration</div>
+              <div class="p-3">
+                <a href="/#/exploration" class="btn btn-exploration">
+                  Go to exploration
+                </a>
               </div>
             </div>
           </div>
@@ -245,13 +245,13 @@ export default function Home({ links }) {
                 <p class="card-text">
                   Analyze signature association with other genomic features and
                   clincial data <br />
-                  <a href="" target="_blank">
-                    Read More
-                  </a>
+                  <a href="/#/about">Read More</a>
                 </p>
               </div>
-              <div class="">
-                <div class="btn btn-association">Go to catalog</div>
+              <div class="p-3">
+                <a href="/#/association" class="btn btn-association">
+                  Go to Association
+                </a>
               </div>
             </div>
           </div>
@@ -263,13 +263,13 @@ export default function Home({ links }) {
                 <p class="card-text">
                   Analyze signature association with other genomic features and
                   clincial data <br />
-                  <a href="" target="_blank">
-                    Read More
-                  </a>
+                  <a href="/#/about">Read More</a>
                 </p>
               </div>
-              <div>
-                <div class="btn btn-api">Go to API Access</div>
+              <div class="p-3">
+                <a href="/#/apiaccess" class="btn btn-api">
+                  Go to API Access
+                </a>
               </div>
             </div>
           </div>
