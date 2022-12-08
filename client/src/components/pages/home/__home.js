@@ -25,11 +25,15 @@ export default function Home({ links }) {
               },
               index
             ) => (
-              <div key={title}>
+              <div
+                className="d-flex bd-highlight w-100"
+                key={title}
+                style={{ marginRight: '1%' }}
+              >
                 <Card
                   key={title}
                   id={title}
-                  className=""
+                  className="mb-5 align-self-center p-2 bd-highlight"
                   style={{
                     minWidth: '45%',
                     justifyContent: 'center',
@@ -49,7 +53,7 @@ export default function Home({ links }) {
                     <span className="sr-only">{title + ' link'}</span>
                   </Link>
                   <Card.Body>
-                    <div className="">
+                    <div className="d-flex flex-row align-items-center justify-content-left">
                       <div
                         className="rounded-circle"
                         style={{
@@ -82,12 +86,12 @@ export default function Home({ links }) {
                           <b>{cardTitle}</b>
                         </h2>
                       </Card.Title>
-                      <div className="description d-none d-md-block">
-                        <div>{parse(description)}</div>
-                      </div>
                     </div>
                   </Card.Body>
                 </Card>
+                <div className="description d-none d-md-block">
+                  <div>{parse(description)}</div>
+                </div>
               </div>
             )
           )}
@@ -95,6 +99,7 @@ export default function Home({ links }) {
       </div>
     );
   }
+
   return (
     <>
       <div className="banner-container text-center d-none d-md-block">
@@ -153,127 +158,38 @@ export default function Home({ links }) {
           </b>
         </div>
       </div>
-
       <div
-        className="container mb-4"
-        // style={{ marginTop: '70px' }}
+        className="container align-middle"
+        style={{
+          textAlign: 'left',
+        }}
       >
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-          <div class="col mb-3">
-            <div class="card h-100">
-              <img src="..." class="card-img-top" alt="..." />
-              <div class="card-body">
-                <h4 class="card-title text-catalog">Signature Catalog</h4>
-                <p class="card-text">
-                  All existing human and mouse signatures based on different
-                  genome builds and algorithm versions <br />
-                  <a href="" target="_blank">
-                    Read More
-                  </a>
-                </p>
-              </div>
-              <div class="">
-                <Button class="btn btn-catalog">Go to catalog </Button>
-              </div>
-            </div>
-          </div>
-          <div class="col mb-3">
-            <div class="card h-100">
-              <img src="..." class="card-img-top" alt="..." />
-              <div class="card-body">
-                <h4 class="card-title text-visualization">
-                  Signature Visualization
-                </h4>
-                <p class="card-text">
-                  Allow identication of signature features at sample level and
-                  sicovery of new signatures <br />
-                  <a href="" target="_blank">
-                    Read More
-                  </a>
-                </p>
-              </div>
-              <div class="">
-                <div class="btn btn-visualization">Go to visualization</div>
-              </div>
-            </div>
-          </div>
-          <div class="col mb-3">
-            <div class="card h-100">
-              <img src="..." class="card-img-top" alt="..." />
-              <div class="card-body">
-                <h4 class="card-title text-extraction">Signature Extraction</h4>
-                <p class="card-text">
-                  Extract and compare muational signatures using
-                  state-of-the-art algorithms <br />
-                  <a href="" target="_blank">
-                    Read More
-                  </a>
-                </p>
-              </div>
-              <div class="">
-                <div class="btn btn-extraction">Go to extraction</div>
-              </div>
-            </div>
-          </div>
-          <div class="col mb-3">
-            <div class="card h-100">
-              <img src="..." class="card-img-top" alt="..." />
-              <div class="card-body">
-                <h4 class="card-title text-exploration">
-                  Signature Exploration
-                </h4>
-                <p class="card-text">
-                  Explore etiological factors associated with signature at
-                  sample level <br />
-                  <a href="" target="_blank">
-                    Read More
-                  </a>
-                </p>
-              </div>
-              <div class="">
-                <div class="btn btn-exploration">Go to exploration</div>
-              </div>
-            </div>
-          </div>
-          <div class="col mb-3">
-            <div class="card h-100">
-              <img src="..." class="card-img-top" alt="..." />
-              <div class="card-body">
-                <h4 class="card-title text-association">
-                  Signature Association
-                </h4>
-                <p class="card-text">
-                  Analyze signature association with other genomic features and
-                  clincial data <br />
-                  <a href="" target="_blank">
-                    Read More
-                  </a>
-                </p>
-              </div>
-              <div class="">
-                <div class="btn btn-association">Go to catalog</div>
-              </div>
-            </div>
-          </div>
-          <div class="col mb-3">
-            <div class="card h-100">
-              <img src="..." class="card-img-top" alt="..." />
-              <div class="card-body">
-                <h4 class="card-title text-api">Signature API Access</h4>
-                <p class="card-text">
-                  Analyze signature association with other genomic features and
-                  clincial data <br />
-                  <a href="" target="_blank">
-                    Read More
-                  </a>
-                </p>
-              </div>
-              <div>
-                <div class="btn btn-api">Go to API Access</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        Mutational signatures are characteristic combinations of mutation types
+        arising from specific mutagenesis processes such as DNA replication
+        infidelity, defective DNA repair, DNA enzymatic editing and exogenous
+        exposures. Analysis of mutational signatures is becoming routine in
+        cancer genomics, providing a novel opportunity for biomarker discovery,
+        tumor diagnostics, and treatment guidance. As the number of mutational
+        signatures associated with known etiologies has increased from many
+        different cancer genomic studies, there is a critical need for curated
+        census as well as data sharing of mutational signatures for public
+        research. mSigPortal provides a platform that enables users to explore,
+        visualize, and analyze mutational signatures and relevant signature data
+        (such as mutational profile, proposed etiology, tissue specificity,
+        activity, and association) in cancer genomic studies from scientific
+        literature or user input. This portal will greatly facilitate broad
+        investigation of mutational signatures to elucidate different
+        mutagenesis processes involved in tumorigenesis. Currently, mSigPortal
+        includes the following modules:
+      </div>
+      <div
+        className="container align-middle text-center"
+        style={{ marginTop: '70px' }}
+      >
+        {cardRow(links.slice(0, 1))}
+        {cardRow(links.slice(1, 2))}
+        {cardRow(links.slice(2, 3))}
+        {cardRow(links.slice(3, 4))}
       </div>
     </>
   );
