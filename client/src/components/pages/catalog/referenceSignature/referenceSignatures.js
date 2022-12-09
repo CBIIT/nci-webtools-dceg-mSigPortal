@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { Tab, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import Overview from './overview';
-import Profile from './rsProfile';
+// import Overview from './overview';
+// import Profile from './rsProfile';
 import RsInMsigportal from './rsInMsigportal/rsInMsigportal-plot';
 import RsProfile from './rsProfile/rsProfile';
-import CosineSimilarity from './cosineSimilarity';
+import CosineSimilarity from './cosineSimilarity/cosineSimilarity';
 import Comparison from './rsComparison';
 import Download from './download';
 import { getJSON } from '../../../../services/utils';
@@ -191,7 +191,7 @@ export default function ReferenceSignature() {
       title: 'RS Profile',
     },
     {
-      component: <CosineSimilarity submitR={(fn, args) => submitR(fn, args)} />,
+      component: <CosineSimilarity />,
       key: 'cosineSimilarity',
       title: 'RS Cosine Similarity',
     },

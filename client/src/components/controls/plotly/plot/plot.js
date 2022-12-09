@@ -3,6 +3,7 @@ import { downloadImage } from 'plotly.js';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
 import { saveAs } from 'file-saver';
+import { handleSaveCSV } from '../../../controls/table/table2';
 
 import './plot.scss';
 
@@ -10,8 +11,8 @@ export default function Plotly({
   data,
   layout,
   config,
-  divId,
-  filename,
+  divId = 'plot',
+  filename = 'plot',
   originalData,
   ...rest
 }) {
@@ -21,14 +22,14 @@ export default function Plotly({
     displaylogo: false,
     toImageButtonOptions: {
       format: 'svg',
-      filename: filename || divId || 'plot',
+      filename: filename || divId,
       scale: 1,
     },
   };
 
   return (
     <Container fluid>
-      <Row>
+      <Row className="d-flex justify-content-end">
         {/* <Col sm="auto">
           <Button
             variant="link"
@@ -55,7 +56,20 @@ export default function Plotly({
             Download SVG
           </Button>
         </Col> */}
-        <Col className="d-flex justify-content-end">
+        {originalData && (
+          <Col sm="auto">
+            <Button
+              variant="link"
+              className="ml-auto m-0"
+              onClick={() =>
+                handleSaveCSV(originalData, `${filename || divId}.csv`)
+              }
+            >
+              Download Data
+            </Button>
+          </Col>
+        )}
+        <Col sm="auto">
           <Button
             variant="link"
             onClick={() =>

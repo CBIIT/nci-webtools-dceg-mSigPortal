@@ -43,18 +43,11 @@ export const getInitialState = () => ({
       },
     ],
   },
-  sigCosineSimilarity: {
-    profileName: '',
-    profileNameOptions: [],
-    rsSet1: '',
-    rsSet2: '',
-    rsSetOptions1: [],
-    rsSetOptions2: [],
-    plotPath: '',
-    txtPath: '',
-    debugR: '',
-    err: '',
-    loading: false,
+  cosineSimilarity: {
+    profile: '',
+    matrix: '',
+    signatureSet1: '',
+    signatureSet2: '',
   },
   sigMutationalSigComparison: {
     profileName: '',
