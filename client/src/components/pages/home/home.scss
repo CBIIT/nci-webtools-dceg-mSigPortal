@@ -11,6 +11,23 @@
     left: 50%;
     transform: translate(-50%, -50%);
   }
+
+  .homepage-title-left {
+    position: absolute;
+    top: 45%;
+    left: 0%;
+    width: 50%;
+  }
+
+  .homepage-title-right {
+    position: absolute;
+    top: 45%;
+    right: 0%;
+    width: 50%;
+  }
+}
+
+.msigportal-title {
 }
 
 .center {

@@ -62,7 +62,7 @@ a:focus {
 
 h1 {
   font-family: 'Montserrat', sans-serif;
-  font-weight: 100;
+  font-weight: 700;
 }
 
 .outline-none {
@@ -597,4 +597,19 @@ select.form-control-sm {
   background-color: #4b325e !important;
   color: white !important;
   border-color: #1a1121 !important;
+}
+
+.btn-gradient {
+  background-image: linear-gradient(to right, #b83d47 0%, #8e4b86 55%);
+  color: white;
+}
+
+.btn-gradient:hover {
+  background-image: linear-gradient(to right, #8e4b86 0%, #b83d47 55%);
+  color: white;
+}
+
+.btn-gradient:active {
+  background-image: linear-gradient(to right, #b83d47 0%, #8e4b86 55%);
+  color: white !important;
 }

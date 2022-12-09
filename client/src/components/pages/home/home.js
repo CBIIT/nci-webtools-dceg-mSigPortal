@@ -98,70 +98,39 @@ export default function Home({ links }) {
   return (
     <>
       <div className="banner-container text-center d-none d-md-block">
-        <div className="image-blurred-edge">
+        <div className="">
           <img
-            src="assets/images/msigportal-banner.png"
+            src="/assets/images/Hero_Image.png"
             alt="mSigPortal banner"
             style={{
               width: '100%',
-              height: '250px',
-              filter: 'contrast(2)',
+              //height: '250px',
+              //filter: 'contrast(2)',
             }}
           ></img>
-        </div>
-        <div className="banner-overlay-text row justify-content-center text-center text-light w-75">
-          <div className="col-12">
-            <img
-              src="assets/images/logo-horizontal.png"
-              alt="mSigPortal title"
-              style={{
-                width: '325px',
-                height: '50px',
-              }}
-            ></img>
+          <div class="row">
+            <div class="homepage-title-left ">
+              <h1>mSigPortal</h1>
+              <h3 class="text-primary-purple">
+                Integrative Mutational Signature Portal for Cancer Genomics
+                Study
+              </h3>
+            </div>
+            <div class="homepage-title-right">
+              <div class=" btn btn-gradient">Learn more about mSigportal</div>
+            </div>
           </div>
-          <div
-            className="col-6 w-50 my-3 align-self-center"
-            style={{ borderTop: '3px solid', color: 'rgb(200,37,6)' }}
-          ></div>
-          <div
-            className="col-12 text-center mt-2 font-weight-bold"
-            style={{
-              width: '100%',
-              fontSize: '18pt',
-              color: 'black',
-              fontStyle: 'italic',
-            }}
-          >
-            Integrative Mutational Signature Portal for Cancer Genomic Studies
-          </div>
-          <div
-            className="col-12 text-center mt-5"
-            style={{ width: '100%', fontSize: '14pt' }}
-          ></div>
         </div>
       </div>
-      {/* mobile */}
-      <div className="text-center mt-2 d-md-none">
-        <h1 className="text-dark">
-          <b>mSigPortal</b>
-        </h1>
-        <hr className="w-75"></hr>
-        <div className="px-3 text-center">
-          <b>
-            Integrative mutational signature portal for cancer genomic studies
-          </b>
-        </div>
-      </div>
-
-      <div
-        className="container mb-4"
-        // style={{ marginTop: '70px' }}
-      >
+      <div className="container p-3">
         <div class="row row-cols-1 row-cols-md-3 g-4">
           <div class="col mb-3">
             <div class="card h-100">
-              <img src="..." class="card-img-top" alt="..." />
+              <img
+                src="/assets/icons/Catalog-Icon.svg"
+                class="card-img-top w-50 h-50"
+                alt="Catalog Icon"
+              />
               <div class="card-body">
                 <h4 class="card-title text-catalog">Signature Catalog</h4>
                 <p class="card-text">
@@ -171,7 +140,10 @@ export default function Home({ links }) {
                 </p>
               </div>
               <div class="p-3">
-                <a href="/#/catalog" class="btn btn-catalog">
+                <a
+                  href="/mutational-signatures/#/catalog"
+                  class="btn btn-catalog"
+                >
                   Go to catalog
                 </a>
               </div>
@@ -179,7 +151,11 @@ export default function Home({ links }) {
           </div>
           <div class="col mb-3">
             <div class="card h-100">
-              <img src="..." class="card-img-top" alt="..." />
+              <img
+                src="/assets/icons/Visualization-Icon.svg"
+                class="card-img-top  w-50 h-50"
+                alt="Visualization Icon"
+              />
               <div class="card-body">
                 <h4 class="card-title text-visualization">
                   Signature Visualization
@@ -187,11 +163,14 @@ export default function Home({ links }) {
                 <p class="card-text">
                   Allow identication of signature features at sample level and
                   sicovery of new signatures <br />
-                  <a href="/#/about">Read More</a>
+                  <a href="/mutational-signatures/#/about">Read More</a>
                 </p>
               </div>
               <div class="p-3">
-                <a href="/#/visualization" class="btn btn-visualization">
+                <a
+                  href="/mutational-signatures/#/visualization"
+                  class="btn btn-visualization"
+                >
                   Go to visualization
                 </a>
               </div>
@@ -199,17 +178,24 @@ export default function Home({ links }) {
           </div>
           <div class="col mb-3">
             <div class="card h-100">
-              <img src="..." class="card-img-top" alt="..." />
+              <img
+                src="/assets/icons/Extraction-Icon.svg"
+                class="card-img-top  w-50 h-50"
+                alt="Extraction Icon"
+              />
               <div class="card-body">
                 <h4 class="card-title text-extraction">Signature Extraction</h4>
                 <p class="card-text">
                   Extract and compare muational signatures using
                   state-of-the-art algorithms <br />
-                  <a href="/#/about">Read More</a>
+                  <a href="/mutational-signatures/#/about">Read More</a>
                 </p>
               </div>
               <div class="p-3">
-                <a href="/#/extraction" class="btn btn-extraction">
+                <a
+                  href="/mutational-signatures/#/extraction"
+                  class="btn btn-extraction"
+                >
                   Go to extraction
                 </a>
               </div>
@@ -217,7 +203,11 @@ export default function Home({ links }) {
           </div>
           <div class="col mb-3">
             <div class="card h-100">
-              <img src="..." class="card-img-top" alt="..." />
+              <img
+                src="/assets/icons/Exploration-Icon.svg"
+                class="card-img-top  w-50 h-50"
+                alt="Exploration Icon"
+              />
               <div class="card-body">
                 <h4 class="card-title text-exploration">
                   Signature Exploration
@@ -225,11 +215,14 @@ export default function Home({ links }) {
                 <p class="card-text">
                   Explore etiological factors associated with signature at
                   sample level <br />
-                  <a href="/#/about">Read More</a>
+                  <a href="/mutational-signatures/#/about">Read More</a>
                 </p>
               </div>
               <div class="p-3">
-                <a href="/#/exploration" class="btn btn-exploration">
+                <a
+                  href="/mutational-signatures/#/exploration"
+                  class="btn btn-exploration"
+                >
                   Go to exploration
                 </a>
               </div>
@@ -237,7 +230,11 @@ export default function Home({ links }) {
           </div>
           <div class="col mb-3">
             <div class="card h-100">
-              <img src="..." class="card-img-top" alt="..." />
+              <img
+                src="/assets/icons/Association-Icon.svg"
+                class="card-img-top  w-50 h-50"
+                alt="Association Icon"
+              />
               <div class="card-body">
                 <h4 class="card-title text-association">
                   Signature Association
@@ -245,11 +242,14 @@ export default function Home({ links }) {
                 <p class="card-text">
                   Analyze signature association with other genomic features and
                   clincial data <br />
-                  <a href="/#/about">Read More</a>
+                  <a href="/mutational-signatures/#/about">Read More</a>
                 </p>
               </div>
               <div class="p-3">
-                <a href="/#/association" class="btn btn-association">
+                <a
+                  href="/mutational-signatures/#/association"
+                  class="btn btn-association"
+                >
                   Go to Association
                 </a>
               </div>
@@ -257,17 +257,24 @@ export default function Home({ links }) {
           </div>
           <div class="col mb-3">
             <div class="card h-100">
-              <img src="..." class="card-img-top" alt="..." />
+              <img
+                src="/assets/icons/API-Icon.svg"
+                class="card-img-top  w-50 h-50"
+                alt="API Icon"
+              />
               <div class="card-body">
                 <h4 class="card-title text-api">Signature API Access</h4>
                 <p class="card-text">
                   Analyze signature association with other genomic features and
                   clincial data <br />
-                  <a href="/#/about">Read More</a>
+                  <a href="/mutational-signatures/#/about">Read More</a>
                 </p>
               </div>
               <div class="p-3">
-                <a href="/#/apiaccess" class="btn btn-api">
+                <a
+                  href="/mutational-signatures/#/apiaccess"
+                  class="btn btn-api"
+                >
                   Go to API Access
                 </a>
               </div>
