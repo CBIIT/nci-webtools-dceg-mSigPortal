@@ -7,27 +7,34 @@
 
   .banner-overlay-text {
     position: absolute;
-    top: 60%;
+    top: 40%;
     left: 50%;
     transform: translate(-50%, -50%);
   }
 
   .homepage-title-left {
     position: absolute;
-    top: 45%;
-    left: 0%;
+    top: 15%;
+    left: 17%;
     width: 50%;
   }
 
   .homepage-title-right {
     position: absolute;
-    top: 45%;
-    right: 0%;
-    width: 50%;
+    top: 35%;
+    right: 5%;
+    width: 45%;
   }
 }
 
+.btn-1 {
+  font-size: 24pt;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
 .msigportal-title {
+  font-size: 28pt;
 }
 
 .center {

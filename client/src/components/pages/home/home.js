@@ -109,26 +109,28 @@ export default function Home({ links }) {
             }}
           ></img>
           <div class="row">
-            <div class="homepage-title-left ">
+            <div class="homepage-title-left text-left">
               <h1>mSigPortal</h1>
-              <h3 class="text-primary-purple">
+              <div class="text-primary-purple msigportal-title">
                 Integrative Mutational Signature Portal for Cancer Genomics
                 Study
-              </h3>
+              </div>
             </div>
             <div class="homepage-title-right">
-              <div class=" btn btn-gradient">Learn more about mSigportal</div>
+              <div class=" btn btn-gradient btn-1 p-3">
+                Learn more about mSigportal &gt;
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div className="container p-3">
+      <div className=" p-3">
         <div class="row row-cols-1 row-cols-md-3 g-4">
           <div class="col mb-3">
-            <div class="card h-100">
+            <div class="card h-100 p-3">
               <img
                 src="/assets/icons/Catalog-Icon.svg"
-                class="card-img-top w-50 h-50"
+                class="card-img-top w-50 h-50 ml-3"
                 alt="Catalog Icon"
               />
               <div class="card-body">
@@ -144,16 +146,16 @@ export default function Home({ links }) {
                   href="/mutational-signatures/#/catalog"
                   class="btn btn-catalog"
                 >
-                  Go to catalog
+                  Go to catalog &gt;
                 </a>
               </div>
             </div>
           </div>
           <div class="col mb-3">
-            <div class="card h-100">
+            <div class="card h-100 p-3">
               <img
                 src="/assets/icons/Visualization-Icon.svg"
-                class="card-img-top  w-50 h-50"
+                class="card-img-top w-50 h-50 ml-3"
                 alt="Visualization Icon"
               />
               <div class="card-body">
@@ -171,16 +173,16 @@ export default function Home({ links }) {
                   href="/mutational-signatures/#/visualization"
                   class="btn btn-visualization"
                 >
-                  Go to visualization
+                  Go to visualization &gt;
                 </a>
               </div>
             </div>
           </div>
           <div class="col mb-3">
-            <div class="card h-100">
+            <div class="card h-100 p-3">
               <img
                 src="/assets/icons/Extraction-Icon.svg"
-                class="card-img-top  w-50 h-50"
+                class="card-img-top w-50 h-50 ml-3"
                 alt="Extraction Icon"
               />
               <div class="card-body">
@@ -196,16 +198,16 @@ export default function Home({ links }) {
                   href="/mutational-signatures/#/extraction"
                   class="btn btn-extraction"
                 >
-                  Go to extraction
+                  Go to extraction &gt;
                 </a>
               </div>
             </div>
           </div>
           <div class="col mb-3">
-            <div class="card h-100">
+            <div class="card h-100 p-3">
               <img
                 src="/assets/icons/Exploration-Icon.svg"
-                class="card-img-top  w-50 h-50"
+                class="card-img-top w-50 h-50 ml-3"
                 alt="Exploration Icon"
               />
               <div class="card-body">
@@ -223,16 +225,16 @@ export default function Home({ links }) {
                   href="/mutational-signatures/#/exploration"
                   class="btn btn-exploration"
                 >
-                  Go to exploration
+                  Go to exploration &gt;
                 </a>
               </div>
             </div>
           </div>
           <div class="col mb-3">
-            <div class="card h-100">
+            <div class="card h-100 p-3">
               <img
                 src="/assets/icons/Association-Icon.svg"
-                class="card-img-top  w-50 h-50"
+                class="card-img-top  w-50 h-50 ml-3"
                 alt="Association Icon"
               />
               <div class="card-body">
@@ -250,16 +252,16 @@ export default function Home({ links }) {
                   href="/mutational-signatures/#/association"
                   class="btn btn-association"
                 >
-                  Go to Association
+                  Go to Association &gt;
                 </a>
               </div>
             </div>
           </div>
           <div class="col mb-3">
-            <div class="card h-100">
+            <div class="card h-100 p-3">
               <img
                 src="/assets/icons/API-Icon.svg"
-                class="card-img-top  w-50 h-50"
+                class="card-img-top w-50 h-50 ml-3"
                 alt="API Icon"
               />
               <div class="card-body">
@@ -275,7 +277,7 @@ export default function Home({ links }) {
                   href="/mutational-signatures/#/apiaccess"
                   class="btn btn-api"
                 >
-                  Go to API Access
+                  Go to API Access &gt;
                 </a>
               </div>
             </div>

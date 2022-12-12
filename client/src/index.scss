@@ -62,7 +62,8 @@ a:focus {
 
 h1 {
   font-family: 'Montserrat', sans-serif;
-  font-weight: 700;
+  font-weight: 900;
+  font-size: 65pt;
 }
 
 .outline-none {
@@ -602,6 +603,7 @@ select.form-control-sm {
 .btn-gradient {
   background-image: linear-gradient(to right, #b83d47 0%, #8e4b86 55%);
   color: white;
+  border-radius: 15px;
 }
 
 .btn-gradient:hover {
