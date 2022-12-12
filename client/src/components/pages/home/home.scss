@@ -2,7 +2,6 @@
   z-index: 0;
   overflow: hidden;
   display: block;
-  // height: 233px;
   position: relative;
 
   .banner-overlay-text {
@@ -136,4 +135,20 @@
 
 .btn-border-radius-25 {
   border-radius: 25%;
+}
+.home-page {
+  position: relative;
+}
+.home-grid-banner {
+  z-index: 1;
+  //position: absolute;
+  top: 75%;
+}
+
+.h-40 {
+  height: 40% !important;
+}
+
+.w-40 {
+  width: 40% !important;
 }

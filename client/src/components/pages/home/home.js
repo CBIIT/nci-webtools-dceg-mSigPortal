@@ -97,188 +97,219 @@ export default function Home({ links }) {
   }
   return (
     <>
-      <div className="banner-container text-center d-none d-md-block">
-        <div className="">
-          <img
-            src="/assets/images/Hero_Image.png"
-            alt="mSigPortal banner"
-            style={{
-              width: '100%',
-              //height: '250px',
-              //filter: 'contrast(2)',
-            }}
-          ></img>
-          <div class="row">
-            <div class="homepage-title-left text-left">
-              <h1>mSigPortal</h1>
-              <div class="text-primary-purple msigportal-title">
-                Integrative Mutational Signature Portal for Cancer Genomics
-                Study
+      <div>
+        <div className="banner-container text-center d-none d-md-block">
+          <div className="">
+            <img
+              src="/assets/images/Hero_Image.png"
+              alt="mSigPortal banner"
+              style={{
+                width: '100%',
+                //height: '250px',
+                //filter: 'contrast(2)',
+              }}
+            ></img>
+            <div class="row">
+              <div class="homepage-title-left text-left">
+                <h1>mSigPortal</h1>
+                <div class="text-primary-purple msigportal-title">
+                  Integrative Mutational Signature Portal for Cancer Genomics
+                  Study
+                </div>
               </div>
-            </div>
-            <div class="homepage-title-right">
-              <div class=" btn btn-gradient btn-1 p-3">
-                Learn more about mSigportal &gt;
+              <div class="homepage-title-right">
+                <div class=" btn btn-gradient btn-1 p-3">
+                  Learn more about mSigportal &gt;
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <div className=" p-3">
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-          <div class="col mb-4">
-            <div class="card h-100 p-3">
-              <img
-                src="/assets/icons/Catalog-Icon.svg"
-                class="card-img-top w-50 h-50 ml-3"
-                alt="Catalog Icon"
-              />
-              <div class="card-body">
-                <h4 class="card-title text-catalog">Signature Catalog</h4>
-                <p class="card-text">
-                  All existing human and mouse signatures based on different
-                  genome builds and algorithm versions <br />
-                  <a href="/#/about">Read More</a>
-                </p>
-              </div>
-              <div class="p-3">
-                <a
-                  href="/mutational-signatures/#/catalog"
-                  class="btn btn-catalog btn-border-radius-25"
-                >
-                  Go to catalog &gt;
-                </a>
-              </div>
-            </div>
-          </div>
-          <div class="col mb-3">
-            <div class="card h-100 p-3">
-              <img
-                src="/assets/icons/Visualization-Icon.svg"
-                class="card-img-top w-50 h-50 ml-3"
-                alt="Visualization Icon"
-              />
-              <div class="card-body">
-                <h4 class="card-title text-visualization">
-                  Signature Visualization
-                </h4>
-                <p class="card-text">
-                  Allow identication of signature features at sample level and
-                  sicovery of new signatures <br />
-                  <a href="/mutational-signatures/#/about">Read More</a>
-                </p>
-              </div>
-              <div class="p-3">
-                <a
-                  href="/mutational-signatures/#/visualization"
-                  class="btn btn-visualization"
-                >
-                  Go to visualization &gt;
-                </a>
+        <div className="p-3 home-grid-banner">
+          <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="col mb-4">
+              <div class="card h-100 p-3">
+                <img
+                  src="/assets/icons/Catalog-Icon.svg"
+                  class="card-img-top w-40 h-40 ml-3"
+                  alt="Catalog Icon"
+                />
+                <div class="card-body">
+                  <h4 class="card-title text-catalog">Signature Catalog</h4>
+                  <p class="card-text">
+                    All existing human and mouse signatures based on different
+                    genome builds and algorithm versions <br />
+                    <a href="/#/about" class="link-primary">
+                      Read More &rarr;
+                    </a>
+                  </p>
+                </div>
+                <div class="p-3">
+                  <a
+                    href="/mutational-signatures/#/catalog"
+                    class="btn btn-lg btn-catalog btn-border-radius-25"
+                  >
+                    Go to catalog &gt;
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="col mb-3">
-            <div class="card h-100 p-3">
-              <img
-                src="/assets/icons/Extraction-Icon.svg"
-                class="card-img-top w-50 h-50 ml-3"
-                alt="Extraction Icon"
-              />
-              <div class="card-body">
-                <h4 class="card-title text-extraction">Signature Extraction</h4>
-                <p class="card-text">
-                  Extract and compare muational signatures using
-                  state-of-the-art algorithms <br />
-                  <a href="/mutational-signatures/#/about">Read More</a>
-                </p>
-              </div>
-              <div class="p-3">
-                <a
-                  href="/mutational-signatures/#/extraction"
-                  class="btn btn-extraction"
-                >
-                  Go to extraction &gt;
-                </a>
-              </div>
-            </div>
-          </div>
-          <div class="col mb-3">
-            <div class="card h-100 p-3">
-              <img
-                src="/assets/icons/Exploration-Icon.svg"
-                class="card-img-top w-50 h-50 ml-3"
-                alt="Exploration Icon"
-              />
-              <div class="card-body">
-                <h4 class="card-title text-exploration">
-                  Signature Exploration
-                </h4>
-                <p class="card-text">
-                  Explore etiological factors associated with signature at
-                  sample level <br />
-                  <a href="/mutational-signatures/#/about">Read More</a>
-                </p>
-              </div>
-              <div class="p-3">
-                <a
-                  href="/mutational-signatures/#/exploration"
-                  class="btn btn-exploration"
-                >
-                  Go to exploration &gt;
-                </a>
+            <div class="col mb-3">
+              <div class="card h-100 p-3">
+                <img
+                  src="/assets/icons/Visualization-Icon.svg"
+                  class="card-img-top w-40 h-40 ml-3"
+                  alt="Visualization Icon"
+                />
+                <div class="card-body">
+                  <h4 class="card-title text-visualization">
+                    Signature Visualization
+                  </h4>
+                  <p class="card-text">
+                    Allow identication of signature features at sample level and
+                    sicovery of new signatures <br />
+                    <a
+                      href="/mutational-signatures/#/about"
+                      class="link-primary"
+                    >
+                      Read More &rarr;
+                    </a>
+                  </p>
+                </div>
+                <div class="p-3">
+                  <a
+                    href="/mutational-signatures/#/visualization"
+                    class="btn btn-lg btn-visualization"
+                  >
+                    Go to visualization &gt;
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="col mb-3">
-            <div class="card h-100 p-3">
-              <img
-                src="/assets/icons/Association-Icon.svg"
-                class="card-img-top  w-50 h-50 ml-3"
-                alt="Association Icon"
-              />
-              <div class="card-body">
-                <h4 class="card-title text-association">
-                  Signature Association
-                </h4>
-                <p class="card-text">
-                  Analyze signature association with other genomic features and
-                  clincial data <br />
-                  <a href="/mutational-signatures/#/about">Read More</a>
-                </p>
-              </div>
-              <div class="p-3">
-                <a
-                  href="/mutational-signatures/#/association"
-                  class="btn btn-association"
-                >
-                  Go to Association &gt;
-                </a>
+            <div class="col mb-3">
+              <div class="card h-100 p-3">
+                <img
+                  src="/assets/icons/Extraction-Icon.svg"
+                  class="card-img-top w-40 h-40 ml-3"
+                  alt="Extraction Icon"
+                />
+                <div class="card-body">
+                  <h4 class="card-title text-extraction">
+                    Signature Extraction
+                  </h4>
+                  <p class="card-text">
+                    Extract and compare muational signatures using
+                    state-of-the-art algorithms <br />
+                    <a
+                      href="/mutational-signatures/#/about"
+                      class="link-primary"
+                    >
+                      Read More &rarr;
+                    </a>
+                  </p>
+                </div>
+                <div class="p-3">
+                  <a
+                    href="/mutational-signatures/#/extraction"
+                    class="btn btn-lg btn-extraction"
+                  >
+                    Go to extraction &gt;
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="col mb-3">
-            <div class="card h-100 p-3">
-              <img
-                src="/assets/icons/API-Icon.svg"
-                class="card-img-top w-50 h-50 ml-3"
-                alt="API Icon"
-              />
-              <div class="card-body">
-                <h4 class="card-title text-api">Signature API Access</h4>
-                <p class="card-text">
-                  Analyze signature association with other genomic features and
-                  clincial data <br />
-                  <a href="/mutational-signatures/#/about">Read More</a>
-                </p>
+            <div class="col mb-3">
+              <div class="card h-100 p-3">
+                <img
+                  src="/assets/icons/Exploration-Icon.svg"
+                  class="card-img-top w-40 h-40 ml-3"
+                  alt="Exploration Icon"
+                />
+                <div class="card-body">
+                  <h4 class="card-title text-exploration">
+                    Signature Exploration
+                  </h4>
+                  <p class="card-text">
+                    Explore etiological factors associated with signature at
+                    sample level <br />
+                    <a
+                      href="/mutational-signatures/#/about"
+                      class="link-primary"
+                    >
+                      Read More &rarr;
+                    </a>
+                  </p>
+                </div>
+                <div class="p-3">
+                  <a
+                    href="/mutational-signatures/#/exploration"
+                    class="btn btn-lg btn-exploration"
+                  >
+                    Go to exploration &gt;
+                  </a>
+                </div>
               </div>
-              <div class="p-3">
-                <a
-                  href="/mutational-signatures/#/apiaccess"
-                  class="btn btn-api"
-                >
-                  Go to API Access &gt;
-                </a>
+            </div>
+            <div class="col mb-3">
+              <div class="card h-100 p-3">
+                <img
+                  src="/assets/icons/Association-Icon.svg"
+                  class="card-img-top w-40 h-40 ml-3"
+                  alt="Association Icon"
+                />
+                <div class="card-body">
+                  <h4 class="card-title text-association">
+                    Signature Association
+                  </h4>
+                  <p class="card-text">
+                    Analyze signature association with other genomic features
+                    and clincial data <br />
+                    <a
+                      href="/mutational-signatures/#/about"
+                      class="link-primary"
+                    >
+                      Read More &rarr;
+                    </a>
+                  </p>
+                </div>
+                <div class="p-3">
+                  <a
+                    href="/mutational-signatures/#/association"
+                    class="btn btn-lg btn-association"
+                  >
+                    Go to Association &gt;
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="col mb-3">
+              <div class="card h-100 p-3">
+                <img
+                  src="/assets/icons/API-Icon.svg"
+                  class="card-img-top w-40 h-40 ml-3"
+                  alt="API Icon"
+                />
+                <div class="card-body">
+                  <h4 class="card-title text-api">Signature API Access</h4>
+                  <p class="card-text">
+                    Analyze signature association with other genomic features
+                    and clincial data <br />
+                    <a
+                      href="/mutational-signatures/#/about"
+                      class="link-primary"
+                    >
+                      Read More &rarr;
+                    </a>
+                  </p>
+                </div>
+                <div class="p-3">
+                  <a
+                    href="/mutational-signatures/#/apiaccess"
+                    class="btn btn-lg btn-api"
+                  >
+                    Go to API Access &gt;
+                  </a>
+                </div>
               </div>
             </div>
           </div>
