@@ -70,7 +70,7 @@ const IndeterminateRadio = forwardRef(({ indeterminate, ...rest }, ref) => {
   return <input type="radio" ref={resolvedRef} {...rest} />;
 });
 
-function handleSaveCSV(data, filename) {
+export function handleSaveCSV(data, filename) {
   const csv = getCsv(data);
 
   const blob = new Blob([csv], { type: 'text/csv' });

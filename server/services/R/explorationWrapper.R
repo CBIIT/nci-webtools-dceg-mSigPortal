@@ -154,7 +154,7 @@ mutationalProfiles <- function(args, config) {
 }
 
 # section3: Cosine similarities among mutational signatures -------------------------
-cosineSimilarity <- function(args, config) {
+rsCosineSimilarity <- function(args, config) {
   # The parameters will be “Matrix Size”, “Reference Signature Set1” and “Reference Signature Set2”.
   source("services/R/Sigvisualfunc.R")
   s3load(paste0(config$s3Data, "Signature/signature_refsets.RData"), config$bucket)
@@ -875,4 +875,35 @@ msLandscape <- function(args, config) {
     arrange(factor(sample, levels = cluster$labels[cluster$order]))
 
   return(list(cosineData = cosineData, exposureData = exposureData))
+}
+
+cosineSimilarity <- function(args, config) {
+  source("services/R/Sigvisualfunc.R")
+
+  signatureData1 <- args$signatureData1 %>%
+    select(Signature_name = signatureName, MutationType = mutationType, Contribution = contribution) %>%
+    pivot_wider(names_from = Signature_name, values_from = Contribution)
+
+  signatureData2 <- args$signatureData2 %>%
+    select(Signature_name = signatureName, MutationType = mutationType, Contribution = contribution) %>%
+    pivot_wider(names_from = Signature_name, values_from = Contribution)
+
+  cosSim <- cos_sim_df(signatureData1, signatureData2)
+
+  colnames(cosSim)[1] <- "sample"
+  cosSimMatrix <- as.matrix(cosSim[, -1])
+  rownames(cosSimMatrix) <- cosSim[[1]]
+
+  hc.sample <- hclust(dist(t(cosSimMatrix)), method = "complete")
+  signatureOrder <- rownames(t(cosSimMatrix))[hc.sample$order]
+  hc.sample <- hclust(dist(cosSimMatrix), method = "complete")
+  sampleOrder <- rownames(cosSimMatrix)[hc.sample$order]
+
+  data <- cosSim %>%
+    pivot_longer(-1, names_to = "signature", values_to = "similarity") %>%
+    select(sample, signature, similarity)
+  data$signature <- factor(data$signature, levels = signatureOrder)
+  data$sample <- factor(data$sample, levels = sampleOrder)
+
+  return(list(original = cosSim, data = data, sampleOrder = sampleOrder, signatureOrder = signatureOrder))
 }

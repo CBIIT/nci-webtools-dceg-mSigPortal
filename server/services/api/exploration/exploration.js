@@ -176,6 +176,47 @@ async function msLandscape(req, res, next) {
   }
 }
 
+// query signature data and calculate cosine similarity
+async function cosineSimilarity(req, res, next) {
+  try {
+    const connection = req.app.locals.connection;
+    const columns = '*';
+    const limit = false;
+
+    const { signatureSetName, ...params } = req.query;
+    const signatureData1 = await getSignatureData(
+      connection,
+      { ...params, signatureSetName: signatureSetName.split(';')[0] },
+      columns,
+      limit
+    );
+    const signatureData2 = await getSignatureData(
+      connection,
+      { ...params, signatureSetName: signatureSetName.split(';')[1] },
+      columns,
+      limit
+    );
+
+    const fn = 'cosineSimilarity';
+    const args = { signatureData1, signatureData2 };
+
+    const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
+      fn,
+      args,
+      config: {
+        ...rConfig,
+      },
+    });
+
+    const { stdout, ...rest } = JSON.parse(wrapper);
+
+    res.json({ stdout, ...rest });
+  } catch (err) {
+    logger.error(`/msLandscape: An error occured `);
+    next(err);
+  }
+}
+
 const router = Router();
 
 router.get('/signature_activity', queryExposure);
@@ -183,5 +224,6 @@ router.get('/signature_activity_options', explorationOptions);
 router.get('/explorationSamples', explorationSamples);
 router.post('/explorationWrapper', explorationWrapper);
 router.get('/signature_landscape', msLandscape);
+router.get('/signature_cosine_similarity', cosineSimilarity);
 
 module.exports = { router, queryExposure };

@@ -141,7 +141,7 @@ export default function MutationalSignatureProfile({ submitR }) {
               className="mt-auto mb-3"
               variant="primary"
               onClick={() => {
-                calculateR('cosineSimilarity', {
+                calculateR('rsCosineSimilarity', {
                   profileName: profileName,
                   rsSet1: rsSet1,
                   rsSet2: rsSet2,
