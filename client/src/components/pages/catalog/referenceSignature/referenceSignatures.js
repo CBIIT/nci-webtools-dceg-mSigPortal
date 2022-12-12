@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import RsInMsigportal from './rsInMsigportal/rsInMsigportal-plot';
 import RsProfile from './rsProfile/rsProfile';
 import CosineSimilarity from './cosineSimilarity/cosineSimilarity';
-import Comparison from './rsComparison';
+import RsComparison from './rsComparison/rsComparison';
 import Download from './download';
 import { getJSON } from '../../../../services/utils';
 import { actions } from '../../../../services/store/catalog';
@@ -196,8 +196,8 @@ export default function ReferenceSignature() {
       title: 'RS Cosine Similarity',
     },
     {
-      component: <Comparison submitR={(fn, args) => submitR(fn, args)} />,
-      key: 'mutationalSignatureComparison',
+      component: <RsComparison />,
+      key: 'SignatureComparison',
       title: 'RS Comparison',
     },
     {
