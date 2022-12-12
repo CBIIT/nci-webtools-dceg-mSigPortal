@@ -91,12 +91,9 @@ export default function CosineSimilarityPlot() {
 
   function handleProfile(profile) {
     const matrices = matrixOptions(profile);
-    const signatureSets = signatureSetOptions(profile, matrices[0]);
 
     setValue('profile', profile);
-    setValue('matrix', matrices[0]);
-    setValue('signatureSet1', signatureSets[0]);
-    setValue('signatureSet2', signatureSets[1] || signatureSets[0]);
+    handleMatrix(profile, matrices[0]);
   }
 
   function handleMatrix(profile, matrix) {
