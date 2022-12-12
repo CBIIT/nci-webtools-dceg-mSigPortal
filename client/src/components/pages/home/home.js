@@ -101,7 +101,7 @@ export default function Home({ links }) {
         <div className="banner-container text-center d-none d-md-block">
           <div className="">
             <img
-              src="/assets/images/Hero_Image.png"
+              src="assets/images/Hero_Image.png"
               alt="mSigPortal banner"
               style={{
                 width: '100%',
@@ -130,7 +130,7 @@ export default function Home({ links }) {
             <div class="col mb-4">
               <div class="card h-100 p-3">
                 <img
-                  src="/assets/icons/Catalog-Icon.svg"
+                  src="assets/icons/Catalog-Icon.svg"
                   class="card-img-top w-40 h-40 ml-3"
                   alt="Catalog Icon"
                 />
@@ -157,7 +157,7 @@ export default function Home({ links }) {
             <div class="col mb-3">
               <div class="card h-100 p-3">
                 <img
-                  src="/assets/icons/Visualization-Icon.svg"
+                  src="assets/icons/Visualization-Icon.svg"
                   class="card-img-top w-40 h-40 ml-3"
                   alt="Visualization Icon"
                 />
@@ -189,7 +189,7 @@ export default function Home({ links }) {
             <div class="col mb-3">
               <div class="card h-100 p-3">
                 <img
-                  src="/assets/icons/Extraction-Icon.svg"
+                  src="assets/icons/Extraction-Icon.svg"
                   class="card-img-top w-40 h-40 ml-3"
                   alt="Extraction Icon"
                 />
@@ -221,7 +221,7 @@ export default function Home({ links }) {
             <div class="col mb-3">
               <div class="card h-100 p-3">
                 <img
-                  src="/assets/icons/Exploration-Icon.svg"
+                  src="assets/icons/Exploration-Icon.svg"
                   class="card-img-top w-40 h-40 ml-3"
                   alt="Exploration Icon"
                 />
@@ -253,7 +253,7 @@ export default function Home({ links }) {
             <div class="col mb-3">
               <div class="card h-100 p-3">
                 <img
-                  src="/assets/icons/Association-Icon.svg"
+                  src="assets/icons/Association-Icon.svg"
                   class="card-img-top w-40 h-40 ml-3"
                   alt="Association Icon"
                 />
@@ -285,7 +285,7 @@ export default function Home({ links }) {
             <div class="col mb-3">
               <div class="card h-100 p-3">
                 <img
-                  src="/assets/icons/API-Icon.svg"
+                  src="assets/icons/API-Icon.svg"
                   class="card-img-top w-40 h-40 ml-3"
                   alt="API Icon"
                 />
