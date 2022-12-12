@@ -57,7 +57,7 @@ export default function Explore() {
               {tabs.map(({ name, id }) => (
                 <Nav.Item key={id} className="col-12 text-center">
                   <NavLink
-                    className="secondary-navlinks px-3 py-1 d-inline-block text-catalog"
+                    className="secondary-navlinks px-3 py-1 d-inline-block text-catalog rounded"
                     activeClassName="bg-catalog text-white"
                     style={{
                       textDecoration: 'none',

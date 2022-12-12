@@ -68,7 +68,7 @@ export default function About() {
             </ul>
           </div>
           <div id="sig-catalog">
-            <h5>Signature Catalog</h5>
+            <h5 class="text-catalog">Signature Catalog</h5>
             <p>
               Comprehensively exploring curated census of mutational signatures
               from scientific literature, currently including COSMIC mutational
@@ -79,9 +79,9 @@ export default function About() {
             </p>
           </div>
           <div id="sig-visualization">
-            <h5>Signature Visualization</h5>
+            <h5 class="text-visualization">Signature Visualization</h5>
             <p>
-              nteractively visualizing and analyzing mutational profiles at the
+              Interactively visualizing and analyzing mutational profiles at the
               sample level from both user input (formats supported include VCF,
               MAF, CSV, TXT, catalog, etc) and collected cancer genomic studies
               from scientific literature. It allows users to perform a wide
@@ -97,7 +97,7 @@ export default function About() {
             </p>
           </div>
           <div id="sig-exploration">
-            <h5>Signature Exploration</h5>
+            <h5 class="text-exploration">Signature Exploration</h5>
             <p>
               Systematically exploring the mutational signature activities and
               performance of the mutational signature decomposition from user
@@ -129,7 +129,7 @@ export default function About() {
             </p>
           </div>
           <div id="sig-association">
-            <h5>Signature Association</h5>
+            <h5 class="text-association">Signature Association</h5>
             <p>
               Statistically analyzing and visualizing associations between
               mutational signature activities (using different measurements) and

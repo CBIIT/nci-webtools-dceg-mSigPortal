@@ -45,14 +45,14 @@ export default function Extraction({ match }) {
                       <Button
                         variant="link"
                         className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
-                          id == displayTab ? 'active-secondary-navlinks' : ''
+                          id == displayTab ? 'bg-extraction text-white' : ''
                         }`}
                         active={id == displayTab && submitted}
                         disabled={id != 'instructions' && !submitted}
                         style={{
                           textDecoration: 'none',
                           fontSize: '12pt',
-                          color: 'black',
+                          color: '#42688b',
                           fontWeight: '500',
                         }}
                         onClick={() => mergeState({ displayTab: id })}
@@ -74,13 +74,13 @@ export default function Extraction({ match }) {
                       <Button
                         variant="link"
                         className={
-                          'secondary-navlinks px-3 py-1 d-inline-block border-0'
+                          'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-extraction text-white'
                         }
                         active={id == displayTab && submitted}
                         style={{
                           textDecoration: 'none',
                           fontSize: '12pt',
-                          color: 'black',
+                          color: '#42688b',
                           fontWeight: '500',
                         }}
                         onClick={() => mergeState({ displayTab: id })}
