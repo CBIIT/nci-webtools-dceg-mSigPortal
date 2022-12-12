@@ -16,8 +16,9 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
         const groupBySample = groupBy(data, 'sample');
         const sample1 = groupBySample[samples[0]].flat();
         const sample2 = groupBySample[samples[1]].flat();
+
         if (arg.profile === 'SBS') {
-          return pcBetweenSamples_SBS(samples, sample1, sample2, 'samples');
+          return pcBetweenSamples_SBS(samples, data);
         } else if (arg.profile === 'DBS') {
           return pcBetweenSamples_DBS(samples, sample1, sample2, 'samples');
         } else {

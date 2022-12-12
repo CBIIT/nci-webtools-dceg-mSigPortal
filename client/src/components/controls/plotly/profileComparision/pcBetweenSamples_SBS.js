@@ -1,6 +1,9 @@
-import { groupBy } from 'lodash';
+import {
+  groupDataByMutation,
+  getMaxMutations,
+} from '../mutationalProfiles/utils';
 
-export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
+export default function pcBetweenSamples_SBS(samples, apiData) {
   const colors = {
     'C>A': '#03BCEE',
     'C>G': 'black',
@@ -9,143 +12,87 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
     'T>C': '#A1CE63',
     'T>G': '#EBC6C4',
   };
-  console.log(samples);
-  console.log(sample1);
-  console.log(sample2);
-  console.log(tab);
   const mutationRegex = /\[(.*)\]/;
-  const groupByMutation1 = sample1.reduce((acc, e, i) => {
-    const mutation = e.mutationType.match(mutationRegex)[1];
-    acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
-    return acc;
-  }, {});
-  const sample1data = Object.entries(groupByMutation1).map(
-    ([mutation, data]) => ({
-      mutation,
-      data,
-    })
-  );
-  console.log(sample2);
-  let groupByMutation2 = [];
-  let array = [];
-  if (sample2.length > 96) {
-    const groupMutationType = groupBy(sample2, (e) => e.mutationType);
-
-    Object.values(groupMutationType).map((e) => {
-      const arr = Object.values(e);
-
-      const sum = (prev, cur) => ({
-        mutationType: prev.mutationType,
-        contribution: prev.contribution + cur.contribution,
-      });
-      const avg = arr.reduce(sum).contribution / arr.length;
-      const result = {
-        mutationType: arr.reduce(sum).mutationType,
-        contribution: avg,
-      };
-      array.push(result);
-    });
-
-    groupByMutation2 = array.reduce((acc, e, i) => {
-      const mutation = e.mutationType.match(mutationRegex)[1];
-      acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
-      return acc;
-    }, {});
-  } else {
-    groupByMutation2 = sample2.reduce((acc, e, i) => {
-      const mutation = e.mutationType.match(mutationRegex)[1];
-      acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
-      return acc;
-    }, {});
+  function mutationGroupSort(a, b) {
+    const order = Object.keys(colors);
+    return order.indexOf(a.mutation) - order.indexOf(b.mutation);
   }
 
-  console.log(groupByMutation2);
-  const sample2data = Object.entries(groupByMutation2).map(
-    ([mutation, data]) => ({
-      mutation,
-      data,
-    })
+  // get samples from sample array args
+  const [sample1, sample2] = samples;
+  // filter api data by samples
+  const sampleApiData1 = apiData.filter(
+    (e) => e.sample == sample1 || e.signatureName == sample1
   );
-  console.log(sample2data);
+  const sampleApiData2 = apiData.filter(
+    (e) => e.sample == sample2 || e.signatureName == sample2
+  );
 
-  const totalMutations1 = sample1data.reduce(
-    (total, mutation) =>
-      total +
-      mutation.data.reduce((mutationSum, e) => mutationSum + e.mutations, 0),
+  // get total mutations per sample
+  const totalMutations1 = sampleApiData1.reduce(
+    (total, e) => total + (e.mutations || e.contribution),
     0
   );
-  const maxMutation1 = Math.max(
-    ...sample1data
-      .map((mutation) =>
-        mutation.data.map((e) => e.mutations / totalMutations1)
-      )
-      .flat()
-  );
-  const totalMutations2 = sample2data.reduce(
-    (total, mutation) =>
-      total +
-      mutation.data.reduce(
-        (mutationSum, e) =>
-          tab === 'samples'
-            ? mutationSum + e.mutations
-            : mutationSum + e.contribution,
-        0
-      ),
+  const totalMutations2 = sampleApiData2.reduce(
+    (total, e) => total + (e.mutations || e.contribution),
     0
   );
-  const maxMutation2 = Math.max(
-    ...sample2data
-      .map((mutation) =>
-        mutation.data.map((e) =>
-          tab === 'samples'
-            ? e.mutations / totalMutations2
-            : e.contribution / totalMutations2
-        )
-      )
-      .flat()
-  );
+
+  // get max mutations per sample
+  const maxMutation1 = getMaxMutations(sampleApiData1) / totalMutations1;
+  const maxMutation2 = getMaxMutations(sampleApiData2) / totalMutations2;
   const maxMutations = Math.max(maxMutation1, maxMutation2);
-  const group1 = groupBy(sample1, 'mutationType');
-  Object.keys(group1);
-  const group2 = groupBy(sample2, 'mutationType');
-  Object.keys(group2);
 
-  let sampleDifferences = [];
-  let s1mutations = [];
-  let s2mutations = [];
+  // normalize mutations per sample
+  const normalizedSample1 = sampleApiData1.map((e) => ({
+    ...e,
+    ...(e.mutations && {
+      mutations: e.mutations / totalMutations1,
+    }),
+    ...(e.contribution && {
+      contribution: e.contribution / totalMutations1,
+    }),
+  }));
+  const normalizedSample2 = sampleApiData2.map((e) => ({
+    ...e,
+    ...(e.mutations && {
+      mutations: e.mutations / totalMutations2,
+    }),
+    ...(e.contribution && {
+      contribution: e.contribution / totalMutations2,
+    }),
+  }));
 
-  for (let mutationType of Object.keys(group1)) {
-    const a = group1[mutationType][0];
-    const b = group2[mutationType][0];
-    let mutations;
-    tab === 'samples'
-      ? (mutations =
-          a.mutations / totalMutations1 - b.mutations / totalMutations2)
-      : (mutations =
-          a.mutations / totalMutations1 - b.contribution / totalMutations2);
-
-    //const cancer = a.cancer;
-    sampleDifferences.push({ mutationType, mutations });
-    s1mutations.push(a.mutations / totalMutations1);
-    s2mutations.push(
-      tab === 'samples'
-        ? b.mutations / totalMutations2
-        : b.contribution / totalMutations2
-    );
-  }
-
-  const groupByMutation3 = groupBy(
-    sampleDifferences,
-    (s) => s.mutationType.match(mutationRegex)[1]
+  const groupSamples1 = groupDataByMutation(
+    normalizedSample1,
+    mutationRegex,
+    mutationGroupSort
+  );
+  const groupSamples2 = groupDataByMutation(
+    normalizedSample2,
+    mutationRegex,
+    mutationGroupSort
   );
 
-  const sample3data = Object.entries(groupByMutation3).map(
-    ([mutation, data]) => ({
-      mutation,
-      data,
-    })
+  // calcualte difference between samples
+  const sampleDifferenceData = normalizedSample1.map((e, i) => ({
+    ...e,
+    ...(e.mutations && {
+      mutations: e.mutations - normalizedSample2[i].mutations,
+    }),
+    ...(e.contribution && {
+      contribution: e.contribution - normalizedSample2[i].contribution,
+    }),
+  }));
+  const groupDifference = groupDataByMutation(
+    sampleDifferenceData,
+    mutationRegex,
+    mutationGroupSort
   );
-  const squarediff = sampleDifferences.map((e) => Math.pow(e.mutations, 2));
+
+  const squarediff = sampleDifferenceData.map((e) =>
+    Math.pow(e.mutations || e.contribution, 2)
+  );
   const rss = squarediff.reduce((a, b, i) => a + b, 0).toExponential(3);
 
   function dotp(x, y) {
@@ -163,9 +110,13 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
       dotp(A, B) / (Math.sqrt(dotp(A, A)) * Math.sqrt(dotp(B, B)));
     return similarity;
   }
-  const cosine = cosineSimilarity(s1mutations, s2mutations).toFixed(3);
 
-  const mutationTypeNames = sample1data
+  const cosine = cosineSimilarity(
+    normalizedSample1.map((e) => e.mutations || e.contribution),
+    normalizedSample2.map((e) => e.mutations || e.contribution)
+  ).toFixed(3);
+
+  const mutationTypeNames = groupSamples1
     .map((group) =>
       group.data.map((e) => ({
         mutation: group.mutation,
@@ -173,7 +124,8 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
       }))
     )
     .flat();
-  const trace1 = sample1data.map((group, groupIndex, array) => ({
+
+  const sampleTrace1 = groupSamples1.map((group, groupIndex, array) => ({
     name: group.mutation,
     type: 'bar',
     marker: { color: colors[group.mutation] },
@@ -184,13 +136,13 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
           .slice(0, groupIndex)
           .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
     ),
-    y: group.data.map((e) => e.mutations / totalMutations1),
+    y: group.data.map((e) => e.mutations || e.contribution),
     hoverinfo: 'x+y',
     showlegend: false,
     yaxis: 'y3',
   }));
 
-  const trace2 = sample2data.map((group, groupIndex, array) => ({
+  const sampleTrace2 = groupSamples2.map((group, groupIndex, array) => ({
     name: group.mutation,
     type: 'bar',
     marker: { color: colors[group.mutation] },
@@ -201,16 +153,12 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
           .slice(0, groupIndex)
           .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
     ),
-    y: group.data.map((e) =>
-      tab === 'samples'
-        ? e.mutations / totalMutations2
-        : e.contribution / totalMutations2
-    ),
+    y: group.data.map((e) => e.mutations || e.contribution),
     hoverinfo: 'x+y',
     showlegend: false,
     yaxis: 'y2',
   }));
-  const trace3 = sample3data.map((group, groupIndex, array) => ({
+  const differenceTrace = groupDifference.map((group, groupIndex, array) => ({
     name: group.mutation,
     type: 'bar',
     marker: { color: colors[group.mutation] },
@@ -221,13 +169,13 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
           .slice(0, groupIndex)
           .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
     ),
-    y: group.data.map((e) => e.mutations),
+    y: group.data.map((e) => e.mutations || e.contribution),
     hoverinfo: 'x+y',
     showlegend: false,
   }));
-  const traces = [...trace2, ...trace3, ...trace1];
+  const traces = [...differenceTrace, ...sampleTrace2, ...sampleTrace1];
 
-  const shapeTop = sample1data.map((group, groupIndex, array) => ({
+  const shapeTop = groupSamples1.map((group, groupIndex, array) => ({
     type: 'rect',
     xref: 'x',
     yref: 'paper',
@@ -245,7 +193,7 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
     },
   }));
 
-  const shapeLine3 = sample1data.map((group, groupIndex, array) => ({
+  const shapeLine3 = groupSamples1.map((group, groupIndex, array) => ({
     type: 'rect',
     xref: 'x',
     yref: 'paper',
@@ -263,7 +211,7 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
     },
   }));
 
-  const shapeLine2 = sample2data.map((group, groupIndex, array) => ({
+  const shapeLine2 = groupSamples2.map((group, groupIndex, array) => ({
     type: 'rect',
     xref: 'x',
     yref: 'paper',
@@ -281,7 +229,7 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
     },
   }));
 
-  const shapeLine1 = sample3data.map((group, groupIndex, array) => ({
+  const shapeLine1 = groupDifference.map((group, groupIndex, array) => ({
     type: 'rect',
     xref: 'x',
     yref: 'paper',
@@ -330,7 +278,7 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
     fillcolor: '#F0F0F0',
   };
 
-  const annotationLabelRight3 = {
+  const sample1Label = {
     xref: 'paper',
     yref: 'paper',
     xanchor: 'middle',
@@ -344,7 +292,7 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
     showarrow: false,
   };
 
-  const annotationLabelRight2 = {
+  const sample2Label = {
     xref: 'paper',
     yref: 'paper',
     xanchor: 'middle',
@@ -358,7 +306,7 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
     showarrow: false,
   };
 
-  const annotationLabelRight1 = {
+  const differenceLabel = {
     xref: 'paper',
     yref: 'paper',
     xanchor: 'middle',
@@ -370,7 +318,7 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
     textangle: 90,
     showarrow: false,
   };
-  const mutationAnnotation = sample1data.map((group, groupIndex, array) => ({
+  const mutationAnnotation = groupSamples1.map((group, groupIndex, array) => ({
     xref: 'x',
     yref: 'paper',
     xanchor: 'bottom',
@@ -412,7 +360,7 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
       rows: 3,
       column: 1,
     },
-    title: '<b>RSS = ' + rss + '; Cosine Simularity =' + cosine + '</b>',
+    title: '<b>RSS = ' + rss + '; Cosine Simularity = ' + cosine + '</b>',
     xaxis: {
       showline: true,
       tickangle: -90,
@@ -477,9 +425,9 @@ export default function pcBetweenSamples_SBS(samples, sample1, sample2, tab) {
     ],
     annotations: [
       ...mutationAnnotation,
-      annotationLabelRight3,
-      annotationLabelRight2,
-      annotationLabelRight1,
+      sample1Label,
+      sample2Label,
+      differenceLabel,
       yTitleAnnotation,
     ],
   };
