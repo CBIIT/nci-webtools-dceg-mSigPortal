@@ -80,7 +80,8 @@ export default function ProfileFormPlot({ options, index }) {
     : [];
 
   const profileOptions = (source) =>
-    source && signatureOptions.length
+    //source && signatureOptions.length
+    source
       ? [
           ...new Set(
             signatureOptions

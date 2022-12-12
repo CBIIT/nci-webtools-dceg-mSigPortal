@@ -126,7 +126,7 @@ export default function Home({ links }) {
       </div>
       <div className=" p-3">
         <div class="row row-cols-1 row-cols-md-3 g-4">
-          <div class="col mb-3">
+          <div class="col mb-4">
             <div class="card h-100 p-3">
               <img
                 src="/assets/icons/Catalog-Icon.svg"
@@ -144,7 +144,7 @@ export default function Home({ links }) {
               <div class="p-3">
                 <a
                   href="/mutational-signatures/#/catalog"
-                  class="btn btn-catalog"
+                  class="btn btn-catalog btn-border-radius-25"
                 >
                   Go to catalog &gt;
                 </a>
