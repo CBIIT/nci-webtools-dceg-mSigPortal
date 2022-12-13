@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { RecoilRoot } from 'recoil';
 import { HashRouter as Router, Route } from 'react-router-dom';
 import { Navbar } from './controls/navbar/navbar';
-import Home from './pages/home/home';
+import Home from './pages/home/home0';
 import About from './pages/about/about';
 import Visualization from './pages/visualization/visualization';
 import Catalog from './pages/catalog/catalog';
@@ -29,10 +29,10 @@ export default function App() {
       cardTitle: 'Signature Catalog',
       cardText: 'Signature Catalog',
       description:
-        'Comprehensively exploring curated census of mutational signatures from scientific literature, currently including COSMIC mutational signatures, environmental mutagenesis, DNA repair gene edits, cancer specific signatures and others. In addition, it allows users to visualize, compare and download  these reference signatures.',
-      image: 'assets/images/catalog.svg',
+        'All existing human and mouse signatures based on different genome builds and algorithm versions.',
+      image: 'assets/images/Catalog-Icon.svg',
       navIndex: 0,
-      color: '#009192', // turquoise
+      color: '#4b833a',
     },
 
     {
@@ -42,10 +42,23 @@ export default function App() {
       cardTitle: 'Signature Visualization',
       cardText: 'Visualize mutational profiles',
       description:
-        'Interactively visualizing and analyzing mutational profiles at the sample level from both user input (formats supported include VCF, MAF, CSV, TXT, catalog, etc) and collected cancer genomic studies from scientific literature. It allows users to perform a wide range of analyses including cosine similarity, enrichment analysis, mutational profile comparison, and principal components analysis for all different types of mutational profiles including SBS, INDEL, DBS, SV, and CNV. Kataegis identification is also supported for VCF input format. With respect to user input, all visualizations and analyses can be performed across different provided groups of assigned mutations in the same sample (such as clustered mutations vs. non-clustered mutations; nonsynonymous mutations vs. other mutations, etc).',
-      image: 'assets/images/visualize.png',
+        'Allow identication of signature features at sample level and sicovery of new signatures.',
+      image: 'assets/images/Visualization-Icon.svg',
       navIndex: 1,
-      color: '#fc8701', // orange
+      color: '#2c5b4e',
+    },
+
+    {
+      route: '/extraction',
+      action: 'Extraction',
+      title: 'Extraction',
+      cardTitle: 'Signature Extraction',
+      cardText: 'Extraction mutational profiles',
+      description:
+        'Extract and compare muational signatures using state-of-the-art algorithms.',
+      image: 'assets/images/Extraction-Icon.svg',
+      navIndex: 1,
+      color: '#2f4a64',
     },
     {
       route: '/exploration',
@@ -54,10 +67,10 @@ export default function App() {
       cardTitle: 'Signature Exploration',
       cardText: 'Signature Exploration',
       description:
-        'Systematically exploring the mutational signature activities and performance of the mutational signature decomposition from user input, or collected public genomic studies (<a href="https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga" target="_blank">TCGA</a>, <a href="https://dcc.icgc.org/pcawg" target="_blank">PCAWG</a>, <a href="https://dceg.cancer.gov/research/cancer-types/lung/sherlock-lung-study" target="_blank">Sherlock-Lung</a>, etc.). This module allows users to perform analyses with mutational signature patterns and integratively explore the activities of each mutational signature including visualizations of tumor mutational burden, signature decomposition performance, mutational signature associations, sample clustering by mutational signatures, prevalence of single mutational signatures, and decomposition of mutational signatures in individual samples.',
-      image: 'assets/images/explore.png',
+        'Explore etiological factors associated with signature at sample levels.',
+      image: 'assets/images/Exploration-Icon.svg',
       navIndex: 2,
-      color: '#2c71dd', // blue
+      color: '#5a4e2e',
     },
     // {
     //   route: '/refitting',
@@ -78,20 +91,20 @@ export default function App() {
       cardTitle: 'Signature Association',
       cardText: 'Signature Association',
       description:
-        'Statistically analyzing and visualizing associations between mutational signature activities (using different measurements) and collected sample level variables including genomic features, epigenomic features, mutational status, copy number alterations or clinical variables from different cancer genomic studies. In addition, this module allows users to select different statistical approaches for both univariable and multivariable association analyses.',
-      image: 'assets/images/association.png',
+        'Analyze signature association with other genomic features and clincial data.',
+      image: 'assets/images/Association-Icon.svg',
       navIndex: 3,
-      color: '#84368d', // purple
+      color: '#7f282f',
     },
     {
-      route: '/extraction',
-      action: 'Extraction',
-      title: 'Extraction',
-      cardTitle: 'Signature Extraction',
-      cardText: 'Signature Extraction',
+      route: '/apiaccess',
+      action: 'API Access',
+      title: 'API Access',
+      cardTitle: 'API Access',
+      cardText: 'API Access',
       description:
         'Statistically analyzing and visualizing associations between mutational signature activities (using different measurements) and collected sample level variables including genomic features, epigenomic features, mutational status, copy number alterations or clinical variables from different cancer genomic studies. In addition, this module allows users to select different statistical approaches for both univariable and multivariable association analyses.',
-      image: 'assets/images/association.png',
+      image: 'assets/images/API-Icon.svg',
       navIndex: 4,
       color: '#84368d', // purple
     },
