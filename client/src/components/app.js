@@ -113,7 +113,7 @@ export default function App() {
     {
       route: '/apiaccess',
       action: 'API Access',
-      title: 'API Access',
+      title: 'APIAccess',
       name: 'api',
       cardTitle: 'API Access',
       cardText: 'API Access',
@@ -123,7 +123,7 @@ export default function App() {
       navIndex: 5,
       color: '#84368d',
       showHomepage: true,
-      about: '/about#association',
+      about: '/about#api',
     },
     {
       route: '/publications',

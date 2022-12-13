@@ -25,8 +25,8 @@ export default function Home({ links }) {
   ) {
     return (
       <div key={index}>
-        <div class="col mb-4">
-          <Card key={title} id={title} className="card h-100 p-3">
+        <div class="col mb-4 ">
+          <Card key={title} id={title} className="h-100 p-3">
             <img
               alt={cardTitle}
               src={image}
