@@ -398,6 +398,7 @@ export default function Profile({ submitR }) {
             <CustomSelect
               id={`mspSource${index}`}
               label="Signature Source"
+              class="msigportal-bg"
               value={plots[index].signatureSource}
               options={plots[index].signatureSourceOptions}
               onChange={(source) => handleSource(source, index)}
@@ -499,7 +500,7 @@ export default function Profile({ submitR }) {
       <hr />
       <Form className="p-3">
         <LoadingOverlay active={loading} />
-        <Row className="">
+        <Row className="msigportal-bg">
           <Col lg="auto">
             <CustomSelect
               id="mspSource"

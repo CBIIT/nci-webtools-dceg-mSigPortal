@@ -696,3 +696,17 @@ select.form-control-sm {
   color: whitesmoke !important;
   background-color: #bf5279 !important;
 }
+
+.dropdown-menu li > a:hover,
+.dropdown-menu li > a:focus,
+.dropdown-submenu:hover > a {
+  background-color: #8e4b86;
+  border-color: #f1e4ef;
+  color: #f1e4ef !important;
+}
+
+.msigportal-bg {
+  background-color: #f1e4ef;
+  border-color: #8e4b86;
+  color: #8e4b86 !important;
+}
