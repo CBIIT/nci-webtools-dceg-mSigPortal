@@ -69,9 +69,10 @@ export default function Plotly({
             </Button>
           </Col>
         )}
-        <Col sm="auto">
+        <Col sm="auto m-1">
           <Button
             variant="link"
+            className="btn-2 btn-secondary border-12"
             onClick={() =>
               saveAs(
                 new Blob([JSON.stringify({ traces: data, layout })], {
@@ -81,7 +82,7 @@ export default function Plotly({
               )
             }
           >
-            Download Plotly Data
+            Download Plotly Data &gt;
           </Button>
         </Col>
       </Row>

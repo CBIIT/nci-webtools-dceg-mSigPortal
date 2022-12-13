@@ -9,18 +9,22 @@ export function Footer() {
             <div className="mb-4 row justify-content-between">
               <div className="col-md-auto footer-nav-col">
                 <div className="d-none d-lg-block footer-header text-left mb-2">
-                  <h3>Division of Cancer Epidemiology and Genetics </h3>
-                  <span>at the National Cancer Institute</span>
+                  <h5>
+                    <b>Division of Cancer Epidemiology and Genetics</b>{' '}
+                  </h5>
+                  <p>
+                    <b>at the National Cancer Institute</b>
+                  </p>
                 </div>
                 <div className="d-lg-none footer-header-mobile text-left mb-2">
-                  <h3>Division of Cancer Epidemiology and Genetics</h3>
+                  <h5>Division of Cancer Epidemiology and Genetics</h5>
                   <span>at the National Cancer Institute</span>
                 </div>
               </div>
             </div>
             <div className="row justify-content-between">
               <div className="col-md-auto footer-nav-col">
-                <h4 className="mb-2">CONTACT INFORMATION</h4>
+                <h5 className="mb-2">CONTACT INFORMATION</h5>
                 <div className="my-2">
                   <a
                     className="footer-link text-light"
@@ -32,7 +36,7 @@ export function Footer() {
                 </div>
               </div>
               <div className="col-md-auto footer-nav-col">
-                <h4 className="mb-2">MORE INFORMATION</h4>
+                <h5 className="mb-2">MORE INFORMATION</h5>
                 <div className="my-2">
                   <a
                     className="footer-link text-light"
@@ -61,7 +65,7 @@ export function Footer() {
               </div> --> */}
               </div>
               <div className="col-md-auto footer-nav-col">
-                <h4 className="mb-2">POLICIES</h4>
+                <h5 className="mb-2">POLICIES</h5>
                 <div className="my-2">
                   <a
                     className="footer-link text-light"
@@ -153,10 +157,10 @@ export function Footer() {
           </div>
 
           <div className="footer-tagline">
-            <h4>
+            <h6>
               NIH ... Turning Discovery Into Health
               <sup>®</sup>
-            </h4>
+            </h6>
           </div>
         </div>
       </div>

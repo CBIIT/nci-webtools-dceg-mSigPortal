@@ -37,7 +37,7 @@ export default function Home({ links }) {
             <img
               alt={cardTitle}
               src={image}
-              className="card-img-top w-30 h-30 ml-3"
+              className="card-img-top w-25 h-25 ml-3"
             />
             <Card.Body>
               <h4 className={`card-title text-${name}`}>{cardTitle}</h4>

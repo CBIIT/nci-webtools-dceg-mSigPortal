@@ -81,12 +81,24 @@ h2 {
 h3 {
   font-family: 'Inter';
   font-weight: 500;
-  font-size: 28pt;
+  font-size: 24pt;
 }
 h4 {
   font-family: 'Inter';
   font-weight: 500;
   font-size: 22pt;
+}
+
+h5 {
+  font-family: 'Inter';
+  font-weight: 500;
+  font-size: 18pt;
+}
+
+h6 {
+  font-family: 'Inter';
+  font-weight: 500;
+  font-size: 15pt;
 }
 
 .link-primary {
@@ -185,7 +197,8 @@ h4 {
 .btn-2 {
   font: 'Inter';
   font-size: 12pt;
-  font-weight: 600;
+  text-transform: uppercase;
+  font-weight: 500;
 }
 .btn-dark {
   &.disabled {
@@ -661,4 +674,25 @@ select.form-control-sm {
 .btn-gradient:active {
   background-image: linear-gradient(to right, #b83d47 0%, #8e4b86 55%);
   color: white !important;
+}
+
+.btn-secondary {
+  background-color: #f1e4ef;
+  border-color: #8e4b86;
+  color: #8e4b86 !important;
+}
+.btn-secondary:hover {
+  background-color: #8e4b86;
+  border-color: #f1e4ef;
+  color: #f1e4ef !important;
+  text-decoration: none;
+}
+
+.border-12 {
+  border-radius: 12px;
+}
+
+.msigportal-form-dropdown {
+  color: whitesmoke !important;
+  background-color: #bf5279 !important;
 }
