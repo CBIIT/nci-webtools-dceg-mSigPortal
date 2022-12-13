@@ -20,6 +20,9 @@ $enable-shadows: true;
 @import '~bootstrap-icons/font/bootstrap-icons.scss';
 
 /** Default Overrides **/
+html {
+  scroll-behavior: smooth;
+}
 
 hr {
   margin: 0;

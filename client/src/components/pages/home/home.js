@@ -16,6 +16,7 @@ export default function Home({ links }) {
       cardText,
       description,
       image,
+      about,
       color,
       examples,
       buttonHomepage,
@@ -29,25 +30,33 @@ export default function Home({ links }) {
             <img
               alt={cardTitle}
               src={image}
-              className="card-img-top w-40 h-40 ml-3"
+              className="card-img-top w-30 h-30 ml-3"
             />
             <Card.Body>
               <h4 className={`card-title text-${name}`}>{cardTitle}</h4>
               <p className="card-text">
                 {description}
                 <br />
-                <a href="/#/about" class="link-primary">
-                  Read More &rarr;
-                </a>
+
+                <Link
+                  className="link-primary"
+                  exact={exact}
+                  key={index}
+                  to={about}
+                >
+                  <span>Read More &rarr;</span>
+                </Link>
               </p>
             </Card.Body>
             <div class="p-3">
-              <a
-                href={route}
+              <Link
                 className={`btn btn-lg btn-${name} btn-border-radius-25`}
+                exact={exact}
+                key={index}
+                to={route}
               >
-                Go to {title} &gt;
-              </a>
+                <span>Go to {title} &gt;</span>
+              </Link>
             </div>
           </Card>
         </div>

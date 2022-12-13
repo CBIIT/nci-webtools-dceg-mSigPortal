@@ -35,7 +35,7 @@ export default function App() {
       navIndex: 0,
       color: '#4b833a',
       showHomepage: true,
-      buttonHomepage: 'btn btn-lg btn-catalog btn-border-radius-25',
+      about: '/about#catalog',
     },
 
     {
@@ -51,8 +51,7 @@ export default function App() {
       navIndex: 1,
       color: '#2c5b4e',
       showHomepage: true,
-      buttonHomepage: 'btn btn-lg btn-visualization btn-border-radius-25',
-      homepageTitle: 'card-title text-visualization',
+      about: '/about#visualization',
     },
     {
       route: '/extraction',
@@ -67,7 +66,7 @@ export default function App() {
       navIndex: 2,
       color: '#2f4a64',
       showHomepage: true,
-      buttonHomepage: 'btn btn-lg btn-extraction btn-border-radius-25',
+      about: '/about#extraction',
     },
     {
       route: '/exploration',
@@ -82,7 +81,7 @@ export default function App() {
       navIndex: 3,
       color: '#5a4e2e',
       showHomepage: true,
-      buttonHomepage: 'btn btn-lg btn-exploration btn-border-radius-25',
+      about: '/about#exploration',
     },
     // {
     //   route: '/refitting',
@@ -109,7 +108,7 @@ export default function App() {
       navIndex: 4,
       color: '#7f282f',
       showHomepage: true,
-      buttonHomepage: 'btn btn-lg btn-association btn-border-radius-25',
+      about: '/about#association',
     },
     {
       route: '/apiaccess',
@@ -124,7 +123,7 @@ export default function App() {
       navIndex: 5,
       color: '#84368d',
       showHomepage: true,
-      buttonHomepage: 'btn btn-lg btn-api btn-border-radius-25',
+      about: '/about#association',
     },
     {
       route: '/publications',

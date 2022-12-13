@@ -67,7 +67,7 @@ export default function About() {
               <li>Initial Release</li>
             </ul>
           </div>
-          <div id="sig-catalog">
+          <div id="catalog">
             <h5 class="text-catalog">Signature Catalog</h5>
             <p>
               Comprehensively exploring curated census of mutational signatures
@@ -78,7 +78,7 @@ export default function About() {
               signatures.
             </p>
           </div>
-          <div id="sig-visualization">
+          <div id="visualization">
             <h5 class="text-visualization">Signature Visualization</h5>
             <p>
               Interactively visualizing and analyzing mutational profiles at the
@@ -96,7 +96,7 @@ export default function About() {
               mutations vs. other mutations, etc).
             </p>
           </div>
-          <div id="sig-exploration">
+          <div id="exploration">
             <h5 class="text-exploration">Signature Exploration</h5>
             <p>
               Systematically exploring the mutational signature activities and
@@ -128,7 +128,7 @@ export default function About() {
               decomposition of mutational signatures in individual samples.
             </p>
           </div>
-          <div id="sig-association">
+          <div id="association">
             <h5 class="text-association">Signature Association</h5>
             <p>
               Statistically analyzing and visualizing associations between
@@ -139,6 +139,30 @@ export default function About() {
               addition, this module allows users to select different statistical
               approaches for both univariable and multivariable association
               analyses.
+            </p>
+          </div>
+          <div id="extraction">
+            <h5 class="text-extraction">Signature Extraction</h5>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+              reprehenderit in voluptate velit esse cillum dolore eu fugiat
+              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
+              sunt in culpa qui officia deserunt mollit anim id est laborum.
+            </p>
+          </div>
+          <div id="api">
+            <h5 class="text-api">Signature API Access</h5>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+              reprehenderit in voluptate velit esse cillum dolore eu fugiat
+              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
+              sunt in culpa qui officia deserunt mollit anim id est laborum.
             </p>
           </div>
         </Container>
