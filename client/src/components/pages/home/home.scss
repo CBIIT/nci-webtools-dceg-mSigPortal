@@ -3,6 +3,7 @@
   overflow: hidden;
   display: block;
   position: relative;
+  height: 1380px;
 
   .banner-overlay-text {
     position: absolute;
@@ -24,6 +25,17 @@
     right: 5%;
     width: 45%;
   }
+}
+.background-img {
+  position: relative;
+  top: 0;
+  left: 0;
+}
+
+.home-grid-banner {
+  z-index: 1;
+  position: absolute;
+  top: 25%;
 }
 
 .btn-1 {
@@ -138,11 +150,6 @@
 }
 .home-page {
   position: relative;
-}
-.home-grid-banner {
-  z-index: 1;
-  //position: absolute;
-  top: 75%;
 }
 
 .h-40 {
