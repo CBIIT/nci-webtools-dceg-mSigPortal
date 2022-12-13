@@ -3,7 +3,8 @@
   overflow: hidden;
   display: block;
   position: relative;
-  height: 1520px;
+  height: 1400px;
+  background-color: #f5f5f5;
 
   .banner-overlay-text {
     position: absolute;
@@ -21,9 +22,9 @@
 
   .homepage-title-right {
     position: absolute;
-    top: 35%;
+    top: 30%;
     right: 5%;
-    width: 45%;
+    width: 40%;
   }
 }
 .background-img {
@@ -39,13 +40,13 @@
 }
 
 .btn-1 {
-  font-size: 24pt;
+  font-size: px;
   text-transform: uppercase;
   font-weight: 600;
 }
 
 .msigportal-title {
-  font-size: 28pt;
+  font-size: 28px;
 }
 
 .center {

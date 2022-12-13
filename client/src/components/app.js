@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { RecoilRoot } from 'recoil';
 import { HashRouter as Router, Route } from 'react-router-dom';
 import { Navbar } from './controls/navbar/navbar';
-import Home from './pages/home/home0';
+import Home from './pages/home/home';
 import About from './pages/about/about';
 import Visualization from './pages/visualization/visualization';
 import Catalog from './pages/catalog/catalog';
@@ -26,6 +26,7 @@ export default function App() {
       route: '/catalog',
       action: 'Catalog',
       title: 'Catalog',
+      name: 'catalog',
       cardTitle: 'Signature Catalog',
       cardText: 'Signature Catalog',
       description:
@@ -33,12 +34,15 @@ export default function App() {
       image: 'assets/images/Catalog-Icon.svg',
       navIndex: 0,
       color: '#4b833a',
+      showHomepage: true,
+      buttonHomepage: 'btn btn-lg btn-catalog btn-border-radius-25',
     },
 
     {
       route: '/visualization',
       action: 'Visualization',
       title: 'Visualization',
+      name: 'visualization',
       cardTitle: 'Signature Visualization',
       cardText: 'Visualize mutational profiles',
       description:
@@ -46,31 +50,39 @@ export default function App() {
       image: 'assets/images/Visualization-Icon.svg',
       navIndex: 1,
       color: '#2c5b4e',
+      showHomepage: true,
+      buttonHomepage: 'btn btn-lg btn-visualization btn-border-radius-25',
+      homepageTitle: 'card-title text-visualization',
     },
-
     {
       route: '/extraction',
       action: 'Extraction',
       title: 'Extraction',
+      name: 'extraction',
       cardTitle: 'Signature Extraction',
       cardText: 'Extraction mutational profiles',
       description:
         'Extract and compare muational signatures using state-of-the-art algorithms.',
       image: 'assets/images/Extraction-Icon.svg',
-      navIndex: 1,
+      navIndex: 2,
       color: '#2f4a64',
+      showHomepage: true,
+      buttonHomepage: 'btn btn-lg btn-extraction btn-border-radius-25',
     },
     {
       route: '/exploration',
       action: 'Exploration',
       title: 'Exploration',
+      name: 'exploration',
       cardTitle: 'Signature Exploration',
       cardText: 'Signature Exploration',
       description:
         'Explore etiological factors associated with signature at sample levels.',
       image: 'assets/images/Exploration-Icon.svg',
-      navIndex: 2,
+      navIndex: 3,
       color: '#5a4e2e',
+      showHomepage: true,
+      buttonHomepage: 'btn btn-lg btn-exploration btn-border-radius-25',
     },
     // {
     //   route: '/refitting',
@@ -88,40 +100,43 @@ export default function App() {
       route: '/association',
       action: 'Association',
       title: 'Association',
+      name: 'association',
       cardTitle: 'Signature Association',
       cardText: 'Signature Association',
       description:
         'Analyze signature association with other genomic features and clincial data.',
       image: 'assets/images/Association-Icon.svg',
-      navIndex: 3,
+      navIndex: 4,
       color: '#7f282f',
+      showHomepage: true,
+      buttonHomepage: 'btn btn-lg btn-association btn-border-radius-25',
     },
     {
       route: '/apiaccess',
       action: 'API Access',
       title: 'API Access',
+      name: 'api',
       cardTitle: 'API Access',
       cardText: 'API Access',
       description:
-        'Statistically analyzing and visualizing associations between mutational signature activities (using different measurements) and collected sample level variables including genomic features, epigenomic features, mutational status, copy number alterations or clinical variables from different cancer genomic studies. In addition, this module allows users to select different statistical approaches for both univariable and multivariable association analyses.',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
       image: 'assets/images/API-Icon.svg',
-      navIndex: 4,
-      color: '#84368d', // purple
+      navIndex: 5,
+      color: '#84368d',
+      showHomepage: true,
+      buttonHomepage: 'btn btn-lg btn-api btn-border-radius-25',
     },
     {
       route: '/publications',
       title: 'Publications',
-      navIndex: 5,
-    },
-    {
-      route: '/apiaccess',
-      title: 'API Access',
       navIndex: 6,
+      showHomepage: false,
     },
     {
       route: '/faq',
       title: 'FAQ',
       navIndex: 7,
+      showHomepage: false,
     },
     {
       route: '/about',
@@ -129,6 +144,7 @@ export default function App() {
       // cardTitle: 'About',
       image: 'assets/images/gwas.svg',
       navIndex: 8,
+      showHomepage: false,
     },
   ];
 

@@ -59,30 +59,33 @@ a:focus {
 }
 
 /** Bootstrap Overrides **/
+body {
+  font-size: 18px;
+  font-family: 'Inter';
+  font-weight: 400;
+}
 
 h1 {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat';
   font-weight: 900;
-  font-size: 65pt;
+  font-size: 65px;
 }
 h2 {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter';
   font-weight: 400;
-  font-size: 32pt;
+  font-size: 32px;
 }
 h3 {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter';
   font-weight: 500;
-  font-size: 28pt;
+  font-size: 28px;
 }
 h4 {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter';
   font-weight: 500;
-  font-size: 22pt;
+  font-size: 22px;
 }
-body {
-  font-size: 18pt;
-}
+
 .link-primary {
   color: #8e4b86;
 }
@@ -109,6 +112,10 @@ body {
 
 .bg-egg {
   background-color: #f7f5f4;
+}
+
+.bg-gray {
+  background-color: #606061;
 }
 
 .bg-primary-vivid {
