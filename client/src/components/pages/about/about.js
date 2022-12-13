@@ -48,25 +48,7 @@ export default function About() {
             is available in Github under MIT license, an Open Source Initiative
             approved license.
           </p>
-          <p>
-            Questions or comments? Contact{' '}
-            <a
-              href="mailto:NCImSigPortalWebAdmin@mail.nih.gov"
-              target="_blank"
-              rel="noreferrer"
-            >
-              support
-            </a>
-            .
-          </p>
-          <br />
-          <div>
-            <h5>Release History</h5>
-            <i>mSigPortal 1.0.0</i>
-            <ul>
-              <li>Initial Release</li>
-            </ul>
-          </div>
+
           <div id="catalog">
             <h5 class="text-catalog">Signature Catalog</h5>
             <p>
@@ -164,6 +146,28 @@ export default function About() {
               nulla pariatur. Excepteur sint occaecat cupidatat non proident,
               sunt in culpa qui officia deserunt mollit anim id est laborum.
             </p>
+          </div>
+          <div>
+            {' '}
+            <p>
+              Questions or comments? Contact{' '}
+              <a
+                href="mailto:NCImSigPortalWebAdmin@mail.nih.gov"
+                target="_blank"
+                rel="noreferrer"
+              >
+                support
+              </a>
+              .
+            </p>
+            <br />
+            <div>
+              <h5>Release History</h5>
+              <i>mSigPortal 1.0.0</i>
+              <ul>
+                <li>Initial Release</li>
+              </ul>
+            </div>
           </div>
         </Container>
       </div>

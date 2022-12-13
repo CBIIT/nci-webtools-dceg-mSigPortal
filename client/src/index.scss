@@ -63,30 +63,30 @@ a:focus {
 
 /** Bootstrap Overrides **/
 body {
-  font-size: 18px;
+  font-size: 12pt;
   font-family: 'Inter';
   font-weight: 400;
 }
 
 h1 {
   font-family: 'Montserrat';
-  font-weight: 900;
-  font-size: 65px;
+  font-weight: 700;
+  font-size: 65pt;
 }
 h2 {
   font-family: 'Inter';
   font-weight: 400;
-  font-size: 32px;
+  font-size: 28pt;
 }
 h3 {
   font-family: 'Inter';
   font-weight: 500;
-  font-size: 28px;
+  font-size: 28pt;
 }
 h4 {
   font-family: 'Inter';
   font-weight: 500;
-  font-size: 22px;
+  font-size: 22pt;
 }
 
 .link-primary {
@@ -175,7 +175,18 @@ h4 {
   color: #8e4b86;
   border-color: #8e4b86;
 }
+.btn-1 {
+  font: 'Inter';
+  font-size: 14pt;
+  text-transform: uppercase;
+  font-weight: 600;
+}
 
+.btn-2 {
+  font: 'Inter';
+  font-size: 12pt;
+  font-weight: 600;
+}
 .btn-dark {
   &.disabled {
     @extend .btn-outline-dark;
@@ -640,7 +651,6 @@ select.form-control-sm {
   background-image: linear-gradient(to right, #b83d47 0%, #8e4b86 55%);
   color: white;
   border-radius: 18px;
-  font-weight: 800;
 }
 
 .btn-gradient:hover {
