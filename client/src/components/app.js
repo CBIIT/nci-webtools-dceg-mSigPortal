@@ -119,7 +119,7 @@ export default function App() {
       cardTitle: 'API Access',
       cardText: 'API Access',
       description:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor .',
       image: 'assets/images/API-Icon.svg',
       navIndex: 5,
       color: '#84368d',
