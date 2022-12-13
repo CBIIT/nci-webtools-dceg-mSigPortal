@@ -98,8 +98,8 @@ export default function Home({ links }) {
   return (
     <>
       <div>
-        <div className="banner-container text-center d-none d-md-block">
-          <div className="background-img">
+        <div className="banner-container d-none d-md-block">
+          <div className="background-img text-center">
             <img
               src="../assets/images/Hero_Image.png"
               alt="mSigPortal banner"
