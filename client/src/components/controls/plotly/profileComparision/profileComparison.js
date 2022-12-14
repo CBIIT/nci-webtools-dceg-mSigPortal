@@ -1,64 +1,114 @@
-import {
-  groupDataByMutation,
-  getMaxMutations,
-} from '../mutationalProfiles/utils';
+export function groupDataByMutation(
+  apiData,
+  groupRegex,
+  mutationGroupSort = false,
+  mutationTypeSort = false
+) {
+  const groupByMutation = apiData.reduce((acc, e) => {
+    const mutation = e.mutationType.match(groupRegex)[1];
+    acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
+    return acc;
+  }, {});
 
-export default function pcBetweenSamples_SBS(samples, apiData) {
-  const colors = {
-    'C>A': '#03BCEE',
-    'C>G': 'black',
-    'C>T': '#E32926',
-    'T>A': '#CAC9C9',
-    'T>C': '#A1CE63',
-    'T>G': '#EBC6C4',
-  };
-  const mutationRegex = /\[(.*)\]/;
-  function mutationGroupSort(a, b) {
-    const order = Object.keys(colors);
-    return order.indexOf(a.mutation) - order.indexOf(b.mutation);
+  const groupedData = Object.entries(groupByMutation).map(
+    ([mutation, data]) => ({
+      mutation,
+      data: mutationTypeSort ? data.sort(mutationTypeSort) : data,
+    })
+  );
+
+  return mutationGroupSort ? groupedData.sort(mutationGroupSort) : groupedData;
+}
+
+export function getTotalMutations(apiData) {
+  return apiData.reduce(
+    (total, e) => total + e.mutations || e.contribution || 0,
+    0
+  );
+}
+
+export function getMaxMutations(apiData) {
+  return Math.max(...apiData.map((e) => e.mutations || e.contribution || 0));
+}
+
+export function getRss(sampleDifferenceData) {
+  const squareDiff = sampleDifferenceData.map((e) =>
+    Math.pow(e.mutations || e.contribution || 0, 2)
+  );
+  return squareDiff.reduce((a, b, i) => a + b, 0).toExponential(3);
+}
+
+export function getCosineSimilarity(sampleData1, sampleData2) {
+  function dotp(x, y) {
+    function dotp_sum(a, b) {
+      return a + b;
+    }
+    function dotp_times(a, i) {
+      return x[i] * y[i];
+    }
+    return x.map(dotp_times).reduce(dotp_sum, 0);
   }
 
+  function cosineSimilarity(A, B) {
+    var similarity =
+      dotp(A, B) / (Math.sqrt(dotp(A, A)) * Math.sqrt(dotp(B, B)));
+    return similarity;
+  }
+  return cosineSimilarity(
+    sampleData1.map((e) => e.mutations || e.contribution || 0),
+    sampleData2.map((e) => e.mutations || e.contribution || 0)
+  ).toFixed(3);
+}
+
+export function compareProfiles(
+  samples,
+  apiData,
+  colors,
+  mutationRegex,
+  formatMutationLabels,
+  formatTickLabels,
+  tickAngle = -90
+) {
   // get samples from sample array args
   const [sample1, sample2] = samples;
   // filter api data by samples
-  const sampleApiData1 = apiData.filter(
+  const sampleData1 = apiData.filter(
     (e) => e.sample == sample1 || e.signatureName == sample1
   );
-  const sampleApiData2 = apiData.filter(
+  const sampleData2 = apiData.filter(
     (e) => e.sample == sample2 || e.signatureName == sample2
   );
 
+  const mutationGroupSort = (a, b) => {
+    const order = Object.keys(colors);
+    return order.indexOf(a.mutation) - order.indexOf(b.mutation);
+  };
+
   // get total mutations per sample
-  const totalMutations1 = sampleApiData1.reduce(
-    (total, e) => total + (e.mutations || e.contribution),
-    0
-  );
-  const totalMutations2 = sampleApiData2.reduce(
-    (total, e) => total + (e.mutations || e.contribution),
-    0
-  );
+  const totalMutations1 = getTotalMutations(sampleData1);
+  const totalMutations2 = getTotalMutations(sampleData2);
 
   // get max mutations per sample
-  const maxMutation1 = getMaxMutations(sampleApiData1) / totalMutations1;
-  const maxMutation2 = getMaxMutations(sampleApiData2) / totalMutations2;
+  const maxMutation1 = getMaxMutations(sampleData1) / totalMutations1;
+  const maxMutation2 = getMaxMutations(sampleData2) / totalMutations2;
   const maxMutations = Math.max(maxMutation1, maxMutation2);
 
   // normalize mutations per sample
-  const normalizedSample1 = sampleApiData1.map((e) => ({
+  const normalizedSample1 = sampleData1.map((e) => ({
     ...e,
-    ...(e.mutations && {
+    ...(e.mutations >= 0 && {
       mutations: e.mutations / totalMutations1,
     }),
-    ...(e.contribution && {
+    ...(e.contribution >= 0 && {
       contribution: e.contribution / totalMutations1,
     }),
   }));
-  const normalizedSample2 = sampleApiData2.map((e) => ({
+  const normalizedSample2 = sampleData2.map((e) => ({
     ...e,
-    ...(e.mutations && {
+    ...(e.mutations >= 0 && {
       mutations: e.mutations / totalMutations2,
     }),
-    ...(e.contribution && {
+    ...(e.contribution >= 0 && {
       contribution: e.contribution / totalMutations2,
     }),
   }));
@@ -77,10 +127,10 @@ export default function pcBetweenSamples_SBS(samples, apiData) {
   // calcualte difference between samples
   const sampleDifferenceData = normalizedSample1.map((e, i) => ({
     ...e,
-    ...(e.mutations && {
+    ...(e.mutations >= 0 && {
       mutations: e.mutations - normalizedSample2[i].mutations,
     }),
-    ...(e.contribution && {
+    ...(e.contribution >= 0 && {
       contribution: e.contribution - normalizedSample2[i].contribution,
     }),
   }));
@@ -89,41 +139,6 @@ export default function pcBetweenSamples_SBS(samples, apiData) {
     mutationRegex,
     mutationGroupSort
   );
-
-  const squarediff = sampleDifferenceData.map((e) =>
-    Math.pow(e.mutations || e.contribution, 2)
-  );
-  const rss = squarediff.reduce((a, b, i) => a + b, 0).toExponential(3);
-
-  function dotp(x, y) {
-    function dotp_sum(a, b) {
-      return a + b;
-    }
-    function dotp_times(a, i) {
-      return x[i] * y[i];
-    }
-    return x.map(dotp_times).reduce(dotp_sum, 0);
-  }
-
-  function cosineSimilarity(A, B) {
-    var similarity =
-      dotp(A, B) / (Math.sqrt(dotp(A, A)) * Math.sqrt(dotp(B, B)));
-    return similarity;
-  }
-
-  const cosine = cosineSimilarity(
-    normalizedSample1.map((e) => e.mutations || e.contribution),
-    normalizedSample2.map((e) => e.mutations || e.contribution)
-  ).toFixed(3);
-
-  const mutationTypeNames = groupSamples1
-    .map((group) =>
-      group.data.map((e) => ({
-        mutation: group.mutation,
-        mutationType: e.mutationType,
-      }))
-    )
-    .flat();
 
   const sampleTrace1 = groupSamples1.map((group, groupIndex, array) => ({
     name: group.mutation,
@@ -136,7 +151,7 @@ export default function pcBetweenSamples_SBS(samples, apiData) {
           .slice(0, groupIndex)
           .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
     ),
-    y: group.data.map((e) => e.mutations || e.contribution),
+    y: group.data.map((e) => e.mutations || e.contribution || 0),
     hoverinfo: 'x+y',
     showlegend: false,
     yaxis: 'y3',
@@ -153,11 +168,12 @@ export default function pcBetweenSamples_SBS(samples, apiData) {
           .slice(0, groupIndex)
           .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
     ),
-    y: group.data.map((e) => e.mutations || e.contribution),
+    y: group.data.map((e) => e.mutations || e.contribution || 0),
     hoverinfo: 'x+y',
     showlegend: false,
     yaxis: 'y2',
   }));
+
   const differenceTrace = groupDifference.map((group, groupIndex, array) => ({
     name: group.mutation,
     type: 'bar',
@@ -169,13 +185,21 @@ export default function pcBetweenSamples_SBS(samples, apiData) {
           .slice(0, groupIndex)
           .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
     ),
-    y: group.data.map((e) => e.mutations || e.contribution),
+    y: group.data.map((e) => e.mutations || e.contribution || 0),
     hoverinfo: 'x+y',
     showlegend: false,
   }));
   const traces = [...differenceTrace, ...sampleTrace2, ...sampleTrace1];
 
-  const shapeTop = groupSamples1.map((group, groupIndex, array) => ({
+  const rss = getRss(sampleDifferenceData);
+  const cosineSimilarity = getCosineSimilarity(
+    normalizedSample1,
+    normalizedSample2
+  );
+
+  const tickLabels = formatTickLabels(groupSamples1);
+
+  const mutationLabelBox = groupSamples1.map((group, groupIndex, array) => ({
     type: 'rect',
     xref: 'x',
     yref: 'paper',
@@ -192,8 +216,7 @@ export default function pcBetweenSamples_SBS(samples, apiData) {
       width: 1,
     },
   }));
-
-  const shapeLine3 = groupSamples1.map((group, groupIndex, array) => ({
+  const sampleBorder1 = groupSamples1.map((group, groupIndex, array) => ({
     type: 'rect',
     xref: 'x',
     yref: 'paper',
@@ -211,7 +234,7 @@ export default function pcBetweenSamples_SBS(samples, apiData) {
     },
   }));
 
-  const shapeLine2 = groupSamples2.map((group, groupIndex, array) => ({
+  const sampleBorder2 = groupSamples2.map((group, groupIndex, array) => ({
     type: 'rect',
     xref: 'x',
     yref: 'paper',
@@ -229,7 +252,7 @@ export default function pcBetweenSamples_SBS(samples, apiData) {
     },
   }));
 
-  const shapeLine1 = groupDifference.map((group, groupIndex, array) => ({
+  const differenceBorder = groupDifference.map((group, groupIndex, array) => ({
     type: 'rect',
     xref: 'x',
     yref: 'paper',
@@ -246,7 +269,7 @@ export default function pcBetweenSamples_SBS(samples, apiData) {
       width: 1,
     },
   }));
-  const shapeRight3 = {
+  const differencLabelBox1 = {
     type: 'rect',
     xref: 'paper',
     yref: 'paper',
@@ -256,7 +279,7 @@ export default function pcBetweenSamples_SBS(samples, apiData) {
     y1: 1,
     fillcolor: '#F0F0F0',
   };
-  const shapeRight2 = {
+  const sampleLabelBox2 = {
     type: 'rect',
     xref: 'paper',
     yref: 'paper',
@@ -267,7 +290,7 @@ export default function pcBetweenSamples_SBS(samples, apiData) {
     fillcolor: '#F0F0F0',
   };
 
-  const shapeRight1 = {
+  const differenceLabelBox = {
     type: 'rect',
     xref: 'paper',
     yref: 'paper',
@@ -278,7 +301,7 @@ export default function pcBetweenSamples_SBS(samples, apiData) {
     fillcolor: '#F0F0F0',
   };
 
-  const sample1Label = {
+  const sampleLabel1 = {
     xref: 'paper',
     yref: 'paper',
     xanchor: 'middle',
@@ -286,13 +309,12 @@ export default function pcBetweenSamples_SBS(samples, apiData) {
     align: 'center',
     x: 1.0175,
     y: 0.835,
-    text:
-      samples[0].length > 16 ? samples[0].substring(0, 16) + '...' : samples[0],
+    text: sample1.length > 16 ? sample1.substring(0, 16) + '...' : sample1,
     textangle: 90,
     showarrow: false,
   };
 
-  const sample2Label = {
+  const sampleLabel2 = {
     xref: 'paper',
     yref: 'paper',
     xanchor: 'middle',
@@ -300,8 +322,7 @@ export default function pcBetweenSamples_SBS(samples, apiData) {
     align: 'center',
     x: 1.0175,
     y: 0.505,
-    text:
-      samples[1].length > 16 ? samples[1].substring(0, 16) + '...' : samples[1],
+    text: sample2.length > 16 ? sample2.substring(0, 16) + '...' : sample2,
     textangle: 90,
     showarrow: false,
   };
@@ -318,6 +339,7 @@ export default function pcBetweenSamples_SBS(samples, apiData) {
     textangle: 90,
     showarrow: false,
   };
+
   const mutationAnnotation = groupSamples1.map((group, groupIndex, array) => ({
     xref: 'x',
     yref: 'paper',
@@ -328,10 +350,10 @@ export default function pcBetweenSamples_SBS(samples, apiData) {
         .slice(0, groupIndex)
         .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
       (group.data.length - 1) * 0.5,
-    y: 1.01,
-    text: `<b>${group.mutation}</b>`,
+    y: 1.005,
+    text: formatMutationLabels(group),
     showarrow: false,
-    font: { size: 16, color: 'white' },
+    font: { color: 'white' },
     align: 'center',
   }));
 
@@ -347,12 +369,7 @@ export default function pcBetweenSamples_SBS(samples, apiData) {
     textangle: -90,
     showarrow: false,
   };
-  function formatTickLabel(mutation, mutationType) {
-    const color = colors[mutation];
-    const regex = /^(.)\[(.).{2}\](.)$/;
-    const match = mutationType.match(regex);
-    return `${match[1]}<span style="color:${color}"><b>${match[2]}</b></span>${match[3]}`;
-  }
+
   const layout = {
     height: 700,
     hoverlabel: { bgcolor: '#FFF' },
@@ -360,19 +377,15 @@ export default function pcBetweenSamples_SBS(samples, apiData) {
       rows: 3,
       column: 1,
     },
-    title: '<b>RSS = ' + rss + '; Cosine Simularity = ' + cosine + '</b>',
+    title:
+      '<b>RSS = ' + rss + '; Cosine Similarity = ' + cosineSimilarity + '</b>',
     xaxis: {
       showline: true,
-      tickangle: -90,
-      tickfont: {
-        family: 'Courier New, monospace',
-        color: '#A0A0A0',
-      },
+      tickangle: tickAngle,
+      tickfont: { family: 'Courier New, monospace' },
       tickmode: 'array',
-      tickvals: mutationTypeNames.map((_, i) => i),
-      ticktext: mutationTypeNames.map((e) =>
-        formatTickLabel(e.mutation, e.mutationType)
-      ),
+      tickvals: tickLabels.map((_, i) => i),
+      ticktext: tickLabels.map((e) => e),
       linecolor: '#E0E0E0',
       linewidth: 1,
       mirror: 'all',
@@ -415,21 +428,22 @@ export default function pcBetweenSamples_SBS(samples, apiData) {
       domain: [0.67, 1],
     },
     shapes: [
-      ...shapeTop,
-      shapeRight3,
-      shapeRight2,
-      shapeRight1,
-      ...shapeLine3,
-      ...shapeLine2,
-      ...shapeLine1,
+      ...mutationLabelBox,
+      differencLabelBox1,
+      sampleLabelBox2,
+      differenceLabelBox,
+      ...sampleBorder1,
+      ...sampleBorder2,
+      ...differenceBorder,
     ],
     annotations: [
       ...mutationAnnotation,
-      sample1Label,
-      sample2Label,
+      sampleLabel1,
+      sampleLabel2,
       differenceLabel,
       yTitleAnnotation,
     ],
   };
+
   return { traces, layout };
 }

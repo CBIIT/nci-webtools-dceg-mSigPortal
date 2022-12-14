@@ -1,8 +1,7 @@
 import { visualizationApiSlice } from '../../../../services/store/rootApi';
-import pcBetweenSamples_SBS from '../../../controls/plotly/profileComparision/pcBetweenSamples_SBS';
-import pcBetweenSamples_DBS from '../../../controls/plotly/profileComparision/pcBetweenSamples_DBS';
-import pcBetweenSamples_ID from '../../../controls/plotly/profileComparision/pcBetweenSamples_ID';
-import { groupBy } from 'lodash';
+import sbs96 from '../../../controls/plotly/profileComparision/sbs96';
+import dbs78 from '../../../controls/plotly/profileComparision/dbs78';
+import id83 from '../../../controls/plotly/profileComparision/id83';
 
 export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -13,16 +12,13 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
       }),
       transformResponse: (data, meta, arg) => {
         const samples = arg.sample.split(';');
-        const groupBySample = groupBy(data, 'sample');
-        const sample1 = groupBySample[samples[0]].flat();
-        const sample2 = groupBySample[samples[1]].flat();
 
         if (arg.profile === 'SBS') {
-          return pcBetweenSamples_SBS(samples, data);
+          return sbs96(samples, data);
         } else if (arg.profile === 'DBS') {
-          return pcBetweenSamples_DBS(samples, sample1, sample2, 'samples');
+          return dbs78(samples, data);
         } else {
-          return pcBetweenSamples_ID(samples, sample1, sample2, 'samples');
+          return id83(samples, data);
         }
       },
     }),
@@ -50,30 +46,15 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
 
           if (_arg.params_spectrum.profile === 'SBS') {
             return {
-              data: pcBetweenSamples_SBS(
-                samples,
-                spectrumData,
-                signatureData,
-                'reference'
-              ),
+              data: sbs96(samples, spectrumData, signatureData, 'reference'),
             };
           } else if (_arg.params_spectrum.profile === 'DBS') {
             return {
-              data: pcBetweenSamples_DBS(
-                samples,
-                spectrumData,
-                signatureData,
-                'reference'
-              ),
+              data: dbs78(samples, spectrumData, signatureData, 'reference'),
             };
           } else {
             return {
-              data: pcBetweenSamples_ID(
-                samples,
-                spectrumData,
-                signatureData,
-                'reference'
-              ),
+              data: id83(samples, spectrumData, signatureData, 'reference'),
             };
           }
         } catch (error) {
