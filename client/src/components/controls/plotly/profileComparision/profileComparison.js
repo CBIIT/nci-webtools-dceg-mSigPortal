@@ -1,10 +1,10 @@
 export function groupDataByMutation(
-  apiData,
+  data,
   groupRegex,
   mutationGroupSort = false,
   mutationTypeSort = false
 ) {
-  const groupByMutation = apiData.reduce((acc, e) => {
+  const groupByMutation = data.reduce((acc, e) => {
     const mutation = e.mutationType.match(groupRegex)[1];
     acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
     return acc;
@@ -20,15 +20,15 @@ export function groupDataByMutation(
   return mutationGroupSort ? groupedData.sort(mutationGroupSort) : groupedData;
 }
 
-export function getTotalMutations(apiData) {
-  return apiData.reduce(
-    (total, e) => total + e.mutations || e.contribution || 0,
+export function getTotalMutations(data) {
+  return data.reduce(
+    (total, e) => total + (e.mutations || e.contribution || 0),
     0
   );
 }
 
-export function getMaxMutations(apiData) {
-  return Math.max(...apiData.map((e) => e.mutations || e.contribution || 0));
+export function getMaxMutations(data) {
+  return Math.max(...data.map((e) => e.mutations || e.contribution || 0));
 }
 
 export function getRss(sampleDifferenceData) {
@@ -38,7 +38,7 @@ export function getRss(sampleDifferenceData) {
   return squareDiff.reduce((a, b, i) => a + b, 0).toExponential(3);
 }
 
-export function getCosineSimilarity(sampleData1, sampleData2) {
+export function getCosineSimilarity(data1, data2) {
   function dotp(x, y) {
     function dotp_sum(a, b) {
       return a + b;
@@ -55,29 +55,22 @@ export function getCosineSimilarity(sampleData1, sampleData2) {
     return similarity;
   }
   return cosineSimilarity(
-    sampleData1.map((e) => e.mutations || e.contribution || 0),
-    sampleData2.map((e) => e.mutations || e.contribution || 0)
+    data1.map((e) => e.mutations || e.contribution || 0),
+    data2.map((e) => e.mutations || e.contribution || 0)
   ).toFixed(3);
 }
 
 export function compareProfiles(
-  samples,
-  apiData,
+  data1,
+  data2,
   colors,
   mutationRegex,
   formatMutationLabels,
   formatTickLabels,
   tickAngle = -90
 ) {
-  // get samples from sample array args
-  const [sample1, sample2] = samples;
-  // filter api data by samples
-  const sampleData1 = apiData.filter(
-    (e) => e.sample == sample1 || e.signatureName == sample1
-  );
-  const sampleData2 = apiData.filter(
-    (e) => e.sample == sample2 || e.signatureName == sample2
-  );
+  const sample1 = data1[0].sample || data1[0].signatureName;
+  const sample2 = data2[0].sample || data2[0].signatureName;
 
   const mutationGroupSort = (a, b) => {
     const order = Object.keys(colors);
@@ -85,16 +78,16 @@ export function compareProfiles(
   };
 
   // get total mutations per sample
-  const totalMutations1 = getTotalMutations(sampleData1);
-  const totalMutations2 = getTotalMutations(sampleData2);
+  const totalMutations1 = getTotalMutations(data1);
+  const totalMutations2 = getTotalMutations(data2);
 
   // get max mutations per sample
-  const maxMutation1 = getMaxMutations(sampleData1) / totalMutations1;
-  const maxMutation2 = getMaxMutations(sampleData2) / totalMutations2;
+  const maxMutation1 = getMaxMutations(data1) / totalMutations1;
+  const maxMutation2 = getMaxMutations(data2) / totalMutations2;
   const maxMutations = Math.max(maxMutation1, maxMutation2);
 
   // normalize mutations per sample
-  const normalizedSample1 = sampleData1.map((e) => ({
+  const normalizedSample1 = data1.map((e) => ({
     ...e,
     ...(e.mutations >= 0 && {
       mutations: e.mutations / totalMutations1,
@@ -103,7 +96,7 @@ export function compareProfiles(
       contribution: e.contribution / totalMutations1,
     }),
   }));
-  const normalizedSample2 = sampleData2.map((e) => ({
+  const normalizedSample2 = data2.map((e) => ({
     ...e,
     ...(e.mutations >= 0 && {
       mutations: e.mutations / totalMutations2,

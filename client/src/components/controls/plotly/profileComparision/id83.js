@@ -1,6 +1,6 @@
 import { compareProfiles } from './profileComparison';
 
-export default function id83(samples, apiData) {
+export default function id83(data1, data2) {
   const colors = {
     '1:Del:C': '#FBBD6F',
     '1:Del:T': '#FE8002',
@@ -30,8 +30,8 @@ export default function id83(samples, apiData) {
       )
       .flat();
   return compareProfiles(
-    samples,
-    apiData,
+    data1,
+    data2,
     colors,
     mutationRegex,
     mutationLabels,

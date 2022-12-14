@@ -1,6 +1,6 @@
 import { compareProfiles } from './profileComparison';
 
-export default function dbs78(samples, apiData) {
+export default function dbs78(data1, data2) {
   const colors = {
     AC: '#09BCED',
     AT: '#0266CA',
@@ -22,8 +22,8 @@ export default function dbs78(samples, apiData) {
       .flat();
 
   return compareProfiles(
-    samples,
-    apiData,
+    data1,
+    data2,
     colors,
     mutationRegex,
     mutationLabels,

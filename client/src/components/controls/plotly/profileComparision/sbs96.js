@@ -1,6 +1,6 @@
 import { compareProfiles } from './profileComparison';
 
-export default function sbs96(samples, apiData) {
+export default function sbs96(data1, data2) {
   const colors = {
     'C>A': '#03BCEE',
     'C>G': 'black',
@@ -26,8 +26,8 @@ export default function sbs96(samples, apiData) {
       .flat();
 
   return compareProfiles(
-    samples,
-    apiData,
+    data1,
+    data2,
     colors,
     mutationRegex,
     mutationLabels,

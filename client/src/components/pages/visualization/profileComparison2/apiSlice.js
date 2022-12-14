@@ -11,15 +11,23 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
         params,
       }),
       transformResponse: (data, meta, arg) => {
-        const samples = arg.sample.split(';');
+        // get samples from sample array args
+        const [sample1, sample2] = arg.sample.split(';');
+        // filter api data by samples
+        const data1 = data.filter(
+          (e) => e.sample == sample1 || e.signatureName == sample1
+        );
+        const data2 = data.filter(
+          (e) => e.sample == sample2 || e.signatureName == sample2
+        );
 
         if (arg.profile === 'SBS') {
-          return sbs96(samples, data);
+          return sbs96(data1, data2);
         } else if (arg.profile === 'DBS') {
-          return dbs78(samples, data);
-        } else {
-          return id83(samples, data);
-        }
+          return dbs78(data1, data2);
+        } else if (arg.profile == 'ID') {
+          return id83(data1, data2);
+        } else throw Error(`Profile ${arg.profile} is not supported`);
       },
     }),
 
