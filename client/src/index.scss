@@ -167,7 +167,15 @@ h6 {
   color: #8e4b86 !important;
 }
 
-.tebg-primaryxt-lavender {
+.text-primary-lavender {
+  color: #f1e4ef;
+}
+
+.border-primary-purple {
+  color: #8e4b86 !important;
+}
+
+.border-primary-lavender {
   color: #f1e4ef;
 }
 
@@ -723,4 +731,14 @@ select.form-control-sm {
   background-color: #f1e4ef;
   border-color: #8e4b86;
   color: #8e4b86 !important;
+}
+
+.react-select-custom-background {
+  border-color: #8e4b86;
+  background-color: #f1e4ef;
+}
+
+.react-select-custom-background:focus {
+  border-color: #f1e4ef;
+  background-color: #f1e4ef;
 }

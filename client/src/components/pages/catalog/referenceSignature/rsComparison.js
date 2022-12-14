@@ -149,6 +149,35 @@ export default function Comparison({ submitR }) {
     });
   }
 
+  const customStyles = {
+    control: (base, state) => ({
+      ...base,
+      background: '#f1e4ef',
+      // match with the menu
+      borderRadius: state.isFocused ? '3px 3px 0 0' : 3,
+      // Overwrittes the different states of border
+      borderColor: state.isFocused ? '#f1e4ef' : '#8e4b86',
+      // Removes weird border around container
+      boxShadow: state.isFocused ? null : null,
+      '&:hover': {
+        // Overwrittes the different states of border
+        borderColor: state.isFocused ? '#8e4b86' : '#f1e4ef',
+      },
+    }),
+    menu: (base) => ({
+      ...base,
+      // override border radius to match the box
+      borderRadius: 0,
+      // kill the gap
+      marginTop: 0,
+    }),
+    menuList: (base) => ({
+      ...base,
+      // kill the white space on first and last option
+      padding: 0,
+    }),
+  };
+
   return (
     <div>
       <Description
@@ -167,6 +196,7 @@ export default function Comparison({ submitR }) {
               value={profileName}
               options={profileNameOptions}
               onChange={handleProfile}
+              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -176,6 +206,7 @@ export default function Comparison({ submitR }) {
               value={rsSet1}
               options={rsSetOptions1}
               onChange={handleSet1}
+              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -189,6 +220,7 @@ export default function Comparison({ submitR }) {
                   signatureName1: name,
                 })
               }
+              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -198,6 +230,7 @@ export default function Comparison({ submitR }) {
               value={rsSet2}
               options={rsSetOptions2}
               onChange={handleSet2}
+              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -211,6 +244,7 @@ export default function Comparison({ submitR }) {
                   signatureName2: name,
                 })
               }
+              styles={customStyles}
             />
           </Col>
           <Col lg="auto" className="d-flex">

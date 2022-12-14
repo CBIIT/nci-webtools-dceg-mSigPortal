@@ -117,6 +117,35 @@ export default function CosineSimilarityPlot() {
     mergeState(data);
   }
 
+  const customStyles = {
+    control: (base, state) => ({
+      ...base,
+      background: '#f1e4ef',
+      // match with the menu
+      borderRadius: state.isFocused ? '3px 3px 0 0' : 3,
+      // Overwrittes the different states of border
+      borderColor: state.isFocused ? '#f1e4ef' : '#8e4b86',
+      // Removes weird border around container
+      boxShadow: state.isFocused ? null : null,
+      '&:hover': {
+        // Overwrittes the different states of border
+        borderColor: state.isFocused ? '#8e4b86' : '#f1e4ef',
+      },
+    }),
+    menu: (base) => ({
+      ...base,
+      // override border radius to match the box
+      borderRadius: 0,
+      // kill the gap
+      marginTop: 0,
+    }),
+    menuList: (base) => ({
+      ...base,
+      // kill the white space on first and last option
+      padding: 0,
+    }),
+  };
+
   return (
     <div>
       <Form className="p-3" onSubmit={handleSubmit(onSubmit)}>
@@ -130,6 +159,7 @@ export default function CosineSimilarityPlot() {
               onChange={handleProfile}
               disabled={fetchingOptions || fetchingPlot}
               control={control}
+              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -140,6 +170,7 @@ export default function CosineSimilarityPlot() {
               options={matrixOptions(profile)}
               disabled={fetchingOptions || fetchingPlot}
               onChange={(e) => handleMatrix(profile, e)}
+              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -149,6 +180,7 @@ export default function CosineSimilarityPlot() {
               options={signatureSetOptions(profile, matrix)}
               disabled={fetchingOptions || fetchingPlot}
               control={control}
+              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -158,6 +190,7 @@ export default function CosineSimilarityPlot() {
               options={signatureSetOptions(profile, matrix)}
               disabled={fetchingOptions || fetchingPlot}
               control={control}
+              styles={customStyles}
             />
           </Col>
           <Col lg="auto" className="d-flex justify-content-end">

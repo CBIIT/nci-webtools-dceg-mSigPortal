@@ -508,7 +508,6 @@ export default function Profile({ submitR }) {
               value={plots[0].signatureSource}
               options={plots[0].signatureSourceOptions}
               onChange={(source) => handleSource(source, 0)}
-              className="msigportal-bg"
             />
           </Col>
           <Col lg="auto">

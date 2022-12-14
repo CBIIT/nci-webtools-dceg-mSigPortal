@@ -464,6 +464,35 @@ export default function ProfileFormPlot({ options, index }) {
 
     mergeRsProfiles({ plots: newPlots });
   }
+
+  const customStyles = {
+    control: (base, state) => ({
+      ...base,
+      background: '#f1e4ef',
+      // match with the menu
+      borderRadius: state.isFocused ? '3px 3px 0 0' : 3,
+      // Overwrittes the different states of border
+      borderColor: state.isFocused ? '#f1e4ef' : '#8e4b86',
+      // Removes weird border around container
+      boxShadow: state.isFocused ? null : null,
+      '&:hover': {
+        // Overwrittes the different states of border
+        borderColor: state.isFocused ? '#8e4b86' : '#f1e4ef',
+      },
+    }),
+    menu: (base) => ({
+      ...base,
+      // override border radius to match the box
+      borderRadius: 0,
+      // kill the gap
+      marginTop: 0,
+    }),
+    menuList: (base) => ({
+      ...base,
+      // kill the white space on first and last option
+      padding: 0,
+    }),
+  };
   return (
     <div>
       <Form className="p-3">
@@ -477,6 +506,7 @@ export default function ProfileFormPlot({ options, index }) {
               options={signatureSourceOptions}
               control={control}
               onChange={handleSource}
+              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -487,6 +517,7 @@ export default function ProfileFormPlot({ options, index }) {
               options={profileOptions(source)}
               control={control}
               onChange={handleProfile}
+              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -497,6 +528,7 @@ export default function ProfileFormPlot({ options, index }) {
               options={matrixOptions(source, profile)}
               control={control}
               onChange={handleMatrix}
+              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -507,6 +539,7 @@ export default function ProfileFormPlot({ options, index }) {
               options={referenceSignatureSetOption(source, profile, matrix)}
               control={control}
               onChange={handleSet}
+              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -522,6 +555,7 @@ export default function ProfileFormPlot({ options, index }) {
               )}
               control={control}
               onChange={handleStrategy}
+              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -538,6 +572,7 @@ export default function ProfileFormPlot({ options, index }) {
               )}
               control={control}
               onChange={handleName}
+              styles={customStyles}
             />
           </Col>
         </Row>

@@ -25,7 +25,7 @@ export default function Explore() {
   return (
     <div className="px-0">
       <div className="">
-        <div className="d-flex justify-content-center border-catalog">
+        <div className="d-flex justify-content-center border-catalog border-top-0 border-left-0 border-right-0">
           {/* for desktops and tablets */}
           <div className="d-none d-md-block">
             <Nav activeKey={displayTab}>
