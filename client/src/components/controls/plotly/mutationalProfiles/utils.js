@@ -28,11 +28,7 @@ export function getTotalMutations(apiData) {
 }
 
 export function getMaxMutations(apiData) {
-  return Math.max(
-    ...apiData
-      .filter((e) => e.mutations || e.contribution)
-      .map((e) => e.mutations || e.contribution)
-  );
+  return Math.max(...apiData.map((e) => e.mutations || e.contribution || 0));
 }
 
 export function createSampleAnnotation(apiData, text = '') {
