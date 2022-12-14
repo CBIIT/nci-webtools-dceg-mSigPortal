@@ -37,7 +37,7 @@ export default function Home({ links }) {
             <img
               alt={cardTitle}
               src={image}
-              className="card-img-top w-25 h-25 ml-3"
+              className="card-img-top w-25 h-25"
             />
             <Card.Body>
               <h4 className={`card-title text-${name}`}>{cardTitle}</h4>
@@ -80,6 +80,7 @@ export default function Home({ links }) {
             alt="mSigPortal banner"
             style={{
               width: '100%',
+              height: '80%',
             }}
           ></img>
           <div className="row">
@@ -98,7 +99,7 @@ export default function Home({ links }) {
           </div>
         </div>
         <div className="p-3 home-grid-banner">
-          <div class="row row-cols-1 row-cols-md-3 g-4">
+          <div class="row row-cols-1 row-cols-md-3 g-4 m-1">
             {links.filter((e) => e.showHomepage).map((e, i) => CardRow(e, i))}
           </div>
         </div>
