@@ -402,7 +402,6 @@ export default function Profile({ submitR }) {
               value={plots[index].signatureSource}
               options={plots[index].signatureSourceOptions}
               onChange={(source) => handleSource(source, index)}
-              className="msigportal-bg"
             />
           </Col>
           <Col lg="auto">
@@ -509,6 +508,7 @@ export default function Profile({ submitR }) {
               value={plots[0].signatureSource}
               options={plots[0].signatureSourceOptions}
               onChange={(source) => handleSource(source, 0)}
+              className="msigportal-bg"
             />
           </Col>
           <Col lg="auto">
@@ -556,7 +556,12 @@ export default function Profile({ submitR }) {
               variant="link"
               onClick={() => addPlots()}
               title="Add Plot"
-              style={{ textDecoration: 'none' }}
+              style={{
+                textDecoration: 'none',
+                color: '#8e4b86',
+                backgroundColor: '#f1e4ef',
+                borderColor: '#8e4b86',
+              }}
             >
               <span className="text-nowrap" title="Add Plot">
                 <FontAwesomeIcon icon={faPlus} /> Add Plot

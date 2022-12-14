@@ -84,7 +84,7 @@ export default function Home({ links }) {
           ></img>
           <div className="row">
             <div className="homepage-title-left text-left">
-              <h1>mSigPortal</h1>
+              <h1 className="msigportal-home-title">mSigPortal</h1>
               <div class="text-primary-purple msigportal-title">
                 Integrative Mutational Signature Portal for Cancer Genomics
                 Study
