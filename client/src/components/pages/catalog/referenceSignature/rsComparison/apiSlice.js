@@ -1,5 +1,8 @@
 import { catalogApiSlice } from '../../../../../services/store/rootApi';
-import profileComparision_SBS from '../../../../controls/plotly/profileComparision/pcBetweenSamples_SBS';
+import sbs96 from '../../../../controls/plotly/profileComparision/sbs96';
+import sbs192 from '../../../../controls/plotly/profileComparision/sbs192';
+import dbs78 from '../../../../controls/plotly/profileComparision/dbs78';
+import id83 from '../../../../controls/plotly/profileComparision/id83';
 
 export const rsComparisonApiSlice = catalogApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -8,9 +11,27 @@ export const rsComparisonApiSlice = catalogApiSlice.injectEndpoints({
         url: 'mutational_signature',
         params,
       }),
-      transformResponse: (data) => {
-        // return profileComparision_SBS(data);
-        return data;
+      transformResponse: (data, meta, args) => {
+        const signatureSetNames = args.signatureSetName.split(';');
+        const signatureNames = args.signatureName.split(';');
+        const data1 = data.filter(
+          (e) =>
+            e.signatureSetName == signatureSetNames[0] &&
+            e.signatureName == signatureNames[0]
+        );
+        const data2 = data.filter(
+          (e) =>
+            e.signatureSetName == signatureSetNames[1] &&
+            e.signatureName == signatureNames[1]
+        );
+
+        if (args.profile == 'SBS' && args.matrix == '96')
+          return sbs96(data1, data2);
+        else if (args.profile == 'SBS' && args.matrix == '192')
+          return sbs192(data1, data2);
+        else if (args.profile == 'DBS') return dbs78(data1, data2);
+        else if (args.profile == 'ID') return id83(data1, data2);
+        else throw Error(`Profile ${args.profile} is not supported`);
       },
     }),
   }),

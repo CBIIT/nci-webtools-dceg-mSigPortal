@@ -36,35 +36,31 @@ export default function RsComparisonPlot() {
     isFetching: fetchingPlot,
   } = useRsComparisonQuery(params, { skip: !params });
 
-  const {
-    control,
-    setValue,
-    watch,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({ defaultValues: cosineSimilarityStore });
+  const { control, setValue, watch, handleSubmit } = useForm({
+    defaultValues: cosineSimilarityStore,
+  });
 
   const { profile, matrix, signatureSet1, signatureSet2 } = watch();
 
-  // set inital parameters
-  useEffect(() => {
-    if (!profile && data) handleProfile(profileOptions[0]);
-  }, [profile, data]);
-  // const supportedProfiles = ['SBS', 'DBS', 'ID'];
-  // const supportedMatrices = [96, 192, 78, 73];
-
+  const supportedProfiles = ['SBS', 'DBS', 'ID'];
+  const supportedMatrices = [96, 192, 78, 83];
   const profileOptions = data
-    ? [...new Set(data.map((e) => e.profile))].map((e) => ({
-        label: e,
-        value: e,
-      }))
+    ? [...new Set(data.map((e) => e.profile))]
+        .filter((e) => supportedProfiles.includes(e))
+        .map((e) => ({
+          label: e,
+          value: e,
+        }))
     : [];
 
   const matrixOptions = (profile) =>
     data && profile
       ? [
           ...new Set(
-            data.filter((e) => e.profile == profile.value).map((e) => e.matrix)
+            data
+              .filter((e) => e.profile == profile.value)
+              .map((e) => e.matrix)
+              .filter((e) => supportedMatrices.includes(e))
           ),
         ].map((e) => ({
           label: e,
@@ -107,6 +103,11 @@ export default function RsComparisonPlot() {
         }))
       : [];
 
+  // set inital parameters
+  useEffect(() => {
+    if (!profile && profileOptions.length) handleProfile(profileOptions[0]);
+  }, [profile, profileOptions]);
+
   function handleProfile(profile) {
     const matrices = matrixOptions(profile);
 
@@ -136,8 +137,9 @@ export default function RsComparisonPlot() {
       profile: data.profile.value,
       matrix: data.matrix.value,
       signatureSetName: `${data.signatureSet1.value};${data.signatureSet2.value}`,
+      signatureName: `${data.signatureName1.value};${data.signatureName2.value}`,
     };
-    // setParams(params);
+    setParams(params);
     mergeState(data);
   }
 
@@ -172,9 +174,7 @@ export default function RsComparisonPlot() {
               label="Reference Signature Set 1"
               options={signatureSetOptions(profile, matrix)}
               disabled={fetchingOptions || fetchingPlot}
-              onChange={(e) =>
-                handleSignatureSet(profile, matrix, e, 'signatureSet1')
-              }
+              onChange={(e) => handleSignatureSet(profile, matrix, e, 1)}
               control={control}
             />
           </Col>
@@ -193,9 +193,7 @@ export default function RsComparisonPlot() {
               label="Reference Signature Set 2"
               options={signatureSetOptions(profile, matrix)}
               disabled={fetchingOptions || fetchingPlot}
-              onChange={(e) =>
-                handleSignatureSet(profile, matrix, e, 'signatureSet2')
-              }
+              onChange={(e) => handleSignatureSet(profile, matrix, e, 2)}
               control={control}
             />
           </Col>
@@ -229,7 +227,7 @@ export default function RsComparisonPlot() {
           <p>An error has occured. Please verify your input.</p>
         </div>
 
-        {plot && (
+        {plot && !plotError && (
           <Plotly
             data={plot.traces}
             layout={plot.layout}
