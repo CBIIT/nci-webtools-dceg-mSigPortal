@@ -76,7 +76,7 @@ export default function App() {
       cardTitle: 'Signature Exploration',
       cardText: 'Signature Exploration',
       description:
-        'Explore etiological factors associated with signature at sample levels.',
+        'Explore etiological factors associated with signature at sample levels.    ',
       image: 'assets/images/Exploration-Icon.svg',
       navIndex: 3,
       color: '#5a4e2e',

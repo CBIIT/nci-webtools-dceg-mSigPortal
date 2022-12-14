@@ -102,7 +102,17 @@ h6 {
 }
 
 .link-primary {
-  color: #8e4b86;
+  color: #8e4b86 !important;
+}
+
+.link-primary-underline {
+  color: #8e4b86 !important;
+  text-decoration: underline;
+}
+
+.link-primary-underline:hover {
+  color: #8e4b86 !important;
+  text-decoration: none;
 }
 .outline-none {
   outline: none !important;
@@ -280,6 +290,10 @@ h6 {
 
 .text-primary-gray {
   color: #606061;
+}
+
+.text-allcaps {
+  text-transform: uppercase;
 }
 
 .flex-shrink-auto {

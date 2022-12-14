@@ -25,7 +25,7 @@ export default function Home({ links }) {
   ) {
     return (
       <div key={index}>
-        <div class="col mb-4 ">
+        <div class="col mb-3 ">
           <Card
             key={title}
             id={title}
@@ -46,7 +46,7 @@ export default function Home({ links }) {
                 <br />
 
                 <Link
-                  className="link-primary"
+                  className="link-primary-underline"
                   exact={exact}
                   key={index}
                   to={about}
@@ -57,12 +57,12 @@ export default function Home({ links }) {
             </Card.Body>
             <div class="p-3">
               <Link
-                className={`btn btn-lg btn-${name} btn-border-radius-25`}
+                className={`btn btn-2 btn-lg btn-${name} btn-border-radius-25`}
                 exact={exact}
                 key={index}
                 to={route}
               >
-                <span>Go to {title} &gt;</span>
+                <span class="">Go to {title} &gt;</span>
               </Link>
             </div>
           </Card>

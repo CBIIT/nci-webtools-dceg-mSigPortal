@@ -24,7 +24,7 @@ export function Footer() {
             </div>
             <div className="row justify-content-between">
               <div className="col-md-auto footer-nav-col">
-                <h5 className="mb-2">CONTACT INFORMATION</h5>
+                <h6 className="mb-2">CONTACT INFORMATION</h6>
                 <div className="my-2">
                   <a
                     className="footer-link text-light"
@@ -36,7 +36,7 @@ export function Footer() {
                 </div>
               </div>
               <div className="col-md-auto footer-nav-col">
-                <h5 className="mb-2">MORE INFORMATION</h5>
+                <h6 className="mb-2">MORE INFORMATION</h6>
                 <div className="my-2">
                   <a
                     className="footer-link text-light"
@@ -65,7 +65,7 @@ export function Footer() {
               </div> --> */}
               </div>
               <div className="col-md-auto footer-nav-col">
-                <h5 className="mb-2">POLICIES</h5>
+                <h6 className="mb-2">POLICIES</h6>
                 <div className="my-2">
                   <a
                     className="footer-link text-light"
