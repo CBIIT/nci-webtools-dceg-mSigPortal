@@ -409,69 +409,60 @@ export default function InputForm() {
         variant="link"
         onClick={(_) => setShowAdvanced(!showAdvanced)}
       >
-        Advanced Parameters +
+        Advanced Parameters {showAdvanced ? '-' : '+'}
       </Button>
 
       <div className={showAdvanced ? 'd-block' : 'd-none'}>
-        <Form.Label>Execution</Form.Label>
-        <Form.Group>
-          <Form.Label>CPU</Form.Label>
-          <Form.Control {...register('cpu')} type="number" defaultValue={2} />
-        </Form.Group>
-        <Form.Group>
-          <Form.Check
-            {...register('gpu')}
-            id="gpu"
-            label="GPU"
-            defaultChecked={false}
-          />
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>Batch Size</Form.Label>
-          <Form.Control
-            {...register('batchSize')}
-            type="number"
-            defaultValue={1}
-          />
-        </Form.Group>
-        <hr />
-        <Form.Label>NMF Replicates</Form.Label>
-        <Form.Group>
-          <Form.Label>Minimum Signatures</Form.Label>
-          <Form.Control
-            {...register('minSignatures')}
-            type="number"
-            defaultValue={1}
-          />
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>Maximum Signatures</Form.Label>
-          <Form.Control
-            {...register('maxSignatures')}
-            type="number"
-            defaultValue={15}
-          />
-        </Form.Group>
-        <Form.Group>
+        <fieldset className="border rounded p-2 mb-3">
+          <legend className="font-weight-bold">Execution</legend>
           <Form.Group>
-            <Form.Label>NMF Replicates Size</Form.Label>
+            <Form.Label>Batch Size</Form.Label>
+            <Form.Control
+              {...register('batchSize')}
+              type="number"
+              defaultValue={1}
+            />
+          </Form.Group>
+        </fieldset>
+        <fieldset className="border rounded p-2">
+          <legend className="font-weight-bold">NMF Replicates</legend>
+          <Form.Group>
+            <Form.Label>Minimum Signatures</Form.Label>
             <Form.Control
               {...register('minSignatures')}
               type="number"
-              defaultValue={100}
+              defaultValue={1}
             />
           </Form.Group>
-          <Form.Check
-            {...register('resample')}
-            label="Resamples"
-            id="resample"
-            defaultChecked={true}
-          />
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>Seed</Form.Label>
-          <Form.Control {...register('seed')} />
-        </Form.Group>
+          <Form.Group>
+            <Form.Label>Maximum Signatures</Form.Label>
+            <Form.Control
+              {...register('maxSignatures')}
+              type="number"
+              defaultValue={15}
+            />
+          </Form.Group>
+          <Form.Group>
+            <Form.Group>
+              <Form.Label>NMF Replicates Size</Form.Label>
+              <Form.Control
+                {...register('minSignatures')}
+                type="number"
+                defaultValue={100}
+              />
+            </Form.Group>
+            <Form.Check
+              {...register('resample')}
+              label="Resamples"
+              id="resample"
+              defaultChecked={true}
+            />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Seed</Form.Label>
+            <Form.Control {...register('seed')} />
+          </Form.Group>
+        </fieldset>
       </div>
 
       <hr className="mb-3" />
