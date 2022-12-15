@@ -8,8 +8,8 @@ export default function Rainfall(inputData, genomeInfo) {
     ClassIC: { name: 'OMIKLI', color: 'green' },
     ClassII: { name: 'KATAEGIS', color: 'orange' },
     ClassIII: { name: 'OTHER', color: 'blue' },
-    'Non-clust': { name: 'Non-clust', color: 'grey' },
-    Simulation: { name: 'Simulation', color: 'grey' },
+    'Non-clust': { name: 'Non-clust', color: 'grey', text: 'white' },
+    Simulation: { name: 'Simulation', color: 'grey', text: 'white' },
     Clust: { name: 'Clust', color: 'orange' },
   };
   const chrOrder = Object.keys(genomeInfo);
@@ -53,7 +53,10 @@ export default function Rainfall(inputData, genomeInfo) {
         ].join('<br>')
       ),
       hovertemplate: '%{text}<extra></extra>',
-      marker: { color: d.data.map((e) => subclassInfo[e.subclass].color) },
+      marker: { color: subclassInfo[d.data[0].subclass].color },
+      hoverlabel: {
+        font: { color: subclassInfo[d.data[0].subclass].text },
+      },
       mode: 'markers',
       type: 'scatter',
       showlegend: true,
@@ -64,7 +67,7 @@ export default function Rainfall(inputData, genomeInfo) {
     autosize: true,
     height: 800,
     xaxis: {
-      title: { text: 'Chromosome', font: { size: 18 } },
+      title: { text: 'Chromosome', font: { size: 18 }, standoff: 20 },
       mirror: true,
       showline: true,
       zeroline: false,
