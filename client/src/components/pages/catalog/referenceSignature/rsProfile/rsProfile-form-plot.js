@@ -7,7 +7,7 @@ import Plotly from '../../../../controls/plotly/plot/plot';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as catalogActions } from '../../../../../services/store/catalog';
 import { actions as modalActions } from '../../../../../services/store/modal';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import Select from '../../../../controls/select/selectForm';
 import { useRsProfileOptionsQuery, useRsProfileDataQuery } from './apiSlice';
 import {
@@ -55,21 +55,6 @@ export default function ProfileFormPlot({ options, index }) {
   //const { control, setValue, watch } = useForm({ defaultValues });
   const { source, profile, matrix, signatureSetName, strategy, signatureName } =
     watch();
-
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'rsProfile',
-  });
-
-  const watchFieldArray = watch('fieldArray');
-  const controlledFields = fields.map((field, index) => {
-    return {
-      ...field,
-      ...watchFieldArray[index],
-    };
-  });
-  console.log(fields);
-  console.log(controlledFields);
 
   const supportMatrix = {
     SBS: [6, 24, 96, 192, 288, 384, 1536],
