@@ -353,8 +353,15 @@ export default function PcReference() {
           </Col>
           <Col lg="auto" className="d-flex justify-content-end">
             <Button
-              className="m-auto"
-              disabled={!profile || !sample || !signatureSet || !compare}
+              className="mt-auto"
+              disabled={
+                !profile ||
+                !sample ||
+                !signatureSet ||
+                !compare ||
+                fetchingSigSets ||
+                fetchingSigNames
+              }
               variant="primary"
               type="submit"
             >

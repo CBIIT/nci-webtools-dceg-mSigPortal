@@ -47,22 +47,18 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
 
           const spectrumData = res[0]['data'];
           const signatureData = res[1]['data'];
-          const samples = [
-            _arg.params_spectrum.sample,
-            _arg.params_signature.signatureName,
-          ];
 
           if (_arg.params_spectrum.profile === 'SBS') {
             return {
-              data: sbs96(samples, spectrumData, signatureData, 'reference'),
+              data: sbs96(spectrumData, signatureData),
             };
           } else if (_arg.params_spectrum.profile === 'DBS') {
             return {
-              data: dbs78(samples, spectrumData, signatureData, 'reference'),
+              data: dbs78(spectrumData, signatureData),
             };
           } else {
             return {
-              data: id83(samples, spectrumData, signatureData, 'reference'),
+              data: id83(spectrumData, signatureData),
             };
           }
         } catch (error) {

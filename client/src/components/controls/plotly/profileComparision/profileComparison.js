@@ -120,12 +120,11 @@ export function compareProfiles(
   // calcualte difference between samples
   const sampleDifferenceData = normalizedSample1.map((e, i) => ({
     ...e,
-    ...(e.mutations >= 0 && {
-      mutations: e.mutations - normalizedSample2[i].mutations,
-    }),
-    ...(e.contribution >= 0 && {
-      contribution: e.contribution - normalizedSample2[i].contribution,
-    }),
+    mutations:
+      (e.mutations || e.contribution || 0) -
+      (normalizedSample2[i].mutations ||
+        normalizedSample2[i].contribution ||
+        0),
   }));
   const groupDifference = groupDataByMutation(
     sampleDifferenceData,
