@@ -689,6 +689,12 @@ export default function UserForm() {
           />
         </Form.Check>
       </Form.Group>
+      <Form.Text className="text-muted">
+        <span>
+          This option is required for Clustered Mutation Identification
+          visualization analysis and will add additional calculation time.
+        </span>
+      </Form.Text>
       <hr className="mb-3" />
       <div>
         <Form.Group controlId="toggleQueue" className="d-flex">
