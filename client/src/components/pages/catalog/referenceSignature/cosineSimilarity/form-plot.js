@@ -212,13 +212,21 @@ export default function CosineSimilarityPlot() {
         </div>
 
         {plot && (
-          <Plotly
-            data={plot.traces}
-            layout={plot.layout}
-            config={plot.config}
-            originalData={plot.original}
-            filename="cosine_similarity"
-          />
+          <>
+            <Plotly
+              data={plot.traces}
+              layout={plot.layout}
+              config={plot.config}
+              originalData={plot.original}
+              filename="cosine_similarity"
+            />
+            <p className="p-3">
+              The heatmap above shows the cosine similarities between two
+              mutational signature sets given a profile type. The text on the
+              bottom and left show the signature names of the two selected
+              reference signature sets.
+            </p>
+          </>
         )}
       </div>
     </div>

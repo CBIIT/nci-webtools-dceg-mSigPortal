@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
+import { NavHashLink } from 'react-router-hash-link';
 import Plotly from '../../../../controls/plotly/plot/plot';
 import { LoadingOverlay } from '../../../../controls/loading-overlay/loading-overlay';
 import Select from '../../../../controls/select/selectForm';
@@ -228,13 +229,33 @@ export default function RsComparisonPlot() {
         </div>
 
         {plot && !plotError && (
-          <Plotly
-            data={plot.traces}
-            layout={plot.layout}
-            config={plot.config}
-            originalData={plot.original}
-            filename="cosine_similarity"
-          />
+          <>
+            <Plotly
+              data={plot.traces}
+              layout={plot.layout}
+              config={plot.config}
+              originalData={plot.original}
+              filename="cosine_similarity"
+            />
+            <div className="p-4">
+              <p>
+                The plot above shows the mutational profiles of two selected
+                signatures, as well as the difference between them. The text at
+                the top of the plot indicates the profile similarity calculated
+                using Residual Sum of Squares (RSS) and cosine similarity
+                methods.
+              </p>
+              <p>
+                Residual Sum of Squares (RSS) measures the discrepancy between
+                two mutational profiles. Cosine similarity measures how similar
+                two mutational profiles are. For example, two identical
+                mutational signatures will have RSS = 0 and Cosine similarity =
+                1. For additional information about RSS and cosine similarity,
+                click{' '}
+                <NavHashLink to="/faq#cosine-similarity">here</NavHashLink>.
+              </p>
+            </div>
+          </>
         )}
       </div>
     </div>
