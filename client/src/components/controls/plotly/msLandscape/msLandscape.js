@@ -366,6 +366,13 @@ export default function MsLandscape(cosineData, exposureData) {
   let annotations = [text];
 
   const layout = {
+    title: {
+      text: 'Landscape of Mutational Signature Activity',
+      font: {
+        family: 'Arial',
+        size: '1rem',
+      },
+    },
     autosize: true,
     height: 1200,
     barmode: 'stack',
