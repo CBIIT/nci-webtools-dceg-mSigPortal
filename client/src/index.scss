@@ -63,7 +63,7 @@ a:focus {
 
 /** Bootstrap Overrides **/
 body {
-  font-size: 12pt;
+  font-size: 1rem;
   font-family: 'Inter';
   font-weight: 400;
 }
@@ -260,7 +260,7 @@ h6 {
 
 .btn.btn-link {
   // color: rgb(0, 140, 186);
-  color: rgb(0, 126, 167);
+  color: #8e4b86;
 }
 
 .btn.btn-link:active,
@@ -336,6 +336,7 @@ a.nav-link.active {
 .catalog.nav-link.active {
   color: #4b833a !important;
   text-decoration: none;
+  border-bottom: none;
 }
 .nav-tabs .nav-link {
   border-bottom: 0;

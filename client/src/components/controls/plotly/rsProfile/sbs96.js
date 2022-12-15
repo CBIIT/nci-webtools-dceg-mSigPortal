@@ -8,7 +8,6 @@ export default function SBS96(rawData, sample, tab) {
     'T>G': '#EBC6C4',
   };
   //const { profile, matrix, sample } = args;
-  console.log(rawData);
 
   const groupByMutation = rawData.reduce((acc, e, i) => {
     const mutationRegex = /\[(.*)\]/;
