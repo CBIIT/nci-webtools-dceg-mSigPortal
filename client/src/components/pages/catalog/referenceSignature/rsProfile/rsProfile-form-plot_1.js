@@ -1,0 +1,649 @@
+import React, { useEffect, useState } from 'react';
+import { Row, Col, Button, Form } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { LoadingOverlay } from '../../../../controls/loading-overlay/loading-overlay';
+import Plotly from '../../../../controls/plotly/plot/plot';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as catalogActions } from '../../../../../services/store/catalog';
+import { actions as modalActions } from '../../../../../services/store/modal';
+import { useForm, useFieldArray } from 'react-hook-form';
+import Select from '../../../../controls/select/selectForm';
+import { useRsProfileOptionsQuery, useRsProfileDataQuery } from './apiSlice';
+import {
+  defaultProfile2,
+  defaultMatrix2,
+  defaultSignatureSet,
+  defaultStrategy,
+  defaultSignatureName,
+} from '../../../../../services/utils';
+
+const actions = { ...catalogActions, ...modalActions };
+
+export default function ProfileFormPlot() {
+  const dispatch = useDispatch();
+  const { plots: storePlots } = useSelector(
+    (state) => state.catalog.rSProfiles
+  );
+
+  const mergeState = (state) =>
+    dispatch(actions.mergeCatalog({ rSProfiles: state }));
+
+  const [params, setParams] = useState(null);
+
+  const { control, setValue, watch } = useForm({
+    defaultValues: { plots: storePlots },
+  });
+  const { source, profile, matrix, signatureSetName, strategy, signatureName } =
+    watch();
+
+  const {
+    fields: plotsFields,
+    append: addPlots,
+    remove: removePlots,
+  } = useFieldArray({
+    control,
+    name: 'plots',
+  });
+
+  console.log(plotsFields);
+
+  const supportMatrix = {
+    SBS: [6, 24, 96, 192, 288, 384, 1536],
+    DBS: [78, 186],
+    ID: [28, 83, 415],
+    RS: [32],
+    CN: [48],
+  };
+
+  const {
+    data: signatureOptions,
+    error: optionError,
+    isFetching: optionFetching,
+  } = useRsProfileOptionsQuery();
+
+  const signatureSourceOptions = signatureOptions
+    ? [...new Set(signatureOptions.map((e) => e.source))]
+        .sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))
+        .map((e) => ({
+          label: e,
+          value: e,
+        }))
+    : [];
+
+  const profileOptions = (source) =>
+    //source && signatureOptions.length
+    source
+      ? [
+          ...new Set(
+            signatureOptions
+              .filter((e) => e.source === source.value)
+              .map((e) => e.profile)
+              .sort((a, b) => a.localeCompare(b))
+          ),
+        ].map((e) => ({ label: e, value: e }))
+      : [];
+
+  const matrixOptions = (source, profile) =>
+    source && profile && signatureOptions.length
+      ? [
+          ...new Set(
+            signatureOptions
+              .filter(
+                (e) =>
+                  e.source === source.value &&
+                  e.profile === profile.value &&
+                  supportMatrix[e.profile].includes(e.matrix)
+              )
+              .map((e) => e.matrix)
+              .sort((a, b) => a - b)
+          ),
+        ].map((e) => ({ label: e, value: e }))
+      : [];
+
+  const referenceSignatureSetOption = (source, profile, matrix) =>
+    source && profile && matrix && signatureOptions.length
+      ? [
+          ...new Set(
+            signatureOptions
+              .filter(
+                (e) =>
+                  e.source === source.value &&
+                  e.profile === profile.value &&
+                  e.matrix === matrix.value
+              )
+              .map((e) => e.signatureSetName)
+            // .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+          ),
+        ].map((e) => ({ label: e, value: e }))
+      : [];
+
+  const strategyOptions = (source, profile, matrix, signatureSetName) =>
+    source && profile && matrix && signatureSetName && signatureOptions.length
+      ? [
+          ...new Set(
+            signatureOptions
+              .filter(
+                (e) =>
+                  e.source === source.value &&
+                  e.profile === profile.value &&
+                  e.matrix === matrix.value &&
+                  e.signatureSetName === signatureSetName.value
+              )
+              .map((e) => e.strategy)
+              .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+          ),
+        ].map((e) => ({ label: e, value: e }))
+      : [];
+
+  const signatureNameOptions = (
+    source,
+    profile,
+    matrix,
+    signatureSetName,
+    strategy
+  ) =>
+    source &&
+    profile &&
+    matrix &&
+    signatureSetName &&
+    strategy &&
+    signatureOptions.length
+      ? [
+          ...new Set(
+            signatureOptions
+              .filter(
+                (e) =>
+                  e.source === source.value &&
+                  e.profile === profile.value &&
+                  e.matrix === matrix.value &&
+                  e.signatureSetName === signatureSetName.value &&
+                  e.strategy === strategy.value
+              )
+              .map((e) => e.signatureName)
+              .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+          ),
+        ].map((e) => ({ label: e, value: e }))
+      : [];
+
+  function handleSource(source) {
+    const profiles = profileOptions(source);
+    const profile = defaultProfile2(profiles);
+    const matrices = matrixOptions(source, profile);
+    const matrix = defaultMatrix2(profile, matrices);
+    const signatureSetNames = referenceSignatureSetOption(
+      source,
+      profile,
+      matrix
+    );
+    const signatureSetName = defaultSignatureSet(signatureSetNames);
+    const strategies = strategyOptions(
+      source,
+      profile,
+      matrix,
+      signatureSetName
+    );
+    const strategy = defaultStrategy(strategies);
+    const signatureNames = signatureNameOptions(
+      source,
+      profile,
+      matrix,
+      signatureSetName,
+      strategy
+    );
+    const signatureName = defaultSignatureName(signatureNames);
+
+    setValue('source', source);
+    setValue('profile', profile);
+    setValue('matrix', matrix);
+    setValue('signatureSetName', signatureSetName);
+    setValue('strategy', strategy);
+    setValue('signatureName', signatureName);
+    mergeState({
+      source: source,
+      profile: profile,
+      matrix: matrix,
+      signatureSetName: signatureSetName,
+      strategy: strategy,
+      signatureName: signatureName,
+    });
+  }
+
+  function handleProfile(profile) {
+    const matrices = matrixOptions(source, profile);
+    const matrix = defaultMatrix2(profile, matrices);
+    const signatureSetNames = referenceSignatureSetOption(
+      source,
+      profile,
+      matrix
+    );
+    const signatureSetName = defaultSignatureSet(signatureSetNames);
+    const strategies = strategyOptions(
+      source,
+      profile,
+      matrix,
+      signatureSetName
+    );
+    const strategy = defaultStrategy(strategies);
+    const signatureNames = signatureNameOptions(
+      source,
+      profile,
+      matrix,
+      signatureSetName,
+      strategy
+    );
+    const signatureName = defaultSignatureName(signatureNames);
+
+    setValue('profile', profile);
+    setValue('matrix', matrix);
+    setValue('signatureSetName', signatureSetName);
+    setValue('strategy', strategy);
+    setValue('signatureName', signatureName);
+    mergeState({
+      profile,
+      matrix,
+      signatureSetName,
+      strategy,
+      signatureName,
+    });
+  }
+
+  function handleMatrix(matrix) {
+    const signatureSetNames = referenceSignatureSetOption(
+      source,
+      profile,
+      matrix
+    );
+    const signatureSetName = defaultSignatureSet(signatureSetNames);
+    const strategies = strategyOptions(
+      source,
+      profile,
+      matrix,
+      signatureSetName
+    );
+    const strategy = defaultStrategy(strategies);
+    const signatureNames = signatureNameOptions(
+      source,
+      profile,
+      matrix,
+      signatureSetName,
+      strategy
+    );
+    const signatureName = defaultSignatureName(signatureNames);
+
+    setValue('matrix', matrix);
+    setValue('signatureSetName', signatureSetName);
+    setValue('strategy', strategy);
+    setValue('signatureName', signatureName);
+    mergeState({
+      matrix,
+      signatureSetName,
+      strategy,
+      signatureName,
+    });
+  }
+
+  function handleSet(signatureSetName) {
+    const strategies = strategyOptions(
+      source,
+      profile,
+      matrix,
+      signatureSetName
+    );
+    const strategy = defaultStrategy(strategies);
+    const signatureNames = signatureNameOptions(
+      source,
+      profile,
+      matrix,
+      signatureSetName,
+      strategy
+    );
+    const signatureName = defaultSignatureName(signatureNames);
+
+    setValue('signatureSetName', signatureSetName);
+    setValue('strategy', strategy);
+    setValue('signatureName', signatureName);
+
+    mergeState({
+      signatureSetName,
+      strategy,
+      signatureName,
+    });
+  }
+
+  function handleStrategy(strategy) {
+    const signatureNames = signatureNameOptions(
+      source,
+      profile,
+      matrix,
+      signatureSetName,
+      strategy
+    );
+    const signatureName = defaultSignatureName(signatureNames);
+    setValue('strategy', strategy);
+    setValue('signatureName', signatureName);
+
+    mergeState({
+      strategy,
+      signatureName,
+    });
+  }
+
+  function handleName(signatureName) {
+    setValue('signatureName', signatureName);
+    mergeState({
+      signatureName,
+    });
+  }
+  // set inital source
+  useEffect(() => {
+    if (!source && signatureSourceOptions.length)
+      handleSource(signatureSourceOptions[0]);
+  }, [signatureSourceOptions]);
+
+  // get data on form change
+  useEffect(() => {
+    if (
+      source?.value &&
+      profile?.value &&
+      matrix?.value &&
+      signatureSetName?.value &&
+      strategy?.value &&
+      signatureName?.value
+    ) {
+      const params = {
+        source: source.value,
+        profile: profile.value,
+        matrix: matrix.value,
+        signatureSetName: signatureSetName.value,
+        strategy: strategy.value,
+        signatureName: signatureName.value,
+      };
+
+      setParams(params);
+    }
+  }, [source, profile, matrix, signatureSetName, strategy, signatureName]);
+
+  const {
+    data: plotdata,
+    error: plotError,
+    isFetching: plotFetching,
+  } = useRsProfileDataQuery(params, {
+    skip: !params,
+  });
+
+  // function addPlots() {
+  //   mergeRsProfiles({
+  //     plots: [
+  //       ...plots,
+  //       {
+  //         source: '',
+  //         profile: '',
+  //         matrix: '',
+  //         signatureSetName: '',
+  //         strategy: '',
+  //         signatureName: '',
+  //       },
+  //     ],
+  //   });
+  // }
+  //console.log(refSigData);
+  // function addPlots() {
+  //   console.log(index);
+  //   console.log(plots);
+  //   console.log(plots.length);
+  //   const signatureSource = {
+  //     label: 'Reference_signatures',
+  //     value: 'Reference_signatures',
+  //   };
+  //   const profiles = profileOptions(signatureSource);
+
+  //   console.log(profiles);
+  //   const profile = defaultProfile2(profiles);
+
+  //   const matrices = matrixOptions(source, profile);
+  //   const matrix = defaultMatrix2(profile, matrices);
+  //   const signatureSetNames = referenceSignatureSetOption(
+  //     source,
+  //     profile,
+  //     matrix
+  //   );
+  //   const signatureSetName = defaultSignatureSet(signatureSetNames);
+  //   const strategies = strategyOptions(
+  //     source,
+  //     profile,
+  //     matrix,
+  //     signatureSetName
+  //   );
+  //   const strategy = defaultStrategy(strategies);
+  //   const signatureNames = signatureNameOptions(
+  //     source,
+  //     profile,
+  //     matrix,
+  //     signatureSetName,
+  //     strategy
+  //   );
+  //   const signatureName = defaultSignatureName(signatureNames);
+
+  //   mergeRsProfiles({
+  //     plots: [
+  //       ...plots,
+  //       {
+  //         source: signatureSource,
+  //         profile: profile,
+  //         matrix: matrix,
+  //         signatureSetName: signatureSetName,
+  //         strategy: strategy,
+  //         signatureName: signatureName,
+  //         index: plots.length,
+  //       },
+  //     ],
+  //   });
+  // }
+  //console.log(plots);
+  //console.log('----');
+  // function removePlots(index) {
+  //   //if (plots[index.plotURL]) Object.revokeObjectURL(plots[index].plotURL);
+  //   console.log('index: -- ');
+  //   console.log(index);
+  //   //console.log(plots);
+  //   let newPlots = plots.slice();
+  //   //console.log(newPlots);
+  //   //newPlots.splice(index, 1);
+  //   console.log(newPlots);
+  //   const removed = newPlots.splice(index, 1);
+  //   console.log(removed);
+
+  //   mergeRsProfiles({ plots: newPlots });
+  // }
+
+  const customStyles = {
+    control: (base, state) => ({
+      ...base,
+      background: '#f1e4ef',
+      // match with the menu
+      borderRadius: state.isFocused ? '3px 3px 0 0' : 3,
+      // Overwrittes the different states of border
+      borderColor: state.isFocused ? '#f1e4ef' : '#8e4b86',
+      // Removes weird border around container
+      boxShadow: state.isFocused ? null : null,
+      '&:hover': {
+        // Overwrittes the different states of border
+        borderColor: state.isFocused ? '#8e4b86' : '#f1e4ef',
+      },
+    }),
+    menu: (base) => ({
+      ...base,
+      // override border radius to match the box
+      borderRadius: 0,
+      // kill the gap
+      marginTop: 0,
+    }),
+    menuList: (base) => ({
+      ...base,
+      // kill the white space on first and last option
+      padding: 0,
+    }),
+  };
+  return (
+    <div>
+      {plotsFields.map((item, index) => (
+        <div key={index}>
+          <Form className="p-3">
+            <LoadingOverlay active={plotFetching} />
+
+            <Row className="">
+              <Col lg="auto">
+                <Select
+                  name="source"
+                  label="Signature Source"
+                  value={source}
+                  options={signatureSourceOptions}
+                  control={control}
+                  onChange={handleSource}
+                  styles={customStyles}
+                />
+              </Col>
+              <Col lg="auto">
+                <Select
+                  name="profile"
+                  label="Profile Name"
+                  value={profile}
+                  options={profileOptions(source)}
+                  control={control}
+                  onChange={handleProfile}
+                  styles={customStyles}
+                />
+              </Col>
+              <Col lg="auto">
+                <Select
+                  name="matrix"
+                  label="Matrix"
+                  value={matrix}
+                  options={matrixOptions(source, profile)}
+                  control={control}
+                  onChange={handleMatrix}
+                  styles={customStyles}
+                />
+              </Col>
+              <Col lg="auto">
+                <Select
+                  name="signatureSetName"
+                  label="Reference Signature Set"
+                  value={signatureSetName}
+                  options={referenceSignatureSetOption(source, profile, matrix)}
+                  control={control}
+                  onChange={handleSet}
+                  styles={customStyles}
+                />
+              </Col>
+              <Col lg="auto">
+                <Select
+                  name="strategy"
+                  label="Experimental Strategy"
+                  value={strategy}
+                  options={strategyOptions(
+                    source,
+                    profile,
+                    matrix,
+                    signatureSetName
+                  )}
+                  control={control}
+                  onChange={handleStrategy}
+                  styles={customStyles}
+                />
+              </Col>
+              <Col lg="auto">
+                <Select
+                  name="signatureName"
+                  label="Signature Name"
+                  value={signatureName}
+                  options={signatureNameOptions(
+                    source,
+                    profile,
+                    matrix,
+                    signatureSetName,
+                    strategy
+                  )}
+                  control={control}
+                  onChange={handleName}
+                  styles={customStyles}
+                />
+              </Col>
+            </Row>
+            {/* <AdditionalControls /> */}
+            <Row className="mt-3">
+              {index != 0 ? (
+                <Col md="auto" className="d-flex">
+                  <Button
+                    className="ml-auto"
+                    variant="link"
+                    onClick={() => removePlots(index)}
+                    title={'Remove Plot ' + (parseInt(index) + 1)}
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <span className="text-nowrap" title="Remove Plot">
+                      <FontAwesomeIcon icon={faMinus} /> Remove Plot
+                    </span>{' '}
+                    {/* {parseInt(index) + 1} */}
+                  </Button>
+                </Col>
+              ) : (
+                <Col md="auto" className="d-flex"></Col>
+              )}
+            </Row>
+          </Form>
+
+          <div id="plot">
+            <div
+              style={{ display: plotError || optionError ? 'block' : 'none' }}
+            >
+              <p>An error has occured. Please verify your input.</p>
+            </div>
+
+            {plotdata && (
+              <Plotly
+                data={plotdata.traces}
+                layout={plotdata.layout}
+                config={plotdata.config}
+                divId="mutationalProfilePlot"
+                filename={source?.value || 'Mutational Profile'}
+              />
+            )}
+            <Row className="mr-3">
+              {index === plotsFields.length - 1 ? (
+                <Col className="d-flex justify-content-end">
+                  <Button
+                    className="ml-auto"
+                    variant="link"
+                    onClick={() =>
+                      addPlots({
+                        source: '',
+                        profile: '',
+                        matrix: '',
+                        signatureSetName: '',
+                        strategy: '',
+                        signatureName: '',
+                      })
+                    }
+                    title="Add Plot"
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <span className="text-nowrap" title="Add Plot">
+                      <FontAwesomeIcon icon={faPlus} /> Add Plot
+                    </span>
+                  </Button>
+                </Col>
+              ) : (
+                <Col></Col>
+              )}
+            </Row>
+          </div>
+
+          <hr></hr>
+          {/* {additionalPlots()} */}
+        </div>
+      ))}
+    </div>
+  );
+}
