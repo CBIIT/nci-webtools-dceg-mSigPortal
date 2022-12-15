@@ -1,5 +1,5 @@
 import Description from '../../../../controls/description/description';
-import RsProfileFormPlot from './rsProfile-form-plot_0';
+import RsProfileFormPlot from './rsProfile-form-plot';
 import { useSelector, useDispatch } from 'react-redux';
 
 export default function RsProfile() {

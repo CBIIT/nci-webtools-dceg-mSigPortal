@@ -58,8 +58,18 @@ export default function ProfileFormPlot({ options, index }) {
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'test',
+    name: 'rsProfile',
   });
+
+  const watchFieldArray = watch('fieldArray');
+  const controlledFields = fields.map((field, index) => {
+    return {
+      ...field,
+      ...watchFieldArray[index],
+    };
+  });
+  console.log(fields);
+  console.log(controlledFields);
 
   const supportMatrix = {
     SBS: [6, 24, 96, 192, 288, 384, 1536],
