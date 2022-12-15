@@ -76,15 +76,7 @@ export default function InputForm() {
     formState: { errors },
   } = useForm({ defaultValues });
 
-  const {
-    source,
-    study,
-    cancer,
-    inputFile,
-    exome,
-    signatureSetName,
-    useQueue,
-  } = watch();
+  const { source, study, cancer, inputFile, exome, signatureSetName } = watch();
 
   function handleReset() {
     window.location.hash = '#/extraction';
@@ -375,7 +367,7 @@ export default function InputForm() {
           )}
         />
       </Form.Group>
-      <Form.Group>
+      <Form.Group controlId="contextType">
         <Form.Label>Context Type</Form.Label>
         <Form.Control {...register('contextType')} defaultValue="default" />
       </Form.Group>
@@ -409,98 +401,86 @@ export default function InputForm() {
         variant="link"
         onClick={(_) => setShowAdvanced(!showAdvanced)}
       >
-        Advanced Parameters +
+        Advanced Parameters {showAdvanced ? '-' : '+'}
       </Button>
 
       <div className={showAdvanced ? 'd-block' : 'd-none'}>
-        <Form.Label>Execution</Form.Label>
-        <Form.Group>
-          <Form.Label>CPU</Form.Label>
-          <Form.Control {...register('cpu')} type="number" defaultValue={2} />
-        </Form.Group>
-        <Form.Group>
-          <Form.Check
-            {...register('gpu')}
-            id="gpu"
-            label="GPU"
-            defaultChecked={false}
-          />
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>Batch Size</Form.Label>
-          <Form.Control
-            {...register('batchSize')}
-            type="number"
-            defaultValue={1}
-          />
-        </Form.Group>
-        <hr />
-        <Form.Label>NMF Replicates</Form.Label>
-        <Form.Group>
-          <Form.Label>Minimum Signatures</Form.Label>
-          <Form.Control
-            {...register('minSignatures')}
-            type="number"
-            defaultValue={1}
-          />
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>Maximum Signatures</Form.Label>
-          <Form.Control
-            {...register('maxSignatures')}
-            type="number"
-            defaultValue={15}
-          />
-        </Form.Group>
-        <Form.Group>
-          <Form.Group>
-            <Form.Label>NMF Replicates Size</Form.Label>
+        <fieldset className="border rounded p-2 mb-3">
+          <legend className="font-weight-bold">Execution</legend>
+          <Form.Group controlId="batchSize">
+            <Form.Label>Batch Size</Form.Label>
+            <Form.Control
+              {...register('batchSize')}
+              type="number"
+              defaultValue={1}
+            />
+          </Form.Group>
+        </fieldset>
+        <fieldset className="border rounded p-2">
+          <legend className="font-weight-bold">NMF Replicates</legend>
+          <Form.Group controlId="minSignatures">
+            <Form.Label>Minimum Signatures</Form.Label>
             <Form.Control
               {...register('minSignatures')}
+              type="number"
+              defaultValue={1}
+            />
+          </Form.Group>
+          <Form.Group controlId="maxSignatures">
+            <Form.Label>Maximum Signatures</Form.Label>
+            <Form.Control
+              {...register('maxSignatures')}
+              type="number"
+              defaultValue={15}
+            />
+          </Form.Group>
+          <Form.Group controlId="nmfReplicates">
+            <Form.Label>NMF Replicates Size</Form.Label>
+            <Form.Control
+              {...register('nmfReplicates')}
               type="number"
               defaultValue={100}
             />
           </Form.Group>
-          <Form.Check
-            {...register('resample')}
-            label="Resamples"
-            id="resample"
-            defaultChecked={true}
-          />
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>Seed</Form.Label>
-          <Form.Control {...register('seed')} />
-        </Form.Group>
+          <Form.Group controlId="resample">
+            <Form.Check
+              {...register('resample')}
+              label="Resamples"
+              id="resample"
+              defaultChecked={true}
+            />
+          </Form.Group>
+          <Form.Group controlId="seed">
+            <Form.Label>Seed</Form.Label>
+            <Form.Control {...register('seed')} />
+          </Form.Group>
+        </fieldset>
       </div>
 
       <hr className="mb-3" />
       <div>
         <Form.Group controlId="toggleQueue" className="d-flex">
-          <Form.Label className="mr-auto">
-            Submit this job to a Queue
-          </Form.Label>{' '}
-          <Form.Check inline>
-            <Controller
-              name="useQueue"
-              control={control}
-              render={({ field }) => (
-                <Form.Check.Input
-                  {...field}
-                  type="checkbox"
-                  // disabled={submitted}
-                  disabled={true}
-                />
-              )}
-            />
-          </Form.Check>
+          <Controller
+            name="useQueue"
+            control={control}
+            render={({ field }) => (
+              <Form.Check
+                {...field}
+                id="useQueue"
+                type="checkbox"
+                label="Long Running Job"
+                checked={true}
+                disabled={true}
+              />
+            )}
+          />
         </Form.Group>
         <Form.Group controlId="email">
           <Controller
             name="email"
             control={control}
             rules={{
-              required: useQueue,
+              required: true,
               pattern:
                 /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
             }}
@@ -511,19 +491,16 @@ export default function InputForm() {
                 placeholder="Enter Email"
                 size="sm"
                 type="email"
-                disabled={!useQueue || submitted}
+                disabled={submitted}
                 isInvalid={errors.email}
               />
             )}
           />
           <Form.Control.Feedback type="invalid">
-            {errors.email && 'Please provide a valid email'}
+            {errors.email && 'Email required'}
           </Form.Control.Feedback>
           <Form.Text className="text-muted">
-            <i>
-              Note: If sending to queue, when computation is completed, a
-              notification will be sent to the e-mail entered above.
-            </i>
+            <i>You will receive an email when your job is complete</i>
           </Form.Text>
         </Form.Group>
       </div>
