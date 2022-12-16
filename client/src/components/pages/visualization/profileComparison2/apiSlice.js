@@ -1,5 +1,6 @@
 import { visualizationApiSlice } from '../../../../services/store/rootApi';
 import sbs96 from '../../../controls/plotly/profileComparision/sbs96';
+import sbs192 from '../../../controls/plotly/profileComparision/sbs192';
 import dbs78 from '../../../controls/plotly/profileComparision/dbs78';
 import id83 from '../../../controls/plotly/profileComparision/id83';
 
@@ -11,22 +12,22 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
         params,
       }),
       transformResponse: (data, meta, arg) => {
-        // get samples from sample array args
+        // get samples from sample array _arg
         const [sample1, sample2] = arg.sample.split(';');
         // filter api data by samples
-        const data1 = data.filter(
+        const userData = data.filter(
           (e) => e.sample == sample1 || e.signatureName == sample1
         );
-        const data2 = data.filter(
+        const publicData = data.filter(
           (e) => e.sample == sample2 || e.signatureName == sample2
         );
 
         if (arg.profile === 'SBS') {
-          return sbs96(data1, data2);
+          return sbs96(userData, publicData);
         } else if (arg.profile === 'DBS') {
-          return dbs78(data1, data2);
+          return dbs78(userData, publicData);
         } else if (arg.profile == 'ID') {
-          return id83(data1, data2);
+          return id83(userData, publicData);
         } else throw Error(`Profile ${arg.profile} is not supported`);
       },
     }),
@@ -69,19 +70,31 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
 
     profileComparisonPublic: builder.query({
       async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
+        const { profile, matrix } = _arg.userParams;
+
         try {
-          const [userData, publicData] = await Promise.all([
+          const [{ data: userData }, { data: publicData }] = await Promise.all([
             fetchWithBQ(
               '/mutational_spectrum?' + new URLSearchParams(_arg.userParams)
-            ), //seqmatrix
+            ),
             fetchWithBQ(
               '/mutational_spectrum?' + new URLSearchParams(_arg.publicParams)
             ),
           ]);
 
-          return { data: { userData, publicData } };
+          if (profile == 'SBS' && matrix == '96')
+            return { data: sbs96(userData, publicData) };
+          else if (profile == 'SBS' && matrix == '192')
+            return { data: sbs192(userData, publicData) };
+          else if (profile == 'DBS')
+            return { data: dbs78(userData, publicData) };
+          else if (profile == 'ID') return { data: id83(userData, publicData) };
+          else
+            throw Error(
+              `Profile/Matrix: ${profile}/${matrix} is not supported`
+            );
         } catch (error) {
-          return { error };
+          return { error: error };
         }
       },
     }),

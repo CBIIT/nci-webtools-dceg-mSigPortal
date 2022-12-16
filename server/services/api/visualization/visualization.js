@@ -11,10 +11,12 @@ const {
 async function querySeqmatrix(req, res, next) {
   try {
     const { limit, offset, rowMode, userId, ...query } = req.query;
-    const { study, cancer, strategy } = query;
-    if (!userId && (!study || !cancer || !strategy)) {
-      throw 'Missing one or more of the following parameters: study, cancer, strategy';
-    }
+    // const { study, cancer, strategy } = query;
+    // if (!userId && (!study || !cancer || !strategy)) {
+    //   throw Error(
+    //     'Missing one or more of the following parameters: study, cancer, strategy'
+    //   );
+    // }
 
     const connection = userId
       ? req.app.locals.sqlite(userId, 'visualization')

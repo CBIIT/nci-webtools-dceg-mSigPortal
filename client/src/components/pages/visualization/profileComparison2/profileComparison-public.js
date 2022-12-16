@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { NavHashLink } from 'react-router-hash-link';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions } from '../../../../services/store/visualization';
-import { useProfileComparisonWithinQuery } from './apiSlice';
+import { useProfileComparisonPublicQuery } from './apiSlice';
 import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plotly from '../../../controls/plotly/plot/plot';
@@ -16,16 +16,16 @@ export default function PcPublic() {
   const mergeForm = (state) =>
     dispatch(
       actions.mergeVisualization({
-        profileComparison: { ...store.profileComparison, withinForm: state },
+        profileComparison: { ...store.profileComparison, publicForm: state },
       })
     );
 
   const { matrixData, projectID } = store.main;
-  const { withinForm } = store.profileComparison;
+  const { publicForm } = store.profileComparison;
 
   const [params, setParams] = useState(null);
 
-  const { data, error, isFetching } = useProfileComparisonWithinQuery(params, {
+  const { data, error, isFetching } = useProfileComparisonPublicQuery(params, {
     skip: !params,
   });
 
@@ -60,12 +60,14 @@ export default function PcPublic() {
     }
   };
 
-  function sampleOptions(profile) {
-    return matrixData && profile
+  function publicSampleOptions(study, cancer) {
+    return publicOptions && study && cancer
       ? [
           ...new Set(
-            matrixData
-              .filter((e) => e.profile === profile.value)
+            publicOptions
+              .filter(
+                (e) => e.study === study.value && e.cancer === cancer.value
+              )
               .map((e) => e.sample)
               .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
           ),
@@ -77,90 +79,110 @@ export default function PcPublic() {
   }
 
   const { control, handleSubmit, watch, setValue } = useForm({
-    defaultValues: withinForm,
+    defaultValues: publicForm,
   });
 
-  const { profile, matrix, sample, study, cancer, publicSample } = watch();
+  const { profile, matrix, userSample, study, cancer, publicSample } = watch();
+
+  const supportedProfiles = ['SBS', 'DBS', 'ID'];
+  const supportedMatrices = [96, 192, 78, 83];
 
   const profileOptions = matrixData.length
     ? [
         ...new Set(
           matrixData.map((e) => e.profile).sort((a, b) => b.localeCompare(a))
         ),
-      ].map((e) => ({
-        label: e,
-        value: e,
-      }))
+      ]
+        .filter((e) => supportedProfiles.includes(e))
+        .map((e) => ({
+          label: e,
+          value: e,
+        }))
     : [];
+
+  const matrixOptions = (profile) =>
+    matrixData.length && profile
+      ? [
+          ...new Set(
+            matrixData
+              .filter((e) => e.profile == profile.value)
+              .map((e) => e.matrix)
+          ),
+        ]
+          .filter((e) => supportedMatrices.includes(e))
+          .sort((a, b) => a - b)
+          .map((e) => ({
+            label: e,
+            value: e,
+          }))
+      : [];
+
+  const userSampleOptions = (profile, matrix) =>
+    matrixData.length && profile
+      ? [
+          ...new Set(
+            matrixData
+              .filter(
+                (e) => e.profile == profile.value && e.matrix == matrix.value
+              )
+              .map((e) => e.sample)
+          ),
+        ].map((e) => ({
+          label: e,
+          value: e,
+        }))
+      : [];
 
   // set inital parameters
   useEffect(() => {
     if (!profile && profileOptions.length) handleProfile(profileOptions[0]);
   }, [profileOptions]);
+  useEffect(() => {
+    if (!study && studyOptions.length) handleStudy(studyOptions[0]);
+  }, [studyOptions]);
+
+  function handleProfile(profile) {
+    const matrices = matrixOptions(profile);
+    setValue('profile', profile);
+    handleMatrix(profile, matrices[0]);
+  }
+
+  function handleMatrix(profile, matrix) {
+    const samples = userSampleOptions(profile, matrix);
+    setValue('matrix', matrix);
+    setValue('userSample', samples[0]);
+  }
+
+  function handleStudy(study) {
+    const cancers = cancerOptions(study);
+    setValue('study', study);
+    handleCancer(study, cancers[0]);
+  }
+
+  function handleCancer(study, cancer) {
+    const samples = publicSampleOptions(study, cancer);
+    setValue('cancer', cancer);
+    setValue('publicSample', samples[0]);
+  }
 
   function onSubmit(data) {
-    mergeForm(data);
-    const params = {
-      userParams: {
-        userId: projectID,
-        profile: data.profile.value,
-        matrix:
-          data.profile.value === 'SBS'
-            ? '96'
-            : data.profile.value === 'DBS'
-            ? '78'
-            : '83',
-        sample: data.sample.value,
-      },
-      publicParams: {
-        study: data.study.value,
-        cancer: data.cancer.value,
-        sample: data.publicSample.value,
-      },
+    const userParams = {
+      profile: data.profile.value,
+      matrix: data.matrix.value,
+      sample: data.userSample.value,
+      userId: projectID,
     };
-    setParams(params);
+    const publicParams = {
+      profile: data.profile.value,
+      matrix: data.matrix.value,
+      study: data.study.value,
+      cancer: data.cancer.value,
+      sample: data.publicSample.value,
+    };
+    setParams({ userParams, publicParams });
+    mergeForm(data);
   }
 
-  function handleProfile(e) {
-    const samples = sampleOptions(e);
-
-    setValue('profile', e);
-    if (samples.length) {
-      setValue('sample1', samples[0]);
-      samples.length > 1
-        ? setValue('sample2', samples[1])
-        : setValue('sample2', samples[0]);
-    }
-  }
-
-  const customStyles = {
-    control: (base, state) => ({
-      ...base,
-      background: '#f1e4ef',
-      // match with the menu
-      borderRadius: state.isFocused ? '3px 3px 0 0' : 3,
-      // Overwrittes the different states of border
-      borderColor: state.isFocused ? '#f1e4ef' : '#8e4b86',
-      // Removes weird border around container
-      boxShadow: state.isFocused ? null : null,
-      '&:hover': {
-        // Overwrittes the different states of border
-        borderColor: state.isFocused ? '#8e4b86' : '#f1e4ef',
-      },
-    }),
-    menu: (base) => ({
-      ...base,
-      // override border radius to match the box
-      borderRadius: 0,
-      // kill the gap
-      marginTop: 0,
-    }),
-    menuList: (base) => ({
-      ...base,
-      // kill the white space on first and last option
-      padding: 0,
-    }),
-  };
   return (
     <div>
       <p className="p-3 m-0">
@@ -182,27 +204,25 @@ export default function PcPublic() {
               options={profileOptions}
               onChange={handleProfile}
               control={control}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
             <Select
-              disabled={true}
+              disabled={isFetching}
               name="matrix"
-              label="Sample Matrix size"
-              options={[]}
+              label="Matrix size"
+              options={matrixOptions(profile)}
+              onChange={(e) => handleMatrix(profile, e)}
               control={control}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
             <Select
-              disabled={!sampleOptions(profile).length}
-              name="sample"
-              label="Sample Name"
-              options={sampleOptions(profile)}
+              disabled={!userSampleOptions(profile, matrix)}
+              name="userSample"
+              label="Sample"
+              options={userSampleOptions(profile, matrix)}
               control={control}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -210,8 +230,8 @@ export default function PcPublic() {
               name="study"
               label="Study"
               options={studyOptions}
+              onChange={handleStudy}
               control={control}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -219,24 +239,30 @@ export default function PcPublic() {
               name="cancer"
               label="Cancer Type or Gorup"
               options={cancerOptions(study)}
+              onChange={(e) => handleCancer(study, e)}
               control={control}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
             <Select
-              disabled={sampleOptions.length < 2}
-              name="sample"
+              disabled={!publicSampleOptions(study, cancer)}
+              name="publicSample"
               label="Sample Name"
-              options={sampleOptions(study, cancer)}
+              options={publicSampleOptions(study, cancer)}
               control={control}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto" className="d-flex">
             <Button
               className="mt-auto mb-3"
-              disabled={!profile || !sample || !publicSample}
+              disabled={
+                !profile ||
+                !matrix ||
+                !userSample ||
+                !study ||
+                !cancer ||
+                !publicSample
+              }
               variant="primary"
               type="submit"
             >
@@ -244,19 +270,14 @@ export default function PcPublic() {
             </Button>
           </Col>
         </Row>
-        {sampleOptions.length < 2 && (
-          <Row>
-            <Col>Unavailable - More than one Sample Required</Col>
-          </Row>
-        )}
       </Form>
-      <div id="pcWithinPlot">
+      <div id="plot">
         {error && (
           <>
             <hr />
             <div className="p-3">
               <p>An error has occured. Please verify your input.</p>
-              <p>{error.data}</p>
+              <p>{error.data || error.message || error}</p>
             </div>
           </>
         )}
@@ -271,11 +292,11 @@ export default function PcPublic() {
             />
             <div className="p-3">
               <p>
-                The plot above shows the mutational profiles of two selected
-                samples, as well as the difference between them. The text at the
-                top of the plot indicates the profile similarity calculated
-                using Residual Sum of Squares (RSS) and cosine similarity
-                methods.
+                The plot above shows the mutational profile of the input sample,
+                the sample from the selected public data, and the difference
+                between them. The text on the top of the plot indicates the
+                profile similarity calculated using Residual Sum of Squares
+                (RSS) and cosine similarity methods.
               </p>
               <p>
                 RSS measures the discrepancy between two mutational profiles.
