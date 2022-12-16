@@ -76,7 +76,15 @@ export default function InputForm() {
     formState: { errors },
   } = useForm({ defaultValues });
 
-  const { source, study, cancer, inputFile, exome, signatureSetName } = watch();
+  const {
+    source,
+    study,
+    cancer,
+    inputFile,
+    exome,
+    signatureSetName,
+    minSignatures,
+  } = watch();
 
   function handleReset() {
     window.location.hash = '#/extraction';
@@ -346,7 +354,7 @@ export default function InputForm() {
 
       <Select
         name="genome"
-        label="Referencee Genome Build"
+        label="Reference Genome Build"
         disabled={submitted}
         options={genomeOptions}
         control={control}
@@ -373,7 +381,7 @@ export default function InputForm() {
       </Form.Group>
       <Select
         name="signatureSetName"
-        label="Referencee Signature Set"
+        label="Reference Signature Set"
         disabled={submitted}
         options={signatureSetOptions}
         control={control}
@@ -423,6 +431,8 @@ export default function InputForm() {
             <Form.Control
               {...register('minSignatures')}
               type="number"
+              min="1"
+              max="25"
               defaultValue={1}
             />
           </Form.Group>
@@ -431,6 +441,8 @@ export default function InputForm() {
             <Form.Control
               {...register('maxSignatures')}
               type="number"
+              min="1"
+              max="25"
               defaultValue={15}
             />
           </Form.Group>
@@ -439,6 +451,8 @@ export default function InputForm() {
             <Form.Control
               {...register('nmfReplicates')}
               type="number"
+              min="1"
+              max="1000"
               defaultValue={100}
             />
           </Form.Group>
@@ -452,7 +466,7 @@ export default function InputForm() {
           </Form.Group>
           <Form.Group controlId="seed">
             <Form.Label>Seed</Form.Label>
-            <Form.Control {...register('seed')} />
+            <Form.Control {...register('seed')} defaultValue="random" />
           </Form.Group>
         </fieldset>
       </div>
