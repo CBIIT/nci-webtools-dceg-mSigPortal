@@ -5,41 +5,126 @@ import { useForm } from 'react-hook-form';
 import { NavHashLink } from 'react-router-hash-link';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions } from '../../../../services/store/visualization';
-import { useProfileComparisonWithinQuery } from './apiSlice';
-import { useSeqmatrixOptionsQuery } from '../publicForm/apiSlice';
+import { useProfileComparisonPublicQuery } from './apiSlice';
+import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import SvgContainer from '../../../controls/svgContainer/svgContainer';
-import { defaultMatrix } from '../../../../services/utils';
+import Plotly from '../../../controls/plotly/plot/plot';
 
-export default function PcWithin() {
+export default function PcPublic() {
   const dispatch = useDispatch();
   const store = useSelector((state) => state.visualization);
   const mergeForm = (state) =>
     dispatch(
       actions.mergeVisualization({
-        profileComparison: { ...store.profileComparison, withinForm: state },
+        profileComparison: { ...store.profileComparison, publicForm: state },
       })
     );
 
-  const { study, cancer, strategy } = store.publicForm;
-  const { source, svgList, matrixList, projectID } = store.main;
-  const { withinForm } = store.profileComparison;
+  const { matrixData, projectID } = store.main;
+  const { publicForm } = store.profileComparison;
 
   const [params, setParams] = useState(null);
 
-  //   const { data: publicData } = useSeqmatrixOptionsQuery({
-  //     skip: source == 'user',
-  //   });
-  const { data, error, isFetching } = useProfileComparisonWithinQuery(params, {
+  const { data, error, isFetching } = useProfileComparisonPublicQuery(params, {
     skip: !params,
   });
 
-  const getSampleOptions = (profile) =>
-    svgList && profile
+  const { data: publicOptions, isFetching: fetchingPublicOptions } =
+    useSeqmatrixOptionsQuery();
+
+  const studyOptions = publicOptions
+    ? [...new Set(publicOptions.map((e) => e.study))].sort().map((e) => ({
+        label: e,
+        value: e,
+      }))
+    : [];
+
+  const cancerOptions = (study) => {
+    if (publicOptions && study?.value) {
+      return [
+        ...[
+          ...new Set(
+            publicOptions
+              .filter((e) => e.study == study.value)
+              .map((e) => e.cancer)
+          ),
+        ]
+          .sort()
+          .map((e) => ({
+            label: e,
+            value: e,
+          })),
+      ];
+    } else {
+      return [];
+    }
+  };
+
+  function publicSampleOptions(study, cancer) {
+    return publicOptions && study && cancer
       ? [
           ...new Set(
-            svgList
+            publicOptions
+              .filter(
+                (e) => e.study === study.value && e.cancer === cancer.value
+              )
+              .map((e) => e.sample)
+              .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+          ),
+        ].map((e) => ({
+          label: e,
+          value: e,
+        }))
+      : [];
+  }
+
+  const { control, handleSubmit, watch, setValue } = useForm({
+    defaultValues: publicForm,
+  });
+
+  const { profile, matrix, userSample, study, cancer, publicSample } = watch();
+
+  const supportedProfiles = ['SBS', 'DBS', 'ID'];
+  const supportedMatrices = [96, 192, 78, 83];
+
+  const profileOptions = matrixData.length
+    ? [
+        ...new Set(
+          matrixData.map((e) => e.profile).sort((a, b) => b.localeCompare(a))
+        ),
+      ]
+        .filter((e) => supportedProfiles.includes(e))
+        .map((e) => ({
+          label: e,
+          value: e,
+        }))
+    : [];
+
+  const matrixOptions = (profile) =>
+    matrixData.length && profile
+      ? [
+          ...new Set(
+            matrixData
               .filter((e) => e.profile == profile.value)
+              .map((e) => e.matrix)
+          ),
+        ]
+          .filter((e) => supportedMatrices.includes(e))
+          .sort((a, b) => a - b)
+          .map((e) => ({
+            label: e,
+            value: e,
+          }))
+      : [];
+
+  const userSampleOptions = (profile, matrix) =>
+    matrixData.length && profile
+      ? [
+          ...new Set(
+            matrixData
+              .filter(
+                (e) => e.profile == profile.value && e.matrix == matrix.value
+              )
               .map((e) => e.sample)
           ),
         ].map((e) => ({
@@ -48,79 +133,63 @@ export default function PcWithin() {
         }))
       : [];
 
-  const { control, handleSubmit, watch, setValue } = useForm({
-    defaultValues: withinForm,
-  });
-
-  const { profile, sample1, sample2 } = watch();
-
-  const profileOptions = svgList.length
-    ? [...new Set(svgList.map((e) => e.profileType))].map((e) => ({
-        label: e,
-        value: e,
-      }))
-    : [];
-
-  const sampleOptions = getSampleOptions(profile);
-
   // set inital parameters
   useEffect(() => {
     if (!profile && profileOptions.length) handleProfile(profileOptions[0]);
   }, [profileOptions]);
+  useEffect(() => {
+    if (!study && studyOptions.length) handleStudy(studyOptions[0]);
+  }, [studyOptions]);
 
-  function onSubmit(data) {
-    mergeForm(data);
-
-    const params =
-      source == 'user'
-        ? {
-            fn: 'profileComparisonWithin',
-            args: {
-              profileType: data.profile.value,
-              sampleName1: data.sample1.value,
-              sampleName2: data.sample2.value,
-              matrixFile: matrixList.filter(
-                (row) =>
-                  row.profileType == data.profile.value &&
-                  row.matrixSize ==
-                    defaultMatrix(data.profile.value, ['96', '78', '83'])
-              )[0].Path,
-            },
-            projectID,
-          }
-        : {
-            fn: 'profileComparisonWithinPublic',
-            args: {
-              profileType: data.profile.value,
-              sampleName1: data.sample1.value,
-              sampleName2: data.sample2.value,
-              study: study.value,
-              cancerType: cancer.value,
-              experimentalStrategy: strategy.value,
-            },
-            projectID,
-          };
-    setParams(params);
+  function handleProfile(profile) {
+    const matrices = matrixOptions(profile);
+    setValue('profile', profile);
+    handleMatrix(profile, matrices[0]);
   }
 
-  function handleProfile(e) {
-    const samples = getSampleOptions(e);
+  function handleMatrix(profile, matrix) {
+    const samples = userSampleOptions(profile, matrix);
+    setValue('matrix', matrix);
+    setValue('userSample', samples[0]);
+  }
 
-    setValue('profile', e);
-    if (samples.length) {
-      setValue('sample1', samples[0]);
-      samples.length > 1
-        ? setValue('sample2', samples[1])
-        : setValue('sample2', samples[0]);
-    }
+  function handleStudy(study) {
+    const cancers = cancerOptions(study);
+    setValue('study', study);
+    handleCancer(study, cancers[0]);
+  }
+
+  function handleCancer(study, cancer) {
+    const samples = publicSampleOptions(study, cancer);
+    setValue('cancer', cancer);
+    setValue('publicSample', samples[0]);
+  }
+
+  function onSubmit(data) {
+    const userParams = {
+      profile: data.profile.value,
+      matrix: data.matrix.value,
+      sample: data.userSample.value,
+      userId: projectID,
+    };
+    const publicParams = {
+      profile: data.profile.value,
+      matrix: data.matrix.value,
+      study: data.study.value,
+      cancer: data.cancer.value,
+      sample: data.publicSample.value,
+    };
+    setParams({ userParams, publicParams });
+    mergeForm(data);
   }
 
   return (
     <div>
       <p className="p-3 m-0">
-        Input a [Profile Type] and two sample names ([Sample Name 1], [Sample
-        Name 2]) to generate the mutational profile of each sample, as well as
-        the difference between the two mutational profiles.
+        Input a [Profile Type], [Matrix Size], [Sample Name] (from your input
+        data), [Study], [Cancer Type], and [Public Sample Name] to generate the
+        mutational profile of the input sample, the sample from the selected
+        public data, and the difference between them.
       </p>
 
       <hr />
@@ -139,26 +208,61 @@ export default function PcWithin() {
           </Col>
           <Col lg="auto">
             <Select
-              disabled={sampleOptions.length < 2}
-              name="sample1"
-              label="Sample Name 1"
-              options={sampleOptions}
+              disabled={isFetching}
+              name="matrix"
+              label="Matrix size"
+              options={matrixOptions(profile)}
+              onChange={(e) => handleMatrix(profile, e)}
               control={control}
             />
           </Col>
           <Col lg="auto">
             <Select
-              disabled={sampleOptions.length < 2}
-              name="sample2"
-              label="Sample Name 2"
-              options={sampleOptions}
+              disabled={!userSampleOptions(profile, matrix)}
+              name="userSample"
+              label="Sample"
+              options={userSampleOptions(profile, matrix)}
+              control={control}
+            />
+          </Col>
+          <Col lg="auto">
+            <Select
+              name="study"
+              label="Study"
+              options={studyOptions}
+              onChange={handleStudy}
+              control={control}
+            />
+          </Col>
+          <Col lg="auto">
+            <Select
+              name="cancer"
+              label="Cancer Type or Gorup"
+              options={cancerOptions(study)}
+              onChange={(e) => handleCancer(study, e)}
+              control={control}
+            />
+          </Col>
+          <Col lg="auto">
+            <Select
+              disabled={!publicSampleOptions(study, cancer)}
+              name="publicSample"
+              label="Sample Name"
+              options={publicSampleOptions(study, cancer)}
               control={control}
             />
           </Col>
           <Col lg="auto" className="d-flex">
             <Button
               className="mt-auto mb-3"
-              disabled={!profile || !sample1 || !sample2}
+              disabled={
+                !profile ||
+                !matrix ||
+                !userSample ||
+                !study ||
+                !cancer ||
+                !publicSample
+              }
               variant="primary"
               type="submit"
             >
@@ -166,38 +270,33 @@ export default function PcWithin() {
             </Button>
           </Col>
         </Row>
-        {sampleOptions.length < 2 && (
-          <Row>
-            <Col>Unavailable - More than one Sample Required</Col>
-          </Row>
-        )}
       </Form>
-      <div id="pcWithinPlot">
+      <div id="plot">
         {error && (
           <>
             <hr />
             <div className="p-3">
               <p>An error has occured. Please verify your input.</p>
-              <p>{error.data}</p>
+              <p>{error.data || error.message || error}</p>
             </div>
           </>
         )}
-        {data?.output.plotPath && (
+        {data && (
           <>
             <hr />
-            <SvgContainer
-              className="p-3"
-              downloadName={data.output.plotPath.split('/').slice(-1)[0]}
-              plotPath={'web/results/' + data.output.plotPath}
-              txtPath={`web/results/${data.output.plotPath}`}
+            <Plotly
+              className="w-100"
+              data={data.traces}
+              layout={data.layout}
+              config={data.config}
             />
             <div className="p-3">
               <p>
-                The plot above shows the mutational profiles of two selected
-                samples, as well as the difference between them. The text at the
-                top of the plot indicates the profile similarity calculated
-                using Residual Sum of Squares (RSS) and cosine similarity
-                methods.
+                The plot above shows the mutational profile of the input sample,
+                the sample from the selected public data, and the difference
+                between them. The text on the top of the plot indicates the
+                profile similarity calculated using Residual Sum of Squares
+                (RSS) and cosine similarity methods.
               </p>
               <p>
                 RSS measures the discrepancy between two mutational profiles.

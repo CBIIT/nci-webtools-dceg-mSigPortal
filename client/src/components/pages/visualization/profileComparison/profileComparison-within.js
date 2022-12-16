@@ -7,8 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { actions } from '../../../../services/store/visualization';
 import { useProfileComparisonWithinQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import SvgContainer from '../../../controls/svgContainer/svgContainer';
-import { defaultMatrix } from '../../../../services/utils';
+import Plotly from '../../../controls/plotly/plot/plot';
 
 export default function PcWithin() {
   const dispatch = useDispatch();
@@ -21,7 +20,7 @@ export default function PcWithin() {
     );
 
   const { study, cancer, strategy } = store.publicForm;
-  const { source, matrixData, svgList, matrixList, projectID } = store.main;
+  const { source, matrixData, projectID } = store.main;
   const { withinForm } = store.profileComparison;
 
   const [params, setParams] = useState(null);
@@ -29,14 +28,14 @@ export default function PcWithin() {
   const { data, error, isFetching } = useProfileComparisonWithinQuery(params, {
     skip: !params,
   });
-
   function getSampleOptions(profile) {
     return matrixData && profile
       ? [
           ...new Set(
             matrixData
-              .filter((e) => e.profile == profile.value)
+              .filter((e) => e.profile === profile.value)
               .map((e) => e.sample)
+              .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
           ),
         ].map((e) => ({
           label: e,
@@ -52,7 +51,11 @@ export default function PcWithin() {
   const { profile, sample1, sample2 } = watch();
 
   const profileOptions = matrixData.length
-    ? [...new Set(matrixData.map((e) => e.profile))].map((e) => ({
+    ? [
+        ...new Set(
+          matrixData.map((e) => e.profile).sort((a, b) => b.localeCompare(a))
+        ),
+      ].map((e) => ({
         label: e,
         value: e,
       }))
@@ -67,36 +70,24 @@ export default function PcWithin() {
 
   function onSubmit(data) {
     mergeForm(data);
+    const params = {
+      ...(source == 'public' && {
+        study: study.value,
+        cancer: cancer.value,
+        strategy: strategy.value,
+      }),
 
-    const params =
-      source == 'user'
-        ? {
-            fn: 'profileComparisonWithin',
-            args: {
-              profileType: data.profile.value,
-              sampleName1: data.sample1.value,
-              sampleName2: data.sample2.value,
-              matrixFile: matrixList.filter(
-                (e) =>
-                  e.profile == data.profile.value &&
-                  e.matrix ==
-                    defaultMatrix(data.profile.value, ['96', '78', '83'])
-              )[0].Path,
-            },
-            projectID,
-          }
-        : {
-            fn: 'profileComparisonWithinPublic',
-            args: {
-              profileType: data.profile.value,
-              sampleName1: data.sample1.value,
-              sampleName2: data.sample2.value,
-              study: study.value,
-              cancerType: cancer.value,
-              experimentalStrategy: strategy.value,
-            },
-            projectID,
-          };
+      ...(source == 'user' && { userId: projectID }),
+
+      profile: data.profile.value,
+      matrix:
+        data.profile.value === 'SBS'
+          ? '96'
+          : data.profile.value === 'DBS'
+          ? '78'
+          : '83',
+      sample: data.sample1.value + ';' + data.sample2.value,
+    };
     setParams(params);
   }
 
@@ -111,6 +102,35 @@ export default function PcWithin() {
         : setValue('sample2', samples[0]);
     }
   }
+
+  const customStyles = {
+    control: (base, state) => ({
+      ...base,
+      background: '#f1e4ef',
+      // match with the menu
+      borderRadius: state.isFocused ? '3px 3px 0 0' : 3,
+      // Overwrittes the different states of border
+      borderColor: state.isFocused ? '#f1e4ef' : '#8e4b86',
+      // Removes weird border around container
+      boxShadow: state.isFocused ? null : null,
+      '&:hover': {
+        // Overwrittes the different states of border
+        borderColor: state.isFocused ? '#8e4b86' : '#f1e4ef',
+      },
+    }),
+    menu: (base) => ({
+      ...base,
+      // override border radius to match the box
+      borderRadius: 0,
+      // kill the gap
+      marginTop: 0,
+    }),
+    menuList: (base) => ({
+      ...base,
+      // kill the white space on first and last option
+      padding: 0,
+    }),
+  };
 
   return (
     <div>
@@ -132,6 +152,7 @@ export default function PcWithin() {
               options={profileOptions}
               onChange={handleProfile}
               control={control}
+              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -141,6 +162,7 @@ export default function PcWithin() {
               label="Sample Name 1"
               options={sampleOptions}
               control={control}
+              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -150,6 +172,7 @@ export default function PcWithin() {
               label="Sample Name 2"
               options={sampleOptions}
               control={control}
+              styles={customStyles}
             />
           </Col>
           <Col lg="auto" className="d-flex">
@@ -179,14 +202,14 @@ export default function PcWithin() {
             </div>
           </>
         )}
-        {data?.output.plotPath && (
+        {data && (
           <>
             <hr />
-            <SvgContainer
-              className="p-3"
-              downloadName={data.output.plotPath.split('/').slice(-1)[0]}
-              plotPath={'web/results/' + data.output.plotPath}
-              txtPath={`web/results/${data.output.plotPath}`}
+            <Plotly
+              className="w-100"
+              data={data.traces}
+              layout={data.layout}
+              config={data.config}
             />
             <div className="p-3">
               <p>
