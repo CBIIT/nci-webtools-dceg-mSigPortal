@@ -113,7 +113,7 @@ export default function App() {
     {
       route: '/apiaccess',
       action: 'API Access',
-      title: 'APIAccess',
+      title: 'API Access',
       name: 'api',
       cardTitle: 'API Access',
       cardText: 'API Access',
