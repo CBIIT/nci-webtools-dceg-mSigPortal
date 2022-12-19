@@ -20,8 +20,8 @@ import {
   usePcSignatureNamesQuery,
 } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import { defaultMatrix } from '../../../../services/utils';
+import Plotly from '../../../controls/plotly/plot/plot';
 
 export default function PcReference() {
   const dispatch = useDispatch();
@@ -34,7 +34,7 @@ export default function PcReference() {
     );
 
   const { study, cancer, strategy } = store.publicForm;
-  const { source, matrixData, svgList, matrixList, projectID } = store.main;
+  const { source, matrixData, projectID } = store.main;
   const { referenceForm } = store.profileComparison;
 
   // main form
@@ -73,15 +73,21 @@ export default function PcReference() {
   } = usePcSignatureNamesQuery(signatureNamesQuery, {
     skip: !signatureNamesQuery,
   });
-  //   calculate plot
+  //   seqmatrix api
   const { data, error, isFetching } = useProfileComparisonReferenceQuery(
     calculationQuery,
-    { skip: !calculationQuery }
+    {
+      skip: !calculationQuery,
+    }
   );
 
   // declare form Options
   const profileOptions = matrixData.length
-    ? [...new Set(matrixData.map((e) => e.profile))].map((e) => ({
+    ? [
+        ...new Set(
+          matrixData.map((e) => e.profile).sort((a, b) => b.localeCompare(a))
+        ),
+      ].map((e) => ({
         label: e,
         value: e,
       }))
@@ -111,6 +117,7 @@ export default function PcReference() {
     }
   }, [profile]);
   // get signature names when signature set is selected
+
   useEffect(() => {
     if (signatureSet) {
       setSignatureNamesQuery({
@@ -129,6 +136,7 @@ export default function PcReference() {
             matrixData
               .filter((e) => e.profile == profile.value)
               .map((e) => e.sample)
+            //.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
           ),
         ].map((e) => ({
           label: e,
@@ -136,42 +144,38 @@ export default function PcReference() {
         }))
       : [];
   }
-
   function onSubmit(data) {
     mergeForm(data);
-
     const { profile, sample, signatureSet, compare } = data;
-    const params =
-      source == 'user'
-        ? {
-            fn: 'profileComparisonRefSig',
-            args: {
-              profileType: profile.value,
-              sampleName: sample.value,
-              signatureSet: signatureSet.value,
-              compare: compare,
-              matrixFile: matrixList.filter(
-                (e) =>
-                  e.profile == profile.value &&
-                  e.matrix == defaultMatrix(profile.value, ['96', '78', '83'])
-              )[0].Path,
-            },
-            projectID,
-          }
-        : {
-            fn: 'profileComparisonRefSigPublic',
-            args: {
-              profileType: profile.value,
-              sampleName: sample.value,
-              signatureSet: signatureSet.value,
-              compare: compare,
-              study: study.value,
-              cancerType: cancer.value,
-              experimentalStrategy: strategy.value,
-            },
-            projectID,
-          };
-    setCalculationQuery(params);
+    const params_spectrum = {
+      ...(source == 'public' && {
+        study: study.value,
+        cancer: cancer.value,
+        strategy: strategy.value,
+      }),
+      ...(source == 'user' && { userId: projectID }),
+      profile: profile.value,
+      sample: sample.value,
+      matrix:
+        data.profile.value === 'SBS'
+          ? '96'
+          : data.profile.value === 'DBS'
+          ? '78'
+          : '83',
+    };
+    const params_signature = {
+      profile: profile.value,
+      matrix:
+        data.profile.value === 'SBS'
+          ? '96'
+          : data.profile.value === 'DBS'
+          ? '78'
+          : '83',
+      signatureSetName: signatureSet.value,
+      signatureName: compare,
+    };
+
+    setCalculationQuery({ params_spectrum, params_signature });
   }
 
   function handleProfile(e) {
@@ -206,7 +210,7 @@ export default function PcReference() {
                   variant="link"
                   onClick={() => {
                     if (compare.length) {
-                      setValue('compare', compare + `;1*${signature}`);
+                      setValue('compare', compare + `;${signature}`);
                     } else {
                       setValue('compare', signature);
                     }
@@ -223,13 +227,45 @@ export default function PcReference() {
     </Popover>
   );
 
-  console.log(data);
+  const customStyles = {
+    control: (base, state) => ({
+      ...base,
+      background: '#f1e4ef',
+      // match with the menu
+      borderRadius: state.isFocused ? '3px 3px 0 0' : 3,
+      // Overwrittes the different states of border
+      borderColor: state.isFocused ? '#f1e4ef' : '#8e4b86',
+      // Removes weird border around container
+      boxShadow: state.isFocused ? null : null,
+      '&:hover': {
+        // Overwrittes the different states of border
+        borderColor: state.isFocused ? '#8e4b86' : '#f1e4ef',
+      },
+    }),
+    menu: (base) => ({
+      ...base,
+      // override border radius to match the box
+      borderRadius: 0,
+      // kill the gap
+      marginTop: 0,
+    }),
+    menuList: (base) => ({
+      ...base,
+      // kill the white space on first and last option
+      padding: 0,
+    }),
+  };
+
   return (
     <div>
       <p className="p-3 m-0">
-        Input a [Profile Type] and two sample names ([Sample Name 1], [Sample
-        Name 2]) to generate the mutational profile of each sample, as well as
-        the difference between the two mutational profiles.
+        Input a [Profile Type], [Sample Name], [Reference Signature Set], and
+        [Compare Signatures] parameter to generate the mutational profile of the
+        sample, the signature profile from the reference set, and the difference
+        between two mutational profiles. The [Compare Signatures] can be a
+        single reference signature name or a combined multiple reference
+        signature name with different contributions (see example below [Compare
+        Signatures]).
       </p>
 
       <hr />
@@ -241,23 +277,28 @@ export default function PcReference() {
               disabled={!profileOptions.length}
               name="profile"
               label="Profile Type"
+              className="m-auto"
               options={profileOptions}
               onChange={handleProfile}
               control={control}
+              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
             <Select
               disabled={sampleOptions.length < 2}
+              className="m-auto"
               name="sample"
               label="Sample Name"
               options={sampleOptions}
               control={control}
+              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
             <Select
               disabled={sampleOptions.length < 2 || fetchingSigSets}
+              className="m-auto"
               name="signatureSet"
               label="Reference Signature Set"
               options={signatureSetOptions}
@@ -267,10 +308,11 @@ export default function PcReference() {
                 refetchSignatureNames();
               }}
               control={control}
+              styles={customStyles}
             />
           </Col>
-          <Col lg="auto">
-            <Form.Group controlId="compare">
+          <Col lg="auto" className="d-flex">
+            <Form.Group controlId="compare" className="m-auto">
               <Form.Label>
                 Compare Signatures{' '}
                 <OverlayTrigger
@@ -304,18 +346,22 @@ export default function PcReference() {
                   />
                 )}
               />
-              <Form.Text className="text-muted">
-                (Ex. 0.8*SBS5,0.1*SBS1)
-              </Form.Text>
               <Form.Control.Feedback type="invalid">
                 Enter a valid signature. Click info icon for options.
               </Form.Control.Feedback>
             </Form.Group>
           </Col>
-          <Col lg="auto" className="d-flex">
+          <Col lg="auto" className="d-flex justify-content-end">
             <Button
-              className="mt-auto mb-3"
-              disabled={!profile || !sample || !signatureSet || !compare}
+              className="mt-auto"
+              disabled={
+                !profile ||
+                !sample ||
+                !signatureSet ||
+                !compare ||
+                fetchingSigSets ||
+                fetchingSigNames
+              }
               variant="primary"
               type="submit"
             >
@@ -330,31 +376,32 @@ export default function PcReference() {
         )}
       </Form>
       <div id="pcReferencePlot">
-        {data?.output.error && (
+        {error && (
           <>
             <hr />
             <div className="p-3">
               <p>An error has occured. Please verify your input.</p>
-              <p>{data?.output.error}</p>
+              <p>{error.data}</p>
             </div>
           </>
         )}
-        {data?.output.plotPath && (
+        {data && (
           <>
             <hr />
-            <SvgContainer
-              className="p-3"
-              downloadName={data.output.plotPath.split('/').slice(-1)[0]}
-              plotPath={'web/results/' + data.output.plotPath}
-              txtPath={`web/results/${data.output.plotPath}`}
+
+            <Plotly
+              className="w-100"
+              data={data.traces}
+              layout={data.layout}
+              config={data.config}
             />
             <div className="p-3">
               <p>
-                The plot above shows the mutational profiles of two selected
-                samples, as well as the difference between them. The text at the
-                top of the plot indicates the profile similarity calculated
-                using Residual Sum of Squares (RSS) and cosine similarity
-                methods.
+                The plot above shows the mutational profiles of a selected
+                sample, the signature from the selected reference signature set,
+                and the difference between them. The text at the top of the plot
+                indicates the profile similarity calculated using Residual Sum
+                of Squares (RSS) and cosine similarity methods.
               </p>
               <p>
                 RSS measures the discrepancy between two mutational profiles.

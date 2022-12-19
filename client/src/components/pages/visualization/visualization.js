@@ -13,7 +13,7 @@ import MutationalProfiles from './mutationalProfiles/mutProfiles';
 import TreeAndLeaf from './treeLeaf/treeLeaf';
 import CosineSimilarity from './cosineSimilarity/cosineSimilarity';
 import MutationalPattern from './mutationalPattern/mutationalPattern';
-import ProfileComparison from './profileComparison2/profileComparison';
+import ProfileComparison from './profileComparison/profileComparison';
 import PCA from './pca';
 import PCA2 from './pca/pca';
 import ClusteredIdentification from './clustered/clustered';
@@ -24,8 +24,6 @@ import { actions as visualizationActions } from '../../../services/store/visuali
 import { actions as modalActions } from '../../../services/store/modal';
 import './visualization.scss';
 
-// import MultationalProfilesTest from './test/multationalProfilesTest';
-
 const actions = { ...visualizationActions, ...modalActions };
 const { Group, Label, Check } = Form;
 
@@ -34,16 +32,11 @@ export default function Visualization({ match }) {
   const store = useSelector((state) => state.visualization);
   const mergeState = (state) =>
     dispatch(actions.mergeVisualization({ main: state }));
-  const mergeKataegis = (state) =>
-    dispatch(actions.mergeVisualization({ kataegis: state }));
-  const mergeCosineSimilarity = (state) =>
-    dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
-  const mergeProfileComparison = (state) =>
-    dispatch(actions.mergeVisualization({ profileComparison: state }));
-  const mergeMutationalProfiles = (state) =>
-    dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
-  const mergePCA = (state) =>
-    dispatch(actions.mergeVisualization({ pca: state }));
+
+  // const mergeCosineSimilarity = (state) =>
+  //   dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
+  // const mergePCA = (state) =>
+  //   dispatch(actions.mergeVisualization({ pca: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -60,7 +53,7 @@ export default function Visualization({ match }) {
     matrixList,
     matrixData,
   } = store.main;
-  const mutationalProfiles = store.mutationalProfiles;
+
   const { signatureSetOptions } = store.pca;
 
   const { type, id } = match.params;

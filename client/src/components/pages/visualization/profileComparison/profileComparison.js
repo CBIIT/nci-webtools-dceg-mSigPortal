@@ -1,7 +1,7 @@
 import { Nav, Tab } from 'react-bootstrap';
 import PcWithin from './profileComparison-within';
 import PcReference from './profileComparison-reference';
-// import PcPublic from './profileComparison-public';
+import PcPublic from './profileComparison-public';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions } from '../../../../services/store/visualization';
 
@@ -60,7 +60,7 @@ export default function MutationalProfiles(props) {
           </Tab.Pane>
           {source == 'user' && (
             <Tab.Pane key="public" eventKey="public" className="border-0">
-              {/* <PcPublic /> */}
+              <PcPublic />
             </Tab.Pane>
           )}
         </Tab.Content>
