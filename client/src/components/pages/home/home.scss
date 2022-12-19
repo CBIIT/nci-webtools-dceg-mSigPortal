@@ -3,7 +3,7 @@
   overflow: hidden;
   display: block;
   position: relative;
-  height: 1250px;
+  height: 1050px;
   background-color: #f5f5f5;
 
   .banner-overlay-text {
@@ -15,24 +15,28 @@
 
   .homepage-title-left {
     position: absolute;
-    top: 10%;
-    left: 17%;
-    width: 35%;
+    top: 15%;
+    left: 27%;
+    width: 25%;
   }
 
   .homepage-title-right {
     position: absolute;
-    top: 27%;
-    right: 13%;
-    width: 40%;
+    top: 29%;
+    right: 22%;
+    width: 25%;
   }
 }
 .homepage-title {
-  font-weight: 900;
+  font-weight: 1rem;
 }
 
 .msigportal-home-title {
-  font-size: 4rem;
+  font-size: 2.5rem;
+}
+
+.msigportal-home-title-right {
+  font-size: 1rem;
 }
 .background-img {
   position: relative;
@@ -43,11 +47,19 @@
 .home-grid-banner {
   z-index: 1;
   position: absolute;
-  top: 28%;
+  top: 29%;
 }
 
+.home-grid-banner-container {
+  width: 65%;
+  margin: auto;
+}
 .msigportal-title {
-  font-size: 1.8rem;
+  font-size: 1.4rem;
+}
+
+.card-title-homepage {
+  font-size: 1.3rem;
 }
 
 .center {
@@ -179,6 +191,9 @@
 
 .btn-border-radius-25 {
   border-radius: 25%;
+}
+.btn-border-radius-15 {
+  border-radius: 15%;
 }
 .home-page {
   position: relative;

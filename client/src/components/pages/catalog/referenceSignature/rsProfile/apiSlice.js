@@ -17,7 +17,7 @@ export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
         params,
       }),
     }),
-    rsProfileData: builder.query({
+    rsProfilePlot: builder.query({
       query: (params) => ({
         url: 'mutational_signature',
         params,
@@ -51,5 +51,5 @@ export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
   }),
 });
 
-export const { useRsProfileOptionsQuery, useRsProfileDataQuery } =
+export const { useRsProfileOptionsQuery, useRsProfilePlotQuery } =
   rsProfileApiSlice;

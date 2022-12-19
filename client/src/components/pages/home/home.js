@@ -25,47 +25,51 @@ export default function Home({ links }) {
   ) {
     return (
       <div key={index}>
-        <div class="col mb-3 ">
-          <Card
-            key={title}
-            id={title}
-            className="h-100 p-3"
-            style={{
-              borderRadius: '2em',
-            }}
-          >
-            <img
-              alt={cardTitle}
-              src={image}
-              className="card-img-top w-25 h-25"
-            />
-            <Card.Body>
-              <h4 className={`card-title text-${name}`}>{cardTitle}</h4>
-              <p className="card-text">
-                {description}
-                <br />
+        <div className="col h-100 mb-4">
+          <div className="">
+            <Card
+              key={title}
+              id={title}
+              className="p-3"
+              style={{
+                borderRadius: '2em',
+              }}
+            >
+              <img
+                alt={cardTitle}
+                src={image}
+                className="card-img-top w-25 h-25 ml-3"
+              />
+              <Card.Body>
+                <h4 className={`card-title card-title-homepage text-${name}`}>
+                  {cardTitle}
+                </h4>
+                <p className="card-text">
+                  {description}
+                  <br />
 
-                <Link
-                  className="link-primary-underline"
-                  exact={exact}
-                  key={index}
-                  to={about}
-                >
-                  <span>Read More &rarr;</span>
-                </Link>
-              </p>
-            </Card.Body>
-            <div class="p-3">
-              <Link
-                className={`btn btn-2 btn-lg btn-${name} btn-border-radius-25`}
-                exact={exact}
-                key={index}
-                to={route}
-              >
-                <span class="">Go to {title} &gt;</span>
-              </Link>
-            </div>
-          </Card>
+                  <Link
+                    className="link-primary-underline"
+                    exact={exact}
+                    key={index}
+                    to={about}
+                  >
+                    <span>Read More &rarr;</span>
+                  </Link>
+                </p>
+                <div class="">
+                  <Link
+                    className={`btn btn-2 btn-${name} btn-border-radius-15`}
+                    exact={exact}
+                    key={index}
+                    to={route}
+                  >
+                    <span class="">Go to {title} &gt;</span>
+                  </Link>
+                </div>
+              </Card.Body>
+            </Card>
+          </div>
         </div>
       </div>
     );
@@ -80,7 +84,7 @@ export default function Home({ links }) {
             alt="mSigPortal banner"
             style={{
               width: '100%',
-              height: '80%',
+              height: '365px',
             }}
           ></img>
           <div className="row">
@@ -91,16 +95,27 @@ export default function Home({ links }) {
                 Study
               </div>
             </div>
-            <div class="homepage-title-right">
-              <div class=" btn btn-gradient btn-1 p-3">
-                <div>Learn more about mSigportal &gt;</div>
+            <div className="homepage-title-right">
+              <div className=" btn btn-gradient btn-1">
+                <div className="msigportal-home-title-right">
+                  Learn more about mSigportal &gt;
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <div className="p-3 home-grid-banner">
-          <div class="row row-cols-1 row-cols-md-3 g-4 m-1">
-            {links.filter((e) => e.showHomepage).map((e, i) => CardRow(e, i))}
+        {/* <div className="home-grid-banner">
+          <div className="home-grid-banner-container">
+            <div className="row row-cols-1 row-cols-md-3 g-4 m-3">
+              {links.filter((e) => e.showHomepage).map((e, i) => CardRow(e, i))}
+            </div>
+          </div>
+        </div> */}
+        <div className="home-grid-banner">
+          <div className="home-grid-banner-container">
+            <div className="row row-cols-1 row-cols-md-3 row-cols-sm-2 row-cols-xs-6">
+              {links.filter((e) => e.showHomepage).map((e, i) => CardRow(e, i))}
+            </div>
           </div>
         </div>
       </div>
