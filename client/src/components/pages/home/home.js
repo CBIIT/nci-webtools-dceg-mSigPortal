@@ -25,51 +25,49 @@ export default function Home({ links }) {
   ) {
     return (
       <div key={index}>
-        <div className="col h-100 mb-4">
-          <div className="">
-            <Card
-              key={title}
-              id={title}
-              className="p-3"
-              style={{
-                borderRadius: '2em',
-              }}
-            >
-              <img
-                alt={cardTitle}
-                src={image}
-                className="card-img-top w-25 h-25 ml-3"
-              />
-              <Card.Body>
-                <h4 className={`card-title card-title-homepage text-${name}`}>
-                  {cardTitle}
-                </h4>
-                <p className="card-text">
-                  {description}
-                  <br />
+        <div className="col">
+          <Card
+            key={title}
+            id={title}
+            className="p-3"
+            style={{
+              borderRadius: '2em',
+            }}
+          >
+            <img
+              alt={cardTitle}
+              src={image}
+              className="card-img-top w-25 h-25 ml-3"
+            />
+            <Card.Body>
+              <h4 className={`card-title card-title-homepage text-${name}`}>
+                {cardTitle}
+              </h4>
+              <p className="card-text">
+                {description}
+                <br />
 
-                  <Link
-                    className="link-primary-underline"
-                    exact={exact}
-                    key={index}
-                    to={about}
-                  >
-                    <span>Read More &rarr;</span>
-                  </Link>
-                </p>
-                <div class="">
-                  <Link
-                    className={`btn btn-2 btn-${name} btn-border-radius-15`}
-                    exact={exact}
-                    key={index}
-                    to={route}
-                  >
-                    <span class="">Go to {title} &gt;</span>
-                  </Link>
-                </div>
-              </Card.Body>
-            </Card>
-          </div>
+                <Link
+                  className="link-primary-underline"
+                  exact={exact}
+                  key={index}
+                  to={about}
+                >
+                  <span>Read More &rarr;</span>
+                </Link>
+              </p>
+              <div class="">
+                <Link
+                  className={`btn btn-2 btn-${name} btn-border-radius-15`}
+                  exact={exact}
+                  key={index}
+                  to={route}
+                >
+                  <span class="">Go to {title} &gt;</span>
+                </Link>
+              </div>
+            </Card.Body>
+          </Card>
         </div>
       </div>
     );

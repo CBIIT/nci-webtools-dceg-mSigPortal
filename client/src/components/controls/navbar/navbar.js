@@ -6,7 +6,7 @@ import './navbar.scss';
 
 export function NavbarCustom({ links }) {
   return (
-    <Navbar className="shadow-sm bg-nav border-0" expand="md">
+    <Navbar collapseOnSelect className="shadow-sm bg-nav border-0" expand="md">
       <div className="justify-content-center">
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">

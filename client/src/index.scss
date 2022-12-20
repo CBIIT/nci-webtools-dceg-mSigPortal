@@ -743,3 +743,73 @@ select.form-control-sm {
   border-color: #f1e4ef;
   background-color: #f1e4ef;
 }
+
+/**** x-large devices ****/
+
+@media (min-device-width: 1200px) {
+  .banner-container {
+    height: 1080px;
+  }
+  .home-grid-banner {
+    z-index: 1;
+    position: absolute;
+    top: 28%;
+  }
+
+  .home-grid-banner-container {
+    width: 64%;
+    margin: auto;
+  }
+  .card-columns {
+    column-count: 3;
+  }
+}
+/**** large devices ****/
+@media (min-device-width: 992px) and (max-device-width: 1199px) {
+  .card-columns {
+    column-count: 3;
+  }
+}
+/**** medium devices ****/
+@media (min-device-width: 768px) and (max-device-width: 991px) {
+  .card-columns {
+    column-count: 2;
+  }
+}
+/**** small devices ****/
+@media (min-device-width: 576px) and (max-device-width: 767px) {
+  .card-columns {
+    column-count: 1;
+  }
+}
+/**** x-small devices ****/
+@media (max-device-width: 576px) {
+  .card-columns {
+    column-count: 1;
+  }
+}
+
+/**** large devices ****/
+@media (min-width: 992px) and (max-width: 1199px) {
+  .card-columns {
+    column-count: 3;
+  }
+}
+/**** medium devices ****/
+@media (min-width: 768px) and (max-width: 991px) {
+  .card-columns {
+    column-count: 2;
+  }
+}
+/**** small devices ****/
+@media (min-width: 576px) and (max-width: 767px) {
+  .card-columns {
+    column-count: 1;
+  }
+}
+/**** x-small devices ****/
+@media (max-width: 576px) {
+  .card-columns {
+    column-count: 1;
+  }
+}
