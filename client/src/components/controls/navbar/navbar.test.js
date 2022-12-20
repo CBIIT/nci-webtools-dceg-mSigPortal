@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import { HashRouter } from 'react-router-dom';
-import { Navbar } from './navbar';
+import { NavbarCustom } from './navbar';
 
 describe('Navbar Module', function () {
   test('Navbar renders correctly', () => {
@@ -12,7 +12,7 @@ describe('Navbar Module', function () {
     const links = [{ route, title }];
     render(
       <HashRouter>
-        <Navbar links={links} />
+        <NavbarCustom links={links} />
       </HashRouter>
     );
     expect(screen.queryAllByText(title)[0]).toHaveAttribute(
