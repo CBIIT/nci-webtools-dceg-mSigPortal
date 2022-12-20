@@ -743,23 +743,16 @@ select.form-control-sm {
   border-color: #f1e4ef;
   background-color: #f1e4ef;
 }
+.navbar-light .navbar-toggler {
+  border-color: white;
+}
+.navbar-light .navbar-toggler {
+  background-color: #f1e4ef;
+}
 
 /**** x-large devices ****/
 
 @media (min-device-width: 1200px) {
-  .banner-container {
-    height: 1080px;
-  }
-  .home-grid-banner {
-    z-index: 1;
-    position: absolute;
-    top: 28%;
-  }
-
-  .home-grid-banner-container {
-    width: 64%;
-    margin: auto;
-  }
   .card-columns {
     column-count: 3;
   }

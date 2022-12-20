@@ -224,8 +224,7 @@
 }
 
 /**** x-large devices ****/
-
-@media (min-device-width: 1200px) {
+@media (min-device-width: 1401px) {
   .banner-container {
     height: 1080px;
   }
@@ -236,7 +235,7 @@
   }
 
   .home-grid-banner-container {
-    width: 64%;
+    width: 80%;
     margin: auto;
   }
   .card-columns {
@@ -244,7 +243,7 @@
   }
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1401px) {
   .banner-container {
     height: 1080px;
   }
@@ -255,7 +254,45 @@
   }
 
   .home-grid-banner-container {
-    width: 64%;
+    width: 80%;
+    margin: auto;
+  }
+  .card-columns {
+    column-count: 3;
+  }
+}
+
+@media (min-device-width: 1200px) and (max-device-width: 1400px) {
+  .banner-container {
+    height: 1080px;
+  }
+  .home-grid-banner {
+    z-index: 1;
+    position: absolute;
+    top: 28%;
+  }
+
+  .home-grid-banner-container {
+    width: 75%;
+    margin: auto;
+  }
+  .card-columns {
+    column-count: 3;
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1400px) {
+  .banner-container {
+    height: 1080px;
+  }
+  .home-grid-banner {
+    z-index: 1;
+    position: absolute;
+    top: 28%;
+  }
+
+  .home-grid-banner-container {
+    width: 75%;
     margin: auto;
   }
   .card-columns {
