@@ -77,7 +77,7 @@ export default function Home({ links }) {
 
   return (
     <>
-      <div className="banner-container d-none d-md-block">
+      <div className="banner-container ">
         <div className="background-img text-center">
           <img
             src="assets/images/Hero_Image.png"
@@ -111,9 +111,10 @@ export default function Home({ links }) {
             </div>
           </div>
         </div> */}
+
         <div className="home-grid-banner">
           <div className="home-grid-banner-container">
-            <div className="row row-cols-1 row-cols-md-3 row-cols-sm-2 row-cols-xs-6">
+            <div className="card-columns">
               {links.filter((e) => e.showHomepage).map((e, i) => CardRow(e, i))}
             </div>
           </div>
