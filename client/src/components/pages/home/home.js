@@ -32,6 +32,7 @@ export default function Home({ links }) {
             className="p-3"
             style={{
               borderRadius: '2em',
+              display: 'inline-block',
             }}
           >
             <img
@@ -68,6 +69,144 @@ export default function Home({ links }) {
               </div>
             </Card.Body>
           </Card>
+        </div>
+      </div>
+    );
+  }
+
+  function CardRow2(
+    {
+      exact,
+      route,
+      action,
+      title,
+      name,
+      cardTitle,
+      cardText,
+      description,
+      image,
+      about,
+      color,
+      examples,
+      buttonHomepage,
+    },
+    index
+  ) {
+    return (
+      <div key={index} className="col-sm-12 col-md-6 col-lg-4 mb-3" id={title}>
+        <div
+          style={{
+            borderRadius: '2em',
+            display: 'inline-block',
+            backgroundColor: 'white',
+          }}
+        >
+          <div className="flex-fill">
+            <div className="m-3">
+              <img
+                alt={cardTitle}
+                src={image}
+                className="card-img-top w-25 h-25"
+              />
+              <h4 className={`card-title card-title-homepage text-${name}`}>
+                {cardTitle}
+              </h4>
+              <p className="card-text">
+                {description}
+                <br />
+
+                <Link
+                  className="link-primary-underline"
+                  exact={exact}
+                  key={index}
+                  to={about}
+                >
+                  <span>Read More &rarr;</span>
+                </Link>
+              </p>
+              <div class="">
+                <Link
+                  className={`btn btn-2 btn-${name} btn-border-radius-15`}
+                  exact={exact}
+                  key={index}
+                  to={route}
+                >
+                  <span class="">Go to {title} &gt;</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function CardRow3(
+    {
+      exact,
+      route,
+      action,
+      title,
+      cardId,
+      name,
+      cardTitle,
+      cardText,
+      description,
+      image,
+      about,
+      color,
+      examples,
+      buttonHomepage,
+    },
+    index
+  ) {
+    return (
+      <div
+        key={index}
+        class="col-lg-4 col-md-6 col-sm-12 mb-3 d-flex align-items-stretch"
+      >
+        <div
+          className="card"
+          id={cardId}
+          style={{
+            borderRadius: '2em',
+            display: 'inline-block',
+            backgroundColor: 'white',
+          }}
+        >
+          <img
+            alt={cardTitle}
+            src={image}
+            className="card-img-top w-40 h-40 p-3 pb-0"
+          />
+          <div className="card-body d-flex flex-column">
+            <h5 className={`card-title card-title-homepage text-${name}`}>
+              {cardTitle}
+            </h5>
+            <p class="card-text mb-4">
+              {description}
+              <br />
+
+              <Link
+                className="link-primary-underline"
+                exact={exact}
+                key={index}
+                to={about}
+              >
+                <span>Read More &rarr;</span>
+              </Link>
+            </p>
+            <div class="">
+              <Link
+                className={`btn btn-2 btn-${name} btn-border-radius-15`}
+                exact={exact}
+                key={index}
+                to={route}
+              >
+                <span class="">Go to {title} &gt;</span>
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -110,11 +249,32 @@ export default function Home({ links }) {
           </div>
         </div> */}
 
-        <div className="home-grid-banner">
+        {/* <div className="home-grid-banner">
           <div className="home-grid-banner-container">
             <div className="card-columns">
               {links.filter((e) => e.showHomepage).map((e, i) => CardRow(e, i))}
             </div>
+          </div>
+        </div> */}
+        {/* <div className="home-grid-banner">
+          <div className="home-grid-banner-container">
+            <div class="row my-4">
+              <div class="col">
+                <div class="container-fluid">
+                  <div class="row">
+                    {links
+                      .filter((e) => e.showHomepage)
+                      .map((e, i) => CardRow2(e, i))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> */}
+        <div className="container home-grid">
+          <div className="row pt-5"></div>
+          <div className="row">
+            {links.filter((e) => e.showHomepage).map((e, i) => CardRow3(e, i))}
           </div>
         </div>
       </div>
