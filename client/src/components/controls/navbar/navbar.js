@@ -53,17 +53,13 @@ export function NavbarCustom({ links }) {
         <div className="mx-auto">
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
-            <div className="">
+            <div className="mx-auto">
               {[{ route: '/', title: 'Home', exact: true }]
                 .concat(links)
                 .filter((link) => link.title)
                 .sort((a, b) => a.navIndex - b.navIndex)
                 .map(({ route, action, title, exact }, index) => (
-                  <div
-                    data-testid="Navbar"
-                    className="d-inline-block"
-                    key={title}
-                  >
+                  <div data-testid="Navbar" className="" key={title}>
                     <NavLink
                       data-testid={`Navbar-NavLink-${index}`}
                       id={title + '-navbar'}
