@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "homepage": ".",
-  "proxy": "http://localhost:8330",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.29",
     "@fortawesome/free-solid-svg-icons": "^5.13.1",
@@ -66,6 +65,7 @@
     "@testing-library/user-event": "^7.2.1",
     "assert": "^2.0.0",
     "buffer": "^6.0.3",
+    "http-proxy-middleware": "^2.0.6",
     "jest-junit": "^11.0.1",
     "path-browserify": "^1.0.1",
     "prettier": "^2.4.1",
