@@ -16,6 +16,9 @@ export const optionsApiSlice = createApi({
     associationOptions: builder.query({
       query: (params) => ({ url: 'signature_association_options', params }),
     }),
+    refGenome: builder.query({
+      query: (params) => ({ url: 'refgenome', params }),
+    }),
   }),
 });
 
@@ -24,6 +27,7 @@ export const {
   useExposureOptionsQuery,
   useSignatureOptionsQuery,
   useAssociationOptionsQuery,
+  useRefGenomeQuery,
 } = optionsApiSlice;
 
 export const catalogApiSlice = createApi({
@@ -52,7 +56,7 @@ export const associationApiSlice = createApi({
 
 export const extractionApiSlice = createApi({
   reducerPath: 'extractionApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'web' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'extraction' }),
   endpoints: () => ({}),
 });
 
