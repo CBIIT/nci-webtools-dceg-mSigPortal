@@ -110,7 +110,7 @@ export default function InputForm() {
       value: 'SigProfilerExtractor',
     },
     inputFile: new File(['test'], 'test.txt'),
-    email: 'chop2@nih.gov',
+    email: '',
   };
 
   const {
