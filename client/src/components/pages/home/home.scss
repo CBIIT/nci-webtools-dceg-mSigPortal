@@ -3,7 +3,7 @@
   overflow: hidden;
   display: block;
   position: relative;
-  height: 1250px;
+  height: 1050px;
   background-color: #f5f5f5;
 
   .banner-overlay-text {
@@ -15,24 +15,28 @@
 
   .homepage-title-left {
     position: absolute;
-    top: 10%;
-    left: 17%;
-    width: 35%;
+    top: 15%;
+    left: 27%;
+    width: 25%;
   }
 
   .homepage-title-right {
     position: absolute;
-    top: 27%;
-    right: 13%;
-    width: 40%;
+    top: 29%;
+    right: 22%;
+    width: 25%;
   }
 }
 .homepage-title {
-  font-weight: 900;
+  font-weight: 1rem;
 }
 
 .msigportal-home-title {
-  font-size: 4rem;
+  font-size: 2.5rem;
+}
+
+.msigportal-home-title-right {
+  font-size: 1rem;
 }
 .background-img {
   position: relative;
@@ -43,11 +47,27 @@
 .home-grid-banner {
   z-index: 1;
   position: absolute;
-  top: 28%;
+  top: 25%;
 }
 
+.home-grid {
+  z-index: 1;
+  position: absolute;
+  top: 25%;
+  left: 20%;
+  margin: auto;
+}
+
+.home-grid-banner-container {
+  width: 68%;
+  margin: auto;
+}
 .msigportal-title {
-  font-size: 1.8rem;
+  font-size: 1.4rem;
+}
+
+.card-title-homepage {
+  font-size: 1.3rem;
 }
 
 .center {
@@ -180,6 +200,9 @@
 .btn-border-radius-25 {
   border-radius: 25%;
 }
+.btn-border-radius-15 {
+  border-radius: 15%;
+}
 .home-page {
   position: relative;
 }
@@ -206,4 +229,489 @@
 
 .w-30 {
   width: 30% !important;
+}
+
+/**** x-large devices ****/
+@media (min-device-width: 1401px) {
+  .banner-container {
+    height: 1080px;
+  }
+  .home-grid-banner {
+    z-index: 1;
+    position: absolute;
+    top: 28%;
+  }
+  .home-grid {
+    z-index: 1;
+    position: absolute;
+    top: 25%;
+    left: 19%;
+    // margin: auto;
+  }
+
+  .home-grid-banner-container {
+    width: 80%;
+    margin: auto;
+  }
+  .card-columns {
+    column-count: 3;
+  }
+}
+
+@media (min-width: 1401px) {
+  .banner-container {
+    height: 1080px;
+  }
+  .home-grid-banner {
+    z-index: 1;
+    position: absolute;
+    top: 28%;
+  }
+  .home-grid {
+    z-index: 1;
+    position: absolute;
+    top: 25%;
+    left: 19%;
+    // margin: auto;
+  }
+
+  .home-grid-banner-container {
+    width: 80%;
+    margin: auto;
+  }
+  .card-columns {
+    column-count: 3;
+  }
+}
+
+@media (min-device-width: 1200px) and (max-device-width: 1400px) {
+  .banner-container {
+    height: 1080px;
+  }
+  .home-grid-banner {
+    z-index: 1;
+    position: absolute;
+    top: 28%;
+  }
+
+  .home-grid {
+    z-index: 1;
+    position: absolute;
+    top: 25%;
+    left: 8.5%;
+    // margin: auto;
+  }
+  .home-grid-banner-container {
+    width: 70%;
+    margin: auto;
+  }
+  .card-columns {
+    column-count: 3;
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1400px) {
+  .banner-container {
+    height: 1080px;
+  }
+  .home-grid-banner {
+    z-index: 1;
+    position: absolute;
+    top: 28%;
+  }
+  .home-grid {
+    z-index: 1;
+    position: absolute;
+    top: 25%;
+    left: 8.5%;
+    // margin: auto;
+  }
+  .home-grid-banner-container {
+    width: 70%;
+    margin: auto;
+  }
+  .card-columns {
+    column-count: 3;
+  }
+}
+/**** large devices ****/
+@media (min-device-width: 992px) and (max-device-width: 1199px) {
+  .banner-container {
+    z-index: 0;
+    overflow: hidden;
+    display: block;
+    position: relative;
+    height: 1100px;
+    background-color: #f5f5f5;
+
+    .homepage-title-left {
+      position: absolute;
+      top: 15%;
+      left: 20%;
+      width: 100%;
+    }
+
+    .homepage-title-right {
+      position: absolute;
+      top: 45%;
+      left: 22%;
+      width: 100%;
+    }
+  }
+  .home-grid-banner {
+    z-index: 1;
+    position: absolute;
+    top: 28%;
+  }
+
+  .home-grid {
+    z-index: 1;
+    position: absolute;
+    top: 25%;
+    left: 8%;
+    // margin: auto;
+  }
+
+  .home-grid-banner-container {
+    width: 80%;
+    margin: auto;
+  }
+  .card-columns {
+    column-count: 3;
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+  .banner-container {
+    z-index: 0;
+    overflow: hidden;
+    display: block;
+    position: relative;
+    height: 1100px;
+    background-color: #f5f5f5;
+
+    .homepage-title-left {
+      position: absolute;
+      top: 15%;
+      left: 20%;
+      width: 100%;
+    }
+
+    .homepage-title-right {
+      position: absolute;
+      top: 45%;
+      left: 22%;
+      width: 100%;
+    }
+  }
+  .home-grid-banner {
+    z-index: 1;
+    position: absolute;
+    top: 28%;
+  }
+
+  .home-grid {
+    z-index: 1;
+    position: absolute;
+    top: 25%;
+    left: 8%;
+    // margin: auto;
+  }
+  .home-grid-banner-container {
+    width: 80%;
+    margin: auto;
+  }
+  .card-columns {
+    column-count: 3;
+  }
+}
+/**** medium devices ****/
+@media (min-device-width: 768px) and (max-device-width: 991px) {
+  .banner-container {
+    z-index: 0;
+    overflow: hidden;
+    display: block;
+    position: relative;
+    height: 1450px;
+    background-color: #f5f5f5;
+
+    .homepage-title-left {
+      position: absolute;
+      top: 7%;
+      left: 10%;
+      width: 90%;
+    }
+
+    .homepage-title-right {
+      position: absolute;
+      top: 45%;
+      left: 5%;
+      width: 100%;
+    }
+  }
+  .msigportal-title {
+    font-size: 1.3rem;
+  }
+  .home-grid-banner {
+    z-index: 1;
+    position: absolute;
+    top: 20%;
+  }
+  .home-grid {
+    z-index: 1;
+    position: absolute;
+    top: 18%;
+    left: 3%;
+    // margin: auto;
+  }
+
+  .home-grid-banner-container {
+    width: 95%;
+    margin: auto;
+  }
+  .card-columns {
+    column-count: 2;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .banner-container {
+    z-index: 0;
+    overflow: hidden;
+    display: block;
+    position: relative;
+    height: 1450px;
+    background-color: #f5f5f5;
+
+    .homepage-title-left {
+      position: absolute;
+      top: 7%;
+      left: 15%;
+      width: 90%;
+    }
+
+    .homepage-title-right {
+      position: absolute;
+      top: 45%;
+      left: 5%;
+      width: 100%;
+    }
+  }
+  .msigportal-title {
+    font-size: 1.3rem;
+  }
+  .home-grid-banner {
+    z-index: 1;
+    position: absolute;
+    top: 20%;
+  }
+  .home-grid {
+    z-index: 1;
+    position: absolute;
+    top: 18%;
+    left: 3%;
+    // margin: auto;
+  }
+  .home-grid-banner-container {
+    width: 95%;
+    margin: auto;
+  }
+  .card-columns {
+    column-count: 2;
+  }
+}
+/**** small devices ****/
+@media (min-device-width: 576px) and (max-device-width: 767px) {
+  .banner-container {
+    z-index: 0;
+    overflow: hidden;
+    display: block;
+    position: relative;
+    height: 2920px;
+    background-color: #f5f5f5;
+
+    .homepage-title-left {
+      position: absolute;
+      top: 10%;
+      left: 10%;
+      width: 95%;
+    }
+
+    .homepage-title-right {
+      position: absolute;
+      top: 50%;
+      left: 5%;
+      width: 95%;
+    }
+  }
+  .msigportal-title {
+    font-size: 1.3rem;
+  }
+  .home-grid-banner-container {
+    width: 80%;
+    margin: auto;
+  }
+  .home-grid {
+    z-index: 1;
+    position: absolute;
+    top: 10%;
+    left: 13%;
+    // margin: auto;
+  }
+  .home-grid-banner {
+    z-index: 1;
+    position: absolute;
+    top: 11%;
+  }
+
+  .home-grid-banner-container {
+    width: 70%;
+    margin: auto;
+  }
+  .card-columns {
+    column-count: 1;
+  }
+}
+@media (min-width: 576px) and (max-width: 767px) {
+  .banner-container {
+    z-index: 0;
+    overflow: hidden;
+    display: block;
+    position: relative;
+    height: 2920px;
+    background-color: #f5f5f5;
+
+    .homepage-title-left {
+      position: absolute;
+      top: 10%;
+      left: 10%;
+      width: 95%;
+    }
+
+    .homepage-title-right {
+      position: absolute;
+      top: 50%;
+      left: 5%;
+      width: 95%;
+    }
+  }
+  .msigportal-title {
+    font-size: 1.3rem;
+  }
+
+  .home-grid-banner {
+    z-index: 1;
+    position: absolute;
+    top: 11%;
+  }
+  .home-grid {
+    z-index: 1;
+    position: absolute;
+    top: 10%;
+    left: 13%;
+    // margin: auto;
+  }
+
+  .home-grid-banner-container {
+    width: 70%;
+    margin: auto;
+  }
+  .card-columns {
+    column-count: 1;
+  }
+}
+/**** x-small devices ****/
+@media (max-device-width: 576px) {
+  .banner-container {
+    z-index: 0;
+    overflow: hidden;
+    display: block;
+    position: relative;
+    height: 2700px;
+    background-color: #f5f5f5;
+
+    .homepage-title-left {
+      position: absolute;
+      top: 12%;
+      left: 15%;
+      width: 80%;
+    }
+
+    .homepage-title-right {
+      position: absolute;
+      top: 50%;
+      left: 0%;
+      width: 100%;
+    }
+  }
+
+  .msigportal-title {
+    font-size: 1.2rem;
+  }
+  .home-grid-banner {
+    z-index: 1;
+    position: absolute;
+    top: 12%;
+  }
+  .home-grid {
+    z-index: 1;
+    position: absolute;
+    top: 10%;
+    left: 0%;
+    // margin: auto;
+  }
+  .home-grid-banner-container {
+    width: 90%;
+    margin: auto;
+  }
+  .card-columns {
+    column-count: 1;
+  }
+}
+@media (max-width: 576px) {
+  .banner-container {
+    z-index: 0;
+    overflow: hidden;
+    display: block;
+    position: relative;
+    height: 2700px;
+    background-color: #f5f5f5;
+
+    .homepage-title-left {
+      position: absolute;
+      top: 12%;
+      left: 15%;
+      width: 80%;
+    }
+
+    .homepage-title-right {
+      position: absolute;
+      top: 50%;
+      left: 0%;
+      width: 100%;
+    }
+  }
+
+  .msigportal-title {
+    font-size: 1.2rem;
+  }
+  .home-grid-banner {
+    z-index: 1;
+    position: absolute;
+    top: 12%;
+  }
+  .home-grid {
+    z-index: 1;
+    position: absolute;
+    top: 10%;
+    left: 0%;
+    // margin: auto;
+  }
+  .home-grid-banner-container {
+    width: 90%;
+    margin: auto;
+  }
+  .card-columns {
+    column-count: 1;
+  }
 }

@@ -214,7 +214,7 @@ h6 {
 
 .btn-2 {
   font: 'Inter';
-  font-size: 12pt;
+  font-size: 0.9rem;
   text-transform: uppercase;
   font-weight: 500;
 }
@@ -686,7 +686,7 @@ select.form-control-sm {
 .btn-gradient {
   background-image: linear-gradient(to right, #b83d47 0%, #8e4b86 55%);
   color: white;
-  border-radius: 18px;
+  border-radius: 15px;
 }
 
 .btn-gradient:hover {
@@ -742,4 +742,67 @@ select.form-control-sm {
 .react-select-custom-background:focus {
   border-color: #f1e4ef;
   background-color: #f1e4ef;
+}
+.navbar-light .navbar-toggler {
+  border-color: white;
+}
+.navbar-light .navbar-toggler {
+  background-color: #f1e4ef;
+}
+
+/**** x-large devices ****/
+
+@media (min-device-width: 1200px) {
+  .card-columns {
+    column-count: 3;
+  }
+}
+/**** large devices ****/
+@media (min-device-width: 992px) and (max-device-width: 1199px) {
+  .card-columns {
+    column-count: 3;
+  }
+}
+/**** medium devices ****/
+@media (min-device-width: 768px) and (max-device-width: 991px) {
+  .card-columns {
+    column-count: 2;
+  }
+}
+/**** small devices ****/
+@media (min-device-width: 576px) and (max-device-width: 767px) {
+  .card-columns {
+    column-count: 1;
+  }
+}
+/**** x-small devices ****/
+@media (max-device-width: 576px) {
+  .card-columns {
+    column-count: 1;
+  }
+}
+
+/**** large devices ****/
+@media (min-width: 992px) and (max-width: 1199px) {
+  .card-columns {
+    column-count: 3;
+  }
+}
+/**** medium devices ****/
+@media (min-width: 768px) and (max-width: 991px) {
+  .card-columns {
+    column-count: 2;
+  }
+}
+/**** small devices ****/
+@media (min-width: 576px) and (max-width: 767px) {
+  .card-columns {
+    column-count: 1;
+  }
+}
+/**** x-small devices ****/
+@media (max-width: 576px) {
+  .card-columns {
+    column-count: 1;
+  }
 }

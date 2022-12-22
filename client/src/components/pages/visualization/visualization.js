@@ -403,7 +403,7 @@ export default function Visualization({ match }) {
               {tabs
                 .filter((e) => e)
                 .map(({ name, id }) => (
-                  <div key={id} className="d-inline-block ">
+                  <div key={id} className="d-inline-block">
                     <Button
                       variant="link"
                       className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${

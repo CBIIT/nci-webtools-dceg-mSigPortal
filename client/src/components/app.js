@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { RecoilRoot } from 'recoil';
 import { HashRouter as Router, Route } from 'react-router-dom';
-import { Navbar } from './controls/navbar/navbar';
+import { NavbarCustom } from './controls/navbar/navbar';
 import Home from './pages/home/home';
 import About from './pages/about/about';
 import Visualization from './pages/visualization/visualization';
@@ -26,6 +26,7 @@ export default function App() {
       route: '/catalog',
       action: 'Catalog',
       title: 'Catalog',
+      cardId: 'Catalog',
       name: 'catalog',
       cardTitle: 'Signature Catalog',
       cardText: 'Signature Catalog',
@@ -42,6 +43,7 @@ export default function App() {
       route: '/visualization',
       action: 'Visualization',
       title: 'Visualization',
+      cardId: 'Visualization',
       name: 'visualization',
       cardTitle: 'Signature Visualization',
       cardText: 'Visualize mutational profiles',
@@ -57,6 +59,7 @@ export default function App() {
       route: '/extraction',
       action: 'Extraction',
       title: 'Extraction',
+      cardId: 'Extraction',
       name: 'extraction',
       cardTitle: 'Signature Extraction',
       cardText: 'Extraction mutational profiles',
@@ -72,6 +75,7 @@ export default function App() {
       route: '/exploration',
       action: 'Exploration',
       title: 'Exploration',
+      cardId: 'Exploration',
       name: 'exploration',
       cardTitle: 'Signature Exploration',
       cardText: 'Signature Exploration',
@@ -99,6 +103,7 @@ export default function App() {
       route: '/association',
       action: 'Association',
       title: 'Association',
+      cardId: 'Association',
       name: 'association',
       cardTitle: 'Signature Association',
       cardText: 'Signature Association',
@@ -113,7 +118,8 @@ export default function App() {
     {
       route: '/apiaccess',
       action: 'API Access',
-      title: 'APIAccess',
+      title: 'API Access',
+      cardId: 'APIAccess',
       name: 'api',
       cardTitle: 'API Access',
       cardText: 'API Access',
@@ -239,7 +245,7 @@ export default function App() {
         <Router>
           <ErrorModal />
           <SuccessModal />
-          <Navbar links={links} />
+          <NavbarCustom links={links} />
           <Route path="/" exact={true} render={(_) => <Home links={links} />} />
           <Route path="/about" component={About} />
           <Route path="/visualization/:type?/:id?" component={Visualization} />
