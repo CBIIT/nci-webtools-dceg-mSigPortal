@@ -34,8 +34,6 @@ export default function ProfileFormPlot() {
   const { control, setValue, watch } = useForm({
     defaultValues: { plots: storePlots },
   });
-  const { source, profile, matrix, signatureSetName, strategy, signatureName } =
-    watch();
 
   const {
     fields: plotsFields,
@@ -47,6 +45,8 @@ export default function ProfileFormPlot() {
   });
 
   console.log(plotsFields);
+
+  const { plots } = watch();
 
   const supportMatrix = {
     SBS: [6, 24, 96, 192, 288, 384, 1536],
@@ -166,7 +166,7 @@ export default function ProfileFormPlot() {
         ].map((e) => ({ label: e, value: e }))
       : [];
 
-  function handleSource(source) {
+  function handleSource(source, index) {
     const profiles = profileOptions(source);
     const profile = defaultProfile2(profiles);
     const matrices = matrixOptions(source, profile);
@@ -193,23 +193,25 @@ export default function ProfileFormPlot() {
     );
     const signatureName = defaultSignatureName(signatureNames);
 
-    setValue('source', source);
-    setValue('profile', profile);
-    setValue('matrix', matrix);
-    setValue('signatureSetName', signatureSetName);
-    setValue('strategy', strategy);
-    setValue('signatureName', signatureName);
-    mergeState({
-      source: source,
-      profile: profile,
-      matrix: matrix,
-      signatureSetName: signatureSetName,
-      strategy: strategy,
-      signatureName: signatureName,
-    });
+    setValue(`plots.[${index}].source`, source);
+    handleProfile(source, profile, index);
+    // setValue(`plots[${index}].profile`, profile);
+    // setValue(`plots[${index}].matrix`, matrix);
+    // setValue(`plots[${index}].signatureSetName`, signatureSetName);
+    // setValue(`plots[${index}].strategy`, strategy);
+    // setValue(`plots[${index}].signatureName`, signatureName);
+
+    // mergeState({
+    //   source: source,
+    //   profile: profile,
+    //   matrix: matrix,
+    //   signatureSetName: signatureSetName,
+    //   strategy: strategy,
+    //   signatureName: signatureName,
+    // });
   }
 
-  function handleProfile(profile) {
+  function handleProfile(source, profile, index) {
     const matrices = matrixOptions(source, profile);
     const matrix = defaultMatrix2(profile, matrices);
     const signatureSetNames = referenceSignatureSetOption(
@@ -234,21 +236,22 @@ export default function ProfileFormPlot() {
     );
     const signatureName = defaultSignatureName(signatureNames);
 
-    setValue('profile', profile);
-    setValue('matrix', matrix);
-    setValue('signatureSetName', signatureSetName);
-    setValue('strategy', strategy);
-    setValue('signatureName', signatureName);
-    mergeState({
-      profile,
-      matrix,
-      signatureSetName,
-      strategy,
-      signatureName,
-    });
+    setValue(`plots[${index}].profile`, profile);
+    handleMatrix(source, profile, matrix, index);
+    //setValue(`plots[${index}].matrix`, matrix);
+    // setValue(`plots[${index}].signatureSetName`, signatureSetName);
+    // setValue(`plots[${index}].strategy`, strategy);
+    // setValue(`plots[${index}].signatureName`, signatureName);
+    // mergeState({
+    //   profile,
+    //   matrix,
+    //   signatureSetName,
+    //   strategy,
+    //   signatureName,
+    // });
   }
 
-  function handleMatrix(matrix) {
+  function handleMatrix(source, profile, matrix, index) {
     const signatureSetNames = referenceSignatureSetOption(
       source,
       profile,
@@ -271,19 +274,20 @@ export default function ProfileFormPlot() {
     );
     const signatureName = defaultSignatureName(signatureNames);
 
-    setValue('matrix', matrix);
-    setValue('signatureSetName', signatureSetName);
-    setValue('strategy', strategy);
-    setValue('signatureName', signatureName);
-    mergeState({
-      matrix,
-      signatureSetName,
-      strategy,
-      signatureName,
-    });
+    setValue(`plots[${index}].matrix`, matrix);
+    handleSet(source, profile, matrix, signatureSetName, index);
+    // setValue(`plots[${index}].signatureSetName`, signatureSetName);
+    // setValue(`plots[${index}].strategy`, strategy);
+    // setValue(`plots[${index}].signatureName`, signatureName);
+    // mergeState({
+    //   matrix,
+    //   signatureSetName,
+    //   strategy,
+    //   signatureName,
+    // });
   }
 
-  function handleSet(signatureSetName) {
+  function handleSet(source, profile, matrix, signatureSetName, index) {
     const strategies = strategyOptions(
       source,
       profile,
@@ -300,18 +304,26 @@ export default function ProfileFormPlot() {
     );
     const signatureName = defaultSignatureName(signatureNames);
 
-    setValue('signatureSetName', signatureSetName);
-    setValue('strategy', strategy);
-    setValue('signatureName', signatureName);
+    setValue(`plots[${index}].signatureSetName`, signatureSetName);
+    handleStrategy(source, profile, matrix, signatureSetName, strategy, index);
+    // setValue(`plots[${index}].strategy`, strategy);
+    // setValue(`plots[${index}].signatureName`, signatureName);
 
-    mergeState({
-      signatureSetName,
-      strategy,
-      signatureName,
-    });
+    // mergeState({
+    //   signatureSetName,
+    //   strategy,
+    //   signatureName,
+    // });
   }
 
-  function handleStrategy(strategy) {
+  function handleStrategy(
+    source,
+    profile,
+    matrix,
+    signatureSetName,
+    strategy,
+    index
+  ) {
     const signatureNames = signatureNameOptions(
       source,
       profile,
@@ -320,49 +332,68 @@ export default function ProfileFormPlot() {
       strategy
     );
     const signatureName = defaultSignatureName(signatureNames);
-    setValue('strategy', strategy);
-    setValue('signatureName', signatureName);
 
-    mergeState({
+    setValue(`plots[${index}].strategy`, strategy);
+    handleName(
+      source,
+      profile,
+      matrix,
+      signatureSetName,
       strategy,
       signatureName,
-    });
+      index
+    );
+    // setValue(`plots[${index}].signatureName`, signatureName);
+
+    // mergeState({
+    //   strategy,
+    //   signatureName,
+    // });
   }
 
-  function handleName(signatureName) {
-    setValue('signatureName', signatureName);
-    mergeState({
-      signatureName,
-    });
+  function handleName(
+    source,
+    profile,
+    matrix,
+    signatureSetName,
+    strategy,
+    signatureName,
+    index
+  ) {
+    setValue(`plots[${index}].signatureName`, signatureName);
+    // mergeState({
+    //   signatureName,
+    // });
   }
   // set inital source
   useEffect(() => {
-    if (!source && signatureSourceOptions.length)
+    if (!plots[0].source && signatureSourceOptions.length)
       handleSource(signatureSourceOptions[0]);
+    console.log('useEffect1');
   }, [signatureSourceOptions]);
 
   // get data on form change
-  useEffect(() => {
-    if (
-      source?.value &&
-      profile?.value &&
-      matrix?.value &&
-      signatureSetName?.value &&
-      strategy?.value &&
-      signatureName?.value
-    ) {
-      const params = {
-        source: source.value,
-        profile: profile.value,
-        matrix: matrix.value,
-        signatureSetName: signatureSetName.value,
-        strategy: strategy.value,
-        signatureName: signatureName.value,
-      };
+  // useEffect(() => {
+  //   if (
+  //     source?.value &&
+  //     profile?.value &&
+  //     matrix?.value &&
+  //     signatureSetName?.value &&
+  //     strategy?.value &&
+  //     signatureName?.value
+  //   ) {
+  //     const params = {
+  //       source: source.value,
+  //       profile: profile.value,
+  //       matrix: matrix.value,
+  //       signatureSetName: signatureSetName.value,
+  //       strategy: strategy.value,
+  //       signatureName: signatureName.value,
+  //     };
 
-      setParams(params);
-    }
-  }, [source, profile, matrix, signatureSetName, strategy, signatureName]);
+  //     setParams(params);
+  //   }
+  // }, [plots]);
 
   const {
     data: plotdata,
@@ -371,91 +402,6 @@ export default function ProfileFormPlot() {
   } = useRsProfilePlotQuery(params, {
     skip: !params,
   });
-
-  // function addPlots() {
-  //   mergeRsProfiles({
-  //     plots: [
-  //       ...plots,
-  //       {
-  //         source: '',
-  //         profile: '',
-  //         matrix: '',
-  //         signatureSetName: '',
-  //         strategy: '',
-  //         signatureName: '',
-  //       },
-  //     ],
-  //   });
-  // }
-  //console.log(refSigData);
-  // function addPlots() {
-  //   console.log(index);
-  //   console.log(plots);
-  //   console.log(plots.length);
-  //   const signatureSource = {
-  //     label: 'Reference_signatures',
-  //     value: 'Reference_signatures',
-  //   };
-  //   const profiles = profileOptions(signatureSource);
-
-  //   console.log(profiles);
-  //   const profile = defaultProfile2(profiles);
-
-  //   const matrices = matrixOptions(source, profile);
-  //   const matrix = defaultMatrix2(profile, matrices);
-  //   const signatureSetNames = referenceSignatureSetOption(
-  //     source,
-  //     profile,
-  //     matrix
-  //   );
-  //   const signatureSetName = defaultSignatureSet(signatureSetNames);
-  //   const strategies = strategyOptions(
-  //     source,
-  //     profile,
-  //     matrix,
-  //     signatureSetName
-  //   );
-  //   const strategy = defaultStrategy(strategies);
-  //   const signatureNames = signatureNameOptions(
-  //     source,
-  //     profile,
-  //     matrix,
-  //     signatureSetName,
-  //     strategy
-  //   );
-  //   const signatureName = defaultSignatureName(signatureNames);
-
-  //   mergeRsProfiles({
-  //     plots: [
-  //       ...plots,
-  //       {
-  //         source: signatureSource,
-  //         profile: profile,
-  //         matrix: matrix,
-  //         signatureSetName: signatureSetName,
-  //         strategy: strategy,
-  //         signatureName: signatureName,
-  //         index: plots.length,
-  //       },
-  //     ],
-  //   });
-  // }
-  //console.log(plots);
-  //console.log('----');
-  // function removePlots(index) {
-  //   //if (plots[index.plotURL]) Object.revokeObjectURL(plots[index].plotURL);
-  //   console.log('index: -- ');
-  //   console.log(index);
-  //   //console.log(plots);
-  //   let newPlots = plots.slice();
-  //   //console.log(newPlots);
-  //   //newPlots.splice(index, 1);
-  //   console.log(newPlots);
-  //   const removed = newPlots.splice(index, 1);
-  //   console.log(removed);
-
-  //   mergeRsProfiles({ plots: newPlots });
-  // }
 
   const customStyles = {
     control: (base, state) => ({
@@ -488,85 +434,126 @@ export default function ProfileFormPlot() {
   return (
     <div>
       {plotsFields.map((item, index) => (
-        <div key={index}>
+        <div key={item.id}>
           <Form className="p-3">
             <LoadingOverlay active={plotFetching} />
 
             <Row className="">
               <Col lg="auto">
                 <Select
-                  name="source"
+                  name={`plots[${index}].source`}
                   label="Signature Source"
-                  value={source}
+                  //value={source}
                   options={signatureSourceOptions}
                   control={control}
-                  onChange={handleSource}
+                  onChange={(e) => handleSource(e, index)}
                   styles={customStyles}
                 />
               </Col>
               <Col lg="auto">
                 <Select
-                  name="profile"
+                  name={`plots[${index}].profile`}
                   label="Profile Name"
-                  value={profile}
-                  options={profileOptions(source)}
+                  //value={profile}
+                  options={profileOptions(plots[index].source)}
                   control={control}
-                  onChange={handleProfile}
+                  onChange={(e) => handleProfile(plots[index].source, e, index)}
                   styles={customStyles}
                 />
               </Col>
               <Col lg="auto">
                 <Select
-                  name="matrix"
+                  name={`plots[${index}] .matrix`}
                   label="Matrix"
-                  value={matrix}
-                  options={matrixOptions(source, profile)}
+                  //value={matrix}
+                  options={matrixOptions(
+                    plots[index].source,
+                    plots[index].profile
+                  )}
                   control={control}
-                  onChange={handleMatrix}
+                  onChange={(e) =>
+                    handleMatrix(
+                      plots[index].source,
+                      plots[index].profile,
+                      e,
+                      index
+                    )
+                  }
                   styles={customStyles}
                 />
               </Col>
               <Col lg="auto">
                 <Select
-                  name="signatureSetName"
+                  name={`plots[${index}].signatureSetName`}
                   label="Reference Signature Set"
-                  value={signatureSetName}
-                  options={referenceSignatureSetOption(source, profile, matrix)}
+                  //value={signatureSetName}
+                  options={referenceSignatureSetOption(
+                    plots[index].source,
+                    plots[index].profile,
+                    plots[index].matrix
+                  )}
                   control={control}
-                  onChange={handleSet}
+                  onChange={(e) =>
+                    handleSet(
+                      plots[index].source,
+                      plots[index].profile,
+                      plots[index].matrix,
+                      e,
+                      index
+                    )
+                  }
                   styles={customStyles}
                 />
               </Col>
               <Col lg="auto">
                 <Select
-                  name="strategy"
+                  name={`plots[${index}].strategy`}
                   label="Experimental Strategy"
-                  value={strategy}
+                  //value={strategy}
                   options={strategyOptions(
-                    source,
-                    profile,
-                    matrix,
-                    signatureSetName
+                    plots[index].source,
+                    plots[index].profile,
+                    plots[index].matrix,
+                    plots[index].signatureSetName
                   )}
                   control={control}
-                  onChange={handleStrategy}
+                  onChange={(e) =>
+                    handleStrategy(
+                      plots[index].source,
+                      plots[index].profile,
+                      plots[index].matrix,
+                      plots[index].signatureSetName,
+                      e,
+                      index
+                    )
+                  }
                   styles={customStyles}
                 />
               </Col>
               <Col lg="auto">
                 <Select
-                  name="signatureName"
+                  name={`plots[${index}]].signatureName`}
                   label="Signature Name"
-                  value={signatureName}
+                  //value={signatureName}
                   options={signatureNameOptions(
-                    source,
-                    profile,
-                    matrix,
-                    signatureSetName,
-                    strategy
+                    plots[index].source,
+                    plots[index].profile,
+                    plots[index].matrix,
+                    plots[index].signatureSetName,
+                    plots[index].strategy
                   )}
                   control={control}
-                  onChange={handleName}
+                  onChange={(e) =>
+                    handleName(
+                      plots[index].source,
+                      plots[index].profile,
+                      plots[index].matrix,
+                      plots[index].signatureSetName,
+                      plots[index].strategy,
+                      e,
+                      index
+                    )
+                  }
                   styles={customStyles}
                 />
               </Col>
@@ -594,7 +581,7 @@ export default function ProfileFormPlot() {
             </Row>
           </Form>
 
-          <div id="plot">
+          <div id={`plots[${index}]`}>
             <div
               style={{ display: plotError || optionError ? 'block' : 'none' }}
             >
@@ -607,7 +594,7 @@ export default function ProfileFormPlot() {
                 layout={plotdata.layout}
                 config={plotdata.config}
                 divId="mutationalProfilePlot"
-                filename={source?.value || 'Mutational Profile'}
+                filename={plots[index].source?.value || 'Mutational Profile'}
               />
             )}
             <Row className="mr-3">

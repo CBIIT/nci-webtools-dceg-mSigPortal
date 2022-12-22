@@ -53,7 +53,7 @@ export function NavbarCustom({ links }) {
         <div className="mx-auto">
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
-            <div className="mx-auto">
+            <div className="mx-auto text-center">
               {[{ route: '/', title: 'Home', exact: true }]
                 .concat(links)
                 .filter((link) => link.title)
