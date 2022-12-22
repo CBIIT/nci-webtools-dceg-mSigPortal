@@ -12,6 +12,7 @@ export default function Select({
   labelClass,
   control,
   rules,
+  defaultValue,
   ...rest
 }) {
   const selectStyles = {
@@ -45,6 +46,7 @@ export default function Select({
         name={name}
         control={control}
         rules={rules}
+        defaultValue={defaultValue}
         render={({ field }) => (
           <ReactSelect
             {...selectStyles}
