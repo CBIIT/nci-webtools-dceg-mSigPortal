@@ -2,13 +2,21 @@ import { extractionApiSlice } from '../../../../services/store/rootApi';
 
 export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    signatureOptions: builder.query({
-      query: (params) => ({
-        url: 'mutational_signature_options',
-        params,
+    upload: builder.mutation({
+      query: (body) => ({
+        url: 'upload',
+        method: 'POST',
+        body,
+      }),
+    }),
+    submit: builder.mutation({
+      query: (body) => ({
+        url: 'submit',
+        method: 'POST',
+        body,
       }),
     }),
   }),
 });
 
-export const { useSignatureOptionsQuery } = inputFormApiSlice;
+export const { useUploadMutation, useSubmitMutation } = inputFormApiSlice;

@@ -2,19 +2,10 @@ import { createSlice } from '@reduxjs/toolkit';
 import { mergeObject } from './utils';
 
 export const getInitialState = () => ({
-  inputForm: {
-    source: 'public',
-    study: '',
-    strategy: '',
-    cancer: '',
-    dataType: '',
-    inputFilename: '',
-    genome: '',
-    exome: '',
-  },
+  inputForm: {},
   main: {
     displayTab: 'instructions',
-    projectID: '',
+    id: '',
     openSidebar: true,
     submitted: false,
   },
