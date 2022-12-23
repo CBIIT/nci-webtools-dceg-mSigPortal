@@ -193,7 +193,7 @@ export default function ProfileFormPlot() {
     );
     const signatureName = defaultSignatureName(signatureNames);
 
-    setValue(`plots.[${index}].source`, source);
+    setValue(`plots[${index}].source`, source);
     handleProfile(source, profile, index);
     // setValue(`plots[${index}].profile`, profile);
     // setValue(`plots[${index}].matrix`, matrix);
@@ -343,7 +343,7 @@ export default function ProfileFormPlot() {
       signatureName,
       index
     );
-    // setValue(`plots[${index}].signatureName`, signatureName);
+    //setValue(`plots[${index}].signatureName`, signatureName);
 
     // mergeState({
     //   strategy,
@@ -361,39 +361,52 @@ export default function ProfileFormPlot() {
     index
   ) {
     setValue(`plots[${index}].signatureName`, signatureName);
-    // mergeState({
-    //   signatureName,
-    // });
+
+    mergeState({
+      signatureName,
+    });
   }
   // set inital source
   useEffect(() => {
     if (!plots[0].source && signatureSourceOptions.length)
       handleSource(signatureSourceOptions[0]);
-    console.log('useEffect1');
   }, [signatureSourceOptions]);
 
-  // get data on form change
-  // useEffect(() => {
-  //   if (
-  //     source?.value &&
-  //     profile?.value &&
-  //     matrix?.value &&
-  //     signatureSetName?.value &&
-  //     strategy?.value &&
-  //     signatureName?.value
-  //   ) {
-  //     const params = {
-  //       source: source.value,
-  //       profile: profile.value,
-  //       matrix: matrix.value,
-  //       signatureSetName: signatureSetName.value,
-  //       strategy: strategy.value,
-  //       signatureName: signatureName.value,
-  //     };
+  const validDataArray = plots.filter(
+    (e) =>
+      e.source?.value &&
+      e.profile?.value &&
+      e.matrix?.value &&
+      e.signatureSetName?.value &&
+      e.strategy?.value &&
+      e.signatureName?.value
+  );
+  console.log(validDataArray);
+  console.log(plots.filter((e) => e.source.value));
 
-  //     setParams(params);
-  //   }
-  // }, [plots]);
+  // get data on form change
+  useEffect(() => {
+    const params = {
+      source: plots.filter((e) => e.source.value),
+      profile: plots.filter((e) => e.profile.value),
+      matrix: plots.filter((e) => e.matrix.value),
+      signatureSetName: plots.filter((e) => e.value),
+      strategy: plots.filter((e) => e.strategy.value),
+      signatureName: plots.filter((e) => e.signatureName.value),
+    };
+    // const params = plots.filter((e) => ({
+    //   source: e.source.value,
+    //   profile: e.profile.value,
+    //   matrix: e.matrix.value,
+    //   signatureSetName: e.signatureSetName.value,
+    //   strategy: e.strategy.value,
+    //   signatureName: e.signatureName.value,
+    // }));
+    // console.log(params);
+    // console.log(Object.values(params));
+    // setParams(params);
+    setParams(Object.values(params)[0]);
+  }, [plots]);
 
   const {
     data: plotdata,
@@ -402,7 +415,7 @@ export default function ProfileFormPlot() {
   } = useRsProfilePlotQuery(params, {
     skip: !params,
   });
-
+  console.log(plotdata);
   const customStyles = {
     control: (base, state) => ({
       ...base,
@@ -532,7 +545,7 @@ export default function ProfileFormPlot() {
               </Col>
               <Col lg="auto">
                 <Select
-                  name={`plots[${index}]].signatureName`}
+                  name={`plots[${index}].signatureName`}
                   label="Signature Name"
                   //value={signatureName}
                   options={signatureNameOptions(
@@ -590,9 +603,9 @@ export default function ProfileFormPlot() {
 
             {plotdata && (
               <Plotly
-                data={plotdata.traces}
-                layout={plotdata.layout}
-                config={plotdata.config}
+                data={plotdata[index].data.traces}
+                layout={plotdata[index].data.layout}
+                config={plotdata[index].data.config}
                 divId="mutationalProfilePlot"
                 filename={plots[index].source?.value || 'Mutational Profile'}
               />
