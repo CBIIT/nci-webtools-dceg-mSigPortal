@@ -51,7 +51,7 @@ export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
 
     rsProfilePlot: builder.query({
       async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
-        console.log(_arg);
+        //console.log(_arg);
         const params = _arg.map((e) => ({
           source: e.source.value,
           profile: e.profile.value,
@@ -60,7 +60,7 @@ export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
           strategy: e.strategy.value,
           signatureName: e.signatureName.value,
         }));
-        console.log(params);
+        //console.log(params);
         try {
           const res = await Promise.all(
             params.map((e) =>
@@ -70,12 +70,12 @@ export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
 
           console.log(res);
           const plotData = res.map((e, i) => {
-            console.log(e);
-            console.log(i);
-            console.log(params[i].profile);
-            console.log(params[i].matrix);
-            console.log(params[i].signatureName);
-            console.log(res[i].data);
+            // console.log(e);
+            // console.log(i);
+            // console.log(params[i].profile);
+            // console.log(params[i].matrix);
+            // console.log(params[i].signatureName);
+            // console.log(res[i].data);
 
             if (params[i].profile + params[i].matrix === 'SBS96') {
               return {
@@ -100,8 +100,8 @@ export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
             }
           });
 
-          console.log(plotData);
-          console.log(plotData[0].data.traces);
+          // console.log(plotData);
+          // console.log(plotData[0].data.traces);
           return { plotData };
         } catch (error) {
           return { error };

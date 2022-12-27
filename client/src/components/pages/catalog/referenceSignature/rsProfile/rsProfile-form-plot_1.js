@@ -44,7 +44,7 @@ export default function ProfileFormPlot() {
     name: 'plots',
   });
 
-  console.log(plotsFields);
+  //console.log(plotsFields);
 
   const { plots } = watch();
 
@@ -381,8 +381,8 @@ export default function ProfileFormPlot() {
       e.strategy?.value &&
       e.signatureName?.value
   );
-  console.log(validDataArray);
-  console.log(plots.filter((e) => e.source.value));
+  //console.log(validDataArray);
+  //console.log(plots.filter((e) => e.source.value));
 
   // get data on form change
   useEffect(() => {
@@ -415,7 +415,7 @@ export default function ProfileFormPlot() {
   } = useRsProfilePlotQuery(params, {
     skip: !params,
   });
-  console.log(plotdata);
+  //console.log(plotdata);
   const customStyles = {
     control: (base, state) => ({
       ...base,

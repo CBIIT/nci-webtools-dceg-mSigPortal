@@ -1,5 +1,21 @@
 import { groupBy } from 'lodash';
 export default function RsInMsigportal(rawData) {
+  console.log(rawData);
+  function mapOrder(array, order, key) {
+    array.sort(function (a, b) {
+      var A = a[key],
+        B = b[key];
+
+      if (order.indexOf(A) > order.indexOf(B)) {
+        return 1;
+      } else {
+        return -1;
+      }
+    });
+
+    return array;
+  }
+  const profile_order = ['SBS', 'DBS', 'ID', 'CN', 'RS'];
   const groupBySpecies = groupBy(rawData, (item) => `${item.species}`);
   const groupByignatureSetName = groupBy(
     rawData,
@@ -32,13 +48,18 @@ export default function RsInMsigportal(rawData) {
     }
   });
   dataHuman = dataHuman.flat();
+  const dataHumanSort = mapOrder(dataHuman, profile_order, 'profile');
   dataMm9 = dataMm9.flat();
   dataRn6 = dataRn6.flat();
+
+  console.log(dataHuman);
+  console.log(dataHumanSort);
 
   const groupedHuman = groupBy(
     dataHuman,
     (item) => `${item.profile}${item.matrix}`
   );
+  console.log(groupedHuman);
   const groupedMm9 = groupBy(
     dataMm9,
     (item) => `${item.profile}${item.matrix}`
@@ -47,14 +68,26 @@ export default function RsInMsigportal(rawData) {
     dataRn6,
     (item) => `${item.profile}${item.matrix}`
   );
-  const dataArray = [];
-  Object.values(groupedHuman).map((e) => dataArray.push(e));
+  // const dataArray = [];
+  // Object.values(groupedHuman).map((e) => dataArray.push(e));
+
+  for (var key in groupedHuman)
+    groupedHuman[key].sort(function (a, b) {
+      var x = a.profile,
+        y = b.profile;
+      return x === y ? 0 : x < y ? -1 : 1;
+    });
+  console.log(groupedHuman);
 
   const tracePies0 = Object.entries(groupedHuman).map(
     ([key, element], index, array) => ({
       type: 'pie',
       marker: {
         color: element.map((e) => colors[e.signatureSetName]),
+        line: {
+          color: 'black',
+          width: 1,
+        },
       },
       textposition: 'inside',
       labels: element.map((e) => e.signatureSetName),
@@ -83,6 +116,10 @@ export default function RsInMsigportal(rawData) {
       e: element,
       marker: {
         color: element.map((e) => colors[e.signatureSetName]),
+        line: {
+          color: 'black',
+          width: 1,
+        },
       },
       textposition: 'inside',
       labels: element.map((e) => e.signatureSetName),
@@ -112,6 +149,10 @@ export default function RsInMsigportal(rawData) {
       e: element,
       marker: {
         color: element.map((e) => colors[e.signatureSetName]),
+        line: {
+          color: 'black',
+          width: 1,
+        },
       },
       textposition: 'inside',
       labels: element.map((e) => e.signatureSetName),
@@ -134,6 +175,21 @@ export default function RsInMsigportal(rawData) {
         '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
     })
   );
+  function indexPos(index) {
+    let indexPosition;
+    if (index === 0 || index === 4) {
+      indexPosition = 0.072;
+    } else if (index === 1 || index === 5) {
+      indexPosition = 0.27;
+    } else if (index === 2 || index === 6) {
+      indexPosition = 0.495;
+    } else if (index === 3 || index === 7) {
+      indexPosition = 0.72;
+    } else {
+      indexPosition = 0.92;
+    }
+    return indexPosition;
+  }
 
   const pieTitles0 = Object.entries(groupedHuman).map(
     ([key, element], index, array) => ({
@@ -142,12 +198,14 @@ export default function RsInMsigportal(rawData) {
       xanchor: 'bottom',
       yanchor: 'bottom',
       showarrow: false,
-      text: key,
-      x: index < 4 ? index * (1 / 5) + 0.0975 : (index - 4) * (1 / 5) + 0.0975,
+      text: key.padStart(7, ' '),
+      align: 'center',
+      //x: index < 4 ? index * (1 / 5) + 0.0975 : (index - 4) * (1 / 5) + 0.0975,
+      x: indexPos(index),
       y: index < 4 ? 0.75 : 0.98,
     })
   );
-
+  console.log(pieTitles0);
   const pieTitles1 = Object.entries(groupedMm9).map(
     ([key, element], index, array) => ({
       xref: 'paper',
@@ -155,8 +213,10 @@ export default function RsInMsigportal(rawData) {
       xanchor: 'bottom',
       yanchor: 'bottom',
       showarrow: false,
-      text: key,
-      x: index < 4 ? index * (1 / 5) + 0.085 : (index - 4) * (1 / 5) + 0.085,
+      text: key.padStart(7, ' '),
+      align: 'right',
+      // x: index < 4 ? index * (1 / 5) + 0.085 : (index - 4) * (1 / 5) + 0.085,
+      x: indexPos(index),
       y: 0.46,
     })
   );
@@ -168,8 +228,10 @@ export default function RsInMsigportal(rawData) {
       xanchor: 'bottom',
       yanchor: 'bottom',
       showarrow: false,
-      text: key,
-      x: index < 4 ? index * (1 / 5) + 0.08 : (index - 4) * (1 / 5) + 0.08,
+      text: key.padStart(7, ' '),
+      align: 'center',
+      //x: index < 4 ? index * (1 / 5) + 0.08 : (index - 4) * (1 / 5) + 0.08,
+      x: indexPos(index),
       y: 0.2,
     })
   );
