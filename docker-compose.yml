@@ -12,6 +12,18 @@ services:
             - '~/.aws:/root/.aws:ro'
         ports: 
             - '8330:8330'
+    extraction:
+        build:
+            context: '.'
+            dockerfile: './docker/backend-extraction.dockerfile'
+        volumes:
+            - './server/config.json:/deploy/server/config.json:ro'
+            - './logs:/deploy/server/logs'
+            - './tmp:/deploy/tmp'
+            - './data:/deploy/data'
+            - '~/.aws:/root/.aws:ro'
+        ports: 
+            - '8331:8331'
 
     frontend:
         build: 
@@ -23,7 +35,7 @@ services:
             API_BASE_URL: http://backend:8330
             APP_PATH: /mutational-signatures
         ports: 
-            - '8331:80'
+            - '8332:80'
 
     database:
         image: postgres

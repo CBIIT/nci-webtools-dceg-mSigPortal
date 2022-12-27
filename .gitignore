@@ -3,6 +3,7 @@
 /tmp
 /data
 node_modules
+/packages
 
 *.meta
 *.vs

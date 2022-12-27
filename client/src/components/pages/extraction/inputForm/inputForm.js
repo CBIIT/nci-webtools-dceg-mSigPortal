@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
 import Select from '../../../controls/select/selectForm';
@@ -9,24 +9,24 @@ import { actions as modalActions } from '../../../../services/store/modal';
 import {
   resetExtractionApi,
   useSeqmatrixOptionsQuery,
+  useSignatureOptionsQuery,
+  useRefGenomeQuery,
 } from '../../../../services/store/rootApi';
-import { useSignatureOptionsQuery } from './apiSlice';
+import { useUploadMutation, useSubmitMutation } from './apiSlice';
 
 const actions = { ...extractionActions, ...modalActions };
 
 export default function InputForm() {
   const store = useSelector((state) => state.extraction);
   const { submitted } = store.main;
-  const { inputFilename } = store.inputForm;
+  const { inputFilename, ...inputForm } = store.inputForm;
 
   const dispatch = useDispatch();
-  const mergeState = (state) =>
-    dispatch(actions.mergeExtraction({ publicForm: state }));
+  const mergeForm = (state) =>
+    dispatch(actions.mergeExtraction({ inputForm: state }));
   const resetExtraction = (_) => dispatch(actions.resetExtraction());
   const mergeMain = (state) =>
     dispatch(actions.mergeExtraction({ main: state }));
-  const mergeError = (msg) =>
-    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   // query options to populate form
   const {
@@ -39,31 +39,78 @@ export default function InputForm() {
     error: signatureError,
     isFetching: fetchingSignatureOptions,
   } = useSignatureOptionsQuery();
+  const {
+    data: genomeData,
+    error: genomeError,
+    isFetching: fetchingGenomes,
+  } = useRefGenomeQuery();
+
+  const [uploadFiles, { isLoading: loadingUpload }] = useUploadMutation();
+  const [submitForm, { isLoading: loadingSubmit }] = useSubmitMutation();
 
   // toggle visibility of advanced menu
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const genomeOptions = [
-    { label: 'GRCh37', value: 'GRCh37' },
-    { label: 'GRCh38', value: 'GRCh38' },
-    { label: 'mm10', value: 'mm10' },
-  ];
+  const genomeOptions = genomeData
+    ? [...new Set(genomeData.map((e) => e.genome))].sort().map((e) => ({
+        label: e,
+        value: e,
+      }))
+    : [];
+
+  const signatureSetOptions = signatureOptions
+    ? [...new Set(signatureOptions.map((e) => e.signatureSetName))].map(
+        (e) => ({ label: e, value: e })
+      )
+    : [];
+
+  const signatureNameOptions = (signatureSetName) =>
+    signatureOptions && signatureSetName
+      ? [
+          { label: 'all', value: 'all' },
+          ...[
+            ...new Set(
+              signatureOptions
+                .filter((e) => e.signatureSetName == signatureSetName.value)
+                .map((e) => e.signatureName)
+            ),
+          ].map((e) => ({ label: e, value: e })),
+        ]
+      : [];
+
+  const contextTypeOptions = signatureOptions
+    ? [
+        { label: 'default', value: 'SBS96' },
+        ...[...new Set(signatureOptions.map((e) => e.profile + e.matrix))]
+          .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }))
+          .map((e) => ({ label: e, value: e })),
+      ]
+    : [];
+
+  const dataTypeOptions = ['vcf', 'matrix'].map((e) => ({
+    label: e,
+    value: e,
+  }));
+
   const defaultValues = {
-    source: 'public',
+    source: 'user',
     study: { label: 'PCAWG', value: 'PCAWG' },
     cancer: { label: 'Lung-AdenoCA', value: 'Lung-AdenoCA' },
     strategy: { label: 'WGS', value: 'WGS' },
-    genome: genomeOptions[0],
+    input_type: { label: 'vcf', value: 'vcf' },
+    reference_genome: genomeOptions[0],
     exome: false,
     signatureSetName: {
       label: 'COSMIC_v3.3_Signatures_GRCh37_SBS96',
       value: 'COSMIC_v3.3_Signatures_GRCh37_SBS96',
     },
-    signatureName: { label: 'all', value: 'all' },
+    signatureName: [{ label: 'all', value: 'all' }],
     extractTool: {
       label: 'SigProfilerExtractor',
       value: 'SigProfilerExtractor',
     },
+    inputFile: new File(['test'], 'test.txt'),
+    email: '',
   };
 
   const {
@@ -74,17 +121,31 @@ export default function InputForm() {
     setValue,
     watch,
     formState: { errors },
-  } = useForm({ defaultValues });
+  } = useForm({ defaultValues: defaultValues });
 
   const {
     source,
     study,
     cancer,
     inputFile,
+    reference_genome,
     exome,
+    context_type,
     signatureSetName,
     minSignatures,
+    input_type,
   } = watch();
+
+  // set inital genome
+  useEffect(() => {
+    if (!reference_genome && genomeOptions.length)
+      setValue('reference_genome', genomeOptions[0]);
+  }, [genomeOptions]);
+  // set inital context type
+  useEffect(() => {
+    if (!context_type && contextTypeOptions.length)
+      setValue('context_type', contextTypeOptions[0]);
+  }, [contextTypeOptions]);
 
   function handleReset() {
     window.location.hash = '#/extraction';
@@ -95,42 +156,75 @@ export default function InputForm() {
 
   async function onSubmit(data) {
     console.log(data);
-    return;
-    try {
-      mergeMain({ submitted: true, loading: { active: true } });
-      mergeState(data);
-      const params = {
-        study: data.study.value,
-        cancer: data.cancer.value,
-        strategy: data.strategy.value,
-      };
+    const args = {
+      ...(source == 'user' && {
+        input_type: data.input_type.value,
+        input_data: data.inputFile.name,
+      }),
+      reference_genome: data.reference_genome.value,
+      exome: data.exome ? 'True' : 'False',
+      context_type: data.context_type.value,
+      minimum_signatures: data.minimum_signatures,
+      maximum_signatures: data.maximum_signatures,
+      nmf_replicates: data.nmf_replicates,
+      resample: data.resample ? 'True' : 'False',
+      seeds: data.seeds,
+    };
+    const signatureQuery = {
+      signatureSetName: data.signatureSetName.value,
+      profile: data.context_type.value.match(/^\D*/)[0],
+      matrix: data.context_type.value.match(/\d*$/)[0],
+      ...(data.signatureName[0].value != 'all' && {
+        signatureName: data.signatureName.map((e) => e.value).join(';'),
+      }),
+    };
 
-      // let matrixData = [];
-      // for await (const data of paginateQuery(fetchMatrix, params)) {
-      //   matrixData = [...matrixData, ...data];
-      // }
-      const matrixData = []; //await fetchMatrix(params).unwrap();
+    const formData = new FormData();
+    formData.append('inputFile', data.inputFile);
 
-      mergeMain({ matrixData, projectID: crypto.randomUUID() });
-    } catch (error) {
-      console.log(error);
-      if (error.originalStatus == 504) {
-        mergeMain({
-          error: 'Please Reset Your Parameters and Try again.',
-        });
-        mergeError({
-          visible: true,
-          message:
-            'Your submission has timed out. Please try again by submitting this job to a queue instead.',
-        });
-      } else {
-        mergeMain({
-          error: 'Please Reset Your Parameters and Try again.',
-        });
-        mergeError(error.data);
-      }
-    }
-    mergeMain({ loading: { active: false } });
+    const { id } = await uploadFiles(formData).unwrap();
+    const params = { args, signatureQuery, id, email: data.email };
+    const res = await submitForm(params).unwrap();
+
+    console.log(res);
+
+    mergeForm(data);
+    mergeMain({ id });
+    // try {
+    //   mergeMain({ submitted: true, loading: { active: true } });
+    //   mergeState(data);
+    //   const params = {
+    //     study: data.study.value,
+    //     cancer: data.cancer.value,
+    //     strategy: data.strategy.value,
+    //   };
+
+    //   // let matrixData = [];
+    //   // for await (const data of paginateQuery(fetchMatrix, params)) {
+    //   //   matrixData = [...matrixData, ...data];
+    //   // }
+    //   const matrixData = []; //await fetchMatrix(params).unwrap();
+
+    //   mergeMain({ matrixData, projectID: crypto.randomUUID() });
+    // } catch (error) {
+    //   console.log(error);
+    //   if (error.originalStatus == 504) {
+    //     mergeMain({
+    //       error: 'Please Reset Your Parameters and Try again.',
+    //     });
+    //     mergeError({
+    //       visible: true,
+    //       message:
+    //         'Your submission has timed out. Please try again by submitting this job to a queue instead.',
+    //     });
+    //   } else {
+    //     mergeMain({
+    //       error: 'Please Reset Your Parameters and Try again.',
+    //     });
+    //     mergeError(error.data);
+    //   }
+    // }
+    // mergeMain({ loading: { active: false } });
   }
 
   const studyOptions = seqmatrixOptions
@@ -217,26 +311,6 @@ export default function InputForm() {
     setValue('strategy', strategies[0]);
   }
 
-  const signatureSetOptions = signatureOptions
-    ? [...new Set(signatureOptions.map((e) => e.signatureSetName))].map(
-        (e) => ({ label: e, value: e })
-      )
-    : [];
-
-  const signatureNameOptions = (signatureSetName) =>
-    signatureOptions
-      ? [
-          { label: 'all', value: 'all' },
-          ...[
-            ...new Set(
-              signatureOptions
-                .filter((e) => e.signatureSetName == signatureSetName.value)
-                .map((e) => e.signatureName)
-            ),
-          ].map((e) => ({ label: e, value: e })),
-        ]
-      : [];
-
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
       <LoadingOverlay active={fetchingSeqmatrixOptions} />
@@ -257,8 +331,8 @@ export default function InputForm() {
                 type="radio"
                 label={<span className="font-weight-normal">Public</span>}
                 value={'public'}
-                checked={source == 'public'}
-                disabled={submitted}
+                checked={field.value == 'public'}
+                disabled={true}
               />
             )}
           />
@@ -272,8 +346,8 @@ export default function InputForm() {
                 id="radioUser"
                 type="radio"
                 label={<span className="font-weight-normal">User</span>}
-                value={'user'}
-                checked={source == 'user'}
+                value={'vcf'}
+                checked={field.value == 'user'}
                 disabled={submitted}
               />
             )}
@@ -311,10 +385,10 @@ export default function InputForm() {
         ) : (
           <div>
             <Select
-              name="dataType"
+              name="input_type"
               label="Data Type"
               disabled={submitted}
-              options={[{ label: 'default', value: 'default' }]}
+              options={dataTypeOptions}
               control={control}
             />
             <Form.Group>
@@ -335,7 +409,6 @@ export default function InputForm() {
                     label={
                       inputFile?.name || inputFilename || 'Upload Data File...'
                     }
-                    accept=".csv, .tsv, .vcf, .gz, .tar, .tar.gz, .txt"
                     isInvalid={errors.inputFile}
                     feedback="Please upload a data file"
                     onChange={(e) => {
@@ -353,11 +426,12 @@ export default function InputForm() {
       </div>
 
       <Select
-        name="genome"
+        name="reference_genome"
         label="Reference Genome Build"
         disabled={submitted}
         options={genomeOptions}
         control={control}
+        rules={{ required: input_type == 'vcf' }}
       />
       <Form.Group>
         <Controller
@@ -369,16 +443,20 @@ export default function InputForm() {
               id="exome"
               type="checkbox"
               label={'Exome'}
-              checked={exome}
+              checked={field.checked}
               disabled={submitted}
             />
           )}
         />
       </Form.Group>
-      <Form.Group controlId="contextType">
-        <Form.Label>Context Type</Form.Label>
-        <Form.Control {...register('contextType')} defaultValue="default" />
-      </Form.Group>
+      <Select
+        name="context_type"
+        label="Context Type"
+        disabled={submitted}
+        defaultValue={contextTypeOptions[0]}
+        options={contextTypeOptions}
+        control={control}
+      />
       <Select
         name="signatureSetName"
         label="Reference Signature Set"
@@ -413,23 +491,23 @@ export default function InputForm() {
       </Button>
 
       <div className={showAdvanced ? 'd-block' : 'd-none'}>
-        <fieldset className="border rounded p-2 mb-3">
+        {/* <fieldset className="border rounded p-2 mb-3">
           <legend className="font-weight-bold">Execution</legend>
-          <Form.Group controlId="batchSize">
+          <Form.Group controlId="batch_size">
             <Form.Label>Batch Size</Form.Label>
             <Form.Control
-              {...register('batchSize')}
+              {...register('batch_size')}
               type="number"
               defaultValue={1}
             />
           </Form.Group>
-        </fieldset>
+        </fieldset> */}
         <fieldset className="border rounded p-2">
           <legend className="font-weight-bold">NMF Replicates</legend>
           <Form.Group controlId="minSignatures">
             <Form.Label>Minimum Signatures</Form.Label>
             <Form.Control
-              {...register('minSignatures')}
+              {...register('minimum_signatures')}
               type="number"
               min="1"
               max="25"
@@ -439,17 +517,17 @@ export default function InputForm() {
           <Form.Group controlId="maxSignatures">
             <Form.Label>Maximum Signatures</Form.Label>
             <Form.Control
-              {...register('maxSignatures')}
+              {...register('maximum_signatures')}
               type="number"
               min="1"
               max="25"
               defaultValue={15}
             />
           </Form.Group>
-          <Form.Group controlId="nmfReplicates">
+          <Form.Group controlId="nmf_replicates">
             <Form.Label>NMF Replicates Size</Form.Label>
             <Form.Control
-              {...register('nmfReplicates')}
+              {...register('nmf_replicates')}
               type="number"
               min="1"
               max="1000"
@@ -459,14 +537,14 @@ export default function InputForm() {
           <Form.Group controlId="resample">
             <Form.Check
               {...register('resample')}
-              label="Resamples"
+              label="Resample"
               id="resample"
               defaultChecked={true}
             />
           </Form.Group>
-          <Form.Group controlId="seed">
-            <Form.Label>Seed</Form.Label>
-            <Form.Control {...register('seed')} defaultValue="random" />
+          <Form.Group controlId="seeds">
+            <Form.Label>Seeds</Form.Label>
+            <Form.Control {...register('seeds')} defaultValue="random" />
           </Form.Group>
         </fieldset>
       </div>
