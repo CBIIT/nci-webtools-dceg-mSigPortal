@@ -1,21 +1,17 @@
 import { groupBy } from 'lodash';
 export default function RsInMsigportal(rawData) {
-  console.log(rawData);
-  function mapOrder(array, order, key) {
-    array.sort(function (a, b) {
-      var A = a[key],
-        B = b[key];
-
-      if (order.indexOf(A) > order.indexOf(B)) {
-        return 1;
-      } else {
-        return -1;
-      }
-    });
-
-    return array;
-  }
-  const profile_order = ['SBS', 'DBS', 'ID', 'CN', 'RS'];
+  const profile_order_0 = [
+    'ID29',
+    'ID83',
+    'CN48',
+    'RS32',
+    'SBS96',
+    'SBS192',
+    'SBS288',
+    'SBS1536',
+    'DBS78',
+  ];
+  const profile_order_1 = ['SBS96', 'DBS78', 'ID83'];
   const groupBySpecies = groupBy(rawData, (item) => `${item.species}`);
   const groupByignatureSetName = groupBy(
     rawData,
@@ -48,18 +44,13 @@ export default function RsInMsigportal(rawData) {
     }
   });
   dataHuman = dataHuman.flat();
-  const dataHumanSort = mapOrder(dataHuman, profile_order, 'profile');
   dataMm9 = dataMm9.flat();
   dataRn6 = dataRn6.flat();
-
-  console.log(dataHuman);
-  console.log(dataHumanSort);
 
   const groupedHuman = groupBy(
     dataHuman,
     (item) => `${item.profile}${item.matrix}`
   );
-  console.log(groupedHuman);
   const groupedMm9 = groupBy(
     dataMm9,
     (item) => `${item.profile}${item.matrix}`
@@ -68,18 +59,10 @@ export default function RsInMsigportal(rawData) {
     dataRn6,
     (item) => `${item.profile}${item.matrix}`
   );
-  // const dataArray = [];
-  // Object.values(groupedHuman).map((e) => dataArray.push(e));
 
-  for (var key in groupedHuman)
-    groupedHuman[key].sort(function (a, b) {
-      var x = a.profile,
-        y = b.profile;
-      return x === y ? 0 : x < y ? -1 : 1;
-    });
-  console.log(groupedHuman);
-
-  const tracePies0 = Object.entries(groupedHuman).map(
+  const groupedHuman_sorted = profile_order_0.map((key) => groupedHuman[key]);
+  const groupedMm9_sorted = profile_order_1.map((key) => groupedMm9[key]);
+  const tracePies0 = Object.entries(groupedHuman_sorted).map(
     ([key, element], index, array) => ({
       type: 'pie',
       marker: {
@@ -94,7 +77,7 @@ export default function RsInMsigportal(rawData) {
       values: element.map((e) => parseInt(e.count)),
       texttemplate: '%{value}',
       direction: 'clockwise',
-      name: key,
+      name: array[index][1][0].profile + array[index][1][0].matrix,
       domain: {
         x: [
           index < 4
@@ -110,7 +93,7 @@ export default function RsInMsigportal(rawData) {
         '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
     })
   );
-  const tracePies1 = Object.entries(groupedMm9).map(
+  const tracePies1 = Object.entries(groupedMm9_sorted).map(
     ([key, element], index, array) => ({
       type: 'pie',
       e: element,
@@ -191,29 +174,34 @@ export default function RsInMsigportal(rawData) {
     return indexPosition;
   }
 
-  const pieTitles0 = Object.entries(groupedHuman).map(
+  const pieTitles0 = Object.entries(groupedHuman_sorted).map(
     ([key, element], index, array) => ({
       xref: 'paper',
       yref: 'paper',
       xanchor: 'bottom',
       yanchor: 'bottom',
       showarrow: false,
-      text: key.padStart(7, ' '),
+      text: (array[index][1][0].profile + array[index][1][0].matrix).padStart(
+        7,
+        ' '
+      ),
       align: 'center',
       //x: index < 4 ? index * (1 / 5) + 0.0975 : (index - 4) * (1 / 5) + 0.0975,
       x: indexPos(index),
       y: index < 4 ? 0.75 : 0.98,
     })
   );
-  console.log(pieTitles0);
-  const pieTitles1 = Object.entries(groupedMm9).map(
+  const pieTitles1 = Object.entries(groupedMm9_sorted).map(
     ([key, element], index, array) => ({
       xref: 'paper',
       yref: 'paper',
       xanchor: 'bottom',
       yanchor: 'bottom',
       showarrow: false,
-      text: key.padStart(7, ' '),
+      text: (array[index][1][0].profile + array[index][1][0].matrix).padStart(
+        7,
+        ' '
+      ),
       align: 'right',
       // x: index < 4 ? index * (1 / 5) + 0.085 : (index - 4) * (1 / 5) + 0.085,
       x: indexPos(index),
