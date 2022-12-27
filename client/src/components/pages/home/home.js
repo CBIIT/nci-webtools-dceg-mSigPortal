@@ -271,10 +271,19 @@ export default function Home({ links }) {
             </div>
           </div>
         </div> */}
-        <div className="container home-grid">
-          <div className="row pt-5"></div>
-          <div className="row">
-            {links.filter((e) => e.showHomepage).map((e, i) => CardRow3(e, i))}
+        <div
+          className="card-grid"
+          style={{
+            zIndex: '1',
+            position: 'relative',
+          }}
+        >
+          <div className="container">
+            <div className="row">
+              {links
+                .filter((e) => e.showHomepage)
+                .map((e, i) => CardRow3(e, i))}
+            </div>
           </div>
         </div>
       </div>

@@ -54,7 +54,7 @@
   z-index: 1;
   position: absolute;
   top: 25%;
-  left: 20%;
+  //left: 20%;
   margin: auto;
 }
 
@@ -241,12 +241,8 @@
     position: absolute;
     top: 28%;
   }
-  .home-grid {
-    z-index: 1;
-    position: absolute;
-    top: 25%;
-    left: 19%;
-    // margin: auto;
+  .card-grid {
+    top: -5%;
   }
 
   .home-grid-banner-container {
@@ -270,9 +266,12 @@
   .home-grid {
     z-index: 1;
     position: absolute;
-    top: 25%;
-    left: 19%;
+    top: 20%;
+    //left: 14%;
     // margin: auto;
+  }
+  .card-grid {
+    top: -5%;
   }
 
   .home-grid-banner-container {
@@ -294,12 +293,8 @@
     top: 28%;
   }
 
-  .home-grid {
-    z-index: 1;
-    position: absolute;
-    top: 25%;
-    left: 8.5%;
-    // margin: auto;
+  .card-grid {
+    top: -5%;
   }
   .home-grid-banner-container {
     width: 70%;
@@ -319,12 +314,8 @@
     position: absolute;
     top: 28%;
   }
-  .home-grid {
-    z-index: 1;
-    position: absolute;
-    top: 25%;
-    left: 8.5%;
-    // margin: auto;
+  .card-grid {
+    top: -5%;
   }
   .home-grid-banner-container {
     width: 70%;
@@ -364,12 +355,8 @@
     top: 28%;
   }
 
-  .home-grid {
-    z-index: 1;
-    position: absolute;
-    top: 25%;
-    left: 8%;
-    // margin: auto;
+  .card-grid {
+    top: -5%;
   }
 
   .home-grid-banner-container {
@@ -410,12 +397,8 @@
     top: 28%;
   }
 
-  .home-grid {
-    z-index: 1;
-    position: absolute;
-    top: 25%;
-    left: 8%;
-    // margin: auto;
+  .card-grid {
+    top: -5%;
   }
   .home-grid-banner-container {
     width: 80%;
@@ -457,12 +440,9 @@
     position: absolute;
     top: 20%;
   }
-  .home-grid {
-    z-index: 1;
-    position: absolute;
-    top: 18%;
-    left: 3%;
-    // margin: auto;
+
+  .card-grid {
+    top: -5%;
   }
 
   .home-grid-banner-container {
@@ -505,12 +485,9 @@
     position: absolute;
     top: 20%;
   }
-  .home-grid {
-    z-index: 1;
-    position: absolute;
-    top: 18%;
-    left: 3%;
-    // margin: auto;
+
+  .card-grid {
+    top: -5%;
   }
   .home-grid-banner-container {
     width: 95%;
@@ -551,12 +528,9 @@
     width: 80%;
     margin: auto;
   }
-  .home-grid {
-    z-index: 1;
-    position: absolute;
-    top: 10%;
-    left: 13%;
-    // margin: auto;
+
+  .card-grid {
+    top: -3%;
   }
   .home-grid-banner {
     z-index: 1;
@@ -604,12 +578,9 @@
     position: absolute;
     top: 11%;
   }
-  .home-grid {
-    z-index: 1;
-    position: absolute;
-    top: 10%;
-    left: 13%;
-    // margin: auto;
+
+  .card-grid {
+    top: -3%;
   }
 
   .home-grid-banner-container {
@@ -653,12 +624,9 @@
     position: absolute;
     top: 12%;
   }
-  .home-grid {
-    z-index: 1;
-    position: absolute;
-    top: 10%;
-    left: 0%;
-    // margin: auto;
+
+  .card-grid {
+    top: -3%;
   }
   .home-grid-banner-container {
     width: 90%;
@@ -700,12 +668,9 @@
     position: absolute;
     top: 12%;
   }
-  .home-grid {
-    z-index: 1;
-    position: absolute;
-    top: 10%;
-    left: 0%;
-    // margin: auto;
+
+  .card-grid {
+    top: -3%;
   }
   .home-grid-banner-container {
     width: 90%;
