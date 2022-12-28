@@ -177,7 +177,7 @@ export default function Home({ links }) {
           <img
             alt={cardTitle}
             src={image}
-            className="card-img-top w-40 h-40 p-3 pb-0"
+            className="card-img-top w-40 ml-3 mt-3"
           />
           <div className="card-body d-flex flex-column">
             <h5 className={`card-title card-title-homepage text-${name}`}>
@@ -196,14 +196,20 @@ export default function Home({ links }) {
                 <span>Read More &rarr;</span>
               </Link>
             </p>
-            <div class="">
+            <div class="pb-1">
               <Link
                 className={`btn btn-2 btn-${name} btn-border-radius-15`}
                 exact={exact}
                 key={index}
                 to={route}
               >
-                <span class="">Go to {title} &gt;</span>
+                <span
+                  style={{
+                    fontSize: '12px',
+                  }}
+                >
+                  Go to {title} &gt;
+                </span>
               </Link>
             </div>
           </div>
@@ -214,63 +220,36 @@ export default function Home({ links }) {
 
   return (
     <>
-      <div className="banner-container ">
-        <div className="background-img text-center">
-          <img
-            src="assets/images/Hero_Image.png"
-            alt="mSigPortal banner"
-            style={{
-              width: '100%',
-              height: '365px',
-            }}
-          ></img>
-          <div className="row">
-            <div className="homepage-title-left text-left">
-              <h1 className="msigportal-home-title">mSigPortal</h1>
-              <div class="text-primary-purple msigportal-title">
-                Integrative Mutational Signature Portal for Cancer Genomics
-                Study
-              </div>
-            </div>
-            <div className="homepage-title-right">
-              <div className=" btn btn-gradient btn-1">
-                <div className="msigportal-home-title-right">
-                  Learn more about mSigportal &gt;
+      <div className="banner-container">
+        <div className="image-blurred-edge">
+          <div className="background-img text-center">
+            <img
+              src="assets/images/Hero_Image.png"
+              alt="mSigPortal banner"
+              style={{
+                width: '100%',
+                height: '365px',
+              }}
+            ></img>
+            <div className="row">
+              <div className="homepage-title-left text-left">
+                <h1 className="msigportal-home-title">mSigPortal</h1>
+                <div class="text-primary-purple msigportal-title">
+                  Integrative Mutational Signature Portal for Cancer Genomics
+                  Study
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-        {/* <div className="home-grid-banner">
-          <div className="home-grid-banner-container">
-            <div className="row row-cols-1 row-cols-md-3 g-4 m-3">
-              {links.filter((e) => e.showHomepage).map((e, i) => CardRow(e, i))}
-            </div>
-          </div>
-        </div> */}
-
-        {/* <div className="home-grid-banner">
-          <div className="home-grid-banner-container">
-            <div className="card-columns">
-              {links.filter((e) => e.showHomepage).map((e, i) => CardRow(e, i))}
-            </div>
-          </div>
-        </div> */}
-        {/* <div className="home-grid-banner">
-          <div className="home-grid-banner-container">
-            <div class="row my-4">
-              <div class="col">
-                <div class="container-fluid">
-                  <div class="row">
-                    {links
-                      .filter((e) => e.showHomepage)
-                      .map((e, i) => CardRow2(e, i))}
+              <div className="homepage-title-right">
+                <div className=" btn btn-gradient btn-1">
+                  <div className="msigportal-home-title-right">
+                    Learn more about mSigportal &gt;
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div> */}
+        </div>
+
         <div
           className="card-grid"
           style={{
@@ -278,12 +257,23 @@ export default function Home({ links }) {
             position: 'relative',
           }}
         >
-          <div className="container">
+          {/* <div className="container">
             <div className="row">
               {links
                 .filter((e) => e.showHomepage)
                 .map((e, i) => CardRow3(e, i))}
             </div>
+          </div> */}
+          <div className="row">
+            <div className="col-lg-2 col-md-1 col-sm-1 col-xs-1"></div>
+            <div className="col-lg-8 col-md-10 col-sm-10 col-xs-10">
+              <div className="row">
+                {links
+                  .filter((e) => e.showHomepage)
+                  .map((e, i) => CardRow3(e, i))}
+              </div>
+            </div>
+            <div className="col-lg-2 col-md-1 col-sm-1 col-xs-1"></div>
           </div>
         </div>
       </div>
