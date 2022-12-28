@@ -26,11 +26,8 @@ export default function SBS1536(data, sample) {
     Array.from(new Array(Math.ceil(a.length / size)), (_, i) =>
       a.slice(i * size, i * size + size)
     );
-  console.log('data--:');
-  console.log(data);
+
   // const maxValMutation = Math.max(...data.map((o) => o.mutations));
-  // console.log("maxValMutation:---");
-  // console.log(maxValMutation);
 
   function formatTickLabel(mutation, mutationType) {
     const color = colors[mutation];
@@ -342,8 +339,6 @@ export default function SBS1536(data, sample) {
   let heatMapZ3 = [];
   let heatMapZ4 = [];
   let heatMapZ5 = [];
-  console.log('groupByMutationOuter');
-  console.log(groupByMutationOuter);
 
   Object.entries(groupByMutationOuter).forEach(
     ([key, value], groupIndex, array) => {
@@ -354,7 +349,6 @@ export default function SBS1536(data, sample) {
           ? 1
           : 0
       );
-      //console.log(value);
       heatmapY.push(key.charAt(0) + '--' + key.charAt(key.length - 1));
 
       //console.log(totalMutations);
@@ -374,11 +368,11 @@ export default function SBS1536(data, sample) {
     }
   );
 
-  console.log('groupByMutationOuterSort');
-  console.log(groupByMutationOuter);
+  // console.log('groupByMutationOuterSort');
+  // console.log(groupByMutationOuter);
 
-  console.log('heatmapZ');
-  console.log(heatmapZ);
+  // console.log('heatmapZ');
+  // console.log(heatmapZ);
 
   heatmapZ.forEach((item, index) => {
     heatMapZ0.push(item.slice().splice(0, 16));
@@ -389,14 +383,14 @@ export default function SBS1536(data, sample) {
     heatMapZ5.push(item.slice().splice(80, 16));
   });
 
-  console.log('heatMapZ0');
-  console.log(heatMapZ0);
+  // console.log('heatMapZ0');
+  // console.log(heatMapZ0);
 
-  console.log('heatMapZ1');
-  console.log(heatMapZ1);
+  // console.log('heatMapZ1');
+  // console.log(heatMapZ1);
 
-  console.log('heatMapZ5');
-  console.log(heatMapZ5);
+  // console.log('heatMapZ5');
+  // console.log(heatMapZ5);
 
   const heatMapZFinal = [
     heatMapZ0,
@@ -524,7 +518,7 @@ export default function SBS1536(data, sample) {
     yanchor: 'top',
     x: -0.045,
     y: 1.02,
-    text: '<b>Number of Single Base Substitutions</b>',
+    text: '<b>Percent of Single Base Substitutions</b>',
     showarrow: false,
     font: {
       size: 10,
@@ -567,7 +561,8 @@ export default function SBS1536(data, sample) {
       linewidth: 1,
       mirror: 'all',
       domain: [0.72, 1],
-      tickformat: maxVal > 1000 ? '~s' : '',
+      //tickformat: maxVal > 1000 ? '~s' : '',
+      tickformat: '.1%',
       tickfont: {
         family: 'Courier New, monospace',
         size: 8,

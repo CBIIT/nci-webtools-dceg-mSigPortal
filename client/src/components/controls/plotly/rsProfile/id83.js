@@ -244,7 +244,7 @@ export default function ID83(rawData, sample) {
     },
     yaxis: {
       title: {
-        text: '<b>Number of Indels</b>',
+        text: '<b>Percent of Indels</b>',
         font: {
           family: 'Times New Roman',
           size: 18,
@@ -255,6 +255,7 @@ export default function ID83(rawData, sample) {
       linecolor: 'black',
       linewidth: 1,
       mirror: true,
+      tickformat: '.1%',
     },
 
     shapes: [...topShapes, ...bottomShapes],

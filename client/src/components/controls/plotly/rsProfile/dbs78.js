@@ -138,7 +138,7 @@ export default function DBS78(rawData, sample) {
     },
     yaxis: {
       title: {
-        text: '<b>Number of Double Base Substitutions</b>',
+        text: '<b>Percent of Double Base Substitutions</b>',
         font: {
           family: 'Times New Roman',
         },
@@ -147,7 +147,8 @@ export default function DBS78(rawData, sample) {
       range: [0, maxMutation * 1.2],
       linecolor: 'black',
       linewidth: 1,
-      tickformat: maxMutation > 1000 ? '~s' : '',
+      //tickformat: maxMutation > 1000 ? '~s' : '',
+      tickformat: '.1%',
       ticks: 'inside',
       tickcolor: '#D3D3D3',
       showgrid: true,

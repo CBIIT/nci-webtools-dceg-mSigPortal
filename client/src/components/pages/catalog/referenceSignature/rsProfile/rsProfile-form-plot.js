@@ -93,7 +93,8 @@ export default function ProfileFormPlot({ options, index }) {
       : [];
 
   const matrixOptions = (source, profile) =>
-    source && profile && signatureOptions.length
+    //source && profile && signatureOptions.length
+    source && profile
       ? [
           ...new Set(
             signatureOptions
@@ -110,7 +111,8 @@ export default function ProfileFormPlot({ options, index }) {
       : [];
 
   const referenceSignatureSetOption = (source, profile, matrix) =>
-    source && profile && matrix && signatureOptions.length
+    //source && profile && matrix && signatureOptions.length
+    source && profile && matrix
       ? [
           ...new Set(
             signatureOptions
@@ -121,13 +123,14 @@ export default function ProfileFormPlot({ options, index }) {
                   e.matrix === matrix.value
               )
               .map((e) => e.signatureSetName)
-            // .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+              .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
           ),
         ].map((e) => ({ label: e, value: e }))
       : [];
 
   const strategyOptions = (source, profile, matrix, signatureSetName) =>
-    source && profile && matrix && signatureSetName && signatureOptions.length
+    //source && profile && matrix && signatureSetName && signatureOptions.length
+    source && profile && matrix && signatureSetName
       ? [
           ...new Set(
             signatureOptions
@@ -151,12 +154,13 @@ export default function ProfileFormPlot({ options, index }) {
     signatureSetName,
     strategy
   ) =>
-    source &&
-    profile &&
-    matrix &&
-    signatureSetName &&
-    strategy &&
-    signatureOptions.length
+    // source &&
+    // profile &&
+    // matrix &&
+    // signatureSetName &&
+    // strategy &&
+    //   signatureOptions.length
+    source && profile && matrix && signatureSetName && strategy
       ? [
           ...new Set(
             signatureOptions
@@ -184,9 +188,7 @@ export default function ProfileFormPlot({ options, index }) {
       profile,
       matrix
     );
-    console.log(signatureSetNames);
     const signatureSetName = defaultSignatureSet2(signatureSetNames);
-    console.log(signatureSetName);
     const strategies = strategyOptions(
       source,
       profile,
@@ -399,16 +401,12 @@ export default function ProfileFormPlot({ options, index }) {
   // }
   //console.log(refSigData);
   function addPlots() {
-    console.log(index);
-    console.log(plots);
-    console.log(plots.length);
     const signatureSource = {
       label: 'Reference_signatures',
       value: 'Reference_signatures',
     };
     const profiles = profileOptions(signatureSource);
 
-    console.log(profiles);
     const profile = defaultProfile2(profiles);
 
     const matrices = matrixOptions(source, profile);
@@ -450,19 +448,15 @@ export default function ProfileFormPlot({ options, index }) {
       ],
     });
   }
-  //console.log(plots);
-  //console.log('----');
+
   function removePlots(index) {
     //if (plots[index.plotURL]) Object.revokeObjectURL(plots[index].plotURL);
-    console.log('index: -- ');
-    console.log(index);
-    //console.log(plots);
+
     let newPlots = plots.slice();
-    //console.log(newPlots);
+
     //newPlots.splice(index, 1);
-    console.log(newPlots);
+
     const removed = newPlots.splice(index, 1);
-    console.log(removed);
 
     mergeRsProfiles({ plots: newPlots });
   }

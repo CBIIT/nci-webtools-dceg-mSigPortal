@@ -390,7 +390,7 @@ export default function SBS288(data, sample, tab) {
     },
     yaxis: {
       title: {
-        text: '<b>Number of Single Base Substitutions</b>',
+        text: '<b>Percent of Single Base Substitutions</b>',
         font: {
           family: 'Times New Roman',
         },
@@ -414,7 +414,8 @@ export default function SBS288(data, sample, tab) {
         size: 12,
       },
       domain: [0.8, 1],
-      tickformat: maxValByTotal >= 1000 ? '~s' : '',
+      //tickformat: maxValByTotal >= 1000 ? '~s' : '',
+      tickformat: '.1%',
       ticks: 'outside',
       linecolor: '#E0E0E0',
       linewidth: 1,
