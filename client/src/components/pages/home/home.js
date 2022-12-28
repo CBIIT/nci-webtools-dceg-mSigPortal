@@ -205,7 +205,7 @@ export default function Home({ links }) {
               >
                 <span
                   style={{
-                    fontSize: '12px',
+                    fontSize: '13px',
                   }}
                 >
                   Go to {title} &gt;
