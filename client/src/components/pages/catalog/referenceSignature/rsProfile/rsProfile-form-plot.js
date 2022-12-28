@@ -9,7 +9,7 @@ import { actions as catalogActions } from '../../../../../services/store/catalog
 import { actions as modalActions } from '../../../../../services/store/modal';
 import { useForm } from 'react-hook-form';
 import Select from '../../../../controls/select/selectForm';
-import { useRsProfileOptionsQuery, useRsProfileDataQuery } from './apiSlice';
+import { useRsProfileOptionsQuery, useRsProfilePlotQuery } from './apiSlice';
 import {
   defaultProfile2,
   defaultMatrix2,
@@ -376,7 +376,7 @@ export default function ProfileFormPlot({ options, index }) {
     data: plotdata,
     error: plotError,
     isFetching: plotFetching,
-  } = useRsProfileDataQuery(params, {
+  } = useRsProfilePlotQuery(params, {
     skip: !params,
   });
 

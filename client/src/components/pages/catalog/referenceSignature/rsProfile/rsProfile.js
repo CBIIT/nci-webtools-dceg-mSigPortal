@@ -1,5 +1,5 @@
 import Description from '../../../../controls/description/description';
-import RsProfileFormPlot from '../rsProfile/rsProfile-form-plot_1';
+import RsProfileFormPlot from '../rsProfile/rsProfile-form-plot';
 import { useSelector, useDispatch } from 'react-redux';
 
 export default function RsProfile() {
@@ -13,10 +13,10 @@ export default function RsProfile() {
         more="Click ‘+ Add Plot’ to load one or more mutational signature profiles at the same time."
       />
       <hr />
-      {/* {plots.map((e, i) => (
+      {plots.map((e, i) => (
         <RsProfileFormPlot options={e} index={i} />
-      ))} */}
-      <RsProfileFormPlot />
+      ))}
+      {/* <RsProfileFormPlot /> */}
     </div>
   );
 }
