@@ -78,6 +78,20 @@ export default function About() {
               mutations vs. other mutations, etc).
             </p>
           </div>
+          <div id="extraction">
+            <h5 class="text-extraction">Signature Extraction</h5>
+            <p>
+              This module allows users to perform both mutational signature de
+              novo extraction and decomposition analysis using state-of-the-art
+              algorithms such as SigProfiler, Signal, MuSiCal, and
+              SignatureAnalyzer. It supports both user input and mutation
+              profile data collected from popular cancer genomic studies. Users
+              can select any combination of known mutational signatures for the
+              signature decomposition analysis as a reference. The results from
+              this module can be fully imported into the Signature Exploration
+              module for visualization and comparison.
+            </p>
+          </div>
           <div id="exploration">
             <h5 class="text-exploration">Signature Exploration</h5>
             <p>
@@ -123,28 +137,17 @@ export default function About() {
               analyses.
             </p>
           </div>
-          <div id="extraction">
-            <h5 class="text-extraction">Signature Extraction</h5>
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-              reprehenderit in voluptate velit esse cillum dolore eu fugiat
-              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-              sunt in culpa qui officia deserunt mollit anim id est laborum.
-            </p>
-          </div>
           <div id="api">
             <h5 class="text-api">Signature API Access</h5>
             <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-              reprehenderit in voluptate velit esse cillum dolore eu fugiat
-              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-              sunt in culpa qui officia deserunt mollit anim id est laborum.
+              The mutational signature-related data in mSigPortal can be
+              accessed programmatically through a REST API. The syntax for
+              accessing the data is similar to the web address link used for
+              queries on the webpage for each mSigPortal module, and the text
+              output returned is typically the same as the file that can be
+              downloaded from the online site. Users can connect directly to the
+              API to perform batch queries and develop their own visualizations
+              or analyses.
             </p>
           </div>
           <div>

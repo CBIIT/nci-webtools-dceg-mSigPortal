@@ -13,7 +13,7 @@ import { useRsProfileOptionsQuery, useRsProfilePlotQuery } from './apiSlice';
 import {
   defaultProfile2,
   defaultMatrix2,
-  defaultSignatureSet,
+  defaultSignatureSet2,
   defaultStrategy,
   defaultSignatureName,
 } from '../../../../../services/utils';
@@ -184,7 +184,9 @@ export default function ProfileFormPlot({ options, index }) {
       profile,
       matrix
     );
-    const signatureSetName = defaultSignatureSet(signatureSetNames);
+    console.log(signatureSetNames);
+    const signatureSetName = defaultSignatureSet2(signatureSetNames);
+    console.log(signatureSetName);
     const strategies = strategyOptions(
       source,
       profile,
@@ -225,7 +227,7 @@ export default function ProfileFormPlot({ options, index }) {
       profile,
       matrix
     );
-    const signatureSetName = defaultSignatureSet(signatureSetNames);
+    const signatureSetName = defaultSignatureSet2(signatureSetNames);
     const strategies = strategyOptions(
       source,
       profile,
@@ -262,7 +264,7 @@ export default function ProfileFormPlot({ options, index }) {
       profile,
       matrix
     );
-    const signatureSetName = defaultSignatureSet(signatureSetNames);
+    const signatureSetName = defaultSignatureSet2(signatureSetNames);
     const strategies = strategyOptions(
       source,
       profile,
@@ -416,7 +418,7 @@ export default function ProfileFormPlot({ options, index }) {
       profile,
       matrix
     );
-    const signatureSetName = defaultSignatureSet(signatureSetNames);
+    const signatureSetName = defaultSignatureSet2(signatureSetNames);
     const strategies = strategyOptions(
       source,
       profile,

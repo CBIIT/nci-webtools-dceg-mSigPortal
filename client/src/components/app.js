@@ -124,7 +124,7 @@ export default function App() {
       cardTitle: 'API Access',
       cardText: 'API Access',
       description:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor .',
+        'Provide REST API for programmatic access to the mSigPortal data.',
       image: 'assets/images/API-Icon.svg',
       navIndex: 5,
       color: '#84368d',
