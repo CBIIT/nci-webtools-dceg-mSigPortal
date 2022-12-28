@@ -101,17 +101,23 @@ export default function About() {
               <a
                 href="https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga"
                 target="_blank"
+                rel="noreferrer"
               >
                 TCGA
               </a>
               ,{' '}
-              <a href="https://dcc.icgc.org/pcawg" target="_blank">
+              <a
+                href="https://dcc.icgc.org/pcawg"
+                target="_blank"
+                rel="noreferrer"
+              >
                 PCAWG
               </a>
               ,{' '}
               <a
                 href="https://dceg.cancer.gov/research/cancer-types/lung/sherlock-lung-study"
                 target="_blank"
+                rel="noreferrer"
               >
                 Sherlock-Lung
               </a>
