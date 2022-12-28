@@ -147,7 +147,7 @@ export default function SBS96(rawData, sample, tab) {
     },
     yaxis: {
       title: {
-        text: '<b>Number of Single Base Substitutions</b>',
+        text: '<b>Percentage of Single Base Substitutions</b>',
         font: {
           family: 'Times New Roman',
         },
@@ -159,7 +159,7 @@ export default function SBS96(rawData, sample, tab) {
       linecolor: '#D3D3D3',
       linewidth: 1,
       mirror: 'all',
-      tickformat: maxMutation > 1000 ? '~s' : '',
+      tickformat: '.1%',
       showgrid: true,
       gridcolor: '#F5F5F5',
     },

@@ -9,6 +9,13 @@ import { actions as catalogActions } from '../../../../../services/store/catalog
 import { actions as modalActions } from '../../../../../services/store/modal';
 import { useSignatureOptionsQuery } from '../../../../../services/store/rootApi';
 import { useCosineSimilarityQuery } from './apiSlice';
+import {
+  defaultProfile2,
+  defaultMatrix2,
+  defaultSignatureSet2,
+  defaultStrategy,
+  defaultSignatureName,
+} from '../../../../../services/utils';
 
 const actions = { ...catalogActions, ...modalActions };
 
@@ -82,6 +89,7 @@ export default function CosineSimilarityPlot() {
                 (e) => e.profile == profile.value && e.matrix == matrix.value
               )
               .map((e) => e.signatureSetName)
+              .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
           ),
         ].map((e) => ({
           label: e,
@@ -100,8 +108,8 @@ export default function CosineSimilarityPlot() {
     const signatureSets = signatureSetOptions(profile, matrix);
 
     setValue('matrix', matrix);
-    setValue('signatureSet1', signatureSets[0]);
-    setValue('signatureSet2', signatureSets[1] || signatureSets[0]);
+    setValue('signatureSet1', signatureSets[14]);
+    setValue('signatureSet2', signatureSets[3] || signatureSets[0]);
   }
 
   function onSubmit(data) {

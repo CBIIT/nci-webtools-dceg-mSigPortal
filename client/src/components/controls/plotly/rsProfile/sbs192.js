@@ -255,7 +255,7 @@ export default function SBS192(data, sample, tab) {
     },
     yaxis: {
       title: {
-        text: '<b>Number of Single Base Substitutions</b>',
+        text: '<b>Percent of Single Base Substitutions</b>',
         font: {
           family: 'Times New Roman',
         },
@@ -265,6 +265,7 @@ export default function SBS192(data, sample, tab) {
       linecolor: '#E0E0E0',
       linewidth: 1,
       mirror: 'all',
+      tickformat: '.1%',
     },
 
     shapes: [...shapes1, ...shapes2],
