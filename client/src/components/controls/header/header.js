@@ -35,11 +35,13 @@ export function Header() {
               />
             </a> */}
           </div>
-          <div className="p-1 d-sm-none">
+
+          <div className="p-1 d-block d-sm-none">
             <a href="https://dceg.cancer.gov/">
               <img
                 src="https://analysistools.cancer.gov/common/images/DCEG-logo.svg"
                 height="80"
+                width="100%"
                 alt="National Cancer Institute Logo"
               />
             </a>

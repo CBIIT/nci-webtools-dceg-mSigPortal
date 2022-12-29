@@ -16,15 +16,15 @@
   .homepage-title-left {
     position: absolute;
     top: 15%;
-    left: 27%;
-    width: 25%;
+    left: 20%;
+    width: 35%;
   }
 
   .homepage-title-right {
     position: absolute;
     top: 29%;
-    right: 22%;
-    width: 25%;
+    right: 12%;
+    width: 30%;
   }
 }
 .homepage-title {
@@ -64,6 +64,11 @@
 }
 .msigportal-title {
   font-size: 1.4rem;
+}
+
+.img-banner {
+  width: 100%;
+  height: 365px;
 }
 
 .card-title-homepage {
@@ -315,6 +320,12 @@
   .w-40 {
     width: 25% !important;
   }
+
+  .image-blurred-edge {
+    position: relative;
+    width: 90%;
+    margin: auto;
+  }
 }
 
 @media (min-width: 1200px) and (max-width: 1400px) {
@@ -338,6 +349,11 @@
   }
   .w-40 {
     width: 25% !important;
+  }
+  .image-blurred-edge {
+    position: relative;
+    width: 90%;
+    margin: auto;
   }
 }
 /**** large devices ****/
@@ -384,6 +400,11 @@
   .w-40 {
     width: 25% !important;
   }
+  .image-blurred-edge {
+    position: relative;
+    width: 90%;
+    margin: auto;
+  }
 }
 
 @media (min-width: 992px) and (max-width: 1199px) {
@@ -428,6 +449,11 @@
   .w-40 {
     width: 25% !important;
   }
+  .image-blurred-edge {
+    position: relative;
+    width: 90%;
+    margin: auto;
+  }
 }
 /**** medium devices ****/
 @media (min-device-width: 768px) and (max-device-width: 991px) {
@@ -443,7 +469,7 @@
       position: absolute;
       top: 7%;
       left: 10%;
-      width: 90%;
+      width: 80%;
     }
 
     .homepage-title-right {
@@ -475,6 +501,11 @@
   }
   .w-40 {
     width: 25% !important;
+  }
+  .image-blurred-edge {
+    position: relative;
+    width: 95%;
+    margin: auto;
   }
 }
 
@@ -491,7 +522,7 @@
       position: absolute;
       top: 7%;
       left: 15%;
-      width: 90%;
+      width: 80%;
     }
 
     .homepage-title-right {
@@ -523,6 +554,11 @@
   .w-40 {
     width: 25% !important;
   }
+  .image-blurred-edge {
+    position: relative;
+    width: 95%;
+    margin: auto;
+  }
 }
 /**** small devices ****/
 @media (min-device-width: 576px) and (max-device-width: 767px) {
@@ -537,8 +573,8 @@
     .homepage-title-left {
       position: absolute;
       top: 10%;
-      left: 10%;
-      width: 95%;
+      left: 15%;
+      width: 75%;
     }
 
     .homepage-title-right {
@@ -575,6 +611,11 @@
   .w-40 {
     width: 20% !important;
   }
+  .image-blurred-edge {
+    position: relative;
+    width: 100%;
+    margin: auto;
+  }
 }
 @media (min-width: 576px) and (max-width: 767px) {
   .banner-container {
@@ -588,8 +629,8 @@
     .homepage-title-left {
       position: absolute;
       top: 10%;
-      left: 10%;
-      width: 95%;
+      left: 15%;
+      width: 75%;
     }
 
     .homepage-title-right {
@@ -622,6 +663,11 @@
   }
   .w-40 {
     width: 20% !important;
+  }
+  .image-blurred-edge {
+    position: relative;
+    width: 100%;
+    margin: auto;
   }
 }
 /**** x-small devices ****/
@@ -671,6 +717,11 @@
   .w-40 {
     width: 20% !important;
   }
+  .image-blurred-edge {
+    position: relative;
+    width: 100%;
+    margin: auto;
+  }
 }
 @media (max-width: 576px) {
   .banner-container {
@@ -717,5 +768,10 @@
   }
   .w-40 {
     width: 20% !important;
+  }
+  .image-blurred-edge {
+    position: relative;
+    width: 100%;
+    margin: auto;
   }
 }
