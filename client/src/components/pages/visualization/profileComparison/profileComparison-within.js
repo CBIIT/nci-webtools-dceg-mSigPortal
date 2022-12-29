@@ -53,7 +53,9 @@ export default function PcWithin() {
   const profileOptions = matrixData.length
     ? [
         ...new Set(
-          matrixData.map((e) => e.profile).sort((a, b) => b.localeCompare(a))
+          matrixData
+            .map((e) => e.profile)
+            .sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))
         ),
       ].map((e) => ({
         label: e,
