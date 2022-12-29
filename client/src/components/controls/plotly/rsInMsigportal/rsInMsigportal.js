@@ -87,7 +87,7 @@ export default function RsInMsigportal(rawData) {
             ? Math.round((index * (1 / 5) + 0.2) * 10) / 10
             : Math.round(((index - 4) * (1 / 5) + 0.2) * 10) / 10,
         ],
-        y: [index < 4 ? 0.55 : 0.78, index < 4 ? 0.745 : 0.975],
+        y: [index < 4 ? 0.55 : 0.8, index < 4 ? 0.725 : 0.975],
       },
       hovertemplate:
         '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
@@ -119,7 +119,7 @@ export default function RsInMsigportal(rawData) {
             ? Math.round((index * (1 / 5) + 0.2) * 10) / 10
             : Math.round(((index - 4) * (1 / 5) + 0.2) * 10) / 10,
         ],
-        y: [0.265, 0.46],
+        y: [0.265, 0.44],
       },
       hovertemplate:
         '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
@@ -152,7 +152,7 @@ export default function RsInMsigportal(rawData) {
             ? Math.round((index * (1 / 5) + 0.2) * 10) / 10
             : Math.round(((index - 4) * (1 / 5) + 0.2) * 10) / 10,
         ],
-        y: [0, 0.195],
+        y: [0, 0.175],
       },
       hovertemplate:
         '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
@@ -167,7 +167,7 @@ export default function RsInMsigportal(rawData) {
     } else if (index === 2 || index === 6) {
       indexPosition = 0.495;
     } else if (index === 3 || index === 7) {
-      indexPosition = 0.72;
+      indexPosition = 0.728;
     } else {
       indexPosition = 0.92;
     }
@@ -182,13 +182,13 @@ export default function RsInMsigportal(rawData) {
       yanchor: 'bottom',
       showarrow: false,
       text: (array[index][1][0].profile + array[index][1][0].matrix).padStart(
-        7,
+        8,
         ' '
       ),
       align: 'center',
       //x: index < 4 ? index * (1 / 5) + 0.0975 : (index - 4) * (1 / 5) + 0.0975,
       x: indexPos(index),
-      y: index < 4 ? 0.75 : 0.98,
+      y: index < 4 ? 0.73 : 0.98,
     })
   );
   const pieTitles1 = Object.entries(groupedMm9_sorted).map(
@@ -202,10 +202,10 @@ export default function RsInMsigportal(rawData) {
         7,
         ' '
       ),
-      align: 'right',
+      align: 'center',
       // x: index < 4 ? index * (1 / 5) + 0.085 : (index - 4) * (1 / 5) + 0.085,
       x: indexPos(index),
-      y: 0.46,
+      y: 0.445,
     })
   );
 
@@ -220,7 +220,7 @@ export default function RsInMsigportal(rawData) {
       align: 'center',
       //x: index < 4 ? index * (1 / 5) + 0.08 : (index - 4) * (1 / 5) + 0.08,
       x: indexPos(index),
-      y: 0.2,
+      y: 0.18,
     })
   );
   const annotationTitle0 = {
@@ -248,7 +248,7 @@ export default function RsInMsigportal(rawData) {
       size: 16,
     },
     x: 0.25,
-    y: 0.5,
+    y: 0.49,
   };
 
   const annotationTitle2 = {
@@ -262,7 +262,7 @@ export default function RsInMsigportal(rawData) {
       size: 16,
     },
     x: 0.15,
-    y: 0.23,
+    y: 0.22,
   };
 
   const shapes = [
@@ -297,9 +297,9 @@ export default function RsInMsigportal(rawData) {
       xref: 'paper',
       yref: 'paper',
       x0: 0,
-      y0: 0.51,
+      y0: 0.5,
       x1: 0.23,
-      y1: 0.51,
+      y1: 0.5,
       line: {
         color: 'gray',
         width: 3,
@@ -310,9 +310,9 @@ export default function RsInMsigportal(rawData) {
       xref: 'paper',
       yref: 'paper',
       x0: 0.5,
-      y0: 0.51,
+      y0: 0.5,
       x1: 0.7,
-      y1: 0.51,
+      y1: 0.5,
       line: {
         color: 'gray',
         width: 3,
@@ -323,9 +323,9 @@ export default function RsInMsigportal(rawData) {
       xref: 'paper',
       yref: 'paper',
       x0: 0,
-      y0: 0.24,
+      y0: 0.23,
       x1: 0.14,
-      y1: 0.24,
+      y1: 0.23,
       line: {
         color: 'gray',
         width: 3,
@@ -336,9 +336,9 @@ export default function RsInMsigportal(rawData) {
       xref: 'paper',
       yref: 'paper',
       x0: 0.38,
-      y0: 0.24,
+      y0: 0.23,
       x1: 0.7,
-      y1: 0.24,
+      y1: 0.23,
       line: {
         color: 'gray',
         width: 3,
@@ -349,11 +349,17 @@ export default function RsInMsigportal(rawData) {
   const traces = [...tracePies0, ...tracePies1, ...tracePies2];
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
-    height: 975,
+    height: 1080,
     width: 1080,
     autosize: true,
     legend: {
-      title: { text: '\t Signature Set Name' },
+      title: {
+        text: '\t <b>Signature Set Name</b>',
+        font: {
+          family: 'Times New Roman',
+          size: 17,
+        },
+      },
       x: 1,
       xanchor: 'right',
       y: 0,
