@@ -9,13 +9,6 @@ import { actions as catalogActions } from '../../../../../services/store/catalog
 import { actions as modalActions } from '../../../../../services/store/modal';
 import { useSignatureOptionsQuery } from '../../../../../services/store/rootApi';
 import { useCosineSimilarityQuery } from './apiSlice';
-import {
-  defaultProfile2,
-  defaultMatrix2,
-  defaultSignatureSet2,
-  defaultStrategy,
-  defaultSignatureName,
-} from '../../../../../services/utils';
 
 const actions = { ...catalogActions, ...modalActions };
 
