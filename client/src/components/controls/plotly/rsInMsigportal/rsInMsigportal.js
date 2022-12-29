@@ -353,7 +353,13 @@ export default function RsInMsigportal(rawData) {
     width: 1080,
     autosize: true,
     legend: {
-      title: { text: '\t Signature Set Name' },
+      title: {
+        text: '\t <b>Signature Set Name</b>',
+        font: {
+          family: 'Times New Roman',
+          size: 17,
+        },
+      },
       x: 1,
       xanchor: 'right',
       y: 0,
