@@ -9,8 +9,8 @@ export function NavbarCustom({ links }) {
     <div>
       <Navbar
         collapseOnSelect
-        className="shadow-sm bg-nav p-0 border-0 d-none d-md-block"
-        expand="md"
+        className="shadow-sm bg-nav p-0 border-0 d-none d-lg-block"
+        expand="lg"
       >
         <div>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -47,8 +47,8 @@ export function NavbarCustom({ links }) {
       {/* Mobile view*/}
       <Navbar
         collapseOnSelect
-        className="shadow-sm bg-nav border-0 d-block d-md-none ml-3 mr-auto"
-        expand="md"
+        className="shadow-sm bg-nav border-0 d-block d-lg-none ml-3 mr-auto"
+        expand="lg"
       >
         <div className="mx-auto">
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
