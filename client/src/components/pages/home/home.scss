@@ -244,11 +244,37 @@
   .banner-container {
     height: 1120px;
   }
+  .card-grid {
+    top: -3%;
+  }
+  .home-grid-banner-container {
+    width: 80%;
+    margin: auto;
+  }
+  .card-columns {
+    column-count: 3;
+  }
+  .w-40 {
+    width: 25% !important;
+  }
 }
 
 @media (min-width: 1449px) {
   .banner-container {
     height: 1120px;
+  }
+  .card-grid {
+    top: -3%;
+  }
+  .home-grid-banner-container {
+    width: 80%;
+    margin: auto;
+  }
+  .card-columns {
+    column-count: 3;
+  }
+  .w-40 {
+    width: 25% !important;
   }
 }
 
