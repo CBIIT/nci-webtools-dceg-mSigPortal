@@ -163,7 +163,7 @@ export default function Home({ links }) {
     return (
       <div
         key={index}
-        class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-3 d-flex align-items-stretch"
+        class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12 mb-3 d-flex align-items-stretch"
       >
         <div
           className="card"
@@ -263,15 +263,15 @@ export default function Home({ links }) {
           </div> */}
           {/* <div className="container-fluid"> */}
           <div className="row">
-            <div className="col-xl-2 col-lg-2 col-md-1 col-sm-1 col-xs-1"></div>
-            <div className="col-xl-8 col-lg-8 col-md-10 col-sm-10 col-xs-10">
+            <div className="col-xl-2 col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>
+            <div className="col-xl-8 col-lg-10 col-md-10 col-sm-10 col-xs-10">
               <div className="row">
                 {links
                   .filter((e) => e.showHomepage)
                   .map((e, i) => CardRow3(e, i))}
               </div>
             </div>
-            <div className="col-xl-2 col-lg-2 col-md-1 col-sm-1 col-xs-1"></div>
+            <div className="col-xl-2 col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>
           </div>
           {/* </div> */}
         </div>
