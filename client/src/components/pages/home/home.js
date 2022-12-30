@@ -163,7 +163,7 @@ export default function Home({ links }) {
     return (
       <div
         key={index}
-        class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12 mb-3 d-flex align-items-stretch"
+        className="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12 mb-3 d-flex align-items-stretch"
       >
         <div
           className="card"
@@ -174,43 +174,45 @@ export default function Home({ links }) {
             backgroundColor: 'white',
           }}
         >
-          <img
-            alt={cardTitle}
-            src={image}
-            className="card-img-top w-40 ml-3 mt-3"
-          />
-          <div className="card-body d-flex flex-column">
-            <h5 className={`card-title card-title-homepage text-${name}`}>
-              {cardTitle}
-            </h5>
-            <p class="card-text mb-4">
-              {description}
-              <br />
+          <div className="m-3">
+            <img
+              alt={cardTitle}
+              src={image}
+              className="card-img-top w-40 ml-3 mt-3"
+            />
+            <div className="card-body d-flex flex-column">
+              <h5 className={`card-title card-title-homepage text-${name}`}>
+                {cardTitle}
+              </h5>
+              <p class="card-text mb-4">
+                {description}
+                <br />
 
-              <Link
-                className="link-primary-underline"
-                exact={exact}
-                key={index}
-                to={about}
-              >
-                <span>Read More &rarr;</span>
-              </Link>
-            </p>
-            <div class="pb-1">
-              <Link
-                className={`btn btn-2 btn-${name} btn-border-radius-15`}
-                exact={exact}
-                key={index}
-                to={route}
-              >
-                <span
-                  style={{
-                    fontSize: '13px',
-                  }}
+                <Link
+                  className="link-primary-underline"
+                  exact={exact}
+                  key={index}
+                  to={about}
                 >
-                  Go to {title} &gt;
-                </span>
-              </Link>
+                  <span>Read More &rarr;</span>
+                </Link>
+              </p>
+              <div class="pb-1">
+                <Link
+                  className={`btn btn-2 btn-${name} btn-border-radius-15`}
+                  exact={exact}
+                  key={index}
+                  to={route}
+                >
+                  <span
+                    style={{
+                      fontSize: '13px',
+                    }}
+                  >
+                    Go to {title} &gt;
+                  </span>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
