@@ -315,7 +315,10 @@ export default function InputForm() {
   }
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <Form
+      onSubmit={handleSubmit(onSubmit)}
+      style={{ maxHeight: '900px', overflow: 'hidden auto' }}
+    >
       <LoadingOverlay active={fetchingSeqmatrixOptions} />
       {(seqmatrixError || signatureError) && (
         <p>There was an error retrieving public data options</p>
@@ -469,10 +472,21 @@ export default function InputForm() {
       />
       <Select
         name="signatureName"
-        label="Included Signature Names"
+        label="Select Signature Names"
         disabled={submitted}
         options={signatureNameOptions(signatureSetName)}
         control={control}
+        onChange={(values, e) => {
+          // remove "all" option if a specific signature is selected
+          if (e.option.value !== 'all') {
+            setValue(
+              'signatureName',
+              values.filter((e) => e.value !== 'all')
+            );
+          } else if (e.option.value === 'all') {
+            setValue('signatureName', [e.option]);
+          } else setValue('signatureName', values);
+        }}
         isMulti
       />
       <Select
@@ -513,7 +527,7 @@ export default function InputForm() {
               {...register('minimum_signatures')}
               type="number"
               min="1"
-              max="25"
+              max="24"
               defaultValue={1}
             />
           </Form.Group>
