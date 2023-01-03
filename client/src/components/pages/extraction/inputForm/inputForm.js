@@ -110,7 +110,7 @@ export default function InputForm() {
       value: 'SigProfilerExtractor',
     },
     inputFile: new File(['test'], 'test.txt'),
-    email: '',
+    email: 'test.email@nih.gov',
   };
 
   const {
@@ -169,6 +169,9 @@ export default function InputForm() {
       nmf_replicates: data.nmf_replicates,
       resample: data.resample ? 'True' : 'False',
       seeds: data.seeds,
+      min_nmf_iterations: 2,
+      max_nmf_iterations: 4,
+      nmf_test_conv: 2,
     };
     const signatureQuery = {
       signatureSetName: data.signatureSetName.value,
