@@ -761,6 +761,9 @@
     width: 100%;
     margin: auto;
   }
+  .msigportal-home-title-right {
+    font-size: 0.8rem;
+  }
 }
 @media (max-width: 576px) {
   .banner-container {
@@ -781,9 +784,9 @@
 
     .homepage-title-right {
       position: absolute;
-      top: 50%;
-      left: 0%;
-      width: 100%;
+      top: 53%;
+      left: 9%;
+      width: 80%;
     }
   }
 
@@ -813,5 +816,8 @@
     position: relative;
     width: 100%;
     margin: auto;
+  }
+  .msigportal-home-title-right {
+    font-size: 0.8rem;
   }
 }

@@ -246,6 +246,28 @@ export default function Home({ links }) {
                 </div>
               </div>
             </div>
+            {/* <div className="row" style={{ position: 'absolute', top: '15%' }}>
+              <div className="col-xl-8 col-lg-8 col-md-8 col-sm-12 col-xs-12">
+                <div>
+                  {' '}
+                  <h1 className="msigportal-home-title">mSigPortal</h1>
+                  <div class="text-primary-purple msigportal-title">
+                    Integrative Mutational Signature Portal for Cancer Genomics
+                    Study
+                  </div>
+                </div>
+              </div>
+              <div
+                className="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-xs-12"
+                style={{ top: '25%' }}
+              >
+                <div className=" btn btn-gradient btn-1">
+                  <div className="msigportal-home-title-right">
+                    Learn more about mSigportal &gt;
+                  </div>
+                </div>
+              </div>
+            </div> */}
           </div>
         </div>
 
