@@ -75,6 +75,10 @@
   background-size: cover;
 }
 
+.image-banner {
+  width: 1300px;
+  height: 390px;
+}
 .card-title-homepage {
   font-size: 1.3rem;
 }
@@ -275,6 +279,11 @@
   .w-40 {
     width: 25% !important;
   }
+  .image-blurred-edge {
+    position: relative;
+    width: 100%;
+    margin: auto;
+  }
 }
 
 @media (min-width: 1449px) {
@@ -307,6 +316,11 @@
   }
   .w-40 {
     width: 25% !important;
+  }
+  .image-blurred-edge {
+    position: relative;
+    width: 100%;
+    margin: auto;
   }
 }
 
