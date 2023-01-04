@@ -23,7 +23,7 @@
   .homepage-title-right {
     position: absolute;
     top: 29%;
-    right: 12%;
+    right: 16%;
     width: 30%;
   }
 }
@@ -67,8 +67,8 @@
 }
 
 .img-banner {
-  width: 100%;
-  height: 365px;
+  width: auto;
+  height: 390px;
 }
 
 .card-title-homepage {
@@ -162,7 +162,7 @@
 
 .image-blurred-edge {
   position: relative;
-  width: 80%;
+  width: 100%;
   margin: auto;
 }
 
@@ -243,6 +243,20 @@
 @media (min-device-width: 1449px) {
   .banner-container {
     height: 1120px;
+
+    .homepage-title-left {
+      position: absolute;
+      top: 15%;
+      left: 20%;
+      width: 35%;
+    }
+
+    .homepage-title-right {
+      position: absolute;
+      top: 29%;
+      right: 16%;
+      width: 30%;
+    }
   }
   .card-grid {
     top: -3%;
@@ -262,6 +276,20 @@
 @media (min-width: 1449px) {
   .banner-container {
     height: 1120px;
+
+    .homepage-title-left {
+      position: absolute;
+      top: 15%;
+      left: 23%;
+      width: 35%;
+    }
+
+    .homepage-title-right {
+      position: absolute;
+      top: 30%;
+      right: 18%;
+      width: 30%;
+    }
   }
   .card-grid {
     top: -3%;
@@ -281,6 +309,20 @@
 @media (min-device-width: 1401px) and (max-device-width: 1448px) {
   .banner-container {
     height: 1150px;
+
+    .homepage-title-left {
+      position: absolute;
+      top: 15%;
+      left: 23%;
+      width: 35%;
+    }
+
+    .homepage-title-right {
+      position: absolute;
+      top: 30%;
+      right: 18%;
+      width: 30%;
+    }
   }
   .home-grid-banner {
     z-index: 1;
@@ -301,11 +343,30 @@
   .w-40 {
     width: 25% !important;
   }
+  .image-blurred-edge {
+    position: relative;
+    width: 100%;
+    margin: auto;
+  }
 }
 
 @media (min-width: 1401px) and (max-width: 1448px) {
   .banner-container {
-    height: 1150px;
+    height: 1200px;
+
+    .homepage-title-left {
+      position: absolute;
+      top: 15%;
+      left: 23%;
+      width: 35%;
+    }
+
+    .homepage-title-right {
+      position: absolute;
+      top: 30%;
+      right: 18%;
+      width: 30%;
+    }
   }
   .home-grid-banner {
     z-index: 1;
@@ -333,11 +394,30 @@
   .w-40 {
     width: 25% !important;
   }
+  .image-blurred-edge {
+    position: relative;
+    width: 100%;
+    margin: auto;
+  }
 }
 
 @media (min-device-width: 1200px) and (max-device-width: 1400px) {
   .banner-container {
     height: 1200px;
+
+    .homepage-title-left {
+      position: absolute;
+      top: 15%;
+      left: 23%;
+      width: 35%;
+    }
+
+    .homepage-title-right {
+      position: absolute;
+      top: 30%;
+      right: 18%;
+      width: 30%;
+    }
   }
   .home-grid-banner {
     z-index: 1;
@@ -361,7 +441,7 @@
 
   .image-blurred-edge {
     position: relative;
-    width: 90%;
+    width: 100%;
     margin: auto;
   }
 }
@@ -369,6 +449,20 @@
 @media (min-width: 1200px) and (max-width: 1400px) {
   .banner-container {
     height: 1200px;
+
+    .homepage-title-left {
+      position: absolute;
+      top: 15%;
+      left: 20%;
+      width: 35%;
+    }
+
+    .homepage-title-right {
+      position: absolute;
+      top: 29%;
+      right: 16%;
+      width: 30%;
+    }
   }
   .home-grid-banner {
     z-index: 1;
@@ -390,7 +484,7 @@
   }
   .image-blurred-edge {
     position: relative;
-    width: 90%;
+    width: 100%;
     margin: auto;
   }
 }
@@ -401,7 +495,7 @@
     overflow: hidden;
     display: block;
     position: relative;
-    height: 1180px;
+    height: 1500px;
     background-color: #f5f5f5;
 
     .homepage-title-left {
@@ -440,7 +534,7 @@
   }
   .image-blurred-edge {
     position: relative;
-    width: 90%;
+    width: 100%;
     margin: auto;
   }
 }
@@ -451,7 +545,7 @@
     overflow: hidden;
     display: block;
     position: relative;
-    height: 1180px;
+    height: 1500px;
     background-color: #f5f5f5;
 
     .homepage-title-left {
@@ -489,7 +583,7 @@
   }
   .image-blurred-edge {
     position: relative;
-    width: 90%;
+    width: 100%;
     margin: auto;
   }
 }
@@ -506,8 +600,8 @@
     .homepage-title-left {
       position: absolute;
       top: 7%;
-      left: 10%;
-      width: 80%;
+      left: 19%;
+      width: 70%;
     }
 
     .homepage-title-right {
@@ -542,7 +636,7 @@
   }
   .image-blurred-edge {
     position: relative;
-    width: 95%;
+    width: 100%;
     margin: auto;
   }
 }
@@ -559,8 +653,8 @@
     .homepage-title-left {
       position: absolute;
       top: 7%;
-      left: 15%;
-      width: 80%;
+      left: 19%;
+      width: 70%;
     }
 
     .homepage-title-right {
@@ -594,7 +688,7 @@
   }
   .image-blurred-edge {
     position: relative;
-    width: 95%;
+    width: 100%;
     margin: auto;
   }
 }
@@ -611,14 +705,14 @@
     .homepage-title-left {
       position: absolute;
       top: 10%;
-      left: 15%;
-      width: 75%;
+      left: 26%;
+      width: 70%;
     }
 
     .homepage-title-right {
       position: absolute;
       top: 50%;
-      left: 5%;
+      left: 15%;
       width: 95%;
     }
   }
@@ -667,14 +761,14 @@
     .homepage-title-left {
       position: absolute;
       top: 10%;
-      left: 15%;
-      width: 75%;
+      left: 26%;
+      width: 70%;
     }
 
     .homepage-title-right {
       position: absolute;
       top: 50%;
-      left: 5%;
+      left: 15%;
       width: 95%;
     }
   }
@@ -744,7 +838,7 @@
   }
 
   .card-grid {
-    top: -3%;
+    top: 0%;
   }
   .home-grid-banner-container {
     width: 90%;
@@ -800,7 +894,7 @@
   }
 
   .card-grid {
-    top: -3%;
+    top: 0%;
   }
   .home-grid-banner-container {
     width: 90%;
