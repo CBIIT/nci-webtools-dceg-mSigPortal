@@ -297,7 +297,7 @@ export default function MsLandscape(cosineData, exposureData) {
         orientation: 'h',
         x: 0.5,
         y: colorBarLoc,
-
+        thickness: 20,
         bordercolor: 'black',
         tickmode: 'array',
         tickvals: [0.6, 0.7, 0.8, 0.9, 1],
