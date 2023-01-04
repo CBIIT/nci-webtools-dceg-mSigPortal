@@ -223,31 +223,31 @@ export default function Home({ links }) {
   return (
     <>
       <div className="banner-container">
-        <div className="image-blurred-edge">
-          <div className="img-banner background-img text-center  d-none d-sm-block">
-            {/* <img
+        {/* <div className="image-blurred-edge"> */}
+        <div className="img-banner background-img text-center  d-none d-sm-block">
+          {/* <img
               src="assets/images/Hero_Image.png"
               alt="mSigPortal banner"
               className="img-banner"
             ></img> */}
-            <div className="row">
-              <div className="homepage-title-left text-left">
-                <h1 className="msigportal-home-title">mSigPortal</h1>
-                <div class="text-primary-purple msigportal-title">
-                  Integrative Mutational Signature Portal for Cancer Genomics
-                  Study
-                </div>
+          <div className="row">
+            <div className="homepage-title-left text-left">
+              <h1 className="msigportal-home-title">mSigPortal</h1>
+              <div class="text-primary-purple msigportal-title">
+                Integrative Mutational Signature Portal for Cancer Genomics
+                Study
               </div>
-              <div className="homepage-title-right">
-                <div className=" btn btn-gradient btn-1">
-                  <div className="msigportal-home-title-right">
-                    Learn more about mSigportal &gt;
-                  </div>
+            </div>
+            <div className="homepage-title-right">
+              <div className=" btn btn-gradient btn-1">
+                <div className="msigportal-home-title-right">
+                  Learn more about mSigportal &gt;
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* <div className="row" style={{ position: 'absolute', top: '15%' }}>
+          {/* <div className="row" style={{ position: 'absolute', top: '15%' }}>
               <div className="col-xl-8 col-lg-8 col-md-8 col-sm-12 col-xs-12">
                 <div>
                   {' '}
@@ -269,8 +269,8 @@ export default function Home({ links }) {
                 </div>
               </div>
             </div> */}
-          </div>
         </div>
+        {/* </div> */}
         <div className="container my-3 d-sm-none">
           <div className="row">
             <div className="col-12">

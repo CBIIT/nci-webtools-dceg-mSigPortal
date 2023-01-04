@@ -67,16 +67,12 @@
 }
 
 .img-banner {
-  // width: 1300px;
-  // height: 390px;
-
   background-image: url('../../../../public/assets/images/Hero_Image.png');
-  // object-fit: scale-down;
-  // object-position: center;
   min-height: 390px;
   background-size: contain;
   background-position: bottom center;
   background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .card-title-homepage {
@@ -254,15 +250,15 @@
 
     .homepage-title-left {
       position: absolute;
-      top: 15%;
-      left: 28%;
+      top: 10%;
+      left: 22%;
       width: 30%;
     }
 
     .homepage-title-right {
       position: absolute;
-      top: 30%;
-      right: 20%;
+      top: 25%;
+      right: 15%;
       width: 30%;
     }
   }
@@ -287,15 +283,15 @@
 
     .homepage-title-left {
       position: absolute;
-      top: 15%;
-      left: 28%;
+      top: 10%;
+      left: 22%;
       width: 30%;
     }
 
     .homepage-title-right {
       position: absolute;
-      top: 30%;
-      right: 20%;
+      top: 25%;
+      right: 15%;
       width: 30%;
     }
   }
@@ -515,7 +511,7 @@
 
     .homepage-title-right {
       position: absolute;
-      top: 45%;
+      top: 40%;
       left: 22%;
       width: 100%;
     }
@@ -565,7 +561,7 @@
 
     .homepage-title-right {
       position: absolute;
-      top: 45%;
+      top: 40%;
       left: 22%;
       width: 100%;
     }
@@ -614,7 +610,7 @@
 
     .homepage-title-right {
       position: absolute;
-      top: 45%;
+      top: 40%;
       left: 5%;
       width: 100%;
     }
@@ -667,7 +663,7 @@
 
     .homepage-title-right {
       position: absolute;
-      top: 45%;
+      top: 40%;
       left: 5%;
       width: 100%;
     }
@@ -713,13 +709,13 @@
     .homepage-title-left {
       position: absolute;
       top: 10%;
-      left: 26%;
-      width: 70%;
+      left: 5%;
+      width: 90%;
     }
 
     .homepage-title-right {
       position: absolute;
-      top: 50%;
+      top: 40%;
       left: 15%;
       width: 95%;
     }
@@ -769,13 +765,13 @@
     .homepage-title-left {
       position: absolute;
       top: 10%;
-      left: 26%;
-      width: 70%;
+      left: 5%;
+      width: 90%;
     }
 
     .homepage-title-right {
       position: absolute;
-      top: 50%;
+      top: 40%;
       left: 15%;
       width: 95%;
     }
