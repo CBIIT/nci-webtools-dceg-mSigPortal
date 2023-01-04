@@ -160,7 +160,7 @@ export default function RsInMsigportal(rawData) {
   );
   function indexPos(index) {
     let indexPosition;
-    if (index === 0 || index === 4) {
+    if (index === 0) {
       indexPosition = 0.072;
     } else if (index === 1 || index === 5) {
       indexPosition = 0.27;
@@ -168,6 +168,8 @@ export default function RsInMsigportal(rawData) {
       indexPosition = 0.495;
     } else if (index === 3 || index === 7) {
       indexPosition = 0.728;
+    } else if (index === 4) {
+      indexPosition = 0.065;
     } else {
       indexPosition = 0.92;
     }
@@ -185,7 +187,7 @@ export default function RsInMsigportal(rawData) {
         8,
         ' '
       ),
-      align: 'center',
+      align: 'left',
       //x: index < 4 ? index * (1 / 5) + 0.0975 : (index - 4) * (1 / 5) + 0.0975,
       x: indexPos(index),
       y: index < 4 ? 0.73 : 0.98,
