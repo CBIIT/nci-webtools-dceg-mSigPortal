@@ -114,10 +114,10 @@ export default function Univariable() {
             body: JSON.stringify({
               fn: 'loadCollapse',
               args: {
-                study,
-                strategy,
+                study: study.value,
+                strategy: strategy.value,
                 rsSet,
-                cancer,
+                cancer: cancer.value,
                 source: associationVar.source,
                 type: associationVar.type,
                 assocName: associationVar.tmpName,

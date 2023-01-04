@@ -23,15 +23,13 @@ export default function PublicForm() {
   const mergeState = async (state) =>
     dispatch(actions.mergeAssociation({ main: state }));
   const resetAssociation = (_) => dispatch(actions.resetAssociation());
-  const mergeMain = (state) =>
-    dispatch(actions.mergeAssociation({ main: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const defaultValues = {
     study: { label: 'PCAWG', value: 'PCAWG' },
     strategy: { label: 'WGS', value: 'WGS' },
-    signatureSet: {
+    rsSet: {
       label: 'COSMIC_v3_Signatures_GRCh37_SBS96',
       value: 'COSMIC_v3_Signatures_GRCh37_SBS96',
     },
@@ -48,7 +46,7 @@ export default function PublicForm() {
 
   const formStudy = watch('study');
   const formStrategy = watch('strategy');
-  const formSignatureSet = watch('signatureSet');
+  const formSignatureSet = watch('rsSet');
 
   const [loading, setLoading] = useState(false);
 
@@ -74,10 +72,11 @@ export default function PublicForm() {
   }
 
   async function onSubmit(data) {
+    console.log(data);
     const params = {
       study: data.study.value,
       strategy: data.strategy.value,
-      rsSet: data.signatureSet.value,
+      rsSet: data.rsSet.value,
       cancer: data.cancer.value,
     };
     const getAssocVarData = () =>
@@ -98,8 +97,7 @@ export default function PublicForm() {
 
     try {
       setLoading(true);
-      mergeMain({ submitted: true });
-      mergeState(data);
+      mergeState({ submitted: true, ...data });
 
       const [assocResponse, expResponse] = await Promise.all([
         getAssocVarData(),
@@ -123,7 +121,7 @@ export default function PublicForm() {
       dispatch(actions.mergeAssociation({ univariable: { projectID } }));
     } catch (error) {
       if (error.originalStatus == 504) {
-        mergeMain({
+        mergeState({
           error: 'Please Reset Your Parameters and Try again.',
         });
         mergeError({
@@ -132,7 +130,7 @@ export default function PublicForm() {
             'Your submission has timed out. Please try again by submitting this job to a queue instead.',
         });
       } else {
-        mergeMain({
+        mergeState({
           error: 'Please Reset Your Parameters and Try again.',
         });
         mergeError(error.data);
@@ -242,7 +240,7 @@ export default function PublicForm() {
   function handleSignatureSetChange(signatureSet) {
     const cancers = cancerOptions(formStudy, formStrategy, signatureSet);
 
-    setValue('signatureSet', signatureSet);
+    setValue('rsSet', signatureSet);
     setValue('cancer', cancers[0]);
   }
 
@@ -273,7 +271,7 @@ export default function PublicForm() {
       />
       <Select
         className="mb-2"
-        name="signatureSet"
+        name="rsSet"
         label="Reference Signature Set"
         disabled={submitted || fetchingExposure}
         options={signatureSetOptions(formStudy, formStrategy)}
