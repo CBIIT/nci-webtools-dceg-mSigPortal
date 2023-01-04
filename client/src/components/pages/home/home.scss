@@ -67,8 +67,16 @@
 }
 
 .img-banner {
-  width: auto;
-  height: 390px;
+  // width: 1300px;
+  // height: 390px;
+
+  background-image: url('../../../../public/assets/images/Hero_Image.png');
+  // object-fit: scale-down;
+  // object-position: center;
+  min-height: 390px;
+  background-size: contain;
+  background-position: bottom center;
+  background-repeat: no-repeat;
 }
 
 .card-title-homepage {

@@ -224,12 +224,12 @@ export default function Home({ links }) {
     <>
       <div className="banner-container">
         <div className="image-blurred-edge">
-          <div className="background-img text-center  d-none d-sm-block">
-            <img
+          <div className="img-banner background-img text-center  d-none d-sm-block">
+            {/* <img
               src="assets/images/Hero_Image.png"
               alt="mSigPortal banner"
               className="img-banner"
-            ></img>
+            ></img> */}
             <div className="row">
               <div className="homepage-title-left text-left">
                 <h1 className="msigportal-home-title">mSigPortal</h1>
@@ -246,6 +246,7 @@ export default function Home({ links }) {
                 </div>
               </div>
             </div>
+
             {/* <div className="row" style={{ position: 'absolute', top: '15%' }}>
               <div className="col-xl-8 col-lg-8 col-md-8 col-sm-12 col-xs-12">
                 <div>
