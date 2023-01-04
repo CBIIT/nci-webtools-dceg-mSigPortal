@@ -89,7 +89,7 @@ async function submit(req, res, next) {
 
     const { execa } = await import('execa');
     const { stdout, stderr } = await execa('python3', [
-      'services/python/mSigPortal_Profiler_Extraction.py',
+      'services/python/mSigPortal-SigProfilerExtractor.py',
       cliArgs,
     ]);
     res.json({ stdout, stderr });
