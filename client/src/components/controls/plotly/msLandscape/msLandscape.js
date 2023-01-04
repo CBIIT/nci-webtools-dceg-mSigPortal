@@ -2,8 +2,8 @@ import { groupBy } from 'lodash';
 import { First } from 'react-bootstrap/esm/PageItem';
 
 export default function MsLandscape(cosineData, exposureData) {
-  console.log(cosineData);
-  console.log(exposureData);
+  // console.log(cosineData);
+  // console.log(exposureData);
   const defaultNames = ['SBS', 'DBS', 'ID'];
   const names = exposureData.map((group) => group.signatureName);
   const contains = defaultNames.some((element) => {
@@ -13,8 +13,8 @@ export default function MsLandscape(cosineData, exposureData) {
 
     return false;
   });
-  console.log(names);
-  console.log(contains);
+  // console.log(names);
+  // console.log(contains);
   let colors = {};
   if (!contains) {
     var randomColors = [];
@@ -144,9 +144,9 @@ export default function MsLandscape(cosineData, exposureData) {
   const extraMargin =
     longest > 0 && longest < 10 ? -0.157 : (longest * -0.027) / 2;
 
-  console.log(xAxis);
-  console.log(longest);
-  console.log(extraMargin);
+  // console.log(xAxis);
+  // console.log(longest);
+  // console.log(extraMargin);
   function signatureSort(a, b) {
     return a[0].signatureName.localeCompare(b[0].signatureName, 'en', {
       numeric: true,
@@ -217,7 +217,7 @@ export default function MsLandscape(cosineData, exposureData) {
       };
     });
 
-  console.log(normalizedBarTraces);
+  // console.log(normalizedBarTraces);
 
   const sortSignatureName = (sourceArray) => {
     const sortByLocation = (a, b) =>
@@ -226,12 +226,12 @@ export default function MsLandscape(cosineData, exposureData) {
   };
 
   const groupBySample_exposure = groupBy(exposureData, 'sample');
-  console.log(groupBySample_exposure);
+  // console.log(groupBySample_exposure);
 
   const sortedCosin = cosineData.sort(
     (a, b) => xAxis.indexOf(a.sample) - xAxis.indexOf(b.sample)
   );
-  console.log(sortedCosin);
+  // console.log(sortedCosin);
 
   // const dataSignature = Object.entries(groupBySample_exposure).map(
   //   ([key, value]) => ({
@@ -256,7 +256,7 @@ export default function MsLandscape(cosineData, exposureData) {
 
     .flat();
 
-  console.log(dataSignature2);
+  // console.log(dataSignature2);
 
   const groupBySignatureName_exposure2 = groupBy(
     sortSignatureName(dataSignature2),
@@ -281,7 +281,7 @@ export default function MsLandscape(cosineData, exposureData) {
       hovertemplate:
         '<b>Signature contribution: </b>%{y} <br><b>Sample: </b> %{x}',
     }));
-  console.log(tracesNormalize);
+  //console.log(tracesNormalize);
   const tracesHeatMap = [
     {
       z: [cosineData.map((e) => e.similarity)],
@@ -300,22 +300,22 @@ export default function MsLandscape(cosineData, exposureData) {
         thickness: 20,
         bordercolor: 'black',
         tickmode: 'array',
-        tickvals: [0.6, 0.7, 0.8, 0.9, 1],
-        title: {
-          text: 'Cosine Similarity',
-          font: {
-            family: 'Arial',
-            size: 17,
-            color: 'rgb(37,37,37)',
-          },
-        },
+        tickvals: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+        // title: {
+        //   text: 'Cosine Similarity',
+        //   font: {
+        //     family: 'Arial',
+        //     size: 17,
+        //     color: 'rgb(37,37,37)',
+        //   },
+        // },
       },
       xgap: 0.5,
       hovertemplate:
         '<b>Sample: </b> %{x}<br> <b>Similarity: </b>%{z} <extra></extra>',
     },
   ];
-  console.log(tracesHeatMap);
+  // console.log(tracesHeatMap);
   const tracesStackedBar = Object.entries(groupBySignatureName_exposure2)
     .reverse()
     .map(([key, value]) => ({
@@ -343,7 +343,7 @@ export default function MsLandscape(cosineData, exposureData) {
       ],
       hovertemplate: '<b>Number of mutation: </b>%{y} <br><b>Sample: </b> %{x}',
     }));
-  console.log(tracesStackedBar);
+  // console.log(tracesStackedBar);
   const traces = [...tracesHeatMap, ...tracesStackedBar, ...tracesNormalize];
 
   const text = {
@@ -354,7 +354,7 @@ export default function MsLandscape(cosineData, exposureData) {
     yanchor: 'bottom',
     xref: 'paper',
     yref: 'paper',
-    text: 'Mutational Signatures:',
+    text: '\t Mutational Signatures:',
     showarrow: false,
     font: {
       family: 'Arial',
@@ -363,14 +363,31 @@ export default function MsLandscape(cosineData, exposureData) {
     },
   };
 
-  let annotations = [text];
+  const annotationTitle = {
+    x: 0,
+    y: colorBarLoc + 0.06,
+
+    xanchor: 'left',
+    yanchor: 'bottom',
+    xref: 'paper',
+    yref: 'paper',
+    text: '\t Cosine Similarity:',
+    showarrow: false,
+    font: {
+      family: 'Arial',
+      size: 17,
+      color: 'rgb(37,37,37)',
+    },
+  };
+
+  let annotations = [text, annotationTitle];
 
   const layout = {
     title: {
-      text: 'Landscape of Mutational Signature Activity',
+      text: '<b>Landscape of Mutational Signature Activity</b>',
       font: {
         family: 'Arial',
-        size: '1rem',
+        size: 18,
       },
     },
     autosize: true,
