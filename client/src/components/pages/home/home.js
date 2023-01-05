@@ -163,7 +163,7 @@ export default function Home({ links }) {
     return (
       <div
         key={index}
-        className="col-xl-4 col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-3 d-flex align-items-stretch"
+        className="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12 mb-3 d-flex align-items-stretch"
       >
         <div
           className="card"
@@ -247,7 +247,7 @@ export default function Home({ links }) {
               </div>
             </div>
 
-         
+
           </div>
         </div>
 
