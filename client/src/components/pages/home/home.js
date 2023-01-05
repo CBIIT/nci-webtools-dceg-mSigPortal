@@ -298,26 +298,26 @@ export default function Home({ links }) {
             position: 'relative',
           }}
         >
-          {/* <div className="container">
+          <div className="container  d-none d-lg-block">
             <div className="row">
               {links
                 .filter((e) => e.showHomepage)
                 .map((e, i) => CardRow3(e, i))}
             </div>
-          </div> */}
-          {/* <div className="container-fluid"> */}
-          <div className="row">
-            <div className="col-xl-2 col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>
-            <div className="col-xl-8 col-lg-10 col-md-10 col-sm-10 col-xs-10">
-              <div className="row">
-                {links
-                  .filter((e) => e.showHomepage)
-                  .map((e, i) => CardRow3(e, i))}
-              </div>
-            </div>
-            <div className="col-xl-2 col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>
           </div>
-          {/* </div> */}
+          <div className="container-fluid d-block d-lg-none">
+            <div className="row">
+              <div className="col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>
+              <div className="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                <div className="row">
+                  {links
+                    .filter((e) => e.showHomepage)
+                    .map((e, i) => CardRow3(e, i))}
+                </div>
+              </div>
+              <div className="col-xl-2 col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>
+            </div>
+          </div>
         </div>
       </div>
     </>
