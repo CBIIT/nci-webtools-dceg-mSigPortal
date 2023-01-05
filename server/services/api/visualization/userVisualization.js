@@ -1,7 +1,6 @@
 const { Router } = require('express');
 const { randomUUID } = require('crypto');
 const { validate } = require('uuid');
-const { spawn } = require('child_process');
 const fs = require('fs-extra');
 const path = require('path');
 const glob = require('glob');
@@ -88,83 +87,65 @@ function getRelativePath(paths, id = '') {
 }
 
 async function profilerExtraction(params) {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     const projectPath = path.join(config.results.folder, params.projectID[1]);
     // update path
     params.outputDir[1] = path.join(projectPath, 'results');
 
-    logger.debug(projectPath);
-    const args = Object.values(params);
-    const cli = args.reduce((params, arg) => [...params, ...arg]);
-
-    logger.debug('/profilerExtraction: CLI args\n' + cli.join(' '));
-
-    let scriptOutput;
-    const pythonProcess = spawn(
-      'python3',
-      ['services/python/mSigPortal_Profiler_Extraction.py', ...cli],
-      { encoding: 'utf8' }
+    const cliArgs = Object.values(params).reduce(
+      (string, arg) => string + ' ' + arg.join(' '),
+      ''
     );
+    const command = [
+      'services/python/mSigPortal_Profiler_Extraction.py',
+      ...cliArgs.split(' '),
+    ];
 
-    pythonProcess.stdout.setEncoding('utf8');
-    pythonProcess.stdout.on('data', (data) => {
-      scriptOutput += data.toString();
-    });
+    try {
+      const { execa } = await import('execa');
+      const { all: scriptOutput } = await execa('python3', command, {
+        all: true,
+        shell: true,
+      });
 
-    pythonProcess.stderr.setEncoding('utf8');
-    pythonProcess.stderr.on('data', (data) => {
-      scriptOutput += data.toString();
-    });
+      try {
+        // parse matrix files and transform into single json file
+        const matrixFiles = path.join(projectPath, 'results/output');
+        const matrices = await getMatrices(matrixFiles);
+        const matricesFile = path.join(projectPath, 'matrices.json');
+        fs.writeFileSync(matricesFile, JSON.stringify(matrices));
 
-    pythonProcess.on('error', (error) => {
-      logger.error('Profiler Extraction Error');
-      logger.error(error);
-      return reject({ scriptOutput, error });
-    });
-
-    pythonProcess.on('close', async (code) => {
-      if (code == 0) {
-        try {
-          // parse matrix files and transform into single json file
-          const matrixFiles = path.join(projectPath, 'results/output');
-          const matrices = await getMatrices(matrixFiles);
-          const matricesFile = path.join(projectPath, 'matrices.json');
-          fs.writeFileSync(matricesFile, JSON.stringify(matrices));
-
-          // parse cluster data if option was used
-          let cluster = [];
-          if (params?.cluster[1] == 'True') {
-            const clusterFile = path.join(
-              projectPath,
-              `results/Cluster/Result/${params.projectID[1]}_clustered_class_All.txt`
-            );
-            const clusterData = fs.existsSync(clusterFile)
-              ? await parseCSV(clusterFile)
-              : [];
-            // filter cluster objects for relevent values and rename keys if needed
-            if (clusterData.length) {
-              cluster = clusterData.map((e) => {
-                const { project, samples, ID, __parsed_extra, ...rest } = e;
-                return { sample: samples, geneId: ID, ...rest };
-              });
-            }
-          }
-          resolve({
-            scriptOutput,
+        // parse cluster data if option was used
+        let cluster = [];
+        if (params?.cluster[1] == 'True') {
+          const clusterFile = path.join(
             projectPath,
-            matrices,
-            ...(cluster && { cluster }),
-          });
-        } catch (error) {
-          logger.error('Error parsing matrix data. ');
-          reject({ scriptOutput, error });
+            `results/Cluster/Result/${params.projectID[1]}_clustered_class_All.txt`
+          );
+          const clusterData = fs.existsSync(clusterFile)
+            ? await parseCSV(clusterFile)
+            : [];
+          // filter cluster objects for relevent values and rename keys if needed
+          if (clusterData.length) {
+            cluster = clusterData.map((e) => {
+              const { project, samples, ID, __parsed_extra, ...rest } = e;
+              return { sample: samples, geneId: ID, ...rest };
+            });
+          }
         }
-      } else {
-        logger.error('Profiler Extraction Error');
-        logger.error(scriptOutput);
-        reject({ scriptOutput });
+        resolve({
+          scriptOutput,
+          projectPath,
+          matrices,
+          ...(cluster && { cluster }),
+        });
+      } catch (error) {
+        logger.error('Error parsing matrix data. ');
+        reject(error);
       }
-    });
+    } catch (error) {
+      reject(error);
+    }
   });
 }
 
@@ -244,9 +225,7 @@ async function userProfilerExtraction(req, res, next) {
         '/profilerExtraction: An error occured while extracting profiles'
       );
 
-      res.status(500).json({
-        scriptOutput,
-      });
+      res.status(500).json({ scriptOutput });
     }
   } catch (error) {
     logger.error('/profilerExtraction: Caught error while extracting profiles');
