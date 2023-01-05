@@ -281,8 +281,12 @@
   }
   .image-blurred-edge {
     position: relative;
-    width: 100%;
+    width: 1300px;
     margin: auto;
+  }
+  .image-banner {
+    width: 1300px;
+    height: 390px;
   }
 }
 
@@ -319,8 +323,12 @@
   }
   .image-blurred-edge {
     position: relative;
-    width: 100%;
+    width: 1300px;
     margin: auto;
+  }
+  .image-banner {
+    width: 1300px;
+    height: 390px;
   }
 }
 
@@ -363,8 +371,12 @@
   }
   .image-blurred-edge {
     position: relative;
-    width: 100%;
+    width: 1300px;
     margin: auto;
+  }
+  .image-banner {
+    width: 1300px;
+    height: 390px;
   }
 }
 
@@ -414,8 +426,12 @@
   }
   .image-blurred-edge {
     position: relative;
-    width: 100%;
+    width: 1300px;
     margin: auto;
+  }
+  .image-banner {
+    width: 1300px;
+    height: 390px;
   }
 }
 
@@ -459,8 +475,12 @@
 
   .image-blurred-edge {
     position: relative;
-    width: 100%;
+    width: 1300px;
     margin: auto;
+  }
+  .image-banner {
+    width: 1300px;
+    height: 390px;
   }
 }
 
@@ -502,8 +522,12 @@
   }
   .image-blurred-edge {
     position: relative;
-    width: 100%;
+    width: 1300px;
     margin: auto;
+  }
+  .image-banner {
+    width: 1300px;
+    height: 390px;
   }
 }
 /**** large devices ****/
@@ -552,8 +576,12 @@
   }
   .image-blurred-edge {
     position: relative;
-    width: 100%;
+    width: 1198px;
     margin: auto;
+  }
+  .image-banner {
+    width: 1198px;
+    height: 390px;
   }
 }
 
@@ -601,8 +629,12 @@
   }
   .image-blurred-edge {
     position: relative;
-    width: 100%;
+    width: 1198px;
     margin: auto;
+  }
+  .image-banner {
+    width: 1198px;
+    height: 390px;
   }
 }
 /**** medium devices ****/
@@ -657,6 +689,10 @@
     width: 100%;
     margin: auto;
   }
+  .image-banner {
+    width: 1300px;
+    height: 390px;
+  }
 }
 
 @media (min-width: 768px) and (max-width: 991px) {
@@ -708,6 +744,10 @@
     position: relative;
     width: 100%;
     margin: auto;
+  }
+  .image-banner {
+    width: 1300px;
+    height: 390px;
   }
 }
 /**** small devices ****/
@@ -766,6 +806,10 @@
     width: 100%;
     margin: auto;
   }
+  .image-banner {
+    width: 1300px;
+    height: 390px;
+  }
 }
 @media (min-width: 576px) and (max-width: 767px) {
   .banner-container {
@@ -818,6 +862,10 @@
     position: relative;
     width: 100%;
     margin: auto;
+  }
+  .image-banner {
+    width: 1300px;
+    height: 390px;
   }
 }
 /**** x-small devices ****/
@@ -876,6 +924,10 @@
   .msigportal-home-title-right {
     font-size: 0.8rem;
   }
+  .image-banner {
+    width: 1300px;
+    height: 390px;
+  }
 }
 @media (max-width: 576px) {
   .banner-container {
@@ -931,5 +983,9 @@
   }
   .msigportal-home-title-right {
     font-size: 0.8rem;
+  }
+  .image-banner {
+    width: 1300px;
+    height: 390px;
   }
 }

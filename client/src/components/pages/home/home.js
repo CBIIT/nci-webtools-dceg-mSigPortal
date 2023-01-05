@@ -224,7 +224,7 @@ export default function Home({ links }) {
     <>
       <div className="banner-container">
         <div className="image-blurred-edge">
-          <div className="background-img text-center  d-none d-sm-block">
+          <div className="text-center  d-none d-sm-block">
             <img
               src="assets/images/Hero_Image.png"
               alt="mSigPortal banner"
