@@ -36,12 +36,12 @@ async function* getFiles(dir) {
 // transform all matrix files into a single json object
 async function getMatrices(matrixFolder) {
   let files = [];
-  const fileRegex = /\.all$/;
+  const fileRegex = /\.(all|region)$/;
   for await (const f of getFiles(matrixFolder)) {
     if (fileRegex.test(f)) files = [...files, f];
   }
-  const profileRegex = /\.([A-Z]+)\d+.all$/;
-  const matrixRegex = /\.[A-Z]+(\d+).all$/;
+  const profileRegex = /\.([A-Z]+)\d+\.(all|region)$/;
+  const matrixRegex = /\.[A-Z]+(\d+)\.(all|region)$/;
 
   return (
     await Promise.all(
