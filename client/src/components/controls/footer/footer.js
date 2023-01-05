@@ -3,8 +3,9 @@ import React from 'react';
 export function Footer() {
   return (
     <footer className="py-2 bg-gray">
-      <div className="mx-5 pl-2 pr-4">
-        <div className="mt-4 text-light text-center">
+      {/* <div className="pl-2 pr-4"> */}
+      <div className="mt-4 text-light text-center">
+        <div className="container">
           <div className="footer-nav text-left">
             <div className="mb-4 row justify-content-between">
               <div className="col-md-auto footer-nav-col">
@@ -164,6 +165,7 @@ export function Footer() {
           </div>
         </div>
       </div>
+      {/* </div> */}
     </footer>
   );
 }
