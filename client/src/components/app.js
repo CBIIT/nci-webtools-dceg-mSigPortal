@@ -212,10 +212,10 @@ export default function App() {
         orB: {
           columns: [
             ...new Set(
-              ...data['Orignal Research B'].map((row) => Object.keys(row))
+              ...data['Original Research B'].map((row) => Object.keys(row))
             ),
           ].reduce(reducer, []),
-          data: data['Orignal Research B'],
+          data: data['Original Research B'],
         },
         rp: {
           columns: [
