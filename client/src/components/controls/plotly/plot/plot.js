@@ -28,7 +28,7 @@ export default function Plotly({
   };
 
   return (
-    <Container fluid>
+    <Container fluid style={{ minHeight: layout.height || 500 }}>
       <Row className="d-flex justify-content-end">
         {/* <Col sm="auto">
           <Button
