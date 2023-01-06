@@ -14,8 +14,7 @@ import TreeAndLeaf from './treeLeaf/treeLeaf';
 import CosineSimilarity from './cosineSimilarity/cosineSimilarity';
 import MutationalPattern from './mutationalPattern/mutationalPattern';
 import ProfileComparison from './profileComparison/profileComparison';
-import PCA from './pca';
-import PCA2 from './pca/pca';
+import PCA from './pca/pca';
 import ClusteredIdentification from './clustered/clustered';
 import Download from './download';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
@@ -33,10 +32,6 @@ export default function Visualization({ match }) {
   const mergeState = (state) =>
     dispatch(actions.mergeVisualization({ main: state }));
 
-  // const mergeCosineSimilarity = (state) =>
-  //   dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
-  // const mergePCA = (state) =>
-  //   dispatch(actions.mergeVisualization({ pca: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -53,8 +48,6 @@ export default function Visualization({ match }) {
     matrixList,
     matrixData,
   } = store.main;
-
-  const { signatureSetOptions } = store.pca;
 
   const { type, id } = match.params;
 
@@ -74,10 +67,7 @@ export default function Visualization({ match }) {
     if (source == 'user') {
       if (projectID && !Object.keys(matrixList).length) {
         getResults();
-      } else if (
-        Object.keys(matrixList).length &&
-        !signatureSetOptions.length
-      ) {
+      } else if (Object.keys(matrixList).length) {
         loadData();
       }
     }
@@ -371,15 +361,7 @@ export default function Visualization({ match }) {
     {
       name: 'PCA',
       id: 'pca',
-      component:
-        source == 'user' ? (
-          <PCA
-            // getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
-            submitR={(fn, args) => submitR(fn, args)}
-          />
-        ) : (
-          <PCA2 />
-        ),
+      component: <PCA />,
     },
     source == 'user' && {
       name: 'Clustered Mutations Identification',
