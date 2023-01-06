@@ -120,8 +120,8 @@ export default function RsComparisonPlot() {
 
   function handleMatrix(profile, matrix) {
     const signatureSets = signatureSetOptions(profile, matrix);
-    const sigSet1 = signatureSets[14];
-    const sigSet2 = signatureSets[3] || signatureSets[0];
+    const sigSet1 = signatureSets[0];
+    const sigSet2 = signatureSets[1] || signatureSets[0];
 
     setValue('matrix', matrix);
     handleSignatureSet(profile, matrix, sigSet1, 1);
