@@ -33,6 +33,7 @@ export default function CosineSimilarity(inputData) {
     height: 300 + 50 * sampleOrder.length,
     xaxis: {
       automargin: true,
+      showticklabels: signatureOrder.length > 100 ? false : true,
     },
     yaxis: {
       automargin: true,
