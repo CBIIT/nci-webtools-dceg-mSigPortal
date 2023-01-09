@@ -122,9 +122,9 @@ export const sources = [
   },
 
   {
-    sourcePath: 'Etiology/aetiology_exposure.csv',
+    sourcePath: 'Etiology/etiology.csv',
     table: 'etiology',
-    description: 'etiology - aetiology_expoosure',
+    description: 'etiology - aetiology_exposure',
     columns: [
       'study',
       'strategy',
