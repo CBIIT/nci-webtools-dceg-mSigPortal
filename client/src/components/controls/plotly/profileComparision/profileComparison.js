@@ -330,6 +330,8 @@ export function compareProfiles(
     text: 'Difference',
     textangle: 90,
     showarrow: false,
+    height: 15,
+    valign: 'top',
   };
 
   const mutationAnnotation = groupSamples1.map((group, groupIndex, array) => ({
