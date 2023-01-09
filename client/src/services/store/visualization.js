@@ -66,7 +66,13 @@ export const getInitialState = () => ({
   },
   cosineSimilarity: {
     withinForm: { profile: '', matrix: '' },
-    referenceForm: { profile: '', signatureSet: '' },
+    referenceForm: {
+      profile: { value: 'SBS', label: 'SBS' },
+      signatureSet: {
+        value: 'COSMIC_v3.3_Signatures_GRCh38_SBS96',
+        label: 'COSMIC_v3.3_Signatures_GRCh38_SBS96',
+      },
+    },
     publicForm: {},
 
     withinProfileType: '',

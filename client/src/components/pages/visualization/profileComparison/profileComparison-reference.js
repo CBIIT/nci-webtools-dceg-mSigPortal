@@ -103,14 +103,7 @@ export default function PcReference() {
   // useEffect(() => {
   //   if (signatureSetOptions) setValue('signatureSet', signatureSetOptions[0]);
   // }, [signatureSetOptions]);
-  useEffect(() => {
-    if (signatureSetOptions)
-      setSignatureSetQuery({
-        profile: profile.value,
-        matrix: defaultMatrix(profile.value, ['96', '78', '83']),
-        signatureSetName: signatureSet.value,
-      });
-  }, [signatureSetOptions]);
+
   // set initial signature
   useEffect(() => {
     if (signatureNameOptions) setValue('compare', signatureNameOptions[0]);
