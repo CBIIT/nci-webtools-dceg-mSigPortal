@@ -44,21 +44,47 @@ export const getInitialState = () => ({
     ],
   },
   cosineSimilarity: {
-    profile: '',
-    matrix: '',
-    signatureSet1: '',
-    signatureSet2: '',
+    profile: { value: 'SBS', label: 'SBS' },
+    matrix: { value: '96', label: '96' },
+    signatureSet1: {
+      value: 'COSMIC_v3.3_Signatures_GRCh38_SBS96',
+      label: 'COSMIC_v3.3_Signatures_GRCh38_SBS96',
+    },
+    signatureName1: {
+      value: 'SBS1',
+      label: 'SBS1',
+    },
+    signatureSet2: {
+      value: 'COSMIC_v1_Signatures_GRCh37_SBS96',
+      label: 'COSMIC_v1_Signatures_GRCh37_SBS96',
+    },
+    signatureName2: {
+      value: 'Signature_1A',
+      label: 'Signature_1A',
+    },
   },
   sigMutationalSigComparison: {
-    profileName: '',
+    profileName: { value: 'SBS', label: 'SBS' },
     profileNameOptions: [],
-    rsSet1: '',
+    rsSet1: {
+      value: 'COSMIC_v3.3_Signatures_GRCh38_SBS96',
+      label: 'COSMIC_v3.3_Signatures_GRCh38_SBS96',
+    },
     rsSetOptions1: [],
-    rsSet2: '',
+    rsSet2: {
+      value: 'COSMIC_v1_Signatures_GRCh37_SBS96',
+      label: 'COSMIC_v1_Signatures_GRCh37_SBS96',
+    },
     rsSetOptions2: [],
-    signatureName1: '',
+    signatureName1: {
+      value: 'SBS1',
+      label: 'SBS1',
+    },
     signatureNameOptions1: [],
-    signatureName2: '',
+    signatureName2: {
+      value: 'Signature_1A',
+      label: 'Signature_1A',
+    },
     signatureNameOptions2: [],
     plotPath: '',
     debugR: '',
