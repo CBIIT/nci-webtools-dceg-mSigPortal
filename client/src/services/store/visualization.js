@@ -102,7 +102,15 @@ export const getInitialState = () => ({
   },
   profileComparison: {
     withinForm: { profile: '', sample1: '', sample2: '' },
-    referenceForm: { profile: '', sample: '', signatureSet: '', compare: '' },
+    referenceForm: {
+      profile: { value: 'SBS', label: 'SBS' },
+      sample: { value: 'SP50263', label: 'SP50263' },
+      signatureSet: {
+        value: 'COSMIC_v3.3_Signatures_GRCh38_SBS96',
+        label: 'COSMIC_v3.3_Signatures_GRCh38_SBS96',
+      },
+      compare: { value: 'SBS1', label: 'SBS1' },
+    },
     publicForm: {},
     display: 'within',
   },
