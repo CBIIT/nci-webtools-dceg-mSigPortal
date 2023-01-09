@@ -73,13 +73,14 @@ export default function PcReference() {
   } = usePcSignatureNamesQuery(signatureNamesQuery, {
     skip: !signatureNamesQuery,
   });
-  //   seqmatrix api
-  const { data, error, isFetching } = useProfileComparisonReferenceQuery(
-    calculationQuery,
-    {
-      skip: !calculationQuery,
-    }
-  );
+  // get plot data
+  const {
+    data: plot,
+    error,
+    isFetching,
+  } = useProfileComparisonReferenceQuery(calculationQuery, {
+    skip: !calculationQuery,
+  });
 
   // declare form Options
   const profileOptions = matrixData.length
@@ -386,15 +387,14 @@ export default function PcReference() {
             </div>
           </>
         )}
-        {data && (
+        {plot && (
           <>
             <hr />
-
             <Plotly
               className="w-100"
-              data={data.traces}
-              layout={data.layout}
-              config={data.config}
+              data={plot.traces}
+              layout={plot.layout}
+              config={plot.config}
             />
             <div className="p-3">
               <p>
