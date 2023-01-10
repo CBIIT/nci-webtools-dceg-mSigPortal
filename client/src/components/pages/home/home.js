@@ -224,11 +224,11 @@ export default function Home({ links }) {
     <>
       <div className="banner-container">
         <div className="image-blurred-edge">
-          <div className="background-img text-center">
+          <div className="text-center  d-none d-sm-block">
             <img
               src="assets/images/Hero_Image.png"
               alt="mSigPortal banner"
-              className="img-banner"
+              className="image-banner"
             ></img>
             <div className="row">
               <div className="homepage-title-left text-left">
@@ -246,6 +246,27 @@ export default function Home({ links }) {
                 </div>
               </div>
             </div>
+
+
+          </div>
+        </div>
+
+        <div className="container my-3 d-sm-none">
+          <div className="row">
+            <div className="col-12">
+              <h1 className="msigportal-home-title">mSigPortal</h1>
+              <div class="text-primary-purple msigportal-title">
+                Integrative Mutational Signature Portal for Cancer Genomics
+                Study
+              </div>
+            </div>
+            <div className="col-12">
+              <div className=" btn btn-gradient btn-1">
+                <div className="msigportal-home-title-right">
+                  Learn more about mSigportal &gt;
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -256,26 +277,26 @@ export default function Home({ links }) {
             position: 'relative',
           }}
         >
-          {/* <div className="container">
+          <div className="container  d-none d-lg-block">
             <div className="row">
               {links
                 .filter((e) => e.showHomepage)
                 .map((e, i) => CardRow3(e, i))}
             </div>
-          </div> */}
-          {/* <div className="container-fluid"> */}
-          <div className="row">
-            <div className="col-xl-2 col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>
-            <div className="col-xl-8 col-lg-10 col-md-10 col-sm-10 col-xs-10">
-              <div className="row">
-                {links
-                  .filter((e) => e.showHomepage)
-                  .map((e, i) => CardRow3(e, i))}
-              </div>
-            </div>
-            <div className="col-xl-2 col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>
           </div>
-          {/* </div> */}
+          <div className="container-fluid d-block d-lg-none">
+            <div className="row">
+              <div className="col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>
+              <div className="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                <div className="row">
+                  {links
+                    .filter((e) => e.showHomepage)
+                    .map((e, i) => CardRow3(e, i))}
+                </div>
+              </div>
+              <div className="col-xl-2 col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>
+            </div>
+          </div>
         </div>
       </div>
     </>

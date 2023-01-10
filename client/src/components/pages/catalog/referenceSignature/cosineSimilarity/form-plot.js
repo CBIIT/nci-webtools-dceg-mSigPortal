@@ -101,8 +101,8 @@ export default function CosineSimilarityPlot() {
     const signatureSets = signatureSetOptions(profile, matrix);
 
     setValue('matrix', matrix);
-    setValue('signatureSet1', signatureSets[14]);
-    setValue('signatureSet2', signatureSets[3] || signatureSets[0]);
+    setValue('signatureSet1', signatureSets[0]);
+    setValue('signatureSet2', signatureSets[1] || signatureSets[0]);
   }
 
   function onSubmit(data) {

@@ -16,16 +16,18 @@ export function Header() {
         >
           Skip to Main Content
         </a>
-        <div className="ml-4 mr-5">
-          <div className="p-2 d-none d-sm-block">
-            <a href="https://dceg.cancer.gov/" target="_blank">
-              <img
-                src="https://analysistools.cancer.gov/common/images/DCEG-logo.svg"
-                height="100"
-                alt="National Cancer Institute Logo"
-              />
-            </a>
-            {/* <a href="/#/">
+        <div className="container d-none d-lg-block">
+          <div className="">
+            <div className="">
+              <div className="p-2 d-none d-sm-block">
+                <a href="https://dceg.cancer.gov/" target="_blank">
+                  <img
+                    src="https://analysistools.cancer.gov/common/images/DCEG-logo.svg"
+                    height="100"
+                    alt="National Cancer Institute Logo"
+                  />
+                </a>
+                {/* <a href="/#/">
               <img
                 className="d-none d-md-block"
                 src="assets/images/msigportal-logo.png"
@@ -34,17 +36,54 @@ export function Header() {
                 style={{float: 'right', marginTop: '15px'}}
               />
             </a> */}
-          </div>
+              </div>
 
-          <div className="p-1 d-block d-sm-none">
-            <a href="https://dceg.cancer.gov/">
+              <div className="p-1 d-block d-sm-none">
+                <a href="https://dceg.cancer.gov/">
+                  <img
+                    src="https://analysistools.cancer.gov/common/images/DCEG-logo.svg"
+                    height="80"
+                    width="100%"
+                    alt="National Cancer Institute Logo"
+                  />
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className=" d-block d-lg-none">
+          <div className="">
+            <div className="">
+              <div className="p-2 d-none d-sm-block">
+                <a href="https://dceg.cancer.gov/" target="_blank">
+                  <img
+                    src="https://analysistools.cancer.gov/common/images/DCEG-logo.svg"
+                    height="100"
+                    alt="National Cancer Institute Logo"
+                  />
+                </a>
+                {/* <a href="/#/">
               <img
-                src="https://analysistools.cancer.gov/common/images/DCEG-logo.svg"
+                className="d-none d-md-block"
+                src="assets/images/msigportal-logo.png"
+                alt="mSigPortal Logo"
                 height="80"
-                width="100%"
-                alt="National Cancer Institute Logo"
+                style={{float: 'right', marginTop: '15px'}}
               />
-            </a>
+            </a> */}
+              </div>
+
+              <div className="p-1 d-block d-sm-none">
+                <a href="https://dceg.cancer.gov/">
+                  <img
+                    src="https://analysistools.cancer.gov/common/images/DCEG-logo.svg"
+                    height="80"
+                    width="100%"
+                    alt="National Cancer Institute Logo"
+                  />
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>

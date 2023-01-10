@@ -12,7 +12,7 @@ export function NavbarCustom({ links }) {
         className="shadow-sm bg-nav p-0 border-0 d-none d-lg-block"
         expand="lg"
       >
-        <div>
+        <div className="container">
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <div className="mx-auto">
@@ -30,7 +30,7 @@ export function NavbarCustom({ links }) {
                       data-testid={`Navbar-NavLink-${index}`}
                       id={title + '-navbar'}
                       // key={title}
-                      className="navlinks py-2 px-4 d-inline-block"
+                      className="navlinks py-2 px-3 d-inline-block"
                       activeClassName="active-navlinks"
                       exact={exact}
                       to={route}

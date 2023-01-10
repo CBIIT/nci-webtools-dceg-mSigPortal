@@ -70,9 +70,9 @@ export default function CsReference() {
       setValue('profile', profileOptions[0]);
   }, [profileOptions]);
   // set intital signature set
-  useEffect(() => {
-    if (signatureSetOptions) setValue('signatureSet', signatureSetOptions[0]);
-  }, [signatureSetOptions]);
+  // useEffect(() => {
+  //   if (signatureSetOptions) setValue('signatureSet', signatureSetOptions[0]);
+  // }, [signatureSetOptions]);
 
   // get signature sets when profile is selected
   useEffect(() => {

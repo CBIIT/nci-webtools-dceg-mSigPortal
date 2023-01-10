@@ -14,8 +14,7 @@ import TreeAndLeaf from './treeLeaf/treeLeaf';
 import CosineSimilarity from './cosineSimilarity/cosineSimilarity';
 import MutationalPattern from './mutationalPattern/mutationalPattern';
 import ProfileComparison from './profileComparison/profileComparison';
-import PCA from './pca';
-import PCA2 from './pca/pca';
+import PCA from './pca/pca';
 import ClusteredIdentification from './clustered/clustered';
 import Download from './download';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
@@ -33,10 +32,6 @@ export default function Visualization({ match }) {
   const mergeState = (state) =>
     dispatch(actions.mergeVisualization({ main: state }));
 
-  // const mergeCosineSimilarity = (state) =>
-  //   dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
-  // const mergePCA = (state) =>
-  //   dispatch(actions.mergeVisualization({ pca: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -54,8 +49,6 @@ export default function Visualization({ match }) {
     matrixData,
   } = store.main;
 
-  const { signatureSetOptions } = store.pca;
-
   const { type, id } = match.params;
 
   // when retrieving queued result, update id in store
@@ -69,204 +62,12 @@ export default function Visualization({ match }) {
     }
   }, [id, loading.active]);
 
-  // get mapping of plots after retrieving projectID
-  useEffect(() => {
-    if (source == 'user') {
-      if (projectID && !Object.keys(matrixList).length) {
-        getResults();
-      } else if (
-        Object.keys(matrixList).length &&
-        !signatureSetOptions.length
-      ) {
-        loadData();
-      }
-    }
-  }, [matrixList, projectID]);
-
   // switch to first tab after fetching samples
   useEffect(() => {
     if (matrixData.length) {
       mergeState({ displayTab: 'profilerSummary', openSidebar: false });
     }
   }, [matrixData]);
-
-  // reload summary information
-  async function getResults() {
-    const response = await fetch(`web/getResults`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ projectID: projectID }),
-    });
-
-    if (response.ok) {
-      const { statistics, matrixList, downloads } = await response.json();
-      mergeState({
-        statistics: statistics,
-        matrixList: matrixList,
-        downloads: downloads,
-      });
-    } else {
-      mergeError(await response.json());
-    }
-  }
-
-  // retrieve mapping of samples to plots from svgList file
-  async function loadData() {
-    mergeState({
-      loading: {
-        active: true,
-        // content: 'Putting Data Into Session',
-        // showIndicator: true,
-      },
-    });
-
-    // Mutational Profiles
-    // const nameOptions = [...new Set(svgList.map((d) => d.sample))];
-    // const selectName = nameOptions[0];
-    // const filteredPlots = svgList.filter((e) => e.sample == selectName);
-
-    // const filteredProfileOptions = [
-    //   ...new Set(filteredPlots.map((e) => e.profileType).sort((a, b) => a - b)),
-    // ];
-
-    // const profile = defaultProfile(filteredProfileOptions);
-
-    // const filteredMatrixOptions = [
-    //   ...new Set(
-    //     filteredPlots
-    //       .filter((e) => e.profileType == profile)
-    //       .map((e) => e.matrixSize)
-    //   ),
-    // ].sort((a, b) => a - b);
-
-    // const matrix = defaultMatrix(profile, filteredMatrixOptions);
-
-    // const filteredFilterOptions = [
-    //   ...new Set(
-    //     filteredPlots
-    //       .filter((e) => e.profileType == profile && e.matrixSize == matrix)
-    //       .map((e) => e.Filter)
-    //       .sort((a, b) => a - b)
-    //   ),
-    // ];
-
-    // const filter = defaultFilter(filteredFilterOptions);
-
-    // const filteredMatrixList = [
-    //   ...new Set(
-    //     matrixList
-    //       .filter((e) => e.profileType == profile)
-    //       .map((e) => e.matrixSize)
-    //       .sort((a, b) => a - b)
-    //   ),
-    // ];
-
-    // mergeMutationalProfiles({
-    //   filtered: filteredPlots,
-    //   nameOptions: nameOptions,
-    //   profileOptions: filteredProfileOptions,
-    //   matrixOptions: filteredMatrixOptions,
-    //   filterOptions: filteredFilterOptions,
-    //   selectName: selectName,
-    //   selectProfile: profile,
-    //   selectMatrix: matrix,
-    //   selectFilter: filter,
-    // });
-
-    // Cosine Similarity - Profile Comparison - PCA - Kataegis
-    // const sampleNameOptions = [
-    //   ...new Set(
-    //     svgList.map((e) => {
-    //       if (e.Filter != 'NA') return `${e.sample}@${e.Filter}`;
-    //       else return e.samples;
-    //     })
-    //   ),
-    // ];
-    // const profileOptions = [...new Set(svgList.map((e) => e.profileType))];
-
-    // const selectProfile = defaultProfile(profileOptions);
-    // const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);
-
-    // const { output: refSignatureSetOptions } = await (
-    //   await getRefSigOptions(selectProfile)
-    // ).json();
-
-    // mergeCosineSimilarity({
-    //   withinProfileType: selectProfile,
-    //   refProfileType: selectProfile,
-    //   withinMatrixSize: selectMatrix,
-    //   withinMatrixOptions: filteredMatrixList,
-    //   userProfileType: selectProfile,
-    //   userMatrixSize: selectMatrix,
-    //   userMatrixOptions: filteredMatrixOptions,
-    // });
-
-    // mergeProfileComparison({
-    //   withinProfileType: selectProfile,
-    //   withinSampleName1: sampleNameOptions[0],
-    //   withinSampleName2: sampleNameOptions[1],
-    //   sampleOptions: sampleNameOptions,
-    //   refProfileType: selectProfile,
-    //   refSampleName: sampleNameOptions[0],
-    //   // refSignatureSet: refSignatureSetOptions[0],
-    //   // refSignatureSetOptions: refSignatureSetOptions,
-    //   userProfileType: selectProfile,
-    //   userMatrixSize: selectMatrix,
-    //   userMatrixOptions: filteredMatrixOptions,
-    //   userSampleName: sampleNameOptions[0],
-    // });
-
-    // mergePCA({
-    //   profileType: selectProfile,
-    //   // signatureSet: refSignatureSetOptions[0],
-    //   // signatureSetOptions: refSignatureSetOptions,
-    //   userProfileType: selectProfile,
-    //   userMatrixSize: selectMatrix,
-    //   userMatrixOptions: filteredMatrixOptions,
-    // });
-
-    // mergeKataegis({
-    //   sample: sampleNameOptions[0],
-    //   sampleOptions: sampleNameOptions,
-    // });
-
-    mergeState({
-      // displayTab: 'profilerSummary',
-      // profileOptions: profileOptions,
-      loading: {
-        active: false,
-      },
-      // openSidebar: false,
-    });
-  }
-
-  function submitR(fn, args) {
-    return fetch(`web/visualizationWrapper`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ fn: fn, args: args, projectID: projectID }),
-    });
-  }
-
-  // function getRefSigOptions(profileType) {
-  //   return fetch(`web/visualizationWrapper`, {
-  //     method: 'POST',
-  //     headers: {
-  //       Accept: 'application/json',
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify({
-  //       fn: 'getReferenceSignatureSets',
-  //       args: { profileType: profileType },
-  //     }),
-  //   });
-  // }
 
   async function loadQueueResult(id) {
     mergeState({
@@ -371,15 +172,7 @@ export default function Visualization({ match }) {
     {
       name: 'PCA',
       id: 'pca',
-      component:
-        source == 'user' ? (
-          <PCA
-            // getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
-            submitR={(fn, args) => submitR(fn, args)}
-          />
-        ) : (
-          <PCA2 />
-        ),
+      component: <PCA />,
     },
     source == 'user' && {
       name: 'Clustered Mutations Identification',

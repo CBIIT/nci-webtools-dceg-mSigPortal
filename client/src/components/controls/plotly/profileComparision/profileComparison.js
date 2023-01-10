@@ -296,7 +296,7 @@ export function compareProfiles(
   const sampleLabel1 = {
     xref: 'paper',
     yref: 'paper',
-    xanchor: 'middle',
+    xanchor: 'top',
     yanchor: 'middle',
     align: 'center',
     x: 1.017,
@@ -309,7 +309,7 @@ export function compareProfiles(
   const sampleLabel2 = {
     xref: 'paper',
     yref: 'paper',
-    xanchor: 'middle',
+    xanchor: 'top',
     yanchor: 'middle',
     align: 'center',
     x: 1.017,
@@ -322,7 +322,7 @@ export function compareProfiles(
   const differenceLabel = {
     xref: 'paper',
     yref: 'paper',
-    xanchor: 'middle',
+    xanchor: 'top',
     yanchor: 'middle',
     align: 'center',
     x: 1.017,
@@ -355,7 +355,7 @@ export function compareProfiles(
     xanchor: 'middle',
     yanchor: 'middle',
     align: 'center',
-    x: -0.051,
+    x: -0.04,
     y: 0.5,
     text: '<b>Relative contribution</b>',
     textangle: -90,

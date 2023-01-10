@@ -73,13 +73,14 @@ export default function PcReference() {
   } = usePcSignatureNamesQuery(signatureNamesQuery, {
     skip: !signatureNamesQuery,
   });
-  //   seqmatrix api
-  const { data, error, isFetching } = useProfileComparisonReferenceQuery(
-    calculationQuery,
-    {
-      skip: !calculationQuery,
-    }
-  );
+  // get plot data
+  const {
+    data: plot,
+    error,
+    isFetching,
+  } = useProfileComparisonReferenceQuery(calculationQuery, {
+    skip: !calculationQuery,
+  });
 
   // declare form Options
   const profileOptions = matrixData.length
@@ -100,9 +101,10 @@ export default function PcReference() {
     if (!profile && profileOptions.length) handleProfile(profileOptions[0]);
   }, [profileOptions]);
   // set intital signature set
-  useEffect(() => {
-    if (signatureSetOptions) setValue('signatureSet', signatureSetOptions[0]);
-  }, [signatureSetOptions]);
+  // useEffect(() => {
+  //   if (signatureSetOptions) setValue('signatureSet', signatureSetOptions[0]);
+  // }, [signatureSetOptions]);
+
   // set initial signature
   useEffect(() => {
     if (signatureNameOptions) setValue('compare', signatureNameOptions[0]);
@@ -408,15 +410,14 @@ export default function PcReference() {
             </div>
           </>
         )}
-        {data && (
+        {plot && (
           <>
             <hr />
-
             <Plotly
               className="w-100"
-              data={data.traces}
-              layout={data.layout}
-              config={data.config}
+              data={plot.traces}
+              layout={plot.layout}
+              config={plot.config}
             />
             <div className="p-3">
               <p>

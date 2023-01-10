@@ -3,7 +3,7 @@ import { Form } from 'react-bootstrap';
 import ReactSelect, { createFilter } from 'react-select';
 import { Controller } from 'react-hook-form';
 
-export default function Select({
+export default function SelectForm({
   name,
   label,
   options,

@@ -3,6 +3,7 @@ import sbs96 from '../../../controls/plotly/profileComparision/sbs96';
 import sbs192 from '../../../controls/plotly/profileComparision/sbs192';
 import dbs78 from '../../../controls/plotly/profileComparision/dbs78';
 import id83 from '../../../controls/plotly/profileComparision/id83';
+import { groupBy } from 'lodash';
 
 export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -64,17 +65,29 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
 
           // for (var i = 0; i < )
 
+          // normalize signatureData by taking the average of contribution of selected signatureNames
+          const groupByMutation = Object.values(
+            groupBy(signatureData, (e) => e.mutationType)
+          );
+          const normalizeSigData = groupByMutation.map((signatures) => ({
+            ...signatures[0],
+            signatureName: _arg.params_signature.signatureName,
+            contributions:
+              signatures.reduce((total, e) => total + e.contributions, 0) /
+              signatures.length,
+          }));
+
           if (_arg.params_spectrum.profile === 'SBS') {
             return {
-              data: sbs96(spectrumData, signatureData),
+              data: sbs96(spectrumData, normalizeSigData),
             };
           } else if (_arg.params_spectrum.profile === 'DBS') {
             return {
-              data: dbs78(spectrumData, signatureData),
+              data: dbs78(spectrumData, normalizeSigData),
             };
           } else {
             return {
-              data: id83(spectrumData, signatureData),
+              data: id83(spectrumData, normalizeSigData),
             };
           }
         } catch (error) {

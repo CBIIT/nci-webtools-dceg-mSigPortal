@@ -88,11 +88,12 @@ async function submit(req, res, next) {
       .join(' ');
 
     const { execa } = await import('execa');
-    const { stdout, stderr } = await execa('python3', [
-      'services/python/mSigPortal_Profiler_Extraction.py',
-      cliArgs,
-    ]);
-    res.json({ stdout, stderr });
+    const { all } = await execa(
+      'python3',
+      ['services/python/mSigPortal-SigProfilerExtractor.py', cliArgs],
+      { all: true, shell: true }
+    );
+    res.json(all);
   } catch (error) {
     logger.error('error at /submit');
     next(error);

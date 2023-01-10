@@ -17,7 +17,7 @@ import {
   useRowSelect,
   useExpanded,
 } from 'react-table';
-// import "./table.scss";
+import './table.scss';
 
 export function TextFilter({
   column: { filterValue, setFilter, placeholder, aria },
@@ -224,7 +224,7 @@ export default function Table({
                 className="h5 sample-title"
               >
                 {headerGroup.headers.map((column) => (
-                  <td
+                  <th
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                     aria-label={column.Header + '-sort'}
                   >
@@ -240,7 +240,7 @@ export default function Table({
                         <i className="bi bi-chevron-expand ms-1" />
                       )
                     )}
-                  </td>
+                  </th>
                 ))}
               </tr>
             ))}
