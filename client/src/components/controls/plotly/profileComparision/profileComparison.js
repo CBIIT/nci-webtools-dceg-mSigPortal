@@ -1,3 +1,10 @@
+import React, {
+  useLayoutEffect,
+  useState,
+  useCallback,
+  useEffect,
+} from 'react';
+
 export function groupDataByMutation(
   data,
   groupRegex,
@@ -58,6 +65,64 @@ export function getCosineSimilarity(data1, data2) {
     data1.map((e) => e.mutations || e.contribution || 0),
     data2.map((e) => e.mutations || e.contribution || 0)
   ).toFixed(3);
+}
+
+export function debounce(func, wait, immediate) {
+  var timeout;
+  return function () {
+    var context = this,
+      args = arguments;
+    var later = function () {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    var callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
+}
+
+export function useWindowSize() {
+  const [size, setSize] = useState([0, 0]);
+  useLayoutEffect(() => {
+    function updateSize() {
+      setSize([window.innerWidth, window.innerHeight]);
+    }
+    window.addEventListener('resize', updateSize);
+    updateSize();
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+  return size;
+}
+
+const getSize = () => {
+  return {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  };
+};
+
+export function useResize() {
+  const [size, setSize] = useState(getSize());
+
+  const handleResize = useCallback(() => {
+    let ticking = false;
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        setSize(getSize());
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return size;
 }
 
 export function compareProfiles(
@@ -181,6 +246,7 @@ export function compareProfiles(
     hoverinfo: 'x+y',
     showlegend: false,
   }));
+
   const traces = [...differenceTrace, ...sampleTrace2, ...sampleTrace1];
 
   const rss = getRss(sampleDifferenceData);
@@ -296,10 +362,10 @@ export function compareProfiles(
   const sampleLabel1 = {
     xref: 'paper',
     yref: 'paper',
-    xanchor: 'top',
+    xanchor: 'right',
     yanchor: 'middle',
     align: 'center',
-    x: 1.017,
+    x: 1.04,
     y: 0.835,
     text: sample1.length > 16 ? sample1.substring(0, 16) + '...' : sample1,
     textangle: 90,
@@ -309,10 +375,10 @@ export function compareProfiles(
   const sampleLabel2 = {
     xref: 'paper',
     yref: 'paper',
-    xanchor: 'top',
+    xanchor: 'right',
     yanchor: 'middle',
     align: 'center',
-    x: 1.017,
+    x: 1.035,
     y: 0.505,
     text: sample2.length > 16 ? sample2.substring(0, 16) + '...' : sample2,
     textangle: 90,
@@ -322,12 +388,12 @@ export function compareProfiles(
   const differenceLabel = {
     xref: 'paper',
     yref: 'paper',
-    xanchor: 'top',
+    xanchor: 'right',
     yanchor: 'middle',
     align: 'center',
-    x: 1.017,
+    x: 1.035,
     y: 0.165,
-    text: 'Difference',
+    text: 'Difference <br>',
     textangle: 90,
     showarrow: false,
     height: 15,
@@ -421,11 +487,12 @@ export function compareProfiles(
       },
       domain: [0.67, 1],
     },
+
     shapes: [
       ...mutationLabelBox,
-      differencLabelBox1,
-      sampleLabelBox2,
-      differenceLabelBox,
+      // differencLabelBox1,
+      // sampleLabelBox2,
+      // differenceLabelBox,
       ...sampleBorder1,
       ...sampleBorder2,
       ...differenceBorder,
