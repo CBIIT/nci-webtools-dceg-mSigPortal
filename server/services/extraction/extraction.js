@@ -8,9 +8,9 @@ const { unparse } = require('papaparse');
 const AWS = require('aws-sdk');
 const tar = require('tar');
 const { groupBy } = require('lodash');
-const logger = require('../services/logger');
-const config = require('../config.json');
-const { getSignatureData } = require('../services/query');
+const logger = require('../logger');
+const config = require('../../config.json');
+const { getSignatureData } = require('../query');
 
 function upload(req, res, next) {
   const id = randomUUID();
@@ -93,8 +93,10 @@ async function submit(req, res, next) {
       ['services/python/mSigPortal-SigProfilerExtractor.py', cliArgs],
       { all: true, shell: true }
     );
-    res.json(all);
+    logger.debug(all);
+    res.json({ id });
   } catch (error) {
+    logger.debug(error);
     logger.error('error at /submit');
     next(error);
   }

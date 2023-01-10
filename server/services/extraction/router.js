@@ -2,7 +2,7 @@ const express = require('express');
 const compression = require('compression');
 // const cors = require('cors');
 const extraction = require('./extraction');
-const logger = require('../services/logger');
+const logger = require('../logger');
 
 const apiRouter = express.Router();
 
