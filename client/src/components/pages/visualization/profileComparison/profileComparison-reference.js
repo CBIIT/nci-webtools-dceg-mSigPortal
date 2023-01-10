@@ -163,6 +163,21 @@ export default function PcReference() {
           ? '78'
           : '83',
     };
+    const paramsArray = compare.split(';');
+    console.log(paramsArray);
+    let paramsScalar = [];
+    let paramsSig = [];
+    for (var i = 0; i < paramsArray.length; i++) {
+      if (paramsArray[i].includes('*')) {
+        const parts = paramsArray[i].split('*');
+        paramsScalar.push(parts[0]);
+        paramsSig.push(parts[1]);
+      } else {
+        paramsScalar.push('1');
+        paramsSig.push(paramsArray[i]);
+      }
+    }
+
     const params_signature = {
       profile: profile.value,
       matrix:
@@ -172,10 +187,18 @@ export default function PcReference() {
           ? '78'
           : '83',
       signatureSetName: signatureSet.value,
-      signatureName: compare,
+      signatureName: paramsSig.join(';'),
+    };
+    const params_signature_scalar = {
+      arrayScalar: paramsScalar,
+      arraySignature: paramsSig,
     };
 
-    setCalculationQuery({ params_spectrum, params_signature });
+    setCalculationQuery({
+      params_spectrum,
+      params_signature,
+      params_signature_scalar,
+    });
   }
 
   function handleProfile(e) {

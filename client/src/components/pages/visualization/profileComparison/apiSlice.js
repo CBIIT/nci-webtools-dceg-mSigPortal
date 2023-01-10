@@ -35,6 +35,9 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
     profileComparisonReference: builder.query({
       async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
         try {
+          console.log(_arg.params_signature);
+          console.log(_arg.params_signature_scalar);
+
           const res = await Promise.all([
             fetchWithBQ(
               '/mutational_spectrum?' +
@@ -48,6 +51,18 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
 
           const spectrumData = res[0]['data'];
           const signatureData = res[1]['data'];
+          const scalarArray = Object.values(_arg.params_signature_scalar)[0];
+          const signatureArray = Object.values(_arg.params_signature_scalar)[1];
+
+          console.log(res);
+          console.log(signatureData);
+          console.log(_arg.params_signature_scalar);
+          console.log(scalarArray);
+          console.log(signatureArray);
+
+          let result = [];
+
+          // for (var i = 0; i < )
 
           if (_arg.params_spectrum.profile === 'SBS') {
             return {
