@@ -3,7 +3,7 @@ const fs = require('fs-extra');
 const knex = require('knex');
 const logger = require('./services/logger');
 const config = require('./config.json');
-const apiRouter = require('./extraction/router');
+const apiRouter = require('./services/extraction/router');
 
 const app = createApp(config);
 const server = app.listen(config.extraction.port, () => {

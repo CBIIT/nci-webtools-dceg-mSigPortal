@@ -15,6 +15,7 @@ node_modules
 
 mSigPortal_Profiler_Extraction.py
 mSigPortal-SigProfilerExtractor.py
+/server/src
 Sigvisualfunc.R
 config.json
 database/data
