@@ -8,7 +8,7 @@
     "start:dev": "pm2-runtime start pm2.config.json --only dev",
     "start:debug": "node server.js",
     "start-queue-worker": "node queue-worker.js",
-    "start-extraction-service": "node extraction-service.js",
+    "start-extraction-worker": "node extraction-worker.js",
     "build": "npm run format",
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --write \"**/*.{js,json}\""

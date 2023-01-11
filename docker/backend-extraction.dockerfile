@@ -64,7 +64,7 @@ RUN npm install
 # copy the rest of the application
 COPY server .
 
-CMD npm run start-extraction-service
+CMD npm run start-extraction-worker
 
 # docker build -t msigportal-backend -f backend.dockerfile ~/Projects/msigportal/
 # docker run -d -p 8330:8330 -v ~/Projects/msigportal/logs/:/deploy/logs -v ~/Projects/msigportal/tmp:/deploy/tmp -v ~/Projects/msigportal/config:/deploy/config -v ~/Projects/sigprofiler/data/genomes:/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb  -v ~/.aws/credentials:/root/.aws/credentials:ro --name msigportal-backend msigportal-backend 
