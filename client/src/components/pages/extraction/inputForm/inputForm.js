@@ -355,7 +355,9 @@ export default function InputForm() {
       onSubmit={handleSubmit(onSubmit)}
       style={{ maxHeight: '900px', overflow: 'hidden auto' }}
     >
-      <LoadingOverlay active={fetchingSeqmatrixOptions} />
+      <LoadingOverlay
+        active={fetchingSeqmatrixOptions || loadingUpload || loadingSubmit}
+      />
       {(seqmatrixError || signatureError) && (
         <p>There was an error retrieving public data options</p>
       )}
