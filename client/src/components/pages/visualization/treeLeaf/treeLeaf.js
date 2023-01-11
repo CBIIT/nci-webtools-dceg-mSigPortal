@@ -29,9 +29,8 @@ export default function TreeAndLeaf(props) {
     >
       <ErrorBoundary
         fallback={
-          <Alert variant="danger">
-            An internal error prevented plots from loading. Please contact the
-            website administrator if this problem persists.
+          <Alert variant="warning">
+            The selected study does not provide exposure and mutation seqmatrix data.
           </Alert>
         }
       >
@@ -40,7 +39,7 @@ export default function TreeAndLeaf(props) {
             <TreeLeafForm />
             <Button variant="link" onClick={handleExport}>Export Plot</Button>
           </div>
-          <D3TreeLeaf id={plotId} width={2000} height={2000} onSelect={props.onSelect} />
+          <D3TreeLeaf id={plotId} width={2500} height={2500} onSelect={props.onSelect} />
         </Suspense>
       </ErrorBoundary>
     </Container>
