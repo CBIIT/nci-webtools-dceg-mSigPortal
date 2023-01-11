@@ -1072,107 +1072,91 @@ getTL <- function(args, config) {
   return(list(data = d3))
 }
 
+# Given seqmatrix and exposure data for a study, returns a hierarchical graph of nodes
+# clustered by similarity, with leaf nodes representing samples.
+# Additional properties for each leaf node include:
+# - sample name
+# - cosine similarity
+# - dominant mutation
+# - dominant signature
+# - cancer type
 getTreeLeaf <- function(args, config) {
+
   library(TreeAndLeaf)
   library(igraph)
   library(networkD3)
 
   source("services/R/Sigvisualfunc.R")
 
-  s3load(paste0(config$s3Data, "Seqmatrix/PCAWG_WGS_seqmatrix_refdata.RData"), config$bucket)
-  s3load(paste0(config$s3Data, "Exposure/PCAWG_WGS_exposure_refdata.RData"), config$bucket)
+  seqmatrix_refdata <- args$seqmatrixData
+  signature_refsets <- args$signatureData
+  exposure_refdata <- args$exposureData
 
-  seqmatrix_refdata <- seqmatrix_refdata %>% filter(Profile %in% c("SBS96", "DBS78", "ID83"))
   seqmatrix_refdata_ratio <- seqmatrix_refdata %>%
-    group_by(Sample, Profile) %>%
-    mutate(Mutations = Mutations / sum(Mutations)) %>%
+    group_by(sample, profileMatrix) %>%
+    mutate(mutations = mutations / sum(mutations)) %>%
     ungroup()
 
-  pcawglist <- seqmatrix_refdata %>%
-    select(Cancer_Type, Sample) %>%
-    unique()
-
-  exposure_refdata <- exposure_refdata %>% filter(Signature_set_name == "COSMIC_v3_Signatures_GRCh37_SBS96")
-
-  tmp <- exposure_refdata %>%
-    filter(Exposure > 0) %>%
-    pull(Signature_name) %>%
-    unique()
-
   exposure_refdata_ratio <- exposure_refdata %>%
-    filter(Signature_name %in% tmp) %>%
-    select(Sample, Cancer_Type, Signature_name, Exposure) %>%
-    group_by(Sample) %>%
-    mutate(Exposure = Exposure / sum(Exposure)) %>%
-    pivot_wider(names_from = Signature_name, values_from = Exposure) %>%
+    filter(exposure > 0) %>%
+    select(sample, cancer, signatureName, exposure) %>%
+    group_by(sample) %>%
+    mutate(exposure = exposure / sum(exposure)) %>%
+    pivot_wider(names_from = signatureName, values_from = exposure) %>%
     ungroup()
 
   exposure_refdata <- exposure_refdata %>%
-    filter(Signature_name %in% tmp) %>%
-    select(Sample, Cancer_Type, Signature_name, Exposure) %>%
-    group_by(Sample) %>%
-    # mutate(Exposure=Exposure/sum(Exposure)) %>%
-    pivot_wider(names_from = Signature_name, values_from = Exposure) %>%
+    filter(exposure > 0) %>%
+    select(sample, cancer, signatureName, exposure) %>%
+    group_by(sample) %>%
+    mutate(exposure=exposure/sum(exposure)) %>%
+    pivot_wider(names_from = signatureName, values_from = exposure) %>%
     ungroup()
 
-
-  ## add cosine similarity
-  cosdata <- read_delim("services/R/PCAWG_Decomposition_Quality.txt", delim = "\t", col_names = T) %>%
-    separate(col = Sample_Names, into = c("Cancer_Type", "Sample"), sep = "@", convert = T) %>%
-    select(Cancer_Type, Sample, Cosine_similarity)
-
-
-  # # Read the data -----------------------------------------------------------
-  #
+  # determine dominant signature
   dsigdata <- exposure_refdata_ratio %>%
-    select(-Cancer_Type) %>%
-    pivot_longer(cols = -Sample) %>%
-    group_by(Sample) %>%
+    select(-cancer) %>%
+    pivot_longer(cols = -sample) %>%
+    group_by(sample) %>%
     arrange(desc(value)) %>%
     slice(1) %>%
     ungroup() %>%
     rename(Dsig = name, Dvalue = value)
+
+  # determine dominant mutation
   dmdata <- seqmatrix_refdata %>%
-    filter(Profile == "SBS96") %>%
-    mutate(Type = str_sub(MutationType, 3, 5)) %>%
-    group_by(Sample, Type) %>%
-    summarise(value = sum(Mutations)) %>%
+    # filter(Profile == "SBS96") %>%
+    mutate(type = str_sub(mutationType, 3, 5)) %>%
+    group_by(sample, type) %>%
+    summarise(value = sum(mutations)) %>%
     mutate(value = value / (sum(value))) %>%
     arrange(desc(value)) %>%
     slice(1) %>%
     ungroup() %>%
-    rename(Dmut = Type, Dmvalue = value)
-  #
-  tmp <- dsigdata %>%
-    arrange(Dsig) %>%
-    pull(Dsig) %>%
-    unique()
-  #
-  dsigcol <- SBScolor[tmp]
-  dsigcol[["SBS22"]] <- "yellow"
-  #
-  dmcol <- c("#03BCEE", "#010101", "#E32926", "#CAC9C9", "#A1CE63", "#EBC6C4")
+    rename(Dmut = type, Dmvalue = value)
 
+  # select mutation data
   mdata <- seqmatrix_refdata_ratio %>%
-    select(MutationType, Mutations, Sample) %>%
-    pivot_wider(names_from = MutationType, values_from = Mutations)
+    select(mutationType, mutations, sample) %>%
+    pivot_wider(names_from = mutationType, values_from = mutations)
 
   mdata0 <- as.matrix(mdata[, -1])
-  rownames(mdata0) <- mdata$Sample
+  rownames(mdata0) <- mdata$sample
 
   mdatax <- mdata %>%
-    select(Sample) %>%
+    select(sample) %>%
     left_join(exposure_refdata_ratio) %>%
-    mutate(APOBEC = SBS2 + SBS13) %>%
-    mutate(SBS17 = SBS17a + SBS17b) %>%
     left_join(dsigdata) %>%
     left_join(dmdata) %>%
     left_join(
-      seqmatrix_refdata %>% filter(Profile == "SBS96") %>% group_by(Sample) %>% summarise(Mutations = sum(Mutations)) %>% ungroup()
-    ) %>%
-    left_join(cosdata) %>%
-    mutate(Cosine_similarity = if_else(Cosine_similarity < 0.8, 0.8, Cosine_similarity))
-
+      seqmatrix_refdata %>% 
+      group_by(sample) %>% 
+      summarise(mutations = sum(mutations)) %>% 
+      ungroup()
+    ) %>% 
+    rename(Cancer_Type = cancer, Sample = sample, Mutations = mutations) %>%
+    group_by(row_number()) %>% 
+    mutate(Cosine_similarity = runif(1)) # todo: implement
 
   # TreeAndLeaf -------------------------------------------------------------
   hc <- hclust(dist(mdata0), "ward.D") # ave #ward.D
@@ -1186,7 +1170,6 @@ getTreeLeaf <- function(args, config) {
   members <- membership(wc)
   # Convert to object suitable for networkD3
   d3 <- igraph_to_networkD3(tal, group = members)
-
 
   return(list(graph = d3, hierarchy = as.radialNetwork(hc, ""), attributes = mdatax))
 }

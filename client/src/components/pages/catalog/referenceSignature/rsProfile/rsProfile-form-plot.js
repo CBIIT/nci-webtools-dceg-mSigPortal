@@ -80,8 +80,7 @@ export default function ProfileFormPlot({ options, index }) {
     : [];
 
   const profileOptions = (source) =>
-    //source && signatureOptions.length
-    source
+    signatureOptions && source
       ? [
           ...new Set(
             signatureOptions
@@ -93,8 +92,7 @@ export default function ProfileFormPlot({ options, index }) {
       : [];
 
   const matrixOptions = (source, profile) =>
-    //source && profile && signatureOptions.length
-    source && profile
+    signatureOptions && source && profile
       ? [
           ...new Set(
             signatureOptions
@@ -111,8 +109,7 @@ export default function ProfileFormPlot({ options, index }) {
       : [];
 
   const referenceSignatureSetOption = (source, profile, matrix) =>
-    //source && profile && matrix && signatureOptions.length
-    source && profile && matrix
+    signatureOptions && source && profile && matrix
       ? [
           ...new Set(
             signatureOptions
@@ -129,8 +126,7 @@ export default function ProfileFormPlot({ options, index }) {
       : [];
 
   const strategyOptions = (source, profile, matrix, signatureSetName) =>
-    //source && profile && matrix && signatureSetName && signatureOptions.length
-    source && profile && matrix && signatureSetName
+    signatureOptions && source && profile && matrix && signatureSetName
       ? [
           ...new Set(
             signatureOptions
@@ -154,13 +150,12 @@ export default function ProfileFormPlot({ options, index }) {
     signatureSetName,
     strategy
   ) =>
-    // source &&
-    // profile &&
-    // matrix &&
-    // signatureSetName &&
-    // strategy &&
-    //   signatureOptions.length
-    source && profile && matrix && signatureSetName && strategy
+    signatureOptions &&
+    source &&
+    profile &&
+    matrix &&
+    signatureSetName &&
+    strategy
       ? [
           ...new Set(
             signatureOptions

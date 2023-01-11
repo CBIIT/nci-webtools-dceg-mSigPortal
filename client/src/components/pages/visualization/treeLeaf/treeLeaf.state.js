@@ -1,6 +1,5 @@
-import { atom, selector } from 'recoil';
+import { atom, selectorFamily } from 'recoil';
 import axios from 'axios';
-import sigPatternData from './sigPatternData.json';
 
 export const colorOptions = [
   {
@@ -41,17 +40,16 @@ export const formState = atom({
 
 export const defaultTreeLeafData = { links: [], nodes: [] };
 
-export const graphDataSelector = selector({
+export const graphDataSelector = selectorFamily({
   key: 'treeLeaf.plotData',
-  get: async ({ get }) => {
+  get: (params) => async ({ get }) => {
     try {
-      // const { data } = await axios.post('web/visualizationWrapper', {
-      //   fn: 'getTreeLeaf',
-      // });
-
-      // return data.output;
-      return sigPatternData;
+      const response = await axios.post('web/treeLeaf', params);
+      const data = response.data.output;
+      console.log(data);
+      return data;
     } catch (error) {
+      console.error(error);
       return null;
     }
   },

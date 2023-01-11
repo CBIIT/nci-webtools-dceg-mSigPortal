@@ -267,7 +267,7 @@ export default function SignatureInfo({ data }) {
   }
 
   // split description string delimited by key:
-  const descriptionRegex = /(\w*\s?\w+:)/g;
+  const descriptionRegex = /([A-Z]+[a-z]+\s?\w+:)/g;
   const description = metadata?.description
     ? metadata.description.split(descriptionRegex).filter((e) => e.length)
     : '';
@@ -518,7 +518,10 @@ export default function SignatureInfo({ data }) {
                           hiddenColumns: ['id', 'signature'],
                         },
                       }}
-                      customOptions={{ hideColumns: true, download: 'etiology_data' }}
+                      customOptions={{
+                        hideColumns: true,
+                        download: 'etiology_data',
+                      }}
                       striped
                     />
                   ) : (

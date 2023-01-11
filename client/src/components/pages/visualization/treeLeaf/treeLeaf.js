@@ -29,9 +29,8 @@ export default function TreeAndLeaf(props) {
     >
       <ErrorBoundary
         fallback={
-          <Alert variant="danger">
-            An internal error prevented plots from loading. Please contact the
-            website administrator if this problem persists.
+          <Alert variant="warning">
+            The selected study does not provide exposure and mutation seqmatrix data.
           </Alert>
         }
       >
