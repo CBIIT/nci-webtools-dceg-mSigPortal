@@ -190,6 +190,7 @@ export default function PcReference() {
           : '83',
       signatureSetName: signatureSet.value,
       signatureName: paramsSig.join(';'),
+      scalarValue: paramsScalar.join(';'),
     };
     const params_signature_scalar = {
       arrayScalar: paramsScalar,

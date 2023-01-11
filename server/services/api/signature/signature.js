@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const { isArguments } = require('lodash');
 const {
   getSignatureData,
   getSignatureOptions,
@@ -7,7 +8,7 @@ const {
 
 async function querySignature(req, res, next) {
   try {
-    const { limit, offset, ...query } = req.query;
+    const { limit, offset, scalarValue, ...query } = req.query;
     const connection = req.app.locals.connection;
 
     const columns = '*';
@@ -22,6 +23,20 @@ async function querySignature(req, res, next) {
       rowMode,
       distinct
     );
+    const signatureName = req.query.signatureName;
+    if (scalarValue) {
+      const scalarArray = scalarValue.split(';');
+      const signatureNameArray = signatureName.split(';');
+      console.log(scalarArray);
+      for (var i = 0; i < signatureNameArray.length; i++) {
+        for (var j = 0; j < data.length; j++) {
+          if (data[j].signatureName === signatureNameArray[i]) {
+            data[j].contribution =
+              data[j].contribution * parseInt(scalarArray[i]);
+          }
+        }
+      }
+    }
     res.json(data);
   } catch (error) {
     next(error);

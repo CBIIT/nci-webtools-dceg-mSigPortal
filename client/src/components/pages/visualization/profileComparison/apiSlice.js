@@ -61,9 +61,7 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
           console.log(scalarArray);
           console.log(signatureArray);
 
-          let result = [];
-
-          // for (var i = 0; i < )
+        
 
           // normalize signatureData by taking the average of contribution of selected signatureNames
           const groupByMutation = Object.values(
