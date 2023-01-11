@@ -5,14 +5,19 @@ import * as d3 from 'd3';
 import cloneDeep from 'lodash/cloneDeep';
 import { useRecoilValue } from 'recoil';
 import { formState, graphDataSelector } from './treeLeaf.state';
-import { groupBy } from './treeLeaf.utils';
+import { groupBy, forceHierarchical, getAttractionMatrix } from './treeLeaf.utils';
 
 export default function D3TreeLeaf({ id = 'treeleaf-plot', width = 1000, height = 1000, onSelect, ...props }) {
   const plotRef = useRef(null);
   const form = useRecoilValue(formState);
-  const graphData = useRecoilValue(graphDataSelector);
-  const { hierarchy, attributes } = cloneDeep(graphData) || {};
   const publicForm = useSelector((state) => state.visualization.publicForm);
+  const study = publicForm?.study?.value || 'PCAWG';
+  const strategy = publicForm?.strategy?.value || 'WGS';
+  const signatureSetName = 'COSMIC_v3_Signatures_GRCh37_SBS96' 
+  const profileMatrix = ["SBS96", "DBS78", "ID83"];
+  const params = { study, strategy, signatureSetName, profileMatrix };
+  const graphData = useRecoilValue(graphDataSelector(params));
+  const { hierarchy, attributes } = cloneDeep(graphData) || {};
   const plotData = {
     data: hierarchy,
     attributes: groupBy(attributes, 'Sample'),
@@ -124,8 +129,10 @@ function createForceDirectedTree(
 
   const nodeRadius = ({ data, children }) =>
     !children && data.name && attributes[data.name]
-      ? r.domain([mutationMin, mutationMax])(attributes[data.name].Mutations)
+      ? 2 * r.domain([mutationMin, mutationMax])(attributes[data.name].Mutations)
       : 0;
+
+  const attractionMatrix = getAttractionMatrix();
 
   const simulation = d3
     .forceSimulation(nodes)
@@ -139,7 +146,7 @@ function createForceDirectedTree(
     )
     .force(
       'charge',
-      d3.forceManyBody().strength((d) => (d.children ? -15 : 15))
+      forceHierarchical(attractionMatrix).strength((d) => (d.children ? -15 : 15))
     )
     // .force("center", d3.forceCenter().strength(1))
     .force('x', d3.forceX().strength(0.005))
@@ -147,7 +154,7 @@ function createForceDirectedTree(
     .force('collision', d3.forceCollide().radius(nodeRadius));
 
   // simulation.stop();
-  // simulation.tick(10);
+  // simulation.tick(40);
 
   const zoom = d3.zoom().on('zoom', zoomed);
 
@@ -275,10 +282,10 @@ function createForceDirectedTree(
     // console.log(data);
     const content = (
       <div className="text-start">
-        <div>Sample: {sample}</div>
-        <div>Cancer Type: {data.Cancer_Type}</div>
-        <div>Cosine Similarity: {data.Cosine_similarity}</div>
-        <div>Mutations: {data.Mutations}</div>
+        <div>Sample: {sample ?? 'Unavailable'}</div>
+        <div>Cancer Type: {data.Cancer_Type ?? 'Unavailable'}</div>
+        <div>Cosine Similarity: {data.Cosine_similarity ?? 'Unavailable'}</div>
+        <div>Mutations: {data.Mutations ?? 'Unavailable'}</div>
       </div>
     );
     tooltip
@@ -434,7 +441,7 @@ function categoricalLegend({
     .attr('fill', 'black')
     .attr('text-anchor', 'end')
     .style('alignment-baseline', 'middle')
-    .text((d) => d);
+    .text((d) => d  ?? 'Unavailable');
 
   // add title
   group

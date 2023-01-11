@@ -1,11 +1,18 @@
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { formState, graphDataSelector, colorOptions } from './treeLeaf.state';
+import { useSelector } from 'react-redux';
+import Select from 'react-select';
 import { Form, Row, Col } from 'react-bootstrap';
 import MultiSelect from '../../../controls/select/multiSelect';
-import Select from 'react-select';
+import { formState, graphDataSelector, colorOptions } from './treeLeaf.state';
 
 export default function TreeLeafForm() {
-  const { attributes } = useRecoilValue(graphDataSelector);
+  const store = useSelector((state) => state.visualization);
+  const study = store?.publicForm?.study?.value || 'PCAWG';
+  const strategy = store?.publicForm?.strategy?.value || 'WGS';
+  const signatureSetName = 'COSMIC_v3_Signatures_GRCh37_SBS96' 
+  const profileMatrix = ["SBS96", "DBS78", "ID83"];
+  const params = { study, strategy, signatureSetName, profileMatrix };
+  const { attributes } = useRecoilValue(graphDataSelector(params));
   const [form, setForm] = useRecoilState(formState);
   const mergeForm = (state) => setForm({ ...form, ...state });
 
