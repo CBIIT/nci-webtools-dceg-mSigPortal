@@ -1,6 +1,5 @@
 import { atom, selectorFamily } from 'recoil';
 import axios from 'axios';
-import sigPatternData from './sigPatternData.json';
 
 export const colorOptions = [
   {

@@ -11,8 +11,8 @@ export default function D3TreeLeaf({ id = 'treeleaf-plot', width = 1000, height 
   const plotRef = useRef(null);
   const form = useRecoilValue(formState);
   const publicForm = useSelector((state) => state.visualization.publicForm);
-  const study = publicForm?.study?.value || 'PCAWG';
-  const strategy = publicForm?.strategy?.value || 'WGS';
+  const study = publicForm?.study?.value ?? 'PCAWG';
+  const strategy = publicForm?.strategy?.value ?? 'WGS';
   const signatureSetName = 'COSMIC_v3_Signatures_GRCh37_SBS96' 
   const profileMatrix = ["SBS96", "DBS78", "ID83"];
   const params = { study, strategy, signatureSetName, profileMatrix };
@@ -57,7 +57,7 @@ function createForceDirectedTree(
     id,
     children, // if hierarchical data, given a d in data, returns its children
     tree = d3.tree, // layout algorithm (typically d3.tree or d3.cluster)
-    separation = (a, b) => (a.parent == b.parent ? 1 : 1) / a.depth,
+    separation = (a, b) => (a.parent == b.parent ? 1 : 2) / a.depth,
     sort, // how to sort nodes prior to layout (e.g., (a, b) => d3.descending(a.height, b.height))
     label = (d) => d.name, // given a node d, returns the display name
     title, // given a node d, returns its hover text
@@ -75,7 +75,7 @@ function createForceDirectedTree(
     r = d3.scaleSqrt().range([5, 20]), // radius of nodes
     padding = 1, // horizontal padding for first and last column
     fill = form.color.continuous
-      ? d3.scaleSequential(d3.interpolateViridis)
+      ? d3.scaleSequential(d3.interpolateBlues)
       : d3.scaleOrdinal(d3.schemeCategory10), // fill for nodes
     fillOpacity, // fill opacity for nodes
     stroke = '#555', // stroke for links
@@ -108,8 +108,6 @@ function createForceDirectedTree(
   // Sort the nodes.
   if (sort != null) treeData.sort(sort);
 
-  separation = (a, b) => (a.parent == b.parent ? 1 : 2) / a.depth;
-
   // Compute the layout.
   const root = d3
     .tree()
@@ -129,7 +127,7 @@ function createForceDirectedTree(
 
   const nodeRadius = ({ data, children }) =>
     !children && data.name && attributes[data.name]
-      ? 2 * r.domain([mutationMin, mutationMax])(attributes[data.name].Mutations)
+      ? r.domain([mutationMin, mutationMax])(attributes[data.name].Mutations)
       : 0;
 
   const attractionMatrix = getAttractionMatrix();

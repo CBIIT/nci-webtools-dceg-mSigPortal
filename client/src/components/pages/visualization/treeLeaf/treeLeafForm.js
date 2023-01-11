@@ -76,7 +76,7 @@ export default function TreeLeafForm() {
       <Row>
         <Col md="auto">
           <Form.Group controlId="color" className="mb-3">
-            <Form.Label>Color By</Form.Label>
+            <Form.Label>Leaf Property</Form.Label>
             <Select
               name="color"
               defaultValue={colorOptions[0]}
