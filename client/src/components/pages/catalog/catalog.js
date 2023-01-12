@@ -27,30 +27,33 @@ export default function Explore() {
       <div className="mx-3">
         <div className="mx-3 bg-white border border-top-0">
           {/* for desktops and tablets */}
-          <div className="d-none d-md-block">
-            <Nav activeKey={displayTab}>
-              {tabs.map(({ name, id }) => (
-                <Nav.Item key={id} className="d-inline-block">
-                  <NavLink
-                    className="button secondary-navlinks px-3 py-1 d-inline-block text-catalog rounded"
-                    activeClassName="bg-catalog text-white"
-                    style={{
-                      textDecoration: 'none',
-                      fontSize: '12pt',
-                      //color: 'black',
-                      fontWeight: '500',
-                    }}
-                    exact={true}
-                    to={`/catalog/${id}`}
-                    onClick={() => handleTabChange(id)}
-                  >
-                    {name}
-                  </NavLink>
-                  <div className="d-md-none w-100"></div>
-                </Nav.Item>
-              ))}
-            </Nav>
+          <div className="container">
+            <div className=" d-none d-md-block">
+              <Nav activeKey={displayTab}>
+                {tabs.map(({ name, id }) => (
+                  <Nav.Item key={id} className="d-inline-block">
+                    <NavLink
+                      className="btn secondary-navlinks px-2 py-1 d-inline-block text-catalog rounded"
+                      activeClassName="bg-catalog text-white"
+                      style={{
+                        textDecoration: 'none',
+                        fontSize: '12pt',
+                        //color: 'black',
+                        fontWeight: '500',
+                      }}
+                      exact={true}
+                      to={`/catalog/${id}`}
+                      onClick={() => handleTabChange(id)}
+                    >
+                      {name}
+                    </NavLink>
+                    <div className="d-md-none w-100"></div>
+                  </Nav.Item>
+                ))}
+              </Nav>
+            </div>
           </div>
+
           {/* for mobile devices */}
           <div className="row d-md-none">
             <Nav activeKey={displayTab}>

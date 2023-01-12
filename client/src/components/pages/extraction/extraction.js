@@ -36,34 +36,37 @@ export default function Extraction({ match }) {
       <div className="mx-3">
         <div className="mx-3 bg-white border border-top-0">
           {/* for desktops and tablets */}
-          <div className="d-none d-md-block">
-            <Nav defaultActiveKey="instructions">
-              {tabs.map(({ name, id }) => {
-                if (name)
-                  return (
-                    <div key={id} className="d-inline-block">
-                      <Button
-                        variant="link"
-                        className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
-                          id == displayTab ? 'bg-extraction text-white' : ''
-                        }`}
-                        active={id == displayTab && submitted}
-                        disabled={id != 'instructions' && !submitted}
-                        style={{
-                          textDecoration: 'none',
-                          fontSize: '12pt',
-                          color: '#42688b',
-                          fontWeight: '500',
-                        }}
-                        onClick={() => mergeState({ displayTab: id })}
-                      >
-                        {name}
-                      </Button>
-                    </div>
-                  );
-              })}
-            </Nav>
+          <div className="container">
+            <div className="d-none d-md-block">
+              <Nav defaultActiveKey="instructions">
+                {tabs.map(({ name, id }) => {
+                  if (name)
+                    return (
+                      <div key={id} className="d-inline-block">
+                        <Button
+                          variant="link"
+                          className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
+                            id == displayTab ? 'bg-extraction text-white' : ''
+                          }`}
+                          active={id == displayTab && submitted}
+                          disabled={id != 'instructions' && !submitted}
+                          style={{
+                            textDecoration: 'none',
+                            fontSize: '12pt',
+                            color: '#42688b',
+                            fontWeight: '500',
+                          }}
+                          onClick={() => mergeState({ displayTab: id })}
+                        >
+                          {name}
+                        </Button>
+                      </div>
+                    );
+                })}
+              </Nav>
+            </div>
           </div>
+
           {/* for mobile devices */}
           <div className="row d-md-none">
             <Nav defaultActiveKey="instructions">

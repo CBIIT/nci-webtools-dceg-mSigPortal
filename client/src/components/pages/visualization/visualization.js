@@ -183,39 +183,42 @@ export default function Visualization({ match }) {
       <div className="mx-3">
         <div className="mx-3 bg-white border border-top-0">
           {/* for desktops and tablets */}
-          <div className="d-none d-md-block">
-            <Nav defaultActiveKey="profilerSummary">
-              {tabs
-                .filter((e) => e)
-                .map(({ name, id }) => (
-                  <div key={id} className="d-inline-block">
-                    <Button
-                      variant="link"
-                      className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
-                        id == displayTab ? 'bg-visualization text-white' : ''
-                      }`}
-                      active={id == displayTab}
-                      disabled={
-                        id != 'instructions' &&
-                        !(source == 'public'
-                          ? matrixData.length
-                          : matrixList.length)
-                      }
-                      style={{
-                        textDecoration: 'none',
-                        fontSize: '12pt',
-                        color: '#3a7867',
-                        fontWeight: '500',
-                      }}
-                      onClick={() => mergeState({ displayTab: id })}
-                    >
-                      {name}
-                    </Button>
-                    <div className="d-md-none w-100"></div>
-                  </div>
-                ))}
-            </Nav>
+          <div className="container">
+            <div className="d-none d-md-block">
+              <Nav defaultActiveKey="profilerSummary">
+                {tabs
+                  .filter((e) => e)
+                  .map(({ name, id }) => (
+                    <div key={id} className="d-inline-block">
+                      <Button
+                        variant="link"
+                        className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
+                          id == displayTab ? 'bg-visualization text-white' : ''
+                        }`}
+                        active={id == displayTab}
+                        disabled={
+                          id != 'instructions' &&
+                          !(source == 'public'
+                            ? matrixData.length
+                            : matrixList.length)
+                        }
+                        style={{
+                          textDecoration: 'none',
+                          fontSize: '12pt',
+                          color: '#3a7867',
+                          fontWeight: '500',
+                        }}
+                        onClick={() => mergeState({ displayTab: id })}
+                      >
+                        {name}
+                      </Button>
+                      <div className="d-md-none w-100"></div>
+                    </div>
+                  ))}
+              </Nav>
+            </div>
           </div>
+
           {/* for mobile devices */}
           <div className="e d-md-none">
             <Nav defaultActiveKey="summary">
