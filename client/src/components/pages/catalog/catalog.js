@@ -24,12 +24,12 @@ export default function Explore() {
 
   return (
     <div className="position-relative">
-      <div className="mx-3">
-        <div className="mx-3 bg-white border border-top-0">
+      <div className="bg-white border border-top-0">
+        <div className="container">
           {/* for desktops and tablets */}
-          <div className="container">
+          <div className="mx-3 ">
             <div className=" d-none d-md-block">
-              <Nav activeKey={displayTab}>
+              <Nav activeKey={displayTab} className="container">
                 {tabs.map(({ name, id }) => (
                   <Nav.Item key={id} className="d-inline-block">
                     <NavLink
@@ -53,33 +53,35 @@ export default function Explore() {
               </Nav>
             </div>
           </div>
-
-          {/* for mobile devices */}
-          <div className="row d-md-none">
-            <Nav activeKey={displayTab}>
-              {tabs.map(({ name, id }) => (
-                <Nav.Item key={id} className="col-12 text-center">
-                  <NavLink
-                    className="button secondary-navlinks px-3 py-1 d-inline-block text-catalog rounded"
-                    activeClassName="bg-catalog text-white"
-                    style={{
-                      textDecoration: 'none',
-                      fontSize: '12pt',
-                      //color: 'black',
-                      fontWeight: '500',
-                    }}
-                    exact={true}
-                    to={`/catalog/${id}`}
-                    onClick={() => handleTabChange(id)}
-                  >
-                    {name}
-                  </NavLink>
-                  <div className="d-md-none w-100"></div>
-                </Nav.Item>
-              ))}
-            </Nav>
-          </div>
         </div>
+
+        {/* for mobile devices */}
+        <div className="row d-md-none">
+          <Nav activeKey={displayTab}>
+            {tabs.map(({ name, id }) => (
+              <Nav.Item key={id} className="col-12 text-center">
+                <NavLink
+                  className="button secondary-navlinks px-3 py-1 d-inline-block text-catalog rounded"
+                  activeClassName="bg-catalog text-white"
+                  style={{
+                    textDecoration: 'none',
+                    fontSize: '12pt',
+                    //color: 'black',
+                    fontWeight: '500',
+                  }}
+                  exact={true}
+                  to={`/catalog/${id}`}
+                  onClick={() => handleTabChange(id)}
+                >
+                  {name}
+                </NavLink>
+                <div className="d-md-none w-100"></div>
+              </Nav.Item>
+            ))}
+          </Nav>
+        </div>
+      </div>
+      <div className="mx-3">
         <div className="mx-3 my-3">
           <Route
             exact
