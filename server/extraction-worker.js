@@ -3,7 +3,7 @@ const fs = require('fs-extra');
 const knex = require('knex');
 const logger = require('./services/logger');
 const config = require('./config.json');
-const serviceRouter = require('./services/extraction/router');
+const api = require('./services/extraction/api');
 
 const app = createApp(config);
 const server = app.listen(config.extraction.port, () => {
@@ -11,6 +11,8 @@ const server = app.listen(config.extraction.port, () => {
     `mSigPortal extraction service running on config.port: ${config.extraction.port}`
   );
 });
+server.keepAliveTimeout = 61 * 1000;
+server.headersTimeout = 62 * 1000;
 
 function createApp(config) {
   const app = express();
@@ -23,7 +25,7 @@ function createApp(config) {
     });
   }
   app.locals.logger = logger;
-  app.use(serviceRouter);
+  app.use(api);
 
   // create required folders
   for (let folder of [config.logs.folder, config.results.folder]) {
