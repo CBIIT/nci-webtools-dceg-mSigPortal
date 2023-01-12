@@ -43,7 +43,7 @@ export default function Extraction({ match }) {
                   if (name)
                     return (
                       <div key={id} className="d-inline-block">
-                        <Button
+                        <div
                           variant="link"
                           className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
                             id == displayTab ? 'bg-extraction text-white' : ''
@@ -59,7 +59,7 @@ export default function Extraction({ match }) {
                           onClick={() => mergeState({ displayTab: id })}
                         >
                           {name}
-                        </Button>
+                        </div>
                       </div>
                     );
                 })}
@@ -73,7 +73,7 @@ export default function Extraction({ match }) {
                   if (name)
                     return (
                       <div key={id} className="col-12 text-center">
-                        <Button
+                        <div
                           variant="link"
                           className={
                             'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-extraction text-white'
@@ -88,7 +88,7 @@ export default function Extraction({ match }) {
                           onClick={() => mergeState({ displayTab: id })}
                         >
                           {name}
-                        </Button>
+                        </div>
                         <div className="d-md-none w-100"></div>
                       </div>
                     );

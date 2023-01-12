@@ -663,7 +663,7 @@ export default function Exposure({ match }) {
                   if (name)
                     return (
                       <div key={id} className="d-inline-block">
-                        <Button
+                        <div
                           variant="link"
                           className={`secondary-navlinks px-3 py-1 d-inline-block border-0 text-exploration ${
                             id == displayTab
@@ -684,7 +684,7 @@ export default function Exposure({ match }) {
                           onClick={() => mergeState({ displayTab: id })}
                         >
                           {name}
-                        </Button>
+                        </div>
                       </div>
                     );
                 })}
@@ -699,7 +699,7 @@ export default function Exposure({ match }) {
                 if (name)
                   return (
                     <div key={id} className="col-12 text-center">
-                      <Button
+                      <div
                         variant="link"
                         className={
                           id == displayTab && Object.keys(exposureCancer).length
@@ -715,7 +715,7 @@ export default function Exposure({ match }) {
                         onClick={() => mergeState({ displayTab: id })}
                       >
                         {name}
-                      </Button>
+                      </div>
                       <div className="d-md-none w-100"></div>
                     </div>
                   );

@@ -33,7 +33,7 @@ export default function Explore() {
                 {tabs.map(({ name, id }) => (
                   <Nav.Item key={id} className="d-inline-block">
                     <NavLink
-                      className="btn secondary-navlinks px-2 py-1 d-inline-block text-catalog rounded"
+                      className="secondary-navlinks px-2 py-1 d-inline-block text-catalog"
                       activeClassName="bg-catalog text-white"
                       style={{
                         textDecoration: 'none',

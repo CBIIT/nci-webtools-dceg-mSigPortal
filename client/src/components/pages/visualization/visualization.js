@@ -193,7 +193,7 @@ export default function Visualization({ match }) {
                   .filter((e) => e)
                   .map(({ name, id }) => (
                     <div key={id} className="d-inline-block">
-                      <Button
+                      <div
                         variant="link"
                         className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
                           id == displayTab ? 'bg-visualization text-white' : ''
@@ -214,7 +214,7 @@ export default function Visualization({ match }) {
                         onClick={() => mergeState({ displayTab: id })}
                       >
                         {name}
-                      </Button>
+                      </div>
                       <div className="d-md-none w-100"></div>
                     </div>
                   ))}
@@ -228,7 +228,7 @@ export default function Visualization({ match }) {
           <Nav defaultActiveKey="summary">
             {tabs.map(({ name, id }) => (
               <div key={id} className="col-12 text-center">
-                <Button
+                <div
                   variant="link"
                   className={
                     id == displayTab &&
@@ -245,7 +245,7 @@ export default function Visualization({ match }) {
                   onClick={() => mergeState({ displayTab: id })}
                 >
                   {name}
-                </Button>
+                </div>
                 <div className="d-md-none w-100"></div>
               </div>
             ))}

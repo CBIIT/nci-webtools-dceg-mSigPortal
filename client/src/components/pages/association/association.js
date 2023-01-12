@@ -59,7 +59,7 @@ export default function Association() {
               >
                 {tabs.map(({ name, id }) => (
                   <div key={id} className="d-inline-block ">
-                    <Button
+                    <div
                       variant="link"
                       className={`secondary-navlinks px-3 py-1 d-inline-block border-0 association ${
                         id == displayTab ? 'bg-association text-white' : ''
@@ -77,7 +77,7 @@ export default function Association() {
                       onClick={() => mergeState({ displayTab: id })}
                     >
                       {name}
-                    </Button>
+                    </div>
                   </div>
                 ))}
               </Nav>
@@ -89,7 +89,7 @@ export default function Association() {
             <Nav defaultActiveKey="summary">
               {tabs.map(({ name, id }) => (
                 <div key={id} className="col-12 text-center">
-                  <Button
+                  <div
                     variant="link"
                     className={
                       id == displayTab && Object.keys(expVarList).length
@@ -105,7 +105,7 @@ export default function Association() {
                     onClick={() => mergeState({ displayTab: id })}
                   >
                     {name}
-                  </Button>
+                  </div>
                   <div className="d-md-none w-100"></div>
                 </div>
               ))}
