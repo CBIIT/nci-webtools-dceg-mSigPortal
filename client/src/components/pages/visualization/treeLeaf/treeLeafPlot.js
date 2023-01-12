@@ -1,5 +1,4 @@
 import { useRef, useEffect } from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
 import { useSelector } from 'react-redux';
 import * as d3 from 'd3';
 import cloneDeep from 'lodash/cloneDeep';
@@ -42,7 +41,7 @@ export default function D3TreeLeaf({ id = 'treeleaf-plot', width = 1000, height 
   }, [plotRef, plotData, plotLayout]);
 
   return (
-    <div className="border rounded p-3" {...props}>
+    <div className="border rounded p-3 position-relative" {...props}>
       <div ref={plotRef} />
     </div>
   );
@@ -278,20 +277,17 @@ function createForceDirectedTree(
   function mousemove(e, d) {
     const sample = d.data.name;
     const data = attributes[sample];
-    // console.log(data);
-    const content = (
-      <div className="text-start">
-        <div>Sample: {sample ?? 'Unavailable'}</div>
-        <div>Cancer Type: {data.Cancer_Type ?? 'Unavailable'}</div>
-        <div>Cosine Similarity: {data.Cosine_similarity ?? 'Unavailable'}</div>
-        <div>Mutations: {data.Mutations ?? 'Unavailable'}</div>
-      </div>
-    );
     tooltip
-      .html(renderToStaticMarkup(content))
-      // .html('Sample: ' + sample || 'none')
-      .style('left', e.pageX - 30 + 'px')
-      .style('top', e.pageY - 320 + 'px');
+      .html(
+        `<div class="text-start">
+          <div>Sample: ${sample ?? 'Unavailable'}</div>
+          <div>Cancer Type: ${data.Cancer_Type ?? 'Unavailable'}</div>
+          <div>Cosine Similarity: ${data.Cosine_similarity ?? 'Unavailable'}</div>
+          <div>Mutations: ${data.Mutations ?? 'Unavailable'}</div>
+        </div>`
+      )
+      .style('left', e.layerX + 'px')
+      .style('top', e.layerY + 'px');
   }
 
   function click(e, d) {
