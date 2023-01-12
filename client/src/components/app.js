@@ -108,7 +108,7 @@ export default function App() {
       cardTitle: 'Signature Association',
       cardText: 'Signature Association',
       description:
-        'Analyze signature association with other genomic features and clincial data.',
+        'Analyze signature association with other genomic features and clinical data.',
       image: 'assets/images/Association-Icon.svg',
       navIndex: 4,
       color: '#7f282f',

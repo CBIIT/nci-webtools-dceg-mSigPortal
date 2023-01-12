@@ -223,31 +223,27 @@ export default function Home({ links }) {
   return (
     <>
       <div className="banner-container">
-        <div className="image-blurred-edge">
-          <div className="text-center  d-none d-sm-block">
-            <img
-              src="assets/images/Hero_Image.png"
-              alt="mSigPortal banner"
-              className="image-banner"
-            ></img>
-            <div className="row">
-              <div className="homepage-title-left text-left">
-                <h1 className="msigportal-home-title">mSigPortal</h1>
-                <div class="text-primary-purple msigportal-title">
-                  Integrative Mutational Signature Portal for Cancer Genomics
-                  Study
-                </div>
+        <div className="text-center  d-none d-sm-block">
+          <img
+            src="assets/images/Hero_Image.png"
+            alt="mSigPortal banner"
+            className="image-banner"
+          ></img>
+          <div className="row">
+            <div className="homepage-title-left text-left">
+              <h1 className="msigportal-home-title">mSigPortal</h1>
+              <div class="text-primary-purple msigportal-title">
+                Integrative Mutational Signature Portal for Cancer Genomics
+                Study
               </div>
-              <div className="homepage-title-right">
-                <div className=" btn btn-gradient btn-1">
-                  <div className="msigportal-home-title-right">
-                    Learn more about mSigportal &gt;
-                  </div>
+            </div>
+            <div className="homepage-title-right">
+              <div className=" btn btn-gradient btn-1">
+                <div className="msigportal-home-title-right">
+                  Learn more about mSigportal &gt;
                 </div>
               </div>
             </div>
-
-
           </div>
         </div>
 
