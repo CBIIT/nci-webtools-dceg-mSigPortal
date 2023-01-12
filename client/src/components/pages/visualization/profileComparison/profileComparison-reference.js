@@ -382,7 +382,7 @@ export default function PcReference() {
           </Col>
           <Col lg="auto" className="d-flex justify-content-end">
             <Button
-              className="mt-auto"
+              className="mt-4 mb-4"
               disabled={
                 !profile ||
                 !sample ||
