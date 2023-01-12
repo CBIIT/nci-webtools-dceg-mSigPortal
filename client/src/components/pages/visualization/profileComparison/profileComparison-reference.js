@@ -14,11 +14,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { actions } from '../../../../services/store/visualization';
-import {
-  useProfileComparisonReferenceQuery,
-  usePcSignatureSetsQuery,
-  usePcSignatureNamesQuery,
-} from './apiSlice';
+import { useProfileComparisonReferenceQuery } from './apiSlice';
+import { useSignatureOptionsQuery } from '../../../../services/store/rootApi';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { defaultMatrix } from '../../../../services/utils';
 import Plotly from '../../../controls/plotly/plot/plot';
@@ -57,22 +54,11 @@ export default function PcReference() {
   const { search } = watchSearch();
 
   const [calculationQuery, setCalculationQuery] = useState('');
-  const [signatureSetQuery, setSignatureSetQuery] = useState('');
-  const [signatureNamesQuery, setSignatureNamesQuery] = useState('');
 
-  // get signature sets
-  const { data: signatureSetOptions, isFetching: fetchingSigSets } =
-    usePcSignatureSetsQuery(signatureSetQuery, {
-      skip: !signatureSetQuery,
-    });
-  // get signature names in set
-  const {
-    data: signatureNameOptions,
-    isFetching: fetchingSigNames,
-    refetch: refetchSignatureNames,
-  } = usePcSignatureNamesQuery(signatureNamesQuery, {
-    skip: !signatureNamesQuery,
-  });
+  // get signature options
+  const { data: signatureOptions, isFetching: fetchingSignatureOptions } =
+    useSignatureOptionsQuery();
+
   // get plot data
   const {
     data: plot,
@@ -82,7 +68,7 @@ export default function PcReference() {
     skip: !calculationQuery,
   });
 
-  // declare form Options
+  // create form Options
   const profileOptions = matrixData.length
     ? [
         ...new Set(
@@ -94,45 +80,8 @@ export default function PcReference() {
       }))
     : [];
 
-  const sampleOptions = getSampleOptions(profile);
-
-  // set inital profile
-  useEffect(() => {
-    if (!profile && profileOptions.length) handleProfile(profileOptions[0]);
-  }, [profileOptions]);
-  // set intital signature set
-  // useEffect(() => {
-  //   if (signatureSetOptions) setValue('signatureSet', signatureSetOptions[0]);
-  // }, [signatureSetOptions]);
-
-  // set initial signature
-  useEffect(() => {
-    if (signatureNameOptions) setValue('compare', signatureNameOptions[0]);
-  }, [signatureNameOptions]);
-  // get signature sets when profile is selected
-  useEffect(() => {
-    if (profile) {
-      setSignatureSetQuery({
-        profile: profile.value,
-        matrix: defaultMatrix(profile.value, ['96', '78', '83']),
-      });
-    }
-  }, [profile]);
-  // get signature names when signature set is selected
-
-  useEffect(() => {
-    if (signatureSet) {
-      setSignatureNamesQuery({
-        profile: profile.value,
-        matrix: defaultMatrix(profile.value, ['96', '78', '83']),
-        signatureSetName: signatureSet.value,
-      });
-    }
-  }, [signatureSet]);
-
-  // get samples filtered by selected profile
-  function getSampleOptions(profile) {
-    return matrixData && profile
+  const sampleOptions = (profile) =>
+    matrixData && profile
       ? [
           ...new Set(
             matrixData
@@ -145,7 +94,52 @@ export default function PcReference() {
           value: e,
         }))
       : [];
-  }
+
+  const signatureSetOptions = (profile) =>
+    signatureOptions && profile
+      ? [
+          ...new Set(
+            signatureOptions
+              .filter(
+                (e) =>
+                  e.profile == profile.value &&
+                  e.matrix == defaultMatrix(profile.value, ['96', '78', '83'])
+              )
+              .map((e) => e.signatureSetName)
+          ),
+        ]
+          .sort((a, b) =>
+            a.localeCompare(b, undefined, { sensitivity: 'base' })
+          )
+          .map((e) => ({
+            label: e,
+            value: e,
+          }))
+      : [];
+
+  const signatureNameOptions = (profile, signatureSet) =>
+    signatureOptions && profile && signatureSet
+      ? [
+          ...new Set(
+            signatureOptions
+              .filter(
+                (e) =>
+                  e.profile == profile.value &&
+                  e.matrix ==
+                    defaultMatrix(profile.value, ['96', '78', '83']) &&
+                  e.signatureSetName == signatureSet.value
+              )
+              .map((e) => e.signatureName)
+          ),
+        ].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+      : [];
+
+  // set inital form options
+  useEffect(() => {
+    if (!profile && profileOptions.length && signatureOptions)
+      handleProfile(profileOptions[0]);
+  }, [profileOptions, signatureOptions]);
+
   function onSubmit(data) {
     mergeForm(data);
     const { profile, sample, signatureSet, compare } = data;
@@ -203,13 +197,20 @@ export default function PcReference() {
     });
   }
 
-  function handleProfile(e) {
-    const samples = getSampleOptions(e);
+  function handleProfile(profile) {
+    const samples = sampleOptions(profile);
+    const signatureSets = signatureSetOptions(profile);
 
-    setValue('profile', e);
-    if (samples.length) {
-      setValue('sample', samples[0]);
-    }
+    setValue('profile', profile);
+    setValue('sample', samples.length ? samples[0] : null);
+    handleSignatureSet(profile, signatureSets.length ? signatureSets[0] : null);
+  }
+
+  function handleSignatureSet(profile, signatureSet) {
+    const names = signatureNameOptions(profile, signatureSet);
+
+    setValue('signatureSet', signatureSet);
+    setValue('compare', names[0]);
   }
 
   const signatureListPopover = signatureSet && (
@@ -224,8 +225,8 @@ export default function PcReference() {
           )}
         />
         <div>
-          {signatureNameOptions ? (
-            signatureNameOptions
+          {signatureNameOptions(profile, signatureSet) ? (
+            signatureNameOptions(profile, signatureSet)
               .filter((e) =>
                 search ? e.toLowerCase().includes(search.toLowerCase()) : true
               )
@@ -311,27 +312,23 @@ export default function PcReference() {
           </Col>
           <Col lg="auto">
             <Select
-              disabled={sampleOptions.length < 2}
+              disabled={!profile}
               className="m-auto"
               name="sample"
               label="Sample Name"
-              options={sampleOptions}
+              options={sampleOptions(profile)}
               control={control}
               styles={customStyles}
             />
           </Col>
           <Col lg="auto">
             <Select
-              disabled={sampleOptions.length < 2 || fetchingSigSets}
+              disabled={fetchingSignatureOptions}
               className="m-auto"
               name="signatureSet"
               label="Reference Signature Set"
-              options={signatureSetOptions}
-              onChange={(e) => {
-                setValue('signatureSet', e);
-                resetField('compare');
-                refetchSignatureNames();
-              }}
+              options={signatureSetOptions(profile)}
+              onChange={(e) => handleSignatureSet(profile, e)}
               control={control}
               styles={customStyles}
             />
@@ -367,7 +364,7 @@ export default function PcReference() {
                   <Form.Control
                     {...field}
                     isInvalid={formErrors?.compare}
-                    disabled={fetchingSigNames}
+                    disabled={fetchingSignatureOptions}
                   />
                 )}
               />
@@ -387,8 +384,8 @@ export default function PcReference() {
                 !sample ||
                 !signatureSet ||
                 !compare ||
-                fetchingSigSets ||
-                fetchingSigNames
+                fetchingSignatureOptions ||
+                fetchingSignatureOptions
               }
               variant="primary"
               type="submit"
@@ -397,7 +394,7 @@ export default function PcReference() {
             </Button>
           </Col>
         </Row>
-        {sampleOptions.length < 2 && (
+        {sampleOptions(profile).length < 2 && (
           <Row>
             <Col>Unavailable - More than one Sample Required</Col>
           </Row>
