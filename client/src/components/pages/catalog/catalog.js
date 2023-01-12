@@ -29,7 +29,7 @@ export default function Explore() {
           {/* for desktops and tablets */}
           <div className="mx-3 ">
             <div className=" d-none d-md-block">
-              <Nav activeKey={displayTab} className="container">
+              <Nav activeKey={displayTab} className="container pl-3">
                 {tabs.map(({ name, id }) => (
                   <Nav.Item key={id} className="d-inline-block">
                     <NavLink

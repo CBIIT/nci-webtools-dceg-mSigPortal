@@ -151,12 +151,6 @@ export default function Visualization({ match }) {
       component: <CosineSimilarity />,
     },
     {
-      name: 'Mutational Pattern Enrichment Analysis',
-      id: 'mutationalPattern',
-      component: <MutationalPattern />,
-    },
-
-    {
       name: 'Profile Comparison',
       id: 'profileComparison',
       component: <ProfileComparison />,
@@ -166,6 +160,12 @@ export default function Visualization({ match }) {
       id: 'pca',
       component: <PCA />,
     },
+    {
+      name: 'Mutational Pattern Enrichment Analysis',
+      id: 'mutationalPattern',
+      component: <MutationalPattern />,
+    },
+
     source == 'user' && {
       name: 'Clustered Mutations Identification',
       id: 'cluster',
@@ -180,12 +180,15 @@ export default function Visualization({ match }) {
 
   return (
     <div className="position-relative">
-      <div className="mx-3">
-        <div className="mx-3 bg-white border border-top-0">
+      <div className="bg-white border border-top-0">
+        <div className="container">
           {/* for desktops and tablets */}
           <div className="container">
             <div className="d-none d-md-block">
-              <Nav defaultActiveKey="profilerSummary">
+              <Nav
+                defaultActiveKey="profilerSummary"
+                className="container pl-3"
+              >
                 {tabs
                   .filter((e) => e)
                   .map(({ name, id }) => (
@@ -218,37 +221,38 @@ export default function Visualization({ match }) {
               </Nav>
             </div>
           </div>
+        </div>
 
-          {/* for mobile devices */}
-          <div className="e d-md-none">
-            <Nav defaultActiveKey="summary">
-              {tabs.map(({ name, id }) => (
-                <div key={id} className="col-12 text-center">
-                  <Button
-                    variant="link"
-                    className={
-                      id == displayTab &&
-                      (matrixData.length || Object.keys(svgList).length)
-                        ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-visualization text-white'
-                        : 'secondary-navlinks px-3 py-1 d-inline-block border-0'
-                    }
-                    style={{
-                      textDecoration: 'none',
-                      fontSize: '12pt',
-                      color: '#3a7867',
-                      fontWeight: '500',
-                    }}
-                    onClick={() => mergeState({ displayTab: id })}
-                  >
-                    {name}
-                  </Button>
-                  <div className="d-md-none w-100"></div>
-                </div>
-              ))}
-            </Nav>
-          </div>
+        {/* for mobile devices */}
+        <div className="e d-md-none">
+          <Nav defaultActiveKey="summary">
+            {tabs.map(({ name, id }) => (
+              <div key={id} className="col-12 text-center">
+                <Button
+                  variant="link"
+                  className={
+                    id == displayTab &&
+                    (matrixData.length || Object.keys(svgList).length)
+                      ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-visualization text-white'
+                      : 'secondary-navlinks px-3 py-1 d-inline-block border-0'
+                  }
+                  style={{
+                    textDecoration: 'none',
+                    fontSize: '12pt',
+                    color: '#3a7867',
+                    fontWeight: '500',
+                  }}
+                  onClick={() => mergeState({ displayTab: id })}
+                >
+                  {name}
+                </Button>
+                <div className="d-md-none w-100"></div>
+              </div>
+            ))}
+          </Nav>
         </div>
       </div>
+
       <SidebarContainer
         className="m-3"
         collapsed={!openSidebar}
