@@ -43,9 +43,9 @@ export default function Extraction({ match }) {
                   if (name)
                     return (
                       <div key={id} className="d-inline-block">
-                        <div
+                        <Button
                           variant="link"
-                          className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
+                          className={`secondary-navlinks px-3 py-1 d-inline-block border-0 rounded-0 ${
                             id == displayTab ? 'bg-extraction text-white' : ''
                           }`}
                           active={id == displayTab && submitted}
@@ -59,7 +59,7 @@ export default function Extraction({ match }) {
                           onClick={() => mergeState({ displayTab: id })}
                         >
                           {name}
-                        </div>
+                        </Button>
                       </div>
                     );
                 })}
@@ -73,10 +73,10 @@ export default function Extraction({ match }) {
                   if (name)
                     return (
                       <div key={id} className="col-12 text-center">
-                        <div
+                        <Button
                           variant="link"
                           className={
-                            'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-extraction text-white'
+                            'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-extraction text-white rounded-0'
                           }
                           active={id == displayTab && submitted}
                           style={{
@@ -88,7 +88,7 @@ export default function Extraction({ match }) {
                           onClick={() => mergeState({ displayTab: id })}
                         >
                           {name}
-                        </div>
+                        </Button>
                         <div className="d-md-none w-100"></div>
                       </div>
                     );

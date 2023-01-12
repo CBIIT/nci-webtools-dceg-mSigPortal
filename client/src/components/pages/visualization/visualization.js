@@ -193,9 +193,9 @@ export default function Visualization({ match }) {
                   .filter((e) => e)
                   .map(({ name, id }) => (
                     <div key={id} className="d-inline-block">
-                      <div
+                      <Button
                         variant="link"
-                        className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
+                        className={`secondary-navlinks px-3 py-1 d-inline-block border-0 rounded-0 ${
                           id == displayTab ? 'bg-visualization text-white' : ''
                         }`}
                         active={id == displayTab}
@@ -214,7 +214,7 @@ export default function Visualization({ match }) {
                         onClick={() => mergeState({ displayTab: id })}
                       >
                         {name}
-                      </div>
+                      </Button>
                       <div className="d-md-none w-100"></div>
                     </div>
                   ))}
@@ -228,13 +228,13 @@ export default function Visualization({ match }) {
           <Nav defaultActiveKey="summary">
             {tabs.map(({ name, id }) => (
               <div key={id} className="col-12 text-center">
-                <div
+                <Button
                   variant="link"
                   className={
                     id == displayTab &&
                     (matrixData.length || Object.keys(svgList).length)
-                      ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-visualization text-white'
-                      : 'secondary-navlinks px-3 py-1 d-inline-block border-0'
+                      ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-visualization text-white rounded-0'
+                      : 'secondary-navlinks px-3 py-1 d-inline-block border-0 rounded-0'
                   }
                   style={{
                     textDecoration: 'none',
@@ -245,7 +245,7 @@ export default function Visualization({ match }) {
                   onClick={() => mergeState({ displayTab: id })}
                 >
                   {name}
-                </div>
+                </Button>
                 <div className="d-md-none w-100"></div>
               </div>
             ))}

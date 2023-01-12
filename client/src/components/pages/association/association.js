@@ -59,9 +59,9 @@ export default function Association() {
               >
                 {tabs.map(({ name, id }) => (
                   <div key={id} className="d-inline-block ">
-                    <div
+                    <Button
                       variant="link"
-                      className={`secondary-navlinks px-3 py-1 d-inline-block border-0 association ${
+                      className={`secondary-navlinks px-3 py-1 d-inline-block border-0 association rounded-0 ${
                         id == displayTab ? 'bg-association text-white' : ''
                       }`}
                       active={id == displayTab && submitted}
@@ -77,7 +77,7 @@ export default function Association() {
                       onClick={() => mergeState({ displayTab: id })}
                     >
                       {name}
-                    </div>
+                    </Button>
                   </div>
                 ))}
               </Nav>
@@ -89,12 +89,12 @@ export default function Association() {
             <Nav defaultActiveKey="summary">
               {tabs.map(({ name, id }) => (
                 <div key={id} className="col-12 text-center">
-                  <div
+                  <Button
                     variant="link"
                     className={
                       id == displayTab && Object.keys(expVarList).length
-                        ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-association text-white'
-                        : 'secondary-navlinks px-3 py-1 d-inline-block border-0'
+                        ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-association text-white rounded-0'
+                        : 'secondary-navlinks px-3 py-1 d-inline-block border-0 rounded-0'
                     }
                     style={{
                       textDecoration: 'none',
@@ -105,7 +105,7 @@ export default function Association() {
                     onClick={() => mergeState({ displayTab: id })}
                   >
                     {name}
-                  </div>
+                  </Button>
                   <div className="d-md-none w-100"></div>
                 </div>
               ))}
