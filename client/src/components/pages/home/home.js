@@ -262,16 +262,16 @@ export default function Home({ links }) {
 
         <div className="container mb-3 d-sm-none">
           <div className="row">
-            <div className="col-xs-12">
+            <div className="col-md-12 col-sm-12">
               <h1 className="msigportal-home-title">mSigPortal</h1>
               <div class="text-primary-purple msigportal-title">
                 Integrative Mutational Signature Portal for Cancer Genomics
                 Study
               </div>
             </div>
-            <div className="col-xs-12">
+            <div className="col-md-12 col-sm-12">
               <Link
-                className="link-primary-underline"
+                className="text-center"
                 to={{
                   pathname: '/about',
                 }}

@@ -48,12 +48,15 @@ export default function Association() {
 
   return (
     <div className="position-relative">
-      <div className="mx-3">
-        <div className="mx-3 bg-white border border-top-0">
+      <div className="bg-white border border-top-0">
+        <div className="container">
           {/* for desktops and tablets */}
           <div className="container">
             <div className="d-none d-md-block">
-              <Nav defaultActiveKey="profilerSummary">
+              <Nav
+                defaultActiveKey="profilerSummary"
+                className="container pl-3"
+              >
                 {tabs.map(({ name, id }) => (
                   <div key={id} className="d-inline-block ">
                     <Button
@@ -110,6 +113,7 @@ export default function Association() {
           </div>
         </div>
       </div>
+
       <SidebarContainer
         className="m-3"
         collapsed={!openSidebar}
