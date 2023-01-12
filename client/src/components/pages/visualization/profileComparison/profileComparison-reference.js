@@ -188,6 +188,7 @@ export default function PcReference() {
     const params_signature_scalar = {
       arrayScalar: paramsScalar,
       arraySignature: paramsSig,
+      paramsSignatureScalar: compare,
     };
 
     setCalculationQuery({

@@ -135,7 +135,8 @@ export function compareProfiles(
   tickAngle = -90
 ) {
   const sample1 = data1[0].sample || data1[0].signatureName;
-  const sample2 = data2[0].sample || data2[0].signatureName;
+  const sample2 =
+    data2[0].scalarSignature || data2[0].sample || data2[0].signatureName;
 
   const mutationGroupSort = (a, b) => {
     const order = Object.keys(colors);
