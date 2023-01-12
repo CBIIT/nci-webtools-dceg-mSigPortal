@@ -289,7 +289,6 @@ export function compareProfiles(
     showarrow: false,
     width: 100,
   };
-  console.log(sample2);
 
   const sampleLabel2 = {
     xref: 'paper',
