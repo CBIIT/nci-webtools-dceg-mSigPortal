@@ -20,17 +20,20 @@ export default function CosineSimilarity(inputData) {
       colorbar: {
         title: 'Cosine Similarity',
         orientation: 'h',
-        len: 0.5,
+        y: 1.01,
+        len: 450,
+        lenmode: 'pixels',
       },
     },
   ];
 
   const layout = {
     autosize: true,
-    // width: 900,
-    height: 1000,
+    width: signatureOrder.length < 10 ? 400 + 50 * signatureOrder.length : null,
+    height: 300 + 50 * sampleOrder.length,
     xaxis: {
       automargin: true,
+      showticklabels: signatureOrder.length > 100 ? false : true,
     },
     yaxis: {
       automargin: true,

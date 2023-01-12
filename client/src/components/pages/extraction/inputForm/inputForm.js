@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Form, Select, Button, Row, Col } from 'react-bootstrap';
+import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
 import SelectForm from '../../../controls/select/selectForm';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -185,7 +185,7 @@ export default function InputForm() {
     cancer: { label: 'Lung-AdenoCA', value: 'Lung-AdenoCA' },
     strategy: { label: 'WGS', value: 'WGS' },
     input_type: { label: 'vcf', value: 'vcf' },
-    reference_genome: genomeOptions[0],
+    reference_genome: { label: 'GRCh37', value: 'GRCh37' },
     exome: false,
     signatureSetName: {
       label: 'COSMIC_v3.3_Signatures_GRCh37_SBS96',
@@ -196,13 +196,41 @@ export default function InputForm() {
       label: 'SigProfilerExtractor',
       value: 'SigProfilerExtractor',
     },
-    inputFile: new File(['test'], 'test.txt'),
 
     matrix_normalization: 'gmm',
     nmf_init: 'random',
     precision: 'single',
+  };
+
+  const sample1 = {
+    source: 'user',
+    study: { label: 'PCAWG', value: 'PCAWG' },
+    cancer: { label: 'Lung-AdenoCA', value: 'Lung-AdenoCA' },
+    strategy: { label: 'WGS', value: 'WGS' },
+    input_type: { label: 'matrix', value: 'matrix' },
+    reference_genome: { label: 'GRCh37', value: 'GRCh37' },
+    exome: false,
+    context_type: { label: 'SBS96', value: 'SBS96' },
+    signatureSetName: {
+      label: 'COSMIC_v3.3_Signatures_GRCh37_SBS96',
+      value: 'COSMIC_v3.3_Signatures_GRCh37_SBS96',
+    },
+    signatureName: [{ label: 'all', value: 'all' }],
+    extractTool: {
+      label: 'SigProfilerExtractor',
+      value: 'SigProfilerExtractor',
+    },
+
+    minimum_signatures: 1,
+    maximum_signatures: 2,
+    min_nmf_iterations: 2,
+    max_nmf_iterations: 4,
+    nmf_test_conv: 2,
+    nmf_replicates: 10,
+
     email: 'test.email@nih.gov',
   };
+  const sample2 = {};
 
   const {
     control,
@@ -240,14 +268,14 @@ export default function InputForm() {
 
   function handleReset() {
     window.location.hash = '#/extraction';
-    resetForm();
+    resetForm(defaultValues);
     resetExtraction();
     dispatch(resetExtractionApi);
   }
 
   async function onSubmit(data) {
     console.log(data);
-    return;
+
     const args = {
       ...(source == 'user' && {
         input_type: data.input_type.value,
@@ -261,9 +289,9 @@ export default function InputForm() {
       nmf_replicates: data.nmf_replicates,
       resample: data.resample ? 'True' : 'False',
       seeds: data.seeds,
-      min_nmf_iterations: 2 || data.min_nmf_iterations,
-      max_nmf_iterations: 4 || data.max_nmf_iterations,
-      nmf_test_conv: 2 || data.nmf_test_conv,
+      min_nmf_iterations: data.min_nmf_iterations,
+      max_nmf_iterations: data.max_nmf_iterations,
+      nmf_test_conv: data.nmf_test_conv,
     };
     const signatureQuery = {
       signatureSetName: data.signatureSetName.value,
@@ -327,7 +355,9 @@ export default function InputForm() {
       onSubmit={handleSubmit(onSubmit)}
       style={{ maxHeight: '900px', overflow: 'hidden auto' }}
     >
-      <LoadingOverlay active={fetchingSeqmatrixOptions} />
+      <LoadingOverlay
+        active={fetchingSeqmatrixOptions || loadingUpload || loadingSubmit}
+      />
       {(seqmatrixError || signatureError) && (
         <p>There was an error retrieving public data options</p>
       )}
@@ -435,6 +465,23 @@ export default function InputForm() {
                 )}
               />
             </Form.Group>
+            <Button
+              variant="link"
+              onClick={async () => {
+                resetForm(sample1);
+                const file = 'extraction_sample_SBS96.all';
+                const path = 'assets/exampleInput/' + file;
+                setValue(
+                  'inputFile',
+                  new File([await (await fetch(path)).blob()], file)
+                );
+              }}
+            >
+              Load Sample
+            </Button>
+            {/* <Button variant="link" onClick={() => resetForm(sample2)}>
+              Sample 2
+            </Button> */}
           </div>
         )}
       </div>

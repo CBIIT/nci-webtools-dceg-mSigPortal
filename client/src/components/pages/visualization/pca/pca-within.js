@@ -81,8 +81,8 @@ export default function CsWithin() {
               signatureSet: data.signatureSet.value,
               matrixFile: matrixList.filter(
                 (row) =>
-                  row.profileType == data.profile.value &&
-                  row.matrixSize ==
+                  row.profile == data.profile.value &&
+                  row.matrix ==
                     defaultMatrix(data.profile.value, ['96', '78', '83'])
               )[0].Path,
             },
@@ -128,7 +128,7 @@ export default function CsWithin() {
           <Col lg="auto" className="d-flex">
             <Button
               className="mt-auto mb-3"
-              disabled={!profile || !signatureSet}
+              disabled={!profile || !signatureSet || fetchingSigSets}
               variant="primary"
               type="submit"
             >

@@ -414,6 +414,20 @@ function getRefgenomeData(
   );
 }
 
+function getQueryMiddleware(queryFunction) {
+  return async function (req, res, next) {
+    try {
+      const connection = req.app.locals.connection;
+      let { query, columns = '*', limit = 200000, offset = 0, rowMode = 'object', distinct = 'false' } = req.body;
+      const response = await queryFunction(connection, query, columns, limit, offset, rowMode, distinct);
+      console.log(response);
+      res.json(response);
+    } catch(e) {
+      next(e);
+    }
+  }
+}
+
 module.exports = {
   getData,
   getAssociationData,
@@ -433,4 +447,5 @@ module.exports = {
   getPatternData,
   getClusterData,
   getRefgenomeData,
+  getQueryMiddleware,
 };

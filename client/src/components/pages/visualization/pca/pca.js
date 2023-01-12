@@ -1,6 +1,6 @@
 import { Nav, Tab } from 'react-bootstrap';
 import PcaWithin from './pca-within';
-// import PcaPublic from './pca-public';
+import PcaPublic from './pca-public';
 import { useSelector, useDispatch } from 'react-redux';
 import Description from '../../../controls/description/description';
 import { actions } from '../../../../services/store/visualization';
@@ -52,7 +52,7 @@ export default function PCA() {
           </Tab.Pane>
           {source == 'user' && (
             <Tab.Pane key="public" eventKey="public" className="border-0">
-              {/* <CsPublic /> */}
+              <PcaPublic />
             </Tab.Pane>
           )}
         </Tab.Content>

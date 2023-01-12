@@ -19,7 +19,7 @@ export default function ReferenceSignature() {
     {
       component: <RsInMsigportal />,
       key: 'overview',
-      title: 'RS In mSigportal',
+      title: 'RS In mSigPortal',
     },
     {
       component: <RsProfile />,
@@ -64,10 +64,7 @@ export default function ReferenceSignature() {
             </Nav.Item>
           ))}
         </Nav>
-        <Tab.Content
-          className={`bg-white tab-pane-bordered rounded-0 d-block`}
-          style={{ overflowX: 'auto' }}
-        >
+        <Tab.Content className="bg-white tab-pane-bordered rounded-0 d-block">
           {tabs.map(({ key, component }) => (
             <Tab.Pane key={key} eventKey={key} className="border-0">
               {component}

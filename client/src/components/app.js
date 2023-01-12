@@ -48,7 +48,7 @@ export default function App() {
       cardTitle: 'Signature Visualization',
       cardText: 'Visualize mutational profiles',
       description:
-        'Allow identication of signature features at sample level and sicovery of new signatures.',
+        'Allow identification of signature features at sample level and discovery of new signatures.',
       image: 'assets/images/Visualization-Icon.svg',
       navIndex: 1,
       color: '#2c5b4e',
@@ -212,10 +212,10 @@ export default function App() {
         orB: {
           columns: [
             ...new Set(
-              ...data['Orignal Research B'].map((row) => Object.keys(row))
+              ...data['Original Research B'].map((row) => Object.keys(row))
             ),
           ].reduce(reducer, []),
-          data: data['Orignal Research B'],
+          data: data['Original Research B'],
         },
         rp: {
           columns: [

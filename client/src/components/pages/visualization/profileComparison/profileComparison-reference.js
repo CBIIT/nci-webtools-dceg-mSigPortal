@@ -73,13 +73,14 @@ export default function PcReference() {
   } = usePcSignatureNamesQuery(signatureNamesQuery, {
     skip: !signatureNamesQuery,
   });
-  //   seqmatrix api
-  const { data, error, isFetching } = useProfileComparisonReferenceQuery(
-    calculationQuery,
-    {
-      skip: !calculationQuery,
-    }
-  );
+  // get plot data
+  const {
+    data: plot,
+    error,
+    isFetching,
+  } = useProfileComparisonReferenceQuery(calculationQuery, {
+    skip: !calculationQuery,
+  });
 
   // declare form Options
   const profileOptions = matrixData.length
@@ -100,9 +101,10 @@ export default function PcReference() {
     if (!profile && profileOptions.length) handleProfile(profileOptions[0]);
   }, [profileOptions]);
   // set intital signature set
-  useEffect(() => {
-    if (signatureSetOptions) setValue('signatureSet', signatureSetOptions[0]);
-  }, [signatureSetOptions]);
+  // useEffect(() => {
+  //   if (signatureSetOptions) setValue('signatureSet', signatureSetOptions[0]);
+  // }, [signatureSetOptions]);
+
   // set initial signature
   useEffect(() => {
     if (signatureNameOptions) setValue('compare', signatureNameOptions[0]);
@@ -163,6 +165,21 @@ export default function PcReference() {
           ? '78'
           : '83',
     };
+    const paramsArray = compare.split(';');
+    console.log(paramsArray);
+    let paramsScalar = [];
+    let paramsSig = [];
+    for (var i = 0; i < paramsArray.length; i++) {
+      if (paramsArray[i].includes('*')) {
+        const parts = paramsArray[i].split('*');
+        paramsScalar.push(parts[0]);
+        paramsSig.push(parts[1]);
+      } else {
+        paramsScalar.push('1');
+        paramsSig.push(paramsArray[i]);
+      }
+    }
+
     const params_signature = {
       profile: profile.value,
       matrix:
@@ -172,10 +189,19 @@ export default function PcReference() {
           ? '78'
           : '83',
       signatureSetName: signatureSet.value,
-      signatureName: compare,
+      signatureName: paramsSig.join(';'),
+      scalarValue: paramsScalar.join(';'),
+    };
+    const params_signature_scalar = {
+      arrayScalar: paramsScalar,
+      arraySignature: paramsSig,
     };
 
-    setCalculationQuery({ params_spectrum, params_signature });
+    setCalculationQuery({
+      params_spectrum,
+      params_signature,
+      params_signature_scalar,
+    });
   }
 
   function handleProfile(e) {
@@ -346,6 +372,9 @@ export default function PcReference() {
                   />
                 )}
               />
+              <Form.Text className="text-muted">
+                (Ex. 0.8*SBS5;0.1*SBS1)
+              </Form.Text>
               <Form.Control.Feedback type="invalid">
                 Enter a valid signature. Click info icon for options.
               </Form.Control.Feedback>
@@ -385,15 +414,14 @@ export default function PcReference() {
             </div>
           </>
         )}
-        {data && (
+        {plot && (
           <>
             <hr />
-
             <Plotly
               className="w-100"
-              data={data.traces}
-              layout={data.layout}
-              config={data.config}
+              data={plot.traces}
+              layout={plot.layout}
+              config={plot.config}
             />
             <div className="p-3">
               <p>
