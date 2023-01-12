@@ -134,8 +134,10 @@ export function compareProfiles(
   formatTickLabels,
   tickAngle = -90
 ) {
+  console.log(data2);
   const sample1 = data1[0].sample || data1[0].signatureName;
-  const sample2 = data2[0].sample || data2[0].signatureName;
+  const sample2 =
+    data2[0].scalarSignature || data2[0].sample || data2[0].signatureName;
 
   const mutationGroupSort = (a, b) => {
     const order = Object.keys(colors);
@@ -373,6 +375,7 @@ export function compareProfiles(
     width: 100,
   };
 
+  console.log(sample2);
   const sampleLabel2 = {
     xref: 'paper',
     yref: 'paper',

@@ -57,6 +57,7 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
           const normalizeSigData = groupByMutation.map((signatures) => ({
             ...signatures[0],
             signatureName: _arg.params_signature.signatureName,
+            scalarSignature: _arg.params_signature_scalar.paramsSignatureScalar,
             contributions:
               signatures.reduce((total, e) => total + e.contributions, 0) /
               signatures.length,
