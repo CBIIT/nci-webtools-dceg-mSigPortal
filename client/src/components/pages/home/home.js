@@ -238,11 +238,16 @@ export default function Home({ links }) {
               </div>
             </div>
             <div className="homepage-title-right">
-              <div className=" btn btn-gradient btn-1">
+              <Link
+                className="btn btn-gradient btn-1"
+                to={{
+                  pathname: '/about',
+                }}
+              >
                 <div className="msigportal-home-title-right">
                   Learn more about mSigportal &gt;
                 </div>
-              </div>
+              </Link>
             </div>
           </div>
         </div>
@@ -257,11 +262,25 @@ export default function Home({ links }) {
               </div>
             </div>
             <div className="col-12">
-              <div className=" btn btn-gradient btn-1">
+              <Link
+                className="link-primary-underline"
+                to={{
+                  pathname: '/about',
+                }}
+              >
                 <div className="msigportal-home-title-right">
-                  Learn more about mSigportal &gt;
+                  <Link
+                    className="btn btn-gradient btn-1"
+                    to={{
+                      pathname: '/about',
+                    }}
+                  >
+                    <div className="msigportal-home-title-right">
+                      Learn more about mSigportal &gt;
+                    </div>
+                  </Link>
                 </div>
-              </div>
+              </Link>
             </div>
           </div>
         </div>
