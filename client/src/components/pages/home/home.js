@@ -172,6 +172,7 @@ export default function Home({ links }) {
             borderRadius: '2em',
             display: 'inline-block',
             backgroundColor: 'white',
+            position: 'relative',
           }}
         >
           <div className="m-3">
@@ -197,7 +198,14 @@ export default function Home({ links }) {
                   <span>Read More &rarr;</span>
                 </Link>
               </p>
-              <div class="pb-1">
+              <div
+                className="mb-3"
+                style={{
+                  position: 'absolute',
+                  left: '1',
+                  bottom: '0',
+                }}
+              >
                 <Link
                   className={`btn btn-2 btn-${name} btn-border-radius-15`}
                   exact={exact}
