@@ -58,8 +58,8 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
             ...signatures[0],
             signatureName: _arg.params_signature.signatureName,
             scalarSignature: _arg.params_signature_scalar.paramsSignatureScalar,
-            contributions:
-              signatures.reduce((total, e) => total + e.contributions, 0) /
+            contribution:
+              signatures.reduce((total, e) => total + e.contribution, 0) /
               signatures.length,
           }));
 

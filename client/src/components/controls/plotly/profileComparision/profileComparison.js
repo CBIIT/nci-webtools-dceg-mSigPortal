@@ -1,10 +1,3 @@
-import React, {
-  useLayoutEffect,
-  useState,
-  useCallback,
-  useEffect,
-} from 'react';
-
 export function groupDataByMutation(
   data,
   groupRegex,
@@ -39,9 +32,7 @@ export function getMaxMutations(data) {
 }
 
 export function getRss(sampleDifferenceData) {
-  const squareDiff = sampleDifferenceData.map((e) =>
-    Math.pow(e.mutations || e.contribution || 0, 2)
-  );
+  const squareDiff = sampleDifferenceData.map((e) => Math.pow(e || 0, 2));
   return squareDiff.reduce((a, b, i) => a + b, 0).toExponential(3);
 }
 
@@ -62,67 +53,9 @@ export function getCosineSimilarity(data1, data2) {
     return similarity;
   }
   return cosineSimilarity(
-    data1.map((e) => e.mutations || e.contribution || 0),
-    data2.map((e) => e.mutations || e.contribution || 0)
+    data1.map((e) => e || 0),
+    data2.map((e) => e || 0)
   ).toFixed(3);
-}
-
-export function debounce(func, wait, immediate) {
-  var timeout;
-  return function () {
-    var context = this,
-      args = arguments;
-    var later = function () {
-      timeout = null;
-      if (!immediate) func.apply(context, args);
-    };
-    var callNow = immediate && !timeout;
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-    if (callNow) func.apply(context, args);
-  };
-}
-
-export function useWindowSize() {
-  const [size, setSize] = useState([0, 0]);
-  useLayoutEffect(() => {
-    function updateSize() {
-      setSize([window.innerWidth, window.innerHeight]);
-    }
-    window.addEventListener('resize', updateSize);
-    updateSize();
-    return () => window.removeEventListener('resize', updateSize);
-  }, []);
-  return size;
-}
-
-const getSize = () => {
-  return {
-    width: window.innerWidth,
-    height: window.innerHeight,
-  };
-};
-
-export function useResize() {
-  const [size, setSize] = useState(getSize());
-
-  const handleResize = useCallback(() => {
-    let ticking = false;
-    if (!ticking) {
-      window.requestAnimationFrame(() => {
-        setSize(getSize());
-        ticking = false;
-      });
-      ticking = true;
-    }
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  return size;
 }
 
 export function compareProfiles(
@@ -183,21 +116,6 @@ export function compareProfiles(
     mutationGroupSort
   );
 
-  // calcualte difference between samples
-  const sampleDifferenceData = normalizedSample1.map((e, i) => ({
-    ...e,
-    mutations:
-      (e.mutations || e.contribution || 0) -
-      (normalizedSample2[i].mutations ||
-        normalizedSample2[i].contribution ||
-        0),
-  }));
-  const groupDifference = groupDataByMutation(
-    sampleDifferenceData,
-    mutationRegex,
-    mutationGroupSort
-  );
-
   const sampleTrace1 = groupSamples1.map((group, groupIndex, array) => ({
     name: group.mutation,
     type: 'bar',
@@ -232,29 +150,27 @@ export function compareProfiles(
     yaxis: 'y2',
   }));
 
-  const differenceTrace = groupDifference.map((group, groupIndex, array) => ({
-    name: group.mutation,
-    type: 'bar',
-    marker: { color: colors[group.mutation] },
-    x: [...group.data.keys()].map(
-      (e) =>
-        e +
-        array
-          .slice(0, groupIndex)
-          .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
-    ),
-    y: group.data.map((e) => e.mutations || e.contribution || 0),
-    hoverinfo: 'x+y',
-    showlegend: false,
+  const differenceTrace = sampleTrace1.map((trace, traceIndex) => ({
+    ...trace,
+    y: trace.y.map((e, i) => e - sampleTrace2[traceIndex].y[i]),
+    yaxis: 'y',
   }));
-
   const traces = [...differenceTrace, ...sampleTrace2, ...sampleTrace1];
 
-  const rss = getRss(sampleDifferenceData);
-  const cosineSimilarity = getCosineSimilarity(
-    normalizedSample1,
-    normalizedSample2
+  const sampleDifferenceData = differenceTrace.reduce(
+    (array, trace) => [...array, ...trace.y],
+    []
   );
+  const sample1Data = sampleTrace1.reduce(
+    (array, trace) => [...array, ...trace.y],
+    []
+  );
+  const sample2Data = sampleTrace2.reduce(
+    (array, trace) => [...array, ...trace.y],
+    []
+  );
+  const rss = getRss(sampleDifferenceData);
+  const cosineSimilarity = getCosineSimilarity(sample1Data, sample2Data);
 
   const tickLabels = formatTickLabels(groupSamples1);
 
@@ -311,7 +227,7 @@ export function compareProfiles(
     },
   }));
 
-  const differenceBorder = groupDifference.map((group, groupIndex, array) => ({
+  const differenceBorder = groupSamples2.map((group, groupIndex, array) => ({
     type: 'rect',
     xref: 'x',
     yref: 'paper',
