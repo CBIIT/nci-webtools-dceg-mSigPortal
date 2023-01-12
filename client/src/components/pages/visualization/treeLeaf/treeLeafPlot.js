@@ -197,7 +197,7 @@ function createForceDirectedTree(
   const highlightedColor = 'yellow';
 
   function getNodeColor({ data }) {
-    if (data.name && searchValues.includes(data.name[0])) {
+    if (data.name && searchValues.includes(data.name)) {
       return highlightedColor;
     }
 
