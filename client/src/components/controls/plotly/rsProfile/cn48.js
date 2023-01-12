@@ -1,4 +1,3 @@
-import { groupBy } from 'lodash';
 export default function CN48(rawData, sample) {
   const colors = {
     '0:0-100kb': '#F0F8FF',

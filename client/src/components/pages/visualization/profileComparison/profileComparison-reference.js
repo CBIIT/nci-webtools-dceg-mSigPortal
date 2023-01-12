@@ -166,7 +166,6 @@ export default function PcReference() {
           : '83',
     };
     const paramsArray = compare.split(';');
-    console.log(paramsArray);
     let paramsScalar = [];
     let paramsSig = [];
     for (var i = 0; i < paramsArray.length; i++) {
