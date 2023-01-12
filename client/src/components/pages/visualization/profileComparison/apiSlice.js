@@ -36,9 +36,6 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
     profileComparisonReference: builder.query({
       async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
         try {
-          console.log(_arg.params_signature);
-          console.log(_arg.params_signature_scalar);
-
           const res = await Promise.all([
             fetchWithBQ(
               '/mutational_spectrum?' +
@@ -52,16 +49,6 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
 
           const spectrumData = res[0]['data'];
           const signatureData = res[1]['data'];
-          const scalarArray = Object.values(_arg.params_signature_scalar)[0];
-          const signatureArray = Object.values(_arg.params_signature_scalar)[1];
-
-          console.log(res);
-          console.log(signatureData);
-          console.log(_arg.params_signature_scalar);
-          console.log(scalarArray);
-          console.log(signatureArray);
-
-        
 
           // normalize signatureData by taking the average of contribution of selected signatureNames
           const groupByMutation = Object.values(
