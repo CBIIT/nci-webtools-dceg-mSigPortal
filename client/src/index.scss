@@ -689,11 +689,13 @@ select.form-control-sm {
   background-image: linear-gradient(to right, #b83d47 0%, #8e4b86 55%);
   color: white;
   border-radius: 15px;
+  cursor: pointer;
 }
 
 .btn-gradient:hover {
   background-image: linear-gradient(to right, #8e4b86 0%, #b83d47 55%);
   color: white;
+  cursor: pointer;
 }
 
 .btn-gradient:active {
