@@ -547,7 +547,7 @@
 
     .homepage-title-right {
       position: absolute;
-      top: 10%;
+      top: 12%;
       left: 15%;
       width: 100%;
     }
@@ -601,7 +601,7 @@
 
     .homepage-title-right {
       position: absolute;
-      top: 10%;
+      top: 12%;
       left: 15%;
       width: 100%;
     }
@@ -661,6 +661,10 @@
   }
   .msigportal-title {
     font-size: 1.3rem;
+    text-align: center;
+  }
+  .msigportal-home-title {
+    text-align: center;
   }
   .home-grid-banner {
     z-index: 1;
@@ -688,8 +692,8 @@
     margin: auto;
   }
   .image-banner {
-    width: 980px;
-    height: 320px;
+    width: 100%;
+    height: 330px;
   }
 }
 
@@ -707,17 +711,22 @@
       top: 1%;
       left: 18%;
       width: 69%;
+      text-align: center;
     }
 
     .homepage-title-right {
       position: absolute;
-      top: 9%;
+      top: 10%;
       left: 5%;
       width: 100%;
     }
   }
   .msigportal-title {
     font-size: 1.3rem;
+    text-align: center;
+  }
+  .msigportal-home-title {
+    text-align: center;
   }
   .home-grid-banner {
     z-index: 1;
@@ -744,8 +753,8 @@
     margin: auto;
   }
   .image-banner {
-    width: 820px;
-    height: 320px;
+    width: 100%;
+    height: 330px;
   }
 }
 /**** small devices ****/
@@ -768,12 +777,16 @@
     .homepage-title-right {
       position: absolute;
       top: 5%;
-      left: 15%;
+      left: 7%;
       width: 95%;
     }
   }
   .msigportal-title {
     font-size: 1.3rem;
+    text-align: center;
+  }
+  .msigportal-home-title {
+    text-align: center;
   }
   .home-grid-banner-container {
     width: 80%;
@@ -820,20 +833,25 @@
 
     .homepage-title-left {
       position: absolute;
-      top: 0%;
+      top: 0.2%;
       left: 18%;
       width: 70%;
     }
 
     .homepage-title-right {
       position: absolute;
-      top: 5%;
-      left: 15%;
+      top: 5.2%;
+      left: 7%;
       width: 95%;
     }
   }
+
   .msigportal-title {
     font-size: 1.3rem;
+    text-align: center;
+  }
+  .msigportal-home-title {
+    text-align: center;
   }
 
   .home-grid-banner {
@@ -879,7 +897,7 @@
 
     .homepage-title-left {
       position: absolute;
-      top: 12%;
+      top: 5%;
       left: 15%;
       width: 80%;
     }
@@ -894,6 +912,10 @@
 
   .msigportal-title {
     font-size: 1.2rem;
+    text-align: center;
+  }
+  .msigportal-home-title {
+    text-align: center;
   }
   .home-grid-banner {
     z-index: 1;
@@ -935,7 +957,7 @@
 
     .homepage-title-left {
       position: absolute;
-      top: 12%;
+      top: 5%;
       left: 15%;
       width: 80%;
     }
@@ -943,13 +965,17 @@
     .homepage-title-right {
       position: absolute;
       top: 53%;
-      left: 9%;
+      left: 20%;
       width: 80%;
     }
   }
 
   .msigportal-title {
     font-size: 1.2rem;
+    text-align: center;
+  }
+  .msigportal-home-title {
+    text-align: center;
   }
   .home-grid-banner {
     z-index: 1;

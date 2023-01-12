@@ -260,16 +260,16 @@ export default function Home({ links }) {
           </div>
         </div>
 
-        <div className="container my-3 d-sm-none">
+        <div className="container mb-3 d-sm-none">
           <div className="row">
-            <div className="col-12">
+            <div className="col-xs-12">
               <h1 className="msigportal-home-title">mSigPortal</h1>
               <div class="text-primary-purple msigportal-title">
                 Integrative Mutational Signature Portal for Cancer Genomics
                 Study
               </div>
             </div>
-            <div className="col-12">
+            <div className="col-xs-12">
               <Link
                 className="link-primary-underline"
                 to={{
