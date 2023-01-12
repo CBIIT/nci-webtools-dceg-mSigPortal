@@ -475,6 +475,7 @@ export function compareProfiles(
         family: 'Arial',
       },
       domain: [0.34, 0.66],
+      title: { text: '<b>Relative contribution</b>' },
     },
     yaxis3: {
       autorange: false,
@@ -503,7 +504,7 @@ export function compareProfiles(
       sampleLabel1,
       sampleLabel2,
       differenceLabel,
-      yTitleAnnotation,
+      //yTitleAnnotation,
     ],
   };
 

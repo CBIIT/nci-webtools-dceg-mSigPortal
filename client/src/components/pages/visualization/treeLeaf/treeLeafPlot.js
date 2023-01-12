@@ -1,5 +1,4 @@
 import { useRef, useEffect } from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
 import { useSelector } from 'react-redux';
 import * as d3 from 'd3';
 import cloneDeep from 'lodash/cloneDeep';
@@ -42,7 +41,7 @@ export default function D3TreeLeaf({ id = 'treeleaf-plot', width = 1000, height 
   }, [plotRef, plotData, plotLayout]);
 
   return (
-    <div className="border rounded p-3" {...props}>
+    <div className="border rounded p-3 position-relative" {...props}>
       <div ref={plotRef} />
     </div>
   );
@@ -151,16 +150,17 @@ function createForceDirectedTree(
     .force('y', d3.forceY().strength(0.005))
     .force('collision', d3.forceCollide().radius(nodeRadius));
 
-  // simulation.stop();
-  // simulation.tick(40);
+  simulation.stop();
+  simulation.tick(40);
 
   const zoom = d3.zoom().on('zoom', zoomed);
-
+  
+  const viewBoxScale = 1.3;
   const container = d3.create('div');
   const svg = container
     .append('svg')
     .attr('id', id)
-    .attr('viewBox', [-marginLeft - radius, -marginTop - radius, width, height])
+    .attr('viewBox', [-marginLeft - radius, -marginTop - radius, width, height].map(v => v * viewBoxScale))
     .attr('width', width)
     .attr('height', height)
     .attr(
@@ -197,7 +197,7 @@ function createForceDirectedTree(
   const highlightedColor = 'yellow';
 
   function getNodeColor({ data }) {
-    if (data.name && searchValues.includes(data.name[0])) {
+    if (data.name && searchValues.includes(data.name)) {
       return highlightedColor;
     }
 
@@ -277,20 +277,17 @@ function createForceDirectedTree(
   function mousemove(e, d) {
     const sample = d.data.name;
     const data = attributes[sample];
-    // console.log(data);
-    const content = (
-      <div className="text-start">
-        <div>Sample: {sample ?? 'Unavailable'}</div>
-        <div>Cancer Type: {data.Cancer_Type ?? 'Unavailable'}</div>
-        <div>Cosine Similarity: {data.Cosine_similarity ?? 'Unavailable'}</div>
-        <div>Mutations: {data.Mutations ?? 'Unavailable'}</div>
-      </div>
-    );
     tooltip
-      .html(renderToStaticMarkup(content))
-      // .html('Sample: ' + sample || 'none')
-      .style('left', e.pageX - 30 + 'px')
-      .style('top', e.pageY - 320 + 'px');
+      .html(
+        `<div class="text-start">
+          <div>Sample: ${sample ?? 'Unavailable'}</div>
+          <div>Cancer Type: ${data.Cancer_Type ?? 'Unavailable'}</div>
+          <div>Cosine Similarity: ${data.Cosine_similarity ?? 'Unavailable'}</div>
+          <div>Mutations: ${data.Mutations ?? 'Unavailable'}</div>
+        </div>`
+      )
+      .style('left', e.layerX + 'px')
+      .style('top', e.layerY + 'px');
   }
 
   function click(e, d) {
@@ -305,7 +302,7 @@ function createForceDirectedTree(
   svg
     .append('g')
     .attr('id', 'treeleaf-title')
-    .attr('transform', `translate(0, ${-height/2 + 10})`)
+    .attr('transform', `translate(0, ${(-height/2 + 10) * viewBoxScale})`)
     .append('text')
     .attr('x', 0)
     .attr('y', 0)
@@ -320,8 +317,8 @@ function createForceDirectedTree(
     svg,
     color: colorFill,
     title: form.color.label,
-    x: width/2 - 40, 
-    y: -height/2 + 20
+    x: (width/2 - 40)  * viewBoxScale, 
+    y: (-height/2 + 20) *  viewBoxScale
   };
 
   form.color.continuous

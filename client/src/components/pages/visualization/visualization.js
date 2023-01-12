@@ -124,14 +124,6 @@ export default function Visualization({ match }) {
     });
   }
 
-  function handleTreeAndLeafSelect(data) {
-    const sample = data.Sample;
-    const profile = data.Dsig.replace(/\d+/g, '');
-    const matrix = +data.Dsig.replace(profile, '');
-    const mutationalProfilesFormState = { sample, profile, matrix };
-    mergeState({ displayTab: 'mutationalProfiles', openSidebar: false });
-  }
-
   const tabs = [
     {
       name: 'Instructions',
@@ -151,7 +143,7 @@ export default function Visualization({ match }) {
     {
       name: 'Tree and Leaf',
       id: 'treeAndLeaf',
-      component: <TreeAndLeaf onSelect={handleTreeAndLeafSelect} />,
+      component: <TreeAndLeaf />,
     },
     {
       name: 'Cosine Similarity',

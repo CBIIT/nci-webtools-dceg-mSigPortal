@@ -34,6 +34,14 @@ export default function TreeLeafForm() {
     CN: [48],
   };
 
+  // handle external sample change events
+  useEffect(() => {
+    if (typeof sample === 'string') {
+      const sampleOption = sampleOptions.find((e) => e.value == sample) || sampleOptions[0];
+      handleSample(sampleOption);
+    }
+  }, [sample])
+
   // populate controls
   useEffect(() => {
     if (matrixData.length && !sample) {

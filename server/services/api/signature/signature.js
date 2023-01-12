@@ -1,5 +1,4 @@
 const { Router } = require('express');
-const { isArguments } = require('lodash');
 const {
   getSignatureData,
   getSignatureOptions,
@@ -27,7 +26,6 @@ async function querySignature(req, res, next) {
     if (scalarValue) {
       const scalarArray = scalarValue.split(';');
       const signatureNameArray = signatureName.split(';');
-      console.log(scalarArray);
       for (var i = 0; i < signatureNameArray.length; i++) {
         for (var j = 0; j < data.length; j++) {
           if (data[j].signatureName === signatureNameArray[i]) {
