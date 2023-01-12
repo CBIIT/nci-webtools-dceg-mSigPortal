@@ -57,8 +57,9 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
           const normalizeSigData = groupByMutation.map((signatures) => ({
             ...signatures[0],
             signatureName: _arg.params_signature.signatureName,
-            contributions:
-              signatures.reduce((total, e) => total + e.contributions, 0) /
+            scalarSignature: _arg.params_signature_scalar.paramsSignatureScalar,
+            contribution:
+              signatures.reduce((total, e) => total + e.contribution, 0) /
               signatures.length,
           }));
 
@@ -76,6 +77,7 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
             };
           }
         } catch (error) {
+          console.error(error);
           return { error };
         }
       },
@@ -111,31 +113,11 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
         }
       },
     }),
-
-    pcSignatureSets: builder.query({
-      query: (params) => ({ url: 'mutational_signature_options', params }),
-      transformResponse: (data) =>
-        [...new Set(data.map((e) => e.signatureSetName))]
-          .sort((a, b) =>
-            a.localeCompare(b, undefined, { sensitivity: 'base' })
-          )
-          .map((e) => ({ label: e, value: e })),
-    }),
-    pcSignatureNames: builder.query({
-      query: (params) => ({ url: 'mutational_signature_options', params }),
-      transformResponse: (data, meta, arg) =>
-        [...new Set(data.map((e) => e.signatureName))].sort((a, b) =>
-          a.localeCompare(b, undefined, { sensitivity: 'base' })
-        ),
-    }),
   }),
 });
 
 export const {
   useProfileComparisonWithinQuery,
-
   useProfileComparisonReferenceQuery,
   useProfileComparisonPublicQuery,
-  usePcSignatureSetsQuery,
-  usePcSignatureNamesQuery,
 } = profilerSummaryApiSlice;

@@ -161,17 +161,23 @@ export default function RsInMsigportal(rawData) {
   function indexPos(index) {
     let indexPosition;
     if (index === 0) {
-      indexPosition = 0.072;
-    } else if (index === 1 || index === 5) {
-      indexPosition = 0.27;
-    } else if (index === 2 || index === 6) {
-      indexPosition = 0.495;
-    } else if (index === 3 || index === 7) {
-      indexPosition = 0.728;
+      indexPosition = 0.095;
+    } else if (index === 1) {
+      indexPosition = 0.294;
+    } else if (index === 2) {
+      indexPosition = 0.493;
+    } else if (index === 3) {
+      indexPosition = 0.693;
     } else if (index === 4) {
-      indexPosition = 0.065;
+      indexPosition = 0.095;
+    } else if (index === 5) {
+      indexPosition = 0.2955;
+    } else if (index === 6) {
+      indexPosition = 0.498;
+    } else if (index === 7) {
+      indexPosition = 0.698;
     } else {
-      indexPosition = 0.92;
+      indexPosition = 0.892;
     }
     return indexPosition;
   }
@@ -180,8 +186,8 @@ export default function RsInMsigportal(rawData) {
     ([key, element], index, array) => ({
       xref: 'paper',
       yref: 'paper',
-      xanchor: 'bottom',
-      yanchor: 'bottom',
+      xanchor: 'center',
+      yanchor: 'middle',
       showarrow: false,
       text: (array[index][1][0].profile + array[index][1][0].matrix).padStart(
         8,
@@ -190,15 +196,15 @@ export default function RsInMsigportal(rawData) {
       align: 'left',
       //x: index < 4 ? index * (1 / 5) + 0.0975 : (index - 4) * (1 / 5) + 0.0975,
       x: indexPos(index),
-      y: index < 4 ? 0.73 : 0.98,
+      y: index < 4 ? 0.74 : 0.99,
     })
   );
   const pieTitles1 = Object.entries(groupedMm9_sorted).map(
     ([key, element], index, array) => ({
       xref: 'paper',
       yref: 'paper',
-      xanchor: 'bottom',
-      yanchor: 'bottom',
+      xanchor: 'center',
+      yanchor: 'middle',
       showarrow: false,
       text: (array[index][1][0].profile + array[index][1][0].matrix).padStart(
         7,
@@ -207,7 +213,7 @@ export default function RsInMsigportal(rawData) {
       align: 'center',
       // x: index < 4 ? index * (1 / 5) + 0.085 : (index - 4) * (1 / 5) + 0.085,
       x: indexPos(index),
-      y: 0.445,
+      y: 0.455,
     })
   );
 
@@ -215,14 +221,14 @@ export default function RsInMsigportal(rawData) {
     ([key, element], index, array) => ({
       xref: 'paper',
       yref: 'paper',
-      xanchor: 'bottom',
-      yanchor: 'bottom',
+      xanchor: 'center',
+      yanchor: 'middle',
       showarrow: false,
       text: key.padStart(7, ' '),
       align: 'center',
       //x: index < 4 ? index * (1 / 5) + 0.08 : (index - 4) * (1 / 5) + 0.08,
       x: indexPos(index),
-      y: 0.18,
+      y: 0.19,
     })
   );
   const annotationTitle0 = {

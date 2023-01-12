@@ -115,7 +115,7 @@ export const getInitialState = () => ({
         value: 'COSMIC_v3.3_Signatures_GRCh38_SBS96',
         label: 'COSMIC_v3.3_Signatures_GRCh38_SBS96',
       },
-      compare: { value: 'SBS1', label: 'SBS1' },
+      compare: 'SBS1',
     },
     publicForm: {},
     display: 'within',
