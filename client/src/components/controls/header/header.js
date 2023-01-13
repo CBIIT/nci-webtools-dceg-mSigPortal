@@ -1,6 +1,10 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 
 export function Header() {
+  const location = useLocation();
+  console.log(location);
+  console.log(location.pathname);
   return (
     <header className="bg-light">
       <div>
@@ -16,7 +20,13 @@ export function Header() {
         >
           Skip to Main Content
         </a>
-        <div className="container d-none d-lg-block">
+        <div
+          className={
+            location.pathname === '/'
+              ? 'container d-none d-lg-block'
+              : 'd-none d-lg-block'
+          }
+        >
           <div className="">
             <div className="">
               <div className="p-2 d-none d-sm-block">
@@ -51,6 +61,7 @@ export function Header() {
             </div>
           </div>
         </div>
+
         <div className=" d-block d-lg-none">
           <div className="">
             <div className="">

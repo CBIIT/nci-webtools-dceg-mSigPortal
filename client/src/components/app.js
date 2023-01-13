@@ -240,9 +240,9 @@ export default function App() {
 
   return (
     <>
-      <Header />
-      <RecoilRoot>
-        <Router>
+      <Router>
+        <Header />
+        <RecoilRoot>
           <ErrorModal />
           <SuccessModal />
           <NavbarCustom links={links} />
@@ -257,9 +257,9 @@ export default function App() {
           <Route path="/publications" component={Publications} />
           <Route path="/faq" component={Faq} />
           <Route path="/apiaccess" component={APIAccess} />
-        </Router>
-      </RecoilRoot>
-      <Footer />
+        </RecoilRoot>
+        <Footer />
+      </Router>
     </>
   );
 }
