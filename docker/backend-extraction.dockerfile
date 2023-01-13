@@ -30,7 +30,7 @@ RUN mkdir -p /deploy/server /deploy/logs
 # install SigProfilerExtractor from local zip
 COPY packages/SigProfilerExtractor/ /deploy/server/SigProfilerExtractor
 WORKDIR /deploy/server
-RUN pip3 install -e SigProfilerExtractor/SigProfilerExtractor
+RUN pip3 install -e SigProfilerExtractor/SigProfilerExtractor PyPDF2==2.11.2
 
 # install other python packages
 RUN pip3 install SigProfilerAssignment==0.0.14 sigProfilerPlotting==1.2.2
