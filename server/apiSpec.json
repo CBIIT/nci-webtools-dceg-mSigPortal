@@ -711,6 +711,16 @@
             "value": ""
           },
           {
+            "name": "scalarValue",
+            "in": "query",
+            "description": "Enter scalar value",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": ""
+          },
+          {
             "name": "mutationType",
             "in": "query",
             "description": "Enter mutationType",
