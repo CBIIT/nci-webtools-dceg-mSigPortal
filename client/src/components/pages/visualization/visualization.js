@@ -180,76 +180,71 @@ export default function Visualization({ match }) {
 
   return (
     <div className="position-relative">
-      <div className="bg-white border border-top-0">
-        <div className="container">
+      <div className="mx-3">
+        <div className="mx-3 bg-white border border-top-0">
           {/* for desktops and tablets */}
-          <div className="container">
-            <div className="d-none d-md-block">
-              <Nav
-                defaultActiveKey="profilerSummary"
-                className="container pl-3"
-              >
-                {tabs
-                  .filter((e) => e)
-                  .map(({ name, id }) => (
-                    <div key={id} className="d-inline-block">
-                      <div
-                        variant="link"
-                        className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
-                          id == displayTab ? 'bg-visualization text-white' : ''
-                        }`}
-                        active={id == displayTab}
-                        disabled={
-                          id != 'instructions' &&
-                          !(source == 'public'
-                            ? matrixData.length
-                            : matrixList.length)
-                        }
-                        style={{
-                          textDecoration: 'none',
-                          fontSize: '12pt',
-                          color: '#3a7867',
-                          fontWeight: '500',
-                        }}
-                        onClick={() => mergeState({ displayTab: id })}
-                      >
-                        {name}
-                      </div>
-                      <div className="d-md-none w-100"></div>
-                    </div>
-                  ))}
-              </Nav>
-            </div>
+          <div className="d-none d-md-block">
+            <Nav defaultActiveKey="profilerSummary">
+              {tabs
+                .filter((e) => e)
+                .map(({ name, id }) => (
+                  <div key={id} className="d-inline-block">
+                    <Button
+                      variant="link"
+                      className={`secondary-navlinks px-3 py-1 d-inline-block border-0 rounded-0 ${
+                        id == displayTab ? 'bg-visualization text-white' : ''
+                      }`}
+                      active={id == displayTab}
+                      disabled={
+                        id != 'instructions' &&
+                        !(source == 'public'
+                          ? matrixData.length
+                          : matrixList.length)
+                      }
+                      style={{
+                        textDecoration: 'none',
+                        fontSize: '12pt',
+                        color: '#3a7867',
+                        fontWeight: '500',
+                      }}
+                      onClick={() => mergeState({ displayTab: id })}
+                    >
+                      {name}
+                    </Button>
+                    <div className="d-md-none w-100"></div>
+                  </div>
+                ))}
+            </Nav>
           </div>
-        </div>
 
-        {/* for mobile devices */}
-        <div className="e d-md-none">
-          <Nav defaultActiveKey="summary">
-            {tabs.map(({ name, id }) => (
-              <div key={id} className="col-12 text-center">
-                <div
-                  variant="link"
-                  className={
-                    id == displayTab &&
-                    (matrixData.length || Object.keys(svgList).length)
-                      ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-visualization text-white'
-                      : 'secondary-navlinks px-3 py-1 d-inline-block border-0'
-                  }
-                  style={{
-                    textDecoration: 'none',
-                    fontSize: '12pt',
-                    color: '#3a7867',
-                    fontWeight: '500',
-                  }}
-                  onClick={() => mergeState({ displayTab: id })}
-                >
-                  {name}
+          {/* for mobile devices */}
+          <div className="e d-md-none">
+            <Nav defaultActiveKey="summary">
+              {tabs.map(({ name, id }) => (
+                <div key={id} className="col-12 text-center">
+                  <Button
+                    variant="link"
+                    className={
+                      id == displayTab &&
+                      (matrixData.length || Object.keys(svgList).length)
+                        ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-visualization text-white rounded-0'
+                        : 'secondary-navlinks px-3 py-1 d-inline-block border-0 rounded-0'
+                    }
+                    style={{
+                      textDecoration: 'none',
+                      fontSize: '12pt',
+                      color: '#3a7867',
+                      fontWeight: '500',
+                    }}
+                    onClick={() => mergeState({ displayTab: id })}
+                  >
+                    {name}
+                  </Button>
+                  <div className="d-md-none w-100"></div>
                 </div>
-                <div className="d-md-none w-100"></div>
-              </div>
-            ))}
-          </Nav>
+              ))}
+            </Nav>
+          </div>
         </div>
       </div>
 

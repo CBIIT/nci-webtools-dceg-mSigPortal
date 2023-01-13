@@ -33,68 +33,66 @@ export default function Extraction({ match }) {
 
   return (
     <div className="position-relative">
-      <div className="bg-white border border-top-0">
-        <div className="container">
+      <div className="mx-3">
+        <div className="mx-3 bg-white border border-top-0">
           {/* for desktops and tablets */}
-          <div className="container">
-            <div className="d-none d-md-block">
-              <Nav defaultActiveKey="instructions" className="container pl-3">
-                {tabs.map(({ name, id }) => {
-                  if (name)
-                    return (
-                      <div key={id} className="d-inline-block">
-                        <div
-                          variant="link"
-                          className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
-                            id == displayTab ? 'bg-extraction text-white' : ''
-                          }`}
-                          active={id == displayTab && submitted}
-                          disabled={id != 'instructions' && !submitted}
-                          style={{
-                            textDecoration: 'none',
-                            fontSize: '12pt',
-                            color: '#42688b',
-                            fontWeight: '500',
-                          }}
-                          onClick={() => mergeState({ displayTab: id })}
-                        >
-                          {name}
-                        </div>
-                      </div>
-                    );
-                })}
-              </Nav>
-            </div>
+          <div className="d-none d-md-block">
+            <Nav defaultActiveKey="instructions">
+              {tabs.map(({ name, id }) => {
+                if (name)
+                  return (
+                    <div key={id} className="d-inline-block">
+                      <Button
+                        variant="link"
+                        className={`secondary-navlinks px-3 py-1 d-inline-block border-0 rounded-0 ${
+                          id == displayTab ? 'bg-extraction text-white' : ''
+                        }`}
+                        active={id == displayTab && submitted}
+                        disabled={id != 'instructions' && !submitted}
+                        style={{
+                          textDecoration: 'none',
+                          fontSize: '12pt',
+                          color: '#42688b',
+                          fontWeight: '500',
+                        }}
+                        onClick={() => mergeState({ displayTab: id })}
+                      >
+                        {name}
+                      </Button>
+                    </div>
+                  );
+              })}
+            </Nav>
+          </div>
 
-            {/* for mobile devices */}
-            <div className="row d-md-none">
-              <Nav defaultActiveKey="instructions">
-                {tabs.map(({ name, id }) => {
-                  if (name)
-                    return (
-                      <div key={id} className="col-12 text-center">
-                        <div
-                          variant="link"
-                          className={
-                            'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-extraction text-white'
-                          }
-                          active={id == displayTab && submitted}
-                          style={{
-                            textDecoration: 'none',
-                            fontSize: '12pt',
-                            color: '#42688b',
-                            fontWeight: '500',
-                          }}
-                          onClick={() => mergeState({ displayTab: id })}
-                        >
-                          {name}
-                        </div>
-                        <div className="d-md-none w-100"></div>
-                      </div>
-                    );
-                })}
-              </Nav>
-            </div>
+          {/* for mobile devices */}
+          <div className="row d-md-none">
+            <Nav defaultActiveKey="instructions">
+              {tabs.map(({ name, id }) => {
+                if (name)
+                  return (
+                    <div key={id} className="col-12 text-center">
+                      <Button
+                        variant="link"
+                        className={
+                          'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-extraction text-white'
+                        }
+                        active={id == displayTab && submitted}
+                        style={{
+                          textDecoration: 'none',
+                          fontSize: '12pt',
+                          color: '#42688b',
+                          fontWeight: '500',
+                        }}
+                        onClick={() => mergeState({ displayTab: id })}
+                      >
+                        {name}
+                      </Button>
+                      <div className="d-md-none w-100"></div>
+                    </div>
+                  );
+              })}
+            </Nav>
           </div>
         </div>
       </div>
