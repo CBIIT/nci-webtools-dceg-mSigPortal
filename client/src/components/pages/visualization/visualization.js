@@ -183,6 +183,7 @@ export default function Visualization({ match }) {
       <div className="mx-3">
         <div className="mx-3 bg-white border border-top-0">
           {/* for desktops and tablets */}
+
           <div className="d-none d-md-block">
             <Nav defaultActiveKey="profilerSummary">
               {tabs
@@ -215,7 +216,9 @@ export default function Visualization({ match }) {
                   </div>
                 ))}
             </Nav>
+
           </div>
+
 
           {/* for mobile devices */}
           <div className="e d-md-none">
@@ -245,6 +248,7 @@ export default function Visualization({ match }) {
               ))}
             </Nav>
           </div>
+
         </div>
       </div>
 

@@ -298,7 +298,8 @@ export function compareProfiles(
     align: 'center',
     x: 1.017,
     y: 0.505,
-    text: sample2.length > 16 ? sample2.substring(0, 16) + '...' : sample2,
+    // text: sample2.length > 16 ? sample2.substring(0, 16) + '...' : sample2,
+    text: sample2.indexOf(';') > 1 ? 'Reconstructed' : sample2,
     textangle: 90,
     showarrow: false,
   };
@@ -311,7 +312,7 @@ export function compareProfiles(
     align: 'center',
     x: 1.017,
     y: 0.165,
-    text: 'Difference <br>',
+    text: 'Difference',
     textangle: 90,
     showarrow: false,
     height: 15,
