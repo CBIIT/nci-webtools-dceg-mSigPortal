@@ -237,6 +237,7 @@ export default function Home({ links }) {
             alt="mSigPortal banner"
             className="image-banner"
           ></img>
+
           <div className="row">
             <div className="homepage-title-left text-left">
               <h1 className="msigportal-home-title">mSigPortal</h1>
