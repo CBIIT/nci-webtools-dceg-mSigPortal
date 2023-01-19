@@ -2,8 +2,8 @@ import { groupBy } from 'lodash';
 import { First } from 'react-bootstrap/esm/PageItem';
 
 export default function MsLandscape(cosineData, exposureData) {
-  // console.log(cosineData);
-  // console.log(exposureData);
+  console.log(cosineData);
+  console.log(exposureData);
   const defaultNames = ['SBS', 'DBS', 'ID'];
   const names = exposureData.map((group) => group.signatureName);
   const contains = defaultNames.some((element) => {

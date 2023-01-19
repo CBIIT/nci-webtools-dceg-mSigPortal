@@ -17,7 +17,10 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 import './plot.scss';
 
 const { Label, Group } = Form;
-export default function MsLandscapePlot() {
+export default function MsLandscapePlot({
+  calculateLandscape,
+  handleVariable,
+}) {
   const publicForm = useSelector((state) => state.exposure.publicForm);
   const exposure = useSelector((state) => state.exposure);
   const { variableFile, plotPath, debugR, err, loading } = exposure.msLandscape;
@@ -25,6 +28,8 @@ export default function MsLandscapePlot() {
   // const { data, error, isFetching } = useMsLandscapePlotQuery(params, {
   //   skip: !params,
   // });
+
+  console.log(variableFile);
   const [calculationQuery, setCalculationQuery] = useState('');
   const { data, error, isFetching } = useMsLandscapePlotQuery(
     calculationQuery,
@@ -83,8 +88,8 @@ export default function MsLandscapePlot() {
                   label={variableFile || 'Upload here (optional)'}
                   title={variableFile || 'Upload here (optional)'}
                   value={''}
-                  // accept=''
-                  //onChange={(e) => handleVariable(e.target.files[0])}
+                  accept=""
+                  onChange={(e) => handleVariable(e.target.files[0])}
                   custom
                 />
                 {variableFile && (
@@ -94,9 +99,9 @@ export default function MsLandscapePlot() {
                     title="Remove"
                     variant="danger"
                     disabled={loading}
-                    //onClick={() => {
-                    //  handleVariable(new File([], ''));
-                    //}}
+                    onClick={() => {
+                      handleVariable(new File([], ''));
+                    }}
                   >
                     <FontAwesomeIcon icon={faFolderMinus} size="lg" />
                   </Button>
@@ -109,7 +114,7 @@ export default function MsLandscapePlot() {
               // disabled={source == 'user' && !projectID}
               className="mt-auto mb-3"
               variant="primary"
-              // onClick={calculateLandscape}
+              onClick={calculateLandscape}
             >
               Recalculate
             </Button>

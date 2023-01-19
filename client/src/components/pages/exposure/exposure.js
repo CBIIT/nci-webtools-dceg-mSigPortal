@@ -392,6 +392,7 @@ export default function Exposure({ match }) {
   }
 
   function handleVariable(file) {
+    console.log(file);
     setVariable(file);
     mergeMsLandscape({ variableFile: file.name });
   }
@@ -547,14 +548,14 @@ export default function Exposure({ match }) {
             name: 'MS Association',
           },
           {
-            component: (
-              <MsLandscape
-                calculateLandscape={calculateLandscape}
-                handleVariable={handleVariable}
-              />
-            ),
-            id: 'msLandscape',
-            name: 'MS Landscape',
+            // component: (
+            //   <MsLandscape
+            //     calculateLandscape={calculateLandscape}
+            //     handleVariable={handleVariable}
+            //   />
+            // ),
+            // id: 'msLandscape',
+            // name: 'MS Landscape',
           },
           {
             component: (
@@ -615,7 +616,12 @@ export default function Exposure({ match }) {
           },
 
           {
-            component: <MsLandscape2 />,
+            component: (
+              <MsLandscape2
+                calculateLandscape={calculateLandscape}
+                handleVariable={console.log}
+              />
+            ),
             id: 'msLandscape',
             name: 'MS Landscape',
           },
