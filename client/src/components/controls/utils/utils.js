@@ -26,3 +26,18 @@ export const customStyles = {
     padding: 0,
   }),
 };
+
+export const readFile = (file) => {
+  let fileReader = new FileReader();
+  return new Promise((resolve, reject) => {
+    fileReader.onload = () => {
+      resolve(fileReader.result);
+    };
+    fileReader.onerror = reject;
+    fileReader.readAsText(file);
+  });
+};
+
+export const asMatrix = (text) => {
+  
+}

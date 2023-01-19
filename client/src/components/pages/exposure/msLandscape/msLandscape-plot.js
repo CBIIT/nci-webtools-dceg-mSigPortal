@@ -10,12 +10,14 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolderMinus, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import Plotly from '../../../controls/plotly/plot/plot';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useMsLandscapePlotQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
 import './plot.scss';
 import MsLandscape from '../../../controls/plotly/msLandscape/msLandscape';
+import { readFile, asMatrix } from '../../../controls/utils/utils';
+import { actions } from '../../../../services/store/exposure';
 
 const { Label, Group } = Form;
 export default function MsLandscapePlot({
@@ -29,6 +31,46 @@ export default function MsLandscapePlot({
   // const { data, error, isFetching } = useMsLandscapePlotQuery(params, {
   //   skip: !params,
   // });
+
+  const dispatch = useDispatch();
+  const mergeExposureState = (state) =>
+    dispatch(actions.mergeExposure({ ...state }));
+  const variableData =
+    useSelector((state) => state.exposure.variableData) || [];
+
+  async function handleVariableData(event) {
+    const text = await readFile(event.target.files[0]);
+    console.log(text);
+
+    let arr = text.split('\n');
+
+    const title = arr[0].split('\t');
+    console.log(title);
+
+    let result = [];
+    for (var i = 1; i < arr.length - 1; i++) {
+      let data = arr[i].split(/\t|\s+/);
+      console.log(data);
+      console.log(data.length);
+      let dataObject;
+      if (data.length === 3) {
+        dataObject = {
+          [title[0]]: data[0],
+          [title[1]]: data[1],
+          [title[2]]: data[2],
+        };
+      } else {
+        dataObject = {
+          [title[0]]: data[0],
+          Value1: data[1],
+        };
+      }
+      result.push(dataObject);
+    }
+    console.log(result);
+    //const variableData = asMatrix(text);
+    //mergeExposureState({ variableData });
+  }
 
   console.log(variableFile);
   const [calculationQuery, setCalculationQuery] = useState('');
@@ -63,17 +105,6 @@ export default function MsLandscapePlot({
     }
   }, [publicForm]);
 
-  function readFile(file) {
-    let fileReader = new FileReader();
-    return new Promise((resolve, reject) => {
-      fileReader.onload = () => {
-        resolve(fileReader.result);
-      };
-      fileReader.onerror = reject;
-      fileReader.readAsText(file);
-    });
-  }
-
   return (
     <>
       <Form className="p-3">
@@ -105,7 +136,8 @@ export default function MsLandscapePlot({
                   title={variableFile || 'Upload here (optional)'}
                   value={''}
                   accept=""
-                  onChange={(e) => handleVariable(e.target.files[0])}
+                  //onChange={(e) => handleVariable(e.target.files[0])}
+                  onChange={(e) => handleVariableData(e)}
                   custom
                 />
                 {variableFile && (
@@ -116,7 +148,7 @@ export default function MsLandscapePlot({
                     variant="danger"
                     disabled={loading}
                     onClick={() => {
-                      handleVariable(new File([], ''));
+                      handleVariableData(new File([], ''));
                     }}
                   >
                     <FontAwesomeIcon icon={faFolderMinus} size="lg" />

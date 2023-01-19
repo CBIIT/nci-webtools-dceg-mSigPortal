@@ -10,7 +10,7 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import Description from '../../../controls/description/description';
 import { defaultMatrix2 } from '../../../../services/utils';
-import { customStyles } from '../../../controls/custom/customFormStyle';
+import { customStyles } from '../../../controls/utils/utils';
 
 export default function CsWithin() {
   const dispatch = useDispatch();

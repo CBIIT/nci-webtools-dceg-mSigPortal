@@ -1,12 +1,10 @@
 import { Container } from 'react-bootstrap';
 import MsLandscapePlot from './msLandscape-plot';
 import Description from '../../../controls/description/description';
+import { readFile } from '../../../controls/utils/utils';
 
 export default function MutationalProfiles(props) {
-  function handleVariable(args) {
-    console.log(args);
-    const reader = new FileReader();
-  }
+  function handleVariable(args) {}
 
   return (
     <Container fluid className="bg-white border rounded p-0" {...props}>

@@ -13,7 +13,7 @@ import Description from '../../../controls/description/description';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import { defaultMatrix } from '../../../../services/utils';
-import { customStyles } from '../../../controls/custom/customFormStyle';
+import { customStyles } from '../../../controls/utils/utils';
 
 export default function CsReference() {
   const dispatch = useDispatch();

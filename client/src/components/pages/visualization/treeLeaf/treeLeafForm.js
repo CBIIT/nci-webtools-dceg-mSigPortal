@@ -4,7 +4,7 @@ import Select from 'react-select';
 import { Form, Row, Col } from 'react-bootstrap';
 import MultiSelect from '../../../controls/select/multiSelect';
 import { formState, graphDataSelector, colorOptions } from './treeLeaf.state';
-import { customStyles } from '../../../controls/custom/customFormStyle';
+import { customStyles } from '../../../controls/utils/utils';
 
 export default function TreeLeafForm() {
   const store = useSelector((state) => state.visualization);
