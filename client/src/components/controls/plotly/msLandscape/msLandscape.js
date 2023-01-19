@@ -1,9 +1,10 @@
 import { groupBy } from 'lodash';
 import { First } from 'react-bootstrap/esm/PageItem';
 
-export default function MsLandscape(cosineData, exposureData) {
+export default function MsLandscape(cosineData, exposureData, variableData) {
   console.log(cosineData);
   console.log(exposureData);
+  console.log(variableData);
   const defaultNames = ['SBS', 'DBS', 'ID'];
   const names = exposureData.map((group) => group.signatureName);
   const contains = defaultNames.some((element) => {
@@ -315,7 +316,7 @@ export default function MsLandscape(cosineData, exposureData) {
         '<b>Sample: </b> %{x}<br> <b>Similarity: </b>%{z} <extra></extra>',
     },
   ];
-  // console.log(tracesHeatMap);
+  console.log(tracesHeatMap);
   const tracesStackedBar = Object.entries(groupBySignatureName_exposure2)
     .reverse()
     .map(([key, value]) => ({
@@ -344,7 +345,33 @@ export default function MsLandscape(cosineData, exposureData) {
       hovertemplate: '<b>Number of mutation: </b>%{y} <br><b>Sample: </b> %{x}',
     }));
   // console.log(tracesStackedBar);
-  const traces = [...tracesHeatMap, ...tracesStackedBar, ...tracesNormalize];
+
+  const tracesHeatMapVariable = [
+    {
+      z: [variableData.map((e) => e.value1)],
+      x: variableData.map((e) => e.sample),
+      //hoverongaps: false,
+      xaxis: 'x',
+      yaxis: 'y4',
+      type: 'heatmap',
+
+      xgap: 0.5,
+      hovertemplate:
+        '<b>Sample: </b> %{x}<br> <b>Value: </b>%{z} <extra></extra>',
+    },
+  ];
+
+  console.log(tracesHeatMapVariable);
+
+  let traces = [];
+  variableData.length > 0
+    ? (traces = [
+        ...tracesHeatMap,
+        ...tracesStackedBar,
+        ...tracesNormalize,
+        ...tracesHeatMapVariable,
+      ])
+    : (traces = [...tracesHeatMap, ...tracesStackedBar, ...tracesNormalize]);
 
   const text = {
     x: 0,
@@ -422,7 +449,13 @@ export default function MsLandscape(cosineData, exposureData) {
       showticklabels: false,
       ticks: '',
     },
-    yaxis3: { title: 'Number of mutation', domain: [0.5, 1] },
+    yaxis3: { title: 'Number of mutation', domain: [0.5, 0.95] },
+    yaxis4: {
+      title: '',
+      domain: [0.96, 0.978],
+      showticklabels: false,
+      ticks: '',
+    },
 
     bargap: 0.04,
     annotations: annotations,

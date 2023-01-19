@@ -40,48 +40,24 @@ export default function MsLandscapePlot({
 
   async function handleVariableData(event) {
     const text = await readFile(event.target.files[0]);
-    console.log(text);
+    const variableData = asMatrix(text);
+    console.log(variableData);
 
-    let arr = text.split('\n');
-
-    const title = arr[0].split('\t');
-    console.log(title);
-
-    let result = [];
-    for (var i = 1; i < arr.length - 1; i++) {
-      let data = arr[i].split(/\t|\s+/);
-      console.log(data);
-      console.log(data.length);
-      let dataObject;
-      if (data.length === 3) {
-        dataObject = {
-          [title[0]]: data[0],
-          [title[1]]: data[1],
-          [title[2]]: data[2],
-        };
-      } else {
-        dataObject = {
-          [title[0]]: data[0],
-          Value1: data[1],
-        };
-      }
-      result.push(dataObject);
-    }
-    console.log(result);
-    //const variableData = asMatrix(text);
-    //mergeExposureState({ variableData });
+    mergeExposureState({ variableData });
   }
 
   console.log(variableFile);
   const [calculationQuery, setCalculationQuery] = useState('');
-  console.log();
   let { data, error, isFetching } = useMsLandscapePlotQuery(calculationQuery, {
     skip: !calculationQuery,
   });
-  console.log(data);
   if (data) {
     console.log(data);
-    data = MsLandscape(data.output.cosineData, data.output.exposureData);
+    data = MsLandscape(
+      data.output.cosineData,
+      data.output.exposureData,
+      variableData
+    );
   }
   // useEffect(() => {
   //   const { study, strategy, signatureSetName } = publicForm;

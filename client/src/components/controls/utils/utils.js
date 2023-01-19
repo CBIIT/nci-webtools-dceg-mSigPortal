@@ -39,5 +39,28 @@ export const readFile = (file) => {
 };
 
 export const asMatrix = (text) => {
-  
-}
+  let arr = text.split('\n');
+
+  const title = arr[0].split('\t');
+
+  let result = [];
+  for (var i = 1; i < arr.length - 1; i++) {
+    let data = arr[i].split(/\t|\s+/);
+
+    let dataObject;
+    if (data.length === 3) {
+      dataObject = {
+        sample: data[0],
+        value1: data[1],
+        value2: data[2],
+      };
+    } else {
+      dataObject = {
+        sample: data[0],
+        value1: data[1],
+      };
+    }
+    result.push(dataObject);
+  }
+  return result;
+};
