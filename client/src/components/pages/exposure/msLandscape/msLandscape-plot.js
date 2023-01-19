@@ -15,6 +15,7 @@ import { useMsLandscapePlotQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
 import './plot.scss';
+import MsLandscape from '../../../controls/plotly/msLandscape/msLandscape';
 
 const { Label, Group } = Form;
 export default function MsLandscapePlot({
@@ -31,11 +32,15 @@ export default function MsLandscapePlot({
 
   console.log(variableFile);
   const [calculationQuery, setCalculationQuery] = useState('');
-  const { data, error, isFetching } = useMsLandscapePlotQuery(
-    calculationQuery,
-    { skip: !calculationQuery }
-  );
-
+  console.log();
+  let { data, error, isFetching } = useMsLandscapePlotQuery(calculationQuery, {
+    skip: !calculationQuery,
+  });
+  console.log(data);
+  if (data) {
+    console.log(data);
+    data = MsLandscape(data.output.cosineData, data.output.exposureData);
+  }
   // useEffect(() => {
   //   const { study, strategy, signatureSetName } = publicForm;
   //   if (study) {
@@ -57,6 +62,17 @@ export default function MsLandscapePlot({
       });
     }
   }, [publicForm]);
+
+  function readFile(file) {
+    let fileReader = new FileReader();
+    return new Promise((resolve, reject) => {
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+      fileReader.onerror = reject;
+      fileReader.readAsText(file);
+    });
+  }
 
   return (
     <>

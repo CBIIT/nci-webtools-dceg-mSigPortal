@@ -3,6 +3,21 @@ import MsLandscapePlot from './msLandscape-plot';
 import Description from '../../../controls/description/description';
 
 export default function MutationalProfiles(props) {
+  function handleVariable(args) {
+    console.log(args);
+    const reader = new FileReader();
+  }
+
+  function readFile(file) {
+    let fileReader = new FileReader();
+    return new Promise((resolve, reject) => {
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+      fileReader.onerror = reject;
+      fileReader.readAsText(file);
+    });
+  }
   return (
     <Container fluid className="bg-white border rounded p-0" {...props}>
       <div className="p-3">
@@ -14,7 +29,7 @@ export default function MutationalProfiles(props) {
         />
       </div>
       <hr />
-      <MsLandscapePlot />
+      <MsLandscapePlot handleVariable={handleVariable} />
     </Container>
   );
 }

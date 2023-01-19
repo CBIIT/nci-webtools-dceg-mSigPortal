@@ -619,7 +619,7 @@ export default function Exposure({ match }) {
             component: (
               <MsLandscape2
                 calculateLandscape={calculateLandscape}
-                handleVariable={console.log}
+                handleVariable={handleVariable}
               />
             ),
             id: 'msLandscape',

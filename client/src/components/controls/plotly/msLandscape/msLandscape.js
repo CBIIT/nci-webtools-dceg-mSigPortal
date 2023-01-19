@@ -228,9 +228,9 @@ export default function MsLandscape(cosineData, exposureData) {
   const groupBySample_exposure = groupBy(exposureData, 'sample');
   // console.log(groupBySample_exposure);
 
-  const sortedCosin = cosineData.sort(
-    (a, b) => xAxis.indexOf(a.sample) - xAxis.indexOf(b.sample)
-  );
+  // const sortedCosin = cosineData.sort(
+  //   (a, b) => xAxis.indexOf(a.sample) - xAxis.indexOf(b.sample)
+  // );
   // console.log(sortedCosin);
 
   // const dataSignature = Object.entries(groupBySample_exposure).map(
