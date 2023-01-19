@@ -3,8 +3,6 @@ import { useLocation } from 'react-router-dom';
 
 export function Header() {
   const location = useLocation();
-  console.log(location);
-  console.log(location.pathname);
   return (
     <header className="bg-light">
       <div>

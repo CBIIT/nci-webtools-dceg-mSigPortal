@@ -8,16 +8,6 @@ export default function MutationalProfiles(props) {
     const reader = new FileReader();
   }
 
-  function readFile(file) {
-    let fileReader = new FileReader();
-    return new Promise((resolve, reject) => {
-      fileReader.onload = () => {
-        resolve(fileReader.result);
-      };
-      fileReader.onerror = reject;
-      fileReader.readAsText(file);
-    });
-  }
   return (
     <Container fluid className="bg-white border rounded p-0" {...props}>
       <div className="p-3">
