@@ -9,7 +9,7 @@ import { actions as catalogActions } from '../../../../../services/store/catalog
 import { actions as modalActions } from '../../../../../services/store/modal';
 import { useSignatureOptionsQuery } from '../../../../../services/store/rootApi';
 import { useCosineSimilarityQuery } from './apiSlice';
-import { customStyles } from '../../../../controls/custom/customFormStyle';
+import { customStyles } from '../../../../controls/utils/utils';
 
 const actions = { ...catalogActions, ...modalActions };
 

@@ -8,7 +8,7 @@ import { actions } from '../../../../services/store/visualization';
 import { useProfileComparisonWithinQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plotly from '../../../controls/plotly/plot/plot';
-import { customStyles } from '../../../controls/custom/customFormStyle';
+import { customStyles } from '../../../controls/utils/utils';
 
 export default function PcWithin() {
   const dispatch = useDispatch();

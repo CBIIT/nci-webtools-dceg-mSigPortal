@@ -8,11 +8,12 @@ export const msLandscapeApiSlice = explorationApiSlice.injectEndpoints({
         url: 'signature_landscape',
         params,
       }),
-      transformResponse: (data) => {
-        const { cosineData, exposureData } = data.output;
-        console.log(cosineData);
-        return MsLandscape(cosineData, exposureData);
-      },
+      // transformResponse: (data) => {
+      //   const { cosineData, exposureData } = data.output;
+      //   console.log(cosineData);
+      //   return { cosineData, exposureData };
+      //   //return MsLandscape(cosineData, exposureData);
+      // },
     }),
 
     // msLandscapePlot: builder.query({

@@ -11,7 +11,7 @@ import {
   defaultFilter2,
 } from '../../../../services/utils';
 import { NavHashLink } from 'react-router-hash-link';
-import { customStyles } from '../../../controls/custom/customFormStyle';
+import { customStyles } from '../../../controls/utils/utils';
 const actions = { ...visualizationActions };
 
 export default function TreeLeafForm() {

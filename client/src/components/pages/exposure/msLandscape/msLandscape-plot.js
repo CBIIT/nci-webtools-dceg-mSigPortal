@@ -10,14 +10,20 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolderMinus, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import Plotly from '../../../controls/plotly/plot/plot';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useMsLandscapePlotQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
 import './plot.scss';
+import MsLandscape from '../../../controls/plotly/msLandscape/msLandscape';
+import { readFile, asMatrix } from '../../../controls/utils/utils';
+import { actions } from '../../../../services/store/exposure';
 
 const { Label, Group } = Form;
-export default function MsLandscapePlot() {
+export default function MsLandscapePlot({
+  calculateLandscape,
+  handleVariable,
+}) {
   const publicForm = useSelector((state) => state.exposure.publicForm);
   const exposure = useSelector((state) => state.exposure);
   const { variableFile, plotPath, debugR, err, loading } = exposure.msLandscape;
@@ -25,12 +31,34 @@ export default function MsLandscapePlot() {
   // const { data, error, isFetching } = useMsLandscapePlotQuery(params, {
   //   skip: !params,
   // });
-  const [calculationQuery, setCalculationQuery] = useState('');
-  const { data, error, isFetching } = useMsLandscapePlotQuery(
-    calculationQuery,
-    { skip: !calculationQuery }
-  );
 
+  const dispatch = useDispatch();
+  const mergeExposureState = (state) =>
+    dispatch(actions.mergeExposure({ ...state }));
+  const variableData =
+    useSelector((state) => state.exposure.variableData) || [];
+
+  async function handleVariableData(event) {
+    const text = await readFile(event.target.files[0]);
+    const variableData = asMatrix(text);
+    console.log(variableData);
+
+    mergeExposureState({ variableData });
+  }
+
+  console.log(variableFile);
+  const [calculationQuery, setCalculationQuery] = useState('');
+  let { data, error, isFetching } = useMsLandscapePlotQuery(calculationQuery, {
+    skip: !calculationQuery,
+  });
+  if (data) {
+    console.log(data);
+    data = MsLandscape(
+      data.output.cosineData,
+      data.output.exposureData,
+      variableData
+    );
+  }
   // useEffect(() => {
   //   const { study, strategy, signatureSetName } = publicForm;
   //   if (study) {
@@ -83,8 +111,9 @@ export default function MsLandscapePlot() {
                   label={variableFile || 'Upload here (optional)'}
                   title={variableFile || 'Upload here (optional)'}
                   value={''}
-                  // accept=''
+                  accept=""
                   //onChange={(e) => handleVariable(e.target.files[0])}
+                  onChange={(e) => handleVariableData(e)}
                   custom
                 />
                 {variableFile && (
@@ -94,9 +123,9 @@ export default function MsLandscapePlot() {
                     title="Remove"
                     variant="danger"
                     disabled={loading}
-                    //onClick={() => {
-                    //  handleVariable(new File([], ''));
-                    //}}
+                    onClick={() => {
+                      handleVariableData(new File([], ''));
+                    }}
                   >
                     <FontAwesomeIcon icon={faFolderMinus} size="lg" />
                   </Button>
@@ -109,7 +138,7 @@ export default function MsLandscapePlot() {
               // disabled={source == 'user' && !projectID}
               className="mt-auto mb-3"
               variant="primary"
-              // onClick={calculateLandscape}
+              onClick={calculateLandscape}
             >
               Recalculate
             </Button>

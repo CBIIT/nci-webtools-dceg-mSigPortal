@@ -7,7 +7,7 @@ import Plotly from '../../../controls/plotly/plot/plot';
 import { actions } from '../../../../services/store/visualization';
 import { useMpeaScatterQuery, useMpeaBarQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import { customStyles } from '../../../controls/custom/customFormStyle';
+import { customStyles } from '../../../controls/utils/utils';
 
 export default function MutPatternPlot() {
   const store = useSelector((state) => state.visualization);

@@ -14,6 +14,7 @@ export default function RsProfile() {
       {plots.map((e, i) => (
         <RsProfileFormPlot options={e} index={i} />
       ))}
+      {/* New RS plot */}
       {/* <RsProfileFormPlot /> */}
     </div>
   );

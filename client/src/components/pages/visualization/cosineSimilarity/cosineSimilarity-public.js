@@ -11,7 +11,7 @@ import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import Description from '../../../controls/description/description';
 import { defaultMatrix2, defaultMatrix } from '../../../../services/utils';
 import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
-import { customStyles } from '../../../controls/custom/customFormStyle';
+import { customStyles } from '../../../controls/utils/utils';
 
 export default function CsPublic() {
   const dispatch = useDispatch();

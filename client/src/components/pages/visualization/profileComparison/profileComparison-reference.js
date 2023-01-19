@@ -19,7 +19,7 @@ import { useSignatureOptionsQuery } from '../../../../services/store/rootApi';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { defaultMatrix } from '../../../../services/utils';
 import Plotly from '../../../controls/plotly/plot/plot';
-import { customStyles } from '../../../controls/custom/customFormStyle';
+import { customStyles } from '../../../controls/utils/utils';
 
 export default function PcReference() {
   const dispatch = useDispatch();

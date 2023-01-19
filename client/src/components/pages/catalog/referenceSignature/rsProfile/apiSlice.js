@@ -17,6 +17,8 @@ export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
         params,
       }),
     }),
+
+    /** rsProfile-form-plot **/
     rsProfilePlot: builder.query({
       query: (params) => ({
         url: 'mutational_signature',
@@ -49,9 +51,10 @@ export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
       },
     }),
 
+    /** rsProfile-form-plot_1 **/
     // rsProfilePlot: builder.query({
     //   async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
-    //     //console.log(_arg);
+    //     console.log(_arg);
     //     const params = _arg.map((e) => ({
     //       source: e.source.value,
     //       profile: e.profile.value,
