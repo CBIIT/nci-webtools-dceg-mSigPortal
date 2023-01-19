@@ -137,6 +137,38 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     [0.9, 'rgb(252,165,55)'],
     [1.0, 'rgb(241,246,34)'],
   ];
+
+  const heatmapColorscale2 = [
+    [0, 'rgb(69,8,87)'],
+    [0.1, 'rgb(70,36,106)'],
+
+    [0.1, 'rgb(69,44,112)'],
+    [0.2, 'rgb(68,55,123)'],
+
+    [0.2, 'rgb(66,64,130)'],
+    [0.3, 'rgb(59,92,138)'],
+
+    [0.3, 'rgb(57,97,139)'],
+    [0.4, 'rgb(49,111,141)'],
+
+    [0.4, 'rgb(43,119,142)'],
+    [0.5, 'rgb(43,139,138)'],
+
+    [0.5, 'rgb(42,151,136'],
+    [0.6, 'rgb(35,165,132)'],
+
+    [0.6, 'rgb(39,168,130)'],
+    [0.7, 'rgb(84,185,112)'],
+
+    [0.7, 'rgb(101,195,100)'],
+    [0.8, 'rgb(120,208,82)'],
+
+    [0.8, 'rgb(145,213,76)'],
+    [0.9, 'rgb(177,218,68)'],
+
+    [0.9, 'rgb(204,223,59)'],
+    [1.0, 'rgb(249,230,39)'],
+  ];
   const xAxis = cosineData.map((e) => e.sample);
   //const longest = xAxis.reduce((a, e) => (a > e.length ? a : e.length), 0);
   var longest = xAxis.sort(function (a, b) {
@@ -346,13 +378,45 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     }));
   // console.log(tracesStackedBar);
 
-  const tracesHeatMapVariable = [
+  const tracesHeatMapVariable1 = [
     {
       z: [variableData.map((e) => e.value1)],
       x: variableData.map((e) => e.sample),
       //hoverongaps: false,
       xaxis: 'x',
       yaxis: 'y4',
+      type: 'heatmap',
+      colorscale: heatmapColorscale2,
+      colorbar: {
+        orientation: 'h',
+        x: 0.5,
+        y: colorBarLoc - 0.1,
+        thickness: 20,
+        bordercolor: 'black',
+        tickmode: 'array',
+
+        // title: {
+        //   text: 'Cosine Similarity',
+        //   font: {
+        //     family: 'Arial',
+        //     size: 17,
+        //     color: 'rgb(37,37,37)',
+        //   },
+        // },
+      },
+      xgap: 0.5,
+      hovertemplate:
+        '<b>Sample: </b> %{x}<br> <b>Value: </b>%{z} <extra></extra>',
+    },
+  ];
+
+  const tracesHeatMapVariable2 = [
+    {
+      z: [variableData.map((e) => e.value2)],
+      x: variableData.map((e) => e.sample),
+      //hoverongaps: false,
+      xaxis: 'x',
+      yaxis: 'y5',
       type: 'heatmap',
 
       xgap: 0.5,
@@ -361,17 +425,19 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     },
   ];
 
-  console.log(tracesHeatMapVariable);
+  console.log(tracesHeatMapVariable1);
 
   let traces = [];
-  variableData.length > 0
-    ? (traces = [
-        ...tracesHeatMap,
-        ...tracesStackedBar,
-        ...tracesNormalize,
-        ...tracesHeatMapVariable,
-      ])
-    : (traces = [...tracesHeatMap, ...tracesStackedBar, ...tracesNormalize]);
+  if (variableData.length > 0) {
+    traces = [
+      ...tracesHeatMap,
+      ...tracesStackedBar,
+      ...tracesNormalize,
+      ...tracesHeatMapVariable1,
+    ];
+  } else {
+    traces = [...tracesHeatMap, ...tracesStackedBar, ...tracesNormalize];
+  }
 
   const text = {
     x: 0,
@@ -453,6 +519,12 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     yaxis4: {
       title: '',
       domain: [0.96, 0.978],
+      showticklabels: false,
+      ticks: '',
+    },
+    yaxis5: {
+      title: '',
+      domain: [0.978, 0.996],
       showticklabels: false,
       ticks: '',
     },
