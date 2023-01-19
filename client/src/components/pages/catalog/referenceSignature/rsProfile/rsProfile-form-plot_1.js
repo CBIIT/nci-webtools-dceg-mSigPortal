@@ -17,7 +17,7 @@ import {
   defaultStrategy,
   defaultSignatureName,
 } from '../../../../../services/utils';
-import { customStyles } from '../../../../controls/custom/customFormStyle';
+import { customStyles } from '../../../../controls/utils/utils';
 
 const actions = { ...catalogActions, ...modalActions };
 
