@@ -1,10 +1,18 @@
 import { groupBy } from 'lodash';
 import { First } from 'react-bootstrap/esm/PageItem';
+import { get } from 'react-hook-form';
+import CosineSimilarityPlot from '../../../pages/catalog/referenceSignature/cosineSimilarity/form-plot';
+import { getRandomColor, isNumber } from '../../utils/utils';
 
 export default function MsLandscape(cosineData, exposureData, variableData) {
   console.log(cosineData);
   console.log(exposureData);
   console.log(variableData);
+  if (variableData.length > 0) {
+    console.log(variableData[0]);
+    console.log(variableData[0].hasOwnProperty('value2'));
+  }
+
   const defaultNames = ['SBS', 'DBS', 'ID'];
   const names = exposureData.map((group) => group.signatureName);
   const contains = defaultNames.some((element) => {
@@ -169,6 +177,42 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     [0.9, 'rgb(204,223,59)'],
     [1.0, 'rgb(249,230,39)'],
   ];
+
+  const heatmapColorscale3 = [
+    [0, '#4DBBD5'],
+    [0.1, '#3C5488'],
+    [0.2, '#E64B35'],
+
+    [0.3, '#F39B7F'],
+    [0.4, '#00A087'],
+
+    [0.5, 'EBC6C4'],
+    [0.6, 'rgb(35,165,132)'],
+
+    [0.7, 'rgb(101,195,100)'],
+    [0.8, 'rgb(120,208,82)'],
+
+    [0.9, 'rgb(204,223,59)'],
+    [1.0, 'rgb(249,230,39)'],
+  ];
+
+  const charColors = {
+    A: '#4DBBD5',
+    B: '#3C5488',
+    C: '#E64B35',
+    D: '#F39B7F',
+    E: '#00A087',
+    F: '#EBC6C4',
+  };
+
+  var bg_colors = variableData.map((e) => getRandomColor());
+  console.log(bg_colors);
+
+  let stringData;
+  if (!isNumber(variableData[0].value1)) {
+    stringData = variableData.map((e) => e.value1);
+  }
+  console.log(stringData);
   const xAxis = cosineData.map((e) => e.sample);
   //const longest = xAxis.reduce((a, e) => (a > e.length ? a : e.length), 0);
   var longest = xAxis.sort(function (a, b) {
@@ -378,7 +422,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     }));
   // console.log(tracesStackedBar);
 
-  const tracesHeatMapVariable1 = [
+  const tracesHeatMapVariableNum1 = [
     {
       z: [variableData.map((e) => e.value1)],
       x: variableData.map((e) => e.sample),
@@ -394,15 +438,6 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
         thickness: 20,
         bordercolor: 'black',
         tickmode: 'array',
-
-        // title: {
-        //   text: 'Cosine Similarity',
-        //   font: {
-        //     family: 'Arial',
-        //     size: 17,
-        //     color: 'rgb(37,37,37)',
-        //   },
-        // },
       },
       xgap: 0.5,
       hovertemplate:
@@ -410,7 +445,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     },
   ];
 
-  const tracesHeatMapVariable2 = [
+  const tracesHeatMapVariableNum2 = [
     {
       z: [variableData.map((e) => e.value2)],
       x: variableData.map((e) => e.sample),
@@ -418,6 +453,15 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
       xaxis: 'x',
       yaxis: 'y5',
       type: 'heatmap',
+      colorscale: heatmapColorscale2,
+      colorbar: {
+        orientation: 'h',
+        x: 0.5,
+        y: colorBarLoc - 0.1,
+        thickness: 20,
+        bordercolor: 'black',
+        tickmode: 'array',
+      },
 
       xgap: 0.5,
       hovertemplate:
@@ -425,16 +469,68 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     },
   ];
 
-  console.log(tracesHeatMapVariable1);
+  var tracesBarMapVariableStr1 = {
+    x: variableData.map((e) => e.sample),
+    y: variableData.map((e) => 1),
+    xaxis: 'x',
+    yaxis: 'y4',
+    type: 'bar',
+    test: variableData.map((e) => e.value1),
+    marker: { color: variableData.map((e) => charColors[e.value1]) },
+    hovertemplate:
+      '<b>Signature contribution: </b>%{y} <br><b>Sample: </b> %{x}',
+  };
+  // var tracesBarMapVariable1 = {
+  //   z: [
+  //     variableData.map((e) =>
+  //       e.value1 === 'A'
+  //         ? 0
+  //         : e.value1 === 'B'
+  //         ? 0.1
+  //         : e.value1 === 'C'
+  //         ? 0.2
+  //         : e.value1 === 'D'
+  //         ? 0.3
+  //         : e.value1 === 'E'
+  //         ? 0.4
+  //         : 0.5
+  //     ),
+  //   ],
+  //   x: variableData.map((e) => e.sample),
+  //   xaxis: 'x',
+  //   yaxis: 'y4',
+  //   type: 'heatmap',
+  //   colorscale: heatmapColorscale3,
+  //   colorbar: {
+  //     orientation: 'h',
+  //     x: 0.5,
+  //     y: colorBarLoc - 0.1,
+  //     thickness: 20,
+  //     bordercolor: 'black',
+  //     tickmode: 'array',
+  //   },
+  // };
 
+  console.log(tracesBarMapVariableStr1);
   let traces = [];
   if (variableData.length > 0) {
-    traces = [
-      ...tracesHeatMap,
-      ...tracesStackedBar,
-      ...tracesNormalize,
-      ...tracesHeatMapVariable1,
-    ];
+    if (variableData[0].hasOwnProperty('value2')) {
+      traces = [
+        ...tracesHeatMap,
+        ...tracesStackedBar,
+        ...tracesNormalize,
+        ...tracesHeatMapVariableNum1,
+        ...tracesHeatMapVariableNum2,
+      ];
+    } else {
+      traces = [
+        ...tracesHeatMap,
+        ...tracesStackedBar,
+        ...tracesNormalize,
+        ...tracesHeatMapVariableNum1,
+        tracesBarMapVariableStr1,
+      ];
+    }
   } else {
     traces = [...tracesHeatMap, ...tracesStackedBar, ...tracesNormalize];
   }

@@ -17,7 +17,7 @@ export default function MutationalProfiles(props) {
         />
       </div>
       <hr />
-      <MsLandscapePlot handleVariable={handleVariable} />
+      <MsLandscapePlot />
     </Container>
   );
 }

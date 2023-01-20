@@ -27,6 +27,10 @@ export const customStyles = {
   }),
 };
 
+export function isNumber(n) {
+  return !isNaN(parseFloat(n)) && !isNaN(n - 0);
+}
+
 export const readFile = (file) => {
   let fileReader = new FileReader();
   return new Promise((resolve, reject) => {
@@ -38,10 +42,8 @@ export const readFile = (file) => {
   });
 };
 
-export const asMatrix = (text) => {
+export const parseMatrix = (text) => {
   let arr = text.split('\n');
-
-  const title = arr[0].split('\t');
 
   let result = [];
   for (var i = 1; i < arr.length - 1; i++) {
@@ -49,12 +51,14 @@ export const asMatrix = (text) => {
 
     let dataObject;
     if (data.length === 3) {
+     
       dataObject = {
         sample: data[0],
         value1: data[1],
         value2: data[2],
       };
     } else {
+      
       dataObject = {
         sample: data[0],
         value1: data[1],
@@ -63,4 +67,22 @@ export const asMatrix = (text) => {
     result.push(dataObject);
   }
   return result;
+};
+
+export const checkKey = (obj, keyName) => {
+  if (Object.keys(obj).indexOf(keyName) !== -1) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+export const getRandomColor = () => {
+  var letters = '0123456789ABCDEF'.split('');
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  console.log(color);
+  return color;
 };

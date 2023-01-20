@@ -16,14 +16,11 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 
 import './plot.scss';
 import MsLandscape from '../../../controls/plotly/msLandscape/msLandscape';
-import { readFile, asMatrix } from '../../../controls/utils/utils';
+import { readFile, parseMatrix } from '../../../controls/utils/utils';
 import { actions } from '../../../../services/store/exposure';
 
 const { Label, Group } = Form;
-export default function MsLandscapePlot({
-  calculateLandscape,
-  handleVariable,
-}) {
+export default function MsLandscapePlot({ calculateLandscape }) {
   const publicForm = useSelector((state) => state.exposure.publicForm);
   const exposure = useSelector((state) => state.exposure);
   const { variableFile, plotPath, debugR, err, loading } = exposure.msLandscape;
@@ -40,8 +37,10 @@ export default function MsLandscapePlot({
 
   async function handleVariableData(event) {
     const text = await readFile(event.target.files[0]);
-    const variableData = asMatrix(text);
+    const variableData = parseMatrix(text);
     console.log(variableData);
+
+    console.log(event.target);
 
     mergeExposureState({ variableData });
   }
