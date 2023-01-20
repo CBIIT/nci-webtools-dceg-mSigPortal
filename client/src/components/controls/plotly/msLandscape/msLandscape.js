@@ -8,24 +8,25 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
   console.log(cosineData);
   console.log(exposureData);
   console.log(variableData);
-  let stringData;
+
   let charColors = {};
   if (variableData.length > 0) {
+    let stringData;
     console.log(variableData[0]);
     console.log(variableData[0].hasOwnProperty('value2'));
     if (!isNumber(variableData[0].value1)) {
       const stringVal = variableData.map((e) => e.value1);
       console.log(stringVal);
       stringData = [...new Set(stringVal)];
-    }
-    console.log(stringData);
-    var bg_colors = stringData.map((e) => getRandomColor());
-    console.log(bg_colors);
+      console.log(stringData);
+      var bg_colors = stringData.map((e) => getRandomColor());
+      console.log(bg_colors);
 
-    stringData.forEach((element, index) => {
-      charColors[element] = bg_colors[index];
-    });
-    console.log(charColors);
+      stringData.forEach((element, index) => {
+        charColors[element] = bg_colors[index];
+      });
+      console.log(charColors);
+    }
   }
 
   // const charColors = {
@@ -425,6 +426,10 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
           order: 'descending',
         },
       ],
+      // legendgroup: 'bar',
+      // legendgrouptitle: {
+      //   text: 'Cosine Similarityyy:',
+      // },
       hovertemplate: '<b>Number of mutation: </b>%{y} <br><b>Sample: </b> %{x}',
     }));
   // console.log(tracesStackedBar);
@@ -461,15 +466,8 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
       yaxis: 'y5',
       type: 'heatmap',
       colorscale: heatmapColorscale2,
-      colorbar: {
-        orientation: 'h',
-        x: 0.5,
-        y: colorBarLoc - 0.1,
-        thickness: 20,
-        bordercolor: 'black',
-        tickmode: 'array',
-      },
 
+      showlegend: false,
       xgap: 0.5,
       hovertemplate:
         '<b>Sample: </b> %{x}<br> <b>Value: </b>%{z} <extra></extra>',
@@ -498,11 +496,16 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     customdata: variableData.map((e) => ({
       name: e.value1,
     })),
+    name: 'Variable String',
     xaxis: 'x',
     yaxis: 'y4',
     type: 'bar',
     test: variableData.map((e) => e.value1),
     marker: { color: variableData.map((e) => charColors[e.value1]) },
+    // legendgroup: 'heatmap',
+    // legendgrouptitle: {
+    //   text: 'Variableee',
+    // },
     hovertemplate: '<b>Sample: </b>%{x} <br><b>Value: </b> %{customdata.name}',
   };
 
@@ -643,7 +646,27 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     },
   };
 
-  let annotations = [text, annotationTitle];
+  const annotationLegendTitle = {
+    x: 0,
+    y: colorBarLoc - 0.045,
+
+    xanchor: 'left',
+    yanchor: 'bottom',
+    xref: 'paper',
+    yref: 'paper',
+    text: '\t Variable:',
+    showarrow: false,
+    font: {
+      family: 'Arial',
+      size: 17,
+      color: 'rgb(37,37,37)',
+    },
+  };
+
+  let annotations =
+    variableData.length > 0
+      ? [text, annotationTitle, annotationLegendTitle]
+      : [text, annotationTitle];
 
   const layout = {
     title: {
