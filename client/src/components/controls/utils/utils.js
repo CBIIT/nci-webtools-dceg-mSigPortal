@@ -51,14 +51,26 @@ export const parseMatrix = (text) => {
 
     let dataObject;
     if (data.length === 3) {
-     
-      dataObject = {
-        sample: data[0],
-        value1: data[1],
-        value2: data[2],
-      };
+      if (!isNumber(data[0].value1) && isNumber(data[1].value1)) {
+        dataObject = {
+          sample: data[0],
+          value1: data[1],
+          value2: data[2],
+        };
+      } else if (isNumber(data[0].value1) && !isNumber(data[1].value1)) {
+        dataObject = {
+          sample: data[0],
+          value1: data[2],
+          value2: data[1],
+        };
+      } else {
+        dataObject = {
+          sample: data[0],
+          value1: data[1],
+          value2: data[2],
+        };
+      }
     } else {
-      
       dataObject = {
         sample: data[0],
         value1: data[1],
@@ -83,6 +95,6 @@ export const getRandomColor = () => {
   for (var i = 0; i < 6; i++) {
     color += letters[Math.floor(Math.random() * 16)];
   }
-  console.log(color);
+
   return color;
 };

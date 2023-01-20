@@ -8,10 +8,18 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
   console.log(cosineData);
   console.log(exposureData);
   console.log(variableData);
+  let stringData;
+
   if (variableData.length > 0) {
     console.log(variableData[0]);
     console.log(variableData[0].hasOwnProperty('value2'));
+    if (!isNumber(variableData[0].value1)) {
+      const stringVal = variableData.map((e) => e.value1);
+      console.log(stringVal);
+      stringData = [...new Set(stringVal)];
+    }
   }
+  console.log(stringData);
 
   const defaultNames = ['SBS', 'DBS', 'ID'];
   const names = exposureData.map((group) => group.signatureName);
@@ -208,11 +216,6 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
   var bg_colors = variableData.map((e) => getRandomColor());
   console.log(bg_colors);
 
-  let stringData;
-  if (!isNumber(variableData[0].value1)) {
-    stringData = variableData.map((e) => e.value1);
-  }
-  console.log(stringData);
   const xAxis = cosineData.map((e) => e.sample);
   //const longest = xAxis.reduce((a, e) => (a > e.length ? a : e.length), 0);
   var longest = xAxis.sort(function (a, b) {
@@ -468,17 +471,49 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
         '<b>Sample: </b> %{x}<br> <b>Value: </b>%{z} <extra></extra>',
     },
   ];
+  // var tracesBarMapVariableStr1 = variableData.map((e) => ({
+  //   x: [e.sample],
+  //   y: [1],
+  //   name: e.value1,
+  //   customdata: [
+  //     {
+  //       name: e.value1,
+  //     },
+  //   ],
+  //   xaxis: 'x',
+  //   yaxis: 'y4',
+  //   type: 'bar',
+
+  //   marker: { color: charColors[e.value1] },
+  //   hovertemplate: '<b>Sample: </b>%{x} <br><b>Value: </b> %{customdata.name}',
+  // }));
 
   var tracesBarMapVariableStr1 = {
     x: variableData.map((e) => e.sample),
     y: variableData.map((e) => 1),
+    customdata: variableData.map((e) => ({
+      name: e.value1,
+    })),
     xaxis: 'x',
     yaxis: 'y4',
     type: 'bar',
     test: variableData.map((e) => e.value1),
     marker: { color: variableData.map((e) => charColors[e.value1]) },
-    hovertemplate:
-      '<b>Signature contribution: </b>%{y} <br><b>Sample: </b> %{x}',
+    hovertemplate: '<b>Sample: </b>%{x} <br><b>Value: </b> %{customdata.name}',
+  };
+
+  var tracesBarMapVariableStr2 = {
+    x: variableData.map((e) => e.sample),
+    y: variableData.map((e) => 1),
+    customdata: variableData.map((e) => ({
+      name: e.value2,
+    })),
+    xaxis: 'x',
+    yaxis: 'y4',
+    type: 'bar',
+    test: variableData.map((e) => e.value1),
+    marker: { color: variableData.map((e) => charColors[e.value1]) },
+    hovertemplate: '<b>Sample: </b>%{x} <br><b>Value: </b> %{customdata.name}',
   };
   // var tracesBarMapVariable1 = {
   //   z: [
@@ -515,21 +550,56 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
   let traces = [];
   if (variableData.length > 0) {
     if (variableData[0].hasOwnProperty('value2')) {
-      traces = [
-        ...tracesHeatMap,
-        ...tracesStackedBar,
-        ...tracesNormalize,
-        ...tracesHeatMapVariableNum1,
-        ...tracesHeatMapVariableNum2,
-      ];
+      if (
+        !isNumber(variableData[0].value1) &&
+        isNumber(variableData[0].value2)
+      ) {
+        //1st is string , 2nd is numeric
+        traces = [
+          ...tracesHeatMap,
+          ...tracesStackedBar,
+          ...tracesNormalize,
+          tracesBarMapVariableStr1,
+          ...tracesHeatMapVariableNum2,
+        ];
+      } else if (
+        isNumber(variableData[0].value1) &&
+        isNumber(variableData[0].value2)
+      ) {
+        //both value are number
+        traces = [
+          ...tracesHeatMap,
+          ...tracesStackedBar,
+          ...tracesNormalize,
+          ...tracesHeatMapVariableNum1,
+          ...tracesHeatMapVariableNum2,
+        ];
+      } else {
+        //both value are number
+        traces = [
+          ...tracesHeatMap,
+          ...tracesStackedBar,
+          ...tracesNormalize,
+          tracesBarMapVariableStr1,
+          tracesBarMapVariableStr2,
+        ];
+      }
     } else {
-      traces = [
-        ...tracesHeatMap,
-        ...tracesStackedBar,
-        ...tracesNormalize,
-        ...tracesHeatMapVariableNum1,
-        tracesBarMapVariableStr1,
-      ];
+      if (!isNumber(variableData[0].value1)) {
+        traces = [
+          ...tracesHeatMap,
+          ...tracesStackedBar,
+          ...tracesNormalize,
+          tracesBarMapVariableStr1,
+        ];
+      } else {
+        traces = [
+          ...tracesHeatMap,
+          ...tracesStackedBar,
+          ...tracesNormalize,
+          ...tracesHeatMapVariableNum1,
+        ];
+      }
     }
   } else {
     traces = [...tracesHeatMap, ...tracesStackedBar, ...tracesNormalize];

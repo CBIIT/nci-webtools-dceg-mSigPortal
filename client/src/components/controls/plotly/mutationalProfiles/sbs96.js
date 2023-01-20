@@ -49,7 +49,7 @@ export default function SBS96(apiData) {
     hoverinfo: 'x+y',
     showlegend: false,
   }));
-
+  console.log(traces);
   const sampleAnnotation = createSampleAnnotation(apiData);
   const mutationAnnotation = createMutationAnnotations(data);
   const mutationShapes = createMutationShapes(data, colors);
