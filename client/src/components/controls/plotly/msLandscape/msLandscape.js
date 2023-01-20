@@ -10,6 +10,8 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
   console.log(variableData);
 
   let charColors = {};
+  let arrNames = [];
+  let arrColors = [];
   if (variableData.length > 0) {
     let stringData;
     console.log(variableData[0]);
@@ -25,9 +27,13 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
       stringData.forEach((element, index) => {
         charColors[element] = bg_colors[index];
       });
+      arrNames = stringData;
+      arrColors = bg_colors;
       console.log(charColors);
     }
   }
+  console.log(arrNames);
+  console.log(arrColors);
 
   // const charColors = {
   //   A: '#4DBBD5',
@@ -50,6 +56,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
   // console.log(names);
   // console.log(contains);
   let colors = {};
+
   if (!contains) {
     var randomColors = [];
     while (randomColors.length < names.length) {
@@ -250,7 +257,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     } else if (longest > 15) {
       colorBarLoc = -0.4;
     } else {
-      colorBarLoc = -0.3;
+      colorBarLoc = -0.33;
     }
   }
   const groupBySignatureName = groupBy(exposureData, 'signatureName');
@@ -361,6 +368,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
       marker: {
         color: contains ? colors[key.replace(/^\D*/, '')] : colors[key],
       },
+      lendgroup: 'bar',
       showlegend: false,
       exposure: value.map((e, i) => e.exposure),
       hovertemplate:
@@ -410,7 +418,6 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
       type: 'bar',
       x: value.filter((obj) => obj.exposure !== 0).map((e) => e.sample),
       y: value.filter((obj) => obj.exposure !== 0).map((e, i) => e.exposure),
-      //showlegend: true,
       // marker: {
       //   color: colors[key.replace(/^\D*/, '')],
       // },
@@ -428,8 +435,9 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
       ],
       // legendgroup: 'bar',
       // legendgrouptitle: {
-      //   text: 'Cosine Similarityyy:',
+      //   text: 'Mutational Signatures:',
       // },
+      showlegend: true,
       hovertemplate: '<b>Number of mutation: </b>%{y} <br><b>Sample: </b> %{x}',
     }));
   // console.log(tracesStackedBar);
@@ -467,7 +475,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
       type: 'heatmap',
       colorscale: heatmapColorscale2,
 
-      showlegend: false,
+      showscale: false,
       xgap: 0.5,
       hovertemplate:
         '<b>Sample: </b> %{x}<br> <b>Value: </b>%{z} <extra></extra>',
@@ -490,7 +498,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
   //   hovertemplate: '<b>Sample: </b>%{x} <br><b>Value: </b> %{customdata.name}',
   // }));
 
-  var tracesBarMapVariableStr1 = {
+  const tracesBarMapVariableStr1 = {
     x: variableData.map((e) => e.sample),
     y: variableData.map((e) => 1),
     customdata: variableData.map((e) => ({
@@ -506,10 +514,11 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     // legendgrouptitle: {
     //   text: 'Variableee',
     // },
+    showlegend: false,
     hovertemplate: '<b>Sample: </b>%{x} <br><b>Value: </b> %{customdata.name}',
   };
 
-  var tracesBarMapVariableStr2 = {
+  const tracesBarMapVariableStr2 = {
     x: variableData.map((e) => e.sample),
     y: variableData.map((e) => 1),
     customdata: variableData.map((e) => ({
@@ -517,42 +526,36 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     })),
     xaxis: 'x',
     yaxis: 'y4',
-    type: 'bar',
+    //type: 'bar',
     test: variableData.map((e) => e.value1),
     marker: { color: variableData.map((e) => charColors[e.value1]) },
+    // legendgroup: 'heatmap',
+    // legendgrouptitle: {
+    //   text: 'Variableee',
+    // },
+    showlegend: false,
     hovertemplate: '<b>Sample: </b>%{x} <br><b>Value: </b> %{customdata.name}',
   };
-  // var tracesBarMapVariable1 = {
-  //   z: [
-  //     variableData.map((e) =>
-  //       e.value1 === 'A'
-  //         ? 0
-  //         : e.value1 === 'B'
-  //         ? 0.1
-  //         : e.value1 === 'C'
-  //         ? 0.2
-  //         : e.value1 === 'D'
-  //         ? 0.3
-  //         : e.value1 === 'E'
-  //         ? 0.4
-  //         : 0.5
-  //     ),
-  //   ],
-  //   x: variableData.map((e) => e.sample),
-  //   xaxis: 'x',
-  //   yaxis: 'y4',
-  //   type: 'heatmap',
-  //   colorscale: heatmapColorscale3,
-  //   colorbar: {
-  //     orientation: 'h',
-  //     x: 0.5,
-  //     y: colorBarLoc - 0.1,
-  //     thickness: 20,
-  //     bordercolor: 'black',
-  //     tickmode: 'array',
-  //   },
-  // };
-
+  const stringLegend = Object.entries(charColors).map(([key, val], index) => ({
+    key: key,
+    val: val,
+    x: variableData.map((e) => -1),
+    y: variableData.map((e) => 0),
+    xaxis: 'x',
+    yaxis: 'y',
+    name: key,
+    marker: {
+      size: 0,
+      color: val,
+    },
+    type: 'bar',
+    hoverinfo: 'skip',
+    // legendgroup: 'heatmap',
+    // legendgrouptitle: {
+    //   text: 'Variableee',
+    // },
+  }));
+  console.log(stringLegend);
   console.log(tracesBarMapVariableStr1);
   let traces = [];
   if (variableData.length > 0) {
@@ -567,6 +570,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
           ...tracesStackedBar,
           ...tracesNormalize,
           tracesBarMapVariableStr1,
+          ...stringLegend,
           ...tracesHeatMapVariableNum2,
         ];
       } else if (
@@ -588,6 +592,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
           ...tracesStackedBar,
           ...tracesNormalize,
           tracesBarMapVariableStr1,
+          ...stringLegend,
           tracesBarMapVariableStr2,
         ];
       }
@@ -598,6 +603,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
           ...tracesStackedBar,
           ...tracesNormalize,
           tracesBarMapVariableStr1,
+          ...stringLegend,
         ];
       } else {
         traces = [
@@ -648,7 +654,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
 
   const annotationLegendTitle = {
     x: 0,
-    y: colorBarLoc - 0.045,
+    y: colorBarLoc - 0.043,
 
     xanchor: 'left',
     yanchor: 'bottom',
@@ -680,10 +686,15 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     height: 1200,
     barmode: 'stack',
     hovermode: 'closest',
+    // legend: {
+    //   orientation: 'h',
+    //   //title: { text: 'Signatures Name<br>' },
+    //   traceorder: 'reserved',
+    //   x: 0,
+    //   y: xAxis.length > 250 ? -0.03 : extraMargin,
+    // },
     legend: {
       orientation: 'h',
-      //title: { text: 'Signatures Name<br>' },
-      traceorder: 'reserved',
       x: 0,
       y: xAxis.length > 250 ? -0.03 : extraMargin,
     },
