@@ -9,7 +9,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
   console.log(exposureData);
   console.log(variableData);
   let stringData;
-
+  let charColors = {};
   if (variableData.length > 0) {
     console.log(variableData[0]);
     console.log(variableData[0].hasOwnProperty('value2'));
@@ -18,8 +18,24 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
       console.log(stringVal);
       stringData = [...new Set(stringVal)];
     }
+    console.log(stringData);
+    var bg_colors = stringData.map((e) => getRandomColor());
+    console.log(bg_colors);
+
+    stringData.forEach((element, index) => {
+      charColors[element] = bg_colors[index];
+    });
+    console.log(charColors);
   }
-  console.log(stringData);
+
+  // const charColors = {
+  //   A: '#4DBBD5',
+  //   B: '#3C5488',
+  //   C: '#E64B35',
+  //   D: '#F39B7F',
+  //   E: '#00A087',
+  //   F: '#EBC6C4',
+  // };
 
   const defaultNames = ['SBS', 'DBS', 'ID'];
   const names = exposureData.map((group) => group.signatureName);
@@ -203,18 +219,6 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     [0.9, 'rgb(204,223,59)'],
     [1.0, 'rgb(249,230,39)'],
   ];
-
-  const charColors = {
-    A: '#4DBBD5',
-    B: '#3C5488',
-    C: '#E64B35',
-    D: '#F39B7F',
-    E: '#00A087',
-    F: '#EBC6C4',
-  };
-
-  var bg_colors = variableData.map((e) => getRandomColor());
-  console.log(bg_colors);
 
   const xAxis = cosineData.map((e) => e.sample);
   //const longest = xAxis.reduce((a, e) => (a > e.length ? a : e.length), 0);
