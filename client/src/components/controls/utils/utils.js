@@ -1,3 +1,4 @@
+import * as d3 from 'd3';
 export const customStyles = {
   control: (base, state) => ({
     ...base,
@@ -92,9 +93,52 @@ export const checkKey = (obj, keyName) => {
 export const getRandomColor = () => {
   var letters = '0123456789ABCDEF'.split('');
   var color = '#';
+
   for (var i = 0; i < 6; i++) {
+    // color += letters[Math.floor(Math.random() * 16)];
     color += letters[Math.floor(Math.random() * 16)];
   }
 
   return color;
 };
+
+export const colorPallet0 = [
+  '#BA6338',
+  '#3C5488',
+  '#7A65A5',
+  '#F39B7F',
+  '#80796B',
+  '#00A1D5',
+  '#6A6599',
+  '#DC0000',
+  '#8491B4',
+  '#837B8D',
+  '#E7C76F',
+  '#DF8F44',
+  '#CDDEB7',
+  '#E64B35',
+  '#91D1C2',
+  '#924822',
+  '#B09C85',
+  '#F0E685',
+  '#4DBBD5',
+  '#AE1F63',
+  '#7E6148',
+  '#612A79',
+  '#5050FF',
+  '#D595A7',
+  '#466983',
+  '#3B1B53',
+  '#749B58',
+  '#802268',
+  '#5DB1DD',
+  '#E4AF69',
+  '#79AF97',
+  '#00A087',
+  '#374E55',
+  '#B24745',
+  '#C75127',
+  '#CE3D32',
+  '#6BD76B',
+  '#D58F5C',
+];

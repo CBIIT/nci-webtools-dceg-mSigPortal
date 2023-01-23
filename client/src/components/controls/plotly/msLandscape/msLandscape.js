@@ -2,7 +2,7 @@ import { groupBy } from 'lodash';
 import { First } from 'react-bootstrap/esm/PageItem';
 import { get } from 'react-hook-form';
 import CosineSimilarityPlot from '../../../pages/catalog/referenceSignature/cosineSimilarity/form-plot';
-import { getRandomColor, isNumber } from '../../utils/utils';
+import { getRandomColor, isNumber, colorPallet0 } from '../../utils/utils';
 
 export default function MsLandscape(cosineData, exposureData, variableData) {
   console.log(cosineData);
@@ -17,9 +17,13 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     let stringData;
     if (!isNumber(variableData[0].value1)) {
       const stringVal = variableData.map((e) => e.value1);
-      stringData = [...new Set(stringVal)];
-      var bg_colors = stringData.map((e) => getRandomColor());
-
+      stringData = [...new Set(stringVal)].sort();
+      //var bg_colors = stringData.map((e) => getRandomColor());
+      var bg_colors = stringData.map(
+        (e, i) => colorPallet0[i % colorPallet0.length]
+      );
+      console.log(stringData);
+      console.log(bg_colors);
       stringData.forEach((element, index) => {
         charColors[element] = bg_colors[index];
       });
@@ -759,6 +763,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
       showgrid: false,
       zeroline: false,
       showline: false,
+      zerolinewidth: 0,
     },
     yaxis: { title: 'Signature contribution', domain: [0, 0.49] },
     yaxis2: {
