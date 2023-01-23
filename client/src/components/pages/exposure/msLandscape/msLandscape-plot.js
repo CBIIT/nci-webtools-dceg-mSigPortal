@@ -30,45 +30,53 @@ export default function MsLandscapePlot({ calculateLandscape }) {
   // const { data, error, isFetching } = useMsLandscapePlotQuery(params, {
   //   skip: !params,
   // });
+
+  const [file, setFile] = useState(null);
   const fileRef = useRef(null);
 
   const dispatch = useDispatch();
   const mergeExposureState = (state) =>
     dispatch(actions.mergeExposure({ ...state }));
-  const variableData =
-    useSelector((state) => state.exposure.variableData) || [];
+  let variableData = useSelector((state) => state.exposure.variableData) || [];
 
   const variableFileName =
     useSelector((state) => state.exposure.variableFileName) || [];
 
-  function handleVariableData(event) {
-    const variableFileName = event.target.files[0].name;
-    mergeExposureState({ variableFileName });
+  // function handleVariableData(event) {
+  //   variableFileName = event.target.files[0].name;
+  // }
+
+  function handleChange(e) {
+    setFile(e.target.files[0].name);
   }
 
   async function Recalculate() {
     if (!fileRef) return;
-    // const text = await readFile(event.target.files[0]);
-    console.log(fileRef);
-    console.log(fileRef.current);
 
-    if (!fileRef.current?.files?.length) return;
-    const files = fileRef.current.files;
-    console.log(files);
-    const fileData = await readFile(files[0]);
-    console.log(fileData);
-    const variableData = parseMatrix(fileData);
-    console.log(variableData);
-    mergeExposureState({ variableData });
+
+    if (!fileRef.current?.files?.length) {
+      mergeExposureState({
+        variableFileName: '',
+        variableData: null,
+      });
+    } else {
+      const variableFileName = fileRef.current.files[0].name;
+      const files = fileRef.current.files;
+      const fileData = await readFile(files[0]);
+      const variableData = parseMatrix(fileData);
+      mergeExposureState({
+        variableFileName: variableFileName,
+        variableData: variableData,
+      });
+    }
   }
 
   function removeFile() {
-    debugger;
     if (!fileRef.current?.files?.length) return;
     fileRef.current.files.value = '';
-    variableFileName = '';
-    variableData = [];
-    mergeExposureState({ variableFileName, variableData });
+    setFile();
+    fileRef.current.value = null;
+    //mergeExposureState({ variableData: fileRef.current.value });
   }
 
   console.log(variableFileName);
@@ -135,10 +143,11 @@ export default function MsLandscapePlot({ calculateLandscape }) {
                 <Form.File
                   ref={fileRef}
                   id="variableData"
-                  label={variableFileName || 'Upload here (optional)'}
-                  title={variableFileName || 'Upload here (optional)'}
-                  type="input"
-                  onChange={(e) => handleVariableData(e)}
+                  label={file || 'Upload here (optional)'}
+                  title={file || 'Upload here (optional)'}
+                  onChange={(e) => {
+                    handleChange(e);
+                  }}
                   custom
                 />
                 {fileRef.current?.files?.length > 0 && (
