@@ -110,7 +110,7 @@ export default function MsLandscapePlot({ calculateLandscape }) {
                   label={variableFile || 'Upload here (optional)'}
                   title={variableFile || 'Upload here (optional)'}
                   value={''}
-                  accept=""
+                  //accept=""
                   //onChange={(e) => handleVariable(e.target.files[0])}
                   onChange={(e) => handleVariableData(e)}
                   custom

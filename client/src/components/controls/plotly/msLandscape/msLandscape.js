@@ -433,10 +433,10 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
           order: 'descending',
         },
       ],
-      // legendgroup: 'bar',
-      // legendgrouptitle: {
-      //   text: 'Mutational Signatures:',
-      // },
+      legendgroup: 'bar',
+      legendgrouptitle: {
+        text: '\t Mutational Signatures:',
+      },
       showlegend: true,
       hovertemplate: '<b>Number of mutation: </b>%{y} <br><b>Sample: </b> %{x}',
     }));
@@ -510,10 +510,10 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     type: 'bar',
     test: variableData.map((e) => e.value1),
     marker: { color: variableData.map((e) => charColors[e.value1]) },
-    // legendgroup: 'heatmap',
-    // legendgrouptitle: {
-    //   text: 'Variableee',
-    // },
+    legendgroup: 'heatmap',
+    legendgrouptitle: {
+      text: '\t Variable',
+    },
     showlegend: false,
     hovertemplate: '<b>Sample: </b>%{x} <br><b>Value: </b> %{customdata.name}',
   };
@@ -529,17 +529,17 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     //type: 'bar',
     test: variableData.map((e) => e.value1),
     marker: { color: variableData.map((e) => charColors[e.value1]) },
-    // legendgroup: 'heatmap',
-    // legendgrouptitle: {
-    //   text: 'Variableee',
-    // },
+    legendgroup: 'heatmap',
+    legendgrouptitle: {
+      text: '\t Variable',
+    },
     showlegend: false,
     hovertemplate: '<b>Sample: </b>%{x} <br><b>Value: </b> %{customdata.name}',
   };
   const stringLegend = Object.entries(charColors).map(([key, val], index) => ({
     key: key,
     val: val,
-    x: variableData.map((e) => -1),
+    x: variableData.map((e) => xAxis[0]),
     y: variableData.map((e) => 0),
     xaxis: 'x',
     yaxis: 'y',
@@ -550,10 +550,10 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     },
     type: 'bar',
     hoverinfo: 'skip',
-    // legendgroup: 'heatmap',
-    // legendgrouptitle: {
-    //   text: 'Variableee',
-    // },
+    legendgroup: 'heatmap',
+    legendgrouptitle: {
+      text: '\t Variable',
+    },
   }));
   console.log(stringLegend);
   console.log(tracesBarMapVariableStr1);
@@ -669,10 +669,15 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     },
   };
 
+  // let annotations =
+  //   variableData.length > 0
+  //     ? [text, annotationTitle, annotationLegendTitle]
+  //     : [text, annotationTitle];
+
   let annotations =
     variableData.length > 0
-      ? [text, annotationTitle, annotationLegendTitle]
-      : [text, annotationTitle];
+      ? [annotationTitle, annotationLegendTitle]
+      : [annotationTitle];
 
   const layout = {
     title: {
@@ -693,11 +698,11 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     //   x: 0,
     //   y: xAxis.length > 250 ? -0.03 : extraMargin,
     // },
-    legend: {
-      orientation: 'h',
-      x: 0,
-      y: xAxis.length > 250 ? -0.03 : extraMargin,
-    },
+    // legend: {
+    //   orientation: 'h',
+    //   x: 0,
+    //   y: xAxis.length > 250 ? -0.03 : extraMargin,
+    // },
 
     xaxis: {
       tickmode: 'array',
