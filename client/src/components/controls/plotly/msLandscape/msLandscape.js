@@ -555,10 +555,6 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     type: 'bar',
     test: variableData.map((e) => e.value1),
     marker: { color: variableData.map((e) => charColors[e.value1]) },
-    // legendgroup: 'heatmap',
-    // legendgrouptitle: {
-    //   text: '\t Variable',
-    // },
     showlegend: false,
     hovertemplate: '<b>Sample: </b>%{x} <br><b>Value: </b> %{customdata.name}',
   };
@@ -574,10 +570,6 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     //type: 'bar',
     test: variableData.map((e) => e.value1),
     marker: { color: variableData.map((e) => charColors[e.value1]) },
-    // legendgroup: 'heatmap',
-    // legendgrouptitle: {
-    //   text: '\t Variable',
-    // },
     showlegend: false,
     hovertemplate: '<b>Sample: </b>%{x} <br><b>Value: </b> %{customdata.name}',
   };

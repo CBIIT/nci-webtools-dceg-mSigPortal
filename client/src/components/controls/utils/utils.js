@@ -103,15 +103,15 @@ export const getRandomColor = () => {
 };
 
 export const colorPallet0 = [
+  '#00A1D5',
+  '#F39B7F',
   '#BA6338',
+  '#8491B4',
   '#3C5488',
   '#7A65A5',
-  '#F39B7F',
   '#80796B',
-  '#00A1D5',
   '#6A6599',
   '#DC0000',
-  '#8491B4',
   '#837B8D',
   '#E7C76F',
   '#DF8F44',
