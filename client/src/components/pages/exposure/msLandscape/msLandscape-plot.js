@@ -13,6 +13,8 @@ import Plotly from '../../../controls/plotly/plot/plot';
 import { useSelector, useDispatch } from 'react-redux';
 import { useMsLandscapePlotQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { useForm, Controller } from 'react-hook-form';
+import { useRef } from 'react';
 
 import './plot.scss';
 import MsLandscape from '../../../controls/plotly/msLandscape/msLandscape';
@@ -28,6 +30,7 @@ export default function MsLandscapePlot({ calculateLandscape }) {
   // const { data, error, isFetching } = useMsLandscapePlotQuery(params, {
   //   skip: !params,
   // });
+  const fileRef = useRef(null);
 
   const dispatch = useDispatch();
   const mergeExposureState = (state) =>
@@ -35,17 +38,41 @@ export default function MsLandscapePlot({ calculateLandscape }) {
   const variableData =
     useSelector((state) => state.exposure.variableData) || [];
 
-  async function handleVariableData(event) {
-    const text = await readFile(event.target.files[0]);
-    const variableData = parseMatrix(text);
+  const variableFileName =
+    useSelector((state) => state.exposure.variableFileName) || [];
+
+  function handleVariableData(event) {
+    const variableFileName = event.target.files[0].name;
+    mergeExposureState({ variableFileName });
+  }
+
+  async function Recalculate() {
+    if (!fileRef) return;
+    // const text = await readFile(event.target.files[0]);
+    console.log(fileRef);
+    console.log(fileRef.current);
+
+    if (!fileRef.current?.files?.length) return;
+    const files = fileRef.current.files;
+    console.log(files);
+    const fileData = await readFile(files[0]);
+    console.log(fileData);
+    const variableData = parseMatrix(fileData);
     console.log(variableData);
-
-    console.log(event.target);
-
     mergeExposureState({ variableData });
   }
 
-  console.log(variableFile);
+  function removeFile() {
+    debugger;
+    if (!fileRef.current?.files?.length) return;
+    fileRef.current.files.value = '';
+    variableFileName = '';
+    variableData = [];
+    mergeExposureState({ variableFileName, variableData });
+  }
+
+  console.log(variableFileName);
+  console.log(variableData);
   const [calculationQuery, setCalculationQuery] = useState('');
   let { data, error, isFetching } = useMsLandscapePlotQuery(calculationQuery, {
     skip: !calculationQuery,
@@ -106,25 +133,22 @@ export default function MsLandscapePlot({ calculateLandscape }) {
               </Label>
               <div className="d-flex">
                 <Form.File
+                  ref={fileRef}
                   id="variableData"
-                  label={variableFile || 'Upload here (optional)'}
-                  title={variableFile || 'Upload here (optional)'}
-                  value={''}
-                  //accept=""
-                  //onChange={(e) => handleVariable(e.target.files[0])}
+                  label={variableFileName || 'Upload here (optional)'}
+                  title={variableFileName || 'Upload here (optional)'}
+                  type="input"
                   onChange={(e) => handleVariableData(e)}
                   custom
                 />
-                {variableFile && (
+                {fileRef.current?.files?.length > 0 && (
                   <Button
                     className="ml-1"
                     size="sm"
                     title="Remove"
                     variant="danger"
                     disabled={loading}
-                    onClick={() => {
-                      handleVariableData(new File([], ''));
-                    }}
+                    onClick={removeFile}
                   >
                     <FontAwesomeIcon icon={faFolderMinus} size="lg" />
                   </Button>
@@ -137,7 +161,7 @@ export default function MsLandscapePlot({ calculateLandscape }) {
               // disabled={source == 'user' && !projectID}
               className="mt-auto mb-3"
               variant="primary"
-              onClick={calculateLandscape}
+              onClick={Recalculate}
             >
               Recalculate
             </Button>

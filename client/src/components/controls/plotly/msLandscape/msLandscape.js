@@ -12,28 +12,33 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
   let charColors = {};
   let arrNames = [];
   let arrColors = [];
+  let mixMatch = false;
   if (variableData.length > 0) {
     let stringData;
-    console.log(variableData[0]);
-    console.log(variableData[0].hasOwnProperty('value2'));
     if (!isNumber(variableData[0].value1)) {
       const stringVal = variableData.map((e) => e.value1);
-      console.log(stringVal);
       stringData = [...new Set(stringVal)];
-      console.log(stringData);
       var bg_colors = stringData.map((e) => getRandomColor());
-      console.log(bg_colors);
 
       stringData.forEach((element, index) => {
         charColors[element] = bg_colors[index];
       });
       arrNames = stringData;
       arrColors = bg_colors;
-      console.log(charColors);
+      if (
+        variableData[0].hasOwnProperty('value2') &&
+        isNumber(variableData[0].value2)
+      ) {
+        mixMatch = true;
+      } else {
+        mixMatch = false;
+      }
     }
   }
+
   console.log(arrNames);
   console.log(arrColors);
+  console.log(mixMatch);
 
   // const charColors = {
   //   A: '#4DBBD5',
@@ -395,14 +400,6 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
         bordercolor: 'black',
         tickmode: 'array',
         tickvals: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
-        // title: {
-        //   text: 'Cosine Similarity',
-        //   font: {
-        //     family: 'Arial',
-        //     size: 17,
-        //     color: 'rgb(37,37,37)',
-        //   },
-        // },
       },
       xgap: 0.5,
       hovertemplate:
@@ -433,7 +430,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
             order: 'descending',
           },
         ],
-        legendgroup: 'bar',
+        legendgroup: 'b',
         legendgrouptitle: {
           text: '\t Mutational Signatures:',
         },
@@ -482,6 +479,8 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
       yaxis: 'y4',
       type: 'heatmap',
       colorscale: heatmapColorscale2,
+      zmin: 0,
+      zmax: 100,
       colorbar: {
         orientation: 'h',
         x: 0.5,
@@ -489,6 +488,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
         thickness: 20,
         bordercolor: 'black',
         tickmode: 'array',
+        tickvals: [0, 20, 40, 60, 80, 100],
       },
       xgap: 0.5,
       hovertemplate:
@@ -505,8 +505,18 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
       yaxis: 'y5',
       type: 'heatmap',
       colorscale: heatmapColorscale2,
-
-      showscale: false,
+      zmin: 0,
+      zmax: 100,
+      showscale: mixMatch ? true : false,
+      colorbar: {
+        orientation: 'h',
+        x: 0.5,
+        y: colorBarLoc - 0.1,
+        thickness: 20,
+        bordercolor: 'black',
+        tickmode: 'array',
+        tickvals: [0, 20, 40, 60, 80, 100],
+      },
       xgap: 0.5,
       hovertemplate:
         '<b>Sample: </b> %{x}<br> <b>Value: </b>%{z} <extra></extra>',
@@ -584,7 +594,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
       },
       type: 'bar',
       hoverinfo: 'skip',
-      legendgroup: 'heatmap',
+      legendgroup: 'a',
       legendgrouptitle: {
         text: '\t Variable Data String:',
       },
@@ -706,7 +716,9 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
   let annotations =
     variableData.length > 0
       ? arrNames.length > 0
-        ? [annotationTitle]
+        ? mixMatch
+          ? [annotationTitle, annotationLegendTitle]
+          : [annotationTitle]
         : [text, annotationTitle, annotationLegendTitle]
       : [text, annotationTitle];
 
