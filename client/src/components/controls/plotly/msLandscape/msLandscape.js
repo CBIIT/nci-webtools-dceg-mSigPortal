@@ -419,12 +419,18 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
         tickmode: 'array',
         tickvals: [0, 20, 40, 60, 80, 100],
       },
-      //xgap: variableDataSort.length < xAxis.length ? 10 : 0.5,
+      xAxis: xAxis.length,
+      variableData: variableDataSort.length,
+      xgap:
+        variableDataSort.length < xAxis.length
+          ? Math.ceil(xAxis.length / variableDataSort.length) * 2.5
+          : 0.5,
+      //xgap: 2,
       hovertemplate:
         '<b>Sample: </b> %{x}<br> <b>Value: </b>%{z} <extra></extra>',
     },
   ];
-
+  console.log(tracesHeatMapVariableNum1);
   const tracesHeatMapVariableNum2 = [
     {
       z: [variableDataSort.map((e) => e.value2)],
@@ -446,7 +452,11 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
         tickmode: 'array',
         tickvals: [0, 20, 40, 60, 80, 100],
       },
-      //xgap: variableDataSort.length < xAxis.length ? 10 : 0.5,
+      xgap:
+        variableDataSort.length < xAxis.length
+          ? Math.ceil(xAxis.length / variableDataSort.length) * 2.5
+          : 0.5,
+      //xgap: 2,
       hovertemplate:
         '<b>Sample: </b> %{x}<br> <b>Value: </b>%{z} <extra></extra>',
     },
