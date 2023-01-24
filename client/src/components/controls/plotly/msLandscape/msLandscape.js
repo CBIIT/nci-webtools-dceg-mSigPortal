@@ -548,9 +548,10 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     y: variableData.map((e) => 1),
     customdata: variableData.map((e) => ({
       name: e.value1,
+      xVal: e.sample,
     })),
     name: 'Variable String',
-    xaxis: 'x',
+    xaxis: variableData.length < xAxis.length ? 'x2' : 'x',
     yaxis: 'y4',
     type: 'bar',
     test: variableData.map((e) => e.value1),
