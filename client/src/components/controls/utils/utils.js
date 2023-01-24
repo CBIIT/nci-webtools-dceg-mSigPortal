@@ -142,3 +142,6 @@ export const colorPallet0 = [
   '#6BD76B',
   '#D58F5C',
 ];
+
+export const mapOrder = (order, key) => (a, b) =>
+  order.indexOf(a[key]) > order.indexOf(b[key]) ? 1 : -1;

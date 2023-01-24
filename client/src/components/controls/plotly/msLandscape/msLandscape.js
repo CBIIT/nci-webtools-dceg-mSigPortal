@@ -2,7 +2,12 @@ import { groupBy } from 'lodash';
 import { First } from 'react-bootstrap/esm/PageItem';
 import { get } from 'react-hook-form';
 import CosineSimilarityPlot from '../../../pages/catalog/referenceSignature/cosineSimilarity/form-plot';
-import { getRandomColor, isNumber, colorPallet0 } from '../../utils/utils';
+import {
+  getRandomColor,
+  isNumber,
+  colorPallet0,
+  mapOrder,
+} from '../../utils/utils';
 
 export default function MsLandscape(cosineData, exposureData, variableData) {
   console.log(cosineData);
@@ -62,7 +67,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
 
     return false;
   });
-  // console.log(names);
+  console.log(names);
   // console.log(contains);
   let colors = {};
 
@@ -245,7 +250,12 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
   const extraMargin =
     longest > 0 && longest < 10 ? -0.157 : (longest * -0.027) / 2;
 
-  // console.log(xAxis);
+  console.log(xAxis);
+
+  const newVariableData = [...variableData];
+  const variableDataSort = newVariableData.sort(mapOrder(xAxis, 'sample'));
+
+  console.log(variableDataSort);
   // console.log(longest);
   // console.log(extraMargin);
   function signatureSort(a, b) {
@@ -254,20 +264,26 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     });
   }
   let colorBarLoc;
-  if (xAxis.length > 250 || arrNames.length > 0) {
-    if (longest > 30) {
-      colorBarLoc = -0.3;
-    } else {
-      colorBarLoc = -0.2;
-    }
+  // if (xAxis.length > 250 || arrNames.length > 0) {
+  //   if (longest > 30) {
+  //     colorBarLoc = -0.3;
+  //   } else {
+  //     colorBarLoc = -0.2;
+  //   }
+  // } else {
+  //   if (longest > 25) {
+  //     colorBarLoc = -0.7;
+  //   } else if (longest > 15) {
+  //     colorBarLoc = -0.4;
+  //   } else {
+  //     colorBarLoc = -0.33;
+  //   }
+  // }
+
+  if (longest > 30) {
+    colorBarLoc = -0.3;
   } else {
-    if (longest > 25) {
-      colorBarLoc = -0.7;
-    } else if (longest > 15) {
-      colorBarLoc = -0.4;
-    } else {
-      colorBarLoc = -0.33;
-    }
+    colorBarLoc = -0.2;
   }
 
   console.log(colorBarLoc);
@@ -434,6 +450,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
             order: 'descending',
           },
         ],
+        legendrank: 1001,
         legendgroup: 'b',
         legendgrouptitle: {
           text: '\t Mutational Signatures:',
@@ -467,7 +484,9 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
             order: 'descending',
           },
         ],
-
+        legendgrouptitle: {
+          text: '\t Mutational Signatures:',
+        },
         showlegend: true,
         hovertemplate:
           '<b>Number of mutation: </b>%{y} <br><b>Sample: </b> %{x}',
@@ -476,10 +495,10 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
 
   const tracesHeatMapVariableNum1 = [
     {
-      z: [variableData.map((e) => e.value1)],
-      x: variableData.map((e) => e.sample),
+      z: [variableDataSort.map((e) => e.value1)],
+      x: variableDataSort.map((e) => e.sample),
       //hoverongaps: false,
-      xaxis: 'x',
+      xaxis: variableDataSort.length < xAxis.length ? 'x2' : 'x',
       yaxis: 'y4',
       type: 'heatmap',
       colorscale: heatmapColorscale2,
@@ -494,7 +513,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
         tickmode: 'array',
         tickvals: [0, 20, 40, 60, 80, 100],
       },
-      xgap: 0.5,
+      xgap: variableDataSort.length < xAxis.length ? 10 : 0.5,
       hovertemplate:
         '<b>Sample: </b> %{x}<br> <b>Value: </b>%{z} <extra></extra>',
     },
@@ -502,10 +521,10 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
 
   const tracesHeatMapVariableNum2 = [
     {
-      z: [variableData.map((e) => e.value2)],
-      x: variableData.map((e) => e.sample),
+      z: [variableDataSort.map((e) => e.value2)],
+      x: variableDataSort.map((e) => e.sample),
       //hoverongaps: false,
-      xaxis: 'x',
+      xaxis: variableDataSort.length < xAxis.length ? 'x2' : 'x',
       yaxis: 'y5',
       type: 'heatmap',
       colorscale: heatmapColorscale2,
@@ -521,7 +540,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
         tickmode: 'array',
         tickvals: [0, 20, 40, 60, 80, 100],
       },
-      xgap: 0.5,
+      xgap: variableDataSort.length < xAxis.length ? 10 : 0.5,
       hovertemplate:
         '<b>Sample: </b> %{x}<br> <b>Value: </b>%{z} <extra></extra>',
     },
@@ -544,35 +563,45 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
   // }));
 
   const tracesBarMapVariableStr1 = {
-    x: variableData.map((e) => e.sample),
-    y: variableData.map((e) => 1),
-    customdata: variableData.map((e) => ({
+    x: variableDataSort.map((e) => e.sample),
+    y: variableDataSort.map((e) => 1),
+    customdata: variableDataSort.map((e) => ({
       name: e.value1,
       xVal: e.sample,
     })),
-    name: 'Variable String',
-    xaxis: variableData.length < xAxis.length ? 'x2' : 'x',
+
+    xaxis: variableDataSort.length < xAxis.length ? 'x2' : 'x',
     yaxis: 'y4',
     type: 'bar',
-    test: variableData.map((e) => e.value1),
-    marker: { color: variableData.map((e) => charColors[e.value1]) },
+    test: variableDataSort.map((e) => e.value1),
+    marker: {
+      color: variableDataSort.map((e) => charColors[e.value1]),
+      //line: { width: 1 },
+    },
     showlegend: false,
-    hovertemplate: '<b>Sample: </b>%{x} <br><b>Value: </b> %{customdata.name}',
+    xgap: 0,
+    hovertemplate:
+      '<b>Sample: </b>%{x} <br><b>Value: </b> %{customdata.name}<extra></extra>',
   };
 
   const tracesBarMapVariableStr2 = {
-    x: variableData.map((e) => e.sample),
-    y: variableData.map((e) => 1),
-    customdata: variableData.map((e) => ({
+    x: variableDataSort.map((e) => e.sample),
+    y: variableDataSort.map((e) => 1),
+    customdata: variableDataSort.map((e) => ({
       name: e.value2,
     })),
-    xaxis: 'x',
+    xaxis: variableDataSort.length < xAxis.length ? 'x2' : 'x',
     yaxis: 'y4',
-    //type: 'bar',
-    test: variableData.map((e) => e.value1),
-    marker: { color: variableData.map((e) => charColors[e.value1]) },
+    type: 'bar',
+    test: variableDataSort.map((e) => e.value1),
+    marker: {
+      color: variableDataSort.map((e) => charColors[e.value1]),
+      //line: { width: 1 },
+    },
     showlegend: false,
-    hovertemplate: '<b>Sample: </b>%{x} <br><b>Value: </b> %{customdata.name}',
+    xgap: 0,
+    hovertemplate:
+      '<b>Sample: </b>%{x} <br><b>Value: </b> %{customdata.name}<extra></extra>',
   };
   const stringLegend = Object.entries(charColors)
     .sort()
@@ -580,8 +609,8 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     .map(([key, val], index) => ({
       key: key,
       val: val,
-      x: variableData.map((e) => xAxis[0]),
-      y: variableData.map((e) => 0),
+      x: variableDataSort.map((e) => xAxis[0]),
+      y: variableDataSort.map((e) => 0),
       xaxis: 'x',
       yaxis: 'y',
       name: key,
@@ -599,11 +628,11 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
   console.log(stringLegend);
   console.log(tracesBarMapVariableStr1);
   let traces = [];
-  if (variableData.length > 0) {
-    if (variableData[0].hasOwnProperty('value2')) {
+  if (variableDataSort.length > 0) {
+    if (variableDataSort[0].hasOwnProperty('value2')) {
       if (
-        !isNumber(variableData[0].value1) &&
-        isNumber(variableData[0].value2)
+        !isNumber(variableDataSort[0].value1) &&
+        isNumber(variableDataSort[0].value2)
       ) {
         //1st is string , 2nd is numeric
         traces = [
@@ -710,15 +739,23 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     },
   };
 
+  // let annotations =
+  //   variableData.length > 0
+  //     ? arrNames.length > 0
+  //       ? mixMatch
+  //         ? [annotationTitle, annotationLegendTitle]
+  //         : [annotationTitle]
+  //       : [text, annotationTitle, annotationLegendTitle]
+  //     : [text, annotationTitle];
+
   let annotations =
     variableData.length > 0
       ? arrNames.length > 0
         ? mixMatch
           ? [annotationTitle, annotationLegendTitle]
           : [annotationTitle]
-        : [text, annotationTitle, annotationLegendTitle]
-      : [text, annotationTitle];
-
+        : [annotationTitle, annotationLegendTitle]
+      : [annotationTitle];
   const layout = {
     title: {
       text: '<b>Landscape of Mutational Signature Activity</b>',
@@ -727,22 +764,20 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
         size: 18,
       },
     },
+    bargap: 0.1,
     autosize: true,
     height: 1200,
     barmode: 'stack',
     hovermode: 'closest',
-    // legend: {
-    //   orientation: 'h',
-    //   //title: { text: 'Signatures Name<br>' },
-    //   traceorder: 'reserved',
-    //   x: 0,
-    //   y: xAxis.length > 250 ? -0.03 : extraMargin,
-    // },
     legend: {
-      orientation: arrNames.length > 0 ? 'v' : 'h',
-      x: arrNames.length > 0 ? 1 : 0,
-      y: arrNames.length > 0 ? 1 : xAxis.length > 250 ? -0.03 : extraMargin,
+      x: 1,
+      y: 0.95,
     },
+    // legend: {
+    //   orientation: arrNames.length > 0 ? 'v' : 'h',
+    //   x: arrNames.length > 0 ? 1 : 0,
+    //   y: arrNames.length > 0 ? 1 : xAxis.length > 250 ? -0.03 : extraMargin,
+    // },
 
     xaxis: {
       tickmode: 'array',
@@ -758,28 +793,43 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
       showline: false,
       zerolinewidth: 0,
     },
-    yaxis: { title: 'Signature contribution', domain: [0, 0.49] },
+    xaxis2: {
+      showticklabels: false,
+      zerolinecolor: 'rgba(0,0,0,0)',
+    },
+    yaxis: {
+      title: 'Signature contribution',
+      domain: [0, 0.49],
+      zeroline: false,
+    },
     yaxis2: {
       title: '',
       domain: [0.475, 0.493],
       showticklabels: false,
       ticks: '',
+      showgrid: true,
+      zeroline: false,
     },
-    yaxis3: { title: 'Number of mutation', domain: [0.5, 0.95] },
+    yaxis3: {
+      title: 'Number of mutation',
+      domain: [0.5, 0.95],
+      zeroline: false,
+    },
     yaxis4: {
       title: '',
       domain: [0.96, 0.978],
       showticklabels: false,
       ticks: '',
+      zeroline: false,
     },
     yaxis5: {
       title: '',
       domain: [0.978, 0.996],
       showticklabels: false,
       ticks: '',
+      zeroline: false,
     },
 
-    bargap: 0.04,
     annotations: annotations,
   };
 
