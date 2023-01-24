@@ -6,6 +6,7 @@ import {
   getRandomColor,
   isNumber,
   colorPallet0,
+  colorPallet,
   mapOrder,
 } from '../../utils/utils';
 
@@ -16,7 +17,6 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
 
   let charColors = {};
   let arrNames = [];
-  let arrColors = [];
   let mixMatch = false;
   if (variableData.length > 0) {
     let stringData;
@@ -27,13 +27,11 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
       var bg_colors = stringData.map(
         (e, i) => colorPallet0[i % colorPallet0.length]
       );
-      console.log(stringData);
-      console.log(bg_colors);
+
       stringData.forEach((element, index) => {
         charColors[element] = bg_colors[index];
       });
       arrNames = stringData;
-      arrColors = bg_colors;
       if (
         variableData[0].hasOwnProperty('value2') &&
         isNumber(variableData[0].value2)
@@ -45,19 +43,6 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     }
   }
 
-  console.log(arrNames);
-  console.log(arrColors);
-  console.log(mixMatch);
-
-  // const charColors = {
-  //   A: '#4DBBD5',
-  //   B: '#3C5488',
-  //   C: '#E64B35',
-  //   D: '#F39B7F',
-  //   E: '#00A087',
-  //   F: '#EBC6C4',
-  // };
-
   const defaultNames = ['SBS', 'DBS', 'ID'];
   const names = exposureData.map((group) => group.signatureName);
   const contains = defaultNames.some((element) => {
@@ -67,7 +52,6 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
 
     return false;
   });
-  console.log(names);
   // console.log(contains);
   let colors = {};
 
@@ -83,81 +67,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
       colors[element] = randomColors[index];
     });
   } else {
-    colors = {
-      1: '#4a9855',
-      2: '#e2a8ab',
-      3: '#40004b',
-      4: '#5aa1ca',
-      5: '#305d39',
-      6: '#785940',
-      '7a': '#6e70b7',
-      '7b': '#ff7f00',
-      '7c': '#fec44f',
-      '7d': '#846a2a',
-      8: '#cab2d6',
-      9: '#f4a582',
-      '10a': '#8dd3c7',
-      '10b': '#5e4fa2',
-      '10c': '#761429',
-      11: '#9e0142',
-      12: '#ffed6f',
-      13: '#e41a1c',
-      14: '#ffffbf',
-      15: '#4d4d4d',
-      16: '#513276',
-      17: '#ef4c7d',
-      '17a': '#df4c7d',
-      '17b': '#08519c',
-      18: '#b3de69',
-      19: '#dfc27d',
-      20: '#b2182b',
-      21: '#9ecae1',
-      22: '#01665e',
-      23: '#d53e4f',
-      24: '#1c9099',
-      25: '#35978f',
-      26: '#ec7014',
-      27: '#f46d43',
-      28: '#de77ae',
-      29: '#fdae61',
-      30: '#d9d9d9',
-      31: '#f781bf',
-      32: '#dd1c77',
-      33: '#b25d7e',
-      34: '#fee08b',
-      35: '#fc8d59',
-      36: 'yellow',
-      37: '#e6f598',
-      38: '#abdda4',
-      39: '#636363',
-      40: '#b15928',
-      41: '#fccde5',
-      42: '#ae017e',
-      43: '#66c2a5',
-      44: '#8c6bb1',
-      45: '#3288bd',
-      46: '#e6f598',
-      47: '#bababa',
-      48: '#5e4fa2',
-      49: '#40004b',
-      50: '#762a83',
-      51: '#9970ab',
-      52: '#c2a5cf',
-      53: '#e7d4e8',
-      54: '#fcc5c0',
-      55: '#d9f0d3',
-      56: '#8c510a',
-      57: '#a6dba0',
-      58: '#5aae61',
-      59: '#1b7837',
-      60: '#00441b',
-      84: '#063C3C',
-      85: '#AA9139',
-      88: '#BB9139',
-      92: '#0E1844',
-      110: '#5E1855',
-      '-others': '#cececa',
-    };
+    colors = colorPallet;
   }
 
   const heatmapColorscale = [
@@ -250,12 +160,9 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
   const extraMargin =
     longest > 0 && longest < 10 ? -0.157 : (longest * -0.027) / 2;
 
-  console.log(xAxis);
-
   const newVariableData = [...variableData];
   const variableDataSort = newVariableData.sort(mapOrder(xAxis, 'sample'));
 
-  console.log(variableDataSort);
   // console.log(longest);
   // console.log(extraMargin);
   function signatureSort(a, b) {
@@ -279,14 +186,14 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
   //     colorBarLoc = -0.33;
   //   }
   // }
-
-  if (longest > 30) {
+  if (longest > 200) {
+    colorBarLoc = -0.2;
+  } else if (longest > 30) {
     colorBarLoc = -0.3;
   } else {
     colorBarLoc = -0.2;
   }
 
-  console.log(colorBarLoc);
   const groupBySignatureName = groupBy(exposureData, 'signatureName');
 
   const stackedBarTraces = Object.values(groupBySignatureName)
@@ -426,7 +333,6 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
         '<b>Sample: </b> %{x}<br> <b>Similarity: </b>%{z} <extra></extra>',
     },
   ];
-  console.log(tracesHeatMap);
   let tracesStackedBar;
   if (arrNames.length > 0) {
     tracesStackedBar = Object.entries(groupBySignatureName_exposure2)
@@ -513,7 +419,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
         tickmode: 'array',
         tickvals: [0, 20, 40, 60, 80, 100],
       },
-      xgap: variableDataSort.length < xAxis.length ? 10 : 0.5,
+      //xgap: variableDataSort.length < xAxis.length ? 10 : 0.5,
       hovertemplate:
         '<b>Sample: </b> %{x}<br> <b>Value: </b>%{z} <extra></extra>',
     },
@@ -540,7 +446,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
         tickmode: 'array',
         tickvals: [0, 20, 40, 60, 80, 100],
       },
-      xgap: variableDataSort.length < xAxis.length ? 10 : 0.5,
+      //xgap: variableDataSort.length < xAxis.length ? 10 : 0.5,
       hovertemplate:
         '<b>Sample: </b> %{x}<br> <b>Value: </b>%{z} <extra></extra>',
     },
@@ -579,7 +485,6 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
       //line: { width: 1 },
     },
     showlegend: false,
-    xgap: 0,
     hovertemplate:
       '<b>Sample: </b>%{x} <br><b>Value: </b> %{customdata.name}<extra></extra>',
   };
@@ -599,7 +504,6 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
       //line: { width: 1 },
     },
     showlegend: false,
-    xgap: 0,
     hovertemplate:
       '<b>Sample: </b>%{x} <br><b>Value: </b> %{customdata.name}<extra></extra>',
   };
@@ -625,8 +529,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
         text: '\t Variable Data String:',
       },
     }));
-  console.log(stringLegend);
-  console.log(tracesBarMapVariableStr1);
+
   let traces = [];
   if (variableDataSort.length > 0) {
     if (variableDataSort[0].hasOwnProperty('value2')) {
