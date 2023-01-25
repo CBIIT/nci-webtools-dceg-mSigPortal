@@ -12,6 +12,7 @@ node_modules
 *-audit.json
 .DS_Store
 .eslintcache
+*.env
 
 mSigPortal_Profiler_Extraction.py
 mSigPortal-SigProfilerExtractor.py

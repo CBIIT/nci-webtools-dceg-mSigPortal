@@ -176,6 +176,59 @@ async function msLandscape(req, res, next) {
   }
 }
 
+async function msDecomposition(req, res, next) {
+  try {
+    const { study, strategy, signatureSetName, cancer, userId } = req.query;
+
+    const connection = req.app.locals.connection;
+    const columns = '*';
+    const limit = false;
+
+    const exposureData = await getExposureData(
+      connection,
+      { study, strategy, signatureSetName, cancer },
+      columns,
+      limit
+    );
+    const signatureData = await getSignatureData(
+      connection,
+      { signatureSetName },
+      columns,
+      limit
+    );
+    const seqmatrixData = await getSeqmatrixData(
+      connection,
+      { study, strategy, cancer },
+      columns,
+      limit
+    );
+
+    const fn = 'msDecomposition';
+    const args = { exposureData, signatureData, seqmatrixData };
+    const projectID = userId || randomUUID();
+
+    const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
+      fn,
+      args,
+      config: {
+        ...rConfig,
+        projectID,
+      },
+    });
+
+    const { stdout, ...rest } = JSON.parse(wrapper);
+
+    res.json({
+      projectID,
+      stdout,
+      ...rest,
+    });
+  } catch (err) {
+    logger.error(`/msDecomposition: An error occured `);
+    next(err);
+  }
+}
+
 // query signature data and calculate cosine similarity
 async function cosineSimilarity(req, res, next) {
   try {
@@ -224,6 +277,7 @@ router.get('/signature_activity_options', explorationOptions);
 router.get('/explorationSamples', explorationSamples);
 router.post('/explorationWrapper', explorationWrapper);
 router.get('/signature_landscape', msLandscape);
+router.get('/signature_decomposition', msDecomposition);
 router.get('/signature_cosine_similarity', cosineSimilarity);
 
 module.exports = { router, queryExposure };

@@ -7,47 +7,44 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 import './plot.scss';
 export default function MutProfilePlot() {
   const publicForm = useSelector((state) => state.exposure.publicForm);
-  //const [params, setParams] = useState('');
+  const [params, setParams] = useState('');
   // const { data, error, isFetching } = useMsDecompositionQuery(params, {
   //   skip: !params,
   // });
-  const [calculationQuery, setCalculationQuery] = useState('');
-  const { data, error, isFetching } = useMsDecompositionQuery(
-    calculationQuery,
-    {
-      skip: !calculationQuery,
-    }
-  );
+  // const [calculationQuery, setCalculationQuery] = useState('');
+  const { data, error, isFetching } = useMsDecompositionQuery(params, {
+    skip: !params,
+  });
 
   console.log(data);
   useEffect(() => {
     const { study, strategy, signatureSetName, cancer } = publicForm;
     if (study) {
-      // setParams({
+      setParams({
+        study: study.value,
+        strategy: strategy.value,
+        signatureSetName: signatureSetName.value,
+        cancer: cancer.value,
+      });
+      // const params_activity = {
       //   study: study.value,
       //   strategy: strategy.value,
       //   signatureSetName: signatureSetName.value,
       //   cancer: cancer.value,
+      // };
+      // const params_spectrum = {
+      //   study: study.value,
+      //   strategy: strategy.value,
+      //   cancer: cancer.value,
+      // };
+      // const params_signature = {
+      //   signatureSetName: signatureSetName.value,
+      // };
+      // setCalculationQuery({
+      //   params_activity,
+      //   params_signature,
+      //   params_spectrum,
       // });
-      const params_activity = {
-        study: study.value,
-        strategy: strategy.value,
-        signatureSetName: signatureSetName.value,
-        cancer: cancer.value,
-      };
-      const params_spectrum = {
-        study: study.value,
-        strategy: strategy.value,
-        cancer: cancer.value,
-      };
-      const params_signature = {
-        signatureSetName: signatureSetName.value,
-      };
-      setCalculationQuery({
-        params_activity,
-        params_signature,
-        params_spectrum,
-      });
     }
   }, [publicForm]);
 
