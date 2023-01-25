@@ -7,7 +7,7 @@ export const msPrevalenceApiSlice = explorationApiSlice.injectEndpoints({
       // query: ({ mutation, ...params }) => ({
       query: ({ minimum, ...params }) => ({
         url: 'signature_activity',
-        params: { ...params, limit: '*ALL' },
+        params: { ...params, limit: 1000000 },
       }),
       transformResponse: (data, meta, arg) => {
         const { minimum } = arg;

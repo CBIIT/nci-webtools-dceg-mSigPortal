@@ -7,7 +7,7 @@ export const msBurdenApiSlice = explorationApiSlice.injectEndpoints({
     msBurden: builder.query({
       query: (params) => ({
         url: 'signature_activity',
-        params: { ...params, limit: '*ALL' },
+        params: { ...params, limit: 1000000 },
       }),
       transformResponse: (data, meta, arg) => {
         const { signatureName } = arg;
