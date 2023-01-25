@@ -37,12 +37,14 @@ export default function MsDecomposition(data, arg) {
   console.log(resultSortedCosine);
 
   var trace1 = {
+    name: 'Cosine Similarity',
     y: resultSortedCosine.map((e, i) => i),
     x: resultSortedCosine.map((e) => e['Cosine_similarity']),
     fillcolor: '#2B9089',
     line: { color: '#182B2A' },
     fill: 'tozeroy',
     type: 'scatter',
+    hovertemplate: '<b>Cosine Similarity:</b> %{x}</b> <extra></extra>',
   };
 
   console.log(trace1);
@@ -51,6 +53,7 @@ export default function MsDecomposition(data, arg) {
   );
   console.log(resultSortedL1);
   var trace2 = {
+    name: '00-L1_Norm_%',
     y: resultSortedL1.map((e, i) => i),
     x: resultSortedL1.map((e) => e['100-L1_Norm_%']),
     fill: 'tozeroy',
@@ -60,6 +63,7 @@ export default function MsDecomposition(data, arg) {
     mode: 'lines',
     xaxis: 'x2',
     yaxis: 'y2',
+    hovertemplate: '<b>100-L1_Norm_%:</b> %{x}</b> <extra></extra>',
   };
   console.log(trace2);
 
@@ -68,6 +72,7 @@ export default function MsDecomposition(data, arg) {
   );
   console.log(resultSortedL2);
   var trace3 = {
+    name: '100-L2_Norm_%',
     y: resultSortedL2.map((e, i) => i),
     x: resultSortedL2.map((e) => e['100-L2_Norm_%']),
     fill: 'tozeroy',
@@ -77,6 +82,7 @@ export default function MsDecomposition(data, arg) {
     line: { color: '#182B2A' },
     xaxis: 'x3',
     yaxis: 'y3',
+    hovertemplate: '<b>100-L2_Norm_%: </b>%{x}</b> <extra></extra>',
   };
 
   const resultSortedKL = result.sort((a, b) =>
@@ -84,6 +90,7 @@ export default function MsDecomposition(data, arg) {
   );
   console.log(resultSortedKL);
   var trace4 = {
+    name: 'KL_Divergence',
     y: resultSortedKL.map((e, i) => i),
     x: resultSortedKL.map((e) => e['KL_Divergence']),
     fill: 'tonexty',
@@ -93,12 +100,14 @@ export default function MsDecomposition(data, arg) {
     line: { color: '#182B2A' },
     xaxis: 'x4',
     yaxis: 'y4',
+    hovertemplate: '<b>KL_Divergence:</b> %{x}</b> <extra></extra>',
   };
   const resultSortedCorrelation = result.sort((a, b) =>
     a['Correlation'] > b['Correlation'] ? 1 : -1
   );
   console.log(resultSortedKL);
   var trace5 = {
+    name: 'Correlation',
     y: resultSortedCorrelation.map((e, i) => i),
     x: resultSortedCorrelation.map((e) => e['Correlation']),
     fill: 'tonexty',
@@ -108,6 +117,7 @@ export default function MsDecomposition(data, arg) {
     line: { color: '#182B2A' },
     xaxis: 'x5',
     yaxis: 'y5',
+    hovertemplate: '<b>Correlation:</b> %{x}</b> <extra></extra>',
   };
 
   const annotations = [
