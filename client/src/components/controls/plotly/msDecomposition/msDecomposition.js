@@ -6,9 +6,9 @@ export default function MsDecomposition(data, arg) {
 
   const result = Object.values(data)[0];
   console.log(result);
-  const groupByCancer = groupBy(result, 'Cancer_Type');
+
+  const groupByCancer = groupBy(result, 'cancer');
   console.log(groupByCancer);
-  console.log(groupByCancer.length);
 
   function dotp(x, y) {
     function dotp_sum(a, b) {
@@ -31,51 +31,81 @@ export default function MsDecomposition(data, arg) {
     signature,
     signature_activities
   ) {}
+  const resultSortedCosine = result.sort((a, b) =>
+    a['Cosine_similarity'] > b['Cosine_similarity'] ? 1 : -1
+  );
+  console.log(resultSortedCosine);
 
   var trace1 = {
-    y: Object.values(groupByCancer).map((e) => e[0].Cancer_Type),
-    x: Object.values(groupByCancer).map((e) => e[0].Cosine_similarity),
+    y: resultSortedCosine.map((e, i) => i),
+    x: resultSortedCosine.map((e) => e['Cosine_similarity']),
+    fillcolor: '#2B9089',
+    line: { color: '#182B2A' },
     fill: 'tozeroy',
     type: 'scatter',
   };
 
   console.log(trace1);
-
+  const resultSortedL1 = result.sort((a, b) =>
+    a['100-L1_Norm_%'] > b['100-L1_Norm_%'] ? 1 : -1
+  );
+  console.log(resultSortedL1);
   var trace2 = {
-    y: Object.values(groupByCancer).map((e) => e[0].Cancer_Type),
-    x: Object.values(groupByCancer).map((e) => e[0].Cosine_similarity),
-    fill: 'tonexty',
+    y: resultSortedL1.map((e, i) => i),
+    x: resultSortedL1.map((e) => e['100-L1_Norm_%']),
+    fill: 'tozeroy',
     type: 'scatter',
+    fillcolor: '#2B9089',
+    line: { color: '#182B2A' },
+    mode: 'lines',
     xaxis: 'x2',
     yaxis: 'y2',
   };
   console.log(trace2);
+
+  const resultSortedL2 = result.sort((a, b) =>
+    a['100-L2_Norm_%'] > b['100-L2_Norm_%'] ? 1 : -1
+  );
+  console.log(resultSortedL2);
   var trace3 = {
-    x: [1, 2, 3, 4],
-    y: [0, 2, 3, 5],
+    y: resultSortedL2.map((e, i) => i),
+    x: resultSortedL2.map((e) => e['100-L2_Norm_%']),
     fill: 'tozeroy',
     type: 'scatter',
-    mode: 'none',
+    mode: 'lines',
+    fillcolor: '#2B9089',
+    line: { color: '#182B2A' },
     xaxis: 'x3',
     yaxis: 'y3',
   };
 
+  const resultSortedKL = result.sort((a, b) =>
+    a['KL_Divergence'] < b['KL_Divergence'] ? 1 : -1
+  );
+  console.log(resultSortedKL);
   var trace4 = {
-    x: [1, 2, 3, 4],
-    y: [3, 5, 1, 7],
+    y: resultSortedKL.map((e, i) => i),
+    x: resultSortedKL.map((e) => e['KL_Divergence']),
     fill: 'tonexty',
     type: 'scatter',
-    mode: 'none',
+    mode: 'lines',
+    fillcolor: '#2B9089',
+    line: { color: '#182B2A' },
     xaxis: 'x4',
     yaxis: 'y4',
   };
-
+  const resultSortedCorrelation = result.sort((a, b) =>
+    a['Correlation'] > b['Correlation'] ? 1 : -1
+  );
+  console.log(resultSortedKL);
   var trace5 = {
-    x: [1, 2, 3, 4],
-    y: [3, 5, 1, 7],
+    y: resultSortedCorrelation.map((e, i) => i),
+    x: resultSortedCorrelation.map((e) => e['Correlation']),
     fill: 'tonexty',
     type: 'scatter',
-    mode: 'none',
+    mode: 'lines',
+    fillcolor: '#2B9089',
+    line: { color: '#182B2A' },
     xaxis: 'x5',
     yaxis: 'y5',
   };
