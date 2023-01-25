@@ -43,12 +43,13 @@ export default function MsDecomposition(data, arg) {
 
   var trace2 = {
     y: Object.values(groupByCancer).map((e) => e[0].Cancer_Type),
-    x: Object.values(groupByCancer).map((e) => `e[0].100-L1_Norm_%`),
+    x: Object.values(groupByCancer).map((e) => e[0].Cosine_similarity),
     fill: 'tonexty',
     type: 'scatter',
     xaxis: 'x2',
     yaxis: 'y2',
   };
+  console.log(trace2);
   var trace3 = {
     x: [1, 2, 3, 4],
     y: [0, 2, 3, 5],
