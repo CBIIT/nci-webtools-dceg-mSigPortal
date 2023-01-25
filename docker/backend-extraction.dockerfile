@@ -25,15 +25,15 @@ RUN dnf -y update \
     gcc \
     && dnf clean all
 
-RUN mkdir -p /deploy/server /deploy/logs
+RUN mkdir -p /deploy/app /deploy/logs
 
 # install SigProfilerExtractor from local zip
-COPY packages/SigProfilerExtractor/ /deploy/server/SigProfilerExtractor
-WORKDIR /deploy/server
-RUN pip3 install -e SigProfilerExtractor/SigProfilerExtractor PyPDF2==2.11.2
+COPY packages/SigProfilerExtractor/ /deploy/app/SigProfilerExtractor
+WORKDIR /deploy/app
+RUN pip3 install -e SigProfilerExtractor/SigProfilerExtractor 
 
 # install other python packages
-RUN pip3 install SigProfilerAssignment==0.0.14 sigProfilerPlotting==1.2.2
+RUN pip3 install SigProfilerAssignment==0.0.14 sigProfilerPlotting==1.2.2 PyPDF2==2.11.2
 RUN pip3 install -e 'git+https://github.com/AlexandrovLab/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
 
 
@@ -58,11 +58,12 @@ RUN pip3 install -e 'git+https://github.com/AlexandrovLab/SigProfilerMatrixGener
 
 
 # use build cache for npm packages
-COPY server/package*.json /deploy/server/
+COPY extraction-service/package*.json /deploy/app
 RUN npm install
 
 # copy the rest of the application
-COPY server .
+COPY extraction-service /deploy/app
+COPY server /deploy
 
 CMD npm run start-extraction-worker
 
