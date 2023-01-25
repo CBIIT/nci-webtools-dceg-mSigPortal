@@ -3,8 +3,12 @@ import { groupBy } from 'lodash';
 export default function MsDecomposition(data, arg) {
   console.log(data);
   console.log(arg);
-  const groupByCancer = groupBy(data, 'cancer');
+
+  const result = Object.values(data)[0];
+  console.log(result);
+  const groupByCancer = groupBy(result, 'Cancer_Type');
   console.log(groupByCancer);
+  console.log(groupByCancer.length);
 
   function dotp(x, y) {
     function dotp_sum(a, b) {
@@ -29,15 +33,17 @@ export default function MsDecomposition(data, arg) {
   ) {}
 
   var trace1 = {
-    x: [1, 2, 3, 4],
-    y: [0, 2, 3, 5],
+    y: Object.values(groupByCancer).map((e) => e[0].Cancer_Type),
+    x: Object.values(groupByCancer).map((e) => e[0].Cosine_similarity),
     fill: 'tozeroy',
     type: 'scatter',
   };
 
+  console.log(trace1);
+
   var trace2 = {
-    x: [1, 2, 3, 4],
-    y: [3, 5, 1, 7],
+    y: Object.values(groupByCancer).map((e) => e[0].Cancer_Type),
+    x: Object.values(groupByCancer).map((e) => `e[0].100-L1_Norm_%`),
     fill: 'tonexty',
     type: 'scatter',
     xaxis: 'x2',

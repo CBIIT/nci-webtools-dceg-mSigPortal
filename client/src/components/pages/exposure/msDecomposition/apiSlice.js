@@ -1,6 +1,7 @@
 import { explorationApiSlice } from '../../../../services/store/rootApi';
 import MsDecomposition from '../../../controls/plotly/msDecomposition/msDecomposition';
 import { groupBy } from 'lodash';
+import { CallTracker } from 'assert';
 
 export const msDecompositionApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -86,9 +87,9 @@ export const msDecompositionApiSlice = explorationApiSlice.injectEndpoints({
         params,
       }),
       transformResponse: (data, meta, arg) => {
-        //return false;
         console.log(data);
-        return { data: MsDecomposition(data, arg) };
+        //return false;
+        return MsDecomposition(data.output, arg);
       },
     }),
   }),
