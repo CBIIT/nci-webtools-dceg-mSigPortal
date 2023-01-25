@@ -898,11 +898,36 @@ msDecomposition <- function(args, config) {
     arrange(MutationType) ## have to sort the mutationtype
 
   decompsite_input <- calculate_similarities(orignal_genomes = seqmatrixData, signature = signatureData, signature_activaties = exposureData)
-  before <- calculate_similarities(orignal_genomes = seqmatrixData, signature = signatureData, signature_activaties = exposureData)
+  decompsite <- decompsite_input %>% separate(col = Sample_Names, into = c("Cancer_Type", "Sample"), sep = "@")
 
-  decompsite_input <- decompsite_input %>% separate(col = Sample_Names, into = c("cancer", "sample"), sep = "@")
+  fealist <- c("Cancer_Type", "Sample", "Cosine_similarity", "100-L1_Norm_%", "100-L2_Norm_%", "KL_Divergence", "Correlation")
+  decompsite2 <- decompsite %>%
+    select(one_of(fealist)) %>%
+    pivot_longer(cols = -c(Cancer_Type, Sample))
+  mtmp <- decompsite %>%
+    group_by(Cancer_Type) %>%
+    summarise(m = median(Cosine_similarity, na.rm = TRUE))
+  mtmp2 <- decompsite2 %>%
+    group_by(Cancer_Type, name) %>%
+    summarise(m = median(value, na.rm = TRUE)) %>%
+    ungroup() %>%
+    mutate(m = if_else(name == "KL_Divergence", 1 - m, m)) %>%
+    group_by(name) %>%
+    arrange(desc(m)) %>%
+    mutate(Seq = seq_along(Cancer_Type)) %>%
+    ungroup()
+  ntmp <- decompsite %>%
+    count(Cancer_Type) %>%
+    mutate(Caner_type2 = paste0(Cancer_Type, " (", n, ")")) %>%
+    left_join(mtmp) %>%
+    arrange(m)
 
-  return(list(data = decompsite_input))
+  data <- decompsite2 %>%
+    left_join(mtmp2) %>%
+    left_join(ntmp) %>%
+    select(cancer = Cancer_Type, sample = Sample, name, value, m, n, Seq)
+
+  return(list(data = data))
 }
 
 cosineSimilarity <- function(args, config) {
