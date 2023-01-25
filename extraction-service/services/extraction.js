@@ -1,46 +1,15 @@
-const { Router } = require('express');
-const { randomUUID } = require('crypto');
-const { validate } = require('uuid');
-const formidable = require('formidable');
-const fs = require('fs-extra');
-const path = require('path');
-const { unparse } = require('papaparse');
-const AWS = require('aws-sdk');
-const tar = require('tar');
-const { groupBy } = require('lodash');
-const logger = require('../logger');
-const config = require('../../config.json');
-const { getSignatureData } = require('../query');
+import fs from 'fs-extra';
+import path from 'path';
+import { unparse } from 'papaparse';
+// const tar = require('tar');
+import { groupBy } from 'lodash';
+import { getSignatureData } from '../../server/services/query';
 
-function upload(req, res, next) {
-  const id = randomUUID();
-  const form = formidable({
-    uploadDir: path.join(config.results.folder, id),
-    multiples: true,
-  });
-
-  // create upload directory
-  fs.mkdirSync(form.uploadDir);
-
-  form
-    .on('fileBegin', (field, file) => {
-      uploadPath = path.join(form.uploadDir, file.name);
-      file.path = uploadPath;
-    })
-    .on('error', (error) => {
-      logger.error('error at /upload');
-      next(error);
-    })
-    .on('end', () => {
-      res.json({ id });
-    });
-
-  form.parse(req);
-}
-
-async function submit(req, res, next) {
+export async function extraction(params, app, logger2, env = process.env) {
+  const id = params.id;
+  const logger = app.locals.logger;
   try {
-    const { args, signatureQuery, id, email } = req.body;
+    const { args, signatureQuery, id, email } = params;
     if (!validate(id)) throw Error('Invalid ID');
 
     const workPath = path.resolve(config.results.folder, id);
@@ -94,17 +63,9 @@ async function submit(req, res, next) {
       { all: true, shell: true }
     );
     logger.debug(all);
-    res.json({ id });
+    return { id };
   } catch (error) {
     logger.debug(error);
     logger.error('error at /submit');
-    next(error);
   }
 }
-const router = Router();
-
-router.get('/ping', (req, res) => res.send(true));
-router.post('/upload', upload);
-router.post('/submit', submit);
-
-module.exports = router;
