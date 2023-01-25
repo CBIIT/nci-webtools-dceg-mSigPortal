@@ -8,7 +8,7 @@ export const tmbApiSlice = explorationApiSlice.injectEndpoints({
     tmbPlot: builder.query({
       query: (params) => ({
         url: 'signature_activity',
-        params: { ...params, limit: 1000000 },
+        params: { ...params, limit: '*ALL' },
       }),
       transformResponse: (data, meta, arg) => {
         // calculate median burden across cancer types
