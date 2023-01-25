@@ -49,35 +49,45 @@ export const msDecompositionApiSlice = explorationApiSlice.injectEndpoints({
     //   },
     // }),
 
-    msDecomposition: builder.query({
-      async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
-        try {
-          console.log(_arg);
-          console.log(
-            '/signature_activity?' + new URLSearchParams(_arg.params_activity)
-          );
-          console.log(
-            '/mutational_spectrum' + new URLSearchParams(_arg.params_spectrum)
-          );
-          const res = await Promise.all([
-            fetchWithBQ(
-              '/signature_activity?' +
-                new URLSearchParams(_arg.params_activity)
-            ), //exposure
-            fetchWithBQ(
-              '/mutational_signature?' +
-                new URLSearchParams(_arg.params_signature)
-            ), //signature
-            fetchWithBQ(
-              '/mutational_spectrum?' +
-                new URLSearchParams(_arg.params_spectrum)
-            ), //seqmatrix
-          ]);
+    // msDecomposition: builder.query({
+    //   async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
+    //     try {
+    //       console.log(_arg);
+    //       console.log(
+    //         '/signature_activity?' + new URLSearchParams(_arg.params_activity)
+    //       );
+    //       console.log(
+    //         '/mutational_spectrum' + new URLSearchParams(_arg.params_spectrum)
+    //       );
+    //       const res = await Promise.all([
+    //         fetchWithBQ(
+    //           '/signature_activity?' +
+    //             new URLSearchParams(_arg.params_activity)
+    //         ), //exposure
+    //         fetchWithBQ(
+    //           '/mutational_signature?' +
+    //             new URLSearchParams(_arg.params_signature)
+    //         ), //signature
+    //         fetchWithBQ(
+    //           '/mutational_spectrum?' +
+    //             new URLSearchParams(_arg.params_spectrum)
+    //         ), //seqmatrix
+    //       ]);
 
-          console.log(res);
-        } catch (error) {
-          return { error };
-        }
+    //       console.log(res);
+    //     } catch (error) {
+    //       return { error };
+    //     }
+    //   },
+    // }),
+    msDecomposition: builder.query({
+      query: (params) => ({
+        url: 'signature_decomposition',
+        params,
+      }),
+      transformResponse: (data, meta, arg) => {
+        return false;
+        // return MsDecomposition(data, arg);
       },
     }),
   }),

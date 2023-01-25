@@ -877,6 +877,30 @@ msLandscape <- function(args, config) {
   return(list(cosineData = cosineData, exposureData = exposureData))
 }
 
+msDecomposition <- function(args, config) {
+  source("services/R/Sigvisualfunc.R")
+
+  exposureData <- args$exposureData %>%
+    select(Sample = sample, Signature_name = signatureName, Exposure = exposure) %>%
+    pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure)
+
+  signatureData <- args$signatureData %>%
+    select(MutationType = mutationType, Signature_name = signatureName, Contribution = contribution) %>%
+    pivot_wider(id_cols = MutationType, names_from = Signature_name, values_from = Contribution) %>%
+    arrange(MutationType) # have to sort the mutationtype
+
+  seqmatrixData <- args$seqmatrixData %>%
+    filter(profile == args$signatureData$profile[1], matrix == args$signatureData$matrix[1]) %>%
+    select(MutationType = mutationType, Sample = sample, Mutations = mutations) %>%
+    pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
+    arrange(MutationType) ## have to sort the mutationtype
+
+  decompsite_input <- calculate_similarities(orignal_genomes = seqmatrixData, signature = signatureData, signature_activaties = exposureData)
+  decompsite_input <- decompsite_input %>% separate(col = Sample_Names, into = c("Cancer_Type", "Sample"), sep = "@")
+
+  return(list(data = decompsite_input))
+}
+
 cosineSimilarity <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
 
