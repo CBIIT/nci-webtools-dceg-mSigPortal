@@ -9,28 +9,14 @@ export default function MsDecomposition(data, arg) {
 
   const groupByCancer = groupBy(result, 'cancer');
   console.log(groupByCancer);
-
-  function dotp(x, y) {
-    function dotp_sum(a, b) {
-      return a + b;
-    }
-    function dotp_times(a, i) {
-      return x[i] * y[i];
-    }
-    return x.map(dotp_times).reduce(dotp_sum, 0);
-  }
-
-  function cosineSimilarity(A, B) {
-    var similarity =
-      dotp(A, B) / (Math.sqrt(dotp(A, A)) * Math.sqrt(dotp(B, B)));
-    return similarity;
-  }
-
-  function calculate_simularities(
-    original_genomes,
-    signature,
-    signature_activities
-  ) {}
+  console.log(Object.values(groupByCancer));
+  const cancerName =
+    Object.keys(groupByCancer) +
+    ' (' +
+    Object.values(groupByCancer)[0].length +
+    ')';
+  console.log(cancerName);
+  console.log(cancerName.length);
   const resultSortedCosine = result.sort((a, b) =>
     a['Cosine_similarity'] > b['Cosine_similarity'] ? 1 : -1
   );
@@ -41,9 +27,10 @@ export default function MsDecomposition(data, arg) {
     y: resultSortedCosine.map((e, i) => i),
     x: resultSortedCosine.map((e) => e['Cosine_similarity']),
     fillcolor: '#2B9089',
-    line: { color: '#182B2A' },
+    line: { color: '#182B2A', shape: 'spline', smoothing: 1.3 },
     fill: 'tozeroy',
     type: 'scatter',
+    mode: 'lines',
     hovertemplate: '<b>Cosine Similarity:</b> %{x}</b> <extra></extra>',
   };
 
@@ -58,11 +45,11 @@ export default function MsDecomposition(data, arg) {
     x: resultSortedL1.map((e) => e['100-L1_Norm_%']),
     fill: 'tozeroy',
     type: 'scatter',
-    fillcolor: '#2B9089',
-    line: { color: '#182B2A' },
+    line: { color: '#182B2A', shape: 'spline', smoothing: 1.3 },
     mode: 'lines',
+    fillcolor: '#2B9089',
     xaxis: 'x2',
-    yaxis: 'y2',
+    yaxis: 'y',
     hovertemplate: '<b>100-L1_Norm_%:</b> %{x}</b> <extra></extra>',
   };
   console.log(trace2);
@@ -77,11 +64,11 @@ export default function MsDecomposition(data, arg) {
     x: resultSortedL2.map((e) => e['100-L2_Norm_%']),
     fill: 'tozeroy',
     type: 'scatter',
+    line: { color: '#182B2A', shape: 'spline', smoothing: 1.3 },
     mode: 'lines',
     fillcolor: '#2B9089',
-    line: { color: '#182B2A' },
     xaxis: 'x3',
-    yaxis: 'y3',
+    yaxis: 'y',
     hovertemplate: '<b>100-L2_Norm_%: </b>%{x}</b> <extra></extra>',
   };
 
@@ -93,13 +80,13 @@ export default function MsDecomposition(data, arg) {
     name: 'KL_Divergence',
     y: resultSortedKL.map((e, i) => i),
     x: resultSortedKL.map((e) => e['KL_Divergence']),
-    fill: 'tonexty',
+    fill: 'tozeroy',
     type: 'scatter',
+    line: { color: '#182B2A', shape: 'spline', smoothing: 1.3 },
     mode: 'lines',
     fillcolor: '#2B9089',
-    line: { color: '#182B2A' },
     xaxis: 'x4',
-    yaxis: 'y4',
+    yaxis: 'y',
     hovertemplate: '<b>KL_Divergence:</b> %{x}</b> <extra></extra>',
   };
   const resultSortedCorrelation = result.sort((a, b) =>
@@ -110,13 +97,13 @@ export default function MsDecomposition(data, arg) {
     name: 'Correlation',
     y: resultSortedCorrelation.map((e, i) => i),
     x: resultSortedCorrelation.map((e) => e['Correlation']),
-    fill: 'tonexty',
+    fill: 'tozeroy',
     type: 'scatter',
+    line: { color: '#182B2A', shape: 'spline', smoothing: 1.3 },
     mode: 'lines',
     fillcolor: '#2B9089',
-    line: { color: '#182B2A' },
     xaxis: 'x5',
-    yaxis: 'y5',
+    yaxis: 'y',
     hovertemplate: '<b>Correlation:</b> %{x}</b> <extra></extra>',
   };
 
@@ -176,6 +163,18 @@ export default function MsDecomposition(data, arg) {
       align: 'center',
       showarrow: false,
     },
+
+    {
+      xref: 'paper',
+      yref: 'paper',
+      xanchor: 'right',
+      x: -0.03,
+      y: -0.1,
+      yanchor: 'right',
+      text: cancerName,
+      align: 'center',
+      showarrow: false,
+    },
   ];
 
   const boxes = [
@@ -186,7 +185,7 @@ export default function MsDecomposition(data, arg) {
       x0: 0,
       x1: 0.19,
       y0: 1,
-      y1: 1.1,
+      y1: 1.15,
       fillcolor: '#A1D99B',
       line: {
         width: 0,
@@ -199,7 +198,7 @@ export default function MsDecomposition(data, arg) {
       x0: 0.2,
       x1: 0.39,
       y0: 1,
-      y1: 1.1,
+      y1: 1.15,
       fillcolor: '#A1D99B',
       line: {
         width: 0,
@@ -212,7 +211,7 @@ export default function MsDecomposition(data, arg) {
       x0: 0.4,
       x1: 0.59,
       y0: 1,
-      y1: 1.1,
+      y1: 1.15,
       fillcolor: '#A1D99B',
       line: {
         width: 0,
@@ -225,7 +224,7 @@ export default function MsDecomposition(data, arg) {
       x0: 0.6,
       x1: 0.79,
       y0: 1,
-      y1: 1.1,
+      y1: 1.15,
       fillcolor: '#A1D99B',
       line: {
         width: 0,
@@ -238,7 +237,7 @@ export default function MsDecomposition(data, arg) {
       x0: 0.8,
       x1: 0.99,
       y0: 1,
-      y1: 1.1,
+      y1: 1.15,
       fillcolor: '#A1D99B',
       line: {
         width: 0,
@@ -250,8 +249,8 @@ export default function MsDecomposition(data, arg) {
 
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
-    height: 450,
-    // width: 1080,
+    height: 350,
+
     autosize: true,
     title: {
       text: '<b>Evaluating the Performance of Mutational Signature Decomposition</b>',
@@ -259,16 +258,20 @@ export default function MsDecomposition(data, arg) {
     showlegend: false,
     annotations: annotations,
     shapes: boxes,
+    margin: {
+      l: cancerName.length * 10,
+    },
     xaxis: { domain: [0, 0.19] },
-    yaxis2: { anchor: 'x2', showticklabels: false },
+    yaxis: { anchor: 'x', showticklabels: false, showgrid: false },
+    yaxis2: { anchor: 'x2', showticklabels: false, showgrid: false },
     xaxis2: { domain: [0.2, 0.39] },
-    yaxis3: { anchor: 'x3', showticklabels: false },
+    yaxis3: { anchor: 'x3', showticklabels: false, showgrid: false },
     xaxis3: { domain: [0.4, 0.59] },
-    yaxis4: { anchor: 'x4', showticklabels: false },
+    yaxis4: { anchor: 'x4', showticklabels: false, showgrid: false },
     xaxis4: { domain: [0.6, 0.79] },
-    yaxis5: { anchor: 'x5', showticklabels: false },
+    yaxis5: { anchor: 'x5', showticklabels: false, showgrid: false },
     xaxis5: { domain: [0.8, 0.99] },
   };
-
+  console.log(layout);
   return { traces, layout };
 }

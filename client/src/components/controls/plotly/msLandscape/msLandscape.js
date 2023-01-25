@@ -425,7 +425,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
         '<b>Sample: </b> %{x}<br> <b>Value: </b>%{z} <extra></extra>',
     },
   ];
-  console.log(tracesHeatMapVariableNum1);
+  //console.log(tracesHeatMapVariableNum1);
   const tracesHeatMapVariableNum2 = [
     {
       z: [variableDataSort.map((e) => e.value2)],
