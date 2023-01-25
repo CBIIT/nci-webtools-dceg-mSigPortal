@@ -61,8 +61,7 @@ export const msDecompositionApiSlice = explorationApiSlice.injectEndpoints({
           );
           const res = await Promise.all([
             fetchWithBQ(
-              '/signature_activity?' +
-                new URLSearchParams(_arg.params_activity)
+              '/signature_activity?' + new URLSearchParams(_arg.params_activity)
             ), //exposure
             fetchWithBQ(
               '/mutational_signature?' +
@@ -75,6 +74,7 @@ export const msDecompositionApiSlice = explorationApiSlice.injectEndpoints({
           ]);
 
           console.log(res);
+          return { data: MsDecomposition(res, _arg) };
         } catch (error) {
           return { error };
         }
