@@ -4,14 +4,14 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     upload: builder.mutation({
       query: (body) => ({
-        url: 'upload',
+        url: `upload/${crypto.randomUUID()}`,
         method: 'POST',
         body,
       }),
     }),
     submit: builder.mutation({
       query: (body) => ({
-        url: 'submit',
+        url: `submit/${body.id}`,
         method: 'POST',
         body,
       }),
