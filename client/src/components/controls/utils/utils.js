@@ -102,7 +102,19 @@ export const getRandomColor = () => {
   return color;
 };
 
-
-
 export const mapOrder = (order, key) => (a, b) =>
   order.indexOf(a[key]) > order.indexOf(b[key]) ? 1 : -1;
+
+export function groupByCustom(list, keyGetter) {
+  const map = new Map();
+  list.forEach((item) => {
+    const key = keyGetter(item);
+    const collection = map.get(key);
+    if (!collection) {
+      map.set(key, [item]);
+    } else {
+      collection.push(item);
+    }
+  });
+  return map;
+}

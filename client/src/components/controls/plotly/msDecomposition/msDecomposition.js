@@ -1,4 +1,5 @@
 import { groupBy } from 'lodash';
+import { groupByCustom } from '../../utils/utils';
 
 export default function MsDecomposition(data, arg) {
   console.log(data);
@@ -7,25 +8,44 @@ export default function MsDecomposition(data, arg) {
   const result = Object.values(data)[0];
   console.log(result);
 
+  const grouped = groupByCustom(result, (e) => e.name);
+  console.log(grouped);
+  console.log(grouped.get('Cosine_similarity'));
+  const cosine_similarity = grouped
+    .get('Cosine_similarity')
+    .sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
+  console.log(cosine_similarity);
+
+  const L1_Norm = grouped
+    .get('100-L1_Norm_%')
+    .sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
+  console.log(L1_Norm);
+
+  const L2_Norm = grouped
+    .get('100-L2_Norm_%')
+    .sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
+  console.log(L2_Norm);
+
+  const KL_Divergence = grouped
+    .get('KL_Divergence')
+    .sort((a, b) => (a['value'] < b['value'] ? 1 : -1));
+  console.log(KL_Divergence);
+
+  const Correlation = grouped
+    .get('Correlation')
+    .sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
+  console.log(Correlation);
+
   const groupByCancer = groupBy(result, 'cancer');
   console.log(groupByCancer);
   console.log(Object.values(groupByCancer));
   const cancerName =
-    Object.keys(groupByCancer) +
-    ' (' +
-    Object.values(groupByCancer)[0].length +
-    ')';
-  console.log(cancerName);
-  console.log(cancerName.length);
-  const resultSortedCosine = result.sort((a, b) =>
-    a['Cosine_similarity'] > b['Cosine_similarity'] ? 1 : -1
-  );
-  console.log(resultSortedCosine);
+    Object.keys(groupByCancer) + ' (' + cosine_similarity.length + ')';
 
   var trace1 = {
     name: 'Cosine Similarity',
-    y: resultSortedCosine.map((e, i) => i),
-    x: resultSortedCosine.map((e) => e['Cosine_similarity']),
+    y: cosine_similarity.map((e, i) => i),
+    x: cosine_similarity.map((e) => e['value']),
     fillcolor: '#2B9089',
     line: { color: '#182B2A', shape: 'spline', smoothing: 1.3 },
     fill: 'tozeroy',
@@ -35,14 +55,11 @@ export default function MsDecomposition(data, arg) {
   };
 
   console.log(trace1);
-  const resultSortedL1 = result.sort((a, b) =>
-    a['100-L1_Norm_%'] > b['100-L1_Norm_%'] ? 1 : -1
-  );
-  console.log(resultSortedL1);
+
   var trace2 = {
-    name: '00-L1_Norm_%',
-    y: resultSortedL1.map((e, i) => i),
-    x: resultSortedL1.map((e) => e['100-L1_Norm_%']),
+    name: '100-L1_Norm_%',
+    y: L1_Norm.map((e, i) => i),
+    x: L1_Norm.map((e) => e['value']),
     fill: 'tozeroy',
     type: 'scatter',
     line: { color: '#182B2A', shape: 'spline', smoothing: 1.3 },
@@ -54,14 +71,10 @@ export default function MsDecomposition(data, arg) {
   };
   console.log(trace2);
 
-  const resultSortedL2 = result.sort((a, b) =>
-    a['100-L2_Norm_%'] > b['100-L2_Norm_%'] ? 1 : -1
-  );
-  console.log(resultSortedL2);
   var trace3 = {
     name: '100-L2_Norm_%',
-    y: resultSortedL2.map((e, i) => i),
-    x: resultSortedL2.map((e) => e['100-L2_Norm_%']),
+    y: L2_Norm.map((e, i) => i),
+    x: L2_Norm.map((e) => e['value']),
     fill: 'tozeroy',
     type: 'scatter',
     line: { color: '#182B2A', shape: 'spline', smoothing: 1.3 },
@@ -72,14 +85,10 @@ export default function MsDecomposition(data, arg) {
     hovertemplate: '<b>100-L2_Norm_%: </b>%{x}</b> <extra></extra>',
   };
 
-  const resultSortedKL = result.sort((a, b) =>
-    a['KL_Divergence'] < b['KL_Divergence'] ? 1 : -1
-  );
-  console.log(resultSortedKL);
   var trace4 = {
     name: 'KL_Divergence',
-    y: resultSortedKL.map((e, i) => i),
-    x: resultSortedKL.map((e) => e['KL_Divergence']),
+    y: KL_Divergence.map((e, i) => i),
+    x: KL_Divergence.map((e) => e['value']),
     fill: 'tozeroy',
     type: 'scatter',
     line: { color: '#182B2A', shape: 'spline', smoothing: 1.3 },
@@ -89,14 +98,11 @@ export default function MsDecomposition(data, arg) {
     yaxis: 'y',
     hovertemplate: '<b>KL_Divergence:</b> %{x}</b> <extra></extra>',
   };
-  const resultSortedCorrelation = result.sort((a, b) =>
-    a['Correlation'] > b['Correlation'] ? 1 : -1
-  );
-  console.log(resultSortedKL);
+
   var trace5 = {
     name: 'Correlation',
-    y: resultSortedCorrelation.map((e, i) => i),
-    x: resultSortedCorrelation.map((e) => e['Correlation']),
+    y: Correlation.map((e, i) => i),
+    x: Correlation.map((e) => e['value']),
     fill: 'tozeroy',
     type: 'scatter',
     line: { color: '#182B2A', shape: 'spline', smoothing: 1.3 },
