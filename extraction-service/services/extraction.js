@@ -1,21 +1,22 @@
 import fs from 'fs-extra';
 import path from 'path';
-import { unparse } from 'papaparse';
+import { stringify } from 'csv-stringify';
 // const tar = require('tar');
-import { groupBy } from 'lodash';
-import { getSignatureData } from '../../server/services/query';
+import { groupBy } from 'lodash-es';
+import { getSignatureData } from './query.js';
+import { execa } from 'execa';
 
 export async function extraction(params, app, logger2, env = process.env) {
   const id = params.id;
   const logger = app.locals.logger;
   try {
     const { args, signatureQuery, id, email } = params;
-    if (!validate(id)) throw Error('Invalid ID');
 
-    const workPath = path.resolve(config.results.folder, id);
+    const inputFolder = path.resolve(env.INPUT_FOLDER, id);
+    const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
 
     // query signature data
-    const connection = req.app.locals.connection;
+    const connection = app.locals.connection;
     const columns = ['signatureName', 'mutationType', 'contribution'];
     const limit = false;
     const signatureData = await getSignatureData(
@@ -38,17 +39,21 @@ export async function extraction(params, app, logger2, env = process.env) {
     );
 
     // write data to tsv file
-    const signatureTSV = unparse(transposeSignature, {
-      delimiter: '\t',
-    });
-    const signatureFilePath = path.join(workPath, 'signature.tsv');
-    fs.writeFileSync(signatureFilePath, signatureTSV);
+    const signatureFilePath = path.join(outputFolder, 'signature.tsv');
+    stringify(
+      transposeSignature,
+      {
+        header: true,
+        delimiter: '\t',
+      },
+      (error, output) => fs.writeFileSync(signatureFilePath, output)
+    );
 
     // modify and include parameters
     const transformArgs = {
       ...args,
-      input_data: path.join(workPath, args.input_data),
-      output: path.join(workPath, 'output'),
+      input_data: path.join(inputFolder, args.input_data),
+      output: path.join(outputFolder),
       signature_database: signatureFilePath,
     };
     logger.debug(transformArgs);
@@ -56,7 +61,6 @@ export async function extraction(params, app, logger2, env = process.env) {
       .reduce((params, [key, value]) => [...params, `--${key} ${value}`], [])
       .join(' ');
 
-    const { execa } = await import('execa');
     const { all } = await execa(
       'python3',
       ['services/python/mSigPortal-SigProfilerExtractor.py', cliArgs],

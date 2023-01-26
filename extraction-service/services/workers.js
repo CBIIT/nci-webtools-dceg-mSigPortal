@@ -2,7 +2,7 @@ import path from 'path';
 import ECS, { ECSClient, RunTaskCommand } from '@aws-sdk/client-ecs';
 import { readJson } from './utils.js';
 import { createLogger } from '../services/logger.js';
-import { extraction } from './extraction';
+import { extraction } from './extraction.js';
 
 export function getWorker(workerType = 'local') {
   switch (workerType) {
