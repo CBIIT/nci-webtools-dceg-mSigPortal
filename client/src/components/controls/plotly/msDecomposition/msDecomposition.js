@@ -14,33 +14,31 @@ export default function MsDecomposition(data, arg) {
   const cosine_similarity = grouped
     .get('Cosine_similarity')
     .sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
-  console.log(cosine_similarity);
 
   const L1_Norm = grouped
     .get('100-L1_Norm_%')
     .sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
-  console.log(L1_Norm);
 
   const L2_Norm = grouped
     .get('100-L2_Norm_%')
     .sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
-  console.log(L2_Norm);
 
   const KL_Divergence = grouped
     .get('KL_Divergence')
     .sort((a, b) => (a['value'] < b['value'] ? 1 : -1));
-  console.log(KL_Divergence);
 
   const Correlation = grouped
     .get('Correlation')
     .sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
-  console.log(Correlation);
 
   const groupByCancer = groupBy(result, 'cancer');
   console.log(groupByCancer);
   console.log(Object.values(groupByCancer));
   const cancerName =
     Object.keys(groupByCancer) + ' (' + cosine_similarity.length + ')';
+
+  const groupBySample = groupBy(result, 'sample');
+  console.log(groupBySample);
 
   var trace1 = {
     name: 'Cosine Similarity',

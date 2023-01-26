@@ -898,6 +898,11 @@ msDecomposition <- function(args, config) {
     arrange(MutationType) ## have to sort the mutationtype
 
   decompsite_input <- calculate_similarities(orignal_genomes = seqmatrixData, signature = signatureData, signature_activaties = exposureData)
+  #  before <- calculate_similarities(orignal_genomes = seqmatrixData, signature = signatureData, signature_activaties = exposureData)
+
+  # decompsite_input <- decompsite_input %>% separate(col = Sample_Names, into = c("cancer", "sample"), sep = "@")
+
+  # return(list(data = decompsite_input))
   decompsite <- decompsite_input %>% separate(col = Sample_Names, into = c("Cancer_Type", "Sample"), sep = "@")
 
   fealist <- c("Cancer_Type", "Sample", "Cosine_similarity", "100-L1_Norm_%", "100-L2_Norm_%", "KL_Divergence", "Correlation")
