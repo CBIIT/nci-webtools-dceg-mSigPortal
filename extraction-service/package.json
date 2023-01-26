@@ -1,0 +1,29 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "pm2-runtime start pm2.config.json --only prod",
+    "start:dev": "pm2-runtime start pm2.config.json --only dev",
+    "start:debug": "node -r dotenv/config app.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-ecs": "^3.245.0",
+    "better-sqlite3": "^8.0.1",
+    "csv-parse": "^5.3.3",
+    "csv-stringify": "^6.2.3",
+    "dotenv": "^16.0.3",
+    "execa": "^6.1.0",
+    "express": "^4.18.2",
+    "express-promise-router": "^4.1.1",
+    "express-validator": "^6.14.2",
+    "knex": "^2.4.2",
+    "lodash-es": "^4.17.21",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.0",
+    "pg": "^8.8.0",
+    "pm2": "^5.2.2",
+    "winston": "^3.8.2"
+  }
+}

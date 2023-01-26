@@ -277,7 +277,7 @@ export default function PublicForm({ calculate }) {
                     id="exposureFile"
                     title={exposureFile.name || 'Upload Exposure File'}
                     label={exposureFile.name || 'Upload Exposure File'}
-                    accept=".txt"
+                    // accept=".txt"
                     isInvalid={errors.exposureFile}
                     feedback="Upload an exposure file"
                     onChange={(e) => {
@@ -346,7 +346,7 @@ export default function PublicForm({ calculate }) {
                     id="uploadMatrix"
                     title={matrixFile.name || 'Upload Matrix File'}
                     label={matrixFile.name || 'Upload Matrix File'}
-                    accept=".txt"
+                    // accept=".txt"
                     isInvalid={errors.matrixFile}
                     feedback="Upload a matrix file"
                     onChange={(e) => {
@@ -455,7 +455,7 @@ export default function PublicForm({ calculate }) {
                       id="uploadSignature"
                       title={signatureFile.name || 'Upload Signature File'}
                       label={signatureFile.name || 'Upload Signature File'}
-                      accept=".txt"
+                      // accept=".txt"
                       isInvalid={errors.signatureFile}
                       feedback="Upload a signature file"
                       onChange={(e) => {

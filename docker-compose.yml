@@ -19,8 +19,8 @@ services:
             context: '.'
             dockerfile: './docker/backend-extraction.dockerfile'
         volumes:
-            - './server/config.json:/deploy/server/config.json:ro'
-            - './logs:/deploy/server/logs'
+            - './extraction-service/config.json:/deploy/app/config.json:ro'
+            - './logs:/deploy/app/logs'
             - './tmp:/deploy/tmp'
             - './data:/deploy/data'
             - '~/.aws:/root/.aws:ro'

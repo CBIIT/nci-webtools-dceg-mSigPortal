@@ -932,7 +932,7 @@ msDecomposition <- function(args, config) {
     left_join(ntmp) %>%
     select(cancer = Cancer_Type, sample = Sample, name, value, m, n, Seq)
 
-  return(list(data = data))
+  return(list(data = data, download = decompsite))
 }
 
 cosineSimilarity <- function(args, config) {
