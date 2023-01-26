@@ -200,6 +200,8 @@ export default function InputForm() {
     matrix_normalization: 'gmm',
     nmf_init: 'random',
     precision: 'single',
+
+    calculationType: { label: 'Denovo', value: 'Denovo' },
   };
 
   const sample1 = {
@@ -312,7 +314,7 @@ export default function InputForm() {
     console.log(res);
 
     mergeForm(data);
-    mergeMain({ id });
+    mergeMain({ id, submitted: true });
     // try {
     //   mergeMain({ submitted: true, loading: { active: true } });
     //   mergeState(data);
@@ -361,6 +363,22 @@ export default function InputForm() {
       {(seqmatrixError || signatureError) && (
         <p>There was an error retrieving public data options</p>
       )}
+      <div className="border rounded p-2 mb-3">
+        <SelectForm
+          className="mb-2"
+          name="calculationType"
+          label="Exploration Calculation"
+          disabled={!submitted}
+          options={['Denovo', 'Decomposed'].map((e) => ({
+            label: e,
+            value: e,
+          }))}
+          control={control}
+        />
+        <Form.Text className="text-muted">
+          <i>Select after Extraction is completed</i>
+        </Form.Text>
+      </div>
       <div className="border rounded p-2 mb-3">
         <Form.Group>
           <Form.Label className="mr-4">Data Source</Form.Label>
