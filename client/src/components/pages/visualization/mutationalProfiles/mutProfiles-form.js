@@ -11,7 +11,6 @@ import {
   defaultFilter2,
 } from '../../../../services/utils';
 import { NavHashLink } from 'react-router-hash-link';
-import { customStyles } from '../../../controls/utils/utils';
 const actions = { ...visualizationActions };
 
 export default function TreeLeafForm() {
@@ -169,7 +168,6 @@ export default function TreeLeafForm() {
               options={sampleOptions}
               control={control}
               onChange={handleSample}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -180,7 +178,6 @@ export default function TreeLeafForm() {
               options={profileOptions(sample)}
               control={control}
               onChange={handleProfile}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -191,7 +188,6 @@ export default function TreeLeafForm() {
               options={matrixOptions(sample, profile)}
               control={control}
               onChange={handleMatrix}
-              styles={customStyles}
             />
           </Col>
           {source == 'user' && (
@@ -203,7 +199,6 @@ export default function TreeLeafForm() {
                 options={filterOptions(sample, profile, matrix)}
                 control={control}
                 onChange={handleFilter}
-                styles={customStyles}
               />
             </Col>
           )}

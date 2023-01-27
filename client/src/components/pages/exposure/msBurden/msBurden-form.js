@@ -7,7 +7,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { actions as exposureActions } from '../../../../services/store/exposure';
 
 import { NavHashLink } from 'react-router-hash-link';
-import { customStyles } from '../../../controls/utils/utils';
 const actions = { ...exposureActions };
 
 export default function MsBurdenForm() {
@@ -53,7 +52,6 @@ export default function MsBurdenForm() {
               control={control}
               options={signatureNameOptions}
               onChange={(name) => mergeMsBurden({ signatureName: name })}
-              styles={customStyles}
               //onChange={handleSignatureName}
             />
           </Col>

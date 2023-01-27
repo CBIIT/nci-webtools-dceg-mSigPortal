@@ -10,7 +10,6 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import Description from '../../../controls/description/description';
 import { defaultMatrix2 } from '../../../../services/utils';
-import { customStyles } from '../../../controls/utils/utils';
 
 export default function CsWithin() {
   const dispatch = useDispatch();
@@ -143,7 +142,6 @@ export default function CsWithin() {
               options={profileOptions}
               onChange={handleProfile}
               control={control}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -153,7 +151,6 @@ export default function CsWithin() {
               label="Matrix Size"
               options={matrixOptions}
               control={control}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto" className="d-flex">

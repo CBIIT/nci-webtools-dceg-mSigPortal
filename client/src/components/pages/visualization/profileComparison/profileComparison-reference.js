@@ -19,7 +19,6 @@ import { useSignatureOptionsQuery } from '../../../../services/store/rootApi';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { defaultMatrix } from '../../../../services/utils';
 import Plotly from '../../../controls/plotly/plot/plot';
-import { customStyles } from '../../../controls/utils/utils';
 
 export default function PcReference() {
   const dispatch = useDispatch();
@@ -280,7 +279,6 @@ export default function PcReference() {
               options={profileOptions}
               onChange={handleProfile}
               control={control}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -291,7 +289,6 @@ export default function PcReference() {
               label="Sample Name"
               options={sampleOptions(profile)}
               control={control}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -303,7 +300,6 @@ export default function PcReference() {
               options={signatureSetOptions(profile)}
               onChange={(e) => handleSignatureSet(profile, e)}
               control={control}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto" className="d-flex">

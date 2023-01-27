@@ -8,7 +8,6 @@ import { actions } from '../../../../services/store/visualization';
 import { useProfileComparisonWithinQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plotly from '../../../controls/plotly/plot/plot';
-import { customStyles } from '../../../controls/utils/utils';
 
 export default function PcWithin() {
   const dispatch = useDispatch();
@@ -126,7 +125,6 @@ export default function PcWithin() {
               options={profileOptions}
               onChange={handleProfile}
               control={control}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -136,7 +134,6 @@ export default function PcWithin() {
               label="Sample Name 1"
               options={sampleOptions}
               control={control}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -146,7 +143,6 @@ export default function PcWithin() {
               label="Sample Name 2"
               options={sampleOptions}
               control={control}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto" className="d-flex">

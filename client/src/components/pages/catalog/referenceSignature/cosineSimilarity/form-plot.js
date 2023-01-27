@@ -9,7 +9,6 @@ import { actions as catalogActions } from '../../../../../services/store/catalog
 import { actions as modalActions } from '../../../../../services/store/modal';
 import { useSignatureOptionsQuery } from '../../../../../services/store/rootApi';
 import { useCosineSimilarityQuery } from './apiSlice';
-import { customStyles } from '../../../../controls/utils/utils';
 
 const actions = { ...catalogActions, ...modalActions };
 
@@ -129,7 +128,7 @@ export default function CosineSimilarityPlot() {
               onChange={handleProfile}
               disabled={fetchingOptions || fetchingPlot}
               control={control}
-              styles={customStyles}
+              
             />
           </Col>
           <Col lg="auto">
@@ -140,7 +139,7 @@ export default function CosineSimilarityPlot() {
               options={matrixOptions(profile)}
               disabled={fetchingOptions || fetchingPlot}
               onChange={(e) => handleMatrix(profile, e)}
-              styles={customStyles}
+              
             />
           </Col>
           <Col lg="auto">
@@ -150,7 +149,7 @@ export default function CosineSimilarityPlot() {
               options={signatureSetOptions(profile, matrix)}
               disabled={fetchingOptions || fetchingPlot}
               control={control}
-              styles={customStyles}
+              
             />
           </Col>
           <Col lg="auto">
@@ -160,7 +159,7 @@ export default function CosineSimilarityPlot() {
               options={signatureSetOptions(profile, matrix)}
               disabled={fetchingOptions || fetchingPlot}
               control={control}
-              styles={customStyles}
+              
             />
           </Col>
           <Col lg="auto" className="d-flex justify-content-end">

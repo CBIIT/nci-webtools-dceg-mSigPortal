@@ -11,7 +11,6 @@ import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import Description from '../../../controls/description/description';
 import { defaultMatrix2, defaultMatrix } from '../../../../services/utils';
 import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
-import { customStyles } from '../../../controls/utils/utils';
 
 export default function CsPublic() {
   const dispatch = useDispatch();
@@ -165,7 +164,6 @@ export default function CsPublic() {
               options={profileOptions}
               onChange={handleProfile}
               control={control}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -175,7 +173,6 @@ export default function CsPublic() {
               label="Matrix Size"
               options={matrixOptions(profile)}
               control={control}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -186,7 +183,6 @@ export default function CsPublic() {
               options={studyOptions}
               onChange={handleStudy}
               control={control}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -196,7 +192,6 @@ export default function CsPublic() {
               label="Cancer Type"
               options={cancerOptions(study)}
               control={control}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto" className="d-flex">
