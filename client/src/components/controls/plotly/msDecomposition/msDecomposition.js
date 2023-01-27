@@ -13,36 +13,28 @@ export default function MsDecomposition(data, arg) {
 
   const cosine_similarity = grouped.get('Cosine_similarity');
   //.sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
-  console.log(cosine_similarity);
   const L1_Norm = grouped.get('100-L1_Norm_%');
   //.sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
-  console.log(L1_Norm);
-  const L2_Norm = grouped
-    .get('100-L2_Norm_%')
-    .sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
+  const L2_Norm = grouped.get('100-L2_Norm_%');
+  //  .sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
 
-  const KL_Divergence = grouped
-    .get('KL_Divergence')
-    .sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
+  const KL_Divergence = grouped.get('KL_Divergence');
+  // .sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
 
-  const Correlation = grouped
-    .get('Correlation')
-    .sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
+  const Correlation = grouped.get('Correlation');
+  // .sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
 
   const groupByCancer = groupBy(result, 'cancer');
-  console.log(groupByCancer);
-  console.log(Object.values(groupByCancer));
+
   const cancerName =
     Object.keys(groupByCancer) + ' (' + Object.values(data)[1].length + ')';
-
-  const groupBySample = groupBy(result, 'sample');
-  console.log(groupBySample);
 
   const traces = [
     {
       type: 'violin',
       spanmode: 'soft',
-      //span: [0,5],
+      hoveron: 'points+kde',
+      // span: [0, 5],
       side: 'positive', //positive side means right for vertical violin plots
       //y: 4,
       x: cosine_similarity.map((e) => e['value']),
@@ -55,15 +47,23 @@ export default function MsDecomposition(data, arg) {
         color: 'black',
       },
       fillcolor: '#2B9089',
+      scalemode: 'count',
+      marker: {
+        line: {
+          width: 0,
+        },
+        symbol: 'line-ns',
+      },
       opacity: 0.6,
       meanline: {
         visible: true,
       },
-      x0: 'Cosine_Similarity',
+      y0: 'Cosine_Similarity',
     },
     {
       type: 'violin',
       spanmode: 'soft',
+      hoveron: 'points+kde',
       //span: [0,5],
       side: 'positive', //positive side means right for vertical violin plots
       //y: 4,
@@ -76,18 +76,26 @@ export default function MsDecomposition(data, arg) {
       line: {
         color: 'black',
       },
-      fillcolor: '#2B9089',
+      fillcolor: '#8491B4',
+      scalemode: 'count',
+      marker: {
+        line: {
+          width: 0,
+        },
+        symbol: 'line-ns',
+      },
       opacity: 0.6,
       meanline: {
         visible: true,
       },
-      x0: 'Cosine_Similarity',
+      y0: '100-L1_Norm%',
       xaxis: 'x2',
       yaxis: 'y2',
     },
     {
       type: 'violin',
       spanmode: 'soft',
+      hoveron: 'points+kde',
       //span: [0,5],
       side: 'positive', //positive side means right for vertical violin plots
       //y: 4,
@@ -100,18 +108,26 @@ export default function MsDecomposition(data, arg) {
       line: {
         color: 'black',
       },
-      fillcolor: '#2B9089',
+      fillcolor: '#B24745',
+      scalemode: 'count',
+      marker: {
+        line: {
+          width: 0,
+        },
+        symbol: 'line-ns',
+      },
       opacity: 0.6,
       meanline: {
         visible: true,
       },
-      x0: 'Cosine_Similarity',
+      y0: '100-L2_Norm%',
       xaxis: 'x3',
       yaxis: 'y3',
     },
     {
       type: 'violin',
       spanmode: 'soft',
+      hoveron: 'points+kde',
       //span: [0,5],
       side: 'positive', //positive side means right for vertical violin plots
       //y: 4,
@@ -124,18 +140,26 @@ export default function MsDecomposition(data, arg) {
       line: {
         color: 'black',
       },
-      fillcolor: '#2B9089',
+      fillcolor: '#E4AF69',
+      scalemode: 'count',
+      marker: {
+        line: {
+          width: 0,
+        },
+        symbol: 'line-ns',
+      },
       opacity: 0.6,
       meanline: {
         visible: true,
       },
-      x0: 'Cosine_Similarity',
+      y0: 'KL_Divergence',
       xaxis: 'x4',
       yaxis: 'y4',
     },
     {
       type: 'violin',
       spanmode: 'soft',
+      hoveron: 'points+kde',
       //span: [0,5],
       side: 'positive', //positive side means right for vertical violin plots
       //y: 4,
@@ -148,12 +172,19 @@ export default function MsDecomposition(data, arg) {
       line: {
         color: 'black',
       },
-      fillcolor: '#2B9089',
+      fillcolor: '#AE1F63',
+      scalemode: 'count',
+      marker: {
+        line: {
+          width: 0,
+        },
+        symbol: 'line-ns',
+      },
       opacity: 0.6,
       meanline: {
         visible: true,
       },
-      x0: 'Cosine_Similarity',
+      y0: 'Correlation',
       xaxis: 'x5',
       yaxis: 'y5',
     },
@@ -322,6 +353,5 @@ export default function MsDecomposition(data, arg) {
     yaxis5: { anchor: 'x5', showticklabels: false },
     xaxis5: { domain: [0.8, 0.99] },
   };
-  console.log(layout);
   return { traces, layout };
 }
