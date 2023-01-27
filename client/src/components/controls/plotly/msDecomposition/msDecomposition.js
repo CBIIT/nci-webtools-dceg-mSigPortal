@@ -2,14 +2,9 @@ import { groupBy } from 'lodash';
 import { groupByCustom } from '../../utils/utils';
 
 export default function MsDecomposition(data, arg) {
-  console.log(data);
-  console.log(arg);
-
   const result = Object.values(data)[0];
-  console.log(result);
 
   const grouped = groupByCustom(result, (e) => e.name);
-  console.log(grouped);
 
   const cosine_similarity = grouped.get('Cosine_similarity');
   //.sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
