@@ -54,21 +54,141 @@ export default function MsDecomposition(data, arg) {
   console.log(cosine_similarity[0].value);
   console.log(cosine_similarity[cosine_similarity.length - 1].value);
 
-  var trace1 = {
-    x: cosine_similarity.map((e) => e['value']),
-    type: 'histogram',
-    histnorm: 'density',
-    nbinsx: Object.values(data)[1].length,
-    xbins: {
-      end:
-        cosine_similarity[cosine_similarity.length - 1].value +
-        cosine_similarity[cosine_similarity.length - 1].value,
-      start: cosine_similarity[0].value - cosine_similarity[0].value,
-    },
-    hovertemplate: '<b>Cosine Similarity:</b> %{x}</b> <extra></extra>',
-  };
+  // var trace1 = {
+  //   x: cosine_similarity.map((e) => e['value']),
+  //   type: 'histogram',
+  //   histnorm: 'density',
+  //   nbinsx: Object.values(data)[1].length,
+  //   xbins: {
+  //     end:
+  //       cosine_similarity[cosine_similarity.length - 1].value +
+  //       cosine_similarity[cosine_similarity.length - 1].value,
+  //     start: cosine_similarity[0].value - cosine_similarity[0].value,
+  //   },
+  //   hovertemplate: '<b>Cosine Similarity:</b> %{x}</b> <extra></extra>',
+  // };
 
-  console.log(trace1);
+  const traces = [
+    {
+      type: 'violin',
+      spanmode: 'soft',
+      //span: [0,5],
+      side: 'positive', //positive side means right for vertical violin plots
+      //y: 4,
+      x: cosine_similarity.map((e) => e['value']),
+      points: 'none',
+      box: {
+        visible: false,
+      },
+      boxpoints: false,
+      line: {
+        color: 'black',
+      },
+      fillcolor: '#2B9089',
+      opacity: 0.6,
+      meanline: {
+        visible: true,
+      },
+      x0: 'Cosine_Similarity',
+    },
+    {
+      type: 'violin',
+      spanmode: 'soft',
+      //span: [0,5],
+      side: 'positive', //positive side means right for vertical violin plots
+      //y: 4,
+      x: L1_Norm.map((e) => e['value']),
+      points: 'none',
+      box: {
+        visible: false,
+      },
+      boxpoints: false,
+      line: {
+        color: 'black',
+      },
+      fillcolor: '#2B9089',
+      opacity: 0.6,
+      meanline: {
+        visible: true,
+      },
+      x0: 'Cosine_Similarity',
+      xaxis: 'x2',
+      yaxis: 'y2',
+    },
+    {
+      type: 'violin',
+      spanmode: 'soft',
+      //span: [0,5],
+      side: 'positive', //positive side means right for vertical violin plots
+      //y: 4,
+      x: L2_Norm.map((e) => e['value']),
+      points: 'none',
+      box: {
+        visible: false,
+      },
+      boxpoints: false,
+      line: {
+        color: 'black',
+      },
+      fillcolor: '#2B9089',
+      opacity: 0.6,
+      meanline: {
+        visible: true,
+      },
+      x0: 'Cosine_Similarity',
+      xaxis: 'x3',
+      yaxis: 'y3',
+    },
+    {
+      type: 'violin',
+      spanmode: 'soft',
+      //span: [0,5],
+      side: 'positive', //positive side means right for vertical violin plots
+      //y: 4,
+      x: KL_Divergence.map((e) => e['value']),
+      points: 'none',
+      box: {
+        visible: false,
+      },
+      boxpoints: false,
+      line: {
+        color: 'black',
+      },
+      fillcolor: '#2B9089',
+      opacity: 0.6,
+      meanline: {
+        visible: true,
+      },
+      x0: 'Cosine_Similarity',
+      xaxis: 'x4',
+      yaxis: 'y4',
+    },
+    {
+      type: 'violin',
+      spanmode: 'soft',
+      //span: [0,5],
+      side: 'positive', //positive side means right for vertical violin plots
+      //y: 4,
+      x: Correlation.map((e) => e['value']),
+      points: 'none',
+      box: {
+        visible: false,
+      },
+      boxpoints: false,
+      line: {
+        color: 'black',
+      },
+      fillcolor: '#2B9089',
+      opacity: 0.6,
+      meanline: {
+        visible: true,
+      },
+      x0: 'Cosine_Similarity',
+      xaxis: 'x5',
+      yaxis: 'y5',
+    },
+  ];
+
 
   // var trace2 = {
   //   name: '100-L1_Norm_%',
@@ -84,21 +204,21 @@ export default function MsDecomposition(data, arg) {
   //   hovertemplate: '<b>100-L1_Norm_%:</b> %{x}</b> <extra></extra>',
   // };
 
-  var trace2 = {
-    x: L1_Norm.map((e) => e['value']),
-    type: 'histogram',
-    xaxis: 'x2',
-    yaxis: 'y2',
-    histnorm: 'density',
-    nbinsx: Object.values(data)[1].length,
-    xbins: {
-      end:
-        L1_Norm[L1_Norm.length - 1].value + L1_Norm[L1_Norm.length - 1].value,
-      start: L1_Norm[0].value - L1_Norm[0].value,
-    },
-    hovertemplate: '<b>100-L1_Norm_%:</b> %{x}</b> <extra></extra>',
-  };
-  console.log(trace2);
+  // var trace2 = {
+  //   x: L1_Norm.map((e) => e['value']),
+  //   type: 'histogram',
+  //   xaxis: 'x2',
+  //   yaxis: 'y2',
+  //   histnorm: 'density',
+  //   nbinsx: Object.values(data)[1].length,
+  //   xbins: {
+  //     end:
+  //       L1_Norm[L1_Norm.length - 1].value + L1_Norm[L1_Norm.length - 1].value,
+  //     start: L1_Norm[0].value - L1_Norm[0].value,
+  //   },
+  //   hovertemplate: '<b>100-L1_Norm_%:</b> %{x}</b> <extra></extra>',
+  // };
+  // console.log(trace2);
 
   // var trace3 = {
   //   name: '100-L2_Norm_%',
@@ -113,20 +233,20 @@ export default function MsDecomposition(data, arg) {
   //   yaxis: 'y',
   //   hovertemplate: '<b>100-L2_Norm_%: </b>%{x}</b> <extra></extra>',
   // };
-  var trace3 = {
-    x: L2_Norm.map((e) => e['value']),
-    type: 'histogram',
-    xaxis: 'x3',
-    yaxis: 'y3',
-    histnorm: 'density',
-    nbinsx: Object.values(data)[1].length,
-    xbins: {
-      end:
-        L2_Norm[L2_Norm.length - 1].value + L2_Norm[L2_Norm.length - 1].value,
-      start: L2_Norm[0].value - L2_Norm[0].value,
-    },
-    hovertemplate: '<b>100-L2_Norm_%: </b>%{x}</b> <extra></extra>',
-  };
+  // var trace3 = {
+  //   x: L2_Norm.map((e) => e['value']),
+  //   type: 'histogram',
+  //   xaxis: 'x3',
+  //   yaxis: 'y3',
+  //   histnorm: 'density',
+  //   nbinsx: Object.values(data)[1].length,
+  //   xbins: {
+  //     end:
+  //       L2_Norm[L2_Norm.length - 1].value + L2_Norm[L2_Norm.length - 1].value,
+  //     start: L2_Norm[0].value - L2_Norm[0].value,
+  //   },
+  //   hovertemplate: '<b>100-L2_Norm_%: </b>%{x}</b> <extra></extra>',
+  // };
 
   // var trace4 = {
   //   name: 'KL_Divergence',
@@ -142,21 +262,21 @@ export default function MsDecomposition(data, arg) {
   //   hovertemplate: '<b>KL_Divergence:</b> %{x}</b> <extra></extra>',
   // };
 
-  var trace4 = {
-    x: KL_Divergence.map((e) => e['value']),
-    type: 'histogram',
-    xaxis: 'x4',
-    yaxis: 'y4',
-    histnorm: 'density',
-    nbinsx: Object.values(data)[1].length,
-    xbins: {
-      end:
-        KL_Divergence[KL_Divergence.length - 1].value +
-        KL_Divergence[KL_Divergence.length - 1].value,
-      start: KL_Divergence[0].value - KL_Divergence[0].value,
-    },
-    hovertemplate: '<b>KL_Divergence:</b> %{x}</b> <extra></extra>',
-  };
+  // var trace4 = {
+  //   x: KL_Divergence.map((e) => e['value']),
+  //   type: 'histogram',
+  //   xaxis: 'x4',
+  //   yaxis: 'y4',
+  //   histnorm: 'density',
+  //   nbinsx: Object.values(data)[1].length,
+  //   xbins: {
+  //     end:
+  //       KL_Divergence[KL_Divergence.length - 1].value +
+  //       KL_Divergence[KL_Divergence.length - 1].value,
+  //     start: KL_Divergence[0].value - KL_Divergence[0].value,
+  //   },
+  //   hovertemplate: '<b>KL_Divergence:</b> %{x}</b> <extra></extra>',
+  // };
 
   // var trace5 = {
   //   name: 'Correlation',
@@ -172,21 +292,21 @@ export default function MsDecomposition(data, arg) {
   //   hovertemplate: '<b>Correlation:</b> %{x}</b> <extra></extra>',
   // };
 
-  var trace5 = {
-    x: Correlation.map((e) => e['value']),
-    type: 'histogram',
-    xaxis: 'x5',
-    yaxis: 'y5',
-    histnorm: 'density',
-    nbinsx: Object.values(data)[1].length,
-    xbins: {
-      end:
-        Correlation[Correlation.length - 1].value +
-        Correlation[Correlation.length - 1].value,
-      start: Correlation[0].value - Correlation[0].value,
-    },
-    hovertemplate: '<b>Correlation:</b> %{x}</b> <extra></extra>',
-  };
+  // var trace5 = {
+  //   x: Correlation.map((e) => e['value']),
+  //   type: 'histogram',
+  //   xaxis: 'x5',
+  //   yaxis: 'y5',
+  //   histnorm: 'density',
+  //   nbinsx: Object.values(data)[1].length,
+  //   xbins: {
+  //     end:
+  //       Correlation[Correlation.length - 1].value +
+  //       Correlation[Correlation.length - 1].value,
+  //     start: Correlation[0].value - Correlation[0].value,
+  //   },
+  //   hovertemplate: '<b>Correlation:</b> %{x}</b> <extra></extra>',
+  // };
 
   const annotations = [
     {
@@ -325,8 +445,6 @@ export default function MsDecomposition(data, arg) {
       },
     },
   ];
-
-  const traces = [trace1, trace2, trace3, trace4, trace5];
 
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
