@@ -10,22 +10,20 @@ export default function MsDecomposition(data, arg) {
 
   const grouped = groupByCustom(result, (e) => e.name);
   console.log(grouped);
-  console.log(grouped.get('Cosine_similarity'));
-  const cosine_similarity = grouped
-    .get('Cosine_similarity')
-    .sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
 
-  const L1_Norm = grouped
-    .get('100-L1_Norm_%')
-    .sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
-
+  const cosine_similarity = grouped.get('Cosine_similarity');
+  //.sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
+  console.log(cosine_similarity);
+  const L1_Norm = grouped.get('100-L1_Norm_%');
+  //.sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
+  console.log(L1_Norm);
   const L2_Norm = grouped
     .get('100-L2_Norm_%')
     .sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
 
   const KL_Divergence = grouped
     .get('KL_Divergence')
-    .sort((a, b) => (a['value'] < b['value'] ? 1 : -1));
+    .sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
 
   const Correlation = grouped
     .get('Correlation')
@@ -35,79 +33,158 @@ export default function MsDecomposition(data, arg) {
   console.log(groupByCancer);
   console.log(Object.values(groupByCancer));
   const cancerName =
-    Object.keys(groupByCancer) + ' (' + cosine_similarity.length + ')';
+    Object.keys(groupByCancer) + ' (' + Object.values(data)[1].length + ')';
 
   const groupBySample = groupBy(result, 'sample');
   console.log(groupBySample);
 
+  // var trace1 = {
+  //   name: 'Cosine Similarity',
+  //   y: cosine_similarity.map((e, i) => i),
+  //   x: cosine_similarity.map((e) => e['value']),
+  //   fillcolor: '#2B9089',
+  //   line: { color: '#182B2A', shape: 'spline', smoothing: 1.3 },
+  //   fill: 'tozeroy',
+  //   type: 'scatter',
+  //   mode: 'lines',
+  //   hovertemplate: '<b>Cosine Similarity:</b> %{x}</b> <extra></extra>',
+  // };
+  console.log(Math.min(...cosine_similarity.map((e) => e.value)));
+  console.log(Math.max(...cosine_similarity.map((e) => e.value)));
+  console.log(cosine_similarity[0].value);
+  console.log(cosine_similarity[cosine_similarity.length - 1].value);
+
   var trace1 = {
-    name: 'Cosine Similarity',
-    y: cosine_similarity.map((e, i) => i),
     x: cosine_similarity.map((e) => e['value']),
-    fillcolor: '#2B9089',
-    line: { color: '#182B2A', shape: 'spline', smoothing: 1.3 },
-    fill: 'tozeroy',
-    type: 'scatter',
-    mode: 'lines',
+    type: 'histogram',
+    histnorm: 'density',
+    nbinsx: Object.values(data)[1].length,
+    xbins: {
+      end:
+        cosine_similarity[cosine_similarity.length - 1].value +
+        cosine_similarity[cosine_similarity.length - 1].value,
+      start: cosine_similarity[0].value - cosine_similarity[0].value,
+    },
     hovertemplate: '<b>Cosine Similarity:</b> %{x}</b> <extra></extra>',
   };
 
   console.log(trace1);
 
+  // var trace2 = {
+  //   name: '100-L1_Norm_%',
+  //   y: L1_Norm.map((e, i) => i),
+  //   x: L1_Norm.map((e) => e['value']),
+  //   fill: 'tozeroy',
+  //   type: 'scatter',
+  //   line: { color: '#182B2A', shape: 'spline', smoothing: 1.3 },
+  //   mode: 'lines',
+  //   fillcolor: '#2B9089',
+  //   xaxis: 'x2',
+  //   yaxis: 'y',
+  //   hovertemplate: '<b>100-L1_Norm_%:</b> %{x}</b> <extra></extra>',
+  // };
+
   var trace2 = {
-    name: '100-L1_Norm_%',
-    y: L1_Norm.map((e, i) => i),
     x: L1_Norm.map((e) => e['value']),
-    fill: 'tozeroy',
-    type: 'scatter',
-    line: { color: '#182B2A', shape: 'spline', smoothing: 1.3 },
-    mode: 'lines',
-    fillcolor: '#2B9089',
+    type: 'histogram',
     xaxis: 'x2',
-    yaxis: 'y',
+    yaxis: 'y2',
+    histnorm: 'density',
+    nbinsx: Object.values(data)[1].length,
+    xbins: {
+      end:
+        L1_Norm[L1_Norm.length - 1].value + L1_Norm[L1_Norm.length - 1].value,
+      start: L1_Norm[0].value - L1_Norm[0].value,
+    },
     hovertemplate: '<b>100-L1_Norm_%:</b> %{x}</b> <extra></extra>',
   };
   console.log(trace2);
 
+  // var trace3 = {
+  //   name: '100-L2_Norm_%',
+  //   y: L2_Norm.map((e, i) => i),
+  //   x: L2_Norm.map((e) => e['value']),
+  //   fill: 'tozeroy',
+  //   type: 'scatter',
+  //   line: { color: '#182B2A', shape: 'spline', smoothing: 1.3 },
+  //   mode: 'lines',
+  //   fillcolor: '#2B9089',
+  //   xaxis: 'x3',
+  //   yaxis: 'y',
+  //   hovertemplate: '<b>100-L2_Norm_%: </b>%{x}</b> <extra></extra>',
+  // };
   var trace3 = {
-    name: '100-L2_Norm_%',
-    y: L2_Norm.map((e, i) => i),
     x: L2_Norm.map((e) => e['value']),
-    fill: 'tozeroy',
-    type: 'scatter',
-    line: { color: '#182B2A', shape: 'spline', smoothing: 1.3 },
-    mode: 'lines',
-    fillcolor: '#2B9089',
+    type: 'histogram',
     xaxis: 'x3',
-    yaxis: 'y',
+    yaxis: 'y3',
+    histnorm: 'density',
+    nbinsx: Object.values(data)[1].length,
+    xbins: {
+      end:
+        L2_Norm[L2_Norm.length - 1].value + L2_Norm[L2_Norm.length - 1].value,
+      start: L2_Norm[0].value - L2_Norm[0].value,
+    },
     hovertemplate: '<b>100-L2_Norm_%: </b>%{x}</b> <extra></extra>',
   };
 
+  // var trace4 = {
+  //   name: 'KL_Divergence',
+  //   y: KL_Divergence.map((e, i) => i),
+  //   x: KL_Divergence.map((e) => e['value']),
+  //   fill: 'tozeroy',
+  //   type: 'scatter',
+  //   line: { color: '#182B2A', shape: 'spline', smoothing: 1.3 },
+  //   mode: 'lines',
+  //   fillcolor: '#2B9089',
+  //   xaxis: 'x4',
+  //   yaxis: 'y',
+  //   hovertemplate: '<b>KL_Divergence:</b> %{x}</b> <extra></extra>',
+  // };
+
   var trace4 = {
-    name: 'KL_Divergence',
-    y: KL_Divergence.map((e, i) => i),
     x: KL_Divergence.map((e) => e['value']),
-    fill: 'tozeroy',
-    type: 'scatter',
-    line: { color: '#182B2A', shape: 'spline', smoothing: 1.3 },
-    mode: 'lines',
-    fillcolor: '#2B9089',
+    type: 'histogram',
     xaxis: 'x4',
-    yaxis: 'y',
+    yaxis: 'y4',
+    histnorm: 'density',
+    nbinsx: Object.values(data)[1].length,
+    xbins: {
+      end:
+        KL_Divergence[KL_Divergence.length - 1].value +
+        KL_Divergence[KL_Divergence.length - 1].value,
+      start: KL_Divergence[0].value - KL_Divergence[0].value,
+    },
     hovertemplate: '<b>KL_Divergence:</b> %{x}</b> <extra></extra>',
   };
 
+  // var trace5 = {
+  //   name: 'Correlation',
+  //   y: Correlation.map((e, i) => i),
+  //   x: Correlation.map((e) => e['value']),
+  //   fill: 'tozeroy',
+  //   type: 'scatter',
+  //   line: { color: '#182B2A', shape: 'spline', smoothing: 1.3 },
+  //   mode: 'lines',
+  //   fillcolor: '#2B9089',
+  //   xaxis: 'x5',
+  //   yaxis: 'y',
+  //   hovertemplate: '<b>Correlation:</b> %{x}</b> <extra></extra>',
+  // };
+
   var trace5 = {
-    name: 'Correlation',
-    y: Correlation.map((e, i) => i),
     x: Correlation.map((e) => e['value']),
-    fill: 'tozeroy',
-    type: 'scatter',
-    line: { color: '#182B2A', shape: 'spline', smoothing: 1.3 },
-    mode: 'lines',
-    fillcolor: '#2B9089',
+    type: 'histogram',
     xaxis: 'x5',
-    yaxis: 'y',
+    yaxis: 'y5',
+    histnorm: 'density',
+    nbinsx: Object.values(data)[1].length,
+    xbins: {
+      end:
+        Correlation[Correlation.length - 1].value +
+        Correlation[Correlation.length - 1].value,
+      start: Correlation[0].value - Correlation[0].value,
+    },
     hovertemplate: '<b>Correlation:</b> %{x}</b> <extra></extra>',
   };
 
@@ -266,14 +343,14 @@ export default function MsDecomposition(data, arg) {
       l: cancerName.length * 10,
     },
     xaxis: { domain: [0, 0.19] },
-    yaxis: { anchor: 'x', showticklabels: false, showgrid: false },
-    yaxis2: { anchor: 'x2', showticklabels: false, showgrid: false },
+    yaxis: { anchor: 'x', showticklabels: false },
+    yaxis2: { anchor: 'x2', showticklabels: false },
     xaxis2: { domain: [0.2, 0.39] },
-    yaxis3: { anchor: 'x3', showticklabels: false, showgrid: false },
+    yaxis3: { anchor: 'x3', showticklabels: false },
     xaxis3: { domain: [0.4, 0.59] },
-    yaxis4: { anchor: 'x4', showticklabels: false, showgrid: false },
+    yaxis4: { anchor: 'x4', showticklabels: false },
     xaxis4: { domain: [0.6, 0.79] },
-    yaxis5: { anchor: 'x5', showticklabels: false, showgrid: false },
+    yaxis5: { anchor: 'x5', showticklabels: false },
     xaxis5: { domain: [0.8, 0.99] },
   };
   console.log(layout);
