@@ -17,7 +17,6 @@ import {
   defaultStrategy,
   defaultSignatureName,
 } from '../../../../../services/utils';
-import { customStyles } from '../../../../controls/utils/utils';
 
 const actions = { ...catalogActions, ...modalActions };
 
@@ -470,7 +469,6 @@ export default function ProfileFormPlot({ options, index }) {
               options={signatureSourceOptions}
               control={control}
               onChange={handleSource}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -481,7 +479,6 @@ export default function ProfileFormPlot({ options, index }) {
               options={profileOptions(source)}
               control={control}
               onChange={handleProfile}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -492,7 +489,6 @@ export default function ProfileFormPlot({ options, index }) {
               options={matrixOptions(source, profile)}
               control={control}
               onChange={handleMatrix}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -503,7 +499,6 @@ export default function ProfileFormPlot({ options, index }) {
               options={referenceSignatureSetOption(source, profile, matrix)}
               control={control}
               onChange={handleSet}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -519,7 +514,6 @@ export default function ProfileFormPlot({ options, index }) {
               )}
               control={control}
               onChange={handleStrategy}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -536,7 +530,6 @@ export default function ProfileFormPlot({ options, index }) {
               )}
               control={control}
               onChange={handleName}
-              styles={customStyles}
             />
           </Col>
         </Row>

@@ -13,7 +13,6 @@ import Description from '../../../controls/description/description';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import { defaultMatrix } from '../../../../services/utils';
-import { customStyles } from '../../../controls/utils/utils';
 
 export default function CsReference() {
   const dispatch = useDispatch();
@@ -153,7 +152,6 @@ export default function CsReference() {
               label="Profile Type"
               options={profileOptions}
               control={control}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto">
@@ -163,7 +161,6 @@ export default function CsReference() {
               label="Reference Signature Set"
               options={signatureSetOptions}
               control={control}
-              styles={customStyles}
             />
           </Col>
           <Col lg="auto" className="d-flex">

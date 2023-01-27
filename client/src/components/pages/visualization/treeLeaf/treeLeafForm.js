@@ -4,7 +4,6 @@ import Select from 'react-select';
 import { Form, Row, Col } from 'react-bootstrap';
 import MultiSelect from '../../../controls/select/multiSelect';
 import { formState, graphDataSelector, colorOptions } from './treeLeaf.state';
-import { customStyles } from '../../../controls/utils/utils';
 
 export default function TreeLeafForm() {
   const store = useSelector((state) => state.visualization);
@@ -54,7 +53,6 @@ export default function TreeLeafForm() {
               defaultValue={colorOptions[0]}
               options={colorOptions}
               onChange={(e) => mergeForm({ color: e })}
-              styles={customStyles}
             />
           </Form.Group>
         </Col>
@@ -68,7 +66,6 @@ export default function TreeLeafForm() {
               defaultOptions={filterSampleOptions()}
               loadOptions={handleSearchOptions}
               onChange={handleSearch}
-              styles={customStyles}
             />
           </Form.Group>
         </Col>
