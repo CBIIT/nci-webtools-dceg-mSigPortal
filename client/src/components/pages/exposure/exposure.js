@@ -512,147 +512,62 @@ export default function Exposure({ match }) {
     mergeState(params);
   }
 
-  const tabs =
-    source == 'user'
-      ? [
-          {
-            component: <Instructions loading={loading} />,
-            id: 'instructions',
-            name: 'Instructions',
-          },
-          {
-            component: <TMB />,
-            id: 'tmb',
-            name: 'TMB',
-          },
-          {
-            component: <TmbSig />,
-            id: 'tmbSig',
-            name: 'TMB Signatures',
-          },
-          {
-            component: <MsBurden calculateBurden={calculateBurden} />,
-            id: 'msBurden',
-            name: 'MS Burden',
-          },
-          {
-            component: <MsDecomposition />,
-            id: 'msDecomposition',
-            name: 'MS Decomposition',
-          },
-          {
-            component: (
-              <MsAssociation calculateAssociation={calculateAssociation} />
-            ),
-            id: 'msAssociation',
-            name: 'MS Association',
-          },
-          {
-            // component: (
-            //   <MsLandscape
-            //     calculateLandscape={calculateLandscape}
-            //     handleVariable={handleVariable}
-            //   />
-            // ),
-            // id: 'msLandscape',
-            // name: 'MS Landscape',
-          },
-          {
-            component: (
-              <MsPrevalence calculatePrevalence={calculatePrevalence} />
-            ),
-            id: 'msPrevalence',
-            name: 'MS Prevalence',
-          },
-          {
-            component: (
-              <MSIndividual calculateIndividual={calculateIndividual} />
-            ),
-            id: 'msIndividaul',
-            name: 'MS Individual',
-          },
-          source == 'public' ? (
-            {
-              component: <Download exposureDownload={exposureDownload} />,
-              id: 'download',
-              name: 'Download',
-            }
-          ) : (
-            <></>
-          ),
-        ]
-      : [
-          {
-            component: <Instructions loading={loading} />,
-            id: 'instructions',
-            name: 'Instructions',
-          },
-          {
-            component: <TMB2 />,
-            id: 'tmb',
-            name: 'TMB',
-          },
-          {
-            component: <TmbSig2 />,
-            id: 'tmbSig',
-            name: 'TMB Signatures',
-          },
-          {
-            component: <MsBurden2 />,
-            id: 'msBurden',
-            name: 'MS Burden',
-          },
-          {
-            component: <MsDecomposition2 />,
-            id: 'msDecomposition',
-            name: 'MS Decomposition',
-          },
-          {
-            component: (
-              <MsAssociation calculateAssociation={calculateAssociation} />
-            ),
-            id: 'msAssociation',
-            name: 'MS Association',
-          },
-
-          {
-            component: (
-              <MsLandscape2
-                calculateLandscape={calculateLandscape}
-                handleVariable={handleVariable}
-              />
-            ),
-            id: 'msLandscape',
-            name: 'MS Landscape',
-          },
-          // {
-          //   component: (
-          //     <MsLandscape
-          //       calculateLandscape={calculateLandscape}
-          //       handleVariable={handleVariable}
-          //     />
-          //   ),
-          //   id: 'msLandscape',
-          //   name: 'MS Landscape',
-          // },
-          {
-            component: <MsPrevalence2 />,
-            id: 'msPrevalence',
-            name: 'MS Prevalence',
-          },
-          {
-            component: (
-              <MSIndividual calculateIndividual={calculateIndividual} />
-            ),
-            id: 'msIndividual',
-            name: 'MS Individual',
-          },
-          {
-            component: <Download exposureDownload={exposureDownload} />,
-            id: 'download',
-            name: 'Download',
-          },
-        ];
+  const tabs = [
+    {
+      component: <Instructions loading={loading} />,
+      id: 'instructions',
+      name: 'Instructions',
+    },
+    {
+      component: <TMB2 />,
+      id: 'tmb',
+      name: 'TMB',
+    },
+    {
+      component: <TmbSig2 />,
+      id: 'tmbSig',
+      name: 'TMB Signatures',
+    },
+    {
+      component: <MsBurden2 />,
+      id: 'msBurden',
+      name: 'MS Burden',
+    },
+    {
+      component: <MsDecomposition2 />,
+      id: 'msDecomposition',
+      name: 'MS Decomposition',
+    },
+    {
+      component: <MsAssociation calculateAssociation={calculateAssociation} />,
+      id: 'msAssociation',
+      name: 'MS Association',
+    },
+    {
+      component: <MsLandscape2 />,
+      id: 'msLandscape',
+      name: 'MS Landscape',
+    },
+    {
+      component: <MsPrevalence2 />,
+      id: 'msPrevalence',
+      name: 'MS Prevalence',
+    },
+    {
+      component: <MSIndividual calculateIndividual={calculateIndividual} />,
+      id: 'msIndividual',
+      name: 'MS Individual',
+    },
+    source == 'public' ? (
+      {
+        component: <Download exposureDownload={exposureDownload} />,
+        id: 'download',
+        name: 'Download',
+      }
+    ) : (
+      <></>
+    ),
+  ];
 
   return (
     <div className="position-relative">
