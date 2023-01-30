@@ -31,8 +31,10 @@ function alphaNumericSort(array) {
 }
 async function queryExposure(req, res, next) {
   try {
-    const { limit, offset, orderByCluster, ...query } = req.query;
-    const connection = req.app.locals.connection;
+    const { userId, limit, offset, orderByCluster, ...query } = req.query;
+    const connection = userId
+      ? req.app.locals.sqlite(userId, 'local')
+      : req.app.locals.connection;
 
     const columns = '*';
     const data = await getExposureData(
@@ -49,11 +51,13 @@ async function queryExposure(req, res, next) {
   }
 }
 
-// query public exploration options for exploration tab
-async function explorationOptions(req, res, next) {
+// query exposure options for exploration tab
+async function exposureOptions(req, res, next) {
   try {
-    const { limit, offset, ...query } = req.query;
-    const connection = req.app.locals.connection;
+    const { userId, limit, offset, ...query } = req.query;
+    const connection = userId
+      ? req.app.locals.sqlite(userId, 'local')
+      : req.app.locals.connection;
 
     const columns = ['study', 'strategy', 'cancer', 'signatureSetName'];
     const data = await getExposureOptions(
@@ -127,7 +131,9 @@ async function msLandscape(req, res, next) {
   try {
     const { study, strategy, signatureSetName, cancer, userId } = req.query;
 
-    const connection = req.app.locals.connection;
+    const connection = userId
+      ? req.app.locals.sqlite(userId, 'local')
+      : req.app.locals.connection;
     const columns = '*';
     const limit = false;
 
@@ -180,7 +186,9 @@ async function msDecomposition(req, res, next) {
   try {
     const { study, strategy, signatureSetName, cancer, userId } = req.query;
 
-    const connection = req.app.locals.connection;
+    const connection = userId
+      ? req.app.locals.sqlite(userId, 'local')
+      : req.app.locals.connection;
     const columns = '*';
     const limit = false;
 
@@ -232,11 +240,13 @@ async function msDecomposition(req, res, next) {
 // query signature data and calculate cosine similarity
 async function cosineSimilarity(req, res, next) {
   try {
-    const connection = req.app.locals.connection;
+    const { signatureSetName, userId, ...params } = req.query;
+    const connection = userId
+      ? req.app.locals.sqlite(userId, 'local')
+      : req.app.locals.connection;
     const columns = '*';
     const limit = false;
 
-    const { signatureSetName, ...params } = req.query;
     const signatureData1 = await getSignatureData(
       connection,
       { ...params, signatureSetName: signatureSetName.split(';')[0] },
@@ -273,7 +283,7 @@ async function cosineSimilarity(req, res, next) {
 const router = Router();
 
 router.get('/signature_activity', queryExposure);
-router.get('/signature_activity_options', explorationOptions);
+router.get('/signature_activity_options', exposureOptions);
 router.get('/explorationSamples', explorationSamples);
 router.post('/explorationWrapper', explorationWrapper);
 router.get('/signature_landscape', msLandscape);
