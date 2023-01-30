@@ -5,18 +5,12 @@ import { saveAs } from 'file-saver';
 import PublicForm from './publicForm/publicForm';
 import UserForm from './userForm/userForm';
 import Instructions from './instructions';
-import TMB from './tmb';
 import TMB2 from './tmb/tmb.js';
-import TmbSig from './tmbSignatures';
 import TmbSig2 from './tmbSignature/tmbSignature.js';
-import MsBurden from './msBurden';
 import MsBurden2 from './msBurden/msBurden.js';
 import MsAssociation from './msAssociation';
-import MsDecomposition from './msDecomposition';
 import MsDecomposition2 from './msDecomposition/msDecomposition.js';
-import MsLandscape from './msLandscape';
 import MsLandscape2 from './msLandscape/msLandscape.js';
-import MsPrevalence from './msPrevalence';
 import MsPrevalence2 from './msPrevalence/msPrevalence.js';
 import MSIndividual from './msIndividual';
 import Download from './download';
@@ -68,17 +62,9 @@ export default function Exposure({ match }) {
     exposureCancer,
     study,
     studyOptions,
-    strategy,
     strategyOptions,
-    cancer,
     cancerOptions,
-    rsSet,
     rsSetOptions,
-    useCancerType,
-    genome,
-    exposureFile,
-    matrixFile,
-    signatureFile,
     source,
     loading,
     projectID,
@@ -124,26 +110,6 @@ export default function Exposure({ match }) {
       submitted: true,
       openSidebar: false,
     });
-  }
-
-  async function calculateBurden() {
-    try {
-      if (source == 'user' && !projectID) {
-        mergeError('Missing Required Files');
-      } else {
-        mergeMsBurden({
-          loading: true,
-          err: false,
-          plotPath: '',
-        });
-
-        await handleCalculate('burden');
-
-        mergeMsBurden({ loading: false });
-      }
-    } catch (error) {
-      mergeError(error.message);
-    }
   }
 
   async function calculateAssociation() {
@@ -654,7 +620,7 @@ export default function Exposure({ match }) {
                   <Label className="mr-4">Data Source</Label>
                   <Check inline id="radioPublic">
                     <Check.Input
-                      disabled={loading || projectID}
+                      disabled={loading || submitted || submitted}
                       type="radio"
                       value="public"
                       checked={source == 'public'}
@@ -666,7 +632,7 @@ export default function Exposure({ match }) {
                   </Check>
                   <Check inline id="radioUser">
                     <Check.Input
-                      disabled={loading || projectID}
+                      disabled={loading || submitted || submitted}
                       type="radio"
                       value="user"
                       checked={source == 'user'}
