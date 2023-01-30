@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
 import Plotly from '../../../controls/plotly/plot/plot';
-import { Container, Row, Col } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { useMsPrevelencePlotQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
-import './plot.scss';
 export default function MutProfilePlot() {
-  const publicForm = useSelector((state) => state.exposure.publicForm);
+  const { publicForm, main } = useSelector((state) => state.exposure);
   const [params, setParams] = useState('');
   const { data, error, isFetching } = useMsPrevelencePlotQuery(params, {
     skip: !params,
@@ -25,8 +23,13 @@ export default function MutProfilePlot() {
         cancer: cancer.value,
         minimum,
       });
+    } else if (main.id) {
+      setParams({
+        userId: main.id,
+        minimum,
+      });
     }
-  }, [publicForm, minimum]);
+  }, [publicForm, minimum, main]);
 
   return (
     <>

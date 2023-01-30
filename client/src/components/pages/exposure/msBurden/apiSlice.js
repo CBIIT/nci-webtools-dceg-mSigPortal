@@ -47,7 +47,29 @@ export const msBurdenApiSlice = explorationApiSlice.injectEndpoints({
         return MsBurden(transform, 'MSBurden', signatureName);
       },
     }),
+    msBurdenOptions: builder.query({
+      query: (params) => ({
+        url: 'signature_activity',
+        params: { ...params },
+      }),
+      transformResponse: (data) => {
+        console.log(data);
+        return data
+          ? [...new Set(data.map((e) => e.signatureName))]
+              .sort((a, b) =>
+                a.localeCompare(b, undefined, {
+                  numeric: true,
+                  sensitivity: 'base',
+                })
+              )
+              .map((e) => ({
+                label: e,
+                value: e,
+              }))
+          : [];
+      },
+    }),
   }),
 });
 
-export const { useMsBurdenQuery } = msBurdenApiSlice;
+export const { useMsBurdenQuery, useMsBurdenOptionsQuery } = msBurdenApiSlice;
