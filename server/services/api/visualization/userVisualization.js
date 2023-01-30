@@ -207,7 +207,7 @@ async function userProfilerExtraction(req, res, next) {
     } = await profilerExtraction(req.body);
     const resultsPath = path.join(projectPath, 'results');
     // import data into user session table
-    const connection = req.app.locals.sqlite(userId, 'visualization');
+    const connection = req.app.locals.sqlite(userId, 'local');
     const importStatus = await importUserSession(
       connection,
       { seqmatrix, cluster },
@@ -586,8 +586,18 @@ async function getPublicTreeLeafData(req, res, next) {
   try {
     const { connection } = req.app.locals;
     const { study, strategy, signatureSetName, profileMatrix } = req.body;
-    const exposureData = await getExposureData(connection, { study, strategy }, '*', 1e8);
-    const signatureData = await getSignatureData(connection, { strategy, signatureSetName }, '*', 1e8);
+    const exposureData = await getExposureData(
+      connection,
+      { study, strategy },
+      '*',
+      1e8
+    );
+    const signatureData = await getSignatureData(
+      connection,
+      { strategy, signatureSetName },
+      '*',
+      1e8
+    );
     const seqmatrixData = await connection
       .select('*', connection.raw('concat(profile, matrix) as "profileMatrix"'))
       .from('seqmatrix')
@@ -595,18 +605,22 @@ async function getPublicTreeLeafData(req, res, next) {
       .andWhere('study', study)
       .andWhere(connection.raw('concat(profile, matrix)'), 'in', profileMatrix);
 
-    console.log("exposureData", exposureData[0], exposureData?.length);
-    console.log("seqmatrixData", seqmatrixData[0], seqmatrixData?.length);
-    console.log("signatureData", signatureData[0], signatureData?.length);
+    console.log('exposureData', exposureData[0], exposureData?.length);
+    console.log('seqmatrixData', seqmatrixData[0], seqmatrixData?.length);
+    console.log('signatureData', signatureData[0], signatureData?.length);
 
-    if (!exposureData?.length || !seqmatrixData?.length || !signatureData?.length) {
+    if (
+      !exposureData?.length ||
+      !seqmatrixData?.length ||
+      !signatureData?.length
+    ) {
       throw new Error('No data found');
     }
 
     const args = { exposureData, seqmatrixData, signatureData };
     const results = await wrapper('wrapper', { fn: 'getTreeLeaf', args });
     res.json(results);
-  } catch(error) {
+  } catch (error) {
     console.log(error);
     next(error);
   }
@@ -624,7 +638,7 @@ router.post('/queue', submitQueue);
 router.get('/getQueueResults/:id', getQueueResults);
 router.get('/getVisExample/:example', getVisExample);
 router.post('/downloadWorkspace', downloadWorkspace);
-router.post('/treeLeaf', getPublicTreeLeafData)
+router.post('/treeLeaf', getPublicTreeLeafData);
 
 module.exports = {
   router,
