@@ -75,14 +75,14 @@ async function submit(req, res, next) {
       },
       schema
     );
+    if (!importStatus)
+      res.status(500).json('Failed to import data into database');
+
+    res.json(id);
   } catch (error) {
     logger.error(error);
     next(error);
   }
-  if (!importStatus)
-    res.status(500).json('Failed to import data into database');
-
-  res.json(id);
 }
 
 const router = Router();
