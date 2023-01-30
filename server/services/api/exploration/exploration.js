@@ -21,14 +21,6 @@ const rConfig = {
   wd: path.resolve(config.results.folder),
 };
 
-function alphaNumericSort(array) {
-  return array.sort((a, b) => {
-    return a.localeCompare(b, undefined, {
-      numeric: true,
-      sensitivity: 'base',
-    });
-  });
-}
 async function queryExposure(req, res, next) {
   try {
     const { userId, limit, offset, orderByCluster, ...query } = req.query;
@@ -68,24 +60,6 @@ async function exposureOptions(req, res, next) {
       offset
     );
     res.json(data);
-  } catch (error) {
-    next(error);
-  }
-}
-
-async function explorationSamples(req, res, next) {
-  try {
-    const { study, strategy, signatureSetName } = req.query;
-    const connection = req.app.locals.connection;
-
-    const query = { study, strategy, signatureSetName };
-    const columns = ['sample', 'signatureName'];
-    const data = await getExposureData(connection, query, columns);
-    const samples = alphaNumericSort([...new Set(data.map((e) => e.sample))]);
-    const signatureNames = alphaNumericSort([
-      ...new Set(data.map((e) => e.signatureName)),
-    ]);
-    res.json({ samples, signatureNames });
   } catch (error) {
     next(error);
   }
@@ -284,7 +258,6 @@ const router = Router();
 
 router.get('/signature_activity', queryExposure);
 router.get('/signature_activity_options', exposureOptions);
-router.get('/explorationSamples', explorationSamples);
 router.post('/explorationWrapper', explorationWrapper);
 router.get('/signature_landscape', msLandscape);
 router.get('/signature_decomposition', msDecomposition);
