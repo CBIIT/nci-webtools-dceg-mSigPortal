@@ -11,14 +11,17 @@ import {
   resetExplorationApi,
   useExposureOptionsQuery,
 } from '../../../../services/store/rootApi';
-import { useExposureUploadMutation, useExposureUserMutation } from './apiSlice';
+import {
+  useExposureUploadMutation,
+  useSubmitExplorationMutation,
+} from './apiSlice';
 
 const actions = { ...exposureActions, ...modalActions };
 const { Group, Check, Label } = Form;
 
-export default function PublicForm({ calculate }) {
+export default function PublicForm() {
   const dispatch = useDispatch();
-  const mergeState = async (state) =>
+  const mergeForm = async (state) =>
     await dispatch(actions.mergeExposure({ userForm: state }));
   const mergeMain = async (state) =>
     await dispatch(actions.mergeExposure({ main: state }));
@@ -31,7 +34,7 @@ export default function PublicForm({ calculate }) {
     loading,
     userNameOptions,
     userSampleOptions,
-    projectID,
+    id,
     usePublicSignature,
   } = useSelector((state) => state.exposure.main);
 
@@ -42,15 +45,15 @@ export default function PublicForm({ calculate }) {
   } = useExposureOptionsQuery();
   const [handleUpload, { isLoading: isUploading }] =
     useExposureUploadMutation();
-  const [getUserExposure, { isLoading: loadingUserExposure }] =
-    useExposureUserMutation();
+  const [submitExploration, { isLoading: loadingUserExposure }] =
+    useSubmitExplorationMutation();
 
   const defaultFormValues = {
     exposureFile: '',
     matrixFile: '',
     signatureFile: '',
     study: { label: 'PCAWG', value: 'PCAWG' },
-    signatureSet: {
+    signatureSetName: {
       label: 'COSMIC_v3_Signatures_GRCh37_SBS96',
       value: 'COSMIC_v3_Signatures_GRCh37_SBS96',
     },
@@ -72,15 +75,15 @@ export default function PublicForm({ calculate }) {
   const { exposureFile, matrixFile, signatureFile } = watch();
 
   // call calculate after receiving signature and sample name options
-  useEffect(() => {
-    if (
-      !submitted &&
-      !loading &&
-      userNameOptions.length &&
-      userSampleOptions.length
-    )
-      calculate('all', projectID);
-  }, [userNameOptions, userSampleOptions, loading]);
+  // useEffect(() => {
+  //   if (
+  //     !submitted &&
+  //     !loading &&
+  //     userNameOptions.length &&
+  //     userSampleOptions.length
+  //   )
+  //     calculate('all', id);
+  // }, [userNameOptions, userSampleOptions, loading]);
 
   async function loadExample(type) {
     const filepath = `assets/exampleInput/Sherlock_SBS96_${type}.txt`;
@@ -107,9 +110,9 @@ export default function PublicForm({ calculate }) {
 
   //  get signature and sample names. useEffect will call main calculate function
   async function handleCalculate() {
-    mergeState({ loading: true });
+    mergeForm({ loading: true });
     try {
-      const { projectID, exposureData } = await handleUpload();
+      const { projectID: id, exposureData } = await handleUpload();
       // get signature name options, ignore sample key
       const nameOptions = Object.keys(exposureData[0]).filter(
         (key) => key != 'Samples'
@@ -121,7 +124,7 @@ export default function PublicForm({ calculate }) {
       dispatch(
         actions.mergeExposure({
           main: {
-            projectID: projectID,
+            id,
             userNameOptions: nameOptions,
             userSampleOptions: sampleOptions,
           },
@@ -136,7 +139,7 @@ export default function PublicForm({ calculate }) {
     } catch (err) {
       mergeError(err);
     }
-    mergeState({ loading: false });
+    mergeForm({ loading: false });
   }
 
   const studyOptions = exposureOptions
@@ -169,58 +172,61 @@ export default function PublicForm({ calculate }) {
     const signatureSets = signatureSetOptions(study);
 
     setValue('study', study);
-    setValue('signatureSet', signatureSets[0]);
+    setValue('signatureSetName', signatureSets[0]);
   }
 
   async function onSubmit(data) {
     try {
-      mergeMain({ loading: true });
+      mergeMain({ submitted: true, loading: true });
+      mergeForm(data);
+
+      // create form data for upload
       const formData = new FormData();
       formData.append('exposureFile', exposureFile);
       formData.append('matrixFile', matrixFile);
       if (!usePublicSignature) formData.append('signatureFile', signatureFile);
+      const { projectID: id } = await handleUpload(formData).unwrap();
 
-      const { projectID, ...filePaths } = await handleUpload(formData).unwrap();
-      const { exposurePath } = filePaths;
-
-      const exposureData = await getUserExposure({
-        path: exposurePath,
-      }).unwrap();
-
-      // get signature name options, ignore sample key
-      const nameOptions = Object.keys(exposureData[0]).filter(
-        (key) => key != 'Samples'
-      );
-      const sampleOptions = [
-        ...new Set(exposureData.map(({ Samples }) => Samples)),
-      ];
-
-      dispatch(
-        actions.mergeExposure({
-          main: {
-            projectID: projectID,
-            userNameOptions: nameOptions,
-            userSampleOptions: sampleOptions,
-          },
-          msIndividual: { sample: sampleOptions[0] },
-          msAssociation: {
-            signatureName1: nameOptions[0],
-            signatureName2: nameOptions[1],
-          },
-          msBurden: { signatureName: nameOptions[0] },
-        })
-      );
-
-      mergeState({
-        ...data,
-        ...filePaths,
-        projectID,
+      // submit after upload
+      await submitExploration({
+        id,
         exposureFile: data.exposureFile.name,
         matrixFile: data.matrixFile.name,
-        signatureFile: data.sigantureFile?.name || '',
+        signatureFile: data?.signatureFile.name,
+      }).unwrap();
+
+      // // get signature name options, ignore sample key
+      // const nameOptions = Object.keys(exposureData[0]).filter(
+      //   (key) => key != 'Samples'
+      // );
+      // const sampleOptions = [
+      //   ...new Set(exposureData.map(({ Samples }) => Samples)),
+      // ];
+
+      // dispatch(
+      //   actions.mergeExposure({
+      //     main: {
+      //       id,
+      //       userNameOptions: nameOptions,
+      //       userSampleOptions: sampleOptions,
+      //     },
+      //     msIndividual: { sample: sampleOptions[0] },
+      //     msAssociation: {
+      //       signatureName1: nameOptions[0],
+      //       signatureName2: nameOptions[1],
+      //     },
+      //     msBurden: { signatureName: nameOptions[0] },
+      //   })
+      // );
+
+      mergeMain({
+        displayTab: 'tmb',
+        id,
+        samples: [1],
+        signatureNames: [1],
       });
     } catch (error) {
-      mergeError(error);
+      mergeError(error.message || 'Failed to submit');
     } finally {
       mergeMain({ loading: false });
     }
@@ -406,7 +412,7 @@ export default function PublicForm({ calculate }) {
             onChange={handleStudy}
           />
           <Select
-            name="signatureSet"
+            name="signatureSetName"
             label="Reference Signature Set"
             control={control}
             disabled={loading || submitted || isFetching}
@@ -491,6 +497,7 @@ export default function PublicForm({ calculate }) {
               name="genome"
               label="Genome"
               control={control}
+              disabled={id}
               options={[
                 { label: 'GRCh37', value: 'GRCh37' },
                 { label: 'GRCh38', value: 'GRCh38' },
@@ -513,7 +520,7 @@ export default function PublicForm({ calculate }) {
         <Col lg="6">
           <Button
             disabled={
-              loading || isFetching || isUploading || loadingUserExposure
+              loading || isFetching || isUploading || loadingUserExposure || id
             }
             className="w-100"
             variant="primary"
