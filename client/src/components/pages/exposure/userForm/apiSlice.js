@@ -9,15 +9,25 @@ export const userFormApiSlice = explorationApiSlice.injectEndpoints({
         body: formData,
       }),
     }),
-    exposureUser: builder.mutation({
+    submitExploration: builder.mutation({
       query: (data) => ({
-        url: 'getSignaturesUser',
+        url: `submitExploration/${data.id}`,
         method: 'POST',
         body: data,
+      }),
+    }),
+    explorationUser: builder.mutation({
+      query: (params) => ({
+        url: 'explorationWrapper',
+        type: 'POST',
+        body: params,
       }),
     }),
   }),
 });
 
-export const { useExposureUploadMutation, useExposureUserMutation } =
-  userFormApiSlice;
+export const {
+  useExposureUploadMutation,
+  useSubmitExplorationMutation,
+  useExplorationUserMutation,
+} = userFormApiSlice;

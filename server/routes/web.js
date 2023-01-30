@@ -14,6 +14,9 @@ const {
   router: explorationRoutes,
 } = require('../services/api/exploration/exploration');
 const {
+  router: userExplorationRoutes,
+} = require('../services/api/exploration/userExploration');
+const {
   router: signatureRoutes,
 } = require('../services/api/signature/signature');
 const {
@@ -41,6 +44,7 @@ router.use(visualizationRoutes);
 router.use(userVisualizationRoutes);
 router.use(signatureRoutes);
 router.use(explorationRoutes);
+router.use(userExplorationRoutes);
 router.use(associationRoutes);
 router.use(etiologyRoutes);
 router.use(publicationsRoutes);
