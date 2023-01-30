@@ -337,16 +337,16 @@ export default function MsDecomposition(data, arg) {
     margin: {
       l: cancerName.length * 10,
     },
-    xaxis: { domain: [0, 0.19] },
+    xaxis: { domain: [0, 0.195] },
     yaxis: { anchor: 'x', showticklabels: false },
     yaxis2: { anchor: 'x2', showticklabels: false },
-    xaxis2: { domain: [0.2, 0.39] },
+    xaxis2: { domain: [0.2, 0.395] },
     yaxis3: { anchor: 'x3', showticklabels: false },
-    xaxis3: { domain: [0.4, 0.59] },
+    xaxis3: { domain: [0.4, 0.595] },
     yaxis4: { anchor: 'x4', showticklabels: false },
-    xaxis4: { domain: [0.6, 0.79] },
+    xaxis4: { domain: [0.6, 0.795] },
     yaxis5: { anchor: 'x5', showticklabels: false },
-    xaxis5: { domain: [0.8, 0.99] },
+    xaxis5: { domain: [0.8, 0.995] },
   };
   return { traces, layout };
 }
