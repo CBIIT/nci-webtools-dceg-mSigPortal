@@ -531,7 +531,10 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
       hoverinfo: 'skip',
       legendgroup: 'a',
       legendgrouptitle: {
-        text: '\t Variable Data String:',
+        text:
+          variableData.length > 0
+            ? '\t' + variableData[0].titles[0]
+            : '\t Variable Data String:',
       },
     }));
 
@@ -629,6 +632,23 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
       color: 'rgb(37,37,37)',
     },
   };
+  let variableDataNum = '';
+  if (variableData.length > 0) {
+    if (variableData[0].titles.length === 2) {
+      if (arrNames.length > 0) {
+        if (mixMatch) {
+          variableDataNum = '\t' + variableData[0].titles[1];
+        } else {
+          variableDataNum = '\t' + variableData[0].titles[0];
+        }
+      } else {
+        variableDataNum =
+          '\t' + variableData[0].titles[0] + '/ ' + variableData[0].titles[1];
+      }
+    } else {
+      variableDataNum = '\t' + variableData[0].titles[0];
+    }
+  }
 
   const annotationLegendTitle = {
     x: 0,
@@ -638,7 +658,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     yanchor: 'bottom',
     xref: 'paper',
     yref: 'paper',
-    text: '\t Variable Data Number:',
+    text: variableDataNum,
     showarrow: false,
     font: {
       family: 'Arial',

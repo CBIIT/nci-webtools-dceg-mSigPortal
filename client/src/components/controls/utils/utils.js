@@ -46,34 +46,43 @@ export const parseMatrix = (text) => {
   let arr = text.split('\n');
 
   let result = [];
+  var titles = arr[0].split(/\t|\s+/);
+  console.log(titles);
   for (var i = 1; i < arr.length - 1; i++) {
     let data = arr[i].split(/\t|\s+/);
+    console.log(data[0]);
+    console.log(data[1]);
+    console.log(data[2]);
 
     let dataObject;
     if (data.length === 3) {
-      if (!isNumber(data[0].value1) && isNumber(data[1].value1)) {
+      if (!isNumber(data[1]) && isNumber(data[2])) {
         dataObject = {
           sample: data[0],
           value1: data[1],
           value2: data[2],
+          titles: [titles[1], titles[2]],
         };
-      } else if (isNumber(data[0].value1) && !isNumber(data[1].value1)) {
+      } else if (isNumber(data[1]) && !isNumber(data[2])) {
         dataObject = {
           sample: data[0],
           value1: data[2],
           value2: data[1],
+          titles: [titles[2], titles[1]],
         };
       } else {
         dataObject = {
           sample: data[0],
           value1: data[1],
           value2: data[2],
+          titles: [titles[1], titles[2]],
         };
       }
     } else {
       dataObject = {
         sample: data[0],
         value1: data[1],
+        titles: [titles[1]],
       };
     }
     result.push(dataObject);

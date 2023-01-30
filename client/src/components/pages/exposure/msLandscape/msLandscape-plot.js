@@ -42,9 +42,6 @@ export default function MsLandscapePlot({ calculateLandscape }) {
   const variableFileName =
     useSelector((state) => state.exposure.variableFileName) || [];
 
-  // function handleVariableData(event) {
-  //   variableFileName = event.target.files[0].name;
-  // }
 
   function handleChange(e) {
     setFile(e.target.files[0].name);
