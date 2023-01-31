@@ -55,15 +55,17 @@ export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
     rsProfilePlot: builder.query({
       async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
         console.log(_arg);
-        const params = _arg.map((e) => ({
-          source: e.source.value,
-          profile: e.profile.value,
-          matrix: e.matrix.value,
-          signatureSetName: e.signatureSetName.value,
-          strategy: e.strategy.value,
-          signatureName: e.signatureName.value,
-        }));
-        //console.log(params);
+        // const params = _arg.map((e) => ({
+        //   source: e.source.value,
+        //   profile: e.profile.value,
+        //   matrix: e.matrix.value,
+        //   signatureSetName: e.signatureSetName.value,
+        //   strategy: e.strategy.value,
+        //   signatureName: e.signatureName.value,
+        // }));
+
+        const params = _arg.params;
+        console.log(params);
         try {
           const res = await Promise.all(
             params.map((e) =>
@@ -76,32 +78,28 @@ export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
             console.log(params[i].profile + params[i].matrix);
 
             if (params[i].profile + params[i].matrix === 'SBS96') {
-              return {
-                data: SBS96(res[i].data, params[i].signatureName, 'rsProfile'),
-              };
+              return SBS96(res[i].data, params[i].signatureName, 'rsProfile');
             } else if (params[i].profile + params[i].matrix === 'SBS192') {
-              return {
-                data: SBS192(res[i].data, params[i].signatureName, 'rsProfile'),
-              };
+              return SBS192(res[i].data, params[i].signatureName, 'rsProfile');
             } else if (params[i].profile + params[i].matrix === 'SBS288') {
-              return { data: SBS288(res[i].data, params[i].signatureName) };
+              return SBS288(res[i].data, params[i].signatureName);
             } else if (params[i].profile + params[i].matrix === 'SBS1536') {
-              return { data: SBS1536(res[i].data, params[i].signatureName) };
+              return SBS1536(res[i].data, params[i].signatureName);
             } else if (params[i].profile + params[i].matrix === 'ID83') {
-              return { data: ID83(res[i].data, params[i].signatureName) };
+              return ID83(res[i].data, params[i].signatureName);
             } else if (params[i].profile + params[i].matrix === 'DBS78') {
-              return { data: DBS78(res[i].data, params[i].signatureName) };
+              return DBS78(res[i].data, params[i].signatureName);
             } else if (params[i].profile + params[i].matrix === 'RS32') {
-              return { data: RS32(res[i].data, params[i].signatureName) };
+              return RS32(res[i].data, params[i].signatureName);
             } else if (params[i].profile + params[i].matrix === 'CN48') {
-              return { data: CN48(res[i].data, params[i].signatureName) };
+              return CN48(res[i].data, params[i].signatureName);
             }
           });
 
-          if (plotData) {
+          if (plotData.length) {
             return { data: plotData };
           } else {
-            return null;
+            return { data: [] };
           }
         } catch (error) {
           return { error };
