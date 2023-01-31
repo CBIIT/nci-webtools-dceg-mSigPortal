@@ -120,7 +120,7 @@ export async function extraction(
           submittedAt: submittedTime.toISOString(),
           executionTime:
             (new Date().getTime() - submittedTime.getTime()) / 1000,
-          resultsUrl: `${env.APP_BASE_URL}/#extraction/${id}`,
+          resultsUrl: `${env.APP_BASE_URL}/#/extraction/${id}`,
         }
       );
     }
