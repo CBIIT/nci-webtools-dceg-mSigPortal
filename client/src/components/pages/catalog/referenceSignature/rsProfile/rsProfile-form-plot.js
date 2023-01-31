@@ -378,6 +378,7 @@ export default function ProfileFormPlot({ options, index }) {
   } = useRsProfilePlotQuery(params, {
     skip: !params,
   });
+  console.log(plotdata);
 
   // function addPlots() {
   //   mergeRsProfiles({

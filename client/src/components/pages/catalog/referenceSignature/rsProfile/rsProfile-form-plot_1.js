@@ -415,8 +415,12 @@ export default function ProfileFormPlot() {
   } = useRsProfilePlotQuery(params, {
     skip: !params,
   });
-  //console.log(plotdata);
-
+  console.log(plotdata);
+  console.log(plotdata?.length);
+  plotdata && plotdata.length > 0
+    ? console.log(plotdata[0].data.traces)
+    : console.log(plotdata);
+  console.log(plotError);
   return (
     <div>
       {plotsFields.map((item, index) => (
@@ -568,14 +572,16 @@ export default function ProfileFormPlot() {
               <p>An error has occured. Please verify your input.</p>
             </div>
 
-            {plotdata && (
+            {plotdata && plotdata.length > 0 ? (
               <Plotly
                 data={plotdata[index].data.traces}
                 layout={plotdata[index].data.layout}
                 config={plotdata[index].data.config}
                 divId="mutationalProfilePlot"
-                filename={plots[index].source?.value || 'Mutational Profile'}
+                filename={plots[index].source.value || 'Mutational Profile'}
               />
+            ) : (
+              <div className="text-center my-4">No data available</div>
             )}
             <Row className="mr-3">
               {index === plotsFields.length - 1 ? (
