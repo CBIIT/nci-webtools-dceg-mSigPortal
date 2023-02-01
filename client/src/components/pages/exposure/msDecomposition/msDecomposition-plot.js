@@ -4,9 +4,8 @@ import { useSelector } from 'react-redux';
 import { useMsDecompositionQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
-import './plot.scss';
 export default function MutProfilePlot() {
-  const publicForm = useSelector((state) => state.exposure.publicForm);
+  const { publicForm, main } = useSelector((state) => state.exposure);
   const [params, setParams] = useState('');
   // const { data, error, isFetching } = useMsDecompositionQuery(params, {
   //   skip: !params,
@@ -26,27 +25,10 @@ export default function MutProfilePlot() {
         signatureSetName: signatureSetName.value,
         cancer: cancer.value,
       });
-      // const params_activity = {
-      //   study: study.value,
-      //   strategy: strategy.value,
-      //   signatureSetName: signatureSetName.value,
-      //   cancer: cancer.value,
-      // };
-      // const params_spectrum = {
-      //   study: study.value,
-      //   strategy: strategy.value,
-      //   cancer: cancer.value,
-      // };
-      // const params_signature = {
-      //   signatureSetName: signatureSetName.value,
-      // };
-      // setCalculationQuery({
-      //   params_activity,
-      //   params_signature,
-      //   params_spectrum,
-      // });
+    } else if (main.id) {
+      setParams({ userId: main.id });
     }
-  }, [publicForm]);
+  }, [publicForm, main]);
 
   return (
     <>

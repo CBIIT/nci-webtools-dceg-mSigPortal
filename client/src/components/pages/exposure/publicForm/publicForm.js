@@ -9,7 +9,6 @@ import {
   resetExplorationApi,
   useExposureOptionsQuery,
 } from '../../../../services/store/rootApi';
-import { useExplorationSamplesMutation } from './apiSlice';
 
 const actions = { ...exposureActions, ...modalActions };
 
@@ -30,10 +29,6 @@ export default function PublicForm() {
     error: optionsError,
     isFetching,
   } = useExposureOptionsQuery();
-
-  const [fetchSamples, { isLoading }] = useExplorationSamplesMutation();
-  // const [handleSubmitWeb, { isLoading, reset: resetWeb }] =
-  //   useExplorationPublicMutation();
 
   const defaultValues = {
     study: { label: 'PCAWG', value: 'PCAWG' },
@@ -65,17 +60,8 @@ export default function PublicForm() {
 
   async function onSubmit(data) {
     try {
-      mergeMain({ submitted: true, loading: true });
       mergeForm(data);
-
-      const params = {
-        study: data.study.value,
-        strategy: data.strategy.value,
-        signatureSetName: data.signatureSetName.value,
-        ...(!data.useAllCancer && { cancer: data.cancer.value }),
-      };
-      const { samples, signatureNames } = await fetchSamples(params).unwrap();
-      mergeMain({ displayTab: 'tmb', samples, signatureNames });
+      mergeMain({ displayTab: 'tmb', submitted: true, loading: true });
     } catch (error) {
       if (error.originalStatus == 504) {
         mergeMain({
@@ -263,7 +249,7 @@ export default function PublicForm() {
       <Row>
         <Col>
           <Button
-            disabled={isFetching || isLoading}
+            disabled={isFetching}
             className="w-100"
             variant="secondary"
             onClick={() => handleReset()}
@@ -273,7 +259,7 @@ export default function PublicForm() {
         </Col>
         <Col>
           <Button
-            disabled={isFetching || isLoading || submitted}
+            disabled={isFetching || submitted}
             className="w-100"
             variant="primary"
             type="submit"

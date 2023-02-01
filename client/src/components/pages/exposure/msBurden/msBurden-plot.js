@@ -4,28 +4,34 @@ import { useSelector } from 'react-redux';
 import { useMsBurdenQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
-import './plot.scss';
 export default function MutProfilePlot() {
-  const publicForm = useSelector((state) => state.exposure.publicForm);
+  const { publicForm, main } = useSelector((state) => state.exposure);
   const [params, setParams] = useState('');
   const { data, error, isFetching } = useMsBurdenQuery(params, {
     skip: !params,
   });
 
   const { signatureName } = useSelector((state) => state.exposure.msBurden);
-  const { study, strategy, signatureSetName, cancer, useAllCancer } = publicForm;
+  const { study, strategy, signatureSetName, cancer, useAllCancer } =
+    publicForm;
 
+  // query after signature name is changed
   useEffect(() => {
-    if (signatureName) {
+    if (signatureName && main.id) {
       setParams({
+        signatureName: signatureName.value,
+        userId: main.id,
+      });
+    } else if (signatureName && study) {
+      setParams({
+        signatureName: signatureName.value,
         study: study.value,
         strategy: strategy.value,
         signatureSetName: signatureSetName.value,
-        signatureName: signatureName.value,
         ...(!useAllCancer && { cancer: cancer.value }),
       });
     }
-  }, [signatureName]);
+  }, [signatureName, main]);
 
   return (
     <>

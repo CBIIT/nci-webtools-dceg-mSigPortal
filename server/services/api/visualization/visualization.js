@@ -19,7 +19,7 @@ async function querySeqmatrix(req, res, next) {
     // }
 
     const connection = userId
-      ? req.app.locals.sqlite(userId, 'visualization')
+      ? req.app.locals.sqlite(userId, 'local')
       : req.app.locals.connection;
 
     const columns = '*';
@@ -43,7 +43,7 @@ async function seqmatrixOptions(req, res, next) {
     const { limit, offset, userId, ...query } = req.query;
 
     const connection = userId
-      ? req.app.locals.sqlite(userId, 'visualization')
+      ? req.app.locals.sqlite(userId, 'local')
       : req.app.locals.connection;
 
     const columns = '*';
@@ -70,7 +70,7 @@ async function seqmatrixSummary(req, res, next) {
     }
 
     const connection = userId
-      ? req.app.locals.sqlite(userId, 'visualization')
+      ? req.app.locals.sqlite(userId, 'local')
       : req.app.locals.connection;
 
     const columns = '*';
@@ -96,7 +96,7 @@ async function queryCluster(req, res, next) {
       throw 'This API is only available for user data calculations';
     }
 
-    const connection = req.app.locals.sqlite(userId, 'visualization');
+    const connection = req.app.locals.sqlite(userId, 'local');
 
     const columns = '*';
     const data = await getClusterData(

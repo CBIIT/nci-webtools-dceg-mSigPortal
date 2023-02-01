@@ -21,18 +21,12 @@ const rConfig = {
   wd: path.resolve(config.results.folder),
 };
 
-function alphaNumericSort(array) {
-  return array.sort((a, b) => {
-    return a.localeCompare(b, undefined, {
-      numeric: true,
-      sensitivity: 'base',
-    });
-  });
-}
 async function queryExposure(req, res, next) {
   try {
-    const { limit, offset, orderByCluster, ...query } = req.query;
-    const connection = req.app.locals.connection;
+    const { userId, limit, offset, orderByCluster, ...query } = req.query;
+    const connection = userId
+      ? req.app.locals.sqlite(userId, 'local')
+      : req.app.locals.connection;
 
     const columns = '*';
     const data = await getExposureData(
@@ -49,11 +43,13 @@ async function queryExposure(req, res, next) {
   }
 }
 
-// query public exploration options for exploration tab
-async function explorationOptions(req, res, next) {
+// query exposure options for exploration tab
+async function exposureOptions(req, res, next) {
   try {
-    const { limit, offset, ...query } = req.query;
-    const connection = req.app.locals.connection;
+    const { userId, limit, offset, ...query } = req.query;
+    const connection = userId
+      ? req.app.locals.sqlite(userId, 'local')
+      : req.app.locals.connection;
 
     const columns = ['study', 'strategy', 'cancer', 'signatureSetName'];
     const data = await getExposureOptions(
@@ -64,24 +60,6 @@ async function explorationOptions(req, res, next) {
       offset
     );
     res.json(data);
-  } catch (error) {
-    next(error);
-  }
-}
-
-async function explorationSamples(req, res, next) {
-  try {
-    const { study, strategy, signatureSetName } = req.query;
-    const connection = req.app.locals.connection;
-
-    const query = { study, strategy, signatureSetName };
-    const columns = ['sample', 'signatureName'];
-    const data = await getExposureData(connection, query, columns);
-    const samples = alphaNumericSort([...new Set(data.map((e) => e.sample))]);
-    const signatureNames = alphaNumericSort([
-      ...new Set(data.map((e) => e.signatureName)),
-    ]);
-    res.json({ samples, signatureNames });
   } catch (error) {
     next(error);
   }
@@ -127,7 +105,9 @@ async function msLandscape(req, res, next) {
   try {
     const { study, strategy, signatureSetName, cancer, userId } = req.query;
 
-    const connection = req.app.locals.connection;
+    const connection = userId
+      ? req.app.locals.sqlite(userId, 'local')
+      : req.app.locals.connection;
     const columns = '*';
     const limit = false;
 
@@ -180,7 +160,9 @@ async function msDecomposition(req, res, next) {
   try {
     const { study, strategy, signatureSetName, cancer, userId } = req.query;
 
-    const connection = req.app.locals.connection;
+    const connection = userId
+      ? req.app.locals.sqlite(userId, 'local')
+      : req.app.locals.connection;
     const columns = '*';
     const limit = false;
 
@@ -232,11 +214,13 @@ async function msDecomposition(req, res, next) {
 // query signature data and calculate cosine similarity
 async function cosineSimilarity(req, res, next) {
   try {
-    const connection = req.app.locals.connection;
+    const { signatureSetName, userId, ...params } = req.query;
+    const connection = userId
+      ? req.app.locals.sqlite(userId, 'local')
+      : req.app.locals.connection;
     const columns = '*';
     const limit = false;
 
-    const { signatureSetName, ...params } = req.query;
     const signatureData1 = await getSignatureData(
       connection,
       { ...params, signatureSetName: signatureSetName.split(';')[0] },
@@ -273,8 +257,7 @@ async function cosineSimilarity(req, res, next) {
 const router = Router();
 
 router.get('/signature_activity', queryExposure);
-router.get('/signature_activity_options', explorationOptions);
-router.get('/explorationSamples', explorationSamples);
+router.get('/signature_activity_options', exposureOptions);
 router.post('/explorationWrapper', explorationWrapper);
 router.get('/signature_landscape', msLandscape);
 router.get('/signature_decomposition', msDecomposition);

@@ -1,43 +1,47 @@
-import React, { useEffect } from 'react';
-import { Form, Row, Col, Button } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Form, Row, Col } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import Select from '../../../controls/select/selectForm';
-import Description from '../../../controls/description/description';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as exposureActions } from '../../../../services/store/exposure';
+import { useMsBurdenOptionsQuery } from './apiSlice';
 
-import { NavHashLink } from 'react-router-hash-link';
 const actions = { ...exposureActions };
 
 export default function MsBurdenForm() {
   const dispatch = useDispatch();
-  const store = useSelector((state) => state.exposure);
-
   const mergeMsBurden = (state) =>
     dispatch(actions.mergeExposure({ msBurden: state }));
 
-  const { signatureNames } = store.main;
-  const { signatureName } = store.msBurden;
+  const { publicForm, main, msBurden } = useSelector((state) => state.exposure);
 
-  const signatureNameOptions = signatureNames.length
-    ? [...new Set(signatureNames.map((d) => d))]
-        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-        .map((e) => ({
-          label: e,
-          value: e,
-        }))
-    : [];
-
-  const { control, setValue, watch } = useForm({
-    defaultValues: signatureName,
+  const [params, setParams] = useState('');
+  const { data: signatureNameOptions } = useMsBurdenOptionsQuery(params, {
+    skip: !params,
   });
+
+  const { control } = useForm({ defaultValues: msBurden });
+
+  // query signature name options
+  useEffect(() => {
+    if (publicForm.study) {
+      setParams({
+        study: publicForm.study.value,
+        strategy: publicForm.strategy.value,
+        signatureSetName: publicForm.signatureSetName.value,
+        ...(!publicForm.useAllCancer && { cancer: publicForm.cancer.value }),
+      });
+    } else if (main.id) {
+      setParams({ userId: main.id });
+    }
+  }, [publicForm, main]);
 
   // set inital
   useEffect(() => {
-    if (!signatureName && signatureNameOptions.length) {
+    if (!msBurden.signatureName && signatureNameOptions) {
       mergeMsBurden({ signatureName: signatureNameOptions[0] });
     }
-  }, [signatureNameOptions]);
+  }, [signatureNameOptions, msBurden]);
 
   return (
     <div>
@@ -48,22 +52,14 @@ export default function MsBurdenForm() {
             <Select
               name="signatureName"
               label="Signature Name"
-              value={signatureName}
+              value={msBurden.signatureName}
+              disabled={!signatureNameOptions}
               control={control}
               options={signatureNameOptions}
               onChange={(name) => mergeMsBurden({ signatureName: name })}
               //onChange={handleSignatureName}
             />
           </Col>
-          {/* <Col lg="auto" className="d-flex">
-            <Button
-              className="mt-auto mb-2"
-              variant="primary"
-              //onClick={}
-            >
-              Recalculate
-            </Button>
-          </Col> */}
         </Row>
       </Form>
     </div>

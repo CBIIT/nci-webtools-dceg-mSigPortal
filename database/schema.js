@@ -216,6 +216,19 @@ export const schema = [
   },
 
   {
+    name: 'cache',
+    schema: (table) => {
+      table.text('key');
+      table.json('value');
+    },
+    index: (table) => {
+      table.unique([
+        'key',
+      ]);
+    },
+  },
+
+  {
     name: 'signatureOption',
     type: 'materializedView',
     dependsOn: ['signature'],

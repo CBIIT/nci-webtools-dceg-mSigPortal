@@ -25,8 +25,10 @@ export function getWorker(workerType = 'local') {
 export async function runLocalWorker(id, app, env = process.env) {
   const paramsFilePath = path.resolve(env.INPUT_FOLDER, id, 'params.json');
   const params = await readJson(paramsFilePath);
-  const logger = createLogger(env.APP_NAME, env.LOG_LEVEL);
-  return await extraction(params, app, logger, env);
+  // const logger = createLogger(env.APP_NAME, env.LOG_LEVEL);
+  const logger = app.locals.logger;
+  const dbConnection = app.locals.connection;
+  return await extraction(params, logger, dbConnection, env);
 }
 
 /**

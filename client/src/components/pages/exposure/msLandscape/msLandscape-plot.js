@@ -23,7 +23,7 @@ import { actions } from '../../../../services/store/exposure';
 
 const { Label, Group } = Form;
 export default function MsLandscapePlot({ calculateLandscape }) {
-  const publicForm = useSelector((state) => state.exposure.publicForm);
+  const { publicForm, main } = useSelector((state) => state.exposure);
   const exposure = useSelector((state) => state.exposure);
   const { variableFile, plotPath, debugR, err, loading } = exposure.msLandscape;
   // const [params, setParams] = useState('');
@@ -42,14 +42,12 @@ export default function MsLandscapePlot({ calculateLandscape }) {
   const variableFileName =
     useSelector((state) => state.exposure.variableFileName) || [];
 
-
   function handleChange(e) {
     setFile(e.target.files[0].name);
   }
 
   async function Recalculate() {
     if (!fileRef) return;
-
 
     if (!fileRef.current?.files?.length) {
       mergeExposureState({

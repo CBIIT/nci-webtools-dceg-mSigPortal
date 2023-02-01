@@ -4,14 +4,14 @@ import { useSelector } from 'react-redux';
 import { useTmbPlotQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
-import './plot.scss';
 export default function MutProfilePlot() {
-  const publicForm = useSelector((state) => state.exposure.publicForm);
+  const { publicForm, main } = useSelector((state) => state.exposure);
   const [params, setParams] = useState('');
   const { data, error, isFetching } = useTmbPlotQuery(params, {
     skip: !params,
   });
 
+  // query after public form is submitted
   useEffect(() => {
     const { study, strategy, signatureSetName, cancer, useAllCancer } =
       publicForm;
@@ -24,6 +24,12 @@ export default function MutProfilePlot() {
       });
     }
   }, [publicForm]);
+  // query after project id is recieved from user form
+  useEffect(() => {
+    if (main.id) {
+      setParams({ userId: main.id });
+    }
+  }, [main.id]);
 
   return (
     <>
