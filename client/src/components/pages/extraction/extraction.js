@@ -1,7 +1,7 @@
 import { Button, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import InputForm from './inputForm/inputForm';
+import ExtractionForm from './extraction-form';
 import Instructions from './instructions';
 // import Download from './download';
 
@@ -104,9 +104,7 @@ export default function Extraction() {
         onCollapsed={(e) => mergeState({ openSidebar: !e })}
       >
         <SidebarPanel>
-          <div className="p-3 bg-white border rounded">
-            <InputForm />
-          </div>
+          <ExtractionForm />
         </SidebarPanel>
         <MainPanel>
           {tabs.filter((tab) => tab.id == displayTab)[0].component}

@@ -1,25 +1,27 @@
 import { useState, useEffect } from 'react';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
-import SelectForm from '../../../controls/select/selectForm';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { useHistory } from 'react-router-dom';
+import SelectForm from '../../controls/select/selectForm';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as extractionActions } from '../../../../services/store/extraction';
-import { actions as modalActions } from '../../../../services/store/modal';
+import { actions as extractionActions } from '../../../services/store/extraction';
+import { actions as modalActions } from '../../../services/store/modal';
 import {
   resetExtractionApi,
   useSeqmatrixOptionsQuery,
   useSignatureOptionsQuery,
   useRefGenomeQuery,
-} from '../../../../services/store/rootApi';
+} from '../../../services/store/rootApi';
 import { useUploadMutation, useSubmitMutation } from './apiSlice';
 
 const actions = { ...extractionActions, ...modalActions };
 
-export default function InputForm() {
+export default function ExtractionForm() {
   const store = useSelector((state) => state.extraction);
   const { submitted } = store.main;
   const { inputFilename, ...inputForm } = store.inputForm;
+  const history = useHistory();
 
   const dispatch = useDispatch();
   const mergeForm = (state) =>
@@ -276,7 +278,12 @@ export default function InputForm() {
   }
 
   async function onSubmit(data) {
-    console.log(data);
+    mergeMain({ submitted: true });
+    mergeForm(data);
+
+    const formData = new FormData();
+    formData.append('inputFile', data.inputFile);
+    const { id } = await uploadFiles(formData).unwrap();
 
     const args = {
       ...(source == 'user' && {
@@ -303,59 +310,16 @@ export default function InputForm() {
         signatureName: data.signatureName.map((e) => e.value).join(';'),
       }),
     };
-
-    const formData = new FormData();
-    formData.append('inputFile', data.inputFile);
-
-    const { id } = await uploadFiles(formData).unwrap();
     const params = { args, signatureQuery, id, email: data.email };
-    const res = await submitForm(params).unwrap();
-
-    console.log(res);
-
-    mergeForm(data);
-    mergeMain({ id, submitted: true });
-    // try {
-    //   mergeMain({ submitted: true, loading: { active: true } });
-    //   mergeState(data);
-    //   const params = {
-    //     study: data.study.value,
-    //     cancer: data.cancer.value,
-    //     strategy: data.strategy.value,
-    //   };
-
-    //   // let matrixData = [];
-    //   // for await (const data of paginateQuery(fetchMatrix, params)) {
-    //   //   matrixData = [...matrixData, ...data];
-    //   // }
-    //   const matrixData = []; //await fetchMatrix(params).unwrap();
-
-    //   mergeMain({ matrixData, projectID: crypto.randomUUID() });
-    // } catch (error) {
-    //   console.log(error);
-    //   if (error.originalStatus == 504) {
-    //     mergeMain({
-    //       error: 'Please Reset Your Parameters and Try again.',
-    //     });
-    //     mergeError({
-    //       visible: true,
-    //       message:
-    //         'Your submission has timed out. Please try again by submitting this job to a queue instead.',
-    //     });
-    //   } else {
-    //     mergeMain({
-    //       error: 'Please Reset Your Parameters and Try again.',
-    //     });
-    //     mergeError(error.data);
-    //   }
-    // }
-    // mergeMain({ loading: { active: false } });
+    const submitStatus = await submitForm(params).unwrap();
+    history.push(`/extraction/${submitStatus.id}`);
   }
 
   return (
     <Form
       onSubmit={handleSubmit(onSubmit)}
       style={{ maxHeight: '900px', overflow: 'hidden auto' }}
+      className="p-3 bg-white border rounded"
     >
       <LoadingOverlay
         active={fetchingSeqmatrixOptions || loadingUpload || loadingSubmit}
@@ -485,6 +449,7 @@ export default function InputForm() {
             </Form.Group>
             <Button
               variant="link"
+              disabled={submitted}
               onClick={async () => {
                 resetForm(sample1);
                 const file = 'extraction_sample_SBS96.all';
