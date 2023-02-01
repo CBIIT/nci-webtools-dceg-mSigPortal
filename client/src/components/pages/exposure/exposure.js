@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { saveAs } from 'file-saver';
+import { useParams } from 'react-router-dom';
 import PublicForm from './publicForm/publicForm';
 import UserForm from './userForm/userForm';
 import Instructions from './instructions';
@@ -25,7 +26,7 @@ import {
 const actions = { ...exposureActions, ...modalActions };
 const { Group, Label, Check } = Form;
 
-export default function Exposure({ match }) {
+export default function Exposure() {
   const dispatch = useDispatch();
 
   const mergeState = (state) =>
@@ -35,7 +36,7 @@ export default function Exposure({ match }) {
 
   const { publicForm, main } = useSelector((state) => state.exposure);
 
-  const { exampleName } = match.params;
+  const { exampleName } = useParams();
 
   // const [variableFileObj, setVariable] = useState(new File([], ''));
 

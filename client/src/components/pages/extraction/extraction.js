@@ -1,5 +1,6 @@
 import { Button, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import InputForm from './inputForm/inputForm';
 import Instructions from './instructions';
 // import Download from './download';
@@ -14,11 +15,12 @@ import {
 
 const actions = { ...extractionActions, ...modalActions };
 
-export default function Extraction({ match }) {
+export default function Extraction() {
   const dispatch = useDispatch();
   const mergeState = (state) =>
     dispatch(actions.mergeExtraction({ main: state }));
 
+  const id = useParams().id || false;
   const { displayTab, openSidebar, submitted } = useSelector(
     (state) => state.extraction.main
   );

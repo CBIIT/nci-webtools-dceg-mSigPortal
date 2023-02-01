@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { RecoilRoot } from 'recoil';
-import { HashRouter as Router, Route } from 'react-router-dom';
+import { HashRouter, Switch, Route } from 'react-router-dom';
 import { NavbarCustom } from './controls/navbar/navbar';
 import Home from './pages/home/home';
 import About from './pages/about/about';
@@ -240,26 +240,31 @@ export default function App() {
 
   return (
     <>
-      <Router>
+      <HashRouter>
         <Header />
         <RecoilRoot>
           <ErrorModal />
           <SuccessModal />
           <NavbarCustom links={links} />
-          <Route path="/" exact={true} render={(_) => <Home links={links} />} />
-          <Route path="/about" component={About} />
-          <Route path="/visualization/:type?/:id?" component={Visualization} />
-          <Route path="/catalog" component={Catalog} />
-          <Route path="/exploration/:exampleName?" component={Exposure} />
-          <Route path="/refitting" component={Refitting} />
-          <Route path="/association" component={Association} />
-          <Route path="/extraction" component={Extraction} />
-          <Route path="/publications" component={Publications} />
-          <Route path="/faq" component={Faq} />
-          <Route path="/apiaccess" component={APIAccess} />
+          <Switch>
+            <Route path="/" exact={true} children={<Home links={links} />} />
+            <Route path="/about" children={<About />} />
+            <Route
+              path="/visualization/:type?/:id?"
+              children={<Visualization />}
+            />
+            <Route path="/catalog" children={<Catalog />} />
+            <Route path="/exploration/:exampleName?" children={<Exposure />} />
+            <Route path="/refitting" children={<Refitting />} />
+            <Route path="/association" children={<Association />} />
+            <Route path="/extraction/:id?" children={<Extraction />} />
+            <Route path="/publications" children={<Publications />} />
+            <Route path="/faq" children={<Faq />} />
+            <Route path="/apiaccess" children={<APIAccess />} />
+          </Switch>
         </RecoilRoot>
         <Footer />
-      </Router>
+      </HashRouter>
     </>
   );
 }
