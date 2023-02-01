@@ -25,8 +25,12 @@ export function createApi(env) {
   const router = Router();
   router.use(express.json());
   router.use(logRequests());
+
+  // serve static files under /data
   router.use('/data', express.static(env.DATA_FOLDER));
+
   router.get('/ping', async (req, res) => res.json(true));
+
   router.post(
     '/upload/:id',
     validate,
@@ -35,6 +39,7 @@ export function createApi(env) {
     logFiles(),
     (req, res) => res.json({ id: req.params.id })
   );
+
   router.post(
     '/submit/:id',
     validate,
@@ -42,6 +47,7 @@ export function createApi(env) {
     async (req, res) =>
       res.json(await submit({ ...req.body, id: req.params.id }, req.app))
   );
+
   router.post('/query/:id', async (req, res) =>
     res.json(await query({ ...req.body, id: req.params.id }))
   );
