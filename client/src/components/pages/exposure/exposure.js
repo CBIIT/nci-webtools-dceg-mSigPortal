@@ -9,6 +9,7 @@ import TMB2 from './tmb/tmb.js';
 import TmbSig2 from './tmbSignature/tmbSignature.js';
 import MsBurden2 from './msBurden/msBurden.js';
 import MsAssociation from './msAssociation';
+import MsAssociation2 from './msAssociation/msAssociation';
 import MsDecomposition2 from './msDecomposition/msDecomposition.js';
 import MsLandscape2 from './msLandscape/msLandscape.js';
 import MsPrevalence2 from './msPrevalence/msPrevalence.js';
@@ -187,7 +188,7 @@ export default function Exposure({ match }) {
       name: 'MS Decomposition',
     },
     {
-      component: <MsAssociation />,
+      component: <MsAssociation2 />,
       id: 'msAssociation',
       name: 'MS Association',
     },

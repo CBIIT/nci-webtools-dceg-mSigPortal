@@ -45,8 +45,6 @@ export default function ProfileFormPlot() {
     name: 'plotForms',
   });
 
-  //console.log(plotsFields);
-
   const { plotForms } = watch();
 
   const supportMatrix = {
@@ -368,14 +366,12 @@ export default function ProfileFormPlot() {
   }
   // set inital source
   useEffect(() => {
-    console.log('int');
     if (!plotForms[0].source && signatureSourceOptions.length)
       handleSource(signatureSourceOptions[0], plotForms.length - 1);
   }, [signatureSourceOptions]);
 
   // get data on form change
   useEffect(() => {
-    console.log('form change');
     if (plotForms.length) {
       const params = plotForms
         .filter(
@@ -395,11 +391,8 @@ export default function ProfileFormPlot() {
           strategy: e.strategy.value,
           signatureName: e.signatureName.value,
         }));
-      console.log(params);
       setParams({ params });
     }
-
-    // console.log(Object.values(params));
 
     //setParams(Object.values(params));
   }, [plotForms]);
@@ -428,7 +421,6 @@ export default function ProfileFormPlot() {
                   options={signatureSourceOptions}
                   control={control}
                   onChange={(e) => handleSource(e, index)}
-                  // onChange={updatePlots(index)}
                 />
               </Col>
               <Col lg="auto">
@@ -441,7 +433,6 @@ export default function ProfileFormPlot() {
                   onChange={(e) =>
                     handleProfile(plotForms[index].source, e, index)
                   }
-                  //onChange={updatePlots(index)}
                 />
               </Col>
               <Col lg="auto">
@@ -462,7 +453,6 @@ export default function ProfileFormPlot() {
                       index
                     )
                   }
-                  // onChange={updatePlots(index)}
                 />
               </Col>
               <Col lg="auto">
@@ -485,7 +475,6 @@ export default function ProfileFormPlot() {
                       index
                     )
                   }
-                  // onChange={updatePlots(index)}
                 />
               </Col>
               <Col lg="auto">
@@ -510,7 +499,6 @@ export default function ProfileFormPlot() {
                       index
                     )
                   }
-                  // onChange={updatePlots(index)}
                 />
               </Col>
               <Col lg="auto">
@@ -537,7 +525,6 @@ export default function ProfileFormPlot() {
                       index
                     )
                   }
-                  // onChange={updatePlots(index)}
                 />
               </Col>
               <Col lg="auto" className="d-flex justify-content-end">
