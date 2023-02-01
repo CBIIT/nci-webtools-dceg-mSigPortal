@@ -31,7 +31,7 @@ export default function ProfileFormPlot() {
 
   const [params, setParams] = useState(null);
 
-  const { control, setValue, watch } = useForm({
+  const { control, setValue, watch, handleSubmit } = useForm({
     defaultValues: { plotForms: storePlots },
   });
 
@@ -39,6 +39,7 @@ export default function ProfileFormPlot() {
     fields: plotsFields,
     append: addPlots,
     remove: removePlots,
+    update: updatePlots,
   } = useFieldArray({
     control,
     name: 'plotForms',
@@ -342,7 +343,7 @@ export default function ProfileFormPlot() {
       signatureName,
       index
     );
-    //setValue(`plotForms[${index}].signatureName`, signatureName);
+    setValue(`plotForms[${index}].signatureName`, signatureName);
 
     // mergeState({
     //   strategy,
@@ -367,32 +368,13 @@ export default function ProfileFormPlot() {
   }
   // set inital source
   useEffect(() => {
+    console.log('int');
     if (!plotForms[0].source && signatureSourceOptions.length)
-      handleSource(signatureSourceOptions[0], 0);
+      handleSource(signatureSourceOptions[0], plotForms.length - 1);
   }, [signatureSourceOptions]);
-
-  // const validDataArray = plotForms.filter(
-  //   (e) =>
-  //     e.source?.value &&
-  //     e.profile?.value &&
-  //     e.matrix?.value &&
-  //     e.signatureSetName?.value &&
-  //     e.strategy?.value &&
-  //     e.signatureName?.value
-  // );
-  //console.log(validDataArray);
-  //console.log(plotForms.filter((e) => e.source.value));
 
   // get data on form change
   useEffect(() => {
-    // const params = {
-    //   source: plotForms.filter((e) => e.source.value),
-    //   profile: plotForms.filter((e) => e.profile.value),
-    //   matrix: plotForms.filter((e) => e.matrix.value),
-    //   signatureSetName: plotForms.filter((e) => e.value),
-    //   strategy: plotForms.filter((e) => e.strategy.value),
-    //   signatureName: plotForms.filter((e) => e.signatureName.value),
-    // };
     console.log('form change');
     if (plotForms.length) {
       const params = plotForms
@@ -446,6 +428,7 @@ export default function ProfileFormPlot() {
                   options={signatureSourceOptions}
                   control={control}
                   onChange={(e) => handleSource(e, index)}
+                  // onChange={updatePlots(index)}
                 />
               </Col>
               <Col lg="auto">
@@ -458,6 +441,7 @@ export default function ProfileFormPlot() {
                   onChange={(e) =>
                     handleProfile(plotForms[index].source, e, index)
                   }
+                  //onChange={updatePlots(index)}
                 />
               </Col>
               <Col lg="auto">
@@ -478,6 +462,7 @@ export default function ProfileFormPlot() {
                       index
                     )
                   }
+                  // onChange={updatePlots(index)}
                 />
               </Col>
               <Col lg="auto">
@@ -500,6 +485,7 @@ export default function ProfileFormPlot() {
                       index
                     )
                   }
+                  // onChange={updatePlots(index)}
                 />
               </Col>
               <Col lg="auto">
@@ -524,6 +510,7 @@ export default function ProfileFormPlot() {
                       index
                     )
                   }
+                  // onChange={updatePlots(index)}
                 />
               </Col>
               <Col lg="auto">
@@ -550,7 +537,17 @@ export default function ProfileFormPlot() {
                       index
                     )
                   }
+                  // onChange={updatePlots(index)}
                 />
+              </Col>
+              <Col lg="auto" className="d-flex justify-content-end">
+                <Button
+                  className="mt-auto mb-3"
+                  variant="primary"
+                  onClick={() => updatePlots()}
+                >
+                  Calculate
+                </Button>
               </Col>
             </Row>
             {/* <AdditionalControls /> */}
@@ -583,7 +580,7 @@ export default function ProfileFormPlot() {
               <p>An error has occured. Please verify your input.</p>
             </div>
 
-            {plotdata && plotdata[index] ? (
+            {plotdata && plotdata[index] && (
               <Plotly
                 data={plotdata[index].traces}
                 layout={plotdata[index].layout}
@@ -591,8 +588,6 @@ export default function ProfileFormPlot() {
                 divId="mutationalProfilePlot"
                 filename={plotForms[index].source.value || 'Mutational Profile'}
               />
-            ) : (
-              <div className="text-center my-4">No data available</div>
             )}
             <Row className="mr-3">
               {index === plotsFields.length - 1 ? (

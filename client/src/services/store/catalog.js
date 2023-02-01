@@ -35,14 +35,11 @@ export const getInitialState = () => ({
     plots: [
       {
         source: '',
-        profile: { value: 'SBS', label: 'SBS' },
-        matrix: { value: '96', label: '96' },
-        signatureSetName: {
-          value: 'Other_Published_Signatures_GRCh37_SBS96',
-          label: 'Other_Published_Signatures_GRCh37_SBS96',
-        },
-        strategy: { value: 'TS', label: 'TS' },
-        signatureName: { value: 'SBS_CPD_CDSEQ', label: 'SBS_CPD_CDSEQ' },
+        profile: '',
+        matrix: '',
+        signatureSetName: '',
+        strategy: '',
+        signatureName: '',
       },
     ],
   },
