@@ -130,23 +130,23 @@ export default function MsAssociationForm() {
           </Col>
         </Row>
       </Form>
-      {/* <div id="exposureAssociationPlot">
+      <div id="exposureAssociationPlot">
         {signatureNameError && (
           <div>
             <hr />
             <p className="p-3 text-danger">{signatureNameError}</p>
           </div>
-        )} */}
-      {/* {plotPath &&
-        <Plotly
+        )}
+        {data && (
+          <Plotly
             className="w-100"
             data={data.traces}
             layout={data.layout}
             config={data.config}
-          /> 
-        }  */}
-      {/* <Debug msg={debugR} /> */}
+          />
+        )}
+        {/* <Debug msg={debugR} /> */}
+      </div>
     </div>
-    // </div>
   );
 }
