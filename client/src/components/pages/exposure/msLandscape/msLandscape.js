@@ -1,10 +1,8 @@
 import { Container } from 'react-bootstrap';
 import MsLandscapePlot from './msLandscape-plot';
 import Description from '../../../controls/description/description';
-import { readFile } from '../../../controls/utils/utils';
 
-export default function MutationalProfiles(props) {
-
+export default function MsLandscape(props) {
   return (
     <Container fluid className="bg-white border rounded p-0" {...props}>
       <div className="p-3">

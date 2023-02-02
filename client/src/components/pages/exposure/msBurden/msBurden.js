@@ -3,7 +3,7 @@ import TmbBurdenPlot from './msBurden-plot';
 import TmbBurdenForm from './msBurden-form';
 import Description from '../../../controls/description/description';
 
-export default function MutationalProfiles(props) {
+export default function MsBurden(props) {
   return (
     <Container fluid className="bg-white border rounded p-0" {...props}>
       <div className="p-3">

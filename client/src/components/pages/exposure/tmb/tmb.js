@@ -2,7 +2,7 @@ import { Container } from 'react-bootstrap';
 import TmbPlot from './tmb-plot';
 import Description from '../../../controls/description/description';
 
-export default function MutationalProfiles(props) {
+export default function TMB(props) {
   return (
     <Container fluid className="bg-white border rounded p-0" {...props}>
       <div className="p-3">

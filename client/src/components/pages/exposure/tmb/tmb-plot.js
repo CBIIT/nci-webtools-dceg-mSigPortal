@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { useTmbPlotQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
-export default function MutProfilePlot() {
+export default function TmbPlot() {
   const { publicForm, main } = useSelector((state) => state.exposure);
   const [params, setParams] = useState('');
   const { data, error, isFetching } = useTmbPlotQuery(params, {

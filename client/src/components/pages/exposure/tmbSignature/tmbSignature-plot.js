@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { useTmbSignaturesPlotQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
-export default function MutProfilePlot() {
+export default function TmbSignaturePlot() {
   const { publicForm, main } = useSelector((state) => state.exposure);
   const [params, setParams] = useState('');
   const { data, error, isFetching } = useTmbSignaturesPlotQuery(params, {

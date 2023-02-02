@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { useMsDecompositionQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
-export default function MutProfilePlot() {
+export default function MsDecompositionPlot() {
   const { publicForm, main } = useSelector((state) => state.exposure);
   const [params, setParams] = useState('');
   // const { data, error, isFetching } = useMsDecompositionQuery(params, {

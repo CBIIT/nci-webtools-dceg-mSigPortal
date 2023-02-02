@@ -1,9 +1,9 @@
 import { Container } from 'react-bootstrap';
-import MsPrevalence from './msPrevalence-plot';
 import Description from '../../../controls/description/description';
+import MsPrevalencePlot from './msPrevalence-plot';
 import MsPrevalenceForm from './msPrevalence-form';
 
-export default function MutationalProfiles(props) {
+export default function MsPrevalence(props) {
   return (
     <Container fluid className="bg-white border rounded p-0" {...props}>
       <div className="p-3">
@@ -17,7 +17,7 @@ export default function MutationalProfiles(props) {
       <MsPrevalenceForm />
       <hr />
 
-      <MsPrevalence />
+      <MsPrevalencePlot />
     </Container>
   );
 }
