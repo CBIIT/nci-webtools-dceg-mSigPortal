@@ -1,6 +1,7 @@
 import { Button, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import InputForm from './inputForm/inputForm';
+import { useParams } from 'react-router-dom';
+import ExtractionForm from './extraction-form';
 import Instructions from './instructions';
 // import Download from './download';
 
@@ -14,11 +15,12 @@ import {
 
 const actions = { ...extractionActions, ...modalActions };
 
-export default function Extraction({ match }) {
+export default function Extraction() {
   const dispatch = useDispatch();
   const mergeState = (state) =>
     dispatch(actions.mergeExtraction({ main: state }));
 
+  const id = useParams().id || false;
   const { displayTab, openSidebar, submitted } = useSelector(
     (state) => state.extraction.main
   );
@@ -102,9 +104,7 @@ export default function Extraction({ match }) {
         onCollapsed={(e) => mergeState({ openSidebar: !e })}
       >
         <SidebarPanel>
-          <div className="p-3 bg-white border rounded">
-            <InputForm />
-          </div>
+          <ExtractionForm />
         </SidebarPanel>
         <MainPanel>
           {tabs.filter((tab) => tab.id == displayTab)[0].component}

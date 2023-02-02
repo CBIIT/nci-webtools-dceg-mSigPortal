@@ -77,7 +77,6 @@ export async function extraction(
       output: path.join(outputFolder),
       signature_database: signatureFilePath,
     };
-    logger.debug(transformArgs);
     const cliArgs = Object.entries(transformArgs)
       .reduce((params, [key, value]) => [...params, `--${key} ${value}`], [])
       .join(' ');
@@ -97,19 +96,19 @@ export async function extraction(
     // send success notification if email was provided
     if (params.email) {
       //delete input files
-      readdir(paths.inputFolder, (err, files) => {
-        if (err) {
-          console.log(err);
-        }
+      // readdir(paths.inputFolder, (err, files) => {
+      //   if (err) {
+      //     console.log(err);
+      //   }
 
-        files.forEach((file) => {
-          const fileDir = path.join(paths.inputFolder, file);
+      //   files.forEach((file) => {
+      //     const fileDir = path.join(paths.inputFolder, file);
 
-          if (file !== 'params.json') {
-            unlinkSync(fileDir);
-          }
-        });
-      });
+      //     if (file !== 'params.json') {
+      //       unlinkSync(fileDir);
+      //     }
+      //   });
+      // });
 
       await sendNotification(
         params.email,
@@ -172,13 +171,52 @@ export async function extraction(
  * @returns {any} paths
  */
 export async function getPaths(params, env = process.env) {
-  const { id } = params;
+  const { id, args } = params;
   const inputFolder = path.resolve(env.INPUT_FOLDER, id);
   const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
   const paramsFile = path.resolve(inputFolder, 'params.json');
   const statusFile = path.resolve(outputFolder, 'status.json');
   const manifestFile = path.resolve(outputFolder, 'manifest.json');
   const databaseFile = path.resolve(outputFolder, 'results.db');
+
+  // map files to be used as input for exploration module
+  const solutionsFolder = path.resolve(
+    outputFolder,
+    args.context_type,
+    'Suggested_Solution'
+  );
+  const denovoFolder = path.resolve(
+    solutionsFolder,
+    `${args.context_type}_De-Novo_Solution`
+  );
+  const decomposedFolder = path.resolve(
+    solutionsFolder,
+    `COSMIC_${args.context_type}_Decomposed_Solution`
+  );
+  // SigProfilerExtraction log
+  const extractionLog = path.resolve(outputFolder, 'JOB_METADATA.txt');
+
+  // matrix file - input for extraction and exploration
+  const matrixFile = path.resolve(inputFolder, args.input_data);
+
+  // files for denovo exploration input
+  const denovoExposureFile = path.resolve(
+    denovoFolder,
+    'Activities',
+    `${args.context_type}_De-Novo_Activities_refit.txt`
+  );
+  const denovoSignatureFile = path.resolve(
+    denovoFolder,
+    `${args.context_type}_De-Novo_Signatures.txt`
+  );
+
+  // files for decomposed exploration input
+  const decomposedExposureFile = path.resolve(
+    decomposedFolder,
+    'Activities',
+    `COSMIC_${args.context_type}_Activities.txt`
+  );
+  const decomposedSignatureFile = path.resolve(outputFolder, 'signature.tsv');
 
   return {
     inputFolder,
@@ -187,6 +225,12 @@ export async function getPaths(params, env = process.env) {
     statusFile,
     manifestFile,
     databaseFile,
+    extractionLog,
+    matrixFile,
+    denovoExposureFile,
+    denovoSignatureFile,
+    decomposedExposureFile,
+    decomposedSignatureFile,
   };
 }
 
