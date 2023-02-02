@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import SelectForm from '../../controls/select/selectForm';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
@@ -13,22 +13,28 @@ import {
   useSignatureOptionsQuery,
   useRefGenomeQuery,
 } from '../../../services/store/rootApi';
-import { useUploadMutation, useSubmitMutation } from './apiSlice';
+import {
+  useUploadMutation,
+  useSubmitMutation,
+  useParamsQuery,
+  useManifestQuery,
+} from './apiSlice';
 
 const actions = { ...extractionActions, ...modalActions };
 
 export default function ExtractionForm() {
   const store = useSelector((state) => state.extraction);
   const { submitted } = store.main;
-  const { inputFilename, ...inputForm } = store.inputForm;
+  const { id } = useParams();
   const history = useHistory();
 
   const dispatch = useDispatch();
-  const mergeForm = (state) =>
-    dispatch(actions.mergeExtraction({ inputForm: state }));
   const resetExtraction = (_) => dispatch(actions.resetExtraction());
   const mergeMain = (state) =>
     dispatch(actions.mergeExtraction({ main: state }));
+
+  const { data: params } = useParamsQuery(id, { skip: !id });
+  const { data: manifest } = useManifestQuery(id, { skip: !id });
 
   // query options to populate form
   const {
@@ -180,6 +186,11 @@ export default function ExtractionForm() {
     setValue('strategy', strategies[0]);
   }
 
+  function handleExplorationType(e) {
+    setValue('explorationType', e);
+    mergeMain({ explorationType: e });
+  }
+
   // define form
   const defaultValues = {
     source: 'user',
@@ -203,7 +214,8 @@ export default function ExtractionForm() {
     nmf_init: 'random',
     precision: 'single',
 
-    calculationType: { label: 'Denovo', value: 'Denovo' },
+    explorationType: { label: 'Denovo', value: 'Denovo' },
+    email: '',
   };
 
   const sample1 = {
@@ -231,10 +243,7 @@ export default function ExtractionForm() {
     max_nmf_iterations: 4,
     nmf_test_conv: 2,
     nmf_replicates: 10,
-
-    email: 'test.email@nih.gov',
   };
-  const sample2 = {};
 
   const {
     control,
@@ -252,12 +261,17 @@ export default function ExtractionForm() {
     cancer,
     inputFile,
     reference_genome,
-    exome,
     context_type,
     signatureSetName,
-    minSignatures,
     input_type,
   } = watch();
+
+  useEffect(() => {
+    if (params) {
+      resetForm(params.form);
+      mergeMain({ submitted: true });
+    }
+  }, [resetForm, params]);
 
   // set inital genome option after querying options
   useEffect(() => {
@@ -271,7 +285,7 @@ export default function ExtractionForm() {
   }, [contextTypeOptions]);
 
   function handleReset() {
-    window.location.hash = '#/extraction';
+    history.push('/extraction');
     resetForm(defaultValues);
     resetExtraction();
     dispatch(resetExtractionApi);
@@ -279,7 +293,6 @@ export default function ExtractionForm() {
 
   async function onSubmit(data) {
     mergeMain({ submitted: true });
-    mergeForm(data);
 
     const formData = new FormData();
     formData.append('inputFile', data.inputFile);
@@ -310,7 +323,7 @@ export default function ExtractionForm() {
         signatureName: data.signatureName.map((e) => e.value).join(';'),
       }),
     };
-    const params = { args, signatureQuery, id, email: data.email };
+    const params = { args, signatureQuery, id, email: data.email, form: data };
     const submitStatus = await submitForm(params).unwrap();
     history.push(`/extraction/${submitStatus.id}`);
   }
@@ -330,13 +343,14 @@ export default function ExtractionForm() {
       <div className="border rounded p-2 mb-3">
         <SelectForm
           className="mb-2"
-          name="calculationType"
+          name="explorationType"
           label="Exploration Calculation"
-          disabled={!submitted}
+          disabled={!manifest}
           options={['Denovo', 'Decomposed'].map((e) => ({
             label: e,
             value: e,
           }))}
+          onChange={handleExplorationType}
           control={control}
         />
         <Form.Text className="text-muted">
@@ -431,9 +445,10 @@ export default function ExtractionForm() {
                     value={''} // set dummy value for file input
                     disabled={submitted}
                     id="inputFile"
-                    title={inputFile?.name || 'Upload Data File...'}
                     label={
-                      inputFile?.name || inputFilename || 'Upload Data File...'
+                      inputFile?.name ||
+                      params?.args.input_data ||
+                      'Upload Data File...'
                     }
                     isInvalid={errors.inputFile}
                     feedback="Please upload a data file"
@@ -462,9 +477,6 @@ export default function ExtractionForm() {
             >
               Load Sample
             </Button>
-            {/* <Button variant="link" onClick={() => resetForm(sample2)}>
-              Sample 2
-            </Button> */}
           </div>
         )}
       </div>
