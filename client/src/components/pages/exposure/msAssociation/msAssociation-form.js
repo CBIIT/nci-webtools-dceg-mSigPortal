@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Row, Col } from 'react-bootstrap';
+import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import Select from '../../../controls/select/selectForm';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as exposureActions } from '../../../../services/store/exposure';
-import { useMsAssociationOptionsQuery } from './apiSlice';
+import {
+  useMsAssociationOptionsQuery,
+  useMsAssociationQuery,
+} from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plotly from '../../../controls/plotly/plot/plot';
 
@@ -20,6 +23,7 @@ export default function MsAssociationForm() {
     (state) => state.exposure
   );
   const [signatureOptionParams, setSignatureOptionParams] = useState('');
+  const [params, setParams] = useState(null);
   const {
     data: signatureNameOptions,
     error: signatureNameError,
@@ -28,11 +32,19 @@ export default function MsAssociationForm() {
     skip: !signatureOptionParams,
   });
 
-  const { control } = useForm({ defaultValues: msAssociation });
+  const { data, error, isFetching } = useMsAssociationQuery(params, {
+    skip: !params,
+  });
 
-  console.log(signatureNameOptions);
-  console.log(msAssociation);
-  console.log(publicForm);
+  const { control, handleSubmit, watch } = useForm({
+    defaultValues: msAssociation,
+  });
+
+  const { signatureName1, signatureName2 } = watch();
+
+  //   console.log(signatureNameOptions);
+  //   console.log(msAssociation);
+  //   console.log(publicForm);
   // query signature name options
   useEffect(() => {
     if (publicForm.study) {
@@ -47,9 +59,28 @@ export default function MsAssociationForm() {
     }
   }, [publicForm, main]);
 
+  function getSignatureNameOptions(name) {
+    return name ? name.map((e) => ({ label: e, value: e })) : [];
+  }
+
+  function onSubmit(data) {
+    console.log(data);
+    mergeMsAssociation(data);
+    const params = {
+      study: publicForm.study.value,
+      strategy: publicForm.strategy.value,
+      signatureSetName: publicForm.signatureSetName.value,
+      cancer: publicForm.cancer.value,
+
+      signatureName:
+        data.signatureName1.value + ';' + data.signatureName2.value,
+    };
+    setParams(params);
+  }
+
   return (
     <div>
-      <Form className="p-3">
+      <Form className="p-3" onSubmit={handleSubmit(onSubmit)}>
         <LoadingOverlay active={signatureNameIsFetching} />
         <Row>
           <Col lg="auto">
@@ -60,18 +91,18 @@ export default function MsAssociationForm() {
               disabled={!signatureNameOptions}
               control={control}
               options={signatureNameOptions}
-              onChange={(name) => mergeMsAssociation({ signatureName1: name })}
+              //onChange={(name) => mergeMsAssociation({ signatureName1: name })}
             />
           </Col>
           <Col lg="auto">
             <Select
-              name="signatureName1"
+              name="signatureName2"
               label="Signature Name 2"
               value={msAssociation.signatureName2}
               disabled={!signatureNameOptions}
               control={control}
               options={signatureNameOptions}
-              onChange={(name) => mergeMsAssociation({ signatureName2: name })}
+              //onChange={(name) => mergeMsAssociation({ signatureName2: name })}
             />
           </Col>
           <Col lg="auto">
@@ -81,25 +112,21 @@ export default function MsAssociationForm() {
                 label="Samples Detected Both Signatures"
                 value={msAssociation.both}
                 checked={msAssociation.both}
-                onChange={(e) =>
-                  mergeMsAssociation({ both: !msAssociation.both })
-                }
+                // onChange={(e) =>
+                //   mergeMsAssociation({ both: !msAssociation.both })
+                // }
               />
             </Group>
           </Col>
           <Col lg="auto" className="d-flex">
-            {/* <Button
+            <Button
               className="mt-auto mb-3"
-              disabled={
-                !signatureName1 ||
-                !signatureName2 ||
-                (source == 'user' && !projectID)
-              }
+              //disabled={!signatureName1 || !signatureName2}
               variant="primary"
-              onClick={calculateAssociation}
+              type="submit"
             >
-              Recalculate
-            </Button> */}
+              Calculate
+            </Button>
           </Col>
         </Row>
       </Form>

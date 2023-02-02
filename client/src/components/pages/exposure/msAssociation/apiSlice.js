@@ -9,6 +9,7 @@ export const msAssociationApiSlice = explorationApiSlice.injectEndpoints({
         url: 'signature_activity',
         params: { ...params },
       }),
+
       transformResponse: (data) => {
         console.log(data);
         return data
@@ -26,7 +27,20 @@ export const msAssociationApiSlice = explorationApiSlice.injectEndpoints({
           : [];
       },
     }),
+    msAssociation: builder.query({
+      query: (params) => ({
+        url: 'signature_activity',
+        params: { ...params },
+      }),
+      transformResponse: (data, meta, arg) => {
+        console.log(data);
+        console.log(arg);
+
+        return MsAssociation(data, arg);
+      },
+    }),
   }),
 });
 
-export const { useMsAssociationOptionsQuery } = msAssociationApiSlice;
+export const { useMsAssociationOptionsQuery, useMsAssociationQuery } =
+  msAssociationApiSlice;
