@@ -155,55 +155,43 @@ export default function Exposure() {
 
   const tabs = [
     {
-      component: <Instructions loading={loading} />,
       id: 'instructions',
       name: 'Instructions',
     },
     {
-      component: <TMB state={{ ...publicForm, ...main }} />,
       id: 'tmb',
       name: 'TMB',
     },
     {
-      component: <TmbSig state={{ ...publicForm, ...main }} />,
       id: 'tmbSig',
       name: 'TMB Signatures',
     },
     {
-      component: <MsBurden state={{ ...publicForm, ...main }} />,
       id: 'msBurden',
       name: 'MS Burden',
     },
     {
-      component: <MsDecomposition state={{ ...publicForm, ...main }} />,
       id: 'msDecomposition',
       name: 'MS Decomposition',
     },
     {
-      // component: <MsAssociation state={{ ...publicForm, ...main }} />,
-      component: <div>Under Construction</div>,
       id: 'msAssociation',
       name: 'MS Association',
     },
     {
-      component: <MsLandscape state={{ ...publicForm, ...main }} />,
       id: 'msLandscape',
       name: 'MS Landscape',
     },
     {
-      component: <MsPrevalence state={{ ...publicForm, ...main }} />,
       id: 'msPrevalence',
       name: 'MS Prevalence',
     },
     {
-      // component: <MSIndividual state={{ ...publicForm, ...main }} />,
-      component: <div>Under Construction</div>,
       id: 'msIndividual',
       name: 'MS Individual',
     },
     source == 'public' ? (
       {
-        component: <Download exposureDownload={exposureDownload} />,
         id: 'download',
         name: 'Download',
       }
@@ -330,7 +318,46 @@ export default function Exposure() {
           </div>
         </SidebarPanel>
         <MainPanel>
-          {tabs.filter((tab) => tab.id == displayTab)[0].component}
+          <div className={displayTab == 'instructions' ? 'd-block' : 'd-none'}>
+            <Instructions />
+          </div>
+          <div className={displayTab == 'tmb' ? 'd-block' : 'd-none'}>
+            <TMB state={{ ...publicForm, ...main }} />
+          </div>
+          <div className={displayTab == 'tmbSig' ? 'd-block' : 'd-none'}>
+            <TmbSig state={{ ...publicForm, ...main }} />
+          </div>
+          <div className={displayTab == 'msBurden' ? 'd-block' : 'd-none'}>
+            <MsBurden state={{ ...publicForm, ...main }} />
+          </div>
+          <div
+            className={displayTab == 'msDecomposition' ? 'd-block' : 'd-none'}
+          >
+            <MsDecomposition state={{ ...publicForm, ...main }} />
+          </div>
+          <div className={displayTab == 'msAssociation' ? 'd-block' : 'd-none'}>
+            {/* <MsAssociation state={{ ...publicForm, ...main }} /> */}
+            Under Construction
+          </div>
+          <div className={displayTab == 'msLandscape' ? 'd-block' : 'd-none'}>
+            <MsLandscape state={{ ...publicForm, ...main }} />
+          </div>
+          <div className={displayTab == 'msPrevalence' ? 'd-block' : 'd-none'}>
+            <MsPrevalence state={{ ...publicForm, ...main }} />
+          </div>
+          <div className={displayTab == 'msIndividual' ? 'd-block' : 'd-none'}>
+            {/* <MsIndividual state={{ ...publicForm, ...main }}  /> */}
+            Under Construction
+          </div>
+          <div
+            className={
+              displayTab == 'download' && source == 'public'
+                ? 'd-block'
+                : 'd-none'
+            }
+          >
+            <Download exposureDownload={exposureDownload} />
+          </div>
         </MainPanel>
       </SidebarContainer>
     </div>
