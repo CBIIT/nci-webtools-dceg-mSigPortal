@@ -6,14 +6,14 @@ import { useParams } from 'react-router-dom';
 import PublicForm from './publicForm/publicForm';
 import UserForm from './userForm/userForm';
 import Instructions from './instructions';
-import TMB2 from './tmb/tmb.js';
-import TmbSig2 from './tmbSignature/tmbSignature.js';
-import MsBurden2 from './msBurden/msBurden.js';
-import MsAssociation from './msAssociation';
-import MsDecomposition2 from './msDecomposition/msDecomposition.js';
-import MsLandscape2 from './msLandscape/msLandscape.js';
-import MsPrevalence2 from './msPrevalence/msPrevalence.js';
-import MSIndividual from './msIndividual';
+import TMB from './tmb/tmb.js';
+import TmbSig from './tmbSignature/tmbSignature.js';
+import MsBurden from './msBurden/msBurden.js';
+// import MsAssociation from './msAssociation';
+import MsDecomposition from './msDecomposition/msDecomposition.js';
+import MsLandscape from './msLandscape/msLandscape.js';
+import MsPrevalence from './msPrevalence/msPrevalence.js';
+// import MSIndividual from './msIndividual';
 import Download from './download';
 import { actions as exposureActions } from '../../../services/store/exposure';
 import { actions as modalActions } from '../../../services/store/modal';
@@ -40,16 +40,8 @@ export default function Exposure() {
 
   // const [variableFileObj, setVariable] = useState(new File([], ''));
 
-  const {
-    displayTab,
-    exposureCancer,
-    source,
-    loading,
-    projectID,
-    openSidebar,
-    submitted,
-    samples,
-  } = main;
+  const { displayTab, source, loading, projectID, openSidebar, submitted } =
+    main;
 
   // load example if available
   useEffect(() => {
@@ -168,42 +160,44 @@ export default function Exposure() {
       name: 'Instructions',
     },
     {
-      component: <TMB2 />,
+      component: <TMB state={{ ...publicForm, ...main }} />,
       id: 'tmb',
       name: 'TMB',
     },
     {
-      component: <TmbSig2 />,
+      component: <TmbSig state={{ ...publicForm, ...main }} />,
       id: 'tmbSig',
       name: 'TMB Signatures',
     },
     {
-      component: <MsBurden2 />,
+      component: <MsBurden state={{ ...publicForm, ...main }} />,
       id: 'msBurden',
       name: 'MS Burden',
     },
     {
-      component: <MsDecomposition2 />,
+      component: <MsDecomposition state={{ ...publicForm, ...main }} />,
       id: 'msDecomposition',
       name: 'MS Decomposition',
     },
     {
-      component: <MsAssociation />,
+      // component: <MsAssociation state={{ ...publicForm, ...main }} />,
+      component: <div>Under Construction</div>,
       id: 'msAssociation',
       name: 'MS Association',
     },
     {
-      component: <MsLandscape2 />,
+      component: <MsLandscape state={{ ...publicForm, ...main }} />,
       id: 'msLandscape',
       name: 'MS Landscape',
     },
     {
-      component: <MsPrevalence2 />,
+      component: <MsPrevalence state={{ ...publicForm, ...main }} />,
       id: 'msPrevalence',
       name: 'MS Prevalence',
     },
     {
-      component: <MSIndividual />,
+      // component: <MSIndividual state={{ ...publicForm, ...main }} />,
+      component: <div>Under Construction</div>,
       id: 'msIndividual',
       name: 'MS Individual',
     },
@@ -267,7 +261,7 @@ export default function Exposure() {
                       <Button
                         variant="link"
                         className={
-                          id == displayTab && Object.keys(exposureCancer).length
+                          id == displayTab
                             ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-exploration text-white rounded-0'
                             : 'secondary-navlinks px-3 py-1 d-inline-block border-0 rounded-0'
                         }

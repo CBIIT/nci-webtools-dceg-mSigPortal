@@ -3,9 +3,9 @@ import MsDecompositionPlot from './msDecomposition-plot';
 import Description from '../../../controls/description/description';
 import { NavHashLink } from 'react-router-hash-link';
 
-export default function MsDecomposition(props) {
+export default function MsDecomposition({ state }) {
   return (
-    <Container fluid className="bg-white border rounded p-0" {...props}>
+    <Container fluid className="bg-white border rounded p-0">
       <div className="p-3">
         <b>Evaluating the Performance of Mutational Signature Decomposition</b>
         <Description
@@ -25,7 +25,7 @@ export default function MsDecomposition(props) {
         />
       </div>
       <hr />
-      <MsDecompositionPlot />
+      <MsDecompositionPlot state={state} />
     </Container>
   );
 }

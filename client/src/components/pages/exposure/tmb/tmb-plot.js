@@ -1,20 +1,17 @@
 import { useState, useEffect } from 'react';
 import Plotly from '../../../controls/plotly/plot/plot';
-import { useSelector } from 'react-redux';
 import { useTmbPlotQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
-export default function TmbPlot() {
-  const { publicForm, main } = useSelector((state) => state.exposure);
+export default function TmbPlot({ state }) {
   const [params, setParams] = useState('');
   const { data, error, isFetching } = useTmbPlotQuery(params, {
     skip: !params,
   });
 
+  const { study, strategy, signatureSetName, cancer, useAllCancer, id } = state;
   // query after public form is submitted
   useEffect(() => {
-    const { study, strategy, signatureSetName, cancer, useAllCancer } =
-      publicForm;
     if (study) {
       setParams({
         study: study.value,
@@ -23,13 +20,13 @@ export default function TmbPlot() {
         ...(!useAllCancer && { cancer: cancer.value }),
       });
     }
-  }, [publicForm]);
+  }, [study]);
   // query after project id is recieved from user form
   useEffect(() => {
-    if (main.id) {
-      setParams({ userId: main.id });
+    if (id) {
+      setParams({ userId: id });
     }
-  }, [main.id]);
+  }, [id]);
 
   return (
     <>

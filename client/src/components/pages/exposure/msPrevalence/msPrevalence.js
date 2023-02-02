@@ -1,11 +1,14 @@
+import { useState } from 'react';
 import { Container } from 'react-bootstrap';
 import Description from '../../../controls/description/description';
 import MsPrevalencePlot from './msPrevalence-plot';
 import MsPrevalenceForm from './msPrevalence-form';
 
-export default function MsPrevalence(props) {
+export default function MsPrevalence({ state }) {
+  const [form, setForm] = useState({ minimum: 100 });
+
   return (
-    <Container fluid className="bg-white border rounded p-0" {...props}>
+    <Container fluid className="bg-white border rounded p-0">
       <div className="p-3">
         <b>Prevalence of Mutational Signature</b>
         <Description
@@ -14,10 +17,10 @@ export default function MsPrevalence(props) {
           more="For prevalence by samples, input the [Minimal Number of Mutations Assigned to Each Signature] to set the smallest number of mutations assigned to each signature required for the detection of the mutational signature in each sample."
         />
       </div>
-      <MsPrevalenceForm />
+      <MsPrevalenceForm form={form} setForm={setForm} />
       <hr />
 
-      <MsPrevalencePlot />
+      <MsPrevalencePlot form={form} state={state} />
     </Container>
   );
 }

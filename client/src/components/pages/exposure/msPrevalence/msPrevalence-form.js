@@ -1,28 +1,19 @@
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
-import { actions as exposureActions } from '../../../../services/store/exposure';
-import { useSelector, useDispatch } from 'react-redux';
 
-const actions = { ...exposureActions };
-const { Group, Label, Check, Control } = Form;
+const { Group, Label, Control } = Form;
 
-export default function MsPrevalenceForm() {
-  const dispatch = useDispatch();
-  const mergeState = (state) =>
-    dispatch(actions.mergeExposure({ msPrevalence: state }));
-  const store = useSelector((state) => state.exposure);
-  const { minimum } = store.msPrevalence;
-
+export default function MsPrevalenceForm({ form, setForm }) {
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm({
-    defaultValues: { minimum: minimum || 100 },
+    defaultValues: form,
   });
 
   async function onSubmit(data) {
-    mergeState(data);
+    setForm(data);
   }
 
   return (

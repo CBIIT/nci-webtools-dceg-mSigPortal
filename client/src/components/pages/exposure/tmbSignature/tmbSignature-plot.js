@@ -1,19 +1,17 @@
 import { useState, useEffect } from 'react';
 import Plotly from '../../../controls/plotly/plot/plot';
-import { useSelector } from 'react-redux';
 import { useTmbSignaturesPlotQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
-export default function TmbSignaturePlot() {
-  const { publicForm, main } = useSelector((state) => state.exposure);
+export default function TmbSignaturePlot({ state }) {
   const [params, setParams] = useState('');
   const { data, error, isFetching } = useTmbSignaturesPlotQuery(params, {
     skip: !params,
   });
+  const { study, strategy, signatureSetName, cancer, id } = state;
 
   // query after public form is submitted
   useEffect(() => {
-    const { study, strategy, signatureSetName, cancer } = publicForm;
     if (study) {
       setParams({
         study: study.value,
@@ -22,13 +20,11 @@ export default function TmbSignaturePlot() {
         cancer: cancer.value,
       });
     }
-  }, [publicForm]);
+  }, [study]);
   // query after project id is recieved from user form
   useEffect(() => {
-    if (main.id) {
-      setParams({ userId: main.id });
-    }
-  }, [main.id]);
+    if (id) setParams({ userId: id });
+  }, [id]);
 
   return (
     <>

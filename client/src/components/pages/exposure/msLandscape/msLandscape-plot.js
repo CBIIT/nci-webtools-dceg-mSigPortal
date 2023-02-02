@@ -22,10 +22,7 @@ import { readFile, parseMatrix } from '../../../controls/utils/utils';
 import { actions } from '../../../../services/store/exposure';
 
 const { Label, Group } = Form;
-export default function MsLandscapePlot({ calculateLandscape }) {
-  const { publicForm, main } = useSelector((state) => state.exposure);
-  const exposure = useSelector((state) => state.exposure);
-  const { variableFile, plotPath, debugR, err, loading } = exposure.msLandscape;
+export default function MsLandscapePlot({ state }) {
   // const [params, setParams] = useState('');
   // const { data, error, isFetching } = useMsLandscapePlotQuery(params, {
   //   skip: !params,
@@ -99,7 +96,7 @@ export default function MsLandscapePlot({ calculateLandscape }) {
   //   }
   // }, [publicForm]);
   useEffect(() => {
-    const { study, strategy, signatureSetName, cancer } = publicForm;
+    const { study, strategy, signatureSetName, cancer } = state;
     if (study) {
       setCalculationQuery({
         study: study.value,
@@ -108,7 +105,7 @@ export default function MsLandscapePlot({ calculateLandscape }) {
         cancer: cancer.value,
       });
     }
-  }, [publicForm]);
+  }, [state]);
 
   return (
     <>
@@ -151,7 +148,6 @@ export default function MsLandscapePlot({ calculateLandscape }) {
                     size="sm"
                     title="Remove"
                     variant="danger"
-                    disabled={loading}
                     onClick={removeFile}
                   >
                     <FontAwesomeIcon icon={faFolderMinus} size="lg" />

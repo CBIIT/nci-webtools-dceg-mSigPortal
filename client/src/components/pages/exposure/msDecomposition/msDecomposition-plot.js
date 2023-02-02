@@ -1,23 +1,17 @@
 import { useState, useEffect } from 'react';
 import Plotly from '../../../controls/plotly/plot/plot';
-import { useSelector } from 'react-redux';
 import { useMsDecompositionQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
-export default function MsDecompositionPlot() {
-  const { publicForm, main } = useSelector((state) => state.exposure);
+export default function MsDecompositionPlot({ state }) {
   const [params, setParams] = useState('');
-  // const { data, error, isFetching } = useMsDecompositionQuery(params, {
-  //   skip: !params,
-  // });
-  // const [calculationQuery, setCalculationQuery] = useState('');
+
   const { data, error, isFetching } = useMsDecompositionQuery(params, {
     skip: !params,
   });
 
-  console.log(data);
   useEffect(() => {
-    const { study, strategy, signatureSetName, cancer } = publicForm;
+    const { study, strategy, signatureSetName, cancer } = state;
     if (study) {
       setParams({
         study: study.value,
@@ -25,10 +19,10 @@ export default function MsDecompositionPlot() {
         signatureSetName: signatureSetName.value,
         cancer: cancer.value,
       });
-    } else if (main.id) {
-      setParams({ userId: main.id });
+    } else if (state.id) {
+      setParams({ userId: state.id });
     }
-  }, [publicForm, main]);
+  }, [state]);
 
   return (
     <>
