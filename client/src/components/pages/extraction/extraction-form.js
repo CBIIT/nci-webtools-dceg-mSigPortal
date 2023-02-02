@@ -24,14 +24,13 @@ const actions = { ...extractionActions, ...modalActions };
 
 export default function ExtractionForm() {
   const store = useSelector((state) => state.extraction);
-  const { submitted } = store.main;
+  const { submitted } = store;
   const { id } = useParams();
   const history = useHistory();
 
   const dispatch = useDispatch();
   const resetExtraction = (_) => dispatch(actions.resetExtraction());
-  const mergeMain = (state) =>
-    dispatch(actions.mergeExtraction({ main: state }));
+  const mergeState = (state) => dispatch(actions.mergeExtraction(state));
 
   const { data: params } = useParamsQuery(id, { skip: !id });
   const { data: manifest } = useManifestQuery(id, { skip: !id });
@@ -188,7 +187,7 @@ export default function ExtractionForm() {
 
   function handleExplorationType(e) {
     setValue('explorationType', e);
-    mergeMain({ explorationType: e });
+    mergeState({ explorationType: e });
   }
 
   // define form
@@ -269,7 +268,7 @@ export default function ExtractionForm() {
   useEffect(() => {
     if (params) {
       resetForm(params.form);
-      mergeMain({ submitted: true });
+      mergeState({ submitted: true });
     }
   }, [resetForm, params]);
 
@@ -292,7 +291,7 @@ export default function ExtractionForm() {
   }
 
   async function onSubmit(data) {
-    mergeMain({ submitted: true });
+    mergeState({ submitted: true });
 
     const formData = new FormData();
     formData.append('inputFile', data.inputFile);
