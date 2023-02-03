@@ -1,6 +1,5 @@
 import { explorationApiSlice } from '../../../../services/store/rootApi';
 import MsAssociation from '../../../controls/plotly/msAssociation/msAssociation';
-import { groupBy } from 'lodash';
 
 export const msAssociationApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -11,7 +10,6 @@ export const msAssociationApiSlice = explorationApiSlice.injectEndpoints({
       }),
 
       transformResponse: (data) => {
-        console.log(data);
         return data
           ? [...new Set(data.map((e) => e.signatureName))]
               .sort((a, b) =>
@@ -33,9 +31,6 @@ export const msAssociationApiSlice = explorationApiSlice.injectEndpoints({
         params: { ...params },
       }),
       transformResponse: (data, meta, arg) => {
-        console.log(data);
-        console.log(arg);
-
         return MsAssociation(data, arg);
       },
     }),

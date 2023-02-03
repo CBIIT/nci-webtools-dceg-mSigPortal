@@ -36,11 +36,20 @@ export default function MsAssociationForm() {
     skip: !params,
   });
 
-  const { control, handleSubmit, watch } = useForm({
+  const { control, handleSubmit, watch, setValue } = useForm({
     defaultValues: msAssociation,
   });
 
   const { signatureName1, signatureName2 } = watch();
+  // set inital
+  useEffect(() => {
+    if (!msAssociation.signatureName1 && signatureNameOptions) {
+      setValue('signatureName1', signatureNameOptions[0]);
+    }
+    if (!msAssociation.signatureName2 && signatureNameOptions) {
+      setValue('signatureName2', signatureNameOptions[1]);
+    }
+  }, [signatureNameOptions, msAssociation]);
 
   //   console.log(signatureNameOptions);
   //   console.log(msAssociation);
@@ -59,8 +68,12 @@ export default function MsAssociationForm() {
     }
   }, [publicForm, main]);
 
-  function getSignatureNameOptions(name) {
-    return name ? name.map((e) => ({ label: e, value: e })) : [];
+  function handleSignatureName1(e) {
+    setValue('signatureName1', e);
+  }
+
+  function handleSignatureName2(e) {
+    setValue('signatureName2', e);
   }
 
   function onSubmit(data) {
@@ -87,22 +100,22 @@ export default function MsAssociationForm() {
             <Select
               name="signatureName1"
               label="Signature Name 1"
-              value={msAssociation.signatureName1}
+              //value={msAssociation.signatureName1}
               disabled={!signatureNameOptions}
               control={control}
               options={signatureNameOptions}
-              //onChange={(name) => mergeMsAssociation({ signatureName1: name })}
+              onChange={handleSignatureName1}
             />
           </Col>
           <Col lg="auto">
             <Select
               name="signatureName2"
               label="Signature Name 2"
-              value={msAssociation.signatureName2}
+              //value={msAssociation.signatureName2}
               disabled={!signatureNameOptions}
               control={control}
               options={signatureNameOptions}
-              //onChange={(name) => mergeMsAssociation({ signatureName2: name })}
+              onChange={handleSignatureName2}
             />
           </Col>
           <Col lg="auto">
