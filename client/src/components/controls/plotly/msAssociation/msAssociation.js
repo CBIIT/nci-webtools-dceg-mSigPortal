@@ -18,7 +18,7 @@ export default function MsAssociation(data, arg) {
     type: 'histogram',
     histnorm: 'density',
     nbinsx: signatureName1data.length,
-    xaxis: 'x3',
+    xaxis: 'x',
     yaxis: 'y3',
   };
 
@@ -26,9 +26,9 @@ export default function MsAssociation(data, arg) {
     y: signatureName2data.map((e) => e['exposure']),
     type: 'histogram',
     histnorm: 'density',
-    nbinsx: signatureName2data.length,
+    nbinsy: signatureName2data.length,
     xaxis: 'x2',
-    yaxis: 'y2',
+    yaxis: 'y',
   };
 
   const traceMain = {
@@ -41,14 +41,16 @@ export default function MsAssociation(data, arg) {
   const traces = [traceMain, traceSig1, traceSig2];
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
-    height: 350,
+    height: 900,
 
     autosize: true,
     title: {
       text: '<b>Mutational Signature Association</b>',
     },
+    xaxis: { domain: [0.0, 0.75] },
+    yaxis: { anchor: 'x', domain: [0.0, 0.75] },
 
-    xaxis2: { domain: [0.8, 1] },
+    xaxis2: { domain: [0.75, 1] },
     yaxis2: { anchor: 'x2', domain: [0.0, 0.75] },
 
     xaxis3: { domain: [0.0, 0.75] },
