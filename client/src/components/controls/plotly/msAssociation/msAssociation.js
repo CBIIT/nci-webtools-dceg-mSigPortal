@@ -18,85 +18,20 @@ export default function MsAssociation(data, arg) {
     name: signatureName1,
     type: 'histogram',
     histnorm: 'density',
-    nbinsx: signatureName1data.length,
+    nbinsx: signatureName1data.length - 1,
     yaxis: 'y2',
-    marker: { color: '#019E72' },
+    marker: { color: '#019E72', line: { color: 'black', width: 1 } },
   };
-  // const traceSig1 = {
-  //   type: 'violin',
-  //   spanmode: 'soft',
-  //   hoveron: 'points+kde',
-  //   // span: [0, 5],
-  //   side: 'positive', //positive side means right for vertical violin plots
-  //   //y: 4,
-  //   x: signatureName1data.map((e) => e['exposure']),
-  //   points: 'none',
-  //   box: {
-  //     visible: false,
-  //   },
-  //   boxpoints: false,
-  //   line: {
-  //     color: 'black',
-  //   },
-  //   fillcolor: '#019E72',
-  //   scalemode: 'count',
-  //   marker: {
-  //     line: {
-  //       width: 0,
-  //     },
-  //     symbol: 'line-ns',
-  //   },
-  //   opacity: 0.6,
-  //   meanline: {
-  //     visible: true,
-  //   },
-  //   y0: signatureName1,
-  //   xaxis: 'x',
-  //   yaxis: 'y3',
-  // };
 
   const traceSig2 = {
     y: signatureName2data.map((e) => Math.log(e['exposure'] + 1)),
     name: signatureName2,
     type: 'histogram',
     histnorm: 'density',
-    nbinsy: signatureName2data.length,
+    nbinsy: signatureName2data.length - 1,
     xaxis: 'x2',
-    marker: { color: '#D55E00' },
+    marker: { color: '#D55E00', line: { color: 'black', width: 1 } },
   };
-
-  // const traceSig2 = {
-  //   type: 'violin',
-  //   spanmode: 'soft',
-  //   hoveron: 'points+kde',
-  //   // span: [0, 5],
-  //   side: 'positive', //positive side means right for vertical violin plots
-  //   //y: 4,
-  //   y: signatureName2data.map((e) => e['exposure']),
-  //   points: 'none',
-  //   box: {
-  //     visible: false,
-  //   },
-  //   boxpoints: false,
-  //   line: {
-  //     color: 'black',
-  //   },
-  //   fillcolor: '#D55E00',
-  //   scalemode: 'count',
-  //   marker: {
-  //     line: {
-  //       width: 0,
-  //     },
-  //     symbol: 'line-ns',
-  //   },
-  //   opacity: 0.6,
-  //   meanline: {
-  //     visible: true,
-  //   },
-  //   x0: signatureName2,
-  //   xaxis: 'x2',
-  //   yaxis: 'y',
-  // };
 
   const traceMain = {
     x: signatureName1data.map((e) => Math.log(e['exposure'] + 1)),
@@ -109,7 +44,7 @@ export default function MsAssociation(data, arg) {
     },
     opacity: 0.9,
   };
-  console.log(traceSig1);
+
   const traces = [traceMain, traceSig1, traceSig2];
   const layout = {
     showlegend: false,
@@ -121,7 +56,7 @@ export default function MsAssociation(data, arg) {
       text: '<b>Mutational Signature Association</b>',
     },
     xaxis: {
-      domain: [0.0, 0.75],
+      domain: [0.0, 0.83],
       showgrid: true,
       title: {
         text: '<b>Number of mutations in ' + signatureName1 + ' (log10)</b>',
@@ -129,15 +64,15 @@ export default function MsAssociation(data, arg) {
     },
     yaxis: {
       anchor: 'x',
-      domain: [0.0, 0.75],
+      domain: [0.0, 0.83],
       title: {
         text: '<b>Number of mutations in ' + signatureName2 + ' (log10)</b>',
       },
       showgrid: true,
     },
 
-    xaxis2: { domain: [0.85, 1] },
-    yaxis2: { anchor: 'x', domain: [0.85, 1] },
+    xaxis2: { domain: [0.85, 1], zerolinecolor: '#EBEBEB' },
+    yaxis2: { anchor: 'x', domain: [0.85, 1], zerolinecolor: '#EBEBEB' },
   };
   return { traces: traces, layout: layout };
 }

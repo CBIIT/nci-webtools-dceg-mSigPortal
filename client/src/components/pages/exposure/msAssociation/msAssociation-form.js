@@ -51,10 +51,6 @@ export default function MsAssociationForm() {
     }
   }, [signatureNameOptions, msAssociation]);
 
-  //   console.log(signatureNameOptions);
-  //   console.log(msAssociation);
-  //   console.log(publicForm);
-  // query signature name options
   useEffect(() => {
     if (publicForm.study) {
       setSignatureOptionParams({
@@ -138,7 +134,7 @@ export default function MsAssociationForm() {
               variant="primary"
               type="submit"
             >
-              Calculate
+              Recalculate
             </Button>
           </Col>
         </Row>
