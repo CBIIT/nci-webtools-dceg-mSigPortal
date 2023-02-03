@@ -9,7 +9,7 @@ import Instructions from './instructions';
 import TMB from './tmb/tmb.js';
 import TmbSig from './tmbSignature/tmbSignature.js';
 import MsBurden from './msBurden/msBurden.js';
-// import MsAssociation from './msAssociation';
+import MsAssociation from './msAssociation/msAssociation';
 import MsDecomposition from './msDecomposition/msDecomposition.js';
 import MsLandscape from './msLandscape/msLandscape.js';
 import MsPrevalence from './msPrevalence/msPrevalence.js';
@@ -336,8 +336,7 @@ export default function Exposure() {
             <MsDecomposition state={{ ...publicForm, ...main }} />
           </div>
           <div className={displayTab == 'msAssociation' ? 'd-block' : 'd-none'}>
-            {/* <MsAssociation state={{ ...publicForm, ...main }} /> */}
-            Under Construction
+            <MsAssociation state={{ ...publicForm, ...main }} />
           </div>
           <div className={displayTab == 'msLandscape' ? 'd-block' : 'd-none'}>
             <MsLandscape state={{ ...publicForm, ...main }} />
