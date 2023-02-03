@@ -12,7 +12,56 @@ export default function MsAssociation(data, arg) {
   console.log(groupBySignatureName);
   console.log(signatureName1data);
   console.log(signatureName2data);
+  function median(numbers) {
+    const sorted = Array.from(numbers).sort((a, b) => a - b);
+    const middle = Math.floor(sorted.length / 2);
 
+    if (sorted.length % 2 === 0) {
+      return (sorted[middle - 1] + sorted[middle]) / 2;
+    }
+
+    return sorted[middle];
+  }
+
+  function getAvg(grades) {
+    const total = grades.reduce((acc, c) => acc + c, 0);
+    return total / grades.length;
+  }
+  const minX = Math.min(
+    ...signatureName1data.map((e) => Math.log(e['exposure'] + 1))
+  );
+  console.log(minX);
+
+  const maxX = Math.max(
+    ...signatureName1data.map((e) => Math.log(e['exposure'] + 1))
+  );
+  console.log(maxX);
+
+  const minY = Math.min(
+    ...signatureName2data.map((e) => Math.log(e['exposure'] + 1))
+  );
+  console.log(minY);
+
+  const maxY = Math.max(
+    ...signatureName2data.map((e) => Math.log(e['exposure'] + 1))
+  );
+  console.log(maxY);
+
+  const medianY = median([minY, maxY]);
+  console.log(medianY);
+
+  const medianY2 = median([
+    ...signatureName2data.map((e) => Math.log(e['exposure'] + 1)),
+  ]);
+  console.log(medianY2);
+
+  const avgY0 = getAvg([
+    ...signatureName2data.map((e) => Math.log(e['exposure'] + 1)),
+  ]);
+  console.log(avgY0);
+
+  const avgY1 = getAvg([minY, maxY]);
+  console.log(avgY1);
   const traceSig1 = {
     x: signatureName1data.map((e) => Math.log(e['exposure'] + 1)),
     name: signatureName1,
@@ -45,7 +94,13 @@ export default function MsAssociation(data, arg) {
     opacity: 0.9,
   };
 
-  const traces = [traceMain, traceSig1, traceSig2];
+  const traceLine = {
+    x: [minX, maxX],
+    y: [avgY1, avgY0],
+    mode: 'lines',
+  };
+
+  const traces = [traceMain, traceLine, traceSig1, traceSig2];
   const layout = {
     showlegend: false,
     hoverlabel: { bgcolor: '#FFF' },
