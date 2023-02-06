@@ -13,6 +13,7 @@ const logger = require('../../logger');
 const { parseCSV, importUserSession } = require('../analysis');
 const { schema } = require('./userSchema');
 const { getExposureData, getSignatureData } = require('../../query');
+const { createCacheMiddleware } = require('../../cache');
 
 // config info for R functions
 const rConfig = {
@@ -585,7 +586,7 @@ async function downloadWorkspace(req, res, next) {
 async function getPublicTreeLeafData(req, res, next) {
   try {
     const { connection } = req.app.locals;
-    const { study, strategy, signatureSetName, profileMatrix } = req.body;
+    const { study, strategy, cancer, signatureSetName, profileMatrix } = req.body;
     const exposureData = await getExposureData(
       connection,
       { study, strategy },
@@ -598,16 +599,22 @@ async function getPublicTreeLeafData(req, res, next) {
       '*',
       1e8
     );
-    const seqmatrixData = await connection
+    let params = {};
+    for (let key of ['study', 'strategy', 'cancer']) {
+      if (req.body[key]) {
+        params[key] = req.body[key];
+      }
+    }
+
+    let seqmatrixData = await connection
       .select('*', connection.raw('concat(profile, matrix) as "profileMatrix"'))
       .from('seqmatrix')
-      .where('strategy', strategy)
-      .andWhere('study', study)
+      .where(params)
       .andWhere(connection.raw('concat(profile, matrix)'), 'in', profileMatrix);
 
-    console.log('exposureData', exposureData[0], exposureData?.length);
-    console.log('seqmatrixData', seqmatrixData[0], seqmatrixData?.length);
-    console.log('signatureData', signatureData[0], signatureData?.length);
+    // console.log('exposureData', exposureData[0], exposureData?.length);
+    // console.log('seqmatrixData', seqmatrixData[0], seqmatrixData?.length);
+    // console.log('signatureData', signatureData[0], signatureData?.length);
 
     if (
       !exposureData?.length ||
@@ -638,7 +645,7 @@ router.post('/queue', submitQueue);
 router.get('/getQueueResults/:id', getQueueResults);
 router.get('/getVisExample/:example', getVisExample);
 router.post('/downloadWorkspace', downloadWorkspace);
-router.post('/treeLeaf', getPublicTreeLeafData);
+router.post('/treeLeaf', createCacheMiddleware((req) => ['treeLeaf', req.body.study, req.body.strategy, req.body.cancer, req.body.signatureSetName, req.body.profileMatrix].join(':')), getPublicTreeLeafData);
 
 module.exports = {
   router,
