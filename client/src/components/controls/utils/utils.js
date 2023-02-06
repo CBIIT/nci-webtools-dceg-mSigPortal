@@ -159,3 +159,8 @@ export function getAvg(grades) {
   const total = grades.reduce((acc, c) => acc + c, 0);
   return total / grades.length;
 }
+
+export function round(num, decimalPlaces = 0) {
+  num = Math.round(num + 'e' + decimalPlaces);
+  return Number(num + 'e' + -decimalPlaces);
+}
