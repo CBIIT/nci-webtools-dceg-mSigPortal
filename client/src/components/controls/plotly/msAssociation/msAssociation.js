@@ -16,23 +16,23 @@ export default function MsAssociation(data, arg) {
   function checkBothCal(e, checked) {
     let checkCalculation;
     if (checked) {
-      checkCalculation = Math.log(e['exposure']);
+      checkCalculation = Math.log10(e['exposure']);
     } else {
-      checkCalculation = Math.log(e['exposure'] + 1);
+      checkCalculation = Math.log10(e['exposure'] + 1);
     }
     return checkCalculation;
   }
 
   const minX = Math.min(
-    ...signatureName1data.map((e) => Math.log(e['exposure'] + 1) / 2.3)
+    ...signatureName1data.map((e) => Math.log10(e['exposure'] + 1))
   );
 
   const maxX = Math.max(
-    ...signatureName1data.map((e) => Math.log(e['exposure'] + 1) / 2.3)
+    ...signatureName1data.map((e) => Math.log10(e['exposure'] + 1))
   );
 
   const traceSig1 = {
-    x: signatureName1data.map((e) => Math.log(e['exposure'] + 1) / 2.3),
+    x: signatureName1data.map((e) => Math.log10(e['exposure'] + 1)),
     name: signatureName1,
     type: 'histogram',
     histnorm: 'density',
@@ -48,7 +48,7 @@ export default function MsAssociation(data, arg) {
   };
 
   const traceSig2 = {
-    y: signatureName2data.map((e) => Math.log(e['exposure'] + 1) / 2.3),
+    y: signatureName2data.map((e) => Math.log10(e['exposure'] + 1)),
     name: signatureName2,
     type: 'histogram',
     histnorm: 'density',
@@ -64,8 +64,8 @@ export default function MsAssociation(data, arg) {
   };
 
   const traceMain = {
-    x: signatureName1data.map((e) => Math.log(e['exposure'] + 1) / 2.3),
-    y: signatureName2data.map((e) => Math.log(e['exposure'] + 1) / 2.3),
+    x: signatureName1data.map((e) => Math.log10(e['exposure'] + 1)),
+    y: signatureName2data.map((e) => Math.log10(e['exposure'] + 1)),
     mode: 'markers',
     type: 'scatter',
     marker: {
