@@ -2,6 +2,14 @@
 
 function createDatabaseCache(connection, tableName = 'cache')  {
   return {
+    initialize: async () => {
+      if (!await connection.schema.hasTable(tableName)) {
+        await connection.schema.createTable(tableName, (table) => {
+          table.text('key').unique();
+          table.json('value');
+        })
+      }
+    },
     get: async (key) => {
       const result = await connection(tableName).where({ key }).first();
       return result ? result.value : null;
@@ -16,4 +24,9 @@ function createDatabaseCache(connection, tableName = 'cache')  {
       await connection(tableName).truncate();
     }
   }
+}
+
+
+module.exports = {
+  createDatabaseCache
 }
