@@ -28,7 +28,7 @@ export const msAssociationApiSlice = explorationApiSlice.injectEndpoints({
     msAssociation: builder.query({
       query: (params) => ({
         url: 'signature_activity',
-        params: { ...params },
+        params: ({ ...params } = params),
       }),
       transformResponse: (data, meta, arg) => {
         console.log(arg);

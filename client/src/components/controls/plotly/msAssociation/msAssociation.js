@@ -1,4 +1,4 @@
-import { groupByCustom } from '../../utils/utils';
+import { groupByCustom, linearRegression } from '../../utils/utils';
 export default function MsAssociation(data, arg) {
   console.log(data);
   console.log(arg);
@@ -23,45 +23,24 @@ export default function MsAssociation(data, arg) {
     return sorted[middle];
   }
 
-  function getAvg(grades) {
-    const total = grades.reduce((acc, c) => acc + c, 0);
-    return total / grades.length;
+  function checkBothCal(e, checked) {
+    let checkCalculation;
+    if (checked) {
+      checkCalculation = Math.log(e['exposure']);
+    } else {
+      checkCalculation = Math.log(e['exposure'] + 1);
+    }
+    return checkCalculation;
   }
+
   const minX = Math.min(
     ...signatureName1data.map((e) => Math.log(e['exposure'] + 1))
   );
-  console.log(minX);
 
   const maxX = Math.max(
     ...signatureName1data.map((e) => Math.log(e['exposure'] + 1))
   );
-  console.log(maxX);
 
-  const minY = Math.min(
-    ...signatureName2data.map((e) => Math.log(e['exposure'] + 1))
-  );
-  console.log(minY);
-
-  const maxY = Math.max(
-    ...signatureName2data.map((e) => Math.log(e['exposure'] + 1))
-  );
-  console.log(maxY);
-
-  const medianY = median([minY, maxY]);
-  console.log(medianY);
-
-  const medianY2 = median([
-    ...signatureName2data.map((e) => Math.log(e['exposure'] + 1)),
-  ]);
-  console.log(medianY2);
-
-  const avgY0 = getAvg([
-    ...signatureName2data.map((e) => Math.log(e['exposure'] + 1)),
-  ]);
-  console.log(avgY0);
-
-  const avgY1 = getAvg([minY, maxY]);
-  console.log(avgY1);
   const traceSig1 = {
     x: signatureName1data.map((e) => Math.log(e['exposure'] + 1)),
     name: signatureName1,
@@ -70,6 +49,10 @@ export default function MsAssociation(data, arg) {
     nbinsx: signatureName1data.length - 1,
     yaxis: 'y2',
     marker: { color: '#019E72', line: { color: 'black', width: 1 } },
+    hovertemplate:
+      '<b>x-Range of ' +
+      signatureName1 +
+      ' (log10)</b>: %{x}<br><b>Value (log10): </b> %{y}<extra></extra>',
   };
 
   const traceSig2 = {
@@ -80,6 +63,10 @@ export default function MsAssociation(data, arg) {
     nbinsy: signatureName2data.length - 1,
     xaxis: 'x2',
     marker: { color: '#D55E00', line: { color: 'black', width: 1 } },
+    hovertemplate:
+      '<b>x-range of ' +
+      signatureName2 +
+      ' (log10)</b>: %{y}<br><b>Value (log10): </b> %{x}<extra></extra>',
   };
 
   const traceMain = {
@@ -92,20 +79,31 @@ export default function MsAssociation(data, arg) {
       size: 10,
     },
     opacity: 0.9,
+    showlegend: false,
+    hovertemplate:
+      '<b>Number of mutation in ' +
+      signatureName1 +
+      ' (log10)</b>: %{x}<br><b>Number of mutation in ' +
+      signatureName2 +
+      ': (log10)</b> %{y}<extra></extra>',
   };
+
+  var lr = linearRegression(traceMain.x, traceMain.y);
+  console.log(lr);
 
   const traceLine = {
     x: [minX, maxX],
-    y: [avgY0, avgY0],
+    y: [minX * lr.sl + lr.off, maxX * lr.sl + lr.off],
     mode: 'lines',
     marker: {
       color: 'blue',
     },
+    showlegend: false,
   };
 
   const traces = [traceMain, traceLine, traceSig1, traceSig2];
   const layout = {
-    showlegend: false,
+    showlegend: true,
     hoverlabel: { bgcolor: '#FFF' },
     height: 900,
     bargap: 0,

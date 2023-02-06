@@ -84,7 +84,9 @@ export default function MsAssociationForm() {
       cancer: publicForm.cancer.value,
       signatureName:
         data.signatureName1.value + ';' + data.signatureName2.value,
+      //bothCheck: bothCheck,
     };
+    console.log(params);
     setParams(params);
   }
 
