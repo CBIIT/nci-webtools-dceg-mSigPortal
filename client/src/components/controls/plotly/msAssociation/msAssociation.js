@@ -3,25 +3,28 @@ export default function MsAssociation(data, arg) {
   console.log(data);
   console.log(arg);
   const [signatureName1, signatureName2] = arg.signatureName.split(';');
-  console.log(signatureName1);
-  console.log(signatureName2);
+  const checked = arg.both;
+  console.log(checked);
+
   const groupBySignatureName = groupByCustom(data, (e) => e.signatureName);
-  const signatureName1data = groupBySignatureName.get(signatureName1);
-  const signatureName2data = groupBySignatureName.get(signatureName2);
+  let signatureName1data;
+  let signatureName2data;
 
   console.log(groupBySignatureName);
+
+  if (checked) {
+    signatureName1data = groupBySignatureName
+      .get(signatureName1)
+      .filter((o) => o['exposure'] > 0);
+    signatureName2data = groupBySignatureName
+      .get(signatureName2)
+      .filter((o) => o['exposure'] > 0);
+  } else {
+    signatureName1data = groupBySignatureName.get(signatureName1);
+    signatureName2data = groupBySignatureName.get(signatureName2);
+  }
   console.log(signatureName1data);
   console.log(signatureName2data);
-
-  function checkBothCal(e, checked) {
-    let checkCalculation;
-    if (checked) {
-      checkCalculation = Math.log10(e['exposure']);
-    } else {
-      checkCalculation = Math.log10(e['exposure'] + 1);
-    }
-    return checkCalculation;
-  }
 
   const minX = Math.min(
     ...signatureName1data.map((e) => Math.log10(e['exposure'] + 1))

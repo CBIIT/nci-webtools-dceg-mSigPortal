@@ -28,10 +28,17 @@ export const msAssociationApiSlice = explorationApiSlice.injectEndpoints({
     msAssociation: builder.query({
       query: (params) => ({
         url: 'signature_activity',
-        params: ({ ...params } = params),
+        params: {
+          study: params.study,
+          strategy: params.strategy,
+          signatureSetName: params.signatureSetName,
+          cancer: params.cancer,
+          signatureName: params.signatureName,
+        },
       }),
       transformResponse: (data, meta, arg) => {
         console.log(arg);
+
         return MsAssociation(data, arg);
       },
     }),
