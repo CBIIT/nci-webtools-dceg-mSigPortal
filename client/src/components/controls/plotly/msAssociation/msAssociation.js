@@ -96,8 +96,11 @@ export default function MsAssociation(data, arg) {
 
   const traceLine = {
     x: [minX, maxX],
-    y: [avgY1, avgY0],
+    y: [avgY0, avgY0],
     mode: 'lines',
+    marker: {
+      color: 'blue',
+    },
   };
 
   const traces = [traceMain, traceLine, traceSig1, traceSig2];

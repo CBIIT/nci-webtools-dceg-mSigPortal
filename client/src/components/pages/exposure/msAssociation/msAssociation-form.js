@@ -72,6 +72,7 @@ export default function MsAssociationForm() {
     setValue('signatureName2', e);
   }
 
+  
   function onSubmit(data) {
     console.log(data);
     mergeMsAssociation(data);
