@@ -1,13 +1,11 @@
-
-
-function createDatabaseCache(connection, tableName = 'cache')  {
+function createDatabaseCache(connection, tableName = 'cache') {
   return {
     initialize: async () => {
-      if (!await connection.schema.hasTable(tableName)) {
+      if (!(await connection.schema.hasTable(tableName))) {
         await connection.schema.createTable(tableName, (table) => {
           table.text('key').unique();
           table.json('value');
-        })
+        });
       }
     },
     get: async (key) => {
@@ -15,18 +13,43 @@ function createDatabaseCache(connection, tableName = 'cache')  {
       return result ? result.value : null;
     },
     set: async (key, value) => {
-      await connection(tableName).insert({ key, value }).onConflict('key').merge();
+      await connection(tableName)
+        .insert({ key, value })
+        .onConflict('key')
+        .merge();
     },
     clear: async (key) => {
       await connection(tableName).where({ key }).del();
     },
     reset: async () => {
       await connection(tableName).truncate();
-    }
-  }
+    },
+  };
 }
 
+function createCacheMiddleware(getCacheKey) {
+  return async (req, res, next) => {
+    try {
+      const key = await getCacheKey(req);
+      const cache = req.app.locals.cache;
+      const value = await cache.get(key);
+      if (value) {
+        res.json(value);
+      } else {
+        let originalJson = res.json;
+        res.json = (body) => {
+          cache.set(key, body);
+          originalJson(body);
+        };
+        next();
+      }
+    } catch (err) {
+      next(err);
+    }
+  };
+}
 
 module.exports = {
-  createDatabaseCache
-}
+  createDatabaseCache,
+  createCacheMiddleware,
+};
