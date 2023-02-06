@@ -24,6 +24,8 @@ export default function MsAssociationForm() {
   );
   const [signatureOptionParams, setSignatureOptionParams] = useState('');
   const [params, setParams] = useState(null);
+
+  const [bothCheck, setBothCheck] = useState(false);
   const {
     data: signatureNameOptions,
     error: signatureNameError,
@@ -72,7 +74,6 @@ export default function MsAssociationForm() {
     setValue('signatureName2', e);
   }
 
-  
   function onSubmit(data) {
     console.log(data);
     mergeMsAssociation(data);
@@ -81,7 +82,6 @@ export default function MsAssociationForm() {
       strategy: publicForm.strategy.value,
       signatureSetName: publicForm.signatureSetName.value,
       cancer: publicForm.cancer.value,
-
       signatureName:
         data.signatureName1.value + ';' + data.signatureName2.value,
     };
@@ -97,7 +97,6 @@ export default function MsAssociationForm() {
             <Select
               name="signatureName1"
               label="Signature Name 1"
-              //value={msAssociation.signatureName1}
               disabled={!signatureNameOptions}
               control={control}
               options={signatureNameOptions}
@@ -108,7 +107,6 @@ export default function MsAssociationForm() {
             <Select
               name="signatureName2"
               label="Signature Name 2"
-              //value={msAssociation.signatureName2}
               disabled={!signatureNameOptions}
               control={control}
               options={signatureNameOptions}
@@ -118,13 +116,13 @@ export default function MsAssociationForm() {
           <Col lg="auto">
             <Group controlId="toggleBothSamples">
               <Check
+                name="signatureCheck"
                 type="checkbox"
                 label="Samples Detected Both Signatures"
-                value={msAssociation.both}
-                checked={msAssociation.both}
-                // onChange={(e) =>
-                //   mergeMsAssociation({ both: !msAssociation.both })
-                // }
+                defaultChecked={bothCheck}
+                onChange={(e) => {
+                  setBothCheck(e.target.checked);
+                }}
               />
             </Group>
           </Col>

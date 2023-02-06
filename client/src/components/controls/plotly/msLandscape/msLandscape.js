@@ -1,14 +1,11 @@
 import { groupBy } from 'lodash';
-import { First } from 'react-bootstrap/esm/PageItem';
-import { get } from 'react-hook-form';
-import CosineSimilarityPlot from '../../../pages/catalog/referenceSignature/cosineSimilarity/form-plot';
 import { getRandomColor, isNumber, mapOrder } from '../../utils/utils';
 import { colorPallet, colorPallet0 } from '../../utils/colors';
 
 export default function MsLandscape(cosineData, exposureData, variableData) {
-  console.log(cosineData);
-  console.log(exposureData);
-  console.log(variableData);
+  // console.log(cosineData);
+  // console.log(exposureData);
+  // console.log(variableData);
 
   let charColors = {};
   let arrNames = [];
