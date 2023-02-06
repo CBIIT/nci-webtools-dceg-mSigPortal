@@ -1,12 +1,10 @@
 import { Container } from 'react-bootstrap';
 import MsLandscapePlot from './msLandscape-plot';
 import Description from '../../../controls/description/description';
-import { readFile } from '../../../controls/utils/utils';
 
-export default function MutationalProfiles(props) {
-
+export default function MsLandscape({ state }) {
   return (
-    <Container fluid className="bg-white border rounded p-0" {...props}>
+    <Container fluid className="bg-white border rounded p-0">
       <div className="p-3">
         <b>Landscape of Mutational Signature Activity</b>
         <Description
@@ -16,7 +14,7 @@ export default function MutationalProfiles(props) {
         />
       </div>
       <hr />
-      <MsLandscapePlot />
+      <MsLandscapePlot state={state} />
     </Container>
   );
 }

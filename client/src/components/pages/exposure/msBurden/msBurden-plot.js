@@ -1,26 +1,23 @@
 import { useState, useEffect } from 'react';
 import Plotly from '../../../controls/plotly/plot/plot';
-import { useSelector } from 'react-redux';
 import { useMsBurdenQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
-export default function MutProfilePlot() {
-  const { publicForm, main } = useSelector((state) => state.exposure);
+export default function MsBurdenPlot({ state, form }) {
   const [params, setParams] = useState('');
   const { data, error, isFetching } = useMsBurdenQuery(params, {
     skip: !params,
   });
 
-  const { signatureName } = useSelector((state) => state.exposure.msBurden);
-  const { study, strategy, signatureSetName, cancer, useAllCancer } =
-    publicForm;
+  const { signatureName } = form;
+  const { study, strategy, signatureSetName, cancer, useAllCancer, id } = state;
 
   // query after signature name is changed
   useEffect(() => {
-    if (signatureName && main.id) {
+    if (signatureName && id) {
       setParams({
         signatureName: signatureName.value,
-        userId: main.id,
+        userId: id,
       });
     } else if (signatureName && study) {
       setParams({
@@ -31,7 +28,7 @@ export default function MutProfilePlot() {
         ...(!useAllCancer && { cancer: cancer.value }),
       });
     }
-  }, [signatureName, main]);
+  }, [signatureName, id]);
 
   return (
     <>

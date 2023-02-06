@@ -2,13 +2,10 @@ import { createSlice } from '@reduxjs/toolkit';
 import { mergeObject } from './utils';
 
 export const getInitialState = () => ({
-  inputForm: {},
-  main: {
-    displayTab: 'instructions',
-    id: '',
-    openSidebar: true,
-    submitted: false,
-  },
+  tabIndex: 0,
+  id: '',
+  openSidebar: true,
+  submitted: false,
 });
 
 export const { actions, reducer } = createSlice({

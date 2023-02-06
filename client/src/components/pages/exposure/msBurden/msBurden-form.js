@@ -2,46 +2,37 @@ import React, { useEffect, useState } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import Select from '../../../controls/select/selectForm';
-import { useSelector, useDispatch } from 'react-redux';
-import { actions as exposureActions } from '../../../../services/store/exposure';
 import { useMsBurdenOptionsQuery } from './apiSlice';
 
-const actions = { ...exposureActions };
-
-export default function MsBurdenForm() {
-  const dispatch = useDispatch();
-  const mergeMsBurden = (state) =>
-    dispatch(actions.mergeExposure({ msBurden: state }));
-
-  const { publicForm, main, msBurden } = useSelector((state) => state.exposure);
-
+export default function MsBurdenForm({ state, form, setForm }) {
   const [params, setParams] = useState('');
   const { data: signatureNameOptions } = useMsBurdenOptionsQuery(params, {
     skip: !params,
   });
 
-  const { control } = useForm({ defaultValues: msBurden });
+  const { control } = useForm({ defaultValues: form });
 
   // query signature name options
   useEffect(() => {
-    if (publicForm.study) {
+    const { study, strategy, signatureSetName, cancer, useAllCancer } = state;
+    if (study) {
       setParams({
-        study: publicForm.study.value,
-        strategy: publicForm.strategy.value,
-        signatureSetName: publicForm.signatureSetName.value,
-        ...(!publicForm.useAllCancer && { cancer: publicForm.cancer.value }),
+        study: study.value,
+        strategy: strategy.value,
+        signatureSetName: signatureSetName.value,
+        ...(!useAllCancer && { cancer: cancer.value }),
       });
-    } else if (main.id) {
-      setParams({ userId: main.id });
+    } else if (state.id) {
+      setParams({ userId: state.id });
     }
-  }, [publicForm, main]);
+  }, [state]);
 
   // set inital
   useEffect(() => {
-    if (!msBurden.signatureName && signatureNameOptions) {
-      mergeMsBurden({ signatureName: signatureNameOptions[0] });
+    if (!form.signatureName && signatureNameOptions) {
+      setForm({ signatureName: signatureNameOptions[0] });
     }
-  }, [signatureNameOptions, msBurden]);
+  }, [signatureNameOptions, form]);
 
   return (
     <div>
@@ -52,12 +43,11 @@ export default function MsBurdenForm() {
             <Select
               name="signatureName"
               label="Signature Name"
-              value={msBurden.signatureName}
+              value={form.signatureName}
               disabled={!signatureNameOptions}
               control={control}
               options={signatureNameOptions}
-              onChange={(name) => mergeMsBurden({ signatureName: name })}
-              //onChange={handleSignatureName}
+              onChange={(name) => setForm({ signatureName: name })}
             />
           </Col>
         </Row>

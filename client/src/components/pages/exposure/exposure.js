@@ -2,17 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { saveAs } from 'file-saver';
+import { useParams } from 'react-router-dom';
 import PublicForm from './publicForm/publicForm';
 import UserForm from './userForm/userForm';
 import Instructions from './instructions';
-import TMB2 from './tmb/tmb.js';
-import TmbSig2 from './tmbSignature/tmbSignature.js';
-import MsBurden2 from './msBurden/msBurden.js';
-import MsAssociation from './msAssociation';
-import MsDecomposition2 from './msDecomposition/msDecomposition.js';
-import MsLandscape2 from './msLandscape/msLandscape.js';
-import MsPrevalence2 from './msPrevalence/msPrevalence.js';
-import MSIndividual from './msIndividual';
+import TMB from './tmb/tmb.js';
+import TmbSig from './tmbSignature/tmbSignature.js';
+import MsBurden from './msBurden/msBurden.js';
+import MsAssociation from './msAssociation/msAssociation';
+import MsDecomposition from './msDecomposition/msDecomposition.js';
+import MsLandscape from './msLandscape/msLandscape.js';
+import MsPrevalence from './msPrevalence/msPrevalence.js';
+// import MSIndividual from './msIndividual';
 import Download from './download';
 import { actions as exposureActions } from '../../../services/store/exposure';
 import { actions as modalActions } from '../../../services/store/modal';
@@ -25,7 +26,7 @@ import {
 const actions = { ...exposureActions, ...modalActions };
 const { Group, Label, Check } = Form;
 
-export default function Exposure({ match }) {
+export default function Exposure() {
   const dispatch = useDispatch();
 
   const mergeState = (state) =>
@@ -35,20 +36,12 @@ export default function Exposure({ match }) {
 
   const { publicForm, main } = useSelector((state) => state.exposure);
 
-  const { exampleName } = match.params;
+  const { exampleName } = useParams();
 
   // const [variableFileObj, setVariable] = useState(new File([], ''));
 
-  const {
-    displayTab,
-    exposureCancer,
-    source,
-    loading,
-    projectID,
-    openSidebar,
-    submitted,
-    samples,
-  } = main;
+  const { displayTab, source, loading, projectID, openSidebar, submitted } =
+    main;
 
   // load example if available
   useEffect(() => {
@@ -162,53 +155,43 @@ export default function Exposure({ match }) {
 
   const tabs = [
     {
-      component: <Instructions loading={loading} />,
       id: 'instructions',
       name: 'Instructions',
     },
     {
-      component: <TMB2 />,
       id: 'tmb',
       name: 'TMB',
     },
     {
-      component: <TmbSig2 />,
       id: 'tmbSig',
       name: 'TMB Signatures',
     },
     {
-      component: <MsBurden2 />,
       id: 'msBurden',
       name: 'MS Burden',
     },
     {
-      component: <MsDecomposition2 />,
       id: 'msDecomposition',
       name: 'MS Decomposition',
     },
     {
-      component: <MsAssociation />,
       id: 'msAssociation',
       name: 'MS Association',
     },
     {
-      component: <MsLandscape2 />,
       id: 'msLandscape',
       name: 'MS Landscape',
     },
     {
-      component: <MsPrevalence2 />,
       id: 'msPrevalence',
       name: 'MS Prevalence',
     },
     {
-      component: <MSIndividual />,
       id: 'msIndividual',
       name: 'MS Individual',
     },
     source == 'public' ? (
       {
-        component: <Download exposureDownload={exposureDownload} />,
         id: 'download',
         name: 'Download',
       }
@@ -266,7 +249,7 @@ export default function Exposure({ match }) {
                       <Button
                         variant="link"
                         className={
-                          id == displayTab && Object.keys(exposureCancer).length
+                          id == displayTab
                             ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-exploration text-white rounded-0'
                             : 'secondary-navlinks px-3 py-1 d-inline-block border-0 rounded-0'
                         }
@@ -335,7 +318,45 @@ export default function Exposure({ match }) {
           </div>
         </SidebarPanel>
         <MainPanel>
-          {tabs.filter((tab) => tab.id == displayTab)[0].component}
+          <div className={displayTab == 'instructions' ? 'd-block' : 'd-none'}>
+            <Instructions />
+          </div>
+          <div className={displayTab == 'tmb' ? 'd-block' : 'd-none'}>
+            <TMB state={{ ...publicForm, ...main }} />
+          </div>
+          <div className={displayTab == 'tmbSig' ? 'd-block' : 'd-none'}>
+            <TmbSig state={{ ...publicForm, ...main }} />
+          </div>
+          <div className={displayTab == 'msBurden' ? 'd-block' : 'd-none'}>
+            <MsBurden state={{ ...publicForm, ...main }} />
+          </div>
+          <div
+            className={displayTab == 'msDecomposition' ? 'd-block' : 'd-none'}
+          >
+            <MsDecomposition state={{ ...publicForm, ...main }} />
+          </div>
+          <div className={displayTab == 'msAssociation' ? 'd-block' : 'd-none'}>
+            <MsAssociation state={{ ...publicForm, ...main }} />
+          </div>
+          <div className={displayTab == 'msLandscape' ? 'd-block' : 'd-none'}>
+            <MsLandscape state={{ ...publicForm, ...main }} />
+          </div>
+          <div className={displayTab == 'msPrevalence' ? 'd-block' : 'd-none'}>
+            <MsPrevalence state={{ ...publicForm, ...main }} />
+          </div>
+          <div className={displayTab == 'msIndividual' ? 'd-block' : 'd-none'}>
+            {/* <MsIndividual state={{ ...publicForm, ...main }}  /> */}
+            Under Construction
+          </div>
+          <div
+            className={
+              displayTab == 'download' && source == 'public'
+                ? 'd-block'
+                : 'd-none'
+            }
+          >
+            <Download exposureDownload={exposureDownload} />
+          </div>
         </MainPanel>
       </SidebarContainer>
     </div>

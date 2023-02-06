@@ -1,32 +1,39 @@
 import { useState, useEffect } from 'react';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
-import SelectForm from '../../../controls/select/selectForm';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { useHistory, useParams } from 'react-router-dom';
+import SelectForm from '../../controls/select/selectForm';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as extractionActions } from '../../../../services/store/extraction';
-import { actions as modalActions } from '../../../../services/store/modal';
+import { actions as extractionActions } from '../../../services/store/extraction';
+import { actions as modalActions } from '../../../services/store/modal';
 import {
   resetExtractionApi,
   useSeqmatrixOptionsQuery,
   useSignatureOptionsQuery,
   useRefGenomeQuery,
-} from '../../../../services/store/rootApi';
-import { useUploadMutation, useSubmitMutation } from './apiSlice';
+} from '../../../services/store/rootApi';
+import {
+  useUploadMutation,
+  useSubmitMutation,
+  useParamsQuery,
+  useManifestQuery,
+} from './apiSlice';
 
 const actions = { ...extractionActions, ...modalActions };
 
-export default function InputForm() {
+export default function ExtractionForm() {
   const store = useSelector((state) => state.extraction);
-  const { submitted } = store.main;
-  const { inputFilename, ...inputForm } = store.inputForm;
+  const { submitted } = store;
+  const { id } = useParams();
+  const history = useHistory();
 
   const dispatch = useDispatch();
-  const mergeForm = (state) =>
-    dispatch(actions.mergeExtraction({ inputForm: state }));
   const resetExtraction = (_) => dispatch(actions.resetExtraction());
-  const mergeMain = (state) =>
-    dispatch(actions.mergeExtraction({ main: state }));
+  const mergeState = (state) => dispatch(actions.mergeExtraction(state));
+
+  const { data: params } = useParamsQuery(id, { skip: !id });
+  const { data: manifest } = useManifestQuery(id, { skip: !id });
 
   // query options to populate form
   const {
@@ -178,6 +185,11 @@ export default function InputForm() {
     setValue('strategy', strategies[0]);
   }
 
+  function handleExplorationType(e) {
+    setValue('explorationType', e);
+    mergeState({ explorationType: e });
+  }
+
   // define form
   const defaultValues = {
     source: 'user',
@@ -201,7 +213,8 @@ export default function InputForm() {
     nmf_init: 'random',
     precision: 'single',
 
-    calculationType: { label: 'Denovo', value: 'Denovo' },
+    explorationType: { label: 'Denovo', value: 'Denovo' },
+    email: '',
   };
 
   const sample1 = {
@@ -229,10 +242,7 @@ export default function InputForm() {
     max_nmf_iterations: 4,
     nmf_test_conv: 2,
     nmf_replicates: 10,
-
-    email: 'test.email@nih.gov',
   };
-  const sample2 = {};
 
   const {
     control,
@@ -250,12 +260,17 @@ export default function InputForm() {
     cancer,
     inputFile,
     reference_genome,
-    exome,
     context_type,
     signatureSetName,
-    minSignatures,
     input_type,
   } = watch();
+
+  useEffect(() => {
+    if (params) {
+      resetForm(params.form);
+      mergeState({ submitted: true });
+    }
+  }, [resetForm, params]);
 
   // set inital genome option after querying options
   useEffect(() => {
@@ -269,14 +284,18 @@ export default function InputForm() {
   }, [contextTypeOptions]);
 
   function handleReset() {
-    window.location.hash = '#/extraction';
+    history.push('/extraction');
     resetForm(defaultValues);
     resetExtraction();
     dispatch(resetExtractionApi);
   }
 
   async function onSubmit(data) {
-    console.log(data);
+    mergeState({ submitted: true });
+
+    const formData = new FormData();
+    formData.append('inputFile', data.inputFile);
+    const { id } = await uploadFiles(formData).unwrap();
 
     const args = {
       ...(source == 'user' && {
@@ -303,59 +322,16 @@ export default function InputForm() {
         signatureName: data.signatureName.map((e) => e.value).join(';'),
       }),
     };
-
-    const formData = new FormData();
-    formData.append('inputFile', data.inputFile);
-
-    const { id } = await uploadFiles(formData).unwrap();
-    const params = { args, signatureQuery, id, email: data.email };
-    const res = await submitForm(params).unwrap();
-
-    console.log(res);
-
-    mergeForm(data);
-    mergeMain({ id, submitted: true });
-    // try {
-    //   mergeMain({ submitted: true, loading: { active: true } });
-    //   mergeState(data);
-    //   const params = {
-    //     study: data.study.value,
-    //     cancer: data.cancer.value,
-    //     strategy: data.strategy.value,
-    //   };
-
-    //   // let matrixData = [];
-    //   // for await (const data of paginateQuery(fetchMatrix, params)) {
-    //   //   matrixData = [...matrixData, ...data];
-    //   // }
-    //   const matrixData = []; //await fetchMatrix(params).unwrap();
-
-    //   mergeMain({ matrixData, projectID: crypto.randomUUID() });
-    // } catch (error) {
-    //   console.log(error);
-    //   if (error.originalStatus == 504) {
-    //     mergeMain({
-    //       error: 'Please Reset Your Parameters and Try again.',
-    //     });
-    //     mergeError({
-    //       visible: true,
-    //       message:
-    //         'Your submission has timed out. Please try again by submitting this job to a queue instead.',
-    //     });
-    //   } else {
-    //     mergeMain({
-    //       error: 'Please Reset Your Parameters and Try again.',
-    //     });
-    //     mergeError(error.data);
-    //   }
-    // }
-    // mergeMain({ loading: { active: false } });
+    const params = { args, signatureQuery, id, email: data.email, form: data };
+    const submitStatus = await submitForm(params).unwrap();
+    history.push(`/extraction/${submitStatus.id}`);
   }
 
   return (
     <Form
       onSubmit={handleSubmit(onSubmit)}
       style={{ maxHeight: '900px', overflow: 'hidden auto' }}
+      className="p-3 bg-white border rounded"
     >
       <LoadingOverlay
         active={fetchingSeqmatrixOptions || loadingUpload || loadingSubmit}
@@ -366,13 +342,14 @@ export default function InputForm() {
       <div className="border rounded p-2 mb-3">
         <SelectForm
           className="mb-2"
-          name="calculationType"
+          name="explorationType"
           label="Exploration Calculation"
-          disabled={!submitted}
+          disabled={!manifest}
           options={['Denovo', 'Decomposed'].map((e) => ({
             label: e,
             value: e,
           }))}
+          onChange={handleExplorationType}
           control={control}
         />
         <Form.Text className="text-muted">
@@ -467,9 +444,10 @@ export default function InputForm() {
                     value={''} // set dummy value for file input
                     disabled={submitted}
                     id="inputFile"
-                    title={inputFile?.name || 'Upload Data File...'}
                     label={
-                      inputFile?.name || inputFilename || 'Upload Data File...'
+                      inputFile?.name ||
+                      params?.args.input_data ||
+                      'Upload Data File...'
                     }
                     isInvalid={errors.inputFile}
                     feedback="Please upload a data file"
@@ -485,6 +463,7 @@ export default function InputForm() {
             </Form.Group>
             <Button
               variant="link"
+              disabled={submitted}
               onClick={async () => {
                 resetForm(sample1);
                 const file = 'extraction_sample_SBS96.all';
@@ -497,9 +476,6 @@ export default function InputForm() {
             >
               Load Sample
             </Button>
-            {/* <Button variant="link" onClick={() => resetForm(sample2)}>
-              Sample 2
-            </Button> */}
           </div>
         )}
       </div>

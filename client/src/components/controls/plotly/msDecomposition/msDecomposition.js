@@ -29,9 +29,7 @@ export default function MsDecomposition(data, arg) {
       type: 'violin',
       spanmode: 'soft',
       hoveron: 'points+kde',
-      // span: [0, 5],
       side: 'positive', //positive side means right for vertical violin plots
-      //y: 4,
       x: cosine_similarity.map((e) => e['value']),
       points: 'none',
       box: {
@@ -147,6 +145,7 @@ export default function MsDecomposition(data, arg) {
       meanline: {
         visible: true,
       },
+      
       y0: 'KL_Divergence',
       xaxis: 'x4',
       yaxis: 'y4',

@@ -2,9 +2,9 @@ import { Container } from 'react-bootstrap';
 import TmbSigPlot from './tmbSignature-plot';
 import Description from '../../../controls/description/description';
 
-export default function MutationalProfiles(props) {
+export default function TmbSignature({ state }) {
   return (
-    <Container fluid className="bg-white border rounded p-0" {...props}>
+    <Container fluid className="bg-white border rounded p-0">
       <div className="p-3">
         <b>Tumor Mutational Burden Separated by Signatures</b>
         <Description
@@ -14,7 +14,7 @@ export default function MutationalProfiles(props) {
         />
       </div>
       <hr />
-      <TmbSigPlot />
+      <TmbSigPlot state={state} />
     </Container>
   );
 }

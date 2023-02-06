@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Nav, Button } from 'react-bootstrap';
+import { useParams } from 'react-router-dom';
 import {
   SidebarContainer,
   SidebarPanel,
@@ -26,7 +27,7 @@ import './visualization.scss';
 const actions = { ...visualizationActions, ...modalActions };
 const { Group, Label, Check } = Form;
 
-export default function Visualization({ match }) {
+export default function Visualization() {
   const dispatch = useDispatch();
   const store = useSelector((state) => state.visualization);
   const mergeState = (state) =>
@@ -49,7 +50,7 @@ export default function Visualization({ match }) {
     matrixData,
   } = store.main;
 
-  const { type, id } = match.params;
+  const { type, id } = useParams();
 
   // when retrieving queued result, update id in store
   useEffect(() => {
@@ -216,9 +217,7 @@ export default function Visualization({ match }) {
                   </div>
                 ))}
             </Nav>
-
           </div>
-
 
           {/* for mobile devices */}
           <div className="e d-md-none">
@@ -248,7 +247,6 @@ export default function Visualization({ match }) {
               ))}
             </Nav>
           </div>
-
         </div>
       </div>
 

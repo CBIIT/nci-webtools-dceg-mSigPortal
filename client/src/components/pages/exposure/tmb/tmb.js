@@ -2,9 +2,9 @@ import { Container } from 'react-bootstrap';
 import TmbPlot from './tmb-plot';
 import Description from '../../../controls/description/description';
 
-export default function MutationalProfiles(props) {
+export default function TMB({ state }) {
   return (
-    <Container fluid className="bg-white border rounded p-0" {...props}>
+    <Container fluid className="bg-white border rounded p-0">
       <div className="p-3">
         <b>Tumor Mutational Burden</b>
         <Description
@@ -14,7 +14,7 @@ export default function MutationalProfiles(props) {
         />
       </div>
       <hr />
-      <TmbPlot />
+      <TmbPlot state={state} />
     </Container>
   );
 }

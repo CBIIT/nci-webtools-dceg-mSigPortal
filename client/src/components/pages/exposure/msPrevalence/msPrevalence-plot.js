@@ -1,20 +1,18 @@
 import { useState, useEffect } from 'react';
 import Plotly from '../../../controls/plotly/plot/plot';
-import { useSelector } from 'react-redux';
 import { useMsPrevelencePlotQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
-export default function MutProfilePlot() {
-  const { publicForm, main } = useSelector((state) => state.exposure);
+export default function MsPrevalancePlot({ form, state }) {
   const [params, setParams] = useState('');
   const { data, error, isFetching } = useMsPrevelencePlotQuery(params, {
     skip: !params,
   });
 
-  const { minimum } = useSelector((state) => state.exposure.msPrevalence);
+  const { minimum } = form;
 
   useEffect(() => {
-    const { study, strategy, signatureSetName, cancer } = publicForm;
+    const { study, strategy, signatureSetName, cancer } = state;
     if (study) {
       setParams({
         study: study.value,
@@ -23,13 +21,10 @@ export default function MutProfilePlot() {
         cancer: cancer.value,
         minimum,
       });
-    } else if (main.id) {
-      setParams({
-        userId: main.id,
-        minimum,
-      });
+    } else if (state.id) {
+      setParams({ userId: state.id, minimum });
     }
-  }, [publicForm, minimum, main]);
+  }, [form, state]);
 
   return (
     <>

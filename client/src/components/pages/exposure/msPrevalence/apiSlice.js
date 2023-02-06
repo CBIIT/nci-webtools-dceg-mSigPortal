@@ -4,7 +4,6 @@ import MsPrevalence from '../../../controls/plotly/msPrevalence/msPrevalence';
 export const msPrevalenceApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     msPrevelencePlot: builder.query({
-      // query: ({ mutation, ...params }) => ({
       query: ({ minimum, ...params }) => ({
         url: 'signature_activity',
         params: { ...params, limit: 1000000 },
