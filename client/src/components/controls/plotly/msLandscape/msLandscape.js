@@ -126,24 +126,6 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
     [1.0, 'rgb(249,230,39)'],
   ];
 
-  const heatmapColorscale3 = [
-    [0, '#4DBBD5'],
-    [0.1, '#3C5488'],
-    [0.2, '#E64B35'],
-
-    [0.3, '#F39B7F'],
-    [0.4, '#00A087'],
-
-    [0.5, 'EBC6C4'],
-    [0.6, 'rgb(35,165,132)'],
-
-    [0.7, 'rgb(101,195,100)'],
-    [0.8, 'rgb(120,208,82)'],
-
-    [0.9, 'rgb(204,223,59)'],
-    [1.0, 'rgb(249,230,39)'],
-  ];
-
   const xAxis = cosineData.map((e) => e.sample);
   //const longest = xAxis.reduce((a, e) => (a > e.length ? a : e.length), 0);
   var longest = xAxis.sort(function (a, b) {
