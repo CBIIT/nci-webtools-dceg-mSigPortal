@@ -1,44 +1,49 @@
 import { groupByCustom, linearRegression, round } from '../../utils/utils';
+import { groupBy, countBy } from 'lodash';
+
 export default function MsAssociation(data, arg) {
   console.log(data);
   console.log(arg);
   const [signatureName1, signatureName2] = arg.signatureName.split(';');
   const checked = arg.both;
-  console.log(checked);
 
-  let signatureName1data;
-  let signatureName2data;
+  let groupBySample;
+  let xValues = [];
+  let yValues = [];
 
   if (checked) {
-    const dataFilter = data.filter((o) => o['exposure'] > 0);
-    const groupBySignatureNameFilter = groupByCustom(
-      dataFilter,
-      (e) => e.signatureName
+    const dataFilter = groupBy(
+      data.filter((o) => o['exposure'] > 0),
+      'sample'
     );
-    signatureName1data = groupBySignatureNameFilter.get(signatureName1);
-    signatureName2data = groupBySignatureNameFilter.get(signatureName2);
+    groupBySample = Object.values(dataFilter).filter((e) => e.length > 1);
   } else {
-    const groupBySignatureName = groupByCustom(data, (e) => e.signatureName);
-    signatureName1data = groupBySignatureName.get(signatureName1);
-    signatureName2data = groupBySignatureName.get(signatureName2);
+    groupBySample = groupBy(data, 'sample');
   }
 
-  console.log(signatureName1data);
-  console.log(signatureName2data);
+  const dataArraySample = Object.values(groupBySample);
 
-  const minX = Math.min(
-    ...signatureName1data.map((e) => Math.log10(e['exposure'] + 1))
-  );
+  for (var i = 0; i < dataArraySample.length; i++) {
+    for (var j = 0; j < dataArraySample[i].length; j++) {
+      if (dataArraySample[i][j].signatureName === signatureName1) {
+        xValues.push(dataArraySample[i][j]);
+      }
+      if (dataArraySample[i][j].signatureName === signatureName2) {
+        yValues.push(dataArraySample[i][j]);
+      }
+    }
+  }
 
-  const maxX = Math.max(
-    ...signatureName1data.map((e) => Math.log10(e['exposure'] + 1))
-  );
+  const minX = Math.min(...xValues.map((e) => Math.log10(e['exposure'] + 1)));
+
+  const maxX = Math.max(...xValues.map((e) => Math.log10(e['exposure'] + 1)));
 
   console.log(minX);
   console.log(maxX);
 
   const traceSig1 = {
-    x: signatureName1data.map((e) => Math.log10(e['exposure'] + 1)),
+    //x: signatureName1data.map((e) => Math.log10(e['exposure'] + 1)),
+    x: xValues.map((e) => Math.log10(e['exposure'] + 1)),
     name: signatureName1,
     type: 'histogram',
     histnorm: 'density',
@@ -53,8 +58,11 @@ export default function MsAssociation(data, arg) {
       ' (log10)</b>: %{x}<br><b>Value (log10): </b> %{y}<extra></extra>',
   };
 
+  console.log(traceSig1);
+
   const traceSig2 = {
-    y: signatureName2data.map((e) => Math.log10(e['exposure'] + 1)),
+    //y: signatureName2data.map((e) => Math.log10(e['exposure'] + 1)),
+    y: yValues.map((e) => Math.log10(e['exposure'] + 1)),
     name: signatureName2,
     type: 'histogram',
     histnorm: 'density',
@@ -66,12 +74,12 @@ export default function MsAssociation(data, arg) {
       signatureName2 +
       '</b> <br> <b>x-range of ' +
       signatureName2 +
-      ' (log10)</b>: %{y}<br><b>Value (log10): </b> %{x}<extra></extra>',
+      ' (log10)</b> %{y}<br><b>Value (log10): </b> %{x}<extra></extra>',
   };
 
   const traceMain = {
-    x: signatureName1data.map((e) => Math.log10(e['exposure'] + 1)),
-    y: signatureName2data.map((e) => Math.log10(e['exposure'] + 1)),
+    x: xValues.map((e) => Math.log10(e['exposure'] + 1)),
+    y: yValues.map((e) => Math.log10(e['exposure'] + 1)),
     mode: 'markers',
     type: 'scatter',
     marker: {
@@ -87,7 +95,7 @@ export default function MsAssociation(data, arg) {
       signatureName2 +
       ': (log10)</b> %{y}<extra></extra>',
   };
-
+  console.log(traceMain);
   const lr = linearRegression(traceMain.x, traceMain.y);
   console.log(lr);
 
@@ -108,17 +116,17 @@ export default function MsAssociation(data, arg) {
       '<extra></extra>',
     showlegend: false,
   };
-
+  console.log(traceLine);
   const traces = [traceMain, traceLine, traceSig1, traceSig2];
 
   const detailAnnotation = {
     xref: 'x',
     yref: 'paper',
-    x: minX,
+    x: minX - 0.15,
     xanchor: 'bottom',
     y: 1,
     yanchor: 'bottom',
-    text: 'n<sub>pairs</sub> = ' + signatureName1data.length,
+    text: 'n<sub>pairs</sub> = ' + dataArraySample.length,
     showarrow: false,
     font: {
       size: 16,

@@ -128,6 +128,8 @@ export function groupByCustom(list, keyGetter) {
 }
 
 export function linearRegression(x, y) {
+  console.log(x);
+  console.log(y);
   var lr = {};
   var n = y.length;
   var sum_x = 0;
