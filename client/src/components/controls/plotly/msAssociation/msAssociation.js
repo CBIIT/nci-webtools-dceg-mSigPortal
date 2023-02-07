@@ -47,7 +47,7 @@ export default function MsAssociation(data, arg) {
     name: signatureName1,
     type: 'histogram',
     histnorm: 'density',
-    nbinsx: Math.round(data.length / 2),
+    nbinsx: round(data.length / 1.75),
     yaxis: 'y2',
     marker: { color: '#019E72', line: { color: 'black', width: 1 } },
     hovertemplate:
@@ -66,7 +66,7 @@ export default function MsAssociation(data, arg) {
     name: signatureName2,
     type: 'histogram',
     histnorm: 'density',
-    nbinsy: Math.round(data.length / 2),
+    nbinsy: round(data.length / 1.75),
     xaxis: 'x2',
     marker: { color: '#D55E00', line: { color: 'black', width: 1 } },
     hovertemplate:
@@ -76,6 +76,8 @@ export default function MsAssociation(data, arg) {
       signatureName2 +
       ' (log10)</b> %{y}<br><b>Value (log10): </b> %{x}<extra></extra>',
   };
+
+  console.log(traceSig2);
 
   const traceMain = {
     x: xValues.map((e) => Math.log10(e['exposure'] + 1)),
@@ -152,16 +154,14 @@ export default function MsAssociation(data, arg) {
       text: '<b>Mutational Signature Association</b>',
     },
     xaxis: {
-      anchor: 'y',
       domain: [0.0, 0.83],
-      range: [minX - 0.15, maxX + 0.15],
+
       showgrid: true,
       title: {
         text: '<b>Number of mutations in ' + signatureName1 + ' (log10)</b>',
       },
     },
     yaxis: {
-      anchor: 'x',
       domain: [0.0, 0.83],
       title: {
         text: '<b>Number of mutations in ' + signatureName2 + ' (log10)</b>',
