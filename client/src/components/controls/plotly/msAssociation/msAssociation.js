@@ -10,11 +10,19 @@ export default function MsAssociation(data, arg) {
   let signatureName2data;
 
   if (checked) {
-    data = data.filter((o) => o['exposure'] > 0);
+    const dataFilter = data.filter((o) => o['exposure'] > 0);
+    const groupBySignatureNameFilter = groupByCustom(
+      dataFilter,
+      (e) => e.signatureName
+    );
+    signatureName1data = groupBySignatureNameFilter.get(signatureName1);
+    signatureName2data = groupBySignatureNameFilter.get(signatureName2);
+  } else {
+    const groupBySignatureName = groupByCustom(data, (e) => e.signatureName);
+    signatureName1data = groupBySignatureName.get(signatureName1);
+    signatureName2data = groupBySignatureName.get(signatureName2);
   }
-  const groupBySignatureName = groupByCustom(data, (e) => e.signatureName);
-  signatureName1data = groupBySignatureName.get(signatureName1);
-  signatureName2data = groupBySignatureName.get(signatureName2);
+
   console.log(signatureName1data);
   console.log(signatureName2data);
 
@@ -106,7 +114,7 @@ export default function MsAssociation(data, arg) {
   const detailAnnotation = {
     xref: 'x',
     yref: 'paper',
-    x: 0,
+    x: minX,
     xanchor: 'bottom',
     y: 1,
     yanchor: 'bottom',
