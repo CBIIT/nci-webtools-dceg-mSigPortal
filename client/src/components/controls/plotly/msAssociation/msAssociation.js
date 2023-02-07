@@ -6,23 +6,15 @@ export default function MsAssociation(data, arg) {
   const checked = arg.both;
   console.log(checked);
 
-  const groupBySignatureName = groupByCustom(data, (e) => e.signatureName);
   let signatureName1data;
   let signatureName2data;
 
-  console.log(groupBySignatureName);
-
   if (checked) {
-    signatureName1data = groupBySignatureName
-      .get(signatureName1)
-      .filter((o) => o['exposure'] > 0);
-    signatureName2data = groupBySignatureName
-      .get(signatureName2)
-      .filter((o) => o['exposure'] > 0);
-  } else {
-    signatureName1data = groupBySignatureName.get(signatureName1);
-    signatureName2data = groupBySignatureName.get(signatureName2);
+    data = data.filter((o) => o['exposure'] > 0);
   }
+  const groupBySignatureName = groupByCustom(data, (e) => e.signatureName);
+  signatureName1data = groupBySignatureName.get(signatureName1);
+  signatureName2data = groupBySignatureName.get(signatureName2);
   console.log(signatureName1data);
   console.log(signatureName2data);
 
@@ -34,12 +26,15 @@ export default function MsAssociation(data, arg) {
     ...signatureName1data.map((e) => Math.log10(e['exposure'] + 1))
   );
 
+  console.log(minX);
+  console.log(maxX);
+
   const traceSig1 = {
     x: signatureName1data.map((e) => Math.log10(e['exposure'] + 1)),
     name: signatureName1,
     type: 'histogram',
     histnorm: 'density',
-    nbinsx: signatureName1data.length - 1,
+    nbinsx: Math.round(data.length / 2),
     yaxis: 'y2',
     marker: { color: '#019E72', line: { color: 'black', width: 1 } },
     hovertemplate:
@@ -55,7 +50,7 @@ export default function MsAssociation(data, arg) {
     name: signatureName2,
     type: 'histogram',
     histnorm: 'density',
-    nbinsy: signatureName2data.length - 1,
+    nbinsy: Math.round(data.length / 2),
     xaxis: 'x2',
     marker: { color: '#D55E00', line: { color: 'black', width: 1 } },
     hovertemplate:
@@ -136,6 +131,7 @@ export default function MsAssociation(data, arg) {
     xaxis: {
       anchor: 'y',
       domain: [0.0, 0.83],
+      range: [minX - 0.15, maxX + 0.15],
       showgrid: true,
       title: {
         text: '<b>Number of mutations in ' + signatureName1 + ' (log10)</b>',
