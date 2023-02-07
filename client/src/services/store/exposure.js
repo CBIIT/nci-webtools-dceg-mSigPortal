@@ -17,6 +17,7 @@ export const getInitialState = () => ({
     projectID: '',
     openSidebar: true,
     submitted: false,
+    usePublicSignature: true,
   },
 
   msAssociation: {
