@@ -2,7 +2,7 @@ import { explorationApiSlice } from '../../../../services/store/rootApi';
 
 export const userFormApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    exposureUpload: builder.mutation({
+    uploadExploration: builder.mutation({
       query: (formData) => ({
         url: 'upload',
         method: 'POST',
@@ -16,7 +16,7 @@ export const userFormApiSlice = explorationApiSlice.injectEndpoints({
         body: data,
       }),
     }),
-    explorationUser: builder.mutation({
+    explorationWrapper: builder.mutation({
       query: (params) => ({
         url: 'explorationWrapper',
         type: 'POST',
@@ -27,7 +27,7 @@ export const userFormApiSlice = explorationApiSlice.injectEndpoints({
 });
 
 export const {
-  useExposureUploadMutation,
+  useUploadExplorationMutation,
   useSubmitExplorationMutation,
-  useExplorationUserMutation,
+  useExplorationWrapperMutation,
 } = userFormApiSlice;

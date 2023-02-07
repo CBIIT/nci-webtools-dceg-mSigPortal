@@ -2,8 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { mergeObject } from './utils';
 
 export const getInitialState = () => ({
-  tabIndex: 0,
-  id: '',
+  displayTab: 'instructions',
   openSidebar: true,
   submitted: false,
 });

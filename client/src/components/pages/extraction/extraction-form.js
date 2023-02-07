@@ -23,8 +23,7 @@ import {
 const actions = { ...extractionActions, ...modalActions };
 
 export default function ExtractionForm() {
-  const store = useSelector((state) => state.extraction);
-  const { submitted } = store;
+  const { submitted } = useSelector((state) => state.extraction);
   const { id } = useParams();
   const history = useHistory();
 
@@ -185,11 +184,6 @@ export default function ExtractionForm() {
     setValue('strategy', strategies[0]);
   }
 
-  function handleExplorationType(e) {
-    setValue('explorationType', e);
-    mergeState({ explorationType: e });
-  }
-
   // define form
   const defaultValues = {
     source: 'user',
@@ -213,8 +207,9 @@ export default function ExtractionForm() {
     nmf_init: 'random',
     precision: 'single',
 
-    explorationType: { label: 'Denovo', value: 'Denovo' },
+    useQueue: false,
     email: '',
+    jobName: '',
   };
 
   const sample1 = {
@@ -263,6 +258,7 @@ export default function ExtractionForm() {
     context_type,
     signatureSetName,
     input_type,
+    useQueue,
   } = watch();
 
   useEffect(() => {
@@ -322,242 +318,232 @@ export default function ExtractionForm() {
         signatureName: data.signatureName.map((e) => e.value).join(';'),
       }),
     };
-    const params = { args, signatureQuery, id, email: data.email, form: data };
+    const params = {
+      args,
+      signatureQuery,
+      id,
+      email: useQueue ? data.email : null,
+      jobName: data.jobName || 'Extraction',
+      form: data,
+    };
     const submitStatus = await submitForm(params).unwrap();
     history.push(`/extraction/${submitStatus.id}`);
   }
 
   return (
-    <Form
-      onSubmit={handleSubmit(onSubmit)}
-      style={{ maxHeight: '900px', overflow: 'hidden auto' }}
-      className="p-3 bg-white border rounded"
-    >
-      <LoadingOverlay
-        active={fetchingSeqmatrixOptions || loadingUpload || loadingSubmit}
-      />
-      {(seqmatrixError || signatureError) && (
-        <p>There was an error retrieving public data options</p>
-      )}
-      <div className="border rounded p-2 mb-3">
-        <SelectForm
-          className="mb-2"
-          name="explorationType"
-          label="Exploration Calculation"
-          disabled={!manifest}
-          options={['Denovo', 'Decomposed'].map((e) => ({
-            label: e,
-            value: e,
-          }))}
-          onChange={handleExplorationType}
-          control={control}
+    <div className="p-3 bg-white border rounded">
+      <Form
+        onSubmit={handleSubmit(onSubmit)}
+        style={{ maxHeight: '900px', overflow: 'hidden auto' }}
+      >
+        <LoadingOverlay
+          active={fetchingSeqmatrixOptions || loadingUpload || loadingSubmit}
         />
-        <Form.Text className="text-muted">
-          <i>Select after Extraction is completed</i>
-        </Form.Text>
-      </div>
-      <div className="border rounded p-2 mb-3">
-        <Form.Group>
-          <Form.Label className="mr-4">Data Source</Form.Label>
-          <Controller
-            name="source"
-            control={control}
-            render={({ field }) => (
-              <Form.Check
-                {...field}
-                inline
-                id="radioPublic"
-                type="radio"
-                label={<span className="font-weight-normal">Public</span>}
-                value={'public'}
-                checked={field.value == 'public'}
-                disabled={true}
+        {(seqmatrixError || signatureError) && (
+          <p>There was an error retrieving public data options</p>
+        )}
+        <div className="border rounded p-2 mb-3">
+          <Form.Group>
+            <Form.Label className="mr-4">Data Source</Form.Label>
+            <Controller
+              name="source"
+              control={control}
+              render={({ field }) => (
+                <Form.Check
+                  {...field}
+                  inline
+                  id="radioPublic"
+                  type="radio"
+                  label={<span className="font-weight-normal">Public</span>}
+                  value={'public'}
+                  checked={field.value == 'public'}
+                  disabled={true}
+                />
+              )}
+            />
+            <Controller
+              name="source"
+              control={control}
+              render={({ field }) => (
+                <Form.Check
+                  {...field}
+                  inline
+                  id="radioUser"
+                  type="radio"
+                  label={<span className="font-weight-normal">User</span>}
+                  value={'vcf'}
+                  checked={field.value == 'user'}
+                  disabled={submitted || id}
+                />
+              )}
+            />
+          </Form.Group>
+          {source == 'public' ? (
+            <div>
+              <SelectForm
+                className="mb-2"
+                name="study"
+                label="Study"
+                disabled={submitted || id || fetchingSeqmatrixOptions}
+                options={studyOptions}
+                control={control}
+                onChange={handleStudyChange}
               />
-            )}
-          />
+              <SelectForm
+                className="mb-2"
+                name="cancer"
+                label="Cancer Type or Group"
+                disabled={submitted || id || fetchingSeqmatrixOptions}
+                options={cancerOptions(study)}
+                control={control}
+                onChange={handleCancerChange}
+              />
+              <SelectForm
+                className="mb-2"
+                name="strategy"
+                label="Experimental Strategy"
+                disabled={submitted || id || fetchingSeqmatrixOptions}
+                options={strategyOptions(study, cancer)}
+                control={control}
+              />
+            </div>
+          ) : (
+            <div>
+              <SelectForm
+                name="input_type"
+                label="Data Type"
+                disabled={submitted || id}
+                options={dataTypeOptions}
+                control={control}
+              />
+              <Form.Group>
+                <Form.Label>
+                  Upload File <span style={{ color: 'crimson' }}>*</span>
+                </Form.Label>
+                <Controller
+                  name="inputFile"
+                  control={control}
+                  rules={{ required: source == 'user' }}
+                  render={({ field }) => (
+                    <Form.File
+                      {...field}
+                      value={''} // set dummy value for file input
+                      disabled={submitted || id}
+                      id="inputFile"
+                      label={
+                        inputFile?.name ||
+                        params?.args.input_data ||
+                        'Upload Data File...'
+                      }
+                      isInvalid={errors.inputFile}
+                      feedback="Please upload a data file"
+                      onChange={(e) => {
+                        if (e.target.files.length) {
+                          setValue('inputFile', e.target.files[0]);
+                        }
+                      }}
+                      custom
+                    />
+                  )}
+                />
+              </Form.Group>
+              <Button
+                variant="link"
+                disabled={submitted || id}
+                onClick={async () => {
+                  resetForm(sample1);
+                  const file = 'extraction_sample_SBS96.all';
+                  const path = 'assets/exampleInput/' + file;
+                  setValue(
+                    'inputFile',
+                    new File([await (await fetch(path)).blob()], file)
+                  );
+                }}
+              >
+                Load Sample
+              </Button>
+            </div>
+          )}
+        </div>
+
+        <SelectForm
+          name="reference_genome"
+          label="Reference Genome Build"
+          disabled={submitted || id}
+          options={genomeOptions}
+          control={control}
+          rules={{ required: input_type == 'vcf' }}
+        />
+        <Form.Group>
           <Controller
-            name="source"
+            name="exome"
             control={control}
             render={({ field }) => (
               <Form.Check
                 {...field}
-                inline
-                id="radioUser"
-                type="radio"
-                label={<span className="font-weight-normal">User</span>}
-                value={'vcf'}
-                checked={field.value == 'user'}
-                disabled={submitted}
+                id="exome"
+                type="checkbox"
+                label={'Exome'}
+                checked={field.checked}
+                disabled={submitted || id}
               />
             )}
           />
         </Form.Group>
-        {source == 'public' ? (
-          <div>
-            <SelectForm
-              className="mb-2"
-              name="study"
-              label="Study"
-              disabled={submitted || fetchingSeqmatrixOptions}
-              options={studyOptions}
-              control={control}
-              onChange={handleStudyChange}
-            />
-            <SelectForm
-              className="mb-2"
-              name="cancer"
-              label="Cancer Type or Group"
-              disabled={submitted || fetchingSeqmatrixOptions}
-              options={cancerOptions(study)}
-              control={control}
-              onChange={handleCancerChange}
-            />
-            <SelectForm
-              className="mb-2"
-              name="strategy"
-              label="Experimental Strategy"
-              disabled={submitted || fetchingSeqmatrixOptions}
-              options={strategyOptions(study, cancer)}
-              control={control}
-            />
-          </div>
-        ) : (
-          <div>
-            <SelectForm
-              name="input_type"
-              label="Data Type"
-              disabled={submitted}
-              options={dataTypeOptions}
-              control={control}
-            />
-            <Form.Group>
-              <Form.Label>
-                Upload File <span style={{ color: 'crimson' }}>*</span>
-              </Form.Label>
-              <Controller
-                name="inputFile"
-                control={control}
-                rules={{ required: source == 'user' }}
-                render={({ field }) => (
-                  <Form.File
-                    {...field}
-                    value={''} // set dummy value for file input
-                    disabled={submitted}
-                    id="inputFile"
-                    label={
-                      inputFile?.name ||
-                      params?.args.input_data ||
-                      'Upload Data File...'
-                    }
-                    isInvalid={errors.inputFile}
-                    feedback="Please upload a data file"
-                    onChange={(e) => {
-                      if (e.target.files.length) {
-                        setValue('inputFile', e.target.files[0]);
-                      }
-                    }}
-                    custom
-                  />
-                )}
-              />
-            </Form.Group>
-            <Button
-              variant="link"
-              disabled={submitted}
-              onClick={async () => {
-                resetForm(sample1);
-                const file = 'extraction_sample_SBS96.all';
-                const path = 'assets/exampleInput/' + file;
-                setValue(
-                  'inputFile',
-                  new File([await (await fetch(path)).blob()], file)
-                );
-              }}
-            >
-              Load Sample
-            </Button>
-          </div>
-        )}
-      </div>
-
-      <SelectForm
-        name="reference_genome"
-        label="Reference Genome Build"
-        disabled={submitted}
-        options={genomeOptions}
-        control={control}
-        rules={{ required: input_type == 'vcf' }}
-      />
-      <Form.Group>
-        <Controller
-          name="exome"
+        <SelectForm
+          name="context_type"
+          label="Context Type"
+          disabled={submitted || id}
+          defaultValue={contextTypeOptions[0]}
+          options={contextTypeOptions}
           control={control}
-          render={({ field }) => (
-            <Form.Check
-              {...field}
-              id="exome"
-              type="checkbox"
-              label={'Exome'}
-              checked={field.checked}
-              disabled={submitted}
-            />
-          )}
         />
-      </Form.Group>
-      <SelectForm
-        name="context_type"
-        label="Context Type"
-        disabled={submitted}
-        defaultValue={contextTypeOptions[0]}
-        options={contextTypeOptions}
-        control={control}
-      />
-      <SelectForm
-        name="signatureSetName"
-        label="Reference Signature Set"
-        disabled={submitted}
-        options={signatureSetOptions}
-        control={control}
-      />
-      <SelectForm
-        name="signatureName"
-        label="SelectForm Signature Names"
-        disabled={submitted}
-        options={signatureNameOptions(signatureSetName)}
-        control={control}
-        onChange={(values, e) => {
-          // remove "all" option if a specific signature is selected
-          if (e.option.value !== 'all') {
-            setValue(
-              'signatureName',
-              values.filter((e) => e.value !== 'all')
-            );
-          } else if (e.option.value === 'all') {
-            setValue('signatureName', [e.option]);
-          } else setValue('signatureName', values);
-        }}
-        isMulti
-      />
-      <SelectForm
-        name="extractTool"
-        label="Extract Tool"
-        disabled={submitted}
-        options={[
-          { label: 'SigProfilerExtractor', value: 'SigProfilerExtractor' },
-        ]}
-        control={control}
-      />
+        <SelectForm
+          name="signatureSetName"
+          label="Reference Signature Set"
+          disabled={submitted || id}
+          options={signatureSetOptions}
+          control={control}
+        />
+        <SelectForm
+          name="signatureName"
+          label="SelectForm Signature Names"
+          disabled={submitted || id}
+          options={signatureNameOptions(signatureSetName)}
+          control={control}
+          onChange={(values, e) => {
+            // remove "all" option if a specific signature is selected
+            if (e.option.value !== 'all') {
+              setValue(
+                'signatureName',
+                values.filter((e) => e.value !== 'all')
+              );
+            } else if (e.option.value === 'all') {
+              setValue('signatureName', [e.option]);
+            } else setValue('signatureName', values);
+          }}
+          isMulti
+        />
+        <SelectForm
+          name="extractTool"
+          label="Extract Tool"
+          disabled={submitted || id}
+          options={[
+            { label: 'SigProfilerExtractor', value: 'SigProfilerExtractor' },
+          ]}
+          control={control}
+        />
 
-      <Button
-        className="p-0"
-        variant="link"
-        onClick={(_) => setShowAdvanced(!showAdvanced)}
-      >
-        Advanced Parameters {showAdvanced ? '-' : '+'}
-      </Button>
+        <Button
+          className="p-0"
+          variant="link"
+          onClick={(_) => setShowAdvanced(!showAdvanced)}
+        >
+          Advanced Parameters {showAdvanced ? '-' : '+'}
+        </Button>
 
-      <div className={showAdvanced ? 'd-block' : 'd-none'}>
-        {/* <fieldset className="border rounded p-2 mb-3">
+        <div className={showAdvanced ? 'd-block' : 'd-none'}>
+          {/* <fieldset className="border rounded p-2 mb-3">
           <legend className="font-weight-bold">Execution</legend>
           <Form.Group controlId="batch_size">
             <Form.Label>Batch Size</Form.Label>
@@ -568,266 +554,300 @@ export default function ExtractionForm() {
             />
           </Form.Group>
         </fieldset> */}
-        <fieldset className="border rounded p-2 mb-3">
-          <legend className="font-weight-bold">NMF Replicates</legend>
-          <Form.Group controlId="minSignatures">
-            <Form.Label>Minimum Signatures</Form.Label>
-            <Form.Control
-              {...register('minimum_signatures')}
-              type="number"
-              min="1"
-              max="24"
-              defaultValue={1}
-            />
-          </Form.Group>
-          <Form.Group controlId="maxSignatures">
-            <Form.Label>Maximum Signatures</Form.Label>
-            <Form.Control
-              {...register('maximum_signatures')}
-              type="number"
-              min="1"
-              max="25"
-              defaultValue={15}
-            />
-          </Form.Group>
-          <Form.Group controlId="nmf_replicates">
-            <Form.Label>NMF Replicates Size</Form.Label>
-            <Form.Control
-              {...register('nmf_replicates')}
-              type="number"
-              min="1"
-              max="1000"
-              defaultValue={100}
-            />
-          </Form.Group>
-          <Form.Group controlId="resample">
-            <Form.Check
-              {...register('resample')}
-              label="Resample"
-              id="resample"
-              defaultChecked={true}
-            />
-          </Form.Group>
-          <Form.Group controlId="seeds">
-            <Form.Label>Seeds</Form.Label>
-            <Form.Control {...register('seeds')} defaultValue="random" />
-          </Form.Group>
-        </fieldset>
-
-        <fieldset className="border rounded p-2 mb-3">
-          <legend className="font-weight-bold">NMF Engines</legend>
-          <Form.Group controlId="matrixNormalization">
-            <Form.Label>Matrix Normalization</Form.Label>
-            <Controller
-              name="matrix_normalization"
-              control={control}
-              render={({ field }) => (
-                <Form.Control {...field} as="select" disabled={submitted}>
-                  <option>gmm</option>
-                  <option>log2</option>
-                  <option>custom</option>
-                  <option>none</option>
-                  {['gmm', 'log2', 'custom', 'none'].map((e) => (
-                    <option value={e}>{e}</option>
-                  ))}
-                </Form.Control>
-              )}
-            />
-          </Form.Group>
-          <Form.Group controlId="nmfInit">
-            <Form.Label>NMF Initialization</Form.Label>
-            <Controller
-              name="nmf_init"
-              control={control}
-              render={({ field }) => (
-                <Form.Control {...field} as="select" disabled={submitted}>
-                  {[
-                    'random',
-                    'nndsvd',
-                    'nndsvda',
-                    'nndsvdar',
-                    'nndsvd_min',
-                  ].map((e) => (
-                    <option value={e}>{e}</option>
-                  ))}
-                </Form.Control>
-              )}
-            />
-          </Form.Group>
-          <Form.Group controlId="precision">
-            <Form.Label>Precision</Form.Label>
-            <Controller
-              name="precision"
-              control={control}
-              render={({ field }) => (
-                <Form.Control {...field} as="select" disabled={submitted}>
-                  {['single', 'double'].map((e) => (
-                    <option value={e}>{e}</option>
-                  ))}
-                </Form.Control>
-              )}
-            />
-          </Form.Group>
-          <Form.Group controlId="minNmfIterations">
-            <Form.Label>Minimum NMF Iterations</Form.Label>
-            <Form.Control
-              {...register('min_nmf_iterations')}
-              type="number"
-              defaultValue={10000}
-            />
-          </Form.Group>
-          <Form.Group controlId="maxNmfIterations">
-            <Form.Label>Maximum NMF Iterations</Form.Label>
-            <Form.Control
-              {...register('max_nmf_iterations')}
-              type="number"
-              defaultValue={1000000}
-            />
-          </Form.Group>
-          <Form.Group controlId="nmfTestConv">
-            <Form.Label>NMF Test Convergence</Form.Label>
-            <Form.Control
-              {...register('nmf_test_conv')}
-              type="number"
-              defaultValue={10000}
-            />
-          </Form.Group>
-          <Form.Group controlId="nmfTolerance">
-            <Form.Label>NMF Tolerance</Form.Label>
-            <Form.Control
-              {...register('nmf_tolerance')}
-              type="number"
-              defaultValue={1.0e-15}
-            />
-          </Form.Group>
-        </fieldset>
-
-        <fieldset className="border rounded p-2 mb-3">
-          <legend className="font-weight-bold">Decomposition</legend>
-          <Form.Group>
-            <Controller
-              name="make_decomposition_plots"
-              control={control}
-              render={({ field }) => (
-                <Form.Check
-                  {...field}
-                  id="make_decomposition_plots"
-                  type="checkbox"
-                  label={'Make Decomposition Plots'}
-                  defaultChecked={true}
-                  checked={field.checked}
-                  disabled={submitted}
-                />
-              )}
-            />
-          </Form.Group>
-          <Form.Group>
-            <Controller
-              name="collapse_to_SBS96"
-              control={control}
-              render={({ field }) => (
-                <Form.Check
-                  {...field}
-                  id="collpase_to_SBS96"
-                  type="checkbox"
-                  label={'Collapse to SBS96'}
-                  defaultChecked={true}
-                  checked={field.checked}
-                  disabled={submitted}
-                />
-              )}
-            />
-          </Form.Group>
-        </fieldset>
-
-        <fieldset className="border rounded p-2 mb-3">
-          <legend className="font-weight-bold">Others</legend>
-          <Form.Group>
-            <Controller
-              name="get_all_signature_matrices"
-              control={control}
-              render={({ field }) => (
-                <Form.Check
-                  {...field}
-                  id="get_all_signature_matrices"
-                  type="checkbox"
-                  label={'Get All Signature Matrices'}
-                  defaultChecked={true}
-                  checked={field.checked}
-                  disabled={submitted}
-                />
-              )}
-            />
-          </Form.Group>
-          <Form.Group>
-            <Controller
-              name="export_probabilities"
-              control={control}
-              render={({ field }) => (
-                <Form.Check
-                  {...field}
-                  id="export_probabilities"
-                  type="checkbox"
-                  label={'Export Probabilities'}
-                  defaultChecked={true}
-                  checked={field.checked}
-                  disabled={submitted}
-                />
-              )}
-            />
-          </Form.Group>
-        </fieldset>
-      </div>
-
-      <hr className="mb-3" />
-      <div>
-        <Form.Group controlId="toggleQueue" className="d-flex">
-          <Controller
-            name="useQueue"
-            control={control}
-            render={({ field }) => (
-              <Form.Check
-                {...field}
-                id="useQueue"
-                type="checkbox"
-                label="Long Running Job"
-                checked={true}
-                disabled={true}
-              />
-            )}
-          />
-        </Form.Group>
-        <Form.Group controlId="email">
-          <Controller
-            name="email"
-            control={control}
-            rules={{
-              required: true,
-              pattern:
-                /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
-            }}
-            render={({ field }) => (
+          <fieldset className="border rounded p-2 mb-3">
+            <legend className="font-weight-bold">NMF Replicates</legend>
+            <Form.Group controlId="minSignatures">
+              <Form.Label>Minimum Signatures</Form.Label>
               <Form.Control
-                {...field}
-                aria-label="Enter Email"
-                placeholder="Enter Email"
-                size="sm"
-                type="email"
-                disabled={submitted}
-                isInvalid={errors.email}
+                {...register('minimum_signatures')}
+                type="number"
+                min="1"
+                max="24"
+                defaultValue={1}
+                disabled={submitted || id}
               />
-            )}
-          />
-          <Form.Control.Feedback type="invalid">
-            {errors.email && 'Email required'}
-          </Form.Control.Feedback>
-          <Form.Text className="text-muted">
-            <i>You will receive an email when your job is complete</i>
-          </Form.Text>
-        </Form.Group>
-      </div>
+            </Form.Group>
+            <Form.Group controlId="maxSignatures">
+              <Form.Label>Maximum Signatures</Form.Label>
+              <Form.Control
+                {...register('maximum_signatures')}
+                type="number"
+                min="1"
+                max="25"
+                defaultValue={15}
+                disabled={submitted || id}
+              />
+            </Form.Group>
+            <Form.Group controlId="nmf_replicates">
+              <Form.Label>NMF Replicates Size</Form.Label>
+              <Form.Control
+                {...register('nmf_replicates')}
+                type="number"
+                min="1"
+                max="1000"
+                defaultValue={100}
+                disabled={submitted || id}
+              />
+            </Form.Group>
+            <Form.Group controlId="resample">
+              <Form.Check
+                {...register('resample')}
+                label="Resample"
+                id="resample"
+                defaultChecked={true}
+                disabled={submitted || id}
+              />
+            </Form.Group>
+            <Form.Group controlId="seeds">
+              <Form.Label>Seeds</Form.Label>
+              <Form.Control
+                {...register('seeds')}
+                defaultValue="random"
+                disabled={submitted || id}
+              />
+            </Form.Group>
+          </fieldset>
 
-      <Row>
+          <fieldset className="border rounded p-2 mb-3">
+            <legend className="font-weight-bold">NMF Engines</legend>
+            <Form.Group controlId="matrixNormalization">
+              <Form.Label>Matrix Normalization</Form.Label>
+              <Controller
+                name="matrix_normalization"
+                control={control}
+                render={({ field }) => (
+                  <Form.Control
+                    {...field}
+                    as="select"
+                    disabled={submitted || id}
+                  >
+                    <option>gmm</option>
+                    <option>log2</option>
+                    <option>custom</option>
+                    <option>none</option>
+                    {['gmm', 'log2', 'custom', 'none'].map((e) => (
+                      <option value={e}>{e}</option>
+                    ))}
+                  </Form.Control>
+                )}
+              />
+            </Form.Group>
+            <Form.Group controlId="nmfInit">
+              <Form.Label>NMF Initialization</Form.Label>
+              <Controller
+                name="nmf_init"
+                control={control}
+                render={({ field }) => (
+                  <Form.Control
+                    {...field}
+                    as="select"
+                    disabled={submitted || id}
+                  >
+                    {[
+                      'random',
+                      'nndsvd',
+                      'nndsvda',
+                      'nndsvdar',
+                      'nndsvd_min',
+                    ].map((e) => (
+                      <option value={e}>{e}</option>
+                    ))}
+                  </Form.Control>
+                )}
+              />
+            </Form.Group>
+            <Form.Group controlId="precision">
+              <Form.Label>Precision</Form.Label>
+              <Controller
+                name="precision"
+                control={control}
+                render={({ field }) => (
+                  <Form.Control
+                    {...field}
+                    as="select"
+                    disabled={submitted || id}
+                  >
+                    {['single', 'double'].map((e) => (
+                      <option value={e}>{e}</option>
+                    ))}
+                  </Form.Control>
+                )}
+              />
+            </Form.Group>
+            <Form.Group controlId="minNmfIterations">
+              <Form.Label>Minimum NMF Iterations</Form.Label>
+              <Form.Control
+                {...register('min_nmf_iterations')}
+                type="number"
+                defaultValue={10000}
+                disabled={submitted || id}
+              />
+            </Form.Group>
+            <Form.Group controlId="maxNmfIterations">
+              <Form.Label>Maximum NMF Iterations</Form.Label>
+              <Form.Control
+                {...register('max_nmf_iterations')}
+                type="number"
+                defaultValue={1000000}
+                disabled={submitted || id}
+              />
+            </Form.Group>
+            <Form.Group controlId="nmfTestConv">
+              <Form.Label>NMF Test Convergence</Form.Label>
+              <Form.Control
+                {...register('nmf_test_conv')}
+                type="number"
+                defaultValue={10000}
+                disabled={submitted || id}
+              />
+            </Form.Group>
+            <Form.Group controlId="nmfTolerance">
+              <Form.Label>NMF Tolerance</Form.Label>
+              <Form.Control
+                {...register('nmf_tolerance')}
+                type="number"
+                defaultValue={1.0e-15}
+                disabled={submitted || id}
+              />
+            </Form.Group>
+          </fieldset>
+
+          <fieldset className="border rounded p-2 mb-3">
+            <legend className="font-weight-bold">Decomposition</legend>
+            <Form.Group>
+              <Controller
+                name="make_decomposition_plots"
+                control={control}
+                render={({ field }) => (
+                  <Form.Check
+                    {...field}
+                    id="make_decomposition_plots"
+                    type="checkbox"
+                    label={'Make Decomposition Plots'}
+                    defaultChecked={true}
+                    checked={field.checked}
+                    disabled={submitted || id}
+                  />
+                )}
+              />
+            </Form.Group>
+            <Form.Group>
+              <Controller
+                name="collapse_to_SBS96"
+                control={control}
+                render={({ field }) => (
+                  <Form.Check
+                    {...field}
+                    id="collpase_to_SBS96"
+                    type="checkbox"
+                    label={'Collapse to SBS96'}
+                    defaultChecked={true}
+                    checked={field.checked}
+                    disabled={submitted || id}
+                  />
+                )}
+              />
+            </Form.Group>
+          </fieldset>
+
+          <fieldset className="border rounded p-2 mb-3">
+            <legend className="font-weight-bold">Others</legend>
+            <Form.Group>
+              <Controller
+                name="get_all_signature_matrices"
+                control={control}
+                render={({ field }) => (
+                  <Form.Check
+                    {...field}
+                    id="get_all_signature_matrices"
+                    type="checkbox"
+                    label={'Get All Signature Matrices'}
+                    defaultChecked={true}
+                    checked={field.checked}
+                    disabled={submitted || id}
+                  />
+                )}
+              />
+            </Form.Group>
+            <Form.Group>
+              <Controller
+                name="export_probabilities"
+                control={control}
+                render={({ field }) => (
+                  <Form.Check
+                    {...field}
+                    id="export_probabilities"
+                    type="checkbox"
+                    label={'Export Probabilities'}
+                    defaultChecked={true}
+                    checked={field.checked}
+                    disabled={submitted || id}
+                  />
+                )}
+              />
+            </Form.Group>
+          </fieldset>
+        </div>
+
+        <hr className="mb-3" />
+        <div>
+          {useQueue}
+          <Form.Group controlId="toggleQueue" className="d-flex">
+            <Controller
+              name="useQueue"
+              control={control}
+              render={({ field }) => (
+                <Form.Check
+                  {...field}
+                  id="useQueue"
+                  type="checkbox"
+                  label="Long Running Job"
+                  checked={useQueue == true}
+                  onChange={(e) => setValue('useQueue', e.target.checked)}
+                  disabled={submitted || id}
+                />
+              )}
+            />
+          </Form.Group>
+          <Form.Group controlId="email">
+            <Controller
+              name="email"
+              control={control}
+              rules={{
+                required: useQueue,
+                pattern:
+                  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
+              }}
+              render={({ field }) => (
+                <Form.Control
+                  {...field}
+                  aria-label="Enter Email"
+                  placeholder="Enter Email"
+                  type="email"
+                  disabled={submitted || id || !useQueue}
+                  isInvalid={errors.email}
+                />
+              )}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.email && 'Email required'}
+            </Form.Control.Feedback>
+            <Form.Text className="text-muted">
+              <i>You will receive an email when your job is complete</i>
+            </Form.Text>
+          </Form.Group>
+          <Form.Group controlId="jobName">
+            <Form.Label>Job Name</Form.Label>
+            <Form.Control
+              {...register('jobName')}
+              defaultValue={''}
+              placeholder="Enter Job Name"
+              disabled={submitted || id}
+            />
+          </Form.Group>
+        </div>
+      </Form>
+      <Row className="mt-3">
         <Col>
           <Button
             disabled={fetchingSeqmatrixOptions}
@@ -840,7 +860,7 @@ export default function ExtractionForm() {
         </Col>
         <Col>
           <Button
-            disabled={fetchingSeqmatrixOptions || submitted}
+            disabled={fetchingSeqmatrixOptions || submitted || id}
             className="w-100"
             variant="primary"
             type="submit"
@@ -849,6 +869,6 @@ export default function ExtractionForm() {
           </Button>
         </Col>
       </Row>
-    </Form>
+    </div>
   );
 }

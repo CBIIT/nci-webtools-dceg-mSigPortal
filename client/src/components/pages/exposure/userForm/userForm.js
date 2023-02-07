@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -12,7 +11,7 @@ import {
   useExposureOptionsQuery,
 } from '../../../../services/store/rootApi';
 import {
-  useExposureUploadMutation,
+  useUploadExplorationMutation,
   useSubmitExplorationMutation,
 } from './apiSlice';
 
@@ -44,7 +43,7 @@ export default function PublicForm() {
     isError,
   } = useExposureOptionsQuery();
   const [handleUpload, { isLoading: isUploading }] =
-    useExposureUploadMutation();
+    useUploadExplorationMutation();
   const [submitExploration, { isLoading: loadingUserExposure }] =
     useSubmitExplorationMutation();
 

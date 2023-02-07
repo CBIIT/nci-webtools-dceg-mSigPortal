@@ -50,6 +50,8 @@ router.use(etiologyRoutes);
 router.use(publicationsRoutes);
 router.use(patternRoutes);
 
+router.get('/ping', (req, res) => res.send(true));
+
 router.use((error, req, res, next) => {
   logger.error(error);
   res.status(500).json([error.message]);

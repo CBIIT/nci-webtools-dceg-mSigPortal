@@ -1,4 +1,4 @@
-import { readdir, unlinkSync, writeFileSync } from 'fs';
+import { readdir, unlinkSync, writeFileSync, createReadStream } from 'fs';
 import path from 'path';
 import { stringify } from 'csv-stringify';
 // const tar = require('tar');
@@ -9,6 +9,9 @@ import validator from 'validator';
 import mapValues from 'lodash/mapValues.js';
 import { readJson, writeJson, mkdirs } from './utils.js';
 import { sendNotification } from './notifications.js';
+import { formatObject } from './logger.js';
+import axios from 'axios';
+import FormData from 'form-data';
 
 export async function extraction(
   params,
@@ -89,6 +92,86 @@ export async function extraction(
     );
     logger.debug(all);
 
+    let denovoId, decomposedId;
+    // run exploration calculation on denovo and decomposed solutions
+    try {
+      logger.info(`[${id}] Run Denovo Exploration`);
+      const denovoFormData = new FormData();
+      denovoFormData.append('matrixFile', createReadStream(paths.matrixFile));
+      denovoFormData.append(
+        'exposureFile',
+        createReadStream(paths.denovoExposureFile)
+      );
+      denovoFormData.append(
+        'signatureFile',
+        createReadStream(paths.denovoSignatureFile)
+      );
+
+      const denovoUpload = await axios.post(
+        `${env.API_BASE_URL}/web/upload`,
+        denovoFormData,
+        { headers: denovoFormData.getHeaders() }
+      );
+
+      const denovoExploration = await axios.post(
+        `${env.API_BASE_URL}/web/submitExploration/${denovoUpload.data.projectID}`,
+        {
+          matrixFile: path.parse(paths.matrixFile).base,
+          exposureFile: path.parse(paths.denovoExposureFile).base,
+          signatureFile: path.parse(paths.denovoSignatureFile).base,
+        }
+      );
+
+      denovoId = denovoExploration.data;
+    } catch (error) {
+      logger.error('Denovo Exploration Error');
+      throw error.data;
+    }
+
+    try {
+      logger.info(`[${id}] Run Decomposed Exploration`);
+      const decomposedFormData = new FormData();
+      decomposedFormData.append(
+        'matrixFile',
+        createReadStream(paths.matrixFile)
+      );
+      decomposedFormData.append(
+        'exposureFile',
+        createReadStream(paths.decomposedExposureFile)
+      );
+      decomposedFormData.append(
+        'signatureFile',
+        createReadStream(paths.decomposedSignatureFile)
+      );
+
+      const decomposedUpload = await axios.post(
+        `${env.API_BASE_URL}/web/upload`,
+        decomposedFormData,
+        { headers: decomposedFormData.getHeaders() }
+      );
+
+      const decomposedExploration = await axios.post(
+        `${env.API_BASE_URL}/web/submitExploration/${decomposedUpload.data.projectID}`,
+        {
+          matrixFile: path.parse(paths.matrixFile).base,
+          exposureFile: path.parse(paths.decomposedExposureFile).base,
+          signatureFile: path.parse(paths.decomposedSignatureFile).base,
+        }
+      );
+
+      decomposedId = decomposedExploration.data;
+    } catch (error) {
+      logger.error('Decomposed Exploration Error');
+      throw error.data;
+    }
+
+    // add exploration ids to manifest
+    await writeJson(paths.manifestFile, {
+      ...mapValues(paths, (value) => path.parse(value).base),
+      denovoId,
+      decomposedId,
+    });
+
     // write success status
     const status = { id, status: 'COMPLETED' };
     await writeJson(paths.statusFile, status);
@@ -109,7 +192,6 @@ export async function extraction(
       //     }
       //   });
       // });
-
       await sendNotification(
         params.email,
         `Extraction Complete - ${params.jobName}`,
@@ -126,7 +208,6 @@ export async function extraction(
     return { id };
   } catch (error) {
     // send error notification if email was provided
-    console.log(error);
     logger.error(error);
     const status = { id, status: 'FAILED', error: { ...error } };
     await writeJson(paths.statusFile, status);
@@ -207,6 +288,7 @@ export async function getPaths(params, env = process.env) {
   );
   const denovoSignatureFile = path.resolve(
     denovoFolder,
+    'Signatures',
     `${args.context_type}_De-Novo_Signatures.txt`
   );
 
