@@ -188,10 +188,9 @@ export default function Extraction() {
                   value={''} // set dummy value for file input
                   disabled={true}
                   label={
-                    'asdf'
-                    // explorationType == 'denovo'
-                    //   ? manifest.denovoExposureFile
-                    //   : manifest.decomposedExposureFile
+                    explorationType == 'denovo'
+                      ? manifest.denovoExposureFile
+                      : manifest.decomposedExposureFile
                   }
                   feedback="Please upload a data file"
                   custom
@@ -213,10 +212,9 @@ export default function Extraction() {
                   value={''} // set dummy value for file input
                   disabled={true}
                   label={
-                    'asdf'
-                    // explorationType == 'denovo'
-                    //   ? manifest.denovoSignatureFile
-                    //   : manifest.decomposedSignatureFile
+                    explorationType == 'denovo'
+                      ? manifest.denovoSignatureFile
+                      : manifest.decomposedSignatureFile
                   }
                   feedback="Please upload a data file"
                   custom
