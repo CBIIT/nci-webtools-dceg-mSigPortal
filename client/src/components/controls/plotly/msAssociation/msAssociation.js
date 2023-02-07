@@ -1,5 +1,5 @@
-import { groupByCustom, linearRegression, round } from '../../utils/utils';
-import { groupBy, countBy } from 'lodash';
+import { linearRegression, round, pearson } from '../../utils/utils';
+import { groupBy } from 'lodash';
 
 export default function MsAssociation(data, arg) {
   console.log(data);
@@ -99,6 +99,9 @@ export default function MsAssociation(data, arg) {
   const lr = linearRegression(traceMain.x, traceMain.y);
   console.log(lr);
 
+  const pearsonVal = round(pearson(traceMain.x, traceMain.y), 2);
+  console.log(pearsonVal);
+
   const traceLine = {
     x: [minX, maxX],
     y: [minX * lr.sl + lr.off, maxX * lr.sl + lr.off],
@@ -120,19 +123,23 @@ export default function MsAssociation(data, arg) {
   const traces = [traceMain, traceLine, traceSig1, traceSig2];
 
   const detailAnnotation = {
-    xref: 'x',
+    xref: 'paper',
     yref: 'paper',
-    x: minX - 0.15,
+    x: 0,
     xanchor: 'bottom',
-    y: 1,
+    y: 1.01,
     yanchor: 'bottom',
-    text: 'n<sub>pairs</sub> = ' + dataArraySample.length,
+    text:
+      'r<sub>Pearson</sub> = ' +
+      pearsonVal +
+      ', n<sub>pairs</sub> = ' +
+      dataArraySample.length,
     showarrow: false,
     font: {
       size: 16,
       family: 'Times New Roman',
     },
-    align: 'center',
+    align: 'left',
   };
 
   const layout = {
