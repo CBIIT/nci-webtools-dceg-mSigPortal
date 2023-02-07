@@ -83,7 +83,6 @@ export default function CN48(rawData, sample) {
       data,
     })
   );
-  console.log(groupbyfirst2Data);
   const thesort = (arr) => {
     // first grab the obj that is not getting sorted
     let first = arr.shift();
@@ -116,7 +115,6 @@ export default function CN48(rawData, sample) {
   const sortedData = sortGroupByFirst2DataInside
     .map((indel) => indel.data.map((e) => e))
     .flat();
-  console.log(sortedData);
 
   // const dataD = groupByClusterData
   //   .map((indel) => indel.data.map((e) => e))
@@ -160,7 +158,6 @@ export default function CN48(rawData, sample) {
     showlegend: false,
   }));
 
-  console.log(sortGroupByFirst2Data);
   const topShapes = sortGroupByFirst2Data.map((group, groupIndex, array) => ({
     group: group,
     name: group.mutation,
@@ -224,7 +221,6 @@ export default function CN48(rawData, sample) {
     },
     showlegend: false,
   }));
-  console.log(topTitleShapes);
   const topTitleShapesAnnitations = groupByClusterData.map(
     (group, groupIndex, array) => ({
       group: group,

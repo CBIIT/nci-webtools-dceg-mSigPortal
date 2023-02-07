@@ -292,7 +292,6 @@ export default function ID415(data, sample) {
     showlegend: true,
   };
 
-  console.log(tracesT);
 
   const tracesU = {
     name: 'Untranscribed Strand',
@@ -306,7 +305,6 @@ export default function ID415(data, sample) {
   };
 
   Object.values(T_arrayID).forEach((group) => {
-    console.log(group);
     if (group.length > 1) {
       arrayIDAnnotationTop.push(
         group[Math.floor(group.length / 2)].mutationType

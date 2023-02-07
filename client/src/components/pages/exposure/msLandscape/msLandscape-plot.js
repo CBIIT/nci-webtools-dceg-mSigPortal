@@ -71,14 +71,11 @@ export default function MsLandscapePlot({ state }) {
     //mergeExposureState({ variableData: fileRef.current.value });
   }
 
-  console.log(variableFileName);
-  console.log(variableData);
   const [calculationQuery, setCalculationQuery] = useState('');
   let { data, error, isFetching } = useMsLandscapePlotQuery(calculationQuery, {
     skip: !calculationQuery,
   });
   if (data) {
-    console.log(data);
     data = MsLandscape(
       data.output.cosineData,
       data.output.exposureData,

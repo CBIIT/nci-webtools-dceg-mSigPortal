@@ -25,7 +25,6 @@ export const clusteredApiSlice = visualizationApiSlice.injectEndpoints({
             data: plotAndTable,
           };
         } catch (error) {
-          console.log(error);
           return { error };
         }
       },

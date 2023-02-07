@@ -7,7 +7,6 @@ export default function SBS288(data, sample, tab) {
     'T>C': '#A1CE63',
     'T>G': '#EBC6C4',
   };
-  console.log(data);
 
   const transcribed = data.filter((e) => /^T:/.test(e.mutationType));
   const untranscribed = data.filter((e) => /^U:/.test(e.mutationType));
@@ -17,14 +16,12 @@ export default function SBS288(data, sample, tab) {
     transcribed.reduce((total, e) => total + e.contribution, 0) +
     untranscribed.reduce((total, e) => total + e.contribution, 0) +
     neutral.reduce((total, e) => total + e.contribution, 0);
-  console.log(totalMutations);
   const maxMutation = Math.max(
     ...[
       ...transcribed.map((e) => e?.mutations || e?.contribution),
       ...untranscribed.map((e) => e?.mutations || e?.contribution),
     ]
   );
-  console.log(maxMutation);
   //// ------ bar char left  --------- //
 
   const groupByMutationWoFirstLetter = data.reduce((groups, e, i) => {

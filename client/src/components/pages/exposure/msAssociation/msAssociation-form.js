@@ -42,7 +42,6 @@ export default function MsAssociationForm() {
     defaultValues: msAssociation,
   });
 
-  const { signatureName1, signatureName2 } = watch();
   // set inital
   useEffect(() => {
     if (!msAssociation.signatureName1 && signatureNameOptions) {

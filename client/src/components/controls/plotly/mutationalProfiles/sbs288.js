@@ -7,7 +7,6 @@ export default function SBS288(data, sample) {
     'T>C': '#A1CE63',
     'T>G': '#EBC6C4',
   };
-  console.log(data);
   const transcribed = data.filter((e) => /^T:/.test(e.mutationType));
   const untranscribed = data.filter((e) => /^U:/.test(e.mutationType));
   const neutral = data.filter((e) => /^N:/.test(e.mutationType));
@@ -61,7 +60,6 @@ export default function SBS288(data, sample) {
 
   const flatSortedTotal = Object.values(groupByTotal).flat();
   const maxValTotal = Math.max(...flatSortedTotal.map((o) => o.contribution));
-  console.log(maxValTotal);
 
   const tracesBarTotal = Object.entries(groupByTotal).map(
     ([mutation, signatures], groupIndex, array) => ({

@@ -11,9 +11,7 @@ export default function DBS78(rawData, sample) {
     TG: '#CB98FD',
     TT: '#4C0299',
   };
-  console.log(sample);
   const dbsdata = ['AC', 'AT', 'CC', 'CG', 'CT', 'GC', 'TA', 'TC', 'TG', 'TT'];
-  console.log(sample);
   const groupByMutation = rawData.reduce((acc, e, i) => {
     const mutationRegex = /^(.{2})/;
     const mutation = e.mutationType.match(mutationRegex)[1];
@@ -26,7 +24,6 @@ export default function DBS78(rawData, sample) {
     mutation,
     data,
   }));
-  console.log(data);
   const datafilter = data.filter((e) => dbsdata.includes(e.mutation));
   const totalMutations = datafilter.reduce(
     (total, mutation) =>
@@ -34,13 +31,11 @@ export default function DBS78(rawData, sample) {
       mutation.data.reduce((mutationSum, e) => mutationSum + e.contribution, 0),
     0
   );
-  console.log(totalMutations);
   const maxMutation = Math.max(
     ...datafilter
       .map((mutation) => mutation.data.map((e) => e.contribution))
       .flat()
   );
-  console.log(maxMutation);
   const mutationTypeNames = datafilter
     .map((group) =>
       group.data.map((e) => ({

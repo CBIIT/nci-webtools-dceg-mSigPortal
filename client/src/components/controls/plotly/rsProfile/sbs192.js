@@ -7,7 +7,6 @@ export default function SBS192(data, sample, tab) {
     'T>C': '#A1CE63',
     'T>G': '#EBC6C4',
   };
-  console.log(tab);
 
   const transcribed = data.filter((e) => /^T:/.test(e.mutationType));
   const untranscribed = data.filter((e) => /^U:/.test(e.mutationType));
@@ -24,7 +23,6 @@ export default function SBS192(data, sample, tab) {
   );
 
   const maxVal = Math.max(...data.map((o) => o?.mutations || o?.contribution));
-  console.log(maxVal);
 
   const groupByMutationT = transcribed.reduce((groups, e, i) => {
     const mutationRegex = /\[(.*)\]/;
@@ -81,7 +79,6 @@ export default function SBS192(data, sample, tab) {
         .substring(2, 5)
         .localeCompare(b.mutationType.substring(2, 5))
     );
-  console.log(flatSortedT);
   const flatSortedU = Object.values(groupByMutationU)
     .flat()
     .sort((a, b) =>
@@ -94,7 +91,6 @@ export default function SBS192(data, sample, tab) {
         .substring(2, 5)
         .localeCompare(b.mutationType.substring(2, 5))
     );
-  console.log(flatSortedU);
 
   const tracesT = {
     name: 'Transcrribed Strand',
@@ -106,7 +102,6 @@ export default function SBS192(data, sample, tab) {
     //hoverinfo: 'x+y',
     showlegend: true,
   };
-  console.log(tracesT);
   const tracesU = {
     name: 'Untranscribed Strand',
     type: 'bar',
@@ -117,7 +112,6 @@ export default function SBS192(data, sample, tab) {
     //hoverinfo: 'x+y',
     showlegend: true,
   };
-  console.log(tracesU);
   const annotations = Object.entries(groupByMutationU).map(
     ([mutation, signatures], groupIndex, array) => ({
       xref: 'x',

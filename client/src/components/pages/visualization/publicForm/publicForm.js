@@ -84,7 +84,6 @@ export default function PublicForm() {
 
       mergeMain({ matrixData, projectID: crypto.randomUUID() });
     } catch (error) {
-      console.log(error);
       if (error.originalStatus == 504) {
         mergeMain({
           error: 'Please Reset Your Parameters and Try again.',

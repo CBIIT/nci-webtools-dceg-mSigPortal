@@ -26,8 +26,7 @@ export default function SBS1536(data, sample, tab) {
     Array.from(new Array(Math.ceil(a.length / size)), (_, i) =>
       a.slice(i * size, i * size + size)
     );
-  console.log('data--:');
-  console.log(data);
+
   // const maxValMutation = Math.max(...data.map((o) => o.mutations));
   // console.log("maxValMutation:---");
   // console.log(maxValMutation);
@@ -330,7 +329,6 @@ export default function SBS1536(data, sample, tab) {
     ygap: 0.1,
     hovertemplate: 'x: %{x}<br>y: %{y}<br>Value: %{z}<extra></extra>',
   }));
-  console.log(traceHeatMap3);
   ////--------------------- Heat Map Total --------------------------//
   const heatmapY = [];
   const heatmapZ = [];
@@ -342,8 +340,7 @@ export default function SBS1536(data, sample, tab) {
   let heatMapZ3 = [];
   let heatMapZ4 = [];
   let heatMapZ5 = [];
-  console.log('groupByMutationOuter');
-  console.log(groupByMutationOuter);
+
 
   Object.entries(groupByMutationOuter).forEach(
     ([key, value], groupIndex, array) => {
@@ -374,11 +371,7 @@ export default function SBS1536(data, sample, tab) {
     }
   );
 
-  console.log('groupByMutationOuterSort');
-  console.log(groupByMutationOuter);
 
-  console.log('heatmapZ');
-  console.log(heatmapZ);
 
   heatmapZ.forEach((item, index) => {
     heatMapZ0.push(item.slice().splice(0, 16));
@@ -389,14 +382,6 @@ export default function SBS1536(data, sample, tab) {
     heatMapZ5.push(item.slice().splice(80, 16));
   });
 
-  console.log('heatMapZ0');
-  console.log(heatMapZ0);
-
-  console.log('heatMapZ1');
-  console.log(heatMapZ1);
-
-  console.log('heatMapZ5');
-  console.log(heatMapZ5);
 
   const heatMapZFinal = [
     heatMapZ0,
