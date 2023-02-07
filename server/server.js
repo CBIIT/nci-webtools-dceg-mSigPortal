@@ -3,6 +3,7 @@ const express = require('express');
 const fs = require('fs');
 const knex = require('knex');
 const logger = require('./services/logger');
+const { createDatabaseCache } = require('./services/cache');
 const { apiRouter } = require('./routes/router');
 const config = require('./config.json');
 
@@ -32,6 +33,8 @@ function createApp(config) {
       }),
       useNullAsDefault: true,
     });
+  app.locals.cache = createDatabaseCache(app.locals.connection, 'cache');
+  app.locals.cache.initialize();
 
   app.use(apiRouter);
   // app.use(express.static(config.server.static));
