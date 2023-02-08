@@ -47,7 +47,8 @@ export default function MsAssociation(data, arg) {
     name: signatureName1,
     type: 'histogram',
     histnorm: 'density',
-    nbinsx: round(data.length / 1.75),
+    // nbinsx: round(data.length / 1.75),
+    nbinsx: 35,
     yaxis: 'y2',
     marker: { color: '#019E72', line: { color: 'black', width: 1 } },
     hovertemplate:
@@ -66,7 +67,8 @@ export default function MsAssociation(data, arg) {
     name: signatureName2,
     type: 'histogram',
     histnorm: 'density',
-    nbinsy: round(data.length / 1.75),
+    // nbinsy: round(data.length / 1.75),
+    nbinsy: 35,
     xaxis: 'x2',
     marker: { color: '#D55E00', line: { color: 'black', width: 1 } },
     hovertemplate:
