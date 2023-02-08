@@ -25,24 +25,29 @@ export default function SignatureOptions({ data }) {
     data: thumbnails,
     error,
     isFetching,
-  } = useThumbnailsQuery({
-    keys: data.map((e) => getThumbnailKey(e.signature)),
-  });
+  } = useThumbnailsQuery(
+    {
+      keys: data.map((e) => getThumbnailKey(e.signature)),
+    },
+    { skip: !data }
+  );
 
   // for category CancerSpecificSignatures
   const { data: refSigThumbnails } = useThumbnailsQuery(
     {
       keys: data.map((e) => getThumbnailKey(e.json.referenceSignature)),
     },
-    { skip: category != 'CancerSpecificSignatures' }
+    { skip: !data || category != 'CancerSpecificSignatures' }
   );
 
   // creates s3 path key from signature name
   function getThumbnailKey(signature) {
+    // replace slashes with colons in filenames
+    const file = signature ? signature.replaceAll(/\//g, ':') : '';
     return encodeURIComponent(
       category == 'CancerSpecificSignatures_2022'
-        ? `msigportal/Database/Etiology/Profile_logo/Cancer_Specific_Signature_2022/${signature}.svg`
-        : `msigportal/Database/Etiology/Profile_logo/${signature}.svg`
+        ? `msigportal/Database/Etiology/Profile_logo/Cancer_Specific_Signature_2022/${file}.svg`
+        : `msigportal/Database/Etiology/Profile_logo/${file}.svg`
     );
   }
 
@@ -157,7 +162,7 @@ export default function SignatureOptions({ data }) {
                       }
                     >
                       <img
-                        src={thumbnails[e.signature]}
+                        src={thumbnails[e.signature.replaceAll(/\//g, ':')]}
                         className="w-100"
                         // height="110"
                         alt=""
@@ -195,7 +200,7 @@ export default function SignatureOptions({ data }) {
                     title={`${e.etiology} - ${e.signature}`}
                   >
                     <img
-                      src={thumbnails[e.signature]}
+                      src={thumbnails[e.signature.replaceAll(/\//g, ':')]}
                       className="w-100"
                       // height="70"
                       alt=""
@@ -235,7 +240,11 @@ export default function SignatureOptions({ data }) {
                       }
                     >
                       <img
-                        src={refSigThumbnails[e.json.referenceSignature]}
+                        src={
+                          refSigThumbnails[
+                            e.json.referenceSignature.replaceAll(/\//g, ':')
+                          ]
+                        }
                         className="w-100"
                         // height="110"
                         alt=""
