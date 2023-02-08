@@ -25,8 +25,10 @@ export default function Extraction() {
   const dispatch = useDispatch();
   const mergeState = (state) => dispatch(actions.mergeExtraction(state));
   const [explorationType, setExplorationType] = useState('denovo');
-  const { displayTab, openSidebar } = useSelector((state) => state.extraction);
-  const id = useParams().id || false;
+  const { displayTab, openSidebar, ...state } = useSelector(
+    (state) => state.extraction
+  );
+  const id = useParams().id || state.id || false;
   const { data: status, refetch: refetchStatus } = useStatusQuery(id, {
     skip: !id,
   });
@@ -189,8 +191,8 @@ export default function Extraction() {
                   disabled={true}
                   label={
                     explorationType == 'denovo'
-                      ? manifest.denovoExposureFile
-                      : manifest.decomposedExposureFile
+                      ? manifest?.denovoExposureFile
+                      : manifest?.decomposedExposureFile
                   }
                   feedback="Please upload a data file"
                   custom
@@ -201,7 +203,7 @@ export default function Extraction() {
                 <Form.File
                   value={''} // set dummy value for file input
                   disabled={true}
-                  label={manifest.matrixFile}
+                  label={manifest?.matrixFile}
                   feedback="Please upload a data file"
                   custom
                 />
@@ -213,8 +215,8 @@ export default function Extraction() {
                   disabled={true}
                   label={
                     explorationType == 'denovo'
-                      ? manifest.denovoSignatureFile
-                      : manifest.decomposedSignatureFile
+                      ? manifest?.denovoSignatureFile
+                      : manifest?.decomposedSignatureFile
                   }
                   feedback="Please upload a data file"
                   custom
