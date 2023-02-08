@@ -131,7 +131,7 @@ export default function MsAssociationForm({ state, form, setForm }) {
           <Col lg="auto" className="d-flex">
             <Button
               className="mt-auto mb-3"
-              //disabled={!signatureName1 || !signatureName2}
+              disabled={!signatureName1 || !signatureName2}
               variant="primary"
               type="submit"
             >
