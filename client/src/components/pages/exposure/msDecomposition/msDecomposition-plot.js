@@ -9,9 +9,8 @@ export default function MsDecompositionPlot({ state }) {
   const { data, error, isFetching } = useMsDecompositionQuery(params, {
     skip: !params,
   });
-
+  const { study, strategy, signatureSetName, cancer, id } = state;
   useEffect(() => {
-    const { study, strategy, signatureSetName, cancer } = state;
     if (study) {
       setParams({
         study: study.value,
@@ -19,10 +18,10 @@ export default function MsDecompositionPlot({ state }) {
         signatureSetName: signatureSetName.value,
         cancer: cancer.value,
       });
-    } else if (state.id) {
-      setParams({ userId: state.id });
+    } else if (id) {
+      setParams({ userId: id });
     }
-  }, [state]);
+  }, [study, id]);
 
   return (
     <>

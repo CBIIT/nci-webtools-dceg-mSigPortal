@@ -6,7 +6,7 @@ export const msLandscapeApiSlice = explorationApiSlice.injectEndpoints({
     msLandscapePlot: builder.query({
       query: (params) => ({
         url: 'signature_landscape',
-        params,
+        params: { ...params },
       }),
       // transformResponse: (data) => {
       //   const { cosineData, exposureData } = data.output;

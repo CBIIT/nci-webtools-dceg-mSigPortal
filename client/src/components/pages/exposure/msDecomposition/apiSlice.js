@@ -84,9 +84,13 @@ export const msDecompositionApiSlice = explorationApiSlice.injectEndpoints({
     msDecomposition: builder.query({
       query: (params) => ({
         url: 'signature_decomposition',
-        params,
+        params: {
+          ...params,
+        },
       }),
       transformResponse: (data, meta, arg) => {
+        console.log(arg);
+        console.log(data);
         //return false;
         return MsDecomposition(data.output, arg);
       },

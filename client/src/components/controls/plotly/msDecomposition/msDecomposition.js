@@ -7,17 +7,10 @@ export default function MsDecomposition(data, arg) {
   const grouped = groupByCustom(result, (e) => e.name);
 
   const cosine_similarity = grouped.get('Cosine_similarity');
-  //.sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
   const L1_Norm = grouped.get('100-L1_Norm_%');
-  //.sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
   const L2_Norm = grouped.get('100-L2_Norm_%');
-  //  .sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
-
   const KL_Divergence = grouped.get('KL_Divergence');
-  // .sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
-
   const Correlation = grouped.get('Correlation');
-  // .sort((a, b) => (a['value'] > b['value'] ? 1 : -1));
 
   const groupByCancer = groupBy(result, 'cancer');
 
@@ -145,7 +138,7 @@ export default function MsDecomposition(data, arg) {
       meanline: {
         visible: true,
       },
-      
+
       y0: 'KL_Divergence',
       xaxis: 'x4',
       yaxis: 'y4',
