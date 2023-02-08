@@ -47,12 +47,8 @@ export const parseMatrix = (text) => {
 
   let result = [];
   var titles = arr[0].split(/\t|\s+/);
-  console.log(titles);
   for (var i = 1; i < arr.length - 1; i++) {
     let data = arr[i].split(/\t|\s+/);
-    console.log(data[0]);
-    console.log(data[1]);
-    console.log(data[2]);
 
     let dataObject;
     if (data.length === 3) {

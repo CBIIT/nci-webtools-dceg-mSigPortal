@@ -38,8 +38,8 @@ export default function MsAssociation(data, arg) {
 
   const maxX = Math.max(...xValues.map((e) => Math.log10(e['exposure'] + 1)));
 
-  console.log(minX);
-  console.log(maxX);
+  // console.log(minX);
+  // console.log(maxX);
 
   const traceSig1 = {
     //x: signatureName1data.map((e) => Math.log10(e['exposure'] + 1)),
@@ -58,7 +58,7 @@ export default function MsAssociation(data, arg) {
       ' (log10)</b>: %{x}<br><b>Value (log10): </b> %{y}<extra></extra>',
   };
 
-  console.log(traceSig1);
+  // console.log(traceSig1);
 
   const traceSig2 = {
     //y: signatureName2data.map((e) => Math.log10(e['exposure'] + 1)),
@@ -77,7 +77,7 @@ export default function MsAssociation(data, arg) {
       ' (log10)</b> %{y}<br><b>Value (log10): </b> %{x}<extra></extra>',
   };
 
-  console.log(traceSig2);
+  // console.log(traceSig2);
 
   const traceMain = {
     x: xValues.map((e) => Math.log10(e['exposure'] + 1)),
@@ -97,12 +97,12 @@ export default function MsAssociation(data, arg) {
       signatureName2 +
       ': (log10)</b> %{y}<extra></extra>',
   };
-  console.log(traceMain);
+  // console.log(traceMain);
   const lr = linearRegression(traceMain.x, traceMain.y);
-  console.log(lr);
+  // console.log(lr);
 
   const pearsonVal = round(pearson(traceMain.x, traceMain.y), 2);
-  console.log(pearsonVal);
+  // console.log(pearsonVal);
 
   const traceLine = {
     x: [minX, maxX],
@@ -121,7 +121,7 @@ export default function MsAssociation(data, arg) {
       '<extra></extra>',
     showlegend: false,
   };
-  console.log(traceLine);
+  // console.log(traceLine);
   const traces = [traceMain, traceLine, traceSig1, traceSig2];
 
   const detailAnnotation = {
@@ -152,6 +152,9 @@ export default function MsAssociation(data, arg) {
     autosize: true,
     title: {
       text: '<b>Mutational Signature Association</b>',
+    },
+    legend: {
+      title: { text: '\t Signature Names:' },
     },
     xaxis: {
       domain: [0.0, 0.83],

@@ -1,10 +1,13 @@
 import { Container } from 'react-bootstrap';
 import MsAssociationForm from './msAssociation-form';
 import Description from '../../../controls/description/description';
+import { useState } from 'react';
 
-export default function MutationalProfiles(props) {
+export default function MsAssociation({ state }) {
+  const [form, setForm] = useState({ signatureName1: '', signatureName2: '' });
+
   return (
-    <Container fluid className="bg-white border rounded p-0" {...props}>
+    <Container fluid className="bg-white border rounded p-0">
       <div className="p-3">
         <b>Mutational Signature Association</b>
         <Description
@@ -13,7 +16,7 @@ export default function MutationalProfiles(props) {
         />
       </div>
       <hr />
-      <MsAssociationForm />
+      <MsAssociationForm state={state} form={form} setForm={setForm} />
     </Container>
   );
 }

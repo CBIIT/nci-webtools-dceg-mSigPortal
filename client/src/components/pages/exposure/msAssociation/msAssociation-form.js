@@ -14,14 +14,7 @@ import Plotly from '../../../controls/plotly/plot/plot';
 const actions = { ...exposureActions };
 const { Group, Check } = Form;
 
-export default function MsAssociationForm() {
-  const dispatch = useDispatch();
-  const mergeMsAssociation = (state) =>
-    dispatch(actions.mergeExposure({ msAssociation: state }));
-  const exposure = useSelector((state) => state.exposure);
-  const { publicForm, main, msAssociation } = useSelector(
-    (state) => state.exposure
-  );
+export default function MsAssociationForm({ state, form, setForm }) {
   const [signatureOptionParams, setSignatureOptionParams] = useState('');
   const [params, setParams] = useState(null);
 
@@ -34,59 +27,65 @@ export default function MsAssociationForm() {
     skip: !signatureOptionParams,
   });
 
+  const { signatureName1, signatureName2 } = form;
+
+  const { study, strategy, signatureSetName, cancer, useAllCancer, id } = state;
+
   const { data, error, isFetching } = useMsAssociationQuery(params, {
     skip: !params,
   });
 
   const { control, handleSubmit, watch, setValue } = useForm({
-    defaultValues: msAssociation,
+    defaultValues: form,
   });
 
   // set inital
   useEffect(() => {
-    if (!msAssociation.signatureName1 && signatureNameOptions) {
-      setValue('signatureName1', signatureNameOptions[0]);
+    if (!form.signatureName1 && signatureNameOptions) {
+      setForm({ ...form, signatureName1: signatureNameOptions[0] });
     }
-    if (!msAssociation.signatureName2 && signatureNameOptions) {
-      setValue('signatureName2', signatureNameOptions[1]);
+    if (!form.signatureName2 && signatureNameOptions) {
+      setForm({ ...form, signatureName2: signatureNameOptions[1] });
     }
-  }, [signatureNameOptions, msAssociation]);
+  }, [signatureNameOptions, form]);
 
   useEffect(() => {
-    if (publicForm.study) {
+    if (study) {
       setSignatureOptionParams({
-        study: publicForm.study.value,
-        strategy: publicForm.strategy.value,
-        signatureSetName: publicForm.signatureSetName.value,
-        ...(!publicForm.useAllCancer && { cancer: publicForm.cancer.value }),
+        study: study.value,
+        strategy: strategy.value,
+        signatureSetName: signatureSetName.value,
+        ...(!useAllCancer && { cancer: cancer.value }),
       });
-    } else if (main.id) {
-      setSignatureOptionParams({ userId: main.id });
+    } else if (id) {
+      setSignatureOptionParams({ userId: id });
     }
-  }, [publicForm, main]);
+  }, [state]);
 
   function handleSignatureName1(e) {
-    setValue('signatureName1', e);
+    setForm({ ...form, signatureName1: e });
   }
 
   function handleSignatureName2(e) {
-    setValue('signatureName2', e);
+    setForm({ ...form, signatureName2: e });
   }
-
-  function onSubmit(data) {
-    console.log(data);
-    mergeMsAssociation(data);
-    const params = {
-      study: publicForm.study.value,
-      strategy: publicForm.strategy.value,
-      signatureSetName: publicForm.signatureSetName.value,
-      cancer: publicForm.cancer.value,
-      signatureName:
-        data.signatureName1.value + ';' + data.signatureName2.value,
-      both: bothCheck,
-    };
-    console.log(params);
-    setParams(params);
+  function onSubmit() {
+    if (signatureName1 && signatureName2 && id) {
+      setParams({
+        signatureName: signatureName1.value + ';' + signatureName2.value,
+        both: bothCheck,
+        userId: id,
+      });
+    } else if (signatureName1 && signatureName2 && study) {
+      setParams({
+        signatureName: signatureName1.value + ';' + signatureName2.value,
+        both: bothCheck,
+        study: study.value,
+        strategy: strategy.value,
+        signatureSetName: signatureSetName.value,
+        ...(!useAllCancer && { cancer: cancer.value }),
+      });
+    }
   }
 
   return (
@@ -98,6 +97,7 @@ export default function MsAssociationForm() {
             <Select
               name="signatureName1"
               label="Signature Name 1"
+              value={form.signatureName1}
               disabled={!signatureNameOptions}
               control={control}
               options={signatureNameOptions}
@@ -108,6 +108,7 @@ export default function MsAssociationForm() {
             <Select
               name="signatureName2"
               label="Signature Name 2"
+              value={form.signatureName2}
               disabled={!signatureNameOptions}
               control={control}
               options={signatureNameOptions}

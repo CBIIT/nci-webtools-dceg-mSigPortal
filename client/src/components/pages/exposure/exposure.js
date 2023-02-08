@@ -9,7 +9,7 @@ import Instructions from './instructions';
 import TMB from './tmb/tmb.js';
 import TmbSig from './tmbSignature/tmbSignature.js';
 import MsBurden from './msBurden/msBurden.js';
-import MsAssociation from './msAssociation/msAssociation';
+import MsAssociation from './msAssociation/msAssociation.js';
 import MsDecomposition from './msDecomposition/msDecomposition.js';
 import MsLandscape from './msLandscape/msLandscape.js';
 import MsPrevalence from './msPrevalence/msPrevalence.js';
