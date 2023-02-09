@@ -13,10 +13,8 @@ import Plotly from '../../../controls/plotly/plot/plot';
 import { useSelector, useDispatch } from 'react-redux';
 import { useMsLandscapePlotQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import { useForm, Controller } from 'react-hook-form';
 import { useRef } from 'react';
 
-import './plot.scss';
 import MsLandscape from '../../../controls/plotly/msLandscape/msLandscape';
 import { readFile, parseMatrix } from '../../../controls/utils/utils';
 import { actions } from '../../../../services/store/exposure';
