@@ -292,7 +292,7 @@ export default function ExtractionForm() {
 
   async function onSubmit(data) {
     mergeState({ submitted: true });
-    console.log('hi');
+
     const formData = new FormData();
     formData.append('inputFile', data.inputFile);
     const { id } = await uploadFiles(formData).unwrap();

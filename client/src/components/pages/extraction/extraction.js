@@ -15,9 +15,11 @@ import TMB from '../exposure/tmb/tmb';
 import TmbSignature from '../exposure/tmbSignature/tmbSignature';
 import MsBurden from '../exposure/msBurden/msBurden';
 import MsDecomposition from '../exposure/msDecomposition/msDecomposition';
+import MsAssociation from '../exposure/msAssociation/msAssociation';
 import MsLandscape from '../exposure/msLandscape/msLandscape';
 import MsPrevalence from '../exposure/msPrevalence/msPrevalence';
 import { useStatusQuery, useManifestQuery } from './apiSlice';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const actions = { ...extractionActions, ...modalActions };
 
@@ -39,8 +41,8 @@ export default function Extraction() {
   const isDone = ['COMPLETED', 'FAILED'].includes(status?.status);
   const explorationId = (() => {
     if (isDone) {
-      if (explorationType == 'denovo') return manifest?.denovoId;
-      else if (explorationType == 'decomposed') return manifest?.decomposedId;
+      if (explorationType === 'denovo') return manifest?.denovoId;
+      else if (explorationType === 'decomposed') return manifest?.decomposedId;
       else return false;
     } else return false;
   })();
@@ -58,7 +60,8 @@ export default function Extraction() {
   }, [isDone, refreshState]);
 
   useEffect(() => {
-    if (isDone) mergeState({ displayTab: 'tmb' });
+    if (status && status.status === 'COMPLETED')
+      mergeState({ displayTab: 'tmb' });
   }, [isDone]);
 
   const tabs = [
@@ -116,7 +119,7 @@ export default function Extraction() {
                   <Button
                     variant="link"
                     className={`secondary-navlinks px-3 py-1 d-inline-block border-0 text-exploration rounded-0 ${
-                      id == displayTab
+                      id === displayTab
                         ? 'bg-exploration text-white'
                         : 'text-exploration'
                     }`}
@@ -146,7 +149,7 @@ export default function Extraction() {
                       <Button
                         variant="link"
                         className={
-                          id == displayTab
+                          id === displayTab
                             ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-exploration text-white rounded-0'
                             : 'secondary-navlinks px-3 py-1 d-inline-block border-0 rounded-0'
                         }
@@ -174,7 +177,7 @@ export default function Extraction() {
         onCollapsed={(e) => mergeState({ openSidebar: !e })}
       >
         <SidebarPanel>
-          {isDone && (
+          {status && status.status === 'COMPLETED' && (
             <div className="p-3 bg-white border rounded mb-3">
               <Form.Group controlId="explorationType">
                 <Form.Label>Exploration Calculation</Form.Label>
@@ -190,7 +193,7 @@ export default function Extraction() {
                   value={''} // set dummy value for file input
                   disabled={true}
                   label={
-                    explorationType == 'denovo'
+                    explorationType === 'denovo'
                       ? manifest?.denovoExposureFile
                       : manifest?.decomposedExposureFile
                   }
@@ -214,7 +217,7 @@ export default function Extraction() {
                   value={''} // set dummy value for file input
                   disabled={true}
                   label={
-                    explorationType == 'denovo'
+                    explorationType === 'denovo'
                       ? manifest?.denovoSignatureFile
                       : manifest?.decomposedSignatureFile
                   }
@@ -227,41 +230,76 @@ export default function Extraction() {
           <ExtractionForm setExplorationType={setExplorationType} />
         </SidebarPanel>
         <MainPanel>
-          <div className={displayTab == 'instructions' ? 'd-block' : 'd-none'}>
+          {status && status.status === 'IN_PROGRESS' && (
+            <div className="border rounded bg-white mb-3 p-3">
+              <p>
+                Your analysis is currently in progress.
+                {/* {params.sendNotification && (
+                  <span> You will receive an email once it is complete.</span>
+                )} */}
+              </p>
+              <LoadingOverlay active={true} />
+            </div>
+          )}
+          {status && status.status === 'FAILED' && (
+            <div className="border rounded bg-white mb-3 p-3">
+              <p>
+                Your analysis failed with the following error:{' '}
+                {status?.error?.message || 'INTERNAL ERROR'}. Please contact the
+                site administrator for assistance if this issue persists.
+              </p>
+            </div>
+          )}
+          <div className={displayTab === 'instructions' ? 'd-block' : 'd-none'}>
             <Instructions />
           </div>
-          <div className={displayTab == 'tmb' ? 'd-block' : 'd-none'}>
-            <TMB state={{ id: explorationId }} />
-          </div>
-          <div className={displayTab == 'tmbSig' ? 'd-block' : 'd-none'}>
-            <TmbSignature state={{ id: explorationId }} />
-          </div>
-          <div className={displayTab == 'msBurden' ? 'd-block' : 'd-none'}>
-            <MsBurden state={{ id: explorationId }} />
-          </div>
-          <div
-            className={displayTab == 'msDecomposition' ? 'd-block' : 'd-none'}
-          >
-            <MsDecomposition state={{ id: explorationId }} />
-          </div>
-          <div className={displayTab == 'msAssociation' ? 'd-block' : 'd-none'}>
-            {/* <MsAssociation state={{ id: explorationId }} /> */}
-            Under Construction
-          </div>
-          <div className={displayTab == 'msLandscape' ? 'd-block' : 'd-none'}>
-            <MsLandscape state={{ id: explorationId }} />
-          </div>
-          <div className={displayTab == 'msPrevalence' ? 'd-block' : 'd-none'}>
-            <MsPrevalence state={{ id: explorationId }} />
-          </div>
-          <div
-            className={
-              displayTab == 'msIndivexplorationIdual' ? 'd-block' : 'd-none'
-            }
-          >
-            {/* <MsIndividual state={{ id: explorationId }}  /> */}
-            Under Construction
-          </div>
+          {status && status.status === 'COMPLETED' && (
+            <>
+              <div className={displayTab === 'tmb' ? 'd-block' : 'd-none'}>
+                <TMB state={{ id: explorationId }} />
+              </div>
+              <div className={displayTab === 'tmbSig' ? 'd-block' : 'd-none'}>
+                <TmbSignature state={{ id: explorationId }} />
+              </div>
+              <div className={displayTab === 'msBurden' ? 'd-block' : 'd-none'}>
+                <MsBurden state={{ id: explorationId }} />
+              </div>
+              <div
+                className={
+                  displayTab === 'msDecomposition' ? 'd-block' : 'd-none'
+                }
+              >
+                <MsDecomposition state={{ id: explorationId }} />
+              </div>
+              <div
+                className={
+                  displayTab === 'msAssociation' ? 'd-block' : 'd-none'
+                }
+              >
+                <MsAssociation state={{ id: explorationId }} />
+              </div>
+              <div
+                className={displayTab === 'msLandscape' ? 'd-block' : 'd-none'}
+              >
+                <MsLandscape state={{ id: explorationId }} />
+              </div>
+              <div
+                className={displayTab === 'msPrevalence' ? 'd-block' : 'd-none'}
+              >
+                <MsPrevalence state={{ id: explorationId }} />
+              </div>
+              <div
+                className={
+                  displayTab === 'msIndivexplorationIdual'
+                    ? 'd-block'
+                    : 'd-none'
+                }
+              >
+                {/* <MsIndividual state={{ id: explorationId }}  /> */}
+                Under Construction
+              </div>
+            </>
+          )}
         </MainPanel>
       </SidebarContainer>
     </div>
