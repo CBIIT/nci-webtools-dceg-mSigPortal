@@ -13,7 +13,7 @@ import MsAssociation from './msAssociation/msAssociation.js';
 import MsDecomposition from './msDecomposition/msDecomposition.js';
 import MsLandscape from './msLandscape/msLandscape.js';
 import MsPrevalence from './msPrevalence/msPrevalence.js';
-// import MSIndividual from './msIndividual';
+import MsIndividual from './msIndividual//msIndividual.js';
 import Download from './download';
 import { actions as exposureActions } from '../../../services/store/exposure';
 import { actions as modalActions } from '../../../services/store/modal';
@@ -345,8 +345,7 @@ export default function Exposure() {
             <MsPrevalence state={{ ...publicForm, ...main }} />
           </div>
           <div className={displayTab == 'msIndividual' ? 'd-block' : 'd-none'}>
-            {/* <MsIndividual state={{ ...publicForm, ...main }}  /> */}
-            Under Construction
+            <MsIndividual state={{ ...publicForm, ...main }} />
           </div>
           <div
             className={

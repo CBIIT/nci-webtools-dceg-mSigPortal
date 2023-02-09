@@ -53,7 +53,8 @@ export const msBurdenApiSlice = explorationApiSlice.injectEndpoints({
         params: { ...params },
       }),
       transformResponse: (data) => {
-        //console.log(data);
+        console.log('ms burden');
+        console.log(data);
         return data
           ? [...new Set(data.map((e) => e.signatureName))]
               .sort((a, b) =>
