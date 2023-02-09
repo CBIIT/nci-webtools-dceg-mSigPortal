@@ -810,7 +810,9 @@ export default function ExtractionForm() {
               />
             </Form.Group> */}
             <Form.Group controlId="email">
-              <Form.Label>Email</Form.Label>
+              <Form.Label>
+                Email <span style={{ color: 'crimson' }}>*</span>
+              </Form.Label>
               <Controller
                 name="email"
                 control={control}
@@ -838,7 +840,9 @@ export default function ExtractionForm() {
               </Form.Text>
             </Form.Group>
             <Form.Group controlId="jobName">
-              <Form.Label>Job Name</Form.Label>
+              <Form.Label>
+                Job Name <span style={{ color: 'crimson' }}>*</span>
+              </Form.Label>
               <Form.Control
                 {...register('jobName', { required: true })}
                 defaultValue={''}
