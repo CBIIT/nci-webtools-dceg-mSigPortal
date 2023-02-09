@@ -205,7 +205,6 @@ export default function ExtractionForm() {
     nmf_init: 'random',
     precision: 'single',
 
-    useQueue: false,
     email: '',
     jobName: '',
   };
@@ -256,7 +255,6 @@ export default function ExtractionForm() {
     context_type,
     signatureSetName,
     input_type,
-    useQueue,
   } = watch();
 
   // update url with id
@@ -326,7 +324,7 @@ export default function ExtractionForm() {
       args,
       signatureQuery,
       id,
-      email: useQueue ? data.email : null,
+      email: data.email,
       jobName: data.jobName || 'Extraction',
       form: data,
     };
@@ -794,8 +792,7 @@ export default function ExtractionForm() {
 
           <hr className="mb-3" />
           <div>
-            {useQueue}
-            <Form.Group controlId="toggleQueue" className="d-flex">
+            {/* <Form.Group controlId="toggleQueue" className="d-flex">
               <Controller
                 name="useQueue"
                 control={control}
@@ -805,19 +802,20 @@ export default function ExtractionForm() {
                     id="useQueue"
                     type="checkbox"
                     label="Long Running Job"
-                    checked={useQueue == true}
+                    checked={true}
                     onChange={(e) => setValue('useQueue', e.target.checked)}
                     disabled={submitted || id}
                   />
                 )}
               />
-            </Form.Group>
+            </Form.Group> */}
             <Form.Group controlId="email">
+              <Form.Label>Email</Form.Label>
               <Controller
                 name="email"
                 control={control}
                 rules={{
-                  required: useQueue,
+                  required: true,
                   pattern:
                     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
                 }}
@@ -827,7 +825,7 @@ export default function ExtractionForm() {
                     aria-label="Enter Email"
                     placeholder="Enter Email"
                     type="email"
-                    disabled={submitted || id || !useQueue}
+                    disabled={submitted || id}
                     isInvalid={errors.email}
                   />
                 )}
@@ -842,7 +840,7 @@ export default function ExtractionForm() {
             <Form.Group controlId="jobName">
               <Form.Label>Job Name</Form.Label>
               <Form.Control
-                {...register('jobName')}
+                {...register('jobName', { required: true })}
                 defaultValue={''}
                 placeholder="Enter Job Name"
                 disabled={submitted || id}
