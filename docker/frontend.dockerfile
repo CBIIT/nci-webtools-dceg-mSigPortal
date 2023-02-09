@@ -17,9 +17,9 @@ COPY client/package.json /app/client/
 
 RUN npm install
 
+ARG CACHE_BUST
 COPY client /app/client/
 
-ARG CACHE_BUST
 RUN npm run build
 
 RUN mkdir -p /var/www/html/mutational-signatures \
