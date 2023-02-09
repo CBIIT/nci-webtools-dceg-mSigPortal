@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Button, Nav, Form } from 'react-bootstrap';
+import { Button, Nav, Form, Row, Col } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { actions as extractionActions } from '../../../services/store/extraction';
@@ -18,6 +18,7 @@ import MsDecomposition from '../exposure/msDecomposition/msDecomposition';
 import MsAssociation from '../exposure/msAssociation/msAssociation';
 import MsLandscape from '../exposure/msLandscape/msLandscape';
 import MsPrevalence from '../exposure/msPrevalence/msPrevalence';
+// import MsIndividual from '../exposure/msIndividual';
 import { useStatusQuery, useManifestQuery } from './apiSlice';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
@@ -177,59 +178,70 @@ export default function Extraction() {
         onCollapsed={(e) => mergeState({ openSidebar: !e })}
       >
         <SidebarPanel>
-          {status && status.status === 'COMPLETED' && (
-            <div className="p-3 bg-white border rounded mb-3">
-              <Form.Group controlId="explorationType">
-                <Form.Label>Exploration Calculation</Form.Label>
-                <Form.Control as="select" onChange={handleExplorationType}>
-                  <option value="denovo">Denovo</option>
-                  <option value="decomposed">Decomposed</option>
-                </Form.Control>
-              </Form.Group>
-
-              <Form.Group controlId="explorationExposure">
-                <Form.Label>Exposure File</Form.Label>
-                <Form.File
-                  value={''} // set dummy value for file input
-                  disabled={true}
-                  label={
-                    explorationType === 'denovo'
-                      ? manifest?.denovoExposureFile
-                      : manifest?.decomposedExposureFile
-                  }
-                  feedback="Please upload a data file"
-                  custom
-                />
-              </Form.Group>
-              <Form.Group controlId="explorationMatrix">
-                <Form.Label>Matrix File</Form.Label>
-                <Form.File
-                  value={''} // set dummy value for file input
-                  disabled={true}
-                  label={manifest?.matrixFile}
-                  feedback="Please upload a data file"
-                  custom
-                />
-              </Form.Group>
-              <Form.Group controlId="explorationSignature">
-                <Form.Label>Signature File</Form.Label>
-                <Form.File
-                  value={''} // set dummy value for file input
-                  disabled={true}
-                  label={
-                    explorationType === 'denovo'
-                      ? manifest?.denovoSignatureFile
-                      : manifest?.decomposedSignatureFile
-                  }
-                  feedback="Please upload a data file"
-                  custom
-                />
-              </Form.Group>
-            </div>
-          )}
           <ExtractionForm setExplorationType={setExplorationType} />
         </SidebarPanel>
         <MainPanel>
+          {status && status.status === 'COMPLETED' && (
+            <div className="p-3 bg-white border rounded mb-3">
+              <Row>
+                <Col lg="auto">
+                  <Form.Group controlId="explorationType">
+                    <Form.Label>Exploration Calculation</Form.Label>
+                    <Form.Control as="select" onChange={handleExplorationType}>
+                      <option value="denovo">Denovo</option>
+                      <option value="decomposed">Decomposed</option>
+                    </Form.Control>
+                  </Form.Group>
+                </Col>
+                <Col lg="auto">
+                  <Form.Group controlId="explorationExposure">
+                    <Form.Label>Exposure File</Form.Label>
+                    <Form.Control
+                      disabled={true}
+                      value={
+                        explorationType === 'denovo'
+                          ? manifest?.denovoExposureFile
+                          : manifest?.decomposedExposureFile
+                      }
+                      title={
+                        explorationType === 'denovo'
+                          ? manifest?.denovoExposureFile
+                          : manifest?.decomposedExposureFile
+                      }
+                    />
+                  </Form.Group>
+                </Col>
+                <Col lg="auto">
+                  <Form.Group controlId="explorationMatrix">
+                    <Form.Label>Matrix File</Form.Label>
+                    <Form.Control
+                      disabled={true}
+                      value={manifest?.matrixFile}
+                      title={manifest?.matrixFile}
+                    />
+                  </Form.Group>
+                </Col>
+                <Col lg="auto">
+                  <Form.Group controlId="explorationSignature">
+                    <Form.Label>Signature File</Form.Label>
+                    <Form.Control
+                      disabled={true}
+                      value={
+                        explorationType === 'denovo'
+                          ? manifest?.denovoSignatureFile
+                          : manifest?.decomposedSignatureFile
+                      }
+                      title={
+                        explorationType === 'denovo'
+                          ? manifest?.denovoSignatureFile
+                          : manifest?.decomposedSignatureFile
+                      }
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+            </div>
+          )}
           {status && status.status === 'IN_PROGRESS' && (
             <div className="border rounded bg-white mb-3 p-3">
               <p>
