@@ -5,6 +5,7 @@ export const getInitialState = () => ({
   displayTab: 'instructions',
   openSidebar: true,
   submitted: false,
+  explorationType: 'denovo',
 });
 
 export const { actions, reducer } = createSlice({

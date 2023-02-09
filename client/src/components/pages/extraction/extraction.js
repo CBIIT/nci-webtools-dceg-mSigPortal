@@ -27,8 +27,7 @@ const actions = { ...extractionActions, ...modalActions };
 export default function Extraction() {
   const dispatch = useDispatch();
   const mergeState = (state) => dispatch(actions.mergeExtraction(state));
-  const [explorationType, setExplorationType] = useState('denovo');
-  const { displayTab, openSidebar, ...state } = useSelector(
+  const { displayTab, openSidebar, explorationType, ...state } = useSelector(
     (state) => state.extraction
   );
   const id = useParams().id || state.id || false;
@@ -104,7 +103,7 @@ export default function Extraction() {
   ];
 
   function handleExplorationType(e) {
-    setExplorationType(e.target.value);
+    mergeState({ explorationType: e.target.value });
   }
 
   return (
@@ -186,7 +185,11 @@ export default function Extraction() {
                 <Col md="auto">
                   <Form.Group controlId="explorationType">
                     <Form.Label>Exploration Calculation</Form.Label>
-                    <Form.Control as="select" onChange={handleExplorationType}>
+                    <Form.Control
+                      as="select"
+                      value={explorationType}
+                      onChange={handleExplorationType}
+                    >
                       <option value="denovo">Denovo</option>
                       <option value="decomposed">Decomposed</option>
                     </Form.Control>
