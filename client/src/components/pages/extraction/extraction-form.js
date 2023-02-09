@@ -29,6 +29,8 @@ export default function ExtractionForm() {
   const dispatch = useDispatch();
   const resetExtraction = (_) => dispatch(actions.resetExtraction());
   const mergeState = (state) => dispatch(actions.mergeExtraction(state));
+  const mergeSuccess = (msg) =>
+    dispatch(actions.mergeModal({ success: { visible: true, message: msg } }));
 
   const { data: params } = useParamsQuery(id, { skip: !id });
 
@@ -331,6 +333,9 @@ export default function ExtractionForm() {
     const submitStatus = await submitForm(params).unwrap();
     history.push(`/extraction/${submitStatus.id}`);
     mergeState({ id });
+    mergeSuccess(
+      `Your job was successfully submitted. You will recieve an email at ${data.email} when it is complete.`
+    );
   }
 
   return (
