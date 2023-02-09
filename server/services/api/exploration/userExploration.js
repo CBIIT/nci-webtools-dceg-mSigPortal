@@ -33,6 +33,7 @@ async function submit(req, res, next) {
         signatureName,
         sample: e[sampleName],
         exposure: e[signatureName],
+        cancer: 'Input',
       }));
     })
     .flat();

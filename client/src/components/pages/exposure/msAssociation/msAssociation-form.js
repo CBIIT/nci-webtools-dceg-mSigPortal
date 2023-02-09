@@ -58,9 +58,34 @@ export default function MsAssociationForm({ state, form, setForm }) {
         ...(!useAllCancer && { cancer: cancer.value }),
       });
     } else if (id) {
+      console.log(id);
       setSignatureOptionParams({ userId: id });
     }
   }, [state]);
+
+  // useEffect(() => {
+  //   if (signatureName1 && signatureName2 && id && signatureNameOptions.length) {
+  //     setParams({
+  //       signatureName: signatureName1.value + ';' + signatureName2.value,
+  //       both: bothCheck,
+  //       userId: id,
+  //     });
+  //   } else if (
+  //     signatureName1 &&
+  //     signatureName2 &&
+  //     study &&
+  //     signatureNameOptions.length
+  //   ) {
+  //     setParams({
+  //       signatureName: signatureName1.value + ';' + signatureName2.value,
+  //       both: bothCheck,
+  //       study: study.value,
+  //       strategy: strategy.value,
+  //       signatureSetName: signatureSetName.value,
+  //       ...(!useAllCancer && { cancer: cancer.value }),
+  //     });
+  //   }
+  // }, [signatureName1, signatureName2, id]);
 
   function handleSignatureName1(e) {
     setForm({ ...form, signatureName1: e });

@@ -194,20 +194,6 @@ export default function ProfileFormPlot() {
 
     setValue(`plotForms[${index}].source`, source);
     handleProfile(source, profile, index);
-    // setValue(`plotForms[${index}].profile`, profile);
-    // setValue(`plotForms[${index}].matrix`, matrix);
-    // setValue(`plotForms[${index}].signatureSetName`, signatureSetName);
-    // setValue(`plotForms[${index}].strategy`, strategy);
-    // setValue(`plotForms[${index}].signatureName`, signatureName);
-
-    // mergeState({
-    //   source: source,
-    //   profile: profile,
-    //   matrix: matrix,
-    //   signatureSetName: signatureSetName,
-    //   strategy: strategy,
-    //   signatureName: signatureName,
-    // });
   }
 
   function handleProfile(source, profile, index) {
@@ -237,17 +223,6 @@ export default function ProfileFormPlot() {
 
     setValue(`plotForms[${index}].profile`, profile);
     handleMatrix(source, profile, matrix, index);
-    //setValue(`plotForms[${index}].matrix`, matrix);
-    // setValue(`plotForms[${index}].signatureSetName`, signatureSetName);
-    // setValue(`plotForms[${index}].strategy`, strategy);
-    // setValue(`plotForms[${index}].signatureName`, signatureName);
-    // mergeState({
-    //   profile,
-    //   matrix,
-    //   signatureSetName,
-    //   strategy,
-    //   signatureName,
-    // });
   }
 
   function handleMatrix(source, profile, matrix, index) {
@@ -274,15 +249,6 @@ export default function ProfileFormPlot() {
     const signatureName = defaultSignatureName(signatureNames);
     setValue(`plotForms[${index}].matrix`, matrix);
     handleSet(source, profile, matrix, signatureSetName, index);
-    // setValue(`plotForms[${index}].signatureSetName`, signatureSetName);
-    // setValue(`plotForms[${index}].strategy`, strategy);
-    // setValue(`plotForms[${index}].signatureName`, signatureName);
-    // mergeState({
-    //   matrix,
-    //   signatureSetName,
-    //   strategy,
-    //   signatureName,
-    // });
   }
 
   function handleSet(source, profile, matrix, signatureSetName, index) {
@@ -304,14 +270,6 @@ export default function ProfileFormPlot() {
 
     setValue(`plotForms[${index}].signatureSetName`, signatureSetName);
     handleStrategy(source, profile, matrix, signatureSetName, strategy, index);
-    // setValue(`plotForms[${index}].strategy`, strategy);
-    // setValue(`plotForms[${index}].signatureName`, signatureName);
-
-    // mergeState({
-    //   signatureSetName,
-    //   strategy,
-    //   signatureName,
-    // });
   }
 
   function handleStrategy(
@@ -342,11 +300,6 @@ export default function ProfileFormPlot() {
       index
     );
     setValue(`plotForms[${index}].signatureName`, signatureName);
-
-    // mergeState({
-    //   strategy,
-    //   signatureName,
-    // });
   }
 
   function handleName(
@@ -359,10 +312,6 @@ export default function ProfileFormPlot() {
     index
   ) {
     setValue(`plotForms[${index}].signatureName`, signatureName);
-
-    // mergeState({
-    //   signatureName,
-    // });
   }
   // set inital source
   useEffect(() => {
