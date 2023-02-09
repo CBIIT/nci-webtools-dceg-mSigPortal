@@ -50,7 +50,6 @@ export default function Extraction() {
 
   const refreshState = useCallback(() => {
     refetchStatus();
-
     refetchManifest();
   }, [refetchStatus, refetchManifest]);
 
@@ -61,9 +60,9 @@ export default function Extraction() {
   }, [isDone, refreshState]);
 
   useEffect(() => {
-    if (status && status.status === 'COMPLETED')
-      mergeState({ displayTab: 'tmb' });
-  }, [isDone]);
+    if (status && status.status === 'COMPLETED' && displayTab == 'instructions')
+      mergeState({ displayTab: 'tmb', openSidebar: false });
+  }, [status]);
 
   const tabs = [
     {
@@ -178,13 +177,13 @@ export default function Extraction() {
         onCollapsed={(e) => mergeState({ openSidebar: !e })}
       >
         <SidebarPanel>
-          <ExtractionForm setExplorationType={setExplorationType} />
+          <ExtractionForm />
         </SidebarPanel>
         <MainPanel>
           {status && status.status === 'COMPLETED' && (
             <div className="p-3 bg-white border rounded mb-3">
               <Row>
-                <Col lg="auto">
+                <Col md="auto">
                   <Form.Group controlId="explorationType">
                     <Form.Label>Exploration Calculation</Form.Label>
                     <Form.Control as="select" onChange={handleExplorationType}>
@@ -193,51 +192,25 @@ export default function Extraction() {
                     </Form.Control>
                   </Form.Group>
                 </Col>
-                <Col lg="auto">
-                  <Form.Group controlId="explorationExposure">
-                    <Form.Label>Exposure File</Form.Label>
-                    <Form.Control
-                      disabled={true}
-                      value={
-                        explorationType === 'denovo'
-                          ? manifest?.denovoExposureFile
-                          : manifest?.decomposedExposureFile
-                      }
-                      title={
-                        explorationType === 'denovo'
-                          ? manifest?.denovoExposureFile
-                          : manifest?.decomposedExposureFile
-                      }
-                    />
-                  </Form.Group>
+                <Col md="auto">
+                  <b>Exposure File</b>
+                  <p>
+                    {explorationType === 'denovo'
+                      ? manifest?.denovoExposureFile
+                      : manifest?.decomposedExposureFile}
+                  </p>
                 </Col>
-                <Col lg="auto">
-                  <Form.Group controlId="explorationMatrix">
-                    <Form.Label>Matrix File</Form.Label>
-                    <Form.Control
-                      disabled={true}
-                      value={manifest?.matrixFile}
-                      title={manifest?.matrixFile}
-                    />
-                  </Form.Group>
+                <Col md="auto">
+                  <b>Matrix File</b>
+                  <p>{manifest?.matrixFile}</p>
                 </Col>
-                <Col lg="auto">
-                  <Form.Group controlId="explorationSignature">
-                    <Form.Label>Signature File</Form.Label>
-                    <Form.Control
-                      disabled={true}
-                      value={
-                        explorationType === 'denovo'
-                          ? manifest?.denovoSignatureFile
-                          : manifest?.decomposedSignatureFile
-                      }
-                      title={
-                        explorationType === 'denovo'
-                          ? manifest?.denovoSignatureFile
-                          : manifest?.decomposedSignatureFile
-                      }
-                    />
-                  </Form.Group>
+                <Col md="auto">
+                  <b>Signature File</b>
+                  <p>
+                    {explorationType === 'denovo'
+                      ? manifest?.denovoSignatureFile
+                      : manifest?.decomposedSignatureFile}
+                  </p>
                 </Col>
               </Row>
             </div>
