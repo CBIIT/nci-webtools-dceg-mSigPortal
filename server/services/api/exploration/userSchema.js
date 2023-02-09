@@ -30,6 +30,7 @@ const schema = [
       table.string('sample');
       table.string('signatureName');
       table.double('exposure');
+      table.string('cancer');
     },
     index: (table) => {
       table.index(['sample']);
