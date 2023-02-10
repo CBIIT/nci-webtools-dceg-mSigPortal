@@ -119,14 +119,14 @@ export default function Extraction() {
                     variant="link"
                     className={`secondary-navlinks px-3 py-1 d-inline-block border-0 text-exploration rounded-0 ${
                       id === displayTab
-                        ? 'bg-exploration text-white'
-                        : 'text-exploration'
+                        ? 'bg-extraction text-white'
+                        : 'text-extraction'
                     }`}
                     disabled={!explorationId}
                     style={{
                       textDecoration: 'none',
                       fontSize: '12pt',
-                      color: '#837244',
+                      color: '#42688b',
                       fontWeight: '500',
                     }}
                     onClick={() => mergeState({ displayTab: id })}
@@ -149,7 +149,7 @@ export default function Extraction() {
                         variant="link"
                         className={
                           id === displayTab
-                            ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-exploration text-white rounded-0'
+                            ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-extraction text-white rounded-0'
                             : 'secondary-navlinks px-3 py-1 d-inline-block border-0 rounded-0'
                         }
                         style={{
