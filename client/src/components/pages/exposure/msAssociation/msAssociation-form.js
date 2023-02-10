@@ -47,7 +47,7 @@ export default function MsAssociationForm({ state, form, setForm }) {
     if (!form.signatureName2 && signatureNameOptions) {
       setForm({ ...form, signatureName2: signatureNameOptions[1] });
     }
-  }, [signatureNameOptions, form]);
+  }, [signatureNameOptions]);
 
   useEffect(() => {
     if (study) {

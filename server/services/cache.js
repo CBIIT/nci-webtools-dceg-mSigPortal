@@ -36,9 +36,9 @@ function createCacheMiddleware(getCacheKey) {
       if (value) {
         res.json(value);
       } else {
-        let originalJson = res.json;
+        const originalJson = res.json.bind(res);
         res.json = (body) => {
-          cache.set(key, body);
+          cache.set(key, JSON.stringify(body));
           originalJson(body);
         };
         next();

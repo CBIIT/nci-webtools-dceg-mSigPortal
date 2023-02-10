@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Button, Nav, Form } from 'react-bootstrap';
+import { Button, Nav, Form, Row, Col } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { actions as extractionActions } from '../../../services/store/extraction';
@@ -18,6 +18,7 @@ import MsDecomposition from '../exposure/msDecomposition/msDecomposition';
 import MsAssociation from '../exposure/msAssociation/msAssociation';
 import MsLandscape from '../exposure/msLandscape/msLandscape';
 import MsPrevalence from '../exposure/msPrevalence/msPrevalence';
+// import MsIndividual from '../exposure/msIndividual';
 import { useStatusQuery, useManifestQuery } from './apiSlice';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
@@ -26,8 +27,7 @@ const actions = { ...extractionActions, ...modalActions };
 export default function Extraction() {
   const dispatch = useDispatch();
   const mergeState = (state) => dispatch(actions.mergeExtraction(state));
-  const [explorationType, setExplorationType] = useState('denovo');
-  const { displayTab, openSidebar, ...state } = useSelector(
+  const { displayTab, openSidebar, explorationType, ...state } = useSelector(
     (state) => state.extraction
   );
   const id = useParams().id || state.id || false;
@@ -49,7 +49,6 @@ export default function Extraction() {
 
   const refreshState = useCallback(() => {
     refetchStatus();
-
     refetchManifest();
   }, [refetchStatus, refetchManifest]);
 
@@ -60,9 +59,9 @@ export default function Extraction() {
   }, [isDone, refreshState]);
 
   useEffect(() => {
-    if (status && status.status === 'COMPLETED')
-      mergeState({ displayTab: 'tmb' });
-  }, [isDone]);
+    if (status && status.status === 'COMPLETED' && displayTab == 'instructions')
+      mergeState({ displayTab: 'tmb', openSidebar: false });
+  }, [status]);
 
   const tabs = [
     {
@@ -104,7 +103,7 @@ export default function Extraction() {
   ];
 
   function handleExplorationType(e) {
-    setExplorationType(e.target.value);
+    mergeState({ explorationType: e.target.value });
   }
 
   return (
@@ -120,14 +119,14 @@ export default function Extraction() {
                     variant="link"
                     className={`secondary-navlinks px-3 py-1 d-inline-block border-0 text-exploration rounded-0 ${
                       id === displayTab
-                        ? 'bg-exploration text-white'
-                        : 'text-exploration'
+                        ? 'bg-extraction text-white'
+                        : 'text-extraction'
                     }`}
                     disabled={!explorationId}
                     style={{
                       textDecoration: 'none',
                       fontSize: '12pt',
-                      color: '#837244',
+                      color: '#42688b',
                       fontWeight: '500',
                     }}
                     onClick={() => mergeState({ displayTab: id })}
@@ -150,7 +149,7 @@ export default function Extraction() {
                         variant="link"
                         className={
                           id === displayTab
-                            ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-exploration text-white rounded-0'
+                            ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-extraction text-white rounded-0'
                             : 'secondary-navlinks px-3 py-1 d-inline-block border-0 rounded-0'
                         }
                         style={{
@@ -177,59 +176,48 @@ export default function Extraction() {
         onCollapsed={(e) => mergeState({ openSidebar: !e })}
       >
         <SidebarPanel>
-          {status && status.status === 'COMPLETED' && (
-            <div className="p-3 bg-white border rounded mb-3">
-              <Form.Group controlId="explorationType">
-                <Form.Label>Exploration Calculation</Form.Label>
-                <Form.Control as="select" onChange={handleExplorationType}>
-                  <option value="denovo">Denovo</option>
-                  <option value="decomposed">Decomposed</option>
-                </Form.Control>
-              </Form.Group>
-
-              <Form.Group controlId="explorationExposure">
-                <Form.Label>Exposure File</Form.Label>
-                <Form.File
-                  value={''} // set dummy value for file input
-                  disabled={true}
-                  label={
-                    explorationType === 'denovo'
-                      ? manifest?.denovoExposureFile
-                      : manifest?.decomposedExposureFile
-                  }
-                  feedback="Please upload a data file"
-                  custom
-                />
-              </Form.Group>
-              <Form.Group controlId="explorationMatrix">
-                <Form.Label>Matrix File</Form.Label>
-                <Form.File
-                  value={''} // set dummy value for file input
-                  disabled={true}
-                  label={manifest?.matrixFile}
-                  feedback="Please upload a data file"
-                  custom
-                />
-              </Form.Group>
-              <Form.Group controlId="explorationSignature">
-                <Form.Label>Signature File</Form.Label>
-                <Form.File
-                  value={''} // set dummy value for file input
-                  disabled={true}
-                  label={
-                    explorationType === 'denovo'
-                      ? manifest?.denovoSignatureFile
-                      : manifest?.decomposedSignatureFile
-                  }
-                  feedback="Please upload a data file"
-                  custom
-                />
-              </Form.Group>
-            </div>
-          )}
-          <ExtractionForm setExplorationType={setExplorationType} />
+          <ExtractionForm />
         </SidebarPanel>
         <MainPanel>
+          {status && status.status === 'COMPLETED' && (
+            <div className="p-3 bg-white border rounded mb-3">
+              <Row>
+                <Col md="auto">
+                  <Form.Group controlId="explorationType">
+                    <Form.Label>Exploration Calculation</Form.Label>
+                    <Form.Control
+                      as="select"
+                      value={explorationType}
+                      onChange={handleExplorationType}
+                    >
+                      <option value="denovo">Denovo</option>
+                      <option value="decomposed">Decomposed</option>
+                    </Form.Control>
+                  </Form.Group>
+                </Col>
+                <Col md="auto">
+                  <b>Exposure File</b>
+                  <p>
+                    {explorationType === 'denovo'
+                      ? manifest?.denovoExposureFile
+                      : manifest?.decomposedExposureFile}
+                  </p>
+                </Col>
+                <Col md="auto">
+                  <b>Matrix File</b>
+                  <p>{manifest?.matrixFile}</p>
+                </Col>
+                <Col md="auto">
+                  <b>Signature File</b>
+                  <p>
+                    {explorationType === 'denovo'
+                      ? manifest?.denovoSignatureFile
+                      : manifest?.decomposedSignatureFile}
+                  </p>
+                </Col>
+              </Row>
+            </div>
+          )}
           {status && status.status === 'IN_PROGRESS' && (
             <div className="border rounded bg-white mb-3 p-3">
               <p>

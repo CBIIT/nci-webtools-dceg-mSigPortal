@@ -29,6 +29,8 @@ export default function ExtractionForm() {
   const dispatch = useDispatch();
   const resetExtraction = (_) => dispatch(actions.resetExtraction());
   const mergeState = (state) => dispatch(actions.mergeExtraction(state));
+  const mergeSuccess = (msg) =>
+    dispatch(actions.mergeModal({ success: { visible: true, message: msg } }));
 
   const { data: params } = useParamsQuery(id, { skip: !id });
 
@@ -331,6 +333,9 @@ export default function ExtractionForm() {
     const submitStatus = await submitForm(params).unwrap();
     history.push(`/extraction/${submitStatus.id}`);
     mergeState({ id });
+    mergeSuccess(
+      `Your job was successfully submitted. You will recieve an email at ${data.email} when it is complete.`
+    );
   }
 
   return (
@@ -810,7 +815,9 @@ export default function ExtractionForm() {
               />
             </Form.Group> */}
             <Form.Group controlId="email">
-              <Form.Label>Email</Form.Label>
+              <Form.Label>
+                Email <span style={{ color: 'crimson' }}>*</span>
+              </Form.Label>
               <Controller
                 name="email"
                 control={control}
@@ -838,7 +845,9 @@ export default function ExtractionForm() {
               </Form.Text>
             </Form.Group>
             <Form.Group controlId="jobName">
-              <Form.Label>Job Name</Form.Label>
+              <Form.Label>
+                Job Name <span style={{ color: 'crimson' }}>*</span>
+              </Form.Label>
               <Form.Control
                 {...register('jobName', { required: true })}
                 defaultValue={''}

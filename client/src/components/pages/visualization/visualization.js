@@ -194,7 +194,9 @@ export default function Visualization() {
                     <Button
                       variant="link"
                       className={`secondary-navlinks px-3 py-1 d-inline-block border-0 rounded-0 ${
-                        id == displayTab ? 'bg-visualization text-white' : ''
+                        id == displayTab
+                          ? 'bg-visualization text-white'
+                          : 'text-visualization'
                       }`}
                       active={id == displayTab}
                       disabled={
