@@ -17,6 +17,7 @@ export default function MsBurden({ state }) {
           more="On the y-axis is the number of mutations per Mb (log10) assigned to selected signatures, and the x-axis denotes the sample numbers. The number in green denotes the number of samples for each cancer type, and the number in blue is the number of samples in that cancer type with the selected signature. "
         />
       </div>
+      <hr />
       <TmbBurdenForm state={state} form={form} setForm={setForm} />
       <hr />
       <TmbBurdenPlot form={form} state={state} />

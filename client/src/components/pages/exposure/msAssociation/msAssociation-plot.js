@@ -1,41 +1,40 @@
-import { useState, useEffect } from 'react';
-import Plotly from '../../../controls/plotly/plot/plot';
-import { useMsBurdenQuery } from './apiSlice';
+import React, { useEffect, useState } from 'react';
+import { useMsAssociationQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import Plotly from '../../../controls/plotly/plot/plot';
 
-export default function MsBurdenPlot({ state, form }) {
+export default function MsAssociationPlot({ state, form }) {
   const [params, setParams] = useState('');
-  const { data, error, isFetching } = useMsBurdenQuery(params, {
+  const { data, error, isFetching } = useMsAssociationQuery(params, {
     skip: !params,
   });
 
-  const { signatureName } = form;
+  const { signatureName1, signatureName2, both } = form;
+
   const { study, strategy, signatureSetName, cancer, useAllCancer, id } = state;
 
-  // query after signature name is changed
   useEffect(() => {
-    if (signatureName && id) {
+    if (signatureName1 && signatureName2 && id) {
       setParams({
-        signatureName: signatureName.value,
+        signatureName: signatureName1.value + ';' + signatureName2.value,
+        both,
         userId: id,
       });
-    } else if (signatureName && study) {
+    } else if (signatureName1 && signatureName2 && study) {
       setParams({
-        signatureName: signatureName.value,
+        signatureName: signatureName1.value + ';' + signatureName2.value,
+        both,
         study: study.value,
         strategy: strategy.value,
         signatureSetName: signatureSetName.value,
         ...(!useAllCancer && { cancer: cancer.value }),
       });
     }
-  }, [signatureName, id]);
+  }, [signatureName1, signatureName2, both, id]);
 
   return (
     <div>
       <LoadingOverlay active={isFetching} />
-      <h5 className="d-flex justify-content-center">
-        Mutational Signature Burden Across Cancer Types
-      </h5>
       {error && <p className="p-3 text-danger">{error}</p>}
       {data && (
         <Plotly

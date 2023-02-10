@@ -1,10 +1,17 @@
 import { Container } from 'react-bootstrap';
 import MsAssociationForm from './msAssociation-form';
+import MsAssociationPlot from './msAssociation-plot';
 import Description from '../../../controls/description/description';
 import { useState } from 'react';
 
 export default function MsAssociation({ state }) {
-  const [form, setForm] = useState({ signatureName1: '', signatureName2: '' });
+  const [form, setForm] = useState({
+    signatureName1: '',
+    signatureName2: '',
+    both: false,
+  });
+
+  const mergeForm = (update) => setForm({ ...form, ...update });
 
   return (
     <Container fluid className="bg-white border rounded p-0">
@@ -16,7 +23,9 @@ export default function MsAssociation({ state }) {
         />
       </div>
       <hr />
-      <MsAssociationForm state={state} form={form} setForm={setForm} />
+      <MsAssociationForm state={state} form={form} mergeForm={mergeForm} />
+      <hr />
+      <MsAssociationPlot state={state} form={form} />
     </Container>
   );
 }

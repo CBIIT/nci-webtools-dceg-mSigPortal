@@ -29,29 +29,26 @@ export default function MsBurdenForm({ state, form, setForm }) {
 
   // set inital
   useEffect(() => {
-    if (!form.signatureName && signatureNameOptions) {
+    if (signatureNameOptions) {
       setForm({ signatureName: signatureNameOptions[0] });
     }
-  }, [signatureNameOptions, form]);
+  }, [signatureNameOptions]);
 
   return (
-    <div>
-      <hr />
-      <Form className="p-3">
-        <Row>
-          <Col lg="auto">
-            <Select
-              name="signatureName"
-              label="Signature Name"
-              value={form.signatureName}
-              disabled={!signatureNameOptions}
-              control={control}
-              options={signatureNameOptions}
-              onChange={(name) => setForm({ signatureName: name })}
-            />
-          </Col>
-        </Row>
-      </Form>
-    </div>
+    <Form className="p-3">
+      <Row>
+        <Col lg="auto">
+          <Select
+            name="signatureName"
+            label="Signature Name"
+            value={form.signatureName}
+            disabled={!signatureNameOptions}
+            control={control}
+            options={signatureNameOptions}
+            onChange={(name) => setForm({ signatureName: name })}
+          />
+        </Col>
+      </Row>
+    </Form>
   );
 }
