@@ -80,6 +80,12 @@ export default function ExtractionForm() {
               signatureOptions
                 .filter((e) => e.signatureSetName == signatureSetName.value)
                 .map((e) => e.signatureName)
+                .sort((a, b) =>
+                  a.localeCompare(b, undefined, {
+                    numeric: true,
+                    sensitivity: 'base',
+                  })
+                )
             ),
           ].map((e) => ({ label: e, value: e })),
         ]
@@ -513,19 +519,22 @@ export default function ExtractionForm() {
           />
           <SelectForm
             name="signatureName"
-            label="SelectForm Signature Names"
+            label="Select Signature Names"
             disabled={submitted || id}
             options={signatureNameOptions(signatureSetName)}
             control={control}
             onChange={(values, e) => {
               // remove "all" option if a specific signature is selected
-              if (e.option.value !== 'all') {
-                setValue(
-                  'signatureName',
-                  values.filter((e) => e.value !== 'all')
-                );
-              } else if (e.option.value === 'all') {
-                setValue('signatureName', [e.option]);
+              // remove other options if "all" is selected
+              if (e.action === 'select-option') {
+                if (e.option.value !== 'all') {
+                  setValue(
+                    'signatureName',
+                    values.filter((e) => e.value !== 'all')
+                  );
+                } else if (e.option.value === 'all') {
+                  setValue('signatureName', [e.option]);
+                }
               } else setValue('signatureName', values);
             }}
             isMulti
