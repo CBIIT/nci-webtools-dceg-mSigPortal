@@ -5,6 +5,7 @@ const config = require('../../../config.json');
 const logger = require('../../logger');
 const { parseCSV, importUserSession } = require('../analysis');
 const { schema } = require('./userSchema');
+const { getSignatureData } = require('../../query');
 
 async function submit(req, res, next) {
   const id = req.params.id;
@@ -13,7 +14,8 @@ async function submit(req, res, next) {
   const inputFolder = path.resolve(config.results.folder, id);
   const outputFolder = path.resolve(config.results.folder, id);
 
-  const { exposureFile, matrixFile, signatureFile } = req.body;
+  const { exposureFile, matrixFile, signatureFile, signatureSetName } =
+    req.body;
   const exposurePath = path.resolve(inputFolder, exposureFile);
   const matrixPath = path.resolve(inputFolder, matrixFile);
   const signaturePath = signatureFile
@@ -63,7 +65,12 @@ async function submit(req, res, next) {
           }));
         })
         .flat()
-    : '';
+    : await getSignatureData(
+        req.app.locals.connection,
+        { signatureSetName },
+        ['signatureName', 'mutationType', 'contribution'],
+        false
+      );
 
   // import data into user session table
   const connection = req.app.locals.sqlite(id, 'local');
