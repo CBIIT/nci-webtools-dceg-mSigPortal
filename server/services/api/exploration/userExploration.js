@@ -46,6 +46,7 @@ async function submit(req, res, next) {
         sample,
         mutationType: e[mutationType],
         mutations: e[sample],
+        cancer: 'Input',
       }));
     })
     .flat();
