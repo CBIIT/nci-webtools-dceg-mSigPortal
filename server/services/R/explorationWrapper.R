@@ -837,7 +837,8 @@ msLandscape <- function(args, config) {
     arrange(MutationType) # have to sort the mutationtype
 
   seqmatrixData <- args$seqmatrixData %>%
-    filter(profile == args$signatureData$profile[1], matrix == args$signatureData$matrix[1]) %>%
+    filter(if ("profile" %in% names(.)) profile == args$signatureData$profile[1] else TRUE) %>%
+    filter(if ("matrix" %in% names(.)) matrix == args$signatureData$matrix[1] else TRUE) %>%
     select(MutationType = mutationType, Sample = sample, Mutations = mutations) %>%
     pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
     arrange(MutationType) ## have to sort the mutationtype
@@ -891,7 +892,8 @@ msDecomposition <- function(args, config) {
     arrange(MutationType) # have to sort the mutationtype
 
   seqmatrixData <- args$seqmatrixData %>%
-    filter(profile == args$signatureData$profile[1], matrix == args$signatureData$matrix[1]) %>%
+    filter(if ("profile" %in% names(.)) profile == args$signatureData$profile[1] else TRUE) %>%
+    filter(if ("matrix" %in% names(.)) matrix == args$signatureData$matrix[1] else TRUE) %>%
     mutate(Sample = paste0(cancer, "@", sample)) %>%
     select(MutationType = mutationType, Sample, Mutations = mutations) %>%
     pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
