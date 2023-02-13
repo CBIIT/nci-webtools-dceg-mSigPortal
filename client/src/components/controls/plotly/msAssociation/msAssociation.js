@@ -1,5 +1,6 @@
-import { linearRegression, round, pearson } from '../../utils/utils';
+import { linearRegression, round, calculatePearson } from '../../utils/utils';
 import { groupBy } from 'lodash';
+import pcorrtest from '@stdlib/stats-pcorrtest';
 
 export default function MsAssociation(data, arg) {
   console.log(data);
@@ -99,13 +100,16 @@ export default function MsAssociation(data, arg) {
       signatureName2 +
       ': (log10)</b> %{y}<extra></extra>',
   };
-  // console.log(traceMain);
+
   const lr = linearRegression(traceMain.x, traceMain.y);
-  // console.log(lr);
-
-  const pearsonVal = round(pearson(traceMain.x, traceMain.y), 2);
-  // console.log(pearsonVal);
-
+  let pearsonV;
+  if (traceMain.x.length > 3) {
+    pearsonV = pcorrtest(traceMain.x, traceMain.y);
+    console.log(pearsonV);
+  } else {
+    pearsonV = calculatePearson(traceMain.x, traceMain.y);
+  }
+  console.log(pearsonV);
   const traceLine = {
     x: [minX, maxX],
     y: [minX * lr.sl + lr.off, maxX * lr.sl + lr.off],
@@ -134,9 +138,17 @@ export default function MsAssociation(data, arg) {
     y: 1.01,
     yanchor: 'bottom',
     text:
-      'r<sub>Pearson</sub> = ' +
-      pearsonVal +
-      ', n<sub>pairs</sub> = ' +
+      't<sub>Student</sub> = ' +
+      round(pearsonV.statistic, 2) +
+      ', p = ' +
+      round(pearsonV.pValue, 3) +
+      ' ,r<sub>Pearson</sub> = ' +
+      round(pearsonV.pcorr, 2) +
+      ' ,CI<sub>95%</sub>[' +
+      round(pearsonV.ci[0], 2) +
+      ', ' +
+      round(pearsonV.ci[1], 2) +
+      '], n<sub>pairs</sub> = ' +
       dataArraySample.length,
     showarrow: false,
     font: {

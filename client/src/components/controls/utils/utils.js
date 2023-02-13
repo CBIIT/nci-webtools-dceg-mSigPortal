@@ -1,3 +1,6 @@
+import jStat from 'jstat';
+import { mean, std, erf } from 'mathjs';
+
 export const customStyles = {
   control: (base, state) => ({
     ...base,
@@ -161,30 +164,101 @@ export function round(num, decimalPlaces = 0) {
   return Number(num + 'e' + -decimalPlaces);
 }
 
-export function pearson(x, y) {
-  const promedio = (l) => l.reduce((s, a) => s + a, 0) / l.length;
-  const calc = (v, prom) =>
-    Math.sqrt(v.reduce((s, a) => s + a * a, 0) - n * prom * prom);
+export function pearson_correlation(x, y, confidence = 0.95) {
   let n = x.length;
-  let nn = 0;
-  for (let i = 0; i < n; i++, nn++) {
-    if ((!x[i] && x[i] !== 0) || (!y[i] && y[i] !== 0)) {
-      nn--;
-      continue;
-    }
-    x[nn] = x[i];
-    y[nn] = y[i];
+  let rho = jStat.corrcoeff(x, y);
+  let t = rho * Math.sqrt((n - 2) / (1 - rho ** 2));
+  let pvalue = jStat.ttest(t, n - 2, 2);
+  let t_critical = jStat.studentt.inv(confidence, n - 2);
+  let lower_bound = rho - t_critical * Math.sqrt((1 - rho ** 2) / (n - 2));
+  let upper_bound = rho + t_critical * Math.sqrt((1 - rho ** 2) / (n - 2));
+  let se = Math.sqrt((1 - rho ** 2) / (n - 2));
+  let standard_error = se;
+  let z_value = t;
+  return {
+    rho: rho,
+    pvalue: pvalue,
+    CI: [lower_bound, upper_bound],
+    standard_error: standard_error,
+    z_value: z_value,
+  };
+}
+
+export function spearman_correlation(x, y, confidence = 0.95) {
+  let n = x.length;
+  let rank_x = jStat.rank(x);
+  let rank_y = jStat.rank(y);
+  let d_squared = 0;
+  for (let i = 0; i < n; i++) {
+    d_squared += (rank_x[i] - rank_y[i]) ** 2;
   }
-  if (n !== nn) {
-    x = x.splice(0, nn);
-    y = y.splice(0, nn);
-    n = nn;
+  let rho = 1 - (6 * d_squared) / (n * (n ** 2 - 1));
+  let z = Math.asin(rho) * Math.sqrt(n - 3);
+  let pvalue = jStat.normal.cdf(-Math.abs(z), 0, 1);
+  let z_critical = jStat.normal.inv(confidence + (1 - confidence) / 2, 0, 1);
+  let lower_bound = Math.sin(Math.asin(rho) - z_critical / Math.sqrt(n - 3));
+  let upper_bound = Math.sin(Math.asin(rho) + z_critical / Math.sqrt(n - 3));
+  let se = Math.sqrt((1 - rho ** 2) / (n - 3));
+  let standard_error = se;
+  let z_value = z;
+  return {
+    rho: rho,
+    pvalue: pvalue,
+    CI: [lower_bound, upper_bound],
+    standard_error: standard_error,
+    z_value: z_value,
+  };
+}
+
+export function calculateSpearman(x, y) {
+  const n = x.length;
+  const ranksX = jStat.rank(x);
+  const ranksY = jStat.rank(y);
+  let numerator = 0;
+  for (let i = 0; i < n; i++) {
+    numerator += (ranksX[i] - ranksY[i]) ** 2;
   }
-  const prom_x = promedio(x),
-    prom_y = promedio(y);
-  return (
-    (x.map((e, i) => ({ x: e, y: y[i] })).reduce((v, a) => v + a.x * a.y, 0) -
-      n * prom_x * prom_y) /
-    (calc(x, prom_x) * calc(y, prom_y))
-  );
+  const rho = 1 - (6 * numerator) / (n * (n ** 2 - 1));
+  const t = rho * Math.sqrt((n - 2) / (1 - rho ** 2));
+  const pValue = jStat.ttest(t, n - 2);
+  const CILower = rho - 1.96 * Math.sqrt((1 - rho ** 2) / (n - 2));
+  const CIUpper = rho + 1.96 * Math.sqrt((1 - rho ** 2) / (n - 2));
+  const stats = {
+    n: n,
+    rho: rho,
+    t: t,
+    pValue: pValue,
+    CILower: CILower,
+    CIUpper: CIUpper,
+  };
+  return stats;
+}
+
+export function calculatePearson(x, y) {
+  const n = x.length;
+  const xMean = jStat.mean(x);
+  const yMean = jStat.mean(y);
+  let numerator = 0;
+  let xDenominator = 0;
+  let yDenominator = 0;
+  for (let i = 0; i < n; i++) {
+    numerator += (x[i] - xMean) * (y[i] - yMean);
+    xDenominator += (x[i] - xMean) ** 2;
+    yDenominator += (y[i] - yMean) ** 2;
+  }
+  const r = numerator / Math.sqrt(xDenominator * yDenominator);
+  const t = r * Math.sqrt((n - 2) / (1 - r ** 2));
+  const pValue = jStat.ttest(t, n - 2);
+  const CILower = r - 1.96 * Math.sqrt((1 - r ** 2) / (n - 2));
+  const CIUpper = r + 1.96 * Math.sqrt((1 - r ** 2) / (n - 2));
+  const stats = {
+    n: n,
+    pcorr: r,
+    statistic: t,
+    pValue: pValue,
+    CILower: CILower,
+    CIUpper: CIUpper,
+    ci: [CILower, CIUpper],
+  };
+  return stats;
 }
