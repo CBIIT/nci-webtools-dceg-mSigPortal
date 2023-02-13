@@ -6,6 +6,7 @@ const schema = [
       table.string('sample');
       table.string('mutationType');
       table.integer('mutations');
+      table.string('cancer');
     },
     index: (table) => {
       table.index(['sample']);

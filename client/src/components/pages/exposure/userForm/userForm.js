@@ -8,7 +8,7 @@ import { actions as exposureActions } from '../../../../services/store/exposure'
 import { actions as modalActions } from '../../../../services/store/modal';
 import {
   resetExplorationApi,
-  useExposureOptionsQuery,
+  useSignatureOptionsQuery,
 } from '../../../../services/store/rootApi';
 import {
   useUploadExplorationMutation,
@@ -28,20 +28,15 @@ export default function PublicForm() {
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const {
-    submitted,
-    loading,
-    userNameOptions,
-    userSampleOptions,
-    id,
-    usePublicSignature,
-  } = useSelector((state) => state.exposure.main);
+  const { submitted, loading, id, usePublicSignature } = useSelector(
+    (state) => state.exposure.main
+  );
 
   const {
-    data: exposureOptions,
+    data: signatureOptions,
     isFetching,
     isError,
-  } = useExposureOptionsQuery();
+  } = useSignatureOptionsQuery();
   const [handleUpload, { isLoading: isUploading }] =
     useUploadExplorationMutation();
   const [submitExploration, { isLoading: loadingUserExposure }] =
@@ -65,24 +60,11 @@ export default function PublicForm() {
     resetField,
     handleSubmit,
     watch,
-    getValues,
     setValue,
     formState: { errors },
   } = useForm({ defaultValues: defaultFormValues });
 
-  const formStudy = watch('study');
   const { exposureFile, matrixFile, signatureFile } = watch();
-
-  // call calculate after receiving signature and sample name options
-  // useEffect(() => {
-  //   if (
-  //     !submitted &&
-  //     !loading &&
-  //     userNameOptions.length &&
-  //     userSampleOptions.length
-  //   )
-  //     calculate('all', id);
-  // }, [userNameOptions, userSampleOptions, loading]);
 
   async function loadExample(type) {
     const filepath = `assets/exampleInput/Sherlock_SBS96_${type}.txt`;
@@ -107,72 +89,14 @@ export default function PublicForm() {
     }
   }
 
-  //  get signature and sample names. useEffect will call main calculate function
-  async function handleCalculate() {
-    mergeForm({ loading: true });
-    try {
-      const { projectID: id, exposureData } = await handleUpload();
-      // get signature name options, ignore sample key
-      const nameOptions = Object.keys(exposureData[0]).filter(
-        (key) => key != 'Samples'
-      );
-      const sampleOptions = [
-        ...new Set(exposureData.map(({ Samples }) => Samples)),
-      ];
-
-      dispatch(
-        actions.mergeExposure({
-          main: {
-            id,
-            userNameOptions: nameOptions,
-            userSampleOptions: sampleOptions,
-          },
-          msIndividual: { sample: sampleOptions[0] },
-          msAssociation: {
-            signatureName1: nameOptions[0],
-            signatureName2: nameOptions[1],
-          },
-          msBurden: { signatureName: nameOptions[0] },
-        })
-      );
-    } catch (err) {
-      mergeError(err);
-    }
-    mergeForm({ loading: false });
-  }
-
-  const studyOptions = exposureOptions
-    ? [...new Set(exposureOptions.map((e) => e.study))].sort().map((e) => ({
-        label: e,
-        value: e,
-      }))
-    : [];
-
-  const signatureSetOptions = (study) => {
-    if (exposureOptions && study.value) {
-      return [
-        ...new Set(
-          exposureOptions
-            .filter((e) => e.study == study.value)
-            .map((e) => e.signatureSetName)
-        ),
-      ]
+  const signatureSetOptions = signatureOptions
+    ? [...new Set(signatureOptions.map((e) => e.signatureSetName))]
         .sort()
         .map((e) => ({
           label: e,
           value: e,
-        }));
-    } else {
-      return [];
-    }
-  };
-
-  function handleStudy(study) {
-    const signatureSets = signatureSetOptions(study);
-
-    setValue('study', study);
-    setValue('signatureSetName', signatureSets[0]);
-  }
+        }))
+    : [];
 
   async function onSubmit(data) {
     try {
@@ -192,38 +116,12 @@ export default function PublicForm() {
         exposureFile: data.exposureFile.name,
         matrixFile: data.matrixFile.name,
         signatureFile: data?.signatureFile.name,
+        ...(usePublicSignature && {
+          signatureSetName: data?.signatureSetName.value,
+        }),
       }).unwrap();
 
-      // // get signature name options, ignore sample key
-      // const nameOptions = Object.keys(exposureData[0]).filter(
-      //   (key) => key != 'Samples'
-      // );
-      // const sampleOptions = [
-      //   ...new Set(exposureData.map(({ Samples }) => Samples)),
-      // ];
-
-      // dispatch(
-      //   actions.mergeExposure({
-      //     main: {
-      //       id,
-      //       userNameOptions: nameOptions,
-      //       userSampleOptions: sampleOptions,
-      //     },
-      //     msIndividual: { sample: sampleOptions[0] },
-      //     msAssociation: {
-      //       signatureName1: nameOptions[0],
-      //       signatureName2: nameOptions[1],
-      //     },
-      //     msBurden: { signatureName: nameOptions[0] },
-      //   })
-      // );
-
-      mergeMain({
-        displayTab: 'tmb',
-        id,
-        samples: [1],
-        signatureNames: [1],
-      });
+      mergeMain({ displayTab: 'tmb', id });
     } catch (error) {
       mergeError(error.message || 'Failed to submit');
     } finally {
@@ -401,23 +299,13 @@ export default function PublicForm() {
       </Row>
 
       {usePublicSignature ? (
-        <div>
-          <Select
-            name="study"
-            label="Study"
-            control={control}
-            disabled={loading || submitted || isFetching}
-            options={studyOptions}
-            onChange={handleStudy}
-          />
-          <Select
-            name="signatureSetName"
-            label="Reference Signature Set"
-            control={control}
-            disabled={loading || submitted || isFetching}
-            options={signatureSetOptions(formStudy)}
-          />
-        </div>
+        <Select
+          name="signatureSetName"
+          label="Reference Signature Set"
+          control={control}
+          disabled={loading || submitted || isFetching}
+          options={signatureSetOptions}
+        />
       ) : (
         <Row>
           <Col>
