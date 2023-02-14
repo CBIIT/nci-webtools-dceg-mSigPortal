@@ -11,12 +11,13 @@ import { router as associationRoutes } from '../services/api/association/associa
 import { router as etiologyRoutes } from '../services/api/etiology/etiology.js';
 import { router as publicationsRoutes } from '../services/api/publications/publications.js';
 import { router as patternRoutes } from '../services/api/pattern/pattern.js';
+import { router as extrationRoutes } from '../services/api/extraction/extraction.js';
 
 const router = express.Router();
 
 router.use(
-  '/results',
-  express.static(config.results.folder, {
+  '/data',
+  express.static(config.folders.data, {
     setHeaders: (res, path, stat) => {
       res.set('Cache-Control', 'max-age=0, must-revalidate');
     },
@@ -33,6 +34,7 @@ router.use(associationRoutes);
 router.use(etiologyRoutes);
 router.use(publicationsRoutes);
 router.use(patternRoutes);
+router.use(extrationRoutes);
 router.get('/ping', (req, res) => res.send(true));
 router.use((error, req, res, next) => {
   logger.error(error);

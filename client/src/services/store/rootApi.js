@@ -56,7 +56,7 @@ export const associationApiSlice = createApi({
 
 export const extractionApiSlice = createApi({
   reducerPath: 'extractionApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'extraction' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'web' }),
   endpoints: () => ({}),
 });
 

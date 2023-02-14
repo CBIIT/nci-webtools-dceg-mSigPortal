@@ -222,8 +222,8 @@ export default function CsPublic() {
             <SvgContainer
               className="p-3"
               downloadName={data.output.plotPath.split('/').slice(-1)[0]}
-              plotPath={'web/results/' + data.output.plotPath}
-              txtPath={`web/results/${data.output.plotPath}`}
+              plotPath={'web/data/' + data.output.plotPath}
+              txtPath={`web/data/${data.output.plotPath}`}
             />
             <div className="p-3">
               <p>

@@ -12,7 +12,7 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
 
     submit: builder.mutation({
       query: (body) => ({
-        url: `submit/${body.id}`,
+        url: `submitExtraction/${body.id}`,
         method: 'POST',
         body,
       }),
