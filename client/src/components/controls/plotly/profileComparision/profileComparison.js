@@ -371,7 +371,8 @@ export function compareProfiles(
       ticks: '',
     },
     yaxis: {
-      autorange: true,
+      autorange: false,
+      range: [-1 * maxMutations * 1.2, maxMutations * 1.2],
       linecolor: '#D3D3D3',
       linewidth: 1,
       mirror: 'all',
