@@ -20,7 +20,7 @@ export default function PcWithin() {
     );
 
   const { study, cancer, strategy } = store.publicForm;
-  const { source, matrixData, projectID } = store.main;
+  const { source, matrixData, id } = store.main;
   const { withinForm } = store.profileComparison;
 
   const [params, setParams] = useState(null);
@@ -79,7 +79,7 @@ export default function PcWithin() {
         strategy: strategy.value,
       }),
 
-      ...(source == 'user' && { userId: projectID }),
+      ...(source == 'user' && { userId: id }),
 
       profile: data.profile.value,
       matrix:

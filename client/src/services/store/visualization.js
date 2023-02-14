@@ -36,7 +36,7 @@ export const getInitialState = () => ({
     },
     queueExpired: false,
     error: '',
-    projectID: '',
+    id: '',
     displayTab: 'instructions',
     downloads: {},
     svgList: {},

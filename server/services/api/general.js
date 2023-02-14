@@ -103,13 +103,12 @@ function upload(req, res, next) {
 }
 
 async function associationWrapper(req, res, next) {
-  const { fn, args, projectID: id } = req.body;
+  const { fn, args, id } = req.body;
   logger.debug('/associationCalc: %o', { ...req.body });
-  const projectID = id ? id : randomUUID();
+  const sessionId = id || randomUUID();
   // create directory for results if needed
-  const savePath = projectID ? path.join(projectID, 'results', fn, '/') : null;
-  if (projectID)
-    fs.mkdirSync(path.join(rConfig.wd, savePath), { recursive: true });
+  const savePath = sessionId ? path.join(sessionId, 'results', fn, '/') : null;
+  if (sessionId) fs.mkdirSync(path.join(rConfig.wd, savePath), { recursive: true });
   try {
     const wrapper = await r('services/R/associationWrapper.R', 'wrapper', {
       fn,
@@ -122,7 +121,7 @@ async function associationWrapper(req, res, next) {
     const { stdout, ...rest } = JSON.parse(wrapper);
     logger.debug(stdout);
     res.json({
-      projectID,
+      sessionId,
       stdout,
       ...rest,
     });
@@ -157,7 +156,7 @@ async function getExposureExample(req, res, next) {
       const paramsPath = path.join(resultsPath, `params.json`);
       // rename file paths with new ID
       let params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
-      const oldID = params.main.projectID;
+      const oldID = params.main.id;
       await replace({
         files: paramsPath,
         from: new RegExp(oldID, 'g'),
@@ -167,7 +166,7 @@ async function getExposureExample(req, res, next) {
       res.json({
         state: {
           ...params,
-          main: { ...params.main, projectID: id },
+          main: { ...params.main, id },
         },
       });
     } else {

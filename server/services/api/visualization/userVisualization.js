@@ -1,19 +1,21 @@
-const { Router } = require('express');
-const { randomUUID } = require('crypto');
-const { validate } = require('uuid');
-const fs = require('fs-extra');
-const path = require('path');
-const glob = require('glob');
-const archiver = require('archiver');
-const r = require('r-wrapper').async;
-const AWS = require('aws-sdk');
-const tar = require('tar');
-const config = require('../../../config.json');
-const logger = require('../../logger');
-const { parseCSV, importUserSession } = require('../analysis');
-const { schema } = require('./userSchema');
-const { getExposureData, getSignatureData } = require('../../query');
-const { createCacheMiddleware } = require('../../cache');
+import { Router } from 'express';
+import { randomUUID } from 'crypto';
+import { validate } from 'uuid';
+import fs from 'fs-extra';
+import path from 'path';
+import glob from 'glob';
+import archiver from 'archiver';
+import rWrapper from 'r-wrapper';
+import AWS from 'aws-sdk';
+import tar from 'tar';
+import config from '../../../config.json' assert { type: 'json' };
+import logger from '../../logger.js';
+import { parseCSV, importUserSession } from '../general.js';
+import { schema } from './userSchema.js';
+import { getExposureData, getSignatureData } from '../../query.js';
+import { createCacheMiddleware } from '../../cache.js';
+import { execa } from 'execa';
+const r = rWrapper.async;
 
 // config info for R functions
 const rConfig = {
@@ -88,41 +90,36 @@ function getRelativePath(paths, id = '') {
   return newPaths;
 }
 
-async function profilerExtraction(params) {
+async function profilerExtraction(paramsObj) {
   return new Promise(async (resolve, reject) => {
-    const projectPath = path.join(config.results.folder, params.projectID[1]);
-    // update path
-    params.outputDir[1] = path.join(projectPath, 'results');
+    const outputFolder = paramsObj.Output_Dir;
 
-    const cliArgs = Object.values(params).reduce(
-      (string, arg) => string + ' ' + arg.join(' '),
-      ''
-    );
+    const cliArgs = Object.entries(paramsObj)
+      .reduce((params, [key, value]) => [...params, `--${key} ${value}`], [])
+      .join(' ');
+
     const command = [
       'services/python/mSigPortal_Profiler_Extraction.py',
-      ...cliArgs.split(' '),
+      cliArgs,
     ];
-
     try {
-      const { execa } = await import('execa');
       const { all: scriptOutput } = await execa('python3', command, {
         all: true,
         shell: true,
       });
-
       try {
         // parse matrix files and transform into single json file
-        const matrixFiles = path.join(projectPath, 'results/output');
-        const matrices = await getMatrices(matrixFiles);
-        const matricesFile = path.join(projectPath, 'matrices.json');
-        fs.writeFileSync(matricesFile, JSON.stringify(matrices));
+        const matrixFiles = path.resolve(outputFolder, 'output');
+        const seqmatrix = await getMatrices(matrixFiles);
+        const matricesFile = path.join(outputFolder, 'matrices.json');
+        fs.writeFileSync(matricesFile, JSON.stringify(seqmatrix));
 
         // parse cluster data if option was used
         let cluster = [];
-        if (params?.cluster[1] == 'True') {
+        if (paramsObj?.Cluster == 'True') {
           const clusterFile = path.join(
-            projectPath,
-            `results/Cluster/Result/${params.projectID[1]}_clustered_class_All.txt`
+            outputFolder,
+            `Cluster/Result/${paramsObj.Project_ID}_clustered_class_All.txt`
           );
           const clusterData = fs.existsSync(clusterFile)
             ? await parseCSV(clusterFile)
@@ -137,8 +134,7 @@ async function profilerExtraction(params) {
         }
         resolve({
           scriptOutput,
-          projectPath,
-          matrices,
+          seqmatrix,
           ...(cluster && { cluster }),
         });
       } catch (error) {
@@ -150,7 +146,6 @@ async function profilerExtraction(params) {
     }
   });
 }
-
 // retrieves parsed data files - modify paths if needed
 async function getResultsFiles(resultsPath, id = '') {
   const statisticsPath = path.join(resultsPath, 'Statistics.txt');
@@ -159,18 +154,15 @@ async function getResultsFiles(resultsPath, id = '') {
   let matrixList = [];
   let statistics = '';
   let downloads = [];
-
   if (fs.existsSync(matrixPath)) matrixList = await parseCSV(matrixPath);
   if (fs.existsSync(statisticsPath))
     statistics = fs.readFileSync(statisticsPath, 'utf8');
-
   if (fs.existsSync(downloadsPath)) {
     downloads = fs
       .readdirSync(downloadsPath)
       .filter((file) => file.endsWith('.zip'))
       .map((file) => file);
   }
-
   if (fs.existsSync(path.join(downloadsPath, 'vcf_files_zip'))) {
     downloads = [
       ...downloads,
@@ -180,12 +172,10 @@ async function getResultsFiles(resultsPath, id = '') {
         .map((file) => path.join('vcf_files_zip', file)),
     ];
   }
-
   // convert to relative paths
   matrixList.forEach(
     (plot) => (plot.Path = getRelativePath({ Path: plot.Path }, id).Path)
   );
-
   return {
     statistics: statistics,
     matrixList: matrixList,
@@ -193,20 +183,34 @@ async function getResultsFiles(resultsPath, id = '') {
   };
 }
 
-async function userProfilerExtraction(req, res, next) {
+async function submitVisualization(req, res, next) {
   res.setTimeout(15 * 60 * 1000, () => {
     res.status(504).send('request timed out');
   });
 
   try {
-    const userId = req.body.projectID[1];
-    const {
-      scriptOutput,
-      projectPath,
-      matrices: seqmatrix,
-      cluster,
-    } = await profilerExtraction(req.body);
-    const resultsPath = path.join(projectPath, 'results');
+    const userId = req.body.Project_ID;
+    // resolve file paths
+    const params = {
+      ...req.body,
+      Input_Path: path.resolve(
+        config.folders.input,
+        userId,
+        req.body.Input_Path
+      ),
+      Output_Dir: path.resolve(config.folders.output, userId),
+      ...(req.body?.Bed && {
+        Bed: path.resolve(config.folders.input, userId, req.body.Bed),
+      }),
+    };
+    fs.mkdirSync(params.Output_Dir, { recursive: true });
+
+    const { scriptOutput, seqmatrix, cluster } = await profilerExtraction(
+      params
+    );
+    const outputFolder = path.resolve(params.Output_Dir);
+    // fs.mkdirSync(resultsPath, { recursive: true });
+
     // import data into user session table
     const connection = req.app.locals.sqlite(userId, 'local');
     const importStatus = await importUserSession(
@@ -216,17 +220,16 @@ async function userProfilerExtraction(req, res, next) {
     );
     if (!importStatus)
       next(new Error('Failed to import matrix data into database'));
-
-    if (fs.existsSync(path.join(resultsPath, 'svg_files_list.txt'))) {
+    if (fs.existsSync(path.join(outputFolder, 'svg_files_list.txt'))) {
       res.json({
         scriptOutput,
-        ...(await getResultsFiles(resultsPath, userId)),
+        id: userId,
+        ...(await getResultsFiles(outputFolder, userId)),
       });
     } else {
       logger.error(
         '/profilerExtraction: An error occured while extracting profiles'
       );
-
       res.status(500).json({ scriptOutput });
     }
   } catch (error) {
@@ -237,36 +240,29 @@ async function userProfilerExtraction(req, res, next) {
 }
 
 async function getResults(req, res, next) {
-  logger.info(`/getResults: Retrieving Results for ${req.body.projectID}`);
-
+  logger.info(`/getResults: Retrieving Results for ${req.body.id}`);
   const userResults = path.resolve(
     config.results.folder,
-    req.body.projectID,
+    req.body.id,
     'results'
   );
-
   if (fs.existsSync(path.join(userResults, 'svg_files_list.txt'))) {
-    res.json(await getResultsFiles(userResults, req.body.projectID));
+    res.json(await getResultsFiles(userResults, req.body.id));
   } else {
     logger.info('/getResults: Results not found');
     res.status(500).json('Results not found');
   }
 }
-
 async function wrapper(fn, args) {
   return await JSON.parse(await r('services/R/visualizeWrapper.R', fn, args));
 }
-
 // Visualization Calculation functions
 async function visualizationWrapper(req, res, next) {
-  const { fn, args, projectID } = req.body;
+  const { fn, args, id } = req.body;
   logger.debug(`/visualizationWrapper: %o`, req.body);
-
   // create directory for results if needed
-  const savePath = projectID ? path.join(projectID, 'results', fn, '/') : null;
-  if (projectID)
-    fs.mkdirSync(path.join(rConfig.wd, savePath), { recursive: true });
-
+  const savePath = id ? path.join(id, 'results', fn, '/') : null;
+  if (id) fs.mkdirSync(path.join(rConfig.wd, savePath), { recursive: true });
   try {
     const { scriptOutput, ...rest } = await wrapper('wrapper', {
       fn,
@@ -276,10 +272,9 @@ async function visualizationWrapper(req, res, next) {
         savePath,
       },
     });
-
     // generate an id if getPublicData is called
     res.json({
-      projectID: fn == 'getPublicData' ? randomUUID() : projectID,
+      id: fn == 'getPublicData' ? randomUUID() : id,
       scriptOutput,
       ...rest,
     });
@@ -338,13 +333,11 @@ async function visualizationDownloadPublic(req, res, next) {
     id,
     `results/msigportal-${study}-${cancerType}-${experimentalStrategy}`
   );
-
   try {
     await r('services/R/visualizeWrapper.R', 'downloadPublicData', {
       args,
       config: { ...rConfig, savePath },
     });
-
     const file = path.resolve(
       path.join(
         config.results.folder,
@@ -352,7 +345,6 @@ async function visualizationDownloadPublic(req, res, next) {
         `results/msigportal-${study}-${cancerType}-${experimentalStrategy}.tar.gz`
       )
     );
-
     if (file.indexOf(path.resolve(config.results.folder)) == 0) {
       res.download(file);
     } else {
@@ -367,30 +359,27 @@ async function visualizationDownloadPublic(req, res, next) {
 }
 
 async function submitQueue(req, res, next) {
-  const projectID = req.body.args.projectID[1];
+  const id = req.body.args.id[1];
   const sqs = new AWS.SQS();
-
   try {
     // upload archived project directory
     await new AWS.S3()
       .upload({
         Body: tar
-          .c({ sync: true, gzip: true, C: config.results.folder }, [projectID])
+          .c({ sync: true, gzip: true, C: config.results.folder }, [id])
           .read(),
         Bucket: config.queue.bucket,
-        Key: `${config.queue.inputKeyPrefix}${projectID}/${projectID}.tgz`,
+        Key: `${config.queue.inputKeyPrefix}${id}/${id}.tgz`,
       })
       .promise();
-
     const { QueueUrl } = await sqs
       .getQueueUrl({ QueueName: config.queue.url })
       .promise();
-
     await sqs
       .sendMessage({
         QueueUrl: QueueUrl,
-        MessageDeduplicationId: projectID,
-        MessageGroupId: projectID,
+        MessageDeduplicationId: id,
+        MessageGroupId: id,
         MessageBody: JSON.stringify({
           ...req.body,
           timestamp: new Date().toLocaleString('en-US', {
@@ -399,11 +388,10 @@ async function submitQueue(req, res, next) {
         }),
       })
       .promise();
-
-    logger.info('Queue submitted ID: ' + projectID);
-    res.json({ projectID });
+    logger.info('Queue submitted ID: ' + id);
+    res.json({ id });
   } catch (err) {
-    logger.info('Queue failed to submit ID: ' + projectID);
+    logger.info('Queue failed to submit ID: ' + id);
     next(err);
   }
 }
@@ -412,16 +400,12 @@ async function getQueueResults(req, res, next) {
   try {
     const s3 = new AWS.S3();
     const { id } = req.params;
-
     logger.info(`Fetch Queue Result: ${id}`);
-
     // validate id format
     if (!validate(id)) next(new Error(`Invalid request`));
-
     // ensure output directory exists
     const resultsFolder = path.resolve(config.results.folder, id);
     await fs.promises.mkdir(resultsFolder, { recursive: true });
-
     // find objects which use the specified id as the prefix
     const objects = await s3
       .listObjectsV2({
@@ -429,12 +413,10 @@ async function getQueueResults(req, res, next) {
         Prefix: `${config.queue.outputKeyPrefix}${id}/`,
       })
       .promise();
-
     // download results
     for (let { Key } of objects.Contents) {
       const filename = path.basename(Key);
       const filepath = path.resolve(resultsFolder, filename);
-
       // download results if they do not exist
       if (!fs.existsSync(filepath)) {
         logger.info(`Downloading result: ${Key}`);
@@ -444,7 +426,6 @@ async function getQueueResults(req, res, next) {
             Key,
           })
           .promise();
-
         await fs.promises.writeFile(filepath, object.Body);
         // extract and delete archive
         if (path.extname(filename) == '.tgz') {
@@ -464,12 +445,9 @@ async function getQueueResults(req, res, next) {
         }
       }
     }
-
     let paramsPath = path.resolve(resultsFolder, `params.json`);
-
     if (fs.existsSync(paramsPath)) {
       const data = JSON.parse(String(await fs.promises.readFile(paramsPath)));
-
       res.json(data);
     } else {
       next(new Error(`Params not found`));
@@ -483,14 +461,12 @@ async function getVisExample(req, res, next) {
   try {
     const { example } = req.params;
     logger.info(`Fetching example: ${example}`);
-
     // check exists
     const examplePath = path.resolve(
       config.data.examples,
       'visualization',
       `${example}.tgz`
     );
-
     if (fs.existsSync(examplePath)) {
       // copy example to results with unique id
       const id = randomUUID();
@@ -503,19 +479,16 @@ async function getVisExample(req, res, next) {
           .on('error', (err) => reject(err))
           .pipe(tar.x({ strip: 1, C: resultsPath }));
       });
-
       const paramsPath = path.join(resultsPath, `params.json`);
-
       // rename file paths with new ID
       let params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
-      const oldID = params.visualization.main.projectID;
+      const oldID = params.visualization.main.id;
       await replace({
         files: paramsPath,
         from: new RegExp(oldID, 'g'),
         to: id,
       });
       params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
-
       const svgPath = path.join(resultsPath, 'results', 'svg_files_list.txt');
       if (fs.existsSync(svgPath)) {
         const matrixPath = path.join(
@@ -523,7 +496,6 @@ async function getVisExample(req, res, next) {
           'results',
           'matrix_files_list.txt'
         );
-
         await replace({
           files: [svgPath, matrixPath],
           from: new RegExp(oldID, 'g'),
@@ -538,8 +510,7 @@ async function getVisExample(req, res, next) {
           }
         });
       });
-
-      res.json({ projectID: id, state: params.visualization });
+      res.json({ id, state: params.visualization });
     } else {
       throw `Invalid example`;
     }
@@ -550,20 +521,17 @@ async function getVisExample(req, res, next) {
 
 async function downloadWorkspace(req, res, next) {
   logger.info(`/visualization/downloadWorkspace`);
-
   const { state, id } = req.body;
   const session = path.resolve(config.results.folder, id);
   const archive = archiver('zip', {
     zlib: { level: 6 }, // Sets the compression level.
   });
-
   if (fs.existsSync(session)) {
     try {
       await fs.promises.writeFile(
         path.join(session, 'params.json'),
         JSON.stringify(state)
       );
-
       archive.on('finish', function (error) {
         return res.end();
       });
@@ -586,7 +554,8 @@ async function downloadWorkspace(req, res, next) {
 async function getPublicTreeLeafData(req, res, next) {
   try {
     const { connection } = req.app.locals;
-    const { study, strategy, cancer, signatureSetName, profileMatrix } = req.body;
+    const { study, strategy, cancer, signatureSetName, profileMatrix } =
+      req.body;
     const exposureData = await getExposureData(
       connection,
       { study, strategy },
@@ -605,17 +574,14 @@ async function getPublicTreeLeafData(req, res, next) {
         params[key] = req.body[key];
       }
     }
-
     let seqmatrixData = await connection
       .select('*', connection.raw('concat(profile, matrix) as "profileMatrix"'))
       .from('seqmatrix')
       .where(params)
       .andWhere(connection.raw('concat(profile, matrix)'), 'in', profileMatrix);
-
     // console.log('exposureData', exposureData[0], exposureData?.length);
     // console.log('seqmatrixData', seqmatrixData[0], seqmatrixData?.length);
     // console.log('signatureData', signatureData[0], signatureData?.length);
-
     if (
       !exposureData?.length ||
       !seqmatrixData?.length ||
@@ -623,7 +589,6 @@ async function getPublicTreeLeafData(req, res, next) {
     ) {
       throw new Error('No data found');
     }
-
     const args = { exposureData, seqmatrixData, signatureData };
     const results = await wrapper('wrapper', { fn: 'getTreeLeaf', args });
     res.json(results);
@@ -632,10 +597,8 @@ async function getPublicTreeLeafData(req, res, next) {
     next(error);
   }
 }
-
 const router = Router();
-
-router.post('/profilerExtraction', userProfilerExtraction);
+router.post('/submitVisualization', submitVisualization);
 router.post('/getResults', getResults);
 router.post('/getSignaturesUser', getSignaturesUser);
 router.post('/visualizationWrapper', visualizationWrapper);
@@ -645,9 +608,22 @@ router.post('/queue', submitQueue);
 router.get('/getQueueResults/:id', getQueueResults);
 router.get('/getVisExample/:example', getVisExample);
 router.post('/downloadWorkspace', downloadWorkspace);
-router.post('/treeLeaf', createCacheMiddleware((req) => ['treeLeaf', req.body.study, req.body.strategy, req.body.cancer, req.body.signatureSetName, req.body.profileMatrix].join(':')), getPublicTreeLeafData);
+router.post(
+  '/treeLeaf',
+  createCacheMiddleware((req) =>
+    [
+      'treeLeaf',
+      req.body.study,
+      req.body.strategy,
+      req.body.cancer,
+      req.body.signatureSetName,
+      req.body.profileMatrix,
+    ].join(':')
+  ),
+  getPublicTreeLeafData
+);
 
-module.exports = {
+export {
   router,
   getFiles,
   getMatrices,

@@ -18,7 +18,7 @@ import { resetVisualizationApi } from '../../../../services/store/rootApi';
 import {
   useVisualizationUserUploadMutation,
   useSubmitQueueMutation,
-  useProfilerExtractionMutation,
+  useSubmitVisualizationMutation,
   useUserMatrixMutation,
 } from './apiSlice';
 
@@ -39,14 +39,14 @@ export default function UserForm() {
     dispatch(actions.mergeModal({ success: { visible: true, message: msg } }));
   const resetVisualization = (_) => dispatch(actions.resetVisualization());
 
-  const { inputFilename, bedFilename, projectID, ...userForm } = store.userForm;
+  const { inputFilename, bedFilename, id, ...userForm } = store.userForm;
   const { submitted } = store.main;
 
   const [handleUpload, { isLoading: isUploading }] =
     useVisualizationUserUploadMutation();
   const [handleSubmitQueue, { isLoading: isQueueing }] =
     useSubmitQueueMutation();
-  const [profilerExtraction, { isLoading }] = useProfilerExtractionMutation();
+  const [profilerExtraction, { isLoading }] = useSubmitVisualizationMutation();
   const [fetchMatrix, { isLoading: loadingMatrix }] = useUserMatrixMutation();
 
   const formatOptions = [
@@ -164,42 +164,36 @@ export default function UserForm() {
       formData.append('inputFile', data.inputFile);
       if (bedFile.size) formData.append('bedFile', data.bedFile);
 
-      const { projectID, ...filePaths } = await handleUpload(formData).unwrap();
+      const { id } = await handleUpload(formData).unwrap();
 
       mergeState({
         ...data,
-        ...filePaths,
-        projectID,
-        inputFilename: data.inputFile.name,
-        bedFilename: data.bedFile.name,
+        id,
       });
 
       // python cli args
       let args = {
-        inputFormat: ['-f', data.inputFormat.value],
-        inputFile: ['-i', filePaths.filePath],
-        projectID: ['-p', projectID],
-        genomeAssemblyVersion: ['-g', data.genome.value],
-        strategy: ['-t', data.strategy],
-        outputDir: ['-o', projectID],
-        seqInfo: ['-S', seqInfo ? 'True' : 'False'],
-        cluster: ['-C', cluster ? 'True' : 'False'],
+        Input_Format: data.inputFormat.value,
+        Input_Path: data.inputFile.name,
+        Project_ID: id,
+        Output_Dir: id,
+        Genome_Building: data.genome.value,
+        Data_Type: data.strategy,
+        Cluster: cluster ? 'True' : 'False',
+        SeqInfo: seqInfo ? 'True' : 'False',
       };
 
       // conditionally include mutation split and mutation filter params
       if (['vcf', 'csv', 'tsv'].includes(inputFormat.value)) {
-        args['collapseSample'] = ['-c', data.collapse ? 'True' : 'False'];
-
-        if (data.bedFile) args['bedFile'] = ['-b', filePaths.bedPath];
-
-        if (data.filter.length) {
-          args['mutationFilter'] = [
-            '-F',
-            data.filter.map((e) => e.value).join('@'),
-          ];
-        } else {
-          args['mutationSplit'] = ['-s', data.mutationSplit ? 'True' : 'False'];
-        }
+        args = {
+          ...args,
+          ...(data.filter.length && {
+            Filter: data.filter.map((e) => e.value).join('@'),
+          }),
+          Collapse: data.collapse ? 'True' : 'False',
+          vcf_split_all_filter: data.mutationSplit ? 'True' : 'False',
+          Bed: data.bedFile.name,
+        };
       }
 
       if (useQueue) {
@@ -215,12 +209,9 @@ export default function UserForm() {
       } else {
         try {
           mergeMain({ loading: { active: true } });
-          const { stdout, stderr, ...rest } = await profilerExtraction(
-            args
-          ).unwrap();
-          const matrixData = await fetchMatrix({ userId: projectID }).unwrap();
-
-          mergeMain({ projectID, matrixData, ...rest });
+          const response = await profilerExtraction(args).unwrap();
+          const matrixData = await fetchMatrix({ userId: id }).unwrap();
+          mergeMain({ ...response, matrixData });
         } catch (error) {
           mergeMain({
             error: 'Please Reset Your Parameters and Try again.',

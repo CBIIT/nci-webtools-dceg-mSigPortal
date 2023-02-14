@@ -82,7 +82,7 @@ export default function PublicForm() {
       // }
       const matrixData = await fetchMatrix(params).unwrap();
 
-      mergeMain({ matrixData, projectID: crypto.randomUUID() });
+      mergeMain({ matrixData, id: crypto.randomUUID() });
     } catch (error) {
       if (error.originalStatus == 504) {
         mergeMain({

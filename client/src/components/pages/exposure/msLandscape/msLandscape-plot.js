@@ -157,7 +157,7 @@ export default function MsLandscapePlot({ state }) {
           </Col>
           <Col lg="auto" className="d-flex">
             <Button
-              // disabled={source == 'user' && !projectID}
+              // disabled={source == 'user' && !id}
               className="mt-auto mb-3"
               variant="primary"
               onClick={Recalculate}

@@ -16,7 +16,7 @@ export default function Download() {
     study,
     experimentalStrategy,
     cancerType,
-    projectID,
+    id,
     downloads,
     statistics,
   } = visualization.main;
@@ -27,7 +27,7 @@ export default function Download() {
   async function downloadOutput(file) {
     setDownload((downloading) => [...downloading, file]);
     const response = await fetch(
-      `web/visualization/download?id=${projectID}&file=${file}`
+      `web/visualization/download?id=${id}&file=${file}`
     );
     if (response.ok) {
       saveAs(
@@ -51,7 +51,7 @@ export default function Download() {
       body: JSON.stringify({
         fn: 'downloadPublicData',
         args: {
-          id: projectID,
+          id,
           study: study,
           cancerType: cancerType,
           experimentalStrategy: experimentalStrategy,
@@ -82,7 +82,7 @@ export default function Download() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id: projectID,
+        id,
         state: {
           visualization: {
             ...rest,

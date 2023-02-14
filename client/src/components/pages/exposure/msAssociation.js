@@ -23,7 +23,7 @@ export default function MsAssociation({ calculateAssociation }) {
     err,
     loading,
   } = exposure.msAssociation;
-  const { projectID, signatureNameOptions, userNameOptions, source } =
+  const { id, signatureNameOptions, userNameOptions, source } =
     exposure.main;
 
   const mergeMsAssociation = (state) =>
@@ -83,7 +83,7 @@ export default function MsAssociation({ calculateAssociation }) {
               disabled={
                 !signatureName1 ||
                 !signatureName2 ||
-                (source == 'user' && !projectID)
+                (source == 'user' && !id)
               }
               variant="primary"
               onClick={calculateAssociation}

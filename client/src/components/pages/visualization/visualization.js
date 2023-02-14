@@ -43,18 +43,19 @@ export default function Visualization() {
     submitted,
     queueExpired,
     error,
-    projectID,
     displayTab,
     svgList,
     matrixList,
     matrixData,
   } = store.main;
 
-  const { type, id } = useParams();
+  const urlParams = useParams();
+  const { type } = urlParams;
+  const id = store.main.id || urlParams.id;
 
   // when retrieving queued result, update id in store
   useEffect(() => {
-    if (id && !loading.active && !submitted && !projectID) {
+    if (id && !loading.active && !submitted && !id) {
       if (type == 'queue') {
         loadQueueResult(id);
       } else if (type == 'example') {
@@ -105,13 +106,13 @@ export default function Visualization() {
       },
     });
     try {
-      const { projectID, state: visualizationStore } = await (
+      const { id, state: visualizationStore } = await (
         await fetch(`web/getVisExample/${id}`)
       ).json();
       dispatch(
         actions.mergeVisualization({
           ...visualizationStore,
-          state: { ...visualizationStore.main, projectID: projectID },
+          state: { ...visualizationStore.main, id },
         })
       );
     } catch (error) {

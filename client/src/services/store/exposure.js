@@ -14,7 +14,7 @@ export const getInitialState = () => ({
     displayTab: 'instructions',
     source: 'public',
     loading: false,
-    projectID: '',
+    id: '',
     openSidebar: true,
     submitted: false,
     usePublicSignature: true,

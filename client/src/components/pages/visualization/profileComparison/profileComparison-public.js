@@ -20,7 +20,7 @@ export default function PcPublic() {
       })
     );
 
-  const { matrixData, projectID } = store.main;
+  const { matrixData, id } = store.main;
   const { publicForm } = store.profileComparison;
 
   const [params, setParams] = useState(null);
@@ -170,7 +170,7 @@ export default function PcPublic() {
       profile: data.profile.value,
       matrix: data.matrix.value,
       sample: data.userSample.value,
-      userId: projectID,
+      userId: id,
     };
     const publicParams = {
       profile: data.profile.value,

@@ -16,9 +16,9 @@ export const userFormApiSlice = visualizationApiSlice.injectEndpoints({
         body: data,
       }),
     }),
-    profilerExtraction: builder.mutation({
+    submitVisualization: builder.mutation({
       query: (data) => ({
-        url: 'profilerExtraction',
+        url: 'submitVisualization',
         method: 'POST',
         body: data,
       }),
@@ -60,7 +60,7 @@ export const userFormApiSlice = visualizationApiSlice.injectEndpoints({
 export const {
   useVisualizationUserUploadMutation,
   useSubmitQueueMutation,
-  useProfilerExtractionMutation,
+  useSubmitVisualizationMutation,
   useUserMatrixMutation,
   useExampleHeaderQuery,
 } = userFormApiSlice;

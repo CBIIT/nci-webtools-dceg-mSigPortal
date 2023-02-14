@@ -19,7 +19,7 @@ export default function PcaPublic() {
       })
     );
 
-  const { matrixData, matrixList, projectID } = store.main;
+  const { matrixData, matrixList, id } = store.main;
   const { publicForm } = store.pca;
 
   const [params, setParams] = useState(null);
@@ -121,7 +121,7 @@ export default function PcaPublic() {
             row.profile == data.profile.value && row.matrix == data.matrix.value
         )[0].Path,
       },
-      projectID,
+      id,
     };
     mergeForm(data);
     setParams(params);

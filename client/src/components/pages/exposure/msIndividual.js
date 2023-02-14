@@ -17,7 +17,7 @@ export default function MSIndividual({ calculateIndividual }) {
   const dispatch = useDispatch();
   const exposure = useSelector((state) => state.exposure);
   const { sample, plotPath, debugR, err, loading } = exposure.msIndividual;
-  const { projectID, publicSampleOptions, userSampleOptions, source } =
+  const { id, publicSampleOptions, userSampleOptions, source } =
     exposure.main;
 
   const mergeMsIndividual = (state) =>
@@ -79,7 +79,7 @@ export default function MSIndividual({ calculateIndividual }) {
           <Col lg="auto" className="d-flex">
             <Button
               className="mt-auto mb-3"
-              disabled={!sample || (source == 'user' && !projectID)}
+              disabled={!sample || (source == 'user' && !id)}
               variant="primary"
               onClick={calculateIndividual}
             >

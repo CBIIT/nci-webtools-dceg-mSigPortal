@@ -108,7 +108,7 @@ export default function PublicForm() {
       formData.append('exposureFile', exposureFile);
       formData.append('matrixFile', matrixFile);
       if (!usePublicSignature) formData.append('signatureFile', signatureFile);
-      const { projectID: id } = await handleUpload(formData).unwrap();
+      const { id } = await handleUpload(formData).unwrap();
 
       // submit after upload
       await submitExploration({

@@ -99,7 +99,7 @@ async function downloadS3(id, savePath) {
  */
 async function processMessage(params) {
   const { args, state: visualizationStore, timestamp } = params;
-  const id = args.projectID[1];
+  const id = args.id[1];
   const s3 = new AWS.S3();
   const mailer = nodemailer.createTransport(config.email.smtp);
   try {
@@ -155,7 +155,7 @@ async function processMessage(params) {
       state: {
         ...visualizationStore.state,
         submitted: true,
-        projectID: id,
+        id,
       },
     };
     // get dropdown options
@@ -781,7 +781,7 @@ async function processMessage(params) {
     const stderr = err.stderr ? err.stderr.toString() : '';
     // template variables
     const templateData = {
-      id: id,
+      id,
       parameters: JSON.stringify(args, null, 4),
       originalTimestamp: timestamp,
       exception: err.toString(),
@@ -838,7 +838,7 @@ async function receiveMessage() {
     if (data.Messages && data.Messages.length > 0) {
       const message = data.Messages[0];
       const params = JSON.parse(message.Body);
-      logger.info(`Received Message ${params.args.projectID[1]}`);
+      logger.info(`Received Message ${params.args.id[1]}`);
       // logger.debug(message.Body);
       // while processing is not complete, update the message's visibilityTimeout
       const intervalId = setInterval((_) => {

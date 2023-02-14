@@ -46,7 +46,7 @@ export default function Univariable() {
     loadingRecalculate,
     error,
     loadError,
-    projectID,
+    id,
     plotPath,
     dataPath,
     assocTablePath,
@@ -167,7 +167,7 @@ export default function Univariable() {
         collapse: '',
         collapseOptions: [],
       },
-      projectID: '',
+      id: '',
       plotPath: '',
       dataPath: '',
       assocTablePath: '',
@@ -195,7 +195,7 @@ export default function Univariable() {
       });
       try {
         const {
-          projectID: id,
+          id,
           stdout,
           output,
         } = await (
@@ -207,7 +207,7 @@ export default function Univariable() {
             },
             body: JSON.stringify({
               fn: 'univariable',
-              projectID,
+              id,
               args: {
                 study,
                 strategy,
@@ -255,7 +255,7 @@ export default function Univariable() {
           });
         } else {
           mergeState({
-            projectID: id,
+            id,
             plotPath,
             dataPath,
             assocTablePath,
@@ -591,7 +591,7 @@ export default function Univariable() {
                   pagination={resultsTable.pagination}
                   hidden={resultsTable.hidden}
                   downloadName="Download Association Result"
-                  downloadLink={projectID + assocTablePath}
+                  downloadLink={id + assocTablePath}
                   mergeState={async (e) =>
                     await mergeState({ resultsTable: { ...e } })
                   }
