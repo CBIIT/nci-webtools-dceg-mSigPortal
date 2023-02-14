@@ -1,4 +1,4 @@
-import express from 'express';
+import { Router } from 'express';
 import { validate } from 'uuid';
 import path from 'path';
 import config from '../../../config.json' assert { type: 'json' };
@@ -7,7 +7,6 @@ import { parseCSV, importUserSession } from '../general.js';
 import { schema } from './userSchema.js';
 import { getSignatureData } from '../../query.js';
 import fs from 'fs';
-const { Router } = express;
 
 async function submit(req, res, next) {
   const id = req.params.id;
