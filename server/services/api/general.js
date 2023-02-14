@@ -3,6 +3,7 @@ import logger from '../logger.js';
 import formidable from 'formidable';
 import fs from 'fs-extra';
 import { randomUUID } from 'crypto';
+import { validate } from 'uuid';
 import Papa from 'papaparse';
 import tar from 'tar';
 import rWrapper from 'r-wrapper';
@@ -72,7 +73,8 @@ async function importUserSession(connection, data, userSchema) {
 }
 
 function upload(req, res, next) {
-  const id = randomUUID();
+  const id = req.params.id;
+  if (!validate(id)) next(new Error('Invalid ID'));
   const form = formidable({
     uploadDir: path.resolve(config.folders.input, id),
     multiples: true,
@@ -108,7 +110,8 @@ async function associationWrapper(req, res, next) {
   const sessionId = id || randomUUID();
   // create directory for results if needed
   const savePath = sessionId ? path.join(sessionId, 'results', fn, '/') : null;
-  if (sessionId) fs.mkdirSync(path.join(rConfig.wd, savePath), { recursive: true });
+  if (sessionId)
+    fs.mkdirSync(path.join(rConfig.wd, savePath), { recursive: true });
   try {
     const wrapper = await r('services/R/associationWrapper.R', 'wrapper', {
       fn,
@@ -287,7 +290,7 @@ const getDataUsingS3Select = (params) => {
 };
 
 const router = express.Router();
-router.post('/upload', upload);
+router.post('/upload/:id', upload);
 router.get('/getExposureExample/:example', getExposureExample);
 router.get('/getPublications', getPublications);
 router.post('/getImageS3Batch', getImageS3Batch);
