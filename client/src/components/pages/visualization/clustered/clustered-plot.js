@@ -7,7 +7,7 @@ import { useClusteredQuery } from './apiSlice';
 
 export default function ClusteredPlot() {
   const store = useSelector((state) => state.visualization);
-  const { cluster, projectID } = store.userForm;
+  const { cluster, id } = store.userForm;
   const { sample } = store.clustered;
 
   const [params, setParams] = useState();
@@ -18,9 +18,9 @@ export default function ClusteredPlot() {
 
   // query cluster data
   useEffect(() => {
-    if (cluster && projectID && sample) {
+    if (cluster && id && sample) {
       const params = {
-        userId: projectID,
+        userId: id,
         sample: sample.value,
       };
 

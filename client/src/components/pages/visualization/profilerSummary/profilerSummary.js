@@ -12,7 +12,7 @@ import { actions } from '../../../../services/store/visualization';
 export default function ProfilerSummary() {
   const store = useSelector((state) => state.visualization);
   const publicForm = store.publicForm;
-  const { matrixData, source, projectID } = store.main;
+  const { matrixData, source, id } = store.main;
   const { filter } = store.profilerSummary;
 
   const dispatch = useDispatch();
@@ -50,7 +50,7 @@ export default function ProfilerSummary() {
         study: publicForm.study.value,
         cancer: publicForm.cancer.value,
         strategy: publicForm.strategy.value,
-        ...(source == 'user' && { userId: projectID }),
+        ...(source == 'user' && { userId: id }),
         ...(filter?.value !== false && { filter: filter.value }),
       };
       if (source == 'public' || (source == 'user' && filter?.label)) {

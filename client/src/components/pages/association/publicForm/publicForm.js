@@ -104,7 +104,7 @@ export default function PublicForm() {
         getExpVarData(),
       ]);
 
-      const { projectID, output: assocOutput } = assocResponse;
+      const { id, output: assocOutput } = assocResponse;
       const { output: expOutput } = expResponse;
 
       if (assocOutput.uncaughtError) throw assocOutput.uncaughtError;
@@ -118,7 +118,7 @@ export default function PublicForm() {
         displayTab: 'univariable',
         openSidebar: false,
       });
-      dispatch(actions.mergeAssociation({ univariable: { projectID } }));
+      dispatch(actions.mergeAssociation({ univariable: { id } }));
     } catch (error) {
       if (error.originalStatus == 504) {
         mergeState({

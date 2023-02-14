@@ -20,7 +20,7 @@ export default function MsIndividualPlot({ state }) {
   const dispatch = useDispatch();
   const exposure = useSelector((state) => state.exposure);
   const { sample, plotPath, debugR, err, loading } = exposure.msIndividual;
-  const { projectID, publicSampleOptions, userSampleOptions, source } =
+  const { id, publicSampleOptions, userSampleOptions, source } =
     exposure.main;
 
   const mergeMsIndividual = (state) =>

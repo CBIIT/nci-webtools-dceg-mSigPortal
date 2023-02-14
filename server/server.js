@@ -1,11 +1,11 @@
-const path = require('path');
-const express = require('express');
-const fs = require('fs');
-const knex = require('knex');
-const logger = require('./services/logger');
-const { createDatabaseCache } = require('./services/cache');
-const { apiRouter } = require('./routes/router');
-const config = require('./config.json');
+import path from 'path';
+import express from 'express';
+import fs from 'fs';
+import knex from 'knex';
+import logger from './services/logger.js';
+import { createDatabaseCache } from './services/cache.js';
+import { apiRouter } from './routes/router.js';
+import config from './config.json' assert { type: 'json' };
 
 const app = createApp(config);
 const server = app.listen(config.server.port, () => {
@@ -29,7 +29,7 @@ function createApp(config) {
     knex({
       client: 'better-sqlite3',
       connection: () => ({
-        filename: path.join(config.results.folder, userId, `${db}.sqlite3`),
+        filename: path.join(config.folders.output, userId, `${db}.sqlite3`),
       }),
       useNullAsDefault: true,
     });
@@ -37,8 +37,6 @@ function createApp(config) {
   app.locals.cache.initialize();
 
   app.use(apiRouter);
-  // app.use(express.static(config.server.static));
-  // app.use(express.static(path.resolve('www')));
 
   // create required folders
   for (let folder of [config.logs.folder, config.results.folder]) {

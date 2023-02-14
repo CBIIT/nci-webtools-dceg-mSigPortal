@@ -31,7 +31,7 @@ export default function Download({ exposureDownload }) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id: exposure.main.projectID,
+        id: exposure.main.id,
         state: {
           ...exposure,
           main: { ...exposure.main, displayTab: 'tmb' },

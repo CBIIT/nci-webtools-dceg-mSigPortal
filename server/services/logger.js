@@ -1,10 +1,13 @@
-const util = require('util');
-const path = require('path');
-const { createLogger, format, transports } = require('winston');
-const { folder, level } = require('../config.json').logs;
-require('winston-daily-rotate-file');
+import util from 'util';
+import path from 'path';
+import winston from 'winston';
+import config from '../config.json' assert { type: 'json' };
+import 'winston-daily-rotate-file';
 
-module.exports = new createLogger({
+const { createLogger, format, transports } = winston;
+const { folder, level } = config.logs;
+
+export default new createLogger({
   level: level || 'info',
   format: format.combine(
     format.colorize(),

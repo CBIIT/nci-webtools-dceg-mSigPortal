@@ -46,7 +46,7 @@ export default function Multivariable() {
     loadingCalculate,
     loadingRecalculate,
     error,
-    projectID,
+    id,
     plotPath,
     dataPath,
     assocTablePath,
@@ -196,7 +196,7 @@ export default function Multivariable() {
           collapseOptions: [],
         },
       ],
-      projectID: '',
+      id: '',
       plotPath: '',
       dataPath: '',
       assocTablePath: '',
@@ -223,7 +223,7 @@ export default function Multivariable() {
       });
       try {
         const {
-          projectID: id,
+          id,
           stdout,
           output,
         } = await (
@@ -235,7 +235,7 @@ export default function Multivariable() {
             },
             body: JSON.stringify({
               fn: 'multivariable',
-              projectID,
+              id,
               args: {
                 study,
                 strategy,
@@ -282,7 +282,7 @@ export default function Multivariable() {
           });
         } else {
           mergeState({
-            projectID: id,
+            id,
             plotPath,
             dataPath,
             assocTablePath,
@@ -657,7 +657,7 @@ export default function Multivariable() {
                   pagination={resultsTable.pagination}
                   hidden={resultsTable.hidden}
                   downloadName="Download Association Result"
-                  downloadLink={projectID + assocTablePath}
+                  downloadLink={id + assocTablePath}
                   mergeState={async (e) =>
                     await mergeState({ resultsTable: { ...e } })
                   }

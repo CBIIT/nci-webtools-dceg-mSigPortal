@@ -1,12 +1,11 @@
-const { Router } = require('express');
-const { getPublicationData } = require('../../query');
-const { pickNonNullValues } = require('../../utils');
+import { Router } from 'express';
+import { getPublicationData } from '../../query.js';
+import { pickNonNullValues } from '../../utils.js';
 
 async function queryPublications(req, res, next) {
   try {
     const { limit, offset, ...query } = req.query;
     const connection = req.app.locals.connection;
-
     const columns = '*';
     const data = await getPublicationData(
       connection,
@@ -23,7 +22,6 @@ async function queryPublications(req, res, next) {
 }
 
 const router = Router();
-
 router.get('/publications', queryPublications);
 
-module.exports = { router, queryPublications };
+export { router, queryPublications };

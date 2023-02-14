@@ -31,7 +31,7 @@ export default function PcReference() {
     );
 
   const { study, cancer, strategy } = store.publicForm;
-  const { source, matrixData, projectID } = store.main;
+  const { source, matrixData, id } = store.main;
   const { referenceForm } = store.profileComparison;
 
   // main form
@@ -149,7 +149,7 @@ export default function PcReference() {
         cancer: cancer.value,
         strategy: strategy.value,
       }),
-      ...(source == 'user' && { userId: projectID }),
+      ...(source == 'user' && { userId: id }),
       profile: profile.value,
       sample: sample.value,
       matrix:

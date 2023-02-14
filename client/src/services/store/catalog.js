@@ -9,7 +9,7 @@ export const getInitialState = () => ({
     exposureSignature: [],
     exposureCancer: [],
     refSigData: [],
-    projectID: '',
+    id: '',
     submitted: false,
   },
   etiology: {
@@ -25,7 +25,7 @@ export const getInitialState = () => ({
     displayTab: 'overview',
     refSigData: [],
     exposureSignature: [],
-    projectID: '',
+    id: '',
   },
   sigRefSig: {
     plot: '',

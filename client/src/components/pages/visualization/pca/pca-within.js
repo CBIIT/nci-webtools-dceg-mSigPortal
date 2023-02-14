@@ -20,7 +20,7 @@ export default function CsWithin() {
     );
 
   const { study, cancer, strategy } = store.publicForm;
-  const { source, matrixData, matrixList, projectID } = store.main;
+  const { source, matrixData, matrixList, id } = store.main;
   const { withinForm } = store.pca;
 
   const [calculationQuery, setCalculationQuery] = useState('');
@@ -86,7 +86,7 @@ export default function CsWithin() {
                     defaultMatrix(data.profile.value, ['96', '78', '83'])
               )[0].Path,
             },
-            projectID,
+            id,
           }
         : {
             fn: 'pcaPublic',
@@ -97,7 +97,7 @@ export default function CsWithin() {
               cancerType: cancer.value,
               experimentalStrategy: strategy.value,
             },
-            projectID,
+            id,
           };
     setCalculationQuery(params);
   }

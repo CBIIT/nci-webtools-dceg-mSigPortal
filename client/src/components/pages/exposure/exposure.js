@@ -40,7 +40,7 @@ export default function Exposure() {
 
   // const [variableFileObj, setVariable] = useState(new File([], ''));
 
-  const { displayTab, source, loading, projectID, openSidebar, submitted } =
+  const { displayTab, source, loading, id, openSidebar, submitted } =
     main;
 
   // load example if available
@@ -72,7 +72,7 @@ export default function Exposure() {
     });
   }
 
-  async function submitR(fn, args, id = projectID) {
+  async function submitR(fn, args, id = id) {
     try {
       const response = await fetch(`web/explorationWrapper`, {
         method: 'POST',
@@ -83,7 +83,7 @@ export default function Exposure() {
         body: JSON.stringify({
           fn: fn,
           args: args,
-          projectID: id,
+          id,
         }),
       });
 
@@ -116,9 +116,9 @@ export default function Exposure() {
   //         mergeError([msg, error]);
   //         reject(error);
   //       } else {
-  //         const { projectID } = await response.json();
-  //         await mergeState({ projectID });
-  //         resolve(projectID);
+  //         const { id } = await response.json();
+  //         await mergeState({ id });
+  //         resolve(id);
   //       }
   //     } catch (err) {
   //       mergeError(err.message);
@@ -135,7 +135,7 @@ export default function Exposure() {
 
   async function exposureDownload() {
     try {
-      const { output, projectID, stdout } = await submitR('exposureDownload', {
+      const { output, id, stdout } = await submitR('exposureDownload', {
         study: publicForm.study.value,
         strategy: publicForm.strategy.value,
         rsSet: publicForm.signatureSet.value,

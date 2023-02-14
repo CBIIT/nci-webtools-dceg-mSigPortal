@@ -10,7 +10,7 @@ export default function MutProfilePlot() {
 
   const { sample, profile, matrix, filter } = store.mutationalProfiles;
   const { study, cancer, strategy } = store.publicForm;
-  const { source, projectID } = store.main;
+  const { source, id } = store.main;
 
   const [params, setParams] = useState(null);
 
@@ -25,7 +25,7 @@ export default function MutProfilePlot() {
         study: study.value,
         cancer: cancer.value,
         strategy: strategy.value,
-        ...(source == 'user' && { userId: projectID, filter: filter.value }),
+        ...(source == 'user' && { userId: id, filter: filter.value }),
         sample: sample.value,
         profile: profile.value,
         matrix: matrix.value,

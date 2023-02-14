@@ -11,7 +11,7 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 export default function MutPatternPlot() {
   const store = useSelector((state) => state.visualization);
   const { study, cancer, strategy } = store.publicForm;
-  const { source, projectID, matrixList } = store.main;
+  const { source, id, matrixList } = store.main;
   const { proportion, pattern } = store.mutationalPattern;
 
   const [scatterParams, setScatterParams] = useState('');
@@ -60,7 +60,7 @@ export default function MutPatternPlot() {
           cancer: cancer.value,
           strategy: strategy.value,
         }),
-        ...(source == 'user' && { userId: projectID }),
+        ...(source == 'user' && { userId: id }),
       });
     }
   }, [study, proportion, pattern]);
@@ -81,7 +81,7 @@ export default function MutPatternPlot() {
           matrixFile: matrixList.filter(
             (e) => e.profile == 'SBS' && e.matrix == '96'
           )[0].Path,
-          userId: projectID,
+          userId: id,
         });
       }
     }

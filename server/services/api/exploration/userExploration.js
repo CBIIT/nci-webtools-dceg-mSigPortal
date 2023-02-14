@@ -1,19 +1,20 @@
-const { Router } = require('express');
-const { validate } = require('uuid');
-const path = require('path');
-const config = require('../../../config.json');
-const logger = require('../../logger');
-const { parseCSV, importUserSession } = require('../analysis');
-const { schema } = require('./userSchema');
-const { getSignatureData } = require('../../query');
+import express from 'express';
+import { validate } from 'uuid';
+import path from 'path';
+import config from '../../../config.json' assert { type: 'json' };
+import logger from '../../logger.js';
+import { parseCSV, importUserSession } from '../general.js';
+import { schema } from './userSchema.js';
+import { getSignatureData } from '../../query.js';
+import fs from 'fs';
+const { Router } = express;
 
 async function submit(req, res, next) {
   const id = req.params.id;
   if (!validate(id)) res.status(500).json('Invalid ID');
-
-  const inputFolder = path.resolve(config.results.folder, id);
-  const outputFolder = path.resolve(config.results.folder, id);
-
+  const inputFolder = path.resolve(config.folders.input, id);
+  const outputFolder = path.resolve(config.folders.output, id);
+  fs.mkdirSync(outputFolder, { recursive: true });
   const { exposureFile, matrixFile, signatureFile, signatureSetName } =
     req.body;
   const exposurePath = path.resolve(inputFolder, exposureFile);
@@ -86,7 +87,6 @@ async function submit(req, res, next) {
     );
     if (!importStatus)
       res.status(500).json('Failed to import data into database');
-
     res.json(id);
   } catch (error) {
     logger.error(error);
@@ -95,7 +95,6 @@ async function submit(req, res, next) {
 }
 
 const router = Router();
-
 router.post('/submitExploration/:id', submit);
 
-module.exports = { router };
+export { router };

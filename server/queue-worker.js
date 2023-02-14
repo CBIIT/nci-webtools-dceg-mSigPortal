@@ -1,21 +1,22 @@
-const fs = require('fs');
-const path = require('path');
-const AWS = require('aws-sdk');
-const nodemailer = require('nodemailer');
-const r = require('r-wrapper').async;
-const tar = require('tar');
-const config = require('./config.json');
-const logger = require('./services/logger');
-const { parseCSV } = require('./services/api/analysis');
-const {
+import fs from 'fs';
+import path from 'path';
+import AWS from 'aws-sdk';
+import nodemailer from 'nodemailer';
+import rWrapper from 'r-wrapper';
+import tar from 'tar';
+import config from './config.json' assert { type: 'json' };
+import logger from './services/logger.js';
+import { parseCSV } from './services/api/analysis.js';
+import {
   getRelativePath,
   profilerExtraction,
-} = require('./services/api/visualization/userVisualization');
-const {
+} from './services/api/visualization/userVisualization.js';
+import {
   defaultProfile,
   defaultMatrix,
   defaultFilter,
-} = require('./services/utils');
+} from './services/utils.js';
+const r = rWrapper.async;
 
 (async function main() {
   // update aws configuration if all keys are supplied, otherwise
@@ -23,15 +24,12 @@ const {
   if (config.aws) {
     AWS.config.update(config.aws);
   }
-
   // create required folders
   for (let folder of [config.logs.folder, config.results.folder]) {
     fs.mkdirSync(folder, { recursive: true });
   }
-
   receiveMessage();
 })();
-
 /**
  * Reads a template, substituting {tokens} with data values
  * @param {string} filepath
@@ -39,14 +37,12 @@ const {
  */
 async function readTemplate(filePath, data) {
   const template = await fs.promises.readFile(path.resolve(filePath));
-
   // replace {tokens} with data values or removes them if not found
   return String(template).replace(
     /{[^{}]+}/g,
     (key) => data[key.replace(/[{}]+/g, '')] || ''
   );
 }
-
 /**
  * Writes the contents of a stream to a file and resolves once complete
  * @param {*} readStream
@@ -60,7 +56,6 @@ function streamToFile(readStream, filePath) {
     stream.on('close', (_) => resolve());
   });
 }
-
 /**
  * Downloads work files from s3 for calculation
  * @param {string} id
@@ -74,12 +69,10 @@ async function downloadS3(id, savePath) {
       Prefix: `${config.queue.inputKeyPrefix}${id}/`,
     })
     .promise();
-
   // download work files
   for (let { Key } of objects.Contents) {
     const filename = path.basename(Key);
     const filepath = path.resolve(savePath, filename);
-
     logger.info(`Downloading: ${Key}`);
     const object = await s3
       .getObject({
@@ -87,7 +80,6 @@ async function downloadS3(id, savePath) {
         Key,
       })
       .promise();
-
     await fs.promises.writeFile(filepath, object.Body);
     // extract and delete archive
     if (path.extname(filename) == '.tgz') {
@@ -101,39 +93,33 @@ async function downloadS3(id, savePath) {
     }
   }
 }
-
 /**
  * Processes a message and sends emails when finished
  * @param {object} params
  */
 async function processMessage(params) {
   const { args, state: visualizationStore, timestamp } = params;
-  const id = args.projectID[1];
+  const id = args.id[1];
   const s3 = new AWS.S3();
   const mailer = nodemailer.createTransport(config.email.smtp);
-
   try {
     // Setup folders
     const directory = path.resolve(config.results.folder, id);
     await fs.promises.mkdir(directory, { recursive: true });
-
     const rConfig = {
       s3Data: config.data.s3,
       bucket: config.data.bucket,
       localData: path.resolve(config.data.localData),
       wd: path.resolve(config.results.folder),
     };
-
     // python extraction
     const start = new Date().getTime();
     await downloadS3(id, directory);
     const { stdout, stderr, projectPath } = await profilerExtraction(args);
     // logger.debug('stdout:' + stdout);
     // logger.debug('stderr:' + stderr);
-
     const matrixPath = path.join(directory, 'results/matrix_files_list.txt');
     const svgPath = path.join(directory, 'results/svg_files_list.txt');
-
     if (!fs.existsSync(svgPath)) {
       logger.error(stdout);
       logger.error(stderr);
@@ -144,15 +130,12 @@ async function processMessage(params) {
       error.stderr = stderr;
       throw error;
     }
-
     if (!fs.existsSync(matrixPath))
       throw `matrix file lists does not exist at ${matrixPath}`;
     if (!fs.existsSync(svgPath))
       throw `svg file list does not exist at ${svgPath}`;
-
     let matrixList = await parseCSV(matrixPath);
     let svgList = await parseCSV(svgPath);
-
     svgList = svgList.map(({ Profile_Type, Matrix_Size, Path, ...e }) => ({
       ...e,
       profileType: Profile_Type,
@@ -167,16 +150,14 @@ async function processMessage(params) {
         Path: getRelativePath({ Path: Path }, id).Path,
       })
     );
-
     let newState = {
       ...visualizationStore,
       state: {
         ...visualizationStore.state,
         submitted: true,
-        projectID: id,
+        id,
       },
     };
-
     // get dropdown options
     // Mutational Profiles
     const nameOptions = [
@@ -186,12 +167,10 @@ async function processMessage(params) {
     const filteredPlots = svgList.filter(
       (row) => row.Sample_Name == selectName
     );
-
     const filteredProfileOptions = [
       ...new Set(filteredPlots.map(({ profileType }) => profileType)),
     ];
     const profile = defaultProfile(filteredProfileOptions);
-
     const filteredMatrixOptions = [
       ...new Set(
         filteredPlots
@@ -199,9 +178,7 @@ async function processMessage(params) {
           .map(({ matrixSize }) => matrixSize)
       ),
     ].sort((a, b) => a - b);
-
     const matrix = defaultMatrix(profile, filteredMatrixOptions);
-
     const filteredFilterOptions = [
       ...new Set(
         filteredPlots
@@ -209,7 +186,6 @@ async function processMessage(params) {
           .map(({ Filter }) => Filter)
       ),
     ];
-
     const filteredMatrixList = [
       ...new Set(
         matrixList
@@ -217,12 +193,10 @@ async function processMessage(params) {
           .map(({ matrixSize }) => matrixSize)
       ),
     ];
-
     newState = {
       ...newState,
       state: { ...newState.state, profileOptions: filteredFilterOptions },
     };
-
     // Cosine Similarity - Profile Comparison - PCA - Kataegis
     const sampleNameOptions = [
       ...new Set(
@@ -233,10 +207,8 @@ async function processMessage(params) {
       ),
     ];
     const profileOptions = [...new Set(svgList.map((row) => row.profileType))];
-
     const selectProfile = defaultProfile(profileOptions);
     const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);
-
     const refSignatureSetOptions = await r(
       'services/R/visualizeWrapper.R',
       'getReferenceSignatureSets',
@@ -245,7 +217,6 @@ async function processMessage(params) {
         config,
       }
     );
-
     newState = {
       ...newState,
       cosineSimilarity: {
@@ -290,7 +261,6 @@ async function processMessage(params) {
         sampleOptions: sampleNameOptions,
       },
     };
-
     // R calculations
     // Profiler Summary
     try {
@@ -312,7 +282,6 @@ async function processMessage(params) {
           },
         }
       );
-
       const { stdout, output } = JSON.parse(profilerSummary);
       if (output.plotPath) {
         newState = {
@@ -329,7 +298,6 @@ async function processMessage(params) {
     } catch (err) {
       logger.error(err);
     }
-
     // cosinse similarity within
     try {
       const csWithinPath = path.join(id, 'results/cosineSimilarityWithin/');
@@ -349,7 +317,6 @@ async function processMessage(params) {
           savePath: csWithinPath,
         },
       });
-
       let { output, stdout } = JSON.parse(csWithin);
       if (output.plotPath) {
         newState = {
@@ -391,7 +358,6 @@ async function processMessage(params) {
         },
       });
       let { output, stdout } = JSON.parse(csRef);
-
       if (output.plotPath) {
         newState = {
           ...newState,
@@ -409,7 +375,6 @@ async function processMessage(params) {
     } catch (err) {
       logger.error(err);
     }
-
     // cosinse similarity public
     try {
       const csPublicPath = path.join(id, 'results/cosineSimilarityPublic/');
@@ -433,7 +398,6 @@ async function processMessage(params) {
         },
       });
       let { output, stdout } = JSON.parse(csPublic);
-
       if (output.plotPath) {
         newState = {
           ...newState,
@@ -451,7 +415,6 @@ async function processMessage(params) {
     } catch (err) {
       logger.error(err);
     }
-
     // mutational pattern
     try {
       const mpPath = path.join(id, 'results/mutationalPattern/');
@@ -477,7 +440,6 @@ async function processMessage(params) {
         }
       );
       let { output, stdout } = JSON.parse(mutationalPattern);
-
       if (output.plotPath) {
         newState = {
           ...newState,
@@ -494,7 +456,6 @@ async function processMessage(params) {
     } catch (err) {
       logger.error(err);
     }
-
     // profile comparison within
     try {
       const pcWithinPath = path.join(id, 'results/profileComparisonWithin/');
@@ -524,7 +485,6 @@ async function processMessage(params) {
         }
       );
       let { output, stdout } = JSON.parse(profileComparisonWithin);
-
       if (output.plotPath) {
         newState = {
           ...newState,
@@ -541,14 +501,12 @@ async function processMessage(params) {
     } catch (err) {
       logger.error(err);
     }
-
     // profile comparison ref
     try {
       const pcRefPath = path.join(id, 'results/profileComparisonRefSig/');
       await fs.promises.mkdir(path.join(config.wd, pcRefPath), {
         recursive: true,
       });
-
       const refCompare = await r(
         'services/R/visualizeWrapper.R',
         'getSignaturesR',
@@ -560,7 +518,6 @@ async function processMessage(params) {
           config,
         }
       );
-
       const profileComparisonRefSig = await r(
         'services/R/visualizeWrapper.R',
         'wrapper',
@@ -585,7 +542,6 @@ async function processMessage(params) {
         }
       );
       let { output, stdout } = JSON.parse(profileComparisonRefSig);
-
       if (output.plotPath) {
         newState = {
           ...newState,
@@ -604,7 +560,6 @@ async function processMessage(params) {
     } catch (err) {
       logger.error(err);
     }
-
     // profile comparison public
     try {
       const pcPubPath = path.join(id, 'results/profileComparisonPublic/');
@@ -635,7 +590,6 @@ async function processMessage(params) {
         }
       );
       let { output, stdout } = JSON.parse(profileComparisonPublic);
-
       if (output.plotPath) {
         newState = {
           ...newState,
@@ -652,7 +606,6 @@ async function processMessage(params) {
     } catch (err) {
       logger.error(err);
     }
-
     // pca
     try {
       const pcaPath = path.join(id, 'results/pca/');
@@ -676,7 +629,6 @@ async function processMessage(params) {
         },
       });
       let { output, stdout } = JSON.parse(pca);
-
       if (output.pca1) {
         newState = {
           ...newState,
@@ -693,7 +645,6 @@ async function processMessage(params) {
     } catch (err) {
       logger.error(err);
     }
-
     // pca public
     try {
       const pcaPublicPath = path.join(id, 'results/pcaWithPublic/');
@@ -722,7 +673,6 @@ async function processMessage(params) {
         }
       );
       let { output, stdout } = JSON.parse(pcaWithPublic);
-
       if (output.pca1) {
         newState = {
           ...newState,
@@ -743,7 +693,6 @@ async function processMessage(params) {
     } catch (err) {
       logger.error(err);
     }
-
     // kataegis
     try {
       const kataegisPath = path.join(id, 'results/kataegis/');
@@ -765,7 +714,6 @@ async function processMessage(params) {
         },
       });
       let { output, stdout } = JSON.parse(kataegis);
-
       if (output.plotPath) {
         newState = {
           ...newState,
@@ -784,15 +732,11 @@ async function processMessage(params) {
     } catch (err) {
       logger.error(err);
     }
-
     const end = new Date().getTime();
-
     const time = end - start;
     const minutes = Math.floor(time / 60000);
     var seconds = ((time % 60000) / 1000).toFixed(0);
-
     const runtime = (minutes > 0 ? minutes + ' min ' : '') + seconds + ' secs';
-
     // upload parameters
     await s3
       .upload({
@@ -801,7 +745,6 @@ async function processMessage(params) {
         Key: `${config.queue.outputKeyPrefix}${id}/params.json`,
       })
       .promise();
-
     // upload archived project directory
     await s3
       .upload({
@@ -812,7 +755,6 @@ async function processMessage(params) {
         Key: `${config.queue.outputKeyPrefix}${id}/${id}.tgz`,
       })
       .promise();
-
     // specify email template variables
     const templateData = {
       jobName: 'mSigPortal',
@@ -821,7 +763,6 @@ async function processMessage(params) {
       resultsUrl: `${config.email.baseUrl}/#/visualization/queue/${id}`,
       supportEmail: config.email.adminSupport,
     };
-
     // send user success email
     logger.info(`Sending user success email`);
     const userEmailResults = await mailer.sendMail({
@@ -833,36 +774,31 @@ async function processMessage(params) {
         templateData
       ),
     });
-
     return true;
   } catch (err) {
     logger.error(err);
-
     const stdout = err.stdout ? err.stdout.toString() : '';
     const stderr = err.stderr ? err.stderr.toString() : '';
-
     // template variables
     const templateData = {
-      id: id,
+      id,
       parameters: JSON.stringify(args, null, 4),
       originalTimestamp: timestamp,
       exception: err.toString(),
       processOutput: !stdout && !stderr ? null : stdout + stderr,
       supportEmail: config.email.adminSupport,
     };
-
     // send techSupport error email
     logger.error(`Sending techSupport error email`);
     const adminEmailResults = await mailer.sendMail({
       from: config.email.adminSupport,
       to: config.email.techSupport,
-      subject: `mSigPortal Error: ${id} - ${timestamp} EST`, // searchable calculation error subject
+      subject: `mSigPortal Error: ${id} - ${timestamp} EST`,
       html: await readTemplate(
         __dirname + '/templates/admin-failure-email.html',
         templateData
       ),
     });
-
     // send user error email
     if (visualizationStore.state.email) {
       logger.error(`Sending user error email`);
@@ -876,25 +812,21 @@ async function processMessage(params) {
         ),
       });
     }
-
     return false;
   }
 }
-
 /**
  * Receives messages from the queue at regular intervals,
  * specified by config.pollInterval
  */
 async function receiveMessage() {
   const sqs = new AWS.SQS();
-
   try {
     // to simplify running multiple workers in parallel,
     // fetch one message at a time
     const { QueueUrl } = await sqs
       .getQueueUrl({ QueueName: config.queue.url })
       .promise();
-
     const data = await sqs
       .receiveMessage({
         QueueUrl: QueueUrl,
@@ -903,14 +835,11 @@ async function receiveMessage() {
         WaitTimeSeconds: 20,
       })
       .promise();
-
     if (data.Messages && data.Messages.length > 0) {
       const message = data.Messages[0];
       const params = JSON.parse(message.Body);
-
-      logger.info(`Received Message ${params.args.projectID[1]}`);
+      logger.info(`Received Message ${params.args.id[1]}`);
       // logger.debug(message.Body);
-
       // while processing is not complete, update the message's visibilityTimeout
       const intervalId = setInterval((_) => {
         logger.debug('refreshing visibility timeout');
@@ -922,11 +851,9 @@ async function receiveMessage() {
           })
           .send();
       }, 1000 * (config.queue.visibilityTimeout - 5));
-
       // processMessage should return a boolean status indicating success or failure
       const status = await processMessage(params);
       clearInterval(intervalId);
-
       // if message was not processed successfully, send it to the
       // error queue (add metadata in future if needed)
       //   if (!status && config.queue.errorUrl) {
@@ -941,7 +868,6 @@ async function receiveMessage() {
       //       })
       //       .promise();
       //   }
-
       // remove original message from queue once processed
       await sqs
         .deleteMessage({

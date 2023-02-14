@@ -1,32 +1,16 @@
-const express = require('express');
-const logger = require('../services/logger');
-const config = require('../config.json');
-
-const { router: analysisRoutes } = require('../services/api/analysis');
-
-const {
-  router: visualizationRoutes,
-} = require('../services/api/visualization/visualization');
-const {
-  router: userVisualizationRoutes,
-} = require('../services/api/visualization/userVisualization');
-const {
-  router: explorationRoutes,
-} = require('../services/api/exploration/exploration');
-const {
-  router: userExplorationRoutes,
-} = require('../services/api/exploration/userExploration');
-const {
-  router: signatureRoutes,
-} = require('../services/api/signature/signature');
-const {
-  router: associationRoutes,
-} = require('../services/api/association/association');
-const { router: etiologyRoutes } = require('../services/api/etiology/etiology');
-const {
-  router: publicationsRoutes,
-} = require('../services/api/publications/publications');
-const { router: patternRoutes } = require('../services/api/pattern/pattern');
+import express from 'express';
+import logger from '../services/logger.js';
+import config from '../config.json' assert { type: 'json' };
+import { router as general } from '../services/api/general.js';
+import { router as visualizationRoutes } from '../services/api/visualization/visualization.js';
+import { router as userVisualizationRoutes } from '../services/api/visualization/userVisualization.js';
+import { router as explorationRoutes } from '../services/api/exploration/exploration.js';
+import { router as userExplorationRoutes } from '../services/api/exploration/userExploration.js';
+import { router as signatureRoutes } from '../services/api/signature/signature.js';
+import { router as associationRoutes } from '../services/api/association/association.js';
+import { router as etiologyRoutes } from '../services/api/etiology/etiology.js';
+import { router as publicationsRoutes } from '../services/api/publications/publications.js';
+import { router as patternRoutes } from '../services/api/pattern/pattern.js';
 
 const router = express.Router();
 
@@ -39,7 +23,7 @@ router.use(
   })
 );
 
-router.use(analysisRoutes);
+router.use(general);
 router.use(visualizationRoutes);
 router.use(userVisualizationRoutes);
 router.use(signatureRoutes);
@@ -49,12 +33,10 @@ router.use(associationRoutes);
 router.use(etiologyRoutes);
 router.use(publicationsRoutes);
 router.use(patternRoutes);
-
 router.get('/ping', (req, res) => res.send(true));
-
 router.use((error, req, res, next) => {
   logger.error(error);
   res.status(500).json([error.message]);
 });
 
-module.exports = router;
+export default router;

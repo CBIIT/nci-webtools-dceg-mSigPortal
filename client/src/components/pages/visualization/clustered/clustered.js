@@ -6,7 +6,7 @@ import ClusteredForm from './clustered-form';
 
 export default function ClusteredIdentification() {
   const store = useSelector((state) => state.visualization);
-  const { cluster, projectID, inputFormat } = store.userForm;
+  const { cluster, id, inputFormat } = store.userForm;
 
   return (
     <div className="bg-white border rounded" style={{ minHeight: '500px' }}>
@@ -34,7 +34,7 @@ export default function ClusteredIdentification() {
         }
       />
       <hr />
-      {cluster && projectID && inputFormat.value == 'vcf' && (
+      {cluster && id && inputFormat.value == 'vcf' && (
         <>
           <ClusteredForm />
           <hr />

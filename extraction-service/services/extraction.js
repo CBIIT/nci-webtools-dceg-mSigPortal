@@ -114,7 +114,7 @@ export async function extraction(
       );
 
       const denovoExploration = await axios.post(
-        `${env.API_BASE_URL}/web/submitExploration/${denovoUpload.data.projectID}`,
+        `${env.API_BASE_URL}/web/submitExploration/${denovoUpload.data.id}`,
         {
           matrixFile: path.parse(paths.matrixFile).base,
           exposureFile: path.parse(paths.denovoExposureFile).base,
@@ -151,7 +151,7 @@ export async function extraction(
       );
 
       const decomposedExploration = await axios.post(
-        `${env.API_BASE_URL}/web/submitExploration/${decomposedUpload.data.projectID}`,
+        `${env.API_BASE_URL}/web/submitExploration/${decomposedUpload.data.id}`,
         {
           matrixFile: path.parse(paths.matrixFile).base,
           exposureFile: path.parse(paths.decomposedExposureFile).base,

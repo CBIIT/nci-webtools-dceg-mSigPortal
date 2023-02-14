@@ -409,7 +409,7 @@ mutationalSignatureIndividual <- function(sample, cancerType, plotPath, exposure
   plot_individual_samples(exposure_refdata_input = exposure_refdata_input, signature_refsets_input = signature_refsets_input, seqmatrix_refdata_input = seqmatrix_refdata_input, condensed = FALSE, output_plot = plotPath)
 }
 
-# exposurePublic <- function(fn, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', individual = '{}', projectID, pythonOutput, rootDir, config$savePath, config$s3Data, config$localData, config$bucket) {
+# exposurePublic <- function(fn, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', individual = '{}', id, pythonOutput, rootDir, config$savePath, config$s3Data, config$localData, config$bucket) {
 exposurePublic <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
@@ -562,7 +562,7 @@ exposurePublic <- function(args, config) {
         print("Landscape of Mutational Signature Activity")
         varDataPath <- ""
         if (stringi::stri_length(landscape$variableFile) > 0) {
-          varDataPath <- file.path(paste0(config$wd, "/", config$projectID), landscape$variableFile)
+          varDataPath <- file.path(paste0(config$wd, "/", config$id), landscape$variableFile)
         }
         mutationalSignatureLandscape(common$cancerType, varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
         output[["landscapePath"]] <- landscapePath
@@ -614,7 +614,7 @@ exposurePublic <- function(args, config) {
   return(c(output, errors))
 }
 
-# exposureUser <- function(args$fn, files, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', individual = '{}', projectID, pythonOutput, rootDir, config$savePath, config$s3Data, config$localData, config$bucket) {
+# exposureUser <- function(args$fn, files, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', individual = '{}', id, pythonOutput, rootDir, config$savePath, config$s3Data, config$localData, config$bucket) {
 exposureUser <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
@@ -641,12 +641,12 @@ exposureUser <- function(args, config) {
   prevalence <- if (is.null(args$prevalence)) list() else fromJSON(args$prevalence)
   individual <- if (is.null(args$individual)) list() else fromJSON(args$individual)
 
-  exposure_refdata_selected <- read_delim(file.path(paste0(config$wd, "/", config$projectID), files$exposureFile), delim = "\t", col_names = T)
-  seqmatrix_refdata_selected <- read_delim(file.path(paste0(config$wd, "/", config$projectID), files$matrixFile), delim = "\t", col_names = T)
+  exposure_refdata_selected <- read_delim(file.path(paste0(config$wd, "/", config$id), files$exposureFile), delim = "\t", col_names = T)
+  seqmatrix_refdata_selected <- read_delim(file.path(paste0(config$wd, "/", config$id), files$matrixFile), delim = "\t", col_names = T)
 
   if (stringi::stri_length(files$signatureFile) > 0) {
     # if using user uploaded signature file
-    signature_refsets_selected <- read_delim(file.path(paste0(config$wd, "/", config$projectID), files$signatureFile), delim = "\t", col_names = T)
+    signature_refsets_selected <- read_delim(file.path(paste0(config$wd, "/", config$id), files$signatureFile), delim = "\t", col_names = T)
   } else {
     # else use public signature data
     s3load(paste0(config$s3Data, "Signature/signature_refsets.RData"), config$bucket)
@@ -773,7 +773,7 @@ exposureUser <- function(args, config) {
         print("Landscape of Mutational Signature Activity")
         varDataPath <- ""
         if (stringi::stri_length(landscape$variableFile) > 0) {
-          varDataPath <- file.path(paste0(config$wd, "/", config$projectID), landscape$variableFile$signatureFile)
+          varDataPath <- file.path(paste0(config$wd, "/", config$id), landscape$variableFile$signatureFile)
         }
         mutationalSignatureLandscape(cancer_type_user, varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
         output[["landscapePath"]] <- landscapePath

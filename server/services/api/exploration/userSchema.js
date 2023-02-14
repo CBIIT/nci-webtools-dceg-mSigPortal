@@ -37,14 +37,12 @@ const schema = [
       table.index(['sample']);
     },
   },
-
   {
     name: 'seqmatrixOption',
     type: 'materializedView',
     dependsOn: ['seqmatrix'],
     create: (connection) => {
       const columns = ['sample'];
-
       return connection.raw(
         [
           `CREATE TABLE seqmatrixOption AS`,
@@ -63,7 +61,6 @@ const schema = [
     dependsOn: ['signature'],
     create: (connection) => {
       const columns = ['signatureName'];
-
       return connection.raw(
         [
           `CREATE TABLE signatureOption AS`,
@@ -82,7 +79,6 @@ const schema = [
     dependsOn: ['exposure'],
     create: (connection) => {
       const columns = ['sample'];
-
       return connection.raw(
         [
           `CREATE TABLE exposureOption AS`,
@@ -96,5 +92,4 @@ const schema = [
     },
   },
 ];
-
-module.exports = { schema };
+export { schema };

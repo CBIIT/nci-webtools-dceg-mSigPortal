@@ -22,7 +22,7 @@ export default function CsPublic() {
       })
     );
 
-  const { matrixData, matrixList, projectID } = store.main;
+  const { matrixData, matrixList, id } = store.main;
   const { withinForm } = store.cosineSimilarity;
 
   const [params, setParams] = useState('');
@@ -107,7 +107,7 @@ export default function CsPublic() {
             e.matrix == defaultMatrix(data.profile.value, ['96', '78', '83'])
         )[0].Path,
       },
-      projectID,
+      id,
     };
     setParams(params);
   }

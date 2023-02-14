@@ -25,7 +25,7 @@ export default function CsReference() {
     );
 
   const { study, cancer, strategy } = store.publicForm;
-  const { source, matrixData, matrixList, projectID } = store.main;
+  const { source, matrixData, matrixList, id } = store.main;
   const { referenceForm } = store.cosineSimilarity;
 
   // main form
@@ -101,7 +101,7 @@ export default function CsReference() {
                   e.matrix == defaultMatrix(profile.value, ['96', '78', '83'])
               )[0].Path,
             },
-            projectID,
+            id,
           }
         : {
             fn: 'cosineSimilarityRefSigPublic',
@@ -112,7 +112,7 @@ export default function CsReference() {
               cancerType: cancer.value,
               experimentalStrategy: strategy.value,
             },
-            projectID,
+            id,
           };
     setCalculationQuery(params);
   }

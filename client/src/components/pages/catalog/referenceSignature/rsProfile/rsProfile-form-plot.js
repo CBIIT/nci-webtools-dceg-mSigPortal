@@ -36,7 +36,7 @@ export default function ProfileFormPlot({ options, index }) {
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const { matrixList, projectID } = store.main;
+  const { matrixList, id } = store.main;
   const { refSigData, sample } = store.referenceSignature;
 
   const { plots, err, loading } = store.rSProfiles;

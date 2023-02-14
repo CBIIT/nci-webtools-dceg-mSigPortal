@@ -1,4 +1,4 @@
-function createDatabaseCache(connection, tableName = 'cache') {
+export function createDatabaseCache(connection, tableName = 'cache') {
   return {
     initialize: async () => {
       if (!(await connection.schema.hasTable(tableName))) {
@@ -27,7 +27,7 @@ function createDatabaseCache(connection, tableName = 'cache') {
   };
 }
 
-function createCacheMiddleware(getCacheKey) {
+export function createCacheMiddleware(getCacheKey) {
   return async (req, res, next) => {
     try {
       const key = await getCacheKey(req);
@@ -48,8 +48,3 @@ function createCacheMiddleware(getCacheKey) {
     }
   };
 }
-
-module.exports = {
-  createDatabaseCache,
-  createCacheMiddleware,
-};

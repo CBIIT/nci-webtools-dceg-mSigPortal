@@ -22,7 +22,7 @@ export default function CsWithin() {
     );
 
   const { study, cancer, strategy } = store.publicForm;
-  const { source, matrixData, matrixList, projectID } = store.main;
+  const { source, matrixData, matrixList, id } = store.main;
   const { withinForm } = store.cosineSimilarity;
 
   const [params, setParams] = useState('');
@@ -81,7 +81,7 @@ export default function CsWithin() {
                   e.matrix == data.matrix.value
               )[0].Path,
             },
-            projectID,
+            id,
           }
         : {
             fn: 'cosineSimilarityWithinPublic',
@@ -92,7 +92,7 @@ export default function CsWithin() {
               cancerType: cancer.value,
               experimentalStrategy: strategy.value,
             },
-            projectID,
+            id,
           };
     setParams(params);
   }
