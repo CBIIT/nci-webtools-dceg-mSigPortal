@@ -1,15 +1,14 @@
-const { Router } = require('express');
-const {
+import { Router } from 'express';
+import {
   getSignatureData,
   getSignatureOptions,
   getSignatureSummary,
-} = require('../../query');
+} from '../../query.js';
 
 async function querySignature(req, res, next) {
   try {
     const { limit, offset, scalarValue, ...query } = req.query;
     const connection = req.app.locals.connection;
-
     const columns = '*';
     const rowMode = 'object';
     const distinct = true;
@@ -40,13 +39,11 @@ async function querySignature(req, res, next) {
     next(error);
   }
 }
-
 // query public exploration options for exploration tab
 async function signatureOptions(req, res, next) {
   try {
     const { limit, offset, ...query } = req.query;
     const connection = req.app.locals.connection;
-
     const columns = '*';
     const data = await getSignatureOptions(
       connection,
@@ -60,13 +57,11 @@ async function signatureOptions(req, res, next) {
     next(error);
   }
 }
-
 // query signature summary data for catalog RS tab
 async function signatureSummary(req, res, next) {
   try {
     const { limit, offset, ...query } = req.query;
     const connection = req.app.locals.connection;
-
     const columns = '*';
     const data = await getSignatureSummary(
       connection,
@@ -80,11 +75,9 @@ async function signatureSummary(req, res, next) {
     next(error);
   }
 }
-
 const router = Router();
-
 router.get('/mutational_signature', querySignature);
 router.get('/mutational_signature_options', signatureOptions);
 router.get('/mutational_signature_summary', signatureSummary);
 
-module.exports = { router, querySignature };
+export { router, querySignature };

@@ -38,14 +38,12 @@ const schema = [
       table.index(['sample']);
     },
   },
-
   {
     name: 'seqmatrixOption',
     type: 'materializedView',
     dependsOn: ['seqmatrix'],
     create: (connection) => {
       const columns = ['profile', 'matrix', 'sample', 'filter'];
-
       return connection.raw(
         [
           `CREATE TABLE seqmatrixOption AS`,
@@ -58,14 +56,12 @@ const schema = [
       table.index(['profile', 'matrix', 'sample', 'filter']);
     },
   },
-
   {
     name: 'seqmatrixSummary',
     type: 'materializedView',
     dependsOn: ['seqmatrix'],
     create: (connection) => {
-      return connection.raw(
-        `
+      return connection.raw(`
           CREATE TABLE seqmatrixSummary AS
           WITH records AS (
             SELECT        
@@ -88,8 +84,7 @@ const schema = [
           WHERE totalMutations > 0
           GROUP BY sample, profile, totalMutations
           ORDER BY profile
-          `
-      );
+          `);
     },
     index: (table) => {
       table.index(['sample', 'profile', 'matrix', 'filter']);
@@ -97,4 +92,4 @@ const schema = [
   },
 ];
 
-module.exports = { schema };
+export { schema };

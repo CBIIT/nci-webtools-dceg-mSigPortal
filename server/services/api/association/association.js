@@ -1,11 +1,10 @@
-const { Router } = require('express');
-const { getAssociationData, getAssociationOptions } = require('../../query');
+import { Router } from 'express';
+import { getAssociationData, getAssociationOptions } from '../../query.js';
 
 async function queryAssociation(req, res, next) {
   try {
     const { limit, offset, ...query } = req.query;
     const connection = req.app.locals.connection;
-
     const columns = '*';
     const data = await getAssociationData(
       connection,
@@ -24,7 +23,6 @@ async function associationOptions(req, res, next) {
   try {
     const { limit, offset, ...query } = req.query;
     const connection = req.app.locals.connection;
-
     const columns = '*';
     const data = await getAssociationOptions(
       connection,
@@ -40,8 +38,7 @@ async function associationOptions(req, res, next) {
 }
 
 const router = Router();
-
 router.get('/signature_association', queryAssociation);
 router.get('/signature_association_options', associationOptions);
 
-module.exports = { router, queryAssociation, associationOptions };
+export { router, queryAssociation, associationOptions };

@@ -1,17 +1,15 @@
-const { Router } = require('express');
-const {
+import { Router } from 'express';
+import {
   getEtiologyOptions,
   getEtiologyData,
   getEtiologyOrganData,
-  getEtiologySignatureData,
-} = require('../../query');
-const { pickNonNullValues } = require('../../utils');
+} from '../../query.js';
+import { pickNonNullValues } from '../../utils.js';
 
 async function queryEtiologyOptions(req, res, next) {
   try {
     const { limit, offset, ...query } = req.query;
     const connection = req.app.locals.connection;
-
     const columns = '*';
     const data = await getEtiologyOptions(
       connection,
@@ -31,7 +29,6 @@ async function queryEtiology(req, res, next) {
   try {
     const { limit, offset, ...query } = req.query;
     const connection = req.app.locals.connection;
-
     const columns = '*';
     const data = await getEtiologyData(
       connection,
@@ -51,7 +48,6 @@ async function queryEtiologyOrgan(req, res, next) {
   try {
     const { limit, offset, ...query } = req.query;
     const connection = req.app.locals.connection;
-
     const columns = '*';
     const data = await getEtiologyOrganData(
       connection,
@@ -68,11 +64,8 @@ async function queryEtiologyOrgan(req, res, next) {
 }
 
 const router = Router();
-
 router.get('/signature_etiology_options', queryEtiologyOptions);
-
 router.get('/signature_etiology', queryEtiology);
-
 router.get('/signature_etiology_organ', queryEtiologyOrgan);
 
-module.exports = { router, queryEtiologyOptions };
+export { router, queryEtiologyOptions };

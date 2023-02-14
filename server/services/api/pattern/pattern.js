@@ -1,9 +1,9 @@
-const { Router } = require('express');
-const logger = require('../../logger');
-const { getPatternData } = require('../../query');
-const { wrapper } = require('../visualization/userVisualization');
-const path = require('path');
-const config = require('../../../config.json');
+import { Router } from 'express';
+import logger from '../../logger.js';
+import { getPatternData } from '../../query.js';
+import { wrapper } from '../visualization/userVisualization.js';
+import path from 'path';
+import config from '../../../config.json' assert { type: 'json' };
 
 // for public data, query the pattern table
 // for user data, generate pattern data in R
@@ -13,11 +13,9 @@ async function queryPattern(req, res, next) {
     if (query.study) {
       // public data query
       const connection = req.app.locals.connection;
-
       const columns = '*';
       let sql = getPatternData(connection, query, columns, limit, offset);
       if (proportion) sql = sql.where('n1', '>', proportion);
-
       res.json(await sql);
     } else {
       // generate for user data
@@ -34,7 +32,6 @@ async function queryPattern(req, res, next) {
         },
         config: {},
       };
-
       const { output, ...logs } = await wrapper('wrapper', params);
       logger.debug(logs);
       res.json(output);
@@ -45,7 +42,6 @@ async function queryPattern(req, res, next) {
 }
 
 const router = Router();
-
 router.get('/pattern', queryPattern);
 
-module.exports = { router, queryPattern };
+export { router, queryPattern };

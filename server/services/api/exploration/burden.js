@@ -1,4 +1,4 @@
-const { groupBy } = require('lodash');
+import { groupBy } from 'lodash-es';
 
 function calculateBurden(exposure, study) {
   const genome = { PCAWG: 'GRCh37', TCGA: 'GRCh37' };
@@ -14,7 +14,6 @@ function calculateBurden(exposure, study) {
   // const genomeSize = genomeSize[genome[study]];
   return Math.log10(exposure / genomeSize);
 }
-
 // Calculate the number of mutations (burden) per megabase for each study
 function addBurden(data, study) {
   // calculate burden per cancer/sample and append to data
@@ -35,7 +34,6 @@ function addBurden(data, study) {
       return samples;
     })
     .reduce((obj, e) => ({ ...obj, ...e }), {});
-
   return data.map((e) => ({
     ...e,
     cancerBurden: cancerBurden[e.sample],
@@ -43,4 +41,4 @@ function addBurden(data, study) {
   }));
 }
 
-module.exports = { addBurden };
+export { addBurden };

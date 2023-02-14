@@ -1,16 +1,17 @@
-const path = require('path');
-const logger = require('../logger');
-const formidable = require('formidable');
-const fs = require('fs-extra');
-const { randomUUID } = require('crypto');
-const Papa = require('papaparse');
-const tar = require('tar');
-const r = require('r-wrapper').async;
-const AWS = require('aws-sdk');
-const XLSX = require('xlsx');
-const replace = require('replace-in-file');
-const express = require('express');
-const config = require('../../config.json');
+import path from 'path';
+import logger from '../logger.js';
+import formidable from 'formidable';
+import fs from 'fs-extra';
+import { randomUUID } from 'crypto';
+import Papa from 'papaparse';
+import tar from 'tar';
+import rWrapper from 'r-wrapper';
+import AWS from 'aws-sdk';
+import XLSX from 'xlsx';
+import replace from 'replace-in-file';
+import express from 'express';
+import config from '../../config.json' assert { type: 'json' };
+const r = rWrapper.async;
 
 if (config.aws) AWS.config.update(config.aws);
 
@@ -45,7 +46,6 @@ async function importUserSession(connection, data, userSchema) {
     (e) => e.type === 'materializedView'
   );
   const indexedTables = userSchema.filter((s) => typeof s.index === 'function');
-
   try {
     // create tables
     for (const { name, schema } of tables) {
@@ -53,21 +53,17 @@ async function importUserSession(connection, data, userSchema) {
         schema(table, connection)
       );
     }
-
     // import data
     for (const [tableName, tableData] of Object.entries(data))
       await connection.batchInsert(tableName, tableData, 100);
-
     // create "materialized" style tables
     for (const { create } of materializedViews) {
       await create(connection);
     }
-
     // index tables
     for (const { name, index } of indexedTables) {
       await connection.schema.table(name, index);
     }
-
     return true;
   } catch (error) {
     logger.error(error);
@@ -76,40 +72,31 @@ async function importUserSession(connection, data, userSchema) {
 }
 
 function upload(req, res, next) {
-  const projectID = randomUUID();
+  const id = randomUUID();
   const form = formidable({
-    uploadDir: path.join(config.results.folder, projectID),
+    uploadDir: path.resolve(config.folders.input, id),
     multiples: true,
   });
 
-  logger.info(`/upload: Request Project ID:${projectID}`);
-
-  fs.mkdirSync(form.uploadDir);
+  logger.info(`/upload: Request Project ID:${id}`);
+  console.log(form.uploadDir);
+  fs.mkdirSync(form.uploadDir, { recursive: true });
 
   form
     .on('fileBegin', (field, file) => {
-      uploadPath = path.join(form.uploadDir, file.name);
-      if (field == 'inputFile') form.filePath = uploadPath;
-      if (field == 'bedFile') form.bedPath = uploadPath;
-      if (field == 'exposureFile') form.exposurePath = uploadPath;
-
-      file.path = uploadPath;
+      const destination = path.join(form.uploadDir, file.name);
+      file.path = destination;
     })
     .on('error', (err) => {
       logger.info('/UPLOAD: An error occured\n' + err);
       logger.error(err);
       res.status(500).json({
-        msg: 'An error occured while trying to upload',
+        msg: 'An error occured during upload',
         err: err,
       });
     })
     .on('end', () => {
-      res.json({
-        projectID: projectID,
-        filePath: form.filePath,
-        bedPath: form.bedPath,
-        exposurePath: form.exposurePath,
-      });
+      res.json({ id });
     });
 
   form.parse(req);
@@ -118,14 +105,11 @@ function upload(req, res, next) {
 async function associationWrapper(req, res, next) {
   const { fn, args, projectID: id } = req.body;
   logger.debug('/associationCalc: %o', { ...req.body });
-
   const projectID = id ? id : randomUUID();
-
   // create directory for results if needed
   const savePath = projectID ? path.join(projectID, 'results', fn, '/') : null;
   if (projectID)
     fs.mkdirSync(path.join(rConfig.wd, savePath), { recursive: true });
-
   try {
     const wrapper = await r('services/R/associationWrapper.R', 'wrapper', {
       fn,
@@ -135,11 +119,8 @@ async function associationWrapper(req, res, next) {
         savePath: savePath,
       },
     });
-
     const { stdout, ...rest } = JSON.parse(wrapper);
-
     logger.debug(stdout);
-
     res.json({
       projectID,
       stdout,
@@ -155,14 +136,12 @@ async function getExposureExample(req, res, next) {
   try {
     const { example } = req.params;
     logger.info(`Fetching Exposure example: ${example}`);
-
     // check exists
     const examplePath = path.resolve(
       config.data.examples,
       'exposure',
       `${example}.tgz`
     );
-
     if (fs.existsSync(examplePath)) {
       // copy example to results with unique id
       const id = randomUUID();
@@ -175,9 +154,7 @@ async function getExposureExample(req, res, next) {
           .on('error', (err) => reject(err))
           .pipe(tar.x({ strip: 1, C: resultsPath }));
       });
-
       const paramsPath = path.join(resultsPath, `params.json`);
-
       // rename file paths with new ID
       let params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
       const oldID = params.main.projectID;
@@ -187,7 +164,6 @@ async function getExposureExample(req, res, next) {
         to: id,
       });
       params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
-
       res.json({
         state: {
           ...params,
@@ -211,7 +187,6 @@ async function getPublications(req, res, next) {
       Key: `${config.data.s3}Others/Publications.xlsx`,
     })
     .createReadStream();
-
   filestream
     .on('data', (data) => buffers.push(data))
     .on('end', () => {
@@ -220,7 +195,6 @@ async function getPublications(req, res, next) {
       excelToJSON(workbook);
     })
     .on('error', next);
-
   function excelToJSON(workbook) {
     const sheetNames = workbook.SheetNames;
     const data = sheetNames.reduce(
@@ -230,7 +204,6 @@ async function getPublications(req, res, next) {
       }),
       {}
     );
-
     res.json(data);
   }
 }
@@ -239,7 +212,6 @@ async function getImageS3Batch(req, res, next) {
   // serve static images from s3
   const { keys } = req.body;
   const s3 = new AWS.S3();
-
   const batch = Object.fromEntries(
     await Promise.all(
       (keys || []).map((Key) => {
@@ -261,7 +233,6 @@ async function getImageS3Batch(req, res, next) {
       })
     )
   );
-
   res.json(batch);
 }
 
@@ -269,7 +240,6 @@ async function getImageS3(req, res, next) {
   // serve static images from s3
   const key = req.body.path;
   const s3 = new AWS.S3();
-
   s3.getObject({
     Bucket: config.data.bucket,
     Key: key,
@@ -284,7 +254,6 @@ async function getFileS3(req, res, next) {
   // serve static files from s3
   const { path } = req.body;
   const s3 = new AWS.S3();
-
   s3.getObject({
     Bucket: config.data.bucket,
     Key: `msigportal/Database/${path}`,
@@ -301,7 +270,6 @@ const getDataUsingS3Select = (params) => {
       const response = await s3.selectObjectContent(params).promise();
       const events = response.Payload;
       let records = [];
-
       events.on('data', ({ Records, End }) => {
         if (Records) {
           records.push(Records.Payload);
@@ -309,7 +277,6 @@ const getDataUsingS3Select = (params) => {
           let string = Buffer.concat(records).toString('utf8');
           string = string.replace(/\,$/, '');
           const results = JSON.parse(`[${string}]`);
-
           resolve(results);
         }
       });
@@ -321,22 +288,15 @@ const getDataUsingS3Select = (params) => {
 };
 
 const router = express.Router();
-
 router.post('/upload', upload);
-
 router.get('/getExposureExample/:example', getExposureExample);
-
 router.get('/getPublications', getPublications);
-
 router.post('/getImageS3Batch', getImageS3Batch);
-
 router.post('/getImageS3', getImageS3);
-
 router.post('/getFileS3', getFileS3);
-
 router.post('/associationWrapper', associationWrapper);
 
-module.exports = {
+export {
   router,
   parseCSV,
   importUserSession,
