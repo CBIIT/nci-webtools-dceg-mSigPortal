@@ -2,11 +2,12 @@ import { Container } from 'react-bootstrap';
 import Description from '../../../controls/description/description';
 import { NavHashLink } from 'react-router-hash-link';
 import MsIndividualPlot from './msIndividual-plot';
+import MsIndividualForm from './msIndividual-form';
 import { useState } from 'react';
 
 export default function MsIndividual({ state }) {
-  const [form, setForm] = useState({ signatureName1: '', signatureName2: '' });
-
+  const [form, setForm] = useState({ sampleName: '' });
+  const mergeForm = (update) => setForm({ ...form, ...update });
   return (
     <Container fluid className="bg-white border rounded p-0">
       <div className="p-3">
@@ -38,6 +39,8 @@ export default function MsIndividual({ state }) {
           }
         />
       </div>
+      <hr />
+      <MsIndividualForm state={state} form={form} mergeForm={mergeForm} />
       <hr />
       <MsIndividualPlot state={state} form={form} setForm={setForm} />
     </Container>

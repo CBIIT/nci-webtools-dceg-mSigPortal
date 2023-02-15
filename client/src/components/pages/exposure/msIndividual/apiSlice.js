@@ -1,8 +1,9 @@
 import { explorationApiSlice } from '../../../../services/store/rootApi';
 import MsIndividual from '../../../controls/plotly/msIndividual/msIndividual';
-export const msDecompositionApiSlice = explorationApiSlice.injectEndpoints({
+
+export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    msIndividual: builder.query({
+    msIndividualOption: builder.query({
       query: (params) => ({
         url: 'signature_activity',
         params: {
@@ -19,3 +20,5 @@ export const msDecompositionApiSlice = explorationApiSlice.injectEndpoints({
     }),
   }),
 });
+
+export const { useMsIndividualOptionQuery } = msIndividualApiSlice;
