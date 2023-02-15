@@ -6,7 +6,7 @@ import MsIndividualForm from './msIndividual-form';
 import { useState } from 'react';
 
 export default function MsIndividual({ state }) {
-  const [form, setForm] = useState({ sampleName: '' });
+  const [form, setForm] = useState({ sample: '' });
   const mergeForm = (update) => setForm({ ...form, ...update });
   return (
     <Container fluid className="bg-white border rounded p-0">

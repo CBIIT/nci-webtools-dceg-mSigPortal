@@ -29,7 +29,7 @@ export default function MsIndividualForm({ state, form, mergeForm }) {
   useEffect(() => {
     if (data) {
       mergeForm({
-        sampleName: data[0],
+        sample: data[0],
       });
     }
   }, [data]);
@@ -48,8 +48,8 @@ export default function MsIndividualForm({ state, form, mergeForm }) {
     }
   }, [state]);
 
-  function handleSampleName(e) {
-    mergeForm({ sampleName: e });
+  function handleSample(e) {
+    mergeForm({ sample: e });
   }
 
   return (
@@ -60,10 +60,10 @@ export default function MsIndividualForm({ state, form, mergeForm }) {
           <Select
             name="sampleName"
             label="Sample"
-            value={form.sampleName}
+            value={form.sample}
             disabled={!data}
             options={data}
-            onChange={handleSampleName}
+            onChange={handleSample}
             control={control}
           />
         </Col>

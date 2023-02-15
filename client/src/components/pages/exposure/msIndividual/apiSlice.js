@@ -14,8 +14,19 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
         console.log('---ms indiidual');
         console.log(arg);
         console.log(data);
-        //return false;
-        return MsIndividual(data, arg);
+        return data
+          ? [...new Set(data.map((e) => e.sample))]
+              .sort((a, b) =>
+                a.localeCompare(b, undefined, {
+                  numeric: true,
+                  sensitivity: 'base',
+                })
+              )
+              .map((e) => ({
+                label: e,
+                value: e,
+              }))
+          : [];
       },
     }),
   }),
