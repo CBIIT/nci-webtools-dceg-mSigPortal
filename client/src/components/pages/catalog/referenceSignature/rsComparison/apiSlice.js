@@ -25,6 +25,9 @@ export const rsComparisonApiSlice = catalogApiSlice.injectEndpoints({
             e.signatureName == signatureNames[1]
         );
 
+        console.log('--RS Comparison:');
+        console.log(data1);
+        console.log(data2);
         if (args.profile == 'SBS' && args.matrix == '96')
           return sbs96(data1, data2);
         else if (args.profile == 'SBS' && args.matrix == '192')

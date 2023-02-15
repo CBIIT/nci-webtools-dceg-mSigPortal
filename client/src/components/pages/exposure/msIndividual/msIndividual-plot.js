@@ -9,21 +9,65 @@ import {
 } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as exposureActions } from '../../../../services/store/exposure';
-
+import { useMsIndividualQuery } from './apiSlice';
 import Select from '../../../controls/select/selectForm';
 import Plotly from '../../../controls/plotly/plot/plot';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 const { Group, Check } = Form;
 const actions = { ...exposureActions };
 
-export default function MsIndividualPlot({ state }) {
-  const dispatch = useDispatch();
-  const exposure = useSelector((state) => state.exposure);
-  const { sample, plotPath, debugR, err, loading } = exposure.msIndividual;
-  const { id, publicSampleOptions, userSampleOptions, source } =
-    exposure.main;
+export default function MsIndividualPlot({ state, form }) {
+  const [params, setParams] = useState('');
+  const { data, error, isFetching } = useMsIndividualQuery(params, {
+    skip: !params,
+  });
 
-  const mergeMsIndividual = (state) =>
-    dispatch(actions.mergeExposure({ msIndividual: state }));
-  return <Form className="p-3"></Form>;
+  const { sample } = form;
+  const { study, strategy, signatureSetName, cancer, useAllCancer, id } = state;
+  console.log(state);
+  useEffect(() => {
+    if (sample && id) {
+      setParams({
+        sample: sample.value,
+        userId: id,
+      });
+    } else if (sample && study) {
+      const params_activity = {
+        sample: sample.value,
+        study: study.value,
+        strategy: strategy.value,
+        signatureSetName: signatureSetName.value,
+        ...(!useAllCancer && { cancer: cancer.value }),
+      };
+      const params_signature = {
+        strategy: strategy.value,
+        signatureSetName: signatureSetName.value,
+      };
+      const params_spectrum = {
+        study: study.value,
+        strategy: strategy.value,
+        sample: sample.value,
+        ...(!useAllCancer && { cancer: cancer.value }),
+      };
+      setParams({
+        params_activity,
+        params_signature,
+        params_spectrum,
+      });
+    }
+  }, [sample, id]);
+  return (
+    <div>
+      <LoadingOverlay active={isFetching} />
+      {error && <p className="p-3 text-danger">{error}</p>}
+      {data && (
+        <Plotly
+          className="w-100"
+          data={data.traces}
+          layout={data.layout}
+          config={data.config}
+        />
+      )}
+    </div>
+  );
 }
