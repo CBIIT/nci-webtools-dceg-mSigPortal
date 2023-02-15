@@ -42,9 +42,9 @@ export const msAssociationApiSlice = explorationApiSlice.injectEndpoints({
             },
       }),
       transformResponse: (data, meta, arg) => {
-        console.log('api slice association');
-        console.log(arg);
-        console.log(data);
+        // console.log('api slice association');
+        // console.log(arg);
+        // console.log(data);
 
         return MsAssociation(data, arg);
       },

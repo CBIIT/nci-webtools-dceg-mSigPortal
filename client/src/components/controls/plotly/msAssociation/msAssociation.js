@@ -3,8 +3,8 @@ import { groupBy } from 'lodash';
 import pcorrtest from '@stdlib/stats-pcorrtest';
 
 export default function MsAssociation(data, arg) {
-  console.log(data);
-  console.log(arg);
+  // console.log(data);
+  // console.log(arg);
   const [signatureName1, signatureName2] = arg.signatureName.split(';');
   const checked = arg.both;
 
@@ -105,11 +105,9 @@ export default function MsAssociation(data, arg) {
   let pearsonV;
   if (traceMain.x.length > 3) {
     pearsonV = pcorrtest(traceMain.x, traceMain.y);
-    console.log(pearsonV);
   } else {
     pearsonV = calculatePearson(traceMain.x, traceMain.y);
   }
-  console.log(pearsonV);
   const traceLine = {
     x: [minX, maxX],
     y: [minX * lr.sl + lr.off, maxX * lr.sl + lr.off],

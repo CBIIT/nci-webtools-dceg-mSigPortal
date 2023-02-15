@@ -73,7 +73,6 @@ export default function MsLandscapePlot({ state }) {
   let { data, error, isFetching } = useMsLandscapePlotQuery(calculationQuery, {
     skip: !calculationQuery,
   });
-  console.log(data);
   if (data) {
     data = MsLandscape(
       data.output.cosineData,
@@ -93,7 +92,6 @@ export default function MsLandscapePlot({ state }) {
   // }, [publicForm]);
   useEffect(() => {
     const { study, strategy, signatureSetName, cancer, id } = state;
-    console.log(state);
     if (study) {
       setCalculationQuery({
         study: study.value,

@@ -29,7 +29,34 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
           : [];
       },
     }),
+    msIndividual: builder.query({
+      async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
+        try {
+          const res = await Promise.all([
+            fetchWithBQ(
+              '/signature_activity?' + new URLSearchParams(_arg.params_activity)
+            ), //exposure
+            fetchWithBQ(
+              '/mutational_signature?' +
+                new URLSearchParams(_arg.params_signature)
+            ), //signature
+            fetchWithBQ(
+              '/mutational_spectrum?' +
+                new URLSearchParams(_arg.params_spectrum)
+            ), //seqmatrix
+          ]);
+
+          console.log(res);
+          console.log(_arg);
+          //return MsLandscape(res, _arg);
+          return { data: MsIndividual(res, _arg) };
+        } catch (error) {
+          return { error };
+        }
+      },
+    }),
   }),
 });
 
-export const { useMsIndividualOptionQuery } = msIndividualApiSlice;
+export const { useMsIndividualOptionQuery, useMsIndividualQuery } =
+  msIndividualApiSlice;
