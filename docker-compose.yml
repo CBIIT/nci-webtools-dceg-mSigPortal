@@ -20,11 +20,8 @@ services:
             dockerfile: './docker/backend-extraction.dockerfile'
         env_file: './extraction-service/.env'
         volumes:
-            - './logs:/deploy/logs'
-            - './tmp:/deploy/tmp'
-            - './data:/deploy/data'
-            - '~/.aws:/root/.aws:ro'
-            - './src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb:/deploy/app/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb:ro'
+            - './logs/extraction:/deploy/logs'
+            - './tmp/extraction:/deploy/tmp'
         ports: 
             - '8331:8331'
             
