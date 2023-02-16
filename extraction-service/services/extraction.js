@@ -15,7 +15,7 @@ import axios from 'axios';
 import FormData from 'form-data';
 import { putDirectory } from './s3.js';
 
-async function uploadWorkingDirectory(inputFolder, outputFolder, id) {
+async function uploadWorkingDirectory(inputFolder, outputFolder, id, env) {
   // upload input folder
   await putDirectory(
     inputFolder,
@@ -58,7 +58,7 @@ export async function extraction(
       paths.manifestFile,
       mapValues(paths, (value) => path.parse(value).base)
     );
-    await uploadWorkingDirectory(inputFolder, outputFolder, id);
+    await uploadWorkingDirectory(inputFolder, outputFolder, id, env);
 
     // query signature data
     const connection = dbConnection;
@@ -198,7 +198,7 @@ export async function extraction(
     const status = { id, status: 'COMPLETED' };
     await writeJson(paths.statusFile, status);
 
-    await uploadWorkingDirectory(inputFolder, outputFolder, id);
+    await uploadWorkingDirectory(inputFolder, outputFolder, id, env);
 
     // // upload denovo output
     // await putDirectory(
@@ -218,6 +218,7 @@ export async function extraction(
 
     // send success notification if email was provided
     if (params.email) {
+      logger.info(`[${id}] Sending success notificaiton`);
       //delete input files
       // readdir(paths.inputFolder, (err, files) => {
       //   if (err) {
@@ -248,6 +249,7 @@ export async function extraction(
     return { id };
   } catch (error) {
     // send error notification if email was provided
+    logger.error(`[${id}] Sending error notificaiton`);
     logger.error(error);
     const status = { id, status: 'FAILED', error: { ...error } };
     await writeJson(paths.statusFile, status);
@@ -266,7 +268,12 @@ export async function extraction(
       });
     });
 
-    await uploadWorkingDirectory(inputFolder, outputFolder, id);
+    await uploadWorkingDirectory(
+      paths.inputFolder,
+      paths.outputFolder,
+      id,
+      env
+    );
 
     if (params.email) {
       await sendNotification(
