@@ -70,7 +70,8 @@ export function compareProfiles(
   const sample1 = data1[0].sample || data1[0].signatureName;
   const sample2 =
     data2[0].scalarSignature || data2[0].sample || data2[0].signatureName;
-
+  console.log(sample1);
+  console.log(sample2);
   const mutationGroupSort = (a, b) => {
     const order = Object.keys(colors);
     return order.indexOf(a.mutation) - order.indexOf(b.mutation);

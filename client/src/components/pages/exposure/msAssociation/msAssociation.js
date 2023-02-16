@@ -25,6 +25,7 @@ export default function MsAssociation({ state }) {
       <hr />
       <MsAssociationForm state={state} form={form} mergeForm={mergeForm} />
       <hr />
+      
       <MsAssociationPlot state={state} form={form} />
     </Container>
   );

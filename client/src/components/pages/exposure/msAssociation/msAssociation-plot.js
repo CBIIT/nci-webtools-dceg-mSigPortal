@@ -34,6 +34,9 @@ export default function MsAssociationPlot({ state, form }) {
 
   return (
     <div>
+      <h6 className="p-3 text-center">
+        <b>Mutational Signature Association</b>
+      </h6>
       <LoadingOverlay active={isFetching} />
       {error && <p className="p-3 text-danger">{error}</p>}
       {data && (

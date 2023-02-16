@@ -1,4 +1,9 @@
-import { linearRegression, round, calculatePearson } from '../../utils/utils';
+import {
+  linearRegression,
+  round,
+  calculatePearson,
+  calculateSpearman,
+} from '../../utils/utils';
 import { groupBy } from 'lodash';
 import pcorrtest from '@stdlib/stats-pcorrtest';
 
@@ -108,6 +113,8 @@ export default function MsAssociation(data, arg) {
   } else {
     pearsonV = calculatePearson(traceMain.x, traceMain.y);
   }
+  console.log(pearsonV);
+  const spearman = calculateSpearman(traceMain.x, traceMain.y);
   const traceLine = {
     x: [minX, maxX],
     y: [minX * lr.sl + lr.off, maxX * lr.sl + lr.off],
@@ -136,18 +143,30 @@ export default function MsAssociation(data, arg) {
     y: 1.01,
     yanchor: 'bottom',
     text:
-      't<sub>Student</sub> = ' +
+      'Pearson:\tt<sub>Student</sub> = ' +
       round(pearsonV.statistic, 2) +
       ', p = ' +
       round(pearsonV.pValue, 3) +
-      ' ,r<sub>Pearson</sub> = ' +
+      ', r<sub>Pearson</sub> = ' +
       round(pearsonV.pcorr, 2) +
-      ' ,CI<sub>95%</sub>[' +
+      ', CI<sub>95%</sub>[' +
       round(pearsonV.ci[0], 2) +
       ', ' +
       round(pearsonV.ci[1], 2) +
       '], n<sub>pairs</sub> = ' +
-      dataArraySample.length,
+      dataArraySample.length +
+      '<br>Spearman:\tt<sub>Student</sub> =' +
+      round(spearman.t, 2) +
+      ', p = ' +
+      round(spearman.pValue, 3) +
+      ', r<sub>Spearman</sub> = ' +
+      round(spearman.rho, 2) +
+      ', CI<sub>95%</sub>[' +
+      round(spearman.CILower, 2) +
+      ', ' +
+      round(spearman.CIUpper, 2) +
+      '], n<sub>pairs</sub> = ' +
+      spearman.n,
     showarrow: false,
     font: {
       size: 16,
@@ -162,9 +181,7 @@ export default function MsAssociation(data, arg) {
     height: 900,
     bargap: 0,
     autosize: true,
-    title: {
-      text: '<b>Mutational Signature Association</b>',
-    },
+
     legend: {
       title: { text: '\t Signature Names:' },
     },
