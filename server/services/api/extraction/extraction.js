@@ -37,6 +37,12 @@ export async function submit(req, res, next) {
     s3ClientConfig
   );
 
+  try {
+    fetch(`${config.email.baseUrl}/extraction/run/${id}`);
+  } catch (error) {
+    next(new Error('Failed to submit job'));
+  }
+
   res.json(status);
 }
 
@@ -46,12 +52,7 @@ export async function refresh(req, res, next) {
 
   const inputFolder = path.resolve(config.folders.input, id);
   const outputFolder = path.resolve(config.folders.output, id);
-  console.log(
-    inputFolder,
-    path.join(config.aws.inputKeyPrefix, id),
-    config.aws.bucket,
-    { region: config.aws.region }
-  );
+
   try {
     await getDirectory(
       inputFolder,
@@ -68,7 +69,7 @@ export async function refresh(req, res, next) {
 
     res.json(id);
   } catch (error) {
-    logger.error('/refreshExtraction Error')
+    logger.error('/refreshExtraction Error');
     next(error);
   }
 }
