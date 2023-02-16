@@ -195,7 +195,7 @@ async function getPublications(req, res, next) {
       const workbook = XLSX.read(buffer);
       excelToJSON(workbook);
     })
-    .on('error', next);
+    .on('error', res.status(500).json('Unable to retrieve Publications.xlsx'));
   function excelToJSON(workbook) {
     const sheetNames = workbook.SheetNames;
     const data = sheetNames.reduce(
