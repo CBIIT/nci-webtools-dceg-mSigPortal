@@ -19,7 +19,7 @@ import MsAssociation from '../exposure/msAssociation/msAssociation';
 import MsLandscape from '../exposure/msLandscape/msLandscape';
 import MsPrevalence from '../exposure/msPrevalence/msPrevalence';
 // import MsIndividual from '../exposure/msIndividual';
-import { useStatusQuery, useManifestQuery } from './apiSlice';
+import { useStatusQuery, useManifestQuery, useRefreshQuery } from './apiSlice';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const actions = { ...extractionActions, ...modalActions };
@@ -31,6 +31,13 @@ export default function Extraction() {
     (state) => state.extraction
   );
   const id = useParams().id || state.id || false;
+
+  const { data: refreshStatus, refetch: refreshExtraction } = useRefreshQuery(
+    id,
+    {
+      skip: !id,
+    }
+  );
   const { data: status, refetch: refetchStatus } = useStatusQuery(id, {
     skip: !id,
   });
@@ -48,9 +55,10 @@ export default function Extraction() {
   })();
 
   const refreshState = useCallback(() => {
+    refreshExtraction();
     refetchStatus();
     refetchManifest();
-  }, [refetchStatus, refetchManifest]);
+  }, [refreshExtraction, refetchStatus, refetchManifest]);
 
   useEffect(() => {
     const interval = setInterval(refreshState, 1000 * 60);

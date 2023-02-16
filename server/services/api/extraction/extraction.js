@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { validate } from 'uuid';
 import path from 'path';
-import AWS from 'aws-sdk';
-import tar from 'tar';
+import { getDirectory, putDirectory } from '../../s3.js';
+import logger from '../../logger.js';
 import { mkdirs, writeJson } from '../../utils.js';
 import config from '../../../config.json' assert { type: 'json' };
 
@@ -21,30 +21,60 @@ export async function submit(req, res, next) {
   await writeJson(paramsFilePath, req.body);
   await writeJson(statusFilePath, status);
 
-  await new AWS.S3()
-    .upload({
-      Body: tar
-        .c({ sync: true, gzip: true, C: config.folders.input }, [id])
-        .read(),
-      Bucket: config.aws.bucket,
-      Key: `${config.aws.inputKeyPrefix}${id}/${id}.tgz`,
-    })
-    .promise();
+  const s3ClientConfig = { region: config.aws.region };
 
-  await new AWS.S3()
-    .upload({
-      Body: tar
-        .c({ sync: true, gzip: true, C: config.folders.output }, [id])
-        .read(),
-      Bucket: config.aws.bucket,
-      Key: `${config.aws.outputKeyPrefix}${id}/${id}.tgz`,
-    })
-    .promise();
+  await putDirectory(
+    inputFolder,
+    path.join(config.aws.inputKeyPrefix, id),
+    config.aws.bucket,
+    s3ClientConfig
+  );
+
+  await putDirectory(
+    outputFolder,
+    path.join(config.aws.outputKeyPrefix, id),
+    config.aws.bucket,
+    s3ClientConfig
+  );
 
   res.json(status);
 }
 
+export async function refresh(req, res, next) {
+  const id = req.params.id;
+  if (!validate(id)) res.status(500).json('Invalid ID');
+
+  const inputFolder = path.resolve(config.folders.input, id);
+  const outputFolder = path.resolve(config.folders.output, id);
+  console.log(
+    inputFolder,
+    path.join(config.aws.inputKeyPrefix, id),
+    config.aws.bucket,
+    { region: config.aws.region }
+  );
+  try {
+    await getDirectory(
+      inputFolder,
+      path.join(config.aws.inputKeyPrefix, id),
+      config.aws.bucket,
+      { region: config.aws.region }
+    );
+    await getDirectory(
+      outputFolder,
+      path.join(config.aws.outputKeyPrefix, id),
+      config.aws.bucket,
+      { region: config.aws.region }
+    );
+
+    res.json(id);
+  } catch (error) {
+    logger.error('/refreshExtraction Error')
+    next(error);
+  }
+}
+
 const router = Router();
-router.post('/submitExtraction/:id', submit);
+router.post('/submitExtraction/:id?', submit);
+router.get('/refreshExtraction/:id?', refresh);
 
 export { router };

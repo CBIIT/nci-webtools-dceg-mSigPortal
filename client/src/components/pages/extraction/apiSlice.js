@@ -18,6 +18,12 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
       }),
     }),
 
+    refresh: builder.query({
+      query: (id) => ({
+        url: `refreshExtraction/${id}`,
+      }),
+    }),
+
     status: builder.query({
       query: (id) => ({
         url: `data/output/${id}/status.json`,
@@ -41,6 +47,7 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
 export const {
   useUploadMutation,
   useSubmitMutation,
+  useRefreshQuery,
   useStatusQuery,
   useParamsQuery,
   useManifestQuery,
