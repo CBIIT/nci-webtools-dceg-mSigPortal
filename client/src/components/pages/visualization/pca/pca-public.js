@@ -195,7 +195,7 @@ export default function PcaPublic() {
           <SvgContainer
             className="p-3"
             downloadName={data.output.pca1.split('/').slice(-1)[0]}
-            plotPath={'web/results/' + data.output.pca1}
+            plotPath={'web/data/' + data.output.pca1}
           />
           <p className="p-3">
             The bar plot illustrates each of the principal components on the
@@ -211,8 +211,8 @@ export default function PcaPublic() {
           <SvgContainer
             className="p-3"
             downloadName={data.output.pca2.split('/').slice(-1)[0]}
-            plotPath={'web/results/' + data.output.pca2}
-            txtPath={`web/results/${data.output.pca2Data}`}
+            plotPath={'web/data/' + data.output.pca2}
+            txtPath={`web/data/${data.output.pca2Data}`}
           />
           <p className="p-3">
             The individual PCA plot based on the top two principal components
@@ -230,8 +230,8 @@ export default function PcaPublic() {
           <SvgContainer
             className="p-3"
             downloadName={data.output.pca3.split('/').slice(-1)[0]}
-            plotPath={'web/results/' + data.output.pca3}
-            txtPath={`web/results/${data.output.pca3Data}`}
+            plotPath={'web/data/' + data.output.pca3}
+            txtPath={`web/data/${data.output.pca3Data}`}
           />
           <p className="p-3">
             The variable PCA plot based on the top two principal components

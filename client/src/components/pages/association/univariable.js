@@ -645,8 +645,8 @@ export default function Univariable() {
                 <SvgContainer
                   className="p-3 border rounded"
                   downloadName={plotPath.split('/').slice(-1)[0]}
-                  plotPath={`web/results/${plotPath}`}
-                  txtPath={`web/results/${dataPath}`}
+                  plotPath={`web/data/${plotPath}`}
+                  txtPath={`web/data/${dataPath}`}
                   height="800px"
                 />
               )}

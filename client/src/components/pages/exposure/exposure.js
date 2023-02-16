@@ -142,7 +142,7 @@ export default function Exposure() {
         cancerType: publicForm.cancer.value,
       });
 
-      const file = await fetch(`web/results/${output.path}`);
+      const file = await fetch(`web/data/${output.path}`);
       if (file.ok) {
         saveAs(await file.blob(), output.filename);
       } else {

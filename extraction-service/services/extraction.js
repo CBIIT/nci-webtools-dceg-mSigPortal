@@ -7,11 +7,31 @@ import { getSignatureData } from './query.js';
 import { execa } from 'execa';
 import validator from 'validator';
 import mapValues from 'lodash/mapValues.js';
+import { randomUUID } from 'crypto';
 import { readJson, writeJson, mkdirs } from './utils.js';
 import { sendNotification } from './notifications.js';
 import { formatObject } from './logger.js';
 import axios from 'axios';
 import FormData from 'form-data';
+import { putDirectory } from './s3.js';
+
+async function uploadWorkingDirectory(inputFolder, outputFolder, id) {
+  // upload input folder
+  await putDirectory(
+    inputFolder,
+    path.join(env.INPUT_KEY_PREFIX, id),
+    env.DATA_BUCKET,
+    { region: env.AWS_DEFAULT_REGION }
+  );
+
+  // upload output folder
+  await putDirectory(
+    outputFolder,
+    path.join(env.OUTPUT_KEY_PREFIX, id),
+    env.DATA_BUCKET,
+    { region: env.AWS_DEFAULT_REGION }
+  );
+}
 
 export async function extraction(
   params,
@@ -28,6 +48,9 @@ export async function extraction(
     if (!id) throw new Error('Missing id');
     if (!validator.isUUID(id)) throw new Error('Invalid id');
 
+    const inputFolder = path.resolve(env.INPUT_FOLDER, id);
+    const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
+
     await mkdirs([paths.inputFolder, paths.outputFolder]);
     await writeJson(paths.paramsFile, params);
     await writeJson(paths.statusFile, { id, status: 'IN_PROGRESS' });
@@ -35,9 +58,7 @@ export async function extraction(
       paths.manifestFile,
       mapValues(paths, (value) => path.parse(value).base)
     );
-
-    const inputFolder = path.resolve(env.INPUT_FOLDER, id);
-    const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
+    await uploadWorkingDirectory(inputFolder, outputFolder, id);
 
     // query signature data
     const connection = dbConnection;
@@ -108,7 +129,7 @@ export async function extraction(
       );
 
       const denovoUpload = await axios.post(
-        `${env.API_BASE_URL}/web/upload`,
+        `${env.API_BASE_URL}/web/upload/${randomUUID()}`,
         denovoFormData,
         { headers: denovoFormData.getHeaders() }
       );
@@ -125,6 +146,7 @@ export async function extraction(
       denovoId = denovoExploration.data;
     } catch (error) {
       logger.error('Denovo Exploration Error');
+      console.log(error);
       throw error.data;
     }
 
@@ -145,7 +167,7 @@ export async function extraction(
       );
 
       const decomposedUpload = await axios.post(
-        `${env.API_BASE_URL}/web/upload`,
+        `${env.API_BASE_URL}/web/upload/${randomUUID()}`,
         decomposedFormData,
         { headers: decomposedFormData.getHeaders() }
       );
@@ -175,6 +197,24 @@ export async function extraction(
     // write success status
     const status = { id, status: 'COMPLETED' };
     await writeJson(paths.statusFile, status);
+
+    await uploadWorkingDirectory(inputFolder, outputFolder, id);
+
+    // // upload denovo output
+    // await putDirectory(
+    //   path.resolve(env.OUTPUT_FOLDER, denovoId),
+    //   path.join(env.OUTPUT_KEY_PREFIX, denovoId),
+    //   env.DATA_BUCKET,
+    //   { region: env.AWS_DEFAULT_REGION }
+    // );
+
+    // // upload decmoposed output
+    // await putDirectory(
+    //   path.resolve(env.OUTPUT_FOLDER, decomposedId),
+    //   path.join(env.OUTPUT_KEY_PREFIX, decomposedId),
+    //   env.DATA_BUCKET,
+    //   { region: env.AWS_DEFAULT_REGION }
+    // );
 
     // send success notification if email was provided
     if (params.email) {
@@ -225,6 +265,8 @@ export async function extraction(
         }
       });
     });
+
+    await uploadWorkingDirectory(inputFolder, outputFolder, id);
 
     if (params.email) {
       await sendNotification(

@@ -9,8 +9,16 @@
   "results": {
     "folder": "../tmp"
   },
+  "folders": {
+    "data": "../tmp",
+    "input": "../tmp/input",
+    "output": "../tmp/output"
+  },
   "aws": {
-    "region": ""
+    "region": "",
+    "bucket": "",
+    "inputKeyPrefix": "",
+    "outputKeyPrefix": ""
   },
   "data": {
     "folder": "../data",

@@ -1,58 +1,105 @@
-import { pickBy } from 'lodash-es';
+import { fileURLToPath } from 'url';
+import { existsSync } from 'fs';
+import { mkdir, writeFile, readFile, copyFile, readdir } from 'fs/promises';
+import path from 'path';
+import { promisify } from 'util';
+import { execFile } from 'child_process';
+import template from 'lodash/template.js';
 
-function defaultProfile(profileOptions) {
-  if (profileOptions.includes('SBS')) return 'SBS';
-  if (profileOptions.includes('DBS')) return 'DBS';
-  if (profileOptions.includes('ID')) return 'ID';
+// promisified executeFile
+export const execFileAsync = promisify(execFile);
+
+/**
+ * Checks if the current module is the main module.
+ * @param {ImportMeta} importMeta
+ * @param {NodeJS.ProcessEnv} env
+ * @returns
+ */
+export function isMainModule(importMeta, env = process.env) {
+  const mainModulePath = env.pm_exec_path || process.argv[1];
+  const currentModulePath = fileURLToPath(importMeta.url);
+  return mainModulePath === currentModulePath;
 }
-function defaultMatrix(profile, matrixOptions) {
-  if (profile == 'SBS')
-    return matrixOptions.includes('96') ? '96' : matrixOptions[0];
-  if (profile == 'DBS')
-    return matrixOptions.includes('78') ? '78' : matrixOptions[0];
-  if (profile == 'ID')
-    return matrixOptions.includes('83') ? '83' : matrixOptions[0];
+
+/**
+ * Creates directories if they don't exist.
+ * @param {string[]} dirs
+ * @returns
+ */
+export async function mkdirs(dirs) {
+  return await Promise.all(dirs.map((dir) => mkdir(dir, { recursive: true })));
 }
-function defaultFilter(filterOptions) {
-  return filterOptions.includes('NA') ? 'NA' : filterOptions[0];
+
+/**
+ * Writes json to a file.
+ * @param {string} filepath
+ * @param {any} data
+ * @returns {Promise<void>} fulfilled when the file is written
+ */
+export async function writeJson(filepath, data) {
+  return await writeFile(filepath, JSON.stringify(data), 'utf-8');
 }
-function defaultProfile2(profileOptions) {
-  const options = profileOptions.map(({ value }) => value);
-  if (options.includes('SBS')) return { label: 'SBS', value: 'SBS' };
-  if (options.includes('DBS')) return { label: 'DBS', value: 'DBS' };
-  if (options.includes('ID')) return { label: 'ID', value: 'ID' };
+
+/**
+ * Reads json from a file.
+ * @param {string} filepath
+ * @returns {any} data
+ */
+export async function readJson(filepath) {
+  try {
+    const data = await readFile(filepath, 'utf8');
+    return JSON.parse(data);
+  } catch (e) {
+    return null;
+  }
 }
-function defaultMatrix2(profile, matrixOptions) {
-  const options = options.map(({ value }) => value);
-  if (profile.value == 'SBS')
-    return options.includes('96')
-      ? { label: '96', value: '96' }
-      : matrixOptions[0];
-  if (profile.value == 'DBS')
-    return options.includes('78')
-      ? { label: '78', value: '78' }
-      : matrixOptions[0];
-  if (profile.value == 'ID')
-    return options.includes('83')
-      ? { label: '83', value: '83' }
-      : matrixOptions[0];
+
+export async function renderTemplate(filepath, data) {
+  const templateContents = await readFile(filepath, 'utf8');
+  return template(templateContents)(data);
 }
-function defaultFilter2(filterOptions) {
-  const options = options.map(({ value }) => value);
-  return options.includes('NA')
-    ? { label: 'NA', value: 'NA' }
-    : filterOptions[0];
+
+/**
+ * Selects the first file which exists from the given list of files.
+ * @param {string[]} filePaths
+ * @returns string
+ */
+export function coalesceFilePaths(filePaths) {
+  for (const filePath of filePaths) {
+    if (existsSync(filePath)) {
+      return filePath;
+    }
+  }
 }
-function pickNonNullValues(object) {
+
+/**
+ * Removes the file extension from the given file path.
+ * @param {string} filePath
+ * @returns {string} The file path without the extension.
+ */
+export function stripExtension(filePath) {
+  if (!filePath) return null;
+  const { dir, name } = path.parse(filePath);
+  return path.join(dir, name);
+}
+
+/**
+ * Copies files from the given source directory to the given destination directory.
+ * @param {string} source Source directory path
+ * @param {string} destination Destination directory path
+ * @param {boolean} overwrite Overwrite existing files
+ */
+export async function copyFiles(source, destination, overwrite = false) {
+  const sourceFiles = await readdir(source, { withFileTypes: true });
+  for (const file of sourceFiles.filter((f) => f.isFile())) {
+    const sourceFilePath = path.resolve(source, file.name);
+    const destinationFilePath = path.resolve(destination, file.name);
+    if (overwrite || !existsSync(destinationFilePath)) {
+      await copyFile(sourceFilePath, destinationFilePath);
+    }
+  }
+}
+
+export function pickNonNullValues(object) {
   return pickBy(object, (v) => v !== null);
 }
-
-export {
-  defaultProfile,
-  defaultMatrix,
-  defaultFilter,
-  defaultProfile2,
-  defaultMatrix2,
-  defaultFilter2,
-  pickNonNullValues,
-};
