@@ -81,7 +81,6 @@ function upload(req, res, next) {
   });
 
   logger.info(`/upload: Request Project ID:${id}`);
-  console.log(form.uploadDir);
   fs.mkdirSync(form.uploadDir, { recursive: true });
 
   form
@@ -186,7 +185,7 @@ async function getPublications(req, res, next) {
   const filestream = new AWS.S3()
     .getObject({
       Bucket: config.data.bucket,
-      Key: `${config.data.s3}Others/Publications.xlsx`,
+      Key: path.join(config.data.s3, 'Others', 'Publications.xlsx'),
     })
     .createReadStream();
   filestream
@@ -290,7 +289,7 @@ const getDataUsingS3Select = (params) => {
 };
 
 const router = express.Router();
-router.post('/upload/:id', upload);
+router.post('/upload/:id?', upload);
 router.get('/getExposureExample/:example', getExposureExample);
 router.get('/getPublications', getPublications);
 router.post('/getImageS3Batch', getImageS3Batch);
