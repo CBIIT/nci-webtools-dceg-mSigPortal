@@ -1,4 +1,5 @@
 import { groupBy } from 'lodash';
+import { round } from '../../utils/utils';
 import {
   groupDataByMutation,
   getTotalMutations,
@@ -43,9 +44,21 @@ export function MsIndividualComparison(
       signatureName: e[0].signatureName,
       exposure: e[0].exposure,
       exposureSum: exposureSum,
+      percent: e[0].exposure / exposureSum,
     })
   );
+
   console.log(percentSignature);
+
+  let ptext = '';
+  for (let i = 0; i < percentSignature.length; i++) {
+    ptext +=
+      (percentSignature[i].percent * 100).toFixed(1) +
+      '%*' +
+      percentSignature[i].signatureName +
+      ' + ';
+  }
+  console.log(ptext);
   const signature_groupBySignature = groupBy(
     signatureData.filter((e) => signatureNames.includes(e.signatureName)),
     'signatureName'
@@ -93,25 +106,138 @@ export function MsIndividualComparison(
   ).flat(); //original data for the comparison
   console.log(seqmatrixDataFilter);
 
+  const mutationGroupSort = (a, b) => {
+    const order = Object.keys(colors);
+    return order.indexOf(a.mutation) - order.indexOf(b.mutation);
+  };
+
+  const totalMutationsOriginal = getTotalMutations(seqmatrixDataFilter);
+  //const totalMutationsDestructed = getTotalMutations(data2);
+
+  const maxMutationOriginal =
+    getMaxMutations(seqmatrixDataFilter) / totalMutationsOriginal;
+
+  console.log(maxMutationOriginal);
+  const normalizedOriginal = seqmatrixDataFilter.map((e) => ({
+    ...e,
+    ...(e.mutations >= 0 && {
+      mutations: e.mutations / totalMutationsOriginal,
+    }),
+    ...(e.contribution >= 0 && {
+      contribution: e.contribution / totalMutationsOriginal,
+    }),
+  }));
+  console.log(normalizedOriginal);
+
+  const groupOriginal = groupDataByMutation(
+    normalizedOriginal,
+    mutationRegex,
+    mutationGroupSort
+  );
+  console.log(groupOriginal);
+
   const arraySignatureData = Object.values(signature_groupBySignature).map(
     (e) => e
   );
 
   console.log(arraySignatureData);
-  let totalMutationsArray = [];
-  let maxMutationsArray = [];
-  for (let i = 0; i < arraySignatureData.length; i++) {
-    // console.log(arraySignatureData[i]);
-    totalMutationsArray.push(getTotalMutations(arraySignatureData[i]));
-    maxMutationsArray.push(
-      getMaxMutations(arraySignatureData[i]) /
-        getTotalMutations(arraySignatureData[i])
-    );
+  const arraySignatureDataFlat = arraySignatureData.flat();
+  console.log(arraySignatureDataFlat);
+  const destructedData = [];
+
+  for (let i = 0; i < percentSignature.length; i++) {
+    for (let j = 0; j < arraySignatureDataFlat.length; j++) {
+      if (
+        arraySignatureDataFlat[j].signatureName ===
+        percentSignature[i].signatureName
+      ) {
+        let n = {
+          signatureName: arraySignatureDataFlat[j].signatureName,
+          mutationType: arraySignatureDataFlat[j].mutationType,
+          mutations:
+            arraySignatureDataFlat[j].contribution *
+            percentSignature[i].percent,
+        };
+        destructedData.push(n);
+      }
+    }
   }
-  const maxMutations = Math.max(...maxMutationsArray);
-  console.log(totalMutationsArray);
-  console.log(maxMutationsArray);
-  console.log(maxMutations);
+
+  console.log(destructedData);
+
+  const groupByMutationType_destructed = groupBy(
+    destructedData,
+    'mutationType'
+  );
+  console.log(Object.values(groupByMutationType_destructed).length);
+  let newDestructedData = [];
+  const groupByMutationType_destructed_value = Object.values(
+    groupByMutationType_destructed
+  );
+  for (let i = 0; i < groupByMutationType_destructed_value.length; i++) {
+    let n = {
+      mutations: getTotalMutations(groupByMutationType_destructed_value[i]),
+      mutationType: groupByMutationType_destructed_value[i][0].mutationType,
+      signatureName: groupByMutationType_destructed_value[i][0].signatureName,
+    };
+    newDestructedData.push(n);
+  }
+  console.log(newDestructedData);
+
+  const groupDestructed = groupDataByMutation(
+    newDestructedData,
+    mutationRegex,
+    mutationGroupSort
+  );
+
+  // --- Top subplots : original, destructed, different
+  const sampleTraceOriginal = groupOriginal.map((group, groupIndex, array) => ({
+    name: group.mutation,
+    type: 'bar',
+    marker: { color: colors[group.mutation] },
+    x: [...group.data.keys()].map(
+      (e) =>
+        e +
+        array
+          .slice(0, groupIndex)
+          .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
+    ),
+    y: group.data.map((e) => e.mutations || e.contribution || 0),
+    hoverinfo: 'x+y',
+    showlegend: false,
+    xaxis: 'x2',
+    yaxis: 'y12',
+  }));
+  console.log(sampleTraceOriginal);
+  const sampleTraceDestructed = groupDestructed.map(
+    (group, groupIndex, array) => ({
+      name: group.mutations,
+      type: 'bar',
+      marker: { color: colors[group.mutation] },
+      x: [...group.data.keys()].map(
+        (e) =>
+          e +
+          array
+            .slice(0, groupIndex)
+            .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
+      ),
+      y: group.data.map((e) => e.mutations || e.contribution || 0),
+      hoverinfo: 'x+y',
+      showlegend: false,
+      xaxis: 'x2',
+      yaxis: 'y11',
+    })
+  );
+  console.log(sampleTraceDestructed);
+
+  const differenceTrace = sampleTraceOriginal.map((trace, traceIndex) => ({
+    ...trace,
+    y: trace.y.map((e, i) => e - sampleTraceDestructed[traceIndex].y[i]),
+    yaxis: 'y10',
+    axis: 'x2',
+  }));
+
+  //-------- under subplot -----------//
 
   const contributionGroupSort = (a, b) => {
     const order = Object.keys(colors);
@@ -130,12 +256,10 @@ export function MsIndividualComparison(
     );
   }
   console.log(groupSamples);
-  let range = [];
 
   const tracesArray = [];
   const sampleLabels = [];
   for (let i = 0; i < groupSamples.length; i++) {
-    range.push(i);
     let l = {
       xref: 'paper',
       yref: 'paper',
@@ -173,11 +297,16 @@ export function MsIndividualComparison(
       tracesArray.push(t);
     }
   }
-  console.log(tracesArray);
-  console.log(sampleLabels);
-  const tracesGroupY = groupBy(tracesArray, 'yaxis');
 
-  const traces = tracesArray;
+  console.log(sampleTraceOriginal);
+  console.log(tracesArray);
+  const traces = [
+    ...tracesArray,
+    ...differenceTrace,
+    ...sampleTraceOriginal,
+    ...sampleTraceDestructed,
+  ];
+  console.log(traces);
   console.log(divide);
   const leftTitleAnnotation = {
     xref: 'paper',
@@ -192,7 +321,7 @@ export function MsIndividualComparison(
     textangle: -90,
     showarrow: false,
   };
-  const mutationAnnotation = groupSamples[0].map(
+  const mutationAnnotation0 = groupSamples[0].map(
     (group, groupIndex, array) => ({
       xref: 'x',
       yref: 'paper',
@@ -211,20 +340,36 @@ export function MsIndividualComparison(
     })
   );
 
-  const percentAnnotation = {
+  const mutationAnnotation1 = groupOriginal.map((group, groupIndex, array) => ({
     xref: 'x',
     yref: 'paper',
     xanchor: 'bottom',
     yanchor: 'bottom',
-    x: 0.5,
-    y: -0.05,
-    text: 'Original Profile = ',
+    x:
+      array
+        .slice(0, groupIndex)
+        .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
+      (group.data.length - 1) * 0.5,
+    y: 1.005,
+    text: formatMutationLabels(group),
     showarrow: false,
     font: { color: 'white' },
     align: 'center',
+  }));
+
+  const percentAnnotation = {
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
+    x: 0.5,
+    y: -0.07,
+    text: '<b>Original Profile = ' + ptext.slice(0, -2) + '</b>',
+    showarrow: false,
+    align: 'center',
   };
 
-  const mutationLabelBox = groupSamples[0].map((group, groupIndex, array) => ({
+  const mutationLabelBox0 = groupSamples[0].map((group, groupIndex, array) => ({
     type: 'rect',
     xref: 'x',
     yref: 'paper',
@@ -242,16 +387,45 @@ export function MsIndividualComparison(
     },
   }));
 
+  const mutationLabelBox1 = groupOriginal.map((group, groupIndex, array) => ({
+    type: 'rect',
+    xref: 'x',
+    yref: 'paper',
+    x0: array
+      .slice(0, groupIndex)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    x1: array
+      .slice(0, groupIndex + 1)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    y0: 1.0,
+    y1: 1.035,
+    fillcolor: colors[group.mutation],
+    line: {
+      width: 1,
+    },
+  }));
   const tickLabels = formatTickLabels(groupSamples[0]);
 
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
-    height: 900,
+    height: 1000,
     grid: {
       rows: groupSamples.length,
       column: 1,
     },
     xaxis: {
+      showline: true,
+      tickangle: tickAngle,
+      tickfont: { family: 'Courier New, monospace' },
+      tickmode: 'array',
+      tickvals: tickLabels.map((_, i) => i),
+      ticktext: tickLabels.map((e) => e),
+      linecolor: '#E0E0E0',
+      linewidth: 1,
+      mirror: 'all',
+      ticks: '',
+    },
+    xaxis2: {
       showline: true,
       tickangle: tickAngle,
       tickfont: { family: 'Courier New, monospace' },
@@ -337,12 +511,58 @@ export function MsIndividualComparison(
       },
       domain: [divide * 5, divide * 5 + divide - 0.02],
     },
-    shapes: [...mutationLabelBox],
+
+    yaxis10: {
+      autorange: true,
+      //range: [-1 * maxMutations * 1.2, maxMutations * 1.2],
+      linecolor: '#D3D3D3',
+      linewidth: 1,
+      mirror: 'all',
+      tickfont: {
+        family: 'Arial',
+      },
+      showgrid: true,
+      gridcolor: '#F5F5F5',
+      domain: [
+        1 - ((1 - plotYrange - 0.05) / 3) * 3 - 0.01,
+        1 - ((1 - plotYrange - 0.05) / 3) * 2 - 0.01,
+      ],
+    },
+    yaxis11: {
+      autorange: true,
+      //range: [0, maxMutations * 1.2],
+      linecolor: '#D3D3D3',
+      linewidth: 1,
+      ticks: '',
+      mirror: 'all',
+      tickfont: {
+        family: 'Arial',
+      },
+      domain: [
+        1 - ((1 - plotYrange - 0.05) / 3) * 2 - 0.01,
+        1 - (1 - plotYrange - 0.05) / 3 - 0.01,
+      ],
+      title: { text: '<b>Relative contribution</b>' },
+    },
+    yaxis12: {
+      autorange: true,
+      //range: [0, maxMutations * 1.2],
+      linecolor: '#D3D3D3',
+      linewidth: 1,
+      ticks: '',
+      mirror: 'all',
+      tickfont: {
+        family: 'Arial',
+      },
+      domain: [1 - (1 - plotYrange - 0.05) / 3, 1],
+    },
+    shapes: [...mutationLabelBox0, ...mutationLabelBox1],
     annotations: [
-      ...mutationAnnotation,
+      ...mutationAnnotation0,
+      ...mutationAnnotation1,
       ...sampleLabels,
       leftTitleAnnotation,
-      // percentAnnotation,
+      percentAnnotation,
     ],
   };
 
