@@ -3,7 +3,7 @@ import { validate } from 'uuid';
 import path from 'path';
 import { getDirectory, putDirectory } from '../../s3.js';
 import logger from '../../logger.js';
-import { mkdirs, writeJson } from '../../utils.js';
+import { mkdirs, writeJson, readJson } from '../../utils.js';
 import config from '../../../config.json' assert { type: 'json' };
 
 export async function submit(req, res, next) {
@@ -67,7 +67,14 @@ export async function refresh(req, res, next) {
       { region: config.aws.region }
     );
 
-    res.json(id);
+    const paramsFilePath = path.resolve(inputFolder, 'params.json');
+    const statusFilePath = path.resolve(outputFolder, 'status.json');
+    const manifestFilePath = path.resolve(outputFolder, 'manifest.json');
+    const params = await readJson(paramsFilePath);
+    const status = await readJson(statusFilePath);
+    const manifest = await readJson(manifestFilePath);
+
+    res.json({ params, status, manifest });
   } catch (error) {
     logger.error('/refreshExtraction Error');
     next(error);
