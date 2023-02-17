@@ -77,9 +77,13 @@ export function compareProfiles(
     return order.indexOf(a.mutation) - order.indexOf(b.mutation);
   };
 
+  console.log(data1);
+  console.log(data2);
   // get total mutations per sample
   const totalMutations1 = getTotalMutations(data1);
   const totalMutations2 = getTotalMutations(data2);
+  console.log(totalMutations1);
+  console.log(totalMutations2);
 
   // get max mutations per sample
   const maxMutation1 = getMaxMutations(data1) / totalMutations1;
@@ -105,17 +109,21 @@ export function compareProfiles(
       contribution: e.contribution / totalMutations2,
     }),
   }));
-
+  console.log(normalizedSample1);
   const groupSamples1 = groupDataByMutation(
     normalizedSample1,
     mutationRegex,
     mutationGroupSort
   );
+
   const groupSamples2 = groupDataByMutation(
     normalizedSample2,
     mutationRegex,
     mutationGroupSort
   );
+
+  console.log(groupSamples1);
+  console.log(groupSamples2);
 
   const sampleTrace1 = groupSamples1.map((group, groupIndex, array) => ({
     name: group.mutation,
@@ -133,7 +141,7 @@ export function compareProfiles(
     showlegend: false,
     yaxis: 'y3',
   }));
-
+  console.log(sampleTrace1);
   const sampleTrace2 = groupSamples2.map((group, groupIndex, array) => ({
     name: group.mutation,
     type: 'bar',
@@ -174,6 +182,7 @@ export function compareProfiles(
   const cosineSimilarity = getCosineSimilarity(sample1Data, sample2Data);
 
   const tickLabels = formatTickLabels(groupSamples1);
+  console.log(tickLabels);
 
   const mutationLabelBox = groupSamples1.map((group, groupIndex, array) => ({
     type: 'rect',

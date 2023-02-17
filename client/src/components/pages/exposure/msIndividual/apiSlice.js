@@ -1,5 +1,5 @@
 import { explorationApiSlice } from '../../../../services/store/rootApi';
-import MsIndividual from '../../../controls/plotly/msIndividual/msIndividual';
+import msIndividual_sbs96 from '../../../controls/plotly/msIndividual/sbs96';
 
 export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -49,7 +49,7 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
           console.log(res);
           console.log(_arg);
           //return MsLandscape(res, _arg);
-          return { data: MsIndividual(res, _arg) };
+          return { data: msIndividual_sbs96(res, _arg) };
         } catch (error) {
           return { error };
         }
