@@ -24,7 +24,7 @@ export default function MsIndividualPlot({ state, form }) {
 
   const { sample } = form;
   const { study, strategy, signatureSetName, cancer, useAllCancer, id } = state;
-  console.log(state);
+
   useEffect(() => {
     if (sample && id) {
       setParams({

@@ -166,6 +166,8 @@ export function compareProfiles(
   }));
   const traces = [...differenceTrace, ...sampleTrace2, ...sampleTrace1];
 
+  console.log(traces);
+
   const sampleDifferenceData = differenceTrace.reduce(
     (array, trace) => [...array, ...trace.y],
     []
@@ -182,7 +184,6 @@ export function compareProfiles(
   const cosineSimilarity = getCosineSimilarity(sample1Data, sample2Data);
 
   const tickLabels = formatTickLabels(groupSamples1);
-  console.log(tickLabels);
 
   const mutationLabelBox = groupSamples1.map((group, groupIndex, array) => ({
     type: 'rect',
