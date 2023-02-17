@@ -40,7 +40,7 @@ export async function submit(req, res, next) {
   try {
     fetch(`${config.email.baseUrl}/extraction/run/${id}`);
   } catch (error) {
-    next(new Error('Failed to submit job'));
+    next(error);
   }
 
   res.json(status);
