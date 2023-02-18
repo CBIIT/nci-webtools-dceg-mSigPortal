@@ -189,7 +189,19 @@ export function MsIndividualComparison(
     mutationRegex,
     mutationGroupSort
   );
+  console.log();
 
+  // get total mutations per sample
+  const totalMutations1 = getTotalMutations(normalizedOriginal);
+  const totalMutations2 = getTotalMutations(newDestructedData);
+  console.log(totalMutations1);
+  console.log(totalMutations2);
+
+  // get max mutations per sample
+  const maxMutation1 = getMaxMutations(normalizedOriginal) / totalMutations1;
+  const maxMutation2 = getMaxMutations(newDestructedData) / totalMutations2;
+  const maxMutations = Math.max(maxMutation1, maxMutation2);
+  console.log(maxMutations);
   // --- Top subplots : original, destructed, different
   const sampleTraceOriginal = groupOriginal.map((group, groupIndex, array) => ({
     name: group.mutation,
@@ -279,7 +291,7 @@ export function MsIndividualComparison(
       let t = {
         name: groupSamples[i][j].mutation,
         type: 'bar',
-        maker: { color: colors[groupSamples[i][j].mutation] },
+        marker: { color: colors[groupSamples[i][j].mutation] },
         x: [...groupSamples[i][j].data.keys()].map(
           (e) =>
             e +
@@ -308,19 +320,35 @@ export function MsIndividualComparison(
   ];
   console.log(traces);
   console.log(divide);
-  const leftTitleAnnotation = {
-    xref: 'paper',
-    yref: 'paper',
-    xanchor: 'center',
-    yanchor: 'middle',
-    align: 'center',
-    x: -0.05,
-    y: plotYrange / 2,
-    text: '<b>Relative contribution</b>',
-    font: { size: 12 },
-    textangle: -90,
-    showarrow: false,
-  };
+
+  const leftTitleAnnotation = [
+    {
+      xref: 'paper',
+      yref: 'paper',
+      xanchor: 'center',
+      yanchor: 'middle',
+      align: 'center',
+      x: -0.05,
+      y: plotYrange / 2,
+      text: '<b>Relative contribution</b>',
+      font: { size: 15 },
+      textangle: -90,
+      showarrow: false,
+    },
+    {
+      xref: 'paper',
+      yref: 'paper',
+      xanchor: 'center',
+      yanchor: 'middle',
+      align: 'center',
+      x: -0.05,
+      y: plotYrange + (1 - plotYrange) / 2,
+      text: '<b>Relative contribution</b>',
+      font: { size: 15 },
+      textangle: -90,
+      showarrow: false,
+    },
+  ];
   const mutationAnnotation0 = groupSamples[0].map(
     (group, groupIndex, array) => ({
       xref: 'x',
@@ -513,8 +541,8 @@ export function MsIndividualComparison(
     },
 
     yaxis10: {
-      autorange: true,
-      //range: [-1 * maxMutations * 1.2, maxMutations * 1.2],
+      autorange: false,
+      range: [-1 * maxMutations, maxMutations],
       linecolor: '#D3D3D3',
       linewidth: 1,
       mirror: 'all',
@@ -529,8 +557,8 @@ export function MsIndividualComparison(
       ],
     },
     yaxis11: {
-      autorange: true,
-      //range: [0, maxMutations * 1.2],
+      autorange: false,
+      range: [0, maxMutations * 1.2],
       linecolor: '#D3D3D3',
       linewidth: 1,
       ticks: '',
@@ -542,11 +570,10 @@ export function MsIndividualComparison(
         1 - ((1 - plotYrange - 0.05) / 3) * 2 - 0.01,
         1 - (1 - plotYrange - 0.05) / 3 - 0.01,
       ],
-      title: { text: '<b>Relative contribution</b>' },
     },
     yaxis12: {
-      autorange: true,
-      //range: [0, maxMutations * 1.2],
+      autorange: false,
+      range: [0, maxMutations * 1.2],
       linecolor: '#D3D3D3',
       linewidth: 1,
       ticks: '',
@@ -561,7 +588,7 @@ export function MsIndividualComparison(
       ...mutationAnnotation0,
       ...mutationAnnotation1,
       ...sampleLabels,
-      leftTitleAnnotation,
+      ...leftTitleAnnotation,
       percentAnnotation,
     ],
   };
