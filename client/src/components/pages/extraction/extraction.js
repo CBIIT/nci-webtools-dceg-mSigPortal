@@ -38,12 +38,15 @@ export default function Extraction() {
       skip: !id,
     }
   );
-  const { data: status, refetch: refetchStatus } = useStatusQuery(id, {
-    skip: !id,
-  });
-  const { data: manifest, refetch: refetchManifest } = useManifestQuery(id, {
-    skip: !id,
-  });
+
+  const status = refreshStatus?.status;
+  const manifest = refreshStatus?.manifest;
+  // const { data: status, refetch: refetchStatus } = useStatusQuery(id, {
+  //   skip: !id,
+  // });
+  // const { data: manifest, refetch: refetchManifest } = useManifestQuery(id, {
+  //   skip: !id,
+  // });
 
   const isDone = ['COMPLETED', 'FAILED'].includes(status?.status);
   const explorationId = (() => {
@@ -56,9 +59,12 @@ export default function Extraction() {
 
   const refreshState = useCallback(() => {
     refreshExtraction();
-    refetchStatus();
-    refetchManifest();
-  }, [refreshExtraction, refetchStatus, refetchManifest]);
+  }, [refreshExtraction]);
+  // const refreshState = useCallback(() => {
+  //   refreshExtraction();
+  //   refetchStatus();
+  //   refetchManifest();
+  // }, [refreshExtraction, refetchStatus, refetchManifest]);
 
   useEffect(() => {
     const interval = setInterval(refreshState, 1000 * 60);

@@ -3,7 +3,7 @@ import express from 'express';
 import Router from 'express-promise-router';
 import { check } from 'express-validator';
 import multer from 'multer';
-import { submit, query } from './analysis.js';
+import { submit, query, run } from './analysis.js';
 import {
   handleValidationErrors,
   logRequests,
@@ -46,6 +46,10 @@ export function createApi(env) {
     handleValidationErrors,
     async (req, res) =>
       res.json(await submit({ ...req.body, id: req.params.id }, req.app))
+  );
+
+  router.get('/run/:id', validate, handleValidationErrors, async (req, res) =>
+    res.json(await run(req.params.id, req.app, env))
   );
 
   router.post('/query/:id', async (req, res) =>

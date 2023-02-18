@@ -28,9 +28,9 @@ function createApp(config) {
   app.locals.sqlite = (userId, db) =>
     knex({
       client: 'better-sqlite3',
-      connection: () => ({
+      connection: {
         filename: path.join(config.folders.output, userId, `${db}.sqlite3`),
-      }),
+      },
       useNullAsDefault: true,
     });
   app.locals.cache = createDatabaseCache(app.locals.connection, 'cache');
