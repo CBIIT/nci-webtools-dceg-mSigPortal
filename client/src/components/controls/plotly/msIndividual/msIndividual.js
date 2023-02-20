@@ -5,6 +5,7 @@ import {
   getTotalMutations,
   getMaxMutations,
   getCosineSimilarity,
+  getRss,
 } from '../profileComparision/profileComparison';
 
 export function MsIndividualComparison(
@@ -50,14 +51,21 @@ export function MsIndividualComparison(
 
   console.log(percentSignature);
 
-  let ptext = '';
-  for (let i = 0; i < percentSignature.length; i++) {
-    ptext +=
-      (percentSignature[i].percent * 100).toFixed(1) +
-      '%*' +
-      percentSignature[i].signatureName +
-      ' + ';
-  }
+  // let ptext = '';
+  // for (let i = 0; i < percentSignature.length; i++) {
+  //   ptext +=
+  //     (percentSignature[i].percent * 100).toFixed(1) +
+  //     '%*' +
+  //     percentSignature[i].signatureName +
+  //     ' + ';
+  // }
+  const ptext = percentSignature
+    .map(
+      (signature) =>
+        `${(signature.percent * 100).toFixed(1)}%*${signature.signatureName} + `
+    )
+    .join('');
+
   console.log(ptext);
   const signature_groupBySignature = groupBy(
     signatureData.filter((e) => signatureNames.includes(e.signatureName)),
@@ -66,18 +74,29 @@ export function MsIndividualComparison(
   console.log(signature_groupBySignature);
   console.log(signatureNames.length);
 
-  let plotYrange;
-  if (signatureNames.length > 6) {
-    plotYrange = 0.8;
-  } else if (signatureNames.length === 6) {
-    plotYrange = 0.7;
-  } else if (signatureNames.length === 5) {
-    plotYrange = 0.65;
-  } else if (signatureNames.length === 4) {
-    plotYrange = 0.6;
-  } else {
-    plotYrange = 0.6;
-  }
+  // let plotYrange;
+  // if (signatureNames.length > 6) {
+  //   plotYrange = 0.8;
+  // } else if (signatureNames.length === 6) {
+  //   plotYrange = 0.7;
+  // } else if (signatureNames.length === 5) {
+  //   plotYrange = 0.65;
+  // } else if (signatureNames.length === 4) {
+  //   plotYrange = 0.6;
+  // } else {
+  //   plotYrange = 0.6;
+  // }
+  // const divide = plotYrange / signatureNames.length;
+
+  const plotYrange =
+    signatureNames.length > 6
+      ? 0.8
+      : signatureNames.length === 6
+      ? 0.7
+      : signatureNames.length === 5
+      ? 0.65
+      : 0.6;
+
   const divide = plotYrange / signatureNames.length;
 
   const signatureDataFilter = Object.values(signature_groupBySignature).flat();
@@ -162,6 +181,20 @@ export function MsIndividualComparison(
       }
     }
   }
+  // const destructedData = percentSignature
+  //   .map(({ signatureName, percent }) => {
+  //     const matchingData = arraySignatureDataFlat.find(
+  //       ({ signatureName: name }) => name === signatureName
+  //     );
+  //     if (!matchingData) return null;
+  //     const { mutationType, contribution } = matchingData;
+  //     return {
+  //       signatureName,
+  //       mutationType,
+  //       mutations: contribution * percent,
+  //     };
+  //   })
+  //   .filter(Boolean);
 
   console.log(destructedData);
 
@@ -183,13 +216,21 @@ export function MsIndividualComparison(
     newDestructedData.push(n);
   }
   console.log(newDestructedData);
+  // const newDestructedData = Object.values(
+  //   groupBy(destructedData, 'mutationType')
+  // ).map((group) => ({
+  //   mutations: getTotalMutations(group),
+  //   mutationType: group[0].mutationType,
+  //   signatureName: group[0].signatureName,
+  // }));
+  // console.log(newDestructedData);
 
   const groupDestructed = groupDataByMutation(
     newDestructedData,
     mutationRegex,
     mutationGroupSort
   );
-  console.log();
+  console.log(groupDestructed);
 
   // get total mutations per sample
   const totalMutations1 = getTotalMutations(normalizedOriginal);
@@ -249,6 +290,59 @@ export function MsIndividualComparison(
     axis: 'x2',
   }));
 
+  const sampleBorder1 = groupOriginal.map((group, groupIndex, array) => ({
+    type: 'rect',
+    xref: 'x',
+    yref: 'paper',
+    x0: array
+      .slice(0, groupIndex)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    x1: array
+      .slice(0, groupIndex + 1)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    y0: 1 - (1 - plotYrange - 0.05) / 3,
+    y1: 1,
+    line: {
+      width: 1,
+    },
+  }));
+
+  const sampleBorder2 = groupDestructed.map((group, groupIndex, array) => ({
+    type: 'rect',
+    xref: 'x',
+    yref: 'paper',
+    x0: array
+      .slice(0, groupIndex)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    x1: array
+      .slice(0, groupIndex + 1)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    y0: 1 - ((1 - plotYrange - 0.05) / 3) * 2 - 0.01,
+    y1: 1 - (1 - plotYrange - 0.05) / 3 - 0.01,
+
+    line: {
+      width: 1,
+    },
+  }));
+
+  const differenceBorder = groupDestructed.map((group, groupIndex, array) => ({
+    type: 'rect',
+    xref: 'x',
+    yref: 'paper',
+    x0: array
+      .slice(0, groupIndex)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    x1: array
+      .slice(0, groupIndex + 1)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    y0: 1 - ((1 - plotYrange - 0.05) / 3) * 3 - 0.025,
+    y1: 1 - ((1 - plotYrange - 0.05) / 3) * 2 - 0.025,
+
+    line: {
+      width: 1,
+    },
+  }));
+
   //-------- under subplot -----------//
 
   const contributionGroupSort = (a, b) => {
@@ -271,6 +365,7 @@ export function MsIndividualComparison(
 
   const tracesArray = [];
   const sampleLabels = [];
+  const sampleBorders = [];
   for (let i = 0; i < groupSamples.length; i++) {
     let l = {
       xref: 'paper',
@@ -286,6 +381,7 @@ export function MsIndividualComparison(
       showarrow: false,
       width: 100,
     };
+
     sampleLabels.push(l);
     for (let j = 0; j < groupSamples[i].length; j++) {
       let t = {
@@ -307,9 +403,28 @@ export function MsIndividualComparison(
         yaxis: i > 0 ? 'y' + parseInt(Number(i) + Number(1)) : 'y',
       };
       tracesArray.push(t);
+
+      let s = {
+        type: 'rect',
+        xref: 'x',
+        yref: 'paper',
+        x0: groupSamples[i]
+          .slice(0, j)
+          .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+        x1: groupSamples[i]
+          .slice(0, j + 1)
+          .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+        y0: divide * i,
+        y1: divide * i + divide - 0.02,
+
+        line: {
+          width: 1,
+        },
+      };
+      sampleBorders.push(s);
     }
   }
-
+  console.log(sampleBorders);
   console.log(sampleTraceOriginal);
   console.log(tracesArray);
   const traces = [
@@ -360,7 +475,7 @@ export function MsIndividualComparison(
           .slice(0, groupIndex)
           .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
         (group.data.length - 1) * 0.5,
-      y: plotYrange + 0.001,
+      y: plotYrange - 0.02,
       text: formatMutationLabels(group),
       showarrow: false,
       font: { color: 'white' },
@@ -407,8 +522,8 @@ export function MsIndividualComparison(
     x1: array
       .slice(0, groupIndex + 1)
       .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
-    y0: plotYrange,
-    y1: plotYrange + 0.03,
+    y0: plotYrange - 0.02,
+    y1: plotYrange + 0.005,
     fillcolor: colors[group.mutation],
     line: {
       width: 1,
@@ -437,10 +552,7 @@ export function MsIndividualComparison(
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     height: 1000,
-    grid: {
-      rows: groupSamples.length,
-      column: 1,
-    },
+
     xaxis: {
       showline: true,
       tickangle: tickAngle,
@@ -467,7 +579,6 @@ export function MsIndividualComparison(
     },
     yaxis: {
       autorange: true,
-      //range: [0, maxMutations * 1.2],
       linecolor: '#D3D3D3',
       linewidth: 1,
       mirror: 'all',
@@ -477,10 +588,10 @@ export function MsIndividualComparison(
       showgrid: true,
       gridcolor: '#F5F5F5',
       domain: [0, divide - 0.02],
+      anchor: 'x',
     },
     yaxis2: {
       autorange: true,
-      // range: [0, maxMutations * 1.2],
       linecolor: '#D3D3D3',
       linewidth: 1,
       ticks: '',
@@ -489,11 +600,10 @@ export function MsIndividualComparison(
         family: 'Arial',
       },
       domain: [divide * 1, divide * 1 + divide - 0.02],
-      //title: { text: '<b>Relative contribution</b>' },
+      anchor: 'x',
     },
     yaxis3: {
       autorange: true,
-      // range: [0, maxMutations * 1.2],
       linecolor: '#D3D3D3',
       linewidth: 1,
       ticks: '',
@@ -502,6 +612,7 @@ export function MsIndividualComparison(
         family: 'Arial',
       },
       domain: [divide * 2, divide * 2 + divide - 0.02],
+      anchor: 'x',
     },
     yaxis4: {
       autorange: true,
@@ -514,10 +625,10 @@ export function MsIndividualComparison(
         family: 'Arial',
       },
       domain: [divide * 3, divide * 3 + divide - 0.02],
+      anchor: 'x',
     },
     yaxis5: {
       autorange: true,
-      // range: [0, maxMutations * 1.2],
       linecolor: '#D3D3D3',
       linewidth: 1,
       ticks: '',
@@ -526,10 +637,10 @@ export function MsIndividualComparison(
         family: 'Arial',
       },
       domain: [divide * 4, divide * 4 + divide - 0.02],
+      anchor: 'x',
     },
     yaxis6: {
       autorange: true,
-      // range: [0, maxMutations * 1.2],
       linecolor: '#D3D3D3',
       linewidth: 1,
       ticks: '',
@@ -538,11 +649,13 @@ export function MsIndividualComparison(
         family: 'Arial',
       },
       domain: [divide * 5, divide * 5 + divide - 0.02],
+      anchor: 'x',
     },
 
     yaxis10: {
       autorange: false,
-      range: [-1 * maxMutations, maxMutations],
+      //range: [-1 * maxMutations, maxMutations],
+      range: [-0.02, 0.02],
       linecolor: '#D3D3D3',
       linewidth: 1,
       mirror: 'all',
@@ -552,9 +665,10 @@ export function MsIndividualComparison(
       showgrid: true,
       gridcolor: '#F5F5F5',
       domain: [
-        1 - ((1 - plotYrange - 0.05) / 3) * 3 - 0.01,
-        1 - ((1 - plotYrange - 0.05) / 3) * 2 - 0.01,
+        1 - ((1 - plotYrange - 0.05) / 3) * 3 - 0.025,
+        1 - ((1 - plotYrange - 0.05) / 3) * 2 - 0.025,
       ],
+      anchor: 'x2',
     },
     yaxis11: {
       autorange: false,
@@ -570,6 +684,7 @@ export function MsIndividualComparison(
         1 - ((1 - plotYrange - 0.05) / 3) * 2 - 0.01,
         1 - (1 - plotYrange - 0.05) / 3 - 0.01,
       ],
+      anchor: 'x2',
     },
     yaxis12: {
       autorange: false,
@@ -582,8 +697,16 @@ export function MsIndividualComparison(
         family: 'Arial',
       },
       domain: [1 - (1 - plotYrange - 0.05) / 3, 1],
+      anchor: 'x2',
     },
-    shapes: [...mutationLabelBox0, ...mutationLabelBox1],
+    shapes: [
+      ...mutationLabelBox0,
+      ...mutationLabelBox1,
+      ...sampleBorders,
+      ...sampleBorder1,
+      ...sampleBorder2,
+      ...differenceBorder,
+    ],
     annotations: [
       ...mutationAnnotation0,
       ...mutationAnnotation1,

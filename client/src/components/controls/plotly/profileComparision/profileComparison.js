@@ -363,10 +363,7 @@ export function compareProfiles(
   const layout = {
     height: 700,
     hoverlabel: { bgcolor: '#FFF' },
-    grid: {
-      rows: 3,
-      column: 1,
-    },
+
     title:
       '<b>RSS = ' + rss + '; Cosine Similarity = ' + cosineSimilarity + '</b>',
     xaxis: {
