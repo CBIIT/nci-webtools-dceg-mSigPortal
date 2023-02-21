@@ -11,6 +11,7 @@ import {
 } from '../../controls/sidebar-container/sidebar-container';
 import ExtractionForm from './extraction-form';
 import Instructions from './instructions';
+import Status from './status';
 import TMB from '../exposure/tmb/tmb';
 import TmbSignature from '../exposure/tmbSignature/tmbSignature';
 import MsBurden from '../exposure/msBurden/msBurden';
@@ -81,38 +82,52 @@ export default function Extraction() {
     {
       id: 'instructions',
       name: 'Instructions',
+      disabled: false,
+    },
+    {
+      id: 'status',
+      name: 'Status',
+      disabled: false,
     },
     {
       id: 'tmb',
       name: 'TMB',
+      disabled: explorationId === false,
     },
     {
       id: 'tmbSig',
       name: 'TMB Signatures',
+      disabled: explorationId === false,
     },
     {
       id: 'msBurden',
       name: 'MS Burden',
+      disabled: explorationId === false,
     },
     {
       id: 'msDecomposition',
       name: 'MS Decomposition',
+      disabled: explorationId === false,
     },
     {
       id: 'msAssociation',
       name: 'MS Association',
+      disabled: explorationId === false,
     },
     {
       id: 'msLandscape',
       name: 'MS Landscape',
+      disabled: explorationId === false,
     },
     {
       id: 'msPrevalence',
       name: 'MS Prevalence',
+      disabled: explorationId === false,
     },
     {
       id: 'msIndividual',
       name: 'MS Individual',
+      disabled: explorationId === false,
     },
   ];
 
@@ -127,7 +142,7 @@ export default function Extraction() {
           {/* for desktops and tablets */}
           <div className="d-none d-md-block">
             <Nav defaultActiveKey="instructions">
-              {tabs.map(({ name, id }, i) => (
+              {tabs.map(({ name, id, disabled }, i) => (
                 <div key={name} className="d-inline-block">
                   <Button
                     variant="link"
@@ -136,7 +151,7 @@ export default function Extraction() {
                         ? 'bg-extraction text-white'
                         : 'text-extraction'
                     }`}
-                    disabled={!explorationId}
+                    disabled={disabled}
                     style={{
                       textDecoration: 'none',
                       fontSize: '12pt',
@@ -155,7 +170,7 @@ export default function Extraction() {
           {/* for mobile devices */}
           <div className="row d-md-none">
             <Nav defaultActiveKey="instructions">
-              {tabs.map(({ name, id }, i) => {
+              {tabs.map(({ name, id, disabled }, i) => {
                 if (name)
                   return (
                     <div key={name} className="col-12 text-center">
@@ -166,6 +181,7 @@ export default function Extraction() {
                             ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-extraction text-white rounded-0'
                             : 'secondary-navlinks px-3 py-1 d-inline-block border-0 rounded-0'
                         }
+                        disabled={disabled}
                         style={{
                           textDecoration: 'none',
                           fontSize: '12pt',
@@ -257,6 +273,9 @@ export default function Extraction() {
           )}
           <div className={displayTab === 'instructions' ? 'd-block' : 'd-none'}>
             <Instructions />
+          </div>
+          <div className={displayTab === 'status' ? 'd-block' : 'd-none'}>
+            <Status />
           </div>
           {status && status.status === 'COMPLETED' && (
             <>

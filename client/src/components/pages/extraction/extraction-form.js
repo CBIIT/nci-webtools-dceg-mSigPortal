@@ -342,6 +342,8 @@ export default function ExtractionForm() {
     mergeSuccess(
       `Your job was successfully submitted. You will recieve an email at ${data.email} when it is complete.`
     );
+    const jobs = JSON.parse(localStorage.getItem('jobs')) || [];
+    localStorage.setItem('jobs', JSON.stringify([...jobs, id]));
   }
 
   return (

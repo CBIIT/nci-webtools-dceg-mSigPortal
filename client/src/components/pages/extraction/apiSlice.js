@@ -41,6 +41,25 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
         url: `data/output/${id}/manifest.json`,
       }),
     }),
+
+    multiJobStatus: builder.query({
+      query: (body) => ({
+        url: `refreshExtractionMulti`,
+        method: 'POST',
+        body,
+      }),
+      transformResponse: (data) => {
+        return data.map((job) => {
+          const { status, params, manifest } = job;
+          if (status)
+            return {
+              jobName: params.jobName,
+              status: status.status,
+              id: status.id,
+            };
+        });
+      },
+    }),
   }),
 });
 
@@ -51,4 +70,5 @@ export const {
   useStatusQuery,
   useParamsQuery,
   useManifestQuery,
+  useMultiJobStatusQuery,
 } = inputFormApiSlice;

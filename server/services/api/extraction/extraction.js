@@ -46,37 +46,57 @@ export async function submit(req, res, next) {
   res.json(status);
 }
 
-export async function refresh(req, res, next) {
-  const id = req.params.id;
-  if (!validate(id)) res.status(500).json('Invalid ID');
-
+// downloads latest files from s3 and returns status, params, and manifest
+async function getJobStatus(id) {
+  if (!validate(id)) return `${id} is not a valid ID`;
   const inputFolder = path.resolve(config.folders.input, id);
   const outputFolder = path.resolve(config.folders.output, id);
 
+  await getDirectory(
+    inputFolder,
+    path.join(config.aws.inputKeyPrefix, id),
+    config.aws.bucket,
+    { region: config.aws.region }
+  );
+  await getDirectory(
+    outputFolder,
+    path.join(config.aws.outputKeyPrefix, id),
+    config.aws.bucket,
+    { region: config.aws.region }
+  );
+
+  const paramsFilePath = path.resolve(inputFolder, 'params.json');
+  const statusFilePath = path.resolve(outputFolder, 'status.json');
+  const manifestFilePath = path.resolve(outputFolder, 'manifest.json');
+  const params = await readJson(paramsFilePath);
+  const status = await readJson(statusFilePath);
+  const manifest = await readJson(manifestFilePath);
+
+  return { params, status, manifest };
+}
+
+export async function refresh(req, res, next) {
+  const id = req.params.id;
+
   try {
-    await getDirectory(
-      inputFolder,
-      path.join(config.aws.inputKeyPrefix, id),
-      config.aws.bucket,
-      { region: config.aws.region }
-    );
-    await getDirectory(
-      outputFolder,
-      path.join(config.aws.outputKeyPrefix, id),
-      config.aws.bucket,
-      { region: config.aws.region }
-    );
+    const data = getJobStatus(id);
 
-    const paramsFilePath = path.resolve(inputFolder, 'params.json');
-    const statusFilePath = path.resolve(outputFolder, 'status.json');
-    const manifestFilePath = path.resolve(outputFolder, 'manifest.json');
-    const params = await readJson(paramsFilePath);
-    const status = await readJson(statusFilePath);
-    const manifest = await readJson(manifestFilePath);
-
-    res.json({ params, status, manifest });
+    res.json(data);
   } catch (error) {
     logger.error('/refreshExtraction Error');
+    next(error);
+  }
+}
+
+export async function refreshMulti(req, res, next) {
+  const ids = req.body;
+
+  try {
+    const stauses = await Promise.all(ids.map(getJobStatus));
+
+    res.json(stauses);
+  } catch (error) {
+    logger.error('/refreshExtractionMulti Error');
     next(error);
   }
 }
@@ -84,5 +104,6 @@ export async function refresh(req, res, next) {
 const router = Router();
 router.post('/submitExtraction/:id?', submit);
 router.get('/refreshExtraction/:id?', refresh);
+router.post('/refreshExtractionMulti', refreshMulti);
 
 export { router };
