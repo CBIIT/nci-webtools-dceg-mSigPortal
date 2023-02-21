@@ -126,12 +126,7 @@ export default function Table({
     {
       columns: useMemo((_) => columns, [columns]),
       data: useMemo((_) => data, [data]),
-      defaultColumn: useMemo(
-        (_) => ({
-          Filter: TextFilter,
-        }),
-        []
-      ),
+      defaultColumn: useMemo((_) => ({ Filter: TextFilter }), []),
       ...options,
     },
     useFilters,
@@ -314,7 +309,7 @@ export default function Table({
               value={pageSize}
               onChange={(e) => setPageSize(Number(e.target.value))}
             >
-              {[10, 25, 50, 100].map((pageSize) => (
+              {[25, 50, 100].map((pageSize) => (
                 <option key={pageSize} value={pageSize}>
                   Show {pageSize}
                 </option>
