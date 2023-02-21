@@ -495,6 +495,8 @@ export function MsIndividualComparison(
       sampleBorders.push(s);
     }
   }
+
+  
   console.log(sampleBorders);
   console.log(sampleTraceOriginal);
   console.log(tracesArray);
@@ -549,7 +551,7 @@ export function MsIndividualComparison(
           .slice(0, groupIndex)
           .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
         (group.data.length - 1) * 0.5,
-      y: plotYrange2 - 0.02,
+      y: plotYrange2 - 0.017,
       text: formatMutationLabels(group),
       showarrow: false,
       font: { color: 'white' },
@@ -567,7 +569,7 @@ export function MsIndividualComparison(
         .slice(0, groupIndex)
         .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
       (group.data.length - 1) * 0.5,
-    y: 1.005,
+    y: 1.002,
     text: formatMutationLabels(group),
     showarrow: false,
     font: { color: 'white' },
@@ -616,7 +618,7 @@ export function MsIndividualComparison(
       .slice(0, groupIndex + 1)
       .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
     y0: 1.0,
-    y1: 1.03,
+    y1: 1.025,
     fillcolor: colors[group.mutation],
     line: {
       width: 1,
@@ -649,19 +651,38 @@ export function MsIndividualComparison(
         sortArr[i].signatureName.replace(/^\D*/, '').replace(')', '')
       ],
     line: {
+      width: 0,
+    },
+  }));
+
+  const signaturePercentLine = scaledPercents.map((val, i, arr) => ({
+    type: 'line',
+    xref: 'paper',
+    yref: 'paper',
+    y0: i === 0 ? val / 2 : (val - arr[i - 1]) / 2 + arr[i - 1],
+    y1: i === 0 ? val / 2 : (val - arr[i - 1]) / 2 + arr[i - 1],
+    x0: -0.105,
+    x1: -0.125,
+    signatureName: sortArr[i] ? sortArr[i].signatureName : '',
+
+    line: {
       width: 1,
+      color:
+        signatureColors[
+          sortArr[i].signatureName.replace(/^\D*/, '').replace(')', '')
+        ],
     },
   }));
 
   const signaturePercentAnnotation = scaledPercents.map((val, i, arr) => ({
     xref: 'paper',
     yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'right',
+    xanchor: 'center',
+    yanchor: 'middle',
     val: val,
     val1: arr[i - 1],
     y: i === 0 ? val / 2 : (val - arr[i - 1]) / 2 + arr[i - 1],
-    x: -0.17,
+    x: -0.15,
     signatureName: sortArr[i] ? sortArr[i].signatureName : '',
     font: {
       color:
@@ -843,6 +864,7 @@ export function MsIndividualComparison(
       ...sampleBorder2,
       ...differenceBorder,
       ...signaturePercentBox,
+      ...signaturePercentLine,
     ],
     annotations: [
       ...mutationAnnotation0,
@@ -857,7 +879,7 @@ export function MsIndividualComparison(
     ],
 
     margin: {
-      l: 150,
+      l: 200,
     },
   };
 
