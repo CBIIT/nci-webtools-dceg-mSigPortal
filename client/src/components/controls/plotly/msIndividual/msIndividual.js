@@ -1,5 +1,7 @@
 import { groupBy } from 'lodash';
 import { round } from '../../utils/utils';
+import { colorPallet } from '../../utils/colors';
+
 import {
   groupDataByMutation,
   getTotalMutations,
@@ -26,7 +28,7 @@ export function MsIndividualComparison(
   console.log(signatureData);
   const segmatrixData = data[2].data;
   console.log(segmatrixData);
-
+  const signatureColors = colorPallet;
   const exposure_groupBySignature = groupBy(
     exposureData.filter((o) => o['exposure'] > 0.01),
     'signatureName'
@@ -301,6 +303,21 @@ export function MsIndividualComparison(
     axis: 'x2',
   }));
 
+  const sample1Data = sampleTraceOriginal.reduce(
+    (array, trace) => [...array, ...trace.y],
+    []
+  );
+  const sample2Data = sampleTraceDestructed.reduce(
+    (array, trace) => [...array, ...trace.y],
+    []
+  );
+
+  const sampleDifferenceData = differenceTrace.reduce(
+    (array, trace) => [...array, ...trace.y],
+    []
+  );
+  const rss = getRss(sampleDifferenceData);
+  const cosineSimilarity = getCosineSimilarity(sample1Data, sample2Data);
   const sampleBorder1 = groupOriginal.map((group, groupIndex, array) => ({
     type: 'rect',
     xref: 'x',
@@ -377,7 +394,7 @@ export function MsIndividualComparison(
     align: 'center',
     x: 1.017,
     y: 1 - divide1 * 1.5 - 0.01,
-    text: 'Reconstructed',
+    text: 'Deconstructed',
     textangle: 90,
     showarrow: false,
   };
@@ -502,7 +519,7 @@ export function MsIndividualComparison(
       align: 'center',
       x: -0.05,
       y: plotYrange2 / 2,
-      text: '<b>Relative contribution</b>',
+      text: 'Relative contribution',
       font: { size: 15 },
       textangle: -90,
       showarrow: false,
@@ -515,7 +532,7 @@ export function MsIndividualComparison(
       align: 'center',
       x: -0.05,
       y: plotYrange2 + (1 - plotYrange2) / 2,
-      text: '<b>Relative contribution</b>',
+      text: 'Relative contribution',
       font: { size: 15 },
       textangle: -90,
       showarrow: false,
@@ -550,7 +567,7 @@ export function MsIndividualComparison(
         .slice(0, groupIndex)
         .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
       (group.data.length - 1) * 0.5,
-    y: 1.0,
+    y: 1.005,
     text: formatMutationLabels(group),
     showarrow: false,
     font: { color: 'white' },
@@ -605,13 +622,68 @@ export function MsIndividualComparison(
       width: 1,
     },
   }));
+  console.log(mutationLabelBox1);
+
+  const sortArr = percentSignature
+    .slice()
+    .sort((a, b) => b.percent - a.percent);
+  const percents = sortArr.map((obj) => obj.percent); // extract percent values
+  const scaledPercents = percents.map((p, i) =>
+    percents.slice(0, i + 1).reduce((acc, val) => acc + val)
+  ); // compute cumulative sum
+  const objArray = scaledPercents.map((val, i, arr) => ({})); // create object array
+  console.log(percents);
+  console.log(scaledPercents);
+  console.log(objArray);
+  const signaturePercentBox = scaledPercents.map((val, i, arr) => ({
+    type: 'rect',
+    xref: 'paper',
+    yref: 'paper',
+    y0: i === 0 ? 0 : arr[i - 1],
+    y1: val,
+    x0: -0.105,
+    x1: -0.08,
+    signatureName: sortArr[i] ? sortArr[i].signatureName : '',
+    fillcolor:
+      signatureColors[
+        sortArr[i].signatureName.replace(/^\D*/, '').replace(')', '')
+      ],
+    line: {
+      width: 1,
+    },
+  }));
+
+  const signaturePercentAnnotation = scaledPercents.map((val, i, arr) => ({
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'right',
+    val: val,
+    val1: arr[i - 1],
+    y: i === 0 ? val / 2 : (val - arr[i - 1]) / 2 + arr[i - 1],
+    x: -0.17,
+    signatureName: sortArr[i] ? sortArr[i].signatureName : '',
+    font: {
+      color:
+        signatureColors[
+          sortArr[i].signatureName.replace(/^\D*/, '').replace(')', '')
+        ],
+    },
+    text: sortArr[i].signatureName,
+    showarrow: false,
+
+    align: 'center',
+  }));
+  console.log(signaturePercentAnnotation);
+  console.log(signaturePercentBox);
   const tickLabels = formatTickLabels(groupSamples[0]);
 
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     height: 1080,
     autosize: true,
-
+    title:
+      '<b>RSS = ' + rss + '; Cosine Similarity = ' + cosineSimilarity + '</b>',
     xaxis: {
       showline: true,
       tickangle: tickAngle,
@@ -770,6 +842,7 @@ export function MsIndividualComparison(
       ...sampleBorder1,
       ...sampleBorder2,
       ...differenceBorder,
+      ...signaturePercentBox,
     ],
     annotations: [
       ...mutationAnnotation0,
@@ -780,10 +853,11 @@ export function MsIndividualComparison(
       sampleLabelDiff,
       ...leftTitleAnnotation,
       percentAnnotation,
+      ...signaturePercentAnnotation,
     ],
 
     margin: {
-      l: -0.5,
+      l: 150,
     },
   };
 
