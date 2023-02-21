@@ -88,17 +88,27 @@ export function MsIndividualComparison(
   // }
   // const divide = plotYrange / signatureNames.length;
 
-  const plotYrange =
+  const plotYrange2 =
     signatureNames.length > 6
       ? 0.7
       : signatureNames.length === 6
       ? 0.65
       : signatureNames.length === 5
       ? 0.6
-      : 0.55;
-
-  const divide = plotYrange / signatureNames.length;
-  console.log(divide);
+      : signatureNames.length === 4
+      ? 0.55
+      : signatureNames.length === 3
+      ? 0.5
+      : signatureNames.length === 2
+      ? 0.4
+      : signatureNames.length === 1
+      ? 0.2
+      : 0.1;
+  const plotYrange1 = 1 - plotYrange2 - 0.06;
+  const divide2 = plotYrange2 / signatureNames.length;
+  console.log(divide2);
+  const divide1 = plotYrange1 / 3;
+  console.log(divide1);
 
   const signatureDataFilter = Object.values(signature_groupBySignature).flat();
   console.log(signatureDataFilter);
@@ -301,7 +311,7 @@ export function MsIndividualComparison(
     x1: array
       .slice(0, groupIndex + 1)
       .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
-    y0: 1 - (1 - plotYrange - 0.05) / 3,
+    y0: 1 - divide1 - 0.01,
     y1: 1,
     line: {
       width: 1,
@@ -318,8 +328,8 @@ export function MsIndividualComparison(
     x1: array
       .slice(0, groupIndex + 1)
       .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
-    y0: 1 - ((1 - plotYrange - 0.05) / 3) * 2 - 0.01,
-    y1: 1 - (1 - plotYrange - 0.05) / 3 - 0.01,
+    y0: 1 - divide1 * 2 - 0.01,
+    y1: 1 - divide1 - 0.02,
 
     line: {
       width: 1,
@@ -336,8 +346,8 @@ export function MsIndividualComparison(
     x1: array
       .slice(0, groupIndex + 1)
       .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
-    y0: 1 - ((1 - plotYrange - 0.05) / 3) * 3 - 0.02,
-    y1: 1 - ((1 - plotYrange - 0.05) / 3) * 2 - 0.02,
+    y0: 1 - divide1 * 3 - 0.01,
+    y1: 1 - divide1 * 2 - 0.02,
 
     line: {
       width: 1,
@@ -351,7 +361,7 @@ export function MsIndividualComparison(
     yanchor: 'middle',
     align: 'center',
     x: 1.017,
-    y: 1 - (1 - plotYrange - 0.05) / 3 + divide / 2,
+    y: 1 - divide1 / 2,
 
     text: 'Original',
     textangle: 90,
@@ -366,7 +376,7 @@ export function MsIndividualComparison(
     yanchor: 'middle',
     align: 'center',
     x: 1.017,
-    y: 1 - ((1 - plotYrange - 0.05) / 3) * 2 - 0.01 + divide / 2,
+    y: 1 - divide1 * 1.5 - 0.01,
     text: 'Reconstructed',
     textangle: 90,
     showarrow: false,
@@ -379,7 +389,7 @@ export function MsIndividualComparison(
     yanchor: 'middle',
     align: 'center',
     x: 1.017,
-    y: 1 - ((1 - plotYrange - 0.05) / 3) * 3 - 0.02 + divide / 2,
+    y: 1 - divide1 * 2.5 - 0.01,
     text: 'Difference',
     textangle: 90,
     showarrow: false,
@@ -418,7 +428,7 @@ export function MsIndividualComparison(
       yanchor: 'middle',
       align: 'center',
       x: 1.017,
-      y: divide * i + divide / 2 - 0.02,
+      y: divide2 * i + divide2 / 2 - 0.02,
 
       text: groupSamples[i][0].data[0].signatureName,
       textangle: 90,
@@ -458,8 +468,8 @@ export function MsIndividualComparison(
         x1: groupSamples[i]
           .slice(0, j + 1)
           .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
-        y0: i === 0 ? 0 : divide * i - 0.01,
-        y1: divide * i + divide - 0.02,
+        y0: i === 0 ? 0 : divide2 * i - 0.01,
+        y1: divide2 * i + divide2 - 0.02,
 
         line: {
           width: 1,
@@ -478,7 +488,10 @@ export function MsIndividualComparison(
     ...sampleTraceDestructed,
   ];
   console.log(traces);
-  console.log(divide);
+  console.log(divide1);
+  console.log(divide2);
+  console.log(plotYrange1);
+  console.log(plotYrange2);
 
   const leftTitleAnnotation = [
     {
@@ -488,7 +501,7 @@ export function MsIndividualComparison(
       yanchor: 'middle',
       align: 'center',
       x: -0.05,
-      y: plotYrange / 2,
+      y: plotYrange2 / 2,
       text: '<b>Relative contribution</b>',
       font: { size: 15 },
       textangle: -90,
@@ -501,7 +514,7 @@ export function MsIndividualComparison(
       yanchor: 'middle',
       align: 'center',
       x: -0.05,
-      y: plotYrange + (1 - plotYrange) / 2,
+      y: plotYrange2 + (1 - plotYrange2) / 2,
       text: '<b>Relative contribution</b>',
       font: { size: 15 },
       textangle: -90,
@@ -519,7 +532,7 @@ export function MsIndividualComparison(
           .slice(0, groupIndex)
           .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
         (group.data.length - 1) * 0.5,
-      y: plotYrange - 0.02,
+      y: plotYrange2 - 0.02,
       text: formatMutationLabels(group),
       showarrow: false,
       font: { color: 'white' },
@@ -537,7 +550,7 @@ export function MsIndividualComparison(
         .slice(0, groupIndex)
         .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
       (group.data.length - 1) * 0.5,
-    y: 1.005,
+    y: 1.0,
     text: formatMutationLabels(group),
     showarrow: false,
     font: { color: 'white' },
@@ -567,8 +580,8 @@ export function MsIndividualComparison(
     x1: array
       .slice(0, groupIndex + 1)
       .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
-    y0: plotYrange - 0.02,
-    y1: plotYrange + 0.005,
+    y0: plotYrange2 - 0.02,
+    y1: plotYrange2 + 0.005,
     fillcolor: colors[group.mutation],
     line: {
       width: 1,
@@ -586,7 +599,7 @@ export function MsIndividualComparison(
       .slice(0, groupIndex + 1)
       .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
     y0: 1.0,
-    y1: 1.035,
+    y1: 1.03,
     fillcolor: colors[group.mutation],
     line: {
       width: 1,
@@ -635,7 +648,7 @@ export function MsIndividualComparison(
       },
       showgrid: true,
       gridcolor: '#F5F5F5',
-      domain: [0, divide - 0.02],
+      domain: [0, divide2 - 0.02],
       anchor: 'x',
     },
     yaxis2: {
@@ -647,7 +660,7 @@ export function MsIndividualComparison(
       tickfont: {
         family: 'Arial',
       },
-      domain: [divide * 1 - 0.01, divide * 1 + divide - 0.02],
+      domain: [divide2 * 1 - 0.01, divide2 * 1 + divide2 - 0.02],
       anchor: 'x',
     },
     yaxis3: {
@@ -659,7 +672,7 @@ export function MsIndividualComparison(
       tickfont: {
         family: 'Arial',
       },
-      domain: [divide * 2 - 0.01, divide * 2 + divide - 0.02],
+      domain: [divide2 * 2 - 0.01, divide2 * 2 + divide2 - 0.02],
       anchor: 'x',
     },
     yaxis4: {
@@ -671,7 +684,7 @@ export function MsIndividualComparison(
       tickfont: {
         family: 'Arial',
       },
-      domain: [divide * 3 - 0.01, divide * 3 + divide - 0.02],
+      domain: [divide2 * 3 - 0.01, divide2 * 3 + divide2 - 0.02],
       anchor: 'x',
     },
     yaxis5: {
@@ -683,7 +696,7 @@ export function MsIndividualComparison(
       tickfont: {
         family: 'Arial',
       },
-      domain: [divide * 4 - 0.01, divide * 4 + divide - 0.02],
+      domain: [divide2 * 4 - 0.01, divide2 * 4 + divide2 - 0.02],
       anchor: 'x',
     },
     yaxis6: {
@@ -695,7 +708,7 @@ export function MsIndividualComparison(
       tickfont: {
         family: 'Arial',
       },
-      domain: [divide * 5 - 0.01, divide * 5 + divide - 0.02],
+      domain: [divide2 * 5 - 0.01, divide2 * 5 + divide2 - 0.02],
     },
 
     yaxis10: {
@@ -719,10 +732,8 @@ export function MsIndividualComparison(
       },
       showgrid: true,
       gridcolor: '#F5F5F5',
-      domain: [
-        1 - ((1 - plotYrange - 0.05) / 3) * 3 - 0.015,
-        1 - ((1 - plotYrange - 0.05) / 3) * 2 - 0.02,
-      ],
+
+      domain: [1 - divide1 * 3 - 0.01, 1 - divide1 * 2 - 0.02],
       anchor: 'x2',
     },
     yaxis11: {
@@ -735,10 +746,8 @@ export function MsIndividualComparison(
       tickfont: {
         family: 'Arial',
       },
-      domain: [
-        1 - ((1 - plotYrange - 0.05) / 3) * 2 - 0.01,
-        1 - (1 - plotYrange - 0.05) / 3 - 0.01,
-      ],
+
+      domain: [1 - divide1 * 2 - 0.01, 1 - divide1 - 0.02],
       anchor: 'x2',
     },
     yaxis12: {
@@ -751,7 +760,7 @@ export function MsIndividualComparison(
       tickfont: {
         family: 'Arial',
       },
-      domain: [1 - (1 - plotYrange - 0.05) / 3, 1],
+      domain: [1 - divide1 - 0.01, 1],
       anchor: 'x2',
     },
     shapes: [
