@@ -90,14 +90,15 @@ export function MsIndividualComparison(
 
   const plotYrange =
     signatureNames.length > 6
-      ? 0.8
-      : signatureNames.length === 6
       ? 0.7
-      : signatureNames.length === 5
+      : signatureNames.length === 6
       ? 0.65
-      : 0.6;
+      : signatureNames.length === 5
+      ? 0.6
+      : 0.55;
 
   const divide = plotYrange / signatureNames.length;
+  console.log(divide);
 
   const signatureDataFilter = Object.values(signature_groupBySignature).flat();
   console.log(signatureDataFilter);
@@ -335,13 +336,56 @@ export function MsIndividualComparison(
     x1: array
       .slice(0, groupIndex + 1)
       .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
-    y0: 1 - ((1 - plotYrange - 0.05) / 3) * 3 - 0.025,
-    y1: 1 - ((1 - plotYrange - 0.05) / 3) * 2 - 0.025,
+    y0: 1 - ((1 - plotYrange - 0.05) / 3) * 3 - 0.02,
+    y1: 1 - ((1 - plotYrange - 0.05) / 3) * 2 - 0.02,
 
     line: {
       width: 1,
     },
   }));
+
+  const sampleLabel1 = {
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'center',
+    yanchor: 'middle',
+    align: 'center',
+    x: 1.017,
+    y: 1 - (1 - plotYrange - 0.05) / 3 + divide / 2,
+
+    text: 'Original',
+    textangle: 90,
+    showarrow: false,
+    width: 100,
+  };
+
+  const sampleLabel2 = {
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'center',
+    yanchor: 'middle',
+    align: 'center',
+    x: 1.017,
+    y: 1 - ((1 - plotYrange - 0.05) / 3) * 2 - 0.01 + divide / 2,
+    text: 'Reconstructed',
+    textangle: 90,
+    showarrow: false,
+  };
+
+  const sampleLabelDiff = {
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'center',
+    yanchor: 'middle',
+    align: 'center',
+    x: 1.017,
+    y: 1 - ((1 - plotYrange - 0.05) / 3) * 3 - 0.02 + divide / 2,
+    text: 'Difference',
+    textangle: 90,
+    showarrow: false,
+    height: 15,
+    valign: 'top',
+  };
 
   //-------- under subplot -----------//
 
@@ -374,7 +418,7 @@ export function MsIndividualComparison(
       yanchor: 'middle',
       align: 'center',
       x: 1.017,
-      y: divide * i + divide / 2,
+      y: divide * i + divide / 2 - 0.02,
 
       text: groupSamples[i][0].data[0].signatureName,
       textangle: 90,
@@ -414,7 +458,7 @@ export function MsIndividualComparison(
         x1: groupSamples[i]
           .slice(0, j + 1)
           .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
-        y0: divide * i,
+        y0: i === 0 ? 0 : divide * i - 0.01,
         y1: divide * i + divide - 0.02,
 
         line: {
@@ -508,6 +552,7 @@ export function MsIndividualComparison(
     x: 0.5,
     y: -0.07,
     text: '<b>Original Profile = ' + ptext.slice(0, -2) + '</b>',
+    font: { size: 15 },
     showarrow: false,
     align: 'center',
   };
@@ -551,7 +596,8 @@ export function MsIndividualComparison(
 
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
-    height: 1000,
+    height: 1080,
+    autosize: true,
 
     xaxis: {
       showline: true,
@@ -564,6 +610,7 @@ export function MsIndividualComparison(
       linewidth: 1,
       mirror: 'all',
       ticks: '',
+      anchor: 'y',
     },
     xaxis2: {
       showline: true,
@@ -576,6 +623,7 @@ export function MsIndividualComparison(
       linewidth: 1,
       mirror: 'all',
       ticks: '',
+      anchor: 'y10',
     },
     yaxis: {
       autorange: true,
@@ -599,7 +647,7 @@ export function MsIndividualComparison(
       tickfont: {
         family: 'Arial',
       },
-      domain: [divide * 1, divide * 1 + divide - 0.02],
+      domain: [divide * 1 - 0.01, divide * 1 + divide - 0.02],
       anchor: 'x',
     },
     yaxis3: {
@@ -611,12 +659,11 @@ export function MsIndividualComparison(
       tickfont: {
         family: 'Arial',
       },
-      domain: [divide * 2, divide * 2 + divide - 0.02],
+      domain: [divide * 2 - 0.01, divide * 2 + divide - 0.02],
       anchor: 'x',
     },
     yaxis4: {
       autorange: true,
-      // range: [0, maxMutations * 1.2],
       linecolor: '#D3D3D3',
       linewidth: 1,
       ticks: '',
@@ -624,7 +671,7 @@ export function MsIndividualComparison(
       tickfont: {
         family: 'Arial',
       },
-      domain: [divide * 3, divide * 3 + divide - 0.02],
+      domain: [divide * 3 - 0.01, divide * 3 + divide - 0.02],
       anchor: 'x',
     },
     yaxis5: {
@@ -636,7 +683,7 @@ export function MsIndividualComparison(
       tickfont: {
         family: 'Arial',
       },
-      domain: [divide * 4, divide * 4 + divide - 0.02],
+      domain: [divide * 4 - 0.01, divide * 4 + divide - 0.02],
       anchor: 'x',
     },
     yaxis6: {
@@ -648,14 +695,22 @@ export function MsIndividualComparison(
       tickfont: {
         family: 'Arial',
       },
-      domain: [divide * 5, divide * 5 + divide - 0.02],
-      anchor: 'x',
+      domain: [divide * 5 - 0.01, divide * 5 + divide - 0.02],
     },
 
     yaxis10: {
       autorange: false,
-      //range: [-1 * maxMutations, maxMutations],
-      range: [-0.02, 0.02],
+      //range: [-0.02, 0.02],
+      range:
+        maxMutation1 - maxMutation2 > 0
+          ? [
+              -1 * (maxMutation1 - maxMutation2) * 4,
+              (maxMutation1 - maxMutation2) * 4,
+            ]
+          : [
+              1 * (maxMutation1 - maxMutation2) * 4,
+              -1 * (maxMutation1 - maxMutation2) * 4,
+            ],
       linecolor: '#D3D3D3',
       linewidth: 1,
       mirror: 'all',
@@ -665,8 +720,8 @@ export function MsIndividualComparison(
       showgrid: true,
       gridcolor: '#F5F5F5',
       domain: [
-        1 - ((1 - plotYrange - 0.05) / 3) * 3 - 0.025,
-        1 - ((1 - plotYrange - 0.05) / 3) * 2 - 0.025,
+        1 - ((1 - plotYrange - 0.05) / 3) * 3 - 0.015,
+        1 - ((1 - plotYrange - 0.05) / 3) * 2 - 0.02,
       ],
       anchor: 'x2',
     },
@@ -711,9 +766,16 @@ export function MsIndividualComparison(
       ...mutationAnnotation0,
       ...mutationAnnotation1,
       ...sampleLabels,
+      sampleLabel1,
+      sampleLabel2,
+      sampleLabelDiff,
       ...leftTitleAnnotation,
       percentAnnotation,
     ],
+
+    margin: {
+      l: -0.5,
+    },
   };
 
   console.log(layout);
