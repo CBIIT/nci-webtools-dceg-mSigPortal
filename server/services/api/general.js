@@ -12,6 +12,7 @@ import XLSX from 'xlsx';
 import replace from 'replace-in-file';
 import express from 'express';
 import config from '../../config.json' assert { type: 'json' };
+import { getObjectBuffer } from '../s3.js';
 const r = rWrapper.async;
 
 if (config.aws) AWS.config.update(config.aws);
@@ -181,32 +182,20 @@ async function getExposureExample(req, res, next) {
 
 // Publications page data
 async function getPublications(req, res, next) {
-  let buffers = [];
-  const filestream = new AWS.S3()
-    .getObject({
-      Bucket: config.data.bucket,
-      Key: path.join(config.data.s3, 'Others', 'Publications.xlsx'),
-    })
-    .createReadStream();
-  filestream
-    .on('data', (data) => buffers.push(data))
-    .on('end', () => {
-      const buffer = Buffer.concat(buffers);
-      const workbook = XLSX.read(buffer);
-      excelToJSON(workbook);
-    })
-    .on('error', res.status(500).json('Unable to retrieve Publications.xlsx'));
-  function excelToJSON(workbook) {
-    const sheetNames = workbook.SheetNames;
-    const data = sheetNames.reduce(
-      (acc, sheet) => ({
-        ...acc,
-        [sheet]: XLSX.utils.sheet_to_json(workbook.Sheets[sheet]),
-      }),
-      {}
-    );
-    res.json(data);
-  }
+  const publications = await getObjectBuffer(
+    path.join(config.data.s3, 'Others', 'Publications.xlsx'),
+    config.data.bucket
+  );
+  const workbook = XLSX.read(publications);
+  const sheetNames = workbook.SheetNames;
+  const data = sheetNames.reduce(
+    (acc, sheet) => ({
+      ...acc,
+      [sheet]: XLSX.utils.sheet_to_json(workbook.Sheets[sheet]),
+    }),
+    {}
+  );
+  res.json(data);
 }
 
 async function getImageS3Batch(req, res, next) {
