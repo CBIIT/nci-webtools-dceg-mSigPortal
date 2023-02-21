@@ -6,8 +6,16 @@ import {
 } from '@aws-sdk/client-s3';
 import { createWriteStream, createReadStream, readdirSync, statSync } from 'fs';
 import path from 'path';
+import consumers from 'stream/consumers';
 
-export async function getObject(
+export async function getObjectBuffer(key, bucket, config = { region: 'us-east-1' }) {
+  const s3 = new S3Client(config);
+  const params = { Bucket: bucket, Key: key };
+  const { Body } = await s3.send(new GetObjectCommand(params));
+  return await consumers.buffer(Body);
+}
+
+export async function saveObject(
   destination,
   key,
   bucket,
@@ -19,7 +27,12 @@ export async function getObject(
   return writeStream(destination, Body);
 }
 
-export function putObject(file, key, bucket, config = { region: 'us-east-1' }) {
+export function uploadObject(
+  file,
+  key,
+  bucket,
+  config = { region: 'us-east-1' }
+) {
   const s3 = new S3Client(config);
   const params = {
     Bucket: bucket,
@@ -53,7 +66,7 @@ export function getDirectory(destination, key, bucket, config = {}) {
         );
       const response = await Promise.all(
         files.map((e) => {
-          return getObject(
+          return saveObject(
             path.join(destination, e.Key.replace(key, '')),
             e.Key,
             bucket,
@@ -78,7 +91,7 @@ export function putDirectory(directory, key, bucket, config = {}) {
         files.map((file) => {
           const filePath = path.resolve(directory, file);
           if (statSync(filePath).isFile()) {
-            return putObject(filePath, path.join(key, file), bucket, config);
+            return uploadObject(filePath, path.join(key, file), bucket, config);
           }
         })
       );
