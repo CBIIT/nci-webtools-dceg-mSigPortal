@@ -76,11 +76,9 @@ async function getJobStatus(id) {
 }
 
 export async function refresh(req, res, next) {
-  const id = req.params.id;
-
   try {
-    const data = getJobStatus(id);
-
+    const id = req.params.id;
+    const data = await getJobStatus(id);
     res.json(data);
   } catch (error) {
     logger.error('/refreshExtraction Error');
@@ -89,11 +87,9 @@ export async function refresh(req, res, next) {
 }
 
 export async function refreshMulti(req, res, next) {
-  const ids = req.body;
-
   try {
+    const ids = req.body;
     const stauses = await Promise.all(ids.map(getJobStatus));
-
     res.json(stauses);
   } catch (error) {
     logger.error('/refreshExtractionMulti Error');
