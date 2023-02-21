@@ -19,28 +19,19 @@ export function MsIndividualComparison(
   formatTickLabels,
   tickAngle = -90
 ) {
-  console.log('MS Individual Plot');
-  console.log(data);
-  console.log(arg);
   const exposureData = data[0].data;
-  console.log(exposureData);
   const signatureData = data[1].data;
-  console.log(signatureData);
   const segmatrixData = data[2].data;
-  console.log(segmatrixData);
   const signatureColors = colorPallet;
   const exposure_groupBySignature = groupBy(
     exposureData.filter((o) => o['exposure'] > 0.01),
     'signatureName'
   );
-  console.log(exposure_groupBySignature);
 
   const signatureNames = Object.keys(exposure_groupBySignature).map((e) => e);
-  console.log(signatureNames);
   const exposureSum = Object.values(exposure_groupBySignature)
     .flat()
     .reduce((n, { exposure }) => n + exposure, 0);
-  console.log(exposureSum);
 
   const percentSignature = Object.values(exposure_groupBySignature).map(
     (e) => ({
@@ -51,16 +42,6 @@ export function MsIndividualComparison(
     })
   );
 
-  console.log(percentSignature);
-
-  // let ptext = '';
-  // for (let i = 0; i < percentSignature.length; i++) {
-  //   ptext +=
-  //     (percentSignature[i].percent * 100).toFixed(1) +
-  //     '%*' +
-  //     percentSignature[i].signatureName +
-  //     ' + ';
-  // }
   const ptext = percentSignature
     .map(
       (signature) =>
@@ -68,27 +49,10 @@ export function MsIndividualComparison(
     )
     .join('');
 
-  console.log(ptext);
   const signature_groupBySignature = groupBy(
     signatureData.filter((e) => signatureNames.includes(e.signatureName)),
     'signatureName'
   );
-  console.log(signature_groupBySignature);
-  console.log(signatureNames.length);
-
-  // let plotYrange;
-  // if (signatureNames.length > 6) {
-  //   plotYrange = 0.8;
-  // } else if (signatureNames.length === 6) {
-  //   plotYrange = 0.7;
-  // } else if (signatureNames.length === 5) {
-  //   plotYrange = 0.65;
-  // } else if (signatureNames.length === 4) {
-  //   plotYrange = 0.6;
-  // } else {
-  //   plotYrange = 0.6;
-  // }
-  // const divide = plotYrange / signatureNames.length;
 
   const plotYrange2 =
     signatureNames.length > 6
@@ -108,35 +72,27 @@ export function MsIndividualComparison(
       : 0.1;
   const plotYrange1 = 1 - plotYrange2 - 0.06;
   const divide2 = plotYrange2 / signatureNames.length;
-  console.log(divide2);
   const divide1 = plotYrange1 / 3;
-  console.log(divide1);
 
   const signatureDataFilter = Object.values(signature_groupBySignature).flat();
-  console.log(signatureDataFilter);
 
   const signatureDataFiltergroupBymutationTypes = groupBy(
     signatureDataFilter,
     'mutationType'
   );
 
-  console.log(signatureDataFiltergroupBymutationTypes);
-
   const mutationTypes = Object.keys(
     signatureDataFiltergroupBymutationTypes
   ).map((e) => e);
-  // console.log(mutationTypes);
 
   const seqmatrix_groupByMutationType = groupBy(
     segmatrixData.filter((e) => mutationTypes.includes(e.mutationType)),
     'mutationType'
   );
-  console.log(seqmatrix_groupByMutationType);
 
   const seqmatrixDataFilter = Object.values(
     seqmatrix_groupByMutationType
   ).flat(); //original data for the comparison
-  console.log(seqmatrixDataFilter);
 
   const mutationGroupSort = (a, b) => {
     const order = Object.keys(colors);
@@ -144,12 +100,7 @@ export function MsIndividualComparison(
   };
 
   const totalMutationsOriginal = getTotalMutations(seqmatrixDataFilter);
-  //const totalMutationsDestructed = getTotalMutations(data2);
 
-  const maxMutationOriginal =
-    getMaxMutations(seqmatrixDataFilter) / totalMutationsOriginal;
-
-  console.log(maxMutationOriginal);
   const normalizedOriginal = seqmatrixDataFilter.map((e) => ({
     ...e,
     ...(e.mutations >= 0 && {
@@ -159,22 +110,18 @@ export function MsIndividualComparison(
       contribution: e.contribution / totalMutationsOriginal,
     }),
   }));
-  console.log(normalizedOriginal);
 
   const groupOriginal = groupDataByMutation(
     normalizedOriginal,
     mutationRegex,
     mutationGroupSort
   );
-  console.log(groupOriginal);
 
   const arraySignatureData = Object.values(signature_groupBySignature).map(
     (e) => e
   );
 
-  console.log(arraySignatureData);
   const arraySignatureDataFlat = arraySignatureData.flat();
-  console.log(arraySignatureDataFlat);
   const destructedData = [];
 
   for (let i = 0; i < percentSignature.length; i++) {
@@ -194,28 +141,11 @@ export function MsIndividualComparison(
       }
     }
   }
-  // const destructedData = percentSignature
-  //   .map(({ signatureName, percent }) => {
-  //     const matchingData = arraySignatureDataFlat.find(
-  //       ({ signatureName: name }) => name === signatureName
-  //     );
-  //     if (!matchingData) return null;
-  //     const { mutationType, contribution } = matchingData;
-  //     return {
-  //       signatureName,
-  //       mutationType,
-  //       mutations: contribution * percent,
-  //     };
-  //   })
-  //   .filter(Boolean);
-
-  console.log(destructedData);
 
   const groupByMutationType_destructed = groupBy(
     destructedData,
     'mutationType'
   );
-  console.log(Object.values(groupByMutationType_destructed).length);
   let newDestructedData = [];
   const groupByMutationType_destructed_value = Object.values(
     groupByMutationType_destructed
@@ -228,34 +158,21 @@ export function MsIndividualComparison(
     };
     newDestructedData.push(n);
   }
-  console.log(newDestructedData);
-  // const newDestructedData = Object.values(
-  //   groupBy(destructedData, 'mutationType')
-  // ).map((group) => ({
-  //   mutations: getTotalMutations(group),
-  //   mutationType: group[0].mutationType,
-  //   signatureName: group[0].signatureName,
-  // }));
-  // console.log(newDestructedData);
 
   const groupDestructed = groupDataByMutation(
     newDestructedData,
     mutationRegex,
     mutationGroupSort
   );
-  console.log(groupDestructed);
 
   // get total mutations per sample
   const totalMutations1 = getTotalMutations(normalizedOriginal);
   const totalMutations2 = getTotalMutations(newDestructedData);
-  console.log(totalMutations1);
-  console.log(totalMutations2);
 
   // get max mutations per sample
   const maxMutation1 = getMaxMutations(normalizedOriginal) / totalMutations1;
   const maxMutation2 = getMaxMutations(newDestructedData) / totalMutations2;
   const maxMutations = Math.max(maxMutation1, maxMutation2);
-  console.log(maxMutations);
   // --- Top subplots : original, destructed, different
   const sampleTraceOriginal = groupOriginal.map((group, groupIndex, array) => ({
     name: group.mutation,
@@ -274,7 +191,6 @@ export function MsIndividualComparison(
     xaxis: 'x2',
     yaxis: 'y12',
   }));
-  console.log(sampleTraceOriginal);
   const sampleTraceDestructed = groupDestructed.map(
     (group, groupIndex, array) => ({
       name: group.mutations,
@@ -294,7 +210,6 @@ export function MsIndividualComparison(
       yaxis: 'y11',
     })
   );
-  console.log(sampleTraceDestructed);
 
   const differenceTrace = sampleTraceOriginal.map((trace, traceIndex) => ({
     ...trace,
@@ -420,7 +335,6 @@ export function MsIndividualComparison(
     const order = Object.keys(colors);
     return order.indexOf(a.contribution) - order.indexOf(b.contribution);
   };
-  console.log(arraySignatureData);
 
   let groupSamples = [];
   for (let i = 0; i < arraySignatureData.length; i++) {
@@ -432,7 +346,7 @@ export function MsIndividualComparison(
       )
     );
   }
-  console.log(groupSamples);
+  groupSamples.reverse(); //make the lower subplot has same order as in stage
 
   const tracesArray = [];
   const sampleLabels = [];
@@ -496,21 +410,12 @@ export function MsIndividualComparison(
     }
   }
 
-  
-  console.log(sampleBorders);
-  console.log(sampleTraceOriginal);
-  console.log(tracesArray);
   const traces = [
     ...tracesArray,
     ...differenceTrace,
     ...sampleTraceOriginal,
     ...sampleTraceDestructed,
   ];
-  console.log(traces);
-  console.log(divide1);
-  console.log(divide2);
-  console.log(plotYrange1);
-  console.log(plotYrange2);
 
   const leftTitleAnnotation = [
     {
@@ -624,7 +529,6 @@ export function MsIndividualComparison(
       width: 1,
     },
   }));
-  console.log(mutationLabelBox1);
 
   const sortArr = percentSignature
     .slice()
@@ -633,10 +537,7 @@ export function MsIndividualComparison(
   const scaledPercents = percents.map((p, i) =>
     percents.slice(0, i + 1).reduce((acc, val) => acc + val)
   ); // compute cumulative sum
-  const objArray = scaledPercents.map((val, i, arr) => ({})); // create object array
-  console.log(percents);
-  console.log(scaledPercents);
-  console.log(objArray);
+
   const signaturePercentBox = scaledPercents.map((val, i, arr) => ({
     type: 'rect',
     xref: 'paper',
@@ -695,8 +596,7 @@ export function MsIndividualComparison(
 
     align: 'center',
   }));
-  console.log(signaturePercentAnnotation);
-  console.log(signaturePercentBox);
+
   const tickLabels = formatTickLabels(groupSamples[0]);
 
   const layout = {
@@ -883,6 +783,5 @@ export function MsIndividualComparison(
     },
   };
 
-  console.log(layout);
   return { traces, layout };
 }
