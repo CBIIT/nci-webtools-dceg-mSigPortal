@@ -5,6 +5,7 @@ import path from 'path';
 import { promisify } from 'util';
 import { execFile } from 'child_process';
 import template from 'lodash/template.js';
+import { pickBy } from 'lodash-es';
 
 // promisified executeFile
 export const execFileAsync = promisify(execFile);
