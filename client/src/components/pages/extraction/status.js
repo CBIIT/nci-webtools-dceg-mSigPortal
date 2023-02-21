@@ -17,7 +17,7 @@ export default function Status() {
   }, [localStorage.getItem('jobs')]);
   // update local storage
   useEffect(() => {
-    if (jobs.length) localStorage.setItem('jobs', JSON.stringify(jobs));
+    if (jobs && jobs.length) localStorage.setItem('jobs', JSON.stringify(jobs));
   }, [jobs]);
 
   function removeJob(id) {
