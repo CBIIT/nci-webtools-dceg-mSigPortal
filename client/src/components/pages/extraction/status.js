@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import { Button } from 'react-bootstrap';
+import { Button, Popover, OverlayTrigger } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
 import Table from '../../controls/table/table2';
@@ -50,9 +50,28 @@ export default function Status() {
     {
       Header: 'Remove',
       Cell: (e) => (
-        <Button onClick={() => removeJob(e.row.original.id)}>Remove</Button>
+        <OverlayTrigger
+          trigger="click"
+          placement="left"
+          rootClose
+          overlay={
+            <Popover>
+              <Popover.Title as="h3">Confirm Remove</Popover.Title>
+              <Popover.Content className="d-flex">
+                <Button
+                  className="w-100 mx-auto"
+                  variant="danger"
+                  onClick={() => removeJob(e.row.original.id)}
+                >
+                  Confirm
+                </Button>
+              </Popover.Content>
+            </Popover>
+          }
+        >
+          <Button variant="danger">Remove</Button>
+        </OverlayTrigger>
       ),
-      size: 100,
     },
   ]);
 
