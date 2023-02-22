@@ -229,8 +229,8 @@ export default function Extraction() {
                   <b>Exposure File</b>
                   <p>
                     {explorationType === 'denovo'
-                      ? manifest?.denovoExposureFile
-                      : manifest?.decomposedExposureFile}
+                      ? manifest?.denovoExposureInput
+                      : manifest?.decomposedExposureInput}
                   </p>
                 </Col>
                 <Col md="auto">
@@ -241,8 +241,8 @@ export default function Extraction() {
                   <b>Signature File</b>
                   <p>
                     {explorationType === 'denovo'
-                      ? manifest?.denovoSignatureFile
-                      : manifest?.decomposedSignatureFile}
+                      ? manifest?.denovoSignatureInput
+                      : manifest?.decomposedSignatureInput}
                   </p>
                 </Col>
               </Row>

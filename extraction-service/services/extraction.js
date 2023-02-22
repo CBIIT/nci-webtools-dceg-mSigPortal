@@ -330,24 +330,24 @@ export async function getPaths(params, env = process.env) {
   const matrixFile = path.resolve(inputFolder, args.input_data);
 
   // files for denovo exploration input
-  const denovoExposureFile = path.resolve(
+  const denovoExposureInput = path.resolve(
     denovoFolder,
     'Activities',
     `${args.context_type}_De-Novo_Activities_refit.txt`
   );
-  const denovoSignatureFile = path.resolve(
+  const denovoSignatureInput = path.resolve(
     denovoFolder,
     'Signatures',
     `${args.context_type}_De-Novo_Signatures.txt`
   );
 
   // files for decomposed exploration input
-  const decomposedExposureFile = path.resolve(
+  const decomposedExposureInput = path.resolve(
     decomposedFolder,
     'Activities',
     `COSMIC_${args.context_type}_Activities.txt`
   );
-  const decomposedSignatureFile = path.resolve(outputFolder, 'signature.tsv');
+  const decomposedSignatureInput = path.resolve(outputFolder, 'signature.tsv');
 
   return {
     inputFolder,
@@ -358,10 +358,10 @@ export async function getPaths(params, env = process.env) {
     databaseFile,
     extractionLog,
     matrixFile,
-    denovoExposureFile,
-    denovoSignatureFile,
-    decomposedExposureFile,
-    decomposedSignatureFile,
+    denovoExposureInput,
+    denovoSignatureInput,
+    decomposedExposureInput,
+    decomposedSignatureInput,
   };
 }
 
