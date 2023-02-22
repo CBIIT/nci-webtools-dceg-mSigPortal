@@ -536,9 +536,9 @@ export function MsIndividualComparison(
       yanchor: 'middle',
       align: 'center',
       x: -0.05,
-      y: plotYrange2 / 2,
-      text: 'Relative contribution',
-      font: { size: 15 },
+      y: 1 - divide1 * 1.5 - 0.015,
+      text: '<b>Relative contribution</b>',
+      font: { size: 16, family: 'Times New Roman' },
       textangle: -90,
       showarrow: false,
     },
@@ -549,9 +549,9 @@ export function MsIndividualComparison(
       yanchor: 'middle',
       align: 'center',
       x: -0.05,
-      y: plotYrange2 + (1 - plotYrange2) / 2,
-      text: 'Relative contribution',
-      font: { size: 15 },
+      y: plotYrange2 / 2,
+      text: '<b>Relative contribution</b>',
+      font: { size: 16, family: 'Times New Roman' },
       textangle: -90,
       showarrow: false,
     },
@@ -632,8 +632,19 @@ export function MsIndividualComparison(
     hoverlabel: { bgcolor: '#FFF' },
     height: 1080,
     autosize: true,
-    title:
-      '<b>RSS = ' + rss + '; Cosine Similarity = ' + cosineSimilarity + '</b>',
+    title: {
+      text:
+        '<b>RSS = ' +
+        rss +
+        '; Cosine Similarity = ' +
+        cosineSimilarity +
+        '</b>',
+      font: {
+        family: 'Times New Roman',
+        size: 20,
+      },
+    },
+
     xaxis: {
       showline: true,
       tickangle: tickAngle,
@@ -768,7 +779,7 @@ export function MsIndividualComparison(
       tickfont: {
         family: 'Arial',
       },
-
+      //title: { text: '<b>Relative contribution</b>' },
       domain: [1 - divide1 * 2 - 0.01, 1 - divide1 - 0.02],
       anchor: 'x2',
     },
