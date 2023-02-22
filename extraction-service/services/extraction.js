@@ -13,11 +13,11 @@ import { sendNotification } from './notifications.js';
 import { formatObject } from './logger.js';
 import axios from 'axios';
 import FormData from 'form-data';
-import { putDirectory } from './s3.js';
+import { uploadDirectory } from './s3.js';
 
 async function uploadWorkingDirectory(inputFolder, outputFolder, id, env) {
   // upload input folder
-  await putDirectory(
+  await uploadDirectory(
     inputFolder,
     path.join(env.INPUT_KEY_PREFIX, id),
     env.DATA_BUCKET,
@@ -25,7 +25,7 @@ async function uploadWorkingDirectory(inputFolder, outputFolder, id, env) {
   );
 
   // upload output folder
-  await putDirectory(
+  await uploadDirectory(
     outputFolder,
     path.join(env.OUTPUT_KEY_PREFIX, id),
     env.DATA_BUCKET,
@@ -201,7 +201,7 @@ export async function extraction(
     await uploadWorkingDirectory(inputFolder, outputFolder, id, env);
 
     // // upload denovo output
-    // await putDirectory(
+    // await uploadDirectory(
     //   path.resolve(env.OUTPUT_FOLDER, denovoId),
     //   path.join(env.OUTPUT_KEY_PREFIX, denovoId),
     //   env.DATA_BUCKET,
@@ -209,7 +209,7 @@ export async function extraction(
     // );
 
     // // upload decmoposed output
-    // await putDirectory(
+    // await uploadDirectory(
     //   path.resolve(env.OUTPUT_FOLDER, decomposedId),
     //   path.join(env.OUTPUT_KEY_PREFIX, decomposedId),
     //   env.DATA_BUCKET,

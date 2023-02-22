@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { validate } from 'uuid';
 import path from 'path';
-import { getDirectory, putDirectory } from '../../s3.js';
+import { downloadDirectory, uploadDirectory } from '../../s3.js';
 import logger from '../../logger.js';
 import { mkdirs, writeJson, readJson } from '../../utils.js';
 import config from '../../../config.json' assert { type: 'json' };
@@ -23,14 +23,14 @@ export async function submit(req, res, next) {
 
   const s3ClientConfig = { region: config.aws.region };
 
-  await putDirectory(
+  await uploadDirectory(
     inputFolder,
     path.join(config.aws.inputKeyPrefix, id),
     config.aws.bucket,
     s3ClientConfig
   );
 
-  await putDirectory(
+  await uploadDirectory(
     outputFolder,
     path.join(config.aws.outputKeyPrefix, id),
     config.aws.bucket,
@@ -52,13 +52,13 @@ async function getJobStatus(id) {
   const inputFolder = path.resolve(config.folders.input, id);
   const outputFolder = path.resolve(config.folders.output, id);
 
-  await getDirectory(
+  await downloadDirectory(
     inputFolder,
     path.join(config.aws.inputKeyPrefix, id),
     config.aws.bucket,
     { region: config.aws.region }
   );
-  await getDirectory(
+  await downloadDirectory(
     outputFolder,
     path.join(config.aws.outputKeyPrefix, id),
     config.aws.bucket,

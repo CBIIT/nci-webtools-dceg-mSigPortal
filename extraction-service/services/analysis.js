@@ -5,7 +5,7 @@ import { getWorker } from './workers.js';
 import { existsSync } from 'fs';
 const { WORKER_TYPE } = process.env;
 import { extraction } from './extraction.js';
-import { getDirectory } from './s3.js';
+import { downloadDirectory } from './s3.js';
 import { readJson } from './utils.js';
 
 export async function submit(params, app, env = process.env) {
@@ -47,13 +47,13 @@ export async function run(id, app, env = process.env) {
   await mkdirs([inputFolder, outputFolder]);
 
   // download folders from s3
-  await getDirectory(
+  await downloadDirectory(
     inputFolder,
     path.join(env.INPUT_KEY_PREFIX, id),
     env.DATA_BUCKET,
     { region: env.AWS_DEFAULT_REGION }
   );
-  await getDirectory(
+  await downloadDirectory(
     outputFolder,
     path.join(env.OUTPUT_KEY_PREFIX, id),
     env.DATA_BUCKET,
