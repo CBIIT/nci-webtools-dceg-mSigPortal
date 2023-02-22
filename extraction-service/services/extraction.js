@@ -121,11 +121,11 @@ export async function extraction(
       denovoFormData.append('matrixFile', createReadStream(paths.matrixFile));
       denovoFormData.append(
         'exposureFile',
-        createReadStream(paths.denovoExposureFile)
+        createReadStream(paths.denovoExposureInput)
       );
       denovoFormData.append(
         'signatureFile',
-        createReadStream(paths.denovoSignatureFile)
+        createReadStream(paths.denovoSignatureInput)
       );
 
       const denovoUpload = await axios.post(
@@ -138,8 +138,8 @@ export async function extraction(
         `${env.API_BASE_URL}/web/submitExploration/${denovoUpload.data.id}`,
         {
           matrixFile: path.parse(paths.matrixFile).base,
-          exposureFile: path.parse(paths.denovoExposureFile).base,
-          signatureFile: path.parse(paths.denovoSignatureFile).base,
+          exposureFile: path.parse(paths.denovoExposureInput).base,
+          signatureFile: path.parse(paths.denovoSignatureInput).base,
         }
       );
 
@@ -159,11 +159,11 @@ export async function extraction(
       );
       decomposedFormData.append(
         'exposureFile',
-        createReadStream(paths.decomposedExposureFile)
+        createReadStream(paths.decomposedExposureInput)
       );
       decomposedFormData.append(
         'signatureFile',
-        createReadStream(paths.decomposedSignatureFile)
+        createReadStream(paths.decomposedSignatureInput)
       );
 
       const decomposedUpload = await axios.post(
@@ -176,8 +176,8 @@ export async function extraction(
         `${env.API_BASE_URL}/web/submitExploration/${decomposedUpload.data.id}`,
         {
           matrixFile: path.parse(paths.matrixFile).base,
-          exposureFile: path.parse(paths.decomposedExposureFile).base,
-          signatureFile: path.parse(paths.decomposedSignatureFile).base,
+          exposureFile: path.parse(paths.decomposedExposureInput).base,
+          signatureFile: path.parse(paths.decomposedSignatureInput).base,
         }
       );
 
