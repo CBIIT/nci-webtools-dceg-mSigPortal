@@ -22,11 +22,14 @@ export default function MsAssociation(data, arg) {
       data.filter((o) => o['exposure'] > 0),
       'sample'
     );
-    groupBySample = Object.values(dataFilter).filter((e) => e.length > 1);
+    if (signatureName1 === signatureName2) {
+      groupBySample = { ...dataFilter };
+    } else {
+      groupBySample = Object.values(dataFilter).filter((e) => e.length > 1);
+    }
   } else {
     groupBySample = groupBy(data, 'sample');
   }
-
   const dataArraySample = Object.values(groupBySample);
 
   for (var i = 0; i < dataArraySample.length; i++) {
@@ -113,7 +116,6 @@ export default function MsAssociation(data, arg) {
   } else {
     pearsonV = calculatePearson(traceMain.x, traceMain.y);
   }
-  console.log(pearsonV);
   const spearman = calculateSpearman(traceMain.x, traceMain.y);
   const traceLine = {
     x: [minX, maxX],
@@ -178,7 +180,7 @@ export default function MsAssociation(data, arg) {
   const layout = {
     showlegend: true,
     hoverlabel: { bgcolor: '#FFF' },
-    height: 900,
+    height: 650,
     bargap: 0,
     autosize: true,
 
