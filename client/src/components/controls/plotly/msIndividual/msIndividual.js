@@ -74,19 +74,17 @@ export function MsIndividualComparison(
   const divide2 = plotYrange2 / signatureNames.length;
   const divide1 = plotYrange1 / 3;
 
-  const signatureDataFilter = Object.values(signature_groupBySignature).flat();
-
   const signatureDataFiltergroupBymutationTypes = groupBy(
-    signatureDataFilter,
+    Object.values(signature_groupBySignature).flat(),
     'mutationType'
   );
 
-  const mutationTypes = Object.keys(
-    signatureDataFiltergroupBymutationTypes
-  ).map((e) => e);
-
   const seqmatrix_groupByMutationType = groupBy(
-    segmatrixData.filter((e) => mutationTypes.includes(e.mutationType)),
+    segmatrixData.filter((e) =>
+      Object.keys(signatureDataFiltergroupBymutationTypes)
+        .map((m) => m)
+        .includes(e.mutationType)
+    ),
     'mutationType'
   );
 
@@ -121,43 +119,70 @@ export function MsIndividualComparison(
     (e) => e
   );
 
-  const arraySignatureDataFlat = arraySignatureData.flat();
-  const destructedData = [];
+  // const arraySignatureDataFlat = arraySignatureData.flat();
+  // const destructedData = [];
+  // for (let i = 0; i < percentSignature.length; i++) {
+  //   for (let j = 0; j < arraySignatureDataFlat.length; j++) {
+  //     if (
+  //       arraySignatureDataFlat[j].signatureName ===
+  //       percentSignature[i].signatureName
+  //     ) {
+  //       let n = {
+  //         signatureName: arraySignatureDataFlat[j].signatureName,
+  //         mutationType: arraySignatureDataFlat[j].mutationType,
+  //         mutations:
+  //           arraySignatureDataFlat[j].contribution *
+  //           percentSignature[i].percent,
+  //       };
+  //       destructedData.push(n);
+  //     }
+  //   }
+  // }
 
-  for (let i = 0; i < percentSignature.length; i++) {
-    for (let j = 0; j < arraySignatureDataFlat.length; j++) {
-      if (
-        arraySignatureDataFlat[j].signatureName ===
-        percentSignature[i].signatureName
-      ) {
-        let n = {
-          signatureName: arraySignatureDataFlat[j].signatureName,
-          mutationType: arraySignatureDataFlat[j].mutationType,
-          mutations:
-            arraySignatureDataFlat[j].contribution *
-            percentSignature[i].percent,
+  const destructedData = arraySignatureData
+    .flat()
+    .filter((data) =>
+      percentSignature.some((p) => p.signatureName === data.signatureName)
+    )
+    .map((data) => ({
+      signatureName: data.signatureName,
+      mutationType: data.mutationType,
+      mutations:
+        data.contribution *
+        percentSignature.find((p) => p.signatureName === data.signatureName)
+          .percent,
+    }));
+
+  // const groupByMutationType_destructed = groupBy(
+  //   destructedData,
+  //   'mutationType'
+  // );
+  // let newDestructedData = [];
+  // const groupByMutationType_destructed_value = Object.values(
+  //   groupByMutationType_destructed
+  // );
+  // for (let i = 0; i < groupByMutationType_destructed_value.length; i++) {
+  //   let n = {
+  //     mutations: getTotalMutations(groupByMutationType_destructed_value[i]),
+  //     mutationType: groupByMutationType_destructed_value[i][0].mutationType,
+  //     signatureName: groupByMutationType_destructed_value[i][0].signatureName,
+  //   };
+  //   newDestructedData.push(n);
+  // }
+  const newDestructedData = Object.values(
+    destructedData.reduce((acc, curr) => {
+      const key = curr.mutationType;
+      if (!acc[key]) {
+        acc[key] = {
+          mutations: 0,
+          mutationType: curr.mutationType,
+          signatureName: curr.signatureName,
         };
-        destructedData.push(n);
       }
-    }
-  }
-
-  const groupByMutationType_destructed = groupBy(
-    destructedData,
-    'mutationType'
+      acc[key].mutations += curr.mutations;
+      return acc;
+    }, {})
   );
-  let newDestructedData = [];
-  const groupByMutationType_destructed_value = Object.values(
-    groupByMutationType_destructed
-  );
-  for (let i = 0; i < groupByMutationType_destructed_value.length; i++) {
-    let n = {
-      mutations: getTotalMutations(groupByMutationType_destructed_value[i]),
-      mutationType: groupByMutationType_destructed_value[i][0].mutationType,
-      signatureName: groupByMutationType_destructed_value[i][0].signatureName,
-    };
-    newDestructedData.push(n);
-  }
 
   const groupDestructed = groupDataByMutation(
     newDestructedData,
@@ -233,101 +258,6 @@ export function MsIndividualComparison(
   );
   const rss = getRss(sampleDifferenceData);
   const cosineSimilarity = getCosineSimilarity(sample1Data, sample2Data);
-  const sampleBorder1 = groupOriginal.map((group, groupIndex, array) => ({
-    type: 'rect',
-    xref: 'x',
-    yref: 'paper',
-    x0: array
-      .slice(0, groupIndex)
-      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
-    x1: array
-      .slice(0, groupIndex + 1)
-      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
-    y0: 1 - divide1 - 0.01,
-    y1: 1,
-    line: {
-      width: 1,
-    },
-  }));
-
-  const sampleBorder2 = groupDestructed.map((group, groupIndex, array) => ({
-    type: 'rect',
-    xref: 'x',
-    yref: 'paper',
-    x0: array
-      .slice(0, groupIndex)
-      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
-    x1: array
-      .slice(0, groupIndex + 1)
-      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
-    y0: 1 - divide1 * 2 - 0.01,
-    y1: 1 - divide1 - 0.02,
-
-    line: {
-      width: 1,
-    },
-  }));
-
-  const differenceBorder = groupDestructed.map((group, groupIndex, array) => ({
-    type: 'rect',
-    xref: 'x',
-    yref: 'paper',
-    x0: array
-      .slice(0, groupIndex)
-      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
-    x1: array
-      .slice(0, groupIndex + 1)
-      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
-    y0: 1 - divide1 * 3 - 0.01,
-    y1: 1 - divide1 * 2 - 0.02,
-
-    line: {
-      width: 1,
-    },
-  }));
-
-  const sampleLabel1 = {
-    xref: 'paper',
-    yref: 'paper',
-    xanchor: 'center',
-    yanchor: 'middle',
-    align: 'center',
-    x: 1.017,
-    y: 1 - divide1 / 2,
-
-    text: 'Original',
-    textangle: 90,
-    showarrow: false,
-    width: 100,
-  };
-
-  const sampleLabel2 = {
-    xref: 'paper',
-    yref: 'paper',
-    xanchor: 'center',
-    yanchor: 'middle',
-    align: 'center',
-    x: 1.017,
-    y: 1 - divide1 * 1.5 - 0.01,
-    text: 'Deconstructed',
-    textangle: 90,
-    showarrow: false,
-  };
-
-  const sampleLabelDiff = {
-    xref: 'paper',
-    yref: 'paper',
-    xanchor: 'center',
-    yanchor: 'middle',
-    align: 'center',
-    x: 1.017,
-    y: 1 - divide1 * 2.5 - 0.01,
-    text: 'Difference',
-    textangle: 90,
-    showarrow: false,
-    height: 15,
-    valign: 'top',
-  };
 
   //-------- under subplot -----------//
 
@@ -416,83 +346,59 @@ export function MsIndividualComparison(
     ...sampleTraceOriginal,
     ...sampleTraceDestructed,
   ];
-
-  const leftTitleAnnotation = [
-    {
-      xref: 'paper',
-      yref: 'paper',
-      xanchor: 'center',
-      yanchor: 'middle',
-      align: 'center',
-      x: -0.05,
-      y: plotYrange2 / 2,
-      text: 'Relative contribution',
-      font: { size: 15 },
-      textangle: -90,
-      showarrow: false,
-    },
-    {
-      xref: 'paper',
-      yref: 'paper',
-      xanchor: 'center',
-      yanchor: 'middle',
-      align: 'center',
-      x: -0.05,
-      y: plotYrange2 + (1 - plotYrange2) / 2,
-      text: 'Relative contribution',
-      font: { size: 15 },
-      textangle: -90,
-      showarrow: false,
-    },
-  ];
-  const mutationAnnotation0 = groupSamples[0].map(
-    (group, groupIndex, array) => ({
-      xref: 'x',
-      yref: 'paper',
-      xanchor: 'bottom',
-      yanchor: 'bottom',
-      x:
-        array
-          .slice(0, groupIndex)
-          .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
-        (group.data.length - 1) * 0.5,
-      y: plotYrange2 - 0.017,
-      text: formatMutationLabels(group),
-      showarrow: false,
-      font: { color: 'white' },
-      align: 'center',
-    })
-  );
-
-  const mutationAnnotation1 = groupOriginal.map((group, groupIndex, array) => ({
+  // ----- Shapes -------//
+  const sampleBorder1 = groupOriginal.map((group, groupIndex, array) => ({
+    type: 'rect',
     xref: 'x',
     yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'bottom',
-    x:
-      array
-        .slice(0, groupIndex)
-        .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
-      (group.data.length - 1) * 0.5,
-    y: 1.002,
-    text: formatMutationLabels(group),
-    showarrow: false,
-    font: { color: 'white' },
-    align: 'center',
+    x0: array
+      .slice(0, groupIndex)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    x1: array
+      .slice(0, groupIndex + 1)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    y0: 1 - divide1 - 0.01,
+    y1: 1,
+    line: {
+      width: 1,
+    },
   }));
 
-  const percentAnnotation = {
-    xref: 'paper',
+  const sampleBorder2 = groupDestructed.map((group, groupIndex, array) => ({
+    type: 'rect',
+    xref: 'x',
     yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'bottom',
-    x: 0.5,
-    y: -0.07,
-    text: '<b>Original Profile = ' + ptext.slice(0, -2) + '</b>',
-    font: { size: 15 },
-    showarrow: false,
-    align: 'center',
-  };
+    x0: array
+      .slice(0, groupIndex)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    x1: array
+      .slice(0, groupIndex + 1)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    y0: 1 - divide1 * 2 - 0.01,
+    y1: 1 - divide1 - 0.02,
+
+    line: {
+      width: 1,
+    },
+  }));
+
+  const differenceBorder = groupDestructed.map((group, groupIndex, array) => ({
+    type: 'rect',
+    xref: 'x',
+    yref: 'paper',
+    x0: array
+      .slice(0, groupIndex)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    x1: array
+      .slice(0, groupIndex + 1)
+      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+    y0: 1 - divide1 * 3 - 0.01,
+    y1: 1 - divide1 * 2 - 0.02,
+
+    line: {
+      width: 1,
+    },
+  }));
 
   const mutationLabelBox0 = groupSamples[0].map((group, groupIndex, array) => ({
     type: 'rect',
@@ -573,6 +479,129 @@ export function MsIndividualComparison(
           sortArr[i].signatureName.replace(/^\D*/, '').replace(')', '')
         ],
     },
+  }));
+
+  //------ Annotations -------//
+  const topSubplotAnnotations = [
+    {
+      //Sample Original
+      xref: 'paper',
+      yref: 'paper',
+      xanchor: 'center',
+      yanchor: 'middle',
+      align: 'center',
+      x: 1.017,
+      y: 1 - divide1 / 2,
+
+      text: 'Original',
+      textangle: 90,
+      showarrow: false,
+      width: 100,
+    },
+    {
+      //Sample Destructed
+      xref: 'paper',
+      yref: 'paper',
+      xanchor: 'center',
+      yanchor: 'middle',
+      align: 'center',
+      x: 1.017,
+      y: 1 - divide1 * 1.5 - 0.015,
+      text: 'Deconstructed',
+      textangle: 90,
+      showarrow: false,
+    },
+    {
+      //Sample difference
+      xref: 'paper',
+      yref: 'paper',
+      xanchor: 'center',
+      yanchor: 'middle',
+      align: 'center',
+      x: 1.017,
+      y: 1 - divide1 * 2.5 - 0.01,
+      text: 'Difference',
+      textangle: 90,
+      showarrow: false,
+      height: 15,
+      valign: 'top',
+    },
+  ];
+
+  const titleAnnotations = [
+    {
+      xref: 'paper',
+      yref: 'paper',
+      xanchor: 'center',
+      yanchor: 'middle',
+      align: 'center',
+      x: -0.05,
+      y: plotYrange2 / 2,
+      text: 'Relative contribution',
+      font: { size: 15 },
+      textangle: -90,
+      showarrow: false,
+    },
+    {
+      xref: 'paper',
+      yref: 'paper',
+      xanchor: 'center',
+      yanchor: 'middle',
+      align: 'center',
+      x: -0.05,
+      y: plotYrange2 + (1 - plotYrange2) / 2,
+      text: 'Relative contribution',
+      font: { size: 15 },
+      textangle: -90,
+      showarrow: false,
+    },
+    {
+      xref: 'paper',
+      yref: 'paper',
+      xanchor: 'bottom',
+      yanchor: 'bottom',
+      x: 0.5,
+      y: -0.07,
+      text: '<b>Original Profile = ' + ptext.slice(0, -2) + '</b>',
+      font: { size: 15 },
+      showarrow: false,
+      align: 'center',
+    },
+  ];
+  const mutationAnnotation0 = groupSamples[0].map(
+    (group, groupIndex, array) => ({
+      xref: 'x',
+      yref: 'paper',
+      xanchor: 'bottom',
+      yanchor: 'bottom',
+      x:
+        array
+          .slice(0, groupIndex)
+          .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
+        (group.data.length - 1) * 0.5,
+      y: plotYrange2 - 0.017,
+      text: formatMutationLabels(group),
+      showarrow: false,
+      font: { color: 'white' },
+      align: 'center',
+    })
+  );
+
+  const mutationAnnotation1 = groupOriginal.map((group, groupIndex, array) => ({
+    xref: 'x',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
+    x:
+      array
+        .slice(0, groupIndex)
+        .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
+      (group.data.length - 1) * 0.5,
+    y: 1.002,
+    text: formatMutationLabels(group),
+    showarrow: false,
+    font: { color: 'white' },
+    align: 'center',
   }));
 
   const signaturePercentAnnotation = scaledPercents.map((val, i, arr) => ({
@@ -770,11 +799,8 @@ export function MsIndividualComparison(
       ...mutationAnnotation0,
       ...mutationAnnotation1,
       ...sampleLabels,
-      sampleLabel1,
-      sampleLabel2,
-      sampleLabelDiff,
-      ...leftTitleAnnotation,
-      percentAnnotation,
+      ...topSubplotAnnotations,
+      ...titleAnnotations,
       ...signaturePercentAnnotation,
     ],
 
