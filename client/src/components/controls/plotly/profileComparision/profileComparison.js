@@ -363,6 +363,7 @@ export function compareProfiles(
   const layout = {
     height: 700,
     hoverlabel: { bgcolor: '#FFF' },
+    autosize: true,
 
     title:
       '<b>RSS = ' + rss + '; Cosine Similarity = ' + cosineSimilarity + '</b>',
@@ -381,6 +382,16 @@ export function compareProfiles(
     yaxis: {
       autorange: false,
       range: [-1 * maxMutations * 1.2, maxMutations * 1.2],
+      // range:
+      //   maxMutation1 - maxMutation2 > 0
+      //     ? [
+      //         -1 * (maxMutation1 - maxMutation2) * 1.5,
+      //         (maxMutation1 - maxMutation2) * 1.5,
+      //       ]
+      //     : [
+      //         1 * (maxMutation1 - maxMutation2) * 1.5,
+      //         -1 * (maxMutation1 - maxMutation2) * 1.5,
+      //       ],
       linecolor: '#D3D3D3',
       linewidth: 1,
       mirror: 'all',
