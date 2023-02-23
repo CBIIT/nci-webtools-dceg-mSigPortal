@@ -748,20 +748,10 @@ export function MsIndividualComparison(
 
     yaxis10: {
       autorange: false,
-      //range: [-0.02, 0.02],
-      range: [
-        -1 * differenceTraceMaxYValue * 1.2,
-        differenceTraceMaxYValue * 1.2,
-      ],
-      // range:
-      //   maxMutation1 - maxMutation2 > 0
-      //     ? [
-      //         -1 * (maxMutation1 - maxMutation2) * 4,
-      //         (maxMutation1 - maxMutation2) * 4,
-      //       ]
-      //     : [
-      //         1 * (maxMutation1 - maxMutation2) * 4,
-      //         -1 * (maxMutation1 - maxMutation2) * 4,
+      range: [-0.02, 0.02],
+      // range: [
+      //   -1 * differenceTraceMaxYValue * 1.2,
+      //   differenceTraceMaxYValue * 1.2,
       // ],
 
       linecolor: '#D3D3D3',
