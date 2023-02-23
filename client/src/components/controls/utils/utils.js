@@ -262,3 +262,33 @@ export function calculatePearson(x, y) {
   };
   return stats;
 }
+
+export function extractSubstring(str) {
+  // Split the string using underscore as the separator
+  const arr = str.split('_');
+
+  // Loop through the array to find the substring
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i].indexOf('SBS') !== -1) {
+      // If "SBS" is found, return it
+      return 'SBS';
+    } else if (arr[i].indexOf('DBS') !== -1) {
+      // If "DBS" is found, return it
+      return 'DBS';
+    } else if (arr[i].indexOf('ID') !== -1) {
+      // If "ID" is found, return it
+      return 'ID';
+    }
+  }
+
+  // If none of the substrings are found, return null
+  return null;
+}
+
+export function extractLastWord(str) {
+  // Split the string using whitespace as the separator
+  const arr = str.split('_');
+
+  // Return the last element of the array
+  return arr[arr.length - 1];
+}

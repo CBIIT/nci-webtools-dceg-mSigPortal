@@ -24,11 +24,11 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
         );
 
         if (arg.profile === 'SBS') {
-          return sbs96(userData, publicData);
+          return sbs96(userData, publicData, 'pc');
         } else if (arg.profile === 'DBS') {
-          return dbs78(userData, publicData);
+          return dbs78(userData, publicData, 'pc');
         } else if (arg.profile == 'ID') {
-          return id83(userData, publicData);
+          return id83(userData, publicData, 'pc');
         } else throw Error(`Profile ${arg.profile} is not supported`);
       },
     }),

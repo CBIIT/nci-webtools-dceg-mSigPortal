@@ -1,6 +1,7 @@
 import { compareProfiles } from './profileComparison';
+import { MsIndividualComparison } from '../msIndividual/msIndividual';
 
-export default function id83(data1, data2) {
+export default function id83(data1, data2, tab) {
   const colors = {
     '1:Del:C': '#FBBD6F',
     '1:Del:T': '#FE8002',
@@ -29,12 +30,23 @@ export default function id83(data1, data2) {
         data.map((_, index) => (index >= 5 ? index + 1 + '+' : index + 1))
       )
       .flat();
-  return compareProfiles(
-    data1,
-    data2,
-    colors,
-    mutationRegex,
-    mutationLabels,
-    formatTickLabels
-  );
+  if (tab === 'pc') {
+    return compareProfiles(
+      data1,
+      data2,
+      colors,
+      mutationRegex,
+      mutationLabels,
+      formatTickLabels
+    );
+  } else {
+    return MsIndividualComparison(
+      data1,
+      data2,
+      colors,
+      mutationRegex,
+      mutationLabels,
+      formatTickLabels
+    );
+  }
 }

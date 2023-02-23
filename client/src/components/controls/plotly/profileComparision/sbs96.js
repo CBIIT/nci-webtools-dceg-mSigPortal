@@ -1,6 +1,7 @@
 import { compareProfiles } from './profileComparison';
+import { MsIndividualComparison } from '../msIndividual/msIndividual';
 
-export default function sbs96(data1, data2) {
+export default function sbs96(data1, data2, tab) {
   const colors = {
     'C>A': '#03BCEE',
     'C>G': 'black',
@@ -24,13 +25,23 @@ export default function sbs96(data1, data2) {
         })
       )
       .flat();
-
-  return compareProfiles(
-    data1,
-    data2,
-    colors,
-    mutationRegex,
-    mutationLabels,
-    formatTickLabels
-  );
+  if (tab === 'pc') {
+    return compareProfiles(
+      data1,
+      data2,
+      colors,
+      mutationRegex,
+      mutationLabels,
+      formatTickLabels
+    );
+  } else {
+    return MsIndividualComparison(
+      data1,
+      data2,
+      colors,
+      mutationRegex,
+      mutationLabels,
+      formatTickLabels
+    );
+  }
 }

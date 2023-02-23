@@ -1,5 +1,9 @@
 import { explorationApiSlice } from '../../../../services/store/rootApi';
-import msIndividual_sbs96 from '../../../controls/plotly/msIndividual/sbs96';
+import sbs96 from '../../../controls/plotly/profileComparision/sbs96';
+import dbs78 from '../../../controls/plotly/profileComparision/dbs78';
+import id83 from '../../../controls/plotly/profileComparision/id83';
+import rs32 from '../../../controls/plotly/profileComparision/rs32';
+import { extractLastWord } from '../../../controls/utils/utils';
 
 export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -49,7 +53,19 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
           console.log(res);
           console.log(_arg);
           //return MsLandscape(res, _arg);
-          return { data: msIndividual_sbs96(res, _arg) };
+          const profile = extractLastWord(
+            _arg.params_activity.signatureSetName
+          );
+          console.log(profile);
+          if (profile === 'SBS96') {
+            return { data: sbs96(res, _arg, 'msIndividual') };
+          } else if (profile === 'DBS78') {
+            return { data: dbs78(res, _arg, 'msIndividual') };
+          } else if (profile === 'ID83') {
+            return { data: id83(res, _arg, 'msIndividual') };
+          } else if (profile === 'RS32') {
+            return { data: rs32(res, _arg, 'msIndividual') };
+          } else throw Error(`Profile ${profile} is not supported`);
         } catch (error) {
           return { error };
         }

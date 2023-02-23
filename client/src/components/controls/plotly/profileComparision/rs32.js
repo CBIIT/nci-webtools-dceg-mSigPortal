@@ -1,7 +1,7 @@
 import { compareProfiles } from './profileComparison';
 import { MsIndividualComparison } from '../msIndividual/msIndividual';
 
-export default function dbs78(data1, data2, tab) {
+export default function rs32(data1, data2, tab) {
   const colors = {
     AC: '#09BCED',
     AT: '#0266CA',
