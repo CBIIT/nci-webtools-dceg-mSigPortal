@@ -39,7 +39,14 @@ export const colorPallet0 = [
   '#D58F5C',
 ];
 
-export const colorPallet1 = ['#1F77B4'];
+export const colorPallet1 = [
+  '#1F77B4',
+  '#FF7F0F',
+  '#2DA02C',
+  '#D62728',
+  '#9467BD',
+  '#8C564B',
+];
 
 export const colorPallet = {
   1: '#4a9855',

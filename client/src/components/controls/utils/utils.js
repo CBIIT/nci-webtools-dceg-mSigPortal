@@ -292,3 +292,12 @@ export function extractLastWord(str) {
   // Return the last element of the array
   return arr[arr.length - 1];
 }
+
+export function arrayContainsTerms(arr, searchTerms) {
+  for (let i = 0; i < searchTerms.length; i++) {
+    if (arr.some((item) => item.includes(searchTerms[i]))) {
+      return true;
+    }
+  }
+  return false;
+}

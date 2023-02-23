@@ -34,6 +34,7 @@ export default function MsLandscape(cosineData, exposureData, variableData) {
       }
     }
   }
+  console.log(charColors);
 
   const defaultNames = ['SBS', 'DBS', 'ID'];
   const names = exposureData.map((group) => group.signatureName);

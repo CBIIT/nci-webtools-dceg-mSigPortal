@@ -1,6 +1,6 @@
 import { groupBy } from 'lodash';
-import { round } from '../../utils/utils';
-import { colorPallet } from '../../utils/colors';
+import { round, arrayContainsTerms } from '../../utils/utils';
+import { colorPallet, colorPallet1 } from '../../utils/colors';
 
 import {
   groupDataByMutation,
@@ -23,13 +23,31 @@ export function MsIndividualComparison(
   const exposureData = data[0].data;
   const signatureData = data[1].data;
   const segmatrixData = data[2].data;
-  const signatureColors = colorPallet;
+
   const exposure_groupBySignature = groupBy(
     exposureData.filter((o) => o['exposure'] > 0.01),
     'signatureName'
   );
 
   const signatureNames = Object.keys(exposure_groupBySignature).map((e) => e);
+  // find the longest label to calculate extra height margin
+  const longest = signatureNames.reduce(
+    (a, e) => (a > e.length ? a : e.length),
+    0
+  );
+  console.log(signatureNames);
+  const extraMargin = longest < 7 ? 200 : longest * 12.5;
+  console.log(longest);
+  console.log(extraMargin);
+
+  const searchTerms = ['SBS', 'DBS', 'ID'];
+  const containsTerm = arrayContainsTerms(signatureNames, searchTerms);
+  console.log(containsTerm);
+  let signatureColors;
+  containsTerm
+    ? (signatureColors = colorPallet)
+    : (signatureColors = colorPallet1);
+  console.log(signatureColors);
   const exposureSum = Object.values(exposure_groupBySignature)
     .flat()
     .reduce((n, { exposure }) => n + exposure, 0);
@@ -455,10 +473,11 @@ export function MsIndividualComparison(
     x0: -0.105,
     x1: -0.08,
     signatureName: sortArr[i] ? sortArr[i].signatureName : '',
-    fillcolor:
-      signatureColors[
-        sortArr[i].signatureName.replace(/^\D*/, '').replace(')', '')
-      ],
+    fillcolor: containsTerm
+      ? signatureColors[
+          sortArr[i].signatureName.replace(/^\D*/, '').replace(')', '')
+        ]
+      : signatureColors[i],
     line: {
       width: 0,
     },
@@ -476,10 +495,11 @@ export function MsIndividualComparison(
 
     line: {
       width: 1,
-      color:
-        signatureColors[
-          sortArr[i].signatureName.replace(/^\D*/, '').replace(')', '')
-        ],
+      color: containsTerm
+        ? signatureColors[
+            sortArr[i].signatureName.replace(/^\D*/, '').replace(')', '')
+          ]
+        : signatureColors[i],
     },
   }));
 
@@ -614,20 +634,21 @@ export function MsIndividualComparison(
     val: val,
     val1: arr[i - 1],
     y: i === 0 ? val / 2 : (val - arr[i - 1]) / 2 + arr[i - 1],
-    x: -0.15,
+    x: longest < 7 ? -0.15 : -0.2,
     signatureName: sortArr[i] ? sortArr[i].signatureName : '',
     font: {
-      color:
-        signatureColors[
-          sortArr[i].signatureName.replace(/^\D*/, '').replace(')', '')
-        ],
+      color: containsTerm
+        ? signatureColors[
+            sortArr[i].signatureName.replace(/^\D*/, '').replace(')', '')
+          ]
+        : signatureColors[i],
     },
     text: sortArr[i].signatureName,
     showarrow: false,
 
     align: 'center',
   }));
-
+  console.log(signaturePercentAnnotation);
   const tickLabels = formatTickLabels(groupSamples[0]);
 
   const layout = {
@@ -813,7 +834,7 @@ export function MsIndividualComparison(
     ],
 
     margin: {
-      l: 200,
+      l: extraMargin,
     },
   };
 
