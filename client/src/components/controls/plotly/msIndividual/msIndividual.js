@@ -40,14 +40,12 @@ export function MsIndividualComparison(
   console.log(longest);
   console.log(extraMargin);
 
-  const searchTerms = ['SBS', 'DBS', 'ID'];
+  const searchTerms = ['SBS'];
   const containsTerm = arrayContainsTerms(signatureNames, searchTerms);
-  console.log(containsTerm);
   let signatureColors;
   containsTerm
     ? (signatureColors = colorPallet)
     : (signatureColors = colorPallet1);
-  console.log(signatureColors);
   const exposureSum = Object.values(exposure_groupBySignature)
     .flat()
     .reduce((n, { exposure }) => n + exposure, 0);
@@ -262,7 +260,6 @@ export function MsIndividualComparison(
     axis: 'x2',
   }));
   const differenceTraceMaxYValue = findMaxAbsoluteYValue(differenceTrace);
-  console.log(differenceTraceMaxYValue);
   const sample1Data = sampleTraceOriginal.reduce(
     (array, trace) => [...array, ...trace.y],
     []
@@ -766,7 +763,17 @@ export function MsIndividualComparison(
       },
       domain: [divide2 * 5 - 0.01, divide2 * 5 + divide2 - 0.02],
     },
-
+    yaxis7: {
+      autorange: true,
+      linecolor: '#D3D3D3',
+      linewidth: 1,
+      ticks: '',
+      mirror: 'all',
+      tickfont: {
+        family: 'Arial',
+      },
+      domain: [divide2 * 6 - 0.01, divide2 * 6 + divide2 - 0.02],
+    },
     yaxis10: {
       autorange: false,
 
