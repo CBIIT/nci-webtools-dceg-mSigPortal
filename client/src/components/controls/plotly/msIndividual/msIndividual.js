@@ -748,7 +748,7 @@ export function MsIndividualComparison(
 
     yaxis10: {
       autorange: false,
-      range: [-0.02, 0.02],
+      range: [-0.023, 0.023],
       // range: [
       //   -1 * differenceTraceMaxYValue * 1.2,
       //   differenceTraceMaxYValue * 1.2,
