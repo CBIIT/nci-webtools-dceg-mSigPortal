@@ -8,6 +8,7 @@ import {
   getMaxMutations,
   getCosineSimilarity,
   getRss,
+  findMaxAbsoluteYValue,
 } from '../profileComparision/profileComparison';
 
 export function MsIndividualComparison(
@@ -242,6 +243,7 @@ export function MsIndividualComparison(
     yaxis: 'y10',
     axis: 'x2',
   }));
+  const differenceTraceMaxYValue = findMaxAbsoluteYValue(differenceTrace);
 
   const sample1Data = sampleTraceOriginal.reduce(
     (array, trace) => [...array, ...trace.y],
@@ -519,7 +521,7 @@ export function MsIndividualComparison(
       yanchor: 'middle',
       align: 'center',
       x: 1.017,
-      y: 1 - divide1 * 2.5 - 0.01,
+      y: 1 - divide1 * 2.5 - 0.015,
       text: 'Difference',
       textangle: 90,
       showarrow: false,
@@ -536,9 +538,9 @@ export function MsIndividualComparison(
       yanchor: 'middle',
       align: 'center',
       x: -0.05,
-      y: plotYrange2 / 2,
-      text: 'Relative contribution',
-      font: { size: 15 },
+      y: 1 - divide1 * 1.5 - 0.015,
+      text: '<b>Relative contribution</b>',
+      font: { size: 16, family: 'Times New Roman' },
       textangle: -90,
       showarrow: false,
     },
@@ -549,9 +551,9 @@ export function MsIndividualComparison(
       yanchor: 'middle',
       align: 'center',
       x: -0.05,
-      y: plotYrange2 + (1 - plotYrange2) / 2,
-      text: 'Relative contribution',
-      font: { size: 15 },
+      y: plotYrange2 / 2,
+      text: '<b>Relative contribution</b>',
+      font: { size: 16, family: 'Times New Roman' },
       textangle: -90,
       showarrow: false,
     },
@@ -582,7 +584,7 @@ export function MsIndividualComparison(
       y: plotYrange2 - 0.017,
       text: formatMutationLabels(group),
       showarrow: false,
-      font: { color: 'white' },
+      font: { color: 'white', size: 16, family: 'Times New Roman' },
       align: 'center',
     })
   );
@@ -632,8 +634,19 @@ export function MsIndividualComparison(
     hoverlabel: { bgcolor: '#FFF' },
     height: 1080,
     autosize: true,
-    title:
-      '<b>RSS = ' + rss + '; Cosine Similarity = ' + cosineSimilarity + '</b>',
+    title: {
+      text:
+        '<b>RSS = ' +
+        rss +
+        '; Cosine Similarity = ' +
+        cosineSimilarity +
+        '</b>',
+      font: {
+        family: 'Times New Roman',
+        size: 20,
+      },
+    },
+
     xaxis: {
       showline: true,
       tickangle: tickAngle,
@@ -735,17 +748,12 @@ export function MsIndividualComparison(
 
     yaxis10: {
       autorange: false,
-      //range: [-0.02, 0.02],
-      range:
-        maxMutation1 - maxMutation2 > 0
-          ? [
-              -1 * (maxMutation1 - maxMutation2) * 4,
-              (maxMutation1 - maxMutation2) * 4,
-            ]
-          : [
-              1 * (maxMutation1 - maxMutation2) * 4,
-              -1 * (maxMutation1 - maxMutation2) * 4,
-            ],
+      range: [-0.023, 0.023],
+      // range: [
+      //   -1 * differenceTraceMaxYValue * 1.2,
+      //   differenceTraceMaxYValue * 1.2,
+      // ],
+
       linecolor: '#D3D3D3',
       linewidth: 1,
       mirror: 'all',
@@ -768,7 +776,7 @@ export function MsIndividualComparison(
       tickfont: {
         family: 'Arial',
       },
-
+      //title: { text: '<b>Relative contribution</b>' },
       domain: [1 - divide1 * 2 - 0.01, 1 - divide1 - 0.02],
       anchor: 'x2',
     },

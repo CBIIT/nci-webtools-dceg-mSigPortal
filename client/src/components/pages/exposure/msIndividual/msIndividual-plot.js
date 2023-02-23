@@ -58,6 +58,11 @@ export default function MsIndividualPlot({ state, form }) {
   }, [sample, id]);
   return (
     <div>
+      <div className="p-3 text-center">
+        <h6>
+          <b>Mutational Signature in Individual Samples</b>
+        </h6>
+      </div>
       <LoadingOverlay active={isFetching} />
       {error && <p className="p-3 text-danger">{error}</p>}
       {data && (
