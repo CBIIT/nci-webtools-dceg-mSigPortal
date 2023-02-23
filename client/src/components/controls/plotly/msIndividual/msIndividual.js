@@ -244,7 +244,7 @@ export function MsIndividualComparison(
     axis: 'x2',
   }));
   const differenceTraceMaxYValue = findMaxAbsoluteYValue(differenceTrace);
-
+  console.log(differenceTraceMaxYValue);
   const sample1Data = sampleTraceOriginal.reduce(
     (array, trace) => [...array, ...trace.y],
     []
@@ -748,11 +748,11 @@ export function MsIndividualComparison(
 
     yaxis10: {
       autorange: false,
-      range: [-0.023, 0.023],
-      // range: [
-      //   -1 * differenceTraceMaxYValue * 1.2,
-      //   differenceTraceMaxYValue * 1.2,
-      // ],
+
+      range: [
+        -1 * differenceTraceMaxYValue * 1.5,
+        differenceTraceMaxYValue * 1.5,
+      ],
 
       linecolor: '#D3D3D3',
       linewidth: 1,
