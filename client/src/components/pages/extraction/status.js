@@ -8,21 +8,22 @@ import { useMultiJobStatusQuery } from './apiSlice';
 
 export default function Status() {
   const [jobs, setJobs] = useState([]);
-  const { data, isFetching, refetch } = useMultiJobStatusQuery(jobs);
+  const { data, isFetching, refetch } = useMultiJobStatusQuery(jobs, {
+    skip: !jobs.length,
+  });
 
   // get jobs from local storage
   useEffect(() => {
     const localJobs = JSON.parse(localStorage.getItem('jobs'));
     setJobs(localJobs);
   }, [localStorage.getItem('jobs')]);
-  // update local storage
+  // update jobs in local storage
   useEffect(() => {
     if (jobs && jobs.length) localStorage.setItem('jobs', JSON.stringify(jobs));
   }, [jobs]);
 
   function removeJob(id) {
     const remaining = jobs.filter((e) => e !== id);
-    localStorage.setItem('jobs', JSON.stringify(remaining));
     setJobs(remaining);
   }
 
