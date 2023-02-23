@@ -16,7 +16,11 @@ export async function submit(req, res, next) {
   const statusFilePath = path.resolve(outputFolder, 'status.json');
   await mkdirs([inputFolder, outputFolder]);
 
-  const status = { id, status: 'SUBMITTED' };
+  const status = {
+    id,
+    status: 'SUBMITTED',
+    submittedAt: new Date(),
+  };
 
   await writeJson(paramsFilePath, req.body);
   await writeJson(statusFilePath, status);

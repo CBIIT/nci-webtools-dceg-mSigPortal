@@ -41,7 +41,10 @@ export async function extraction(
 ) {
   const { args, signatureQuery, id, email } = params;
   const paths = await getPaths(params, env);
-  const submittedTime = new Date();
+  const submittedTime = new Date(
+    (await readJson(paths.statusFile)).submittedAt
+  );
+  console.log((await readJson(paths.statusFile)));
   logger.info(paths);
 
   try {
@@ -53,7 +56,11 @@ export async function extraction(
 
     await mkdirs([paths.inputFolder, paths.outputFolder]);
     await writeJson(paths.paramsFile, params);
-    await writeJson(paths.statusFile, { id, status: 'IN_PROGRESS' });
+    await writeJson(paths.statusFile, {
+      ...(await readJson(paths.statusFile)),
+      id,
+      status: 'IN_PROGRESS',
+    });
     await writeJson(
       paths.manifestFile,
       mapValues(paths, (value) => path.parse(value).base)
@@ -195,8 +202,10 @@ export async function extraction(
     });
 
     // write success status
-    const status = { id, status: 'COMPLETED' };
-    await writeJson(paths.statusFile, status);
+    await writeJson(paths.statusFile, {
+      ...(await readJson(paths.statusFile)),
+      status: 'COMPLETED',
+    });
 
     await uploadWorkingDirectory(inputFolder, outputFolder, id, env);
 
@@ -218,7 +227,7 @@ export async function extraction(
 
     // send success notification if email was provided
     if (params.email) {
-      logger.info(`[${id}] Sending success notificaiton`);
+      logger.info(`[${id}] Sending success notification`);
       //delete input files
       // readdir(paths.inputFolder, (err, files) => {
       //   if (err) {
@@ -249,10 +258,13 @@ export async function extraction(
     return { id };
   } catch (error) {
     // send error notification if email was provided
-    logger.error(`[${id}] Sending error notificaiton`);
+    logger.error(`[${id}] Sending error notification`);
     logger.error(error);
-    const status = { id, status: 'FAILED', error: { ...error } };
-    await writeJson(paths.statusFile, status);
+    await writeJson(paths.statusFile, {
+      ...(await readJson(paths.statusFile)),
+      status: 'FAILED',
+      error: { ...error },
+    });
     //delete input files
     readdir(paths.inputFolder, (err, files) => {
       if (err) {

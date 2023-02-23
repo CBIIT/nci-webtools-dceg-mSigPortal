@@ -56,6 +56,7 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
               jobName: params.jobName,
               status: status.status,
               id: status.id,
+              submittedAt: status.submittedAt,
             };
         });
       },

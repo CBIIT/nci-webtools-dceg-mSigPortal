@@ -48,6 +48,10 @@ export default function Status() {
       },
     },
     {
+      accessor: 'submittedAt',
+      Header: 'Submitted Time',
+    },
+    {
       Header: 'Remove',
       Cell: (e) => (
         <OverlayTrigger
