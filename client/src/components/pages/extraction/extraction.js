@@ -216,10 +216,9 @@ export default function Extraction() {
           <ExtractionForm />
         </SidebarPanel>
         <MainPanel>
-          {(status &&
+          {status &&
             status.status === 'COMPLETED' &&
-            displayTab !== 'instructions') ||
-            (displayTab !== 'status' && (
+            (displayTab !== 'instructions' || displayTab !== 'status') && (
               <div className="p-3 bg-white border rounded mb-3">
                 <Row>
                   <Col md="auto">
@@ -257,7 +256,7 @@ export default function Extraction() {
                   </Col>
                 </Row>
               </div>
-            ))}
+            )}
           {status && status.status === 'SUBMITTED' && (
             <div className="border rounded bg-white mb-3 p-3">
               <p>
