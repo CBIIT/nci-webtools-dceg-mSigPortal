@@ -9,7 +9,7 @@ import {
   getCosineSimilarity,
   getRss,
   findMaxAbsoluteYValue,
-} from '../profileComparision/profileComparison';
+} from '../profileComparison/profileComparison';
 
 export function MsIndividualComparison(
   data,

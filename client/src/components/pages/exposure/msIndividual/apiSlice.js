@@ -1,8 +1,8 @@
 import { explorationApiSlice } from '../../../../services/store/rootApi';
-import sbs96 from '../../../controls/plotly/profileComparision/sbs96';
-import dbs78 from '../../../controls/plotly/profileComparision/dbs78';
-import id83 from '../../../controls/plotly/profileComparision/id83';
-import msIndividual_rs32 from '../../../controls/plotly/msIndividual/msIndividual_rs32';
+import sbs96 from '../../../controls/plotly/profileComparison/sbs96';
+import dbs78 from '../../../controls/plotly/profileComparison/dbs78';
+import id83 from '../../../controls/plotly/profileComparison/id83';
+import msIndividual_rs32 from '../../../controls/plotly/profileComparison/rs32';
 import { extractLastWord } from '../../../controls/utils/utils';
 
 export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
