@@ -1,4 +1,4 @@
-export default function RS32(rawData, arg) {
+export default function MsIndividual_RS32(rawData, arg) {
   const annotation = {
     xref: 'paper',
     yref: 'paper',
@@ -28,5 +28,6 @@ export default function RS32(rawData, arg) {
     yaxis: { showticklabels: false, zeroline: false },
     annotations: [annotation],
   };
+  console.log(layout);
   return { traces, layout };
 }

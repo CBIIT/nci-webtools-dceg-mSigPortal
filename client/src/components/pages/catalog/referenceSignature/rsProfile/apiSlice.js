@@ -55,7 +55,7 @@ export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
     rsProfilePlot: builder.query({
       async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
         console.log(_arg);
-            const params = _arg.params;
+        const params = _arg.params;
         console.log(params);
         try {
           const res = await Promise.all(

@@ -9,7 +9,6 @@ export default function SBS96(rawData, sample, tab) {
   };
   //const { profile, matrix, sample } = args;
 
-
   const groupByMutation = rawData.reduce((acc, e, i) => {
     const mutationRegex = /\[(.*)\]/;
     const mutation = e.mutationType.match(mutationRegex)[1];
