@@ -1,44 +1,9 @@
 import { groupBy } from 'lodash';
+import { rs32Color } from '../../utils/colors';
 export default function RS32(rawData, sample) {
-  const colors = {
-    'clustered_del_>10Mb': 'deeppink',
-    'non-clustered_del_>10Mb': 'deeppink',
-    'clustered_del_1Mb-10Mb': 'hotpink',
-    'non-clustered_del_1Mb-10Mb': 'hotpink',
-    'clustered_del_10-100Kb': 'lightpink',
-    'non-clustered_del_10-100Kb': 'lightpink',
-    'clustered_del_100Kb-1Mb': 'palevioletred',
-    'non-clustered_del_100Kb-1Mb': 'palevioletred',
-    'clustered_del_1-10Kb': 'lavenderblush',
-    'non-clustered_del_1-10Kb': 'lavenderblush',
-    'clustered_tds_>10Mb': 'saddlebrown',
-    'non-clustered_tds_>10Mb': 'saddlebrown',
-    'clustered_tds_1Mb-10Mb': 'sienna',
-    'non-clustered_tds_1Mb-10Mb': 'sienna',
-    'clustered_tds_10-100Kb': 'sandybrown',
-    'non-clustered_tds_10-100Kb': 'sandybrown',
-    'clustered_tds_100Kb-1Mb': 'peru',
-    'non-clustered_tds_100Kb-1Mb': 'peru',
-    'clustered_tds_1-10Kb': 'linen',
-    'non-clustered_tds_1-10Kb': 'linen',
-    'clustered_inv_>10Mb': 'rebeccapurple',
-    'non-clustered_inv_>10Mb': 'rebeccapurple',
-    'clustered_inv_1Mb-10Mb': 'blueviolet',
-    'non-clustered_inv_1Mb-10Mb': 'blueviolet',
-    'clustered_inv_10-100Kb': 'plum',
-    'non-clustered_inv_10-100Kb': 'plum',
-    'clustered_inv_100Kb-1Mb': 'mediumorchid',
-    'non-clustered_inv_100Kb-1Mb': 'mediumorchid',
-    'clustered_inv_1-10Kb': 'thistle',
-    'non-clustered_inv_1-10Kb': 'thistle',
-    clustered_trans: 'gray',
-    'non-clustered_trans': 'gray',
-    del: '#800001',
-    tds: '#FF8C00',
-    inv: '#6A5ACD',
-    tra: '#696969',
-  };
-
+  const colors = rs32Color;
+  console.log(rawData);
+  console.log(sample);
   const totalMutations = rawData.reduce(
     (total, indel) => total + indel.contribution,
     0
