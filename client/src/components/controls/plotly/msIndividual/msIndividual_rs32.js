@@ -1,6 +1,4 @@
 export default function RS32(rawData, arg) {
-  console.log(rawData);
-  console.log(arg);
   const annotation = {
     xref: 'paper',
     yref: 'paper',
