@@ -226,7 +226,7 @@ export default function Visualization() {
           <div className="e d-md-none">
             <Nav defaultActiveKey="summary">
               {tabs.map(({ name, id }) => (
-                <div key={id} className="col-12 text-center">
+                <div key={id + 'm'} className="col-12 text-center">
                   <Button
                     variant="link"
                     className={
