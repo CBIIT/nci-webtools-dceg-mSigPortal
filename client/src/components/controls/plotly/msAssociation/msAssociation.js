@@ -180,10 +180,16 @@ export default function MsAssociation(data, arg) {
   const layout = {
     showlegend: true,
     hoverlabel: { bgcolor: '#FFF' },
-    height: 650,
+    height: 700,
     bargap: 0,
     autosize: true,
-
+    title: {
+      text: '<b>Mutational Signature Association</b>',
+      font: {
+        family: 'Arial',
+        size: 18,
+      },
+    },
     legend: {
       title: { text: '\t Signature Names:' },
     },
@@ -207,6 +213,9 @@ export default function MsAssociation(data, arg) {
     yaxis2: { anchor: 'x', domain: [0.85, 1], zerolinecolor: '#EBEBEB' },
 
     annotations: [detailAnnotation],
+    margin: {
+      t: 150,
+    },
   };
   return { traces: traces, layout: layout };
 }

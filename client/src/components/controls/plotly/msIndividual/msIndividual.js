@@ -654,7 +654,7 @@ export function MsIndividualComparison(
     autosize: true,
     title: {
       text:
-        '<b>RSS = ' +
+        '<b>Mutational Signature Association</b><br><b>RSS = ' +
         rss +
         '; Cosine Similarity = ' +
         cosineSimilarity +
@@ -842,6 +842,7 @@ export function MsIndividualComparison(
 
     margin: {
       l: extraMargin,
+      t: 150,
     },
   };
 

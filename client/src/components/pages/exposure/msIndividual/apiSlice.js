@@ -15,9 +15,6 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
         },
       }),
       transformResponse: (data, meta, arg) => {
-        console.log('---ms indiidual');
-        console.log(arg);
-        console.log(data);
         return data
           ? [...new Set(data.map((e) => e.sample))]
               .sort((a, b) =>
@@ -50,13 +47,10 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
             ), //seqmatrix
           ]);
 
-          console.log(res);
-          console.log(_arg);
           //return MsLandscape(res, _arg);
           const profile = extractLastWord(
             _arg.params_activity.signatureSetName
           );
-          console.log(profile);
           if (profile === 'SBS96') {
             return { data: sbs96(res, _arg, 'msIndividual') };
           } else if (profile === 'DBS78') {
