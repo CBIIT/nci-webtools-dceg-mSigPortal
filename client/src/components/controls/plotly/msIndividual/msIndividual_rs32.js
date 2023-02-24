@@ -1,40 +1,34 @@
 export default function RS32(rawData, arg) {
   console.log(rawData);
   console.log(arg);
-  const annotation = {};
+  const annotation = {
+    xref: 'paper',
+    yref: 'paper',
+
+    x: 0.5,
+    y: 0.5,
+    text:
+      'Signature SetName: <b>' +
+      arg.params_activity.signatureSetName +
+      '</b> is not supported in MS Individual',
+    font: {
+      size: 15,
+      color: 'red',
+    },
+    showarrow: false,
+    align: 'center',
+  };
   const traces = {};
   const layout = {
-    hoverlabel: { bgcolor: '#FFF' },
-    height: 500,
+    height: 100,
     autosize: true,
     xaxis: {
-      showticklabels: true,
-      showline: true,
-      tickangle: -90,
-      tickfont: { size: 11 },
-      tickmode: 'array',
-
-      linecolor: 'black',
-      linewidth: 1,
-      mirror: 'all',
+      showticklabels: false,
+      showline: false,
+      zeroline: false,
     },
-    yaxis: {
-      title: {
-        text: '<b>Percentage(%)</b>',
-        font: {
-          family: 'Times New Roman',
-          size: 18,
-        },
-      },
-      autorange: false,
-      tickformat: ',.1%',
-      linecolor: 'black',
-      linewidth: 1,
-      mirror: true,
-    },
-
-    shapes: [],
-    annotations: [],
+    yaxis: { showticklabels: false, zeroline: false },
+    annotations: [annotation],
   };
   return { traces, layout };
 }
