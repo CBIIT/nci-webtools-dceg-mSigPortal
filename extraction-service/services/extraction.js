@@ -44,7 +44,7 @@ export async function extraction(
   const submittedTime = new Date(
     (await readJson(paths.statusFile)).submittedAt
   );
-  console.log((await readJson(paths.statusFile)));
+
   logger.info(paths);
 
   try {
@@ -361,6 +361,17 @@ export async function getPaths(params, env = process.env) {
   );
   const decomposedSignatureInput = path.resolve(outputFolder, 'signature.tsv');
 
+  // signature map file
+  const signatureMapFile = path.resolve(
+    decomposedFolder,
+    `De_Novo_map_to_COSMIC_${args.context_type}.csv`
+  );
+  const decomposedSignatureFile = path.resolve(
+    decomposedFolder,
+    'Signatures',
+    `COSMIC_${args.context_type}_Signatures.txt`
+  );
+
   return {
     inputFolder,
     outputFolder,
@@ -374,6 +385,8 @@ export async function getPaths(params, env = process.env) {
     denovoSignatureInput,
     decomposedExposureInput,
     decomposedSignatureInput,
+    signatureMapFile,
+    decomposedSignatureFile,
   };
 }
 

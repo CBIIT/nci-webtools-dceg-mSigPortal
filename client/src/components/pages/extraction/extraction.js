@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Button, Nav, Form, Row, Col } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -12,6 +12,7 @@ import {
 import ExtractionForm from './extraction-form';
 import Instructions from './instructions';
 import Status from './status';
+// import SignatureMap from './signatureMap';
 import TMB from '../exposure/tmb/tmb';
 import TmbSignature from '../exposure/tmbSignature/tmbSignature';
 import MsBurden from '../exposure/msBurden/msBurden';
@@ -19,8 +20,8 @@ import MsDecomposition from '../exposure/msDecomposition/msDecomposition';
 import MsAssociation from '../exposure/msAssociation/msAssociation';
 import MsLandscape from '../exposure/msLandscape/msLandscape';
 import MsPrevalence from '../exposure/msPrevalence/msPrevalence';
-// import MsIndividual from '../exposure/msIndividual';
-import { useStatusQuery, useManifestQuery, useRefreshQuery } from './apiSlice';
+// import MsIndividual from '../exposure/msIndividual/msIndividual';
+import { useRefreshQuery } from './apiSlice';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const actions = { ...extractionActions, ...modalActions };
@@ -42,6 +43,7 @@ export default function Extraction() {
 
   const status = refreshStatus?.status;
   const manifest = refreshStatus?.manifest;
+  const params = refreshStatus?.params;
   // const { data: status, refetch: refetchStatus } = useStatusQuery(id, {
   //   skip: !id,
   // });
@@ -88,6 +90,11 @@ export default function Extraction() {
       id: 'status',
       name: 'Status',
       disabled: false,
+    },
+    {
+      id: 'signatureMap',
+      name: 'Signature Map',
+      disabled: status?.status !== 'COMPLETED',
     },
     {
       id: 'tmb',
@@ -209,45 +216,48 @@ export default function Extraction() {
           <ExtractionForm />
         </SidebarPanel>
         <MainPanel>
-          {status && status.status === 'COMPLETED' && (
-            <div className="p-3 bg-white border rounded mb-3">
-              <Row>
-                <Col md="auto">
-                  <Form.Group controlId="explorationType">
-                    <Form.Label>Exploration Calculation</Form.Label>
-                    <Form.Control
-                      as="select"
-                      value={explorationType}
-                      onChange={handleExplorationType}
-                    >
-                      <option value="denovo">Denovo</option>
-                      <option value="decomposed">Decomposed</option>
-                    </Form.Control>
-                  </Form.Group>
-                </Col>
-                <Col md="auto">
-                  <b>Exposure File</b>
-                  <p>
-                    {explorationType === 'denovo'
-                      ? manifest?.denovoExposureInput
-                      : manifest?.decomposedExposureInput}
-                  </p>
-                </Col>
-                <Col md="auto">
-                  <b>Matrix File</b>
-                  <p>{manifest?.matrixFile}</p>
-                </Col>
-                <Col md="auto">
-                  <b>Signature File</b>
-                  <p>
-                    {explorationType === 'denovo'
-                      ? manifest?.denovoSignatureInput
-                      : manifest?.decomposedSignatureInput}
-                  </p>
-                </Col>
-              </Row>
-            </div>
-          )}
+          {(status &&
+            status.status === 'COMPLETED' &&
+            displayTab !== 'instructions') ||
+            (displayTab !== 'status' && (
+              <div className="p-3 bg-white border rounded mb-3">
+                <Row>
+                  <Col md="auto">
+                    <Form.Group controlId="explorationType">
+                      <Form.Label>Exploration Calculation</Form.Label>
+                      <Form.Control
+                        as="select"
+                        value={explorationType}
+                        onChange={handleExplorationType}
+                      >
+                        <option value="denovo">Denovo</option>
+                        <option value="decomposed">Decomposed</option>
+                      </Form.Control>
+                    </Form.Group>
+                  </Col>
+                  <Col md="auto">
+                    <b>Exposure File</b>
+                    <p>
+                      {explorationType === 'denovo'
+                        ? manifest?.denovoExposureInput
+                        : manifest?.decomposedExposureInput}
+                    </p>
+                  </Col>
+                  <Col md="auto">
+                    <b>Matrix File</b>
+                    <p>{manifest?.matrixFile}</p>
+                  </Col>
+                  <Col md="auto">
+                    <b>Signature File</b>
+                    <p>
+                      {explorationType === 'denovo'
+                        ? manifest?.denovoSignatureInput
+                        : manifest?.decomposedSignatureInput}
+                    </p>
+                  </Col>
+                </Row>
+              </div>
+            ))}
           {status && status.status === 'SUBMITTED' && (
             <div className="border rounded bg-white mb-3 p-3">
               <p>
@@ -279,6 +289,11 @@ export default function Extraction() {
           </div>
           {status && status.status === 'COMPLETED' && (
             <>
+              {/* <div
+                className={displayTab === 'signatureMap' ? 'd-block' : 'd-none'}
+              >
+                <SignatureMap state={{ id, params, manifest }} />
+              </div> */}
               <div className={displayTab === 'tmb' ? 'd-block' : 'd-none'}>
                 <TMB state={{ id: explorationId }} />
               </div>

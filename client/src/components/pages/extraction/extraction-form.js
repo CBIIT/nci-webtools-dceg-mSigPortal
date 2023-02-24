@@ -239,6 +239,9 @@ export default function ExtractionForm() {
     max_nmf_iterations: 4,
     nmf_test_conv: 2,
     nmf_replicates: 10,
+
+    email: '',
+    jobName: '',
   };
 
   const {
