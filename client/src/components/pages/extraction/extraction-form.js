@@ -212,9 +212,6 @@ export default function ExtractionForm() {
     matrix_normalization: 'gmm',
     nmf_init: 'random',
     precision: 'single',
-
-    email: '',
-    jobName: '',
   };
 
   const sample1 = {
@@ -840,11 +837,12 @@ export default function ExtractionForm() {
                 render={({ field }) => (
                   <Form.Control
                     {...field}
-                    aria-label="Enter Email"
+                    aria-label="email"
                     placeholder="Enter Email"
                     type="email"
                     disabled={submitted || id}
                     isInvalid={errors.email}
+                    defaultValue={''}
                   />
                 )}
               />
