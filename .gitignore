@@ -4,6 +4,7 @@
 /data
 node_modules
 /packages
+/src
 
 *.meta
 *.vs
