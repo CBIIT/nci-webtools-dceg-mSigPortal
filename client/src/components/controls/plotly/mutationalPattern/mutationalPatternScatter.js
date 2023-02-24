@@ -8,7 +8,7 @@ export default function mutationalPatternScatter(inputData, arg) {
   const subtype2 = pattern.split('>')[0].slice(-1);
   // const subtype1 = pattern.substring(0, 1);
   // const subtype2 = pattern.substring(2, 3);
-  const pattern1 = pattern + ' context';
+  const pattern1 = type + ' context';
   const pattern2 = pattern + ' other context';
   const tmpdata0 = Object.values(
     groupBy(inputData, (e) => `${e.study}_${e.sample}`)
@@ -254,11 +254,13 @@ export default function mutationalPatternScatter(inputData, arg) {
     xaxis: {
       title: pattern2,
       range: [-0.1, 1.1],
+      dtick: 0.25,
       zeroline: false,
     },
     yaxis: {
       title: pattern1,
       range: [-0.1, 1.1],
+      dtick: 0.25,
       zeroline: false,
     },
     title: {
@@ -275,7 +277,7 @@ export default function mutationalPatternScatter(inputData, arg) {
     responsive: true,
     displaylogo: false,
     toImageButtonOptions: {
-      format:'svg',
+      format: 'svg',
       filename: 'Proportion of Mutational Pattern',
     },
   };
