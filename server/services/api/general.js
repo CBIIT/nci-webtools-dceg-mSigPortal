@@ -86,14 +86,14 @@ function upload(req, res, next) {
 
   form
     .on('fileBegin', (field, file) => {
-      const destination = path.join(form.uploadDir, file.name);
-      file.path = destination;
+      const destination = path.join(form.uploadDir, file.originalFilename);
+      file.filepath = destination;
     })
     .on('error', (err) => {
-      logger.info('/UPLOAD: An error occured\n' + err);
+      logger.info('/UPLOAD: An error occurred\n' + err);
       logger.error(err);
       res.status(500).json({
-        msg: 'An error occured during upload',
+        msg: 'An error occurred during upload',
         err: err,
       });
     })
