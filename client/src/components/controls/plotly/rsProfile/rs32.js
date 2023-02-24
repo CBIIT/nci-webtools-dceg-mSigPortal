@@ -8,6 +8,7 @@ export default function RS32(rawData, sample) {
     (total, indel) => total + indel.contribution,
     0
   );
+  console.log(rawData);
   const maxMutation = Math.max(...rawData.map((indel) => indel.contribution));
 
   var sortOrder = ['1-10Kb', '10-100Kb', '100Kb-1Mb', '1Mb-10Mb', '>10Mb']; // Declare a array that defines the order of the elements to be sorted.

@@ -65,7 +65,10 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
             return { data: id83(res, _arg, 'msIndividual') };
           } else if (profile === 'RS32') {
             return { data: msIndividual_rs32(res, _arg, 'msIndividual') };
-          } else throw Error(`Profile ${profile} is not supported`);
+          } else
+            throw Error(
+              `Signature Set Name: ${_arg.params_activity.signatureSetName} is not supported`
+            );
         } catch (error) {
           return { error };
         }

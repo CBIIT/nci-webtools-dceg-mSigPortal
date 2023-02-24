@@ -1,8 +1,7 @@
-import { rs32Color } from '../../utils/colors';
 export default function RS32(rawData, arg) {
   console.log(rawData);
   console.log(arg);
-
+  const annotation = {};
   const traces = {};
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
@@ -18,8 +17,6 @@ export default function RS32(rawData, arg) {
       linecolor: 'black',
       linewidth: 1,
       mirror: 'all',
-      //tickvals: mutationTypeNames.map((_, i) => i),
-      //   ticktext: mutationTypeNames.map((e) => e.mutationType),
     },
     yaxis: {
       title: {
@@ -30,7 +27,6 @@ export default function RS32(rawData, arg) {
         },
       },
       autorange: false,
-      //range: [0, maxMutation * 1.25],
       tickformat: ',.1%',
       linecolor: 'black',
       linewidth: 1,
