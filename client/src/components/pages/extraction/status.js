@@ -9,7 +9,7 @@ import { useMultiJobStatusQuery } from './apiSlice';
 export default function Status() {
   const [jobs, setJobs] = useState([]);
   const { data, isFetching, refetch } = useMultiJobStatusQuery(jobs, {
-    skip: !jobs.length,
+    skip: !jobs || !jobs.length,
   });
 
   // get jobs from local storage
@@ -85,7 +85,10 @@ export default function Status() {
       <LoadingOverlay active={isFetching}></LoadingOverlay>
       <h4>Status</h4>
       <p>The status of your submitted jobs will appear here.</p>
-      <p>This list is tracked by your browser and will be lost if browser data is cleared.</p>
+      <p>
+        This list is tracked by your browser and will be lost if browser data is
+        cleared.
+      </p>
       <Button variant="light" className="mb-3" onClick={() => refetch()}>
         <i className="bi bi-arrow-clockwise" /> Refresh
       </Button>
