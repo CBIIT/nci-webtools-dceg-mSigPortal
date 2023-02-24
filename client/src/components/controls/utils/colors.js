@@ -162,3 +162,12 @@ export const rs32Color = {
   inv: '#6A5ACD',
   tra: '#696969',
 };
+
+export const sbsColor = {
+  'C>A': '#03BCEE',
+  'C>G': 'black',
+  'C>T': '#E32926',
+  'T>A': '#CAC9C9',
+  'T>C': '#A1CE63',
+  'T>G': '#EBC6C4',
+};

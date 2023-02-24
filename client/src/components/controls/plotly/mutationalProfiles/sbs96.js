@@ -5,16 +5,10 @@ import {
   createMutationShapes,
   createMutationAnnotations,
 } from './utils';
+import { sbsColor } from '../../utils/colors';
 
 export default function SBS96(apiData) {
-  const colors = {
-    'C>A': '#03BCEE',
-    'C>G': 'black',
-    'C>T': '#E32926',
-    'T>A': '#CAC9C9',
-    'T>C': '#A1CE63',
-    'T>G': '#EBC6C4',
-  };
+  const colors = sbsColor;
   const mutationRegex = /\[(.*)\]/;
 
   const mutationGroupSort = (a, b) => {

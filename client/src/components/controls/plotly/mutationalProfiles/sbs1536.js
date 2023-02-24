@@ -1,12 +1,6 @@
+import { sbsColor } from '../../utils/colors';
 export default function SBS1536(data, sample, tab) {
-  const colors = {
-    'C>A': '#03BCEE',
-    'C>G': 'black',
-    'C>T': '#E32926',
-    'T>A': '#CAC9C9',
-    'T>C': '#A1CE63',
-    'T>G': '#EBC6C4',
-  };
+  const colors = sbsColor;
 
   const heatmapColorscale = [
     [0, 'rgb(56,56,156'],
@@ -341,7 +335,6 @@ export default function SBS1536(data, sample, tab) {
   let heatMapZ4 = [];
   let heatMapZ5 = [];
 
-
   Object.entries(groupByMutationOuter).forEach(
     ([key, value], groupIndex, array) => {
       value.sort((a, b) =>
@@ -371,8 +364,6 @@ export default function SBS1536(data, sample, tab) {
     }
   );
 
-
-
   heatmapZ.forEach((item, index) => {
     heatMapZ0.push(item.slice().splice(0, 16));
     heatMapZ1.push(item.slice().splice(16, 16));
@@ -381,7 +372,6 @@ export default function SBS1536(data, sample, tab) {
     heatMapZ4.push(item.slice().splice(64, 16));
     heatMapZ5.push(item.slice().splice(80, 16));
   });
-
 
   const heatMapZFinal = [
     heatMapZ0,

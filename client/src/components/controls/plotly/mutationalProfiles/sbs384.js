@@ -1,12 +1,6 @@
+import { sbsColor } from '../../utils/colors';
 export default function SBS384(data, sample) {
-  const colors = {
-    'C>A': '#03BCEE',
-    'C>G': 'black',
-    'C>T': '#E32926',
-    'T>A': '#CAC9C9',
-    'T>C': '#A1CE63',
-    'T>G': '#EBC6C4',
-  };
+  const colors = sbsColor;
 
   const groupByMutation = data.reduce((groups, e, i) => {
     const mutation = e.mutationType.substring(2, e.mutationType.length);
