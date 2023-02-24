@@ -25,8 +25,8 @@ export default function sbs96(data1, data2, tab) {
         })
       )
       .flat();
-  if (tab === 'pc') {
-    return compareProfiles(
+  if (tab === 'msIndividual') {
+    return MsIndividualComparison(
       data1,
       data2,
       colors,
@@ -35,7 +35,7 @@ export default function sbs96(data1, data2, tab) {
       formatTickLabels
     );
   } else {
-    return MsIndividualComparison(
+    return compareProfiles(
       data1,
       data2,
       colors,

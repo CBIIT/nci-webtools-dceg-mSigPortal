@@ -2,7 +2,7 @@ import { explorationApiSlice } from '../../../../services/store/rootApi';
 import sbs96 from '../../../controls/plotly/profileComparision/sbs96';
 import dbs78 from '../../../controls/plotly/profileComparision/dbs78';
 import id83 from '../../../controls/plotly/profileComparision/id83';
-import rs32 from '../../../controls/plotly/profileComparision/rs32';
+import msIndividual_rs32 from '../../../controls/plotly/msIndividual/msIndividual_rs32';
 import { extractLastWord } from '../../../controls/utils/utils';
 
 export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
@@ -64,8 +64,11 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
           } else if (profile === 'ID83') {
             return { data: id83(res, _arg, 'msIndividual') };
           } else if (profile === 'RS32') {
-            return { data: rs32(res, _arg, 'msIndividual') };
-          } else throw Error(`Profile ${profile} is not supported`);
+            return { data: msIndividual_rs32(res, _arg, 'msIndividual') };
+          } else
+            throw Error(
+              `Signature Set Name: ${_arg.params_activity.signatureSetName} is not supported`
+            );
         } catch (error) {
           return { error };
         }
