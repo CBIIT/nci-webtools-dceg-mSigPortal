@@ -4,12 +4,15 @@ import {
   groupDataByMutation,
   createMutationShapes,
   createMutationAnnotations,
+  getTotalMutations,
 } from './utils';
 import { sbsColor } from '../../utils/colors';
 
 export default function SBS96(apiData) {
   const colors = sbsColor;
   const mutationRegex = /\[(.*)\]/;
+  const totalMutations = getTotalMutations(apiData);
+  totalMutations < 1.1 ? console.log('true') : console.log('false');
 
   const mutationGroupSort = (a, b) => {
     const order = Object.keys(colors);
@@ -39,7 +42,9 @@ export default function SBS96(apiData) {
           .slice(0, groupIndex)
           .reduce((lastIndex, b) => lastIndex + b.data.length, 0)
     ),
-    y: group.data.map((e) => e.mutations || e.contribution),
+    y: group.data.map((e) =>
+      totalMutations < 1.1 ? e.mutations : e.mutations || e.contribution
+    ),
     hoverinfo: 'x+y',
     showlegend: false,
   }));
@@ -93,7 +98,8 @@ export default function SBS96(apiData) {
       linecolor: '#D3D3D3',
       linewidth: 1,
       mirror: 'all',
-      tickformat: apiData[0].contribution ? '.1%' : '~s',
+      tickformat:
+        apiData[0].contribution || totalMutations < 1.1 ? '.1%' : '~s',
       showgrid: true,
       gridcolor: '#F5F5F5',
     },

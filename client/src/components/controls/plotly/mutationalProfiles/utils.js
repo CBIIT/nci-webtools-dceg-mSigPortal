@@ -40,11 +40,14 @@ export function createSampleAnnotation(apiData, text = '') {
     yanchor: 'bottom',
     x: 0.01,
     y: 0.88,
-    text: apiData[0].sample
-      ? `<b>${apiData[0].sample}: ${totalMutations.toLocaleString()} ${
-          text || 'Substitutions'
-        }</b>`
-      : `<b>${apiData[0].signatureName}</b>`,
+    text:
+      apiData[0].sample && totalMutations > 1.1
+        ? `<b>${apiData[0].sample}: ${totalMutations.toLocaleString()} ${
+            text || 'Substitutions'
+          }</b>`
+        : apiData[0].sample && totalMutations <= 1.1
+        ? `<b>${apiData[0].sample}</b>`
+        : `<b>${apiData[0].signatureName}</b>`,
     showarrow: false,
     font: {
       size: 24,
