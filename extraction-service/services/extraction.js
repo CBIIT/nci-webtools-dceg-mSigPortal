@@ -144,8 +144,8 @@ export async function extraction(
     const transformSignatures = decomposedSignatures
       .map((e) => {
         const { MutationType, ...signatures } = e;
-        return Object.entries(signatures).map(([signature, mutations]) => ({
-          signature,
+        return Object.entries(signatures).map(([signatureName, mutations]) => ({
+          signatureName,
           MutationType,
           mutations,
         }));

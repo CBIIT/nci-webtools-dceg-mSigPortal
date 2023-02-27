@@ -3,12 +3,12 @@ export const signatureSchema = [
     name: 'signature',
     schema: (table) => {
       table.increments('id');
-      table.string('signature');
+      table.string('signatureName');
       table.string('mutationType');
       table.integer('mutations');
     },
     index: (table) => {
-      table.index(['signature']);
+      table.index(['signatureName']);
     },
   },
   {
@@ -16,7 +16,7 @@ export const signatureSchema = [
     type: 'materializedView',
     dependsOn: ['signature'],
     create: (connection) => {
-      const columns = ['signature'];
+      const columns = ['signatureName'];
       return connection.raw(
         [
           `CREATE TABLE signatureOption AS`,
@@ -26,7 +26,7 @@ export const signatureSchema = [
       );
     },
     index: (table) => {
-      table.index(['signature']);
+      table.index(['signatureName']);
     },
   },
 ];
