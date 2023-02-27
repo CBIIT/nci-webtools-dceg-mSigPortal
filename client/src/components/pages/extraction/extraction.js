@@ -218,7 +218,9 @@ export default function Extraction() {
         <MainPanel>
           {status &&
             status.status === 'COMPLETED' &&
-            (displayTab !== 'instructions' || displayTab !== 'status') && (
+            !['instructions', 'status', 'signatureMap'].includes(
+              displayTab
+            ) && (
               <div className="p-3 bg-white border rounded mb-3">
                 <Row>
                   <Col md="auto">
@@ -257,6 +259,7 @@ export default function Extraction() {
                 </Row>
               </div>
             )}
+
           {status && status.status === 'SUBMITTED' && (
             <div className="border rounded bg-white mb-3 p-3">
               <p>
@@ -280,6 +283,7 @@ export default function Extraction() {
               </p>
             </div>
           )}
+
           <div className={displayTab === 'instructions' ? 'd-block' : 'd-none'}>
             <Instructions />
           </div>
@@ -288,11 +292,11 @@ export default function Extraction() {
           </div>
           {status && status.status === 'COMPLETED' && (
             <>
-              {/* <div
+              <div
                 className={displayTab === 'signatureMap' ? 'd-block' : 'd-none'}
               >
                 <SignatureMap state={{ id, params, manifest }} />
-              </div> */}
+              </div>
               <div className={displayTab === 'tmb' ? 'd-block' : 'd-none'}>
                 <TMB state={{ id: explorationId }} />
               </div>
@@ -327,14 +331,9 @@ export default function Extraction() {
                 <MsPrevalence state={{ id: explorationId }} />
               </div>
               <div
-                className={
-                  displayTab === 'msIndivexplorationIdual'
-                    ? 'd-block'
-                    : 'd-none'
-                }
+                className={displayTab === 'msIndividual' ? 'd-block' : 'd-none'}
               >
-                {/* <MsIndividual state={{ id: explorationId }}  /> */}
-                Under Construction
+                {/* <MsIndividual state={{ id: explorationId }} /> */}
               </div>
             </>
           )}

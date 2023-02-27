@@ -63,27 +63,9 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
     }),
 
     signatureMap: builder.query({
-      async queryFn(arg, queryApi, extraOptions, fetchWithBQ) {
-        const { id, context_type, signatureMapFile, decomposedSignatureFile } =
-          arg;
-        const folder = `data/output/${id}/${context_type}/Suggested_Solution/COSMIC_${context_type}_Decomposed_Solution`;
-        try {
-          const [signatureMap, signatures] = await Promise.all([
-            fetchWithBQ(`${folder}/${signatureMapFile}`),
-            fetchWithBQ(`${folder}/Signatures/${decomposedSignatureFile}`),
-          ]);
-
-          console.log(signatureMap);
-          return {
-            data: {
-              signatureMap: signatureMap.data,
-              signatures: signatures.data,
-            },
-          };
-        } catch (error) {
-          return { error };
-        }
-      },
+      query: ({ id, context_type, signatureMap }) => ({
+        url: `data/output/${id}/${context_type}/Suggested_Solution/COSMIC_${context_type}_Decomposed_Solution/${signatureMap}`,
+      }),
     }),
   }),
 });
