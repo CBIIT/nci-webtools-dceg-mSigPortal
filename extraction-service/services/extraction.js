@@ -22,6 +22,8 @@ function parseCSV(filepath) {
   return new Promise((resolve, reject) => {
     Papa.parse(file, {
       header: true,
+      transformHeader: (e) => e.trim(),
+      transform: (e) => e.trim(),
       complete(results, file) {
         resolve(results.data);
       },
@@ -157,6 +159,10 @@ export async function extraction(
       useNullAsDefault: true,
     });
     await importUserSession(localDb, { signature: transformSignatures });
+
+    // parse signatureMap csv to JSON
+    const signatureMap = await parseCSV(paths.signatureMapFile);
+    await writeJson(paths.signatureMapJson, signatureMap);
 
     // run exploration calculation on denovo and decomposed solutions
     let denovoId, decomposedId;
@@ -404,6 +410,11 @@ export async function getPaths(params, env = process.env) {
     decomposedFolder,
     `De_Novo_map_to_COSMIC_${args.context_type}.csv`
   );
+  // signature map file
+  const signatureMapJson = path.resolve(
+    decomposedFolder,
+    `De_Novo_map_to_COSMIC_${args.context_type}.json`
+  );
   const decomposedSignatureFile = path.resolve(
     decomposedFolder,
     'Signatures',
@@ -424,6 +435,7 @@ export async function getPaths(params, env = process.env) {
     decomposedExposureInput,
     decomposedSignatureInput,
     signatureMapFile,
+    signatureMapJson,
     decomposedSignatureFile,
   };
 }
