@@ -26,7 +26,7 @@ import {
 const actions = { ...exposureActions, ...modalActions };
 const { Group, Label, Check } = Form;
 
-export default function Exposure() {
+export default function Exploration() {
   const dispatch = useDispatch();
 
   const mergeState = (state) =>
