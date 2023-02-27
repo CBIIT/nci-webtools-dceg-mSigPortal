@@ -4,16 +4,26 @@ import * as d3 from 'd3';
 import cloneDeep from 'lodash/cloneDeep';
 import { useRecoilValue } from 'recoil';
 import { formState, graphDataSelector } from './treeLeaf.state';
-import { groupBy, forceHierarchical, getAttractionMatrix } from './treeLeaf.utils';
+import {
+  groupBy,
+  forceHierarchical,
+  getAttractionMatrix,
+} from './treeLeaf.utils';
 
-export default function D3TreeLeaf({ id = 'treeleaf-plot', width = 1000, height = 1000, onSelect, ...props }) {
+export default function D3TreeLeaf({
+  id = 'treeleaf-plot',
+  width = 1000,
+  height = 1000,
+  onSelect,
+  ...props
+}) {
   const plotRef = useRef(null);
   const form = useRecoilValue(formState);
   const publicForm = useSelector((state) => state.visualization.publicForm);
   const study = publicForm?.study?.value ?? 'PCAWG';
   const strategy = publicForm?.strategy?.value ?? 'WGS';
-  const signatureSetName = 'COSMIC_v3_Signatures_GRCh37_SBS96' 
-  const profileMatrix = ["SBS96", "DBS78", "ID83"];
+  const signatureSetName = 'COSMIC_v3_Signatures_GRCh37_SBS96';
+  const profileMatrix = ['SBS96', 'DBS78', 'ID83'];
   const params = { study, strategy, signatureSetName, profileMatrix };
   const graphData = useRecoilValue(graphDataSelector(params));
   const { hierarchy, attributes } = cloneDeep(graphData) || {};
@@ -31,7 +41,7 @@ export default function D3TreeLeaf({ id = 'treeleaf-plot', width = 1000, height 
   };
   const plotEvents = {
     onClick: onSelect,
-  }
+  };
 
   useEffect(() => {
     if (plotRef.current && plotData.data) {
@@ -143,7 +153,9 @@ function createForceDirectedTree(
     )
     .force(
       'charge',
-      forceHierarchical(attractionMatrix).strength((d) => (d.children ? -15 : 15))
+      forceHierarchical(attractionMatrix).strength((d) =>
+        d.children ? -15 : 15
+      )
     )
     // .force("center", d3.forceCenter().strength(1))
     .force('x', d3.forceX().strength(0.005))
@@ -154,13 +166,18 @@ function createForceDirectedTree(
   simulation.tick(40);
 
   const zoom = d3.zoom().on('zoom', zoomed);
-  
+
   const viewBoxScale = 1.3;
   const container = d3.create('div');
   const svg = container
     .append('svg')
     .attr('id', id)
-    .attr('viewBox', [-marginLeft - radius, -marginTop - radius, width, height].map(v => v * viewBoxScale))
+    .attr(
+      'viewBox',
+      [-marginLeft - radius, -marginTop - radius, width, height].map(
+        (v) => v * viewBoxScale
+      )
+    )
     .attr('width', width)
     .attr('height', height)
     .attr(
@@ -172,8 +189,7 @@ function createForceDirectedTree(
     .call(zoom);
 
   // add tree container
-  const treeGroup = svg.append('g')
-    .attr('transform', `translate(0, 20)`)
+  const treeGroup = svg.append('g').attr('transform', `translate(0, 20)`);
 
   // add lines
   const link = treeGroup
@@ -282,7 +298,9 @@ function createForceDirectedTree(
         `<div class="text-start">
           <div>Sample: ${sample ?? 'Unavailable'}</div>
           <div>Cancer Type: ${data.Cancer_Type ?? 'Unavailable'}</div>
-          <div>Cosine Similarity: ${data.Cosine_similarity ?? 'Unavailable'}</div>
+          <div>Cosine Similarity: ${
+            data.Cosine_similarity ?? 'Unavailable'
+          }</div>
           <div>Mutations: ${data.Mutations ?? 'Unavailable'}</div>
         </div>`
       )
@@ -293,7 +311,7 @@ function createForceDirectedTree(
   function click(e, d) {
     const sample = d.data.name;
     const data = attributes[sample];
-    if (typeof onClick === "function") {
+    if (typeof onClick === 'function') {
       onClick(data);
     }
   }
@@ -302,14 +320,14 @@ function createForceDirectedTree(
   svg
     .append('g')
     .attr('id', 'treeleaf-title')
-    .attr('transform', `translate(0, ${(-height/2 + 10) * viewBoxScale})`)
+    .attr('transform', `translate(0, ${(-height / 2 + 10) * viewBoxScale})`)
     .append('text')
     .attr('x', 0)
-    .attr('y', 0)
+    .attr('y', 20)
     .attr('fill', 'black')
     .attr('text-anchor', 'center')
     .attr('font-weight', 'bold')
-    .attr('class', 'title')    
+    .attr('class', 'h2 title')
     .text(plotTitle);
 
   // append legend
@@ -317,8 +335,8 @@ function createForceDirectedTree(
     svg,
     color: colorFill,
     title: form.color.label,
-    x: (width/2 - 40)  * viewBoxScale, 
-    y: (-height/2 + 20) *  viewBoxScale
+    x: (width / 2 - 40) * viewBoxScale,
+    y: (-height / 2 + 20) * viewBoxScale,
   };
 
   form.color.continuous
@@ -334,8 +352,8 @@ function continuousLegend({
   title = '',
   x = 10,
   y = 10,
-  width = 20,
-  height = 200,
+  width = 50,
+  height = 300,
 } = {}) {
   // define gradient
   const defs = svg.append('defs');
@@ -365,9 +383,7 @@ function continuousLegend({
     .attr('id', 'treeleaf-legend')
     .attr('transform', `translate(${x}, ${y})`);
 
-  const legendBar = group
-    .append('g')
-    .attr('transform', `translate(0, 15)`)
+  const legendBar = group.append('g').attr('transform', `translate(0, 15)`);
 
   legendBar
     .append('rect')
@@ -377,7 +393,8 @@ function continuousLegend({
 
   // add legend axis labels
   const axisScale = d3.scaleLinear().domain(color.domain()).range([height, 0]);
-  const axisLeft = (g) => g.call(d3.axisLeft(axisScale));
+  const axisLeft = (g) =>
+    g.call(d3.axisLeft(axisScale)).style('font-size', '17px');
   legendBar.call(axisLeft);
 
   // add title
@@ -388,7 +405,7 @@ function continuousLegend({
     .attr('fill', 'black')
     .attr('text-anchor', 'end')
     .attr('font-weight', 'bold')
-    .attr('class', 'title')    
+    .attr('class', 'h5 title')
     .text(title);
 
   return group;
@@ -411,9 +428,7 @@ function categoricalLegend({
     .attr('transform', `translate(${x}, ${y})`);
 
   // add legend bar
-  const legendBar = group
-    .append('g')
-    .attr('transform', `translate(0, 10)`)
+  const legendBar = group.append('g').attr('transform', `translate(0, 10)`);
 
   legendBar
     .selectAll('treeleaf-legend-colors')
@@ -432,11 +447,12 @@ function categoricalLegend({
     .enter()
     .append('text')
     .attr('x', -5)
-    .attr('y', (d, i) => i * (size) + size / 2)
+    .attr('y', (d, i) => i * size + size / 2)
     .attr('fill', 'black')
     .attr('text-anchor', 'end')
     .style('alignment-baseline', 'middle')
-    .text((d) => d  ?? 'Unavailable');
+    .style('font-size', '17px')
+    .text((d) => d ?? 'Unavailable');
 
   // add title
   group
@@ -446,8 +462,8 @@ function categoricalLegend({
     .attr('fill', 'black')
     .attr('text-anchor', 'end')
     .attr('font-weight', 'bold')
-    .attr('class', 'title')    
-    .text(title);    
+    .attr('class', 'h5 title')
+    .text(title);
 
   return group;
 }
