@@ -1,19 +1,36 @@
 import { readdir, unlinkSync, writeFileSync, createReadStream } from 'fs';
 import path from 'path';
 import { stringify } from 'csv-stringify';
-// const tar = require('tar');
 import { groupBy } from 'lodash-es';
 import { getSignatureData } from './query.js';
 import { execa } from 'execa';
 import validator from 'validator';
 import mapValues from 'lodash/mapValues.js';
 import { randomUUID } from 'crypto';
+import Papa from 'papaparse';
+import knex from 'knex';
 import { readJson, writeJson, mkdirs } from './utils.js';
 import { sendNotification } from './notifications.js';
 import { formatObject } from './logger.js';
 import axios from 'axios';
 import FormData from 'form-data';
 import { uploadDirectory } from './s3.js';
+import { importUserSession } from './importSignatures.js';
+
+function parseCSV(filepath) {
+  const file = createReadStream(filepath);
+  return new Promise((resolve, reject) => {
+    Papa.parse(file, {
+      header: true,
+      complete(results, file) {
+        resolve(results.data);
+      },
+      error(err, file) {
+        reject(err);
+      },
+    });
+  });
+}
 
 async function uploadWorkingDirectory(inputFolder, outputFolder, id, env) {
   // upload input folder
@@ -120,8 +137,29 @@ export async function extraction(
     );
     logger.debug(all);
 
-    let denovoId, decomposedId;
+    // import signatures data to database
+    const decomposedSignatures = await parseCSV(paths.decomposedSignatureFile);
+    const transformSignatures = decomposedSignatures
+      .map((e) => {
+        const { MutationType, ...signatures } = e;
+        return Object.entries(signatures).map(([signature, mutations]) => ({
+          signature,
+          MutationType,
+          mutations,
+        }));
+      })
+      .flat();
+    const localDb = knex({
+      client: 'better-sqlite3',
+      connection: {
+        filename: path.join(outputFolder, `local.sqlite3`),
+      },
+      useNullAsDefault: true,
+    });
+    await importUserSession(localDb, { signature: transformSignatures });
+
     // run exploration calculation on denovo and decomposed solutions
+    let denovoId, decomposedId;
     try {
       logger.info(`[${id}] Run Denovo Exploration`);
       const denovoFormData = new FormData();
