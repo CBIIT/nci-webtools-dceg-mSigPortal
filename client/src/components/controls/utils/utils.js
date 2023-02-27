@@ -1,5 +1,4 @@
 import jStat from 'jstat';
-import { mean, std, erf } from 'mathjs';
 
 export const customStyles = {
   control: (base, state) => ({
