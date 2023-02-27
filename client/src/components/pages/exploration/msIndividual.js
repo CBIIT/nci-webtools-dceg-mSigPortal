@@ -7,7 +7,6 @@ import { actions as exposureActions } from '../../../services/store/exposure';
 import { actions as modalActions } from '../../../services/store/modal';
 import SvgContainer from '../../controls/svgContainer/svgContainer';
 import CustomSelect from '../../controls/select/select-old';
-import Debug from '../../controls/debug/debug';
 import { NavHashLink } from 'react-router-hash-link';
 
 const actions = { ...exposureActions, ...modalActions };
@@ -15,13 +14,13 @@ const { Group } = Form;
 
 export default function MSIndividual({ calculateIndividual }) {
   const dispatch = useDispatch();
-  const exposure = useSelector((state) => state.exposure);
-  const { sample, plotPath, debugR, err, loading } = exposure.msIndividual;
+  const exploration = useSelector((state) => state.exploration);
+  const { sample, plotPath, debugR, err, loading } = exploration.msIndividual;
   const { id, publicSampleOptions, userSampleOptions, source } =
-    exposure.main;
+    exploration.main;
 
   const mergeMsIndividual = (state) =>
-    dispatch(actions.mergeExposure({ msIndividual: state }));
+    dispatch(actions.mergeExploration({ msIndividual: state }));
 
   return (
     <div>

@@ -8,7 +8,7 @@ import {
   Popover,
 } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as exposureActions } from '../../../../services/store/exposure';
+import { actions as exposureActions } from '../../../../services/store/exploration';
 import { useMsIndividualQuery } from './apiSlice';
 import Select from '../../../controls/select/selectForm';
 import Plotly from '../../../controls/plotly/plot/plot';

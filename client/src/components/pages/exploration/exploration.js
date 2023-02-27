@@ -13,9 +13,9 @@ import MsAssociation from './msAssociation/msAssociation.js';
 import MsDecomposition from './msDecomposition/msDecomposition.js';
 import MsLandscape from './msLandscape/msLandscape.js';
 import MsPrevalence from './msPrevalence/msPrevalence.js';
-import MsIndividual from './msIndividual//msIndividual.js';
+import MsIndividual from './msIndividual/msIndividual.js';
 import Download from './download';
-import { actions as exposureActions } from '../../../services/store/exposure';
+import { actions as exposureActions } from '../../../services/store/exploration';
 import { actions as modalActions } from '../../../services/store/modal';
 import {
   SidebarContainer,
@@ -30,11 +30,11 @@ export default function Exposure() {
   const dispatch = useDispatch();
 
   const mergeState = (state) =>
-    dispatch(actions.mergeExposure({ main: state }));
+    dispatch(actions.mergeExploration({ main: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const { publicForm, main } = useSelector((state) => state.exposure);
+  const { publicForm, main } = useSelector((state) => state.exploration);
 
   const { exampleName } = useParams();
 
@@ -61,7 +61,7 @@ export default function Exposure() {
         await fetch(`web/getExposureExample/${id}`)
       ).json();
 
-      dispatch(actions.mergeExposure(state));
+      dispatch(actions.mergeExploration(state));
     } catch (error) {
       mergeError('Example does not exist');
     }

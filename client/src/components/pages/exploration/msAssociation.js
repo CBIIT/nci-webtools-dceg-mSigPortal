@@ -3,17 +3,17 @@ import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import Description from '../../controls/description/description';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import { actions as exposureActions } from '../../../services/store/exposure';
+import { actions as explorationActions } from '../../../services/store/exploration';
 import { actions as modalActions } from '../../../services/store/modal';
 import SvgContainer from '../../controls/svgContainer/svgContainer';
 import CustomSelect from '../../controls/select/select-old';
 
-const actions = { ...exposureActions, ...modalActions };
+const actions = { ...explorationActions, ...modalActions };
 const { Group, Check } = Form;
 
 export default function MsAssociation({ calculateAssociation }) {
   const dispatch = useDispatch();
-  const exposure = useSelector((state) => state.exposure);
+  const exploration = useSelector((state) => state.exploration);
   const {
     both,
     signatureName1,
@@ -22,12 +22,12 @@ export default function MsAssociation({ calculateAssociation }) {
     debugR,
     err,
     loading,
-  } = exposure.msAssociation;
+  } = exploration.msAssociation;
   const { id, signatureNameOptions, userNameOptions, source } =
-    exposure.main;
+    exploration.main;
 
   const mergeMsAssociation = (state) =>
-    dispatch(actions.mergeExposure({ msAssociation: state }));
+    dispatch(actions.mergeExploration({ msAssociation: state }));
 
   return (
     <div>
@@ -93,7 +93,7 @@ export default function MsAssociation({ calculateAssociation }) {
           </Col>
         </Row>
       </Form>
-      <div id="exposureAssociationPlot">
+      <div id="explorationAssociationPlot">
         {err && (
           <div>
             <hr />

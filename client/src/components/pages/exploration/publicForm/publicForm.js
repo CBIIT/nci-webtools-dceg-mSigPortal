@@ -3,7 +3,7 @@ import { Controller, useForm } from 'react-hook-form';
 import Select from '../../../controls/select/selectForm';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as exposureActions } from '../../../../services/store/exposure';
+import { actions as exposureActions } from '../../../../services/store/exploration';
 import { actions as modalActions } from '../../../../services/store/modal';
 import {
   resetExplorationApi,
@@ -13,14 +13,14 @@ import {
 const actions = { ...exposureActions, ...modalActions };
 
 export default function PublicForm() {
-  const store = useSelector((state) => state.exposure);
+  const store = useSelector((state) => state.exploration);
   const { submitted } = store.main;
 
   const dispatch = useDispatch();
   const mergeForm = (state) =>
-    dispatch(actions.mergeExposure({ publicForm: state }));
-  const resetExposure = (_) => dispatch(actions.resetExposure());
-  const mergeMain = (state) => dispatch(actions.mergeExposure({ main: state }));
+    dispatch(actions.mergeExploration({ publicForm: state }));
+  const resetExploration = (_) => dispatch(actions.resetExploration());
+  const mergeMain = (state) => dispatch(actions.mergeExploration({ main: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -55,7 +55,7 @@ export default function PublicForm() {
     window.location.hash = '#/exploration';
     resetForm();
     dispatch(resetExplorationApi);
-    resetExposure();
+    resetExploration();
   }
 
   async function onSubmit(data) {

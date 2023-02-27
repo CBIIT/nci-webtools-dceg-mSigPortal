@@ -17,7 +17,7 @@ import { useRef } from 'react';
 
 import MsLandscape from '../../../controls/plotly/msLandscape/msLandscape';
 import { readFile, parseMatrix } from '../../../controls/utils/utils';
-import { actions } from '../../../../services/store/exposure';
+import { actions } from '../../../../services/store/exploration';
 
 const { Label, Group } = Form;
 export default function MsLandscapePlot({ state }) {
@@ -30,12 +30,12 @@ export default function MsLandscapePlot({ state }) {
   const fileRef = useRef(null);
 
   const dispatch = useDispatch();
-  const mergeExposureState = (state) =>
-    dispatch(actions.mergeExposure({ ...state }));
-  let variableData = useSelector((state) => state.exposure.variableData) || [];
+  const mergeExplorationState = (state) =>
+    dispatch(actions.mergeExploration({ ...state }));
+  let variableData = useSelector((state) => state.exploration.variableData) || [];
 
   const variableFileName =
-    useSelector((state) => state.exposure.variableFileName) || [];
+    useSelector((state) => state.exploration.variableFileName) || [];
 
   function handleChange(e) {
     setFile(e.target.files[0].name);
@@ -45,7 +45,7 @@ export default function MsLandscapePlot({ state }) {
     if (!fileRef) return;
 
     if (!fileRef.current?.files?.length) {
-      mergeExposureState({
+      mergeExplorationState({
         variableFileName: '',
         variableData: null,
       });
@@ -54,7 +54,7 @@ export default function MsLandscapePlot({ state }) {
       const files = fileRef.current.files;
       const fileData = await readFile(files[0]);
       const variableData = parseMatrix(fileData);
-      mergeExposureState({
+      mergeExplorationState({
         variableFileName: variableFileName,
         variableData: variableData,
       });
@@ -66,7 +66,7 @@ export default function MsLandscapePlot({ state }) {
     fileRef.current.files.value = '';
     setFile();
     fileRef.current.value = null;
-    //mergeExposureState({ variableData: fileRef.current.value });
+    //mergeExplorationState({ variableData: fileRef.current.value });
   }
 
   const [calculationQuery, setCalculationQuery] = useState('');
