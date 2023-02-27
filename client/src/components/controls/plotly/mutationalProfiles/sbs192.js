@@ -156,7 +156,7 @@ export default function SBS192(apiData) {
       linecolor: '#E0E0E0',
       linewidth: 1,
       mirror: 'all',
-      tickformat: apiData[0].contribution ? '.1%' : '~s',
+      tickformat: Number.isInteger(traces[0].y[0]) ? '~s' : '.1%',
     },
 
     shapes: [...mutationShapes, ...backgroundShapes],

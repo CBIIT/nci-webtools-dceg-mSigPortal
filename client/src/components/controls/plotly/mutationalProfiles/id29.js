@@ -113,7 +113,7 @@ export default function ID29(apiData) {
       linecolor: '#D3D3D3',
       linewidth: 1,
       mirror: 'all',
-      tickformat: apiData[0].contribution ? '.1%' : '~s',
+      tickformat: Number.isInteger(traces[0].y[0]) ? '~s' : '.1%',
       showgrid: true,
       gridcolor: '#F5F5F5',
     },
