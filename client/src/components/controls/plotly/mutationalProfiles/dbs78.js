@@ -1,3 +1,4 @@
+import { dbs78Color } from '../../utils/colors';
 import {
   createSampleAnnotation,
   getMaxMutations,
@@ -7,18 +8,7 @@ import {
 } from './utils';
 
 export default function DBS78(apiData) {
-  const colors = {
-    AC: '#09BCED',
-    AT: '#0266CA',
-    CC: '#9FCE62',
-    CG: '#006501',
-    CT: '#FF9898',
-    GC: '#E22925',
-    TA: '#FEB065',
-    TC: '#FD8000',
-    TG: '#CB98FD',
-    TT: '#4C0299',
-  };
+  const colors = dbs78Color;
   const mutationRegex = /^(.{2})/;
 
   const mutationGroupSort = (a, b) => {
