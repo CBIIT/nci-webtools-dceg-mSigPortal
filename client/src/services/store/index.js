@@ -1,6 +1,6 @@
 import { reducer as catalogReducer } from './catalog';
 import { reducer as visualizationReducer } from './visualization';
-import { reducer as exposureReducer } from './exposure';
+import { reducer as explorationReducer } from './exploration';
 import { reducer as associationReducer } from './association';
 import { reducer as extractionReducer } from './extraction';
 import { reducer as publicationsReducer } from './publications';
@@ -22,7 +22,7 @@ export const store = configureStore({
   reducer: {
     catalog: catalogReducer,
     visualization: visualizationReducer,
-    exposure: exposureReducer,
+    exploration: explorationReducer,
     association: associationReducer,
     extraction: extractionReducer,
     publications: publicationsReducer,

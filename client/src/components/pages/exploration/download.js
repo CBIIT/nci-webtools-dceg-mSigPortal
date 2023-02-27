@@ -10,7 +10,7 @@ export default function Download({ exposureDownload }) {
   const [downloadingWorkspace, setWorkspace] = useState(false);
 
   const dispatch = useDispatch();
-  const exposure = useSelector((state) => state.exposure);
+  const exploration = useSelector((state) => state.exploration);
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
@@ -31,16 +31,16 @@ export default function Download({ exposureDownload }) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id: exposure.main.id,
+        id: exploration.main.id,
         state: {
-          ...exposure,
-          main: { ...exposure.main, displayTab: 'tmb' },
+          ...exploration,
+          main: { ...exploration.main, displayTab: 'tmb' },
         },
       }),
     });
 
     if (response.ok) {
-      saveAs(await response.blob(), 'exposure-workspace.zip');
+      saveAs(await response.blob(), 'exploration-workspace.zip');
     } else {
       mergeError(`error`);
     }

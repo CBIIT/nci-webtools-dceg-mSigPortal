@@ -48,10 +48,10 @@ export const getInitialState = () => ({
 });
 
 export const { actions, reducer } = createSlice({
-  name: 'exposure',
+  name: 'exploration',
   initialState: getInitialState(),
   reducers: {
-    mergeExposure: mergeObject,
-    resetExposure: getInitialState,
+    mergeExploration: mergeObject,
+    resetExploration: getInitialState,
   },
 });

@@ -6,7 +6,7 @@ import Home from './pages/home/home';
 import About from './pages/about/about';
 import Visualization from './pages/visualization/visualization';
 import Catalog from './pages/catalog/catalog';
-import Exposure from './pages/exposure/exposure';
+import Exploration from './pages/exploration/exploration';
 import Refitting from './pages/refitting/refitting';
 import Association from './pages/association/association';
 import Extraction from './pages/extraction/extraction';
@@ -254,7 +254,7 @@ export default function App() {
               children={<Visualization />}
             />
             <Route path="/catalog" children={<Catalog />} />
-            <Route path="/exploration/:exampleName?" children={<Exposure />} />
+            <Route path="/exploration/:exampleName?" children={<Exploration />} />
             <Route path="/refitting" children={<Refitting />} />
             <Route path="/association" children={<Association />} />
             <Route path="/extraction/:id?" children={<Extraction />} />

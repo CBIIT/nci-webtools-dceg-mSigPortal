@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolderMinus } from '@fortawesome/free-solid-svg-icons';
 import Select from '../../../controls/select/selectForm';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as exposureActions } from '../../../../services/store/exposure';
+import { actions as exposureActions } from '../../../../services/store/exploration';
 import { actions as modalActions } from '../../../../services/store/modal';
 import {
   resetExplorationApi,
@@ -21,15 +21,15 @@ const { Group, Check, Label } = Form;
 export default function PublicForm() {
   const dispatch = useDispatch();
   const mergeForm = async (state) =>
-    await dispatch(actions.mergeExposure({ userForm: state }));
+    await dispatch(actions.mergeExploration({ userForm: state }));
   const mergeMain = async (state) =>
-    await dispatch(actions.mergeExposure({ main: state }));
-  const resetExposure = (_) => dispatch(actions.resetExposure());
+    await dispatch(actions.mergeExploration({ main: state }));
+  const resetExploration = (_) => dispatch(actions.resetExploration());
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const { submitted, loading, id, usePublicSignature } = useSelector(
-    (state) => state.exposure.main
+    (state) => state.exploration.main
   );
 
   const {
@@ -132,7 +132,7 @@ export default function PublicForm() {
   function handleReset() {
     window.location.hash = '#/exploration';
     resetForm();
-    resetExposure();
+    resetExploration();
     dispatch(resetExplorationApi);
     mergeMain({ source: 'user' });
   }
