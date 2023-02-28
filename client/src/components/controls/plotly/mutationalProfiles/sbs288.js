@@ -383,7 +383,10 @@ export default function SBS288(data, sample) {
     },
     yaxis: {
       title: {
-        text: '<b>Number of Single Base Substitutions</b>',
+        text:
+          totalMutations > 1.1
+            ? '<b>Number of Single Base Substitutions</b>'
+            : '<b>Percentage of Single Base Substitutions</b>',
         font: {
           family: 'Times New Roman',
         },
@@ -393,7 +396,7 @@ export default function SBS288(data, sample) {
       tickcolor: '#D3D3D3',
       linecolor: '#D3D3D3',
       linewidth: 1,
-      tickformat: maxValTotal >= 1000 ? '~s' : '',
+      tickformat: maxValTotal >= 1000 || totalMutations > 1.1 ? '~s' : '.1%',
       ticks: 'inside',
       showgrid: true,
       gridcolor: '#F5F5F5',

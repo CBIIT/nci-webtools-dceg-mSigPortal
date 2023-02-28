@@ -84,9 +84,10 @@ export default function SBS96(apiData) {
     },
     yaxis: {
       title: {
-        text: apiData[0].mutations
-          ? '<b>Number of Single Base Substitutions</b>'
-          : '<b>Percentage of Single Base Substitutions</b>',
+        text:
+          apiData[0].mutations && totalMutations > 1.1
+            ? '<b>Number of Single Base Substitutions</b>'
+            : '<b>Percentage of Single Base Substitutions</b>',
         font: {
           family: 'Times New Roman',
         },
