@@ -12,7 +12,7 @@ import {
 import ExtractionForm from './extraction-form';
 import Instructions from './instructions';
 import Status from './status';
-// import SignatureMap from './signatureMap';
+import SignatureMap from './signatureMap';
 import TMB from '../exploration/tmb/tmb';
 import TmbSignature from '../exploration/tmbSignature/tmbSignature';
 import MsBurden from '../exploration/msBurden/msBurden';
