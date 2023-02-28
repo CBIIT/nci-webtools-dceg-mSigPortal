@@ -141,16 +141,19 @@ export async function extraction(
 
     // import signatures data to database
     const decomposedSignatures = await parseCSV(paths.decomposedSignatureFile);
-    const transformSignatures = decomposedSignatures
-      .map((e) => {
-        const { MutationType, ...signatures } = e;
-        return Object.entries(signatures).map(([signatureName, mutations]) => ({
-          signatureName,
-          MutationType,
-          mutations,
-        }));
-      })
-      .flat();
+    const denovoSignatures = await parseCSV(paths.denovoSignatureInput);
+    function signatureMapping(e) {
+      const { MutationType, ...signatures } = e;
+      return Object.entries(signatures).map(([signatureName, mutations]) => ({
+        signatureName,
+        MutationType,
+        mutations,
+      }));
+    }
+    const transformSignatures = [
+      ...decomposedSignatures.map(signatureMapping).flat(),
+      ...denovoSignatures.map(signatureMapping).flat(),
+    ];
     const localDb = knex({
       client: 'better-sqlite3',
       connection: {
@@ -268,7 +271,11 @@ export async function extraction(
     //   env.DATA_BUCKET,
     //   { region: env.AWS_DEFAULT_REGION }
     // );
-
+    logger.debug(
+      `Execution Time: ${
+        (new Date().getTime() - submittedTime.getTime()) / 1000
+      }`
+    );
     // send success notification if email was provided
     if (params.email) {
       logger.info(`[${id}] Sending success notification`);
@@ -330,7 +337,11 @@ export async function extraction(
       id,
       env
     );
-
+    logger.debug(
+      `Execution Time: ${
+        (new Date().getTime() - submittedTime.getTime()) / 1000
+      }`
+    );
     if (params.email) {
       await sendNotification(
         params.email,
