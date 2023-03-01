@@ -96,7 +96,6 @@ export default function ProfilerSummary() {
       <LoadingOverlay active={isFetching} />
       {data && (
         <Plotly
-          className="w-100"
           data={data.traces}
           layout={data.layout}
           config={data.config}
