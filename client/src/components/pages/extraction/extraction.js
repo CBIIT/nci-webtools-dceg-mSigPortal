@@ -36,9 +36,7 @@ export default function Extraction() {
 
   const { data: refreshStatus, refetch: refreshExtraction } = useRefreshQuery(
     id,
-    {
-      skip: !id,
-    }
+    { skip: !id }
   );
 
   const status = refreshStatus?.status;
@@ -77,7 +75,7 @@ export default function Extraction() {
 
   useEffect(() => {
     if (status && status.status === 'COMPLETED' && displayTab == 'instructions')
-      mergeState({ displayTab: 'tmb', openSidebar: false });
+      mergeState({ displayTab: 'signatureMap', openSidebar: false });
   }, [status]);
 
   const tabs = [
