@@ -1,6 +1,7 @@
 import { dbs78Color } from '../../utils/colors';
 import {
   createSampleAnnotation,
+  getTotalMutations,
   getMaxMutations,
   groupDataByMutation,
   createMutationShapes,
@@ -18,7 +19,7 @@ export default function DBS78(apiData) {
 
   const data = groupDataByMutation(apiData, mutationRegex, mutationGroupSort);
   const maxMutation = getMaxMutations(apiData);
-
+  const totalMutations = getTotalMutations(apiData);
   const mutationTypeNames = data
     .map((group) => group.data.map((e) => e.mutationType.slice(-2)))
     .flat();
@@ -38,6 +39,7 @@ export default function DBS78(apiData) {
     hoverinfo: 'x+y',
     showlegend: false,
   }));
+  console.log(traces);
 
   const sampleAnnotation = createSampleAnnotation(apiData);
   const mutationAnnotation = createMutationAnnotations(data, '>NN');
@@ -64,9 +66,10 @@ export default function DBS78(apiData) {
     },
     yaxis: {
       title: {
-        text: apiData[0].mutations
-          ? '<b>Number of Double Base Substitutions</b>'
-          : '<b>Percentage of Double Base Substitutions</b>',
+        text:
+          parseFloat(totalMutations).toFixed(2) > 1
+            ? '<b>Number of Double Base Substitutions</b>'
+            : '<b>Percentage of Double Base Substitutions</b>',
         font: {
           family: 'Times New Roman',
         },
@@ -75,7 +78,7 @@ export default function DBS78(apiData) {
       range: [0, maxMutation * 1.2],
       linecolor: 'black',
       linewidth: 1,
-      tickformat: Number.isInteger(traces[0].y[0]) ? '~s' : '.1%',
+      tickformat: parseFloat(totalMutations).toFixed(2) > 1 ? '~s' : '.1%',
       ticks: 'inside',
       tickcolor: '#D3D3D3',
       showgrid: true,

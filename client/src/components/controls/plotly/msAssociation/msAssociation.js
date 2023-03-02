@@ -8,11 +8,12 @@ import { groupBy } from 'lodash';
 import pcorrtest from '@stdlib/stats-pcorrtest';
 
 export default function MsAssociation(data, arg) {
-  // console.log(data);
-  // console.log(arg);
+  console.log(data);
+  console.log(arg);
   const [signatureName1, signatureName2] = arg.signatureName.split(';');
   const checked = arg.both;
-
+  console.log(signatureName1);
+  console.log(signatureName2);
   let groupBySample;
   let xValues = [];
   let yValues = [];
@@ -30,7 +31,11 @@ export default function MsAssociation(data, arg) {
   } else {
     groupBySample = groupBy(data, 'sample');
   }
+  console.log('groupBySample');
+  console.log(groupBySample);
   const dataArraySample = Object.values(groupBySample);
+  console.log('dataArraySample');
+  console.log(dataArraySample);
 
   for (var i = 0; i < dataArraySample.length; i++) {
     for (var j = 0; j < dataArraySample[i].length; j++) {
@@ -217,5 +222,6 @@ export default function MsAssociation(data, arg) {
       t: 150,
     },
   };
+  console.log(layout);
   return { traces: traces, layout: layout };
 }

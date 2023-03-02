@@ -4,13 +4,13 @@ import {
   groupDataByMutation,
   createMutationShapes,
   createMutationAnnotations,
+  getTotalMutations,
 } from './utils';
 import { sbsColor } from '../../utils/colors';
 
 export default function SBS96(apiData) {
   const colors = sbsColor;
   const mutationRegex = /\[(.*)\]/;
-
 
   const mutationGroupSort = (a, b) => {
     const order = Object.keys(colors);
@@ -19,7 +19,7 @@ export default function SBS96(apiData) {
 
   const data = groupDataByMutation(apiData, mutationRegex, mutationGroupSort);
   const maxMutation = getMaxMutations(apiData);
-
+  const totalMutations = getTotalMutations(apiData);
   const mutationTypeNames = data
     .map((group) =>
       group.data.map((e) => ({
@@ -80,9 +80,10 @@ export default function SBS96(apiData) {
     },
     yaxis: {
       title: {
-        text: Number.isInteger(traces[0].y[0])
-          ? '<b>Number of Single Base Substitutions</b>'
-          : '<b>Percentage of Single Base Substitutions</b>',
+        text:
+          parseFloat(totalMutations).toFixed(2) > 1
+            ? '<b>Number of Single Base Substitutions</b>'
+            : '<b>Percentage of Single Base Substitutions</b>',
         font: {
           family: 'Times New Roman',
         },
@@ -94,7 +95,7 @@ export default function SBS96(apiData) {
       linecolor: '#D3D3D3',
       linewidth: 1,
       mirror: 'all',
-      tickformat: Number.isInteger(traces[0].y[0]) ? '~s' : '.1%',
+      tickformat: parseFloat(totalMutations).toFixed(2) > 1 ? '~s' : '.1%',
       showgrid: true,
       gridcolor: '#F5F5F5',
     },

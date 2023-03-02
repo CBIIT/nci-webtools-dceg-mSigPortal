@@ -76,7 +76,7 @@ export default function ID83(apiData) {
       '%{y} indels<extra></extra>',
     showlegend: false,
   }));
-
+  console.log(traces);
   const shapeAnnotations = data.map((group, groupIndex, array) => ({
     xref: 'x',
     yref: 'paper',
@@ -145,7 +145,7 @@ export default function ID83(apiData) {
     },
     align: 'center',
   }));
-
+  console.log(apiData);
   const sampleAnnotation = {
     xref: 'paper',
     yref: 'paper',
@@ -153,9 +153,14 @@ export default function ID83(apiData) {
     yanchor: 'bottom',
     x: 0.01,
     y: 0.88,
-    text: apiData[0].sample
-      ? `<b>${apiData[0].sample}: ${totalMutations.toLocaleString()} Indels</b>`
-      : `<b>${apiData[0].signatureName}</b>`,
+    text:
+      apiData[0].sample && parseFloat(totalMutations).toFixed(2) > 1
+        ? `<b>${
+            apiData[0].sample
+          }: ${totalMutations.toLocaleString()} Indels</b>`
+        : apiData[0].sample && parseFloat(totalMutations).toFixed(2) < 1
+        ? `<b>${apiData[0].sample}`
+        : `<b>${apiData[0].signatureName}</b>`,
     showarrow: false,
     font: {
       size: 24,
@@ -218,7 +223,10 @@ export default function ID83(apiData) {
     },
     yaxis: {
       title: {
-        text: '<b>Number of Indels</b>',
+        text:
+          parseFloat(totalMutations).toFixed(2) > 1
+            ? '<b>Number of Indels</b>'
+            : '<b>Percent of Indels</b>',
         font: {
           family: 'Times New Roman',
           size: 18,
@@ -229,6 +237,7 @@ export default function ID83(apiData) {
       linecolor: 'black',
       linewidth: 1,
       mirror: true,
+      tickformat: parseFloat(totalMutations).toFixed(2) > 1 ? '~s' : '.1%',
     },
 
     shapes: [...topShapes, ...bottomShapes],
