@@ -168,7 +168,7 @@ export default function ID83(rawData, sample) {
     text: '<b>' + arrayIDAnnXBot[index] + '</b>',
     showarrow: false,
     font: {
-      size: 16,
+      size: 15,
       family: 'Times New Roman',
     },
     align: 'center',

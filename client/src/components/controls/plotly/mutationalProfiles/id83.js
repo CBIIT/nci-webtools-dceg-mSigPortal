@@ -76,7 +76,6 @@ export default function ID83(apiData) {
       '%{y} indels<extra></extra>',
     showlegend: false,
   }));
-  console.log(traces);
   const shapeAnnotations = data.map((group, groupIndex, array) => ({
     xref: 'x',
     yref: 'paper',
@@ -140,12 +139,11 @@ export default function ID83(apiData) {
     text: '<b>' + arrayIDAnnXBot[index] + '</b>',
     showarrow: false,
     font: {
-      size: 16,
+      size: 15,
       family: 'Times New Roman',
     },
     align: 'center',
   }));
-  console.log(apiData);
   const sampleAnnotation = {
     xref: 'paper',
     yref: 'paper',

@@ -292,7 +292,6 @@ export default function ID415(data, sample) {
     showlegend: true,
   };
 
-
   const tracesU = {
     name: 'Untranscribed Strand',
     type: 'bar',
@@ -424,7 +423,7 @@ export default function ID415(data, sample) {
     text: '<b>' + arrayIDAnnXBot[index] + '</b>',
     showarrow: false,
     font: {
-      size: 16,
+      size: 15,
       family: 'Times New Roman',
     },
     align: 'center',

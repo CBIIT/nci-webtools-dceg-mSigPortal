@@ -39,7 +39,6 @@ export default function DBS78(apiData) {
     hoverinfo: 'x+y',
     showlegend: false,
   }));
-  console.log(traces);
 
   const sampleAnnotation = createSampleAnnotation(apiData);
   const mutationAnnotation = createMutationAnnotations(data, '>NN');
