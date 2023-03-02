@@ -95,6 +95,7 @@ export default function Univariable() {
     });
     return ref.current;
   }
+  console.log(associationVar);
 
   async function handleLoadData() {
     if (associationVar.filter && isNaN(associationVar.filter)) {
@@ -126,7 +127,7 @@ export default function Univariable() {
             }),
           })
         ).json();
-
+        console.log(collapseData);
         const { collapseVar1, collapseVar2, error, uncaughtError } =
           collapseData;
 
@@ -194,11 +195,7 @@ export default function Univariable() {
         dataPath: '',
       });
       try {
-        const {
-          id,
-          stdout,
-          output,
-        } = await (
+        const { id, stdout, output } = await (
           await fetch(`web/associationWrapper`, {
             method: 'POST',
             headers: {

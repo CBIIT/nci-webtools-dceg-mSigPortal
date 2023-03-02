@@ -12,7 +12,6 @@ export default function SBS96(apiData) {
   const colors = sbsColor;
   const mutationRegex = /\[(.*)\]/;
   const totalMutations = getTotalMutations(apiData);
-  totalMutations < 1.1 ? console.log('true') : console.log('false');
 
   const mutationGroupSort = (a, b) => {
     const order = Object.keys(colors);
