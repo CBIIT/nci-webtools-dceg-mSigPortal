@@ -100,7 +100,7 @@ export default function ExtractionForm() {
       ]
     : [];
 
-  const dataTypeOptions = ['vcf', 'matrix'].map((e) => ({
+  const dataTypeOptions = ['matrix', 'vcf'].map((e) => ({
     label: e,
     value: e,
   }));
@@ -217,7 +217,7 @@ export default function ExtractionForm() {
     jobName: '',
   };
 
-  const sample1 = {
+  const sbsSample = {
     source: 'user',
     study: { label: 'PCAWG', value: 'PCAWG' },
     cancer: { label: 'Lung-AdenoCA', value: 'Lung-AdenoCA' },
@@ -229,6 +229,32 @@ export default function ExtractionForm() {
     signatureSetName: {
       label: 'COSMIC_v3.3_Signatures_GRCh37_SBS96',
       value: 'COSMIC_v3.3_Signatures_GRCh37_SBS96',
+    },
+    signatureName: [{ label: 'all', value: 'all' }],
+    extractTool: {
+      label: 'SigProfilerExtractor',
+      value: 'SigProfilerExtractor',
+    },
+
+    minimum_signatures: 1,
+    maximum_signatures: 2,
+    min_nmf_iterations: 2,
+    max_nmf_iterations: 4,
+    nmf_test_conv: 2,
+    nmf_replicates: 10,
+  };
+  const dbsSample = {
+    source: 'user',
+    study: { label: 'PCAWG', value: 'PCAWG' },
+    cancer: { label: 'Lung-AdenoCA', value: 'Lung-AdenoCA' },
+    strategy: { label: 'WGS', value: 'WGS' },
+    input_type: { label: 'matrix', value: 'matrix' },
+    reference_genome: { label: 'GRCh37', value: 'GRCh37' },
+    exome: false,
+    context_type: { label: 'DBS78', value: 'DBS78' },
+    signatureSetName: {
+      label: 'COSMIC_v3.3_Signatures_GRCh37_DBS78',
+      value: 'COSMIC_v3.3_Signatures_GRCh37_DBS78',
     },
     signatureName: [{ label: 'all', value: 'all' }],
     extractTool: {
@@ -465,7 +491,7 @@ export default function ExtractionForm() {
                   variant="link"
                   disabled={submitted || id}
                   onClick={async () => {
-                    resetForm(sample1);
+                    resetForm(sbsSample);
                     const file = 'extraction_sample_SBS96.all';
                     const path = 'assets/exampleInput/' + file;
                     setValue(
@@ -474,7 +500,22 @@ export default function ExtractionForm() {
                     );
                   }}
                 >
-                  Load Sample
+                  Load SBS Sample
+                </Button>
+                <Button
+                  variant="link"
+                  disabled={submitted || id}
+                  onClick={async () => {
+                    resetForm(dbsSample);
+                    const file = 'extraction_sample_DBS78.all';
+                    const path = 'assets/exampleInput/' + file;
+                    setValue(
+                      'inputFile',
+                      new File([await (await fetch(path)).blob()], file)
+                    );
+                  }}
+                >
+                  Load DBS Sample
                 </Button>
               </div>
             )}

@@ -14,6 +14,8 @@ export default function Plotly({
   divId = 'plot',
   filename = 'plot',
   originalData,
+  style = {},
+  className = '',
   ...rest
 }) {
   const defaultConfig = {
@@ -29,7 +31,21 @@ export default function Plotly({
 
   return (
     <Container fluid style={{ minHeight: layout.height || 500 }}>
-      <Row className="d-flex justify-content-end">
+      <Row>
+        <Col>
+          <Plot
+            className={`w-100 ${className}`}
+            style={{ minHeight: layout.height || 500, ...style }}
+            divId={divId}
+            data={cloneDeep(data)}
+            layout={cloneDeep(layout)}
+            config={cloneDeep({ ...defaultConfig, ...config })}
+            useResizeHandler
+            {...rest}
+          />
+        </Col>
+      </Row>
+      <Row className="p-3 d-flex justify-content-end">
         {/* <Col sm="auto">
           <Button
             variant="link"
@@ -84,19 +100,6 @@ export default function Plotly({
           >
             Download Plotly Data &gt;
           </Button>
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <Plot
-            className="w-100"
-            divId={divId}
-            data={cloneDeep(data)}
-            layout={cloneDeep(layout)}
-            config={cloneDeep({ ...defaultConfig, ...config })}
-            useResizeHandler
-            {...rest}
-          />
         </Col>
       </Row>
     </Container>

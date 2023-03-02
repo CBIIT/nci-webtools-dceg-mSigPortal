@@ -1,4 +1,8 @@
 import { extractionApiSlice } from '../../../services/store/rootApi';
+import { groupBy } from 'lodash';
+import SBS96 from '../../controls/plotly/mutationalProfiles/sbs96';
+import DBS78 from '../../controls/plotly/mutationalProfiles/dbs78';
+import ID83 from '../../controls/plotly/mutationalProfiles/id83';
 
 export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -62,23 +66,128 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
       },
     }),
 
-    signatureMap: builder.query({
-      async queryFn(arg, queryApi, extraOptions, fetchWithBQ) {
-        const { id, context_type, signatureMapFile, decomposedSignatureFile } =
-          arg;
-        const folder = `data/output/${id}/${context_type}/Suggested_Solution/COSMIC_${context_type}_Decomposed_Solution`;
-        try {
-          const [signatureMap, signatures] = await Promise.all([
-            fetchWithBQ(`${folder}/${signatureMapFile}`),
-            fetchWithBQ(`${folder}/Signatures/${decomposedSignatureFile}`),
-          ]);
+    signatureMapTable: builder.query({
+      query: ({ id, context_type, signatureMap }) => ({
+        url: `data/output/${id}/${context_type}/Suggested_Solution/COSMIC_${context_type}_Decomposed_Solution/${signatureMap}`,
+      }),
+      transformResponse: (data) => {
+        const columns = Object.keys(data[0]).map((e) => ({
+          Header: e,
+          accessor: e,
+        }));
 
-          console.log(signatureMap);
+        return { data, columns };
+      },
+    }),
+
+    signatureMapPlots: builder.query({
+      async queryFn(params, queryApi, extraOptions, fetchWithBQ) {
+        try {
+          const profileMatrixMap = { SBS: 96, DBS: 78, ID: 83 };
+          const { userId, decompSigString, denovoSigString } = params;
+
+          // parse signature distribution names and proportion
+          const distributionRegex = new RegExp(
+            /Signature\s(\w+)\s\((\d+.\d+)%\)/g
+          );
+          const distribution = [
+            ...decompSigString.matchAll(distributionRegex),
+          ].reduce((obj, e) => {
+            const [_, key, value] = e;
+            return { ...obj, [key]: parseFloat(value) / 100 };
+          }, {});
+          const decomposedSignatureNames = Object.keys(distribution);
+
+          // parse denovo signature name
+          const profileRegex = /([a-zA-Z]+)/;
+          const profile = decomposedSignatureNames[0].match(profileRegex)[1];
+          const profileMatrix = profile + profileMatrixMap[profile];
+          const denovoSignature = profileMatrix + denovoSigString.slice(-1);
+
+          // query signatures
+          const { data: signatureData } = await fetchWithBQ({
+            url: `mutational_signature`,
+            params: { userId },
+          });
+
+          const allSignatures = groupBy(signatureData, (e) => e.signatureName);
+          const reconstructed = Object.values(
+            groupBy(signatureData, (e) => e.mutationType)
+          ).map((data) =>
+            data
+              .filter((e) => decomposedSignatureNames.includes(e.signatureName))
+              .reduce(
+                (obj, e) => ({
+                  ...obj,
+                  ...e,
+                  mutations:
+                    (obj?.mutations || 0) +
+                    e.mutations * distribution[e.signatureName],
+                  signatureName: `${denovoSignature} (Reconstructed)`,
+                }),
+                {}
+              )
+          );
+
+          const denovo = allSignatures[denovoSignature];
+
+          const decomposed = decomposedSignatureNames.map((e) =>
+            allSignatures[e].reduce(
+              (array, e) => [
+                ...array,
+                {
+                  ...e,
+                  signatureName: `${e.signatureName} (${(
+                    distribution[e.signatureName] * 100
+                  ).toFixed(2)}%)`,
+                },
+              ],
+              []
+            )
+          );
+
+          const plots = [denovo, reconstructed, ...decomposed].map((e) => {
+            switch (profileMatrix) {
+              case 'SBS96':
+                return SBS96(e);
+              case 'DBS78':
+                return DBS78(e);
+              case 'ID83':
+                return ID83(e);
+              default:
+                throw new Error(`${profileMatrix} is not supported`);
+            }
+          });
+
+          // const multi = plots.reduce(
+          //   (obj, e, i) => {
+          //     const count = plots.length - 1;
+          //     const index = i === count ? '' : count - i;
+          //     return {
+          //       traces: [
+          //         ...obj.traces,
+          //         ...e.traces.map((trace) => ({
+          //           ...trace,
+
+          //           xaxis: 'x' + index,
+          //           yaxis: 'y' + index,
+          //         })),
+          //       ],
+          //       layout: {
+          //         // ...obj.layout,
+          //         // ...e.layout,
+          //         grid: { rows: count, col: 1, pattern: 'independent' },
+          //       },
+          //     };
+          //   },
+          //   {
+          //     traces: [],
+          //     layout: {},
+          //   }
+          // );
+
           return {
-            data: {
-              signatureMap: signatureMap.data,
-              signatures: signatures.data,
-            },
+            data: { plots },
           };
         } catch (error) {
           return { error };
@@ -96,5 +205,6 @@ export const {
   useParamsQuery,
   useManifestQuery,
   useMultiJobStatusQuery,
-  useSignatureMapQuery,
+  useSignatureMapTableQuery,
+  useSignatureMapPlotsQuery,
 } = inputFormApiSlice;

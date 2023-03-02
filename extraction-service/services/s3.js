@@ -109,14 +109,14 @@ export function uploadDirectory(directory, key, bucket, config = {}) {
       const response = await Promise.all(
         files.map((file) => {
           const relativePath = file.replace(directory, '');
-          if (statSync(file).isFile()) {
+          // if (statSync(file).isFile()) {
             return uploadObject(
               file,
               path.join(key, relativePath),
               bucket,
               config
             );
-          }
+          // }
         })
       );
       resolve(response);

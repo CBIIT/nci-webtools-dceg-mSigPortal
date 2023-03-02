@@ -75,7 +75,7 @@ export default function DBS78(apiData) {
       range: [0, maxMutation * 1.2],
       linecolor: 'black',
       linewidth: 1,
-      tickformat: apiData[0].contribution ? '.1%' : '~s',
+      tickformat: Number.isInteger(traces[0].y[0]) ? '~s' : '.1%',
       ticks: 'inside',
       tickcolor: '#D3D3D3',
       showgrid: true,

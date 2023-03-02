@@ -7,8 +7,10 @@ import {
 
 async function querySignature(req, res, next) {
   try {
-    const { limit, offset, scalarValue, ...query } = req.query;
-    const connection = req.app.locals.connection;
+    const { limit, offset, scalarValue, userId, ...query } = req.query;
+    const connection = userId
+      ? req.app.locals.sqlite(userId, 'local')
+      : req.app.locals.connection;
     const columns = '*';
     const rowMode = 'object';
     const distinct = true;
@@ -42,8 +44,10 @@ async function querySignature(req, res, next) {
 // query public exploration options for exploration tab
 async function signatureOptions(req, res, next) {
   try {
-    const { limit, offset, ...query } = req.query;
-    const connection = req.app.locals.connection;
+    const { limit, offset, userId, ...query } = req.query;
+    const connection = userId
+      ? req.app.locals.sqlite(userId, 'local')
+      : req.app.locals.connection;
     const columns = '*';
     const data = await getSignatureOptions(
       connection,
