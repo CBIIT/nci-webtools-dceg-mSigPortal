@@ -4,47 +4,21 @@ import MsLandscape from '../../../controls/plotly/msLandscape/msLandscape';
 export const msLandscapeApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     msLandscapePlot: builder.query({
-      query: (params) => ({
+      query: ({ variableData, ...params }) => ({
         url: 'signature_landscape',
-        params: { ...params },
+        params,
       }),
-      // transformResponse: (data) => {
-      //   const { cosineData, exposureData } = data.output;
-      //   console.log(cosineData);
-      //   return { cosineData, exposureData };
-      //   //return MsLandscape(cosineData, exposureData);
-      // },
+      transformResponse: (data, meta, params) => {
+        const { cosineData, exposureData, dendrogram } = data.output;
+        return MsLandscape(
+          cosineData,
+          exposureData,
+          dendrogram,
+          params?.variableData || []
+        );
+      },
     }),
-
-    // msLandscapePlot: builder.query({
-    //   async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
-    //     try {
-    //       const res = await Promise.all([
-    //         fetchWithBQ(
-    //           '/signature_activity?' +
-    //             new URLSearchParams(_arg.params_activity)
-    //         ), //exposure
-    //         fetchWithBQ(
-    //           '/mutational_signature?' +
-    //             new URLSearchParams(_arg.params_signature)
-    //         ), //signature
-    //         fetchWithBQ(
-    //           '/mutational_spectrum?' +
-    //             new URLSearchParams(_arg.params_spectrum)
-    //         ), //seqmatrix
-    //       ]);
-
-    //       console.log(res);
-    //       console.log(_arg);
-    //       //return MsLandscape(res, _arg);
-    //       return { data: MsLandscape(res, _arg) };
-    //     } catch (error) {
-    //       return { error };
-    //     }
-    //   },
-    // }),
   }),
 });
 
-export const { useMsLandscapePlotQuery, useMsLandscapePlot2Query } =
-  msLandscapeApiSlice;
+export const { useMsLandscapePlotQuery } = msLandscapeApiSlice;

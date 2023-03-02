@@ -1,8 +1,15 @@
 import { Container } from 'react-bootstrap';
+import MsLandscapeForm from './msLandscape-form';
 import MsLandscapePlot from './msLandscape-plot';
 import Description from '../../../controls/description/description';
+import { useForm } from 'react-hook-form';
 
 export default function MsLandscape({ state }) {
+  const { control, watch, setValue, resetField } = useForm({
+    defaultValues: { variableFile: '' },
+  });
+  const { variableFile } = watch();
+
   return (
     <Container fluid className="bg-white border rounded p-0">
       <div className="p-3">
@@ -14,7 +21,15 @@ export default function MsLandscape({ state }) {
         />
       </div>
       <hr />
-      <MsLandscapePlot state={state} />
+      <MsLandscapeForm
+        state={state}
+        variableFile={variableFile}
+        formControl={control}
+        setValue={setValue}
+        resetField={resetField}
+      />
+      <hr />
+      <MsLandscapePlot state={state} variableFile={variableFile} />
     </Container>
   );
 }
