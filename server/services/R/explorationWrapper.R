@@ -868,6 +868,10 @@ msLandscape <- function(args, config) {
   clustern <- ifelse(dim(mdata)[1] < 10, 2L, 5)
   cluster <- factoextra::hcut(mdata, k = clustern, hc_func = "hclust", hc_metric = "euclidean", hc_method = "ward.D2", stand = TRUE)
 
+  # create ggplot plotly dendrogram
+  dendrogramPlot <- ggdendro::ggdendrogram(cluster)
+  dendrogram_json <- fromJSON(plotly::plotly_json(dendrogramPlot))
+
   # sort according to hierarchy order
   exposureData <- args$exposureData %>%
     arrange(factor(sample, levels = cluster$labels[cluster$order])) %>%
@@ -875,7 +879,7 @@ msLandscape <- function(args, config) {
   cosineData <- cosineData %>%
     arrange(factor(sample, levels = cluster$labels[cluster$order]))
 
-  return(list(cosineData = cosineData, exposureData = exposureData))
+  return(list(cosineData = cosineData, exposureData = exposureData, dendrogram = dendrogram_json))
 }
 
 msDecomposition <- function(args, config) {
