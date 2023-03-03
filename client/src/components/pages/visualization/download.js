@@ -100,7 +100,9 @@ export default function Download() {
     if (response.ok) {
       saveAs(await response.blob(), 'visualization-workspace.zip');
     } else {
-      mergeError(`error`);
+      mergeError(
+        `error - Please calculate Cosine Similarity tab before attempt to download the workspace`
+      );
     }
     setWorkspace(false);
   }

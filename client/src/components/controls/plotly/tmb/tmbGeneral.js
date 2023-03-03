@@ -1,6 +1,5 @@
 export default function TMB(data, tmbTabName, signatureName) {
   const totalCancer = data.length;
-  console.log(tmbTabName);
 
   const absYValue = data
     .map((o) => o.samples.map((e) => Math.abs(e.burden)))
