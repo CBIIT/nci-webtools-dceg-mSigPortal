@@ -70,7 +70,7 @@ export function MsIndividualComparison(
 
   const plotYrange2 =
     signatureNames.length > 6
-      ? 0.7
+      ? 0.68
       : signatureNames.length === 6
       ? 0.65
       : signatureNames.length === 5
@@ -539,7 +539,6 @@ export function MsIndividualComparison(
       text: 'Difference',
       textangle: 90,
       showarrow: false,
-      height: 15,
       valign: 'top',
     },
   ];
@@ -595,10 +594,10 @@ export function MsIndividualComparison(
           .slice(0, groupIndex)
           .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
         (group.data.length - 1) * 0.5,
-      y: plotYrange2 - 0.017,
+      y: plotYrange2 - 0.0185,
       text: formatMutationLabels(group),
       showarrow: false,
-      font: { color: 'white', size: 16, family: 'Times New Roman' },
+      font: { color: 'white', size: 13, family: 'Times New Roman' },
       align: 'center',
     })
   );
@@ -616,7 +615,7 @@ export function MsIndividualComparison(
     y: 1.002,
     text: formatMutationLabels(group),
     showarrow: false,
-    font: { color: 'white' },
+    font: { color: 'white', size: 13, family: 'Times New Roman' },
     align: 'center',
   }));
 
@@ -769,6 +768,17 @@ export function MsIndividualComparison(
         family: 'Arial',
       },
       domain: [divide2 * 6 - 0.01, divide2 * 6 + divide2 - 0.02],
+    },
+    yaxis8: {
+      autorange: true,
+      linecolor: '#D3D3D3',
+      linewidth: 1,
+      ticks: '',
+      mirror: 'all',
+      tickfont: {
+        family: 'Arial',
+      },
+      domain: [divide2 * 8 - 0.01, divide2 * 8 + divide2 - 0.02],
     },
     yaxis10: {
       autorange: false,
