@@ -32,16 +32,11 @@ export default function MsLandscapePlot({ state, variableFile }) {
   }, [state, variableFile]);
 
   return (
-    <div>
+    <div style={{ minHeight: '500px' }}>
       <LoadingOverlay active={isFetching} />
       {error && <p className="p-3 text-danger">{error}</p>}
       {data && (
-        <Plotly
-          className="w-100"
-          data={data.traces}
-          layout={data.layout}
-          config={data.config}
-        />
+        <Plotly data={data.traces} layout={data.layout} config={data.config} />
       )}
     </div>
   );
