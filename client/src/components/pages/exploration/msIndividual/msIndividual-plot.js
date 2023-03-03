@@ -26,24 +26,37 @@ export default function MsIndividualPlot({ state, form }) {
   const { study, strategy, signatureSetName, cancer, useAllCancer, id } = state;
 
   useEffect(() => {
+    let params_activity, params_signature, params_spectrum;
     if (sample && id) {
-      setParams({
+      params_activity = {
         sample: sample.value,
         userId: id,
+      };
+      params_signature = {
+        userId: id,
+      };
+      params_spectrum = {
+        sample: sample.value,
+        userId: id,
+      };
+      setParams({
+        params_activity,
+        params_signature,
+        params_spectrum,
       });
     } else if (sample && study) {
-      const params_activity = {
+      params_activity = {
         sample: sample.value,
         study: study.value,
         strategy: strategy.value,
         signatureSetName: signatureSetName.value,
         ...(!useAllCancer && { cancer: cancer.value }),
       };
-      const params_signature = {
+      params_signature = {
         strategy: strategy.value,
         signatureSetName: signatureSetName.value,
       };
-      const params_spectrum = {
+      params_spectrum = {
         study: study.value,
         strategy: strategy.value,
         sample: sample.value,

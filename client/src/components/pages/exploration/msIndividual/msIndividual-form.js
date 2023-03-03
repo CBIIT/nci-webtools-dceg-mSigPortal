@@ -5,7 +5,6 @@ import Select from '../../../controls/select/selectForm';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { useMsIndividualOptionQuery } from './apiSlice';
 
-const { Group, Check } = Form;
 
 export default function MsIndividualForm({ state, form, mergeForm }) {
   const [signatureOptionParams, setSignatureOptionParams] = useState('');
@@ -17,7 +16,6 @@ export default function MsIndividualForm({ state, form, mergeForm }) {
     }
   );
 
-  const { both } = form;
 
   const { study, strategy, signatureSetName, cancer, useAllCancer, id } = state;
 

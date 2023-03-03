@@ -5,10 +5,11 @@ export default function MsIndividual_RS32(rawData, arg) {
 
     x: 0.5,
     y: 0.5,
-    text:
-      'Signature SetName: <b>' +
-      arg.params_activity.signatureSetName +
-      '</b> is not supported in MS Individual',
+    text: arg.params_activity.signatureSetName
+      ? 'Signature SetName: <b>' +
+        arg.params_activity.signatureSetName +
+        '</b> is not supported in MS Individual'
+      : 'No data found, please try again',
     font: {
       size: 15,
       color: 'red',
@@ -28,6 +29,5 @@ export default function MsIndividual_RS32(rawData, arg) {
     yaxis: { showticklabels: false, zeroline: false },
     annotations: [annotation],
   };
-  console.log(layout);
   return { traces, layout };
 }

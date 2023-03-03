@@ -32,42 +32,36 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
     }),
     msIndividual: builder.query({
       async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
-        try {
-          const res = await Promise.all([
-            fetchWithBQ(
-              '/signature_activity?' + new URLSearchParams(_arg.params_activity)
-            ), //exposure
-            fetchWithBQ(
-              '/mutational_signature?' +
-                new URLSearchParams(_arg.params_signature)
-            ), //signature
-            fetchWithBQ(
-              '/mutational_spectrum?' +
-                new URLSearchParams(_arg.params_spectrum)
-            ), //seqmatrix
-          ]);
+        const res = await Promise.all([
+          fetchWithBQ(
+            '/signature_activity?' + new URLSearchParams(_arg.params_activity)
+          ), //exposure
+          fetchWithBQ(
+            '/mutational_signature?' +
+              new URLSearchParams(_arg.params_signature)
+          ), //signature
+          fetchWithBQ(
+            '/mutational_spectrum?' + new URLSearchParams(_arg.params_spectrum)
+          ), //seqmatrix
+        ]);
 
-          //return MsLandscape(res, _arg);
-          const profile = extractLastWord(
-            _arg.params_activity.signatureSetName
-          );
+        let profile;
+        if (res[0].data.length > 0 && _arg.params_activity.userId) {
+          profile = res[0].data[0].signatureName;
+        } else if (res[0].data.length > 0 && !_arg.params_activity.userId) {
+          profile = extractLastWord(_arg.params_activity.signatureSetName);
+        } else {
+          profile = 'No data';
+        }
 
-          console.log(profile);
-          if (profile === 'SBS96') {
-            return { data: sbs96(res, _arg, 'msIndividual') };
-          } else if (profile === 'DBS78') {
-            return { data: dbs78(res, _arg, 'msIndividual') };
-          } else if (profile === 'ID83') {
-            return { data: id83(res, _arg, 'msIndividual') };
-          } else if (profile === 'RS32') {
-            console.log('.....rs32');
-            return { data: msIndividual_rs32(res, _arg, 'msIndividual') };
-          } else
-            throw Error(
-              `Signature Set Name: ${_arg.params_activity.signatureSetName} is not supported`
-            );
-        } catch (error) {
-          return { error };
+        if (profile === 'SBS96' || profile.includes('SBS')) {
+          return { data: sbs96(res, _arg, 'msIndividual') };
+        } else if (profile === 'DBS78' || profile.includes('DBS')) {
+          return { data: dbs78(res, _arg, 'msIndividual') };
+        } else if (profile === 'ID83' || profile.includes('ID')) {
+          return { data: id83(res, _arg, 'msIndividual') };
+        } else {
+          return { data: msIndividual_rs32(res, _arg, 'msIndividual') };
         }
       },
     }),

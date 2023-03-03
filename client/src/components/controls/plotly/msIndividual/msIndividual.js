@@ -20,6 +20,7 @@ export function MsIndividualComparison(
   formatTickLabels,
   tickAngle = -90
 ) {
+  console.log('MS Individual');
   console.log(data);
   const exposureData = data[0].data;
   const signatureData = data[1].data;
@@ -38,8 +39,6 @@ export function MsIndividualComparison(
   );
   console.log(signatureNames);
   const extraMargin = longest < 7 ? 200 : longest * 12.5;
-  console.log(longest);
-  console.log(extraMargin);
 
   const searchTerms = ['SBS'];
   const containsTerm = arrayContainsTerms(signatureNames, searchTerms);
@@ -583,7 +582,7 @@ export function MsIndividualComparison(
       x: 0.5,
       y: -0.07,
       text: '<b>Original Profile = ' + ptext.slice(0, -2) + '</b>',
-      font: { size: 15 },
+      font: { size: 13 },
       showarrow: false,
       align: 'center',
     },
