@@ -8,12 +8,9 @@ import { groupBy } from 'lodash';
 import pcorrtest from '@stdlib/stats-pcorrtest';
 
 export default function MsAssociation(data, arg) {
-  // console.log(data);
-  // console.log(arg);
   const [signatureName1, signatureName2] = arg.signatureName.split(';');
   const checked = arg.both;
-  // console.log(signatureName1);
-  // console.log(signatureName2);
+
   let groupBySample;
   let xValues = [];
   let yValues = [];
@@ -31,11 +28,8 @@ export default function MsAssociation(data, arg) {
   } else {
     groupBySample = groupBy(data, 'sample');
   }
-  // console.log('groupBySample');
-  // console.log(groupBySample);
+
   const dataArraySample = Object.values(groupBySample);
-  // console.log('dataArraySample');
-  // console.log(dataArraySample);
 
   for (var i = 0; i < dataArraySample.length; i++) {
     for (var j = 0; j < dataArraySample[i].length; j++) {
@@ -51,9 +45,6 @@ export default function MsAssociation(data, arg) {
   const minX = Math.min(...xValues.map((e) => Math.log10(e['exposure'] + 1)));
 
   const maxX = Math.max(...xValues.map((e) => Math.log10(e['exposure'] + 1)));
-
-  // console.log(minX);
-  // console.log(maxX);
 
   const traceSig1 = {
     //x: signatureName1data.map((e) => Math.log10(e['exposure'] + 1)),
@@ -73,8 +64,6 @@ export default function MsAssociation(data, arg) {
       ' (log10)</b>: %{x}<br><b>Value (log10): </b> %{y}<extra></extra>',
   };
 
-  // console.log(traceSig1);
-
   const traceSig2 = {
     //y: signatureName2data.map((e) => Math.log10(e['exposure'] + 1)),
     y: yValues.map((e) => Math.log10(e['exposure'] + 1)),
@@ -92,8 +81,6 @@ export default function MsAssociation(data, arg) {
       signatureName2 +
       ' (log10)</b> %{y}<br><b>Value (log10): </b> %{x}<extra></extra>',
   };
-
-  // console.log(traceSig2);
 
   const traceMain = {
     x: xValues.map((e) => Math.log10(e['exposure'] + 1)),
@@ -115,8 +102,7 @@ export default function MsAssociation(data, arg) {
   };
 
   const lr = linearRegression(traceMain.x, traceMain.y);
-  // console.log('lr');
-  // console.log(lr);
+
   let pearsonV;
   if (traceMain.x.length > 3) {
     pearsonV = pcorrtest(traceMain.x, traceMain.y);
@@ -141,10 +127,8 @@ export default function MsAssociation(data, arg) {
       '<extra></extra>',
     showlegend: false,
   };
-  // console.log(traceLine);
   const traces = [traceMain, traceLine, traceSig1, traceSig2];
-  // console.log('traces');
-  // console.log(traces);
+
   const detailAnnotation = {
     xref: 'paper',
     yref: 'paper',
@@ -225,6 +209,5 @@ export default function MsAssociation(data, arg) {
       t: 150,
     },
   };
-  // console.log(layout);
   return { traces: traces, layout: layout };
 }

@@ -20,8 +20,6 @@ export function MsIndividualComparison(
   formatTickLabels,
   tickAngle = -90
 ) {
-  console.log('MS Individual');
-  console.log(data);
   const exposureData = data[0].data;
   const signatureData = data[1].data;
   const segmatrixData = data[2].data;
@@ -37,7 +35,6 @@ export function MsIndividualComparison(
     (a, e) => (a > e.length ? a : e.length),
     0
   );
-  console.log(signatureNames);
   const extraMargin = longest < 7 ? 200 : longest * 12.5;
 
   const searchTerms = ['SBS'];
@@ -645,7 +642,6 @@ export function MsIndividualComparison(
 
     align: 'center',
   }));
-  console.log(signaturePercentAnnotation);
   const tickLabels = formatTickLabels(groupSamples[0]);
 
   const layout = {
@@ -845,7 +841,6 @@ export function MsIndividualComparison(
       t: 150,
     },
   };
-  console.log(traces);
-  console.log(layout);
+
   return { traces, layout };
 }
