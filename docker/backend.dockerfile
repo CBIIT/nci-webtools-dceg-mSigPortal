@@ -78,6 +78,7 @@ COPY server/package*.json /deploy/server/
 RUN npm install
 
 # copy the rest of the application
+ARG CACHE_BUST
 COPY server .
 
 CMD npm start
