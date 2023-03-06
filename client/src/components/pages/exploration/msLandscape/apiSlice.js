@@ -10,12 +10,16 @@ export const msLandscapeApiSlice = explorationApiSlice.injectEndpoints({
       }),
       transformResponse: (data, meta, params) => {
         const { cosineData, exposureData, dendrogram } = data.output;
-        return MsLandscape(
-          cosineData,
-          exposureData,
-          params?.variableData || [],
-          dendrogram
-        );
+        if (cosineData && exposureData) {
+          return MsLandscape(
+            cosineData,
+            exposureData,
+            params?.variableData || [],
+            dendrogram
+          );
+        } else {
+          return false;
+        }
       },
     }),
   }),
