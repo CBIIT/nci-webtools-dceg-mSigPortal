@@ -547,7 +547,7 @@ export default function MsLandscape(
       zerolinecolor: 'rgba(0,0,0,0)',
     },
     xaxis3: {
-      ...dendrogram.layout.xaxis,
+      ...(Object.keys(dendrogram).length && dendrogram.layout.xaxis),
       showticklabels: false,
       range: [0.5, samples.length + 0.5],
     },
@@ -581,7 +581,7 @@ export default function MsLandscape(
       zeroline: false,
     },
     yaxis6: {
-      ...dendrogram.layout.yaxis,
+      ...(Object.keys(dendrogram).length && dendrogram.layout.yaxis),
       domain: [0.8, 1],
       zeroline: false,
     },
