@@ -326,8 +326,8 @@ function createForceDirectedTree(
     .attr('y', 20)
     .attr('fill', 'black')
     .attr('text-anchor', 'center')
-    .attr('font-weight', 'bold')
-    .attr('class', 'h2 title')
+    .style('font-weight', 'bold')
+    .attr('class', 'h2')
     .text(plotTitle);
 
   // append legend
