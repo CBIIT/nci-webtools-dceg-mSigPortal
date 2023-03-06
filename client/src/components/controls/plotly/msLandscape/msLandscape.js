@@ -250,14 +250,14 @@ export default function MsLandscape(
   const tracesHeatMapVariableNum1 = [
     {
       z: [variableDataSort.map((e) => e.value1)],
-      x: variableDataSort.map((e) => samples.findIndex((v) => v === e.sample)),
+      x: variableDataSort.map((e, i) => i),
       customdata: [
         variableDataSort.map((e) => ({
           sample: e.sample,
           value: e.value1,
         })),
       ],
-      xaxis: variableDataSort.length < samples.length ? 'x2' : 'x',
+      xaxis: variableDataSort.length === samples.length ? 'x' : 'x2',
       yaxis: 'y4',
       type: 'heatmap',
       colorscale: heatmapColorscale2,
@@ -285,14 +285,14 @@ export default function MsLandscape(
   const tracesHeatMapVariableNum2 = [
     {
       z: [variableDataSort.map((e) => e.value2)],
-      x: variableDataSort.map((e) => samples.findIndex((v) => v === e.sample)),
+      x: variableDataSort.map((e, i) => i),
       customdata: [
         variableDataSort.map((e) => ({
           sample: e.sample,
           value: e.value1,
         })),
       ],
-      xaxis: variableDataSort.length < samples.length ? 'x2' : 'x',
+      xaxis: variableDataSort.length === samples.length ? 'x' : 'x2',
       yaxis: 'y5',
       type: 'heatmap',
       colorscale: heatmapColorscale2,
@@ -318,13 +318,13 @@ export default function MsLandscape(
   ];
 
   const tracesBarMapVariableStr1 = {
-    x: variableDataSort.map((e) => samples.findIndex((v) => v === e.sample)),
+    x: variableDataSort.map((e, i) => i),
     y: variableDataSort.map((e) => 1),
     customdata: variableDataSort.map((e) => ({
       sample: e.sample,
       value: e.value1,
     })),
-    xaxis: variableDataSort.length < samples.length ? 'x2' : 'x',
+    xaxis: variableDataSort.length === samples.length ? 'x' : 'x2',
     yaxis: 'y4',
     type: 'bar',
     marker: {
@@ -336,12 +336,12 @@ export default function MsLandscape(
   };
 
   const tracesBarMapVariableStr2 = {
-    x: variableDataSort.map((e) => samples.findIndex((v) => v === e.sample)),
+    x: variableDataSort.map((e, i) => i),
     y: variableDataSort.map((e) => 1),
     customdata: variableDataSort.map((e) => ({
       name: e.value2,
     })),
-    xaxis: variableDataSort.length < samples.length ? 'x2' : 'x',
+    xaxis: variableDataSort.length === samples.length ? 'x' : 'x2',
     yaxis: 'y4',
     type: 'bar',
     marker: {
