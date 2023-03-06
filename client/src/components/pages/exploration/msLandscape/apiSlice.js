@@ -13,8 +13,8 @@ export const msLandscapeApiSlice = explorationApiSlice.injectEndpoints({
         return MsLandscape(
           cosineData,
           exposureData,
-          dendrogram,
-          params?.variableData || []
+          params?.variableData || [],
+          dendrogram
         );
       },
     }),

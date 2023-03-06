@@ -5,8 +5,8 @@ import { colorPallet, colorPallet0 } from '../../utils/colors';
 export default function MsLandscape(
   cosineData,
   exposureData,
-  dendrogram,
-  variableData
+  variableData,
+  dendrogram = {}
 ) {
   let charColors = {};
   let arrNames = [];
@@ -376,14 +376,16 @@ export default function MsLandscape(
     }));
 
   // modify dendrogram trace
-  const dendrogramTrace = {
-    ...dendrogram.data[1],
-    xaxis: 'x3',
-    yaxis: 'y6',
-    text: dendrogram.data[1].x.map((e) =>
-      samples[e] ? `<b>Sample: </b>${samples[e - 1]}` : null
-    ),
-  };
+  const dendrogramTrace = Object.keys(dendrogram).length
+    ? {
+        ...dendrogram.data[1],
+        xaxis: 'x3',
+        yaxis: 'y6',
+        text: dendrogram.data[1].x.map((e) =>
+          samples[e] ? `<b>Sample: </b>${samples[e - 1]}` : null
+        ),
+      }
+    : {};
 
   let traces = [];
   if (variableDataSort.length > 0) {
