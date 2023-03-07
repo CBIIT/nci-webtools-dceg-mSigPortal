@@ -1,18 +1,18 @@
 version: "3"
 services:
-  # backend:
-  #     build:
-  #         context: '.'
-  #         dockerfile: './docker/backend.dockerfile'
-  #     volumes:
-  #         - './server/config.json:/deploy/server/config.json:ro'
-  #         - './logs:/deploy/logs'
-  #         - './tmp:/deploy/tmp'
-  #         - './data:/deploy/data'
-  #         - '~/.aws:/root/.aws:ro'
-  #         - ./src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb:/deploy/server/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb:ro'
-  #     ports:
-  #         - '8330:8330'
+  backend:
+    build:
+      context: "."
+      dockerfile: "./docker/backend.dockerfile"
+    volumes:
+      - "./server/config.json:/deploy/server/config.json:ro"
+      - "./logs:/deploy/logs"
+      - "./tmp:/deploy/tmp"
+      - "./data:/deploy/data"
+      - "~/.aws:/root/.aws:ro"
+      - ./src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb:/deploy/server/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb:ro'
+    ports:
+      - "8330:8330"
 
   extraction:
     build:
@@ -25,26 +25,26 @@ services:
     ports:
       - "8332:8332"
 
-  # frontend:
-  #     build:
-  #         context: '.'
-  #         dockerfile: './docker/frontend.dockerfile'
-  #         args:
-  #             APP_PATH: /mutational-signatures
-  #     environment:
-  #         API_BASE_URL: http://backend:8330
-  #         API_EXTRACTION_URL: http://extraction:8331
-  #         APP_PATH: /mutational-signatures
-  #     ports:
-  #         - '3000:80'
+  frontend:
+    build:
+      context: "."
+      dockerfile: "./docker/frontend.dockerfile"
+      args:
+        APP_PATH: /mutational-signatures
+    environment:
+      API_BASE_URL: http://backend:8330
+      API_EXTRACTION_URL: http://extraction:8331
+      APP_PATH: /mutational-signatures
+    ports:
+      - "3000:80"
 
-  # database:
-  #     image: postgres
-  #     environment:
-  #         POSTGRES_USER: msigportal
-  #         POSTGRES_PASSWORD: msigportal
-  #         POSTGRES_DB: msigportal
-  #     volumes:
-  #         - './data:/var/lib/postgresql/data'
-  #     ports:
-  #     - "5432:5432"
+  database:
+    image: postgres
+    environment:
+      POSTGRES_USER: msigportal
+      POSTGRES_PASSWORD: msigportal
+      POSTGRES_DB: msigportal
+    volumes:
+      - "./data:/var/lib/postgresql/data"
+    ports:
+      - "5432:5432"
