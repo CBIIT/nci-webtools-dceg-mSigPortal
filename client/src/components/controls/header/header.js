@@ -1,8 +1,9 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-
+import HeaderSearch from './header-search';
 export function Header() {
-  const location = useLocation();
+  const { pathname } = useLocation();
+
   return (
     <header className="bg-light">
       <div>
@@ -19,81 +20,31 @@ export function Header() {
           Skip to Main Content
         </a>
         <div
-          className={
-            location.pathname === '/'
-              ? 'container d-none d-lg-block'
-              : 'd-none d-lg-block'
-          }
+          className={`d-none d-md-block ${pathname === '/' ? 'container' : ''}`}
         >
-          <div className="">
-            <div className="">
-              <div className="p-2 d-none d-sm-block">
-                <a href="https://dceg.cancer.gov/" target="_blank">
-                  <img
-                    src="https://analysistools.cancer.gov/common/images/DCEG-logo.svg"
-                    height="100"
-                    alt="National Cancer Institute Logo"
-                  />
-                </a>
-                {/* <a href="/#/">
+          <div className="d-flex justify-content-between">
+            <a href="https://dceg.cancer.gov/" target="_blank">
               <img
-                className="d-none d-md-block"
-                src="assets/images/msigportal-logo.png"
-                alt="mSigPortal Logo"
-                height="80"
-                style={{float: 'right', marginTop: '15px'}}
+                src="https://analysistools.cancer.gov/common/images/DCEG-logo.svg"
+                height="100"
+                alt="National Cancer Institute Logo"
               />
-            </a> */}
-              </div>
-
-              <div className="p-1 d-block d-sm-none">
-                <a href="https://dceg.cancer.gov/">
-                  <img
-                    src="https://analysistools.cancer.gov/common/images/DCEG-logo.svg"
-                    height="80"
-                    width="100%"
-                    alt="National Cancer Institute Logo"
-                  />
-                </a>
-              </div>
+            </a>
+            <div className="mr-4 mt-4">
+              <HeaderSearch />
             </div>
           </div>
         </div>
 
-        <div className=" d-block d-lg-none">
-          <div className="">
-            <div className="">
-              <div className="p-2 d-none d-sm-block">
-                <a href="https://dceg.cancer.gov/" target="_blank">
-                  <img
-                    src="https://analysistools.cancer.gov/common/images/DCEG-logo.svg"
-                    height="100"
-                    alt="National Cancer Institute Logo"
-                  />
-                </a>
-                {/* <a href="/#/">
-              <img
-                className="d-none d-md-block"
-                src="assets/images/msigportal-logo.png"
-                alt="mSigPortal Logo"
-                height="80"
-                style={{float: 'right', marginTop: '15px'}}
-              />
-            </a> */}
-              </div>
-
-              <div className="p-1 d-block d-sm-none">
-                <a href="https://dceg.cancer.gov/">
-                  <img
-                    src="https://analysistools.cancer.gov/common/images/DCEG-logo.svg"
-                    height="80"
-                    width="100%"
-                    alt="National Cancer Institute Logo"
-                  />
-                </a>
-              </div>
-            </div>
-          </div>
+        <div className="d-block d-sm-block d-md-none">
+          <a href="https://dceg.cancer.gov/">
+            <img
+              src="https://analysistools.cancer.gov/common/images/DCEG-logo.svg"
+              height="80"
+              width="100%"
+              alt="National Cancer Institute Logo"
+            />
+          </a>
         </div>
       </div>
     </header>
