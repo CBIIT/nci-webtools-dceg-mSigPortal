@@ -42,7 +42,7 @@ getAssocVarData <- function(args, config) {
 
   # save vardata_refdata_selected for download
   vardata_refdata_selected %>% write_delim(file = fullDataPath, delim = '\t', col_names = T, na = '')
-
+print(vardata_refdata_selected)
   return(list(assocVarData = clist, fullDataPath = fullDataPath))
 }
 
@@ -158,6 +158,8 @@ univariable <- function(args, config) {
   s3load(exposure_data_file, config$bucket)
   s3load(association_data_file, config$bucket)
 
+ 
+
   exposure_refdata_selected <- exposure_refdata %>% filter(Signature_set_name == args$rsSet, Cancer_Type == args$cancer)
 
   exposure_refdata_selected <- exposure_refdata_selected %>%
@@ -169,6 +171,10 @@ univariable <- function(args, config) {
 
   vardata_refdata_selected <- vardata_refdata %>% filter(Cancer_Type == args$cancer)
 
+  print(exposure_data_file)
+  print(association_data_file)
+  print(s3load)
+  print(exposure_refdata_selected)
   # overlapped samples
   osamples <- intersect(unique(vardata_refdata_selected$Sample), unique(exposure_refdata_selected$Sample))
 
