@@ -2101,28 +2101,26 @@
     },
     "ggplot2": {
       "Package": "ggplot2",
-      "Version": "3.4.1",
+      "Version": "3.3.6",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "MASS",
         "R",
-        "cli",
+        "digest",
         "glue",
         "grDevices",
         "grid",
         "gtable",
         "isoband",
-        "lifecycle",
         "mgcv",
         "rlang",
         "scales",
         "stats",
         "tibble",
-        "vctrs",
         "withr"
       ],
-      "Hash": "d494daf77c4aa7f084dbbe6ca5dcaca7"
+      "Hash": "0fb26d0674c82705c6b701d1a61e02ea"
     },
     "ggplotify": {
       "Package": "ggplotify",
