@@ -1,20 +1,26 @@
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { useSelector } from 'react-redux';
+import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil';
+import { useSelector, useRes } from 'react-redux';
 import Select from 'react-select';
 import { Form, Row, Col } from 'react-bootstrap';
 import MultiSelect from '../../../controls/select/multiSelect';
 import { formState, graphDataSelector, colorOptions } from './treeLeaf.state';
+import { useEffect } from 'react';
 
 export default function TreeLeafForm() {
   const store = useSelector((state) => state.visualization);
   const study = store?.publicForm?.study?.value || 'PCAWG';
   const strategy = store?.publicForm?.strategy?.value || 'WGS';
+  const cancers = store?.publicForm?.cancers?.filter(c => c.value !== '*ALL') || [];
+  const cancerTypes = [{ label: 'All', value: '' }].concat(cancers);
   const signatureSetName = 'COSMIC_v3_Signatures_GRCh37_SBS96';
   const profileMatrix = ['SBS96', 'DBS78', 'ID83'];
-  const params = { study, strategy, signatureSetName, profileMatrix };
-  const { attributes } = useRecoilValue(graphDataSelector(params));
   const [form, setForm] = useRecoilState(formState);
+  const cancer = form?.cancerType?.value;
+  const params = { study, strategy,  signatureSetName, profileMatrix, cancer };
+  const { attributes } = useRecoilValue(graphDataSelector(params));
+  const resetForm = useResetRecoilState(formState);
   const mergeForm = (state) => setForm({ ...form, ...state });
+  useEffect(() => resetForm(), [study]); // reset form when study changes
 
   function handleChange(event) {
     let { name, value, checked, type } = event.target;
@@ -45,6 +51,17 @@ export default function TreeLeafForm() {
   return (
     <Form>
       <Row>
+        <Col md="auto">
+          <Form.Group controlId="cancerType" className="mb-3">
+            <Form.Label>Cancer Type</Form.Label>
+            <Select
+              name="cancerType"
+              defaultValue={cancerTypes[0]}
+              options={cancerTypes}
+              onChange={(e) => mergeForm({ cancerType: e })}
+            />
+          </Form.Group>
+        </Col>        
         <Col md="auto">
           <Form.Group controlId="color" className="mb-3">
             <Form.Label>Leaf Property</Form.Label>

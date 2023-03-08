@@ -25,6 +25,7 @@ export const colorOptions = [
 ];
 
 export const defaultFormState = {
+  cancerType: null,
   showLabels: false,
   color: {
     label: 'Cosine Similarity',

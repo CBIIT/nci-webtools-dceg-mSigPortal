@@ -24,7 +24,7 @@ export default function D3TreeLeaf({
   const strategy = publicForm?.strategy?.value ?? 'WGS';
   const signatureSetName = 'COSMIC_v3_Signatures_GRCh37_SBS96';
   const profileMatrix = ['SBS96', 'DBS78', 'ID83'];
-  const params = { study, strategy, signatureSetName, profileMatrix };
+  const params = { study, strategy,  signatureSetName, profileMatrix, cancer: form?.cancerType?.value };
   const graphData = useRecoilValue(graphDataSelector(params));
   const { hierarchy, attributes } = cloneDeep(graphData) || {};
   const plotData = {
@@ -42,6 +42,7 @@ export default function D3TreeLeaf({
   const plotEvents = {
     onClick: onSelect,
   };
+
 
   useEffect(() => {
     if (plotRef.current && plotData.data) {
@@ -162,8 +163,8 @@ function createForceDirectedTree(
     .force('y', d3.forceY().strength(0.005))
     .force('collision', d3.forceCollide().radius(nodeRadius));
 
-  simulation.stop();
-  simulation.tick(40);
+  // simulation.stop();
+  // simulation.tick(40);
 
   const zoom = d3.zoom().on('zoom', zoomed);
 
