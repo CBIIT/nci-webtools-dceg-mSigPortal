@@ -39,7 +39,7 @@ RUN cd /tmp && \
 #     echo -e "CXX14FLAGS=-O3 -march=native -mtune=native -fPIC \nCXX14=g++" >> $HOME/.R/Makevars
 
 # install R packages with renv
-COPY server/renv.lock /deploy/server/
+COPY /server /deploy/server/
 WORKDIR /deploy/server
 RUN R -e "options(Ncpus=parallel::detectCores()); install.packages(c('renv', 'BiocManager'), repos = 'https://cloud.r-project.org/'); renv::restore(prompt = FALSE)"
 
@@ -81,7 +81,7 @@ RUN npm install
 ARG CACHE_BUST
 COPY server .
 
-CMD R -e "renv::restore(prompt = FALSE)" && npm start
+CMD npm start
 
 # docker build -t msigportal-backend -f backend.dockerfile ~/Projects/msigportal/
 # docker run -d -p 8330:8330 -v ~/Projects/msigportal/logs/:/deploy/logs -v ~/Projects/msigportal/tmp:/deploy/tmp -v ~/Projects/msigportal/config:/deploy/config -v ~/Projects/sigprofiler/data/genomes:/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb  -v ~/.aws/credentials:/root/.aws/credentials:ro --name msigportal-backend msigportal-backend 
