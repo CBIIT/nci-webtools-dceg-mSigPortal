@@ -68,8 +68,9 @@ export default function PublicForm() {
 
   async function onSubmit(data) {
     try {
+      const cancers = cancerOptions(data.study);
       mergeMain({ submitted: true, loading: { active: true } });
-      mergeState(data);
+      mergeState({...data, cancers });
       const params = {
         study: data.study.value,
         cancer: data.cancer.value,
@@ -172,7 +173,6 @@ export default function PublicForm() {
   function handleStudyChange(study) {
     const cancers = cancerOptions(study);
     const strategies = strategyOptions(study, cancers[0]);
-
     setValue('study', study);
     setValue('cancer', cancers[0]);
     setValue('strategy', strategies[0]);
