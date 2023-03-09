@@ -1,4 +1,6 @@
-export default function ID28(data, sample) {
+import { createSampleAnnotation } from './utils';
+
+export default function ID28(data, title = '') {
   const colors = {
     '1:Del:C': '#FBBD6F',
     '1:Del:T': '#FE8002',
@@ -244,26 +246,7 @@ export default function ID28(data, sample) {
     align: 'center',
   }));
 
-  const sampleAnnotation = {
-    xref: 'paper',
-    yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'bottom',
-    x: 0.01,
-    y: 0.9,
-    text:
-      '<b>' +
-      sample +
-      ': ' +
-      totalMutations.toLocaleString(undefined) +
-      ' indels</b>',
-    showarrow: false,
-    font: {
-      size: 24,
-      family: 'Arial',
-    },
-    align: 'center',
-  };
+  const sampleAnnotation = createSampleAnnotation(data);
 
   const shapes1 = Object.entries(arrayID).map(
     ([mutation, signatures], groupIndex, array) => ({
@@ -332,6 +315,7 @@ export default function ID28(data, sample) {
   );
 
   const layout = {
+    title: `<b>${title}</b>`,
     hoverlabel: { bgcolor: '#FFF' },
     height: 600,
     width: 750,

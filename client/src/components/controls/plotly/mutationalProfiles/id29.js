@@ -6,7 +6,7 @@ import {
   createMutationAnnotations,
 } from './utils';
 
-export default function ID29(apiData) {
+export default function ID29(apiData, title = '') {
   const colors = {
     '[+C]': '#0072b2',
     '[+T]': '#d55e00',
@@ -79,6 +79,7 @@ export default function ID29(apiData) {
   const mutationShapes = createMutationShapes(data, colors);
 
   const layout = {
+    title: `<b>${title}</b>`,
     hoverlabel: { bgcolor: '#FFF' },
     bargap: 0.3,
     height: 450,

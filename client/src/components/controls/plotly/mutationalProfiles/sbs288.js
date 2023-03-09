@@ -1,5 +1,5 @@
-import { getTotalMutations } from './utils';
-export default function SBS288(data, sample) {
+import { createSampleAnnotation, getTotalMutations } from './utils';
+export default function SBS288(data, title = '') {
   const colors = {
     'C>A': '#03BCEE',
     'C>G': 'black',
@@ -276,28 +276,7 @@ export default function SBS288(data, sample) {
     })
   );
 
-  const sampleAnnotation = {
-    xref: 'paper',
-    yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'bottom',
-    x: 0.01,
-    y: 0.88,
-    text:
-      totalMutations > 1.1
-        ? '<b>' +
-          sample +
-          ': ' +
-          totalMutations.toLocaleString(undefined) +
-          ' subs </b>'
-        : '<b>' + sample + '</b>',
-    showarrow: false,
-    font: {
-      size: 24,
-      family: 'Arial',
-    },
-    align: 'center',
-  };
+  const sampleAnnotation = createSampleAnnotation(data);
 
   const transformU = Object.entries(groupByMutationU).map(
     ([mutation, data]) => ({
@@ -344,6 +323,7 @@ export default function SBS288(data, sample) {
   );
 
   const layout = {
+    title: `<b>${title}</b>`,
     hoverlabel: { bgcolor: '#FFF' },
     bargap: 0.3,
     height: 450,

@@ -1,4 +1,4 @@
-export default function SBS24(data, sample) {
+export default function SBS24(data, title = '') {
   // filter transcribed and untranscribed data
   const transcribed = data.filter((e) => /^T:/.test(e.mutationType));
   const untranscribed = data.filter((e) => /^U:/.test(e.mutationType));
@@ -53,11 +53,11 @@ export default function SBS24(data, sample) {
     },
     title: {
       text:
-        '<b>' +
-        sample +
-        ': ' +
-        totalMutations.toLocaleString(undefined) +
-        ' transcribed subs </b>',
+        '<b>' + data[0].sample ||
+        data[0].signatureName +
+          ': ' +
+          totalMutations.toLocaleString(undefined) +
+          ' transcribed subs</b>',
       font: {
         size: 26,
         family: 'Arial',

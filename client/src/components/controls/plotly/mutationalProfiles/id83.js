@@ -1,11 +1,12 @@
 import {
+  createSampleAnnotation,
   getMaxMutations,
   getTotalMutations,
   groupDataByMutation,
 } from './utils';
 
 import { id83Color } from '../../utils/colors';
-export default function ID83(apiData) {
+export default function ID83(apiData, title = '') {
   const colors = id83Color;
 
   const indelRegex = /^(.{7})/;
@@ -144,28 +145,7 @@ export default function ID83(apiData) {
     },
     align: 'center',
   }));
-  const sampleAnnotation = {
-    xref: 'paper',
-    yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'bottom',
-    x: 0.01,
-    y: 0.88,
-    text:
-      apiData[0].sample && parseFloat(totalMutations).toFixed(2) > 1
-        ? `<b>${
-            apiData[0].sample
-          }: ${totalMutations.toLocaleString()} Indels</b>`
-        : apiData[0].sample && parseFloat(totalMutations).toFixed(2) < 1
-        ? `<b>${apiData[0].sample}`
-        : `<b>${apiData[0].signatureName}</b>`,
-    showarrow: false,
-    font: {
-      size: 24,
-      family: 'Arial',
-    },
-    align: 'center',
-  };
+  const sampleAnnotation = createSampleAnnotation(apiData);
 
   const topShapes = data.map((group, groupIndex, array) => ({
     type: 'rect',
@@ -204,6 +184,7 @@ export default function ID83(apiData) {
   }));
 
   const layout = {
+    title: `<b>${title}</b>`,
     hoverlabel: { bgcolor: '#FFF' },
     height: 500,
     //width:1080,

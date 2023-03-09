@@ -8,7 +8,7 @@ import {
   createMutationAnnotations,
 } from './utils';
 
-export default function DBS78(apiData) {
+export default function DBS78(apiData, title = '') {
   const colors = dbs78Color;
   const mutationRegex = /^(.{2})/;
 
@@ -45,6 +45,7 @@ export default function DBS78(apiData) {
   const mutationShapes = createMutationShapes(data, colors);
 
   const layout = {
+    title: `<b>${title}</b>`,
     hoverlabel: { bgcolor: '#FFF' },
     height: 450,
     //width:1080,

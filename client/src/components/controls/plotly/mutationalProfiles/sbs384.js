@@ -1,5 +1,6 @@
 import { sbsColor } from '../../utils/colors';
-export default function SBS384(data, sample) {
+import { createSampleAnnotation } from './utils';
+export default function SBS384(data, title = '') {
   const colors = sbsColor;
 
   const groupByMutation = data.reduce((groups, e, i) => {
@@ -143,26 +144,7 @@ export default function SBS384(data, sample) {
     })
   );
 
-  const sampleAnnotation = {
-    xref: 'paper',
-    yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'bottom',
-    x: 0.01,
-    y: 0.88,
-    text:
-      '<b>' +
-      sample +
-      ': ' +
-      totalMutations.toLocaleString(undefined) +
-      ' transcribed subs </b>',
-    showarrow: false,
-    font: {
-      size: 24,
-      family: 'Arial',
-    },
-    align: 'center',
-  };
+  const sampleAnnotation = createSampleAnnotation(data);
 
   const shapes1 = Object.entries(groupByMutationT).map(
     ([mutation, _], groupIndex, array) => ({
@@ -229,6 +211,7 @@ export default function SBS384(data, sample) {
   }
 
   const layout = {
+    title: `<b>${title}</b>`,
     hoverlabel: { bgcolor: '#FFF' },
     bargap: 0.3,
     height: 450,

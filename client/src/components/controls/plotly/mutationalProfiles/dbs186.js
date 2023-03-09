@@ -1,4 +1,6 @@
-export default function DBS186(data, sample) {
+import { createSampleAnnotation } from './utils';
+
+export default function DBS186(data, title = '') {
   const colors = {
     'CC>': '#09BCEE',
     'CT>': '#A0CE63',
@@ -153,28 +155,10 @@ export default function DBS186(data, sample) {
     })
   );
 
-  const sampleAnnotation = {
-    xref: 'paper',
-    yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'bottom',
-    x: 0.01,
-    y: 0.9,
-    text:
-      '<b>' +
-      sample +
-      ': ' +
-      totalMutations.toLocaleString(undefined) +
-      ' transcribed double subs</b>',
-    showarrow: false,
-    font: {
-      size: 24,
-      family: 'Arial',
-    },
-    align: 'center',
-  };
+  const sampleAnnotation = createSampleAnnotation(data);
 
   const layout = {
+    title: `<b>${title}</b>`,
     hoverlabel: { bgcolor: '#FFF' },
     showlegend: true,
     height: 600,

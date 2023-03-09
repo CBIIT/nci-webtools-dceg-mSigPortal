@@ -1,19 +1,15 @@
-import { groupBy } from 'lodash';
 import { rs32Color } from '../../utils/colors';
-export default function RS32(rawData, sample) {
+import { createSampleAnnotation } from './utils';
+export default function RS32(apiData, title = '') {
   const colors = rs32Color;
 
-  const totalMutations = rawData.reduce(
-    (total, indel) => total + indel.contribution,
-    0
-  );
-  const maxMutation = Math.max(...rawData.map((indel) => indel.contribution));
+  const maxMutation = Math.max(...apiData.map((indel) => indel.contribution));
 
   var sortOrder = ['1-10Kb', '10-100Kb', '100Kb-1Mb', '1Mb-10Mb', '>10Mb']; // Declare a array that defines the order of the elements to be sorted.
 
   const clusterd = [];
   const nonClustered = [];
-  rawData.map((e) => {
+  apiData.map((e) => {
     if (e.mutationType.substring(0, 3) === 'non') {
       nonClustered.push(e);
     } else {
@@ -233,22 +229,9 @@ export default function RS32(rawData, sample) {
       width: 1,
     },
   };
-  const sampleAnnotation = {
-    xref: 'paper',
-    yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'bottom',
-    x: 0.01,
-    y: 0.88,
-    text: '<b>' + sample + '</b>',
-    showarrow: false,
-    font: {
-      size: 18,
-      family: 'Arial',
-    },
-    align: 'center',
-  };
+  const sampleAnnotation = createSampleAnnotation(apiData);
   const layout = {
+    title: `<b>${title}</b>`,
     hoverlabel: { bgcolor: '#FFF' },
     height: 500,
     autosize: true,

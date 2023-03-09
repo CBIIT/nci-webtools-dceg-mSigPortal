@@ -1,6 +1,6 @@
 import { getMaxMutations, createSampleAnnotation } from './utils';
 
-export default function CN48(apiData) {
+export default function CN48(apiData, title = '') {
   const colors = {
     '0:0-100kb': '#F0F8FF',
     '0:100kb-1Mb': '#787CE6',
@@ -240,6 +240,7 @@ export default function CN48(apiData) {
   );
   const sampleAnnotation = createSampleAnnotation(apiData);
   const layout = {
+    title: `<b>${title}</b>`,
     hoverlabel: { bgcolor: '#FFF' },
     height: 500,
     autosize: true,

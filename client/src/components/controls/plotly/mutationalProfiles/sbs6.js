@@ -1,5 +1,5 @@
 import { sbsColor } from '../../utils/colors';
-export default function SBS6(data, sample) {
+export default function SBS6(data) {
   const colors = sbsColor;
 
   const totalMutations = data.reduce((total, e) => total + e.mutations, 0);
@@ -23,11 +23,11 @@ export default function SBS6(data, sample) {
     width: 750,
     title: {
       text:
-        '<b>' +
-        sample +
-        ': ' +
-        totalMutations.toLocaleString(undefined) +
-        ' subs </b>',
+        '<b>' + data[0].sample ||
+        data[0].signatureName +
+          ': ' +
+          totalMutations.toLocaleString(undefined) +
+          ' subs</b>',
       font: {
         size: 26,
         family: 'Arial',

@@ -8,7 +8,7 @@ import {
 } from './utils';
 import { sbsColor } from '../../utils/colors';
 
-export default function SBS96(apiData) {
+export default function SBS96(apiData, title = '') {
   const colors = sbsColor;
   const mutationRegex = /\[(.*)\]/;
 
@@ -56,6 +56,7 @@ export default function SBS96(apiData) {
   }
 
   const layout = {
+    title: `<b>${title}</b>`,
     hoverlabel: { bgcolor: '#FFF' },
     bargap: 0.3,
     height: 450,

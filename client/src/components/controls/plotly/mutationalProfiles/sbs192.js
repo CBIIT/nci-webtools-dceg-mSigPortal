@@ -7,7 +7,7 @@ import {
 } from './utils';
 import { sbsColor } from '../../utils/colors';
 
-export default function SBS192(apiData) {
+export default function SBS192(apiData, title = '') {
   const colors = sbsColor;
   const mutationRegex = /\[(.*)\]/;
   const mutationTypeSort = (a, b) => {
@@ -113,6 +113,7 @@ export default function SBS192(apiData) {
     .flat();
 
   const layout = {
+    title: `<b>${title}</b>`,
     hoverlabel: { bgcolor: '#FFF' },
     showlegend: true,
     height: 450,

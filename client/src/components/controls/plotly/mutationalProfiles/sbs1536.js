@@ -1,5 +1,6 @@
 import { sbsColor } from '../../utils/colors';
-export default function SBS1536(data, sample, tab) {
+import { createSampleAnnotation } from './utils';
+export default function SBS1536(data, title = '') {
   const colors = sbsColor;
 
   const heatmapColorscale = [
@@ -25,12 +26,6 @@ export default function SBS1536(data, sample, tab) {
   // console.log("maxValMutation:---");
   // console.log(maxValMutation);
 
-  function formatTickLabel(mutation, mutationType) {
-    const color = colors[mutation];
-    const regex = /^(.)\[(.).{2}\](.)$/;
-    const match = mutationType.match(regex);
-    return `${match[1]}<span style="color:${color}"><b>${match[2]}</b></span>${match[3]}`;
-  }
   const groupByMutationInner = data.reduce((groups, e, i) => {
     const mutation = e.mutationType.substring(1, 8);
     const signature = {
@@ -437,26 +432,7 @@ export default function SBS1536(data, sample, tab) {
     })
   );
 
-  const sampleAnnotation = {
-    xref: 'paper',
-    yref: 'paper',
-    xanchor: 'bottom',
-    yanchor: 'bottom',
-    x: 0,
-    y: 0.95,
-    text:
-      '<b>' +
-      sample +
-      ': ' +
-      totalMutations.toLocaleString(undefined) +
-      ' subs </b>',
-    showarrow: false,
-    font: {
-      size: 18,
-      family: 'Arial',
-    },
-    align: 'center',
-  };
+  const sampleAnnotation = createSampleAnnotation(data);
 
   const shapes = Object.entries(groupByTotal).map(
     ([mutation, _], groupIndex, array) => ({
@@ -515,6 +491,7 @@ export default function SBS1536(data, sample, tab) {
   };
 
   const layout = {
+    title: `<b>${title}</b>`,
     hoverlabel: { bgcolor: '#FFF' },
     height: 700,
     width: 1080,
