@@ -146,45 +146,25 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
             )
           );
 
-          const plots = [denovo, reconstructed, ...decomposed].map((e) => {
+          const plots = [
+            { title: 'Denovo Signature', data: denovo },
+            { title: 'Reconstructed Signature', data: reconstructed },
+            ...decomposed.map((e) => ({
+              title: 'Decomposed Signature',
+              data: e,
+            })),
+          ].map((e) => {
             switch (profileMatrix) {
               case 'SBS96':
-                return SBS96(e);
+                return SBS96(e.data, e.title);
               case 'DBS78':
-                return DBS78(e);
+                return DBS78(e.data, e.title);
               case 'ID83':
-                return ID83(e);
+                return ID83(e.data, e.title);
               default:
                 throw new Error(`${profileMatrix} is not supported`);
             }
           });
-
-          // const multi = plots.reduce(
-          //   (obj, e, i) => {
-          //     const count = plots.length - 1;
-          //     const index = i === count ? '' : count - i;
-          //     return {
-          //       traces: [
-          //         ...obj.traces,
-          //         ...e.traces.map((trace) => ({
-          //           ...trace,
-
-          //           xaxis: 'x' + index,
-          //           yaxis: 'y' + index,
-          //         })),
-          //       ],
-          //       layout: {
-          //         // ...obj.layout,
-          //         // ...e.layout,
-          //         grid: { rows: count, col: 1, pattern: 'independent' },
-          //       },
-          //     };
-          //   },
-          //   {
-          //     traces: [],
-          //     layout: {},
-          //   }
-          // );
 
           return {
             data: { plots },
