@@ -432,7 +432,7 @@ export default function SBS1536(data, title = '') {
     })
   );
 
-  const sampleAnnotation = createSampleAnnotation(data);
+  const sampleAnnotation = createSampleAnnotation(data, false, 0.95);
 
   const shapes = Object.entries(groupByTotal).map(
     ([mutation, _], groupIndex, array) => ({
@@ -445,7 +445,7 @@ export default function SBS1536(data, title = '') {
       x1: array
         .slice(0, groupIndex + 1)
         .reduce((x0, [_, sigs]) => x0 + sigs.length, -0.6),
-      y0: 1.05,
+      y0: 1.04,
       y1: 1.01,
       fillcolor: colors[mutation],
       line: {
@@ -493,7 +493,7 @@ export default function SBS1536(data, title = '') {
   const layout = {
     title: `<b>${title}</b>`,
     hoverlabel: { bgcolor: '#FFF' },
-    height: 700,
+    height: 800,
     width: 1080,
     grid: {
       rows: 4,
