@@ -44,13 +44,10 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
             '/mutational_spectrum?' + new URLSearchParams(_arg.params_spectrum)
           ), //seqmatrix
         ]);
-        console.log(res);
         let profile;
 
         if (_arg.params_activity.userId) {
           if (res[0].data.length > 0) {
-            console.log(res[0].data[0].signatureName);
-            console.log(res[1].data[0].signatureName);
             if (res[0].data[0].signatureName === res[1].data[0].signatureName) {
               profile = res[0].data[0].signatureName;
             } else {
@@ -66,7 +63,7 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
             profile = 'No data';
           }
         }
-        console.log(profile);
+
         if (profile === 'SBS96' || profile.includes('SBS')) {
           return { data: sbs96(res, _arg, 'msIndividual') };
         } else if (profile === 'DBS78' || profile.includes('DBS')) {
