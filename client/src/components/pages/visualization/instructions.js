@@ -46,13 +46,13 @@ export default function Instructions() {
       <h4>Data Source</h4>
       <p>Public: Perform analysis using data available on the website</p>
       <p>User: Upload your own data</p>
-      <hr />
+      {/* <hr />
       <h4>Example Queries</h4>
       <p>
         Choose an example query to view results for pre-selected parameters. You
         must reset between queries.
       </p>
-      TBA
+      TBA */}
       {/* {examples.map(({ title, external, path }, index) => (
         <div key={index}>
           <Link to={`/visualization/example/${path}`}>
