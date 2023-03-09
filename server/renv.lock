@@ -589,6 +589,17 @@
       ],
       "Hash": "01d7ab3deeee1307b7dfa8eafae2a106"
     },
+    "KernSmooth": {
+      "Package": "KernSmooth",
+      "Version": "2.23-20",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "stats"
+      ],
+      "Hash": "8dcfa99b14c296bc9f1fd64d52fd3ce7"
+    },
     "MASS": {
       "Package": "MASS",
       "Version": "7.3-58.3",
@@ -1106,18 +1117,19 @@
     },
     "bayestestR": {
       "Package": "bayestestR",
-      "Version": "0.11.5",
+      "Version": "0.13.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R",
         "datawizard",
+        "graphics",
         "insight",
         "methods",
         "stats",
         "utils"
       ],
-      "Hash": "a1ac15e988cbeea3524f1f371ad13964"
+      "Hash": "caecf6cf095962f3d6645ddab4c691e8"
     },
     "biomaRt": {
       "Package": "biomaRt",
@@ -1942,6 +1954,19 @@
       ],
       "Hash": "1a0a9a3d5083d0d573c4214576f1e690"
     },
+    "foreign": {
+      "Package": "foreign",
+      "Version": "0.8-82",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "methods",
+        "stats",
+        "utils"
+      ],
+      "Hash": "32b25c97ce306a760c4d9f787991b5d9"
+    },
     "formatR": {
       "Package": "formatR",
       "Version": "1.14",
@@ -2240,9 +2265,9 @@
     },
     "ggside": {
       "Package": "ggside",
-      "Version": "0.2.2",
+      "Version": "0.2.1",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "ggplot2",
         "glue",
@@ -2251,10 +2276,9 @@
         "rlang",
         "scales",
         "stats",
-        "tibble",
-        "vctrs"
+        "tibble"
       ],
-      "Hash": "e306eddae49e2bd6e3dd99ec39d11ae2"
+      "Hash": "50dc39eb41b42a0fd1db619dea83962c"
     },
     "ggsignif": {
       "Package": "ggsignif",
@@ -3166,7 +3190,7 @@
     },
     "parameters": {
       "Package": "parameters",
-      "Version": "0.16.0",
+      "Version": "0.20.2",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -3179,7 +3203,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "a85c1ad47f59e2300edea61724d51924"
+      "Hash": "be0f471c6ca3151ca107231d578233a9"
     },
     "patchwork": {
       "Package": "patchwork",
@@ -3509,17 +3533,6 @@
         "splines"
       ],
       "Hash": "a701708b518dc3b7d68be91493275ef0"
-    },
-    "ragg": {
-      "Package": "ragg",
-      "Version": "1.2.5",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "systemfonts",
-        "textshaping"
-      ],
-      "Hash": "690bc058ea2b1b8a407d3cfe3dce3ef9"
     },
     "rappdirs": {
       "Package": "rappdirs",
@@ -4093,18 +4106,6 @@
       ],
       "Hash": "32454e5780e8dbe31e4b61b13d8918fe"
     },
-    "textshaping": {
-      "Package": "textshaping",
-      "Version": "0.3.6",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "cpp11",
-        "systemfonts"
-      ],
-      "Hash": "1ab6223d3670fac7143202cb6a2d43d5"
-    },
     "tibble": {
       "Package": "tibble",
       "Version": "3.2.0",
@@ -4206,14 +4207,14 @@
     },
     "tidyverse": {
       "Package": "tidyverse",
-      "Version": "2.0.0",
+      "Version": "1.3.2",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "broom",
         "cli",
-        "conflicted",
+        "crayon",
         "dbplyr",
         "dplyr",
         "dtplyr",
@@ -4230,7 +4231,6 @@
         "modelr",
         "pillar",
         "purrr",
-        "ragg",
         "readr",
         "readxl",
         "reprex",
@@ -4242,7 +4242,7 @@
         "tidyr",
         "xml2"
       ],
-      "Hash": "c328568cd14ea89a83bd4ca7f54ae07e"
+      "Hash": "972389aea7fa1a34739054a810d0c6f6"
     },
     "timechange": {
       "Package": "timechange",
