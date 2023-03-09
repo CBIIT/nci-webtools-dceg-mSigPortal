@@ -44,16 +44,29 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
             '/mutational_spectrum?' + new URLSearchParams(_arg.params_spectrum)
           ), //seqmatrix
         ]);
-
+        console.log(res);
         let profile;
-        if (res[0].data.length > 0 && _arg.params_activity.userId) {
-          profile = res[0].data[0].signatureName;
-        } else if (res[0].data.length > 0 && !_arg.params_activity.userId) {
-          profile = extractLastWord(_arg.params_activity.signatureSetName);
-        } else {
-          profile = 'No data';
-        }
 
+        if (_arg.params_activity.userId) {
+          if (res[0].data.length > 0) {
+            console.log(res[0].data[0].signatureName);
+            console.log(res[1].data[0].signatureName);
+            if (res[0].data[0].signatureName === res[1].data[0].signatureName) {
+              profile = res[0].data[0].signatureName;
+            } else {
+              profile = 'Data mismatch';
+            }
+          } else {
+            profile = 'No data';
+          }
+        } else {
+          if (res[0].data.length > 0) {
+            profile = extractLastWord(_arg.params_activity.signatureSetName);
+          } else {
+            profile = 'No data';
+          }
+        }
+        console.log(profile);
         if (profile === 'SBS96' || profile.includes('SBS')) {
           return { data: sbs96(res, _arg, 'msIndividual') };
         } else if (profile === 'DBS78' || profile.includes('DBS')) {
@@ -61,7 +74,16 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
         } else if (profile === 'ID83' || profile.includes('ID')) {
           return { data: id83(res, _arg, 'msIndividual') };
         } else {
-          return { data: msIndividual_rs32(res, _arg, 'msIndividual') };
+          //return { data: msIndividual_rs32(res, _arg, 'msIndividual') };
+          return {
+            error: _arg.params_activity.signatureSetName
+              ? 'Signature SetName: ' +
+                _arg.params_activity.signatureSetName +
+                ' is not supported in MS Individual'
+              : profile === 'Data mismatch'
+              ? 'Data mismatch, please try again with different files'
+              : 'No data found, please try again',
+          };
         }
       },
     }),

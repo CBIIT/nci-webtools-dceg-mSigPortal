@@ -43,27 +43,6 @@ export default function MsIndividual({ state }) {
       <MsIndividualForm state={state} form={form} mergeForm={mergeForm} />
       <hr />
       <MsIndividualPlot state={state} form={form} />
-      <br />
-      <div>
-        {' '}
-        <p>
-          The combination plot shows the original mutational profile, the
-          deconstructed mutational profile, and the difference of each mutation
-          type between these two profiles, mutational signature profiles and
-          proportion of each contributed signature detected in the selected
-          sample. Two measurements (Residual Sum of Squares, RSS, and Cosine
-          Similarity) for evaluating the signature deconvolution are shown on
-          the top of this plot.
-        </p>
-        <p>
-          RSS measures the discrepancy between two mutational profiles. Cosine
-          similarity measures how similar two mutational profiles are. For
-          example, two identical mutational profiles will have RSS = 0 and
-          Cosine similarity = 1. For additional information about RSS and cosine
-          similarity, click{' '}
-          <NavHashLink to="/faq#cosine-similarity">here</NavHashLink>.
-        </p>
-      </div>
     </Container>
   );
 }
