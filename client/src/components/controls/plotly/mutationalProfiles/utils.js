@@ -31,7 +31,7 @@ export function getMaxMutations(apiData) {
   return Math.max(...apiData.map((e) => e.mutations || e.contribution || 0));
 }
 
-export function createSampleAnnotation(apiData, text = '') {
+export function createSampleAnnotation(apiData, text = '', yPos = 0.88) {
   const totalMutations = getTotalMutations(apiData);
   return {
     xref: 'paper',
@@ -39,7 +39,7 @@ export function createSampleAnnotation(apiData, text = '') {
     xanchor: 'bottom',
     yanchor: 'bottom',
     x: 0.01,
-    y: 0.88,
+    y: yPos,
     text:
       apiData[0].sample && parseFloat(totalMutations).toFixed(2) > 1
         ? `<b>${apiData[0].sample}: ${totalMutations.toLocaleString()} ${
