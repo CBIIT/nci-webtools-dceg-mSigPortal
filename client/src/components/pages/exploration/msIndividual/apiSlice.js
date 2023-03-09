@@ -3,6 +3,7 @@ import sbs96 from '../../../controls/plotly/profileComparison/sbs96';
 import dbs78 from '../../../controls/plotly/profileComparison/dbs78';
 import id83 from '../../../controls/plotly/profileComparison/id83';
 import msIndividual_rs32 from '../../../controls/plotly/msIndividual/msIndividual_rs32';
+import MsIndividual_Error from '../../../controls/plotly/msIndividual/msIndividual_error';
 import { extractLastWord } from '../../../controls/utils/utils';
 
 export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
@@ -44,6 +45,7 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
             '/mutational_spectrum?' + new URLSearchParams(_arg.params_spectrum)
           ), //seqmatrix
         ]);
+        console.log(res);
         let profile;
 
         if (_arg.params_activity.userId) {
@@ -72,15 +74,16 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
           return { data: id83(res, _arg, 'msIndividual') };
         } else {
           //return { data: msIndividual_rs32(res, _arg, 'msIndividual') };
-          return {
-            error: _arg.params_activity.signatureSetName
-              ? 'Signature SetName: ' +
-                _arg.params_activity.signatureSetName +
-                ' is not supported in MS Individual'
-              : profile === 'Data mismatch'
-              ? 'Data mismatch, please try again with different files'
-              : 'No data found, please try again',
-          };
+          return { data: MsIndividual_Error(res, _arg, profile) };
+          // return {
+          //   data: _arg.params_activity.signatureSetName
+          //     ? 'Signature SetName: ' +
+          //       _arg.params_activity.signatureSetName +
+          //       ' is not supported in MS Individual'
+          //     : profile === 'Data mismatch'
+          //     ? 'Data mismatch, please try again with different files'
+          //     : 'No data found, please try again',
+          // };
         }
       },
     }),

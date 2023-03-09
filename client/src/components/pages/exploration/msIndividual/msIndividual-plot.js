@@ -28,8 +28,6 @@ export default function MsIndividualPlot({ state, form, setForm }) {
   const { sample } = form;
   const { study, strategy, signatureSetName, cancer, useAllCancer, id } = state;
 
-  const mergeForm = (update) => setForm({ ...form, ...update });
-
   useEffect(() => {
     let params_activity, params_signature, params_spectrum;
     if (sample && id) {
@@ -74,21 +72,16 @@ export default function MsIndividualPlot({ state, form, setForm }) {
       });
     }
   }, [sample, id]);
-  // console.log(data);
-  // console.log(error);
+  console.log(data);
+  console.log(error);
   return (
     <div>
       <LoadingOverlay active={isFetching} />
       {error && <p className="m-3 alert alert-warning">{error}</p>}
-      {!error && (
-        <>
-          <hr />
-          <MsIndividualForm state={state} form={form} mergeForm={mergeForm} />
-          <hr />
-        </>
+      {data && data.error && (
+        <p className="m-3 alert alert-warning">{data.error}</p>
       )}
-
-      {!error && data && (
+      {data && !data.error && (
         <div>
           <Plotly
             className="w-100"

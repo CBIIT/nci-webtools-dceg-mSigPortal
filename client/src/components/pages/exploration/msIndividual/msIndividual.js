@@ -7,7 +7,7 @@ import { useState } from 'react';
 
 export default function MsIndividual({ state }) {
   const [form, setForm] = useState({ sample: '' });
-  //const mergeForm = (update) => setForm({ ...form, ...update });
+  const mergeForm = (update) => setForm({ ...form, ...update });
   return (
     <Container fluid className="bg-white border rounded p-0">
       <div className="p-3">
@@ -39,8 +39,8 @@ export default function MsIndividual({ state }) {
           }
         />
       </div>
-      {/* <hr />
-      <MsIndividualForm state={state} form={form} mergeForm={mergeForm} /> */}
+      <hr />
+      <MsIndividualForm state={state} form={form} mergeForm={mergeForm} />
       <hr />
       <MsIndividualPlot state={state} form={form} setForm={setForm} />
     </Container>
