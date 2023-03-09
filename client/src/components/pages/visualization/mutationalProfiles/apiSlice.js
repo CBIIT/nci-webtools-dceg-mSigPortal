@@ -22,29 +22,29 @@ export const mutationalProfilesApiSlice = visualizationApiSlice.injectEndpoints(
           const profileMatrix = profile + matrix;
 
           if (profileMatrix == 'SBS6') {
-            return SBS6(data, sample);
+            return SBS6(data);
           } else if (profileMatrix == 'SBS24') {
-            return SBS24(data, sample);
+            return SBS24(data);
           } else if (profileMatrix == 'SBS96') {
-            return SBS96(data, sample);
+            return SBS96(data);
           } else if (profileMatrix == 'SBS192') {
-            return SBS192(data, sample);
+            return SBS192(data);
           } else if (profileMatrix == 'SBS288') {
-            return SBS288(data, sample);
+            return SBS288(data);
           } else if (profileMatrix == 'SBS384') {
-            return SBS384(data, sample);
+            return SBS384(data);
           } else if (profileMatrix == 'SBS1536') {
-            return SBS1536(data, sample);
+            return SBS1536(data);
           } else if (profileMatrix == 'DBS78') {
-            return DBS78(data, sample);
+            return DBS78(data);
           } else if (profileMatrix == 'DBS186') {
-            return DBS186(data, sample);
+            return DBS186(data);
           } else if (profileMatrix == 'ID83') {
-            return ID83(data, args);
+            return ID83(data);
           } else if (profileMatrix == 'ID28') {
-            return ID28(data, sample);
+            return ID28(data);
           } else if (profileMatrix == 'ID415') {
-            return ID415(data, sample);
+            return ID415(data);
           } else {
             throw `Unsupported profile and matrix: ${profile} - ${matrix}`;
           }
