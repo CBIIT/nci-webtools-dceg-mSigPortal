@@ -14,11 +14,12 @@ import Select from '../../../controls/select/selectForm';
 import Plotly from '../../../controls/plotly/plot/plot';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { NavHashLink } from 'react-router-hash-link';
+import MsIndividualForm from './msIndividual-form';
 
 const { Group, Check } = Form;
 const actions = { ...exposureActions };
 
-export default function MsIndividualPlot({ state, form }) {
+export default function MsIndividualPlot({ state, form, setForm }) {
   const [params, setParams] = useState('');
   const { data, error, isFetching } = useMsIndividualQuery(params, {
     skip: !params,
@@ -26,6 +27,8 @@ export default function MsIndividualPlot({ state, form }) {
 
   const { sample } = form;
   const { study, strategy, signatureSetName, cancer, useAllCancer, id } = state;
+
+  const mergeForm = (update) => setForm({ ...form, ...update });
 
   useEffect(() => {
     let params_activity, params_signature, params_spectrum;
@@ -71,17 +74,20 @@ export default function MsIndividualPlot({ state, form }) {
       });
     }
   }, [sample, id]);
-  console.log(data);
-  console.log(error);
+  // console.log(data);
+  // console.log(error);
   return (
     <div>
-      {/* <div className="p-3 text-center">
-        <h6>
-          <b>Mutational Signature in Individual Samples</b>
-        </h6>
-      </div> */}
       <LoadingOverlay active={isFetching} />
       {error && <p className="m-3 alert alert-warning">{error}</p>}
+      {!error && (
+        <>
+          <hr />
+          <MsIndividualForm state={state} form={form} mergeForm={mergeForm} />
+          <hr />
+        </>
+      )}
+
       {!error && data && (
         <div>
           <Plotly
