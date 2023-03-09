@@ -65,7 +65,6 @@ export default function SignatureMap({ state }) {
           striped
         />
       )}
-      {/* {multi && <Plotly data={multi.traces} layout={multi.traces} />} */}
       {plots &&
         plots.map((e, i) => (
           <div key={i} className="border rounded mb-3">

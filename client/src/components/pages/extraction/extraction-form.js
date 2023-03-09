@@ -886,7 +886,6 @@ export default function ExtractionForm() {
                     type="email"
                     disabled={submitted || id}
                     isInvalid={errors.email}
-                    defaultValue={''}
                   />
                 )}
               />
@@ -903,7 +902,6 @@ export default function ExtractionForm() {
               </Form.Label>
               <Form.Control
                 {...register('jobName', { required: true })}
-                defaultValue={''}
                 placeholder="Enter Job Name"
                 disabled={submitted || id}
               />
