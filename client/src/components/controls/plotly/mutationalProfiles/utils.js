@@ -43,7 +43,7 @@ export function createSampleAnnotation(apiData, text = '') {
     text:
       apiData[0].sample && parseFloat(totalMutations).toFixed(2) > 1
         ? `<b>${apiData[0].sample}: ${totalMutations.toLocaleString()} ${
-            text || 'Substitutions'
+            text || apiData[0].profile == 'ID' ? 'Indels' : 'Substitutions'
           }</b>`
         : apiData[0].sample && totalMutations <= 1.1
         ? `<b>${apiData[0].sample}</b>`
