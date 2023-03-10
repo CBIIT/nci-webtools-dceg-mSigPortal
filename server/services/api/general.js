@@ -1,7 +1,6 @@
 import path from 'path';
-import logger from '../logger.js';
 import formidable from 'formidable';
-import fs from 'fs-extra';
+import fs from 'fs';
 import { randomUUID } from 'crypto';
 import { validate } from 'uuid';
 import Papa from 'papaparse';
@@ -10,20 +9,20 @@ import rWrapper from 'r-wrapper';
 import AWS from 'aws-sdk';
 import XLSX from 'xlsx';
 import replace from 'replace-in-file';
-import express from 'express';
-import config from '../../config.json' assert { type: 'json' };
+import Router from 'express-promise-router';
 import { getObjectBuffer } from '../s3.js';
+import { mkdirs } from '../utils.js';
 const r = rWrapper.async;
 
-if (config.aws) AWS.config.update(config.aws);
+const env = process.env;
 
-// config info for R functions
-const rConfig = {
-  s3Data: config.data.s3,
-  bucket: config.data.bucket,
-  localData: path.resolve(config.data.localData),
-  wd: path.resolve(config.results.folder),
-};
+AWS.config.update({
+  region: env.AWS_DEFAULT_REGION || 'us-east-1',
+  credentials: {
+    accessKeyId: env.AWS_ACCESS_KEY_ID || null,
+    secretAccessKey: env.AWS_SECRET_ACCESS_KEY || null,
+  },
+});
 
 function parseCSV(filepath) {
   const file = fs.createReadStream(filepath);
@@ -34,8 +33,6 @@ function parseCSV(filepath) {
         resolve(results.data);
       },
       error(err, file) {
-        logger.info('Error parsing ' + filepath);
-        logger.error(err);
         reject(err);
       },
     });
@@ -74,10 +71,11 @@ async function importUserSession(connection, data, userSchema) {
 }
 
 function upload(req, res, next) {
+  const { logger } = req.app.locals;
   const id = req.params.id;
   if (!validate(id)) next(new Error('Invalid ID'));
   const form = formidable({
-    uploadDir: path.resolve(config.folders.input, id),
+    uploadDir: path.resolve(env.INPUT_FOLDER, id),
     multiples: true,
   });
 
@@ -106,12 +104,21 @@ function upload(req, res, next) {
 
 async function associationWrapper(req, res, next) {
   const { fn, args, id } = req.body;
-  logger.debug('/associationCalc: %o', { ...req.body });
   const sessionId = id || randomUUID();
+
+  // config info for R functions
+  const rConfig = {
+    prefix: env.DATA_BUCKET_PREFIX,
+    bucket: env.DATA_BUCKET,
+    wd: path.resolve(env.DATA_FOLDER),
+  };
+
   // create directory for results if needed
-  const savePath = sessionId ? path.join(sessionId, 'results', fn, '/') : null;
-  if (sessionId)
-    fs.mkdirSync(path.join(rConfig.wd, savePath), { recursive: true });
+  const savePath = sessionId
+    ? path.join('output', sessionId, 'results', fn, '/')
+    : null;
+  if (sessionId) await mkdirs(path.join(rConfig.wd, savePath));
+
   try {
     const wrapper = await r('services/R/associationWrapper.R', 'wrapper', {
       fn,
@@ -134,51 +141,51 @@ async function associationWrapper(req, res, next) {
   }
 }
 
-async function getExposureExample(req, res, next) {
-  try {
-    const { example } = req.params;
-    logger.info(`Fetching Exposure example: ${example}`);
-    // check exists
-    const examplePath = path.resolve(
-      config.data.examples,
-      'exposure',
-      `${example}.tgz`
-    );
-    if (fs.existsSync(examplePath)) {
-      // copy example to results with unique id
-      const id = randomUUID();
-      const resultsPath = path.resolve(config.results.folder, id);
-      await fs.promises.mkdir(resultsPath, { recursive: true });
-      // await fs.copy(examplePath, resultsPath);
-      await new Promise((resolve, reject) => {
-        fs.createReadStream(examplePath)
-          .on('end', () => resolve())
-          .on('error', (err) => reject(err))
-          .pipe(tar.x({ strip: 1, C: resultsPath }));
-      });
-      const paramsPath = path.join(resultsPath, `params.json`);
-      // rename file paths with new ID
-      let params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
-      const oldID = params.main.id;
-      await replace({
-        files: paramsPath,
-        from: new RegExp(oldID, 'g'),
-        to: id,
-      });
-      params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
-      res.json({
-        state: {
-          ...params,
-          main: { ...params.main, id },
-        },
-      });
-    } else {
-      throw `Invalid example`;
-    }
-  } catch (error) {
-    next(error);
-  }
-}
+// async function getExposureExample(req, res, next) {
+//   try {
+//     const { example } = req.params;
+//     logger.info(`Fetching Exposure example: ${example}`);
+//     // check exists
+//     const examplePath = path.resolve(
+//       config.data.examples,
+//       'exposure',
+//       `${example}.tgz`
+//     );
+//     if (fs.existsSync(examplePath)) {
+//       // copy example to results with unique id
+//       const id = randomUUID();
+//       const resultsPath = path.resolve(config.results.folder, id);
+//       await fs.promises.mkdir(resultsPath, { recursive: true });
+//       // await fs.copy(examplePath, resultsPath);
+//       await new Promise((resolve, reject) => {
+//         fs.createReadStream(examplePath)
+//           .on('end', () => resolve())
+//           .on('error', (err) => reject(err))
+//           .pipe(tar.x({ strip: 1, C: resultsPath }));
+//       });
+//       const paramsPath = path.join(resultsPath, `params.json`);
+//       // rename file paths with new ID
+//       let params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
+//       const oldID = params.main.id;
+//       await replace({
+//         files: paramsPath,
+//         from: new RegExp(oldID, 'g'),
+//         to: id,
+//       });
+//       params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
+//       res.json({
+//         state: {
+//           ...params,
+//           main: { ...params.main, id },
+//         },
+//       });
+//     } else {
+//       throw `Invalid example`;
+//     }
+//   } catch (error) {
+//     next(error);
+//   }
+// }
 
 async function getImageS3Batch(req, res, next) {
   // serve static images from s3
@@ -190,7 +197,7 @@ async function getImageS3Batch(req, res, next) {
         const key = decodeURIComponent(Key);
         return s3
           .getObject({
-            Bucket: config.data.bucket,
+            Bucket: env.DATA_BUCKET,
             Key: key,
           })
           .promise()
@@ -213,7 +220,7 @@ async function getImageS3(req, res, next) {
   const key = req.body.path;
   const s3 = new AWS.S3();
   s3.getObject({
-    Bucket: config.data.bucket,
+    Bucket: env.DATA_BUCKET,
     Key: key,
   })
     .createReadStream()
@@ -227,7 +234,7 @@ async function getFileS3(req, res, next) {
   const { path } = req.body;
   const s3 = new AWS.S3();
   s3.getObject({
-    Bucket: config.data.bucket,
+    Bucket: env.DATA_BUCKET,
     Key: `msigportal/Database/${path}`,
   })
     .createReadStream()
@@ -259,7 +266,7 @@ const getDataUsingS3Select = (params) => {
   });
 };
 
-const router = express.Router();
+const router = Router();
 router.post('/upload/:id?', upload);
 router.get('/getExposureExample/:example', getExposureExample);
 router.post('/getImageS3Batch', getImageS3Batch);

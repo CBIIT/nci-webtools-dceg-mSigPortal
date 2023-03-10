@@ -4,8 +4,7 @@ import AWS from 'aws-sdk';
 import nodemailer from 'nodemailer';
 import rWrapper from 'r-wrapper';
 import tar from 'tar';
-import config from './config.json' assert { type: 'json' };
-import logger from './services/logger.js';
+import { createLogger } from './services/logger.js';
 import { parseCSV } from './services/api/analysis.js';
 import {
   getRelativePath,
@@ -28,7 +27,9 @@ const r = rWrapper.async;
   for (let folder of [config.logs.folder, config.results.folder]) {
     fs.mkdirSync(folder, { recursive: true });
   }
-  receiveMessage();
+  const env = process.env;
+  var logger = createLogger(env.APP_NAME, env.LOG_LEVEL);
+  receiveMessage(env);
 })();
 /**
  * Reads a template, substituting {tokens} with data values
@@ -107,7 +108,7 @@ async function processMessage(params) {
     const directory = path.resolve(config.results.folder, id);
     await fs.promises.mkdir(directory, { recursive: true });
     const rConfig = {
-      s3Data: config.data.s3,
+      prefix: config.data.s3,
       bucket: config.data.bucket,
       localData: path.resolve(config.data.localData),
       wd: path.resolve(config.results.folder),
@@ -819,7 +820,7 @@ async function processMessage(params) {
  * Receives messages from the queue at regular intervals,
  * specified by config.pollInterval
  */
-async function receiveMessage() {
+async function receiveMessage(env, logger) {
   const sqs = new AWS.SQS();
   try {
     // to simplify running multiple workers in parallel,
