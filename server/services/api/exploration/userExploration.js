@@ -1,19 +1,20 @@
 import { Router } from 'express';
 import { validate } from 'uuid';
 import path from 'path';
-import config from '../../../config.json' assert { type: 'json' };
-import logger from '../../logger.js';
 import { parseCSV, importUserSession } from '../general.js';
 import { schema } from './userSchema.js';
 import { getSignatureData } from '../../query.js';
-import fs from 'fs';
+import { mkdirs } from '../../utils.js';
+
+const env = process.env;
 
 async function submit(req, res, next) {
+  const { logger } = req.app.locals;
   const id = req.params.id;
   if (!validate(id)) res.status(500).json('Invalid ID');
-  const inputFolder = path.resolve(config.folders.input, id);
-  const outputFolder = path.resolve(config.folders.output, id);
-  fs.mkdirSync(outputFolder, { recursive: true });
+  const inputFolder = path.resolve(env.INPUT_FOLDER, id);
+  const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
+  await mkdirs([inputFolder, outputFolder]);
   const { exposureFile, matrixFile, signatureFile, signatureSetName } =
     req.body;
   const exposurePath = path.resolve(inputFolder, exposureFile);
