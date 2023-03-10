@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
 import Table from '../../controls/table/table2';
 import { useMultiJobStatusQuery } from './apiSlice';
+import moment from 'moment';
 
 export default function Status() {
   const [jobs, setJobs] = useState([]);
@@ -51,6 +52,10 @@ export default function Status() {
     {
       accessor: 'submittedAt',
       Header: 'Submitted Time',
+      Cell: (e) => {
+        const time = moment(e.value);
+        return `${time.format('LLL')} (${time.fromNow()})`;
+      },
     },
     {
       Header: 'Remove',
