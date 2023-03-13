@@ -230,6 +230,8 @@ export function MsIndividualComparison(
     xaxis: 'x2',
     yaxis: 'y12',
   }));
+
+  console.log(sampleTraceOriginal);
   const sampleTraceDestructed = groupDestructed.map(
     (group, groupIndex, array) => ({
       name: group.mutations,
@@ -249,7 +251,7 @@ export function MsIndividualComparison(
       yaxis: 'y11',
     })
   );
-
+  console.log(sampleTraceDestructed);
   const differenceTrace = sampleTraceOriginal.map((trace, traceIndex) => ({
     ...trace,
     y: trace.y.map((e, i) => e - sampleTraceDestructed[traceIndex].y[i]),

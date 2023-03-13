@@ -49,20 +49,28 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
         let profile;
 
         if (_arg.params_activity.userId) {
-          if (res[0].data.length > 0) {
+          if (
+            res[0].data.length > 0 &&
+            res[1].data.length > 0 &&
+            res[2].data.length > 0
+          ) {
             if (res[0].data[0].signatureName === res[1].data[0].signatureName) {
               profile = res[0].data[0].signatureName;
             } else {
               profile = 'Data mismatch';
             }
           } else {
-            profile = 'No data';
+            profile = 'No data/ Data is missing';
           }
         } else {
-          if (res[0].data.length > 0) {
+          if (
+            res[0].data.length > 0 &&
+            res[1].data.length > 0 &&
+            res[2].data.length > 0
+          ) {
             profile = extractLastWord(_arg.params_activity.signatureSetName);
           } else {
-            profile = 'No data';
+            profile = 'No data / Data is missing';
           }
         }
 
@@ -75,15 +83,6 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
         } else {
           //return { data: msIndividual_rs32(res, _arg, 'msIndividual') };
           return { data: MsIndividual_Error(res, _arg, profile) };
-          // return {
-          //   data: _arg.params_activity.signatureSetName
-          //     ? 'Signature SetName: ' +
-          //       _arg.params_activity.signatureSetName +
-          //       ' is not supported in MS Individual'
-          //     : profile === 'Data mismatch'
-          //     ? 'Data mismatch, please try again with different files'
-          //     : 'No data found, please try again',
-          // };
         }
       },
     }),
