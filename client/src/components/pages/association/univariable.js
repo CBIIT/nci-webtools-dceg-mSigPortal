@@ -117,7 +117,7 @@ export default function Univariable() {
               args: {
                 study: study.value,
                 strategy: strategy.value,
-                rsSet,
+                rsSet: rsSet.value,
                 cancer: cancer.value,
                 source: associationVar.source,
                 type: associationVar.type,
