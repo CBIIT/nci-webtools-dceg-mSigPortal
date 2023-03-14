@@ -489,8 +489,8 @@ export default function ID415(data, title = '') {
     title: `<b>${title}</b>`,
     hoverlabel: { bgcolor: '#FFF' },
     height: 500,
-    //width: 1080,
-    autosize: true,
+    width: 1200,
+    autosize: false,
     legend: {
       x: 1,
       xanchor: 'right',
