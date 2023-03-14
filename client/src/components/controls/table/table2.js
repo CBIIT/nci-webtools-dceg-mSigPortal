@@ -1,4 +1,12 @@
-import { useMemo, forwardRef, useRef, useEffect, Fragment } from 'react';
+// table with column search
+import {
+  useMemo,
+  forwardRef,
+  useRef,
+  useEffect,
+  useState,
+  Fragment,
+} from 'react';
 import BootstrapTable from 'react-bootstrap/Table';
 import {
   Form,
@@ -11,13 +19,38 @@ import {
 } from 'react-bootstrap';
 import {
   useTable,
+  useGlobalFilter,
   useFilters,
   usePagination,
   useSortBy,
   useRowSelect,
   useExpanded,
+  useAsyncDebounce,
 } from 'react-table';
 import './table.scss';
+
+function GlobalFilter({ globalFilter, setGlobalFilter, title }) {
+  const [value, setValue] = useState(globalFilter);
+  const onChange = useAsyncDebounce((value) => {
+    setGlobalFilter(value || '');
+  }, 200);
+
+  return (
+    <Form.Group className="m-0">
+      <Form.Control
+        type="text"
+        size="sm"
+        placeholder="Search"
+        value={value || ''}
+        onChange={(e) => {
+          setValue(e.target.value);
+          onChange(e.target.value);
+        }}
+        aria-label={`${title.replace(/\s/g, '')}-search`}
+      />
+    </Form.Group>
+  );
+}
 
 export function TextFilter({
   column: { filterValue, setFilter, placeholder, aria },
@@ -99,6 +132,7 @@ function getCsv(data) {
 export default function Table({
   columns,
   data,
+  title = '',
   options = {},
   customOptions = {},
   renderRowSubComponent = false,
@@ -121,7 +155,8 @@ export default function Table({
     previousPage,
     setPageSize,
     allColumns,
-    state: { pageIndex, pageSize },
+    setGlobalFilter,
+    state: { pageIndex, pageSize, globalFilter },
   } = useTable(
     {
       columns: useMemo((_) => columns, [columns]),
@@ -129,6 +164,7 @@ export default function Table({
       defaultColumn: useMemo((_) => ({ Filter: TextFilter }), []),
       ...options,
     },
+    useGlobalFilter,
     useFilters,
     useSortBy,
     customOptions.expanded ? useExpanded : () => {},
@@ -160,7 +196,23 @@ export default function Table({
   };
   return (
     <>
-      <Row className="justify-content-end">
+      <Row className="">
+        {title && (
+          <Col md="auto" className="mr-auto">
+            <strong>{title}</strong>
+          </Col>
+        )}
+        {customOptions.globalSearch && (
+          <Col md="auto">
+            <div style={{ width: '280px' }}>
+              <GlobalFilter
+                globalFilter={globalFilter}
+                setGlobalFilter={setGlobalFilter}
+                title={title}
+              />
+            </div>
+          </Col>
+        )}
         {customOptions.download && (
           <Col sm="auto">
             <Button
@@ -205,12 +257,12 @@ export default function Table({
       </Row>
       <div className="table-responsive">
         <BootstrapTable
-          {...getTableProps()}
-          hover
+          className="mt-3"
           size="sm"
           responsive
-          className="mt-3"
+          hover
           {...props}
+          {...getTableProps()}
         >
           <thead>
             {headerGroups.map((headerGroup) => (
@@ -240,7 +292,7 @@ export default function Table({
               </tr>
             ))}
 
-            {!options.disableFilters &&
+            {!customOptions.disableColumnSearch &&
               headerGroups.map((headerGroup) => (
                 <tr
                   {...headerGroup.getHeaderGroupProps()}
@@ -309,7 +361,7 @@ export default function Table({
               value={pageSize}
               onChange={(e) => setPageSize(Number(e.target.value))}
             >
-              {[25, 50, 100].map((pageSize) => (
+              {[10, 25, 50, 100].map((pageSize) => (
                 <option key={pageSize} value={pageSize}>
                   Show {pageSize}
                 </option>
