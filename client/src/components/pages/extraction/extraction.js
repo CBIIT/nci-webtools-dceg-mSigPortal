@@ -20,7 +20,7 @@ import MsDecomposition from '../exploration/msDecomposition/msDecomposition';
 import MsAssociation from '../exploration/msAssociation/msAssociation';
 import MsLandscape from '../exploration/msLandscape/msLandscape';
 import MsPrevalence from '../exploration/msPrevalence/msPrevalence';
-// import MsIndividual from '../exploration/msIndividual/msIndividual';
+import MsIndividual from '../exploration/msIndividual/msIndividual';
 import { useRefreshQuery } from './apiSlice';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
@@ -331,7 +331,7 @@ export default function Extraction() {
               <div
                 className={displayTab === 'msIndividual' ? 'd-block' : 'd-none'}
               >
-                {/* <MsIndividual state={{ id: explorationId }} /> */}
+                <MsIndividual state={{ id: explorationId }} />
               </div>
             </>
           )}
