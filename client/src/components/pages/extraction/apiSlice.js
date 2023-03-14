@@ -52,17 +52,18 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
         method: 'POST',
         body,
       }),
-      transformResponse: (data) => {
-        return data.map((job) => {
-          const { status, params, manifest } = job;
-          if (status)
+      transformResponse: (data, meta, args) => {
+        return data
+          .filter((e) => e.status && e.params)
+          .map((job) => {
+            const { status, params, manifest } = job;
             return {
               jobName: params.jobName,
               status: status.status,
               id: status.id,
               submittedAt: status.submittedAt,
             };
-        });
+          });
       },
     }),
 

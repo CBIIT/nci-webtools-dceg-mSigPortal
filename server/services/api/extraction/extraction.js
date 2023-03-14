@@ -56,27 +56,31 @@ async function getJobStatus(id) {
   const inputFolder = path.resolve(config.folders.input, id);
   const outputFolder = path.resolve(config.folders.output, id);
 
-  await downloadDirectory(
-    inputFolder,
-    path.join(config.aws.inputKeyPrefix, id),
-    config.aws.bucket,
-    { region: config.aws.region }
-  );
-  await downloadDirectory(
-    outputFolder,
-    path.join(config.aws.outputKeyPrefix, id),
-    config.aws.bucket,
-    { region: config.aws.region }
-  );
+  try {
+    await downloadDirectory(
+      inputFolder,
+      path.join(config.aws.inputKeyPrefix, id),
+      config.aws.bucket,
+      { region: config.aws.region }
+    );
+    await downloadDirectory(
+      outputFolder,
+      path.join(config.aws.outputKeyPrefix, id),
+      config.aws.bucket,
+      { region: config.aws.region }
+    );
 
-  const paramsFilePath = path.resolve(inputFolder, 'params.json');
-  const statusFilePath = path.resolve(outputFolder, 'status.json');
-  const manifestFilePath = path.resolve(outputFolder, 'manifest.json');
-  const params = await readJson(paramsFilePath);
-  const status = await readJson(statusFilePath);
-  const manifest = await readJson(manifestFilePath);
+    const paramsFilePath = path.resolve(inputFolder, 'params.json');
+    const statusFilePath = path.resolve(outputFolder, 'status.json');
+    const manifestFilePath = path.resolve(outputFolder, 'manifest.json');
+    const params = await readJson(paramsFilePath);
+    const status = await readJson(statusFilePath);
+    const manifest = await readJson(manifestFilePath);
 
-  return { params, status, manifest };
+    return { params, status, manifest };
+  } catch (error) {
+    return error.message;
+  }
 }
 
 export async function refresh(req, res, next) {

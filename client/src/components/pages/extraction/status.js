@@ -97,7 +97,7 @@ export default function Status() {
       <Button variant="light" className="mb-3" onClick={() => refetch()}>
         <i className="bi bi-arrow-clockwise" /> Refresh
       </Button>
-      {data && jobs.length > 0 && (
+      {data && data.length > 0 && (
         <Table className="border" columns={columns} data={data} striped />
       )}
     </Container>
