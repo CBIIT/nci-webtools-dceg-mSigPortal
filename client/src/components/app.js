@@ -1,4 +1,3 @@
-import React, { useEffect } from 'react';
 import { RecoilRoot } from 'recoil';
 import { HashRouter, Switch, Route } from 'react-router-dom';
 import { NavbarCustom } from './controls/navbar/navbar';
@@ -17,8 +16,6 @@ import { Header } from './controls/header/header';
 import { Footer } from './controls/footer/footer';
 import { ErrorModal } from './controls/error-modal/error-modal';
 import { SuccessModal } from './controls/success-modal/success-modal';
-import { useSelector, useDispatch } from 'react-redux';
-import { actions } from '../services/store/publications';
 
 export default function App() {
   const links = [
@@ -153,91 +150,6 @@ export default function App() {
     },
   ];
 
-  // load data for publications tab
-  const dispatch = useDispatch();
-  const publicationsState = useSelector((state) => state.publications);
-  const mergePublications = (state) => dispatch(actions.mergeState(state));
-
-  useEffect(() => {
-    const getData = async () => {
-      const data = await (await fetch(`web/getPublications`)).json();
-
-      const reducer = (acc, column) => [
-        ...acc,
-        {
-          Header: column,
-          accessor: column,
-          id: column,
-          Cell: (e) => {
-            if (
-              column == 'Title' &&
-              e.row.values['DOI'] &&
-              e.row.values['DOI'] != 'NA'
-            ) {
-              return (
-                <a href={e.row.values['DOI']} target="_blank" rel="noreferrer">
-                  {e.value}
-                </a>
-              );
-            } else if (
-              column == 'Name' &&
-              e.row.values['Github'] &&
-              e.row.values['Github'] != 'NA'
-            ) {
-              return (
-                <a
-                  href={e.row.values['Github']}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {e.value}
-                </a>
-              );
-            } else {
-              return e.value || '';
-            }
-          },
-        },
-      ];
-
-      mergePublications({
-        orA: {
-          columns: [
-            ...new Set(
-              ...data['Original Research A'].map((row) => Object.keys(row))
-            ),
-          ].reduce(reducer, []),
-          data: data['Original Research A'],
-        },
-        orB: {
-          columns: [
-            ...new Set(
-              ...data['Original Research B'].map((row) => Object.keys(row))
-            ),
-          ].reduce(reducer, []),
-          data: data['Original Research B'],
-        },
-        rp: {
-          columns: [
-            ...new Set(...data['Review Paper'].map((row) => Object.keys(row))),
-          ].reduce(reducer, []),
-          data: data['Review Paper'],
-        },
-        cm: {
-          columns: [
-            ...new Set(
-              ...data['Computational Methods'].map((row) => Object.keys(row))
-            ),
-          ].reduce(reducer, []),
-          data: data['Computational Methods'],
-        },
-      });
-    };
-
-    // get data on inital page load
-    if (!publicationsState.orA.data) getData();
-  }, [publicationsState]);
-
   return (
     <>
       <HashRouter>
@@ -254,7 +166,10 @@ export default function App() {
               children={<Visualization />}
             />
             <Route path="/catalog" children={<Catalog />} />
-            <Route path="/exploration/:exampleName?" children={<Exploration />} />
+            <Route
+              path="/exploration/:exampleName?"
+              children={<Exploration />}
+            />
             <Route path="/refitting" children={<Refitting />} />
             <Route path="/association" children={<Association />} />
             <Route path="/extraction/:id?" children={<Extraction />} />

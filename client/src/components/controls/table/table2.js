@@ -257,7 +257,6 @@ export default function Table({
       </Row>
       <div className="table-responsive">
         <BootstrapTable
-          className="mt-3"
           size="sm"
           responsive
           hover
@@ -344,7 +343,7 @@ export default function Table({
         </BootstrapTable>
       </div>
 
-      <div className="d-flex flex-wrap align-items-center justify-content-between p-3">
+      <div className="d-flex flex-wrap align-items-center justify-content-between">
         <div>
           Showing rows {(1 + pageIndex * pageSize).toLocaleString()}-
           {Math.min(rows.length, (pageIndex + 1) * pageSize).toLocaleString()}{' '}

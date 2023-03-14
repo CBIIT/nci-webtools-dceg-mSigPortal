@@ -3,7 +3,6 @@ import { reducer as visualizationReducer } from './visualization';
 import { reducer as explorationReducer } from './exploration';
 import { reducer as associationReducer } from './association';
 import { reducer as extractionReducer } from './extraction';
-import { reducer as publicationsReducer } from './publications';
 import { reducer as modalReducer } from './modal';
 
 import { configureStore } from '@reduxjs/toolkit';
@@ -25,7 +24,6 @@ export const store = configureStore({
     exploration: explorationReducer,
     association: associationReducer,
     extraction: extractionReducer,
-    publications: publicationsReducer,
     modal: modalReducer,
 
     [optionsApiSlice.reducerPath]: optionsApiSlice.reducer,

@@ -1,41 +1,15 @@
-import React, { useMemo } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import Table from '../../../components/controls/table/table';
-import { actions } from '../../../services/store/publications';
+import Table from '../../../components/controls/table/table2';
+import { usePublicationsQuery } from './apiSlice';
 import './publications.scss';
 
 export default function Publications() {
-  // data is retrieved in components/app.js
-  const dispatch = useDispatch();
-  const { orA, orB, rp, cm } = useSelector((state) => state.publications);
-  const {
-    globalFilter: oraSearch,
-    hidden: oraHidden,
-    pagination: oraPagination,
-    ...oraTable
-  } = orA;
-  const {
-    globalFilter: orbSearch,
-    hidden: orbHidden,
-    pagination: orbPagination,
-    ...orbTable
-  } = orB;
-  const {
-    globalFilter: rpSearch,
-    hidden: rpHidden,
-    pagination: rpPagination,
-    ...rpTable
-  } = rp;
-  const {
-    globalFilter: cmSearch,
-    hidden: cmHidden,
-    pagination: cmPagination,
-    ...cmTable
-  } = cm;
-  const oraMemo = useMemo(() => oraTable, [oraTable]) || {};
-  const orbMemo = useMemo(() => orbTable, [orbTable]) || {};
-  const rpMemo = useMemo(() => rpTable, [rpTable]) || {};
-  const cmMemo = useMemo(() => cmTable, [cmTable]) || {};
+  const { data, error } = usePublicationsQuery();
+
+  const customOptions = {
+    disableColumnSearch: true,
+    globalSearch: true,
+    hideColumns: true,
+  };
 
   return (
     <div className="mx-3">
@@ -46,64 +20,93 @@ export default function Publications() {
             websites and databases related to mutational signature analyses.
           </p>
         </div>
-
-        {oraMemo.data && (
+        {error && 'An error occurred while retrieving publications.'}
+        {data && data['Original Research A'] && (
           <div className="mb-5">
             <Table
               title="Original Research Papers Including Specific Mutational Signatures in mSigPortal"
-              columns={oraMemo.columns}
-              data={oraMemo.data}
-              hidden={oraHidden}
-              globalFilter={oraSearch}
-              pagination={oraPagination}
-              mergeState={(state) =>
-                dispatch(actions.mergeState({ orA: state }))
-              }
+              columns={data['Original Research A'].columns}
+              data={data['Original Research A'].data}
+              striped
+              bordered
+              options={{
+                initialState: {
+                  hiddenColumns: [
+                    'diseaseOrPhenotypeOrExposure',
+                    'firstAuthor',
+                    'lastAuthor',
+                    'bioRxivOrPubmedId',
+                    'note',
+                    'doi',
+                  ],
+                },
+              }}
+              customOptions={customOptions}
             />
           </div>
         )}
-        {orbMemo.data && (
+        {data && data['Original Research B'] && (
           <div className="mb-5">
             <Table
               title="Original Research Papers Involved in Mutational Signature Analyses"
-              columns={orbMemo.columns}
-              data={orbMemo.data}
-              hidden={orbHidden}
-              globalFilter={orbSearch}
-              pagination={orbPagination}
-              mergeState={(state) =>
-                dispatch(actions.mergeState({ orB: state }))
-              }
+              columns={data['Original Research B'].columns}
+              data={data['Original Research B'].data}
+              striped
+              bordered
+              options={{
+                initialState: {
+                  hiddenColumns: [
+                    'diseaseOrPhenotypeOrExposure',
+                    'firstAuthor',
+                    'lastAuthor',
+                    'bioRxivOrPubmedId',
+                    'doi',
+                  ],
+                },
+              }}
+              customOptions={customOptions}
             />
           </div>
         )}
-        {rpMemo.data && (
+        {data && data['Review Paper'] && (
           <div className="mb-5">
             <Table
               title="Review Papers Focused on Mutational Signatures"
-              columns={rpMemo.columns}
-              data={rpMemo.data}
-              hidden={rpHidden}
-              globalFilter={rpSearch}
-              pagination={rpPagination}
-              mergeState={(state) =>
-                dispatch(actions.mergeState({ rp: state }))
-              }
+              columns={data['Review Paper'].columns}
+              data={data['Review Paper'].data}
+              striped
+              bordered
+              options={{
+                initialState: {
+                  hiddenColumns: ['bioRxivOrPubmedId', 'doi'],
+                },
+              }}
+              customOptions={customOptions}
             />
           </div>
         )}
-        {cmMemo.data && (
+        {data && data['Computational Methods'] && (
           <div className="mb-5">
             <Table
               title="Computational Methods, Tools, Databases or Websites for Mutational Signature Analyses"
-              columns={cmMemo.columns}
-              data={cmMemo.data}
-              hidden={cmHidden}
-              globalFilter={cmSearch}
-              pagination={cmPagination}
-              mergeState={(state) =>
-                dispatch(actions.mergeState({ cm: state }))
-              }
+              columns={data['Computational Methods'].columns}
+              data={data['Computational Methods'].data}
+              striped
+              bordered
+              options={{
+                initialState: {
+                  hiddenColumns: [
+                    'programmingLanguage',
+                    'firstAuthor',
+                    'lastAuthor',
+                    'bioRxivOrPubmedId',
+                    'doi',
+                    'sourceUrl',
+                    'note',
+                  ],
+                },
+              }}
+              customOptions={customOptions}
             />
           </div>
         )}

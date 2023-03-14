@@ -180,24 +180,6 @@ async function getExposureExample(req, res, next) {
   }
 }
 
-// Publications page data
-async function getPublications(req, res, next) {
-  const publications = await getObjectBuffer(
-    path.join(config.data.s3, 'Others', 'Publications.xlsx'),
-    config.data.bucket
-  );
-  const workbook = XLSX.read(publications);
-  const sheetNames = workbook.SheetNames;
-  const data = sheetNames.reduce(
-    (acc, sheet) => ({
-      ...acc,
-      [sheet]: XLSX.utils.sheet_to_json(workbook.Sheets[sheet]),
-    }),
-    {}
-  );
-  res.json(data);
-}
-
 async function getImageS3Batch(req, res, next) {
   // serve static images from s3
   const { keys } = req.body;
@@ -280,7 +262,6 @@ const getDataUsingS3Select = (params) => {
 const router = express.Router();
 router.post('/upload/:id?', upload);
 router.get('/getExposureExample/:example', getExposureExample);
-router.get('/getPublications', getPublications);
 router.post('/getImageS3Batch', getImageS3Batch);
 router.post('/getImageS3', getImageS3);
 router.post('/getFileS3', getFileS3);
@@ -292,7 +273,6 @@ export {
   importUserSession,
   upload,
   getExposureExample,
-  getPublications,
   getImageS3Batch,
   getImageS3,
   getFileS3,
