@@ -126,12 +126,21 @@ loadCollapse <- function(args, config) {
   }
   tmpdata <- vardata_refdata_selected
   colnames(tmpdata)[2] <- 'Variable'
-  tmpvalue <- tmpdata %>% count(Variable) %>% filter(n < 2) %>% dim() %>% .[[1]]
+  # tmpvalue <- tmpdata %>% count(Variable) %>% filter(n < 2) %>% dim() %>% .[[1]]
 
-  if (tmpvalue != 0) {
-    error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " does not have enough obsevations for both levels.")
-    return(list(error = error))
-  }
+  # if (tmpvalue != 0) {
+  #   error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " does not have enough obsevations for both levels.")
+  #   return(list(error = error))
+  # }
+
+  ## revise for category only...
+    
+    if(is.character(tmpdata$Variable)){
+      tmpvalue <- tmpdata %>% count(Variable) %>% filter(n>2) %>% dim() %>% .[[1]]
+      if(tmpvalue == 0){
+        stop(paste0("mSigPortal Association failed: the selected variable name ",Association_varinput_name," have not enough obsevations for both levels."))
+      }
+    }
 
   ### combined dataset
   data_input <- left_join(vardata_refdata_selected, exposure_refdata_selected) %>% select(-Sample)
@@ -145,6 +154,10 @@ loadCollapse <- function(args, config) {
 }
 
 univariable <- function(args, config) {
+  print("_____________ARGS___________")
+  print(args)
+  print("CONFIG_______________________")
+  print(config)
   source('services/R/Sigvisualfunc.R')
   setwd(config$wd)
   plotPath = paste0(config$savePath, 'association_result.svg')
@@ -196,12 +209,21 @@ univariable <- function(args, config) {
   }
   tmpdata <- vardata_refdata_selected
   colnames(tmpdata)[2] <- 'Variable'
-  tmpvalue <- tmpdata %>% count(Variable) %>% filter(n < 2) %>% dim() %>% .[[1]]
+  # tmpvalue <- tmpdata %>% count(Variable) %>% filter(n < 2) %>% dim() %>% .[[1]]
 
-  if (tmpvalue != 0) {
-    error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " have not enough obsevations for both levels.")
-    return(list(error = error))
-  }
+  # if (tmpvalue != 0) {
+  #   error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " have not enough obsevations for both levels.")
+  #   return(list(error = error))
+  # }
+
+  ## revise for category only...
+    
+    if(is.character(tmpdata$Variable)){
+      tmpvalue <- tmpdata %>% count(Variable) %>% filter(n>2) %>% dim() %>% .[[1]]
+      if(tmpvalue == 0){
+        stop(paste0("mSigPortal Association failed: the selected variable name ",Association_varinput_name," have not enough obsevations for both levels."))
+      }
+    }
 
   ### combined dataset
   data_input <- left_join(vardata_refdata_selected, exposure_refdata_selected) %>% select(-Sample)

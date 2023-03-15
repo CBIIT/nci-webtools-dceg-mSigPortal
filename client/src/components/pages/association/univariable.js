@@ -62,6 +62,7 @@ export default function Univariable() {
 
   const [invalidAssocFilter, setInvalidAssocFilter] = useState(false);
   const [invalidExpFilter, setInvalidExpFilter] = useState(false);
+  let newId;
 
   // populate controls
   useEffect(() => {
@@ -96,7 +97,6 @@ export default function Univariable() {
     return ref.current;
   }
   console.log(associationVar);
-
   async function handleLoadData() {
     if (associationVar.filter && isNaN(associationVar.filter)) {
       setInvalidAssocFilter(true);
@@ -105,7 +105,11 @@ export default function Univariable() {
 
       mergeState({ loadingParams: true, error: false });
       try {
-        const { stdout, output: collapseData } = await (
+        const {
+          sessionId,
+          stdout,
+          output: collapseData,
+        } = await (
           await fetch(`web/associationWrapper`, {
             method: 'POST',
             headers: {
@@ -128,6 +132,8 @@ export default function Univariable() {
           })
         ).json();
         console.log(collapseData);
+        newId = sessionId;
+        console.log(sessionId);
         const { collapseVar1, collapseVar2, error, uncaughtError } =
           collapseData;
 
@@ -143,6 +149,7 @@ export default function Univariable() {
             associationVar: {
               name: associationVar.tmpName,
               collapseOptions: Array.isArray(collapseVar1) ? collapseVar1 : [],
+              id: sessionId,
             },
             // exposureVar: {
             //   name: expVarList[0],
@@ -156,7 +163,8 @@ export default function Univariable() {
       mergeState({ loadingParams: false });
     }
   }
-
+  console.log(newId);
+  console.log(id);
   function handleReset() {
     setInvalidAssocFilter(false);
     setInvalidExpFilter(false);
@@ -182,6 +190,7 @@ export default function Univariable() {
   }
 
   async function handleCalculate() {
+    console.log('Calculate');
     if (exposureVar.filter && isNaN(exposureVar.filter)) {
       setInvalidExpFilter(true);
     } else {
@@ -234,6 +243,8 @@ export default function Univariable() {
           })
         ).json();
 
+        console.log(id);
+        console.log(output);
         const {
           plotPath,
           dataPath,
