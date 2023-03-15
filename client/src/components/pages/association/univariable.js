@@ -204,7 +204,8 @@ export default function Univariable() {
         dataPath: '',
       });
       try {
-        const { id, stdout, output } = await (
+        console.log('TRYYYYY');
+        const { sessionId, stdout, output } = await (
           await fetch(`web/associationWrapper`, {
             method: 'POST',
             headers: {
@@ -213,7 +214,7 @@ export default function Univariable() {
             },
             body: JSON.stringify({
               fn: 'univariable',
-              id,
+              id: sessionId,
               args: {
                 study,
                 strategy,
@@ -243,7 +244,7 @@ export default function Univariable() {
           })
         ).json();
 
-        console.log(id);
+        console.log(sessionId);
         console.log(output);
         const {
           plotPath,

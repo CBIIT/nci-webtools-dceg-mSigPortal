@@ -236,9 +236,12 @@ univariable <- function(args, config) {
     log1 = args$associationVar$log2, log2 = args$exposureVar$log2
     )
 
+print("=========== assocTable =============")
+print(assocTable)
   assocTable %>% write_delim(file = assocTablePath, delim = '\t', col_names = T, na = '')
   ## put result as a short table above the figure
-
+print("=========== ------ assocTable =============")
+print(assocTable)
   signature_name_list <- unique(assocTable[[1]]) ## dropdown list for the signature name
   signature_name_input <- if_else(args$signature != '', args$signature, signature_name_list[1]) ## by default, select the first signature name
 
