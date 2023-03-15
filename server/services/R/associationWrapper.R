@@ -227,7 +227,8 @@ univariable <- function(args, config) {
 
   ### combined dataset
   data_input <- left_join(vardata_refdata_selected, exposure_refdata_selected) %>% select(-Sample)
-
+print("-+++++++++ data_input ++++++++++++--")
+print(data_input)
   ## association test by group of signature name
   assocTable <- mSigPortal_associaiton_group(data = data_input, Group_Var = "Signature_name",
     Var1 = args$associationVar$name, Var2 = args$exposureVar$name, type = args$associationVar$type,
@@ -254,8 +255,10 @@ print(assocTable)
     log1 = args$associationVar$log2, log2 = args$exposureVar$log2,
     output_plot = plotPath)
 
+
   ## asssociation_data.txt will output as download text file.
   data_input %>% write_delim(file = dataPath, delim = '\t', col_names = T, na = '')
+
 
   return(list(plotPath = plotPath, dataPath = dataPath, assocTablePath = assocTablePath, dataTable = assocTable, signatureOptions = signature_name_list))
 }

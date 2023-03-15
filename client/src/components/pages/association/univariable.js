@@ -205,6 +205,7 @@ export default function Univariable() {
       });
       try {
         console.log('TRYYYYY');
+        console.log(signature);
         const { sessionId, stdout, output } = await (
           await fetch(`web/associationWrapper`, {
             method: 'POST',
@@ -214,14 +215,14 @@ export default function Univariable() {
             },
             body: JSON.stringify({
               fn: 'univariable',
-              id: sessionId,
+              id,
               args: {
-                study,
-                strategy,
-                rsSet,
-                cancer,
-                testType,
-                signature,
+                study: study.value,
+                strategy: strategy.value,
+                rsSet: rsSet.value,
+                cancer: cancer.value,
+                testType: testType,
+                signature: signature,
                 xlab: xlab || associationVar.name,
                 ylab: ylab || exposureVar.name,
                 associationVar: (() => {
@@ -244,7 +245,6 @@ export default function Univariable() {
           })
         ).json();
 
-        console.log(sessionId);
         console.log(output);
         const {
           plotPath,
