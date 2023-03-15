@@ -126,12 +126,21 @@ loadCollapse <- function(args, config) {
   }
   tmpdata <- vardata_refdata_selected
   colnames(tmpdata)[2] <- 'Variable'
-  tmpvalue <- tmpdata %>% count(Variable) %>% filter(n < 2) %>% dim() %>% .[[1]]
+  # tmpvalue <- tmpdata %>% count(Variable) %>% filter(n < 2) %>% dim() %>% .[[1]]
 
-  if (tmpvalue != 0) {
-    error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " does not have enough obsevations for both levels.")
-    return(list(error = error))
-  }
+  # if (tmpvalue != 0) {
+  #   error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " does not have enough obsevations for both levels.")
+  #   return(list(error = error))
+  # }
+
+  ## revise for category only...
+    
+    if(is.character(tmpdata$Variable)){
+      tmpvalue <- tmpdata %>% count(Variable) %>% filter(n>2) %>% dim() %>% .[[1]]
+      if(tmpvalue == 0){
+        stop(paste0("mSigPortal Association failed: the selected variable name ",Association_varinput_name," have not enough obsevations for both levels."))
+      }
+    }
 
   ### combined dataset
   data_input <- left_join(vardata_refdata_selected, exposure_refdata_selected) %>% select(-Sample)
@@ -145,6 +154,10 @@ loadCollapse <- function(args, config) {
 }
 
 univariable <- function(args, config) {
+  print("_____________ARGS___________")
+  print(args)
+  print("CONFIG_______________________")
+  print(config)
   source('services/R/Sigvisualfunc.R')
   setwd(config$wd)
   plotPath = paste0(config$savePath, 'association_result.svg')
@@ -196,16 +209,26 @@ univariable <- function(args, config) {
   }
   tmpdata <- vardata_refdata_selected
   colnames(tmpdata)[2] <- 'Variable'
-  tmpvalue <- tmpdata %>% count(Variable) %>% filter(n < 2) %>% dim() %>% .[[1]]
+  # tmpvalue <- tmpdata %>% count(Variable) %>% filter(n < 2) %>% dim() %>% .[[1]]
 
-  if (tmpvalue != 0) {
-    error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " have not enough obsevations for both levels.")
-    return(list(error = error))
-  }
+  # if (tmpvalue != 0) {
+  #   error = paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " have not enough obsevations for both levels.")
+  #   return(list(error = error))
+  # }
+
+  ## revise for category only...
+    
+    if(is.character(tmpdata$Variable)){
+      tmpvalue <- tmpdata %>% count(Variable) %>% filter(n>2) %>% dim() %>% .[[1]]
+      if(tmpvalue == 0){
+        stop(paste0("mSigPortal Association failed: the selected variable name ",Association_varinput_name," have not enough obsevations for both levels."))
+      }
+    }
 
   ### combined dataset
   data_input <- left_join(vardata_refdata_selected, exposure_refdata_selected) %>% select(-Sample)
-
+print("-+++++++++ data_input ++++++++++++--")
+print(data_input)
   ## association test by group of signature name
   assocTable <- mSigPortal_associaiton_group(data = data_input, Group_Var = "Signature_name",
     Var1 = args$associationVar$name, Var2 = args$exposureVar$name, type = args$associationVar$type,
@@ -214,9 +237,12 @@ univariable <- function(args, config) {
     log1 = args$associationVar$log2, log2 = args$exposureVar$log2
     )
 
+print("=========== assocTable =============")
+print(assocTable)
   assocTable %>% write_delim(file = assocTablePath, delim = '\t', col_names = T, na = '')
   ## put result as a short table above the figure
-
+print("=========== ------ assocTable =============")
+print(assocTable)
   signature_name_list <- unique(assocTable[[1]]) ## dropdown list for the signature name
   signature_name_input <- if_else(args$signature != '', args$signature, signature_name_list[1]) ## by default, select the first signature name
 
@@ -229,8 +255,10 @@ univariable <- function(args, config) {
     log1 = args$associationVar$log2, log2 = args$exposureVar$log2,
     output_plot = plotPath)
 
+
   ## asssociation_data.txt will output as download text file.
   data_input %>% write_delim(file = dataPath, delim = '\t', col_names = T, na = '')
+
 
   return(list(plotPath = plotPath, dataPath = dataPath, assocTablePath = assocTablePath, dataTable = assocTable, signatureOptions = signature_name_list))
 }

@@ -130,7 +130,11 @@ export default function Multivariable() {
     if (!dupeIndexes.length && !invalidFilters.length) {
       mergeState({ loadingParams: true, error: false });
       try {
-        const { stdout, output: collapseData } = await (
+        const {
+          sessionId,
+          stdout,
+          output: collapseData,
+        } = await (
           await fetch(`web/associationWrapper`, {
             method: 'POST',
             headers: {
@@ -170,6 +174,7 @@ export default function Multivariable() {
             collapseOptions: Array.isArray(collapseData[i + 1])
               ? collapseData[i + 1]
               : [],
+            id: sessionId,
           })),
           // exposureVar: { name: expVarList[0] },
         });
@@ -222,11 +227,7 @@ export default function Multivariable() {
         dataPath: '',
       });
       try {
-        const {
-          id,
-          stdout,
-          output,
-        } = await (
+        const { sessionId, stdout, output } = await (
           await fetch(`web/associationWrapper`, {
             method: 'POST',
             headers: {
@@ -237,12 +238,12 @@ export default function Multivariable() {
               fn: 'multivariable',
               id,
               args: {
-                study,
-                strategy,
-                rsSet,
-                cancer,
-                testType,
-                signature,
+                study: study.value,
+                strategy: strategy.value,
+                rsSet: rsSet.value,
+                cancer: cancer.value,
+                testType: testType,
+                signature: signature,
                 xlab: xlab || associationVars.name,
                 ylab: ylab || exposureVar.name,
                 associationVars: associationVars.map(
