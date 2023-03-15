@@ -98,7 +98,7 @@ export default function Status() {
         <i className="bi bi-arrow-clockwise" /> Refresh
       </Button>
       {data && data.length > 0 && (
-        <Table className="border" columns={columns} data={data} striped />
+        <Table columns={columns} data={data} striped bordered />
       )}
     </Container>
   );

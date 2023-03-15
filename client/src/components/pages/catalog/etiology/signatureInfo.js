@@ -508,7 +508,6 @@ export default function SignatureInfo({ data }) {
                   </Row>
                   {organTable?.data ? (
                     <Table
-                      className="border"
                       data={organTable.data.filter((e) =>
                         cohort ? e.cohort == cohort : true
                       )}
@@ -523,6 +522,7 @@ export default function SignatureInfo({ data }) {
                         download: 'etiology_data',
                       }}
                       striped
+                      bordered
                     />
                   ) : (
                     <div className="text-center my-4">No data available</div>

@@ -61,8 +61,8 @@ export default function SignatureMap({ state }) {
           columns={table.columns}
           options={options}
           customOptions={{ rowSelectRadio: true }}
-          className="border"
           striped
+          bordered
         />
       )}
       {plots &&

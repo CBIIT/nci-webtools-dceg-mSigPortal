@@ -133,7 +133,6 @@ export default function ClusteredPlot() {
           </p>
           <div className="m-3">
             <Table
-              className="border"
               data={data.table}
               columns={columns}
               customOptions={{
@@ -146,6 +145,7 @@ export default function ClusteredPlot() {
                 },
               }}
               striped
+              bordered
             />
           </div>
         </>
