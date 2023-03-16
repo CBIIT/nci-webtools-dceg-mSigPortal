@@ -229,8 +229,14 @@ univariable <- function(args, config) {
   data_input <- left_join(vardata_refdata_selected, exposure_refdata_selected) %>% select(-Sample)
 
   ## association test by group of signature name
-  assocTable <- mSigPortal_associaiton_group(data = data_input, Group_Var = "Signature_name",
-    Var1 = args$associationVar$name, Var2 = args$exposureVar$name, type = args$associationVar$type,
+  # assocTable <- mSigPortal_associaiton_group(data = data_input, Group_Var = "Signature_name",
+  #   Var1 = args$associationVar$name, Var2 = args$exposureVar$name, type = args$associationVar$type,
+  #   filter1 = args$associationVar$filter, filter2 = args$exposureVar$filter,
+  #   collapse_var1 = args$associationVar$collapse, collapse_var2 = NULL,
+  #   log1 = args$associationVar$log2, log2 = args$exposureVar$log2
+  #   )
+assocTable <- mSigPortal_associaiton_group(data = data_input, Group_Var = "Signature_name",
+    Var1 = args$associationVar$name, Var2 = args$exposureVar$name, type = args$testType,
     filter1 = args$associationVar$filter, filter2 = args$exposureVar$filter,
     collapse_var1 = args$associationVar$collapse, collapse_var2 = NULL,
     log1 = args$associationVar$log2, log2 = args$exposureVar$log2
@@ -246,8 +252,14 @@ print(assocTable)
 
   data_input <- data_input %>% filter(Signature_name == signature_name_input) %>% select(-Signature_name)
 
+  # mSigPortal_associaiton(data = data_input, Var1 = args$associationVar$name, Var2 = args$exposureVar$name, type = args$associationVar$type,
+  #   xlab = args$xlab, ylab = args$ylab,
+  #   filter1 = args$associationVar$filter, filter2 = args$exposureVar$filter,
+  #   collapse_var1 = args$associationVar$collapse, collapse_var2 = NULL,
+  #   log1 = args$associationVar$log2, log2 = args$exposureVar$log2,
+  #   output_plot = plotPath)
 
-  mSigPortal_associaiton(data = data_input, Var1 = args$associationVar$name, Var2 = args$exposureVar$name, type = args$associationVar$type,
+   mSigPortal_associaiton(data = data_input, Var1 = args$associationVar$name, Var2 = args$exposureVar$name, type = args$testType,
     xlab = args$xlab, ylab = args$ylab,
     filter1 = args$associationVar$filter, filter2 = args$exposureVar$filter,
     collapse_var1 = args$associationVar$collapse, collapse_var2 = NULL,
