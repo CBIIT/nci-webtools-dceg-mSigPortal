@@ -247,7 +247,6 @@ print(assocTable)
   data_input <- data_input %>% filter(Signature_name == signature_name_input) %>% select(-Signature_name)
 
 
-
   mSigPortal_associaiton(data = data_input, Var1 = args$associationVar$name, Var2 = args$exposureVar$name, type = args$associationVar$type,
     xlab = args$xlab, ylab = args$ylab,
     filter1 = args$associationVar$filter, filter2 = args$exposureVar$filter,
@@ -255,15 +254,7 @@ print(assocTable)
     log1 = args$associationVar$log2, log2 = args$exposureVar$log2,
     output_plot = plotPath)
 
-  # mSigPortal_associaiton(data = data_input, Var1 = args$associationVar$name, Var2 = args$exposureVar$name,
-  #   xlab = args$xlab, ylab = args$ylab,
-  #   filter1 = args$associationVar$filter, filter2 = args$exposureVar$filter,
-  #   collapse_var1 = args$associationVar$collapse, collapse_var2 = NULL,
-  #   log1 = args$associationVar$log2, log2 = args$exposureVar$log2,
-  #   type = args$testType,
-  #   output_plot = plotPath)
-
-  ## asssociation_data.txt will output as download text file.
+   ## asssociation_data.txt will output as download text file.
   data_input %>% write_delim(file = dataPath, delim = '\t', col_names = T, na = '')
 
 

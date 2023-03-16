@@ -260,6 +260,7 @@ export default function Univariable() {
           mergeState({
             error:
               error ||
+              uncaughtError ||
               'An error has occured. Please review your input and try again. If the issue persists, please contact us: NCImSigPortalWebAdmin@mail.nih.gov',
           });
         } else {
