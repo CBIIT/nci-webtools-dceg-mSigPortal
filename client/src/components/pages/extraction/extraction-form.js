@@ -215,6 +215,7 @@ export default function ExtractionForm() {
 
     email: '',
     jobName: '',
+    gpu: false,
   };
 
   const sbsSample = {
@@ -345,6 +346,7 @@ export default function ExtractionForm() {
       min_nmf_iterations: data.min_nmf_iterations,
       max_nmf_iterations: data.max_nmf_iterations,
       nmf_test_conv: data.nmf_test_conv,
+      gpu: data.gpu ? 'True' : 'False',
     };
     const signatureQuery = {
       signatureSetName: data.signatureSetName.value,
@@ -601,17 +603,33 @@ export default function ExtractionForm() {
           </Button>
 
           <div className={showAdvanced ? 'd-block' : 'd-none'}>
-            {/* <fieldset className="border rounded p-2 mb-3">
-          <legend className="font-weight-bold">Execution</legend>
-          <Form.Group controlId="batch_size">
-            <Form.Label>Batch Size</Form.Label>
-            <Form.Control
-              {...register('batch_size')}
-              type="number"
-              defaultValue={1}
-            />
-          </Form.Group>
-        </fieldset> */}
+            <fieldset className="border rounded p-2 mb-3">
+              <legend className="font-weight-bold">Execution</legend>
+              <Form.Group>
+                <Controller
+                  name="gpu"
+                  control={control}
+                  render={({ field }) => (
+                    <Form.Check
+                      {...field}
+                      id="gpu"
+                      type="checkbox"
+                      label={'GPU'}
+                      checked={field.checked}
+                      disabled={submitted || id}
+                    />
+                  )}
+                />
+              </Form.Group>
+              {/* <Form.Group controlId="batch_size">
+                <Form.Label>Batch Size</Form.Label>
+                <Form.Control
+                  {...register('batch_size')}
+                  type="number"
+                  defaultValue={1}
+                />
+              </Form.Group> */}
+            </fieldset>
             <fieldset className="border rounded p-2 mb-3">
               <legend className="font-weight-bold">NMF Replicates</legend>
               <Form.Group controlId="minSignatures">
