@@ -862,6 +862,18 @@
       ],
       "Hash": "a60f752f43d02ebcacd6fdfa02e1d97b"
     },
+    "SKIT": {
+      "Package": "SKIT",
+      "Version": "0.0.2",
+      "Source": "Local",
+      "RemoteType": "local",
+      "RemoteUrl": "../r-packages/skit-0.0.2.tar.gz",
+      "Requirements": [
+        "stats",
+        "utils"
+      ],
+      "Hash": "2275d95cc24583400b43f49884de7fd9"
+    },
     "SparseM": {
       "Package": "SparseM",
       "Version": "1.81",
