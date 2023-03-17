@@ -252,6 +252,28 @@ print(assocTable)
 
   data_input <- data_input %>% filter(Signature_name == signature_name_input) %>% select(-Signature_name)
 
+print("data_input")
+print(data_input)
+print("Var1 ---- args$associationVar$name")
+print(args$associationVar$name)
+print("Var2 ---- args$exposureVar$name")
+print(args$exposureVar$name)
+print("Type ---- args$associationVar$type")
+print(args$associationVar$type)
+print("Type ---- args$testType")
+print(args$testType)
+print("Filter1 : ---- args$associationVar$filter")
+print(args$associationVar$filter)
+print("Filter2: --- args$exposureVar$filter")
+print(args$exposureVar$filter)
+print("Collapse var 1 : ---------")
+print(args$associationVar$collapse)
+print("----- log1 --------")
+print(args$associationVar$log2)
+print("-------log2--------")
+print(args$exposureVar$log2)
+print("Plotpath")
+print(plotPath)
   # mSigPortal_associaiton(data = data_input, Var1 = args$associationVar$name, Var2 = args$exposureVar$name, type = args$associationVar$type,
   #   xlab = args$xlab, ylab = args$ylab,
   #   filter1 = args$associationVar$filter, filter2 = args$exposureVar$filter,
