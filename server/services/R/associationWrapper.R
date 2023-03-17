@@ -155,6 +155,7 @@ loadCollapse <- function(args, config) {
 }
 
 univariable <- function(args, config) {
+  source('services/R/Sigvisualfunc.R')
   setwd(config$wd)
   plotPath = paste0(config$savePath, 'association_result.svg')
   dataPath = paste0(config$savePath, 'asssociation_data.txt')

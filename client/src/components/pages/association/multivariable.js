@@ -227,7 +227,6 @@ export default function Multivariable() {
         dataPath: '',
       });
       try {
-        console.log('IM HERE');
         const { sessionId, stdout, output } = await (
           await fetch(`web/associationWrapper`, {
             method: 'POST',
@@ -266,7 +265,6 @@ export default function Multivariable() {
           })
         ).json();
 
-        console.log(output);
         const {
           plotPath,
           dataPath,
