@@ -39,9 +39,13 @@ RUN cd /tmp && \
 #     echo -e "CXX14FLAGS=-O3 -march=native -mtune=native -fPIC \nCXX14=g++" >> $HOME/.R/Makevars
 
 # install R packages with renv
-COPY /server /deploy/server/
+COPY server/renv.lock /deploy/server/
+COPY server/.Rprofile /deploy/server/
+COPY server/renv/activate.R /deploy/server/renv/
+COPY server/renv/settings.dcf /deploy/server/renv/
+
 WORKDIR /deploy/server
-RUN R -e "options(Ncpus=parallel::detectCores()); install.packages(c('renv', 'BiocManager'), repos = 'https://cloud.r-project.org/'); renv::restore()"
+# RUN R -e "options(Ncpus=parallel::detectCores()); install.packages(c('renv', 'BiocManager'), repos = 'https://cloud.r-project.org/'); renv::restore()"
 
 # install python packages
 RUN pip3 install pandas seaborn 
