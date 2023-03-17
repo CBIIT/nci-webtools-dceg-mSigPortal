@@ -1,6 +1,7 @@
 library(tidyverse)
 library(jsonlite)
 library(aws.s3)
+library(scales)
 
 # capture console output for all functions called in wrapper
 wrapper <- function(fn, args, config) {
