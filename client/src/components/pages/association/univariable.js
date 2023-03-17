@@ -62,7 +62,6 @@ export default function Univariable() {
 
   const [invalidAssocFilter, setInvalidAssocFilter] = useState(false);
   const [invalidExpFilter, setInvalidExpFilter] = useState(false);
-  let newId;
 
   // populate controls
   useEffect(() => {
@@ -96,7 +95,6 @@ export default function Univariable() {
     });
     return ref.current;
   }
-  console.log(associationVar);
   async function handleLoadData() {
     if (associationVar.filter && isNaN(associationVar.filter)) {
       setInvalidAssocFilter(true);
@@ -131,9 +129,6 @@ export default function Univariable() {
             }),
           })
         ).json();
-        console.log(collapseData);
-        newId = sessionId;
-        console.log(sessionId);
         const { collapseVar1, collapseVar2, error, uncaughtError } =
           collapseData;
 
@@ -163,8 +158,6 @@ export default function Univariable() {
       mergeState({ loadingParams: false });
     }
   }
-  console.log(newId);
-  console.log(id);
   function handleReset() {
     setInvalidAssocFilter(false);
     setInvalidExpFilter(false);
@@ -190,7 +183,6 @@ export default function Univariable() {
   }
 
   async function handleCalculate() {
-    console.log('Calculate');
     if (exposureVar.filter && isNaN(exposureVar.filter)) {
       setInvalidExpFilter(true);
     } else {
@@ -204,8 +196,6 @@ export default function Univariable() {
         dataPath: '',
       });
       try {
-        console.log('TRYYYYY');
-        console.log(signature);
         const { sessionId, stdout, output } = await (
           await fetch(`web/associationWrapper`, {
             method: 'POST',
@@ -245,7 +235,6 @@ export default function Univariable() {
           })
         ).json();
 
-        console.log(output);
         const {
           plotPath,
           dataPath,
