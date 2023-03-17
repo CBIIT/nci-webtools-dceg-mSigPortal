@@ -155,11 +155,6 @@ loadCollapse <- function(args, config) {
 }
 
 univariable <- function(args, config) {
-  print("_____________ARGS___________")
-  print(args)
-  print("CONFIG_______________________")
-  print(config)
-  source('services/R/Sigvisualfunc.R')
   setwd(config$wd)
   plotPath = paste0(config$savePath, 'association_result.svg')
   dataPath = paste0(config$savePath, 'asssociation_data.txt')
@@ -243,8 +238,7 @@ assocTable <- mSigPortal_associaiton_group(data = data_input, Group_Var = "Signa
     log1 = args$associationVar$log2, log2 = args$exposureVar$log2
     )
 
-print("---------------assocTable")
-print(assocTable)
+
   assocTable %>% write_delim(file = assocTablePath, delim = '\t', col_names = T, na = '')
   ## put result as a short table above the figure
 
@@ -253,28 +247,6 @@ print(assocTable)
 
   data_input <- data_input %>% filter(Signature_name == signature_name_input) %>% select(-Signature_name)
 
-print("data_input")
-print(data_input)
-print("Var1 ---- args$associationVar$name")
-print(args$associationVar$name)
-print("Var2 ---- args$exposureVar$name")
-print(args$exposureVar$name)
-print("Type ---- args$associationVar$type")
-print(args$associationVar$type)
-print("Type ---- args$testType")
-print(args$testType)
-print("Filter1 : ---- args$associationVar$filter")
-print(args$associationVar$filter)
-print("Filter2: --- args$exposureVar$filter")
-print(args$exposureVar$filter)
-print("Collapse var 1 : ---------")
-print(args$associationVar$collapse)
-print("----- log1 --------")
-print(args$associationVar$log2)
-print("-------log2--------")
-print(args$exposureVar$log2)
-print("Plotpath")
-print(plotPath)
   # mSigPortal_associaiton(data = data_input, Var1 = args$associationVar$name, Var2 = args$exposureVar$name, type = args$associationVar$type,
   #   xlab = args$xlab, ylab = args$ylab,
   #   filter1 = args$associationVar$filter, filter2 = args$exposureVar$filter,
@@ -392,6 +364,7 @@ multivariable <- function(args, config) {
   data_input <- data_input %>% filter(Signature_name == signature_name_input) %>% select(-Signature_name)
 
   mSigPortal_associaiton(data = data_input, type = args$testType, regression = TRUE, formula = rformula, output_plot = plotPath)
+
   data_input %>% write_delim(file = dataPath, delim = '\t', col_names = T, na = '')
 
   return(list(plotPath = plotPath, dataPath = dataPath, assocTablePath = assocTablePath, dataTable = assocTable, signatureOptions = signature_name_list))
