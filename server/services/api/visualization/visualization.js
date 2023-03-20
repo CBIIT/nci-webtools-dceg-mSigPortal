@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import path from 'path';
 import {
   getSeqmatrixData,
   getSeqmatrixOptions,
@@ -6,6 +7,8 @@ import {
   getClusterData,
   getRefgenomeData,
 } from '../../query.js';
+
+const env = process.env;
 
 async function querySeqmatrix(req, res, next) {
   try {
@@ -16,6 +19,7 @@ async function querySeqmatrix(req, res, next) {
     //     'Missing one or more of the following parameters: study, cancer, strategy'
     //   );
     // }
+
     const connection = userId
       ? req.app.locals.sqlite(userId, 'local')
       : req.app.locals.connection;
