@@ -2124,7 +2124,7 @@
     },
     "ggfun": {
       "Package": "ggfun",
-      "Version": "0.0.5",
+      "Version": "0.0.9",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -2133,7 +2133,7 @@
         "rlang",
         "utils"
       ],
-      "Hash": "be6dbe9ddc9cc77fb9277611eff20a96"
+      "Hash": "c970ab268b09d3c8b0f524294050860f"
     },
     "ggplot2": {
       "Package": "ggplot2",
@@ -2349,19 +2349,20 @@
     },
     "ggtree": {
       "Package": "ggtree",
-      "Version": "3.2.1",
-      "Source": "Bioconductor",
-      "RemoteType": "bioconductor",
+      "Version": "3.7.1.003",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "YuLab-SMU",
+      "RemoteRepo": "ggtree",
+      "RemoteRef": "master",
+      "RemoteSha": "2bbee05b68ab3259eb6a2e13bc7ccc71685e9a49",
       "Remotes": "GuangchuangYu/treeio",
-      "Remotes": "GuangchuangYu/treeio",
-      "git_url": "https://git.bioconductor.org/packages/ggtree",
-      "git_branch": "RELEASE_3_14",
-      "git_last_commit": "d3747e6",
-      "git_last_commit_date": "2021-11-14",
       "Requirements": [
         "R",
         "ape",
         "aplot",
+        "cli",
         "dplyr",
         "ggfun",
         "ggplot2",
@@ -2371,13 +2372,14 @@
         "purrr",
         "rlang",
         "scales",
+        "stats",
         "tidyr",
         "tidytree",
         "treeio",
         "utils",
         "yulab.utils"
       ],
-      "Hash": "5711c057a04e53ed1c70909939dd9ad9"
+      "Hash": "b3f9c1be6c3b886581d46e691991b38c"
     },
     "glue": {
       "Package": "glue",
@@ -4203,23 +4205,25 @@
     },
     "tidytree": {
       "Package": "tidytree",
-      "Version": "0.3.8",
+      "Version": "0.4.2",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R",
         "ape",
+        "cli",
         "dplyr",
         "lazyeval",
         "magrittr",
         "methods",
+        "pillar",
         "rlang",
         "tibble",
         "tidyr",
         "tidyselect",
         "yulab.utils"
       ],
-      "Hash": "66ad30d2d3eb876551650cdc315676e7"
+      "Hash": "6f2eb34d95db945d4dd022b0811e28db"
     },
     "tidyverse": {
       "Package": "tidyverse",
@@ -4283,17 +4287,18 @@
     },
     "treeio": {
       "Package": "treeio",
-      "Version": "1.19.1",
+      "Version": "1.23.1",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteUsername": "GuangchuangYu",
       "RemoteRepo": "treeio",
       "RemoteRef": "master",
-      "RemoteSha": "976d5643862aeff3583c4698c5f7237e24db9a7a",
+      "RemoteSha": "2f756cb04a3f7a9d9a7ad6723a2327c31361ecca",
       "Requirements": [
         "R",
         "ape",
+        "cli",
         "dplyr",
         "jsonlite",
         "magrittr",
@@ -4303,7 +4308,7 @@
         "tidytree",
         "utils"
       ],
-      "Hash": "707ffbbf3c90b63bce5c906cc6c84f15"
+      "Hash": "61ff44cdd602cbc45d190a15d63e2bdb"
     },
     "tweenr": {
       "Package": "tweenr",
