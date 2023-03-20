@@ -45,7 +45,7 @@ COPY server/renv/activate.R /deploy/server/renv/
 COPY server/renv/settings.dcf /deploy/server/renv/
 
 WORKDIR /deploy/server
-# RUN R -e "options(Ncpus=parallel::detectCores()); install.packages(c('renv', 'BiocManager'), repos = 'https://cloud.r-project.org/'); renv::restore()"
+RUN R -e "options(Ncpus=parallel::detectCores()); install.packages(c('renv', 'BiocManager'), repos = 'https://cloud.r-project.org/'); renv::restore()"
 
 # install python packages
 RUN pip3 install pandas seaborn 
