@@ -866,12 +866,12 @@
       "Version": "0.0.2",
       "Source": "Local",
       "RemoteType": "local",
-      "RemoteUrl": "../r-packages/skit-0.0.2.tar.gz",
+      "RemoteUrl": "./r-packages/skit-0.0.2.tar.gz",
       "Requirements": [
         "stats",
         "utils"
       ],
-      "Hash": "2275d95cc24583400b43f49884de7fd9"
+      "Hash": "178b509d57e6af0ef83ca53282f11198"
     },
     "SparseM": {
       "Package": "SparseM",
