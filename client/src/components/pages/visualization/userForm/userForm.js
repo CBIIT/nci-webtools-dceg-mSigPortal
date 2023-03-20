@@ -295,7 +295,8 @@ export default function UserForm() {
                     label={
                       inputFile.name || inputFilename || 'Upload Data File...'
                     }
-                    accept=".csv, .tsv, .vcf, .gz, .tar, .tar.gz, .txt"
+                    //accept=".csv, .tsv, .vcf, .gz, .tar, .tar.gz, .txt"
+                    accept=".csv, .tsv, .vcf, .gz, .tar, .gz, .txt"
                     isInvalid={errors.inputFile}
                     feedback="Please upload a data file"
                     onChange={(e) => {
