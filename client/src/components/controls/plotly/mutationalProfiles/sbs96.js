@@ -5,8 +5,8 @@ import {
   createMutationShapes,
   createMutationAnnotations,
   getTotalMutations,
-} from './utils';
-import { sbsColor } from '../../utils/colors';
+} from './utils.js';
+import { sbsColor } from '../../utils/colors.js';
 
 export default function SBS96(apiData, title = '') {
   const colors = sbsColor;
