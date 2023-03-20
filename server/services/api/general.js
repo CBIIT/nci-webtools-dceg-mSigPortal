@@ -4,13 +4,9 @@ import fs from 'fs';
 import { randomUUID } from 'crypto';
 import { validate } from 'uuid';
 import Papa from 'papaparse';
-import tar from 'tar';
 import rWrapper from 'r-wrapper';
 import AWS from 'aws-sdk';
-import XLSX from 'xlsx';
-import replace from 'replace-in-file';
 import Router from 'express-promise-router';
-import { getObjectBuffer } from '../s3.js';
 import { mkdirs } from '../utils.js';
 const r = rWrapper.async;
 
@@ -39,43 +35,22 @@ function parseCSV(filepath) {
   });
 }
 
-async function importUserSession(connection, data, userSchema) {
-  const tables = userSchema.filter((e) => !e.type || e.type === 'table');
-  const materializedViews = userSchema.filter(
-    (e) => e.type === 'materializedView'
-  );
-  const indexedTables = userSchema.filter((s) => typeof s.index === 'function');
-  try {
-    // create tables
-    for (const { name, schema } of tables) {
-      await connection.schema.createTable(name, (table) =>
-        schema(table, connection)
-      );
-    }
-    // import data
-    for (const [tableName, tableData] of Object.entries(data))
-      await connection.batchInsert(tableName, tableData, 100);
-    // create "materialized" style tables
-    for (const { create } of materializedViews) {
-      await create(connection);
-    }
-    // index tables
-    for (const { name, index } of indexedTables) {
-      await connection.schema.table(name, index);
-    }
-    return true;
-  } catch (error) {
-    logger.error(error);
-    return false;
-  }
-}
-
 function upload(req, res, next) {
   const { logger } = req.app.locals;
-  const id = req.params.id;
+  const { module, id } = req.params;
   if (!validate(id)) next(new Error('Invalid ID'));
+  if (!module && !id) next(new Error('module name and session id required'));
+
+  const inputFolderMap = {
+    visualization: env.INPUT_FOLDER,
+    exploration: env.INPUT_FOLDER,
+    extraction: env.EXTRACTION_INPUT_FOLDER,
+  };
+  const inputFolder =
+    inputFolderMap[module] || path.resolve(env.DATA_FOLDER, module, 'input');
+
   const form = formidable({
-    uploadDir: path.resolve(env.INPUT_FOLDER, id),
+    uploadDir: path.resolve(inputFolder, id),
     multiples: true,
   });
 
@@ -84,7 +59,7 @@ function upload(req, res, next) {
 
   form
     .on('fileBegin', (field, file) => {
-      const destination = path.join(form.uploadDir, file.originalFilename);
+      const destination = path.resolve(form.uploadDir, file.originalFilename);
       file.filepath = destination;
     })
     .on('error', (err) => {
@@ -140,52 +115,6 @@ async function associationWrapper(req, res, next) {
     next(err);
   }
 }
-
-// async function getExposureExample(req, res, next) {
-//   try {
-//     const { example } = req.params;
-//     logger.info(`Fetching Exposure example: ${example}`);
-//     // check exists
-//     const examplePath = path.resolve(
-//       config.data.examples,
-//       'exposure',
-//       `${example}.tgz`
-//     );
-//     if (fs.existsSync(examplePath)) {
-//       // copy example to results with unique id
-//       const id = randomUUID();
-//       const resultsPath = path.resolve(config.results.folder, id);
-//       await fs.promises.mkdir(resultsPath, { recursive: true });
-//       // await fs.copy(examplePath, resultsPath);
-//       await new Promise((resolve, reject) => {
-//         fs.createReadStream(examplePath)
-//           .on('end', () => resolve())
-//           .on('error', (err) => reject(err))
-//           .pipe(tar.x({ strip: 1, C: resultsPath }));
-//       });
-//       const paramsPath = path.join(resultsPath, `params.json`);
-//       // rename file paths with new ID
-//       let params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
-//       const oldID = params.main.id;
-//       await replace({
-//         files: paramsPath,
-//         from: new RegExp(oldID, 'g'),
-//         to: id,
-//       });
-//       params = JSON.parse(String(await fs.promises.readFile(paramsPath)));
-//       res.json({
-//         state: {
-//           ...params,
-//           main: { ...params.main, id },
-//         },
-//       });
-//     } else {
-//       throw `Invalid example`;
-//     }
-//   } catch (error) {
-//     next(error);
-//   }
-// }
 
 async function getImageS3Batch(req, res, next) {
   // serve static images from s3
@@ -267,8 +196,7 @@ const getDataUsingS3Select = (params) => {
 };
 
 const router = Router();
-router.post('/upload/:id?', upload);
-router.get('/getExposureExample/:example', getExposureExample);
+router.post('/upload/:module?/:id?', upload);
 router.post('/getImageS3Batch', getImageS3Batch);
 router.post('/getImageS3', getImageS3);
 router.post('/getFileS3', getFileS3);
@@ -277,9 +205,7 @@ router.post('/associationWrapper', associationWrapper);
 export {
   router,
   parseCSV,
-  importUserSession,
   upload,
-  getExposureExample,
   getImageS3Batch,
   getImageS3,
   getFileS3,

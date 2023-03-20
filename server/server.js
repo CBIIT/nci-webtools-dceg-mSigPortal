@@ -51,11 +51,11 @@ function createApp(env) {
       database: env.POSTGRES_DB,
     },
   });
-  app.locals.sqlite = (userId, db) =>
+  app.locals.sqlite = (id, filename) =>
     knex({
       client: 'better-sqlite3',
       connection: {
-        filename: path.join(env.OUTPUT_FOLDER, userId, `${db}.sqlite3`),
+        filename: path.join(env.OUTPUT_FOLDER, id, `${filename}.sqlite3`),
       },
       useNullAsDefault: true,
     });

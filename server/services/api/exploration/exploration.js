@@ -9,7 +9,6 @@ import {
 import { addBurden } from './burden.js';
 import rWrapper from 'r-wrapper';
 import path from 'path';
-import fs from 'fs-extra';
 import { mkdirs } from '../../utils.js';
 const { Router } = express;
 const r = rWrapper.async;

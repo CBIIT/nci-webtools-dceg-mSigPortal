@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { validate } from 'uuid';
 import path from 'path';
-import { parseCSV, importUserSession } from '../general.js';
+import { parseCSV } from '../general.js';
 import { schema } from './userSchema.js';
 import { getSignatureData } from '../../query.js';
 import { mkdirs } from '../../utils.js';
+import { sqliteImport } from '../../sqlite.js';
 
 const env = process.env;
 
@@ -76,7 +77,7 @@ async function submit(req, res, next) {
   // import data into user session table
   const connection = req.app.locals.sqlite(id, 'local');
   try {
-    const importStatus = await importUserSession(
+    const importStatus = await sqliteImport(
       connection,
       {
         exposure: transformExposure,
