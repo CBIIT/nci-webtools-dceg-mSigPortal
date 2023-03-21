@@ -16,28 +16,75 @@ export default function ID29(apiData, title = '') {
     '[->1]': '#009e73',
     '[-]': '#911eb4',
   };
-  const mutationTypeSort = (a, b) => {
-    const mutationTypeOrder = [
-      'A',
-      'G',
-      'C',
-      'T',
-      'CC',
-      'TT',
-      'LR',
-      'NonR',
-      'Rep',
-      'MH',
-    ];
-    const mutationRegex = /\[.*\](.*)/;
 
-    return (
-      mutationTypeOrder.indexOf(a.mutationType.match(mutationRegex)[1]) -
-      mutationTypeOrder.indexOf(b.mutationType.match(mutationRegex)[1])
-    );
+  // const mutationTypeSort = (a, b) => {
+  //   const mutationTypeOrder = [
+  //     'A',
+  //     'G',
+  //     'C',
+  //     'T',
+  //     'CC',
+  //     'TT',
+  //     'LR',
+  //     'NonR',
+  //     'Rep',
+  //     'MH',
+  //   ];
+  //   const mutationRegex = /\[.*\](.*)/;
+
+  //   return (
+  //     mutationTypeOrder.indexOf(a.mutationType.match(mutationRegex)[1]) -
+  //     mutationTypeOrder.indexOf(b.mutationType.match(mutationRegex)[1])
+  //   );
+  // };
+  const mutationTypeSort = (a, b) => {
+    // A G T C CC LR     [+c]
+    // A C G T TT LR     [+T]
+    // NonR Rep          [+>1]
+    // A G T C CC LR     [-C]
+    // A C G T TT LR     [-T]
+    // NonR Rep MH       [->1]
+    const mutationTypeOrder = [
+      '[+C]A',
+      '[+C]G',
+      '[+C]T',
+      '[+C]C',
+      '[+C]CC',
+      '[+C]LR',
+      '[+T]A',
+      '[+T]C',
+      '[+T]G',
+      '[+T]T',
+      '[+T]TT',
+      '[+T]LR',
+      '[+>1]NonR',
+      '[+>1]Rep',
+      '[-C]A',
+      '[-C]G',
+      '[-C]T',
+      '[-C]C',
+      '[-C]CC',
+      '[-C]LR',
+      '[-T]A',
+      '[-T]C',
+      '[-T]G',
+      '[-T]T',
+      '[-T]TT',
+      '[-T]LR',
+      '[->1]NonR',
+      '[->1]Rep',
+      '[-]MH',
+    ];
+
+    const aType = a.mutationType;
+    const bType = b.mutationType;
+
+    return mutationTypeOrder.indexOf(aType) - mutationTypeOrder.indexOf(bType);
   };
+
   const groupRegex = /(\[.*\])/;
 
+  console.log(apiData);
   const mutationGroupSort = (a, b) => {
     const order = Object.keys(colors);
     return order.indexOf(a.mutation) - order.indexOf(b.mutation);
