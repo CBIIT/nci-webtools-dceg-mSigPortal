@@ -1,4 +1,4 @@
-import { createSampleAnnotation } from './utils';
+import { createSampleAnnotation } from './utils.js';
 
 export default function DBS186(data, title = '') {
   const colors = {

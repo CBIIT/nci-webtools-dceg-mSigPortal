@@ -4,7 +4,7 @@ import {
   groupDataByMutation,
   createMutationShapes,
   createMutationAnnotations,
-} from './utils';
+} from './utils.js';
 
 export default function ID29(apiData, title = '') {
   const colors = {

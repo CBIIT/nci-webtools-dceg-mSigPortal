@@ -1,5 +1,5 @@
 import { rs32Color } from '../../utils/colors';
-import { createSampleAnnotation } from './utils';
+import { createSampleAnnotation } from './utils.js';
 export default function RS32(apiData, title = '') {
   const colors = rs32Color;
 

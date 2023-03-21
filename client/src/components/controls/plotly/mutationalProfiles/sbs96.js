@@ -5,7 +5,7 @@ import {
   createMutationShapes,
   createMutationAnnotations,
   getTotalMutations,
-} from './utils';
+} from './utils.js';
 import { sbsColor } from '../../utils/colors';
 
 export default function SBS96(apiData, title = '') {

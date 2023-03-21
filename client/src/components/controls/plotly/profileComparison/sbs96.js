@@ -1,4 +1,4 @@
-import { compareProfiles } from './profileComparison';
+import { compareProfiles } from './profileComparison.js';
 import { MsIndividualComparison } from '../msIndividual/msIndividual';
 
 export default function sbs96(data1, data2, tab) {

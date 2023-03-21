@@ -6,7 +6,7 @@ import {
   groupDataByMutation,
   createMutationShapes,
   createMutationAnnotations,
-} from './utils';
+} from './utils.js';
 
 export default function DBS78(apiData, title = '') {
   const colors = dbs78Color;

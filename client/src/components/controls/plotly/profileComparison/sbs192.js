@@ -4,7 +4,7 @@ import {
   groupDataByMutation,
   getRss,
   getCosineSimilarity,
-} from './profileComparison';
+} from './profileComparison.js';
 
 export default function sbs192(data1, data2) {
   const colors = {
