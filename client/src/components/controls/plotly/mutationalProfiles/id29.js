@@ -113,6 +113,12 @@ export default function ID29(apiData, title = '') {
     autosize: true,
 
     xaxis: {
+      title: {
+        text: '<b>Indel</b>',
+        font: {
+          family: 'Times New Roman',
+        },
+      },
       showline: true,
       tickangle: 45,
       tickfont: {
