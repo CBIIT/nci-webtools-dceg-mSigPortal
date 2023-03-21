@@ -17,26 +17,6 @@ export default function ID29(apiData, title = '') {
     '[-]': '#911eb4',
   };
 
-  // const mutationTypeSort = (a, b) => {
-  //   const mutationTypeOrder = [
-  //     'A',
-  //     'G',
-  //     'C',
-  //     'T',
-  //     'CC',
-  //     'TT',
-  //     'LR',
-  //     'NonR',
-  //     'Rep',
-  //     'MH',
-  //   ];
-  //   const mutationRegex = /\[.*\](.*)/;
-
-  //   return (
-  //     mutationTypeOrder.indexOf(a.mutationType.match(mutationRegex)[1]) -
-  //     mutationTypeOrder.indexOf(b.mutationType.match(mutationRegex)[1])
-  //   );
-  // };
   const mutationTypeSort = (a, b) => {
     // A G T C CC LR     [+c]
     // A C G T TT LR     [+T]
@@ -84,7 +64,6 @@ export default function ID29(apiData, title = '') {
 
   const groupRegex = /(\[.*\])/;
 
-  console.log(apiData);
   const mutationGroupSort = (a, b) => {
     const order = Object.keys(colors);
     return order.indexOf(a.mutation) - order.indexOf(b.mutation);
