@@ -161,10 +161,7 @@ export default function App() {
           <Switch>
             <Route path="/" exact={true} children={<Home links={links} />} />
             <Route path="/about" children={<About />} />
-            <Route
-              path="/visualization/:type?/:id?"
-              children={<Visualization />}
-            />
+            <Route path="/visualization/:id?" children={<Visualization />} />
             <Route path="/catalog" children={<Catalog />} />
             <Route
               path="/exploration/:exampleName?"

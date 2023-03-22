@@ -1,29 +1,21 @@
 import { useState, useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import Select from '../../../controls/select/selectForm';
+import Select from '../../../controls/select/selectHookForm';
 import { useForm } from 'react-hook-form';
 import { NavHashLink } from 'react-router-hash-link';
-import { useSelector, useDispatch } from 'react-redux';
-import { actions } from '../../../../services/store/visualization';
 import { useProfileComparisonPublicQuery } from './apiSlice';
 import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plotly from '../../../controls/plotly/plot/plot';
 
-export default function PcPublic() {
-  const dispatch = useDispatch();
-  const store = useSelector((state) => state.visualization);
-  const mergeForm = (state) =>
-    dispatch(
-      actions.mergeVisualization({
-        profileComparison: { ...store.profileComparison, publicForm: state },
-      })
-    );
+export default function PcPublic({ state }) {
+  const [params, setParams] = useState('');
+  const { id } = state;
 
-  const { matrixData, id } = store.main;
-  const { publicForm } = store.profileComparison;
-
-  const [params, setParams] = useState(null);
+  const { data: options } = useSeqmatrixOptionsQuery(
+    { userId: id },
+    { skip: !id }
+  );
 
   const { data, error, isFetching } = useProfileComparisonPublicQuery(params, {
     skip: !params,
@@ -79,7 +71,14 @@ export default function PcPublic() {
   }
 
   const { control, handleSubmit, watch, setValue } = useForm({
-    defaultValues: publicForm,
+    defaultValues: {
+      profile: '',
+      matrix: '',
+      userSample: '',
+      study: '',
+      cancer: '',
+      publicSample: '',
+    },
   });
 
   const { profile, matrix, userSample, study, cancer, publicSample } = watch();
@@ -87,10 +86,10 @@ export default function PcPublic() {
   const supportedProfiles = ['SBS', 'DBS', 'ID'];
   const supportedMatrices = [96, 192, 78, 83];
 
-  const profileOptions = matrixData.length
+  const profileOptions = options
     ? [
         ...new Set(
-          matrixData.map((e) => e.profile).sort((a, b) => b.localeCompare(a))
+          options.map((e) => e.profile).sort((a, b) => b.localeCompare(a))
         ),
       ]
         .filter((e) => supportedProfiles.includes(e))
@@ -101,10 +100,10 @@ export default function PcPublic() {
     : [];
 
   const matrixOptions = (profile) =>
-    matrixData.length && profile
+    options && profile
       ? [
           ...new Set(
-            matrixData
+            options
               .filter((e) => e.profile == profile.value)
               .map((e) => e.matrix)
           ),
@@ -118,10 +117,10 @@ export default function PcPublic() {
       : [];
 
   const userSampleOptions = (profile, matrix) =>
-    matrixData.length && profile
+    options && profile
       ? [
           ...new Set(
-            matrixData
+            options
               .filter(
                 (e) => e.profile == profile.value && e.matrix == matrix.value
               )
@@ -180,7 +179,6 @@ export default function PcPublic() {
       sample: data.publicSample.value,
     };
     setParams({ userParams, publicParams });
-    mergeForm(data);
   }
 
   return (

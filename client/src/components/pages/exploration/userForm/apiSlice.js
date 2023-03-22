@@ -4,7 +4,7 @@ export const userFormApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     uploadExploration: builder.mutation({
       query: (formData) => ({
-        url: `upload/${crypto.randomUUID()}`,
+        url: `upload/exploration/${crypto.randomUUID()}`,
         method: 'POST',
         body: formData,
       }),

@@ -10,7 +10,7 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as exposureActions } from '../../../../services/store/exploration';
 import { useMsIndividualQuery } from './apiSlice';
-import Select from '../../../controls/select/selectForm';
+import Select from '../../../controls/select/selectHookForm';
 import Plotly from '../../../controls/plotly/plot/plot';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 const { Group, Check } = Form;

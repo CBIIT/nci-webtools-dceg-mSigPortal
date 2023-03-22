@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Form, Row, Col, Nav, Button } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import {
@@ -23,155 +23,109 @@ import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
 import './visualization.scss';
+import { useRefreshQuery } from './userForm/apiSlice';
 
 const actions = { ...visualizationActions, ...modalActions };
 const { Group, Label, Check } = Form;
 
 export default function Visualization() {
   const dispatch = useDispatch();
-  const store = useSelector((state) => state.visualization);
   const mergeState = (state) =>
     dispatch(actions.mergeVisualization({ main: state }));
-
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
+  const { main, publicForm, mutationalProfiles } = useSelector(
+    (state) => state.visualization
+  );
   const {
     openSidebar,
     loading,
     source,
     submitted,
-    queueExpired,
     error,
     displayTab,
-    svgList,
-    matrixList,
-    matrixData,
-  } = store.main;
+    ...state
+  } = main;
 
-  const urlParams = useParams();
-  const { type } = urlParams;
-  const id = store.main.id || urlParams.id;
+  const id = useParams().id || state.id;
+  const { data: jobInfo, refetch: refreshJob } = useRefreshQuery(id, {
+    skip: !id,
+  });
+  const status = jobInfo?.status;
+  const manifest = jobInfo?.manifest;
+  const params = jobInfo?.params;
+  const isDone = ['COMPLETED', 'FAILED'].includes(status?.status);
+  const completed =
+    (source === 'user' && status?.status === 'COMPLETED') ||
+    (source === 'public' && submitted);
 
-  // when retrieving queued result, update id in store
+  const refreshState = useCallback(() => {
+    refreshJob();
+  }, [refreshJob]);
+
+  // refresh job status every minute
   useEffect(() => {
-    if (id && !loading.active && !submitted && !id) {
-      if (type == 'queue') {
-        loadQueueResult(id);
-      } else if (type == 'example') {
-        loadExample(id);
-      }
-    }
-  }, [id, loading.active]);
-
-  // switch to first tab after fetching samples
+    const interval = setInterval(refreshState, 1000 * 60);
+    if (isDone) clearInterval(interval);
+    return () => clearInterval(interval);
+  }, [isDone, refreshState]);
+  // switch to first tab when job is complete
   useEffect(() => {
-    if (matrixData.length) {
-      mergeState({ displayTab: 'profilerSummary', openSidebar: false });
-    }
-  }, [matrixData]);
-
-  async function loadQueueResult(id) {
-    mergeState({
-      loading: {
-        active: true,
-        // content: 'Loading Queued Result',
-        // showIndicator: true,
-      },
-    });
-    try {
-      const { args, visualization, timestamp } = await (
-        await fetch(`web/getQueueResults/${id}`)
-      ).json();
-      dispatch(actions.mergeVisualization(visualization));
-    } catch (error) {
+    if (status && status.status === 'COMPLETED' && displayTab == 'instructions')
       mergeState({
-        queueExpired: true,
+        displayTab: 'profilerSummary',
+        openSidebar: false,
+        source: 'user',
       });
-    }
-    mergeState({
-      loading: { active: false },
-      submitted: true,
-      // displayTab: 'profilerSummary',
-      // openSidebar: false,
-    });
-  }
-
-  async function loadExample(id) {
-    mergeState({
-      loading: {
-        active: true,
-        // content: 'Loading Example',
-        // showIndicator: true,
-      },
-    });
-    try {
-      const { id, state: visualizationStore } = await (
-        await fetch(`web/getVisExample/${id}`)
-      ).json();
-      dispatch(
-        actions.mergeVisualization({
-          ...visualizationStore,
-          state: { ...visualizationStore.main, id },
-        })
-      );
-    } catch (error) {
-      mergeError(`Example: ${id} does not exist`);
-    }
-    mergeState({
-      loading: { active: false },
-      submitted: true,
-      // displayTab: 'profilerSummary',
-      // openSidebar: false,
-    });
-  }
+  }, [status]);
 
   const tabs = [
     {
       name: 'Instructions',
       id: 'instructions',
-      component: <Instructions />,
+      disabled: false,
     },
     {
       name: 'Profiler Summary',
       id: 'profilerSummary',
-      component: <ProfilerSummary />,
+      disabled: !completed,
     },
     {
       name: 'Mutational Profiles',
       id: 'mutationalProfiles',
-      component: <MutationalProfiles />,
+      disabled: !completed,
     },
     {
       name: 'Tree and Leaf',
       id: 'treeAndLeaf',
-      component: <TreeAndLeaf />,
+      disabled: !completed,
     },
     {
       name: 'Cosine Similarity',
       id: 'cosineSimilarity',
-      component: <CosineSimilarity />,
+      disabled: !completed,
     },
     {
       name: 'Profile Comparison',
       id: 'profileComparison',
-      component: <ProfileComparison />,
+      disabled: !completed,
     },
     {
       name: 'PCA',
       id: 'pca',
-      component: <PCA />,
+      disabled: !completed,
     },
     {
       name: 'Mutational Pattern Enrichment Analysis',
       id: 'mutationalPattern',
-      component: <MutationalPattern />,
+      disabled: !completed,
     },
 
     source == 'user' && {
       name: 'Clustered Mutations Identification',
       id: 'cluster',
-      component: <ClusteredIdentification />,
+      disabled: !completed,
     },
     // {
     //   name: 'Download',
@@ -185,38 +139,30 @@ export default function Visualization() {
       <div className="mx-3">
         <div className="mx-3 bg-white border border-top-0">
           {/* for desktops and tablets */}
-
           <div className="d-none d-md-block">
             <Nav defaultActiveKey="profilerSummary">
               {tabs
                 .filter((e) => e)
-                .map(({ name, id }) => (
-                  <div key={id} className="d-inline-block">
+                .map(({ name, id, disabled }, i) => (
+                  <div key={name} className="d-inline-block">
                     <Button
                       variant="link"
-                      className={`secondary-navlinks px-3 py-1 d-inline-block border-0 rounded-0 ${
-                        id == displayTab
+                      className={`secondary-navlinks px-3 py-1 d-inline-block border-0 text-exploration rounded-0 ${
+                        id === displayTab
                           ? 'bg-visualization text-white'
                           : 'text-visualization'
                       }`}
-                      active={id == displayTab}
-                      disabled={
-                        id != 'instructions' &&
-                        !(source == 'public'
-                          ? matrixData.length
-                          : matrixList.length)
-                      }
+                      disabled={disabled}
                       style={{
                         textDecoration: 'none',
                         fontSize: '12pt',
-                        color: '#3a7867',
+                        color: '#42688b',
                         fontWeight: '500',
                       }}
                       onClick={() => mergeState({ displayTab: id })}
                     >
                       {name}
                     </Button>
-                    <div className="d-md-none w-100"></div>
                   </div>
                 ))}
             </Nav>
@@ -225,29 +171,34 @@ export default function Visualization() {
           {/* for mobile devices */}
           <div className="e d-md-none">
             <Nav defaultActiveKey="summary">
-              {tabs.map(({ name, id }) => (
-                <div key={id + 'm'} className="col-12 text-center">
-                  <Button
-                    variant="link"
-                    className={
-                      id == displayTab &&
-                      (matrixData.length || Object.keys(svgList).length)
-                        ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-visualization text-white rounded-0'
-                        : 'secondary-navlinks px-3 py-1 d-inline-block border-0 rounded-0'
-                    }
-                    style={{
-                      textDecoration: 'none',
-                      fontSize: '12pt',
-                      color: '#3a7867',
-                      fontWeight: '500',
-                    }}
-                    onClick={() => mergeState({ displayTab: id })}
-                  >
-                    {name}
-                  </Button>
-                  <div className="d-md-none w-100"></div>
-                </div>
-              ))}
+              {tabs
+                .filter((e) => e)
+                .map(({ name, id, disabled }, i) => {
+                  if (name)
+                    return (
+                      <div key={name} className="col-12 text-center">
+                        <Button
+                          variant="link"
+                          className={
+                            id === displayTab
+                              ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-visualization text-white rounded-0'
+                              : 'secondary-navlinks px-3 py-1 d-inline-block border-0 rounded-0'
+                          }
+                          disabled={disabled}
+                          style={{
+                            textDecoration: 'none',
+                            fontSize: '12pt',
+                            color: '#837244',
+                            fontWeight: '500',
+                          }}
+                          onClick={() => mergeState({ displayTab: id })}
+                        >
+                          {name}
+                        </Button>
+                        <div className="d-md-none w-100"></div>
+                      </div>
+                    );
+                })}
             </Nav>
           </div>
         </div>
@@ -309,31 +260,94 @@ export default function Visualization() {
           <hr className="d-lg-none" style={{ opacity: 0 }}></hr>
         </SidebarPanel>
         <MainPanel className="col-lg-9 col-md-7">
-          {queueExpired && (
-            <div className="bg-warning mb-3 p-3 border rounded">
-              <span>Queue results have expired</span>
+          {status && status.status === 'SUBMITTED' && (
+            <div className="border rounded bg-white mb-3 p-3">
+              <p>
+                Your job has been submitted. You will receive an email once it
+                is complete.
+              </p>
             </div>
           )}
-          {error && (
-            <div className="bg-danger text-white mb-3 p-3 border rounded">
-              {error}
+          {status && status.status === 'IN_PROGRESS' && (
+            <div className="border rounded bg-white mb-3 p-3">
+              <p>Your analysis is currently in progress.</p>
+              <LoadingOverlay active={true} />
             </div>
           )}
-          <div>
-            <LoadingOverlay
-              active={loading.active}
-              content={loading.content}
-              showIndicator={loading.showIndicator}
-            />
-            <div style={{ minHeight: '500px' }}>
-              {tabs.filter((tab) => tab.id == displayTab)[0].component}
-              {/* {tabs.map((tab) => (
-                <div className={tab.id == displayTab ? 'd-block' : 'd-none'}>
-                  {tab.component}
-                </div>
-              ))} */}
+          {status && status.status === 'FAILED' && (
+            <div className="border rounded bg-white mb-3 p-3">
+              <p>
+                Your analysis failed with the following error:{' '}
+                {status?.error?.message || 'INTERNAL ERROR'}. Please contact the
+                site administrator for assistance if this issue persists.
+              </p>
             </div>
+          )}
+
+          <div className={displayTab === 'instructions' ? 'd-block' : 'd-none'}>
+            <Instructions />
           </div>
+          {completed && (
+            <>
+              <div
+                className={
+                  displayTab === 'profilerSummary' ? 'd-block' : 'd-none'
+                }
+              >
+                <ProfilerSummary state={{ ...publicForm, ...main, id }} />
+              </div>
+              <div
+                className={
+                  displayTab === 'mutationalProfiles' ? 'd-block' : 'd-none'
+                }
+              >
+                <MutationalProfiles
+                  state={{ ...publicForm, ...main, mutationalProfiles, id }}
+                />
+              </div>
+              <div
+                className={displayTab === 'treeAndLeaf' ? 'd-block' : 'd-none'}
+              >
+                <TreeAndLeaf state={{ ...publicForm, ...main, id }} />
+              </div>
+              <div
+                className={
+                  displayTab === 'cosineSimilarity' ? 'd-block' : 'd-none'
+                }
+              >
+                <CosineSimilarity state={{ ...publicForm, ...main, id }} />
+              </div>
+              <div
+                className={
+                  displayTab === 'profileComparison' ? 'd-block' : 'd-none'
+                }
+              >
+                <ProfileComparison state={{ ...publicForm, ...main, id }} />
+              </div>
+              <div className={displayTab === 'pca' ? 'd-block' : 'd-none'}>
+                <PCA state={{ ...publicForm, ...main, id }} />
+              </div>
+              <div
+                className={
+                  displayTab === 'mutationalPattern' ? 'd-block' : 'd-none'
+                }
+              >
+                <MutationalPattern state={{ ...publicForm, ...main, id }} />
+              </div>
+              {source == 'user' && (
+                <div
+                  className={displayTab === 'cluster' ? 'd-block' : 'd-none'}
+                >
+                  <ClusteredIdentification
+                    state={{ ...publicForm, ...main, params, id }}
+                  />
+                </div>
+              )}
+              <div className={displayTab === 'download' ? 'd-block' : 'd-none'}>
+                <Download state={{ ...publicForm, ...main, id }} />
+              </div>
+            </>
+          )}
         </MainPanel>
       </SidebarContainer>
     </div>

@@ -1,14 +1,14 @@
 import { useEffect, useState, useMemo } from 'react';
 import Table from '../../../controls/table/table2';
 import Plotly from '../../../controls/plotly/plot/plot';
-import { useSelector } from 'react-redux';
+
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { useClusteredQuery } from './apiSlice';
 
-export default function ClusteredPlot() {
-  const store = useSelector((state) => state.visualization);
-  const { cluster, id } = store.userForm;
-  const { sample } = store.clustered;
+export default function ClusteredPlot({ state, form }) {
+  const { params: visParams, id } = state;
+  const { sample } = form;
+  const cluster = visParams.Cluster === 'True';
 
   const [params, setParams] = useState();
 
